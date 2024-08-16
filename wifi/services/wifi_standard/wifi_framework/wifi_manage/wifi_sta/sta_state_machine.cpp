@@ -4387,20 +4387,20 @@ void StaStateMachine::SetConnectMethod(int connectMethod)
     return;
 }
 
-bool StaStateMachine::IsGoodSignalQuality()
+bool StaStateMachine::IsGoodSignalQuality(const NetworkStatus &networkStatus)
 {
     const WifiLinkedInfo singalInfo = linkedInfo;
     bool isGoodSignal = true;
     if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency)) {
-        if (singalInfo.rssi <= RSSI_LEVEL_1_5G) {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_5G && networkStatus == NetworkStatus::NO_INTERNET) {
             isGoodSignal = false;
         }
     } else {
-        if (singalInfo.rssi <= RSSI_LEVEL_1_2G) {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_2G && networkStatus == NetworkStatus::NO_INTERNET) {
             isGoodSignal = false;
         }
     }
-    if (singalInfo.chload >= MAX_CHLOAD) {
+    if (singalInfo.chload >= MAX_CHLOAD && networkStatus == NetworkStatus::NO_INTERNET) {
         isGoodSignal = false;
     }
     return isGoodSignal;

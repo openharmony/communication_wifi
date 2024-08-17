@@ -3201,7 +3201,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 void StaStateMachine::HandlePortalNetworkPorcess()
 {
 #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("portal uri is %{public}s\n", mPortalUrl.c_str());
+    WIFI_LOGI("portal uri is %{private}s\n", mPortalUrl.c_str());
     int netId = m_NetWorkState->GetWifiNetId();
     AAFwk::Want want;
     want.SetAction(PORTAL_ACTION);

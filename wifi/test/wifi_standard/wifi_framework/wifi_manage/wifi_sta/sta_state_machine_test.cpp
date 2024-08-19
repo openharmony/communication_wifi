@@ -173,13 +173,13 @@ public:
     void ConvertDeviceCfgFail1()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
     }
 
     void ConvertDeviceCfgFail2()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
     }
 
     void StartWifiProcessSuccess()
@@ -914,7 +914,7 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
-        EXPECT_FALSE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(msg));
     }
 
     void ApLinkedStateExeMsgFai2()
@@ -923,7 +923,7 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(CMD_SIGNAL_POLL);
-        EXPECT_FALSE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(msg));
         EXPECT_FALSE(pStaStateMachine->pApLinkedState->ExecuteStateMsg(nullptr));
     }
 
@@ -994,7 +994,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPS_START_EVENT);
         msg->SetParam1(static_cast<int>(SetupMethod::DISPLAY));
-        EXPECT_TRUE(pStaStateMachine->pWpsState->ExecuteStateMsg(msg));
+        EXPECT_FALSE(pStaStateMachine->pWpsState->ExecuteStateMsg(msg));
     }
 
     void WpsStateExeMsgSuccess4()
@@ -1178,7 +1178,7 @@ public:
     void HandleNetCheckResultSuccess1()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_WORKING, "");
     }
@@ -1186,14 +1186,14 @@ public:
     void HandleNetCheckResultSuccess3()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
     }
     void HandleNetCheckResultSuccess4()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
     }

@@ -116,7 +116,7 @@ enum Wpa3ConnectFailReason {
     WPA3_FAIL_REASON_MAX
 };
 
-const std::map<int, int> wpa3FailreasonMap {
+inline const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
     {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
     {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -132,10 +132,10 @@ typedef enum EnumDhcpReturnCode {
     DHCP_OFFER_REPORT,
 } DhcpReturnCode;
 
-const int DETECT_TYPE_DEFAULT = 0;
-const int DETECT_TYPE_PERIODIC = 1;
-const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
-const int PORTAL_EXPERIED_DETECT_MAX_COUNT = 2;
+inline const int DETECT_TYPE_DEFAULT = 0;
+inline const int DETECT_TYPE_PERIODIC = 1;
+inline const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
+inline const int PORTAL_EXPERIED_DETECT_MAX_COUNT = 2;
 enum PortalState {
     UNCHECKED = 0,
     NOT_PORTAL,
@@ -1254,8 +1254,9 @@ private:
     void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
+    bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
-    void ConvertOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

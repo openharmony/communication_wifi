@@ -67,21 +67,21 @@ constexpr int WIFI_DISAPPEAR_TIMES = 3;
 constexpr uint32_t COMPARE_MAC_OFFSET = 2;
 constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
 
-constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
-constexpr char BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/backup_config.conf";
-constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
-constexpr char BLOCK_LIST_FILE_PATH[] = CONFIG_ROOR_DIR"/block_list.conf";
-constexpr char WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/wifi_config.conf";
-constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_groups.conf";
-constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_vendor_config.conf";
-const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/trust_list_polices.conf";
-const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/moving_freeze_policy.conf";
-constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
-constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
-constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.xml";
-constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
-constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
-constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
+inline constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
+inline constexpr char BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/backup_config.conf";
+inline constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
+inline constexpr char BLOCK_LIST_FILE_PATH[] = CONFIG_ROOR_DIR"/block_list.conf";
+inline constexpr char WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/wifi_config.conf";
+inline constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_groups.conf";
+inline constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_vendor_config.conf";
+inline constexpr char WIFI_TRUST_LIST_POLICY_FILE_PATH[] = CONFIG_ROOR_DIR"/trust_list_polices.conf";
+inline constexpr char WIFI_MOVING_FREEZE_POLICY_FILE_PATH[] = CONFIG_ROOR_DIR"/moving_freeze_policy.conf";
+inline constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
+inline constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
+inline constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.xml";
+inline constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
+inline constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
+inline constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
 
 namespace OHOS {
 namespace Wifi {
@@ -156,6 +156,8 @@ public:
     int OnBackup(UniqueFd &fd, const std::string &backupInfo);
 
     void MergeWifiCloneConfig(std::string &cloneData);
+
+    std::string SetBackupReplyCode(int replyCode);
 
     void RemoveBackupFile();
 #endif

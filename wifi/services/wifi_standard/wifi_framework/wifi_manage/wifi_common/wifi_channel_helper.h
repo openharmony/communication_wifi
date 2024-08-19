@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
-const std::map <BandType, std::vector<int32_t>> DEFAULT_VALID_CHANNEL = {{
+inline const std::map <BandType, std::vector<int32_t>> DEFAULT_VALID_CHANNEL = {{
     BandType::BAND_2GHZ, { 2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472 }}};
 class WifiChannelHelper {
 public:

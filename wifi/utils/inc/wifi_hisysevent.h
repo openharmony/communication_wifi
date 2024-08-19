@@ -41,28 +41,28 @@ enum class WifiConnectionType {
     DISCONNECT
 };
 
-const int HISYS_EVENT_DEFAULT_VALUE = -1;
-const int HISYS_EVENT_PROTAL_STATE_NOT_PORTAL = 0;
-const int HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED = 1;
-const int HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED = 2;
+inline const int HISYS_EVENT_DEFAULT_VALUE = -1;
+inline const int HISYS_EVENT_PROTAL_STATE_NOT_PORTAL = 0;
+inline const int HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED = 1;
+inline const int HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED = 2;
 
-const std::string HISYS_STA_POWER_STATE_CHANGE = "wifiStateChange";
-const std::string HISYS_STA_CONN_STATE_CHANGE = "wifiConnectionChange";
-const std::string HISYS_STA_SCAN_STATE_CHANGE = "wifiScanStateChange";
-const std::string HISYS_STA_RSSI_STATE_CHANGE = "wifiRssiChange";
-const std::string HISYS_HOTSPOT_STATE_CHANGE = "hotspotStateChange";
-const std::string HISYS_HOTSPOT_STA_JOIN = "hotspotStaJoin";
-const std::string HISYS_HOTSPOT_STA_LEAVE = "hotspotStaLeave";
-const std::string HISYS_P2P_STATE_CHANGE = "p2pStateChange";
-const std::string HISYS_P2P_CONN_STATE_CHANGE = "p2pConnectionChange";
-const std::string HISYS_P2P_DEVICE_STATE_CHANGE = "p2pDeviceChange";
-const std::string HISYS_P2P_PERSISTENT_GROUP_CHANGE = "p2pPersistentGroupChange";
-const std::string HISYS_P2P_PEER_DEVICE_CHANGE = "p2pPeerDeviceChange";
-const std::string HISYS_P2P_DISCOVERY_CHANGE = "p2pDiscoveryChange";
+inline const std::string HISYS_STA_POWER_STATE_CHANGE = "wifiStateChange";
+inline const std::string HISYS_STA_CONN_STATE_CHANGE = "wifiConnectionChange";
+inline const std::string HISYS_STA_SCAN_STATE_CHANGE = "wifiScanStateChange";
+inline const std::string HISYS_STA_RSSI_STATE_CHANGE = "wifiRssiChange";
+inline const std::string HISYS_HOTSPOT_STATE_CHANGE = "hotspotStateChange";
+inline const std::string HISYS_HOTSPOT_STA_JOIN = "hotspotStaJoin";
+inline const std::string HISYS_HOTSPOT_STA_LEAVE = "hotspotStaLeave";
+inline const std::string HISYS_P2P_STATE_CHANGE = "p2pStateChange";
+inline const std::string HISYS_P2P_CONN_STATE_CHANGE = "p2pConnectionChange";
+inline const std::string HISYS_P2P_DEVICE_STATE_CHANGE = "p2pDeviceChange";
+inline const std::string HISYS_P2P_PERSISTENT_GROUP_CHANGE = "p2pPersistentGroupChange";
+inline const std::string HISYS_P2P_PEER_DEVICE_CHANGE = "p2pPeerDeviceChange";
+inline const std::string HISYS_P2P_DISCOVERY_CHANGE = "p2pDiscoveryChange";
 
-const std::string HISYS_SERVICE_TYPE_STA = "STA";
-const std::string HISYS_SERVICE_TYPE_AP = "AP";
-const std::string HISYS_SERVICE_TYPE_P2P = "P2P";
+inline const std::string HISYS_SERVICE_TYPE_STA = "STA";
+inline const std::string HISYS_SERVICE_TYPE_AP = "AP";
+inline const std::string HISYS_SERVICE_TYPE_P2P = "P2P";
 
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 

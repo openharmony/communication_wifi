@@ -18,14 +18,14 @@
 #include <unordered_map>
 #include "wifi_ap_msg.h"
 
-constexpr auto XML_TAG_HEADER_SOFTAP = "SoftAp";
-constexpr auto XML_TAG_SOFTAP_SSID = "SSID";
-constexpr auto XML_SECURITY_TYPE = "SecurityType";
-constexpr auto XML_PASSPHRASE = "Passphrase";
-constexpr auto XML_BAND_CHANNEL_MAP = "BandChannelMap";
-constexpr auto XML_BAND_CHANNEL = "BandChannel";
-constexpr auto XML_BAND = "Band";
-constexpr auto XML_CHANNEL = "Channel";
+inline constexpr auto XML_TAG_HEADER_SOFTAP = "SoftAp";
+inline constexpr auto XML_TAG_SOFTAP_SSID = "SSID";
+inline constexpr auto XML_SECURITY_TYPE = "SecurityType";
+inline constexpr auto XML_PASSPHRASE = "Passphrase";
+inline constexpr auto XML_BAND_CHANNEL_MAP = "BandChannelMap";
+inline constexpr auto XML_BAND_CHANNEL = "BandChannel";
+inline constexpr auto XML_BAND = "Band";
+inline constexpr auto XML_CHANNEL = "Channel";
 
 enum class HotspotConfigType {
     SOFTAP_SSID = 0,

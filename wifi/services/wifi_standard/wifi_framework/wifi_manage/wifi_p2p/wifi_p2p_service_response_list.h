@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Wifi {
-const int MAX_BUF_SIZE = 1024;
+inline const int MAX_BUF_SIZE = 1024;
 class WifiP2pServiceResponseList {
 public:
     /**

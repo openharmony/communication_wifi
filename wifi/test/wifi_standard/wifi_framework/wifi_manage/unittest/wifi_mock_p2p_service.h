@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace Wifi {
-const int TEST_ONE_THOUSAND = 1000;
-const int TEST_TWO_THOUSAND = 2000;
+inline const int TEST_ONE_THOUSAND = 1000;
+inline const int TEST_TWO_THOUSAND = 2000;
 class WifiMockP2pService : public IP2pService {
 public:
     ErrCode EnableP2p();

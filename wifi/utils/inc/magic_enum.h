@@ -35,7 +35,7 @@ namespace OHOS {
 namespace Wifi {
 namespace magic_enum {
 
-const int MAGIC_ENUM_RANGE_MAX = 1024;
+inline const int MAGIC_ENUM_RANGE_MAX = 1024;
 template <typename E, E V>
 constexpr std::string_view GetEnumValueName()
 {

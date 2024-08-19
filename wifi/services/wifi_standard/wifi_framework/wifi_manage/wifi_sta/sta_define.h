@@ -90,9 +90,9 @@ namespace Wifi {
 #define WIFI_SIM_GSM_AUTH_MAX_PARAM_COUNT 4
 #define WIFI_SIM_UMTS_AUTH_PARAM_COUNT 3
 
-const int NETWORK_24G_BAND = 1;
-const int NETWORK_5G_BAND = 2;
-const int MAX_RETRY_COUNT = 3;
+inline const int NETWORK_24G_BAND = 1;
+inline const int NETWORK_5G_BAND = 2;
+inline const int MAX_RETRY_COUNT = 3;
 #define BAND_2_G 1
 #define BAND_5_G 2
 

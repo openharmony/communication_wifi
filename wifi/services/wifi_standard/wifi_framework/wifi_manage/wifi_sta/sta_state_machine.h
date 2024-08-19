@@ -1174,6 +1174,16 @@ private:
      * @param networkId - current connected networkId;
      */
     void SaveWifiConfigForUpdate(int networkId);
+
+    /**
+     * @Description operation before dhcp
+     */
+    void HandlePreDhcpSetup();
+
+    /**
+     * @Description operation after dhcp
+     */
+    void HandlePostDhcpSetup();
 #endif // OHOS_ARCH_LITE
 
 private:

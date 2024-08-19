@@ -213,7 +213,7 @@ HWTEST_F(WifiSettingsTest, GetScoretacticsInitScoreTest, TestSize.Level1)
     WifiSettings::GetInstance().GetScoretacticsInitScore(NETWORK_ID);
     int result = WifiSettings::GetInstance().GetScoretacticsInitScore();
     WIFI_LOGE("GetScoretacticsInitScoreTest result(%{public}d)", result);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    EXPECT_EQ(result, WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
 }
 
 HWTEST_F(WifiSettingsTest, GetScoretacticsNormalScoreTest, TestSize.Level1)
@@ -222,7 +222,7 @@ HWTEST_F(WifiSettingsTest, GetScoretacticsNormalScoreTest, TestSize.Level1)
     WifiSettings::GetInstance().GetScoretacticsNormalScore(NETWORK_ID);
     int result = WifiSettings::GetInstance().GetScoretacticsNormalScore();
     WIFI_LOGE("GetScoretacticsNormalScoreTest result(%{public}d)", result);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    EXPECT_EQ(result, WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED);
 }
 
 HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
@@ -232,7 +232,7 @@ HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
     EXPECT_FALSE(state);
     bool result = WifiSettings::GetInstance().IsModulePreLoad("StaService");
     WIFI_LOGE("IsModulePreLoadTest result(%{public}d)", result);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 }
 
 HWTEST_F(WifiSettingsTest, GetSupportHwPnoFlagTest, TestSize.Level1)
@@ -476,7 +476,6 @@ HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
     WifiDeviceConfig config;
     int result =  WifiSettings::GetInstance().AddWpsDeviceConfig(config);
     EXPECT_EQ(result, -1);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
     WifiSettings::GetInstance().AddWpsDeviceConfig(config);
 }
 

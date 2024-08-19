@@ -24,10 +24,10 @@
 namespace OHOS {
 namespace Wifi {
 #define FRIEND_GTEST(test_typename) friend class test_typename##Test
-static const int MIN_SYSTEM_SCAN_INTERVAL = 20;
-static const int MAX_SYSTEM_SCAN_INTERVAL = 160;
-static const int MAX_SCAN_CONFIG_STORE_INDEX = 10000;
-static const int SECOND_TO_MILLI_SECOND = 1000;
+inline const int MIN_SYSTEM_SCAN_INTERVAL = 20;
+inline const int MAX_SYSTEM_SCAN_INTERVAL = 160;
+inline const int MAX_SCAN_CONFIG_STORE_INDEX = 10000;
+inline const int SECOND_TO_MILLI_SECOND = 1000;
 
 /* Scan Parameter Configuration */
 struct ScanConfig {

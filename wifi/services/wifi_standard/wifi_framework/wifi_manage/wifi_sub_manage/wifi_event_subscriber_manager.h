@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace Wifi {
 #ifdef HAS_POWERMGR_PART
-const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_MANAGER_STATE_CHANGED";
+inline const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_MANAGER_STATE_CHANGED";
 #endif
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:

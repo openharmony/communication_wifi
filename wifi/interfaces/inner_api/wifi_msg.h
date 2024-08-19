@@ -42,24 +42,24 @@ namespace Wifi {
 #define WIFI_PASSWORD_LEN 128
 #define MAX_PID_LIST_SIZE 128
 
-const std::string KEY_MGMT_NONE = "NONE";
-const std::string KEY_MGMT_WEP = "WEP";
-const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
-const std::string KEY_MGMT_SAE = "SAE";
-const std::string KEY_MGMT_EAP = "WPA-EAP";
-const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
-const std::string KEY_MGMT_WAPI_CERT = "WAPI-CERT";
-const std::string KEY_MGMT_WAPI_PSK = "WAPI-PSK";
-const std::string KEY_MGMT_WAPI = "WAPI";
+inline const std::string KEY_MGMT_NONE = "NONE";
+inline const std::string KEY_MGMT_WEP = "WEP";
+inline const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";
+inline const std::string KEY_MGMT_SAE = "SAE";
+inline const std::string KEY_MGMT_EAP = "WPA-EAP";
+inline const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
+inline const std::string KEY_MGMT_WAPI_CERT = "WAPI-CERT";
+inline const std::string KEY_MGMT_WAPI_PSK = "WAPI-PSK";
+inline const std::string KEY_MGMT_WAPI = "WAPI";
 
-const std::string EAP_METHOD_NONE = "NONE";
-const std::string EAP_METHOD_PEAP = "PEAP";
-const std::string EAP_METHOD_TLS = "TLS";
-const std::string EAP_METHOD_TTLS = "TTLS";
-const std::string EAP_METHOD_PWD = "PWD";
-const std::string EAP_METHOD_SIM = "SIM";
-const std::string EAP_METHOD_AKA = "AKA";
-const std::string EAP_METHOD_AKA_PRIME = "AKA'";
+inline const std::string EAP_METHOD_NONE = "NONE";
+inline const std::string EAP_METHOD_PEAP = "PEAP";
+inline const std::string EAP_METHOD_TLS = "TLS";
+inline const std::string EAP_METHOD_TTLS = "TTLS";
+inline const std::string EAP_METHOD_PWD = "PWD";
+inline const std::string EAP_METHOD_SIM = "SIM";
+inline const std::string EAP_METHOD_AKA = "AKA";
+inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
 enum class SupplicantState {
     DISCONNECTED = 0,

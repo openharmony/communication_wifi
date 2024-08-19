@@ -28,9 +28,9 @@
 
 namespace OHOS {
 namespace Wifi {
-const int MODE_ADD = 0;
-const int MODE_DEL = 1;
-const int MODE_UPDATE = 2;
+inline const int MODE_ADD = 0;
+inline const int MODE_DEL = 1;
+inline const int MODE_UPDATE = 2;
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 
 class MockWifiSettings {

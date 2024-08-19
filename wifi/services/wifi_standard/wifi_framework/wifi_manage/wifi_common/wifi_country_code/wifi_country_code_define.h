@@ -21,19 +21,19 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int WIFI_COUNTRY_CODE_POLICE_DEF_LEN = 5;
-constexpr const char* WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY = "persist.wifi.country_code.dynamic_update";
-constexpr const char* DEFAULT_WIFI_COUNTRY_CODE_ZZ = "ZZ";  // for tablets only, priority greater than HK
-constexpr const char* DEFAULT_WIFI_COUNTRY_CODE = "HK";
-constexpr const char* DEFAULT_RO_RUN_MODE = "normal";
-constexpr const char* FACTORY_RO_RUN_MODE = "factory";
-constexpr const char* FACTORY_WIFI_COUNTRY_CODE = "const.wifi.country_code.factory";
-constexpr const char* WIFI_COUNTRY_CODE_RUN_MODE = "const.wifi.country_code.runmode";
-constexpr const char* WIFI_COUNTRY_CODE_CONFIG = "const.wifi.country_code.conf";
-constexpr const char* WIFI_COUNTRY_CODE_CONFIG_DEFAULT = "0";
-constexpr const char* DEFAULT_REGION_KEY = "const.global.region";
-constexpr const char* DEFAULT_REGION = "CN";
-constexpr const char* OPERATOR_NUMERIC_KEY = "ril.operator.numeric";  // plmn cached
-constexpr const char* DEFAULT_OPERATOR_NUMERIC = "00000";
+inline constexpr const char* WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY = "persist.wifi.country_code.dynamic_update";
+inline constexpr const char* DEFAULT_WIFI_COUNTRY_CODE_ZZ = "ZZ";  // for tablets only, priority greater than HK
+inline constexpr const char* DEFAULT_WIFI_COUNTRY_CODE = "HK";
+inline constexpr const char* DEFAULT_RO_RUN_MODE = "normal";
+inline constexpr const char* FACTORY_RO_RUN_MODE = "factory";
+inline constexpr const char* FACTORY_WIFI_COUNTRY_CODE = "const.wifi.country_code.factory";
+inline constexpr const char* WIFI_COUNTRY_CODE_RUN_MODE = "const.wifi.country_code.runmode";
+inline constexpr const char* WIFI_COUNTRY_CODE_CONFIG = "const.wifi.country_code.conf";
+inline constexpr const char* WIFI_COUNTRY_CODE_CONFIG_DEFAULT = "0";
+inline constexpr const char* DEFAULT_REGION_KEY = "const.global.region";
+inline constexpr const char* DEFAULT_REGION = "CN";
+inline constexpr const char* OPERATOR_NUMERIC_KEY = "ril.operator.numeric";  // plmn cached
+inline constexpr const char* DEFAULT_OPERATOR_NUMERIC = "00000";
 constexpr int WIFI_COUNTRY_CODE_SIZE = 16;
 constexpr int FACTORY_WIFI_COUNTRY_CODE_SIZE = 16;
 constexpr int WIFI_COUNTRY_CODE_RUN_MODE_SIZE = 16;
@@ -76,7 +76,7 @@ struct MccEntry {
  *
  * very importent：The order of mnc must be from small to large！
  */
-const MccEntry MCC_TABLE[] = {
+inline const MccEntry MCC_TABLE[] = {
     // Fake country code, which is the default value, Scan only 2.4G channels and passively receive 5G beacons
     {0, "zz", 0},
 

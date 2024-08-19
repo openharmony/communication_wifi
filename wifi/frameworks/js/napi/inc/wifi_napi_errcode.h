@@ -22,9 +22,9 @@
 
 namespace OHOS {
 namespace Wifi {
-static const std::string BUSINESS_ERROR_PROPERTY_CODE = "code";
-static const std::string BUSINESS_ERROR_PROPERTY_MESSAGE = "message";
-static const std::string BUSINESS_ERROR_PROPERTY_DATA = "data";
+inline const std::string BUSINESS_ERROR_PROPERTY_CODE = "code";
+inline const std::string BUSINESS_ERROR_PROPERTY_MESSAGE = "message";
+inline const std::string BUSINESS_ERROR_PROPERTY_DATA = "data";
 
 enum WifiNapiErrCode {
     WIFI_ERRCODE_SUCCESS = 0, /* successfully */

@@ -22,11 +22,11 @@
 
 namespace OHOS {
 namespace Wifi {
-const int MAX_SSID_LENGTH = 32;
-const int MAX_PSK_LENGTH = 63;
-const int MAC_LENGTH = 17;
-const int MAX_IP_LENGTH = 39;
-const std::string GETTING_INFO = "Unknown";
+inline const int MAX_SSID_LENGTH = 32;
+inline const int MAX_PSK_LENGTH = 63;
+inline const int MAC_LENGTH = 17;
+inline const int MAX_IP_LENGTH = 39;
+inline const std::string GETTING_INFO = "Unknown";
 
 /* *****************************ApService********************************** */
 

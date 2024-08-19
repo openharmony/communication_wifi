@@ -32,16 +32,16 @@
 
 namespace OHOS {
 namespace Wifi {
-const int SCAN_TYPE_LOW_SPAN = 0;
-const int SCAN_TYPE_LOW_POWER = 1;
-const int SCAN_TYPE_HIGH_ACCURACY = 2;
-const int SCAN_TYPE_INVALID = 0xFF;
-const int MAX_WAIT_SCAN_RESULT_TIME = 5 * 1000;
-const int SCAN_24GHZ_MAX_FREQUENCY = 2500;
-const int SCAN_5GHZ_MIN_FREQUENCY = 5000;
-const int SCAN_24GHZ_BAND = 1;
-const int SCAN_5GHZ_BAND = 2;
-const int MAX_RATES_24G = 24000000;
+inline const int SCAN_TYPE_LOW_SPAN = 0;
+inline const int SCAN_TYPE_LOW_POWER = 1;
+inline const int SCAN_TYPE_HIGH_ACCURACY = 2;
+inline const int SCAN_TYPE_INVALID = 0xFF;
+inline const int MAX_WAIT_SCAN_RESULT_TIME = 5 * 1000;
+inline const int SCAN_24GHZ_MAX_FREQUENCY = 2500;
+inline const int SCAN_5GHZ_MIN_FREQUENCY = 5000;
+inline const int SCAN_24GHZ_BAND = 1;
+inline const int SCAN_5GHZ_BAND = 2;
+inline const int MAX_RATES_24G = 24000000;
 
 class ScanStateMachine : public StateMachine {
     FRIEND_GTEST(ScanStateMachine);

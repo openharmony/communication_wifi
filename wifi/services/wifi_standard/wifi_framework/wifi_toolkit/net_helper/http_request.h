@@ -34,10 +34,10 @@
 #define URLSIZE 1024
 #define INVALID_SOCKET (-1)
 
-const int HTTP_HEADER_LENGTH = 7;
-const int HTTPS_HEADER_LENGTH = 8;
-const int DEFAULT_PORT = 80;
-const int SEND_HTTP_DELAY_TIME = 1;
+inline const int HTTP_HEADER_LENGTH = 7;
+inline const int HTTPS_HEADER_LENGTH = 8;
+inline const int DEFAULT_PORT = 80;
+inline const int SEND_HTTP_DELAY_TIME = 1;
 
 namespace OHOS {
 namespace Wifi {

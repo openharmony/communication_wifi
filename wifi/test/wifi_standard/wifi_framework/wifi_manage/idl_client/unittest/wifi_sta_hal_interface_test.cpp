@@ -33,9 +33,9 @@ void OnWpaStateChanged(int status)
     LOGD("OnWpaStateChanged status %d", status);
 }
 
-void OnWpaSsidWrongKey(int status)
+void OnWpaSsidWrongKey()
 {
-    LOGD("OnWpaSsidWrongKey status %d", status);
+    LOGD("OnWpaSsidWrongKey");
 }
 
 void OnWpsOverlap(int status)

@@ -20,7 +20,7 @@
 #include <iostream>
 #include <map>
 
-constexpr auto XML_TAG_DOCUMENT_HEADER = "WifiConfigStoreData";
+inline constexpr auto XML_TAG_DOCUMENT_HEADER = "WifiConfigStoreData";
 inline bool ConvertStringToBool(const std::string str)
 {
     if (str == "true") {

@@ -24,7 +24,7 @@
 #endif
 namespace OHOS {
 namespace Wifi {
-const int USEC_1000 = 1000;
+inline const int USEC_1000 = 1000;
 
 class Handler {
 public:

@@ -26,10 +26,10 @@ namespace OHOS {
 namespace Wifi {
 constexpr int DEFAULT_INVAL_VALUE = -1;
 constexpr int32_t SIGNAL_NUM = 3;
-const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
-const std::string WIFI_EVENT_TAP_NOTIFICATION = "ohos.event.notification.wifi.TAP_NOTIFICATION";
-const std::string WIFI_EVENT_DIALOG_ACCEPT = "ohos.event.wifi.DIALOG_ACCEPT";
-const std::string WIFI_EVENT_DIALOG_REJECT = "ohos.event.wifi.DIALOG_REJECT";
+inline const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
+inline const std::string WIFI_EVENT_TAP_NOTIFICATION = "ohos.event.notification.wifi.TAP_NOTIFICATION";
+inline const std::string WIFI_EVENT_DIALOG_ACCEPT = "ohos.event.wifi.DIALOG_ACCEPT";
+inline const std::string WIFI_EVENT_DIALOG_REJECT = "ohos.event.wifi.DIALOG_REJECT";
 enum WifiNotificationId {
     WIFI_PORTAL_NOTIFICATION_ID = 101000
 };

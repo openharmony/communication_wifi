@@ -140,7 +140,7 @@ struct GcInfo {
 };
 
 enum class GroupOwnerBand { GO_BAND_AUTO, GO_BAND_2GHZ, GO_BAND_5GHZ };
-const int MAX_WFD_SUBELEMS = 12;
+inline const int MAX_WFD_SUBELEMS = 12;
 const char DeviceInfoSubelemLenHex[] = {"0006"};
 class WifiP2pWfdInfo {
 public:
@@ -239,9 +239,9 @@ private:
     int groupCapabilitys;
 };
 
-const int TEMPORARY_NET_ID = -1;
-const int PERSISTENT_NET_ID = -2;
-const int INVALID_NET_ID = -999;
+inline const int TEMPORARY_NET_ID = -1;
+inline const int PERSISTENT_NET_ID = -2;
+inline const int INVALID_NET_ID = -999;
 class WifiP2pGroupInfo {
 public:
     WifiP2pGroupInfo()
@@ -327,9 +327,9 @@ private:
     std::string pin; /* the length is 4 or 8 characters. */
 };
 
-const int AUTO_GROUP_OWNER_VALUE = -1;
-const int MIN_GROUP_OWNER_VALUE = 0;
-const int MAX_GROUP_OWNER_VALUE = 15;
+inline const int AUTO_GROUP_OWNER_VALUE = -1;
+inline const int MIN_GROUP_OWNER_VALUE = 0;
+inline const int MAX_GROUP_OWNER_VALUE = 15;
 class WifiP2pConfig {
 public:
     WifiP2pConfig()
@@ -425,9 +425,9 @@ private:
     std::vector<GcInfo> gc_info_list;
 };
 
-const int SERVICE_TLV_LENGTH_SIZE = 2;
-const int PROTOCOL_SIZE = 1;
-const int TRANSACTION_ID_SIZE = 1;
+inline const int SERVICE_TLV_LENGTH_SIZE = 2;
+inline const int PROTOCOL_SIZE = 1;
+inline const int TRANSACTION_ID_SIZE = 1;
 const int SERVICE_STATUS_SIZE = 1;
 
 class WifiP2pServiceRequest {

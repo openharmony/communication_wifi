@@ -23,10 +23,10 @@ namespace OHOS {
 namespace Wifi {
 
 #define CMD_SET_SOFTAP_MIMOMODE "SET_AP_MODE"
-const int CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH = 125;
-const int CMD_SET_SOFTAP_2G_MSS = 106;
-const int CMD_AX_BLA_LIST = 131;
-const int CMD_AX_SELFCURE = 132;
+inline const int CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH = 125;
+inline const int CMD_SET_SOFTAP_2G_MSS = 106;
+inline const int CMD_AX_BLA_LIST = 131;
+inline const int CMD_AX_SELFCURE = 132;
 
 struct WifiPrivCmd {
     uint8_t *buf;

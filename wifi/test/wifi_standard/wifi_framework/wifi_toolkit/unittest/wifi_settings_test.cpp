@@ -441,6 +441,15 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest3, TestSize.Level1)
     remove(BACKUP_CONFIG_FILE_PATH_TEST);
 }
 
+HWTEST_F(WifiSettingsTest, SetBackupReplyCodeTest, TestSize.Level1)
+{
+    WIFI_LOGI("SetBackupReplyCodeTest enter");
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
+    std::string checkReplyCode = R"({"resultInfo":[{"errorCode":"0","errorInfo":"","type":"ErrorInfo"}]})";
+    checkReplyCode += "\n";
+    EXPECT_EQ(replyCode, checkReplyCode);
+}
+
 HWTEST_F(WifiSettingsTest, ConvertBackupCfgToDeviceCfgTest, TestSize.Level1)
 {
     WIFI_LOGI("ConvertBackupCfgToDeviceCfgTest enter");

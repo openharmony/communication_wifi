@@ -198,7 +198,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
     m_NetWorkState->SetNetStateCallback(
         std::bind(&StaStateMachine::NetStateObserverCallback, this, std::placeholders::_1, std::placeholders::_2));
 #endif
-    HandlePostDhcpSetup(); // reset power save mode and suspend mode after dhcp crash
     return WIFI_OPT_SUCCESS;
 }
 

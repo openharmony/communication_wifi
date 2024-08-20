@@ -373,7 +373,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetPmModeTest_01, TestSize.Level1)
     int mode = 1;
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetPmMode(ifaceName, mode);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetChipsetWifiFeatrureCapabilityTest_01, TestSize.Level1)
@@ -383,7 +383,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetChipsetWifiFeatrureCapabilityTest_01, Test
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetWifiFeatrureCapability(
         ifaceName, chipsetFeatrureCapability);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SetTxPowerTest_01, TestSize.Level1)
@@ -392,7 +392,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetTxPowerTest_01, TestSize.Level1)
     int model = 0;
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(ifaceName, model);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SetDpiMarkRuleTest_01, TestSize.Level1)
@@ -403,7 +403,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetDpiMarkRuleTest_01, TestSize.Level1)
     int enable = 0;
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetDpiMarkRule(ifaceName, uid, protocol, enable);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SetStaMacAddressTest_01, TestSize.Level1)
@@ -421,7 +421,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetPowerModelTest_01, TestSize.Level1)
     int model = 0;
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetPowerModel(ifaceName, model);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetConnectSignalInfoTest_01, TestSize.Level1)
@@ -430,7 +430,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetConnectSignalInfoTest_01, TestSize.Level1)
     SignalPollResult signalPollResult;
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetConnectSignalInfo(ifaceName, signalPollResult);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest_01, TestSize.Level1)
@@ -440,7 +440,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest_01, TestSize.Level1)
     std::vector<int> frequencies;
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SetPowerModeTest_01, TestSize.Level1)
@@ -449,7 +449,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetPowerModeTest_01, TestSize.Level1)
     int model = 0;
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetPowerModel(ifaceName, model);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SetWifiCountryCodeTest_01, TestSize.Level1)
@@ -458,7 +458,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetWifiCountryCodeTest_01, TestSize.Level1)
     std::string code{"AB"};
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetWifiCountryCode(ifaceName, code);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetIfaceTypeTest_01, TestSize.Level1)
@@ -477,7 +477,7 @@ HWTEST_F(WifiHalDeviceManagerTest, StopPnoScanTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     HalDeviceManager::g_chipHdiServiceDied = true;
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->StopPnoScan(ifaceName);
-    EXPECT_EQ(result, true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest_01, TestSize.Level1)

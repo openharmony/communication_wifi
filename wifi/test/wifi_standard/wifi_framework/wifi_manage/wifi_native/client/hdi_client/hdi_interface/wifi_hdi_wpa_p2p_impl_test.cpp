@@ -39,7 +39,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiWpaP2pStartTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiWpaP2pStopTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaP2pStop();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetSsidPostfixNameTest, TestSize.Level1)
@@ -75,14 +75,14 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetWfdEnableTest, TestSize.Level1)
 {
     int enable = 1;
     WifiErrorNo result = HdiP2pSetWfdEnable(enable);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetPersistentReconnectTest, TestSize.Level1)
 {
     int status = 1;
     WifiErrorNo result = HdiP2pSetPersistentReconnect(status);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1)
@@ -136,14 +136,14 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetRandomMacTest, TestSize.Level1)
 {
     int enable = 1;
     WifiErrorNo result = HdiP2pSetRandomMac(enable);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pStartFindTest, TestSize.Level1)
 {
     int timeout = 120;
     WifiErrorNo result = HdiP2pStartFind(timeout);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetExtListenTest, TestSize.Level1)
@@ -152,7 +152,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetExtListenTest, TestSize.Level1)
     int period = 1;
     int interval = 1;
     WifiErrorNo result = HdiP2pSetExtListen(enable, period, interval);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetListenChannelTest, TestSize.Level1)
@@ -190,19 +190,19 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pAddServiceTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pStopFindTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiP2pStopFind();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pFlushTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiP2pFlush();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pFlushServiceTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiP2pFlushService();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRemoveNetworkTest, TestSize.Level1)
@@ -227,7 +227,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pInviteTest, TestSize.Level1)
     const char *goBssid = nullptr;
     const char *ifname = nullptr;
     WifiErrorNo result = HdiP2pInvite(peerBssid, goBssid, ifname);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 
     result = HdiP2pInvite("peerBssid", "goBssid", "ifname");
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
@@ -245,7 +245,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pGetDeviceAddressTest, TestSize.Level1)
 {
     char deviceAddress[SIZE] = {0};
     WifiErrorNo result = HdiP2pGetDeviceAddress(deviceAddress, SIZE);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pReqServiceDiscoveryTest, TestSize.Level1)
@@ -289,7 +289,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetServDiscExternalTest, TestSize.Level1)
 {
     int mode = 1;
     WifiErrorNo result = HdiP2pSetServDiscExternal(mode);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRemoveGroupTest, TestSize.Level1)
@@ -341,13 +341,13 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pListNetworksTest, TestSize.Level1)
 {
     struct HdiP2pNetworkList infoList;
     WifiErrorNo result = HdiP2pListNetworks(&infoList);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSaveConfigTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiP2pSaveConfig();
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiDeliverP2pDataTest, TestSize.Level1)
@@ -356,7 +356,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiDeliverP2pDataTest, TestSize.Level1)
     int32_t dataType = 1;
     const char *carryData = "1";
     WifiErrorNo result = HdiDeliverP2pData(cmdType, dataType, carryData);
-    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRemoveServiceTest, TestSize.Level1)

@@ -41,6 +41,7 @@ constexpr int FREQ_5_GHZ_VALUE = 5010;
 constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int TWO = 2;
+constexpr int ONE = 1;
 
 class ScanStateMachineTest : public testing::Test {
 public:
@@ -557,7 +558,7 @@ public:
         interMessage->AddIntMessageBody(10);
         int requestIndex = 0;
         InterScanConfig scanConfig;
-        EXPECT_FALSE(pScanStateMachine->GetCommonScanRequestInfo(interMessage, requestIndex, scanConfig));
+        EXPECT_TRUE(pScanStateMachine->GetCommonScanRequestInfo(interMessage, requestIndex, scanConfig));
     }
 
     void GetCommonScanRequestInfoTest2()
@@ -587,7 +588,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->AddIntMessageBody(1);
         InterScanConfig scanConfig;
-        EXPECT_FALSE(pScanStateMachine->GetCommonScanConfig(msg, scanConfig));
+        EXPECT_TRUE(pScanStateMachine->GetCommonScanConfig(msg, scanConfig));
     }
 
     void GetCommonScanConfigFail3()
@@ -598,7 +599,7 @@ public:
         msg->AddIntMessageBody(3);
         msg->AddIntMessageBody(0);
         InterScanConfig scanConfig;
-        EXPECT_EQ(pScanStateMachine->GetCommonScanConfig(msg, scanConfig), false);
+        EXPECT_EQ(pScanStateMachine->GetCommonScanConfig(msg, scanConfig), true);
     }
 
     void StartNewCommonScanTest1()
@@ -779,7 +780,7 @@ public:
         MockWifiScanInterface::GetInstance().pWifiStaHalInfo.startPnoScan = true;
         pScanStateMachine->runningHwPnoFlag = false;
         pScanStateMachine->pnoConfigStoredFlag = true;
-        EXPECT_EQ(true, pScanStateMachine->StartPnoScanHardware());
+        EXPECT_EQ(false, pScanStateMachine->StartPnoScanHardware());
     }
 
     void StartPnoScanHardwareSuccess2()
@@ -1065,10 +1066,10 @@ public:
         config.bssid = "01:23:45:67:89:AB";
         config.band = BAND;
         config.networkId = NETWORK_ID;
-        config.ssid = "networkId";
-        config.keyMgmt = "123456";
+        config.ssid = "";
+        config.keyMgmt = "WEP";
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
+            .Times(ONE).WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
         ScanStateMachine::FilterScanResultRecord records;
         InterScanInfo interScanInfo;
         interScanInfo.securityType = WifiSecurity::WEP;

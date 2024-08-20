@@ -210,6 +210,13 @@ void WifiEventSubscriberManager::HandleDistributedKvDataServiceChange(bool add)
     RegisterCloneEvent();
 }
 
+void WifiEventSubscriberManager::HandleCastServiceChange(bool add)
+{
+    if (!add) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(CAST_ENGINE_SERVICE_UID);
+    }
+}
+
 #ifdef FEATURE_P2P_SUPPORT
 void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
@@ -217,6 +224,7 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     if (add) {
         return;
     }
+    WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SOFT_BUS_SERVICE_UID);
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
@@ -253,6 +261,9 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             HandleP2pBusinessChange(systemAbilityId, add);
             break;
 #endif
+        case CAST_ENGINE_SA_ID:
+            HandleCastServiceChange(add);
+            break;
         default:
             break;
     }
@@ -437,6 +448,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 #endif
     SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
+    SubscribeSystemAbility(CAST_ENGINE_SA_ID);
 }
 
 bool WifiEventSubscriberManager::IsDataMgrServiceActive()

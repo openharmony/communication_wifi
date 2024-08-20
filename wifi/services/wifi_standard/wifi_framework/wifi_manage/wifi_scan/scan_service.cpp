@@ -2320,37 +2320,33 @@ bool ScanService::AllowScanByMovingFreeze(ScanMode appRunMode)
 bool ScanService::AllowScanByHid2dState()
 {
     LOGD("Enter AllowScanByHid2dState.\n");
-    std::string ifName;
-    Hid2dUpperScene scene;
-    P2pBusinessType type;
+    Hid2dUpperScene softbusScene;
+    Hid2dUpperScene castScene;
     WifiP2pLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(ifName, scene);
-    WifiConfigCenter::GetInstance().GetP2pBusinessType(type);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
     WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
 
     if (IsAppInFilterList(scan_hid2d_list)) {
         WIFI_LOGI("ScanService::AllowScanByHid2dState, no need to control this scan");
         return true;
     }
-    if (strstr(ifName.c_str(), "chba")) {
-        if ((scene.scene & 0x07) > 0) {
-            WIFI_LOGW("Scan is not allowed in hml.");
-            return false;
-        } else {
-            WIFI_LOGW("allow scan, and clear ifname.");
-            WifiConfigCenter::GetInstance().SetHid2dUpperScene("", scene);
-        }
+    if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED
+        && WifiConfigCenter::GetInstance().GetP2pEnhanceState() == 0) {
+        WIFI_LOGW("allow scan, and clear scene.");
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
         return true;
+    }
+    // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
+    // scene & 0x07 > 0 means one of them takes effect.
+    if ((softbusScene.scene & 0x07) > 0) {
+        WIFI_LOGW("Scan is not allowed in softbus hid2d.");
+        return false;
+    } else if ((castScene.scene & 0x07) > 0) {
+        WIFI_LOGW("Scan is not allowed in csat hid2d.");
+        return false;
     } else {
-        if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED) {
-            return true;
-        }
-        // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
-        // scene & 0x07 > 0 means one of them takes effect.
-        if (((scene.scene & 0x07) > 0) && type == P2pBusinessType::P2P_TYPE_HID2D) {
-            WIFI_LOGW("Scan is not allowed in hid2d business.");
-            return false;
-        }
+        WIFI_LOGD("allow hid2d scan");
     }
     return true;
 }

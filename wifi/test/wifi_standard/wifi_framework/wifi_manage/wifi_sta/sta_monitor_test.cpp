@@ -63,9 +63,7 @@ public:
     void OnWpaStateChangedCallBackFail1();
     void OnWpaStateChangedCallBackFail2();
     void OnWpaSsidWrongKeyCallBackSuccess();
-    void OnWpaSsidWrongKeyCallBackFail1();
-    void OnWpaSsidWrongKeyCallBackFail2();
-    void OnWpaSsidWrongKeyCallBackFail3();
+    void OnWpaSsidWrongKeyCallBackFail();
     void OnWpsPbcOverlapCallBackSuccess();
     void OnWpsPbcOverlapCallBackFail1();
     void OnWpsPbcOverlapCallBackFail2();
@@ -396,14 +394,9 @@ HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackSuccess, TestSize.Level1)
     OnWpaSsidWrongKeyCallBackSuccess();
 }
 
-HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackFail1, TestSize.Level1)
+HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackFail, TestSize.Level1)
 {
-    OnWpaSsidWrongKeyCallBackFail1();
-}
-
-HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackFail2, TestSize.Level1)
-{
-    OnWpaSsidWrongKeyCallBackFail2();
+    OnWpaSsidWrongKeyCallBackFail();
 }
 
 HWTEST_F(StaMonitorTest, OnWpsPbcOverlapCallBackSuccess, TestSize.Level1)

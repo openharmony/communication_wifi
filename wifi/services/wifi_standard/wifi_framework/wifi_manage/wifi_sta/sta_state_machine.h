@@ -1047,6 +1047,16 @@ private:
      */
     void HilinkSaveConfig(void);
 
+    /**
+     * @Description operation before dhcp
+     */
+    void HandlePreDhcpSetup();
+
+    /**
+     * @Description operation after dhcp
+     */
+    void HandlePostDhcpSetup();
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.

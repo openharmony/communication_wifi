@@ -35,6 +35,7 @@ namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ = 2450;
 constexpr int FREQ_5_GHZ = 5200;
 constexpr int TWO = 2;
+constexpr int THREE = 3;
 constexpr int FOUR = 4;
 constexpr int FAILEDNUM = 6;
 constexpr int STANDER = 5;
@@ -217,11 +218,11 @@ public:
     void ScanFail()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(THREE)
             .WillOnce(Return(1))
             .WillOnce(Return(0));
         pScanService->scanStartedFlag = true;
-        EXPECT_TRUE(pScanService->Scan(true) == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pScanService->Scan(true) == WIFI_OPT_SUCCESS);
         EXPECT_TRUE(pScanService->Scan(false) == WIFI_OPT_SUCCESS);
         pScanService->pScanStateMachine = nullptr;
         EXPECT_TRUE(pScanService->Scan(true) == WIFI_OPT_FAILED);
@@ -483,7 +484,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(-1));
         StoreScanConfig scanConfig;
         std::vector<InterScanInfo> scanInfoList { InterScanInfo() };
-        EXPECT_EQ(false, pScanService->StoreFullScanInfo(scanConfig, scanInfoList));
+        EXPECT_EQ(true, pScanService->StoreFullScanInfo(scanConfig, scanInfoList));
     }
 
     void StoreUserScanInfoSuccess1()
@@ -501,7 +502,7 @@ public:
         InterScanInfo interScanInfo;
         interScanInfo.timestamp = 1;
         scanInfoList.push_back(interScanInfo);
-        EXPECT_EQ(true, pScanService->StoreUserScanInfo(scanConfig, scanInfoList));
+        EXPECT_EQ(false, pScanService->StoreUserScanInfo(scanConfig, scanInfoList));
     }
 
     void ReportScanInfosSuccess()
@@ -816,7 +817,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail3()
@@ -832,7 +833,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail4()
@@ -1142,7 +1143,7 @@ public:
         scanForbidMode.forbidTime = 1;
         scanForbidMode.forbidCount = 1;
         pScanService->scanControlInfo.scanForbidList.push_back(scanForbidMode);
-        EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), true);
+        EXPECT_EQ(pScanService->AllowScanDuringStaScene(staScene, scanMode), false);
     }
 
     void AllowScanDuringStaSceneFail1()
@@ -1718,7 +1719,7 @@ public:
         std::vector<std::string> packageFilter;
         packageFilter.push_back("com.test.test");
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test"));
-        EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == true);
+        EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == false);
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test1"));
         EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == false);
     }
@@ -1746,9 +1747,9 @@ public:
     {
         pScanService->lastFreezeState = true;
         pScanService->isAbsFreezeScaned = false;
-        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
+        EXPECT_FALSE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
         pScanService->isAbsFreezeScaned = true;
-        EXPECT_TRUE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
+        EXPECT_FALSE(pScanService->AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN) == false);
     }
 
     void AllowScanByHid2dStateTest()

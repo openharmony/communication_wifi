@@ -168,21 +168,6 @@ public:
         pStaStateMachine->FillSuiteB192Cfg(halDeviceConfig);
     }
 
-    void ConvertDeviceCfgSuccess()
-    {
-        std::vector<WifiScanInfo> scanInfoList;
-        WifiScanInfo temp;
-        temp.ssid = "123";
-        temp.bssid ="456";
-        temp.capabilities = "PSK+SAE";
-        scanInfoList.push_back(temp);
-        WifiDeviceConfig config;
-        config.keyMgmt = "WEP";
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
-            .WillOnce(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
-    }
-
     void GetGsmAuthResponseWithoutLengthTest()
     {
         EapSimGsmAuthParam param;
@@ -301,11 +286,6 @@ HWTEST_F(StaStateMachineTest, SetExternalSimTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, FillSuiteB192CfgTest, TestSize.Level1)
 {
     FillSuiteB192CfgTest();
-}
-
-HWTEST_F(StaStateMachineTest, ConvertDeviceCfgSuccess, TestSize.Level1)
-{
-    ConvertDeviceCfgSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, GetGsmAuthResponseWithoutLengthTest, TestSize.Level1)

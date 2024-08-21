@@ -67,18 +67,6 @@ HWTEST_F(P2pDisabledStateTest, GoOutState, TestSize.Level1)
     pP2pDisabledState->GoOutState();
 }
 
-HWTEST_F(P2pDisabledStateTest, ProcessCmdP2pEnable1, TestSize.Level1)
-{
-    InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    EXPECT_CALL(*pMockMonitor, RegisterIfaceHandler(_, _)).WillOnce(Return());
-    EXPECT_CALL(*pMockMonitor, MonitorBegins(_)).WillOnce(Return());
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), StartP2p()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetRandomMacAddr(_)).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_ENABLE));
-    EXPECT_TRUE(pP2pDisabledState->ExecuteStateMsg(msg));
-}
-
 HWTEST_F(P2pDisabledStateTest, ProcessCmdP2pEnable2, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();

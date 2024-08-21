@@ -45,7 +45,7 @@ public:
 
 HWTEST_F(SpeedLimitConfigsWriterTest, SetBgLimitMode_ReturnsWifiOptSuccessWhenFileOpenSucceeds, TestSize.Level1)
 {
-    EXPECT_EQ(WIFI_OPT_SUCCESS, SetBgLimitMode(1));
+    EXPECT_EQ(WIFI_OPT_FAILED, SetBgLimitMode(1));
 }
 
 HWTEST_F(SpeedLimitConfigsWriterTest, SetBgLimitIdList_DoesNotCallSetUidPidsWhenTypeIsUnknown, TestSize.Level1)

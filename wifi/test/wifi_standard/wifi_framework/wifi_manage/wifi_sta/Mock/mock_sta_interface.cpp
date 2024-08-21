@@ -176,12 +176,6 @@ ErrCode StaInterface::SetPowerMode(bool mode)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::SetTxPower(int power)
-{
-    LOGI("Enter SetTxPower, power=[%{public}d]!", power);
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 {
     return WIFI_OPT_SUCCESS;

@@ -686,15 +686,11 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (!IsStaServiceRunning()) {
-        return WIFI_OPT_STA_NOT_OPENED;
+    if (WifiStaHalInterface::GetInstance().SetTxPower(power) != WIFI_HAL_OPT_OK) {
+        LOGE("SetTxPower() failed");
+        return WIFI_OPT_FAILED;
     }
-
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if (pService == nullptr) {
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
-    return pService->SetTxPower(power);
+    return WIFI_OPT_SUCCESS;
 }
 
 void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result)

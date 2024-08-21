@@ -176,7 +176,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
     }
 #ifndef OHOS_ARCH_LITE
     if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
-        WIFI_LOGE("EnableSemiWifi: Mdm forbidden PERMISSION_DENIED!");
+        ("EnableSemiWifi: Mdm forbidden PERMISSION_DENIED!");
         return WIFI_OPT_ENTERPRISE_DENIED;
     }
     if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
@@ -687,7 +687,7 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
     }
 
     if (WifiStaHalInterface::GetInstance().SetTxPower(power) != WIFI_HAL_OPT_OK) {
-        LOGE("SetTxPower() failed");
+        WIFI_LOGE("SetTxPower() failed");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

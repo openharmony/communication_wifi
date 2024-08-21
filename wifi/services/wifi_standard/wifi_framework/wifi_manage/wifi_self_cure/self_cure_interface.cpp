@@ -30,6 +30,14 @@ SelfCureInterface::~SelfCureInterface()
 {
     WIFI_LOGI("SelfCureInterface::~SelfCureInterface");
     std::lock_guard<std::mutex> lock(mutex);
+    // unRegister callback func
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pService == nullptr) {
+        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
+    } else {
+        pService->UnRegisterStaServiceCallback(mStaCallback);
+    }
+
     if (pSelfCureService != nullptr) {
         delete pSelfCureService;
         pSelfCureService = nullptr;

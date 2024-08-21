@@ -1249,10 +1249,6 @@ void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
 #endif
     /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP, linkedInfo);
-
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false) != WIFI_HAL_OPT_OK) {
-        LOGE("DealConnectionEvent WpaSetPowerMode() failed!");
-    }
     mConnectFailedCnt = 0;
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);
@@ -1288,6 +1284,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
     } else {
         StopDhcpClient(ifname.c_str(), true);
     }
+    HandlePostDhcpSetup();
     getIpSucNum = 0;
     getIpFailNum = 0;
     isRoam = false;
@@ -2892,6 +2889,7 @@ void StaStateMachine::GetIpState::GoInState()
         }
         return;
     }
+    pStaStateMachine->HandlePreDhcpSetup();
     do {
         int result = pStaStateMachine->RegisterCallBack();
         if (result != DHCP_SUCCESS) {
@@ -2937,6 +2935,7 @@ void StaStateMachine::GetIpState::GoOutState()
 {
     WIFI_LOGI("GetIpState GoOutState function.");
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+    pStaStateMachine->HandlePostDhcpSetup();
 }
 
 bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -4045,9 +4044,6 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
     }
     LOGI("DhcpResultNotify OnSuccess, uLeaseTime=%{public}d %{public}d %{public}d", result->uOptLeasetime, assignMethod,
         pStaStateMachine->currentTpType);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true) != WIFI_HAL_OPT_OK) {
-        LOGE("DhcpResultNotify OnSuccess WpaSetPowerMode() failed!");
-    }
     return;
 }
 
@@ -4313,6 +4309,19 @@ void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
     }
 }
 #endif
+
+void StaStateMachine::HandlePreDhcpSetup()
+{
+    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false);
+    WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(false);
+}
+
+void StaStateMachine::HandlePostDhcpSetup()
+{
+    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true);
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+    WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+}
 
 WifiDeviceConfig StaStateMachine::getCurrentWifiDeviceConfig()
 {

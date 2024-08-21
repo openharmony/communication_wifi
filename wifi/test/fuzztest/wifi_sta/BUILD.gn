@@ -37,6 +37,7 @@ group("fuzztest") {
     "isconnected_fuzzer:IsConnectedFuzzTest",
     "reassociate_fuzzer:ReAssociateFuzzTest",
     "reconnect_fuzzer:ReConnectFuzzTest",
+    "wifiap_fuzzer:WifiApFuzzTest",
     "wifidevicestub_fuzzer:WifiDeviceStubFuzzTest",
     "wifihotspotimpl_fuzzer:WifiHotspotImplFuzzTest",
     "wifihotspotstub_fuzzer:WifiHotSpotStubFuzzTest",

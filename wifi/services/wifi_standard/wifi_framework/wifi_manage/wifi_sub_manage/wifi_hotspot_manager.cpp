@@ -124,10 +124,6 @@ void WifiHotspotManager::DealApStateChanged(ApState state, int id)
     cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     if (state == ApState::AP_STATE_IDLE) {
-        if (WifiConfigCenter::GetInstance().GetApMidState() == WifiOprMidState::OPENING) {
-            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-            ins->SendMessage(CMD_AP_SERVICE_START_FAILURE, id);
-        }
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, id);
         WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
     }

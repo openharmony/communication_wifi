@@ -16,6 +16,8 @@
 #include "self_cure_interface.h"
 #include "self_cure_service.h"
 #include "wifi_logger.h"
+#include "ista_service.h"
+#include "wifi_service_manager.h"
 
 DEFINE_WIFILOG_LABEL("SelfCureInterface");
 

@@ -308,13 +308,14 @@ ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callb
 ErrCode StaInterface::UnRegisterStaServiceCallback(const StaServiceCallback &callbacks)
 {
     LOGD("Enter UnRegisterStaServiceCallback.\n");
-    auto check = [&callbacks](const StaServiceCallback &cb) -> bool {
-        if (strcasecmp(callbacks.callbackModuleName.c_str(), cb.callbackModuleName.c_str()) == 0) {
-            return true;
+    std::vector<StaServiceCallback>::iterator iter = m_staCallback.begin();
+    while (iter != m_staCallback.end()) {
+        if (strcasecmp(callbacks.callbackModuleName.c_str(), iter->callbackModuleName.c_str()) == 0) {
+            m_staCallback.erase(iter);
+            break;
         }
-        return false;
-    };
-    m_staCallback.erase(remove_if(m_staCallback.begin(), m_staCallback.end(), check), m_staCallback.end());
+        iter++;
+    }
  
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->UnRegisterStaServiceCallback(callbacks);

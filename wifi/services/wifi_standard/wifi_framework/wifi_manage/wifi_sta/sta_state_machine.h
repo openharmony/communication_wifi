@@ -872,12 +872,6 @@ private:
     void DealWpaLinkFailEvent(InternalMessagePtr msg);
 
     /**
-     * @Description  try to connect the saved network for three times
-     *@Return true: try to reconnect  fail: try max
-     */
-    bool DealReconnectSavedNetwork();
-
-    /**
      * @Description  set sta connect failed count
      *@Return void
      */
@@ -1024,14 +1018,6 @@ private:
      * @Return true: used randomized mac address.
      */
     bool CurrentIsRandomizedMac();
-
-    /**
-     * @Description : Check Current DisConnect event is should retry.
-     *
-     * @param eventName - eventName.
-     * @Return true: need retry.
-     */
-    bool IsStaDisConnectReasonShouldRetryEvent(int eventName);
 
     /**
      * @Description : Check wpa report DisConnect reason is should stoptimer.

@@ -45,6 +45,7 @@ ScanService::ScanService(int instId)
       autoNetworkSelection(false),
       lastSystemScanTime(0),
       pnoScanFailedNum(0),
+      systemScanFailedNum(0),
       disableScanFlag(false),
       customCurrentTime(0),
       customSceneForbidCount(0),
@@ -226,21 +227,25 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
             RestartPnoScanTimeOut();
             break;
         }
+        case RESTART_SYSTEM_SCAN_TIMER: {
+            RestartSystemScanTimeOut();
+            break;
+        }
         default: {
             break;
         }
     }
 }
 
-ErrCode ScanService::Scan(bool externFlag)
+ErrCode ScanService::Scan(ScanType scanType)
 {
-    WIFI_LOGI("Enter Scan, externFlag:%{public}d.\n", externFlag);
+    WIFI_LOGI("Enter Scan, scanType:%{public}d.\n", static_cast<int>(scanType));
     if (!scanStartedFlag) {
         WIFI_LOGE("Scan service has not started.\n");
         return WIFI_OPT_FAILED;
     }
 
-    ErrCode rlt = ScanControlInner(externFlag);
+    ErrCode rlt = ScanControlInner(scanType);
     if (rlt != WIFI_OPT_SUCCESS) {
         return rlt;
     }
@@ -256,7 +261,7 @@ ErrCode ScanService::Scan(bool externFlag)
 
     scanConfig.scanBand = SCAN_BAND_BOTH_WITH_DFS;
     scanConfig.fullScanFlag = true;
-    scanConfig.externFlag = externFlag;
+    scanConfig.scanType = scanType;
     scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
     if (!SingleScan(scanConfig)) {
         WIFI_LOGE("SingleScan failed.\n");
@@ -266,7 +271,7 @@ ErrCode ScanService::Scan(bool externFlag)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag)
+ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanType)
 {
     WIFI_LOGI("Enter ScanWithParam, freqs num:%{public}d.\n", (int)params.freqs.size());
 
@@ -275,7 +280,7 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag
         return WIFI_OPT_FAILED;
     }
 
-    ErrCode rlt = ScanControlInner(externFlag);
+    ErrCode rlt = ScanControlInner(scanType);
     if (rlt != WIFI_OPT_SUCCESS) {
         return rlt;
     }
@@ -313,7 +318,7 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag
     scanConfig.scanFreqs.assign(params.freqs.begin(), params.freqs.end());
     scanConfig.ssid = params.ssid;
     scanConfig.bssid = params.bssid;
-    scanConfig.externFlag = true;
+    scanConfig.scanType = scanType;
     scanConfig.scanningWithParamFlag = true;
     scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
 
@@ -325,9 +330,9 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::ScanControlInner(bool externFlag)
+ErrCode ScanService::ScanControlInner(ScanType scanType)
 {
-    if (externFlag) {
+    if (scanType == ScanType::SCAN_TYPE_EXTERN) {
         ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_EXTERN);
         if (rlt != WIFI_OPT_SUCCESS) {
             return rlt;
@@ -552,7 +557,7 @@ int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const Inte
     storeScanConfig.scanTime =
         static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND + times.tv_nsec / SECOND_TO_MILLI_SECOND;
     storeScanConfig.fullScanFlag = scanConfig.fullScanFlag;
-    storeScanConfig.externFlag = scanConfig.externFlag;
+    storeScanConfig.scanType = scanConfig.scanType;
     storeScanConfig.scanningWithParamFlag = scanConfig.scanningWithParamFlag;
 
     std::unique_lock<std::mutex> lock(scanConfigMapMutex);
@@ -567,18 +572,31 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
         static_cast<int>(requestIndexList.size()));
 
     std::unique_lock<std::mutex> lock(scanConfigMapMutex);
+    bool needRestartSystemScan = false;
+    bool needReportScanResult = false;
     for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
         ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
         /* No configuration found. */
         if (configIter == scanConfigMap.end()) {
             continue;
         }
-
+        if (configIter->second.scanType != ScanType::SCAN_TYPE_SYSTEMTIMER) {
+            needReportScanResult = true;
+        } else {
+            needRestartSystemScan = true;
+            systemScanFailedNum++;
+        }
+        scanConfigMap.erase(*reqIter);
+    }
+    if (pScanStateMachine != nullptr && needRestartSystemScan && systemScanFailedNum < MAX_SYSTEM_SCAN_FAILED_NUM
+        && staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
+        pScanStateMachine->StopTimer(static_cast<int>(RESTART_SYSTEM_SCAN_TIMER));
+        pScanStateMachine->StartTimer(static_cast<int>(RESTART_SYSTEM_SCAN_TIMER), RESTART_SYSTEM_SCAN_TIME);
+    }
+    if (needReportScanResult) {
         /* Notification of the end of scanning. */
         ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL));
         scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_FAIL);
-
-        scanConfigMap.erase(*reqIter);
     }
 
     return;
@@ -596,6 +614,7 @@ void ScanService::HandleCommonScanInfo(
         std::unique_lock<std::mutex> lock(scanConfigMapMutex);
         HandleScanResults(requestIndexList, scanInfoList, fullScanStored);
     }
+    pScanStateMachine->StopTimer(static_cast<int>(RESTART_SYSTEM_SCAN_TIMER));
     if (fullScanStored) {
         TryToRestoreSavedNetwork();
     }
@@ -623,11 +642,17 @@ void ScanService::HandleCommonScanInfo(
 void ScanService::HandleScanResults(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList,
     bool &fullScanStored)
 {
+    bool needReportScanResult = false;
     for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
         ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
         /* No configuration found. */
         if (configIter == scanConfigMap.end()) {
             continue;
+        }
+        if (configIter->second.scanType != ScanType::SCAN_TYPE_SYSTEMTIMER) {
+            needReportScanResult = true;
+        } else {
+            systemScanFailedNum = 0;
         }
         /* Full Scan Info. */
         if (configIter->second.fullScanFlag) {
@@ -637,7 +662,6 @@ void ScanService::HandleScanResults(std::vector<int> &requestIndexList, std::vec
             }
             if (StoreFullScanInfo(configIter->second, scanInfoList)) {
                 fullScanStored = true;
-                ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
                 scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
             } else {
                 WIFI_LOGE("StoreFullScanInfo failed.\n");
@@ -647,10 +671,14 @@ void ScanService::HandleScanResults(std::vector<int> &requestIndexList, std::vec
             if (!StoreUserScanInfo(configIter->second, scanInfoList)) {
                 WIFI_LOGE("StoreUserScanInfo failed.\n");
             }
-            ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
             scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_OK);
         }
         scanConfigMap.erase(*reqIter);
+    }
+    if (needReportScanResult) {
+        ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK));
+    } else {
+        WIFI_LOGI("No need to report scan finish event.\n");
     }
 }
 
@@ -737,7 +765,7 @@ void ScanService::TryToRestoreSavedNetwork()
         }
     }
     if (!params.freqs.empty()) {
-        ScanWithParam(params, false);
+        ScanWithParam(params, ScanType::SCAN_TYPE_SYSTEMTIMER);
     }
 }
 
@@ -1110,11 +1138,15 @@ void ScanService::HandleMovingFreezeChanged()
         WIFI_LOGW("set movingFreeze scanned false.");
         WifiScanConfig::GetInstance().SetMovingFreezeScaned(false);
     }
-    if (lastFreezeState == freezeState) {
-        WIFI_LOGD("AbsFreezeState not change, no need to restart system timer scan.");
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+    if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) || screenState == MODE_STATE_CLOSE) {
+        WIFI_LOGW("Moving change do nothing.");
         return;
     }
-    lastFreezeState = freezeState;
+    {
+        std::unique_lock<std::mutex> lock(scanControlInfoMutex);
+        lastFreezeState = freezeState;
+    }
     SystemScanProcess(false);
 }
 
@@ -1140,6 +1172,20 @@ void ScanService::HandleCustomStatusChanged(int customScene, int customSceneStat
 void ScanService::HandleGetCustomSceneState(std::map<int, time_t>& sceneMap) const
 {
     sceneMap = customSceneTimeMap;
+}
+
+void ScanService::HandleAutoConnectStateChanged(bool success)
+{
+    WIFI_LOGI("Enter HandleAutoConnectStateChanged\n");
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+    if (staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)
+        && screenState != MODE_STATE_CLOSE && !success && systemScanIntervalMode.scanIntervalMode.count <= 1) {
+        if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Scan failed.");
+        }
+        std::unique_lock<std::mutex> lock(scanControlInfoMutex);
+        systemScanIntervalMode.scanIntervalMode.count++;
+    }
 }
 
 void ScanService::SystemScanProcess(bool scanAtOnce)
@@ -1185,8 +1231,10 @@ void ScanService::StopSystemScan()
         return;
     }
     pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SCAN_TIMER));
+    pScanStateMachine->StopTimer(static_cast<int>(RESTART_SYSTEM_SCAN_TIMER));
     EndPnoScan();
     pnoScanFailedNum = 0;
+    systemScanFailedNum = 0;
     pScanStateMachine->StopTimer(static_cast<int>(RESTART_PNO_SCAN_TIMER));
     return;
 }
@@ -1218,7 +1266,7 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
     }
     if (scanAtOnce || (lastSystemScanTime == 0) ||
         (sinceLastScan / SECOND_TO_MILLI_SECOND >= systemScanIntervalMode.scanIntervalMode.interval)) {
-        if (Scan(false) != WIFI_OPT_SUCCESS) {
+        if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Scan failed.");
         }
         lastSystemScanTime = nowTime;
@@ -1269,7 +1317,7 @@ void ScanService::HandleDisconnectedScanTimeout()
         WIFI_LOGE("pScanStateMachine is null.\n");
         return;
     }
-    if (Scan(false) != WIFI_OPT_SUCCESS) {
+    if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Scan failed.");
     }
     pScanStateMachine->StopTimer(static_cast<int>(DISCONNECTED_SCAN_TIMER));
@@ -1293,6 +1341,14 @@ void ScanService::RestartPnoScanTimeOut()
     }
 
     return;
+}
+
+void ScanService::RestartSystemScanTimeOut()
+{
+    WIFI_LOGI("Enter RestartSystemScanTimeOut.\n");
+    if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("RestartSystemScanTimeOut failed.");
+    }
 }
 
 void ScanService::GetScanControlInfo()
@@ -1647,7 +1703,7 @@ bool ScanService::IsExternScanning() const
 
     std::unique_lock<std::mutex> lock(scanConfigMapMutex);
     for (auto iter = scanConfigMap.begin(); iter != scanConfigMap.end(); ++iter) {
-        if (iter->second.externFlag) {
+        if (iter->second.scanType != ScanType::SCAN_TYPE_SYSTEMTIMER) {
             return true;
         }
     }

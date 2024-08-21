@@ -55,8 +55,6 @@ constexpr int VALID_RSSI3 = -80;
 constexpr int VALID_RSSI4 = 156;
 constexpr int INVALID_RSSI5 = 100;
 static constexpr int MAX_STR_LENT = 127;
-static constexpr int MAX_CONNECTED_COUNT = 4;
-
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -502,7 +500,6 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
-        pStaStateMachine->linkedInfo.retryedConnCount = MAX_CONNECTED_COUNT;
         pStaStateMachine->DealWpaLinkFailEvent(msg);
     }
 
@@ -514,7 +511,6 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
-        pStaStateMachine->linkedInfo.retryedConnCount = MAX_CONNECTED_COUNT;
         pStaStateMachine->DealWpaLinkFailEvent(msg);
     }
 
@@ -1811,18 +1807,6 @@ public:
         pStaStateMachine->DealHiLinkDataToWpa(msg);
     }
 
-    void IsStaDisConnectReasonShouldRetryEventSuccessTest()
-    {
-        int event = 0x3018;
-        EXPECT_TRUE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
-    }
-
-    void IsStaDisConnectReasonShouldRetryEventFailedTest()
-    {
-        int event = 0;
-        EXPECT_FALSE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
-    }
-
     void IsDisConnectReasonShouldStopTimerSuccessTest()
     {
         int event = 8;
@@ -2064,16 +2048,6 @@ HWTEST_F(StaStateMachineTest, IsDisConnectReasonShouldStopTimerSuccessTest, Test
 HWTEST_F(StaStateMachineTest, IsDisConnectReasonShouldStopTimerFailedTest, TestSize.Level1)
 {
     IsDisConnectReasonShouldStopTimerFailedTest();
-}
-
-HWTEST_F(StaStateMachineTest, IsStaDisConnectReasonShouldRetryEventSuccessTest, TestSize.Level1)
-{
-    IsStaDisConnectReasonShouldRetryEventSuccessTest();
-}
-
-HWTEST_F(StaStateMachineTest, IsStaDisConnectReasonShouldRetryEventFailedTest, TestSize.Level1)
-{
-    IsStaDisConnectReasonShouldRetryEventFailedTest();
 }
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)

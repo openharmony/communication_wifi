@@ -82,6 +82,7 @@ inline constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfig
 inline constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
 inline constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 inline constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
+inline constexpr char WIFI_VARIABLE_PATH[] = "/system/etc/wifi/wifi_variable.cfg";
 
 namespace OHOS {
 namespace Wifi {
@@ -173,6 +174,8 @@ public:
     const MovingFreezePolicy ReloadMovingFreezePolicy();
 
     int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
+
+    int GetVariableMap(std::map<std::string, std::string> &variableMap);
 
     int SyncHotspotConfig();
 
@@ -279,6 +282,7 @@ private:
     int ReloadStaRandomMac();
     int ReloadPortalconf();
     void InitPackageFilterConfig();
+    void InitVariableConfig();
     void InitDefaultHotspotConfig();
     void InitHotspotConfig();
     int SyncBlockList();
@@ -350,6 +354,8 @@ private:
     std::atomic<int> mMaxNumConfigs;
     std::map<int, WifiConfig> mWifiConfig;
     WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
+    WifiConfigFileImpl<VariableConf> mVariableConf;
+    std::map<std::string, std::string> mVariableMap;
 };
 }  // namespace Wifi
 }  // namespace OHOS

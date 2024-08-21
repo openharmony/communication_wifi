@@ -185,6 +185,14 @@ static void ClearIfaceName(void)
     }
 }
 
+static void (*mNativeProcessCallback)(int) = NULL;
+WifiErrorNo SetNativeProcessCallback(void (*callback)(int))
+{
+    LOGI("%{public}s enter", __func__);
+    mNativeProcessCallback = callback;
+    return WIFI_HAL_OPT_OK;
+}
+
 static void HdiWpaResetGlobalObj()
 {
     if (IsHdiWpaStopped() == WIFI_HAL_OPT_OK) {

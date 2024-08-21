@@ -1258,6 +1258,14 @@ private:
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
     bool IsGoodSignalQuality();
+#if 0
+void StaStateMachine::UnRegisterStaServiceCallback(const StaServiceCallback &callback)
+{
+    WIFI_LOGI("UnRegisterStaServiceCallback, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    std::unique_lock<std::shared_mutex> lock(m_staCallbackMutex);
+    m_staCallback.erase(callback.callbackModuleName);
+}
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

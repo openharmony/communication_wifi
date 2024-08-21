@@ -79,7 +79,7 @@ ErrCode ScanInterface::Scan(bool externFlag)
     WIFI_LOGI("Enter ScanInterface::Scan\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    return pScanService->Scan(externFlag);
+    return pScanService->Scan(externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN);
 }
 
 ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag)
@@ -87,7 +87,8 @@ ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool 
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    return pScanService->ScanWithParam(wifiScanParams, externFlag);
+    return pScanService->ScanWithParam(wifiScanParams,
+        externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN);
 }
 
 ErrCode ScanInterface::DisableScan(bool disable)
@@ -128,7 +129,7 @@ ErrCode ScanInterface::OnStandbyStateChanged(bool sleeping)
     }
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
-    return pScanService->Scan(false);
+    return pScanService->Scan(ScanType::SCAN_TYPE_SYSTEMTIMER);
 }
 
 ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
@@ -191,6 +192,15 @@ ErrCode ScanInterface::OnControlStrategyChanged()
     pScanService->ClearScanControlValue();
     pScanService->GetScanControlInfo();
     pScanService->SystemScanProcess(true);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanInterface::OnAutoConnectStateChanged(bool success)
+{
+    WIFI_LOGI("Enter ScanInterface::OnAutoConnectStateChanged, success:%{public}d", success);
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    pScanService->HandleAutoConnectStateChanged(success);
     return WIFI_OPT_SUCCESS;
 }
 

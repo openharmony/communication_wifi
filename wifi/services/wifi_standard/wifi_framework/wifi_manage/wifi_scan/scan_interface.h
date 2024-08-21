@@ -128,6 +128,13 @@ public:
      */
     ErrCode OnControlStrategyChanged() override;
     /**
+     * @Description Auto connect state change.
+     *
+     * @param success auto connect state[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode OnAutoConnectStateChanged(bool success) override;
+    /**
      * @Description Registers the callback function of the scanning module to the interface service.
      *
      * @param scanSerivceCallbacks callback function

@@ -95,7 +95,6 @@ public:
     {
         int staScene = 0;
         StoreScanConfig cfg;
-        cfg.externFlag = true;
         pScanService->scanConfigMap.emplace(staScene, cfg);
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         ScanForbidMode forbidMode;

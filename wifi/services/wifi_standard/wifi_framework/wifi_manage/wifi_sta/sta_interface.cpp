@@ -305,6 +305,22 @@ ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callb
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::UnRegisterStaServiceCallback(const StaServiceCallback &callbacks)
+{
+    LOGD("Enter UnRegisterStaServiceCallback.\n");
+    auto check = [&callbacks](const StaServiceCallback &cb) -> bool {
+        if (strcasecmp(callbacks.callbackModuleName.c_str(), cb.callbackModuleName.c_str()) == 0) {
+            return true;
+        }
+        return false;
+    };
+    m_staCallback.erase(remove_if(m_staCallback.begin(), m_staCallback.end(), check), m_staCallback.end());
+ 
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->UnRegisterStaServiceCallback(callbacks);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::SetSuspendMode(bool mode)
 {
     LOGI("Enter SetSuspendMode, mode=[%{public}d]!", mode);

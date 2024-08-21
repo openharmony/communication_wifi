@@ -688,6 +688,9 @@ void WifiDeviceProxy::ParseBigConfig(MessageParcel &reply, std::vector<WifiDevic
         config.uid = CheckDataLegal(tokens[g_bigDataRecvLen++]);
         config.callProcessName = HexToString(tokens[g_bigDataRecvLen++]);
         config.ancoCallProcessName = HexToString(tokens[g_bigDataRecvLen++]);
+        config.networkSelectionStatus.status = WifiDeviceConfigStatus(CheckDataLegal(tokens[g_bigDataRecvLen++]));
+        config.networkSelectionStatus.networkSelectionDisableReason =
+            DisabledReason(CheckDataLegal(tokens[g_bigDataRecvLen++]));
         result.emplace_back(config);
     }
     g_bigDataRecvLen = 0;
@@ -740,6 +743,8 @@ void WifiDeviceProxy::ParseSmallConfig(MessageParcel &reply, std::vector<WifiDev
         config.callProcessName = reply.ReadString();
         config.ancoCallProcessName = reply.ReadString();
         config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
+        config.networkSelectionStatus.status = WifiDeviceConfigStatus(reply.ReadInt32());
+        config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason(reply.ReadInt32());
         result.emplace_back(config);
     }
 }

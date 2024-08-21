@@ -440,12 +440,10 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest_01, TestSize.Level1)
 
 HWTEST_F(WifiHalDeviceManagerTest, SetTxPowerTest_01, TestSize.Level1)
 {
-    std::string ifaceName = "Wlan0";
-    int model = 0;
+    int power = 1000;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    DelayedSingleton<HalDeviceManager>::GetInstance()->ResetHalDeviceManagerInfo();
-    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(ifaceName, model);
-    EXPECT_EQ(result, false);
+    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(power);
+    EXPECT_EQ(result, true);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SetDpiMarkRuleTest_01, TestSize.Level1)

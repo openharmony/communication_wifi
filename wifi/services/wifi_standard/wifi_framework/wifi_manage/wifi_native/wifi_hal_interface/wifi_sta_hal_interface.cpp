@@ -209,10 +209,10 @@ WifiErrorNo WifiStaHalInterface::GetSupportFeature(long &feature)
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::SetTxPower(const std::string &ifaceName, int power)
+WifiErrorNo WifiStaHalInterface::SetTxPower(int power)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(ifaceName, power)) {
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(power)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;

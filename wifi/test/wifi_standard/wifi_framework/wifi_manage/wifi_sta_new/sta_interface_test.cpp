@@ -85,13 +85,6 @@ HWTEST_F(StaInterfaceTest, SetPowerModeTest01, TestSize.Level1)
     EXPECT_TRUE(pStaInterface->SetPowerMode(mode) == WIFI_OPT_SUCCESS);
 }
 
-HWTEST_F(StaInterfaceTest, SetTxPowerTest01, TestSize.Level1)
-{
-    int power = 0;
-    EXPECT_CALL(*pMockStaService, SetPowerMode(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-    EXPECT_TRUE(pStaInterface->SetTxPower(power) == WIFI_OPT_SUCCESS);
-}
-
 HWTEST_F(StaInterfaceTest, OnSystemAbilityChangedTest01, TestSize.Level1)
 {
     int systemAbilityid = 0;

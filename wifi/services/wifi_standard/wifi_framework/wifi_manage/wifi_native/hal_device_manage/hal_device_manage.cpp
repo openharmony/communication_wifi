@@ -27,6 +27,7 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "servmgr_hdi.h"
 #include "hdf_remote_service.h"
+#include "wifi_config_center.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HalDeviceManager"
@@ -614,32 +615,45 @@ bool HalDeviceManager::SetPowerModel(const std::string &ifaceName, int model)
     return true;
 }
 
-bool HalDeviceManager::SetTxPower(const std::string &ifaceName, int power)
+bool HalDeviceManager::SetTxPower(int power)
 {
     if (!CheckReloadChipHdiService()) {
         return false;
     }
     
     std::lock_guard<std::mutex> lock(mMutex);
-    LOGI("SetTxPower, ifaceName:%{public}s, power:%{public}d", ifaceName.c_str(), power);
-    auto iter = mIWifiStaIfaces.find(ifaceName);
-    if (iter == mIWifiStaIfaces.end()) {
-        LOGE("SetTxPower, not find iface info");
-        return false;
+    int32_t staResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetStaIfaceName(),
+                                        mIWifiStaIfaces, power);
+    int32_t p2pResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetP2pIfaceName(),
+                                        mIWifiP2pIfaces, power);
+    int32_t apResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetApIfaceName(),
+                                        mIWifiApIfaces, power);
+    LOGI("SetTxPower, result:sta:%{public}d, p2p:%{public}d, ap:%{public}d",
+        staResult, p2pResult, apResult);
+    if (staResult == HDF_SUCCESS || p2pResult == HDF_SUCCESS || apResult == HDF_SUCCESS) {
+        LOGE("SetTxPower success");
+        return true;
     }
-
-    sptr<IChipIface> &iface = iter->second;
-    CHECK_NULL_AND_RETURN(iface, false);
-    int32_t ret = iface->SetTxPower(power);
-    if (ret != HDF_SUCCESS) {
-        LOGE("SetTxPower, call SetTxPower failed! ret:%{public}d", ret);
-        return false;
-    }
-
-    LOGI("SetTxPower success");
-    return true;
+    return false;
 }
 
+int32_t HalDeviceManager::IfaceSetTxPower(
+    const std::string &ifaceName, const std::map<std::string, sptr<IChipIface>> &mWifiIfaces, int power)
+{
+    int32_t result = HDF_FAILURE;
+    auto iter = mWifiIfaces.find(ifaceName);
+    if (iter != mWifiIfaces.end()) {
+        const sptr<IChipIface> &iface = iter->second;
+        CHECK_NULL_AND_RETURN(iface, false);
+        int32_t result = iface->SetTxPower(power);
+        if (result != HDF_SUCCESS) {
+            LOGE("SetTxPower, call SetTxPower failed! Result:%{public}d", result);
+        }
+        return result;
+    }
+    LOGI("can not find iface:%{public}s", ifaceName.c_str());
+    return result;
+}
 bool HalDeviceManager::GetPowerModel(const std::string &ifaceName, int &model)
 {
     if (!CheckReloadChipHdiService()) {

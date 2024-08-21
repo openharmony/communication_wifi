@@ -176,7 +176,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
     }
 #ifndef OHOS_ARCH_LITE
     if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
-        ("EnableSemiWifi: Mdm forbidden PERMISSION_DENIED!");
+        WIFI_LOGE("EnableSemiWifi: Mdm forbidden PERMISSION_DENIED!");
         return WIFI_OPT_ENTERPRISE_DENIED;
     }
     if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {

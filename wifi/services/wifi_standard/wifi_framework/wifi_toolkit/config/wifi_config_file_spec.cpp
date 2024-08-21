@@ -1622,6 +1622,14 @@ void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
 }
 
 template <>
+void ClearTClass<VariableConf>(VariableConf &item)
+{
+    item.variableName.clear();
+    item.variableValue.clear();
+    return;
+}
+
+template <>
 int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value)
 {
     int errorKeyValue = 0;
@@ -1648,6 +1656,21 @@ int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::str
         item.filterName = value;
     } else if (key == "package") {
         item.packageList.push_back(value);
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+
+template <>
+int SetTClassKeyValue<VariableConf>(VariableConf &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "variableName") {
+        item.variableName = value;
+    } else if (key == "variableValue") {
+        item.variableValue = value;
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;

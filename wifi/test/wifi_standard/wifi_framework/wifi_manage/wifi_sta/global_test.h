@@ -15,7 +15,7 @@
 
 #ifndef GLOBAL_TEST_H
 #define GLOBAL_TEST_H
-#include<gtest/gtest.h>
+#include <gtest/gtest.h>
 class GlobalTest:public testing::Environment
 {
 public:

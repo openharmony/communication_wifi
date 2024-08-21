@@ -871,13 +871,15 @@ void WifiControllerMachine::StopSoftapCloseTimer()
 }
 #endif
 
-void WifiControllerMachine::ShutdownWifi()
+void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
 {
     WIFI_LOGI("shutdownWifi.");
+    if (shutDownAp) {
 #ifdef FEATURE_AP_SUPPORT
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     StopAllSoftapManagers();
 #endif
+    }
     StopAllConcreteManagers();
 }
 } // namespace Wifi

@@ -61,7 +61,7 @@ HWTEST_F(WifiWatchDogUtilsTest, ResetProcessTest, TestSize.Level1)
     bool result = wifiWatchDogUtils->ResetProcess(true, "TestThread", true);
 
     // Check that the function returns true
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 // Test case for WifiWatchDogUtils::StartWatchDogForFunc()

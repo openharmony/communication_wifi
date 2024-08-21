@@ -348,6 +348,11 @@ struct PackageFilterConf {
     std::string filterName;
     std::vector<std::string> packageList;
 };
+
+struct VariableConf {
+    std::string variableName;
+    std::string variableValue;
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

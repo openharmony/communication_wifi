@@ -67,7 +67,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     for (OHOS::Wifi::WifiScanInfo &item : scanResults) {
         if (strcasecmp(item.bssid.c_str(), szBssid) == 0 &&
             (item.capabilities.find("PSK") != std::string::npos ||
-                item.capabilities.find("WAPI-PSK") != std::string::npos)) {
+            item.capabilities.find("WAPI-PSK") != std::string::npos)) {
                 isPsk = true;
                 break;
         }

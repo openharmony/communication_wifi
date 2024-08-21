@@ -516,6 +516,8 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteString(config.callProcessName);
     reply.WriteString(config.ancoCallProcessName);
     reply.WriteInt32(config.wifiWapiConfig.wapiPskType);
+    reply.WriteInt32((int)config.networkSelectionStatus.status);
+    reply.WriteInt32((int)config.networkSelectionStatus.networkSelectionDisableReason);
     return;
 }
 
@@ -608,6 +610,8 @@ void WifiDeviceStub::SendBigConfigEx(int contentSize, std::vector<WifiDeviceConf
         bigDataStream << result[i].uid << ";";
         bigDataStream << StringToHex(result[i].callProcessName) << ";";
         bigDataStream << StringToHex(result[i].ancoCallProcessName) << ";";
+        bigDataStream << (int)result[i].networkSelectionStatus.status << ";";
+        bigDataStream << (int)result[i].networkSelectionStatus.networkSelectionDisableReason << ";";
     }
 }
 

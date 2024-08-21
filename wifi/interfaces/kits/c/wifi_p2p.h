@@ -16,7 +16,7 @@
 #ifndef OHOS_C_P2P_H
 #define OHOS_C_P2P_H
 
-#include<stdint.h>
+#include <stdint.h>
 #include "wifi_error_code.h"
 #include "wifi_p2p_config.h"
 

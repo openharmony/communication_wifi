@@ -60,21 +60,6 @@ public:
     ErrCode RegisterP2PEvents(const std::vector<std::string> &event);
 
 private:
-    // std::function<void(int32_t)> wifiStateChange{nullptr};
-    // std::function<void(int32_t)> wifiConnectionChange{nullptr};
-    // std::function<void(int32_t)> wifiRssiChange{nullptr};
-    // std::function<void(int32_t)> wifiScanStateChange{nullptr};
-    // std::function<void(int32_t)> hotspotStateChange{nullptr};
-    // std::function<void(int32_t)> p2pStateChange{nullptr};
-    // std::function<void(CWifiP2PLinkedInfo)> p2pConnectionChange{nullptr};
-    // std::function<void(CWifiP2pDevice)> p2pDeviceChange{nullptr};
-    // std::function<void(WifiP2pDeviceArr)> p2pPeerDeviceChange{nullptr};
-    // std::function<void()> p2pPersistentGroupChange{nullptr};
-    // std::function<void(int32_t)> p2pDiscoveryChange{nullptr};
     OHOS::sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
 };
-
-
-
-
 }

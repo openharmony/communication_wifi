@@ -35,6 +35,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 DEFINE_WIFILOG_LABEL("ConcreteMangerMachine");
 int ConcreteMangerMachine::mTargetRole{static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW)};
 using TimeOutCallback = std::function<void()>;

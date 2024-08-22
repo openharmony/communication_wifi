@@ -34,9 +34,12 @@
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
+#include "wifi_global_func.h"
 
 namespace OHOS {
 namespace Wifi {
+constexpr const char* WIFI_SELFCURE_PROP_CONFIG = "const.wifi.selfcure";
+constexpr const int32_t WIFI_SELFCURE_PROP_SIZE = 16;
 DEFINE_WIFILOG_LABEL("WifiServiceScheduler");
 WifiServiceScheduler &WifiServiceScheduler::GetInstance()
 {
@@ -364,6 +367,13 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService)
 #ifdef FEATURE_SELF_CURE_SUPPORT
 ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
 {
+    char preValue[WIFI_SELFCURE_PROP_SIZE] = {0};
+    int errorCode = GetParamValue(WIFI_SELFCURE_PROP_CONFIG, "true", preValue, WIFI_SELFCURE_PROP_SIZE);
+    if ((errorCode > 0) && (strcmp(preValue, "false") == 0)) {
+        WIFI_LOGI("due to disable selfcure, not start selfcure service");
+        return WIFI_OPT_SUCCESS;
+    }
+
     if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SELFCURE) < 0) {
         WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_SELFCURE);
         return WIFI_OPT_FAILED;

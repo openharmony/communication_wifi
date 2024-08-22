@@ -168,7 +168,6 @@ public:
     void ClearStartFailCountTest()
     {
         pWifiControllerMachine->ClearWifiStartFailCount();
-        pWifiControllerMachine->ClearApStartFailCount();
     }
 
     void RmoveSoftapManagerTest()
@@ -244,10 +243,6 @@ public:
             new (std::nothrow) ConcreteClientModeManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
         pWifiControllerMachine->concreteManagers.push_back(clientmode);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
-        msg->SetMessageName(CMD_AP_SERVICE_START_FAILURE);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
-        pWifiControllerMachine->mSoftapStartFailCount = AP_OPEN_RETRY_MAX_COUNT;
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 

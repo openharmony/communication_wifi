@@ -30,7 +30,6 @@
 namespace OHOS {
 namespace Wifi {
 
-
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
 
@@ -808,9 +807,8 @@ void WifiControllerMachine::HandleSoftapStop(int id)
         RmoveSoftapManager(id);
         if (!HasAnyManager()) {
             SwitchState(pDisableState);
-        } else {
-            return;
         }
+        return;
     }
 
     RmoveSoftapManager(id);

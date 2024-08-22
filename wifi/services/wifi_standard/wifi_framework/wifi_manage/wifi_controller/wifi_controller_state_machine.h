@@ -90,7 +90,6 @@ public:
     void HandleStaSemiActive(int id);
     void HandleConcreteStop(int id);
     void ClearWifiStartFailCount();
-    void ClearApStartFailCount();
 #ifdef FEATURE_AP_SUPPORT
     void RmoveSoftapManager(int id);
     void HandleSoftapStop(int id);
@@ -153,7 +152,6 @@ private:
     std::vector<ConcreteClientModeManager *> concreteManagers;
     mutable std::mutex concreteManagerMutex;
     static int mWifiStartFailCount;
-    static int mSoftapStartFailCount;
 #ifdef FEATURE_AP_SUPPORT
     std::vector<SoftApManager *> softapManagers;
     mutable std::mutex softapManagerMutex;

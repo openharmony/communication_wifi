@@ -55,8 +55,7 @@ constexpr int VALID_RSSI3 = -80;
 constexpr int VALID_RSSI4 = 156;
 constexpr int INVALID_RSSI5 = 100;
 static constexpr int MAX_STR_LENT = 127;
-static constexpr int MAX_CONNECTED_COUNT = 4;
-
+static const std::string TEMP_TEST_DATA = "1234567890abcdef1234567890abcdef";
 class StaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -502,7 +501,6 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
-        pStaStateMachine->linkedInfo.retryedConnCount = MAX_CONNECTED_COUNT;
         pStaStateMachine->DealWpaLinkFailEvent(msg);
     }
 
@@ -514,7 +512,6 @@ public:
         std::string bssid = "wifitest";
         msg->SetMessageObj(bssid);
         msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
-        pStaStateMachine->linkedInfo.retryedConnCount = MAX_CONNECTED_COUNT;
         pStaStateMachine->DealWpaLinkFailEvent(msg);
     }
 
@@ -1811,18 +1808,6 @@ public:
         pStaStateMachine->DealHiLinkDataToWpa(msg);
     }
 
-    void IsStaDisConnectReasonShouldRetryEventSuccessTest()
-    {
-        int event = 0x3018;
-        EXPECT_TRUE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
-    }
-
-    void IsStaDisConnectReasonShouldRetryEventFailedTest()
-    {
-        int event = 0;
-        EXPECT_FALSE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
-    }
-
     void IsDisConnectReasonShouldStopTimerSuccessTest()
     {
         int event = 8;
@@ -1922,14 +1907,14 @@ public:
     void GetGsmAuthResponseWithLengthTest()
     {
         EapSimGsmAuthParam param;
-        param.rands.push_back("aaaaa12345656789098");
+        param.rands.push_back(TEMP_TEST_DATA);
         pStaStateMachine->GetGsmAuthResponseWithLength(param);
     }
 
     void GetGsmAuthResponseWithoutLengthTest()
     {
         EapSimGsmAuthParam param;
-        param.rands.push_back("aaaaa12345656789098");
+        param.rands.push_back(TEMP_TEST_DATA);
         pStaStateMachine->GetGsmAuthResponseWithoutLength(param);
     }
 
@@ -1941,8 +1926,8 @@ public:
     void FillUmtsAuthReqTest()
     {
         EapSimUmtsAuthParam param;
-        param.rand = "aaaaa12345656789098";
-        param.autn = "bbbbb23235656598898";
+        param.rand = TEMP_TEST_DATA;
+        param.autn = TEMP_TEST_DATA;
         pStaStateMachine->FillUmtsAuthReq(param);
     }
     void ParseAndFillUmtsAuthParamTest()
@@ -1968,7 +1953,7 @@ public:
         InternalMessagePtr msg1 = std::make_shared<InternalMessage>();
         msg1->SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT);
         EapSimGsmAuthParam param;
-        param.rands.push_back("11111");
+        param.rands.push_back(TEMP_TEST_DATA);
         msg1->SetMessageObj(param);
         pStaStateMachine->DealWpaEapSimAuthEvent(msg1);
         InternalMessagePtr msg2 = std::make_shared<InternalMessage>();
@@ -1992,8 +1977,8 @@ public:
         pStaStateMachine->DealWpaEapUmtsAuthEvent(msg1);
         InternalMessagePtr msg2 = std::make_shared<InternalMessage>();
         msg2->SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT);
-        param.rand = "111111122222233333333";
-        param.autn = "222222333333344444444";
+        param.rand = TEMP_TEST_DATA;
+        param.autn = TEMP_TEST_DATA;
         msg2->SetMessageObj(param);
         WifiDeviceConfig wifiDeviceConfig;
         wifiDeviceConfig.networkId = 1;
@@ -2064,16 +2049,6 @@ HWTEST_F(StaStateMachineTest, IsDisConnectReasonShouldStopTimerSuccessTest, Test
 HWTEST_F(StaStateMachineTest, IsDisConnectReasonShouldStopTimerFailedTest, TestSize.Level1)
 {
     IsDisConnectReasonShouldStopTimerFailedTest();
-}
-
-HWTEST_F(StaStateMachineTest, IsStaDisConnectReasonShouldRetryEventSuccessTest, TestSize.Level1)
-{
-    IsStaDisConnectReasonShouldRetryEventSuccessTest();
-}
-
-HWTEST_F(StaStateMachineTest, IsStaDisConnectReasonShouldRetryEventFailedTest, TestSize.Level1)
-{
-    IsStaDisConnectReasonShouldRetryEventFailedTest();
 }
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)

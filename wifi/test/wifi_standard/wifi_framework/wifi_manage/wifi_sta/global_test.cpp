@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include"global_test.h"
+#include "global_test.h"
 void GlobalTest::SetUp()
 {
     printf("GlobalTest SetUp\n");

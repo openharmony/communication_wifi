@@ -15,7 +15,6 @@
 
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 
-
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -325,7 +324,7 @@ WifiErrorNo HdiWpaStop()
         g_wpaStartSucceed = false;
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or wpa hdi already stopped", __func__);
-        return WIFI_HAL_OPT_FAILED;
+        return WIFI_HAL_OPT_OK;
     }
 
     int32_t ret = g_wpaObj->Stop(g_wpaObj);

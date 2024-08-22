@@ -325,7 +325,7 @@ static void DeviceConfig2C(WifiDeviceConfig &config, CWifiDeviceConfig &cfg)
 
 extern "C" {
 
-int32_t CJ_IsWifiActive(bool &ret)
+int32_t FfiWifiIsWifiActive(bool &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -333,7 +333,7 @@ int32_t CJ_IsWifiActive(bool &ret)
     return cjWifiDevicePtr->IsWifiActive(ret);
 }
 
-WifiScanInfoArr CJ_GetScanInfoList(int32_t &ret)
+WifiScanInfoArr FfiWifiGetScanInfoList(int32_t &ret)
 {
     WifiScanInfoArr infos{ .head = nullptr, .size = 0 };
     if (cjWifiScanPtr == nullptr) {
@@ -348,7 +348,7 @@ WifiScanInfoArr CJ_GetScanInfoList(int32_t &ret)
     return infos;
 }
 
-int32_t CJ_RemoveCandidateConfig(int32_t id)
+int32_t FfiWifiRemoveCandidateConfig(int32_t id)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -356,7 +356,7 @@ int32_t CJ_RemoveCandidateConfig(int32_t id)
     return static_cast<int32_t>(cjWifiDevicePtr->RemoveCandidateConfig(id));
 }
 
-int32_t CJ_ConnectToCandidateConfig(int32_t id)
+int32_t FfiWifiConnectToCandidateConfig(int32_t id)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -364,7 +364,7 @@ int32_t CJ_ConnectToCandidateConfig(int32_t id)
     return static_cast<int32_t>(cjWifiDevicePtr->ConnectToNetwork(id, true));
 }
 
-int32_t CJ_GetSignalLevel(int32_t rssi, int32_t band, uint32_t &ret)
+int32_t FfiWifiGetSignalLevel(int32_t rssi, int32_t band, uint32_t &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -375,7 +375,7 @@ int32_t CJ_GetSignalLevel(int32_t rssi, int32_t band, uint32_t &ret)
     return static_cast<int32_t>(code);
 }
 
-int32_t CJ_IsConnected(bool &ret)
+int32_t FfiWifiIsConnected(bool &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -383,7 +383,7 @@ int32_t CJ_IsConnected(bool &ret)
     return static_cast<int32_t>(cjWifiDevicePtr->IsConnected(ret));
 }
 
-int32_t CJ_IsFeatureSupported(int64_t featureId, bool &ret)
+int32_t FfiWifiIsFeatureSupported(int64_t featureId, bool &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -391,7 +391,7 @@ int32_t CJ_IsFeatureSupported(int64_t featureId, bool &ret)
     return static_cast<int32_t>(cjWifiDevicePtr->IsFeatureSupported(featureId, ret));
 }
 
-int32_t CJ_GetIpInfo(CIpInfo &ret)
+int32_t FfiWifiGetIpInfo(CIpInfo &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -410,7 +410,7 @@ int32_t CJ_GetIpInfo(CIpInfo &ret)
     return code;
 }
 
-int32_t CJ_GetIpv6Info(CIpv6Info &ret)
+int32_t FfiWifiGetIpv6Info(CIpv6Info &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -431,7 +431,7 @@ int32_t CJ_GetIpv6Info(CIpv6Info &ret)
     return code;
 }
 
-char *CJ_GetCountryCode(int32_t &code)
+char *FfiWifiGetCountryCode(int32_t &code)
 {
     if (cjWifiDevicePtr == nullptr) {
         code = WIFI_OPT_FAILED;
@@ -445,7 +445,7 @@ char *CJ_GetCountryCode(int32_t &code)
     return nullptr;
 }
 
-int32_t CJ_IsBandTypeSupported(int32_t bandType, bool &ret)
+int32_t FfiWifiIsBandTypeSupported(int32_t bandType, bool &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -453,7 +453,7 @@ int32_t CJ_IsBandTypeSupported(int32_t bandType, bool &ret)
     return cjWifiDevicePtr->IsBandTypeSupported(bandType, ret);
 }
 
-int32_t CJ_IsMeteredHotspot(bool &ret)
+int32_t FfiWifiIsMeteredHotspot(bool &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -461,7 +461,7 @@ int32_t CJ_IsMeteredHotspot(bool &ret)
     return cjWifiDevicePtr->IsMeteredHotspot(ret);
 }
 
-int32_t CJ_RemoveGroup()
+int32_t FfiWifiRemoveGroup()
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -469,7 +469,7 @@ int32_t CJ_RemoveGroup()
     return cjWifiP2pPtr->RemoveGroup();
 }
 
-int32_t CJ_P2pConnect(CWifiP2PConfig &cfg)
+int32_t FfiWifiP2pConnect(CWifiP2PConfig &cfg)
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -479,7 +479,7 @@ int32_t CJ_P2pConnect(CWifiP2PConfig &cfg)
     return cjWifiP2pPtr->P2pConnect(config);
 }
 
-int32_t CJ_P2pCancelConnect()
+int32_t FfiWifiP2pCancelConnect()
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -487,7 +487,7 @@ int32_t CJ_P2pCancelConnect()
     return cjWifiP2pPtr->P2pCancelConnect();
 }
 
-int32_t CJ_StartDiscoverDevices()
+int32_t FfiWifiStartDiscoverDevices()
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -495,7 +495,7 @@ int32_t CJ_StartDiscoverDevices()
     return cjWifiP2pPtr->DiscoverDevices();
 }
 
-int32_t CJ_StopDiscoverDevices()
+int32_t FfiWifiStopDiscoverDevices()
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -503,7 +503,7 @@ int32_t CJ_StopDiscoverDevices()
     return cjWifiP2pPtr->StopDiscoverDevices();
 }
 
-int32_t CJ_GetP2pLinkedInfo(CWifiP2PLinkedInfo &info)
+int32_t FfiWifiGetP2pLinkedInfo(CWifiP2PLinkedInfo &info)
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -518,7 +518,7 @@ int32_t CJ_GetP2pLinkedInfo(CWifiP2PLinkedInfo &info)
     return code;
 }
 
-int32_t CJ_GetCurrentGroup(CWifiP2PGroupInfo &info)
+int32_t FfiWifiGetCurrentGroup(CWifiP2PGroupInfo &info)
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -554,7 +554,7 @@ int32_t CJ_GetCurrentGroup(CWifiP2PGroupInfo &info)
     return code;
 }
 
-WifiP2pDeviceArr CJ_GetP2pPeerDevices(int32_t &ret)
+WifiP2pDeviceArr FfiWifiGetP2pPeerDevices(int32_t &ret)
 {
     WifiP2pDeviceArr arr{.head = nullptr, .size = 0};
     if (cjWifiP2pPtr == nullptr) {
@@ -585,7 +585,7 @@ WifiP2pDeviceArr CJ_GetP2pPeerDevices(int32_t &ret)
     return arr;
 }
 
-int32_t CJ_GetP2pLocalDevice(CWifiP2pDevice &info)
+int32_t FfiWifiGetP2pLocalDevice(CWifiP2pDevice &info)
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -598,7 +598,7 @@ int32_t CJ_GetP2pLocalDevice(CWifiP2pDevice &info)
     return code;
 }
 
-int32_t CJ_CreateGroup(CWifiP2PConfig &cfg)
+int32_t FfiWifiCreateGroup(CWifiP2PConfig &cfg)
 {
     if (cjWifiP2pPtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -608,7 +608,7 @@ int32_t CJ_CreateGroup(CWifiP2PConfig &cfg)
     return cjWifiP2pPtr->CreateGroup(config);
 }
 
-int32_t CJ_GetLinkedInfo(CWifiLinkedInfo &info)
+int32_t FfiWifiGetLinkedInfo(CWifiLinkedInfo &info)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -639,7 +639,7 @@ int32_t CJ_GetLinkedInfo(CWifiLinkedInfo &info)
     return code;
 }
 
-int32_t CJ_AddCandidateConfig(CWifiDeviceConfig cfg, int32_t &ret)
+int32_t FfiWifiAddCandidateConfig(CWifiDeviceConfig cfg, int32_t &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
         return WIFI_OPT_FAILED;
@@ -694,7 +694,7 @@ int32_t CJ_AddCandidateConfig(CWifiDeviceConfig cfg, int32_t &ret)
     return code;
 }
 
-WifiDeviceConfigArr CJ_GetCandidateConfigs(int32_t &code)
+WifiDeviceConfigArr FfiWifiGetCandidateConfigs(int32_t &code)
 {
     WifiDeviceConfigArr arr{.head = nullptr, .size = 0};
     if (cjWifiDevicePtr == nullptr) {
@@ -722,7 +722,7 @@ WifiDeviceConfigArr CJ_GetCandidateConfigs(int32_t &code)
     return arr;
 }
 
-int32_t CJ_WifiOn(char *type, void (*callback)())
+int32_t FfiWifiWifiOn(char *type, void (*callback)())
 {
     std::string eventType(type);
     if (eventType.empty()) {
@@ -731,7 +731,7 @@ int32_t CJ_WifiOn(char *type, void (*callback)())
     return CjEventRegister::GetInstance().Register(eventType, callback);
 }
 
-int32_t CJ_WifiOff(char* type)
+int32_t FfiWifiWifiOff(char* type)
 {
     std::string eventType(type);
     if (eventType.empty()) {

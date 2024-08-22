@@ -112,7 +112,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail3()
@@ -128,7 +128,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail4()

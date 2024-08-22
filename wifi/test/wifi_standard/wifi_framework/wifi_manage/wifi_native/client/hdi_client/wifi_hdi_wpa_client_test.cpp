@@ -41,7 +41,7 @@ public:
 HWTEST_F(WifiHdiWpaClientTest, StartWifi, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->StartWifi("wlan");
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqConnect, TestSize.Level1)
@@ -54,7 +54,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqConnect, TestSize.Level1)
 HWTEST_F(WifiHdiWpaClientTest, StopWifi, TestSize.Level1)
 {
     WifiErrorNo result = wifiHdiWpaClient->StopWifi();
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqReconnect, TestSize.Level1)

@@ -30,6 +30,7 @@ public:
     void TearDown() override {}
 };
 
+
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiWpaP2pStartTest, TestSize.Level1)
 {
     WifiErrorNo result = HdiWpaP2pStart("wlan0");

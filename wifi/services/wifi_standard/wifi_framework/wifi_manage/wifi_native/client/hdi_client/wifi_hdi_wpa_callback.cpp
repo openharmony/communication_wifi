@@ -78,7 +78,6 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         (reasonCode != Wifi80211ReasonCode::WLAN_REASON_IE_IN_4WAY_DIFFERS || !locallyGenerated)) {
         LOGI("OnEventDisconnected, wrong password");
         cbk.onWpaSsidWrongKey();
-        return 0;
     }
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, reasonCode, std::string(szBssid));

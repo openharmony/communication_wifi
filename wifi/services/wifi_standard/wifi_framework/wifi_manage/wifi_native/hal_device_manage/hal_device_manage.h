@@ -390,8 +390,6 @@ public:
      */
     bool SetApMacAddress(const std::string &ifaceName, const std::string &mac);
 
-    bool IsDied();
-
 private:
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();

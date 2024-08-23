@@ -38,6 +38,13 @@ std::atomic_bool HalDeviceManager::g_chipHdiServiceDied = false;
 std::mutex HalDeviceManager::mMutex;
 static HdfRemoteService *g_chipHdiService = nullptr;
 static RssiReportCallback g_rssiReportCallback = nullptr;
+std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> HalDeviceManager::mInterfaceInfoCache;
+std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiStaIfaces;
+std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiApIfaces;
+std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiP2pIfaces;
+sptr<IChipController> HalDeviceManager::g_IWifi = nullptr;
+sptr<ChipControllerCallback> HalDeviceManager::g_chipControllerCallback = nullptr;
+sptr<ChipIfaceCallback> HalDeviceManager::g_chipIfaceCallback = nullptr;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -738,6 +745,11 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
 void HalDeviceManager::ResetHalDeviceManagerInfo()
 {
     std::lock_guard<std::mutex> lock(mMutex);
+    WifiP2PHalInterface::GetInstance().StopP2p();
+    WifiStaHalInterface::GetInstance().StopWifi();
+    WifiApHalInterface::GetInstance().StopAp();
+    ClearStaInfo();
+    ClearApInfo();
     g_chipControllerCallback = nullptr;
     g_chipIfaceCallback = nullptr;
     g_IWifi = nullptr;
@@ -746,6 +758,35 @@ void HalDeviceManager::ResetHalDeviceManagerInfo()
     mIWifiApIfaces.clear();
     mIWifiP2pIfaces.clear();
     return;
+}
+
+void HalDeviceManager::NotifyDestory(std::string &ifaceName, IfaceType type)
+{
+    auto iter = mInterfaceInfoCache.find(std::pair<std::string, IfaceType>(ifaceName, type));
+    if (iter != mInterfaceInfoCache.end()) {
+        for (auto &callback : iter->second.ifaceDestoryCallback) {
+            if (callback) {
+                callback(ifaceName, static_cast<int>(type));
+            }
+        }
+        mInterfaceInfoCache.erase(iter);
+    }
+}
+ 
+void HalDeviceManager::ClearStaInfo()
+{
+    for (auto &it : mIWifiStaIfaces) {
+        std::string ifaceName = it.first;
+        NotifyDestory(ifaceName, IfaceType::STA);
+    }
+}
+ 
+void HalDeviceManager::ClearApInfo()
+{
+    for (auto &it : mIWifiApIfaces) {
+        std::string ifaceName = it.first;
+        NotifyDestory(ifaceName, IfaceType::AP);
+    }
 }
 
 bool HalDeviceManager::CheckReloadChipHdiService()
@@ -758,7 +799,6 @@ bool HalDeviceManager::CheckReloadChipHdiService()
         return true;
     }
 
-    ResetHalDeviceManagerInfo();
     if (!StartChipHdi()) {
         LOGE("reload chip hdi service failed");
         return false;
@@ -1440,7 +1480,9 @@ void HalDeviceManager::AddChipHdiDeathRecipient()
         .OnRemoteDied = [](HdfDeathRecipient *recipient, HdfRemoteService *service) {
             LOGI("Chip Hdi service died!");
             g_chipHdiServiceDied = true;
+            ResetHalDeviceManagerInfo();
             RemoveChipHdiDeathRecipient();
+            LOGI("Chip Hdi service died process success!");
             return;
         }
     };

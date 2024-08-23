@@ -807,9 +807,8 @@ void WifiControllerMachine::HandleSoftapStop(int id)
         RmoveSoftapManager(id);
         if (!HasAnyManager()) {
             SwitchState(pDisableState);
-        } else {
-            return;
         }
+        return;
     }
 
     RmoveSoftapManager(id);

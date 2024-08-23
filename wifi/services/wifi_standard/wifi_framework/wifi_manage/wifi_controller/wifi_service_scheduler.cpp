@@ -410,10 +410,12 @@ void WifiServiceScheduler::StaIfaceDestoryCallback(std::string &destoryIfaceName
     auto iter = staIfaceNameMap.begin();
     while (iter != staIfaceNameMap.end()) {
         if (destoryIfaceName == iter->second) {
-            WifiConfigCenter::GetInstance().SetStaIfaceName("");
             auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
             ins->SendMessage(CMD_STA_REMOVED, createIfaceType, iter->first);
-            staIfaceNameMap.erase(iter);
+            if (createIfaceType >= 0) {
+                WifiConfigCenter::GetInstance().SetStaIfaceName("");
+                staIfaceNameMap.erase(iter);
+            }
             return;
         }
         iter++;
@@ -640,10 +642,13 @@ void WifiServiceScheduler::SoftApIfaceDestoryCallback(std::string &destoryIfaceN
     auto iter = softApIfaceNameMap.begin();
     while (iter != softApIfaceNameMap.end()) {
         if (destoryIfaceName == iter->second) {
-            WifiConfigCenter::GetInstance().SetApIfaceName("");
+            WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
             auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
             ins->SendMessage(CMD_AP_REMOVED, createIfaceType, iter->first);
-            softApIfaceNameMap.erase(iter);
+            if (createIfaceType >= 0) {
+                WifiConfigCenter::GetInstance().SetApIfaceName("");
+                softApIfaceNameMap.erase(iter);
+            }
             return;
         }
         iter++;

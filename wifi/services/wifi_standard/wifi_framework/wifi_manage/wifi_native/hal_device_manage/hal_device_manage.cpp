@@ -760,7 +760,7 @@ void HalDeviceManager::ResetHalDeviceManagerInfo()
     return;
 }
 
-void HalDeviceManager::NotifyDestory(std::string ifaceName, IfaceType type)
+void HalDeviceManager::NotifyDestory(std::string &ifaceName, IfaceType type)
 {
     auto iter = mInterfaceInfoCache.find(std::pair<std::string, IfaceType>(ifaceName, type));
     if (iter != mInterfaceInfoCache.end()) {
@@ -775,7 +775,7 @@ void HalDeviceManager::NotifyDestory(std::string ifaceName, IfaceType type)
  
 void HalDeviceManager::ClearStaInfo()
 {
-    for (auto it : mIWifiStaIfaces) {
+    for (auto &it : mIWifiStaIfaces) {
         std::string ifaceName = it.first;
         NotifyDestory(ifaceName, IfaceType::STA);
     }
@@ -783,7 +783,7 @@ void HalDeviceManager::ClearStaInfo()
  
 void HalDeviceManager::ClearApInfo()
 {
-    for (auto it : mIWifiApIfaces) {
+    for (auto &it : mIWifiApIfaces) {
         std::string ifaceName = it.first;
         NotifyDestory(ifaceName, IfaceType::AP);
     }

@@ -426,7 +426,7 @@ private:
     static void ClearStaInfo();
     static void ClearApInfo();
     static void ResetHalDeviceManagerInfo();
-    static void NotifyDestory(std::string ifaceName, IfaceType type);
+    static void NotifyDestory(std::string &ifaceName, IfaceType type);
 
     // death recipient
     static void AddChipHdiDeathRecipient();

@@ -38,7 +38,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 constexpr const char* WIFI_SELFCURE_PROP_CONFIG = "const.wifi.selfcure";
 constexpr const int32_t WIFI_SELFCURE_PROP_SIZE = 16;
 DEFINE_WIFILOG_LABEL("WifiServiceScheduler");
@@ -411,10 +410,12 @@ void WifiServiceScheduler::StaIfaceDestoryCallback(std::string &destoryIfaceName
     auto iter = staIfaceNameMap.begin();
     while (iter != staIfaceNameMap.end()) {
         if (destoryIfaceName == iter->second) {
-            WifiConfigCenter::GetInstance().SetStaIfaceName("");
             auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
             ins->SendMessage(CMD_STA_REMOVED, createIfaceType, iter->first);
-            staIfaceNameMap.erase(iter);
+            if (createIfaceType >= 0) {
+                WifiConfigCenter::GetInstance().SetStaIfaceName("");
+                staIfaceNameMap.erase(iter);
+            }
             return;
         }
         iter++;
@@ -641,10 +642,13 @@ void WifiServiceScheduler::SoftApIfaceDestoryCallback(std::string &destoryIfaceN
     auto iter = softApIfaceNameMap.begin();
     while (iter != softApIfaceNameMap.end()) {
         if (destoryIfaceName == iter->second) {
-            WifiConfigCenter::GetInstance().SetApIfaceName("");
             auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
             ins->SendMessage(CMD_AP_REMOVED, createIfaceType, iter->first);
-            softApIfaceNameMap.erase(iter);
+            if (createIfaceType >= 0) {
+                WifiConfigCenter::GetInstance().SetApIfaceName("");
+                softApIfaceNameMap.erase(iter);
+            }
+            WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
             return;
         }
         iter++;

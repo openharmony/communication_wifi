@@ -38,6 +38,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 constexpr const char* WIFI_SELFCURE_PROP_CONFIG = "const.wifi.selfcure";
 constexpr const int32_t WIFI_SELFCURE_PROP_SIZE = 16;
 DEFINE_WIFILOG_LABEL("WifiServiceScheduler");

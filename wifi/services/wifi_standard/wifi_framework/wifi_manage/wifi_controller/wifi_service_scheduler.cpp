@@ -642,13 +642,13 @@ void WifiServiceScheduler::SoftApIfaceDestoryCallback(std::string &destoryIfaceN
     auto iter = softApIfaceNameMap.begin();
     while (iter != softApIfaceNameMap.end()) {
         if (destoryIfaceName == iter->second) {
+            WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
             auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
             ins->SendMessage(CMD_AP_REMOVED, createIfaceType, iter->first);
             if (createIfaceType >= 0) {
                 WifiConfigCenter::GetInstance().SetApIfaceName("");
                 softApIfaceNameMap.erase(iter);
             }
-            WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
             return;
         }
         iter++;

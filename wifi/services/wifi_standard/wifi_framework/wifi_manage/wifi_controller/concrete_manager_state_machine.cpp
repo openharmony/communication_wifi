@@ -507,8 +507,7 @@ void ConcreteMangerMachine::HandleStaStop()
 void ConcreteMangerMachine::ReportClose()
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!ifaceName.empty() ||
-        DelayedSingleton<HalDeviceManager>::GetInstance()->IsDied()) {
+    if (!ifaceName.empty()) {
         mcb.onStopped(mid);
     } else {
         mcb.onRemoved(mid);

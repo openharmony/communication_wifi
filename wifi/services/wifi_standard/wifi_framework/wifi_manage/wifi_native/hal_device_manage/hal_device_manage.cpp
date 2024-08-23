@@ -62,11 +62,6 @@ HalDeviceManager::~HalDeviceManager()
     ResetHalDeviceManagerInfo();
 }
 
-bool HalDeviceManager::IsDied()
-{
-    return g_chipHdiServiceDied;
-}
-
 bool HalDeviceManager::StartChipHdi()
 {
     std::lock_guard<std::mutex> lock(mMutex);

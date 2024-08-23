@@ -285,8 +285,8 @@ bool NoInternetWifiFilter::Filter(NetworkCandidate &networkCandidate)
 #ifndef OHOS_ARCH_LITE
     std::map<std::string, std::vector<std::string>> filterMap;
     WifiSettings::GetInstance().GetPackageFilterMap(filterMap);
-    std::vector<std::string> settings_module_name = filterMap["settings_module_name"];
-    std::string name = settings_module_name.empty() ? "" : settings_module_name.front();
+    std::vector<std::string> settingsModuleName = filterMap["settings_module_name"];
+    std::string name = settingsModuleName.empty() ? "" : settingsModuleName.front();
     if (!name.empty() && WifiAppStateAware::GetInstance().IsForegroundApp(name)) {
         WIFI_LOGI("NoInternetWifiFilter, settings in foreground, skip candidate, bssid=%{public}s",
             MacAnonymize(interScanInfo.bssid).c_str());

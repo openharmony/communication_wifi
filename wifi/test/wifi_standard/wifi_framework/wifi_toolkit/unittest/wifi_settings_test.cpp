@@ -603,11 +603,11 @@ HWTEST_F(WifiSettingsTest, GetConfigValueByName, TestSize.Level1)
     WIFI_LOGI("GetConfigValueByName enter");
     std::string ancoValue = "";
     WifiSettings::GetInstance().Init();
-    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", ancoValue);
-    EXPECT_TRUE(success);
+    bool sucess = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", ancoValue);
+    EXPECT_TRUE(sucess);
     std::string ancoNoValue = "";
-    bool faile = WifiSettings::GetInstance().GetConfigValueByName("Novalue", ancoNoValue);
-    EXPECT_TRUE(faile);
+    bool fail = WifiSettings::GetInstance().GetConfigValueByName("Novalue", ancoNoValue);
+    EXPECT_FALSE(fail);
     EXPECT_EQ(ancoNoValue, "");
 }
 

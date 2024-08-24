@@ -46,7 +46,6 @@ DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
 namespace Wifi {
 
-constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 constexpr int EXTENSION_ERROR_CODE = 13500099;
@@ -362,8 +361,13 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
         "ancoCallProcessName =[%{public}s],bssid = [%{public}s],ssid=[%{public}s]",
         config.networkId, config.callProcessName.c_str(), config.ancoCallProcessName.c_str(),
         MacAnonymize(config.bssid).c_str(), SsidAnonymize(config.ssid).c_str());
-    if (config.networkId == WIFI_BROKER_NETWORK_ID && config.ancoCallProcessName == BROKER_PROCESS_PROTECT_FLAG &&
-        config.bssid.empty() && config.ssid.empty() && config.callProcessName == ANCO_SERVICE_BROKER) {
+    if (config.networkId != WIFI_BROKER_NETWORK_ID || config.ancoCallProcessName != BROKER_PROCESS_PROTECT_FLAG ||
+        config.bssid.empty() && !config.ssid.empty()) {
+        return false;
+    }
+    std::string ancoWifiValue = "";
+    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", ancoWifiValue);
+    if (success && config.callProcessName == ancoWifiValue) {
         SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);
         return true;
     }
@@ -388,9 +392,9 @@ bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
 {
 #ifndef OHOS_ARCH_LITE
    int pid = GetCallingPid();
-   const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+   std::string wifiBrokerFrameProcessName = "";
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(uid, pid);
-    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (!success || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
         return false;
     }
     return true;

@@ -1969,6 +1969,26 @@ bool WifiSettings::EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
     }
     return true;
 }
+
+bool WifiSettings::GetConfigValueByName(const std::string &name, std::string &value)
+{
+    if (name.empty()) {
+        LOGE("name empty");
+        return false;
+    }
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    std::vector<std::string> values = mFilterMap[name];
+    if (values.empty()) {
+        LOGE("GetConfigValueByName values is empty");
+        return false;
+    }
+    value = values.front();
+    if (value.empty()) {
+        LOGE("GetConfigValueByName value is empty");
+        return false;
+    }
+    return true;
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

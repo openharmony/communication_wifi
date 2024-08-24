@@ -598,5 +598,18 @@ HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
 }
+HWTEST_F(WifiSettingsTest, GetConfigValueByName, TestSize.Level1)
+{
+    WIFI_LOGI("GetConfigValueByName enter");
+    std::string ancoValue = "";
+    WifiSettings::GetInstance().Init();
+    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", ancoValue);
+    EXPECT_TRUE(success);
+    std::string ancoNoValue = "";
+    bool faile = WifiSettings::GetInstance().GetConfigValueByName("Novalue", ancoNoValue);
+    EXPECT_TRUE(faile);
+    EXPECT_EQ(ancoNoValue, "");
+}
+
 }  // namespace Wifi
 }  // namespace OHO

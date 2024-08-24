@@ -220,6 +220,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     if (config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
         std::string wifiBrokerFrameProcessName = "";
+        bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
         if (!success || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
             LOGE("AddCandidateConfig unsupport wep key!");
@@ -486,6 +487,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
 #ifndef OHOS_ARCH_LITE
     std::string wifiBrokerFrameProcessName = "";
+    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (success && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;

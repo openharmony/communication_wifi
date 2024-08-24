@@ -393,6 +393,7 @@ bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
 #ifndef OHOS_ARCH_LITE
    int pid = GetCallingPid();
    std::string wifiBrokerFrameProcessName = "";
+   bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(uid, pid);
     if (!success || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
         return false;

@@ -25,16 +25,15 @@ namespace OHOS {
 namespace Wifi {
 
 struct Hid2dInfo {
-    std::string upperIfName;
-    Hid2dUpperScene upperScene;
-    P2pBusinessType p2pBusinessType;
+    Hid2dUpperScene softBusScene;
+    Hid2dUpperScene castScene;
     P2pConnectedState p2pConnectState;
+    int p2pEnhanceState;
 
     Hid2dInfo()
     {
-        upperIfName = "";
         p2pConnectState = P2pConnectedState::P2P_DISCONNECTED;
-        p2pBusinessType = P2pBusinessType::INVALID;
+        p2pEnhanceState = 0;
     }
 };
 

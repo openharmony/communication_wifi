@@ -29,7 +29,6 @@
 #include "wifi_common_util.h"
 #include "wifi_sa_event.h"
 DEFINE_WIFILOG_LABEL("WifiCEvent");
-  
 std::shared_ptr<OHOS::Wifi::WifiDevice> g_wifiStaPtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<OHOS::Wifi::WifiScan> g_wifiScanPtr = OHOS::Wifi::WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 std::shared_ptr<OHOS::Wifi::WifiP2p> g_wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
@@ -296,6 +295,7 @@ WifiErrorCode EventManager::RegisterP2PEvent(const std::vector<std::string> &eve
 
 NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
 {
+    std::unique_lock<std::mutex> lock(callbackMutex);
     if (mSaStatusListener == nullptr) {
         int32_t ret;
         auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -371,6 +371,7 @@ EventManager& EventManager::GetInstance()
 
 void EventManager::Init()
 {
+    std::unique_lock<std::mutex> lock(callbackMutex);
     if (mSaStatusListener == nullptr) {
         int32_t ret;
         WIFI_LOGI("EventManager Listener Init!");

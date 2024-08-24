@@ -86,6 +86,7 @@ int WifiSettings::Init()
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
     mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
+    mVariableConf.SetConfigFilePath(WIFI_VARIABLE_PATH);
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -104,6 +105,7 @@ int WifiSettings::Init()
     ReloadPortalconf();
     InitPackageFilterConfig();
     IncreaseNumRebootsSinceLastUse();
+    InitVariableConfig();
     return 0;
 }
 

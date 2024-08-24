@@ -272,6 +272,8 @@ public:
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
+    bool GetConfigValueByName(const std::string &name, std::string &name);
+
 private:
     WifiSettings();
     int IncreaseNumRebootsSinceLastUse();

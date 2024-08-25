@@ -171,21 +171,21 @@ void SelfCureService::UnRegisterP2pEnhanceCallback()
 void SelfCureService::P2pEnhanceStateChange(const std::string &ifName, int32_t state)
 {
     WIFI_LOGI("P2pEnhanceStateChange, state %{public}d", state);
-    int32_t p2pEnhanceState = state;
-    if (p2pEnhanceState == P2P_ENHANCE_BC_CONNECT_SUCC) {
+    int32_t p2pEnhanceState = -1;
+    if (state == P2P_ENHANCE_BC_CONNECT_SUCC) {
         p2pEnhanceState = 1;
-    } else if (p2pEnhanceState == P2P_ENHANCE_BC_DESTROYED) {
+    } else if (state == P2P_ENHANCE_BC_DESTROYED) {
         p2pEnhanceState = 0;
     } else {
         WIFI_LOGD("No need to handle the state");
     }
-    if (lastP2pEnhanceState_ != p2pEnhanceState) {
+    if ((lastP2pEnhanceState_ != p2pEnhanceState) && (p2pEnhanceState != -1)) {
         lastP2pEnhanceState_ = p2pEnhanceState;
         if (pSelfCureStateMachine == nullptr) {
             WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
             return;
         }
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_P2P_ENHANCE_STATE_CHANGED, 0, state);
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_P2P_ENHANCE_STATE_CHANGED, p2pEnhanceState);
         WifiConfigCenter::GetInstance().SetP2pEnhanceState(p2pEnhanceState);
     }
 }

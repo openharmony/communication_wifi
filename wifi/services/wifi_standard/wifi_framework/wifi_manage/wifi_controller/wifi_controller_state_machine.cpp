@@ -417,6 +417,23 @@ bool WifiControllerMachine::ShouldEnableSoftap()
 }
 #endif
 
+bool WifiControllerMachine::ShouldDisableWifi()
+{
+    WIFI_LOGI("Enter ShouldDisableWifi");
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
+        return true;
+    }
+#endif
+    if (WifiConfigCenter::GetInstance().GetWifiToggledEnable() == WIFI_STATE_ENABLED) {
+        WIFI_LOGI("no need to disable Wifi");
+        return false;
+    }
+
+    WIFI_LOGI("Should disable wifi");
+    return true;
+}
+
 bool WifiControllerMachine::ShouldEnableWifi()
 {
     WIFI_LOGI("Enter ShouldEnableWifi");
@@ -603,7 +620,7 @@ void WifiControllerMachine::SwitchRole(ConcreteManagerRole role)
 void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg)
 {
     ConcreteManagerRole presentRole;
-    if (!(pWifiControllerMachine->ShouldEnableWifi())) {
+    if (pWifiControllerMachine->ShouldDisableWifi()) {
         pWifiControllerMachine->StopAllConcreteManagers();
         return;
     }

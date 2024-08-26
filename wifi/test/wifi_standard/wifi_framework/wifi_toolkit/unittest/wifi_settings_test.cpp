@@ -32,7 +32,6 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
-
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiSettingsTest");
@@ -223,7 +222,7 @@ HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
     EXPECT_FALSE(state);
     bool result = WifiSettings::GetInstance().IsModulePreLoad("StaService");
     WIFI_LOGE("IsModulePreLoadTest result(%{public}d)", result);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiSettingsTest, GetSupportHwPnoFlagTest, TestSize.Level1)

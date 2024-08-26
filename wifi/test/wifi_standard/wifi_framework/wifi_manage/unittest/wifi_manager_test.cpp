@@ -492,6 +492,12 @@ HWTEST_F(WifiManagerTest, DealSoftapStartFailureTest, TestSize.Level1)
     wifiManager.wifiTogglerManager->DealSoftapStartFailure(1);
 }
 
+HWTEST_F(WifiManagerTest, ForceStopWifiTest, TestSize.Level1)
+{
+    WIFI_LOGI("ForceStopWifiTest enter!");
+    wifiManager.wifiTogglerManager->ForceStopWifi();
+}
+
 HWTEST_F(WifiManagerTest, SatelliteToggledTest, TestSize.Level1)
 {
     WIFI_LOGI("SatelliteToggledTest enter!");

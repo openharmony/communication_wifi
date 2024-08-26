@@ -32,6 +32,7 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
+
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiSettingsTest");

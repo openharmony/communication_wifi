@@ -619,6 +619,10 @@ if (defined(ohos_lite)) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
     }
+
+    if (wifi_feature_with_vap_manager) {
+      defines += [ "FEATURE_VAP_MANAGER_SUPPORT" ]
+    }
     version_script = "libwifi_manager.map"
     part_name = "wifi"
     subsystem_name = "communication"

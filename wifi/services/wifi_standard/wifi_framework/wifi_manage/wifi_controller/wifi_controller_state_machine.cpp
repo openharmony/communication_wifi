@@ -692,6 +692,14 @@ void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 
 void WifiControllerMachine::EnableState::HandleStaRemoved(InternalMessagePtr msg)
 {
+    {
+        std::unique_lock<std::mutex> lock(pWifiControllerMachine->concreteManagerMutex);
+        for (auto iter = pWifiControllerMachine->concreteManagers.begin(); iter != pWifiControllerMachine->concreteManagers.end(); ++iter) {
+            if ((*iter)->mid == msg->GetParam2() && msg->GetParam1() >= 0) {
+                (*iter)->GetConcreteMachine()->ClearIfaceName();
+            }
+        }
+    }
     pWifiControllerMachine->StopConcreteManager(msg->GetParam2());
 }
 

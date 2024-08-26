@@ -716,6 +716,16 @@ void StaService::RegisterStaServiceCallback(const std::vector<StaServiceCallback
     }
 }
 
+void StaService::UnRegisterStaServiceCallback(const StaServiceCallback &callbacks) const
+{
+    LOGI("Enter UnRegisterStaServiceCallback.");
+    if (pStaStateMachine == nullptr) {
+        LOGE("pStaStateMachine is null.\n");
+        return;
+    }
+    pStaStateMachine->UnRegisterStaServiceCallback(callbacks);
+}
+
 ErrCode StaService::ReConnect() const
 {
     WIFI_LOGI("Enter ReConnect.\n");

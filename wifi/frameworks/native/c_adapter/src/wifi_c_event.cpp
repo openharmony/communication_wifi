@@ -295,6 +295,7 @@ WifiErrorCode EventManager::RegisterP2PEvent(const std::vector<std::string> &eve
 
 NO_SANITIZE("cfi") WifiErrorCode EventManager::RegisterWifiEvents()
 {
+    std::unique_lock<std::mutex> lock(callbackMutex);
     if (mSaStatusListener == nullptr) {
         int32_t ret;
         auto samgrProxy = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -370,6 +371,7 @@ EventManager& EventManager::GetInstance()
 
 void EventManager::Init()
 {
+    std::unique_lock<std::mutex> lock(callbackMutex);
     if (mSaStatusListener == nullptr) {
         int32_t ret;
         WIFI_LOGI("EventManager Listener Init!");

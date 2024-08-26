@@ -206,6 +206,7 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToConnectMode(InternalMessage
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
 void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessagePtr msg)
@@ -227,6 +228,7 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMess
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
 }
 
 void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr msg)
@@ -462,6 +464,9 @@ bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)
             return true;
         case CONCRETE_CMD_STA_SEMI_ACTIVE:
             HandleStaSemiActive();
+            return true;
+        case CONCRETE_CMD_STA_REMOVED:
+            ClearIfaceName();
             return true;
         default:
             return false;

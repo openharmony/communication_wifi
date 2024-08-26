@@ -1266,7 +1266,7 @@ static void ProxyConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDev
 
 static void UpdateSecurityTypeAndPreSharedKey(WifiDeviceConfig& cppConfig)
 {
-    if (cppConfig.keyMgmt != KEY_MGMT_NONE) {
+    if (cppConfig.keyMgmt != KEY_MGMT_NONE && cppConfig.keyMgmt != KEY_MGMT_WEP) {
         return;
     }
     for (int i = 0; i != WEPKEYS_SIZE; ++i) {

@@ -246,45 +246,30 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netAddr->prefixlen_ = prefixLength;
     netLinkInfo->netAddrList_.push_back(*netAddr);
 
-    LOGD("SetNetLinkIPInfo %{public}s", wifiIpV6Info.globalIpV6Address.c_str());
+    sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
+    netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
+    netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
+    netIpv6Addr->prefixlen_ = 0;
     if (!wifiIpV6Info.globalIpV6Address.empty()) {
-        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
         netIpv6Addr->address_ = wifiIpV6Info.globalIpV6Address;
-        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-        netIpv6Addr->prefixlen_ = 0;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo globalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.globalIpV6Address).c_str());
     }
-    LOGD("SetNetLinkIPInfo randGlobalIpV6Address:%{public}s", wifiIpV6Info.randGlobalIpV6Address.c_str());
     if (!wifiIpV6Info.randGlobalIpV6Address.empty()) {
-        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
         netIpv6Addr->address_ = wifiIpV6Info.randGlobalIpV6Address;
-        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-        netIpv6Addr->prefixlen_ = 0;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo randGlobalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.randGlobalIpV6Address).c_str());
     }
-    LOGD("SetNetLinkIPInfo uniqueLocalAddress1:%{public}s", wifiIpV6Info.uniqueLocalAddress1.c_str());
     if (!wifiIpV6Info.uniqueLocalAddress1.empty()) {
-        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
         netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress1;
-        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-        netIpv6Addr->prefixlen_ = 0;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo LocalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.uniqueLocalAddress1).c_str());
     }
-    LOGD("SetNetLinkIPInfo uniqueLocalAddress2:%{public}s", wifiIpV6Info.uniqueLocalAddress2.c_str());
     if (!wifiIpV6Info.uniqueLocalAddress2.empty()) {
-        sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
         netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress2;
-        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-        netIpv6Addr->prefixlen_ = 0;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo randLocalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.uniqueLocalAddress2).c_str());
     }
 }
 

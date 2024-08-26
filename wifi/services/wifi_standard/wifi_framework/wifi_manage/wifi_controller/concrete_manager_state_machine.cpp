@@ -246,6 +246,7 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }
+        pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
         WIFI_LOGI("HandleStartInIdleState, current role is %{public}d, start scan only success.", mTargetRole);
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
@@ -257,6 +258,7 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }
+        pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
     } else {
         WIFI_LOGE("idlestate start role is error");
     }
@@ -363,6 +365,7 @@ void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
 void ConcreteMangerMachine::ScanonlyState::SwitchSemiActiveInScanOnlyState()
@@ -372,6 +375,7 @@ void ConcreteMangerMachine::ScanonlyState::SwitchSemiActiveInScanOnlyState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
 }
 
 ConcreteMangerMachine::SemiActiveState::SemiActiveState(ConcreteMangerMachine *concreteMangerMachine)
@@ -432,6 +436,7 @@ void ConcreteMangerMachine::SemiActiveState::SwitchConnectInSemiActiveState()
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
 }
 
 void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
@@ -609,7 +614,8 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
     auto detailState = WifiConfigCenter::GetInstance().GetWifiDetailState(mid);
     WIFI_LOGI("SwitchEnableFromSemi, current sta detailState:%{public}d", detailState);
     if (detailState == WifiDetailState::STATE_ACTIVATED) {
-        HandleStaStart();
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        ins->HandleStaStart(mid);
         return WIFI_OPT_SUCCESS;
     }
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
@@ -668,6 +674,11 @@ void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessagePtr msg)
         auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
         ins->HandleStaClose(mid);
     }
+}
+
+void ConcreteMangerMachine::ClearIfaceName()
+{
+    ifaceName.clear();
 }
 } // namespace Wifi
 } // namespace OHOS

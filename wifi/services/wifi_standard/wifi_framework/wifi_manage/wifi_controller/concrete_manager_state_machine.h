@@ -108,7 +108,7 @@ public:
     ErrCode InitConcreteMangerMachine();
     void RegisterCallback(ConcreteModeCallback &callback);
     void SetTargetRole(ConcreteManagerRole role);
-
+    void ClearIfaceName();
 private:
     template <typename T>
     inline void ParsePointer(T *&pointer)

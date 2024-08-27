@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef CJ_WIFI_CALLBACK_H
+#define CJ_WIFI_CALLBACK_H
+
 #include <shared_mutex>
 
 #include "ffi_structs.h"
@@ -63,3 +66,5 @@ private:
     OHOS::sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
 };
 }
+
+#endif

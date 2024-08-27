@@ -33,6 +33,31 @@ std::shared_ptr<WifiScan> cjWifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILIT
 std::shared_ptr<WifiP2p> cjWifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 static const std::string EAP_METHOD[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", "SIM", "AKA", "AKA'" };
 
+enum class SecTypeCj {
+    /** Invalid security type */
+    SEC_TYPE_INVALID = 0,
+    /** Open */
+    SEC_TYPE_OPEN = 1,
+    /** Wired Equivalent Privacy (WEP) */
+    SEC_TYPE_WEP = 2,
+    /** Pre-shared key (PSK) */
+    SEC_TYPE_PSK = 3,
+    /** Simultaneous Authentication of Equals (SAE) */
+    SEC_TYPE_SAE = 4,
+    /** EAP authentication. */
+    SEC_TYPE_EAP = 5,
+    /** SUITE_B_192 192 bit level. */
+    SEC_TYPE_EAP_SUITE_B = 6,
+#ifdef ENABLE_NAPI_WIFI_MANAGER
+    /** Opportunistic Wireless Encryption. */
+    SEC_TYPE_OWE = 7,
+#endif
+    /** WAPI certificate to be specified. */
+    SEC_TYPE_WAPI_CERT = 8,
+    /** WAPI pre-shared key to be specified. */
+    SEC_TYPE_WAPI_PSK = 9,
+};
+
 static std::string EapMethod2Str(const int& method)
 {
     if (method < 0 || method >= static_cast<int>(sizeof(EAP_METHOD) / sizeof(EAP_METHOD[0]))) {
@@ -133,44 +158,47 @@ static void ProcessPassphrase(const SecTypeCj& securityType, WifiDeviceConfig& c
     }
 }
 
-static void NativeInfoElems2Cj(const std::vector<WifiInfoElem>& infoElems, CWifiScanInfo &info)
+static void SetInfoElemContent(const WifiInfoElem &infoElem, CWifiInfoElem &cinfo)
 {
     int valueStep = 2;
-    int64_t size = static_cast<int64_t>(infoElems.size());
-    if (size > 0) {
-        info.infoElems = static_cast<CWifiInfoElem *>(malloc(sizeof(CWifiInfoElem) * size));
-        if (info.infoElems == nullptr) {
-            info.elemsSize = 0;
+    const char *uStr = &infoElem.content[0];
+    size_t len = infoElem.content.size();
+    size_t inLen = static_cast<size_t>(infoElem.content.size() * valueStep + 1);
+    char *buf = static_cast<char *>(calloc(inLen + 1, sizeof(char)));
+    if (buf == nullptr) {
+        return;
+    }
+    int pos = 0;
+    for (size_t k = 0; k < len; ++k) {
+        pos = (k << 1);
+        if (snprintf_s(buf + pos, inLen - pos, inLen - pos - 1, "%02x", uStr[k]) < 0) {
+            free(buf);
+            buf = nullptr;
             return;
         }
-        info.elemsSize = size;
-        for (int64_t i = 0; i < size; i++) {
-            CWifiInfoElem elem;
-            elem.eid = infoElems[i].id;
+    }
+    cinfo.content.head = reinterpret_cast<uint8_t *>(buf);
+    cinfo.content.size = inLen - 1;
+}
 
-            const char *uStr = &infoElems[i].content[0];
-            size_t len = infoElems[i].content.size();
-            size_t inLen = static_cast<size_t>(infoElems[i].content.size() * valueStep + 1);
-            char *buf = (char *)calloc(inLen + 1, sizeof(char));
-            if (buf == nullptr) {
-                elem.content = CArrUI8{.head = nullptr, .size = 0};
-                info.infoElems[i] = elem;
-                continue;
-            }
-            int pos = 0;
-            for (size_t k = 0; k < len; ++k) {
-                pos = (k << 1);
-                if (snprintf_s(buf + pos, inLen - pos, inLen - pos - 1, "%02x", uStr[k]) < 0) {
-                    free(buf);
-                    buf = NULL;
-                    elem.content = CArrUI8{.head = nullptr, .size = 0};
-                    info.infoElems[i] = elem;
-                    continue;
-                }
-            }
-            elem.content = CArrUI8{.head = reinterpret_cast<uint8_t *>(buf), .size = inLen - 1}; // TODO check size
-            info.infoElems[i] = elem;
-        }
+static void NativeInfoElems2Cj(const std::vector<WifiInfoElem>& infoElems, CWifiScanInfo &info)
+{
+    info.infoElems = nullptr;
+    info.elemsSize = 0;
+    int64_t size = static_cast<int64_t>(infoElems.size());
+    if (size <= 0) {
+        return;
+    }
+    info.infoElems = static_cast<CWifiInfoElem *>(malloc(sizeof(CWifiInfoElem) * size));
+    if (info.infoElems == nullptr) {
+        return;
+    }
+    info.elemsSize = size;
+    int64_t idx = 0;
+    for (auto& each : infoElems) {
+        info.infoElems[idx] = CWifiInfoElem{ .eid = each.id, .content = CArrUI8{.head = nullptr, .size = 0}};
+        SetInfoElemContent(each, info.infoElems[idx]);
+        idx++;
     }
 }
 
@@ -187,7 +215,7 @@ static int32_t ScanInfo2Cj(const std::vector<WifiScanInfo>& scanInfos, WifiScanI
         infos.size = size;
 
         uint32_t idx = 0;
-        for(auto& each : scanInfos) {
+        for (auto& each : scanInfos) {
             CWifiScanInfo info;
             info.ssid = MallocCString(each.ssid);
             info.bssid = MallocCString(each.bssid);
@@ -275,6 +303,38 @@ static int Str2EapMethod(const std::string &str)
     return 0;
 }
 
+static void EapConfig2C(WifiEapConfig &wifiEapConfig, CWifiEapConfig &eapConfig)
+{
+    eapConfig.eapMethod = Str2EapMethod(wifiEapConfig.eap);
+    eapConfig.phase2Method = static_cast<int>(wifiEapConfig.phase2Method);
+    eapConfig.identity = MallocCString(wifiEapConfig.identity);
+    eapConfig.anonymousIdentity = MallocCString(wifiEapConfig.anonymousIdentity);
+    eapConfig.password = MallocCString(wifiEapConfig.password);
+    eapConfig.caCertAlias = MallocCString(wifiEapConfig.caCertAlias);
+    eapConfig.caPath = MallocCString(wifiEapConfig.caCertPath);
+    eapConfig.clientCertAlias = MallocCString(wifiEapConfig.caCertAlias);
+    CArrUI8 arr{.head = nullptr, .size = 0};
+    int64_t size = wifiEapConfig.certEntry.size();
+    if (size > 0) {
+        arr.head = static_cast<uint8_t *>(malloc(sizeof(uint8_t) * size));
+        if (arr.head != nullptr) {
+            uint32_t idx = 0;
+            for (auto& each : wifiEapConfig.certEntry) {
+                arr.head[idx] = each;
+                idx++;
+            }
+        }
+    }
+    eapConfig.certEntry = arr;
+    eapConfig.certPassword = MallocCString(wifiEapConfig.certPassword);
+    eapConfig.altSubjectMatch = MallocCString(wifiEapConfig.altSubjectMatch);
+    eapConfig.domainSuffixMatch = MallocCString(wifiEapConfig.domainSuffixMatch);
+    eapConfig.realm = MallocCString(wifiEapConfig.realm);
+    eapConfig.plmn = MallocCString(wifiEapConfig.plmn);
+    eapConfig.eapSubId = wifiEapConfig.eapSubId;
+    eapConfig.isNone = false;
+}
+
 static void DeviceConfig2C(WifiDeviceConfig &config, CWifiDeviceConfig &cfg)
 {
     UpdateSecurityTypeAndPreSharedKey(config);
@@ -288,32 +348,7 @@ static void DeviceConfig2C(WifiDeviceConfig &config, CWifiDeviceConfig &cfg)
     SecTypeCj type = ConvertKeyMgmtToSecType(config.keyMgmt);
     cfg.securityType = static_cast<int32_t>(type);
     if (type == SecTypeCj::SEC_TYPE_EAP || type == SecTypeCj::SEC_TYPE_EAP_SUITE_B) {
-        cfg.eapConfig.eapMethod = Str2EapMethod(config.wifiEapConfig.eap);
-        cfg.eapConfig.phase2Method = static_cast<int>(config.wifiEapConfig.phase2Method);
-        cfg.eapConfig.identity = MallocCString(config.wifiEapConfig.identity);
-        cfg.eapConfig.anonymousIdentity = MallocCString(config.wifiEapConfig.anonymousIdentity);
-        cfg.eapConfig.password = MallocCString(config.wifiEapConfig.password);
-        cfg.eapConfig.caCertAlias = MallocCString(config.wifiEapConfig.caCertAlias);
-        cfg.eapConfig.caPath = MallocCString(config.wifiEapConfig.caCertPath);
-        cfg.eapConfig.clientCertAlias = MallocCString(config.wifiEapConfig.caCertAlias); // ?
-        CArrUI8 arr{.head = nullptr, .size = 0};
-        int64_t size = config.wifiEapConfig.certEntry.size();
-        arr.head = static_cast<uint8_t *>(malloc(sizeof(uint8_t) * size));
-        if (arr.head != nullptr) {
-            uint32_t idx = 0;
-            for (auto& each : config.wifiEapConfig.certEntry) {
-                arr.head[idx] = each;
-                idx++;
-            }
-        }
-        cfg.eapConfig.certEntry = arr;
-        cfg.eapConfig.certPassword = MallocCString(config.wifiEapConfig.certPassword);
-        cfg.eapConfig.altSubjectMatch = MallocCString(config.wifiEapConfig.altSubjectMatch);
-        cfg.eapConfig.domainSuffixMatch = MallocCString(config.wifiEapConfig.domainSuffixMatch);
-        cfg.eapConfig.realm = MallocCString(config.wifiEapConfig.realm);
-        cfg.eapConfig.plmn = MallocCString(config.wifiEapConfig.plmn);
-        cfg.eapConfig.eapSubId = config.wifiEapConfig.eapSubId;
-        cfg.eapConfig.isNone = false;
+        EapConfig2C(config.wifiEapConfig, cfg.eapConfig);
     }
     if (type == SecTypeCj::SEC_TYPE_WAPI_CERT || type == SecTypeCj::SEC_TYPE_WAPI_PSK) {
         cfg.wapiConfig.wapiPskType = config.wifiWapiConfig.wapiPskType;
@@ -324,7 +359,6 @@ static void DeviceConfig2C(WifiDeviceConfig &config, CWifiDeviceConfig &cfg)
 }
 
 extern "C" {
-
 int32_t FfiWifiIsWifiActive(bool &ret)
 {
     if (cjWifiDevicePtr == nullptr) {
@@ -525,31 +559,35 @@ int32_t FfiWifiGetCurrentGroup(CWifiP2PGroupInfo &info)
     }
     WifiP2pGroupInfo groupInfo;
     ErrCode code = cjWifiP2pPtr->GetCurrentGroup(groupInfo);
-    if (code == WIFI_OPT_SUCCESS) {
-        info.isP2pGo = groupInfo.IsGroupOwner();
-        DeviceInfo2Cj(groupInfo.GetOwner(), info.ownerInfo);
-        info.passphrase = MallocCString(groupInfo.GetPassphrase());
-        info.interfaceName = MallocCString(groupInfo.GetInterface());
-        info.groupName = MallocCString(groupInfo.GetGroupName());
-        info.goIpAddress = MallocCString(groupInfo.GetGoIpAddress());
-        info.networkId = groupInfo.GetNetworkId();
-        info.frequency = groupInfo.GetFrequency();
-        info.clientSize = 0;
-        if (!groupInfo.IsClientDevicesEmpty()) {
-            const std::vector<OHOS::Wifi::WifiP2pDevice>& vecDevices = groupInfo.GetClientDevices();
-            int64_t size = static_cast<int64_t>(vecDevices.size());
-            info.clientDevices = static_cast<CWifiP2pDevice *>(malloc(sizeof(CWifiP2pDevice) * size));
-            if (info.clientDevices != nullptr) {
-                info.clientSize = size;
-                uint32_t idx = 0;
-                for (auto& each : vecDevices) {
-                    CWifiP2pDevice device;
-                    DeviceInfo2Cj(each, device);
-                    info.clientDevices[idx] = device;
-                    idx++;
-                }
-            }
-        }
+    if (code != WIFI_OPT_SUCCESS) {
+        return code;
+    }
+    info.isP2pGo = groupInfo.IsGroupOwner();
+    DeviceInfo2Cj(groupInfo.GetOwner(), info.ownerInfo);
+    info.passphrase = MallocCString(groupInfo.GetPassphrase());
+    info.interfaceName = MallocCString(groupInfo.GetInterface());
+    info.groupName = MallocCString(groupInfo.GetGroupName());
+    info.goIpAddress = MallocCString(groupInfo.GetGoIpAddress());
+    info.networkId = groupInfo.GetNetworkId();
+    info.frequency = groupInfo.GetFrequency();
+    info.clientSize = 0;
+    info.clientDevices = nullptr;
+    if (groupInfo.IsClientDevicesEmpty()) {
+        return code;
+    }
+    const std::vector<OHOS::Wifi::WifiP2pDevice>& vecDevices = groupInfo.GetClientDevices();
+    int64_t size = static_cast<int64_t>(vecDevices.size());
+    info.clientDevices = static_cast<CWifiP2pDevice *>(malloc(sizeof(CWifiP2pDevice) * size));
+    if (info.clientDevices == nullptr) {
+        return code;
+    }
+    info.clientSize = size;
+    uint32_t idx = 0;
+    for (auto& each : vecDevices) {
+        CWifiP2pDevice device;
+        DeviceInfo2Cj(each, device);
+        info.clientDevices[idx] = device;
+        idx++;
     }
     return code;
 }
@@ -669,7 +707,8 @@ int32_t FfiWifiAddCandidateConfig(CWifiDeviceConfig cfg, int32_t &ret)
         config.wifiEapConfig.caCertPath = std::string(cfg.eapConfig.caPath);
         config.wifiEapConfig.clientCert = std::string(cfg.eapConfig.clientCertAlias);
         config.wifiEapConfig.privateKey = std::string(cfg.eapConfig.clientCertAlias);
-        config.wifiEapConfig.certEntry = std::vector<uint8_t>(cfg.eapConfig.certEntry.head, cfg.eapConfig.certEntry.head + cfg.eapConfig.certEntry.size);
+        config.wifiEapConfig.certEntry = std::vector<uint8_t>(cfg.eapConfig.certEntry.head,
+            cfg.eapConfig.certEntry.head + cfg.eapConfig.certEntry.size);
         if (strncpy_s(config.wifiEapConfig.certPassword, sizeof(config.wifiEapConfig.certPassword),
             cfg.eapConfig.certPassword, strlen(cfg.eapConfig.certPassword)) != EOK) {
             WIFI_LOGE("%{public}s: failed to copy", __func__);
@@ -706,14 +745,13 @@ WifiDeviceConfigArr FfiWifiGetCandidateConfigs(int32_t &code)
     int64_t size = static_cast<int64_t>(vecDeviceConfigs.size());
     if (code == WIFI_OPT_SUCCESS && size > 0) {
         WIFI_LOGI("Get candidate device configs size: %{public}zu", vecDeviceConfigs.size());
-        // transform
         arr.head = static_cast<CWifiDeviceConfig *>(malloc(sizeof(CWifiDeviceConfig) * size));
         if (arr.head == nullptr) {
             code = WIFI_OPT_FAILED;
             return arr;
         }
         arr.size = size;
-        for(int64_t i = 0; i < size; i++) {
+        for (int64_t i = 0; i < size; i++) {
             CWifiDeviceConfig cfg;
             DeviceConfig2C(vecDeviceConfigs[i], cfg);
             arr.head[i] = cfg;
@@ -739,6 +777,5 @@ int32_t FfiWifiWifiOff(char* type)
     }
     return CjEventRegister::GetInstance().UnRegister(eventType);
 }
-
 }
-}
+} //OHOS::Wifi

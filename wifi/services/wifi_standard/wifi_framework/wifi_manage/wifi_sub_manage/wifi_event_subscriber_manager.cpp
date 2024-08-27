@@ -1073,9 +1073,21 @@ void AssetEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData 
 {
     std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("AssetListerner OnReceiveEvent action: %{public}s", action.c_str());
-    if (action == COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED) {
-        WifiAssetManager::GetInstance().CloudAssetSyn();
+    if (action != COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED) {
+        return;
     }
+    // Do not sync from cloud during connecting
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+        if (pService != nullptr) {
+            WifiLinkedInfo linkedInfo;
+            WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, i);
+            if (linkedInfo.connState == ConnState::CONNECTING) {
+                return;
+            }
+        }
+    }
+    WifiAssetManager::GetInstance().CloudAssetSync();
 }
 #endif
 }  // namespace Wifi

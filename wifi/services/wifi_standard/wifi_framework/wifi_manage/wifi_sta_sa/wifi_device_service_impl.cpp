@@ -685,12 +685,16 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
         WIFI_LOGE("SetTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (WifiStaHalInterface::GetInstance().SetTxPower(power) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetTxPower() failed");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
+#else
+    WIFI_LOGE("call WifiStaHalInterface:SetTxPower failed");
+    return WIFI_OPT_FAILED;
+#endif
 }
 
 void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result)

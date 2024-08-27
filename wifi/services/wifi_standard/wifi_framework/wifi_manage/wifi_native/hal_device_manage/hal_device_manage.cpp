@@ -627,7 +627,7 @@ bool HalDeviceManager::SetTxPower(int power)
     int32_t p2pResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetP2pIfaceName(),
                                         mIWifiP2pIfaces, power);
     int32_t apResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetApIfaceName(),
-                                        mIWifiApIfaces, power);
+                                       mIWifiApIfaces, power);
     LOGI("SetTxPower, result:sta:%{public}d, p2p:%{public}d, ap:%{public}d",
         staResult, p2pResult, apResult);
     if (staResult == HDF_SUCCESS || p2pResult == HDF_SUCCESS || apResult == HDF_SUCCESS) {

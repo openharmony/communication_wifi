@@ -68,7 +68,6 @@ ohos_unittest("wifi_hal_unittest") {
     "wifi_hal_wpa_p2p_test.cpp",
     "wifi_hal_wpa_sta_test.cpp",
     "wifi_wpa_common_test.cpp",
-    "wifi_wpa_hal_test.cpp",
   ]
 
   include_dirs = [

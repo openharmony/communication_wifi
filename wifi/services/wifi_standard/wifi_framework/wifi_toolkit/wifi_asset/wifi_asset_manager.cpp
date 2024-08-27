@@ -211,8 +211,8 @@ static void WifiAssetAttrQuery(const AssetResultSet &resultSet, int32_t userId,
 WifiAssetManager &WifiAssetManager::GetInstance()
 {
     static WifiAssetManager gWifiAsset;
-    if (gWifiAsset.mAssetServiceThread == nullptr) {
-        gWifiAsset.mAssetServiceThread = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
+    if (gWifiAsset.assetServiceThread_ == nullptr) {
+        gWifiAsset.assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
     }
     return gWifiAsset;
 }
@@ -221,19 +221,23 @@ WifiAssetManager::WifiAssetManager()
 {}
  
 WifiAssetManager::~WifiAssetManager()
-{}
+{
+    if (assetServiceThread_ != nullptr) {
+        assetServiceThread_.reset();
+    }
+}
  
-void WifiAssetManager::CloudAssetSyn()
+void WifiAssetManager::CloudAssetSync()
 {
     WifiAssetQuery(USER_ID_DEFAULT);
 }
  
 void WifiAssetManager::WifiAssetAdd(const WifiDeviceConfig &config, int32_t userId, bool flagSync)
 {
-    if (!WifiAssetValid(config) || !mAssetServiceThread) {
+    if (!WifiAssetValid(config) || !assetServiceThread_) {
         return;
     }
-    mAssetServiceThread->PostAsyncTask([=]() {
+    assetServiceThread_->PostAsyncTask([=]() {
         int32_t ret = WifiAssetAttrAdd(config, flagSync);
         if (ret != SEC_ASSET_SUCCESS) {
             LOGE("WifiAssetAdd Failed, ret: %{public}d, ssid: %{public}s", ret, SsidAnonymize(config.ssid).c_str());
@@ -245,11 +249,11 @@ void WifiAssetManager::WifiAssetAdd(const WifiDeviceConfig &config, int32_t user
  
 void WifiAssetManager::WifiAssetQuery(int32_t userId)
 {
-    if (!mAssetServiceThread) {
-        LOGE("WifiAssetQuery, mAssetServiceThread is null");
+    if (!assetServiceThread_) {
+        LOGE("WifiAssetQuery, assetServiceThread_ is null");
         return;
     }
-    mAssetServiceThread->PostAsyncTask([=]() {
+    assetServiceThread_->PostAsyncTask([=]() {
         int32_t ret = 0;
         AssetAttr attrQu[] = {
             {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
@@ -284,10 +288,10 @@ void WifiAssetManager::WifiAssetUpdate(const WifiDeviceConfig &config, int32_t u
  
 void WifiAssetManager::WifiAssetRemove(const WifiDeviceConfig &config, int32_t userId, bool flagSync)
 {
-    if (!(WifiAssetValid(config)) || !mAssetServiceThread) {
+    if (!(WifiAssetValid(config)) || !assetServiceThread_) {
         return;
     }
-    mAssetServiceThread->PostAsyncTask([=]() {
+    assetServiceThread_->PostAsyncTask([=]() {
         std::string aliasId = config.ssid + config.keyMgmt;
         AssetBlob aliasValue = {static_cast<uint32_t>(aliasId.size()),
             const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))};
@@ -311,11 +315,11 @@ void WifiAssetManager::WifiAssetRemove(const WifiDeviceConfig &config, int32_t u
 void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig,
     int32_t userId, bool flagSync)
 {
-    if (!mAssetServiceThread || mWifiDeviceConfig.size() == 0) {
-        LOGE("WifiAssetAddPack, mAssetServiceThread is null");
+    if (!assetServiceThread_ || mWifiDeviceConfig.size() == 0) {
+        LOGE("WifiAssetAddPack, assetServiceThread_ is null");
         return;
     }
-    mAssetServiceThread->PostAsyncTask([=]() {
+    assetServiceThread_->PostAsyncTask([=]() {
         for (auto mapConfig : mWifiDeviceConfig) {
             if (!WifiAssetValid(mapConfig)) {
                 continue;
@@ -368,18 +372,18 @@ void WifiAssetManager::WifiAssetUpdatePack(const std::vector<WifiDeviceConfig> &
 void WifiAssetManager::WifiAssetRemovePack(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig,
     int32_t userId, bool flagSync)
 {
-    if (!mAssetServiceThread || mWifiDeviceConfig.size() == 0) {
+    if (!assetServiceThread_ || mWifiDeviceConfig.size() == 0) {
         return;
     }
-    mAssetServiceThread->PostAsyncTask([=]() { WifiAssetRemovePackInner(mWifiDeviceConfig, userId, flagSync); });
+    assetServiceThread_->PostAsyncTask([=]() { WifiAssetRemovePackInner(mWifiDeviceConfig, userId, flagSync); });
 }
  
 void WifiAssetManager::WifiAssetRemoveAll(int32_t userId, bool flagSync)
 {
-    if (!mAssetServiceThread) {
+    if (!assetServiceThread_) {
         return;
     }
-    mAssetServiceThread->PostAsyncTask([=]() {
+    assetServiceThread_->PostAsyncTask([=]() {
         int32_t ret = 0;
         AssetAttr attrMove[] = {
             {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},

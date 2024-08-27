@@ -33,10 +33,9 @@ public:
  
     static WifiAssetManager &GetInstance();
  
-    void CloudAssetSyn();
+    void CloudAssetSync();
  
-    void WifiAssetAdd(
-        const WifiDeviceConfig &config, int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
+    void WifiAssetAdd(const WifiDeviceConfig &config, int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
  
     void WifiAssetQuery(int32_t userId = USER_ID_DEFAULT);
  
@@ -60,7 +59,7 @@ public:
  
     bool IsWifiConfigUpdated(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs, WifiDeviceConfig &config);
 private:
-    std::unique_ptr<WifiEventHandler> mAssetServiceThread = nullptr;
+    std::unique_ptr<WifiEventHandler> assetServiceThread_ = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

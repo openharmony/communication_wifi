@@ -274,6 +274,10 @@ public:
 
     bool GetConfigValueByName(const std::string &name, std::string &value);
 
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs);
+#endif
+
 private:
     WifiSettings();
     int IncreaseNumRebootsSinceLastUse();

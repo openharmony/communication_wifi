@@ -117,10 +117,10 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
 
 ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
 {
-    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-    WIFI_LOGI("AutoStopStaService, current sta state:%{public}d", staState);
+    WifiOprMidState staStateBefore = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+    WIFI_LOGI("AutoStopStaService, current sta state:%{public}d", staStateBefore);
     std::lock_guard<std::mutex> lock(mutex);
-    if (staState == WifiOprMidState::CLOSED) {
+    if (staStateBefore == WifiOprMidState::CLOSED) {
         return WIFI_OPT_SUCCESS;
     }
     ErrCode ret = WIFI_OPT_FAILED;
@@ -131,7 +131,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
     }
 #endif
 
-    if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSING, instId)) {
+    if (!WifiConfigCenter::GetInstance().SetWifiMidState(staStateBefore, WifiOprMidState::CLOSING, instId)) {
         WIFI_LOGE("AutoStopStaService,set wifi mid state closing failed!");
         return WIFI_OPT_FAILED;
     }
@@ -154,6 +154,10 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
     if (WifiStaHalInterface::GetInstance().StopWifi() != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("stop wifi failed.");
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+        if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, staStateBefore, instId)) {
+            WIFI_LOGE("AutoStopStaService, set wifi mid state:%{public}d failed!", staStateBefore);
+            return WIFI_OPT_FAILED;
+        }
         WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
             static_cast<int>(staState));
         return WIFI_OPT_FAILED;

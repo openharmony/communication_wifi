@@ -46,7 +46,6 @@ DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
 namespace Wifi {
 
-constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 constexpr int EXTENSION_ERROR_CODE = 13500099;
@@ -133,7 +132,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     WIFI_LOGI("DisableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DisableWifi: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -161,7 +160,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
     WIFI_LOGI("EnableSemiWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("EnableSemiWifi: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -362,8 +361,13 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
         "ancoCallProcessName =[%{public}s],bssid = [%{public}s],ssid=[%{public}s]",
         config.networkId, config.callProcessName.c_str(), config.ancoCallProcessName.c_str(),
         MacAnonymize(config.bssid).c_str(), SsidAnonymize(config.ssid).c_str());
-    if (config.networkId == WIFI_BROKER_NETWORK_ID && config.ancoCallProcessName == BROKER_PROCESS_PROTECT_FLAG &&
-        config.bssid.empty() && config.ssid.empty() && config.callProcessName == ANCO_SERVICE_BROKER) {
+    if (config.networkId != WIFI_BROKER_NETWORK_ID || config.ancoCallProcessName != BROKER_PROCESS_PROTECT_FLAG ||
+        !config.bssid.empty() || !config.ssid.empty()) {
+        return false;
+    }
+    std::string ancoWifiValue = "";
+    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", ancoWifiValue);
+    if (success && config.callProcessName == ancoWifiValue) {
         SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);
         return true;
     }
@@ -388,9 +392,10 @@ bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
 {
 #ifndef OHOS_ARCH_LITE
    int pid = GetCallingPid();
-   const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+   std::string wifiBrokerFrameProcessName = "";
+   bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(uid, pid);
-    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (!success || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
         return false;
     }
     return true;
@@ -526,7 +531,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     }
 
     if (!isCandidate) {
-        if (!WifiAuthCenter::IsSystemAppByToken()) {
+        if (!WifiAuthCenter::IsSystemAccess()) {
             WIFI_LOGE("AddDeviceConfig: NOT System APP, PERMISSION_DENIED!");
             return WIFI_OPT_NON_SYSTEMAPP;
         }
@@ -586,7 +591,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
 
 ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("UpdateDeviceConfig: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -619,7 +624,7 @@ ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config
 
 ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("RemoveDevice: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -650,7 +655,7 @@ ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
 
 ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("RemoveAllDevice:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -677,7 +682,7 @@ ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
 
 ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetTxPower:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -724,7 +729,7 @@ void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<Wifi
 
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
-    if (!isCandidate && !WifiAuthCenter::IsSystemAppByToken()) {
+    if (!isCandidate && !WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetDeviceConfigs:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -769,7 +774,7 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
 
 ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("EnableDeviceConfig:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -795,7 +800,7 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
 
 ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DisableDeviceConfig:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -836,7 +841,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
             return WIFI_OPT_PERMISSION_DENIED;
         }
     } else {
-        if (!WifiAuthCenter::IsSystemAppByToken()) {
+        if (!WifiAuthCenter::IsSystemAccess()) {
             WIFI_LOGE("ConnectToCandidateConfig:NOT System APP, PERMISSION_DENIED!");
             return WIFI_OPT_NON_SYSTEMAPP;
         }
@@ -890,7 +895,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
 {
     WIFI_LOGI("%{public}s: device address %{private}s, addressType:%{public}d",
         __func__, config.bssid.c_str(), config.bssidType);
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("ConnectToDevice:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1035,7 +1040,7 @@ ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)
 
 ErrCode WifiDeviceServiceImpl::ReConnect()
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("ReConnect:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1063,7 +1068,7 @@ ErrCode WifiDeviceServiceImpl::ReConnect()
 
 ErrCode WifiDeviceServiceImpl::ReAssociate(void)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("ReAssociate:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1091,7 +1096,7 @@ ErrCode WifiDeviceServiceImpl::ReAssociate(void)
 
 ErrCode WifiDeviceServiceImpl::Disconnect(void)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("Disconnect:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1234,7 +1239,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
 
 ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetDisconnectedReason:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1319,7 +1324,7 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
 
 ErrCode WifiDeviceServiceImpl::GetWifiDetailState(WifiDetailState &state)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetWifiDetailState: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1389,7 +1394,7 @@ ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
 ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
 {
     WIFI_LOGI("GetDeviceMacAddress");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetDeviceMacAddress:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1421,7 +1426,7 @@ bool WifiDeviceServiceImpl::SetLowLatencyMode(bool enabled)
 
 ErrCode WifiDeviceServiceImpl::CheckCanEnableWifi(void)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("EnableWifi:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1597,7 +1602,7 @@ ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported
 ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
 {
     WIFI_LOGI("Enter get 5g channel list.");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("Get5GHzChannelList: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1624,7 +1629,7 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
 ErrCode WifiDeviceServiceImpl::StartPortalCertification()
 {
     WIFI_LOGI("Enter StartPortalCertification.");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("StartPortalCertification: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1651,7 +1656,7 @@ ErrCode WifiDeviceServiceImpl::StartPortalCertification()
 ErrCode WifiDeviceServiceImpl::FactoryReset()
 {
     WIFI_LOGI("Enter FactoryReset.");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("FactoryReset: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1765,7 +1770,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
 ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, WifiDeviceConfig &deviceConfig)
 {
     WIFI_LOGI("EnableHiLinkHandshake enter");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("EnableHiLinkHandshake: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1896,7 +1901,7 @@ ErrCode WifiDeviceServiceImpl::ResetAllFrozenApp()
 
 ErrCode WifiDeviceServiceImpl::DisableAutoJoin(const std::string &conditionName)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DisableAutoJoin:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -1910,7 +1915,7 @@ ErrCode WifiDeviceServiceImpl::DisableAutoJoin(const std::string &conditionName)
 
 ErrCode WifiDeviceServiceImpl::EnableAutoJoin(const std::string &conditionName)
 {
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("EnableAutoJoin:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -2002,7 +2007,7 @@ ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
 {
     WIFI_LOGI("Enter SetSatelliteState");
 
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetSatelliteState:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }

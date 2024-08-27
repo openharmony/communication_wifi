@@ -100,11 +100,11 @@ void OnWpaStateChanged(int status)
     }
 }
 
-void OnWpaSsidWrongKey(int status)
+void OnWpaSsidWrongKey()
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onWpaSsidWrongKey) {
-        cbk.onWpaSsidWrongKey(status);
+        cbk.onWpaSsidWrongKey();
     }
 }
 

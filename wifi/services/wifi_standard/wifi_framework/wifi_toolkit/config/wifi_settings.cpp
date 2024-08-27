@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,9 @@
 #include "softap_parser.h"
 #include "wifi_backup_config.h"
 #include "json/json.h"
+#endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+#include "wifi_asset_manager.h"
 #endif
 #ifdef INIT_LIB_ENABLE
 #include "parameter.h"
@@ -65,7 +68,10 @@ WifiSettings::~WifiSettings()
 {
     SyncDeviceConfig();
     SyncHotspotConfig();
-    SyncBlockList();
+    {
+        std::unique_lock<std::mutex> lock(mApMutex);
+        SyncBlockList();
+    }
     SyncWifiP2pGroupInfoConfig();
     SyncP2pVendorConfig();
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
@@ -106,6 +112,19 @@ int WifiSettings::Init()
     InitPackageFilterConfig();
     IncreaseNumRebootsSinceLastUse();
     InitVariableConfig();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    std::vector<WifiDeviceConfig> tmp;
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        if (IsWifiDeviceConfigDeciphered(iter->second)) {
+            tmp.push_back(iter->second);
+        }
+#else
+        tmp.push_back(iter->second);
+#endif
+    }
+    WifiAssetManager::GetInstance().WifiAssetAddPack(tmp);
+#endif
     return 0;
 }
 
@@ -118,11 +137,32 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mWifiDeviceConfig.find(config.networkId);
     if (iter != mWifiDeviceConfig.end()) {
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        if (WifiAssetManager::GetInstance().IsWifiConfigChanged(config, iter->second)) {
+            WifiAssetManager::GetInstance().WifiAssetUpdate(config);
+        }
+#endif
         iter->second = config;
     } else {
         mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        WifiAssetManager::GetInstance().WifiAssetAdd(config);
+#endif
     }
     return config.networkId;
+}
+
+void WifiSettings::SyncAfterDecryped(WifiDeviceConfig &config)
+{
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    if (IsWifiDeviceConfigDeciphered(config)) {
+        return;
+    }
+    DecryptionDeviceConfig(config);
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().WifiAssetAdd(config);
+#endif
+#endif
 }
 
 int WifiSettings::RemoveDevice(int networkId)
@@ -137,6 +177,9 @@ int WifiSettings::RemoveDevice(int networkId)
                 LOGD("uninstall cert %{public}s success", iter->second.wifiEapConfig.clientCert.c_str());
             }
         }
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        WifiAssetManager::GetInstance().WifiAssetRemove(iter->second);
+#endif
         mWifiDeviceConfig.erase(iter);
     }
     return 0;
@@ -156,6 +199,9 @@ void WifiSettings::ClearDeviceConfig(void)
         }
     }
     mWifiDeviceConfig.clear();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().WifiAssetRemoveAll();
+#endif
     return;
 }
 
@@ -185,9 +231,7 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId) {
             config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-            DecryptionDeviceConfig(config);
-#endif
+            SyncAfterDecryped(config);
             return 0;
         }
     }
@@ -205,9 +249,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
                 config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-                DecryptionDeviceConfig(config);
-#endif
+                SyncAfterDecryped(config);
                 return 0;
             }
         }
@@ -215,9 +257,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index) {
                 config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-                DecryptionDeviceConfig(config);
-#endif
+                SyncAfterDecryped(config);
                 return 0;
             }
         }
@@ -238,9 +278,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
             if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
                 && (iter->second.uid == -1 || iter->second.isShared)) {
                 config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-                DecryptionDeviceConfig(config);
-#endif
+                SyncAfterDecryped(config);
                 return 0;
             }
         }
@@ -249,9 +287,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
             if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
                 && (iter->second.uid == -1 || iter->second.isShared)) {
                 config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-                DecryptionDeviceConfig(config);
-#endif
+                SyncAfterDecryped(config);
                 return 0;
             }
         }
@@ -825,6 +861,7 @@ int WifiSettings::ManageBlockList(const StationInfo &info, int mode, int id)
     } else {
         return -1;
     }
+    SyncBlockList();
     return 0;
 }
 
@@ -1506,7 +1543,6 @@ void WifiSettings::InitHotspotConfig()
 
 int WifiSettings::SyncBlockList()
 {
-    std::unique_lock<std::mutex> lock(mApMutex);
     std::vector<StationInfo> tmp;
     for (auto iter = mBlockListInfo.begin(); iter != mBlockListInfo.end(); ++iter) {
         tmp.push_back(iter->second);
@@ -1619,6 +1655,10 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     }
     LOGI("saved config size greater than %{public}d, remove ssid(print up to 1000)=%{public}s",
         maxNumConfigs, removeConfig.str().c_str());
+    std::vector<WifiDeviceConfig> newVec(configs.begin(), configs.begin() + numExcessNetworks);
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().WifiAssetRemovePack(newVec);
+#endif
     configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
     return 0;
 }
@@ -1728,6 +1768,7 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
         std::string configKey = localConfig.ssid + localConfig.keyMgmt;
         tmp.insert(configKey);
     }
+    std::vector<WifiDeviceConfig> addConfigs;
     for (auto &config : newConfigs) {
         std::string configKey = config.ssid + config.keyMgmt;
         auto iter = tmp.find(configKey);
@@ -1737,8 +1778,12 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
             EncryptionDeviceConfig(config);
 #endif
             localConfigs.push_back(config);
+            addConfigs.push_back(config);
         }
     }
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().WifiAssetAddPack(addConfigs);
+#endif
     std::vector<WifiDeviceConfig>().swap(newConfigs);
     mSavedDeviceConfig.SetValue(localConfigs);
     mSavedDeviceConfig.SaveConfig();
@@ -1863,7 +1908,9 @@ bool WifiSettings::IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) 
     if (!config.preSharedKey.empty() || !config.wepKeys[keyIndex].empty() || !config.wifiEapConfig.password.empty()) {
         return true;
     }
-
+    if (config.keyMgmt == KEY_MGMT_NONE) {
+        return true;
+    }
     return false;
 }
 
@@ -1987,6 +2034,68 @@ bool WifiSettings::EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         return false;
     }
     return true;
+}
+
+bool WifiSettings::GetConfigValueByName(const std::string &name, std::string &value)
+{
+    if (name.empty()) {
+        LOGE("name empty");
+        return false;
+    }
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    std::vector<std::string> values = mFilterMap[name];
+    if (values.empty()) {
+        LOGE("GetConfigValueByName values is empty");
+        return false;
+    }
+    value = values.front();
+    if (value.empty()) {
+        LOGE("GetConfigValueByName value is empty");
+        return false;
+    }
+    return true;
+}
+#endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    LOGI("UpdateWifiConfigFromCloud enter");
+    std::map<int, WifiDeviceConfig> tempConfigs;
+    mNetworkId = 0;
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
+            iter->second.networkId = mNetworkId;
+            tempConfigs.emplace(std::make_pair(mNetworkId, iter->second));
+            mNetworkId++;
+            continue;
+        }
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        // Do not remove local encrypted data
+        if (!IsWifiDeviceConfigDeciphered(iter->second)) {
+            iter->second.networkId = mNetworkId;
+            tempConfigs.emplace(std::make_pair(mNetworkId, iter->second));
+            mNetworkId++;
+            continue;
+        }
+#endif
+        LOGI("UpdateWifiConfigFromCloud remove from cloud %{public}s", SsidAnonymize(iter->second.ssid).c_str());
+    }
+    for (auto iter : newWifiDeviceConfigs) {
+        bool find = false;
+        for (auto oriIter = mWifiDeviceConfig.begin(); oriIter != mWifiDeviceConfig.end(); oriIter++) {
+            if (oriIter->second.ssid == iter.ssid && oriIter->second.keyMgmt == iter.keyMgmt) {
+                find = true;
+                break;
+            }
+        }
+        if (find) {
+            continue;
+        }
+        tempConfigs.emplace(std::make_pair(mNetworkId, iter));
+        mNetworkId++;
+    }
+    mWifiDeviceConfig.swap(tempConfigs);
 }
 #endif
 }  // namespace Wifi

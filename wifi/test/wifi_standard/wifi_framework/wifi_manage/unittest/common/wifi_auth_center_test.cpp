@@ -115,7 +115,7 @@ HWTEST_F(WifiAuthCenterTest, VerifyManageWifiHotspotExtPermission, TestSize.Leve
 HWTEST_F(WifiAuthCenterTest, IsSystemAppByTokenTest001, TestSize.Level1)
 {
     WifiAuthCenter wifiAuthCenter;
-    EXPECT_EQ(wifiAuthCenter.IsSystemAppByToken(), true);
+    EXPECT_EQ(wifiAuthCenter.IsSystemAccess(), true);
 }
 
 HWTEST_F(WifiAuthCenterTest, IsNativeProcessTest001, TestSize.Level1)

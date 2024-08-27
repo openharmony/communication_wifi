@@ -29,7 +29,7 @@ int WifiAuthCenter::Init()
     return PERMISSION_DENIED;
 }
 
-bool WifiAuthCenter::IsSystemAppByToken()
+bool WifiAuthCenter::IsSystemAccess()
 {
     return false;
 }

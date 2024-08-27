@@ -391,7 +391,6 @@ public:
     bool SetApMacAddress(const std::string &ifaceName, const std::string &mac);
 
 private:
-    void ResetHalDeviceManagerInfo();
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();
     bool GetIfaceName(sptr<IChipIface> &iface, std::string &ifaceName);
@@ -424,19 +423,23 @@ private:
         IfaceType createIfaceType);
     bool GetChip(const std::string &removeIfaceName, IfaceType removeIfaceType, sptr<IConcreteChip> &chip);
     bool RemoveIface(sptr<IChipIface> &iface, bool isCallback, IfaceType createIfaceType);
+    static void ClearStaInfo();
+    static void ClearApInfo();
+    static void ResetHalDeviceManagerInfo();
+    static void NotifyDestory(std::string &ifaceName, IfaceType type);
 
     // death recipient
     static void AddChipHdiDeathRecipient();
     static void RemoveChipHdiDeathRecipient();
 
 private:
-    std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> mInterfaceInfoCache;
-    std::map<std::string, sptr<IChipIface>> mIWifiStaIfaces;
-    std::map<std::string, sptr<IChipIface>> mIWifiApIfaces;
-    std::map<std::string, sptr<IChipIface>> mIWifiP2pIfaces;
-    sptr<IChipController> g_IWifi{nullptr};
-    sptr<ChipControllerCallback> g_chipControllerCallback{nullptr};
-    sptr<ChipIfaceCallback> g_chipIfaceCallback{nullptr};
+    static std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> mInterfaceInfoCache;
+    static std::map<std::string, sptr<IChipIface>> mIWifiStaIfaces;
+    static std::map<std::string, sptr<IChipIface>> mIWifiApIfaces;
+    static std::map<std::string, sptr<IChipIface>> mIWifiP2pIfaces;
+    static sptr<IChipController> g_IWifi;
+    static sptr<ChipControllerCallback> g_chipControllerCallback;
+    static sptr<ChipIfaceCallback> g_chipIfaceCallback;
     static std::atomic_bool g_chipHdiServiceDied;
     static std::mutex mMutex;
 };

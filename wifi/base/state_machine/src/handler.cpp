@@ -66,6 +66,7 @@ bool Handler::InitialHandler(const std::string &name)
             return false;
         }
     }
+    WifiWatchDogUtils::GetInstance();
 #endif
     LOGI("InitialHandler success: %{public}s", mThreadName.c_str());
     mThreadName = name;

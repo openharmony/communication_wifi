@@ -1,0 +1,115 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("//foundation/communication/wifi/wifi/wifi.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("WifiApFuzzTest") {
+  module_out_path = fuzz_test_output_path
+  fuzz_config_file = "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifiap_fuzzer"
+
+  include_dirs = [
+    "$WIFI_ROOT_DIR/interfaces/inner_api",
+    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
+    "$WIFI_ROOT_DIR/base/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
+    "$WIFI_ROOT_DIR/utils/inc",
+    "$WIFI_ROOT_DIR/services/wifi_standard/include",
+    "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  defines = [
+    "AP_INTF=\"$wifi_feature_with_ap_intf\"",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    "private=public",
+    "SUPPORT_NAT",
+  ]
+
+  defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+
+  if (is_asan || use_clang_coverage) {
+    defines += [ "DTFUZZ_TEST" ]
+  }
+
+  sources = [
+    "$WIFI_ROOT_DIR/base/utils/xml_parser.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_config_use.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_idle_state.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_monitor.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_root_state.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_service.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_started_state.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_state_machine.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/ap_stations_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap/wifi_ap_nat_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_channel_helper.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_cmd_client.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/base_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/dhcpd_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/if_config.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ipv4_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/mac_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
+    "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_wifi_ap_service.cpp",
+    "wifiap_fuzzer.cpp",
+  ]
+
+  deps = [
+    "$WIFI_ROOT_DIR/base:wifi_base",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
+  ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:want",
+    "c_utils:utils",
+    "dhcp:dhcp_sdk",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
+    "libxml2:libxml2",
+    "netmanager_base:net_conn_manager_if",
+  ]
+
+  part_name = "wifi"
+  subsystem_name = "communication"
+}

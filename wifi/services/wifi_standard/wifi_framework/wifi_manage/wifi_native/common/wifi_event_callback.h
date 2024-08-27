@@ -24,7 +24,7 @@ struct WifiEventCallback {
     std::function<void(int, int, const std::string &)> onConnectChanged;
     std::function<void(const std::string &, const std::string &)> onBssidChanged;
     std::function<void(int)> onWpaStateChanged;
-    std::function<void(int)> onWpaSsidWrongKey;
+    std::function<void(void)> onWpaSsidWrongKey;
     std::function<void(int)> onWpsOverlap;
     std::function<void(int)> onWpsTimeOut;
     std::function<void(void)> onWpaAuthTimeout;

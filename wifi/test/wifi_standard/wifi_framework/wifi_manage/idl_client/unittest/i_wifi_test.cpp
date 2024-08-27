@@ -131,7 +131,7 @@ public:
         LOGI("Mock OnWpaStateChangedTest!");
     }
 
-    static void OnSsidWrongkeyTest(int status)
+    static void OnSsidWrongkeyTest()
     {
         LOGI("Mock OnSsidWrongkeyTest!");
     }

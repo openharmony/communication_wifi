@@ -318,6 +318,13 @@ void StaStateMachine::RegisterStaServiceCallback(const StaServiceCallback &callb
     m_staCallback.insert_or_assign(callback.callbackModuleName, callback);
 }
 
+void StaStateMachine::UnRegisterStaServiceCallback(const StaServiceCallback &callback)
+{
+    WIFI_LOGI("UnRegisterStaServiceCallback, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    std::unique_lock<std::shared_mutex> lock(m_staCallbackMutex);
+    m_staCallback.erase(callback.callbackModuleName);
+}
+
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
     {
@@ -576,6 +583,40 @@ void StaStateMachine::TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig,
     FillWapiCfg(config, halDeviceConfig);
 }
 
+void StaStateMachine::AppendFastTransitionKeyMgmt(
+    const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const
+{
+    if (scanInfo.capabilities.find("FT/EAP") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-EAP ");
+    } else if (scanInfo.capabilities.find("FT/PSK") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-PSK ");
+    } else if (scanInfo.capabilities.find("FT/SAE") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-SAE ");
+    } else {
+        LOGI("No need append ft keyMgmt!");
+    }
+}
+
+void StaStateMachine::ConvertSsidToOriginalSsid(
+    const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const
+{
+    std::vector<WifiScanInfo> scanInfoList;
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    for (auto &scanInfo : scanInfoList) {
+        std::string deviceKeyMgmt;
+        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (config.ssid == scanInfo.ssid
+            && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
+                || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处理
+            AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
+            halDeviceConfig.ssid = scanInfo.oriSsid;
+            LOGI("ConvertSsidToOriginalSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",
+                SsidAnonymize(halDeviceConfig.ssid).c_str(), halDeviceConfig.keyMgmt.c_str());
+            break;
+        }
+    }
+}
+
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
     LOGI("Enter ConvertDeviceCfg.\n");
@@ -610,19 +651,8 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     }
     LOGI("ConvertDeviceCfg SetDeviceConfig selected network ssid=%{public}s, bssid=%{public}s",
         SsidAnonymize(halDeviceConfig.ssid).c_str(), MacAnonymize(halDeviceConfig.bssid).c_str());
-
-    std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
-    for (auto scanInfo : scanInfoList) {
-        std::string deviceKeyMgmt;
-        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (halDeviceConfig.ssid == scanInfo.ssid && halDeviceConfig.keyMgmt == deviceKeyMgmt) {
-            halDeviceConfig.ssid = scanInfo.oriSsid;
-            LOGI("ConvertDeviceCfg back to oriSsid:%{public}s", SsidAnonymize(halDeviceConfig.ssid).c_str());
-            break;
-        }
-    }
-
+    ConvertSsidToOriginalSsid(config, halDeviceConfig);
+    
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, halDeviceConfig) != WIFI_HAL_OPT_OK) {
         LOGE("ConvertDeviceCfg SetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
@@ -3167,7 +3197,9 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 void StaStateMachine::HandlePortalNetworkPorcess()
 {
 #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("portal uri is %{public}s\n", mPortalUrl.c_str());
+    if (mPortalUrl.empty()) {
+        WIFI_LOGE("portal uri is nullptr\n");
+    }
     int netId = m_NetWorkState->GetWifiNetId();
     std::map<std::string, std::string> variableMap;
     if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
@@ -4308,7 +4340,8 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
 {
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     if (networkStatusHistoryInserted) {
-        if (IsGoodSignalQuality()) {
+        if (IsGoodSignalQuality() || (networkStatus == NetworkStatus::HAS_INTERNET) ||
+            (networkStatus == NetworkStatus::PORTAL)) {
             NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
             WIFI_LOGI("After updated, current network status history is %{public}s.",
                       NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());

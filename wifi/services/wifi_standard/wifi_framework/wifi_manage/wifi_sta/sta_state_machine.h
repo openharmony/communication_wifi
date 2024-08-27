@@ -488,6 +488,13 @@ public:
     void RegisterStaServiceCallback(const StaServiceCallback &callback);
 
     /**
+     * @Description unRegister sta callback function
+     *
+     * @param callback - Callback function pointer storage structure
+     */
+    void UnRegisterStaServiceCallback(const StaServiceCallback &callback);
+
+    /**
      * @Description  Convert the deviceConfig structure and set it to idl structure
      *
      * @param config -The Network info(in)
@@ -1251,6 +1258,8 @@ private:
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
     bool IsGoodSignalQuality();
+    void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
+    void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -20,14 +20,12 @@
 #include "cj_ffi/cj_common_ffi.h"
 
 extern "C" {
-    struct CWifiInfoElem
-    {
+    struct CWifiInfoElem {
         uint32_t eid;
         CArrUI8 content;
     };
 
-    struct CWifiScanInfo
-    {
+    struct CWifiScanInfo {
         char *ssid;
         char *bssid;
         int32_t bssidType;
@@ -46,15 +44,12 @@ extern "C" {
         bool isHiLinkNetwork;
     };
 
-    struct WifiScanInfoArr
-    {
+    struct WifiScanInfoArr {
         CWifiScanInfo *head;
         int64_t size;
     };
 
-    // TODO figure out clientCertAlias
-    struct CWifiEapConfig
-    {
+    struct CWifiEapConfig {
         int32_t eapMethod;                        /* EAP authentication mode:PEAP/TLS/TTLS/PWD/SIM/AKA/AKA' */
         int32_t phase2Method;              /* Second stage authentication method */
         char *identity;                   /* Identity information */
@@ -73,16 +68,14 @@ extern "C" {
         bool isNone;
     };
 
-    struct CWifiWapiConfig
-    {
+    struct CWifiWapiConfig {
         int32_t wapiPskType;
         char *wapiAsCert;
         char *wapiUserCert;
         bool isNone;
     };
 
-    struct CIpInfo
-    {
+    struct CIpInfo {
         uint32_t ipAddress;
         uint32_t gateway;
         uint32_t netmask;
@@ -92,8 +85,7 @@ extern "C" {
         uint32_t leaseDuration;
     };
 
-    struct CIpv6Info
-    {
+    struct CIpv6Info {
         char *linkIpV6Address;
         char *globalIpV6Address;
         char *randomGlobalIpV6Address;
@@ -105,8 +97,7 @@ extern "C" {
         char *secondDNS;
     };
 
-    struct CWifiP2PConfig
-    {
+    struct CWifiP2PConfig {
         char *deviceAddress;
         char *passphrase;
         char *groupName;
@@ -115,15 +106,13 @@ extern "C" {
         int32_t deviceAddressType;
     };
 
-    struct CWifiP2PLinkedInfo
-    {
+    struct CWifiP2PLinkedInfo {
         int32_t connectState;
         bool isGroupOwner;
         char *groupOwnerAddr;
     };
 
-    struct CWifiP2pDevice
-    {
+    struct CWifiP2pDevice {
         char *deviceName;
         char *deviceAddress;
         char *primaryDeviceType;
@@ -132,14 +121,12 @@ extern "C" {
         int32_t deviceAddressType;
     };
 
-    struct WifiP2pDeviceArr
-    {
+    struct WifiP2pDeviceArr {
         CWifiP2pDevice *head;
         int64_t size;
     };
 
-    struct CWifiP2PGroupInfo
-    {
+    struct CWifiP2PGroupInfo {
         bool isP2pGo;
         CWifiP2pDevice ownerInfo;
         char *passphrase;
@@ -152,8 +139,7 @@ extern "C" {
         char *goIpAddress;
     };
 
-    struct CWifiLinkedInfo
-    {
+    struct CWifiLinkedInfo {
         char *ssid;
         char *bssid;
         int32_t rssi;
@@ -175,8 +161,7 @@ extern "C" {
         bool isHiLinkNetwork;
     };
 
-    struct CWifiDeviceConfig
-    {
+    struct CWifiDeviceConfig {
         int32_t securityType;
         int32_t bssidType;
         bool isHiddenSsid;
@@ -187,13 +172,10 @@ extern "C" {
         CWifiWapiConfig wapiConfig;
     };
 
-    struct WifiDeviceConfigArr
-    {
+    struct WifiDeviceConfigArr {
         CWifiDeviceConfig *head;
         int64_t size;
     };
 }
-
-
 
 #endif // CJ_WIFI_FFI_STRUCTS_H

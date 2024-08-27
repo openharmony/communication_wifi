@@ -274,6 +274,10 @@ public:
 
     bool GetConfigValueByName(const std::string &name, std::string &value);
 
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs);
+#endif
+
 private:
     WifiSettings();
     int IncreaseNumRebootsSinceLastUse();
@@ -308,7 +312,7 @@ private:
     int DecryptionDeviceConfig(WifiDeviceConfig &config);
     bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
-
+    void SyncAfterDecryped(WifiDeviceConfig &config);
 private:
     // STA
     std::mutex mStaMutex;

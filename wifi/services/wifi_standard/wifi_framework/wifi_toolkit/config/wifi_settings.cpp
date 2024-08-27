@@ -113,7 +113,13 @@ int WifiSettings::Init()
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     std::vector<WifiDeviceConfig> tmp;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        if (IsWifiDeviceConfigDeciphered(iter->second)) {
+            tmp.push_back(iter->second);
+        }
+#else
         tmp.push_back(iter->second);
+#endif
     }
     WifiAssetManager::GetInstance().WifiAssetAddPack(tmp);
 #endif
@@ -142,6 +148,19 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 #endif
     }
     return config.networkId;
+}
+
+void WifiSettings::SyncAfterDecryped(WifiDeviceConfig &config)
+{
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+    if (IsWifiDeviceConfigDeciphered(config)) {
+        return;
+    }
+    DecryptionDeviceConfig(config);
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().WifiAssetAdd(config);
+#endif
+#endif
 }
 
 int WifiSettings::RemoveDevice(int networkId)
@@ -210,9 +229,7 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId) {
             config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-            DecryptionDeviceConfig(config);
-#endif
+            SyncAfterDecryped(config);
             return 0;
         }
     }
@@ -230,9 +247,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
                 config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-                DecryptionDeviceConfig(config);
-#endif
+                SyncAfterDecryped(config);
                 return 0;
             }
         }
@@ -240,9 +255,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index) {
                 config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-                DecryptionDeviceConfig(config);
-#endif
+                SyncAfterDecryped(config);
                 return 0;
             }
         }
@@ -263,9 +276,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
             if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
                 && (iter->second.uid == -1 || iter->second.isShared)) {
                 config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-                DecryptionDeviceConfig(config);
-#endif
+                SyncAfterDecryped(config);
                 return 0;
             }
         }
@@ -274,9 +285,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
             if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
                 && (iter->second.uid == -1 || iter->second.isShared)) {
                 config = iter->second;
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-                DecryptionDeviceConfig(config);
-#endif
+                SyncAfterDecryped(config);
                 return 0;
             }
         }
@@ -1877,7 +1886,9 @@ bool WifiSettings::IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) 
     if (!config.preSharedKey.empty() || !config.wepKeys[keyIndex].empty() || !config.wifiEapConfig.password.empty()) {
         return true;
     }
-
+    if (config.keyMgmt == KEY_MGMT_NONE) {
+        return true;
+    }
     return false;
 }
 
@@ -2035,9 +2046,18 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
             iter->second.networkId = mNetworkId;
             tempConfigs.emplace(std::make_pair(mNetworkId, iter->second));
             mNetworkId++;
-        } else {
-            LOGI("UpdateWifiConfigFromCloud remove from cloud %{public}s", SsidAnonymize(iter->second.ssid).c_str());
+            continue;
         }
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        // Do not remove local encrypted data
+        if (!IsWifiDeviceConfigDeciphered(iter->second)) {
+            iter->second.networkId = mNetworkId;
+            tempConfigs.emplace(std::make_pair(mNetworkId, iter->second));
+            mNetworkId++;
+            continue;
+        }
+#endif
+        LOGI("UpdateWifiConfigFromCloud remove from cloud %{public}s", SsidAnonymize(iter->second.ssid).c_str());
     }
     for (auto iter : newWifiDeviceConfigs) {
         bool find = false;

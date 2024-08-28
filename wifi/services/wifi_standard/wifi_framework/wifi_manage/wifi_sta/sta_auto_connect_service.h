@@ -120,6 +120,13 @@ public:
      * @param conditionName the name of condition.
      */
     virtual void DeregisterAutoJoinCondition(const std::string &conditionName);
+
+    /**
+     * @Description  set auto connect state callback.
+     *
+     * @param callbacks callbacks.
+     */
+    virtual void SetAutoConnectStateCallback(const std::vector<StaServiceCallback> &callbacks);
 private:
     StaStateMachine *pStaStateMachine;
     StaDeviceAppraisal *pSavedDeviceAppraisal;
@@ -131,6 +138,7 @@ private:
     int m_instId;
     std::map<std::string, std::function<bool()>> autoJoinConditionsMap{};
     std::mutex autoJoinMutex;
+    std::vector<StaServiceCallback> mStaCallbacks;
     struct BlockedBssidInfo {
         int count; /* Number of times the BSSID is rejected. */
         bool blockedFlag;

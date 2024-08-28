@@ -66,12 +66,12 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
     return;
 }
 
-ErrCode ScanService::Scan(bool externFlag)
+ErrCode ScanService::Scan(ScanType scanType)
 {
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag)
+ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanType)
 {
     return WIFI_OPT_SUCCESS;
 }

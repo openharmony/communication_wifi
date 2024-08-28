@@ -237,6 +237,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
 #ifndef OHOS_ARCH_LITE
     if (IsAppInCandidateFilterList(uid)) {
         tempDeviceConfig.isShared = true;
+        tempDeviceConfig.isEphemeral = false;
     }
 #endif
     netWorkId = AddDeviceConfig(tempDeviceConfig);

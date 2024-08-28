@@ -875,6 +875,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
                 return WIFI_OPT_INVALID_PARAM;
             }
         }
+        WifiSettings::GetInstance().SetDeviceEphemeral(networkId, false);
         WifiSettings::GetInstance().SetDeviceState(networkId, static_cast<int>(WifiDeviceConfigStatus::ENABLED), false);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
@@ -885,7 +886,6 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
                 return WIFI_OPT_SUCCESS;
             }
         }
-        WifiSettings::GetInstance().SetDeviceEphemeral(networkId, false);
         return pService->ConnectToCandidateConfig(uid, networkId);
     }
     return pService->ConnectToNetwork(networkId);

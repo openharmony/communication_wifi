@@ -3099,6 +3099,9 @@ bool SelfCureStateMachine::IsSettingsPage()
     if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
     }
+    if (variableMap.find("SETTINGS_PAGE") == variableMap.end()) {
+        return false;
+    }
     if (WifiAppStateAware::GetInstance().IsForegroundApp(variableMap["SETTINGS_PAGE"])) {
         WIFI_LOGI("settings page, do not allow reset self cure");
         return true;

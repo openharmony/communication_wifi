@@ -180,6 +180,15 @@ static napi_value WifiChannelWidthInit(napi_env env)
         static_cast<int>(WifiChannelWidthJs::WIDTH_INVALID), "WIDTH_INVALID");
     return wifiChannelWidth;
 }
+static napi_value WifiCategoryInit(napi_env env)
+{
+    napi_value wifiCategory = nullptr;
+    napi_create_object(env, &wifiCategory);
+    SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::DEFAULT), "DEFAULT");
+    SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI6), "WIFI6");
+    SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI6_PLUS), "WIFI6_PLUS");
+    return wifiCategory;
+}
 static napi_value WifiStandardInit(napi_env env)
 {
     napi_value wifiStandard = nullptr;
@@ -272,6 +281,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value bandTypeObj = WifiBandTypeInit(env);
     napi_value proxyMethodObj = ProxyMethodInit(env);
     napi_value wapiPskTypeObj = WapiPskTypeInit(env);
+    napi_value wifiCategoryObj = WifiCategoryInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
@@ -282,6 +292,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("WifiBandType", bandTypeObj),
         DECLARE_NAPI_PROPERTY("ProxyMethod", proxyMethodObj),
         DECLARE_NAPI_PROPERTY("WapiPskType", wapiPskTypeObj),
+        DECLARE_NAPI_PROPERTY("WifiCategory", wifiCategoryObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),

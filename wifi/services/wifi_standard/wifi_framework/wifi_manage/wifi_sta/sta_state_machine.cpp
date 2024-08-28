@@ -3201,15 +3201,19 @@ void StaStateMachine::HandlePortalNetworkPorcess()
         WIFI_LOGE("portal uri is nullptr\n");
     }
     int netId = m_NetWorkState->GetWifiNetId();
+    std::string bundle;
     std::map<std::string, std::string> variableMap;
     if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("BROWSER_BUNDLE") != variableMap.end()) {
+        bundle = variableMap["BROWSER_BUNDLE"];
     }
     AAFwk::Want want;
     want.SetAction(PORTAL_ACTION);
     want.SetUri(mPortalUrl);
     want.AddEntity(PORTAL_ENTITY);
-    want.SetBundle(variableMap["BROWSER_BUNDLE"]);
+    want.SetBundle(bundle);
     want.SetParam("netId", netId);
     WIFI_LOGI("wifi netId is %{public}d", netId);
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
@@ -3242,10 +3246,14 @@ void StaStateMachine::ShowPortalNitification()
             WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
     } else {
         std::map<std::string, std::string> variableMap;
+        std::string bundle;
         if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
             WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
         }
-        if (WifiAppStateAware::GetInstance().IsForegroundApp(variableMap["SETTINGS_BUNDLE"])) {
+        if (variableMap.find("SETTINGS_BUNDLE") != variableMap.end()) {
+            bundle = variableMap["SETTINGS_BUNDLE"];
+        }
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_CONNECTED);

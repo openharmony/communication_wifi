@@ -433,7 +433,7 @@ private:
     void WriteWifiP2pConfigData(MessageParcel &data, const WifiP2pConfig &config) const;
 
 private:
-    bool mRemoteDied;
+    std::atomic<bool> mRemoteDied;
     static BrokerDelegator<WifiP2pProxy> delegator;
     sptr<IRemoteObject> remote_ = nullptr;
     std::mutex mutex_;

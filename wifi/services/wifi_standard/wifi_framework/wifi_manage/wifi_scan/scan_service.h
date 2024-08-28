@@ -38,16 +38,14 @@ namespace OHOS {
 namespace Wifi {
 inline const int DISCONNECTED_SCAN_INTERVAL = 20 * 60 * 1000;
 inline const int RESTART_PNO_SCAN_TIME = 5 * 1000;
+inline const int RESTART_SYSTEM_SCAN_TIME = 2 * 1000;
 inline const int FREQS_24G_MAX_VALUE = 2500;
 inline const int FREQS_5G_MIN_VALUE = 5000;
 inline const int SECOND_TO_MICRO_SECOND = 1000000;
 inline const int MAX_PNO_SCAN_FAILED_NUM = 5;
+inline const int MAX_SYSTEM_SCAN_FAILED_NUM = 5;
 inline const int DOUBLE_SCAN_INTERVAL = 2;
-inline const int STA_SCAN_SCENE = 1;
-inline const int CUSTOM_SCAN_SCENE = 2;
-inline const int SCREEN_SCAN_SCENE = 3;
-inline const int OTHER_SCAN_SCENE = 4;
-inline const int SYSTEM_SCAN_INIT_TIME = 20;
+inline const int SYSTEM_SCAN_INIT_TIME = 10;
 inline const int SYSTEM_SCAN_INTERVAL_ONE_HOUR = 60 * 60;
 inline const int SYSTEM_SCAN_INTERVAL_FIVE_MINUTE = 5 * 60;
 inline const int SYSTEM_SCAN_INTERVAL_160_SECOND = 160;
@@ -136,14 +134,14 @@ public:
      * @param externFlag - Externally initiated scanning[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode Scan(bool externFlag);
+    virtual ErrCode Scan(ScanType scanType);
     /**
      * @Description Start Wi-Fi scanning based on specified parameters.
      *
      * @param params - Scan specified parameters[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode ScanWithParam(const WifiScanParams &params, bool externFlag);
+    virtual ErrCode ScanWithParam(const WifiScanParams &params, ScanType scanType);
     /**
      * @Description Disable/Restore the scanning operation.
      *
@@ -245,6 +243,13 @@ public:
      */
     virtual void HandleGetCustomSceneState(std::map<int, time_t>& sceneMap) const;
     /**
+     * @Description Handle auto connect state.
+     *
+     * @param success auto connect state[in]
+     * @return
+     */
+    virtual void HandleAutoConnectStateChanged(bool success);
+    /**
      * @Description Query and save the scan control policy.
      *
      */
@@ -300,6 +305,7 @@ private:
     bool autoNetworkSelection;                       /* Automatic network selection */
     int64_t lastSystemScanTime;                      /* Last System Scan Time */
     int pnoScanFailedNum;                            /* Number of PNO Scan Failures */
+    std::atomic<int> systemScanFailedNum;
     ScanControlInfo scanControlInfo;                 /* Scan Control Policy */
     bool disableScanFlag;                            /* Disable Scan Flag. */
     std::vector<int> freqs2G;                        /* The support frequencys for 2.4G */
@@ -325,11 +331,6 @@ private:
     int customSceneForbidCount;
     mutable std::mutex scanConfigMapMutex;
     mutable std::mutex scanControlInfoMutex;
-    enum class ScanType {
-        SCAN_TYPE_EXTERN = 0,
-        SCAN_TYPE_SYSTEMTIMER,
-        SCAN_TYPE_PNO,
-    };
     bool scanTrustMode;                              /* scan trustlist mode */
     std::unordered_set<int> scanTrustSceneIds;       /* scan scene ids */
     bool lastFreezeState;                            /* last freeze state. */
@@ -490,13 +491,23 @@ private:
      *
      */
     void RestartPnoScanTimeOut();
-    ErrCode ScanControlInner(bool externFlag);
+    ErrCode ScanControlInner(ScanType scanType);
+    /**
+     * @Description System scanning failed, Restart after a delay.
+     */
+    void RestartSystemScanTimeOut();
     /**
      * @Description Determines whether external scanning is allowed based on the scanning policy.
      *
      * @return success: true, failed: false
      */
     ErrCode AllowExternScan();
+    /**
+     * @Description Determines whether native external scanning is allowed based on the scanning policy.
+     *
+     * @return success: true, failed: false
+     */
+    ErrCode AllowNativeExternScan();
     /**
      * @Description Determine whether to allow scheduled system scanning.
      *

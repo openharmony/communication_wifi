@@ -638,7 +638,11 @@ void WifiEventSubscriberManager::RegisterMovementCallBack()
     }
     if (Msdp::MovementClient::GetInstance().SubscribeCallback(
         Msdp::MovementDataUtils::MovementType::TYPE_STILL, deviceMovementCallback_) != ERR_OK) {
-        WIFI_LOGE("Register a device movement observer failed!");
+        WIFI_LOGE("Register movement still observer failed!");
+    }
+    if (Msdp::MovementClient::GetInstance().SubscribeCallback(
+        Msdp::MovementDataUtils::MovementType::TYPE_STAY, deviceMovementCallback_) != ERR_OK) {
+        WIFI_LOGE("Register movement stay observer failed!");
     }
 }
 

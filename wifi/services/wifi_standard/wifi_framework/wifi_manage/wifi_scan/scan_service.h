@@ -307,7 +307,7 @@ private:
     int pnoScanFailedNum;                            /* Number of PNO Scan Failures */
     std::atomic<int> systemScanFailedNum;
     ScanControlInfo scanControlInfo;                 /* Scan Control Policy */
-    bool disableScanFlag;                            /* Disable Scan Flag. */
+    std::atomic<bool> disableScanFlag {false};       /* Disable Scan Flag. */
     std::vector<int> freqs2G;                        /* The support frequencys for 2.4G */
     std::vector<int> freqs5G;                        /* The support frequencys for 5G */
     std::vector<int> freqsDfs;                       /* The support frequencys for DFS */

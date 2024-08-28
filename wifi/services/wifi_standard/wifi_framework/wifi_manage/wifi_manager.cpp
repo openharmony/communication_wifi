@@ -56,7 +56,7 @@ WifiManager::~WifiManager()
 int WifiManager::Init()
 {
     std::unique_lock<std::mutex> lock(initStatusMutex);
-    WifiWatchDogUtils::GetInstance();
+    WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
     if (mInitStatus == INIT_OK) {
         WIFI_LOGI("WifiManager already init!");
         return 0;

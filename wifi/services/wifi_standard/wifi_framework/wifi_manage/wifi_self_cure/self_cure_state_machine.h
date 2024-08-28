@@ -416,6 +416,7 @@ private:
     bool IsSettingsPage();
     bool IsMultiDhcpOffer();
     void ClearDhcpOffer();
+    void UpdateSelfcureState(int selfcureType, bool isSelfCureOnGoing);
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;

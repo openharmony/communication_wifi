@@ -33,6 +33,7 @@
 #include "wifi_common_service_manager.h"
 #include "wifi_native_define.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_watchdog_utils.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -55,6 +56,7 @@ WifiManager::~WifiManager()
 int WifiManager::Init()
 {
     std::unique_lock<std::mutex> lock(initStatusMutex);
+    WifiWatchDogUtils::GetInstance();
     if (mInitStatus == INIT_OK) {
         WIFI_LOGI("WifiManager already init!");
         return 0;

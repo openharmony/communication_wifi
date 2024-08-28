@@ -121,6 +121,7 @@ public:
     virtual int GetHotspotState(int id = 0) = 0;
     virtual int SetP2pEnhanceState(int state = 0) = 0;
     virtual int GetP2pEnhanceState() = 0;
+    virtual void ClearLocalHid2dInfo(int uid = 0) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -222,6 +223,7 @@ public:
     MOCK_METHOD1(GetHotspotState, int(int id));
     MOCK_METHOD1(SetP2pEnhanceState, int(int state));
     MOCK_METHOD0(GetP2pEnhanceState, int());
+    MOCK_METHOD1(ClearLocalHid2dInfo, void(int uid));
 };
 }  // namespace OHOS
 }  // namespace Wifi

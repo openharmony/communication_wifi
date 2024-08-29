@@ -664,6 +664,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     }
     if (memset_s(g_hdiWpaStaCallbackObj, sizeof(struct IWpaCallback),
         0, sizeof(struct IWpaCallback)) != EOK) {
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     g_hdiWpaStaCallbackObj->OnEventDisconnected = callback->OnEventDisconnected;

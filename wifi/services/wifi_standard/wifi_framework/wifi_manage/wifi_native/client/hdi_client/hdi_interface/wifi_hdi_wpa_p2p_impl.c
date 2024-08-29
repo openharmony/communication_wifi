@@ -232,6 +232,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
     }
     if (memset_s(g_hdiWpaP2pCallbackObj, sizeof(struct IWpaCallback),
         0, sizeof(struct IWpaCallback)) != EOK) {
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     InitHdiWpaP2pCallbackObj(callback);

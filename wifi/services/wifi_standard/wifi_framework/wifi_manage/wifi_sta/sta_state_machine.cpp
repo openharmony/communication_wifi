@@ -1228,6 +1228,8 @@ void StaStateMachine::HilinkSaveConfig(void)
     }
     WifiSettings::GetInstance().AddDeviceConfig(m_hilinkDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
+
+    WifiConfigCenter::GetInstance().SetMacAddress(m_hilinkDeviceConfig.macAddress, m_instId);
     m_hilinkFlag = false;
 }
 
@@ -3513,7 +3515,6 @@ void StaStateMachine::HilinkSetMacAddress(std::string &cmd)
     }
 
     m_hilinkDeviceConfig.macAddress = macAddress;
-    WifiConfigCenter::GetInstance().SetMacAddress(macAddress, m_instId);
     std::string realMacAddress = "";
 
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);

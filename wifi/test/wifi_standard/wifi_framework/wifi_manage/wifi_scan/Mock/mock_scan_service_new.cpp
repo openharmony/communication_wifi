@@ -228,6 +228,11 @@ void ScanService::HandleGetCustomSceneState(std::map<int, time_t>& sceneMap) con
 {
 }
 
+void ScanService::HandleAutoConnectStateChanged(bool success)
+{
+    return;
+}
+
 void ScanService::SystemScanProcess(bool scanAtOnce)
 {
     return;

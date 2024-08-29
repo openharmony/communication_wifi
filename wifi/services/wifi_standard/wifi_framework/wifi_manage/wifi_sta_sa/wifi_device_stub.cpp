@@ -178,7 +178,7 @@ void WifiDeviceStub::InitHandleMap()
     return;
 }
 
-static std::map<int, std::string> g_collieCodeStringStaMap = {
+static std::map<int, std::string> collieCodeStringStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), "WIFI_SVR_CMD_IS_METERED_HOTSPOT"},
@@ -206,19 +206,19 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         if (exception) {
             return WIFI_OPT_FAILED;
         }
-        std::map<int, std::string>::iterator itCollieId = g_collieCodeStringStaMap.find(code);
-        if (itCollieId != g_collieCodeStringStaMap.end()) {
-            int idTimer = 0;
+        std::map<int, std::string>::iterator itCollieId = collieCodeStringStaMap.find(code);
+        int idTimer = -1;
+        if (itCollieId != collieCodeStringStaMap.end()) {
             idTimer = WifiWatchDogUtils::GetInstance()->StartWatchDogForFunc(itCollieId->second);
-            WIFI_LOGI("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
-            (iter->second)(code, data, reply);
-            WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
-        } else {
-            (iter->second)(code, data, reply);
+            WIFI_LOGE("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
         }
+        (iter->second)(code, data, reply);
+        WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
     }
+
     return 0;
 }
+
 
 void WifiDeviceStub::OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {

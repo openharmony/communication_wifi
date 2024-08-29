@@ -112,6 +112,7 @@ const char *GetHdiP2pIfaceName();
  * @return WifiErrorNo - operation result
  */
 struct IWpaInterface* GetWpaInterface();
+pthread_mutex_t* GetWpaObjMutex(void);
 
 /**
  * @Description copy file.

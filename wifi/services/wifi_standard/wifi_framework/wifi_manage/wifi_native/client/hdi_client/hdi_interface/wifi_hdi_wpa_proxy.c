@@ -425,10 +425,13 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
 struct IWpaInterface* GetWpaInterface()
 {
     struct IWpaInterface *wpaObj = NULL;
-    pthread_mutex_lock(&g_wpaObjMutex);
     wpaObj = g_wpaObj;
-    pthread_mutex_unlock(&g_wpaObjMutex);
     return wpaObj;
+}
+
+pthread_mutex_t* GetWpaObjMutex(void)
+{
+    return &g_wpaObjMutex;
 }
 
 WifiErrorNo SetHdiStaIfaceName(const char *ifaceName)

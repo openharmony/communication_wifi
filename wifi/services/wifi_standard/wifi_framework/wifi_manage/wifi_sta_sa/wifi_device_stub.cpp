@@ -54,119 +54,131 @@ WifiDeviceStub::~WifiDeviceStub()
 
 void WifiDeviceStub::InitHandleMapEx()
 {
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL)] =
-        &WifiDeviceStub::OnGetSignalLevel;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
-        &WifiDeviceStub::OnGetSupportedFeatures;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO)] =
-        &WifiDeviceStub::OnGetIpV6Info;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DERVICE_MAC_ADD)] =
-        &WifiDeviceStub::OnGetDeviceMacAdd;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED)] =
-        &WifiDeviceStub::OnIsWifiConnected;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_LATENCY_MODE)] =
-        &WifiDeviceStub::OnSetLowLatencyMode;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG)] =
-        &WifiDeviceStub::OnRemoveCandidateConfig;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED)] =
-        &WifiDeviceStub::OnIsBandTypeSupported;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNELLIST)] =
-        &WifiDeviceStub::OnGet5GHzChannelList;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DISCONNECTED_REASON)] =
-        &WifiDeviceStub::OnGetDisconnectedReason;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_FROZEN_APP)] =
-        &WifiDeviceStub::OnSetFrozenApp;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RESET_ALL_FROZEN_APP)] =
-        &WifiDeviceStub::OnResetAllFrozenApp;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_AUTO_JOIN)] =
-        &WifiDeviceStub::OnDisableAutoJoin;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_AUTO_JOIN)] =
-        &WifiDeviceStub::OnEnableAutoJoin;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_PORTAL_CERTIF)] =
-        &WifiDeviceStub::OnStartPortalCertification;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE)] =
-        &WifiDeviceStub::OnGetChangeDeviceConfig;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET)] =
-        &WifiDeviceStub::OnFactoryReset;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED)] =
-        &WifiDeviceStub::OnLimitSpeed;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT)] =
-        &WifiDeviceStub::OnEnableHiLinkHandshake;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI)] =
-        &WifiDeviceStub::OnEnableSemiWifi;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE)] =
-        &WifiDeviceStub::OnGetWifiDetailState;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE)] =
-        &WifiDeviceStub::OnSetSatelliteState;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER)] =
-        &WifiDeviceStub::OnSetLowTxPower;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER)] =
-        &WifiDeviceStub::OnSetTxPower;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetSignalLevel(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetSupportedFeatures(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetIpV6Info(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DERVICE_MAC_ADD)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetDeviceMacAdd(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnIsWifiConnected(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_LATENCY_MODE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetLowLatencyMode(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnRemoveCandidateConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnIsBandTypeSupported(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNELLIST)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGet5GHzChannelList(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DISCONNECTED_REASON)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetDisconnectedReason(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_FROZEN_APP)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetFrozenApp(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RESET_ALL_FROZEN_APP)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnResetAllFrozenApp(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_AUTO_JOIN)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnDisableAutoJoin(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_AUTO_JOIN)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnEnableAutoJoin(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_PORTAL_CERTIF)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnStartPortalCertification(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE)] = [this](
+        uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetChangeDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnFactoryReset(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnLimitSpeed(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnEnableHiLinkHandshake(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnEnableSemiWifi(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetWifiDetailState(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetSatelliteState(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetLowTxPower(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetTxPower(code, data, reply); };
     return;
 }
 
 void WifiDeviceStub::InitHandleMapEx2()
 {
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK)] =
-        &WifiDeviceStub::OnStartRoamToNetwork;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_ROAM_TO_NETWORK)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnStartRoamToNetwork(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_CONNECT_TO_USER_SELECT_NETWORK)] =
-        &WifiDeviceStub::OnStartConnectToUserSelectNetwork;
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply) {
+            OnStartConnectToUserSelectNetwork(code, data, reply);
+        };
 }
 
 void WifiDeviceStub::InitHandleMap()
 {
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI)] = &WifiDeviceStub::OnEnableWifi;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI)] = &WifiDeviceStub::OnDisableWifi;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT)] =
-        &WifiDeviceStub::OnInitWifiProtect;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_PROTECT)] =
-        &WifiDeviceStub::OnGetWifiProtectRef;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_PUT_WIFI_PROTECT)] =
-        &WifiDeviceStub::OnPutWifiProtectRef;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT)] =
-        &WifiDeviceStub::OnIsHeldWifiProtectRef;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ADD_DEVICE_CONFIG)] =
-        &WifiDeviceStub::OnAddDeviceConfig;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG)] =
-        &WifiDeviceStub::OnUpdateDeviceConfig;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG)] =
-        &WifiDeviceStub::OnRemoveDevice;
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnEnableWifi(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnDisableWifi(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnInitWifiProtect(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_PROTECT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetWifiProtectRef(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_PUT_WIFI_PROTECT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnPutWifiProtectRef(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnIsHeldWifiProtectRef(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ADD_DEVICE_CONFIG)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnAddDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnUpdateDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnRemoveDevice(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG)] =
-        &WifiDeviceStub::OnRemoveAllDevice;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIGS)] =
-        &WifiDeviceStub::OnGetDeviceConfigs;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_DEVICE)] =
-        &WifiDeviceStub::OnEnableDeviceConfig;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE)] =
-        &WifiDeviceStub::OnDisableDeviceConfig;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = &WifiDeviceStub::OnConnectTo;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = &WifiDeviceStub::OnConnect2To;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = &WifiDeviceStub::OnReConnect;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE)] = &WifiDeviceStub::OnReAssociate;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISCONNECT)] = &WifiDeviceStub::OnDisconnect;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WPS)] = &WifiDeviceStub::OnStartWps;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANCEL_WPS)] = &WifiDeviceStub::OnCancelWps;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE)] =
-        &WifiDeviceStub::OnIsWifiActive;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_STATE)] =
-        &WifiDeviceStub::OnGetWifiState;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT)] =
-        &WifiDeviceStub::OnIsMeteredHotspot;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO)] =
-        &WifiDeviceStub::OnGetLinkedInfo;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO)] = &WifiDeviceStub::OnGetIpInfo;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_COUNTRY_CODE)] =
-         &WifiDeviceStub::OnSetCountryCode;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE)] =
-         &WifiDeviceStub::OnGetCountryCode;
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply) { OnRemoveAllDevice(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIGS)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetDeviceConfigs(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_DEVICE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnEnableDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnDisableDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnConnectTo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnConnect2To(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnReConnect(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnReAssociate(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISCONNECT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnDisconnect(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WPS)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnStartWps(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANCEL_WPS)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnCancelWps(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnIsWifiActive(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_STATE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetWifiState(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnIsMeteredHotspot(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetLinkedInfo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetIpInfo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_COUNTRY_CODE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetCountryCode(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetCountryCode(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT)] =
-        &WifiDeviceStub::OnRegisterCallBack;
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply) { OnRegisterCallBack(code, data, reply); };
     InitHandleMapEx();
     InitHandleMapEx2();
     return;
 }
 
-static std::map<int, std::string> collieCodeStringStaMap = {
+static std::map<int, std::string> g_collieCodeStringStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), "WIFI_SVR_CMD_IS_METERED_HOTSPOT"},
@@ -194,16 +206,17 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         if (exception) {
             return WIFI_OPT_FAILED;
         }
-        std::map<int, std::string>::iterator itCollieId = collieCodeStringStaMap.find(code);
-        int idTimer = -1;
-        if (itCollieId != collieCodeStringStaMap.end()) {
+        std::map<int, std::string>::iterator itCollieId = g_collieCodeStringStaMap.find(code);
+        if (itCollieId != g_collieCodeStringStaMap.end()) {
+            int idTimer = 0;
             idTimer = WifiWatchDogUtils::GetInstance()->StartWatchDogForFunc(itCollieId->second);
-            WIFI_LOGE("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
+            WIFI_LOGI("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
+            (iter->second)(code, data, reply);
+            WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
+        } else {
+            (iter->second)(code, data, reply);
         }
-        (this->*(iter->second))(code, data, reply);
-        WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
     }
-
     return 0;
 }
 

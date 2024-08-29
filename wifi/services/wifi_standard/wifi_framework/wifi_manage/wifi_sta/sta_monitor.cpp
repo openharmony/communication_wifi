@@ -41,17 +41,19 @@ ErrCode StaMonitor::InitStaMonitor()
     WIFI_LOGI("Enter InitStaMonitor.\n");
     using namespace std::placeholders;
     WifiEventCallback callBack = {
-        std::bind(&StaMonitor::OnConnectChangedCallBack, this, _1, _2, _3),
-        std::bind(&StaMonitor::OnBssidChangedCallBack, this, _1, _2),
-        std::bind(&StaMonitor::OnWpaStateChangedCallBack, this, _1),
-        std::bind(&StaMonitor::OnWpaSsidWrongKeyCallBack, this),
-        std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
-        std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
-        std::bind(&StaMonitor::OnWpaAuthTimeOutCallBack, this),
-        std::bind(&StaMonitor::OnWpaConnectionFullCallBack, this, _1),
-        std::bind(&StaMonitor::OnWpaConnectionRejectCallBack, this, _1),
-        std::bind(&StaMonitor::OnWpaStaNotifyCallBack, this, _1),
-        std::bind(&StaMonitor::OnReportDisConnectReasonCallBack, this, _1, _2),
+        [this](int status, int networkId, const std::string &bssid) {
+            this->OnConnectChangedCallBack(status, networkId, bssid);
+        },
+        [this](const std::string &reason, const std::string &bssid) { this->OnBssidChangedCallBack(reason, bssid); },
+        [this](int status) { this->OnWpaStateChangedCallBack(status); },
+        [this]() { this->OnWpaSsidWrongKeyCallBack(); },
+        [this](int status) { this->OnWpsPbcOverlapCallBack(status); },
+        [this](int status) { this->OnWpsTimeOutCallBack(status); },
+        [this]() { this->OnWpaAuthTimeOutCallBack(); },
+        [this](int status) { this->OnWpaConnectionFullCallBack(status); },
+        [this](int status) { this->OnWpaConnectionRejectCallBack(status); },
+        [this](const std::string &notifyParam) { this->OnWpaStaNotifyCallBack(notifyParam); },
+        [this](int reason, const std::string &bssid) { this->OnReportDisConnectReasonCallBack(reason, bssid); },
     };
 
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_HAL_OPT_OK) {

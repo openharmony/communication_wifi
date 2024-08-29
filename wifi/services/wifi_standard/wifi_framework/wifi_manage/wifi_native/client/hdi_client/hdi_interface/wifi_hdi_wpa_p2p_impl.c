@@ -243,7 +243,7 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
 WifiErrorNo HdiP2pSetSsidPostfixName(const char *name)
 {
     LOGI("HdiP2pSetSsidPostfixName enter, name:%{private}s", name);
-	pthread_mutex_lock(GetWpaObjMutex());
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetSsidPostfixName: wpaObj is NULL");

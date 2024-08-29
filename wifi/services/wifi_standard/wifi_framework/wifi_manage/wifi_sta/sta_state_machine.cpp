@@ -196,7 +196,7 @@ ErrCode StaStateMachine::InitStaStateMachine()
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
     m_NetWorkState->SetNetStateCallback(
-        std::bind(&StaStateMachine::NetStateObserverCallback, this, std::placeholders::_1, std::placeholders::_2));
+        [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
 #endif
     return WIFI_OPT_SUCCESS;
 }
@@ -901,7 +901,7 @@ bool StaStateMachine::LinkState::ExecuteStateMsg(InternalMessagePtr msg)
     LOGD("LinkState ExecuteStateMsg function:msgName=[%{public}d].\n", msg->GetMessageName());
     auto iter = pStaStateMachine->staSmHandleFuncMap.find(msg->GetMessageName());
     if (iter != pStaStateMachine->staSmHandleFuncMap.end()) {
-        (pStaStateMachine->*(iter->second))(msg);
+        (iter->second)(msg);
         return EXECUTED;
     }
     return NOT_EXECUTED;
@@ -910,33 +910,81 @@ bool StaStateMachine::LinkState::ExecuteStateMsg(InternalMessagePtr msg)
 /* -- state machine Connect State Message processing function -- */
 int StaStateMachine::InitStaSMHandleMap()
 {
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CONNECT_NETWORK] = &StaStateMachine::DealConnectToUserSelectedNetwork;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK] = &StaStateMachine::DealConnectToUserSelectedNetwork;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT] = &StaStateMachine::DealDisconnectEvent;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT] = &StaStateMachine::DealConnectionEvent;
-    staSmHandleFuncMap[CMD_NETWORK_CONNECT_TIMEOUT] = &StaStateMachine::DealConnectTimeOutCmd;
-    staSmHandleFuncMap[WPA_BLOCK_LIST_CLEAR_EVENT] = &StaStateMachine::DealWpaBlockListClearEvent;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_STARTWPS] = &StaStateMachine::DealStartWpsCmd;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET] = &StaStateMachine::DealWpsConnectTimeOutEvent;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CANCELWPS] = &StaStateMachine::DealCancelWpsCmd;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_RECONNECT_NETWORK] = &StaStateMachine::DealReConnectCmd;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK] = &StaStateMachine::DealReassociateCmd;
-    staSmHandleFuncMap[WIFI_SVR_COM_STA_START_ROAM] = &StaStateMachine::DealStartRoamCmd;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_REPORT_DISCONNECT_REASON_EVENT] = &StaStateMachine::DealWpaLinkFailEvent;
-    staSmHandleFuncMap[CMD_START_NETCHECK] = &StaStateMachine::DealNetworkCheck;
-    staSmHandleFuncMap[CMD_START_GET_DHCP_IP_TIMEOUT] = &StaStateMachine::DealGetDhcpIpTimeout;
-    staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = &StaStateMachine::DealScreenStateChangedEvent;
-    staSmHandleFuncMap[CMD_AP_ROAMING_TIMEOUT_CHECK] = &StaStateMachine::DealApRoamingStateTimeout;
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CONNECT_NETWORK] = [this](InternalMessagePtr msg) {
+        return this->DealConnectToUserSelectedNetwork(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK] = [this](InternalMessagePtr msg) {
+        return this->DealConnectToUserSelectedNetwork(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealDisconnectEvent(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealConnectionEvent(msg);
+    };
+    staSmHandleFuncMap[CMD_NETWORK_CONNECT_TIMEOUT] = [this](InternalMessagePtr msg) {
+        return this->DealConnectTimeOutCmd(msg);
+    };
+    staSmHandleFuncMap[WPA_BLOCK_LIST_CLEAR_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaBlockListClearEvent(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_STARTWPS] = [this](InternalMessagePtr msg) {
+        return this->DealStartWpsCmd(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPS_TIMEOUT_EVNET] = [this](InternalMessagePtr msg) {
+        return this->DealWpsConnectTimeOutEvent(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CANCELWPS] = [this](InternalMessagePtr msg) {
+        return this->DealCancelWpsCmd(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_RECONNECT_NETWORK] = [this](InternalMessagePtr msg) {
+        return this->DealReConnectCmd(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK] = [this](InternalMessagePtr msg) {
+        return this->DealReassociateCmd(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_START_ROAM] = [this](InternalMessagePtr msg) {
+        return this->DealStartRoamCmd(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaLinkFailEvent(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaLinkFailEvent(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaLinkFailEvent(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_REPORT_DISCONNECT_REASON_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaLinkFailEvent(msg);
+    };
+    staSmHandleFuncMap[CMD_START_NETCHECK] = [this](InternalMessagePtr msg) { return this->DealNetworkCheck(msg); };
+    staSmHandleFuncMap[CMD_START_GET_DHCP_IP_TIMEOUT] = [this](InternalMessagePtr msg) {
+        return this->DealGetDhcpIpTimeout(msg);
+    };
+    staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealScreenStateChangedEvent(msg);
+    };
+    staSmHandleFuncMap[CMD_AP_ROAMING_TIMEOUT_CHECK] = [this](InternalMessagePtr msg) {
+        return this->DealApRoamingStateTimeout(msg);
+    };
 #ifndef OHOS_ARCH_LITE
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT] = &StaStateMachine::DealWpaEapSimAuthEvent;
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT] = &StaStateMachine::DealWpaEapUmtsAuthEvent;
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaEapSimAuthEvent(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaEapUmtsAuthEvent(msg);
+    };
 #endif
-    staSmHandleFuncMap[WIFI_SVR_COM_STA_ENABLE_HILINK] = &StaStateMachine::DealHiLinkDataToWpa;
-    staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_DELIVER_MAC] = &StaStateMachine::DealHiLinkDataToWpa;
-    staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS] = &StaStateMachine::DealHiLinkDataToWpa;
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_ENABLE_HILINK] = [this](InternalMessagePtr msg) {
+        return this->DealHiLinkDataToWpa(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_DELIVER_MAC] = [this](InternalMessagePtr msg) {
+        return this->DealHiLinkDataToWpa(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS] = [this](InternalMessagePtr msg) {
+        return this->DealHiLinkDataToWpa(msg);
+    };
     return WIFI_OPT_SUCCESS;
 }
 

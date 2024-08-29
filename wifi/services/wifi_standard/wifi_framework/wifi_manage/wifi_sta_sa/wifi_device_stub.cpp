@@ -31,6 +31,15 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int MAX_ASHMEM_SIZE = 300;
+static std::map<int, std::string> g_HicollieStaMap = {
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), "WIFI_SVR_CMD_IS_METERED_HOTSPOT"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT),
+        "WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL), "WIFI_SVR_CMD_GET_SIGNAL_LEVEL"},
+    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), "WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE"},
+};
 
 WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
 {
@@ -178,23 +187,13 @@ void WifiDeviceStub::InitHandleMap()
     return;
 }
 
-static std::map<int, std::string> collieCodeStringStaMap = {
-    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
-    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
-    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), "WIFI_SVR_CMD_IS_METERED_HOTSPOT"},
-    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT),
-        "WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT"},
-    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL), "WIFI_SVR_CMD_GET_SIGNAL_LEVEL"},
-    {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), "WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE"},
-};
-
 int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     if (data.ReadInterfaceToken() != GetDescriptor()) {
         WIFI_LOGE("Sta stub token verification error: %{public}d", code);
         return WIFI_OPT_FAILED;
     }
-    
+
     WIFI_LOGD("%{public}s, code: %{public}u, uid: %{public}d, pid: %{public}d",
         __func__, code, GetCallingUid(), GetCallingPid());
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
@@ -206,16 +205,17 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         if (exception) {
             return WIFI_OPT_FAILED;
         }
-        std::map<int, std::string>::iterator itCollieId = collieCodeStringStaMap.find(code);
-        int idTimer = -1;
-        if (itCollieId != collieCodeStringStaMap.end()) {
+        std::map<int, std::string>::const_iterator itCollieId = g_HicollieStaMap.find(code);
+        if (itCollieId != g_HicollieStaMap.end()) {
+            int idTimer = 0;
             idTimer = WifiWatchDogUtils::GetInstance()->StartWatchDogForFunc(itCollieId->second);
-            WIFI_LOGE("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
+            WIFI_LOGI("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
+            (iter->second)(code, data, reply);
+            WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
+        } else {
+            (iter->second)(code, data, reply);
         }
-        (iter->second)(code, data, reply);
-        WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
     }
-
     return 0;
 }
 

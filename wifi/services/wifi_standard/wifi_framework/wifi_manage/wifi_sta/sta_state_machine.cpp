@@ -3508,6 +3508,8 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
                 pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
             } else if (result == DhcpReturnCode::DHCP_IP_EXPIRED) {
                 pStaStateMachine->DisConnectProcess();
+            } else if (result == DhcpReturnCode::DHCP_OFFER_REPORT) {
+                pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
             }
             break;
         }

@@ -238,6 +238,7 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return WIFI_OPT_SUCCESS;
 }
 
+
 ErrCode StaInterface::StartPortalCertification()
 {
     WIFI_LOGI("Enter StartPortalCertification");

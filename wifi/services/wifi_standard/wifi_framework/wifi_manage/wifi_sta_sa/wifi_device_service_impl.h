@@ -133,7 +133,7 @@ public:
 
     ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &builderName) override;
 
-     ErrCode RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
+    ErrCode RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
                                           const ScoreBuilder &scoreBuilder) override;
  
     ErrCode DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName) override;

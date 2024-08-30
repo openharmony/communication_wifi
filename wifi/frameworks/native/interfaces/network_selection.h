@@ -150,6 +150,23 @@ protected:
     std::string m_scoreName;
 };
 
+class WifiFunctionScorerAdapter : public SimpleWifiScorer {
+public:
+ 
+    /**
+     *
+     * @param scorer the point to scorerFunction
+     * @param scorerName the scorerName
+     * @param reverse for default it should be filtered when the function return true, And it can be modified;
+     */
+    WifiFunctionScorerAdapter(const std::function<double(NetworkCandidate &)> &scorer,
+                              const std::string &scorerName);
+    ~WifiFunctionScorerAdapter() override;
+protected:
+    virtual double Score(NetworkCandidate &networkCandidate) override;
+    std::function<bool(NetworkCandidate &)> targetFunction;
+    std::string m_scoreName;
+};
 
 class IWifiComparator {
 public:

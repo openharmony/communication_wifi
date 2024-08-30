@@ -17,6 +17,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 ApInterface::ApInterface(int id)
     : m_ApRootState(id),
       m_ApStartedState(m_ApStateMachine, m_ApConfigUse, m_ApMonitor, id),

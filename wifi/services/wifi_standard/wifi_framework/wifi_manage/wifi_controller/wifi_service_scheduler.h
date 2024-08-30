@@ -66,8 +66,8 @@ private:
     void SoftApIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void OnRssiReportCallback(int index, int antRssi);
 #endif
-    std::map<int, std::string> staIfaceNameMap;
-    std::map<int, std::string> softApIfaceNameMap;
+    std::map<int, std::string> g_staIfaceNameMap;
+    std::map<int, std::string> g_softApIfaceNameMap;
     std::mutex mutex;
 };
 }

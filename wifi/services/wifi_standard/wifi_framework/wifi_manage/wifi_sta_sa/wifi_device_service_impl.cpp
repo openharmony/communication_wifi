@@ -40,6 +40,7 @@
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
+#include "wifi_sta_hal_interface.h"
 #include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");

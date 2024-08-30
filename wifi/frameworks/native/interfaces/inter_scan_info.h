@@ -77,6 +77,7 @@ struct InterScanInfo {
     int maxRates;
     bool isHiLinkNetwork;
     WifiCategory supportedWifiCategory;
+
     InterScanInfo()
         : frequency(0),
           band(0),

@@ -328,7 +328,26 @@ public:
      */
     virtual ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName);
 
-
+     /**
+     * @Description  register external score builder.
+     *
+     * @param scoreTag scoreTag which define where the score should be inserted.
+     * @param scoreName the name of the score to build.
+     * @param scoreBuilder score builder.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
+                                          const ScoreBuilder &scoreBuilder);
+ 
+    /**
+     * @Description  deregister external score builder.
+     *
+     * @param scoreTag filterTag which define where the score should be inserted.
+     * @param scoreName the name of the score to build.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName);
+    
     /**
      * @Description start portal certification.
      *

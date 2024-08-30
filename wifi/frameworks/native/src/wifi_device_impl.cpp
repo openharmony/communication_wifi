@@ -513,7 +513,7 @@ ErrCode WifiDeviceImpl::DeregisterFilterBuilder(const FilterTag &filterTag, cons
 }
 
 ErrCode WifiDeviceImpl::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                                          const ScoreBuilder &scoreBuilder)
+                                             const ScoreBuilder &scoreBuilder)
 {
     if (!scoreBuilder) {
         WIFI_LOGE("the target of scoreBuilder for %{public}s is empty", scoreName.c_str());

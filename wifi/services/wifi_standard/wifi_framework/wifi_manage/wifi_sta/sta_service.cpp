@@ -893,7 +893,7 @@ ErrCode StaService::DeregisterFilterBuilder(const OHOS::Wifi::FilterTag &filterT
 }
 
 ErrCode StaService::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                                          const ScoreBuilder &scoreBuilder)
+                                         const ScoreBuilder &scoreBuilder)
 {
     ExternalWifiScoreBuildManager::GetInstance().RegisterScorerBuilder(scoreTag, scoreName, scoreBuilder);
     return WIFI_OPT_SUCCESS;

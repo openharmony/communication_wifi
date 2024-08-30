@@ -164,7 +164,7 @@ public:
     ~WifiFunctionScorerAdapter() override;
 protected:
     virtual double Score(NetworkCandidate &networkCandidate) override;
-    std::function<bool(NetworkCandidate &)> targetFunction;
+    std::function<double(NetworkCandidate &)> targetFunction;
     std::string m_scoreName;
 };
 

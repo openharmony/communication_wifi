@@ -19,6 +19,7 @@
 #include "wifi_log.h"
 #include "stub_collector.h"
 #include "wifi_native_define.h"
+#include <osal_mem.h>
 
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaStaImpl"
@@ -366,46 +367,58 @@ int ConvertMacToStr(char *mac, int macSize, char *macStr, int strLen)
 
 WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen)
 {
+    WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     LOGI("HdiWpaStaGetDeviceMacAddress enter");
     if (macAddr == NULL) {
         LOGE("HdiWpaStaGetDeviceMacAddress: invalid parameter!");
         return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
-    struct HdiWpaCmdStatus status;
-    if (memset_s(&status, sizeof(status), 0, sizeof(status)) != EOK) {
-        LOGE("HdiWpaStaGetDeviceMacAddress: memset_s failed!");
-        return WIFI_HAL_OPT_FAILED;
-    }
+    struct HdiWpaCmdStatus status = {0};
     pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaGetDeviceMacAddress: wpaObj is NULL");
-        pthread_mutex_unlock(GetWpaObjMutex());
-        return WIFI_HAL_OPT_FAILED;
+        goto EXIT;
     }
 
     int32_t result = wpaObj->WifiStatus(wpaObj, GetHdiStaIfaceName(), &status);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaGetDeviceMacAddress: WifiStatus failed result:%{public}d", result);
-        pthread_mutex_unlock(GetWpaObjMutex());
-        return WIFI_HAL_OPT_FAILED;
+        goto EXIT;
     }
 
     if ((uint32_t)macAddrLen < status.addressLen) {
-        LOGE("Input mac length %{public}d is little than mac address length %{public}d", macAddrLen, status.addressLen);
-        pthread_mutex_unlock(GetWpaObjMutex());
-        return WIFI_HAL_OPT_BUFFER_TOO_LITTLE;
+        LOGE("Input mac length %{public}d is little than mac length %{public}d", macAddrLen, status.addressLen);
+        ret = WIFI_HAL_OPT_BUFFER_TOO_LITTLE;
+        goto EXIT;
     }
 
     if (ConvertMacToStr((char *)status.address, status.addressLen, macAddr, macAddrLen) != EOK) {
         LOGE("HdiWpaStaGetDeviceMacAddress: convertMacToStr failed!");
-        pthread_mutex_unlock(GetWpaObjMutex());
-        return WIFI_HAL_OPT_FAILED;
+        goto EXIT;
     }
-    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiWpaStaGetDeviceMacAddress success.");
-    return WIFI_HAL_OPT_OK;
+    ret = WIFI_HAL_OPT_OK;
+EXIT:
+    pthread_mutex_unlock(GetWpaObjMutex());
+    if (status.keyMgmt != NULL) {
+        OsalMemFree(status.keyMgmt);
+        status.keyMgmt = NULL;
+    }
+    if (status.ssid != NULL) {
+        OsalMemFree(status.ssid);
+        status.ssid = NULL;
+    }
+    if (status.address != NULL) {
+        OsalMemFree(status.address);
+        status.address = NULL;
+    }
+    if (status.bssid != NULL) {
+        OsalMemFree(status.bssid);
+        status.bssid = NULL;
+    }
+    return ret;
 }
 
 WifiErrorNo HdiWpaStaScan()

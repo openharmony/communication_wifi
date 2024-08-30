@@ -512,6 +512,7 @@ ErrCode WifiDeviceImpl::DeregisterFilterBuilder(const FilterTag &filterTag, cons
     return client_->DeregisterFilterBuilder(filterTag, filterName);
 }
 
+
 bool WifiDeviceImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();

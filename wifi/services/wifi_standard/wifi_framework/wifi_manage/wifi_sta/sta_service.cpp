@@ -891,6 +891,7 @@ ErrCode StaService::DeregisterFilterBuilder(const OHOS::Wifi::FilterTag &filterT
     return WIFI_OPT_SUCCESS;
 }
 
+
 ErrCode StaService::StartPortalCertification()
 {
     if (pStaStateMachine == nullptr) {

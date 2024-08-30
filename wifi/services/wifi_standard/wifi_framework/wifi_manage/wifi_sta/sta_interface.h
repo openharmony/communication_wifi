@@ -317,6 +317,7 @@ public:
      * @return WifiErrorNo
      */
     ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) override;
+    
     /**
      * @Description start portal certification.
      *

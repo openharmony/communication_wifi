@@ -889,6 +889,12 @@ void ScanService::ReportScanInfos(std::vector<InterScanInfo> &interScanList)
 {
     WIFI_LOGI("Enter ScanService::ReportScanInfos.\n");
     std::shared_lock<std::shared_mutex> lock(mScanCallbackMutex);
+    for (auto&scanInfo : interScanList) {
+        if (mEnhanceService != nullptr) {
+            scanInfo.supportedWifiCategory = mEnhanceService->GetWifiCategory(
+                scanInfo.infoElems, chipsetCategory, chipsetFeatrureCapability);
+        }
+    }
     mScanSerivceCallbacks.OnScanInfoEvent(interScanList, m_instId);
     return;
 }

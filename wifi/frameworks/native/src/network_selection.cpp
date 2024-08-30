@@ -185,6 +185,7 @@ void CompositeWifiScorer::DoScore(NetworkCandidate &networkCandidate,
     }
 }
 
+
 NetworkSelector::NetworkSelector(const std::string &networkSelectorName) : m_networkSelectorName(networkSelectorName) {}
 
 NetworkSelector::~NetworkSelector() = default;

@@ -448,6 +448,7 @@ public:
      */
     virtual ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) = 0;
 
+
     virtual ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) = 0;
 
     /**

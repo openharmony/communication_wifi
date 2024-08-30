@@ -440,6 +440,7 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return pStaService->DeregisterFilterBuilder(filterTag, filterName);
 }
 
+
 ErrCode StaInterface::StartPortalCertification()
 {
     WIFI_LOGI("Enter StartPortalCertification");

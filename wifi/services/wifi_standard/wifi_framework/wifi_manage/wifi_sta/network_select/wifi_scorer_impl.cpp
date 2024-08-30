@@ -228,5 +228,7 @@ SavedNetworkScorer::SavedNetworkScorer(const std::string &scorerName) : Composit
     AddScorer(std::make_shared<RssiLevelBonusScorer>());
     AddScorer(std::make_shared<SecurityBonusScorer>());
     AddScorer(std::make_shared<Network5gBonusScorer>());
+    ExternalWifiScoreBuildManager::GetInstance().BuildScore(ScoreTag::HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI6_TAG,
+                                                            *this);
 }
 }

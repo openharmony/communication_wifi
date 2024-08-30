@@ -440,6 +440,22 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return pStaService->DeregisterFilterBuilder(filterTag, filterName);
 }
 
+ErrCode StaInterface::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
+                                          const ScoreBuilder &scoreBuilder)
+{
+    LOGI("Enter RegisterScoreBuilder");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->RegisterScoreBuilder(scoreTag, scoreName, scoreBuilder);
+}
+ 
+ErrCode StaInterface::DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName)
+{
+    LOGI("Enter DeregisterScoreBuilder");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->DeregisterScoreBuilder(scoreTag, scoreName);
+}
 
 ErrCode StaInterface::StartPortalCertification()
 {

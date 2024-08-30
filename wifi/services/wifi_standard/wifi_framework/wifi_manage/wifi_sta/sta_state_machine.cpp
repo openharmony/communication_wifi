@@ -3250,8 +3250,8 @@ void StaStateMachine::ShowPortalNitification()
         if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
             WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
         }
-        if (variableMap.find("SETTINGS_BUNDLE") != variableMap.end()) {
-            bundle = variableMap["SETTINGS_BUNDLE"];
+        if (variableMap.find("SETTINGS") != variableMap.end()) {
+            bundle = variableMap["SETTINGS"];
         }
         if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(

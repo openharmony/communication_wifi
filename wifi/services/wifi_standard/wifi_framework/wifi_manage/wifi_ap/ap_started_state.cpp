@@ -46,8 +46,6 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
 namespace OHOS {
 namespace Wifi {
-    
-const std::string AP_DEFAULT_IP = "192.168.43.1";
 const int STA_JOIN_HANDLE_DELAY = 5 * 1000;
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
@@ -65,40 +63,7 @@ ApStartedState::~ApStartedState()
 
 void ApStartedState::GoInState()
 {
-    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTING);
-    WIFI_LOGI("Instance %{public}d %{public}s  GoInState", m_id, GetStateName().c_str());
-    m_ApStateMachine.RegisterEventHandler();
-    StartMonitor();
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-    SetRandomMac();
-#endif
-    do {
-        if (!SetCountry()) {
-            break;
-        }
-        if (!StartAp()) {
-            WIFI_LOGE("enter ApstartedState is failed.");
-            break;
-        }
-        WIFI_LOGI("StartAP is ok.");
-        if (!SetConfig()) {
-            WIFI_LOGE("wifi_settings.hotspotconfig is error.");
-            break;
-        }
-        if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
-            WIFI_LOGE("Set Blocklist failed.");
-        }
-        WIFI_LOGE("Singleton version has not nat and use %{public}s.", AP_INTF);
-        if (!EnableInterfaceNat()) {
-            break;
-        }
-        UpdatePowerMode();
-        return;
-    } while (0);
-    WIFI_LOGI("Ap disabled, set softap toggled false");
-    WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-    m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
+    WIFI_LOGI("Instance %{public}d %{public}s  GoInState.", m_id, GetStateName().c_str());
 }
 
 void ApStartedState::GoOutState()
@@ -149,6 +114,8 @@ void ApStartedState::Init()
     (ProcessFun)&ApStartedState::ProcessCmdHotspotChannelChanged));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_ASSOCIATED_STATIONS_CHANGED,
     (ProcessFun)&ApStartedState::ProcessCmdAssociatedStaChanged));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_START_HOTSPOT,
+    (ProcessFun)&ApStartedState::ProcessCmdEnableAp));
 }
 
 bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -360,7 +327,6 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     if (msg->GetParam1() == 1) {
         WIFI_LOGI("Hot update HotspotConfig succeeded.");
-        m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
         if (WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id)) {
             WIFI_LOGE("set apConfig to settings failed.");
         }
@@ -529,5 +495,23 @@ void ApStartedState::ProcessCmdAssociatedStaChanged(InternalMessagePtr msg)
     return;
 }
 
+void ApStartedState::ProcessCmdEnableAp(InternalMessagePtr msg)
+{
+    WIFI_LOGI("Instance %{public}d %{public}s  GoInState", m_id, GetStateName().c_str());
+    do {
+        if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
+            WIFI_LOGE("Set Blocklist failed.");
+        }
+        WIFI_LOGE("Singleton version has not nat and use %{public}s.", AP_INTF);
+        if (!EnableInterfaceNat()) {
+            break;
+        }
+        UpdatePowerMode();
+        return;
+    } while (0);
+    WIFI_LOGI("Ap disabled, set softap toggled false");
+    WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+    m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
+}
 }  // namespace Wifi
 }  // namespace OHOS

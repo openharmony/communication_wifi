@@ -185,6 +185,16 @@ void CompositeWifiScorer::DoScore(NetworkCandidate &networkCandidate,
     }
 }
 
+WifiFunctionScorerAdapter::WifiFunctionScorerAdapter(const std::function<double(NetworkCandidate &)> &scorer,
+                                                     const std::string &scorerName)
+    :SimpleWifiScorer(scorerName), targetFunction(scorer) {}
+ 
+WifiFunctionScorerAdapter::~WifiFunctionScorerAdapter() = default;
+ 
+double WifiFunctionScorerAdapter::Score(NetworkCandidate &networkCandidate)
+{
+    return targetFunction.operator()(networkCandidate);
+}
 
 NetworkSelector::NetworkSelector(const std::string &networkSelectorName) : m_networkSelectorName(networkSelectorName) {}
 

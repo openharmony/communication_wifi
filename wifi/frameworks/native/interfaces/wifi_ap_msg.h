@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 #define AP_CHANNEL_INVALID (-1)
 #define AP_CHANNEL_DEFAULT 6
 #define AP_MAX_CONN_DEFAULT (-1)

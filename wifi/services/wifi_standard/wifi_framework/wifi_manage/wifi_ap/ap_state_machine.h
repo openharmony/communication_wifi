@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 class ApConfigUse;
 class ApStationsManager;
 class ApMonitor;

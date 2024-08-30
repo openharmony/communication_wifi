@@ -295,6 +295,10 @@ enum class FilterTag {
     IT_NETWORK_SELECTOR_FILTER_TAG
 };
 
+enum class ScoreTag {
+    HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI6_TAG,
+};
 using FilterBuilder = std::function<void(NetworkSelection::CompositeWifiFilter &)>;
+using ScoreBuilder = std::function<void(NetworkSelection::CompositeWifiScorer &)>;
 }
 #endif

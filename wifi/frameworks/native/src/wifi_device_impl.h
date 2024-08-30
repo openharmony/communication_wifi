@@ -484,7 +484,6 @@ public:
      */
     virtual ErrCode DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName) override;
  
-
     /**
      * @Description Check whether service is died.
      *

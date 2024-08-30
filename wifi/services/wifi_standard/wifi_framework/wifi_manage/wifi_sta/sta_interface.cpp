@@ -441,7 +441,7 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
 }
 
 ErrCode StaInterface::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                                          const ScoreBuilder &scoreBuilder)
+                                           const ScoreBuilder &scoreBuilder)
 {
     LOGI("Enter RegisterScoreBuilder");
     std::lock_guard<std::mutex> lock(mutex);

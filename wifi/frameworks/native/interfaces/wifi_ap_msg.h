@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 #define AP_CHANNEL_INVALID (-1)
 #define AP_CHANNEL_DEFAULT 6
 #define AP_MAX_CONN_DEFAULT (-1)
@@ -38,6 +37,9 @@ namespace Wifi {
 #define AP_CHANNEL_5G_160M_DEFAULT 36
 #define AP_CHANNEL_5G_160M_SET_BEGIN 36
 #define AP_CHANNEL_5G_160M_SET_END 48
+
+const std::string AP_DEFAULT_IP = "192.168.43.1";
+
 enum class ApState {
     AP_STATE_NONE = 0,
     AP_STATE_IDLE,

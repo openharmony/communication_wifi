@@ -339,11 +339,6 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
     ]
-
-    if (wifi_feature_with_hdi_chip_supported) {
-      defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
-    }
   }
   ohos_source_set("wifi_hotspot_service_impl") {
     branch_protector_ret = "pac_ret"

@@ -464,7 +464,7 @@ public:
      */
     virtual ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) = 0;
 
-        /**
+    /**
      * @Description  register external score builder.
      *
      * @param scoreTag scoreTag which define where the score should be inserted.
@@ -483,6 +483,7 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName) = 0;
+    
     /**
      * @Description start portal certification
      *

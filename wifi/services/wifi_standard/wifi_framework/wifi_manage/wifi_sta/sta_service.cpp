@@ -31,6 +31,7 @@
 #include "network_selection_manager.h"
 #include "wifi_config_center.h"
 #include "external_wifi_filter_builder_manager.h"
+#include "external_wifi_score_builder_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -891,6 +892,18 @@ ErrCode StaService::DeregisterFilterBuilder(const OHOS::Wifi::FilterTag &filterT
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
+                                          const ScoreBuilder &scoreBuilder)
+{
+    ExternalWifiScoreBuildManager::GetInstance().RegisterScorerBuilder(scoreTag, scoreName, scoreBuilder);
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaService::DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName)
+{
+    ExternalWifiScoreBuildManager::GetInstance().DeregisterScorerBuilder(scoreTag, scoreName);
+    return WIFI_OPT_SUCCESS;
+}
 
 ErrCode StaService::StartPortalCertification()
 {

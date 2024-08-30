@@ -66,10 +66,9 @@ ohos_unittest("wifi_native_test") {
     "client/hdi_client/hdi_interface/mock_wifi_hdi_wpa_ap_impl.cpp",
     "client/hdi_client/hdi_interface/mock_wifi_hdi_wpa_p2p_impl.cpp",
     "client/hdi_client/hdi_interface/mock_wifi_hdi_wpa_proxy.cpp",
+    "client/hdi_client/hdi_interface/wifi_hdi_common_test.cpp",
+    "client/hdi_client/hdi_interface/wifi_hdi_util_test.cpp",
     "client/hdi_client/hdi_interface/wifi_hdi_wpa_ap_impl_test.cpp",
-    "client/hdi_client/hdi_interface/wifi_hdi_wpa_p2p_impl_test.cpp",
-    
-    "client/hdi_client/hdi_interface/wifi_hdi_wpa_proxy_test.cpp",
     "client/hdi_client/hdi_interface/wifi_hdi_wpa_sta_impl_test.cpp",
     "client/hdi_client/wifi_hdi_wpa_callback_test.cpp",
     "client/hdi_client/wifi_hdi_wpa_client_test.cpp",

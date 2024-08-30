@@ -26,7 +26,6 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStateMachine");
 
 namespace OHOS {
 namespace Wifi {
-    
 ApStateMachine::ApStateMachine(ApStationsManager &apStationsManager, ApRootState &apRootState, ApIdleState &apIdleState,
     ApStartedState &apStartedState, ApMonitor &apMonitor, int id)
     : StateMachine("ApStateMachine"),
@@ -61,7 +60,7 @@ void ApStateMachine::Init()
     StatePlus(&m_ApRootState, nullptr);
     StatePlus(&m_ApIdleState, &m_ApRootState);
     StatePlus(&m_ApStartedState, &m_ApRootState);
-    SetFirstState(&m_ApIdleState);
+    SetFirstState(&m_ApStartedState);
     m_iface = WifiConfigCenter::GetInstance().GetApIfaceName();
     StartStateMachine();
 }

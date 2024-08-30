@@ -30,7 +30,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 using OHOS::HDI::Wlan::Chip::V1_0::IChipController;
 using OHOS::HDI::Wlan::Chip::V1_0::IChipControllerCallback;
 using OHOS::HDI::Wlan::Chip::V1_0::IConcreteChip;
@@ -432,6 +431,7 @@ private:
     // death recipient
     static void AddChipHdiDeathRecipient();
     static void RemoveChipHdiDeathRecipient();
+    IChipIface *FindIface(const std::string &ifaceName);
 
 private:
     static std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> mInterfaceInfoCache;

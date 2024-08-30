@@ -20,6 +20,7 @@
 namespace OHOS {
 namespace Wifi {
 static AssetValue g_userIdValue = {.u32 = USER_ID_DEFAULT};
+static AssetValue g_trustAccountValue = {.u32 = SEC_ASSET_SYNC_TYPE_TRUSTED_ACCOUNT};
 static void SplitString(const std::string &input, const char spChar, std::vector<std::string> &outArray)
 {
     std::stringstream sstr(input);
@@ -118,15 +119,18 @@ static bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::s
  
 static void WifiAssetTriggerSync()
 {
+    AssetValue syncValue = {.u32 = SEC_ASSET_NEED_SYNC};
     AssetAttr attrMove[] = {
         {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
-        {.tag = SEC_ASSET_TAG_OPERATION_TYPE, .value.u32 = SEC_ASSET_NEED_SYNC},
-        {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value.u32 = SEC_ASSET_SYNC_TYPE_TRUSTED_ACCOUNT},
+        {.tag = SEC_ASSET_TAG_OPERATION_TYPE, .value = syncValue},
+        {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value = g_trustAccountValue},
     };
     int32_t ret = 0;
     AssetResultSet resultSetSingel = {0};
+    /* The AssetQuery function is only used as a synchronous operation */
     ret = AssetQuery(attrMove, sizeof(attrMove) / sizeof(attrMove[0]), &resultSetSingel);
     LOGI("WifiAssetTriggerSync ret = %{public}d", ret);
+    AssetFreeResultSet(&resultSetSingel);
 }
  
 static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = true)
@@ -146,19 +150,17 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
     secretWifiDevice += std::to_string(config.wifiProxyconfig.manualProxyConfig.serverPort) + ";";
     secretWifiDevice += StringToHex(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList) + ";";
     secretWifiDevice += std::to_string(config.version);
- 
-    AssetBlob secret = {static_cast<uint32_t>(secretWifiDevice.size()),
-        const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(secretWifiDevice.c_str()))};
-    AssetBlob aliasValue = {static_cast<uint32_t>(aliasId.size()),
-        const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))};
+    AssetValue secret = {.blob = {static_cast<uint32_t>(secretWifiDevice.size()),
+        const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(secretWifiDevice.c_str()))}};
+    AssetValue aliasValue = {.blob = {static_cast<uint32_t>(aliasId.size()),
+        const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))}};
     AssetValue authTypeValue = {.u32 = SEC_ASSET_AUTH_TYPE_NONE};
-    AssetValue sysType = {.u32 = SEC_ASSET_SYNC_TYPE_TRUSTED_ACCOUNT};
     AssetAttr attr[] = {
-        {.tag = SEC_ASSET_TAG_ALIAS, .value.blob = aliasValue},
+        {.tag = SEC_ASSET_TAG_ALIAS, .value = aliasValue},
         {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
         {.tag = SEC_ASSET_TAG_AUTH_TYPE, .value = authTypeValue},
-        {.tag = SEC_ASSET_TAG_SECRET, .value.blob = secret},
-        {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value = sysType},
+        {.tag = SEC_ASSET_TAG_SECRET, .value = secret},
+        {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value = g_trustAccountValue},
     };
     int32_t ret = AssetAdd(attr, sizeof(attr) / sizeof(attr[0]));
     if (flagSync) {
@@ -178,10 +180,11 @@ static void WifiAssetAttrQuery(const AssetResultSet &resultSet, int32_t userId,
         }
         std::string strAlias =
             std::string(reinterpret_cast<const char *>(checkItem->value.blob.data), checkItem->value.blob.size);
+        AssetValue returnValue = {.u32 = SEC_ASSET_RETURN_ALL};
         AssetAttr attrSingle[] = {
             {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
-            {.tag = SEC_ASSET_TAG_ALIAS, .value.blob = checkItem->value.blob},
-            {.tag = SEC_ASSET_TAG_RETURN_TYPE, .value.u32 = SEC_ASSET_RETURN_ALL},
+            {.tag = SEC_ASSET_TAG_ALIAS, .value = checkItem->value},
+            {.tag = SEC_ASSET_TAG_RETURN_TYPE, .value = returnValue},
         };
         AssetResultSet resultSetSingel = {0};
         int ret = AssetQuery(attrSingle, sizeof(attrSingle) / sizeof(attrSingle[0]), &resultSetSingel);
@@ -239,7 +242,7 @@ void WifiAssetManager::WifiAssetAdd(const WifiDeviceConfig &config, int32_t user
     }
     assetServiceThread_->PostAsyncTask([=]() {
         int32_t ret = WifiAssetAttrAdd(config, flagSync);
-        if (ret != SEC_ASSET_SUCCESS) {
+        if (ret != SEC_ASSET_SUCCESS && ret != SEC_ASSET_DUPLICATED) {
             LOGE("WifiAssetAdd Failed, ret: %{public}d, ssid: %{public}s", ret, SsidAnonymize(config.ssid).c_str());
         } else {
             LOGI("WifiAssetAdd Success");
@@ -255,9 +258,10 @@ void WifiAssetManager::WifiAssetQuery(int32_t userId)
     }
     assetServiceThread_->PostAsyncTask([=]() {
         int32_t ret = 0;
+        AssetValue returnValue = {.u32 = SEC_ASSET_RETURN_ATTRIBUTES};
         AssetAttr attrQu[] = {
             {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
-            {.tag = SEC_ASSET_TAG_RETURN_TYPE, .value.u32 = SEC_ASSET_RETURN_ATTRIBUTES},
+            {.tag = SEC_ASSET_TAG_RETURN_TYPE, .value = returnValue},
         };
         AssetResultSet resultSet = {0};
         LOGI("WifiAssetQuery start");
@@ -293,12 +297,12 @@ void WifiAssetManager::WifiAssetRemove(const WifiDeviceConfig &config, int32_t u
     }
     assetServiceThread_->PostAsyncTask([=]() {
         std::string aliasId = config.ssid + config.keyMgmt;
-        AssetBlob aliasValue = {static_cast<uint32_t>(aliasId.size()),
-            const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))};
+        AssetValue aliasValue = {.blob = {static_cast<uint32_t>(aliasId.size()),
+            const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))}};
         int32_t ret = 0;
         AssetAttr attrMove[] = {
             {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
-            {.tag = SEC_ASSET_TAG_ALIAS, .value.blob = aliasValue},
+            {.tag = SEC_ASSET_TAG_ALIAS, .value = aliasValue},
         };
         ret = AssetRemove(attrMove, sizeof(attrMove) / sizeof(attrMove[0]));
         if (ret != SEC_ASSET_SUCCESS) {
@@ -312,20 +316,20 @@ void WifiAssetManager::WifiAssetRemove(const WifiDeviceConfig &config, int32_t u
     });
 }
  
-void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig,
+void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
     int32_t userId, bool flagSync)
 {
-    if (!assetServiceThread_ || mWifiDeviceConfig.size() == 0) {
+    if (!assetServiceThread_ || wifiDeviceConfigs.size() == 0) {
         LOGE("WifiAssetAddPack, assetServiceThread_ is null");
         return;
     }
     assetServiceThread_->PostAsyncTask([=]() {
-        for (auto mapConfig : mWifiDeviceConfig) {
+        for (auto mapConfig : wifiDeviceConfigs) {
             if (!WifiAssetValid(mapConfig)) {
                 continue;
             }
             int32_t ret = WifiAssetAttrAdd(mapConfig, flagSync);
-            if (ret != SEC_ASSET_SUCCESS) {
+            if (ret != SEC_ASSET_SUCCESS && ret != SEC_ASSET_DUPLICATED) {
                 LOGE("WifiAssetAttrAdd Failed, %{public}s", SsidAnonymize(mapConfig.ssid).c_str());
             } else {
                 LOGI("WifiAssetAttrAdd Success");
@@ -337,19 +341,19 @@ void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &mWi
     });
 }
  
-static void WifiAssetRemovePackInner(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig,
+static void WifiAssetRemovePackInner(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
     int32_t userId, bool flagSync)
 {
-    for (auto mapConfig: mWifiDeviceConfig) {
+    for (auto mapConfig: wifiDeviceConfigs) {
         if (!WifiAssetValid(mapConfig)) {
             continue;
         }
         std::string aliasId = mapConfig.ssid + mapConfig.keyMgmt;
-        AssetBlob aliasValue = {static_cast<uint32_t>(aliasId.size()),
-            const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))};
+        AssetValue aliasValue = {.blob = {static_cast<uint32_t>(aliasId.size()),
+            const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))}};
         AssetAttr attrMove[] = {
             {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
-            {.tag = SEC_ASSET_TAG_ALIAS, .value.blob = aliasValue},
+            {.tag = SEC_ASSET_TAG_ALIAS, .value = aliasValue},
         };
         int32_t ret = AssetRemove(attrMove, sizeof(attrMove) / sizeof(attrMove[0]));
         if (ret != SEC_ASSET_SUCCESS) {
@@ -363,19 +367,19 @@ static void WifiAssetRemovePackInner(const std::vector<WifiDeviceConfig> &mWifiD
     }
 }
  
-void WifiAssetManager::WifiAssetUpdatePack(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig, int32_t userId)
+void WifiAssetManager::WifiAssetUpdatePack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs, int32_t userId)
 {
-    WifiAssetRemovePack(mWifiDeviceConfig, userId, false);
-    WifiAssetAddPack(mWifiDeviceConfig, userId, false);
+    WifiAssetRemovePack(wifiDeviceConfigs, userId, false);
+    WifiAssetAddPack(wifiDeviceConfigs, userId, false);
 }
  
-void WifiAssetManager::WifiAssetRemovePack(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig,
+void WifiAssetManager::WifiAssetRemovePack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
     int32_t userId, bool flagSync)
 {
-    if (!assetServiceThread_ || mWifiDeviceConfig.size() == 0) {
+    if (!assetServiceThread_ || wifiDeviceConfigs.size() == 0) {
         return;
     }
-    assetServiceThread_->PostAsyncTask([=]() { WifiAssetRemovePackInner(mWifiDeviceConfig, userId, flagSync); });
+    assetServiceThread_->PostAsyncTask([=]() { WifiAssetRemovePackInner(wifiDeviceConfigs, userId, flagSync); });
 }
  
 void WifiAssetManager::WifiAssetRemoveAll(int32_t userId, bool flagSync)

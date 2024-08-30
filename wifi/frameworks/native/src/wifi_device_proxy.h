@@ -464,7 +464,26 @@ public:
     ErrCode RegisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName,
                                   const FilterBuilder &filterBuilder) override;
 
-
+    /**
+     * @Description  register external score builder.
+     *
+     * @param scoreTag scoreTag which define where the score should be inserted.
+     * @param scoreName the name of the score to build.
+     * @param scoreBuilder score builder.
+     * @return WifiErrorNo
+     */
+    ErrCode RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
+                                          const ScoreBuilder &scoreBuilder) override;
+ 
+    /**
+     * @Description  deregister external score builder.
+     *
+     * @param scoreTag filterTag which define where the score should be inserted.
+     * @param scoreName the name of the score to build.
+     * @return WifiErrorNo
+     */
+    ErrCode DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName) override;
+ 
     /**
      * @Description  deregister external filter builder.
      *

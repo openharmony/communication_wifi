@@ -150,6 +150,7 @@ protected:
     std::string m_scoreName;
 };
 
+
 class IWifiComparator {
 public:
     virtual ~IWifiComparator() = default;

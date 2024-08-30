@@ -17,6 +17,7 @@
 #include "wifi_scorer_impl.h"
 #include "wifi_config_center.h"
 #include "network_status_history_manager.h"
+#include "external_wifi_score_builder_manager.h"
 #include "wifi_logger.h"
 
 namespace OHOS::Wifi::NetworkSelection {

@@ -133,6 +133,7 @@ public:
 
     ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &builderName) override;
 
+
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,
         const std::vector<std::string> &event) override;

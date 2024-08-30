@@ -238,6 +238,18 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
+                                           const ScoreBuilder &scoreBuilder)
+{
+    LOGI("Enter RegisterScoreBuilder");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName)
+{
+    LOGI("Enter DeregisterScoreBuilder");
+    return WIFI_OPT_SUCCESS;
+}
 
 ErrCode StaInterface::StartPortalCertification()
 {

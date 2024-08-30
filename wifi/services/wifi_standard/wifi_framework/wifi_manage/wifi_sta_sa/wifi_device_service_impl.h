@@ -133,6 +133,10 @@ public:
 
     ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &builderName) override;
 
+     ErrCode RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
+                                          const ScoreBuilder &scoreBuilder) override;
+ 
+    ErrCode DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName) override;
 
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,

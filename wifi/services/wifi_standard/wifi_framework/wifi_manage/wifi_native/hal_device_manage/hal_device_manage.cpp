@@ -59,7 +59,7 @@ HalDeviceManager::~HalDeviceManager()
 {
     LOGI("HalDeviceManager::~HalDeviceManager");
     StopChipHdi();
-    ResetHalDeviceManagerInfo();
+    ResetHalDeviceManagerInfo(false);
 }
 
 bool HalDeviceManager::StartChipHdi()
@@ -730,14 +730,16 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     return true;
 }
 
-void HalDeviceManager::ResetHalDeviceManagerInfo()
+void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    WifiP2PHalInterface::GetInstance().StopP2p();
-    WifiStaHalInterface::GetInstance().StopWifi();
-    WifiApHalInterface::GetInstance().StopAp();
-    ClearStaInfo();
-    ClearApInfo();
+    if (isRemoteDied) {
+        WifiP2PHalInterface::GetInstance().StopP2p();
+        WifiStaHalInterface::GetInstance().StopWifi();
+        WifiApHalInterface::GetInstance().StopAp();
+        ClearStaInfo();
+        ClearApInfo();
+    }
     g_chipControllerCallback = nullptr;
     g_chipIfaceCallback = nullptr;
     g_IWifi = nullptr;
@@ -1468,7 +1470,7 @@ void HalDeviceManager::AddChipHdiDeathRecipient()
         .OnRemoteDied = [](HdfDeathRecipient *recipient, HdfRemoteService *service) {
             LOGI("Chip Hdi service died!");
             g_chipHdiServiceDied = true;
-            ResetHalDeviceManagerInfo();
+            ResetHalDeviceManagerInfo(true);
             RemoveChipHdiDeathRecipient();
             LOGI("Chip Hdi service died process success!");
             return;

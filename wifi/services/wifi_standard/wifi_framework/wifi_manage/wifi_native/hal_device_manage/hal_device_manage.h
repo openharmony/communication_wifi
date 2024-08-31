@@ -425,7 +425,7 @@ private:
     bool RemoveIface(sptr<IChipIface> &iface, bool isCallback, IfaceType createIfaceType);
     static void ClearStaInfo();
     static void ClearApInfo();
-    static void ResetHalDeviceManagerInfo();
+    static void ResetHalDeviceManagerInfo(bool isRemoteDied);
     static void NotifyDestory(std::string &ifaceName, IfaceType type);
 
     // death recipient

@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace Wifi {
 
+
 class ApStateMachine;
 class MockApRootState : public ApRootState {
 public:

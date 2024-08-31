@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 class WifiHalDeviceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase()

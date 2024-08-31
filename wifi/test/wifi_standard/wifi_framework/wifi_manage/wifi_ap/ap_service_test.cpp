@@ -37,6 +37,7 @@ DEFINE_WIFILOG_LABEL("ApServiceTest");
 
 namespace OHOS {
 namespace Wifi {
+    
 const StationInfo staInfo = {
     "test_deviceName",
     "AA:BB:CC:DD:EE:FF",

@@ -19,6 +19,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+    
 void WifiHalDeviceManagerTest::DestoryCallback(std::string &destoryIfaceName, int createIfaceType)
 {
     return;

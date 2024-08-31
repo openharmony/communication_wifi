@@ -33,7 +33,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 constexpr const char *CHIP_SERVICE_NAME = "chip_interface_service";
 std::atomic_bool HalDeviceManager::g_chipHdiServiceDied = false;
 std::mutex HalDeviceManager::mMutex;

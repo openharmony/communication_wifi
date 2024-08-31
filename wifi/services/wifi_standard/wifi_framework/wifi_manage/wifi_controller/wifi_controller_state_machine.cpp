@@ -417,6 +417,19 @@ bool WifiControllerMachine::ShouldEnableSoftap()
 }
 #endif
 
+bool WifiControllerMachine::ShouldDisableWifi(InternalMessagePtr msg)
+{
+    auto currState = WifiConfigCenter::GetInstance().GetWifiDetailState(msg->GetParam2());
+    if (WifiConfigCenter::GetInstance().GetWifiToggledEnable() == WIFI_STATE_SEMI_ENABLED &&
+        (currState == WifiDetailState::STATE_ACTIVATED || currState == WifiDetailState::STATE_ACTIVATING) &&
+        msg->GetMessageName() == CMD_WIFI_TOGGLED && pWifiControllerMachine->ConcreteIdExist(msg->GetParam2())) {
+        WIFI_LOGI("Should disable wifi");
+        pWifiControllerMachine->StopAllConcreteManagers();
+        return;
+    }
+    return !ShouldEnableWifi();
+}
+
 bool WifiControllerMachine::ShouldEnableWifi()
 {
     WIFI_LOGI("Enter ShouldEnableWifi");
@@ -602,14 +615,8 @@ void WifiControllerMachine::SwitchRole(ConcreteManagerRole role)
 
 void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg)
 {
-    if (WifiConfigCenter::GetInstance().GetWifiToggledEnable() == WIFI_STATE_SEMI_ENABLED &&
-        msg->GetMessageName() == CMD_WIFI_TOGGLED && pWifiControllerMachine->ConcreteIdExist(msg->GetParam2())) {
-        WIFI_LOGI("Should disable wifi");
-        pWifiControllerMachine->StopAllConcreteManagers();
-        return;
-    }
     ConcreteManagerRole presentRole;
-    if (!pWifiControllerMachine->ShouldEnableWifi()) {
+    if (pWifiControllerMachine->ShouldDisableWifi(msg)) {
         pWifiControllerMachine->StopAllConcreteManagers();
         return;
     }

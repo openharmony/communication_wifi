@@ -30,7 +30,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 using OHOS::HDI::Wlan::Chip::V1_0::IChipController;
 using OHOS::HDI::Wlan::Chip::V1_0::IChipControllerCallback;
 using OHOS::HDI::Wlan::Chip::V1_0::IConcreteChip;

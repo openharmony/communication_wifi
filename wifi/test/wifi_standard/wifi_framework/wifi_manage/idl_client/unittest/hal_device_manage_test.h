@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 class WifiHalDeviceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -114,6 +113,10 @@ public:
         return 0;
     }
     virtual int32_t SetPowerMode(int32_t powerMode)
+    {
+        return 0;
+    }
+    virtual int32_t SetIfaceState(bool state)
     {
         return 0;
     }

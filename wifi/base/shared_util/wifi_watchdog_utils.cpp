@@ -38,15 +38,14 @@ constexpr uint32_t FFRT_CALLBACK_TIME = 5 * 60 * 1000; // 5min
 constexpr uint32_t TIME_MS_TO_S = 1000;
 std::shared_ptr<WifiWatchDogUtils> WifiWatchDogUtils::GetInstance()
 {
-    static std::shared_ptr<WifiWatchDogUtils> instance = nullptr;
-    if (instance == nullptr) {
-        instance = std::make_shared<WifiWatchDogUtils>();
-        instance->StartAllWatchDog();
-    }
+    static std::shared_ptr<WifiWatchDogUtils> instance = std::make_shared<WifiWatchDogUtils>();
     return instance;
 }
+
 WifiWatchDogUtils::WifiWatchDogUtils()
-{}
+{
+    StartAllWatchDog();
+}
 
 WifiWatchDogUtils::~WifiWatchDogUtils()
 {}

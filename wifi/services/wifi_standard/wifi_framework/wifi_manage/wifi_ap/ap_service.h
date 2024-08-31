@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 class ApStateMachine;
 class ApService {
     FRIEND_GTEST(ApService);

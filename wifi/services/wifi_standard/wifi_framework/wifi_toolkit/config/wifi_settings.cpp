@@ -322,6 +322,7 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     iter->second.lastConnectTime = time(0);
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;
+    iter->second.networkSelectionStatus.networkDisableCount = 0;
     return 0;
 }
 

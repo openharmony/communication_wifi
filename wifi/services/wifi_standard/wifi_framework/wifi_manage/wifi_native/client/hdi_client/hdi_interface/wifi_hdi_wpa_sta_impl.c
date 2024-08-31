@@ -387,7 +387,6 @@ static void HdiWpaFree(struct HdiWpaCmdStatus *status)
 
 WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen)
 {
-    WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     LOGI("HdiWpaStaGetDeviceMacAddress enter");
     if (macAddr == NULL) {
         LOGE("HdiWpaStaGetDeviceMacAddress: invalid parameter!");
@@ -399,8 +398,8 @@ WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiWpaStaGetDeviceMacAddress: wpaObj is NULL");
-		HdiWpaFree(&status);
-		pthread_mutex_unlock(GetWpaObjMutex());
+        HdiWpaFree(&status);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
@@ -408,26 +407,26 @@ WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen)
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaGetDeviceMacAddress: WifiStatus failed result:%{public}d", result);
         HdiWpaFree(&status);
-		pthread_mutex_unlock(GetWpaObjMutex());
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     if ((uint32_t)macAddrLen < status.addressLen) {
         LOGE("Input mac length %{public}d is little than mac address length %{public}d", macAddrLen, status.addressLen);
         HdiWpaFree(&status);
-		pthread_mutex_unlock(GetWpaObjMutex());
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_BUFFER_TOO_LITTLE;
     }
 
     if (ConvertMacToStr((char *)status.address, status.addressLen, macAddr, macAddrLen) != EOK) {
         LOGE("HdiWpaStaGetDeviceMacAddress: convertMacToStr failed!");
         HdiWpaFree(&status);
-		pthread_mutex_unlock(GetWpaObjMutex());
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     LOGI("HdiWpaStaGetDeviceMacAddress success.");
-	HdiWpaFree(&status);
-	pthread_mutex_unlock(GetWpaObjMutex());
+    HdiWpaFree(&status);
+    pthread_mutex_unlock(GetWpaObjMutex());
     return WIFI_HAL_OPT_OK;
 }
 

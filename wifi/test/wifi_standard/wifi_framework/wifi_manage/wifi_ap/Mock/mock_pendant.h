@@ -30,6 +30,7 @@ namespace OHOS {
 namespace Wifi {
 
 class MockPendant {
+    
 public:
     MockPendant()
         : m_MockApRootState(),

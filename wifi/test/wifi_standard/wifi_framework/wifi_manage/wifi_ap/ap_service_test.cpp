@@ -37,7 +37,6 @@ DEFINE_WIFILOG_LABEL("ApServiceTest");
 
 namespace OHOS {
 namespace Wifi {
-    
 const StationInfo staInfo = {
     "test_deviceName",
     "AA:BB:CC:DD:EE:FF",
@@ -55,7 +54,8 @@ public:
     {
         const int SLEEP_TIME = 20;
         pMockPendant = new MockPendant();
-        pApService = new ApService(pMockPendant->GetMockApStateMachine());
+        pApService = new ApService(pMockPendant->GetMockApStateMachine(),
+            pMockPendant->GetMockApStartedState());
         int testMaxConn = 10;
         int channel = 6;
         apInfo.SetSsid(std::string("TEST"));

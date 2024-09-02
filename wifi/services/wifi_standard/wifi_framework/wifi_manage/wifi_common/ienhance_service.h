@@ -161,6 +161,13 @@ public:
      * @return true: available, false: not available
      */
     virtual bool CheckEnhanceVapAvailable() = 0;
+
+    /**
+     * @Description Check if custom network
+     *
+     * @return true or false
+     */
+    virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

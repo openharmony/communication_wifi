@@ -35,6 +35,8 @@ namespace OHOS {
 namespace Wifi {
 using namespace NetManagerStandard;
 
+#define INVALID_SUPPLIER_ID 0
+
 WifiNetAgent &WifiNetAgent::GetInstance()
 {
     static WifiNetAgent gWifiNetAgent;
@@ -57,10 +59,14 @@ bool WifiNetAgent::RegisterNetSupplier()
     using NetManagerStandard::NetBearType;
     using NetManagerStandard::NetCap;
     std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
+    if (supplierId != INVALID_SUPPLIER_ID) {
+        WIFI_LOGI("RegisterNetSupplier supplierId alread exist.");
+        return true;
+    }
     int32_t result = NetConnClient::GetInstance().RegisterNetSupplier(NetBearType::BEARER_WIFI,
                                                                       ident, netCaps, supplierId);
     if (result == NETMANAGER_SUCCESS) {
-        WIFI_LOGI("Register NetSupplier successful");
+        WIFI_LOGI("Register NetSupplier successful, supplierId is [%{public}d]", supplierId);
         return true;
     }
     WIFI_LOGI("Register NetSupplier failed");
@@ -92,6 +98,7 @@ void WifiNetAgent::UnregisterNetSupplier()
     WIFI_LOGI("Enter UnregisterNetSupplier.");
     int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(supplierId);
     WIFI_LOGI("Unregister network result:%{public}d", result);
+    supplierId = INVALID_SUPPLIER_ID;
 }
 
 void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
@@ -360,6 +367,16 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
 void WifiNetAgent::InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCallbacks)
 {
     wifiNetAgentCallbacks_ = wifiNetAgentCallbacks;
+}
+
+void WifiNetAgent::ResetSupplierId()
+{
+    supplierId = INVALID_SUPPLIER_ID;
+}
+ 
+uint32_t WifiNetAgent::GetSupplierId()
+{
+    return supplierId;
 }
 
 bool WifiNetAgent::RequestNetwork(const int uid, const int networkId)

@@ -395,6 +395,7 @@ private:
 #endif
     int m_instId;
     std::vector<std::string> sta_candidate_trust_list;
+    bool m_connMangerStatus = true;
 };
 }  // namespace Wifi
 }  // namespace OHOS

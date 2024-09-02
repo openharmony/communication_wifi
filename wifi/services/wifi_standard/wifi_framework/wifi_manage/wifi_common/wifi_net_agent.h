@@ -141,6 +141,16 @@ public:
      */
     bool RequestNetwork(const int uid, const int networkId);
 
+    /**
+     * return wifi supplierId
+     */
+    uint32_t GetSupplierId();
+ 
+     /**
+     * set wifi supplierId to 0
+     */
+    void ResetSupplierId();
+
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {
     public:

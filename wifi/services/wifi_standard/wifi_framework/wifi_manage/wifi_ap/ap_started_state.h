@@ -255,7 +255,7 @@ private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result
     HotspotConfig m_hotspotConfig;
     WifiApNatManager mApNatManager;
-    typedef void (ApStartedState::*ProcessFun)(InternalMessagePtr msg) const;
+    using ProcessFun = std::function<void(InternalMessagePtr)> const;
 
     // Message processing function map of the state machine
     std::map<ApStatemachineEvent, ProcessFun> mProcessFunMap;

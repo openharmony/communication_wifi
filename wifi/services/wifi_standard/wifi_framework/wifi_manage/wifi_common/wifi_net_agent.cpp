@@ -355,7 +355,7 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
         ipv6route->gateway_.address_ = "";
         if (!wifiIpV6Info.globalIpV6Address.empty()) {
             ipv6route->destination_.address_ =
-            Ipv6Address::GetPrefixByAddr(wifiIpV6Info.globalIpV6Address, ipv6PrefixLength);
+                Ipv6Address::GetPrefixByAddr(wifiIpV6Info.globalIpV6Address, ipv6PrefixLength);
             netLinkInfo->routeList_.push_back(*ipv6route);
             LOGI("SetNetLinkLocalRouteInfo ipv6PrefixLength:%{public}u globalIpv6:%{public}s", ipv6PrefixLength,
                 MacAnonymize(wifiIpV6Info.globalIpV6Address).c_str());

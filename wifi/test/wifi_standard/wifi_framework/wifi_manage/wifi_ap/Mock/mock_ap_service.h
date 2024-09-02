@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Wifi {
 class MockApService : public ApService {
 public:
-    MockApService(ApStateMachine &apStateMachine ApStartedState &apStartedState)
+    MockApService(ApStateMachine &apStateMachine, ApStartedState &apStartedState)
         : ApService(apStateMachine, apStartedState)
     {}
     MOCK_METHOD0(EnableHotspot, ErrCode());

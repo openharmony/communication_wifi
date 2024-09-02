@@ -411,6 +411,7 @@ void WifiServiceScheduler::StaIfaceDestoryCallback(std::string &destoryIfaceName
 {
     WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
         destoryIfaceName.c_str(), createIfaceType);
+    std::lock_guard<std::mutex> lock(mutex);
     auto iter = g_staIfaceNameMap.begin();
     while (iter != g_staIfaceNameMap.end()) {
         if (destoryIfaceName == iter->second) {
@@ -656,6 +657,7 @@ void WifiServiceScheduler::SoftApIfaceDestoryCallback(std::string &destoryIfaceN
 {
     WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
         destoryIfaceName.c_str(), createIfaceType);
+    std::lock_guard<std::mutex> lock(mutex);
     auto iter = g_softApIfaceNameMap.begin();
     while (iter != g_softApIfaceNameMap.end()) {
         if (destoryIfaceName == iter->second) {

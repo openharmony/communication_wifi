@@ -546,6 +546,7 @@ public:
     void DealApRoamingStateTimeout(InternalMessagePtr msg);
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
+    void DealWpaStateChange(InternalMessagePtr msg);
 private:
     /**
      * @Description  Destruct state.

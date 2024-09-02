@@ -985,6 +985,9 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS] = [this](InternalMessagePtr msg) {
         return this->DealHiLinkDataToWpa(msg);
     };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaStateChange(msg);
+    };
     return WIFI_OPT_SUCCESS;
 }
 
@@ -3625,6 +3628,17 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessagePtr msg)
     }
 }
 
+void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        LOGE("DealWpaStateChange InternalMessage msg is null.");
+        return;
+    }
+    int status = msg->GetParam1();
+    LOGI("DealWpaStateChange status: %{public}d", status);
+    linkedInfo.supplicantState = static_cast<SupplicantState>(status);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+}
 /* --------------------------- state machine Roaming State ------------------------------ */
 StaStateMachine::ApRoamingState::ApRoamingState(StaStateMachine *staStateMachine)
     : State("ApRoamingState"), pStaStateMachine(staStateMachine)

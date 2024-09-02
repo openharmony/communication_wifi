@@ -318,6 +318,7 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
     netLinkInfo->routeList_.push_back(*route);
     LOGD("SetNetLinkRouteInfo: gateway %{public}s, address %{public}s",
         wifiIpV6Info.gateway.c_str(), route->gateway_.address_.c_str());
+    //duliqun
     if (!wifiIpV6Info.gateway.empty()) {
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
         ipv6route->iface_ = netLinkInfo->ifaceName_;
@@ -344,6 +345,7 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
     localRoute->destination_.prefixlen_ = prefixLength;
     localRoute->gateway_.address_ = "0.0.0.0";
     netLinkInfo->routeList_.push_back(*localRoute);
+    //duliqun
     if (!wifiIpV6Info.netmask.empty()) {
         unsigned int ipv6PrefixLength = IpTools::GetIPV6MaskLength(wifiIpV6Info.netmask);
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
@@ -354,6 +356,7 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
         ipv6route->destination_.prefixlen_ = ipv6PrefixLength;
         ipv6route->gateway_.address_ = "";
         netLinkInfo->routeList_.push_back(*ipv6route);
+        //duliqun
     }
 }
 

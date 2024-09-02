@@ -123,31 +123,33 @@ void ApStartedState::GoOutState()
 
 void ApStartedState::Init()
 {
-    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_FAIL, &ApStartedState::ProcessCmdFail));
     mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_STATION_JOIN, (ProcessFun)&ApStartedState::ProcessCmdStationJoin));
-    mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_STATION_LEAVE, (ProcessFun)&ApStartedState::ProcessCmdStationLeave));
+        std::make_pair(ApStatemachineEvent::CMD_FAIL, [this](InternalMessagePtr msg) { this->ProcessCmdFail(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_STATION_JOIN,
+        [this](InternalMessagePtr msg) { this->ProcessCmdStationJoin(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_STATION_LEAVE,
+        [this](InternalMessagePtr msg) { this->ProcessCmdStationLeave(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG,
+        [this](InternalMessagePtr msg) { this->ProcessCmdSetHotspotConfig(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT,
+        [this](InternalMessagePtr msg) { this->ProcessCmdUpdateConfigResult(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_ADD_BLOCK_LIST,
+        [this](InternalMessagePtr msg) { this->ProcessCmdAddBlockList(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_DEL_BLOCK_LIST,
+        [this](InternalMessagePtr msg) { this->ProcessCmdDelBlockList(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_STOP_HOTSPOT,
+        [this](InternalMessagePtr msg) { this->ProcessCmdStopHotspot(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_DISCONNECT_STATION,
+        [this](InternalMessagePtr msg) { this->ProcessCmdDisconnectStation(msg); }));
     mProcessFunMap.insert(std::make_pair(
-        ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG, (ProcessFun)&ApStartedState::ProcessCmdSetHotspotConfig));
-    mProcessFunMap.insert(std::make_pair(
-        ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT, &ApStartedState::ProcessCmdUpdateConfigResult));
-    mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_ADD_BLOCK_LIST, &ApStartedState::ProcessCmdAddBlockList));
-    mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_DEL_BLOCK_LIST, &ApStartedState::ProcessCmdDelBlockList));
-    mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_STOP_HOTSPOT, &ApStartedState::ProcessCmdStopHotspot));
-    mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_DISCONNECT_STATION, &ApStartedState::ProcessCmdDisconnectStation));
-    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_SET_IDLE_TIMEOUT,
-    (ProcessFun)&ApStartedState::ProcessCmdSetHotspotIdleTimeout));
-    mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE, &ApStartedState::ProcessCmdUpdateCountryCode));
+        ApStatemachineEvent::CMD_SET_IDLE_TIMEOUT,
+        (ProcessFun)[this](InternalMessagePtr msg) { this->ProcessCmdSetHotspotIdleTimeout(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE,
+        [this](InternalMessagePtr msg) { this->ProcessCmdUpdateCountryCode(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_HOTSPOT_CHANNEL_CHANGED,
-    (ProcessFun)&ApStartedState::ProcessCmdHotspotChannelChanged));
+        [this](InternalMessagePtr msg) { this->ProcessCmdHotspotChannelChanged(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_ASSOCIATED_STATIONS_CHANGED,
-    (ProcessFun)&ApStartedState::ProcessCmdAssociatedStaChanged));
+        [this](InternalMessagePtr msg) { this->ProcessCmdAssociatedStaChanged(msg); }));
 }
 
 bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -163,7 +165,7 @@ bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    ((*this).*(iter->second))(msg);
+    (iter->second)(msg);
 
     return EXECUTED;
 }

@@ -68,7 +68,7 @@ void WifiCountryCodePolicy::CreatePolicy()
     WIFI_LOGI("create wifi country code policy");
     GetWifiCountryCodePolicy();
     m_policyList.emplace_back(
-        std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByFactory, this, std::placeholders::_1));
+        [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByFactory(wifiCountryCode); });
     if (m_wifiCountryCodePolicyConf[FEATURE_MCC]) {
         OHOS::EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED);
@@ -78,11 +78,11 @@ void WifiCountryCodePolicy::CreatePolicy()
         OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(m_telephoneNetworkSearchStateChangeListener);
 
         m_policyList.emplace_back(
-            std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByMcc, this, std::placeholders::_1));
+            [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByMcc(wifiCountryCode); });
     }
     if (m_wifiCountryCodePolicyConf[FEATURE_RCV_AP_CONNECTED]) {
         m_policyList.emplace_back(
-            std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByAP, this, std::placeholders::_1));
+            [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByAP(wifiCountryCode); });
     }
     if (m_wifiCountryCodePolicyConf[FEATURE_RCV_SCAN_RESLUT]) {
         OHOS::EventFwk::MatchingSkills matchingSkills;
@@ -93,22 +93,22 @@ void WifiCountryCodePolicy::CreatePolicy()
         OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(m_wifiScanFinishCommonEventListener);
 
         m_policyList.emplace_back(
-            std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByScanResult, this, std::placeholders::_1));
+            [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByScanResult(wifiCountryCode); });
     }
     if (m_wifiCountryCodePolicyConf[FEATURE_USE_REGION]) {
         m_policyList.emplace_back(
-            std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByRegion, this, std::placeholders::_1));
+            [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByRegion(wifiCountryCode); });
     }
     if (m_wifiCountryCodePolicyConf[FEATURE_USE_ZZ]) {
         m_policyList.emplace_back(
-            std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByDefaultZZ, this, std::placeholders::_1));
+            [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByDefaultZZ(wifiCountryCode); });
     }
     m_policyList.emplace_back(
-        std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByCache, this, std::placeholders::_1));
+        [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByCache(wifiCountryCode); });
     m_policyList.emplace_back(
-        std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByDefaultRegion, this, std::placeholders::_1));
+        [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByDefaultRegion(wifiCountryCode); });
     m_policyList.emplace_back(
-        std::bind(&WifiCountryCodePolicy::GetWifiCountryCodeByDefault, this, std::placeholders::_1));
+        [this](std::string &wifiCountryCode) { return this->GetWifiCountryCodeByDefault(wifiCountryCode); });
 }
 
 ErrCode WifiCountryCodePolicy::CalculateWifiCountryCode(std::string &wifiCountryCode)

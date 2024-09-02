@@ -21,13 +21,12 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotMgrStub");
 
 namespace OHOS {
 namespace Wifi {
-WifiHotspotMgrStub::FuncHandleMap WifiHotspotMgrStub::funcHandleMap_ = {
-    {static_cast<uint32_t>(HotspotInterfaceCode::WIFI_MGR_GET_HOTSPOT_SERVICE),
-        &WifiHotspotMgrStub::GetWifiRemoteInner},
-};
-
 WifiHotspotMgrStub::WifiHotspotMgrStub()
-{}
+{
+    funcHandleMap_[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_MGR_GET_HOTSPOT_SERVICE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return GetWifiRemoteInner(code, data, reply, option); };
+}
 
 WifiHotspotMgrStub::~WifiHotspotMgrStub()
 {}
@@ -53,7 +52,7 @@ int WifiHotspotMgrStub::OnRemoteRequest(
         WIFI_LOGE("not find function to deal, code %{public}u", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
-        (this->*(iter->second))(code, data, reply, option);
+        (iter->second)(code, data, reply, option);
     }
     return 0;
 }

@@ -344,9 +344,8 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
     localRoute->destination_.prefixlen_ = prefixLength;
     localRoute->gateway_.address_ = "0.0.0.0";
     netLinkInfo->routeList_.push_back(*localRoute);
-    LOGI("SetNetLinkLocalRouteInfo ifaceName_:%{public}s", netLinkInfo->ifaceName_.c_str());
-    LOGI("SetNetLinkLocalRouteInfo prefixLength:%{public}u", prefixLength);
-    LOGI("SetNetLinkLocalRouteInfo strLocalRoute:%{public}s", IpAnonymize(strLocalRoute).c_str());
+    LOGI("SetNetLinkLocalRouteInfo ifaceName_:%{public}s %{public}u %{public}s", netLinkInfo->ifaceName_.c_str(),
+        prefixLength, IpAnonymize(strLocalRoute).c_str());
     if (!wifiIpV6Info.netmask.empty()) {
         unsigned int ipv6PrefixLength = IpTools::GetIPV6MaskLength(wifiIpV6Info.netmask);
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
@@ -354,20 +353,19 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
         ipv6route->destination_.type_ = NetManagerStandard::INetAddr::IPV6;
         ipv6route->destination_.prefixlen_ = ipv6PrefixLength;
         ipv6route->gateway_.address_ = "";
-        LOGI("SetNetLinkLocalRouteInfo prefixLength:%{public}u", ipv6PrefixLength);
         if (!wifiIpV6Info.globalIpV6Address.empty()) {
             ipv6route->destination_.address_ =
             Ipv6Address::GetPrefixByAddr(wifiIpV6Info.globalIpV6Address, ipv6PrefixLength);
             netLinkInfo->routeList_.push_back(*ipv6route);
-            LOGI("SetNetLinkLocalRouteInfo globalIpv6:%{public}s",
+            LOGI("SetNetLinkLocalRouteInfo ipv6PrefixLength:%{public}u globalIpv6:%{public}s", ipv6PrefixLength,
                 MacAnonymize(wifiIpV6Info.globalIpV6Address).c_str());
         }
         if (!wifiIpV6Info.uniqueLocalAddress1.empty()) {
             ipv6route->destination_.address_ =
                 Ipv6Address::GetPrefixByAddr(wifiIpV6Info.uniqueLocalAddress1, ipv6PrefixLength);
             netLinkInfo->routeList_.push_back(*ipv6route);
-            LOGI("SetNetLinkLocalRouteInfo uniqueLocalIpv6:%{public}s",
-                MacAnonymize(wifiIpV6Info.uniqueLocalAddress1).c_str());  
+            LOGI("SetNetLinkLocalRouteInfo ipv6PrefixLength:%{public}u uniqueLocalIpv6:%{public}s", ipv6PrefixLength,
+                MacAnonymize(wifiIpV6Info.uniqueLocalAddress1).c_str());
         }
     }
 }

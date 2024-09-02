@@ -425,12 +425,13 @@ private:
     bool RemoveIface(sptr<IChipIface> &iface, bool isCallback, IfaceType createIfaceType);
     static void ClearStaInfo();
     static void ClearApInfo();
-    static void ResetHalDeviceManagerInfo();
+    static void ResetHalDeviceManagerInfo(bool isRemoteDied);
     static void NotifyDestory(std::string &ifaceName, IfaceType type);
 
     // death recipient
     static void AddChipHdiDeathRecipient();
     static void RemoveChipHdiDeathRecipient();
+    IChipIface *FindIface(const std::string &ifaceName);
 
 private:
     static std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> mInterfaceInfoCache;

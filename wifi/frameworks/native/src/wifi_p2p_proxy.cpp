@@ -1145,7 +1145,7 @@ ErrCode WifiP2pProxy::RegisterCallBack(const sptr<IWifiP2pCallback> &callback, c
     }
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (g_wifiP2pCallbackStub == nullptr) {
         WIFI_LOGE("g_wifiP2pCallbackStub is nullptr");

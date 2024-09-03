@@ -2003,8 +2003,8 @@ ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTa
     return pService->DeregisterFilterBuilder(filterTag, builderName);
 }
 
-ErrCode WifiDeviceServiceImpl::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                                                    const ScoreBuilder &scoreBuilder)
+ErrCode WifiDeviceServiceImpl::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                                     const CommonBuilder &commonBuilder)
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("RegisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
@@ -2019,10 +2019,10 @@ ErrCode WifiDeviceServiceImpl::RegisterScoreBuilder(const ScoreTag &scoreTag, co
         WIFI_LOGE("pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    return pService->RegisterScoreBuilder(scoreTag, scoreName, scoreBuilder);
+    return pService->RegisterCommonBuilder(tagType, tagName, commonBuilder);
 }
 
-ErrCode WifiDeviceServiceImpl::DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName)
+ErrCode WifiDeviceServiceImpl::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
 {
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("DeregisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
@@ -2037,7 +2037,7 @@ ErrCode WifiDeviceServiceImpl::DeregisterScoreBuilder(const ScoreTag &scoreTag, 
         WIFI_LOGE("pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    return pService->DeregisterScoreBuilder(scoreTag, scoreName);
+    return pService->DeregisterCommonBuilder(tagType, tagName);
 }
 
 ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)

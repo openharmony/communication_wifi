@@ -422,10 +422,9 @@ bool WifiControllerMachine::ShouldDisableWifi(InternalMessagePtr msg)
     auto currState = WifiConfigCenter::GetInstance().GetWifiDetailState(msg->GetParam2());
     if (WifiConfigCenter::GetInstance().GetWifiToggledEnable() == WIFI_STATE_SEMI_ENABLED &&
         (currState == WifiDetailState::STATE_ACTIVATED || currState == WifiDetailState::STATE_ACTIVATING) &&
-        msg->GetMessageName() == CMD_WIFI_TOGGLED && pWifiControllerMachine->ConcreteIdExist(msg->GetParam2())) {
+        msg->GetMessageName() == CMD_WIFI_TOGGLED && ConcreteIdExist(msg->GetParam2())) {
         WIFI_LOGI("Should disable wifi");
-        pWifiControllerMachine->StopAllConcreteManagers();
-        return;
+        return true;
     }
     return !ShouldEnableWifi();
 }

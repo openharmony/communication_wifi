@@ -2010,13 +2010,13 @@ ErrCode WifiDeviceProxy::DeregisterFilterBuilder(const FilterTag &filterTag, con
     return WIFI_OPT_FAILED;
 }
 
-ErrCode WifiDeviceProxy::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                                              const ScoreBuilder &scoreBuilder)
+ErrCode WifiDeviceProxy::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                               const CommonBuilder &commonBuilder)
 {
     return WIFI_OPT_FAILED;
 }
 
-ErrCode WifiDeviceProxy::DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName)
+ErrCode WifiDeviceProxy::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
 {
     return WIFI_OPT_FAILED;
 }

@@ -335,6 +335,14 @@ public:
      */
 #ifndef OHOS_ARCH_LITE
     virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) override;
+
+    /**
+     * @Description Set EnhanceService to sta Service.
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) override;
 #endif
 	/**
      * @Description EnableHiLinkHandshake.

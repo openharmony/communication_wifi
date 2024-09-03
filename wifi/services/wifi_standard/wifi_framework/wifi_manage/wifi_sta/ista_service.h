@@ -19,6 +19,7 @@
 #include "wifi_errcode.h"
 #ifndef OHOS_ARCH_LITE
 #include "app_state_data.h"
+#include "ienhance_service.h"
 #endif
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
@@ -341,6 +342,14 @@ public:
      */
 #ifndef OHOS_ARCH_LITE
     virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) = 0;
+
+    /**
+     * @Description Set EnhanceService to sta Service.
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetEnhanceService(IEnhanceService *enhanceService) = 0;
 #endif
     /**
      * @Description enable hilink

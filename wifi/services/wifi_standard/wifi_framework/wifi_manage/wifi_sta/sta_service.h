@@ -223,6 +223,13 @@ public:
     virtual void RegisterStaServiceCallback(const std::vector<StaServiceCallback> &callbacks) const;
 
     /**
+     * @Description Register sta callback function
+     *
+     * @param callbacks - Callback function pointer storage structure
+     */
+    virtual void UnRegisterStaServiceCallback(const StaServiceCallback &callbacks) const;
+
+    /**
      * @Description  Reconnect network
      *
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
@@ -379,6 +386,7 @@ private:
 #endif
     int m_instId;
     std::vector<std::string> sta_candidate_trust_list;
+    bool m_connMangerStatus = true;
 };
 }  // namespace Wifi
 }  // namespace OHOS

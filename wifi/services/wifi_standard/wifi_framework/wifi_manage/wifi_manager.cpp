@@ -33,6 +33,9 @@
 #include "wifi_common_service_manager.h"
 #include "wifi_native_define.h"
 #include "wifi_sta_hal_interface.h"
+#ifndef OHOS_ARCH_LITE
+#include "wifi_watchdog_utils.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -55,6 +58,9 @@ WifiManager::~WifiManager()
 int WifiManager::Init()
 {
     std::unique_lock<std::mutex> lock(initStatusMutex);
+#ifndef OHOS_ARCH_LITE
+    WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
+#endif
     if (mInitStatus == INIT_OK) {
         WIFI_LOGI("WifiManager already init!");
         return 0;
@@ -169,9 +175,16 @@ void WifiManager::OnNativeProcessStatusChange(int status)
     switch (status) {
         case WPA_DEATH:
             WIFI_LOGE("wpa_supplicant process is dead!");
+            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
+                wifiTogglerManager->ForceStopWifi();
+            }
             break;
         case AP_DEATH:
             WIFI_LOGE("hostapd process is dead!");
+            if (wifiTogglerManager && WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
+                wifiTogglerManager->SoftapToggled(0, 0);
+                wifiTogglerManager->SoftapToggled(1, 0);
+            }
             break;
         default:
             break;

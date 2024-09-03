@@ -312,6 +312,9 @@ public:
         pWifiControllerMachine->SwitchRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
         WifiConfigCenter::GetInstance().SetWifiToggledState(1);
         EXPECT_TRUE(pWifiControllerMachine->ShouldEnableWifi());
+        EXPECT_FALSE(pWifiControllerMachine->ShouldDisableWifi());
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
+        EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi());
         pWifiControllerMachine->RemoveConcreteManager(1);
         pWifiControllerMachine->RemoveConcreteManager(0);
         pWifiControllerMachine->ShutdownWifi();

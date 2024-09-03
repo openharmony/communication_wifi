@@ -189,6 +189,13 @@ static int GetIfaceCount()
     }
     return count;
 }
+static void (*mNativeProcessCallback)(int) = NULL;
+WifiErrorNo SetNativeProcessCallback(void (*callback)(int))
+{
+    LOGI("%{public}s enter", __func__);
+    mNativeProcessCallback = callback;
+    return WIFI_HAL_OPT_OK;
+}
 
 static void HdiWpaResetGlobalObj()
 {
@@ -198,19 +205,18 @@ static void HdiWpaResetGlobalObj()
     }
     pthread_mutex_lock(&g_wpaObjMutex);
     g_wpaStartSucceed = false;
+    IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
     g_wpaObj = NULL;
-    g_devMgr = NULL;
+    if (g_devMgr != NULL) {
+        g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
+        g_devMgr = NULL;
+    }
+    ClearIfaceName();
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGE("%{public}s reset wpa g_wpaObj", __func__);
-    HdiWpaStart();
-}
-
-static void (*mNativeProcessCallback)(int) = NULL;
-WifiErrorNo SetNativeProcessCallback(void (*callback)(int))
-{
-    LOGI("%{public}s enter", __func__);
-    mNativeProcessCallback = callback;
-    return WIFI_HAL_OPT_OK;
+    if (mNativeProcessCallback != NULL) {
+        mNativeProcessCallback(WPA_DEATH);
+    }
 }
 
 static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
@@ -230,9 +236,6 @@ static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRem
     }
     OsalMemFree(recipient);
     recipient = NULL;
-    if (mNativeProcessCallback != NULL) {
-        mNativeProcessCallback(WPA_DEATH);
-    }
     HdiWpaResetGlobalObj();
 }
 
@@ -324,7 +327,7 @@ WifiErrorNo HdiWpaStop()
         g_wpaStartSucceed = false;
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or wpa hdi already stopped", __func__);
-        return WIFI_HAL_OPT_FAILED;
+        return WIFI_HAL_OPT_OK;
     }
 
     int32_t ret = g_wpaObj->Stop(g_wpaObj);
@@ -422,10 +425,13 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
 struct IWpaInterface* GetWpaInterface()
 {
     struct IWpaInterface *wpaObj = NULL;
-    pthread_mutex_lock(&g_wpaObjMutex);
     wpaObj = g_wpaObj;
-    pthread_mutex_unlock(&g_wpaObjMutex);
     return wpaObj;
+}
+
+pthread_mutex_t* GetWpaObjMutex(void)
+{
+    return &g_wpaObjMutex;
 }
 
 WifiErrorNo SetHdiStaIfaceName(const char *ifaceName)
@@ -572,10 +578,16 @@ static void HdiApResetGlobalObj()
     }
     pthread_mutex_lock(&g_apObjMutex);
     g_apIsRunning = false;
+    IHostapdInterfaceReleaseInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
     g_apObj = NULL;
-    g_apDevMgr = NULL;
+    if (g_apDevMgr != NULL) {
+        g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);
+        g_apDevMgr = NULL;
+    }
     pthread_mutex_unlock(&g_apObjMutex);
-    HdiApStart(g_id, g_apIfaceName);
+    if (mNativeProcessCallback != NULL) {
+        mNativeProcessCallback(AP_DEATH);
+    }
 }
 
 static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
@@ -595,9 +607,6 @@ static void ProxyOnApRemoteDied(struct HdfDeathRecipient* recipient, struct HdfR
     }
     OsalMemFree(recipient);
     recipient = NULL;
-    if (mNativeProcessCallback != NULL) {
-        mNativeProcessCallback(AP_DEATH);
-    }
     HdiApResetGlobalObj();
 }
 

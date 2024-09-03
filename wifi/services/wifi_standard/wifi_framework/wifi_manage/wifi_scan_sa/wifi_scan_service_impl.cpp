@@ -132,7 +132,7 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
                 return WIFI_OPT_PERMISSION_DENIED;
             }
         } else {
-            if (!WifiAuthCenter::IsSystemAppByToken()) {
+            if (!WifiAuthCenter::IsSystemAccess()) {
                 WIFI_LOGE("Scan:NOT System APP, PERMISSION_DENIED!");
 #ifndef OHOS_ARCH_LITE
                 WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
@@ -250,7 +250,7 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService != nullptr) {
         scanInfo.externScan = externFlag;
-        scanInfo.isSystemApp = WifiAuthCenter::IsSystemAppByToken();
+        scanInfo.isSystemApp = WifiAuthCenter::IsSystemAccess();
         bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
         WifiScanConfig::GetInstance().SaveScanDeviceInfo(scanInfo);
         return allowScan;
@@ -318,7 +318,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
 ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
 {
     WIFI_LOGD("WifiScanServiceImpl::SetScanOnlyAvailable");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetScanOnlyAvailable:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -343,7 +343,7 @@ ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
 ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
 {
     WIFI_LOGD("WifiScanServiceImpl::GetScanOnlyAvailable");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetScanOnlyAvailable: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }

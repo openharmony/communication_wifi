@@ -30,7 +30,9 @@
 #ifdef HAS_MOVEMENT_PART
 #include "wifi_msdp_state_listener.h"
 #endif
-
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+#include "wifi_asset_manager.h"
+#endif
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -91,6 +93,9 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 #ifdef HAS_POWERMGR_PART
     RegisterPowermgrEvent();
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    RegisterAssetEvent();
+#endif
     if (IsDataMgrServiceActive()) {
         RegisterCloneEvent();
     }
@@ -104,6 +109,9 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
 {
     WIFI_LOGI("~WifiEventSubscriberManager");
     UnRegisterCesEvent();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    UnRegisterAssetEvent();
+#endif
     UnRegisterNotificationEvent();
     UnRegisterCloneEvent();
     UnRegisterLocationEvent();
@@ -166,9 +174,6 @@ void WifiEventSubscriberManager::HandleAppMgrServiceChange(bool add)
 
 void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbilityId, bool add)
 {
-    if (!add) {
-        return;
-    }
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
         if (pService != nullptr) {
@@ -183,9 +188,15 @@ void WifiEventSubscriberManager::HandleCommonEventServiceChange(int systemAbilit
     if (add) {
         RegisterCesEvent();
         RegisterNotificationEvent();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        RegisterAssetEvent();
+#endif
     } else {
         UnRegisterCesEvent();
         UnRegisterNotificationEvent();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        UnRegisterAssetEvent();
+#endif
     }
 }
 
@@ -210,6 +221,13 @@ void WifiEventSubscriberManager::HandleDistributedKvDataServiceChange(bool add)
     RegisterCloneEvent();
 }
 
+void WifiEventSubscriberManager::HandleCastServiceChange(bool add)
+{
+    if (!add) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(CAST_ENGINE_SERVICE_UID);
+    }
+}
+
 #ifdef FEATURE_P2P_SUPPORT
 void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
@@ -217,6 +235,7 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     if (add) {
         return;
     }
+    WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SOFT_BUS_SERVICE_UID);
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
@@ -253,6 +272,9 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             HandleP2pBusinessChange(systemAbilityId, add);
             break;
 #endif
+        case CAST_ENGINE_SA_ID:
+            HandleCastServiceChange(add);
+            break;
         default:
             break;
     }
@@ -437,6 +459,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 #endif
     SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
+    SubscribeSystemAbility(CAST_ENGINE_SA_ID);
 }
 
 bool WifiEventSubscriberManager::IsDataMgrServiceActive()
@@ -612,7 +635,11 @@ void WifiEventSubscriberManager::RegisterMovementCallBack()
     }
     if (Msdp::MovementClient::GetInstance().SubscribeCallback(
         Msdp::MovementDataUtils::MovementType::TYPE_STILL, deviceMovementCallback_) != ERR_OK) {
-        WIFI_LOGE("Register a device movement observer failed!");
+        WIFI_LOGE("Register movement still observer failed!");
+    }
+    if (Msdp::MovementClient::GetInstance().SubscribeCallback(
+        Msdp::MovementDataUtils::MovementType::TYPE_STAY, deviceMovementCallback_) != ERR_OK) {
+        WIFI_LOGE("Register movement stay observer failed!");
     }
 }
 
@@ -989,8 +1016,81 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
 }
 
 #endif
-
-
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+void WifiEventSubscriberManager::RegisterAssetEvent()
+{
+    std::unique_lock<std::mutex> lock(AssetEventMutex);
+    if (assetMgrId != 0) {
+        WifiTimer::GetInstance()->UnRegister(assetMgrId);
+    }
+    if (wifiAssetrEventSubsciber_) {
+        return;
+    }
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetPublisherUid(ASSETID);
+    wifiAssetrEventSubsciber_ = std::make_shared<AssetEventSubscriber>(subscriberInfo);
+    WIFI_LOGI("RegisterAssetEvent start");
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiAssetrEventSubsciber_)) {
+        WIFI_LOGE("AssetCloud SubscribeCommonEvent() failed");
+        wifiAssetrEventSubsciber_ = nullptr;
+        WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterAssetEvent, this);
+        WifiTimer::GetInstance()->Register(timeoutCallBack, assetMgrId, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WIFI_LOGI("RegisterAssetEvent retry, powerMgrId = %{public}u", assetMgrId);
+    } else {
+        WIFI_LOGI("RegisterAssetEvent success");
+    }
+}
+ 
+void WifiEventSubscriberManager::UnRegisterAssetEvent()
+{
+    std::unique_lock<std::mutex> lock(AssetEventMutex);
+    if (assetMgrId != 0) {
+        WifiTimer::GetInstance()->UnRegister(assetMgrId);
+    }
+    if (!wifiAssetrEventSubsciber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(wifiAssetrEventSubsciber_)) {
+        WIFI_LOGE("UnRegisterAssetEvent failed");
+    }
+    wifiAssetrEventSubsciber_ = nullptr;
+    WIFI_LOGI("UnRegisterAssetEvent finished");
+}
+ 
+AssetEventSubscriber::AssetEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+    : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("AssetEventSubscriber enter");
+}
+ 
+AssetEventSubscriber::~AssetEventSubscriber()
+{
+    WIFI_LOGI("~AssetEventSubscriber enter");
+}
+ 
+void AssetEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    std::string action = eventData.GetWant().GetAction();
+    WIFI_LOGI("AssetListerner OnReceiveEvent action: %{public}s", action.c_str());
+    if (action != COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED) {
+        return;
+    }
+    // Do not sync from cloud during connecting
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+        if (pService != nullptr) {
+            WifiLinkedInfo linkedInfo;
+            WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, i);
+            if (linkedInfo.connState == ConnState::CONNECTING) {
+                return;
+            }
+        }
+    }
+    WifiAssetManager::GetInstance().CloudAssetSync();
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

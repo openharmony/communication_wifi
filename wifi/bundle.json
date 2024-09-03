@@ -63,7 +63,9 @@
             "wifi_feature_with_hdi_wpa_supported",
             "wifi_feature_with_scan_control",
             "wifi_feature_network_selection",
-            "wifi_feature_with_hdi_chip_supported"
+            "wifi_feature_with_hdi_chip_supported",
+            "wifi_feature_with_vap_manager",
+            "wifi_feature_with_sta_asset"
         ],
         "adapted_system_type": [
             "small",
@@ -111,9 +113,12 @@
                 "time_service",
                 "bounds_checking_function",
                 "jsoncpp",
-                "libxml2"
+                "libxml2",
+                "asset"
             ],
-            "third_party": [ "wpa_supplicant" ]
+            "third_party": [
+                "wpa_supplicant"
+            ]
         },
         "build": {
             "group_type": {
@@ -131,25 +136,25 @@
             },
             "inner_api": [
                 {
-                    "header" : {
+                    "header": {
                         "header_base": "//foundation/communication/wifi/wifi/interfaces/",
-                        "header_files": [ ]
+                        "header_files": []
                     },
-                    "name" : "//foundation/communication/wifi/wifi/frameworks/native:wifi_sdk"
+                    "name": "//foundation/communication/wifi/wifi/frameworks/native:wifi_sdk"
                 },
                 {
-                    "header" : {
+                    "header": {
                         "header_base": "//foundation/communication/wifi/wifi/base/inner_api/",
-                        "header_files": [ ]
+                        "header_files": []
                     },
-                    "name" : "//foundation/communication/wifi/wifi/base:wifi_base"
+                    "name": "//foundation/communication/wifi/wifi/base:wifi_base"
                 },
                 {
-                    "header" : {
+                    "header": {
                         "header_base": "//foundation/communication/wifi/wifi/utils/inc",
-                        "header_files": [ ]
+                        "header_files": []
                     },
-                    "name" : "//foundation/communication/wifi/wifi/utils:wifi_utils"
+                    "name": "//foundation/communication/wifi/wifi/utils:wifi_utils"
                 }
             ],
             "test": [

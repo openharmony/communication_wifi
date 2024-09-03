@@ -463,7 +463,7 @@ public:
      * @return WifiErrorNo
      */
     ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) override;
-    
+
     /**
      * Register the common builder function
      *

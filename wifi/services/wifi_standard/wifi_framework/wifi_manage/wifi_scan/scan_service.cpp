@@ -718,6 +718,7 @@ void ScanService::ConvertScanInfo(WifiScanInfo &scanInfo, const InterScanInfo &i
     scanInfo.maxSupportedTxLinkSpeed = GetWifiMaxSupportedMaxSpeed(interInfo, MAX_TX_SPATIAL_STREAMS);
     interInfo.GetWifiStandard(scanInfo.wifiStandard);
     scanInfo.isHiLinkNetwork = interInfo.isHiLinkNetwork;
+    scanInfo.supportedWifiCategory = interInfo.supportedWifiCategory;
 }
 
 void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vector<WifiScanInfo> &storeInfoList)
@@ -738,13 +739,6 @@ void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vecto
 #endif
             WIFI_LOGI("ScanInfo add new ssid=%{public}s bssid=%{public}s.\n",
                 SsidAnonymize(storedIter->ssid).c_str(), MacAnonymize(storedIter->bssid).c_str());
-        }
-        if (mEnhanceService != nullptr) {
-            storedIter->supportedWifiCategory = mEnhanceService->GetWifiCategory(storedIter->infoElems,
-                chipsetCategory, chipsetFeatrureCapability);
-            WifiConfigCenter::GetInstance().RecordWifiCategory(storedIter->bssid, storedIter->supportedWifiCategory);
-            WIFI_LOGD("GetWifiCategory supportedWifiCategory=%{public}d.\n",
-                static_cast<int>(storedIter->supportedWifiCategory));
         }
         results.push_back(*storedIter);
         WifiConfigCenter::GetInstance().UpdateLinkedChannelWidth(storedIter->bssid, storedIter->channelWidth, m_instId);
@@ -775,7 +769,7 @@ void ScanService::TryToRestoreSavedNetwork()
 }
 
 bool ScanService::StoreFullScanInfo(
-    const StoreScanConfig &scanConfig, const std::vector<InterScanInfo> &scanInfoList)
+    const StoreScanConfig &scanConfig, std::vector<InterScanInfo> &scanInfoList)
 {
     WIFI_LOGI("Enter StoreFullScanInfo.\n");
     /* Filtering result. */
@@ -800,6 +794,13 @@ bool ScanService::StoreFullScanInfo(
     std::vector<WifiScanInfo> storeInfoList;
     for (auto iter = scanInfoList.begin(); iter != scanInfoList.end(); ++iter) {
         WifiScanInfo scanInfo;
+        if (mEnhanceService != nullptr) {
+            iter->supportedWifiCategory = mEnhanceService->GetWifiCategory(iter->infoElems,
+                chipsetCategory, chipsetFeatrureCapability);
+            WifiConfigCenter::GetInstance().RecordWifiCategory(iter->bssid, iter->supportedWifiCategory);
+            WIFI_LOGD("GetWifiCategory supportedWifiCategory=%{public}d.\n",
+                static_cast<int>(storedIter->supportedWifiCategory));
+        }
         ConvertScanInfo(scanInfo, *iter);
         storeInfoList.push_back(scanInfo);
     }
@@ -889,12 +890,6 @@ void ScanService::ReportScanInfos(std::vector<InterScanInfo> &interScanList)
 {
     WIFI_LOGI("Enter ScanService::ReportScanInfos.\n");
     std::shared_lock<std::shared_mutex> lock(mScanCallbackMutex);
-    for (auto &scanInfo : interScanList) {
-        if (mEnhanceService != nullptr) {
-            scanInfo.supportedWifiCategory = mEnhanceService->GetWifiCategory(
-                scanInfo.infoElems, chipsetCategory, chipsetFeatrureCapability);
-        }
-    }
     mScanSerivceCallbacks.OnScanInfoEvent(interScanList, m_instId);
     return;
 }
@@ -1049,9 +1044,9 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
                 iter->frequency, iter->rssi, iter->timestamp);
         }
         if (mEnhanceService != nullptr) {
-            WifiCategory category = mEnhanceService->GetWifiCategory(iter->infoElems,
+            iter->supportedWifiCategory = mEnhanceService->GetWifiCategory(iter->infoElems,
                 chipsetCategory, chipsetFeatrureCapability);
-            WifiConfigCenter::GetInstance().RecordWifiCategory(iter->bssid, category);
+            WifiConfigCenter::GetInstance().RecordWifiCategory(iter->bssid, iter->supportedWifiCategory);
         }
     }
 

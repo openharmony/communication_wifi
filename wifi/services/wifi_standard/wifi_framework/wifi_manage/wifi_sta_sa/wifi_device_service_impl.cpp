@@ -697,7 +697,6 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
     }
     return WIFI_OPT_SUCCESS;
 }
-}
 
 void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result)
 {

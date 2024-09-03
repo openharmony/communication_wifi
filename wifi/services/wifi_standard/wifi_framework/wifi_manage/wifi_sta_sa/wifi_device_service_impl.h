@@ -137,7 +137,6 @@ public:
                                const CommonBuilder &commonBuilder) override;
 
     ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName) override;
- 
 
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiDeviceCallBack> &callback,

@@ -184,7 +184,6 @@ void WifiP2pManager::StartUnloadP2PSaTimer(void)
 void WifiP2pManager::CloseP2pService(void)
 {
     WIFI_LOGD("close p2p service");
-    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
     WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
     WifiConfigCenter::GetInstance().SetP2pState(static_cast<int>(P2pState::P2P_STATE_CLOSED));
     WifiEventCallbackMsg cbMsg;
@@ -208,7 +207,6 @@ void WifiP2pManager::CloseP2pService(void)
         WIFI_LOGI("airplaneMode not close p2p SA!");
         return;
     }
-    StartUnloadP2PSaTimer();
 #endif
     WIFI_LOGI("CloseP2pService, current sta state:%{public}d", staState);
     return;

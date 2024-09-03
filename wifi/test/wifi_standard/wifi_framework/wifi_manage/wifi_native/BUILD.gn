@@ -22,6 +22,7 @@ config("module_private_config") {
   ]
 }
 
+
 ohos_unittest("wifi_native_test") {
   module_out_path = "wifi/native_hdi_test"
 

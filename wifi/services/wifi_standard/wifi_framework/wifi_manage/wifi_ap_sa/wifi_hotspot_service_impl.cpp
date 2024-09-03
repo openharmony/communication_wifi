@@ -25,7 +25,6 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_logger.h"
 #include "define.h"
-#include "wifi_logger.h"
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
 #include "mac_address.h"
@@ -187,7 +186,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     }
 
     WifiLinkedInfo linkInfo;
-    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+    for (size_t i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo, i);
         if (!linkInfo.ssid.empty() && linkInfo.ssid == config.GetSsid()) {
             WIFI_LOGE("set ssid equal current linked ap ssid, no permission!");

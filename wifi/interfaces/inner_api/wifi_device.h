@@ -440,6 +440,15 @@ public:
                                const FilterBuilder &filterBuilder) = 0;
 
     /**
+     * @Description  deregister external filter builder.
+     *
+     * @param filterTag filterTag which define where the filter should be inserted.
+     * @param filterName the name of the filter to build.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) = 0;
+
+     /**
      * Register the common builder function
      *
      * @param TagType scoreTag which define where the score or filter should be inserted.
@@ -448,6 +457,7 @@ public:
      */
     virtual ErrCode RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
                                const CommonBuilder &commonBuilder) = 0;
+ 
     /**
      * Deregister the common builder function
      *
@@ -455,16 +465,7 @@ public:
      * @param tagName the score or filte name.
      */
     virtual ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName) = 0;
- 
-    /**
-     * @Description  deregister external score builder.
-     *
-     * @param scoreTag filterTag which define where the score should be inserted.
-     * @param scoreName the name of the score to build.
-     * @return WifiErrorNo
-     */
-    virtual ErrCode DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName) = 0;
- 
+
     virtual ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) = 0;
 
     /**

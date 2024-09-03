@@ -465,24 +465,21 @@ public:
     ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) override;
     
     /**
-     * @Description  register external score builder.
+     * Register the common builder function
      *
-     * @param scoreTag scoreTag which define where the score should be inserted.
-     * @param scoreName the name of the score to build.
-     * @param scoreBuilder score builder.
-     * @return WifiErrorNo
+     * @param TagType scoreTag which define where the score or filter should be inserted.
+     * @param tagName the score or filter name.
+     * @param CommonBuilder CommonBuilder function.
      */
-    virtual ErrCode RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                                          const ScoreBuilder &scoreBuilder) override;
- 
+    ErrCode RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                               const CommonBuilder &commonBuilder) override;
     /**
-     * @Description  deregister external score builder.
+     * Deregister the common builder function
      *
-     * @param scoreTag filterTag which define where the score should be inserted.
-     * @param scoreName the name of the score to build.
-     * @return WifiErrorNo
+     * @param TagType TagType which define where the score or filter should be inserted.
+     * @param tagName the score or filte name.
      */
-    virtual ErrCode DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName) override;
+    ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName) override;
  
     /**
      * @Description Check whether service is died.

@@ -3085,7 +3085,14 @@ bool StaStateMachine::GetIpState::IsProhibitUseCacheIp()
         WIFI_LOGE("current keyMgmt is WEP, not use cache ip if dhcp timeout");
         return true;
     }
-
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->enhanceService_ != nullptr) {
+        if (pStaStateMachine->enhanceService_->IsCustomNetwork(config)) {
+            WIFI_LOGE("current network not use cache ip if dhcp timeout");
+            return true;
+        }
+    }
+#endif
     int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(
         pStaStateMachine->linkedInfo.rssi, pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId);
     if (currentSignalLevel < RSSI_LEVEL_3) {
@@ -3338,7 +3345,7 @@ void StaStateMachine::PortalExpiredDetect()
         } else if (portalExpiredDetectCount == PORTAL_EXPERIED_DETECT_MAX_COUNT) {
             portalExpiredDetectCount = 0;
             auto config = getCurrentWifiDeviceConfig();
-            WritePortalAuthExpiredHisysevent(SystemNetWorkState::NETWORK_IS_PORTAL,
+            WritePortalAuthExpiredHisysevent(static_cast<int>(SystemNetWorkState::NETWORK_IS_PORTAL),
                 detectNum, config.lastConnectTime, config.portalAuthTime, false);
         }
     }
@@ -3472,6 +3479,41 @@ void StaStateMachine::LinkedState::GoOutState()
     WIFI_LOGI("LinkedState GoOutState function.");
 }
 
+void StaStateMachine::LinkedState::DhcpResultNotify(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("msg is nullptr.");
+        return;
+    }
+    int result = msg->GetParam1();
+    int ipType = msg->GetParam2();
+    WIFI_LOGI("LinkedState, result:%{public}d, ipType = %{public}d\n", result, ipType);
+    if (result == DhcpReturnCode::DHCP_RENEW_FAIL) {
+        pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+    } else if (result == DhcpReturnCode::DHCP_RESULT) {
+        pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
+    } else if (result == DhcpReturnCode::DHCP_IP_EXPIRED) {
+        pStaStateMachine->DisConnectProcess();
+    } else if (result == DhcpReturnCode::DHCP_OFFER_REPORT) {
+        pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
+    }
+}
+
+void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("msg is nullptr.");
+        return;
+    }
+    SystemNetWorkState netstate = (SystemNetWorkState)msg->GetParam1();
+    std::string url;
+    if (!msg->GetMessageObj(url)) {
+        WIFI_LOGW("Failed to obtain portal url.");
+    }
+    WIFI_LOGI("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
+    pStaStateMachine->HandleNetCheckResult(netstate, url);
+}
+
 bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
@@ -3504,29 +3546,12 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
         }
         case WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT: {
             ret = EXECUTED;
-            int result = msg->GetParam1();
-            int ipType = msg->GetParam2();
-            WIFI_LOGI("LinkedState, result:%{public}d, ipType = %{public}d\n", result, ipType);
-            if (result == DhcpReturnCode::DHCP_RENEW_FAIL) {
-                pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
-            } else if (result == DhcpReturnCode::DHCP_RESULT) {
-                pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
-            } else if (result == DhcpReturnCode::DHCP_IP_EXPIRED) {
-                pStaStateMachine->DisConnectProcess();
-            } else if (result == DhcpReturnCode::DHCP_OFFER_REPORT) {
-                pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
-            }
+            DhcpResultNotify(msg);
             break;
         }
         case WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT: {
             ret = EXECUTED;
-            SystemNetWorkState netstate = (SystemNetWorkState)msg->GetParam1();
-            std::string url;
-            if (!msg->GetMessageObj(url)) {
-                WIFI_LOGW("Failed to obtain portal url.");
-            }
-            WIFI_LOGI("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
-            pStaStateMachine->HandleNetCheckResult(netstate, url);
+            NetDetectionNotify(msg);
             break;
         }
         case WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT: {
@@ -4479,5 +4504,11 @@ bool StaStateMachine::IsGoodSignalQuality()
     }
     return isGoodSignal;
 }
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    enhanceService_ = enhanceService;
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

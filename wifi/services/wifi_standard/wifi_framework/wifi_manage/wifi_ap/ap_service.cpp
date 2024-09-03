@@ -25,8 +25,8 @@
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {
 namespace Wifi {
-ApService::ApService(ApStateMachine &apStateMachine, int id)
-    : m_ApStateMachine(apStateMachine), m_id(id)
+ApService::ApService(ApStateMachine &apStateMachine, ApStartedState &apStartedState, int id)
+    : m_ApStateMachine(apStateMachine), apStartedState_(apStartedState), m_id(id)
 {}
 
 ApService::~ApService()
@@ -40,9 +40,35 @@ ErrCode ApService::EnableHotspot()
     std::string moduleName = "ApService_" + std::to_string(m_id);
     m_apObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, m_ApStateMachine);
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_apObserver);
-
-    m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
-    return ErrCode::WIFI_OPT_SUCCESS;
+    m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTING);
+    m_ApStateMachine.RegisterEventHandler();
+    apStartedState_.StartMonitor();
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    apStartedState_.SetRandomMac();
+#endif
+    do {
+        if (!(apStartedState_.SetCountry())) {
+            break;
+        }
+        if (!(apStartedState_.StartAp())) {
+            WIFI_LOGE("enter ApstartedState is failed.");
+            break;
+        }
+        WIFI_LOGI("StartAP is ok.");
+        if (!(apStartedState_.SetConfig())) {
+            WIFI_LOGE("wifi_settings.hotspotconfig is error.");
+            break;
+        }
+        m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
+        m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
+        return ErrCode::WIFI_OPT_SUCCESS;
+    } while (0);
+    WIFI_LOGI("Ap disabled, set softap toggled false");
+    WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+    if (!(apStartedState_.StopAp())) {
+        WIFI_LOGE("StopAp not going well.");
+    }
+    return WIFI_OPT_FAILED;
 }
 
 ErrCode ApService::DisableHotspot() const

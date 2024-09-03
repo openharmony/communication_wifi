@@ -465,6 +465,15 @@ public:
                                   const FilterBuilder &filterBuilder) override;
 
     /**
+     * @Description  deregister external filter builder.
+     *
+     * @param filterTag filterTag which define where the filter should be inserted.
+     * @param filterName the name of the filter to build.
+     * @return WifiErrorNo
+     */
+    ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) override;
+
+    /**
      * Register the common builder function
      *
      * @param TagType scoreTag which define where the score or filter should be inserted.
@@ -480,15 +489,6 @@ public:
      * @param tagName the score or filte name.
      */
     ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName) override;
- 
-    /**
-     * @Description  deregister external filter builder.
-     *
-     * @param filterTag filterTag which define where the filter should be inserted.
-     * @param filterName the name of the filter to build.
-     * @return WifiErrorNo
-     */
-    ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) override;
 
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
     /**

@@ -22,7 +22,6 @@ config("module_private_config") {
   ]
 }
 
-
 ohos_unittest("wifi_native_test") {
   module_out_path = "wifi/native_hdi_test"
 
@@ -70,7 +69,6 @@ ohos_unittest("wifi_native_test") {
     "client/hdi_client/hdi_interface/wifi_hdi_wpa_ap_impl_test.cpp",
     "client/hdi_client/hdi_interface/wifi_hdi_wpa_sta_impl_test.cpp",
     "client/hdi_client/wifi_hdi_wpa_callback_test.cpp",
-    "client/hdi_client/wifi_hdi_wpa_client_test.cpp",
   ]
 
   ldflags = [

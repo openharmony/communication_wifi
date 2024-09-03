@@ -120,6 +120,22 @@ public:
     {
         return 0;
     }
+    virtual int32_t SendCmdToDriver(const std::string& ifName, int32_t cmdId, const std::vector<int8_t>& paramBuf)
+    {
+        return 0;
+    }
+    virtual int32_t SendActionFrame(const std::string& ifName, uint32_t freq, const std::vector<uint8_t>& frameData)
+    {
+        return 0;
+    }
+    virtual int32_t RegisterActionFrameReceiver(const std::string& ifName, const std::vector<uint8_t>& match)
+    {
+        return 0;
+    }
+    virtual int32_t GetCoexictenceChannelList(const std::string& ifName, std::vector<uint8_t>& paramBuf)
+    {
+        return 0;
+    }
 };
 
 class IConcreteChipTest : public IConcreteChip {
@@ -195,6 +211,18 @@ public:
         return 0;
     }
     virtual int32_t SetChipMode(uint32_t modeId)
+    {
+        return 0;
+    }
+    virtual int32_t CreateExtService(const std::string& ifName, sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t GetExtService(const std::string& ifName, sptr<IChipIface>& iface)
+    {
+        return 0;
+    }
+    virtual int32_t RemoveExtService(const std::string& ifName)
     {
         return 0;
     }

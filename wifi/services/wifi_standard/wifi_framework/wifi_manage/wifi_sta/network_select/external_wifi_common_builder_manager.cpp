@@ -13,56 +13,65 @@
  * limitations under the License.
  */
 
-#include "external_wifi_score_builder_manager.h"
+#include "external_wifi_common_builder_manager.h"
 #include "wifi_logger.h"
 #include "wifi_scorer_impl.h"
 
 
 namespace OHOS::Wifi {
-DEFINE_WIFILOG_LABEL("WifiScoreBuilderManager")
+DEFINE_WIFILOG_LABEL("WifiCommonBuilderManager")
 
-ExternalWifiScoreBuildManager &ExternalWifiScoreBuildManager::GetInstance()
+ExternalWifiCommonBuildManager &ExternalWifiCommonBuildManager::GetInstance()
 {
-    static ExternalWifiScoreBuildManager gNetworkSelectorScoreBuilderManager;
-    return gNetworkSelectorScoreBuilderManager;
+    static ExternalWifiCommonBuildManager gNetworkSelectorCommonBuilderManager;
+    return gNetworkSelectorCommonBuilderManager;
 }
 
-void ExternalWifiScoreBuildManager::RegisterScorerBuilder(const ScoreTag &scoreTag,
-                                                          const std::string &scoreName,
-                                                          const ScoreBuilder &scoreBuilder)
+void ExternalWifiCommonBuildManager::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                                           const CommonBuilder &commonBuilder)
 {
-    if (!scoreBuilder) {
-        WIFI_LOGE("the scoreBuilder for scoreTag: %{public}d, filterName: %{public}s is empty",
-                  static_cast<int>(scoreTag),
-                  scoreName.c_str());
+    if (commonBuilder.IsEmpty()) {
+        WIFI_LOGE("the scoreBuilder for tagType: %{public}d, tagName: %{public}s is empty",
+                  static_cast<int>(tagType), tagName.c_str());
         return;
     }
     std::lock_guard<std::mutex> lock(mutex);
-    WIFI_LOGI("RegisterScoreBuilder for scoreTag: %{public}d, filterName: %{public}s",
-              static_cast<int>(scoreTag),
-              scoreName.c_str());
-    scoreBuilders.insert_or_assign({scoreTag, scoreName}, scoreBuilder);
+    WIFI_LOGI("RegisterCommonBuilder for tagType: %{public}d, tagName: %{public}s",
+              static_cast<int>(tagType), tagName.c_str());
+    commonBuilders.insert_or_assign({tagType, tagName}, commonBuilder);
 }
 
-void ExternalWifiScoreBuildManager::DeregisterScorerBuilder(const ScoreTag &scoreTag, const std::string &scoreName)
+void ExternalWifiCommonBuildManager::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
 {
     std::lock_guard<std::mutex> lock(mutex);
-    WIFI_LOGI("DeregisterScorerBuilder for scoreTag: %{public}d, filterName: %{public}s",
-              static_cast<int>(scoreTag),
-              scoreName.c_str());
-    scoreBuilders.erase({scoreTag, scoreName});
+    WIFI_LOGI("DeregisterCommonBuilder for tagType: %{public}d, tagName: %{public}s",
+              static_cast<int>(tagType), tagName.c_str());
+    commonBuilders.erase({tagType, tagName});
 }
 
-void ExternalWifiScoreBuildManager::BuildScore(const ScoreTag &scoreTag,
-                                               NetworkSelection::CompositeWifiScorer &compositeScore)
+void ExternalWifiCommonBuildManager::BuildScore(const TagType &scoreTag,
+                                                NetworkSelection::CompositeWifiScorer &compositeScore)
 {
     std::lock_guard<std::mutex> lock(mutex);
-    for (const auto &scorerBuilderPair : scoreBuilders) {
+    for (const auto &commonBuilderPair : commonBuilders) {
         /* find the builder which match the filterTag  */
-        if (scorerBuilderPair.first.first != scoreTag) {
+        if (commonBuilderPair.first.first != scoreTag) {
             continue;
         }
-        scorerBuilderPair.second.operator()(compositeScore);
+        commonBuilderPair.second.scoreBuilder.operator()(compositeScore);
+    }
+}
+
+void ExternalWifiCommonBuildManager::BuildFilter(const TagType &filterTag,
+    NetworkSelection::CompositeWifiFilter &compositeFilter)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (const auto &commonBuilderPair : commonBuilders) {
+        /* find the builder which match the filterTag  */
+        if (commonBuilderPair.first.first != filterTag) {
+            continue;
+        }
+        commonBuilderPair.second.filterBuilder.operator()(compositeFilter);
     }
 }
 }

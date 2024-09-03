@@ -36,7 +36,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
 #endif
@@ -418,6 +417,7 @@ int WifiSettings::SyncDeviceConfig()
 int WifiSettings::ReloadDeviceConfig()
 {
 #ifndef CONFIG_NO_CONFIG_WRITE
+    std::unique_lock<std::mutex> lock(mStaMutex);
     int ret = mSavedDeviceConfig.LoadConfig();
     if (ret < 0) {
         deviceConfigLoadFlag.clear();
@@ -427,7 +427,6 @@ int WifiSettings::ReloadDeviceConfig()
     deviceConfigLoadFlag.test_and_set();
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
-    std::unique_lock<std::mutex> lock(mStaMutex);
     mNetworkId = 0;
     mWifiDeviceConfig.clear();
     for (std::size_t i = 0; i < tmp.size(); ++i) {

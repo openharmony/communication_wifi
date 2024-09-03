@@ -238,16 +238,16 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                                           const ScoreBuilder &scoreBuilder)
+ErrCode StaInterface::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                            const CommonBuilder &commonBuilder)
 {
-    LOGI("Enter RegisterScoreBuilder");
+    LOGI("Enter RegisterCommonBuilder");
     return WIFI_OPT_SUCCESS;
 }
  
-ErrCode StaInterface::DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName)
+ErrCode StaInterface::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
 {
-    LOGI("Enter DeregisterScoreBuilder");
+    LOGI("Enter DeregisterCommonBuilder");
     return WIFI_OPT_SUCCESS;
 }
 

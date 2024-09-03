@@ -1044,7 +1044,7 @@ void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
                 iter->frequency, iter->rssi, iter->timestamp);
         }
         if (mEnhanceService != nullptr) {
-            WifiCategory category= mEnhanceService->GetWifiCategory(iter->infoElems,
+            WifiCategory category = mEnhanceService->GetWifiCategory(iter->infoElems,
                 chipsetCategory, chipsetFeatrureCapability);
             WifiConfigCenter::GetInstance().RecordWifiCategory(iter->bssid, category);
         }

@@ -346,7 +346,6 @@ public:
      */
     virtual ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName) = 0;
 
-    
     /**
      * @Description start portal certification.
      *

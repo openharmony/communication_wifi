@@ -295,10 +295,38 @@ enum class FilterTag {
     IT_NETWORK_SELECTOR_FILTER_TAG
 };
 
-enum class ScoreTag {
-    HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI6_TAG,
+enum class TagType {
+    HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG,
 };
 using FilterBuilder = std::function<void(NetworkSelection::CompositeWifiFilter &)>;
 using ScoreBuilder = std::function<void(NetworkSelection::CompositeWifiScorer &)>;
-}
+ 
+union CommonBuilder {
+    CommonBuilder() {}
+ 
+    CommonBuilder(const CommonBuilder &commonBuilder)
+    {
+        filterBuilder = commonBuilder.filterBuilder;
+        scoreBuilder = commonBuilder.scoreBuilder;
+    }
+ 
+    ~CommonBuilder() {}
+ 
+    const CommonBuilder &operator=(const CommonBuilder &commonBuilder)
+    {
+        filterBuilder = commonBuilder.filterBuilder;
+        scoreBuilder = commonBuilder.scoreBuilder;
+        return *this;
+    }
+    bool IsEmpty() const
+    {
+        if (!filterBuilder && !scoreBuilder) {
+            return true;
+        }
+        return false;
+    }
+ 
+    FilterBuilder filterBuilder;
+    ScoreBuilder scoreBuilder;
+};
 #endif

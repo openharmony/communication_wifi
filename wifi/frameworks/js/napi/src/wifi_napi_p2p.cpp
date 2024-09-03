@@ -29,7 +29,7 @@ static void DeviceInfoToJs(const napi_env& env, const WifiP2pDevice& device, nap
     SetValueInt32(env, "deviceAddressType", device.GetDeviceAddressType(), result);
     SetValueUtf8String(env, "primaryDeviceType", device.GetPrimaryDeviceType().c_str(), result);
     SetValueInt32(env, "deviceStatus", static_cast<int>(device.GetP2pDeviceStatus()), result);
-    SetValueInt32(env, "groupCapabilitys", device.GetGroupCapabilitys(), result);
+    SetValueInt32(env, "groupCapabilities", device.GetGroupCapabilitys(), result);
 }
 
 static ErrCode DevicesToJsArray(const napi_env& env,

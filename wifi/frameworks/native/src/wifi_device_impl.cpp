@@ -512,23 +512,23 @@ ErrCode WifiDeviceImpl::DeregisterFilterBuilder(const FilterTag &filterTag, cons
     return client_->DeregisterFilterBuilder(filterTag, filterName);
 }
 
-ErrCode WifiDeviceImpl::RegisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                                             const ScoreBuilder &scoreBuilder)
+ErrCode WifiDeviceImpl::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                              const CommonBuilder &commonBuilder)
 {
-    if (!scoreBuilder) {
-        WIFI_LOGE("the target of scoreBuilder for %{public}s is empty", scoreName.c_str());
+    if (commonBuilder.IsEmpty()) {
+        WIFI_LOGE("the target of commonBuilder for %{public}s is empty", tagName.c_str());
         return WIFI_OPT_FAILED;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
-    return client_->RegisterScoreBuilder(scoreTag, scoreName, scoreBuilder);
+    return client_->RegisterCommonBuilder(tagType, tagName, commonBuilder);
 }
  
-ErrCode WifiDeviceImpl::DeregisterScoreBuilder(const ScoreTag &scoreTag, const std::string &scoreName)
+ErrCode WifiDeviceImpl::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
-    return client_->DeregisterScoreBuilder(scoreTag, scoreName);
+    return client_->DeregisterCommonBuilder(tagType, tagName);
 }
 
 bool WifiDeviceImpl::IsRemoteDied(void)

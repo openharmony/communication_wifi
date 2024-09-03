@@ -36,6 +36,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
 #endif

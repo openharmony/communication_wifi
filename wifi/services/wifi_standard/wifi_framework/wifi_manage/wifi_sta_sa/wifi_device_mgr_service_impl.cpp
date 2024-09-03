@@ -26,6 +26,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiDeviceMgrServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
+    
 const std::string EXTENSION_BACKUP = "backup";
 const std::string EXTENSION_RESTORE = "restore";
 std::mutex WifiDeviceMgrServiceImpl::g_instanceLock;

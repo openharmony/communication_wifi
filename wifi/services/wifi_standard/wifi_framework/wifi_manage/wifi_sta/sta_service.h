@@ -336,7 +336,7 @@ public:
      * @param CommonBuilder CommonBuilder function.
      */
     virtual ErrCode RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
-                               const CommonBuilder &commonBuilder) = 0;
+                               const CommonBuilder &commonBuilder);
  
     /**
      * Deregister the common builder function
@@ -344,7 +344,7 @@ public:
      * @param TagType TagType which define where the score or filter should be inserted.
      * @param tagName the score or filte name.
      */
-    virtual ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName) = 0;
+    virtual ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName);
 
     /**
      * @Description start portal certification.

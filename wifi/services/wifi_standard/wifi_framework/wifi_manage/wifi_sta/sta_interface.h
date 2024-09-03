@@ -216,6 +216,15 @@ public:
      * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode RegisterStaServiceCallback(const StaServiceCallback &callbacks) override;
+
+    /**
+     * @Description UnRegister sta callback function
+     *
+     * @param callbacks - Callback function pointer storage structure
+     * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
+     */
+    ErrCode UnRegisterStaServiceCallback(const StaServiceCallback &callbacks) override;
+
     /**
      * @Description send suspend mode for wpa.
      *

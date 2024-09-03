@@ -83,7 +83,7 @@ public:
     virtual int GetStationList(std::vector<StationInfo> &results, int id = 0) = 0;
     virtual int ManageStation(const StationInfo &info, int mode, int id = 0) = 0;
     virtual int ClearStationList(int id = 0)= 0;
-    virtual int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene) = 0;
+    virtual int GetHid2dUpperScene(int uid, Hid2dUpperScene &scene) = 0;
     virtual int SetP2pBusinessType(const P2pBusinessType &type) = 0;
     virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
     virtual int SaveP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
@@ -119,6 +119,9 @@ public:
     virtual void SetApMidState(WifiOprMidState state, int id = 0) = 0;
     virtual int GetAirplaneModeState() const = 0;
     virtual int GetHotspotState(int id = 0) = 0;
+    virtual int SetP2pEnhanceState(int state = 0) = 0;
+    virtual int GetP2pEnhanceState() = 0;
+    virtual void ClearLocalHid2dInfo(int uid = 0) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -182,7 +185,7 @@ public:
     MOCK_METHOD2(GetStationList, int(std::vector<StationInfo> &results, int id));
     MOCK_METHOD3(ManageStation, int(const StationInfo &info, int mode, int id));
     MOCK_METHOD1(ClearStationList, int(int id));
-    MOCK_METHOD2(GetHid2dUpperScene, int(std::string& ifName, Hid2dUpperScene &scene));
+    MOCK_METHOD2(GetHid2dUpperScene, int(int uid, Hid2dUpperScene &scene));
     MOCK_METHOD1(SetP2pBusinessType, int(const P2pBusinessType &type));
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
     MOCK_METHOD1(SaveP2pInfo, int(WifiP2pLinkedInfo &linkedInfo));
@@ -218,6 +221,9 @@ public:
     MOCK_METHOD2(SetApMidState, void(WifiOprMidState state, int id));
     MOCK_CONST_METHOD0(GetAirplaneModeState, int(void));
     MOCK_METHOD1(GetHotspotState, int(int id));
+    MOCK_METHOD1(SetP2pEnhanceState, int(int state));
+    MOCK_METHOD0(GetP2pEnhanceState, int());
+    MOCK_METHOD1(ClearLocalHid2dInfo, void(int uid));
 };
 }  // namespace OHOS
 }  // namespace Wifi

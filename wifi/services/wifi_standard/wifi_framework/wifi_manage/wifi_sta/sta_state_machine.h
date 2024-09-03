@@ -153,7 +153,7 @@ class StaStateMachine : public StateMachine {
 public:
     explicit StaStateMachine(int instId = 0);
     ~StaStateMachine();
-    using staSmHandleFunc = void (StaStateMachine::*)(InternalMessagePtr msg);
+    using staSmHandleFunc = std::function<void(InternalMessagePtr)>;
     using StaSmHandleFuncMap = std::map<int, staSmHandleFunc>;
     /**
      * @Description  Definition of member function of State base class in StaStateMachine.
@@ -333,6 +333,8 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        void DhcpResultNotify(InternalMessagePtr msg);
+        void NetDetectionNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -488,6 +490,13 @@ public:
     void RegisterStaServiceCallback(const StaServiceCallback &callback);
 
     /**
+     * @Description unRegister sta callback function
+     *
+     * @param callback - Callback function pointer storage structure
+     */
+    void UnRegisterStaServiceCallback(const StaServiceCallback &callback);
+
+    /**
      * @Description  Convert the deviceConfig structure and set it to idl structure
      *
      * @param config -The Network info(in)
@@ -539,6 +548,7 @@ public:
     void DealApRoamingStateTimeout(InternalMessagePtr msg);
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
+    void DealWpaStateChange(InternalMessagePtr msg);
 private:
     /**
      * @Description  Destruct state.
@@ -1251,6 +1261,8 @@ private:
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
     bool IsGoodSignalQuality();
+    void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
+    void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

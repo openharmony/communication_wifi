@@ -41,6 +41,7 @@ public:
     MOCK_CONST_METHOD0(CancelWps, ErrCode());
     MOCK_METHOD1(AutoConnectService, ErrCode(const std::vector<InterScanInfo> &scanInfos));
     MOCK_CONST_METHOD1(RegisterStaServiceCallback, void(const std::vector<StaServiceCallback> &callbacks));
+    MOCK_CONST_METHOD1(UnRegisterStaServiceCallback, void(const StaServiceCallback &callbacks));
     MOCK_CONST_METHOD2(ConnectToCandidateConfig, ErrCode(const int uid, const int networkId));
     MOCK_CONST_METHOD2(RemoveCandidateConfig, ErrCode(const int uid, const int networkId));
     MOCK_CONST_METHOD1(RemoveAllCandidateConfig, ErrCode(const int uid));

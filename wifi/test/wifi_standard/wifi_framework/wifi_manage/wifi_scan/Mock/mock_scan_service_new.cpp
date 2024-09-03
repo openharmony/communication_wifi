@@ -66,12 +66,12 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
     return;
 }
 
-ErrCode ScanService::Scan(bool externFlag)
+ErrCode ScanService::Scan(ScanType scanType)
 {
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag)
+ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanType)
 {
     return WIFI_OPT_SUCCESS;
 }
@@ -226,6 +226,11 @@ void ScanService::HandleCustomStatusChanged(int customScene, int customSceneStat
 
 void ScanService::HandleGetCustomSceneState(std::map<int, time_t>& sceneMap) const
 {
+}
+
+void ScanService::HandleAutoConnectStateChanged(bool success)
+{
+    return;
 }
 
 void ScanService::SystemScanProcess(bool scanAtOnce)

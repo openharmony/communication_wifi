@@ -110,10 +110,19 @@ void WifiStaManager::InitStaCallback(void)
 {
     using namespace std::placeholders;
     mStaCallback.callbackModuleName = "WifiStaManager";
-    mStaCallback.OnStaConnChanged = std::bind(&WifiStaManager::DealStaConnChanged, this, _1, _2, _3);
-    mStaCallback.OnWpsChanged = std::bind(&WifiStaManager::DealWpsChanged, this, _1, _2, _3);
-    mStaCallback.OnStaStreamChanged = std::bind(&WifiStaManager::DealStreamChanged, this, _1, _2);
-    mStaCallback.OnStaRssiLevelChanged = std::bind(&WifiStaManager::DealRssiChanged, this, _1, _2);
+    mStaCallback.OnStaConnChanged = [this](OperateResState state, const WifiLinkedInfo &info, int instId) {
+        this->DealStaConnChanged(state, info, instId);
+    };
+    mStaCallback.OnWpsChanged = [this](WpsStartState state, const int pinCode, int instId) {
+        this->DealWpsChanged(state, pinCode, instId);
+    };
+    mStaCallback.OnStaStreamChanged = [this](StreamDirection direction, int instId) {
+        this->DealStreamChanged(direction, instId);
+    };
+    mStaCallback.OnStaRssiLevelChanged = [this](int rssi, int instId) { this->DealRssiChanged(rssi, instId); };
+    mStaCallback.OnAutoSelectNetworkRes = [this](int networkId, int instId) {
+        this->DealAutoSelectNetworkChanged(networkId, instId);
+    };
     return;
 }
 
@@ -279,6 +288,15 @@ void WifiStaManager::DealRssiChanged(int rssi, int instId)
     cbMsg.msgData = rssi;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiStaManager::DealAutoSelectNetworkChanged(int networkId, int instId)
+{
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
+    if (pService != nullptr) {
+        pService->OnAutoConnectStateChanged(networkId != -1);
+    }
     return;
 }
 

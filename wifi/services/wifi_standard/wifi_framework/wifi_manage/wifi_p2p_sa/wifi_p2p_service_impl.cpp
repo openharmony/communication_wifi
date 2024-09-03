@@ -35,9 +35,6 @@
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
 
-#define SOFT_BUS_SERVICE_UID 1024
-#define CAST_ENGINE_SERVICE_UID 5526
-
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 
 namespace OHOS {
@@ -507,7 +504,7 @@ ErrCode WifiP2pServiceImpl::RemoveGroupClient(const GcInfo &info)
 ErrCode WifiP2pServiceImpl::DeleteGroup(const WifiP2pGroupInfo &group)
 {
     WIFI_LOGI("DeleteGroup, group name [%{public}s]", group.GetGroupName().c_str());
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DeleteGroup:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -878,7 +875,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pLocalDevice(WifiP2pDevice &device)
 ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 {
     WIFI_LOGI("QueryP2pGroups");
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("QueryP2pGroups:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -992,7 +989,7 @@ ErrCode WifiP2pServiceImpl::GetSupportedFeatures(long &features)
 bool WifiP2pServiceImpl::IsCallingAllowed()
 {
     auto state = WifiConfigCenter::GetInstance().GetWifiDetailState();
-    if (state == WifiDetailState::STATE_SEMI_ACTIVE && !WifiAuthCenter::IsSystemAppByToken()) {
+    if (state == WifiDetailState::STATE_SEMI_ACTIVE && !WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGW("curr wifi state is semiactive, only allow system app use p2p service");
         return false;
     }
@@ -1015,7 +1012,7 @@ bool WifiP2pServiceImpl::IsP2pServiceRunning()
 ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
 {
     WIFI_LOGI("SetP2pDeviceName:%{public}s", deviceName.c_str());
-    if (!WifiAuthCenter::IsSystemAppByToken()) {
+    if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetP2pDeviceName:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
@@ -1311,7 +1308,9 @@ ErrCode WifiP2pServiceImpl::Hid2dGetChannelListFor5G(std::vector<int>& vecChanne
     }
 
     if (vecChannelList.size() == 0) {
-        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, vecChannelList);
+        std::vector<int> tempFrequenciesList;
+        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, tempFrequenciesList);
+        TransformFrequencyIntoChannel(tempFrequenciesList, vecChannelList);
     }
     std::string strChannel;
     for (auto channel : vecChannelList) {
@@ -1396,7 +1395,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    WifiConfigCenter::GetInstance().SetHid2dUpperScene(ifName, scene);
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(callingUid, scene);
     return pService->Hid2dSetUpperScene(ifName, scene);
 }
 

@@ -283,22 +283,23 @@ void WriteWifiWpaStateHiSysEvent(int state)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WPA_STATE", "EVENT_VALUE", writer.write(root));
 }
 
-void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, int connTime,
-    int portalAuthTime, bool isNotificationClicked)
+void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, time_t connTime,
+    time_t portalAuthTime, bool isNotificationClicked)
 {
     Json::Value root;
     Json::FastWriter writer;
-    auto now = time(nullptr);
+    time_t now = time(nullptr);
     if (now < 0) {
-        now = -1;
+        now = 0;
     }
-    int64_t authDura = now - portalAuthTime;
-    int64_t connDura = now - connTime;
-    int authCostDura = portalAuthTime - connTime;
+    int64_t authDura = (now > 0 && portalAuthTime > 0 && now > portalAuthTime) ? now - portalAuthTime : 0;
+    int64_t connDura = (now > 0 && connTime > 0 && now > connTime) ? now - connTime : 0;
+    int64_t authCostDura =
+        (portalAuthTime > 0 && connTime > 0 && portalAuthTime > connTime) ? portalAuthTime - connTime : 0;
     root["RESP_CODE"] = respCode;
-    root["DURA"] = (authDura > 0 && portalAuthTime) ? authDura : 0;
-    root["CONN_DURA"] = (connDura > 0 && connTime) ? connDura : 0;
-    root["AUTH_COST_DURA"] = (authCostDura > 0 && portalAuthTime && connTime > 0) ? authCostDura : 0;
+    root["DURA"] = authDura;
+    root["CONN_DURA"] = connDura;
+    root["AUTH_COST_DURA"] = authCostDura;
     root["DET_NUM"] = detectNum;
     root["IS_NOTIFICA_CLICKED"] = isNotificationClicked ? 1 : 0;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "PORTAL_AUTH_EXPIRED", "EVENT_VALUE", writer.write(root));

@@ -154,6 +154,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode UnRegisterP2pEnhanceCallback() = 0;
+
+    /**
+     * @Description Check Enhance Vap Available
+     *
+     * @return true: available, false: not available
+     */
+    virtual bool CheckEnhanceVapAvailable() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

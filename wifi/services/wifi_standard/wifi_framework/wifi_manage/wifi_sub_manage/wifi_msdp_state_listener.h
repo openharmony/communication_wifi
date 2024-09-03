@@ -18,14 +18,19 @@
 
 #include "movement_client.h"
 #include "movement_callback_stub.h"
+#include "wifi_event_handler.h"
 
 namespace OHOS {
 namespace Wifi {
 class DeviceMovementCallback : public Msdp::MovementCallbackStub {
 public:
-    DeviceMovementCallback() = default;
-    ~DeviceMovementCallback() = default;
+    DeviceMovementCallback();
+    ~DeviceMovementCallback();
     void OnMovementChanged(const Msdp::MovementDataUtils::MovementData &movementData) override;
+
+private:
+    void HandleMovementChange();
+    std::unique_ptr<WifiEventHandler> movementChangeEventHandler = nullptr;
 };
 
 } // namespace Wifi

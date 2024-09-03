@@ -1,4 +1,4 @@
-# Copyright (C) 2024-2024 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -27,6 +27,7 @@ ohos_unittest("wifi_sta_new_unittest") {
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/external_wifi_common_builder_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/external_wifi_filter_builder_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selection_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select/network_selection_utils.cpp",

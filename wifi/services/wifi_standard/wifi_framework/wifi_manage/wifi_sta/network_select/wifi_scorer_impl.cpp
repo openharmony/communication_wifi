@@ -17,7 +17,7 @@
 #include "wifi_scorer_impl.h"
 #include "wifi_config_center.h"
 #include "network_status_history_manager.h"
-#include "external_wifi_score_builder_manager.h"
+#include "external_wifi_common_builder_manager.h"
 #include "wifi_logger.h"
 
 namespace OHOS::Wifi::NetworkSelection {
@@ -228,7 +228,7 @@ SavedNetworkScorer::SavedNetworkScorer(const std::string &scorerName) : Composit
     AddScorer(std::make_shared<RssiLevelBonusScorer>());
     AddScorer(std::make_shared<SecurityBonusScorer>());
     AddScorer(std::make_shared<Network5gBonusScorer>());
-    ExternalWifiScoreBuildManager::GetInstance().BuildScore(ScoreTag::HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI6_TAG,
-                                                            *this);
+    ExternalWifiCommonBuildManager::GetInstance().BuildScore(
+        TagType::HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG, *this);
 }
 }

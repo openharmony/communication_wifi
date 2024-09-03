@@ -13,37 +13,37 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_EXTERNAL_NETWORK_SCORE_BUILDER_MANAGER_H_
-#define OHOS_WIFI_EXTERNAL_NETWORK_SCORE_BUILDER_MANAGER_H_
+#ifndef OHOS_WIFI_EXTERNAL_NETWORK_COMMON_BUILDER_MANAGER_H_
+#define OHOS_WIFI_EXTERNAL_NETWORK_COMMON_BUILDER_MANAGER_H_
 
 #include <mutex>
 #include "network_selection.h"
 
 namespace OHOS::Wifi {
-class ExternalWifiScoreBuildManager {
+class ExternalWifiCommonBuildManager {
 public:
-    static ExternalWifiScoreBuildManager &GetInstance();
+    static ExternalWifiCommonBuildManager &GetInstance();
 
-    ExternalWifiScoreBuildManager(const ExternalWifiScoreBuildManager &) = delete;
+    ExternalWifiCommonBuildManager(const ExternalWifiCommonBuildManager &) = delete;
 
-    const ExternalWifiScoreBuildManager &operator=(const ExternalWifiScoreBuildManager &) = delete;
+    const ExternalWifiCommonBuildManager &operator=(const ExternalWifiCommonBuildManager &) = delete;
 
     /**
-     * Register the score builder function
+     * Register the common builder function
      *
-     * @param scoreTag scoreTag which define where the score should be inserted.
-     * @param scoreName the score name.
-     * @param scoreBuilder scoreBuilder function.
+     * @param TagType scoreTag which define where the score or filter should be inserted.
+     * @param tagName the score or filter name.
+     * @param CommonBuilder CommonBuilder function.
      */
-    void RegisterScorerBuilder(const ScoreTag &scoreTag, const std::string &scoreName,
-                               const ScoreBuilder &scoreBuilder);
+    void RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                               const CommonBuilder &commonBuilder);
     /**
-     * Deregister the score builder function
+     * Deregister the common builder function
      *
-     * @param scoreTag scoreTag which define where the score should be inserted.
-     * @param scoreName the score name.
+     * @param TagType TagType which define where the score or filter should be inserted.
+     * @param tagName the score or filte name.
      */
-    void DeregisterScorerBuilder(const ScoreTag &scoreTag, const std::string &scoreName);
+    void DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName);
 
     /**
      * build the compositeScore
@@ -51,13 +51,22 @@ public:
      * @param scoreTag scoreTag which define where the compositeScore should be inserted.
      * @param compositeScore the target score to build.
      */
-    void BuildScore(const ScoreTag &scoreTag, NetworkSelection::CompositeWifiScorer &compositeScore);
+    void BuildScore(const TagType &scoreTag, NetworkSelection::CompositeWifiScorer &compositeScore);
+
+    /**
+     * build the compositeFilter
+     *
+     * @param filterTag filterTag which define where the compositeFilter should be inserted.
+     * @param compositeFilter the target Filter to build.
+     */
+    void BuildFilter(const TagType &filterTag, NetworkSelection::CompositeWifiFilter &compositeFilter);
+
 private:
-    ExternalWifiScoreBuildManager() = default;
+    ExternalWifiCommonBuildManager() = default;
 
-    ~ExternalWifiScoreBuildManager() = default;
+    ~ExternalWifiCommonBuildManager() = default;
 
-    std::map<std::pair<ScoreTag, std::string>, ScoreBuilder> scoreBuilders;
+    std::map<std::pair<TagType, std::string>, CommonBuilder> commonBuilders;
     std::mutex mutex;
 };
 }

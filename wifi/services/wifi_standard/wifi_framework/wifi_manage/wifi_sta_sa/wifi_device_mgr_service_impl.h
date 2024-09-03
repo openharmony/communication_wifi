@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 enum ServiceRunningState {
     STATE_NOT_START,
     STATE_RUNNING

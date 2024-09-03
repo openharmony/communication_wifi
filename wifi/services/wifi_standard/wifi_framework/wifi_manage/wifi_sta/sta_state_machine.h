@@ -333,6 +333,8 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        void DhcpResultNotify(InternalMessagePtr msg);
+        void NetDetectionNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
     /**

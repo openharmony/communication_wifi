@@ -2061,7 +2061,9 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 void StaStateMachine::OnNetworkDisconnectEvent(int reason)
 {
     mIsWifiInternetCHRFlag = false;
-    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+        WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    }
     WriteWifiAbnormalDisconnectHiSysEvent(reason);
 }
 
@@ -3275,7 +3277,9 @@ void StaStateMachine::SetPortalBrowserFlag(bool flag)
 {
     portalFlag = flag;
     mIsWifiInternetCHRFlag = false;
-    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+        WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    }
     if (!flag) {
         portalState = PortalState::UNCHECKED;
     }

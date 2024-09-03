@@ -329,4 +329,5 @@ union CommonBuilder {
     FilterBuilder filterBuilder;
     ScoreBuilder scoreBuilder;
 };
+}
 #endif

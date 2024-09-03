@@ -322,6 +322,18 @@ ErrCode WifiServiceScheduler::PostStartWifi(int instId)
             WIFI_LOGE("Service enable sta failed ,ret %{public}d!", static_cast<int>(errCode));
             break;
         }
+    #ifndef OHOS_ARCH_LITE
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService == nullptr) {
+            WIFI_LOGE("get pEnhance service failed!");
+            break;
+        }
+        errCode = pService->SetEnhanceService(pEnhanceService);
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
+            break;
+        }
+    #endif
     } while (0);
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 #ifdef FEATURE_P2P_SUPPORT

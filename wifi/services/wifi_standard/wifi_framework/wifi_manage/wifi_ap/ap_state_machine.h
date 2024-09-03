@@ -105,15 +105,15 @@ public:
      */
     bool GetConnectedStationInfo(std::map<std::string, StationInfo> &result);
 
-private:
-    DISALLOW_COPY_AND_ASSIGN(ApStateMachine);
-
     /**
      * @Description  Register event handler to apmonitor.
      * @param None
      * @return None
      */
     virtual void RegisterEventHandler();
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(ApStateMachine);
 
 private:
     std::string m_iface;

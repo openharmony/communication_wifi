@@ -31,6 +31,7 @@
 #include "network_selection_manager.h"
 #include "wifi_config_center.h"
 #include "external_wifi_filter_builder_manager.h"
+#include "external_wifi_common_builder_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -894,6 +895,19 @@ ErrCode StaService::RegisterFilterBuilder(const OHOS::Wifi::FilterTag &filterTag
 ErrCode StaService::DeregisterFilterBuilder(const OHOS::Wifi::FilterTag &filterTag, const std::string &filterName)
 {
     ExternalWifiFilterBuildManager::GetInstance().DeregisterFilterBuilder(filterTag, filterName);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                          const CommonBuilder &commonBuilder)
+{
+    ExternalWifiCommonBuildManager::GetInstance().RegisterCommonBuilder(tagType, tagName, commonBuilder);
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaService::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    ExternalWifiCommonBuildManager::GetInstance().DeregisterCommonBuilder(tagType, tagName);
     return WIFI_OPT_SUCCESS;
 }
 

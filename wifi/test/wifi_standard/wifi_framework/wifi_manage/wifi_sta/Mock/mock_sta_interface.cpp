@@ -238,6 +238,19 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                            const CommonBuilder &commonBuilder)
+{
+    LOGI("Enter RegisterCommonBuilder");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    LOGI("Enter DeregisterCommonBuilder");
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::StartPortalCertification()
 {
     WIFI_LOGI("Enter StartPortalCertification");

@@ -360,6 +360,8 @@ private:
     std::atomic<int> mMaxNumConfigs;
     std::map<int, WifiConfig> mWifiConfig;
     WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
+
+    std::mutex mVariableConfMutex;
     WifiConfigFileImpl<VariableConf> mVariableConf;
     std::map<std::string, std::string> mVariableMap;
 };

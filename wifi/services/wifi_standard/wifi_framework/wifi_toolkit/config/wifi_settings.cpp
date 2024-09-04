@@ -90,7 +90,6 @@ int WifiSettings::Init()
     mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
-    mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
     mVariableConf.SetConfigFilePath(WIFI_VARIABLE_PATH);
 #ifndef OHOS_ARCH_LITE
@@ -108,7 +107,6 @@ int WifiSettings::Init()
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
     ReloadStaRandomMac();
-    ReloadPortalconf();
     InitPackageFilterConfig();
     IncreaseNumRebootsSinceLastUse();
     InitVariableConfig();
@@ -721,15 +719,6 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
         }
     }
     return randomMacInfo.randomMac.empty();
-}
-
-void WifiSettings::GetPortalUri(WifiPortalConf &urlInfo)
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    urlInfo.portalHttpUrl = mPortalUri.portalHttpUrl;
-    urlInfo.portalHttpsUrl = mPortalUri.portalHttpsUrl;
-    urlInfo.portalBakHttpUrl = mPortalUri.portalBakHttpUrl;
-    urlInfo.portalBakHttpsUrl = mPortalUri.portalBakHttpsUrl;
 }
 
 const std::vector<TrustListPolicy> WifiSettings::ReloadTrustListPolicies()
@@ -1434,23 +1423,6 @@ int WifiSettings::ReloadStaRandomMac()
         }
         mSavedWifiStoreRandomMac.SetValue(mWifiStoreRandomMac);
         mSavedWifiStoreRandomMac.SaveConfig();
-    }
-    return 0;
-}
-
-int WifiSettings::ReloadPortalconf()
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mSavedPortal.LoadConfig() >= 0) {
-        std::vector<WifiPortalConf> tmp;
-        mSavedPortal.GetValue(tmp);
-        if (tmp.size() > 0) {
-            mPortalUri = tmp[0];
-        } else {
-            mPortalUri.portalHttpUrl = "test";
-        }
-    } else {
-        mPortalUri.portalHttpUrl = "test";
     }
     return 0;
 }

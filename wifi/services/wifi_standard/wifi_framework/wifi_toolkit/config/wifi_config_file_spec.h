@@ -510,15 +510,6 @@ template <>
 std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item);
 
 /**
- * @Description Clear and init WifiPortalConf
- *
- * @tparam
- * @param item - WifiPortalConf &item
- */
-template <>
-void ClearTClass<WifiPortalConf>(WifiPortalConf &item);
-
-/**
  * @Description Clear and init PackageFilterConf
  *
  * @tparam
@@ -537,18 +528,6 @@ template <>
 void ClearTClass<VariableConf>(VariableConf &item);
 
 /**
- * @Description Set WifiPortalConf item data
- *
- * @tparam
- * @param item - WifiPortalConf &item
- * @param key - WifiPortalConf struct member name
- * @param value - the WifiPortalConf item member value
- * @return int - parse error: 0 Success, >0 parse failed
- */
-template <>
-int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value);
-
-/**
  * @Description Set PackageFilterConf item data
  *
  * @tparam
@@ -561,16 +540,6 @@ template <>
 int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::string &key, const std::string &value);
 
 /**
- * @Description Output WifiPortalConf class name
- *
- * @tparam
- * @param item - WifiPortalConf &item
- * @return std::string - Class name
- */
-template <>
-std::string GetTClassName<WifiPortalConf>();
-
-/**
  * @Description Set VariableConf item data
  *
  * @tparam
@@ -581,16 +550,6 @@ std::string GetTClassName<WifiPortalConf>();
  */
 template <>
 int SetTClassKeyValue<VariableConf>(VariableConf &item, const std::string &key, const std::string &value);
-
-/**
- * @Description Output the WifiPortalConf item, format: item's member = the member value
- *
- * @tparam
- * @param item - WifiPortalConf &item
- * @return std::string - output total member=value string about the WifiPortalConf item
- */
-template <>
-std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item);
 /* ----------template function specialization declare end----------- */
 }  // namespace Wifi
 }  // namespace OHOS

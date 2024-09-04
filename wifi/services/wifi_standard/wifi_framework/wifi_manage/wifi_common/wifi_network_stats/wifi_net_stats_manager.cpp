@@ -42,7 +42,7 @@ void WifiNetStatsManager::StartNetStats()
     }
     std::shared_ptr<WifiSysTimer> netStatsTimer =
         std::make_shared<WifiSysTimer>(true, NET_STATS_POLL_INTERVAL, true, false);
-    std::function<void()> callback = std::bind(&WifiNetStatsManager::PerformPollAndLog, this);
+    std::function<void()> callback = [this]() { this->PerformPollAndLog(); };
     netStatsTimer->SetCallbackInfo(callback);
     m_netStatsTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(netStatsTimer);
     int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();

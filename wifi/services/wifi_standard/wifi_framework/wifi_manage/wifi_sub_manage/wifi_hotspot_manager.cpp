@@ -109,9 +109,12 @@ void WifiHotspotManager::InitApCallback(void)
 {
     using namespace std::placeholders;
     mApCallback.callbackModuleName = "WifiHotspotManager";
-    mApCallback.OnApStateChangedEvent = std::bind(&WifiHotspotManager::DealApStateChanged, this, _1, _2);
-    mApCallback.OnHotspotStaJoinEvent = std::bind(&WifiHotspotManager::DealApGetStaJoin, this, _1, _2);
-    mApCallback.OnHotspotStaLeaveEvent = std::bind(&WifiHotspotManager::DealApGetStaLeave, this, _1, _2);
+    mApCallback.OnApStateChangedEvent =
+        [this](ApState state, int id) { this->DealApStateChanged(state, id); };
+    mApCallback.OnHotspotStaJoinEvent =
+        [this](const StationInfo &info, int id) { this->DealApGetStaJoin(info, id); };
+    mApCallback.OnHotspotStaLeaveEvent =
+        [this](const StationInfo &info, int id) { this->DealApGetStaLeave(info, id); };
     return;
 }
 

@@ -51,48 +51,72 @@ WifiHotspotStub::~WifiHotspotStub()
 
 void WifiHotspotStub::InitHandleMap()
 {
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE)] =
-        &WifiHotspotStub::OnIsHotspotActive;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GETAPSTATE_WIFI)] =
-        &WifiHotspotStub::OnGetApStateWifi;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_CONFIG)] =
-        &WifiHotspotStub::OnGetHotspotConfig;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETAPCONFIG_WIFI)] =
-        &WifiHotspotStub::OnSetApConfigWifi;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_STATION_LIST)] =
-        &WifiHotspotStub::OnGetStationList;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP)] =
-        &WifiHotspotStub::OnEnableWifiAp;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI_AP)] =
-        &WifiHotspotStub::OnDisableWifiAp;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ADD_BLOCK_LIST)] =
-        &WifiHotspotStub::OnAddBlockList;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DEL_BLOCK_LIST)] =
-        &WifiHotspotStub::OnDelBlockList;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_BLOCK_LISTS)] =
-        &WifiHotspotStub::OnGetBlockLists;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISCONNECT_STA)] =
-        &WifiHotspotStub::OnDisassociateSta;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_BANDS)] =
-        &WifiHotspotStub::OnGetValidBands;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_CHANNELS)] =
-        &WifiHotspotStub::OnGetValidChannels;
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_ACTIVE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnIsHotspotActive(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GETAPSTATE_WIFI)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetApStateWifi(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_CONFIG)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetHotspotConfig(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETAPCONFIG_WIFI)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnSetApConfigWifi(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_STATION_LIST)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetStationList(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnEnableWifiAp(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI_AP)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnDisableWifiAp(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ADD_BLOCK_LIST)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnAddBlockList(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DEL_BLOCK_LIST)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnDelBlockList(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_BLOCK_LISTS)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetBlockLists(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISCONNECT_STA)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnDisassociateSta(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_BANDS)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetValidBands(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_VALID_CHANNELS)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetValidChannels(code, data, reply, option); };
     handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_REGISTER_HOTSPOT_CALLBACK)] =
-        &WifiHotspotStub::OnRegisterCallBack;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
-        &WifiHotspotStub::OnGetSupportedFeatures;
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnRegisterCallBack(code, data, reply, option);
+        };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetSupportedFeatures(code, data, reply, option); };
     handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_POWER_MODEL)] =
-        &WifiHotspotStub::OnGetSupportedPowerModel;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_POWER_MODEL)] =
-        &WifiHotspotStub::OnGetPowerModel;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SET_POWER_MODEL)] =
-        &WifiHotspotStub::OnSetPowerModel;
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnGetSupportedPowerModel(code, data, reply, option);
+        };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_POWER_MODEL)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetPowerModel(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SET_POWER_MODEL)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnSetPowerModel(code, data, reply, option); };
     handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED)] =
-        &WifiHotspotStub::OnIsHotspotDualBandSupported;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP)] =
-        &WifiHotspotStub::OnSetApIdleTimeout;
-    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_IFACE_NAME)] =
-        &WifiHotspotStub::OnGetApIfaceName;
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnIsHotspotDualBandSupported(code, data, reply, option);
+        };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnSetApIdleTimeout(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_IFACE_NAME)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetApIfaceName(code, data, reply, option); };
     return;
 }
 
@@ -113,7 +137,7 @@ int WifiHotspotStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
         WIFI_LOGW("not find function to deal, code %{public}u", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
-        (this->*(iter->second))(code, data, reply, option);
+        (iter->second)(code, data, reply, option);
     }
     return 0;
 }

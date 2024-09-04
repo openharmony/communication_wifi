@@ -1866,14 +1866,16 @@ bool ScanService::GetSavedNetworkSsidList(std::vector<std::string> &savedNetwork
         WIFI_LOGE("WifiSettings::GetInstance().GetDeviceConfig failed");
         return false;
     }
-
+    std::sort(deviceConfigs.begin(), deviceConfigs.end(), [](WifiDeviceConfig deviceA, WifiDeviceConfig deviceB) {
+        return deviceA.lastConnectTime > deviceB.lastConnectTime;
+    });
     for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
         if ((iter->status == static_cast<int>(WifiDeviceConfigStatus::ENABLED)) && (!(iter->isPasspoint)) &&
             (!(iter->isEphemeral))) {
             savedNetworkSsid.push_back(iter->ssid);
         }
     }
-
+    WIFI_LOGI("Saved network list size:%{public}d", (int)savedNetworkSsid.size());
     return true;
 }
 

@@ -2041,24 +2041,19 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
     std::unique_lock<std::mutex> lock(mStaMutex);
     LOGI("UpdateWifiConfigFromCloud enter");
     std::map<int, WifiDeviceConfig> tempConfigs;
-    mNetworkId = 0;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
-            iter->second.networkId = mNetworkId;
-            tempConfigs.emplace(std::make_pair(mNetworkId, iter->second));
-            mNetworkId++;
+            tempConfigs[iter->second.networkId] = iter->second;
             continue;
         }
 #ifdef FEATURE_ENCRYPTION_SUPPORT
         // Do not remove local encrypted data
         if (!IsWifiDeviceConfigDeciphered(iter->second)) {
-            iter->second.networkId = mNetworkId;
-            tempConfigs.emplace(std::make_pair(mNetworkId, iter->second));
-            mNetworkId++;
+            tempConfigs[iter->second.networkId] = iter->second;
             continue;
         }
 #endif
-        LOGI("UpdateWifiConfigFromCloud remove from cloud %{public}s", SsidAnonymize(iter->second.ssid).c_str());
+        tempConfigs[iter->second.networkId] = iter->second;
     }
     for (auto iter : newWifiDeviceConfigs) {
         bool find = false;

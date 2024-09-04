@@ -102,9 +102,9 @@ void ApMonitor::StartMonitor()
 {
     using namespace std::placeholders;
     IWifiApMonitorEventCallback wifiApEventCallback = {
-        std::bind(&ApMonitor::OnStaJoinOrLeave, this, _1),
-        std::bind(&ApMonitor::OnHotspotStateEvent, this, _1),
-        std::bind(&ApMonitor::WpaEventApNotifyCallBack, this, _1),
+        [this](const WifiHalApConnectionNofify &cbInfo) { this->OnStaJoinOrLeave(cbInfo); },
+        [this](int state) { this->OnHotspotStateEvent(state); },
+        [this](const std::string &notifyParam) { this->WpaEventApNotifyCallBack(notifyParam); },
     };
     WifiApHalInterface::GetInstance().RegisterApEvent(wifiApEventCallback, m_id);
 

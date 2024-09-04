@@ -473,10 +473,21 @@ int32_t OnEventGoNegotiationRequest(struct IWpaCallback *self,
 int32_t OnEventGoNegotiationCompleted(struct IWpaCallback *self,
     const struct HdiP2pGoNegotiationCompletedParam *goNegotiationCompletedParam, const char* ifName)
 {
-    LOGI("OnEventGoNegotiationCompleted");
+    if (goNegotiationCompletedParam == nullptr) {
+        LOGI("goNegotiationCompletedParam is null");
+        return 1;
+    }
+    int status = goNegotiationCompletedParam->status;
+    LOGI("OnEventGoNegotiationCompleted, status is %{public}d", status);
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
-    if (cbk.onGoNegotiationSuccess) {
-        cbk.onGoNegotiationSuccess();
+    if (status == 0) {
+        if (cbk.onGoNegotiationSuccess) {
+            cbk.onGoNegotiationSuccess();
+        }
+    } else {
+        if (cbk.onGoNegotiationFailure) {
+            cbk.onGoNegotiationFailure(status);
+        }
     }
     return 0;
 }

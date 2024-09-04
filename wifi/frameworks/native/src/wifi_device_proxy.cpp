@@ -2010,6 +2010,17 @@ ErrCode WifiDeviceProxy::DeregisterFilterBuilder(const FilterTag &filterTag, con
     return WIFI_OPT_FAILED;
 }
 
+ErrCode WifiDeviceProxy::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                               const CommonBuilder &commonBuilder)
+{
+    return WIFI_OPT_FAILED;
+}
+
+ErrCode WifiDeviceProxy::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    return WIFI_OPT_FAILED;
+}
+
 ErrCode WifiDeviceProxy::StartPortalCertification()
 {
     if (mRemoteDied) {

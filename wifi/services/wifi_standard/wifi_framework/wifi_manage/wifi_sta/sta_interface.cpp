@@ -440,6 +440,23 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return pStaService->DeregisterFilterBuilder(filterTag, filterName);
 }
 
+ErrCode StaInterface::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                            const CommonBuilder &commonBuilder)
+{
+    LOGI("Enter RegisterCommonBuilder");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->RegisterCommonBuilder(tagType, tagName, commonBuilder);
+}
+ 
+ErrCode StaInterface::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    LOGI("Enter DeregisterCommonBuilder");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->DeregisterCommonBuilder(tagType, tagName);
+}
+
 ErrCode StaInterface::StartPortalCertification()
 {
     WIFI_LOGI("Enter StartPortalCertification");

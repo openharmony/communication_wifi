@@ -1470,7 +1470,7 @@ void WifiSettings::InitPackageFilterConfig()
 
 int WifiSettings::GetVariableMap(std::map<std::string, std::string> &variableMap)
 {
-    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    std::unique_lock<std::mutex> lock(mVariableConfMutex);
     variableMap = mVariableMap;
     return 0;
 }
@@ -1480,7 +1480,7 @@ void WifiSettings::InitVariableConfig()
     if (mVariableConf.LoadConfig() >= 0) {
         std::vector<VariableConf> tmp;
         mVariableConf.GetValue(tmp);
-        std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+        std::unique_lock<std::mutex> lock(mVariableConfMutex);
         for (unsigned int i = 0; i < tmp.size(); i++) {
             mVariableMap.insert(std::make_pair(tmp[i].variableName, tmp[i].variableValue));
         }

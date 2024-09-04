@@ -15,7 +15,6 @@
 
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 
-
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -84,6 +83,8 @@ static char g_apCfgName[CFGNAME_LEN] = {0};
 static int g_id;
 static int g_execDisable;
 static bool g_apIsRunning = false;
+static struct HdfRemoteService* g_remote = NULL;
+static struct HdfDeathRecipient* g_recipient = NULL;
 struct IfaceNameInfo {
     char ifName[BUFF_SIZE];
     struct IfaceNameInfo* next;
@@ -247,20 +248,20 @@ static WifiErrorNo RegistHdfDeathCallBack()
         LOGE("%{public}s: failed to get HDIServiceManager", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
-    struct HdfRemoteService* remote = serviceMgr->GetService(serviceMgr, HDI_WPA_SERVICE_NAME);
+    g_remote = serviceMgr->GetService(serviceMgr, HDI_WPA_SERVICE_NAME);
     HDIServiceManagerRelease(serviceMgr);
-    if (remote == NULL) {
+    if (g_remote == NULL) {
         LOGE("%{public}s: failed to get HdfRemoteService", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
     LOGI("%{public}s: success to get HdfRemoteService", __func__);
-    struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
-    if (recipient == NULL) {
+    g_recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
+    if (g_recipient == NULL) {
         LOGE("%{public}s: OsalMemCalloc is failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
-    recipient->OnRemoteDied = ProxyOnRemoteDied;
-    HdfRemoteServiceAddDeathRecipient(remote, recipient);
+    g_recipient->OnRemoteDied = ProxyOnRemoteDied;
+    HdfRemoteServiceAddDeathRecipient(g_remote, g_recipient);
     return WIFI_HAL_OPT_OK;
 }
 
@@ -334,6 +335,12 @@ WifiErrorNo HdiWpaStop()
     int32_t ret = g_wpaObj->Stop(g_wpaObj);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Stop failed: %{public}d", __func__, ret);
+    }
+    HdfRemoteServiceRemoveDeathRecipient(g_remote, g_recipient);
+    HdfRemoteServiceRecycle(g_remote);
+    if (g_recipient != NULL) {
+        OsalMemFree(g_recipient);
+        g_recipient = NULL;
     }
     IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
     g_wpaStartSucceed = false;

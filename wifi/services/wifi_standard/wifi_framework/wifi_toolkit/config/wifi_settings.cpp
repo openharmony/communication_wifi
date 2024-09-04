@@ -2066,6 +2066,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
+        LOGI("UpdateWifiConfigFromCloud new wifiDevice %{public}s", SsidAnonymize(iter.ssid).c_str());
         tempConfigs.emplace(std::make_pair(mNetworkId, iter));
         mNetworkId++;
     }

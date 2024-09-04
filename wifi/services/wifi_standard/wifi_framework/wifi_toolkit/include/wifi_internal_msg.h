@@ -337,13 +337,6 @@ struct WifiStoreRandomMac {
     std::unordered_set<std::string> fuzzyBssids;
 };
 
-struct WifiPortalConf {
-    std::string portalHttpUrl;
-    std::string portalHttpsUrl;
-    std::string portalBakHttpUrl;
-    std::string portalBakHttpsUrl;
-};
-
 struct PackageFilterConf {
     std::string filterName;
     std::vector<std::string> packageList;

@@ -122,7 +122,21 @@ public:
     virtual int SetP2pEnhanceState(int state = 0) = 0;
     virtual int GetP2pEnhanceState() = 0;
     virtual void ClearLocalHid2dInfo(int uid = 0) = 0;
-    
+    virtual std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo) = 0;
+    virtual int GetHotspotIdleTimeout() const = 0;
+    virtual void SetSoftapToggledState(bool state) = 0;
+    virtual void SetNoChargerPlugModeState(int state) = 0;
+    virtual void SetPowerIdelState(const int &state) = 0;
+    virtual void SetApIfaceName(const std::string &ifaceName) = 0;
+    virtual int GetWifiToggledEnable() = 0;
+    virtual bool GetSoftapToggledState() const = 0;
+    virtual bool CheckScanOnlyAvailable(int instId) = 0;
+    virtual int GetSelectedCandidateNetworkId() const = 0;
+    virtual void SetSelectedCandidateNetworkId(const int networkId) = 0;
+    virtual void SetP2pIfaceName(const std::string &ifaceName) = 0;
+    virtual int SetP2pState(int state) = 0;
+    virtual int GetPowerSavingModeState() const = 0;
+    virtual void CleanWifiCategoryRecord() = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -225,6 +239,21 @@ public:
     MOCK_METHOD1(SetP2pEnhanceState, int(int state));
     MOCK_METHOD0(GetP2pEnhanceState, int());
     MOCK_METHOD1(ClearLocalHid2dInfo, void(int uid));
+    MOCK_METHOD2(GetMacAddrPairs, std::string(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo));
+    MOCK_CONST_METHOD0(GetHotspotIdleTimeout, int());
+    MOCK_METHOD1(SetSoftapToggledState, void(bool state));
+    MOCK_METHOD1(SetNoChargerPlugModeState, void(int state));
+    MOCK_METHOD1(SetPowerIdelState, void(const int &state));
+    MOCK_METHOD1(SetApIfaceName, void(const std::string &ifaceName));
+    MOCK_METHOD0(GetWifiToggledEnable, int());
+    MOCK_CONST_METHOD0(GetSoftapToggledState, bool());
+    MOCK_METHOD1(CheckScanOnlyAvailable, bool(int instId));
+    MOCK_CONST_METHOD0(GetSelectedCandidateNetworkId, int());
+    MOCK_METHOD1(SetSelectedCandidateNetworkId, void(const int networkId));
+    MOCK_METHOD1(SetP2pIfaceName, void(const std::string &ifaceName));
+    MOCK_METHOD1(SetP2pState, int(int state));
+    MOCK_CONST_METHOD0(GetPowerSavingModeState, int());
+    MOCK_METHOD0(CleanWifiCategoryRecord, void());
 };
 }  // namespace OHOS
 }  // namespace Wifi

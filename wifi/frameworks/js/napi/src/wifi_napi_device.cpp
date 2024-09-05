@@ -1299,7 +1299,7 @@ static void EapConfigToJs(const napi_env& env, const WifiEapConfig& wifiEapConfi
     SetValueUtf8String(env, "password", wifiEapConfig.password.c_str(), cfgObj);
     SetValueUtf8String(env, "caCertAlias", wifiEapConfig.caCertAlias.c_str(), cfgObj);
     SetValueUtf8String(env, "caPath", wifiEapConfig.caCertPath.c_str(), cfgObj);
-    SetValueUtf8String(env, "clientCertAlias", wifiEapConfig.caCertAlias.c_str(), cfgObj);
+    SetValueUtf8String(env, "clientCertAlias", wifiEapConfig.clientCert.c_str(), cfgObj);
     SetValueU8Vector(env, "certEntry", wifiEapConfig.certEntry, cfgObj);
     SetValueUtf8String(env, "certPassword", wifiEapConfig.certPassword, cfgObj);
     SetValueUtf8String(env, "altSubjectMatch", wifiEapConfig.altSubjectMatch.c_str(), cfgObj);

@@ -65,7 +65,6 @@
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
-static bool g_wpaStartSucceed = false;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
 static pthread_mutex_t g_ifaceNameMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -179,16 +178,6 @@ static void ClearIfaceName(void)
     }
 }
 
-static int GetIfaceCount()
-{
-    int count = 0;
-    struct IfaceNameInfo* current = g_IfaceNameInfoHead;
-    while (current != NULL) {
-        current = current->next;
-        count++;
-    }
-    return count;
-}
 static void (*mNativeProcessCallback)(int) = NULL;
 WifiErrorNo SetNativeProcessCallback(void (*callback)(int))
 {
@@ -268,12 +257,10 @@ WifiErrorNo HdiWpaStart()
 {
     LOGI("HdiWpaStart start...");
     pthread_mutex_lock(&g_wpaObjMutex);
-    if (g_wpaStartSucceed && g_wpaObj != NULL && g_devMgr != NULL) {
+    if (g_wpaObj != NULL && g_devMgr != NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGI("%{public}s wpa hdi already started", __func__);
         return WIFI_HAL_OPT_OK;
-    } else {
-        g_wpaStartSucceed = false;
     }
     g_devMgr = HDIDeviceManagerGet();
     if (g_devMgr == NULL) {
@@ -313,7 +300,6 @@ WifiErrorNo HdiWpaStart()
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_HAL_OPT_FAILED;
     }
-    g_wpaStartSucceed = true;
     RegistHdfDeathCallBack();
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("HdiWpaStart start success!");
@@ -324,8 +310,7 @@ WifiErrorNo HdiWpaStop()
 {
     LOGI("HdiWpaStop stop...");
     pthread_mutex_lock(&g_wpaObjMutex);
-    if (g_wpaObj == NULL || g_wpaStartSucceed == false) {
-        g_wpaStartSucceed = false;
+    if (g_wpaObj == NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or wpa hdi already stopped", __func__);
         return WIFI_HAL_OPT_OK;
@@ -336,7 +321,6 @@ WifiErrorNo HdiWpaStop()
         LOGE("%{public}s Stop failed: %{public}d", __func__, ret);
     }
     IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
-    g_wpaStartSucceed = false;
     g_wpaObj = NULL;
     if (g_devMgr != NULL) {
         g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
@@ -351,7 +335,7 @@ WifiErrorNo HdiWpaStop()
 WifiErrorNo IsHdiWpaStopped()
 {
     pthread_mutex_lock(&g_wpaObjMutex);
-    if (g_wpaStartSucceed == false && g_wpaObj == NULL && g_devMgr == NULL) {
+    if (g_wpaObj == NULL && g_devMgr == NULL) {
         LOGI("HdiWpa already stopped");
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_HAL_OPT_OK;
@@ -370,18 +354,15 @@ WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName)
         return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
-    if (g_wpaObj == NULL || g_wpaStartSucceed == false) {
-        g_wpaStartSucceed = false;
+    if (g_wpaObj == NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or wpa hdi already stopped", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
-    int count = GetIfaceCount();
     LOGI("HdiAddWpaIface ifName:%{public}s, confName:%{public}s", ifName, confName);
     if (!FindifaceName(ifName)) {
         int32_t ret = g_wpaObj->AddWpaIface(g_wpaObj, ifName, confName);
         if (ret != HDF_SUCCESS) {
-            (count == 0)?(g_wpaStartSucceed = false):(g_wpaStartSucceed = true);
             LOGE("%{public}s AddWpaIface failed: %{public}d", __func__, ret);
             pthread_mutex_unlock(&g_wpaObjMutex);
             return WIFI_HAL_OPT_FAILED;
@@ -402,7 +383,7 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
         return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
-    if (g_wpaObj == NULL || g_wpaStartSucceed == 0) {
+    if (g_wpaObj == NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or wpa hdi already stopped", __func__);
         return WIFI_HAL_OPT_OK;

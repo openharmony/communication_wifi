@@ -15,6 +15,8 @@
 #include "wifi_permission_utils.h"
 #ifndef OHOS_ARCH_LITE
 #include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
+#include "tokenid_kit.h"
 #endif
 #include "wifi_auth_center.h"
 
@@ -85,7 +87,15 @@ int WifiPermissionUtils::VerifyManageWifiHotspotExtPermission()
 {
     return PERMISSION_GRANTED;
 }
+
+int WifiPermissionUtils::GetApiVersion()
+{
+    return API_VERSION_INVALID;
+}
+
 #else
+using namespace OHOS::Security::AccessToken;
+
 int WifiPermissionUtils::VerifySetWifiInfoPermission()
 {
     return WifiAuthCenter::GetInstance().VerifySetWifiInfoPermission(
@@ -161,6 +171,20 @@ int WifiPermissionUtils::VerifyManageWifiHotspotExtPermission()
 {
     return WifiAuthCenter::GetInstance().VerifyManageWifiHotspotExtPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::GetApiVersion()
+{
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    ATokenTypeEnum callingType = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (callingType != ATokenTypeEnum::TOKEN_HAP) {
+        return API_VERSION_INVALID;
+    }
+    HapTokenInfo hapTokenInfo;
+    if (AccessTokenKit::GetHapTokenInfo(tokenId, hapTokenInfo) != AccessTokenKitRet::RET_SUCCESS) {
+        return API_VERSION_INVALID;
+    }
+    return API_VERSION_INVALID;
 }
 #endif
 }  // namespace Wifi

@@ -250,7 +250,7 @@ private:
      */
     virtual bool ProcessCmdDiscoverPeers(InternalMessagePtr msg) const;
 private:
-    using ProcessFun = bool (P2pEnabledState::*)(InternalMessagePtr msg) const;
+    using ProcessFun = std::function<bool(const InternalMessagePtr)> const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

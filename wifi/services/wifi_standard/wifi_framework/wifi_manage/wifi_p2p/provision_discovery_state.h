@@ -128,7 +128,7 @@ private:
     virtual bool ProcessCmdCancelConnect(InternalMessagePtr msg) const;
 
 private:
-    using ProcessFun = bool (ProvisionDiscoveryState::*)(InternalMessagePtr msg) const;
+    using ProcessFun = std::function<bool(InternalMessagePtr)> const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

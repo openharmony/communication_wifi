@@ -97,7 +97,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
     }
 
     if (!pScanStateMachine->EnrollScanStatusListener(
-        std::bind(&ScanService::HandleScanStatusReport, this, std::placeholders::_1))) {
+        [this](ScanStatusReport &scanStatusReport) { this->HandleScanStatusReport(scanStatusReport); })) {
         WIFI_LOGE("ScanStateMachine_->EnrollScanStatusListener failed.\n");
         return false;
     }

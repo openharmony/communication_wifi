@@ -417,6 +417,7 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("WifiLoopEncrypt HksUpdateAndFinish failed: %{public}d.", ret);
         free(cipherBuf);
+        cipherBuf = nullptr;
         return ret;
     }
 
@@ -424,6 +425,7 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
     encryptedData.encryptedPassword = temp;
     HksFreeParamSet(&encryParamSet);
     free(cipherBuf);
+    cipherBuf = nullptr;
     return ret;
 }
 
@@ -464,18 +466,21 @@ int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const Encr
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("WifiLoopDecrypt HksUpdateAndFinish failed: %{public}d.", ret);
         free(plainBuf);
+        plainBuf = nullptr;
         return ret;
     }
     std::string temp(outData.data, outData.data + outData.size);
     if (memset_s(outData.data, outData.size, 0, outData.size) != EOK) {
         WIFI_LOGE("WifiLoopDecrypt memset_s return error!");
         free(plainBuf);
+        plainBuf = nullptr;
         return HKS_FAILURE;
     }
     decryptedData = temp;
     std::fill(temp.begin(), temp.end(), 0);
     HksFreeParamSet(&decryParamSet);
     free(plainBuf);
+    plainBuf = nullptr;
     return ret;
 }
 

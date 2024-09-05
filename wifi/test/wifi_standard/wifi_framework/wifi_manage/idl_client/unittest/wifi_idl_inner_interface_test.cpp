@@ -49,11 +49,6 @@ static void OnWpaStateChangedMock(int status)
     LOGI("OnWpaStateChangedMock");
 }
 
-static void OnWpaSsidWrongKeyMock(int status)
-{
-    LOGI("OnWpaSsidWrongKeyMock");
-}
-
 static void OnWpsOverlapMock(int status)
 {
     LOGI("OnWpsOverlapMock");
@@ -412,7 +407,6 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     RegisterStaCallbackMock(&callback);
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
     OnWpaStateChanged(status);
-    OnWpaSsidWrongKey(status);
     OnWpaConnectionFull(status);
     OnWpaConnectionReject(status);
     OnWpsOverlap(status);
@@ -420,7 +414,6 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     UnRegisterStaCallbackMock(&callback);
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);
     OnWpaStateChanged(status);
-    OnWpaSsidWrongKey(status);
     OnWpaConnectionFull(status);
     OnWpaConnectionReject(status);
     OnWpsOverlap(status);

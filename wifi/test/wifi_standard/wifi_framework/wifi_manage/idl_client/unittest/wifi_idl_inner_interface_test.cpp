@@ -200,7 +200,6 @@ public:
         callback->onConnectChanged = OnConnectChangedMock;
         callback->onBssidChanged = OnBssidChangedMock;
         callback->onWpaStateChanged = OnWpaStateChangedMock;
-        callback->onWpaSsidWrongKey = OnWpaSsidWrongKeyMock;
         callback->onWpsOverlap = OnWpsOverlapMock;
         callback->onWpsTimeOut = OnWpsTimeOutMock;
         callback->onWpaConnectionFull = OnWpaConnectionFullMock;

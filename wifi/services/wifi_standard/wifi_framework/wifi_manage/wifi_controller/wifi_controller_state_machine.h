@@ -132,7 +132,7 @@ private:
     void StopSoftapManager(int id);
     SoftApManager *GetSoftApManager(int id);
 #endif
-    bool ShouldDisableWifi();
+    bool ShouldDisableWifi(InternalMessagePtr msg);
     bool ShouldEnableWifi();
     ConcreteManagerRole GetWifiRole();
     void StopAllConcreteManagers();

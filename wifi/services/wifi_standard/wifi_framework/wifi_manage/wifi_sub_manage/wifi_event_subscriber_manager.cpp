@@ -37,7 +37,6 @@ DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
 namespace Wifi {
-    
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
 constexpr uint32_t TIMEOUT_EVENT_DELAY_ACCESS_DATASHARE = 10 * 1000;
 constexpr uint32_t PROP_LEN = 26;
@@ -270,6 +269,7 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
 #ifdef FEATURE_P2P_SUPPORT
         case SOFTBUS_SERVER_SA_ID:
+        case MIRACAST_SERVICE_UID:
             HandleP2pBusinessChange(systemAbilityId, add);
             break;
 #endif

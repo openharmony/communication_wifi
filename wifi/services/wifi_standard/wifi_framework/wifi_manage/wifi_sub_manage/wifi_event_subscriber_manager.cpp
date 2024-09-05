@@ -461,6 +461,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
     SubscribeSystemAbility(CAST_ENGINE_SA_ID);
+    SubscribeSystemAbility(MIRACAST_SERVICE_UID);
 }
 
 bool WifiEventSubscriberManager::IsDataMgrServiceActive()

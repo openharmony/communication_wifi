@@ -24,6 +24,7 @@ DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 
 namespace OHOS {
 namespace Wifi {
+    
 #ifdef DTFUZZ_TEST
 static WifiConfigCenter* gWifiConfigCenter = nullptr;
 #endif

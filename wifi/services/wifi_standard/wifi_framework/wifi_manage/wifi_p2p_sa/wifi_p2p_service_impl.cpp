@@ -39,6 +39,7 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
+    
 std::mutex WifiP2pServiceImpl::instanceLock;
 sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiP2pServiceImpl::GetInstance().GetRefPtr());

@@ -1255,6 +1255,7 @@ private:
     WifiDeviceConfig getCurrentWifiDeviceConfig();
     void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus, bool updatePortalAuthTime);
     bool CanArpReachable();
+    void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();

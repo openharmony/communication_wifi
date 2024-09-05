@@ -255,6 +255,10 @@ static WifiErrorNo RegistHdfDeathCallBack()
         return WIFI_HAL_OPT_FAILED;
     }
     LOGI("%{public}s: success to get HdfRemoteService", __func__);
+    if (g_recipient != NULL) {
+        OsalMemFree(g_recipient);
+        g_recipient = NULL;
+    }
     g_recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
     if (g_recipient == NULL) {
         LOGE("%{public}s: OsalMemCalloc is failed", __func__);

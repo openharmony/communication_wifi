@@ -1912,6 +1912,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         config.wifiWapiConfig.wapiAsCertData = "";
     }
     delete encryWapiAs;
+    encryWapiAs = nullptr;
 
     EncryptedData *encryWapiUser = new EncryptedData(config.wifiWapiConfig.encryptedUserCertData,
         config.wifiWapiConfig.userCertDataIV);
@@ -1924,6 +1925,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         config.wifiWapiConfig.wapiUserCertData = "";
     }
     delete encryWapiUser;
+    encryWapiUser = nullptr;
 }
 
 int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)

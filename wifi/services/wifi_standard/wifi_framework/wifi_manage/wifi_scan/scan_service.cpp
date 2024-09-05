@@ -1043,7 +1043,7 @@ void ScanService::EndPnoScan()
 void ScanService::HandleScreenStatusChanged()
 {
     WIFI_LOGI("Enter HandleScreenStatusChanged.");
-    SystemScanProcess(false);
+    SystemScanProcess(staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED));
     return;
 }
 

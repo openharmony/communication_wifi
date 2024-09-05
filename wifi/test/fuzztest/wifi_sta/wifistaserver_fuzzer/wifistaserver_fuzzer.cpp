@@ -16,6 +16,7 @@
 #include "wifistaserver_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 #include "mock_sta_state_machine.h"
+#include "wifi_config_center.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +27,7 @@
 #include "sta_interface.h"
 #include "sta_auto_connect_service.h"
 #include "wifi_config_center.h"
+#include "wifi_settings.h"
 #include "sta_service.h"
 #include "wifi_internal_msg.h"
 #include <mutex>

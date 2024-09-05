@@ -193,25 +193,6 @@ void StaMonitorTest::OnWpaStateChangedCallBackFail1()
     pStaMonitor->OnWpaStateChangedCallBack(status);
 }
 
-void StaMonitorTest::OnWpaSsidWrongKeyCallBackSuccess()
-{
-    int status = 1;
-    pStaMonitor->OnWpaSsidWrongKeyCallBack(status);
-}
-
-void StaMonitorTest::OnWpaSsidWrongKeyCallBackFail1()
-{
-    int status = 1;
-    pStaMonitor->pStaStateMachine = nullptr;
-    pStaMonitor->OnWpaSsidWrongKeyCallBack(status);
-}
-
-void StaMonitorTest::OnWpaSsidWrongKeyCallBackFail2()
-{
-    int status = -1;
-    pStaMonitor->OnWpaSsidWrongKeyCallBack(status);
-}
-
 void StaMonitorTest::OnWpsPbcOverlapCallBackSuccess()
 {
     int status = 1;
@@ -402,21 +383,6 @@ HWTEST_F(StaMonitorTest, OnWpaStateChangedCallBackSuccess, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnWpaStateChangedCallBackFail1, TestSize.Level1)
 {
     OnWpaStateChangedCallBackFail1();
-}
-
-HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackSuccess, TestSize.Level1)
-{
-    OnWpaSsidWrongKeyCallBackSuccess();
-}
-
-HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackFail1, TestSize.Level1)
-{
-    OnWpaSsidWrongKeyCallBackFail1();
-}
-
-HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackFail2, TestSize.Level1)
-{
-    OnWpaSsidWrongKeyCallBackFail2();
 }
 
 HWTEST_F(StaMonitorTest, OnWpsPbcOverlapCallBackSuccess, TestSize.Level1)

@@ -598,6 +598,7 @@ int WifiConfigCenter::GetAbnormalApps(std::vector<std::string> &abnormalAppList)
 int WifiConfigCenter::SaveScanInfoList(const std::vector<WifiScanInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
+    mWifiScanInfoList.clear();
     mWifiScanInfoList = results;
     return 0;
 }

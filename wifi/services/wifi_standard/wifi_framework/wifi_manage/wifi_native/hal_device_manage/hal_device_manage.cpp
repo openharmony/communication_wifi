@@ -740,9 +740,15 @@ void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
         ClearStaInfo();
         ClearApInfo();
     }
-    g_chipControllerCallback = nullptr;
-    g_chipIfaceCallback = nullptr;
-    g_IWifi = nullptr;
+    if (!g_chipControllerCallback) {
+        g_chipControllerCallback = nullptr;
+    }
+    if (!g_chipIfaceCallback) {
+        g_chipIfaceCallback = nullptr;
+    }
+    if (!g_IWifi) {
+        g_IWifi = nullptr;
+    }
     mInterfaceInfoCache.clear();
     mIWifiStaIfaces.clear();
     mIWifiApIfaces.clear();

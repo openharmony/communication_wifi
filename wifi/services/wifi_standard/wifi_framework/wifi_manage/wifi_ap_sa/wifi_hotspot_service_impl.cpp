@@ -25,7 +25,6 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_logger.h"
 #include "define.h"
-#include "wifi_logger.h"
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"
 #include "mac_address.h"

@@ -196,6 +196,8 @@ public:
     virtual int GetHotspotState(int id = 0) = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
+    virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
+    virtual bool GetScanAlwaysState(int instId) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -360,6 +362,8 @@ public:
     MOCK_METHOD1(GetHotspotState, int(int id));
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
     MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int));
+    MOCK_METHOD1(MergeWifiCloneConfig, void(std::string &cloneData));
+    MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
 };
 }  // namespace Wifi
 }  // namespace OHOS

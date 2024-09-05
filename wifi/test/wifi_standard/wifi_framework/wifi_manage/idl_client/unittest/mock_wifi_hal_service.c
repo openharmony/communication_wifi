@@ -593,18 +593,6 @@ WifiErrorNo P2pSetListenChannel(int channel, int regClass)
     return WIFI_HAL_SUCCESS;
 }
 
-WifiErrorNo P2pConnect(const P2pConnectInfo *info)
-{
-    P2pHalCbStaConnectState("00:00:00:00:00:00", "00:00:00:00:00:00", 1);
-    return WIFI_HAL_SUCCESS;
-}
-
-WifiErrorNo P2pCancelConnect()
-{
-    P2pHalCbStaConnectState("00:00:00:00:00:00", "00:00:00:00:00:00", 0);
-    return WIFI_HAL_SUCCESS;
-}
-
 WifiErrorNo P2pProvisionDiscovery(const char *peerBssid, int mode)
 {
     P2pHalCbGoNegotiationRequest(peerBssid, 10086);

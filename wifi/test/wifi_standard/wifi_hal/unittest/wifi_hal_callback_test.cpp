@@ -259,15 +259,6 @@ HWTEST_F(WifiHalCallbackTest, P2pHalCbServiceDiscoveryResponseTest, TestSize.Lev
     P2pHalCbServiceDiscoveryResponse(&info);
 }
 
-HWTEST_F(WifiHalCallbackTest, P2pHalCbStaConnectStateTest, TestSize.Level1)
-{
-    int state = STATUS_MSG;
-    char p2pDeviceAddress[] = "wifibssid";
-    char p2pGroupAddress[] = "wifiGroupAddr";
-    P2pHalCbStaConnectState(NULL, NULL, state);
-    P2pHalCbStaConnectState(p2pDeviceAddress, p2pGroupAddress, state);
-}
-
 HWTEST_F(WifiHalCallbackTest, P2pHalCbServDiscReqTest, TestSize.Level1)
 {
     P2pServDiscReqInfo info;

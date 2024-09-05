@@ -131,11 +131,6 @@ public:
         LOGI("Mock OnWpaStateChangedTest!");
     }
 
-    static void OnSsidWrongkeyTest(int status)
-    {
-        LOGI("Mock OnSsidWrongkeyTest!");
-    }
-
     static void OnWpsOverlapTest(int status)
     {
         LOGI("Mock OnWpsOverlapTest!");
@@ -162,7 +157,6 @@ public:
         callback.onConnectChanged = OnConnectChangedTest;
         callback.onBssidChanged = OnBssidChangedTest;
         callback.onWpaStateChanged = OnWpaStateChangedTest;
-        callback.onSsidWrongkey = OnSsidWrongkeyTest;
         callback.onWpsOverlap = OnWpsOverlapTest;
         callback.onWpsTimeOut = OnWpsTimeOutTest;
         callback.onWpsConnectionFull = OnWpsConnectionFullTest;

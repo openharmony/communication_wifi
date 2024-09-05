@@ -33,11 +33,6 @@ void OnWpaStateChanged(int status)
     LOGD("OnWpaStateChanged status %d", status);
 }
 
-void OnWpaSsidWrongKey(int status)
-{
-    LOGD("OnWpaSsidWrongKey status %d", status);
-}
-
 void OnWpsOverlap(int status)
 {
     LOGD("OnWpsOverlap status %d", status);
@@ -58,7 +53,6 @@ void WifiStaHalInterfaceTest::SetUpTestCase()
     WifiEventCallback callback;
     callback.onConnectChanged = OnConnectChanged;
     callback.onWpaStateChanged = OnWpaStateChanged;
-    callback.onWpaSsidWrongKey = OnWpaSsidWrongKey;
     callback.onWpsOverlap = OnWpsOverlap;
     callback.onWpsTimeOut = OnWpsTimeOut;
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback);

@@ -120,17 +120,15 @@ std::unique_ptr<WifiControllerMachine>& WifiTogglerManager::GetControllerMachine
 
 void WifiTogglerManager::InitConcreteCallback()
 {
-    using namespace std::placeholders;
-    mConcreteModeCb.onStartFailure = std::bind(&WifiTogglerManager::DealConcreateStartFailure, this, _1);
-    mConcreteModeCb.onStopped = std::bind(&WifiTogglerManager::DealConcreateStop, this, _1);
-    mConcreteModeCb.onRemoved = std::bind(&WifiTogglerManager::DealClientRemoved, this, _1);
+    mConcreteModeCb.onStartFailure = [this](int id) { this->DealConcreateStartFailure(id); };
+    mConcreteModeCb.onStopped = [this](int id) { this->DealConcreateStop(id); };
+    mConcreteModeCb.onRemoved = [this](int id) { this->DealClientRemoved(id); };
 }
 
 void WifiTogglerManager::InitSoftapCallback()
 {
-    using namespace std::placeholders;
-    mSoftApModeCb.onStartFailure = std::bind(&WifiTogglerManager::DealSoftapStartFailure, this, _1);
-    mSoftApModeCb.onStopped = std::bind(&WifiTogglerManager::DealSoftapStop, this, _1);
+    mSoftApModeCb.onStartFailure = [this](int id) { this->DealSoftapStartFailure(id); };
+    mSoftApModeCb.onStopped =  [this](int id) { this->DealSoftapStop(id); };
 }
 
 void WifiTogglerManager::DealConcreateStop(int id)

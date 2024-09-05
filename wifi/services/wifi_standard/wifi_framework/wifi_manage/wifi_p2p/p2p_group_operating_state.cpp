@@ -55,22 +55,22 @@ void P2pGroupOperatingState::GoOutState()
 
 void P2pGroupOperatingState::Init()
 {
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP, &P2pGroupOperatingState::ProcessCmdCreateGroup));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED, &P2pGroupOperatingState::ProcessGroupStartedEvt));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT, &P2pGroupOperatingState::ProcessCreateGroupTimeOut));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED, &P2pGroupOperatingState::ProcessGroupRemovedEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE, &P2pGroupOperatingState::ProcessCmdDisable));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP, &P2pGroupOperatingState::ProcessCmdRemoveGroup));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP, &P2pGroupOperatingState::ProcessCmdDeleteGroup));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdCreateGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED,
+        [this](const InternalMessagePtr msg) { return this->ProcessGroupStartedEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT,
+        [this](const InternalMessagePtr msg) { return this->ProcessCreateGroupTimeOut(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED,
+        [this](const InternalMessagePtr msg) { return this->ProcessGroupRemovedEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdDisable(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdRemoveGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdDeleteGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP,
-        &P2pGroupOperatingState::ProcessCmdHid2dCreateGroup));
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdHid2dCreateGroup(msg); }));
 }
 
 bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg) const
@@ -398,7 +398,7 @@ bool P2pGroupOperatingState::ExecuteStateMsg(InternalMessagePtr msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(msg)) {
+    if ((iter->second)(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;

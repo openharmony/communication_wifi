@@ -139,10 +139,9 @@ void P2pStateMachine::Initialize()
 
 void P2pStateMachine::RegisterEventHandler()
 {
-    using namespace std::placeholders;
-    using type = void (StateMachine::*)(int, int, int, const std::any &);
-
-    auto handler = std::bind(static_cast<type>(&StateMachine::SendMessage), this, _1, _2, _3, _4);
+    auto handler = [this](int msgName, int param1, int param2, const std::any &messageObj) {
+        this->SendMessage(msgName, param1, param2, messageObj);
+    };
 
     p2pMonitor.RegisterIfaceHandler(
         p2pIface, [=](P2P_STATE_MACHINE_CMD msgName, int param1, int param2, const std::any &messageObj) {
@@ -693,8 +692,8 @@ void P2pStateMachine::NotifyUserInvitationSentMessage(const std::string &pin, co
 void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string &pin, const std::string &peerAddress)
 {
     WIFI_LOGI("P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage  enter");
-    auto sendMessage =
-        std::bind(static_cast<void (StateMachine::*)(int)>(&StateMachine::SendMessage), this, std::placeholders::_1);
+    auto sendMessage = [this](int msgName) { this->SendMessage(msgName); };
+
     std::function<void(AlertDialog &, std::any)> acceptEvent = [=](AlertDialog &dlg, std::any msg) {
         AlertDialog dlgBuf = dlg;
         std::any msgBuf = msg;
@@ -714,10 +713,8 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
 {
     WIFI_LOGI("P2pStateMachine::NotifyUserInvitationReceivedMessage  enter");
     const std::string inputBoxPin("input pin:");
-    auto sendMessage = std::bind(static_cast<void (StateMachine::*)(int, const std::any &)>(&StateMachine::SendMessage),
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2);
+    auto sendMessage = [this](int msgName, const std::any &messageObj) { this->SendMessage(msgName, messageObj); };
+
     const WpsInfo &wps = savedP2pConfig.GetWpsInfo();
     std::function<void(AlertDialog &, std::any)> acceptEvent = [=](AlertDialog &dlg, std::any msg) {
         std::any msgBuf = msg;

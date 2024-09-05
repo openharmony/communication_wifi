@@ -61,8 +61,9 @@ ErrCode WifiP2pManager::AutoStartP2pService()
     }
 
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface(
-        std::bind(&WifiP2pManager::IfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
+    if (ifaceName.empty() &&
+        !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface([this](std::string &destoryIfaceName,
+        int createIfaceType) { this->IfaceDestoryCallback(destoryIfaceName, createIfaceType); },
         ifaceName)) {
         WIFI_LOGE("AutoStartP2pService, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -216,18 +217,32 @@ void WifiP2pManager::InitP2pCallback(void)
 {
     using namespace std::placeholders;
     mP2pCallback.callbackModuleName = "P2pManager";
-    mP2pCallback.OnP2pStateChangedEvent = std::bind(&WifiP2pManager::DealP2pStateChanged, this, _1);
-    mP2pCallback.OnP2pPeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPeersChanged, this, _1);
-    mP2pCallback.OnP2pServicesChangedEvent = std::bind(&WifiP2pManager::DealP2pServiceChanged, this, _1);
-    mP2pCallback.OnP2pConnectionChangedEvent = std::bind(&WifiP2pManager::DealP2pConnectionChanged, this, _1);
-    mP2pCallback.OnP2pThisDeviceChangedEvent = std::bind(&WifiP2pManager::DealP2pThisDeviceChanged, this, _1);
-    mP2pCallback.OnP2pDiscoveryChangedEvent = std::bind(&WifiP2pManager::DealP2pDiscoveryChanged, this, _1);
-    mP2pCallback.OnP2pGroupsChangedEvent = std::bind(&WifiP2pManager::DealP2pGroupsChanged, this);
-    mP2pCallback.OnP2pActionResultEvent = std::bind(&WifiP2pManager::DealP2pActionResult, this, _1, _2);
-    mP2pCallback.OnConfigChangedEvent = std::bind(&WifiP2pManager::DealConfigChanged, this, _1, _2, _3);
-    mP2pCallback.OnP2pGcJoinGroupEvent = std::bind(&WifiP2pManager::DealP2pGcJoinGroup, this, _1);
-    mP2pCallback.OnP2pGcLeaveGroupEvent = std::bind(&WifiP2pManager::DealP2pGcLeaveGroup, this, _1);
-    mP2pCallback.OnP2pPrivatePeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPrivatePeersChanged, this, _1);
+    mP2pCallback.OnP2pStateChangedEvent = [this](P2pState state) { this->DealP2pStateChanged(state); };
+    mP2pCallback.OnP2pPeersChangedEvent = [this](const std::vector<WifiP2pDevice> &vPeers) {
+        this->DealP2pPeersChanged(vPeers);
+    };
+    mP2pCallback.OnP2pServicesChangedEvent = [this](const std::vector<WifiP2pServiceInfo> &vServices) {
+        this->DealP2pServiceChanged(vServices);
+    };
+    mP2pCallback.OnP2pConnectionChangedEvent = [this](const WifiP2pLinkedInfo &info) {
+        this->DealP2pConnectionChanged(info);
+    };
+    mP2pCallback.OnP2pThisDeviceChangedEvent = [this](const WifiP2pDevice &info) {
+        this->DealP2pThisDeviceChanged(info);
+    };
+    mP2pCallback.OnP2pDiscoveryChangedEvent = [this](bool bState) { this->DealP2pDiscoveryChanged(bState); };
+    mP2pCallback.OnP2pGroupsChangedEvent = [this]() { this->DealP2pGroupsChanged(); };
+    mP2pCallback.OnP2pActionResultEvent = [this](P2pActionCallback action, ErrCode code) {
+        this->DealP2pActionResult(action, code);
+    };
+    mP2pCallback.OnConfigChangedEvent = [this](CfgType type, char *data, int dataLen) {
+        this->DealConfigChanged(type, data, dataLen);
+    };
+    mP2pCallback.OnP2pGcJoinGroupEvent = [this](const GcInfo &info) { this->DealP2pGcJoinGroup(info); };
+    mP2pCallback.OnP2pGcLeaveGroupEvent = [this](const GcInfo &info) { this->DealP2pGcLeaveGroup(info); };
+    mP2pCallback.OnP2pPrivatePeersChangedEvent = [this](const std::string &privateInfo) {
+        this->DealP2pPrivatePeersChanged(privateInfo);
+    };
     return;
 }
 

@@ -194,7 +194,7 @@ private:
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;
-    using ProcessFun = bool (GroupFormedState::*)(const InternalMessagePtr msg) const;
+    using ProcessFun = std::function<bool(const InternalMessagePtr)> const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
 };
 } // namespace Wifi

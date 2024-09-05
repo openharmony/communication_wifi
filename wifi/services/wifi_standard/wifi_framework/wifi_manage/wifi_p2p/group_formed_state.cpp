@@ -46,44 +46,44 @@ void GroupFormedState::GoOutState()
 
 void GroupFormedState::Init()
 {
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::AP_STA_CONNECTED, &GroupFormedState::ProcessConnectEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::AP_STA_DISCONNECTED, &GroupFormedState::ProcessDisconnectEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST, &GroupFormedState::ProcessDeviceLostEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP, &GroupFormedState::ProcessCmdRemoveGroup));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP, &GroupFormedState::ProcessCmdDeleteGroup));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED, &GroupFormedState::ProcessGroupRemovedEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP_CLIENT, &GroupFormedState::ProcessCmdRemoveGroupClient));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CONNECT, &GroupFormedState::ProcessCmdConnect));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ, &GroupFormedState::ProcessProvDiscEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN, &GroupFormedState::ProcessProvDiscEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN, &GroupFormedState::ProcessProvDiscEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED, &GroupFormedState::ProcessGroupStartedEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS, &GroupFormedState::ProcessCmdDiscoverPeer));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES, &GroupFormedState::ProcessCmdDiscServices));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN, &GroupFormedState::ProcessCmdStartListen));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE, &GroupFormedState::ProcessCmdDisable));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &GroupFormedState::ProcessCmdCancelConnect));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, &GroupFormedState::ProcessCmdChSwitch));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IP_ADDRESS, &GroupFormedState::ProcessCmdSetIpAddress));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::AP_STA_CONNECTED,
+        [this](InternalMessagePtr msg) { return this->ProcessConnectEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::AP_STA_DISCONNECTED,
+        [this](InternalMessagePtr msg) { return this->ProcessDisconnectEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST,
+        [this](InternalMessagePtr msg) { return this->ProcessDeviceLostEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdRemoveGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDeleteGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_REMOVED,
+        [this](InternalMessagePtr msg) { return this->ProcessGroupRemovedEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP_CLIENT,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdRemoveGroupClient(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CONNECT,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdConnect(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED,
+        [this](InternalMessagePtr msg) { return this->ProcessGroupStartedEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDiscoverPeer(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDiscServices(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdStartListen(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDisable(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdCancelConnect(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdChSwitch(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IP_ADDRESS,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdSetIpAddress(msg); }));
 }
 
 bool GroupFormedState::ProcessCmdConnect(const InternalMessagePtr msg) const
@@ -380,7 +380,7 @@ bool GroupFormedState::ExecuteStateMsg(InternalMessagePtr msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(msg)) {
+    if ((iter->second)(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;

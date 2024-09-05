@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace Wifi {
 
+
 struct Hid2dInfo {
     Hid2dUpperScene softBusScene;
     Hid2dUpperScene castScene;

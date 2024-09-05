@@ -34,6 +34,7 @@ DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 namespace OHOS {
 namespace Wifi {
 
+
 ScanService::ScanService(int instId)
     : pScanStateMachine(nullptr),
       pScanMonitor(nullptr),

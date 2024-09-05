@@ -28,7 +28,6 @@
 #define LOG_TAG "WifiHalApInterface"
 
 #define DISABLE_AP_WAIT_MS 50000
-#define ABLE_AP_WAIT_MS 50000
 #define WIFI_MULTI_CMD_MAX_LEN 1024
 #define IFCAE_NAME_LEN 256
 

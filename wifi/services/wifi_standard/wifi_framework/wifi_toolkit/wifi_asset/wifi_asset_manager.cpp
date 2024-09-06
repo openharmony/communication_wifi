@@ -214,14 +214,15 @@ static void WifiAssetAttrQuery(const AssetResultSet &resultSet, int32_t userId,
 WifiAssetManager &WifiAssetManager::GetInstance()
 {
     static WifiAssetManager gWifiAsset;
-    if (gWifiAsset.assetServiceThread_ == nullptr) {
-        gWifiAsset.assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
-    }
     return gWifiAsset;
 }
  
 WifiAssetManager::WifiAssetManager()
-{}
+{
+    if (assetServiceThread_ == nullptr) {
+        assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
+    }
+}
  
 WifiAssetManager::~WifiAssetManager()
 {
@@ -229,9 +230,21 @@ WifiAssetManager::~WifiAssetManager()
         assetServiceThread_.reset();
     }
 }
- 
+
+void WifiAssetManager::InitUpLoadLocalDeviceSync()
+{
+    if (firstSync_ == true) {
+        return;
+    }
+    WifiSettings::GetInstance().UpLoadLocalDeviceConfigToCloud();
+    firstSync_ = true;
+}
+
 void WifiAssetManager::CloudAssetSync()
 {
+    if (!firstSync_) {
+        LOGE("WifiAssetManager, local data not sync");
+    }
     WifiAssetQuery(USER_ID_DEFAULT);
 }
  

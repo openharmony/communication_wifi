@@ -124,64 +124,6 @@ ohos_shared_library("wifiext") {
   subsystem_name = "communication"
 }
 
-ohos_shared_library("wifi_native_js") {
-  branch_protector_ret = "pac_ret"
-
-  sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
-    debug = false
-  }
-  install_enable = true
-  include_dirs = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-    "$WIFI_ROOT_DIR/frameworks/js/napi/inc",
-    "$WIFI_ROOT_DIR/interfaces/inner_api",
-    "$WIFI_ROOT_DIR/frameworks/native/include",
-    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "$WIFI_ROOT_DIR/frameworks/native/src",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
-    "$WIFI_ROOT_DIR/utils/inc",
-  ]
-
-  sources = [
-    "src/wifi_napi_device.cpp",
-    "src/wifi_napi_entry.cpp",
-    "src/wifi_napi_errcode.cpp",
-    "src/wifi_napi_event.cpp",
-    "src/wifi_napi_hotspot.cpp",
-    "src/wifi_napi_p2p.cpp",
-    "src/wifi_napi_utils.cpp",
-  ]
-  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
-
-  defines = [ "ENABLE_NAPI_COMPATIBLE" ]
-
-  if (wifi_feature_with_random_mac_addr) {
-    defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
-  }
-
-  external_deps = [
-    "ability_runtime:app_context",
-    "access_token:libaccesstoken_sdk",
-    "bundle_framework:appexecfwk_base",
-    "c_utils:utils",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-    "napi:ace_napi",
-    "samgr:samgr_proxy",
-  ]
-  cflags = memory_optimization_cflags
-  cflags_cc = memory_optimization_cflags_cc
-  ldflags = memory_optimization_ldflags
-  relative_install_dir = "module"
-  part_name = "wifi"
-  subsystem_name = "communication"
-}
-
 ohos_shared_library("wifimanager") {
   branch_protector_ret = "pac_ret"
 

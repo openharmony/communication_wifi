@@ -451,7 +451,6 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    pService->SetGroupUid(callingUid);
     return pService->CreateGroup(config);
 }
 
@@ -611,7 +610,6 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
-    pService->SetGroupUid(GetCallingUid());
     return pService->P2pConnect(updateConfig);
 }
 
@@ -1162,10 +1160,6 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     pService->DecreaseSharedLink(callingUid);
-    if (pService->GetSharedLinkCount() == 0) {
-        WIFI_LOGI("Shared link count == 0, remove group!");
-        RemoveGroup();
-    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1193,7 +1187,6 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
-    pService->SetGroupUid(callingUid);
     return pService->Hid2dCreateGroup(frequency, type);
 }
 
@@ -1234,7 +1227,6 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
     }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));
-    pService->SetGroupUid(callingUid);
     return pService->Hid2dConnect(config);
 }
 

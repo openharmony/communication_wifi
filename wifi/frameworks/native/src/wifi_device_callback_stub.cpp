@@ -95,7 +95,7 @@ bool WifiDeviceCallBackStub::IsRemoteDied() const
 
 void WifiDeviceCallBackStub::SetRemoteDied(bool val)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::SetRemoteDied, state:%{public}d!", val);
+    WIFI_LOGI("SetRemoteDied, state:%{public}d!", val);
     mRemoteDied = val;
 }
 
@@ -120,7 +120,7 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int stat
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::OnWifiRssiChanged, rssi:%{public}d!", rssi);
+    WIFI_LOGI("OnWifiRssiChanged, rssi:%{public}d!", rssi);
     if (callback_) {
         callback_->OnWifiRssiChanged(rssi);
     }
@@ -145,7 +145,7 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange value)
 {
-    WIFI_LOGI("WifiDeviceCallBackStub::OnDeviceConfigChanged, value:%{public}d!", value);
+    WIFI_LOGI("OnDeviceConfigChanged, value:%{public}d!", value);
     if (callback_) {
         callback_->OnDeviceConfigChanged(value);
     }

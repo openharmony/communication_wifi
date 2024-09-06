@@ -67,6 +67,7 @@ void WifiNetStatsManager::StopNetStats()
 
 void WifiNetStatsManager::PerformPollAndLog()
 {
+    WIFI_LOGI("%{public}s, enter", __FUNCTION__);
     NetStats curNetStats;
     if (GetWifiNetStatsDetail(curNetStats) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("%{public}s, get network stats failed", __FUNCTION__);

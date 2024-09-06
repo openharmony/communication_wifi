@@ -169,8 +169,8 @@ napi_value NapiEvent::CreateResult(const napi_env& env, const WifiP2pDevice& dev
     SetValueUtf8String(env, "deviceAddress", device.GetDeviceAddress(), result);
     SetValueInt32(env, "deviceAddressType", device.GetDeviceAddressType(), result);
     SetValueUtf8String(env, "primaryDeviceType", device.GetPrimaryDeviceType(), result);
-    SetValueInt32(env, "devStatus", static_cast<int>(device.GetP2pDeviceStatus()), result);
-    SetValueInt32(env, "groupCapability", device.GetGroupCapabilitys(), result);
+    SetValueInt32(env, "deviceStatus", static_cast<int>(device.GetP2pDeviceStatus()), result);
+    SetValueInt32(env, "groupCapabilities", device.GetGroupCapabilitys(), result);
     return result;
 }
 

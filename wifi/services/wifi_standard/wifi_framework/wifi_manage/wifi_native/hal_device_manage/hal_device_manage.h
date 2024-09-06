@@ -362,7 +362,10 @@ public:
      * @param power: [in] power
      * @return bool
      */
-    bool SetTxPower(const std::string &ifaceName, int power);
+    bool SetTxPower(int power);
+
+    int32_t IfaceSetTxPower(const std::string &ifaceName,
+                            const std::map<std::string, sptr<IChipIface>> &mWifiIfaces, int power);
 
     /**
      * @Description get the power mode.

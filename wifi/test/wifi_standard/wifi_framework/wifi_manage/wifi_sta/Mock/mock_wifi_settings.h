@@ -59,7 +59,6 @@ public:
     virtual int SetRealMacAddress(const std::string &macAddress, int instId = 0) = 0;
     virtual int GetRealMacAddress(std::string &macAddress, int instId = 0) = 0;
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
-    virtual void GetPortalUri(WifiPortalConf &urlInfo) = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
     virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
     virtual int GetMinRssi2Dot4Ghz(int instId = 0) = 0;
@@ -133,7 +132,6 @@ public:
     MOCK_METHOD2(SetRealMacAddress, int(const std::string &macAddress, int));
     MOCK_METHOD2(GetRealMacAddress, int(std::string &macAddress, int));
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
-    MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
     MOCK_METHOD1(GetPackageFilterMap,  int(std::map<std::string, std::vector<std::string>> &filterMap));
     MOCK_METHOD1(GetMinRssi2Dot4Ghz, int(int));

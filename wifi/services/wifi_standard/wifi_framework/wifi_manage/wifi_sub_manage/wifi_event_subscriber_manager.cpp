@@ -75,7 +75,9 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED, &
     CesEventSubscriber::OnReceiveThermalEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
-    CesEventSubscriber::OnReceiveStandbyEvent}
+    CesEventSubscriber::OnReceiveStandbyEvent},
+    {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED, &
+    CesEventSubscriber::OnReceiveUserUnlockedEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -1098,6 +1100,13 @@ void AssetEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData 
     WifiAssetManager::GetInstance().CloudAssetSync();
 }
 #endif
+void CesEventSubscriber::OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    WIFI_LOGI("OnReceiveUserUnlockedEvent");
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().InitUpLoadLocalDeviceSync();
+#endif
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

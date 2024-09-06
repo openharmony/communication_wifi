@@ -32,6 +32,8 @@ public:
     ~WifiAssetManager();
  
     static WifiAssetManager &GetInstance();
+
+    void InitUpLoadLocalDeviceSync();
  
     void CloudAssetSync();
  
@@ -60,6 +62,8 @@ public:
     bool IsWifiConfigUpdated(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs, WifiDeviceConfig &config);
 private:
     std::unique_ptr<WifiEventHandler> assetServiceThread_ = nullptr;
+
+    std::atomic<bool> firstSync_ = false;
 };
 }  // namespace Wifi
 }  // namespace OHOS

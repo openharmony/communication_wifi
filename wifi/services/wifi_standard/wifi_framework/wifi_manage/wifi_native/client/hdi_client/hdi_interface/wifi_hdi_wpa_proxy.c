@@ -188,11 +188,12 @@ WifiErrorNo SetNativeProcessCallback(void (*callback)(int))
 
 static void HdiWpaResetGlobalObj()
 {
+    pthread_mutex_lock(&g_wpaObjMutex);
     if (IsHdiWpaStopped() == WIFI_HAL_OPT_OK) {
         LOGE("%{public}s HdiWpa already stopped", __func__);
+        pthread_mutex_unlock(&g_wpaObjMutex);
         return;
     }
-    pthread_mutex_lock(&g_wpaObjMutex);
     IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
     g_wpaObj = NULL;
     if (g_devMgr != NULL) {

@@ -276,6 +276,8 @@ public:
 
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs);
+
+    void UpLoadLocalDeviceConfigToCloud();
 #endif
 
 private:

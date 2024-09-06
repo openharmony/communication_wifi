@@ -1389,6 +1389,13 @@ bool StaStateMachine::IsDisConnectReasonShouldStopTimer(int reason)
     return reason == DIS_REASON_DISASSOC_STA_HAS_LEFT;
 }
 
+void StaStateMachine::AddRandomMacCure()
+{
+    if (targetNetworkId == mLastConnectNetId) {
+        mConnectFailedCnt++;
+    }
+}
+
 void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
 {
     LOGW("enter DealWpaLinkFailEvent.\n");
@@ -1441,6 +1448,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
+            AddRandomMacCure();
             break;
         case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
             WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
@@ -1450,6 +1458,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
+            AddRandomMacCure();
             break;
         default:
             LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);

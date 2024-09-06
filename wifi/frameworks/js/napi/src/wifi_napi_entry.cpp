@@ -21,8 +21,6 @@
 
 namespace OHOS {
 namespace Wifi {
-#ifndef ENABLE_NAPI_COMPATIBLE
-
 static napi_value SuppStateInit(napi_env env)
 {
     napi_value suppState = nullptr;
@@ -423,49 +421,9 @@ static napi_module wifiJsModule = {
     .reserved = { 0 }
 };
 
-#else
-
-/*
- * Module initialization function
- */
-static napi_value InitForCompatible(napi_env env, napi_value exports) {
-    napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("enableWifi", EnableWifi),
-        DECLARE_NAPI_FUNCTION("disableWifi", DisableWifi),
-        DECLARE_NAPI_FUNCTION("isWifiActive", IsWifiActive),
-        DECLARE_NAPI_FUNCTION("scan", Scan),
-        DECLARE_NAPI_FUNCTION("getScanInfos", GetScanInfos),
-        DECLARE_NAPI_FUNCTION("addDeviceConfig", AddDeviceConfig),
-        DECLARE_NAPI_FUNCTION("connectToNetwork", ConnectToNetwork),
-        DECLARE_NAPI_FUNCTION("connectToDevice", ConnectToDevice),
-        DECLARE_NAPI_FUNCTION("disconnect", Disconnect),
-        DECLARE_NAPI_FUNCTION("getSignalLevel", GetSignalLevel),
-    };
-
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
-    return exports;
-}
-
-/* @Deprecated - Changeme module name from "wifi_native_js" to "wifi",
- * "wifi_native_js" will be discarded. Modify @11/2021
- */
-static napi_module wifiJsModuleForCompatible = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = NULL,
-    .nm_register_func = InitForCompatible,
-    .nm_modname = "wifi_native_js",
-    .nm_priv = ((void *)0),
-    .reserved = { 0 }
-};
-#endif
 
 extern "C" __attribute__((constructor)) void RegisterModule(void) {
-#ifndef ENABLE_NAPI_COMPATIBLE
     napi_module_register(&wifiJsModule);
-#else
-    napi_module_register(&wifiJsModuleForCompatible);
-#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -41,6 +41,7 @@
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
 #include "wifi_randommac_helper.h"
+#include "wifi_sta_hal_interface.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -700,16 +701,11 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
         WIFI_LOGE("SetTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
-    if (!IsStaServiceRunning()) {
-        return WIFI_OPT_STA_NOT_OPENED;
+    if (WifiStaHalInterface::GetInstance().SetTxPower(power) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("SetTxPower() failed");
+        return WIFI_OPT_FAILED;
     }
-
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if (pService == nullptr) {
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
-    return pService->SetTxPower(power);
+    return WIFI_OPT_SUCCESS;
 }
 
 void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result)

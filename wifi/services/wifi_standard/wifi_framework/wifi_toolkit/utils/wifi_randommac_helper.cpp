@@ -163,7 +163,7 @@ void WifiRandomMacHelper::LongLongToBytes(unsigned long long value, std::vector<
 unsigned long long WifiRandomMacHelper::BytesToLonglong(const std::vector<uint8_t> &byte)
 {
     if (byte.size() != LONG_TO_BYTE_SIZE) {
-        WIFI_LOGI("%{public}s byte size is invalid :%{public}zu", __func__, byte.size());
+        WIFI_LOGI("%{public}s byte size is invalid :%{public}lu", __func__, byte.size());
         return 0;
     }
     unsigned long long value = 0;
@@ -256,7 +256,7 @@ int WifiRandomMacHelper::GenerateRandomMacAddressByLong(unsigned long long rando
     std::vector<uint8_t> bytes = {};
     WifiRandomMacHelper::LongLongToBytes(random, bytes);
     if (bytes.size() != LONG_TO_BYTE_SIZE) {
-        WIFI_LOGE("%{public}s LongLongToBytes failed size:%{public}zu", __func__, bytes.size());
+        WIFI_LOGE("%{public}s LongLongToBytes failed size:%{public}lu", __func__, bytes.size());
         return -1;
     }
     std::vector<uint8_t> addrBytes = {};

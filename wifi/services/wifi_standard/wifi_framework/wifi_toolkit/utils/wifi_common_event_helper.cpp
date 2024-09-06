@@ -89,7 +89,7 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const s
     commonData.SetCode(code);
     commonData.SetData(data);
     if (!CommonEventManager::PublishCommonEvent(commonData)) {
-        WIFI_LOGE("failed to publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
+        WIFI_LOGE("failed to publish event:%{public}s, code:%{public}d", eventAction.c_str(), code);
         return false;
     }
 #endif

@@ -74,8 +74,7 @@ template <typename E, int... Is>
 constexpr size_t GetEnumSize(std::integer_sequence<int, Is...>)
 {
     constexpr std::array<bool, sizeof...(Is)> valid{IsValid<E, static_cast<E>(Is)>()...};
-    constexpr std::size_t count = [](decltype((valid)) validValue) constexpr noexcept->std::size_t
-    {
+    constexpr std::size_t count = [](decltype((valid)) validValue) constexpr noexcept->std::size_t {
         auto nSize = std::size_t{0};
         for (std::size_t index = 0; index < validValue.size(); ++index) {
             if (validValue[index]) {
@@ -84,7 +83,7 @@ constexpr size_t GetEnumSize(std::integer_sequence<int, Is...>)
         }
         return nSize;
     }
-    (valid);
+        (valid);
     return count;
 }
 

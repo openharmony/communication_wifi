@@ -649,8 +649,8 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
             int uid = mScanCallBackInfo[msg.id][remote].callingUid;
             int pid = mScanCallBackInfo[msg.id][remote].callingPid;
             isFrozen = IsAppFrozen(pid);
-            WIFI_LOGD("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
-                %{public}d", uid, pid, isFrozen);
+            WIFI_LOGD("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
+                uid, pid, isFrozen);
 #endif
             if (mScanCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGI("Not registered callback event! msg.msgCode: %{public}d,"
@@ -692,8 +692,8 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
             int uid = mStaCallBackInfo[msg.id][remote].callingUid;
             int pid = mStaCallBackInfo[msg.id][remote].callingPid;
             isFrozen = IsAppFrozen(pid);
-            WIFI_LOGD("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
-                %{public}d", uid, pid, isFrozen);
+            WIFI_LOGD("Check calling APP is hardwareProxied,"
+                "uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d", uid, pid, isFrozen);
 #endif
             if (mStaCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGD("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode: %{public}d,"

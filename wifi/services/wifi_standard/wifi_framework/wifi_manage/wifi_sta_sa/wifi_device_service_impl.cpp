@@ -40,6 +40,7 @@
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
+#include "wifi_sta_hal_interface.h"
 #include "wifi_randommac_helper.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
@@ -676,14 +677,13 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("setTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
@@ -979,7 +979,6 @@ ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std
     }
     return pService->StartRoamToNetwork(networkId, bssid);
 }
-
 
 ErrCode WifiDeviceServiceImpl::StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate)
 {

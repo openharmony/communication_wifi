@@ -68,7 +68,7 @@ public:
     ErrCode RemoveDevice(int networkId) override;
 
     ErrCode RemoveAllDevice() override;
-
+    
     ErrCode SetTxPower(int power) override;
 
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
@@ -157,9 +157,9 @@ public:
     ErrCode IsBandTypeSupported(int bandType, bool &supported) override;
 
     ErrCode Get5GHzChannelList(std::vector<int> &result) override;
-    
+
     ErrCode StartPortalCertification() override;
-    
+
     static void SaBasicDump(std::string& result);
 
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;

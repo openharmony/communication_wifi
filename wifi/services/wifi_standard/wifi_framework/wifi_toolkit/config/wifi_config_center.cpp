@@ -876,6 +876,7 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
     } else {
         mHid2dUpperScenePair.insert_or_assign(SOFT_BUS_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(CAST_ENGINE_SERVICE_UID, scene);
+        mHid2dUpperScenePair.insert_or_assign(MIRACAST_SERVICE_UID, scene);
     }
 }
 

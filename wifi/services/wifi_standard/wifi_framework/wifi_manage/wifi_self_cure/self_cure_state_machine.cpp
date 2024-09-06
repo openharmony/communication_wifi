@@ -53,7 +53,6 @@ const int CMD_WIFI_CONNECT_TIMEOUT_SCREEN = 8 * 1000;
 const int CMD_WIFI_CONNECT_TIMEOUT = 16 * 1000;
 const int PUBLIC_DNS_SERVERS_SIZE = 46;
 const int PUBLIC_IP_ADDR_NUM = 4;
-const std::string SETTINGS_PAGE = "com.huawei.hmos.settings";
 const std::string INIT_SELFCURE_HISTORY = "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
 const std::string COUNTRY_CHINA_CAPITAL = "CN";
 const std::string COUNTRY_CODE_CN = "460";
@@ -3103,7 +3102,15 @@ bool SelfCureStateMachine::IfMultiGateway()
 
 bool SelfCureStateMachine::IsSettingsPage()
 {
-    if (WifiAppStateAware::GetInstance().IsForegroundApp(SETTINGS_PAGE)) {
+    std::map<std::string, std::string> variableMap;
+    std::string page;
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("SETTINGS") != variableMap.end()) {
+        page = variableMap["SETTINGS"];
+    }
+    if (WifiAppStateAware::GetInstance().IsForegroundApp(page)) {
         WIFI_LOGI("settings page, do not allow reset self cure");
         return true;
     }

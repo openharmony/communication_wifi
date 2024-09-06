@@ -91,7 +91,6 @@ public:
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
     virtual void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0) = 0;
-    virtual void GetPortalUri(WifiPortalConf &urlInfo) = 0;
     virtual void InsertWifi6BlackListCache(const std::string currentBssid,
         const Wifi6BlackListInfo wifi6BlackListInfo) = 0;
     virtual void RemoveWifi6BlackListCache(const std::string bssid) = 0;
@@ -258,7 +257,6 @@ public:
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
     MOCK_METHOD2(SaveDisconnectedReason, void(DisconnectedReason discReason, int));
-    MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
     MOCK_METHOD2(InsertWifi6BlackListCache, void(const std::string currentBssid,
         const Wifi6BlackListInfo wifi6BlackListInfo));
     MOCK_METHOD1(RemoveWifi6BlackListCache, void(const std::string bssid));

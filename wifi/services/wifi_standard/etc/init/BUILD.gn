@@ -15,19 +15,11 @@ import("//build/ohos.gni")
 
 group("etc") {
   deps = [ ":wifi_standard.cfg" ]
-  deps += [ ":wifi_portal.conf" ]
 }
 
 ohos_prebuilt_etc("wifi_standard.cfg") {
   source = "wifi_standard.cfg"
   relative_install_dir = "init"
-  part_name = "wifi"
-  subsystem_name = "communication"
-}
-
-ohos_prebuilt_etc("wifi_portal.conf") {
-  source = "wifi_portal.conf"
-  relative_install_dir = "wifi"
   part_name = "wifi"
   subsystem_name = "communication"
 }

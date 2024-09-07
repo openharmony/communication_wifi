@@ -29,6 +29,8 @@
 #define CAST_ENGINE_SERVICE_UID 5526
 #define MIRACAST_SERVICE_UID 5529
 #define MIRACAST_SERVICE_SA_ID 5527
+#define SHARE_SERVICE_UID 5520
+#define MOUSE_CROSS_SERVICE_UID 6699
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;

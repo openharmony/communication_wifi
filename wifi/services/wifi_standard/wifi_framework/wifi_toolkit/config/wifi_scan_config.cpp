@@ -54,6 +54,10 @@ void WifiScanConfig::GetScanDeviceInfo(WifiScanDeviceInfo &scanDeviceInfo)
         mScanDeviceInfo.hid2dInfo.castScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID,
         mScanDeviceInfo.hid2dInfo.miraCastScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SHARE_SERVICE_UID,
+        mScanDeviceInfo.hid2dInfo.shareScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MOUSE_CROSS_SERVICE_UID,
+        mScanDeviceInfo.hid2dInfo.mouseCrossScene);
     scanDeviceInfo = mScanDeviceInfo;
 }
 

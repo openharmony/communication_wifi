@@ -209,7 +209,12 @@ PoorPortalWifiFilter::~PoorPortalWifiFilter()
 bool PoorPortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &interScanInfo = networkCandidate.interScanInfo;
-    
+    if (networkCandidate.wifiDeviceConfig.isPortal &&
+        networkSelectionResult.wifiDeviceConfig.noInternetAcces &&
+        !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
+            networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
+        return false;
+    }
     int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(interScanInfo.rssi, interScanInfo.band);
     if (currentSignalLevel > SIGNAL_LEVEL_TWO) {
         return true;
@@ -239,6 +244,12 @@ PortalWifiFilter::~PortalWifiFilter()
 
 bool PortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
+    if (networkCandidate.wifiDeviceConfig.isPortal &&
+        networkSelectionResult.wifiDeviceConfig.noInternetAcces &&
+        !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
+            networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
+        return false;
+    }
     return networkCandidate.wifiDeviceConfig.isPortal;
 }
 

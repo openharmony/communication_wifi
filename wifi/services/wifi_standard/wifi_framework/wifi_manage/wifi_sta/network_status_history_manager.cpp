@@ -129,5 +129,6 @@ std::string NetworkStatusHistoryManager::ToString(uint32_t networkStatusHistory)
     }
     return networkStatusString.str();
 }
+
 }
 }

@@ -92,6 +92,7 @@ public:
      * @return
      */
     static std::string ToString(uint32_t networkStatusHistory);
+
 private:
 
     /**

@@ -13,35 +13,6 @@
  * limitations under the License.
  */
 
-void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCureLevel)
-{
-    WIFI_LOGI("enter SelfCureForReset, internetUnknown is %{public}d, hasInternetRecently, %{public}d",
-        pSelfCureStateMachine->internetUnknown, hasInternetRecently);
-    if ((pSelfCureStateMachine->internetUnknown) || (!hasInternetRecently) ||
-        (pSelfCureStateMachine->IsSettingsPage())) {
-        pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pNoInternetState);
-        return;
-    }
-
-    if ((currentRssi < MIN_VAL_LEVEL_3_5) || pSelfCureStateMachine->IfP2pConnected()) {
-        delayedResetSelfCure = true;
-        return;
-    }
-    WIFI_LOGI("begin to self cure for internet access: Reset");
-    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
-    pSelfCureStateMachine->selfCureOnGoing = true;
-    pSelfCureStateMachine->StopTimer(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK);
-    delayedResetSelfCure = false;
-    testedSelfCureLevel.push_back(requestCureLevel);
-
-    WifiLinkedInfo wifiLinkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
-    WifiConfigCenter::GetInstance().SetLastNetworkId(wifiLinkedInfo.networkId);
-    pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
-    pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
-    pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
-}
-
 #ifndef OHOS_SELF_CURE_STATE_MACHINE_H
 #define OHOS_SELF_CURE_STATE_MACHINE_H
 

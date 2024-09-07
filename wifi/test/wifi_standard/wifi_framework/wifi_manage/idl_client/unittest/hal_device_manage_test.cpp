@@ -552,7 +552,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest_01, TestSize.Level1)
     DelayedSingleton<HalDeviceManager>::GetInstance()->mIWifiApIfaces.insert(
         std::pair<std::string, sptr<IChipIface>>(ifaceName, iface));
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetApMacAddress(ifaceName, mac);
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, true);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, ValidateInterfaceCacheTest_01, TestSize.Level1)

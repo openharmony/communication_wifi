@@ -61,10 +61,8 @@ public:
     virtual ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
         char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) override;
     virtual ErrCode Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr) override;
-    void SetGroupUid(int callingUid) override;
     void IncreaseSharedLink(int callingUid) override;
     void DecreaseSharedLink(int callingUid) override;
-    int GetSharedLinkCount(void) override;
     virtual ErrCode HandleBusinessSAException(int systemAbilityId) override;
     int GetP2pRecommendChannel(void) override;
     virtual ErrCode Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene) override;

@@ -82,7 +82,8 @@ constexpr size_t GetEnumSize(std::integer_sequence<int, Is...>)
             }
         }
         return nSize;
-    } (valid);
+    }
+        (valid);
     return count;
 }
 

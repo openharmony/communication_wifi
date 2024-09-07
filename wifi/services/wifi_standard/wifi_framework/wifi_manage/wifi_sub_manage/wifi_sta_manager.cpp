@@ -226,7 +226,8 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         }
     }
     PublishWifiOperateStateHiSysEvent(state);
-    if (info.connState == ConnState::AUTHENTICATING) {
+    if (info.connState == ConnState::AUTHENTICATING)
+    {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
             static_cast<int>(WifiOperateState::STA_AUTHING));
     }

@@ -331,7 +331,7 @@ ErrCode StaInterface::SetPowerMode(bool mode)
 
 ErrCode StaInterface::SetTxPower(int power)
 {
-    LOGD("Enter SetTxPower, power=[%{public}d]!", power);
+    LOGI("Enter SetTxPower, power=[%{public}d]!", power);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->SetTxPower(power) != WIFI_OPT_SUCCESS) {
@@ -449,10 +449,10 @@ ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, cons
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->EnableHiLinkHandshake(config, bssid);
- 
+
     return WIFI_OPT_SUCCESS;
 }
- 
+
 ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
 {
     WIFI_LOGI("Enter DeliverStaIfaceData");
@@ -464,7 +464,7 @@ ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
 
 bool StaInterface::InitStaServiceLocked()
 {
-    if (pStaService == nullptr) {
+    if(pStaService == nullptr) {
         pStaService = new (std::nothrow) StaService(m_instId);
         if (pStaService == nullptr) {
             WIFI_LOGE("New StaService failed.\n");

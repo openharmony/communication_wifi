@@ -238,9 +238,9 @@ public:
     virtual ErrCode SetPowerMode(bool mode) = 0;
 
     /**
-     * @Description set tx power for sar.
+     * @Description set tx power for sar
      *
-     * @param power: 1001,1002,1003......
+     * @param power: 1001,1002,1003······
      * @return WifiErrorNo
      */
     virtual ErrCode SetTxPower(int power) = 0;
@@ -339,7 +339,7 @@ public:
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid) = 0;
- 
+
     /**
      * @Description deliver mac
      *

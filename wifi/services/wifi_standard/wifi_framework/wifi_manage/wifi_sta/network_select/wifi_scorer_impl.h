@@ -147,6 +147,7 @@ class SavedNetworkScorer : public CompositeWifiScorer {
 public:
     explicit SavedNetworkScorer(const std::string &scorerName);
 };
+
 }
 
 #endif

@@ -209,6 +209,7 @@ PoorPortalWifiFilter::~PoorPortalWifiFilter()
 bool PoorPortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &interScanInfo = networkCandidate.interScanInfo;
+    
     int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(interScanInfo.rssi, interScanInfo.band);
     if (currentSignalLevel > SIGNAL_LEVEL_TWO) {
         return true;

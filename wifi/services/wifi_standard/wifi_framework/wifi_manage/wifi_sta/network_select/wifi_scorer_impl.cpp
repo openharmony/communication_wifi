@@ -45,6 +45,7 @@ constexpr int MIN_RSSI = -128;
 constexpr int INTERNET_ACCESS_AWARD = 2;
 constexpr int EMPTY_NETWORK_STATUS_HISTORY_AWARD = 1;
 
+
 RssiScorer::RssiScorer() : SimpleWifiScorer("rssiScorer") {}
 
 double RssiScorer::Score(NetworkCandidate &networkCandidate)

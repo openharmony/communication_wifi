@@ -283,6 +283,7 @@ string PortalNetworkSelector::GetNetworkSelectorMsg()
 NoInternetNetworkSelector::NoInternetNetworkSelector() : SimpleFilterNetworkSelector("noInternetNetworkSelector")
 {
     SetWifiFilter(make_shared<NoInternetWifiFilter>());
+    
     auto networkScorerComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     networkScorerComparator->AddScorer(make_shared<SavedNetworkScorer>("noInternetNetworkScorer"));
     networkScorerComparator->AddScorer(make_shared<RssiScorer>());

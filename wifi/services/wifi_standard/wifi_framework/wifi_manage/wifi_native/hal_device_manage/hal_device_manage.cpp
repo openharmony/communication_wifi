@@ -619,9 +619,9 @@ bool HalDeviceManager::SetTxPower(const std::string &ifaceName, int power)
     if (!CheckReloadChipHdiService()) {
         return false;
     }
-    
+
     std::lock_guard<std::mutex> lock(mMutex);
-    LOGD("SetTxPower, ifaceName:%{public}s, power:%{public}d", ifaceName.c_str(), power);
+    LOGI("SetTxPower, ifaceName:%{public}s, power:%{public}d", ifaceName.c_str(), power);
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter == mIWifiStaIfaces.end()) {
         LOGE("SetTxPower, not find iface info");
@@ -636,7 +636,7 @@ bool HalDeviceManager::SetTxPower(const std::string &ifaceName, int power)
         return false;
     }
 
-    LOGD("SetTxPower success");
+    LOGI("SetTxPower success");
     return true;
 }
 

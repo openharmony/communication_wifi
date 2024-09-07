@@ -233,13 +233,12 @@ public:
     virtual ErrCode SetPowerMode(bool mode) override;
 
     /**
-     * @Description send tx power for sar.
+     * @Description set tx power for sar
      *
-     * @param power: 1001,1002,1003......
+     * @param power: 1001,1002,1003······
      * @return WifiErrorNo
      */
     virtual ErrCode SetTxPower(int power) override;
-
     /**
      * @Description systemabilitychanged
      *
@@ -333,7 +332,7 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid) override;
- 
+
 	/**
      * @Description DeliverStaIfaceData.
      *

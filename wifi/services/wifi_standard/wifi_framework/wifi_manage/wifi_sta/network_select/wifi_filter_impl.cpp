@@ -210,7 +210,7 @@ bool PoorPortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &interScanInfo = networkCandidate.interScanInfo;
     if (networkCandidate.wifiDeviceConfig.isPortal &&
-        networkCandidate.wifiDeviceConfig.noInternetAcces &&
+        networkCandidate.wifiDeviceConfig.noInternetAccess &&
         !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
             networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
         return false;
@@ -245,7 +245,7 @@ PortalWifiFilter::~PortalWifiFilter()
 bool PortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     if (networkCandidate.wifiDeviceConfig.isPortal &&
-        networkCandidate.wifiDeviceConfig.noInternetAcces &&
+        networkCandidate.wifiDeviceConfig.noInternetAccess &&
         !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
             networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
         return false;
@@ -269,7 +269,7 @@ bool MaybePortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     return !NetworkSelectionUtils::IsScanResultForOweNetwork(networkCandidate) &&
         NetworkSelectionUtils::IsOpenAndMaybePortal(networkCandidate) &&
-        (!networkCandidate.wifiDeviceConfig.noInternetAcces ||
+        (!networkCandidate.wifiDeviceConfig.noInternetAccess ||
         NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
             networkCandidate.wifiDeviceConfig.networkStatusHistory));
 }

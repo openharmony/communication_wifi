@@ -148,9 +148,9 @@ public:
     explicit SavedNetworkScorer(const std::string &scorerName);
 };
 
-class NoInternetNetworkStatusHistoryScore : public SimpleWifiScorer {
+class NoInternetNetworkStatusHistoryScorer : public SimpleWifiScorer {
 public:
-    NoInternetNetworkStatusHistoryScore();
+    NoInternetNetworkStatusHistoryScorer();
     double Score(NetworkCandidate &networkCandidate) override;
 };
 }

@@ -3467,8 +3467,6 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
                 pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
             } else if (result == DhcpReturnCode::DHCP_IP_EXPIRED) {
                 pStaStateMachine->DisConnectProcess();
-            } else if (result == DhcpReturnCode::DHCP_OFFER_REPORT) {
-                pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
             }
             break;
         }
@@ -3481,7 +3479,6 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             }
             WIFI_LOGI("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
             pStaStateMachine->HandleNetCheckResult(netstate, url);
-            NetDetectionNotify(msg);
             break;
         }
         case WIFI_SVR_CMD_STA_PORTAL_BROWSE_NOTIFY_EVENT: {

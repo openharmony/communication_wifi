@@ -3041,7 +3041,6 @@ bool StaStateMachine::GetIpState::IsProhibitUseCacheIp()
         }
     }
 #endif
-
     int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(
         pStaStateMachine->linkedInfo.rssi, pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId);
     if (currentSignalLevel < RSSI_LEVEL_3) {

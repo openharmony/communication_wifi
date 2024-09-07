@@ -286,31 +286,7 @@ NoInternetWifiFilter::~NoInternetWifiFilter()
 bool NoInternetWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    InterScanInfo interScanInfo = networkCandidate.interScanInfo;
-    if (!wifiDeviceConfig.noInternetAccess ||
-        NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory)) {
-        WIFI_LOGI("NoInternetWifiFilter, has internet or not allow recovery, skip candidate, "
-            "noInternetAccess=%{public}d bssid=%{public}s",
-            wifiDeviceConfig.noInternetAccess, MacAnonymize(interScanInfo.bssid).c_str());
-        return false;
-    }
-#ifndef OHOS_ARCH_LITE
-    std::map<std::string, std::vector<std::string>> filterMap;
-    WifiSettings::GetInstance().GetPackageFilterMap(filterMap);
-    std::vector<std::string> settingsModuleName = filterMap["settings_module_name"];
-    std::string name = settingsModuleName.empty() ? "" : settingsModuleName.front();
-    if (!name.empty() && WifiAppStateAware::GetInstance().IsForegroundApp(name)) {
-        WIFI_LOGI("NoInternetWifiFilter, settings in foreground, skip candidate, bssid=%{public}s",
-            MacAnonymize(interScanInfo.bssid).c_str());
-        return false;
-    }
-#endif
-    if (!NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory)) {
-        WIFI_LOGI("NoInternetWifiFilter, never has internet, skip candidate, bssid=%{public}s",
-            MacAnonymize(interScanInfo.bssid).c_str());
-        return false;
-    }
-    return true;
+    return NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
 }
 
 

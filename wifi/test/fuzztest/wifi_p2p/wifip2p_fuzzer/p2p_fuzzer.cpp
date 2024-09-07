@@ -30,7 +30,6 @@ constexpr size_t U32_AT_SIZE_ZERO = 4;
 /* Group Manager */
 void RemoveGroupFuzzerTest(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter RemoveGroupFuzzerTest.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
 
@@ -41,7 +40,6 @@ void RemoveGroupFuzzerTest(const uint8_t *data, size_t size)
 
 void UpdateWpaGroupFuzzerTest(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter UpdateWpaGroupFuzzerTest.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
     pGroupInfo.SetGroupName("p2p0");
@@ -53,7 +51,6 @@ void UpdateWpaGroupFuzzerTest(const uint8_t *data, size_t size)
 
 void RemoveClientFromGroupFuzzerTest(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter RemoveClientFromGroupFuzzerTest.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
     std::string mDeviceAddress = std::string(reinterpret_cast<const char *>(data), size);
@@ -66,7 +63,6 @@ void RemoveClientFromGroupFuzzerTest(const uint8_t *data, size_t size)
 
 void GetNetworkIdFromClientsFuzzerTest(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter GetNetworkIdFromClientsFuzzerTest.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
 
@@ -83,7 +79,6 @@ void GetNetworkIdFromClientsFuzzerTest(const uint8_t *data, size_t size)
 
 void GetGroupNetworkIdFuzzerTest(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter GetGroupNetworkIdFuzzerTest.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
     WifiP2pDevice device;
@@ -95,7 +90,6 @@ void GetGroupNetworkIdFuzzerTest(const uint8_t *data, size_t size)
 
 void GetGroupNetworkIdFuzzerTest1(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter GetGroupNetworkIdFuzzerTest1.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
     pGroupInfo.SetGroupName(std::string(reinterpret_cast<const char *>(data), size));
@@ -169,7 +163,6 @@ void UpdateGroupsNetworkFuzzerTest(const uint8_t *data, size_t size)
 
 void UpdateGroupsNetworkFuzzerTest1(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter UpdateGroupsNetworkFuzzerTest1.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
 
@@ -181,7 +174,6 @@ void UpdateGroupsNetworkFuzzerTest1(const uint8_t *data, size_t size)
 
 void AddMacAddrPairInfoFuzzerTest(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter AddMacAddrPairInfoFuzzerTest.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
 
@@ -194,7 +186,6 @@ void AddMacAddrPairInfoFuzzerTest(const uint8_t *data, size_t size)
 
 void RemoveMacAddrPairInfoFuzzerTest(const uint8_t *data, size_t size)
 {
-    LOGE("cjd enter RemoveMacAddrPairInfoFuzzerTest.");
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
 

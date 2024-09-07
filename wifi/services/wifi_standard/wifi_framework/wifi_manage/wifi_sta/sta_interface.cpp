@@ -441,6 +441,16 @@ ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStat
     pStaService->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::SetEnhanceService(IEnhanceService *enhanceService)
+{
+    WIFI_LOGI("Enter SetEnhanceService");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->SetEnhanceService(enhanceService);
+    return WIFI_OPT_SUCCESS;
+}
+
 #endif
 
 ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)

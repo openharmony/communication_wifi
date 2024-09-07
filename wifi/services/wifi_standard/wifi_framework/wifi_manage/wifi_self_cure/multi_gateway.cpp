@@ -174,8 +174,8 @@ int32_t MultiGateway::GetMacAddr(char *buff, const char *macAddr)
         return -1;
     }
 
-    if (sscanf_s(macAddr, "%x:%x:%x:%x:%x:%x", &addr[0], &addr[1], &addr[2], &addr[3], &addr[4], &addr[5]) <
-        MAC_ADDRESS_LENGTH) {  // 0、1、2、3、4、5 is mac index
+    if (sscanf_s(macAddr, "%x:%x:%x:%x:%x:%x", &addr[MAC_INDEX_0], &addr[MAC_INDEX_1], &addr[MAC_INDEX_2],
+        &addr[MAC_INDEX_3], &addr[MAC_INDEX_4], &addr[MAC_INDEX_5]) < MAC_ADDRESS_LENGTH) {
         WIFI_LOGE("sscanf_s macAddr err");
         return -1;
     }

@@ -283,7 +283,7 @@ NoInternetNetworkSelector::NoInternetNetworkSelector() : SimpleFilterNetworkSele
     SetWifiFilter(make_shared<NoInternetWifiFilter>());
     auto networkScorerComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     auto noInternetNetworkScorer = make_shared<SavedNetworkScorer>("noInternetNetworkScorer");
-    noInternetNetworkScorer->AddScorer(make_shared<NoInternetNetworkStatusHistoryScore>());
+    noInternetNetworkScorer->AddScorer(make_shared<NoInternetNetworkStatusHistoryScorer>());
     networkScorerComparator->AddScorer(noInternetNetworkScorer);
     networkScorerComparator->AddScorer(make_shared<RssiScorer>());
     SetWifiComparator(networkScorerComparator);

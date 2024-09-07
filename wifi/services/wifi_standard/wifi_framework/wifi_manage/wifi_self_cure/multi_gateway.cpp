@@ -102,7 +102,10 @@ int32_t MultiGateway::SetStaticArp(const std::string& iface, const std::string& 
         return -1;
     }
 
-    (void)memset_s(&req, sizeof(struct arpreq), 0, sizeof(struct arpreq));
+    if (memset_s(&req, sizeof(struct arpreq), 0, sizeof(struct arpreq)) != EOK) {
+        WIFI_LOGE("DelStaticArp memset_s err");
+        return -1;
+    }
     sin = reinterpret_cast<struct sockaddr_in *>(&req.arp_pa);
     sin->sin_family = AF_INET;
     sin->sin_addr.s_addr = inet_addr(ipAddr.c_str());
@@ -128,7 +131,10 @@ int32_t MultiGateway::DelStaticArp(const std::string& iface, const std::string& 
         return -1;
     }
 
-    (void)memset_s(&req, sizeof(struct arpreq), 0, sizeof(struct arpreq));
+    if (memset_s(&req, sizeof(struct arpreq), 0, sizeof(struct arpreq)) != EOK) {
+        WIFI_LOGE("DelStaticArp memset_s err");
+        return -1;
+    }
     struct sockaddr_in *sin = reinterpret_cast<struct sockaddr_in *>(&req.arp_pa);
     sin->sin_family = AF_INET;
     sin->sin_addr.s_addr = inet_addr(ipAddr.c_str());

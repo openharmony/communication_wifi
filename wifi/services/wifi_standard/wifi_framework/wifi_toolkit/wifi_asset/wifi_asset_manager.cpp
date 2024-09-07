@@ -223,7 +223,7 @@ WifiAssetManager::WifiAssetManager()
         assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
     }
 }
- 
+
 WifiAssetManager::~WifiAssetManager()
 {
     if (assetServiceThread_ != nullptr) {
@@ -234,6 +234,7 @@ WifiAssetManager::~WifiAssetManager()
 void WifiAssetManager::InitUpLoadLocalDeviceSync()
 {
     if (firstSync_ == true) {
+        LOGE("WifiAssetManager, local data is sync");
         return;
     }
     WifiSettings::GetInstance().UpLoadLocalDeviceConfigToCloud();
@@ -244,6 +245,7 @@ void WifiAssetManager::CloudAssetSync()
 {
     if (!firstSync_) {
         LOGE("WifiAssetManager, local data not sync");
+        return;
     }
     WifiAssetQuery(USER_ID_DEFAULT);
 }

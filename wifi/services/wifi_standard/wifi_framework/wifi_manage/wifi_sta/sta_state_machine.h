@@ -41,6 +41,7 @@
 #include "cellular_data_client.h"
 #include "core_manager_inner.h"
 #include "telephony_errors.h"
+#include "ienhance_service.h"
 #endif
 
 namespace OHOS {
@@ -541,6 +542,9 @@ public:
     void DealApRoamingStateTimeout(InternalMessagePtr msg);
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
+#ifndef OHOS_ARCH_LITE
+    void SetEnhanceService(IEnhanceService* enhanceService);
+#endif
 private:
     /**
      * @Description  Destruct state.
@@ -1191,6 +1195,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
+    IEnhanceService *enhanceService_;        /* EnhanceService handle */
 #endif
 
     int lastNetworkId;

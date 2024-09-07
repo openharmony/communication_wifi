@@ -26,6 +26,8 @@ namespace Wifi {
 struct Hid2dInfo {
     Hid2dUpperScene softBusScene;
     Hid2dUpperScene castScene;
+    Hid2dUpperScene shareScene;
+    Hid2dUpperScene mouseCrossScene;
     Hid2dUpperScene miraCastScene;
     P2pConnectedState p2pConnectState;
     int p2pEnhanceState;

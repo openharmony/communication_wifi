@@ -2385,11 +2385,15 @@ bool ScanService::AllowScanByHid2dState()
     LOGD("Enter AllowScanByHid2dState.\n");
     Hid2dUpperScene softbusScene;
     Hid2dUpperScene castScene;
+    Hid2dUpperScene shareScene;
+    Hid2dUpperScene mouseCrossScene;
     Hid2dUpperScene miracastScene;
     WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SHARE_SERVICE_UID, shareScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MOUSE_CROSS_SERVICE_UID, mouseCrossScene);
     WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
 
     if (IsAppInFilterList(scan_hid2d_list)) {
@@ -2412,6 +2416,12 @@ bool ScanService::AllowScanByHid2dState()
         return false;
     } else if ((miracastScene.scene & 0x07) > 0) {
         WIFI_LOGW("Scan is not allowed in miracast hid2d.");
+        return false;
+    } else if ((shareScene.scene & 0x07) > 0) {
+        WIFI_LOGW("Scan is not allowed in share hid2d.");
+        return false;
+    } else if ((mouseCrossScene.scene & 0x07) > 0) {
+        WIFI_LOGW("Scan is not allowed in mouse cross hid2d.");
         return false;
     } else {
         WIFI_LOGD("allow hid2d scan");

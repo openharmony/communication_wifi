@@ -268,7 +268,10 @@ MaybePortalWifiFilter::~MaybePortalWifiFilter()
 bool MaybePortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     return !NetworkSelectionUtils::IsScanResultForOweNetwork(networkCandidate) &&
-        NetworkSelectionUtils::IsOpenAndMaybePortal(networkCandidate);
+        NetworkSelectionUtils::IsOpenAndMaybePortal(networkCandidate) &&
+        (!networkSelectionResult.wifiDeviceConfig.noInternetAcces ||
+        NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
+            networkCandidate.wifiDeviceConfig.networkStatusHistory));
 }
 
 

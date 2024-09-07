@@ -43,41 +43,6 @@
 #include "telephony_errors.h"
 #endif
 
-void StaStateMachine::LinkedState::DhcpResultNotify(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        WIFI_LOGE("msg is nullptr.");
-        return;
-    }
-    int result = msg->GetParam1();
-    int ipType = msg->GetParam2();
-    WIFI_LOGI("LinkedState, result:%{public}d, ipType = %{public}d\n", result, ipType);
-    if (result == DhcpReturnCode::DHCP_RENEW_FAIL) {
-        pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
-    } else if (result == DhcpReturnCode::DHCP_RESULT) {
-        pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
-    } else if (result == DhcpReturnCode::DHCP_IP_EXPIRED) {
-        pStaStateMachine->DisConnectProcess();
-    } else if (result == DhcpReturnCode::DHCP_OFFER_REPORT) {
-        pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
-    }
-}
-
-void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        WIFI_LOGE("msg is nullptr.");
-        return;
-    }
-    SystemNetWorkState netstate = (SystemNetWorkState)msg->GetParam1();
-    std::string url;
-    if (!msg->GetMessageObj(url)) {
-        WIFI_LOGW("Failed to obtain portal url.");
-    }
-    WIFI_LOGI("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
-    pStaStateMachine->HandleNetCheckResult(netstate, url);
-}
-
 namespace OHOS {
 namespace Wifi {
 #ifndef OHOS_ARCH_LITE

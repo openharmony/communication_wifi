@@ -123,6 +123,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetStaticIpConfig(const bool &isMultiDhcpServer, const bool &startSelfcure, IpInfo &ipInfo) = 0;
+    
+    /**
+     * @Description Check if custom network
+     *
+     * @return true or false
+     */
+    virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

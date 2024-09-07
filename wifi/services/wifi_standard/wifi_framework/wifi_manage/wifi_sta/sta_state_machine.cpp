@@ -3033,7 +3033,14 @@ bool StaStateMachine::GetIpState::IsProhibitUseCacheIp()
         WIFI_LOGE("current keyMgmt is WEP, not use cache ip if dhcp timeout");
         return true;
     }
-
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->enhanceService_ != nullptr) {
+        if (pStaStateMachine->enhanceService_->IsCustomNetwork(config)) {
+            WIFI_LOGE("current network not use cache ip if dhcp timeout");
+            return true;
+        }
+    }
+#endif
     int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(
         pStaStateMachine->linkedInfo.rssi, pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId);
     if (currentSignalLevel < RSSI_LEVEL_3) {
@@ -4391,5 +4398,11 @@ void StaStateMachine::SetConnectMethod(int connectMethod)
         retStr.c_str(), connectMethod);
     return;
 }
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    enhanceService_ = enhanceService;
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

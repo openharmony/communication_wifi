@@ -258,6 +258,12 @@ ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    WIFI_LOGI("Enter DeliverStaIfaceData");
+    return WIFI_OPT_SUCCESS;
+}
+
 bool StaInterface::InitStaServiceLocked()
 {
     return true;

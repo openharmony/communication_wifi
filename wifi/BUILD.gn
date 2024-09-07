@@ -14,7 +14,7 @@
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//foundation/communication/wifi/wifi/wifi_lite.gni")
-
+   
   lite_component("wifi") {
     deps = [
       "$WIFI_ROOT_DIR/frameworks:wifi_kits",

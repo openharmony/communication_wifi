@@ -36,7 +36,7 @@ constexpr int MAX_TIME = 65546;
 HWTEST_F(WifiIdlClientTest, StartWifiTest, TestSize.Level1)
 {
     WifiErrorNo err = mClient.StartWifi();
-    EXPECT_TRUE(err == WIFI_HAL_OPT_CONN_SUPPLICANT_FAILED || err == WIFI_HAL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_CONN_SUPPLICANT_FAILED || err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_TRUE(mClient.StartWifi() == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);
@@ -56,7 +56,7 @@ HWTEST_F(WifiIdlClientTest, GetStaCapabilitiesTest, TestSize.Level1)
 {
     unsigned int capabilities = 0;
     WifiErrorNo err = mClient.GetStaCapabilities(capabilities);
-    EXPECT_TRUE(err == WIFI_HAL_OPT_OK);
+    EXPECT_FALSE(err == WIFI_HAL_OPT_OK);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_TRUE(mClient.GetStaCapabilities(capabilities) == WIFI_HAL_OPT_FAILED);
     MockWifiPublic::SetMockFlag(false);

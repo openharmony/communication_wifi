@@ -249,8 +249,6 @@ bool PortalNetworkSelector::Filter(NetworkCandidate &networkCandidate)
 {
     if (OrWifiFilter::Filter(networkCandidate)) {
         TryNominate(networkCandidate);
-        filteredNetworkCandidates.emplace_back(&networkCandidate);
-        return false;
     }
     if (networkCandidates.empty()) {
         return true;

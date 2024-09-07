@@ -619,9 +619,12 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
     auto detailState = WifiConfigCenter::GetInstance().GetWifiDetailState(mid);
     WIFI_LOGI("SwitchEnableFromSemi, current sta detailState:%{public}d", detailState);
     if (detailState == WifiDetailState::STATE_ACTIVATED) {
-        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-        ins->HandleStaStart(mid);
-        return WIFI_OPT_SUCCESS;
+        auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
+        if (wifiTogglerManager != nullptr) {
+            auto &ins = wifiTogglerManager->GetControllerMachine();
+            ins->HandleStaStart(mid);
+            return WIFI_OPT_SUCCESS;
+        }
     }
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING, mid)) {
@@ -676,8 +679,11 @@ void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessagePtr msg)
             ins->HandleStaClose(mid);
         }
     } else {
-        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-        ins->HandleStaClose(mid);
+        auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
+        if (wifiTogglerManager != nullptr) {
+            auto &ins = wifiTogglerManager->GetControllerMachine();
+            ins->HandleStaClose(mid);
+        }
     }
 }
 

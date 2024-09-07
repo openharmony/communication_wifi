@@ -44,7 +44,10 @@ constexpr int SIGNAL_LEVEL_FOUR = 4;
 constexpr int MIN_RSSI = -128;
 constexpr int INTERNET_ACCESS_AWARD = 2;
 constexpr int EMPTY_NETWORK_STATUS_HISTORY_AWARD = 1;
-
+constexpr int MAX_HISTORY_NETWORK_STATUS_NUM = 10;
+constexpr int HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[MAX_HISTORY_NETWORK_STATUS_NUM] =
+    {0, 8000, 4000, 2000, 1000, 16, 8, 4, 2, 1};
+constexpr int WIFI_2G_BAND_SCORE_HISTORY_NETWORK = 29;
 
 RssiScorer::RssiScorer() : SimpleWifiScorer("rssiScorer") {}
 
@@ -231,5 +234,30 @@ SavedNetworkScorer::SavedNetworkScorer(const std::string &scorerName) : Composit
     AddScorer(std::make_shared<Network5gBonusScorer>());
     ExternalWifiCommonBuildManager::GetInstance().BuildScore(
         TagType::HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG, *this);
+}
+
+NoInternetNetworkStatusHistoryScore::NoInternetNetworkStatusHistoryScore()
+    : SimpleWifiScorer("NoInternetNetworkStatusHistoryScore") {}
+ 
+double NoInternetNetworkStatusHistoryScore::Score(NetworkCandidate &networkCandidate)
+{
+    double score = 0;
+    std::vector<int> vNetworkStatusHistory{};
+    vNetworkStatusHistory = NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Array(
+        networkCandidate.wifiDeviceConfig.networkStatusHistory);
+ 
+    int nSize = (int)vNetworkStatusHistory.size();
+    for (int i = 0; i < nSize; i++) {
+        if (i >= MAX_HISTORY_NETWORK_STATUS_NUM) {
+            break;
+        }
+        score += HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[i] * vNetworkStatusHistory[i];
+    }
+    int frequency = networkCandidate.interScanInfo.frequency;
+    bool is5G = frequency >= MIN_5G_FREQUENCY && frequency <= MAX_5G_FREQUENCY;
+    if (!is5G) {
+        score += WIFI_2G_BAND_SCORE_HISTORY_NETWORK;
+    }
+    return score;
 }
 }

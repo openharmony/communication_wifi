@@ -48,6 +48,7 @@ constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 #define EAP_AUTH_MIN_PLMN_LEN  5
 #define EAP_AUTH_MAX_PLMN_LEN  6
 #define EAP_AUTH_MAX_IMSI_LENGTH 15
+#define INVALID_SUPPLIER_ID 0
 
 #define EAP_AKA_PERMANENT_PREFIX "0"
 #define EAP_SIM_PERMANENT_PREFIX "1"
@@ -782,8 +783,13 @@ ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
     WIFI_LOGI("Enter OnSystemAbilityChanged.");
 #ifndef OHOS_ARCH_LITE
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    if (systemAbilityid == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID && add) {
-        pStaStateMachine->OnNetManagerRestart();
+    if (systemAbilityid == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
+        uint32_t supplierId = WifiNetAgent::GetInstance().GetSupplierId();
+        if ((add && !m_connMangerStatus) || (supplierId == INVALID_SUPPLIER_ID)) {
+            WifiNetAgent::GetInstance().ResetSupplierId();
+            pStaStateMachine->OnNetManagerRestart();
+        }
+        m_connMangerStatus = add;
     }
 #endif
     return WIFI_OPT_SUCCESS;

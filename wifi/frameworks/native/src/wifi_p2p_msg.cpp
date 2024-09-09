@@ -16,7 +16,7 @@
 #include "wifi_p2p_msg.h"
 
 namespace OHOS {
-namespace Wifi {  
+namespace Wifi {
 void WifiP2pWfdInfo::SetWfdEnabled(bool value)
 {
     wfdEnabled = value;

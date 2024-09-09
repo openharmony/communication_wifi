@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 constexpr int WIFI_STR_MAC_LENGTH = 17;
 constexpr int MAX_PASSPHRASE_LENGTH = 127;
 constexpr int DEVICE_NAME_LENGTH = 32;

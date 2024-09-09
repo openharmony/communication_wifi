@@ -16,6 +16,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 bool WifiP2pGroupInfoProxy::operator==(const WifiP2pGroupInfo &group)
 {
     std::unique_lock<std::mutex> lock(proxyMutex);

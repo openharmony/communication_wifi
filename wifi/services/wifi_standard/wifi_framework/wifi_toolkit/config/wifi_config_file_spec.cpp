@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
 {
     item.instanceId = 0;

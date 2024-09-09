@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 WifiP2pGroupManager::WifiP2pGroupManager() : groupsInfo(), currentGroup(), groupMutex(), p2pConnInfo()
 {}
 

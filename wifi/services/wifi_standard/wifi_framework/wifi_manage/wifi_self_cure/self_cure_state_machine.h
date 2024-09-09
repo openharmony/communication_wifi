@@ -35,6 +35,16 @@
 #include "wifi_common_util.h"
 #include "wifi_net_observer.h"
 
+bool SelfCureStateMachine::IsSuppOnCompletedState()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.supplicantState == SupplicantState::COMPLETED) {
+        return true;
+    }
+    return false;
+}
+
 namespace OHOS {
 namespace Wifi {
 constexpr int SELF_CURE_DNS_SIZE = 2;

@@ -111,8 +111,6 @@ void WifiDeviceStub::InitHandleMapEx()
         MessageParcel &data, MessageParcel &reply) { OnSetLowTxPower(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnSetTxPower(code, data, reply); };
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG)] = [this](uint32_t code,
-        MessageParcel &data, MessageParcel &reply) { OnGetDeviceConfig(code, data, reply); };
     return;
 }
 
@@ -124,6 +122,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply) {
             OnStartConnectToUserSelectNetwork(code, data, reply);
         };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetDeviceConfig(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()

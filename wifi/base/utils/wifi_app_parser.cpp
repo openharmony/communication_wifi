@@ -103,7 +103,7 @@ bool AppParser::IsBlackListApp(const std::string &bundleName) const
 
 bool AppParser::IsMultiLinkApp(const std::string &bundleName) const
 {
-    return std::any_of(m_blackAppVec.begin(), m_blackAppVec.end(),
+    return std::any_of(m_multilinkAppVec.begin(), m_multilinkAppVec.end(),
         [bundleName](const MultiLinkAppInfo &app) { return app.packageName == bundleName; });
 }
 

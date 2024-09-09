@@ -29,6 +29,7 @@ static void SplitString(const std::string &input, const char spChar, std::vector
         outArray.push_back(token);
     }
 }
+
 static bool CheckEap(const WifiDeviceConfig &config)
 {
     if (config.keyMgmt != KEY_MGMT_EAP && config.keyMgmt != KEY_MGMT_SUITE_B_192) {
@@ -214,24 +215,38 @@ static void WifiAssetAttrQuery(const AssetResultSet &resultSet, int32_t userId,
 WifiAssetManager &WifiAssetManager::GetInstance()
 {
     static WifiAssetManager gWifiAsset;
-    if (gWifiAsset.assetServiceThread_ == nullptr) {
-        gWifiAsset.assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
-    }
     return gWifiAsset;
 }
  
 WifiAssetManager::WifiAssetManager()
-{}
- 
+{
+    if (assetServiceThread_ == nullptr) {
+        assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
+    }
+}
+
 WifiAssetManager::~WifiAssetManager()
 {
     if (assetServiceThread_ != nullptr) {
         assetServiceThread_.reset();
     }
 }
- 
+
+void WifiAssetManager::InitUpLoadLocalDeviceSync()
+{
+    if (firstSync_) {
+        LOGE("WifiAssetManager, local data is sync");
+        return;
+    }
+    WifiSettings::GetInstance().UpLoadLocalDeviceConfigToCloud();
+}
+
 void WifiAssetManager::CloudAssetSync()
 {
+    if (!firstSync_) {
+        LOGE("WifiAssetManager, local data not sync");
+        return;
+    }
     WifiAssetQuery(USER_ID_DEFAULT);
 }
  
@@ -317,7 +332,7 @@ void WifiAssetManager::WifiAssetRemove(const WifiDeviceConfig &config, int32_t u
 }
  
 void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
-    int32_t userId, bool flagSync)
+    int32_t userId, bool flagSync, bool firstSync)
 {
     if (!assetServiceThread_ || wifiDeviceConfigs.size() == 0) {
         LOGE("WifiAssetAddPack, assetServiceThread_ is null");
@@ -337,6 +352,9 @@ void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wif
         }
         if (flagSync) {
             WifiAssetTriggerSync();
+        }
+        if (firstSync) {
+            firstSync_ = true;
         }
     });
 }

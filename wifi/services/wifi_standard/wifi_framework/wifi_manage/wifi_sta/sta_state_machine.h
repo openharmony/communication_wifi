@@ -44,20 +44,6 @@
 #include "ienhance_service.h"
 #endif
 
-staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = &StaStateMachine::DealWpaStateChange;
-
-void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        LOGE("DealWpaStateChange InternalMessage msg is null.");
-        return;
-    }
-    int status = msg->GetParam1();
-    LOGI("DealWpaStateChange status: %{public}d", status);
-    linkedInfo.supplicantState = static_cast<SupplicantState>(status);
-    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-}
-
 namespace OHOS {
 namespace Wifi {
 #ifndef OHOS_ARCH_LITE

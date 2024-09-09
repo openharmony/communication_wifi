@@ -34,7 +34,8 @@ inline const std::string COMMON_EVENT_WIFI_AP_STA_LEAVE = "usual.event.wifi.WIFI
 inline const std::string COMMON_EVENT_WIFI_MPLINK_STATE = "usual.event.wifi.mplink.STATE_CHANGE";
 inline const std::string COMMON_EVENT_WIFI_P2P_CONN_STATE = "usual.event.wifi.p2p.CONN_STATE_CHANGE";
 inline const std::string COMMON_EVENT_WIFI_P2P_STATE_CHANGED = "usual.event.wifi.p2p.STATE_CHANGE";
-inline const std::string COMMON_EVENT_WIFI_P2P_PEERS_STATE_CHANGED = "usual.event.wifi.p2p.DEVICES_CHANGE";
+inline const std::string COMMON_EVENT_WIFI_P2P_PEERS_STATE_CHANGED = 
+    "usual.event.wifi.p2p.DEVICES_CHANGE";
 inline const std::string COMMON_EVENT_WIFI_P2P_PEERS_DISCOVERY_STATE_CHANGED =
     "usual.event.wifi.p2p.PEER_DISCOVERY_STATE_CHANGE";
 inline const std::string COMMON_EVENT_WIFI_P2P_CURRENT_DEVICE_STATE_CHANGED =

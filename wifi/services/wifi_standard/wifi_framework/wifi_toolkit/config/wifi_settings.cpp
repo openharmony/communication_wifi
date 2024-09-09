@@ -236,7 +236,8 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     return -1;
 }
 
-int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId)
+int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType, 
+    WifiDeviceConfig &config, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");

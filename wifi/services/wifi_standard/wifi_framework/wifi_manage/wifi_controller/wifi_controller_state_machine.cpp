@@ -213,10 +213,12 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
 #endif
         case CMD_STA_START_FAILURE:
-            msg->GetParam1() == INSTID_WLAN0 ? HandleStaStartFailure(INSTID_WLAN0) : HandleStaWifi2StartFailure(INSTID_WLAN1);
+            msg->GetParam1() == INSTID_WLAN0 ? 
+                HandleStaStartFailure(INSTID_WLAN0) : HandleStaWifi2StartFailure(INSTID_WLAN1);
             break;
         case CMD_CONCRETE_STOPPED:
-            msg->GetParam1() == INSTID_WLAN0 ? pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0) : HandleStaWifi2StartFailure(INSTID_WLAN1);
+            msg->GetParam1() == INSTID_WLAN0 ?
+                pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0) : HandleStaWifi2StartFailure(INSTID_WLAN1);
             break;
         case CMD_AIRPLANE_TOGGLED:
             if (msg->GetParam1()) {
@@ -482,6 +484,7 @@ bool WifiControllerMachine::ShouldDisableWifi(InternalMessagePtr msg)
 
 bool WifiControllerMachine::ShouldEnableWifi(int id)
 {
+    // instId == 1 判断wifi0是否打开 连接 = true 否则 false
     WIFI_LOGI("Enter ShouldEnableWifi");
     if(id == INSTID_WLAN1) {
         return WifiConfigCenter::GetInstance().GetWifiToggledEnable(INSTID_WLAN0) == WIFI_STATE_ENABLED;
@@ -726,13 +729,14 @@ void WifiControllerMachine::SwitchRole(ConcreteManagerRole role)
 void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg)
 {
     int instId = msg->GetParam2();
-    if(instId == INSTID_WLAN1 && msg->GetParam1() == 0) {
+    if (instId == INSTID_WLAN1 && msg->GetParam1() == 0) {
         WIFI_LOGI("Toggle disable wlan1.");
         pWifiControllerMachine->StopMultiStaManager(INSTID_WLAN1);
         return;
     }
-    if(instId == INSTID_WLAN1 && WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0) == WIFI_STATE_ENABLED 
-    && msg->GetParam1() == 1) {
+    if (instId == INSTID_WLAN1 && 
+        WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0) == WIFI_STATE_ENABLED 
+        && msg->GetParam1() == 1) {
         pWifiControllerMachine->MakeMultiStaManager(MultiStaManager::Role::ROLE_STA_WIFI_2, instId);
         return;
     }

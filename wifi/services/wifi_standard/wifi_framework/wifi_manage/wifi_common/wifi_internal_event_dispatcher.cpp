@@ -20,6 +20,7 @@
 #include "wifi_common_util.h"
 #include "wifi_auth_center.h"
 #include "wifi_permission_utils.h"
+#include "define.h"
 #ifdef SUPPORT_RANDOM_MAC_ADDR
 #include "wifi_p2p_msg.h"
 #include "wifi_common_msg.h"
@@ -555,13 +556,13 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
 
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_STATE_CHANGE:
-            WifiInternalEventDispatcher::PublishWifiStateChangedEvent(msg.msgData);
+            WifiInternalEventDispatcher::PublishWifiStateChangedEvent(msg.msgData, msg.id);
             break;
         case WIFI_CBK_MSG_CONNECTION_CHANGE:
-            WifiInternalEventDispatcher::PublishConnStateChangedEvent(msg.msgData, msg.linkInfo);
+            WifiInternalEventDispatcher::PublishConnStateChangedEvent(msg.msgData, msg.id, msg.linkInfo);
             break;
         case WIFI_CBK_MSG_RSSI_CHANGE:
-            WifiInternalEventDispatcher::PublishRssiValueChangedEvent(msg.msgData);
+            WifiInternalEventDispatcher::PublishRssiValueChangedEvent(msg.msgData, msg.id);
             break;
         case WIFI_CBK_MSG_STREAM_DIRECTION:
             break;
@@ -936,7 +937,7 @@ void WifiInternalEventDispatcher::DealP2pCallbackMsg(
     return;
 }
 
-void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, const WifiLinkedInfo &info)
+void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, int instId, const WifiLinkedInfo &info)
 {
     std::string eventData = "Other";
     switch (state) {
@@ -957,15 +958,20 @@ void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, const 
             break;
         }
     }
-    if (!WifiCommonEventHelper::PublishConnStateChangedEvent(state, eventData)) {
-        WIFI_LOGE("failed to publish connection state changed event,%{public}s!", eventData.c_str());
+    if ((instId == INSTID_WLAN0 && WifiCommonEventHelper::PublishConnStateChangedEvent(state, eventData) || 
+        (instId == INSTID_WLAN1 && WifiCommonEventHelper::PublishWifi2ConnStateChangedEvent(state, eventData))) {
+        WIFI_LOGI("publish connection state changed event,%{public}s, instId %{public}d.", eventData.c_str(), instId);
         return;
     }
-    WIFI_LOGI("publish connection state changed event,%{public}s.", eventData.c_str());
+    WIFI_LOGE("publish connection state changed event,%{public}s, instId {public}d fail.", eventData.c_str(), instId);
 }
 
-void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state)
+void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state, int id)
 {
+    if (id == INSTID_WLAN1) {
+        WIFI_LOGW("PublishRssiValueChangedEvent instId wlan1!");
+        return ;
+    }
     WifiLinkedInfo likedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(likedInfo);
     int signalLevel = WifiSettings::GetInstance().GetSignalLevel(state, likedInfo.band);
@@ -977,13 +983,28 @@ void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state)
     WIFI_LOGD("publish rssi value changed event.");
 }
 
-void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state)
+void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state, int instId)
 {
+    if (instId == INSTID_WLAN0) {
+        if (!WifiCommonEventHelper::PublishPowerStateChangeEvent(state, "OnWifiPowerStateChanged")) {
+            WIFI_LOGE("failed to publish wifi state changed event!");
+            return;
+        }
+    } else if (instId == INSTID_WLAN1) {
+            if (!WifiCommonEventHelper::PublishWifi2Power2StateChangeEvent(state, "OnWifiPowerStateChanged")) {
+                WIFI_LOGE("failed to publish wifi state changed event!"); 
+                return;
+            }
+    } esle {
+            WIFI_LOGE("invalid InstId!")
+            return;
+    }
+    
     if (!WifiCommonEventHelper::PublishPowerStateChangeEvent(state, "OnWifiPowerStateChanged")) {
         WIFI_LOGE("failed to publish wifi state changed event!");
         return;
     }
-    WIFI_LOGD("publish wifi state changed event.");
+    WIFI_LOGI("publish wifi state changed event, state %{public}d, instId %{public}d", state, instId);
 }
 
 bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackEventId)

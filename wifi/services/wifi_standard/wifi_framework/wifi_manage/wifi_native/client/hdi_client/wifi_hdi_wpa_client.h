@@ -27,6 +27,7 @@
 #include "wifi_event_callback.h"
 #include "wifi_ap_event_callback.h"
 #include "wifi_p2p_event_callback.h"
+#include "define.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -41,14 +42,14 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWifi(const std::string &ifaceName);
+    WifiErrorNo StartWifi(const std::string &ifaceName, int instId = 0);
 
     /**
      * @Description Close Wifi.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StopWifi(void);
+    WifiErrorNo StopWifi(int instId = 0);
 
     /**
      * @Description Connect Wifi.
@@ -56,28 +57,28 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqConnect(int networkId);
+    WifiErrorNo ReqConnect(int networkId, const char *ifaceName);
 
     /**
      * @Description Reconnect Wifi.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqReconnect(void);
+    WifiErrorNo ReqReconnect(const char *ifaceName);
 
     /**
      * @Description Reassociate Wifi.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqReassociate(void);
+    WifiErrorNo ReqReassociate(const char *ifaceName);
 
     /**
      * @Description Disconnect Wifi.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqDisconnect(void);
+    WifiErrorNo ReqDisconnect(const char *ifaceName);
 
     /**
      * @Description Obtaining the STA Support Capability.
@@ -93,7 +94,7 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo GetStaDeviceMacAddress(std::string &mac);
+    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const char *ifaceName);
 
     /**
      * @Description Obtains the frequencies supported by a specified
@@ -150,14 +151,14 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo RemoveDevice(int networkId);
+    WifiErrorNo RemoveDevice(int networkId, const char *ifaceName);
 
     /**
      * @Description Clears the network configuration information saved by wpa_supplicant.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ClearDeviceConfig(void) const;
+    WifiErrorNo ClearDeviceConfig(const char *ifaceName) const;
 
     /**
      * @Description Request to obtain the next network ID.
@@ -165,7 +166,7 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo GetNextNetworkId(int &networkId);
+    WifiErrorNo GetNextNetworkId(int &networkId, const char *ifaceName);
 
     /**
      * @Description Enable a network.
@@ -173,7 +174,7 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqEnableNetwork(int networkId);
+    WifiErrorNo ReqEnableNetwork(int networkId, const char *ifaceName);
 
     /**
      * @Description Disable a network.
@@ -181,7 +182,7 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqDisableNetwork(int networkId);
+    WifiErrorNo ReqDisableNetwork(int networkId, const char *ifaceName);
 
     /**
      * @Description Setting the network.
@@ -190,7 +191,7 @@ public:
      * @param config - Setting Network Parameters.
      * @return WifiErrorNo
      */
-    WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config);
+    WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config, const char *ifaceName);
 
     /**
      * @Description Set bssid to supplicant.
@@ -199,14 +200,14 @@ public:
      * @param bssid
      * @return WifiErrorNo
      */
-    WifiErrorNo SetBssid(int networkId, const std::string &bssid);
+    WifiErrorNo SetBssid(int networkId, const std::string &bssid, const char *ifaceName);
 
     /**
      * @Description Save the network.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo SaveDeviceConfig(void);
+    WifiErrorNo SaveDeviceConfig(const char *ifaceName);
 
     /**
      * @Description Registering the Sta Event Callback.
@@ -214,7 +215,7 @@ public:
      * @param callback - Registering an Event Callback Function.
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqRegisterStaEventCallback(const WifiEventCallback &callback);
+    WifiErrorNo ReqRegisterStaEventCallback(const WifiEventCallback &callback, const char *ifaceName, int instId);
 
     /**
      * @Description Enabling WPS in PBC Mode.
@@ -222,7 +223,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqStartWpsPbcMode(const WifiHalWpsConfig &config);
+    WifiErrorNo ReqStartWpsPbcMode(const WifiHalWpsConfig &config, const char *ifaceName);
 
     /**
      * @Description Enable PIN mode WPS.
@@ -231,14 +232,14 @@ public:
      * @param pinCode
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqStartWpsPinMode(const WifiHalWpsConfig &config, int &pinCode);
+    WifiErrorNo ReqStartWpsPinMode(const WifiHalWpsConfig &config, int &pinCode, const char *ifaceName);
 
     /**
      * @Description Close wps.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqStopWps(void);
+    WifiErrorNo ReqStopWps(const char *ifaceName);
 
     /**
      * @Description Obtains the roaming support capability.
@@ -271,14 +272,14 @@ public:
      * @param enable
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqWpaAutoConnect(int enable);
+    WifiErrorNo ReqWpaAutoConnect(int enable, const char *ifaceName);
 
     /**
      * @Description Clearing the wpa Blocklist.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqWpaBlocklistClear(void);
+    WifiErrorNo ReqWpaBlocklistClear(const char *ifaceName);
 
     /**
      * @Description Turn on/off power save mode for the interface.
@@ -286,7 +287,7 @@ public:
      * @param enable
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqSetPowerSave(bool enable);
+    WifiErrorNo ReqSetPowerSave(bool enable,const char *ifaceName);
 
     /**
      * @Description Setting the country code.
@@ -294,17 +295,17 @@ public:
      * @param countCode
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqWpaSetCountryCode(const std::string &countryCode);
-    WifiErrorNo ReqWpaGetCountryCode(std::string &countryCode);
+    WifiErrorNo ReqWpaSetCountryCode(const std::string &countryCode, const char *ifaceName);
+    WifiErrorNo ReqWpaGetCountryCode(std::string &countryCode, const char *ifaceName);
     /**
      * @Description Send suspend mode to wpa
      *
      * @param mode: true for suspend, false for resume
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqWpaSetSuspendMode(bool mode) const;
-    WifiErrorNo GetNetworkList(std::vector<WifiHalWpaNetworkInfo> &networkList);
-    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config);
+    WifiErrorNo ReqWpaSetSuspendMode(bool mode, const char *ifaceName) const;
+    WifiErrorNo GetNetworkList(std::vector<WifiHalWpaNetworkInfo> &networkList, const char *ifaceName);
+    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config, const char *ifaceName);
 
     /**
      * @Description Send SIM/AKA/AKA' authentication to wpa

@@ -116,4 +116,13 @@
 #define INTERFACEDESCRIPTORL1  u"ohos.wifi.IWifiDeviceService"
 #define DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH (sizeof(INTERFACEDESCRIPTORL1)/sizeof(uint16_t))
 #define DECLARE_INTERFACE_DESCRIPTOR_L1 ((uint16_t*)&INTERFACEDESCRIPTORL1[0])
+
+/* Multilink */
+#define INSTID_WLAN0 (0)
+#define INSTID_WLAN1 (1)
+#ifndef STA_INSTANCE_MAX_NUM
+#define STA_INSTANCE_MAX_NUM (2)
 #endif
+
+#endif
+88

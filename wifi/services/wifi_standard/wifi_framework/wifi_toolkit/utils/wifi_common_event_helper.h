@@ -21,11 +21,13 @@
 namespace OHOS {
 namespace Wifi {
 inline const std::string COMMON_EVENT_WIFI_POWER_STATE = "usual.event.wifi.POWER_STATE";
+inline const std::string COMMON_EVENT_WIFI2_POWER_STATE = "usual.event.wifi.WIFI2_POWER_STATE";
 inline const std::string COMMON_EVENT_WIFI_SCAN_FINISHED = "usual.event.wifi.SCAN_FINISHED";
 inline const std::string COMMON_EVENT_WIFI_SCAN_STATE = "usual.event.wifi.SCAN_STATE";
 inline const std::string COMMON_EVENT_WIFI_RSSI_VALUE = "usual.event.wifi.RSSI_VALUE";
 inline const std::string COMMON_EVENT_WITAS_RSSI_VALUE = "usual.event.wifi.WITAS_RSSI_VALUE";
 inline const std::string COMMON_EVENT_WIFI_CONN_STATE = "usual.event.wifi.CONN_STATE";
+inline const std::string COMMON_EVENT_WIFI2_CONN_STATE = "usual.event.wifi.WIFI2_CONN_STATE";
 inline const std::string COMMON_EVENT_WIFI_HOTSPOT_STATE = "usual.event.wifi.HOTSPOT_STATE";
 inline const std::string COMMON_EVENT_WIFI_AP_STA_JOIN = "usual.event.wifi.WIFI_HS_STA_JOIN";
 inline const std::string COMMON_EVENT_WIFI_AP_STA_LEAVE = "usual.event.wifi.WIFI_HS_STA_LEAVE";
@@ -52,12 +54,14 @@ public:
     static bool PublishEvent(const std::string &eventAction, const std::string &paramKey, T paramValue,
         const int &code, const std::string &data);
     static bool PublishPowerStateChangeEvent(const int &code, const std::string &data);
+    static bool PublishWifi2PowerStateChangeEvent(const int &code, const std::string &data);
     static bool PublishScanFinishedEvent(const int &code, const std::string &data);
     static bool PublishScanStateChangedEvent(const int &code, const std::string &data);
     static bool PublishRssiValueChangedEvent(const std::string &pramKey, int paramValue,
         const int &code, const std::string &data);
     static bool PublishWiTasRssiValueChangedEvent(const int &code, const std::string &data);
     static bool PublishConnStateChangedEvent(const int &code, const std::string &data);
+    static bool PublishWifi2ConnStateChangedEvent(const int &code, const std::string &data);
     static bool PublishHotspotStateChangedEvent(const int &code, const std::string &data);
     static bool PublishApStaJoinEvent(const int &code, const std::string &data);
     static bool PublishApStaLeaveEvent(const int &code, const std::string &data);

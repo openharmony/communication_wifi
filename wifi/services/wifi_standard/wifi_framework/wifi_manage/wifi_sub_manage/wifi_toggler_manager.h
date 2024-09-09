@@ -30,7 +30,8 @@ public:
     WifiTogglerManager();
     ~WifiTogglerManager() = default;
 
-    ConcreteModeCallback& GetConcreteCallback(void);
+    ConcreteModeCallback &GetConcreteCallback(void);
+    MultiStaModeCallback &GetMultiStaCallback();
     SoftApModeCallback& GetSoftApCallback(void);
     ErrCode WifiToggled(int isOpen, int id = 0);
     ErrCode SoftapToggled(int isOpen, int id = 0);
@@ -48,17 +49,21 @@ public:
 private:
     void InitConcreteCallback(void);
     void InitSoftapCallback(void);
+    void InitMultiStacallback();
     void DealConcreateStop(int id = 0);
     void DealConcreateStartFailure(int id = 0);
     void DealSoftapStop(int id = 0);
     void DealSoftapStartFailure(int id = 0);
     void DealClientRemoved(int id = 0);
+    void DealMultiStaStartFailure(int id);
+    void DealMultiStaStop(int id);
     void CheckSatelliteState();
     bool IsInterfaceUp(std::string &iface);
 
 private:
     ConcreteModeCallback mConcreteModeCb;
     SoftApModeCallback mSoftApModeCb;
+    MultiStaModeCallback mMultiStaModeCb;
     std::unique_ptr<WifiControllerMachine> pWifiControllerMachine = nullptr;
 };
 

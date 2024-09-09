@@ -38,7 +38,7 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr const char* WIFI_SELFCURE_PROP_CONFIG = "const.wifi.selfcure";
+constexpr const char *WIFI_SELFCURE_PROP_CONFIG = "const.wifi.selfcure";
 constexpr const int32_t WIFI_SELFCURE_PROP_SIZE = 16;
 DEFINE_WIFILOG_LABEL("WifiServiceScheduler");
 WifiServiceScheduler &WifiServiceScheduler::GetInstance()
@@ -60,11 +60,11 @@ WifiServiceScheduler::~WifiServiceScheduler()
 void WifiServiceScheduler::ClearStaIfaceNameMap(int instId)
 {
     WIFI_LOGI("ClearStaIfaceNameMap");
-    std::lock_guard<std::mutex> lock(mutex);
-    auto iter = g_staIfaceNameMap.begin();
-    while (iter != g_staIfaceNameMap.end()) {
+    std::lock_guard<std::mutex> lock(mutexStaIfaceNameMap_);
+    auto iter = staIfaceNameMap.begin();
+    while (iter != staIfaceNameMap.end()) {
         if (iter->first == instId) {
-            g_staIfaceNameMap.erase(iter);
+            staIfaceNameMap.erase(iter);
             break;
         }
         iter++;
@@ -74,11 +74,11 @@ void WifiServiceScheduler::ClearStaIfaceNameMap(int instId)
 void WifiServiceScheduler::ClearSoftApIfaceNameMap(int instId)
 {
     WIFI_LOGI("ClearSoftApIfaceNameMap");
-    std::lock_guard<std::mutex> lock(mutex);
-    auto iter = g_softApIfaceNameMap.begin();
-    while (iter != g_softApIfaceNameMap.end()) {
+    std::lock_guard<std::mutex> lock(mutexApIfaceNameMap_);
+    auto iter = softApIfaceNameMap.begin();
+    while (iter != softApIfaceNameMap.end()) {
         if (iter->first == instId) {
-            g_softApIfaceNameMap.erase(iter);
+            softApIfaceNameMap.erase(iter);
             break;
         }
         iter++;
@@ -97,21 +97,55 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
         return WIFI_OPT_FAILED;
     }
     DispatchWifiOpenRes(OperateResState::OPEN_WIFI_OPENING, instId);
-    int ret = WifiStaHalInterface::GetInstance().StartWifi(WifiConfigCenter::GetInstance().GetStaIfaceName());
+    WIFI_LOGI("AutoStartStaService startwifi iface:%{public}s instId:%{public}d",
+    WifiConfigCenter::GetInstance().GetStaIfaceName(instId).c_str(), instId);
+    int ret = WifiStaHalInterface::GetInstance().StartWifi(WifiConfigCenter::GetInstance().GetStaIfaceName(instId),
+        instId);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("AutoStartStaService start wifi fail.");
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
         WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED), "TIME_OUT",
             static_cast<int>(staState));
         return WIFI_OPT_FAILED;
+    } else {
+        WIFI_LOGE("AutoStartStaService start wifi instId:%{public}d success.", instId);
     }
     if (PostStartWifi(instId) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AutoStartStaService PostStartWifi instId:%{public}d", instId);
         return WIFI_OPT_FAILED;
     }
+    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
-    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaStart(instId);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiServiceScheduler::AutoStartStaWifi2Service(int instId, std::string &staIfName)
+{
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+    WIFI_LOGI("AutoStartStaWifi2Service, current sta state:%{public}d", staState);
+    std::lock_guard<std::mutex> lock(mutex);
+    if (staState == WifiOprMidState::RUNNING) {
+        return WIFI_OPT_SUCCESS;
+    }
+    if (PreStartWifi(instId, staIfName) != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_FAILED;
+    }
+    DispatchWifi2OpenRes(OperateResState::OPEN_WIFI_OPENING, instId);
+    int ret = WifiStaHalInterface::GetInstance().StartWifi(WifiConfigCenter::GetInstance().GetStaIfaceName(instId),
+        instId);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AutoStartStaWifi2Service start wifi fail.");
+        return WIFI_OPT_FAILED;
+    }
+    if (PostStartWifi2(instId) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AutoStartStaWifi2Service PostStartWifi instId %{public}d", instId);
+        return WIFI_OPT_FAILED;
+    }
+    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    DispatchWifi2OpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
+    ins->HandleStaWifi2Start(instId);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -151,7 +185,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("service disable sta failed, ret %{public}d!", static_cast<int>(ret));
     }
-    if (WifiStaHalInterface::GetInstance().StopWifi() != WIFI_HAL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().StopWifi(instId) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("stop wifi failed.");
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
         if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, staStateBefore, instId)) {
@@ -159,7 +193,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
             return WIFI_OPT_FAILED;
         }
         WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
-            static_cast<int>(staState));
+        static_cast<int>(staState));
         return WIFI_OPT_FAILED;
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
@@ -169,12 +203,57 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiServiceScheduler::AutoStopStaWifi2Service(int instId)
+{
+    WifiOprMidState staStateBefore = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+    WIFI_LOGI("AutoStopStaWifi2Service, current sta state:%{public}d, instId:%{public}d",
+        staStateBefore, instId);
+    std::lock_guard<std::mutex> lock(mutex);
+    if (staStateBefore == WifiOprMidState::CLOSED) {
+        return WIFI_OPT_SUCCESS;
+    }
+    ErrCode ret = WIFI_OPT_FAILED;
+
+    if (!WifiConfigCenter::GetInstance().SetWifiMidState(staStateBefore, WifiOprMidState::CLOSING, instId)) {
+        WIFI_LOGE("AutoStopStaWifi2Service,set wifi mid state closing failed!");
+        return WIFI_OPT_FAILED;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("AutoStopStaWifi2Service, Instance get sta service is null!");
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
+        return WIFI_OPT_SUCCESS;
+    }
+    DispatchWifi2CloseRes(OperateResState::CLOSE_WIFI_CLOSING, instId);
+    ret = pService->DisableStaService();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AutoStopStaWifi2Service service disable sta failed, ret %{public}d!", static_cast<int>(ret));
+    }
+    if (WifiStaHalInterface::GetInstance().StopWifi(instId) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("AutoStopStaWifi2Service stop wifi failed.");
+        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+        if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, staStateBefore, instId)) {
+            WIFI_LOGE("AutoStopStaWifi2Service, set wifi mid state:%{public}d failed!", staStateBefore);
+            return WIFI_OPT_FAILED;
+        }
+    }
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
+    DispatchWifi2CloseRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
+    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    ins->HandleStaClose(instId);
+    WIFI_LOGE("AutoStopStaWifi2Service %{public}d success!", instId);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfName)
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId);
-    WIFI_LOGI("AutoStartScanOnly, Wifi scan only state is %{public}d", static_cast<int>(curState));
+    WIFI_LOGI("AutoStartScanOnly, Wifi scan only state is %{public}d, instId = %{public}d",
+        static_cast<int>(curState), instId);
     std::lock_guard<std::mutex> lock(mutex);
-    if (curState != WifiOprMidState::CLOSED) {
+    if (curState != WifiOprMidState::CLOSED && instId == 0) {
         WIFI_LOGE("ScanOnly State  is not closed, return\n");
         return WIFI_OPT_SUCCESS;
     }
@@ -185,23 +264,29 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
         return WIFI_OPT_SUCCESS;
     }
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    std::string ifaceName = "";
-    if (g_staIfaceNameMap.count(instId) > 0) {
-        ifaceName = g_staIfaceNameMap[instId];
+    {
+        std::lock_guard<std::mutex> lock(mutexStaIfaceNameMap_);
+        std::string ifaceName = "";
+        if (staIfaceNameMap.count(instId) > 0) {
+            ifaceName = staIfaceNameMap[instId];
+        }
+        if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+            std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
+            std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
+            ifaceName, instId)) {
+            WIFI_LOGE("AutoStartScanOnly, create iface failed!");
+            return WIFI_OPT_FAILED;
+        }
+        WIFI_LOGI("AutoStartScanOnly SetStaIfaceName:%{public}s, instId:%{public}d", ifaceName.c_str(), instId);
+        WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName);
+        staIfName = ifaceName;
+        staIfaceNameMap.insert(std::make_pair(instId, ifaceName));
     }
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
-        std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
-        ifaceName)) {
-        WIFI_LOGE("AutoStartScanOnly, create iface failed!");
-        return WIFI_OPT_FAILED;
-    }
-    WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName);
-    staIfName = ifaceName;
-    g_staIfaceNameMap.insert(std::make_pair(instId, ifaceName));
 #endif
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, instId);
-    WifiManager::GetInstance().AutoStartEnhanceService();
+    if(instId == INSTID_WLAN0) {
+        WifiManager::GetInstance().AutoStartEnhanceService();
+    }
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(instId);
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, instId);
     return WIFI_OPT_SUCCESS;
@@ -230,7 +315,7 @@ ErrCode WifiServiceScheduler::AutoStopScanOnly(int instId, bool setIfaceDown)
     if (setIfaceDown) {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
         DelayedSingleton<HalDeviceManager>::GetInstance()->SetNetworkUpDown(
-            WifiConfigCenter::GetInstance().GetStaIfaceName(), false);
+            WifiConfigCenter::GetInstance().GetStaIfaceName(instId), false);
 #endif
     }
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(instId);
@@ -250,7 +335,8 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
         return WIFI_OPT_FAILED;
     }
     DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_OPENING, instId);
-    int ret = WifiStaHalInterface::GetInstance().StartWifi(WifiConfigCenter::GetInstance().GetStaIfaceName());
+    int ret = WifiStaHalInterface::GetInstance().StartWifi(WifiConfigCenter::GetInstance().GetStaIfaceName(instId),
+        instId);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("AutoStartSemiStaService start wifi fail.");
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
@@ -258,11 +344,11 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
             static_cast<int>(staState));
         return WIFI_OPT_FAILED;
     }
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
+    DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED, instId);
     if (PostStartWifi(instId) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
     }
-    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
-    DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED, instId);
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaSemiActive(instId);
     return WIFI_OPT_SUCCESS;
@@ -271,20 +357,25 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
 ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    std::string ifaceName = "";
-    if (g_staIfaceNameMap.count(instId) > 0) {
-        ifaceName = g_staIfaceNameMap[instId];
-        staIfName = ifaceName;
+    {
+        std::lock_guard<std::mutex> lock(mutexStaIfaceNameMap_);
+        std::string ifaceName = "";
+        if (staIfaceNameMap.count(instId) > 0) {
+            ifaceName = staIfaceNameMap[instId];
+            staIfName = ifaceName;
+        }
+        if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+            std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
+            std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
+            ifaceName, instId)) {
+            WIFI_LOGE("PreStartWifi, create iface failed!");
+            return WIFI_OPT_FAILED;
+        }
+        WIFI_LOGI("PreStartWifi SetStaIfaceName:%{public}s, instId:%{public}d", ifaceName.c_str(), instId);
+        WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName, instId);
+        staIfaceNameMap.insert(std::make_pair(instId, ifaceName));
+        staIfName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
     }
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
-        std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
-        ifaceName)) {
-        WIFI_LOGE("PreStartWifi, create iface failed!");
-        return WIFI_OPT_FAILED;
-    }
-    WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName);
-    g_staIfaceNameMap.insert(std::make_pair(instId, ifaceName));
 #endif
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING, instId)) {
@@ -297,44 +388,14 @@ ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
 ErrCode WifiServiceScheduler::PostStartWifi(int instId)
 {
     ErrCode errCode = WIFI_OPT_FAILED;
-    do {
-        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA) < 0) {
-            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_STA);
-            break;
-        }
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
-        if (pService == nullptr) {
-            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_STA);
-            break;
-        }
-        if (InitStaService(pService) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("InitStaService failed!");
-            break;
-        }
+    if(StartWifiStaService(instId) == WIFI_OPT_FAILED) {
+        WIFI_LOGE("StartWifiStaService failed!");
+    }
 #ifdef FEATURE_SELF_CURE_SUPPORT
-        if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("StartSelfCureService failed!");
-            break;
-        }
+    if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartSelfCureService failed!");
+    }
 #endif
-        errCode = pService->EnableStaService();
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Service enable sta failed ,ret %{public}d!", static_cast<int>(errCode));
-            break;
-        }
-    #ifndef OHOS_ARCH_LITE
-        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-        if (pEnhanceService == nullptr) {
-            WIFI_LOGE("get pEnhance service failed!");
-            break;
-        }
-        errCode = pService->SetEnhanceService(pEnhanceService);
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
-            break;
-        }
-    #endif
-    } while (0);
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 #ifdef FEATURE_P2P_SUPPORT
     errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
@@ -342,6 +403,39 @@ ErrCode WifiServiceScheduler::PostStartWifi(int instId)
         WIFI_LOGE("AutoStartStaService, AutoStartP2pService failed!");
     }
 #endif
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiServiceScheduler::PostStartWifi2(int instId)
+{
+    StartWifiStaService(instId);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
+{
+    if(WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_STA, instId) < 0) {
+        WIFI_LOGE("StartWifiStaService Load %{public}s service failed!", WIFI_SERVICE_STA);
+        return WIFI_OPT_FAILED;
+    }
+    WIFI_LOGD("StartWifiStaService GetStaServiceInst instId:%{public}d", instId);
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("StartWifiStaService Create %{public}s service failed!", WIFI_SERVICE_STA);
+        return WIFI_OPT_FAILED; 
+    }
+    WIFI_LOGD("StartWifiStaService InitStaService instId:%{public}d", instId);
+    if (InitStaService(pService) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartWifiStaService InitStaService failed!");
+        return WIFI_OPT_FAILED; 
+    }
+    WIFI_LOGD("StartWifiStaService EnableStaService instId:%{public}d", instId);
+    ErrCode = pService->EnableStaService();
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartWifiStaService Service enable sta failed ,ret %{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED; 
+    }
+    WIFI_LOGI("StartWifiStaService instId%{public}d successful", instId);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -423,18 +517,21 @@ void WifiServiceScheduler::StaIfaceDestoryCallback(std::string &destoryIfaceName
 {
     WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
         destoryIfaceName.c_str(), createIfaceType);
-    auto iter = g_staIfaceNameMap.begin();
-    while (iter != g_staIfaceNameMap.end()) {
-        if (destoryIfaceName == iter->second) {
-            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-            ins->SendMessage(CMD_STA_REMOVED, createIfaceType, iter->first);
-            if (createIfaceType >= 0) {
-                WifiConfigCenter::GetInstance().SetStaIfaceName("");
-                g_staIfaceNameMap.erase(iter);
+    {
+        std::lock_guard<std::mutex> lock(mutexStaIfaceNameMap_);
+        auto iter = staIfaceNameMap.begin();
+        while (iter != staIfaceNameMap.end()) {
+            if (destoryIfaceName == iter->second) {
+                auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+                ins->SendMessage(CMD_STA_REMOVED, createIfaceType, iter->first);
+                if (createIfaceType >= 0) {
+                    WifiConfigCenter::GetInstance().SetStaIfaceName("");
+                    staIfaceNameMap.erase(iter);
+                }
+                return;
             }
-            return;
+            iter++;
         }
-        iter++;
     }
 }
 
@@ -478,6 +575,29 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
         return;
     }
+}
+
+void WifiServiceScheduler::DispatchWifi2OpenRes(OperateResState state, int instId)
+{
+    WIFI_LOGI("DispatchWifi2OpenRes, state:%{public}d", static_cast<int>(state));
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+    cbMsg.id = instId;
+    if (state == OperateResState::OPEN_WIFI_OPENING) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATING, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::ENABLING);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    }
+    if (state == OperateResState::OPEN_WIFI_SUCCEED) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, instId);
+        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED, instId);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    }
+    return;
 }
 
 void WifiServiceScheduler::DispatchWifiSemiActiveRes(OperateResState state, int instId)
@@ -538,7 +658,7 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
             WIFI_LOGI("reset selfcure wifi off->open!");
             int state = WifiSettings::GetInstance().GetStaLastRunState();
             state = (state == WIFI_STATE_SEMI_ENABLED) ? WIFI_STATE_SEMI_ENABLED : WIFI_STATE_ENABLED;
-            WifiConfigCenter::GetInstance().SetWifiToggledState(state);
+            WifiConfigCenter::GetInstance().SetWifiToggledState(state, instId);
             WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
             WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
         }
@@ -549,13 +669,37 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
     }
 }
 
+void WifiServiceScheduler::DispatchWifi2CloseRes(OperateResState state, int instId)
+{
+    WIFI_LOGI("DispatchWifi2CloseRes, state:%{public}d", static_cast<int>(state));
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+    cbMsg.id = instId;
+    if (state == OperateResState::CLOSE_WIFI_CLOSING) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_DEACTIVATING, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::DISABLING);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        return;
+    }
+    if (state == OperateResState::CLOSE_WIFI_SUCCEED) {
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
+        cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
+        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+        return;
+    }
+}
+
 /*--------------------------------------------------softAp------------------------------------------------------------*/
 
 #ifdef FEATURE_AP_SUPPORT
 ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softApIfName)
 {
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(instId);
-    WIFI_LOGE("AutoStartApService, current ap state:%{public}d", apState);
+    WIFI_LOGI("AutoStartApService, current ap state:%{public}d", apState);
     std::lock_guard<std::mutex> lock(mutex);
     if (apState != WifiOprMidState::CLOSED) {
         if (apState == WifiOprMidState::CLOSING) {
@@ -565,20 +709,23 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
         }
     }
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    std::string ifaceName = "";
-    if (g_softApIfaceNameMap.count(instId) > 0) {
-        ifaceName = g_softApIfaceNameMap[instId];
+    {
+        std::lock_guard<std::mutex> lock(mutexApIfaceNameMap_);
+        std::string ifaceName = "";
+        if (softApIfaceNameMap.count(instId) > 0) {
+            ifaceName = softApIfaceNameMap[instId];
+        }
+        if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
+            std::bind(&WifiServiceScheduler::SoftApIfaceDestoryCallback,
+            this, std::placeholders::_1, std::placeholders::_2),
+            ifaceName)) {
+            WIFI_LOGE("AutoStartApService, create iface failed!");
+            return WIFI_OPT_FAILED;
+        }
+        WifiConfigCenter::GetInstance().SetApIfaceName(ifaceName);
+        softApIfName = ifaceName;
+        softApIfaceNameMap.insert(std::make_pair(instId, ifaceName));
     }
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
-        std::bind(&WifiServiceScheduler::SoftApIfaceDestoryCallback,
-        this, std::placeholders::_1, std::placeholders::_2),
-        ifaceName)) {
-        WIFI_LOGE("AutoStartApService, create iface failed!");
-        return WIFI_OPT_FAILED;
-    }
-    WifiConfigCenter::GetInstance().SetApIfaceName(ifaceName);
-    softApIfName = ifaceName;
-    g_softApIfaceNameMap.insert(std::make_pair(instId, ifaceName));
 #endif
     if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0)) {
         WIFI_LOGE("AutoStartApService, set ap mid state opening failed!");
@@ -597,14 +744,13 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
 ErrCode WifiServiceScheduler::AutoStopApService(int instId)
 {
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(instId);
-    WIFI_LOGE("AutoStopApService, current ap state:%{public}d", apState);
+    WIFI_LOGI("AutoStopApService, current ap state:%{public}d", apState);
     std::lock_guard<std::mutex> lock(mutex);
+    if (apState == WifiOprMidState::OPENING) {
+        return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
+    }
     if (apState != WifiOprMidState::RUNNING) {
-        if (apState == WifiOprMidState::OPENING) {
-            return WIFI_OPT_CLOSE_FAIL_WHEN_OPENING;
-        } else {
-            return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
-        }
+        return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
 
     if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, instId)) {
@@ -668,20 +814,24 @@ void WifiServiceScheduler::SoftApIfaceDestoryCallback(std::string &destoryIfaceN
 {
     WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
         destoryIfaceName.c_str(), createIfaceType);
-    auto iter = g_softApIfaceNameMap.begin();
-    while (iter != g_softApIfaceNameMap.end()) {
-        if (destoryIfaceName == iter->second) {
-            WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-            ins->SendMessage(CMD_AP_REMOVED, createIfaceType, iter->first);
-            if (createIfaceType >= 0) {
-                WifiConfigCenter::GetInstance().SetApIfaceName("");
-                g_softApIfaceNameMap.erase(iter);
+    {
+        std::lock_guard<std::mutex> lock(mutexApIfaceNameMap_);
+        auto iter = softApIfaceNameMap.begin();
+        while (iter != softApIfaceNameMap.end()) {
+            if (destoryIfaceName == iter->second) {
+                WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+                auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+                ins->SendMessage(CMD_AP_REMOVED, createIfaceType, iter->first);
+                if (createIfaceType >= 0) {
+                    WifiConfigCenter::GetInstance().SetApIfaceName("");
+                    softApIfaceNameMap.erase(iter);
+                }
+                return;
             }
-            return;
+            iter++;
         }
-        iter++;
     }
+
 }
 #endif
 #endif

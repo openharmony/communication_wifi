@@ -478,7 +478,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
-    WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
+    WIFI_LOGD("HandleInternetFailedDetected, wifi has no internet when connected.");
     if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
         WIFI_LOGI("current network do not need selfcure");
         return;
@@ -2708,7 +2708,7 @@ bool SelfCureStateMachine::IsCustNetworkSelfCure()
         return false;
     }
     if (pEnhanceService->IsHwItCustNetwork(config)) {
-        WIFI_LOGI("dns-selfcure is not triggered on the network.");
+        WIFI_LOGD("dns-selfcure is not triggered on the network.");
         return true;
     }
     return false;

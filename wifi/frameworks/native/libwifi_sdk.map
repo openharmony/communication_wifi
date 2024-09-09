@@ -44,6 +44,7 @@
         GetScanInfoList;
         AddDeviceConfig;
         GetDeviceConfigs;
+        GetDeviceConfig;
         RemoveDevice;
         DisableDeviceConfig;
         EnableDeviceConfig;

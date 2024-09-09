@@ -2426,7 +2426,7 @@ ErrCode WifiDeviceProxy::GetDeviceConfig(const int &networkId, WifiDeviceConfig 
         return ErrCode(ret);
     }
 
-    ReadDeviceConfig(reply, result);
+    ReadDeviceConfig(reply, config);
     return WIFI_OPT_SUCCESS;
 }
 

@@ -50,9 +50,10 @@ StaServiceCallback AppNetworkSpeedLimitService::GetStaCallback() const
 
 void AppNetworkSpeedLimitService::Init()
 {
-    using namespace std::placeholders;
     m_staCallback.callbackModuleName = APP_NETWORK_SPEED_LIMIT_CLASS_NAME;
-    m_staCallback.OnStaConnChanged = std::bind(&AppNetworkSpeedLimitService::DealStaConnChanged, this, _1, _2, _3);
+    m_staCallback.OnStaConnChanged = [this](OperateResState state, const WifiLinkedInfo &info, int instId) {
+        this->DealStaConnChanged(state, info, instId);
+    };
     InitWifiLimitRecord();
     InitCellarLimitRecord();
 }

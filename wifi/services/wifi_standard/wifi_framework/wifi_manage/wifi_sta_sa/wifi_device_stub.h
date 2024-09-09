@@ -29,7 +29,7 @@ public:
     explicit WifiDeviceStub(int instId);
     virtual ~WifiDeviceStub();
 
-    using handleFunc = void (WifiDeviceStub::*)(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    using handleFunc = std::function<void(uint32_t, MessageParcel &, MessageParcel &)>;
     using HandleFuncMap = std::map<int, handleFunc>;
 
     virtual int OnRemoteRequest(

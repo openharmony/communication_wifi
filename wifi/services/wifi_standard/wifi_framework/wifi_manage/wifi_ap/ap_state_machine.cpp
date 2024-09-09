@@ -60,7 +60,7 @@ void ApStateMachine::Init()
     StatePlus(&m_ApRootState, nullptr);
     StatePlus(&m_ApIdleState, &m_ApRootState);
     StatePlus(&m_ApStartedState, &m_ApRootState);
-    SetFirstState(&m_ApIdleState);
+    SetFirstState(&m_ApStartedState);
     m_iface = WifiConfigCenter::GetInstance().GetApIfaceName();
     StartStateMachine();
 }
@@ -166,17 +166,17 @@ bool ApStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo> 
 
 void ApStateMachine::RegisterEventHandler()
 {
-    using namespace std::placeholders;
-    using type = void (StateMachine::*)(int, int, int, const std::any &);
-
-    auto handler = std::bind(static_cast<type>(&StateMachine::SendMessage), this, _1, _2, _3, _4);
+    auto handler = [this](int msgName, int param1, int param2, const std::any &messageObj) {
+        this->SendMessage(msgName, param1, param2, messageObj);
+    };
 
     m_ApMonitor.RegisterHandler(
         m_iface, [=](ApStatemachineEvent msgName, int param1, int param2, const std::any &messageObj) {
             handler(static_cast<int>(msgName), param1, param2, messageObj);
         });
 
-    m_ApStationsManager.RegisterEventHandler(std::bind(&ApStateMachine::BroadCastStationChange, this, _1, _2));
+    m_ApStationsManager.RegisterEventHandler(
+        [this](const StationInfo &staInfo, ApStatemachineEvent act) { this->BroadCastStationChange(staInfo, act); });
 }
 }  // namespace Wifi
 }  // namespace OHOS

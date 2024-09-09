@@ -31,6 +31,8 @@ namespace Wifi {
 inline const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_MANAGER_STATE_CHANGED";
 #endif
 const int CAST_ENGINE_SA_ID = 65546;
+const int SHARE_SERVICE_ID = 2902;
+const int MOUSE_CROSS_SERVICE_ID = 65569;
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 inline const std::string COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED = "usual.event.ASSET_SYNC_DATA_CHANGED_SA";
 const int ASSETID = 6226;
@@ -100,6 +102,8 @@ private:
 #endif
     void HandleDistributedKvDataServiceChange(bool add);
     void HandleCastServiceChange(bool add);
+    void HandleShareServiceChange(bool add);
+    void HandleMouseCrossServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void GetCloneDataByDatashare(std::string &cloneData);
     void SetCloneDataByDatashare(const std::string &cloneData);

@@ -59,7 +59,6 @@ public:
     virtual int SetRealMacAddress(const std::string &macAddress, int instId = 0) = 0;
     virtual int GetRealMacAddress(std::string &macAddress, int instId = 0) = 0;
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
-    virtual void GetPortalUri(WifiPortalConf &urlInfo) = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
     virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
     virtual int GetMinRssi2Dot4Ghz(int instId = 0) = 0;
@@ -90,6 +89,7 @@ public:
     virtual int SetStaLastRunState(int bRun, int instId = 0) = 0;
     virtual void SetScanOnlySwitchState(const int &state, int instId = 0) = 0;
     virtual  bool IsModulePreLoad(const std::string &name) = 0;
+    virtual bool GetConfigValueByName(const std::string &name, std::string &value) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -132,7 +132,6 @@ public:
     MOCK_METHOD2(SetRealMacAddress, int(const std::string &macAddress, int));
     MOCK_METHOD2(GetRealMacAddress, int(std::string &macAddress, int));
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
-    MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
     MOCK_METHOD1(GetPackageFilterMap,  int(std::map<std::string, std::vector<std::string>> &filterMap));
     MOCK_METHOD1(GetMinRssi2Dot4Ghz, int(int));
@@ -162,6 +161,7 @@ public:
     MOCK_METHOD2(SetScanOnlySwitchState, void(const int &state, int instId));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD1(IsModulePreLoad,  bool(const std::string &name));
+    MOCK_METHOD2(GetConfigValueByName,  bool(const std::string &name, std::string &value));
 };
 }  // namespace OHOS
 }  // namespace Wifi

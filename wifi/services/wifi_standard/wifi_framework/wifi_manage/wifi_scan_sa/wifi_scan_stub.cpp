@@ -30,6 +30,9 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScanStub");
 
 namespace OHOS {
 namespace Wifi {
+static std::map<int, std::string> g_HicollieScanMap = {
+    { static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), "WIFI_SVR_CMD_START_PNO_SCAN" },
+};
 WifiScanStub::WifiScanStub() : mSingleCallback(false)
 {
     InitHandleMap();
@@ -69,9 +72,6 @@ void WifiScanStub::InitHandleMap()
     handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN)] =
         &WifiScanStub::OnStartWifiPnoScan;
 }
-static std::map<int, std::string> collieCodeStringScanMap = {
-    { static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), "WIFI_SVR_CMD_START_PNO_SCAN" },
-};
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -91,14 +91,16 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
         if (exception) {
             return WIFI_OPT_FAILED;
         }
-        std::map<int, std::string>::iterator itCollieId = collieCodeStringScanMap.find(code);
-        int idTimer = 0;
-        if (itCollieId != collieCodeStringScanMap.end()) {
+        std::map<int, std::string>::const_iterator itCollieId = g_HicollieScanMap.find(code);
+        if (itCollieId != g_HicollieScanMap.end()) {
+            int idTimer = 0;
             idTimer = WifiWatchDogUtils::GetInstance()->StartWatchDogForFunc(itCollieId->second);
             WIFI_LOGI("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
+            (this->*(iter->second))(code, data, reply, option);
+            WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
+        } else {
+            (this->*(iter->second))(code, data, reply, option);
         }
-        (this->*(iter->second))(code, data, reply, option);
-        WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
     }
     return 0;
 }

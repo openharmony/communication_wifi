@@ -148,7 +148,7 @@ public:
      * @param power
      * @return WifiErrorNo
      */
-    WifiErrorNo SetTxPower(const std::string &ifaceName, int power);
+    WifiErrorNo SetTxPower(int power);
 
     /**
      * @Description Scan by specified parameter.

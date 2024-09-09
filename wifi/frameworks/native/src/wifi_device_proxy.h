@@ -473,6 +473,23 @@ public:
      */
     ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) override;
 
+    /**
+     * Register the common builder function
+     *
+     * @param TagType scoreTag which define where the score or filter should be inserted.
+     * @param tagName the score or filter name.
+     * @param CommonBuilder CommonBuilder function.
+     */
+    ErrCode RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                               const CommonBuilder &commonBuilder) override;
+    /**
+     * Deregister the common builder function
+     *
+     * @param TagType TagType which define where the score or filter should be inserted.
+     * @param tagName the score or filte name.
+     */
+    ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName) override;
+
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;
     /**
      * @Description reset factory
@@ -581,7 +598,7 @@ private:
     void ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
     sptr<IRemoteObject> remote_ = nullptr;
-    bool mRemoteDied;
+    std::atomic<bool> mRemoteDied;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
 #endif

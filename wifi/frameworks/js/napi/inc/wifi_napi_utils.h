@@ -244,6 +244,12 @@ enum class WifiChannelWidthJs {
     WIDTH_INVALID,
 };
 
+enum class WifiCategoryJs {
+    DEFAULT = 1,
+    WIFI6 = 2,
+    WIFI6_PLUS = 3
+};
+
 enum class WifiStandardJs {
     WIFI_STANDARD_UNDEFINED = 0,
     WIFI_STANDARD_11A = 1,

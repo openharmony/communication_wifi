@@ -41,6 +41,7 @@
 #include "cellular_data_client.h"
 #include "core_manager_inner.h"
 #include "telephony_errors.h"
+#include "ienhance_service.h"
 #endif
 
 namespace OHOS {
@@ -153,7 +154,7 @@ class StaStateMachine : public StateMachine {
 public:
     explicit StaStateMachine(int instId = 0);
     ~StaStateMachine();
-    using staSmHandleFunc = void (StaStateMachine::*)(InternalMessagePtr msg);
+    using staSmHandleFunc = std::function<void(InternalMessagePtr)>;
     using StaSmHandleFuncMap = std::map<int, staSmHandleFunc>;
     /**
      * @Description  Definition of member function of State base class in StaStateMachine.
@@ -333,6 +334,8 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        void DhcpResultNotify(InternalMessagePtr msg);
+        void NetDetectionNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -546,6 +549,10 @@ public:
     void DealApRoamingStateTimeout(InternalMessagePtr msg);
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
+    void DealWpaStateChange(InternalMessagePtr msg);
+#ifndef OHOS_ARCH_LITE
+    void SetEnhanceService(IEnhanceService* enhanceService);
+#endif
 private:
     /**
      * @Description  Destruct state.
@@ -1188,6 +1195,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
+    IEnhanceService *enhanceService_;        /* EnhanceService handle */
 #endif
 
     int lastNetworkId;
@@ -1215,7 +1223,6 @@ private:
     DhcpResultNotify *pDhcpResultNotify;
     ClientCallBack clientCallBack;
     DhcpClientReport dhcpClientReport_;
-    WifiPortalConf mUrlInfo;
     RootState *pRootState;
     InitState *pInitState;
     WpaStartingState *pWpaStartingState; /* Starting wpa_supplicant state. */
@@ -1247,6 +1254,7 @@ private:
     WifiDeviceConfig getCurrentWifiDeviceConfig();
     void InsertOrUpdateNetworkStatusHistory(const NetworkStatus &networkStatus, bool updatePortalAuthTime);
     bool CanArpReachable();
+    void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();

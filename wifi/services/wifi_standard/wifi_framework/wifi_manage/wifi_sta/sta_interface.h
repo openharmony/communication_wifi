@@ -242,14 +242,6 @@ public:
     virtual ErrCode SetPowerMode(bool mode) override;
 
     /**
-     * @Description send tx power for sar.
-     *
-     * @param power: 1001,1002,1003......
-     * @return WifiErrorNo
-     */
-    virtual ErrCode SetTxPower(int power) override;
-
-    /**
      * @Description systemabilitychanged
      *
      * @param add: true for setup, false for shutdown.
@@ -317,6 +309,25 @@ public:
      * @return WifiErrorNo
      */
     ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName) override;
+
+    /**
+     * Register the common builder function
+     *
+     * @param TagType scoreTag which define where the score or filter should be inserted.
+     * @param tagName the score or filter name.
+     * @param CommonBuilder CommonBuilder function.
+     */
+     
+    ErrCode RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                          const CommonBuilder &commonBuilder) override;
+    /**
+     * Deregister the common builder function
+     *
+     * @param TagType TagType which define where the score or filter should be inserted.
+     * @param tagName the score or filte name.
+     */
+    ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName) override;
+ 
     /**
      * @Description start portal certification.
      *
@@ -335,6 +346,14 @@ public:
      */
 #ifndef OHOS_ARCH_LITE
     virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) override;
+
+    /**
+     * @Description Set EnhanceService to sta Service.
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) override;
 #endif
 	/**
      * @Description EnableHiLinkHandshake.

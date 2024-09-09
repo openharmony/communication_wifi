@@ -44,15 +44,15 @@ public:
     void WifiAssetRemove(const WifiDeviceConfig &config,
         int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
  
-    void WifiAssetAddPack(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig,
+    void WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
         int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
  
-    void WifiAssetRemovePack(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig,
+    void WifiAssetRemovePack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
         int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
  
     void WifiAssetRemoveAll(int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
  
-    void WifiAssetUpdatePack(const std::vector<WifiDeviceConfig> &mWifiDeviceConfig,
+    void WifiAssetUpdatePack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
         int32_t userId = USER_ID_DEFAULT);
  
     bool IsWifiConfigChanged(const WifiDeviceConfig &config, const WifiDeviceConfig &oriConfig);

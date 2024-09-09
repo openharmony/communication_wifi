@@ -94,8 +94,7 @@ void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
 {
     WIFI_LOGI("%{public}s enter", __func__);
     if (appChangeEventHandler) {
-        std::function<void()> RegisterAppStateObserverFunc =
-            std::bind(&WifiAppStateAware::RegisterAppStateObserver, this);
+        std::function<void()> RegisterAppStateObserverFunc = [this]() { this->RegisterAppStateObserver(); };
         appChangeEventHandler->PostAsyncTask(RegisterAppStateObserverFunc, delayTime);
     } else {
         WIFI_LOGE("%{public}s appChangeEventHandler is null", __func__);

@@ -26,8 +26,8 @@ namespace OHOS {
 namespace Wifi {
 class WifiHotspotStub : public IRemoteStub<IWifiHotspot> {
 public:
-    using handleFunc = void (WifiHotspotStub::*)(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    using handleFunc = std::function<void
+        (uint32_t, MessageParcel &, MessageParcel &, MessageOption &)>;
     using HandleFuncMap = std::map<int, handleFunc>;
 
     WifiHotspotStub();

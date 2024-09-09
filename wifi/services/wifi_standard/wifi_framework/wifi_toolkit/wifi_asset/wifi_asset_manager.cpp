@@ -348,13 +348,13 @@ void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wif
                 LOGE("WifiAssetAttrAdd Failed, %{public}s", SsidAnonymize(mapConfig.ssid).c_str());
             } else {
                 LOGI("WifiAssetAttrAdd Success");
-                if (firstSync) {
-                    firstSync_ = true;
-                }
             }
         }
         if (flagSync) {
             WifiAssetTriggerSync();
+        }
+        if (firstSync) {
+            firstSync_ = true;
         }
     });
 }

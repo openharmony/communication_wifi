@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 /**
  * This class solves the problem caused by frequent operations on the WifiP2pGroupInfo object in the following
    scenarios:

@@ -24,6 +24,7 @@ DEFINE_WIFILOG_P2P_LABEL("GroupFormedState");
 
 namespace OHOS {
 namespace Wifi {
+    
 GroupFormedState::GroupFormedState(
     P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr)
     : State("GroupFormedState"), p2pStateMachine(stateMachine), groupManager(groupMgr), deviceManager(deviceMgr)

@@ -566,6 +566,7 @@ private:
     void WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &req);
 #else
 private:
+    void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit WifiDeathRecipient(WifiDeviceProxy &client) : client_(client) {}
@@ -574,7 +575,6 @@ private:
         {
             client_.OnRemoteDied(remote);
         }
-        void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     private:
         WifiDeviceProxy &client_;
     };

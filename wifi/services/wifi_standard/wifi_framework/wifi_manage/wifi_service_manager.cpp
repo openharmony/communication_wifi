@@ -197,7 +197,7 @@ int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCrea
         WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
         return -1;
     }
-    mEnhanceServiceHandle.create = (IEnhanceService * (*)()) dlsym(mEnhanceServiceHandle.handle, "Create");
+    mEnhanceServiceHandle.create = (IEnhanceService *(*)()) dlsym(mEnhanceServiceHandle.handle, "Create");
     mEnhanceServiceHandle.destroy = (void *(*)(IEnhanceService *))dlsym(mEnhanceServiceHandle.handle, "Destroy");
     if (mEnhanceServiceHandle.create == nullptr || mEnhanceServiceHandle.destroy == nullptr) {
         WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());

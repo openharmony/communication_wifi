@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ DEFINE_WIFILOG_LABEL("MultiStaManager");
 namespace OHOS {
 namespace Wifi {
 MultiStaManager::MultiStaManager(MultiStaManager::Role role, int id) : mid(id), curRole(role),
-    pMultiStaStateMachine(nullptr) 
+    pMultiStaStateMachine(nullptr)
 {}
 
 MultiStaManager::~MultiStaManager()

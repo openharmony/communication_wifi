@@ -500,7 +500,7 @@ WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen, const ch
         return WIFI_HAL_OPT_FAILED;
     }
 
-    if ((uint32_t)macAddrLen < (int)status.addressLen) {
+    if ((uint32_t)macAddrLen < status.addressLen) {
         LOGE("Input mac length %{public}d is little than mac address length %{public}d", macAddrLen, status.addressLen);
         HdiWpaFree(&status);
         pthread_mutex_unlock(GetWpaObjMutex());
@@ -544,12 +544,8 @@ WifiErrorNo HdiWpaStaScan()
 ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
 {
     LOGI("HdiWpaStaGetScanInfos enter");
-    if (ifaceName == NULL) {
+    if (ifaceName == NULL || size == NULL) {
         LOGE("HdiWpaStaGetScanInfos ifaceName is null");
-        return NULL;
-    }
-    if (size == NULL) {
-        LOGE("HdiWpaStaGetScanInfos: invalid parameter!");
         return NULL;
     }
 
@@ -588,6 +584,11 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
         return NULL;
     }
 
+    HandleGetScanInfo(resultBuff, size, results);
+    return results;
+}
+
+void HandleGetScanInfo(unsigned char *resultBuff, int *size, ScanInfo *results) {
     char *savedPtr = NULL;
     strtok_r((char *)resultBuff, "\n", &savedPtr);
     char *token = strtok_r(NULL, "\n", &savedPtr);
@@ -623,7 +624,6 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     free(resultBuff);
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiWpaStaGetScanInfos success.");
-    return results;
 }
 
 WifiErrorNo HdiWpaStaRemoveNetwork(int networkId, const char *ifaceName)
@@ -822,7 +822,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback, const 
     g_hdiWpaStaCallbackObj[instId]->OnEventScanResult = callback->OnEventScanResult;
 #endif
     g_hdiWpaStaCallbackObj[instId]->OnEventScanResult = callback->OnEventScanResult;
-    g_hdiWpaStaCallbackObj->OnEventStaNotify = callback->OnEventStaNotify;
+    g_hdiWpaStaCallbackObj[instId]->OnEventStaNotify = callback->OnEventStaNotify;
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterHdiWpaStaEventCallback3 success.");
     return WIFI_HAL_OPT_OK;

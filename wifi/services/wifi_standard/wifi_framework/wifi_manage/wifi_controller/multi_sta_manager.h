@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +17,8 @@
 #define OHOS_MULTI_STA_MANAGER_H
 
 #include <functional>
-#include "wifi_errcode.h"
 #include <string>
+#include "wifi_errcode.h"
 #include "multi_sta_state_machine.h"
 
 namespace OHOS {
@@ -31,8 +31,8 @@ public:
         ROLE_STA_2_REMOVED = 1,
     };
 
-    ErrCode RegisterCallback(const MultiStaModeCallback &callbacks);
     explicit MultiStaManager(MultiStaManager::Role role, int id);
+    ErrCode RegisterCallback(const MultiStaModeCallback &callbacks);
     ~MultiStaManager();
     ErrCode InitMultiStaManager();
     void SetRole(Role role);

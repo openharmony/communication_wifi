@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ public:
 
     class IdleState : public State {
     public:
-        explicit IdleState(MultiStaStateMachine *MultiStaStateMachine);
+        explicit IdleState(MultiStaStateMachine *multiStaStateMachine);
         ~IdleState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -48,7 +48,7 @@ public:
 
     class DefaultState : public State {
     public:
-        explicit DefaultState(MultiStaStateMachine *MultiStaStateMachine);
+        explicit DefaultState(MultiStaStateMachine *multiStaStateMachine);
         ~DefaultState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -60,7 +60,7 @@ public:
 
     class StartedState : public State {
     public:
-        explicit StartedState(MultiStaStateMachine *MultiStaStateMachine);
+        explicit StartedState(MultiStaStateMachine *multiStaStateMachine);
         ~StartedState() override;
         void GoInState() override;
         void GoOutState() override;
@@ -95,7 +95,6 @@ private:
 
     void BuildStateTree();
     ErrCode InitMultiStaStates();
-    void StopMultiSta();
     DefaultState *pDefaultState;
     IdleState *pIdleState;
     StartedState *pStartedState;

@@ -58,7 +58,6 @@ namespace Wifi {
 #define CONCRETE_CMD_STA_WIFI2_START 0x303
 #define CONCRETE_CMD_STA_WIFI2_STOP 0x304
 
-
 #define STOP_WIFI_WAIT_TIME 100
 
 struct ConcreteModeCallback {

@@ -87,9 +87,9 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, reasonCode, std::string(szBssid));
     }
     LOGI("%{public}s callback out, bssid:%{public}s ifName = %{public}s",
-    __func__,
-    OHOS::Wifi::MacAnonymize(szBssid).c_str(),
-    ifName);
+        __func__,
+        OHOS::Wifi::MacAnonymize(szBssid).c_str(),
+        ifName);
     return 0;
 }
 

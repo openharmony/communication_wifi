@@ -2476,7 +2476,7 @@ bool SelfCureStateMachine::IsSuppOnCompletedState()
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState == ConnState::CONNECTED) {
+    if (linkedInfo.supplicantState == SupplicantState::COMPLETED) {
         return true;
     }
     return false;

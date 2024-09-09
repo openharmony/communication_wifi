@@ -234,7 +234,7 @@ WifiAssetManager::~WifiAssetManager()
 
 void WifiAssetManager::InitUpLoadLocalDeviceSync()
 {
-    if (firstSync_ == true) {
+    if (firstSync_) {
         LOGE("WifiAssetManager, local data is sync");
         return;
     }

@@ -120,10 +120,10 @@ void P2pEnabledState::Init()
 
 void P2pEnabledState::InitProcessMsg()
 {
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_INCREASE_SHARE_LINK, &P2pEnabledState::ProcessCmdIncreaseSharedLink));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DECREASE_SHARE_LINK, &P2pEnabledState::ProcessCmdDecreaseSharedLink));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_INCREASE_SHARE_LINK,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdIncreaseSharedLink(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DECREASE_SHARE_LINK,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDecreaseSharedLink(msg); }));
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const

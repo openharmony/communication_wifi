@@ -64,6 +64,7 @@ ErrCode ConcreteClientModeManager::InitConcreteManager()
     }
     pConcreteMangerMachine->RegisterCallback(mcb);
     pConcreteMangerMachine->SetTargetRole(curRole);
+    WIFI_LOGD("SendMessage CONCRETE_CMD_START mid=%{public}d.\n", mid);
     pConcreteMangerMachine->SendMessage(CONCRETE_CMD_START, mid);
     return WIFI_OPT_SUCCESS;
 }

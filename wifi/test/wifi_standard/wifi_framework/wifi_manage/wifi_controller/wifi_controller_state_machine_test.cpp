@@ -84,8 +84,9 @@ public:
 
     void WifiToggledTest1()
     {
+        int instId = 0;
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false, instId);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg->SetMessageName(CMD_WIFI_TOGGLED);
@@ -101,8 +102,9 @@ public:
 
     void WifiToggledTest2()
     {
+        int instId = 0;
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false, instId);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg->SetMessageName(CMD_WIFI_TOGGLED);
@@ -120,8 +122,9 @@ public:
 
     void HandleStaStartFail()
     {
+        int instId = 0;
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false, instId);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg->SetMessageName(CMD_STA_START_FAILURE);
@@ -295,6 +298,7 @@ public:
 
     void ConcreteIdExistTest()
     {
+        int instId = 0;
         ConcreteClientModeManager *clientmode =
             new (std::nothrow) ConcreteClientModeManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
@@ -310,15 +314,15 @@ public:
         pWifiControllerMachine->HandleStaSemiActive(0);
         pWifiControllerMachine->HandleStaClose(0);
         pWifiControllerMachine->SwitchRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
-        WifiConfigCenter::GetInstance().SetWifiToggledState(1);
-        EXPECT_TRUE(pWifiControllerMachine->ShouldEnableWifi());
+        WifiConfigCenter::GetInstance().SetWifiToggledState(1, instId);
+        EXPECT_TRUE(pWifiControllerMachine->ShouldEnableWifi(instId));
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(CMD_WIFI_TOGGLED);
         msg->SetParam2(0);
-        EXPECT_FALSE(pWifiControllerMachine->ShouldDisableWifi(msg));
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
+        EXPECT_FALSE(pWifiControllerMachine->ShouldDisableWifi(msg, instId));
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
-        EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi(msg));
+        EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi(msg, instId));
         pWifiControllerMachine->RemoveConcreteManager(1);
         pWifiControllerMachine->RemoveConcreteManager(0);
         pWifiControllerMachine->ShutdownWifi();
@@ -326,7 +330,8 @@ public:
 
     void GetWifiRoleTest()
     {
-        pWifiControllerMachine->GetWifiRole();
+        int instId = 0;
+        pWifiControllerMachine->GetWifiRole(instId);
     }
 };
 
@@ -467,11 +472,12 @@ HWTEST_F(WifiControllerMachineTest, GetWifiRoleTest, TestSize.Level1)
 
 HWTEST_F(WifiControllerMachineTest, HandleApStopTest, TestSize.Level1)
 {
+    int instId = 0;
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(CMD_AP_STOPPED);
     msg->SetParam1(0);
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, instId);
     pWifiControllerMachine->pEnableState->HandleApStop(msg);
 }
 }

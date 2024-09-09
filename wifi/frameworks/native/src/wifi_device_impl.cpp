@@ -586,5 +586,12 @@ ErrCode WifiDeviceImpl::StartConnectToUserSelectNetwork(int networkId, std::stri
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->StartConnectToUserSelectNetwork(networkId, bssid, isCandidate);
 }
+
+ErrCode WifiDeviceImpl::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetDeviceConfig(networkId, config);
+}
 }  // namespace Wifi
 }  // namespace OHOS

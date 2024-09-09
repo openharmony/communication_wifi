@@ -523,6 +523,7 @@ void WifiP2pGroupInfo::SetClientPersistentDevices(const std::vector<WifiP2pDevic
 void WifiP2pGroupInfo::ClearClientDevices()
 {
     clientDevices.clear();
+    persistentClients.clear();
 }
 
 void WifiP2pGroupInfo::SetCreatorUid(int uid)

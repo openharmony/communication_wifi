@@ -624,6 +624,7 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
             auto &ins = wifiTogglerManager->GetControllerMachine();
             ins->HandleStaStart(mid);
             return WIFI_OPT_SUCCESS;
+            
         }
     }
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);

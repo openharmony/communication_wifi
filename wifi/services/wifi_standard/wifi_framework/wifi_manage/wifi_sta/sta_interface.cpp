@@ -346,18 +346,6 @@ ErrCode StaInterface::SetPowerMode(bool mode)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::SetTxPower(int power)
-{
-    LOGD("Enter SetTxPower, power=[%{public}d]!", power);
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->SetTxPower(power) != WIFI_OPT_SUCCESS) {
-        LOGE("SetTxPower() failed!");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 {
     LOGI("Enter OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",

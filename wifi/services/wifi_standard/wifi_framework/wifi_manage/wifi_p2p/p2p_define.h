@@ -112,6 +112,8 @@ enum class P2P_STATE_MACHINE_CMD {
     CMD_REMOVE_GROUP_CLIENT,
     CMD_DISCOVER_PEERS,
     CMD_DISABLE_RANDOM_MAC,
+    CMD_INCREASE_SHARE_LINK,
+    CMD_DECREASE_SHARE_LINK,
 
     /* monitor to state machine */
     WPA_CONNECTED_EVENT = 100,  // result of connect

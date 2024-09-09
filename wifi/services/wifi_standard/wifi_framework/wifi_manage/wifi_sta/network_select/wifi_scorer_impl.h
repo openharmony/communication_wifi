@@ -147,6 +147,12 @@ class SavedNetworkScorer : public CompositeWifiScorer {
 public:
     explicit SavedNetworkScorer(const std::string &scorerName);
 };
+
+class NoInternetNetworkStatusHistoryScorer : public SimpleWifiScorer {
+public:
+    NoInternetNetworkStatusHistoryScorer();
+    double Score(NetworkCandidate &networkCandidate) override;
+};
 }
 
 #endif

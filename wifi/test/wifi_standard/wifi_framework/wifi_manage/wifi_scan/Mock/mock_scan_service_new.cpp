@@ -144,7 +144,7 @@ void ScanService::TryToRestoreSavedNetwork()
 }
 
 bool ScanService::StoreFullScanInfo(
-    const StoreScanConfig &scanConfig, const std::vector<InterScanInfo> &scanInfoList)
+    const StoreScanConfig &scanConfig, std::vector<InterScanInfo> &scanInfoList)
 {
     return true;
 }

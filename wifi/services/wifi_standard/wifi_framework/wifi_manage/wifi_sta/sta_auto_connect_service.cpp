@@ -97,13 +97,6 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
-        if (networkSelectionResult.wifiDeviceConfig.isPortal &&
-            networkSelectionResult.wifiDeviceConfig.noInternetAccess &&
-            !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
-                networkSelectionResult.wifiDeviceConfig.networkStatusHistory)) {
-            WIFI_LOGE("this netwrok is portal, AutoSelectDevice return fail.");
-            return;
-        }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
         std::string &bssid = networkSelectionResult.interScanInfo.bssid;
         std::string &ssid = networkSelectionResult.interScanInfo.ssid;

@@ -186,25 +186,26 @@ bool P2pIdleState::ProcessCmdConnect(InternalMessagePtr msg) const
                 P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME);
         }
         return EXECUTED;
-    } else {
-        p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
-        if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
-            WIFI_LOGE("Attempt to connect but cannot stop find");
-            p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
-            return EXECUTED;
-        }
-
-        if (p2pStateMachine.ReawakenPersistentGroup(p2pStateMachine.savedP2pConfig)) {
-            p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupNegotiationState);
-        } else {
-            p2pStateMachine.SwitchState(&p2pStateMachine.p2pProvisionDiscoveryState);
-        }
-
-        deviceManager.UpdateDeviceStatus(
-            p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED);
-        p2pStateMachine.BroadcastP2pPeersChanged();
-        p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_SUCCESS);
     }
+
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
+    if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {
+        WIFI_LOGE("Attempt to connect but cannot stop find");
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
+        return EXECUTED;
+    }
+    int callingUid = msg->GetParam1();
+    SharedLinkManager::SetGroupUid(callingUid);
+    if (p2pStateMachine.ReawakenPersistentGroup(p2pStateMachine.savedP2pConfig)) {
+        p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupNegotiationState);
+    } else {
+        p2pStateMachine.SwitchState(&p2pStateMachine.p2pProvisionDiscoveryState);
+    }
+
+    deviceManager.UpdateDeviceStatus(
+        p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED);
+    p2pStateMachine.BroadcastP2pPeersChanged();
+    p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_SUCCESS);
 
     return EXECUTED;
 }
@@ -228,6 +229,8 @@ bool P2pIdleState::ProcessCmdHid2dConnect(InternalMessagePtr msg) const
         WIFI_LOGE("Hid2d Connection failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::Hid2dConnect, ErrCode::WIFI_OPT_FAILED);
     }
+    int callingUid = msg->GetParam1();
+    SharedLinkManager::SetGroupUid(callingUid);
     hasConnect = true;
     return EXECUTED;
 }

@@ -440,11 +440,10 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest_01, TestSize.Level1)
 
 HWTEST_F(WifiHalDeviceManagerTest, SetTxPowerTest_01, TestSize.Level1)
 {
-    std::string ifaceName = "Wlan0";
-    int model = 0;
+    int power = 1000;
     HalDeviceManager::g_chipHdiServiceDied = false;
     DelayedSingleton<HalDeviceManager>::GetInstance()->ResetHalDeviceManagerInfo(false);
-    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(ifaceName, model);
+    bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(power);
     EXPECT_EQ(result, false);
 }
 
@@ -553,7 +552,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest_01, TestSize.Level1)
     DelayedSingleton<HalDeviceManager>::GetInstance()->mIWifiApIfaces.insert(
         std::pair<std::string, sptr<IChipIface>>(ifaceName, iface));
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetApMacAddress(ifaceName, mac);
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, true);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, ValidateInterfaceCacheTest_01, TestSize.Level1)

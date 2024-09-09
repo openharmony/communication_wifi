@@ -566,7 +566,6 @@ private:
     void WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &req);
 #else
 private:
-    void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit WifiDeathRecipient(WifiDeviceProxy &client) : client_(client) {}
@@ -593,6 +592,7 @@ private:
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
+    void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     void RemoveDeathRecipient(void);
     void ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize, long len);
     void ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize);

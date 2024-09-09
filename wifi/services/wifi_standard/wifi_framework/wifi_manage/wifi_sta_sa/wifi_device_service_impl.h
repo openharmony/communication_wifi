@@ -178,6 +178,7 @@ public:
 
     ErrCode SetSatelliteState(const int state) override;
 
+    ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

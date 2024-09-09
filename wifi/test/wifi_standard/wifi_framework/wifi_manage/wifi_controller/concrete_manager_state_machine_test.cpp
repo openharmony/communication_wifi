@@ -193,6 +193,7 @@ public:
     void SwitchScanOnlyInConnectStateTest()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiManager::GetInstance().Init();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
         msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE);

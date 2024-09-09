@@ -61,6 +61,7 @@ int WifiManager::Init()
 #ifndef OHOS_ARCH_LITE
     WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
 #endif
+    WIFI_LOGI("WifiManager Init Enter!");
     if (mInitStatus == INIT_OK) {
         WIFI_LOGI("WifiManager already init!");
         return 0;
@@ -109,9 +110,10 @@ int WifiManager::Init()
         }
     }
     int lastState = WifiSettings::GetInstance().GetStaLastRunState();
+    WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
     if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
-        WifiConfigCenter::GetInstance().SetWifiToggledState(lastState);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(lastState, INSTID_WLAN0);
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();

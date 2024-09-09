@@ -41,12 +41,12 @@ namespace Wifi {
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 
 #define EAP_AUTH_IMSI_MCC_POS 0
-#define EAP_AUTH_MAX_MCC_LEN  3
+#define EAP_AUTH_MAX_MCC_LEN 3
 #define EAP_AUTH_IMSI_MNC_POS 3
-#define EAP_AUTH_MIN_MNC_LEN  2
-#define EAP_AUTH_MAX_MNC_LEN  3
-#define EAP_AUTH_MIN_PLMN_LEN  5
-#define EAP_AUTH_MAX_PLMN_LEN  6
+#define EAP_AUTH_MIN_MNC_LEN 2
+#define EAP_AUTH_MAX_MNC_LEN 3
+#define EAP_AUTH_MIN_PLMN_LEN 5
+#define EAP_AUTH_MAX_PLMN_LEN 6
 #define EAP_AUTH_MAX_IMSI_LENGTH 15
 #define INVALID_SUPPLIER_ID 0
 
@@ -59,14 +59,14 @@ constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 #define EAP_AUTH_PERMANENT_SUFFIX ".3gppnetwork.org"
 
 StaService::StaService(int instId)
-    : pStaStateMachine(nullptr),
-      pStaMonitor(nullptr),
-      pStaAutoConnectService(nullptr),
+    : pStaStateMachine(nullptr), pStaMonitor(nullptr), pStaAutoConnectService(nullptr),
 #ifndef OHOS_ARCH_LITE
       pStaAppAcceleration(nullptr),
 #endif
       m_instId(instId)
-{}
+{
+    WIFI_LOGI("StaService constuctor insId %{public}d", insId);
+}
 
 StaService::~StaService()
 {
@@ -97,7 +97,7 @@ StaService::~StaService()
 
 ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callbacks)
 {
-    WIFI_LOGI("Enter InitStaService.\n");
+    WIFI_LOGI("Enter InitStaService m_instId:%{public}d\n", m_instId);
     pStaStateMachine = new (std::nothrow) StaStateMachine(m_instId);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("Alloc pStaStateMachine failed.\n");
@@ -168,8 +168,8 @@ bool StaService::IsAppInCandidateFilterList(int uid) const
 {
     std::string packageName;
     GetBundleNameByUid(uid, packageName);
-    if (std::find(sta_candidate_trust_list.begin(), sta_candidate_trust_list.end(), packageName)
-        != sta_candidate_trust_list.end()) {
+    if (std::find(sta_candidate_trust_list.begin(), sta_candidate_trust_list.end(), packageName) !=
+    sta_candidate_trust_list.end()) {
         WIFI_LOGI("App is in Candidate filter list.");
         return true;
     }
@@ -179,7 +179,7 @@ bool StaService::IsAppInCandidateFilterList(int uid) const
 
 ErrCode StaService::EnableStaService()
 {
-    WIFI_LOGI("Enter EnableStaService.\n");
+    WIFI_LOGI("Enter EnableStaService m_instId:%{public}d\n", m_instId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 #ifndef OHOS_ARCH_LITE
     // notification of registration country code change
@@ -207,7 +207,7 @@ ErrCode StaService::DisableStaService() const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId) const
+ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int &netWorkId) const
 {
     LOGI("Enter AddCandidateConfig.\n");
 
@@ -297,7 +297,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
 
 std::string StaService::ConvertString(const std::u16string &wideText) const
 {
-    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(wideText);
+    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(wideText);
 }
 
 #ifndef OHOS_ARCH_LITE
@@ -390,8 +390,8 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
     }
 
     // identity: prefix + imsi + "@wlan.mnc" + mnc + ".mcc" + mcc + ".3gppnetwork.org"
-    std::string identity = prefix + imsi + EAP_AUTH_WLAN_MNC + mnc +
-        EAP_AUTH_WLAN_MCC + GetMcc(imsi) + EAP_AUTH_PERMANENT_SUFFIX;
+    std::string identity =
+        prefix + imsi + EAP_AUTH_WLAN_MNC + mnc + EAP_AUTH_WLAN_MCC + GetMcc(imsi) + EAP_AUTH_PERMANENT_SUFFIX;
     LOGI("StaService::UpdateEapConfig, identity: %{public}s", identity.c_str());
     wifiEapConfig.identity = identity;
 }
@@ -405,7 +405,9 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     std::string bssid;
     std::string userSelectbssid = config.bssid;
     int status = config.status;
+    LOGI("AddDeviceConfig id%{public}d succeed!", config.instanceId);
     WifiDeviceConfig tempDeviceConfig;
+    tempDeviceConfig.instanceId = config.instanceId;
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
         status = tempDeviceConfig.status;
@@ -437,8 +439,8 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
             }
         }
         std::string alias = formatSsid + "_TLS_" + std::to_string(config.uid < 0 ? 0 : config.uid);
-        int ret = WifiCertUtils::InstallCert(config.wifiEapConfig.certEntry,
-            std::string(config.wifiEapConfig.certPassword), alias, uri);
+        int ret = WifiCertUtils::InstallCert(
+            config.wifiEapConfig.certEntry, std::string(config.wifiEapConfig.certPassword), alias, uri);
         if (ret == 0) {
             tempDeviceConfig.wifiEapConfig.clientCert = uri;
             tempDeviceConfig.wifiEapConfig.privateKey = uri;
@@ -470,15 +472,16 @@ int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
 
 ErrCode StaService::RemoveDevice(int networkId) const
 {
-    LOGI("Enter RemoveDevice, networkId = %{public}d.\n", networkId);
+    LOGI("Enter RemoveDevice, networkId = %{public}d m_instId:%{public}d\n", networkId, m_instId);
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (linkedInfo.networkId == networkId) {
-        WifiStaHalInterface::GetInstance().ClearDeviceConfig();
+        std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+        WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName);
     }
 
     WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) == 0) {
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     } else {
@@ -506,7 +509,8 @@ ErrCode StaService::RemoveDevice(int networkId) const
 ErrCode StaService::RemoveAllDevice() const
 {
     LOGI("Enter RemoveAllDevice.\n");
-    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig() == WIFI_HAL_OPT_OK) {
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName) == WIFI_HAL_OPT_OK) {
         LOGD("Remove all device config successfully!");
     } else {
         LOGE("WifiStaHalInterface:RemoveAllDevice failed!");
@@ -537,10 +541,11 @@ ErrCode StaService::RemoveAllDevice() const
 
 ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter ConnectToDevice, ssid = %{public}s.\n", SsidAnonymize(config.ssid).c_str());
+    LOGI(
+        "Enter ConnectToDevice, ssid = %{public}s instId:%{public}d. \n", SsidAnonymize(config.ssid).c_str(), m_instId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = AddDeviceConfig(config);
-    if(netWorkId == INVALID_NETWORK_ID) {
+    if (netWorkId == INVALID_NETWORK_ID) {
         LOGD("ConnectToDevice, AddDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
@@ -553,7 +558,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
 {
     LOGI("Enter ConnectToNetwork, networkId is %{public}d.", networkId);
     WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
         LOGE("WifiDeviceConfig is null!");
         return WIFI_OPT_FAILED;
     }
@@ -570,7 +575,7 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
 {
     LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
     WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
         LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
         return WIFI_OPT_FAILED;
     }
@@ -583,7 +588,9 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
         } else {
             LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
-                __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
+                __FUNCTION__,
+                MacAnonymize(linkedInfo.bssid).c_str(),
+                MacAnonymize(bssid).c_str());
             pStaStateMachine->StartRoamToNetwork(bssid);
         }
     } else {
@@ -600,9 +607,10 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
 ErrCode StaService::StartConnectToUserSelectNetwork(int networkId, std::string bssid) const
 {
     LOGI("Enter StartConnectToUserSelectNetwork, networkId: %{public}d, bssid: %{public}s",
-        networkId, MacAnonymize(bssid).c_str());
+        networkId,
+        MacAnonymize(bssid).c_str());
     WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
         LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
         return WIFI_OPT_FAILED;
     }
@@ -859,7 +867,7 @@ ErrCode StaService::EnableAutoJoin(const std::string &conditionName)
 }
 
 ErrCode StaService::RegisterAutoJoinCondition(const std::string &conditionName,
-                                              const std::function<bool()> &autoJoinCondition)
+    const std::function<bool()> &autoJoinCondition)
 {
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     pStaAutoConnectService->RegisterAutoJoinCondition(conditionName, autoJoinCondition);
@@ -873,9 +881,8 @@ ErrCode StaService::DeregisterAutoJoinCondition(const std::string &conditionName
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::RegisterFilterBuilder(const OHOS::Wifi::FilterTag &filterTag,
-                                          const std::string &filterName,
-                                          const OHOS::Wifi::FilterBuilder &filterBuilder)
+ErrCode StaService::RegisterFilterBuilder(const OHOS::Wifi::FilterTag &filterTag, const std::string &filterName,
+    const OHOS::Wifi::FilterBuilder &filterBuilder)
 {
     ExternalWifiFilterBuildManager::GetInstance().RegisterFilterBuilder(filterTag, filterName, filterBuilder);
     return WIFI_OPT_SUCCESS;

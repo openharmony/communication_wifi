@@ -115,13 +115,13 @@ public:
 
     void ClearDeviceConfig(void);
 
-    int GetDeviceConfig(std::vector<WifiDeviceConfig> &results);
+    int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0);
 
-    int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config);
+    int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0);
 
-    int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config);
+    int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0);
 
-    int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config);
+    int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
 
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 

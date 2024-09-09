@@ -336,6 +336,7 @@ public:
     private:
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
+        bool HandleBssidChanged(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -922,6 +923,22 @@ private:
     bool SetRandomMac(int networkId, const std::string &bssid);
 
     /**
+     * @Description  Set mac address to hal
+     *
+     * @param currentMac - mac address set to hal
+     *@param realMac - real address
+     */
+    bool SetMacToHal(const std::string &currentMac, const std::string &realMac);
+
+    /**
+     * @Description  change random mac for wifi2
+     *for example, input mac is 00:1a:2b:3c:4d:5e, this func will change pos 3 byte mac from "3c" to "bc" by
+     *performing an XOR operation with 0x80
+     * @param wifi2RandomMac - wifi2RandomMac
+     */
+    bool GetWifi2RandomMac(std::string &wifi2RandomMac);
+
+    /**
      * @Description  check whether the current bssid are consistent.
      *
      * @param bssid - bssid
@@ -1056,6 +1073,14 @@ private:
      * @Description operation after dhcp
      */
     void HandlePostDhcpSetup();
+
+    /**
+     * @Description Get sta state machine instant id
+     */
+    int GetInstId()
+    {
+        return m_instId;
+    }
 
 #ifndef OHOS_ARCH_LITE
     /**
@@ -1256,6 +1281,7 @@ private:
     bool CanArpReachable();
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
+    void HandleWpaLinkFailByEventName(int eventName);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
 #endif

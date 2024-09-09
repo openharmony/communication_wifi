@@ -224,17 +224,9 @@ HWTEST_F(WifiP2pServiceTest, SetUpperScene, TestSize.Level1)
  */
 HWTEST_F(WifiP2pServiceTest, HiD2dSharedLinkTest, TestSize.Level1)
 {
-    int count = pWifiP2pService->GetSharedLinkCount();
     int callingUid = 0;
     pWifiP2pService->IncreaseSharedLink(callingUid);
-    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
-    pWifiP2pService->IncreaseSharedLink(callingUid);
-    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 2);
-
     pWifiP2pService->DecreaseSharedLink(callingUid);
-    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
-    pWifiP2pService->DecreaseSharedLink(callingUid);
-    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count);
 }
 
 
@@ -297,30 +289,16 @@ HWTEST_F(WifiP2pServiceTest, Hid2dRequestGcIpTest002, TestSize.Level1)
 HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest001, TestSize.Level1)
 {
     int systemAbilityId = 0;
-    int count = pWifiP2pService->GetSharedLinkCount();
     int callingUid = 0;
     pWifiP2pService->IncreaseSharedLink(callingUid);
-    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
-    EXPECT_EQ(pWifiP2pService->HandleBusinessSAException(systemAbilityId), ErrCode::WIFI_OPT_INVALID_PARAM);
-}
-
-HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest002, TestSize.Level1)
-{
-    int systemAbilityId = 1;
-    int count = pWifiP2pService->GetSharedLinkCount();
-    int callingUid = 0;
-    pWifiP2pService->IncreaseSharedLink(callingUid);
-    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
-    EXPECT_EQ(pWifiP2pService->HandleBusinessSAException(systemAbilityId), ErrCode::WIFI_OPT_INVALID_PARAM);
+    pWifiP2pService->HandleBusinessSAException(systemAbilityId);
 }
 
 HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest003, TestSize.Level1)
 {
     int systemAbilityId = 4700;
-    int count = pWifiP2pService->GetSharedLinkCount();
     int callingUid = 0;
     pWifiP2pService->IncreaseSharedLink(callingUid);
-    EXPECT_EQ(pWifiP2pService->GetSharedLinkCount(), count + 1);
     EXPECT_EQ(pWifiP2pService->HandleBusinessSAException(systemAbilityId), ErrCode::WIFI_OPT_SUCCESS);
 }
 

@@ -195,11 +195,6 @@ ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ip
     return WIFI_OPT_SUCCESS;
 }
 
-void P2pInterface::SetGroupUid(int callingUid)
-{
-    return;
-}
-
 void P2pInterface::IncreaseSharedLink(int callingUid)
 {
     return;
@@ -208,11 +203,6 @@ void P2pInterface::IncreaseSharedLink(int callingUid)
 void P2pInterface::DecreaseSharedLink(int callingUid)
 {
     return;
-}
-
-int P2pInterface::GetSharedLinkCount(void)
-{
-    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode P2pInterface::HandleBusinessSAException(int systemAbilityId)

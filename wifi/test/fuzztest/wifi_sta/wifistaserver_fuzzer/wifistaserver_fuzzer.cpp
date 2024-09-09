@@ -165,7 +165,6 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->EnableAutoJoin(conditionName);
     pStaInterface->StartPortalCertification();
     pStaInterface->EnableHiLinkHandshake(config, conditionName);
-    pStaInterface->SetTxPower(uid);
     pStaInterface->DeregisterFilterBuilder(filterTag, conditionName);
     pStaService->UpdateEapConfig(config, config.wifiEapConfig);
     pStaService->RemoveCandidateConfig(uid, networkId);
@@ -190,7 +189,6 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->ReConnect();
     pStaService->SetSuspendMode(attemptEnable);
     pStaService->SetPowerMode(attemptEnable);
-    pStaService->SetTxPower(networkId);
     pStaService->DisableAutoJoin(conditionName);
     pStaService->EnableAutoJoin(conditionName);
     pStaService->StartPortalCertification();

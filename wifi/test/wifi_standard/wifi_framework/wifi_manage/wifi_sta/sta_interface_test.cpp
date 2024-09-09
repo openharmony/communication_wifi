@@ -397,11 +397,6 @@ public:
         pStaInterface->SetPowerMode(0);
     }
 
-    void SetTxPower()
-    {
-        pStaInterface->SetTxPower(0);
-    }
-
     void OnSystemAbilityChanged()
     {
         pStaInterface->OnSystemAbilityChanged(0, 0);
@@ -737,10 +732,6 @@ HWTEST_F(StaInterfaceTest, StartConnectToUserSelectNetwork, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, SetPowerMode, TestSize.Level1)
 {
     SetPowerMode();
-}
-HWTEST_F(StaInterfaceTest, SetTxPower, TestSize.Level1)
-{
-    SetTxPower();
 }
 
 HWTEST_F(StaInterfaceTest, OnSystemAbilityChanged, TestSize.Level1)

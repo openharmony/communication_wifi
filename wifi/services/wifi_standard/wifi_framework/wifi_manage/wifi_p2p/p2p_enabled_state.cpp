@@ -117,6 +117,15 @@ void P2pEnabledState::Init()
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_PEERS,
         [this](InternalMessagePtr msg) { return this->ProcessCmdDiscoverPeers(msg); }));
 }
+
+void P2pEnabledState::InitProcessMsg()
+{
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_INCREASE_SHARE_LINK, &P2pEnabledState::ProcessCmdIncreaseSharedLink));
+    mProcessFunMap.insert(
+        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DECREASE_SHARE_LINK, &P2pEnabledState::ProcessCmdDecreaseSharedLink));
+}
+
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
 {
     WIFI_LOGI("P2P ProcessCmdDisable recv CMD: %{public}d", msg->GetMessageName());
@@ -644,6 +653,25 @@ bool P2pEnabledState::ProcessCmdDiscoverPeers(InternalMessagePtr msg) const
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::DiscoverPeers, ErrCode::WIFI_OPT_SUCCESS);
         p2pStateMachine.BroadcastP2pDiscoveryChanged(true);
         return EXECUTED;
+    }
+    return EXECUTED;
+}
+
+bool P2pEnabledState::ProcessCmdIncreaseSharedLink(InternalMessagePtr msg) const
+{
+    int callingUid = msg->GetParam1();
+    WIFI_LOGI("Uid %{public}d increaseSharedLink", callingUid);
+    SharedLinkManager::IncreaseSharedLink(callingUid);
+    return EXECUTED;
+}
+
+bool P2pEnabledState::ProcessCmdDecreaseSharedLink(InternalMessagePtr msg) const
+{
+    int callingUid = msg->GetParam1();
+    WIFI_LOGI("Uid %{public}d decreaseSharedLink", callingUid);
+    SharedLinkManager::DecreaseSharedLink(callingUid);
+    if (SharedLinkManager::GetSharedLinkCount() == 0) {
+        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
     }
     return EXECUTED;
 }

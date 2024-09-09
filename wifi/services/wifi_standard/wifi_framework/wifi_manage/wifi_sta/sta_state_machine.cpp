@@ -57,8 +57,6 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
 #define PORTAL_ACTION "ohos.want.action.awc"
 #define PORTAL_ENTITY "entity.browser.hbct"
-#define BROWSER_BUNDLE "com.huawei.hmos.browser"
-#define SETTINGS_BUNDLE "com.huawei.hmos.settings"
 #define PORTAL_CHECK_TIME (10 * 60)
 #define PORTAL_AUTH_EXPIRED_CHECK_TIME (2)
 #define PORTAL_MILLSECOND  1000
@@ -191,7 +189,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-    WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
 #ifndef OHOS_ARCH_LITE
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
@@ -1392,6 +1389,13 @@ bool StaStateMachine::IsDisConnectReasonShouldStopTimer(int reason)
     return reason == DIS_REASON_DISASSOC_STA_HAS_LEFT;
 }
 
+void StaStateMachine::AddRandomMacCure()
+{
+    if (targetNetworkId == mLastConnectNetId) {
+        mConnectFailedCnt++;
+    }
+}
+
 void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
 {
     LOGW("enter DealWpaLinkFailEvent.\n");
@@ -1444,6 +1448,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
+            AddRandomMacCure();
             break;
         case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
             WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID);
@@ -1453,6 +1458,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
+            AddRandomMacCure();
             break;
         default:
             LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);
@@ -2061,7 +2067,9 @@ void StaStateMachine::OnNetworkConnectionEvent(int networkId, std::string bssid)
 void StaStateMachine::OnNetworkDisconnectEvent(int reason)
 {
     mIsWifiInternetCHRFlag = false;
-    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+        WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    }
     WriteWifiAbnormalDisconnectHiSysEvent(reason);
 }
 
@@ -3263,11 +3271,19 @@ void StaStateMachine::HandlePortalNetworkPorcess()
         WIFI_LOGE("portal uri is nullptr\n");
     }
     int netId = m_NetWorkState->GetWifiNetId();
+    std::string bundle;
+    std::map<std::string, std::string> variableMap;
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("BROWSER_BUNDLE") != variableMap.end()) {
+        bundle = variableMap["BROWSER_BUNDLE"];
+    }
     AAFwk::Want want;
     want.SetAction(PORTAL_ACTION);
     want.SetUri(mPortalUrl);
     want.AddEntity(PORTAL_ENTITY);
-    want.SetBundle(BROWSER_BUNDLE);
+    want.SetBundle(bundle);
     want.SetParam("netId", netId);
     WIFI_LOGI("wifi netId is %{public}d", netId);
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
@@ -3282,7 +3298,9 @@ void StaStateMachine::SetPortalBrowserFlag(bool flag)
 {
     portalFlag = flag;
     mIsWifiInternetCHRFlag = false;
-    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
+        WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    }
     if (!flag) {
         portalState = PortalState::UNCHECKED;
     }
@@ -3299,7 +3317,15 @@ void StaStateMachine::ShowPortalNitification()
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
             WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
     } else {
-        if (WifiAppStateAware::GetInstance().IsForegroundApp(SETTINGS_BUNDLE)) {
+        std::map<std::string, std::string> variableMap;
+        std::string bundle;
+        if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+            WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+        }
+        if (variableMap.find("SETTINGS") != variableMap.end()) {
+            bundle = variableMap["SETTINGS"];
+        }
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_CONNECTED);
@@ -4265,7 +4291,7 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
     WIFI_LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d, isRoam=%{public}d",
         pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
     pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_JUMP);
-    if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
+    if (pStaStateMachine->getIpSucNum == 0) {
         pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(

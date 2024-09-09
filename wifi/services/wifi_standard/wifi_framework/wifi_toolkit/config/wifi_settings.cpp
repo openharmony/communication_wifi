@@ -2067,7 +2067,7 @@ void WifiSettings::UpLoadLocalDeviceConfigToCloud()
         tmp.push_back(iter->second);
 #endif
     }
-    WifiAssetManager::GetInstance().WifiAssetAddPack(tmp);
+    WifiAssetManager::GetInstance().WifiAssetAddPack(tmp, USER_ID_DEFAULT, true, true);
 }
 #endif
 }  // namespace Wifi

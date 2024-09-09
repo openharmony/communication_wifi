@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
 {
     item.instanceId = 0;
@@ -1276,13 +1275,13 @@ static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key
         std::string::size_type pos = key.find(".");
         if (pos == std::string::npos) {
             WifiP2pDevice device;
-            item.AddClientDevice(device);
+            item.AddPersistentDevice(device);
         } else {
             unsigned long index = static_cast<unsigned long>(std::stoi(key.substr(strlen("vecDev_"), pos)));
             if (index < item.GetClientDevices().size()) {
                 std::vector<WifiP2pDevice> clients = item.GetClientDevices();
                 SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value);
-                item.SetClientDevices(clients);
+                item.SetClientPersistentDevices(clients);
             }
         }
     } else {
@@ -1389,11 +1388,11 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
     ss << "    " <<"groupStatus=" << static_cast<int>(item.GetP2pGroupStatus()) << std::endl;
     ss << "    " <<"goIpAddress=" << item.GetGoIpAddress() << std::endl;
     ss << OutWifiP2pDeviceClassString(item.GetOwner(), "ownerDev.");
-    unsigned int size = item.GetClientDevices().size();
+    unsigned int size = item.GetPersistentDevices().size();
     for (unsigned int i = 0; i < size; i++) {
         std::string prefix = "vecDev_" + std::to_string(i) + ".";
         ss << "    " <<"vecDev_=" << i << std::endl;
-        const WifiP2pDevice &tmp = item.GetClientDevices().at(i);
+        const WifiP2pDevice &tmp = item.GetPersistentDevices().at(i);
         ss << OutWifiP2pDeviceClassString(tmp, prefix);
     }
     ss << "    " <<"</WifiP2pGroupInfo>" << std::endl;

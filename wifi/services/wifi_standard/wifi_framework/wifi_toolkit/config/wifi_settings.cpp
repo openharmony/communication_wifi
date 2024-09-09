@@ -1962,6 +1962,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wepKeys[config.wepTxKeyIndex] = "";
     }
     delete encryWep;
+    encryWep = nullptr;
 
     EncryptedData *encryEap = new EncryptedData(config.wifiEapConfig.encryptedData, config.wifiEapConfig.IV);
     std::string decryEap = "";
@@ -1973,6 +1974,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
+    encryEap = nullptr;
     DecryptionWapiConfig(mWifiEncryptionInfo, config);
     LOGD("DecryptionDeviceConfig end");
     return 0;

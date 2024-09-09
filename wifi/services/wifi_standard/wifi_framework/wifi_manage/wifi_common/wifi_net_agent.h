@@ -122,6 +122,16 @@ public:
     void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
         int instId = 0);
 
+    /**
+     * return wifi supplierId
+     */
+    uint32_t GetSupplierId();
+ 
+     /**
+     * set wifi supplierId to 0
+     */
+    void ResetSupplierId();
+
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {
     public:

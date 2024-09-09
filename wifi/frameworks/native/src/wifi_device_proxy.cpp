@@ -2339,5 +2339,85 @@ ErrCode WifiDeviceProxy::GetWifiDetailState(WifiDetailState &state)
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config)
+{
+    config.networkId = reply.ReadInt32();
+    config.status = reply.ReadInt32();
+    config.bssid = reply.ReadString();
+    config.bssidType = reply.ReadInt32();
+    config.ssid = reply.ReadString();
+    config.band = reply.ReadInt32();
+    config.channel = reply.ReadInt32();
+    config.frequency = reply.ReadInt32();
+    config.level = reply.ReadInt32();
+    config.isPasspoint = reply.ReadBool();
+    config.isEphemeral = reply.ReadBool();
+    config.preSharedKey = reply.ReadString();
+    config.keyMgmt = reply.ReadString();
+    for (int j = 0; j < WEPKEYS_SIZE; j++) {
+        config.wepKeys[j] = reply.ReadString();
+    }
+    config.wepTxKeyIndex = reply.ReadInt32();
+    config.priority = reply.ReadInt32();
+    config.hiddenSSID = reply.ReadBool();
+    config.wifiIpConfig.assignMethod = AssignIpMethod(reply.ReadInt32());
+    ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.ipAddress.address);
+    config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = reply.ReadInt32();
+    config.wifiIpConfig.staticIpAddress.ipAddress.flags = reply.ReadInt32();
+    config.wifiIpConfig.staticIpAddress.ipAddress.scope = reply.ReadInt32();
+    ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.gateway);
+    ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
+    ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
+    config.wifiIpConfig.staticIpAddress.domains = reply.ReadString();
+    ReadEapConfig(reply, config.wifiEapConfig);
+    config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(reply.ReadInt32());
+    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reply.ReadString();
+    config.wifiProxyconfig.manualProxyConfig.serverHostName = reply.ReadString();
+    config.wifiProxyconfig.manualProxyConfig.serverPort = reply.ReadInt32();
+    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = reply.ReadString();
+    config.wifiPrivacySetting = WifiPrivacyConfig(reply.ReadInt32());
+    config.uid = reply.ReadInt32();
+    config.callProcessName = reply.ReadString();
+    config.ancoCallProcessName = reply.ReadString();
+    config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
+    config.networkSelectionStatus.status = WifiDeviceConfigStatus(reply.ReadInt32());
+    config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason(reply.ReadInt32());
+}
+
+ErrCode WifiDeviceProxy::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(networkId);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    ReadDeviceConfig(reply, result);
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

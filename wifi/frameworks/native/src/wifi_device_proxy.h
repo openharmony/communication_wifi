@@ -530,6 +530,15 @@ public:
     * @Description Handle remote object died event.
     */
     void OnRemoteDied(void);
+
+    /**
+     * @Description Get single device config
+     *
+     * @param networkId - the network id of the device config
+     * @param config - Get result vector of WifiDeviceConfig
+     * @return ErrCode - operation result
+     */
+    ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
 private:
     static WifiDeviceProxy *g_instance;
     IClientProxy *remote_ = nullptr;
@@ -548,7 +557,7 @@ private:
         {
             client_.OnRemoteDied(remote);
         }
-
+        void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     private:
         WifiDeviceProxy &client_;
     };

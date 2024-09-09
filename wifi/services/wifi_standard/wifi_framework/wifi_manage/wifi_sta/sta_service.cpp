@@ -686,7 +686,7 @@ ErrCode StaService::CancelWps() const
 
 ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter AutoConnectService.\n");
+    WIFI_LOGD("Enter AutoConnectService.\n");
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
 #ifndef OHOS_ARCH_LITE
     if (IsOtherVapConnect()) {
@@ -825,7 +825,7 @@ std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
  
 void StaService::HandleScreenStatusChanged(int screenState)
 {
-    WIFI_LOGI("Enter HandleScreenStatusChanged screenState:%{public}d.", screenState);
+    WIFI_LOGD("Enter HandleScreenStatusChanged screenState:%{public}d.", screenState);
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("pStaStateMachine is null!");

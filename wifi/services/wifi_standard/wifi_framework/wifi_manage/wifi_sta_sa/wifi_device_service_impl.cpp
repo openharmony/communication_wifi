@@ -1348,7 +1348,7 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
     }
 #ifndef OHOS_ARCH_LITE
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
-    WIFI_LOGI("GetCountryCode: country code is %{public}s", countryCode.c_str());
+    WIFI_LOGD("GetCountryCode: country code is %{public}s", countryCode.c_str());
 #endif
     return WIFI_OPT_SUCCESS;
 }
@@ -1858,10 +1858,10 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
 #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+    WIFI_LOGD("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
-    WIFI_LOGI("Enter LimitSpeed.");
+    WIFI_LOGD("Enter LimitSpeed.");
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_NON_SYSTEMAPP;

@@ -482,6 +482,7 @@ bool WifiControllerMachine::ShouldDisableWifi(InternalMessagePtr msg)
 
 bool WifiControllerMachine::ShouldEnableWifi(int id)
 {
+    // instId == 1 判断wifi0是否打开 连接 = true 否则 false
     WIFI_LOGI("Enter ShouldEnableWifi");
     if(id == INSTID_WLAN1) {
         return WifiConfigCenter::GetInstance().GetWifiToggledEnable(INSTID_WLAN0) == WIFI_STATE_ENABLED;

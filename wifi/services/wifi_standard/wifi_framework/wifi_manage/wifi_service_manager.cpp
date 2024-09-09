@@ -104,7 +104,7 @@ int WifiServiceManager::CheckPreLoadService(void)
     for (auto iter = mServiceDllMap.begin(); iter != mServiceDllMap.end(); ++iter) {
         bool bLoad = WifiSettings::GetInstance().IsModulePreLoad(iter->first);
         if (bLoad) {
-            int ret = CheckAndEnforceService(iter->first, false);
+            int ret = CheckAndEnforceService(iter->first, 0, false);
             if (ret < 0) {
                 return -1;
             }
@@ -113,15 +113,17 @@ int WifiServiceManager::CheckPreLoadService(void)
     return 0;
 }
 
-int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
+int WifiServiceManager::LoadStaService(const std::string &dlname, int instId, bool bCreate)
 {
-    WIFI_LOGI("LoadStaService");
+    WIFI_LOGI("LoadStaService, insId %{public}d", instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mStaServiceHandle.pService[0]) {
+    if (mStaServiceHandle.pService[instId]) {
+        WIFI_LOGE("WifiServiceManager::LoadStaService pService is not NULL");
         return 0;
     }
-    IStaService *service = new StaInterface();
-    mStaServiceHandle.pService[0] = service;
+    IStaService *service = new StaInterface(instId);
+    mStaServiceHandle.pService[instId] = service;
+    WIFI_LOGI("WifiServiceManager::LoadStaService new pService %{public}d", instId);
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
     return 0;
 }
@@ -195,7 +197,7 @@ int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCrea
         WIFI_LOGE("dlopen %{public}s failed: %{public}s!", dlname.c_str(), dlerror());
         return -1;
     }
-    mEnhanceServiceHandle.create = (IEnhanceService *(*)()) dlsym(mEnhanceServiceHandle.handle, "Create");
+    mEnhanceServiceHandle.create = (IEnhanceService * (*)()) dlsym(mEnhanceServiceHandle.handle, "Create");
     mEnhanceServiceHandle.destroy = (void *(*)(IEnhanceService *))dlsym(mEnhanceServiceHandle.handle, "Destroy");
     if (mEnhanceServiceHandle.create == nullptr || mEnhanceServiceHandle.destroy == nullptr) {
         WIFI_LOGE("%{public}s dlsym Create or Destroy failed!", dlname.c_str());
@@ -209,7 +211,7 @@ int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCrea
     return 0;
 }
 
-int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
+int WifiServiceManager::CheckAndEnforceService(const std::string &name, int insId, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
     std::string dlname;
@@ -219,7 +221,7 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
     }
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService get dllname: %{public}s", dlname.c_str());
     if (name == WIFI_SERVICE_STA) {
-        return LoadStaService(dlname, bCreate);
+        return LoadStaService(dlname, insId, bCreate);
     }
 #ifdef FEATURE_SELF_CURE_SUPPORT
     if (name == WIFI_SERVICE_SELFCURE) {
@@ -247,11 +249,11 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
 
 IStaService *WifiServiceManager::GetStaServiceInst(int instId)
 {
-    WIFI_LOGD("WifiServiceManager::GetStaServiceInst, instId: %{public}d", instId);
+    WIFI_LOGI("WifiServiceManager::GetStaServiceInst, instId: %{public}d", instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mStaServiceHandle.pService.find(instId);
     if (iter != mStaServiceHandle.pService.end()) {
-        WIFI_LOGD("find a new sta service instance, instId: %{public}d", instId);
+        WIFI_LOGI("find a new sta service instance, instId: %{public}d", instId);
         return iter->second;
     }
 

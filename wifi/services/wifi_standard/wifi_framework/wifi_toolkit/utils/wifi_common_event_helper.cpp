@@ -31,7 +31,7 @@ namespace Wifi {
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data,
     const std::vector<std::string> &permissions)
 {
-    WIFI_LOGD("publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
+    WIFI_LOGD("publish event[%s], code:%d", eventAction.c_str(), code);
 #ifndef OHOS_ARCH_LITE
     Want want;
     want.SetAction(eventAction);
@@ -58,7 +58,7 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
 
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data)
 {
-    WIFI_LOGD("publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
+    WIFI_LOGD("publish event[%s], code:%d", eventAction.c_str(), code);
 #ifndef OHOS_ARCH_LITE
     Want want;
     want.SetAction(eventAction);
@@ -96,6 +96,11 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const s
     return true;
 }
 
+bool WifiCommonEventHelper::PublishWifi2PowerStateChangeEvent(const int &code, const std::string &data)
+{
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI2_POWER_STATE, code, data);
+}
+
 bool WifiCommonEventHelper::PublishPowerStateChangeEvent(const int &code, const std::string &data)
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_POWER_STATE, code, data);
@@ -120,6 +125,11 @@ bool WifiCommonEventHelper::PublishRssiValueChangedEvent(const std::string &pram
 bool WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(const int &code, const std::string &data)
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WITAS_RSSI_VALUE, code, data);
+}
+
+bool WifiCommonEventHelper::PublishWifi2ConnStateChangedEvent(const int &code, const std::string &data)
+{
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI2_CONN_STATE, code, data);
 }
 
 bool WifiCommonEventHelper::PublishConnStateChangedEvent(const int &code, const std::string &data)

@@ -45,7 +45,11 @@ int g_currentWpaStatus = static_cast<int>(OHOS::Wifi::SupplicantState::UNKNOWN);
 int32_t OnEventDisconnected(struct IWpaCallback *self,
     const struct HdiWpaDisconnectParam *disconectParam, const char* ifName)
 {
-    LOGI("OnEventDisconnected: callback enter!");
+    if (ifName == nullptr) {
+        LOGE("OnEventDisconnected: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventDisconnected: callback enter! ifName = %{public}s", ifName);
     if (disconectParam == NULL || disconectParam->bssidLen <= 0) {
         LOGE("OnEventDisconnected: invalid parameter!");
         return 1;
@@ -57,7 +61,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         return 1;
     }
     int reasonCode = disconectParam->reasonCode;
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (cbk.onReportDisConnectReason) {
         cbk.onReportDisConnectReason(reasonCode, std::string(szBssid));
     }
@@ -82,14 +86,21 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, reasonCode, std::string(szBssid));
     }
-    LOGI("%{public}s callback out, bssid:%{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
+    LOGI("%{public}s callback out, bssid:%{public}s ifName = %{public}s",
+    __func__,
+    OHOS::Wifi::MacAnonymize(szBssid).c_str(),
+    ifName);
     return 0;
 }
 
 int32_t OnEventConnected(struct IWpaCallback *self,
     const struct HdiWpaConnectParam *connectParam, const char* ifName)
 {
-    LOGI("OnEventConnected: callback enter!");
+    if (ifName == nullptr) {
+        LOGE("OnEventConnected: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventConnected: callback enter! ifName = %{public}s", ifName);
     if (connectParam == NULL || connectParam->bssidLen <= 0) {
         LOGE("OnEventConnected: invalid parameter!");
         return 1;
@@ -100,7 +111,7 @@ int32_t OnEventConnected(struct IWpaCallback *self,
         LOGE("%{public}s: failed to convert mac!", __func__);
         return 1;
     }
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(HAL_WPA_CB_CONNECTED, connectParam->networkId, szBssid);
     }
@@ -111,7 +122,11 @@ int32_t OnEventConnected(struct IWpaCallback *self,
 int32_t OnEventBssidChanged(struct IWpaCallback *self,
     const struct HdiWpaBssidChangedParam *bssidChangedParam, const char* ifName)
 {
-    LOGI("OnEventBssidChanged: callback enter!");
+    if (ifName == nullptr) {
+        LOGE("OnEventBssidChanged: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventBssidChanged: callback enter! ifName = %{public}s", ifName);
     if (bssidChangedParam == nullptr || bssidChangedParam->reason == nullptr) {
         LOGE("OnEventBssidChanged: invalid parameter!");
         return 1;
@@ -129,7 +144,7 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
         return 1;
     }
 
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (cbk.onBssidChanged) {
         cbk.onBssidChanged(reason, szBssid);
     }
@@ -141,25 +156,38 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
 int32_t OnEventStateChanged(struct IWpaCallback *self,
     const struct HdiWpaStateChangedParam *statechangedParam, const char* ifName)
 {
-    LOGI("OnEventStateChanged: callback enter!");
+    if (ifName == nullptr) {
+        LOGE("OnEventStateChanged: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventStateChanged: callback enter! ifName = %{public}s", ifName);
     if (statechangedParam == NULL) {
         LOGE("OnEventStateChanged: invalid parameter!");
         return 1;
     }
 
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     g_currentWpaStatus = statechangedParam->status;
     if (cbk.onWpaStateChanged) {
         cbk.onWpaStateChanged(g_currentWpaStatus);
     }
-    LOGI("OnEventStateChanged:callback out status = %{public}d", g_currentWpaStatus);
+    /* lyx: 这里好像有点重复判断，开头就判断了，看是否要删掉 */
+    if (ifName == nullptr) {
+        LOGE("OnEventStateChanged: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventStateChanged:callback out status = %{public}d, ifName = %{public}s", g_currentWpaStatus, ifName);
     return 0;
 }
 
 int32_t OnEventTempDisabled(struct IWpaCallback *self,
     const struct HdiWpaTempDisabledParam *tempDisabledParam, const char *ifName)
 {
-    LOGI("OnEventTempDisabled: callback enter!");
+    if (ifName == nullptr) {
+        LOGE("OnEventTempDisabled: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventTempDisabled: callback enter! ifName = %{public}s", ifName);
     
     if (tempDisabledParam == NULL) {
         LOGE("OnEventTempDisabled tempDisabledParam is NULL");
@@ -173,9 +201,11 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
     if (tempDisabledParam->reason != NULL && tempDisabledParam->reasonLen > 0) {
         reason = std::string(tempDisabledParam->reason, tempDisabledParam->reason + tempDisabledParam->reasonLen);
     }
-    LOGI("OnEventTempDisabled ssid:%{public}s reason:%{public}s",
-        OHOS::Wifi::SsidAnonymize(ssid).c_str(), reason.c_str());
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    LOGI("OnEventTempDisabled ssid:%{public}s reason:%{public}s, ifName = %{public}s",
+        OHOS::Wifi::SsidAnonymize(ssid).c_str(),
+        reason.c_str(),
+        ifName);
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (cbk.onWpaSsidWrongKey && reason == "AUTH_FAILED") {
         cbk.onWpaSsidWrongKey();
     }
@@ -185,7 +215,11 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
 int32_t OnEventAssociateReject(struct IWpaCallback *self,
     const struct HdiWpaAssociateRejectParam *associateRejectParam, const char *ifName)
 {
-    LOGI("OnEventAssociateReject: callback enter!");
+    if (ifName == nullptr) {
+        LOGE("OnEventAssociateReject: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventAssociateReject: callback enter! ifName = %{public}s", ifName);
     if (associateRejectParam == NULL) {
         LOGE("OnEventAssociateReject: invalid parameter!");
         return 1;
@@ -215,7 +249,7 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
             }
         }
     }
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (isWrongPwd && cbk.onWpaSsidWrongKey) {
         LOGI("onWpaConnectionRejectCallBack, wrong password");
         cbk.onWpaSsidWrongKey();
@@ -238,14 +272,19 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
 
 int32_t OnEventStaNotify(struct IWpaCallback *self, const char* notifyParam, const char *ifName)
 {
-    LOGI("OnEventStaNotify: callback enter!");
+    if (ifName == nullptr) {
+        LOGE("OnEventStaNotify: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventStaNotify: callback enter! ifName = %{public}s", ifName);
     if (notifyParam == NULL) {
         LOGE("OnEventStaNotify: invalid parameter!");
         return 1;
     }
 
-    if (strcmp(ifName, "wlan0") == 0) {
-        const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (strcmp(ifName, "wlan0") == 0 || strcmp(ifName, "wlan1") == 0) {
+        const OHOS::Wifi::WifiEventCallback &cbk =
+            OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
         if (cbk.onEventStaNotify) {
             cbk.onEventStaNotify(notifyParam);
         }
@@ -260,8 +299,12 @@ int32_t OnEventStaNotify(struct IWpaCallback *self, const char* notifyParam, con
 
 int32_t OnEventWpsOverlap(struct IWpaCallback *self, const char *ifName)
 {
-    LOGI("OnEventWpsOverlap: callback enter!");
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (ifName == nullptr) {
+        LOGE("OnEventWpsOverlap: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventWpsOverlap: callback enter! ifName = %{public}s", ifName);
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (cbk.onWpsOverlap) {
         cbk.onWpsOverlap(1);
     }
@@ -270,8 +313,12 @@ int32_t OnEventWpsOverlap(struct IWpaCallback *self, const char *ifName)
 
 int32_t OnEventWpsTimeout(struct IWpaCallback *self, const char *ifName)
 {
-    LOGI("OnEventWpsTimeout: callback enter!");
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    if (ifName == nullptr) {
+        LOGE("OnEventWpsOverlap: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventWpsTimeout: callback enter! ifName = %{public}s", ifName);
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (cbk.onWpsTimeOut) {
         cbk.onWpsTimeOut(1);
     }
@@ -280,8 +327,13 @@ int32_t OnEventWpsTimeout(struct IWpaCallback *self, const char *ifName)
 
 int32_t OnEventAuthTimeout(struct IWpaCallback *self, const char *ifName)
 {
-    LOGI("OnEventAuthTimeout: callback enter!");
-    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
+    /* lyx: 后面有打印，但是没加判空，我加上了，看是否必要 */
+    if (ifName == nullptr) {
+        LOGE("OnEventWpsOverlap: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventAuthTimeout: callback enter! ifName = %{public}s", ifName);
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (g_currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
         cbk.onWpaSsidWrongKey) {
         LOGI("OnEventAuthTimeout, wrong password");

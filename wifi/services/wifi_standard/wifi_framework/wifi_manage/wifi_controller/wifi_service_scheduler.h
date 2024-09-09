@@ -40,22 +40,28 @@ public:
     explicit WifiServiceScheduler();
     ~WifiServiceScheduler();
     ErrCode AutoStartStaService(int instId, std::string &staIfName);
+    ErrCode AutoStartStaWifi2Service(int instId, std::string &staIfName);
     ErrCode AutoStopStaService(int instId);
+    ErrCode AutoStopStaWifi2Service(int instId);
     ErrCode AutoStartScanOnly(int instId, std::string &staIfName);
     ErrCode AutoStopScanOnly(int instId, bool setIfaceDown);
     ErrCode AutoStartSemiStaService(int instId, std::string &staIfName);
     ErrCode AutoStartApService(int instId, std::string &softApIfName);
     ErrCode AutoStopApService(int instId);
     void DispatchWifiOpenRes(OperateResState state, int instId);
+    void DispatchWifi2OpenRes(OperateResState state, int instId);
     void DispatchWifiSemiActiveRes(OperateResState state, int instId);
     void DispatchWifiCloseRes(OperateResState state, int instId);
+    void DispatchWifi2CloseRes(OperateResState state, int instId);
     void ClearStaIfaceNameMap(int instId);
     void ClearP2pIfaceNameMap(int instId);
     void ClearSoftApIfaceNameMap(int instId);
 private:
     ErrCode PreStartWifi(int instId, std::string &staIfName);
     ErrCode PostStartWifi(int instId);
+    ErrCode PostStartWifi2(int instId);
     ErrCode InitStaService(IStaService *pService);
+    ErrCode StartWifiStaService(int instId);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     ErrCode StartSelfCureService(int instId);
 #endif
@@ -66,9 +72,11 @@ private:
     void SoftApIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void OnRssiReportCallback(int index, int antRssi);
 #endif
-    std::map<int, std::string> g_staIfaceNameMap;
-    std::map<int, std::string> g_softApIfaceNameMap;
+    std::map<int, std::string> staIfaceNameMap;
+    std::map<int, std::string> softApIfaceNameMap;
     std::mutex mutex;
+    std::mutex mutexStaIfaceNameMap_;
+    std::mutex mutexApIfaceNameMap_;
 };
 }
 }

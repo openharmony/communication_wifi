@@ -216,7 +216,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
 void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
     IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId)
 {
-    netLinkInfo->ifaceName_ = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    netLinkInfo->ifaceName_ = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
 
     SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);

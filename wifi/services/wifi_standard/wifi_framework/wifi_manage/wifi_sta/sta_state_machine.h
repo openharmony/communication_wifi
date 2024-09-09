@@ -336,6 +336,7 @@ public:
     private:
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
+        bool HandleBssidChanged(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -1057,6 +1058,14 @@ private:
      */
     void HandlePostDhcpSetup();
 
+    /**
+     * @Description Get sta state machine instant id
+     */
+    int GetInstId()
+    {
+        return m_instId;
+    }
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.
@@ -1256,6 +1265,7 @@ private:
     bool CanArpReachable();
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
+    void HandleWpaLinkFailByEventName(int eventName);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
 #endif

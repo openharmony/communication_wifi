@@ -342,7 +342,12 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, bool externFlag
 ErrCode ScanService::DisableScan(bool disable)
 {
     LOGI("Enter DisableScan");
-    std::unique_lock<std::mutex> lock(scanControlInfoMutex);
+    if (disableScanFlag == disable) {
+        if (!disable) {
+            SystemScanProcess(true);
+        }
+        return WIFI_OPT_SUCCESS;
+    }
     disableScanFlag = disable;
     if (disableScanFlag) {
         pScanStateMachine->SendMessage(static_cast<int>(CMD_DISABLE_SCAN));

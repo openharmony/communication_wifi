@@ -20,7 +20,8 @@ DEFINE_WIFILOG_LABEL("MultiStaManager");
 
 namespace OHOS {
 namespace Wifi {
-MultiStaManager::MultiStaManager(MultiStaManager::Role role, int id) : mid(id), curRole(role), pMultiStaStateMachine(nullptr)
+MultiStaManager::MultiStaManager(MultiStaManager::Role role, int id) : mid(id), curRole(role),
+    pMultiStaStateMachine(nullptr) 
 {}
 
 MultiStaManager::~MultiStaManager()

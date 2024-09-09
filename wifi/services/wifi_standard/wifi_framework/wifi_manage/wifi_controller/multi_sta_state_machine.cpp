@@ -45,10 +45,10 @@ MultiStaStateMachine::~MultiStaStateMachine()
     ParsePointer(pDefaultState);
     ParsePointer(pIdleState);
     ParsePointer(pStartedState);
-    WIFI_LOGE("MultiStaStateMachine::~MultiStaStateMachine ifaceName before: %{public}s, instId:%{public}d", ifaceName.c_str(),mid);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
-        WIFI_LOGE("MultiStaStateMachine::~MultiStaStateMachine ifaceName after: %{public}s, instId:%{public}d", ifaceName.c_str(),mid);
+        WIFI_LOGW("MultiStaStateMachine::~MultiStaStateMachine ifaceName after: %{public}s,
+            instId:%{public}d", ifaceName.c_str(), mid);
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
         ifaceName.clear();
         WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(mid);
@@ -160,7 +160,6 @@ bool MultiStaStateMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg)
             HandleStartInIdleState(msg);
             break;
         case MULTI_STA_CMD_STOP:
-            // pMultiStaStateMachine->StopMultiSta();
             break;
         case CONCRETE_CMD_STA_WIFI2_START:
             pMultiStaStateMachine->SwitchState(pMultiStaStateMachine->pStartedState);

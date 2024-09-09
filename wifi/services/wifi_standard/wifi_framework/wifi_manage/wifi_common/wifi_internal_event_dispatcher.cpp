@@ -966,9 +966,9 @@ void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, int in
     WIFI_LOGE("publish connection state changed event,%{public}s, instId {public}d fail.", eventData.c_str(), instId);
 }
 
-void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state, int id)
+void WifiInternalEventDispatcher::PublishRssiValueChangedEvent(int state, int instId)
 {
-    if (id == INSTID_WLAN1) {
+    if (instId == INSTID_WLAN1) {
         WIFI_LOGW("PublishRssiValueChangedEvent instId wlan1!");
         return ;
     }

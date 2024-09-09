@@ -153,7 +153,8 @@ void WifiConfigCenter::SetStaIfaceName(const std::string &ifaceName, int instId)
 std::string WifiConfigCenter::GetStaIfaceName(int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    WIFI_LOGD("GetStaIfaceName instId:%{public}d mStaIfaceName[instId]:%{public}s ", insId, mStaIfaceName[instId].c_str());
+    WIFI_LOGD("GetStaIfaceName instId:%{public}d mStaIfaceName[instId]:%{public}s ",
+        insId, mStaIfaceName[instId].c_str());
     return mStaIfaceName[instId];
 }
 

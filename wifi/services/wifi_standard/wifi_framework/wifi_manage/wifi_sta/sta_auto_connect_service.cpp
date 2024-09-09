@@ -17,6 +17,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_config_center.h"
 #include "wifi_common_util.h"
+#include "wifi_service_manager.h"
 #include "block_connect_service.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
@@ -64,6 +65,12 @@ ErrCode StaAutoConnectService::InitAutoConnectService()
     return WIFI_OPT_SUCCESS;
 }
 
+void StaAutoConnectService::SetAutoConnectStateCallback(const std::vector<StaServiceCallback> &callbacks)
+{
+    WIFI_LOGI("Enter SetAutoConnectStateCallback.\n");
+    mStaCallbacks = callbacks;
+}
+
 void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter OnScanInfosReadyHandler.\n");
@@ -90,13 +97,6 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
-        if (networkSelectionResult.wifiDeviceConfig.isPortal &&
-            networkSelectionResult.wifiDeviceConfig.noInternetAccess &&
-            !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
-                networkSelectionResult.wifiDeviceConfig.networkStatusHistory)) {
-            WIFI_LOGE("this netwrok is portal, AutoSelectDevice return fail.");
-            return;
-        }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
         std::string &bssid = networkSelectionResult.interScanInfo.bssid;
         std::string &ssid = networkSelectionResult.interScanInfo.ssid;
@@ -109,7 +109,11 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         pStaStateMachine->SendMessage(message);
     } else {
         WIFI_LOGI("AutoSelectDevice return fail.");
-        return;
+    }
+    for (const auto &callBackItem : mStaCallbacks) {
+        if (callBackItem.OnAutoSelectNetworkRes != nullptr) {
+            callBackItem.OnAutoSelectNetworkRes(networkSelectionResult.wifiDeviceConfig.networkId, m_instId);
+        }
     }
 }
 

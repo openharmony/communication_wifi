@@ -255,15 +255,6 @@ public:
     virtual ErrCode SetPowerMode(bool mode) const;
 
     /**
-     * @Description  Set tx power to reduce sar.
-     *
-     * @param power - 1001,1002,1003......
-     *
-     * @Return WifiErrorNo
-     */
-    virtual ErrCode SetTxPower(int power) const;
-
-    /**
      * @Description systemabilitychanged
      *
      * @param mode: true for setup, false for shutdown.
@@ -329,6 +320,24 @@ public:
     virtual ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName);
 
     /**
+     * Register the common builder function
+     *
+     * @param TagType scoreTag which define where the score or filter should be inserted.
+     * @param tagName the score or filter name.
+     * @param CommonBuilder CommonBuilder function.
+     */
+    virtual ErrCode RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                               const CommonBuilder &commonBuilder);
+ 
+    /**
+     * Deregister the common builder function
+     *
+     * @param TagType TagType which define where the score or filter should be inserted.
+     * @param tagName the score or filte name.
+     */
+    virtual ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName);
+
+    /**
      * @Description start portal certification.
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
@@ -346,6 +355,14 @@ public:
      */
 #ifndef OHOS_ARCH_LITE
     virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
+
+    /**
+     * @Description Set EnhanceService
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService);
 #endif
     /**
      * @Description enable hilink
@@ -395,6 +412,7 @@ private:
 #endif
     int m_instId;
     std::vector<std::string> sta_candidate_trust_list;
+    bool m_connMangerStatus = true;
 };
 }  // namespace Wifi
 }  // namespace OHOS

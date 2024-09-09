@@ -346,18 +346,6 @@ ErrCode StaInterface::SetPowerMode(bool mode)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::SetTxPower(int power)
-{
-    LOGD("Enter SetTxPower, power=[%{public}d]!", power);
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->SetTxPower(power) != WIFI_OPT_SUCCESS) {
-        LOGE("SetTxPower() failed!");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 {
     LOGI("Enter OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!",
@@ -440,6 +428,23 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return pStaService->DeregisterFilterBuilder(filterTag, filterName);
 }
 
+ErrCode StaInterface::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                            const CommonBuilder &commonBuilder)
+{
+    LOGI("Enter RegisterCommonBuilder");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->RegisterCommonBuilder(tagType, tagName, commonBuilder);
+}
+ 
+ErrCode StaInterface::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    LOGI("Enter DeregisterCommonBuilder");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->DeregisterCommonBuilder(tagType, tagName);
+}
+
 ErrCode StaInterface::StartPortalCertification()
 {
     WIFI_LOGI("Enter StartPortalCertification");
@@ -458,6 +463,16 @@ ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStat
     pStaService->HandleForegroundAppChangedAction(appStateData);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::SetEnhanceService(IEnhanceService *enhanceService)
+{
+    WIFI_LOGI("Enter SetEnhanceService");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->SetEnhanceService(enhanceService);
+    return WIFI_OPT_SUCCESS;
+}
+
 #endif
 
 ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)

@@ -127,7 +127,8 @@ ErrCode WifiP2pService::StopP2pListen()
 
 ErrCode WifiP2pService::CreateGroup(const WifiP2pConfig &config)
 {
-    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
+    int callingUid = IPCSkeleton::GetCallingUid();
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(callingUid);
     WIFI_LOGI("CreateGroup name: %{private}s, address:%{private}s, addressType:%{public}d",
         config.GetGroupName().c_str(), config.GetDeviceAddress().c_str(), config.GetDeviceAddressType());
     WifiP2pConfigInternal configInternal(config);
@@ -135,7 +136,7 @@ ErrCode WifiP2pService::CreateGroup(const WifiP2pConfig &config)
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
     configInternal.SetWpsInfo(wps);
     const std::any info = configInternal;
-    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP), info);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP), callingUid, 0, info);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -165,14 +166,15 @@ ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 {
     WIFI_LOGI("P2pConnect");
-    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
+    int callingUid = IPCSkeleton::GetCallingUid();
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(callingUid);
     WifiP2pConfigInternal configInternal(config);
     WpsInfo wps;
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
     configInternal.SetWpsInfo(wps);
     p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_P2P);
     const std::any info = configInternal;
-    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT), info);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT), callingUid, 0, info);
 
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -300,16 +302,18 @@ void WifiP2pService::ClearAllP2pServiceCallbacks()
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)
 {
     WIFI_LOGI("Create hid2d group");
-    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
+    int callingUid = IPCSkeleton::GetCallingUid();
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(callingUid);
     const std::any info = std::pair<int, FreqType>(frequency, type);
-    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP), info);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP), callingUid, 0, info);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
 {
     WIFI_LOGI("Hid2dConnect");
-    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
+    int callingUid = IPCSkeleton::GetCallingUid();
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(callingUid);
     DHCPTYPE dhcpType = DHCPTYPE::DHCP_LEGACEGO;
     if (config.GetDhcpMode() == DhcpMode::CONNECT_GO_NODHCP ||
         config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
@@ -317,7 +321,7 @@ ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
     }
     p2pStateMachine.SetIsNeedDhcp(dhcpType);
     const std::any info = config;
-    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT), info);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT), callingUid, 0, info);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -350,28 +354,16 @@ ErrCode WifiP2pService::Hid2dRequestGcIp(const std::string& gcMac, std::string& 
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiP2pService::SetGroupUid(int callingUid)
-{
-    WIFI_LOGI("Uid %{public}d SetGroupUid", callingUid);
-    SharedLinkManager::SetGroupUid(callingUid);
-}
-
 void WifiP2pService::IncreaseSharedLink(int callingUid)
 {
     WIFI_LOGI("Uid %{public}d increaseSharedLink", callingUid);
-    SharedLinkManager::IncreaseSharedLink(callingUid);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_INCREASE_SHARE_LINK), callingUid);
 }
 
 void WifiP2pService::DecreaseSharedLink(int callingUid)
 {
     WIFI_LOGI("Uid %{public}d decreaseSharedLink", callingUid);
-    SharedLinkManager::DecreaseSharedLink(callingUid);
-}
-
-int WifiP2pService::GetSharedLinkCount(void)
-{
-    WIFI_LOGI("GetSharedLinkCount");
-    return SharedLinkManager::GetSharedLinkCount();
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DECREASE_SHARE_LINK), callingUid);
 }
 
 ErrCode WifiP2pService::HandleBusinessSAException(int systemAbilityId)

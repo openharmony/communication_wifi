@@ -182,12 +182,6 @@ ErrCode StaInterface::SetPowerMode(bool mode)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::SetTxPower(int power)
-{
-    LOGI("Enter SetTxPower, power=[%{public}d]!", power);
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode StaInterface::OnSystemAbilityChanged(int systemAbilityid, bool add)
 {
     return WIFI_OPT_SUCCESS;
@@ -238,6 +232,19 @@ ErrCode StaInterface::DeregisterFilterBuilder(const FilterTag &filterTag, const 
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                            const CommonBuilder &commonBuilder)
+{
+    LOGI("Enter RegisterCommonBuilder");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    LOGI("Enter DeregisterCommonBuilder");
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::StartPortalCertification()
 {
     WIFI_LOGI("Enter StartPortalCertification");
@@ -259,6 +266,12 @@ ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, cons
 }
 
 ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
+{
+    WIFI_LOGI("Enter DeliverStaIfaceData");
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::SetEnhanceService(IEnhanceService* enhanceService)
 {
     WIFI_LOGI("Enter DeliverStaIfaceData");
     return WIFI_OPT_SUCCESS;

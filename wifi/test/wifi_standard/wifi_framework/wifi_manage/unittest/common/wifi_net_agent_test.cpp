@@ -250,5 +250,13 @@ HWTEST_F(WifiNetAgentTest, LogNetCapsTest001, TestSize.Level1)
     std::set<NetManagerStandard::NetCap> netCaps;
     netConnCallback.LogNetCaps(ident, netCaps);
 }
+
+HWTEST_F(WifiNetAgentTest, GetSupplierId001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    wifiNetAgent.ResetSupplierId();
+    uint32_t tmpSupplierId = wifiNetAgent.GetSupplierId();
+    EXPECT_EQ(tmpSupplierId, 0);
+}
 }
 }

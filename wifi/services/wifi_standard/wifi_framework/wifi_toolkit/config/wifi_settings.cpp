@@ -90,8 +90,8 @@ int WifiSettings::Init()
     mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
-    mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
+    mVariableConf.SetConfigFilePath(WIFI_VARIABLE_PATH);
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -107,9 +107,9 @@ int WifiSettings::Init()
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
     ReloadStaRandomMac();
-    ReloadPortalconf();
     InitPackageFilterConfig();
     IncreaseNumRebootsSinceLastUse();
+    InitVariableConfig();
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     std::vector<WifiDeviceConfig> tmp;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
@@ -337,6 +337,7 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     iter->second.lastConnectTime = time(0);
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;
+    iter->second.networkSelectionStatus.networkDisableCount = 0;
     return 0;
 }
 
@@ -719,15 +720,6 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
         }
     }
     return randomMacInfo.randomMac.empty();
-}
-
-void WifiSettings::GetPortalUri(WifiPortalConf &urlInfo)
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    urlInfo.portalHttpUrl = mPortalUri.portalHttpUrl;
-    urlInfo.portalHttpsUrl = mPortalUri.portalHttpsUrl;
-    urlInfo.portalBakHttpUrl = mPortalUri.portalBakHttpUrl;
-    urlInfo.portalBakHttpsUrl = mPortalUri.portalBakHttpsUrl;
 }
 
 const std::vector<TrustListPolicy> WifiSettings::ReloadTrustListPolicies()
@@ -1436,23 +1428,6 @@ int WifiSettings::ReloadStaRandomMac()
     return 0;
 }
 
-int WifiSettings::ReloadPortalconf()
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mSavedPortal.LoadConfig() >= 0) {
-        std::vector<WifiPortalConf> tmp;
-        mSavedPortal.GetValue(tmp);
-        if (tmp.size() > 0) {
-            mPortalUri = tmp[0];
-        } else {
-            mPortalUri.portalHttpUrl = "test";
-        }
-    } else {
-        mPortalUri.portalHttpUrl = "test";
-    }
-    return 0;
-}
-
 void WifiSettings::InitPackageFilterConfig()
 {
     if (mPackageFilterConfig.LoadConfig() >= 0) {
@@ -1461,6 +1436,26 @@ void WifiSettings::InitPackageFilterConfig()
         std::unique_lock<std::mutex> lock(mScanMutex);
         for (unsigned int i = 0; i < tmp.size(); i++) {
             mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
+        }
+    }
+    return;
+}
+
+int WifiSettings::GetVariableMap(std::map<std::string, std::string> &variableMap)
+{
+    std::unique_lock<std::mutex> lock(mVariableConfMutex);
+    variableMap = mVariableMap;
+    return 0;
+}
+
+void WifiSettings::InitVariableConfig()
+{
+    if (mVariableConf.LoadConfig() >= 0) {
+        std::vector<VariableConf> tmp;
+        mVariableConf.GetValue(tmp);
+        std::unique_lock<std::mutex> lock(mVariableConfMutex);
+        for (unsigned int i = 0; i < tmp.size(); i++) {
+            mVariableMap.insert(std::make_pair(tmp[i].variableName, tmp[i].variableValue));
         }
     }
     return;
@@ -2040,24 +2035,19 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
     std::unique_lock<std::mutex> lock(mStaMutex);
     LOGI("UpdateWifiConfigFromCloud enter");
     std::map<int, WifiDeviceConfig> tempConfigs;
-    mNetworkId = 0;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
-            iter->second.networkId = mNetworkId;
-            tempConfigs.emplace(std::make_pair(mNetworkId, iter->second));
-            mNetworkId++;
+            tempConfigs[iter->second.networkId] = iter->second;
             continue;
         }
 #ifdef FEATURE_ENCRYPTION_SUPPORT
         // Do not remove local encrypted data
         if (!IsWifiDeviceConfigDeciphered(iter->second)) {
-            iter->second.networkId = mNetworkId;
-            tempConfigs.emplace(std::make_pair(mNetworkId, iter->second));
-            mNetworkId++;
+            tempConfigs[iter->second.networkId] = iter->second;
             continue;
         }
 #endif
-        LOGI("UpdateWifiConfigFromCloud remove from cloud %{public}s", SsidAnonymize(iter->second.ssid).c_str());
+        tempConfigs[iter->second.networkId] = iter->second;
     }
     for (auto iter : newWifiDeviceConfigs) {
         bool find = false;
@@ -2070,6 +2060,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
+        LOGI("UpdateWifiConfigFromCloud new wifiDevice %{public}s", SsidAnonymize(iter.ssid).c_str());
         tempConfigs.emplace(std::make_pair(mNetworkId, iter));
         mNetworkId++;
     }

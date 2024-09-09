@@ -27,13 +27,14 @@ public:
     bool InitScanService(const IScanSerivceCallbacks &iScanSerivceCallbacks);
     void UnInitScanService();
     void RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSerivceCallbacks);
-    ErrCode Scan(bool externFlag);
-    ErrCode ScanWithParam(const WifiScanParams &params, bool externFlag);
+    ErrCode Scan(ScanType scanType);
+    ErrCode ScanWithParam(const WifiScanParams &params, ScanType scanType);
     void SystemScanProcess(bool scanAtOnce);
     void HandleScreenStatusChanged();
     void HandleStaStatusChanged(int status);
     void HandleCustomStatusChanged(int customScene, int customSceneStatus);
     void HandleGetCustomSceneState(std::map<int, time_t>& sceneMap) const;
+    void HandleAutoConnectStateChanged(bool success);
     void GetScanControlInfo();
     void ClearScanControlValue();
     void SetStaCurrentTime();

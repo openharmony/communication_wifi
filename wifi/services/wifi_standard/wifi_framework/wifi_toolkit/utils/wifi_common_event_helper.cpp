@@ -176,5 +176,27 @@ bool WifiCommonEventHelper::PublishP2pGroupStateChangedEvent(const int &code, co
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED, code, data);
 }
+
+bool WifiCommonEventHelper::PublishSelfcureStateChangedEvent(const int &pid, const int &code, bool isSelfCureOnGoing)
+{
+#ifndef OHOS_ARCH_LITE
+    Want want;
+    want.SetAction(COMMON_EVENT_WIFI_SELF_CURE_STATE_CHANGED);
+    want.SetParam("pid", pid);
+    want.SetParam("selfcureType", code);
+    want.SetParam("isSelfCureOnGoing", isSelfCureOnGoing);
+    CommonEventData commonData;
+    commonData.SetWant(want);
+    std::vector<std::string> permissions;
+    permissions.push_back(COMMON_EVENT_GET_WIFI_INFO_PERMISSION);
+    CommonEventPublishInfo publishInfo;
+    publishInfo.SetSubscriberPermissions(permissions);
+    if (!CommonEventManager::PublishCommonEvent(commonData, publishInfo)) {
+        WIFI_LOGE("failed to publish SelfcureStateChanged Event");
+        return false;
+    }
+#endif
+    return true;
+}
 }  // namespace Wifi
 }  // namespace OHOS

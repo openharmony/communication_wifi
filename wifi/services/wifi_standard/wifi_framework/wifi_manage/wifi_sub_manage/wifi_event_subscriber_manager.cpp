@@ -48,7 +48,7 @@ const std::string PROP_TRUE = "true";
 const std::string PROP_FALSE = "false";
 const std::string SUBCHIP_WIFI_PROP = "ohos.boot.odm.conn.schiptype";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
-const std::string SUPPORT_COEXCHIP = "bisheng";
+const std::string SUPPORT_COEXCHIP = "";
 const std::string COEX_IFACENAME = "wlan1";
 const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
@@ -174,9 +174,6 @@ void WifiEventSubscriberManager::HandleAppMgrServiceChange(bool add)
 
 void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbilityId, bool add)
 {
-    if (!add) {
-        return;
-    }
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
         if (pService != nullptr) {
@@ -231,6 +228,20 @@ void WifiEventSubscriberManager::HandleCastServiceChange(bool add)
     }
 }
 
+void WifiEventSubscriberManager::HandleShareServiceChange(bool add)
+{
+    if (!add) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SHARE_SERVICE_UID);
+    }
+}
+
+void WifiEventSubscriberManager::HandleMouseCrossServiceChange(bool add)
+{
+    if (!add) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MOUSE_CROSS_SERVICE_UID);
+    }
+}
+
 #ifdef FEATURE_P2P_SUPPORT
 void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
@@ -238,7 +249,12 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     if (add) {
         return;
     }
-    WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SOFT_BUS_SERVICE_UID);
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SOFT_BUS_SERVICE_UID);
+    }
+    if (systemAbilityId == MIRACAST_SERVICE_SA_ID) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MIRACAST_SERVICE_UID);
+    }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
@@ -272,11 +288,18 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
 #ifdef FEATURE_P2P_SUPPORT
         case SOFTBUS_SERVER_SA_ID:
+        case MIRACAST_SERVICE_SA_ID:
             HandleP2pBusinessChange(systemAbilityId, add);
             break;
 #endif
         case CAST_ENGINE_SA_ID:
             HandleCastServiceChange(add);
+            break;
+        case SHARE_SERVICE_ID:
+            HandleShareServiceChange(add);
+            break;
+        case MOUSE_CROSS_SERVICE_ID:
+            HandleMouseCrossServiceChange(add);
             break;
         default:
             break;
@@ -463,6 +486,9 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
     SubscribeSystemAbility(CAST_ENGINE_SA_ID);
+    SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
+    SubscribeSystemAbility(SHARE_SERVICE_ID);
+    SubscribeSystemAbility(MOUSE_CROSS_SERVICE_ID);
 }
 
 bool WifiEventSubscriberManager::IsDataMgrServiceActive()
@@ -638,7 +664,11 @@ void WifiEventSubscriberManager::RegisterMovementCallBack()
     }
     if (Msdp::MovementClient::GetInstance().SubscribeCallback(
         Msdp::MovementDataUtils::MovementType::TYPE_STILL, deviceMovementCallback_) != ERR_OK) {
-        WIFI_LOGE("Register a device movement observer failed!");
+        WIFI_LOGE("Register movement still observer failed!");
+    }
+    if (Msdp::MovementClient::GetInstance().SubscribeCallback(
+        Msdp::MovementDataUtils::MovementType::TYPE_STAY, deviceMovementCallback_) != ERR_OK) {
+        WIFI_LOGE("Register movement stay observer failed!");
     }
 }
 

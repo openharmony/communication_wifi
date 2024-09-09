@@ -32,8 +32,9 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_net_agent.h"
 #include "parameter.h"
+#include "wifi_common_event_helper.h"
 #include "wifi_country_code_manager.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 std::vector<std::string> chinaPublicDnses(SELF_CURE_DNS_SIZE);
@@ -52,7 +53,6 @@ const int CMD_WIFI_CONNECT_TIMEOUT_SCREEN = 8 * 1000;
 const int CMD_WIFI_CONNECT_TIMEOUT = 16 * 1000;
 const int PUBLIC_DNS_SERVERS_SIZE = 46;
 const int PUBLIC_IP_ADDR_NUM = 4;
-const std::string SETTINGS_PAGE = "com.huawei.hmos.settings";
 const std::string INIT_SELFCURE_HISTORY = "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
 const std::string COUNTRY_CHINA_CAPITAL = "CN";
 const std::string COUNTRY_CODE_CN = "460";
@@ -675,13 +675,13 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(I
     } else {
         pSelfCureStateMachine->StartTimer(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET, CMD_WIFI_CONNECT_TIMEOUT);
     }
+    pSelfCureStateMachine->UpdateSelfcureState(static_cast<int>(SelfCureType::SCE_TYPE_RESET), false);
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(pSelfCureStateMachine->m_instId);
     if (pStaService == nullptr) {
         WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
         return;
     }
     int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
-    pSelfCureStateMachine->selfCureOnGoing = false;
     if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("ConnectToNetwork failed.\n");
     }
@@ -1411,7 +1411,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     }
     WIFI_LOGI("begin to self cure for internet access: Reset");
     WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
-    pSelfCureStateMachine->selfCureOnGoing = true;
+    pSelfCureStateMachine->UpdateSelfcureState(static_cast<int>(SelfCureType::SCE_TYPE_RESET), true);
     pSelfCureStateMachine->StopTimer(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK);
     delayedResetSelfCure = false;
     testedSelfCureLevel.push_back(requestCureLevel);
@@ -1419,9 +1419,15 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     WifiLinkedInfo wifiLinkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
     WifiConfigCenter::GetInstance().SetLastNetworkId(wifiLinkedInfo.networkId);
+    WifiConfigCenter::GetInstance().SetWifiSelfcureReset(true);
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
-    pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
+    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+        WIFI_LOGI("GetWifiTogglerManager is nullptr");
+        return;
+    }
+    WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 0);
 }
 
 bool SelfCureStateMachine::InternetSelfCureState::SelectedSelfCureAcceptable()
@@ -2492,7 +2498,7 @@ bool SelfCureStateMachine::IsSuppOnCompletedState()
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState == ConnState::CONNECTED) {
+    if (linkedInfo.supplicantState == SupplicantState::COMPLETED) {
         return true;
     }
     return false;
@@ -3096,7 +3102,15 @@ bool SelfCureStateMachine::IfMultiGateway()
 
 bool SelfCureStateMachine::IsSettingsPage()
 {
-    if (WifiAppStateAware::GetInstance().IsForegroundApp(SETTINGS_PAGE)) {
+    std::map<std::string, std::string> variableMap;
+    std::string page;
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("SETTINGS") != variableMap.end()) {
+        page = variableMap["SETTINGS"];
+    }
+    if (WifiAppStateAware::GetInstance().IsForegroundApp(page)) {
         WIFI_LOGI("settings page, do not allow reset self cure");
         return true;
     }
@@ -3131,6 +3145,15 @@ void SelfCureStateMachine::ClearDhcpOffer()
     uint32_t retSize = 0;
     IpInfo info;
     pEnhanceService->DealDhcpOfferResult(OperationCmd::DHCP_OFFER_CLEAR, info, retSize);
+}
+
+void SelfCureStateMachine::UpdateSelfcureState(int selfcureType, bool isSelfCureOnGoing)
+{
+    selfCureOnGoing = isSelfCureOnGoing;
+    int currentPid = static_cast<int>(getpid());
+    WIFI_LOGE("UpdateSelfcureState selfcureType: %{public}d, isSelfCureOnGoing: %{public}d",
+        selfcureType, isSelfCureOnGoing);
+    WifiCommonEventHelper::PublishSelfcureStateChangedEvent(currentPid, selfcureType, isSelfCureOnGoing);
 }
 } // namespace Wifi
 } // namespace OHOS

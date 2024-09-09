@@ -598,6 +598,7 @@ int WifiConfigCenter::GetAbnormalApps(std::vector<std::string> &abnormalAppList)
 int WifiConfigCenter::SaveScanInfoList(const std::vector<WifiScanInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
+    mWifiScanInfoList.clear();
     mWifiScanInfoList = results;
     return 0;
 }
@@ -875,6 +876,9 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
     } else {
         mHid2dUpperScenePair.insert_or_assign(SOFT_BUS_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(CAST_ENGINE_SERVICE_UID, scene);
+        mHid2dUpperScenePair.insert_or_assign(MIRACAST_SERVICE_UID, scene);
+        mHid2dUpperScenePair.insert_or_assign(SHARE_SERVICE_UID, scene);
+        mHid2dUpperScenePair.insert_or_assign(MOUSE_CROSS_SERVICE_UID, scene);
     }
 }
 

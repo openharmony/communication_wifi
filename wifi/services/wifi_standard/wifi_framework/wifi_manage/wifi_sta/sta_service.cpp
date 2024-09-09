@@ -31,6 +31,7 @@
 #include "network_selection_manager.h"
 #include "wifi_config_center.h"
 #include "external_wifi_filter_builder_manager.h"
+#include "external_wifi_common_builder_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -47,6 +48,7 @@ constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 #define EAP_AUTH_MIN_PLMN_LEN  5
 #define EAP_AUTH_MAX_PLMN_LEN  6
 #define EAP_AUTH_MAX_IMSI_LENGTH 15
+#define INVALID_SUPPLIER_ID 0
 
 #define EAP_AKA_PERMANENT_PREFIX "0"
 #define EAP_SIM_PERMANENT_PREFIX "1"
@@ -131,6 +133,7 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
         WIFI_LOGE("InitAutoConnectService failed.\n");
         return WIFI_OPT_FAILED;
     }
+    pStaAutoConnectService->SetAutoConnectStateCallback(callbacks);
 #ifndef OHOS_ARCH_LITE
     pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
     if (pStaAppAcceleration == nullptr) {
@@ -236,6 +239,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
 #ifndef OHOS_ARCH_LITE
     if (IsAppInCandidateFilterList(uid)) {
         tempDeviceConfig.isShared = true;
+        tempDeviceConfig.isEphemeral = false;
     }
 #endif
     netWorkId = AddDeviceConfig(tempDeviceConfig);
@@ -754,17 +758,6 @@ ErrCode StaService::SetPowerMode(bool mode) const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::SetTxPower(int power) const
-{
-    LOGD("Enter SetTxPower, power=[%{public}d]!", power);
-    if (WifiStaHalInterface::GetInstance().SetTxPower(WifiConfigCenter::GetInstance().GetStaIfaceName(), power)
-        != WIFI_HAL_OPT_OK) {
-        LOGE("SetTxPower() failed!");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
 void StaService::NotifyDeviceConfigChange(ConfigChange value) const
 {
     WIFI_LOGI("Notify device config change: %{public}d\n", static_cast<int>(value));
@@ -795,8 +788,13 @@ ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
     WIFI_LOGI("Enter OnSystemAbilityChanged.");
 #ifndef OHOS_ARCH_LITE
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    if (systemAbilityid == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID && add) {
-        pStaStateMachine->OnNetManagerRestart();
+    if (systemAbilityid == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
+        uint32_t supplierId = WifiNetAgent::GetInstance().GetSupplierId();
+        if ((add && !m_connMangerStatus) || (supplierId == INVALID_SUPPLIER_ID)) {
+            WifiNetAgent::GetInstance().ResetSupplierId();
+            pStaStateMachine->OnNetManagerRestart();
+        }
+        m_connMangerStatus = add;
     }
 #endif
     return WIFI_OPT_SUCCESS;
@@ -889,6 +887,19 @@ ErrCode StaService::DeregisterFilterBuilder(const OHOS::Wifi::FilterTag &filterT
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                          const CommonBuilder &commonBuilder)
+{
+    ExternalWifiCommonBuildManager::GetInstance().RegisterCommonBuilder(tagType, tagName, commonBuilder);
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaService::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    ExternalWifiCommonBuildManager::GetInstance().DeregisterCommonBuilder(tagType, tagName);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::StartPortalCertification()
 {
     if (pStaStateMachine == nullptr) {
@@ -908,6 +919,13 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
         return WIFI_OPT_FAILED;
     }
     pStaAppAcceleration->HandleForegroundAppChangedAction(appStateData);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->SetEnhanceService(enhanceService);
     return WIFI_OPT_SUCCESS;
 }
 #endif

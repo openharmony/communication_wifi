@@ -91,7 +91,6 @@ public:
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
     virtual void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0) = 0;
-    virtual void GetPortalUri(WifiPortalConf &urlInfo) = 0;
     virtual void InsertWifi6BlackListCache(const std::string currentBssid,
         const Wifi6BlackListInfo wifi6BlackListInfo) = 0;
     virtual void RemoveWifi6BlackListCache(const std::string bssid) = 0;
@@ -196,6 +195,8 @@ public:
     virtual int GetHotspotState(int id = 0) = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
+    virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
+    virtual bool GetScanAlwaysState(int instId) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -256,7 +257,6 @@ public:
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
     MOCK_METHOD2(SaveDisconnectedReason, void(DisconnectedReason discReason, int));
-    MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
     MOCK_METHOD2(InsertWifi6BlackListCache, void(const std::string currentBssid,
         const Wifi6BlackListInfo wifi6BlackListInfo));
     MOCK_METHOD1(RemoveWifi6BlackListCache, void(const std::string bssid));
@@ -360,6 +360,8 @@ public:
     MOCK_METHOD1(GetHotspotState, int(int id));
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
     MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int));
+    MOCK_METHOD1(MergeWifiCloneConfig, void(std::string &cloneData));
+    MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
 };
 }  // namespace Wifi
 }  // namespace OHOS

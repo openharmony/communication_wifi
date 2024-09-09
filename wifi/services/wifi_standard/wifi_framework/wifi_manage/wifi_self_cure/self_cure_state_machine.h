@@ -35,16 +35,6 @@
 #include "wifi_common_util.h"
 #include "wifi_net_observer.h"
 
-bool SelfCureStateMachine::IsSuppOnCompletedState()
-{
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.supplicantState == SupplicantState::COMPLETED) {
-        return true;
-    }
-    return false;
-}
-
 namespace OHOS {
 namespace Wifi {
 constexpr int SELF_CURE_DNS_SIZE = 2;
@@ -85,7 +75,7 @@ constexpr int POS_RANDMAC_CONNECT_FAILED_TS = 15;
 constexpr int POS_RESET_CONNECT_FAILED_CNT = 16;
 constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
 constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
-
+ 
 class SelfCureStateMachine : public StateMachine {
     FRIEND_GTEST(SelfCureStateMachine);
 

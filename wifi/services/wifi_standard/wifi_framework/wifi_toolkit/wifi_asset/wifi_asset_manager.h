@@ -47,7 +47,7 @@ public:
         int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
  
     void WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
-        int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
+        int32_t userId = USER_ID_DEFAULT, bool flagSync = true, bool firstSync = false);
  
     void WifiAssetRemovePack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
         int32_t userId = USER_ID_DEFAULT, bool flagSync = true);

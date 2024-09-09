@@ -239,7 +239,6 @@ void WifiAssetManager::InitUpLoadLocalDeviceSync()
         return;
     }
     WifiSettings::GetInstance().UpLoadLocalDeviceConfigToCloud();
-    firstSync_ = true;
 }
 
 void WifiAssetManager::CloudAssetSync()
@@ -333,7 +332,7 @@ void WifiAssetManager::WifiAssetRemove(const WifiDeviceConfig &config, int32_t u
 }
  
 void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
-    int32_t userId, bool flagSync)
+    int32_t userId, bool flagSync, bool firstSync)
 {
     if (!assetServiceThread_ || wifiDeviceConfigs.size() == 0) {
         LOGE("WifiAssetAddPack, assetServiceThread_ is null");
@@ -349,6 +348,9 @@ void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wif
                 LOGE("WifiAssetAttrAdd Failed, %{public}s", SsidAnonymize(mapConfig.ssid).c_str());
             } else {
                 LOGI("WifiAssetAttrAdd Success");
+                if (firstSync) {
+                    firstSync_ = true;
+                }
             }
         }
         if (flagSync) {

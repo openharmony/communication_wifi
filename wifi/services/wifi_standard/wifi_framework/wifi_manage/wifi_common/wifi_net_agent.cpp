@@ -64,7 +64,6 @@ bool WifiNetAgent::RegisterNetSupplier()
     int32_t result = NetConnClient::GetInstance().RegisterNetSupplier(NetBearType::BEARER_WIFI,
                                                                       ident, netCaps, supplierId);
     if (result == NETMANAGER_SUCCESS) {
-        WIFI_LOGI("Register NetSupplier successful");
         WIFI_LOGI("Register NetSupplier successful, supplierId is [%{public}d]", supplierId);
         return true;
     }

@@ -29,6 +29,7 @@ static void SplitString(const std::string &input, const char spChar, std::vector
         outArray.push_back(token);
     }
 }
+
 static bool CheckEap(const WifiDeviceConfig &config)
 {
     if (config.keyMgmt != KEY_MGMT_EAP && config.keyMgmt != KEY_MGMT_SUITE_B_192) {

@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 inline const int CREDENTIAL_MAX_NUM = 32;
 class WifiP2pGroupManager {
 FRIEND_GTEST(WifiP2pGroupManager);
@@ -173,6 +172,9 @@ public:
     inline void UpdateCurrGroupClient(const WifiP2pDevice &device)
     {
         currentGroup.AddClientDevice(device);
+        if (currentGroup.IsPersistent()) {
+            currentGroup.AddPersistentDevice(device);
+        }
     }
 
     inline void RemoveCurrGroupClient(const WifiP2pDevice &device)

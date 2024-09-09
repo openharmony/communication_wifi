@@ -1141,20 +1141,12 @@ void StaStateMachine::OnConnectFailed(int networkId)
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
 }
 
-void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
-{
-    LOGI("enter DealConnectToUserSelectedNetwork m_instId = %{public}d\n", m_instId);
-    if (msg == nullptr) {
-        LOGE("msg is null.\n");
-        return;
-    }
-    
+void HandleWifi2Config(int &networkId) {
     WifiDeviceConfig config1;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config1, m_instId) != 0) {
         LOGE("GetDeviceConfig failed m_instId = %{public}d", m_instId);
         return;
     }
-
     if (config1.instanceId != m_instId) {
         int netWorkId2 = INVALID_NETWORK_ID;
         netWorkId2 = WifiSettings::GetInstance().GetNextNetworkId();
@@ -1167,7 +1159,16 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
     }
     LOGI("DealConnectToUserSelectedNetwork the same networkId = %{public}d, m_instId = %{public}d",
         networkId, m_instId);
+}
 
+void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
+{
+    LOGI("enter DealConnectToUserSelectedNetwork m_instId = %{public}d\n", m_instId);
+    if (msg == nullptr) {
+        LOGE("msg is null.\n");
+        return;
+    }
+    HandleWifi2Config(networkId);
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
@@ -1191,26 +1192,21 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
             return;
         }
     }
-
     std::string connectType = config.lastConnectTime <= 0 ? "FIRST_CONNECT" :
         connTriggerMode == NETWORK_SELECTED_BY_AUTO ? "AUTO_CONNECT" :
         connTriggerMode == NETWORK_SELECTED_BY_USER ? "SELECT_CONNECT" : "";
     if (!connectType.empty()) {
         WirteConnectTypeHiSysEvent(connectType);
     }
-    /* Save connection information. */
     SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
     networkStatusHistoryInserted = false;
-    /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
-
     if (StartConnectToNetwork(networkId, bssid) != WIFI_OPT_SUCCESS) {
         OnConnectFailed(networkId);
         return;
     }
     SetConnectMethod(connTriggerMode);
-    /* Sets network status. */
     WifiConfigCenter::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
 }
@@ -2063,9 +2059,11 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     return true;
 }
 
-bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::string &realMac) {
+bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::string &realMac)
+{
     std::string lastMac;
-    if ((WifiStaHalInterface::Getinstance().GetStaDeviceMacAddress(lastMac)) != WIFI_HAL_OPT_OK) {
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac, ifaceName)) != WIFI_HAL_OPT_OK) {
         LOGE("%{public}s randommac, GetStaDeviceMacAddress failed!", __func__);
         return false;
     }
@@ -2082,7 +2080,7 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     if (MacAddress::IsValidMac(actualConfiguredMac.c_str())) {
         if (lastMac != actualConfiguredMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
-                WifiConfigCenter::GetInstance().GetStaIfaceName(), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
+                WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
                     LOGE("set Mac [%{public}s] failed", MacAnonymize(actualConfiguredMac).c_str());
                 }
         }
@@ -2094,7 +2092,8 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     }
 }
 
-bool StaStateMachine::GetWifi2RandomMac(std::string &wifi2RandomMac) {
+bool StaStateMachine::GetWifi2RandomMac(std::string &wifi2RandomMac)
+{
     std::string inputStrMac = wifi2RandomMac.substr(WIFI2_RANDOM_MAC_CHANGE_POS, WIFI2_RANDOM_MAC_CHANGE_LEN);
     std::stringstream inputSsMac;
     inputSsMac << std::hex <<inputStrMac;

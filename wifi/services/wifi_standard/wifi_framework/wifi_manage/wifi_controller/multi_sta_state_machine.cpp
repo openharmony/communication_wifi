@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,10 +19,8 @@
 #include "wifi_config_center.h"
 #include "wifi_chip_hal_interface.h"
 #include "wifi_internal_event_dispatcher.h"
-#include "wifi_hisysevent.h"
 #include "wifi_settings.h"
 #include "wifi_common_event_helper.h"
-#include "wifi_country_code_manager.h"
 #include "wifi_service_scheduler.h"
 #include "i_ap_service.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
@@ -47,12 +45,12 @@ MultiStaStateMachine::~MultiStaStateMachine()
     ParsePointer(pStartedState);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
-        WIFI_LOGW("MultiStaStateMachine::~MultiStaStateMachine ifaceName after: %{public}s,
+        WIFI_LOGW("MultiStaStateMachine::~MultiStaStateMachine ifaceName: %{public}s,
             instId:%{public}d", ifaceName.c_str(), mid);
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
         ifaceName.clear();
         WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(mid);
-        // WifiConfigCenter::GetInstance().SetApIfaceName("");
+        WifiConfigCenter::GetInstance().SetStaIfaceName("", mid);
     }
 #endif
 }
@@ -86,7 +84,7 @@ ErrCode MultiStaStateMachine::InitMultiStaStates()
 {
     int tmpErrNumber;
 
-    WIFI_LOGE("Enter InitConcreteMangerStates\n");
+    WIFI_LOGE("Enter MultiStaStateMachine\n");
     pDefaultState = new (std::nothrow) DefaultState(this);
     tmpErrNumber = JudgmentEmpty(pDefaultState);
     pIdleState = new (std::nothrow) IdleState(this);
@@ -106,8 +104,8 @@ ErrCode MultiStaStateMachine::RegisterCallback(const MultiStaModeCallback &callb
     return WIFI_OPT_SUCCESS;
 }
 
-MultiStaStateMachine::DefaultState::DefaultState(MultiStaStateMachine *MultiStaStateMachine)
-    : State("DefaultState"), pMultiStaStateMachine(MultiStaStateMachine)
+MultiStaStateMachine::DefaultState::DefaultState(MultiStaStateMachine *multiStaStateMachine)
+    : State("DefaultState"), pMultiStaStateMachine(multiStaStateMachine)
 {}
 
 MultiStaStateMachine::DefaultState::~DefaultState()
@@ -132,8 +130,8 @@ bool MultiStaStateMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
     return true;
 }
 
-MultiStaStateMachine::IdleState::IdleState(MultiStaStateMachine *MultiStaStateMachine)
-    : State("IdleState"), pMultiStaStateMachine(MultiStaStateMachine)
+MultiStaStateMachine::IdleState::IdleState(MultiStaStateMachine *multiStaStateMachine)
+    : State("IdleState"), pMultiStaStateMachine(multiStaStateMachine)
 {}
 
 MultiStaStateMachine::IdleState::~IdleState()
@@ -182,8 +180,8 @@ void MultiStaStateMachine::IdleState::HandleStartInIdleState(InternalMessagePtr 
     pMultiStaStateMachine->SwitchState(pMultiStaStateMachine->pStartedState);
 }
 
-MultiStaStateMachine::StartedState::StartedState(MultiStaStateMachine *MultiStaStateMachine)
-    : State("StartedState"), pMultiStaStateMachine(MultiStaStateMachine)
+MultiStaStateMachine::StartedState::StartedState(MultiStaStateMachine *multiStaStateMachine)
+    : State("StartedState"), pMultiStaStateMachine(multiStaStateMachine)
 {}
 
 MultiStaStateMachine::StartedState::~StartedState()
@@ -221,17 +219,6 @@ bool MultiStaStateMachine::StartedState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
     }
     return true;
-}
-
-void MultiStaStateMachine::StopMultiSta()
-{
-    ClearIfaceName();
-        return;
-}
-
-void MultiStaStateMachine::ClearIfaceName()
-{
-    ifaceName.clear();
 }
 
 } // namespace Wifi

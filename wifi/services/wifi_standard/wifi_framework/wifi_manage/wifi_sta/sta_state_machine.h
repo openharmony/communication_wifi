@@ -917,16 +917,12 @@ private:
 
     /**
      * @Description  Set a random MAC address.
-     *
      * @param networkId - network id[in]
      */
     bool SetRandomMac(int networkId, const std::string &bssid);
 
     /**
      * @Description  Set mac address to hal
-     *
-     * @param currentMac - mac address set to hal
-     *@param realMac - real address
      */
     bool SetMacToHal(const std::string &currentMac, const std::string &realMac);
 
@@ -940,7 +936,6 @@ private:
 
     /**
      * @Description  check whether the current bssid are consistent.
-     *
      * @param bssid - bssid
      */
     bool CheckRoamingBssidIsSame(std::string bssid);
@@ -1294,6 +1289,7 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    void HandleWifi2Config(int &networkId);
 };
 }  // namespace Wifi
 }  // namespace OHOS

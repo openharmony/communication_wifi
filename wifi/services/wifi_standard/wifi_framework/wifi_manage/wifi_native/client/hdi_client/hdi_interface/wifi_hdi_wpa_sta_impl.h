@@ -87,6 +87,8 @@ int ConvertMacToStr(char *mac, int macSize, char *macStr, int strLen);
 
 WifiErrorNo HdiSetNativeProcessCallback(void (*callback)(int));
 
+void HandleGetScanInfo(unsigned char *resultBuff, int *size, ScanInfo *results);
+
 #ifdef __cplusplus
 }
 #endif

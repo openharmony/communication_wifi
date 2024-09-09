@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_DEFINE_H
 #define OHOS_DEFINE_H
 
@@ -125,4 +126,3 @@
 #endif
 
 #endif
-88

@@ -55,7 +55,6 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void HandleStaStartFailure(int id);
-        void HandleStaWifi2StartFailure(int id);
         void HandleStaRemoved(InternalMessagePtr msg);
         void HandleStaWifi2Removed(InternalMessagePtr msg);
         void HandleAPServiceStartFail(int id);

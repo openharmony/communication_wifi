@@ -542,11 +542,6 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetSatelliteState(const int state) override;
-#ifdef OHOS_ARCH_LITE
-    /**
-    * @Description Handle remote object died event.
-    */
-    void OnRemoteDied(void);
 
     /**
      * @Description Get single device config
@@ -556,6 +551,11 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
+#ifdef OHOS_ARCH_LITE
+    /**
+    * @Description Handle remote object died event.
+    */
+    void OnRemoteDied(void);
 private:
     static WifiDeviceProxy *g_instance;
     IClientProxy *remote_ = nullptr;

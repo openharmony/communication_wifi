@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 /**
  * This class solves the problem caused by frequent operations on the WifiP2pGroupInfo object in the following
    scenarios:
@@ -73,6 +72,7 @@ public:
     const std::string &GetGoIpAddress() const;
 
     void AddClientDevice(const WifiP2pDevice &clientDevice);
+    void AddPersistentDevice(const WifiP2pDevice &clientDevice);
     void RemoveClientDevice(const WifiP2pDevice &clientDevice);
 
     bool IsContainsDevice(const WifiP2pDevice &clientDevice) const;

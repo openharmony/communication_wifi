@@ -48,7 +48,7 @@ public:
 private:   
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:
-        SelfCureDnsResultCallback(SelfCureService &ins) : selfCureService_(ins){};
+        explicit SelfCureDnsResultCallback(SelfCureService &ins) : selfCureService_(ins){};
         int32_t OnDnsResultReport(uint32_t size, const std::list<NetsysNative::NetDnsResultReport> reports);
     private:
         SelfCureService& selfCureService_;

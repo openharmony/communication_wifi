@@ -496,7 +496,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(Interna
         pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_DNS_FAILED_MONITOR, INTERNET_DETECT_INTERVAL_MS);
         return;
     }
- 
+
     int currentDnsFailedCnt = dnsFailedCnt_;
     int deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
     lastDnsFailedCnt_ = currentDnsFailedCnt;

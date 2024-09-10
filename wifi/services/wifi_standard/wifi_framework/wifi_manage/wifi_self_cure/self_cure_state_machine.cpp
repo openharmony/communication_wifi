@@ -484,7 +484,6 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(InternalMessagePtr msg)
 {
-    // signal leve <= 1, continue
     if (lastSignalLevel <= SIGNAL_LEVEL_1) {
         WIFI_LOGI("HandleDnsFailedMonitor, lastSignalLevel <= 1, next peroid.");
         if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
@@ -506,7 +505,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(Interna
             WIFI_LOGI("HandleDnsFailedMonitor, HTTP detection succeeded.");
             return;
         }
-        WIFI_LOGI("HandleDnsFailedMonitor, start dns self cure.");
+        WIFI_LOGI("HandleDnsFailedMonitor, deltaFailedDns is %{public}d, transition to selfcurestate", deltaFailedDns);
         pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
         TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
     }

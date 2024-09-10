@@ -55,13 +55,12 @@ int32_t SelfCureUtils::GetCurrentDnsFailedCounter()
 
 void SelfCureUtils::ClearDnsFailedCounter()
 {
-    return dnsResultCallback_->dnsFailedCounter_ = 0;
+    dnsResultCallback_->dnsFailedCounter_ = 0;
 }
 
 int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t size,
     const std::list<NetsysNative::NetDnsResultReport> netDnsResultReport)
 {
-    int dnsFailCount = 0;
     int32_t wifiNetId = GetWifiNetId();
 	int32_t defaultNetId = GetDefaultNetId();
     for (auto &it : netDnsResultReport) {
@@ -69,9 +68,8 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t siz
         int32_t targetNetId = netId > 0 ? netId : (defaultNetId > 0 ? defaultNetId : 0);
         if (wifiNetId > 0 && wifiNetId == targetNetId) {
             if (it.queryresult_ != 0) {
-                dnsFailCount++;
+                dnsFailedCounter_++;
             }
-            WIFI_LOGI("SelfCureDnsResultCallback dnsFailCount = %{public}d, queryresult_ = %{public}d", dnsFailCount, it.queryresult_);
         }
     }
     return 0;

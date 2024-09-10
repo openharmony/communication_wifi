@@ -34,7 +34,111 @@
 #include "self_cure_msg.h"
 #include "wifi_common_util.h"
 #include "wifi_net_observer.h"
-
+//
+void SelfCureStateMachine::ConnectedMonitorState::GoInState()
+{
+    WIFI_LOGI("ConnectedMonitorState GoInState function.");
+    WIFI_LOGI("yyjtest ConnectedMonitorState GoInState function.");
+    if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
+        WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD,
+    &SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery;
+    selfCureCmsHandleFuncMap[WIFI_CURE_CMD_GATEWAY_CHANGED_DETECT] =
+    &SelfCureStateMachine::ConnectedMonitorState::HandleGatewayChanged;
+    selfCureCmsHandleFuncMap[WIFI_CURE_CMD_DNS_FAILED_MONITOR] =
+    &SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor;
+    selfCureCmsHandleFuncMap[WIFI_CURE_CMD_DNS_FAILED_REPORT] =
+    &SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedReport;
+    return WIFI_OPT_SUCCESS;
+}
+//
+WIFI_LOGI("SetupSelfCureMonitor, internetUnknown: %{public}d, hasInternetRecently: %{public}d, portalUnthenEver: %{public}d",
+            pSelfCureStateMachine->internetUnknown, hasInternetRecently, portalUnthenEver);
+//
+void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedReport(InternalMessagePtr msg)
+{
+    dnsFailedCnt_ += msg->GetParam1();
+}
+ 
+void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(InternalMessagePtr msg)
+{
+    // signal leve <= 1, continue
+    if (lastSignalLevel <= SIGNAL_LEVEL_1) {
+        WIFI_LOGI("HandleDnsFailedMonitor, lastSignalLevel <= 1, next peroid.");
+        lastDnsFailedCnt_ = dnsFailedCnt_;
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_DNS_FAILED_MONITOR, INTERNET_DETECT_INTERVAL_MS);
+        return;
+    }
+ 
+    int currentDnsFailedCnt = dnsFailedCnt_;
+    int deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
+    lastDnsFailedCnt_ = currentDnsFailedCnt;
+    if (deltaFailedDns >= DNS_FAILED_CNT) {
+        pSelfCureStateMachine->selfCureOnGoing = true;
+        if (pSelfCureStateMachine->IsHttpReachable()) {
+            pSelfCureStateMachine->selfCureOnGoing = false;
+            WIFI_LOGI("HandleDnsFailedMonitor, HTTP detection succeeded.");
+            return;
+        }
+        WIFI_LOGI("HandleDnsFailedMonitor, start dns self cure.");
+        pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
+        TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
+    }
+    return;
+}
+ 
+//
+WIFI_LOGI("yyjtest HandleConnectFailed");
+//
+void SelfCureStateMachine::InternetSelfCureState::HandleNetworkDisconnected(InternalMessagePtr msg)
+{
+    WIFI_LOGD("enter HandleNetworkDisconnected.");
+    if (pSelfCureStateMachine->useWithRandMacAddress == FAC_MAC_REASSOC) {
+        WIFI_LOGI("yyjtest HandleSelfCureException");
+        pSelfCureStateMachine->HandleSelfCureException();
+        return;
+    }
+    if (msg == nullptr) {
+        WIFI_LOGE("msg is nullptr.");
+        return;
+        }
+        usleep(HTTP_DETECT_USLEEP_TIME);
+    }
+    WIFI_LOGI("IsHttpReachable network detect end, %{public}d", mIsHttpReachable);
+    return mIsHttpReachable;
+}
+//
+ 
+void SelfCureStateMachine::HandleSelfCureException()
+{
+    WifiDeviceConfig config;
+    int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        WIFI_LOGE("%{public}s: GetDeviceConfig failed!.", __FUNCTION__);
+        return;
+    }
+    config.isReassocSelfCureWithFactoryMacAddress = RAND_MAC_REASSOC;
+    config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+    useWithRandMacAddress = 0;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+ 
+    if (connectNetworkRetryCnt >= CONNECT_NETWORK_RETRY) {
+        return;
+    }
+    connectNetworkRetryCnt++;
+    WIFI_LOGI("HandleSelfCureException, reconnect to network");
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pStaService == nullptr) {
+        WIFI_LOGE("HandleSelfCureException Get pStaService failed!");
+        return;
+    }
+    if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("HandleSelfCureException ConnectToNetwork failed");
+        return;
+    }
+}
+//
 namespace OHOS {
 namespace Wifi {
 constexpr int SELF_CURE_DNS_SIZE = 2;
@@ -74,6 +178,7 @@ constexpr int POS_RANDMAC_CONNECT_FAILED_CNT = 14;
 constexpr int POS_RANDMAC_CONNECT_FAILED_TS = 15;
 constexpr int POS_RESET_CONNECT_FAILED_CNT = 16;
 constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
+constexpr int DNS_FAILED_CNT = 2;
 inline constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
 
 class SelfCureStateMachine : public StateMachine {
@@ -128,6 +233,8 @@ public:
         bool portalUnthenEver = false;
         bool userSetStaticIpConfig = false;
         bool wifiSwitchAllowed = false;
+        int lastDnsFailedCnt_ = 0;
+        int dnsFailedCnt_ = 0;
         SelfCureCmsHandleFuncMap selfCureCmsHandleFuncMap;
         int InitSelfCureCmsHandleMap();
         void HandleResetupSelfCure(InternalMessagePtr msg);
@@ -145,6 +252,8 @@ public:
         void HandleTcpQualityQuery(InternalMessagePtr msg);
         void HandleGatewayChanged(InternalMessagePtr msg);
         bool IsGatewayChanged();
+        void HandleDnsFailedMonitor(InternalMessagePtr msg);
+        void HandleDnsFailedReport(InternalMessagePtr msg);
     };
 
     /* *
@@ -417,6 +526,7 @@ private:
     bool IsMultiDhcpOffer();
     void ClearDhcpOffer();
     void UpdateSelfcureState(int selfcureType, bool isSelfCureOnGoing);
+    void HandleSelfCureException();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;

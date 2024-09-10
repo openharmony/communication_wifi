@@ -695,7 +695,6 @@ void StaStateMachine::StartWifiProcess()
     InitWifiLinkedInfo();
     InitLastWifiLinkedInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    WifiSettings::GetInstance().ReloadDeviceConfig();
     /* The current state of StaStateMachine transfers to SeparatedState after
      * enable supplicant.
      */

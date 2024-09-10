@@ -241,7 +241,8 @@ int32_t SelfCureService::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t s
     const std::list<NetsysNative::NetDnsResultReport> netDnsResultReport)
 {
     int32_t wifiNetId = selfCureService_.GetWifiNetId();
-    WIFI_LOGD("OnDnsResultReport,size is: %{public}d, wifiNetId is %{public}d", static_cast<int>(netDnsResultReport.size()), wifiNetId);
+    WIFI_LOGD("OnDnsResultReport, size is: %{public}d, wifiNetId is %{public}d",
+        static_cast<int>(netDnsResultReport.size()), wifiNetId);
     for (auto &it : netDnsResultReport) {
         if (wifiNetId > 0 && wifiNetId == static_cast<int32_t>(it.netid_)) {
             if (it.queryresult_ != 0) {

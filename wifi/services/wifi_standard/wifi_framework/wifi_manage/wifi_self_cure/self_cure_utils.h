@@ -39,12 +39,12 @@ private:
     private:
         int32_t GetWifiNetId();
         int32_t GetDefaultNetId();
-    private:
+    public:
         int32_t dnsFailedCounter_;
     };
 
 private:
-    sptr<OHOS::NetManagerStandard::NetsysDnsReportCallback> dnsResultCallback_{nullptr}; 
+    sptr<SelfCureDnsResultCallback> dnsResultCallback_{nullptr}; 
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -39,7 +39,6 @@ SelfCureService::~SelfCureService()
         pSelfCureStateMachine = nullptr;
     }
     UnRegisterP2pEnhanceCallback();
-    UnRegisterP2pEnhanceCallback();
     if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
         DelayedSingleton<SelfCureUtils>::GetInstance()->UnRegisterDnsResultCallback();
     }

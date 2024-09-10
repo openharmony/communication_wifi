@@ -114,38 +114,35 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
 ErrCode WifiScanServiceImpl::Scan(bool compatible)
 {
     WIFI_LOGI("Scan, compatible:%{public}d", compatible);
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("Scan:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
-        if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("Scan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("Scan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+#ifndef OHOS_ARCH_LITE
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+#endif
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (compatible) {
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
 #ifndef OHOS_ARCH_LITE
             WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
 #endif
             return WIFI_OPT_PERMISSION_DENIED;
         }
-        if (compatible) {
-            if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
-                WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+    } else {
+        if (!WifiAuthCenter::IsSystemAccess()) {
+            WIFI_LOGE("Scan:NOT System APP, PERMISSION_DENIED!");
 #ifndef OHOS_ARCH_LITE
-                WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+            WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
 #endif
-                return WIFI_OPT_PERMISSION_DENIED;
-            }
-        } else {
-            if (!WifiAuthCenter::IsSystemAccess()) {
-                WIFI_LOGE("Scan:NOT System APP, PERMISSION_DENIED!");
+            return WIFI_OPT_NON_SYSTEMAPP;
+        }
+        if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("Scan:VerifyWifiConnectionPermission PERMISSION_DENIED!");
 #ifndef OHOS_ARCH_LITE
-                WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+            WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
 #endif
-                return WIFI_OPT_NON_SYSTEMAPP;
-            }
-            if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
-                WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
-#ifndef OHOS_ARCH_LITE
-                WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
-#endif
-                return WIFI_OPT_PERMISSION_DENIED;
-            }
+            return WIFI_OPT_PERMISSION_DENIED;
         }
     }
     
@@ -196,18 +193,14 @@ ErrCode WifiScanServiceImpl::PermissionVerification()
 ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
 {
     WIFI_LOGI("Scan with WifiScanParams, band %{public}u", params.band);
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("AdvanceScan:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
 
-        if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("AdvanceScan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
-
-        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("AdvanceScan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AdvanceScan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AdvanceScan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (!IsScanServiceRunning()) {
@@ -353,7 +346,7 @@ ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetScanOnlyAvailable:VerifySetWifiConfigPermission() PERMISSION_DENIED!");
+        WIFI_LOGE("GetScanOnlyAvailable:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -364,11 +357,19 @@ ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
 ErrCode WifiScanServiceImpl::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
 {
     WIFI_LOGD("WifiScanServiceImpl::StartWifiPnoScan");
-    if (!WifiAuthCenter::IsNativeProcess()) {
-        WIFI_LOGE("StartWifiPnoScan:NOT NATIVE PROCESS, PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("StartWifiPnoScan:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
     }
 
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartWifiPnoScan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartWifiPnoScan:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_SCAN_NOT_OPENED;

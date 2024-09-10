@@ -44,7 +44,7 @@ private:
     };
 
 private:
-    sptr<SelfCureDnsResultCallback> dnsResultCallback_{nullptr}; 
+    sptr<SelfCureDnsResultCallback> dnsResultCallback_{nullptr};
 };
 } // namespace Wifi
 } // namespace OHOS

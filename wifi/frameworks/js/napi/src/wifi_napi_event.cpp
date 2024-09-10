@@ -139,7 +139,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         WIFI_LOGE("napi_send_event: Failed to SendEvent");
         delete asyncEvent;
     } else {
-        WIFI_LOGI("napi_send_event: Successed to SendEvent");
+        WIFI_LOGD("napi_send_event: Successed to SendEvent");
     }
 }
 

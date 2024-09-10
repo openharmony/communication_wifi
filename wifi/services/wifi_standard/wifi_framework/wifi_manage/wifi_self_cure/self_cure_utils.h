@@ -15,10 +15,10 @@
  
 #ifndef OHOS_SELF_CURE_UTILS_H
 #define OHOS_SELF_CURE_UTILS_H
- 
+
 #include "singleton.h"
 #include "netsys_dns_report_callback.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 class SelfCureUtils : public Singleton<SelfCureUtils> {
@@ -29,7 +29,7 @@ public:
     void UnRegisterDnsResultCallback();
     int32_t GetCurrentDnsFailedCounter();
     void ClearDnsFailedCounter();
- 
+
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:
@@ -42,11 +42,10 @@ private:
     private:
         int32_t dnsFailedCounter_;
     };
- 
+
 private:
     sptr<OHOS::NetManagerStandard::NetsysDnsReportCallback> dnsResultCallback_{nullptr}; 
 };
- 
 } // namespace Wifi
 } // namespace OHOS
 #endif // OHOS_SELF_CURE_UTILS_H

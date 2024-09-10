@@ -28,7 +28,6 @@ public:
     void RegisterDnsResultCallback();
     void UnRegisterDnsResultCallback();
     int32_t GetCurrentDnsFailedCounter();
-    void ClearDnsFailedCounter();
 
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {

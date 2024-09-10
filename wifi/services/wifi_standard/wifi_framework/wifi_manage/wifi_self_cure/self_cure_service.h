@@ -41,7 +41,6 @@ public:
     void HandleDhcpOfferReport(const IpInfo &ipInfo);
     void NotifyInternetFailureDetected(int forceNoHttpCheck);
     bool IsSelfCureOnGoing();
-
 private:
     void RegisterP2pEnhanceCallback();
     void UnRegisterP2pEnhanceCallback();

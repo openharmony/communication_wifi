@@ -45,7 +45,7 @@ public:
     int32_t GetWifiNetId();
     void DnsFailedCount(int dnsFailCount);
 
-private:   
+private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:
         explicit SelfCureDnsResultCallback(SelfCureService &ins) : selfCureService_(ins){};

@@ -44,7 +44,7 @@ public:
     bool IsSelfCureOnGoing();
     int32_t GetWifiNetId();
     void DnsFailedCount(int dnsFailCount);
- 
+
 private:   
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:
@@ -53,7 +53,7 @@ private:
     private:
         SelfCureService& selfCureService_;
     };
- 
+
 private:
     void RegisterP2pEnhanceCallback();
     void UnRegisterP2pEnhanceCallback();

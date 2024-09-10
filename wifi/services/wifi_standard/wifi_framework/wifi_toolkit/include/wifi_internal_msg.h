@@ -96,13 +96,13 @@ enum class OperateResState {
     CONNECT_NETWORK_DISABLED,          /* cannot visit internet */
     DISCONNECT_DISCONNECTING,          /* disconnecting */
     DISCONNECT_DISCONNECT_FAILED,      /* disconnect failed */
-    DISCONNECT_DISCONNECTED,           /* disconnect succeed */  //23
+    DISCONNECT_DISCONNECTED,           /* disconnect succeed */
     CONNECT_PASSWORD_WRONG,            /* wrong password */
     CONNECT_CONNECTION_FULL,           /* connection full */
-    CONNECT_CONNECTION_REJECT,         /* connection reject */  //26
+    CONNECT_CONNECTION_REJECT,         /* connection reject */
     CONNECT_OBTAINING_IP,              /* obtain ip */
     CONNECT_OBTAINING_IP_FAILED,       /* obtain ip FAILED */
-    CONNECT_ASSOCIATING,  //29
+    CONNECT_ASSOCIATING,
     CONNECT_ASSOCIATED,
     OPEN_SCAN_ONLY_OPENING,                  /* open scan only opening */
     OPEN_SCAN_ONLY_SUCCEED,                 /* open scan only succeed */

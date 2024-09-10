@@ -51,6 +51,10 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     &SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedReport;
     return WIFI_OPT_SUCCESS;
 }
+    selfCureCmsHandleFuncMap[WIFI_CURE_CMD_DNS_FAILED_MONITOR] =
+    &SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor;
+    selfCureCmsHandleFuncMap[WIFI_CURE_CMD_DNS_FAILED_REPORT] =
+    &SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedReport;
 //
 WIFI_LOGI("SetupSelfCureMonitor, internetUnknown: %{public}d, hasInternetRecently: %{public}d, portalUnthenEver: %{public}d",
             pSelfCureStateMachine->internetUnknown, hasInternetRecently, portalUnthenEver);

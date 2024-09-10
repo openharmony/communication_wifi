@@ -53,11 +53,6 @@ int32_t SelfCureUtils::GetCurrentDnsFailedCounter()
     return dnsResultCallback_->dnsFailedCounter_;
 }
 
-void SelfCureUtils::ClearDnsFailedCounter()
-{
-    dnsResultCallback_->dnsFailedCounter_ = 0;
-}
-
 int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t size,
     const std::list<NetsysNative::NetDnsResultReport> netDnsResultReport)
 {

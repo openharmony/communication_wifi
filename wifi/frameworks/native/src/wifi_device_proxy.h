@@ -542,6 +542,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetSatelliteState(const int state) override;
+
+    /**
+     * @Description Get single device config
+     *
+     * @param networkId - the network id of the device config
+     * @param config - Get result vector of WifiDeviceConfig
+     * @return ErrCode - operation result
+     */
+    ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.
@@ -565,7 +574,6 @@ private:
         {
             client_.OnRemoteDied(remote);
         }
-
     private:
         WifiDeviceProxy &client_;
     };
@@ -584,6 +592,7 @@ private:
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
+    void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     void RemoveDeathRecipient(void);
     void ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize, long len);
     void ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize);

@@ -51,6 +51,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
+constexpr int MAX_CHLOAD = 800;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"

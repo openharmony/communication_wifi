@@ -89,6 +89,7 @@ P2pStateMachine::~P2pStateMachine()
     StopHandlerThread();
     groupManager.StashGroups();
     StopDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
+    StopP2pDhcpClient();
     StopDhcpServer();
     if (pDhcpResultNotify != nullptr) {
         delete pDhcpResultNotify;
@@ -1228,5 +1229,15 @@ bool P2pStateMachine::HandlerDisableRandomMac(int setmode) const
     return EXECUTED;
 }
 
+void P2pStateMachine::StopP2pDhcpClient()
+{
+    WIFI_LOGI("%{public}s enter", __func__);
+    std::string ifName = groupManager.GetCurrentGroup().GetInterface();
+    if (ifName.empty()) {
+        ifName = "p2p";
+        WIFI_LOGE("%{public}s ifName is empty", __func__);
+    }
+    StopDhcpClient(ifName.c_str(), false);
+}
 } // namespace Wifi
 } // namespace OHOS

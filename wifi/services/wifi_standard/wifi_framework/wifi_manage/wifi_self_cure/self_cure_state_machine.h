@@ -422,7 +422,6 @@ private:
     bool IsMultiDhcpOffer();
     void ClearDhcpOffer();
     void UpdateSelfcureState(int selfcureType, bool isSelfCureOnGoing);
-    void HandleSelfCureException();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;

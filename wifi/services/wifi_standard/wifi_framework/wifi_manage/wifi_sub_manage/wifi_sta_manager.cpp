@@ -210,7 +210,7 @@ bool WifiStaManager::IgnoreConnStateChange(int instId)
 
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    WIFI_LOGD("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
+    WIFI_LOGI("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
         magic_enum::Enum2Name(state).c_str());
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
@@ -220,6 +220,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         cbMsg.msgData = reportStateNum;
         cbMsg.linkInfo = info;
         cbMsg.id = instId;
+        WIFI_LOGI("yyjtest Notify DealStaConnChanged");
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
     if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||

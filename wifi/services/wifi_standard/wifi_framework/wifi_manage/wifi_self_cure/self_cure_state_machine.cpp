@@ -245,6 +245,9 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
     lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
         pSelfCureStateMachine->m_instId);
+    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
+        currentDnsFailedCnt = DelayedSingleton<SelfCureUtils>::GetInstance()->ClearDnsFailedCounter();
+    }
     if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing == true) {
         pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE, SELF_CURE_DELAYED_MS);
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pInternetSelfCureState);

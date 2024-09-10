@@ -1354,12 +1354,17 @@ ErrCode WifiP2pServiceImpl::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
-    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-    if (pService == nullptr) {
-        WIFI_LOGE("Get P2P service failed!");
-        return WIFI_OPT_P2P_NOT_OPENED;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("Get pEnhanceService service failed!");
+        return WIFI_OPT_FAILED;
     }
-    return pService->Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
+
+    if (pEnhanceService->Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Hid2dGetSelfWifiCfgInfo failed");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pServiceImpl::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
@@ -1380,12 +1385,17 @@ ErrCode WifiP2pServiceImpl::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
-    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-    if (pService == nullptr) {
-        WIFI_LOGE("Get P2P service failed!");
-        return WIFI_OPT_P2P_NOT_OPENED;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("Get pEnhanceService service failed!");
+        return WIFI_OPT_FAILED;
     }
-    return pService->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
+
+    if (pEnhanceService->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Hid2dSetPeerWifiCfgInfo failed");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)

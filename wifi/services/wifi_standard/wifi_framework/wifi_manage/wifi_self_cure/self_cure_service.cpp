@@ -18,9 +18,6 @@
 #include "self_cure_utils.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
-#include "netsys_controller.h"
-#include "net_conn_client.h"
-#include "net_handle.h"
 
 DEFINE_WIFILOG_LABEL("SelfCureService");
 

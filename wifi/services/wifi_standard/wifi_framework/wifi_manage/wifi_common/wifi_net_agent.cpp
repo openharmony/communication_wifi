@@ -162,11 +162,11 @@ bool WifiNetAgent::DelInterfaceAddress(const std::string interface, const std::s
     return false;
 }
 
-void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
-    WifiProxyConfig &wifiProxyConfig, int instId)
+void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wifiIpV6Info,
+    WifiProxyConfig wifiProxyConfig, int instId)
 {
     if (netAgentEventHandler_) {
-        netAgentEventHandler_->PostSyncTask(
+        netAgentEventHandler_->PostAsyncTask(
             [this, &wifiIpInfo, &wifiIpV6Info, &wifiProxyConfig, &instId]() {
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
@@ -175,10 +175,10 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &w
     }
 }
 
-void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo)
 {
     if (netAgentEventHandler_) {
-        netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
+        netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo]() {
            this->UpdateNetSupplierInfo(netInfo);
         });
     } else {
@@ -189,7 +189,7 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 void WifiNetAgent::OnStaMachineWifiStart()
 {
     if (netAgentEventHandler_) {
-        netAgentEventHandler_->PostSyncTask([this]() {
+        netAgentEventHandler_->PostAsyncTask([this]() {
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
         });
@@ -198,11 +198,11 @@ void WifiNetAgent::OnStaMachineWifiStart()
     }
 }
 
-void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo,
     int instId)
 {
     if (netAgentEventHandler_) {
-        netAgentEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+        netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
             WifiLinkedInfo linkedInfo;

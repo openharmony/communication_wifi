@@ -482,38 +482,6 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
     }
 }
 
-void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedReport(InternalMessagePtr msg)
-{
-    dnsFailedCnt_ += msg->GetParam1();
-}
- 
-void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(InternalMessagePtr msg)
-{
-    // signal leve <= 1, continue
-    if (lastSignalLevel <= SIGNAL_LEVEL_1) {
-        WIFI_LOGI("HandleDnsFailedMonitor, lastSignalLevel <= 1, next peroid.");
-        lastDnsFailedCnt_ = dnsFailedCnt_;
-        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_DNS_FAILED_MONITOR, INTERNET_DETECT_INTERVAL_MS);
-        return;
-    }
-
-    int currentDnsFailedCnt = dnsFailedCnt_;
-    int deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
-    lastDnsFailedCnt_ = currentDnsFailedCnt;
-    if (deltaFailedDns >= DNS_FAILED_CNT) {
-        pSelfCureStateMachine->selfCureOnGoing = true;
-        if (pSelfCureStateMachine->IsHttpReachable()) {
-            pSelfCureStateMachine->selfCureOnGoing = false;
-            WIFI_LOGI("HandleDnsFailedMonitor, HTTP detection succeeded.");
-            return;
-        }
-        WIFI_LOGI("HandleDnsFailedMonitor, start dns self cure.");
-        pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
-        TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
-    }
-    return;
-}
-
 void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(InternalMessagePtr msg)
 {
     // signal leve <= 1, continue

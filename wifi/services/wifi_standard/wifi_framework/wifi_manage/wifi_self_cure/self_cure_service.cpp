@@ -17,6 +17,9 @@
 #include "self_cure_service_callback.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
+#include "netsys_controller.h"
+#include "net_conn_client.h"
+#include "net_handle.h"
 
 DEFINE_WIFILOG_LABEL("SelfCureService");
 
@@ -38,6 +41,7 @@ SelfCureService::~SelfCureService()
         pSelfCureStateMachine = nullptr;
     }
     UnRegisterP2pEnhanceCallback();
+    UnRegisterDnsResultCallback();
 }
 
 ErrCode SelfCureService::InitSelfCureService()
@@ -52,6 +56,7 @@ ErrCode SelfCureService::InitSelfCureService()
         WIFI_LOGE("InitSelfCureStateMachine failed.\n");
         return WIFI_OPT_FAILED;
     }
+    RegisterDnsResultCallback();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -188,6 +193,65 @@ void SelfCureService::P2pEnhanceStateChange(const std::string &ifName, int32_t s
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_P2P_ENHANCE_STATE_CHANGED, p2pEnhanceState);
         WifiConfigCenter::GetInstance().SetP2pEnhanceState(p2pEnhanceState);
     }
+}
+
+int32_t SelfCureService::GetWifiNetId()
+{
+    std::list<sptr<NetManagerStandard::NetHandle>> netList;
+    int32_t ret = NetManagerStandard::NetConnClient::GetInstance().GetAllNets(netList);
+    if (ret != 0) {
+        return 0;
+    }
+ 
+    for (auto iter : netList) {
+        NetManagerStandard::NetAllCapabilities netAllCap;
+        NetManagerStandard::NetConnClient::GetInstance().GetNetCapabilities(*iter, netAllCap);
+        if (netAllCap.bearerTypes_.count(NetManagerStandard::BEARER_WIFI) > 0) {
+            return iter->GetNetId();
+        }
+    }
+    return 0;
+}
+ 
+void SelfCureService::RegisterDnsResultCallback()
+{
+    dnsResultCallback_ = std::make_unique<SelfCureDnsResultCallback>(*this).release();
+    int32_t regDnsResult =
+        NetManagerStandard::NetsysController::GetInstance().RegisterDnsResultCallback(dnsResultCallback_, 0);
+    WIFI_LOGI("RegisterDnsResultCallback result = %{public}d", regDnsResult);
+}
+ 
+void SelfCureService::UnRegisterDnsResultCallback()
+{
+    WIFI_LOGI("UnRegisterDnsResultCallback");
+    if (dnsResultCallback_ != nullptr) {
+        NetManagerStandard::NetsysController::GetInstance().UnregisterDnsResultCallback(dnsResultCallback_);
+    }
+}
+ 
+void SelfCureService::DnsFailedCount(int dnsFailCount)
+{
+    if (dnsFailCount <= 0) {
+        return;
+    }
+    pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_DNS_FAILED_REPORT, dnsFailCount);
+}
+ 
+int32_t SelfCureService::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t size,
+    const std::list<NetsysNative::NetDnsResultReport> netDnsResultReport)
+{
+    int32_t wifiNetId = selfCureService_.GetWifiNetId();
+     WIFI_LOGI("yyjtest OnDnsResultReport,size is: %{public}d, wifiNetId is %{public}d", static_cast<int>(netDnsResultReport.size()), wifiNetId);
+    for (auto &it : netDnsResultReport) {
+        WIFI_LOGI("yyjtest OnDnsResultReport, netid_ is %{public}d", static_cast<int32_t>(it.netid_));
+        if (wifiNetId > 0 && wifiNetId == static_cast<int32_t>(it.netid_)) {
+            if (it.queryresult_ != 0) {
+                selfCureService_.DnsFailedCount(dnsFailCount);
+                break;
+            }
+        }
+    }
+    return 0;
 }
 } //namespace Wifi
 } //namespace OHOS

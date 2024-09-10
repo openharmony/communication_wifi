@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "self_cure_utils.h"
 #include "net_conn_client.h"
 #include "net_handle.h"
 #include "netsys_controller.h"
 #include "wifi_logger.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("SelfCureUtils");
@@ -26,12 +26,12 @@ SelfCureUtils::SelfCureUtils()
 {
     WIFI_LOGI("SelfCureUtils()");
 }
- 
+
 SelfCureUtils::~SelfCureUtils()
 {
     WIFI_LOGI("~SelfCureUtils()");
 }
- 
+
 void SelfCureUtils::RegisterDnsResultCallback()
 {
     dnsResultCallback_ = std::make_unique<SelfCureDnsResultCallback>().release();
@@ -39,7 +39,7 @@ void SelfCureUtils::RegisterDnsResultCallback()
         NetManagerStandard::NetsysController::GetInstance().RegisterDnsResultCallback(dnsResultCallback_, 0);
     WIFI_LOGI("RegisterDnsResultCallback result = %{public}d", regDnsResult);
 }
- 
+
 void SelfCureUtils::UnRegisterDnsResultCallback()
 {
     WIFI_LOGI("UnRegisterDnsResultCallback");
@@ -47,17 +47,17 @@ void SelfCureUtils::UnRegisterDnsResultCallback()
         NetManagerStandard::NetsysController::GetInstance().UnregisterDnsResultCallback(dnsResultCallback_);
     }
 }
- 
+
 int32_t SelfCureUtils::GetCurrentDnsFailedCounter()
 {
     return dnsResultCallback_->dnsFailedCounter_;
 }
- 
+
 void SelfCureUtils::ClearDnsFailedCounter()
 {
     return dnsResultCallback_->dnsFailedCounter_ = 0;
 }
- 
+
 int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t size,
     const std::list<NetsysNative::NetDnsResultReport> netDnsResultReport)
 {
@@ -76,14 +76,14 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t siz
     }
     return 0;
 }
- 
+
 int32_t SelfCureUtils::SelfCureDnsResultCallback::GetWifiNetId()
 {
     NetManagerStandard::NetHandle defaultNet;
     NetManagerStandard::NetConnClient::GetInstance().GetDefaultNet(defaultNet);
     return defaultNet.GetNetId();
 }
- 
+
 int32_t SelfCureUtils::SelfCureDnsResultCallback::GetDefaultNetId()
 {
     std::list<sptr<NetManagerStandard::NetHandle>> netList;
@@ -91,7 +91,7 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::GetDefaultNetId()
     if (ret != 0) {
         return 0;
     }
- 
+
     for (auto iter : netList) {
         NetManagerStandard::NetAllCapabilities netAllCap;
         NetManagerStandard::NetConnClient::GetInstance().GetNetCapabilities(*iter, netAllCap);

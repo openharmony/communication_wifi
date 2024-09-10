@@ -35,46 +35,6 @@
 #include "wifi_common_util.h"
 #include "wifi_net_observer.h"
 
-//
-#include "self_cure_utils.h"
-//
-selfCureCmsHandleFuncMap[WIFI_CURE_CMD_DNS_FAILED_MONITOR] =
-    &SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor;
-//
-WIFI_LOGI("SetupSelfCureMonitor, internetUnknown: %{public}d, hasInternetRecently: %{public}d, portalUnthenEver: %{public}d",
-            pSelfCureStateMachine->internetUnknown, hasInternetRecently, portalUnthenEver);
-//
-void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(InternalMessagePtr msg)
-{
-    // signal leve <= 1, continue
-    if (lastSignalLevel <= SIGNAL_LEVEL_1) {
-        WIFI_LOGI("HandleDnsFailedMonitor, lastSignalLevel <= 1, next peroid.");
-        if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
-            lastDnsFailedCnt_ = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
-        }
-        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_DNS_FAILED_MONITOR, INTERNET_DETECT_INTERVAL_MS);
-        return;
-    }
-    int32_t currentDnsFailedCnt = 0;
-    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
-        currentDnsFailedCnt = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
-    }
-    int32_t deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
-    lastDnsFailedCnt_ = currentDnsFailedCnt;
-    if (deltaFailedDns >= DNS_FAILED_CNT) {
-        pSelfCureStateMachine->selfCureOnGoing = true;
-        if (pSelfCureStateMachine->IsHttpReachable()) {
-            pSelfCureStateMachine->selfCureOnGoing = false;
-            WIFI_LOGI("HandleDnsFailedMonitor, HTTP detection succeeded.");
-            return;
-        }
-        WIFI_LOGI("HandleDnsFailedMonitor, start dns self cure.");
-        pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
-        TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
-    }
-    return;
-}
-//
 namespace OHOS {
 namespace Wifi {
 constexpr int SELF_CURE_DNS_SIZE = 2;

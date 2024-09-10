@@ -212,7 +212,7 @@ int32_t SelfCureService::GetWifiNetId()
     }
     return 0;
 }
- 
+
 void SelfCureService::RegisterDnsResultCallback()
 {
     dnsResultCallback_ = std::make_unique<SelfCureDnsResultCallback>(*this).release();
@@ -220,7 +220,7 @@ void SelfCureService::RegisterDnsResultCallback()
         NetManagerStandard::NetsysController::GetInstance().RegisterDnsResultCallback(dnsResultCallback_, 0);
     WIFI_LOGI("RegisterDnsResultCallback result = %{public}d", regDnsResult);
 }
- 
+
 void SelfCureService::UnRegisterDnsResultCallback()
 {
     WIFI_LOGI("UnRegisterDnsResultCallback");
@@ -228,7 +228,7 @@ void SelfCureService::UnRegisterDnsResultCallback()
         NetManagerStandard::NetsysController::GetInstance().UnregisterDnsResultCallback(dnsResultCallback_);
     }
 }
- 
+
 void SelfCureService::DnsFailedCount(int dnsFailCount)
 {
     if (dnsFailCount <= 0) {
@@ -236,10 +236,11 @@ void SelfCureService::DnsFailedCount(int dnsFailCount)
     }
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_DNS_FAILED_REPORT, dnsFailCount);
 }
- 
+
 int32_t SelfCureService::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t size,
     const std::list<NetsysNative::NetDnsResultReport> netDnsResultReport)
 {
+    int dnsFailCount = 0;
     int32_t wifiNetId = selfCureService_.GetWifiNetId();
     WIFI_LOGD("OnDnsResultReport, size is: %{public}d, wifiNetId is %{public}d",
         static_cast<int>(netDnsResultReport.size()), wifiNetId);

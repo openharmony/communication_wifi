@@ -130,7 +130,6 @@ public:
         bool userSetStaticIpConfig = false;
         bool wifiSwitchAllowed = false;
         int lastDnsFailedCnt_ = 0;
-        int dnsFailedCnt_ = 0;
         SelfCureCmsHandleFuncMap selfCureCmsHandleFuncMap;
         int InitSelfCureCmsHandleMap();
         void HandleResetupSelfCure(InternalMessagePtr msg);

@@ -198,6 +198,7 @@ private:
 private:
     uint32_t supplierId{0};
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
+    std::unique_ptr<WifiEventHandler> netAgentEventHandler_ = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -34,6 +34,7 @@
 #include "parameter.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_country_code_manager.h"
+#include "self_cure_utils.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -304,8 +305,6 @@ int SelfCureStateMachine::ConnectedMonitorState::InitSelfCureCmsHandleMap()
     &SelfCureStateMachine::ConnectedMonitorState::HandleGatewayChanged;
     selfCureCmsHandleFuncMap[WIFI_CURE_CMD_DNS_FAILED_MONITOR] =
     &SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor;
-    selfCureCmsHandleFuncMap[WIFI_CURE_CMD_DNS_FAILED_REPORT] =
-    &SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedReport;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -500,6 +499,37 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(Interna
  
     int currentDnsFailedCnt = dnsFailedCnt_;
     int deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
+    lastDnsFailedCnt_ = currentDnsFailedCnt;
+    if (deltaFailedDns >= DNS_FAILED_CNT) {
+        pSelfCureStateMachine->selfCureOnGoing = true;
+        if (pSelfCureStateMachine->IsHttpReachable()) {
+            pSelfCureStateMachine->selfCureOnGoing = false;
+            WIFI_LOGI("HandleDnsFailedMonitor, HTTP detection succeeded.");
+            return;
+        }
+        WIFI_LOGI("HandleDnsFailedMonitor, start dns self cure.");
+        pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
+        TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
+    }
+    return;
+}
+
+void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(InternalMessagePtr msg)
+{
+    // signal leve <= 1, continue
+    if (lastSignalLevel <= SIGNAL_LEVEL_1) {
+        WIFI_LOGI("HandleDnsFailedMonitor, lastSignalLevel <= 1, next peroid.");
+        if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
+            lastDnsFailedCnt_ = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
+        }
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_DNS_FAILED_MONITOR, INTERNET_DETECT_INTERVAL_MS);
+        return;
+    }
+    int32_t currentDnsFailedCnt = 0;
+    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
+        currentDnsFailedCnt = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
+    }
+    int32_t deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
     lastDnsFailedCnt_ = currentDnsFailedCnt;
     if (deltaFailedDns >= DNS_FAILED_CNT) {
         pSelfCureStateMachine->selfCureOnGoing = true;

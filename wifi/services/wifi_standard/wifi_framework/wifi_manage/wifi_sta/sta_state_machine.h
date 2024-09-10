@@ -44,6 +44,13 @@
 #include "ienhance_service.h"
 #endif
 
+ 
+    if(netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
+        netState = SystemNetWorkState::NETWORK_NOTWORKING;
+    }
+ 
+ 
+
 namespace OHOS {
 namespace Wifi {
 #ifndef OHOS_ARCH_LITE

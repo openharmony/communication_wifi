@@ -42,6 +42,7 @@
 #include "wifi_net_stats_manager.h"
 #endif // OHOS_ARCH_LITE
 
+#include "wifi_channel_helper.h"
 #ifndef OHOS_WIFI_STA_TEST
 #else
 #include "mock_dhcp_service.h"
@@ -4367,9 +4368,15 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
 {
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     if (networkStatusHistoryInserted) {
-        NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
-        WIFI_LOGI("After updated, current network status history is %{public}s.",
-                  NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+        if (IsGoodSignalQuality() || (networkStatus == NetworkStatus::HAS_INTERNET) ||
+            (networkStatus == NetworkStatus::PORTAL)) {
+            NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
+            WIFI_LOGI("After updated, current network status history is %{public}s.",
+                      NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+        } else {
+            WIFI_LOGI("No updated, current network status history is %{public}s.",
+                NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+        }
     } else {
         NetworkStatusHistoryManager::Insert(wifiDeviceConfig.networkStatusHistory, networkStatus);
         networkStatusHistoryInserted = true;
@@ -4421,6 +4428,25 @@ void StaStateMachine::SetConnectMethod(int connectMethod)
     WIFI_LOGI("SetConnectMethod %{public}s,connectMethod:%{public}d",
         retStr.c_str(), connectMethod);
     return;
+}
+
+bool StaStateMachine::IsGoodSignalQuality()
+{
+    const WifiLinkedInfo singalInfo = linkedInfo;
+    bool isGoodSignal = true;
+    if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency)) {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_5G) {
+            isGoodSignal = false;
+        }
+    } else {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_2G) {
+            isGoodSignal = false;
+        }
+    }
+    if (singalInfo.chload >= MAX_CHLOAD) {
+        isGoodSignal = false;
+    }
+    return isGoodSignal;
 }
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SetEnhanceService(IEnhanceService* enhanceService)

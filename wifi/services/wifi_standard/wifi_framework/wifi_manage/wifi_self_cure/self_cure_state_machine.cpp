@@ -421,7 +421,8 @@ bool SelfCureStateMachine::ConnectedMonitorState::SetupSelfCureMonitor()
             pSelfCureStateMachine->GetNetworkStatusHistory());
         portalUnthenEver = NetworkStatusHistoryManager::IsPortalByHistory(
             pSelfCureStateMachine->GetNetworkStatusHistory());
-        WIFI_LOGI("SetupSelfCureMonitor, internetUnknown: %{public}d, hasInternetRecently: %{public}d, portalUnthenEver: %{public}d",
+        WIFI_LOGI("SetupSelfCureMonitor, internetUnknown: %{public}d," \
+            " hasInternetRecently: %{public}d, portalUnthenEver: %{public}d",
             pSelfCureStateMachine->internetUnknown, hasInternetRecently, portalUnthenEver);
         if (!mobileHotspot) {
             if ((!pSelfCureStateMachine->staticIpCureSuccess) &&

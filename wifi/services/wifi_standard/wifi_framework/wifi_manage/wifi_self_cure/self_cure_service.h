@@ -24,6 +24,7 @@
 #include "wifi_service_manager.h"
 #include "ienhance_service.h"
 #include "ip2p_service_callbacks.h"
+#include "netsys_dns_report_callback.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -41,15 +42,30 @@ public:
     void HandleDhcpOfferReport(const IpInfo &ipInfo);
     void NotifyInternetFailureDetected(int forceNoHttpCheck);
     bool IsSelfCureOnGoing();
+    int32_t GetWifiNetId();
+    void DnsFailedCount(int dnsFailCount);
+ 
+private:   
+    class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
+    public:
+        SelfCureDnsResultCallback(SelfCureService &ins) : selfCureService_(ins){};
+        int32_t OnDnsResultReport(uint32_t size, const std::list<NetsysNative::NetDnsResultReport> reports);
+    private:
+        SelfCureService& selfCureService_;
+    };
+ 
 private:
     void RegisterP2pEnhanceCallback();
     void UnRegisterP2pEnhanceCallback();
     void P2pEnhanceStateChange(const std::string &ifName, int32_t state);
+    void RegisterDnsResultCallback();
+    void UnRegisterDnsResultCallback();
 private:
     SelfCureStateMachine *pSelfCureStateMachine;
     int m_instId;
     P2pEnhanceCallback p2pEnhanceStateChange_;
     int32_t lastP2pEnhanceState_ = -1;
+    sptr<OHOS::NetManagerStandard::NetsysDnsReportCallback> dnsResultCallback_{nullptr};
 };
 } //namespace Wifi
 } //namespace OHOS

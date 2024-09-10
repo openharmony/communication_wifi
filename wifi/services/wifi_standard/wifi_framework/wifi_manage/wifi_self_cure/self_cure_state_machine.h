@@ -149,7 +149,6 @@ public:
         void HandleGatewayChanged(InternalMessagePtr msg);
         bool IsGatewayChanged();
         void HandleDnsFailedMonitor(InternalMessagePtr msg);
-        void HandleDnsFailedReport(InternalMessagePtr msg);
     };
 
     /* *

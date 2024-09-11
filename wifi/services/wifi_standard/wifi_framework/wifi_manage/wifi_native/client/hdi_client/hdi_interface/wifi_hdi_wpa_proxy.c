@@ -36,6 +36,7 @@
 #define LOGE(...)
 #endif
 
+
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaProxy"
 #define PATH_NUM 2

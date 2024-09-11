@@ -623,9 +623,10 @@ void P2pMonitor::WpaEventApStaDisconnected(const std::string &p2pDeviceAddress) 
     Broadcast2SmApStaDisconnected(selectIfacName, device);
 }
 
-void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress, const std::string &p2pGroupAddress) const
+void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress,
+    const std::string &p2pGroupAddress) const
 {
-    WIFI_LOGD("onStaAuthorized callback, p2pDeviceAddress: %{private}s, p2pGroupAddress: %{private}s",
+    WIFI_LOGD("onStaAuthorized callback, p2pDeviceAddress:%{private}s p2pGroupAddress %{private}s",
         p2pDeviceAddress.c_str(), p2pGroupAddress.c_str());
     WifiP2pDevice device;
     device.SetDeviceAddress(p2pDeviceAddress);

@@ -745,7 +745,6 @@ static int WpaCliCmdBssFlush(WifiWpaStaInterface *this)
 static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings)
 {
     if (this == NULL) {
-        LOGE("WpaCliCmdScan, this is NULL!");
         return -1;
     }
 
@@ -761,7 +760,6 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     }
     char *pcmd = (char *)calloc(len, sizeof(char));
     if (pcmd == NULL) {
-        LOGE("WpaCliCmdScan, pcmd is NULL!");
         return -1;
     }
     int pos = 0;
@@ -776,7 +774,7 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
         }
     }
     if (res < 0) {
-        LOGE("WpaCliCmdScan, snprintf_s error!");
+        LOGE("snprintf error");
         free(pcmd);
         return -1;
     }
@@ -793,7 +791,6 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     }
     free(pcmd);
     if (strncmp(buf, "FAIL-BUSY", strlen("FAIL-BUSY")) == 0) {
-        LOGE("WpaCliCmdScan, WpaCliCmd return FAIL-BUSY!");
         return FAIL_BUSY;
     }
     return 0;
@@ -1288,7 +1285,7 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
             LOGE("parse scan result line failed!");
             break;
         }
-        LOGD("-->>%{public}2d %{private}s %{private}s %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d\
+        LOGD("-->>%{public}2d %{private}s %{private}s %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d \
          %{public}d %{public}d %{public}d %{public}d %{public}d",
              j, pcmd[j].ssid, pcmd[j].bssid, pcmd[j].freq, pcmd[j].siglv,
              pcmd[j].centerFrequency0, pcmd[j].centerFrequency1, pcmd[j].channelWidth,

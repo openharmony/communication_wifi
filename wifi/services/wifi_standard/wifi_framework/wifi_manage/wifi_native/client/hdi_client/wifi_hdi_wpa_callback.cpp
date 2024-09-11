@@ -38,7 +38,7 @@ constexpr int PD_STATUS_CODE_PBC_REQ = 2;
 constexpr int PD_STATUS_CODE_PBC_RSP = 3;
 constexpr int PD_STATUS_CODE_FAIL = 4;
 constexpr int WEP_WRONG_PASSWORD_STATUS_CODE = 5202;
-int currentWpaStatus = static_cast<int>(OHOS::Wifi::SupplicantState::UNKNOWN);
+int g_currentWpaStatus = static_cast<int>(OHOS::Wifi::SupplicantState::UNKNOWN);
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaCallback"
 
@@ -50,6 +50,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         LOGE("OnEventDisconnected: invalid parameter!");
         return 1;
     }
+    int reasonCode = disconectParam->reasonCode;
     uint32_t bssidLen = disconectParam->bssidLen;
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
     if (ConvertMacArr2String(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid)) != 0) {
@@ -58,10 +59,28 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onReportDisConnectReason) {
-        cbk.onReportDisConnectReason(disconectParam->reasonCode, std::string(szBssid));
+        cbk.onReportDisConnectReason(reasonCode, std::string(szBssid));
+    }
+    bool isPsk = false;
+    std::vector<OHOS::Wifi::WifiScanInfo> scanResults;
+    OHOS::Wifi::WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    for (OHOS::Wifi::WifiScanInfo &item : scanResults) {
+        if (strcasecmp(item.bssid.c_str(), szBssid) == 0 &&
+            (item.capabilities.find("PSK") != std::string::npos ||
+            item.capabilities.find("WAPI-PSK") != std::string::npos)) {
+                isPsk = true;
+                break;
+        }
+    }
+    int locallyGenerated = disconectParam->locallyGenerated;
+    if (cbk.onWpaSsidWrongKey && isPsk &&
+        g_currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
+        (reasonCode != Wifi80211ReasonCode::WLAN_REASON_IE_IN_4WAY_DIFFERS || !locallyGenerated)) {
+        LOGI("OnEventDisconnected, wrong password");
+        cbk.onWpaSsidWrongKey();
     }
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, disconectParam->reasonCode, std::string(szBssid));
+        cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, reasonCode, std::string(szBssid));
     }
     LOGI("%{public}s callback out, bssid:%{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;
@@ -129,11 +148,11 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
     }
 
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    currentWpaStatus = statechangedParam->status;
+    g_currentWpaStatus = statechangedParam->status;
     if (cbk.onWpaStateChanged) {
-        cbk.onWpaStateChanged(currentWpaStatus);
+        cbk.onWpaStateChanged(g_currentWpaStatus);
     }
-    LOGI("OnEventStateChanged:callback out status = %{public}d", currentWpaStatus);
+    LOGI("OnEventStateChanged:callback out status = %{public}d", g_currentWpaStatus);
     return 0;
 }
 
@@ -157,8 +176,8 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
     LOGI("OnEventTempDisabled ssid:%{public}s reason:%{public}s",
         OHOS::Wifi::SsidAnonymize(ssid).c_str(), reason.c_str());
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    if (cbk.onWpaSsidWrongKey && (reason == "WRONG_KEY" || reason == "AUTH_FAILED")) {
-        cbk.onWpaSsidWrongKey(1);
+    if (cbk.onWpaSsidWrongKey && reason == "AUTH_FAILED") {
+        cbk.onWpaSsidWrongKey();
     }
     return 0;
 }
@@ -199,7 +218,7 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (isWrongPwd && cbk.onWpaSsidWrongKey) {
         LOGI("onWpaConnectionRejectCallBack, wrong password");
-        cbk.onWpaSsidWrongKey(1);
+        cbk.onWpaSsidWrongKey();
         return 0;
     }
     if ((statusCode == Wifi80211StatusCode::WLAN_STATUS_AP_UNABLE_TO_HANDLE_NEW_STA ||
@@ -263,10 +282,10 @@ int32_t OnEventAuthTimeout(struct IWpaCallback *self, const char *ifName)
 {
     LOGI("OnEventAuthTimeout: callback enter!");
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
-    if (currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
+    if (g_currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
         cbk.onWpaSsidWrongKey) {
         LOGI("OnEventAuthTimeout, wrong password");
-        cbk.onWpaSsidWrongKey(1);
+        cbk.onWpaSsidWrongKey();
         return 0;
     }
     if (cbk.onWpaAuthTimeout) {

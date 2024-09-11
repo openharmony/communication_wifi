@@ -205,12 +205,12 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.connState == ConnState::CONNECTED) {
-    #ifndef OHOS_ARCH_LITE
+#ifndef OHOS_ARCH_LITE
             if (supplierInfo != nullptr) {
                 TimeStats timeStats("Call UpdateNetSupplierInfo");
                 this->UpdateNetSupplierInfo(supplierInfo);
             }
-    #endif
+#endif
             IpInfo wifiIpInfo;
             WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
             IpV6Info wifiIpV6Info;

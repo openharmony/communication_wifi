@@ -53,9 +53,6 @@ namespace Wifi {
 namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
 constexpr int MAX_CHLOAD = 800;
-constexpr unsigned int WIFI2_RANDOM_MAC_CHANGE_POS = 9;
-constexpr unsigned int WIFI2_RANDOM_MAC_CHANGE_LEN = 2;
-constexpr unsigned int WIFI2_RANDOM_MA_MASK = 0x80;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
@@ -825,7 +822,7 @@ void StaStateMachine::StopWifiProcess()
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     if (curConnState == ConnState::CONNECTING || curConnState == ConnState::AUTHENTICATING ||
         curConnState == ConnState::OBTAINING_IPADDR || curConnState == ConnState::CONNECTED) {
-        WifiStaHalInterface::GetInstance().Disconnect(WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
+        WifiStaHalInterface::GetInstance().Disconnect(WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId));
         /* Callback result to InterfaceService. */
         linkedInfo.ssid = ssid;
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
@@ -1141,7 +1138,8 @@ void StaStateMachine::OnConnectFailed(int networkId)
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
 }
 
-void HandleWifi2Config(int &networkId) {
+void HandleWifi2Config(int &networkId)
+{
     WifiDeviceConfig config1;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config1, m_instId) != 0) {
         LOGE("GetDeviceConfig failed m_instId = %{public}d", m_instId);
@@ -2072,7 +2070,7 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     isReaslMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str();
     std::string actualConfiguredMac = currentMac;
     if (!isReaslMac && m_insId == 1) {
-        if (!GetWifi2RandomMac(actualConfiguredMac)) {
+        if (!WifiRandomMacHelper::GetWifi2RandomMac(actualConfiguredMac)) {
             actualConfiguredMac = realMac;
         }
         LOGI("%{public}s wifi2 actualConfiguredMac: %{public}s", __func__, MacAnonymize(actualConfiguredMac).c_str());
@@ -2090,24 +2088,6 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
         LOGE("%{public}s randommac, Check MacAddress error", __func__);
         return false;
     }
-}
-
-bool StaStateMachine::GetWifi2RandomMac(std::string &wifi2RandomMac)
-{
-    std::string inputStrMac = wifi2RandomMac.substr(WIFI2_RANDOM_MAC_CHANGE_POS, WIFI2_RANDOM_MAC_CHANGE_LEN);
-    std::stringstream inputSsMac;
-    inputSsMac << std::hex <<inputStrMac;
-    unsigned int inputHexMac;
-    if (inputSsMac >> inputHexMac) {
-        LOGI("%{public}s conver pos 3 mac to hex success", __func__,);
-    } else {
-        LOGE("%{public}s conver pos 3 mac to hex fail", __func__,);
-    }
-    unsigned int outputMac = inputHexMac ^ WIFI2_RANDOM_MAC_MASK;
-    std::stringstream outSsMac;
-    outSsMac << std::hex <<outputHexMac;
-    wifi2RandomMac.replace(WIFI2_RANDOM_MAC_CHANGE_POS, WIFI2_RANDOM_MAC_CHANGE_LEN, outSsMac.str());
-    return true;
 }
 
 void StaStateMachine::StartRoamToNetwork(std::string bssid)

@@ -424,7 +424,7 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
     if (pService == nullptr) {
         WIFI_LOGE("StartWifiStaService Create %{public}s service failed!", WIFI_SERVICE_STA);
-        return WIFI_OPT_FAILED; 
+        return WIFI_OPT_FAILED;
     }
     WIFI_LOGD("StartWifiStaService InitStaService instId:%{public}d", instId);
     if (InitStaService(pService) != WIFI_OPT_SUCCESS) {

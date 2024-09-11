@@ -76,9 +76,9 @@ ohos_static_library("wifi_self_cure") {
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "init:libbegetutil",
+    "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_stats_manager_if",
     "netmanager_base:netsys_controller",
-    "netmanager_base:net_conn_manager_if",
     "netstack:http_client",
   ]
 

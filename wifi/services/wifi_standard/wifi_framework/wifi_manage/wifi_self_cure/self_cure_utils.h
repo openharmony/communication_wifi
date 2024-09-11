@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
-class SelfCureUtils{
+class SelfCureUtils {
     DECLARE_DELAYED_SINGLETON(SelfCureUtils);
 public:
     void RegisterDnsResultCallback();

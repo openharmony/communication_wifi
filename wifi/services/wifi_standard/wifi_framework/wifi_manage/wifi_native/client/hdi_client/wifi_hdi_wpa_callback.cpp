@@ -50,13 +50,13 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         LOGE("OnEventDisconnected: invalid parameter!");
         return 1;
     }
-    int reasonCode = disconectParam->reasonCode;
     uint32_t bssidLen = disconectParam->bssidLen;
     char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
     if (ConvertMacArr2String(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid)) != 0) {
         LOGE("%{public}s: failed to convert mac!", __func__);
         return 1;
     }
+    int reasonCode = disconectParam->reasonCode;
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onReportDisConnectReason) {
         cbk.onReportDisConnectReason(reasonCode, std::string(szBssid));

@@ -21,13 +21,13 @@
 
 namespace OHOS {
 namespace Wifi {
-class SelfCureUtils : public Singleton<SelfCureUtils> {
+class SelfCureUtils{
+    DECLARE_DELAYED_SINGLETON(SelfCureUtils);
 public:
-    SelfCureUtils();
-    ~SelfCureUtils();
     void RegisterDnsResultCallback();
     void UnRegisterDnsResultCallback();
     int32_t GetCurrentDnsFailedCounter();
+    void ClearDnsFailedCounter();
 
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {

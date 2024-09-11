@@ -274,6 +274,8 @@ public:
 
     bool GetConfigValueByName(const std::string &name, std::string &value);
 
+    void SetDeviceAfterDisconnect();
+
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs);
 
@@ -327,6 +329,7 @@ private:
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
+    std::atomic<int> currentNetworkID = -1;
 
     // SCAN
     std::mutex mScanMutex;

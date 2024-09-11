@@ -31,11 +31,9 @@
 #define REPLY_BUF_LENGTH (4096 * 10)
 #define ETH_ADDR_LEN 6
 
-
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
 
-static pthread_mutex_t g_hdiCallbackMutex = PTHREAD_MUTEX_INITIALIZER;
 static struct IWpaCallback *g_hdiWpaStaCallbackObj = NULL;
 static WpaSsidField g_wpaSsidFields[] = {
     {DEVICE_CONFIG_SSID, "ssid", QUOTATION_MARKS_FLAG_YES},
@@ -73,28 +71,28 @@ static WpaSsidField g_wpaSsidFields[] = {
 static WifiErrorNo RegisterEventCallback()
 {
     LOGI("RegisterEventCallback enter");
-    pthread_mutex_lock(&g_hdiCallbackMutex);
+    pthread_mutex_lock(GetWpaObjMutex());
     if (g_hdiWpaStaCallbackObj == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterEventCallback: g_hdiWpaStaCallbackObj is NULL");
         return WIFI_HAL_OPT_FAILED;
     }
 
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterEventCallback: wpaObj is NULL");
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->RegisterWpaEventCallback(wpaObj, g_hdiWpaStaCallbackObj, GetHdiStaIfaceName());
     if (result != HDF_SUCCESS) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterEventCallback: RegisterEventCallback failed result:%{public}d", result);
         return WIFI_HAL_OPT_FAILED;
     }
 
-    pthread_mutex_unlock(&g_hdiCallbackMutex);
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -102,18 +100,18 @@ static WifiErrorNo RegisterEventCallback()
 static WifiErrorNo UnRegisterEventCallback()
 {
     LOGI("UnRegisterEventCallback enter");
-    pthread_mutex_lock(&g_hdiCallbackMutex);
+    pthread_mutex_lock(GetWpaObjMutex());
     if (g_hdiWpaStaCallbackObj != NULL) {
         struct IWpaInterface *wpaObj = GetWpaInterface();
         if (wpaObj == NULL) {
-            pthread_mutex_unlock(&g_hdiCallbackMutex);
+            pthread_mutex_unlock(GetWpaObjMutex());
             LOGE("UnRegisterEventCallback: wpaObj is NULL");
             return WIFI_HAL_OPT_FAILED;
         }
 
         int32_t result = wpaObj->UnregisterWpaEventCallback(wpaObj, g_hdiWpaStaCallbackObj, GetHdiStaIfaceName());
         if (result != HDF_SUCCESS) {
-            pthread_mutex_unlock(&g_hdiCallbackMutex);
+            pthread_mutex_unlock(GetWpaObjMutex());
             LOGE("UnRegisterEventCallback: UnregisterEventCallback failed result:%{public}d", result);
             return WIFI_HAL_OPT_FAILED;
         }
@@ -122,7 +120,7 @@ static WifiErrorNo UnRegisterEventCallback()
         g_hdiWpaStaCallbackObj = NULL;
     }
 
-    pthread_mutex_unlock(&g_hdiCallbackMutex);
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("UnRegisterEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -604,27 +602,28 @@ WifiErrorNo HdiWpaStaSaveConfig()
 WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
 {
     LOGI("RegisterHdiWpaStaEventCallback enter");
-    pthread_mutex_lock(&g_hdiCallbackMutex);
+    pthread_mutex_lock(GetWpaObjMutex());
     if (callback == NULL || callback->OnEventConnected == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterHdiWpaStaEventCallback: invalid parameter!");
         return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     if (g_hdiWpaStaCallbackObj != NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGI("RegisterHdiWpaStaEventCallback: already register!");
         return WIFI_HAL_OPT_OK;
     }
 
     g_hdiWpaStaCallbackObj = (struct IWpaCallback *)malloc(sizeof(struct IWpaCallback));
     if (g_hdiWpaStaCallbackObj == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterHdiWpaStaEventCallback: IWpaCallback malloc failed!");
         return WIFI_HAL_OPT_FAILED;
     }
     if (memset_s(g_hdiWpaStaCallbackObj, sizeof(struct IWpaCallback),
         0, sizeof(struct IWpaCallback)) != EOK) {
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     g_hdiWpaStaCallbackObj->OnEventDisconnected = callback->OnEventDisconnected;
@@ -640,7 +639,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback)
     g_hdiWpaStaCallbackObj->OnEventScanResult = callback->OnEventScanResult;
 #endif
     g_hdiWpaStaCallbackObj->OnEventStaNotify = callback->OnEventStaNotify;
-    pthread_mutex_unlock(&g_hdiCallbackMutex);
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterHdiWpaStaEventCallback3 success.");
     return WIFI_HAL_OPT_OK;
 }

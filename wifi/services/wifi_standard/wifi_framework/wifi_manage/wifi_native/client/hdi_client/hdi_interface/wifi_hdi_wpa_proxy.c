@@ -36,7 +36,6 @@
 #define LOGE(...)
 #endif
 
-
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaProxy"
 #define PATH_NUM 2
@@ -198,6 +197,7 @@ static void HdiWpaResetGlobalObj()
     g_wpaObj = NULL;
     if (g_devMgr != NULL) {
         g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
+        HDIDeviceManagerRelease(g_devMgr);
         g_devMgr = NULL;
     }
     ClearIfaceName();

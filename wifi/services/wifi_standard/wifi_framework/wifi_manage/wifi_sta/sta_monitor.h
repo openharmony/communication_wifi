@@ -97,7 +97,7 @@ public:
      *
      * @param status - status codes [in]
      */
-    void OnWpaSsidWrongKeyCallBack(int status);
+    void OnWpaSsidWrongKeyCallBack();
 
     /**
      * @Description : Callback of the Connection Full event.

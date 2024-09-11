@@ -146,7 +146,6 @@ bool WifiConfigCenter::GetWifiStopState() const
 void WifiConfigCenter::SetStaIfaceName(const std::string &ifaceName, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    WIFI_LOGD("SetStaIfaceName ifaceName:%{public}s instId:%{public}d", ifaceName.c_str(), instId);
     mStaIfaceName[instId] = ifaceName;
 }
 
@@ -154,7 +153,7 @@ std::string WifiConfigCenter::GetStaIfaceName(int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     WIFI_LOGD("GetStaIfaceName instId:%{public}d mStaIfaceName[instId]:%{public}s ",
-        insId, mStaIfaceName[instId].c_str());
+        instId, mStaIfaceName[instId].c_str());
     return mStaIfaceName[instId];
 }
 
@@ -1473,7 +1472,7 @@ void WifiConfigCenter::InitScanControlIntervalList()
 
 void WifiConfigCenter::SetPersistWifiState(int state, int instId)
 {
-    if (instId < 0 || insId >= STA_INSTANCE_MAX_NUM) {
+    if (instId < 0 || instId >= STA_INSTANCE_MAX_NUM) {
         LOGE("SetPersistWifiState invalid instId %{public}d", instId);
         return;
     }
@@ -1484,7 +1483,7 @@ void WifiConfigCenter::SetPersistWifiState(int state, int instId)
 
 int WifiConfigCenter::GetPersistWifiState(int instId)
 {
-    if (instId < 0 || insId >= STA_INSTANCE_MAX_NUM) {
+    if (instId < 0 || instId >= STA_INSTANCE_MAX_NUM) {
         LOGE("GetPersistWifiState invalid instId %{public}d", instId);
         return -1;
     }

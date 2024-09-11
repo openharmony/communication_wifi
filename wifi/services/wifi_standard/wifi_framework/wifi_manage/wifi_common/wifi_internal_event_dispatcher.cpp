@@ -958,7 +958,7 @@ void WifiInternalEventDispatcher::PublishConnStateChangedEvent(int state, int in
             break;
         }
     }
-    if ((instId == INSTID_WLAN0 && WifiCommonEventHelper::PublishConnStateChangedEvent(state, eventData) ||
+    if ((instId == INSTID_WLAN0 && WifiCommonEventHelper::PublishConnStateChangedEvent(state, eventData)) ||
         (instId == INSTID_WLAN1 && WifiCommonEventHelper::PublishWifi2ConnStateChangedEvent(state, eventData))) {
         WIFI_LOGI("publish connection state changed event,%{public}s, instId %{public}d.", eventData.c_str(), instId);
         return;
@@ -991,11 +991,11 @@ void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state, int in
             return;
         }
     } else if (instId == INSTID_WLAN1) {
-            if (!WifiCommonEventHelper::PublishWifi2Power2StateChangeEvent(state, "OnWifiPowerStateChanged")) {
+            if (!WifiCommonEventHelper::PublishWifi2PowerStateChangeEvent(state, "OnWifiPowerStateChanged")) {
                 WIFI_LOGE("failed to publish wifi state changed event!");
                 return;
             }
-    } esle {
+    } else {
             WIFI_LOGE("invalid InstId!")
             return;
     }

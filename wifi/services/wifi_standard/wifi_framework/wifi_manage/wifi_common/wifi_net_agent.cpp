@@ -223,8 +223,6 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, m_instId);
             }
         });
-    } else {
-        WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __FUNCTION__);
     }
 }
 

@@ -211,7 +211,7 @@ int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCrea
     return 0;
 }
 
-int WifiServiceManager::CheckAndEnforceService(const std::string &name, int insId, bool bCreate)
+int WifiServiceManager::CheckAndEnforceService(const std::string &name, int instId, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
     std::string dlname;
@@ -221,7 +221,7 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, int insI
     }
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService get dllname: %{public}s", dlname.c_str());
     if (name == WIFI_SERVICE_STA) {
-        return LoadStaService(dlname, insId, bCreate);
+        return LoadStaService(dlname, instId, bCreate);
     }
 #ifdef FEATURE_SELF_CURE_SUPPORT
     if (name == WIFI_SERVICE_SELFCURE) {

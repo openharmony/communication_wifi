@@ -484,7 +484,7 @@ bool WifiControllerMachine::ShouldDisableWifi(InternalMessagePtr msg)
         WIFI_LOGI("Should disable wifi");
         return true;
     }
-    return !ShouldEnableWifi();
+    return !ShouldEnableWifi(msg->GetParam2());
 }
 
 bool WifiControllerMachine::ShouldEnableWifi(int id)
@@ -743,7 +743,7 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
     }
 
     ConcreteManagerRole presentRole;
-    if (pWifiControllerMachine->ShouldDisableWifi(msg->GetParam2())) {
+    if (!pWifiControllerMachine->ShouldEnableWifi(msg->GetParam2())) {
         pWifiControllerMachine->StopMultiStaManager(INSTID_WLAN1);
         pWifiControllerMachine->StopAllConcreteManagers();
         return;

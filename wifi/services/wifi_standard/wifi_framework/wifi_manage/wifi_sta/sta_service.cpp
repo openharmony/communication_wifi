@@ -784,7 +784,7 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
     if (config.uid > WIFI_INVALID_UID) {
         ret = WifiSettings::GetInstance().GetCandidateConfig(config.uid, config.ssid, config.keyMgmt, outConfig);
     } else {
-        ret = WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, outConfig);
+        ret = WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, outConfig, m_instId);
     }
     LOGI("FindDeviceConfig uid:%{public}d, ssid:%{public}s, ret:%{public}d.", config.uid,
         SsidAnonymize(outConfig.ssid).c_str(), ret);

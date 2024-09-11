@@ -319,10 +319,10 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(CMD_WIFI_TOGGLED);
         msg->SetParam2(0);
-        EXPECT_FALSE(pWifiControllerMachine->ShouldDisableWifi(msg, instId));
+        EXPECT_FALSE(pWifiControllerMachine->ShouldDisableWifi(msg));
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
-        EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi(msg, instId));
+        EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi(msg));
         pWifiControllerMachine->RemoveConcreteManager(1);
         pWifiControllerMachine->RemoveConcreteManager(0);
         pWifiControllerMachine->ShutdownWifi();

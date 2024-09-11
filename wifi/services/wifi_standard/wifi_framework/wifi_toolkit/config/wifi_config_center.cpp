@@ -372,12 +372,6 @@ int WifiConfigCenter::GetMacAddress(std::string &macAddress, int instId)
     if (iter != mMacAddress.end()) {
         macAddress = iter->second;
     }
-    if (instId == 1) {
-        for (auto &c : macAddress) {
-            c = c + 1;
-        }
-    }
-    WIFI_LOGI("GetMacAddress instId:%{public}d, macAddress:%{public}s", instId, macAddress.c_str());
     return 0;
 }
 

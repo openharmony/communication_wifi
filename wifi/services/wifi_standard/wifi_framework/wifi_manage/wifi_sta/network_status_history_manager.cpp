@@ -145,3 +145,4 @@ std::vector<int> NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Arr
     return vNetworkStatusHistory;
 }
 }
+}

@@ -45,7 +45,7 @@ public:
 public:
 };
 
-HWTEST_F(wifi_scorer_impl_test, ScoreTest01, TestSize.Level1)
+HWTEST_F(WifiScorerImplTest, ScoreTest01, TestSize.Level1)
 {
     InterScanInfo interScanInfo;
     interScanInfo.frequency = 2442;
@@ -57,12 +57,12 @@ HWTEST_F(wifi_scorer_impl_test, ScoreTest01, TestSize.Level1)
     EXPECT_FALSE(realscore == expcetScore);
 }
 
-HWTEST_F(wifi_scorer_impl_test, ScoreTest02, TestSize.Level1)
+HWTEST_F(WifiScorerImplTest, ScoreTest02, TestSize.Level1)
 {
     InterScanInfo interScanInfo;
     interScanInfo.frequency = 2447;
     NetworkSelection::NoInternetNetworkStatusHistoryScorer  noInternetScore;
-    NetworkSelection::NetworkCandidate networkCandidate(interScanInfo);; 
+    NetworkSelection::NetworkCandidate networkCandidate(interScanInfo);
     networkCandidate.wifiDeviceConfig.networkStatusHistory = 221;
     int realscore = (int)noInternetScore.Score(networkCandidate);
     int expcetScore = HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[1] + HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[3] +
@@ -70,7 +70,7 @@ HWTEST_F(wifi_scorer_impl_test, ScoreTest02, TestSize.Level1)
     EXPECT_FALSE(realscore == expcetScore);
 }
 
-HWTEST_F(wifi_scorer_impl_test, ScoreTest03, TestSize.Level1)
+HWTEST_F(WifiScorerImplTest, ScoreTest03, TestSize.Level1)
 {
     InterScanInfo interScanInfo;
     interScanInfo.frequency = 5000;
@@ -83,7 +83,7 @@ HWTEST_F(wifi_scorer_impl_test, ScoreTest03, TestSize.Level1)
     EXPECT_FALSE(realscore == expcetScore);
 }
 
-HWTEST_F(wifi_scorer_impl_test, ScoreTest04, TestSize.Level1)
+HWTEST_F(WifiScorerImplTest, ScoreTest04, TestSize.Level1)
 {
     InterScanInfo interScanInfo;
     interScanInfo.frequency = 5200;

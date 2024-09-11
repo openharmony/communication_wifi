@@ -134,5 +134,6 @@ HWTEST_F(NetworkStatusHistoryManagerTest, IsEmptyNetworkStatusHistory, TestSize.
     EXPECT_FALSE(NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(0b11));
     EXPECT_TRUE(NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(0));
 }
+
 } // Wifi
 } // OHOS

@@ -500,6 +500,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(Interna
         currentDnsFailedCnt = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
     }
     int32_t deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
+    WIFI_LOGI("HandleDnsFailedMonitor, deltaFailedDns is %{public}d", deltaFailedDns);
     lastDnsFailedCnt_ = currentDnsFailedCnt;
     if (deltaFailedDns >= DNS_FAILED_CNT) {
         pSelfCureStateMachine->selfCureOnGoing = true;
@@ -508,7 +509,6 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(Interna
             WIFI_LOGI("HandleDnsFailedMonitor, HTTP detection succeeded.");
             return;
         }
-        WIFI_LOGI("HandleDnsFailedMonitor, deltaFailedDns is %{public}d, transition to selfcurestate", deltaFailedDns);
         pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
         TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
     }

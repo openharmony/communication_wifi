@@ -62,7 +62,7 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t siz
     const std::list<NetsysNative::NetDnsResultReport> netDnsResultReport)
 {
     int32_t wifiNetId = GetWifiNetId();
-	int32_t defaultNetId = GetDefaultNetId();
+    int32_t defaultNetId = GetDefaultNetId();
     for (auto &it : netDnsResultReport) {
         int32_t netId = static_cast<int32_t>(it.netid_);
         int32_t targetNetId = netId > 0 ? netId : (defaultNetId > 0 ? defaultNetId : 0);

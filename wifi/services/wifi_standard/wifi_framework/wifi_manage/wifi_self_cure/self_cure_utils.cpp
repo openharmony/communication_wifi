@@ -53,6 +53,11 @@ int32_t SelfCureUtils::GetCurrentDnsFailedCounter()
     return dnsResultCallback_->dnsFailedCounter_;
 }
 
+void SelfCureUtils::ClearDnsFailedCounter()
+{
+    dnsResultCallback_->dnsFailedCounter_ = 0;
+}
+
 int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t size,
     const std::list<NetsysNative::NetDnsResultReport> netDnsResultReport)
 {
@@ -72,13 +77,6 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t siz
 
 int32_t SelfCureUtils::SelfCureDnsResultCallback::GetWifiNetId()
 {
-    NetManagerStandard::NetHandle defaultNet;
-    NetManagerStandard::NetConnClient::GetInstance().GetDefaultNet(defaultNet);
-    return defaultNet.GetNetId();
-}
-
-int32_t SelfCureUtils::SelfCureDnsResultCallback::GetDefaultNetId()
-{
     std::list<sptr<NetManagerStandard::NetHandle>> netList;
     int32_t ret = NetManagerStandard::NetConnClient::GetInstance().GetAllNets(netList);
     if (ret != 0) {
@@ -93,6 +91,13 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::GetDefaultNetId()
         }
     }
     return 0;
+}
+
+int32_t SelfCureUtils::SelfCureDnsResultCallback::GetDefaultNetId()
+{
+    NetManagerStandard::NetHandle defaultNet;
+    NetManagerStandard::NetConnClient::GetInstance().GetDefaultNet(defaultNet);
+    return defaultNet.GetNetId();
 }
 } // namespace Wifi
 } // namespace OHOS

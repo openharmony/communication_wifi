@@ -141,12 +141,12 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
             WIFI_LOGI("ProcessGroupStartedEvt %{private}s %{private}s",
                 device.GetDeviceAddress().c_str(), device.GetRandomDeviceAddress().c_str());
             deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
-
             p2pStateMachine.BroadcastP2pPeersChanged();
         } else {
             WIFI_LOGE("fail:No GO device information is found.");
         }
     }
+
     SharedLinkManager::IncreaseSharedLink();
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
@@ -184,17 +184,17 @@ bool GroupNegotiationState::ProcessInvitationResultEvt(InternalMessagePtr msg) c
         return EXECUTED;
     }
 
-    if (status == P2pStatus::UNKNOWN_P2P_GROUP) {
+    if (P2pStatus::UNKNOWN_P2P_GROUP == status) {
         int networkId = p2pStateMachine.savedP2pConfig.GetNetId();
         if (networkId >= 0) {
             groupManager.RemoveClientFromGroup(networkId, p2pStateMachine.savedP2pConfig.GetDeviceAddress());
         }
         p2pStateMachine.savedP2pConfig.SetNetId(-1);
         p2pStateMachine.P2pConnectByShowingPin(p2pStateMachine.savedP2pConfig);
-    } else if (status == P2pStatus::INFORMATION_IS_CURRENTLY_UNAVAILABLE) {
+    } else if (P2pStatus::INFORMATION_IS_CURRENTLY_UNAVAILABLE == status) {
         p2pStateMachine.savedP2pConfig.SetNetId(-1);
         p2pStateMachine.P2pConnectByShowingPin(p2pStateMachine.savedP2pConfig);
-    } else if (status == P2pStatus::NO_COMMON_CHANNELS) {
+    } else if (P2pStatus::NO_COMMON_CHANNELS == status) {
         WIFI_LOGE("fail:There is no common channel.");
     } else {
         p2pStateMachine.DealGroupCreationFailed();

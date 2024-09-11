@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Wifi {
 StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId)
 {
-    WIFI_LOGI("StaInterface constuctor insId %{public}d", insId);
+    WIFI_LOGI("StaInterface constuctor instId %{public}d", instId);
 }
 
 StaInterface::~StaInterface()

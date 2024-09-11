@@ -546,7 +546,7 @@ WifiErrorNo WifiStaHalInterface::StopWps(void)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqStopWps(, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
+    return mHdiWpaClient->ReqStopWps(WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqStopWps();
@@ -735,7 +735,7 @@ WifiErrorNo WifiStaHalInterface::SetNetworkInterfaceUpDown(const std::string &if
 
 const WifiEventCallback &WifiStaHalInterface::GetCallbackInst(const std::string &ifaceName) const
 {
-    int instId = GetInstId(ifaceName)
+    int instId = GetInstId(ifaceName);
     return mStaCallback[instId];
 }
 

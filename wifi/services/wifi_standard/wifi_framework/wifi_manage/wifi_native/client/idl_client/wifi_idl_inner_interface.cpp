@@ -66,7 +66,7 @@ void OnConnectChanged(int status, int networkId, const char *mac)
         return;
     }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(status, networkId, mac);
     }
@@ -78,7 +78,7 @@ void OnDisConnectReasonCallback(int reason, const char *bssid)
         return;
     }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onReportDisConnectReason) {
         cbk.onReportDisConnectReason(reason, bssid);
     }
@@ -90,7 +90,7 @@ void OnBssidChanged(const char *reason, const char *bssid)
         return;
     }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onBssidChanged) {
         cbk.onBssidChanged(reason, bssid);
     }
@@ -99,7 +99,7 @@ void OnBssidChanged(const char *reason, const char *bssid)
 void OnWpaStateChanged(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpaStateChanged) {
         cbk.onWpaStateChanged(status);
     }
@@ -108,7 +108,7 @@ void OnWpaStateChanged(int status)
 void OnWpaSsidWrongKey()
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpaSsidWrongKey) {
         cbk.onWpaSsidWrongKey();
     }
@@ -117,7 +117,7 @@ void OnWpaSsidWrongKey()
 void OnWpaConnectionFull(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpaConnectionFull) {
         cbk.onWpaConnectionFull(status);
     }
@@ -126,7 +126,7 @@ void OnWpaConnectionFull(int status)
 void OnWpaConnectionReject(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpaConnectionReject) {
         cbk.onWpaConnectionReject(status);
     }
@@ -138,7 +138,7 @@ void OnWpaStaNotifyCallBack(const char *notifyParam)
         return;
     }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onEventStaNotify) {
         cbk.onEventStaNotify(notifyParam);
     }
@@ -147,7 +147,7 @@ void OnWpaStaNotifyCallBack(const char *notifyParam)
 void OnWpsOverlap(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpsOverlap) {
         cbk.onWpsOverlap(status);
     }
@@ -156,7 +156,7 @@ void OnWpsOverlap(int status)
 void OnWpsTimeOut(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
-        OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(INSTID_WLAN0));
+        OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpsTimeOut) {
         cbk.onWpsTimeOut(status);
     }

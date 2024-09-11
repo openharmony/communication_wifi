@@ -31,6 +31,7 @@
 extern "C" {
 #endif
 
+
 #ifndef CHECK_HDI_WPA_INTERFACE
 #define CHECK_HDI_WPA_INTERFACE(wpaObj) \
 if (wpaObj == NULL) { \

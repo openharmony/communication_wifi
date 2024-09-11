@@ -54,6 +54,7 @@ ohos_unittest("wifi_sta_new_unittest") {
     "sta_auto_connect_service_test.cpp",
     "sta_interface_test.cpp",
     "sta_monitor_test.cpp",
+    "wifi_scorer_impl_test.cpp",
   ]
 
   include_dirs = [

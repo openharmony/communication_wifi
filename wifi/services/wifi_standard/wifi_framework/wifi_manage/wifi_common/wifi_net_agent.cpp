@@ -170,8 +170,6 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
             [this, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId]() mutable {
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
-    } else {
-        WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __FUNCTION__);
     }
 }
 
@@ -181,8 +179,6 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
         netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo]() {
            this->UpdateNetSupplierInfo(netInfo);
         });
-    } else {
-        WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __FUNCTION__);
     }
 }
 
@@ -193,8 +189,6 @@ void WifiNetAgent::OnStaMachineWifiStart()
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
         });
-    } else {
-        WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __FUNCTION__);
     }
 }
 

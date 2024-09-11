@@ -461,7 +461,7 @@ static bool GetScanData(unsigned char *resultBuff, ScanInfo *results, int *size)
 ScanInfo *HdiWpaStaGetScanInfos(int *size)
 {
     LOGI("HdiWpaStaGetScanInfos enter");
-    if (size == NULL || *size <= 0)) {
+    if (size == NULL || *size <= 0) {
         LOGE("HdiWpaStaGetScanInfos: invalid parameter!");
         return NULL;
     }

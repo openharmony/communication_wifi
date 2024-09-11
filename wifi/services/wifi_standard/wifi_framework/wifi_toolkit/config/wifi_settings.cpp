@@ -184,9 +184,6 @@ void WifiSettings::ClearDeviceConfig(void)
         }
     }
     mWifiDeviceConfig.clear();
-#ifdef SUPPORT_ClOUD_WIFI_ASSET
-    WifiAssetManager::GetInstance().WifiAssetRemoveAll();
-#endif
     return;
 }
 
@@ -325,7 +322,13 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;
     iter->second.networkSelectionStatus.networkDisableCount = 0;
+    currentNetworkID = networkId;
     return 0;
+}
+
+void WifiSettings::SetDeviceAfterDisconnect()
+{
+    currentNetworkID = -1;
 }
 
 int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
@@ -2022,6 +2025,11 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
     LOGI("UpdateWifiConfigFromCloud enter");
     std::map<int, WifiDeviceConfig> tempConfigs;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if (currentNetworkID == iter->second.networkId) {
+            tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
+            LOGD("UpdateWifiConfigFromCloud, connected network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
+            continue;
+        }
         if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
             continue;
@@ -2046,7 +2054,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
-        LOGI("UpdateWifiConfigFromCloud new %{public}s", SsidAnonymize(iter.ssid).c_str());
+        LOGD("UpdateWifiConfigFromCloud new %{public}s", SsidAnonymize(iter.ssid).c_str());
         tempConfigs.emplace(std::make_pair(mNetworkId, iter));
         mNetworkId++;
     }

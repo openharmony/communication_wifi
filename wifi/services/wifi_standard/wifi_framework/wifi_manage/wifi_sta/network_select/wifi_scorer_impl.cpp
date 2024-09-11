@@ -43,6 +43,9 @@ constexpr int SIGNAL_LEVEL_FOUR = 4;
 constexpr int MIN_RSSI = -128;
 constexpr int INTERNET_ACCESS_AWARD = 2;
 constexpr int EMPTY_NETWORK_STATUS_HISTORY_AWARD = 1;
+constexpr int MAX_HISTORY_NETWORK_STATUS_NUM = 10;
+constexpr int HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[MAX_HISTORY_NETWORK_STATUS_NUM] = {
+    81920, 40960, 20480, 10240, 5120, 2560, 1280, 640, 320, 160};
 
 RssiScorer::RssiScorer() : SimpleWifiScorer("rssiScorer") {}
 
@@ -228,4 +231,23 @@ SavedNetworkScorer::SavedNetworkScorer(const std::string &scorerName) : Composit
     AddScorer(std::make_shared<SecurityBonusScorer>());
     AddScorer(std::make_shared<Network5gBonusScorer>());
 }
+
+NoInternetNetworkStatusHistoryScorer::NoInternetNetworkStatusHistoryScorer()
+    : SimpleWifiScorer("NoInternetNetworkStatusHistoryScorer") {}
+ 
+double NoInternetNetworkStatusHistoryScorer::Score(NetworkCandidate &networkCandidate)
+{
+    double score = 0;
+    std::vector<int> vNetworkStatusHistory{};
+    vNetworkStatusHistory = NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Array(
+        networkCandidate.wifiDeviceConfig.networkStatusHistory);
+ 
+    int nSize = (int)vNetworkStatusHistory.size();
+    for (int i = 0; i < nSize; i++) {
+        if (i >= MAX_HISTORY_NETWORK_STATUS_NUM) {
+            break;
+        }
+        score += HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[i] * vNetworkStatusHistory[i];
+    }
+    return score;
 }

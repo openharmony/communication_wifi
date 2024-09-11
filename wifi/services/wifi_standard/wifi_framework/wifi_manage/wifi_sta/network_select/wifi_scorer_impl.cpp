@@ -251,3 +251,4 @@ double NoInternetNetworkStatusHistoryScorer::Score(NetworkCandidate &networkCand
     }
     return score;
 }
+}

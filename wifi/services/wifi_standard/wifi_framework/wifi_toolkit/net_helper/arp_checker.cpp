@@ -14,6 +14,7 @@
  */
 
 #include "arp_checker.h"
+#include "wifi_log.h"
 
 #ifdef LOG_TAG
 #undef LOG_TAG
@@ -48,7 +49,9 @@ bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp)
 
 bool ArpChecker::DoArpCheck(int timeoutMillis, bool isFillSenderIp, uint64_t &timeCost)
 {
-    return m_dhcpArpChecker.DoArpCheck(timeoutMillis, isFillSenderIp, timeCost);
+    bool ret = m_dhcpArpChecker.DoArpCheck(timeoutMillis, isFillSenderIp, timeCost);
+    LOGI("doArp return %{public}s:", ret ? "true" : "false");
+    return ret;
 }
 
 void ArpChecker::GetGwMacAddrList(int32_t timeoutMillis, bool isFillSenderIp, std::vector<std::string>& gwMacLists)

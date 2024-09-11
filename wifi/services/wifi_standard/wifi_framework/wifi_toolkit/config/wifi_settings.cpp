@@ -64,7 +64,10 @@ WifiSettings::~WifiSettings()
 {
     SyncDeviceConfig();
     SyncHotspotConfig();
-    SyncBlockList();
+    {
+        std::unique_lock<std::mutex> lock(mApMutex);
+        SyncBlockList();
+    }
     SyncWifiP2pGroupInfoConfig();
     SyncP2pVendorConfig();
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
@@ -794,6 +797,7 @@ int WifiSettings::ManageBlockList(const StationInfo &info, int mode, int id)
     } else {
         return -1;
     }
+    SyncBlockList();
     return 0;
 }
 
@@ -1453,7 +1457,6 @@ void WifiSettings::InitHotspotConfig()
 
 int WifiSettings::SyncBlockList()
 {
-    std::unique_lock<std::mutex> lock(mApMutex);
     std::vector<StationInfo> tmp;
     for (auto iter = mBlockListInfo.begin(); iter != mBlockListInfo.end(); ++iter) {
         tmp.push_back(iter->second);

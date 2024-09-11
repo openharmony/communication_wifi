@@ -454,8 +454,8 @@ static bool GetScanData(unsigned char *resultBuff, ScanInfo *results, int *size)
         token = strtok_r(NULL, "\n", &savedPtr);
         j++;
     }
-	*size = j;
-	return true;
+    *size = j;
+    return true;
 }
 
 ScanInfo *HdiWpaStaGetScanInfos(int *size)
@@ -493,7 +493,7 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size)
 
     if (GetScanData(resultBuff, results, size) == false) {
         goto EXIT;
-	}
+    }
     
     free(resultBuff);
     pthread_mutex_unlock(GetWpaObjMutex());

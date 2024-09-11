@@ -279,7 +279,8 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiHalDevice
     return HdiWpaStaSetNetwork(networkId, conf, num, ifaceName);
 }
 
-void Handleconfig(const WifiHalDeviceConfig &config, SetNetworkConfig *conf, int &num) {
+void Handleconfig(const WifiHalDeviceConfig &config, SetNetworkConfig *conf, int &num)
+{
     if (config.priority >= 0) {
         num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_PRIORITY, config.priority);
     }
@@ -320,7 +321,8 @@ void Handleconfig(const WifiHalDeviceConfig &config, SetNetworkConfig *conf, int
 }
 
 void WifiHdiWpaClient::HandleEapMethod(EapMethod eapMethod, const WifiHalDeviceConfig &config,
-                                        SetNetworkConfig *conf, int &num) {
+    SetNetworkConfig *conf, int &num)
+{
     switch (eapMethod) {
         case EapMethod::EAP_PEAP:
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);

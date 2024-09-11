@@ -588,7 +588,8 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     return results;
 }
 
-void HandleGetScanInfo(unsigned char *resultBuff, int *size, ScanInfo *results) {
+void HandleGetScanInfo(unsigned char *resultBuff, int *size, ScanInfo *results)
+{
     char *savedPtr = NULL;
     strtok_r((char *)resultBuff, "\n", &savedPtr);
     char *token = strtok_r(NULL, "\n", &savedPtr);

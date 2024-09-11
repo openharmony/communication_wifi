@@ -178,19 +178,9 @@ void WifiControllerMachine::EnableState::GoOutState()
     WIFI_LOGE("EnableState GoOutState function.");
 }
 
-bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
+void WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
 {
-    if (msg == nullptr) {
-        return false;
-    }
-    WIFI_LOGE("EnableState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     switch (msg->GetMessageName()) {
-        case CMD_WIFI_TOGGLED:
-        case CMD_SCAN_ALWAYS_MODE_CHANGED:
-            pWifiControllerMachine->StopTimer(CMD_OPEN_WIFI_RETRY);
-            HandleWifiToggleChangeInEnabledState(msg);
-            break;
-#ifdef FEATURE_AP_SUPPORT
         case CMD_SOFTAP_TOGGLED:
             HandleSoftapToggleChangeInEnabledState(msg);
             break;
@@ -211,7 +201,29 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
         case CMD_AP_STOP_TIME:
             WriteSoftApOpenAndCloseFailedEvent(static_cast<int>(SoftApperateType::CLOSE_SOFT_AP_FAILED), "TIME_OUT");
             break;
+        case CMD_AP_REMOVED:
+            HandleApRemoved(msg);
+            break;
+        default:
+            break;
+    }
+}
+
+bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        return false;
+    }
+    WIFI_LOGE("EnableState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+#ifdef FEATURE_AP_SUPPORT
+    HandleApMsg(msg);
 #endif
+    switch (msg->GetMessageName()) {
+        case CMD_WIFI_TOGGLED:
+        case CMD_SCAN_ALWAYS_MODE_CHANGED:
+            pWifiControllerMachine->StopTimer(CMD_OPEN_WIFI_RETRY);
+            HandleWifiToggleChangeInEnabledState(msg);
+            break;
         case CMD_STA_START_FAILURE:
             msg->GetParam1() == INSTID_WLAN0 ?
                 HandleStaStartFailure(INSTID_WLAN0) : pWifiControllerMachine->RemoveConcreteWifi2Manager(INSTID_WLAN1);
@@ -236,11 +248,6 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         case CMD_CONCRETECLIENT_REMOVED:
             HandleConcreteClientRemoved(msg);
-            break;
-        case CMD_AP_REMOVED:
-#ifdef FEATURE_AP_SUPPORT
-            HandleApRemoved(msg);
-#endif
             break;
         default:
             break;

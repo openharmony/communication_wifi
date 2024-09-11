@@ -33,7 +33,7 @@ constexpr int WIFI_2G_BAND_SCORE_HISTORY_NETWORK = 29;
 
 namespace OHOS {
 namespace Wifi {
-class wifi_scorer_impl_test : public testing::Test {
+class WifiScorerImplTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}

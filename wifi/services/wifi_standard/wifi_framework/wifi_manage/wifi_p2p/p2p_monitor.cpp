@@ -630,6 +630,7 @@ void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress,
         p2pDeviceAddress.c_str(), p2pGroupAddress.c_str());
     WifiP2pDevice device;
     device.SetDeviceAddress(p2pDeviceAddress);
+    device.SetGroupAddress(p2pGroupAddress);
     device.SetRandomDeviceAddress(p2pGroupAddress);
     Broadcast2SmApStaConnected(selectIfacName, device);
 }

@@ -195,29 +195,31 @@ void WifiNetAgent::OnStaMachineWifiStart()
 void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo,
     int instId)
 {
-    if (netAgentEventHandler_) {
-        netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
-            this->RegisterNetSupplier();
-            this->RegisterNetSupplierCallback();
-            WifiLinkedInfo linkedInfo;
-            WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-            if (linkedInfo.connState == ConnState::CONNECTED) {
-#ifndef OHOS_ARCH_LITE
-                if (supplierInfo != nullptr) {
-                    TimeStats timeStats("Call UpdateNetSupplierInfo");
-                    this->UpdateNetSupplierInfo(supplierInfo);
-                }
-#endif
-                IpInfo wifiIpInfo;
-                WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
-                IpV6Info wifiIpV6Info;
-                WifiConfigCenter::GetInstance().GetIpv6Info(wifiIpV6Info, m_instId);
-                WifiDeviceConfig config;
-                WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
-                this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, m_instId);
-            }
-        });
+    if (!netAgentEventHandler_) {
+        WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __func__);
+        return;
     }
+    netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+        this->RegisterNetSupplier();
+        this->RegisterNetSupplierCallback();
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+        if (linkedInfo.connState == ConnState::CONNECTED) {
+    #ifndef OHOS_ARCH_LITE
+            if (supplierInfo != nullptr) {
+                TimeStats timeStats("Call UpdateNetSupplierInfo");
+                this->UpdateNetSupplierInfo(supplierInfo);
+            }
+    #endif
+            IpInfo wifiIpInfo;
+            WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
+            IpV6Info wifiIpV6Info;
+            WifiConfigCenter::GetInstance().GetIpv6Info(wifiIpV6Info, m_instId);
+            WifiDeviceConfig config;
+            WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
+            this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, m_instId);
+        }
+    });
 }
 
 void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,

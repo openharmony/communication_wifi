@@ -167,7 +167,7 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
 {
     if (netAgentEventHandler_) {
         netAgentEventHandler_->PostAsyncTask(
-            [this, &wifiIpInfo, &wifiIpV6Info, &wifiProxyConfig, &instId]() {
+            [this, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId]() mutable {
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
     } else {

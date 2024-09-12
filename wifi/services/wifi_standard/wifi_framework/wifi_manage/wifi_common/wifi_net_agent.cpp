@@ -26,6 +26,8 @@
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
 #include "ipv6_address.h"
+#include "wifi_global_func.h"
+#include "wifi_app_state_aware.h"
 
 DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
@@ -363,6 +365,23 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
     }
 }
 
+void WifiNetAgent::InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCallbacks)
+{
+    wifiNetAgentCallbacks_ = wifiNetAgentCallbacks;
+}
+
+bool WifiNetAgent::RequestNetwork(const int uid, const int networkId)
+{
+    if (!wifiNetAgentCallbacks_.OnRequestNetwork) {
+        WIFI_LOGE("OnRequestNetwork is nullptr.");
+        return false;
+    }
+    if (wifiNetAgentCallbacks_.OnRequestNetwork(uid, networkId)) {
+        return true;
+    }
+    return false;
+}
+
 WifiNetAgent::NetConnCallback::NetConnCallback()
 {
 }
@@ -386,6 +405,38 @@ int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
 {
     WIFI_LOGD("Enter NetConnCallback::RequestNetwork");
     LogNetCaps(ident, netCaps);
+#ifndef OHOS_ARCH_LITE
+    if (requestIds_.find(netrequest.requestId) != requestIds_.end()) {
+        return -1;
+    }
+    requestIds_.insert(netrequest.requestId);
+
+    int networkId = ConvertStringToInt(netrequest.ident);
+    if (networkId <= INVALID_NETWORK_ID || std::to_string(networkId) != netrequest.ident) {
+        WIFI_LOGE("networkId is invaild.");
+        return -1;
+    }
+
+    WIFI_LOGI("RequestNetwork uid[%{public}d], networkId[%{public}d].", netrequest.uid, networkId);
+    if (!WifiAppStateAware::GetInstance().IsForegroundApp(netrequest.uid)) {
+        WIFI_LOGE("App is not in foreground.");
+        return -1;
+    }
+
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
+        if (linkedInfo.networkId == networkId) {
+            WIFI_LOGI("RequestNetwork networkId is connecting or connected.");
+            return 0;
+        }
+    }
+
+    if (!WifiNetAgent::GetInstance().RequestNetwork(netrequest.uid, networkId)) {
+        WIFI_LOGE("RequestNetwork fail.");
+        return -1;
+    }
+#endif
     return 0;
 }
 

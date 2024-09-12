@@ -112,10 +112,10 @@ StaStateMachine::StaStateMachine(int instId)
       targetNetworkId(INVALID_NETWORK_ID), pinCode(0), wpsState(SetupMethod::INVALID),
       lastSignalLevel_(INVALID_SIGNAL_LEVEL), targetRoamBssid(WPA_BSSID_ANY), currentTpType(IPTYPE_IPV4),
       isWpsConnect(IsWpsConnected::WPS_INVALID), getIpSucNum(0), getIpFailNum(0), enableSignalPoll(true), isRoam(false),
-      lastTimeStamp(0), portalFlag(true), portalState(PortalState::UNCHECKED), detectNum(0),
+      lastTimestamp(0), portalFlag(true), portalState(PortalState::UNCHECKED), detectNum(0),
       portalExpiredDetectCount(0), mIsWifiInternetCHRFlag(false), networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr), pRootState(nullptr), pInitState(nullptr), pWpaStartingState(nullptr),
-      pWpaStartedState(nullptr), pWpaStoppingState(nullptr), pLinkedState(nullptr), pSeparatingState(nullptr),
+      pWpaStartedState(nullptr), pWpaStoppingState(nullptr), pLinkState(nullptr), pSeparatingState(nullptr),
       pSeparatedState(nullptr), pApLinkedState(nullptr), pWpsState(nullptr), pGetIpState(nullptr),
       pLinkedState(nullptr), pApRoamingState(nullptr), m_instId(instId), mLastConnectNetId(INVALID_NETWORK_ID),
       mConnectFailedCnt(0)
@@ -794,9 +794,9 @@ void StaStateMachine::StopWifiProcess()
         std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
 
         if (currentTpType == IPTYPE_IPV4) {
-            StopDhcpClient(ifname.c_str(), false);
+            StopDhcpClient(ifaceName.c_str(), false);
         } else {
-            StopDhcpClient(ifname.c_str(), true);
+            StopDhcpClient(ifaceName.c_str(), true);
         }
 
         IpInfo ipInfo;
@@ -2057,7 +2057,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     return true;
 }
 
-static bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId)
+static bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId)
 {
     std::string lastMac;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
@@ -2066,8 +2066,8 @@ static bool StaStateMachine::SetMacToHal(const std::string &currentMac, const st
         return false;
     }
     bool isRealMac = currentMac == realMac;
-    LOGI("%{public}s randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}!", __func__);
-    isReaslMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str();
+    LOGI("%{public}s randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}!", __func__
+        isRealMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str();
     std::string actualConfiguredMac = currentMac;
     if (!isRealMac && instId == 1) {
         if (!WifiRandomMacHelper::GetWifi2RandomMac(actualConfiguredMac)) {

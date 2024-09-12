@@ -996,7 +996,7 @@ void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state, int in
                 return;
             }
     } else {
-            WIFI_LOGE("invalid InstId!")
+            WIFI_LOGE("invalid InstId!");
             return;
     }
 

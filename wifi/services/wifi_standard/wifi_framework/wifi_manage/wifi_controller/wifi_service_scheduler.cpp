@@ -435,7 +435,7 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
     ErrCode errCode = pService->EnableStaService();
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("StartWifiStaService Service enable sta failed ,ret %{public}d!", static_cast<int>(errCode));
-        return WIFI_OPT_FAILED; 
+        return WIFI_OPT_FAILED;
     }
     WIFI_LOGI("StartWifiStaService instId%{public}d successful", instId);
     return WIFI_OPT_SUCCESS;

@@ -345,7 +345,7 @@ private:
     std::atomic<int> mSelectedCandidateNetworkId {INVALID_NETWORK_ID};
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
-    std::string mStaIfaceName[STA_INSTANCE_MAX_NUM] = {"wlan0", "wlan1"};
+    std::vector<std::string> mStaIfaceName = {"wlan0", "wlan1"};
     std::map<int, std::atomic<int>> mWifiState;
     std::map<int, WifiDetailState> mWifiDetailState;
     std::map<int, std::atomic<WifiOprMidState>> mStaMidState;

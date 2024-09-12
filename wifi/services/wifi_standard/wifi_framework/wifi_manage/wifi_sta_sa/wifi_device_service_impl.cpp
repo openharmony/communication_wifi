@@ -496,6 +496,30 @@ ErrCode WifiDeviceServiceImpl::RemoveCandidateConfig(int networkId)
     }
 }
 
+void WifiDeviceServiceImpl::updateStaDeviceMacAddress(WifiDeviceConfig &config)
+{
+    WifiMacAddrInfo macAddrInfo;
+    macAddrInfo.bssid = config.bssid;
+    macAddrInfo.bssidType = config.bssidType;
+    std::string macAddr =
+        WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+            macAddrInfo);
+    if (macAddr.empty()) {
+        WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
+            __func__, config.bssid.c_str(), config.bssidType);
+    } else {
+        WIFI_LOGI("%{public}s: the record is exists, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
+            __func__, config.bssid.c_str(), config.bssidType, macAddr.c_str());
+        /* random MAC address are translated into real MAC address */
+        if (!config.bssid.empty() && config.bssidType == RANDOM_DEVICE_ADDRESS) {
+            config.bssid = macAddr;
+            config.bssidType = REAL_DEVICE_ADDRESS;
+            WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                __func__, config.bssid.c_str(), config.bssidType);
+        }
+    }
+}
+
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -533,27 +557,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     }
     WifiDeviceConfig updateConfig = config;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
-    WifiMacAddrInfo macAddrInfo;
-    macAddrInfo.bssid = config.bssid;
-    macAddrInfo.bssidType = config.bssidType;
-    std::string macAddr =
-        WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
-            macAddrInfo);
-    if (macAddr.empty()) {
-        WIFI_LOGW("%{public}s: record not found, bssid:%{private}s, bssidType:%{public}d",
-            __func__, config.bssid.c_str(), config.bssidType);
-    } else {
-        WIFI_LOGI("%{public}s: the record is exists, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-            __func__, config.bssid.c_str(), config.bssidType, macAddr.c_str());
-        /* random MAC address are translated into real MAC address */
-        if (!config.bssid.empty() &&
-            config.bssidType == RANDOM_DEVICE_ADDRESS) {
-            updateConfig.bssid = macAddr;
-            updateConfig.bssidType = REAL_DEVICE_ADDRESS;
-            WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                __func__, updateConfig.bssid.c_str(), updateConfig.bssidType);
-        }
-    }
+    updateStaDeviceMacAddress(updateConfig);
 #endif
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
@@ -567,6 +571,9 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
                 WIFI_LOGE("CheckCallingUid IsWifiBrokerProcess failed!");
                 return WIFI_OPT_INVALID_PARAM;
             }
+        }
+        if (!IsWifiBrokerProcess(uid)) {
+            updateConfig.isEphemeral = true;
         }
         return pService->AddCandidateConfig(uid, updateConfig, result);
     }
@@ -874,6 +881,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
                 return WIFI_OPT_SUCCESS;
             }
         }
+        WifiSettings::GetInstance().SetDeviceEphemeral(networkId, false);
         return pService->ConnectToCandidateConfig(uid, networkId);
     }
     return pService->ConnectToNetwork(networkId);

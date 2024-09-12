@@ -120,7 +120,7 @@ StaStateMachine::StaStateMachine(int instId)
       pLinkedState(nullptr), pApRoamingState(nullptr), m_instId(instId), mLastConnectNetId(INVALID_NETWORK_ID),
       mConnectFailedCnt(0)
 {
-    WIFI_LOGI("StaStateMachine constructor instId %{public}d", instId);
+    WIFI_LOGI("StaStateMachine constructor instId %{public}d ", instId);
 }
 
 StaStateMachine::~StaStateMachine()

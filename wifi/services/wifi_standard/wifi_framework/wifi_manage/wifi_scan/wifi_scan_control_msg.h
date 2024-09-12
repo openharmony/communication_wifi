@@ -25,6 +25,7 @@ namespace OHOS {
 namespace Wifi {
 
 struct Hid2dInfo {
+    
     std::string upperIfName;
     Hid2dUpperScene upperScene;
     P2pBusinessType p2pBusinessType;

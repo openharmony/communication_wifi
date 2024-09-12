@@ -35,6 +35,7 @@
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
 
+
 #define SOFT_BUS_SERVICE_UID 1024
 #define CAST_ENGINE_SERVICE_UID 5526
 

@@ -26,6 +26,7 @@ config("module_private_config") {
 ohos_unittest("wifi_non_mock_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/block_connect_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_file_spec.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_settings.cpp",
@@ -82,6 +83,7 @@ ohos_unittest("wifi_non_mock_unittest") {
     "c_utils:utils",
     "hilog:libhilog",
     "jsoncpp:jsoncpp",
+    "libxml2:libxml2",
   ]
 
   defines = [

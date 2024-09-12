@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr int MAX_ALIAS_LEN = 128;
 
-uint WifiCertUtils::FreeData(uint8* pData)
+uint8_t WifiCertUtils::FreeData(uint8_t* pData)
 {
     if (pData != NULL) {
         free(pData);

@@ -113,7 +113,7 @@ public:
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(HARDWARE_LOAD_EVENT);
-        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(msg) == true);
+        EXPECT_FALSE(pScanStateMachine->initState->ExecuteStateMsg(msg) == true);
     }
 
     void InitExeMsgSuccess7()

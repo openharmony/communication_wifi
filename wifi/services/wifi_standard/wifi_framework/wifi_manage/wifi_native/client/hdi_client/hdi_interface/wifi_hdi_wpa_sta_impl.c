@@ -243,6 +243,11 @@ WifiErrorNo HdiWpaStaStop()
         return WIFI_HAL_OPT_FAILED;
     }
 
+    if (HdiRemoveWpaIface(GetHdiP2pIfaceName()) != WIFI_HAL_OPT_OK) {
+        LOGE("HdiWpaStaStop: HdiRemoveWpaIface failed!");
+        return WIFI_HAL_OPT_FAILED;
+    }
+
     if (UnRegisterEventCallback() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: UnRegisterEventCallback failed!");
         return WIFI_HAL_OPT_FAILED;
@@ -884,7 +889,7 @@ WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd)
         LOGE("HdiWpaStaSetShellCmd: wpaObj is NULL");
         return WIFI_HAL_OPT_FAILED;
     }
- 
+
     int32_t result = wpaObj->StaShellCmd(wpaObj, ifName, cmd);
     if (result != HDF_SUCCESS) {
         LOGE("HdiWpaStaSetShellCmd: failed to StaShellCmd, result:%{public}d", result);

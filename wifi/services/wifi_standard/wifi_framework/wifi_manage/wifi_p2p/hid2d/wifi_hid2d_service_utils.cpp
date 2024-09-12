@@ -41,7 +41,7 @@ bool IpPool::InitIpPool(const std::string& serverIp)
         return true;
     }
 
-    std::string hostIp = serverIp.empty() ? DHCP::IP_V4_DEFAULT : serverIp;
+    std::string hostIp = serverIp.empty() ? IP_V4_DEFAULT : serverIp;
     if (!IsValidIp(hostIp)) {
         return false;
     }

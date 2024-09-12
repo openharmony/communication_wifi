@@ -202,7 +202,7 @@ static int GetVhtCentFreq(int channelType, int centerFrequencyIndex)
 static int HexStringToString(const char *str, char *out)
 {
     unsigned len = strlen(str);
-    if (((len & 1) != 0) || (len == 0)) {
+    if ((len & 1) != 0) {
         return -1;
     }
     const int hexShiftNum = 4;

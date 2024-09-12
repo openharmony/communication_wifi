@@ -248,11 +248,10 @@ public:
     virtual ErrCode SetPowerMode(bool mode) const;
 
     /**
-     * @Description  Set tx power to reduce sar.
+     * @Description Set tx power to reduce sar
      *
-     * @param power - 1001,1002,1003......
-     *
-     * @Return WifiErrorNo
+     * @param power: 1001,1002,1003········
+     * @return WifiErrorNo
      */
     virtual ErrCode SetTxPower(int power) const;
 
@@ -339,7 +338,7 @@ public:
      */
 #ifndef OHOS_ARCH_LITE
     virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
-    
+
     /**
      * @Description Set EnhanceService
      *
@@ -354,7 +353,7 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd);
- 
+
     /**
      * @Description deliver mac
      *

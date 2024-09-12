@@ -543,6 +543,7 @@ public:
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
 #endif
+
 private:
     /**
      * @Description  Destruct state.

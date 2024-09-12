@@ -156,7 +156,7 @@ void IsValidHotspotConfigFuzzTest(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if ((data == NULL) || (size < DATA_SIZE_MIN)) {
+    if ((data == nullptr) || (size < DATA_SIZE_MIN)) {
         return 0;
     }
     OHOS::Wifi::TransRandomToRealMacFuzzTest(data, size);

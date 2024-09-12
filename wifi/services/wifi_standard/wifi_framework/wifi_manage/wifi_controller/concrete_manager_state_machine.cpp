@@ -311,7 +311,7 @@ void ConcreteMangerMachine::ConnectState::SwitchSemiActiveInConnectState()
 {
     ErrCode ret = pConcreteMangerMachine->SwitchSemiFromEnable();
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("switch semi wifi failed ret =%{public}d \n", ret);
+        WIFI_LOGE("switch semi wifi failed ret = %{public}d \n", ret);
     }
 }
 
@@ -575,7 +575,7 @@ ErrCode ConcreteMangerMachine::PostStartWifi(int instId)
             WIFI_LOGE("Service enable sta failed ,ret %{public}d!", static_cast<int>(errCode));
             break;
         }
-#ifndef OHOS_ARCH_LITE
+    #ifndef OHOS_ARCH_LITE
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService == nullptr) {
             WIFI_LOGE("get pEnhance service failed!");
@@ -586,7 +586,7 @@ ErrCode ConcreteMangerMachine::PostStartWifi(int instId)
             WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
             break;
         }
-#endif
+    #endif
     } while (0);
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 #ifdef FEATURE_P2P_SUPPORT
@@ -721,6 +721,7 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, instId);
         return WIFI_OPT_SUCCESS;
     }
+
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(ConcreteMangerMachine::IfaceDestoryCallback, std::placeholders::_1, std::placeholders::_2),
@@ -731,6 +732,7 @@ ErrCode ConcreteMangerMachine::AutoStartScanOnly(int instId)
     }
     WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName);
 #endif
+
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, instId);
     WifiManager::GetInstance().AutoStartEnhanceService();
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(instId);

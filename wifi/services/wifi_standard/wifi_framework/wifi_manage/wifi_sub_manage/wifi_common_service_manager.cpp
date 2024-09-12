@@ -25,6 +25,7 @@
 #else
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_app_parser.h"
 #endif
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
@@ -67,6 +68,9 @@ InitStatus WifiCommonServiceManager::Init()
         std::bind(&WifiCommonServiceManager::OnForegroundAppChanged, this, _1, _2);
     if (WifiAppStateAware::GetInstance().InitAppStateAware(mWifiAppStateAwareCallbacks) < 0) {
         WIFI_LOGE("WifiAppStateAware Init failed!");
+    }
+    if (!AppParser::GetInstance().Init()) {
+        WIFI_LOGE("AppParser Init failed!");
     }
 #endif
 #ifdef FEATURE_SELF_CURE_SUPPORT

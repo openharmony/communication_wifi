@@ -177,6 +177,8 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
         int exception = data.ReadInt32();
@@ -675,6 +677,7 @@ void WifiDeviceStub::OnGetChangeDeviceConfig(uint32_t code, MessageParcel &data,
     reply.WriteString(config.bssid);
     reply.WriteString(config.callProcessName);
     reply.WriteString(config.ancoCallProcessName);
+    reply.WriteString(config.keyMgmt);
     reply.WriteInt32(ret);
     return;
 }

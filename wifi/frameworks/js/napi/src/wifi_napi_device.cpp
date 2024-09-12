@@ -1702,6 +1702,5 @@ NO_SANITIZE("cfi") napi_value GetWifiDetailState(napi_env env, napi_callback_inf
     napi_create_int32(env, static_cast<int>(state), &value);
     return value;
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

@@ -47,31 +47,23 @@ ErrCode WifiCountryCodeManager::Init()
 {
     WIFI_LOGI("init");
     m_wifiCountryCodePolicy = std::make_shared<WifiCountryCodePolicy>();
-#ifdef FEATURE_STA_SUPPORT
+
     m_staCallback.callbackModuleName = CLASS_NAME;
     m_staCallback.OnStaConnChanged = DealStaConnChanged;
-#endif
-
-#ifdef FEATURE_AP_SUPPORT
     m_apCallback.callbackModuleName = CLASS_NAME;
     m_apCallback.OnApStateChangedEvent = DealApStateChanged;
-#endif
     return WIFI_OPT_SUCCESS;
 }
 
-#ifdef FEATURE_STA_SUPPORT
 StaServiceCallback WifiCountryCodeManager::GetStaCallback() const
 {
     return m_staCallback;
 }
-#endif
 
-#ifdef FEATURE_AP_SUPPORT
 IApServiceCallbacks WifiCountryCodeManager::GetApCallback() const
 {
     return m_apCallback;
 }
-#endif
 
 void WifiCountryCodeManager::GetWifiCountryCode(std::string &wifiCountryCode) const
 {
@@ -190,7 +182,6 @@ void WifiCountryCodeManager::DealStaStopped(int instId)
 }
 #endif
 
-#ifdef FEATURE_STA_SUPPORT
 void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     WIFI_LOGD("wifi connection state change, state=%{public}d, id=%{public}d", state, instId);
@@ -199,9 +190,7 @@ void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const Wif
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
     }
 }
-#endif
 
-#ifdef FEATURE_AP_SUPPORT
 void WifiCountryCodeManager::DealApStateChanged(ApState state, int id)
 {
     WIFI_LOGI("ap state change, state=%{public}d, id=%{public}d", state, id);
@@ -212,7 +201,6 @@ void WifiCountryCodeManager::DealApStateChanged(ApState state, int id)
         WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
     }
 }
-#endif
 
 ErrCode WifiCountryCodeManager::UpdateWifiCountryCodeCache(const std::string &wifiCountryCode)
 {

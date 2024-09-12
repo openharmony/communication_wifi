@@ -2046,7 +2046,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             currentMac = deviceConfig.macAddress;
         }
     }
-    if (SetMacToHal(currentMac, realMac)) {
+    if (SetMacToHal(currentMac, realMac, m_instId)) {
         deviceConfig.macAddress = currentMac;
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
@@ -2057,10 +2057,10 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     return true;
 }
 
-bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::string &realMac)
+static bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId)
 {
     std::string lastMac;
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
     if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac, ifaceName)) != WIFI_HAL_OPT_OK) {
         LOGE("%{public}s randommac, GetStaDeviceMacAddress failed!", __func__);
         return false;
@@ -2069,7 +2069,7 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     LOGI("%{public}s randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}!", __func__);
     isReaslMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str();
     std::string actualConfiguredMac = currentMac;
-    if (!isRealMac && m_instId == 1) {
+    if (!isRealMac && instId == 1) {
         if (!WifiRandomMacHelper::GetWifi2RandomMac(actualConfiguredMac)) {
             actualConfiguredMac = realMac;
         }
@@ -2078,12 +2078,12 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     if (MacAddress::IsValidMac(actualConfiguredMac.c_str())) {
         if (lastMac != actualConfiguredMac) {
             if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
-                WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
+                WifiConfigCenter::GetInstance().GetStaIfaceName(instId), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
                     LOGE("set Mac [%{public}s] failed", MacAnonymize(actualConfiguredMac).c_str());
                     return false;
                 }
         }
-        WifiConfigCenter::GetInstance().SetMacAddress(actualConfiguredMac, m_instId);
+        WifiConfigCenter::GetInstance().SetMacAddress(actualConfiguredMac, instId);
         return true;
     } else {
         LOGE("%{public}s randommac, Check MacAddress error", __func__);
@@ -4543,6 +4543,11 @@ void StaStateMachine::HandlePostDhcpSetup()
     WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true);
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+}
+
+int StaStateMachine::GetInstId()
+{
+    return m_instId;
 }
 
 WifiDeviceConfig StaStateMachine::getCurrentWifiDeviceConfig()

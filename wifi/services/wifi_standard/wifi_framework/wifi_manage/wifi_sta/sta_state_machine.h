@@ -922,11 +922,6 @@ private:
     bool SetRandomMac(int networkId, const std::string &bssid);
 
     /**
-     * @Description  Set mac address to hal
-     */
-    bool SetMacToHal(const std::string &currentMac, const std::string &realMac);
-
-    /**
      * @Description  check whether the current bssid are consistent.
      * @param bssid - bssid
      */
@@ -1064,10 +1059,7 @@ private:
     /**
      * @Description Get sta state machine instant id
      */
-    int GetInstId()
-    {
-        return m_instId;
-    }
+    int GetInstId();
 
 #ifndef OHOS_ARCH_LITE
     /**

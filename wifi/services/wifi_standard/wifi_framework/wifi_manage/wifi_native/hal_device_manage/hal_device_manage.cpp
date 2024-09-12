@@ -1448,11 +1448,14 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
     CHECK_NULL_AND_RETURN(chip, false);
     int32_t ret = HDF_FAILURE;
     switch (ifaceType) {
-        case IfaceType::STA :
-            if (iface && g_chipIfaceCallback) {
-                iface->UnRegisterChipIfaceCallBack(g_chipIfaceCallback);
+        case IfaceType::STA:
+            if (ifaceName == "wlan0") {
+                LOGE("RemoveIface, IfaceType::STA wlan0");
+                if (iface && g_chipIfaceCallback) {
+                    iface->UnRegisterChipIfaceCallBack(g_chipIfaceCallback);
+                }
+                g_rssiReportCallback = nullptr;
             }
-            g_rssiReportCallback = nullptr;
             ret = chip->RemoveStaService(ifaceName);
             break;
         case IfaceType::AP :

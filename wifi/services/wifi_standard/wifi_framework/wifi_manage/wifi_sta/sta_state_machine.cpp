@@ -3847,7 +3847,7 @@ bool StaStateMachine::ApRoamingState::HandleNetworkConnectionEvent(InternalMessa
     /* Notify result to InterfaceService. */
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED,
         pStaStateMachine->linkedInfo);
-    if (pStaStateMachine->GetInstid() == INSTID_WLAN0) {
+    if (pStaStateMachine->m_instId == INSTID_WLAN0) {
         if (!pStaStateMachine->CanArpReachable()) {
             WIFI_LOGI("Arp is not reachable");
             WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));

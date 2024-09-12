@@ -110,8 +110,8 @@ void StaMonitor::OnReportDisConnectReasonCallBack(int reason, const std::string 
 
 void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::string &bssid)
 {
-    WIFI_LOGI("OnConnectChangedCallBack status:%{public}d, networkId=%{public}d, bssid=%{public}s,"
-        "m_instId=%{public}d", status, networkId, MacAnonymize(bssid).c_str(), m_instId);
+    WIFI_LOGI("OnConnectChangedCallBack status:%{public}d, networkId=%{public}d, bssid=%{public}s, instId=%{public}d",
+        status, networkId, MacAnonymize(bssid).c_str(), m_instId);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;

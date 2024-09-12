@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
+using namespace NetManagerStandard;
 DEFINE_WIFILOG_LABEL("SelfCureUtils");
 SelfCureUtils::SelfCureUtils()
 {
@@ -35,8 +36,7 @@ SelfCureUtils::~SelfCureUtils()
 void SelfCureUtils::RegisterDnsResultCallback()
 {
     dnsResultCallback_ = std::make_unique<SelfCureDnsResultCallback>().release();
-    int32_t regDnsResult =
-        NetManagerStandard::NetsysController::GetInstance().RegisterDnsResultCallback(dnsResultCallback_, 0);
+    int32_t regDnsResult = NetsysController::GetInstance().RegisterDnsResultCallback(dnsResultCallback_, 0);
     WIFI_LOGI("RegisterDnsResultCallback result = %{public}d", regDnsResult);
 }
 
@@ -44,7 +44,7 @@ void SelfCureUtils::UnRegisterDnsResultCallback()
 {
     WIFI_LOGI("UnRegisterDnsResultCallback");
     if (dnsResultCallback_ != nullptr) {
-        NetManagerStandard::NetsysController::GetInstance().UnregisterDnsResultCallback(dnsResultCallback_);
+        NetsysController::GetInstance().UnregisterDnsResultCallback(dnsResultCallback_);
     }
 }
 
@@ -77,16 +77,16 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t siz
 
 int32_t SelfCureUtils::SelfCureDnsResultCallback::GetWifiNetId()
 {
-    std::list<sptr<NetManagerStandard::NetHandle>> netList;
-    int32_t ret = NetManagerStandard::NetConnClient::GetInstance().GetAllNets(netList);
+    std::list<sptr<NetHandle>> netList;
+    int32_t ret = NetConnClient::GetInstance().GetAllNets(netList);
     if (ret != 0) {
         return 0;
     }
 
     for (auto iter : netList) {
-        NetManagerStandard::NetAllCapabilities netAllCap;
-        NetManagerStandard::NetConnClient::GetInstance().GetNetCapabilities(*iter, netAllCap);
-        if (netAllCap.bearerTypes_.count(NetManagerStandard::BEARER_WIFI) > 0) {
+        NetAllCapabilities netAllCap;
+        NetConnClient::GetInstance().GetNetCapabilities(*iter, netAllCap);
+        if (netAllCap.bearerTypes_.count(BEARER_WIFI) > 0) {
             return iter->GetNetId();
         }
     }
@@ -95,8 +95,8 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::GetWifiNetId()
 
 int32_t SelfCureUtils::SelfCureDnsResultCallback::GetDefaultNetId()
 {
-    NetManagerStandard::NetHandle defaultNet;
-    NetManagerStandard::NetConnClient::GetInstance().GetDefaultNet(defaultNet);
+    NetHandle defaultNet;
+    NetConnClient::GetInstance().GetDefaultNet(defaultNet);
     return defaultNet.GetNetId();
 }
 } // namespace Wifi

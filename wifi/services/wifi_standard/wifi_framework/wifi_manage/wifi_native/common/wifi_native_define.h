@@ -130,4 +130,8 @@ typedef enum Wifi80211StatusCode {
     WLAN_STATUS_ASSOC_REJECTED_TEMPORARILY = 30,
     WLAN_STATUS_DENIED_INSUFFICIENT_BANDWIDTH = 33,
 } Wifi80211StatusCode;
+
+typedef enum Wifi80211ReasonCode {
+    WLAN_REASON_IE_IN_4WAY_DIFFERS = 17,
+} Wifi80211ReasonCode;
 #endif

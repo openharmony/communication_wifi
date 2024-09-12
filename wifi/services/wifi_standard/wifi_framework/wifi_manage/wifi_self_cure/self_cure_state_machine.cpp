@@ -1373,24 +1373,20 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCureLevel)
 {
-    WIFI_LOGI("enter SelfCureForReset");
-    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
+    WIFI_LOGI("enter SelfCureForReset, internetUnknown is %{public}d, hasInternetRecently, %{public}d",
+        pSelfCureStateMachine->internetUnknown, hasInternetRecently);
     if ((pSelfCureStateMachine->internetUnknown) || (!hasInternetRecently) ||
         (pSelfCureStateMachine->IsSettingsPage())) {
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pNoInternetState);
         return;
     }
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService && pEnhanceService->CheckChbaConncted()) {
-        WIFI_LOGE("no need reset");
-        pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pNoInternetState);
-        return;
-    }
+
     if ((currentRssi < MIN_VAL_LEVEL_3_5) || pSelfCureStateMachine->IfP2pConnected()) {
         delayedResetSelfCure = true;
         return;
     }
     WIFI_LOGI("begin to self cure for internet access: Reset");
+    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
     pSelfCureStateMachine->selfCureOnGoing = true;
     pSelfCureStateMachine->StopTimer(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK);
     delayedResetSelfCure = false;
@@ -1399,15 +1395,9 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     WifiLinkedInfo wifiLinkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
     WifiConfigCenter::GetInstance().SetLastNetworkId(wifiLinkedInfo.networkId);
-    WifiConfigCenter::GetInstance().SetWifiSelfcureReset(true);
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
-    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
-    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
-        WIFI_LOGI("GetWifiTogglerManager is nullptr");
-        return;
-    }
-    WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 0);
+    pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
 }
 
 bool SelfCureStateMachine::InternetSelfCureState::SelectedSelfCureAcceptable()
@@ -2476,7 +2466,7 @@ bool SelfCureStateMachine::IsSuppOnCompletedState()
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState == ConnState::CONNECTED) {
+    if (linkedInfo.supplicantState == SupplicantState::COMPLETED) {
         return true;
     }
     return false;

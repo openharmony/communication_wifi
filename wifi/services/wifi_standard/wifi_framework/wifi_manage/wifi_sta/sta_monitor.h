@@ -95,7 +95,7 @@ public:
     /**
      * @Description : Callback of the Wpa ssid wrong key event.
      */
-    void OnWpaSsidWrongKeyCallBack(int status);
+    void OnWpaSsidWrongKeyCallBack();
 
     /**
      * @Description : Callback of the Connection Full event.

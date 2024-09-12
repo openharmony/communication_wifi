@@ -540,6 +540,7 @@ public:
     void DealApRoamingStateTimeout(InternalMessagePtr msg);
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
+    void DealWpaStateChange(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
 #endif
@@ -1182,10 +1183,6 @@ private:
      * @Description Subscribe system ability changed.
      */
     void SubscribeSystemAbilityChanged(void);
-    /**
-     * @Description Reupdate net supplier info
-     */
-    void ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo);
 
     /**
      * @Description save wificonfig for update mode.
@@ -1274,6 +1271,7 @@ private:
     void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
+    bool IsGoodSignalQuality();
 };
 }  // namespace Wifi
 }  // namespace OHOS

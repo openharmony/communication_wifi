@@ -478,7 +478,6 @@ HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
     EXPECT_TRUE(pApStartedState->StopAp());
 }
 
-
 HWTEST_F(ApStartedState_test, EnableInterfaceNat_001, TestSize.Level1)
 {
     EXPECT_CALL(MockNetworkInterface::GetInstance(), IsValidInterfaceName(_)).WillRepeatedly(Return(false));

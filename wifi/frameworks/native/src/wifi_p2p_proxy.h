@@ -397,7 +397,15 @@ public:
      *
      * @return bool - true: service is died, false: service is not died.
      */
-    bool IsRemoteDied(void) override   ;
+    bool IsRemoteDied(void) override;
+
+    /**
+     * @Description Hid2d Is Wide Bandwidth Supported
+     *
+     * @param isSupport - is support 160M
+     * @return ErrCode - operation result
+     */
+    ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) override;
 
 private:
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {

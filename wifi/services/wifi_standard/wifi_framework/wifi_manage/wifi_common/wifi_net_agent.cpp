@@ -26,12 +26,16 @@
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
 #include "ipv6_address.h"
+#include "wifi_global_func.h"
+#include "wifi_app_state_aware.h"
 
 DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
 namespace OHOS {
 namespace Wifi {
 using namespace NetManagerStandard;
+
+#define INVALID_SUPPLIER_ID 0
 
 WifiNetAgent &WifiNetAgent::GetInstance()
 {
@@ -55,10 +59,14 @@ bool WifiNetAgent::RegisterNetSupplier()
     using NetManagerStandard::NetBearType;
     using NetManagerStandard::NetCap;
     std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
+    if (supplierId != INVALID_SUPPLIER_ID) {
+        WIFI_LOGI("RegisterNetSupplier supplierId alread exist.");
+        return true;
+    }
     int32_t result = NetConnClient::GetInstance().RegisterNetSupplier(NetBearType::BEARER_WIFI,
                                                                       ident, netCaps, supplierId);
     if (result == NETMANAGER_SUCCESS) {
-        WIFI_LOGI("Register NetSupplier successful");
+        WIFI_LOGI("Register NetSupplier successful, supplierId is [%{public}d]", supplierId);
         return true;
     }
     WIFI_LOGI("Register NetSupplier failed");
@@ -90,6 +98,7 @@ void WifiNetAgent::UnregisterNetSupplier()
     WIFI_LOGI("Enter UnregisterNetSupplier.");
     int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(supplierId);
     WIFI_LOGI("Unregister network result:%{public}d", result);
+    supplierId = INVALID_SUPPLIER_ID;
 }
 
 void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
@@ -281,20 +290,26 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     dns->type_ = NetManagerStandard::INetAddr::IPV4;
     dns->family_ = NetManagerStandard::INetAddr::IPV4;
-    dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
-    netLinkInfo->dnsList_.push_back(*dns);
-    dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
-    netLinkInfo->dnsList_.push_back(*dns);
-
+    if (wifiIpInfo.primaryDns != 0) {
+        dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+        netLinkInfo->dnsList_.push_back(*dns);
+        LOGI("SetNetLinkDnsInfo ipv4 address:%{public}s", IpAnonymize(dns->address_).c_str());
+    }
+    if (wifiIpInfo.secondDns != 0) {
+        dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+        netLinkInfo->dnsList_.push_back(*dns);
+        LOGI("SetNetLinkDnsInfo ipv4 address:%{public}s", IpAnonymize(dns->address_).c_str());
+    }
     sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     ipv6dns->type_ = NetManagerStandard::INetAddr::IPV6;
     ipv6dns->family_ = NetManagerStandard::INetAddr::IPV6;
-    LOGI("SetNetLinkDnsInfo ipv6 dns size:%{public}zu", wifiIpV6Info.dnsAddr.size());
-    if (wifiIpV6Info.dnsAddr.size() > 0) {
-        for (uint32_t i = 0; i < wifiIpV6Info.dnsAddr.size(); i++) {
-            ipv6dns->address_ = wifiIpV6Info.dnsAddr[i];
-            netLinkInfo->dnsList_.push_back(*ipv6dns);
-        }
+    if (!wifiIpV6Info.primaryDns.empty()) {
+        ipv6dns->address_ = wifiIpV6Info.primaryDns;
+        netLinkInfo->dnsList_.push_back(*ipv6dns);
+    }
+    if (!wifiIpV6Info.secondDns.empty()) {
+        ipv6dns->address_ = wifiIpV6Info.secondDns;
+        netLinkInfo->dnsList_.push_back(*ipv6dns);
     }
 }
 
@@ -350,6 +365,23 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
     }
 }
 
+void WifiNetAgent::InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCallbacks)
+{
+    wifiNetAgentCallbacks_ = wifiNetAgentCallbacks;
+}
+
+bool WifiNetAgent::RequestNetwork(const int uid, const int networkId)
+{
+    if (!wifiNetAgentCallbacks_.OnRequestNetwork) {
+        WIFI_LOGE("OnRequestNetwork is nullptr.");
+        return false;
+    }
+    if (wifiNetAgentCallbacks_.OnRequestNetwork(uid, networkId)) {
+        return true;
+    }
+    return false;
+}
+
 WifiNetAgent::NetConnCallback::NetConnCallback()
 {
 }
@@ -357,12 +389,54 @@ WifiNetAgent::NetConnCallback::NetConnCallback()
 WifiNetAgent::NetConnCallback::~NetConnCallback()
 {}
 
+void WifiNetAgent::ResetSupplierId()
+{
+    supplierId = INVALID_SUPPLIER_ID;
+}
+
+uint32_t WifiNetAgent::GetSupplierId()
+{
+    return supplierId;
+}
+
 int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
     const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps,
     const NetManagerStandard::NetRequest &netrequest)
 {
     WIFI_LOGD("Enter NetConnCallback::RequestNetwork");
     LogNetCaps(ident, netCaps);
+#ifndef OHOS_ARCH_LITE
+    if (requestIds_.find(netrequest.requestId) != requestIds_.end()) {
+        return -1;
+    }
+    requestIds_.insert(netrequest.requestId);
+
+    int networkId = ConvertStringToInt(netrequest.ident);
+    if (networkId <= INVALID_NETWORK_ID || std::to_string(networkId) != netrequest.ident) {
+        WIFI_LOGE("networkId is invaild.");
+        return -1;
+    }
+
+    WIFI_LOGI("RequestNetwork uid[%{public}d], networkId[%{public}d].", netrequest.uid, networkId);
+    if (!WifiAppStateAware::GetInstance().IsForegroundApp(netrequest.uid)) {
+        WIFI_LOGE("App is not in foreground.");
+        return -1;
+    }
+
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
+        if (linkedInfo.networkId == networkId) {
+            WIFI_LOGI("RequestNetwork networkId is connecting or connected.");
+            return 0;
+        }
+    }
+
+    if (!WifiNetAgent::GetInstance().RequestNetwork(netrequest.uid, networkId)) {
+        WIFI_LOGE("RequestNetwork fail.");
+        return -1;
+    }
+#endif
     return 0;
 }
 

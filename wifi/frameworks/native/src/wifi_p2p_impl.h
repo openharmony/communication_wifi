@@ -412,6 +412,14 @@ public:
      */
     ErrCode CheckCanUseP2p() override;
 
+    /**
+     * @Description Hid2d Is Wide Bandwidth Supported
+     *
+     * @param isSupport - is support 160M
+     * @return ErrCode - operation result
+     */
+    ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) override;
+
 private:
     bool GetWifiP2pProxy();
     std::atomic<int> systemAbilityId_;

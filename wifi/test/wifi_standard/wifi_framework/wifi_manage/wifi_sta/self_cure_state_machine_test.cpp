@@ -98,7 +98,7 @@ public:
         msg->SetMessageName(1);
         EXPECT_FALSE(pSelfCureStateMachine->pDefaultState->ExecuteStateMsg(msg));
         msg->SetMessageName(0);
-        EXPECT_TRUE(pSelfCureStateMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_FALSE(pSelfCureStateMachine->pDefaultState->ExecuteStateMsg(msg));
     }
 
     void ConnectedMonitorStateGoInStateSuccess()

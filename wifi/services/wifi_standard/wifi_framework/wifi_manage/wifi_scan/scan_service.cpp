@@ -1619,7 +1619,7 @@ bool ScanService::IsMovingFreezeScaned() const
 
 ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
 {
-    LOGI("Enter ApplyTrustListPolicy.");
+    LOGE("Enter ApplyTrustListPolicy.");
     ErrCode policyResult = WIFI_OPT_SUCCESS;
 
     SetScanTrustMode();

@@ -72,6 +72,8 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::OnDnsResultReport(uint32_t siz
             }
         }
     }
+    WIFI_LOGD("OnDnsResultReport, wifiNetId: %{public}d, defaultNetId: %{public}d, dnsFailedCounter_: %{public}d",
+        wifiNetId, defaultNetId, dnsFailedCounter_);
     return 0;
 }
 

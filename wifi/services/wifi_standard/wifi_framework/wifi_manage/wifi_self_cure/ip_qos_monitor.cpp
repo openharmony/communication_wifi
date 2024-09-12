@@ -118,7 +118,7 @@ bool IpQosMonitor::AllowSelfCureNetwork(int32_t currentRssi)
 
 bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
 {
-    WIFI_LOGI("enter %{public}s", __FUNCTION__);
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
     bool queryResp = (elems[QOS_MSG_FROM] == 0);
     int32_t packetsLength = static_cast<int32_t>(elems.size());
     if ((queryResp) && (packetsLength > MIN_PACKET_LEN)) {

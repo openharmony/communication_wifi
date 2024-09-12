@@ -80,7 +80,7 @@ void WifiCountryCodeManager::GetWifiCountryCode(std::string &wifiCountryCode) co
 
 ErrCode WifiCountryCodeManager::SetWifiCountryCodeFromExternal(const std::string &wifiCountryCode)
 {
-    WIFI_LOGI("set wifi country code from external, externalCode=%{public}s", wifiCountryCode.c_str());
+    WIFI_LOGD("set wifi country code from external, externalCode=%{public}s", wifiCountryCode.c_str());
     return UpdateWifiCountryCode(wifiCountryCode);
 }
 

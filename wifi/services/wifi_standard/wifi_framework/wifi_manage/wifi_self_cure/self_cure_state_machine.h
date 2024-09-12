@@ -74,6 +74,7 @@ constexpr int POS_RANDMAC_CONNECT_FAILED_CNT = 14;
 constexpr int POS_RANDMAC_CONNECT_FAILED_TS = 15;
 constexpr int POS_RESET_CONNECT_FAILED_CNT = 16;
 constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
+constexpr int DNS_FAILED_CNT = 2;
 inline constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
 
 class SelfCureStateMachine : public StateMachine {
@@ -128,6 +129,7 @@ public:
         bool portalUnthenEver = false;
         bool userSetStaticIpConfig = false;
         bool wifiSwitchAllowed = false;
+        int lastDnsFailedCnt_ = 0;
         SelfCureCmsHandleFuncMap selfCureCmsHandleFuncMap;
         int InitSelfCureCmsHandleMap();
         void HandleResetupSelfCure(InternalMessagePtr msg);
@@ -145,6 +147,7 @@ public:
         void HandleTcpQualityQuery(InternalMessagePtr msg);
         void HandleGatewayChanged(InternalMessagePtr msg);
         bool IsGatewayChanged();
+        void HandleDnsFailedMonitor(InternalMessagePtr msg);
     };
 
     /* *

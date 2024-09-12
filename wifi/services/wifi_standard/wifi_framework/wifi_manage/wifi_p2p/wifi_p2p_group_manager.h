@@ -172,6 +172,9 @@ public:
     inline void UpdateCurrGroupClient(const WifiP2pDevice &device)
     {
         currentGroup.AddClientDevice(device);
+        if (currentGroup.IsPersistent()) {
+            currentGroup.AddPersistentDevice(device);
+        }
     }
 
     inline void RemoveCurrGroupClient(const WifiP2pDevice &device)

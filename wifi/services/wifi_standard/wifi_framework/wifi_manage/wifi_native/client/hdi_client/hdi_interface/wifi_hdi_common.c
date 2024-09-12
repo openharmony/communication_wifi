@@ -14,11 +14,11 @@
  */
 
 
-#include "<unistd.h>"
-#include "<net/if.h>"
-#include "<sys/ioctl.h>"
-#include "<net/socket.h>"
-#include "<pthread.h>"
+#include <unistd.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <net/socket.h>
+#include <pthread.h>
 
 #include "securec.h"
 #include "wifi_hdi_common.h"
@@ -623,7 +623,7 @@ int HdiParseIe(const uint8_t *hdiIe, size_t wpaIeLen,
 {
     if (wpaIeLen >= HDI_POS_FIRST && hdiIe[0] == HDI_EID_RSN) {
         return HdiConvertIeRsn(hdiIe, wpaIeLen, data);
-    }
+    }       
     if (wpaIeLen >= HDI_POS_SIX && hdiIe[0] == HDI_EID_VENDOR_SPECIFIC &&
         hdiIe[1] >= HDI_POS_FOURTH && HdiGetBe32(&hdiIe[HDI_POS_SECOND]) == HDI_OSEN_IE_VENDOR_TYPE) {
         return HdiConvertIeRsn(hdiIe, wpaIeLen, data);

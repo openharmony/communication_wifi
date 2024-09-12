@@ -69,6 +69,9 @@ InitStatus WifiCommonServiceManager::Init()
     if (WifiAppStateAware::GetInstance().InitAppStateAware(mWifiAppStateAwareCallbacks) < 0) {
         WIFI_LOGE("WifiAppStateAware Init failed!");
     }
+    if (!AppParser::GetInstance().Init()) {
+        WIFI_LOGE("AppParser Init failed!");
+    }
     wifiNetAgentCallbacks_.OnRequestNetwork = [this](const int uid, const int networkId) {
         return this->OnRequestNetwork(uid, networkId);
     };

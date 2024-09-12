@@ -196,7 +196,7 @@ HksErrorCode HkFreeData(uint8* pData){
     free(pData);
     pData = nullptr;
     }
-return HKS_FAILURE;
+    return HKS_FAILURE;
 }
 
 int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *paramSet,

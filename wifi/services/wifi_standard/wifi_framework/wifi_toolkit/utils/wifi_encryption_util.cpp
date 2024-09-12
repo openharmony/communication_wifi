@@ -191,6 +191,14 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     return ret;
 }
 
+HksErrorCode HkFreeData(uint8* pData){
+    if (pData != NULL) {
+    free(pData);
+    pData = nullptr;
+    }
+return HKS_FAILURE;
+}
+
 int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *paramSet,
     const struct HksBlob *inData, struct HksBlob *outData)
 {
@@ -218,22 +226,16 @@ int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSe
         }
         if (hksResult != HKS_SUCCESS) {
             WIFI_LOGE("HksUpdateAndFinish do HksUpdate or HksFinish failed: %{public}d.", hksResult);
-            free(outDataSeg.data);
-            outDataSeg.data = nullptr;
-            return HKS_FAILURE;
+            return HkFreeData(outDataSeg.data);
         }
 
         if (handledOutDataSize + outDataSeg.size > outData->size) {
             WIFI_LOGE("HksUpdateAndFinish outData->size is too small.");
-            free(outDataSeg.data);
-            outDataSeg.data = nullptr;
-            return HKS_FAILURE;
+            return HkFreeData(outDataSeg.data);
         }
         if (memcpy_s(handledOutData, outDataSeg.size, outDataSeg.data, outDataSeg.size) != EOK) {
             WIFI_LOGE("HksUpdateAndFinish memcpy_s failed.");
-            free(outDataSeg.data);
-            outDataSeg.data = nullptr;
-            return HKS_FAILURE;
+            return HkFreeData(outDataSeg.data);
         }
 
         handledOutData += outDataSeg.size;

@@ -81,6 +81,7 @@ ohos_unittest("wifi_non_mock_unittest") {
     "ability_base:zuri",
     "c_utils:utils",
     "hilog:libhilog",
+    "jsoncpp:jsoncpp",
   ]
 
   defines = [

@@ -279,11 +279,16 @@ public:
     void SetGcIpAddress(const std::string &ipAddr);
     const std::string &GetGcIpAddress() const;
     void AddClientDevice(const WifiP2pDevice &clientDevice);
+    void AddPersistentDevice(const WifiP2pDevice &clientDevice);
     void RemoveClientDevice(const WifiP2pDevice &clientDevice);
+    void RemovePersistentDevice(const WifiP2pDevice &clientDevice);
     bool IsContainsDevice(const WifiP2pDevice &clientDevice) const;
+    bool IsContainsPersistentDevice(const WifiP2pDevice &clientDevice) const;
     bool IsClientDevicesEmpty() const;
     const std::vector<WifiP2pDevice> &GetClientDevices() const;
+    const std::vector<WifiP2pDevice> &GetPersistentDevices() const;
     void SetClientDevices(const std::vector<WifiP2pDevice> &devices);
+    void SetClientPersistentDevices(const std::vector<WifiP2pDevice> &devices);
     void ClearClientDevices();
     bool IsExplicitGroup(void) const;
     void SetExplicitGroup(bool isExplicit);
@@ -301,6 +306,7 @@ private:
     bool isP2pPersistent;
     P2pGroupStatus groupStatus;
     std::vector<WifiP2pDevice> clientDevices;
+    std::vector<WifiP2pDevice> persistentClients;
     std::string goIpAddress;
     std::string gcIpAddress;
     bool explicitGroup;

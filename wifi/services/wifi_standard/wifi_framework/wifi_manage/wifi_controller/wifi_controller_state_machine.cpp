@@ -178,6 +178,7 @@ void WifiControllerMachine::EnableState::GoOutState()
     WIFI_LOGE("EnableState GoOutState function.");
 }
 
+#ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
 {
     switch (msg->GetMessageName()) {
@@ -208,6 +209,7 @@ void WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
             break;
     }
 }
+#endif
 
 bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
 {

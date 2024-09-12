@@ -72,6 +72,7 @@ public:
     const std::string &GetGoIpAddress() const;
 
     void AddClientDevice(const WifiP2pDevice &clientDevice);
+    void AddPersistentDevice(const WifiP2pDevice &clientDevice);
     void RemoveClientDevice(const WifiP2pDevice &clientDevice);
 
     bool IsContainsDevice(const WifiP2pDevice &clientDevice) const;

@@ -71,7 +71,7 @@ void WifiStaHalInterfaceTest::SetUpTestCase()
 void WifiStaHalInterfaceTest::TearDownTestCase()
 {
     WifiEventCallback callback;
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
     WifiSupplicantHalInterface::GetInstance().UnRegisterSupplicantEventCallback();
 }
@@ -84,7 +84,7 @@ HWTEST_F(WifiStaHalInterfaceTest, StartWifiTest, TestSize.Level1)
 
 HWTEST_F(WifiStaHalInterfaceTest, ConnectTest, TestSize.Level1)
 {
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Connect(1, ifaceName);
     EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
 }
@@ -103,7 +103,7 @@ HWTEST_F(WifiStaHalInterfaceTest, ReassociateTest, TestSize.Level1)
 
 HWTEST_F(WifiStaHalInterfaceTest, DisconnectTest, TestSize.Level1)
 {
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Disconnect(ifaceName);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
@@ -118,7 +118,7 @@ HWTEST_F(WifiStaHalInterfaceTest, GetStaCapabilitiesTest, TestSize.Level1)
 HWTEST_F(WifiStaHalInterfaceTest, GetStaDeviceMacAddressTest, TestSize.Level1)
 {
     std::string mac;
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
@@ -228,7 +228,7 @@ HWTEST_F(WifiStaHalInterfaceTest, RemoveDeviceConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiStaHalInterfaceTest, ClearDeviceConfigTest, TestSize.Level1)
 {
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
@@ -236,21 +236,21 @@ HWTEST_F(WifiStaHalInterfaceTest, ClearDeviceConfigTest, TestSize.Level1)
 HWTEST_F(WifiStaHalInterfaceTest, GetNextNetworkIdTest, TestSize.Level1)
 {
     int id = 0;
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetNextNetworkId(id, ifaceName);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, EnableNetworkTest, TestSize.Level1)
 {
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().EnableNetwork(1, ifaceName);
     EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiStaHalInterfaceTest, DisableNetworkTest, TestSize.Level1)
 {
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().DisableNetwork(1, ifaceName);
     EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
 }
@@ -259,7 +259,7 @@ HWTEST_F(WifiStaHalInterfaceTest, SetDeviceConfigTest, TestSize.Level1)
 {
     WifiHalDeviceConfig cfg;
     cfg.psk = "1234567";
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetDeviceConfig(1, cfg);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_FAILED);
     cfg.psk = "01234567890123456789012345678901234567890123456789012345678901234";
@@ -288,7 +288,7 @@ HWTEST_F(WifiStaHalInterfaceTest, SetDeviceConfigTest, TestSize.Level1)
 HWTEST_F(WifiStaHalInterfaceTest, GetDeviceConfigTest, TestSize.Level1)
 {
     WifiHalGetDeviceConfig cfg;
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetDeviceConfig(cfg, ifaceName);
     EXPECT_FALSE(ret == WIFI_HAL_OPT_OK);
 }

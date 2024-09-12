@@ -90,6 +90,8 @@ public:
     virtual void SetScanOnlySwitchState(const int &state, int instId = 0) = 0;
     virtual  bool IsModulePreLoad(const std::string &name) = 0;
     virtual bool GetConfigValueByName(const std::string &name, std::string &value) = 0;
+    virtual int GetHotspotConfig(HotspotConfig &config, int id) = 0;
+    virtual int GetVariableMap(std::map<std::string, std::string> &variableMap) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -162,6 +164,8 @@ public:
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD1(IsModulePreLoad,  bool(const std::string &name));
     MOCK_METHOD2(GetConfigValueByName,  bool(const std::string &name, std::string &value));
+    MOCK_METHOD2(GetHotspotConfig,  int(HotspotConfig &config, int id));
+    MOCK_METHOD1(GetVariableMap,  int(std::map<std::string, std::string> &variableMap));
 };
 }  // namespace OHOS
 }  // namespace Wifi

@@ -78,6 +78,7 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     int ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
 
     free(data);
+    data = nullptr;
     if (ret == 0) {
         uri = reinterpret_cast<char*>(keyUri.data);
     }

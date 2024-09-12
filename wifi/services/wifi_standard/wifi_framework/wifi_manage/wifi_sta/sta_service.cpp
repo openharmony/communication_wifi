@@ -191,6 +191,7 @@ ErrCode StaService::EnableStaService()
     }
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
 #endif
+    WifiSettings::GetInstance().ReloadDeviceConfig();
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
 }

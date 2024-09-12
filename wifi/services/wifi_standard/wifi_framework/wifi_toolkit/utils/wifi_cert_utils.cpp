@@ -26,7 +26,7 @@ uint8_t WifiCertUtils::FreeData(uint8* pData)
 {
     if (pData != NULL) {
         free(pData);
-        data = nullptr;
+        pData = nullptr;
     }
     return -1;
 }

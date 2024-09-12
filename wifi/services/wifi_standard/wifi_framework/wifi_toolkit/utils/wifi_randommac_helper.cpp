@@ -279,11 +279,11 @@ bool WifiRandomMacHelper::GetWifi2RandomMac(std::string &wifi2RandomMac)
     inputSsMac << std::hex <<inputStrMac;
     unsigned int inputHexMac;
     if (inputSsMac >> inputHexMac) {
-        WIFI_LOGD("%{public}s conver pos 3 mac to hex success", __func__,);
+        WIFI_LOGD("%{public}s conver pos 3 mac to hex success", __func__);
     } else {
-        WIFI_LOGE("%{public}s conver pos 3 mac to hex fail", __func__,);
+        WIFI_LOGE("%{public}s conver pos 3 mac to hex fail", __func__);
     }
-    unsigned int outputMac = inputHexMac ^ WIFI2_RANDOM_MAC_MASK;
+    unsigned int outputHexMac = inputHexMac ^ WIFI2_RANDOM_MAC_MASK;
     std::stringstream outSsMac;
     outSsMac << std::hex <<outputHexMac;
     wifi2RandomMac.replace(WIFI2_RANDOM_MAC_CHANGE_POS, WIFI2_RANDOM_MAC_CHANGE_LEN, outSsMac.str());

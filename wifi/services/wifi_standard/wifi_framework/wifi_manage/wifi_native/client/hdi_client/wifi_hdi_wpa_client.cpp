@@ -279,7 +279,7 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiHalDevice
     return HdiWpaStaSetNetwork(networkId, conf, num, ifaceName);
 }
 
-void Handleconfig(const WifiHalDeviceConfig &config, SetNetworkConfig *conf, int &num)
+void WifiHdiWpaClient::HandleConfig(const WifiHalDeviceConfig &config, SetNetworkConfig *conf, int &num)
 {
     if (config.priority >= 0) {
         num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_PRIORITY, config.priority);

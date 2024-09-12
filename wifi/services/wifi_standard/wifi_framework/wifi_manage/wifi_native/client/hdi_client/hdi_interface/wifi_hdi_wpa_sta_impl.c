@@ -601,7 +601,7 @@ void HandleGetScanInfo(unsigned char *resultBuff, int *size, ScanInfo *results)
             free(results);
             free(resultBuff);
             pthread_mutex_unlock(GetWpaObjMutex());
-            return NULL;
+            return;
         }
         int length = strlen(token);
         if (length <= 0) {

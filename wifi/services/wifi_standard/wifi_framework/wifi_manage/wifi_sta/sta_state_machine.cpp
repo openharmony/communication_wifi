@@ -165,7 +165,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
     StartStateMachine();
     InitStaSMHandleMap();
     if (m_instId == 0) {
-        WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
 #ifndef OHOS_ARCH_LITE
         NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
         m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
@@ -1138,7 +1137,7 @@ void StaStateMachine::OnConnectFailed(int networkId)
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
 }
 
-void HandleWifi2Config(int &networkId)
+void StaStateMachine::HandleWifi2Config(int &networkId)
 {
     WifiDeviceConfig config1;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config1, m_instId) != 0) {
@@ -1166,6 +1165,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
         LOGE("msg is null.\n");
         return;
     }
+    int networkId = msg->GetParam1();
     HandleWifi2Config(networkId);
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
@@ -1726,7 +1726,7 @@ void StaStateMachine::DealStartRoamCmd(InternalMessagePtr msg)
     }
     std::string bssid = msg->GetStringFromMessage();
     targetRoamBssid = bssid;
-    WIFI_LOGI("%{public}s target bssid:%{public}s," __FUNCTION__, MacAnonymize(lilnkedInfo.bssid).c_str());
+    WIFI_LOGI("%{public}s target bssid:%{public}s,", __FUNCTION__, MacAnonymize(linkedInfo.bssid).c_str());
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, targetRoamBssid, ifaceName)
         != WIFI_HAL_OPT_OK) {

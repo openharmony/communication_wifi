@@ -92,6 +92,9 @@ public:
      * @return
      */
     static std::string ToString(uint32_t networkStatusHistory);
+
+    static std::vector<int> GetCurrentNetworkStatusHistory2Array(uint32_t networkStatusHistory);
+
 private:
 
     /**

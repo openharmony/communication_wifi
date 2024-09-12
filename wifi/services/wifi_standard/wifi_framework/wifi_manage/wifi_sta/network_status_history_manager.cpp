@@ -129,5 +129,20 @@ std::string NetworkStatusHistoryManager::ToString(uint32_t networkStatusHistory)
     }
     return networkStatusString.str();
 }
+
+std::vector<int> NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Array(uint32_t networkStatusHistory)
+{
+    std::vector<int> vNetworkStatusHistory;
+    while (networkStatusHistory != 0) {
+        NetworkStatus networkStatus = GetLastNetworkStatus(networkStatusHistory);
+        if (networkStatus == NetworkStatus::HAS_INTERNET) {
+            vNetworkStatusHistory.emplace_back(1);
+        } else {
+            vNetworkStatusHistory.emplace_back(0);
+        }
+        networkStatusHistory = networkStatusHistory >> ITEM_BIT_NUM;
+    }
+    return vNetworkStatusHistory;
+}
 }
 }

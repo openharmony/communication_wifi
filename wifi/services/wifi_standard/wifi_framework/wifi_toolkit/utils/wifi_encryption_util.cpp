@@ -191,10 +191,11 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     return ret;
 }
 
-HksErrorCode HkFreeData(uint8* pData){
+HksErrorCode HkFreeData(uint8* pData)
+{
     if (pData != NULL) {
-    free(pData);
-    pData = nullptr;
+        free(pData);
+        pData = nullptr;
     }
     return HKS_FAILURE;
 }

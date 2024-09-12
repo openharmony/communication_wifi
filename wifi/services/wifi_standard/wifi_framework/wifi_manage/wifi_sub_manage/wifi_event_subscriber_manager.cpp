@@ -35,7 +35,6 @@ DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
 namespace Wifi {
-    
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
 constexpr uint32_t TIMEOUT_EVENT_DELAY_ACCESS_DATASHARE = 10 * 1000;
 constexpr uint32_t PROP_LEN = 26;
@@ -215,6 +214,12 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     if (add) {
         return;
     }
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SOFT_BUS_SERVICE_UID);
+    }
+    if (systemAbilityId == MIRACAST_SERVICE_SA_ID) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MIRACAST_SERVICE_UID);
+    }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
@@ -248,6 +253,7 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
 #ifdef FEATURE_P2P_SUPPORT
         case SOFTBUS_SERVER_SA_ID:
+        case MIRACAST_SERVICE_SA_ID:
             HandleP2pBusinessChange(systemAbilityId, add);
             break;
 #endif
@@ -435,6 +441,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 #endif
     SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
+    SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
 }
 
 bool WifiEventSubscriberManager::IsDataMgrServiceActive()

@@ -35,7 +35,6 @@
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
 
-
 #define SOFT_BUS_SERVICE_UID 1024
 #define CAST_ENGINE_SERVICE_UID 5526
 
@@ -1381,7 +1380,8 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
 {
     WIFI_LOGI("Hid2dSetUpperScene");
     int callingUid = GetCallingUid();
-    if (callingUid != SOFT_BUS_SERVICE_UID && callingUid != CAST_ENGINE_SERVICE_UID) {
+    if (callingUid != SOFT_BUS_SERVICE_UID && callingUid != CAST_ENGINE_SERVICE_UID &&
+        callingUid != MIRACAST_SERVICE_UID) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }

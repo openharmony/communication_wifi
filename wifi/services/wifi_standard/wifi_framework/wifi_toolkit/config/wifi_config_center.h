@@ -25,9 +25,10 @@
 #include "wifi_internal_msg.h"
 #include "wifi_settings.h"
 
+#define MIRACAST_SERVICE_UID 5529
+#define MIRACAST_SERVICE_SA_ID 5527
 namespace OHOS {
 namespace Wifi {
-    
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 
 class WifiConfigCenter {

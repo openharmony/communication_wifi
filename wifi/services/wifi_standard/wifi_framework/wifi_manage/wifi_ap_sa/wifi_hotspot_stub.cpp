@@ -111,7 +111,8 @@ int WifiHotspotStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGW("not find function to deal, code %{public}u", code);
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
     } else {
         (this->*(iter->second))(code, data, reply, option);
     }
@@ -226,7 +227,7 @@ void WifiHotspotStub::OnSetApConfigWifi(uint32_t code, MessageParcel &data, Mess
     int dataRead = data.ReadInt32();
     int channel = dataRead & 0x000000FF;
     int bandwidth = (dataRead & 0x00FF0000) >> 16;
-
+  
     BandType band = config.GetBand();
     config.SetBandWidth(bandwidth);
     config.SetChannel(channel);

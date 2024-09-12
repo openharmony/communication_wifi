@@ -97,7 +97,6 @@ private:
     bool IsDataMgrServiceActive();
     void HandleAppMgrServiceChange(bool add);
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
-    void HandleCommonEventServiceChange(int systemAbilityId, bool add);
 #ifdef HAS_MOVEMENT_PART
     void HandleHasMovementPartChange(int systemAbilityId, bool add);
 #endif

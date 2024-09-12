@@ -184,24 +184,6 @@ void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbi
     }
 }
 
-void WifiEventSubscriberManager::HandleCommonEventServiceChange(int systemAbilityId, bool add)
-{
-    WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!", systemAbilityId, add);
-    if (add) {
-        RegisterCesEvent();
-        RegisterNotificationEvent();
-#ifdef SUPPORT_ClOUD_WIFI_ASSET
-        RegisterAssetEvent();
-#endif
-    } else {
-        UnRegisterCesEvent();
-        UnRegisterNotificationEvent();
-#ifdef SUPPORT_ClOUD_WIFI_ASSET
-        UnRegisterAssetEvent();
-#endif
-    }
-}
-
 #ifdef HAS_MOVEMENT_PART
 void WifiEventSubscriberManager::HandleHasMovementPartChange(int systemAbilityId, bool add)
 {
@@ -276,9 +258,6 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
         case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
             HandleCommNetConnManagerSysChange(systemAbilityId, add);
-            break;
-        case COMMON_EVENT_SERVICE_ID:
-            HandleCommonEventServiceChange(systemAbilityId, add);
             break;
 #ifdef HAS_MOVEMENT_PART
         case MSDP_MOVEMENT_SERVICE_ID:
@@ -481,7 +460,6 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 {
     SubscribeSystemAbility(APP_MGR_SERVICE_ID);
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
-    SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
 #ifdef HAS_MOVEMENT_PART
     SubscribeSystemAbility(MSDP_MOVEMENT_SERVICE_ID);
 #endif

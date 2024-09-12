@@ -22,7 +22,6 @@
 #include "wifi_errcode.h"
 #include <string>
 #include "wifi_ap_msg.h"
-#include "i_ap_service_callbacks.h"
 #include "wifi_internal_msg.h"
 #include "wifi_controller_define.h"
 

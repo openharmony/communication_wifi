@@ -58,7 +58,6 @@ public:
      *
      */
     void Exit();
-
 #ifndef OHOS_ARCH_LITE
     void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);
 #endif

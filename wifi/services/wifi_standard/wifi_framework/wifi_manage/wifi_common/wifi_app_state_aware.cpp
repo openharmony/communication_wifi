@@ -62,6 +62,7 @@ ErrCode WifiAppStateAware::InitAppStateAware(const WifiAppStateAwareCallbacks &w
     mWifiAppStateAwareCallbacks = wifiAppStateAwareCallbacks;
     return WIFI_OPT_SUCCESS;
 }
+
 bool WifiAppStateAware::Connect()
 {
     if (appMgrProxy_ != nullptr) {

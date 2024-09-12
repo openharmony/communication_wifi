@@ -138,7 +138,7 @@ P2P_CHR_EVENT:
   __BASE: {type: STATISTIC, level: MINOR, desc: P2P chr event}
   EVENT_NAME: {type: STRING, desc: event name}
   EVENT_VALUE: {type: STRING, desc: event value}
-
+ 
 P2P_CONNECT_STATICS:
   __BASE: {type: STATISTIC, level: MINOR, desc: P2P KPI}
   CONN_CNT: {type: INT32, desc: P2P connect count}
@@ -150,7 +150,7 @@ P2P_CONNECT_FAIL:
   __BASE: {type: FAULT, level: MINOR, desc: P2P conect fail}
   ERR_CODE: {type: INT32, desc: fail error code}
   SUB_ERR_CODE: {type: INT32, desc: fail reason}
-
+ 
 P2P_ABNORMAL_DISCONNECT:
   __BASE: {type: FAULT, level: MINOR, desc: P2P abnormal disconect}
   ERR_CODE: {type: INT32, desc: fail error code}

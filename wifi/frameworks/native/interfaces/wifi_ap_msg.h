@@ -119,7 +119,6 @@ struct HotspotConfig {
     {
         return band;
     }
-
     inline void SetBandWidth(int32_t bandWidth)
     {
         apBandWidth = bandWidth;
@@ -128,6 +127,7 @@ struct HotspotConfig {
     {
         return apBandWidth;
     }
+
     inline void SetChannel(int32_t newchannel)
     {
         channel = newchannel;

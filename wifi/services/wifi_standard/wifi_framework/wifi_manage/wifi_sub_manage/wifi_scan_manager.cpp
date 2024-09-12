@@ -231,7 +231,7 @@ void WifiScanManager::DealScanFinished(int state, int instId)
     cbMsg.msgData = state;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    WifiCommonEventHelper::PublishScanFinishedEvent(state, "OnScanFinished");
+    WifiCommonEventHelper::PublishScanFinishedEvent(state,"OnScanFinished");
 }
 
 void WifiScanManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)

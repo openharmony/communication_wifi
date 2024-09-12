@@ -81,15 +81,16 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGI("not find function to deal, code %{public}u", code);
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
         int exception = data.ReadInt32();
         if (exception) {
             return WIFI_OPT_FAILED;
         }
-        (this->*(iter->second))(code, data, reply, option);
+        return (this->*(iter->second))(code, data, reply, option);
     }
-    return 0;
 }
 
 int WifiScanStub::OnSetScanControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)

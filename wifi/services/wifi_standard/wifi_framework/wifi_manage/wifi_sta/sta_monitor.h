@@ -94,8 +94,6 @@ public:
 
     /**
      * @Description : Callback of the Wpa ssid wrong key event.
-     *
-     * @param status - status codes [in]
      */
     void OnWpaSsidWrongKeyCallBack(int status);
 

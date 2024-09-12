@@ -92,6 +92,7 @@ int ApConfigUse::GetBestChannelFor5G(HotspotConfig &apConfig) const
         WIFI_LOGI("GetBestChannelFor5G BandWidth is 160M");
         return AP_CHANNEL_5G_160M_DEFAULT;
     }
+
     if (channels.empty()) {
         WIFI_LOGI("GetBestChannelFor5G is empty");
         return AP_CHANNEL_INVALID;

@@ -349,6 +349,7 @@ public:
      * @param protocol - target protocol type
      * @param enable - enable/disable dpi mark
      */
+
     WifiErrorNo SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable);
 
     /**
@@ -368,7 +369,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo GetPskPassphrase(const std::string &ifName, std::string &psk);
-
+    
     /**
      * @Description set background limit speed uid&pid list
      *

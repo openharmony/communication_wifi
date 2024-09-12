@@ -793,7 +793,7 @@ ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result,
 ErrCode WifiDeviceProxy::SetTxPower(int power)
 {
     if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`, remote service is died!", __func__);
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -944,7 +944,7 @@ ErrCode WifiDeviceProxy::StartRoamToNetwork(const int networkId, const std::stri
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("%{public}s Write interface token error.", __func__);
+        WIFI_LOGE("%{public}s write interface token error.", __func__);
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -1973,8 +1973,7 @@ ErrCode WifiDeviceProxy::StartPortalCertification()
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -2161,10 +2160,12 @@ ErrCode WifiDeviceProxy::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, 
         WIFI_LOGE("Write interface token error, func:%{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
+
     data.WriteInt32(0);
     data.WriteBool(uiFlag);
     data.WriteString(bssid);
     WriteDeviceConfig(deviceConfig, data);
+
     //Wirte device config
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), data,
         reply, option);
@@ -2173,6 +2174,7 @@ ErrCode WifiDeviceProxy::EnableHiLinkHandshake(bool uiFlag, std::string &bssid, 
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), error);
         return WIFI_OPT_FAILED;
     }
+
     int exception = reply.ReadInt32();
     if (exception) {
         WIFI_LOGE("Reply Read failed, exception:%{public}d", exception);

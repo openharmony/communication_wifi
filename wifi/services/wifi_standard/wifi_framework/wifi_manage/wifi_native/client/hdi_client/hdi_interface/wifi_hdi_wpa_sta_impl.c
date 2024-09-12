@@ -31,6 +31,11 @@
 #define REPLY_BUF_LENGTH (4096 * 10)
 #define ETH_ADDR_LEN 6
 
+
+
+
+
+
 const int QUOTATION_MARKS_FLAG_YES = 0;
 const int QUOTATION_MARKS_FLAG_NO = 1;
 

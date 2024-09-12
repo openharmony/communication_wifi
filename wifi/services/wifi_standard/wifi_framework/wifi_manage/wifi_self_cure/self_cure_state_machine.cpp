@@ -246,6 +246,7 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
         pSelfCureStateMachine->m_instId);
     if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
+        lastDnsFailedCnt_ = 0;
         DelayedSingleton<SelfCureUtils>::GetInstance()->ClearDnsFailedCounter();
     }
     if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing == true) {

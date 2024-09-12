@@ -13,13 +13,6 @@
  * limitations under the License.
  */
 
-
-#include <unistd.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
-#include <net/socket.h>
-#include <pthread.h>
-
 #include "securec.h"
 #include "wifi_hdi_common.h"
 

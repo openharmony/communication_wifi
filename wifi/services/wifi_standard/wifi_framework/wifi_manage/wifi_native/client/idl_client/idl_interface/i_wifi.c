@@ -314,7 +314,7 @@ static void IdlCbkWpaEventDeal(Context *context, int event)
         callback->onWpsOverlap(status);
     }
     if (event == HAL_CBK_CMD_SSID_WRONG_KEY && callback->onSsidWrongkey != NULL) {
-        callback->onSsidWrongkey(status);
+        callback->onSsidWrongkey();
     }
     if (event == HAL_CBK_CMD_WPA_STATE_CHANGEM && callback->onWpaStateChanged != NULL) {
         callback->onWpaStateChanged(status);

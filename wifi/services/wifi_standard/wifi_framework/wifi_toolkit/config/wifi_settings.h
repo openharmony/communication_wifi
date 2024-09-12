@@ -125,6 +125,8 @@ public:
 
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
+    int SetDeviceEphemeral(int networkId, bool isEphemeral);
+
     int SetDeviceAfterConnect(int networkId);
 
     int SetDeviceRandomizedMacSuccessEver(int networkId);

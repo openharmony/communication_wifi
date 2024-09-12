@@ -196,13 +196,43 @@ HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteInfoTest001, TestSize.Level1)
     wifiNetAgent.SetNetLinkLocalRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
 }
 
+HWTEST_F(WifiNetAgentTest, InitWifiNetAgentTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    WifiNetAgentCallbacks wifiNetAgentCallbacks;
+    wifiNetAgent.InitWifiNetAgent(wifiNetAgentCallbacks);
+}
+
 HWTEST_F(WifiNetAgentTest, RequestNetworkTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    int uid = 0;
+    int networkId = 0;
+    EXPECT_EQ(wifiNetAgent.RequestNetwork(uid, networkId), false);
+}
+
+HWTEST_F(WifiNetAgentTest, RequestNetworkTest002, TestSize.Level1)
 {
     WifiNetAgent::NetConnCallback netConnCallback;
     std::string ident = "";
     std::set<NetManagerStandard::NetCap> netCaps;
     NetManagerStandard::NetRequest netrequest;
-    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), 0);
+    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
+
+    ident = "1";
+    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
+
+    ident = "2";
+    netrequest.requestId++;
+    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
+
+    ident = "wifi";
+    netrequest.requestId++;
+    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
+
+    ident = "test123";
+    netrequest.requestId++;
+    EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
 }
 
 HWTEST_F(WifiNetAgentTest, ReleaseNetworkTest001, TestSize.Level1)
@@ -219,6 +249,14 @@ HWTEST_F(WifiNetAgentTest, LogNetCapsTest001, TestSize.Level1)
     std::string ident = "";
     std::set<NetManagerStandard::NetCap> netCaps;
     netConnCallback.LogNetCaps(ident, netCaps);
+}
+
+HWTEST_F(WifiNetAgentTest, GetSupplierId001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    wifiNetAgent.ResetSupplierId();
+    uint32_t tmpSupplierId = wifiNetAgent.GetSupplierId();
+    EXPECT_EQ(tmpSupplierId, 0);
 }
 }
 }

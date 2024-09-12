@@ -44,34 +44,33 @@ static const HdiP2pWpaNetworkField g_hdiP2pWpaNetworkFields[] = {
     {GROUP_CONFIG_DISABLED, "disabled", 1}
 };
 
-static pthread_mutex_t g_hdiCallbackMutex = PTHREAD_MUTEX_INITIALIZER;
 static struct IWpaCallback *g_hdiWpaP2pCallbackObj = NULL;
 
 static WifiErrorNo RegisterP2pEventCallback()
 {
     LOGI("RegisterP2pEventCallback enter");
-    pthread_mutex_lock(&g_hdiCallbackMutex);
+    pthread_mutex_lock(GetWpaObjMutex());
     if (g_hdiWpaP2pCallbackObj == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterP2pEventCallback: g_hdiWpaP2pCallbackObj is NULL");
         return WIFI_HAL_OPT_FAILED;
     }
 
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterP2pEventCallback: wpaObj is NULL");
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->RegisterWpaEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterP2pEventCallback: RegisterEventCallback failed result:%{public}d", result);
         return WIFI_HAL_OPT_FAILED;
     }
 
-    pthread_mutex_unlock(&g_hdiCallbackMutex);
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterP2pEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -79,18 +78,18 @@ static WifiErrorNo RegisterP2pEventCallback()
 static WifiErrorNo UnRegisterP2pEventCallback()
 {
     LOGI("UnRegisterP2pEventCallback enter");
-    pthread_mutex_lock(&g_hdiCallbackMutex);
+    pthread_mutex_lock(GetWpaObjMutex());
     if (g_hdiWpaP2pCallbackObj != NULL) {
         struct IWpaInterface *wpaObj = GetWpaInterface();
         if (wpaObj == NULL) {
-            pthread_mutex_unlock(&g_hdiCallbackMutex);
+            pthread_mutex_unlock(GetWpaObjMutex());
             LOGE("UnRegisterP2pEventCallback: wpaObj is NULL");
             return WIFI_HAL_OPT_FAILED;
         }
 
         int32_t result = wpaObj->UnregisterWpaEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
         if (result != HDF_SUCCESS) {
-            pthread_mutex_unlock(&g_hdiCallbackMutex);
+            pthread_mutex_unlock(GetWpaObjMutex());
             LOGE("UnRegisterP2pEventCallback: UnregisterEventCallback failed result:%{public}d", result);
             return WIFI_HAL_OPT_FAILED;
         }
@@ -99,7 +98,7 @@ static WifiErrorNo UnRegisterP2pEventCallback()
         g_hdiWpaP2pCallbackObj = NULL;
     }
 
-    pthread_mutex_unlock(&g_hdiCallbackMutex);
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("UnRegisterP2pEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -212,31 +211,32 @@ static void InitHdiWpaP2pCallbackObj(struct IWpaCallback *callback)
 WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
 {
     LOGI("RegisterHdiWpaP2pEventCallback enter");
-    pthread_mutex_lock(&g_hdiCallbackMutex);
+    pthread_mutex_lock(GetWpaObjMutex());
     if (callback == NULL || callback->OnEventDeviceFound == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterHdiWpaP2pEventCallback: invalid parameter!");
         return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
     if (g_hdiWpaP2pCallbackObj != NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGI("RegisterHdiWpaP2pEventCallback: already register!");
         return WIFI_HAL_OPT_OK;
     }
 
     g_hdiWpaP2pCallbackObj = (struct IWpaCallback *)malloc(sizeof(struct IWpaCallback));
     if (g_hdiWpaP2pCallbackObj == NULL) {
-        pthread_mutex_unlock(&g_hdiCallbackMutex);
+        pthread_mutex_unlock(GetWpaObjMutex());
         LOGE("RegisterHdiWpaP2pEventCallback: IWpaCallback malloc failed!");
         return WIFI_HAL_OPT_FAILED;
     }
     if (memset_s(g_hdiWpaP2pCallbackObj, sizeof(struct IWpaCallback),
         0, sizeof(struct IWpaCallback)) != EOK) {
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     InitHdiWpaP2pCallbackObj(callback);
-    pthread_mutex_unlock(&g_hdiCallbackMutex);
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterHdiWpaP2pEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -244,18 +244,21 @@ WifiErrorNo RegisterHdiWpaP2pEventCallback(struct IWpaCallback *callback)
 WifiErrorNo HdiP2pSetSsidPostfixName(const char *name)
 {
     LOGI("HdiP2pSetSsidPostfixName enter, name:%{private}s", name);
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetSsidPostfixName: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetSsidPostfixName(wpaObj, GetHdiP2pIfaceName(), name);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetSsidPostfixName: P2pSetSsidPostfixName failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetSsidPostfixName success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -263,18 +266,21 @@ WifiErrorNo HdiP2pSetSsidPostfixName(const char *name)
 WifiErrorNo HdiP2pSetWpsDeviceType(const char *type)
 {
     LOGI("HdiP2pSetWpsDeviceType enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetWpsDeviceType: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetWpsDeviceType(wpaObj, GetHdiP2pIfaceName(), type);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWpsDeviceType: P2pSetWpsDeviceType failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetWpsDeviceType success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -282,18 +288,21 @@ WifiErrorNo HdiP2pSetWpsDeviceType(const char *type)
 WifiErrorNo HdiP2pSetWpsConfigMethods(const char *methods)
 {
     LOGI("HdiP2pSetWpsConfigMethods enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetWpsConfigMethods: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetWpsConfigMethods(wpaObj, GetHdiP2pIfaceName(), methods);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWpsConfigMethods: P2pSetWpsConfigMethods failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetWpsConfigMethods success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -301,18 +310,21 @@ WifiErrorNo HdiP2pSetWpsConfigMethods(const char *methods)
 WifiErrorNo HdiP2pSetGroupMaxIdle(const char *groupIfc, int time)
 {
     LOGI("HdiP2pSetGroupMaxIdle enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetGroupMaxIdle: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetGroupMaxIdle(wpaObj, groupIfc, time);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetGroupMaxIdle: P2pSetGroupMaxIdle failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetGroupMaxIdle success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -320,18 +332,21 @@ WifiErrorNo HdiP2pSetGroupMaxIdle(const char *groupIfc, int time)
 WifiErrorNo HdiP2pSetWfdEnable(int enable)
 {
     LOGI("HdiP2pSetWfdEnable enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetWfdEnable: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetWfdEnable(wpaObj, GetHdiP2pIfaceName(), enable);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWfdEnable: P2pSetWfdEnable failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetWfdEnable success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -339,18 +354,21 @@ WifiErrorNo HdiP2pSetWfdEnable(int enable)
 WifiErrorNo HdiP2pSetPersistentReconnect(int status)
 {
     LOGI("HdiP2pSetPersistentReconnect enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetPersistentReconnect: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetPersistentReconnect(wpaObj, GetHdiP2pIfaceName(), status);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetPersistentReconnect: P2pSetPersistentReconnect failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetPersistentReconnect success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -358,18 +376,21 @@ WifiErrorNo HdiP2pSetPersistentReconnect(int status)
 WifiErrorNo HdiP2pSetWpsSecondaryDeviceType(const char *type)
 {
     LOGI("HdiP2pSetWpsSecondaryDeviceType enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetWpsSecondaryDeviceType: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetWpsSecondaryDeviceType(wpaObj, GetHdiP2pIfaceName(), type);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWpsSecondaryDeviceType: P2pSetWpsSecondaryDeviceType failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetWpsSecondaryDeviceType success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -382,18 +403,21 @@ WifiErrorNo HdiP2pSetupWpsPbc(const char *groupIfc, const char *address)
         LOGE("HdiP2pSetupWpsPbc: failed to convert address!");
     }
     LOGI("HdiP2pSetupWpsPbc enter groupIfc=%{public}s anonymizeAddr=%{public}s", groupIfc, anonymizeAddr);
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetupWpsPbc: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetupWpsPbc(wpaObj, groupIfc, address);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetupWpsPbc: P2pSetupWpsPbc failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetupWpsPbc success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -401,18 +425,21 @@ WifiErrorNo HdiP2pSetupWpsPbc(const char *groupIfc, const char *address)
 WifiErrorNo HdiP2pSetupWpsPin(const char *groupIfc, const char *address, const char *pin, char *result)
 {
     LOGI("HdiP2pSetupWpsPin enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetupWpsPin: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t res = wpaObj->P2pSetupWpsPin(wpaObj, groupIfc, address, pin, result, REPLY_BUF_LENGTH);
     if (res != HDF_SUCCESS) {
         LOGE("HdiP2pSetupWpsPin: P2pSetupWpsPin failed res:%{public}s", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetupWpsPin success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -420,18 +447,21 @@ WifiErrorNo HdiP2pSetupWpsPin(const char *groupIfc, const char *address, const c
 WifiErrorNo HdiP2pSetPowerSave(const char *groupIfc, int enable)
 {
     LOGI("HdiP2pSetPowerSave enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetPowerSave: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetPowerSave(wpaObj, groupIfc, enable);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetPowerSave: P2pSetPowerSave failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetPowerSave success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -439,18 +469,21 @@ WifiErrorNo HdiP2pSetPowerSave(const char *groupIfc, int enable)
 WifiErrorNo HdiP2pSetDeviceName(const char *name)
 {
     LOGI("HdiP2pSetDeviceName enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetDeviceName: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetDeviceName(wpaObj, GetHdiP2pIfaceName(), name);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetDeviceName: P2pSetDeviceName failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetDeviceName success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -458,18 +491,21 @@ WifiErrorNo HdiP2pSetDeviceName(const char *name)
 WifiErrorNo HdiP2pSetWfdDeviceConfig(const char *config)
 {
     LOGI("HdiP2pSetWfdDeviceConfig enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetWfdDeviceConfig: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetWfdDeviceConfig(wpaObj, GetHdiP2pIfaceName(), config);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetWfdDeviceConfig: P2pSetWfdDeviceConfig failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetWfdDeviceConfig success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -477,20 +513,24 @@ WifiErrorNo HdiP2pSetWfdDeviceConfig(const char *config)
 WifiErrorNo HdiP2pSetRandomMac(int enable)
 {
     LOGI("HdiP2pSetRandomMac enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetRandomMac: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetRandomMac(wpaObj, GetHdiP2pIfaceName(), enable);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetRandomMac: P2pSetRandomMac failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     if (AddP2pRandomMacFlag() != WIFI_HAL_OPT_OK) {
         LOGW("%{public}s: failed to write %{public}s", __func__, P2P_RANDOM_MAC_FLAG);
     }
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetRandomMac success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -498,18 +538,21 @@ WifiErrorNo HdiP2pSetRandomMac(int enable)
 WifiErrorNo HdiP2pStartFind(int timeout)
 {
     LOGI("HdiP2pStartFind enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pStartFind: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pStartFind(wpaObj, GetHdiP2pIfaceName(), timeout);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pStartFind: P2pStartFind failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pStartFind success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -517,18 +560,21 @@ WifiErrorNo HdiP2pStartFind(int timeout)
 WifiErrorNo HdiP2pSetExtListen(int enable, int period, int interval)
 {
     LOGI("HdiP2pSetExtListen enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetExtListen: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetExtListen(wpaObj, GetHdiP2pIfaceName(), enable, period, interval);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetExtListen: P2pSetExtListen failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetExtListen success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -536,18 +582,21 @@ WifiErrorNo HdiP2pSetExtListen(int enable, int period, int interval)
 WifiErrorNo HdiP2pSetListenChannel(int channel, int regClass)
 {
     LOGI("HdiP2pSetListenChannel enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetListenChannel: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetListenChannel(wpaObj, GetHdiP2pIfaceName(), channel, regClass);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetListenChannel: P2pSetListenChannel failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetListenChannel success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -555,18 +604,21 @@ WifiErrorNo HdiP2pSetListenChannel(int channel, int regClass)
 WifiErrorNo HdiP2pProvisionDiscovery(const char *peerBssid, int mode)
 {
     LOGI("HdiP2pProvisionDiscovery enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pProvisionDiscovery: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pProvisionDiscovery(wpaObj, GetHdiP2pIfaceName(), peerBssid, mode);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pProvisionDiscovery: P2pProvisionDiscovery failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pProvisionDiscovery success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -574,18 +626,21 @@ WifiErrorNo HdiP2pProvisionDiscovery(const char *peerBssid, int mode)
 WifiErrorNo HdiP2pAddGroup(int isPersistent, int networkId, int freq)
 {
     LOGI("HdiP2pAddGroup enter isPersistent=%{public}d", isPersistent);
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pAddGroup: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pAddGroup(wpaObj, GetHdiP2pIfaceName(), isPersistent, networkId, freq);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pAddGroup: P2pAddGroup failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pAddGroup success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -593,18 +648,21 @@ WifiErrorNo HdiP2pAddGroup(int isPersistent, int networkId, int freq)
 WifiErrorNo HdiP2pAddService(struct HdiP2pServiceInfo *info)
 {
     LOGI("HdiP2pAddService enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pAddService: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pAddService(wpaObj, GetHdiP2pIfaceName(), info);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pAddService: P2pAddService failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pAddService success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -612,18 +670,21 @@ WifiErrorNo HdiP2pAddService(struct HdiP2pServiceInfo *info)
 WifiErrorNo HdiP2pRemoveService(struct HdiP2pServiceInfo *info)
 {
     LOGI("HdiP2pRemoveService enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pRemoveService: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pRemoveService(wpaObj, GetHdiP2pIfaceName(), info);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pRemoveService: P2pRemoveService failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pRemoveService success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -631,18 +692,21 @@ WifiErrorNo HdiP2pRemoveService(struct HdiP2pServiceInfo *info)
 WifiErrorNo HdiP2pStopFind()
 {
     LOGI("HdiP2pStopFind enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pStopFind: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pStopFind(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pStopFind: P2pStopFind failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pStopFind success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -650,18 +714,21 @@ WifiErrorNo HdiP2pStopFind()
 WifiErrorNo HdiP2pFlush()
 {
     LOGI("HdiP2pFlush enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pFlush: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pFlush(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pFlush: P2pFlush failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pFlush success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -669,18 +736,21 @@ WifiErrorNo HdiP2pFlush()
 WifiErrorNo HdiP2pFlushService()
 {
     LOGI("HdiP2pFlushService enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pFlushService: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pFlushService(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pFlushService: P2pFlushService failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pFlushService success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -688,18 +758,21 @@ WifiErrorNo HdiP2pFlushService()
 WifiErrorNo HdiP2pRemoveNetwork(int networkId)
 {
     LOGI("HdiP2pRemoveNetwork enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pRemoveNetwork: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pRemoveNetwork(wpaObj, GetHdiP2pIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pRemoveNetwork: P2pRemoveNetwork failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pRemoveNetwork success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -707,9 +780,11 @@ WifiErrorNo HdiP2pRemoveNetwork(int networkId)
 WifiErrorNo HdiP2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
 {
     LOGI("HdiP2pSetGroupConfig enter size=%{public}d", size);
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetGroupConfig: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
@@ -719,9 +794,11 @@ WifiErrorNo HdiP2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int siz
         if (result != HDF_SUCCESS) {
             LOGE("HdiP2pSetGroupConfig: %{public}s failed result:%{public}d",
                 g_hdiP2pWpaNetworkFields[pConfig[i].cfgParam].fieldName, result);
+            pthread_mutex_unlock(GetWpaObjMutex());
             return WIFI_HAL_OPT_FAILED;
         }
     }
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetGroupConfig success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -729,18 +806,21 @@ WifiErrorNo HdiP2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int siz
 WifiErrorNo HdiP2pInvite(const char *peerBssid, const char *goBssid, const char *ifname)
 {
     LOGI("HdiP2pInvite enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pInvite: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pInvite(wpaObj, ifname, peerBssid, goBssid);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pInvite: P2pInvite failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pInvite success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -748,18 +828,21 @@ WifiErrorNo HdiP2pInvite(const char *peerBssid, const char *goBssid, const char 
 WifiErrorNo HdiP2pReinvoke(int networkId, const char *bssid)
 {
     LOGI("HdiP2pReinvoke enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pReinvoke: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pReinvoke(wpaObj, GetHdiP2pIfaceName(), networkId, bssid);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pReinvoke: P2pReinvoke failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pReinvoke success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -767,18 +850,21 @@ WifiErrorNo HdiP2pReinvoke(int networkId, const char *bssid)
 WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress, int size)
 {
     LOGI("HdiP2pGetDeviceAddress enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pGetDeviceAddress: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pGetDeviceAddress(wpaObj, GetHdiP2pIfaceName(), deviceAddress, size);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetDeviceAddress: P2pGetDeviceAddress failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pGetDeviceAddress success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -786,9 +872,11 @@ WifiErrorNo HdiP2pGetDeviceAddress(char *deviceAddress, int size)
 WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char *replyDisc, int size)
 {
     LOGI("HdiP2pReqServiceDiscovery enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pReqServiceDiscovery: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
@@ -796,9 +884,10 @@ WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char 
         replyDisc, size);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pReqServiceDiscovery: P2pReqServiceDiscovery failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pReqServiceDiscovery success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -806,18 +895,21 @@ WifiErrorNo HdiP2pReqServiceDiscovery(struct HdiP2pReqService *reqService, char 
 WifiErrorNo HdiP2pCancelServiceDiscovery(const char *id)
 {
     LOGI("HdiP2pCancelServiceDiscovery enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pCancelServiceDiscovery: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pCancelServiceDiscovery(wpaObj, GetHdiP2pIfaceName(), id);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pCancelServiceDiscovery: P2pCancelServiceDiscovery failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pCancelServiceDiscovery success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -825,18 +917,21 @@ WifiErrorNo HdiP2pCancelServiceDiscovery(const char *id)
 WifiErrorNo HdiP2pRespServerDiscovery(struct HdiP2pServDiscReqInfo *info)
 {
     LOGI("HdiP2pRespServerDiscovery enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pRespServerDiscovery: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pRespServerDiscovery(wpaObj, GetHdiP2pIfaceName(), info);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pRespServerDiscovery: P2pRespServerDiscovery failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pRespServerDiscovery success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -894,9 +989,11 @@ static int hwaddr_aton(char *txt, uint8_t *addr)
 WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin, int size)
 {
     LOGI("HdiP2pConnect enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pConnect: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     struct HdiP2pConnectInfo wpsParam = {0};
@@ -914,9 +1011,10 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin, int size)
     int32_t result = wpaObj->P2pConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam, replyPin, size - 1);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pConnect: P2pConnect failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pConnect success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -924,9 +1022,11 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin, int size)
 WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
 {
     LOGI("HdiP2pHid2dConnect enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pHid2dConnect: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     struct HdiHid2dConnectInfo wpsParam = {0};
@@ -942,9 +1042,10 @@ WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
     int32_t result = wpaObj->P2pHid2dConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pHid2dConnect: P2pHid2dConnect failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pHid2dConnect success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -952,18 +1053,21 @@ WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
 WifiErrorNo HdiP2pSetServDiscExternal(int mode)
 {
     LOGI("HdiP2pSetServDiscExternal enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSetServDiscExternal: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSetServDiscExternal(wpaObj, GetHdiP2pIfaceName(), mode);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSetServDiscExternal: P2pSetServDiscExternal failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSetServDiscExternal success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -971,18 +1075,21 @@ WifiErrorNo HdiP2pSetServDiscExternal(int mode)
 WifiErrorNo HdiP2pRemoveGroup(const char *groupName)
 {
     LOGI("HdiP2pRemoveGroup enter groupName=%{public}s", groupName);
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pRemoveGroup: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pRemoveGroup(wpaObj, GetHdiP2pIfaceName(), groupName);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pRemoveGroup: P2pRemoveGroup failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pRemoveGroup success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -990,18 +1097,21 @@ WifiErrorNo HdiP2pRemoveGroup(const char *groupName)
 WifiErrorNo HdiP2pCancelConnect()
 {
     LOGI("HdiP2pCancelConnect enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pCancelConnect: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pCancelConnect(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pCancelConnect: P2pCancelConnect failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pCancelConnect success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -1009,9 +1119,11 @@ WifiErrorNo HdiP2pCancelConnect()
 WifiErrorNo HdiP2pGetGroupConfig(int networkId, char *param, char *value)
 {
     LOGI("HdiP2pGetGroupConfig enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pGetGroupConfig: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
@@ -1019,9 +1131,10 @@ WifiErrorNo HdiP2pGetGroupConfig(int networkId, char *param, char *value)
         param, value, WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetGroupConfig: P2pGetGroupConfig failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pGetGroupConfig success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -1029,18 +1142,21 @@ WifiErrorNo HdiP2pGetGroupConfig(int networkId, char *param, char *value)
 WifiErrorNo HdiP2pAddNetwork(int *networkId)
 {
     LOGI("HdiP2pAddNetwork enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pAddNetwork: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pAddNetwork(wpaObj, GetHdiP2pIfaceName(), networkId);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pAddNetwork: P2pAddNetwork failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pAddNetwork success networkId=%{public}d.", *networkId);
     return WIFI_HAL_OPT_OK;
 }
@@ -1048,18 +1164,21 @@ WifiErrorNo HdiP2pAddNetwork(int *networkId)
 WifiErrorNo HdiP2pGetPeer(const char *bssid, struct HdiP2pDeviceInfo *info)
 {
     LOGI("HdiP2pGetPeer enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pGetPeer: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pGetPeer(wpaObj, GetHdiP2pIfaceName(), bssid, info);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetPeer: P2pGetPeer failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pGetPeer success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -1067,18 +1186,21 @@ WifiErrorNo HdiP2pGetPeer(const char *bssid, struct HdiP2pDeviceInfo *info)
 WifiErrorNo HdiP2pGetGroupCapability(const char *bssid, int cap)
 {
     LOGI("HdiP2pGetGroupCapability enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pGetGroupCapability: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pGetGroupCapability(wpaObj, GetHdiP2pIfaceName(), bssid, &cap);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pGetGroupCapability: P2pGetGroupCapability failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pGetGroupCapability success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -1086,18 +1208,21 @@ WifiErrorNo HdiP2pGetGroupCapability(const char *bssid, int cap)
 WifiErrorNo HdiP2pListNetworks(struct HdiP2pNetworkList *infoList)
 {
     LOGI("HdiP2pListNetworks enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pListNetworks: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pListNetworks(wpaObj, GetHdiP2pIfaceName(), infoList);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pListNetworks: P2pListNetworks failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pListNetworks success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -1105,18 +1230,21 @@ WifiErrorNo HdiP2pListNetworks(struct HdiP2pNetworkList *infoList)
 WifiErrorNo HdiP2pSaveConfig()
 {
     LOGI("HdiP2pSaveConfig enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiP2pSaveConfig: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->P2pSaveConfig(wpaObj, GetHdiP2pIfaceName());
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pSaveConfig: P2pSaveConfig failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pSaveConfig success.");
     return WIFI_HAL_OPT_OK;
 }
@@ -1124,18 +1252,21 @@ WifiErrorNo HdiP2pSaveConfig()
 WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData)
 {
     LOGI("HdiDeliverP2pData enter");
+    pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         LOGE("HdiDeliverP2pData: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t result = wpaObj->DeliverP2pData(wpaObj, "p2p0", cmdType, dataType, carryData);
     if (result != HDF_SUCCESS) {
         LOGE("HdiDeliverP2pData: send failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
-
+    pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiDeliverP2pData success.");
     return WIFI_HAL_OPT_OK;
 }

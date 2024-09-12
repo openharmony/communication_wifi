@@ -293,8 +293,7 @@ public:
     virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) = 0;
 
     /**
-     * @Description set tx power for sar.
-     *
+     * @Description set tx power for sar
      * @param power - 1001 1002 1003······
      * @return ErrCode - operation result
      */

@@ -20,6 +20,7 @@
 #include <string>
 #include <unistd.h>
 #include <vector>
+#include <mutex>
 #include "wifi_config_file_spec.h"
 #include "wifi_log.h"
 #ifdef FEATURE_ENCRYPTION_SUPPORT
@@ -108,7 +109,29 @@ public:
     /**
      * @Description read ini config file, need call SetConfigFilePath first
      */
-    void ReadFile(std::istream &fs);
+    void ReadFile(std::istream &fs)
+    {
+        std::lock_guard<std::mutex> lock(valueMutex_);
+        mValues.clear();
+        T item;
+        std::string line;
+        int configError;
+        while (std::getline(fs, line)) {
+            TrimString(line);
+            if (line.empty()) {
+                continue;
+            }
+            if (line[0] == '[' && line[line.length() - 1] == '{') {
+                ClearTClass(item); /* template function, needing specialization */
+                configError = ReadNetwork(item, fs, line);
+                if (configError > 0) {
+                    LOGE("Parse network failed.");
+                    continue;
+                }
+                mValues.push_back(item);
+            }
+        }
+    }
 
     /**
      * @Description read and parses the ini config file, need call SetConfigFilePath first
@@ -124,7 +147,52 @@ public:
      *
      * @return int - 0 Success; -1 Failed
      */
-    int SaveConfig();
+    int SaveConfig()
+    {
+        if (mFileName.empty()) {
+            LOGE("File name is empty.");
+            return -1;
+        }
+        FILE* fp = fopen(mFileName.c_str(), "w");
+        if (!fp) {
+            LOGE("Save config file: %{public}s, fopen() failed!", mFileName.c_str());
+            return -1;
+        }
+        std::string content;
+        std::lock_guard<std::mutex> lock(valueMutex_);
+        {
+            std::ostringstream ss;
+            LOGI("Save config:%{public}s size:%{public}d", GetTClassName<T>().c_str(),
+                static_cast<int>(mValues.size()));
+            for (std::size_t i = 0; i < mValues.size(); ++i) {
+                T &item = mValues[i];
+                /*
+                * here use template function GetTClassName OutTClassString, needing
+                * specialization.
+                */
+                ss << "[" << GetTClassName<T>() << "_" << (i + 1) << "] {" << std::endl;
+                ss << OutTClassString(item) << std::endl;
+                ss << "}" << std::endl;
+            }
+            content = ss.str();
+        }
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        if (mSetEncryption) {
+            WifiLoopEncrypt(mEncryptionInfo, content, mEncry);
+            std::fill(content.begin(), content.end(), 0);
+            content = mEncry.encryptedPassword;
+        }
+#endif
+        size_t ret = fwrite(content.c_str(), 1, content.length(), fp);
+        if (ret != content.length()) {
+            LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());
+        }
+        (void)fflush(fp);
+        (void)fsync(fileno(fp));
+        (void)fclose(fp);
+        mValues.clear(); /* clear values */
+        return 0;
+    }
 
     /**
      * @Description Get config values
@@ -132,14 +200,23 @@ public:
      * @param results - output config values
      * @return int - 0 Success, -1 Failed
      */
-    int GetValue(std::vector<T> &results);
+    int GetValue(std::vector<T> &results)
+    {
+        std::lock_guard<std::mutex> lock(valueMutex_);
+        std::swap(results, mValues);
+        return 0;
+    }
 
     /**
      * @Description Get config values
      *
      * @return config values
      */
-    const std::vector<T>& GetValue() const;
+    const std::vector<T>& GetValue()
+    {
+        std::lock_guard<std::mutex> lock(valueMutex_);
+        return mValues;
+    }
 
     /**
      * @Description Set the config value
@@ -147,12 +224,18 @@ public:
      * @param values - input config values
      * @return int - 0 Success, -1 Failed
      */
-    int SetValue(const std::vector<T> &values);
+    int SetValue(const std::vector<T> &values)
+    {
+        std::lock_guard<std::mutex> lock(valueMutex_);
+        mValues = values;
+        return 0;
+    }
 
 private:
     std::string mFileName;
     std::vector<T> mValues;
     bool mSetEncryption;
+    std::mutex valueMutex_;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     WifiEncryptionInfo mEncryptionInfo;
     EncryptedData mEncry;
@@ -250,30 +333,6 @@ int WifiConfigFileImpl<T>::ReadNetwork(T &item, std::istream &fs, std::string &l
 }
 
 template<typename T>
-void WifiConfigFileImpl<T>::ReadFile(std::istream &fs)
-{
-    mValues.clear();
-    T item;
-    std::string line;
-    int configError;
-    while (std::getline(fs, line)) {
-        TrimString(line);
-        if (line.empty()) {
-            continue;
-        }
-        if (line[0] == '[' && line[line.length() - 1] == '{') {
-            ClearTClass(item); /* template function, needing specialization */
-            configError = ReadNetwork(item, fs, line);
-            if (configError > 0) {
-                LOGE("Parse network failed.");
-                continue;
-            }
-            mValues.push_back(item);
-        }
-    }
-}
-
-template<typename T>
 int WifiConfigFileImpl<T>::LoadConfig()
 {
     if (mFileName.empty()) {
@@ -300,75 +359,6 @@ int WifiConfigFileImpl<T>::LoadConfig()
     ReadFile(fs);
 #endif
     fs.close();
-    return 0;
-}
-
-template<typename T>
-int WifiConfigFileImpl<T>::SaveConfig()
-{
-    if (mFileName.empty()) {
-        LOGE("File name is empty.");
-        return -1;
-    }
-    FILE* fp = fopen(mFileName.c_str(), "w");
-    if (!fp) {
-        LOGE("Save config file: %{public}s, fopen() failed!", mFileName.c_str());
-        return -1;
-    }
-    std::string content;
-    {
-        std::ostringstream ss;
-        LOGI("Save config:%{public}s size:%{public}d", GetTClassName<T>().c_str(), static_cast<int>(mValues.size()));
-        for (std::size_t i = 0; i < mValues.size(); ++i) {
-            T &item = mValues[i];
-            /*
-            * here use template function GetTClassName OutTClassString, needing
-            * specialization.
-            */
-            ss << "[" << GetTClassName<T>() << "_" << (i + 1) << "] {" << std::endl;
-            ss << OutTClassString(item) << std::endl;
-            ss << "}" << std::endl;
-        }
-        content = ss.str();
-    }
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-    if (mSetEncryption) {
-        WifiLoopEncrypt(mEncryptionInfo, content, mEncry);
-        std::fill(content.begin(), content.end(), 0);
-        content = mEncry.encryptedPassword;
-    }
-#endif
-    size_t ret = fwrite(content.c_str(), 1, content.length(), fp);
-    if (ret != content.length()) {
-        LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());
-    }
-    (void)fflush(fp);
-    (void)fsync(fileno(fp));
-    (void)fclose(fp);
-    mValues.clear(); /* clear values */
-    return 0;
-}
-
-template<typename T>
-int WifiConfigFileImpl<T>::GetValue(std::vector<T> &results)
-{
-    /*
-     * swap, WifiConfigFileImpl not saved this config when next use, call LoadConfig first
-     */
-    std::swap(results, mValues);
-    return 0;
-}
-
-template <typename T>
-const std::vector<T>& WifiConfigFileImpl<T>::GetValue() const
-{
-    return mValues;
-}
-
-template <typename T>
-int WifiConfigFileImpl<T>::SetValue(const std::vector<T> &results)
-{
-    mValues = results;
     return 0;
 }
 }  // namespace Wifi

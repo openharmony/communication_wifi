@@ -249,7 +249,6 @@ private:
     void SetRandomMac() const;
     bool SetCountry();
     void ProcessCmdHotspotChannelChanged(InternalMessagePtr msg);
-    void ProcessCmdAssociatedStaChanged(InternalMessagePtr msg);
 
 private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result
@@ -265,7 +264,6 @@ private:
     int m_id;
     bool idleTimerExist = false;
     mutable std::string m_wifiCountryCode;
-    std::set<std::string> curAssocMacList;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -404,6 +404,14 @@ public:
      */
     virtual bool IsRemoteDied(void) = 0;
 
+    /**
+     * @Description Hid2d Is Wide Bandwidth Supported
+     *
+     * @param isSupport - is support 160M
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiP2pService");
 };

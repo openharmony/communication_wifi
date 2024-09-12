@@ -42,6 +42,7 @@
 #include "wifi_net_stats_manager.h"
 #endif // OHOS_ARCH_LITE
 
+#include "wifi_channel_helper.h"
 #ifndef OHOS_WIFI_STA_TEST
 #else
 #include "mock_dhcp_service.h"
@@ -50,6 +51,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
+constexpr int MAX_CHLOAD = 800;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
@@ -907,7 +909,7 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_COM_STA_ENABLE_HILINK] = &StaStateMachine::DealHiLinkDataToWpa;
     staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_DELIVER_MAC] = &StaStateMachine::DealHiLinkDataToWpa;
     staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS] = &StaStateMachine::DealHiLinkDataToWpa;
-
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = &StaStateMachine::DealWpaStateChange;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1204,6 +1206,8 @@ void StaStateMachine::HilinkSaveConfig(void)
     }
     WifiSettings::GetInstance().AddDeviceConfig(m_hilinkDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
+
+    WifiConfigCenter::GetInstance().SetMacAddress(m_hilinkDeviceConfig.macAddress, m_instId);
     m_hilinkFlag = false;
 }
 
@@ -1242,6 +1246,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = true;
         NetSupplierInfo->isRoaming_ = isRoam;
+        NetSupplierInfo->ident_ = std::to_string(linkedInfo.networkId);
         WIFI_LOGI("On connect update net supplier info\n");
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
     }
@@ -1257,12 +1262,8 @@ void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
 void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
 {
     LOGI("Enter DealDisconnectEvent.\n");
-    if (msg == nullptr) {
-        WIFI_LOGE("msg is null\n");
-        return;
-    }
-    if (wpsState != SetupMethod::INVALID) {
-        WIFI_LOGE("wpsState is INVALID\n");
+    if (msg == nullptr || wpsState != SetupMethod::INVALID) {
+        WIFI_LOGE("msg is null or wpsState is INVALID, wpsState:%{public}d", static_cast<int>(wpsState));
         return;
     }
     std::string bssid;
@@ -1274,6 +1275,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
 #ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = false;
+        NetSupplierInfo->ident_ = "";
         WIFI_LOGI("On disconnect update net supplier info\n");
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
     }
@@ -2735,6 +2737,7 @@ void StaStateMachine::DisConnectProcess()
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
+            NetSupplierInfo->ident_ = "";
             WIFI_LOGI("Disconnect process update netsupplierinfo");
             WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
         }
@@ -3208,7 +3211,9 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
 void StaStateMachine::HandlePortalNetworkPorcess()
 {
 #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("portal uri is %{public}s\n", mPortalUrl.c_str());
+    if (mPortalUrl.empty()) {
+        WIFI_LOGE("portal uri is nullptr\n");
+    }
     int netId = m_NetWorkState->GetWifiNetId();
     AAFwk::Want want;
     want.SetAction(PORTAL_ACTION);
@@ -3520,7 +3525,6 @@ void StaStateMachine::HilinkSetMacAddress(std::string &cmd)
     }
 
     m_hilinkDeviceConfig.macAddress = macAddress;
-    WifiConfigCenter::GetInstance().SetMacAddress(macAddress, m_instId);
     std::string realMacAddress = "";
 
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
@@ -3581,6 +3585,17 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessagePtr msg)
     }
 }
 
+void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        LOGE("DealWpaStateChange InternalMessage msg is null.");
+        return;
+    }
+    int status = msg->GetParam1();
+    LOGI("DealWpaStateChange status: %{public}d", status);
+    linkedInfo.supplicantState = static_cast<SupplicantState>(status);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+}
 /* --------------------------- state machine Roaming State ------------------------------ */
 StaStateMachine::ApRoamingState::ApRoamingState(StaStateMachine *staStateMachine)
     : State("ApRoamingState"), pStaStateMachine(staStateMachine)
@@ -4163,8 +4178,10 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
 #ifndef OHOS_ARCH_LITE
         WifiDeviceConfig config;
         WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
-        WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
-            pStaStateMachine->GetInstanceId());
+        if (!ipv6Info.primaryDns.empty()) {
+            WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
+                pStaStateMachine->GetInstanceId());
+        }
 #endif
     } else {
         LOGI("TryToSaveIpV6Result not UpdateNetLinkInfo");
@@ -4287,19 +4304,6 @@ void StaStateMachine::OnNetManagerRestart(void)
     WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo, m_instId);
 }
 
-void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo)
-{
-    LOGI("ReUpdateNetSupplierInfo()");
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)) {
-        if (supplierInfo != nullptr) {
-            TimeStats timeStats("Call UpdateNetSupplierInfo");
-            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(supplierInfo);
-        }
-    }
-}
-
 void StaStateMachine::ReUpdateNetLinkInfo(const WifiDeviceConfig &config)
 {
     WifiLinkedInfo linkedInfo;
@@ -4354,9 +4358,15 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
 {
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     if (networkStatusHistoryInserted) {
-        NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
-        WIFI_LOGI("After updated, current network status history is %{public}s.",
-                  NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+        if (IsGoodSignalQuality() || (networkStatus == NetworkStatus::HAS_INTERNET) ||
+            (networkStatus == NetworkStatus::PORTAL)) {
+            NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
+            WIFI_LOGI("After updated, current network status history is %{public}s.",
+                      NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+        } else {
+            WIFI_LOGI("No updated, current network status history is %{public}s.",
+                NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str());
+        }
     } else {
         NetworkStatusHistoryManager::Insert(wifiDeviceConfig.networkStatusHistory, networkStatus);
         networkStatusHistoryInserted = true;
@@ -4408,6 +4418,25 @@ void StaStateMachine::SetConnectMethod(int connectMethod)
     WIFI_LOGI("SetConnectMethod %{public}s,connectMethod:%{public}d",
         retStr.c_str(), connectMethod);
     return;
+}
+
+bool StaStateMachine::IsGoodSignalQuality()
+{
+    const WifiLinkedInfo singalInfo = linkedInfo;
+    bool isGoodSignal = true;
+    if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency)) {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_5G) {
+            isGoodSignal = false;
+        }
+    } else {
+        if (singalInfo.rssi <= RSSI_LEVEL_1_2G) {
+            isGoodSignal = false;
+        }
+    }
+    if (singalInfo.chload >= MAX_CHLOAD) {
+        isGoodSignal = false;
+    }
+    return isGoodSignal;
 }
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SetEnhanceService(IEnhanceService* enhanceService)

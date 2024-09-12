@@ -166,9 +166,6 @@ void WifiEventSubscriberManager::HandleAppMgrServiceChange(bool add)
 
 void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbilityId, bool add)
 {
-    if (!add) {
-        return;
-    }
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
         if (pService != nullptr) {

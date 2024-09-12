@@ -40,6 +40,17 @@ ApMonitor::~ApMonitor()
     StopMonitor();
 }
 
+void ApMonitor::DealStaJoinOrLeave(const StationInfo &info, ApStatemachineEvent event)
+{
+    std::any anySta = info;
+    WIFI_LOGI("StationChangeEvent  event: [%{public}d(join=3,leave=4)] %{public}s . %{private}s . %{private}s.,",
+        event,
+        info.deviceName.c_str(),
+        MacAnonymize(info.bssid).c_str(),
+        IpAnonymize(info.ipAddr).c_str());
+    SendMessage(m_selectIfacName, event, 0, 0, anySta);
+}
+
 void ApMonitor::OnStaJoinOrLeave(const WifiHalApConnectionNofify &cbInfo)
 {
     StationInfo info;
@@ -48,13 +59,12 @@ void ApMonitor::OnStaJoinOrLeave(const WifiHalApConnectionNofify &cbInfo)
     info.deviceName = GETTING_INFO;
     info.ipAddr = GETTING_INFO;
     int event = cbInfo.type;
-    std::any anySta = info;
-    WIFI_LOGI("StationChangeEvent  event: [%{public}d(join=105)] %{public}s . %{private}s . %{private}s.,",
-        event,
-        info.deviceName.c_str(),
-        MacAnonymize(info.bssid).c_str(),
-        IpAnonymize(info.ipAddr).c_str());
-    SendMessage(m_selectIfacName, ApStatemachineEvent::CMD_ASSOCIATED_STATIONS_CHANGED, event, 0, anySta);
+    if (event == HAL_CBK_CMD_STA_JOIN) {
+        DealStaJoinOrLeave(info, ApStatemachineEvent::CMD_STATION_JOIN);
+    }
+    if (event == HAL_CBK_CMD_STA_LEAVE) {
+        DealStaJoinOrLeave(info, ApStatemachineEvent::CMD_STATION_LEAVE);
+    }
 }
 
 void ApMonitor::OnHotspotStateEvent(int state) const

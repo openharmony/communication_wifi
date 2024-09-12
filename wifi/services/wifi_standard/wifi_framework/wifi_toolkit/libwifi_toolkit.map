@@ -80,6 +80,8 @@
         "*CloudAssetSyn*";
         "*WifiAssetManager*GetInstance*";
         "*InitUpLoadLocalDeviceSync*";
+        "*WifiAssetTriggerSync*";
+        "*SetDeviceAfterDisconnect*";
     local:
         *;
 };

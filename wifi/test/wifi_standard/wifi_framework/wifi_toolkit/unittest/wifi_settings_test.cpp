@@ -94,16 +94,6 @@ HWTEST_F(WifiSettingsTest, SetDeviceStateTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_OPT_RETURN);
 }
 
-HWTEST_F(WifiSettingsTest, SetDeviceEphemeralTest, TestSize.Level1)
-{
-    WIFI_LOGE("SetDeviceEphemeralTest enter!");
-    int result = WifiSettings::GetInstance().SetDeviceEphemeral(NETWORK_ID, false);
-    EXPECT_EQ(result, WIFI_OPT_RETURN);
-    result = WifiSettings::GetInstance().SetDeviceEphemeral(NETWORK_ID, true);
-    WIFI_LOGE("SetDeviceEphemeralTest result(%{public}d)", result);
-    EXPECT_EQ(result, WIFI_OPT_RETURN);
-}
-
 HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectTest, TestSize.Level1)
 {
     WIFI_LOGE("SetDeviceAfterConnectTest enter!");

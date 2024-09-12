@@ -35,6 +35,7 @@ void P2pIdleState::GoInState()
     hasConnect = false;
     Init();
     WIFI_LOGI("             GoInState");
+    p2pStateMachine.StopP2pDhcpClient();
     p2pStateMachine.ClearGroup();
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
     p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE), P2P_REMOVE_DEVICE_TIMEOUT);

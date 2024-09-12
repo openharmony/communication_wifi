@@ -44,7 +44,7 @@ ErrCode StaMonitor::InitStaMonitor()
         std::bind(&StaMonitor::OnConnectChangedCallBack, this, _1, _2, _3),
         std::bind(&StaMonitor::OnBssidChangedCallBack, this, _1, _2),
         std::bind(&StaMonitor::OnWpaStateChangedCallBack, this, _1),
-        std::bind(&StaMonitor::OnWpaSsidWrongKeyCallBack, this, _1),
+        std::bind(&StaMonitor::OnWpaSsidWrongKeyCallBack, this),
         std::bind(&StaMonitor::OnWpsPbcOverlapCallBack, this, _1),
         std::bind(&StaMonitor::OnWpsTimeOutCallBack, this, _1),
         std::bind(&StaMonitor::OnWpaAuthTimeOutCallBack, this),
@@ -207,18 +207,14 @@ void StaMonitor::OnWpaStateChangedCallBack(int status)
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT, status);
 }
 
-void StaMonitor::OnWpaSsidWrongKeyCallBack(int status)
+void StaMonitor::OnWpaSsidWrongKeyCallBack()
 {
-    WIFI_LOGI("OnWpaSsidWrongKeyCallBack() status:%{public}d\n", status);
+    WIFI_LOGI("OnWpaSsidWrongKeyCallBack");
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
 
-    if (status != 1) {
-        WIFI_LOGE("OnWpaSsidWrongKeyCallBack error.");
-        return;
-    }
     /* Notification state machine wpa password wrong event. */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
 }

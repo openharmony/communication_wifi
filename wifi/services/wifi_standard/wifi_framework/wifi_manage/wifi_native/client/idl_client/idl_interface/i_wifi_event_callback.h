@@ -29,7 +29,7 @@ typedef struct IWifiEventCallback {
     void (*onConnectChanged)(int status, int networkId, const char *bssid);
     void (*onBssidChanged)(const char *reason, const char *bssid);
     void (*onWpaStateChanged)(int status);
-    void (*onSsidWrongkey)(int status);
+    void (*onSsidWrongkey)(void);
     void (*onWpsOverlap)(int status);
     void (*onWpsTimeOut)(int status);
     void (*onWpsConnectionFull)(int status);

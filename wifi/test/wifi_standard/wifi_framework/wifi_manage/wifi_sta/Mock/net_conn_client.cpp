@@ -67,7 +67,7 @@ int32_t NetConnClient::GetNetCapabilities(const NetHandle &netHandle, NetAllCapa
 
 int32_t NetConnClient::GetDefaultNet(NetHandle &netHandle)
 {
-    return NETMANAGER;    
+    return NETMANAGER;
 }
 
 int32_t NetConnClient::NetDetection(const NetHandle &netHandle)

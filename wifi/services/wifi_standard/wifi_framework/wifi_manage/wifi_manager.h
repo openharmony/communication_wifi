@@ -139,7 +139,6 @@ private:
     long mSupportedFeatures;
     std::unique_ptr<WifiEventHandler> mCloseServiceThread = nullptr;
     std::unique_ptr<WifiEventHandler> mStartServiceThread = nullptr;
-    std::unique_ptr<WifiEventHandler> mStartServiceExtThread = nullptr;
     std::unique_ptr<WifiStaManager> wifiStaManager = nullptr;
     std::unique_ptr<WifiScanManager> wifiScanManager = nullptr;
     std::unique_ptr<WifiTogglerManager> wifiTogglerManager = nullptr;

@@ -20,6 +20,7 @@
 namespace OHOS {
 namespace Wifi {
 
+
 WifiScanConfig &WifiScanConfig::GetInstance()
 {
     static WifiScanConfig gWifiScanConfig;

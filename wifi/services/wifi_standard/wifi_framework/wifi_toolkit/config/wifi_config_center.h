@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 
 class WifiConfigCenter {

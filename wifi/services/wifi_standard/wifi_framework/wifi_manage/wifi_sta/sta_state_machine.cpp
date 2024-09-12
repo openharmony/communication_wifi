@@ -117,9 +117,10 @@ StaStateMachine::StaStateMachine(int instId)
       pDhcpResultNotify(nullptr), pRootState(nullptr), pInitState(nullptr), pWpaStartingState(nullptr),
       pWpaStartedState(nullptr), pWpaStoppingState(nullptr), pLinkState(nullptr), pSeparatingState(nullptr),
       pSeparatedState(nullptr), pApLinkedState(nullptr), pWpsState(nullptr), pGetIpState(nullptr),
-      pLinkedState(nullptr), pApRoamingState(nullptr), m_instId(instId), mLastConnectNetId(INVALID_NETWORK_ID),
+      pLinkedState(nullptr), pApRoamingState(nullptr), mLastConnectNetId(INVALID_NETWORK_ID),
       mConnectFailedCnt(0)
 {
+    m_instId = instId;
     WIFI_LOGI("StaStateMachine constructor instId %{public}d ", instId);
 }
 
@@ -2014,8 +2015,6 @@ static bool SetMacToHal(const std::string &currentMac, const std::string &realMa
         return false;
     }
     bool isRealMac = currentMac == realMac;
-    LOGI("%{public}s randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}!", __func__,
-        isRealMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     std::string actualConfiguredMac = currentMac;
     if (!isRealMac && instId == 1) {
         if (!WifiRandomMacHelper::GetWifi2RandomMac(actualConfiguredMac)) {
@@ -3560,7 +3559,7 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function. m_instId = %{public}d", pStaStateMachine->m_instId);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
-    if (pStaStateMachine->GetInstId() == ISTID_WLAN0) {
+    if (pStaStateMachine->m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
             pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);
@@ -3569,8 +3568,8 @@ void StaStateMachine::LinkedState::GoInState()
         }
 #endif
     } else {
-        pStaStateMachine->SaveDiscReason(DisconnectReason::DISC_REASON_DEFAULT);
-        pStaStateMachine->SaveLinkState(ConnState::CONNECTED, DetailState::CONNECTED);
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
+        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
     }
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
@@ -3659,7 +3658,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
     return ret;
 }
 
-bool StaStateMachine::linkedState::HandleBssidChanged(InternalMessagePtr msg)
+bool StaStateMachine::LinkedState::HandleBssidChanged(InternalMessagePtr msg)
 {
     std::string reason = msg->GetStringFromMessage();
     std::string bssid = msg->GetStringFromMessage();
@@ -3806,7 +3805,7 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessagePtr msg)
     }
 
     WIFI_LOGI("ApRoamingState, reveived msgCode=%{public}d msg. m_instId = %{public}d",
-        msg->GetMessageName(), pStaStateMachine->GetInstId());
+        msg->GetMessageName(), pStaStateMachine->m_instId);
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
@@ -3838,8 +3837,7 @@ bool StaStateMachine::ApRoamingState::HandleNetworkConnectionEvent(InternalMessa
     bool ret = EXECUTED;
     std::string bssid = msg->GetStringFromMessage();
     if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
-        WIFI_LOGE("ApRoamingState inconsistent bssid in connecter m_instId = %{public}d"
-            pStaStateMachine->GetInstId());
+        WIFI_LOGE("ApRoamingState inconsistent bssid in connecter m_instId = %{public}d", m_instId);
         ret = NOT_EXECUTED;
     }
     pStaStateMachine->isRoam = true;
@@ -4546,11 +4544,6 @@ void StaStateMachine::HandlePostDhcpSetup()
     WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true);
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
-}
-
-int StaStateMachine::GetInstId()
-{
-    return m_instId;
 }
 
 WifiDeviceConfig StaStateMachine::getCurrentWifiDeviceConfig()

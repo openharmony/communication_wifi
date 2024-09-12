@@ -2840,7 +2840,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     /* BSSID change is not received during roaming, only set BSSID */
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
-        WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0)) != WIFI_HAL_OPT_OK) {
+        WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId)) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetBssid return fail.");
     }
 }
@@ -3744,7 +3744,7 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessagePtr msg)
         case WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS: {
             LOGI("DealHiLinkTriggerWps start ClearDeviceConfig");
             WifiStaHalInterface::GetInstance().ClearDeviceConfig(
-                WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
+                WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId));
 
             LOGI("DealHiLinkTriggerWps SPECIAL_CONNECTED");
             InvokeOnStaConnChanged(OperateResState::SPECIAL_CONNECTED, linkedInfo);
@@ -3915,7 +3915,7 @@ void StaStateMachine::GetDeviceCfgInfo(const std::string &bssid, WifiDeviceConfi
     WifiHalGetDeviceConfig config;
     config.networkId = WPA_DEFAULT_NETWORKID;
     config.param = "ssid";
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0);
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (WifiStaHalInterface::GetInstance().GetDeviceConfig(config, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGI("GetDeviceConfig failed!");
     }

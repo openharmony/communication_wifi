@@ -2027,7 +2027,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (currentNetworkID == iter->second.networkId) {
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
-            LOGD("UpdateWifiConfigFromCloud, connected network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
+            LOGI("UpdateWifiConfigFromCloud, connected network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
             continue;
         }
         if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
@@ -2054,7 +2054,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
-        LOGD("UpdateWifiConfigFromCloud new %{public}s", SsidAnonymize(iter.ssid).c_str());
+        LOGI("UpdateWifiConfigFromCloud new %{public}s", SsidAnonymize(iter.ssid).c_str());
         tempConfigs.emplace(std::make_pair(mNetworkId, iter));
         mNetworkId++;
     }

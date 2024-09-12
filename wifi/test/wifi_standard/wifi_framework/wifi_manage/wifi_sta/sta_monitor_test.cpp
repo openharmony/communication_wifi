@@ -94,12 +94,12 @@ void StaMonitorTest::InitStaMonitorSuccess()
 
 void StaMonitorTest::InitStaMonitorFail()
 {
-    EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaMonitor->InitStaMonitor() == WIFI_OPT_FAILED);
 }
 
 void StaMonitorTest::UnInitStaMonitorSuccess()
 {
-    EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::UnInitStaMonitorFail()

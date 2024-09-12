@@ -31,6 +31,12 @@ DEFINE_WIFILOG_LABEL("MultiGateway");
 constexpr int32_t DEFAULT_ARP_TIMEOUT_MS = 1000;
 constexpr uint32_t MULTI_GATEWAY_NUM = 2;
 constexpr int32_t MAC_ADDRESS_LENGTH = 6;
+constexpr int32_t MAC_INDEX_0 = 0;
+constexpr int32_t MAC_INDEX_1 = 1;
+constexpr int32_t MAC_INDEX_2 = 2;
+constexpr int32_t MAC_INDEX_3 = 3;
+constexpr int32_t MAC_INDEX_4 = 4;
+constexpr int32_t MAC_INDEX_5 = 5;
 
 MultiGateway::MultiGateway() : m_currentIdx(0)
 {
@@ -96,7 +102,10 @@ int32_t MultiGateway::SetStaticArp(const std::string& iface, const std::string& 
         return -1;
     }
 
-    (void)memset_s(&req, sizeof(struct arpreq), 0, sizeof(struct arpreq));
+    if (memset_s(&req, sizeof(struct arpreq), 0, sizeof(struct arpreq)) != EOK) {
+        WIFI_LOGE("DelStaticArp memset_s err");
+        return -1;
+    }
     sin = reinterpret_cast<struct sockaddr_in *>(&req.arp_pa);
     sin->sin_family = AF_INET;
     sin->sin_addr.s_addr = inet_addr(ipAddr.c_str());
@@ -122,7 +131,10 @@ int32_t MultiGateway::DelStaticArp(const std::string& iface, const std::string& 
         return -1;
     }
 
-    (void)memset_s(&req, sizeof(struct arpreq), 0, sizeof(struct arpreq));
+    if (memset_s(&req, sizeof(struct arpreq), 0, sizeof(struct arpreq)) != EOK) {
+        WIFI_LOGE("DelStaticArp memset_s err");
+        return -1;
+    }
     struct sockaddr_in *sin = reinterpret_cast<struct sockaddr_in *>(&req.arp_pa);
     sin->sin_family = AF_INET;
     sin->sin_addr.s_addr = inet_addr(ipAddr.c_str());
@@ -162,8 +174,8 @@ int32_t MultiGateway::GetMacAddr(char *buff, const char *macAddr)
         return -1;
     }
 
-    if (sscanf_s(macAddr, "%x:%x:%x:%x:%x:%x", &addr[0], &addr[1], &addr[2], &addr[3], &addr[4], &addr[5]) <
-        MAC_ADDRESS_LENGTH) {  // 0、1、2、3、4、5 is mac index
+    if (sscanf_s(macAddr, "%x:%x:%x:%x:%x:%x", &addr[MAC_INDEX_0], &addr[MAC_INDEX_1], &addr[MAC_INDEX_2],
+        &addr[MAC_INDEX_3], &addr[MAC_INDEX_4], &addr[MAC_INDEX_5]) < MAC_ADDRESS_LENGTH) {
         WIFI_LOGE("sscanf_s macAddr err");
         return -1;
     }

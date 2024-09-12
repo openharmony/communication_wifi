@@ -30,7 +30,7 @@ namespace OHOS {
 namespace Wifi {
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {
-    WIFI_LOGI("StaMonitor constuctor insId %{public}d", insId);
+    WIFI_LOGI("StaMonitor constuctor insId %{public}d", instId);
 }
 
 StaMonitor::~StaMonitor()
@@ -58,7 +58,7 @@ ErrCode StaMonitor::InitStaMonitor()
         [this](int reason, const std::string &bssid) { this->OnReportDisConnectReasonCallBack(reason, bssid); },
     };
 
-    std:string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("InitStaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
@@ -70,7 +70,7 @@ NO_SANITIZE("cfi") ErrCode StaMonitor::UnInitStaMonitor() const
 {
     WIFI_LOGI("Enter UnInitStaMonitor.\n");
     WifiEventCallback callBack;
-    std:string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("~StaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
@@ -110,12 +110,8 @@ void StaMonitor::OnReportDisConnectReasonCallBack(int reason, const std::string 
 
 void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::string &bssid)
 {
-    WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid=%{public}s, m_instId
-    =%{public}d",
-        status,
-        networkId,
-        MacAnonymize(bssid).c_str(),
-        m_instId);
+    WIFI_LOGI("OnConnectChangedCallBack status:%{public}d, networkId=%{public}d, bssid=%{public}s,
+        m_instId=%{public}d", status, networkId, MacAnonymize(bssid).c_str(), m_instId);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;

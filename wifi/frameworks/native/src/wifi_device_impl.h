@@ -567,6 +567,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate) override;
+
+    /**
+     * @Description Get single device config
+     *
+     * @param networkId - the network id of the device config
+     * @param config - Get result vector of WifiDeviceConfig
+     * @return ErrCode - operation result
+     */
+    ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

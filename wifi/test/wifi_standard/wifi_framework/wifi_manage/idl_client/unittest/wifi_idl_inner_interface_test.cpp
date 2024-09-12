@@ -344,7 +344,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnConnectChangedTest, TestSize.Level1)
     char *mac = nullptr;
     OnConnectChanged(status, networkId, mac);
     char mac1[] = "00:00:AA:BB:CC:DD";
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
@@ -367,7 +367,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnDisConnectReasonCallbackTest, TestSize.Lev
     char *mac = nullptr;
     OnDisConnectReasonCallback(reason, mac);
     char mac1[] = "00:00:AA:BB:CC:DD";
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
@@ -393,7 +393,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnBssidChangedTest, TestSize.Level1)
     OnBssidChanged(reason, bss);
     char bssid[] = "00:00:AA:BB:CC:DD";
     WifiEventCallback callback;
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     RegisterStaCallbackMock(&callback);
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
     OnBssidChanged(reason, bssid);
@@ -413,7 +413,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     int status = 1;
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
-    std:string ifaceName = "wlan0";
+    std::string ifaceName = "wlan0";
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
     OnWpaStateChanged(status);
     OnWpaSsidWrongKey();

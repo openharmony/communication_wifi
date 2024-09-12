@@ -241,6 +241,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastRxPackets = 0;
     linkedInfo.lastTxPackets = 0;
     linkedInfo.isAncoConnected = 0;
+    WifiSettings::GetInstance().SetDeviceAfterDisconnect();
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -683,7 +684,6 @@ void StaStateMachine::StartWifiProcess()
     InitWifiLinkedInfo();
     InitLastWifiLinkedInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    WifiSettings::GetInstance().ReloadDeviceConfig();
     /* The current state of StaStateMachine transfers to SeparatedState after
      * enable supplicant.
      */
@@ -2005,6 +2005,40 @@ void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, cons
 #endif
 }
 
+static bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId)
+{
+    std::string lastMac;
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
+    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac, ifaceName)) != WIFI_HAL_OPT_OK) {
+        LOGE("%{public}s randommac, GetStaDeviceMacAddress failed!", __func__);
+        return false;
+    }
+    bool isRealMac = currentMac == realMac;
+    LOGI("%{public}s randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}!", __func__,
+        isRealMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
+    std::string actualConfiguredMac = currentMac;
+    if (!isRealMac && instId == 1) {
+        if (!WifiRandomMacHelper::GetWifi2RandomMac(actualConfiguredMac)) {
+            actualConfiguredMac = realMac;
+        }
+        LOGI("%{public}s wifi2 actualConfiguredMac: %{public}s", __func__, MacAnonymize(actualConfiguredMac).c_str());
+    }
+    if (MacAddress::IsValidMac(actualConfiguredMac.c_str())) {
+        if (lastMac != actualConfiguredMac) {
+            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
+                WifiConfigCenter::GetInstance().GetStaIfaceName(instId), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
+                    LOGE("set Mac [%{public}s] failed", MacAnonymize(actualConfiguredMac).c_str());
+                    return false;
+                }
+        }
+        WifiConfigCenter::GetInstance().SetMacAddress(actualConfiguredMac, instId);
+        return true;
+    } else {
+        LOGE("%{public}s randommac, Check MacAddress error", __func__);
+        return false;
+    }
+}
+
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
     LOGD("enter SetRandomMac.");
@@ -2055,40 +2089,6 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     }
 #endif
     return true;
-}
-
-static bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId)
-{
-    std::string lastMac;
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
-    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(lastMac, ifaceName)) != WIFI_HAL_OPT_OK) {
-        LOGE("%{public}s randommac, GetStaDeviceMacAddress failed!", __func__);
-        return false;
-    }
-    bool isRealMac = currentMac == realMac;
-    LOGI("%{public}s randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}!", __func__
-        isRealMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str();
-    std::string actualConfiguredMac = currentMac;
-    if (!isRealMac && instId == 1) {
-        if (!WifiRandomMacHelper::GetWifi2RandomMac(actualConfiguredMac)) {
-            actualConfiguredMac = realMac;
-        }
-        LOGI("%{public}s wifi2 actualConfiguredMac: %{public}s", __func__, MacAnonymize(actualConfiguredMac).c_str());
-    }
-    if (MacAddress::IsValidMac(actualConfiguredMac.c_str())) {
-        if (lastMac != actualConfiguredMac) {
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
-                WifiConfigCenter::GetInstance().GetStaIfaceName(instId), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
-                    LOGE("set Mac [%{public}s] failed", MacAnonymize(actualConfiguredMac).c_str());
-                    return false;
-                }
-        }
-        WifiConfigCenter::GetInstance().SetMacAddress(actualConfiguredMac, instId);
-        return true;
-    } else {
-        LOGE("%{public}s randommac, Check MacAddress error", __func__);
-        return false;
-    }
 }
 
 void StaStateMachine::StartRoamToNetwork(std::string bssid)
@@ -3573,6 +3573,9 @@ void StaStateMachine::LinkedState::GoInState()
         pStaStateMachine->SaveLinkState(ConnState::CONNECTED, DetailState::CONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
     }
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().WifiAssetTriggerSync();
+#endif
     return;
 }
 

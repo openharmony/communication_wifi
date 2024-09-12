@@ -1182,10 +1182,6 @@ private:
      * @Description Subscribe system ability changed.
      */
     void SubscribeSystemAbilityChanged(void);
-    /**
-     * @Description Reupdate net supplier info
-     */
-    void ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo);
 
     /**
      * @Description save wificonfig for update mode.

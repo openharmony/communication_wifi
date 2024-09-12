@@ -1245,6 +1245,7 @@ void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = true;
         NetSupplierInfo->isRoaming_ = isRoam;
+        NetSupplierInfo->ident_ = std::to_string(linkedInfo.networkId);
         WIFI_LOGI("On connect update net supplier info\n");
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
     }
@@ -1261,12 +1262,8 @@ void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
 void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
 {
     LOGI("Enter DealDisconnectEvent.\n");
-    if (msg == nullptr) {
-        WIFI_LOGE("msg is null\n");
-        return;
-    }
-    if (wpsState != SetupMethod::INVALID) {
-        WIFI_LOGE("wpsState is INVALID\n");
+    if (msg == nullptr || wpsState != SetupMethod::INVALID) {
+        WIFI_LOGE("msg is null or wpsState is INVALID, wpsState:%{public}d", static_cast<int>(wpsState));
         return;
     }
     std::string bssid;
@@ -1278,6 +1275,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
 #ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = false;
+        NetSupplierInfo->ident_ = "";
         WIFI_LOGI("On disconnect update net supplier info\n");
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
     }
@@ -2739,6 +2737,7 @@ void StaStateMachine::DisConnectProcess()
 #ifndef OHOS_ARCH_LITE
         if (NetSupplierInfo != nullptr) {
             NetSupplierInfo->isAvailable_ = false;
+            NetSupplierInfo->ident_ = "";
             WIFI_LOGI("Disconnect process update netsupplierinfo");
             WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo);
         }
@@ -4303,19 +4302,6 @@ void StaStateMachine::OnNetManagerRestart(void)
 {
     LOGI("OnNetManagerRestart()");
     WifiNetAgent::GetInstance().OnStaMachineNetManagerRestart(NetSupplierInfo, m_instId);
-}
-
-void StaStateMachine::ReUpdateNetSupplierInfo(sptr<NetManagerStandard::NetSupplierInfo> supplierInfo)
-{
-    LOGI("ReUpdateNetSupplierInfo()");
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if ((linkedInfo.detailedState == DetailedState::NOTWORKING) && (linkedInfo.connState == ConnState::CONNECTED)) {
-        if (supplierInfo != nullptr) {
-            TimeStats timeStats("Call UpdateNetSupplierInfo");
-            WifiNetAgent::GetInstance().UpdateNetSupplierInfo(supplierInfo);
-        }
-    }
 }
 
 void StaStateMachine::ReUpdateNetLinkInfo(const WifiDeviceConfig &config)

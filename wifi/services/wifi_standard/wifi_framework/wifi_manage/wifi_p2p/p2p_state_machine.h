@@ -402,6 +402,7 @@ private:
 
 private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;
+    void StopP2pDhcpClient();
     GcInfo MatchDevInGcInfos(const std::string &deviceAddr, const std::string &groupAddr, std::vector<GcInfo> &gcInfos);
 
 private:

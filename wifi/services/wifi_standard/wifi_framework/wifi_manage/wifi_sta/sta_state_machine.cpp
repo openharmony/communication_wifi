@@ -3489,7 +3489,7 @@ void StaStateMachine::LinkedState::GoInState()
         static_cast<int>(WifiOperateState::STA_CONNECTED));
     WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
     WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
-                                               (int)WifiDeviceConfigStatus::ENABLED, false);
+                                               static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
     WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {

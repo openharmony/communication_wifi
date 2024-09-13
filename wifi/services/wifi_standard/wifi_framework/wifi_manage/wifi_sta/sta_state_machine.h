@@ -553,6 +553,8 @@ public:
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
 #endif
+
+    bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);
 private:
     /**
      * @Description  Destruct state.
@@ -1182,8 +1184,6 @@ private:
      * @param networkId - current connected networkId;
      */
     void SaveWifiConfigForUpdate(int networkId);
-
-    bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);
 
 #endif // OHOS_ARCH_LITE
     int m_instId;

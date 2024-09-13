@@ -16,6 +16,7 @@
 #include "wifi_asset_manager.h"
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
+#include "wifi_config_center.h"
  
 namespace OHOS {
 namespace Wifi {

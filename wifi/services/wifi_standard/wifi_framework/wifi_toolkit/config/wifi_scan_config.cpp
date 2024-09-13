@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace Wifi {
+
 WifiScanConfig &WifiScanConfig::GetInstance()
 {
     static WifiScanConfig gWifiScanConfig;
@@ -49,8 +50,6 @@ void WifiScanConfig::GetScanDeviceInfo(WifiScanDeviceInfo &scanDeviceInfo)
 
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(
         mScanDeviceInfo.hid2dInfo.upperIfName, mScanDeviceInfo.hid2dInfo.upperScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID,
-        mScanDeviceInfo.hid2dInfo.miraCastScene);
     WifiConfigCenter::GetInstance().GetP2pBusinessType(mScanDeviceInfo.hid2dInfo.p2pBusinessType);
     scanDeviceInfo = mScanDeviceInfo;
 }

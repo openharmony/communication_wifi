@@ -652,7 +652,7 @@ void WifiControllerMachine::RemoveConcreteManager(int id)
 
 void WifiControllerMachine::RemoveConcreteWifi2Manager(int id)
 {
-    MultiStaManager *wifi2ConcreteManager = nullptr;
+    MultiStaManager *wifi2StaManager = nullptr;
 
     if (!HasAnyWifi2ConcreteManager()) {
         return;
@@ -661,15 +661,15 @@ void WifiControllerMachine::RemoveConcreteWifi2Manager(int id)
         std::unique_lock<std::mutex> lock(multiStaManagerMutex);
         for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
             if ((*iter)->mid == id) {
-                wifi2ConcreteManager = *iter;
+                wifi2StaManager = *iter;
                 multiStaManagers.erase(iter);
                 break;
             }
         }
     }
-    if (wifi2ConcreteManager != nullptr) {
-        delete wifi2ConcreteManager;
-        wifi2ConcreteManager = nullptr;
+    if (wifi2StaManager != nullptr) {
+        delete wifi2StaManager;
+        wifi2StaManager = nullptr;
     }
 }
 

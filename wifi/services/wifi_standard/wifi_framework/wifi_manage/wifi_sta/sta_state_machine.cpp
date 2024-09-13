@@ -657,9 +657,11 @@ void StaStateMachine::StartWifiProcess()
     }
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     WIFI_LOGI("set suspend mode to chip when wifi started, screenState: %{public}d", screenState);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
-        != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("%{public}s WpaSetSuspendMode failed!", __FUNCTION__);
+    if (m_insId == INSTID_WLAN0) {
+        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
+            != WIFI_HAL_OPT_OK) {
+            WIFI_LOGE("%{public}s WpaSetSuspendMode failed!", __FUNCTION__);
+        }
     }
     /* Sets the MAC address of WifiSettings. */
     std::string mac;
@@ -4250,8 +4252,7 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
 
     WifiDeviceConfig config;
     AssignIpMethod assignMethod = AssignIpMethod::DHCP;
-    int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
-        pStaStateMachine->GetInstanceId());
+    int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
     if (ret == 0) {
         assignMethod = config.wifiIpConfig.assignMethod;
     }
@@ -4318,12 +4319,9 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
                 IpAnonymize(result->strOptDns2).c_str());
             WIFI_LOGI("On dhcp success update net linke info");
             WifiDeviceConfig config;
-            WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
+            WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
+            WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
                 pStaStateMachine->GetInstanceId());
-            if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
-                WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
-                    pStaStateMachine->GetInstanceId());
-            }
 #endif
         }
 #ifdef OHOS_ARCH_LITE
@@ -4370,14 +4368,10 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
             ipv6Info.primaryDns.c_str(), ipv6Info.secondDns.c_str());
 #ifndef OHOS_ARCH_LITE
         WifiDeviceConfig config;
-        WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
-            pStaStateMachine->GetInstanceId());
+        WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config);
         if (!ipv6Info.primaryDns.empty()) {
-            if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
-                WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
-                    pStaStateMachine->GetInstanceId());
-            }
-        }
+            WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
+                pStaStateMachine->GetInstanceId());
 #endif
     } else {
         LOGI("TryToSaveIpV6Result not UpdateNetLinkInfo");
@@ -4392,8 +4386,8 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
         return;
     }
 
-    WIFI_LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d, isRoam=%{public}d m_instId = %{public}d",
-        pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam, pStaStateMachine->m_instId);
+    WIFI_LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d, isRoam=%{public}d",
+        pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
     pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_JUMP);
     if (pStaStateMachine->getIpSucNum == 0) {
         pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);

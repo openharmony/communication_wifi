@@ -86,6 +86,7 @@ void ApStartedState::GoInState()
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
         return;
     }
+
     if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
         WIFI_LOGE("Set Blocklist failed.");
     }

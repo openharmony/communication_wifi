@@ -15,14 +15,6 @@
 
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_client.h"
-
-#include <securec.h>
-#include <unistd.h>
-#include <locale>
-#include <codecvt>
-#include <iostream>
-#include <fstream>
-
 #include "wifi_hdi_wpa_sta_impl.h"
 #include "wifi_hdi_wpa_callback.h"
 #include "wifi_hdi_wpa_ap_impl.h"
@@ -31,6 +23,12 @@
 #include "wifi_common_util.h"
 #include "wifi_common_def.h"
 #include "hdi_struct_toolkit.h"
+#include <securec.h>
+#include <unistd.h>
+#include <locale>
+#include <codecvt>
+#include <iostream>
+#include <fstream>
 
 #ifndef UT_TEST
 #include "wifi_log.h"
@@ -492,7 +490,7 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const st
         LOGE("%{public}s: failed to copy", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
- 
+
     char cmdBuf[MAX_CMD_BUFFER_SIZE];
     if (strncpy_s(cmdBuf, sizeof(cmdBuf), cmd.c_str(), cmd.length()) != EOK) {
         LOGE("%{public}s: failed to copy", __func__);

@@ -43,6 +43,7 @@ private:
 
 private:
     sptr<IWifiHotspotCallback> userCallback_;
+
     bool mRemoteDied;
 };
 }  // namespace Wifi

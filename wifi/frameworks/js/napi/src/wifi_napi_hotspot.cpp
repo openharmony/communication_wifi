@@ -149,8 +149,8 @@ static bool GetHotspotconfigFromJs(const napi_env& env, const napi_value& object
     value = 0;
     JsObjectToInt(env, object, "leaseTime", value);
     ClearJsLastException(env);
-    if (value < static_cast<int>(DHCP_LEASE_TIME_MIN)) {
-        value = static_cast<int>(DHCP_LEASE_TIME);
+    if (value < (int)(DHCP_LEASE_TIME_MIN)) {
+        value = (int)(DHCP_LEASE_TIME);
     }
     config.SetLeaseTime(value);
     return true;

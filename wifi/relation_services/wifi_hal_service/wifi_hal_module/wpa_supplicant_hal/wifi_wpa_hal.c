@@ -629,9 +629,9 @@ static int WpaP2pCallBackFunc(char *p)
     } else if (strncmp(p, P2P_EVENT_PROV_DISC_FAILURE, strlen(P2P_EVENT_PROV_DISC_FAILURE)) == 0) {
         P2pHalCbProvisionDiscoveryFailure();
     } else if (strncmp(p, AP_STA_DISCONNECTED, strlen(AP_STA_DISCONNECTED)) == 0) {
-        DealP2pConnectChanged(p + strlen(AP_STA_DISCONNECTED), 0);
+        DealP2pConnectChanged(p, 0);
     } else if (strncmp(p, AP_STA_CONNECTED, strlen(AP_STA_CONNECTED)) == 0) {
-        DealP2pConnectChanged(p + strlen(AP_STA_CONNECTED), 1);
+        DealP2pConnectChanged(p, 1);
     } else if (strncmp(p, P2P_EVENT_SERV_DISC_REQ, strlen(P2P_EVENT_SERV_DISC_REQ)) == 0) {
         DealP2pServDiscReqEvent(p);
     } else {

@@ -113,7 +113,6 @@ const char *GetHdiP2pIfaceName();
  */
 struct IWpaInterface* GetWpaInterface();
 pthread_mutex_t* GetWpaObjMutex(void);
-
 /**
  * @Description copy file.
  *
@@ -162,10 +161,8 @@ WifiErrorNo SetNativeProcessCallback(void (*callback)(int));
  * @return WifiErrorNo - operation result
  */
 struct IHostapdInterface* GetApInterface();
-
 WifiErrorNo SetHdiApIfaceName(const char *ifaceName);
 const char *GetHdiApIfaceName();
-
 void SetExecDisable(int execDisable);
 int GetExecDisable();
 

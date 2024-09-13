@@ -214,7 +214,6 @@ bool WifiProtectManager::ChangeToPerfMode(bool isEnabled)
 }
 void WifiProtectManager::HandleScreenStateChanged(bool screenOn)
 {
-
     std::unique_lock<std::mutex> lock(mMutex);
     mScreenOn = screenOn;
     LOGD("%{public}s screen is on: %{public}d", __func__, mScreenOn);

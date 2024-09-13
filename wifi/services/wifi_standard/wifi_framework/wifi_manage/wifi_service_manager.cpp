@@ -254,7 +254,6 @@ IStaService *WifiServiceManager::GetStaServiceInst(int instId)
         WIFI_LOGD("find a new sta service instance, instId: %{public}d", instId);
         return iter->second;
     }
-
     return nullptr;
 }
 
@@ -269,7 +268,6 @@ ISelfCureService *WifiServiceManager::GetSelfCureServiceInst(int instId)
         WIFI_LOGD("find a new self cure service instance, instId: %{public}d", instId);
         return iter->second;
     }
-    
     return nullptr;
 }
 #endif
@@ -284,7 +282,6 @@ IScanService *WifiServiceManager::GetScanServiceInst(int instId)
         WIFI_LOGD("find a new scan service instance, instId: %{public}d", instId);
         return iter->second;
     }
-    
     return nullptr;
 }
 

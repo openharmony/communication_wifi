@@ -61,7 +61,7 @@ void ApStateMachine::Init()
     StatePlus(&m_ApIdleState, &m_ApRootState);
     StatePlus(&m_ApStartedState, &m_ApRootState);
     SetFirstState(&m_ApIdleState);
-    m_iface = WifiConfigCenter::GetInstance().GetApIfaceName();
+    m_iface =  WifiConfigCenter::GetInstance().GetApIfaceName();
     StartStateMachine();
 }
 

@@ -121,7 +121,6 @@ StaStateMachine::StaStateMachine(int instId)
       mConnectFailedCnt(0)
 {
     m_instId = instId;
-    WIFI_LOGI("StaStateMachine constructor instId %{public}d ", instId);
 }
 
 StaStateMachine::~StaStateMachine()
@@ -2841,7 +2840,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     /* BSSID change is not received during roaming, only set BSSID */
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
-        WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId)) != WIFI_HAL_OPT_OK) {
+        WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId)) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetBssid return fail.");
     }
 }
@@ -3839,7 +3838,7 @@ bool StaStateMachine::ApRoamingState::HandleNetworkConnectionEvent(InternalMessa
     bool ret = EXECUTED;
     std::string bssid = msg->GetStringFromMessage();
     if (pStaStateMachine->CheckRoamingBssidIsSame(bssid)) {
-        WIFI_LOGE("ApRoamingState inconsistent bssid in connecter m_instId = %{public}d", m_instId);
+        WIFI_LOGE("ApRoamingState inconsistent bssid in connecter m_instId = %{public}d", pStaStateMachine->m_instId);
         ret = NOT_EXECUTED;
     }
     pStaStateMachine->isRoam = true;

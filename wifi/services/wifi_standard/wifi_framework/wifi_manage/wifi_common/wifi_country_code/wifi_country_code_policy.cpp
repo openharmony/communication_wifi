@@ -261,7 +261,7 @@ ErrCode WifiCountryCodePolicy::FindLargestCountCountryCode(std::string &wifiCoun
     if (sortCode.size() == 1) {
         std::pair<std::string, int> oneCode = sortCode[0];
         wifiCountryCode = oneCode.first;
-        WIFI_LOGI("only one country, code=%{public}s", wifiCountryCode.c_str());
+        WIFI_LOGD("only one country, code=%{public}s", wifiCountryCode.c_str());
         return WIFI_OPT_SUCCESS;
     }
     std::pair<std::string, int> firstCode = sortCode[0];

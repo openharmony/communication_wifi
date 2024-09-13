@@ -122,6 +122,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply) {
             OnStartConnectToUserSelectNetwork(code, data, reply);
         };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetDeviceConfig(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1293,6 +1295,22 @@ void WifiDeviceStub::OnSetTxPower(uint32_t code, MessageParcel &data, MessagePar
     ErrCode ret = SetTxPower(power);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnGetDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool networkId = data.ReadInt32();
+    WifiDeviceConfig config;
+    ErrCode ret = GetDeviceConfig(networkId, config);
+    reply.WriteInt32(0);
+
+    if (ret != WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(ret);
+        return;
+    }
+    WriteWifiDeviceConfig(reply, config);
     return;
 }
 

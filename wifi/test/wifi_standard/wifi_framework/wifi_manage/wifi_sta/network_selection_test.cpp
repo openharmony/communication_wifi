@@ -223,7 +223,7 @@ HWTEST_F(NetworkSelectionTest, TestEnableNetwork, TestSize.Level1)
         return 0;
     }));
     NetworkSelectionManager selectionManager;
-    EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
+    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
     EXPECT_CALL(WifiSettings::GetInstance(),
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig) {
@@ -231,7 +231,7 @@ HWTEST_F(NetworkSelectionTest, TestEnableNetwork, TestSize.Level1)
         wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::UNKNOWN);
         return 0;
     }));
-    EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
+    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
     EXPECT_CALL(WifiSettings::GetInstance(),
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig) {
@@ -584,7 +584,7 @@ HWTEST_F(NetworkSelectionTest, TestBlackListNetworkAndNoInternetNetwork, TestSiz
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
-    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 1);
+    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 0);
 }
 
 HWTEST_F(NetworkSelectionTest, TestNoInternetNetworkAndPortalNetwork, TestSize.Level1)

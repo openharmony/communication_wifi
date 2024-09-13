@@ -63,7 +63,7 @@ void StaAppAcceleration::DealStaConnChanged(OperateResState state, const WifiLin
 
 void StaAppAcceleration::HandleScreenStatusChanged(int screenState)
 {
-    WIFI_LOGI("Enter HandleScreenStatusChanged.\n");
+    WIFI_LOGD("Enter HandleScreenStatusChanged.\n");
 
     if (screenState == MODE_STATE_OPEN) {
         SetPmMode(POWER_SAVE_DISABLE);

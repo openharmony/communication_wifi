@@ -757,7 +757,7 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
             return WIFI_OPT_NON_SYSTEMAPP;
         }
         if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+            WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
     }
@@ -775,6 +775,33 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
         WifiSettings::GetInstance().GetDeviceConfig(result);
         ReplaceConfigWhenCandidateConnected(result);
     }
+    return WIFI_OPT_SUCCESS;
+}
+
+
+ErrCode WifiDeviceServiceImpl::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
+{
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetDeviceConfig:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDeviceConfig:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+
+        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetDeviceConfig:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+    #ifndef SUPPORT_RANDOM_MAC_ADDR
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetDeviceConfig:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+    #endif
+    }
+
+    WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1139,8 +1166,13 @@ ErrCode WifiDeviceServiceImpl::Disconnect(void)
 
 ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
 {
-    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("StartWps:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetScanOnlyAvailable: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartWps:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1157,8 +1189,13 @@ ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
 
 ErrCode WifiDeviceServiceImpl::CancelWps(void)
 {
-    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("CancelWps:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetScanOnlyAvailable: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("CancelWps:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1348,7 +1385,7 @@ ErrCode WifiDeviceServiceImpl::GetCountryCode(std::string &countryCode)
     }
 #ifndef OHOS_ARCH_LITE
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
-    WIFI_LOGI("GetCountryCode: country code is %{public}s", countryCode.c_str());
+    WIFI_LOGD("GetCountryCode: country code is %{public}s", countryCode.c_str());
 #endif
     return WIFI_OPT_SUCCESS;
 }
@@ -1598,6 +1635,26 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
 
 ErrCode WifiDeviceServiceImpl::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config)
 {
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetChangeDeviceConfig:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetChangeDeviceConfig:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+#ifndef SUPPORT_RANDOM_MAC_ADDR
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetChangeDeviceConfig:VerifyGetScanInfosPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+#endif
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     bool result = WifiConfigCenter::GetInstance().GetChangeDeviceConfig(value, config);
     if (!result) {
         WIFI_LOGE("WifiDeviceServiceImpl::GetChangeDeviceConfig failed!");
@@ -1615,7 +1672,7 @@ ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported
 {
     WIFI_LOGI("Enter get bandtype is supported.");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:IsBandTypeSupported() PERMISSION_DENIED!");
+        WIFI_LOGE("IsBandTypeSupported:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1639,12 +1696,12 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
 
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:Get5GHzChannelList() PERMISSION_DENIED!");
+        WIFI_LOGE("Get5GHzChannelList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:Get5GHzChannelList() PERMISSION_DENIED!");
+        WIFI_LOGE("Get5GHzChannelList:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1666,12 +1723,12 @@ ErrCode WifiDeviceServiceImpl::StartPortalCertification()
     }
 
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:StartPortalCertification() PERMISSION_DENIED!");
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:StartPortalCertification() PERMISSION_DENIED!");
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1858,10 +1915,10 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
 #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+    WIFI_LOGD("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
-    WIFI_LOGI("Enter LimitSpeed.");
+    WIFI_LOGD("Enter LimitSpeed.");
     if (!WifiAuthCenter::IsNativeProcess()) {
         WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_NON_SYSTEMAPP;

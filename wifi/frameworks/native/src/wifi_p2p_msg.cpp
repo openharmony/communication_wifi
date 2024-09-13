@@ -428,11 +428,34 @@ void WifiP2pGroupInfo::AddClientDevice(const WifiP2pDevice &clientDevice)
     return;
 }
 
+void WifiP2pGroupInfo::AddPersistentDevice(const WifiP2pDevice &clientDevice)
+{
+    for (auto it = persistentClients.begin(); it != persistentClients.end(); ++it) {
+        if (it->GetDeviceAddress() == clientDevice.GetDeviceAddress()) {
+            *it = clientDevice;
+            return;
+        }
+    }
+    persistentClients.push_back(clientDevice);
+    return;
+}
+
 void WifiP2pGroupInfo::RemoveClientDevice(const WifiP2pDevice &clientDevice)
 {
     for (auto it = clientDevices.begin(); it != clientDevices.end(); ++it) {
         if (*it == clientDevice) {
             clientDevices.erase(it);
+            return;
+        }
+    }
+    return;
+}
+
+void WifiP2pGroupInfo::RemovePersistentDevice(const WifiP2pDevice &clientDevice)
+{
+    for (auto it = persistentClients.begin(); it != persistentClients.end(); ++it) {
+        if (it->GetDeviceAddress() == clientDevice.GetDeviceAddress()) {
+            persistentClients.erase(it);
             return;
         }
     }
@@ -446,6 +469,16 @@ bool WifiP2pGroupInfo::IsContainsDevice(const WifiP2pDevice &clientDevice) const
     }
     for (auto it = clientDevices.begin(); it != clientDevices.end(); ++it) {
         if (*it == clientDevice) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool WifiP2pGroupInfo::IsContainsPersistentDevice(const WifiP2pDevice &clientDevice) const
+{
+    for (auto it = persistentClients.begin(); it != persistentClients.end(); ++it) {
+        if (it->GetDeviceAddress() == clientDevice.GetDeviceAddress()) {
             return true;
         }
     }
@@ -472,14 +505,25 @@ const std::vector<WifiP2pDevice> &WifiP2pGroupInfo::GetClientDevices() const
     return clientDevices;
 }
 
+const std::vector<WifiP2pDevice> &WifiP2pGroupInfo::GetPersistentDevices() const
+{
+    return persistentClients;
+}
+
 void WifiP2pGroupInfo::SetClientDevices(const std::vector<WifiP2pDevice> &devices)
 {
     clientDevices = devices;
 }
 
+void WifiP2pGroupInfo::SetClientPersistentDevices(const std::vector<WifiP2pDevice> &devices)
+{
+    persistentClients = devices;
+}
+
 void WifiP2pGroupInfo::ClearClientDevices()
 {
     clientDevices.clear();
+    persistentClients.clear();
 }
 
 void WifiP2pGroupInfo::SetCreatorUid(int uid)

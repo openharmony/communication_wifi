@@ -134,5 +134,32 @@ HWTEST_F(NetworkStatusHistoryManagerTest, IsEmptyNetworkStatusHistory, TestSize.
     EXPECT_FALSE(NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(0b11));
     EXPECT_TRUE(NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(0));
 }
+
+HWTEST_F(NetworkStatusHistoryManagerTest, GetCurrentNetworkStatusHistory2Array, TestSize.Level1)
+{
+    uint32_t networkStatusHistory = 3;
+    std::vector<int> expectResult {0};
+    std::vector<int> realResult =
+        NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Array(networkStatusHistory);
+    EXPECT_TRUE(expectResult == realResult);
+}
+
+HWTEST_F(NetworkStatusHistoryManagerTest, GetCurrentNetworkStatusHistory2Array, TestSize.Level1)
+{
+    uint32_t networkStatusHistory = 1005567;
+    std::vector<int> expectResult {0, 0, 1, 1, 1, 0, 0, 0, 0, 0};
+    std::vector<int> realResult =
+        NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Array(networkStatusHistory);
+    EXPECT_TRUE(expectResult == realResult);
+}
+
+HWTEST_F(NetworkStatusHistoryManagerTest, GetCurrentNetworkStatusHistory2Array, TestSize.Level1)
+{
+    uint32_t networkStatusHistory = 349525;
+    std::vector<int> expectResult {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    std::vector<int> realResult =
+        NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Array(networkStatusHistory);
+    EXPECT_TRUE(expectResult == realResult);
+}
 } // Wifi
 } // OHOS

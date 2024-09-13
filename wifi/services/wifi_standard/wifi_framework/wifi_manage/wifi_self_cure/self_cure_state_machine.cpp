@@ -34,6 +34,7 @@
 #include "parameter.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_country_code_manager.h"
+#include "self_cure_utils.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -244,6 +245,10 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
     lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
         pSelfCureStateMachine->m_instId);
+    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
+        lastDnsFailedCnt_ = 0;
+        DelayedSingleton<SelfCureUtils>::GetInstance()->ClearDnsFailedCounter();
+    }
     if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing == true) {
         pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE, SELF_CURE_DELAYED_MS);
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pInternetSelfCureState);
@@ -311,6 +316,9 @@ int SelfCureStateMachine::ConnectedMonitorState::InitSelfCureCmsHandleMap()
     };
     selfCureCmsHandleFuncMap[WIFI_CURE_CMD_GATEWAY_CHANGED_DETECT] = [this](InternalMessagePtr msg) {
         this->HandleGatewayChanged(msg);
+    };
+    selfCureCmsHandleFuncMap[WIFI_CURE_CMD_DNS_FAILED_MONITOR] = [this](InternalMessagePtr msg) {
+        this->HandleDnsFailedMonitor(msg);
     };
     return WIFI_OPT_SUCCESS;
 }
@@ -427,6 +435,9 @@ bool SelfCureStateMachine::ConnectedMonitorState::SetupSelfCureMonitor()
             pSelfCureStateMachine->GetNetworkStatusHistory());
         portalUnthenEver = NetworkStatusHistoryManager::IsPortalByHistory(
             pSelfCureStateMachine->GetNetworkStatusHistory());
+        WIFI_LOGI("SetupSelfCureMonitor, internetUnknown: %{public}d," \
+            " hasInternetRecently: %{public}d, portalUnthenEver: %{public}d",
+            pSelfCureStateMachine->internetUnknown, hasInternetRecently, portalUnthenEver);
         if (!mobileHotspot) {
             if ((!pSelfCureStateMachine->staticIpCureSuccess) &&
                 (hasInternetRecently || pSelfCureStateMachine->internetUnknown) &&
@@ -486,9 +497,39 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
     }
 }
 
+void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(InternalMessagePtr msg)
+{
+    if (lastSignalLevel <= SIGNAL_LEVEL_1) {
+        WIFI_LOGI("HandleDnsFailedMonitor, lastSignalLevel <= 1, next peroid.");
+        if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
+            lastDnsFailedCnt_ = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
+        }
+        pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_DNS_FAILED_MONITOR, INTERNET_DETECT_INTERVAL_MS);
+        return;
+    }
+    int32_t currentDnsFailedCnt = 0;
+    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
+        currentDnsFailedCnt = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
+    }
+    int32_t deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
+    WIFI_LOGI("HandleDnsFailedMonitor, deltaFailedDns is %{public}d", deltaFailedDns);
+    lastDnsFailedCnt_ = currentDnsFailedCnt;
+    if (deltaFailedDns >= DNS_FAILED_CNT) {
+        pSelfCureStateMachine->selfCureOnGoing = true;
+        if (pSelfCureStateMachine->IsHttpReachable()) {
+            pSelfCureStateMachine->selfCureOnGoing = false;
+            WIFI_LOGI("HandleDnsFailedMonitor, HTTP detection succeeded.");
+            return;
+        }
+        pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
+        TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
+    }
+    return;
+}
+
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
-    WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
+    WIFI_LOGD("HandleInternetFailedDetected, wifi has no internet when connected.");
     if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
         WIFI_LOGI("current network do not need selfcure");
         return;
@@ -2729,7 +2770,7 @@ bool SelfCureStateMachine::IsCustNetworkSelfCure()
         return false;
     }
     if (pEnhanceService->IsHwItCustNetwork(config)) {
-        WIFI_LOGI("dns-selfcure is not triggered on the network.");
+        WIFI_LOGD("dns-selfcure is not triggered on the network.");
         return true;
     }
     return false;

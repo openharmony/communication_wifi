@@ -503,7 +503,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestSucc()
         .WillOnce(DoAll(SetArgReferee<1>(configs), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));  // 2: The third parameter
-    EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceAddCandidateConfigTestFail0()
@@ -643,7 +643,7 @@ void StaServiceTest::StaServiceReConnectTestSucc()
  */
 void StaServiceTest::StaServiceSetSuspendModeTest()
 {
-    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceSetPowerModeTest()

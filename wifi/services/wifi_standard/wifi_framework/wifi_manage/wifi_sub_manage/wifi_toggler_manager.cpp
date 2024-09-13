@@ -192,7 +192,7 @@ void WifiTogglerManager::DealMultiStaStartFailure(int id)
 void WifiTogglerManager::DealMultiStaStop(int id)
 {
     if (pWifiControllerMachine) {
-        pWifiControllerMachine->SendMessage(CMD_CONCRETE_STOPPED, id);
+        pWifiControllerMachine->SendMessage(CMD_STA_WIFI2_STOPPED, id);
     }
 }
 

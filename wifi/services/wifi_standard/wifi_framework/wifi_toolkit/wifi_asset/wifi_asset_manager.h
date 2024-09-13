@@ -20,6 +20,7 @@
 #include "asset_system_api.h"
 #include "wifi_msg.h"
 #include "wifi_event_handler.h"
+#include "wifi_config_center.h"
  
 namespace OHOS {
 namespace Wifi {

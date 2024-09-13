@@ -59,7 +59,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     int reasonCode = disconectParam->reasonCode;
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst();
     if (cbk.onReportDisConnectReason) {
-                cbk.onReportDisConnectReason(reasonCode, std::string(szBssid));
+        cbk.onReportDisConnectReason(reasonCode, std::string(szBssid));
     }
     bool isPsk = false;
     std::vector<OHOS::Wifi::WifiScanInfo> scanResults;

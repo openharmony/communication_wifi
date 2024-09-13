@@ -33,6 +33,7 @@ public:
     ConcreteModeCallback& GetConcreteCallback(void);
     MultiStaModeCallback &GetMultiStaCallback();
     SoftApModeCallback& GetSoftApCallback(void);
+    RptModeCallback& GetRptCallback(void);
     ErrCode WifiToggled(int isOpen, int id = 0);
     ErrCode SoftapToggled(int isOpen, int id = 0);
     ErrCode ScanOnlyToggled(int isOpen);
@@ -50,10 +51,13 @@ private:
     void InitConcreteCallback(void);
     void InitSoftapCallback(void);
     void InitMultiStacallback();
+    void InitRptCallback(void);
     void DealConcreateStop(int id = 0);
     void DealConcreateStartFailure(int id = 0);
     void DealSoftapStop(int id = 0);
     void DealSoftapStartFailure(int id = 0);
+    void DealRptStop(int id = 0);
+    void DealRptStartFailure(int id = 0);
     void DealClientRemoved(int id = 0);
     void DealMultiStaStartFailure(int id);
     void DealMultiStaStop(int id);
@@ -64,6 +68,7 @@ private:
     ConcreteModeCallback mConcreteModeCb;
     SoftApModeCallback mSoftApModeCb;
     MultiStaModeCallback mMultiStaModeCb;
+    RptModeCallback mRptModeCb;
     std::unique_ptr<WifiControllerMachine> pWifiControllerMachine = nullptr;
 };
 

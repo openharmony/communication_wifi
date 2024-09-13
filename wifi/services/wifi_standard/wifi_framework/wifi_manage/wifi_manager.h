@@ -36,6 +36,9 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_multi_vap_manager.h"
 #endif
+#include "rpt_interface.h"
+
+#define ANY_ID (-1)
 
 namespace OHOS {
 namespace Wifi {
@@ -116,6 +119,7 @@ public:
     std::unique_ptr<WifiStaManager>& GetWifiStaManager();
     std::unique_ptr<WifiScanManager>& GetWifiScanManager();
     std::unique_ptr<WifiTogglerManager>& GetWifiTogglerManager();
+    std::shared_ptr<RptInterface> GetRptInterface(int id = ANY_ID);
 #ifdef FEATURE_AP_SUPPORT
     std::unique_ptr<WifiHotspotManager>& GetWifiHotspotManager();
 #endif

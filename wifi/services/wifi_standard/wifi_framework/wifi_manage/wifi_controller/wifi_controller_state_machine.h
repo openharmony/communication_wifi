@@ -22,10 +22,14 @@
 #include "state_machine.h"
 #include "wifi_logger.h"
 #include "wifi_errcode.h"
+#include "wifi_controller_managers_template.h"
 #include "concrete_clientmode_manager.h"
 #include "multi_sta_manager.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "softap_manager.h"
+#ifdef FEATURE_RPT_SUPPORT
+#include "rpt_manager.h"
+#endif
 #endif
 
 namespace OHOS {
@@ -59,14 +63,23 @@ public:
         void HandleWifi2Removed(InternalMessagePtr msg);
         void HandleAPServiceStartFail(int id);
         void HandleConcreteClientRemoved(InternalMessagePtr msg);
-        
+
     private:
         void HandleApStart(int id);
+        void HandleWifiToggleChangeForRpt(int id, int isOpen);
+        bool HandleWifiToggleChangeForWlan1(int id, int isOpen);
         void HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg);
 #ifdef FEATURE_AP_SUPPORT
         void HandleSoftapToggleChangeInEnabledState(InternalMessagePtr msg);
+        void HandleSoftapOpen(int id);
+        void HandleSoftapClose(int id);
         void HandleApRemoved(InternalMessagePtr msg);
         void HandleApStop(InternalMessagePtr msg);
+        void HandleApMsg(InternalMessagePtr msg);
+#ifdef FEATURE_RPT_SUPPORT
+        void HandleRptStartFail(InternalMessagePtr msg);
+        void HandleP2pStop(InternalMessagePtr msg);
+#endif
 #endif
         WifiControllerMachine *pWifiControllerMachine;
     };
@@ -83,11 +96,16 @@ public:
         WifiControllerMachine *pWifiControllerMachine;
     };
 
+#ifdef FEATURE_AP_SUPPORT
+    enum class HotspotMode {
+        NONE = 0,
+        SOFTAP,
+        RPT
+    };
+#endif
 public:
     ErrCode InitWifiControllerMachine();
 
-    void RemoveConcreteManager(int id);
-    void RemoveMultiStaManager(int id);
     void HandleStaClose(int id);
     void HandleWifi2Close(int id);
     void HandleStaStart(int id);
@@ -96,13 +114,16 @@ public:
     void HandleConcreteStop(int id);
     void ClearWifiStartFailCount();
 #ifdef FEATURE_AP_SUPPORT
-    void RmoveSoftapManager(int id);
+    template <class T> void HandleHotspotStop(int id, HotspotMode THotspotMode, ManagerControl<T> &TManagers);
     void HandleSoftapStop(int id);
     void StartSoftapCloseTimer();
     void StopSoftapCloseTimer();
+#ifdef FEATURE_RPT_SUPPORT
+    void HandleRptStop(int id);
+    std::shared_ptr<RptManager> GetRptManager(int id);
+#endif
 #endif
     void ShutdownWifi(bool shutDownAp = true);
-
 private:
     template <typename T>
     inline void ParsePointer(T *&pointer)
@@ -124,29 +145,22 @@ private:
 
     void BuildStateTree();
     ErrCode InitWifiStates();
-    bool HasAnyConcreteManager();
-    bool HasAnyMultiStaManager();
     bool HasAnyManager();
-    bool ConcreteIdExist(int id);
-    bool IsWifi2IdExist(int id);
     void MakeConcreteManager(ConcreteManagerRole role, int id);
     void MakeMultiStaManager(MultiStaManager::Role role, int instId);
 #ifdef FEATURE_AP_SUPPORT
-    bool HasAnySoftApManager();
-    bool SoftApIdExist(int id);
+    void MakeHotspotManager(int id, bool startTimer = false);
     void MakeSoftapManager(SoftApManager::Role role, int id);
+    HotspotMode CalculateHotspotMode(int id);
     bool ShouldEnableSoftap();
-    void StopAllSoftapManagers();
-    void StopSoftapManager(int id);
-    SoftApManager *GetSoftApManager(int id);
+#ifdef FEATURE_RPT_SUPPORT
+    bool ShouldUseRpt(int id);
+    void MakeRptManager(RptManager::Role role, int id);
+#endif
 #endif
     bool ShouldDisableWifi(InternalMessagePtr msg);
     bool ShouldEnableWifi(int id = 0);
     ConcreteManagerRole GetWifiRole();
-    void StopAllConcreteManagers();
-    void StopConcreteManager(int id);
-    void StopAllMultiStaManagers();
-    void StopMultiStaManager(int id);
     void SwitchRole(ConcreteManagerRole role);
     void HandleAirplaneOpen();
     void HandleAirplaneClose();
@@ -160,16 +174,17 @@ private:
     EnableState *pEnableState;
     DisableState *pDisableState;
     DefaultState *pDefaultState;
-    std::vector<ConcreteClientModeManager *> concreteManagers;
-    mutable std::mutex concreteManagerMutex;
+    ManagerControl<ConcreteClientModeManager> concreteManagers{CONCRETE_CMD_STOP};
     static int mWifiStartFailCount;
 #ifdef FEATURE_AP_SUPPORT
-    std::vector<SoftApManager *> softapManagers;
-    mutable std::mutex softapManagerMutex;
-    uint64_t stopSoftapTimerId_ {0};
+#ifdef FEATURE_RPT_SUPPORT
+    ManagerControl<RptManager> rptManagers{RPT_CMD_STOP};
 #endif
-    mutable std::mutex multiStaManagerMutex;
-    std::vector<MultiStaManager *> multiStaManagers;
+    ManagerControl<SoftApManager> softApManagers{SOFTAP_CMD_STOP};
+    uint64_t stopSoftapTimerId_{0};
+    HotspotMode hotspotMode {HotspotMode::NONE};
+#endif
+    ManagerControl<MultiStaManager> multiStaManagers{MULTI_STA_CMD_STOP};
 };
 }  // namespace Wifi
 }  // namespace OHOS

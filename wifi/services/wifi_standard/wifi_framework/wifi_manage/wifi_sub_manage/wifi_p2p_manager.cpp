@@ -191,6 +191,13 @@ void WifiP2pManager::CloseP2pService(void)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(P2pState::P2P_STATE_CLOSED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+
+    if (auto &togglerManager = WifiManager::GetInstance().GetWifiTogglerManager(); togglerManager != nullptr) {
+        if (auto &ctrlMachine = togglerManager->GetControllerMachine(); ctrlMachine != nullptr) {
+            ctrlMachine->SendMessage(CMD_P2P_STOPPED, 0);
+        }
+    }
+
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveP2pIface(ifaceName);
@@ -220,6 +227,9 @@ void WifiP2pManager::InitP2pCallback(void)
     mP2pCallback.OnP2pStateChangedEvent = [this](P2pState state) { this->DealP2pStateChanged(state); };
     mP2pCallback.OnP2pPeersChangedEvent = [this](const std::vector<WifiP2pDevice> &vPeers) {
         this->DealP2pPeersChanged(vPeers);
+    };
+    mP2pCallback.OnP2pPeerJoinOrLeaveEvent = [this] (bool isJoin, const std::string &mac) {
+        this->DealP2pPeerJoinOrLeave(isJoin, mac);
     };
     mP2pCallback.OnP2pServicesChangedEvent = [this](const std::vector<WifiP2pServiceInfo> &vServices) {
         this->DealP2pServiceChanged(vServices);
@@ -275,6 +285,14 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
     return;
 }
 
+void WifiP2pManager::DealP2pPeerJoinOrLeave(bool isJoin, const std::string &mac)
+{
+    auto rptManager = WifiManager::GetInstance().GetRptInterface();
+    if (rptManager != nullptr) {
+        isJoin ? rptManager->OnStationJoin(mac) : rptManager->OnStationLeave(mac);
+    }
+}
+
 void WifiP2pManager::DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers)
 {
     WifiEventCallbackMsg cbMsg;
@@ -325,6 +343,11 @@ void WifiP2pManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
         WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_SUC_CNT));
     }
+
+    auto rptManager = WifiManager::GetInstance().GetRptInterface();
+    if (rptManager != nullptr) {
+        rptManager->OnP2pConnectionChanged(info.GetConnectState());
+    }
     return;
 }
 
@@ -364,6 +387,11 @@ void WifiP2pManager::DealP2pActionResult(P2pActionCallback action, ErrCode code)
     cbMsg.p2pAction = action;
     cbMsg.msgData = static_cast<int>(code);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+
+    auto rptManager = WifiManager::GetInstance().GetRptInterface();
+    if (rptManager != nullptr) {
+        rptManager->OnP2pActionResult(action, code);
+    }
     return;
 }
 

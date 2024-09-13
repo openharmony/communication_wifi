@@ -102,6 +102,7 @@ enum class P2P_STATE_MACHINE_CMD {
     CMD_FORM_GROUP,
     CMD_REMOVE_GROUP,
     CMD_DELETE_GROUP,
+    CMD_FORM_RPT_GROUP,
     CMD_CONNECT,
     CMD_DISCONNECT,
     CMD_SET_DEVICE_NAME,         /* set device name */

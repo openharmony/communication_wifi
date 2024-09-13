@@ -41,7 +41,7 @@ ErrCode StaInterface::DisableStaService()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::ConnectToNetwork(int networkId)
+ErrCode StaInterface::ConnectToNetwork(int networkId, int type)
 {
     LOGI("Enter Connect.\n");
     return WIFI_OPT_SUCCESS;

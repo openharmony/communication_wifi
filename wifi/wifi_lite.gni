@@ -29,6 +29,7 @@ declare_args() {
   wifi_feature_with_hpf_supported = false
   wifi_feature_with_hdi_wpa_supported = false
   wifi_feature_with_vap_manager = false
+  wifi_feature_wifi_pro_ctrl = true
 }
 
 memory_optimization_cflags = [

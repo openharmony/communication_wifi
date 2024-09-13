@@ -560,7 +560,7 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::ConnectToNetwork(int networkId) const
+ErrCode StaService::ConnectToNetwork(int networkId, int type) const
 {
     LOGI("Enter ConnectToNetwork, networkId is %{public}d.", networkId);
     WifiDeviceConfig config;
@@ -573,7 +573,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     LOGI("ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, type);
     return WIFI_OPT_SUCCESS;
 }
 

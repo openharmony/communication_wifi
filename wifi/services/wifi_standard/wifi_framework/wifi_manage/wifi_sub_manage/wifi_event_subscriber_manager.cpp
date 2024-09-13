@@ -214,12 +214,6 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     if (add) {
         return;
     }
-    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SOFT_BUS_SERVICE_UID);
-    }
-    if (systemAbilityId == MIRACAST_SERVICE_SA_ID) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MIRACAST_SERVICE_UID);
-    }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");

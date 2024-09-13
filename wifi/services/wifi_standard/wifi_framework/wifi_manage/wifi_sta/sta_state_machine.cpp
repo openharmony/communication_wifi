@@ -656,7 +656,7 @@ void StaStateMachine::StartWifiProcess()
     }
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     WIFI_LOGI("set suspend mode to chip when wifi started, screenState: %{public}d", screenState);
-    if (m_insId == INSTID_WLAN0) {
+    if (m_instId == INSTID_WLAN0) {
         if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
             != WIFI_HAL_OPT_OK) {
             WIFI_LOGE("%{public}s WpaSetSuspendMode failed!", __FUNCTION__);
@@ -3039,7 +3039,7 @@ void StaStateMachine::GetIpState::GoInState()
         } else {
             dhcpRet = StartDhcpClient(ifname.c_str(), true);
         }
-        LOGI("StartDhcpClient type:%{public}d dhcpRet:%{public}d isRoam:%{public}d m_insId=%{public}d",
+        LOGI("StartDhcpClient type:%{public}d dhcpRet:%{public}d isRoam:%{public}d m_instId=%{public}d",
             pStaStateMachine->currentTpType, dhcpRet, pStaStateMachine->isRoam, pStaStateMachine->m_instId);
         if (dhcpRet == 0) {
             LOGI("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");

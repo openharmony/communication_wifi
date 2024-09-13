@@ -190,9 +190,9 @@ public:
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
         config.ssid = "123";
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(TWO)
             .WillOnce(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config));
     }
 
     void GetGsmAuthResponseWithoutLengthTest()

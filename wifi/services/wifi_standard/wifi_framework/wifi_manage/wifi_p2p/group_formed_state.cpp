@@ -291,6 +291,7 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessagePtr msg) const
         groupManager.UpdateCurrGroupClient(memberPeer);
         WIFI_LOGI("ProcessConnectEvt memberPeer:%{private}s %{private}s", memberPeer.GetDeviceAddress().c_str(),
             memberPeer.GetRandomDeviceAddress().c_str());
+        p2pStateMachine.UpdatePersistentGroups();
     } else {
         groupManager.UpdateCurrGroupClient(device);
     }

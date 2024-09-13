@@ -264,6 +264,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastRxPackets = 0;
     linkedInfo.lastTxPackets = 0;
     linkedInfo.isAncoConnected = 0;
+    WifiSettings::GetInstance().SetDeviceAfterDisconnect();
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -695,7 +696,6 @@ void StaStateMachine::StartWifiProcess()
     InitWifiLinkedInfo();
     InitLastWifiLinkedInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    WifiSettings::GetInstance().ReloadDeviceConfig();
     /* The current state of StaStateMachine transfers to SeparatedState after
      * enable supplicant.
      */
@@ -3496,6 +3496,9 @@ void StaStateMachine::LinkedState::GoInState()
         pStaStateMachine->lastTimestamp = 0;
         pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
     }
+#endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().WifiAssetTriggerSync();
 #endif
     return;
 }

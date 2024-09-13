@@ -22,7 +22,11 @@
 #include "wifi_errcode.h"
 
 namespace OHOS::Wifi {
-enum class NetworkSelectType { AUTO_CONNECT };
+enum class NetworkSelectType {
+    AUTO_CONNECT,
+    WIFI2WIFI
+};
+
 class NetworkSelectorFactory {
 public:
     NetworkSelectorFactory();
@@ -42,6 +46,12 @@ public:
      * @return the network selector
      */
     std::unique_ptr<NetworkSelection::INetworkSelector> CreateAutoConnectNetworkSelector();
+
+    /**
+     * the function to create wifi2wifi networkSelector
+     * @return the network selector
+     */
+    std::unique_ptr<NetworkSelection::INetworkSelector> CreateWifi2WifiNetworkSelector();
 private:
     HandleFuncMap handleFuncMap;
 };

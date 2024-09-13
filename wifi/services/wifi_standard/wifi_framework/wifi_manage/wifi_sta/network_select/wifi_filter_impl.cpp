@@ -16,20 +16,30 @@
 #include "wifi_filter_impl.h"
 #include "network_selection_utils.h"
 #include "network_status_history_manager.h"
+#include "wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_settings.h"
+#include "network_black_list_manager.h"
+#include "wifi_ap_msg.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_app_state_aware.h"
 #endif
 namespace OHOS::Wifi::NetworkSelection {
 DEFINE_WIFILOG_LABEL("WifiFilter")
-
+namespace {
 constexpr int RECHECK_DELAYED_SECONDS = 1 * 60 * 60;
 constexpr int MIN_5GHZ_BAND_FREQUENCY = 5000;
 constexpr int MIN_RSSI_VALUE_24G = -77;
 constexpr int MIN_RSSI_VALUE_5G = -80;
 constexpr int SIGNAL_LEVEL_TWO = 2;
 constexpr int POOR_PORTAL_RECHECK_DELAYED_SECONDS = 2 * RECHECK_DELAYED_SECONDS;
+constexpr int32_t MIN_SIGNAL_LEVEL_INTERVAL = 2;
+constexpr int32_t SIGNAL_LEVEL_THREE = 3;
+constexpr int32_t SIGNAL_LEVEL_FOUR = 4;
+constexpr int32_t MIN_RSSI_INTERVAL = 8;
+constexpr int32_t SCAN_24GHZ_BAND = 1;
+constexpr int32_t SCAN_5GHZ_BAND = 2;
+}
 
 HiddenWifiFilter::HiddenWifiFilter() : SimpleWifiFilter("notHidden") {}
 
@@ -253,7 +263,6 @@ bool PortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
     return networkCandidate.wifiDeviceConfig.isPortal;
 }
 
-
 MaybePortalWifiFilter::MaybePortalWifiFilter() : SimpleWifiFilter("maybePortal") {}
 
 MaybePortalWifiFilter::~MaybePortalWifiFilter()
@@ -292,7 +301,6 @@ bool NoInternetWifiFilter::Filter(NetworkCandidate &networkCandidate)
     return NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
 }
 
-
 WeakAlgorithmWifiFilter::WeakAlgorithmWifiFilter() : SimpleWifiFilter("noWeakAlgorithm") {}
 
 WeakAlgorithmWifiFilter::~WeakAlgorithmWifiFilter()
@@ -318,6 +326,223 @@ bool WeakAlgorithmWifiFilter::Filter(NetworkCandidate &networkCandidate)
         WIFI_LOGD("WeakAlgorithm: WPA AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
         return false;
     }
+    return true;
+}
+
+NotCurrentNetworkFilter::NotCurrentNetworkFilter() : SimpleWifiFilter("NotCurrentNetwork") {}
+
+NotCurrentNetworkFilter::~NotCurrentNetworkFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool NotCurrentNetworkFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (networkCandidate.interScanInfo.bssid == linkedInfo.bssid) {
+        WIFI_LOGI("NotCurrentNetworkFilter, same bssid:%{public}s",
+            networkCandidate.ToString().c_str());
+        return false;
+    }
+
+    if ((networkCandidate.interScanInfo.ssid == linkedInfo.ssid) &&
+        NetworkSelectionUtils::IsConfigOpenOrEapType(networkCandidate)) {
+        WIFI_LOGI("NotCurrentNetworkFilter, same ssid and open or eap type:%{public}s",
+            networkCandidate.ToString().c_str());
+        return false;
+    }
+    return true;
+}
+
+SignalLevelFilter::SignalLevelFilter() : SimpleWifiFilter("SignalLevel") {}
+
+SignalLevelFilter::~SignalLevelFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool SignalLevelFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    auto &interScanInfo = networkCandidate.interScanInfo;
+    int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(interScanInfo.rssi, interScanInfo.band);
+    return signalLevel > SIGNAL_LEVEL_TWO;
+}
+
+NotNetworkBlackListFilter::NotNetworkBlackListFilter() : SimpleWifiFilter("NotNetworkBlackList") {}
+
+NotNetworkBlackListFilter::~NotNetworkBlackListFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    if (NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(networkCandidate.interScanInfo.bssid)) {
+        WIFI_LOGI("NotNetworkBlockListFilter, in abnormal wifi blocklist, skip candidate:%{public}s",
+            networkCandidate.ToString().c_str());
+        return false;
+    }
+ 
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int32_t curSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
+    auto scanInfo = networkCandidate.interScanInfo;
+    int32_t targetSignalLevel = WifiSettings::GetInstance().GetSignalLevel(scanInfo.rssi, scanInfo.band);
+    if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(networkCandidate.interScanInfo.bssid) &&
+        (targetSignalLevel <= SIGNAL_LEVEL_THREE || targetSignalLevel - curSignalLevel < MIN_SIGNAL_LEVEL_INTERVAL)) {
+        WIFI_LOGI("NotNetworkBlackListFilter, in wifi blocklist and level interval is not enough,"
+            "skip candidate:%{public}s", networkCandidate.ToString().c_str());
+        return false;
+    }
+    return true;
+}
+
+NotP2pFreqAt5gFilter::NotP2pFreqAt5gFilter() : SimpleWifiFilter("NotP2pFreqAt5g") {}
+
+NotP2pFreqAt5gFilter::~NotP2pFreqAt5gFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool NotP2pFreqAt5gFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    if (networkCandidate.interScanInfo.band == SCAN_24GHZ_BAND) {
+        return true;
+    }
+
+    Hid2dUpperScene softbusScene;
+    Hid2dUpperScene castScene;
+    Hid2dUpperScene shareScene;
+    Hid2dUpperScene mouseCrossScene;
+    Hid2dUpperScene miracastScene;
+    WifiP2pLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SHARE_SERVICE_UID, shareScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MOUSE_CROSS_SERVICE_UID, mouseCrossScene);
+    WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
+    if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED
+        && WifiConfigCenter::GetInstance().GetP2pEnhanceState() == 0) {
+        return true;
+    }
+    // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
+    // scene & 0x07 > 0 means one of them takes effect.
+    bool isCastScene = false;
+    if ((softbusScene.scene & 0x07) > 0 || (castScene.scene & 0x07) > 0 || (shareScene.scene & 0x07) > 0 ||
+        (mouseCrossScene.scene & 0x07) > 0 || (miracastScene.scene & 0x07) > 0) {
+        isCastScene = true;
+    }
+
+    if (!isCastScene) {
+        return true;
+    }
+
+    return NetworkSelectionUtils::IsSameFreqAsP2p(networkCandidate);
+}
+
+ValidConfigNetworkFilter::ValidConfigNetworkFilter() : SimpleWifiFilter("ValidConfigNetwork") {}
+
+ValidConfigNetworkFilter::~ValidConfigNetworkFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    // no internet filtering
+    auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
+    if (wifiDeviceConfig.noInternetAccess) {
+        WIFI_LOGI("ValidConfigNetworkFilter, no internet access, skip candidate:%{public}s",
+            networkCandidate.ToString().c_str());
+        return false;
+    }
+
+    // portal network filtering
+    if (networkCandidate.wifiDeviceConfig.isPortal) {
+        WIFI_LOGI("ValidConfigNetworkFilter, portal network, skip candidate:%{public}s",
+            networkCandidate.ToString().c_str());
+        return false;
+    }
+
+    // disable network filtering
+    auto &networkSelectionStatus = networkCandidate.wifiDeviceConfig.networkSelectionStatus;
+    if (networkSelectionStatus.networkSelectionDisableReason != DisabledReason::DISABLED_NONE) {
+        WIFI_LOGI("ValidConfigNetworkFilter, disable network, skip candidate:%{public}s",
+            networkCandidate.ToString().c_str());
+        return false;
+    }
+
+    // empty network status history
+    if (NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory)) {
+        WIFI_LOGI("ValidConfigNetworkFilter, no network status history, skip candidate:%{public}s",
+            networkCandidate.ToString().c_str());
+        return false;
+    }
+
+    // maybe portal network filtering
+    if (NetworkSelectionUtils::IsScanResultForOweNetwork(networkCandidate) &&
+        NetworkSelectionUtils::IsOpenAndMaybePortal(networkCandidate)) {
+        WIFI_LOGI("ValidConfigNetworkFilter, maybe portal network, skip candidate:%{public}s",
+            networkCandidate.ToString().c_str());
+        return false;
+    }
+
+    return true;
+}
+
+WifiSwitchThresholdFilter::WifiSwitchThresholdFilter() : SimpleWifiFilter("WifiSwitchThreshold") {}
+
+WifiSwitchThresholdFilter::~WifiSwitchThresholdFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool WifiSwitchThresholdFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int32_t curSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
+    if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) && curSignalLevel == SIGNAL_LEVEL_THREE) {
+        return false;
+    }
+
+    auto &interScanInfo = networkCandidate.interScanInfo;
+    if (curSignalLevel == SIGNAL_LEVEL_FOUR || (interScanInfo.rssi - linkedInfo.rssi < MIN_RSSI_INTERVAL)) {
+        return false;
+    }
+
+    int32_t targetSignalLevel = WifiSettings::GetInstance().GetSignalLevel(interScanInfo.rssi, interScanInfo.band);
+    if (linkedInfo.band == SCAN_5GHZ_BAND && curSignalLevel == SIGNAL_LEVEL_THREE &&
+        interScanInfo.band == SCAN_24GHZ_BAND && targetSignalLevel == SIGNAL_LEVEL_FOUR) {
+        return false;
+    }
+
     return true;
 }
 }

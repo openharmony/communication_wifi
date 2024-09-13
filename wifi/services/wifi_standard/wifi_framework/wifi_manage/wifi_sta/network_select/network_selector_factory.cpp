@@ -24,6 +24,8 @@ NetworkSelectorFactory::NetworkSelectorFactory()
 {
     handleFuncMap[static_cast<uint32_t>(NetworkSelectType::AUTO_CONNECT)] =
         &NetworkSelectorFactory::CreateAutoConnectNetworkSelector;
+    handleFuncMap[static_cast<uint32_t>(NetworkSelectType::WIFI2WIFI)] =
+        &NetworkSelectorFactory::CreateWifi2WifiNetworkSelector;
 }
 
 std::optional<std::unique_ptr<NetworkSelection::INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(
@@ -40,5 +42,10 @@ std::optional<std::unique_ptr<NetworkSelection::INetworkSelector>> NetworkSelect
 std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateAutoConnectNetworkSelector()
 {
     return std::make_unique<NetworkSelection::AutoConnectIntegrator>();
+}
+
+std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateWifi2WifiNetworkSelector()
+{
+    return std::make_unique<NetworkSelection::Wifi2WifiIntegrator>();
 }
 } // namespace OHOS::Wifi

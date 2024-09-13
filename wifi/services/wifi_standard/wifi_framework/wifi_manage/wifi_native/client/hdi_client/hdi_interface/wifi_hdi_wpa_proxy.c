@@ -428,6 +428,11 @@ struct IWpaInterface* GetWpaInterface()
     return wpaObj;
 }
 
+pthread_mutex_t* GetWpaObjMutex(void)
+{
+    return &g_wpaObjMutex;
+}
+
 WifiErrorNo SetHdiStaIfaceName(const char *ifaceName)
 {
     pthread_mutex_lock(&g_ifaceNameMutex);

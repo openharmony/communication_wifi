@@ -239,7 +239,7 @@ int RpcGetSupportedComboModes(RpcServer *server, Context *context)
         return HAL_FAILURE;
     }
     int maxSize = 0;
-    if (ReadInt(context, &maxSize) < 0 || maxSize <= 0 || maxSize > WIFI_IDL_INTERFACE_SUPPORT_COMBINATIONS) {
+    if (ReadInt(context, &maxSize) < 0 || maxSize <= 0  || maxSize > WIFI_IDL_INTERFACE_SUPPORT_COMBINATIONS) {
         return HAL_FAILURE;
     }
     int *modes = (int *)calloc(maxSize, sizeof(int));

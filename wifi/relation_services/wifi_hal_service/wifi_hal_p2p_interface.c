@@ -161,7 +161,7 @@ static WifiErrorNo AddP2pRandomMacFlag()
         LOGE("%{public}s: failed to open the file", __func__);
         return WIFI_HAL_FAILED;
     }
-    while (fgets(str, BUFF_SIZE, fp)) {
+    while (fgets(str, BUFF_SIZE, fp) != NULL) {
         if (strstr(str, P2P_RANDOM_MAC_FLAG) != NULL) {
             indicate = 1;
             break;

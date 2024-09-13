@@ -950,6 +950,7 @@ void StaStateMachine::DealSignalPollResult()
         LOGE("GetConnectSignalInfo return fail: %{public}d.", ret);
         return;
     }
+
     if (signalInfo.frequency > 0) {
         linkedInfo.frequency = signalInfo.frequency;
     }
@@ -1252,7 +1253,6 @@ void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
 #endif
     /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP, linkedInfo);
-
     mConnectFailedCnt = 0;
     /* The current state of StaStateMachine transfers to GetIpState. */
     SwitchState(pGetIpState);

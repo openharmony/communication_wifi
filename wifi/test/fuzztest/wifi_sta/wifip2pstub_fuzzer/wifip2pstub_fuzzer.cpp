@@ -625,18 +625,6 @@ void OnCheckCanUseP2pFuzzTest(const uint8_t* data, size_t size)
         datas, reply, option);
 }
 
-void Hid2dIsWideBandwidthSupportedFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_WIDE_SUPPORTED),
-        datas, reply, option);
-}
-
 void WifiP2pServiceImplFuzzTest(const uint8_t* data, size_t size)
 {
     WifiP2pServiceInfo srvInfo;
@@ -742,7 +730,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest(data, size);
     OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::Wifi::WifiP2pServiceImplFuzzTest(data, size);
-    OHOS::Wifi::Hid2dIsWideBandwidthSupportedFuzzTest(data, size);
     sleep(U32_AT_SIZE_ZERO);
     return 0;
 }

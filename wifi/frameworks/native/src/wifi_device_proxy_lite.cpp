@@ -1734,6 +1734,5 @@ ErrCode WifiDeviceProxy::GetWifiDetailState(WifiDetailState &state)
     }
     return ErrCode(owner.retCode);
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

@@ -25,7 +25,6 @@
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/x509.h>
-#include "app_mgr_client.h"
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"

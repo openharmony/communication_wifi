@@ -260,17 +260,17 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
         netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->address_ = wifiIpV6Info.globalIpV6Address;
     }
-    LOGD("SetNetLinkIPInfo randGlobalIpV6Address:%{public}s", wifiIpV6Info.randGlobalIpV6Address.c_str());
+
     if (!wifiIpV6Info.randGlobalIpV6Address.empty()) {
         netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->address_ = wifiIpV6Info.randGlobalIpV6Address;
     }
-    LOGD("SetNetLinkIPInfo uniqueLocalAddress1:%{public}s", wifiIpV6Info.uniqueLocalAddress1.c_str());
+
     if (!wifiIpV6Info.uniqueLocalAddress1.empty()) {
         netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress1;
     }
-    LOGD("SetNetLinkIPInfo uniqueLocalAddress2:%{public}s", wifiIpV6Info.uniqueLocalAddress2.c_str());
+
     if (!wifiIpV6Info.uniqueLocalAddress2.empty()) {
         netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress2;

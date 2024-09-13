@@ -104,7 +104,7 @@ int HalCallbackNotify(const char* event)
 
 WifiWpaChbaInterface *GetWifiWpaChbaInterface()
 {
-    if (g_wpaChbaInterface != NULL) {
+    if(g_wpaChbaInterface != NULL) {
         return g_wpaChbaInterface;
     }
     g_wpaChbaInterface = (WifiWpaChbaInterface *)calloc(1, sizeof(WifiWpaChbaInterface));

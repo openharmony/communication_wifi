@@ -155,13 +155,12 @@ if (defined(ohos_lite)) {
     }
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
-    ldflags = memory_optimization_ldflags
     cflags_cc += [
       "-std=c++17",
       "-fno-rtti",
     ]
 
-    ldflags += [
+    ldflags = [
       "-fPIC",
       "-Wl,-E",
     ]

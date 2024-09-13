@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace Wifi {
-
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
 int WifiControllerMachine::mSoftapStartFailCount{0};

@@ -177,7 +177,6 @@ public:
     ErrCode GetWifiDetailState(WifiDetailState &state) override;
 
     ErrCode SetSatelliteState(const int state) override;
-
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

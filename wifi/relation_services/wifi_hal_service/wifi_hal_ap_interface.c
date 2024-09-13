@@ -67,7 +67,7 @@ WifiErrorNo StartHostapd(void)
     int onceMove = 0;
     int sumMove = 0;
     onceMove = snprintf_s(p, WIFI_MULTI_CMD_MAX_LEN - sumMove,
-        WIFI_MULTI_CMD_MAX_LEN - sumMove - 1, "%s", WPA_HOSTAPD_NAME);
+        WIFI_MULTI_CMD_MAX_LEN - sumMove -1, "%s", WPA_HOSTAPD_NAME);
     if (onceMove < 0) {
         return WIFI_HAL_FAILED;
     }

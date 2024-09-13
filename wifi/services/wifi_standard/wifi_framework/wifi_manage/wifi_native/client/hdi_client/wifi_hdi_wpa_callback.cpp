@@ -79,8 +79,6 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         LOGI("OnEventDisconnected, wrong password");
         cbk.onWpaSsidWrongKey();
     }
-    bool isPsk = false;
-    std::vector<OHOS::Wifi::WifiScanInfo> scanResults;
     OHOS::Wifi::WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
     for (OHOS::Wifi::WifiScanInfo &item : scanResults) {
         if (strcasecmp(item.bssid.c_str(), szBssid) == 0 &&
@@ -90,7 +88,6 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
                 break;
         }
     }
-    int locallyGenerated = disconectParam->locallyGenerated;
     if (cbk.onWpaSsidWrongKey && isPsk &&
         g_currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
         (reasonCode != Wifi80211ReasonCode::WLAN_REASON_IE_IN_4WAY_DIFFERS || !locallyGenerated)) {

@@ -389,7 +389,6 @@ ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
 
 ErrCode WifiServiceScheduler::PostStartWifi(int instId)
 {
-    ErrCode errCode = WIFI_OPT_FAILED;
     if (StartWifiStaService(instId) == WIFI_OPT_FAILED) {
         WIFI_LOGE("StartWifiStaService failed!");
     }
@@ -400,7 +399,7 @@ ErrCode WifiServiceScheduler::PostStartWifi(int instId)
 #endif
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 #ifdef FEATURE_P2P_SUPPORT
-    errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
+    ErrCode errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
     if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
         WIFI_LOGE("AutoStartStaService, AutoStartP2pService failed!");
     }

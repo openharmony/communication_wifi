@@ -331,7 +331,7 @@ public:
     void GetWifiRoleTest()
     {
         int instId = 0;
-        pWifiControllerMachine->GetWifiRole(instId);
+        pWifiControllerMachine->GetWifiRole();
     }
 };
 

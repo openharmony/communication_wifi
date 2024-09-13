@@ -354,6 +354,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
             return EXECUTED;
         }
     }
+
     SharedLinkManager::IncreaseSharedLink();
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");

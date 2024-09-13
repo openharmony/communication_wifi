@@ -16,7 +16,6 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_hdi_util.h"
 
-
 using namespace testing::ext;
 
 namespace OHOS {

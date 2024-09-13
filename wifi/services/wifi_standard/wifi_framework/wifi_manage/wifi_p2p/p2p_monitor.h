@@ -409,7 +409,7 @@ private:
      */
     void WpaEventApStaConnected(const std::string &p2pDeviceAddress,
         const std::string &p2pGroupAddress) const;
-    
+
     /**
      * @Description Register Wpa_supplicant client connection failure callback function
      *

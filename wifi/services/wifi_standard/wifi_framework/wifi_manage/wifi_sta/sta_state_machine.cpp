@@ -4371,6 +4371,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         if (!ipv6Info.primaryDns.empty()) {
             WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
                 pStaStateMachine->GetInstanceId());
+        }
 #endif
     } else {
         LOGI("TryToSaveIpV6Result not UpdateNetLinkInfo");

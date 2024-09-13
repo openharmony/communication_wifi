@@ -453,7 +453,8 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
         return WIFI_OPT_FAILED;
     }
     if (instId == INSTID_WLAN0) {
-        errCode = pService->RegisterStaServiceCallback(WifiManager::GetInstance().GetWifiScanManager()->GetStaCallback());
+        errCode = pService->RegisterStaServiceCallback(
+            WifiManager::GetInstance().GetWifiScanManager()->GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("WifiScanManager register sta service callback failed!");
             return WIFI_OPT_FAILED;

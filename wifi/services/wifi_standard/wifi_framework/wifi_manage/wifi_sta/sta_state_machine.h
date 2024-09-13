@@ -1056,11 +1056,6 @@ private:
      */
     void HandlePostDhcpSetup();
 
-    /**
-     * @Description Get sta state machine instant id
-     */
-    int GetInstId();
-
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.

@@ -60,7 +60,7 @@ private:
     ErrCode PreStartWifi(int instId, std::string &staIfName);
     ErrCode PostStartWifi(int instId);
     ErrCode PostStartWifi2(int instId);
-    ErrCode InitStaService(IStaService *pService);
+    ErrCode InitStaService(IStaService *pService, int instId);
     ErrCode StartWifiStaService(int instId);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     ErrCode StartSelfCureService(int instId);

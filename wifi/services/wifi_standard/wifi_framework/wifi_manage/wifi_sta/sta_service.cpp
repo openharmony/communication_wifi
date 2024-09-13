@@ -124,30 +124,32 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
 
     pStaMonitor->SetStateMachine(pStaStateMachine);
 
-    pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine, m_instId);
-    if (pStaAutoConnectService == nullptr) {
-        WIFI_LOGE("Alloc pStaAutoConnectService failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    if (pStaAutoConnectService->InitAutoConnectService() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("InitAutoConnectService failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    pStaAutoConnectService->SetAutoConnectStateCallback(callbacks);
+    if (m_instId == INSTID_WLAN0) {
+        pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine, m_instId);
+        if (pStaAutoConnectService == nullptr) {
+            WIFI_LOGE("Alloc pStaAutoConnectService failed.\n");
+            return WIFI_OPT_FAILED;
+        }
+        if (pStaAutoConnectService->InitAutoConnectService() != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("InitAutoConnectService failed.\n");
+            return WIFI_OPT_FAILED;
+        }
+        pStaAutoConnectService->SetAutoConnectStateCallback(callbacks);
 #ifndef OHOS_ARCH_LITE
-    pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
-    if (pStaAppAcceleration == nullptr) {
-        WIFI_LOGE("Alloc pStaAppAcceleration failed.\n");
-    }
+        pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
+        if (pStaAppAcceleration == nullptr) {
+            WIFI_LOGE("Alloc pStaAppAcceleration failed.\n");
+        }
 
-    if (pStaAppAcceleration->InitAppAcceleration() != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("InitAppAcceleration failed.\n");
-    }
-    std::vector<StaServiceCallback> appAccelerationStaCallBacks;
-    appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
-    RegisterStaServiceCallback(appAccelerationStaCallBacks);
-    GetStaControlInfo();
+        if (pStaAppAcceleration->InitAppAcceleration() != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("InitAppAcceleration failed.\n");
+        }
+        std::vector<StaServiceCallback> appAccelerationStaCallBacks;
+        appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
+        RegisterStaServiceCallback(appAccelerationStaCallBacks);
+        GetStaControlInfo();
 #endif
+    }
     WIFI_LOGI("Init staservice successfully.\n");
     return WIFI_OPT_SUCCESS;
 }
@@ -189,7 +191,9 @@ ErrCode StaService::EnableStaService()
         WIFI_LOGI("m_staObserver is null\n");
         return WIFI_OPT_FAILED;
     }
-    WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
+    if (m_instId == INSTID_WLAN0) {
+        WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
+    }
 #endif
     WifiSettings::GetInstance().ReloadDeviceConfig();
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA, STA_CONNECT_MODE);

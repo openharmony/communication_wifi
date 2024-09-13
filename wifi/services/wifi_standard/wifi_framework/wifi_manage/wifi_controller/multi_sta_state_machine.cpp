@@ -177,7 +177,6 @@ void MultiStaStateMachine::IdleState::HandleStartInIdleState(InternalMessagePtr 
         pMultiStaStateMachine->mcb.onStartFailure(mid);
         return;
     }
-    pMultiStaStateMachine->SwitchState(pMultiStaStateMachine->pStartedState);
 }
 
 MultiStaStateMachine::StartedState::StartedState(MultiStaStateMachine *multiStaStateMachine)
@@ -211,9 +210,6 @@ bool MultiStaStateMachine::StartedState::ExecuteStateMsg(InternalMessagePtr msg)
                 WIFI_LOGE("AutoStopStaWifi2Service fail.\n");
             }
             pMultiStaStateMachine->mcb.onStopped(mid);
-            break;
-        case CONCRETE_CMD_STA_WIFI2_STOP:
-            pMultiStaStateMachine->SwitchState(pMultiStaStateMachine->pIdleState);
             break;
         default:
             break;

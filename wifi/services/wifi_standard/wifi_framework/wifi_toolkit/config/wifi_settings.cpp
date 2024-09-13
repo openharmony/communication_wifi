@@ -1792,12 +1792,14 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
     if (bufferLen < 0) {
         LOGE("GetConfigbyBackupXml read fail.");
         free(buffer);
+        buffer = nullptr;
         return -1;
     }
     std::string backupData = std::string(buffer, buffer + bufferLen);
     if (memset_s(buffer, statBuf.st_size, 0, statBuf.st_size) != EOK) {
         LOGE("GetConfigbyBackupXml memset_s fail.");
         free(buffer);
+        buffer = nullptr;
         return -1;
     }
     free(buffer);
@@ -1893,6 +1895,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         config.wifiWapiConfig.wapiAsCertData = "";
     }
     delete encryWapiAs;
+    encryWapiAs = nullptr;
 
     EncryptedData *encryWapiUser = new EncryptedData(config.wifiWapiConfig.encryptedUserCertData,
         config.wifiWapiConfig.userCertDataIV);
@@ -1905,6 +1908,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         config.wifiWapiConfig.wapiUserCertData = "";
     }
     delete encryWapiUser;
+    encryWapiUser = nullptr;
 }
 
 int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
@@ -1941,6 +1945,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wepKeys[config.wepTxKeyIndex] = "";
     }
     delete encryWep;
+    encryWep = nullptr;
 
     EncryptedData *encryEap = new EncryptedData(config.wifiEapConfig.encryptedData, config.wifiEapConfig.IV);
     std::string decryEap = "";
@@ -1952,6 +1957,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
+    encryEap = nullptr;
     DecryptionWapiConfig(mWifiEncryptionInfo, config);
     LOGD("DecryptionDeviceConfig end");
     return 0;

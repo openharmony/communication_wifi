@@ -27,6 +27,7 @@ public:
     static int InstallCert(const std::vector<uint8_t>& certEntry,
             const std::string& pwd, std::string& alias, std::string& uri);
     static int UninstallCert(std::string& uri);
+    static uint8_t FreeData(uint8_t* pData);
 };
 } // namespace Wifi
 } // namespace OHOS

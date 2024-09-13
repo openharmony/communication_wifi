@@ -19,10 +19,10 @@
 
 #include "wifi_hdi_wpa_proxy.h"
 typedef unsigned char u8;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 int32_t OnEventDisconnected(struct IWpaCallback *self,
     const struct HdiWpaDisconnectParam *disconectParam, const char* ifName);
 int32_t OnEventConnected(struct IWpaCallback *self,

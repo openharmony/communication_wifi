@@ -49,6 +49,7 @@ static void OnWpaStateChangedMock(int status)
     LOGI("OnWpaStateChangedMock");
 }
 
+
 static void OnWpsOverlapMock(int status)
 {
     LOGI("OnWpsOverlapMock");

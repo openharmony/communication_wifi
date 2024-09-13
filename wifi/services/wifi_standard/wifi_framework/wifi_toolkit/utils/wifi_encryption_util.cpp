@@ -191,6 +191,15 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     return ret;
 }
 
+HksErrorCode HkFreeData(uint8_t* pData)
+{
+    if (pData != NULL) {
+        free(pData);
+        pData = nullptr;
+    }
+    return HKS_FAILURE;
+}
+
 int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSet *paramSet,
     const struct HksBlob *inData, struct HksBlob *outData)
 {
@@ -218,19 +227,16 @@ int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSe
         }
         if (hksResult != HKS_SUCCESS) {
             WIFI_LOGE("HksUpdateAndFinish do HksUpdate or HksFinish failed: %{public}d.", hksResult);
-            free(outDataSeg.data);
-            return HKS_FAILURE;
+            return HkFreeData(outDataSeg.data);
         }
 
         if (handledOutDataSize + outDataSeg.size > outData->size) {
             WIFI_LOGE("HksUpdateAndFinish outData->size is too small.");
-            free(outDataSeg.data);
-            return HKS_FAILURE;
+            return HkFreeData(outDataSeg.data);
         }
         if (memcpy_s(handledOutData, outDataSeg.size, outDataSeg.data, outDataSeg.size) != EOK) {
             WIFI_LOGE("HksUpdateAndFinish memcpy_s failed.");
-            free(outDataSeg.data);
-            return HKS_FAILURE;
+            return HkFreeData(outDataSeg.data);
         }
 
         handledOutData += outDataSeg.size;
@@ -414,6 +420,7 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("WifiLoopEncrypt HksUpdateAndFinish failed: %{public}d.", ret);
         free(cipherBuf);
+        cipherBuf = nullptr;
         return ret;
     }
 
@@ -421,6 +428,7 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
     encryptedData.encryptedPassword = temp;
     HksFreeParamSet(&encryParamSet);
     free(cipherBuf);
+    cipherBuf = nullptr;
     return ret;
 }
 
@@ -461,18 +469,21 @@ int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const Encr
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("WifiLoopDecrypt HksUpdateAndFinish failed: %{public}d.", ret);
         free(plainBuf);
+        plainBuf = nullptr;
         return ret;
     }
     std::string temp(outData.data, outData.data + outData.size);
     if (memset_s(outData.data, outData.size, 0, outData.size) != EOK) {
         WIFI_LOGE("WifiLoopDecrypt memset_s return error!");
         free(plainBuf);
+        plainBuf = nullptr;
         return HKS_FAILURE;
     }
     decryptedData = temp;
     std::fill(temp.begin(), temp.end(), 0);
     HksFreeParamSet(&decryParamSet);
     free(plainBuf);
+    plainBuf = nullptr;
     return ret;
 }
 

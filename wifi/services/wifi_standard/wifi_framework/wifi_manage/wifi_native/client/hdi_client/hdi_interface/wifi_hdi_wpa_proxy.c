@@ -125,10 +125,16 @@ static void AddIfaceName(const char* ifName)
         LOGI("%{public}s err2", __func__);
         return;
     }
-    memset_s(current->ifName, BUFF_SIZE, 0, strlen(ifName));
+    if (memset_s(current->ifName, BUFF_SIZE, 0, strlen(ifName)) != EOK) {
+        free(current);
+        current = NULL;
+        LOGI("%{public}s err4", __func__);
+        return;
+    }
     current->next = NULL;
     if (strncpy_s(current->ifName, BUFF_SIZE, ifName, strlen(ifName)) != EOK) {
         free(current);
+        current = NULL;
         LOGI("%{public}s err3", __func__);
         return;
     }

@@ -1453,6 +1453,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
     if (shouldStopTimer) {
         StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     }
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     switch (eventName) {
         case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
             SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
@@ -3631,7 +3632,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
                 WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
                 return false;
             }
-            if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid) != WIFI_HAL_OPT_OK) {
+            if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName) != WIFI_HAL_OPT_OK) {
                 WIFI_LOGE("SetBssid return fail.");
                 return false;
             }

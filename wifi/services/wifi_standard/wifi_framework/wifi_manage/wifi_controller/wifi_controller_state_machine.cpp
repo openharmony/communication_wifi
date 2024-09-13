@@ -228,13 +228,13 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         case CMD_STA_START_FAILURE:
             msg->GetParam1() == INSTID_WLAN0 ?
-                HandleStaStartFailure(INSTID_WLAN0) : pWifiControllerMachine->RemoveConcreteWifi2Manager(INSTID_WLAN1);
+                HandleStaStartFailure(INSTID_WLAN0) : pWifiControllerMachine->RemoveMultiStaManager(INSTID_WLAN1);
             break;
         case CMD_CONCRETE_STOPPED:
             pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0);
             break;
-        case CMD_STA_WIFI2_STOPPED:
-            pWifiControllerMachine->RemoveConcreteWifi2Manager(INSTID_WLAN1);
+        case CMD_MULTI_STA_STOPPED:
+            pWifiControllerMachine->RemoveMultiStaManager(INSTID_WLAN1);
             break;
         case CMD_AIRPLANE_TOGGLED:
             if (msg->GetParam1()) {
@@ -247,7 +247,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, 0);
             break;
         case CMD_STA_REMOVED:
-            INSTID_WLAN0 == msg->GetParam2() ? HandleStaRemoved(msg) : HandleStaWifi2Removed(msg);
+            INSTID_WLAN0 == msg->GetParam2() ? HandleStaRemoved(msg) : HandleWifi2Removed(msg);
             break;
         case CMD_CONCRETECLIENT_REMOVED:
             HandleConcreteClientRemoved(msg);
@@ -375,9 +375,9 @@ bool WifiControllerMachine::ConcreteIdExist(int id)
     return false;
 }
 
-bool WifiControllerMachine::ConcreteWifi2IdExist(int id)
+bool WifiControllerMachine::IsWifi2IdExist(int id)
 {
-    if (!HasAnyWifi2ConcreteManager()) {
+    if (!HasAnyMultiStaManager()) {
         return false;
     }
     std::unique_lock<std::mutex> lock(multiStaManagerMutex);
@@ -400,11 +400,11 @@ bool WifiControllerMachine::HasAnyConcreteManager()
     return true;
 }
 
-bool WifiControllerMachine::HasAnyWifi2ConcreteManager()
+bool WifiControllerMachine::HasAnyMultiStaManager()
 {
     std::unique_lock<std::mutex> lock(multiStaManagerMutex);
     if (multiStaManagers.empty()) {
-        WIFI_LOGE("Enter HasAnyWifi2ConcreteManager is empty");
+        WIFI_LOGE("Enter HasAnyMultiStaManager is empty");
         return false;
     }
     return true;
@@ -562,10 +562,8 @@ void WifiControllerMachine::StopAllConcreteManagers()
     }
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
-        if ((*iter)->mid == INSTID_WLAN0) {
-            WIFI_LOGD("Enter StopAllConcreteManagers. mid = %{public}d", (*iter)->mid);
-            (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STOP, INSTID_WLAN0);
-        }
+        WIFI_LOGD("Enter StopAllConcreteManagers. mid = %{public}d", (*iter)->mid);
+        (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STOP);
     }
 }
 
@@ -604,7 +602,7 @@ void WifiControllerMachine::StopSoftapManager(int id)
 void WifiControllerMachine::StopMultiStaManager(int id)
 {
     WIFI_LOGI("Enter StopMultiStaManager, id = %{public}d", id);
-    if (!HasAnyWifi2ConcreteManager()) {
+    if (!HasAnyMultiStaManager()) {
         return;
     }
     std::unique_lock<std::mutex> lock(multiStaManagerMutex);
@@ -651,26 +649,26 @@ void WifiControllerMachine::RemoveConcreteManager(int id)
     }
 }
 
-void WifiControllerMachine::RemoveConcreteWifi2Manager(int id)
+void WifiControllerMachine::RemoveMultiStaManager(int id)
 {
-    MultiStaManager *wifi2StaManager = nullptr;
+    MultiStaManager *multiStaMgr = nullptr;
 
-    if (!HasAnyWifi2ConcreteManager()) {
+    if (!HasAnyMultiStaManager()) {
         return;
     }
     {
         std::unique_lock<std::mutex> lock(multiStaManagerMutex);
         for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
             if ((*iter)->mid == id) {
-                wifi2StaManager = *iter;
+                multiStaMgr = *iter;
                 multiStaManagers.erase(iter);
                 break;
             }
         }
     }
-    if (wifi2StaManager != nullptr) {
-        delete wifi2StaManager;
-        wifi2StaManager = nullptr;
+    if (multiStaMgr != nullptr) {
+        delete multiStaMgr;
+        multiStaMgr = nullptr;
     }
 }
 
@@ -710,7 +708,7 @@ void WifiControllerMachine::HandleStaClose(int id)
     }
 }
 
-void WifiControllerMachine::HandleStaWifi2Close(int id)
+void WifiControllerMachine::HandleWifi2Close(int id)
 {
     std::unique_lock<std::mutex> lock(multiStaManagerMutex);
     if (multiStaManagers.empty()) {
@@ -718,7 +716,7 @@ void WifiControllerMachine::HandleStaWifi2Close(int id)
     }
     for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
         if ((*iter)->mid == id) {
-            (*iter)->GetMultiStaMachine()->SendMessage(CMD_STA_WIFI2_STOP);
+            (*iter)->GetMultiStaMachine()->SendMessage(MULTI_STA_CMD_STOPPED);
             break;
         }
     }
@@ -851,7 +849,7 @@ void WifiControllerMachine::EnableState::HandleStaRemoved(InternalMessagePtr msg
     pWifiControllerMachine->StopConcreteManager(msg->GetParam2());
 }
 
-void WifiControllerMachine::EnableState::HandleStaWifi2Removed(InternalMessagePtr msg)
+void WifiControllerMachine::EnableState::HandleWifi2Removed(InternalMessagePtr msg)
 {
     pWifiControllerMachine->StopMultiStaManager(msg->GetParam2());
 }
@@ -887,11 +885,11 @@ void WifiControllerMachine::HandleStaStart(int id)
     }
 }
 
-void WifiControllerMachine::HandleStaWifi2Start(int id)
+void WifiControllerMachine::HandleWifi2Start(int id)
 {
     std::unique_lock<std::mutex> lock(multiStaManagerMutex);
     for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
-        (*iter)->GetMultiStaMachine()->SendMessage(CMD_STA_WIFI2_START);
+        (*iter)->GetMultiStaMachine()->SendMessage(MULTI_STA_CMD_STARTED);
     }
 }
 

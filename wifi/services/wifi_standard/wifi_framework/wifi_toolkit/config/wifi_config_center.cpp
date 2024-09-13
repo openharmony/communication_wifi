@@ -1558,5 +1558,14 @@ WifiMacAddrErrCode WifiConfigCenter::AddMacAddrPairs(WifiMacAddrInfoType type,
     }
     return WIFI_MACADDR_INVALID_PARAM;
 }
+std::set<int> WifiConfigCenter::GetAllWifiLinkedNetworkId()
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    std::set<int> wifiLinkedNetworkId;
+    for (auto iter = mWifiLinkedInfo.begin(); iter != mWifiLinkedInfo.end(); iter++) {
+        wifiLinkedNetworkId.insert(iter->second.networkId);
+    }
+    return wifiLinkedNetworkId;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -204,6 +204,7 @@ static void WifiAssetAttrQuery(const AssetResultSet &resultSet, int32_t userId,
             reinterpret_cast<const char *>(checkItemSingle->value.blob.data), checkItemSingle->value.blob.size);
         WifiDeviceConfig AssetWifiDeviceConfig;
         std::vector<std::string> outArray;
+        LOGI("WifiAssetAttrQuery, strSecret : %{public}d", static_cast<int>(strSecret.size()));
         SplitString(strSecret, ';', outArray);
         if (ArrayToWifiDeviceConfig(AssetWifiDeviceConfig, outArray)) {
             assetWifiConfig.push_back(AssetWifiDeviceConfig);
@@ -293,7 +294,8 @@ void WifiAssetManager::WifiAssetQuery(int32_t userId)
             LOGE("WifiAssetQuery empty!");
         }
         AssetFreeResultSet(&resultSet);
-        WifiSettings::GetInstance().UpdateWifiConfigFromCloud(assetWifiConfig);
+        std::set<int> wifiLinkedNetworkIds = WifiConfigCenter::GetInstance().GetAllWifiLinkedNetworkId();
+        WifiSettings::GetInstance().UpdateWifiConfigFromCloud(assetWifiConfig, wifiLinkedNetworkIds);
         WifiSettings::GetInstance().SyncDeviceConfig();
         LOGD("WifiAssetQuery end");
     });
@@ -436,6 +438,8 @@ bool WifiAssetManager::IsWifiConfigUpdated(const std::vector<WifiDeviceConfig> n
         if (IsWifiConfigChanged(iter, config)) {
             config.preSharedKey = iter.preSharedKey;
             config.hiddenSSID = iter.hiddenSSID;
+            LOGI("WifiAssetManager IsWifiConfigUpdated, ssid : %{public}s pk : %{public}d",
+                SsidAnonymize(iter.ssid).c_str(), static_cast<int>((iter.preSharedKey).size()));
             config.wepTxKeyIndex = iter.wepTxKeyIndex;
             for (int u = 0; u < WEPKEYS_SIZE; u++) {
                 config.wepKeys[u] = iter.wepKeys[u];

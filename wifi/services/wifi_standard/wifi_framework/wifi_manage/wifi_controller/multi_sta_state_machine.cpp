@@ -159,7 +159,7 @@ bool MultiStaStateMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         case MULTI_STA_CMD_STOP:
             break;
-        case CMD_STA_WIFI2_START:
+        case MULTI_STA_CMD_STARTED:
             pMultiStaStateMachine->SwitchState(pMultiStaStateMachine->pStartedState);
             break;
         default:
@@ -171,7 +171,7 @@ bool MultiStaStateMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg)
 void MultiStaStateMachine::IdleState::HandleStartInIdleState(InternalMessagePtr msg)
 {
     mid = msg->GetParam2();
-    ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartStaWifi2Service(mid, pMultiStaStateMachine->ifaceName);
+    ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartWifi2Service(mid, pMultiStaStateMachine->ifaceName);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("IdelState start wifi2 fail.\n");
         pMultiStaStateMachine->mcb.onStartFailure(mid);
@@ -205,9 +205,9 @@ bool MultiStaStateMachine::StartedState::ExecuteStateMsg(InternalMessagePtr msg)
     ErrCode ret = WIFI_OPT_FAILED;
     switch (msg->GetMessageName()) {
         case MULTI_STA_CMD_STOP:
-            ret = WifiServiceScheduler::GetInstance().AutoStopStaWifi2Service(mid);
+            ret = WifiServiceScheduler::GetInstance().AutoStopWifi2Service(mid);
             if (ret != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("AutoStopStaWifi2Service fail.\n");
+                WIFI_LOGE("AutoStopWifi2Service fail.\n");
             }
             pMultiStaStateMachine->mcb.onStopped(mid);
             break;

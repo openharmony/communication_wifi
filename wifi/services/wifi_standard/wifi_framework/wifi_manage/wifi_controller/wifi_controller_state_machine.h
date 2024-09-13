@@ -56,7 +56,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void HandleStaStartFailure(int id);
         void HandleStaRemoved(InternalMessagePtr msg);
-        void HandleStaWifi2Removed(InternalMessagePtr msg);
+        void HandleWifi2Removed(InternalMessagePtr msg);
         void HandleAPServiceStartFail(int id);
         void HandleConcreteClientRemoved(InternalMessagePtr msg);
         
@@ -88,11 +88,11 @@ public:
     ErrCode InitWifiControllerMachine();
 
     void RemoveConcreteManager(int id);
-    void RemoveConcreteWifi2Manager(int id);
+    void RemoveMultiStaManager(int id);
     void HandleStaClose(int id);
-    void HandleStaWifi2Close(int id);
+    void HandleWifi2Close(int id);
     void HandleStaStart(int id);
-    void HandleStaWifi2Start(int id);
+    void HandleWifi2Start(int id);
     void HandleStaSemiActive(int id);
     void HandleConcreteStop(int id);
     void ClearWifiStartFailCount();
@@ -126,10 +126,10 @@ private:
     void BuildStateTree();
     ErrCode InitWifiStates();
     bool HasAnyConcreteManager();
-    bool HasAnyWifi2ConcreteManager();
+    bool HasAnyMultiStaManager();
     bool HasAnyManager();
     bool ConcreteIdExist(int id);
-    bool ConcreteWifi2IdExist(int id);
+    bool IsWifi2IdExist(int id);
     void MakeConcreteManager(ConcreteManagerRole role, int id);
     void MakeMultiStaManager(MultiStaManager::Role role, int instId);
 #ifdef FEATURE_AP_SUPPORT

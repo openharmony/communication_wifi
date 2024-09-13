@@ -40,9 +40,9 @@ public:
     explicit WifiServiceScheduler();
     ~WifiServiceScheduler();
     ErrCode AutoStartStaService(int instId, std::string &staIfName);
-    ErrCode AutoStartStaWifi2Service(int instId, std::string &staIfName);
+    ErrCode AutoStartWifi2Service(int instId, std::string &staIfName);
     ErrCode AutoStopStaService(int instId);
-    ErrCode AutoStopStaWifi2Service(int instId);
+    ErrCode AutoStopWifi2Service(int instId);
     ErrCode AutoStartScanOnly(int instId, std::string &staIfName);
     ErrCode AutoStopScanOnly(int instId, bool setIfaceDown);
     ErrCode AutoStartSemiStaService(int instId, std::string &staIfName);

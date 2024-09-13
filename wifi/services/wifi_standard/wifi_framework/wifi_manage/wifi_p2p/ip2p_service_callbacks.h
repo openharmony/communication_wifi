@@ -30,6 +30,7 @@ struct IP2pServiceCallbacks {
     std::function<void(P2pState)> OnP2pStateChangedEvent;
     /* Report the latest devices discovery information. */
     std::function<void(const std::vector<WifiP2pDevice> &)> OnP2pPeersChangedEvent;
+    std::function<void(bool, const std::string &)> OnP2pPeerJoinOrLeaveEvent;
     /* Report the latest services discovery information. */
     std::function<void(const std::vector<WifiP2pServiceInfo> &)> OnP2pServicesChangedEvent;
     /* The event of connection status change. */

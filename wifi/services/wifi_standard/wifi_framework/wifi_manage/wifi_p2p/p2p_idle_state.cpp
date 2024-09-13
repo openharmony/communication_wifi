@@ -69,6 +69,8 @@ void P2pIdleState::Init()
         [this](InternalMessagePtr msg) { return this->ProcessProvDiscShowPinEvt(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP,
         [this](InternalMessagePtr msg) { return this->ProcessCmdCreateGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_FORM_RPT_GROUP,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdCreateGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP,
         [this](InternalMessagePtr msg) { return this->ProcessCmdRemoveGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP,

@@ -324,6 +324,22 @@ std::unique_ptr<WifiTogglerManager>& WifiManager::GetWifiTogglerManager()
     return wifiTogglerManager;
 }
 
+std::shared_ptr<RptInterface> WifiManager::GetRptInterface(int id)
+{
+#if defined(FEATURE_RPT_SUPPORT) && defined(FEATURE_AP_SUPPORT) && defined(FEATURE_P2P_SUPPORT)
+    if (wifiTogglerManager == nullptr) {
+        return nullptr;
+    }
+    auto& wifiControllerMachine = wifiTogglerManager->GetControllerMachine();
+    if (wifiControllerMachine == nullptr) {
+        return nullptr;
+    }
+    return wifiControllerMachine->GetRptManager(id);
+#else
+    return nullptr;
+#endif
+}
+
 #ifdef FEATURE_AP_SUPPORT
 std::unique_ptr<WifiHotspotManager>& WifiManager::GetWifiHotspotManager()
 {

@@ -51,6 +51,8 @@ public:
     ErrCode QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups);
     ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services);
     ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks);
+    ErrCode CreateRptGroup(const WifiP2pConfig &config);
+    ErrCode GetRptStationsList(std::vector<StationInfo> &result);
 
 public:
     IP2pServiceCallbacks mCallback;

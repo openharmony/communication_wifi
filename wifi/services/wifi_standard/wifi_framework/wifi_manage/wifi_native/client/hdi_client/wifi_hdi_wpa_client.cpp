@@ -1368,6 +1368,13 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pGetSupportFrequencies(int band, std::vector<
     return WIFI_HAL_OPT_FAILED;
 }
 
+WifiErrorNo WifiHdiWpaClient::ReqP2pSetSingleConfig(int networkId,
+    const std::string &key, const std::string &value) const
+{
+    LOGI("WifiHdiWpaClient::%{public}s enter, key=%{public}s", __func__, key.c_str());
+    return HdiP2pSetSingleConfig(networkId, key.c_str(), value.c_str());
+}
+
 WifiErrorNo WifiHdiWpaClient::ReqP2pSetGroupConfig(int networkId, const HalP2pGroupConfig &config) const
 {
     P2pGroupConfig conf[GROUP_CONFIG_END_POS];

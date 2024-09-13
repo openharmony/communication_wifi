@@ -3566,6 +3566,9 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
                 WIFI_LOGE("SetBssid return fail.");
                 return false;
             }
+#ifndef OHOS_ARCH_LITE
+            pStaStateMachine->UpdateWifiCategory();
+#endif
             pStaStateMachine->isRoam = true;
             pStaStateMachine->linkedInfo.bssid = bssid;
             WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
@@ -4534,6 +4537,33 @@ bool StaStateMachine::IsGoodSignalQuality()
     return isGoodSignal;
 }
 #ifndef OHOS_ARCH_LITE
+void StaStateMachine::UpdateWifiCategory()
+{
+    WIFI_LOGI("UpdateWifiCategory");
+    std::vector<InterScanInfo> scanInfos;
+    if (WifiStaHalInterface::GetInstance().QueryScanInfos(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), scanInfos) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("WifiStaHalInterface::GetInstance().GetScanInfos failed.");
+    }
+    int chipsetCategory = static_cast<int>(WifiCategory::DEFAULT);
+    if (WifiStaHalInterface::GetInstance().GetChipsetCategory(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), chipsetCategory) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("GetChipsetCategory failed.\n");
+    }
+    int chipsetFeatrureCapability = 0;
+    if (WifiStaHalInterface::GetInstance().GetChipsetWifiFeatrureCapability(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), chipsetFeatrureCapability) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("GetChipsetWifiFeatrureCapability failed.\n");
+    }
+    if (enhanceService_ != nullptr) {
+        for (auto iter = scanInfos.begin(); iter != scanInfos.end(); iter++) {
+            WifiCategory category = enhanceService_->GetWifiCategory(iter->infoElems,
+                chipsetCategory, chipsetFeatrureCapability);
+            WifiConfigCenter::GetInstance().RecordWifiCategory(iter->bssid, category);
+        }
+    }
+}
+
 void StaStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
     enhanceService_ = enhanceService;

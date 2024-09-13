@@ -33,6 +33,7 @@ DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
 namespace OHOS {
 namespace Wifi {
+
 ScanService::ScanService(int instId)
     : pScanStateMachine(nullptr),
       pScanMonitor(nullptr),
@@ -2322,12 +2323,10 @@ bool ScanService::AllowScanByHid2dState()
     LOGD("Enter AllowScanByHid2dState.\n");
     std::string ifName;
     Hid2dUpperScene scene;
-    Hid2dUpperScene miracastScene;
     P2pBusinessType type;
     WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(ifName, scene);
     WifiConfigCenter::GetInstance().GetP2pBusinessType(type);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
     WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
 
     if (IsAppInFilterList(scan_hid2d_list)) {
@@ -2351,9 +2350,6 @@ bool ScanService::AllowScanByHid2dState()
         // scene & 0x07 > 0 means one of them takes effect.
         if (((scene.scene & 0x07) > 0) && type == P2pBusinessType::P2P_TYPE_HID2D) {
             WIFI_LOGW("Scan is not allowed in hid2d business.");
-            return false;
-        } else if ((miracastScene.scene & 0x07) > 0) {
-            WIFI_LOGW("Scan is not allowed in miracast hid2d.");
             return false;
         }
     }

@@ -336,7 +336,6 @@ public:
     private:
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
-        bool HandleBssidChanged(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -1183,6 +1182,9 @@ private:
      * @param networkId - current connected networkId;
      */
     void SaveWifiConfigForUpdate(int networkId);
+
+    bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);
+
 #endif // OHOS_ARCH_LITE
     int m_instId;
 private:
@@ -1254,7 +1256,6 @@ private:
     bool CanArpReachable();
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
-    void HandleWpaLinkFailByEventName(int eventName);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
 #endif

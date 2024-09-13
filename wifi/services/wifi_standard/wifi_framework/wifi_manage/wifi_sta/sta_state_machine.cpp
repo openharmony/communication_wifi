@@ -1453,13 +1453,6 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
     if (shouldStopTimer) {
         StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     }
-    HandleWpaLinkFailByEventName(eventName);
-    linkedInfo.ssid = "";
-}
-
-void StaStateMachine::HandleWpaLinkFailByEventName(int eventName)
-{
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     switch (eventName) {
         case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
             SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
@@ -2007,7 +2000,7 @@ void StaStateMachine::SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, cons
 #endif
 }
 
-static bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId)
+bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId)
 {
     std::string lastMac;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
@@ -3630,9 +3623,23 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {
             ret = EXECUTED;
-            if (!HandleBssidChanged(msg)) {
+            std::string reason = msg->GetStringFromMessage();
+            std::string bssid = msg->GetStringFromMessage();
+            WIFI_LOGI("reveived bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
+                reason.c_str(), MacAnonymize(bssid).c_str());
+            if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
+                WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
                 return false;
             }
+            if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid) != WIFI_HAL_OPT_OK) {
+                WIFI_LOGE("SetBssid return fail.");
+                return false;
+            }
+            pStaStateMachine->isRoam = true;
+            pStaStateMachine->linkedInfo.bssid = bssid;
+            WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
+            /* The current state of StaStateMachine transfers to pApRoamingState. */
+            pStaStateMachine->SwitchState(pStaStateMachine->pApRoamingState);
             break;
         }
         case WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT: {
@@ -3657,29 +3664,6 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
     }
 
     return ret;
-}
-
-bool StaStateMachine::LinkedState::HandleBssidChanged(InternalMessagePtr msg)
-{
-    std::string reason = msg->GetStringFromMessage();
-    std::string bssid = msg->GetStringFromMessage();
-    WIFI_LOGI("reveived bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
-        reason.c_str(), MacAnonymize(bssid).c_str());
-    if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
-        WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
-        return false;
-    }
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
-    if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("SetBssid return fail.");
-        return false;
-    }
-    pStaStateMachine->isRoam = true;
-    pStaStateMachine->linkedInfo.bssid = bssid;
-    WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
-    /* The current state of StaStateMachine transfers to pApRoamingState. */
-    pStaStateMachine->SwitchState(pStaStateMachine->pApRoamingState);
-    return true;
 }
 
 void StaStateMachine::DealApRoamingStateTimeout(InternalMessagePtr msg)

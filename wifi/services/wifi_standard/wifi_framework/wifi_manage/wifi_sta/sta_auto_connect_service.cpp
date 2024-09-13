@@ -17,7 +17,6 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_config_center.h"
 #include "wifi_common_util.h"
-#include "wifi_service_manager.h"
 #include "block_connect_service.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");

@@ -76,12 +76,12 @@ ErrCode StaInterface::DisableStaService()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::ConnectToNetwork(int networkId)
+ErrCode StaInterface::ConnectToNetwork(int networkId, int type)
 {
     LOGI("Enter Connect.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+    if (pStaService->ConnectToNetwork(networkId, type) != WIFI_OPT_SUCCESS) {
         LOGE("ConnectTo failed.\n");
         return WIFI_OPT_FAILED;
     }

@@ -26,6 +26,62 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
+class NotCurrentNetworkFilter final : public SimpleWifiFilter {
+public:
+    NotCurrentNetworkFilter();
+    ~NotCurrentNetworkFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
+class ValidNetworkIdFilter final : public SimpleWifiFilter {
+public:
+    ValidNetworkIdFilter();
+    ~ValidNetworkIdFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
+class SignalLevelFilter final : public SimpleWifiFilter {
+public:
+    SignalLevelFilter();
+    ~SignalLevelFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+ 
+class NotNetworkBlackListFilter final : public SimpleWifiFilter {
+public:
+    NotNetworkBlackListFilter();
+    ~NotNetworkBlackListFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+ 
+class NotP2pFreqAt5gFilter final : public SimpleWifiFilter {
+public:
+    NotP2pFreqAt5gFilter();
+    ~NotP2pFreqAt5gFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+ 
+class ValidConfigNetworkFilter final : public SimpleWifiFilter {
+public:
+    ValidConfigNetworkFilter();
+    ~ValidConfigNetworkFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+ 
+class WifiSwitchThresholdFilter final : public SimpleWifiFilter {
+public:
+    WifiSwitchThresholdFilter();
+    ~WifiSwitchThresholdFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
 class SignalStrengthWifiFilter final : public SimpleWifiFilter {
 public:
     SignalStrengthWifiFilter();

@@ -1558,6 +1558,7 @@ WifiMacAddrErrCode WifiConfigCenter::AddMacAddrPairs(WifiMacAddrInfoType type,
     }
     return WIFI_MACADDR_INVALID_PARAM;
 }
+
 std::set<int> WifiConfigCenter::GetAllWifiLinkedNetworkId()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

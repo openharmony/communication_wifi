@@ -231,9 +231,10 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
                 HandleStaStartFailure(INSTID_WLAN0) : pWifiControllerMachine->RemoveConcreteWifi2Manager(INSTID_WLAN1);
             break;
         case CMD_CONCRETE_STOPPED:
-            msg->GetParam1() == INSTID_WLAN0 ?
-                pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0) :
-                pWifiControllerMachine->RemoveConcreteWifi2Manager(INSTID_WLAN1);
+            pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0);
+            break;
+        case CMD_STA_WIFI2_STOPPED:
+            pWifiControllerMachine->RemoveConcreteWifi2Manager(INSTID_WLAN1);
             break;
         case CMD_AIRPLANE_TOGGLED:
             if (msg->GetParam1()) {
@@ -717,7 +718,7 @@ void WifiControllerMachine::HandleStaWifi2Close(int id)
     }
     for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
         if ((*iter)->mid == id) {
-            (*iter)->GetMultiStaMachine()->SendMessage(CONCRETE_CMD_STA_WIFI2_STOP);
+            (*iter)->GetMultiStaMachine()->SendMessage(CMD_STA_WIFI2_STOP);
             break;
         }
     }
@@ -890,7 +891,7 @@ void WifiControllerMachine::HandleStaWifi2Start(int id)
 {
     std::unique_lock<std::mutex> lock(multiStaManagerMutex);
     for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
-        (*iter)->GetMultiStaMachine()->SendMessage(CONCRETE_CMD_STA_WIFI2_START);
+        (*iter)->GetMultiStaMachine()->SendMessage(CMD_STA_WIFI2_START);
     }
 }
 

@@ -18,6 +18,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int PERMISSION_DENIED = 0;
+
 WifiAuthCenter &WifiAuthCenter::GetInstance()
 {
     static WifiAuthCenter gWifiAuthCenter;

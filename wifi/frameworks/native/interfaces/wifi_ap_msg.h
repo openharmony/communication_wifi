@@ -118,9 +118,9 @@ struct HotspotConfig {
     {
         return band;
     }
-    inline void SetBandWidth(int32_t bandWidth)
+    inline void SetBandWidth(int32_t BandWidth)
     {
-        apBandWidth = bandWidth;
+        apBandWidth = BandWidth;
     }
     inline int32_t GetBandWidth() const
     {

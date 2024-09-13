@@ -79,21 +79,6 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         LOGI("OnEventDisconnected, wrong password");
         cbk.onWpaSsidWrongKey();
     }
-    OHOS::Wifi::WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
-    for (OHOS::Wifi::WifiScanInfo &item : scanResults) {
-        if (strcasecmp(item.bssid.c_str(), szBssid) == 0 &&
-            (item.capabilities.find("PSK") != std::string::npos ||
-            item.capabilities.find("WAPI-PSK") != std::string::npos)) {
-                isPsk = true;
-                break;
-        }
-    }
-    if (cbk.onWpaSsidWrongKey && isPsk &&
-        g_currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
-        (reasonCode != Wifi80211ReasonCode::WLAN_REASON_IE_IN_4WAY_DIFFERS || !locallyGenerated)) {
-        LOGI("OnEventDisconnected, wrong password");
-        cbk.onWpaSsidWrongKey();
-    }
     if (cbk.onConnectChanged) {
         cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, reasonCode, std::string(szBssid));
     }

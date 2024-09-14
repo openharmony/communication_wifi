@@ -327,7 +327,6 @@ WifiErrorNo HdiWpaStaStop(int instId)
 
     if (HdiWpaStop() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: HdiWpaStaStop failed!");
-        return WIFI_HAL_OPT_FAILED;
     }
     
     LOGI("HdiWpaStaStop success");

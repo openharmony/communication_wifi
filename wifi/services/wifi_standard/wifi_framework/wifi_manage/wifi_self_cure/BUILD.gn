@@ -60,6 +60,7 @@ ohos_static_library("wifi_self_cure") {
     "self_cure_interface.cpp",
     "self_cure_service.cpp",
     "self_cure_state_machine.cpp",
+    "self_cure_utils.cpp",
   ]
 
   deps = [
@@ -76,6 +77,8 @@ ohos_static_library("wifi_self_cure") {
     "hilog:libhilog",
     "init:libbegetutil",
     "netmanager_base:net_conn_manager_if",
+    "netmanager_base:net_stats_manager_if",
+    "netmanager_base:netsys_controller",
     "netstack:http_client",
   ]
 

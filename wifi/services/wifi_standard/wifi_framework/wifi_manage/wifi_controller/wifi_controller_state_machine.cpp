@@ -38,7 +38,9 @@ WifiControllerMachine::WifiControllerMachine()
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
       mApidStopWifi(0),
 #endif
-      pEnableState(nullptr), pDisableState(nullptr), pDefaultState(nullptr)
+      pEnableState(nullptr),
+      pDisableState(nullptr),
+      pDefaultState(nullptr)
 {}
 
 WifiControllerMachine::~WifiControllerMachine()
@@ -115,7 +117,7 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg
     if (msg == nullptr) {
         return false;
     }
-    WIFI_LOGI("DisableState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+    WIFI_LOGE("DisableState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     switch (msg->GetMessageName()) {
 #ifdef FEATURE_AP_SUPPORT
         case CMD_SOFTAP_TOGGLED:
@@ -428,7 +430,7 @@ bool WifiControllerMachine::HasAnyManager()
 
 void WifiControllerMachine::MakeConcreteManager(ConcreteManagerRole role, int id)
 {
-    WIFI_LOGI("Enter MakeConcreteManager, curRole = %{public}d id = %{public}d", static_cast<int>(role), id);
+    WIFI_LOGE("Enter MakeConcreteManager");
     ConcreteClientModeManager *clientmode = new (std::nothrow) ConcreteClientModeManager(role, id);
     clientmode->RegisterCallback(WifiManager::GetInstance().GetWifiTogglerManager()->GetConcreteCallback());
     clientmode->InitConcreteManager();
@@ -560,7 +562,6 @@ void WifiControllerMachine::StopAllConcreteManagers()
 
 void WifiControllerMachine::StopConcreteManager(int id)
 {
-    WIFI_LOGI("Enter StopConcreteManager. id = %{public}d", id);
     if (!HasAnyConcreteManager()) {
         return;
     }
@@ -758,7 +759,8 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
     WifiConfigCenter::GetInstance().SetWifiStopState(false);
 #ifdef FEATURE_AP_SUPPORT
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
-    if (!WifiConfigCenter::GetInstance().GetCoexSupport() && pWifiControllerMachine->HasAnySoftApManager()) {
+    if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
+        pWifiControllerMachine->HasAnySoftApManager()) {
         pWifiControllerMachine->StopAllSoftapManagers();
         return;
     }
@@ -818,7 +820,7 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
 
 void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 {
-    WIFI_LOGI("HandleStaStartFailure");
+    WIFI_LOGE("HandleStaStartFailure");
     pWifiControllerMachine->RemoveConcreteManager(id);
     mWifiStartFailCount++;
     if (pWifiControllerMachine->ShouldEnableWifi(id) && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {

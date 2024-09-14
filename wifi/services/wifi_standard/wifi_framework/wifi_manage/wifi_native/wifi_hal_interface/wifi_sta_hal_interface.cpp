@@ -72,6 +72,7 @@ WifiErrorNo WifiStaHalInterface::StartWifi(const std::string &ifaceName, int ins
     return mIdlClient->StartWifi();
 #endif
 }
+    
 
 WifiErrorNo WifiStaHalInterface::StopWifi(int instId)
 {

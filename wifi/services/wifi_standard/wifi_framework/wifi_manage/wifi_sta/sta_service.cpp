@@ -471,12 +471,10 @@ int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
 
 ErrCode StaService::RemoveDevice(int networkId) const
 {
-    LOGI("Enter RemoveDevice, networkId = %{public}d.\n", networkId);
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if (linkedInfo.networkId == networkId) {
-        WifiStaHalInterface::GetInstance().ClearDeviceConfig();
-    }
+    LOGI("Enter RemoveDevice, networkId = %{public}d m_instId:%{public}d\n", networkId, m_instId);
+
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_NETWORK_REMOVED, networkId);
 
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) == 0) {

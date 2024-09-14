@@ -846,11 +846,13 @@ WifiErrorNo WifiHdiWpaClient::GetStationList(std::vector<std::string> &result, i
     WifiErrorNo err = HdiGetStaInfos(staInfos, BUFFER_SIZE, id);
     if (err != WIFI_HAL_OPT_OK) {
         delete[] staInfos;
+        staInfos = nullptr;
         return WIFI_HAL_OPT_FAILED;
     }
     std::string strStaInfo = std::string(staInfos);
     SplitString(strStaInfo, ",", result);
     delete[] staInfos;
+    staInfos = nullptr;
     return WIFI_HAL_OPT_OK;
 }
 

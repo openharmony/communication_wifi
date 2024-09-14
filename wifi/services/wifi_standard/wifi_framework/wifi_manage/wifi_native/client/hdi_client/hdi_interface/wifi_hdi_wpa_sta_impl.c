@@ -320,13 +320,13 @@ WifiErrorNo HdiWpaStaStop(int instId)
 
     if (HdiRemoveWpaIface(GetHdiP2pIfaceName()) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: HdiRemoveWpaP2pIface failed!");
-        return WIFI_HAL_OPT_FAILED;
     }
 
     HdiWpaStaStopWifi(INSTID_WLAN0);
 
     if (HdiWpaStop() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStop: HdiWpaStaStop failed!");
+        return WIFI_HAL_OPT_FAILED;
     }
     
     LOGI("HdiWpaStaStop success");

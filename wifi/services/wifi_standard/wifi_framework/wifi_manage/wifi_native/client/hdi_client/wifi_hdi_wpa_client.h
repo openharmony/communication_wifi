@@ -841,9 +841,6 @@ private:
     std::string StringCombination(const char* fmt, ...);
     void AppendStr(std::string &dst, const char* format, va_list args);
     bool WriteConfigToFile(const std::string &fileContext);
-    void HandleEapMethod(EapMethod eapMethod, const WifiHalDeviceConfig &config,
-                                    SetNetworkConfig *conf, int &num);
-    void HandleConfig(const WifiHalDeviceConfig &config, SetNetworkConfig *conf, int &num);
 };
 }  // namespace Wifi
 }  // namespace OHOS

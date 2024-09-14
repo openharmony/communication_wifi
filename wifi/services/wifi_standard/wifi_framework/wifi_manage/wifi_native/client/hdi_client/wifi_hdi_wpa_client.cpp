@@ -260,69 +260,9 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiHalDevice
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_KEYMGMT, config.keyMgmt);
         }
     } while (0);
-
     EapMethod eapMethod = WifiEapConfig::Str2EapMethod(config.eapConfig.eap);
     LOGI("%{public}s, eap:%{public}s, eapMethod:%{public}d, identity:%{private}s, num:%{public}d",
         __func__, config.eapConfig.eap.c_str(), eapMethod, config.eapConfig.identity.c_str(), num);
-    HandleEapMethod(eapMethod, config, conf, num);
-
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_BSSID, config.bssid);
-    int i = 0;
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WEP_KEY_0, config.wepKeys[i++]);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WEP_KEY_1, config.wepKeys[i++]);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WEP_KEY_2, config.wepKeys[i++]);
-    num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_WEP_KEY_3, config.wepKeys[i++]);
-    HandleConfig(config, conf, num);
-    if (num == 0) {
-        return WIFI_HAL_OPT_OK;
-    }
-    return HdiWpaStaSetNetwork(networkId, conf, num, ifaceName);
-}
-
-void WifiHdiWpaClient::HandleConfig(const WifiHalDeviceConfig &config, SetNetworkConfig *conf, int &num)
-{
-    if (config.priority >= 0) {
-        num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_PRIORITY, config.priority);
-    }
-    if (config.scanSsid == 1) {
-        num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_SCAN_SSID, config.scanSsid);
-    }
-    if (config.wepKeyIdx >= 0) {
-        num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_WEP_KEY_IDX, config.wepKeyIdx);
-    }
-    if (config.authAlgorithms > 0) {
-        num += PushDeviceConfigAuthAlgorithm(conf + num, DEVICE_CONFIG_AUTH_ALGORITHMS, config.authAlgorithms);
-    }
-    if (config.isRequirePmf) {
-        num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_IEEE80211W, PMF_REQUIRED);
-    } else {
-        num += PushDeviceConfigInt(conf + num, DEVICE_CONFIG_IEEE80211W, PMF_OPTIONAL);
-    }
-    if (config.allowedProtocols > 0) {
-        std::string protocolsStr[] = {"WPA ", "RSN ", "WPA2 ", "OSEN ", "WAPI "};
-        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_ALLOW_PROTOCOLS, config.allowedProtocols,
-                                         protocolsStr, sizeof(protocolsStr)/sizeof(protocolsStr[0]));
-    }
-    if (config.allowedPairwiseCiphers > 0) {
-        std::string pairwiseCipherStr[] = {"NONE ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 ", "SMS4 "};
-        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_PAIRWISE_CIPHERS, config.allowedPairwiseCiphers,
-                                         pairwiseCipherStr, sizeof(pairwiseCipherStr)/sizeof(pairwiseCipherStr[0]));
-    }
-    if (config.allowedGroupCiphers > 0) {
-        std::string groupCipherStr[] = {"GTK_NOT_USED ", "TKIP ", "CCMP ", "GCMP ", "CCMP-256 ", "GCMP-256 ", "SMS4 "};
-        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_CIPHERS, config.allowedGroupCiphers,
-                                         groupCipherStr, sizeof(groupCipherStr)/sizeof(groupCipherStr[0]));
-    }
-    if (config.allowedGroupMgmtCiphers > 0) {
-        std::string groupMgmtCipherStr[] = {"AES-128-CMAC ", "BIP-GMAC-128 ", "BIP-GMAC-256 ", "BIP-CMAC-256 "};
-        num += PushDeviceConfigParseMask(conf + num, DEVICE_CONFIG_GROUP_MGMT_CIPHERS, config.allowedGroupMgmtCiphers,
-                                         groupMgmtCipherStr, sizeof(groupMgmtCipherStr)/sizeof(groupMgmtCipherStr[0]));
-    }
-}
-
-void WifiHdiWpaClient::HandleEapMethod(EapMethod eapMethod, const WifiHalDeviceConfig &config,
-    SetNetworkConfig *conf, int &num)
-{
     switch (eapMethod) {
         case EapMethod::EAP_PEAP:
             num += PushDeviceConfigString(conf + num, DEVICE_CONFIG_EAP, config.eapConfig.eap);
@@ -416,7 +356,7 @@ void WifiHdiWpaClient::HandleEapMethod(EapMethod eapMethod, const WifiHalDeviceC
     if (num == 0) {
         return WIFI_HAL_OPT_OK;
     }
-    return HdiWpaStaSetNetwork(networkId, conf, num, ifaceName);
+    return HdiWpaStaSetNetwork(networkId, conf, num，ifaceName);
 }
 
 WifiErrorNo WifiHdiWpaClient::SetBssid(int networkId, const std::string &bssid, const char *ifaceName)

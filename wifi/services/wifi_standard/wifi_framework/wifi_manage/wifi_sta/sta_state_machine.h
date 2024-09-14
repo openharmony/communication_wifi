@@ -918,12 +918,14 @@ private:
 
     /**
      * @Description  Set a random MAC address.
+     *
      * @param networkId - network id[in]
      */
     bool SetRandomMac(int networkId, const std::string &bssid);
 
     /**
      * @Description  check whether the current bssid are consistent.
+     *
      * @param bssid - bssid
      */
     bool CheckRoamingBssidIsSame(std::string bssid);
@@ -1184,9 +1186,8 @@ private:
      * @param networkId - current connected networkId;
      */
     void SaveWifiConfigForUpdate(int networkId);
-
 #endif // OHOS_ARCH_LITE
-    int m_instId;
+
 private:
     StaSmHandleFuncMap staSmHandleFuncMap;
     std::shared_mutex m_staCallbackMutex;
@@ -1237,6 +1238,7 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
     std::string mPortalUrl;

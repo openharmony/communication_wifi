@@ -249,11 +249,11 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, int inst
 
 IStaService *WifiServiceManager::GetStaServiceInst(int instId)
 {
-    WIFI_LOGI("WifiServiceManager::GetStaServiceInst, instId: %{public}d", instId);
+    WIFI_LOGD("WifiServiceManager::GetStaServiceInst, instId: %{public}d", instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mStaServiceHandle.pService.find(instId);
     if (iter != mStaServiceHandle.pService.end()) {
-        WIFI_LOGI("find a new sta service instance, instId: %{public}d", instId);
+        WIFI_LOGD("find a new sta service instance, instId: %{public}d", instId);
         return iter->second;
     }
 

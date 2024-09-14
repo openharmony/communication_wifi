@@ -584,12 +584,6 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
         return NULL;
     }
 
-    HandleGetScanInfo(resultBuff, size, results);
-    return results;
-}
-
-void HandleGetScanInfo(unsigned char *resultBuff, int *size, ScanInfo *results)
-{
     char *savedPtr = NULL;
     strtok_r((char *)resultBuff, "\n", &savedPtr);
     char *token = strtok_r(NULL, "\n", &savedPtr);
@@ -601,7 +595,7 @@ void HandleGetScanInfo(unsigned char *resultBuff, int *size, ScanInfo *results)
             free(results);
             free(resultBuff);
             pthread_mutex_unlock(GetWpaObjMutex());
-            return;
+            return NULL;
         }
         int length = strlen(token);
         if (length <= 0) {
@@ -625,6 +619,7 @@ void HandleGetScanInfo(unsigned char *resultBuff, int *size, ScanInfo *results)
     free(resultBuff);
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiWpaStaGetScanInfos success.");
+    return results;
 }
 
 WifiErrorNo HdiWpaStaRemoveNetwork(int networkId, const char *ifaceName)
@@ -822,7 +817,6 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback, const 
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
     g_hdiWpaStaCallbackObj[instId]->OnEventScanResult = callback->OnEventScanResult;
 #endif
-    g_hdiWpaStaCallbackObj[instId]->OnEventScanResult = callback->OnEventScanResult;
     g_hdiWpaStaCallbackObj[instId]->OnEventStaNotify = callback->OnEventStaNotify;
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterHdiWpaStaEventCallback3 success.");

@@ -31,7 +31,7 @@ namespace Wifi {
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data,
     const std::vector<std::string> &permissions)
 {
-    WIFI_LOGD("publish event[%s], code:%d", eventAction.c_str(), code);
+    WIFI_LOGD("publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
 #ifndef OHOS_ARCH_LITE
     Want want;
     want.SetAction(eventAction);
@@ -58,7 +58,7 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const i
 
 bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const int &code, const std::string &data)
 {
-    WIFI_LOGD("publish event[%s], code:%d", eventAction.c_str(), code);
+    WIFI_LOGD("publish event[%{public}s], code:%{public}d", eventAction.c_str(), code);
 #ifndef OHOS_ARCH_LITE
     Want want;
     want.SetAction(eventAction);

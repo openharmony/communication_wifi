@@ -30,11 +30,7 @@ public:
     WifiTogglerManager();
     ~WifiTogglerManager() = default;
 
-<<<<<<< Updated upstream
-    ConcreteModeCallback &GetConcreteCallback(void);
-=======
     ConcreteModeCallback& GetConcreteCallback(void);
->>>>>>> Stashed changes
     MultiStaModeCallback &GetMultiStaCallback();
     SoftApModeCallback& GetSoftApCallback(void);
     ErrCode WifiToggled(int isOpen, int id = 0);

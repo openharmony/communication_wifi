@@ -116,7 +116,7 @@ static bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::s
         config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = HexToString(outArray[index++]);
         config.version = CheckDataLegal(outArray[index++]);
     }
-    if (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey == "") {
+    if (config.keyMgmt != KEY_MGMT_NONE && (config.preSharedKey).length() == 0) {
         LOGE("ArrayToWifiDeviceConfig, psk empty!");
         return false;
     }
@@ -142,7 +142,7 @@ void WifiAssetManager::WifiAssetTriggerSync()
 static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = true)
 {
     int32_t ret = SEC_ASSET_INVALID_ARGUMENT;
-    if (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey == "") {
+    if (config.keyMgmt != KEY_MGMT_NONE && (config.preSharedKey).length() == 0) {
         LOGE("ArrayToWifiDeviceConfig, psk empty!");
         return ret;
     }

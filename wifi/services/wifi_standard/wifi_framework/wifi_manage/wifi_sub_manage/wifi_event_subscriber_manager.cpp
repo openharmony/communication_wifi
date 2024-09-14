@@ -30,7 +30,9 @@
 #ifdef HAS_MOVEMENT_PART
 #include "wifi_msdp_state_listener.h"
 #endif
-
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+#include "wifi_asset_manager.h"
+#endif
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -73,7 +75,9 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED, &
     CesEventSubscriber::OnReceiveThermalEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
-    CesEventSubscriber::OnReceiveStandbyEvent}
+    CesEventSubscriber::OnReceiveStandbyEvent},
+    {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED, &
+    CesEventSubscriber::OnReceiveUserUnlockedEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -91,6 +95,9 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 #ifdef HAS_POWERMGR_PART
     RegisterPowermgrEvent();
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    RegisterAssetEvent();
+#endif
     if (IsDataMgrServiceActive()) {
         RegisterCloneEvent();
     }
@@ -104,6 +111,9 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
 {
     WIFI_LOGI("~WifiEventSubscriberManager");
     UnRegisterCesEvent();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    UnRegisterAssetEvent();
+#endif
     UnRegisterNotificationEvent();
     UnRegisterCloneEvent();
     UnRegisterLocationEvent();
@@ -180,9 +190,15 @@ void WifiEventSubscriberManager::HandleCommonEventServiceChange(int systemAbilit
     if (add) {
         RegisterCesEvent();
         RegisterNotificationEvent();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        RegisterAssetEvent();
+#endif
     } else {
         UnRegisterCesEvent();
         UnRegisterNotificationEvent();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        UnRegisterAssetEvent();
+#endif
     }
 }
 
@@ -989,7 +1005,88 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
 
 #endif
 
-
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+void WifiEventSubscriberManager::RegisterAssetEvent()
+{
+    std::unique_lock<std::mutex> lock(AssetEventMutex);
+    if (assetMgrId != 0) {
+        WifiTimer::GetInstance()->UnRegister(assetMgrId);
+    }
+    if (wifiAssetrEventSubsciber_) {
+        return;
+    }
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetPublisherUid(ASSETID);
+    wifiAssetrEventSubsciber_ = std::make_shared<AssetEventSubscriber>(subscriberInfo);
+    WIFI_LOGI("RegisterAssetEvent start");
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiAssetrEventSubsciber_)) {
+        WIFI_LOGE("AssetCloud SubscribeCommonEvent() failed");
+        wifiAssetrEventSubsciber_ = nullptr;
+        WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterAssetEvent, this);
+        WifiTimer::GetInstance()->Register(timeoutCallBack, assetMgrId, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WIFI_LOGI("RegisterAssetEvent retry, powerMgrId = %{public}u", assetMgrId);
+    } else {
+        WIFI_LOGI("RegisterAssetEvent success");
+    }
+}
+ 
+void WifiEventSubscriberManager::UnRegisterAssetEvent()
+{
+    std::unique_lock<std::mutex> lock(AssetEventMutex);
+    if (assetMgrId != 0) {
+        WifiTimer::GetInstance()->UnRegister(assetMgrId);
+    }
+    if (!wifiAssetrEventSubsciber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(wifiAssetrEventSubsciber_)) {
+        WIFI_LOGE("UnRegisterAssetEvent failed");
+    }
+    wifiAssetrEventSubsciber_ = nullptr;
+    WIFI_LOGI("UnRegisterAssetEvent finished");
+}
+ 
+AssetEventSubscriber::AssetEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+    : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("AssetEventSubscriber enter");
+}
+ 
+AssetEventSubscriber::~AssetEventSubscriber()
+{
+    WIFI_LOGI("~AssetEventSubscriber enter");
+}
+ 
+void AssetEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    std::string action = eventData.GetWant().GetAction();
+    WIFI_LOGI("AssetListerner OnReceiveEvent action: %{public}s", action.c_str());
+    if (action != COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED) {
+        return;
+    }
+    // Do not sync from cloud during connecting
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+        if (pService != nullptr) {
+            WifiLinkedInfo linkedInfo;
+            WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, i);
+            if (linkedInfo.connState == ConnState::CONNECTING) {
+                return;
+            }
+        }
+    }
+    WifiAssetManager::GetInstance().CloudAssetSync();
+}
+#endif
+void CesEventSubscriber::OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    WIFI_LOGI("OnReceiveUserUnlockedEvent");
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().InitUpLoadLocalDeviceSync();
+#endif
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

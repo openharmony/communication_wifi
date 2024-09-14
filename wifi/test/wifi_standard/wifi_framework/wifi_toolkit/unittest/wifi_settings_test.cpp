@@ -579,5 +579,32 @@ HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
 }
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
+{
+    WIFI_LOGE("UpdateWifiConfigFormCloudTest enter!");
+    WifiDeviceConfig config;
+    config.networkId = 0;
+    config.ssid = "test1";
+    config.keyMgmt = "WPA-PSK";
+    config.preSharedKey = "123456789";
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    std::vector<WifiDeviceConfig> newWifiDeviceConfigs;
+    // Add new WifiDeviceConfig objects to newWifiDeviceConfigs vector
+    WifiDeviceConfig config1;
+    config1.ssid = "test1";
+    config1.keyMgmt = "WPA-PSK";
+    config1.preSharedKey = "12345678";
+    newWifiDeviceConfigs.push_back(config1);
+    WifiSettings::GetInstance().UpdateWifiConfigFromCloud(newWifiDeviceConfigs);
+    // Assert the updated WifiDeviceConfig objects in mWifiDeviceConfig map
+    // based on the newWifiDeviceConfigs vector
+    WifiDeviceConfig updatedConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(0, updatedConfig);
+    EXPECT_EQ(updatedConfig.ssid, "test1");
+    EXPECT_EQ(updatedConfig.keyMgmt, "WPA-PSK");
+    EXPECT_EQ(updatedConfig.preSharedKey, "12345678");
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHO

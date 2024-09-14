@@ -302,7 +302,7 @@ WifiErrorNo HdiWpaStaStop(int instId)
     if (instId == INSTID_WLAN1) {
         const char *ifaceName = GetHdiStaIfaceName(instId);
         if (ifaceName == NULL) {
-            LOGE(HdiWpaStaStopWifi ifaceName is null);
+            LOGE("HdiWpaStaStopWifi ifaceName is null");
             return WIFI_HAL_OPT_FAILED;
         }
         if (HdiRemoveWpaIface(ifaceName) != WIFI_HAL_OPT_OK) {
@@ -336,7 +336,7 @@ WifiErrorNo HdiWpaStaStop(int instId)
 WifiErrorNo HdiWpaStaConnect(int networkId, const char *ifaceName)
 {
     if (ifaceName == NULL) {
-        LOGE(HdiWpaStaConnect ifaceName is null);
+        LOGE("HdiWpaStaConnect ifaceName is null");
         return WIFI_HAL_OPT_FAILED;
     }
     LOGI("HdiWpaStaConnect enter, networkId:%{public}d, ifaceName = %{public}s", networkId, ifaceName);
@@ -362,7 +362,7 @@ WifiErrorNo HdiWpaStaConnect(int networkId, const char *ifaceName)
 WifiErrorNo HdiWpaStaReconnect(const char *ifaceName)
 {
     if (ifaceName == NULL) {
-        LOGE(HdiWpaStaReconnect ifaceName is null);
+        LOGE("HdiWpaStaReconnect ifaceName is null");
         return WIFI_HAL_OPT_FAILED;
     }
     LOGI("HdiWpaStaReconnect enter! ifaceName = %{public}s", ifaceName);
@@ -388,7 +388,7 @@ WifiErrorNo HdiWpaStaReconnect(const char *ifaceName)
 WifiErrorNo HdiWpaStaReassociate(const char *ifaceName)
 {
     if (ifaceName == NULL) {
-        LOGE(HdiWpaStaReassociate ifaceName is null);
+        LOGE("HdiWpaStaReassociate ifaceName is null");
         return WIFI_HAL_OPT_FAILED;
     }
     pthread_mutex_lock(GetWpaObjMutex());
@@ -412,7 +412,7 @@ WifiErrorNo HdiWpaStaReassociate(const char *ifaceName)
 WifiErrorNo HdiWpaStaDisconnect(const char *ifaceName)
 {
     if (ifaceName == NULL) {
-        LOGE(HdiWpaStaDisconnect ifaceName is null);
+        LOGE("HdiWpaStaDisconnect ifaceName is null");
         return WIFI_HAL_OPT_FAILED;
     }
     LOGI("HdiWpaStaDisconnect enter! ifaceName = %{public}s", ifaceName);

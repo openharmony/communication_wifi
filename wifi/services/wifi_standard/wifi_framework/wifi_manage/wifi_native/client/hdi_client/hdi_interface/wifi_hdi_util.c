@@ -1392,9 +1392,15 @@ static uint8_t CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
     while ((index < len) && (index >= 0)) {
         int element = bytes[index];
         if (element != okcLogo[0]) {
+            if (index + 1 >= len) {
+                return 0;
+            }
             int tlvLength = bytes[index + 1];
             index = tlvLength + HILINK_OFFSET_LEN + index;
         } else {
+            if (index + HILINK_OFFSET_LEN >= len) {
+                return 0;
+            }
             return bytes[index + HILINK_OFFSET_LEN];
         }
     }

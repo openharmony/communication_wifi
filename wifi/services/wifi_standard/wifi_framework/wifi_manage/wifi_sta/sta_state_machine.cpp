@@ -1315,9 +1315,6 @@ void StaStateMachine::DealConnectionEvent(InternalMessagePtr msg)
     if (CurrentIsRandomizedMac()) {
         WifiSettings::GetInstance().SetDeviceRandomizedMacSuccessEver(targetNetworkId);
     }
-    WifiSettings::GetInstance().SetDeviceAfterConnect(targetNetworkId);
-    WifiSettings::GetInstance().SetDeviceState(targetNetworkId, (int)WifiDeviceConfigStatus::ENABLED, false);
-    WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
     SaveWifiConfigForUpdate(targetNetworkId);
 #endif
@@ -4059,6 +4056,8 @@ void StaStateMachine::DealGetDhcpIpTimeout(InternalMessagePtr msg)
         return;
     }
     LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT DealGetDhcpIpTimeout");
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
+                                                                 DisabledReason::DISABLED_DHCP_FAILURE);
     StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     DisConnectProcess();
 }

@@ -15,6 +15,7 @@
 #include "wifi_supplicant_hal_interface.h"
 #include <mutex>
 #include "wifi_log.h"
+#include "wifi_config_center.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiSupplicantHalInterface"
@@ -133,7 +134,8 @@ WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqSetPowerSave(enable);
+    return mHdiWpaClient->ReqSetPowerSave(
+        enable, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqSetPowerSave(enable);
@@ -144,7 +146,8 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetCountryCode(const std::string &cou
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqWpaSetCountryCode(countryCode);
+    return mHdiWpaClient->ReqWpaSetCountryCode(
+        countryCode, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqWpaSetCountryCode(countryCode);
@@ -155,7 +158,8 @@ WifiErrorNo WifiSupplicantHalInterface::WpaGetCountryCode(std::string &countryCo
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqWpaGetCountryCode(countryCode);
+    return mHdiWpaClient->ReqWpaGetCountryCode(
+        countryCode, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqWpaGetCountryCode(countryCode);
@@ -171,7 +175,8 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqWpaSetSuspendMode(mode);
+    return mHdiWpaClient->ReqWpaSetSuspendMode(
+        mode, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqWpaSetSuspendMode(mode);
@@ -182,7 +187,7 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqSetPowerSave(mode);
+    return mHdiWpaClient->ReqSetPowerSave(mode, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqWpaSetPowerMode(!mode);   // idl impl need revese power mode

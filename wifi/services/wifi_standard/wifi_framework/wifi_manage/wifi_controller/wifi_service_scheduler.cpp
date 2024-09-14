@@ -60,7 +60,7 @@ WifiServiceScheduler::~WifiServiceScheduler()
 void WifiServiceScheduler::ClearStaIfaceNameMap(int instId)
 {
     WIFI_LOGI("ClearStaIfaceNameMap");
-    std::lock_guard<std::mutex> lock(mutexStaIfaceNameMap_);
+    std::lock_guard<std::mutex> lock(mutex);
     auto iter = staIfaceNameMap.begin();
     while (iter != staIfaceNameMap.end()) {
         if (iter->first == instId) {
@@ -74,7 +74,7 @@ void WifiServiceScheduler::ClearStaIfaceNameMap(int instId)
 void WifiServiceScheduler::ClearSoftApIfaceNameMap(int instId)
 {
     WIFI_LOGI("ClearSoftApIfaceNameMap");
-    std::lock_guard<std::mutex> lock(mutexApIfaceNameMap_);
+    std::lock_guard<std::mutex> lock(mutex);
     auto iter = softApIfaceNameMap.begin();
     while (iter != softApIfaceNameMap.end()) {
         if (iter->first == instId) {
@@ -263,26 +263,23 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
         return WIFI_OPT_SUCCESS;
     }
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    {
-        std::lock_guard<std::mutex> lock(mutexStaIfaceNameMap_);
-        std::string ifaceName = "";
-        if (staIfaceNameMap.count(instId) > 0) {
-            ifaceName = staIfaceNameMap[instId];
-        }
-        if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
-            std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback,
-            this, std::placeholders::_1, std::placeholders::_2),
-            std::bind(&WifiServiceScheduler::OnRssiReportCallback,
-            this, std::placeholders::_1, std::placeholders::_2),
-            ifaceName, instId)) {
-            WIFI_LOGE("AutoStartScanOnly, create iface failed!");
-            return WIFI_OPT_FAILED;
-        }
-        WIFI_LOGI("AutoStartScanOnly SetStaIfaceName:%{public}s, instId:%{public}d", ifaceName.c_str(), instId);
-        WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName);
-        staIfName = ifaceName;
-        staIfaceNameMap.insert(std::make_pair(instId, ifaceName));
+    std::string ifaceName = "";
+    if (staIfaceNameMap.count(instId) > 0) {
+        ifaceName = staIfaceNameMap[instId];
     }
+    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+        std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback,
+        this, std::placeholders::_1, std::placeholders::_2),
+        std::bind(&WifiServiceScheduler::OnRssiReportCallback,
+        this, std::placeholders::_1, std::placeholders::_2),
+        ifaceName, instId)) {
+        WIFI_LOGE("AutoStartScanOnly, create iface failed!");
+        return WIFI_OPT_FAILED;
+    }
+    WIFI_LOGI("AutoStartScanOnly SetStaIfaceName:%{public}s, instId:%{public}d", ifaceName.c_str(), instId);
+    WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName);
+    staIfName = ifaceName;
+    staIfaceNameMap.insert(std::make_pair(instId, ifaceName));
 #endif
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::OPENING, instId);
     if (instId == INSTID_WLAN0) {
@@ -358,26 +355,23 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
 ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    {
-        std::lock_guard<std::mutex> lock(mutexStaIfaceNameMap_);
-        std::string ifaceName = "";
-        if (staIfaceNameMap.count(instId) > 0) {
-            ifaceName = staIfaceNameMap[instId];
-            staIfName = ifaceName;
-        }
-        if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
-            std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this,
-                std::placeholders::_1, std::placeholders::_2),
-            std::bind(&WifiServiceScheduler::OnRssiReportCallback, this,
-                std::placeholders::_1, std::placeholders::_2), ifaceName, instId)) {
-            WIFI_LOGE("PreStartWifi, create iface failed!");
-            return WIFI_OPT_FAILED;
-        }
-        WIFI_LOGI("PreStartWifi SetStaIfaceName:%{public}s, instId:%{public}d", ifaceName.c_str(), instId);
-        WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName, instId);
-        staIfaceNameMap.insert(std::make_pair(instId, ifaceName));
-        staIfName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
+    std::string ifaceName = "";
+    if (staIfaceNameMap.count(instId) > 0) {
+        ifaceName = staIfaceNameMap[instId];
+        staIfName = ifaceName;
     }
+    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+        std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this,
+            std::placeholders::_1, std::placeholders::_2),
+        std::bind(&WifiServiceScheduler::OnRssiReportCallback, this,
+            std::placeholders::_1, std::placeholders::_2), ifaceName, instId)) {
+        WIFI_LOGE("PreStartWifi, create iface failed!");
+        return WIFI_OPT_FAILED;
+    }
+    WIFI_LOGI("PreStartWifi SetStaIfaceName:%{public}s, instId:%{public}d", ifaceName.c_str(), instId);
+    WifiConfigCenter::GetInstance().SetStaIfaceName(ifaceName, instId);
+    staIfaceNameMap.insert(std::make_pair(instId, ifaceName));
+    staIfName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
 #endif
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::OPENING, instId)) {
@@ -520,23 +514,21 @@ ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
 void WifiServiceScheduler::StaIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType)
 {
     WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
-        destoryIfaceName.c_str(), createIfaceType);
-    {
-        std::lock_guard<std::mutex> lock(mutexStaIfaceNameMap_);
-        auto iter = staIfaceNameMap.begin();
-        while (iter != staIfaceNameMap.end()) {
-            if (destoryIfaceName == iter->second) {
-                auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-                ins->SendMessage(CMD_STA_REMOVED, createIfaceType, iter->first);
-                if (createIfaceType >= 0) {
-                    WifiConfigCenter::GetInstance().SetStaIfaceName("", iter->first);
-                    staIfaceNameMap.erase(iter);
-                }
-                return;
+    destoryIfaceName.c_str(), createIfaceType);
+    auto iter = staIfaceNameMap.begin();
+    while (iter != staIfaceNameMap.end()) {
+        if (destoryIfaceName == iter->second) {
+            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+            ins->SendMessage(CMD_STA_REMOVED, createIfaceType, iter->first);
+            if (createIfaceType >= 0) {
+                WifiConfigCenter::GetInstance().SetStaIfaceName("", iter->first);
+                staIfaceNameMap.erase(iter);
             }
-            iter++;
+            return;
         }
+        iter++;
     }
+
 }
 
 void WifiServiceScheduler::OnRssiReportCallback(int index, int antRssi)
@@ -713,23 +705,20 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
         }
     }
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    {
-        std::lock_guard<std::mutex> lock(mutexApIfaceNameMap_);
-        std::string ifaceName = "";
-        if (softApIfaceNameMap.count(instId) > 0) {
-            ifaceName = softApIfaceNameMap[instId];
-        }
-        if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
-            std::bind(&WifiServiceScheduler::SoftApIfaceDestoryCallback,
-            this, std::placeholders::_1, std::placeholders::_2),
-            ifaceName)) {
-            WIFI_LOGE("AutoStartApService, create iface failed!");
-            return WIFI_OPT_FAILED;
-        }
-        WifiConfigCenter::GetInstance().SetApIfaceName(ifaceName);
-        softApIfName = ifaceName;
-        softApIfaceNameMap.insert(std::make_pair(instId, ifaceName));
+    std::string ifaceName = "";
+    if (softApIfaceNameMap.count(instId) > 0) {
+        ifaceName = softApIfaceNameMap[instId];
     }
+    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
+        std::bind(&WifiServiceScheduler::SoftApIfaceDestoryCallback,
+        this, std::placeholders::_1, std::placeholders::_2),
+        ifaceName)) {
+        WIFI_LOGE("AutoStartApService, create iface failed!");
+        return WIFI_OPT_FAILED;
+    }
+    WifiConfigCenter::GetInstance().SetApIfaceName(ifaceName);
+    softApIfName = ifaceName;
+    softApIfaceNameMap.insert(std::make_pair(instId, ifaceName));
 #endif
     if (!WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0)) {
         WIFI_LOGE("AutoStartApService, set ap mid state opening failed!");
@@ -818,22 +807,19 @@ void WifiServiceScheduler::SoftApIfaceDestoryCallback(std::string &destoryIfaceN
 {
     WIFI_LOGI("IfaceDestoryCallback, ifaceName:%{public}s, ifaceType:%{public}d",
         destoryIfaceName.c_str(), createIfaceType);
-    {
-        std::lock_guard<std::mutex> lock(mutexApIfaceNameMap_);
-        auto iter = softApIfaceNameMap.begin();
-        while (iter != softApIfaceNameMap.end()) {
-            if (destoryIfaceName == iter->second) {
-                WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-                auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-                ins->SendMessage(CMD_AP_REMOVED, createIfaceType, iter->first);
-                if (createIfaceType >= 0) {
-                    WifiConfigCenter::GetInstance().SetApIfaceName("");
-                    softApIfaceNameMap.erase(iter);
-                }
-                return;
+    auto iter = softApIfaceNameMap.begin();
+    while (iter != softApIfaceNameMap.end()) {
+        if (destoryIfaceName == iter->second) {
+            WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+            ins->SendMessage(CMD_AP_REMOVED, createIfaceType, iter->first);
+            if (createIfaceType >= 0) {
+                WifiConfigCenter::GetInstance().SetApIfaceName("");
+                softApIfaceNameMap.erase(iter);
             }
-            iter++;
+            return;
         }
+        iter++;
     }
 }
 #endif

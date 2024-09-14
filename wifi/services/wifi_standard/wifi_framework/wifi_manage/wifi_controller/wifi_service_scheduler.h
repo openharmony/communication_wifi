@@ -75,8 +75,6 @@ private:
     std::map<int, std::string> staIfaceNameMap;
     std::map<int, std::string> softApIfaceNameMap;
     std::mutex mutex;
-    std::mutex mutexStaIfaceNameMap_;
-    std::mutex mutexApIfaceNameMap_;
 };
 }
 }

@@ -1139,7 +1139,7 @@ void StaStateMachine::OnConnectFailed(int networkId)
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
 }
 
-void StaStateMachine::HandleWifi2Config(int &networkId)
+void StaStateMachine::CreateWifi2Config(int &networkId)
 {
     WifiDeviceConfig config1;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config1, m_instId) != 0) {
@@ -1168,7 +1168,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
         return;
     }
     int networkId = msg->GetParam1();
-    HandleWifi2Config(networkId);
+    CreateWifi2Config(networkId);
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {

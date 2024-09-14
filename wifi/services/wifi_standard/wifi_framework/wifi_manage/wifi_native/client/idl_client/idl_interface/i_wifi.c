@@ -687,9 +687,9 @@ static void IdlCbP2pProvServDiscFailureEvent()
 
 static void IdlCbP2pApStaConnectEvent(Context *context, int event)
 {
-    char devAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
+    char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     char groupAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
-    if (ReadStr(context, devAddress, sizeof(devAddress)) != 0) {
+    if (ReadStr(context, address, sizeof(address)) != 0) {
         return;
     }
     if (ReadStr(context, groupAddress, sizeof(groupAddress)) != 0) {
@@ -700,10 +700,10 @@ static void IdlCbP2pApStaConnectEvent(Context *context, int event)
         return;
     }
     if (event == HAL_CBK_CMD_AP_STA_DISCONNECTED_EVENT && callback->onStaDeauthorized != NULL) {
-        callback->onStaDeauthorized(devAddress);
+        callback->onStaDeauthorized(address);
     }
     if (event == HAL_CBK_CMD_AP_STA_CONNECTED_EVENT && callback->onStaAuthorized != NULL) {
-        callback->onStaAuthorized(devAddress, groupAddress);
+        callback->onStaAuthorized(address, "");
     }
     return;
 }

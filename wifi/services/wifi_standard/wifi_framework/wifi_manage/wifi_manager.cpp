@@ -22,6 +22,7 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
+#include "parameter.h"
 #include "wifi_internal_event_dispatcher.h"
 #endif
 #ifdef FEATURE_STA_SUPPORT
@@ -125,6 +126,7 @@ int WifiManager::Init()
         }
     }
     InitPidfile();
+    CheckSapcoExist();
     return 0;
 }
 
@@ -193,17 +195,37 @@ void WifiManager::OnNativeProcessStatusChange(int status)
     }
 }
 
+void WifiManager::CheckSapcoExist()
+{
+    char preValue[PROP_SUPPORT_SAPCOEXIST_LEN] = {0};
+
+    g_supportsapcoexistflag = false;
+    int errorCode = GetParamValue(SUPPORT_SAPCOEXIST_PROP.c_str(), 0, preValue, PROP_SUPPORT_SAPCOEXIST_LEN);
+    if (errorCode < 0) {
+        WIFI_LOGI("GetSupportedFeatures no support_sapcoexist.");
+        return;
+    }
+    WIFI_LOGI("GetSupportedFeatures preValue = %{public}s.", preValue);
+    if (strncmp(preValue, SUPPORT_SAPCOEXIST.c_str(), SUPPORT_SAPCOEXIST_LEN) == 0) {
+        g_supportsapcoexistflag = true;
+    }
+    return;
+}
+
 int WifiManager::GetSupportedFeatures(long &features) const
 {
     long supportedFeatures = mSupportedFeatures;
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA_5G);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_PASSPOINT);
-    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_AP_STA);
+    if (g_supportsapcoexistflag) {
+        supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_AP_STA);
+    }
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SAE);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SUITE_B);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_OWE);
     features = supportedFeatures;
+
     return 0;
 }
 

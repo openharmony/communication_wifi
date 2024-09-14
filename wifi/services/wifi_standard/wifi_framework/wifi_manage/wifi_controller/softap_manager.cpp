@@ -28,6 +28,7 @@ SoftApManager::~SoftApManager()
     WIFI_LOGE("Exit.");
     if (pSoftapManagerMachine != nullptr) {
         delete pSoftapManagerMachine;
+        pSoftapManagerMachine = nullptr;
     }
 }
 

@@ -44,6 +44,8 @@ public:
 
     int32_t GetNetCapabilities(const NetHandle &netHandle, NetAllCapabilities &netAllCap);
 
+    int32_t GetDefaultNet(NetHandle &netHandle);
+
     int32_t NetDetection(const NetHandle &netHandle);
 
     int32_t RegisterNetInterfaceCallback(const sptr<INetInterfaceStateCallback> &callback);

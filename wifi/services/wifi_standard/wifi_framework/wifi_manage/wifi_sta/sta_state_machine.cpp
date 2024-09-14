@@ -3559,7 +3559,7 @@ void StaStateMachine::LinkedState::GoInState()
     if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
         WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
         WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
-                                                static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
+            static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
         WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
@@ -3639,7 +3639,8 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
                 return false;
             }
             std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->GetInstanceId());
-            if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName) != WIFI_HAL_OPT_OK) {
+            if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName)
+                != WIFI_HAL_OPT_OK) {
                 WIFI_LOGE("SetBssid return fail.");
                 return false;
             }

@@ -356,7 +356,7 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiHalDevice
     if (num == 0) {
         return WIFI_HAL_OPT_OK;
     }
-    return HdiWpaStaSetNetwork(networkId, conf, num，ifaceName);
+    return HdiWpaStaSetNetwork(networkId, conf, num, ifaceName);
 }
 
 WifiErrorNo WifiHdiWpaClient::SetBssid(int networkId, const std::string &bssid, const char *ifaceName)

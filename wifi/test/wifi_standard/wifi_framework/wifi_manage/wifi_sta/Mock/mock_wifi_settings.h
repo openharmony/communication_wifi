@@ -90,6 +90,7 @@ public:
     virtual int SetStaLastRunState(int bRun, int instId = 0) = 0;
     virtual void SetScanOnlySwitchState(const int &state, int instId = 0) = 0;
     virtual  bool IsModulePreLoad(const std::string &name) = 0;
+    virtual bool GetConfigValueByName(const std::string &name, std::string &value) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -162,6 +163,7 @@ public:
     MOCK_METHOD2(SetScanOnlySwitchState, void(const int &state, int instId));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD1(IsModulePreLoad,  bool(const std::string &name));
+    MOCK_METHOD2(GetConfigValueByName,  bool(const std::string &name, std::string &value));
 };
 }  // namespace OHOS
 }  // namespace Wifi

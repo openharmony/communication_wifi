@@ -116,7 +116,7 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
-	auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaStart(instId);
     return WIFI_OPT_SUCCESS;
 }
@@ -526,7 +526,6 @@ void WifiServiceScheduler::StaIfaceDestoryCallback(std::string &destoryIfaceName
         }
         iter++;
     }
-
 }
 
 void WifiServiceScheduler::OnRssiReportCallback(int index, int antRssi)

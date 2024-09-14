@@ -116,6 +116,10 @@ static bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::s
         config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = HexToString(outArray[index++]);
         config.version = CheckDataLegal(outArray[index++]);
     }
+    if (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey == "") {
+        LOGE("ArrayToWifiDeviceConfig, psk empty!");
+        return false;
+    }
     return true;
 }
  
@@ -137,6 +141,11 @@ void WifiAssetManager::WifiAssetTriggerSync()
  
 static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = true)
 {
+    int32_t ret = SEC_ASSET_INVALID_ARGUMENT;
+    if (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey == "") {
+        LOGE("ArrayToWifiDeviceConfig, psk empty!");
+        return ret;
+    }
     std::string aliasId = config.ssid + config.keyMgmt;
     /* secret */
     std::string secretWifiDevice = "";
@@ -164,7 +173,7 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
         {.tag = SEC_ASSET_TAG_SECRET, .value = secret},
         {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value = g_trustAccountValue},
     };
-    int32_t ret = AssetAdd(attr, sizeof(attr) / sizeof(attr[0]));
+    ret = AssetAdd(attr, sizeof(attr) / sizeof(attr[0]));
     if (flagSync) {
         WifiAssetManager::GetInstance().WifiAssetTriggerSync();
     }

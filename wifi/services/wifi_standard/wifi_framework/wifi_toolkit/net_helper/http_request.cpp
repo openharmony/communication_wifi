@@ -231,6 +231,7 @@ int HttpRequest::HttpDataTransmit(const int &iSockFd)
             } else {
                 LOGD("HttpRequest::HttpDataTransmit recv success\n");
                 delete[] buf;
+                buf = nullptr;
                 return 0;
             }
         } else if (ret > 0) {

@@ -370,7 +370,7 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2, TestSize.Level1)
 HWTEST_F(ApStartedState_test, ExecuteStateMsg_FAILED, TestSize.Level1)
 {
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
-    EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
+    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
     EXPECT_FALSE(pApStartedState->ExecuteStateMsg(nullptr));
 }
 

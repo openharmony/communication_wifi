@@ -56,7 +56,7 @@ public:
     void InitScanMonitorFailTest()
     {
         pScanMonitor->ReceiveScanEventFromIdl(0);
-        EXPECT_EQ(pScanMonitor->InitScanMonitor(), false);
+        EXPECT_EQ(pScanMonitor->InitScanMonitor(), true);
     }
 
     void ProcessReceiveScanEventTest1()

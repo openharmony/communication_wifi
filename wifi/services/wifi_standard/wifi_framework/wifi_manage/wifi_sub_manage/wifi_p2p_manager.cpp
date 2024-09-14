@@ -387,12 +387,15 @@ void WifiP2pManager::DealConfigChanged(CfgType type, char* data, int dataLen)
     if (cfgData == nullptr) {
         WIFI_LOGE("DealConfigChanged: new data failed");
         delete cfgInfoPtr;
+        cfgInfoPtr = nullptr;
         return;
     }
     if (memcpy_s(cfgData, dataLen, data, dataLen) != EOK) {
         WIFI_LOGE("DealConfigChanged: memcpy_s failed");
         delete cfgInfoPtr;
+        cfgInfoPtr = nullptr;
         delete[] cfgData;
+        cfgData = nullptr;
         return;
     }
     cfgInfoPtr->data = cfgData;

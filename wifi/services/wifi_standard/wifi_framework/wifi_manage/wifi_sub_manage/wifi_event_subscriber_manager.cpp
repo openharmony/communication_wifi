@@ -247,6 +247,7 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
 #ifdef FEATURE_P2P_SUPPORT
         case SOFTBUS_SERVER_SA_ID:
+        case MIRACAST_SERVICE_SA_ID:
             HandleP2pBusinessChange(systemAbilityId, add);
             break;
 #endif
@@ -434,6 +435,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 #endif
     SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
+    SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
 }
 
 bool WifiEventSubscriberManager::IsDataMgrServiceActive()

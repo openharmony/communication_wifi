@@ -296,6 +296,7 @@ WifiP2pDevice P2pStateMachine::FetchNewerDeviceInfo(const std::string &deviceAdd
         int groupCap = device.GetGroupCapabilitys();
         deviceManager.UpdateDeviceGroupCap(deviceAddr, groupCap);
         newDevice.SetGroupCapabilitys(groupCap);
+        newDevice.SetDeviceCapabilitys(device.GetDeviceCapabilitys());
         newDevice.SetNetworkName(device.GetNetworkName());
     }
     return newDevice;

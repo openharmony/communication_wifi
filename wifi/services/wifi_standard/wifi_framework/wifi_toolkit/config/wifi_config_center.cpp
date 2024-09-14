@@ -74,7 +74,7 @@ int WifiConfigCenter::Init()
     InitScanControlForbidList();
     InitScanControlIntervalList();
     ClearLocalHid2dInfo();
-    mPersistWifiState = WifiSettings::GetInstance().GetOperatorWifiType();
+    mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
     mAirplaneModeState = WifiSettings::GetInstance().GetLastAirplaneMode();
     return 0;
 }
@@ -143,16 +143,18 @@ bool WifiConfigCenter::GetWifiStopState() const
     return mWifiStoping.load();
 }
 
-void WifiConfigCenter::SetStaIfaceName(const std::string &ifaceName)
+void WifiConfigCenter::SetStaIfaceName(const std::string &ifaceName, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    mStaIfaceName = ifaceName;
+    mStaIfaceName[instId] = ifaceName;
 }
 
-std::string WifiConfigCenter::GetStaIfaceName()
+std::string WifiConfigCenter::GetStaIfaceName(int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    return mStaIfaceName;
+    WIFI_LOGD("GetStaIfaceName instId:%{public}d mStaIfaceName[instId]:%{public}s ",
+        instId, mStaIfaceName[instId].c_str());
+    return mStaIfaceName[instId];
 }
 
 int WifiConfigCenter::GetWifiState(int instId)
@@ -337,6 +339,8 @@ int WifiConfigCenter::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
         if (bssid == info.bssid) {
             iter->second.channelWidth = channelWidth;
         }
+    } else {
+        mWifiLinkedInfo.emplace(instId, info);
     }
 
     return 0;
@@ -357,6 +361,7 @@ int WifiConfigCenter::SetMacAddress(const std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     mMacAddress[instId] = macAddress;
+    WIFI_LOGI("SetMacAddress instId:%{public}d, macAddress:%{public}s", instId, macAddress.c_str());
     return 0;
 }
 
@@ -1054,23 +1059,23 @@ bool WifiConfigCenter::SetWifiStateOnAirplaneChanged(const int &state)
     mAirplaneModeState = state;
     WifiSettings::GetInstance().SetLastAirplaneMode(state);
     if (WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode()) {
-        if (GetPersistWifiState() == WIFI_STATE_DISABLED) {
+        if (GetPersistWifiState(INSTID_WLAN0) == WIFI_STATE_DISABLED) {
             return true;
         }
-        if (GetPersistWifiState() == WIFI_STATE_SEMI_ENABLED && state == MODE_STATE_OPEN) {
-            SetPersistWifiState(WIFI_STATE_DISABLED);
+        if (GetPersistWifiState(INSTID_WLAN0) == WIFI_STATE_SEMI_ENABLED && state == MODE_STATE_OPEN) {
+            SetPersistWifiState(WIFI_STATE_DISABLED, INSTID_WLAN0);
             return true;
         }
         return false;
     }
     if (state == MODE_STATE_OPEN) {
-        if (GetPersistWifiState() == WIFI_STATE_ENABLED) {
+        if (GetPersistWifiState(INSTID_WLAN0) == WIFI_STATE_ENABLED) {
             WifiSettings::GetInstance().SetWifiDisabledByAirplane(true);
         }
-        SetPersistWifiState(WIFI_STATE_DISABLED);
+        SetPersistWifiState(WIFI_STATE_DISABLED, INSTID_WLAN0);
     } else {
         if (WifiSettings::GetInstance().GetWifiDisabledByAirplane()) {
-            SetPersistWifiState(WIFI_STATE_ENABLED);
+            SetPersistWifiState(WIFI_STATE_ENABLED, INSTID_WLAN0);
             WifiSettings::GetInstance().SetWifiDisabledByAirplane(false);
         }
     }
@@ -1082,21 +1087,21 @@ int WifiConfigCenter::GetAirplaneModeState() const
     return mAirplaneModeState.load();
 }
 
-int WifiConfigCenter::GetWifiToggledEnable()
+int WifiConfigCenter::GetWifiToggledEnable(int id)
 {
     if (GetAirplaneModeState() == MODE_STATE_OPEN) {
-        if (GetPersistWifiState() == WIFI_STATE_ENABLED) {
+        if (GetPersistWifiState(id) == WIFI_STATE_ENABLED) {
             return WIFI_STATE_ENABLED;
         }
         return WIFI_STATE_DISABLED;
     }
-    if (GetPersistWifiState() != WIFI_STATE_ENABLED && GetWifiAllowSemiActive()) {
+    if (GetPersistWifiState(id) != WIFI_STATE_ENABLED && GetWifiAllowSemiActive()) {
         return WIFI_STATE_SEMI_ENABLED;
     }
-    return GetPersistWifiState();
+    return GetPersistWifiState(id);
 }
 
-void WifiConfigCenter::SetWifiToggledState(int state)
+void WifiConfigCenter::SetWifiToggledState(int state, int id)
 {
     if (GetAirplaneModeState() == MODE_STATE_OPEN) {
         WifiSettings::GetInstance().SetWifiDisabledByAirplane(false);
@@ -1107,7 +1112,7 @@ void WifiConfigCenter::SetWifiToggledState(int state)
             state = WIFI_STATE_DISABLED;
         }
     }
-    SetPersistWifiState(state);
+    SetPersistWifiState(state, id);
 }
 
 void WifiConfigCenter::SetPowerSavingModeState(const int &state)
@@ -1459,16 +1464,24 @@ void WifiConfigCenter::InitScanControlIntervalList()
     return;
 }
 
-void WifiConfigCenter::SetPersistWifiState(int state)
+void WifiConfigCenter::SetPersistWifiState(int state, int instId)
 {
-    mPersistWifiState = state;
-    WifiSettings::GetInstance().SetOperatorWifiType(state);
+    if (instId < 0 || instId >= STA_INSTANCE_MAX_NUM) {
+        LOGE("SetPersistWifiState invalid instId %{public}d", instId);
+        return;
+    }
+    mPersistWifiState.at(instId) = state;
+    WifiSettings::GetInstance().SetOperatorWifiType(state, instId);
     LOGI("persist wifi state is %{public}d", state);
 }
 
-int WifiConfigCenter::GetPersistWifiState()
+int WifiConfigCenter::GetPersistWifiState(int instId)
 {
-    return mPersistWifiState.load();
+    if (instId < 0 || instId >= STA_INSTANCE_MAX_NUM) {
+        LOGE("GetPersistWifiState invalid instId %{public}d", instId);
+        return -1;
+    }
+    return mPersistWifiState.at(instId);
 }
 
 std::string WifiConfigCenter::GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,

@@ -60,7 +60,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PORTAL_ENTITY "entity.browser.hbct"
 #define PORTAL_CHECK_TIME (10 * 60)
 #define PORTAL_AUTH_EXPIRED_CHECK_TIME (2)
-#define PORTAL_MILLSECOND  1000
+#define PORTAL_MILLSECOND 1000
 #define WPA3_BLACKMAP_MAX_NUM 20
 #define WPA3_BLACKMAP_RSSI_THRESHOLD (-70)
 #define WPA3_CONNECT_FAIL_COUNT_THRESHOLD 2
@@ -108,45 +108,19 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
 StaStateMachine::StaStateMachine(int instId)
-    : StateMachine("StaStateMachine"),
-      lastNetworkId(INVALID_NETWORK_ID),
-      operationalMode(STA_CONNECT_MODE),
-      targetNetworkId(INVALID_NETWORK_ID),
-      pinCode(0),
-      wpsState(SetupMethod::INVALID),
-      lastSignalLevel_(INVALID_SIGNAL_LEVEL),
-      targetRoamBssid(WPA_BSSID_ANY),
-      currentTpType(IPTYPE_IPV4),
-      isWpsConnect(IsWpsConnected::WPS_INVALID),
-      getIpSucNum(0),
-      getIpFailNum(0),
-      enableSignalPoll(true),
-      isRoam(false),
-      lastTimestamp(0),
-      portalFlag(true),
-      portalState(PortalState::UNCHECKED),
-      detectNum(0),
-      portalExpiredDetectCount(0),
-      mIsWifiInternetCHRFlag(false),
-      networkStatusHistoryInserted(false),
-      pDhcpResultNotify(nullptr),
-      pRootState(nullptr),
-      pInitState(nullptr),
-      pWpaStartingState(nullptr),
-      pWpaStartedState(nullptr),
-      pWpaStoppingState(nullptr),
-      pLinkState(nullptr),
-      pSeparatingState(nullptr),
-      pSeparatedState(nullptr),
-      pApLinkedState(nullptr),
-      pWpsState(nullptr),
-      pGetIpState(nullptr),
-      pLinkedState(nullptr),
-      pApRoamingState(nullptr),
-      m_instId(instId),
-      mLastConnectNetId(INVALID_NETWORK_ID),
+    : StateMachine("StaStateMachine"), lastNetworkId(INVALID_NETWORK_ID), operationalMode(STA_CONNECT_MODE),
+      targetNetworkId(INVALID_NETWORK_ID), pinCode(0), wpsState(SetupMethod::INVALID),
+      lastSignalLevel_(INVALID_SIGNAL_LEVEL), targetRoamBssid(WPA_BSSID_ANY), currentTpType(IPTYPE_IPV4),
+      isWpsConnect(IsWpsConnected::WPS_INVALID), getIpSucNum(0), getIpFailNum(0), enableSignalPoll(true), isRoam(false),
+      lastTimestamp(0), portalFlag(true), portalState(PortalState::UNCHECKED), detectNum(0),
+      portalExpiredDetectCount(0), mIsWifiInternetCHRFlag(false), networkStatusHistoryInserted(false),
+      pDhcpResultNotify(nullptr), pRootState(nullptr), pInitState(nullptr), pWpaStartingState(nullptr),
+      pWpaStartedState(nullptr), pWpaStoppingState(nullptr), pLinkState(nullptr), pSeparatingState(nullptr),
+      pSeparatedState(nullptr), pApLinkedState(nullptr), pWpsState(nullptr), pGetIpState(nullptr),
+      pLinkedState(nullptr), pApRoamingState(nullptr), mLastConnectNetId(INVALID_NETWORK_ID),
       mConnectFailedCnt(0)
 {
+    m_instId = instId;
 }
 
 StaStateMachine::~StaStateMachine()
@@ -205,33 +179,33 @@ ErrCode StaStateMachine::InitStaStates()
 {
     WIFI_LOGE("Enter InitStaStates\n");
     int tmpErrNumber;
-    pRootState = new (std::nothrow)RootState();
+    pRootState = new (std::nothrow) RootState();
     tmpErrNumber = JudgmentEmpty(pRootState);
-    pInitState = new (std::nothrow)InitState(this);
+    pInitState = new (std::nothrow) InitState(this);
     tmpErrNumber += JudgmentEmpty(pInitState);
-    pWpaStartingState = new (std::nothrow)WpaStartingState(this);
+    pWpaStartingState = new (std::nothrow) WpaStartingState(this);
     tmpErrNumber += JudgmentEmpty(pWpaStartingState);
-    pWpaStartedState = new (std::nothrow)WpaStartedState(this);
+    pWpaStartedState = new (std::nothrow) WpaStartedState(this);
     tmpErrNumber += JudgmentEmpty(pWpaStartedState);
-    pWpaStoppingState = new (std::nothrow)WpaStoppingState(this);
+    pWpaStoppingState = new (std::nothrow) WpaStoppingState(this);
     tmpErrNumber += JudgmentEmpty(pWpaStoppingState);
-    pLinkState = new (std::nothrow)LinkState(this);
+    pLinkState = new (std::nothrow) LinkState(this);
     tmpErrNumber += JudgmentEmpty(pLinkState);
-    pSeparatingState = new (std::nothrow)SeparatingState();
+    pSeparatingState = new (std::nothrow) SeparatingState();
     tmpErrNumber += JudgmentEmpty(pSeparatingState);
-    pSeparatedState = new (std::nothrow)SeparatedState(this);
+    pSeparatedState = new (std::nothrow) SeparatedState(this);
     tmpErrNumber += JudgmentEmpty(pSeparatedState);
-    pApLinkedState = new (std::nothrow)ApLinkedState(this);
+    pApLinkedState = new (std::nothrow) ApLinkedState(this);
     tmpErrNumber += JudgmentEmpty(pApLinkedState);
-    pWpsState = new (std::nothrow)StaWpsState(this);
+    pWpsState = new (std::nothrow) StaWpsState(this);
     tmpErrNumber += JudgmentEmpty(pWpsState);
-    pGetIpState = new (std::nothrow)GetIpState(this);
+    pGetIpState = new (std::nothrow) GetIpState(this);
     tmpErrNumber += JudgmentEmpty(pGetIpState);
-    pLinkedState = new (std::nothrow)LinkedState(this);
+    pLinkedState = new (std::nothrow) LinkedState(this);
     tmpErrNumber += JudgmentEmpty(pLinkedState);
-    pApRoamingState = new (std::nothrow)ApRoamingState(this);
+    pApRoamingState = new (std::nothrow) ApRoamingState(this);
     tmpErrNumber += JudgmentEmpty(pApRoamingState);
-    pDhcpResultNotify = new (std::nothrow)DhcpResultNotify();
+    pDhcpResultNotify = new (std::nothrow) DhcpResultNotify();
     tmpErrNumber += JudgmentEmpty(pDhcpResultNotify);
     if (tmpErrNumber != 0) {
         WIFI_LOGE("InitStaStates some one state is null\n");
@@ -1219,26 +1193,21 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
             return;
         }
     }
-
     std::string connectType = config.lastConnectTime <= 0 ? "FIRST_CONNECT" :
         connTriggerMode == NETWORK_SELECTED_BY_AUTO ? "AUTO_CONNECT" :
         connTriggerMode == NETWORK_SELECTED_BY_USER ? "SELECT_CONNECT" : "";
     if (!connectType.empty()) {
         WirteConnectTypeHiSysEvent(connectType);
     }
-    /* Save connection information. */
     SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
     networkStatusHistoryInserted = false;
-    /* Callback result to InterfaceService. */
     InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTING, linkedInfo);
-
     if (StartConnectToNetwork(networkId, bssid) != WIFI_OPT_SUCCESS) {
         OnConnectFailed(networkId);
         return;
     }
     SetConnectMethod(connTriggerMode);
-    /* Sets network status. */
     WifiConfigCenter::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
 }
@@ -3588,6 +3557,10 @@ void StaStateMachine::LinkedState::GoInState()
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
     if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
+        WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
+        WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
+                                                static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
+        WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
             pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);
@@ -4279,8 +4252,8 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
     if (ret == 0) {
         assignMethod = config.wifiIpConfig.assignMethod;
     }
-    LOGI("DhcpResultNotify OnSuccess, uLeaseTime=%{public}d %{public}d %{public}d", result->uOptLeasetime, assignMethod,
-        pStaStateMachine->currentTpType);
+    LOGI("DhcpResultNotify OnSuccess, uLeaseTime=%{public}d %{public}d %{public}d m_instId = %{public}d",
+        result->uOptLeasetime, assignMethod, pStaStateMachine->currentTpType, pStaStateMachine->GetInstanceId());
     return;
 }
 
@@ -4404,7 +4377,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
 
 void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
 {
-    std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
     if (iptype == 1) {
         LOGI("TryToCloseDhcpClient iptype ipv6 return");
         return;

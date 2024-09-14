@@ -58,9 +58,11 @@ bool InvitationRequestState::ExecuteStateMsg(InternalMessagePtr msg)
                     WIFI_LOGW("Remove unknown client from currentGroup");
                     p2pStateMachine.groupManager.RemoveClientFromGroup(
                         netId, p2pStateMachine.savedP2pConfig.GetDeviceAddress());
+                    int uid;
+                    SharedLinkManager::GetGroupUid(uid);
                     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
                     p2pStateMachine.SendMessage(
-                        static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT), p2pStateMachine.savedP2pConfig);
+                        static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT), uid, 0, p2pStateMachine.savedP2pConfig);
                     break;
                 }
             }

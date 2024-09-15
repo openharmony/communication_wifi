@@ -325,21 +325,6 @@ ErrCode WifiP2pService::Hid2dConnect(const Hid2dConnectConfig& config)
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiP2pService::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
-    char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
-{
-    WIFI_LOGI("Hid2dGetSelfWifiCfgInfo");
-    *getDatValidLen = 0;
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode WifiP2pService::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
-    char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
-{
-    WIFI_LOGI("Hid2dSetPeerWifiCfgInfo");
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode WifiP2pService::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
 {
     WIFI_LOGI("Hid2dRequestGcIp");

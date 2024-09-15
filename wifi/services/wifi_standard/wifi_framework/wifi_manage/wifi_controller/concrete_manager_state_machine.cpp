@@ -59,10 +59,12 @@ ConcreteMangerMachine::~ConcreteMangerMachine()
     WifiConfigCenter::GetInstance().SetWifiStopState(false);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
+        WIFI_LOGW("destroy ConcreteMangerMachine RemoveStaIface ifaceName:%{public}s, instId:%{public}d",
+            ifaceName.c_str(), mid);
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
         ifaceName.clear();
         WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(mid);
-        WifiConfigCenter::GetInstance().SetStaIfaceName("");
+        WifiConfigCenter::GetInstance().SetStaIfaceName("", mid);
     }
 #endif
 }

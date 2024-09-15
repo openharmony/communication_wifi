@@ -182,8 +182,6 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     int interval = static_cast<int>(data[0]);
     FreqType scanType = static_cast<FreqType>(static_cast<int>(data[0]) % TWO);
     DhcpMode dhcpMode = static_cast<DhcpMode>(static_cast<int>(data[0]) % THREE);
-    PeerCfgType cfgType = static_cast<PeerCfgType>(static_cast<int>(data[0]) % THREE);
-    SelfCfgType cfgTyp = static_cast<SelfCfgType>(static_cast<int>(data[0]) % THREE);
     Hid2dConnectConfig hidConfig;
     hidConfig.SetDhcpMode(dhcpMode);
     hidConfig.SetFrequency(interval);
@@ -224,8 +222,6 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->GetP2pRecommendChannel();
     pP2pInterface->DecreaseSharedLink(interval);
     pP2pInterface->IncreaseSharedLink(interval);
-    char *cfgData = nullptr;
-    (void)memcpy_s(cfgData, CFG_DATA_MAX_BYTES, data, CFG_DATA_MAX_BYTES - 1);
     int channelid = static_cast<int32_t >(data[0]);
     Hid2dUpperScene scene;
     pP2pInterface->RegisterP2pServiceCallbacks(mP2pCallback);
@@ -233,8 +229,6 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->Hid2dCreateGroup(period, scanType);
     pP2pInterface->Hid2dConnect(hidConfig);
     pP2pInterface->Hid2dRequestGcIp(groupOwnerAddress, serviceName);
-    pP2pInterface->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, period);
-    pP2pInterface->Hid2dGetSelfWifiCfgInfo(cfgTyp, cfgData, &period);
     pP2pInterface->DiscoverPeers(channelid);
     pP2pInterface->Hid2dSetUpperScene(serviceName, scene);
     pP2pInterface->HandleBusinessSAException(period);

@@ -33,6 +33,9 @@ const unsigned long long MAC_ADDRESS_MULTICAST_MASK = 1ULL << 40;
 constexpr int MAX_MAC_SIZE = 18;
 constexpr int LONG_TO_BYTE_SIZE = 8;
 constexpr int MAC_ADDRESS_ETHER_ADDR_LEN = 6;
+constexpr unsigned int WIFI2_RANDOM_MAC_CHANGE_POS = 9;
+constexpr unsigned int WIFI2_RANDOM_MAC_CHANGE_LEN = 2;
+constexpr unsigned int WIFI2_RANDOM_MAC_MASK = 0x80;
 
 constexpr int OFFSET_VALUE_56 = 56;
 constexpr int OFFSET_VALUE_48 = 48;
@@ -268,5 +271,24 @@ int WifiRandomMacHelper::GenerateRandomMacAddressByLong(unsigned long long rando
         lngAddr, MacAnonymize(randomMacAddr).c_str());
     return ret;
 }
+
+bool WifiRandomMacHelper::GetWifi2RandomMac(std::string &wifi2RandomMac)
+{
+    std::string inputStrMac = wifi2RandomMac.substr(WIFI2_RANDOM_MAC_CHANGE_POS, WIFI2_RANDOM_MAC_CHANGE_LEN);
+    std::stringstream inputSsMac;
+    inputSsMac << std::hex <<inputStrMac;
+    unsigned int inputHexMac;
+    if (inputSsMac >> inputHexMac) {
+        WIFI_LOGD("%{public}s conver pos 3 mac to hex success", __func__);
+    } else {
+        WIFI_LOGE("%{public}s conver pos 3 mac to hex fail", __func__);
+    }
+    unsigned int outputHexMac = inputHexMac ^ WIFI2_RANDOM_MAC_MASK;
+    std::stringstream outSsMac;
+    outSsMac << std::hex <<outputHexMac;
+    wifi2RandomMac.replace(WIFI2_RANDOM_MAC_CHANGE_POS, WIFI2_RANDOM_MAC_CHANGE_LEN, outSsMac.str());
+    return true;
+}
+
 }   // Wifi
 } // OHOS

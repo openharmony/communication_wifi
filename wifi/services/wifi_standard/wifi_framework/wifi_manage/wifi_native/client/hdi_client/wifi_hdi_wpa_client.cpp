@@ -31,6 +31,8 @@
 #include "wifi_common_util.h"
 #include "wifi_common_def.h"
 #include "hdi_struct_toolkit.h"
+#include "wifi_hdi_wpa_proxy.h"
+#include "define.h"
 
 #ifndef UT_TEST
 #include "wifi_log.h"
@@ -62,37 +64,38 @@ constexpr int P2P_SUPPLICANT_CONNECTED = 1;
 constexpr int SSID_ASSIC_WIDTH = 2;
 constexpr int BAND_WIDTH_OFFSET = 16;
 
-WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName)
+WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName, int instId)
 {
     WifiEventCallback callback;
     callback.onConnectChanged = [](int param1, int param2, const std::string &param3) {};
-    ReqRegisterStaEventCallback(callback);
-    return HdiWpaStaStart(ifaceName.c_str());
+    ReqRegisterStaEventCallback(callback, ifaceName.c_str(), instId);
+    LOGI("WifiHdiWpaClient StartWifi ifaceName:%{public}s instId:%{public}d", ifaceName.c_str(), instId);
+    return HdiWpaStaStart(ifaceName.c_str(), instId);
 }
 
-WifiErrorNo WifiHdiWpaClient::StopWifi(void)
+WifiErrorNo WifiHdiWpaClient::StopWifi(int instId)
 {
-    return HdiWpaStaStop();
+    return HdiWpaStaStop(instId);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqConnect(int networkId)
+WifiErrorNo WifiHdiWpaClient::ReqConnect(int networkId, const char *ifaceName)
 {
-    return HdiWpaStaConnect(networkId);
+    return HdiWpaStaConnect(networkId, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqReconnect(void)
+WifiErrorNo WifiHdiWpaClient::ReqReconnect(const char *ifaceName)
 {
-    return HdiWpaStaReconnect();
+    return HdiWpaStaReconnect(ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqReassociate(void)
+WifiErrorNo WifiHdiWpaClient::ReqReassociate(const char *ifaceName)
 {
-    return HdiWpaStaReassociate();
+    return HdiWpaStaReassociate(ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqDisconnect(void)
+WifiErrorNo WifiHdiWpaClient::ReqDisconnect(const char *ifaceName)
 {
-    return HdiWpaStaDisconnect();
+    return HdiWpaStaDisconnect(ifaceName);
 }
 
 WifiErrorNo WifiHdiWpaClient::GetStaCapabilities(unsigned int &capabilities)
@@ -101,11 +104,11 @@ WifiErrorNo WifiHdiWpaClient::GetStaCapabilities(unsigned int &capabilities)
     return WIFI_HAL_OPT_OK;
 }
 
-WifiErrorNo WifiHdiWpaClient::GetStaDeviceMacAddress(std::string &mac)
+WifiErrorNo WifiHdiWpaClient::GetStaDeviceMacAddress(std::string &mac, const char *ifaceName)
 {
     char macAddr[HAL_BSSID_LENGTH + 1] = {0};
     int macAddrLen = HAL_BSSID_LENGTH + 1;
-    WifiErrorNo err = HdiWpaStaGetDeviceMacAddress(macAddr, macAddrLen);
+    WifiErrorNo err = HdiWpaStaGetDeviceMacAddress(macAddr, macAddrLen, ifaceName);
     if (err == WIFI_HAL_OPT_OK) {
         mac = std::string(macAddr);
     }
@@ -131,7 +134,7 @@ WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInf
 {
     LOGI("WifiHdiWpaClient::%{public}s enter", __func__);
     int size = HAL_GET_MAX_SCAN_INFO;
-    ScanInfo* results = HdiWpaStaGetScanInfos(&size);
+    ScanInfo *results = HdiWpaStaGetScanInfos(&size, GetHdiStaIfaceName(INSTID_WLAN0));
     if (results == NULL) {
         return size == 0 ? WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
     }
@@ -186,33 +189,33 @@ WifiErrorNo WifiHdiWpaClient::ReqStopPnoScan(void)
     return WIFI_HAL_OPT_NOT_SUPPORT;
 }
 
-WifiErrorNo WifiHdiWpaClient::RemoveDevice(int networkId)
+WifiErrorNo WifiHdiWpaClient::RemoveDevice(int networkId, const char *ifaceName)
 {
     if (networkId < 0) {
         return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
-    return HdiWpaStaRemoveNetwork(networkId);
+    return HdiWpaStaRemoveNetwork(networkId, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ClearDeviceConfig(void) const
+WifiErrorNo WifiHdiWpaClient::ClearDeviceConfig(const char *ifaceName) const
 {
-    return HdiWpaStaRemoveNetwork(-1);
+    return HdiWpaStaRemoveNetwork(-1, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::GetNextNetworkId(int &networkId)
+WifiErrorNo WifiHdiWpaClient::GetNextNetworkId(int &networkId, const char *ifaceName)
 {
-    return HdiWpaStaAddNetwork(&networkId);
+    return HdiWpaStaAddNetwork(&networkId, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqEnableNetwork(int networkId)
+WifiErrorNo WifiHdiWpaClient::ReqEnableNetwork(int networkId, const char *ifaceName)
 {
-    return HdiWpaStaEnableNetwork(networkId);
+    return HdiWpaStaEnableNetwork(networkId, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqDisableNetwork(int networkId)
+WifiErrorNo WifiHdiWpaClient::ReqDisableNetwork(int networkId, const char *ifaceName)
 {
-    return HdiWpaStaDisableNetwork(networkId);
+    return HdiWpaStaDisableNetwork(networkId, ifaceName);
 }
 
 void WifiHdiWpaClient::SetWapiConfig(const WifiHalDeviceConfig &config, SetNetworkConfig *conf, int &num)
@@ -229,7 +232,7 @@ void WifiHdiWpaClient::SetWapiConfig(const WifiHalDeviceConfig &config, SetNetwo
     }
 }
 
-WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config)
+WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config, const char *ifaceName)
 {
     if (CheckValidDeviceConfig(config) != WIFI_HAL_OPT_OK) {
         LOGE("SetDeviceConfig, CheckValidDeviceConfig return error!");
@@ -353,10 +356,10 @@ WifiErrorNo WifiHdiWpaClient::SetDeviceConfig(int networkId, const WifiHalDevice
     if (num == 0) {
         return WIFI_HAL_OPT_OK;
     }
-    return HdiWpaStaSetNetwork(networkId, conf, num);
+    return HdiWpaStaSetNetwork(networkId, conf, num, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::SetBssid(int networkId, const std::string &bssid)
+WifiErrorNo WifiHdiWpaClient::SetBssid(int networkId, const std::string &bssid, const char *ifaceName)
 {
     SetNetworkConfig conf;
     int num = PushDeviceConfigString(&conf, DEVICE_CONFIG_BSSID, bssid, false);
@@ -365,15 +368,16 @@ WifiErrorNo WifiHdiWpaClient::SetBssid(int networkId, const std::string &bssid)
         return WIFI_HAL_OPT_OK;
     }
     
-    return HdiWpaStaSetNetwork(networkId, &conf, num);
+    return HdiWpaStaSetNetwork(networkId, &conf, num, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::SaveDeviceConfig(void)
+WifiErrorNo WifiHdiWpaClient::SaveDeviceConfig(const char *ifaceName)
 {
-    return HdiWpaStaSaveConfig();
+    return HdiWpaStaSaveConfig(ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqRegisterStaEventCallback(const WifiEventCallback &callback)
+WifiErrorNo WifiHdiWpaClient::ReqRegisterStaEventCallback(
+    const WifiEventCallback &callback, const char *ifaceName, int instId)
 {
     struct IWpaCallback cWifiHdiWpaCallback;
     if (memset_s(&cWifiHdiWpaCallback, sizeof(cWifiHdiWpaCallback), 0, sizeof(cWifiHdiWpaCallback)) != EOK) {
@@ -394,10 +398,10 @@ WifiErrorNo WifiHdiWpaClient::ReqRegisterStaEventCallback(const WifiEventCallbac
         cWifiHdiWpaCallback.OnEventStaNotify = OnEventStaNotify;
     }
 
-    return RegisterHdiWpaStaEventCallback(&cWifiHdiWpaCallback);
+    return RegisterHdiWpaStaEventCallback(&cWifiHdiWpaCallback, ifaceName, instId);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqStartWpsPbcMode(const WifiHalWpsConfig &config)
+WifiErrorNo WifiHdiWpaClient::ReqStartWpsPbcMode(const WifiHalWpsConfig &config, const char *ifaceName)
 {
     WifiWpsParam param;
     if (memset_s(&param, sizeof(param), 0, sizeof(param)) != EOK) {
@@ -408,10 +412,10 @@ WifiErrorNo WifiHdiWpaClient::ReqStartWpsPbcMode(const WifiHalWpsConfig &config)
     if (strncpy_s(param.bssid, sizeof(param.bssid), config.bssid.c_str(), config.bssid.length()) != EOK) {
         return WIFI_HAL_OPT_FAILED;
     }
-    return HdiWpaStaStartWpsPbcMode(&param);
+    return HdiWpaStaStartWpsPbcMode(&param, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqStartWpsPinMode(const WifiHalWpsConfig &config, int &pinCode)
+WifiErrorNo WifiHdiWpaClient::ReqStartWpsPinMode(const WifiHalWpsConfig &config, int &pinCode, const char *ifaceName)
 {
     WifiWpsParam param;
     if (memset_s(&param, sizeof(param), 0, sizeof(param)) != EOK) {
@@ -427,12 +431,12 @@ WifiErrorNo WifiHdiWpaClient::ReqStartWpsPinMode(const WifiHalWpsConfig &config,
             return WIFI_HAL_OPT_FAILED;
         }
     }
-    return HdiWpaStaStartWpsPinMode(&param, &pinCode);
+    return HdiWpaStaStartWpsPinMode(&param, &pinCode, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqStopWps(void)
+WifiErrorNo WifiHdiWpaClient::ReqStopWps(const char *ifaceName)
 {
-    return HdiStopWpsSta();
+    return HdiStopWpsSta(ifaceName);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqGetRoamingCapabilities(WifiHalRoamCapability &capability)
@@ -450,39 +454,39 @@ WifiErrorNo WifiHdiWpaClient::ReqGetConnectSignalInfo(const std::string &endBssi
     return WIFI_HAL_OPT_NOT_SUPPORT;
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqWpaAutoConnect(int enable)
+WifiErrorNo WifiHdiWpaClient::ReqWpaAutoConnect(int enable, const char *ifaceName)
 {
-    return HdiWpaStaAutoConnect(enable);
+    return HdiWpaStaAutoConnect(enable, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqWpaBlocklistClear(void)
+WifiErrorNo WifiHdiWpaClient::ReqWpaBlocklistClear(const char *ifaceName)
 {
-    return HdiWpaStaBlocklistClear();
+    return HdiWpaStaBlocklistClear(ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqSetPowerSave(bool enable)
+WifiErrorNo WifiHdiWpaClient::ReqSetPowerSave(bool enable, const char *ifaceName)
 {
-    return HdiWpaStaSetPowerSave(enable);
+    return HdiWpaStaSetPowerSave(enable, ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCode)
+WifiErrorNo WifiHdiWpaClient::ReqWpaSetCountryCode(const std::string &countryCode, const char *ifaceName)
 {
-    return HdiWpaStaSetCountryCode(countryCode.c_str());
+    return HdiWpaStaSetCountryCode(countryCode.c_str(), ifaceName);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode)
+WifiErrorNo WifiHdiWpaClient::ReqWpaGetCountryCode(std::string &countryCode, const char *ifaceName)
 {
     char szCountryCode[HAL_COUNTRY_CODE_LENGTH + 1] = "";
-    if (WIFI_HAL_OPT_OK != HdiWpaStaGetCountryCode(szCountryCode, HAL_COUNTRY_CODE_LENGTH)) {
+    if (WIFI_HAL_OPT_OK != HdiWpaStaGetCountryCode(szCountryCode, HAL_COUNTRY_CODE_LENGTH, ifaceName)) {
         return WIFI_HAL_OPT_FAILED;
     }
     countryCode = szCountryCode;
     return WIFI_HAL_OPT_OK;
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqWpaSetSuspendMode(bool mode) const
+WifiErrorNo WifiHdiWpaClient::ReqWpaSetSuspendMode(bool mode, const char *ifaceName) const
 {
-    return HdiWpaStaSetSuspendMode(mode);
+    return HdiWpaStaSetSuspendMode(mode, ifaceName);
 }
 
 WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const std::string &cmd)
@@ -592,7 +596,7 @@ WifiErrorNo WifiHdiWpaClient::CheckValidDeviceConfig(const WifiHalDeviceConfig &
     return WIFI_HAL_OPT_OK;
 }
 
-WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiHalWpaNetworkInfo> &networkList)
+WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiHalWpaNetworkInfo> &networkList, const char *ifaceName)
 {
     HdiWifiWpaNetworkInfo *listNetwork = new HdiWifiWpaNetworkInfo[WIFI_MAX_SCAN_COUNT];
     if (listNetwork == nullptr) {
@@ -600,7 +604,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiHalWpaNetworkInfo> 
         return WIFI_HAL_OPT_FAILED;
     }
     uint32_t size = WIFI_MAX_SCAN_COUNT;
-    if (WIFI_HAL_OPT_OK != HdiWpaListNetworks(listNetwork, &size)) {
+    if (WIFI_HAL_OPT_OK != HdiWpaListNetworks(listNetwork, &size, ifaceName)) {
         if (listNetwork != nullptr) {
             delete[] listNetwork;
             listNetwork = nullptr;
@@ -634,7 +638,7 @@ WifiErrorNo WifiHdiWpaClient::GetNetworkList(std::vector<WifiHalWpaNetworkInfo> 
     return WIFI_HAL_OPT_OK;
 }
 
-WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiHalGetDeviceConfig &config)
+WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiHalGetDeviceConfig &config, const char *ifaceName)
 {
     int32_t networkId = config.networkId;
     char param[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
@@ -644,7 +648,7 @@ WifiErrorNo WifiHdiWpaClient::GetDeviceConfig(WifiHalGetDeviceConfig &config)
     }
     char value[WIFI_HDI_MAX_STR_LENGTH +1] = {0};
     uint32_t valueLen = WIFI_HDI_MAX_STR_LENGTH;
-    if (WIFI_HAL_OPT_OK != HdiWpaGetNetwork(networkId, param, value, valueLen)) {
+    if (WIFI_HAL_OPT_OK != HdiWpaGetNetwork(networkId, param, value, valueLen, ifaceName)) {
         LOGE("WifiHdiWpaClient::%{public}s failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }

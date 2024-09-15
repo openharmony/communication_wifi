@@ -147,8 +147,8 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (m_instId == 0) {
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+    if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, m_instId);
         WifiConfigCenter::GetInstance().SetWifiAllowSemiActive(false);
     }
 
@@ -184,7 +184,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
         return WIFI_OPT_FORBID_AIRPLANE;
     }
 #endif
-    if (m_instId == 0) {
+    if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
 
@@ -1760,8 +1760,8 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     }
 
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
-    if (m_instId == 0) {
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
+    if (m_instId >= 0 || m_instId < STA_INSTANCE_MAX_NUM) {
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, m_instId);
     }
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);

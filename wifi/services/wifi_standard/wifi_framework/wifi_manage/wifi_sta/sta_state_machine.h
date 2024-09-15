@@ -553,6 +553,8 @@ public:
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
 #endif
+
+    bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);
 private:
     /**
      * @Description  Destruct state.
@@ -1258,6 +1260,7 @@ private:
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
+    void UpdateWifiCategory();
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
@@ -1268,6 +1271,7 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    void CreateWifi2Config(int &networkId);
 };
 }  // namespace Wifi
 }  // namespace OHOS

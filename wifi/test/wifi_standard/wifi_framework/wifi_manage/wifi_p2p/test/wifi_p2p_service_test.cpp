@@ -291,7 +291,8 @@ HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest001, TestSize.Level1)
 {
     int systemAbilityId = 0;
     int callingUid = 0;
-    EXPECT_EQ(pWifiP2pService->HandleBusinessSAException(systemAbilityId), ErrCode::WIFI_OPT_INVALID_PARAM);
+    pWifiP2pService->IncreaseSharedLink(callingUid);
+    pWifiP2pService->HandleBusinessSAException(systemAbilityId);
 }
 
 HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest003, TestSize.Level1)

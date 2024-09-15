@@ -829,6 +829,12 @@ void StaStateMachine::StopWifiProcess()
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
         linkedInfo.ssid = "";
     }
+    if (curConnState == ConnState::DISCONNECTING) {
+        /* Callback result to InterfaceService. */
+        linkedInfo.ssid = ssid;
+        InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+        linkedInfo.ssid = "";
+    }
     SwitchState(pInitState);
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
 }
@@ -2858,7 +2864,7 @@ void StaStateMachine::DisConnectProcess()
         }
         WIFI_LOGI("Disconnect update wifi status");
         /* Save connection information to WifiSettings. */
-        SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
+        SaveLinkstate(ConnState::DISCONNECTING, DetailedState::DISCONNECTING);
         WIFI_LOGI("Enter DisConnectProcess DisableNetwork ifaceName:%{public}s!", ifaceName.c_str());
         WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID, ifaceName);
 

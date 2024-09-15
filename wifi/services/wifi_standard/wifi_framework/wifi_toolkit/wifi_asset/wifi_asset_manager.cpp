@@ -143,7 +143,7 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
 {
     int32_t ret = SEC_ASSET_INVALID_ARGUMENT;
     if (config.keyMgmt != KEY_MGMT_NONE && (config.preSharedKey).length() == 0) {
-        LOGE("ArrayToWifiDeviceConfig, psk empty!");
+        LOGE("WifiAssetAttrAdd, psk empty!");
         return ret;
     }
     std::string aliasId = config.ssid + config.keyMgmt;

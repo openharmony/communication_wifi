@@ -981,6 +981,9 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = [this](InternalMessagePtr msg) {
         return this->DealWpaStateChange(msg);
     };
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_NETWORK_REMOVED] = [this](InternalMessagePtr msg) {
+        return this->DealNetworkRemoved(msg);
+    };
     return WIFI_OPT_SUCCESS;
 }
 
@@ -3772,6 +3775,26 @@ void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
     LOGI("DealWpaStateChange status: %{public}d", status);
     linkedInfo.supplicantState = static_cast<SupplicantState>(status);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+}
+
+void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealNetworkRemoved InternalMessage msg is null.");
+        return;
+    }
+    int networkId = 0;
+    networkId = msg->GetParam1();;
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WIFI_LOGI("DealNetworkRemoved networkid = %{public}d linkinfo.networkid = %{public}d targetNetworkId = %{public}d",
+        networkId, linkedInfo.networkId, targetNetworkId);
+    if ((linkedInfo.networkId == networkId) ||
+        ((targetNetworkId == networkId) && (linkedInfo.connState == ConnState::CONNECTING))) {
+        WifiStaHalInterface::GetInstance().Disconnect();
+    }
+ 
+    return;
 }
 /* --------------------------- state machine Roaming State ------------------------------ */
 StaStateMachine::ApRoamingState::ApRoamingState(StaStateMachine *staStateMachine)

@@ -3784,14 +3784,16 @@ void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
         return;
     }
     int networkId = 0;
-    networkId = msg->GetParam1();;
+    networkId = msg->GetParam1();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     WIFI_LOGI("DealNetworkRemoved networkid = %{public}d linkinfo.networkid = %{public}d targetNetworkId = %{public}d",
         networkId, linkedInfo.networkId, targetNetworkId);
     if ((linkedInfo.networkId == networkId) ||
         ((targetNetworkId == networkId) && (linkedInfo.connState == ConnState::CONNECTING))) {
-        WifiStaHalInterface::GetInstance().Disconnect();
+        std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+        WIFI_LOGI("Enter DisConnectProcess ifaceName:%{public}s!", ifaceName.c_str());
+        WifiStaHalInterface::GetInstance().Disconnect(ifaceName);
     }
  
     return;

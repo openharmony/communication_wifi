@@ -1757,6 +1757,20 @@ public:
         pStaStateMachine->DealScreenStateChangedEvent(msg);
     }
 
+    void DealNetworkRemovedSuccessTest()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        pStaStateMachine->GetLinkedInfo(info);
+        msg->SetParam1(static_cast<int>(info.networkId));
+        pStaStateMachine->DealNetworkRemoved(msg);
+    }
+
+    void DealNetworkRemovedFailTest()
+    {
+        pStaStateMachine->DealNetworkRemoved(nullptr);
+    }
+
     void DealHiLinkDataToWpaFailTest()
     {
         pStaStateMachine->DealHiLinkDataToWpa(nullptr);
@@ -3028,6 +3042,16 @@ HWTEST_F(StaStateMachineTest, InvokeOnStaRssiLevelChangedTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest, TestSize.Level1)
 {
     DealScreenStateChangedEventTest();
+}
+
+HWTEST_F(StaStateMachineTest, DealNetworkRemovedFailTest, TestSize.Level1)
+{
+    DealNetworkRemovedFailTest();
+}
+
+HWTEST_F(StaStateMachineTest, DealNetworkRemovedSuccessTest, TestSize.Level1)
+{
+    DealNetworkRemovedSuccessTest();
 }
 
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaFailTest, TestSize.Level1)

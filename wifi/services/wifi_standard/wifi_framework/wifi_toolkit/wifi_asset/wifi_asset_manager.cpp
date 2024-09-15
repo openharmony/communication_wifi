@@ -117,7 +117,7 @@ static bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::s
         config.version = CheckDataLegal(outArray[index++]);
     }
     if (config.keyMgmt != KEY_MGMT_NONE && (config.preSharedKey).length() == 0) {
-        LOGE("ArrayToWifiDeviceConfig, psk empty!");
+        LOGE("ArrayToWifiDeviceConfig, ssid : %{public}s psk empty!", SsidAnonymize(config.ssid).c_str());
         return false;
     }
     return true;
@@ -143,7 +143,7 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
 {
     int32_t ret = SEC_ASSET_INVALID_ARGUMENT;
     if (config.keyMgmt != KEY_MGMT_NONE && (config.preSharedKey).length() == 0) {
-        LOGE("WifiAssetAttrAdd, psk empty!");
+        LOGE("WifiAssetAttrAdd, ssid : %{public}s psk empty!", SsidAnonymize(config.ssid).c_str());
         return ret;
     }
     std::string aliasId = config.ssid + config.keyMgmt;
@@ -214,7 +214,6 @@ static void WifiAssetAttrQuery(const AssetResultSet &resultSet, int32_t userId,
             reinterpret_cast<const char *>(checkItemSingle->value.blob.data), checkItemSingle->value.blob.size);
         WifiDeviceConfig AssetWifiDeviceConfig;
         std::vector<std::string> outArray;
-        LOGI("WifiAssetAttrQuery, strSecret : %{public}d", static_cast<int>(strSecret.size()));
         SplitString(strSecret, ';', outArray);
         if (ArrayToWifiDeviceConfig(AssetWifiDeviceConfig, outArray)) {
             assetWifiConfig.push_back(AssetWifiDeviceConfig);
@@ -448,8 +447,6 @@ bool WifiAssetManager::IsWifiConfigUpdated(const std::vector<WifiDeviceConfig> n
         if (IsWifiConfigChanged(iter, config)) {
             config.preSharedKey = iter.preSharedKey;
             config.hiddenSSID = iter.hiddenSSID;
-            LOGI("WifiAssetManager IsWifiConfigUpdated, ssid : %{public}s pk : %{public}d",
-                SsidAnonymize(iter.ssid).c_str(), static_cast<int>((iter.preSharedKey).size()));
             config.wepTxKeyIndex = iter.wepTxKeyIndex;
             for (int u = 0; u < WEPKEYS_SIZE; u++) {
                 config.wepKeys[u] = iter.wepKeys[u];

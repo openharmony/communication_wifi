@@ -94,7 +94,6 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg)
             p2pStateMachine.UpdatePersistentGroups();
         }
     } else if (netId == PERSISTENT_NET_ID || netId == TEMPORARY_NET_ID) {
-        // Create a new persistence group.
         WIFI_LOGE("Create a new %{public}s group.", (netId == PERSISTENT_NET_ID) ? "persistence" : "temporary");
         if (config.GetPassphrase().empty() && config.GetGroupName().empty()) {
             WifiConfigCenter::GetInstance().SetExplicitGroup(true);

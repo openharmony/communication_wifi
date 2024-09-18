@@ -33,6 +33,7 @@
 #include "wifi_common_service_manager.h"
 #include "wifi_native_define.h"
 #include "wifi_sta_hal_interface.h"
+#include "power_mgr_client.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_watchdog_utils.h"
 #endif
@@ -122,6 +123,8 @@ int WifiManager::Init()
             wifiTogglerManager->ScanOnlyToggled(1);
         }
     }
+    WifiConfigCenter::GetInstance().SetScreenState(
+        PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
     InitPidfile();
     return 0;
 }

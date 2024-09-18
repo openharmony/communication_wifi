@@ -3554,10 +3554,6 @@ void StaStateMachine::LinkedState::GoInState()
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
     if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
-        WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
-        WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
-            static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
-        WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
             pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);
@@ -3565,11 +3561,14 @@ void StaStateMachine::LinkedState::GoInState()
             pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
         }
 #endif
-    } else {
-        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
-        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-        pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
     }
+    WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
+    WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
+        static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
+    pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     WifiAssetManager::GetInstance().WifiAssetTriggerSync();
 #endif

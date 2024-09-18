@@ -415,9 +415,11 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
         status = tempDeviceConfig.status;
-        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
-        bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
-        pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
+        if (m_instId == INSTID_WLAN0) {
+            CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+            bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
+            pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
+        }
         isUpdate = true;
     } else {
         netWorkId = WifiSettings::GetInstance().GetNextNetworkId();
@@ -661,13 +663,15 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
 ErrCode StaService::Disconnect() const
 {
     WIFI_LOGI("Enter Disconnect.\n");
-    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
-    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
-        WIFI_LOGI("The blocklist is updated.\n");
+    if (m_instId == INSTID_WLAN0) {
+        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+        if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
+            WIFI_LOGI("The blocklist is updated.\n");
+        }
     }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISCONNECT);
     return WIFI_OPT_SUCCESS;
 }

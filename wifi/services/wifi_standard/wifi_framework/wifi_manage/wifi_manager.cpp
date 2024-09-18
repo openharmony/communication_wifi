@@ -79,7 +79,7 @@ int WifiManager::Init()
     }
 
     WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(
-        std::bind(&WifiManager::OnNativeProcessStatusChange, this, std::placeholders::_1));
+        [this](int status) { this->OnNativeProcessStatusChange(status); });
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();

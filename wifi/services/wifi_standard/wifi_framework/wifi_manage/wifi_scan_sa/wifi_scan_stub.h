@@ -24,8 +24,8 @@ namespace OHOS {
 namespace Wifi {
 class WifiScanStub : public IRemoteStub<IWifiScan> {
 public:
-    using handleFunc = int (WifiScanStub::*)(
-    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    using handleFunc = std::function<int
+        (uint32_t, MessageParcel &, MessageParcel &, MessageOption &)>;
     using HandleFuncMap = std::map<int, handleFunc>;
     WifiScanStub();
     explicit WifiScanStub(int instId);

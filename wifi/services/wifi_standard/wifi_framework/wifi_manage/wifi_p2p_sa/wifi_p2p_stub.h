@@ -25,8 +25,8 @@ namespace OHOS {
 namespace Wifi {
 class WifiP2pStub : public IRemoteStub<IWifiP2p> {
 public:
-    using handleFunc = void (WifiP2pStub::*)(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    using handleFunc = std::function<void
+        (uint32_t, MessageParcel &, MessageParcel &, MessageOption &)>;
     using HandleFuncMap = std::map<int, handleFunc>;
 
     WifiP2pStub();

@@ -27,8 +27,8 @@ namespace OHOS {
 namespace Wifi {
 class WifiScanMgrStub : public IRemoteStub<IWifiScanMgr> {
 public:
-    using FuncHandle = int (WifiScanMgrStub::*)(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    using FuncHandle = std::function<int
+        (uint32_t, MessageParcel &, MessageParcel &, MessageOption &)>;
     using FuncHandleMap = std::map<int, FuncHandle>;
 
     WifiScanMgrStub();
@@ -37,7 +37,7 @@ public:
         MessageParcel &reply, MessageOption &option) override;
     int GetWifiRemoteInner(uint32_t code, MessageParcel &data,
         MessageParcel &reply, MessageOption &option);
-    static FuncHandleMap funcHandleMap_;
+    FuncHandleMap funcHandleMap_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

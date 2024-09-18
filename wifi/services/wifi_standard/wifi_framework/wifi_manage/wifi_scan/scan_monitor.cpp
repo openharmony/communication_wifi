@@ -31,7 +31,7 @@ bool ScanMonitor::InitScanMonitor()
     WIFI_LOGI("Enter ScanMonitor::InitScanMonitor.");
 
     SupplicantEventCallback eventCallback;
-    eventCallback.onScanNotify = std::bind(&ScanMonitor::ReceiveScanEventFromIdl, this, std::placeholders::_1);
+    eventCallback.onScanNotify = [this](int result) { this->ReceiveScanEventFromIdl(result); };
     if (WifiSupplicantHalInterface::GetInstance().RegisterSupplicantEventCallback(eventCallback) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("RegisterSupplicantEventCallback failed.");
         return false;

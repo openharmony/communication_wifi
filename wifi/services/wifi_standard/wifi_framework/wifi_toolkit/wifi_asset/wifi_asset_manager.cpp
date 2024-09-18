@@ -233,6 +233,7 @@ WifiAssetManager::WifiAssetManager()
     if (assetServiceThread_ == nullptr) {
         assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
     }
+    firstSync_.store(false);
 }
 
 WifiAssetManager::~WifiAssetManager()
@@ -244,7 +245,7 @@ WifiAssetManager::~WifiAssetManager()
 
 void WifiAssetManager::InitUpLoadLocalDeviceSync()
 {
-    if (firstSync_) {
+    if (firstSync_.load()) {
         LOGE("WifiAssetManager, local data is sync");
         return;
     }
@@ -253,7 +254,7 @@ void WifiAssetManager::InitUpLoadLocalDeviceSync()
 
 void WifiAssetManager::CloudAssetSync()
 {
-    if (!firstSync_) {
+    if (!(firstSync_.load())) {
         LOGE("WifiAssetManager, local data not sync");
         return;
     }
@@ -366,7 +367,7 @@ void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wif
             WifiAssetTriggerSync();
         }
         if (firstSync) {
-            firstSync_ = true;
+            firstSync_.store(true);
         }
     });
 }

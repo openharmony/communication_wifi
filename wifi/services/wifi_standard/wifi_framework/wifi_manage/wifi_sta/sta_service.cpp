@@ -838,7 +838,7 @@ std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
  
 void StaService::HandleScreenStatusChanged(int screenState)
 {
-    WIFI_LOGD("Enter HandleScreenStatusChanged screenState:%{public}d.", screenState);
+    WIFI_LOGD("Enter HandleScreenStatusChanged screenState:%{public}d, instId:%{public}d", screenState, m_instId);
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("pStaStateMachine is null!");
@@ -846,7 +846,9 @@ void StaService::HandleScreenStatusChanged(int screenState)
     }
     pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
     if (screenState == MODE_STATE_OPEN) {
-        pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
+        if (m_instId == INSTID_WLAN0) {
+            pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
+        }
     } else {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }

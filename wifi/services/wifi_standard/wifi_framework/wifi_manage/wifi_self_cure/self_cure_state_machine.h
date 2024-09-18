@@ -114,7 +114,7 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-        using selfCureCmsHandleFunc = void (SelfCureStateMachine::ConnectedMonitorState::*)(InternalMessagePtr msg);
+        using selfCureCmsHandleFunc = std::function<void(InternalMessagePtr msg)>;
         using SelfCureCmsHandleFuncMap = std::map<int, selfCureCmsHandleFunc>;
 
     private:
@@ -196,7 +196,7 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-        using selfCureIssHandleFunc = void (SelfCureStateMachine::InternetSelfCureState::*)(InternalMessagePtr msg);
+        using selfCureIssHandleFunc = std::function<void(InternalMessagePtr msg)>;
         using SelfCureIssHandleFuncMap = std::map<int, selfCureIssHandleFunc>;
 
     private:

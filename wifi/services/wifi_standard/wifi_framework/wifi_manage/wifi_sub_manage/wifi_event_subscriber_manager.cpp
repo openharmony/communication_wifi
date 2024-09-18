@@ -84,7 +84,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 {
     WIFI_LOGI("create WifiEventSubscriberManager");
     if (accessDatashareTimerId == 0) {
-        WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::DelayedAccessDataShare, this);
+        WifiTimer::TimerCallback timeoutCallback = [this]() { this->DelayedAccessDataShare(); };
         WifiTimer::GetInstance()->Register(
             timeoutCallback, accessDatashareTimerId, TIMEOUT_EVENT_DELAY_ACCESS_DATASHARE);
         WIFI_LOGI("DelayedAccessDataShare register success! accessDatashareTimerId:%{public}u", accessDatashareTimerId);
@@ -138,7 +138,7 @@ void WifiEventSubscriberManager::RegisterCesEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(cesEventSubscriber_)) {
         WIFI_LOGE("CesEvent SubscribeCommonEvent() failed");
         cesEventSubscriber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterCesEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterCesEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, cesTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterCesEvent retry, cesTimerId = %{public}u", cesTimerId);
     } else {
@@ -908,8 +908,7 @@ void WifiEventSubscriberManager::RegisterNotificationEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiNotificationSubsciber_)) {
         WIFI_LOGE("WifiNotification SubscribeCommonEvent() failed");
         wifiNotificationSubsciber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack =
-            std::bind(&WifiEventSubscriberManager::RegisterNotificationEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterNotificationEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, notificationTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterNotificationEvent retry, notificationTimerId = %{public}u", notificationTimerId);
     } else {

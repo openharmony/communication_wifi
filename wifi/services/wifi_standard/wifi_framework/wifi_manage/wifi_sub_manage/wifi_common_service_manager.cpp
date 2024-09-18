@@ -64,8 +64,8 @@ InitStatus WifiCommonServiceManager::Init()
         return WIFI_COUNTRY_CODE_MANAGER_INIT_FAILED;
     }
     using namespace std::placeholders;
-    mWifiAppStateAwareCallbacks.OnForegroundAppChanged =
-        std::bind(&WifiCommonServiceManager::OnForegroundAppChanged, this, _1, _2);
+    mWifiAppStateAwareCallbacks.OnForegroundAppChanged = [this](const AppExecFwk::AppStateData &appStateData,
+        const int mInstId) { this->OnForegroundAppChanged(appStateData, mInstId); };
     if (WifiAppStateAware::GetInstance().InitAppStateAware(mWifiAppStateAwareCallbacks) < 0) {
         WIFI_LOGE("WifiAppStateAware Init failed!");
     }
@@ -78,8 +78,8 @@ InitStatus WifiCommonServiceManager::Init()
     WifiNetAgent::GetInstance().InitWifiNetAgent(wifiNetAgentCallbacks_);
 #endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
-    mWifiNetLinkCallbacks.OnTcpReportMsgComplete =
-        std::bind(&WifiCommonServiceManager::OnTcpReportMsgComplete, this, _1, _2, _3);
+    mWifiNetLinkCallbacks.OnTcpReportMsgComplete = [this](const std::vector<int64_t> &elems, const int32_t cmd,
+        const int32_t mInstId) { this->OnTcpReportMsgComplete(elems, cmd, mInstId); };
     WifiNetLink::GetInstance().InitWifiNetLink(mWifiNetLinkCallbacks);
 #endif
     if (WifiConfigCenter::GetInstance().Init() < 0) {

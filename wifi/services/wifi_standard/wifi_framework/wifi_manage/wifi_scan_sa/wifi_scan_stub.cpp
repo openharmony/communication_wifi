@@ -52,25 +52,35 @@ WifiScanStub::~WifiScanStub()
 
 void WifiScanStub::InitHandleMap()
 {
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO)] =
-        &WifiScanStub::OnSetScanControlInfo;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN)] = &WifiScanStub::OnScan;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN)] =
-        &WifiScanStub::OnScanByParams;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE)] =
-        &WifiScanStub::OnIsWifiClosedScan;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST)] =
-        &WifiScanStub::OnGetScanInfoList;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK)] =
-        &WifiScanStub::OnRegisterCallBack;
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] =
-        &WifiScanStub::OnGetSupportedFeatures;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY)] =
-        &WifiScanStub::OnSetScanOnlyAvailable;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY)] =
-        &WifiScanStub::OnGetScanOnlyAvailable;
-    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN)] =
-        &WifiScanStub::OnStartWifiPnoScan;
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnSetScanControlInfo(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option) { return OnScan(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnScanByParams(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnIsWifiClosedScan(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnGetScanInfoList(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnRegisterCallBack(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnGetSupportedFeatures(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnSetScanOnlyAvailable(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnGetScanOnlyAvailable(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { return OnStartWifiPnoScan(code, data, reply, option); };
 }
 
 int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -96,10 +106,10 @@ int WifiScanStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
             int idTimer = 0;
             idTimer = WifiWatchDogUtils::GetInstance()->StartWatchDogForFunc(itCollieId->second);
             WIFI_LOGI("SetTimer id: %{public}d, name: %{public}s.", idTimer, itCollieId->second.c_str());
-            (this->*(iter->second))(code, data, reply, option);
+            (iter->second)(code, data, reply, option);
             WifiWatchDogUtils::GetInstance()->StopWatchDogForFunc(itCollieId->second, idTimer);
         } else {
-            (this->*(iter->second))(code, data, reply, option);
+            (iter->second)(code, data, reply, option);
         }
     }
     return 0;

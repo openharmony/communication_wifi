@@ -123,8 +123,10 @@ int WifiManager::Init()
             wifiTogglerManager->ScanOnlyToggled(1);
         }
     }
+#ifndef OHOS_ARCH_LITE
     WifiConfigCenter::GetInstance().SetScreenState(
         PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
+#endif
     InitPidfile();
     return 0;
 }

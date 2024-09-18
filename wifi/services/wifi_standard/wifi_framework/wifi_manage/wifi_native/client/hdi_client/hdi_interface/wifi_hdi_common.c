@@ -334,6 +334,9 @@ static int HdiRsnKeyMgmtToAuthMgmt(const uint8_t *s)
     if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_FT_SAE) {
         return HDI_KEY_MGMT_FT_SAE;
     }
+    if (HDI_GET_RSN_ID(s) == HDI_RSN_AUTH_KEY_MGMT_SHA256) {
+        return HDI_KEY_MGMT_IEEE8021X_SHA256;
+    }
     return 0;
 }
 
@@ -668,6 +671,7 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto, const uint8_t *ie, si
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_FT_IEEE8021X, ret, pos, end, "+", "%sFT/EAP");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_FT_PSK, ret, pos, end, "+", "%sFT/PSK");
     HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_FT_SAE, ret, pos, end, "+", "%sFT/SAE");
+    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_IEEE8021X_SHA256, ret, pos, end, "+", "%sEAP");
 
     pos = HdiGetCipherTxt(pos, end, data.pairwiseCipher);
 

@@ -366,6 +366,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_FAILED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     } else {
+        SharedLinkManager::SetGroupUid(msg->GetParam1());
         const int cgTimedOut = 5000;
         WIFI_LOGI("p2p configure hid2d group successful.");
         p2pStateMachine.MessageExecutedLater(

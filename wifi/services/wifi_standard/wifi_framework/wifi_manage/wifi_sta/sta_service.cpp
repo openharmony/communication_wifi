@@ -845,12 +845,12 @@ void StaService::HandleScreenStatusChanged(int screenState)
         return;
     }
     pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
-    if (screenState == MODE_STATE_OPEN) {
-        if (m_instId == INSTID_WLAN0) {
+    if (m_instId == INSTID_WLAN0) {
+        if (screenState == MODE_STATE_OPEN) {
             pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
+        } else {
+            pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
         }
-    } else {
-        pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
     if (pStaAppAcceleration != nullptr) {
         pStaAppAcceleration->HandleScreenStatusChanged(screenState);

@@ -33,9 +33,9 @@
 #include "wifi_common_service_manager.h"
 #include "wifi_native_define.h"
 #include "wifi_sta_hal_interface.h"
-#include "power_mgr_client.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_watchdog_utils.h"
+#include "power_mgr_client.h"
 #endif
 
 namespace OHOS {

@@ -416,7 +416,7 @@ private:
     WifiP2pServiceManager &serviceManager;   /* service manager */
     ClientCallBack clientCallBack;
     ServerCallBack serverCallBack;
-    DhcpResultNotify *pDhcpResultNotify;
+    DhcpResultNotify *pDhcpResultNotify = nullptr;
     DhcpdInterface m_DhcpdInterface;
     AuthorizingNegotiationRequestState &p2pAuthorizingNegotiationRequestState;
     GroupFormedState &p2pGroupFormedState;

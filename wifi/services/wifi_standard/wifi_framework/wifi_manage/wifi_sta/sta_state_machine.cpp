@@ -3857,8 +3857,9 @@ bool StaStateMachine::ApRoamingState::HandleNetworkConnectionEvent(InternalMessa
                 pStaStateMachine->linkedInfo);
             pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
         }
+    } else {
+        pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
     }
-    pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
     return ret;
 }
 

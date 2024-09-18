@@ -402,6 +402,9 @@ int WifiSettings::IncreaseDeviceConnFailedCount(const std::string &index, const 
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
                 iter->second.connFailedCount += count;
+                LOGI("WifiSettings::IncreaseDeviceConnFailedCount ssid=%{public}s,connFailedCount=%{public}d,"
+                    "count=%{public}d",
+                     SsidAnonymize(index).c_str(), iter->second.connFailedCount, count);
                 return 0;
             }
         }
@@ -409,10 +412,15 @@ int WifiSettings::IncreaseDeviceConnFailedCount(const std::string &index, const 
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index) {
                 iter->second.connFailedCount += count;
+                LOGI("WifiSettings::IncreaseDeviceConnFailedCount bssid=%{public}s,connFailedCount=%{public}d,"
+                    "count=%{public}d",
+                     SsidAnonymize(index).c_str(), iter->second.connFailedCount, count);
                 return 0;
             }
         }
     }
+    LOGE("WifiSettings::IncreaseDeviceConnFailedCount failed %{public}s,count=%{public}d",
+        SsidAnonymize(index).c_str(), count);
     return -1;
 }
 
@@ -423,6 +431,9 @@ int WifiSettings::SetDeviceConnFailedCount(const std::string &index, const int &
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
                 iter->second.connFailedCount = count;
+                LOGI("WifiSettings::SetDeviceConnFailedCount bssid=%{public}s,connFailedCount=%{public}d,"
+                    "count=%{public}d",
+                     SsidAnonymize(index).c_str(), iter->second.connFailedCount, count);
                 return 0;
             }
         }
@@ -430,10 +441,15 @@ int WifiSettings::SetDeviceConnFailedCount(const std::string &index, const int &
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index) {
                 iter->second.connFailedCount = count;
+                LOGI("WifiSettings::SetDeviceConnFailedCount bssid=%{public}s,connFailedCount=%{public}d,"
+                    "count=%{public}d",
+                     SsidAnonymize(index).c_str(), iter->second.connFailedCount, count);
                 return 0;
             }
         }
     }
+    LOGE("WifiSettings::SetDeviceConnFailedCount failed %{public}s,count=%{public}d",
+        SsidAnonymize(index).c_str(), count);
     return -1;
 }
 

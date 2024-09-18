@@ -384,11 +384,6 @@ ErrCode WifiServiceScheduler::PostStartWifi(int instId)
     if (StartWifiStaService(instId) == WIFI_OPT_FAILED) {
         WIFI_LOGE("StartWifiStaService failed!");
     }
-#ifdef FEATURE_SELF_CURE_SUPPORT
-    if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("StartSelfCureService failed!");
-    }
-#endif
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 #ifdef FEATURE_P2P_SUPPORT
     ErrCode errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
@@ -412,6 +407,13 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         return WIFI_OPT_FAILED;
     }
     WIFI_LOGD("StartWifiStaService GetStaServiceInst instId:%{public}d", instId);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (instId == INSTID_WLAN0) {
+        if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("StartSelfCureService failed!");
+        }
+    }
+#endif
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
     if (pService == nullptr) {
         WIFI_LOGE("StartWifiStaService Create %{public}s service failed!", WIFI_SERVICE_STA);
@@ -452,19 +454,33 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             return WIFI_OPT_FAILED;
         }
 #ifndef OHOS_ARCH_LITE
-    errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
-            static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
+        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
 
-    errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
-            static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
+        errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
+#endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        if (instId == INSTID_WLAN0) {
+            ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+            if (pSelfCureService == nullptr) {
+                WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_SELFCURE);
+                return WIFI_OPT_FAILED;
+            }
+            errCode = pService->RegisterStaServiceCallback(pSelfCureService->GetStaCallback());
+            if (errCode != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("SelfCure register sta service callback failed!");
+                return WIFI_OPT_FAILED;
+            }
+        }
 #endif
     }
     return WIFI_OPT_SUCCESS;
@@ -492,16 +508,6 @@ ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
     ErrCode errCode = pSelfCureService->InitSelfCureService();
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Service enable self cure failed, ret %{public}d!", static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
-    if (pService == nullptr) {
-        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
-        return WIFI_OPT_FAILED;
-    }
-    errCode = pService->RegisterStaServiceCallback(pSelfCureService->GetStaCallback());
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("SelfCure register sta service callback failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

@@ -3939,7 +3939,8 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
         WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
     }
     UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
-    WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, PBC_ANY_BSSID);
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, PBC_ANY_BSSID, ifaceName);
 
     std::string macAddr;
     std::string realMacAddr;

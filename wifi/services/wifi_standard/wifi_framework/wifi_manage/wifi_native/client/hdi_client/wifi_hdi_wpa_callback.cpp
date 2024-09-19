@@ -473,7 +473,7 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
         cbInfo.wfdDeviceInfo.insert(cbInfo.wfdDeviceInfo.begin(), deviceInfoParam->wfdDeviceInfo,
             deviceInfoParam->wfdDeviceInfo + deviceInfoParam->wfdLength);
         cbk.onDeviceFound(cbInfo);
-        LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{public}s",
+        LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{private}s",
             p2pDeviceAddress, deviceInfoParam->deviceName);
     }
     return 0;

@@ -320,13 +320,7 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     iter->second.lastConnectTime = time(0);
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;
-    currentNetworkID = networkId;
     return 0;
-}
-
-void WifiSettings::SetDeviceAfterDisconnect()
-{
-    currentNetworkID = -1;
 }
 
 int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
@@ -1982,15 +1976,36 @@ bool WifiSettings::EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
     }
     return true;
 }
+
+bool WifiSettings::GetConfigValueByName(const std::string &name, std::string &value)
+{
+    if (name.empty()) {
+        LOGE("name empty");
+        return false;
+    }
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    std::vector<std::string> values = mFilterMap[name];
+    if (values.empty()) {
+        LOGE("GetConfigValueByName values is empty");
+        return false;
+    }
+    value = values.front();
+    if (value.empty()) {
+        LOGE("GetConfigValueByName value is empty");
+        return false;
+    }
+    return true;
+}
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs)
+void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+    const std::set<int> &wifiLinkedNetworkIds)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     LOGI("UpdateWifiConfigFromCloud enter");
     std::map<int, WifiDeviceConfig> tempConfigs;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if (currentNetworkID == iter->second.networkId) {
+        if (wifiLinkedNetworkIds.count(iter->second.networkId) != 0) {
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
             LOGI("UpdateWifiConfigFromCloud, connected network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
             continue;
@@ -2019,8 +2034,9 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
-        LOGI("UpdateWifiConfigFromCloud new wifiDevice %{public}s", SsidAnonymize(iter.ssid).c_str());
-        tempConfigs.emplace(std::make_pair(mNetworkId, iter));
+        LOGI("UpdateWifiConfigFromCloud new %{public}s", SsidAnonymize(iter.ssid).c_str());
+        iter.networkId = mNetworkId;
+        tempConfigs.emplace(std::make_pair(iter.networkId, iter));
         mNetworkId++;
     }
     mWifiDeviceConfig.swap(tempConfigs);

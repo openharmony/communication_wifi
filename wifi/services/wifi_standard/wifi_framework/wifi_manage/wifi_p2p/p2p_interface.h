@@ -306,13 +306,6 @@ public:
     virtual ErrCode Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr) override;
 
     /**
-     * @Description Set the group UID of calling service.
-     *
-     * @param callingUid - the UID of caller
-     */
-    void SetGroupUid(int callingUid) override;
-
-    /**
      * @Description Increase the reference count of the hid2d service.
      *
      * @param callingUid - the UID of caller
@@ -325,13 +318,6 @@ public:
      * @param callingUid - the UID of caller
      */
     virtual void DecreaseSharedLink(int callingUid) override;
-
-    /**
-     * @Description Get the reference count of the hid2d service.
-     *
-     * @return int - reference count
-     */
-    virtual int GetSharedLinkCount(void) override;
 
     /**
      * @Description Handle the exception of upper-layer business.

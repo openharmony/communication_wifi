@@ -270,13 +270,13 @@ public:
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
-    void SetDeviceAfterDisconnect();
-
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs);
+    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+        const std::set<int> &wifiLinkedNetworkIds);
 
     void UpLoadLocalDeviceConfigToCloud();
 #endif
+    bool GetConfigValueByName(const std::string &name, std::string &value);
 
 private:
     WifiSettings();
@@ -327,7 +327,6 @@ private:
     WifiPortalConf mPortalUri;
     WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
-    std::atomic<int> currentNetworkID = -1;
 
     // SCAN
     std::mutex mScanMutex;

@@ -688,11 +688,7 @@ static void IdlCbP2pProvServDiscFailureEvent()
 static void IdlCbP2pApStaConnectEvent(Context *context, int event)
 {
     char address[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
-    char groupAddress[WIFI_MAX_MAC_ADDR_LENGTH + 1] = {0};
     if (ReadStr(context, address, sizeof(address)) != 0) {
-        return;
-    }
-    if (ReadStr(context, groupAddress, sizeof(groupAddress)) != 0) {
         return;
     }
     IWifiEventP2pCallback *callback = GetWifiP2pEventCallback();

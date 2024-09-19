@@ -2956,15 +2956,6 @@ HWTEST_F(SelfCureStateMachineTest, HandleNetworkConnectedTest, TestSize.Level1)
     pSelfCureStateMachine->HandleNetworkConnected();
 }
 
-HWTEST_F(SelfCureStateMachineTest, GetCurrentGatewayTest, TestSize.Level1)
-{
-    IpInfo ipInfo;
-    ipInfo.gateway = 1;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
-        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
-    pSelfCureStateMachine->GetCurrentGateway();
-}
-
 HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Success_Reassoc, TestSize.Level1)
 {
     WifiSelfCureHistoryInfo historyInfo;
@@ -3202,6 +3193,11 @@ HWTEST_F(SelfCureStateMachineTest, RecoverySoftApTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, IsHttpReachableTest, TestSize.Level1)
 {
     IsHttpReachableTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, InitCurrentGatewayTest, TestSize.Level1)
+{
+    pSelfCureStateMachine->pInternetSelfCureState->InitCurrentGateway();
 }
 } // namespace Wifi
 } // namespace OHOS

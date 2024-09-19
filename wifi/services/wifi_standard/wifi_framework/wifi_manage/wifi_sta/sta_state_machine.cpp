@@ -268,7 +268,6 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastTxPackets = 0;
     linkedInfo.retryedConnCount = 0;
     linkedInfo.isAncoConnected = 0;
-    WifiSettings::GetInstance().SetDeviceAfterDisconnect();
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()

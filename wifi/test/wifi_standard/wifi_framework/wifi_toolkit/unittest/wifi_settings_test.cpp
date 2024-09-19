@@ -596,7 +596,10 @@ HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
     config1.keyMgmt = "WPA-PSK";
     config1.preSharedKey = "12345678";
     newWifiDeviceConfigs.push_back(config1);
-    WifiSettings::GetInstance().UpdateWifiConfigFromCloud(newWifiDeviceConfigs);
+    std::set<int> wifiLinkedNetworkIds;
+    wifiLinkedNetworkIds.insert(0);
+    wifiLinkedNetworkIds.insert(1);
+    WifiSettings::GetInstance().UpdateWifiConfigFromCloud(newWifiDeviceConfigs, wifiLinkedNetworkIds);
     // Assert the updated WifiDeviceConfig objects in mWifiDeviceConfig map
     // based on the newWifiDeviceConfigs vector
     WifiDeviceConfig updatedConfig;
@@ -606,5 +609,18 @@ HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
     EXPECT_EQ(updatedConfig.preSharedKey, "12345678");
 }
 #endif
+HWTEST_F(WifiSettingsTest, GetConfigValueByName, TestSize.Level1)
+{
+    WIFI_LOGI("GetConfigValueByName enter");
+    std::string ancoValue = "";
+    WifiSettings::GetInstance().Init();
+    bool sucess = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", ancoValue);
+    EXPECT_TRUE(sucess);
+    std::string ancoNoValue = "";
+    bool fail = WifiSettings::GetInstance().GetConfigValueByName("Novalue", ancoNoValue);
+    EXPECT_FALSE(fail);
+    EXPECT_EQ(ancoNoValue, "");
+}
+
 }  // namespace Wifi
 }  // namespace OHO

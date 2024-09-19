@@ -306,7 +306,8 @@ public:
     std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
 
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
-
+    
+    std::set<int> GetAllWifiLinkedNetworkId();
 private:
     WifiConfigCenter();
     bool HasWifiActive();

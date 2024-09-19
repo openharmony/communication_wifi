@@ -108,6 +108,7 @@ bool WifiDeviceMgrServiceImpl::Init()
 
 sptr<IRemoteObject> WifiDeviceMgrServiceImpl::GetWifiRemote(int instId)
 {
+    std::lock_guard<std::mutex> lock(g_initMutex);
     auto iter = mWifiService.find(instId);
     if (iter != mWifiService.end()) {
         return mWifiService[instId];

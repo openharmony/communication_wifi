@@ -434,12 +434,12 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("get pEnhance service failed!");
-        break;
+        return WIFI_OPT_FAILED;
     }
     errCode = pService->SetEnhanceService(pEnhanceService);
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
-        break;
+        return WIFI_OPT_FAILED;
     }
 #endif
     WIFI_LOGI("StartWifiStaService instId%{public}d successful", instId);

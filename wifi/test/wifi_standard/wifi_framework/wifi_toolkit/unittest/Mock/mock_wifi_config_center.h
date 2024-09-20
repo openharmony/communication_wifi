@@ -37,7 +37,7 @@ public:
     virtual void SetWifiStopState(bool state) = 0;
     virtual bool GetWifiStopState() const= 0;
     virtual void SetStaIfaceName(const std::string &ifaceName, int instId = 0) = 0;
-    virtual std::string GetStaIfaceName(, int instId = 0) = 0;
+    virtual std::string GetStaIfaceName(int instId = 0) = 0;
     virtual int GetWifiState(int instId = 0) = 0;
     virtual int SetWifiState(int state, int instId = 0) = 0;
     virtual WifiDetailState GetWifiDetailState(int instId = 0) = 0;

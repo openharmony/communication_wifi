@@ -3942,8 +3942,6 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     std::string realMacAddr;
     WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
-    WIFI_LOGI("ConnectToNetworkProcess instId:%{public}d, macAddr:%{public}s, realMacAddr:%{public}s",
-        m_instId, macAddr.c_str(), realMacAddr.c_str());
     linkedInfo.networkId = targetNetworkId;
     linkedInfo.bssid = bssid;
     linkedInfo.ssid = deviceConfig.ssid;

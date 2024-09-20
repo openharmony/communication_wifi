@@ -13,9 +13,9 @@
 * limitations under the License.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "securec.h"
 #include "v1_0/ihostapd_interface.h"
 #include "v1_0/ihostapd_callback.h"
@@ -191,13 +191,13 @@ int32_t DisableNetwork(struct IWpaInterface *self, const char* ifName, int32_t n
 }
 
 int32_t SetNetwork(struct IWpaInterface *self, const char* ifName, int32_t networkId, const char* name,
-        const char* value)
+    const char* value)
 {
     return 0;
 }
 
 int32_t ListNetworks(struct IWpaInterface *self, const char* ifName, struct HdiWifiWpaNetworkInfo* networkInfo,
-        uint32_t* networkInfoLen)
+    uint32_t* networkInfoLen)
 {
     return 0;
 }
@@ -248,24 +248,24 @@ int32_t WpsPbcMode(struct IWpaInterface *self, const char* ifName, const struct 
 }
 
 int32_t WpsPinMode(struct IWpaInterface *self, const char* ifName, const struct HdiWifiWpsParam* wpsParam,
-        int32_t* pinCode)
+    int32_t* pinCode)
 {
     return 0;
 }
 
 int32_t WpsCancel(struct IWpaInterface *self, const char* ifName)
 {
-     return 0;
+    return 0;
 }
 
 int32_t GetCountryCode(struct IWpaInterface *self, const char* ifName, char* countrycode,
-        uint32_t countrycodeLen)
+    uint32_t countrycodeLen)
 {
     return 0;
 }
 
 int32_t GetNetwork (struct IWpaInterface *self, const char* ifName, int32_t networkId, const char* param,
-        char* value, uint32_t valueLen)
+    char* value, uint32_t valueLen)
 {
     return 0;
 }
@@ -290,7 +290,7 @@ int32_t UnregisterEventCallback(struct IWpaInterface *self, struct IWpaCallback*
 }
 
 int32_t GetConnectionCapabilities(struct IWpaInterface *self, const char* ifName,
-        struct ConnectionCapabilities* connectionCap)
+    struct ConnectionCapabilities* connectionCap)
 {
     return 0;
 }
@@ -310,7 +310,7 @@ int32_t GetPsk(struct IWpaInterface *self, const char* ifName, uint8_t* psk, uin
 }
 
 int32_t  GetWepKey(struct IWpaInterface *self, const char* ifName, int32_t keyIdx, uint8_t* wepKey,
-        uint32_t* wepKeyLen)
+    uint32_t* wepKeyLen)
 {
     return 0;
 }
@@ -371,7 +371,7 @@ int32_t P2pSetupWpsPbc(struct IWpaInterface *self, const char* ifName, const cha
 }
 
 int32_t P2pSetupWpsPin(struct IWpaInterface *self, const char* ifName, const char* address, const char* pin,
-        char* result, uint32_t resultLen)
+    char* result, uint32_t resultLen)
 {
     return 0;
 }
@@ -402,7 +402,7 @@ int32_t P2pStartFind(struct IWpaInterface *self, const char* ifName, int32_t tim
 }
 
 int32_t P2pSetExtListen(struct IWpaInterface *self, const char* ifName, int32_t enable, int32_t period,
-        int32_t interval) 
+    int32_t interval) 
 {
     return 0;
 }
@@ -413,13 +413,13 @@ int32_t P2pSetListenChannel(struct IWpaInterface *self, const char* ifName, int3
 }
 
 int32_t P2pProvisionDiscovery(struct IWpaInterface *self, const char* ifName, const char* peerBssid,
-        int32_t mode)
+    int32_t mode)
 {
     return 0;
 }
 
 int32_t P2pAddGroup(struct IWpaInterface *self, const char* ifName, int32_t isPersistent, int32_t networkId,
-        int32_t freq) 
+    int32_t freq) 
 {
     return 0;
 }
@@ -455,7 +455,7 @@ int32_t P2pRemoveNetwork(struct IWpaInterface *self, const char* ifName, int32_t
 }
 
 int32_t P2pSetGroupConfig(struct IWpaInterface *self, const char* ifName, int32_t networkId, const char* name,
-        const char* value)
+    const char* value)
 {
     return 0;
 }
@@ -470,13 +470,13 @@ int32_t P2pReinvoke(struct IWpaInterface *self, const char* ifName, int32_t netw
 }
 
 int32_t P2pGetDeviceAddress(struct IWpaInterface *self, const char* ifName, char* deviceAddress,
-        uint32_t deviceAddressLen)
+    uint32_t deviceAddressLen)
 {
     return 0;
 }
 
 int32_t P2pReqServiceDiscovery(struct IWpaInterface *self, const char* ifName,
-        const struct HdiP2pReqService* reqService, char* replyDisc, uint32_t replyDiscLen)
+    const struct HdiP2pReqService* reqService, char* replyDisc, uint32_t replyDiscLen)
 {
     return 0;
 }
@@ -487,13 +487,13 @@ int32_t P2pCancelServiceDiscovery(struct IWpaInterface *self, const char* ifName
 }
 
 int32_t P2pRespServerDiscovery(struct IWpaInterface *self, const char* ifName,
-        const struct HdiP2pServDiscReqInfo* info)
+    const struct HdiP2pServDiscReqInfo* info)
 {
     return 0;
 }
 
 int32_t P2pConnect(struct IWpaInterface *self, const char* ifName, const struct HdiP2pConnectInfo* info,
-        char* replyPin, uint32_t replyPinLen)
+    char* replyPin, uint32_t replyPinLen)
 {
     return 0;
 }
@@ -519,7 +519,7 @@ int32_t P2pCancelConnect(struct IWpaInterface *self, const char* ifName)
 }
 
 int32_t P2pGetGroupConfig(struct IWpaInterface *self, const char* ifName, int32_t networkId, const char* param,
-        char* value, uint32_t valueLen)
+    char* value, uint32_t valueLen)
 {
     return 0;
 }
@@ -530,36 +530,36 @@ int32_t P2pAddNetwork(struct IWpaInterface *self, const char* ifName, int32_t* n
 }
 
 int32_t P2pGetPeer(struct IWpaInterface *self, const char* ifName, const char* bssid,
-        struct HdiP2pDeviceInfo* info)
+    struct HdiP2pDeviceInfo* info)
 {
-    if (ifName == NULL || info == NULL || bssid == NULL) {
+    if (ifName == nullptr || info == nullptr || bssid == nullptr) {
         return -1;
     }
     
     info->srcAddress = (uint8_t *)malloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
-    if (info->srcAddress == NULL) {
-         return HDF_FAILURE;
+    if (info->srcAddress == nullptr) {
+        return HDF_FAILURE;
     }
-     info->p2pDeviceAddress = (uint8_t *)malloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
-     if (info->p2pDeviceAddress == NULL) {
-         return HDF_FAILURE;
+    info->p2pDeviceAddress = (uint8_t *)malloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
+    if (info->p2pDeviceAddress == nullptr) {
+        return HDF_FAILURE;
      }
-     info->primaryDeviceType = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_TYPE_LENGTH);
-     if (info->primaryDeviceType == NULL) {
-         return HDF_FAILURE;
-     }
-     info->deviceName = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_NAME_LENGTH);
-     if (info->deviceName == NULL) {
-         return HDF_FAILURE;
-     }
-     info->wfdDeviceInfo = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_WFD_DEVICE_INFO_LENGTH);
-     if (info->wfdDeviceInfo == NULL) {
-         return HDF_FAILURE;
-     }
-     info->operSsid = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_NAME_LENGTH);
-     if (info->operSsid == NULL) {
-         return HDF_FAILURE;
-     }
+    info->primaryDeviceType = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_TYPE_LENGTH);
+    if (info->primaryDeviceType == nullptr) {
+        return HDF_FAILURE;
+    }
+    info->deviceName = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_NAME_LENGTH);
+    if (info->deviceName == nullptr) {
+        return HDF_FAILURE;
+    }
+    info->wfdDeviceInfo = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_WFD_DEVICE_INFO_LENGTH);
+    if (info->wfdDeviceInfo == nullptr) {
+        return HDF_FAILURE;
+    }
+    info->operSsid = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_NAME_LENGTH);
+    if (info->operSsid == nullptr) {
+        return HDF_FAILURE;
+    }
     memcpy_s(info->p2pDeviceAddress, sizeof(info->p2pDeviceAddress), "12:33", strlen( "12:33"));
     memcpy_s(info->deviceName, sizeof(info->deviceName), "11", strlen( "11"));
     memcpy_s(info->primaryDeviceType,sizeof(info->deviceName), "1", strlen( "1"));
@@ -618,7 +618,7 @@ int32_t UnregisterWpaEventCallback(struct IWpaInterface *self, struct IWpaCallba
 
 struct HdfRemoteService*  AsWapObject(struct IWpaInterface *self)
 {
-    return 0;
+    return nullptr;
 }
 
 

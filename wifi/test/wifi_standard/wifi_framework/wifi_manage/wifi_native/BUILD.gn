@@ -15,6 +15,7 @@ import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 HDI_ROOT_DIR = "$WIFI_ROOT_DIR/services/wifi_standard"
 
+
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [

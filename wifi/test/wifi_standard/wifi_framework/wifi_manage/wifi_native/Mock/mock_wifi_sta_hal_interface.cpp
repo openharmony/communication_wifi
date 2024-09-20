@@ -199,7 +199,8 @@ WifiErrorNo WifiStaHalInterface::DisableNetwork(int networkId, const std::string
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiStaHalInterface::SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config, const std::string &ifaceName)
+WifiErrorNo WifiStaHalInterface::SetDeviceConfig(
+    int networkId, const WifiHalDeviceConfig &config, const std::string &ifaceName)
 {
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
@@ -217,7 +218,8 @@ WifiErrorNo WifiStaHalInterface::SaveDeviceConfig(void)
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiStaHalInterface::RegisterStaEventCallback(const WifiEventCallback &callback, const std::string &ifaceName)
+WifiErrorNo WifiStaHalInterface::RegisterStaEventCallback(
+    const WifiEventCallback &callback, const std::string &ifaceName)
 {
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;

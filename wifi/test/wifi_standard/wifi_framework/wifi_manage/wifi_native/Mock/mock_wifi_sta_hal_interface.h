@@ -65,7 +65,7 @@ public:
     WifiErrorNo EnableNetwork(int networkId, const std::string &ifaceName);
     WifiErrorNo DisableNetwork(int networkId, const std::string &ifaceName);
     WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config, const std::string &ifaceName);
-    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config), const std::string &ifaceName;
+    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config, const std::string &ifaceName);
     WifiErrorNo SaveDeviceConfig(void);
     WifiErrorNo RegisterStaEventCallback(const WifiEventCallback &callback, const std::string &ifaceName);
     WifiErrorNo StartWpsPbcMode(const WifiHalWpsConfig &config);

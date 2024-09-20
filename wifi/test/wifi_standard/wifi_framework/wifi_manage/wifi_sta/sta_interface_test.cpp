@@ -378,7 +378,7 @@ public:
     {
         std::string bssid = "01:23:45:67:89:ab";
         WifiDeviceConfig deviceConfig;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
             .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
         pStaInterface->StartRoamToNetwork(0, bssid);
     }
@@ -387,7 +387,7 @@ public:
     {
         std::string bssid = "01:23:45:67:89:ab";
         WifiDeviceConfig deviceConfig;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
             .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
         pStaInterface->StartConnectToUserSelectNetwork(0, bssid);
     }

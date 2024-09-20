@@ -40,14 +40,14 @@ private:
 class WifiStaHalInterface {
 public:
     static WifiStaHalInterface &GetInstance(void);
-    WifiErrorNo StartWifi(const std::string &ifaceName = "wlan0");
-    WifiErrorNo StopWifi(void);
+    WifiErrorNo StartWifi(const std::string &ifaceName = "wlan0", int instId = 0);
+    WifiErrorNo StopWifi(int instId = 0);
     WifiErrorNo Connect(int networkId);
     WifiErrorNo Reconnect(void);
     WifiErrorNo Reassociate(void);
-    WifiErrorNo Disconnect(void);
+    WifiErrorNo Disconnect(const std::string &ifaceName);
     WifiErrorNo GetStaCapabilities(unsigned int &capabilities);
-    WifiErrorNo GetStaDeviceMacAddress(std::string &mac);
+    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName);
     WifiErrorNo SetWifiCountryCode(const std::string &ifaceName, const std::string &code);
     WifiErrorNo GetSupportFrequencies(const std::string &ifaceName, int band, std::vector<int> &frequencies);
     WifiErrorNo SetConnectMacAddr(const std::string &ifaceName, const std::string &mac);
@@ -60,19 +60,19 @@ public:
     WifiErrorNo StartPnoScan(const std::string &ifaceName, const WifiHalPnoScanParam &scanParam);
     WifiErrorNo StopPnoScan(const std::string &ifaceName);
     WifiErrorNo RemoveDevice(int networkId);
-    WifiErrorNo ClearDeviceConfig(void) const;
-    WifiErrorNo GetNextNetworkId(int &networkId);
-    WifiErrorNo EnableNetwork(int networkId);
-    WifiErrorNo DisableNetwork(int networkId);
-    WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config);
-    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config);
+    WifiErrorNo ClearDeviceConfig(const std::string &ifaceName) const;
+    WifiErrorNo GetNextNetworkId(int &networkId, const std::string &ifaceName);
+    WifiErrorNo EnableNetwork(int networkId, const std::string &ifaceName);
+    WifiErrorNo DisableNetwork(int networkId, const std::string &ifaceName);
+    WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config, const std::string &ifaceName);
+    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config), const std::string &ifaceName;
     WifiErrorNo SaveDeviceConfig(void);
-    WifiErrorNo RegisterStaEventCallback(const WifiEventCallback &callback);
+    WifiErrorNo RegisterStaEventCallback(const WifiEventCallback &callback, const std::string &ifaceName);
     WifiErrorNo StartWpsPbcMode(const WifiHalWpsConfig &config);
     WifiErrorNo StartWpsPinMode(const WifiHalWpsConfig &config, int &pinCode);
     WifiErrorNo StopWps(void);
     WifiErrorNo GetRoamingCapabilities(WifiHalRoamCapability &capability);
-    WifiErrorNo SetBssid(int networkId, const std::string &bssid);
+    WifiErrorNo SetBssid(int networkId, const std::string &bssid, const std::string &ifaceName);
     WifiErrorNo SetRoamConfig(const WifiHalRoamConfig &config);
     WifiErrorNo WpaAutoConnect(int enable);
     WifiErrorNo WpaBlocklistClear();
@@ -86,7 +86,7 @@ public:
     WifiErrorNo GetChipsetCategory(const std::string &ifaceName, int& chipsetCategory);
     WifiErrorNo GetChipsetWifiFeatrureCapability(const std::string &ifaceName, int& chipsetFeatrureCapability);
     WifiErrorNo SetNetworkInterfaceUpDown(const std::string &ifaceName, bool upDown);
-    const WifiEventCallback &GetCallbackInst(void) const;
+    const WifiEventCallback &GetCallbackInst(const std::string &ifaceName) const;
     const std::function<void(int)> &GetDeathCallbackInst(void) const;
     WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
 public:

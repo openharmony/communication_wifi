@@ -42,8 +42,10 @@ public:
     virtual void ClearDeviceConfig() = 0;
     virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0) = 0;
     virtual int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0) = 0;
-    virtual int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0) = 0;
-    virtual int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0) = 0;
+    virtual int GetDeviceConfig(
+        const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0) = 0;
+    virtual int GetDeviceConfig(
+        const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0) = 0;
     virtual int SetDeviceState(int networkId, int state, bool bSetOther = false) = 0;
     virtual int SyncDeviceConfig() = 0;
     virtual int ReloadDeviceConfig() = 0;
@@ -206,8 +208,10 @@ public:
     MOCK_METHOD0(ClearDeviceConfig, void());
     MOCK_METHOD2(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int));
     MOCK_METHOD3(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));
-    MOCK_METHOD4(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int));
-    MOCK_METHOD4(GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
+    MOCK_METHOD4(
+        GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int));
+    MOCK_METHOD4(
+        GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
     MOCK_METHOD3(SetDeviceState, int(int networkId, int state, bool bSetOther));
     MOCK_METHOD0(SyncDeviceConfig, int());
     MOCK_METHOD0(ReloadDeviceConfig, int());

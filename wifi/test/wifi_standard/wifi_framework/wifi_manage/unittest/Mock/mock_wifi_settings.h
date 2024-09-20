@@ -204,10 +204,10 @@ public:
     MOCK_METHOD1(AddDeviceConfig, int(const WifiDeviceConfig &config));
     MOCK_METHOD1(RemoveDevice, int(int networkId));
     MOCK_METHOD0(ClearDeviceConfig, void());
-    MOCK_METHOD1(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int));
-    MOCK_METHOD2(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));
-    MOCK_METHOD3(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int));
-    MOCK_METHOD3(GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
+    MOCK_METHOD2(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int));
+    MOCK_METHOD3(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));
+    MOCK_METHOD4(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int));
+    MOCK_METHOD4(GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
     MOCK_METHOD3(SetDeviceState, int(int networkId, int state, bool bSetOther));
     MOCK_METHOD0(SyncDeviceConfig, int());
     MOCK_METHOD0(ReloadDeviceConfig, int());

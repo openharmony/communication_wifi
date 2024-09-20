@@ -565,7 +565,7 @@ int32_t P2pGetPeer(struct IWpaInterface *self, const char* ifName, const char* b
     }
     memcpy_s(info->p2pDeviceAddress, sizeof(info->p2pDeviceAddress), "12:33", strlen("12:33"));
     memcpy_s(info->deviceName, sizeof(info->deviceName), "11", strlen("11"));
-    memcpy_s(info->primaryDeviceType,sizeof(info->deviceName), "1", strlen("1"));
+    memcpy_s(info->primaryDeviceType, sizeof(info->deviceName), "1", strlen("1"));
     info->configMethods = 1;
     info->deviceCapabilities = 1;
     info->groupCapabilities = 1;

@@ -173,7 +173,11 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
     WifiProxyConfig wifiProxyConfig, int instId)
 {
     if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask(
+#else
         netAgentEventHandler_->PostAsyncTask(
+#endif
             [this, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId]() mutable {
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
@@ -183,7 +187,11 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
 void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo)
 {
     if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
+#else
         netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo]() {
+#endif
            this->UpdateNetSupplierInfo(netInfo);
         });
     }
@@ -192,7 +200,11 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 void WifiNetAgent::OnStaMachineWifiStart()
 {
     if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask([this]() {
+#else
         netAgentEventHandler_->PostAsyncTask([this]() {
+#endif
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
         });
@@ -206,7 +218,11 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
         WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __func__);
         return;
     }
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    netAgentEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+#else
     netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+#endif
         this->RegisterNetSupplier();
         this->RegisterNetSupplierCallback();
         WifiLinkedInfo linkedInfo;

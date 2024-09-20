@@ -120,7 +120,7 @@ void DealWpaBlockListClearEventSuccess()
 
 void DealStartRoamCmdSuccess()
 {
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _));
     EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
@@ -133,7 +133,7 @@ void StartConnectToNetworkSuccess()
 {
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
     MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
     pStaStateMachine->StartConnectToNetwork(0, "wifitest/123");
@@ -145,7 +145,7 @@ void OnWifiWpa3SelfCureSuccessTest()
     WifiDeviceConfig config;
     config.lastConnectTime = 1;
     config.ssid = "1234";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
     .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
     std::vector<WifiScanInfo> scanResults;
     WifiScanInfo scanInfo;
@@ -187,7 +187,7 @@ void SetRandomMacSuccess1()
     WifiDeviceConfig deviceConfig;
     deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
     deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
@@ -205,7 +205,7 @@ void SetRandomMacFail1()
     randomMacInfo.preSharedKey = RANDOMMAC_PASSWORD;
     randomMacInfo.peerBssid = RANDOMMAC_BSSID;
     pStaStateMachine->MacAddressGenerate(randomMacInfo);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(-1)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
     pStaStateMachine->SetRandomMac(0, "");
@@ -222,7 +222,7 @@ void SetRandomMacFail2()
     pStaStateMachine->MacAddressGenerate(randomMacInfo);
     deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
     deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     std::string MacAddress = "11:22:33:44:55:66";
     EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).

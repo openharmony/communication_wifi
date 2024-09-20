@@ -40,10 +40,10 @@ public:
     virtual int AddDeviceConfig(const WifiDeviceConfig &config) = 0;
     virtual int RemoveDevice(int networkId) = 0;
     virtual void ClearDeviceConfig() = 0;
-    virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results) = 0;
-    virtual int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) = 0;
-    virtual int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config) = 0;
-    virtual int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config) = 0;
+    virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0) = 0;
+    virtual int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0) = 0;
+    virtual int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0) = 0;
+    virtual int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0) = 0;
     virtual int SetDeviceState(int networkId, int state, bool bSetOther = false) = 0;
     virtual int SyncDeviceConfig() = 0;
     virtual int ReloadDeviceConfig() = 0;
@@ -150,8 +150,6 @@ public:
     virtual void SetCoexSupport(bool isSupport) = 0;
     virtual bool GetCoexSupport() const = 0;
     virtual void SetStaIfaceName(const std::string &ifaceName) = 0;
-    virtual int GetDeviceConfig(const std::string &ancoCallProcessName, const std::string &ssid,
-            const std::string &keymgmt, WifiDeviceConfig &config) = 0;
     virtual int GetHiddenDeviceConfig(std::vector<WifiDeviceConfig> &results) = 0;
     virtual int IncreaseNumRebootsSinceLastUse()= 0;
     virtual int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const = 0;
@@ -206,10 +204,10 @@ public:
     MOCK_METHOD1(AddDeviceConfig, int(const WifiDeviceConfig &config));
     MOCK_METHOD1(RemoveDevice, int(int networkId));
     MOCK_METHOD0(ClearDeviceConfig, void());
-    MOCK_METHOD1(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results));
-    MOCK_METHOD2(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config));
-    MOCK_METHOD3(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config));
-    MOCK_METHOD3(GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config));
+    MOCK_METHOD1(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int));
+    MOCK_METHOD2(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));
+    MOCK_METHOD3(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int));
+    MOCK_METHOD3(GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
     MOCK_METHOD3(SetDeviceState, int(int networkId, int state, bool bSetOther));
     MOCK_METHOD0(SyncDeviceConfig, int());
     MOCK_METHOD0(ReloadDeviceConfig, int());
@@ -314,8 +312,6 @@ public:
     MOCK_METHOD1(SetCoexSupport, void(bool isSupport));
     MOCK_CONST_METHOD0(GetCoexSupport, bool());
     MOCK_METHOD1(SetStaIfaceName, void(const std::string &ifaceName));
-    MOCK_METHOD4(GetDeviceConfig, int(const std::string &ancoCallProcessName, const std::string &ssid,
-            const std::string &keymgmt, WifiDeviceConfig &config));
     MOCK_METHOD1(GetHiddenDeviceConfig, int(std::vector<WifiDeviceConfig> &results));
     MOCK_METHOD0(IncreaseNumRebootsSinceLastUse, int());
     MOCK_CONST_METHOD1(RemoveExcessDeviceConfigs, int(std::vector<WifiDeviceConfig> &configs));

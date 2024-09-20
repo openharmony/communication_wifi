@@ -137,7 +137,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess1()
     deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     deviceConfig.networkId = 0;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(1)).WillOnce(Return(0));
@@ -163,7 +163,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess2()
     deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     deviceConfig.networkId = 0;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(1)).WillOnce(Return(0));
@@ -186,7 +186,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess3()
     deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     deviceConfig.networkId = 0;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(1)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(1)).WillOnce(Return(0));
@@ -205,7 +205,7 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorFail1()
 
     info.connState = ConnState::DISCONNECTED;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _, _))
         .Times(AtLeast(1))
         .WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));

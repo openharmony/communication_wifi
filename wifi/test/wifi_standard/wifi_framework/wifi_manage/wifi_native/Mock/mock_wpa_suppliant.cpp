@@ -24,9 +24,9 @@
 #include "v1_1/wpa_types.h"
 
 static const int ETH_ADDR_LEN = 6;
- #define WIFI_P2P_DEVICE_TYPE_LENGTH 64
- #define WIFI_P2P_DEVICE_NAME_LENGTH 128
- #define WIFI_P2P_WFD_DEVICE_INFO_LENGTH 128
+#define WIFI_P2P_DEVICE_TYPE_LENGTH 64
+#define WIFI_P2P_DEVICE_NAME_LENGTH 128
+#define WIFI_P2P_WFD_DEVICE_INFO_LENGTH 128
 
 struct HdfRemoteService;
 int32_t StartAp(struct IHostapdInterface *self)
@@ -264,7 +264,7 @@ int32_t GetCountryCode(struct IWpaInterface *self, const char* ifName, char* cou
     return 0;
 }
 
-int32_t GetNetwork (struct IWpaInterface *self, const char* ifName, int32_t networkId, const char* param,
+int32_t GetNetwork(struct IWpaInterface *self, const char* ifName, int32_t networkId, const char* param,
     char* value, uint32_t valueLen)
 {
     return 0;
@@ -275,7 +275,8 @@ int32_t BlocklistClear(struct IWpaInterface *self, const char* ifName)
     return 0;
 }
 
-int32_t SetSuspendMode(struct IWpaInterface *self, const char* ifName, int32_t mode) {
+int32_t SetSuspendMode(struct IWpaInterface *self, const char* ifName, int32_t mode)
+{
     return 0;
 }
 
@@ -305,7 +306,8 @@ int32_t GetPskPassphrase(struct IWpaInterface *self, const char* ifName, char* p
     return 0;
 }
 
-int32_t GetPsk(struct IWpaInterface *self, const char* ifName, uint8_t* psk, uint32_t* pskLen) {
+int32_t GetPsk(struct IWpaInterface *self, const char* ifName, uint8_t* psk, uint32_t* pskLen)
+{
     return 0;
 }
 
@@ -402,7 +404,7 @@ int32_t P2pStartFind(struct IWpaInterface *self, const char* ifName, int32_t tim
 }
 
 int32_t P2pSetExtListen(struct IWpaInterface *self, const char* ifName, int32_t enable, int32_t period,
-    int32_t interval) 
+    int32_t interval)
 {
     return 0;
 }
@@ -419,7 +421,7 @@ int32_t P2pProvisionDiscovery(struct IWpaInterface *self, const char* ifName, co
 }
 
 int32_t P2pAddGroup(struct IWpaInterface *self, const char* ifName, int32_t isPersistent, int32_t networkId,
-    int32_t freq) 
+    int32_t freq)
 {
     return 0;
 }
@@ -460,7 +462,8 @@ int32_t P2pSetGroupConfig(struct IWpaInterface *self, const char* ifName, int32_
     return 0;
 }
 
-int32_t P2pInvite(struct IWpaInterface *self, const char* ifName, const char* peerBssid, const char* goBssid) {
+int32_t P2pInvite(struct IWpaInterface *self, const char* ifName, const char* peerBssid, const char* goBssid)
+{
     return 0;
 }
 
@@ -543,7 +546,7 @@ int32_t P2pGetPeer(struct IWpaInterface *self, const char* ifName, const char* b
     info->p2pDeviceAddress = (uint8_t *)malloc(sizeof(uint8_t) * (ETH_ADDR_LEN + 1));
     if (info->p2pDeviceAddress == nullptr) {
         return HDF_FAILURE;
-     }
+    }
     info->primaryDeviceType = (uint8_t *)malloc(sizeof(uint8_t) * WIFI_P2P_DEVICE_TYPE_LENGTH);
     if (info->primaryDeviceType == nullptr) {
         return HDF_FAILURE;
@@ -560,13 +563,13 @@ int32_t P2pGetPeer(struct IWpaInterface *self, const char* ifName, const char* b
     if (info->operSsid == nullptr) {
         return HDF_FAILURE;
     }
-    memcpy_s(info->p2pDeviceAddress, sizeof(info->p2pDeviceAddress), "12:33", strlen( "12:33"));
-    memcpy_s(info->deviceName, sizeof(info->deviceName), "11", strlen( "11"));
-    memcpy_s(info->primaryDeviceType,sizeof(info->deviceName), "1", strlen( "1"));
+    memcpy_s(info->p2pDeviceAddress, sizeof(info->p2pDeviceAddress), "12:33", strlen("12:33"));
+    memcpy_s(info->deviceName, sizeof(info->deviceName), "11", strlen("11"));
+    memcpy_s(info->primaryDeviceType,sizeof(info->deviceName), "1", strlen("1"));
     info->configMethods = 1;
     info->deviceCapabilities = 1;
     info->groupCapabilities = 1;
-    memcpy_s(info->operSsid, sizeof(info->operSsid), "123", strlen( "123"));
+    memcpy_s(info->operSsid, sizeof(info->operSsid), "123", strlen("123"));
     return 0;
 }
 
@@ -621,8 +624,6 @@ struct HdfRemoteService*  AsWapObject(struct IWpaInterface *self)
     return nullptr;
 }
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -665,12 +666,10 @@ struct IHostapdInterface *IHostapdInterfaceGetInstance(const char *serviceName, 
 // external method used to create release object, it support ipc and passthrought mode
 void IHostapdInterfaceRelease(struct IHostapdInterface *instance, bool isStub)
 {
-
 }
 
 void IHostapdInterfaceReleaseInstance(const char *serviceName, struct IHostapdInterface *instance, bool isStub)
 {
-
 }
 
 struct IWpaInterface *IWpaInterfaceGet(bool isStub)
@@ -772,11 +771,9 @@ struct IWpaInterface *IWpaInterfaceGetInstance(const char *serviceName, bool isS
 // external method used to create release object, it support ipc and passthrought mode
 void IWpaInterfaceRelease(struct IWpaInterface *instance, bool isStub)
 {
-
 }
 void IWpaInterfaceReleaseInstance(const char *serviceName, struct IWpaInterface *instance, bool isStub)
 {
-
 }
 #ifdef __cplusplus
 }

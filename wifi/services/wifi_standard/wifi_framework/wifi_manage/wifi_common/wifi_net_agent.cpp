@@ -173,7 +173,7 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
     WifiProxyConfig wifiProxyConfig, int instId)
 {
     if (netAgentEventHandler_) {
-        netAgentEventHandler_->PostAsyncTask(
+        netAgentEventHandler_->PostSyncTask(
             [this, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId]() mutable {
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
@@ -183,7 +183,7 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
 void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo)
 {
     if (netAgentEventHandler_) {
-        netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo]() {
+        netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
            this->UpdateNetSupplierInfo(netInfo);
         });
     }
@@ -192,7 +192,7 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 void WifiNetAgent::OnStaMachineWifiStart()
 {
     if (netAgentEventHandler_) {
-        netAgentEventHandler_->PostAsyncTask([this]() {
+        netAgentEventHandler_->PostSyncTask([this]() {
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
         });
@@ -206,7 +206,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
         WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __func__);
         return;
     }
-    netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+    netAgentEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
         this->RegisterNetSupplier();
         this->RegisterNetSupplierCallback();
         WifiLinkedInfo linkedInfo;

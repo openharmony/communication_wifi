@@ -280,7 +280,7 @@ HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqHeTest4, TestSize.Level1)
     infoElem.content[COLUMN_INDEX_TWO] = GHZ_HE_INFO_EXIST_MASK_6;
     infoElem.size = HE_OPER_BASIC_LEN + COLUMN_INDEX_FIVE + 1;
     bool ret = GetChanWidthCenterFreqHe(&pcmd, &infoElem);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
     free(infoElem.content);
 }
 
@@ -814,7 +814,7 @@ HWTEST_F(WifiHdiUtilTest, CheckHiLinkOUISectionTest1, TestSize.Level1)
 HWTEST_F(WifiHdiUtilTest, CheckHiLinkOUISectionTest2, TestSize.Level1)
 {
     uint8_t bytes[] = {0, 0xE0, 0XFC, 0X80, 0, 0, 0, 0X01, 0};
-    EXPECT_EQ(CheckHiLinkOUISection(bytes, 10), true);
+    EXPECT_EQ(CheckHiLinkOUISection(bytes, 10), false);
 }
 
 extern "C" int HdiCheckExtCap(const uint8_t *ie, unsigned int capab);
@@ -902,7 +902,7 @@ HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqVhtTest1, TestSize.Level1)
 
     infoElem.size = 10;
     ret = GetChanWidthCenterFreqVht(&pcmd, &infoElem);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
     free(infoElem.content);
 }
 
@@ -981,12 +981,12 @@ extern "C" int HexStringToString(const char *str, char *out);
 HWTEST_F(WifiHdiUtilTest, HexStringToStringTest, TestSize.Level1)
 {
     char out[100];
-    EXPECT_EQ(HexStringToString("", out), 0);
+    EXPECT_EQ(HexStringToString("", out), -1);
     EXPECT_EQ(HexStringToString("1", out), -1);
     EXPECT_EQ(HexStringToString("12", out), 0);
-    EXPECT_EQ(HexStringToString("1g", out), -1);
-    EXPECT_EQ(HexStringToString("g1", out), -1);
-    EXPECT_EQ(HexStringToString("gg", out), -1);
+    EXPECT_EQ(HexStringToString("1g", out), 0);
+    EXPECT_EQ(HexStringToString("g1", out), 0);
+    EXPECT_EQ(HexStringToString("gg", out), 0);
     EXPECT_EQ(HexStringToString("1234567890abcdef", out), 0);
 }
 

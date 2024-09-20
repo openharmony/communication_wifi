@@ -133,7 +133,7 @@ void StartConnectToNetworkSuccess()
 {
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
     EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
     MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
     pStaStateMachine->StartConnectToNetwork(0, "wifitest/123");

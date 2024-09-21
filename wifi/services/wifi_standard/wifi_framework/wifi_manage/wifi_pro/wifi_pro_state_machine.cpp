@@ -30,6 +30,7 @@ namespace {
 const std::string WIFI_PRO_STATE_MACHINE = "WifiProStateMachine";
 constexpr int32_t DEFAULT_RSSI = -200;
 constexpr int32_t DEFAULT_SCAN_INTERVAL = 10 * 1000; // ms
+constexpr int64_t BLOCKLIST_VALID_TIME = 120 * 1000; // ms
 }
 
 DEFINE_WIFILOG_LABEL("WifiProStateMachine");
@@ -232,10 +233,25 @@ bool WifiProStateMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
         case EVENT_NOTIFY_WIFI_PRO_SWITCH_CHANGED:
             HandleWifiProSwitchChanged(msg);
             break;
+        case EVENT_REMOVE_BLOCK_LIST:
+            HandleRemoveBlockList(msg);
+            break;
         default:
             return false;
     }
     return true;
+}
+
+void WifiProStateMachine::DefaultState::HandleRemoveBlockList(const InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("HandleRemoveBlockList: msg is nullptr.");
+        return;
+    }
+
+    std::string bssid;
+    msg->GetMessageObj(bssid);
+    NetworkBlockListManager::GetInstance().RemoveWifiBlocklist(bssid);
 }
 
 void WifiProStateMachine::DefaultState::HandleWifiProSwitchChanged(const InternalMessagePtr msg)
@@ -753,6 +769,7 @@ void WifiProStateMachine::WifiLinkMonitorState::HandleConnectStateChangedInMonit
                 "switched bssid:%{public}s,",
                 MacAnonymize(targetBssid_).c_str(), MacAnonymize(bssid).c_str());
             NetworkBlockListManager::GetInstance().AddWifiBlocklist(bssid);
+            pWifiProStateMachine_->MessageExecutedLater(EVENT_REMOVE_BLOCK_LIST, bssid, BLOCKLIST_VALID_TIME);
             HandleWifi2WifiFailed(true);
         } else {
             HandleWifi2WifiSucsess();
@@ -772,6 +789,8 @@ void WifiProStateMachine::WifiLinkMonitorState::HandleWifi2WifiSucsess()
     WIFI_LOGI("Enter HandleWifi2WifiSucsess");
     auto &networkBlackListManager = NetworkBlockListManager::GetInstance();
     networkBlackListManager.AddWifiBlocklist(pWifiProStateMachine_->badBssid_);
+    pWifiProStateMachine_->MessageExecutedLater(EVENT_REMOVE_BLOCK_LIST, pWifiProStateMachine_->badBssid_,
+        BLOCKLIST_VALID_TIME);
     networkBlackListManager.CleanTempWifiBlockList();
     pWifiProStateMachine_->RefreshConnectedNetWork();
     isWifi2WifiSwitching_ = false;

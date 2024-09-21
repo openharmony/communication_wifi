@@ -46,6 +46,7 @@ public:
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         void HandleWifiProSwitchChanged(const InternalMessagePtr msg);
+        void HandleRemoveBlockList(const InternalMessagePtr msg);
     };
 
     /**

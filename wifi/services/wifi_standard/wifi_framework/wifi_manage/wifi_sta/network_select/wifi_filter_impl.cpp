@@ -37,8 +37,6 @@ constexpr int32_t MIN_SIGNAL_LEVEL_INTERVAL = 2;
 constexpr int32_t SIGNAL_LEVEL_THREE = 3;
 constexpr int32_t SIGNAL_LEVEL_FOUR = 4;
 constexpr int32_t MIN_RSSI_INTERVAL = 8;
-constexpr int32_t SCAN_24GHZ_BAND = 1;
-constexpr int32_t SCAN_5GHZ_BAND = 2;
 }
 
 HiddenWifiFilter::HiddenWifiFilter() : SimpleWifiFilter("notHidden") {}
@@ -395,7 +393,7 @@ bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
             networkCandidate.ToString().c_str());
         return false;
     }
- 
+
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t curSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
@@ -423,7 +421,7 @@ NotP2pFreqAt5gFilter::~NotP2pFreqAt5gFilter()
 
 bool NotP2pFreqAt5gFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    if (networkCandidate.interScanInfo.band == SCAN_24GHZ_BAND) {
+    if (networkCandidate.interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
         return true;
     }
 
@@ -528,18 +526,18 @@ bool WifiSwitchThresholdFilter::Filter(NetworkCandidate &networkCandidate)
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t curSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
-    if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) && curSignalLevel == SIGNAL_LEVEL_THREE) {
-        return false;
-    }
-
     auto &interScanInfo = networkCandidate.interScanInfo;
-    if (curSignalLevel == SIGNAL_LEVEL_FOUR || (interScanInfo.rssi - linkedInfo.rssi < MIN_RSSI_INTERVAL)) {
+    if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) && curSignalLevel == SIGNAL_LEVEL_THREE &&
+        interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
+        WIFI_LOGI("WifiSwitchThresholdFilter, current network is 5G and level is three and target network is 2G, "
+            "skip candidate:%{public}s", networkCandidate.ToString().c_str());
         return false;
     }
 
-    int32_t targetSignalLevel = WifiSettings::GetInstance().GetSignalLevel(interScanInfo.rssi, interScanInfo.band);
-    if (linkedInfo.band == SCAN_5GHZ_BAND && curSignalLevel == SIGNAL_LEVEL_THREE &&
-        interScanInfo.band == SCAN_24GHZ_BAND && targetSignalLevel == SIGNAL_LEVEL_FOUR) {
+    if (curSignalLevel == SIGNAL_LEVEL_FOUR || (interScanInfo.rssi - linkedInfo.rssi < MIN_RSSI_INTERVAL)) {
+        WIFI_LOGI("WifiSwitchThresholdFilter, curSignalLevel:%{public}d, scan info rssi:%{public}d,"
+            "cur rssi:%{public}d, skip candidate:%{public}s",
+            curSignalLevel, interScanInfo.rssi, linkedInfo.rssi, networkCandidate.ToString().c_str());
         return false;
     }
 

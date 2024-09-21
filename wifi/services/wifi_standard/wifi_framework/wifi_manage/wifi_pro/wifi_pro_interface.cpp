@@ -35,15 +35,15 @@ WifiProInterface::~WifiProInterface()
 ErrCode WifiProInterface::InitWifiProService()
 {
     WIFI_LOGI("Enter WifiProInterface::InitWifiProService");
-    std::lock_guard<std::mutex> lock(mutex);
-    if (pWifiProService == nullptr) {
-        pWifiProService = std::make_shared<WifiProService>(instId_);
-        if (pWifiProService == nullptr) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        pWifiProService_ = std::make_shared<WifiProService>(instId_);
+        if (pWifiProService_ == nullptr) {
             WIFI_LOGE("Alloc pWifiProService failed.");
             return WIFI_OPT_FAILED;
         }
         InitCallback();
-        if (pWifiProService->InitWifiProService() != WIFI_OPT_SUCCESS) {
+        if (pWifiProService_->InitWifiProService() != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("InitWifiProService failed.");
             return WIFI_OPT_FAILED;
         }
@@ -67,34 +67,34 @@ void WifiProInterface::InitCallback()
 void WifiProInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId)
 {
     WIFI_LOGI("Enter WifiProInterface::DealStaConnChanged");
-    std::lock_guard<std::mutex> lock(mutex);
-    if (pWifiProService == nullptr) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");
         return;
     }
-    pWifiProService->HandleStaConnChanged(state, linkedInfo);
+    pWifiProService_->HandleStaConnChanged(state, linkedInfo);
 }
 
 void WifiProInterface::DealRssiLevelChanged(int32_t rssi, int32_t instId)
 {
     WIFI_LOGI("Enter WifiProInterface::DealRssiLevelChanged");
-    std::lock_guard<std::mutex> lock(mutex);
-    if (pWifiProService == nullptr) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");
         return;
     }
-    pWifiProService->HandleRssiLevelChanged(rssi);
+    pWifiProService_->HandleRssiLevelChanged(rssi);
 }
 
 void WifiProInterface::DealScanResult(const std::vector<InterScanInfo> &results)
 {
     WIFI_LOGI("Enter WifiProInterface::DealScanResult");
-    std::lock_guard<std::mutex> lock(mutex);
-    if (pWifiProService == nullptr) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");
         return;
     }
-    pWifiProService->HandleScanResult(results);
+    pWifiProService_->HandleScanResult(results);
 }
 
 StaServiceCallback WifiProInterface::GetStaCallback() const

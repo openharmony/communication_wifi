@@ -491,7 +491,7 @@ bool HalDeviceManager::SetNetworkUpDown(const std::string &ifaceName, bool upDow
     return true;
 }
 
-bool HalDeviceManager::GetChipsetCategory(const std::string &ifaceName, int &chipsetCategory)
+bool HalDeviceManager::GetChipsetCategory(const std::string &ifaceName, uint32_t &chipsetCategory)
 {
     if (!CheckReloadChipHdiService()) {
         return false;
@@ -506,13 +506,11 @@ bool HalDeviceManager::GetChipsetCategory(const std::string &ifaceName, int &chi
     }
 
     CHECK_NULL_AND_RETURN(chip, false);
-    uint32_t capabilities = 0;
-    int32_t ret = chip->GetChipCaps(capabilities);
+    int32_t ret = chip->GetChipCaps(chipsetCategory);
     if (ret != HDF_SUCCESS) {
         LOGE("GetChipsetCategory, call GetChipCaps failed! ret:%{public}d", ret);
         return false;
     }
-    chipsetCategory = capabilities;
     LOGI("GetChipsetCategory success");
     return true;
 }

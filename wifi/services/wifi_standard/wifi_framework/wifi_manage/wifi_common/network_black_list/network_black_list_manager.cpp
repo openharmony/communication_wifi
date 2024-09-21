@@ -24,7 +24,6 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("NetworkBlockListManager");
 namespace {
-constexpr int64_t BLOCKLIST_VALID_TIME = 120; // s
 constexpr int32_t MAX_CONNECT_FAILED_TIMES = 2;
 }
 
@@ -48,36 +47,22 @@ void NetworkBlockListManager::AddWifiBlocklist(const std::string &bssid)
     }
 
     WIFI_LOGI("AddWifiBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
-    time_t now = time(nullptr);
-    if (now < 0) {
-        WIFI_LOGI("AddWifiBlocklist, time return invalid.");
-    }
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        wifiBlockMap_[bssid] = static_cast<int64_t>(now) + BLOCKLIST_VALID_TIME;
-    }
-
-    uint32_t timerId = 0;
-    WifiTimer::GetInstance()->Register([this]() {this->RemoveWifiBlocklist();}, timerId, BLOCKLIST_VALID_TIME);
+    std::lock_guard<std::mutex> lock(mutex_);
+    wifiBlockSet_.insert(bssid);
 }
 
-void NetworkBlockListManager::RemoveWifiBlocklist()
+void NetworkBlockListManager::RemoveWifiBlocklist(const std::string &bssid)
 {
+    WIFI_LOGI("Enter RemoveWifiBlocklist");
     std::lock_guard<std::mutex> lock(mutex_);
-    if (wifiBlockMap_.empty()) {
-        WIFI_LOGI("RemoveWifiBlocklist, wifiBlackMap is empty");
+    if (wifiBlockSet_.empty()) {
+        WIFI_LOGI("RemoveWifiBlocklist, wifiBlockSet is empty");
         return;
     }
 
-    time_t now = time(nullptr);
-    if (now < 0) {
-        WIFI_LOGI("RemoveWifiBlocklist, time return invalid.");
-    }
-    for (auto &[bssid, timeOut] : wifiBlockMap_) {
-        if (static_cast<int64_t>(now) >= timeOut) {
-            WIFI_LOGI("RemoveWifiBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
-            wifiBlockMap_.erase(bssid);
-        }
+    if (wifiBlockSet_.find(bssid) != wifiBlockSet_.end()) {
+        WIFI_LOGI("RemoveWifiBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
+        wifiBlockSet_.erase(bssid);
     }
 }
 
@@ -88,12 +73,12 @@ bool NetworkBlockListManager::IsInWifiBlocklist(const std::string &bssid)
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
-    if (wifiBlockMap_.empty()) {
+    if (wifiBlockSet_.empty()) {
         return false;
     }
 
-    auto iter = wifiBlockMap_.find(bssid);
-    return iter != wifiBlockMap_.end();
+    auto iter = wifiBlockSet_.find(bssid);
+    return iter != wifiBlockSet_.end();
 }
 
 void NetworkBlockListManager::AddAbnormalWifiBlocklist(const std::string &bssid)
@@ -103,30 +88,23 @@ void NetworkBlockListManager::AddAbnormalWifiBlocklist(const std::string &bssid)
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    abnormalWifiBlockVec_.emplace_back(bssid);
+    abnormalWifiBlockSet_.insert(bssid);
 }
 
 void NetworkBlockListManager::CleanAbnormalWifiBlocklist()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    std::vector<std::string> tempVec;
-    abnormalWifiBlockVec_.swap(tempVec);
+    abnormalWifiBlockSet_.clear();
 }
 
 bool NetworkBlockListManager::IsInAbnormalWifiBlocklist(const std::string &bssid)
 {
-    if (abnormalWifiBlockVec_.empty()) {
+    if (abnormalWifiBlockSet_.empty()) {
         return false;
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
-    for (auto &black: abnormalWifiBlockVec_) {
-        if (black == bssid) {
-            return true;
-        }
-    }
-
-    return false;
+    return abnormalWifiBlockSet_.find(bssid) != abnormalWifiBlockSet_.end();
 }
 
 void NetworkBlockListManager::CleanTempWifiBlockList()
@@ -135,7 +113,6 @@ void NetworkBlockListManager::CleanTempWifiBlockList()
     std::map<std::string, int32_t> tempMap;
     tempWifiBlockMap_.swap(tempMap);
 }
-
 
 bool NetworkBlockListManager::IsInTempWifiBlockList(const std::string &bssid)
 {

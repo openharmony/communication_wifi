@@ -12,14 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_WIFI_WIFI_PRO_INTERFACE_H
 #define OHOS_WIFI_WIFI_PRO_INTERFACE_H
- 
+
 #include "iwifi_pro_service.h"
 #include "define.h"
 #include "wifi_pro_common.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 class WifiProService;
@@ -28,28 +28,28 @@ class WifiProInterface : public IWifiProService {
 public:
     explicit WifiProInterface(int32_t instId = 0);
     ~WifiProInterface() override;
- 
+
     /**
      * @Description  self cure service initialization function.
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     ErrCode InitWifiProService() override;
- 
+
     /**
      * @Description Get register sta callback
      *
      * @return StaServiceCallback - sta callback
      */
     StaServiceCallback GetStaCallback() const override;
- 
+
     /**
      * @Description deal scan results
      *
      * @return results - scan results
      */
     void DealScanResult(const std::vector<InterScanInfo> &results) override;
- 
+
 private:
     /**
      * @Description deal sta connection change
@@ -58,7 +58,7 @@ private:
      * @param info -  const WifiLinkedInfo
      */
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId = 0);
- 
+
     /**
      * @Description rssi level changed
      *
@@ -66,8 +66,8 @@ private:
      */
     void DealRssiLevelChanged(int32_t rssi, int32_t instId = 0);
 private:
-    std::mutex mutex;
-    std::shared_ptr<WifiProService> pWifiProService { nullptr };
+    std::mutex mutex_;
+    std::shared_ptr<WifiProService> pWifiProService_ { nullptr };
     int32_t instId_ { 0 };
     StaServiceCallback staCallback_;
     void InitCallback();

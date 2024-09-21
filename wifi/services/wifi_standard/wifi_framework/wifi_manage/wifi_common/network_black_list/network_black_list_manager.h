@@ -17,7 +17,7 @@
 #define OHOS_WIFI_NETWORK_BLACK_LIST_MANAGER_H
 
 #include <map>
-#include <vector>
+#include <set>
 #include "wifi_log.h"
 
 namespace OHOS {
@@ -35,13 +35,13 @@ public:
     bool IsInAbnormalWifiBlocklist(const std::string &bssid);
     bool IsInTempWifiBlockList(const std::string &bssid);
     bool IsFailedMultiTimes(const std::string &bssid);
+    void RemoveWifiBlocklist(const std::string &bssid);
 
 private:
     std::mutex mutex_;
-    std::map<std::string, int64_t> wifiBlockMap_;
-    std::vector<std::string> abnormalWifiBlockVec_;
+    std::set<std::string> wifiBlockSet_;
+    std::set<std::string> abnormalWifiBlockSet_;
     std::map<std::string, int32_t> tempWifiBlockMap_;
-    void RemoveWifiBlocklist();
 };
 
 } // namespace Wifi

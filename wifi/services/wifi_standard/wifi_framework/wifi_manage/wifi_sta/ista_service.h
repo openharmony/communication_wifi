@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_STA_SERVICE_H
 #define OHOS_WIFI_STA_SERVICE_H
 
+#include "sta_define.h"
 #include "wifi_errcode.h"
 #ifndef OHOS_ARCH_LITE
 #include "app_state_data.h"
@@ -62,12 +63,13 @@ public:
      * @Description  Connecting to a specified network.
      *
      * @param networkId - interior saved network index.(in)
+     * @param type - select network type: SelectedType
      * @Output: Return operating results to Interface Service after enable wifi
                 successfully through callback function instead of returning
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode ConnectToNetwork(int networkId) = 0;
+    virtual ErrCode ConnectToNetwork(int networkId, int type = NETWORK_SELECTED_BY_USER) = 0;
 
     /**
      * @Description roam to target bssid

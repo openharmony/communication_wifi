@@ -137,6 +137,12 @@ public:
     double Score(NetworkCandidate &networkCandidate) override;
 };
 
+class SignalLevelScorer : public SimpleWifiScorer {
+public:
+    SignalLevelScorer();
+    double Score(NetworkCandidate &networkCandidate) override;
+};
+
 class Network5gBonusScorer : public SimpleWifiScorer {
 public:
     Network5gBonusScorer();
@@ -153,6 +159,12 @@ public:
     NoInternetNetworkStatusHistoryScorer();
     double Score(NetworkCandidate &networkCandidate) override;
 };
+
+class ApQualityScorer : public CompositeWifiScorer {
+public:
+    explicit ApQualityScorer(const std::string &scorerName);
+};
+
 }
 
 #endif

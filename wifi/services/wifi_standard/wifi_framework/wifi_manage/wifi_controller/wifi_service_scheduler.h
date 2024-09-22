@@ -62,6 +62,11 @@ private:
     ErrCode PostStartWifi2(int instId);
     ErrCode InitStaService(IStaService *pService, int instId);
     ErrCode StartWifiStaService(int instId);
+    ErrCode StartDependentService(int instId);
+    void HandleGetStaFailed(int instId);
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    ErrCode StartWifiProService(int instId);
+#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     ErrCode StartSelfCureService(int instId);
 #endif

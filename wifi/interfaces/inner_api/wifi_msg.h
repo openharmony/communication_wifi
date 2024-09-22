@@ -659,6 +659,7 @@ struct WifiDeviceConfig {
     WifiWapiConfig wifiWapiConfig;
     IpInfo lastDhcpResult;
     bool isShared;
+    int64_t lastTrySwitchWifiTimestamp { -1 };
 
     WifiDeviceConfig()
     {

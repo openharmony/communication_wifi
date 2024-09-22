@@ -50,17 +50,18 @@ public:
     /**
      * @Description  Connect to a new network
      *
-     * @param config - the configuration of network which is going to connect.(in)
+     * @param networkId - interior saved network index.(in)
+     * @param type - select network type: SelectedType
      * @Output: Return operating results to Interface Service after enable wifi
                 successfully through callback function instead of returning
                 result immediately.
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode ConnectToNetwork(int networkId) override;
+    virtual ErrCode ConnectToNetwork(int networkId, int type = NETWORK_SELECTED_BY_USER) override;
     /**
      * @Description  Connecting to a specified network.
      *
-     * @param networkId - interior saved network index.(in)
+     * @param config - the configuration of network which is going to connect.(in)
      * @Output: Return operating results to Interface Service after enable wifi
                 successfully through callback function instead of returning
                 result immediately.

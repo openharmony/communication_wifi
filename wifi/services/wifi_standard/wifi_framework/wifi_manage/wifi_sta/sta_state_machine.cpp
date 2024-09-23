@@ -107,6 +107,13 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
+const std::map<int, int> wpa3FailreasonMap {
+    {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
+};
+
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"), lastNetworkId(INVALID_NETWORK_ID), operationalMode(STA_CONNECT_MODE),
       targetNetworkId(INVALID_NETWORK_ID), pinCode(0), wpsState(SetupMethod::INVALID),
@@ -3711,8 +3718,7 @@ void StaStateMachine::LinkedState::CheckIfRestoreWifi()
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
-    if (WifiSettings::GetInstance().GetDeviceEverConnected(networkId) &&
-        WifiSettings::GetInstance().GetAcceptUnvalidated(networkId)) {
+    if (WifiSettings::GetInstance().GetAcceptUnvalidated(networkId)) {
         WIFI_LOGI("The user has chosen to use the current WiFi.");
         WifiNetAgent::GetInstance().RestoreWifiConnection();
     }

@@ -547,6 +547,7 @@ public:
     void DealNetworkRemoved(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
+    void CheckDeviceEverConnected(bool hasNet);
 #endif
 
     bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);
@@ -1043,11 +1044,6 @@ private:
      *
      */
     void HilinkSaveConfig(void);
-
-    /**
-     * @Description Check whether the Wi-Fi has been connected.
-     */
-    void CheckDeviceEverConnected(bool hasNet);
 
     /**
      * @Description operation before dhcp

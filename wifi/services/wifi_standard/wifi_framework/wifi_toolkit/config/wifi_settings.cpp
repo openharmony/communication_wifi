@@ -2041,7 +2041,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
 #endif
         if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-            EncryptionDeviceConfig(config);
+            EncryptionDeviceConfig(iter->second);
 #endif
             LOGI("UpdateWifiConfigFromCloud, modify network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
@@ -2065,7 +2065,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         iter.networkId = mNetworkId;
         iter.version = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-        EncryptionDeviceConfig(config);
+        EncryptionDeviceConfig(iter);
 #endif
         tempConfigs.emplace(std::make_pair(iter.networkId, iter));
         mNetworkId++;

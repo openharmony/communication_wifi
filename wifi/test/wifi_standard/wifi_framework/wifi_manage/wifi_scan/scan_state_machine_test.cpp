@@ -1026,7 +1026,7 @@ public:
         config.networkId = NETWORK_ID;
         config.ssid = "";
         config.keyMgmt = "WEP";
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _, _))
             .Times(ONE).WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
         ScanStateMachine::FilterScanResultRecord records;
         InterScanInfo interScanInfo;

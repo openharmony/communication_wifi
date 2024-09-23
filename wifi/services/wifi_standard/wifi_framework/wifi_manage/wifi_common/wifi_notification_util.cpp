@@ -136,6 +136,33 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type)
     IPCSkeleton::SetCallingIdentity(identity);
 }
 
+void WifiNotificationUtil::NoNetDialog(WifiDialogType type, std::string HmosSettings)
+{
+    WIFI_LOGI("NoNetDialog, type=%{public}d", static_cast<int32_t>(type));
+    AAFwk::Want want;
+    std::string bundleName = "com.ohos.sceneboard";
+    std::string abilityName = "com.ohos.sceneboard.systemdialog";
+    want.SetElementName(bundleName, abilityName);
+    nlohmann::json param;
+    param["ability.want.params.uiExtensionType"] = "sysDialog/common";
+    std::string cmdData = param.dump();
+    if (HmosSettings.empty()) {
+        WIFI_LOGI("Hmos Settings is null");
+        return;
+    }
+    sptr<UIExtensionAbilityConnection> connection(
+        new (std::nothrow) UIExtensionAbilityConnection(cmdData, HmosSettings, "WifiNotAvailableDialog"));
+    if (connection == nullptr) {
+        WIFI_LOGE("connect UIExtensionAbilityConnection fail");
+        return;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto ret =
+        AAFwk::ExtensionManagerClient::GetInstance().ConnectServiceExtensionAbility(want, connection, nullptr, -1);
+    WIFI_LOGI("connect service extension ability result = %{public}d", ret);
+    IPCSkeleton::SetCallingIdentity(identity);
+}
+
 void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
 {

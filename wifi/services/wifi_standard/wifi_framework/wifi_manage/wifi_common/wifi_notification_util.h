@@ -63,6 +63,8 @@ public:
 
     void ShowDialog(WifiDialogType type);
 
+    void NoNetDialog(WifiDialogType type, std::string HmosSettings);
+
 private:
     std::atomic<bool> isNtfPublished {false};
 

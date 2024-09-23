@@ -131,6 +131,14 @@ public:
 
     int SetDeviceRandomizedMacSuccessEver(int networkId);
 
+    int SetDeviceEverConnected(int networkId);
+ 
+    int SetAcceptUnvalidated(int networkId);
+ 
+    bool GetDeviceEverConnected(int networkId);
+ 
+    bool GetAcceptUnvalidated(int networkId);
+
     int GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config);
 

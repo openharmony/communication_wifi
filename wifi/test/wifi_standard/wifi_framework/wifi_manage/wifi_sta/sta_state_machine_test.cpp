@@ -1273,6 +1273,11 @@ public:
         pStaStateMachine->pLinkedState->ExecuteStateMsg(nullptr);
     }
 
+    void LinkedStateCheckIfRestoreWifiSuccess()
+    {
+        pStaStateMachine->pLinkedState->CheckIfRestoreWifi();
+    }
+ 
     void ApRoamingStateGoInStateSuccess()
     {
         pStaStateMachine->pApRoamingState->GoInState();
@@ -2008,6 +2013,11 @@ public:
         pStaStateMachine->HilinkSaveConfig();
     }
 
+    void CheckDeviceEverConnectedTest(bool hasNet)
+    {
+        pStaStateMachine->CheckDeviceEverConnected(hasNet);
+    }
+ 
     void IsRoamingTest()
     {
         pStaStateMachine->IsRoaming();
@@ -2264,6 +2274,11 @@ HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail3, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail2, TestSize.Level1)
 {
     LinkedStateExeMsgFail2();
+}
+
+HWTEST_F(StaStateMachineTest, LinkedStateCheckIfRestoreWifiSuccess, TestSize.Level1)
+{
+    LinkedStateCheckIfRestoreWifiSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, InitStaSMHandleMapSuccess, TestSize.Level1)
@@ -3183,7 +3198,13 @@ HWTEST_F(StaStateMachineTest, HilinkSaveConfigTest, TestSize.Level1)
 {
     HilinkSaveConfigTest();
 }
- 
+
+HWTEST_F(StaStateMachineTest, CheckDeviceEverConnectedTest, TestSize.Level1)
+{
+    bool hasNet = false;
+    CheckDeviceEverConnectedTest(hasNet);
+}
+
 HWTEST_F(StaStateMachineTest, ReplaceEmptyDnsTest, TestSize.Level1)
 {
     ReplaceEmptyDnsTest();

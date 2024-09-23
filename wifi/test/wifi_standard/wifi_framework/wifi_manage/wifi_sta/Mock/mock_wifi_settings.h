@@ -92,7 +92,9 @@ public:
     virtual bool GetConfigValueByName(const std::string &name, std::string &value) = 0;
     virtual int GetHotspotConfig(HotspotConfig &config, int id) = 0;
     virtual int GetVariableMap(std::map<std::string, std::string> &variableMap) = 0;
-    test;
+    virtual bool GetDeviceEverConnected(int networkId) = 0;
+    virtual int SetDeviceEverConnected(int networkId) = 0;
+    virtual bool GetAcceptUnvalidated(int networkId) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -166,6 +168,9 @@ public:
     MOCK_METHOD2(GetConfigValueByName,  bool(const std::string &name, std::string &value));
     MOCK_METHOD2(GetHotspotConfig,  int(HotspotConfig &config, int id));
     MOCK_METHOD1(GetVariableMap,  int(std::map<std::string, std::string> &variableMap));
+    MOCK_METHOD1(GetDeviceEverConnected, bool(int networkId));
+    MOCK_METHOD1(SetDeviceEverConnected, int(int networkId));
+    MOCK_METHOD1(GetAcceptUnvalidated, bool(int networkId));
 };
 }  // namespace OHOS
 }  // namespace Wifi

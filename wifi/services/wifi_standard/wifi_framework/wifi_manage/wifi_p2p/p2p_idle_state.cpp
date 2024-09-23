@@ -55,39 +55,40 @@ void P2pIdleState::GoOutState()
 
 void P2pIdleState::Init()
 {
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS, &P2pIdleState::ProcessCmdStopDiscPeer));
-    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CONNECT, &P2pIdleState::ProcessCmdConnect));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ, &P2pIdleState::ProcessProvDiscPbcReqEvt));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN, &P2pIdleState::ProcessProvDiscEnterPinEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GO_NEG_REQUEST, &P2pIdleState::ProcessNegotReqEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN, &P2pIdleState::ProcessProvDiscShowPinEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP, &P2pIdleState::ProcessCmdCreateGroup));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP, &P2pIdleState::ProcessCmdRemoveGroup));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP, &P2pIdleState::ProcessCmdDeleteGroup));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED, &P2pIdleState::ProcessGroupStartedEvt));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RECEIVED, &P2pIdleState::ProcessInvitationReceivedEvt));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdStopDiscPeer(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CONNECT,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdConnect(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscPbcReqEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscEnterPinEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GO_NEG_REQUEST,
+        [this](InternalMessagePtr msg) { return this->ProcessNegotReqEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscShowPinEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdCreateGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdRemoveGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDeleteGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED,
+        [this](InternalMessagePtr msg) { return this->ProcessGroupStartedEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_INVITATION_RECEIVED,
+        [this](InternalMessagePtr msg) { return this->ProcessInvitationReceivedEvt(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP,
-        &P2pIdleState::ProcessCmdHid2dCreateGroup));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT, &P2pIdleState::ProcessCmdHid2dConnect));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IFACE_CREATED, &P2pIdleState::ProcessP2pIfaceCreatedEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE, &P2pIdleState::ProcessRemoveDevice));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT, &P2pIdleState::RetryConnect));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISABLE_RANDOM_MAC, &P2pIdleState::ProcessCmdDisableRandomMac));
+        [this](InternalMessagePtr msg) { return this->ProcessCmdHid2dCreateGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CONNECT,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdHid2dConnect(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_IFACE_CREATED,
+        [this](InternalMessagePtr msg) { return this->ProcessP2pIfaceCreatedEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE,
+        [this](InternalMessagePtr msg) { return this->ProcessRemoveDevice(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT,
+        [this](InternalMessagePtr msg) { return this->RetryConnect(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISABLE_RANDOM_MAC,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDisableRandomMac(msg); }));
 }
 
 bool P2pIdleState::ProcessCmdStopDiscPeer(InternalMessagePtr msg) const
@@ -463,7 +464,7 @@ bool P2pIdleState::ExecuteStateMsg(InternalMessagePtr msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(msg)) {
+    if ((iter->second)(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;

@@ -25,15 +25,15 @@ namespace OHOS {
 namespace Wifi {
 struct StaServiceCallback {
     std::string callbackModuleName;
-    std::function<void(OperateResState, int)> OnStaOpenRes;
-    std::function<void(OperateResState, int)> OnStaCloseRes;
-    std::function<void(OperateResState, const WifiLinkedInfo &, int)> OnStaConnChanged;
-    std::function<void(WpsStartState, const int, int)> OnWpsChanged;
-    std::function<void(StreamDirection, int)> OnStaStreamChanged;
-    std::function<void(int, int)> OnStaRssiLevelChanged;
-    std::function<void(OperateResState, int)> OnStaSemiActiveRes;
-    std::function<void(IpInfo, int)> OnDhcpOfferReport;
-    std::function<void(int, int)> OnAutoSelectNetworkRes;
+    std::function<void(OperateResState, int)> OnStaOpenRes { nullptr };
+    std::function<void(OperateResState, int)> OnStaCloseRes { nullptr };
+    std::function<void(OperateResState, const WifiLinkedInfo &, int)> OnStaConnChanged { nullptr };
+    std::function<void(WpsStartState, const int, int)> OnWpsChanged { nullptr };
+    std::function<void(StreamDirection, int)> OnStaStreamChanged { nullptr };
+    std::function<void(int, int)> OnStaRssiLevelChanged { nullptr };
+    std::function<void(OperateResState, int)> OnStaSemiActiveRes { nullptr };
+    std::function<void(IpInfo, int)> OnDhcpOfferReport { nullptr };
+    std::function<void(int, int)> OnAutoSelectNetworkRes { nullptr };
 };
 }  // namespace Wifi
 }  // namespace OHOS

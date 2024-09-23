@@ -284,8 +284,7 @@ void WifiControllerMachine::HandleAirplaneOpen()
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     StopAllSoftapManagers();
 #endif
-    if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() ||
-        WifiConfigCenter::GetInstance().GetWifiDetailState() == WifiDetailState::STATE_SEMI_ACTIVE) {
+    if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() || !ShouldEnableWifi(INSTID_WLAN0)) {
         StopAllConcreteManagers();
     }
 }

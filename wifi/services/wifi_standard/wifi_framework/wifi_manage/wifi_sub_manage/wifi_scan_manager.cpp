@@ -203,13 +203,15 @@ void WifiScanManager::CloseScanService(int instId)
 
 void WifiScanManager::InitScanCallback(void)
 {
-    using namespace std::placeholders;
-    mScanCallback.OnScanStartEvent = std::bind(&WifiScanManager::DealScanOpenRes, this, _1);
-    mScanCallback.OnScanStopEvent = std::bind(&WifiScanManager::DealScanCloseRes, this, _1);
-    mScanCallback.OnScanFinishEvent = std::bind(&WifiScanManager::DealScanFinished, this, _1, _2);
-    mScanCallback.OnScanInfoEvent = std::bind(&WifiScanManager::DealScanInfoNotify, this, _1, _2);
-    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiScanManager::DealStoreScanInfoEvent, this, _1, _2);
-
+    mScanCallback.OnScanStartEvent = [this](int instId) { this->DealScanOpenRes(instId); };
+    mScanCallback.OnScanStopEvent = [this](int instId) { this->DealScanCloseRes(instId); };
+    mScanCallback.OnScanFinishEvent = [this](int state, int instId) { this->DealScanFinished(state, instId); };
+    mScanCallback.OnScanInfoEvent = [this](std::vector<InterScanInfo> &results, int instId) {
+        this->DealScanInfoNotify(results, instId);
+    };
+    mScanCallback.OnStoreScanInfoEvent = [this](std::vector<InterScanInfo> &results, int instId) {
+        this->DealStoreScanInfoEvent(results, instId);
+    };
     mStaCallback.callbackModuleName = "WifiScanManager";
 }
 
@@ -241,6 +243,13 @@ void WifiScanManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, in
         if (pService != nullptr) {
             pService->ConnectivityManager(results);
         }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+        IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+        if (pWifiProService != nullptr) {
+            pWifiProService->DealScanResult(results);
+        }
+#endif
     }
 }
 

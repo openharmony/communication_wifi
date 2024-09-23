@@ -173,11 +173,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
     if (pService == nullptr) {
         WIFI_LOGE("AutoStopStaService, Instance get sta service is null!");
-        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
-#endif
+        HandleGetStaFailed(instId);
         return WIFI_OPT_SUCCESS;
     }
     DispatchWifiCloseRes(OperateResState::CLOSE_WIFI_CLOSING, instId);
@@ -245,6 +241,18 @@ ErrCode WifiServiceScheduler::AutoStopWifi2Service(int instId)
     ins->HandleWifi2Close(instId);
     WIFI_LOGE("AutoStopWifi2Service %{public}d success!", instId);
     return WIFI_OPT_SUCCESS;
+}
+
+void WifiServiceScheduler::HandleGetStaFailed(int instId)
+{
+    WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, instId);
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_WIFIPRO, instId);
+#endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, instId);
+#endif
 }
 
 ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfName)
@@ -384,16 +392,12 @@ ErrCode WifiServiceScheduler::PostStartWifi(int instId)
     if (StartWifiStaService(instId) == WIFI_OPT_FAILED) {
         WIFI_LOGE("StartWifiStaService failed!");
     }
-#ifdef FEATURE_SELF_CURE_SUPPORT
-    if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("StartSelfCureService failed!");
-    }
-#endif
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 #ifdef FEATURE_P2P_SUPPORT
     ErrCode errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
     if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
         WIFI_LOGE("AutoStartStaService, AutoStartP2pService failed!");
+        return WIFI_OPT_FAILED;
     }
 #endif
     return WIFI_OPT_SUCCESS;
@@ -417,6 +421,11 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         WIFI_LOGE("StartWifiStaService Create %{public}s service failed!", WIFI_SERVICE_STA);
         return WIFI_OPT_FAILED;
     }
+
+    if (StartDependentService(instId) != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_FAILED;
+    }
+
     WIFI_LOGD("StartWifiStaService InitStaService instId:%{public}d", instId);
     if (InitStaService(pService, instId) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("StartWifiStaService InitStaService failed!");
@@ -428,7 +437,41 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         WIFI_LOGE("StartWifiStaService Service enable sta failed ,ret %{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("get pEnhance service failed!");
+        return WIFI_OPT_FAILED;
+    }
+    errCode = pService->SetEnhanceService(pEnhanceService);
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+#endif
     WIFI_LOGI("StartWifiStaService instId%{public}d successful", instId);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiServiceScheduler::StartDependentService(int instId)
+{
+    if (instId != INSTID_WLAN0) {
+        return WIFI_OPT_SUCCESS;
+    }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    if (StartWifiProService(instId) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartWifiProService failed!");
+        return WIFI_OPT_FAILED;
+    }
+#endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("StartSelfCureService failed!");
+        return WIFI_OPT_FAILED;
+    }
+#endif
+
     return WIFI_OPT_SUCCESS;
 }
 
@@ -452,23 +495,72 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             return WIFI_OPT_FAILED;
         }
 #ifndef OHOS_ARCH_LITE
-    errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
-            static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
+        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
 
-    errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
-            static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
+        errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
+#endif
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        if (instId == INSTID_WLAN0) {
+            ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+            if (pSelfCureService == nullptr) {
+                WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_SELFCURE);
+                return WIFI_OPT_FAILED;
+            }
+            errCode = pService->RegisterStaServiceCallback(pSelfCureService->GetStaCallback());
+            if (errCode != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("SelfCure register sta service callback failed!");
+                return WIFI_OPT_FAILED;
+            }
+        }
 #endif
     }
     return WIFI_OPT_SUCCESS;
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+ErrCode WifiServiceScheduler::StartWifiProService(int instId)
+{
+    if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_WIFIPRO) < 0) {
+        WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_WIFIPRO);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+    if (pWifiProService == nullptr) {
+        WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_WIFIPRO);
+        return WIFI_OPT_FAILED;
+    }
+    ErrCode errCode = pWifiProService->InitWifiProService();
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Service enable wifi pro failed, ret %{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+ 
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
+        return WIFI_OPT_FAILED;
+    }
+
+    errCode = pService->RegisterStaServiceCallback(pWifiProService->GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("WifiPro register sta service callback failed!");
+        return WIFI_OPT_FAILED;
+    }
+ 
+    return WIFI_OPT_SUCCESS;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
@@ -492,16 +584,6 @@ ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
     ErrCode errCode = pSelfCureService->InitSelfCureService();
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Service enable self cure failed, ret %{public}d!", static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
-    if (pService == nullptr) {
-        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
-        return WIFI_OPT_FAILED;
-    }
-    errCode = pService->RegisterStaServiceCallback(pSelfCureService->GetStaCallback());
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("SelfCure register sta service callback failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
@@ -557,7 +639,6 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
     if (state == OperateResState::OPEN_WIFI_SUCCEED) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, instId);
-        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
         cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
         if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
@@ -585,7 +666,6 @@ void WifiServiceScheduler::DispatchWifi2OpenRes(OperateResState state, int instI
     if (state == OperateResState::OPEN_WIFI_SUCCEED) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, instId);
-        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
         cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
@@ -611,7 +691,6 @@ void WifiServiceScheduler::DispatchWifiSemiActiveRes(OperateResState state, int 
     if (state == OperateResState::ENABLE_SEMI_WIFI_SUCCEED) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, instId);
-        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_SEMI_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::SEMI_ACTIVE, instId);
         cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
@@ -645,14 +724,12 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
         cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
         if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
-            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
             WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
         } else {
             WIFI_LOGI("reset selfcure wifi off->open!");
-            int state = WifiSettings::GetInstance().GetStaLastRunState();
+            int state = WifiConfigCenter::GetInstance().GetPersistWifiState(instId);
             state = (state == WIFI_STATE_SEMI_ENABLED) ? WIFI_STATE_SEMI_ENABLED : WIFI_STATE_ENABLED;
             WifiConfigCenter::GetInstance().SetWifiToggledState(state, instId);
-            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
             WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
         }
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
@@ -680,7 +757,6 @@ void WifiServiceScheduler::DispatchWifi2CloseRes(OperateResState state, int inst
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
         cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
-        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
         return;
     }

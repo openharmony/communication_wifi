@@ -93,14 +93,14 @@ public:
     void ConnectToNetworkIdSuceess()
     {
         int networkId = 0;
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(networkId)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(networkId, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_TRUE(pStaInterface->ConnectToNetwork(0) == WIFI_OPT_SUCCESS);
     }
 
     void ConnectToNetworkIdFail1()
     {
         int networkId = 0;
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(networkId)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(networkId, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->ConnectToNetwork(0) == WIFI_OPT_FAILED);
     }
 

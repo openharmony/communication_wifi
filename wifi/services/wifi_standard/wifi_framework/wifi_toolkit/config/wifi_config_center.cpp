@@ -361,7 +361,6 @@ int WifiConfigCenter::SetMacAddress(const std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     mMacAddress[instId] = macAddress;
-    WIFI_LOGI("SetMacAddress instId:%{public}d, macAddress:%{public}s", instId, macAddress.c_str());
     return 0;
 }
 
@@ -1570,6 +1569,16 @@ WifiMacAddrErrCode WifiConfigCenter::AddMacAddrPairs(WifiMacAddrInfoType type,
             break;
     }
     return WIFI_MACADDR_INVALID_PARAM;
+}
+
+std::set<int> WifiConfigCenter::GetAllWifiLinkedNetworkId()
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    std::set<int> wifiLinkedNetworkId;
+    for (auto iter = mWifiLinkedInfo.begin(); iter != mWifiLinkedInfo.end(); iter++) {
+        wifiLinkedNetworkId.insert(iter->second.networkId);
+    }
+    return wifiLinkedNetworkId;
 }
 }  // namespace Wifi
 }  // namespace OHOS

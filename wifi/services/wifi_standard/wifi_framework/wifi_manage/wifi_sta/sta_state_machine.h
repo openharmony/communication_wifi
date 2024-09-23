@@ -550,6 +550,7 @@ public:
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
+    void DealNetworkRemoved(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
 #endif
@@ -1197,7 +1198,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
-    IEnhanceService *enhanceService_;        /* EnhanceService handle */
+    IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
 #endif
 
     int lastNetworkId;

@@ -70,60 +70,60 @@ void P2pEnabledState::GoOutState()
 
 void P2pEnabledState::Init()
 {
-    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE, &P2pEnabledState::ProcessCmdDisable));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN, &P2pEnabledState::ProcessCmdStartListen));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_STOP_LISTEN, &P2pEnabledState::ProcessCmdStopListen));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS, &P2pEnabledState::ProcessCmdDiscPeer));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS, &P2pEnabledState::ProcessCmdStopDiscPeer));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND, &P2pEnabledState::ProcessDeviceFoundEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PRI_DEVICE_FOUND, &P2pEnabledState::ProcessPriDeviceFoundEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST, &P2pEnabledState::ProcessDeviceLostEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_FIND_STOPPED, &P2pEnabledState::ProcessFindStoppedEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP, &P2pEnabledState::ProcessCmdDeleteGroup));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE, &P2pEnabledState::ProcessCmdAddLocalService));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE, &P2pEnabledState::ProcessCmdDelLocalService));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES, &P2pEnabledState::ProcessCmdDiscServices));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES, &P2pEnabledState::ProcessCmdStopDiscServices));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REQUEST_SERVICE, &P2pEnabledState::ProcessCmdRequestService));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_REQ, &P2pEnabledState::ProcessServiceDiscReqEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_RESP, &P2pEnabledState::ProcessServiceDiscRspEvt));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT, &P2pEnabledState::ProcessExceptionTimeOut));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME, &P2pEnabledState::ProcessCmdSetDeviceName));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO, &P2pEnabledState::ProcessCmdSetWfdInfo));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &P2pEnabledState::ProcessCmdCancelConnect));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED, &P2pEnabledState::ProcessCmdConnectFailed));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_PEERS, &P2pEnabledState::ProcessCmdDiscoverPeers));
-    InitProcessMsg();
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDisable(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdStartListen(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_STOP_LISTEN,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdStopListen(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDiscPeer(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_STOP_DEVICE_DISCOVERS,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdStopDiscPeer(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND,
+        [this](InternalMessagePtr msg) { return this->ProcessDeviceFoundEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PRI_DEVICE_FOUND,
+        [this](InternalMessagePtr msg) { return this->ProcessPriDeviceFoundEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST,
+        [this](InternalMessagePtr msg) { return this->ProcessDeviceLostEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_FIND_STOPPED,
+        [this](InternalMessagePtr msg) { return this->ProcessFindStoppedEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDeleteGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdAddLocalService(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDelLocalService(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDiscServices(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_STOP_DISCOVER_SERVICES,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdStopDiscServices(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REQUEST_SERVICE,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdRequestService(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_REQ,
+        [this](InternalMessagePtr msg) { return this->ProcessServiceDiscReqEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_RESP,
+        [this](InternalMessagePtr msg) { return this->ProcessServiceDiscRspEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT,
+        [this](InternalMessagePtr msg) { return this->ProcessExceptionTimeOut(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_DEVICE_NAME,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdSetDeviceName(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdSetWfdInfo(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdCancelConnect(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_CONNECT_FAILED,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdConnectFailed(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_PEERS,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDiscoverPeers(msg); }));
 }
 
 void P2pEnabledState::InitProcessMsg()
 {
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_INCREASE_SHARE_LINK, &P2pEnabledState::ProcessCmdIncreaseSharedLink));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DECREASE_SHARE_LINK, &P2pEnabledState::ProcessCmdDecreaseSharedLink));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_INCREASE_SHARE_LINK,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdIncreaseSharedLink(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DECREASE_SHARE_LINK,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDecreaseSharedLink(msg); }));
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
@@ -273,7 +273,7 @@ bool P2pEnabledState::ExecuteStateMsg(InternalMessagePtr msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(msg)) {
+    if ((iter->second)(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;

@@ -317,6 +317,8 @@ public:
 
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
 
+    std::set<int> GetAllWifiLinkedNetworkId();
+    
     void SetPersistWifiState(int state, int instId);
 
     int GetPersistWifiState(int instId);

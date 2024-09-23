@@ -82,6 +82,7 @@ ohos_unittest("wifi_controller_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
@@ -97,7 +98,7 @@ ohos_unittest("wifi_controller_unittest") {
     "--coverage",
   ]
   deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
@@ -141,11 +142,14 @@ ohos_unittest("wifi_controller_unittest") {
   ]
   defines += [
     "FEATURE_AP_SUPPORT",
-    "FEATURE_SELF_CURE_SUPPORT",
     "FEATURE_STA_SUPPORT",
     "FEATURE_P2P_SUPPORT",
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
   ]
+
+  if (wifi_feature_wifi_pro_ctrl) {
+    defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
+  }
   part_name = "wifi"
   subsystem_name = "communication"
 }

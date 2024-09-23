@@ -69,7 +69,7 @@ public:
      * @param infoElems - info elems
      * @param chipsetCategory - chipset category
      * @param chipsetFeatrureCapability - chipset featrure capability
-     * @return 1: DEFAULT, 2: WIFI6, 3: WIFI6_PLUS
+     * @return 1: DEFAULT, 2: WIFI6, 3: WIFI6_PLUS, 4: WIFI7, 5: WIFI7_PLUS
      */
     virtual WifiCategory GetWifiCategory(
         std::vector<WifiInfoElem> infoElems, int chipsetCategory, int chipsetFeatrureCapability) = 0;

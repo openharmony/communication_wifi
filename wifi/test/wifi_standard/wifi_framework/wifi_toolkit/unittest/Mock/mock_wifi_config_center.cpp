@@ -22,5 +22,15 @@ WifiConfigCenter &WifiConfigCenter::GetInstance()
     static WifiConfigCenter instance;
     return instance;
 }
+
+WifiConfigCenter::WifiConfigCenter()
+{
+    wifiScanConfig = std::make_unique<WifiScanConfig>();
+}
+
+std::unique_ptr<WifiScanConfig>& WifiConfigCenter::GetWifiScanConfig()
+{
+    return wifiScanConfig;
+}
 }  // namespace Wifi
 }  // namespace OHOS

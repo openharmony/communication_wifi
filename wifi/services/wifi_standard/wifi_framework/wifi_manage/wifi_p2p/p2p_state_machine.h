@@ -42,7 +42,6 @@
 #include "wifi_hid2d_service_utils.h"
 #include "dhcp_c_api.h"
 
-
 namespace OHOS {
 namespace Wifi {
 inline const int MIN_GROUP_NAME_LENGTH = 9;
@@ -405,6 +404,7 @@ private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;
     GcInfo MatchDevInGcInfos(const std::string &deviceAddr, const std::string &groupAddr, std::vector<GcInfo> &gcInfos);
     void StopP2pDhcpClient();
+    void DoP2pArp(std::string &serverIp, std::string &clientIp);
 
 private:
     mutable std::mutex cbMapMutex;

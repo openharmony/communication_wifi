@@ -4202,7 +4202,7 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
     WIFI_LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d, isRoam=%{public}d",
         pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
     pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_JUMP);
-    if (pStaStateMachine->getIpSucNum == 0 || pStaStateMachine->isRoam) {
+    if (pStaStateMachine->getIpSucNum == 0) {
         pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(

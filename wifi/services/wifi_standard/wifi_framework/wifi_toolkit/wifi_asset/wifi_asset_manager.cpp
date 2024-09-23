@@ -468,7 +468,7 @@ bool WifiAssetManager::IsWifiConfigUpdated(const std::vector<WifiDeviceConfig> n
                 iter.wifiProxyconfig.manualProxyConfig.exclusionObjectList;
             config.version = 0;
             LOGI("WifiAsset IsWifiConfigUpdated, ssid : %{public}s, psksize : %{public}d",
-                SsidAnonymize(config.ssid).c_str(), (config.preSharedKey).length());
+                SsidAnonymize(config.ssid).c_str(), static_cast<int>((config.preSharedKey).length());
         }
         return true;
     }

@@ -97,6 +97,10 @@ static bool WifiAssetValid(const WifiDeviceConfig &config)
  
 static bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::string> &outArray)
 {
+    if (outArray.size() != SIZE_OF_ITEM) {
+        LOGE("WifiAsset ArrayToWifiDeviceConfig, Error Number Tag Saved In Asset");
+        return false;
+    }
     size_t index = 0;
     while (index < outArray.size()) {
         config.ssid = HexToString(outArray[index++]);
@@ -114,10 +118,6 @@ static bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::s
     }
     if (config.keyMgmt != KEY_MGMT_NONE && (config.preSharedKey).length() == 0) {
         LOGE("WifiAsset ArrayToWifiDeviceConfig, ssid : %{public}s psk empty!", SsidAnonymize(config.ssid).c_str());
-        return false;
-    }
-    if (outArray.size() != SIZE_OF_ITEM) {
-        LOGE("WifiAsset ArrayToWifiDeviceConfig, Error Number Tag Saved In Asset");
         return false;
     }
     return true;

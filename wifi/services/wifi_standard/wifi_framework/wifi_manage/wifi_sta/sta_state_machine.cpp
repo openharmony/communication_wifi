@@ -3596,7 +3596,9 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function. m_instId = %{public}d", pStaStateMachine->GetInstanceId());
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
+#ifndef OHOS_ARCH_LITE
     CheckIfRestoreWifi();
+#endif
     if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
@@ -3719,6 +3721,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
     return ret;
 }
 
+#ifndef OHOS_ARCH_LITE
 void StaStateMachine::LinkedState::CheckIfRestoreWifi()
 {
     WifiLinkedInfo linkedInfo;
@@ -3729,6 +3732,7 @@ void StaStateMachine::LinkedState::CheckIfRestoreWifi()
         WifiNetAgent::GetInstance().RestoreWifiConnection();
     }
 }
+#endif
 
 void StaStateMachine::DealApRoamingStateTimeout(InternalMessagePtr msg)
 {

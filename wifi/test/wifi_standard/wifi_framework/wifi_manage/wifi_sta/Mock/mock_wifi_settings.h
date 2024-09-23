@@ -92,6 +92,7 @@ public:
     virtual bool GetConfigValueByName(const std::string &name, std::string &value) = 0;
     virtual int GetHotspotConfig(HotspotConfig &config, int id) = 0;
     virtual int GetVariableMap(std::map<std::string, std::string> &variableMap) = 0;
+    test;
 };
 
 class WifiSettings : public MockWifiSettings {

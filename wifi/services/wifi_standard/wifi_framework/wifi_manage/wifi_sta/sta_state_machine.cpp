@@ -3482,6 +3482,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     if (linkedInfo.connState != ConnState::CONNECTED) {
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         WriteIsInternetHiSysEvent(NO_NETWORK);
+        CheckDeviceEverConnected(false);
         return;
     }
     mPortalUrl = portalUrl;
@@ -3537,7 +3538,28 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
+    CheckDeviceEverConnected(true);
     portalFlag = true;
+}
+
+void StaStateMachine::CheckDeviceEverConnected(bool hasNet)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    std::string HmosSettings;
+    if (enhanceService_ != nullptr) {
+        HmosSettings = enhanceService_->GetHmosSetting();
+    }
+    if (!WifiSettings::GetInstance().GetDeviceEverConnected(networkId)) {
+        if (!hasNet) {
+            /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
+            WifiNotificationUtil::GetInstance().NoNetDialog(WifiDialogType::CDD, HmosSettings);
+        }
+        WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
+        WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
 }
 
 void StaStateMachine::HandleArpCheckResult(StaArpState arpState)
@@ -3561,6 +3583,7 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function. m_instId = %{public}d", pStaStateMachine->GetInstanceId());
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
+    CheckIfRestoreWifi();
     if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
@@ -3681,6 +3704,18 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
     }
 
     return ret;
+}
+
+void StaStateMachine::LinkedState::CheckIfRestoreWifi()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    if (WifiSettings::GetInstance().GetDeviceEverConnected(networkId) &&
+        WifiSettings::GetInstance().GetAcceptUnvalidated(networkId)) {
+        WIFI_LOGI("The user has chosen to use the current WiFi.");
+        WifiNetAgent::GetInstance().RestoreWifiConnection();
+    }
 }
 
 void StaStateMachine::DealApRoamingStateTimeout(InternalMessagePtr msg)

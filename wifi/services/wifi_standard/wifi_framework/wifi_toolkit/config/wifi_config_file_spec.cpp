@@ -56,6 +56,8 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.callProcessName.clear();
     item.ancoCallProcessName.clear();
     item.randomizedMacSuccessEver = false;
+    item.everConnected = false;
+    item.acceptUnvalidated = false;
     item.macAddress.clear();
     item.internetSelfCureHistory.clear();
     item.isReassocSelfCureWithFactoryMacAddress = 0;
@@ -247,6 +249,10 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.version = std::stoi(value);
     } else if (key == "randomizedMacSuccessEver") {
         item.randomizedMacSuccessEver = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "everConnected") {
+        item.everConnected = (std::stoi(value) != 0);
+    } else if (key == "acceptUnvalidated") {
+        item.acceptUnvalidated = (std::stoi(value) != 0);
     } else if (key == "macAddress") {
         item.macAddress = value;
     } else if (key == "portalAuthTime") {
@@ -579,6 +585,8 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"callProcessName=" << item.callProcessName << std::endl;
     ss << "    " <<"ancoCallProcessName=" << item.ancoCallProcessName << std::endl;
     ss << "    " <<"randomizedMacSuccessEver=" << item.randomizedMacSuccessEver << std::endl;
+    ss << "    " <<"everConnected=" << item.everConnected << std::endl;
+    ss << "    " <<"acceptUnvalidated=" << item.acceptUnvalidated << std::endl;
     ss << "    " << "macAddress=" << item.macAddress << std::endl;
     ss << "    " <<"</WifiDeviceConfig>" << std::endl;
     return ss.str();

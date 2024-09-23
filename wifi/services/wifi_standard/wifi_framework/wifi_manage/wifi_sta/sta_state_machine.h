@@ -334,6 +334,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        void CheckIfRestoreWifi();
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
@@ -1049,6 +1050,11 @@ private:
      *
      */
     void HilinkSaveConfig(void);
+
+    /**
+     * @Description Check whether the Wi-Fi has been connected.
+     */
+    void CheckDeviceEverConnected(bool hasNet);
 
     /**
      * @Description operation before dhcp

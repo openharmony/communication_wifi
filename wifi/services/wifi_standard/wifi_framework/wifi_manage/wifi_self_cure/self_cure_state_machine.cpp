@@ -1540,7 +1540,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleIpConfigTimeout()
     pSelfCureStateMachine->selfCureOnGoing = false;
     isRenewDhcpTimeout = true;
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     if (currentAbnormalType == WIFI_CURE_INTERNET_FAILED_TYPE_ROAMING &&
         pSelfCureStateMachine->IsEncryptedAuthType(configAuthType) &&
         pSelfCureStateMachine->GetBssidCounter(scanResults) <= DEAUTH_BSSID_CNT && !finalSelfCureUsed) {
@@ -2435,7 +2435,7 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
         return false;
     }
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     if (GetBssidCounter(scanResults) < MULTI_BSSID_NUM) {
         WIFI_LOGI("not multi bssid condition!");
         return false;

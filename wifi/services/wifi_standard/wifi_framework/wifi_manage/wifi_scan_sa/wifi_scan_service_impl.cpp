@@ -28,7 +28,6 @@
 #include "wifi_msg.h"
 #include "wifi_permission_utils.h"
 #include "wifi_scan_callback_proxy.h"
-#include "wifi_scan_config.h"
 #include "wifi_service_manager.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
@@ -99,7 +98,7 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiConfigCenter::GetInstance().SetScanControlInfo(info, m_instId);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanControlInfo(info, m_instId);
     if (IsScanServiceRunning()) {
         IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
         if (pService == nullptr) {
@@ -229,7 +228,7 @@ ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
 bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
 {
     WifiScanDeviceInfo scanInfo;
-    WifiScanConfig::GetInstance().GetScanDeviceInfo(scanInfo);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(scanInfo);
     if (externFlag) {
         if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
             WIFI_LOGW("extern scan not allow when wifi disable");
@@ -245,7 +244,7 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
         scanInfo.externScan = externFlag;
         scanInfo.isSystemApp = WifiAuthCenter::IsSystemAccess();
         bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
-        WifiScanConfig::GetInstance().SaveScanDeviceInfo(scanInfo);
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanDeviceInfo(scanInfo);
         return allowScan;
     }
     return true;
@@ -283,7 +282,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
         }
     }
 
-    WifiConfigCenter::GetInstance().GetScanInfoList(result);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(result);
     if (!compatible) {
     #ifdef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
@@ -435,9 +434,9 @@ void WifiScanServiceImpl::UpdateScanMode()
 {
     int uid = GetCallingUid();
     if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
-            WifiScanConfig::GetInstance().SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
+            WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
         } else {
-            WifiScanConfig::GetInstance().SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
+            WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
         }
 }
 #endif

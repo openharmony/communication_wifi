@@ -2061,7 +2061,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
             continue;
         }
         LOGI("UpdateWifiConfigFromCloud new %{public}s , psksize : %{public}d", SsidAnonymize(iter.ssid).c_str(),
-            (iter.preSharedKey).length());
+            static_cast<int>((iter.preSharedKey).length());
         iter.networkId = mNetworkId;
         iter.version = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT

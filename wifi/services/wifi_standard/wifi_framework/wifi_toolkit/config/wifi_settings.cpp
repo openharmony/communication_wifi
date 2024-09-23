@@ -2072,7 +2072,6 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
     }
     mWifiDeviceConfig.swap(tempConfigs);
 }
-
 void WifiSettings::UpLoadLocalDeviceConfigToCloud()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

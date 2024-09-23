@@ -42,6 +42,7 @@
 #include "wifi_hid2d_service_utils.h"
 #include "dhcp_c_api.h"
 
+
 namespace OHOS {
 namespace Wifi {
 inline const int MIN_GROUP_NAME_LENGTH = 9;

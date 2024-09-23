@@ -402,7 +402,7 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventGoNegotiationCompletedTest, TestSize.Lev
     EXPECT_EQ(result, 0);
 
     result = OnEventGoNegotiationCompleted(nullptr, nullptr, "wlan0");
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result, 1);
 }
 
 HWTEST_F(WifiHdiWpaCallbackTest, OnEventInvitationResultTest, TestSize.Level1)
@@ -518,7 +518,7 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventInvitationReceivedTest, TestSize.Level1)
     EXPECT_EQ(result, 1);
 }
 
-HWTEST(WifiHdiWpaCallbackTest, OnNativeProcessDeathTest, TestSize.Level1)
+HWTEST_F(WifiHdiWpaCallbackTest, OnNativeProcessDeathTest, TestSize.Level1)
 {
     int status = 0;
     OnNativeProcessDeath(status);

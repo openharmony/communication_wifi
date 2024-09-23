@@ -42,9 +42,10 @@ StaAppAcceleration::~StaAppAcceleration()
 
 ErrCode StaAppAcceleration::InitAppAcceleration()
 {
-    using namespace std::placeholders;
     m_staCallback.callbackModuleName = CLASS_NAME;
-    m_staCallback.OnStaConnChanged = std::bind(&StaAppAcceleration::DealStaConnChanged, this, _1, _2, _3);
+    m_staCallback.OnStaConnChanged = [this](OperateResState state, const WifiLinkedInfo &info, int instId) {
+        this->DealStaConnChanged(state, info, instId);
+    };
     return WIFI_OPT_SUCCESS;
 }
 

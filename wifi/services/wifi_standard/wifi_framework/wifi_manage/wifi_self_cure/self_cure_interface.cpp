@@ -81,9 +81,13 @@ ErrCode SelfCureInterface::InitCallback()
     using namespace std::placeholders;
     WIFI_LOGD("Enter SelfCureInterface::InitCallback");
     mStaCallback.callbackModuleName = "SelfCureService";
-    mStaCallback.OnStaConnChanged = std::bind(&SelfCureInterface::DealStaConnChanged, this, _1, _2, _3);
-    mStaCallback.OnStaRssiLevelChanged = std::bind(&SelfCureInterface::DealRssiLevelChanged, this, _1, _2);
-    mStaCallback.OnDhcpOfferReport = std::bind(&SelfCureInterface::DealDhcpOfferReport, this, _1, _2);
+    mStaCallback.OnStaConnChanged = [this](OperateResState state, const WifiLinkedInfo &info, int instId) {
+        this->DealStaConnChanged(state, info, instId);
+    };
+    mStaCallback.OnStaRssiLevelChanged = [this](int rssi, int instId) { this->DealRssiLevelChanged(rssi, instId); };
+    mStaCallback.OnDhcpOfferReport = [this](const IpInfo &ipInfo, int instId) {
+        this->DealDhcpOfferReport(ipInfo, instId);
+    };
     return WIFI_OPT_SUCCESS;
 }
 

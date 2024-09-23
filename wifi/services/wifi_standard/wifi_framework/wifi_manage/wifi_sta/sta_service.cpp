@@ -415,9 +415,11 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
         status = tempDeviceConfig.status;
-        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
-        bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
-        pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
+        if (m_instId == INSTID_WLAN0) {
+            CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+            bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
+            pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
+        }
         isUpdate = true;
     } else {
         netWorkId = WifiSettings::GetInstance().GetNextNetworkId();
@@ -477,12 +479,9 @@ int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
 ErrCode StaService::RemoveDevice(int networkId) const
 {
     LOGI("Enter RemoveDevice, networkId = %{public}d m_instId:%{public}d\n", networkId, m_instId);
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if (linkedInfo.networkId == networkId) {
-        std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
-        WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName);
-    }
+
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_NETWORK_REMOVED, networkId);
 
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) == 0) {
@@ -558,7 +557,7 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::ConnectToNetwork(int networkId) const
+ErrCode StaService::ConnectToNetwork(int networkId, int type) const
 {
     LOGI("Enter ConnectToNetwork, networkId is %{public}d.", networkId);
     WifiDeviceConfig config;
@@ -571,7 +570,7 @@ ErrCode StaService::ConnectToNetwork(int networkId) const
     LOGI("ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, type);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -661,13 +660,15 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
 ErrCode StaService::Disconnect() const
 {
     WIFI_LOGI("Enter Disconnect.\n");
-    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
-    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
-        WIFI_LOGI("The blocklist is updated.\n");
+    if (m_instId == INSTID_WLAN0) {
+        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+        if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
+            WIFI_LOGI("The blocklist is updated.\n");
+        }
     }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISCONNECT);
     return WIFI_OPT_SUCCESS;
 }
@@ -834,17 +835,19 @@ std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
  
 void StaService::HandleScreenStatusChanged(int screenState)
 {
-    WIFI_LOGD("Enter HandleScreenStatusChanged screenState:%{public}d.", screenState);
+    WIFI_LOGD("Enter HandleScreenStatusChanged screenState:%{public}d, instId:%{public}d", screenState, m_instId);
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("pStaStateMachine is null!");
         return;
     }
     pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
-    if (screenState == MODE_STATE_OPEN) {
-        pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
-    } else {
-        pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
+    if (m_instId == INSTID_WLAN0) {
+        if (screenState == MODE_STATE_OPEN) {
+            pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
+        } else {
+            pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
+        }
     }
     if (pStaAppAcceleration != nullptr) {
         pStaAppAcceleration->HandleScreenStatusChanged(screenState);

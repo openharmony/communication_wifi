@@ -78,6 +78,7 @@
 /* -----------Feature service name-------------- */
 #define WIFI_SERVICE_STA "StaService"     /* STA */
 #define WIFI_SERVICE_SELFCURE "SelfCureService"  /* SELFCURE */
+#define WIFI_SERVICE_WIFIPRO "WifiProService"  /* WIFIPRO */
 #define WIFI_SERVICE_AP "ApService"       /* AP */
 #define WIFI_SERVICE_P2P "P2pService"     /* P2P */
 #define WIFI_SERVICE_SCAN "ScanService"   /* SCAN */

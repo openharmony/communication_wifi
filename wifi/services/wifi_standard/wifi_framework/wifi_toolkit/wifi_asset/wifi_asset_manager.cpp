@@ -16,6 +16,7 @@
 #include "wifi_asset_manager.h"
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
+#include "wifi_config_center.h"
  
 namespace OHOS {
 namespace Wifi {
@@ -115,6 +116,10 @@ static bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::s
         config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = HexToString(outArray[index++]);
         config.version = CheckDataLegal(outArray[index++]);
     }
+    if (config.keyMgmt != KEY_MGMT_NONE && (config.preSharedKey).length() == 0) {
+        LOGE("ArrayToWifiDeviceConfig, ssid : %{public}s psk empty!", SsidAnonymize(config.ssid).c_str());
+        return false;
+    }
     return true;
 }
  
@@ -136,6 +141,11 @@ void WifiAssetManager::WifiAssetTriggerSync()
  
 static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = true)
 {
+    int32_t ret = SEC_ASSET_INVALID_ARGUMENT;
+    if (config.keyMgmt != KEY_MGMT_NONE && (config.preSharedKey).length() == 0) {
+        LOGE("WifiAssetAttrAdd, ssid : %{public}s psk empty!", SsidAnonymize(config.ssid).c_str());
+        return ret;
+    }
     std::string aliasId = config.ssid + config.keyMgmt;
     /* secret */
     std::string secretWifiDevice = "";
@@ -163,7 +173,7 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
         {.tag = SEC_ASSET_TAG_SECRET, .value = secret},
         {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value = g_trustAccountValue},
     };
-    int32_t ret = AssetAdd(attr, sizeof(attr) / sizeof(attr[0]));
+    ret = AssetAdd(attr, sizeof(attr) / sizeof(attr[0]));
     if (flagSync) {
         WifiAssetManager::GetInstance().WifiAssetTriggerSync();
     }
@@ -223,6 +233,7 @@ WifiAssetManager::WifiAssetManager()
     if (assetServiceThread_ == nullptr) {
         assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
     }
+    firstSync_.store(false);
 }
 
 WifiAssetManager::~WifiAssetManager()
@@ -234,7 +245,7 @@ WifiAssetManager::~WifiAssetManager()
 
 void WifiAssetManager::InitUpLoadLocalDeviceSync()
 {
-    if (firstSync_) {
+    if (firstSync_.load()) {
         LOGE("WifiAssetManager, local data is sync");
         return;
     }
@@ -243,7 +254,7 @@ void WifiAssetManager::InitUpLoadLocalDeviceSync()
 
 void WifiAssetManager::CloudAssetSync()
 {
-    if (!firstSync_) {
+    if (!(firstSync_.load())) {
         LOGE("WifiAssetManager, local data not sync");
         return;
     }
@@ -293,7 +304,8 @@ void WifiAssetManager::WifiAssetQuery(int32_t userId)
             LOGE("WifiAssetQuery empty!");
         }
         AssetFreeResultSet(&resultSet);
-        WifiSettings::GetInstance().UpdateWifiConfigFromCloud(assetWifiConfig);
+        std::set<int> wifiLinkedNetworkIds = WifiConfigCenter::GetInstance().GetAllWifiLinkedNetworkId();
+        WifiSettings::GetInstance().UpdateWifiConfigFromCloud(assetWifiConfig, wifiLinkedNetworkIds);
         WifiSettings::GetInstance().SyncDeviceConfig();
         LOGD("WifiAssetQuery end");
     });
@@ -355,7 +367,7 @@ void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wif
             WifiAssetTriggerSync();
         }
         if (firstSync) {
-            firstSync_ = true;
+            firstSync_.store(true);
         }
     });
 }

@@ -241,7 +241,6 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastRxPackets = 0;
     linkedInfo.lastTxPackets = 0;
     linkedInfo.isAncoConnected = 0;
-    WifiSettings::GetInstance().SetDeviceAfterDisconnect();
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -829,6 +828,12 @@ void StaStateMachine::StopWifiProcess()
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
         linkedInfo.ssid = "";
     }
+    if (curConnState == ConnState::DISCONNECTING) {
+        /* Callback result to InterfaceService. */
+        linkedInfo.ssid = ssid;
+        InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
+        linkedInfo.ssid = "";
+    }
     SwitchState(pInitState);
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, m_instId);
 }
@@ -980,6 +985,9 @@ int StaStateMachine::InitStaSMHandleMap()
     };
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = [this](InternalMessagePtr msg) {
         return this->DealWpaStateChange(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_COM_STA_NETWORK_REMOVED] = [this](InternalMessagePtr msg) {
+        return this->DealNetworkRemoved(msg);
     };
     return WIFI_OPT_SUCCESS;
 }
@@ -2858,7 +2866,7 @@ void StaStateMachine::DisConnectProcess()
         }
         WIFI_LOGI("Disconnect update wifi status");
         /* Save connection information to WifiSettings. */
-        SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
+        SaveLinkstate(ConnState::DISCONNECTING, DetailedState::DISCONNECTING);
         WIFI_LOGI("Enter DisConnectProcess DisableNetwork ifaceName:%{public}s!", ifaceName.c_str());
         WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID, ifaceName);
 
@@ -3554,10 +3562,6 @@ void StaStateMachine::LinkedState::GoInState()
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
     if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
-        WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
-        WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
-            static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
-        WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
             pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);
@@ -3565,11 +3569,14 @@ void StaStateMachine::LinkedState::GoInState()
             pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
         }
 #endif
-    } else {
-        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
-        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-        pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
     }
+    WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
+    WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
+        static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
+    pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     WifiAssetManager::GetInstance().WifiAssetTriggerSync();
 #endif
@@ -3773,6 +3780,28 @@ void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
     linkedInfo.supplicantState = static_cast<SupplicantState>(status);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
 }
+
+void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealNetworkRemoved InternalMessage msg is null.");
+        return;
+    }
+    int networkId = 0;
+    networkId = msg->GetParam1();
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WIFI_LOGI("DealNetworkRemoved networkid = %{public}d linkinfo.networkid = %{public}d targetNetworkId = %{public}d",
+        networkId, linkedInfo.networkId, targetNetworkId);
+    if ((linkedInfo.networkId == networkId) ||
+        ((targetNetworkId == networkId) && (linkedInfo.connState == ConnState::CONNECTING))) {
+        std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+        WIFI_LOGI("Enter DisConnectProcess ifaceName:%{public}s!", ifaceName.c_str());
+        WifiStaHalInterface::GetInstance().Disconnect(ifaceName);
+    }
+ 
+    return;
+}
 /* --------------------------- state machine Roaming State ------------------------------ */
 StaStateMachine::ApRoamingState::ApRoamingState(StaStateMachine *staStateMachine)
     : State("ApRoamingState"), pStaStateMachine(staStateMachine)
@@ -3946,8 +3975,6 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     std::string realMacAddr;
     WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
-    WIFI_LOGI("ConnectToNetworkProcess instId:%{public}d, macAddr:%{public}s, realMacAddr:%{public}s",
-        m_instId, macAddr.c_str(), realMacAddr.c_str());
     linkedInfo.networkId = targetNetworkId;
     linkedInfo.bssid = bssid;
     linkedInfo.ssid = deviceConfig.ssid;

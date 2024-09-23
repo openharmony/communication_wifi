@@ -16,17 +16,19 @@
 #include "network_selection_utils.h"
 #include "network_status_history_manager.h"
 #include "wifi_common_util.h"
-
-#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+#include "wifi_config_center.h"
+#include "wifi_p2p_msg.h"
 #include "wifi_logger.h"
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
 #include "parameter.h"
 #endif
 
 namespace OHOS::Wifi::NetworkSelection {
+namespace {
+constexpr int32_t SCAN_5GHZ_BAND = 2;
+}
 
-#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
 DEFINE_WIFILOG_LABEL("NetworkSelectionUtils")
-#endif
 
 bool NetworkSelectionUtils::IsOpenNetwork(const NetworkCandidate &networkCandidate)
 {
@@ -80,6 +82,50 @@ std::string NetworkSelectionUtils::GetScoreResultsInfo(const std::vector<ScoreRe
     }
     scoreMsg << " ]";
     return scoreMsg.str();
+}
+
+bool NetworkSelectionUtils::IsConfigOpenType(const NetworkCandidate &networkCandidate)
+{
+    return !(IsOpenNetwork(networkCandidate) || NetworkSelectionUtils::IsScanResultForOweNetwork(networkCandidate)) &&
+        !HasWepKeys(networkCandidate.wifiDeviceConfig);
+}
+
+bool NetworkSelectionUtils::HasWepKeys(const WifiDeviceConfig &wifiConfig)
+{
+    for (int32_t i = 0; i < WEPKEYS_SIZE; i++) {
+        if (!wifiConfig.wepKeys[i].empty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool NetworkSelectionUtils::IsEnterprise(const NetworkCandidate &networkCandidate)
+{
+    auto &keyMgmt = networkCandidate.wifiDeviceConfig.keyMgmt;
+    bool isEnterpriseSecurityType = (keyMgmt == KEY_MGMT_EAP) || (keyMgmt == KEY_MGMT_SUITE_B_192) ||
+        (keyMgmt == KEY_MGMT_WAPI_CERT);
+    auto &eap = networkCandidate.wifiDeviceConfig.wifiEapConfig.eap;
+    return isEnterpriseSecurityType && (eap != EAP_METHOD_NONE);
+}
+
+bool NetworkSelectionUtils::IsConfigOpenOrEapType(const NetworkCandidate &networkCandidate)
+{
+    return IsConfigOpenType(networkCandidate) || IsEnterprise(networkCandidate);
+}
+
+bool NetworkSelectionUtils::IsSameFreqAsP2p(const NetworkCandidate &networkCandidate)
+{
+    WifiP2pGroupInfo group = WifiConfigCenter::GetInstance().GetCurrentP2pGroupInfo();
+    auto &interScanInfo = networkCandidate.interScanInfo;
+    int32_t p2pFrequency = group.GetFrequency();
+    if (interScanInfo.band == SCAN_5GHZ_BAND && p2pFrequency == interScanInfo.frequency) {
+        return true;
+    } else {
+        WIFI_LOGI("IsSameFreqAsP2p, p2p frequency:%{public}d and scanInfo frequency:%{public}d are not same",
+            p2pFrequency, interScanInfo.frequency);
+    }
+    return false;
 }
 
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT

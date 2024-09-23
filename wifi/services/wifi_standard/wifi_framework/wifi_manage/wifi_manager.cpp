@@ -36,6 +36,7 @@
 #include "wifi_sta_hal_interface.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_watchdog_utils.h"
+#include "power_mgr_client.h"
 #endif
 
 namespace OHOS {
@@ -79,7 +80,7 @@ int WifiManager::Init()
     }
 
     WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(
-        std::bind(&WifiManager::OnNativeProcessStatusChange, this, std::placeholders::_1));
+        [this](int status) { this->OnNativeProcessStatusChange(status); });
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
@@ -106,10 +107,10 @@ int WifiManager::Init()
         !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
         if (IsStartUpWifiEnableSupport()) {
             WIFI_LOGI("It's first start up, need open wifi before oobe");
-            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED);
+            WifiConfigCenter::GetInstance().SetPersistWifiState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         }
     }
-    int lastState = WifiSettings::GetInstance().GetStaLastRunState();
+    int lastState = WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0);
     if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
         WifiConfigCenter::GetInstance().SetWifiToggledState(lastState, INSTID_WLAN0);
@@ -123,6 +124,10 @@ int WifiManager::Init()
             wifiTogglerManager->ScanOnlyToggled(1);
         }
     }
+#ifndef OHOS_ARCH_LITE
+    WifiConfigCenter::GetInstance().SetScreenState(
+        PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
+#endif
     InitPidfile();
     CheckSapcoExist();
     return 0;

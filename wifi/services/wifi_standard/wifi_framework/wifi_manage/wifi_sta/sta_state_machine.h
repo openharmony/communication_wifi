@@ -327,7 +327,9 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+#ifndef OHOS_ARCH_LITE
         void CheckIfRestoreWifi();
+#endif
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;

@@ -397,7 +397,6 @@ ErrCode WifiServiceScheduler::PostStartWifi(int instId)
     ErrCode errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
     if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
         WIFI_LOGE("AutoStartStaService, AutoStartP2pService failed!");
-        return WIFI_OPT_FAILED;
     }
 #endif
     return WIFI_OPT_SUCCESS;

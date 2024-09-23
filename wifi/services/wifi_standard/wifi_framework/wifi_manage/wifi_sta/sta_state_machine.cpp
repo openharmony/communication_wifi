@@ -3489,7 +3489,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     if (linkedInfo.connState != ConnState::CONNECTED) {
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         WriteIsInternetHiSysEvent(NO_NETWORK);
+#ifndef OHOS_ARCH_LITE
         CheckDeviceEverConnected(false);
+#endif
         return;
     }
     mPortalUrl = portalUrl;
@@ -3545,10 +3547,13 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
+#ifndef OHOS_ARCH_LITE
     CheckDeviceEverConnected(true);
+#endif
     portalFlag = true;
 }
 
+#ifndef OHOS_ARCH_LITE
 void StaStateMachine::CheckDeviceEverConnected(bool hasNet)
 {
     WifiLinkedInfo linkedInfo;
@@ -3568,6 +3573,7 @@ void StaStateMachine::CheckDeviceEverConnected(bool hasNet)
         WifiSettings::GetInstance().SyncDeviceConfig();
     }
 }
+#endif
 
 void StaStateMachine::HandleArpCheckResult(StaArpState arpState)
 {

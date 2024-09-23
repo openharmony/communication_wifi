@@ -117,13 +117,6 @@ enum Wpa3ConnectFailReason {
     WPA3_FAIL_REASON_MAX
 };
 
-inline const std::map<int, int> wpa3FailreasonMap {
-    {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
-    {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
-    {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
-    {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
-};
-
 typedef enum EnumDhcpReturnCode {
     DHCP_RESULT,
     DHCP_JUMP,

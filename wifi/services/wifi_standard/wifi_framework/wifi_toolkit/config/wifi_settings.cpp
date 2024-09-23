@@ -2032,13 +2032,6 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
             LOGI("UpdateWifiConfigFromCloud, connected network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
             continue;
         }
-#ifdef FEATURE_ENCRYPTION_SUPPORT
-        if (!IsWifiDeviceConfigDeciphered(iter->second)) {
-            LOGI("UpdateWifiConfigFromCloud, encrypted network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
-            tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
-            continue;
-        }
-#endif
         if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
             EncryptionDeviceConfig(iter->second);
@@ -2047,6 +2040,13 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
             continue;
         }
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        if (!IsWifiDeviceConfigDeciphered(iter->second)) {
+            LOGI("UpdateWifiConfigFromCloud, encrypted network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
+            tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
+            continue;
+        }
+#endif
         LOGI("UpdateWifiConfigFromCloud remove from cloud %{public}s", SsidAnonymize(iter->second.ssid).c_str());
     }
     for (auto iter : newWifiDeviceConfigs) {

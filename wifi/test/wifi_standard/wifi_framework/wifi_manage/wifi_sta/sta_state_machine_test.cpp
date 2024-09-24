@@ -2013,9 +2013,9 @@ public:
         pStaStateMachine->HilinkSaveConfig();
     }
 
-    void CheckDeviceEverConnectedTest(bool hasNet)
+    void SyncDeviceEverConnectedStateTest(bool hasNet)
     {
-        pStaStateMachine->CheckDeviceEverConnected(hasNet);
+        pStaStateMachine->SyncDeviceEverConnectedState(hasNet);
     }
  
     void IsRoamingTest()
@@ -3199,10 +3199,10 @@ HWTEST_F(StaStateMachineTest, HilinkSaveConfigTest, TestSize.Level1)
     HilinkSaveConfigTest();
 }
 
-HWTEST_F(StaStateMachineTest, CheckDeviceEverConnectedTest, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, SyncDeviceEverConnectedStateTest, TestSize.Level1)
 {
     bool hasNet = false;
-    CheckDeviceEverConnectedTest(hasNet);
+    SyncDeviceEverConnectedStateTest(hasNet);
 }
 
 HWTEST_F(StaStateMachineTest, ReplaceEmptyDnsTest, TestSize.Level1)

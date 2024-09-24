@@ -3559,9 +3559,13 @@ void StaStateMachine::CheckDeviceEverConnected(bool hasNet)
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
+    std::map<std::string, std::string> variableMap;
     std::string HmosSettings;
-    if (enhanceService_ != nullptr) {
-        HmosSettings = enhanceService_->GetHmosSetting();
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("SETTINGS") != variableMap.end()) {
+        HmosSettings = variableMap["SETTINGS"];
     }
     if (!WifiSettings::GetInstance().GetDeviceEverConnected(networkId)) {
         if (!hasNet) {

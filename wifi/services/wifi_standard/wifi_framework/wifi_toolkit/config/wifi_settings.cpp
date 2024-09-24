@@ -2041,7 +2041,6 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
     const std::set<int> &wifiLinkedNetworkIds)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    LOGI("UpdateWifiConfigFromCloud enter");
     std::map<int, WifiDeviceConfig> tempConfigs;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (wifiLinkedNetworkIds.count(iter->second.networkId) != 0) {
@@ -2050,12 +2049,16 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
             continue;
         }
         if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            EncryptionDeviceConfig(iter->second);
+#endif
+            LOGI("UpdateWifiConfigFromCloud, modify network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
             continue;
         }
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-        // Do not remove local encrypted data
         if (!IsWifiDeviceConfigDeciphered(iter->second)) {
+            LOGI("UpdateWifiConfigFromCloud, encrypted network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
             continue;
         }
@@ -2073,14 +2076,18 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
-        LOGI("UpdateWifiConfigFromCloud new %{public}s", SsidAnonymize(iter.ssid).c_str());
+        LOGI("UpdateWifiConfigFromCloud new %{public}s , psksize : %{public}d", SsidAnonymize(iter.ssid).c_str(),
+            static_cast<int>((iter.preSharedKey).length()));
         iter.networkId = mNetworkId;
+        iter.version = 0;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        EncryptionDeviceConfig(iter);
+#endif
         tempConfigs.emplace(std::make_pair(iter.networkId, iter));
         mNetworkId++;
     }
     mWifiDeviceConfig.swap(tempConfigs);
 }
-
 void WifiSettings::UpLoadLocalDeviceConfigToCloud()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

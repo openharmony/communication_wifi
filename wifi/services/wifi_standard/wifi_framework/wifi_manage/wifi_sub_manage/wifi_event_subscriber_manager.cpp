@@ -898,7 +898,7 @@ void CesEventSubscriber::OnReceiveWlanKeepConnected(const OHOS::EventFwk::Common
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
     WIFI_LOGI("received the WlanKeepConnected, action ==%{public}s, code == %{public}d", action.c_str(), code);
-    if (code == 1) {
+    if (code == 1) { // The user clicks the use button.
         WifiNetAgent::GetInstance().RestoreWifiConnection();
         WIFI_LOGI("change the value of AcceptUnvalidated to true");
         WifiSettings::GetInstance().SetAcceptUnvalidated(networkId);

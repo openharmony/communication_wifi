@@ -416,7 +416,7 @@ private:
     WifiP2pServiceManager &serviceManager;   /* service manager */
     ClientCallBack clientCallBack;
     ServerCallBack serverCallBack;
-    DhcpResultNotify *pDhcpResultNotify = nullptr;
+    DhcpResultNotify *pDhcpResultNotify;
     DhcpdInterface m_DhcpdInterface;
     AuthorizingNegotiationRequestState &p2pAuthorizingNegotiationRequestState;
     GroupFormedState &p2pGroupFormedState;
@@ -436,7 +436,6 @@ private:
     ProvisionDiscoveryState &p2pProvisionDiscoveryState;
     static DHCPTYPE m_isNeedDhcp;
     std::string p2pDevIface;
-    bool p2pSmInitFlag;
     static std::mutex m_gcJoinmutex;
 
 public:

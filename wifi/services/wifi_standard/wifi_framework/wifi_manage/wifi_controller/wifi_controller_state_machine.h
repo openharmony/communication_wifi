@@ -145,6 +145,7 @@ private:
     ConcreteManagerRole GetWifiRole();
     void StopAllConcreteManagers();
     void StopConcreteManager(int id);
+    void StopAllMultiStaManagers();
     void StopMultiStaManager(int id);
     void SwitchRole(ConcreteManagerRole role);
     void HandleAirplaneOpen();

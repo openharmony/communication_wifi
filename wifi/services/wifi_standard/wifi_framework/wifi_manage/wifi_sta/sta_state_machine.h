@@ -1272,7 +1272,6 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
-    void CreateWifi2Config(int &networkId);
 };
 }  // namespace Wifi
 }  // namespace OHOS

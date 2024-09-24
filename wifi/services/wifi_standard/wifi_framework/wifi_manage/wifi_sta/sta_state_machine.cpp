@@ -164,7 +164,7 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-    if (m_instId == 0) {
+    if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
         NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
         m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
@@ -1147,27 +1147,6 @@ void StaStateMachine::OnConnectFailed(int networkId)
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
 }
 
-void StaStateMachine::CreateWifi2Config(int &networkId)
-{
-    WifiDeviceConfig config1;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config1, m_instId) != 0) {
-        LOGE("GetDeviceConfig failed m_instId = %{public}d", m_instId);
-        return;
-    }
-    if (config1.instanceId != m_instId) {
-        int netWorkId2 = INVALID_NETWORK_ID;
-        netWorkId2 = WifiSettings::GetInstance().GetNextNetworkId();
-        LOGI("DealConnectToUserSelectedNetwork netWorkId2 = %{public}d, m_instId = %{public}d", netWorkId2, m_instId);
-        config1.networkId = netWorkId2;
-        config1.instanceId = m_instId;
-        WifiSettings::GetInstance().AddDeviceConfig(config1);
-        WifiSettings::GetInstance().SyncDeviceConfig();
-        networkId = netWorkId2;
-    }
-    LOGI("DealConnectToUserSelectedNetwork the same networkId = %{public}d, m_instId = %{public}d",
-        networkId, m_instId);
-}
-
 void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
 {
     LOGI("enter DealConnectToUserSelectedNetwork m_instId = %{public}d\n", m_instId);
@@ -1176,7 +1155,6 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
         return;
     }
     int networkId = msg->GetParam1();
-    CreateWifi2Config(networkId);
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
@@ -1756,7 +1734,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
 
     targetNetworkId = networkId;
     SetRandomMac(targetNetworkId, bssid);
-    LOGE("StartConnectToNetwork SetRandomMac targetNetworkId:%{public}d, bssid:%{public}s", targetNetworkId,
+    LOGI("StartConnectToNetwork SetRandomMac targetNetworkId:%{public}d, bssid:%{public}s", targetNetworkId,
         MacAnonymize(bssid).c_str());
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
@@ -2851,7 +2829,6 @@ void StaStateMachine::DisConnectProcess()
     WIFI_LOGI("Enter DisConnectProcess m_instId:%{public}d!", m_instId);
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
-    WIFI_LOGI("Enter DisConnectProcess ifaceName:%{public}s!", ifaceName.c_str());
     if (WifiStaHalInterface::GetInstance().Disconnect(ifaceName) == WIFI_HAL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
         if (m_instId == INSTID_WLAN0) {

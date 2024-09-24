@@ -436,6 +436,7 @@ private:
     ProvisionDiscoveryState &p2pProvisionDiscoveryState;
     static DHCPTYPE m_isNeedDhcp;
     std::string p2pDevIface;
+    bool p2pSmInitFlag;
     static std::mutex m_gcJoinmutex;
 
 public:

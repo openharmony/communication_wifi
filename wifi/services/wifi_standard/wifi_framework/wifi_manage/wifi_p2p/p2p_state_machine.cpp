@@ -79,7 +79,8 @@ P2pStateMachine::P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &group
       p2pIdleState(idleState),
       p2pInvitingState(invitingState),
       p2pProvisionDiscoveryState(provisionDiscoveryState),
-      p2pDevIface()
+      p2pDevIface(),
+      p2pSmInitFlag(false)
 {
     Initialize();
 }
@@ -95,6 +96,7 @@ P2pStateMachine::~P2pStateMachine()
         pDhcpResultNotify = nullptr;
     }
     AbstractUI::GetInstance().UnInit();
+    p2pSmInitFlag = false;
 }
 
 void P2pStateMachine::Initialize()
@@ -134,6 +136,7 @@ void P2pStateMachine::Initialize()
     if (pDhcpResultNotify == nullptr) {
         WIFI_LOGW("pDhcpResultNotify Initialize failed.");
     }
+    p2pSmInitFlag = true;
     return;
 }
 

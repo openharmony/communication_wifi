@@ -553,19 +553,15 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
     }
     if (!pSelfCureStateMachine->staticIpCureSuccess && msg->GetParam2() == 1) {
         if (hasInternetRecently || portalUnthenEver || pSelfCureStateMachine->internetUnknown) {
-            if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
-                return;
-            }
             pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
             TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
-            return;
         } else if (pSelfCureStateMachine->internetUnknown && pSelfCureStateMachine->IfMultiGateway()) {
             pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_TCP;
             TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_TCP);
-            return;
         } else {
             WIFI_LOGI("Handle network disable, there is not a expectant condition!.");
         }
+        return;
     }
     pSelfCureStateMachine->selfCureOnGoing = true;
     if (pSelfCureStateMachine->mIsHttpReachable) {
@@ -802,7 +798,6 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     hasInternetRecently = false;
     portalUnthenEver = false;
     userSetStaticIpConfig = false;
-    currentGateway = pSelfCureStateMachine->GetCurrentGateway();
     testedSelfCureLevel.clear();
     finalSelfCureUsed = false;
     delayedReassocSelfCure = false;
@@ -831,6 +826,7 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     userSetStaticIpConfig = ipAssignment == AssignIpMethod::STATIC;
     lastHasInetTime = pSelfCureStateMachine->GetLastHasInternetTime();
     configAuthType = pSelfCureStateMachine->GetAuthType();
+    InitCurrentGateway();
     return;
 }
 
@@ -1306,6 +1302,19 @@ IpInfo SelfCureStateMachine::InternetSelfCureState::GetRecordDhcpResults()
     return ipInfo;
 }
 
+void SelfCureStateMachine::InternetSelfCureState::InitCurrentGateway()
+{
+    IpInfo ipInfo;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, pSelfCureStateMachine->m_instId);
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("InitCurrentGateway get pEnhanceService service failed!");
+        return;
+    }
+    uint32_t retSize = 0;
+    pEnhanceService->DealDhcpOfferResult(OperationCmd::CURRENT_IP_INFO_SET, ipInfo, retSize);
+}
+
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForStaticIp(int requestCureLevel)
 {
     IpInfo dhcpResult;
@@ -1564,7 +1573,6 @@ void SelfCureStateMachine::InternetSelfCureState::HandleIpConfigCompleted()
 
 void SelfCureStateMachine::InternetSelfCureState::HandleIpConfigCompletedAfterRenewDhcp()
 {
-    currentGateway = pSelfCureStateMachine->GetCurrentGateway();
     pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, IP_CONFIG_CONFIRM_DELAYED_MS);
 }
 
@@ -2962,15 +2970,6 @@ bool SelfCureStateMachine::IsEncryptedAuthType(const std::string authType)
         return true;
     }
     return false;
-}
-
-std::string SelfCureStateMachine::GetCurrentGateway()
-{
-    std::string gateway = "";
-    IpInfo ipInfo;
-    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, m_instId);
-    gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
-    return gateway;
 }
 
 void SelfCureStateMachine::UpdateSelfCureConnectHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel,

@@ -285,6 +285,7 @@ void WifiControllerMachine::HandleAirplaneOpen()
     StopAllSoftapManagers();
 #endif
     if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() || !ShouldEnableWifi(INSTID_WLAN0)) {
+        StopAllMultiStaManager();
         StopAllConcreteManagers();
     }
 }

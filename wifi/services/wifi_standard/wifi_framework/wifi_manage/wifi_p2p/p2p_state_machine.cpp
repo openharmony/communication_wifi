@@ -1242,7 +1242,7 @@ void P2pStateMachine::StopP2pDhcpClient()
     StopDhcpClient(ifName.c_str(), false);
 }
 
-void P2pStateMachine::DoP2pArp(std::string &serverIp, std::string &clientIp)
+void P2pStateMachine::DoP2pArp(std::string serverIp, std::string clientIp)
 {
     ArpChecker arpChecker;
     unsigned char macAddr[MAC_LEN];

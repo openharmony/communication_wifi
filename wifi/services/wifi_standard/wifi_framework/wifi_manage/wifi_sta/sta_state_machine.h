@@ -549,7 +549,7 @@ public:
     void DealNetworkRemoved(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
-    void CheckDeviceEverConnected(bool hasNet);
+    void SyncDeviceEverConnectedState(bool hasNet);
 #endif
 
     bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);

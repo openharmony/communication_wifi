@@ -385,6 +385,17 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         WIFI_LOGI("current power saving mode and can not use ap, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
+
+    if (WifiManager::GetInstance().GetWifiMultiVapManager() == nullptr) {
+        WIFI_LOGE("GetWifiMultiVapManager Fail");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (!WifiManager::GetInstance().GetWifiMultiVapManager()->CheckCanUseSoftAp()) {
+        WIFI_LOGE("SoftAp is not allowed to use");
+        return WIFI_OPT_FAILED;
+    }
+
     return WIFI_OPT_SUCCESS;
 }
 

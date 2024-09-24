@@ -40,7 +40,15 @@ bool WifiMultiVapManager::CheckCanUseP2p()
 
 bool WifiMultiVapManager::CheckCanUseSoftAp()
 {
-    // to be implemented
+#ifdef FEATURE_VAP_MANAGER_SUPPORT
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService) {
+        return pEnhanceService->CheckEnhanceVapAvailable();
+    } else {
+        // to be implemented
+        return true;
+    }
+#endif
     return true;
 }
 

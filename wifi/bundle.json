@@ -63,7 +63,8 @@
             "wifi_feature_with_hdi_wpa_supported",
             "wifi_feature_with_scan_control",
             "wifi_feature_network_selection",
-            "wifi_feature_with_hdi_chip_supported"
+            "wifi_feature_with_hdi_chip_supported",
+            "wifi_feature_with_vap_manager"
         ],
         "adapted_system_type": [
             "small",

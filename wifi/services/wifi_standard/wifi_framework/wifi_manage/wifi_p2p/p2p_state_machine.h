@@ -404,7 +404,7 @@ private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;
     GcInfo MatchDevInGcInfos(const std::string &deviceAddr, const std::string &groupAddr, std::vector<GcInfo> &gcInfos);
     void StopP2pDhcpClient();
-    void DoP2pArp(std::string &serverIp, std::string &clientIp);
+    void DoP2pArp(std::string serverIp, std::string clientIp);
 
 private:
     mutable std::mutex cbMapMutex;

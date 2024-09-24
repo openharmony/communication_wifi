@@ -72,9 +72,9 @@ HWTEST_F(WifiNotificationUtilTest, ShowDialogTest001, TestSize.Level1)
     wifiNotificationUtil.ShowDialog(WifiDialogType::CDD);
 }
 
-HWTEST_F(WifiNotificationUtilTest, NoNetDialogTest001, TestSize.Level1)
+HWTEST_F(WifiNotificationUtilTest, ShowSettingsDialogTest001, TestSize.Level1)
 {
     WifiNotificationUtil wifiNotificationUtil;
-    std::string HmosSettings = "";
-    wifiNotificationUtil.NoNetDialog(WifiDialogType::CDD, HmosSettings);
+    std::string settings = "";
+    wifiNotificationUtil.ShowSettingsDialog(WifiDialogType::CDD, settings);
 }

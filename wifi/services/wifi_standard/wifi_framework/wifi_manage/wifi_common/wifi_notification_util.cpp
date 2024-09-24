@@ -136,9 +136,9 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type)
     IPCSkeleton::SetCallingIdentity(identity);
 }
 
-void WifiNotificationUtil::NoNetDialog(WifiDialogType type, std::string HmosSettings)
+void WifiNotificationUtil::ShowSettingsDialog(WifiDialogType type, std::string settings)
 {
-    WIFI_LOGI("NoNetDialog, type=%{public}d", static_cast<int32_t>(type));
+    WIFI_LOGI("ShowSettingsDialog, type=%{public}d", static_cast<int32_t>(type));
     AAFwk::Want want;
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
@@ -146,12 +146,12 @@ void WifiNotificationUtil::NoNetDialog(WifiDialogType type, std::string HmosSett
     nlohmann::json param;
     param["ability.want.params.uiExtensionType"] = "sysDialog/common";
     std::string cmdData = param.dump();
-    if (HmosSettings.empty()) {
-        WIFI_LOGI("Hmos Settings is null");
+    if (settings.empty()) {
+        WIFI_LOGI("settings name is null");
         return;
     }
     sptr<UIExtensionAbilityConnection> connection(
-        new (std::nothrow) UIExtensionAbilityConnection(cmdData, HmosSettings, "WifiNotAvailableDialog"));
+        new (std::nothrow) UIExtensionAbilityConnection(cmdData, settings, "WifiNotAvailableDialog"));
     if (connection == nullptr) {
         WIFI_LOGE("connect UIExtensionAbilityConnection fail");
         return;

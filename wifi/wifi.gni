@@ -51,6 +51,7 @@ declare_args() {
       defined(global_parts_info.hdf_drivers_interface_wlan)) {
     wifi_feature_with_hdi_chip_supported = true
   }
+  wifi_feature_with_vap_manager = true
 }
 
 memory_optimization_cflags = [

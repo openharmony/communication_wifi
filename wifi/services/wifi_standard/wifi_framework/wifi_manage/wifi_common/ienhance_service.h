@@ -90,12 +90,6 @@ public:
     virtual bool CheckChbaConncted() = 0;
 
     /**
-     * @Description get Hmos Settings pkg name
-     *
-     * @return Hmos Settings pkg name
-     */
-    virtual std::string GetHmosSetting() = 0;
-    /**
      * @Description Is external scan allowed.
      *
      * @param scanDeviceInfo - scan device info

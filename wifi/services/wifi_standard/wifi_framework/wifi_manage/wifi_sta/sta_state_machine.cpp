@@ -3490,7 +3490,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         WriteIsInternetHiSysEvent(NO_NETWORK);
 #ifndef OHOS_ARCH_LITE
-        CheckDeviceEverConnected(false);
+        SyncDeviceEverConnectedState(false);
 #endif
         return;
     }
@@ -3548,29 +3548,29 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
 #ifndef OHOS_ARCH_LITE
-    CheckDeviceEverConnected(true);
+    SyncDeviceEverConnectedState(true);
 #endif
     portalFlag = true;
 }
 
 #ifndef OHOS_ARCH_LITE
-void StaStateMachine::CheckDeviceEverConnected(bool hasNet)
+void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
     std::map<std::string, std::string> variableMap;
-    std::string HmosSettings;
+    std::string settings;
     if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
     }
     if (variableMap.find("SETTINGS") != variableMap.end()) {
-        HmosSettings = variableMap["SETTINGS"];
+        settings = variableMap["SETTINGS"];
     }
     if (!WifiSettings::GetInstance().GetDeviceEverConnected(networkId)) {
         if (!hasNet) {
             /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
-            WifiNotificationUtil::GetInstance().NoNetDialog(WifiDialogType::CDD, HmosSettings);
+            WifiNotificationUtil::GetInstance().ShowSettingsDialog(WifiDialogType::CDD, settings);
         }
         WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
         WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);

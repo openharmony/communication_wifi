@@ -250,9 +250,9 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     } else if (key == "randomizedMacSuccessEver") {
         item.randomizedMacSuccessEver = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
     } else if (key == "everConnected") {
-        item.everConnected = (std::stoi(value) != 0);
+        item.everConnected = (CheckDataLegal(value) != 0);
     } else if (key == "acceptUnvalidated") {
-        item.acceptUnvalidated = (std::stoi(value) != 0);
+        item.acceptUnvalidated = (CheckDataLegal(value) != 0);
     } else if (key == "macAddress") {
         item.macAddress = value;
     } else if (key == "portalAuthTime") {

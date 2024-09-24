@@ -38,9 +38,6 @@ SelfCureService::~SelfCureService()
         pSelfCureStateMachine = nullptr;
     }
     UnRegisterP2pEnhanceCallback();
-    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
-        DelayedSingleton<SelfCureUtils>::GetInstance()->UnRegisterDnsResultCallback();
-    }
 }
 
 ErrCode SelfCureService::InitSelfCureService()
@@ -54,9 +51,6 @@ ErrCode SelfCureService::InitSelfCureService()
     if (pSelfCureStateMachine->Initialize() != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("InitSelfCureStateMachine failed.\n");
         return WIFI_OPT_FAILED;
-    }
-    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
-        DelayedSingleton<SelfCureUtils>::GetInstance()->RegisterDnsResultCallback();
     }
     return WIFI_OPT_SUCCESS;
 }

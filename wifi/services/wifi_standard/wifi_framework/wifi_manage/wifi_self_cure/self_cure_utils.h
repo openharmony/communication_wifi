@@ -39,7 +39,7 @@ private:
         int32_t GetWifiNetId();
         int32_t GetDefaultNetId();
     public:
-        int32_t dnsFailedCounter_;
+        int32_t dnsFailedCounter_ = 0;
     };
 
 private:

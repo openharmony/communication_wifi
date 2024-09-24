@@ -849,6 +849,7 @@ enum class OperationCmd {
     DHCP_OFFER_ADD,
     DHCP_OFFER_SIZE_GET,
     DHCP_OFFER_CLEAR,
+    CURRENT_IP_INFO_SET,
 };
 
 enum class WifiSelfcureType {

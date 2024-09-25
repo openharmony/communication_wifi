@@ -409,6 +409,30 @@ HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->UnRegisterLocationEvent();
 }
 
+HWTEST_F(WifiManagerTest, RegisterNetworkStateChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("RegisterNetworkStateChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->RegisterNetworkStateChangeEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterNetworkStateChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("UnRegisterNetworkStateChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->UnRegisterNetworkStateChangeEvent();
+}
+
+HWTEST_F(WifiManagerTest, RegisterWifiScanChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("RegisterWifiScanChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("UnRegisterWifiScanChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
+}
+
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");

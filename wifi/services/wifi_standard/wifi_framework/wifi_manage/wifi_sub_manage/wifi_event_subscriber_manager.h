@@ -79,14 +79,14 @@ public:
 };
 #endif
 
-class NetworkStateChangeSubscriber: public OHOS::EventFwk::CommonEventSubscriber {
+class NetworkStateChangeSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit NetworkStateChangeSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     ~NetworkStateChangeSubscriber() = default;
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
-class WifiScanEventChangeSubscriber: public OHOS::EventFwk::CommonEventSubscriber {
+class WifiScanEventChangeSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit WifiScanEventChangeSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     ~WifiScanEventChangeSubscriber() = default;

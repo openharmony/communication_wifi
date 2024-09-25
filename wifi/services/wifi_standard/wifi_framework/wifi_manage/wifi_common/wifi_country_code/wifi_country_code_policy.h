@@ -33,7 +33,7 @@ public:
      *
      * @param wifiCountryCodePolicyConf wifi country code policy config
      */
-    WifiCountryCodePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf);
+    explicit WifiCountryCodePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf);
     /**
      * @Description WifiCountryCodePolicy destructor
      */
@@ -51,6 +51,7 @@ public:
      */
     void HandleScanResultAction();
 private:
+    void CreatePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf);
     ErrCode GetWifiCountryCodeByFactory(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByMcc(std::string &wifiCountryCode);
     ErrCode StatisticCountryCodeFromScanResult(std::string &wifiCountryCode);

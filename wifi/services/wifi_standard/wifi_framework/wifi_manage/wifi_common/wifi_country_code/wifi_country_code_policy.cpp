@@ -32,7 +32,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCountryCodePolicy");
 
-+WifiCountryCodePolicy::WifiCountryCodePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf)
+WifiCountryCodePolicy::WifiCountryCodePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf)
 {
     CreatePolicy(wifiCountryCodePolicyConf);
 }

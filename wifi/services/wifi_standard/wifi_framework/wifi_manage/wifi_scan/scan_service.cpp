@@ -24,6 +24,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
+#include "wifi_common_event_helper.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
@@ -601,7 +602,7 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
         ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL));
         scanResultBackup = static_cast<int>(ScanHandleNotify::SCAN_FAIL);
     }
-
+    WifiCommonEventHelper::PublishScanFinishedEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL), "OnScanFinished");
     return;
 }
 
@@ -683,6 +684,7 @@ void ScanService::HandleScanResults(std::vector<int> &requestIndexList, std::vec
     } else {
         WIFI_LOGI("No need to report scan finish event.\n");
     }
+    WifiCommonEventHelper::PublishScanFinishedEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), "OnScanFinished");
 }
 
 int ScanService::GetWifiMaxSupportedMaxSpeed(const InterScanInfo &scanInfo, const int &maxNumberSpatialStreams)

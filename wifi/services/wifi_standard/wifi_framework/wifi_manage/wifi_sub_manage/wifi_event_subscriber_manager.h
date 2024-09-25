@@ -78,6 +78,21 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 #endif
+
+class NetworkStateChangeSubscriber: public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit NetworkStateChangeSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~NetworkStateChangeSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
+class WifiScanEventChangeSubscriber: public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit WifiScanEventChangeSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~WifiScanEventChangeSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
@@ -138,16 +153,26 @@ private:
     void RegisterAssetEvent();
     void UnRegisterAssetEvent();
 #endif
+    void RegisterNetworkStateChangeEvent();
+    void UnRegisterNetworkStateChangeEvent();
+    void RegisterWifiScanChangeEvent();
+    void UnRegisterWifiScanChangeEvent();
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
     uint32_t notificationTimerId{0};
     uint32_t accessDatashareTimerId{0};
+    uint32_t networkStateChangeTimerId{0};
+    uint32_t wifiScanChangeTimerId{0};
     std::mutex cesEventMutex;
     std::mutex notificationEventMutex;
+    std::mutex networkStateChangeEventMutex;
+    std::mutex wifiScanChangeEventMutex;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
     std::shared_ptr<NotificationEventSubscriber> wifiNotificationSubsciber_ = nullptr;
+    std::shared_ptr<NetworkStateChangeSubscriber> networkStateChangeSubsciber_ = nullptr;
+    std::shared_ptr<WifiScanEventChangeSubscriber> wifiScanEventChangeSubscriber_ = nullptr;
 #ifdef HAS_MOVEMENT_PART
     std::mutex deviceMovementEventMutex;
 #endif

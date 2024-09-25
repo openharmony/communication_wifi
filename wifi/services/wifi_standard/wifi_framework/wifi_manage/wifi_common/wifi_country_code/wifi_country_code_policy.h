@@ -19,9 +19,6 @@
 #include <bitset>
 #include <list>
 #include <string>
-#include "common_event_manager.h"
-#include "common_event_support.h"
-#include "common_event_subscriber.h"
 #include "wifi_errcode.h"
 #include "wifi_scan_msg.h"
 #include "wifi_country_code_define.h"
@@ -33,13 +30,14 @@ class WifiCountryCodePolicy {
 public:
     /**
      * @Description WifiCountryCodePolicy constructor
+     *
+     * @param wifiCountryCodePolicyConf wifi country code policy config
      */
-    WifiCountryCodePolicy();
-
+    WifiCountryCodePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf);
     /**
      * @Description WifiCountryCodePolicy destructor
      */
-    ~WifiCountryCodePolicy();
+    ~WifiCountryCodePolicy() = default;
 
     /**
      * @Description calculate wifi countryCode
@@ -47,56 +45,14 @@ public:
      * @return wifiCountryCode - country code
      */
     ErrCode CalculateWifiCountryCode(std::string &wifiCountryCode);
+
+    /**
+     * @Description handle scan result action
+     */
+    void HandleScanResultAction();
 private:
-    class TelephoneNetworkSearchStateChangeListener : public OHOS::EventFwk::CommonEventSubscriber {
-    public:
-        /**
-         * @Description TelephoneNetworkSearchStateChangeListener constructor
-         */
-        explicit TelephoneNetworkSearchStateChangeListener(
-            const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
-
-        /**
-         * @Description TelephoneNetworkSearchStateChangeListener destructor
-         */
-        ~TelephoneNetworkSearchStateChangeListener() = default;
-
-        /**
-        * @Description on receive telephone network search state change event
-        *
-        * @param direction - event data
-        */
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
-    };
-
-    class WifiScanEventListener : public OHOS::EventFwk::CommonEventSubscriber {
-    public:
-        /**
-         * @Description WifiScanEventListener constructor
-         */
-        WifiScanEventListener(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo,
-            WifiCountryCodePolicy *wifiCountryCodePolicy);
-
-        /**
-         * @Description WifiScanEventListener destructor
-         */
-        ~WifiScanEventListener() = default;
-
-        /**
-         * @Description on receive change event
-         *
-         * @param direction - event data
-         */
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
-    private:
-        WifiCountryCodePolicy *m_wifiCountryCodePolicyPtr;
-    };
-
-    void CreatePolicy();
-    void GetWifiCountryCodePolicy();
     ErrCode GetWifiCountryCodeByFactory(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByMcc(std::string &wifiCountryCode);
-    void HandleScanResultAction();
     ErrCode StatisticCountryCodeFromScanResult(std::string &wifiCountryCode);
     ErrCode FindLargestCountCountryCode(std::string &wifiCountryCode);
     ErrCode ParseCountryCodeElement(const std::vector<WifiInfoElem> &infoElems, std::string &wifiCountryCode);
@@ -110,12 +66,9 @@ private:
     ErrCode GetWifiCountryCodeByDefault(std::string &wifiCountryCode);
     bool IsContainBssid(const std::vector<std::string> &bssidList, const std::string &bssid);
 
-    std::shared_ptr<TelephoneNetworkSearchStateChangeListener> m_telephoneNetworkSearchStateChangeListener;
-    std::shared_ptr<WifiScanEventListener> m_wifiScanFinishCommonEventListener;
     std::vector<std::vector<std::string>> m_allBssidVector;
     std::map<std::string, std::string> m_bssidAndCountryCodeMap;
     std::string m_wifiCountryCodeFromScanResults;
-    std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> m_wifiCountryCodePolicyConf;
     std::list<std::function<ErrCode(std::string&)>> m_policyList;
 };
 }

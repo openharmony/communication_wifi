@@ -22,7 +22,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_scan_death_recipient.h"
 #include "wifi_common_def.h"
-#include "wifi_scan_config.h"
+#include "wifi_config_center.h"
 #include "wifi_common_util.h"
 #include "wifi_watchdog_utils.h"
 
@@ -165,9 +165,9 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
     std::string name = data.ReadString();
     WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d",
         code, data.GetRawDataSize(), compatible);
-    WifiScanConfig::GetInstance().SetAppPackageName(name);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(name);
     ErrCode ret = Scan(compatible);
-    WifiScanConfig::GetInstance().SetAppPackageName("");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -197,9 +197,9 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
     params.band = static_cast<uint32_t>(data.ReadInt32());
     std::string name = data.ReadString();
 
-    WifiScanConfig::GetInstance().SetAppPackageName(name);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(name);
     ErrCode ret = AdvanceScan(params);
-    WifiScanConfig::GetInstance().SetAppPackageName("");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

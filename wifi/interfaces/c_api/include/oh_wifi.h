@@ -64,7 +64,7 @@ typedef enum WifiResultCode {
      * @error Operation failed.
      * Possible reasons: Internal execution failed.
      */
-    WIFI_OPERATION_FAILED = 1000
+    WIFI_OPERATION_FAILED = 2501000
 } WifiResultCode;
 
 /**
@@ -78,7 +78,7 @@ typedef enum WifiResultCode {
  *     For a detailed definition, please refer to {@link WifiResultCode}.\n
  *     {@link WIFI_SUCCESS} Successfully obtained the wifi switch status.\n
  *     {@link WIFI_INVALID_PARAM} The input parameter enabled is a null pointer.\n
- *     {@link WIFI_PERMISSION_DENIED} The application does not have the permission required to call the API.\n
+ *     {@link WIFI_OPERATION_FAILED} Internal execution failed.\n
  * @since 13
  */
 WifiResultCode OH_Wifi_IsWifiEnabled(bool *enabled);

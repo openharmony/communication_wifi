@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Wifi {
+using P2pEnhanceCallback = std::function<void(const std::string &, int32_t)>;
 class IEnhanceService {
 public:
     virtual ~IEnhanceService() = default;
@@ -130,7 +131,21 @@ public:
      * @return true: support, false: not support
      */
     virtual bool IsWideBandwidthSupported() = 0;
-    
+
+    /**
+     * @Description Register P2pEnhance state Callback
+     *
+     * @param p2pEnhanceCallback - callback
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RegisterP2pEnhanceCallback(P2pEnhanceCallback callback) = 0;
+
+    /**
+     * @Description unRegister P2pEnhance state Callback
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UnRegisterP2pEnhanceCallback() = 0;
     /**
      * @Description Check if custom network
      *

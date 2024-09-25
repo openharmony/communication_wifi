@@ -1433,7 +1433,7 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
 
     IfaceType ifaceType = IFACE_TYPE_DEFAULT;
     if (!GetIfaceType(iface, ifaceType)) {
-        LOGE("RemoveIface, get iface type failed");
+        LOGI("RemoveIface, get iface type failed");
         return false;
     }
 

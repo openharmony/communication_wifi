@@ -41,7 +41,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
-        MultiStaStateMachine *pMultiStaStateMachine;
+        MultiStaStateMachine *pMultiStaStateMachine = nullptr;
         void HandleStartInIdleState(InternalMessagePtr msg);
     };
 
@@ -54,7 +54,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
-        MultiStaStateMachine *pMultiStaStateMachine;
+        MultiStaStateMachine *pMultiStaStateMachine = nullptr;
     };
 
     class StartedState : public State {
@@ -66,7 +66,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
-        MultiStaStateMachine *pMultiStaStateMachine;
+        MultiStaStateMachine *pMultiStaStateMachine = nullptr;
     };
 
 public:

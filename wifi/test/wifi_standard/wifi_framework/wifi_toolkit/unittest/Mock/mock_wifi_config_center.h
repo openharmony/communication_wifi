@@ -18,6 +18,7 @@
 
 #include <gmock/gmock.h>
 #include "wifi_internal_msg.h"
+#include "mock_wifi_scan_config.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -139,11 +140,13 @@ public:
     virtual void CleanWifiCategoryRecord() = 0;
     virtual void SetPersistWifiState(int state, int instId) = 0;
     virtual int GetPersistWifiState(int instId) = 0;
+    virtual void UpdateLinkedInfo(int instId) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
 public:
     static WifiConfigCenter &GetInstance();
+    std::unique_ptr<WifiScanConfig>& GetWifiScanConfig();
 
     MOCK_METHOD1(SetWifiSelfcureReset, void(const bool isReset));
     MOCK_CONST_METHOD0(GetWifiSelfcureReset, bool());
@@ -258,6 +261,11 @@ public:
     MOCK_METHOD0(CleanWifiCategoryRecord, void());
     MOCK_METHOD2(SetPersistWifiState, void(int state, int instId));
     MOCK_METHOD1(GetPersistWifiState, int(int instId));
+    MOCK_METHOD1(UpdateLinkedInfo, void(int instId));
+
+private:
+    WifiConfigCenter();
+    std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
 };
 }  // namespace OHOS
 }  // namespace Wifi

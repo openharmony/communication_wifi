@@ -213,7 +213,7 @@ bool WifiCountryCodePolicy::IsContainBssid(const std::vector<std::string> &bssid
 ErrCode WifiCountryCodePolicy::StatisticCountryCodeFromScanResult(std::string &wifiCountryCode)
 {
     std::vector<WifiScanInfo> results;
-    WifiConfigCenter::GetInstance().GetScanInfoList(results);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(results);
     if (results.size() == 0) {
         WIFI_LOGI("get scanResult size is 0");
         return WIFI_OPT_FAILED;
@@ -308,7 +308,7 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByAP(std::string &wifiCountryCo
         return WIFI_OPT_FAILED;
     }
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     if (scanResults.empty()) {
         return WIFI_OPT_FAILED;
     }

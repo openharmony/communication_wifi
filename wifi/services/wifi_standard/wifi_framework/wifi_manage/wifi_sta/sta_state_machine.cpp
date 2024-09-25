@@ -589,7 +589,7 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const
 {
     std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto &scanInfo : scanInfoList) {
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
@@ -1939,7 +1939,7 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
 bool StaStateMachine::IsWpa3Transition(std::string ssid) const
 {
     std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto scanInfo : scanInfoList) {
         if ((ssid == scanInfo.ssid) &&
             (scanInfo.capabilities.find("PSK+SAE") != std::string::npos)) {
@@ -1961,7 +1961,7 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
         randomMacInfo.peerBssid = bssid;
     } else {
         std::vector<WifiScanInfo> scanInfoList;
-        WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
         for (auto scanInfo : scanInfoList) {
             std::string deviceKeyMgmt;
             scanInfo.GetDeviceMgmt(deviceKeyMgmt);
@@ -3122,7 +3122,7 @@ bool StaStateMachine::GetIpState::IsPublicESS()
 {
     constexpr int32_t BSS_NUM_MIN = 3;
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     if (scanResults.empty()) {
         WIFI_LOGI("IsPublicESS scanResults is empty");
         return false;
@@ -4737,7 +4737,7 @@ void StaStateMachine::UpdateWifiCategory()
         for (auto iter = scanInfos.begin(); iter != scanInfos.end(); iter++) {
             WifiCategory category = enhanceService_->GetWifiCategory(iter->infoElems,
                 chipsetCategory, chipsetFeatrureCapability);
-            WifiConfigCenter::GetInstance().RecordWifiCategory(iter->bssid, category);
+            WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordWifiCategory(iter->bssid, category);
         }
     }
 }

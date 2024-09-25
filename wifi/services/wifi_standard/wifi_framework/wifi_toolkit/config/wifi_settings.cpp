@@ -338,6 +338,48 @@ int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
     return 0;
 }
 
+int WifiSettings::SetDeviceEverConnected(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.everConnected = true;
+    return 0;
+}
+
+int WifiSettings::SetAcceptUnvalidated(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.acceptUnvalidated = true;
+    return 0;
+}
+
+bool WifiSettings::GetDeviceEverConnected(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return false;
+    }
+    return iter->second.everConnected;
+}
+
+bool WifiSettings::GetAcceptUnvalidated(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return false;
+    }
+    return iter->second.acceptUnvalidated;
+}
+
 int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
     WifiDeviceConfig &config)
 {

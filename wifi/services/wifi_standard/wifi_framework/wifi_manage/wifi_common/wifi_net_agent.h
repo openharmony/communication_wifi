@@ -127,6 +127,13 @@ public:
         int instId = 0);
 
     /**
+     * Restart the Wi-Fi connection.
+     *
+     * @param
+     */
+    void RestoreWifiConnection();
+
+    /**
      * Init WifiNetAgentCallbacks
      *
      * @param WifiNetAgentCallbacks WifiNetAgent callback

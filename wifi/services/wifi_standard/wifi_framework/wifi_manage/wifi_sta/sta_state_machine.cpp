@@ -107,6 +107,13 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
+const std::map<int, int> wpa3FailreasonMap {
+    {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
+};
+
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"), lastNetworkId(INVALID_NETWORK_ID), operationalMode(STA_CONNECT_MODE),
       targetNetworkId(INVALID_NETWORK_ID), pinCode(0), wpsState(SetupMethod::INVALID),
@@ -582,7 +589,7 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const
 {
     std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto &scanInfo : scanInfoList) {
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
@@ -1932,7 +1939,7 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
 bool StaStateMachine::IsWpa3Transition(std::string ssid) const
 {
     std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto scanInfo : scanInfoList) {
         if ((ssid == scanInfo.ssid) &&
             (scanInfo.capabilities.find("PSK+SAE") != std::string::npos)) {
@@ -1954,7 +1961,7 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
         randomMacInfo.peerBssid = bssid;
     } else {
         std::vector<WifiScanInfo> scanInfoList;
-        WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
         for (auto scanInfo : scanInfoList) {
             std::string deviceKeyMgmt;
             scanInfo.GetDeviceMgmt(deviceKeyMgmt);
@@ -3115,7 +3122,7 @@ bool StaStateMachine::GetIpState::IsPublicESS()
 {
     constexpr int32_t BSS_NUM_MIN = 3;
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     if (scanResults.empty()) {
         WIFI_LOGI("IsPublicESS scanResults is empty");
         return false;
@@ -3482,6 +3489,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     if (linkedInfo.connState != ConnState::CONNECTED) {
         WIFI_LOGE("connState is NOT in connected state, connState:%{public}d\n", linkedInfo.connState);
         WriteIsInternetHiSysEvent(NO_NETWORK);
+#ifndef OHOS_ARCH_LITE
+        SyncDeviceEverConnectedState(false);
+#endif
         return;
     }
     mPortalUrl = portalUrl;
@@ -3537,8 +3547,37 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
+#ifndef OHOS_ARCH_LITE
+    SyncDeviceEverConnectedState(true);
+#endif
     portalFlag = true;
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    std::map<std::string, std::string> variableMap;
+    std::string settings;
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("SETTINGS") != variableMap.end()) {
+        settings = variableMap["SETTINGS"];
+    }
+    if (!WifiSettings::GetInstance().GetDeviceEverConnected(networkId)) {
+        if (!hasNet) {
+            /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
+            WifiNotificationUtil::GetInstance().ShowSettingsDialog(WifiDialogType::CDD, settings);
+        }
+        WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
+        WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
+}
+#endif
 
 void StaStateMachine::HandleArpCheckResult(StaArpState arpState)
 {
@@ -3561,6 +3600,9 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function. m_instId = %{public}d", pStaStateMachine->GetInstanceId());
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
+#ifndef OHOS_ARCH_LITE
+    CheckIfRestoreWifi();
+#endif
     if (pStaStateMachine->GetInstanceId() == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
@@ -3682,6 +3724,19 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 
     return ret;
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::LinkedState::CheckIfRestoreWifi()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    if (WifiSettings::GetInstance().GetAcceptUnvalidated(networkId)) {
+        WIFI_LOGI("The user has chosen to use the current WiFi.");
+        WifiNetAgent::GetInstance().RestoreWifiConnection();
+    }
+}
+#endif
 
 void StaStateMachine::DealApRoamingStateTimeout(InternalMessagePtr msg)
 {
@@ -4682,7 +4737,7 @@ void StaStateMachine::UpdateWifiCategory()
         for (auto iter = scanInfos.begin(); iter != scanInfos.end(); iter++) {
             WifiCategory category = enhanceService_->GetWifiCategory(iter->infoElems,
                 chipsetCategory, chipsetFeatrureCapability);
-            WifiConfigCenter::GetInstance().RecordWifiCategory(iter->bssid, category);
+            WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordWifiCategory(iter->bssid, category);
         }
     }
 }

@@ -128,7 +128,7 @@
                 ],
                 "fwk_group": [
                     "//foundation/communication/wifi/wifi/frameworks:wifi_kits",
-                    "//foundation/communication/bluetooth/frameworks/wifi_ndk:wifi_ndk"
+                    "//foundation/communication/wifi/wifi/frameworks/wifi_ndk:wifi_ndk"
                 ],
                 "service_group": [
                     "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_manage",

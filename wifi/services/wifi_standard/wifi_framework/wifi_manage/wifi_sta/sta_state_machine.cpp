@@ -1995,6 +1995,8 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
         return false;
     }
     bool isRealMac = currentMac == realMac;
+    LOGI("%{public}s, randommac, use %{public}s mac to connect, currentMac:%{public}s, lastMac:%{public}s", __func__,
+        isRealMac ? "factory" : "random", MacAnonymize(currentMac).c_str(), MacAnonymize(lastMac).c_str());
     std::string actualConfiguredMac = currentMac;
     if (!isRealMac && instId == 1) {
         if (!WifiRandomMacHelper::GetWifi2RandomMac(actualConfiguredMac)) {

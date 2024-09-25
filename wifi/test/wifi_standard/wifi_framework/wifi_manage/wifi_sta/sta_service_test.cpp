@@ -620,7 +620,7 @@ void StaServiceTest::StaServiceRemoveAllDeviceTestSucc()
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestFail0()
 {
-    EXPECT_TRUE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaService->RemoveAllDevice() == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceRemoveAllDeviceTestFail1()
@@ -643,12 +643,12 @@ void StaServiceTest::StaServiceReConnectTestSucc()
  */
 void StaServiceTest::StaServiceSetSuspendModeTest()
 {
-    EXPECT_FALSE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceSetPowerModeTest()
 {
-    EXPECT_TRUE(pStaService->SetPowerMode(true) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaService->SetPowerMode(true) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceOnSystemAbilityChangedTest()

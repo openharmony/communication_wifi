@@ -1171,13 +1171,13 @@ void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     networkStateChangeSubsciber_
         = std::make_shared<NetworkStateChangeSubscriber>(subscriberInfo);
-    if(!EventFwk::CommonEventManager::SubscribeCommonEvent(networkStateChangeSubsciber_)) {
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(networkStateChangeSubsciber_)) {
         WIFI_LOGE("network state change subscribe failed");
         networkStateChangeSubsciber_ = nullptr;
         WifiTimer::TimerCallback timeoutCallBack =
             std::bind(&WifiEventSubscriberManager::RegisterNetworkStateChangeEvent, this);
         WifiTimer::GetInstance()->Register(timeoutCallBack, networkStateChangeTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
-        WIFI_LOGI("RegisterNetworkStateChangeEvent retry, networkStateChangeTimerId = %{public}u", networkStateChangeTimerId);
+        WIFI_LOGI("RegisterNetworkStateChangeEvent retry, timerId = %{public}u", networkStateChangeTimerId);
     } else {
         WIFI_LOGI("RegisterNetworkStateChangeEvent success");
     }
@@ -1227,7 +1227,7 @@ void WifiEventSubscriberManager::RegisterWifiScanChangeEvent()
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     wifiScanEventChangeSubscriber_
         = std::make_shared<WifiScanEventChangeSubscriber>(subscriberInfo);
-    if(!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiScanEventChangeSubscriber_)) {
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiScanEventChangeSubscriber_)) {
         WIFI_LOGE("network state change subscribe failed");
         wifiScanEventChangeSubscriber_ = nullptr;
         WifiTimer::TimerCallback timeoutCallBack =

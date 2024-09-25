@@ -133,7 +133,7 @@ HWTEST_F(WifiCountryCodeManagerTest, TriggerUpdateWifiCountryCodeTest, TestSize.
     WifiCountryCodeManager::GetInstance().wifiCountryCodePolicyConf_ =
         std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(31);  // 31: all the algorithms will take effect
     WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_TEL_NET_CHANGE);
-    WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_SCAN_CHANGE );
+    WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_SCAN_CHANGE);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, IsAllowUpdateWifiCountryCodeTest, TestSize.Level1)

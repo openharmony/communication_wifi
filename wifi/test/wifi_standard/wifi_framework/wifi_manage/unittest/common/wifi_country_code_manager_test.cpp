@@ -128,6 +128,14 @@ HWTEST_F(WifiCountryCodeManagerTest, SetWifiCountryCodeFromExternalSuccessTest, 
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal(code));
 }
 
+HWTEST_F(WifiCountryCodeManagerTest, TriggerUpdateWifiCountryCodeTest, TestSize.Level1)
+{
+    WifiCountryCodeManager::GetInstance().wifiCountryCodePolicyConf_ =
+        std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(31);  // 31: all the algorithms will take effect
+    WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_TEL_NET_CHANGE);
+    WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_SCAN_CHANGE );
+}
+
 HWTEST_F(WifiCountryCodeManagerTest, IsAllowUpdateWifiCountryCodeTest, TestSize.Level1)
 {
     WIFI_LOGI("IsAllowUpdateWifiCountryCodeTest enter");
@@ -141,6 +149,12 @@ HWTEST_F(WifiCountryCodeManagerTest, IsAllowUpdateWifiCountryCodeTest, TestSize.
     WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
     EXPECT_FALSE(WifiCountryCodeManager::GetInstance().IsAllowUpdateWifiCountryCode());
+}
+
+HWTEST_F(WifiCountryCodeManagerTest, GetWifiCountryCodePolicySuccessTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetWifiCountryCodePolicySuccessTest enter");
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCodePolicy();
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, UpdateWifiCountryCodeTest, TestSize.Level1)

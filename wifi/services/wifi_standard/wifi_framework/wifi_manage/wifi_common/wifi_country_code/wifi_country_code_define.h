@@ -56,6 +56,8 @@ constexpr int FEATURE_RCV_AP_CONNECTED = 1;
 constexpr int FEATURE_RCV_SCAN_RESLUT = 2;
 constexpr int FEATURE_USE_REGION = 3;
 constexpr int FEATURE_USE_ZZ = 4;
+constexpr int TRIGGER_UPDATE_REASON_SCAN_CHANGE = 1;
+constexpr int TRIGGER_UPDATE_REASON_TEL_NET_CHANGE = 2;
 
 struct MccEntry {
     int mnc;

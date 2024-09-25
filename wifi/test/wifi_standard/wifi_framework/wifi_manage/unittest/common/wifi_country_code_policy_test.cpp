@@ -53,7 +53,8 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        m_wifiCountryCodePolicy = std::make_unique<WifiCountryCodePolicy>();
+        m_wifiCountryCodePolicy = std::make_unique<WifiCountryCodePolicy>(
+            std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(31));  // 31: all the algorithms will take effect
     }
     virtual void TearDown()
     {}
@@ -61,16 +62,11 @@ public:
     std::unique_ptr<WifiCountryCodePolicy> m_wifiCountryCodePolicy;
 };
 
-HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodePolicySuccessTest, TestSize.Level1)
-{
-    WIFI_LOGI("GetWifiCountryCodePolicySuccessTest enter");
-    m_wifiCountryCodePolicy->GetWifiCountryCodePolicy();
-}
-
 HWTEST_F(WifiCountryCodePolicyTest, CreatePolicyTest, TestSize.Level1)
 {
     WIFI_LOGI("CreatePolicyTest enter");
-    m_wifiCountryCodePolicy->CreatePolicy();
+    m_wifiCountryCodePolicy->CreatePolicy(
+        std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(31));  // 31: all the algorithms will take effect
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, CalculateWifiCountryCodeTest, TestSize.Level1)
@@ -393,76 +389,6 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDefaultTest, TestSize.Le
     WIFI_LOGI("GetWifiCountryCodeByDefaultTest enter");
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByDefault(code));
-}
-
-HWTEST_F(WifiCountryCodePolicyTest, TelephoneNetworkSearchStateChangeListenerOnReceiveEventTest, TestSize.Level1)
-{
-    WIFI_LOGI("TelephoneNetworkSearchStateChangeListenerOnReceiveEventTest enter");
-    std::map <int, WifiLinkedInfo> tempInfos;
-    WifiLinkedInfo info1;
-    info1.connState = ConnState::CONNECTED;
-    tempInfos.emplace(1, info1);
-    WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
-
-#ifndef OHOS_ARCH_LITE
-    AAFwk::Want want;
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED);
-    int32_t code = 1;
-    std::string data("networkStateChanged");
-    EventFwk::CommonEventData commonData;
-    commonData.SetWant(want);
-    commonData.SetCode(code);
-    commonData.SetData(data);
-    ASSERT_TRUE(m_wifiCountryCodePolicy->m_telephoneNetworkSearchStateChangeListener != nullptr);
-    m_wifiCountryCodePolicy->m_telephoneNetworkSearchStateChangeListener->OnReceiveEvent(commonData);
-#endif
-}
-
-HWTEST_F(WifiCountryCodePolicyTest, WifiScanEventListenerOnReceiveEventTest, TestSize.Level1)
-{
-    WIFI_LOGI("WifiScanEventListenerOnReceiveEventTest enter");
-
-    // Add simulated scan results
-    std::vector<WifiScanInfo> list;
-    WifiScanInfo info1;
-    info1.bssid = "11:22:33:44:55:66";
-    std::vector<WifiInfoElem> infoElems1;
-    WifiInfoElem elem1;
-    elem1.id = 7;
-    elem1.content = {'C', 'N'};
-    infoElems1.push_back(elem1);
-    info1.infoElems = std::move(infoElems1);
-    list.push_back(info1);
-    WifiScanInfo info2;
-    info2.bssid = "aa:22:33:44:55:66";
-    std::vector<WifiInfoElem> infoElems2;
-    WifiInfoElem elem2;
-    elem2.id = 7;
-    elem2.content = {'C', 'N'};
-    infoElems2.push_back(elem2);
-    info2.infoElems = std::move(infoElems2);
-    list.push_back(info2);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(list), Return(0)));
-    
-    std::map <int, WifiLinkedInfo> tempInfos;
-    WifiLinkedInfo wifiLinkedInfo;
-    wifiLinkedInfo.connState = OHOS::Wifi::ConnState::CONNECTED;
-    tempInfos.emplace(1, wifiLinkedInfo);
-    WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
-
-    AAFwk::Want want;
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED);
-    int32_t code = static_cast<int>(ScanHandleNotify::SCAN_OK);
-    std::string data("OnScanFinished");
-    EventFwk::CommonEventData commonData;
-    commonData.SetWant(want);
-    commonData.SetCode(code);
-    commonData.SetData(data);
-    ASSERT_TRUE(m_wifiCountryCodePolicy->m_wifiScanFinishCommonEventListener != nullptr);
-    m_wifiCountryCodePolicy->m_wifiScanFinishCommonEventListener->OnReceiveEvent(commonData);
 }
 }
 }

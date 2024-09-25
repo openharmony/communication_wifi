@@ -20,12 +20,11 @@
  * @brief Provide functions for querying the status of wifi switch.
  * @since 13
  */
-
 /**
  * @file oh_wifi.h
  * @kit ConnectivityKit
  * @brief Define interfaces for querying wifi switch status.
- * @library libwifi_ndk.so
+ * @library libwifi.so
  * @syscap SystemCapability.Communication.WiFi.STA
  * @since 13
  */
@@ -42,7 +41,7 @@ extern "C" {
  *
  * @since 13
  */
-typedef enum Wifi_ResultCode {
+typedef enum WifiResultCode {
     /**
      * @error The operation is successful.
      */
@@ -66,7 +65,7 @@ typedef enum Wifi_ResultCode {
      * Possible reasons: Internal execution failed.
      */
     WIFI_OPERATION_FAILED = 1000
-} Wifi_ResultCode;
+} WifiResultCode;
 
 /**
  * @brief Check whether the wifi switch is enabled.
@@ -76,16 +75,16 @@ typedef enum Wifi_ResultCode {
  * the wifi switch is turned off.\n
  * The caller needs to pass in a non empty boolean pointer, otherwise an error will be returned.\n
  * @return wifi functions result code.\n
- *     For a detailed definition, please refer to {@link Wifi_ResultCode}.\n
+ *     For a detailed definition, please refer to {@link WifiResultCode}.\n
  *     {@link WIFI_SUCCESS} Successfully obtained the wifi switch status.\n
  *     {@link WIFI_INVALID_PARAM} The input parameter enabled is a null pointer.\n
  *     {@link WIFI_PERMISSION_DENIED} The application does not have the permission required to call the API.\n
  * @since 13
  */
-Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
+WifiResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
 
 #ifdef __cplusplus
 }
 #endif
-
+/** @} */
 #endif // OH_WIFI_H

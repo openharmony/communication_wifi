@@ -749,7 +749,7 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 
     ConcreteManagerRole presentRole;
     if (pWifiControllerMachine->ShouldDisableWifi(msg)) {
-        pWifiControllerMachine->StopAllMultiStaManager();
+        pWifiControllerMachine->StopAllMultiStaManagers();
         pWifiControllerMachine->StopAllConcreteManagers();
         return;
     }

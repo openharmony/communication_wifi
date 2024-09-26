@@ -201,8 +201,8 @@ void WifiEventSubscriberManager::HandleCommonEventServiceChange(int systemAbilit
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
         RegisterAssetEvent();
 #endif
-        UnRegisterNetworkStateChangeEvent();
-        UnRegisterWifiScanChangeEvent();
+        RegisterNetworkStateChangeEvent();
+        RegisterWifiScanChangeEvent();
     } else {
         UnRegisterCesEvent();
         UnRegisterNotificationEvent();

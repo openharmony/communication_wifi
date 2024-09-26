@@ -27,7 +27,6 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int MAX_SIZE = 256;
-constexpr int MAX_ASHMEM_SIZE = 300;
 int g_bigDataRecvLen = 0;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
@@ -636,136 +635,38 @@ std::vector<std::string> splitString(std::string str, char delimiter)
     return tokens;
 }
 
-void WifiDeviceProxy::ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize,
-    long len)
+void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
 {
-    WIFI_LOGI("WifiDeviceProxy ParseBigConfig");
+    WIFI_LOGI("ParseDeviceConfigs");
+    constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
+    std::vector<uint32_t> allSize;
+    reply.ReadUInt32Vector(&allSize);
+    int retSize = allSize.size();
+    if (retSize > MAX_DEVICE_CONFIG_SIZE || retSize == 0) {
+        WIFI_LOGE("Parse device config size error: %{public}d", retSize);
+        return;
+    }
     sptr<Ashmem> ashmem = reply.ReadAshmem();
     if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
         WIFI_LOGE("ParseDeviceConfigs ReadAshmem error");
         return;
     }
- 
-    std::string net = (char *)ashmem->ReadFromAshmem(len, 0);
-    std::vector<std::string> tokens = splitString(net, ';');
-    for (int m = 0; m < retSize; ++m) {
-        WifiDeviceConfig config;
-        config.networkId = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.status = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.bssid = HexToString(tokens[g_bigDataRecvLen++]);
-        config.bssidType = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.ssid = HexToString(tokens[g_bigDataRecvLen++]);
-        config.band = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.channel = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.frequency = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.level = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.isPasspoint = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.isEphemeral = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.preSharedKey = HexToString(tokens[g_bigDataRecvLen++]);
-        config.keyMgmt = HexToString(tokens[g_bigDataRecvLen++]);
-        for (int j = 0; j < WEPKEYS_SIZE; j++) {
-            config.wepKeys[j] = HexToString(tokens[g_bigDataRecvLen++]);
+    int offset = 0;
+    for (int i = 0; i < retSize; i++) {
+        auto origin = ashmem->ReadFromAshmem(allSize[i], offset);
+        if (origin == nullptr) {
+            offset += allSize[i];
+            continue;
         }
-        config.wepTxKeyIndex = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.priority = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.hiddenSSID = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.wifiIpConfig.assignMethod = AssignIpMethod(CheckDataLegal(tokens[g_bigDataRecvLen++]));
-        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.ipAddress.address, tokens);
-        config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.wifiIpConfig.staticIpAddress.ipAddress.flags = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.wifiIpConfig.staticIpAddress.ipAddress.scope = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.gateway, tokens);
-        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.dnsServer1, tokens);
-        BigDataReadIpAddress(config.wifiIpConfig.staticIpAddress.dnsServer2, tokens);
-        config.wifiIpConfig.staticIpAddress.domains = HexToString(tokens[g_bigDataRecvLen++]);
-        BigDataReadEapConfig(config.wifiEapConfig, tokens);
-        config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(CheckDataLegal(tokens[g_bigDataRecvLen++]));
-        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = HexToString(tokens[g_bigDataRecvLen++]);
-        config.wifiProxyconfig.manualProxyConfig.serverHostName = HexToString(tokens[g_bigDataRecvLen++]);
-        config.wifiProxyconfig.manualProxyConfig.serverPort = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = HexToString(tokens[g_bigDataRecvLen++]);
-        config.wifiPrivacySetting = WifiPrivacyConfig(CheckDataLegal(tokens[g_bigDataRecvLen++]));
-        config.uid = CheckDataLegal(tokens[g_bigDataRecvLen++]);
-        config.callProcessName = HexToString(tokens[g_bigDataRecvLen++]);
-        config.ancoCallProcessName = HexToString(tokens[g_bigDataRecvLen++]);
-        config.networkSelectionStatus.status = WifiDeviceConfigStatus(CheckDataLegal(tokens[g_bigDataRecvLen++]));
-        config.networkSelectionStatus.networkSelectionDisableReason =
-            DisabledReason(CheckDataLegal(tokens[g_bigDataRecvLen++]));
+        MessageParcel inParcel;
+        inParcel.WriteBuffer(reinterpret_cast<const char*>(origin), allSize[i]);
+        WifiDeviceConfig config;
+        ReadDeviceConfig(inParcel, config);
+        offset += allSize[i];
         result.emplace_back(config);
     }
-    g_bigDataRecvLen = 0;
     ashmem->UnmapAshmem();
     ashmem->CloseAshmem();
- 
-    return;
-}
- 
-void WifiDeviceProxy::ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize)
-{
-    for (int i = 0; i < retSize; ++i) {
-        WifiDeviceConfig config;
-        config.networkId = reply.ReadInt32();
-        config.status = reply.ReadInt32();
-        config.bssid = reply.ReadString();
-        config.bssidType = reply.ReadInt32();
-        config.ssid = reply.ReadString();
-        config.band = reply.ReadInt32();
-        config.channel = reply.ReadInt32();
-        config.frequency = reply.ReadInt32();
-        config.level = reply.ReadInt32();
-        config.isPasspoint = reply.ReadBool();
-        config.isEphemeral = reply.ReadBool();
-        config.preSharedKey = reply.ReadString();
-        config.keyMgmt = reply.ReadString();
-        for (int j = 0; j < WEPKEYS_SIZE; j++) {
-            config.wepKeys[j] = reply.ReadString();
-        }
-        config.wepTxKeyIndex = reply.ReadInt32();
-        config.priority = reply.ReadInt32();
-        config.hiddenSSID = reply.ReadBool();
-        config.wifiIpConfig.assignMethod = AssignIpMethod(reply.ReadInt32());
-        ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.ipAddress.address);
-        config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = reply.ReadInt32();
-        config.wifiIpConfig.staticIpAddress.ipAddress.flags = reply.ReadInt32();
-        config.wifiIpConfig.staticIpAddress.ipAddress.scope = reply.ReadInt32();
-        ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.gateway);
-        ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
-        ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
-        config.wifiIpConfig.staticIpAddress.domains = reply.ReadString();
-        ReadEapConfig(reply, config.wifiEapConfig);
-        config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(reply.ReadInt32());
-        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reply.ReadString();
-        config.wifiProxyconfig.manualProxyConfig.serverHostName = reply.ReadString();
-        config.wifiProxyconfig.manualProxyConfig.serverPort = reply.ReadInt32();
-        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = reply.ReadString();
-        config.wifiPrivacySetting = WifiPrivacyConfig(reply.ReadInt32());
-        config.uid = reply.ReadInt32();
-        config.callProcessName = reply.ReadString();
-        config.ancoCallProcessName = reply.ReadString();
-        config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
-        config.networkSelectionStatus.status = WifiDeviceConfigStatus(reply.ReadInt32());
-        config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason(reply.ReadInt32());
-        result.emplace_back(config);
-    }
-}
-
-void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
-{
-    WIFI_LOGI("ParseDeviceConfigs");
-    constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
-    int retSize = reply.ReadInt32();
-    if (retSize > MAX_DEVICE_CONFIG_SIZE || retSize == 0) {
-        WIFI_LOGE("Parse device config size error: %{public}d", retSize);
-        return;
-    }
-    if (retSize > MAX_ASHMEM_SIZE) {
-        long len = reply.ReadInt64();
-        ParseBigConfig(reply, result, retSize, len);
-        return;
-    }
- 
-    ParseSmallConfig(reply, result, retSize);
- 
     return;
 }
 

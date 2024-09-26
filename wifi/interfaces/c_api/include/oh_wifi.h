@@ -41,7 +41,7 @@ extern "C" {
  *
  * @since 13
  */
-typedef enum WifiResultCode {
+typedef enum Wifi_ResultCode {
     /**
      * @error The operation is successful.
      */
@@ -65,7 +65,7 @@ typedef enum WifiResultCode {
      * Possible reasons: Internal execution failed.
      */
     WIFI_OPERATION_FAILED = 2501000
-} WifiResultCode;
+} Wifi_ResultCode;
 
 /**
  * @brief Check whether the wifi switch is enabled.
@@ -75,13 +75,13 @@ typedef enum WifiResultCode {
  * the wifi switch is turned off.\n
  * The caller needs to pass in a non empty boolean pointer, otherwise an error will be returned.\n
  * @return wifi functions result code.\n
- *     For a detailed definition, please refer to {@link WifiResultCode}.\n
+ *     For a detailed definition, please refer to {@link Wifi_ResultCode}.\n
  *     {@link WIFI_SUCCESS} Successfully obtained the wifi switch status.\n
  *     {@link WIFI_INVALID_PARAM} The input parameter enabled is a null pointer.\n
  *     {@link WIFI_OPERATION_FAILED} Internal execution failed.\n
  * @since 13
  */
-WifiResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
+Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
 
 #ifdef __cplusplus
 }

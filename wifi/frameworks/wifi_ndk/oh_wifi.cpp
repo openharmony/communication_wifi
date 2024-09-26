@@ -18,7 +18,7 @@
 
 std::shared_ptr<OHOS::Wifi::WifiDevice> g_WifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 
-static WifiResultCode WifiErrCodeToResultCode(OHOS::Wifi::ErrCode errCode)
+static Wifi_ResultCode WifiErrCodeToResultCode(OHOS::Wifi::ErrCode errCode)
 {
     switch (errCode) {
         case OHOS::Wifi::WIFI_OPT_SUCCESS:
@@ -34,7 +34,7 @@ static WifiResultCode WifiErrCodeToResultCode(OHOS::Wifi::ErrCode errCode)
     }
 }
 
-WifiResultCode OH_Wifi_IsWifiEnabled(bool *enabled)
+Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled)
 {
     if (enabled == nullptr) {
         return WIFI_INVALID_PARAM;

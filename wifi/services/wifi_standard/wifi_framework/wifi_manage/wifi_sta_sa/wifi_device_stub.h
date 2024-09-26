@@ -104,9 +104,7 @@ private:
     void WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config);
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
     void BigDataWriteIpAddress(const WifiIpAddress &address, std::stringstream &bigDataStream);
-    void SendBigConfig(int32_t ashmemSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
-    void SendBigConfigEx(int contentSize, std::vector<WifiDeviceConfig> &result, std::stringstream &bigDataStream);
-    void SendSmallConfig(int32_t size, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
+    void SendDeviceConfig(int32_t ashmemSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
 
 private:
     HandleFuncMap handleFuncMap;

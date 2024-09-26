@@ -334,20 +334,20 @@ ErrCode WifiP2pService::QueryP2pServices(std::vector<WifiP2pServiceInfo> &servic
 ErrCode WifiP2pService::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)
 {
     WIFI_LOGI("RegisterP2pServiceCallbacks");
-    p2pStateMachine.RegisterP2pServiceCallbacks(callbacks);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REGISTER_SERVICE_CB), callbacks);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pService::UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)
 {
     WIFI_LOGI("UnRegisterP2pServiceCallbacks");
-    p2pStateMachine.UnRegisterP2pServiceCallbacks(callbacks);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_UNREGISTER_SERVICE_CB), callbacks);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 void WifiP2pService::ClearAllP2pServiceCallbacks()
 {
-    p2pStateMachine.ClearAllP2pServiceCallbacks();
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CLEAR_SERVICE_CB));
 }
 
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)

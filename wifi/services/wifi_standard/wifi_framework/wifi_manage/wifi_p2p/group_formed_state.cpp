@@ -262,6 +262,7 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessagePtr msg) const
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();
     p2pStateMachine.BroadcastP2pGcLeaveGroup(device);
+    p2pStateMachine.BroadcastP2pPeerJoinOrLeave(false, device.GetDeviceAddress());
     deviceManager.RemoveDevice(device);
     if (groupManager.IsCurrGroupClientEmpty() && !groupManager.GetCurrentGroup().IsExplicitGroup()) {
         WIFI_LOGE("Clients empty, remove p2p group.");
@@ -298,6 +299,7 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessagePtr msg) const
     p2pStateMachine.curClientList.emplace_back(device.GetDeviceAddress());
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();
+    p2pStateMachine.BroadcastP2pPeerJoinOrLeave(true, device.GetDeviceAddress());
     return EXECUTED;
 }
 

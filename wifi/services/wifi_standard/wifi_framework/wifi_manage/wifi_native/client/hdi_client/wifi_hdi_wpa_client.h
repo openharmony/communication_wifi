@@ -757,6 +757,16 @@ public:
     WifiErrorNo ReqP2pGetSupportFrequencies(int band, std::vector<int> &frequencies) const;
 
     /**
+     * @Description Setting one config of the P2P group.
+     *
+     * @param networkId
+     * @param key
+     * @param value
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pSetSingleConfig(int networkId, const std::string &key, const std::string &value) const;
+
+    /**
      * @Description Setting the P2P group config.
      *
      * @param networkId

@@ -747,6 +747,68 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     return true;
 }
 
+bool HalDeviceManager::SendCmdToDriver(const std::string &ifaceName, const std::string &interfaceName,
+    int cmd, const std::string &param)
+{
+    if (!CheckReloadChipHdiService()) {
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(mMutex);
+    LOGI("SendCmdToDriver, ifaceName:%{public}s, cmd:%{public}d", ifaceName.c_str(), cmd);
+    sptr<IChipIface> iface = nullptr;
+    if (auto iter = mIWifiP2pIfaces.find(ifaceName); iter != mIWifiP2pIfaces.end()) {
+        iface = iter->second;
+    } else if (auto iter = mIWifiApIfaces.find(ifaceName); iter != mIWifiApIfaces.end()) {
+        iface = iter->second;
+    } else {
+        LOGE("SendCmdToDriver, not find iface info");
+        return false;
+    }
+    CHECK_NULL_AND_RETURN(iface, false);
+
+    std::vector<int8_t> paramBuf;
+    for (auto c : param) {
+        int8_t cc = c;
+        paramBuf.push_back(cc);
+    }
+    int32_t ret = iface->SendCmdToDriver(interfaceName, cmd, paramBuf);
+    if (ret != HDF_SUCCESS) {
+        LOGE("SendCmdToDriver, call SendCmdToDriver failed! ret:%{public}d", ret);
+    }
+    LOGI("SendCmdToDriver success");
+    return true;
+}
+
+std::string HalDeviceManager::MakeMacFilterString(const std::vector<std::string> &blockList)
+{
+    if (blockList.empty()) {
+        return "MAC_MODE=0,MAC_CNT=0";
+    }
+    int macCount = static_cast<int>(blockList.size());
+    std::string macs = "MAC_MODE=1,MAC_CNT=" + std::to_string(macCount);
+    for (auto mac : blockList) {
+        mac.erase(std::remove(mac.begin(), mac.end(), ':'), mac.end());
+        macs.append(",MAC=").append(mac);
+    }
+    return macs;
+}
+
+bool HalDeviceManager::SetBlockList(const std::string &ifaceName, const std::string &interfaceName,
+    const std::vector<std::string> &blockList)
+{
+    const int setMacFilterCmd = 100;
+    std::string macFilterStr = MakeMacFilterString(blockList);
+    return SendCmdToDriver(ifaceName, interfaceName, setMacFilterCmd, macFilterStr);
+}
+
+bool HalDeviceManager::DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName,
+    std::string mac)
+{
+    const int disAssociateStaCmd = 101;
+    mac.erase(std::remove(mac.begin(), mac.end(), ':'), mac.end());
+    return SendCmdToDriver(ifaceName, interfaceName, disAssociateStaCmd, mac);
+}
+
 void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
 {
     std::lock_guard<std::mutex> lock(mMutex);

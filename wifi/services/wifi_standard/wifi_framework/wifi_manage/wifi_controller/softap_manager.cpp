@@ -54,7 +54,7 @@ ErrCode SoftApManager::RegisterCallback(const SoftApModeCallback &callbacks)
     return WIFI_OPT_SUCCESS;
 }
 
-SoftapManagerMachine *SoftApManager::GetSoftapMachine()
+SoftapManagerMachine *SoftApManager::GetMachine()
 {
     return pSoftapManagerMachine;
 }

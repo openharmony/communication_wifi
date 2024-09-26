@@ -431,6 +431,16 @@ void P2pStateMachine::BroadcastP2pStatusChanged(P2pState state) const
     }
 }
 
+void P2pStateMachine::BroadcastP2pPeerJoinOrLeave(bool isJoin, const std::string &mac) const
+{
+    std::unique_lock<std::mutex> lock(cbMapMutex);
+    for (const auto &callBackItem : p2pServiceCallbacks) {
+        if (callBackItem.second.OnP2pPeerJoinOrLeaveEvent != nullptr) {
+            callBackItem.second.OnP2pPeerJoinOrLeaveEvent(isJoin, mac);
+        }
+    }
+}
+
 void P2pStateMachine::BroadcastP2pPeersChanged() const
 {
     std::vector<WifiP2pDevice> peers;
@@ -1085,11 +1095,7 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool n
     group.SetNetworkId(config.GetNetId());
     groupManager.AddOrUpdateGroup(group);
     ret = WifiP2PHalInterface::GetInstance().P2pSetGroupConfig(config.GetNetId(), wpaConfig);
-    if (ret == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
-        return false;
-    } else {
-        return true;
-    }
+    return ret != WIFI_HAL_OPT_FAILED;
 }
 
 bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const
@@ -1125,7 +1131,32 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
 
     UpdateGroupManager();
     UpdatePersistentGroups();
-    return (ret == WIFI_HAL_OPT_FAILED) ? false : true;
+    return ret != WIFI_HAL_OPT_FAILED;
+}
+
+bool P2pStateMachine::DealCreateRptGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const
+{
+    int createdNetId = -1;
+    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pAddNetwork(createdNetId);
+    if (ret == WIFI_HAL_OPT_OK) {
+        WifiP2PHalInterface::GetInstance().P2pSetSingleConfig(createdNetId, "rptid", std::to_string(createdNetId));
+        WifiP2pConfigInternal cfgBuf = config;
+        cfgBuf.SetNetId(createdNetId);
+        if (!SetGroupConfig(cfgBuf, true)) {
+            WIFI_LOGW("Some configuration settings failed!");
+        }
+        ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, createdNetId, freq);
+    }
+    if (ret == WIFI_HAL_OPT_FAILED) {
+        WifiP2PHalInterface::GetInstance().RemoveNetwork(createdNetId);
+        WifiP2pGroupInfo removedInfo;
+        removedInfo.SetNetworkId(createdNetId);
+        groupManager.RemoveGroup(removedInfo);
+    }
+
+    UpdateGroupManager();
+    UpdatePersistentGroups();
+    return ret != WIFI_HAL_OPT_FAILED;
 }
 
 bool P2pStateMachine::IsInterfaceReuse() const
@@ -1255,5 +1286,16 @@ void P2pStateMachine::DoP2pArp(std::string serverIp, std::string clientIp)
     arpChecker.Start(ifName, macAddress, clientIp, serverIp);
     arpChecker.DoArpCheck(ARP_TIMEOUT, true);
 }
+
+bool P2pStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo> &result)
+{
+#ifdef WIFI_DHCP_DISABLED
+    return true;
+#endif
+    WIFI_LOGE("rpt GetConnectedStationInfo");
+    std::string ifaceName = groupManager.GetCurrentGroup().GetInterface();
+    return m_DhcpdInterface.GetConnectedStationInfo(ifaceName, result);
+}
+
 } // namespace Wifi
 } // namespace OHOS

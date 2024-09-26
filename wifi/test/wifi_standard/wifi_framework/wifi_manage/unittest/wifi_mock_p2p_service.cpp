@@ -421,6 +421,16 @@ ErrCode WifiMockP2pService::RegisterP2pServiceCallbacks(const IP2pServiceCallbac
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiMockP2pService::CreateRptGroup(const WifiP2pConfig &config)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiMockP2pService::GetRptStationsList(std::vector<StationInfo> &result)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
 extern "C" IP2pService *Create(void)
 {
     return new (std::nothrow) WifiMockP2pService();

@@ -65,6 +65,8 @@ public:
     virtual ErrCode MonitorCfgChange(void)  override;
     virtual ErrCode DiscoverPeers(int32_t channelid) override;
     virtual ErrCode DisableRandomMac(int setmode) override;
+    virtual ErrCode CreateRptGroup(const WifiP2pConfig &config) override;
+    virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result) override;
 };
 }  // namespace Wifi
 }  // namespace OHOS

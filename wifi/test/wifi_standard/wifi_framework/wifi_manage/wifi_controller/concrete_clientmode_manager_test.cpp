@@ -44,14 +44,14 @@ public:
         mCb.onStopped = DealConcreteStop;
         mCb.onRemoved = DealClientRemoved;
         pConcreteModeManager->mcb = mCb;
-        pConcreteModeManager->GetConcreteMachine()->SendMessage(CONCRETE_CMD_START,
+        pConcreteModeManager->GetMachine()->SendMessage(CONCRETE_CMD_START,
             static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA), 0);
     }
 
     virtual void TearDown()
     {
         if (pConcreteModeManager != nullptr) {
-            pConcreteModeManager->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STOP);
+            pConcreteModeManager->GetMachine()->SendMessage(CONCRETE_CMD_STOP);
             pConcreteModeManager.reset();
         }
     }

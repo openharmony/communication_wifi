@@ -777,6 +777,27 @@ WifiErrorNo HdiP2pRemoveNetwork(int networkId)
     return WIFI_HAL_OPT_OK;
 }
 
+WifiErrorNo HdiP2pSetSingleConfig(int networkId, const char *key, const char *value)
+{
+    LOGI("HdiP2pSetSingleConfig enter");
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiP2pSetSingleConfig: wpaObj is NULL");
+        return WIFI_HAL_OPT_FAILED;
+    }
+    char cfgValue[WIFI_P2P_GROUP_CONFIG_VALUE_LENGTH];
+    if (sprintf_s(cfgValue, sizeof(cfgValue), "%s", value) < 0) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    int32_t result = wpaObj->P2pSetGroupConfig(wpaObj, GetHdiP2pIfaceName(), networkId, key, cfgValue);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiP2pSetSingleConfig failed result:%{public}d", result);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    LOGI("HdiP2pSetSingleConfig success.");
+    return WIFI_HAL_OPT_OK;
+}
+
 WifiErrorNo HdiP2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size)
 {
     LOGI("HdiP2pSetGroupConfig enter size=%{public}d", size);

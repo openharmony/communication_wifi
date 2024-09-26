@@ -57,6 +57,8 @@ void P2pGroupOperatingState::Init()
 {
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP,
         [this](const InternalMessagePtr msg) { return this->ProcessCmdCreateGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_FORM_RPT_GROUP,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdCreateRptGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_GROUP_STARTED,
         [this](const InternalMessagePtr msg) { return this->ProcessGroupStartedEvt(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT,
@@ -71,6 +73,45 @@ void P2pGroupOperatingState::Init()
         [this](const InternalMessagePtr msg) { return this->ProcessCmdDeleteGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP,
         [this](const InternalMessagePtr msg) { return this->ProcessCmdHid2dCreateGroup(msg); }));
+}
+
+bool P2pGroupOperatingState::ProcessCmdCreateRptGroup(const InternalMessagePtr msg) const
+{
+    WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
+    WifiP2pConfigInternal config;
+    if (!msg->GetMessageObj(config)) {
+        WIFI_LOGE("failed to get config.");
+        return false;
+    }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState == CONNECTED && !config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
+        config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
+        bool sameFreq = (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
+                         config.GetGoBand() == GroupOwnerBand::GO_BAND_5GHZ) ||
+                        (linkedInfo.band == static_cast<int>(BandType::BAND_2GHZ) &&
+                         config.GetGoBand() == GroupOwnerBand::GO_BAND_2GHZ);
+        int freq = sameFreq ? linkedInfo.frequency : p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
+        WIFI_LOGI("Create rpt group.");
+        WifiConfigCenter::GetInstance().SetExplicitGroup(true);
+        if (p2pStateMachine.DealCreateRptGroupWithConfig(config, freq)) {
+            ret = WIFI_HAL_OPT_OK;
+        }
+    } else {
+        WIFI_LOGE("Invalid parameter.");
+    }
+    if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
+        WIFI_LOGE("p2p configure to CreateGroup failed.");
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_FAILED);
+        p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    } else {
+        const int cgTimedOut = 5000;
+        WIFI_LOGI("p2p configure to CreateGroup successful.");
+        p2pStateMachine.MessageExecutedLater(
+            static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT), cgTimedOut);
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_SUCCESS);
+    }
+    return EXECUTED;
 }
 
 bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg) const

@@ -375,6 +375,22 @@ bool SignalLevelFilter::Filter(NetworkCandidate &networkCandidate)
     return signalLevel > SIGNAL_LEVEL_TWO;
 }
 
+ValidNetworkIdFilter::ValidNetworkIdFilter() : SimpleWifiFilter("ValidNetworkId") {}
+ 
+ValidNetworkIdFilter::~ValidNetworkIdFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+ 
+bool ValidNetworkIdFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    return networkCandidate.wifiDeviceConfig.networkId != INVALID_NETWORK_ID;
+}
+
 NotNetworkBlackListFilter::NotNetworkBlackListFilter() : SimpleWifiFilter("NotNetworkBlackList") {}
 
 NotNetworkBlackListFilter::~NotNetworkBlackListFilter()
@@ -401,8 +417,9 @@ bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
     int32_t targetSignalLevel = WifiSettings::GetInstance().GetSignalLevel(scanInfo.rssi, scanInfo.band);
     if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(networkCandidate.interScanInfo.bssid) &&
         (targetSignalLevel <= SIGNAL_LEVEL_THREE || targetSignalLevel - curSignalLevel < MIN_SIGNAL_LEVEL_INTERVAL)) {
-        WIFI_LOGI("NotNetworkBlackListFilter, in wifi blocklist and level interval is not enough,"
-            "skip candidate:%{public}s", networkCandidate.ToString().c_str());
+        WIFI_LOGI("NotNetworkBlackListFilter, in wifi blocklist, targetSignalLevel:%{public}d, "
+            "curSignalLevel:%{public}d, skip candidate:%{public}s",
+            targetSignalLevel, curSignalLevel, networkCandidate.ToString().c_str());
         return false;
     }
     return true;

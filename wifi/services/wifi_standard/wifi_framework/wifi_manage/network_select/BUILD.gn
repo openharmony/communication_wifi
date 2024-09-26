@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (C) 2024-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,37 +20,27 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
-  "sta_auto_connect_service.cpp",
-  "sta_interface.cpp",
-  "sta_monitor.cpp",
-  "sta_saved_device_appraisal.cpp",
-  "sta_service.cpp",
-  "sta_state_machine.cpp",
+  "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
+  "external_wifi_common_builder_manager.cpp",
+  "external_wifi_filter_builder_manager.cpp",
+  "network_selection_manager.cpp",
+  "network_selection_utils.cpp",
+  "network_selector_factory.cpp",
+  "network_selector_impl.cpp",
+  "wifi_comparator_impl.cpp",
+  "wifi_filter_impl.cpp",
+  "wifi_scorer_impl.cpp",
 ]
 
 local_base_include_dirs = [
-  "$WIFI_ROOT_DIR/base/state_machine/include",
-  "$WIFI_ROOT_DIR/base/cRPC/include",
-  "$WIFI_ROOT_DIR/base/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
-  "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
@@ -58,30 +48,23 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_black_list",
+  "$WIFI_ROOT_DIR/utils/inc",
 ]
 
 if (defined(ohos_lite)) {
-  shared_library("wifi_sta_service") {
+  shared_library("network_select") {
     sources = local_base_sources
-
     include_dirs = local_base_include_dirs
     include_dirs += [
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//third_party/bounds_checking_function/include",
-      "$DHCP_ROOT_DIR/interfaces/inner_api/include",
-      "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
-      "$DHCP_ROOT_DIR/interfaces/kits/c",
-      "$DHCP_ROOT_DIR/services",
     ]
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select:network_select",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     ]
 
     external_deps = [
@@ -105,7 +88,7 @@ if (defined(ohos_lite)) {
     ]
   }
 } else {
-  ohos_shared_library("wifi_sta_service") {
+  ohos_shared_library("network_select") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
@@ -118,7 +101,6 @@ if (defined(ohos_lite)) {
     }
     install_enable = true
     sources = local_base_sources
-    sources += [ "sta_app_acceleration.cpp" ]
 
     include_dirs = local_base_include_dirs
     cflags = memory_optimization_cflags
@@ -136,50 +118,22 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select:network_select",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
-    defines = [ "FEATURE_STA_SUPPORT" ]
-
-    if (wifi_feature_with_local_random_mac) {
-      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
-    }
-
-    if (wifi_feature_with_random_mac_addr) {
-      defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
-    }
-
-    if (wifi_feature_with_hpf_supported) {
-      defines += [ "FEATURE_HPF_SUPPORT" ]
+    if (wifi_feature_network_selection) {
+      defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
     }
 
     external_deps = [
-      "ability_base:want",
       "ability_runtime:app_manager",
-      "ability_runtime:wantagent_innerkits",
-      "bundle_framework:appexecfwk_base",
-      "bundle_framework:appexecfwk_core",
-      "c_utils:utils",
-      "cellular_data:tel_cellular_data_api",
-      "core_service:tel_core_service_api",
-      "dhcp:dhcp_sdk",
       "hilog:libhilog",
       "init:libbegetutil",
-      "ipc:ipc_core",
-      "ipc:ipc_single",
-      "netmanager_base:net_conn_manager_if",
-      "netmanager_base:net_stats_manager_if",
-      "safwk:system_ability_fwk",
-      "samgr:samgr_proxy",
-      "time_service:time_client",
     ]
 
     part_name = "wifi"
     subsystem_name = "communication"
-    version_script = "libwifi_sta_service.map"
   }
 }

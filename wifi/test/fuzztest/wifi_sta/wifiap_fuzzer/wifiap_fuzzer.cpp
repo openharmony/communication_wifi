@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "wifiap_fuzzer.h"
 
 #include <cstddef>

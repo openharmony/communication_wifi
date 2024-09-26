@@ -28,23 +28,27 @@ P2pDisabledState::P2pDisabledState(P2pStateMachine &stateMachine, WifiP2pGroupMa
       p2pStateMachine(stateMachine),
       groupManager(groupMgr),
       deviceManager(deviceMgr),
-      serviceManager(svrMgr)
+      serviceManager(svrMgr),
+      p2pSmInitFlag(false)
 {}
 void P2pDisabledState::GoInState()
 {
     WIFI_LOGI("             GoInState");
-    p2pStateMachine.ClearAllP2pServiceCallbacks();
-    p2pStateMachine.groupManager.StashGroups();
-    p2pStateMachine.StopP2pDhcpClient();
-    p2pStateMachine.StopDhcpServer();
-    if (p2pStateMachine.pDhcpResultNotify != nullptr) {
-        delete p2pStateMachine.pDhcpResultNotify;
-        p2pStateMachine.pDhcpResultNotify = nullptr;
+    if (p2pSmInitFlag) {
+        p2pStateMachine.ClearAllP2pServiceCallbacks();
+        p2pStateMachine.groupManager.StashGroups();
+        p2pStateMachine.StopP2pDhcpClient();
+        p2pStateMachine.StopDhcpServer();
+        if (p2pStateMachine.pDhcpResultNotify != nullptr) {
+            delete p2pStateMachine.pDhcpResultNotify;
+            p2pStateMachine.pDhcpResultNotify = nullptr;
+        }
+        AbstractUI::GetInstance().UnInit();
     }
-    AbstractUI::GetInstance().UnInit();
     p2pStateMachine.serviceManager.ClearAll();
     deviceManager.ClearAll();
     serviceManager.ClearAll();
+    p2pSmInitFlag = true;
 }
 
 void P2pDisabledState::GoOutState()

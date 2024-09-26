@@ -713,6 +713,26 @@ HWTEST_F(WifiHalDeviceManagerTest, OnRssiReportCallbackTest_01, TestSize.Level1)
     EXPECT_EQ(result, 0);
 }
 
+HWTEST_F(WifiHalDeviceManagerTest, MakeMacFilterStringTest_01, TestSize.Level1)
+{
+    std::vector<std::string> blockList{};
+    std::string result = DelayedSingleton<HalDeviceManager>::GetInstance()->MakeMacFilterString(blockList);
+    EXPECT_EQ(result, "MAC_MODE=0,MAC_CNT=0");
+}
+
+HWTEST_F(WifiHalDeviceManagerTest, MakeMacFilterStringTest_02, TestSize.Level1)
+{
+    std::vector<std::string> blockList{"AA:BB"};
+    std::string result = DelayedSingleton<HalDeviceManager>::GetInstance()->MakeMacFilterString(blockList);
+    EXPECT_EQ(result, "MAC_MODE=1,MAC_CNT=1,MAC=AABB");
+}
+
+HWTEST_F(WifiHalDeviceManagerTest, MakeMacFilterStringTest_03, TestSize.Level1)
+{
+    std::vector<std::string> blockList{"AA:BB", "CCDD"};
+    std::string result = DelayedSingleton<HalDeviceManager>::GetInstance()->MakeMacFilterString(blockList);
+    EXPECT_EQ(result, "MAC_MODE=1,MAC_CNT=2,MAC=AABB,MAC=CCDD");
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

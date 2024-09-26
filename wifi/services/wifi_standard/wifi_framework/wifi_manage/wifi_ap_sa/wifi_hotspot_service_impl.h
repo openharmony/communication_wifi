@@ -276,6 +276,7 @@ private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
     int CheckOperHotspotSwitchPermission(const ServiceType type);
     bool IsApServiceRunning();
+    bool IsRptRunning();
     static void ConfigInfoDump(std::string& result);
     static void StationsInfoDump(std::string& result);
 

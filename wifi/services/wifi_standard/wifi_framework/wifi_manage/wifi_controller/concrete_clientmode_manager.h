@@ -31,7 +31,7 @@ public:
     explicit ConcreteClientModeManager(ConcreteManagerRole role, int id);
     ~ConcreteClientModeManager();
     ErrCode InitConcreteManager();
-    ConcreteMangerMachine *GetConcreteMachine();
+    ConcreteMangerMachine *GetMachine();
 
     int mid;
 private:

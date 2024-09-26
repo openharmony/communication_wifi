@@ -78,6 +78,8 @@ WifiErrorNo HdiP2pFlushService();
 
 WifiErrorNo HdiP2pRemoveNetwork(int networkId);
 
+WifiErrorNo HdiP2pSetSingleConfig(int networkId, const char *key, const char *value);
+
 WifiErrorNo HdiP2pSetGroupConfig(int networkId, P2pGroupConfig *pConfig, int size);
 
 WifiErrorNo HdiP2pInvite(const char *peerBssid, const char *goBssid, const char *ifname);

@@ -55,7 +55,7 @@ ErrCode MultiStaManager::RegisterCallback(const MultiStaModeCallback &callbacks)
     return WIFI_OPT_SUCCESS;
 }
 
-MultiStaStateMachine *MultiStaManager::GetMultiStaMachine()
+MultiStaStateMachine *MultiStaManager::GetMachine()
 {
     return pMultiStaStateMachine;
 }

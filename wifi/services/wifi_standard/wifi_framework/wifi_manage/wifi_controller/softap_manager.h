@@ -37,7 +37,7 @@ public:
     ErrCode InitSoftapManager();
     void SetRole(Role role);
     Role GetRole();
-    SoftapManagerMachine *GetSoftapMachine();
+    SoftapManagerMachine *GetMachine();
     int mid;
 
 private:

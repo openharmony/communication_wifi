@@ -110,6 +110,7 @@ if (defined(ohos_lite)) {
     install_enable = true
     include_dirs = [
       "network_black_list",
+      "network_status_history",
       "$WIFI_ROOT_DIR/base/utils",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",
@@ -149,6 +150,7 @@ if (defined(ohos_lite)) {
       "app_network_speed_limit/speed_limit_configs_writer.cpp",
       "block_connect_service.cpp",
       "network_black_list/network_black_list_manager.cpp",
+      "network_status_history/network_status_history_manager.cpp",
       "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",
       "wifi_channel_helper.cpp",

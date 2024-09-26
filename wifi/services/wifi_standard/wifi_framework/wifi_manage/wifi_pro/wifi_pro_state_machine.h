@@ -63,7 +63,7 @@ public:
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         void TransitionNetState();
-        void HandleWifiConnectStateChangedInEnableState(const InternalMessagePtr msg);
+        void HandleWifiConnectStateChangedInEnable(const InternalMessagePtr msg);
     };
 
     /**
@@ -95,40 +95,35 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
-        int32_t internetFailureDetectedCount_ { 0 };
         void InitConnectedState();
-        void HandleCheckWifiInternetResultWithConnected(const InternalMessagePtr msg);
-        void HandleWifiInternetResultInLinkMonitorState();
-        void HandleWifiInternetResultWithNoInet(int32_t state);
-        void HandleWifiInternetResultWithPortal(int32_t state);
-        void HandleWifiInternetResultWithInet(int32_t state);
-        void UpdateWifiAgentScore(int32_t state);
+        void HandleHttpResultInConnected(const InternalMessagePtr msg);
+        void HandleWifiConnectStateChangedInConnected(const InternalMessagePtr msg);
     };
 
     /**
-     * @Description  Definition of WifiDisConnectedState class in WifiProStateMachine.
+     * @Description  Definition of WifiDisconnectedState class in WifiProStateMachine.
      *
      */
-    class WifiDisConnectedState : public State {
+    class WifiDisconnectedState : public State {
     public:
-        explicit WifiDisConnectedState(WifiProStateMachine *pWifiProStateMachine);
-        ~WifiDisConnectedState() override;
+        explicit WifiDisconnectedState(WifiProStateMachine *pWifiProStateMachine);
+        ~WifiDisconnectedState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
-        void HandleWifiConnectStateChangedInDisConnectedState(const InternalMessagePtr msg);
+        void HandleWifiConnectStateChangedInDisconnected(const InternalMessagePtr msg);
     };
 
     /**
-     * @Description  Definition of WifiLinkMonitorState class in WifiProStateMachine.
+     * @Description  Definition of WifiHasNetState class in WifiProStateMachine.
      *
      */
-    class WifiLinkMonitorState : public State {
+    class WifiHasNetState : public State {
     public:
-        explicit WifiLinkMonitorState(WifiProStateMachine *pWifiProStateMachine);
-        ~WifiLinkMonitorState() override;
+        explicit WifiHasNetState(WifiProStateMachine *pWifiProStateMachine);
+        ~WifiHasNetState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
@@ -141,8 +136,8 @@ public:
         int32_t rssiLevel0Or1ScanedCounter_ { 0 };
         std::string targetBssid_;
         NetworkSelectionResult networkSelectionResult_;
-        void WifiLinkMonitorStateInit();
-        void HandleCheckResultInMonitor(const NetworkSelectionResult &networkSelectionResult);
+        void WifiHasNetStateInit();
+        void HandleCheckResultInHasNet(const NetworkSelectionResult &networkSelectionResult);
         bool IsSatisfiedWifiOperationCondition();
         bool IsFullscreen();
         void TryWifiHandoverPreferentially(const NetworkSelectionResult &networkSelectionResult);
@@ -150,18 +145,42 @@ public:
         void HandleWifiRoveOut(const NetworkSelectionResult &networkSelectionResult);
         bool IsCallingInCs();
         void TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
-        void HandleConnectStateChangedInMonitor(const InternalMessagePtr msg);
-        void HandleRssiChangedInMonitor(const InternalMessagePtr msg);
-        void HandleReuqestScanInMonitor(const InternalMessagePtr msg);
-        void HandleScanResultInMonitor(const InternalMessagePtr msg);
+        bool HandleConnectStateChangedInHasNet(const InternalMessagePtr msg);
+        void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
+        void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
+        void HandleScanResultInHasNet(const InternalMessagePtr msg);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
-        void HandleHttpResultInLinkMonitorState(const InternalMessagePtr msg);
+        void HandleHttpResultInHasNet(const InternalMessagePtr msg);
         void HandleWifi2WifiSucsess();
         void HandleWifi2WifiFailed(bool isConnected);
         void Wifi2WifiFailed();
         bool HandleWifiToWifi(int32_t switchReason, const NetworkSelectionResult &networkSelectionResult);
         void UpdateWifiSwitchTimeStamp();
         bool TrySwitchWifiNetwork(const NetworkSelectionResult &networkSelectionResult);
+    };
+
+    class WifiNoNetState : public State {
+    public:
+        explicit WifiNoNetState(WifiProStateMachine *pWifiProStateMachine);
+        ~WifiNoNetState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
+    private:
+        WifiProStateMachine *pWifiProStateMachine_ { nullptr };
+        void HandleHttpResultInNoNet(const InternalMessagePtr msg);
+    };
+
+    class WifiPortalState : public State {
+    public:
+        explicit WifiPortalState(WifiProStateMachine *pWifiProStateMachine);
+        ~WifiPortalState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
+    private:
+        WifiProStateMachine *pWifiProStateMachine_ { nullptr };
+        void HandleHttpResultInPortal(const InternalMessagePtr msg);
     };
 
     ErrCode Initialize();
@@ -203,8 +222,10 @@ private:
     WifiProEnableState *pWifiProEnableState_ { nullptr };
     WifiProDisabledState *pWifiProDisabledState_ { nullptr };
     WifiConnectedState *pWifiConnectedState_ { nullptr };
-    WifiDisConnectedState *pWifiDisConnectedState_ { nullptr };
-    WifiLinkMonitorState *pWifiLinkMonitorState_ { nullptr };
+    WifiDisconnectedState *pWifiDisConnectedState_ { nullptr };
+    WifiHasNetState *pWifiHasNetState_ { nullptr };
+    WifiNoNetState *pWifiNoNetState_ { nullptr };
+    WifiPortalState *pWifiPortalState_ { nullptr };
     /* 0:unknow 1:singleAP 2:Mixed Type */
     int32_t duanBandHandoverType_ { 0 };
     int32_t wiFiNoInternetReason_ { 0 };

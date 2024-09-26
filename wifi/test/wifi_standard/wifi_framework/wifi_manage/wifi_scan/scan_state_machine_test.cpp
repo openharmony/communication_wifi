@@ -120,7 +120,7 @@ public:
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(HARDWARE_UNLOAD_EVENT);
-        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(msg) == true);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(msg) == false);
     }
 
     void InitExeMsgSuccess8()

@@ -1264,7 +1264,8 @@ WifiScanEventChangeSubscriber::WifiScanEventChangeSubscriber(
 void WifiScanEventChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventData)
 {
     const auto &action = eventData.GetWant().GetAction();
-    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED) {
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED &&
+        eventData.GetCode() == static_cast<int>(ScanHandleNotify::SCAN_OK)) {
         WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_SCAN_CHANGE);
     }
 }

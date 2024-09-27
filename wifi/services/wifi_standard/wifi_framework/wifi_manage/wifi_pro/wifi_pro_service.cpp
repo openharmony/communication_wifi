@@ -100,9 +100,8 @@ void WifiProService::NotifyWifi2WifiFailed()
 
 void WifiProService::NotifyWifiConnectStateChanged(OperateResState state, const WifiLinkedInfo &linkedInfo)
 {
-    WIFI_LOGI("NotifyWifiConnectStateChanged:networkId:%{public}d, ssid:%{public}s,"
-        "bssid:%{public}s", linkedInfo.networkId, MacAnonymize(linkedInfo.ssid).c_str(),
-        MacAnonymize(linkedInfo.bssid).c_str());
+    WIFI_LOGI("NotifyWifiConnectStateChanged: ssid:%{public}s, bssid:%{public}s",
+        MacAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkedInfo.bssid).c_str());
     pWifiProStateMachine_->SendMessage(EVENT_WIFI_CONNECT_STATE_CHANGED, static_cast<int32_t>(state),
         linkedInfo.networkId, linkedInfo.bssid);
 }

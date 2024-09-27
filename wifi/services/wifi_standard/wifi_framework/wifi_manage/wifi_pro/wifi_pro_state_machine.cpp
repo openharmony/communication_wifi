@@ -52,6 +52,8 @@ WifiProStateMachine::~WifiProStateMachine()
     ParsePointer(pWifiConnectedState_);
     ParsePointer(pWifiDisConnectedState_);
     ParsePointer(pWifiHasNetState_);
+    ParsePointer(pWifiHasNetState_);
+    ParsePointer(pWifiHasNetState_);
 }
 
 void WifiProStateMachine::BuildStateTree()
@@ -173,8 +175,7 @@ void WifiProStateMachine::RefreshConnectedNetWork()
     }
     for (auto &wifiDeviceConfig : configs) {
         if (wifiDeviceConfig.networkId == linkedInfo.networkId) {
-            WIFI_LOGI("RefreshConnectedNetWork, find device config,connState:%{public}d,"
-                "networkId:%{public}d.", linkedInfo.connState, linkedInfo.networkId);
+            WIFI_LOGI("RefreshConnectedNetWork, find device config.");
             pCurrWifiDeviceConfig_ = std::make_shared<WifiDeviceConfig>(wifiDeviceConfig);
         }
     }
@@ -704,11 +705,10 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
     NetworkSelectionResult networkSelectionResult;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::WIFI2WIFI, scanInfos)) {
-        int32_t networkId = networkSelectionResult.wifiDeviceConfig.networkId;
         std::string &bssid = networkSelectionResult.interScanInfo.bssid;
         std::string &ssid = networkSelectionResult.interScanInfo.ssid;
-        WIFI_LOGI("Wifi2Wifi select network result networkId: %{public}d, ssid: %{public}s, bssid: %{public}s.",
-            networkId, SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
+        WIFI_LOGI("Wifi2Wifi select network result, ssid: %{public}s, bssid: %{public}s.",
+            SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
         targetBssid_ = networkSelectionResult.interScanInfo.bssid;
         isScanTriggered_ = false;
         HandleCheckResultInHasNet(networkSelectionResult);
@@ -924,7 +924,7 @@ bool WifiProStateMachine::WifiHasNetState::TrySwitchWifiNetwork(
     const NetworkSelectionResult &networkSelectionResult)
 {
     int32_t networkId = networkSelectionResult.wifiDeviceConfig.networkId;
-    WIFI_LOGI("wifi to wifi step 7: start to connect to new wifi. networkId:%{public}d", networkId);
+    WIFI_LOGI("wifi to wifi step 7: start to connect to new wifi.");
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(pWifiProStateMachine_->instId_);
     if (pStaService == nullptr) {
         WIFI_LOGE("TrySwitchWifiNetwork, pStaService is invalid");

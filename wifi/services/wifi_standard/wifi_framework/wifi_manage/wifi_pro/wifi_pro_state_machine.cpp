@@ -52,8 +52,8 @@ WifiProStateMachine::~WifiProStateMachine()
     ParsePointer(pWifiConnectedState_);
     ParsePointer(pWifiDisConnectedState_);
     ParsePointer(pWifiHasNetState_);
-    ParsePointer(pWifiHasNetState_);
-    ParsePointer(pWifiHasNetState_);
+    ParsePointer(pWifiNoNetState_);
+    ParsePointer(pWifiPortalState_);
 }
 
 void WifiProStateMachine::BuildStateTree()

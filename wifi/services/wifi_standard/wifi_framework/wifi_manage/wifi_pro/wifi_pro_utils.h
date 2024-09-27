@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_WIFI_PRO_UTILS_H
 #define OHOS_WIFI_PRO_UTILS_H
- 
+
 #include "wifi_log.h"
 #include "wifi_pro_common.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 class WifiProUtils {
@@ -36,7 +36,7 @@ public:
     static bool IsDefaultNet();
     static bool IsAppInWhiteLists();
 };
- 
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

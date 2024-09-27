@@ -293,10 +293,12 @@ enum class FilterTag {
     RECOVERY_NETWORK_SELECTOR_FILTER_TAG,
     PORTAL_NETWORK_SELECTOR_FILTER_TAG,
     IT_NETWORK_SELECTOR_FILTER_TAG,
-    NOT_P2P_ENHANCE_FREQ_AT_5G_FILTER_TAG,
 };
 
 enum class TagType {
+    // The following is filter tag
+    NOT_P2P_ENHANCE_FREQ_AT_5G_FILTER_TAG,
+    // The following is the scorer tag
     HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG,
 };
  

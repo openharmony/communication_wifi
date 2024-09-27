@@ -31,6 +31,7 @@ constexpr int CHANNEL_2G_MIN = 1;
 constexpr int CHANNEL_5G = 34;
 constexpr int CHANNEL_2G = 14;
 constexpr uint32_t PLAIN_LENGTH = 10;
+constexpr int EC_INVALID = -9;
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
 
 HWTEST_F(WifiGlobalFuncTest, GetRandomStr, TestSize.Level1)
@@ -314,13 +315,13 @@ HWTEST_F(WifiGlobalFuncTest, ConvertStringToIntTest, TestSize.Level1)
 HWTEST_F(WifiGlobalFuncTest, GetParamValueTest, TestSize.Level1)
 {
     char preValue[WIFI_COUNTRY_CODE_SIZE] = {0};
-    GetParamValue(WIFI_COUNTRY_CODE_CONFIG,
-        WIFI_COUNTRY_CODE_CONFIG_DEFAULT, preValue, WIFI_COUNTRY_CODE_SIZE);
+    EXPECT_EQ(GetParamValue(WIFI_COUNTRY_CODE_CONFIG,
+        WIFI_COUNTRY_CODE_CONFIG_DEFAULT, preValue, WIFI_COUNTRY_CODE_SIZE), EC_INVALID);
 }
 
 HWTEST_F(WifiGlobalFuncTest, SetParamValueTest, TestSize.Level1)
 {
-    SetParamValue(WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY, "US");
+    EXPECT_EQ(SetParamValue(WIFI_COUNTRY_CODE_DYNAMIC_UPDATE_KEY, "US"), EC_INVALID);
 }
 
 void MdmPropChangeEvt(const char *key, const char *value, void *context)
@@ -328,7 +329,7 @@ void MdmPropChangeEvt(const char *key, const char *value, void *context)
 
 HWTEST_F(WifiGlobalFuncTest, WatchParamValueTest, TestSize.Level1)
 {
-    WatchParamValue(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
+    EXPECT_EQ(WatchParamValue(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr), EC_INVALID);
 }
 
 HWTEST_F(WifiGlobalFuncTest, IsFreqDbacTest, TestSize.Level1)

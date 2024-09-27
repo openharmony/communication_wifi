@@ -1015,7 +1015,7 @@ public:
 
     void InitPnoScanState()
     {
-        pScanStateMachine->InitPnoScanState();
+        EXPECT_EQ(pScanStateMachine->InitPnoScanState(), true);
     }
 
     void RecordFilteredScanResultTest()
@@ -1045,7 +1045,7 @@ public:
     void GetFilteredScanResultMsgTest()
     {
         ScanStateMachine::FilterScanResultRecord records;
-        records.GetFilteredScanResultMsg();
+        EXPECT_EQ(records.GetFilteredScanResultMsg(), "");
     }
 
     void FilterScanResultTest()

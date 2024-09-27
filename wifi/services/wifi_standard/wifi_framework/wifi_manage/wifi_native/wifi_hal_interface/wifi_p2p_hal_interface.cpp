@@ -15,6 +15,7 @@
 
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_log.h"
+#include "hal_device_manage.h"
 #include <mutex>
 
 #undef LOG_TAG
@@ -547,6 +548,17 @@ WifiErrorNo WifiP2PHalInterface::P2pGetSupportFrequenciesByBand(int band, std::v
 #endif
 }
 
+WifiErrorNo WifiP2PHalInterface::P2pSetSingleConfig(int networkId,
+    const std::string &key, const std::string &value) const
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->ReqP2pSetSingleConfig(networkId, key, value);
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
+
 WifiErrorNo WifiP2PHalInterface::P2pSetGroupConfig(int networkId, const HalP2pGroupConfig &config) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
@@ -603,6 +615,32 @@ WifiErrorNo WifiP2PHalInterface::DeliverP2pData(int32_t cmdType, int32_t dataTyp
     return mHdiWpaClient->DeliverP2pData(cmdType, dataType, carryData.c_str());
 #else
     LOGE("DeliverP2pData enter Ipc");
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
+
+WifiErrorNo WifiP2PHalInterface::SetRptBlockList(const std::string &ifaceName, const std::string &interfaceName,
+    const std::vector<std::string> &blockList)
+{
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetBlockList(ifaceName, interfaceName, blockList)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
+
+WifiErrorNo WifiP2PHalInterface::DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName,
+    const std::string &mac)
+{
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->DisAssociateSta(ifaceName, interfaceName, mac)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+#else
     return WIFI_HAL_OPT_FAILED;
 #endif
 }

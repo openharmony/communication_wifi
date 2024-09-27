@@ -103,6 +103,31 @@ WifiErrorNo WifiApHalInterface::GetStationList(std::vector<std::string> &result,
 #endif
 }
 
+WifiErrorNo WifiApHalInterface::SetSoftApBlockList(const std::string &ifaceName,
+    const std::vector<std::string> &blockList)
+{
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetBlockList(ifaceName, ifaceName, blockList)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
+
+WifiErrorNo WifiApHalInterface::DisAssociateSta(const std::string &ifaceName, const std::string &mac)
+{
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->DisAssociateSta(ifaceName, ifaceName, mac)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
+
 WifiErrorNo WifiApHalInterface::AddBlockByMac(const std::string &mac, int id)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT

@@ -51,7 +51,9 @@ public:
         wifiManager.wifiScanManager = std::make_unique<WifiScanManager>();
         wifiManager.wifiTogglerManager = std::make_unique<WifiTogglerManager>();
         wifiManager.wifiHotspotManager = std::make_unique<WifiHotspotManager>();
+#ifdef FEATURE_P2P_SUPPORT
         wifiManager.wifiP2pManager = std::make_unique<WifiP2pManager>();
+#endif
         wifiManager.wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
         wifiManager.wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
     }
@@ -61,7 +63,9 @@ public:
         wifiManager.wifiScanManager = nullptr;
         wifiManager.wifiTogglerManager = nullptr;
         wifiManager.wifiHotspotManager = nullptr;
+#ifdef FEATURE_P2P_SUPPORT
         wifiManager.wifiP2pManager = nullptr;
+#endif
         wifiManager.wifiEventSubscriberManager = nullptr;
         wifiManager.wifiMultiVapManager = nullptr;
     }
@@ -204,6 +208,7 @@ HWTEST_F(WifiManagerTest, DealApGetStaLeaveTest, TestSize.Level1)
     wifiManager.wifiHotspotManager->DealApGetStaLeave(info);
 }
 
+#ifdef FEATURE_P2P_SUPPORT
 HWTEST_F(WifiManagerTest, AutoStartP2pService_001, TestSize.Level1)
 {
     WIFI_LOGI("AutoStartP2pService_001 enter!");
@@ -336,6 +341,7 @@ HWTEST_F(WifiManagerTest, IfaceDestoryCallbackTest, TestSize.Level1)
     std::string destoryIfaceName = "test";
     wifiManager.wifiP2pManager->IfaceDestoryCallback(destoryIfaceName, 1);
 }
+#endif
 
 HWTEST_F(WifiManagerTest, GetSupportedFeaturesTest, TestSize.Level1)
 {

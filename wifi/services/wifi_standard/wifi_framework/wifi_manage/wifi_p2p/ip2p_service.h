@@ -20,6 +20,7 @@
 #include "wifi_msg.h"
 #include "ip2p_service_callbacks.h"
 #include "wifi_hid2d_msg.h"
+#include "wifi_ap_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -325,6 +326,20 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) = 0;
+
+    /**
+     * @Description create rpt group
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode CreateRptGroup(const WifiP2pConfig &config) = 0;
+
+    /**
+     * @Description get station list of rpt
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

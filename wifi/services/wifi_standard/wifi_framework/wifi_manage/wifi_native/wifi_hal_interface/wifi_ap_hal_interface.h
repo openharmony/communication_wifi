@@ -72,6 +72,22 @@ public:
     WifiErrorNo GetStationList(std::vector<std::string> &result, int id = 0);
 
     /**
+     * @Description set block list of ap
+     * @param ifaceName ifaceName
+     * @param blockList mac address of block devices
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetSoftApBlockList(const std::string &ifaceName, const std::vector<std::string> &blockList);
+
+    /**
+     * @Description disassociate with target device
+     * @param ifaceName ifaceName
+     * @param mac mac address of target device
+     * @return WifiErrorNo
+     */
+    WifiErrorNo DisAssociateSta(const std::string &ifaceName, const std::string &mac);
+
+    /**
      * @Description To set the blocklist filtering in AP mode to prohibit
      *              the MAC address connection.
      *

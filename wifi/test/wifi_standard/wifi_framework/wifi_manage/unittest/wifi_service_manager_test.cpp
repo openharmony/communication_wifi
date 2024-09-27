@@ -73,6 +73,7 @@ HWTEST_F(WifiServiceManagerTest, GetApServiceInstTest, TestSize.Level1)
     EXPECT_TRUE(WifiServiceManager::GetInstance().GetApServiceInst() == nullptr);
 }
 
+#ifdef FEATURE_P2P_SUPPORT
 HWTEST_F(WifiServiceManagerTest, GetP2pServiceInstTest, TestSize.Level1)
 {
     WIFI_LOGE("GetP2pServiceInstTest enter!");
@@ -83,6 +84,7 @@ HWTEST_F(WifiServiceManagerTest, GetP2pServiceInstTest, TestSize.Level1)
     WifiServiceManager::GetInstance().CheckAndEnforceService("P2pService", false);
     EXPECT_TRUE(WifiServiceManager::GetInstance().GetP2pServiceInst() == nullptr);
 }
+#endif
 
 HWTEST_F(WifiServiceManagerTest, UnloadServiceTest, TestSize.Level1)
 {

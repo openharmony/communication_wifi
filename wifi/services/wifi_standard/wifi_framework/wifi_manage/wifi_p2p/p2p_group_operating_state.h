@@ -80,6 +80,13 @@ private:
     virtual bool ProcessCmdCreateGroup(const InternalMessagePtr msg) const;
 
     /**
+     * @Description Process the create group of rpt command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdCreateRptGroup(const InternalMessagePtr msg) const;
+
+    /**
      * @Description Process the group started message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle

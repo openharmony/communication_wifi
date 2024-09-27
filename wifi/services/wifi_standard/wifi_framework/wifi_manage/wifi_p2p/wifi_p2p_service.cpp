@@ -24,6 +24,7 @@
 #include "wifi_config_center.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_p2p_hal_interface.h"
+#include "ap_define.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 
@@ -122,6 +123,56 @@ ErrCode WifiP2pService::StopP2pListen()
 {
     WIFI_LOGI("StopP2pListen");
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_STOP_LISTEN));
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::CreateRptGroup(const WifiP2pConfig &config)
+{
+    WifiConfigCenter::GetInstance().SaveP2pCreatorUid(IPCSkeleton::GetCallingUid());
+    WIFI_LOGI("CreateGroup name: %{private}s, address:%{private}s, addressType:%{public}d",
+        config.GetGroupName().c_str(), config.GetDeviceAddress().c_str(), config.GetDeviceAddressType());
+    WifiP2pConfigInternal configInternal(config);
+    WpsInfo wps;
+    wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    configInternal.SetWpsInfo(wps);
+    const std::any info = configInternal;
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_RPT_GROUP), info);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::GetRptStationsList(std::vector<StationInfo> &result)
+{
+    auto devices = groupManager.GetCurrentGroup().GetClientDevices();
+    if (devices.empty()) {
+        WIFI_LOGI("GetRptStationsList is empty");
+        return ErrCode::WIFI_OPT_SUCCESS;
+    }
+
+    WIFI_LOGI("GetRptStationsList size:%{public}d", static_cast<int>(devices.size()));
+    for (const auto &dev : devices) {
+        StationInfo info;
+        info.bssid = dev.GetRandomDeviceAddress();
+        info.bssidType = dev.GetDeviceAddressType();
+        info.deviceName = dev.GetDeviceName();
+        info.ipAddr = GETTING_INFO;
+        result.push_back(info);
+    }
+
+    // get dhcp lease info, return full connected station info
+    std::map<std::string, StationInfo> tmp;
+    if (!p2pStateMachine.GetConnectedStationInfo(tmp)) {
+        WIFI_LOGW("Get connected station info failed!");
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+
+    for (auto iter = result.begin(); iter != result.end(); ++iter) {
+        auto itMap = tmp.find(iter->bssid);
+        if (itMap == tmp.end()) {
+            continue;
+        }
+        iter->deviceName = itMap->second.deviceName;
+        iter->ipAddr = itMap->second.ipAddr;
+    }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -283,20 +334,20 @@ ErrCode WifiP2pService::QueryP2pServices(std::vector<WifiP2pServiceInfo> &servic
 ErrCode WifiP2pService::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)
 {
     WIFI_LOGI("RegisterP2pServiceCallbacks");
-    p2pStateMachine.RegisterP2pServiceCallbacks(callbacks);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REGISTER_SERVICE_CB), callbacks);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pService::UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)
 {
     WIFI_LOGI("UnRegisterP2pServiceCallbacks");
-    p2pStateMachine.UnRegisterP2pServiceCallbacks(callbacks);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_UNREGISTER_SERVICE_CB), callbacks);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 void WifiP2pService::ClearAllP2pServiceCallbacks()
 {
-    p2pStateMachine.ClearAllP2pServiceCallbacks();
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CLEAR_SERVICE_CB));
 }
 
 ErrCode WifiP2pService::Hid2dCreateGroup(const int frequency, FreqType type)

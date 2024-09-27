@@ -37,7 +37,7 @@ public:
     ErrCode InitMultiStaManager();
     void SetRole(Role role);
     Role GetRole();
-    MultiStaStateMachine *GetMultiStaMachine();
+    MultiStaStateMachine *GetMachine();
     int mid;
 
 private:

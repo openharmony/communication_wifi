@@ -43,14 +43,14 @@ public:
         mCb.onStartFailure = DealSoftapStartFailure;
         mCb.onStopped = DealSoftapStop;
         pSoftApManager->mcb = mCb;
-        pSoftApManager->GetSoftapMachine()->SendMessage(SOFTAP_CMD_START,
+        pSoftApManager->GetMachine()->SendMessage(SOFTAP_CMD_START,
             static_cast<int>(SoftApManager::Role::ROLE_UNKNOW), 0);
     }
 
     virtual void TearDown()
     {
         if (pSoftApManager != nullptr) {
-            pSoftApManager->GetSoftapMachine()->SendMessage(SOFTAP_CMD_STOP);
+            pSoftApManager->GetMachine()->SendMessage(SOFTAP_CMD_STOP);
             pSoftApManager.reset();
         }
     }

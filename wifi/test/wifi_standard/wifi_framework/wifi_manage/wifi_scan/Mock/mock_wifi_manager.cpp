@@ -53,10 +53,12 @@ std::unique_ptr<WifiScanManager>& WifiManager::GetWifiScanManager()
     return wifiScanManager;
 }
 
+#ifdef FEATURE_P2P_SUPPORT
 std::unique_ptr<WifiP2pManager>& WifiManager::GetWifiP2pManager()
 {
     return wifiP2pManager;
 }
+#endif
 
 std::unique_ptr<WifiTogglerManager>& WifiManager::GetWifiTogglerManager()
 {
@@ -67,7 +69,12 @@ std::unique_ptr<WifiHotspotManager>& WifiManager::GetWifiHotspotManager()
 {
     return wifiHotspotManager;
 }
- 
+
+std::shared_ptr<RptInterface> WifiManager::GetRptInterface(int id)
+{
+    return nullptr;
+}
+
 std::unique_ptr<WifiEventSubscriberManager>& WifiManager::GetWifiEventSubscriberManager()
 {
     return wifiEventSubscriberManager;
@@ -85,7 +92,9 @@ int WifiManager::Init()
     wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
     wifiStaManager = std::make_unique<WifiStaManager>();
     wifiScanManager = std::make_unique<WifiScanManager>();
+#ifdef FEATURE_P2P_SUPPORT
     wifiP2pManager = std::make_unique<WifiP2pManager>();
+#endif
     wifiTogglerManager = std::make_unique<WifiTogglerManager>();
     wifiHotspotManager = std::make_unique<WifiHotspotManager>();
     return 0;
@@ -105,9 +114,11 @@ void WifiManager::Exit()
     if (wifiScanManager) {
         wifiScanManager.reset();
     }
+#ifdef FEATURE_P2P_SUPPORT
     if (wifiP2pManager) {
         wifiP2pManager.reset();
     }
+#endif
     if (wifiTogglerManager) {
         wifiTogglerManager.reset();
     }

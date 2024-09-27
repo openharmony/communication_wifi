@@ -32,22 +32,50 @@ ApStationsManager::ApStationsManager(int id) : m_id(id)
 ApStationsManager::~ApStationsManager()
 {}
 
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+static WifiErrorNo SetMacFilter(std::string mac, int mid)
+{
+    std::vector<StationInfo> blockList;
+    WifiSettings::GetInstance().GetBlockList(blockList, mid);
+
+    std::vector<std::string> blockMacs;
+    for (auto& sta : blockList) {
+        if (mac != sta.bssid) {
+            blockMacs.push_back(sta.bssid);
+        }
+    }
+
+    std::string ifname = WifiConfigCenter::GetInstance().GetApIfaceName();
+    WIFI_LOGI("SetMacFilter size:%{public}d", static_cast<int>(blockMacs.size()));
+    return WifiApHalInterface::GetInstance().SetSoftApBlockList(ifname, blockMacs);
+}
+#endif
+
 bool ApStationsManager::AddBlockList(const StationInfo &staInfo) const
 {
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    WifiApHalInterface::GetInstance().DisAssociateSta(WifiConfigCenter::GetInstance().GetApIfaceName(), staInfo.bssid);
+    return SetMacFilter("", m_id);
+#else
     if (WifiApHalInterface::GetInstance().AddBlockByMac(staInfo.bssid, m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Instance is %{public}d failed to add block.", m_id);
         return false;
     }
     return true;
+#endif
 }
 
 bool ApStationsManager::DelBlockList(const StationInfo &staInfo) const
 {
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    return SetMacFilter(staInfo.bssid, m_id);
+#else
     if (WifiApHalInterface::GetInstance().DelBlockByMac(staInfo.bssid, m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Instance is %{public}d failed to del block.", m_id);
         return false;
     }
     return true;
+#endif
 }
 
 bool ApStationsManager::AddAssociationStation(const StationInfo &staInfo) const
@@ -70,6 +98,9 @@ bool ApStationsManager::DelAssociationStation(const StationInfo &staInfo) const
 
 bool ApStationsManager::EnableAllBlockList() const
 {
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    return SetMacFilter("", m_id);
+#else
     std::vector<StationInfo> results;
     if (WifiSettings::GetInstance().GetBlockList(results, m_id)) {
         WIFI_LOGE("Instance is %{public}d failed to get blocklist.", m_id);
@@ -85,6 +116,7 @@ bool ApStationsManager::EnableAllBlockList() const
         }
     }
     return ret;
+#endif
 }
 
 void ApStationsManager::StationLeave(const std::string &mac) const

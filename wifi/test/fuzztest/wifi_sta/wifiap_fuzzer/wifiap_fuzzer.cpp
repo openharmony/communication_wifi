@@ -177,19 +177,6 @@ void SetForwardingFuzzTest(const uint8_t* data, size_t size)
     pWifiApNatManager->SetForwarding(enable);
 }
 
-void SetInterfaceRouteFuzzTest(const uint8_t* data, size_t size)
-{
-    bool enable = (static_cast<int>(data[0]) % TWO) ? true : false;
-    pWifiApNatManager->SetInterfaceRoute(enable);
-}
-
-void SetInterfaceNatFuzzTest(const uint8_t* data, size_t size)
-{
-    bool enable = (static_cast<int>(data[0]) % TWO) ? true : false;
-    std::string outInterfaceName = std::string(reinterpret_cast<const char*>(data), size);
-    pWifiApNatManager->SetInterfaceNat(enable, outInterfaceName);
-}
-
 void WriteDataToFileFuzzTest(const uint8_t* data, size_t size)
 {
     std::string fileName = "wlan0";
@@ -201,12 +188,6 @@ void EnableHotspotFuzzTest(const uint8_t* data, size_t size)
 {
     pApService->EnableHotspot();
     pApInterface->EnableHotspot();
-}
-
-void DisableHotspotFuzzTest(const uint8_t* data, size_t size)
-{
-    pApService->DisableHotspot();
-    pApInterface->DisableHotspot();
 }
 
 void SetHotspotConfigFuzzTest(const uint8_t* data, size_t size)
@@ -345,11 +326,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::GetAllConnectedStationsFuzzTest(data, size);
     OHOS::Wifi::EnableInterfaceNatFuzzTest(data, size);
     OHOS::Wifi::SetForwardingFuzzTest(data, size);
-    OHOS::Wifi::SetInterfaceRouteFuzzTest(data, size);
-    OHOS::Wifi::SetInterfaceNatFuzzTest(data, size);
     OHOS::Wifi::WriteDataToFileFuzzTest(data, size);
     OHOS::Wifi::EnableHotspotFuzzTest(data, size);
-    OHOS::Wifi::DisableHotspotFuzzTest(data, size);
     OHOS::Wifi::SetHotspotConfigFuzzTest(data, size);
     OHOS::Wifi::SetHotspotIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::AddBlockListFuzzTest(data, size);

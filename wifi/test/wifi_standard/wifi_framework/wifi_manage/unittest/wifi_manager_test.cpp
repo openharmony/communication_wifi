@@ -429,7 +429,7 @@ HWTEST_F(WifiManagerTest, AutoStartEnhanceServiceTest, TestSize.Level1)
 
 HWTEST_F(WifiManagerTest, CheckCanConnectDeviceTest, TestSize.Level1)
 {
-    wifiManager.wifiMultiVapManager->CheckCanConnectDevice();
+    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckCanConnectDevice(), true);
 }
 
 HWTEST_F(WifiManagerTest, CheckCanUseP2pTest, TestSize.Level1)

@@ -65,7 +65,8 @@ public:
     void GetStaCallbackTest()
     {
         StaServiceCallback callback;
-        pSelfCureInterface->GetStaCallback();
+        EXPECT_EQ(pSelfCureInterface->GetStaCallback().callbackModuleName,
+            pSelfCureInterface->mStaCallback.callbackModuleName);
     }
 
     void DealStaConnChangedTest()
@@ -100,7 +101,7 @@ public:
         SelfCureServiceCallback callbacks;
         pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks);
         callbacks.callbackModuleName = "test";
-        pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks);
+        EXPECT_EQ(pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks), WIFI_OPT_SUCCESS);
     }
 
     void DealStaOpenResTest()
@@ -161,7 +162,7 @@ HWTEST_F(SelfCureInterfaceTest, NotifyInternetFailureDetectedTest, TestSize.Leve
 
 HWTEST_F(SelfCureInterfaceTest, IsSelfCureOnGoingTest, TestSize.Level1)
 {
-    pSelfCureInterface->IsSelfCureOnGoing();
+    EXPECT_EQ(pSelfCureInterface->IsSelfCureOnGoing(), false);
 }
 
 } // namespace Wifi

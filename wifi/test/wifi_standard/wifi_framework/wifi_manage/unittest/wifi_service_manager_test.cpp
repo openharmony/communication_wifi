@@ -28,10 +28,6 @@ HWTEST_F(WifiServiceManagerTest, CheckPreLoadServiceTest, TestSize.Level1)
     EXPECT_EQ(0, WifiServiceManager::GetInstance().CheckPreLoadService());
 }
 
-HWTEST_F(WifiServiceManagerTest, CheckAndEnforceService_SUCCESS, TestSize.Level1)
-{
-}
-
 HWTEST_F(WifiServiceManagerTest, CheckAndEnforceService_FAILED, TestSize.Level1)
 {
     WIFI_LOGE("CheckAndEnforceService_FAILED enter!");
@@ -97,6 +93,7 @@ HWTEST_F(WifiServiceManagerTest, UnloadServiceTest, TestSize.Level1)
 
 HWTEST_F(WifiServiceManagerTest, UninstallAllServiceTest, TestSize.Level1)
 {
+    WifiServiceManager::GetInstance().UninstallAllService();
 }
 
 HWTEST_F(WifiServiceManagerTest, ApServiceSetHotspotConfigTest, TestSize.Level1)

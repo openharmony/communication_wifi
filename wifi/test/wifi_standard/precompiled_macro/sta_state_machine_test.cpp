@@ -199,14 +199,14 @@ public:
     {
         EapSimGsmAuthParam param;
         param.rands.push_back("30303a35353a44443a66663a4d4d");
-        pStaStateMachine->GetGsmAuthResponseWithoutLength(param);
+        EXPECT_EQ(pStaStateMachine->GetGsmAuthResponseWithoutLength(param), "");
     }
 
     void GetGsmAuthResponseWithLengthTest()
     {
         EapSimGsmAuthParam param;
         param.rands.push_back("30303a35353a44443a66663a4d4d");
-        pStaStateMachine->GetGsmAuthResponseWithLength(param);
+        EXPECT_EQ(pStaStateMachine->GetGsmAuthResponseWithLength(param), "");
     }
 
     void StartDetectTimerTest()

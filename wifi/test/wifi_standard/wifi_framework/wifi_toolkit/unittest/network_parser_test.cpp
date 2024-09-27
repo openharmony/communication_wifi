@@ -186,13 +186,13 @@ HWTEST_F(NetworkParserTest, IsWifiConfigValidFalseTest, TestSize.Level1)
 HWTEST_F(NetworkParserTest, GetNetworksTest, TestSize.Level1)
 {
     WIFI_LOGI("GetNetworksTest enter");
-    m_networkXmlParser->GetNetworks();
+    EXPECT_EQ(m_networkXmlParser->GetNetworks().size(), 0);
 }
 
 HWTEST_F(NetworkParserTest, GetRandomMacmapTest, TestSize.Level1)
 {
     WIFI_LOGI("GetRandomMacmapTest enter");
-    m_networkXmlParser->GetRandomMacmap();
+    EXPECT_EQ(m_networkXmlParser->GetRandomMacmap().size(), 0);
 }
 
 HWTEST_F(NetworkParserTest, IsRandomMacValidTest, TestSize.Level1)

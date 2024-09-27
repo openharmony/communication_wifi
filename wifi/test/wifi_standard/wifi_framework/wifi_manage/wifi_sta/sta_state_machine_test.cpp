@@ -1913,7 +1913,7 @@ public:
     void IsValidSimIdTest()
     {
         pStaStateMachine->IsValidSimId(0);
-        pStaStateMachine->IsValidSimId(1);
+        EXPECT_EQ(pStaStateMachine->IsValidSimId(1), true);
     }
     void IsMultiSimEnabledTest()
     {
@@ -1921,21 +1921,21 @@ public:
     }
     void SimAkaAuthTest()
     {
-        pStaStateMachine->SimAkaAuth("", SIM_AUTH_EAP_SIM_TYPE);
+        EXPECT_EQ(pStaStateMachine->SimAkaAuth("", SIM_AUTH_EAP_SIM_TYPE), "");
     }
 
     void GetGsmAuthResponseWithLengthTest()
     {
         EapSimGsmAuthParam param;
         param.rands.push_back(TEMP_TEST_DATA);
-        pStaStateMachine->GetGsmAuthResponseWithLength(param);
+        EXPECT_EQ(pStaStateMachine->GetGsmAuthResponseWithLength(param), "");
     }
 
     void GetGsmAuthResponseWithoutLengthTest()
     {
         EapSimGsmAuthParam param;
         param.rands.push_back(TEMP_TEST_DATA);
-        pStaStateMachine->GetGsmAuthResponseWithoutLength(param);
+        EXPECT_EQ(pStaStateMachine->GetGsmAuthResponseWithoutLength(param), "");
     }
 
     void PreWpaEapUmtsAuthEventTest()
@@ -1948,7 +1948,7 @@ public:
         EapSimUmtsAuthParam param;
         param.rand = TEMP_TEST_DATA;
         param.autn = TEMP_TEST_DATA;
-        pStaStateMachine->FillUmtsAuthReq(param);
+        EXPECT_NE(pStaStateMachine->FillUmtsAuthReq(param).size(), 0);
     }
     void ParseAndFillUmtsAuthParamTest()
     {
@@ -1963,7 +1963,7 @@ public:
     void GetUmtsAuthResponseTest()
     {
         EapSimUmtsAuthParam param;
-        pStaStateMachine->GetUmtsAuthResponse(param);
+        EXPECT_EQ(pStaStateMachine->GetUmtsAuthResponse(param), "");
     }
 
     void DealWpaEapSimAuthEventTest()
@@ -2020,7 +2020,7 @@ public:
  
     void IsRoamingTest()
     {
-        pStaStateMachine->IsRoaming();
+        EXPECT_EQ(pStaStateMachine->IsRoaming(), false);
     }
     void OnDhcpResultNotifyEventTest()
     {

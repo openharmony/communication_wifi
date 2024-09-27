@@ -141,7 +141,7 @@ public:
     void InitSelfCureCmsHandleMapTest()
     {
         LOGI("Enter InitSelfCureCmsHandleMapTest");
-        pSelfCureStateMachine->pConnectedMonitorState->InitSelfCureCmsHandleMap();
+        EXPECT_EQ(pSelfCureStateMachine->pConnectedMonitorState->InitSelfCureCmsHandleMap(), 0);
     }
 
     void TransitionToSelfCureStateTest()
@@ -523,7 +523,7 @@ public:
     void InitSelfCureIssHandleMapTest()
     {
         LOGI("Enter InitSelfCureIssHandleMapTest");
-        pSelfCureStateMachine->pInternetSelfCureState->InitSelfCureIssHandleMap();
+        EXPECT_EQ(pSelfCureStateMachine->pInternetSelfCureState->InitSelfCureIssHandleMap(), 0);
     }
 
     void HandleRandMacSelfCureCompleteTest()
@@ -837,7 +837,7 @@ public:
         LOGI("Enter IsNeedMultiGatewaySelfcureTest");
         pSelfCureStateMachine->pInternetSelfCureState->IsNeedMultiGatewaySelfcure();
         pSelfCureStateMachine->pInternetSelfCureState->usedMultiGwSelfcure = true;
-        pSelfCureStateMachine->pInternetSelfCureState->IsNeedMultiGatewaySelfcure();
+        EXPECT_EQ(pSelfCureStateMachine->pInternetSelfCureState->IsNeedMultiGatewaySelfcure(), false);
     }
 
     void SelfcureForMultiGatewayTest()
@@ -1335,7 +1335,7 @@ public:
     void GetNowMilliSecondsTest()
     {
         LOGI("Enter GetNowMilliSecondsTest");
-        pSelfCureStateMachine->GetNowMilliSeconds();
+        EXPECT_NE(pSelfCureStateMachine->GetNowMilliSeconds(), 0);
     }
 
     void SendBlaListToDriverTest()
@@ -1391,7 +1391,7 @@ public:
         pSelfCureStateMachine->ParseWifi6BlackListInfo(iter);
 
         iter = std::make_pair("", wifi6BlackListInfo);
-        pSelfCureStateMachine->ParseWifi6BlackListInfo(iter);
+        EXPECT_NE(pSelfCureStateMachine->ParseWifi6BlackListInfo(iter), "");
     }
 
     void AgeOutWifi6BlackTest()
@@ -2348,7 +2348,7 @@ HWTEST_F(SelfCureStateMachineTest, TransIpAddressToVec, TestSize.Level1)
     pSelfCureStateMachine->TransIpAddressToVec(addr);
 
     addr = "00:aa:bb:cc:dd:ee:ff";
-    pSelfCureStateMachine->TransIpAddressToVec(addr);
+    EXPECT_NE(pSelfCureStateMachine->TransIpAddressToVec(addr).size(), 0);
 }
 
 HWTEST_F(SelfCureStateMachineTest, TransVecToIpAddress, TestSize.Level1)
@@ -2360,7 +2360,7 @@ HWTEST_F(SelfCureStateMachineTest, TransVecToIpAddress, TestSize.Level1)
     pSelfCureStateMachine->TransVecToIpAddress(vec);
     
     vec = {};
-    pSelfCureStateMachine->TransVecToIpAddress(vec);
+    EXPECT_EQ(pSelfCureStateMachine->TransVecToIpAddress(vec), "");
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest, TestSize.Level1)
@@ -2440,7 +2440,7 @@ HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenGatewayAndCurrentAddrAreVal
     std::string gateway = GATEWAY;
     std::string currentAddr = CURRENT_ADDR;
     std::vector<std::string> testedAddr = TESTED_ADDR;
-    pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr);
+    EXPECT_NE(pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr), "");
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsIpAddressInvalidTest1, TestSize.Level1)
@@ -2504,7 +2504,7 @@ HWTEST_F(SelfCureStateMachineTest, TransStrToVecTest, TestSize.Level1)
     char c = '|';
     pSelfCureStateMachine->TransStrToVec(str, c);
     c = '/';
-    pSelfCureStateMachine->TransStrToVec(str, c);
+    EXPECT_NE(pSelfCureStateMachine->TransStrToVec(str, c).size(), 0);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsUseFactoryMacTest, TestSize.Level1)
@@ -3133,7 +3133,7 @@ HWTEST_F(SelfCureStateMachineTest, IfMultiGateway_Test, TestSize.Level1)
 
 HWTEST_F(SelfCureStateMachineTest, IsSelfCureOnGoing_Test, TestSize.Level1)
 {
-    pSelfCureStateMachine->IsSelfCureOnGoing();
+    EXPECT_EQ(pSelfCureStateMachine->IsSelfCureOnGoing(), false);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
@@ -3164,7 +3164,7 @@ HWTEST_F(SelfCureStateMachineTest, IsEncryptedAuthTypeTest, TestSize.Level1)
     pSelfCureStateMachine->IsEncryptedAuthType(authType);
 
     authType = "KEY_MGMT_SAE";
-    pSelfCureStateMachine->IsEncryptedAuthType(authType);
+    EXPECT_EQ(pSelfCureStateMachine->IsEncryptedAuthType(authType), false);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsSoftApSsidSameWithWifiTest, TestSize.Level1)

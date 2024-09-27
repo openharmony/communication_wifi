@@ -170,7 +170,7 @@ HWTEST_F(SelfCureServiceTest, NotifyInternetFailureDetectedTest, TestSize.Level1
 
 HWTEST_F(SelfCureServiceTest, IsSelfCureOnGoingTest, TestSize.Level1)
 {
-    pSelfCureService->IsSelfCureOnGoing();
+    EXPECT_EQ(pSelfCureService->IsSelfCureOnGoing(), false);
 }
 
 } // namespace Wifi

@@ -729,26 +729,26 @@ void StaServiceTest::GetDataSlotIdTest()
 void StaServiceTest::GetImsiTest()
 {
     int32_t slotId = 0;
-    pStaService->GetImsi(slotId);
+    EXPECT_EQ(pStaService->GetImsi(slotId), "");
 }
 
 void StaServiceTest::GetPlmnTest()
 {
     int32_t slotId = 0;
-    pStaService->GetPlmn(slotId);
+    EXPECT_EQ(pStaService->GetPlmn(slotId), "");
 }
 
 void StaServiceTest::GetMccTest()
 {
     std::string imsi = "";
-    pStaService->GetMcc(imsi);
+    EXPECT_EQ(pStaService->GetMcc(imsi), "");
 }
 
 void StaServiceTest::GetMncTest()
 {
     std::string imsi = "1234";
     const int mncLen = 4;
-    pStaService->GetMnc(imsi, mncLen);
+    EXPECT_EQ(pStaService->GetMnc(imsi, mncLen), "4");
 }
 
 void StaServiceTest::UpdateEapConfigTest()

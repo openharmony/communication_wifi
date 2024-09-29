@@ -41,6 +41,7 @@
 
 namespace OHOS {
 namespace Wifi {
+
 DEFINE_WIFILOG_LABEL("WifiCommonUtil");
 
 constexpr int PRIFIX_IP_LEN = 3;
@@ -195,12 +196,12 @@ static char ConvertArrayChar(unsigned char ch)
     return '0';
 }
 
-std::string MacArrayToStr(const unsigned char mac[WIFI_MAC_LEN])
+std::string MacArrayToStr(const unsigned char mac[WIFI_MAC_LEN], int len)
 {
     constexpr int bitWidth = 4;
     constexpr int noColonBit = 5;
     std::stringstream ss;
-    for (int i = 0; i != WIFI_MAC_LEN; ++i) {
+    for (int i = 0; i != len; ++i) {
         ss << ConvertArrayChar(mac[i] >> bitWidth) << ConvertArrayChar(mac[i] & 0xf);
         if (i != noColonBit) {
             ss << ":";

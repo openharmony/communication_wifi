@@ -23,6 +23,7 @@
 constexpr int INVALID_VALUE = -1;
 #define STR_END '\0'
 
+
 DEFINE_WIFILOG_LABEL("WifiCP2P");
 std::shared_ptr<OHOS::Wifi::WifiP2p> wifiP2pPtr = OHOS::Wifi::WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 
@@ -89,7 +90,7 @@ NO_SANITIZE("cfi") WifiErrorCode StopP2pListen()
 static void ConvertConfigCToCpp(const WifiP2pConfig* config, OHOS::Wifi::WifiP2pConfig& cppConfig)
 {
     CHECK_PTR_RETURN_VOID(config);
-    cppConfig.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(config->devAddr));
+    cppConfig.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(config->devAddr, MAC_LEN));
     cppConfig.SetDeviceAddressType(config->bssidType);
     cppConfig.SetGoBand(OHOS::Wifi::GroupOwnerBand(static_cast<int>(config->goBand)));
     cppConfig.SetNetId(config->netId);
@@ -116,7 +117,7 @@ NO_SANITIZE("cfi") WifiErrorCode RemoveGroup()
 static void ConvertP2PDeviceCToCpp(const WifiP2pDevice& p2pDevice, OHOS::Wifi::WifiP2pDevice& cppDevice)
 {
     cppDevice.SetDeviceName(p2pDevice.deviceName);
-    cppDevice.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(p2pDevice.devAddr));
+    cppDevice.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(p2pDevice.devAddr, MAC_LEN));
     cppDevice.SetDeviceAddressType(p2pDevice.bssidType);
     cppDevice.SetPrimaryDeviceType(p2pDevice.primaryDeviceType);
     cppDevice.SetSecondaryDeviceType(p2pDevice.secondaryDeviceType);

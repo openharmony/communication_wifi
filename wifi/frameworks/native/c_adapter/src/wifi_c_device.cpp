@@ -25,7 +25,6 @@
 
 DEFINE_WIFILOG_LABEL("WifiCDevice");
 
-
 static std::map<WifiSecurityType, std::string> g_secTypeKeyMgmtMap = {
     {WIFI_SEC_TYPE_OPEN, "NONE"},
     {WIFI_SEC_TYPE_WEP, "WEP"},
@@ -169,7 +168,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromC(
     if (OHOS::Wifi::IsMacArrayEmpty(config->bssid)) {
         deviceConfig.bssid = "";
     } else {
-        deviceConfig.bssid = OHOS::Wifi::MacArrayToStr(config->bssid, MAC_LEN);
+        deviceConfig.bssid = OHOS::Wifi::MacArrayToStr(config->bssid, WIFI_MAC_LEN);
     }
     deviceConfig.bssidType = config->bssidType;
     if (strnlen(config->preSharedKey, WIFI_MAX_KEY_LEN) == WIFI_MAX_KEY_LEN) {
@@ -232,7 +231,7 @@ static void ConvertScanParamsFromC(const WifiScanParams *params, OHOS::Wifi::Wif
     if (OHOS::Wifi::IsMacArrayEmpty(params->bssid)) {
         scanParams.bssid = "";
     } else {
-        scanParams.bssid = OHOS::Wifi::MacArrayToStr(params->bssid);
+        scanParams.bssid = OHOS::Wifi::MacArrayToStr(params->bssid, WIFI_MAC_LEN);
     }
     scanParams.freqs.push_back(params->freqs);
     scanParams.band = params->band;

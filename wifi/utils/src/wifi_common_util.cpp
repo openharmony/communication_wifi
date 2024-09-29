@@ -41,7 +41,6 @@
 
 namespace OHOS {
 namespace Wifi {
-
 DEFINE_WIFILOG_LABEL("WifiCommonUtil");
 
 constexpr int PRIFIX_IP_LEN = 3;

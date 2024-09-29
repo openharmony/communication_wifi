@@ -23,7 +23,6 @@
 
 DEFINE_WIFILOG_LABEL("WifiCHid2d");
 
-
 std::shared_ptr<OHOS::Wifi::Hid2d> wifiHid2dPtr = OHOS::Wifi::Hid2d::GetInstance(WIFI_P2P_ABILITY_ID);
 
 NO_SANITIZE("cfi") WifiErrorCode Hid2dRequestGcIp(const unsigned char gcMac[MAC_LEN],

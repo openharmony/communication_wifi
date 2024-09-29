@@ -16,7 +16,6 @@
 #ifndef OHOS_WIFI_COMMON_UTIL_H
 #define OHOS_WIFI_COMMON_UTIL_H
 
-
 #include <map>
 #include <chrono>
 #include <string>

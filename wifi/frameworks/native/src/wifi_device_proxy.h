@@ -594,8 +594,6 @@ private:
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
     void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     void RemoveDeathRecipient(void);
-    void ParseBigConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize, long len);
-    void ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
     sptr<IRemoteObject> remote_ = nullptr;
     std::atomic<bool> mRemoteDied;

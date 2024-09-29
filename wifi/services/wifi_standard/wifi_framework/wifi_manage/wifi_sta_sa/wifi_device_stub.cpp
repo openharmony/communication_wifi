@@ -30,7 +30,6 @@ DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 namespace OHOS {
 namespace Wifi {
 
-constexpr int MAX_ASHMEM_SIZE = 300;
 static std::map<int, std::string> g_HicollieStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
@@ -570,58 +569,12 @@ void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, MessageParcel &data, Messa
     return;
 }
 
-void WifiDeviceStub::SendBigConfigEx(int contentSize, std::vector<WifiDeviceConfig> &result,
-    std::stringstream &bigDataStream)
+void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
 {
-    for (int i = 0; i < contentSize; ++i) {
-        bigDataStream << result[i].networkId << ";";
-        bigDataStream << result[i].status << ";";
-        bigDataStream << StringToHex(result[i].bssid) << ";";
-        bigDataStream << result[i].bssidType << ";";
-        bigDataStream << StringToHex(result[i].ssid) << ";";
-        bigDataStream << result[i].band << ";";
-        bigDataStream << result[i].channel << ";";
-        bigDataStream << result[i].frequency << ";";
-        bigDataStream << result[i].level << ";";
-        bigDataStream << result[i].isPasspoint << ";";
-        bigDataStream << result[i].isEphemeral << ";";
-        bigDataStream << StringToHex(result[i].preSharedKey) << ";";
-        bigDataStream << StringToHex(result[i].keyMgmt) << ";";
-        for (int j = 0; j < WEPKEYS_SIZE; j++) {
-            bigDataStream << StringToHex(result[i].wepKeys[j]) << ";";
-        }
-        bigDataStream << result[i].wepTxKeyIndex << ";";
-        bigDataStream << result[i].priority << ";";
-        bigDataStream << result[i].hiddenSSID << ";";
-        bigDataStream << (int)result[i].wifiIpConfig.assignMethod << ";";
-        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.ipAddress.address, bigDataStream);
-        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.prefixLength << ";";
-        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.flags << ";";
-        bigDataStream << result[i].wifiIpConfig.staticIpAddress.ipAddress.scope << ";";
-        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.gateway, bigDataStream);
-        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.dnsServer1, bigDataStream);
-        BigDataWriteIpAddress(result[i].wifiIpConfig.staticIpAddress.dnsServer2, bigDataStream);
-        bigDataStream << StringToHex(result[i].wifiIpConfig.staticIpAddress.domains) << ";";
-        BigDataWriteEapConfig(result[i].wifiEapConfig, bigDataStream);
-        bigDataStream << (int)result[i].wifiProxyconfig.configureMethod << ";";
-        bigDataStream << StringToHex(result[i].wifiProxyconfig.autoProxyConfig.pacWebAddress) << ";";
-        bigDataStream << StringToHex(result[i].wifiProxyconfig.manualProxyConfig.serverHostName) << ";";
-        bigDataStream << result[i].wifiProxyconfig.manualProxyConfig.serverPort << ";";
-        bigDataStream << StringToHex(result[i].wifiProxyconfig.manualProxyConfig.exclusionObjectList) << ";";
-        bigDataStream << (int)result[i].wifiPrivacySetting << ";";
-        bigDataStream << result[i].uid << ";";
-        bigDataStream << StringToHex(result[i].callProcessName) << ";";
-        bigDataStream << StringToHex(result[i].ancoCallProcessName) << ";";
-        bigDataStream << (int)result[i].networkSelectionStatus.status << ";";
-        bigDataStream << (int)result[i].networkSelectionStatus.networkSelectionDisableReason << ";";
-    }
-}
-
-void WifiDeviceStub::SendBigConfig(int contentSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
-{
-    WIFI_LOGI("WifiDeviceStub SendBigConfig");
+    WIFI_LOGI("WifiDeviceStub SendDeviceConfig");
     std::string name = "deviceconfigs";
-    sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), contentSize * sizeof(WifiDeviceConfig));
+    int32_t ashmemSize = contentSize * sizeof(WifiDeviceConfig);
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), ashmemSize);
     if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
         reply.WriteInt32(WIFI_OPT_FAILED);
         if (ashmem != nullptr) {
@@ -630,29 +583,24 @@ void WifiDeviceStub::SendBigConfig(int contentSize, std::vector<WifiDeviceConfig
         }
         return;
     }
-    std::stringstream bigDataStream;
-    SendBigConfigEx(contentSize, result, bigDataStream);
-
+    int offset = 0;
+    std::vector<uint32_t> allSize;
+    for (int32_t i = 0; i < contentSize; ++i) {
+        MessageParcel outParcel;
+        WriteWifiDeviceConfig(outParcel, result[i]);
+        int dataSize = outParcel.GetDataSize();
+        if (offset + dataSize > ashmemSize) {
+            break;
+        }
+        allSize.emplace_back(dataSize);
+        ashmem->WriteToAshmem(reinterpret_cast<void*>(outParcel.GetData()), dataSize, offset);
+        offset += dataSize;
+    }
     reply.WriteInt32(WIFI_OPT_SUCCESS);
-    reply.WriteInt32(contentSize);
-    long len = static_cast<long>(bigDataStream.str().length());
-    reply.WriteInt64(len);
-    ashmem->WriteToAshmem(bigDataStream.str().c_str(), bigDataStream.str().length(), 0);
+    reply.WriteUInt32Vector(allSize);
     reply.WriteAshmem(ashmem);
- 
     ashmem->UnmapAshmem();
     ashmem->CloseAshmem();
-}
-
-void WifiDeviceStub::SendSmallConfig(int32_t size, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
-{
-    reply.WriteInt32(WIFI_OPT_SUCCESS);
-    reply.WriteInt32(size);
-    for (int32_t i = 0; i < size; ++i) {
-        WriteWifiDeviceConfig(reply, result[i]);
-    }
- 
-    return;
 }
 
 void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply)
@@ -668,11 +616,7 @@ void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, Mess
         return;
     }
     unsigned int size = result.size();
-    if (size > MAX_ASHMEM_SIZE) {
-        SendBigConfig(size, result, reply);
-        return;
-    }
-    SendSmallConfig(size, result, reply);
+    SendDeviceConfig(size, result, reply);
     return;
 }
 

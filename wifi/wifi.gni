@@ -20,6 +20,7 @@ CONFIG_CTRL_IFACE = "unix"
 
 declare_args() {
   wifi_feature_with_p2p = true
+  wifi_feature_with_rpt = true
   wifi_feature_with_ap_intf = "wlan"
   wifi_feature_with_ap_num = 1
   wifi_feature_with_sta_num = 2

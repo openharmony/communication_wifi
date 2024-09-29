@@ -246,6 +246,8 @@ ErrCode WifiScanProxy::IsWifiClosedScan(bool &bOpen)
 
 static void GetScanInfo(WifiScanInfo &info, MessageParcel &inParcel)
 {
+    size_t maxIeSize = 256;
+    size_t maxIeLen = 1024;
     info.bssid = inParcel.ReadString();
     info.ssid = inParcel.ReadString();
     info.bssidType = inParcel.ReadInt32();
@@ -259,10 +261,12 @@ static void GetScanInfo(WifiScanInfo &info, MessageParcel &inParcel)
     info.securityType = static_cast<WifiSecurity>(inParcel.ReadInt32());
     // Parse infoElems vector
     size_t numInfoElems = inParcel.ReadUint32();
+    numInfoElems = numInfoElems < maxIeSize ? numInfoElems : maxIeSize;
     for (size_t m = 0; m < numInfoElems; m++) {
         WifiInfoElem elem;
         elem.id = inParcel.ReadInt32();
         size_t ieLen = inParcel.ReadUint32();
+        ieLen = ieLen < maxIeLen ? ieLen : maxIeLen;
         elem.content.resize(ieLen);
         for (size_t n = 0; n < ieLen; n++) {
             elem.content[n] = static_cast<char>(inParcel.ReadInt32());

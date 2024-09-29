@@ -176,26 +176,26 @@ HWTEST_F(AppParserTest, GetCloudPushFileVersion, TestSize.Level1)
 {
     WIFI_LOGI("GetLocalFileVersion enter");
     std::string strCloud = m_appXmlParser->GetCloudPushVersionFilePath();
-    m_appXmlParser->GetCloudPushFileVersion(strCloud.c_str());
+    EXPECT_EQ(m_appXmlParser->GetCloudPushFileVersion(strCloud.c_str()), "");
 }
  
 HWTEST_F(AppParserTest, GetLocalFileVersion, TestSize.Level1)
 {
     WIFI_LOGI("GetLocalFileVersion enter");
     std::string wifiMonitorAppFilePath = "/system/etc/wifi/wifi_monitor_apps.xml";
-    m_appXmlParser->GetLocalFileVersion(wifiMonitorAppFilePath.c_str());
+    EXPECT_NE(m_appXmlParser->GetLocalFileVersion(wifiMonitorAppFilePath.c_str()), "");
 }
  
 HWTEST_F(AppParserTest, GetCloudPushVersionFilePath, TestSize.Level1)
 {
     WIFI_LOGI("GetCloudPushVersionFilePath enter");
-    m_appXmlParser->GetCloudPushVersionFilePath();
+    EXPECT_NE(m_appXmlParser->GetCloudPushVersionFilePath(), "");
 }
  
 HWTEST_F(AppParserTest, GetCloudPushJsonFilePath, TestSize.Level1)
 {
     WIFI_LOGI("GetCloudPushJsonFilePath enter");
-    m_appXmlParser->GetCloudPushJsonFilePath();
+    EXPECT_NE(m_appXmlParser->GetCloudPushJsonFilePath(), "");
 }
 
 } // namespace Wifi

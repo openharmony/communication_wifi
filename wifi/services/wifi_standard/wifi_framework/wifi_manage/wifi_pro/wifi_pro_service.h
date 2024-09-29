@@ -12,16 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_WIFI_PRO_SERVICE_H
 #define OHOS_WIFI_PRO_SERVICE_H
- 
+
 #include "define.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
 #include "wifi_internal_msg.h"
 #include "wifi_pro_state_machine.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 class WifiProService {
@@ -40,7 +40,7 @@ private:
     void NotifyWifiConnectStateChanged(OperateResState state, const WifiLinkedInfo &linkedInfo);
     void NotifyCheckWifiInternetResult(OperateResState state);
 };
- 
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

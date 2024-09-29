@@ -93,7 +93,7 @@ HWTEST_F(SoftapParserTest, TransBandinfoTest, TestSize.Level1)
 HWTEST_F(SoftapParserTest, GetSoftapConfigsTest, TestSize.Level1)
 {
     WIFI_LOGI("GetSoftapConfigsTest enter");
-    m_softapXmlParser->GetSoftapConfigs();
+    EXPECT_NE(m_softapXmlParser->GetSoftapConfigs().size(), 0);
 }
 }
 }

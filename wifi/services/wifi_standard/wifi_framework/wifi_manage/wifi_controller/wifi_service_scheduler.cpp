@@ -235,7 +235,6 @@ ErrCode WifiServiceScheduler::AutoStopWifi2Service(int instId)
             return WIFI_OPT_FAILED;
         }
     }
-    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
     DispatchWifi2CloseRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleWifi2Close(instId);
@@ -397,7 +396,6 @@ ErrCode WifiServiceScheduler::PostStartWifi(int instId)
     ErrCode errCode = WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
     if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
         WIFI_LOGE("AutoStartStaService, AutoStartP2pService failed!");
-        return WIFI_OPT_FAILED;
     }
 #endif
     return WIFI_OPT_SUCCESS;
@@ -509,20 +507,6 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             return WIFI_OPT_FAILED;
         }
 #endif
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        if (instId == INSTID_WLAN0) {
-            ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
-            if (pSelfCureService == nullptr) {
-                WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_SELFCURE);
-                return WIFI_OPT_FAILED;
-            }
-            errCode = pService->RegisterStaServiceCallback(pSelfCureService->GetStaCallback());
-            if (errCode != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("SelfCure register sta service callback failed!");
-                return WIFI_OPT_FAILED;
-            }
-        }
-#endif
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -584,6 +568,16 @@ ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
     ErrCode errCode = pSelfCureService->InitSelfCureService();
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Service enable self cure failed, ret %{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
+        return WIFI_OPT_FAILED;
+    }
+    errCode = pService->RegisterStaServiceCallback(pSelfCureService->GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SelfCure register sta service callback failed!");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

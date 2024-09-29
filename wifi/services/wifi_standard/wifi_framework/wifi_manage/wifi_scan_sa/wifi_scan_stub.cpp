@@ -22,7 +22,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_scan_death_recipient.h"
 #include "wifi_common_def.h"
-#include "wifi_scan_config.h"
+#include "wifi_config_center.h"
 #include "wifi_common_util.h"
 #include "wifi_watchdog_utils.h"
 
@@ -165,9 +165,9 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
     std::string name = data.ReadString();
     WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d",
         code, data.GetRawDataSize(), compatible);
-    WifiScanConfig::GetInstance().SetAppPackageName(name);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(name);
     ErrCode ret = Scan(compatible);
-    WifiScanConfig::GetInstance().SetAppPackageName("");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -197,9 +197,9 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
     params.band = static_cast<uint32_t>(data.ReadInt32());
     std::string name = data.ReadString();
 
-    WifiScanConfig::GetInstance().SetAppPackageName(name);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(name);
     ErrCode ret = AdvanceScan(params);
-    WifiScanConfig::GetInstance().SetAppPackageName("");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName("");
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -233,6 +233,8 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         return;
     }
     int offset = 0;
+    size_t maxIeSize = 256;
+    size_t maxIeLen = 1024;
     std::vector<uint32_t> allSize;
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
@@ -247,11 +249,15 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         outParcel.WriteInt32(result[i].centerFrequency1);
         outParcel.WriteInt32(result[i].rssi);
         outParcel.WriteInt32(static_cast<int>(result[i].securityType));
-        outParcel.WriteUint32(result[i].infoElems.size());
-        for (const auto &elem : result[i].infoElems) {
+        size_t ieSize = result[i].infoElems.size() < maxIeSize ? result[i].infoElems.size() : maxIeSize;
+        outParcel.WriteUint32(ieSize);
+        for (size_t j = 0; j < ieSize; j++) {
+            auto elem = result[i].infoElems[j];
             outParcel.WriteInt32(elem.id);
-            outParcel.WriteUint32(elem.content.size());
-            for (const auto &byte : elem.content) {
+            size_t ieLen = elem.content.size() < maxIeLen ? elem.content.size() : maxIeLen;
+            outParcel.WriteUint32(ieLen);
+            for (size_t k = 0; k < ieLen; k++) {
+                auto byte = elem.content[k];
                 outParcel.WriteInt32(static_cast<int>(byte));
             }
         }

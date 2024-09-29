@@ -86,7 +86,7 @@ void WifiHotspotManager::CloseApService(int id)
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
     WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
     WifiConfigCenter::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);
-    auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->SendMessage(CMD_AP_STOPPED, id);
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
@@ -132,7 +132,7 @@ void WifiHotspotManager::DealApStateChanged(ApState state, int id)
     }
     if (state == ApState::AP_STATE_STARTED) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, id);
-        auto &ins =  WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
         ins->SendMessage(CMD_AP_START, id);
     }
 

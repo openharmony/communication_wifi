@@ -59,6 +59,8 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/multi_sta_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/multi_sta_state_machine.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/rpt_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/rpt_manager_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/softap_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/softap_manager_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/wifi_controller_state_machine.cpp",
@@ -131,6 +133,8 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/base/shared_util",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
@@ -141,6 +145,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
@@ -156,7 +161,6 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/network_select",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/hal_device_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface",
@@ -248,6 +252,10 @@ ohos_unittest("manager_unittest") {
 
   if (wifi_feature_with_p2p) {
     defines += [ "FEATURE_P2P_SUPPORT" ]
+  }
+
+  if (wifi_feature_with_rpt) {
+    defines += [ "FEATURE_RPT_SUPPORT" ]
   }
 
   if (defined(global_parts_info) &&

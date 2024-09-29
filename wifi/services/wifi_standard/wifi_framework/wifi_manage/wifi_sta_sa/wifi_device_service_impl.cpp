@@ -1760,7 +1760,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     }
 
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
-    if (m_instId >= 0 || m_instId < STA_INSTANCE_MAX_NUM) {
+    if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, m_instId);
     }
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
@@ -1809,7 +1809,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
     } else {
         WifiStoreRandomMac randomMacInfo;
         std::vector<WifiScanInfo> scanInfoList;
-        WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
         for (auto scanInfo : scanInfoList) {
             if ((deviceConfig.ssid == scanInfo.ssid) &&
                 (ComparedHinlinkKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {

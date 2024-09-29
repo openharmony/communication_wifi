@@ -63,6 +63,8 @@ public:
 
     void ShowDialog(WifiDialogType type);
 
+    void ShowSettingsDialog(WifiDialogType type, std::string settings);
+
 private:
     std::atomic<bool> isNtfPublished {false};
 

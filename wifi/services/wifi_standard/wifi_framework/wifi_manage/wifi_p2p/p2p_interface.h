@@ -338,6 +338,20 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) override;
+
+    /**
+     * @Description create p2p group of rpt
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode CreateRptGroup(const WifiP2pConfig &config) override;
+
+    /**
+     * @Description get station list of rpt
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result) override;
 private:
     WifiP2pGroupManager groupManager;    /* group manager */
     WifiP2pDeviceManager deviceMgr;  /* device manager */

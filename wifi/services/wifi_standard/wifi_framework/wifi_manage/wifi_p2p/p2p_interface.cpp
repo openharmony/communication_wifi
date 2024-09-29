@@ -132,6 +132,16 @@ ErrCode P2pInterface::DeleteGroup(const WifiP2pGroupInfo &group)
     return p2pService.DeleteGroup(group);
 }
 
+ErrCode P2pInterface::CreateRptGroup(const WifiP2pConfig &config)
+{
+    return p2pService.CreateRptGroup(config);
+}
+
+ErrCode P2pInterface::GetRptStationsList(std::vector<StationInfo> &result)
+{
+    return p2pService.GetRptStationsList(result);
+}
+
 ErrCode P2pInterface::P2pConnect(const WifiP2pConfig &config)
 {
     return p2pService.P2pConnect(config);

@@ -40,6 +40,7 @@ public:
 private:
     void InitP2pCallback(void);
     void DealP2pStateChanged(P2pState bState);
+    void DealP2pPeerJoinOrLeave(bool isJoin, const std::string &mac);
     void DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers);
     void DealP2pServiceChanged(const std::vector<WifiP2pServiceInfo> &vServices);
     void DealP2pConnectionChanged(const WifiP2pLinkedInfo &info);

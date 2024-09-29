@@ -225,7 +225,6 @@ public:
         bool finalSelfCureUsed = false;
         std::vector<int> testedSelfCureLevel;
         WifiSelfCureHistoryInfo selfCureHistoryInfo;
-        std::string currentGateway = "";
         int selfCureForInvalidIpCnt = 0;
         SelfCureIssHandleFuncMap selfCureIssHandleFuncMap;
         std::vector<std::string> AssignedDnses;
@@ -273,6 +272,7 @@ public:
         void RequestUseStaticIpConfig(IpInfo &dhcpResult);
         IpInfo GetNextTestDhcpResults();
         IpInfo GetRecordDhcpResults();
+        void InitCurrentGateway();
     };
 
     /* *
@@ -405,7 +405,6 @@ private:
     bool IsSoftApSsidSameWithWifi(const HotspotConfig& curApConfig);
     void CheckConflictIpForSoftAp();
     static bool IsEncryptedAuthType(const std::string authType);
-    std::string GetCurrentGateway();
     bool DoArpTest(std::string& ipAddress, std::string& gateway);
     void RequestArpConflictTest();
     static void UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel,

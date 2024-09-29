@@ -116,7 +116,7 @@ NO_SANITIZE("cfi") WifiErrorCode RemoveGroup()
 static void ConvertP2PDeviceCToCpp(const WifiP2pDevice& p2pDevice, OHOS::Wifi::WifiP2pDevice& cppDevice)
 {
     cppDevice.SetDeviceName(p2pDevice.deviceName);
-    cppDevice.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(p2pDevice.devAddr, COMMON_MAC_LEN));
+    cppDevice.SetDeviceAddress(OHOS::Wifi::MacArrayToStr(p2pDevice.devAddr, MAC_LEN));
     cppDevice.SetDeviceAddressType(p2pDevice.bssidType);
     cppDevice.SetPrimaryDeviceType(p2pDevice.primaryDeviceType);
     cppDevice.SetSecondaryDeviceType(p2pDevice.secondaryDeviceType);

@@ -50,6 +50,7 @@ namespace Wifi {
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 constexpr int EXTENSION_ERROR_CODE = 13500099;
+constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
@@ -1297,6 +1298,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
 #ifdef SUPPORT_RANDOM_MAC_ADDR
         info.bssid = WifiConfigCenter::GetInstance().GetRandomMacAddr(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
             info.bssid);
+#else
         /* Clear mac addr */
         info.bssid = "";
 #endif

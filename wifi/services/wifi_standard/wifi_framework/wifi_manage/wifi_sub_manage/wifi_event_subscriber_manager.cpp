@@ -192,28 +192,6 @@ void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbi
     }
 }
 
-void WifiEventSubscriberManager::HandleCommonEventServiceChange(int systemAbilityId, bool add)
-{
-    WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!", systemAbilityId, add);
-    if (add) {
-        RegisterCesEvent();
-        RegisterNotificationEvent();
-#ifdef SUPPORT_ClOUD_WIFI_ASSET
-        RegisterAssetEvent();
-#endif
-        RegisterNetworkStateChangeEvent();
-        RegisterWifiScanChangeEvent();
-    } else {
-        UnRegisterCesEvent();
-        UnRegisterNotificationEvent();
-#ifdef SUPPORT_ClOUD_WIFI_ASSET
-        UnRegisterAssetEvent();
-#endif
-        UnRegisterNetworkStateChangeEvent();
-        UnRegisterWifiScanChangeEvent();
-    }
-}
-
 #ifdef HAS_MOVEMENT_PART
 void WifiEventSubscriberManager::HandleHasMovementPartChange(int systemAbilityId, bool add)
 {

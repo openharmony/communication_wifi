@@ -19,6 +19,7 @@
 #include <sys/time.h>
 #include "securec.h"
 #include "wifi_log.h"
+#include "wifi_common_util.h"
 #include <netdb.h>
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_UTILS_HTTP_REQ"
@@ -280,7 +281,7 @@ void HttpRequest::GetPortFromUrl()
 {
     if (strHost.find(":") != std::string::npos) {
         std::string strPort = strHost.substr(strHost.find(":") + 1);
-        iPort = std::stoi(strPort);
+        iPort = CheckDataLegal(strPort);
     } else {
         iPort = DEFAULT_PORT;
     }

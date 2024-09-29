@@ -2089,14 +2089,14 @@ std::string SelfCureStateMachine::ParseWifi6BlackListInfo(std::pair<std::string,
         std::string::size_type npos = currBssid.find(":");
         if (npos != std::string::npos) {
             std::string value = currBssid.substr(0, npos);
-            singleParam.push_back(static_cast<uint8_t>(std::stoi(value, nullptr, HEXADECIMAL)));
+            singleParam.push_back(static_cast<uint8_t>(CheckDataLegal(value, HEXADECIMAL)));
             currBssid = currBssid.substr(npos + 1);
         } else {
             if (currBssid.empty()) {
                 WIFI_LOGI("currBssid is empty");
                 break;
             }
-            singleParam.push_back(static_cast<uint8_t>(std::stoi(currBssid, nullptr, HEXADECIMAL)));
+            singleParam.push_back(static_cast<uint8_t>(CheckDataLegal(currBssid, HEXADECIMAL)));
         }
     }
     singleParam.push_back(static_cast<uint8_t>(iter.second.actionType));
@@ -2169,10 +2169,11 @@ std::vector<uint32_t> SelfCureStateMachine::TransIpAddressToVec(std::string addr
     size_t pos = 0;
     std::vector<uint32_t> currAddr;
     while ((pos = addr.find('.')) != std::string::npos) {
-        currAddr.push_back(stoi(addr.substr(0, pos)));
+        std::string addTmp = addr.substr(0, pos);
+        currAddr.push_back(CheckDataLegal(addTmp));
         addr.erase(0, pos + 1);
     }
-    currAddr.push_back(stoi(addr));
+    currAddr.push_back(CheckDataLegal(addr));
     if (currAddr.size() != IP_ADDR_SIZE) {
         WIFI_LOGE("TransIpAddressToVec failed");
         return {0, 0, 0, 0};
@@ -2506,29 +2507,29 @@ int SelfCureStateMachine::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info,
     // 0 to 12 is history subscript, which record the selfcure failed info, covert array to calss member
     for (int i = 0; i < cnt; i++) {
         if (i == 0) {
-            info.dnsSelfCureFailedCnt = stoi(histories[i]);
+            info.dnsSelfCureFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_DNS_FAILED_TS) {
-            info.lastDnsSelfCureFailedTs = stoll(histories[i]);
+            info.lastDnsSelfCureFailedTs = CheckDataTolonglong(histories[i]);
         } else if (i == POS_RENEW_DHCP_FAILED_CNT) {
-            info.renewDhcpSelfCureFailedCnt = stoi(histories[i]);
+            info.renewDhcpSelfCureFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_RENEW_DHCP_FAILED_TS) {
-            info.lastRenewDhcpSelfCureFailedTs = stoll(histories[i]);
+            info.lastRenewDhcpSelfCureFailedTs = CheckDataTolonglong(histories[i]);
         } else if (i == POS_STATIC_IP_FAILED_CNT) {
-            info.staticIpSelfCureFailedCnt = stoi(histories[i]);
+            info.staticIpSelfCureFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_STATIC_IP_FAILED_TS) {
-            info.lastStaticIpSelfCureFailedTs = stoll(histories[i]);
+            info.lastStaticIpSelfCureFailedTs = CheckDataTolonglong(histories[i]);
         } else if (i == POS_REASSOC_FAILED_CNT) {
-            info.reassocSelfCureFailedCnt = stoi(histories[i]);
+            info.reassocSelfCureFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_REASSOC_FAILED_TS) {
-            info.lastReassocSelfCureFailedTs = stoll(histories[i]);
+            info.lastReassocSelfCureFailedTs = CheckDataTolonglong(histories[i]);
         } else if (i == POS_RANDMAC_FAILED_CNT) {
-            info.randMacSelfCureFailedCnt = stoi(histories[i]);
+            info.randMacSelfCureFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_RANDMAC_FAILED_TS) {
-            info.lastRandMacSelfCureFailedCntTs = stoll(histories[i]);
+            info.lastRandMacSelfCureFailedCntTs = CheckDataTolonglong(histories[i]);
         } else if (i == POS_RESET_FAILED_CNT) {
-            info.resetSelfCureFailedCnt = stoi(histories[i]);
+            info.resetSelfCureFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_RESET_FAILED_TS) {
-            info.lastResetSelfCureFailedTs = stoll(histories[i]);
+            info.lastResetSelfCureFailedTs = CheckDataTolonglong(histories[i]);
         } else {
             WIFI_LOGI("exception happen.");
         }
@@ -2546,17 +2547,17 @@ int SelfCureStateMachine::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &in
     // 12 to 17 is history subscript, which record the selfcure connect failed info, covert array to calss member
     for (int i = cnt; i < SELFCURE_HISTORY_LENGTH; i++) {
         if (i == POS_REASSOC_CONNECT_FAILED_CNT) {
-            info.reassocSelfCureConnectFailedCnt = stoi(histories[i]);
+            info.reassocSelfCureConnectFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_REASSOC_CONNECT_FAILED_TS) {
-            info.lastReassocSelfCureConnectFailedTs = stoll(histories[i]);
+            info.lastReassocSelfCureConnectFailedTs = CheckDataTolonglong(histories[i]);
         } else if (i == POS_RANDMAC_CONNECT_FAILED_CNT) {
-            info.randMacSelfCureConnectFailedCnt = stoi(histories[i]);
+            info.randMacSelfCureConnectFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_RANDMAC_CONNECT_FAILED_TS) {
-            info.lastRandMacSelfCureConnectFailedCntTs = stoll(histories[i]);
+            info.lastRandMacSelfCureConnectFailedCntTs = CheckDataTolonglong(histories[i]);
         } else if (i == POS_RESET_CONNECT_FAILED_CNT) {
-            info.resetSelfCureConnectFailedCnt = stoi(histories[i]);
+            info.resetSelfCureConnectFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_RESET_CONNECT_FAILED_TS) {
-            info.lastResetSelfCureConnectFailedTs = stoll(histories[i]);
+            info.lastResetSelfCureConnectFailedTs = CheckDataTolonglong(histories[i]);
         } else {
             WIFI_LOGI("exception happen.");
         }

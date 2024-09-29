@@ -1217,10 +1217,6 @@ ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("IsWifiActive:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
 
     bActive = IsStaServiceRunning();
     return WIFI_OPT_SUCCESS;

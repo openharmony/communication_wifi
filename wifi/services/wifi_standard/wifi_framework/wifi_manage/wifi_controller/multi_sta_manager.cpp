@@ -29,6 +29,7 @@ MultiStaManager::~MultiStaManager()
     WIFI_LOGE("Exit.");
     if (pMultiStaStateMachine != nullptr) {
         delete pMultiStaStateMachine;
+        pMultiStaStateMachine = nullptr;
     }
 }
 
@@ -54,7 +55,7 @@ ErrCode MultiStaManager::RegisterCallback(const MultiStaModeCallback &callbacks)
     return WIFI_OPT_SUCCESS;
 }
 
-MultiStaStateMachine *MultiStaManager::GetMultiStaMachine()
+MultiStaStateMachine *MultiStaManager::GetMachine()
 {
     return pMultiStaStateMachine;
 }

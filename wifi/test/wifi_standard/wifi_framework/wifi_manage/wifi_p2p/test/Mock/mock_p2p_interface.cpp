@@ -222,5 +222,16 @@ ErrCode P2pInterface::DisableRandomMac(int setmode)
 {
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode P2pInterface::CreateRptGroup(const WifiP2pConfig &config)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode P2pInterface::GetRptStationsList(std::vector<StationInfo> &result)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

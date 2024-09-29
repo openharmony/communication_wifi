@@ -309,6 +309,21 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) override;
+
+    /**
+     * @Description create rpt group
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode CreateRptGroup(const WifiP2pConfig &config) override;
+
+    /**
+     * @Description get rpt station list
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result) override;
+
 private:
     /**
      * @Description - P2P state machine deregistration event callback.

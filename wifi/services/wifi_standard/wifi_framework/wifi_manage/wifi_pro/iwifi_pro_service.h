@@ -12,14 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_WIFI_IWIFI_PRO_SERVICE_H
 #define OHOS_WIFI_IWIFI_PRO_SERVICE_H
- 
+
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 class IWifiProService {
@@ -31,14 +31,14 @@ public:
      * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode InitWifiProService() = 0;
- 
+
     /**
      * @Description Get register sta callback
      *
      * @return StaServiceCallback - sta callback
      */
     virtual StaServiceCallback GetStaCallback() const = 0;
- 
+
     /**
      * @Description deal scan results
      *

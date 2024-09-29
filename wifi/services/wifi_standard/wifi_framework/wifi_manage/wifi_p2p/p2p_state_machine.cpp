@@ -33,6 +33,8 @@
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
+#include "arp_checker.h"
+#include "mac_address.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -43,6 +45,7 @@ const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
 //miracast
 const int CMD_TYPE_SET = 2;
 const int DATA_TYPE_P2P_BUSINESS = 1;
+const int ARP_TIMEOUT = 100;
 const std::string CARRY_DATA_MIRACAST = "1";
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
@@ -424,6 +427,16 @@ void P2pStateMachine::BroadcastP2pStatusChanged(P2pState state) const
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pStateChangedEvent != nullptr) {
             callBackItem.second.OnP2pStateChangedEvent(state);
+        }
+    }
+}
+
+void P2pStateMachine::BroadcastP2pPeerJoinOrLeave(bool isJoin, const std::string &mac) const
+{
+    std::unique_lock<std::mutex> lock(cbMapMutex);
+    for (const auto &callBackItem : p2pServiceCallbacks) {
+        if (callBackItem.second.OnP2pPeerJoinOrLeaveEvent != nullptr) {
+            callBackItem.second.OnP2pPeerJoinOrLeaveEvent(isJoin, mac);
         }
     }
 }
@@ -906,6 +919,10 @@ void P2pStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
     WIFI_LOGI("Start add route on dhcp success");
     WifiNetAgent::GetInstance().AddRoute(ifname, result->strOptClientId, IpTools::GetMaskLength(result->strOptSubnet));
     WIFI_LOGI("DhcpResultNotify::OnSuccess end");
+    std::string serverIp = result->strOptServerId;
+    std::string clientIp = result->strOptClientId;
+    /* trigger arp for miracast */
+    pP2pStateMachine->DoP2pArp(serverIp, clientIp);
 }
 
 void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname, const char *reason)
@@ -1078,11 +1095,7 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool n
     group.SetNetworkId(config.GetNetId());
     groupManager.AddOrUpdateGroup(group);
     ret = WifiP2PHalInterface::GetInstance().P2pSetGroupConfig(config.GetNetId(), wpaConfig);
-    if (ret == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
-        return false;
-    } else {
-        return true;
-    }
+    return ret != WIFI_HAL_OPT_FAILED;
 }
 
 bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const
@@ -1118,7 +1131,32 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
 
     UpdateGroupManager();
     UpdatePersistentGroups();
-    return (ret == WIFI_HAL_OPT_FAILED) ? false : true;
+    return ret != WIFI_HAL_OPT_FAILED;
+}
+
+bool P2pStateMachine::DealCreateRptGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const
+{
+    int createdNetId = -1;
+    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pAddNetwork(createdNetId);
+    if (ret == WIFI_HAL_OPT_OK) {
+        WifiP2PHalInterface::GetInstance().P2pSetSingleConfig(createdNetId, "rptid", std::to_string(createdNetId));
+        WifiP2pConfigInternal cfgBuf = config;
+        cfgBuf.SetNetId(createdNetId);
+        if (!SetGroupConfig(cfgBuf, true)) {
+            WIFI_LOGW("Some configuration settings failed!");
+        }
+        ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, createdNetId, freq);
+    }
+    if (ret == WIFI_HAL_OPT_FAILED) {
+        WifiP2PHalInterface::GetInstance().RemoveNetwork(createdNetId);
+        WifiP2pGroupInfo removedInfo;
+        removedInfo.SetNetworkId(createdNetId);
+        groupManager.RemoveGroup(removedInfo);
+    }
+
+    UpdateGroupManager();
+    UpdatePersistentGroups();
+    return ret != WIFI_HAL_OPT_FAILED;
 }
 
 bool P2pStateMachine::IsInterfaceReuse() const
@@ -1234,5 +1272,30 @@ void P2pStateMachine::StopP2pDhcpClient()
     }
     StopDhcpClient(ifName.c_str(), false);
 }
+
+void P2pStateMachine::DoP2pArp(std::string serverIp, std::string clientIp)
+{
+    ArpChecker arpChecker;
+    unsigned char macAddr[MAC_LEN];
+    std::string ifName = groupManager.GetCurrentGroup().GetInterface();
+    if (!MacAddress::GetMacAddr(ifName, macAddr)) {
+        WIFI_LOGE("get interface mac failed");
+        return;
+    }
+    std::string macAddress = MacArrayToStr(macAddr);
+    arpChecker.Start(ifName, macAddress, clientIp, serverIp);
+    arpChecker.DoArpCheck(ARP_TIMEOUT, true);
+}
+
+bool P2pStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo> &result)
+{
+#ifdef WIFI_DHCP_DISABLED
+    return true;
+#endif
+    WIFI_LOGE("rpt GetConnectedStationInfo");
+    std::string ifaceName = groupManager.GetCurrentGroup().GetInterface();
+    return m_DhcpdInterface.GetConnectedStationInfo(ifaceName, result);
+}
+
 } // namespace Wifi
 } // namespace OHOS

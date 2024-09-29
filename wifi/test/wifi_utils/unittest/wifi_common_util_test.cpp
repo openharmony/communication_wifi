@@ -68,7 +68,7 @@ HWTEST_F(WifiCommonUtilTest, GetBrokerProcessNameByPidTest, TestSize.Level1)
 {
     int uid = FREQ_5G_MIN;
     int pid = CHANNEL_14;
-    GetBrokerProcessNameByPid(uid, pid);
+    EXPECT_EQ(GetBrokerProcessNameByPid(uid, pid), "");
 }
 
 HWTEST_F(WifiCommonUtilTest, FrequencyToChannelTest, TestSize.Level1)
@@ -93,7 +93,7 @@ HWTEST_F(WifiCommonUtilTest, SsidAnonymizeTest, TestSize.Level1)
     std::string strs = "00";
     SsidAnonymize(strs);
     std::string strIp = "00:55:DD";
-    SsidAnonymize(strIp);
+    EXPECT_NE(SsidAnonymize(strIp), "");
 }
 
 HWTEST_F(WifiCommonUtilTest, Byte2HexStringTest, TestSize.Level1)

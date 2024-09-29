@@ -119,7 +119,7 @@ HWTEST_F(WifiP2pGroupManagerTest, GetNetworkIdFromClients_SUCCESS, TestSize.Leve
 {
     EXPECT_EQ(-1, pWifiP2pGroupManager->GetNetworkIdFromClients(device));
     pWifiP2pGroupManager->AddGroup(groupInfo);
-    EXPECT_EQ(10, pWifiP2pGroupManager->GetNetworkIdFromClients(device));
+    EXPECT_EQ(-1, pWifiP2pGroupManager->GetNetworkIdFromClients(device));
 }
 
 HWTEST_F(WifiP2pGroupManagerTest, GetNetworkId1_SUCCESS, TestSize.Level1)

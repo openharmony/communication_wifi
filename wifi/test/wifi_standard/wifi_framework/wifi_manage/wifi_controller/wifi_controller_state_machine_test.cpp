@@ -145,7 +145,7 @@ public:
 
     void RemoveConcreteManagerTest()
     {
-        pWifiControllerMachine->RemoveConcreteManager(0);
+        pWifiControllerMachine->concreteManagers.RemoveManager(0);
     }
 
     void HandleStaCloseTest()
@@ -175,7 +175,7 @@ public:
 
     void RmoveSoftapManagerTest()
     {
-        pWifiControllerMachine->RmoveSoftapManager(0);
+        pWifiControllerMachine->softApManagers.RemoveManager(0);
     }
 
     void HandleSoftapStopTest()
@@ -198,17 +198,16 @@ public:
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, 0);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
-        SoftApManager *softapmode = new (std::nothrow) SoftApManager(SoftApManager::Role::ROLE_SOFTAP, 0);
+        auto softapmode = std::make_shared<SoftApManager>(SoftApManager::Role::ROLE_SOFTAP, 0);
         softapmode->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
-        pWifiControllerMachine->softapManagers.push_back(softapmode);
+        pWifiControllerMachine->softApManagers.AddManager(softapmode);
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::RUNNING, 0);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         msg->SetParam1(1);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
-        ConcreteClientModeManager *clientmode =
-            new (std::nothrow) ConcreteClientModeManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
+        auto clientmode = std::make_shared<ConcreteClientModeManager>(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
-        pWifiControllerMachine->concreteManagers.push_back(clientmode);
+        pWifiControllerMachine->concreteManagers.AddManager(clientmode);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
@@ -235,17 +234,16 @@ public:
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         msg->SetMessageName(CMD_AP_START_FAILURE);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
-        SoftApManager *softapmode = new (std::nothrow) SoftApManager(SoftApManager::Role::ROLE_HAS_REMOVED, 0);
+        auto softapmode = std::make_shared<SoftApManager>(SoftApManager::Role::ROLE_HAS_REMOVED, 0);
         softapmode->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
-        pWifiControllerMachine->softapManagers.push_back(softapmode);
+        pWifiControllerMachine->softApManagers.AddManager(softapmode);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
-        SoftApManager *softapmodeBack = new (std::nothrow) SoftApManager(SoftApManager::Role::ROLE_HAS_REMOVED, 0);
+        auto softapmodeBack = std::make_shared<SoftApManager>(SoftApManager::Role::ROLE_HAS_REMOVED, 0);
         softapmodeBack->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
-        pWifiControllerMachine->softapManagers.push_back(softapmodeBack);
-        ConcreteClientModeManager *clientmode =
-            new (std::nothrow) ConcreteClientModeManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
+        pWifiControllerMachine->softApManagers.AddManager(softapmodeBack);
+        auto clientmode = std::make_shared<ConcreteClientModeManager>(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
-        pWifiControllerMachine->concreteManagers.push_back(clientmode);
+        pWifiControllerMachine->concreteManagers.AddManager(clientmode);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
@@ -281,35 +279,34 @@ public:
 
     void SoftApIdExistTest()
     {
-        SoftApManager *softapmode = new (std::nothrow) SoftApManager(SoftApManager::Role::ROLE_SOFTAP, 0);
+        auto softapmode = std::make_shared<SoftApManager>(SoftApManager::Role::ROLE_SOFTAP, 0);
         softapmode->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
-        pWifiControllerMachine->softapManagers.push_back(softapmode);
-        EXPECT_TRUE(pWifiControllerMachine->SoftApIdExist(0));
-        EXPECT_FALSE(pWifiControllerMachine->SoftApIdExist(1));
-        EXPECT_TRUE(pWifiControllerMachine->HasAnySoftApManager());
-        pWifiControllerMachine->StopSoftapManager(0);
-        pWifiControllerMachine->StopSoftapManager(1);
-        pWifiControllerMachine->StopAllSoftapManagers();
-        pWifiControllerMachine->GetSoftApManager(0);
-        pWifiControllerMachine->GetSoftApManager(1);
-        pWifiControllerMachine->RmoveSoftapManager(1);
-        pWifiControllerMachine->RmoveSoftapManager(0);
+        pWifiControllerMachine->softApManagers.AddManager(softapmode);
+        EXPECT_TRUE(pWifiControllerMachine->softApManagers.IdExist(0));
+        EXPECT_FALSE(pWifiControllerMachine->softApManagers.IdExist(1));
+        EXPECT_TRUE(pWifiControllerMachine->softApManagers.HasAnyManager());
+        pWifiControllerMachine->softApManagers.StopManager(0);
+        pWifiControllerMachine->softApManagers.StopManager(1);
+        pWifiControllerMachine->softApManagers.StopAllManagers();
+        pWifiControllerMachine->softApManagers.GetManager(0);
+        pWifiControllerMachine->softApManagers.GetManager(1);
+        pWifiControllerMachine->softApManagers.RemoveManager(1);
+        pWifiControllerMachine->softApManagers.RemoveManager(0);
     }
 
     void ConcreteIdExistTest()
     {
         int instId = 0;
-        ConcreteClientModeManager *clientmode =
-            new (std::nothrow) ConcreteClientModeManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
+        auto clientmode = std::make_shared<ConcreteClientModeManager>(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
-        pWifiControllerMachine->concreteManagers.push_back(clientmode);
-        EXPECT_TRUE(pWifiControllerMachine->ConcreteIdExist(0));
-        EXPECT_FALSE(pWifiControllerMachine->ConcreteIdExist(1));
-        EXPECT_TRUE(pWifiControllerMachine->HasAnyConcreteManager());
+        pWifiControllerMachine->concreteManagers.AddManager(clientmode);
+        EXPECT_TRUE(pWifiControllerMachine->concreteManagers.IdExist(0));
+        EXPECT_FALSE(pWifiControllerMachine->concreteManagers.IdExist(1));
+        EXPECT_TRUE(pWifiControllerMachine->concreteManagers.HasAnyManager());
         EXPECT_TRUE(pWifiControllerMachine->HasAnyManager());
-        pWifiControllerMachine->StopAllConcreteManagers();
-        pWifiControllerMachine->StopConcreteManager(0);
-        pWifiControllerMachine->StopConcreteManager(1);
+        pWifiControllerMachine->concreteManagers.StopAllManagers();
+        pWifiControllerMachine->concreteManagers.StopManager(0);
+        pWifiControllerMachine->concreteManagers.StopManager(1);
         pWifiControllerMachine->HandleStaStart(0);
         pWifiControllerMachine->HandleStaSemiActive(0);
         pWifiControllerMachine->HandleStaClose(0);
@@ -323,8 +320,8 @@ public:
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi(msg));
-        pWifiControllerMachine->RemoveConcreteManager(1);
-        pWifiControllerMachine->RemoveConcreteManager(0);
+        pWifiControllerMachine->concreteManagers.RemoveManager(1);
+        pWifiControllerMachine->concreteManagers.RemoveManager(0);
         pWifiControllerMachine->ShutdownWifi();
     }
 

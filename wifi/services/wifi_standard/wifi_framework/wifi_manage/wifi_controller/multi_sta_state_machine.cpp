@@ -157,8 +157,6 @@ bool MultiStaStateMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg)
         case MULTI_STA_CMD_START:
             HandleStartInIdleState(msg);
             break;
-        case MULTI_STA_CMD_STOP:
-            break;
         case MULTI_STA_CMD_STARTED:
             pMultiStaStateMachine->SwitchState(pMultiStaStateMachine->pStartedState);
             break;

@@ -67,7 +67,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
     }
     bool isPsk = false;
     std::vector<OHOS::Wifi::WifiScanInfo> scanResults;
-    OHOS::Wifi::WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    OHOS::Wifi::WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     for (OHOS::Wifi::WifiScanInfo &item : scanResults) {
         if (strcasecmp(item.bssid.c_str(), szBssid) == 0 &&
             (item.capabilities.find("PSK") != std::string::npos ||
@@ -230,7 +230,7 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
        authentication failure event up. */
     bool isWrongPwd = false;
     std::vector<OHOS::Wifi::WifiScanInfo> scanResults;
-    OHOS::Wifi::WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    OHOS::Wifi::WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     for (OHOS::Wifi::WifiScanInfo &item : scanResults) {
         if (strcasecmp(item.bssid.c_str(), bssid) == 0) {
             if (statusCode == Wifi80211StatusCode::WLAN_STATUS_UNSPECIFIED_FAILURE &&
@@ -473,7 +473,7 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
         cbInfo.wfdDeviceInfo.insert(cbInfo.wfdDeviceInfo.begin(), deviceInfoParam->wfdDeviceInfo,
             deviceInfoParam->wfdDeviceInfo + deviceInfoParam->wfdLength);
         cbk.onDeviceFound(cbInfo);
-        LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{public}s",
+        LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{private}s",
             p2pDeviceAddress, deviceInfoParam->deviceName);
     }
     return 0;

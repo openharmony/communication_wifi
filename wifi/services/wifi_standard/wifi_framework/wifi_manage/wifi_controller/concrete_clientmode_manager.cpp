@@ -69,7 +69,7 @@ ErrCode ConcreteClientModeManager::InitConcreteManager()
     return WIFI_OPT_SUCCESS;
 }
 
-ConcreteMangerMachine *ConcreteClientModeManager::GetConcreteMachine()
+ConcreteMangerMachine *ConcreteClientModeManager::GetMachine()
 {
     return pConcreteMangerMachine;
 }

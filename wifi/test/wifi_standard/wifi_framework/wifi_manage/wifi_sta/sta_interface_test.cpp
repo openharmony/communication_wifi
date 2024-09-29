@@ -93,14 +93,14 @@ public:
     void ConnectToNetworkIdSuceess()
     {
         int networkId = 0;
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(networkId)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(networkId, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_TRUE(pStaInterface->ConnectToNetwork(0) == WIFI_OPT_SUCCESS);
     }
 
     void ConnectToNetworkIdFail1()
     {
         int networkId = 0;
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(networkId)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(networkId, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         EXPECT_TRUE(pStaInterface->ConnectToNetwork(0) == WIFI_OPT_FAILED);
     }
 
@@ -378,7 +378,7 @@ public:
     {
         std::string bssid = "01:23:45:67:89:ab";
         WifiDeviceConfig deviceConfig;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
             .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
         pStaInterface->StartRoamToNetwork(0, bssid);
     }
@@ -387,7 +387,7 @@ public:
     {
         std::string bssid = "01:23:45:67:89:ab";
         WifiDeviceConfig deviceConfig;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
             .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
         pStaInterface->StartConnectToUserSelectNetwork(0, bssid);
     }

@@ -56,10 +56,13 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.callProcessName.clear();
     item.ancoCallProcessName.clear();
     item.randomizedMacSuccessEver = false;
+    item.everConnected = false;
+    item.acceptUnvalidated = false;
     item.macAddress.clear();
     item.internetSelfCureHistory.clear();
     item.isReassocSelfCureWithFactoryMacAddress = 0;
     item.isShared = true;
+    item.lastTrySwitchWifiTimestamp = -1;
     return;
 }
 
@@ -190,6 +193,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.isReassocSelfCureWithFactoryMacAddress = std::stoi(value);
     } else if (key == "isShared") {
         item.isShared = std::stoi(value);
+    } else if (key == "lastTrySwitchWifiTimestamp") {
+        item.lastTrySwitchWifiTimestamp = std::stoi(value);
     } else {
         return -1;
     }
@@ -201,6 +206,7 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     if (SetWifiDeviceConfigOutDated(item, key, value) == 0) {
         return 0;
     }
+    std::string tmpValue = value;
 
     if (key == "instanceId") {
         item.instanceId = std::stoi(value);
@@ -247,6 +253,10 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.version = std::stoi(value);
     } else if (key == "randomizedMacSuccessEver") {
         item.randomizedMacSuccessEver = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "everConnected") {
+        item.everConnected = (CheckDataLegal(tmpValue) != 0);
+    } else if (key == "acceptUnvalidated") {
+        item.acceptUnvalidated = (CheckDataLegal(tmpValue) != 0);
     } else if (key == "macAddress") {
         item.macAddress = value;
     } else if (key == "portalAuthTime") {
@@ -567,6 +577,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"isReassocSelfCureWithFactoryMacAddress=" << item.isReassocSelfCureWithFactoryMacAddress
        << std::endl;
     ss << "    " <<"isShared=" << item.isShared << std::endl;
+    ss << "    " <<"lastTrySwitchWifiTimestamp=" << item.lastTrySwitchWifiTimestamp << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else
@@ -579,6 +590,8 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"callProcessName=" << item.callProcessName << std::endl;
     ss << "    " <<"ancoCallProcessName=" << item.ancoCallProcessName << std::endl;
     ss << "    " <<"randomizedMacSuccessEver=" << item.randomizedMacSuccessEver << std::endl;
+    ss << "    " <<"everConnected=" << item.everConnected << std::endl;
+    ss << "    " <<"acceptUnvalidated=" << item.acceptUnvalidated << std::endl;
     ss << "    " << "macAddress=" << item.macAddress << std::endl;
     ss << "    " <<"</WifiDeviceConfig>" << std::endl;
     return ss.str();
@@ -1275,13 +1288,13 @@ static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key
         std::string::size_type pos = key.find(".");
         if (pos == std::string::npos) {
             WifiP2pDevice device;
-            item.AddClientDevice(device);
+            item.AddPersistentDevice(device);
         } else {
             unsigned long index = static_cast<unsigned long>(std::stoi(key.substr(strlen("vecDev_"), pos)));
             if (index < item.GetClientDevices().size()) {
                 std::vector<WifiP2pDevice> clients = item.GetClientDevices();
                 SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value);
-                item.SetClientDevices(clients);
+                item.SetClientPersistentDevices(clients);
             }
         }
     } else {
@@ -1388,11 +1401,11 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
     ss << "    " <<"groupStatus=" << static_cast<int>(item.GetP2pGroupStatus()) << std::endl;
     ss << "    " <<"goIpAddress=" << item.GetGoIpAddress() << std::endl;
     ss << OutWifiP2pDeviceClassString(item.GetOwner(), "ownerDev.");
-    unsigned int size = item.GetClientDevices().size();
+    unsigned int size = item.GetPersistentDevices().size();
     for (unsigned int i = 0; i < size; i++) {
         std::string prefix = "vecDev_" + std::to_string(i) + ".";
         ss << "    " <<"vecDev_=" << i << std::endl;
-        const WifiP2pDevice &tmp = item.GetClientDevices().at(i);
+        const WifiP2pDevice &tmp = item.GetPersistentDevices().at(i);
         ss << OutWifiP2pDeviceClassString(tmp, prefix);
     }
     ss << "    " <<"</WifiP2pGroupInfo>" << std::endl;

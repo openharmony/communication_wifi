@@ -20,9 +20,10 @@ CONFIG_CTRL_IFACE = "unix"
 
 declare_args() {
   wifi_feature_with_p2p = true
+  wifi_feature_with_rpt = true
   wifi_feature_with_ap_intf = "wlan"
   wifi_feature_with_ap_num = 1
-  wifi_feature_with_sta_num = 1
+  wifi_feature_with_sta_num = 2
   wifi_feature_with_auth_disable = false
   wifi_feature_with_dhcp_disable = false
   wifi_feature_with_encryption = true
@@ -31,6 +32,7 @@ declare_args() {
   wifi_feature_non_seperate_p2p = false
   wifi_feature_non_hdf_driver = false
   wifi_feature_with_local_random_mac = true
+  wifi_feature_wifi_pro_ctrl = true
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_efficiency_manager)) {
     wifi_feature_with_app_frozen = true

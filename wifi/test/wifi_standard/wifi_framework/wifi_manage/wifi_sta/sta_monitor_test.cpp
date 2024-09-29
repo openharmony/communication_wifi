@@ -99,14 +99,14 @@ void StaMonitorTest::InitStaMonitorFail()
 
 void StaMonitorTest::UnInitStaMonitorSuccess()
 {
-    EXPECT_FALSE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::UnInitStaMonitorFail()
 {
     pStaMonitor->SetStateMachine(pStaMonitor->pStaStateMachine);
     pStaMonitor->SetStateMachine(nullptr);
-    EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);
 }
 
 void StaMonitorTest::OnConnectChangedCallBackSuccess1()

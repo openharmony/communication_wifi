@@ -22,7 +22,9 @@ DEFINE_WIFILOG_LABEL("StaInterface");
 namespace OHOS {
 namespace Wifi {
 StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId)
-{}
+{
+    WIFI_LOGI("StaInterface constuctor instId %{public}d", instId);
+}
 
 StaInterface::~StaInterface()
 {
@@ -47,7 +49,7 @@ extern "C" void Destroy(IStaService *pservice)
 
 ErrCode StaInterface::EnableStaService()
 {
-    WIFI_LOGI("Enter EnableStaService.\n");
+    WIFI_LOGI("Enter EnableStaService m_instId:%{public}d\n", m_instId);
     std::lock_guard<std::mutex> lock(mutex);
     if (!InitStaServiceLocked()) {
         return WIFI_OPT_FAILED;
@@ -55,7 +57,7 @@ ErrCode StaInterface::EnableStaService()
 
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->EnableStaService() != WIFI_OPT_SUCCESS) {
-        LOGE("EnableStaService failed.\n");
+        LOGE("EnableStaService failed m_instId:%{public}d\n", m_instId);
         pStaService->DisableStaService();
         return WIFI_OPT_FAILED;
     }
@@ -64,7 +66,7 @@ ErrCode StaInterface::EnableStaService()
 
 ErrCode StaInterface::DisableStaService()
 {
-    LOGI("Enter DisableStaService.\n");
+    WIFI_LOGI("Enter DisableStaService m_instId:%{public}d\n", m_instId);
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->DisableStaService() != WIFI_OPT_SUCCESS) {
@@ -74,12 +76,12 @@ ErrCode StaInterface::DisableStaService()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::ConnectToNetwork(int networkId)
+ErrCode StaInterface::ConnectToNetwork(int networkId, int type)
 {
     LOGI("Enter Connect.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+    if (pStaService->ConnectToNetwork(networkId, type) != WIFI_OPT_SUCCESS) {
         LOGE("ConnectTo failed.\n");
         return WIFI_OPT_FAILED;
     }
@@ -496,14 +498,15 @@ ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
 
 bool StaInterface::InitStaServiceLocked()
 {
+    WIFI_LOGI("InitStaServiceLocked m_instId:%{public}d\n", m_instId);
     if (pStaService == nullptr) {
         pStaService = new (std::nothrow) StaService(m_instId);
         if (pStaService == nullptr) {
-            WIFI_LOGE("New StaService failed.\n");
+            WIFI_LOGE("New StaService m_instId:%{public}d\n", m_instId);
             return false;
         }
         if (pStaService->InitStaService(m_staCallback) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("InitStaService failed.\n");
+            WIFI_LOGE("InitStaService m_instId:%{public}d\n", m_instId);
             delete pStaService;
             pStaService = nullptr;
             return false;

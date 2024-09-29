@@ -656,9 +656,12 @@ struct WifiDeviceConfig {
     int isReassocSelfCureWithFactoryMacAddress;
     int version;
     bool randomizedMacSuccessEver;
+    bool everConnected;
+    bool acceptUnvalidated;
     WifiWapiConfig wifiWapiConfig;
     IpInfo lastDhcpResult;
     bool isShared;
+    int64_t lastTrySwitchWifiTimestamp { -1 };
 
     WifiDeviceConfig()
     {
@@ -694,6 +697,8 @@ struct WifiDeviceConfig {
         version = -1;
         randomizedMacSuccessEver = false;
         isShared = false;
+        everConnected = false;
+        acceptUnvalidated = false;
     }
 };
 
@@ -848,6 +853,7 @@ enum class OperationCmd {
     DHCP_OFFER_ADD,
     DHCP_OFFER_SIZE_GET,
     DHCP_OFFER_CLEAR,
+    CURRENT_IP_INFO_SET,
 };
 
 enum class WifiSelfcureType {

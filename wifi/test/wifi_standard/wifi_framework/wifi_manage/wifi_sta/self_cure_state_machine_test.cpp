@@ -57,7 +57,7 @@ public:
     virtual void SetUp()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiSelfcureReset(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
         pSelfCureStateMachine = std::make_unique<SelfCureStateMachine>();
@@ -98,7 +98,7 @@ public:
         msg->SetMessageName(1);
         EXPECT_FALSE(pSelfCureStateMachine->pDefaultState->ExecuteStateMsg(msg));
         msg->SetMessageName(0);
-        EXPECT_TRUE(pSelfCureStateMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_FALSE(pSelfCureStateMachine->pDefaultState->ExecuteStateMsg(msg));
     }
 
     void ConnectedMonitorStateGoInStateSuccess()
@@ -107,8 +107,8 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset()).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("sta"));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetLastNetworkId(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
@@ -141,7 +141,7 @@ public:
     void InitSelfCureCmsHandleMapTest()
     {
         LOGI("Enter InitSelfCureCmsHandleMapTest");
-        pSelfCureStateMachine->pConnectedMonitorState->InitSelfCureCmsHandleMap();
+        EXPECT_EQ(pSelfCureStateMachine->pConnectedMonitorState->InitSelfCureCmsHandleMap(), 0);
     }
 
     void TransitionToSelfCureStateTest()
@@ -523,7 +523,7 @@ public:
     void InitSelfCureIssHandleMapTest()
     {
         LOGI("Enter InitSelfCureIssHandleMapTest");
-        pSelfCureStateMachine->pInternetSelfCureState->InitSelfCureIssHandleMap();
+        EXPECT_EQ(pSelfCureStateMachine->pInternetSelfCureState->InitSelfCureIssHandleMap(), 0);
     }
 
     void HandleRandMacSelfCureCompleteTest()
@@ -746,7 +746,7 @@ public:
         LOGI("Enter SelfCureWifiLinkTest");
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetLastNetworkId(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiSelfcureReset(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiToggledState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiToggledState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         int requestCureLevel = 0;
@@ -781,7 +781,7 @@ public:
         IpInfo dhcpResult;
         dhcpResult.ipAddress = IpTools::ConvertIpv4Address("192.168.101.39");
         dhcpResult.gateway = IpTools::ConvertIpv4Address("192.168.101.1");
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("wlan0"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("wlan0"));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         pSelfCureStateMachine->pInternetSelfCureState->RequestUseStaticIpConfig(dhcpResult);
@@ -837,7 +837,7 @@ public:
         LOGI("Enter IsNeedMultiGatewaySelfcureTest");
         pSelfCureStateMachine->pInternetSelfCureState->IsNeedMultiGatewaySelfcure();
         pSelfCureStateMachine->pInternetSelfCureState->usedMultiGwSelfcure = true;
-        pSelfCureStateMachine->pInternetSelfCureState->IsNeedMultiGatewaySelfcure();
+        EXPECT_EQ(pSelfCureStateMachine->pInternetSelfCureState->IsNeedMultiGatewaySelfcure(), false);
     }
 
     void SelfcureForMultiGatewayTest()
@@ -883,10 +883,10 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->currentRssi = MIN_VAL_LEVEL_4;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForRandMacReassoc(requestCureLevel);
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForRandMacReassoc(requestCureLevel);
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForRandMacReassoc(requestCureLevel);
     }
 
@@ -1049,10 +1049,10 @@ public:
         pSelfCureStateMachine->useWithRandMacAddress = FAC_MAC_REASSOC;
         pSelfCureStateMachine->pInternetSelfCureState->HandleSelfCureFailedForRandMacReassoc();
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         pSelfCureStateMachine->pInternetSelfCureState->HandleSelfCureFailedForRandMacReassoc();
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         pSelfCureStateMachine->pInternetSelfCureState->HandleSelfCureFailedForRandMacReassoc();
 
         pSelfCureStateMachine->useWithRandMacAddress = RAND_MAC_REASSOC;
@@ -1199,7 +1199,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("sta"));
         EXPECT_FALSE(pSelfCureStateMachine->CanArpReachable());
     }
 
@@ -1211,7 +1211,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("sta"));
         EXPECT_FALSE(pSelfCureStateMachine->CanArpReachable());
     }
 
@@ -1225,8 +1225,8 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiSelfcureReset(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("sta"));
         EXPECT_TRUE(pSelfCureStateMachine->pWifi6SelfCureState->ExecuteStateMsg(msg));
     }
 
@@ -1240,8 +1240,8 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiSelfcureReset(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("sta"));
         EXPECT_TRUE(pSelfCureStateMachine->pWifi6SelfCureState->ExecuteStateMsg(msg));
     }
 
@@ -1264,7 +1264,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), InsertWifi6BlackListCache(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifi6BlackListCache(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifi6BlackListCache(_)).Times(AtLeast(0)).WillOnce(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_TRUE(pSelfCureStateMachine->pWifi6SelfCureState->ExecuteStateMsg(msg));
     }
 
@@ -1281,7 +1281,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("sta"));
         pSelfCureStateMachine->pWifi6SelfCureState->PeriodicWifi6WithHtcArpDetect(msg);
 
         pSelfCureStateMachine->pWifi6SelfCureState->wifi6HtcArpDetectionFailedCnt = ARP_DETECTED_FAILED_COUNT - 1;
@@ -1301,7 +1301,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName()).WillRepeatedly(Return("sta"));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("sta"));
         pSelfCureStateMachine->pWifi6SelfCureState->PeriodicWifi6WithoutHtcArpDetect(msg);
 
         pSelfCureStateMachine->pWifi6SelfCureState->wifi6ArpDetectionFailedCnt = ARP_DETECTED_FAILED_COUNT - 1;
@@ -1318,7 +1318,7 @@ public:
 
         WifiDeviceConfig config;
         config.bssid = CURR_BSSID;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
         pSelfCureStateMachine->pWifi6SelfCureState->HandleWifi6WithHtcArpFail(msg);
     }
@@ -1335,7 +1335,7 @@ public:
     void GetNowMilliSecondsTest()
     {
         LOGI("Enter GetNowMilliSecondsTest");
-        pSelfCureStateMachine->GetNowMilliSeconds();
+        EXPECT_NE(pSelfCureStateMachine->GetNowMilliSeconds(), 0);
     }
 
     void SendBlaListToDriverTest()
@@ -1391,7 +1391,7 @@ public:
         pSelfCureStateMachine->ParseWifi6BlackListInfo(iter);
 
         iter = std::make_pair("", wifi6BlackListInfo);
-        pSelfCureStateMachine->ParseWifi6BlackListInfo(iter);
+        EXPECT_NE(pSelfCureStateMachine->ParseWifi6BlackListInfo(iter), "");
     }
 
     void AgeOutWifi6BlackTest()
@@ -1462,7 +1462,7 @@ public:
         LOGI("Enter GetCurrentBssidTest");
         std::string currConnectedBssid = "";
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
         pSelfCureStateMachine->GetCurrentBssid();
     }
 
@@ -1529,10 +1529,10 @@ public:
             Return(MODE_STATE_CLOSE));
         pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
     }
 
@@ -1625,10 +1625,10 @@ public:
             .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
         pSelfCureStateMachine->notAllowSelfcure = false;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetLastNetworkId(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiSelfcureReset(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiToggledState(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiToggledState(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
@@ -2348,7 +2348,7 @@ HWTEST_F(SelfCureStateMachineTest, TransIpAddressToVec, TestSize.Level1)
     pSelfCureStateMachine->TransIpAddressToVec(addr);
 
     addr = "00:aa:bb:cc:dd:ee:ff";
-    pSelfCureStateMachine->TransIpAddressToVec(addr);
+    EXPECT_NE(pSelfCureStateMachine->TransIpAddressToVec(addr).size(), 0);
 }
 
 HWTEST_F(SelfCureStateMachineTest, TransVecToIpAddress, TestSize.Level1)
@@ -2360,7 +2360,7 @@ HWTEST_F(SelfCureStateMachineTest, TransVecToIpAddress, TestSize.Level1)
     pSelfCureStateMachine->TransVecToIpAddress(vec);
     
     vec = {};
-    pSelfCureStateMachine->TransVecToIpAddress(vec);
+    EXPECT_EQ(pSelfCureStateMachine->TransVecToIpAddress(vec), "");
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest, TestSize.Level1)
@@ -2440,7 +2440,7 @@ HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenGatewayAndCurrentAddrAreVal
     std::string gateway = GATEWAY;
     std::string currentAddr = CURRENT_ADDR;
     std::vector<std::string> testedAddr = TESTED_ADDR;
-    pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr);
+    EXPECT_NE(pSelfCureStateMachine->GetNextIpAddr(gateway, currentAddr, testedAddr), "");
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsIpAddressInvalidTest1, TestSize.Level1)
@@ -2504,7 +2504,7 @@ HWTEST_F(SelfCureStateMachineTest, TransStrToVecTest, TestSize.Level1)
     char c = '|';
     pSelfCureStateMachine->TransStrToVec(str, c);
     c = '/';
-    pSelfCureStateMachine->TransStrToVec(str, c);
+    EXPECT_NE(pSelfCureStateMachine->TransStrToVec(str, c).size(), 0);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsUseFactoryMacTest, TestSize.Level1)
@@ -2595,7 +2595,7 @@ HWTEST_F(SelfCureStateMachineTest, GetBssidCounterTest, TestSize.Level1)
 
     WifiDeviceConfig config;
     config.keyMgmt = "";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
     pSelfCureStateMachine->GetBssidCounter(scanResults);
 
@@ -2604,7 +2604,7 @@ HWTEST_F(SelfCureStateMachineTest, GetBssidCounterTest, TestSize.Level1)
     pSelfCureStateMachine->GetBssidCounter(scanResults);
 
     config.keyMgmt = "WPA_PSK";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
     pSelfCureStateMachine->GetBssidCounter(scanResults);
 }
@@ -2620,7 +2620,7 @@ HWTEST_F(SelfCureStateMachineTest, IsNeedWifiReassocUseDeviceMac_Test2, TestSize
 {
     WifiDeviceConfig config;
     config.internetSelfCureHistory = "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
     EXPECT_FALSE(pSelfCureStateMachine->IsNeedWifiReassocUseDeviceMac());
 }
@@ -2629,7 +2629,7 @@ HWTEST_F(SelfCureStateMachineTest, IsNeedWifiReassocUseDeviceMac_Test3, TestSize
 {
     WifiDeviceConfig config;
     config.internetSelfCureHistory = "0|0|0|1|2|1|0|0|0|0|0|0|0|0|0|0|0|0";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
     EXPECT_FALSE(pSelfCureStateMachine->IsNeedWifiReassocUseDeviceMac());
 }
@@ -2804,7 +2804,7 @@ HWTEST_F(SelfCureStateMachineTest, GetIpAssignmentTest, TestSize.Level1)
     int result = pSelfCureStateMachine->GetIpAssignment(ipAssignment);
     EXPECT_EQ(result, 0);
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(-1));
     pSelfCureStateMachine->GetIpAssignment(ipAssignment);
 }
 
@@ -2812,7 +2812,7 @@ HWTEST_F(SelfCureStateMachineTest, GetAuthTypeTest, TestSize.Level1)
 {
     pSelfCureStateMachine->GetAuthType();
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(-1));
     pSelfCureStateMachine->GetAuthType();
 }
 
@@ -2820,7 +2820,7 @@ HWTEST_F(SelfCureStateMachineTest, GetLastHasInternetTimeTest, TestSize.Level1)
 {
     pSelfCureStateMachine->GetLastHasInternetTime();
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(-1));
     pSelfCureStateMachine->GetLastHasInternetTime();
 }
 
@@ -2828,7 +2828,7 @@ HWTEST_F(SelfCureStateMachineTest, GetNetworkStatusHistoryTest, TestSize.Level1)
 {
     pSelfCureStateMachine->GetNetworkStatusHistory();
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(-1));
     pSelfCureStateMachine->GetNetworkStatusHistory();
 }
 
@@ -2838,7 +2838,7 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureHistoryInfoTest, TestSize.Level1)
     int result = pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistory);
     EXPECT_EQ(result, 0);
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(-1));
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistory);
 }
 
@@ -2846,7 +2846,7 @@ HWTEST_F(SelfCureStateMachineTest, GetSelfCureHistoryInfoTest, TestSize.Level1)
 {
     pSelfCureStateMachine->GetSelfCureHistoryInfo();
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(-1));
     pSelfCureStateMachine->GetSelfCureHistoryInfo();
 }
 
@@ -2881,7 +2881,7 @@ HWTEST_F(SelfCureStateMachineTest, SetIsReassocWithFactoryMacAddress_Test3, Test
     int result = pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(isReassocWithFactoryMacAddress);
     EXPECT_EQ(result, 0);
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(-1));
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(isReassocWithFactoryMacAddress);
 }
 
@@ -2890,7 +2890,7 @@ HWTEST_F(SelfCureStateMachineTest, GetCurrentWifiDeviceConfigTest, TestSize.Leve
     WifiDeviceConfig config;
     pSelfCureStateMachine->GetCurrentWifiDeviceConfig(config);
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(-1));
     pSelfCureStateMachine->GetCurrentWifiDeviceConfig(config);
 
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0)).WillOnce(Return(-1));
@@ -2954,15 +2954,6 @@ HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_HighReset_ReturnsTrue, Tes
 HWTEST_F(SelfCureStateMachineTest, HandleNetworkConnectedTest, TestSize.Level1)
 {
     pSelfCureStateMachine->HandleNetworkConnected();
-}
-
-HWTEST_F(SelfCureStateMachineTest, GetCurrentGatewayTest, TestSize.Level1)
-{
-    IpInfo ipInfo;
-    ipInfo.gateway = 1;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
-        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
-    pSelfCureStateMachine->GetCurrentGateway();
 }
 
 HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Success_Reassoc, TestSize.Level1)
@@ -3142,7 +3133,7 @@ HWTEST_F(SelfCureStateMachineTest, IfMultiGateway_Test, TestSize.Level1)
 
 HWTEST_F(SelfCureStateMachineTest, IsSelfCureOnGoing_Test, TestSize.Level1)
 {
-    pSelfCureStateMachine->IsSelfCureOnGoing();
+    EXPECT_EQ(pSelfCureStateMachine->IsSelfCureOnGoing(), false);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
@@ -3173,7 +3164,7 @@ HWTEST_F(SelfCureStateMachineTest, IsEncryptedAuthTypeTest, TestSize.Level1)
     pSelfCureStateMachine->IsEncryptedAuthType(authType);
 
     authType = "KEY_MGMT_SAE";
-    pSelfCureStateMachine->IsEncryptedAuthType(authType);
+    EXPECT_EQ(pSelfCureStateMachine->IsEncryptedAuthType(authType), false);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsSoftApSsidSameWithWifiTest, TestSize.Level1)
@@ -3185,7 +3176,7 @@ HWTEST_F(SelfCureStateMachineTest, IsSoftApSsidSameWithWifiTest, TestSize.Level1
     linkedInfo.ssid = "test1";
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
     EXPECT_TRUE(pSelfCureStateMachine->IsSoftApSsidSameWithWifi(curApConfig) == false);
 }
  
@@ -3202,6 +3193,11 @@ HWTEST_F(SelfCureStateMachineTest, RecoverySoftApTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, IsHttpReachableTest, TestSize.Level1)
 {
     IsHttpReachableTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, InitCurrentGatewayTest, TestSize.Level1)
+{
+    pSelfCureStateMachine->pInternetSelfCureState->InitCurrentGateway();
 }
 } // namespace Wifi
 } // namespace OHOS

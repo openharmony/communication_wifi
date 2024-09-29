@@ -56,10 +56,6 @@ public:
     virtual ErrCode UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks) override;
     virtual ErrCode Hid2dCreateGroup(const int frequency, FreqType type) override;
     virtual ErrCode Hid2dConnect(const Hid2dConnectConfig& config) override;
-    virtual ErrCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
-        char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen) override;
-    virtual ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
-        char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) override;
     virtual ErrCode Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr) override;
     void IncreaseSharedLink(int callingUid) override;
     void DecreaseSharedLink(int callingUid) override;
@@ -69,6 +65,8 @@ public:
     virtual ErrCode MonitorCfgChange(void)  override;
     virtual ErrCode DiscoverPeers(int32_t channelid) override;
     virtual ErrCode DisableRandomMac(int setmode) override;
+    virtual ErrCode CreateRptGroup(const WifiP2pConfig &config) override;
+    virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result) override;
 };
 }  // namespace Wifi
 }  // namespace OHOS

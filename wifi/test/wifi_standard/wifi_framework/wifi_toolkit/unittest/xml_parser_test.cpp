@@ -106,19 +106,19 @@ HWTEST_F(XmlParserTest, GetStringValueTest, TestSize.Level1)
 HWTEST_F(XmlParserTest, GetStringArrValueTest, TestSize.Level1)
 {
     WIFI_LOGI("GetStringArrValueTest enter");
-    m_xmlParser->GetStringArrValue(nullptr);
+    EXPECT_EQ(m_xmlParser->GetStringArrValue(nullptr).size(), 0);
 }
 
 HWTEST_F(XmlParserTest, GetByteArrValueTest, TestSize.Level1)
 {
     WIFI_LOGI("GetByteArrValueTest enter");
-    m_xmlParser->GetByteArrValue(nullptr);
+    EXPECT_EQ(m_xmlParser->GetByteArrValue(nullptr).size(), 0);
 }
 
 HWTEST_F(XmlParserTest, GetStringMapValueTest, TestSize.Level1)
 {
     WIFI_LOGI("GetStringMapValueTest enter");
-    m_xmlParser->GetStringMapValue(nullptr);
+    EXPECT_EQ(m_xmlParser->GetStringMapValue(nullptr).size(), 0);
 }
 
 HWTEST_F(XmlParserTest, IsDocValidTest, TestSize.Level1)

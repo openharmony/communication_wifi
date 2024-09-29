@@ -22,6 +22,7 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
+#include "parameter.h"
 #include "wifi_internal_event_dispatcher.h"
 #endif
 #ifdef FEATURE_STA_SUPPORT
@@ -35,6 +36,7 @@
 #include "wifi_sta_hal_interface.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_watchdog_utils.h"
+#include "power_mgr_client.h"
 #endif
 
 namespace OHOS {
@@ -78,7 +80,7 @@ int WifiManager::Init()
     }
 
     WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(
-        std::bind(&WifiManager::OnNativeProcessStatusChange, this, std::placeholders::_1));
+        [this](int status) { this->OnNativeProcessStatusChange(status); });
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
 #ifndef OHOS_ARCH_LITE
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
@@ -105,13 +107,13 @@ int WifiManager::Init()
         !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
         if (IsStartUpWifiEnableSupport()) {
             WIFI_LOGI("It's first start up, need open wifi before oobe");
-            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED);
+            WifiConfigCenter::GetInstance().SetPersistWifiState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         }
     }
-    int lastState = WifiSettings::GetInstance().GetStaLastRunState();
+    int lastState = WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0);
     if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
-        WifiConfigCenter::GetInstance().SetWifiToggledState(lastState);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(lastState, INSTID_WLAN0);
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();
@@ -122,7 +124,12 @@ int WifiManager::Init()
             wifiTogglerManager->ScanOnlyToggled(1);
         }
     }
+#ifndef OHOS_ARCH_LITE
+    WifiConfigCenter::GetInstance().SetScreenState(
+        PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
+#endif
     InitPidfile();
+    CheckSapcoExist();
     return 0;
 }
 
@@ -191,17 +198,37 @@ void WifiManager::OnNativeProcessStatusChange(int status)
     }
 }
 
+void WifiManager::CheckSapcoExist()
+{
+    char preValue[PROP_SUPPORT_SAPCOEXIST_LEN] = {0};
+
+    g_supportsapcoexistflag = false;
+    int errorCode = GetParamValue(SUPPORT_SAPCOEXIST_PROP.c_str(), 0, preValue, PROP_SUPPORT_SAPCOEXIST_LEN);
+    if (errorCode < 0) {
+        WIFI_LOGI("GetSupportedFeatures no support_sapcoexist.");
+        return;
+    }
+    WIFI_LOGI("GetSupportedFeatures preValue = %{public}s.", preValue);
+    if (strncmp(preValue, SUPPORT_SAPCOEXIST.c_str(), SUPPORT_SAPCOEXIST_LEN) == 0) {
+        g_supportsapcoexistflag = true;
+    }
+    return;
+}
+
 int WifiManager::GetSupportedFeatures(long &features) const
 {
     long supportedFeatures = mSupportedFeatures;
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA_5G);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_PASSPOINT);
-    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_AP_STA);
+    if (g_supportsapcoexistflag) {
+        supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_AP_STA);
+    }
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SAE);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SUITE_B);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_OWE);
     features = supportedFeatures;
+
     return 0;
 }
 
@@ -295,6 +322,22 @@ std::unique_ptr<WifiScanManager>& WifiManager::GetWifiScanManager()
 std::unique_ptr<WifiTogglerManager>& WifiManager::GetWifiTogglerManager()
 {
     return wifiTogglerManager;
+}
+
+std::shared_ptr<RptInterface> WifiManager::GetRptInterface(int id)
+{
+#if defined(FEATURE_RPT_SUPPORT) && defined(FEATURE_AP_SUPPORT) && defined(FEATURE_P2P_SUPPORT)
+    if (wifiTogglerManager == nullptr) {
+        return nullptr;
+    }
+    auto& wifiControllerMachine = wifiTogglerManager->GetControllerMachine();
+    if (wifiControllerMachine == nullptr) {
+        return nullptr;
+    }
+    return wifiControllerMachine->GetRptManager(id);
+#else
+    return nullptr;
+#endif
 }
 
 #ifdef FEATURE_AP_SUPPORT

@@ -61,8 +61,9 @@ ErrCode WifiP2pManager::AutoStartP2pService()
     }
 
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface(
-        std::bind(&WifiP2pManager::IfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
+    if (ifaceName.empty() &&
+        !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface([this](std::string &destoryIfaceName,
+        int createIfaceType) { this->IfaceDestoryCallback(destoryIfaceName, createIfaceType); },
         ifaceName)) {
         WIFI_LOGE("AutoStartP2pService, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -190,6 +191,13 @@ void WifiP2pManager::CloseP2pService(void)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(P2pState::P2P_STATE_CLOSED);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+
+    if (auto &togglerManager = WifiManager::GetInstance().GetWifiTogglerManager(); togglerManager != nullptr) {
+        if (auto &ctrlMachine = togglerManager->GetControllerMachine(); ctrlMachine != nullptr) {
+            ctrlMachine->SendMessage(CMD_P2P_STOPPED, 0);
+        }
+    }
+
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveP2pIface(ifaceName);
@@ -216,18 +224,35 @@ void WifiP2pManager::InitP2pCallback(void)
 {
     using namespace std::placeholders;
     mP2pCallback.callbackModuleName = "P2pManager";
-    mP2pCallback.OnP2pStateChangedEvent = std::bind(&WifiP2pManager::DealP2pStateChanged, this, _1);
-    mP2pCallback.OnP2pPeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPeersChanged, this, _1);
-    mP2pCallback.OnP2pServicesChangedEvent = std::bind(&WifiP2pManager::DealP2pServiceChanged, this, _1);
-    mP2pCallback.OnP2pConnectionChangedEvent = std::bind(&WifiP2pManager::DealP2pConnectionChanged, this, _1);
-    mP2pCallback.OnP2pThisDeviceChangedEvent = std::bind(&WifiP2pManager::DealP2pThisDeviceChanged, this, _1);
-    mP2pCallback.OnP2pDiscoveryChangedEvent = std::bind(&WifiP2pManager::DealP2pDiscoveryChanged, this, _1);
-    mP2pCallback.OnP2pGroupsChangedEvent = std::bind(&WifiP2pManager::DealP2pGroupsChanged, this);
-    mP2pCallback.OnP2pActionResultEvent = std::bind(&WifiP2pManager::DealP2pActionResult, this, _1, _2);
-    mP2pCallback.OnConfigChangedEvent = std::bind(&WifiP2pManager::DealConfigChanged, this, _1, _2, _3);
-    mP2pCallback.OnP2pGcJoinGroupEvent = std::bind(&WifiP2pManager::DealP2pGcJoinGroup, this, _1);
-    mP2pCallback.OnP2pGcLeaveGroupEvent = std::bind(&WifiP2pManager::DealP2pGcLeaveGroup, this, _1);
-    mP2pCallback.OnP2pPrivatePeersChangedEvent = std::bind(&WifiP2pManager::DealP2pPrivatePeersChanged, this, _1);
+    mP2pCallback.OnP2pStateChangedEvent = [this](P2pState state) { this->DealP2pStateChanged(state); };
+    mP2pCallback.OnP2pPeersChangedEvent = [this](const std::vector<WifiP2pDevice> &vPeers) {
+        this->DealP2pPeersChanged(vPeers);
+    };
+    mP2pCallback.OnP2pPeerJoinOrLeaveEvent = [this] (bool isJoin, const std::string &mac) {
+        this->DealP2pPeerJoinOrLeave(isJoin, mac);
+    };
+    mP2pCallback.OnP2pServicesChangedEvent = [this](const std::vector<WifiP2pServiceInfo> &vServices) {
+        this->DealP2pServiceChanged(vServices);
+    };
+    mP2pCallback.OnP2pConnectionChangedEvent = [this](const WifiP2pLinkedInfo &info) {
+        this->DealP2pConnectionChanged(info);
+    };
+    mP2pCallback.OnP2pThisDeviceChangedEvent = [this](const WifiP2pDevice &info) {
+        this->DealP2pThisDeviceChanged(info);
+    };
+    mP2pCallback.OnP2pDiscoveryChangedEvent = [this](bool bState) { this->DealP2pDiscoveryChanged(bState); };
+    mP2pCallback.OnP2pGroupsChangedEvent = [this]() { this->DealP2pGroupsChanged(); };
+    mP2pCallback.OnP2pActionResultEvent = [this](P2pActionCallback action, ErrCode code) {
+        this->DealP2pActionResult(action, code);
+    };
+    mP2pCallback.OnConfigChangedEvent = [this](CfgType type, char *data, int dataLen) {
+        this->DealConfigChanged(type, data, dataLen);
+    };
+    mP2pCallback.OnP2pGcJoinGroupEvent = [this](const GcInfo &info) { this->DealP2pGcJoinGroup(info); };
+    mP2pCallback.OnP2pGcLeaveGroupEvent = [this](const GcInfo &info) { this->DealP2pGcLeaveGroup(info); };
+    mP2pCallback.OnP2pPrivatePeersChangedEvent = [this](const std::string &privateInfo) {
+        this->DealP2pPrivatePeersChanged(privateInfo);
+    };
     return;
 }
 
@@ -258,6 +283,14 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
     }
     WifiCommonEventHelper::PublishP2pStateChangedEvent((int)state, "OnP2pStateChanged");
     return;
+}
+
+void WifiP2pManager::DealP2pPeerJoinOrLeave(bool isJoin, const std::string &mac)
+{
+    auto rptManager = WifiManager::GetInstance().GetRptInterface();
+    if (rptManager != nullptr) {
+        isJoin ? rptManager->OnStationJoin(mac) : rptManager->OnStationLeave(mac);
+    }
 }
 
 void WifiP2pManager::DealP2pPeersChanged(const std::vector<WifiP2pDevice> &vPeers)
@@ -310,6 +343,11 @@ void WifiP2pManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
         WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_SUC_CNT));
     }
+
+    auto rptManager = WifiManager::GetInstance().GetRptInterface();
+    if (rptManager != nullptr) {
+        rptManager->OnP2pConnectionChanged(info.GetConnectState());
+    }
     return;
 }
 
@@ -349,6 +387,11 @@ void WifiP2pManager::DealP2pActionResult(P2pActionCallback action, ErrCode code)
     cbMsg.p2pAction = action;
     cbMsg.msgData = static_cast<int>(code);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+
+    auto rptManager = WifiManager::GetInstance().GetRptInterface();
+    if (rptManager != nullptr) {
+        rptManager->OnP2pActionResult(action, code);
+    }
     return;
 }
 
@@ -387,12 +430,15 @@ void WifiP2pManager::DealConfigChanged(CfgType type, char* data, int dataLen)
     if (cfgData == nullptr) {
         WIFI_LOGE("DealConfigChanged: new data failed");
         delete cfgInfoPtr;
+        cfgInfoPtr = nullptr;
         return;
     }
     if (memcpy_s(cfgData, dataLen, data, dataLen) != EOK) {
         WIFI_LOGE("DealConfigChanged: memcpy_s failed");
         delete cfgInfoPtr;
+        cfgInfoPtr = nullptr;
         delete[] cfgData;
+        cfgData = nullptr;
         return;
     }
     cfgInfoPtr->data = cfgData;

@@ -65,7 +65,8 @@
             "wifi_feature_network_selection",
             "wifi_feature_with_hdi_chip_supported",
             "wifi_feature_with_vap_manager",
-            "wifi_feature_with_sta_asset"
+            "wifi_feature_with_sta_asset",
+            "wifi_feature_wifi_pro_ctrl"
         ],
         "adapted_system_type": [
             "small",
@@ -126,7 +127,8 @@
                     "//foundation/communication/wifi/wifi/utils:wifi_utils"
                 ],
                 "fwk_group": [
-                    "//foundation/communication/wifi/wifi/frameworks:wifi_kits"
+                    "//foundation/communication/wifi/wifi/frameworks:wifi_kits",
+                    "//foundation/communication/wifi/wifi/frameworks/wifi_ndk:wifi_ndk"
                 ],
                 "service_group": [
                     "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_manage",

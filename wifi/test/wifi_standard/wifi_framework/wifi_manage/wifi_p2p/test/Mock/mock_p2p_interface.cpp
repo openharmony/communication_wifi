@@ -178,18 +178,6 @@ ErrCode P2pInterface::Hid2dConnect(const Hid2dConnectConfig& config)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode P2pInterface::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
-    char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
-{
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode P2pInterface::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
-    char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
-{
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
 {
     return WIFI_OPT_SUCCESS;
@@ -234,5 +222,16 @@ ErrCode P2pInterface::DisableRandomMac(int setmode)
 {
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode P2pInterface::CreateRptGroup(const WifiP2pConfig &config)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode P2pInterface::GetRptStationsList(std::vector<StationInfo> &result)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

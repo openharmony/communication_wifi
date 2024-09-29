@@ -193,7 +193,7 @@ HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckTest02, TestSize.L
     scanInfo.rssi = 5;
     info.rssi = 8;
     int indexType = DEVICE_CONFIG_INDEX_SSID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(network), Return(0)));
 
     EXPECT_EQ(pStaAutoConnectService->RoamingEncryptionModeCheck(electedDevice, scanInfo, info), false);
@@ -210,7 +210,7 @@ HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckTest03, TestSize.L
     scanInfo.rssi = 5;
     info.rssi = 8;
     int indexType = DEVICE_CONFIG_INDEX_SSID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(network), Return(0)));
 
     EXPECT_EQ(pStaAutoConnectService->RoamingEncryptionModeCheck(electedDevice, scanInfo, info), false);
@@ -228,7 +228,7 @@ HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckTest04, TestSize.L
     scanInfo.rssi = 5;
     info.rssi = 8;
     int indexType = DEVICE_CONFIG_INDEX_SSID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(network), Return(0)));
 
     EXPECT_EQ(pStaAutoConnectService->RoamingEncryptionModeCheck(electedDevice, scanInfo, info), false);
@@ -265,7 +265,7 @@ HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughTest01, TestSize.Leve
     info.networkId = NETWORK_ID;
     deviceConfig.networkId = 0;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_))
         .Times(AtLeast(1)).WillOnce(Return(0));

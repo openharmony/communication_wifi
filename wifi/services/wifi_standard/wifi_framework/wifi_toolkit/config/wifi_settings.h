@@ -115,13 +115,13 @@ public:
 
     void ClearDeviceConfig(void);
 
-    int GetDeviceConfig(std::vector<WifiDeviceConfig> &results);
+    int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0);
 
-    int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config);
+    int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0);
 
-    int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config);
+    int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0);
 
-    int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config);
+    int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
 
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
@@ -130,6 +130,14 @@ public:
     int SetDeviceAfterConnect(int networkId);
 
     int SetDeviceRandomizedMacSuccessEver(int networkId);
+
+    int SetDeviceEverConnected(int networkId);
+ 
+    int SetAcceptUnvalidated(int networkId);
+ 
+    bool GetDeviceEverConnected(int networkId);
+ 
+    bool GetAcceptUnvalidated(int networkId);
 
     int GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config);
@@ -275,7 +283,8 @@ public:
     bool GetConfigValueByName(const std::string &name, std::string &value);
 
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs);
+    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+        const std::set<int> &wifiLinkedNetworkIds);
 
     void UpLoadLocalDeviceConfigToCloud();
 #endif

@@ -18,6 +18,7 @@
 
 #include <gmock/gmock.h>
 #include "wifi_internal_msg.h"
+#include "mock_wifi_scan_config.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -36,8 +37,8 @@ public:
     virtual bool GetWifiAllowSemiActive() const = 0;
     virtual void SetWifiStopState(bool state) = 0;
     virtual bool GetWifiStopState() const= 0;
-    virtual void SetStaIfaceName(const std::string &ifaceName) = 0;
-    virtual std::string GetStaIfaceName() = 0;
+    virtual void SetStaIfaceName(const std::string &ifaceName, int instId = 0) = 0;
+    virtual std::string GetStaIfaceName(int instId = 0) = 0;
     virtual int GetWifiState(int instId = 0) = 0;
     virtual int SetWifiState(int state, int instId = 0) = 0;
     virtual WifiDetailState GetWifiDetailState(int instId = 0) = 0;
@@ -96,7 +97,7 @@ public:
     virtual void SetThermalLevel(const int &level) = 0;
     virtual int GetThermalLevel() const = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
-    virtual void SetWifiToggledState(int state) = 0;
+    virtual void SetWifiToggledState(int state, int id = 0) = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual void SetThreadStatusFlag(bool state) = 0;
     virtual int SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config) = 0;
@@ -128,7 +129,7 @@ public:
     virtual void SetNoChargerPlugModeState(int state) = 0;
     virtual void SetPowerIdelState(const int &state) = 0;
     virtual void SetApIfaceName(const std::string &ifaceName) = 0;
-    virtual int GetWifiToggledEnable() = 0;
+    virtual int GetWifiToggledEnable(int id = 0) = 0;
     virtual bool GetSoftapToggledState() const = 0;
     virtual bool CheckScanOnlyAvailable(int instId) = 0;
     virtual int GetSelectedCandidateNetworkId() const = 0;
@@ -137,11 +138,15 @@ public:
     virtual int SetP2pState(int state) = 0;
     virtual int GetPowerSavingModeState() const = 0;
     virtual void CleanWifiCategoryRecord() = 0;
+    virtual void SetPersistWifiState(int state, int instId) = 0;
+    virtual int GetPersistWifiState(int instId) = 0;
+    virtual void UpdateLinkedInfo(int instId) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
 public:
     static WifiConfigCenter &GetInstance();
+    std::unique_ptr<WifiScanConfig>& GetWifiScanConfig();
 
     MOCK_METHOD1(SetWifiSelfcureReset, void(const bool isReset));
     MOCK_CONST_METHOD0(GetWifiSelfcureReset, bool());
@@ -153,8 +158,8 @@ public:
     MOCK_CONST_METHOD0(GetWifiAllowSemiActive, bool());
     MOCK_METHOD1(SetWifiStopState, void(bool state));
     MOCK_CONST_METHOD0(GetWifiStopState, bool());
-    MOCK_METHOD1(SetStaIfaceName, void(const std::string &ifaceName));
-    MOCK_METHOD0(GetStaIfaceName, std::string());
+    MOCK_METHOD2(SetStaIfaceName, void(const std::string &ifaceName, int));
+    MOCK_METHOD1(GetStaIfaceName, std::string(int));
     MOCK_METHOD1(GetWifiState, int(int));
     MOCK_METHOD2(SetWifiState, int(int state, int));
     MOCK_METHOD1(GetWifiDetailState, WifiDetailState(int instId));
@@ -213,7 +218,7 @@ public:
     MOCK_METHOD1(SetThermalLevel, void(const int &level));
     MOCK_CONST_METHOD0(GetThermalLevel, int());
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
-    MOCK_METHOD1(SetWifiToggledState, void(int state));
+    MOCK_METHOD2(SetWifiToggledState, void(int state, int));
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_METHOD1(SetThreadStatusFlag, void(bool state));
     MOCK_METHOD2(SetChangeDeviceConfig, int(ConfigChange value, const WifiDeviceConfig &config));
@@ -245,7 +250,7 @@ public:
     MOCK_METHOD1(SetNoChargerPlugModeState, void(int state));
     MOCK_METHOD1(SetPowerIdelState, void(const int &state));
     MOCK_METHOD1(SetApIfaceName, void(const std::string &ifaceName));
-    MOCK_METHOD0(GetWifiToggledEnable, int());
+    MOCK_METHOD1(GetWifiToggledEnable, int(int));
     MOCK_CONST_METHOD0(GetSoftapToggledState, bool());
     MOCK_METHOD1(CheckScanOnlyAvailable, bool(int instId));
     MOCK_CONST_METHOD0(GetSelectedCandidateNetworkId, int());
@@ -254,6 +259,13 @@ public:
     MOCK_METHOD1(SetP2pState, int(int state));
     MOCK_CONST_METHOD0(GetPowerSavingModeState, int());
     MOCK_METHOD0(CleanWifiCategoryRecord, void());
+    MOCK_METHOD2(SetPersistWifiState, void(int state, int instId));
+    MOCK_METHOD1(GetPersistWifiState, int(int instId));
+    MOCK_METHOD1(UpdateLinkedInfo, void(int instId));
+
+private:
+    WifiConfigCenter();
+    std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
 };
 }  // namespace OHOS
 }  // namespace Wifi

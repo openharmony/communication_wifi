@@ -113,14 +113,14 @@ public:
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(HARDWARE_LOAD_EVENT);
-        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(msg) == true);
+        EXPECT_FALSE(pScanStateMachine->initState->ExecuteStateMsg(msg) == true);
     }
 
     void InitExeMsgSuccess7()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(HARDWARE_UNLOAD_EVENT);
-        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(msg) == true);
+        EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(msg) == false);
     }
 
     void InitExeMsgSuccess8()
@@ -1015,7 +1015,7 @@ public:
 
     void InitPnoScanState()
     {
-        pScanStateMachine->InitPnoScanState();
+        EXPECT_EQ(pScanStateMachine->InitPnoScanState(), true);
     }
 
     void RecordFilteredScanResultTest()
@@ -1026,7 +1026,7 @@ public:
         config.networkId = NETWORK_ID;
         config.ssid = "";
         config.keyMgmt = "WEP";
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _))
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _, _))
             .Times(ONE).WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
         ScanStateMachine::FilterScanResultRecord records;
         InterScanInfo interScanInfo;
@@ -1045,7 +1045,7 @@ public:
     void GetFilteredScanResultMsgTest()
     {
         ScanStateMachine::FilterScanResultRecord records;
-        records.GetFilteredScanResultMsg();
+        EXPECT_EQ(records.GetFilteredScanResultMsg(), "");
     }
 
     void FilterScanResultTest()

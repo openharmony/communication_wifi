@@ -25,6 +25,9 @@
 #endif
 #include "scan_interface.h"
 #include "sta_interface.h"
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+#include "wifi_pro_interface.h"
+#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
 #include "self_cure_interface.h"
 #endif
@@ -53,6 +56,9 @@ int WifiServiceManager::Init()
 #endif
 #ifdef FEATURE_AP_SUPPORT
     mApServiceHandle.Clear();
+#endif
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    mWifiProServiceHandle.Clear();
 #endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     mSelfCureServiceHandle.Clear();
@@ -104,7 +110,7 @@ int WifiServiceManager::CheckPreLoadService(void)
     for (auto iter = mServiceDllMap.begin(); iter != mServiceDllMap.end(); ++iter) {
         bool bLoad = WifiSettings::GetInstance().IsModulePreLoad(iter->first);
         if (bLoad) {
-            int ret = CheckAndEnforceService(iter->first, false);
+            int ret = CheckAndEnforceService(iter->first, 0, false);
             if (ret < 0) {
                 return -1;
             }
@@ -113,18 +119,36 @@ int WifiServiceManager::CheckPreLoadService(void)
     return 0;
 }
 
-int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
+int WifiServiceManager::LoadStaService(const std::string &dlname, int instId, bool bCreate)
 {
-    WIFI_LOGI("LoadStaService");
+    WIFI_LOGI("LoadStaService, insId %{public}d", instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mStaServiceHandle.pService[0]) {
+    if (mStaServiceHandle.pService[instId]) {
+        WIFI_LOGE("WifiServiceManager::LoadStaService pService is not NULL");
         return 0;
     }
-    IStaService *service = new StaInterface();
-    mStaServiceHandle.pService[0] = service;
+    IStaService *service = new StaInterface(instId);
+    mStaServiceHandle.pService[instId] = service;
+    WIFI_LOGI("WifiServiceManager::LoadStaService new pService %{public}d", instId);
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
     return 0;
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+int32_t WifiServiceManager::LoadWifiProService(bool bCreate, int32_t instId)
+{
+    WIFI_LOGI("WifiServiceManager::LoadWifiProService");
+    std::unique_lock<std::mutex> lock(mWifiProMutex);
+    if (mWifiProServiceHandle.pService[instId]) {
+        WIFI_LOGI("WifiServiceManager::LoadWifiProService pService is not NULL");
+        return 0;
+    }
+    IWifiProService *service = new WifiProInterface();
+    WIFI_LOGI("WifiServiceManager::LoadWifiProService new pService %{public}d", instId);
+    mWifiProServiceHandle.pService[instId] = service;
+    return 0;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 int WifiServiceManager::LoadSelfCureService(const std::string &dlname, bool bCreate)
@@ -209,9 +233,15 @@ int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCrea
     return 0;
 }
 
-int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
+int WifiServiceManager::CheckAndEnforceService(const std::string &name, int instId, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    if (name == WIFI_SERVICE_WIFIPRO) {
+        return LoadWifiProService(bCreate, instId);
+    }
+#endif
+
     std::string dlname;
     if (GetServiceDll(name, dlname) < 0) {
         WIFI_LOGE("%{public}s does not support", name.c_str());
@@ -219,7 +249,7 @@ int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCr
     }
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService get dllname: %{public}s", dlname.c_str());
     if (name == WIFI_SERVICE_STA) {
-        return LoadStaService(dlname, bCreate);
+        return LoadStaService(dlname, instId, bCreate);
     }
 #ifdef FEATURE_SELF_CURE_SUPPORT
     if (name == WIFI_SERVICE_SELFCURE) {
@@ -257,6 +287,21 @@ IStaService *WifiServiceManager::GetStaServiceInst(int instId)
 
     return nullptr;
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+IWifiProService *WifiServiceManager::GetWifiProServiceInst(int32_t instId)
+{
+    WIFI_LOGD("WifiServiceManager::GetWifiProServiceInst, instId: %{public}d", instId);
+    std::unique_lock<std::mutex> lock(mWifiProMutex);
+
+    auto iter = mWifiProServiceHandle.pService.find(instId);
+    if (iter != mWifiProServiceHandle.pService.end()) {
+        WIFI_LOGD("find a new WifiPro service instance, instId: %{public}d", instId);
+        return iter->second;
+    }
+    return nullptr;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 ISelfCureService *WifiServiceManager::GetSelfCureServiceInst(int instId)
@@ -340,6 +385,28 @@ IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
     return nullptr;
 #endif
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+NO_SANITIZE("cfi") int32_t WifiServiceManager::UnloadWifiProService(bool bPreLoad, int32_t instId)
+{
+    WIFI_LOGI("WifiServiceManager::UnloadWifiProService, instId: %{public}d", instId);
+    std::unique_lock<std::mutex> lock(mWifiProMutex);
+
+    auto iter = mWifiProServiceHandle.pService.find(instId);
+    if (iter != mWifiProServiceHandle.pService.end()) {
+        if (iter->second != nullptr) {
+            delete iter->second;
+            iter->second = nullptr;
+        }
+        mWifiProServiceHandle.pService.erase(iter);
+    }
+
+    if (!bPreLoad && mWifiProServiceHandle.pService.empty()) {
+        mWifiProServiceHandle.Clear();
+    }
+    return 0;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 NO_SANITIZE("cfi") int WifiServiceManager::UnloadSelfCureService(bool bPreLoad, int instId)
@@ -466,6 +533,11 @@ int WifiServiceManager::UnloadService(const std::string &name, int id)
     if (name == WIFI_SERVICE_STA) {
         return UnloadStaService(bPreLoad, id);
     }
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    if (name == WIFI_SERVICE_WIFIPRO) {
+        return UnloadWifiProService(bPreLoad, id);
+    }
+#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     if (name == WIFI_SERVICE_SELFCURE) {
         return UnloadSelfCureService(bPreLoad, id);
@@ -507,6 +579,9 @@ void WifiServiceManager::UninstallAllService()
 #endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     UnloadSelfCureService(false);
+#endif
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    UnloadWifiProService(false);
 #endif
     return;
 }

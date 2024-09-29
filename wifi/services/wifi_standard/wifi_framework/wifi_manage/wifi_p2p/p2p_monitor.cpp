@@ -46,33 +46,39 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
     setMonitorIface.insert(iface);
 
     P2pHalCallback callback = {
-        std::bind(&P2pMonitor::OnConnectSupplicant, this, _1),
-        std::bind(&P2pMonitor::WpaEventDeviceFound, this, _1),
-        std::bind(&P2pMonitor::WpaEventDeviceLost, this, _1),
-        std::bind(&P2pMonitor::WpaEventGoNegRequest, this, _1, _2),
-        std::bind(&P2pMonitor::WpaEventGoNegSuccess, this),
-        std::bind(&P2pMonitor::WpaEventGoNegFailure, this, _1),
-        std::bind(&P2pMonitor::WpaEventInvitationReceived, this, _1),
-        std::bind(&P2pMonitor::WpaEventInvitationResult, this, _1, _2),
-        std::bind(&P2pMonitor::WpaEventGroupFormationSuccess, this),
-        std::bind(&P2pMonitor::WpaEventGroupFormationFailure, this, _1),
-        std::bind(&P2pMonitor::WpaEventGroupStarted, this, _1),
-        std::bind(&P2pMonitor::WpaEventGroupRemoved, this, _1, _2),
-        std::bind(&P2pMonitor::WpaEventProvDiscPbcReq, this, _1),
-        std::bind(&P2pMonitor::WpaEventProvDiscPbcResp, this, _1),
-        std::bind(&P2pMonitor::WpaEventProvDiscEnterPin, this, _1),
-        std::bind(&P2pMonitor::WpaEventProvDiscShowPin, this, _1, _2),
-        std::bind(&P2pMonitor::WpaEventProvDiscFailure, this),
-        std::bind(&P2pMonitor::WpaEventFindStopped, this),
-        std::bind(&P2pMonitor::WpaEventServDiscResp, this, _1, _2, _3),
-        std::bind(&P2pMonitor::WpaEventApStaDisconnected, this, _1),
-        std::bind(&P2pMonitor::WpaEventApStaConnected, this, _1, _2),
-        std::bind(&P2pMonitor::OnConnectSupplicantFailed, this),
-        std::bind(&P2pMonitor::WpaEventServDiscReq, this, _1),
-        std::bind(&P2pMonitor::WpaEventP2pIfaceCreated, this, _1, _2),
-        std::bind(&P2pMonitor::WpaEventP2pConnectFailed, this, _1, _2),
-        std::bind(&P2pMonitor::WpaEventP2pChannelSwitch, this, _1),
-        std::bind(&P2pMonitor::WpaEventStaNotifyCallBack, this, _1),
+        [this](int status) { this->OnConnectSupplicant(status); },
+        [this](const HalP2pDeviceFound &deviceInfo) { this->WpaEventDeviceFound(deviceInfo); },
+        [this](const std::string &p2pDeviceAddress) { this->WpaEventDeviceLost(p2pDeviceAddress); },
+        [this](const std::string &srcAddress, short passwordId) { this->WpaEventGoNegRequest(srcAddress, passwordId); },
+        [this]() { this->WpaEventGoNegSuccess(); },
+        [this](int status) { this->WpaEventGoNegFailure(status); },
+        [this](const HalP2pInvitationInfo &recvInfo) { this->WpaEventInvitationReceived(recvInfo); },
+        [this](const std::string &bssid, int status) { this->WpaEventInvitationResult(bssid, status); },
+        [this]() { this->WpaEventGroupFormationSuccess(); },
+        [this](const std::string &failureReason) { this->WpaEventGroupFormationFailure(failureReason); },
+        [this](const HalP2pGroupInfo &groupInfo) { this->WpaEventGroupStarted(groupInfo); },
+        [this](const std::string &groupIfName, bool isGo) { this->WpaEventGroupRemoved(groupIfName, isGo); },
+        [this](const std::string &p2pDeviceAddress) { this->WpaEventProvDiscPbcReq(p2pDeviceAddress); },
+        [this](const std::string &p2pDeviceAddress) { this->WpaEventProvDiscPbcResp(p2pDeviceAddress); },
+        [this](const std::string &p2pDeviceAddress) { this->WpaEventProvDiscEnterPin(p2pDeviceAddress); },
+        [this](const std::string &p2pDeviceAddress, const std::string &generatedPin) {
+            this->WpaEventProvDiscShowPin(p2pDeviceAddress, generatedPin);
+        },
+        [this]() { this->WpaEventProvDiscFailure(); },
+        [this]() { this->WpaEventFindStopped(); },
+        [this](const std::string &srcAddress, short updateIndicator, const std::vector<unsigned char> &tlvList) {
+            this->WpaEventServDiscResp(srcAddress, updateIndicator, tlvList);
+        },
+        [this](const std::string &p2pDeviceAddress) { this->WpaEventApStaDisconnected(p2pDeviceAddress); },
+        [this](const std::string &p2pDeviceAddress, const std::string &p2pGroupAddress) {
+            this->WpaEventApStaConnected(p2pDeviceAddress, p2pGroupAddress);
+        },
+        [this]() { this->OnConnectSupplicantFailed(); },
+        [this](const HalP2pServDiscReqInfo &reqInfo) { this->WpaEventServDiscReq(reqInfo); },
+        [this](const std::string &ifName, int isGo) { this->WpaEventP2pIfaceCreated(ifName, isGo); },
+        [this](const std::string &bssid, int reason) { this->WpaEventP2pConnectFailed(bssid, reason); },
+        [this](int freq) { this->WpaEventP2pChannelSwitch(freq); },
+        [this](const std::string &notifyParam) { this->WpaEventStaNotifyCallBack(notifyParam); },
     };
 
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);

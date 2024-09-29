@@ -27,6 +27,7 @@ ConcreteClientModeManager::~ConcreteClientModeManager()
 {
     WIFI_LOGE("exit");
     delete pConcreteMangerMachine;
+    pConcreteMangerMachine = nullptr;
 }
 
 ErrCode ConcreteClientModeManager::RegisterCallback(const ConcreteModeCallback &callbacks)
@@ -68,7 +69,7 @@ ErrCode ConcreteClientModeManager::InitConcreteManager()
     return WIFI_OPT_SUCCESS;
 }
 
-ConcreteMangerMachine *ConcreteClientModeManager::GetConcreteMachine()
+ConcreteMangerMachine *ConcreteClientModeManager::GetMachine()
 {
     return pConcreteMangerMachine;
 }

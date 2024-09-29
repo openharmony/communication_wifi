@@ -22,7 +22,7 @@ namespace Wifi {
 HWTEST_F(WifiEventHandlerTest, PostSyncTaskTest, TestSize.Level1)
 {
     std::function<void()> callback = EventHandlerCallback;
-    testEventHandler->PostSyncTask(callback);
+    EXPECT_EQ(testEventHandler->PostSyncTask(callback), true);
 }
 
 HWTEST_F(WifiEventHandlerTest, PostAsyncTaskTest, TestSize.Level1)
@@ -45,7 +45,7 @@ HWTEST_F(WifiEventHandlerTest, RemoveAsyncTaskTest, TestSize.Level1)
 HWTEST_F(WifiEventHandlerTest, PostSyncTimeOutTaskTest, TestSize.Level1)
 {
     std::function<void()> callback = EventHandlerCallback;
-    WifiEventHandler::PostSyncTimeOutTask(EventHandlerCallback);
+    EXPECT_EQ(WifiEventHandler::PostSyncTimeOutTask(EventHandlerCallback), true);
 }
 }  // namespace Wifi
 }  // namespace OHOS

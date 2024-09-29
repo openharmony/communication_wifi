@@ -80,6 +80,13 @@ private:
     virtual bool ProcessCmdCreateGroup(const InternalMessagePtr msg) const;
 
     /**
+     * @Description Process the create group of rpt command received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdCreateRptGroup(const InternalMessagePtr msg) const;
+
+    /**
      * @Description Process the group started message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
@@ -129,7 +136,7 @@ private:
     virtual bool ProcessCmdHid2dCreateGroup(const InternalMessagePtr msg) const;
 
 private:
-    using ProcessFun = bool (P2pGroupOperatingState::*)(const InternalMessagePtr msg) const;
+    using ProcessFun = std::function<bool(const InternalMessagePtr)> const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;

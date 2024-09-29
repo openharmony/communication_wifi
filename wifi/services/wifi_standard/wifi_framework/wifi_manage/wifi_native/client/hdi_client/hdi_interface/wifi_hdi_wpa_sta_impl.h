@@ -24,59 +24,60 @@
 extern "C" {
 #endif
 
-WifiErrorNo HdiWpaStaStart(const char *ifaceName);
+WifiErrorNo HdiWpaStaStart(const char *ifaceName, int instId);
 
-WifiErrorNo HdiWpaStaStop();
+WifiErrorNo HdiWpaStaStop(int instId);
 
-WifiErrorNo HdiWpaStaConnect(int networkId);
+WifiErrorNo HdiWpaStaConnect(int networkId, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaReconnect();
+WifiErrorNo HdiWpaStaReconnect(const char *ifaceName);
 
-WifiErrorNo HdiWpaStaReassociate();
+WifiErrorNo HdiWpaStaReassociate(const char *ifaceName);
 
-WifiErrorNo HdiWpaStaDisconnect();
+WifiErrorNo HdiWpaStaDisconnect(const char *ifaceName);
 
-WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen);
+WifiErrorNo HdiWpaStaGetDeviceMacAddress(char *macAddr, int macAddrLen, const char *ifaceName);
 
 WifiErrorNo HdiWpaStaScan();
 
-ScanInfo *HdiWpaStaGetScanInfos(int *size);
+ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaRemoveNetwork(int networkId);
+WifiErrorNo HdiWpaStaRemoveNetwork(int networkId, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaAddNetwork(int *networkId);
+WifiErrorNo HdiWpaStaAddNetwork(int *networkId, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaEnableNetwork(int networkId);
+WifiErrorNo HdiWpaStaEnableNetwork(int networkId, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaDisableNetwork(int networkId);
+WifiErrorNo HdiWpaStaDisableNetwork(int networkId, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaSetNetwork(int networkId, SetNetworkConfig *confs, int size);
+WifiErrorNo HdiWpaStaSetNetwork(int networkId, SetNetworkConfig *confs, int size, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaSaveConfig();
+WifiErrorNo HdiWpaStaSaveConfig(const char *ifaceName);
 
-WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback);
+WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback, const char *ifaceName, int instId);
 
-WifiErrorNo HdiWpaStaStartWpsPbcMode(WifiWpsParam *config);
+WifiErrorNo HdiWpaStaStartWpsPbcMode(WifiWpsParam *config, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaStartWpsPinMode(WifiWpsParam *config, int *pinCode);
+WifiErrorNo HdiWpaStaStartWpsPinMode(WifiWpsParam *config, int *pinCode, const char *ifaceName);
 
-WifiErrorNo HdiStopWpsSta();
+WifiErrorNo HdiStopWpsSta(const char *ifaceName);
 
-WifiErrorNo HdiWpaStaAutoConnect(int enable);
+WifiErrorNo HdiWpaStaAutoConnect(int enable, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaBlocklistClear();
+WifiErrorNo HdiWpaStaBlocklistClear(const char *ifaceName);
 
-WifiErrorNo HdiWpaStaSetPowerSave(int enable);
+WifiErrorNo HdiWpaStaSetPowerSave(int enable, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaSetCountryCode(const char *countryCode);
+WifiErrorNo HdiWpaStaSetCountryCode(const char *countryCode, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaSetSuspendMode(int mode);
+WifiErrorNo HdiWpaStaSetSuspendMode(int mode, const char *ifaceName);
 
-WifiErrorNo HdiWpaStaGetCountryCode(char *countryCode, uint32_t size);
+WifiErrorNo HdiWpaStaGetCountryCode(char *countryCode, uint32_t size, const char *ifaceName);
 
-WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32_t *size);
+WifiErrorNo HdiWpaListNetworks(struct HdiWifiWpaNetworkInfo *networkList, uint32_t *size, const char *ifaceName);
 
-WifiErrorNo HdiWpaGetNetwork(int32_t networkId, const char* param, char* value, uint32_t valueLen);
+WifiErrorNo HdiWpaGetNetwork(
+    int32_t networkId, const char* param, char* value, uint32_t valueLen, const char *ifaceName);
 
 WifiErrorNo HdiWpaStaSetShellCmd(const char *ifName, const char *cmd);
 

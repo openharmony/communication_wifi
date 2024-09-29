@@ -1286,9 +1286,9 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     }
 
     std::string appId = "";
-    std::string packageName;
-    GetBundleNameByUid(GetCallingUid(), packageName);
+    std::string packageName = "";
 #ifndef OHOS_ARCH_LITE
+    GetBundleNameByUid(GetCallingUid(), packageName);
     int32_t userId = static_cast<int32_t>(GetCallingUid() / UID_CALLINGUID_TRANSFORM_DIVISOR);
     appId = GetBundleAppIdByBundleName(userId, packageName);
 #endif
@@ -1304,6 +1304,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
 #endif
         }
     }
+
     WIFI_LOGD("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
               info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
     WIFI_LOGD("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d,\

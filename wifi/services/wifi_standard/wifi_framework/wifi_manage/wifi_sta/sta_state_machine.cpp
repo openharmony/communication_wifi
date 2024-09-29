@@ -242,6 +242,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isDataRestricted = 0;
     linkedInfo.platformType = "";
     linkedInfo.portalUrl = "";
+    linkedInfo.supplicantState = SupplicantState::DISCONNECTED;
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
     linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     linkedInfo.lastPacketDirection = 0;
@@ -274,6 +275,7 @@ void StaStateMachine::InitLastWifiLinkedInfo()
     lastLinkedInfo.lastPacketDirection = 0;
     lastLinkedInfo.lastRxPackets = 0;
     lastLinkedInfo.lastTxPackets = 0;
+    lastLinkedInfo.supplicantState = SupplicantState::DISCONNECTED;
     lastLinkedInfo.detailedState = DetailedState::DISCONNECTED;
 }
 

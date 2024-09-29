@@ -141,7 +141,7 @@ errno_t MacStrToArray(const std::string& strMac, unsigned char mac[WIFI_MAC_LEN]
  * @param mac - Input MAC address
  * @return string - conversion result.
  */
-std::string MacArrayToStr(const unsigned char mac[WIFI_MAC_LEN], int len);
+std::string MacArrayToStr(const unsigned char mac[WIFI_MAC_LEN]);
 
 /**
  * @Description Check whether the array of MAC address is empty

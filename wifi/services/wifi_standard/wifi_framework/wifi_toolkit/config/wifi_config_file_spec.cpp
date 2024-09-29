@@ -194,7 +194,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
     } else if (key == "isShared") {
         item.isShared = std::stoi(value);
     } else if (key == "lastTrySwitchWifiTimestamp") {
-        item.lastTrySwitchWifiTimestamp = std::stoi(value);
+        std::string tmpValue = value;
+        item.lastTrySwitchWifiTimestamp = static_cast<int64_t>(CheckDataLegall(tmpValue));
     } else {
         return -1;
     }

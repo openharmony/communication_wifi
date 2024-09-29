@@ -1284,17 +1284,24 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         }
     }
 
-    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
+    std::string appId = "";
+    std::string packageName;
+    GetBundleNameByUid(GetCallingUid(), packageName);
+#ifndef OHOS_ARCH_LITE
+    int32_t userId = static_cast<int32_t>(GetCallingUid() / UID_CALLINGUID_TRANSFORM_DIVISOR);
+    appId = GetBundleAppIdByBundleName(userId, packageName);
+#endif
+    if (ProcessPermissionVerify(appId, packageName) == PERMISSION_DENIED) {
+        if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
 #ifdef SUPPORT_RANDOM_MAC_ADDR
         info.bssid = WifiConfigCenter::GetInstance().GetRandomMacAddr(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
             info.bssid);
-#else
         /* Clear mac addr */
         info.bssid = "";
 #endif
+        }
     }
-
     WIFI_LOGD("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
               info.networkId, SsidAnonymize(info.ssid).c_str(), info.rssi, info.frequency);
     WIFI_LOGD("GetLinkedInfo, connState=%{public}d, supplicantState=%{public}d, detailedState=%{public}d,\
@@ -2192,5 +2199,27 @@ ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& rep
     return WIFI_OPT_SUCCESS;
 }
 #endif
+
+int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, const std::string &packageName)
+{
+    if (appId.length() == 0 || packageName.length() == 0) {
+        WIFI_LOGI("ProcessPermissionVerify(), PERMISSION_DENIED");
+        return PERMISSION_DENIED;
+    }
+    std::map<std::string, std::vector<std::string>> filterMap;
+    if (WifiSettings::GetInstance().GetPackageFilterMap(filterMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetPackageFilterMap failed");
+        return PERMISSION_DENIED;
+    }
+    std::vector<std::string> whilteListProcessInfo = filterMap["GetLinkProcessPermissionVerify"];
+    auto iter = whilteListProcessInfo.begin();
+    while (iter != whilteListProcessInfo.end()) {
+        if (*iter == packageName + "|" + appId) {
+            return PERMISSION_GRANTED;
+        }
+        iter++;
+    }
+    return PERMISSION_DENIED;
+}
 }  // namespace Wifi
 }  // namespace OHOS

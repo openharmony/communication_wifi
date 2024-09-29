@@ -30,7 +30,7 @@ NO_SANITIZE("cfi") WifiErrorCode Hid2dRequestGcIp(const unsigned char gcMac[MAC_
 {
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
 
-    std::string strMac = OHOS::Wifi::MacArrayToStr(gcMac, MAC_LEN);
+    std::string strMac = OHOS::Wifi::MacArrayToStr(gcMac);
     std::string strIpAddr;
     OHOS::Wifi::ErrCode ret = wifiHid2dPtr->Hid2dRequestGcIp(strMac, strIpAddr);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
@@ -71,7 +71,7 @@ NO_SANITIZE("cfi") WifiErrorCode Hid2dConnect(const Hid2dConnectConfig *config)
 
     OHOS::Wifi::Hid2dConnectConfig cppConfig;
     cppConfig.SetSsid(config->ssid);
-    cppConfig.SetBssid(OHOS::Wifi::MacArrayToStr(config->bssid, MAC_LEN));
+    cppConfig.SetBssid(OHOS::Wifi::MacArrayToStr(config->bssid));
     cppConfig.SetPreSharedKey(config->preSharedKey);
     cppConfig.SetFrequency(config->frequency);
     cppConfig.SetDhcpMode(OHOS::Wifi::DhcpMode(static_cast<int>(config->dhcpMode)));
@@ -192,7 +192,7 @@ NO_SANITIZE("cfi") WifiErrorCode Hid2dSetUpperScene(const char ifName[IF_NAME_LE
     CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
     CHECK_PTR_RETURN(scene, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::Hid2dUpperScene upperScene;
-    upperScene.mac = OHOS::Wifi::MacArrayToStr(scene->mac, MAC_LEN);
+    upperScene.mac = OHOS::Wifi::MacArrayToStr(scene->mac);
     upperScene.scene = scene->scene;
     upperScene.fps = scene->fps;
     upperScene.bw = scene->bw;

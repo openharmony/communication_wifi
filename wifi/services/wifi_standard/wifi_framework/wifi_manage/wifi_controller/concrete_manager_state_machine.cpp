@@ -59,10 +59,12 @@ ConcreteMangerMachine::~ConcreteMangerMachine()
     WifiConfigCenter::GetInstance().SetWifiStopState(false);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
+        WIFI_LOGW("destroy ConcreteMangerMachine RemoveStaIface ifaceName:%{public}s, instId:%{public}d",
+            ifaceName.c_str(), mid);
         DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
         ifaceName.clear();
         WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(mid);
-        WifiConfigCenter::GetInstance().SetStaIfaceName("");
+        WifiConfigCenter::GetInstance().SetStaIfaceName("", mid);
     }
 #endif
 }
@@ -597,6 +599,9 @@ ErrCode ConcreteMangerMachine::SwitchSemiFromEnable()
         WIFI_LOGE("SwitchSemiFromEnable, Instance get sta service is null!");
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, mid);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, mid);
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_WIFIPRO, mid);
+#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, mid);
 #endif

@@ -20,6 +20,7 @@
 #include "wifi_msg.h"
 #include "ip2p_service_callbacks.h"
 #include "wifi_hid2d_msg.h"
+#include "wifi_ap_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -252,28 +253,6 @@ public:
     virtual ErrCode Hid2dConnect(const Hid2dConnectConfig& config) = 0;
 
     /**
-     * @Description Get self config info
-     *
-     * @param cfgType - config type
-     * @param cfgData - config data
-     * @param getDatValidLen - data length
-     * @return ErrCode - operate result
-     */
-    virtual ErrCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
-        char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen) = 0;
-
-    /**
-     * @Description Set self config info
-     *
-     * @param cfgType - config type
-     * @param cfgData - config data
-     * @param setDataValidLen - data length
-     * @return ErrCode - operate result
-     */
-    virtual ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
-        char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen) = 0;
-
-    /**
      * @Description Set self config info
      *
      * @param gcMac - gc mac address
@@ -347,6 +326,20 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) = 0;
+
+    /**
+     * @Description create rpt group
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode CreateRptGroup(const WifiP2pConfig &config) = 0;
+
+    /**
+     * @Description get station list of rpt
+     *
+     * @return ErrCode - operate result
+     */
+    virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

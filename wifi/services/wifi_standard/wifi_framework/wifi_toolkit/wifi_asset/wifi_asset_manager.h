@@ -36,6 +36,8 @@ public:
     void InitUpLoadLocalDeviceSync();
  
     void CloudAssetSync();
+
+    void WifiAssetTriggerSync();
  
     void WifiAssetAdd(const WifiDeviceConfig &config, int32_t userId = USER_ID_DEFAULT, bool flagSync = true);
  

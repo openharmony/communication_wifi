@@ -74,6 +74,7 @@ constexpr int POS_RANDMAC_CONNECT_FAILED_CNT = 14;
 constexpr int POS_RANDMAC_CONNECT_FAILED_TS = 15;
 constexpr int POS_RESET_CONNECT_FAILED_CNT = 16;
 constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
+constexpr int DNS_FAILED_CNT = 2;
 inline constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
 
 class SelfCureStateMachine : public StateMachine {
@@ -113,7 +114,7 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-        using selfCureCmsHandleFunc = void (SelfCureStateMachine::ConnectedMonitorState::*)(InternalMessagePtr msg);
+        using selfCureCmsHandleFunc = std::function<void(InternalMessagePtr msg)>;
         using SelfCureCmsHandleFuncMap = std::map<int, selfCureCmsHandleFunc>;
 
     private:
@@ -128,6 +129,7 @@ public:
         bool portalUnthenEver = false;
         bool userSetStaticIpConfig = false;
         bool wifiSwitchAllowed = false;
+        int lastDnsFailedCnt_ = 0;
         SelfCureCmsHandleFuncMap selfCureCmsHandleFuncMap;
         int InitSelfCureCmsHandleMap();
         void HandleResetupSelfCure(InternalMessagePtr msg);
@@ -145,6 +147,7 @@ public:
         void HandleTcpQualityQuery(InternalMessagePtr msg);
         void HandleGatewayChanged(InternalMessagePtr msg);
         bool IsGatewayChanged();
+        void HandleDnsFailedMonitor(InternalMessagePtr msg);
     };
 
     /* *
@@ -193,7 +196,7 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-        using selfCureIssHandleFunc = void (SelfCureStateMachine::InternetSelfCureState::*)(InternalMessagePtr msg);
+        using selfCureIssHandleFunc = std::function<void(InternalMessagePtr msg)>;
         using SelfCureIssHandleFuncMap = std::map<int, selfCureIssHandleFunc>;
 
     private:
@@ -222,7 +225,6 @@ public:
         bool finalSelfCureUsed = false;
         std::vector<int> testedSelfCureLevel;
         WifiSelfCureHistoryInfo selfCureHistoryInfo;
-        std::string currentGateway = "";
         int selfCureForInvalidIpCnt = 0;
         SelfCureIssHandleFuncMap selfCureIssHandleFuncMap;
         std::vector<std::string> AssignedDnses;
@@ -270,6 +272,7 @@ public:
         void RequestUseStaticIpConfig(IpInfo &dhcpResult);
         IpInfo GetNextTestDhcpResults();
         IpInfo GetRecordDhcpResults();
+        void InitCurrentGateway();
     };
 
     /* *
@@ -402,7 +405,6 @@ private:
     bool IsSoftApSsidSameWithWifi(const HotspotConfig& curApConfig);
     void CheckConflictIpForSoftAp();
     static bool IsEncryptedAuthType(const std::string authType);
-    std::string GetCurrentGateway();
     bool DoArpTest(std::string& ipAddress, std::string& gateway);
     void RequestArpConflictTest();
     static void UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel,

@@ -132,6 +132,16 @@ ErrCode P2pInterface::DeleteGroup(const WifiP2pGroupInfo &group)
     return p2pService.DeleteGroup(group);
 }
 
+ErrCode P2pInterface::CreateRptGroup(const WifiP2pConfig &config)
+{
+    return p2pService.CreateRptGroup(config);
+}
+
+ErrCode P2pInterface::GetRptStationsList(std::vector<StationInfo> &result)
+{
+    return p2pService.GetRptStationsList(result);
+}
+
 ErrCode P2pInterface::P2pConnect(const WifiP2pConfig &config)
 {
     return p2pService.P2pConnect(config);
@@ -215,18 +225,6 @@ ErrCode P2pInterface::Hid2dCreateGroup(const int frequency, FreqType type)
 ErrCode P2pInterface::Hid2dConnect(const Hid2dConnectConfig& config)
 {
     return p2pService.Hid2dConnect(config);
-}
-
-ErrCode P2pInterface::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
-    char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
-{
-    return p2pService.Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
-}
-
-ErrCode P2pInterface::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
-    char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
-{
-    return p2pService.Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
 }
 
 ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)

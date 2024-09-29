@@ -36,6 +36,9 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_multi_vap_manager.h"
 #endif
+#include "rpt_interface.h"
+
+#define ANY_ID (-1)
 
 namespace OHOS {
 namespace Wifi {
@@ -65,6 +68,11 @@ struct WifiCloseServiceMsg {
     WifiCloseServiceCode code;
     int instId;
 };
+
+constexpr uint32_t PROP_SUPPORT_SAPCOEXIST_LEN = 10;
+const std::string SUPPORT_SAPCOEXIST_PROP = "const.wifi.support_sapcoexist";
+const std::string SUPPORT_SAPCOEXIST = "true";
+constexpr uint32_t SUPPORT_SAPCOEXIST_LEN = 7;
 
 class WifiManager {
 public:
@@ -111,6 +119,7 @@ public:
     std::unique_ptr<WifiStaManager>& GetWifiStaManager();
     std::unique_ptr<WifiScanManager>& GetWifiScanManager();
     std::unique_ptr<WifiTogglerManager>& GetWifiTogglerManager();
+    std::shared_ptr<RptInterface> GetRptInterface(int id = ANY_ID);
 #ifdef FEATURE_AP_SUPPORT
     std::unique_ptr<WifiHotspotManager>& GetWifiHotspotManager();
 #endif
@@ -132,11 +141,12 @@ private:
     void CheckAndStartSta();
     void AutoStartServiceThread();
     void InitPidfile(void);
-
+    void CheckSapcoExist(void);
 private:
     std::mutex initStatusMutex;
     InitStatus mInitStatus;
     long mSupportedFeatures;
+    bool g_supportsapcoexistflag;
     std::unique_ptr<WifiEventHandler> mCloseServiceThread = nullptr;
     std::unique_ptr<WifiEventHandler> mStartServiceThread = nullptr;
     std::unique_ptr<WifiStaManager> wifiStaManager = nullptr;

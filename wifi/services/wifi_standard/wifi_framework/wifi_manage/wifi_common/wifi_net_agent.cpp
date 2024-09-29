@@ -37,6 +37,7 @@ constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_TH
 using namespace NetManagerStandard;
 
 #define INVALID_SUPPLIER_ID 0
+#define ACCEPT_UNVALIDATED 7
 
 WifiNetAgent &WifiNetAgent::GetInstance()
 {
@@ -173,7 +174,11 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
     WifiProxyConfig wifiProxyConfig, int instId)
 {
     if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask(
+#else
         netAgentEventHandler_->PostAsyncTask(
+#endif
             [this, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId]() mutable {
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
@@ -183,7 +188,11 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
 void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo)
 {
     if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
+#else
         netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo]() {
+#endif
            this->UpdateNetSupplierInfo(netInfo);
         });
     }
@@ -192,7 +201,11 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 void WifiNetAgent::OnStaMachineWifiStart()
 {
     if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask([this]() {
+#else
         netAgentEventHandler_->PostAsyncTask([this]() {
+#endif
             this->RegisterNetSupplier();
             this->RegisterNetSupplierCallback();
         });
@@ -206,7 +219,11 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
         WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __func__);
         return;
     }
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    netAgentEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+#else
     netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+#endif
         this->RegisterNetSupplier();
         this->RegisterNetSupplierCallback();
         WifiLinkedInfo linkedInfo;
@@ -232,7 +249,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
 void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
     IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId)
 {
-    netLinkInfo->ifaceName_ = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    netLinkInfo->ifaceName_ = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
 
     SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
@@ -489,6 +506,14 @@ void WifiNetAgent::NetConnCallback::LogNetCaps(
     }
     logStr += logStrEnd;
     WIFI_LOGD("%{public}s", logStr.c_str());
+}
+
+void WifiNetAgent::RestoreWifiConnection()
+{
+    using NetManagerStandard::NetBearType;
+    int32_t result = NetConnClient::GetInstance().UpdateSupplierScore(NetBearType::BEARER_WIFI,
+        ACCEPT_UNVALIDATED, supplierId);
+    WIFI_LOGI("Restore Wifi Connection, result:%{public}d", result);
 }
 }
 }

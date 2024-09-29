@@ -117,13 +117,6 @@ enum Wpa3ConnectFailReason {
     WPA3_FAIL_REASON_MAX
 };
 
-inline const std::map<int, int> wpa3FailreasonMap {
-    {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
-    {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
-    {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
-    {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
-};
-
 typedef enum EnumDhcpReturnCode {
     DHCP_RESULT,
     DHCP_JUMP,
@@ -334,6 +327,9 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+#ifndef OHOS_ARCH_LITE
+        void CheckIfRestoreWifi();
+#endif
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
@@ -550,9 +546,13 @@ public:
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
+    void DealNetworkRemoved(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
+    void SyncDeviceEverConnectedState(bool hasNet);
 #endif
+
+    bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);
 private:
     /**
      * @Description  Destruct state.
@@ -1195,7 +1195,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
-    IEnhanceService *enhanceService_;        /* EnhanceService handle */
+    IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
 #endif
 
     int lastNetworkId;
@@ -1258,6 +1258,7 @@ private:
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
+    void UpdateWifiCategory();
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;

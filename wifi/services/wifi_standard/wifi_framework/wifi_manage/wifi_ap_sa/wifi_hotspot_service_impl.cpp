@@ -54,8 +54,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
         WIFI_LOGE("IsHotspotActive:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
-    bActive = IsApServiceRunning();
+    bActive = IsApServiceRunning() || IsRptRunning();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -257,18 +256,21 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
         WIFI_LOGE("GetStationList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
-    if (!IsApServiceRunning()) {
+    ErrCode errCode;
+    if (IsApServiceRunning()) {
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
+        if (pService == nullptr) {
+            WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
+            return WIFI_OPT_AP_NOT_OPENED;
+        }
+        errCode = pService->GetStationList(result);
+    } else if (IsRptRunning()) {
+        auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
+        errCode = (rptManager != nullptr) ? rptManager->GetStationList(result) : WIFI_OPT_FAILED;
+    } else {
         WIFI_LOGE("Instance %{public}d hotspot service is not running!", m_id);
         return WIFI_OPT_AP_NOT_OPENED;
     }
-
-    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
-    if (pService == nullptr) {
-        WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-        return WIFI_OPT_AP_NOT_OPENED;
-    }
-    ErrCode errCode = pService->GetStationList(result);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
         WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED", __func__);
@@ -425,6 +427,34 @@ ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
     return WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_id);
 }
 
+static ErrCode AddApBlockList(int m_id, StationInfo& updateInfo)
+{
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
+    if (pService == nullptr) {
+        WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    if (pService->AddBlockList(updateInfo) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AddBlockList: request add hotspot blocklist failed!");
+        return WIFI_OPT_FAILED;
+    }
+    if (pService->DisconnetStation(updateInfo) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AddBlockList: request disconnet station failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+static ErrCode AddRptBlockList(int m_id, StationInfo &info)
+{
+    auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
+    if (rptManager == nullptr) {
+        return WIFI_OPT_FAILED;
+    }
+    rptManager->AddBlock(info.bssid);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s"
@@ -444,7 +474,9 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
     if (CheckMacIsValid(info.bssid)) {
         return WIFI_OPT_INVALID_PARAM;
     }
-    if (!IsApServiceRunning()) {
+    bool isApServiceRunning = IsApServiceRunning();
+    bool isRptRunning = IsRptRunning();
+    if (!isApServiceRunning && !isRptRunning) {
         WIFI_LOGE("ApService is not running!");
         return WIFI_OPT_AP_NOT_OPENED;
     }
@@ -456,18 +488,11 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
         WIFI_LOGE("Add block list failed!");
         return WIFI_OPT_FAILED;
     }
-    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
-    if (pService == nullptr) {
-        WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-        return WIFI_OPT_AP_NOT_OPENED;
-    }
-    if (pService->AddBlockList(updateInfo) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("AddBlockList: request add hotspot blocklist failed!");
-        return WIFI_OPT_FAILED;
-    }
-    if (pService->DisconnetStation(updateInfo) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("AddBlockList: request disconnet station failed!");
-        return WIFI_OPT_FAILED;
+
+    if (isApServiceRunning) {
+        return AddApBlockList(m_id, updateInfo);
+    } else if (isRptRunning) {
+        return AddRptBlockList(m_id, updateInfo);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -507,6 +532,12 @@ ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
             WIFI_LOGE("request del hotspot blocklist failed!");
             return WIFI_OPT_FAILED;
         }
+    } else if (IsRptRunning()) {
+        auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
+        if (rptManager == nullptr) {
+            return WIFI_OPT_FAILED;
+        }
+        rptManager->DelBlock(info.bssid);
     }
 
     if (WifiSettings::GetInstance().ManageBlockList(info, MODE_DEL, m_id) < 0) {
@@ -606,6 +637,13 @@ bool WifiHotspotServiceImpl::IsApServiceRunning()
         return false;
     }
     return true;
+}
+
+bool WifiHotspotServiceImpl::IsRptRunning()
+{
+    WIFI_LOGI("current rpt is %{public}d %{public}s", m_id, __func__);
+    auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
+    return rptManager != nullptr && rptManager->IsRptRunning();
 }
 
 ErrCode WifiHotspotServiceImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
@@ -925,7 +963,12 @@ ErrCode WifiHotspotServiceImpl::GetApIfaceName(std::string& ifaceName)
         WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
+    if (IsApServiceRunning()) {
+        ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
+    } else if (IsRptRunning()) {
+        auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
+        ifaceName = (rptManager != nullptr) ? rptManager->GetRptIfaceName() : "";
+    }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

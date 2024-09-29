@@ -110,6 +110,11 @@ ohos_shared_library("wifi_ap_service") {
     defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
   }
 
+  if (wifi_feature_with_hdi_chip_supported) {
+    defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
+    external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
+  }
+
   if (defined(global_parts_info) &&
       defined(global_parts_info.powermgr_battery_manager)) {
     external_deps += [ "battery_manager:batterysrv_client" ]

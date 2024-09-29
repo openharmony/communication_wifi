@@ -192,8 +192,8 @@ public:
      * @param ifaceName: [out] iface name
      * @return bool
      */
-    bool CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback,
-                        const RssiReportCallback &rssiReportCallback, std::string &ifaceName);
+    bool CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback, const RssiReportCallback &rssiReportCallback,
+        std::string &ifaceName, int instId);
 
     /**
      * @Description create ap iface
@@ -324,7 +324,7 @@ public:
      * @param chipsetCategory: [out] chipset category
      * @return bool
      */
-    bool GetChipsetCategory(const std::string &ifaceName, int &chipsetCategory);
+    bool GetChipsetCategory(const std::string &ifaceName, uint32_t &chipsetCategory);
 
     /**
      * @Description get chipset feature capability
@@ -394,6 +394,25 @@ public:
      */
     bool SetApMacAddress(const std::string &ifaceName, const std::string &mac);
 
+    /**
+     * @Description set block list
+     * @param ifaceName ifaceName
+     * @param interfaceName interfaceName
+     * @param blockList mac address of block devices
+     * @return bool
+     */
+    bool SetBlockList(const std::string &ifaceName, const std::string &interfaceName,
+        const std::vector<std::string> &blockList);
+
+    /**
+     * @Description disassociate with target device
+     * @param ifaceName ifaceName
+     * @param interfaceName interfaceName
+     * @param mac mac address of target device
+     * @return bool
+     */
+    bool DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName, std::string mac);
+
 private:
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();
@@ -427,6 +446,9 @@ private:
         IfaceType createIfaceType);
     bool GetChip(const std::string &removeIfaceName, IfaceType removeIfaceType, sptr<IConcreteChip> &chip);
     bool RemoveIface(sptr<IChipIface> &iface, bool isCallback, IfaceType createIfaceType);
+    bool SendCmdToDriver(const std::string &ifaceName, const std::string &interfaceName,
+        int cmd, const std::string &param);
+    std::string MakeMacFilterString(const std::vector<std::string> &blockList);
     static void ClearStaInfo();
     static void ClearApInfo();
     static void ResetHalDeviceManagerInfo(bool isRemoteDied);

@@ -413,6 +413,16 @@ public:
     WifiErrorNo P2pGetSupportFrequenciesByBand(int band, std::vector<int> &frequencies) const;
 
     /**
+     * @Description Setting the P2P single config.
+     *
+     * @param networkId
+     * @param key
+     * @param value
+     * @return WifiErrorNo
+     */
+    WifiErrorNo P2pSetSingleConfig(int networkId, const std::string &key, const std::string &value) const;
+
+    /**
      * @Description Setting the P2P group config.
      *
      * @param networkId
@@ -461,6 +471,26 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const;
+
+    /**
+     * @Description set block list of rpt
+     * @param ifaceName ifaceName
+     * @param interfaceName interfaceName
+     * @param blockList mac address of block devices
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetRptBlockList(const std::string &ifaceName, const std::string &interfaceName,
+        const std::vector<std::string> &blockList);
+
+    /**
+     * @Description disassociate with target device
+     * @param ifaceName ifaceName
+     * @param interfaceName interfaceName
+     * @param mac mac address of target device
+     * @return WifiErrorNo
+     */
+    WifiErrorNo DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName,
+        const std::string &mac);
 
 private:
     P2pHalCallback mP2pCallback;

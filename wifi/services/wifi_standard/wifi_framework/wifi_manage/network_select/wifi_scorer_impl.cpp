@@ -22,7 +22,7 @@
 
 namespace OHOS::Wifi::NetworkSelection {
 DEFINE_WIFILOG_LABEL("WifiScorerImpl")
-
+namespace {
 constexpr int SUFFICIENT_RSSI_5G = -70;
 constexpr int SUFFICIENT_RSSI_2G = -73;
 constexpr int RSSI_SCORE_OFFSET = 85;
@@ -36,6 +36,8 @@ constexpr int WIFI_2G_BAND_SCORE = 20;
 constexpr int SECURITY_BONUS_SCORE = 5;
 constexpr int RSSI_LEVEL_FOUR_SCORE = 80;
 constexpr int RSSI_LEVEL_THREE_SCORE = 60;
+constexpr int RSSI_LEVEL_TWO_SCORE = 20;
+constexpr int WIFI_DEFAULT_SCORE = -1;
 constexpr int RSSI_LEVEL_TWO_SCORE_5G = 40;
 constexpr int RSSI_LEVEL_TWO_SCORE_2G = 20;
 constexpr int SIGNAL_LEVEL_TWO = 2;
@@ -46,8 +48,8 @@ constexpr int INTERNET_ACCESS_AWARD = 2;
 constexpr int EMPTY_NETWORK_STATUS_HISTORY_AWARD = 1;
 constexpr int MAX_HISTORY_NETWORK_STATUS_NUM = 10;
 constexpr int HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[MAX_HISTORY_NETWORK_STATUS_NUM] = {
-    0, 40960, 20480, 10240, 5120, 2560, 1280, 640, 320, 160};
-
+    81920, 40960, 20480, 10240, 5120, 2560, 1280, 640, 320, 160};
+}
 RssiScorer::RssiScorer() : SimpleWifiScorer("rssiScorer") {}
 
 double RssiScorer::Score(NetworkCandidate &networkCandidate)
@@ -218,6 +220,31 @@ double RssiLevelBonusScorer::Score(NetworkCandidate &networkCandidate)
     return 0;
 }
 
+SignalLevelScorer::SignalLevelScorer() : SimpleWifiScorer("SignalLevelScorer") {}
+
+double SignalLevelScorer::Score(NetworkCandidate &networkCandidate)
+{
+    auto &scanInfo = networkCandidate.interScanInfo;
+    int signalLevel = WifiSettings::GetInstance().GetSignalLevel(scanInfo.rssi, scanInfo.band);
+    int32_t levelScore = 0;
+    switch (signalLevel) {
+        case SIGNAL_LEVEL_FOUR:
+            levelScore = RSSI_LEVEL_FOUR_SCORE;
+            break;
+        case SIGNAL_LEVEL_THREE:
+            levelScore = RSSI_LEVEL_THREE_SCORE;
+            break;
+        case SIGNAL_LEVEL_TWO:
+            levelScore = RSSI_LEVEL_TWO_SCORE;
+            break;
+        default:
+            levelScore = WIFI_DEFAULT_SCORE;
+            break;
+    }
+ 
+    return levelScore;
+}
+
 Network5gBonusScorer::Network5gBonusScorer() : SimpleWifiScorer("5gBonusScore") {}
 
 double Network5gBonusScorer::Score(NetworkCandidate &networkCandidate)
@@ -253,5 +280,14 @@ double NoInternetNetworkStatusHistoryScorer::Score(NetworkCandidate &networkCand
         score += HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[i] * vNetworkStatusHistory[i];
     }
     return score;
+}
+
+ApQualityScorer::ApQualityScorer(const std::string &scorerName) : CompositeWifiScorer(scorerName)
+{
+    AddScorer(std::make_shared<SignalLevelScorer>());
+    AddScorer(std::make_shared<Network5gBonusScorer>());
+    ExternalWifiCommonBuildManager::GetInstance().BuildScore(
+        TagType::HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG, *this);
+    AddScorer(std::make_shared<SecurityBonusScorer>());
 }
 }

@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include "define.h"
 #include "wifi_base_hal_interface.h"
 #include "wifi_event_callback.h"
 #include "wifi_native_struct.h"
@@ -38,14 +39,14 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartWifi(const std::string &ifaceName = "wlan0");
+    WifiErrorNo StartWifi(const std::string &ifaceName = "wlan0", int instId = 0);
 
     /**
      * @Description Close Wifi.
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StopWifi(void);
+    WifiErrorNo StopWifi(int instId = 0);
 
     /**
      * @Description Connect Wifi.
@@ -53,7 +54,7 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo Connect(int networkId);
+    WifiErrorNo Connect(int networkId, const std::string &ifaceName);
 
     /**
      * @Description Reconnect Wifi.
@@ -74,7 +75,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo Disconnect(void);
+    WifiErrorNo Disconnect(const std::string &ifaceName);
 
     /**
      * @Description Obtaining the STA Support Capability.
@@ -90,7 +91,7 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo GetStaDeviceMacAddress(std::string &mac);
+    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName);
     
     /**
      * @Description Sets the Wi-Fi country code.
@@ -194,7 +195,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ClearDeviceConfig(void) const;
+    WifiErrorNo ClearDeviceConfig(const std::string &ifaceName) const;
 
     /**
      * @Description Request to obtain the next network ID.
@@ -202,7 +203,7 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo GetNextNetworkId(int &networkId);
+    WifiErrorNo GetNextNetworkId(int &networkId, const std::string &ifaceName);
 
     /**
      * @Description Enable a network.
@@ -210,7 +211,7 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo EnableNetwork(int networkId);
+    WifiErrorNo EnableNetwork(int networkId, const std::string &ifaceName);
 
     /**
      * @Description Disable a network.
@@ -218,7 +219,7 @@ public:
      * @param networkId
      * @return WifiErrorNo
      */
-    WifiErrorNo DisableNetwork(int networkId);
+    WifiErrorNo DisableNetwork(int networkId, const std::string &ifaceName);
 
     /**
      * @Description Setting the network.
@@ -227,7 +228,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config);
+    WifiErrorNo SetDeviceConfig(int networkId, const WifiHalDeviceConfig &config, const std::string &ifaceName);
 
     /**
      * @Description Obtaining Network Configurations.
@@ -235,7 +236,7 @@ public:
      * @param config
      * @return WifiErrorNo
      */
-    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config);
+    WifiErrorNo GetDeviceConfig(WifiHalGetDeviceConfig &config, const std::string &ifaceName);
 
     /**
      * @Description Save network config.
@@ -250,7 +251,7 @@ public:
      * @param callback
      * @return WifiErrorNo
      */
-    WifiErrorNo RegisterStaEventCallback(const WifiEventCallback &callback);
+    WifiErrorNo RegisterStaEventCallback(const WifiEventCallback &callback, const std::string &ifaceName);
 
     /**
      * @Description Enabling WPS in PBC Mode.
@@ -291,7 +292,7 @@ public:
      * @param bssid
      * @return WifiErrorNo
      */
-    WifiErrorNo SetBssid(int networkId, const std::string &bssid);
+    WifiErrorNo SetBssid(int networkId, const std::string &bssid, const std::string &ifaceName);
 
     /**
      * @Description Setting Roaming Configurations.
@@ -395,7 +396,7 @@ public:
      *
      * @return const WifiEventCallback& - register sta callback objects
      */
-    const WifiEventCallback &GetCallbackInst(void) const;
+    const WifiEventCallback &GetCallbackInst(const std::string &ifaceName) const;
 
     /**
      * @Description Get register callback objects for death receiver
@@ -413,7 +414,7 @@ public:
     WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
 
 private:
-    WifiEventCallback mStaCallback;
+    WifiEventCallback mStaCallback[2];
     std::function<void(int)> mDeathCallback;
 };
 }  // namespace Wifi

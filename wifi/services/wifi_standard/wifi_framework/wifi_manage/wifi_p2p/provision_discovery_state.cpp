@@ -48,22 +48,22 @@ void ProvisionDiscoveryState::GoOutState()
 
 void ProvisionDiscoveryState::Init()
 {
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS, &ProvisionDiscoveryState::ProcessCmdDiscoverPeer));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES, &ProvisionDiscoveryState::ProcessCmdDiscServices));
-    mProcessFunMap.insert(
-        std::make_pair(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN, &ProvisionDiscoveryState::ProcessCmdStartListen));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_RESP, &ProvisionDiscoveryState::ProcessProvDiscPbcRspEvt));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN, &ProvisionDiscoveryState::ProcessProvDiscEnterPinEvt));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN, &ProvisionDiscoveryState::ProcessProvDiscShowPinEvt));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE, &ProvisionDiscoveryState::ProcessProvDiscFailEvt));
-    mProcessFunMap.insert(std::make_pair(
-        P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT, &ProvisionDiscoveryState::ProcessCmdCancelConnect));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDiscoverPeer(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_SERVICES,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdDiscServices(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_START_LISTEN,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdStartListen(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_RESP,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscPbcRspEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_ENTER_PIN,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscEnterPinEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_SHOW_PIN,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscShowPinEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE,
+        [this](InternalMessagePtr msg) { return this->ProcessProvDiscFailEvt(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT,
+        [this](InternalMessagePtr msg) { return this->ProcessCmdCancelConnect(msg); }));
 }
 
 bool ProvisionDiscoveryState::ProcessCmdDiscoverPeer(InternalMessagePtr msg) const
@@ -191,7 +191,7 @@ bool ProvisionDiscoveryState::ExecuteStateMsg(InternalMessagePtr msg)
     if (iter == mProcessFunMap.end()) {
         return NOT_EXECUTED;
     }
-    if ((this->*(iter->second))(msg)) {
+    if ((iter->second)(msg)) {
         return EXECUTED;
     } else {
         return NOT_EXECUTED;

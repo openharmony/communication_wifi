@@ -627,7 +627,10 @@ HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
     config1.keyMgmt = "WPA-PSK";
     config1.preSharedKey = "12345678";
     newWifiDeviceConfigs.push_back(config1);
-    WifiSettings::GetInstance().UpdateWifiConfigFromCloud(newWifiDeviceConfigs);
+    std::set<int> wifiLinkedNetworkIds;
+    wifiLinkedNetworkIds.insert(0);
+    wifiLinkedNetworkIds.insert(1);
+    WifiSettings::GetInstance().UpdateWifiConfigFromCloud(newWifiDeviceConfigs, wifiLinkedNetworkIds);
     // Assert the updated WifiDeviceConfig objects in mWifiDeviceConfig map
     // based on the newWifiDeviceConfigs vector
     WifiDeviceConfig updatedConfig;

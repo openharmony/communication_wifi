@@ -184,13 +184,10 @@ void WifiSettings::ClearDeviceConfig(void)
         }
     }
     mWifiDeviceConfig.clear();
-#ifdef SUPPORT_ClOUD_WIFI_ASSET
-    WifiAssetManager::GetInstance().WifiAssetRemoveAll();
-#endif
     return;
 }
 
-int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
+int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -199,14 +196,14 @@ int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         // -1: Connect by system, use default uid.
-        if (iter->second.uid == -1 || iter->second.isShared) {
+        if ((iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
             results.push_back(iter->second);
         }
     }
     return 0;
 }
 
-int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
+int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -214,7 +211,7 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if (iter->second.networkId == networkId) {
+        if (iter->second.networkId == networkId && iter->second.instanceId == instId) {
             config = iter->second;
             SyncAfterDecryped(config);
             return 0;
@@ -223,7 +220,8 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     return -1;
 }
 
-int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config)
+int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType,
+    WifiDeviceConfig &config, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -232,7 +230,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
     std::unique_lock<std::mutex> lock(mStaMutex);
     if (indexType == DEVICE_CONFIG_INDEX_SSID) {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-            if (iter->second.ssid == index) {
+            if (iter->second.ssid == index && iter->second.instanceId == instId) {
                 config = iter->second;
                 SyncAfterDecryped(config);
                 return 0;
@@ -240,7 +238,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         }
     } else {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-            if (iter->second.bssid == index) {
+            if (iter->second.bssid == index && iter->second.instanceId == instId) {
                 config = iter->second;
                 SyncAfterDecryped(config);
                 return 0;
@@ -250,7 +248,8 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
     return -1;
 }
 
-int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config)
+int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt,
+    WifiDeviceConfig &config, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -261,7 +260,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     if (keymgmt.compare("WPA-PSK+SAE") == 0) {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
-                && (iter->second.uid == -1 || iter->second.isShared)) {
+                && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
                 config = iter->second;
                 SyncAfterDecryped(config);
                 return 0;
@@ -270,7 +269,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     } else {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
-                && (iter->second.uid == -1 || iter->second.isShared)) {
+                && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
                 config = iter->second;
                 SyncAfterDecryped(config);
                 return 0;
@@ -339,6 +338,48 @@ int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
     return 0;
 }
 
+int WifiSettings::SetDeviceEverConnected(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.everConnected = true;
+    return 0;
+}
+
+int WifiSettings::SetAcceptUnvalidated(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.acceptUnvalidated = true;
+    return 0;
+}
+
+bool WifiSettings::GetDeviceEverConnected(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return false;
+    }
+    return iter->second.everConnected;
+}
+
+bool WifiSettings::GetAcceptUnvalidated(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return false;
+    }
+    return iter->second.acceptUnvalidated;
+}
+
 int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
     WifiDeviceConfig &config)
 {
@@ -397,6 +438,9 @@ int WifiSettings::IncreaseDeviceConnFailedCount(const std::string &index, const 
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
                 iter->second.connFailedCount += count;
+                LOGI("WifiSettings::IncreaseDeviceConnFailedCount ssid=%{public}s,connFailedCount=%{public}d,"
+                    "count=%{public}d",
+                     SsidAnonymize(index).c_str(), iter->second.connFailedCount, count);
                 return 0;
             }
         }
@@ -404,10 +448,15 @@ int WifiSettings::IncreaseDeviceConnFailedCount(const std::string &index, const 
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index) {
                 iter->second.connFailedCount += count;
+                LOGI("WifiSettings::IncreaseDeviceConnFailedCount bssid=%{public}s,connFailedCount=%{public}d,"
+                    "count=%{public}d",
+                     SsidAnonymize(index).c_str(), iter->second.connFailedCount, count);
                 return 0;
             }
         }
     }
+    LOGE("WifiSettings::IncreaseDeviceConnFailedCount failed %{public}s,count=%{public}d",
+        SsidAnonymize(index).c_str(), count);
     return -1;
 }
 
@@ -418,6 +467,9 @@ int WifiSettings::SetDeviceConnFailedCount(const std::string &index, const int &
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index) {
                 iter->second.connFailedCount = count;
+                LOGI("WifiSettings::SetDeviceConnFailedCount bssid=%{public}s,connFailedCount=%{public}d,"
+                    "count=%{public}d",
+                     SsidAnonymize(index).c_str(), iter->second.connFailedCount, count);
                 return 0;
             }
         }
@@ -425,10 +477,15 @@ int WifiSettings::SetDeviceConnFailedCount(const std::string &index, const int &
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index) {
                 iter->second.connFailedCount = count;
+                LOGI("WifiSettings::SetDeviceConnFailedCount bssid=%{public}s,connFailedCount=%{public}d,"
+                    "count=%{public}d",
+                     SsidAnonymize(index).c_str(), iter->second.connFailedCount, count);
                 return 0;
             }
         }
     }
+    LOGE("WifiSettings::SetDeviceConnFailedCount failed %{public}s,count=%{public}d",
+        SsidAnonymize(index).c_str(), count);
     return -1;
 }
 
@@ -438,7 +495,7 @@ int WifiSettings::SyncDeviceConfig()
     std::unique_lock<std::mutex> lock(mStaMutex);
     std::vector<WifiDeviceConfig> tmp;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); ++iter) {
-        if (!iter->second.isEphemeral) {
+        if (!iter->second.isEphemeral && iter->second.instanceId == 0) {
             tmp.push_back(iter->second);
         }
     }
@@ -1789,12 +1846,14 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
     if (bufferLen < 0) {
         LOGE("GetConfigbyBackupXml read fail.");
         free(buffer);
+        buffer = nullptr;
         return -1;
     }
     std::string backupData = std::string(buffer, buffer + bufferLen);
     if (memset_s(buffer, statBuf.st_size, 0, statBuf.st_size) != EOK) {
         LOGE("GetConfigbyBackupXml memset_s fail.");
         free(buffer);
+        buffer = nullptr;
         return -1;
     }
     free(buffer);
@@ -1890,6 +1949,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         config.wifiWapiConfig.wapiAsCertData = "";
     }
     delete encryWapiAs;
+    encryWapiAs = nullptr;
 
     EncryptedData *encryWapiUser = new EncryptedData(config.wifiWapiConfig.encryptedUserCertData,
         config.wifiWapiConfig.userCertDataIV);
@@ -1902,6 +1962,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         config.wifiWapiConfig.wapiUserCertData = "";
     }
     delete encryWapiUser;
+    encryWapiUser = nullptr;
 }
 
 int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
@@ -1938,6 +1999,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wepKeys[config.wepTxKeyIndex] = "";
     }
     delete encryWep;
+    encryWep = nullptr;
 
     EncryptedData *encryEap = new EncryptedData(config.wifiEapConfig.encryptedData, config.wifiEapConfig.IV);
     std::string decryEap = "";
@@ -1949,6 +2011,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
+    encryEap = nullptr;
     DecryptionWapiConfig(mWifiEncryptionInfo, config);
     LOGD("DecryptionDeviceConfig end");
     return 0;
@@ -2016,19 +2079,28 @@ bool WifiSettings::GetConfigValueByName(const std::string &name, std::string &va
 }
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs)
+void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+    const std::set<int> &wifiLinkedNetworkIds)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    LOGI("UpdateWifiConfigFromCloud enter");
     std::map<int, WifiDeviceConfig> tempConfigs;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if (wifiLinkedNetworkIds.count(iter->second.networkId) != 0) {
+            tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
+            LOGI("UpdateWifiConfigFromCloud, connected network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
+            continue;
+        }
         if (WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, iter->second)) {
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+            EncryptionDeviceConfig(iter->second);
+#endif
+            LOGI("UpdateWifiConfigFromCloud, modify network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
             continue;
         }
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-        // Do not remove local encrypted data
         if (!IsWifiDeviceConfigDeciphered(iter->second)) {
+            LOGI("UpdateWifiConfigFromCloud, encrypted network %{public}s", SsidAnonymize(iter->second.ssid).c_str());
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
             continue;
         }
@@ -2046,13 +2118,18 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
-        LOGI("UpdateWifiConfigFromCloud new %{public}s", SsidAnonymize(iter.ssid).c_str());
-        tempConfigs.emplace(std::make_pair(mNetworkId, iter));
+        LOGI("UpdateWifiConfigFromCloud new %{public}s , psksize : %{public}d", SsidAnonymize(iter.ssid).c_str(),
+            static_cast<int>((iter.preSharedKey).length()));
+        iter.networkId = mNetworkId;
+        iter.version = 0;
+#ifdef FEATURE_ENCRYPTION_SUPPORT
+        EncryptionDeviceConfig(iter);
+#endif
+        tempConfigs.emplace(std::make_pair(iter.networkId, iter));
         mNetworkId++;
     }
     mWifiDeviceConfig.swap(tempConfigs);
 }
- 
 void WifiSettings::UpLoadLocalDeviceConfigToCloud()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

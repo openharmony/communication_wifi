@@ -32,6 +32,9 @@
 #ifdef FEATURE_SELF_CURE_SUPPORT
 #include "iself_cure_service.h"
 #endif
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+#include "iwifi_pro_service.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -46,6 +49,20 @@ struct StaServiceHandle {
         pService.clear();
     }
 };
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+struct WifiProServiceHandle {
+    std::map<int, IWifiProService *> pService;
+    WifiProServiceHandle()
+    {}
+    ~WifiProServiceHandle()
+    {}
+    void Clear()
+    {
+        pService.clear();
+    }
+};
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 struct SelfCureServiceHandle {
@@ -143,7 +160,7 @@ public:
      * @param bCreate - whether create the service instance
      * @return int - 0 success; -1 feature service name not correct or load service failed
      */
-    int CheckAndEnforceService(const std::string &name, bool bCreate = true);
+    int CheckAndEnforceService(const std::string &name, int instId = 0, bool bCreate = true);
 
     /**
      * @Description Get the Sta Service Inst object
@@ -159,6 +176,15 @@ public:
      * @return ISelfCureService* - self cure service pointer, if self cure not supported, nullptr is returned
      */
     ISelfCureService *GetSelfCureServiceInst(int instId = 0);
+#endif
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    /**
+     * @Description Get the WifiPro Service Inst object
+     *
+     * @return IWifiProService* - wifi pro service pointer, if wifi pro not supported, nullptr is returned
+     */
+    IWifiProService *GetWifiProServiceInst(int32_t instId);
 #endif
 
     /**
@@ -214,8 +240,12 @@ public:
 
 private:
     int GetServiceDll(const std::string &name, std::string &dlname);
-    int LoadStaService(const std::string &dlname, bool bCreate);
+    int LoadStaService(const std::string &dlname, int insId, bool bCreate);
     int UnloadStaService(bool bPreLoad, int instId = 0);
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    int32_t LoadWifiProService(bool bCreate, int32_t instId = 0);
+    int32_t UnloadWifiProService(bool bPreLoad, int32_t instId = 0);
+#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     int LoadSelfCureService(const std::string &dlname, bool bCreate);
     int UnloadSelfCureService(bool bPreLoad, int instId = 0);
@@ -235,12 +265,16 @@ private:
 private:
     std::mutex mStaMutex;
     std::mutex mSelfCureMutex;
+    std::mutex mWifiProMutex;
     std::mutex mScanMutex;
     std::mutex mP2pMutex;
     std::mutex mApMutex;
     std::mutex mEnhanceMutex;
     std::unordered_map<std::string, std::string> mServiceDllMap;
     StaServiceHandle mStaServiceHandle;
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    WifiProServiceHandle mWifiProServiceHandle;
+#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     SelfCureServiceHandle mSelfCureServiceHandle;
 #endif

@@ -25,6 +25,7 @@
 #endif
 #include "scan_interface.h"
 #include "sta_interface.h"
+#include "wifi_pro_interface.h"
 #ifdef FEATURE_SELF_CURE_SUPPORT
 #include "self_cure_interface.h"
 #endif
@@ -61,11 +62,19 @@ int WifiServiceManager::CheckPreLoadService(void)
     return 0;
 }
 
-int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
+int WifiServiceManager::LoadStaService(const std::string &dlname, int instId, bool bCreate)
 {
     WIFI_LOGI("LoadStaService");
     return 0;
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+int32_t WifiServiceManager::LoadWifiProService(bool bCreate, int32_t instId)
+{
+    WIFI_LOGI("WifiServiceManager::LoadWifiProService");
+    return 0;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 int WifiServiceManager::LoadSelfCureService(const std::string &dlname, bool bCreate)
@@ -103,7 +112,7 @@ int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCrea
     return 0;
 }
 
-int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
+int WifiServiceManager::CheckAndEnforceService(const std::string &name, int instId, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
     return 0;
@@ -114,6 +123,14 @@ IStaService *WifiServiceManager::GetStaServiceInst(int instId)
     WIFI_LOGD("WifiServiceManager::GetStaServiceInst, instId: %{public}d", instId);
     return nullptr;
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+IWifiProService *WifiServiceManager::GetWifiProServiceInst(int32_t instId)
+{
+    WIFI_LOGD("WifiServiceManager::GetWifiProServiceInst, instId: %{public}d", instId);
+    return nullptr;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 ISelfCureService *WifiServiceManager::GetSelfCureServiceInst(int instId)
@@ -153,6 +170,14 @@ IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
 {
     return nullptr;
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+NO_SANITIZE("cfi") int32_t WifiServiceManager::UnloadWifiProService(bool bPreLoad, int32_t instId)
+{
+    WIFI_LOGI("WifiServiceManager::UnloadWifiProService, instId: %{public}d", instId);
+    return 0;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 NO_SANITIZE("cfi") int WifiServiceManager::UnloadSelfCureService(bool bPreLoad, int instId)

@@ -39,6 +39,9 @@ namespace Wifi {
 #define CMD_STA_REMOVED 0x14
 #define CMD_CONCRETECLIENT_REMOVED 0x15
 #define CMD_AP_REMOVED 0x16
+#define CMD_RPT_STOPPED 0x17
+#define CMD_RPT_START_FAILURE 0x18
+#define CMD_P2P_STOPPED 0x19
 
 #define CONCRETE_CMD_START 0x101
 #define CONCRETE_CMD_SWITCH_TO_CONNECT_MODE 0x102
@@ -53,6 +56,25 @@ namespace Wifi {
 #define SOFTAP_CMD_START 0x201
 #define SOFTAP_CMD_STOP 0x202
 
+#define MULTI_STA_CMD_START 0x301
+#define MULTI_STA_CMD_STOP 0x302
+#define MULTI_STA_CMD_STARTED 0x303
+#define MULTI_STA_CMD_STOPPED 0x304
+#define CMD_MULTI_STA_STOPPED 0x305
+
+#define RPT_CMD_START 0x401
+#define RPT_CMD_STOP 0x402
+#define RPT_CMD_ON_P2P_CLOSE 0x403
+#define RPT_CMD_ON_GROUP_CREATED 0x404
+#define RPT_CMD_ON_GROUP_REMOVED 0x405
+#define RPT_CMD_ON_CREATE_RPT_GROUP_TIMEOUT 0x406
+#define RPT_CMD_ON_REMOVE_RPT_GROUP_TIMEOUT 0x407
+#define RPT_CMD_ON_REMOVE_CONFLICT_GROUP_TIMEOUT 0x408
+#define RPT_CMD_ADD_BLOCK 0x409
+#define RPT_CMD_DEL_BLOCK 0x40A
+#define RPT_CMD_ON_STATION_JOIN 0x40B
+#define RPT_CMD_ON_STATION_LEAVE 0x40C
+
 #define STOP_WIFI_WAIT_TIME 100
 
 struct ConcreteModeCallback {
@@ -62,6 +84,16 @@ struct ConcreteModeCallback {
 };
 
 struct SoftApModeCallback {
+    std::function<void(int)> onStopped;
+    std::function<void(int)> onStartFailure;
+};
+
+struct MultiStaModeCallback {
+    std::function<void(int)> onStopped;
+    std::function<void(int)> onStartFailure;
+};
+
+struct RptModeCallback {
     std::function<void(int)> onStopped;
     std::function<void(int)> onStartFailure;
 };

@@ -40,22 +40,33 @@ public:
     explicit WifiServiceScheduler();
     ~WifiServiceScheduler();
     ErrCode AutoStartStaService(int instId, std::string &staIfName);
+    ErrCode AutoStartWifi2Service(int instId, std::string &staIfName);
     ErrCode AutoStopStaService(int instId);
+    ErrCode AutoStopWifi2Service(int instId);
     ErrCode AutoStartScanOnly(int instId, std::string &staIfName);
     ErrCode AutoStopScanOnly(int instId, bool setIfaceDown);
     ErrCode AutoStartSemiStaService(int instId, std::string &staIfName);
     ErrCode AutoStartApService(int instId, std::string &softApIfName);
     ErrCode AutoStopApService(int instId);
     void DispatchWifiOpenRes(OperateResState state, int instId);
+    void DispatchWifi2OpenRes(OperateResState state, int instId);
     void DispatchWifiSemiActiveRes(OperateResState state, int instId);
     void DispatchWifiCloseRes(OperateResState state, int instId);
+    void DispatchWifi2CloseRes(OperateResState state, int instId);
     void ClearStaIfaceNameMap(int instId);
     void ClearP2pIfaceNameMap(int instId);
     void ClearSoftApIfaceNameMap(int instId);
 private:
     ErrCode PreStartWifi(int instId, std::string &staIfName);
     ErrCode PostStartWifi(int instId);
-    ErrCode InitStaService(IStaService *pService);
+    ErrCode PostStartWifi2(int instId);
+    ErrCode InitStaService(IStaService *pService, int instId);
+    ErrCode StartWifiStaService(int instId);
+    ErrCode StartDependentService(int instId);
+    void HandleGetStaFailed(int instId);
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    ErrCode StartWifiProService(int instId);
+#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
     ErrCode StartSelfCureService(int instId);
 #endif

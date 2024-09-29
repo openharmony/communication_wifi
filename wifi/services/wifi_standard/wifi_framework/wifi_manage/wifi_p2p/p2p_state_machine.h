@@ -128,6 +128,12 @@ public:
      */
     void SetIsNeedDhcp(DHCPTYPE dhcpType);
 
+    /**
+     * @Description - get connected stations
+     * @param  result - result
+     */
+    bool GetConnectedStationInfo(std::map<std::string, StationInfo> &result);
+
 private:
     /**
      * @Description Handle event of CMD_DEVICE_DISCOVERS
@@ -268,6 +274,15 @@ private:
      */
     virtual bool DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const;
     /**
+     * @Description Processing function of using configuration to create a group.
+     *
+     * @param config - p2p group's configuration
+     * @param freq - the frequency when starting a group
+     * @return true - created successfully
+     * @return false - creation failed
+     */
+    virtual bool DealCreateRptGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const;
+    /**
      * @Description Update persistent group's info to wpa.
      *
      */
@@ -299,6 +314,12 @@ private:
      * @param  state - current state
      */
     virtual void BroadcastP2pStatusChanged(P2pState state) const;
+    /**
+     * @Description - Broadcast peer change event.
+     * @param isJoin - is join or leave
+     * @param  mac - mac address
+     */
+    virtual void BroadcastP2pPeerJoinOrLeave(bool isJoin, const std::string &mac) const;
     /**
      * @Description - Peers update detected by broadcast.
      */
@@ -404,6 +425,7 @@ private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;
     GcInfo MatchDevInGcInfos(const std::string &deviceAddr, const std::string &groupAddr, std::vector<GcInfo> &gcInfos);
     void StopP2pDhcpClient();
+    void DoP2pArp(std::string serverIp, std::string clientIp);
 
 private:
     mutable std::mutex cbMapMutex;

@@ -27,12 +27,16 @@
 #include "wifi_common_util.h"
 #include "wifi_notification_util.h"
 #include "wifi_app_state_aware.h"
+#include "wifi_net_agent.h"
 #ifdef HAS_MOVEMENT_PART
 #include "wifi_msdp_state_listener.h"
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 #include "wifi_asset_manager.h"
 #endif
+#include "wifi_country_code_manager.h"
+#include "wifi_country_code_define.h"
+
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -52,6 +56,7 @@ const std::string SUPPORT_COEXCHIP = "";
 const std::string COEX_IFACENAME = "wlan1";
 const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
+const std::string EVENT_SETTINGS_WLAN_KEEP_CONNECTED = "event.settings.wlan.keep_connected";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
@@ -77,14 +82,15 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED, &
-    CesEventSubscriber::OnReceiveUserUnlockedEvent}
+    CesEventSubscriber::OnReceiveUserUnlockedEvent},
+    {EVENT_SETTINGS_WLAN_KEEP_CONNECTED, &CesEventSubscriber::OnReceiveWlanKeepConnected}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
 {
     WIFI_LOGI("create WifiEventSubscriberManager");
     if (accessDatashareTimerId == 0) {
-        WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::DelayedAccessDataShare, this);
+        WifiTimer::TimerCallback timeoutCallback = [this]() { this->DelayedAccessDataShare(); };
         WifiTimer::GetInstance()->Register(
             timeoutCallback, accessDatashareTimerId, TIMEOUT_EVENT_DELAY_ACCESS_DATASHARE);
         WIFI_LOGI("DelayedAccessDataShare register success! accessDatashareTimerId:%{public}u", accessDatashareTimerId);
@@ -117,6 +123,8 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterNotificationEvent();
     UnRegisterCloneEvent();
     UnRegisterLocationEvent();
+    UnRegisterNetworkStateChangeEvent();
+    UnRegisterWifiScanChangeEvent();
 }
 
 void WifiEventSubscriberManager::RegisterCesEvent()
@@ -138,7 +146,7 @@ void WifiEventSubscriberManager::RegisterCesEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(cesEventSubscriber_)) {
         WIFI_LOGE("CesEvent SubscribeCommonEvent() failed");
         cesEventSubscriber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterCesEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterCesEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, cesTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterCesEvent retry, cesTimerId = %{public}u", cesTimerId);
     } else {
@@ -181,6 +189,28 @@ void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbi
         if (pService != nullptr) {
             pService->OnSystemAbilityChanged(systemAbilityId, add);
         }
+    }
+}
+
+void WifiEventSubscriberManager::HandleCommonEventServiceChange(int systemAbilityId, bool add)
+{
+    WIFI_LOGI("OnSystemAbilityChanged, id[%{public}d], mode=[%{public}d]!", systemAbilityId, add);
+    if (add) {
+        RegisterCesEvent();
+        RegisterNotificationEvent();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        RegisterAssetEvent();
+#endif
+        RegisterNetworkStateChangeEvent();
+        RegisterWifiScanChangeEvent();
+    } else {
+        UnRegisterCesEvent();
+        UnRegisterNotificationEvent();
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        UnRegisterAssetEvent();
+#endif
+        UnRegisterNetworkStateChangeEvent();
+        UnRegisterWifiScanChangeEvent();
     }
 }
 
@@ -424,14 +454,14 @@ void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
 
     int lastStaState = GetLastStaStateByDatashare();
     if (lastStaState == openWifi) {
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     } else if (lastStaState == openWifiInAirplanemode) {
         WifiSettings::GetInstance().SetWifiFlagOnAirplaneMode(true);
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     } else if (lastStaState == closeWifiByAirplanemodeOpen) {
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN0);
     }
 }
 
@@ -865,6 +895,22 @@ void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEvent
     }
 }
 
+void CesEventSubscriber::OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    const int code = eventData.GetCode();
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    WIFI_LOGI("received the WlanKeepConnected, action ==%{public}s, code == %{public}d", action.c_str(), code);
+    if (code == 1) { // The user clicks the use button.
+        WifiNetAgent::GetInstance().RestoreWifiConnection();
+        WIFI_LOGI("change the value of AcceptUnvalidated to true");
+        WifiSettings::GetInstance().SetAcceptUnvalidated(networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
+}
+
 void WifiEventSubscriberManager::RegisterNotificationEvent()
 {
     std::unique_lock<std::mutex> lock(notificationEventMutex);
@@ -886,8 +932,7 @@ void WifiEventSubscriberManager::RegisterNotificationEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiNotificationSubsciber_)) {
         WIFI_LOGE("WifiNotification SubscribeCommonEvent() failed");
         wifiNotificationSubsciber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack =
-            std::bind(&WifiEventSubscriberManager::RegisterNotificationEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterNotificationEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, notificationTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterNotificationEvent retry, notificationTimerId = %{public}u", notificationTimerId);
     } else {
@@ -1106,6 +1151,119 @@ void CesEventSubscriber::OnReceiveUserUnlockedEvent(const OHOS::EventFwk::Common
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     WifiAssetManager::GetInstance().InitUpLoadLocalDeviceSync();
 #endif
+}
+
+void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()
+{
+    std::unique_lock<std::mutex> lock(networkStateChangeEventMutex);
+    if (networkStateChangeTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(networkStateChangeTimerId);
+    }
+    if (networkStateChangeSubsciber_) {
+        return;
+    }
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    networkStateChangeSubsciber_
+        = std::make_shared<NetworkStateChangeSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(networkStateChangeSubsciber_)) {
+        WIFI_LOGE("network state change subscribe failed");
+        networkStateChangeSubsciber_ = nullptr;
+        WifiTimer::TimerCallback timeoutCallBack =
+            std::bind(&WifiEventSubscriberManager::RegisterNetworkStateChangeEvent, this);
+        WifiTimer::GetInstance()->Register(timeoutCallBack, networkStateChangeTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WIFI_LOGI("RegisterNetworkStateChangeEvent retry, timerId = %{public}u", networkStateChangeTimerId);
+    } else {
+        WIFI_LOGI("RegisterNetworkStateChangeEvent success");
+    }
+}
+
+void WifiEventSubscriberManager::UnRegisterNetworkStateChangeEvent()
+{
+    std::unique_lock<std::mutex> lock(networkStateChangeEventMutex);
+    if (networkStateChangeTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(networkStateChangeTimerId);
+    }
+    if (!networkStateChangeSubsciber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(networkStateChangeSubsciber_)) {
+        WIFI_LOGE("UnRegisterNetworkStateChangeEvent failed");
+    }
+    networkStateChangeSubsciber_ = nullptr;
+    WIFI_LOGI("UnRegisterNetworkStateChangeEvent finished");
+}
+
+NetworkStateChangeSubscriber::NetworkStateChangeSubscriber(
+    const EventFwk::CommonEventSubscribeInfo &subscriberInfo) : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("NetworkStateChangeSubscriber enter");
+}
+
+void NetworkStateChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_NETWORK_STATE_CHANGED) {
+        WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_TEL_NET_CHANGE);
+    }
+}
+
+void WifiEventSubscriberManager::RegisterWifiScanChangeEvent()
+{
+    std::unique_lock<std::mutex> lock(wifiScanChangeEventMutex);
+    if (wifiScanChangeTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(wifiScanChangeTimerId);
+    }
+    if (wifiScanEventChangeSubscriber_) {
+        return;
+    }
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    wifiScanEventChangeSubscriber_
+        = std::make_shared<WifiScanEventChangeSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiScanEventChangeSubscriber_)) {
+        WIFI_LOGE("network state change subscribe failed");
+        wifiScanEventChangeSubscriber_ = nullptr;
+        WifiTimer::TimerCallback timeoutCallBack =
+            std::bind(&WifiEventSubscriberManager::RegisterWifiScanChangeEvent, this);
+        WifiTimer::GetInstance()->Register(timeoutCallBack, wifiScanChangeTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WIFI_LOGI("RegisterWifiScanChangeEvent retry, wifiScanChangeTimerId = %{public}u", wifiScanChangeTimerId);
+    } else {
+        WIFI_LOGI("RegisterWifiScanChangeEvent success");
+    }
+}
+
+void WifiEventSubscriberManager::UnRegisterWifiScanChangeEvent()
+{
+    std::unique_lock<std::mutex> lock(wifiScanChangeEventMutex);
+    if (wifiScanChangeTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(wifiScanChangeTimerId);
+    }
+    if (!wifiScanEventChangeSubscriber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(wifiScanEventChangeSubscriber_)) {
+        WIFI_LOGE("UnRegisterWifiScanChangeEvent failed");
+    }
+    wifiScanEventChangeSubscriber_ = nullptr;
+    WIFI_LOGI("UnRegisterWifiScanChangeEvent finished");
+}
+
+WifiScanEventChangeSubscriber::WifiScanEventChangeSubscriber(
+    const EventFwk::CommonEventSubscribeInfo &subscriberInfo) : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("WifiScanEventChangeSubscriber enter");
+}
+
+void WifiScanEventChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_SCAN_FINISHED &&
+        eventData.GetCode() == static_cast<int>(ScanHandleNotify::SCAN_OK)) {
+        WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_SCAN_CHANGE);
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

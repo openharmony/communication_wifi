@@ -268,9 +268,9 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess1()
     infoPrimary.connState = ConnState::UNKNOWN;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(Return(-1)); // if it is false, it will do process.
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(1));
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -283,7 +283,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerSuccess2()
     infoPrimary.connState = ConnState::DISCONNECTED; // DISCONNECTED
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(1));
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -294,7 +294,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail1()
     infoPrimary.connState = ConnState::SCANNING;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(0);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -305,7 +305,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail2()
     infoPrimary.connState = ConnState::CONNECTING;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(0);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -316,7 +316,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail3()
     infoPrimary.connState = ConnState::AUTHENTICATING;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(0);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -327,7 +327,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail4()
     infoPrimary.connState = ConnState::OBTAINING_IPADDR;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(0);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -338,7 +338,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail5()
     infoPrimary.connState = ConnState::CONNECTED;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(0);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -349,7 +349,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail6()
     infoPrimary.connState = ConnState::DISCONNECTING;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(0);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -400,9 +400,9 @@ void StaAutoConnectServiceTest::AutoSelectDeviceSuccess1()
     GetAllDeviceInfos(deviceConfig, scanInfos, blockedBssids, info);
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).WillOnce(Return(true));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(Return(-1)); // if it is false, it will do process.
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_SUCCESS));
 
     EXPECT_TRUE(pStaAutoConnectService->AutoSelectDevice(deviceConfig, scanInfos, blockedBssids, info) ==
@@ -418,7 +418,7 @@ void StaAutoConnectServiceTest::AutoSelectDeviceSuccess2()
     GetAllDeviceInfos(deviceConfig, scanInfos, blockedBssids, info);
     info.detailedState = DetailedState::DISCONNECTED; // DISCONNECTED
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_SUCCESS));
 
     EXPECT_TRUE(pStaAutoConnectService->AutoSelectDevice(deviceConfig, scanInfos, blockedBssids, info) ==
@@ -437,7 +437,7 @@ void StaAutoConnectServiceTest::AutoSelectDeviceSuccess3()
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_))
         .Times(AtLeast(1))
         .WillOnce(Return(true));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_SUCCESS));
 
     EXPECT_TRUE(pStaAutoConnectService->AutoSelectDevice(deviceConfig, scanInfos, blockedBssids, info) ==
@@ -468,7 +468,7 @@ void StaAutoConnectServiceTest::AutoSelectDeviceFail2()
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).WillOnce(Return(true));
     /* CurrentDeviceGoodEnough:: There is enough devices, so need not devices at start. */
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0))); // if it is true, it will do not process.
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(0)).WillOnce(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).Times(AtLeast(0));
@@ -485,9 +485,9 @@ void StaAutoConnectServiceTest::AutoSelectDeviceFail3()
     GetAllDeviceInfos(deviceConfig, scanInfos, blockedBssids, info);
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).WillOnce(Return(true));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(Return(-1)); // if it is false, it will do process.
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_FAILED));
 
     EXPECT_TRUE(pStaAutoConnectService->AutoSelectDevice(deviceConfig, scanInfos, blockedBssids, info) ==
@@ -503,7 +503,7 @@ void StaAutoConnectServiceTest::AutoSelectDeviceFail4()
     GetAllDeviceInfos(deviceConfig, scanInfos, blockedBssids, info);
     info.detailedState = DetailedState::DISCONNECTED; // DISCONNECTED
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_FAILED));
 
     EXPECT_TRUE(pStaAutoConnectService->AutoSelectDevice(deviceConfig, scanInfos, blockedBssids, info) ==
@@ -539,7 +539,7 @@ void StaAutoConnectServiceTest::AutoSelectDeviceFail6()
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_))
         .Times(AtLeast(1))
         .WillOnce(Return(true));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
     EXPECT_CALL(*(pMockDeviceAppraisal), DeviceAppraisals(_, _, _)).WillOnce(Return(WIFI_OPT_FAILED));
 
     EXPECT_TRUE(pStaAutoConnectService->AutoSelectDevice(deviceConfig, scanInfos, blockedBssids, info) ==
@@ -726,7 +726,7 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess()
     WifiDeviceConfig deviceConfig;
     GetWifiDeviceConfig(deviceConfig);
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
@@ -753,7 +753,7 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess1()
     GetWifiLinkedInfo(info);
     WifiDeviceConfig deviceConfig;
     GetWifiDeviceConfig(deviceConfig);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
 }
@@ -779,7 +779,7 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess2()
     GetWifiLinkedInfo(info);
     WifiDeviceConfig deviceConfig;
     GetWifiDeviceConfig(deviceConfig);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
 }
@@ -806,7 +806,7 @@ void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess3()
     GetWifiLinkedInfo(info);
     WifiDeviceConfig deviceConfig;
     GetWifiDeviceConfig(deviceConfig);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(deviceConfig.bssid, DEVICE_CONFIG_INDEX_BSSID, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
 }
@@ -819,7 +819,7 @@ void StaAutoConnectServiceTest::AllowAutoSelectDeviceSuccess1()
     GetWifiLinkedInfo(info);
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).WillOnce(Return(true));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillRepeatedly(Return(-1)); // if it is false, it will do process.
     EXPECT_TRUE(pStaAutoConnectService->AllowAutoSelectDevice(scanInfos, info) == true);
 }
@@ -880,7 +880,7 @@ void StaAutoConnectServiceTest::AllowAutoSelectDeviceFail2()
     deviceConfig.networkId = 0;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetWhetherToAllowNetworkSwitchover(_)).WillOnce(Return(true));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0))); // if it is true, it will do not process.
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).Times(AtLeast(0));
@@ -929,7 +929,7 @@ void StaAutoConnectServiceTest::CurrentDeviceGoodEnoughSuccess()
     GetWifiLinkedInfo(info);
     deviceConfig.networkId = 0;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).Times(AtLeast(1)).WillOnce(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).Times(AtLeast(1));
@@ -946,7 +946,7 @@ void StaAutoConnectServiceTest::CurrentDeviceGoodEnoughFail1()
     GetInterScanInfoVector(scanInfos);
     GetWifiLinkedInfo(info);
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(-1)));
     EXPECT_TRUE(pStaAutoConnectService->CurrentDeviceGoodEnough(scanInfos, info) == false);
 }
@@ -961,7 +961,7 @@ void StaAutoConnectServiceTest::CurrentDeviceGoodEnoughFail2()
     GetWifiLinkedInfo(info);
     deviceConfig.isEphemeral = true;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_))
         .Times(AtLeast(1))
@@ -982,7 +982,7 @@ void StaAutoConnectServiceTest::CurrentDeviceGoodEnoughFail3()
     deviceConfig.keyMgmt = "NONE";
     deviceConfig.wepTxKeyIndex = -1;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_))
         .Times(AtLeast(1))
@@ -1002,7 +1002,7 @@ void StaAutoConnectServiceTest::CurrentDeviceGoodEnoughFail4()
     GetWifiLinkedInfo(info);
     info.rssi = SMALLER_THAN_RSSI_DELIMITING_VALUE;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_))
         .Times(AtLeast(1))
@@ -1024,7 +1024,7 @@ void StaAutoConnectServiceTest::CurrentDeviceGoodEnoughFail5()
     scanInfos[0].band = NETWORK_5G_BAND;
     scanInfos[0].frequency = MIN_5_FREQUENCY + 1;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_))
         .Times(AtLeast(1))
@@ -1067,7 +1067,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckSuccess()
     info.rssi = 1;
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == true);
@@ -1083,7 +1083,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail1()
     GetWifiLinkedInfo(info);
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
@@ -1101,7 +1101,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail2()
     deviceConfig.wepTxKeyIndex = -1;
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
@@ -1121,7 +1121,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail3()
     deviceConfig.keyMgmt = "NONE";
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
@@ -1141,7 +1141,7 @@ void StaAutoConnectServiceTest::RoamingEncryptionModeCheckFail4()
     deviceConfig.keyMgmt = "WPA-PSK";
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfo.ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingEncryptionModeCheck(deviceConfig, scanInfo, info) == false);
@@ -1167,7 +1167,7 @@ void StaAutoConnectServiceTest::RoamingSelectionSuccess1()
     info.rssi = 1;
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == true);
@@ -1187,7 +1187,7 @@ void StaAutoConnectServiceTest::RoamingSelectionFail1()
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);
@@ -1207,7 +1207,7 @@ void StaAutoConnectServiceTest::RoamingSelectionFail2()
     info.bssid = "2a:76:93:47:e2:8b";
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);
@@ -1229,7 +1229,7 @@ void StaAutoConnectServiceTest::RoamingSelectionFail3()
     info.connState = ConnState::CONNECTED;
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);
@@ -1251,7 +1251,7 @@ void StaAutoConnectServiceTest::RoamingSelectionFail4()
     info.connState = ConnState::CONNECTED;
     int indexType = DEVICE_CONFIG_INDEX_SSID;
 
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _))
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, indexType, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(deviceConfig), Return(0)));
 
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);

@@ -28,6 +28,7 @@ SoftApManager::~SoftApManager()
     WIFI_LOGE("Exit.");
     if (pSoftapManagerMachine != nullptr) {
         delete pSoftapManagerMachine;
+        pSoftapManagerMachine = nullptr;
     }
 }
 
@@ -53,7 +54,7 @@ ErrCode SoftApManager::RegisterCallback(const SoftApModeCallback &callbacks)
     return WIFI_OPT_SUCCESS;
 }
 
-SoftapManagerMachine *SoftApManager::GetSoftapMachine()
+SoftapManagerMachine *SoftApManager::GetMachine()
 {
     return pSoftapManagerMachine;
 }

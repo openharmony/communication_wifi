@@ -168,7 +168,7 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromC(
     if (OHOS::Wifi::IsMacArrayEmpty(config->bssid)) {
         deviceConfig.bssid = "";
     } else {
-        deviceConfig.bssid = OHOS::Wifi::MacArrayToStr(config->bssid, WIFI_MAC_LEN);
+        deviceConfig.bssid = OHOS::Wifi::MacArrayToStr(config->bssid);
     }
     deviceConfig.bssidType = config->bssidType;
     if (strnlen(config->preSharedKey, WIFI_MAX_KEY_LEN) == WIFI_MAX_KEY_LEN) {
@@ -231,7 +231,7 @@ static void ConvertScanParamsFromC(const WifiScanParams *params, OHOS::Wifi::Wif
     if (OHOS::Wifi::IsMacArrayEmpty(params->bssid)) {
         scanParams.bssid = "";
     } else {
-        scanParams.bssid = OHOS::Wifi::MacArrayToStr(params->bssid, WIFI_MAC_LEN);
+        scanParams.bssid = OHOS::Wifi::MacArrayToStr(params->bssid);
     }
     scanParams.freqs.push_back(params->freqs);
     scanParams.band = params->band;

@@ -297,6 +297,7 @@ std::string GetBundleName()
     return bundleInfo.name;
 }
 
+
 ErrCode GetBundleNameByUid(const int uid, std::string &bundleName)
 {
     sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();

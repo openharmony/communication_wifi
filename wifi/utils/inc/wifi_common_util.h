@@ -191,7 +191,6 @@ int64_t GetElapsedMicrosecondsSinceBoot();
  */
 std::string GetBundleName();
 
-
 /**
  * @Description get bundle name by uid
  *

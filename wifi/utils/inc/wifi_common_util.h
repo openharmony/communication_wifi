@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_COMMON_UTIL_H
 #define OHOS_WIFI_COMMON_UTIL_H
 
+
 #include <map>
 #include <chrono>
 #include <string>
@@ -141,7 +142,7 @@ errno_t MacStrToArray(const std::string& strMac, unsigned char mac[WIFI_MAC_LEN]
  * @param mac - Input MAC address
  * @return string - conversion result.
  */
-std::string MacArrayToStr(const unsigned char mac[WIFI_MAC_LEN]);
+std::string MacArrayToStr(const unsigned char mac[WIFI_MAC_LEN], int len);
 
 /**
  * @Description Check whether the array of MAC address is empty

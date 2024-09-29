@@ -1282,7 +1282,7 @@ void P2pStateMachine::DoP2pArp(std::string serverIp, std::string clientIp)
         WIFI_LOGE("get interface mac failed");
         return;
     }
-    std::string macAddress = MacArrayToStr(macAddr);
+    std::string macAddress = MacArrayToStr(macAddr, MAC_LEN);
     arpChecker.Start(ifName, macAddress, clientIp, serverIp);
     arpChecker.DoArpCheck(ARP_TIMEOUT, true);
 }

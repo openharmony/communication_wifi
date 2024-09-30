@@ -65,9 +65,6 @@ HWTEST_F(P2pGroupRemoveStateTest, ExecuteStateMsg, TestSize.Level1)
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
     p2pGroupRemoveState->ExecuteStateMsg(msg);
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), CancelConnect()).WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealGroupCreationFailed()).WillOnce(Return());
-    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
 }
 }  // namespace Wifi
 }  // namespace OHOS

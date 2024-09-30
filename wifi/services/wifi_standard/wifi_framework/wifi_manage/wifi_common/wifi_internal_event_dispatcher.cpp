@@ -549,11 +549,8 @@ void WifiInternalEventDispatcher::Exit()
     }
 }
 
-void WifiInternalEventDispatcher::DealStaCallbackMsg(
-    WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
+void WifiInternalEventDispatcher::PublishStaEvent(const WifiEventCallbackMsg &msg)
 {
-    WIFI_LOGD("Deal Sta Event Callback Msg: %{public}d", msg.msgCode);
-
     switch (msg.msgCode) {
         case WIFI_CBK_MSG_STATE_CHANGE:
             WifiInternalEventDispatcher::PublishWifiStateChangedEvent(msg.msgData, msg.id);
@@ -568,9 +565,20 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
             break;
         case WIFI_CBK_MSG_WPS_STATE_CHANGE:
             break;
+        case WIFI_CBK_MSG_SEMI_STATE_CHANGE:
+            WifiCommonEventHelper::PublishWifiSemiStateChangedEvent(msg.msgData, "OnWifiSemiStateChanged");
+            break;
         default:
             break;
     }
+}
+
+void WifiInternalEventDispatcher::DealStaCallbackMsg(
+    WifiInternalEventDispatcher &instance, const WifiEventCallbackMsg &msg)
+{
+    WIFI_LOGD("Deal Sta Event Callback Msg: %{public}d", msg.msgCode);
+
+    PublishStaEvent(msg);
 
     auto callback = instance.GetSingleStaCallback(msg.id);
     if (callback != nullptr) {

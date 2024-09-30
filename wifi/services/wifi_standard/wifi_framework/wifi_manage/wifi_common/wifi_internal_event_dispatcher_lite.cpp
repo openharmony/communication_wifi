@@ -277,6 +277,8 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance)
             DealStaCallbackMsg(instance, msg);
         } else if (msg.msgCode == WIFI_CBK_MSG_SCAN_STATE_CHANGE) {
             DealScanCallbackMsg(instance, msg);
+        } else if (msg.msgCode == WIFI_CBK_MSG_SEMI_STATE_CHANGE) {
+            WifiCommonEventHelper::PublishWifiSemiStateChangedEvent(msg.msgData, "OnWifiSemiStateChanged");
         } else {
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
         }

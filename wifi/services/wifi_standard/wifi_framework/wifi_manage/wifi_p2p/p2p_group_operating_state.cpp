@@ -76,13 +76,12 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg)
     WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     const int minValidNetworkid = 0;
     WifiP2pConfigInternal config;
+    SharedLinkManager::SetGroupUid(msg->GetParam1());
     msg->GetMessageObj(config);
     int freq = p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
     int netId = config.GetNetId();
     if (netId >= minValidNetworkid) {
-        /**
-         * Restart the group using an existing network ID.
-         */
+        // Restart the group using an existing network ID.
         WIFI_LOGE("Restart the group using an existing network ID.");
         if ((!config.GetPassphrase().empty() && config.GetPassphrase().length() >= MIN_PSK_LEN &&
             config.GetPassphrase().length() <= MAX_PSK_LEN) ||
@@ -95,9 +94,7 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg)
             p2pStateMachine.UpdatePersistentGroups();
         }
     } else if (netId == PERSISTENT_NET_ID || netId == TEMPORARY_NET_ID) {
-        /**
-         * Create a new persistence group.
-         */
+        // Create a new persistence group.
         WIFI_LOGE("Create a new %{public}s group.", (netId == PERSISTENT_NET_ID) ? "persistence" : "temporary");
         if (config.GetPassphrase().empty() && config.GetGroupName().empty()) {
             WifiConfigCenter::GetInstance().SetExplicitGroup(true);
@@ -369,6 +366,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_FAILED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     } else {
+        SharedLinkManager::SetGroupUid(msg->GetParam1());
         const int cgTimedOut = 5000;
         WIFI_LOGI("p2p configure hid2d group successful.");
         p2pStateMachine.MessageExecutedLater(

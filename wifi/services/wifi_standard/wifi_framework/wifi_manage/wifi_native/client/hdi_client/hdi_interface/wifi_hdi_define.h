@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #define HDI_UUID_LEN 16
-#define HDI_PIN_LEN 8
+#define HDI_PIN_LEN 9
 #define HDI_MAC_SUB_LEN 2
 
 #define HDI_PROTO_DEFAULT HDI_BIT(0)

@@ -310,8 +310,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg)
             WifiNetAgent::GetInstance().DelInterfaceAddress(group.GetInterface(),
                 group.GetGcIpAddress(), P2P_IP_ADDR_PREFIX_LEN);
         }
-        ret = WifiP2PHalInterface::GetInstance().GroupRemove(group.GetInterface());
-        if (ret) {
+        if (WifiP2PHalInterface::GetInstance().GroupRemove(group.GetInterface())) {
             WIFI_LOGE("P2P group removal failed.");
             dhcpFunc();
             WifiP2pGroupInfo invalidGroup;
@@ -327,6 +326,7 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg)
             if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
                 WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
             }
+            p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupRemoveState);
         }
     } else {
         WIFI_LOGE("Error:No group can be removed.");

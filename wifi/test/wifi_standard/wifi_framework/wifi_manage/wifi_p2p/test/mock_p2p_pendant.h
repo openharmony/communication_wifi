@@ -32,6 +32,7 @@
 #include "mock_p2p_inviting_state.h"
 #include "mock_p2p_state_machine.h"
 #include "mock_provision_discovery_state.h"
+#include "mock_p2p_group_remove_state.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -57,12 +58,13 @@ public:
           mockP2pIdleState(p2pStateMachine, groupManager, deviceManager),
           mockP2pInvitingState(p2pStateMachine, groupManager, deviceManager),
           mockProvisionDiscoveryState(p2pStateMachine, groupManager, deviceManager),
+          mockP2pGroupRemoveState(),
           p2pStateMachine(mockP2pMonitor, groupManager, deviceManager, svrManager,
               mockAuthorizingNegotiationRequestState, mockGroupFormedState, mockGroupNegotiationState,
               mockInvitationReceivedState, mockInvitationRequestState, mockP2pDefaultState,
               mockP2pDisabledState, mockP2pDisablingState, mockP2pEnabledState, mockP2pEnablingState,
               mockP2pGroupFormationState, mockP2pGroupJoinState, mockP2pGroupOperatingState, mockP2pIdleState,
-              mockP2pInvitingState, mockProvisionDiscoveryState)
+              mockP2pInvitingState, mockProvisionDiscoveryState, mockP2pGroupRemoveState)
     {
     }
     ~MockP2pPendant()
@@ -156,6 +158,10 @@ public:
     {
         return mockP2pMonitor;
     }
+    MockP2pGroupRemoveState &GetMockP2pGroupRemoveState()
+    {
+        return mockP2pGroupRemoveState;
+    }
 
 private:
     WifiP2pGroupManager groupManager;
@@ -181,6 +187,7 @@ private:
     MockP2pIdleState mockP2pIdleState;
     MockP2pInvitingState mockP2pInvitingState;
     MockProvisionDiscoveryState mockProvisionDiscoveryState;
+    MockP2pGroupRemoveState mockP2pGroupRemoveState;
 
     MockP2pMonitor mockP2pMonitor;
     MockP2pStateMachine p2pStateMachine;

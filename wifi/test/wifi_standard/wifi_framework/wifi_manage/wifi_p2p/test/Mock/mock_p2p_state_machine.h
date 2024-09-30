@@ -28,11 +28,11 @@ public:
         P2pDefaultState &defaultState, P2pDisabledState &disabledState, P2pDisablingState &disablingState,
         P2pEnabledState &enabledState, P2pEnablingState &enablingState, P2pGroupFormationState &groupFormationState,
         P2pGroupJoinState &groupJoinState, P2pGroupOperatingState &groupOperatingState, P2pIdleState &idleState,
-        P2pInvitingState &invitingState, ProvisionDiscoveryState &provisionDiscoveryState)
+        P2pInvitingState &invitingState, ProvisionDiscoveryState &provisionDiscoveryState, P2pGroupRemoveState &groupRemoveState)
         : P2pStateMachine(p2pMonitor, groupManager, deviceManager, svrManager, authorizingNegotlationRequestState,
               groupFormedState, groupNegotiationState, invltationRecelvedState, invitationRequestState, defaultState,
               disabledState, disablingState, enabledState, enablingState, groupFormationState, groupJoinState,
-              groupOperatingState, idleState, invitingState, provisionDiscoveryState)
+              groupOperatingState, idleState, invitingState, provisionDiscoveryState, groupRemoveState)
     {}
     ~MockP2pStateMachine() = default;
     MOCK_METHOD0(Initialize, void());

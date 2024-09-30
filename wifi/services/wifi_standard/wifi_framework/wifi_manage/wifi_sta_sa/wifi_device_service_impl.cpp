@@ -125,7 +125,9 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
     }
 
-    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
+    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
+    wifiTogglerManager->StartWifiToggledTimer();
+    return wifiTogglerManager->WifiToggled(1, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
@@ -153,7 +155,9 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WifiConfigCenter::GetInstance().SetWifiAllowSemiActive(false);
     }
 
-    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
+    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
+    wifiTogglerManager->StopWifiToggledTimer();
+    return wifiTogglerManager->WifiToggled(0, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
@@ -189,7 +193,9 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
 
-    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
+    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
+    wifiTogglerManager->StopWifiToggledTimer();
+    return wifiTogglerManager->WifiToggled(0, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)

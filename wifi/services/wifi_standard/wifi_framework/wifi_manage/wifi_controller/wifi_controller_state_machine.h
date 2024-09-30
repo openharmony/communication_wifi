@@ -75,7 +75,7 @@ public:
         void HandleSoftapClose(int id);
         void HandleApRemoved(InternalMessagePtr msg);
         void HandleApStop(InternalMessagePtr msg);
-        void HandleApMsg(InternalMessagePtr msg);
+        bool HandleApMsg(InternalMessagePtr msg);
 #ifdef FEATURE_RPT_SUPPORT
         void HandleRptStartFail(InternalMessagePtr msg);
         void HandleP2pStop(InternalMessagePtr msg);
@@ -108,7 +108,7 @@ public:
 
     void HandleStaClose(int id);
     void HandleWifi2Close(int id);
-    void HandleStaStart(int id);
+    void HandleStaStartSuccess(int id);
     void HandleWifi2Start(int id);
     void HandleStaSemiActive(int id);
     void HandleConcreteStop(int id);

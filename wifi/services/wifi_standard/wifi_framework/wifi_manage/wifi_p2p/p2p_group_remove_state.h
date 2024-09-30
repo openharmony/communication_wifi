@@ -45,21 +45,21 @@ public:
      * @param None
      * @return None
      */
-    virtual void GoInState() override;
+    void GoInState() override;
 
     /**
      * @Description - Called when exiting state
      * @param None
      * @return None
      */
-    virtual void GoOutState() override;
+    void GoOutState() override;
 
     /**
      * @Description - Message Processing Function
      * @param msg - Message object pointer
      * @return - bool true:success   false:fail
      */
-    virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
+    bool ExecuteStateMsg(InternalMessagePtr msg) override;
 };
 } // namespace Wifi
 } // namespace OHOS

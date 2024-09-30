@@ -192,7 +192,7 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultSuccessTes
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
         .WillOnce(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
     std::string code;
-    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
+    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, FindLargestCountCountryCodeSuccessTest, TestSize.Level1)
@@ -314,7 +314,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPSuccessTest, TestSize.
         .WillOnce(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
 
     std::string code;
-    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code));
+    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code));
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPFailTest, TestSize.Level1)

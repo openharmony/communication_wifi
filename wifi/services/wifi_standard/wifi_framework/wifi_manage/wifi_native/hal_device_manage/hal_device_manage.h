@@ -161,7 +161,7 @@ public:
 
     virtual int32_t OnScanResultsCallback(uint32_t event) override;
     virtual int32_t OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c1Rssi) override;
-    virtual int32_t OnWifiNetlinkMessage(const std::vector<uint8_t>& recvMsg) override;
+    virtual int32_t OnWifiNetlinkMessage(uint32_t type, const std::vector<uint8_t>& recvMsg) override;
 };
 
 class HalDeviceManager {

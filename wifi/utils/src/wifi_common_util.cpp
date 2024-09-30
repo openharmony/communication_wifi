@@ -297,6 +297,23 @@ std::string GetBundleName()
     return bundleInfo.name;
 }
 
+std::string GetBundleAppIdByBundleName(const int userId, const std::string &bundleName)
+{
+    sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
+    if (bundleInstance == nullptr) {
+        WIFI_LOGE("bundle instance is null!");
+        return "";
+    }
+ 
+    AppExecFwk::BundleInfo bundleInfo;
+    AppExecFwk::GetBundleInfoFlag bundleInfoFlag = AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO;
+    auto ret = bundleInstance->GetBundleInfoV9(bundleName, static_cast<int32_t>(bundleInfoFlag), bundleInfo, userId);
+    if (ret != OHOS::ERR_OK) {
+        return "";
+    }
+    return bundleInfo.signatureInfo.appIdentifier;
+}
+
 ErrCode GetBundleNameByUid(const int uid, std::string &bundleName)
 {
     sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();

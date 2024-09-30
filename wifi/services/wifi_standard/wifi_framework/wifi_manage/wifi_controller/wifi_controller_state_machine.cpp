@@ -149,7 +149,7 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg
             }
             break;
         default:
-            break;
+            return false;
     }
     return true;
 }
@@ -233,7 +233,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
 #endif
             break;
         default:
-            break;
+            return false;
     }
     return true;
 }
@@ -261,12 +261,20 @@ bool WifiControllerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
         return false;
     }
     WIFI_LOGE("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+    switch (msg->GetMessageName()) {
+        case CMD_WIFI_TOGGLED_TIMEOUT:
+            WifiManager::GetInstance().GetWifiTogglerManager()->OnWifiToggledTimeOut();
+            break;
+        default:
+            return false;
+    }
     return true;
 }
 
 void WifiControllerMachine::HandleAirplaneOpen()
 {
     WIFI_LOGI("airplane open set softap false");
+    this->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
 #ifdef FEATURE_AP_SUPPORT
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     StopAllSoftapManagers();
@@ -727,6 +735,7 @@ void WifiControllerMachine::ClearWifiStartFailCount()
 void WifiControllerMachine::HandleStaStart(int id)
 {
     mWifiStartFailCount = 0;
+    this->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
     this->StopTimer(CMD_OPEN_WIFI_RETRY);
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {

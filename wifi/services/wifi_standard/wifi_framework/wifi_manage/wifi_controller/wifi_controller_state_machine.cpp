@@ -27,6 +27,11 @@
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
+#ifndef OHOS_ARCH_LITE
+#include "wifi_internal_event_dispatcher.h"
+#else
+#include "wifi_internal_event_dispatcher_lite.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -498,6 +503,11 @@ bool WifiControllerMachine::ShouldDisableWifi(InternalMessagePtr msg)
         (currState == WifiDetailState::STATE_ACTIVATED || currState == WifiDetailState::STATE_ACTIVATING) &&
         msg->GetMessageName() == CMD_WIFI_TOGGLED && concreteManagers.IdExist(msg->GetParam2())) {
         WIFI_LOGI("Should disable wifi");
+        WifiEventCallbackMsg cbMsg;
+        cbMsg.msgCode = WIFI_CBK_MSG_SEMI_STATE_CHANGE;
+        cbMsg.id = msg->GetParam2();
+        cbMsg.msgData = static_cast<int>(WifiDetailState::STATE_INACTIVE);
+        WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
         return true;
     }
     return !ShouldEnableWifi(msg->GetParam2());

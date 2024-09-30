@@ -311,7 +311,7 @@ std::string GetBundleAppIdByBundleName(const int userId, const std::string &bund
     if (ret != OHOS::ERR_OK) {
         return "";
     }
-    return bundleInfo.signatureInfo.appIdentifier.c_str();
+    return bundleInfo.signatureInfo.appIdentifier;
 }
 
 ErrCode GetBundleNameByUid(const int uid, std::string &bundleName)

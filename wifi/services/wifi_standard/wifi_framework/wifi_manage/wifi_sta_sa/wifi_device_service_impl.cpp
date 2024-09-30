@@ -2205,7 +2205,7 @@ ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& rep
 
 int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, const std::string &packageName)
 {
-    if (appId.length() == 0 || packageName.length() == 0) {
+    if (appId.empty() || packageName.empty()) {
         WIFI_LOGI("ProcessPermissionVerify(), PERMISSION_DENIED");
         return PERMISSION_DENIED;
     }

@@ -129,6 +129,7 @@ struct HdiElems {
     const uint8_t *multiAp;
     const uint8_t *heCapabilities;
     const uint8_t *heOperation;
+    const uint8_t *ehtCapabilities80211Be;
 
     uint8_t ssidLen;
     uint8_t ratesLen;
@@ -179,6 +180,7 @@ struct HdiElems {
     uint8_t multiApLen;
     uint8_t heCapabilitiesLen;
     uint8_t heOperationLen;
+    uint8_t ehtCapabilities80211BeLen;
 
     struct HdiIesInfo hdiIes;
 };

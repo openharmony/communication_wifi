@@ -82,6 +82,16 @@ HWTEST_F(WifiHdiCommonTest, HdiSSid2TxtTest, TestSize.Level1)
     EXPECT_STREQ(result, "");
 }
 
+HWTEST_F(WifiHdiCommonTest, HdiGetWifiCategoryTxtTest, TestSize.Level1)
+{
+    char *pos = "";
+    char *end = pos + 1024;
+    struct HdiElems elems = {0};
+    elems.ehtCapabilities80211Be = "11be";
+    char *result = HdiGetWifiCategoryTxt(pos, end, &elems);
+    EXPECT_STREQ(result, "");
+}
+
 HWTEST_F(WifiHdiCommonTest, IsValidHexCharAndConvertTest, TestSize.Level1)
 {
     EXPECT_EQ(IsValidHexCharAndConvert('5'), 5);

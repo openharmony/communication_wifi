@@ -153,9 +153,9 @@ public:
         pWifiControllerMachine->HandleStaClose(0);
     }
 
-    void HandleStaStartTest()
+    void HandleStaStartSuccessTest()
     {
-        pWifiControllerMachine->HandleStaStart(0);
+        pWifiControllerMachine->HandleStaStartSuccess(0);
     }
 
     void HandleStaSemiActiveTest()
@@ -307,7 +307,7 @@ public:
         pWifiControllerMachine->concreteManagers.StopAllManagers();
         pWifiControllerMachine->concreteManagers.StopManager(0);
         pWifiControllerMachine->concreteManagers.StopManager(1);
-        pWifiControllerMachine->HandleStaStart(0);
+        pWifiControllerMachine->HandleStaStartSuccess(0);
         pWifiControllerMachine->HandleStaSemiActive(0);
         pWifiControllerMachine->HandleStaClose(0);
         pWifiControllerMachine->SwitchRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
@@ -387,9 +387,9 @@ HWTEST_F(WifiControllerMachineTest, HandleStaCloseTest, TestSize.Level1)
     HandleStaCloseTest();
 }
 
-HWTEST_F(WifiControllerMachineTest, HandleStaStartTest, TestSize.Level1)
+HWTEST_F(WifiControllerMachineTest, HandleStaStartSuccessTest, TestSize.Level1)
 {
-    HandleStaStartTest();
+    HandleStaStartSuccessTest();
 }
 
 HWTEST_F(WifiControllerMachineTest, HandleStaSemiActiveTest, TestSize.Level1)

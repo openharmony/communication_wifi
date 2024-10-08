@@ -162,7 +162,7 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg
             }
             break;
         default:
-            break;
+            return false;
     }
     return true;
 }
@@ -224,15 +224,16 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         default:
 #ifdef FEATURE_AP_SUPPORT
-            HandleApMsg(msg);
+            return HandleApMsg(msg);
+#else
+            return false;
 #endif
-            break;
     }
     return true;
 }
 
 #ifdef FEATURE_AP_SUPPORT
-void WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
+bool WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
 {
     switch (msg->GetMessageName()) {
         case CMD_SOFTAP_TOGGLED:
@@ -270,8 +271,9 @@ void WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
             break;
 #endif
         default:
-            break;
+            return false;
     }
+    return true;
 }
 #endif
 
@@ -298,12 +300,20 @@ bool WifiControllerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
         return false;
     }
     WIFI_LOGE("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+    switch (msg->GetMessageName()) {
+        case CMD_WIFI_TOGGLED_TIMEOUT:
+            WifiManager::GetInstance().GetWifiTogglerManager()->OnWifiToggledTimeOut();
+            break;
+        default:
+            return false;
+    }
     return true;
 }
 
 void WifiControllerMachine::HandleAirplaneOpen()
 {
     WIFI_LOGI("airplane open set softap false");
+    this->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
 #ifdef FEATURE_AP_SUPPORT
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     softApManagers.StopAllManagers();
@@ -777,9 +787,10 @@ void WifiControllerMachine::ClearWifiStartFailCount()
     mWifiStartFailCount = 0;
 }
 
-void WifiControllerMachine::HandleStaStart(int id)
+void WifiControllerMachine::HandleStaStartSuccess(int id)
 {
     mWifiStartFailCount = 0;
+    this->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
     this->StopTimer(CMD_OPEN_WIFI_RETRY);
     concreteManagers.SendMessageToAll(CONCRETE_CMD_STA_START);
 }

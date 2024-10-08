@@ -625,7 +625,7 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
     WIFI_LOGI("SwitchEnableFromSemi, current sta detailState:%{public}d", detailState);
     if (detailState == WifiDetailState::STATE_ACTIVATED) {
         auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-        ins->HandleStaStart(mid);
+        ins->HandleStaStartSuccess(mid);
         return WIFI_OPT_SUCCESS;
     }
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
@@ -648,7 +648,7 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
     WifiServiceScheduler::GetInstance().DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, mid);
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, mid);
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaStart(mid);
+    ins->HandleStaStartSuccess(mid);
     return WIFI_OPT_SUCCESS;
 }
 

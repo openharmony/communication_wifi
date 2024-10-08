@@ -4026,7 +4026,7 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     linkedInfo.networkId = targetNetworkId;
     linkedInfo.bssid = bssid;
 #ifndef OHOS_ARCH_LITE
-    pStaStateMachine->SetSupportedWifiCategory();
+    SetSupportedWifiCategory();
 #endif
     linkedInfo.ssid = deviceConfig.ssid;
     linkedInfo.macType = (macAddr == realMacAddr ?
@@ -4761,7 +4761,7 @@ void StaStateMachine::SetSupportedWifiCategory()
             linkedInfo.isMloConnected = false;
         }
     }
-    WIFI_LOGI("%{public}s supportedWifiCategory:{pulbic}d, isMloConnected:%{public}d", __FUNCTION__,
+    WIFI_LOGI("%{public}s supportedWifiCategory:%{public}d, isMloConnected:%{public}d", __FUNCTION__,
         static_cast<int>(linkedInfo.supportedWifiCategory), linkedInfo.isMloConnected);
 }
 

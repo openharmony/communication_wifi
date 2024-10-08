@@ -1259,6 +1259,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void UpdateWifiCategory();
+    void SetSupportedWifiCategory();
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;

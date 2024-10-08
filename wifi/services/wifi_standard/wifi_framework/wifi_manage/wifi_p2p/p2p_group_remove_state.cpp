@@ -37,7 +37,15 @@ void P2pGroupRemoveState::GoOutState()
 bool P2pGroupRemoveState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     WIFI_LOGI("P2pGroupRemoveState");
-    return EXECUTED;
+    int msgName = msg->GetMessageName();
+    switch (static_cast<P2P_STATE_MACHINE_CMD>(msgName)) {
+        case P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP: {
+            return EXECUTED;
+        }
+        default:
+            WIFI_LOGE("Failed:The  P2P state machine does not process messages: [%{public}d]", msgName);
+            return NOT_EXECUTED;
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

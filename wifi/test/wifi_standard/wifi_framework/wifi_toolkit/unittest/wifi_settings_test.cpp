@@ -637,7 +637,7 @@ HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
     WifiSettings::GetInstance().GetDeviceConfig(0, updatedConfig);
     EXPECT_EQ(updatedConfig.ssid, "test1");
     EXPECT_EQ(updatedConfig.keyMgmt, "WPA-PSK");
-    EXPECT_EQ(updatedConfig.preSharedKey, "12345678");
+    EXPECT_EQ(updatedConfig.preSharedKey, "123456789");
 }
 #endif
 }  // namespace Wifi

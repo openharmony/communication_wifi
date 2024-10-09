@@ -36,7 +36,7 @@ private:
     MockWifiStaHalInterface();
     WifiErrorNo mRetResult;
     WifiErrorNo mGetStaCapabilities;
-    int chipsetFeatureCapability_
+    int chipsetFeatureCapability_;
 };
 
 class WifiStaHalInterface {

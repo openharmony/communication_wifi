@@ -1339,7 +1339,7 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
         0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem));
     HDI_CHECK_ELEMENT(elem, start, len) {
         if (ieIndex >= MAX_INFO_ELEMS_SIZE) {
-            LOGE("ieIndex exceeds the supper limit.");
+            LOGE("ieIndex exceeds the upper limit.");
             break;
         }
         uint8_t id = elem->id, elen = elem->datalen;

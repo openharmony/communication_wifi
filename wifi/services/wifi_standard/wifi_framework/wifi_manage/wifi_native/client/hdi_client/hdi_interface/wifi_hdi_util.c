@@ -1324,6 +1324,10 @@ int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *dest
 
 void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
 {
+    if (scanInfo == NULL || start == NULL) {
+        LOGE("scanInfo or start is NULL.");
+        return;
+    }
     const struct HdiElem *elem;
     int ieIndex = 0;
     ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
@@ -1334,6 +1338,10 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
     memset_s(infoElemsTemp, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem),
         0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem));
     HDI_CHECK_ELEMENT(elem, start, len) {
+        if (ieIndex >= MAX_INFO_ELEMS_SIZE) {
+            LOGE("ieIndex exceeds the supper limit.");
+            break;
+        }
         uint8_t id = elem->id, elen = elem->datalen;
         infoElemsTemp[ieIndex].id = id;
         infoElemsTemp[ieIndex].size = elen;

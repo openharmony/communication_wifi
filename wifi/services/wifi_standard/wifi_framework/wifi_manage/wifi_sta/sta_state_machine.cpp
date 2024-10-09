@@ -53,7 +53,6 @@ namespace Wifi {
 namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
 constexpr int MAX_CHLOAD = 800;
-constexpr unsigned int BIT_MLO_CONNECT = 0x80;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define ANY_BSSID "any"

@@ -253,7 +253,7 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         outParcel.WriteUint32(ieSize);
         for (size_t j = 0; j < ieSize; j++) {
             auto elem = result[i].infoElems[j];
-            outParcel.WriteInt32(elem.id);
+            outParcel.WriteUint32(elem.id);
             size_t ieLen = elem.content.size() < maxIeLen ? elem.content.size() : maxIeLen;
             outParcel.WriteUint32(ieLen);
             for (size_t k = 0; k < ieLen; k++) {
@@ -270,7 +270,7 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         outParcel.WriteBool(result[i].isHiLinkNetwork);
         outParcel.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
 
-        int dataSize = outParcel.GetDataSize();
+        int dataSize = static_cast<int>(outParcel.GetDataSize());
         if (offset + dataSize > ASH_MEM_SIZE) {
             break;
         }

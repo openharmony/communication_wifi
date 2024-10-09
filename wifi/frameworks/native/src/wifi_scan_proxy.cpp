@@ -264,7 +264,7 @@ static void GetScanInfo(WifiScanInfo &info, MessageParcel &inParcel)
     numInfoElems = numInfoElems < maxIeSize ? numInfoElems : maxIeSize;
     for (size_t m = 0; m < numInfoElems; m++) {
         WifiInfoElem elem;
-        elem.id = inParcel.ReadInt32();
+        elem.id = inParcel.ReadUint32();
         size_t ieLen = inParcel.ReadUint32();
         ieLen = ieLen < maxIeLen ? ieLen : maxIeLen;
         elem.content.resize(ieLen);
@@ -296,14 +296,14 @@ ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScan
     for (size_t i = 0; i < allSize.size(); i++) {
         auto origin = ashmem->ReadFromAshmem(allSize[i], offset);
         if (origin == nullptr) {
-            offset += allSize[i];
+            offset += static_cast<int>(allSize[i]);
             continue;
         }
         MessageParcel inParcel;
         inParcel.WriteBuffer(reinterpret_cast<const char*>(origin), allSize[i]);
         WifiScanInfo info;
         GetScanInfo(info, inParcel);
-        offset += allSize[i];
+        offset += static_cast<int>(allSize[i]);
         result.emplace_back(info);
     }
     ashmem->UnmapAshmem();
@@ -347,7 +347,7 @@ ErrCode WifiScanProxy::GetScanInfoList(std::vector<WifiScanInfo> &result, bool c
     constexpr int maxSize = 200;
     std::vector<uint32_t> allSize;
     reply.ReadUInt32Vector(&allSize);
-    int retSize = allSize.size();
+    uint32_t retSize = allSize.size();
     if (retSize > maxSize || retSize < 0) {
         WIFI_LOGE("Scan info size exceeds maximum allowed size: %{public}d", retSize);
         return WIFI_OPT_FAILED;

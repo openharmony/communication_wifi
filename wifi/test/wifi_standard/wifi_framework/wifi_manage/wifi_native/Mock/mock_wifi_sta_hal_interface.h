@@ -31,10 +31,12 @@ public:
     void SetRetResult(WifiErrorNo retResult);
     WifiErrorNo GetRetResult();
     void SetStaCapabilities(WifiErrorNo retResult);
+    void SetChipsetFeatureCapability(int chipsetFeatureCapability);
 private:
     MockWifiStaHalInterface();
     WifiErrorNo mRetResult;
     WifiErrorNo mGetStaCapabilities;
+    int chipsetFeatureCapability_
 };
 
 class WifiStaHalInterface {

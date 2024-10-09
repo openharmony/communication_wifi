@@ -28,6 +28,7 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
+#include "mock_wifi_sta_hal_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -2054,6 +2055,45 @@ public:
         strcpy_s(resultO.strOptDns2, MAX_STR_LENT, bssid2.c_str());
         pStaStateMachine->ReplaceEmptyDns(&resultO);
     }
+
+    void SetSupportedWifiCategoryTest_BssidIsEmpty()
+    {
+        pStaStateMachine->linkedInfo.bssid = "";
+        pStaStateMachine->SetSupportedWifiCategory();
+        EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::DEFAULT);
+    }
+
+    void SetSupportedWifiCategoryTest_Wifi6()
+    {
+        pStaStateMachine->linkedInfo.bssid = "123";
+        EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(),
+            GetWifiCategoryRecord(_)).WillRepeatedly(Return(WifiCategory::WIFI6));
+        pStaStateMachine->SetSupportedWifiCategory();
+        EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::WIFI6);
+        EXPECT_EQ(pStaStateMachine->linkedInfo.isMloConnected, false);
+    }
+
+    void SetSupportedWifiCategoryTest_Wifi7_NOT_MLO()
+    {
+        pStaStateMachine->linkedInfo.bssid = "123";
+        EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(),
+            GetWifiCategoryRecord(_)).WillRepeatedly(Return(WifiCategory::WIFI7));
+        MockWifiStaHalInterface::GetInstance().SetChipsetFeatureCapability(127);
+        pStaStateMachine->SetSupportedWifiCategory();
+        EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::WIFI7);
+        EXPECT_EQ(pStaStateMachine->linkedInfo.isMloConnected, false);
+    }
+
+    void SetSupportedWifiCategoryTest_Wifi7_Is_MLO()
+    {
+        pStaStateMachine->linkedInfo.bssid = "123";
+        EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(),
+            GetWifiCategoryRecord(_)).WillRepeatedly(Return(WifiCategory::WIFI7));
+        MockWifiStaHalInterface::GetInstance().SetChipsetFeatureCapability(255);
+        pStaStateMachine->SetSupportedWifiCategory();
+        EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::WIFI7);
+        EXPECT_EQ(pStaStateMachine->linkedInfo.isMloConnected, true);
+    }
 };
 
 HWTEST_F(StaStateMachineTest, ShouldUseFactoryMacSuccess, TestSize.Level1)
@@ -3238,6 +3278,26 @@ HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest5, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealGetDhcpIpTimeoutTest, TestSize.Level1)
 {
     DealGetDhcpIpTimeoutTest();
+}
+
+HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTest_BssidIsEmpty, TestSize.Level1)
+{
+    SetSupportedWifiCategoryTest_BssidIsEmpty();
+}
+
+HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTest_Wifi6, TestSize.Level1)
+{
+    SetSupportedWifiCategoryTest_Wifi6();
+}
+
+HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTest_Wifi7_NOT_MLO, TestSize.Level1)
+{
+    SetSupportedWifiCategoryTest_Wifi7_NOT_MLO();
+}
+
+HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTest_Wifi7_Is_MLO, TestSize.Level1)
+{
+    SetSupportedWifiCategoryTest_Wifi7_Is_MLO();
 }
 } // namespace Wifi
 } // namespace OHOS

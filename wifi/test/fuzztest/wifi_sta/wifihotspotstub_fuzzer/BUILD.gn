@@ -116,7 +116,6 @@ ohos_fuzztest("WifiHotSpotStubFuzzTest") {
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
-    "netmanager_base:net_stats_manager_if",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",

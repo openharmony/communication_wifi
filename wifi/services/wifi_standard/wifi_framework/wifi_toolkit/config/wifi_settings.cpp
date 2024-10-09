@@ -1492,6 +1492,15 @@ int WifiSettings::GetVariableMap(std::map<std::string, std::string> &variableMap
     return 0;
 }
 
+std::string WifiSettings::GetVariablePackageName(std::string tag)
+{
+    std::unique_lock<std::mutex> lock(mVariableConfMutex);
+    if (mVariableMap.find(tag) != mVariableMap.end()) {
+        return mVariableMap[tag];
+    }
+    return "";
+}
+
 void WifiSettings::InitVariableConfig()
 {
     if (mVariableConf.LoadConfig() >= 0) {

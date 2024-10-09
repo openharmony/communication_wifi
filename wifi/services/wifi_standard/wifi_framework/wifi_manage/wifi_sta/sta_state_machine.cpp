@@ -4739,6 +4739,9 @@ void StaStateMachine::UpdateWifiCategory()
 
 void StaStateMachine::SetSupportedWifiCategory()
 {
+    if (m_instId != INSTID_WLAN0) {
+        return;
+    }
     if (linkedInfo.bssid.empty()) {
         WIFI_LOGE("%{public}s linked bssid is empty", __FUNCTION__);
         return;

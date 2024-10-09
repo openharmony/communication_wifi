@@ -14,7 +14,6 @@
  */
 #include "p2p_group_remove_state.h"
 #include "p2p_state_machine.h"
-#include "wifi_p2p_hal_interface.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupRemoveState");

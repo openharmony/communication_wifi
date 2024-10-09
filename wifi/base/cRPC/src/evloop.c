@@ -62,9 +62,11 @@ EventLoop *CreateEventLoop(int size)
     }
     if (evLoop->fdMasks != NULL) {
         free(evLoop->fdMasks);
+        evLoop->fdMasks = NULL;
     }
     if (evLoop->epEvents != NULL) {
         free(evLoop->epEvents);
+        evLoop->epEvents = NULL;
     }
     free(evLoop);
     evLoop = NULL;

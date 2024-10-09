@@ -561,6 +561,7 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     unsigned char *resultBuff = (unsigned char *)calloc(resultBuffLen, sizeof(unsigned char));
     if (resultBuff == NULL) {
         free(results);
+        results = NULL;
         LOGE("HdiWpaStaGetScanInfos: calloc failed!");
         return NULL;
     }
@@ -568,7 +569,9 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         free(results);
+        results = NULL;
         free(resultBuff);
+        resultBuff = NULL;
         LOGE("HdiWpaStaGetScanInfos: wpaObj is NULL");
         pthread_mutex_unlock(GetWpaObjMutex());
         return NULL;
@@ -577,7 +580,9 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     int32_t result = wpaObj->ScanResult(wpaObj, ifaceName, resultBuff, &resultBuffLen);
     if (result != HDF_SUCCESS) {
         free(results);
+        results = NULL;
         free(resultBuff);
+        resultBuff = NULL;
         LOGE("HdiWpaStaGetScanInfos: ScanResult failed result:%{public}d", result);
         pthread_mutex_unlock(GetWpaObjMutex());
         return NULL;

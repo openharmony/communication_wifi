@@ -49,20 +49,22 @@ void MockScanStateMachine::StartTimer(int timerName, int64_t interval)
     (void)interval;
     WIFI_LOGE("Enter MockScanStateMachine::StartTimer");
 }
-
 void MockScanStateMachine::StopTimer(int timerName)
 {
     (void)timerName;
     WIFI_LOGE("Enter MockScanStateMachine::StopTimer");
 }
-
-InternalMessagePtr MockScanStateMachine::CreateMessage(int msgName)
+bool InitialStateMachine()
+{
+    WIFI_LOGE("Enter MockScanStateMachine::InitialStateMachine");
+    return true;
+}
+InternalMessagePtr CreateMessage(int msgName, int param1)
 {
     WIFI_LOGE("Enter MockScanStateMachine::CreateMessage");
     return nullptr;
 }
-
-InternalMessagePtr MockScanStateMachine::CreateMessage(int msgName, int param1)
+InternalMessagePtr CreateMessage(int msgName)
 {
     WIFI_LOGE("Enter MockScanStateMachine::CreateMessage");
     return nullptr;
@@ -119,5 +121,6 @@ void WifiManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, in
 {
     return;
 }
+
 } // namespace Wifi
 } // namespace OHOS

@@ -42,6 +42,11 @@ void MockWifiStaHalInterface::SetStaCapabilities(WifiErrorNo retResult)
     mGetStaCapabilities = retResult;
 }
 
+void MockWifiStaHalInterface::SetChipsetFeatureCapability(int chipsetFeatureCapability)
+{
+    chipsetFeatureCapability_ = chipsetFeatureCapability;
+}
+
 WifiStaHalInterface &WifiStaHalInterface::GetInstance(void)
 {
     static WifiStaHalInterface inst;
@@ -309,6 +314,7 @@ WifiErrorNo WifiStaHalInterface::GetChipsetCategory(const std::string &ifaceName
 WifiErrorNo WifiStaHalInterface::GetChipsetWifiFeatrureCapability(
     const std::string &ifaceName, int& chipsetFeatrureCapability)
 {
+    chipsetFeatrureCapability = MockWifiStaHalInterface::GetInstance().chipsetFeatureCapability_;
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }

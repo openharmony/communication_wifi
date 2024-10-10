@@ -32,7 +32,6 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int syste
 
     std::shared_ptr<WifiDeviceImpl> device = std::make_shared<WifiDeviceImpl>();
     if (device && device->Init(systemAbilityId, instId)) {
-        WIFI_LOGI("Init instId%{public}d. %{public}d", instId, systemAbilityId);
         return device;
     }
 

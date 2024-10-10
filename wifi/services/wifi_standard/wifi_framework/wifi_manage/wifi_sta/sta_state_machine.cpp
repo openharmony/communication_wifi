@@ -4746,7 +4746,7 @@ void StaStateMachine::SetSupportedWifiCategory()
         WIFI_LOGE("%{public}s linked bssid is empty", __FUNCTION__);
         return;
     }
-    WifiCategory category = 
+    WifiCategory category =
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetWifiCategoryRecord(linkedInfo.bssid);
     linkedInfo.supportedWifiCategory = category;
     if (category == WifiCategory::WIFI7 || category == WifiCategory::WIFI7_PLUS) {

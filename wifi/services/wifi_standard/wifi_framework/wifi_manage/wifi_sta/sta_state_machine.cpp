@@ -3339,6 +3339,10 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     if (mPortalUrl.empty()) {
         WIFI_LOGE("portal uri is nullptr\n");
     }
+    if (!m_NetWorkState) {
+        WIFI_LOGE("m_NetWorkState is nullptr\n");
+        return;
+    }
     int netId = m_NetWorkState->GetWifiNetId();
     std::string bundle;
     std::map<std::string, std::string> variableMap;
@@ -4124,7 +4128,9 @@ void StaStateMachine::DealNetworkCheck(InternalMessagePtr msg)
         return;
     }
 #ifndef OHOS_ARCH_LITE
-    m_NetWorkState->StartWifiDetection();
+    if (m_NetWorkState) {
+        m_NetWorkState->StartWifiDetection();
+    }
 #endif
 }
 

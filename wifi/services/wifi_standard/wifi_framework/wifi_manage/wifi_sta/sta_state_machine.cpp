@@ -3798,6 +3798,7 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessagePtr msg)
                 WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId));
 
             LOGI("DealHiLinkTriggerWps SPECIAL_CONNECTED");
+            SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
             InvokeOnStaConnChanged(OperateResState::SPECIAL_CONNECTED, linkedInfo);
 
             LOGI("DealHiLinkTriggerWps start startWpsPbc");

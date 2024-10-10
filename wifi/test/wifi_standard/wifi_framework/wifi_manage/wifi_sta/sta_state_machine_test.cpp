@@ -56,6 +56,8 @@ constexpr int VALID_RSSI3 = -80;
 constexpr int VALID_RSSI4 = 156;
 constexpr int INVALID_RSSI5 = 100;
 static constexpr int MAX_STR_LENT = 127;
+constexpr int CHIPSET_FEATURE_CAPABILITY_WIFI6_TEST = 127;
+constexpr int CHIPSET_FEATURE_CAPABILITY_WIFI7_TEST = 255;
 static const std::string TEMP_TEST_DATA = "1234567890abcdef1234567890abcdef";
 class StaStateMachineTest : public testing::Test {
 public:
@@ -2056,14 +2058,14 @@ public:
         pStaStateMachine->ReplaceEmptyDns(&resultO);
     }
 
-    void SetSupportedWifiCategoryTest_BssidIsEmpty()
+    void SetSupportedWifiCategoryTestBssidIsEmpty()
     {
         pStaStateMachine->linkedInfo.bssid = "";
         pStaStateMachine->SetSupportedWifiCategory();
         EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::DEFAULT);
     }
 
-    void SetSupportedWifiCategoryTest_Wifi6()
+    void SetSupportedWifiCategoryTestWifi6()
     {
         pStaStateMachine->linkedInfo.bssid = "123";
         EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(),
@@ -2073,23 +2075,23 @@ public:
         EXPECT_EQ(pStaStateMachine->linkedInfo.isMloConnected, false);
     }
 
-    void SetSupportedWifiCategoryTest_Wifi7_NOT_MLO()
+    void SetSupportedWifiCategoryTestWifi7NotMlo()
     {
         pStaStateMachine->linkedInfo.bssid = "123";
         EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(),
             GetWifiCategoryRecord(_)).WillRepeatedly(Return(WifiCategory::WIFI7));
-        MockWifiStaHalInterface::GetInstance().SetChipsetFeatureCapability(127);
+        MockWifiStaHalInterface::GetInstance().SetChipsetFeatureCapability(CHIPSET_FEATURE_CAPABILITY_WIFI6_TEST);
         pStaStateMachine->SetSupportedWifiCategory();
         EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::WIFI7);
         EXPECT_EQ(pStaStateMachine->linkedInfo.isMloConnected, false);
     }
 
-    void SetSupportedWifiCategoryTest_Wifi7_Is_MLO()
+    void SetSupportedWifiCategoryTestWifi7IsMlo()
     {
         pStaStateMachine->linkedInfo.bssid = "123";
         EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(),
             GetWifiCategoryRecord(_)).WillRepeatedly(Return(WifiCategory::WIFI7));
-        MockWifiStaHalInterface::GetInstance().SetChipsetFeatureCapability(255);
+        MockWifiStaHalInterface::GetInstance().SetChipsetFeatureCapability(CHIPSET_FEATURE_CAPABILITY_WIFI7_TEST);
         pStaStateMachine->SetSupportedWifiCategory();
         EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::WIFI7);
         EXPECT_EQ(pStaStateMachine->linkedInfo.isMloConnected, true);
@@ -3280,24 +3282,24 @@ HWTEST_F(StaStateMachineTest, DealGetDhcpIpTimeoutTest, TestSize.Level1)
     DealGetDhcpIpTimeoutTest();
 }
 
-HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTest_BssidIsEmpty, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestBssidIsEmpty, TestSize.Level1)
 {
-    SetSupportedWifiCategoryTest_BssidIsEmpty();
+    SetSupportedWifiCategoryTestBssidIsEmpty();
 }
 
-HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTest_Wifi6, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi6, TestSize.Level1)
 {
-    SetSupportedWifiCategoryTest_Wifi6();
+    SetSupportedWifiCategoryTestWifi6();
 }
 
-HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTest_Wifi7_NOT_MLO, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7NotMlo, TestSize.Level1)
 {
-    SetSupportedWifiCategoryTest_Wifi7_NOT_MLO();
+    SetSupportedWifiCategoryTestWifi7NotMlo();
 }
 
-HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTest_Wifi7_Is_MLO, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7IsMlo, TestSize.Level1)
 {
-    SetSupportedWifiCategoryTest_Wifi7_Is_MLO();
+    SetSupportedWifiCategoryTestWifi7IsMlo();
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -3297,7 +3297,7 @@ void StaStateMachine::PortalExpiredDetect()
         } else if (portalExpiredDetectCount == PORTAL_EXPERIED_DETECT_MAX_COUNT) {
             portalExpiredDetectCount = 0;
             auto config = getCurrentWifiDeviceConfig();
-            WritePortalAuthExpiredHisysevent(SystemNetWorkState::NETWORK_IS_PORTAL,
+            WritePortalAuthExpiredHisysevent(static_cast<int>(SystemNetWorkState::NETWORK_IS_PORTAL),
                 detectNum, config.lastConnectTime, config.portalAuthTime, false);
         }
     }

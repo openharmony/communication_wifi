@@ -125,8 +125,8 @@ void WirteConnectTypeHiSysEvent(std::string connectType);
 
 void WriteWifiWpaStateHiSysEvent(int state);
 
-void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, int connTime,
-    int portalAuthTime, bool isNotificationClicked);
+void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, time_t connTime,
+    time_t portalAuthTime, bool isNotificationClicked);
 
 void WriteWifiSelfcureHisysevent(int type);
 }  // namespace Wifi

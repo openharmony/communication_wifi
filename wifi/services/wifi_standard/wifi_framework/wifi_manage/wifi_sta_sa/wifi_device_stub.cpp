@@ -572,6 +572,12 @@ void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, MessageParcel &data, Messa
 void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
 {
     WIFI_LOGI("WifiDeviceStub SendDeviceConfig");
+    std::vector<uint32_t> allSize;
+    if (contentSize == 0) {
+        reply.WriteInt32(WIFI_OPT_SUCCESS);
+        reply.WriteUInt32Vector(allSize);
+        return;
+    }
     std::string name = "deviceconfigs";
     int32_t ashmemSize = contentSize * sizeof(WifiDeviceConfig);
     sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), ashmemSize);
@@ -584,7 +590,6 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
         return;
     }
     int offset = 0;
-    std::vector<uint32_t> allSize;
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
         WriteWifiDeviceConfig(outParcel, result[i]);
@@ -603,6 +608,7 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
     ashmem->CloseAshmem();
 }
 
+constexpr uint32_t MAX_DEVICE_CONFIG_SIZE = 1024;
 void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -615,7 +621,10 @@ void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, Mess
         reply.WriteInt32(ret);
         return;
     }
-    unsigned int size = result.size();
+    uint32_t size = result.size();
+    if (size > MAX_DEVICE_CONFIG_SIZE) {
+        size = MAX_DEVICE_CONFIG_SIZE;
+    }
     SendDeviceConfig(size, result, reply);
     return;
 }

@@ -420,6 +420,7 @@ private:
     virtual void NotifyUserInvitationReceivedMessage();
     virtual ErrCode AddClientInfo(std::vector<GcInfo> &gcInfos);
     virtual ErrCode RemoveClientInfo(std::string mac);
+    virtual bool IsMatchClientDevice(std::vector<GcInfo> &gcInfos, WifiP2pDevice &device, GcInfo &gcInfo);
 
 private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;

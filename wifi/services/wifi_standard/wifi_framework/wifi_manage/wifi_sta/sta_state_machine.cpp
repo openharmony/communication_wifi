@@ -189,7 +189,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-    WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
 #ifndef OHOS_ARCH_LITE
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());

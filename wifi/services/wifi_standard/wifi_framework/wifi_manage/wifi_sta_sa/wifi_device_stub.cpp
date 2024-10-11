@@ -588,7 +588,7 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
         WriteWifiDeviceConfig(outParcel, result[i]);
-        int dataSize = outParcel.GetDataSize();
+        int dataSize = static_cast<int>(outParcel.GetDataSize());
         if (offset + dataSize > ashmemSize) {
             break;
         }

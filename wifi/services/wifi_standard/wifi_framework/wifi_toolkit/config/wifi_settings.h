@@ -82,6 +82,7 @@ constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.x
 constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
 constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
+inline constexpr char WIFI_VARIABLE_PATH[] = "/system/etc/wifi/wifi_variable.cfg";
 
 namespace OHOS {
 namespace Wifi {
@@ -164,13 +165,13 @@ public:
 
     bool GetRandomMac(WifiStoreRandomMac &randomMacInfo);
 
-    void GetPortalUri(WifiPortalConf &urlInfo);
-
     const std::vector<TrustListPolicy> ReloadTrustListPolicies();
 
     const MovingFreezePolicy ReloadMovingFreezePolicy();
 
     int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
+
+    int GetVariableMap(std::map<std::string, std::string> &variableMap);
 
     int SyncHotspotConfig();
 
@@ -275,8 +276,8 @@ private:
     int IncreaseNumRebootsSinceLastUse();
     void EncryptionWifiDeviceConfigOnBoot();
     int ReloadStaRandomMac();
-    int ReloadPortalconf();
     void InitPackageFilterConfig();
+    void InitVariableConfig();
     void InitDefaultHotspotConfig();
     void InitHotspotConfig();
     int SyncBlockList();
@@ -316,8 +317,6 @@ private:
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
-    WifiPortalConf mPortalUri;
-    WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
 
     // SCAN
@@ -348,6 +347,10 @@ private:
     std::atomic<int> mMaxNumConfigs;
     std::map<int, WifiConfig> mWifiConfig;
     WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
+
+    std::mutex mVariableConfMutex;
+    WifiConfigFileImpl<VariableConf> mVariableConf;
+    std::map<std::string, std::string> mVariableMap;
 };
 }  // namespace Wifi
 }  // namespace OHOS

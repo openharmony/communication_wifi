@@ -126,6 +126,7 @@ static void AddIfaceName(const char* ifName)
         LOGI("%{public}s err2", __func__);
         return;
     }
+
     if (memset_s(currernt->ifName, BUFF_SIZE, 0, strlen(ifName)) != EOK) {
         free(currernt);
         currernt = NULL;

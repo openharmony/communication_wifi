@@ -47,6 +47,15 @@ public:
     static bool IsNativeProcess();
 
     /**
+     * @Description Verify whether the app has the same process permission
+     *
+     * @param pid - the app's process id
+     * @param uid - the app id
+     * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    int VerifySetWifiInfoPermission(const int &pid, const int &uid);
+
+    /**
      * @Description Verify whether the app has the permission to operator wifi
      *
      * @param pid - the app's process id

@@ -51,7 +51,6 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
 #endif
 }
 
-
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.SET_WIFI_INFO", pid, uid, 0) == PERMISSION_DENIED) {

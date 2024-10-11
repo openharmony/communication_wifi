@@ -49,7 +49,7 @@ WifiManager &WifiManager::GetInstance()
     return gWifiManager;
 }
 
-WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0)
+WifiManager::WifiManager() : mInitStatus(INIT_UNKNOWN), mSupportedFeatures(0), g_supportsapcoexistflag(false)
 {}
 
 WifiManager::~WifiManager()

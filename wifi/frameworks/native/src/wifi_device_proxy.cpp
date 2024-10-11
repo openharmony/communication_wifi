@@ -641,7 +641,7 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
     constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
     std::vector<uint32_t> allSize;
     reply.ReadUInt32Vector(&allSize);
-    int retSize = allSize.size();
+    uint32_t retSize = allSize.size();
     if (retSize > MAX_DEVICE_CONFIG_SIZE || retSize == 0) {
         WIFI_LOGE("Parse device config size error: %{public}d", retSize);
         return;
@@ -655,14 +655,14 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
     for (int i = 0; i < retSize; i++) {
         auto origin = ashmem->ReadFromAshmem(allSize[i], offset);
         if (origin == nullptr) {
-            offset += allSize[i];
+            offset += static_cast<int>(allSize[i]);
             continue;
         }
         MessageParcel inParcel;
         inParcel.WriteBuffer(reinterpret_cast<const char*>(origin), allSize[i]);
         WifiDeviceConfig config;
         ReadDeviceConfig(inParcel, config);
-        offset += allSize[i];
+        offset += static_cast<int>(allSize[i]);
         result.emplace_back(config);
     }
     ashmem->UnmapAshmem();

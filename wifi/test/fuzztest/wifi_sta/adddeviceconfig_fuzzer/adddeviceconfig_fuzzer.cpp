@@ -16,8 +16,6 @@
 #include "adddeviceconfig_fuzzer.h"
 #include "wifi_device.h"
 
-
-
 namespace OHOS {
 namespace Wifi {
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);

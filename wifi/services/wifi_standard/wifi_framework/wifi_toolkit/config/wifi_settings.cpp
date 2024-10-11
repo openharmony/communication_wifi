@@ -211,8 +211,8 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId && iter->second.instanceId == instId) {
-            config = iter->second;
-            SyncAfterDecryped(config);
+            SyncAfterDecryped(iter->second);
+            config =  iter->second;
             return 0;
         }
     }
@@ -230,16 +230,16 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
     if (indexType == DEVICE_CONFIG_INDEX_SSID) {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index && iter->second.instanceId == instId) {
-                config = iter->second;
-                SyncAfterDecryped(config);
+                SyncAfterDecryped(iter->second);
+                config =  iter->second;
                 return 0;
             }
         }
     } else {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index && iter->second.instanceId == instId) {
-                config = iter->second;
-                SyncAfterDecryped(config);
+                SyncAfterDecryped(iter->second);
+                config =  iter->second;
                 return 0;
             }
         }
@@ -260,8 +260,8 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
                 && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
-                config = iter->second;
-                SyncAfterDecryped(config);
+                SyncAfterDecryped(iter->second);
+                config =  iter->second;
                 return 0;
             }
         }
@@ -269,8 +269,8 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
                 && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
-                config = iter->second;
-                SyncAfterDecryped(config);
+                SyncAfterDecryped(iter->second);
+                config =  iter->second;
                 return 0;
             }
         }

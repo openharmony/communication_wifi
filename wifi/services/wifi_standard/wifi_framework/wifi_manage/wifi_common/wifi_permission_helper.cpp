@@ -51,6 +51,14 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
 #endif
 }
 
+int WifiPermissionHelper::VerifySameProcessPermission(const int &pid, const int &uid)
+{
+    if (uid == static_cast<int>(getuid()) && pid == static_cast<int>(getpid())) {
+        return PERMISSION_GRANTED;
+    }
+    return PERMISSION_DENIED;
+}
+
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.SET_WIFI_INFO", pid, uid, 0) == PERMISSION_DENIED) {

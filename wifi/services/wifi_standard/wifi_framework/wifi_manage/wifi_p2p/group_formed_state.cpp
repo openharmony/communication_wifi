@@ -243,17 +243,21 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessagePtr msg) const
         WIFI_LOGE("Disconnect:Failed to obtain client information.");
         return EXECUTED;
     }
-
+    WIFI_LOGI("ProcessDisconnectEvt device disconnected, deviceAddr: %{private}s, groupAddr: %{private}s",
+        device.GetDeviceAddress().c_str(), device.GetGroupAddress().c_str());
     IpPool::ReleaseIp(device.GetDeviceAddress());
     device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
     deviceManager.UpdateDeviceStatus(device); // used for peers change event querying device infos
     deviceManager.UpdateGroupAddress(device);
     groupManager.RemoveCurrGroupClient(device);
+    p2pStateMachine.BroadcastP2pPeersChanged();
+    p2pStateMachine.BroadcastP2pConnectionChanged();
+    p2pStateMachine.BroadcastP2pGcLeaveGroup(device);
     if (WIFI_OPT_SUCCESS != p2pStateMachine.RemoveClientInfo(device.GetDeviceAddress())) {
         WIFI_LOGE("Connect: remove client info faild");
     }
     auto iter = std::find(p2pStateMachine.curClientList.begin(),
-    p2pStateMachine.curClientList.end(), device.GetDeviceAddress());
+        p2pStateMachine.curClientList.end(), device.GetDeviceAddress());
     if (iter != p2pStateMachine.curClientList.end()) {
         p2pStateMachine.curClientList.erase(iter);
     } else {
@@ -262,7 +266,6 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessagePtr msg) const
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();
     p2pStateMachine.BroadcastP2pGcLeaveGroup(device);
-    p2pStateMachine.BroadcastP2pPeerJoinOrLeave(false, device.GetDeviceAddress());
     deviceManager.RemoveDevice(device);
     if (groupManager.IsCurrGroupClientEmpty() && !groupManager.GetCurrentGroup().IsExplicitGroup()) {
         WIFI_LOGE("Clients empty, remove p2p group.");
@@ -278,13 +281,15 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessagePtr msg) const
         WIFI_LOGE("Connect:Failed to obtain client information.");
         return EXECUTED;
     }
-
+    WIFI_LOGI("GroupFormedState ProcessConnectEvt deviceAddr: %{private}s, groupAddr: %{private}s",
+        device.GetDeviceAddress().c_str(), device.GetGroupAddress().c_str());
     if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
         WIFI_LOGE("fail to set GO Idle time.");
     }
     device.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
     deviceManager.UpdateDeviceStatus(device);
+    deviceManager.UpdateGroupAddress(device);
     WifiP2pDevice memberPeer = deviceManager.GetDevices(device.GetDeviceAddress());
     if (memberPeer.IsValid()) {
         memberPeer.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);

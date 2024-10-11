@@ -101,12 +101,14 @@ std::string WifiCodeConvertUtil::Convert(const std::string &str, const std::stri
     char *outbufbak = outbuf;
     if (iconv(cd, &inbuf, &inlen, &outbuf, &outlen) == static_cast<size_t>(-1)) {
         delete[] outbufbak;
+        outbufbak = nullptr;
         iconv_close(cd);
         return "";
     }
 
     std::string strOut(outbufbak, outbuf - outbufbak);
     delete[] outbufbak;
+    outbufbak = nullptr;
     iconv_close(cd);
     return strOut;
 }

@@ -22,6 +22,15 @@ namespace OHOS {
 namespace Wifi {
 constexpr int MAX_ALIAS_LEN = 128;
 
+uint8_t WifiCertUtils::FreeData(uint8_t* pData)
+{
+    if (pData != nullptr) {
+        free(pData);
+        pData = nullptr;
+    }
+    return -1;
+}
+
 int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std::string& pwd,
     std::string& alias, std::string& uri)
 {
@@ -45,18 +54,15 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
 
     if (memcpy_s(data, certEntry.size(), certEntry.data(), certEntry.size()) != EOK) {
         LOGE("memcpy_s certEntry.data() error.");
-        free(data);
-        return -1;
+        return FreeData(data);
     }
     if (memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size()) != EOK) {
         LOGE("memcpy_s pwd.c_str() error.");
-        free(data);
-        return -1;
+        return FreeData(data);
     }
     if (memcpy_s(certAliasBuf, sizeof(certAliasBuf), alias.c_str(), alias.size()) != EOK) {
         LOGE("memcpy_s alias.c_str() error.");
-        free(data);
-        return -1;
+        return FreeData(data);
     }
 
     appCert.size = certEntry.size();
@@ -72,6 +78,7 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     int ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
 
     free(data);
+    data = nullptr;
     if (ret == 0) {
         uri = reinterpret_cast<char*>(keyUri.data);
     }

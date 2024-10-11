@@ -1604,15 +1604,6 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     return ss.str();
 }
 
-template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
-{
-    item.portalHttpUrl.clear();
-    item.portalHttpsUrl.clear();
-    item.portalBakHttpUrl.clear();
-    item.portalBakHttpsUrl.clear();
-    return;
-}
-
 template <>
 void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
 {
@@ -1622,22 +1613,11 @@ void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
 }
 
 template <>
-int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value)
+void ClearTClass<VariableConf>(VariableConf &item)
 {
-    int errorKeyValue = 0;
-    if (key == "http") {
-        item.portalHttpUrl = value;
-    } else if (key == "https") {
-        item.portalHttpsUrl = value;
-    } else if (key == "httpbak") {
-        item.portalBakHttpUrl = value;
-    } else if (key == "httpsbak") {
-        item.portalBakHttpsUrl = value;
-    } else {
-        LOGE("Invalid config key value");
-        errorKeyValue++;
-    }
-    return errorKeyValue;
+    item.variableName.clear();
+    item.variableValue.clear();
+    return;
 }
 
 template <>
@@ -1655,17 +1635,19 @@ int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::str
     return errorKeyValue;
 }
 
-template <> std::string GetTClassName<WifiPortalConf>()
+template <>
+int SetTClassKeyValue<VariableConf>(VariableConf &item, const std::string &key, const std::string &value)
 {
-    return "WifiPortalConf";
-}
-
-template <> std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item)
-{
-    std::ostringstream ss;
-    ss << "    " <<"<WifiPortalConf>" << std::endl;
-    ss << "    " <<"http=" << ValidateString(item.portalHttpUrl) << std::endl;
-    return ss.str();
+    int errorKeyValue = 0;
+    if (key == "variableName") {
+        item.variableName = value;
+    } else if (key == "variableValue") {
+        item.variableValue = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
 }
 
 int SetNetworkStatusHistory(WifiDeviceConfig &item, const std::string &value)

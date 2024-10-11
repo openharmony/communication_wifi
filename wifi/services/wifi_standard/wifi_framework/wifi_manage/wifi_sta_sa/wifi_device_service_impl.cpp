@@ -1565,7 +1565,7 @@ bool WifiDeviceServiceImpl::IsStaServiceRunning()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
     if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGW("current wifi state is %{public}d", static_cast<int>(curState));
+        WIFI_LOGW("current wifi state is %{public}d, instId: %{public}d", static_cast<int>(curState), m_instId);
         return false;
     }
     return true;

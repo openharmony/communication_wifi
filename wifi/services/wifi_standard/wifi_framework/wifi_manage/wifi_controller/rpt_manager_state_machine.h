@@ -62,7 +62,7 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-        int retryCount;
+        int retryCount = 0;
     private:
         void StartRpt();
         RptManagerMachine *pRptManagerMachine;
@@ -75,7 +75,7 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-        int retryCount;
+        int retryCount = 0;
     private:
         void RemoveP2pConflictGroup();
         RptManagerMachine *pRptManagerMachine;

@@ -38,7 +38,6 @@ ohos_unittest("base_unittest") {
     "security_utils/wifi_openssl_utils_test.cpp",
     "serial_test.cpp",
     "server_test.cpp",
-    "wifi_watchdog_utils_test.cpp",
   ]
 
   defines = [
@@ -60,7 +59,7 @@ ohos_unittest("base_unittest") {
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

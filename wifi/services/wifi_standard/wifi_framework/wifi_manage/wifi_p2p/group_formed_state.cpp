@@ -265,6 +265,7 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessagePtr msg) const
     }
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();
+    p2pStateMachine.BroadcastP2pPeerJoinOrLeave(false, device.GetDeviceAddress());
     p2pStateMachine.BroadcastP2pGcLeaveGroup(device);
     deviceManager.RemoveDevice(device);
     if (groupManager.IsCurrGroupClientEmpty() && !groupManager.GetCurrentGroup().IsExplicitGroup()) {

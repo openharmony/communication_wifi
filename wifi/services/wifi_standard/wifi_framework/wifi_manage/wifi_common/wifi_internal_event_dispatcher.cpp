@@ -895,9 +895,9 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
                         updateP2pDeviceMacAddress(deviceVec);
                     }
                     callback->OnP2pPeersChanged(deviceVec);
-                }else{
-                updateP2pDeviceMacAddress(deviceVec);
-                callback->OnP2pPeersChanged(deviceVec);
+                } else {
+                    updateP2pDeviceMacAddress(deviceVec);
+                    callback->OnP2pPeersChanged(deviceVec);
                 }
             #else
                 callback->OnP2pPeersChanged(msg.device);

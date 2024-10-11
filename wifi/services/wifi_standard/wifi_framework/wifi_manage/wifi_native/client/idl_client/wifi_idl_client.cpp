@@ -899,11 +899,13 @@ WifiErrorNo WifiIdlClient::GetStationList(std::vector<std::string> &result, int 
     WifiErrorNo err = GetStaInfos(staInfos, &size, id);
     if (err != WIFI_HAL_OPT_OK) {
         delete[] staInfos;
+        staInfos = nullptr;
         return WIFI_HAL_OPT_FAILED;
     }
     std::string strStaInfo = std::string(staInfos);
     SplitString(strStaInfo, ",", result);
     delete[] staInfos;
+    staInfos = nullptr;
     return WIFI_HAL_OPT_OK;
 }
 

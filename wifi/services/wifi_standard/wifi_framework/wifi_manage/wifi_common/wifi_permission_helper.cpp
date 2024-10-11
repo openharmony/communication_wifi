@@ -46,15 +46,11 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
         return PERMISSION_GRANTED;
     }
  
-        LOGE("callerToken=0x%{public}x has no permission_name=%{public}s, pid=0x%{public}x, type=%{public}d",
-            callerToken, permissionName.c_str(), pid, tokenType);
-        return PERMISSION_DENIED;
-    }
- 
     LOGE("has no permission_name=%{public}s, pid=%{public}d, uid=%{public}d", permissionName.c_str(), pid, uid);
     return PERMISSION_DENIED;
 #endif
 }
+
 
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {

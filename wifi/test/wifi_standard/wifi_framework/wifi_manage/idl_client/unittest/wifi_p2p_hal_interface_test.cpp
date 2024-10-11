@@ -129,6 +129,11 @@ void onStaDeauthorized(const std::string &address)
     LOGD("onStaDeauthorized...address: %s\n", address.c_str());
 }
 
+void onStaAuthorized(const std::string &address)
+{
+    LOGD("onStaAuthorized...address: %s\n", address.c_str());
+}
+
 void connectSupplicantFailed()
 {
     LOGD("connectSupplicantFailed...\n");
@@ -165,6 +170,7 @@ void WifiP2pHalInterfaceTest::SetUpTestCase()
     callbacks.onFindStopped = onFindStopped;
     callbacks.onServiceDiscoveryResponse = onServiceDiscoveryResponse;
     callbacks.onStaDeauthorized = onStaDeauthorized;
+    callbacks.onStaAuthorized = onStaAuthorized;
     callbacks.connectSupplicantFailed = connectSupplicantFailed;
     callbacks.onP2pServDiscReq = onP2pServDiscReq;
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callbacks);

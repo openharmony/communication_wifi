@@ -32,6 +32,7 @@ public:
     void SendMessage(InternalMessagePtr msg);
     void StartTimer(int timerName, int64_t interval);
     void StopTimer(int timerName);
+    bool InitialStateMachine();
     InternalMessagePtr CreateMessage(int msgName, int param1);
     InternalMessagePtr CreateMessage(int msgName);
 };
@@ -48,6 +49,7 @@ public:
     void DealScanFinished(int state, int instId = 0);
     void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId = 0);
     void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0);
+    void DealStaOpenRes(OperateResState state, int instId = 0);
 
 private:
     IScanSerivceCallbacks mScanCallback;

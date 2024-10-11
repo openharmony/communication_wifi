@@ -77,35 +77,6 @@ if (defined(ohos_lite)) {
 
     defines = [ "OHOS_ARCH_LITE" ]
   }
-  shared_library("wifi_base_without_crpc") {
-    sources = local_base_sources
-
-    include_dirs = local_base_include_dirs
-
-    deps = [ "$WIFI_ROOT_DIR/base/cRPC:crpc_client" ]
-
-    external_deps = [
-      "hilog_lite:hilog_shared",
-      "openssl:libcrypto_shared",
-      "openssl:libssl_shared",
-    ]
-
-    configs -= [ "//build/lite/config:language_cpp" ]
-    cflags = memory_optimization_cflags
-    cflags_cc = memory_optimization_cflags_cc
-    ldflags = memory_optimization_ldflags
-    cflags_cc += [
-      "-std=c++17",
-      "-fno-rtti",
-    ]
-
-    ldflags += [
-      "-fPIC",
-      "-Wl,-E",
-    ]
-
-    defines = [ "OHOS_ARCH_LITE" ]
-  }
 } else {
   config("wifi_base_exported_header") {
     visibility = [ ":*" ]
@@ -113,67 +84,6 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("wifi_base") {
-    branch_protector_ret = "pac_ret"
-
-    sanitize = {
-      cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
-      cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
-      debug = false
-    }
-
-    install_enable = true
-    sources = local_base_sources
-
-    sources += [
-      "utils/wifi_app_parser.cpp",
-      "utils/xml_parser.cpp",
-    ]
-    include_dirs = local_base_include_dirs
-    include_dirs += [ "$WIFI_ROOT_DIR/base/utils" ]
-
-    deps = [
-      "$WIFI_ROOT_DIR/base/cRPC:crpc_client",
-      "$WIFI_ROOT_DIR/utils:wifi_utils",
-    ]
-    defines = []
-
-    external_deps = [
-      "c_utils:utils",
-      "hicollie:libhicollie",
-      "hilog:libhilog",
-      "jsoncpp:jsoncpp",
-      "libxml2:libxml2",
-      "openssl:libcrypto_shared",
-      "openssl:libssl_shared",
-    ]
-    if (wifi_ffrt_enable) {
-      external_deps += [ "ffrt:libffrt" ]
-      defines += [ "WIFI_FFRT_ENABLE" ]
-    }
-    cflags = memory_optimization_cflags
-    cflags_cc = memory_optimization_cflags_cc
-    ldflags = memory_optimization_ldflags
-    cflags_cc += [
-      "-std=c++17",
-      "-fno-rtti",
-    ]
-
-    ldflags += [
-      "-fPIC",
-      "-Wl,-E",
-    ]
-
-    public_configs = [ ":wifi_base_exported_header" ]
-
-    part_name = "wifi"
-    subsystem_name = "communication"
-    innerapi_tags = [ "platformsdk" ]
-  }
-
-  ohos_shared_library("wifi_base_without_crpc") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {

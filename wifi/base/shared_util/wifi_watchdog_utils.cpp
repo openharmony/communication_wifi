@@ -34,19 +34,18 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiWatchDogUtils");
 constexpr int RESET_NOW = 1; //1s
 constexpr int TIME_OUT_WATCHDOG = 10; // 10s
-constexpr uint32_t FFRT_CALLBACK_TIME = 30 * 1000; // 30s
+constexpr uint32_t FFRT_CALLBACK_TIME = 5 * 60 * 1000; // 5min
 constexpr uint32_t TIME_MS_TO_S = 1000;
 std::shared_ptr<WifiWatchDogUtils> WifiWatchDogUtils::GetInstance()
 {
-    static std::shared_ptr<WifiWatchDogUtils> instance = nullptr;
-    if (instance == nullptr) {
-        instance = std::make_shared<WifiWatchDogUtils>();
-        instance->StartAllWatchDog();
-    }
+    static std::shared_ptr<WifiWatchDogUtils> instance = std::make_shared<WifiWatchDogUtils>();
     return instance;
 }
+
 WifiWatchDogUtils::WifiWatchDogUtils()
-{}
+{
+    StartAllWatchDog();
+}
 
 WifiWatchDogUtils::~WifiWatchDogUtils()
 {}
@@ -78,7 +77,7 @@ bool WifiWatchDogUtils::ResetProcess(bool usingHiviewDfx, const std::string &thr
 int WifiWatchDogUtils::StartWatchDogForFunc(const std::string &funcName)
 {
     #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("StartWatchDogForFunc enter for funcName:%{public}s", funcName.c_str());
+    WIFI_LOGD("StartWatchDogForFunc enter for funcName:%{public}s", funcName.c_str());
     // this will generate a watchdog file in faultlogger but will not reset process
     return HiviewDFX::XCollie::GetInstance().SetTimer(funcName, TIME_OUT_WATCHDOG,
         nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
@@ -89,7 +88,7 @@ int WifiWatchDogUtils::StartWatchDogForFunc(const std::string &funcName)
 bool WifiWatchDogUtils::StopWatchDogForFunc(const std::string &funcName, int id)
 {
     #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("StopWatchDogForFunc enter for funcName:%{public}s", funcName.c_str());
+    WIFI_LOGD("StopWatchDogForFunc enter for funcName:%{public}s", funcName.c_str());
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
     #endif
     return true;

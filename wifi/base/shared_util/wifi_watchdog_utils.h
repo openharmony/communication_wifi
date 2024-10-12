@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_STATE_H
-#define OHOS_STATE_H
+#ifndef OHOS_WIFI_WATCHDOG_UTILS_H
+#define OHOS_WIFI_WATCHDOG_UTILS_H
 #include <memory>
 #include <string>
 namespace OHOS {

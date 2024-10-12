@@ -169,6 +169,13 @@ void WifiTogglerManager::DealClientRemoved(int id)
     }
 }
 
+void WifiTogglerManager::ForceStopWifi()
+{
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->ShutdownWifi(false);
+    }
+}
+
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiTogglerManager::SatelliteToggled(int state)
 {

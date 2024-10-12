@@ -392,7 +392,7 @@ private:
      * @param scanInfoList - scan result list[in]
      * @return success: true, failed: false
      */
-    bool StoreFullScanInfo(const StoreScanConfig &scanConfig, const std::vector<InterScanInfo> &scanInfoList);
+    bool StoreFullScanInfo(const StoreScanConfig &scanConfig, std::vector<InterScanInfo> &scanInfoList);
     /**
      * @Description Saves the scanning result of specified parameters in the configuration center.
      *

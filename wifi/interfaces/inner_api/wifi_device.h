@@ -556,7 +556,7 @@ public:
      * @param protocol - target protocol type
      * @return enable - enable/disable dpi mark
      */
-    virtual SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
+    virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -139,7 +139,7 @@ private:
     ErrCode SwitchSemiFromEnable();
     ErrCode SwitchEnableFromSemi();
     void ReportClose();
-    void ClearIfaceName()
+    void ClearIfaceName();
 
     DefaultState *pDefaultState;
     IdleState *pIdleState;

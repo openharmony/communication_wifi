@@ -127,9 +127,6 @@ public:
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
         EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(msg));
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
-        WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::OPENING, 0);
-        pSoftapManagerMachine->AutoStopApService(0);
-        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::RUNNING, 0);
         EXPECT_TRUE(pSoftapManagerMachine->pStartedState->ExecuteStateMsg(msg));
         msg->SetMessageName(INVILAD_MSG);

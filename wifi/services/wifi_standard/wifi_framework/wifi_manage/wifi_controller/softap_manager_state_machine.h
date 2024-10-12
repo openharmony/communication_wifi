@@ -95,11 +95,7 @@ private:
 
     void BuildStateTree();
     ErrCode InitSoftapManagerStates();
-    ErrCode TryToStartApService(int id);
-    ErrCode AutoStartApService(int id);
-    ErrCode AutoStopApService(int id);
     void StopSoftap();
-    void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     DefaultState *pDefaultState;
     IdleState *pIdleState;
     StartedState *pStartedState;

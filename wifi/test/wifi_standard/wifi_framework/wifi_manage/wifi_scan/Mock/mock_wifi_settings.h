@@ -36,10 +36,17 @@ public:
     virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
     virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
     virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
+    virtual int GetSignalLevel(const int &rssi, const int &band, int instId = 0) = 0;
+    virtual int SyncDeviceConfig() = 0;
+    virtual int RemoveDevice(int networkId) = 0;
+    virtual int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs) = 0;
+    virtual int SetAcceptUnvalidated(int networkId) = 0;
+    virtual int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0) = 0;
+    virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
+    virtual bool GetScanAlwaysState(int instId) = 0;
+    virtual int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0) = 0;
+    virtual bool GetWifiFlagOnAirplaneMode(int instId = 0) = 0;
 };
-
-
-
 
 class WifiSettings : public MockWifiSettings {
 public:
@@ -56,6 +63,16 @@ public:
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
     MOCK_METHOD1(GetPackageFilterMap,  int(std::map<std::string, std::vector<std::string>> &filterMap));
+    MOCK_METHOD3(GetSignalLevel, int(const int &rssi, const int &band, int));
+    MOCK_METHOD0(SyncDeviceConfig, int());
+    MOCK_METHOD1(RemoveDevice, int(int networkId));
+    MOCK_METHOD2(GetAllCandidateConfig, int(const int uid, std::vector<WifiDeviceConfig> &configs));
+    MOCK_METHOD1(SetAcceptUnvalidated, int(int networkId));
+    MOCK_METHOD2(SetWifiFlagOnAirplaneMode, int(bool ifOpen, int instId));
+    MOCK_METHOD1(MergeWifiCloneConfig, void(std::string &cloneData));
+    MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
+    MOCK_METHOD3(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));
+    MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
 };
 }  // namespace Wifi
 }  // namespace OHOS

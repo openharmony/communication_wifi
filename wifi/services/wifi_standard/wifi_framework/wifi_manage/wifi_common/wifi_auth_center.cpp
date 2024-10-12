@@ -76,6 +76,14 @@ bool WifiAuthCenter::IsNativeProcess()
 }
 #endif
 
+int WifiAuthCenter::VerifySameProcessPermission(const int &pid, const int &uid)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifySameProcessPermission(pid, uid);
+}
+
 int WifiAuthCenter::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {
     if (g_permissinAlwaysGrant) {

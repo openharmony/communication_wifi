@@ -715,6 +715,24 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable)
+{
+    if (WifiPermissionUtils::VerifySameProcessPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetDpiMarkRule:VerifySameProcessPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (WifiStaHalInterface::GetInstance().SetDpiMarkRule(ifaceName, uid, protocol, enable) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("SetDpiMarkRule failed");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result)
 {
     WifiLinkedInfo linkedInfo;

@@ -512,6 +512,25 @@ ErrCode WifiDeviceImpl::DeregisterFilterBuilder(const FilterTag &filterTag, cons
     return client_->DeregisterFilterBuilder(filterTag, filterName);
 }
 
+ErrCode WifiDeviceImpl::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                              const CommonBuilder &commonBuilder)
+{
+    if (commonBuilder.IsEmpty()) {
+        WIFI_LOGE("the target of commonBuilder for %{public}s is empty", tagName.c_str());
+        return WIFI_OPT_FAILED;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->RegisterCommonBuilder(tagType, tagName, commonBuilder);
+}
+ 
+ErrCode WifiDeviceImpl::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->DeregisterCommonBuilder(tagType, tagName);
+}
+
 bool WifiDeviceImpl::IsRemoteDied(void)
 {
     return (client_ == nullptr) ? true : client_->IsRemoteDied();

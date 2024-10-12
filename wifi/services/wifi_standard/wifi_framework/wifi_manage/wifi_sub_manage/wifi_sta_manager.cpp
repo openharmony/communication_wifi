@@ -114,6 +114,7 @@ void WifiStaManager::InitStaCallback(void)
     mStaCallback.OnWpsChanged = std::bind(&WifiStaManager::DealWpsChanged, this, _1, _2, _3);
     mStaCallback.OnStaStreamChanged = std::bind(&WifiStaManager::DealStreamChanged, this, _1, _2);
     mStaCallback.OnStaRssiLevelChanged = std::bind(&WifiStaManager::DealRssiChanged, this, _1, _2);
+    mStaCallback.OnAutoSelectNetworkRes = std::bind(&WifiStaManager::DealAutoSelectNetworkChanged, this, _1, _2);
     return;
 }
 
@@ -280,6 +281,15 @@ void WifiStaManager::DealRssiChanged(int rssi, int instId)
     cbMsg.msgData = rssi;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    return;
+}
+
+void WifiStaManager::DealAutoSelectNetworkChanged(int networkId, int instId)
+{
+    IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
+    if (pService != nullptr) {
+        pService->OnAutoConnectStateChanged(networkId != -1);
+    }
     return;
 }
 

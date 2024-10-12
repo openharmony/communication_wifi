@@ -37,14 +37,14 @@ void MockScanService::RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSe
     WIFI_LOGI("Enter MockScanService::RegisterScanCallbacks");
 }
 
-ErrCode MockScanService::Scan(bool externFlag)
+ErrCode MockScanService::Scan(ScanType scanType)
 {
-    (void)externFlag;
+    (void)scanType;
     WIFI_LOGI("Enter MockScanService::Scan");
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode MockScanService::ScanWithParam(const WifiScanParams &params, bool externFlag)
+ErrCode MockScanService::ScanWithParam(const WifiScanParams &params, ScanType scanType)
 {
     (void)params;
     WIFI_LOGI("Enter MockScanService::ScanWithParam");
@@ -79,6 +79,12 @@ void MockScanService::HandleGetCustomSceneState(std::map<int, time_t>& sceneMap)
 {
     (void)sceneMap;
     WIFI_LOGI("Enter MockScanService::HandleGetCustomSceneState");
+}
+
+void MockScanService::HandleAutoConnectStateChanged(bool success)
+{
+    (void)success;
+    WIFI_LOGI("Enter MockScanService::HandleAutoConnectStateChanged");
 }
 
 void MockScanService::GetScanControlInfo()

@@ -37,7 +37,7 @@ enum class WifiCloseServiceCode {
     SERVICE_THREAD_EXIT,
     STA_MSG_OPENED,
     STA_MSG_STOPED,
-}
+};
 
 class MockWifiManager {
 public:

@@ -107,8 +107,6 @@ ohos_unittest("wifi_scan_unittest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
-    "FEATURE_AP_SUPPORT",
-    "FEATURE_P2P_SUPPORT",
   ]
   part_name = "wifi"
   subsystem_name = "communication"

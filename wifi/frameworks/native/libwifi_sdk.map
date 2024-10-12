@@ -1,8 +1,4 @@
 1.0 {
-
-
-
-
     global:
         Hid2d*;
         RegisterCfgChangCallback;
@@ -95,14 +91,48 @@
             "non-virtual thunk to OHOS::Wifi::WifiAbilityStatusChange::OnAddSystemAbility(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Wifi::IpStrToArray(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, unsigned int*)";
             "OHOS::Wifi::IpArrayToStr(unsigned int const*)";
-            OHOS::Wifi::WifiDeviceCallBackStub::*;
-            OHOS::Wifi::WifiHotspotCallbackStub::*;
             "OHOS::Wifi::WifiEapConfig::Phase2MethodToStr(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int const&)";
             "OHOS::Wifi::WifiEapConfig::Phase2MethodFromStr(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
-            OHOS::Wifi::WifiP2pCallbackStub::*;
-            OHOS::Wifi::WifiScanCallbackStub::*;
             OHOS::Wifi::NetworkSelection::*;
             "vtable for OHOS::Wifi::NetworkSelection::OrWifiFilter";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnRemoteRequest(uint32_t, MessageParcel &, MessageParcel &, MessageOption &)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pStateChanged(int)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pPersistentGroupsChanged()";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pThisDeviceChanged(const WifiP2pDevice &)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pPeersChanged(const std::vector<WifiP2pDevice> &)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pPrivatePeersChanged(const std::string &)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo> &)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pConnectionChanged(const WifiP2pLinkedInfo &)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pDiscoveryChanged(bool)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnP2pActionResult(P2pActionCallback, ErrCode)";
+            "OHOS::Wifi::WifiP2pCallbackStub::OnConfigChanged(CfgType, char*, int)";
+            "OHOS::Wifi::WifiP2pCallbackStub::RegisterCallBack(const sptr<IWifiP2pCallback> &)";
+            "OHOS::Wifi::WifiP2pCallbackStub::IsRemoteDied() const";
+            "OHOS::Wifi::WifiP2pCallbackStub::SetRemoteDied(bool)";
+            "OHOS::Wifi::WifiScanCallbackStub::OnRemoteRequest(uint32_t, IpcIo *)";
+            "OHOS::Wifi::WifiScanCallbackStub::OnRemoteRequest(uint32_t, MessageParcel &, MessageParcel &, MessageOption &)";
+            "OHOS::Wifi::WifiScanCallbackStub::OnWifiScanStateChanged(int)";
+            "OHOS::Wifi::WifiScanCallbackStub::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &)";
+            "OHOS::Wifi::WifiScanCallbackStub::RegisterCallBack(const sptr<IWifiScanCallback> &)";
+            "OHOS::Wifi::WifiScanCallbackStub::IsRemoteDied() const";
+            "OHOS::Wifi::WifiScanCallbackStub::SetRemoteDied(bool)";
+            "OHOS::Wifi::WifiHotspotCallbackStub:: OnRemoteRequest(uint32_t, MessageParcel &, MessageParcel &, MessageOption &)";
+            "OHOS::Wifi::WifiHotspotCallbackStub::RegisterCallBack(const sptr<IWifiHotspotCallback> &)";
+            "OHOS::Wifi::WifiHotspotCallbackStub::OnHotspotStateChanged(int)";
+            "OHOS::Wifi::WifiHotspotCallbackStub::OnHotspotStaJoin(const StationInfo &)";
+            "OHOS::Wifi::WifiHotspotCallbackStub::OnHotspotStaLeave(const StationInfo &)";
+            "OHOS::Wifi::WifiHotspotCallbackStub::IsRemoteDied() const";
+            "OHOS::Wifi::WifiHotspotCallbackStub::SetRemoteDied(bool)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::OnRemoteRequest(uint32_t, MessageParcel &, MessageParcel &, MessageOption &)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::OnWifiStateChanged(int)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::OnWifiConnectionChanged(int, const WifiLinkedInfo &)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::OnWifiRssiChanged(int)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::OnWifiWpsStateChanged(int, const std::string &)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::OnStreamChanged(int)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack> &)";
+            "OHOS::Wifi::WifiDeviceCallBackStub::IsRemoteDied() const";
+            "OHOS::Wifi::WifiDeviceCallBackStub::SetRemoteDied(bool)";
         };
     local:
         *;

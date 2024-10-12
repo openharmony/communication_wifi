@@ -141,6 +141,11 @@ public:
     virtual void SetPersistWifiState(int state, int instId) = 0;
     virtual int GetPersistWifiState(int instId) = 0;
     virtual void UpdateLinkedInfo(int instId) = 0;
+    virtual int GetNoChargerPlugModeState() const = 0;
+    virtual bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
+        const std::string &randomAddr) = 0;
+    virtual int GetScanGenieState() const = 0;
+
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -262,6 +267,10 @@ public:
     MOCK_METHOD2(SetPersistWifiState, void(int state, int instId));
     MOCK_METHOD1(GetPersistWifiState, int(int instId));
     MOCK_METHOD1(UpdateLinkedInfo, void(int instId));
+    MOCK_CONST_METHOD0(GetNoChargerPlugModeState, int());
+    MOCK_METHOD3(StoreWifiMacAddrPairInfo, bool(WifiMacAddrInfoType type, const std::string &realMacAddr,
+        const std::string &randomAddr));
+    MOCK_CONST_METHOD0(GetScanGenieState, int());
 
 private:
     WifiConfigCenter();

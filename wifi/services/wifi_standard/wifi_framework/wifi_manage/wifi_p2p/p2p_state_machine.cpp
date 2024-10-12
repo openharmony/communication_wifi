@@ -270,9 +270,9 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
             } else {
                 config.SetNetId(networkId);
                 return true;
-            } else {
-                config.SetNetId(networkId);
             }
+        } else {
+            config.SetNetId(networkId);
         }
     }
 

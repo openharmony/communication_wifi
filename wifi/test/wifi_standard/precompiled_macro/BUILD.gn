@@ -89,7 +89,7 @@ ohos_unittest("precompiled_macro_unittest") {
   ]
 
   deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_device_ability",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_hotspot_ability",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",

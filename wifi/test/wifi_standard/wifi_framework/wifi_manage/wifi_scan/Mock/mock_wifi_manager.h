@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Wifi {
-
 class MockWifiManager {
 public:
     virtual ~MockWifiManager() = default;

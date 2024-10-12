@@ -38,6 +38,9 @@ public:
     virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
 };
 
+
+
+
 class WifiSettings : public MockWifiSettings {
 public:
     static WifiSettings &GetInstance(void);

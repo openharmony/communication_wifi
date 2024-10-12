@@ -296,9 +296,6 @@ enum class FilterTag {
 };
 
 enum class TagType {
-    // The following is filter tag
-    NOT_P2P_ENHANCE_FREQ_AT_5G_FILTER_TAG,
-    // The following is the scorer tag
     HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG,
 };
  

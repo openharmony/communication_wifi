@@ -17,27 +17,9 @@
 
 #include <gmock/gmock.h>
 #include "iscan_service_callbacks.h"
-#include "wifi_sta_manager.h"
-#include "wifi_scan_manager.h"
-#include "wifi_toggler_manager.h"
-#include "wifi_hotspot_manager.h"
-#include "wifi_event_subscriber_manager.h"
-#include "wifi_app_state_aware.h"
-#include "wifi_multi_vap_manager.h"
-#include "wifi_p2p_manager.h"
 
 namespace OHOS {
 namespace Wifi {
-
-enum class WifiCloseServiceCode {
-    STA_SERVICE_CLOSE,
-    SCAN_SERVICE_CLOSE,
-    AP_SERVICE_CLOSE,
-    P2P_SERVICE_CLOSE,
-    SERVICE_THREAD_EXIT,
-    STA_MSG_OPENED,
-    STA_MSG_STOPED,
-};
 
 class MockWifiManager {
 public:
@@ -47,8 +29,6 @@ public:
     virtual void DealScanFinished(int state, int instId = 0) = 0;
     virtual void DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId = 0) = 0;
     virtual void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0) = 0;
-    virtual void PushServiceCloseMsg(WifiCloseServiceCode code, int instId = 0);
-    virtual void AutoStartEnhanceService(void) = 0;
 };
 
 class WifiManager : public MockWifiManager {
@@ -63,29 +43,10 @@ public:
     MOCK_METHOD2(DealScanFinished, void(int state, int));
     MOCK_METHOD2(DealScanInfoNotify, void(std::vector<InterScanInfo> &results, int));
     MOCK_METHOD2(DealStoreScanInfoEvent, void(std::vector<InterScanInfo> &results, int));
-    MOCK_METHOD2(PushServiceCloseMsg, void(WifiCloseServiceCode, int));
-    MOCK_METHOD0(AutoStartEnhanceService, void());
-    std::unique_ptr<WifiStaManager>& GetWifiStaManager();
-    std::unique_ptr<WifiScanManager>& GetWifiScanManager();
-    std::unique_ptr<WifiTogglerManager>& GetWifiTogglerManager();
-    std::unique_ptr<WifiHotspotManager>& GetWifiHotspotManager();
-    std::unique_ptr<WifiEventSubscriberManager>& GetWifiEventSubscriberManager();
-    std::unique_ptr<WifiMultiVapManager>& GetWifiMultiVapManager();
-    std::unique_ptr<WifiP2pManager>& GetWifiP2pManager();
-    int Init();
-    void Exit();
+
 private:
     IScanSerivceCallbacks mScanCallback;
     void InitScanCallback(void);
-    std::unique_ptr<WifiEventHandler> mCloseServiceThread = nullptr;
-    std::unique_ptr<WifiEventHandler> mStartServiceThread = nullptr;
-    std::unique_ptr<WifiStaManager> wifiStaManager = nullptr;
-    std::unique_ptr<WifiScanManager> wifiScanManager = nullptr;
-    std::unique_ptr<WifiTogglerManager> wifiTogglerManager = nullptr;
-    std::unique_ptr<WifiHotspotManager> wifiHotspotManager = nullptr;
-    std::unique_ptr<WifiEventSubscriberManager> wifiEventSubscriberManager = nullptr;
-    std::unique_ptr<WifiMultiVapManager> wifiMultiVapManager = nullptr;
-    std::unique_ptr<WifiP2pManager> wifiP2pManager = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

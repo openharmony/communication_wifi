@@ -36,7 +36,6 @@
 #include "arp_checker.h"
 #include "mac_address.h"
 
-
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
 
@@ -247,13 +246,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
          */
         int networkId = -1;
         /* Prepare to reinvoke as GC. */
-        if (config.GetNetId() >= 0) {
-            if (config.GetDeviceAddress() == groupManager.GetGroupOwnerAddr(config.GetNetId())) {
-                networkId = config.GetNetId();
-            }
-        } else {
-            networkId = groupManager.GetGroupNetworkId(device);
-        }
+        networkId = groupManager.GetGroupNetworkId(device);
         if (networkId < 0) {
             /**
              * Prepare to reinvoke as GO.
@@ -277,6 +270,8 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
             } else {
                 config.SetNetId(networkId);
                 return true;
+            } else {
+                config.SetNetId(networkId);
             }
         }
     }

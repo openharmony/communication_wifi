@@ -36,6 +36,7 @@
 #include "arp_checker.h"
 #include "mac_address.h"
 
+
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
 

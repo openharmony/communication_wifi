@@ -116,6 +116,7 @@ void P2pEnabledState::Init()
         [this](InternalMessagePtr msg) { return this->ProcessCmdConnectFailed(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DISCOVER_PEERS,
         [this](InternalMessagePtr msg) { return this->ProcessCmdDiscoverPeers(msg); }));
+    InitProcessMsg();
 }
 
 void P2pEnabledState::InitProcessMsg()

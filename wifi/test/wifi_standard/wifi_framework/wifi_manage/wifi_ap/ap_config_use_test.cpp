@@ -99,7 +99,7 @@ HWTEST_F(ApConfigUse_Test, GetBestChannelFor2GTest, TestSize.Level1)
     WIFI_LOGI("GetBestChannelFor2GTest enter");
     int channel = m_apConfigUse->GetBestChannelFor2G();
     WIFI_LOGI("GetBestChannelFor2GTest channel=%{public}d", channel);
-    EXPECT_FALSE(IsValid24GChannel(channel));
+    EXPECT_TRUE(IsValid24GChannel(channel));
 }
 
 HWTEST_F(ApConfigUse_Test, GetBestChannelFor5GTest, TestSize.Level1)
@@ -166,5 +166,6 @@ HWTEST_F(ApConfigUse_Test, JudgeDbacWithP2pTest, TestSize.Level1)
         .WillOnce(DoAll(Return(wifiP2pGroupInfo)));
     m_apConfigUse->JudgeDbacWithP2p(apConfig);
 }
+
 } // namespace Wifi
 } // namespace OHOS

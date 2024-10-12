@@ -61,6 +61,7 @@ HWTEST_F(WifiOpensslUtilsTest, OpensslAesEncryptTest1, TestSize.Level1)
     memcpy_s(info.iv, AES_IV_LEN, iv, AES_IV_LEN);
     EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesEncrypt(plainText, PLAIN_TEXT_LEN,
         &info, newCipherText, &cipherTextLen), 0);
+    EXPECT_EQ(cipherTextLen, CIPHER_TEXT_MAX_LEN);
     for (int i = 0; i < cipherTextLen; i++) {
         EXPECT_EQ(newCipherText[i], cipherText[i]);
     }

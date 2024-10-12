@@ -131,6 +131,11 @@ public:
         LOGI("Mock OnWpaStateChangedTest!");
     }
 
+    static void OnSsidWrongkeyTest()
+    {
+        LOGI("Mock OnSsidWrongkeyTest!");
+    }
+
     static void OnWpsOverlapTest(int status)
     {
         LOGI("Mock OnWpsOverlapTest!");
@@ -157,6 +162,7 @@ public:
         callback.onConnectChanged = OnConnectChangedTest;
         callback.onBssidChanged = OnBssidChangedTest;
         callback.onWpaStateChanged = OnWpaStateChangedTest;
+        callback.onSsidWrongkey = OnSsidWrongkeyTest;
         callback.onWpsOverlap = OnWpsOverlapTest;
         callback.onWpsTimeOut = OnWpsTimeOutTest;
         callback.onWpsConnectionFull = OnWpsConnectionFullTest;
@@ -344,7 +350,7 @@ HWTEST_F(IWifiTest, NotifyClearTest, TestSize.Level1)
 HWTEST_F(IWifiTest, OnTransactTest1, TestSize.Level1)
 {
     char test[] = "102\t100\t101\t";
-    EXPECT_FALSE(OnTransact(nullptr) == -1);
+    EXPECT_TRUE(OnTransact(nullptr) == -1);
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;

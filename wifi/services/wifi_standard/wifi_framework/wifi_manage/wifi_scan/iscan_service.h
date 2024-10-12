@@ -123,6 +123,13 @@ public:
      */
     virtual ErrCode OnControlStrategyChanged() = 0;
     /**
+     * @Description Auto connect state change.
+     *
+     * @param success auto connect state[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnAutoConnectStateChanged(bool success) = 0;
+    /**
      * @Description Registers the callback function of the scanning module to the interface service.
      *
      * @param scanSerivceCallbacks callback function

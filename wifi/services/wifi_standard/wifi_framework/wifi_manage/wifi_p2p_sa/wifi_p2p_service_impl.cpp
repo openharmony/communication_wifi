@@ -35,9 +35,6 @@
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
 
-#define SOFT_BUS_SERVICE_UID 1024
-#define CAST_ENGINE_SERVICE_UID 5526
-
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 
 namespace OHOS {
@@ -1390,7 +1387,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    WifiConfigCenter::GetInstance().SetHid2dUpperScene(ifName, scene);
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(callingUid, scene);
     return pService->Hid2dSetUpperScene(ifName, scene);
 }
 

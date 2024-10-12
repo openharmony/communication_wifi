@@ -30,6 +30,7 @@ namespace Wifi {
 #ifdef HAS_POWERMGR_PART
 const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_MANAGER_STATE_CHANGED";
 #endif
+const int CAST_ENGINE_SA_ID = 65546;
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -87,6 +88,7 @@ private:
     void HandleHasMovementPartChange(int systemAbilityId, bool add);
 #endif
     void HandleDistributedKvDataServiceChange(bool add);
+    void HandleCastServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void GetCloneDataByDatashare(std::string &cloneData);
     void SetCloneDataByDatashare(const std::string &cloneData);

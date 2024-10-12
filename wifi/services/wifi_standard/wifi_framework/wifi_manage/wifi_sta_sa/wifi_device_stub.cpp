@@ -1274,7 +1274,7 @@ void WifiDeviceStub::OnSetDpiMarkRule(uint32_t code, MessageParcel &data, Messag
         std::string ifaceName = readStr;
         ret = SetDpiMarkRule(ifaceName, uid, protocol, enable);
     }
-    reply.WriteInt32(0)；
+    reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;
 }

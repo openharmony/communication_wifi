@@ -60,6 +60,7 @@ int WifiPermissionHelper::VerifySameProcessPermission(const int &pid, const int 
         return PERMISSION_GRANTED;
     }
     return PERMISSION_DENIED;
+#endif
 }
 
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)

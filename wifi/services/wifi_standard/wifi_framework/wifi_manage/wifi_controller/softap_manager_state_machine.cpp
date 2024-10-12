@@ -169,7 +169,7 @@ bool SoftapManagerMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg)
 void SoftapManagerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr msg)
 {
     mid = msg->GetParam2();
-    ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartApService(mid);
+    ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartApService(mid, pSoftapManagerMachine->ifaceName);
     if (ret != WIFI_OPT_SUCCESS) {
         pSoftapManagerMachine->mcb.onStartFailure(mid);
         return;

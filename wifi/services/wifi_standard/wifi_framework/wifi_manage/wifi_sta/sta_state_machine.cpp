@@ -108,6 +108,13 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
+const std::map<int, int> wpa3FailreasonMap {
+    {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
+};
+
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       lastNetworkId(INVALID_NETWORK_ID),
@@ -3381,6 +3388,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
+#ifndef OHOS_ARCH_LITE
+        SyncDeviceEverConnectedState(false);
+#endif
         if (!mIsWifiInternetCHRFlag &&
             (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL) &&
             WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered()) {
@@ -3392,8 +3402,37 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
+#ifndef OHOS_ARCH_LITE
+    SyncDeviceEverConnectedState(true);
+#endif
     portalFlag = true;
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    std::map<std::string, std::string> variableMap;
+    std::string settings;
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("SETTINGS") != variableMap.end()) {
+        settings = variableMap["SETTINGS"];
+    }
+    if (!WifiSettings::GetInstance().GetDeviceEverConnected(networkId)) {
+        if (!hasNet) {
+            /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
+            WifiNotificationUtil::GetInstance().ShowSettingsDialog(WifiDialogType::CDD, settings);
+        }
+        WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
+        WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
+}
+#endif
 
 void StaStateMachine::HandleArpCheckResult(StaArpState arpState)
 {
@@ -3416,6 +3455,9 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function.");
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
+#ifndef OHOS_ARCH_LITE
+    CheckIfRestoreWifi();
+#endif
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
         pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);
@@ -3499,6 +3541,19 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 
     return ret;
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::LinkedState::CheckIfRestoreWifi()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    if (WifiSettings::GetInstance().GetAcceptUnvalidated(networkId)) {
+        WIFI_LOGI("The user has chosen to use the current WiFi.");
+        WifiNetAgent::GetInstance().RestoreWifiConnection();
+    }
+}
+#endif
 
 void StaStateMachine::DealApRoamingStateTimeout(InternalMessagePtr msg)
 {

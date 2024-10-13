@@ -36,6 +36,7 @@ namespace Wifi {
 using namespace NetManagerStandard;
 
 #define INVALID_SUPPLIER_ID 0
+#define ACCEPT_UNVALIDATED 7
 
 WifiNetAgent &WifiNetAgent::GetInstance()
 {
@@ -461,6 +462,14 @@ void WifiNetAgent::NetConnCallback::LogNetCaps(
     }
     logStr += logStrEnd;
     WIFI_LOGD("%{public}s", logStr.c_str());
+}
+
+void WifiNetAgent::RestoreWifiConnection()
+{
+    using NetManagerStandard::NetBearType;
+    int32_t result = NetConnClient::GetInstance().UpdateSupplierScore(NetBearType::BEARER_WIFI,
+        ACCEPT_UNVALIDATED, supplierId);
+    WIFI_LOGI("Restore Wifi Connection, result:%{public}d", result);
 }
 }
 }

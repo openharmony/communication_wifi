@@ -763,7 +763,7 @@ bool ScanService::StoreFullScanInfo(
         if (mEnhanceService != nullptr) {
             iter->supportedWifiCategory = mEnhanceService->GetWifiCategory(iter->infoElems,
                 chipsetCategory, chipsetFeatrureCapability);
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordWifiCategory(
+            WifiConfigCenter::GetInstance().RecordWifiCategory(
                 iter->bssid, iter->supportedWifiCategory);
             WIFI_LOGD("GetWifiCategory supportedWifiCategory=%{public}d.\n",
                 static_cast<int>(iter->supportedWifiCategory));

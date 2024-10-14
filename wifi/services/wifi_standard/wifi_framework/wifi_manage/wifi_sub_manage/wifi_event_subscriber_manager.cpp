@@ -78,6 +78,7 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     CesEventSubscriber::OnReceiveThermalEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
+    {EVENT_SETTINGS_WLAN_KEEP_CONNECTED, &CesEventSubscriber::OnReceiveWlanKeepConnected},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED, &
     CesEventSubscriber::OnReceiveUserUnlockedEvent}
 };

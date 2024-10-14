@@ -46,6 +46,7 @@ public:
     void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;

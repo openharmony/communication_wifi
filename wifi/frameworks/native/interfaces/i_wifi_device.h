@@ -541,6 +541,15 @@ public:
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceService");
 #endif
+
+    /**
+     * @Description Get single device config
+     *
+     * @param networkId - the network id of the device config
+     * @param config - Get result vector of WifiDeviceConfig
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -3478,6 +3478,9 @@ void StaStateMachine::LinkedState::GoInState()
         pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
     }
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    WifiAssetManager::GetInstance().WifiAssetTriggerSync();
+#endif
     return;
 }
 

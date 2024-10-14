@@ -41,6 +41,7 @@ void WifiScanConfig::GetScanDeviceInfo(WifiScanDeviceInfo &scanDeviceInfo)
     mScanDeviceInfo.appId = GetCallingUid();
 #endif
     mScanDeviceInfo.hid2dInfo.p2pConnectState = linkedInfo.GetConnectState();
+    mScanDeviceInfo.hid2dInfo.p2pEnhanceState = WifiConfigCenter::GetInstance().GetP2pEnhanceState();
     mScanDeviceInfo.idelState = WifiConfigCenter::GetInstance().GetPowerIdelState();
     mScanDeviceInfo.thermalLevel = WifiConfigCenter::GetInstance().GetThermalLevel();
     mScanDeviceInfo.screenState = WifiConfigCenter::GetInstance().GetScreenState();
@@ -48,9 +49,10 @@ void WifiScanConfig::GetScanDeviceInfo(WifiScanDeviceInfo &scanDeviceInfo)
     mScanDeviceInfo.gnssFixState = WifiConfigCenter::GetInstance().GetGnssFixState();
     mScanDeviceInfo.freezeState = WifiConfigCenter::GetInstance().GetFreezeModeState();
 
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(
-        mScanDeviceInfo.hid2dInfo.upperIfName, mScanDeviceInfo.hid2dInfo.upperScene);
-    WifiConfigCenter::GetInstance().GetP2pBusinessType(mScanDeviceInfo.hid2dInfo.p2pBusinessType);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID,
+        mScanDeviceInfo.hid2dInfo.softBusScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID,
+        mScanDeviceInfo.hid2dInfo.castScene);
     scanDeviceInfo = mScanDeviceInfo;
 }
 

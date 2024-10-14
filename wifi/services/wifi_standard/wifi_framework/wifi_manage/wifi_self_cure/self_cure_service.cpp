@@ -185,7 +185,8 @@ void SelfCureService::P2pEnhanceStateChange(const std::string &ifName, int32_t s
             WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
             return;
         }
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_P2P_ENHANCE_STATE_CHANGED, p2pEnhanceState);
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_P2P_ENHANCE_STATE_CHANGED, 0, state);
+        WifiConfigCenter::GetInstance().SetP2pEnhanceState(p2pEnhanceState);
     }
 }
 } //namespace Wifi

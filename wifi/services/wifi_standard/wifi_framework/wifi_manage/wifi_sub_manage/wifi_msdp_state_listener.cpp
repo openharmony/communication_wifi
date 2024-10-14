@@ -23,6 +23,18 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiMsdpStateListener");
 
+DeviceMovementCallback::DeviceMovementCallback()
+{
+    movementChangeEventHandler = std::make_unique<WifiEventHandler>("WIFI_MOVEMENT_STATE_AWARE_THREAD");
+}
+
+DeviceMovementCallback::~DeviceMovementCallback()
+{
+    if (movementChangeEventHandler) {
+        movementChangeEventHandler.reset();
+    }
+}
+
 void DeviceMovementCallback::OnMovementChanged(const Msdp::MovementDataUtils::MovementData &movementData)
 {
     WIFI_LOGI("enter DeviceMovementCallback::OnMovementChanged type=%{public}d, value=%{public}d",
@@ -34,16 +46,30 @@ void DeviceMovementCallback::OnMovementChanged(const Msdp::MovementDataUtils::Mo
             WifiConfigCenter::GetInstance().SetFreezeModeState(MODE_STATE_CLOSE);
         }
     }
-    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-        IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
-        if (pScanService == nullptr) {
-            WIFI_LOGE("scan service is NOT start!");
-            return;
-        }
-        if (pScanService->OnMovingFreezeStateChange() != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("OnMovingFreezeStateChange failed");
-        }
+    if (movementData.type == Msdp::MovementDataUtils::MovementType::TYPE_STAY) {
+        HandleMovementChange();
     }
+}
+
+void DeviceMovementCallback::HandleMovementChange()
+{
+    WIFI_LOGI("HandleMovementChange enter");
+    if (!movementChangeEventHandler) {
+        WIFI_LOGE("%{public}s movementChangeEventHandler is null", __func__);
+        return;
+    }
+    movementChangeEventHandler->PostAsyncTask([this]() {
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
+            if (pScanService == nullptr) {
+                WIFI_LOGE("scan service is NOT start!");
+                return;
+            }
+            if (pScanService->OnMovingFreezeStateChange() != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("OnMovingFreezeStateChange failed");
+            }
+        }
+    });
 }
 } // namespace Wifi
 } // namespace OHOS

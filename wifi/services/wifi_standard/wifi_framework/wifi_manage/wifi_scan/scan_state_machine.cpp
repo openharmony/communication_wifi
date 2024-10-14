@@ -219,16 +219,6 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             pScanStateMachine->StopPnoScanHardware();
             return true;
 
-        case HARDWARE_LOAD_EVENT:
-            pScanStateMachine->SwitchState(pScanStateMachine->hardwareReadyState);
-            pScanStateMachine->ReportStatusChange(SCAN_STARTED_STATUS);
-            return true;
-
-        case HARDWARE_UNLOAD_EVENT:
-            pScanStateMachine->SwitchState(pScanStateMachine->initState);
-            pScanStateMachine->quitFlag = true;
-            return true;
-
         case CMD_STOP_COMMON_SCAN:
         case SCAN_RESULT_EVENT:
         case PNO_SCAN_RESULT_EVENT:
@@ -238,6 +228,7 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
         case SYSTEM_SCAN_TIMER:
         case DISCONNECTED_SCAN_TIMER:
         case RESTART_PNO_SCAN_TIMER:
+        case RESTART_SYSTEM_SCAN_TIMER:
             pScanStateMachine->ReportScanInnerEvent((ScanInnerEventType)msg->GetMessageName());
             return true;
         case SCAN_UPDATE_COUNTRY_CODE:

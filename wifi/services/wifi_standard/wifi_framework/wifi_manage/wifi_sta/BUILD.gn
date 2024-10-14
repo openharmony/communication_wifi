@@ -21,6 +21,7 @@ if (defined(ohos_lite)) {
 
 local_base_sources = [
   "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
+  "network_select/external_wifi_common_builder_manager.cpp",
   "network_select/external_wifi_filter_builder_manager.cpp",
   "network_select/network_selection_manager.cpp",
   "network_select/network_selection_utils.cpp",

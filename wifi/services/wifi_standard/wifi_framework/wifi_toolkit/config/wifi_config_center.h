@@ -311,6 +311,8 @@ public:
 
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
 
+    std::set<int> GetAllWifiLinkedNetworkId();
+
 private:
     WifiConfigCenter();
     bool HasWifiActive();

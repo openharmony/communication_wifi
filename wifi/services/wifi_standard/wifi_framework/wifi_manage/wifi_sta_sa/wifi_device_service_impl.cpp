@@ -2003,6 +2003,43 @@ ErrCode WifiDeviceServiceImpl::DeregisterFilterBuilder(const FilterTag &filterTa
     return pService->DeregisterFilterBuilder(filterTag, builderName);
 }
 
+ErrCode WifiDeviceServiceImpl::RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                                                     const CommonBuilder &commonBuilder)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("RegisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RegisterFilterBuilder:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->RegisterCommonBuilder(tagType, tagName, commonBuilder);
+}
+
+ErrCode WifiDeviceServiceImpl::DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("DeregisterFilterBuilder:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DeregisterFilterBuilder:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->DeregisterCommonBuilder(tagType, tagName);
+}
+
 ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
 {
     WIFI_LOGI("Enter SetSatelliteState");

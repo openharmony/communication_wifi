@@ -258,5 +258,11 @@ HWTEST_F(WifiNetAgentTest, GetSupplierId001, TestSize.Level1)
     uint32_t tmpSupplierId = wifiNetAgent.GetSupplierId();
     EXPECT_EQ(tmpSupplierId, 0);
 }
+
+HWTEST_F(WifiNetAgentTest, RestoreWifiConnectionTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    wifiNetAgent.RestoreWifiConnection();
+}
 }
 }

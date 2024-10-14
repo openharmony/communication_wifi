@@ -1267,13 +1267,13 @@ static void ProxyConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDev
 
 static void UpdateSecurityTypeAndPreSharedKey(WifiDeviceConfig& cppConfig)
 {
-    if (cppConfig.keyMgmt != KEY_MGMT_NONE) {
-        return;
-    }
-    for (int i = 0; i != WEPKEYS_SIZE; ++i) {
-        if (!cppConfig.wepKeys[i].empty() && cppConfig.wepTxKeyIndex == i) {
-            cppConfig.keyMgmt = KEY_MGMT_WEP;
-            cppConfig.preSharedKey = cppConfig.wepKeys[i];
+    if (cppConfig.keyMgmt == KEY_MGMT_NONE || cppConfig.keyMgmt == KEY_MGMT_WEP) {
+        WIFI_LOGD("%{public}s get psk!", __FUNCTION__);
+        for (int i = 0; i != WEPKEYS_SIZE; ++i) {
+            if (!cppConfig.wepKeys[i].empty() && cppConfig.wepTxKeyIndex == i) {
+                cppConfig.keyMgmt = KEY_MGMT_WEP;
+                cppConfig.preSharedKey = cppConfig.wepKeys[i];
+            }
         }
     }
 }

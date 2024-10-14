@@ -18,7 +18,6 @@
 #include "mock_wifi_config_center.h"
 #include "Mock/mock_wifi_settings.h"
 #include "Mock/mock_scan_state_machine.h"
-#include "Mock/mock_wifi_scan_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -96,7 +95,6 @@ public:
     {
         int staScene = 0;
         StoreScanConfig cfg;
-        cfg.externFlag = true;
         pScanService->scanConfigMap.emplace(staScene, cfg);
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
         ScanForbidMode forbidMode;

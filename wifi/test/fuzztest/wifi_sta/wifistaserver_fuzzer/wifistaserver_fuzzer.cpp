@@ -26,7 +26,6 @@
 #include "wifi_log.h"
 #include "sta_interface.h"
 #include "sta_auto_connect_service.h"
-#include "wifi_config_center.h"
 #include "wifi_settings.h"
 #include "sta_service.h"
 #include "wifi_internal_msg.h"

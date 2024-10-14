@@ -35,7 +35,7 @@ public:
 
     int Init();
 
-    static bool IsSystemAppByToken();
+    static bool IsSystemAccess();
 
     static bool IsNativeProcess();
 

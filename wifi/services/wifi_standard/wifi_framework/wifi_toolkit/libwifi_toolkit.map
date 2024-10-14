@@ -68,6 +68,7 @@
         "*GetRandomMacAddr*";
         "*GetSignalLevel*";
         "*GetLinkedInfo*";
+        "*DoArpCheck*";
    extern "C++" {
         "OHOS::Wifi::WifiCodeConvertUtil::IsUtf8(const std::string&)";
         "OHOS::Wifi::WifiCodeConvertUtil::GbkToUtf8(const std::string&)";
@@ -76,8 +77,6 @@
         "OHOS::Wifi::ArpChecker::Stop()";
         "OHOS::Wifi::ArpChecker::~ArpChecker()";
         "OHOS::Wifi::ArpChecker::ArpChecker()";
-        "OHOS::Wifi::ArpChecker::DoArpCheck(int, bool)";
-        "OHOS::Wifi::ArpChecker::DoArpCheck(int, bool, unsigned long&)";
         "OHOS::Wifi::WifiConfigCenter::GetInstance()";
         "OHOS::Wifi::WifiConfigCenter::Init()";
         "OHOS::Wifi::WifiConfigCenter::SetWifiSelfcureReset(bool)";

@@ -41,7 +41,7 @@ struct ScanConfig {
                                                  */
     int backScanPeriod;                         /* Scan interval for background scan */
     bool fullScanFlag;                          /* Flag indicating whether the request is full scan */
-    bool externFlag;                            /* Flag indicating whether the request is an external scan */
+    ScanType scanType;                          /* Flag indicating whether the request is an external scan */
     bool scanningWithParamFlag;                 /* Flag Indicating whether scanning with parameter */
     std::string ssid;                           /* The network name */
     std::string bssid;                          /* The address of the access point */
@@ -52,7 +52,7 @@ struct ScanConfig {
         scanBand = SCAN_BAND_UNSPECIFIED;
         backScanPeriod = 0;
         fullScanFlag = false;
-        externFlag = false;
+        scanType = ScanType::SCAN_TYPE_SYSTEMTIMER;
         scanningWithParamFlag = false;
         scanStyle = 0xFF;
     }
@@ -92,13 +92,13 @@ struct StoreScanConfig {
     std::vector<int> scanFreqs; /* Only APs with specified frequencies are scanned. */
     int64_t scanTime;           /* Scan Start Time */
     bool fullScanFlag;          /* Flag of scan without specifying parameters */
-    bool externFlag;            /* Flag indicating whether the request is an external scan. */
+    ScanType scanType;            /* Flag indicating whether the request is an external scan. */
     bool scanningWithParamFlag; /* Flag Indicating whether scanning with parameter */
     StoreScanConfig()
     {
         scanTime = 0;
         fullScanFlag = false;
-        externFlag = false;
+        scanType = ScanType::SCAN_TYPE_SYSTEMTIMER;
         scanningWithParamFlag = false;
     }
 };
@@ -152,6 +152,7 @@ enum ScanInnerEventType {
     SYSTEM_SCAN_TIMER = 200,       /* Automatic scanning */
     DISCONNECTED_SCAN_TIMER = 201, /* Automatic scanning in disconnected state */
     RESTART_PNO_SCAN_TIMER = 202,  /* Restart after PNO scanning fails */
+    RESTART_SYSTEM_SCAN_TIMER = 203,
     SCAN_INNER_EVENT_INVALID       /* Invalid value */
 };
 

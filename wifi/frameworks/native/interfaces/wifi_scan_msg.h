@@ -88,6 +88,13 @@ enum class WifiCategory {
     WIFI6_PLUS = 3
 };
 
+enum class ScanType {
+    SCAN_TYPE_EXTERN = 0,
+    SCAN_TYPE_NATIVE_EXTERN,
+    SCAN_TYPE_SYSTEMTIMER,
+    SCAN_TYPE_PNO,
+};
+
 enum ScanBandType {
     SCAN_BAND_UNSPECIFIED = 0,    /* not specified */
     SCAN_BAND_24_GHZ = 1,         /* 2.4 GHz band */

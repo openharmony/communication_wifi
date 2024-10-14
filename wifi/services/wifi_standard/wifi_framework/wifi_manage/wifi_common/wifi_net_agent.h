@@ -77,6 +77,13 @@ public:
         int instId = 0);
 
     /**
+     * Restart the Wi-Fi connection.
+     *
+     * @param
+     */
+    void RestoreWifiConnection();
+ 
+    /**
      * Add route
      *
      * @param interface interface name

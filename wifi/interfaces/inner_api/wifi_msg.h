@@ -658,6 +658,8 @@ struct WifiDeviceConfig {
     int isReassocSelfCureWithFactoryMacAddress;
     int version;
     bool randomizedMacSuccessEver;
+    bool everConnected;
+    bool acceptUnvalidated;
     WifiWapiConfig wifiWapiConfig;
     IpInfo lastDhcpResult;
     bool isShared;
@@ -696,6 +698,8 @@ struct WifiDeviceConfig {
         version = -1;
         randomizedMacSuccessEver = false;
         isShared = false;
+        everConnected = false;
+        acceptUnvalidated = false;
     }
 };
 

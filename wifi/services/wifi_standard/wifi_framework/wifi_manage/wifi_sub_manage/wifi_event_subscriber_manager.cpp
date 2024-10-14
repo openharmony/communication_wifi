@@ -27,6 +27,7 @@
 #include "wifi_common_util.h"
 #include "wifi_notification_util.h"
 #include "wifi_app_state_aware.h"
+#include "wifi_net_agent.h"
 #ifdef HAS_MOVEMENT_PART
 #include "wifi_msdp_state_listener.h"
 #endif
@@ -50,6 +51,7 @@ const std::string SUPPORT_COEXCHIP = "";
 const std::string COEX_IFACENAME = "wlan1";
 const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
+const std::string EVENT_SETTINGS_WLAN_KEEP_CONNECTED = "event.settings.wlan.keep_connected";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
@@ -73,7 +75,8 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED, &
     CesEventSubscriber::OnReceiveThermalEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
-    CesEventSubscriber::OnReceiveStandbyEvent}
+    CesEventSubscriber::OnReceiveStandbyEvent},
+    {EVENT_SETTINGS_WLAN_KEEP_CONNECTED, &CesEventSubscriber::OnReceiveWlanKeepConnected}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -823,6 +826,22 @@ void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEvent
         WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
     } else {
         WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
+    }
+}
+
+void CesEventSubscriber::OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    const int code = eventData.GetCode();
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    WIFI_LOGI("received the WlanKeepConnected, action ==%{public}s, code == %{public}d", action.c_str(), code);
+    if (code == 1) { // The user clicks the use button.
+        WifiNetAgent::GetInstance().RestoreWifiConnection();
+        WIFI_LOGI("change the value of AcceptUnvalidated to true");
+        WifiSettings::GetInstance().SetAcceptUnvalidated(networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
     }
 }
 

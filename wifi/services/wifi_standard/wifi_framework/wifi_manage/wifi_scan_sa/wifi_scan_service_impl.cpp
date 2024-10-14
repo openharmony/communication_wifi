@@ -433,11 +433,12 @@ bool WifiScanServiceImpl::IsRemoteDied(void)
 void WifiScanServiceImpl::UpdateScanMode()
 {
     int uid = GetCallingUid();
-    if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
-        } else {
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
-        }
+    if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)
+        || GetBundleName() == WifiSettings::GetInstance().GetVariablePackageName("SETTINGS")) {
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
+    } else {
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
+    }
 }
 #endif
 }  // namespace Wifi

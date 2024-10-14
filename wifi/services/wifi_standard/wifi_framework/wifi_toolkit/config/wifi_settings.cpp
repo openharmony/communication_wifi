@@ -212,8 +212,8 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId && iter->second.instanceId == instId) {
-            config = iter->second;
-            SyncAfterDecryped(config);
+            SyncAfterDecryped(iter->second);
+            config =  iter->second;
             return 0;
         }
     }
@@ -231,16 +231,16 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
     if (indexType == DEVICE_CONFIG_INDEX_SSID) {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index && iter->second.instanceId == instId) {
-                config = iter->second;
-                SyncAfterDecryped(config);
+                SyncAfterDecryped(iter->second);
+                config =  iter->second;
                 return 0;
             }
         }
     } else {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index && iter->second.instanceId == instId) {
-                config = iter->second;
-                SyncAfterDecryped(config);
+                SyncAfterDecryped(iter->second);
+                config =  iter->second;
                 return 0;
             }
         }
@@ -261,8 +261,8 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
                 && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
-                config = iter->second;
-                SyncAfterDecryped(config);
+                SyncAfterDecryped(iter->second);
+                config =  iter->second;
                 return 0;
             }
         }
@@ -270,8 +270,8 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
                 && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
-                config = iter->second;
-                SyncAfterDecryped(config);
+                SyncAfterDecryped(iter->second);
+                config =  iter->second;
                 return 0;
             }
         }
@@ -829,6 +829,12 @@ int WifiSettings::SyncHotspotConfig()
 int WifiSettings::SetHotspotConfig(const HotspotConfig &config, int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);
+    if (config.GetPreSharedKey() != mHotspotConfig[id].GetPreSharedKey()) {
+        LOGI("Hotspot preShareKey changed to %{public}s", SsidAnonymize(config.GetPreSharedKey()).c_str());
+    }
+    if (config.GetSsid() != mHotspotConfig[id].GetSsid()) {
+        LOGI("Hotspot ssid changed to %{public}s", SsidAnonymize(config.GetSsid()).c_str());
+    }
     mHotspotConfig[id] = config;
     return 0;
 }
@@ -1492,6 +1498,15 @@ int WifiSettings::GetVariableMap(std::map<std::string, std::string> &variableMap
     return 0;
 }
 
+std::string WifiSettings::GetVariablePackageName(std::string tag)
+{
+    std::unique_lock<std::mutex> lock(mVariableConfMutex);
+    if (mVariableMap.find(tag) != mVariableMap.end()) {
+        return mVariableMap[tag];
+    }
+    return "";
+}
+
 void WifiSettings::InitVariableConfig()
 {
     if (mVariableConf.LoadConfig() >= 0) {
@@ -1735,6 +1750,7 @@ void WifiSettings::MergeWifiConfig()
 
 void WifiSettings::MergeSoftapConfig()
 {
+    LOGI("Enter mergeSoftapConfig");
     std::filesystem::path wifiPathNmae = WIFI_CONFIG_FILE_PATH;
     std::filesystem::path hostapdPathName = HOTSPOT_CONFIG_FILE_PATH;
     std::filesystem::path dualApPathName = DUAL_SOFTAP_CONFIG_FILE_PATH;

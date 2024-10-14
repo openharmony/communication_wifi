@@ -123,6 +123,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnGetDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_DPI_MARK_RULE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetDpiMarkRule(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -572,6 +574,12 @@ void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, MessageParcel &data, Messa
 void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
 {
     WIFI_LOGI("WifiDeviceStub SendDeviceConfig");
+    std::vector<uint32_t> allSize;
+    if (contentSize == 0) {
+        reply.WriteInt32(WIFI_OPT_SUCCESS);
+        reply.WriteUInt32Vector(allSize);
+        return;
+    }
     std::string name = "deviceconfigs";
     int32_t ashmemSize = contentSize * sizeof(WifiDeviceConfig);
     sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), ashmemSize);
@@ -584,11 +592,10 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
         return;
     }
     int offset = 0;
-    std::vector<uint32_t> allSize;
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
         WriteWifiDeviceConfig(outParcel, result[i]);
-        int dataSize = outParcel.GetDataSize();
+        int dataSize = static_cast<int>(outParcel.GetDataSize());
         if (offset + dataSize > ashmemSize) {
             break;
         }
@@ -603,6 +610,7 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
     ashmem->CloseAshmem();
 }
 
+constexpr uint32_t MAX_DEVICE_CONFIG_SIZE = 1024;
 void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -615,7 +623,10 @@ void WifiDeviceStub::OnGetDeviceConfigs(uint32_t code, MessageParcel &data, Mess
         reply.WriteInt32(ret);
         return;
     }
-    unsigned int size = result.size();
+    uint32_t size = result.size();
+    if (size > MAX_DEVICE_CONFIG_SIZE) {
+        size = MAX_DEVICE_CONFIG_SIZE;
+    }
     SendDeviceConfig(size, result, reply);
     return;
 }
@@ -1255,6 +1266,25 @@ void WifiDeviceStub::OnGetDeviceConfig(uint32_t code, MessageParcel &data, Messa
         return;
     }
     WriteWifiDeviceConfig(reply, config);
+    return;
+}
+
+void WifiDeviceStub::OnSetDpiMarkRule(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
+    const char *readStr = data.ReadCString();
+    int uid = data.ReadInt32();
+    int protocol = data.ReadInt32();
+    int enable = data.ReadInt32();
+    if (readStr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        std::string ifaceName = readStr;
+        ret = SetDpiMarkRule(ifaceName, uid, protocol, enable);
+    }
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 

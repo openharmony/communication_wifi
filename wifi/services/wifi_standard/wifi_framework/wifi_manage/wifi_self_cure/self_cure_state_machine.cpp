@@ -713,6 +713,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(I
     }
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset() ||
         pSelfCureStateMachine->connectNetworkRetryCnt > CONNECT_NETWORK_RETRY) {
+        WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
         return;
     }
     pSelfCureStateMachine->connectNetworkRetryCnt++;
@@ -1245,6 +1246,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
         GetPublicDnsServers(publicDnsServers);
         UpdateDnsServers(publicDnsServers);
     }
+    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::DNS_ABNORMAL));
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, DNS_UPDATE_CONFIRM_DELAYED_MS);
 }
 

@@ -399,6 +399,7 @@ int RpcSetAssocMacAddr(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
+    mac = NULL;
     return HAL_SUCCESS;
 }
 
@@ -418,6 +419,7 @@ int RpcSetScanningMacAddress(RpcServer *server, Context *context)
     }
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
+        mac = NULL;
         return HAL_FAILURE;
     }
     WifiErrorNo err = SetScanningMacAddress(mac, maxSize);
@@ -425,6 +427,7 @@ int RpcSetScanningMacAddress(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
+    mac = NULL;
     return HAL_SUCCESS;
 }
 
@@ -444,6 +447,7 @@ int RpcDeauthLastRoamingBssid(RpcServer *server, Context *context)
     }
     if (ReadUStr(context, mac, len) != 0) {
         free(mac);
+        mac = NULL;
         return HAL_FAILURE;
     }
     WifiErrorNo err = DeauthLastRoamingBssid(mac, maxSize);
@@ -451,6 +455,7 @@ int RpcDeauthLastRoamingBssid(RpcServer *server, Context *context)
     WriteInt(context, err);
     WriteEnd(context);
     free(mac);
+    mac = NULL;
     return HAL_SUCCESS;
 }
 
@@ -488,6 +493,7 @@ int RpcRunCmd(RpcServer *server, Context *context)
         }
         if (ReadStr(context, pIfName, len) != 0) {
             free(pIfName);
+            pIfName = NULL;
             return HAL_FAILURE;
         }
     }

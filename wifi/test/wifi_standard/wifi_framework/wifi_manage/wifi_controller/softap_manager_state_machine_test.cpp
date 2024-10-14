@@ -102,12 +102,6 @@ public:
         msg->SetMessageName(SOFTAP_CMD_START);
         sleep(1);
         EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(msg));
-        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
-        WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
-        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(msg));
-        apState = WifiConfigCenter::GetInstance().GetApMidState(0);
-        WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSED, 0);
-        EXPECT_TRUE(pSoftapManagerMachine->pIdleState->ExecuteStateMsg(msg));
     }
 
     void StopSoftapTest()

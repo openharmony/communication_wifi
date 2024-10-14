@@ -107,6 +107,8 @@ constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
 constexpr int DHCP_LEASE_EXPIRED = 6;
 
+constexpr unsigned int BIT_MLO_CONNECT = 0x80;
+
 #define DNS_IP_ADDR_LEN 15
 #define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
 #define WIFI_SECOND_DNS_NAME "const.wifi.wifi_second_dns"
@@ -1259,6 +1261,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void UpdateWifiCategory();
+    void SetSupportedWifiCategory();
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;

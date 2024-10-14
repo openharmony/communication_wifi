@@ -1597,7 +1597,7 @@ int32_t ChipIfaceCallback::OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c
     return 0;
 }
 
-int32_t ChipIfaceCallback::OnWifiNetlinkMessage(const std::vector<uint8_t>& recvMsg)
+int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector<uint8_t>& recvMsg)
 {
     return 0;
 }

@@ -24,6 +24,7 @@ inline const std::string COMMON_EVENT_WIFI_POWER_STATE = "usual.event.wifi.POWER
 inline const std::string COMMON_EVENT_WIFI2_POWER_STATE = "usual.event.wifi.WIFI2_POWER_STATE";
 inline const std::string COMMON_EVENT_WIFI_SCAN_FINISHED = "usual.event.wifi.SCAN_FINISHED";
 inline const std::string COMMON_EVENT_WIFI_SCAN_STATE = "usual.event.wifi.SCAN_STATE";
+inline const std::string COMMON_EVENT_WIFI_SEMI_STATE = "usual.event.wifi.SEMI_STATE";
 inline const std::string COMMON_EVENT_WIFI_RSSI_VALUE = "usual.event.wifi.RSSI_VALUE";
 inline const std::string COMMON_EVENT_WITAS_RSSI_VALUE = "usual.event.wifi.WITAS_RSSI_VALUE";
 inline const std::string COMMON_EVENT_WIFI_CONN_STATE = "usual.event.wifi.CONN_STATE";
@@ -43,6 +44,8 @@ inline const std::string COMMON_EVENT_WIFI_P2P_CURRENT_DEVICE_STATE_CHANGED =
 inline const std::string COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED = "usual.event.wifi.p2p.GROUP_STATE_CHANGED";
 inline const std::string COMMON_EVENT_WIFI_SELF_CURE_STATE_CHANGED = "usual.event.wifi.selfcure.STATE_CHANGED";
 inline const std::string COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION = "ohos.permission.SET_WIFI_CONFIG";
+inline const std::string COMMON_EVENT_GET_WIFI_INFO_PERMISSION = "ohos.permission.GET_WIFI_INFO";
+inline const std::string COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION = "ohos.permission.MANAGE_WIFI_CONNECTION";
 
 class WifiCommonEventHelper {
 public:
@@ -58,6 +61,7 @@ public:
     static bool PublishWifi2PowerStateChangeEvent(const int &code, const std::string &data);
     static bool PublishScanFinishedEvent(const int &code, const std::string &data);
     static bool PublishScanStateChangedEvent(const int &code, const std::string &data);
+    static bool PublishWifiSemiStateChangedEvent(const int &code, const std::string &data);
     static bool PublishRssiValueChangedEvent(const std::string &pramKey, int paramValue,
         const int &code, const std::string &data);
     static bool PublishWiTasRssiValueChangedEvent(const int &code, const std::string &data);

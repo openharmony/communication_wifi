@@ -22,25 +22,24 @@ namespace OHOS {
 namespace Wifi {
 constexpr int MAX_ALIAS_LEN = 128;
 
-uint8_t WifiCertUtils::FreeData(uint8_t* pData)
-{
-    if (pData != NULL) {
-        free(pData);
-        pData = nullptr;
-    }
-    return -1;
-}
-
-int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std::string& pwd,
-    std::string& alias, std::string& uri)
+static bool CheckParamters(const std::vector<uint8_t>& certEntry, const std::string& pwd,
+    std::string& alias)
 {
     if (certEntry.size() == 0 || (pwd.size() + 1) > MAX_ALIAS_LEN ||
             (alias.size() + 1) > MAX_ALIAS_LEN) {
         LOGE("InstallCert, certEntry.size: %{public}zu, pwd.size: %{public}zu, alias.size: %{public}zu.",
             certEntry.size(), pwd.size(), alias.size());
+        return false;
+    }
+    return true;
+}
+
+int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std::string& pwd,
+    std::string& alias, std::string& uri)
+{
+    if (!CheckParamters(certEntry, pwd, alias)) {
         return -1;
     }
-
     struct CmBlob appCert;
     struct CmBlob appCertPwd;
     struct CmBlob certAlias;
@@ -54,15 +53,21 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
 
     if (memcpy_s(data, certEntry.size(), certEntry.data(), certEntry.size()) != EOK) {
         LOGE("memcpy_s certEntry.data() error.");
-        return FreeData(data);
+        free(data);
+        data = nullptr;
+        return -1;
     }
     if (memcpy_s(certPwdBuf, sizeof(certPwdBuf), pwd.c_str(), pwd.size()) != EOK) {
         LOGE("memcpy_s pwd.c_str() error.");
-        return FreeData(data);
+        free(data);
+        data = nullptr;
+        return -1;
     }
     if (memcpy_s(certAliasBuf, sizeof(certAliasBuf), alias.c_str(), alias.size()) != EOK) {
         LOGE("memcpy_s alias.c_str() error.");
-        return FreeData(data);
+        free(data);
+        data = nullptr;
+        return -1;
     }
 
     appCert.size = certEntry.size();

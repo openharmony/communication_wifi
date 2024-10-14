@@ -46,7 +46,9 @@ public:
     void SetSatelliteStartState(bool state);
     bool IsSatelliteStateStart();
 #endif
-
+    void StartWifiToggledTimer();
+    void StopWifiToggledTimer();
+    void OnWifiToggledTimeOut();
 private:
     void InitConcreteCallback(void);
     void InitSoftapCallback(void);

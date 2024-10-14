@@ -73,6 +73,8 @@ public:
 
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
+    ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
+
     ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
 
     ErrCode DisableDeviceConfig(int networkId) override;
@@ -202,7 +204,7 @@ private:
 #endif
     void ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result);
     void updateStaDeviceMacAddress(WifiDeviceConfig &config);
-
+    int ProcessPermissionVerify(const std::string &appId, const std::string &packageName);
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;
     static constexpr int MAX_HEX_LEN = 64;

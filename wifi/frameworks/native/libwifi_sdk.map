@@ -60,6 +60,7 @@
         GetSignalLevel;
         SetLowLatencyMode;
         SetLowTxPower;
+        SetDpiMarkRule;
         IsBandTypeSupported;
         Get5GHzChannelList;
         RegisterWifiEvent;
@@ -98,6 +99,7 @@
             OHOS::Wifi::WifiP2pCallbackStub::*;
             OHOS::Wifi::WifiScanCallbackStub::*;
             OHOS::Wifi::NetworkSelection::*;
+            "vtable for OHOS::Wifi::NetworkSelection::OrWifiFilter";
         };
     local:
         *;

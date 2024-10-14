@@ -99,7 +99,7 @@ static int GetInstId(const char *ifaceName)
 
 static WifiErrorNo RegisterEventCallback(const char *ifaceName)
 {
-    LOGI("RegisterEventCallback enter! ifaceName = %{puiblic}s", ifaceName);
+    LOGI("RegisterEventCallback enter! ifaceName = %{public}s", ifaceName);
     pthread_mutex_lock(GetWpaObjMutex());
     int instId = GetInstId(ifaceName);
     if (g_hdiWpaStaCallbackObj[instId] == NULL) {
@@ -136,7 +136,7 @@ static WifiErrorNo UnRegisterEventCallback(const char *ifaceName)
     }
     pthread_mutex_lock(GetWpaObjMutex());
     int instId = GetInstId(ifaceName);
-    LOGI("UnRegisterEventCallback enter! instId = %{puiblic}d", instId);
+    LOGI("UnRegisterEventCallback enter! instId = %{public}d", instId);
     if (g_hdiWpaStaCallbackObj[instId] != NULL) {
         struct IWpaInterface *wpaObj = GetWpaInterface();
         if (wpaObj == NULL) {
@@ -561,6 +561,7 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     unsigned char *resultBuff = (unsigned char *)calloc(resultBuffLen, sizeof(unsigned char));
     if (resultBuff == NULL) {
         free(results);
+        results = NULL;
         LOGE("HdiWpaStaGetScanInfos: calloc failed!");
         return NULL;
     }
@@ -568,7 +569,9 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
         free(results);
+        results = NULL;
         free(resultBuff);
+        resultBuff = NULL;
         LOGE("HdiWpaStaGetScanInfos: wpaObj is NULL");
         pthread_mutex_unlock(GetWpaObjMutex());
         return NULL;
@@ -577,7 +580,9 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     int32_t result = wpaObj->ScanResult(wpaObj, ifaceName, resultBuff, &resultBuffLen);
     if (result != HDF_SUCCESS) {
         free(results);
+        results = NULL;
         free(resultBuff);
+        resultBuff = NULL;
         LOGE("HdiWpaStaGetScanInfos: ScanResult failed result:%{public}d", result);
         pthread_mutex_unlock(GetWpaObjMutex());
         return NULL;

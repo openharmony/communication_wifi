@@ -38,7 +38,7 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr size_t MAP_SCAN_NUMS = 35;
+constexpr size_t MAP_SCAN_NUMS = 20;
 constexpr size_t MAP_P2P_NUMS = 50;
 constexpr size_t MAP_HOTSPOT_NUMS = 30;
 constexpr size_t MAP_DEVICE_NUMS = 60;
@@ -51,7 +51,6 @@ std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceSer
 std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotspotServiceImpl>();
 sptr<WifiP2pStub> pWifiP2pStub = WifiP2pServiceImpl::GetInstance();
 std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanServiceImpl>();
-
 
 bool DoSomethingScanStubTest(const uint8_t* data, size_t size)
 {

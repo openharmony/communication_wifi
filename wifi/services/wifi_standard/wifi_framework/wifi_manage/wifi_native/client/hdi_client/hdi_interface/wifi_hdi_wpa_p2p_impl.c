@@ -1025,7 +1025,7 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin, int size)
     uint8_t addr[ETH_ALEN];
     hwaddr_aton(info->peerDevAddr, addr);
     wpsParam.peerDevAddr = addr;
-    wpsParam.peerDevAddrLen = strlen(info->peerDevAddr);
+    wpsParam.peerDevAddrLen = ETH_ALEN;
     wpsParam.pin = (uint8_t *)info->pin;
     wpsParam.pinLen = HDI_PIN_LEN;
 

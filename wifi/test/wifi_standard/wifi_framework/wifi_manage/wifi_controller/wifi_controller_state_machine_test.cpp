@@ -117,7 +117,7 @@ public:
         msg->SetParam1(0);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
-        EXPECT_TRUE(pWifiControllerMachine->pDefaultState->ExecuteStateMsg(msg));
+        EXPECT_FALSE(pWifiControllerMachine->pDefaultState->ExecuteStateMsg(msg));
     }
 
     void HandleStaStartFail()
@@ -222,8 +222,8 @@ public:
         EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         msg->SetMessageName(INVILAD_MSG);
-        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        EXPECT_FALSE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+        EXPECT_FALSE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
     void ApStartFailureTest()

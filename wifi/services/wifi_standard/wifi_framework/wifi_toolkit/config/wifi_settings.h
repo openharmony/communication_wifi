@@ -271,7 +271,10 @@ public:
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs);
+    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+        const std::set<int> &wifiLinkedNetworkIds);
+
+    void UpLoadLocalDeviceConfigToCloud();
 #endif
 
 private:

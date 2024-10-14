@@ -79,6 +79,8 @@
         "*WifiCodeConvert*";
         "*CloudAssetSyn*";
         "*WifiAssetManager*GetInstance*";
+        "*InitUpLoadLocalDeviceSync*";
+        "*WifiAssetTriggerSync*";
     local:
         *;
 };

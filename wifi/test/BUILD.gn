@@ -17,7 +17,6 @@ group("unittest") {
   deps = []
 
   deps += [
-    
     "wifi_standard/ipc_framework/cRPC/unittest:crpc_unittest",
     "wifi_standard/native:native_unittest",
     "wifi_standard/non_mock:wifi_non_mock_unittest",

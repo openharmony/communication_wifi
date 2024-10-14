@@ -53,7 +53,6 @@ const int CMD_WIFI_CONNECT_TIMEOUT_SCREEN = 8 * 1000;
 const int CMD_WIFI_CONNECT_TIMEOUT = 16 * 1000;
 const int PUBLIC_DNS_SERVERS_SIZE = 46;
 const int PUBLIC_IP_ADDR_NUM = 4;
-const std::string SETTINGS_PAGE = "com.huawei.hmos.settings";
 const std::string INIT_SELFCURE_HISTORY = "0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
 const std::string COUNTRY_CHINA_CAPITAL = "CN";
 const std::string COUNTRY_CODE_CN = "460";
@@ -498,6 +497,9 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
     }
     if (!pSelfCureStateMachine->staticIpCureSuccess && msg->GetParam2() == 1) {
         if (hasInternetRecently || portalUnthenEver || pSelfCureStateMachine->internetUnknown) {
+            if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
+                return;
+            }
             pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
             TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
             return;
@@ -1154,7 +1156,7 @@ void SelfCureStateMachine::InternetSelfCureState::UpdateDnsServers(std::vector<s
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
 {
-    WIFI_LOGI("begin to SelfCureForDns");
+    WIFI_LOGI("begin to self cure for internet access: dns");
     pSelfCureStateMachine->selfCureOnGoing = true;
     testedSelfCureLevel.push_back(WIFI_CURE_RESET_LEVEL_LOW_1_DNS);
     if (pSelfCureStateMachine->internetUnknown) {
@@ -1619,6 +1621,9 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
     pSelfCureStateMachine->selfCureOnGoing = false;
     pSelfCureStateMachine->useWithRandMacAddress = 0;
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
+    if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
+        return;
+    }
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE, WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
     return;
 }
@@ -2686,6 +2691,24 @@ int SelfCureStateMachine::GetIsReassocWithFactoryMacAddress()
     return isReassocWithFactoryMacAddress;
 }
 
+bool SelfCureStateMachine::IsCustNetworkSelfCure()
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("IsCustNetworkSelfCure get pEnhanceService service failed!");
+        return false;
+    }
+    WifiDeviceConfig config;
+    if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
+        return false;
+    }
+    if (pEnhanceService->IsHwItCustNetwork(config)) {
+        WIFI_LOGI("dns-selfcure is not triggered on the network.");
+        return true;
+    }
+    return false;
+}
+
 int SelfCureStateMachine::SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress)
 {
     WifiDeviceConfig config;
@@ -3074,7 +3097,15 @@ bool SelfCureStateMachine::IfMultiGateway()
 
 bool SelfCureStateMachine::IsSettingsPage()
 {
-    if (WifiAppStateAware::GetInstance().IsForegroundApp(SETTINGS_PAGE)) {
+    std::map<std::string, std::string> variableMap;
+    std::string page;
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("SETTINGS") != variableMap.end()) {
+        page = variableMap["SETTINGS"];
+    }
+    if (WifiAppStateAware::GetInstance().IsForegroundApp(page)) {
         WIFI_LOGI("settings page, do not allow reset self cure");
         return true;
     }

@@ -27,6 +27,7 @@
 #include "wifi_common_util.h"
 #include "wifi_notification_util.h"
 #include "wifi_app_state_aware.h"
+#include "wifi_net_agent.h"
 #ifdef HAS_MOVEMENT_PART
 #include "wifi_msdp_state_listener.h"
 #endif
@@ -48,10 +49,11 @@ const std::string PROP_TRUE = "true";
 const std::string PROP_FALSE = "false";
 const std::string SUBCHIP_WIFI_PROP = "ohos.boot.odm.conn.schiptype";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
-const std::string SUPPORT_COEXCHIP = "bisheng";
+const std::string SUPPORT_COEXCHIP = "";
 const std::string COEX_IFACENAME = "wlan1";
 const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
+const std::string EVENT_SETTINGS_WLAN_KEEP_CONNECTED = "event.settings.wlan.keep_connected";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
@@ -839,6 +841,22 @@ void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEvent
         WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
     } else {
         WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
+    }
+}
+
+void CesEventSubscriber::OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    const int code = eventData.GetCode();
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    WIFI_LOGI("received the WlanKeepConnected, action ==%{public}s, code == %{public}d", action.c_str(), code);
+    if (code == 1) { // The user clicks the use button.
+        WifiNetAgent::GetInstance().RestoreWifiConnection();
+        WIFI_LOGI("change the value of AcceptUnvalidated to true");
+        WifiSettings::GetInstance().SetAcceptUnvalidated(networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
     }
 }
 

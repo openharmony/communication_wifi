@@ -322,6 +322,24 @@ public:
     virtual ErrCode DeregisterFilterBuilder(const FilterTag &filterTag, const std::string &filterName);
 
     /**
+     * Register the common builder function
+     *
+     * @param TagType scoreTag which define where the score or filter should be inserted.
+     * @param tagName the score or filter name.
+     * @param CommonBuilder CommonBuilder function.
+     */
+    virtual ErrCode RegisterCommonBuilder(const TagType &tagType, const std::string &tagName,
+                               const CommonBuilder &commonBuilder);
+ 
+    /**
+     * Deregister the common builder function
+     *
+     * @param TagType TagType which define where the score or filter should be inserted.
+     * @param tagName the score or filte name.
+     */
+    virtual ErrCode DeregisterCommonBuilder(const TagType &tagType, const std::string &tagName);
+
+    /**
      * @Description start portal certification.
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED

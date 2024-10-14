@@ -57,8 +57,6 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define PBC_ANY_BSSID "any"
 #define PORTAL_ACTION "ohos.want.action.awc"
 #define PORTAL_ENTITY "entity.browser.hbct"
-#define BROWSER_BUNDLE "com.huawei.hmos.browser"
-#define SETTINGS_BUNDLE "com.huawei.hmos.settings"
 #define PORTAL_CHECK_TIME (10 * 60)
 #define PORTAL_AUTH_EXPIRED_CHECK_TIME (2)
 #define PORTAL_MILLSECOND  1000
@@ -107,6 +105,13 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_IK_STR_LEN (2 * UMTS_AUTH_CHALLENGE_IK_LEN)
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
+
+const std::map<int, int> wpa3FailreasonMap {
+    {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_AUTH_RSP4_TIMEOUT, WPA3_AUTH_TIMEOUT},
+    {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
+};
 
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
@@ -191,7 +196,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
     SetFirstState(pInitState);
     StartStateMachine();
     InitStaSMHandleMap();
-    WifiSettings::GetInstance().GetPortalUri(mUrlInfo);
 #ifndef OHOS_ARCH_LITE
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
@@ -3215,11 +3219,19 @@ void StaStateMachine::HandlePortalNetworkPorcess()
         WIFI_LOGE("portal uri is nullptr\n");
     }
     int netId = m_NetWorkState->GetWifiNetId();
+    std::string bundle;
+    std::map<std::string, std::string> variableMap;
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("BROWSER_BUNDLE") != variableMap.end()) {
+        bundle = variableMap["BROWSER_BUNDLE"];
+    }
     AAFwk::Want want;
     want.SetAction(PORTAL_ACTION);
     want.SetUri(mPortalUrl);
     want.AddEntity(PORTAL_ENTITY);
-    want.SetBundle(BROWSER_BUNDLE);
+    want.SetBundle(bundle);
     want.SetParam("netId", netId);
     WIFI_LOGI("wifi netId is %{public}d", netId);
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
@@ -3251,7 +3263,15 @@ void StaStateMachine::ShowPortalNitification()
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
             WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
     } else {
-        if (WifiAppStateAware::GetInstance().IsForegroundApp(SETTINGS_BUNDLE)) {
+        std::map<std::string, std::string> variableMap;
+        std::string bundle;
+        if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+            WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+        }
+        if (variableMap.find("SETTINGS") != variableMap.end()) {
+            bundle = variableMap["SETTINGS"];
+        }
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_CONNECTED);
@@ -3381,6 +3401,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
+#ifndef OHOS_ARCH_LITE
+        SyncDeviceEverConnectedState(false);
+#endif
         if (!mIsWifiInternetCHRFlag &&
             (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL) &&
             WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered()) {
@@ -3392,8 +3415,37 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
+#ifndef OHOS_ARCH_LITE
+    SyncDeviceEverConnectedState(true);
+#endif
     portalFlag = true;
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    std::map<std::string, std::string> variableMap;
+    std::string settings;
+    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
+    }
+    if (variableMap.find("SETTINGS") != variableMap.end()) {
+        settings = variableMap["SETTINGS"];
+    }
+    if (!WifiSettings::GetInstance().GetDeviceEverConnected(networkId)) {
+        if (!hasNet) {
+            /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
+            WifiNotificationUtil::GetInstance().ShowSettingsDialog(WifiDialogType::CDD, settings);
+        }
+        WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
+        WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
+}
+#endif
 
 void StaStateMachine::HandleArpCheckResult(StaArpState arpState)
 {
@@ -3416,6 +3468,9 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function.");
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
+#ifndef OHOS_ARCH_LITE
+    CheckIfRestoreWifi();
+#endif
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
         pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);
@@ -3502,6 +3557,19 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 
     return ret;
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::LinkedState::CheckIfRestoreWifi()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    if (WifiSettings::GetInstance().GetAcceptUnvalidated(networkId)) {
+        WIFI_LOGI("The user has chosen to use the current WiFi.");
+        WifiNetAgent::GetInstance().RestoreWifiConnection();
+    }
+}
+#endif
 
 void StaStateMachine::DealApRoamingStateTimeout(InternalMessagePtr msg)
 {

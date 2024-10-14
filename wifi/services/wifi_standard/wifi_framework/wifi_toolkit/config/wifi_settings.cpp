@@ -89,8 +89,8 @@ int WifiSettings::Init()
     mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
-    mSavedPortal.SetConfigFilePath(PORTAL_CONFIG_FILE_PATH);
     mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
+    mVariableConf.SetConfigFilePath(WIFI_VARIABLE_PATH);
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -106,9 +106,9 @@ int WifiSettings::Init()
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
     ReloadStaRandomMac();
-    ReloadPortalconf();
     InitPackageFilterConfig();
     IncreaseNumRebootsSinceLastUse();
+    InitVariableConfig();
     return 0;
 }
 
@@ -332,6 +332,48 @@ int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
     }
     iter->second.randomizedMacSuccessEver = true;
     return 0;
+}
+
+int WifiSettings::SetDeviceEverConnected(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.everConnected = true;
+    return 0;
+}
+ 
+int WifiSettings::SetAcceptUnvalidated(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.acceptUnvalidated = true;
+    return 0;
+}
+ 
+bool WifiSettings::GetDeviceEverConnected(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return false;
+    }
+    return iter->second.everConnected;
+}
+ 
+bool WifiSettings::GetAcceptUnvalidated(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return false;
+    }
+    return iter->second.acceptUnvalidated;
 }
 
 int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
@@ -685,15 +727,6 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
         }
     }
     return randomMacInfo.randomMac.empty();
-}
-
-void WifiSettings::GetPortalUri(WifiPortalConf &urlInfo)
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    urlInfo.portalHttpUrl = mPortalUri.portalHttpUrl;
-    urlInfo.portalHttpsUrl = mPortalUri.portalHttpsUrl;
-    urlInfo.portalBakHttpUrl = mPortalUri.portalBakHttpUrl;
-    urlInfo.portalBakHttpsUrl = mPortalUri.portalBakHttpsUrl;
 }
 
 const std::vector<TrustListPolicy> WifiSettings::ReloadTrustListPolicies()
@@ -1400,23 +1433,6 @@ int WifiSettings::ReloadStaRandomMac()
     return 0;
 }
 
-int WifiSettings::ReloadPortalconf()
-{
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mSavedPortal.LoadConfig() >= 0) {
-        std::vector<WifiPortalConf> tmp;
-        mSavedPortal.GetValue(tmp);
-        if (tmp.size() > 0) {
-            mPortalUri = tmp[0];
-        } else {
-            mPortalUri.portalHttpUrl = "test";
-        }
-    } else {
-        mPortalUri.portalHttpUrl = "test";
-    }
-    return 0;
-}
-
 void WifiSettings::InitPackageFilterConfig()
 {
     if (mPackageFilterConfig.LoadConfig() >= 0) {
@@ -1425,6 +1441,26 @@ void WifiSettings::InitPackageFilterConfig()
         std::unique_lock<std::mutex> lock(mScanMutex);
         for (unsigned int i = 0; i < tmp.size(); i++) {
             mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
+        }
+    }
+    return;
+}
+
+int WifiSettings::GetVariableMap(std::map<std::string, std::string> &variableMap)
+{
+    std::unique_lock<std::mutex> lock(mVariableConfMutex);
+    variableMap = mVariableMap;
+    return 0;
+}
+ 
+void WifiSettings::InitVariableConfig()
+{
+    if (mVariableConf.LoadConfig() >= 0) {
+        std::vector<VariableConf> tmp;
+        mVariableConf.GetValue(tmp);
+        std::unique_lock<std::mutex> lock(mVariableConfMutex);
+        for (unsigned int i = 0; i < tmp.size(); i++) {
+            mVariableMap.insert(std::make_pair(tmp[i].variableName, tmp[i].variableValue));
         }
     }
     return;
@@ -1771,12 +1807,14 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
     if (bufferLen < 0) {
         LOGE("GetConfigbyBackupXml read fail.");
         free(buffer);
+        buffer = nullptr;
         return -1;
     }
     std::string backupData = std::string(buffer, buffer + bufferLen);
     if (memset_s(buffer, statBuf.st_size, 0, statBuf.st_size) != EOK) {
         LOGE("GetConfigbyBackupXml memset_s fail.");
         free(buffer);
+        buffer = nullptr;
         return -1;
     }
     free(buffer);
@@ -1872,6 +1910,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         config.wifiWapiConfig.wapiAsCertData = "";
     }
     delete encryWapiAs;
+    encryWapiAs = nullptr;
 
     EncryptedData *encryWapiUser = new EncryptedData(config.wifiWapiConfig.encryptedUserCertData,
         config.wifiWapiConfig.userCertDataIV);
@@ -1884,6 +1923,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
         config.wifiWapiConfig.wapiUserCertData = "";
     }
     delete encryWapiUser;
+    encryWapiUser = nullptr;
 }
 
 int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
@@ -1920,6 +1960,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wepKeys[config.wepTxKeyIndex] = "";
     }
     delete encryWep;
+    encryWep = nullptr;
 
     EncryptedData *encryEap = new EncryptedData(config.wifiEapConfig.encryptedData, config.wifiEapConfig.IV);
     std::string decryEap = "";
@@ -1931,6 +1972,7 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         config.wifiEapConfig.password = "";
     }
     delete encryEap;
+    encryEap = nullptr;
     DecryptionWapiConfig(mWifiEncryptionInfo, config);
     LOGD("DecryptionDeviceConfig end");
     return 0;

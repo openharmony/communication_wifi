@@ -1228,7 +1228,6 @@ private:
     DhcpResultNotify *pDhcpResultNotify;
     ClientCallBack clientCallBack;
     DhcpClientReport dhcpClientReport_;
-    WifiPortalConf mUrlInfo;
     RootState *pRootState;
     InitState *pInitState;
     WpaStartingState *pWpaStartingState; /* Starting wpa_supplicant state. */

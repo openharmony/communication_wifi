@@ -944,6 +944,14 @@ public:
         pStaStateMachine->pApLinkedState->ExecuteStateMsg(msg);
     }
 
+    void ApLinkedStateExeMsgLinkSwitch()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(WIFI_SVR_CMD_STA_LINK_SWITCH_EVENT);
+        msg->AddStringMessageBody("wifitest");
+        pStaStateMachine->pApLinkedState->ExecuteStateMsg(msg);
+    }
+
     void DisConnectProcessSuccess()
     {
         pStaStateMachine->DisConnectProcess();
@@ -1518,6 +1526,13 @@ public:
     {
         std::string reason;
         std::string bssid;
+        pStaStateMachine->OnBssidChangedEvent(reason, bssid);
+    }
+
+    void OnBssidChangedEventLinkSwitch()
+    {
+        std::string reason = "LINK_SWITCH_EVENT";
+        std::string bssid = "12:34:56:78:9A:BC";
         pStaStateMachine->OnBssidChangedEvent(reason, bssid);
     }
 
@@ -2949,6 +2964,11 @@ HWTEST_F(StaStateMachineTest, OnBssidChangedEventSuccess, TestSize.Level1)
     OnBssidChangedEventSuccess();
 }
 
+HWTEST_F(StaStateMachineTest, OnBssidChangedEventLinkSwitch, TestSize.Level1)
+{
+    OnBssidChangedEventLinkSwitch();
+}
+
 HWTEST_F(StaStateMachineTest, OnNetworkDisconnectEventSuccess, TestSize.Level1)
 {
     OnNetworkDisconnectEventSuccess();
@@ -3265,6 +3285,11 @@ HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess3, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess4, TestSize.Level1)
 {
     ApLinkedStateExeMsgSuccess4();
+}
+
+HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgLinkSwitch, TestSize.Level1)
+{
+    ApLinkedStateExeMsgLinkSwitch();
 }
  
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest4, TestSize.Level1)

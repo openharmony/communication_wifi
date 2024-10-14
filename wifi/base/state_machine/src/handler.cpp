@@ -45,10 +45,6 @@ bool Handler::InitialHandler(const std::string &name)
     }
     if (pMyQueue == nullptr) {
         pMyQueue = std::make_unique<MessageQueue>();
-        if (pMyQueue == nullptr) {
-            LOGE("pMyQueue alloc failed.\n");
-            return false;
-        }
     }
 
     int ret = pthread_create(&handleThread, nullptr, RunHandleThreadFunc, this);
@@ -61,10 +57,6 @@ bool Handler::InitialHandler(const std::string &name)
 #else
     if (pMyTaskQueue == nullptr) {
         pMyTaskQueue = std::make_unique<WifiEventHandler>(name);
-        if (pMyTaskQueue == nullptr) {
-            LOGE("pMyTaskQueue alloc failed.\n");
-            return false;
-        }
     }
 #endif
     LOGI("InitialHandler success: %{public}s", mThreadName.c_str());

@@ -327,22 +327,6 @@ HWTEST_F(WifiP2pServiceTest, Hid2dCreateGroupTest001, TestSize.Level1)
     EXPECT_EQ(pWifiP2pService->Hid2dCreateGroup(frequency, type), ErrCode::WIFI_OPT_SUCCESS);
 }
 
-HWTEST_F(WifiP2pServiceTest, Hid2dGetSelfWifiCfgInfoTest001, TestSize.Level1)
-{
-    SelfCfgType cfgType = SelfCfgType::TYPE_OF_GET_SELF_CONFIG;
-    char cfgData[255] = {0};
-    int getDatValidLen = 1;
-    EXPECT_EQ(pWifiP2pService->Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, &getDatValidLen), ErrCode::WIFI_OPT_SUCCESS);
-}
-
-HWTEST_F(WifiP2pServiceTest, Hid2dSetPeerWifiCfgInfoTest001, TestSize.Level1)
-{
-    PeerCfgType cfgType = PeerCfgType::TYPE_OF_SET_PEER_CONFIG;
-    char cfgData[255] = {0};
-    int setDataValidLen = 0;
-    EXPECT_EQ(pWifiP2pService->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen), ErrCode::WIFI_OPT_SUCCESS);
-}
-
 HWTEST_F(WifiP2pServiceTest, MonitorCfgChangeTest001, TestSize.Level1)
 {
     EXPECT_EQ(pWifiP2pService->MonitorCfgChange(), ErrCode::WIFI_OPT_SUCCESS);

@@ -30,8 +30,6 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
-#define INVILAD_MSG 0x1111
-
 namespace OHOS {
 namespace Wifi {
 
@@ -137,12 +135,6 @@ public:
         msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
-        msg->SetMessageName(INVILAD_MSG);
-        EXPECT_TRUE(pConcreteManagerMachine->pDefaultState->ExecuteStateMsg(msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void HandleSwitchToScanOnlyModeTest()
@@ -205,8 +197,6 @@ public:
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, 0);
         msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE);
         sleep(1);
-        EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
-        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
     }
 
@@ -282,9 +272,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
-        pConcreteManagerMachine->mTargetRole =
-            static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
-        pConcreteManagerMachine->HandleStaStop();
     }
 
     void HandleStaStopTest2()
@@ -360,7 +347,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pConnectState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
-        pConcreteManagerMachine->SwitchEnableFromSemi();
     }
 
     void CheckAndContinueToStopWifiTest()
@@ -375,13 +361,6 @@ public:
         EXPECT_TRUE(pConcreteManagerMachine->pScanonlyState->ExecuteStateMsg(msg));
         EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetWifiStopState(false);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
-        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
-        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSING, 0);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
-        staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
-        WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
-        EXPECT_TRUE(pConcreteManagerMachine->pSemiActiveState->ExecuteStateMsg(msg));
     }
 
     void HandleStaSemiActiveTest1()

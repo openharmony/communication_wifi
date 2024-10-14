@@ -844,34 +844,49 @@ std::string WifiConfigCenter::GetP2pIfaceName()
     return mP2pIfaceName;
 }
 
-int WifiConfigCenter::SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene)
+int WifiConfigCenter::SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene)
 {
-    LOGD("SetHid2dUpperScene ifName: %{public}s", ifName.c_str());
+    LOGD("SetHid2dUpperScene uid: %{public}d", uid);
     std::unique_lock<std::mutex> lock(mP2pMutex);
-    mUpperIfName = ifName;
-    mUpperScene = scene;
+    mHid2dUpperScenePair.insert_or_assign(uid, scene);
     return 0;
 }
 
-int WifiConfigCenter::GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene)
+int WifiConfigCenter::GetHid2dUpperScene(int uid, Hid2dUpperScene &scene)
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
-    scene = mUpperScene;
-    ifName = mUpperIfName;
-    return 0;
-}
-
-void WifiConfigCenter::ClearLocalHid2dInfo()
-{
-    std::unique_lock<std::mutex> lock(mP2pMutex);
-    if (strstr(mUpperIfName.c_str(), "chba") == NULL) {
-        mUpperScene.mac = "";
-        mUpperScene.scene = 0;
-        mUpperScene.fps = 0;
-        mUpperScene.bw = 0;
-        mUpperIfName = "";
+    auto iter = mHid2dUpperScenePair.find(uid);
+    if (iter != mHid2dUpperScenePair.end()) {
+        scene = iter->second;
     }
-    mP2pBusinessType = P2pBusinessType::INVALID;
+    return 0;
+}
+
+void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
+{
+    std::unique_lock<std::mutex> lock(mP2pMutex);
+    Hid2dUpperScene scene;
+    scene.mac = "";
+    scene.scene = 0;
+    scene.fps = 0;
+    scene.bw = 0;
+    if (uid != 0) {
+        mHid2dUpperScenePair.insert_or_assign(uid, scene);
+    } else {
+        mHid2dUpperScenePair.insert_or_assign(SOFT_BUS_SERVICE_UID, scene);
+        mHid2dUpperScenePair.insert_or_assign(CAST_ENGINE_SERVICE_UID, scene);
+    }
+}
+
+int WifiConfigCenter::SetP2pEnhanceState(int state)
+{
+    mP2pEnhanceState = state;
+    return 0;
+}
+
+int WifiConfigCenter::GetP2pEnhanceState()
+{
+    return mP2pEnhanceState.load();
 }
 
 WifiOprMidState WifiConfigCenter::GetP2pMidState()

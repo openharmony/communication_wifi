@@ -34,6 +34,7 @@ const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_
 inline const std::string COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED = "usual.event.ASSET_SYNC_DATA_CHANGED_SA";
 const int ASSETID = 6226;
 #endif
+const int CAST_ENGINE_SA_ID = 65546;
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -100,6 +101,7 @@ private:
     void HandleHasMovementPartChange(int systemAbilityId, bool add);
 #endif
     void HandleDistributedKvDataServiceChange(bool add);
+    void HandleCastServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void GetCloneDataByDatashare(std::string &cloneData);
     void SetCloneDataByDatashare(const std::string &cloneData);

@@ -25,6 +25,8 @@
 #include "wifi_internal_msg.h"
 #include "wifi_settings.h"
 
+#define SOFT_BUS_SERVICE_UID 1024
+#define CAST_ENGINE_SERVICE_UID 5526
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
@@ -204,11 +206,15 @@ public:
 
     std::string GetP2pIfaceName();
 
-    int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene);
+    int SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene);
 
-    int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene);
+    int GetHid2dUpperScene(int uid, Hid2dUpperScene &scene);
 
-    void ClearLocalHid2dInfo();
+    void ClearLocalHid2dInfo(int uid = 0);
+
+    int SetP2pEnhanceState(int state);
+
+    int GetP2pEnhanceState();
 
     WifiOprMidState GetP2pMidState();
 
@@ -376,10 +382,10 @@ private:
 #else
     std::string mP2pIfaceName {"p2p-dev-wlan0"};
 #endif
-    std::string mUpperIfName;
-    Hid2dUpperScene mUpperScene;
+    std::map<int, Hid2dUpperScene> mHid2dUpperScenePair;
     std::atomic<WifiOprMidState> mP2pMidState {WifiOprMidState::CLOSED};
     std::atomic<int> mP2pState {static_cast<int>(P2pState::P2P_STATE_CLOSED)};
+    std::atomic<int> mP2pEnhanceState {0};
     std::atomic<int> mP2pDiscoverState {0};
     std::atomic<P2pBusinessType> mP2pBusinessType {P2pBusinessType::INVALID};
     std::atomic<int> mP2pCreatorUid {-1};

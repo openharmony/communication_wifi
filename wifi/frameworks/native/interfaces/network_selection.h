@@ -150,6 +150,24 @@ protected:
     std::string m_scoreName;
 };
 
+class WifiFunctionScorerAdapter : public SimpleWifiScorer {
+public:
+ 
+    /**
+     *
+     * @param scorer the point to scorerFunction
+     * @param scorerName the scorerName
+     * @param reverse for default it should be filtered when the function return true, And it can be modified;
+     */
+    WifiFunctionScorerAdapter(const std::function<double(NetworkCandidate &)> &scorer,
+                              const std::string &scorerName);
+    ~WifiFunctionScorerAdapter() override;
+protected:
+    virtual double Score(NetworkCandidate &networkCandidate) override;
+    std::function<double(NetworkCandidate &)> targetFunction;
+    std::string m_scoreName;
+};
+
 class IWifiComparator {
 public:
     virtual ~IWifiComparator() = default;
@@ -277,6 +295,51 @@ enum class FilterTag {
     IT_NETWORK_SELECTOR_FILTER_TAG
 };
 
+enum class TagType {
+    HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG,
+};
+ 
+enum class CommonBuilderType {
+    FILTER_BUILDER,
+    SCORE_BUILDER,
+};
+ 
 using FilterBuilder = std::function<void(NetworkSelection::CompositeWifiFilter &)>;
+using ScoreBuilder = std::function<void(NetworkSelection::CompositeWifiScorer &)>;
+ 
+struct CommonBuilder {
+    CommonBuilder()
+    {
+        commonBuilderType = CommonBuilderType::FILTER_BUILDER;
+    }
+ 
+    CommonBuilder(const CommonBuilder &commonBuilder)
+    {
+        filterBuilder = commonBuilder.filterBuilder;
+        scoreBuilder = commonBuilder.scoreBuilder;
+    }
+ 
+    ~CommonBuilder() {}
+ 
+    const CommonBuilder &operator=(const CommonBuilder &commonBuilder)
+    {
+        filterBuilder = commonBuilder.filterBuilder;
+        scoreBuilder = commonBuilder.scoreBuilder;
+        return *this;
+    }
+    bool IsEmpty() const
+    {
+        if (!filterBuilder && commonBuilderType == CommonBuilderType::FILTER_BUILDER) {
+            return true;
+        } else if (!scoreBuilder && commonBuilderType == CommonBuilderType::SCORE_BUILDER) {
+            return true;
+        }
+        return false;
+    }
+ 
+    FilterBuilder filterBuilder;
+    ScoreBuilder scoreBuilder;
+    CommonBuilderType commonBuilderType;
+};
 }
 #endif

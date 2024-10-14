@@ -71,32 +71,32 @@ void ApStartedState::GoInState()
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     SetRandomMac();
 #endif
-    if (!SetCountry()) {
-        m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
+    do {
+        if (!SetCountry()) {
+            break;
+        }
+        if (!StartAp()) {
+            WIFI_LOGE("enter ApstartedState is failed.");
+            break;
+        }
+        WIFI_LOGI("StartAP is ok.");
+        if (!SetConfig()) {
+            WIFI_LOGE("wifi_settings.hotspotconfig is error.");
+            break;
+        }
+        if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
+            WIFI_LOGE("Set Blocklist failed.");
+        }
+        WIFI_LOGE("Singleton version has not nat and use %{public}s.", AP_INTF);
+        if (!EnableInterfaceNat()) {
+            break;
+        }
+        UpdatePowerMode();
         return;
-    }
-    if (StartAp() == false) {
-        WIFI_LOGE("enter ApstartedState is failed.");
-        m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
-        return;
-    }
-    WIFI_LOGI("StartAP is ok.");
-    if (SetConfig() == false) {
-        WIFI_LOGE("wifi_settings.hotspotconfig is error.");
-        m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
-        return;
-    }
-    if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
-        WIFI_LOGE("Set Blocklist failed.");
-    }
-    WIFI_LOGE("Singleton version has not nat and use %{public}s.", AP_INTF);
-
-    if (EnableInterfaceNat() == false) {
-        m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
-        return;
-    }
-    UpdatePowerMode();
-    m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
+    } while (0);
+    WIFI_LOGI("Ap disabled, set softap toggled false");
+    WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+    m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
 }
 
 void ApStartedState::GoOutState()
@@ -353,6 +353,7 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     if (msg->GetParam1() == 1) {
         WIFI_LOGI("Hot update HotspotConfig succeeded.");
+        m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
         if (WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id)) {
             WIFI_LOGE("set apConfig to settings failed.");
         }
@@ -361,6 +362,8 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
         m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress(), m_hotspotConfig.GetLeaseTime());
 #endif
     } else {
+        WIFI_LOGI("Ap disabled, set softap toggled false");
+        WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
     }
 }

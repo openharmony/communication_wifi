@@ -2860,8 +2860,8 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
 #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
-    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    DealSignalPollResult();  // update freq info
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
+    pStaStateMachine->DealSignalPollResult();  // update freq info
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, deviceConfig,
         pStaStateMachine->GetInstanceId()) != 0) {
@@ -2869,7 +2869,7 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
             pStaStateMachine->linkedInfo.networkId);
         return;
     }
-    UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
+    pStaStateMachine->UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
 }
 
 void StaStateMachine::DisConnectProcess()

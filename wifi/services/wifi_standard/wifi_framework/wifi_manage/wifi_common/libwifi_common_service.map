@@ -10,6 +10,7 @@
         "*LibraryUtils*";
         "*DelInterfaceAddress*";
         "*NetworkStatusHistoryManager*";
+        "*WifiSysTimer*";
    extern "C++" {
         "OHOS::Wifi::AppNetworkSpeedLimitService::GetInstance()";
         "OHOS::Wifi::AppNetworkSpeedLimitService::GetStaCallback() const";
@@ -179,15 +180,6 @@
         "OHOS::Wifi::WifiProtectManager::RegisterAppStateObserver()";
         "OHOS::Wifi::WifiProtectManager::OnAppDied(const std::string)";
         "OHOS::Wifi::WifiProtectManager::OnAppForegroudChanged(const std::string &, int)";
-        "OHOS::Wifi::WifiSysTimer::WifiSysTimer()";
-        "OHOS::Wifi::WifiSysTimer::WifiSysTimer(bool, unsigned long, bool, bool)";
-        "OHOS::Wifi::WifiSysTimer::~WifiSysTimer()";
-        "OHOS::Wifi::WifiSysTimer::OnTrigger()";
-        "OHOS::Wifi::WifiSysTimer::SetType(const int &)";
-        "OHOS::Wifi::WifiSysTimer::SetRepeat(bool)";
-        "OHOS::Wifi::WifiSysTimer::SetInterval(const uint64_t &)";
-        "OHOS::Wifi::WifiSysTimer::SetWantAgent(std::shared_ptr<OHOS::AbilityRuntime::WantAgent::WantAgent>)";
-        "OHOS::Wifi::WifiSysTimer::SetCallbackInfo(std::__h::function<void ()> const&)";
     };
     local:
         *;

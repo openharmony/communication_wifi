@@ -37,7 +37,7 @@ public:
      *
      * @return bool - true : system app
      */
-    static bool IsSystemAppByToken();
+    static bool IsSystemAccess();
 
     /**
      * @Description Verify whether the app is native process

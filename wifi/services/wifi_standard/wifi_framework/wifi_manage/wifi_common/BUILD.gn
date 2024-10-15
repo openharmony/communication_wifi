@@ -215,10 +215,6 @@ if (defined(ohos_lite)) {
       "FEATURE_SELF_CURE_SUPPORT",
     ]
 
-    if (wifi_feature_wifi_pro_ctrl) {
-      defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
-    }
-
     if (is_asan) {
       defines += [ "DTFUZZ_TEST" ]
     }

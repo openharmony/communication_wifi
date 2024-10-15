@@ -527,7 +527,7 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     JsObjectToInt(env, object, "securityType", type);
     ConvertEncryptionMode(SecTypeJs(type), cppConfig.keyMgmt);
     ProcessPassphrase(SecTypeJs(type), cppConfig);
-    /* "creatorUid" is not supported currently */
+    JsObjectToInt(env, object, "creatorUid", cppConfig.uid);
     /* "disableReason" is not supported currently */
     JsObjectToInt(env, object, "netId", cppConfig.networkId);
     int randomMacType = static_cast<int>(WifiPrivacyConfig::RANDOMMAC);

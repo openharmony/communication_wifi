@@ -83,8 +83,8 @@ static bool IsWapiOrEap(const WifiDeviceConfig &config)
 static bool WifiAssetValid(const WifiDeviceConfig &config)
 {
     if (config.uid != -1) {
-        LOGD("WifiAssetValid WifiDeviceConfig ssid: %{public}s is not created by user",
-            SsidAnonymize(config.ssid).c_str());
+        LOGD("WifiAssetValid WifiDeviceConfig ssid: %{public}s is not created by user, uid : %{public}d",
+            SsidAnonymize(config.ssid).c_str(), config.uid);
         return false;
     }
     if (IsWapiOrEap(config)) {

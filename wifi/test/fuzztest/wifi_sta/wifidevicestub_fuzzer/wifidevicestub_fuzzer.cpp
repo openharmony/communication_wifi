@@ -35,7 +35,6 @@
 #include "wifi_manager.h"
 #include "wifi_net_agent.h"
 
-
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
@@ -749,6 +748,18 @@ void OnSetLowTxPowerTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER), datas);
 }
 
+void OnSetDpiMarkRuleTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_DPI_MARK_RULE), datas);
+}
+
 void DoSomethingDeviceMgrStubTest(const uint8_t* data, size_t size)
 {
     std::string networkName = "backup";
@@ -1109,6 +1120,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::HilinkGetMacAddressTest(data, size);
     OHOS::Wifi::EnableHiLinkHandshakeTest(data, size);
     OHOS::Wifi::RegisterFilterBuilderTest(data, size);
+    OHOS::Wifi::OnSetDpiMarkRuleTest(data, size);
     sleep(4);
     return 0;
 }

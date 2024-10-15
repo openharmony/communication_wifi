@@ -228,7 +228,7 @@ private:
 
     void RemoveDeathRecipient(void);
     static BrokerDelegator<WifiHotspotProxy> g_delegator;
-    bool mRemoteDied;
+    std::atomic<bool> mRemoteDied;
     sptr<IRemoteObject> remote_ = nullptr;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;

@@ -147,7 +147,7 @@ class StaStateMachine : public StateMachine {
 public:
     explicit StaStateMachine(int instId = 0);
     ~StaStateMachine();
-    using staSmHandleFunc = void (StaStateMachine::*)(InternalMessagePtr msg);
+    using staSmHandleFunc = std::function<void(InternalMessagePtr)>;
     using StaSmHandleFuncMap = std::map<int, staSmHandleFunc>;
     /**
      * @Description  Definition of member function of State base class in StaStateMachine.

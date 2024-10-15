@@ -76,6 +76,7 @@ private:
     std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVec {};
     std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVecCloudPush {};
     bool mIshighTempLimitSpeedReadCloudPush = false;
+    bool initFlag_ = false;
 };
 } // namespace Wifi
 } // namespace OHOS

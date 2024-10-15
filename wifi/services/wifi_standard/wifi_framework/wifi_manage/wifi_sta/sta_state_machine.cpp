@@ -200,7 +200,7 @@ ErrCode StaStateMachine::InitStaStateMachine()
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
     m_NetWorkState->SetNetStateCallback(
-            [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
+        [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
 #endif
     return WIFI_OPT_SUCCESS;
 }

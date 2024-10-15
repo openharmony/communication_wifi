@@ -39,14 +39,6 @@ public:
      */
     virtual void OnStaJoinOrLeave(const WifiHalApConnectionNofify &cbInfo);
 
-    /* @Description  IDL called this interface when STA connected or
-                     disconnected, report to state machine.
-     * @param staInfo - station information
-     * @param event - event STA connected or disconnected.
-     * @return None
-     */
-    virtual void DealStaJoinOrLeave(const StationInfo &info, ApStatemachineEvent event);
-
     /**
      * @Description  Asynchronously notifies the hostapd of the enable and disable status.
      * @param state - hostapd status

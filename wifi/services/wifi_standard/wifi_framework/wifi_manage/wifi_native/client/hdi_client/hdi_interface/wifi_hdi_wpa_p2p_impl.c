@@ -117,7 +117,11 @@ static WifiErrorNo AddP2pRandomMacFlag()
             indicate = 1;
             break;
         }
-        memset_s(str, sizeof(str), 0x0, sizeof(str));
+        if (memset_s(str, sizeof(str), 0x0, sizeof(str)) != EOK) {
+            LOGE("%{public}s: memset_s is failed", __func__);
+            fclose(fp);
+            return WIFI_HAL_OPT_FAILED;
+        }
     }
     if (indicate == 0) {
         int ret = fputs(P2P_RANDOM_MAC_FLAG, fp);

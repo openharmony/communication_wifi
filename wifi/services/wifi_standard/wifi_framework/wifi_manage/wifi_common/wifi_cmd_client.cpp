@@ -84,7 +84,10 @@ int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
     struct ifreq ifr;
     WifiPrivCmd privCmd = { 0 };
     uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
-    (void)memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr));
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
+        WIFI_LOGE("%{public}s memset_s ifr error", __FUNCTION__);
+        return ret;
+    }
     if (memcpy_s(buf, MAX_PRIV_CMD_SIZE, cmdParm.c_str(), cmdParm.size() + 1) != EOK) {
         WIFI_LOGE("%{public}s memcpy_s privCmd buf error", __FUNCTION__);
         return ret;

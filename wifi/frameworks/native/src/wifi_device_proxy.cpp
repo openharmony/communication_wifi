@@ -652,7 +652,7 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
         return;
     }
     int offset = 0;
-    for (int i = 0; i < retSize; i++) {
+    for (uint32_t i = 0; i < retSize; i++) {
         auto origin = ashmem->ReadFromAshmem(allSize[i], offset);
         if (origin == nullptr) {
             offset += static_cast<int>(allSize[i]);

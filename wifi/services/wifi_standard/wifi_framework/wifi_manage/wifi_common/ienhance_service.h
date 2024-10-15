@@ -154,8 +154,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode UnRegisterP2pEnhanceCallback() = 0;
-
-
     /**
      * @Description Check if custom network
      *

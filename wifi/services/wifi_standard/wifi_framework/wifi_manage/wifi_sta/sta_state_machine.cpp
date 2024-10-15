@@ -2156,7 +2156,7 @@ void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)
         LOGE("msg is nullptr.\n");
         return;
     }
-    if (strcmp(reason.c_str(), "LINK_SWITCH_EVENT") == 0) {
+    if (strcmp(reason.c_str(), "LINK_SWITCH") == 0) {
         msg->SetMessageName(WIFI_SVR_CMD_STA_LINK_SWITCH_EVENT);
     } else {
         msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);

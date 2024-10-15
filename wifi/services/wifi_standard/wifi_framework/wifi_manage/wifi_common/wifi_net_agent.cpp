@@ -33,6 +33,7 @@ DEFINE_WIFILOG_LABEL("WifiNetAgent");
 
 namespace OHOS {
 namespace Wifi {
+constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
 using namespace NetManagerStandard;
 
 #define INVALID_SUPPLIER_ID 0
@@ -46,9 +47,13 @@ WifiNetAgent &WifiNetAgent::GetInstance()
 
 WifiNetAgent::WifiNetAgent()
 {
+    netAgentEventHandler_ = std::make_unique<WifiEventHandler>(WIFI_NET_CONN_MGR_WORK_THREAD);
 }
 WifiNetAgent::~WifiNetAgent()
 {
+    if (netAgentEventHandler_) {
+        netAgentEventHandler_.reset();
+    }
 }
 
 bool WifiNetAgent::RegisterNetSupplier()
@@ -165,33 +170,60 @@ bool WifiNetAgent::DelInterfaceAddress(const std::string interface, const std::s
     return false;
 }
 
-void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
-    WifiProxyConfig &wifiProxyConfig, int instId)
+void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wifiIpV6Info,
+    WifiProxyConfig wifiProxyConfig, int instId)
 {
-    WifiEventHandler::PostSyncTimeOutTask([this, &wifiIpInfo, &wifiIpV6Info, &wifiProxyConfig, &instId]() {
-        this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
-    });
+    if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask(
+#else
+        netAgentEventHandler_->PostAsyncTask(
+#endif
+            [this, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId]() mutable {
+                this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
+            });
+    }
 }
 
-void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo)
 {
-    WifiEventHandler::PostSyncTimeOutTask([this, netInfo = netSupplierInfo]() {
-        this->UpdateNetSupplierInfo(netInfo);
-    });
+    if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
+#else
+        netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo]() {
+#endif
+           this->UpdateNetSupplierInfo(netInfo);
+        });
+    }
 }
 
 void WifiNetAgent::OnStaMachineWifiStart()
 {
-    WifiEventHandler::PostSyncTimeOutTask([this]() {
-        this->RegisterNetSupplier();
-        this->RegisterNetSupplierCallback();
-    });
+    if (netAgentEventHandler_) {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        netAgentEventHandler_->PostSyncTask([this]() {
+#else
+        netAgentEventHandler_->PostAsyncTask([this]() {
+#endif
+            this->RegisterNetSupplier();
+            this->RegisterNetSupplierCallback();
+        });
+    }
 }
 
-void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo,
     int instId)
 {
-    WifiEventHandler::PostSyncTimeOutTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+    if (!netAgentEventHandler_) {
+        WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __func__);
+        return;
+    }
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    netAgentEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+#else
+    netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
+#endif
         this->RegisterNetSupplier();
         this->RegisterNetSupplierCallback();
         WifiLinkedInfo linkedInfo;

@@ -128,7 +128,8 @@ HWTEST_F(WifiHalDeviceManagerTest, SetNetworkUpDownTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, GetChipsetCategoryTest, TestSize.Level1)
 {
     std::string ifaceName{"wlan0"};
-    int chipsetCategory = 0;
+    unsigned int chipsetCategory = 0;
+    HalDeviceManager::g_chipHdiServiceDied = true;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetCategory(ifaceName, chipsetCategory);
 }
 

@@ -47,6 +47,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 namespace OHOS {
 namespace Wifi {
 const std::string AP_DEFAULT_IP = "192.168.43.1";
+const int STA_JOIN_HANDLE_DELAY = 5 * 1000;
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
       m_hotspotConfig(HotspotConfig()),
@@ -145,6 +146,8 @@ void ApStartedState::Init()
         std::make_pair(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE, &ApStartedState::ProcessCmdUpdateCountryCode));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_HOTSPOT_CHANNEL_CHANGED,
     (ProcessFun)&ApStartedState::ProcessCmdHotspotChannelChanged));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_ASSOCIATED_STATIONS_CHANGED,
+    (ProcessFun)&ApStartedState::ProcessCmdAssociatedStaChanged));
 }
 
 bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -304,12 +307,15 @@ void ApStartedState::ProcessCmdStationJoin(InternalMessagePtr msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
     StationInfo staInfo;
-    if (msg->GetMessageObj(staInfo)) {
-        m_ApStateMachine.m_ApStationsManager.StationJoin(staInfo);
-    } else {
+    if (!msg->GetMessageObj(staInfo)) {
         WIFI_LOGE("failed to get station info.");
         return;
     }
+    if (curAssocMacList.find(staInfo.bssid) == curAssocMacList.end()) {
+        WIFI_LOGE("sta has removed.");
+        return;
+    }
+    m_ApStateMachine.m_ApStationsManager.StationJoin(staInfo);
 }
 
 void ApStartedState::ProcessCmdStationLeave(InternalMessagePtr msg)
@@ -491,6 +497,35 @@ void ApStartedState::ProcessCmdHotspotChannelChanged(InternalMessagePtr msg)
     WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id);
     m_hotspotConfig.SetChannel(channel);
     WifiSettings::GetInstance().SetHotspotConfig(m_hotspotConfig, m_id);
+}
+
+void ApStartedState::ProcessCmdAssociatedStaChanged(InternalMessagePtr msg)
+{
+    int event = msg->GetParam1();
+    StationInfo staInfo;
+    if (!msg->GetMessageObj(staInfo)) {
+        WIFI_LOGE("%{public}s:failed to get station info.", __func__);
+        return;
+    }
+    if (staInfo.bssid.empty()) {
+        WIFI_LOGE("%{public}s:bssid is empty.", __func__);
+        return;
+    }
+    WIFI_LOGI("%{public}s: associated station event: %{public}d", __func__, event);
+    if (event == HAL_CBK_CMD_STA_JOIN) {
+        curAssocMacList.insert(staInfo.bssid);
+        m_ApStateMachine.MessageExecutedLater(static_cast<int>(ApStatemachineEvent::CMD_STATION_JOIN),
+            staInfo, STA_JOIN_HANDLE_DELAY);
+        return;
+    }
+    if (event == HAL_CBK_CMD_STA_LEAVE) {
+        if (curAssocMacList.find(staInfo.bssid) != curAssocMacList.end()) {
+            curAssocMacList.erase(staInfo.bssid);
+            WIFI_LOGI("%{public}s: delete station in curAssocMacList", __func__);
+        }
+        m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STATION_LEAVE), staInfo);
+    }
+    return;
 }
 }  // namespace Wifi
 }  // namespace OHOS

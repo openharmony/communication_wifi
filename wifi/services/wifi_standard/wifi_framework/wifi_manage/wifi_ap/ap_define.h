@@ -49,6 +49,7 @@ enum class ApStatemachineEvent {
     CMD_SET_IDLE_TIMEOUT,            /* Set ap idle timeout */
     CMD_UPDATE_COUNTRY_CODE,         /* update wifi conuntry code */
     CMD_HOTSPOT_CHANNEL_CHANGED,     /* hotspot channel changed */
+    CMD_ASSOCIATED_STATIONS_CHANGED, /* associated stations changed */
                                      /* (asynchronous result) */
 };
 

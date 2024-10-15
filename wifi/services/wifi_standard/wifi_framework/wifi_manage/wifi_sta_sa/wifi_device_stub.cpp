@@ -47,11 +47,6 @@ WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
     deathRecipient_ = nullptr;
 }
 
-
-
-
-
-
 WifiDeviceStub::WifiDeviceStub(int instId) : mSingleCallback(false), m_instId(instId)
 {
     WIFI_LOGI("enter WifiDeviceStub!");

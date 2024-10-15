@@ -38,11 +38,10 @@ public:
     ~WifiAppStateAware();
     static WifiAppStateAware &GetInstance();
     ErrCode InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks);
-    bool Connect();
+    sptr<AppExecFwk::IAppMgr> GetAppMgr();
     void RegisterAppStateObserver();
     void UnSubscribeAppState();
     void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);
-    void GetForegroundApp();
     ErrCode GetProcessRunningInfos(std::vector<AppExecFwk::RunningProcessInfo> &info);
     bool IsForegroundApp(int32_t uid);
     bool IsForegroundApp(const std::string &bundleName);
@@ -50,15 +49,10 @@ public:
 
 private:
     void RegisterAppStateChangedCallback(const int64_t delayTime = 0);
-    bool UpdateCurForegroundAppInfo(const AppExecFwk::AppStateData &appStateData);
-    bool HasRecordInCurForegroundApps(const AppExecFwk::AppStateData &appStateData);
     std::mutex mutex_ {};
-    std::mutex mutexForCurForegroundApps_ {};
     std::unique_ptr<WifiEventHandler> appChangeEventHandler = nullptr;
-    sptr<AppExecFwk::IAppMgr> appMgrProxy_ {nullptr};
     sptr<AppStateObserver> mAppStateObserver {nullptr};
     WifiAppStateAwareCallbacks mWifiAppStateAwareCallbacks;
-    std::vector<AppExecFwk::AppStateData> curForegroundApps_ {};
 };
 
 class AppStateObserver : public AppExecFwk::ApplicationStateObserverStub {

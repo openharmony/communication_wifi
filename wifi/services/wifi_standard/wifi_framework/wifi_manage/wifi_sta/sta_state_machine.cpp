@@ -2273,7 +2273,10 @@ std::string StaStateMachine::GetGsmAuthResponseWithLength(EapSimGsmAuthParam par
     LOGI("%{public}s size:%{public}zu", __func__, param.rands.size());
     for (auto iter = param.rands.begin(); iter != param.rands.end(); ++iter) {
         // data pre-processing
-        memset_s(randArray, sizeof(randArray), 0x0, sizeof(randArray));
+        if (memset_s(randArray, sizeof(randArray), 0x0, sizeof(randArray)) != EOK) {
+            LOGE("%{public}s: memset_s is failed", __func__);
+            return "";
+        }
         char tmpRand[MAX_RAND_STR_LEN + 1] = { 0 };
         if (strncpy_s(tmpRand, sizeof(tmpRand), (*iter).c_str(), (*iter).length()) != EOK) {
             LOGE("%{public}s: failed to copy", __func__);
@@ -2367,7 +2370,10 @@ std::string StaStateMachine::GetGsmAuthResponseWithoutLength(EapSimGsmAuthParam 
     LOGI("%{public}s size: %{public}zu", __func__, param.rands.size());
     for (auto iter = param.rands.begin(); iter != param.rands.end(); ++iter) {
         // data pre-processing
-        memset_s(randArray, sizeof(randArray), 0x0, sizeof(randArray));
+        if (memset_s(randArray, sizeof(randArray), 0x0, sizeof(randArray)) != EOK) {
+            LOGE("%{public}s: memset_s is failed", __func__);
+            return "";
+        }
         char tmpRand[MAX_RAND_STR_LEN + 1] = { 0 };
         if (strncpy_s(tmpRand, sizeof(tmpRand), (*iter).c_str(), (*iter).length()) != EOK) {
             LOGE("%{public}s: failed to copy", __func__);

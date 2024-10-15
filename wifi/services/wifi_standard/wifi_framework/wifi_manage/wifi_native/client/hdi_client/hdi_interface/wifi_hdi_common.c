@@ -413,7 +413,10 @@ int HdiConvertIe(const uint8_t *hdiIe, size_t wpaIeLen,
     int left;
     int i, count;
 
-    (void)memset_s(data, sizeof(*data), 0, sizeof(*data));
+    if (memset_s(data, sizeof(*data), 0, sizeof(*data)) != EOK) {
+        LOGE("HdiConvertIe memset_s is failed");
+        return -1;
+    }
     data->proto = HDI_PROTO_DEFAULT;
     data->pairwiseCipher = HDI_CIPHER_TKIP;
     data->groupCipher = HDI_CIPHER_TKIP;
@@ -501,7 +504,10 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
     int left;
     int i, count;
 
-    (void)memset_s(data, sizeof(*data), 0, sizeof(*data));
+    if (memset_s(data, sizeof(*data), 0, sizeof(*data)) != EOK) {
+        LOGE("HdiConvertIeRsn memset_s is failed");
+        return -1;
+    }
     data->proto = HDI_PROTO_ONE;
     data->pairwiseCipher = HDI_CIPHER_CCMP;
     data->groupCipher = HDI_CIPHER_CCMP;

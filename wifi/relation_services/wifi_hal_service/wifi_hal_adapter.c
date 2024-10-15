@@ -196,10 +196,16 @@ int CopyConfigFile(const char* configName)
             LOGD("%{public}s: destination is %{public}s", __func__, dstPath);
             if ((strcmp(dstPath, P2P_WPA_CONFIG_FILE) == 0) && (FileIsExisted(dstPath) == HAL_SUCCESS)) {
                 LOGW("%{public}s: dstPath is existed", __func__);
-                memset_s(dstPath, sizeof(dstPath), 0x0, sizeof(dstPath));
+                if (memset_s(dstPath, sizeof(dstPath), 0x0, sizeof(dstPath)) != EOK) {
+                    LOGE("CopyConfigFile 1 memset_s dstPath failed.");
+                    return HAL_FAILURE;
+                }
                 continue;
             }
-            memset_s(dstPath, sizeof(dstPath), 0x0, sizeof(dstPath));
+            if (memset_s(dstPath, sizeof(dstPath), 0x0, sizeof(dstPath)) != EOK) {
+                LOGE("CopyConfigFile 2 memset_s dstPath failed.");
+                return HAL_FAILURE;
+            }
             if (snprintf_s(cmd, sizeof(cmd), sizeof(cmd) - 1,
                 "cp %s %s/wpa_supplicant/", path[i], CONFIG_ROOR_DIR) < 0) {
                 LOGE("snprintf_s cp cmd failed.");

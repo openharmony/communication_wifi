@@ -1930,7 +1930,10 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
     }
     g_hiLinkActive = uiFlag;
 
-    (void)memset_s(cmd, sizeof(cmd), 0x0, sizeof(cmd));
+    if (memset_s(cmd, sizeof(cmd), 0x0, sizeof(cmd)) != EOK) {
+        WIFI_LOGE("g_hiLinkActive memset_s error!");
+        return WIFI_OPT_FAILED;
+    }
     if (sprintf_s(cmd, sizeof(cmd), "HILINK_MAC=%s", currentMac.c_str()) < 0) {
         WIFI_LOGE("g_hiLinkActive copy mac error!");
         return WIFI_OPT_FAILED;

@@ -202,6 +202,7 @@ int WifiManager::GetSupportedFeatures(long &features) const
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SUITE_B);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_OWE);
     features = supportedFeatures;
+
     return 0;
 }
 

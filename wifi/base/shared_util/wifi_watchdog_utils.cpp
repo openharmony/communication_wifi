@@ -77,7 +77,7 @@ bool WifiWatchDogUtils::ResetProcess(bool usingHiviewDfx, const std::string &thr
 int WifiWatchDogUtils::StartWatchDogForFunc(const std::string &funcName)
 {
     #ifndef OHOS_ARCH_LITE
-    WIFI_LOGD("StartWatchDogForFunc enter for funcName:%{public}s", funcName.c_str());
+    WIFI_LOGI("StartWatchDogForFunc enter for funcName:%{public}s", funcName.c_str());
     // this will generate a watchdog file in faultlogger but will not reset process
     return HiviewDFX::XCollie::GetInstance().SetTimer(funcName, TIME_OUT_WATCHDOG,
         nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
@@ -88,7 +88,7 @@ int WifiWatchDogUtils::StartWatchDogForFunc(const std::string &funcName)
 bool WifiWatchDogUtils::StopWatchDogForFunc(const std::string &funcName, int id)
 {
     #ifndef OHOS_ARCH_LITE
-    WIFI_LOGD("StopWatchDogForFunc enter for funcName:%{public}s", funcName.c_str());
+    WIFI_LOGI("StopWatchDogForFunc enter for funcName:%{public}s", funcName.c_str());
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
     #endif
     return true;

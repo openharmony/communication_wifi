@@ -159,7 +159,7 @@ private:
     ErrCode ParseScanInfosSmall(MessageParcel &reply, std::vector<WifiScanInfo> &result, int contentSize);
     void RemoveDeathRecipient(void);
     static BrokerDelegator<WifiScanProxy> g_delegator;
-    bool mRemoteDied;
+    std::atomic<bool> mRemoteDied;
     sptr<IRemoteObject> remote_ = nullptr;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;

@@ -48,7 +48,6 @@ config("wifi_fw_common_header") {
     include_dirs += [
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//third_party/bounds_checking_function/include",
-      "//third_party/wpa_supplicant/wpa_supplicant-2.9/src",
     ]
   }
 }
@@ -145,7 +144,6 @@ if (defined(ohos_lite)) {
     ldflags += [
       "-fPIC",
       "-Wl,-E",
-      "Iwpa_client",
     ]
   }
 } else {

@@ -29,7 +29,7 @@ DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 
 namespace OHOS {
 namespace Wifi {
-
+constexpr int MAX_ASHMEM_SIZE = 300;
 static std::map<int, std::string> g_HicollieStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
@@ -121,8 +121,6 @@ void WifiDeviceStub::InitHandleMapEx2()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply) {
             OnStartConnectToUserSelectNetwork(code, data, reply);
         };
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG)] = [this](uint32_t code,
-        MessageParcel &data, MessageParcel &reply) { OnGetDeviceConfig(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()

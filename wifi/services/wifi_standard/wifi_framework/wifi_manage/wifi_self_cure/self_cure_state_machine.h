@@ -163,6 +163,10 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        void HandleWifi7BlacklistRecover(InternalMessagePtr msg);
+        void HandleWifi7WithoutMldBackoff(InternalMessagePtr msg);
+        void HandleWifi7MldBackoff(InternalMessagePtr msg);
+        void HandleNetworkConnectFailCount(InternalMessagePtr msg);
         void HandleConnectFailed(InternalMessagePtr msg);
         void HandleResetConnectNetwork(InternalMessagePtr msg);
         SelfCureStateMachine *pSelfCureStateMachine;
@@ -358,10 +362,11 @@ private:
      */
     ErrCode InitSelfCureStates();
     int64_t GetNowMilliSeconds();
-    void SendBlaListToDriver();
-    std::string BlackListToString(std::map<std::string, Wifi6BlackListInfo> &map);
-    std::string ParseWifi6BlackListInfo(std::pair<std::string, Wifi6BlackListInfo> iter);
-    void AgeOutWifi6Black(std::map<std::string, Wifi6BlackListInfo> &wifi6BlackListCache);
+    void SendBlaListToDriver(int blaListType);
+    std::string BlackListToString(std::map<std::string, WifiCategoryBlackListInfo> &map);
+    std::string ParseWifiCategoryBlackListInfo(std::pair<std::string, WifiCategoryBlackListInfo> iter);
+    void AgeOutWifiCategoryBlack(int blaListType, std::map<std::string, WifiCategoryBlackListInfo> &blackListCache);
+    void AgeOutWifiConnectFailList();
     int GetCurSignalLevel();
     bool IsHttpReachable();
     std::string TransVecToIpAddress(const std::vector<uint32_t>& vec);
@@ -382,6 +387,9 @@ private:
     int SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string>& histories, int cnt);
     bool IfP2pConnected();
     bool ShouldTransToWifi6SelfCure(InternalMessagePtr msg, std::string currConnectedBssid);
+    int GetWifi7SelfCureType(int connectFailTimes, WifiLinkedInfo &info);
+    void ShouldTransToWifi7SelfCure(WifiLinkedInfo &info);
+    int GetScanRssi(std::string currentBssid, const std::vector<WifiScanInfo> scanResults);
     int GetCurrentRssi();
     std::string GetCurrentBssid();
     bool IsWifi6Network(std::string currConnectedBssid);

@@ -27,6 +27,7 @@ inline const int CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH = 125;
 inline const int CMD_SET_SOFTAP_2G_MSS = 106;
 inline const int CMD_AX_BLA_LIST = 131;
 inline const int CMD_AX_SELFCURE = 132;
+inline const int CMD_BE_BLA_LIST = 221;
 
 struct WifiPrivCmd {
     uint8_t *buf;
@@ -45,6 +46,7 @@ private:
     int Set2gSoftapMss(const std::string &ifName, const std::string &param) const;
     int SetAxBlaList(const std::string &ifName, const std::string &param) const;
     int AxSelfcure(const std::string &ifName, const std::string &param) const;
+    int SetBeBlaList(const std::string &ifName, const std::string &param) const;
 };
 } // namespace Wifi
 } // namespace OHOS

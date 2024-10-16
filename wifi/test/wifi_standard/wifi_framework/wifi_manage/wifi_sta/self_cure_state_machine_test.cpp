@@ -649,7 +649,8 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->HandleArpFailedDetected(nullptr);
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_ARP_FAILED_DETECTED);
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifi6BlackListCache(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(),
+            GetWifiCategoryBlackListCache(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         WifiLinkedInfo wifiLinkedInfo;
         wifiLinkedInfo.supportedWifiCategory = WifiCategory::WIFI6;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
@@ -1250,9 +1251,10 @@ public:
         LOGI("Enter InitExeMsgSuccess5");
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_WIFI6_WITH_HTC_ARP_FAILED_DETECTED);
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), InsertWifi6BlackListCache(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifi6BlackListCache(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifi6BlackListCache(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), InsertWifiCategoryBlackListCache(_, _, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiCategoryBlackListCache(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(),
+            GetWifiCategoryBlackListCache(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_TRUE(pSelfCureStateMachine->pWifi6SelfCureState->ExecuteStateMsg(msg));
     }
 
@@ -1261,11 +1263,75 @@ public:
         LOGI("Enter InitExeMsgSuccess6");
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_WIFI6_WITHOUT_HTC_ARP_FAILED_DETECTED);
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), InsertWifi6BlackListCache(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifi6BlackListCache(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifi6BlackListCache(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), InsertWifiCategoryBlackListCache(_, _, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiCategoryBlackListCache(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(),
+            GetWifiCategoryBlackListCache(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_TRUE(pSelfCureStateMachine->pWifi6SelfCureState->ExecuteStateMsg(msg));
+    }
+
+    void InitExeMsgSuccess7()
+    {
+        LOGI("Enter InitExeMsgSuccess7");
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT);
+        msg->SetMessageObj(info);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), UpdateWifiConnectFailListCache(_, _, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiConnectFailListCache(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(),
+            GetWifiConnectFailListCache(_)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(msg));
+    }
+
+    void InitExeMsgSuccess8()
+    {
+        LOGI("Enter InitExeMsgSuccess8");
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_MLD_BACKOFF);
+        msg->SetMessageObj(info);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), InsertWifiCategoryBlackListCache(_, _, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiCategoryBlackListCache(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(),
+            GetWifiCategoryBlackListCache(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(msg));
+    }
+
+        void InitExeMsgSuccess9()
+    {
+        LOGI("Enter InitExeMsgSuccess9");
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF);
+        msg->SetMessageObj(info);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), InsertWifiCategoryBlackListCache(_, _, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiCategoryBlackListCache(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(),
+            GetWifiCategoryBlackListCache(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(msg));
+    }
+
+    void InitExeMsgSuccess10()
+    {
+        LOGI("Enter InitExeMsgSuccess10");
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER);
+        msg->SetMessageObj(info);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiCategoryBlackListCache(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(),
+            GetWifiCategoryBlackListCache(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
+        EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(msg));
     }
 
     void PeriodicWifi6WithHtcArpDetectTest()
@@ -1341,44 +1407,47 @@ public:
     void SendBlaListToDriverTest()
     {
         LOGI("Enter SendBlaListToDriverTest");
-        std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache = {};
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifi6BlackListCache(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(wifi6BlackListCache), Return(0)));
-        pSelfCureStateMachine->SendBlaListToDriver();
+        int blaListType = EVENT_AX_BLA_LIST;
+        std::map<std::string, WifiCategoryBlackListInfo> wifiBlackListCache = {};
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiCategoryBlackListCache(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<1>(wifiBlackListCache), Return(0)));
+        pSelfCureStateMachine->SendBlaListToDriver(EVENT_AX_BLA_LIST);
     }
 
     void SendBlaListToDriverTest2()
     {
         LOGI("Enter SendBlaListToDriverTest2");
-        std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+        int blaListType = EVENT_AX_BLA_LIST;
+        std::map<int, std::map<std::string, WifiCategoryBlackListInfo>> wifiCategoryBlackListCache;
+        std::map<std::string, WifiCategoryBlackListInfo> wifiBlackListCache;
         std::string currentBssid = CURR_BSSID;
-        Wifi6BlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
-        wifi6BlackListCache.emplace(std::make_pair(currentBssid, wifi6BlackListInfo));
-
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifi6BlackListCache(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(wifi6BlackListCache), Return(0)));
-        pSelfCureStateMachine->SendBlaListToDriver();
+        WifiCategoryBlackListInfo wifiBlackListInfo(1, TIME_MILLS);
+        wifiBlackListCache.emplace(std::make_pair(currentBssid, wifiBlackListInfo));
+        wifiCategoryBlackListCache.emplace(blaListType, wifiBlackListCache);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiCategoryBlackListCache(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<1>(wifiBlackListCache), Return(0)));
+        pSelfCureStateMachine->SendBlaListToDriver(EVENT_AX_BLA_LIST);
     }
 
     void BlackListToStringTest()
     {
         LOGI("Enter BlackListToStringTest");
-        std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache = {};
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifi6BlackListCache(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(wifi6BlackListCache), Return(0)));
+        std::map<std::string, WifiCategoryBlackListInfo> wifi6BlackListCache = {};
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiCategoryBlackListCache(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<1>(wifi6BlackListCache), Return(0)));
         pSelfCureStateMachine->BlackListToString(wifi6BlackListCache);
     }
 
     void BlackListToStringTest2()
     {
         LOGI("Enter BlackListToStringTest2");
-        std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+        std::map<std::string, WifiCategoryBlackListInfo> wifi6BlackListCache;
         std::string currentBssid = CURR_BSSID;
-        Wifi6BlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
+        WifiCategoryBlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
         wifi6BlackListCache.emplace(std::make_pair(currentBssid, wifi6BlackListInfo));
 
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifi6BlackListCache(_))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(wifi6BlackListCache), Return(0)));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiCategoryBlackListCache(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<1>(wifi6BlackListCache), Return(0)));
         pSelfCureStateMachine->BlackListToString(wifi6BlackListCache);
     }
 
@@ -1386,23 +1455,23 @@ public:
     {
         LOGI("Enter ParseWifi6BlackListInfoTest");
         std::string currentBssid = CURR_BSSID;
-        Wifi6BlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
-        std::pair<std::string, Wifi6BlackListInfo> iter = std::make_pair(CURR_BSSID, wifi6BlackListInfo);
-        pSelfCureStateMachine->ParseWifi6BlackListInfo(iter);
+        WifiCategoryBlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
+        std::pair<std::string, WifiCategoryBlackListInfo> iter = std::make_pair(CURR_BSSID, wifi6BlackListInfo);
+        pSelfCureStateMachine->ParseWifiCategoryBlackListInfo(iter);
 
         iter = std::make_pair("", wifi6BlackListInfo);
-        EXPECT_NE(pSelfCureStateMachine->ParseWifi6BlackListInfo(iter), "");
+        pSelfCureStateMachine->ParseWifiCategoryBlackListInfo(iter);
     }
 
     void AgeOutWifi6BlackTest()
     {
         LOGI("Enter AgeOutWifi6BlackTest");
-        std::map<std::string, Wifi6BlackListInfo> wifi6BlackListCache;
+        std::map<std::string, WifiCategoryBlackListInfo> wifi6BlackListCache;
         std::string currentBssid = CURR_BSSID;
-        Wifi6BlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
+        WifiCategoryBlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
         wifi6BlackListCache.emplace(std::make_pair(currentBssid, wifi6BlackListInfo));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifi6BlackListCache(_)).Times(AtLeast(0));
-        pSelfCureStateMachine->AgeOutWifi6Black(wifi6BlackListCache);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiCategoryBlackListCache(_, _)).Times(AtLeast(0));
+        pSelfCureStateMachine->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST, wifi6BlackListCache);
 
         wifi6BlackListCache.emplace(std::make_pair("1", wifi6BlackListInfo));
         wifi6BlackListCache.emplace(std::make_pair("2", wifi6BlackListInfo));
@@ -1420,7 +1489,36 @@ public:
         wifi6BlackListCache.emplace(std::make_pair("14", wifi6BlackListInfo));
         wifi6BlackListCache.emplace(std::make_pair("15", wifi6BlackListInfo));
         wifi6BlackListCache.emplace(std::make_pair("16", wifi6BlackListInfo));
-        pSelfCureStateMachine->AgeOutWifi6Black(wifi6BlackListCache);
+        pSelfCureStateMachine->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST, wifi6BlackListCache);
+    }
+
+    void AgeOutWifiConnectFailTest()
+    {
+        LOGI("Enter AgeOutWifiConnectFailTest");
+        std::map<std::string, WifiCategoryConnectFailInfo> connectFailListCache;
+        std::string currentBssid = CURR_BSSID;
+        WifiCategoryConnectFailInfo connectFailListInfo(1, 1, TIME_MILLS);
+        connectFailListCache.emplace(std::make_pair(currentBssid, connectFailListInfo));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiConnectFailListCache(_)).Times(AtLeast(0));
+        pSelfCureStateMachine->AgeOutWifiConnectFailList();
+
+        connectFailListCache.emplace(std::make_pair("1", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("2", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("3", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("4", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("5", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("6", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("7", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("8", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("9", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("10", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("11", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("12", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("13", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("14", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("15", connectFailListInfo));
+        connectFailListCache.emplace(std::make_pair("16", connectFailListInfo));
+        pSelfCureStateMachine->AgeOutWifiConnectFailList();
     }
 
     void ShouldTransToWifi6SelfCureTest()
@@ -1457,6 +1555,54 @@ public:
         pSelfCureStateMachine->ShouldTransToWifi6SelfCure(msg, currConnectedBssid);
     }
 
+    void GetScanRssiTest()
+    {
+        LOGI("Enter GetScanRssiTest");
+        std::vector<WifiScanInfo> scanResult = {};
+        int counter = pSelfCureStateMachine->GetBssidCounter(scanResult);
+        EXPECT_EQ(counter, 0);
+
+        WifiScanInfo info;
+        info.bssid = CURR_BSSID;
+        info.ssid = "ssid";
+        info.bssidType = 0;
+        info.rssi  = 0;
+        scanResult = {info};
+        int rssi = pSelfCureStateMachine->GetScanRssi(CURR_BSSID, scanResult);
+        EXPECT_EQ(rssi, 0);
+    }
+    
+    void GetWifi7SelfCureTypeTest()
+    {
+        LOGI("Enter GetWifi7SelfCureTypeTest");
+        int type;
+        int connectFailTimes = 1;
+        WifiLinkedInfo info;
+        info.supportedWifiCategory = WifiCategory::WIFI7;
+        type = pSelfCureStateMachine->GetWifi7SelfCureType(connectFailTimes, info);
+        EXPECT_EQ(type, 0);
+
+        connectFailTimes = SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT;
+        info.rssi = MIN_VAL_LEVEL_4;
+        type = pSelfCureStateMachine->GetWifi7SelfCureType(connectFailTimes, info);
+        EXPECT_EQ(type, 1);
+    }
+
+    void ShouldTransToWifi7SelfCureTest()
+    {
+        LOGI("Enter ShouldTransToWifi7SelfCureTest");
+        WifiLinkedInfo info;
+        info.supportedWifiCategory = WifiCategory::WIFI7;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(info), Return(0)));
+        pSelfCureStateMachine->ShouldTransToWifi7SelfCure(info);
+    
+        info.rssi = MIN_VAL_LEVEL_2_5G;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(info), Return(0)));
+        pSelfCureStateMachine->ShouldTransToWifi7SelfCure(info);
+    }
+
     void GetCurrentBssidTest()
     {
         LOGI("Enter GetCurrentBssidTest");
@@ -1490,6 +1636,17 @@ public:
         std::string currConnectedBssid = CURR_BSSID;
         WifiLinkedInfo wifiLinkedInfo;
         wifiLinkedInfo.supportedWifiCategory = WifiCategory::WIFI6;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+        EXPECT_TRUE(pSelfCureStateMachine->IsWifi6Network(currConnectedBssid));
+    }
+
+    void IsWifi6NetworkTest4()
+    {
+        LOGI("Enter IsWifi6NetworkTest4");
+        std::string currConnectedBssid = CURR_BSSID;
+        WifiLinkedInfo wifiLinkedInfo;
+        wifiLinkedInfo.supportedWifiCategory = WifiCategory::WIFI7;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
         EXPECT_TRUE(pSelfCureStateMachine->IsWifi6Network(currConnectedBssid));
@@ -2224,6 +2381,11 @@ HWTEST_F(SelfCureStateMachineTest, AgeOutWifi6BlackTest, TestSize.Level1)
     AgeOutWifi6BlackTest();
 }
 
+HWTEST_F(SelfCureStateMachineTest, AgeOutWifiConnectFailTest, TestSize.Level1)
+{
+    AgeOutWifiConnectFailTest();
+}
+
 HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi6SelfCureTest, TestSize.Level1)
 {
     ShouldTransToWifi6SelfCureTest();
@@ -2239,6 +2401,16 @@ HWTEST_F(SelfCureStateMachineTest, GetCurrentBssidTest, TestSize.Level1)
     GetCurrentBssidTest();
 }
 
+HWTEST_F(SelfCureStateMachineTest, GetWifi7SelfCureTypeTest, TestSize.Level1)
+{
+    GetWifi7SelfCureTypeTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi7SelfCureTest, TestSize.Level1)
+{
+    ShouldTransToWifi7SelfCureTest();
+}
+
 HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest, TestSize.Level1)
 {
     IsWifi6NetworkTest();
@@ -2252,6 +2424,11 @@ HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest2, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest3, TestSize.Level1)
 {
     IsWifi6NetworkTest3();
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest4, TestSize.Level1)
+{
+    IsWifi6NetworkTest4();
 }
 
 HWTEST_F(SelfCureStateMachineTest, DisconnectedExeMsgSuccess0, TestSize.Level1)

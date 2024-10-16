@@ -45,6 +45,7 @@ private:
     void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
     void DealStreamChanged(StreamDirection direction, int instId = 0);
     void DealRssiChanged(int rssi, int instId = 0);
+    void DealAutoSelectNetworkChanged(int networkId, int instId);
     void PublishWifiOperateStateHiSysEvent(OperateResState state);
 private:
     StaServiceCallback mStaCallback;

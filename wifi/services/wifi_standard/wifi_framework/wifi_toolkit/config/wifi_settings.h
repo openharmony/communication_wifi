@@ -77,11 +77,11 @@ constexpr char WIFI_P2P_VENDOR_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_vendor_
 const std::string WIFI_TRUST_LIST_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/trust_list_polices.conf";
 const std::string WIFI_MOVING_FREEZE_POLICY_FILE_PATH = CONFIG_ROOR_DIR"/moving_freeze_policy.conf";
 constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
-constexpr char PORTAL_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_portal.conf";
 constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.xml";
 constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
 constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
 constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
+inline constexpr char WIFI_VARIABLE_PATH[] = "/system/etc/wifi/wifi_variable.cfg";
 
 namespace OHOS {
 namespace Wifi {
@@ -131,6 +131,14 @@ public:
 
     int SetDeviceRandomizedMacSuccessEver(int networkId);
 
+    int SetDeviceEverConnected(int networkId);
+ 
+    int SetAcceptUnvalidated(int networkId);
+ 
+    bool GetDeviceEverConnected(int networkId);
+ 
+    bool GetAcceptUnvalidated(int networkId);
+
     int GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config);
 
@@ -164,13 +172,13 @@ public:
 
     bool GetRandomMac(WifiStoreRandomMac &randomMacInfo);
 
-    void GetPortalUri(WifiPortalConf &urlInfo);
-
     const std::vector<TrustListPolicy> ReloadTrustListPolicies();
 
     const MovingFreezePolicy ReloadMovingFreezePolicy();
 
     int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
+
+    int GetVariableMap(std::map<std::string, std::string> &variableMap);
 
     int SyncHotspotConfig();
 
@@ -270,13 +278,20 @@ public:
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+        const std::set<int> &wifiLinkedNetworkIds);
+
+    void UpLoadLocalDeviceConfigToCloud();
+#endif
+
 private:
     WifiSettings();
     int IncreaseNumRebootsSinceLastUse();
     void EncryptionWifiDeviceConfigOnBoot();
     int ReloadStaRandomMac();
-    int ReloadPortalconf();
     void InitPackageFilterConfig();
+    void InitVariableConfig();
     void InitDefaultHotspotConfig();
     void InitHotspotConfig();
     int SyncBlockList();
@@ -304,7 +319,7 @@ private:
     int DecryptionDeviceConfig(WifiDeviceConfig &config);
     bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
-
+    void SyncAfterDecryped(WifiDeviceConfig &config);
 private:
     // STA
     std::mutex mStaMutex;
@@ -316,8 +331,6 @@ private:
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
-    WifiPortalConf mPortalUri;
-    WifiConfigFileImpl<WifiPortalConf> mSavedPortal;
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
 
     // SCAN
@@ -348,6 +361,10 @@ private:
     std::atomic<int> mMaxNumConfigs;
     std::map<int, WifiConfig> mWifiConfig;
     WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
+
+    std::mutex mVariableConfMutex;
+    WifiConfigFileImpl<VariableConf> mVariableConf;
+    std::map<std::string, std::string> mVariableMap;
 };
 }  // namespace Wifi
 }  // namespace OHOS

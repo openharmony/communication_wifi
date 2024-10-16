@@ -370,6 +370,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
     }
     OnConfigChanged(cfgType, cfgData, cfgLen);
     delete[] cfgData;
+    cfgData = nullptr;
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &data, MessageParcel &reply)

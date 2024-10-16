@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hisysevent_test.h"
+#include <limits>
 
 using namespace testing::ext;
 
@@ -48,6 +49,16 @@ HWTEST_F(WifiHisyseventTest, WriteWifiWpaStateHiSysEventTest, TestSize.Level1)
 HWTEST_F(WifiHisyseventTest, WritePortalAuthExpiredHisyseventTest, TestSize.Level1)
 {
     WritePortalAuthExpiredHisysevent(0, 0, 0, 0, false);
+}
+
+HWTEST_F(WifiHisyseventTest, WritePortalAuthExpiredHisyseventTes01, TestSize.Level1)
+{
+    int64_t nums[]{LLONG_MIN, INT_MIN, SHRT_MIN, 0, SHRT_MAX, INT_MAX, LLONG_MAX};
+    for (int64_t i : nums) {
+        for (int64_t j : nums) {
+            WritePortalAuthExpiredHisysevent(0, 0, i, j, false);
+        }
+    }
 }
 
 HWTEST_F(WifiHisyseventTest, WriteWifiStateHiSysEventTest, TestSize.Level1)

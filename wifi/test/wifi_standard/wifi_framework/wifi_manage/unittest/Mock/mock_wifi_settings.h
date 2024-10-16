@@ -91,7 +91,6 @@ public:
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
     virtual void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0) = 0;
-    virtual void GetPortalUri(WifiPortalConf &urlInfo) = 0;
     virtual void InsertWifi6BlackListCache(const std::string currentBssid,
         const Wifi6BlackListInfo wifi6BlackListInfo) = 0;
     virtual void RemoveWifi6BlackListCache(const std::string bssid) = 0;
@@ -125,9 +124,9 @@ public:
     virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
     virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
     virtual int GetThermalLevel() const = 0;
-    virtual int GetHid2dUpperScene(std::string& ifName, Hid2dUpperScene &scene) = 0;
+    virtual int GetHid2dUpperScene(int uid, Hid2dUpperScene &scene) = 0;
     virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
-    virtual int SetHid2dUpperScene(const std::string& ifName, const Hid2dUpperScene &scene) = 0;
+    virtual int SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene) = 0;
     virtual int SetWifiDetailState(WifiDetailState state, int instId) = 0;
     virtual bool EncryptionDeviceConfig(WifiDeviceConfig &config) const = 0;
     virtual bool GetRandomMac(WifiStoreRandomMac &randomMacInfo) = 0;
@@ -256,7 +255,6 @@ public:
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
     MOCK_METHOD2(SaveDisconnectedReason, void(DisconnectedReason discReason, int));
-    MOCK_METHOD1(GetPortalUri, void(WifiPortalConf &urlInfo));
     MOCK_METHOD2(InsertWifi6BlackListCache, void(const std::string currentBssid,
         const Wifi6BlackListInfo wifi6BlackListInfo));
     MOCK_METHOD1(RemoveWifi6BlackListCache, void(const std::string bssid));
@@ -288,9 +286,9 @@ public:
     MOCK_CONST_METHOD0(GetAppPackageName, const std::string());
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
     MOCK_CONST_METHOD0(GetThermalLevel, int());
-    MOCK_METHOD2(GetHid2dUpperScene, int(std::string& ifName, Hid2dUpperScene &scene));
+    MOCK_METHOD2(GetHid2dUpperScene, int(int uid, Hid2dUpperScene &scene));
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
-    MOCK_METHOD2(SetHid2dUpperScene, int(const std::string& ifName, const Hid2dUpperScene &scene));
+    MOCK_METHOD2(SetHid2dUpperScene, int(int uid, const Hid2dUpperScene &scene));
     MOCK_METHOD2(SetWifiDetailState, int(WifiDetailState state, int instId));
     MOCK_CONST_METHOD1(EncryptionDeviceConfig, bool(WifiDeviceConfig &config));
     MOCK_METHOD1(GetRandomMac, bool(WifiStoreRandomMac &randomMacInfo));

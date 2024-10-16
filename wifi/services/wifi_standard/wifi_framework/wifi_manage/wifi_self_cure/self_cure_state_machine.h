@@ -97,6 +97,7 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void HandleDhcpOfferPacketRcv(const IpInfo &info);
+        void HandleP2pEnhanceStateChange(int state);
     private:
         SelfCureStateMachine *pSelfCureStateMachine;
     };
@@ -392,6 +393,7 @@ private:
     int SetSelfCureHistoryInfo(const std::string selfCureHistory);
     int GetIsReassocWithFactoryMacAddress();
     int SetIsReassocWithFactoryMacAddress(int isReassocWithFactoryMacAddress);
+    bool IsCustNetworkSelfCure();
     ErrCode GetCurrentWifiDeviceConfig(WifiDeviceConfig &config);
     bool SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel);
     void HandleNetworkConnected();
@@ -414,6 +416,7 @@ private:
     bool IsSettingsPage();
     bool IsMultiDhcpOffer();
     void ClearDhcpOffer();
+    void UpdateSelfcureState(int selfcureType, bool isSelfCureOnGoing);
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;
@@ -451,6 +454,7 @@ private:
     std::atomic<bool> isWifiBackground = false;
     sptr<NetStateObserver> mNetWorkDetect;
     bool m_httpDetectResponse = false;
+    bool p2pEnhanceConnected_ = false;
 };
 } // namespace Wifi
 } // namespace OHOS

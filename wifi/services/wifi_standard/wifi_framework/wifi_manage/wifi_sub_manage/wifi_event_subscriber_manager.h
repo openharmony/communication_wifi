@@ -30,6 +30,11 @@ namespace Wifi {
 #ifdef HAS_POWERMGR_PART
 const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_MANAGER_STATE_CHANGED";
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+inline const std::string COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED = "usual.event.ASSET_SYNC_DATA_CHANGED_SA";
+const int ASSETID = 6226;
+#endif
+const int CAST_ENGINE_SA_ID = 65546;
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -42,6 +47,8 @@ public:
     void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
 };
@@ -61,7 +68,14 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 #endif
-
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+class AssetEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit AssetEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~AssetEventSubscriber();
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+#endif
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
@@ -87,6 +101,7 @@ private:
     void HandleHasMovementPartChange(int systemAbilityId, bool add);
 #endif
     void HandleDistributedKvDataServiceChange(bool add);
+    void HandleCastServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void GetCloneDataByDatashare(std::string &cloneData);
     void SetCloneDataByDatashare(const std::string &cloneData);
@@ -115,6 +130,10 @@ private:
 #ifdef FEATURE_P2P_SUPPORT
     void HandleP2pBusinessChange(int systemAbilityId, bool add);
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    void RegisterAssetEvent();
+    void UnRegisterAssetEvent();
+#endif
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
@@ -132,6 +151,11 @@ private:
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;
     std::unique_ptr<WifiEventHandler> mWifiEventSubsThread = nullptr;
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    std::shared_ptr<AssetEventSubscriber> wifiAssetrEventSubsciber_ = nullptr;
+    std::mutex AssetEventMutex;
+    uint32_t assetMgrId{0};
+#endif
 };
 
 }  // namespace Wifi

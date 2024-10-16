@@ -37,6 +37,8 @@ const std::string COMMON_EVENT_WIFI_P2P_PEERS_DISCOVERY_STATE_CHANGED =
     "usual.event.wifi.p2p.PEER_DISCOVERY_STATE_CHANGE";
 const std::string COMMON_EVENT_WIFI_P2P_CURRENT_DEVICE_STATE_CHANGED = "usual.event.wifi.p2p.CURRENT_DEVICE_CHANGE";
 const std::string COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED = "usual.event.wifi.p2p.GROUP_STATE_CHANGED";
+const std::string COMMON_EVENT_WIFI_SELF_CURE_STATE_CHANGED = "usual.event.wifi.selfcure.STATE_CHANGED";
+const std::string COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION = "ohos.permission.SET_WIFI_CONFIG";
 class WifiCommonEventHelper {
 public:
     static bool PublishEvent(const std::string &eventAction, const int &code, const std::string &data,
@@ -64,6 +66,7 @@ public:
     static bool PublishP2pDicoveryStateChangedEvent(const int &code, const std::string &data);
     static bool PublishP2pCurrentDeviceStateChangedEvent(const int &code, const std::string &data);
     static bool PublishP2pGroupStateChangedEvent(const int &code, const std::string &data);
+    static bool PublishSelfcureStateChangedEvent(const int &pid, const int &code, bool isSelfCureOnGoing);
 };
 }  // namespace Wifi
 }  // namespace OHOS

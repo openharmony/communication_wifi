@@ -17,7 +17,6 @@
 #include "sta_state_machine.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_sta_interface.h"
 #include <string>
 
 using ::testing::_;
@@ -64,9 +63,7 @@ public:
     void OnWpaStateChangedCallBackFail1();
     void OnWpaStateChangedCallBackFail2();
     void OnWpaSsidWrongKeyCallBackSuccess();
-    void OnWpaSsidWrongKeyCallBackFail1();
-    void OnWpaSsidWrongKeyCallBackFail2();
-    void OnWpaSsidWrongKeyCallBackFail3();
+    void OnWpaSsidWrongKeyCallBackFail();
     void OnWpsPbcOverlapCallBackSuccess();
     void OnWpsPbcOverlapCallBackFail1();
     void OnWpsPbcOverlapCallBackFail2();
@@ -92,25 +89,21 @@ public:
 
 void StaMonitorTest::InitStaMonitorSuccess()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::InitStaMonitorFail()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     EXPECT_TRUE(pStaMonitor->InitStaMonitor() == WIFI_OPT_FAILED);
 }
 
 void StaMonitorTest::UnInitStaMonitorSuccess()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = true;
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_SUCCESS);
 }
 
 void StaMonitorTest::UnInitStaMonitorFail()
 {
-    MockWifiStaInterface::GetInstance().pWifiStaHalInfo.callback = false;
     pStaMonitor->SetStateMachine(pStaMonitor->pStaStateMachine);
     pStaMonitor->SetStateMachine(nullptr);
     EXPECT_TRUE(pStaMonitor->UnInitStaMonitor() == WIFI_OPT_FAILED);
@@ -191,6 +184,17 @@ void StaMonitorTest::OnWpaStateChangedCallBackFail1()
     int status = 1;
     pStaMonitor->pStaStateMachine = nullptr;
     pStaMonitor->OnWpaStateChangedCallBack(status);
+}
+
+void StaMonitorTest::OnWpaSsidWrongKeyCallBackSuccess()
+{
+    pStaMonitor->OnWpaSsidWrongKeyCallBack();
+}
+
+void StaMonitorTest::OnWpaSsidWrongKeyCallBackFail()
+{
+    pStaMonitor->pStaStateMachine = nullptr;
+    pStaMonitor->OnWpaSsidWrongKeyCallBack();
 }
 
 void StaMonitorTest::OnWpsPbcOverlapCallBackSuccess()
@@ -383,6 +387,16 @@ HWTEST_F(StaMonitorTest, OnWpaStateChangedCallBackSuccess, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnWpaStateChangedCallBackFail1, TestSize.Level1)
 {
     OnWpaStateChangedCallBackFail1();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackSuccess, TestSize.Level1)
+{
+    OnWpaSsidWrongKeyCallBackSuccess();
+}
+
+HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackFail, TestSize.Level1)
+{
+    OnWpaSsidWrongKeyCallBackFail();
 }
 
 HWTEST_F(StaMonitorTest, OnWpsPbcOverlapCallBackSuccess, TestSize.Level1)

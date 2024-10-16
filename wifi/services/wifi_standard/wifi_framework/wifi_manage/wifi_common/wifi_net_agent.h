@@ -77,6 +77,13 @@ public:
         int instId = 0);
 
     /**
+     * Restart the Wi-Fi connection.
+     *
+     * @param
+     */
+    void RestoreWifiConnection();
+ 
+    /**
      * Add route
      *
      * @param interface interface name
@@ -101,7 +108,7 @@ public:
      * @param wifiIpV6Info wifi ipv6 network link data information
      * @param wifiProxyConfig wifi network link proxy information
      */
-    void OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig,
+    void OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wifiIpV6Info, WifiProxyConfig wifiProxyConfig,
         int instId = 0);
 
     /**
@@ -109,7 +116,7 @@ public:
      *
      * @param netSupplierInfo net Supplier Info
      */
-    void OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
+    void OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo);
 
     /**
      * Add OnStaMachineWifiStart
@@ -123,7 +130,7 @@ public:
      *
      * @param netSupplierInfo net Supplier Info
      */
-    void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+    void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo,
         int instId = 0);
 
     /**
@@ -208,6 +215,7 @@ private:
 private:
     uint32_t supplierId{0};
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
+    std::unique_ptr<WifiEventHandler> netAgentEventHandler_ = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS

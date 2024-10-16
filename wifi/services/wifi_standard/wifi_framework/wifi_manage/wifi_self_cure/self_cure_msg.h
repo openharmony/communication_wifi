@@ -120,6 +120,17 @@ struct WifiSelfCureHistoryInfo {
         return internetSelfCureHistory;
     }
 };
+
+enum class SelfCureType {
+    SCE_TYPE_INVALID = 0,
+    SCE_TYPE_DNS = 1,
+    SCE_TYPE_REASSOC = 2,
+    SCE_TYPE_WIFI6 = 3,
+    SCE_TYPE_STATIC_IP = 4,
+    SCE_TYPE_MULTI_GW = 5,
+    SCE_TYPE_RANDMAC = 6,
+    SCE_TYPE_RESET = 7,
+};
 }
 }
 #endif

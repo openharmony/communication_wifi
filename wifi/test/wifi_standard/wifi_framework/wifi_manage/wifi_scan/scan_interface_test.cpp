@@ -18,7 +18,6 @@
 #include "mock_scan_service.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include "mock_wifi_scan_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -136,6 +135,11 @@ HWTEST_F(ScanInterfaceTest, OnCustomControlStateChangedFail, TestSize.Level1)
 HWTEST_F(ScanInterfaceTest, OnControlStrategyChangedSuccess, TestSize.Level1)
 {
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnControlStrategyChanged());
+}
+
+HWTEST_F(ScanInterfaceTest, OnAutoConnectStateChangedSuccess, TestSize.Level1)
+{
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnAutoConnectStateChanged(true));
 }
 
 HWTEST_F(ScanInterfaceTest, RegisterScanCallbacksTest, TestSize.Level1)

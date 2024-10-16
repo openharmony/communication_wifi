@@ -44,6 +44,7 @@ local_base_sources = [
   "utils/wifi_encryption_util.cpp",
   "utils/wifi_global_func.cpp",
   "utils/wifi_randommac_helper.cpp",
+  "wifi_asset/wifi_asset_manager.cpp",
 ]
 
 local_base_include_dirs = [
@@ -55,6 +56,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/wifi_asset",
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
@@ -120,7 +122,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "$WIFI_ROOT_DIR/base:wifi_base_without_crpc",
+      "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
@@ -163,7 +165,10 @@ if (defined(ohos_lite)) {
       "jsoncpp:jsoncpp",
       "libxml2:libxml2",
     ]
-
+    if (wifi_feature_with_sta_asset) {
+      defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]
+      external_deps += [ "asset:asset_sdk" ]
+    }
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {
       external_deps += [
         "init:libbeget_proxy",

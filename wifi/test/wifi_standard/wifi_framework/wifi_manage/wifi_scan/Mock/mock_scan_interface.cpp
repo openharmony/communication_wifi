@@ -104,6 +104,12 @@ ErrCode ScanInterface::OnControlStrategyChanged()
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanInterface::OnAutoConnectStateChanged(bool success)
+{
+    WIFI_LOGI("Enter ScanInterface::OnAutoConnectStateChanged\n");
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode ScanInterface::RegisterScanCallbacks(const IScanSerivceCallbacks &scanSerivceCallbacks)
 {
     mScanSerivceCallbacks = scanSerivceCallbacks;

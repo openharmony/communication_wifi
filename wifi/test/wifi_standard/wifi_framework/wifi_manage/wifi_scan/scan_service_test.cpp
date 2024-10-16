@@ -212,7 +212,7 @@ public:
     void ScanSuccess()
     {
         pScanService->scanStartedFlag = false;
-        EXPECT_TRUE(pScanService->Scan(false) == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN) == WIFI_OPT_FAILED);
     }
 
     void ScanFail()
@@ -222,10 +222,10 @@ public:
             .WillOnce(Return(1))
             .WillOnce(Return(0));
         pScanService->scanStartedFlag = true;
-        EXPECT_TRUE(pScanService->Scan(true) == WIFI_OPT_SUCCESS);
-        EXPECT_TRUE(pScanService->Scan(false) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_EXTERN) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN) == WIFI_OPT_SUCCESS);
         pScanService->pScanStateMachine = nullptr;
-        EXPECT_TRUE(pScanService->Scan(true) == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_EXTERN) == WIFI_OPT_FAILED);
     }
 
     void ScanWithParamSuccess()
@@ -235,7 +235,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pScanService->ScanWithParam(params, false));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
     }
 
     void ScanWithParamFail1()
@@ -243,7 +243,7 @@ public:
         pScanService->scanStartedFlag = false;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, false));
+        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
     }
 
     void ScanWithParamFail2()
@@ -251,7 +251,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = -1;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, false));
+        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
     }
 
     void ScanWithParamFail3()
@@ -259,7 +259,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_UNSPECIFIED;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, false));
+        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
     }
 
     void ScanWithParamFail4()
@@ -268,14 +268,14 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_UNSPECIFIED;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, false));
+        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
     }
 
     void SingleScanSuccess1()
     {
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_BOTH_WITH_DFS;
-        scanConfig.externFlag = true;
+        scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
         scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
         EXPECT_EQ(true, pScanService->SingleScan(scanConfig));
     }
@@ -284,7 +284,7 @@ public:
     {
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_UNSPECIFIED;
-        scanConfig.externFlag = true;
+        scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
         scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
         scanConfig.scanFreqs.push_back(0);
         EXPECT_EQ(true, pScanService->SingleScan(scanConfig));
@@ -294,7 +294,7 @@ public:
     {
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_24_GHZ;
-        scanConfig.externFlag = true;
+        scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
         scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
         EXPECT_EQ(true, pScanService->SingleScan(scanConfig));
     }
@@ -303,7 +303,7 @@ public:
     {
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_UNSPECIFIED;
-        scanConfig.externFlag = true;
+        scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
         scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
         EXPECT_EQ(false, pScanService->SingleScan(scanConfig));
     }
@@ -312,7 +312,7 @@ public:
     {
         ScanConfig scanConfig;
         scanConfig.scanBand = static_cast<ScanBandType>(-1);
-        scanConfig.externFlag = true;
+        scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
         scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
         EXPECT_EQ(false, pScanService->SingleScan(scanConfig));
     }
@@ -800,7 +800,6 @@ public:
     {
         int staScene = 0;
         StoreScanConfig cfg;
-        cfg.externFlag = true;
         pScanService->scanConfigMap.emplace(staScene, cfg);
 
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
@@ -941,7 +940,7 @@ public:
     void IsExternScanningSuccess()
     {
         StoreScanConfig storeScanConfig;
-        storeScanConfig.externFlag = true;
+        storeScanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
         pScanService->scanConfigMap.emplace(0, storeScanConfig);
         EXPECT_EQ(true, pScanService->IsExternScanning());
     }
@@ -960,7 +959,7 @@ public:
     void IsExternScanningFail()
     {
         StoreScanConfig storeScanConfig;
-        storeScanConfig.externFlag = false;
+        storeScanConfig.scanType = ScanType::SCAN_TYPE_SYSTEMTIMER;
         pScanService->scanConfigMap.emplace(0, storeScanConfig);
         EXPECT_EQ(false, pScanService->IsExternScanning());
     }
@@ -1673,6 +1672,11 @@ public:
         pScanService->HandleMovingFreezeChanged();
     }
 
+    void HandleAutoConnectStateChangedTest()
+    {
+        pScanService->HandleAutoConnectStateChanged(true);
+    }
+
     void HandleNetworkQualityChangedTest()
     {
         int status = static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED);
@@ -1829,7 +1833,7 @@ public:
 
     void ApplyTrustListPolicyTest()
     {
-        ScanService::ScanType scanType = ScanService::ScanType::SCAN_TYPE_EXTERN;
+        ScanType scanType = ScanType::SCAN_TYPE_EXTERN;
         pScanService->ApplyTrustListPolicy(scanType);
     }
 
@@ -2748,6 +2752,11 @@ HWTEST_F(ScanServiceTest, PnoScanFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleMovingFreezeChangedTest, TestSize.Level1)
 {
     HandleMovingFreezeChangedTest();
+}
+
+HWTEST_F(ScanServiceTest, HandleAutoConnectStateChangedTest, TestSize.Level1)
+{
+    HandleAutoConnectStateChangedTest();
 }
 
 HWTEST_F(ScanServiceTest, HandleNetworkQualityChangedTest, TestSize.Level1)

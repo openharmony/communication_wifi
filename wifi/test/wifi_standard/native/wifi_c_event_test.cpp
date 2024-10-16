@@ -68,7 +68,7 @@ public:
         WIFI_LOGE("RegisterWifiEventErrorTest enter!");
         WifiEvent *event = nullptr;
         RegisterWifiEvent(event);
-        EXPECT_EQ(RegisterWifiEvent(event), WIFI_SUCCESS);
+        EXPECT_EQ(RegisterWifiEvent(event), ERROR_WIFI_UNKNOWN);
     }
     void UnRegisterWifiEventTest()
     {

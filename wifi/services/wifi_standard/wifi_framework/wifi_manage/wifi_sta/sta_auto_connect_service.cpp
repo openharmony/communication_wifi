@@ -78,6 +78,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
     if (info.supplicantState == SupplicantState::ASSOCIATING ||
+        info.supplicantState == SupplicantState::ASSOCIATED ||
         info.supplicantState == SupplicantState::AUTHENTICATING ||
         info.supplicantState == SupplicantState::FOUR_WAY_HANDSHAKE ||
         info.supplicantState == SupplicantState::GROUP_HANDSHAKE) {

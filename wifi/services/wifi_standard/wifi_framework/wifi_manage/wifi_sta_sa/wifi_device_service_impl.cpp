@@ -768,6 +768,33 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
     return WIFI_OPT_SUCCESS;
 }
 
+
+ErrCode WifiDeviceServiceImpl::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
+{
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetDeviceConfig:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDeviceConfig:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+
+        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetDeviceConfig:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+
+    #ifndef SUPPORT_RANDOM_MAC_ADDR
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetDeviceConfig:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+    #endif
+    }
+
+    WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEnable)
 {
     if (!WifiAuthCenter::IsSystemAccess()) {

@@ -662,9 +662,19 @@ WifiErrorNo WifiStaHalInterface::GetPskPassphrase(const std::string &ifName, std
 WifiErrorNo WifiStaHalInterface::GetChipsetCategory(const std::string &ifaceName, int& chipsetCategory)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetCategory(ifaceName, chipsetCategory)) {
+    unsigned int chipsetCategorySupported = static_cast<unsigned int>(WifiCategory::DEFAULT);
+    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetCategory(ifaceName, chipsetCategorySupported)) {
         return WIFI_HAL_OPT_FAILED;
     }
+    if (chipsetCategorySupported & static_cast<unsigned int>(WifiCategory::WIFI7)) {
+        chipsetCategory = static_cast<int>(WifiCategory::WIFI7);
+    } else if (chipsetCategorySupported & static_cast<unsigned int>(WifiCategory::WIFI6)) {
+        chipsetCategory = static_cast<int>(WifiCategory::WIFI6);
+    } else {
+        chipsetCategory = static_cast<int>(WifiCategory::DEFAULT);
+    }
+    LOGI("%{public}s success, chipsetCategorySupported: %{public}u, chipsetCategory: %{public}d",
+        __FUNCTION__, chipsetCategorySupported, chipsetCategory);
     return WIFI_HAL_OPT_OK;
 #else
     return WIFI_HAL_OPT_OK;

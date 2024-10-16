@@ -2156,9 +2156,12 @@ void StaStateMachine::OnBssidChangedEvent(std::string reason, std::string bssid)
         LOGE("msg is nullptr.\n");
         return;
     }
-
-    msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
-    msg->AddStringMessageBody(reason);
+    if (strcmp(reason.c_str(), "LINK_SWITCH") == 0) {
+        msg->SetMessageName(WIFI_SVR_CMD_STA_LINK_SWITCH_EVENT);
+    } else {
+        msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+        msg->AddStringMessageBody(reason);
+    }
     msg->AddStringMessageBody(bssid);
     SendMessage(msg);
 }
@@ -2794,6 +2797,10 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             HandleStaBssidChangedEvent(msg);
             break;
         }
+        case WIFI_SVR_CMD_STA_LINK_SWITCH_EVENT:
+            ret = EXECUTED;
+            HandleLinkSwitchEvent(msg);
+            break;
         case CMD_SIGNAL_POLL:
             ret = EXECUTED;
             pStaStateMachine->DealSignalPollResult();
@@ -2843,6 +2850,26 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
         WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->GetInstanceId())) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetBssid return fail.");
     }
+}
+
+void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr msg)
+{
+    std::string bssid = msg->GetStringFromMessage();
+    WIFI_LOGI("%{public}s enter, bssid:%{public}s", __FUNCTION__, MacAnonymize(bssid).c_str());
+    pStaStateMachine->linkedInfo.bssid = bssid;
+#ifndef OHOS_ARCH_LITE
+    pStaStateMachine->SetSupportedWifiCategory();
+#endif
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
+    pStaStateMachine->DealSignalPollResult();  // update freq info
+    WifiDeviceConfig deviceConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, deviceConfig,
+        pStaStateMachine->GetInstanceId()) != 0) {
+        WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__,
+            pStaStateMachine->linkedInfo.networkId);
+        return;
+    }
+    pStaStateMachine->UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
 }
 
 void StaStateMachine::DisConnectProcess()

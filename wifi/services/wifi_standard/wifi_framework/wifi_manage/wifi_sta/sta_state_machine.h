@@ -281,6 +281,7 @@ public:
     private:
         void HandleNetWorkConnectionEvent(InternalMessagePtr msg);
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
+        void HandleLinkSwitchEvent(InternalMessagePtr msg);
     private:
         StaStateMachine *pStaStateMachine;
     };

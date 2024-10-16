@@ -988,7 +988,7 @@ void WifiInternalEventDispatcher::PublishWifiStateChangedEvent(int state)
 bool WifiInternalEventDispatcher::VerifyRegisterCallbackPermission(int callbackEventId)
 {
     if (g_CallbackEventChkSysAppList.find(callbackEventId) != g_CallbackEventChkSysAppList.end()) {
-        if (!WifiAuthCenter::IsSystemAppByToken()) {
+        if (!WifiAuthCenter::IsSystemAccess()) {
             WIFI_LOGE("VerifyRegisterCallbackPermission:NOT System APP, PERMISSION_DENIED!");
             return false;
         }

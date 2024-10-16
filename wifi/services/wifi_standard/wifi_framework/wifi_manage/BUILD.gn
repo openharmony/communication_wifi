@@ -29,6 +29,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/wifi_controller_state_machine.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/wifi_service_scheduler.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_callback_proxy_lite.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_service_impl.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_stub_lite.cpp",
@@ -197,6 +198,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils/inc",
       "$WIFI_ROOT_DIR/services/wifi_standard/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/wifi_asset",
     ]
   }
 
@@ -468,6 +470,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/softap_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/softap_manager_state_machine.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/wifi_controller_state_machine.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/wifi_service_scheduler.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_common_service_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_event_subscriber_manager.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_hotspot_manager.cpp",
@@ -543,6 +546,11 @@ if (defined(ohos_lite)) {
 
     if (is_asan) {
       defines += [ "DTFUZZ_TEST" ]
+    }
+
+    if (wifi_feature_with_sta_asset) {
+      external_deps += [ "asset:asset_sdk" ]
+      defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]
     }
 
     if (defined(global_parts_info) &&

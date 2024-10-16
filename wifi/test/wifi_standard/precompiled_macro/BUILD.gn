@@ -132,6 +132,7 @@ ohos_unittest("precompiled_macro_unittest") {
     "protected = public",
     "SUPPORT_SCAN_CONTROL",
     "SUPPORT_LOCAL_RANDOM_MAC",
+    "FEATURE_P2P_SUPPORT",
   ]
 
   part_name = "wifi"

@@ -323,7 +323,7 @@ public:
      * @param chipsetCategory: [out] chipset category
      * @return bool
      */
-    bool GetChipsetCategory(const std::string &ifaceName, int &chipsetCategory);
+    bool GetChipsetCategory(const std::string &ifaceName, uint32_t &chipsetCategory);
 
     /**
      * @Description get chipset feature capability

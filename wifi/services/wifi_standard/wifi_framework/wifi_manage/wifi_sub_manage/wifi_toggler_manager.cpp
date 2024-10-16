@@ -72,6 +72,26 @@ ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiTogglerManager::StartWifiToggledTimer()
+{
+    WIFI_LOGD("StartWifiToggledTimer");
+    pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+    pWifiControllerMachine->MessageExecutedLater(CMD_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+}
+
+void WifiTogglerManager::StopWifiToggledTimer()
+{
+    WIFI_LOGD("StopWifiToggledTimer");
+    pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+}
+
+void WifiTogglerManager::OnWifiToggledTimeOut()
+{
+    WIFI_LOGE("OnWifiToggledTimeOut");
+    WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
+        "TIME_OUT", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(0)));
+}
+
 ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
 {
     if (isOpen) {

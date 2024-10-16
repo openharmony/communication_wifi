@@ -116,6 +116,8 @@ void HdiBufEncode(char *txt, size_t maxlen, const uint8_t *data, size_t len);
 
 const char* HdiSSid2Txt(const uint8_t *ssid, size_t ssidLen);
 
+char* HdiGetWifiCategoryTxt(char *pos, char* end, const struct HdiElems *elems);
+
 char* HdiGetIeTxt(char *pos, char *end, const char *proto,
     const uint8_t *ie, size_t ieLen);
 

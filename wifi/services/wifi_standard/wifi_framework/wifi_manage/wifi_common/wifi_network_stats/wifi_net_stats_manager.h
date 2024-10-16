@@ -22,6 +22,7 @@
 #include <vector>
 #include "singleton.h"
 #include "net_stats_info.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Wifi {
@@ -44,6 +45,7 @@ private:
     std::string GetBundleName(int32_t uid);
 private:
     std::map<int32_t, NetStatsInfo> m_lastStatsMap;
+    std::mutex lastStatsMapMutex_ {};
     bool m_hasLastStats {false};
     uint64_t m_netStatsTimerId {0};
 };

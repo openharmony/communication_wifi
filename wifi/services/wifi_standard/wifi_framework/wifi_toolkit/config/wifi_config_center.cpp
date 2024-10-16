@@ -434,33 +434,82 @@ int WifiConfigCenter::GetDisconnectedReason(DisconnectedReason &discReason, int 
     return 0;
 }
 
-void WifiConfigCenter::InsertWifi6BlackListCache(const std::string currentBssid,
-    const Wifi6BlackListInfo wifi6BlackListInfo)
+void WifiConfigCenter::InsertWifiCategoryBlackListCache(int blacklistType, const std::string currentBssid,
+    const WifiCategoryBlackListInfo wifiBlackListInfo)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    auto iter = mWifi6BlackListCache.find(currentBssid);
-    if (iter != mWifi6BlackListCache.end()) {
-        iter->second = wifi6BlackListInfo;
-    } else {
-        mWifi6BlackListCache.emplace(std::make_pair(currentBssid, wifi6BlackListInfo));
+    std::map<std::string, WifiCategoryBlackListInfo> wifiBlackListCache;
+    if (mWifiCategoryBlackListCache.find(blacklistType) != mWifiCategoryBlackListCache.end()) {
+        wifiBlackListCache = mWifiCategoryBlackListCache[blacklistType];
     }
+    auto iter = wifiBlackListCache.find(currentBssid);
+    if (iter != wifiBlackListCache.end()) {
+        iter->second = wifiBlackListInfo;
+    } else {
+        wifiBlackListCache.emplace(std::make_pair(currentBssid, wifiBlackListInfo));
+    }
+    mWifiCategoryBlackListCache[blacklistType] = wifiBlackListCache;
 }
 
-void WifiConfigCenter::RemoveWifi6BlackListCache(const std::string bssid)
+void WifiConfigCenter::RemoveWifiCategoryBlackListCache(int blacklistType, const std::string bssid)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mWifi6BlackListCache.find(bssid) != mWifi6BlackListCache.end()) {
-        mWifi6BlackListCache.erase(bssid);
+    if (mWifiCategoryBlackListCache.find(blacklistType) != mWifiCategoryBlackListCache.end()) {
+        LOGE("%{public}s: dont exist wifi bla type", __func__);
+        return;
+    }
+    std::map<std::string, WifiCategoryBlackListInfo> wifiBlackListCache = mWifiCategoryBlackListCache[blacklistType];
+    if (wifiBlackListCache.find(bssid) != wifiBlackListCache.end()) {
+        wifiBlackListCache.erase(bssid);
+        mWifiCategoryBlackListCache[blacklistType] = wifiBlackListCache;
     } else {
         LOGE("%{public}s: don't exist wifi bla list, bssid: %{public}s", __func__, MacAnonymize(bssid).c_str());
         return;
     }
 }
 
-int WifiConfigCenter::GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache)
+int WifiConfigCenter::GetWifiCategoryBlackListCache(int blacklistType,
+    std::map<std::string, WifiCategoryBlackListInfo> &blackListCache)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    blackListCache = mWifi6BlackListCache;
+    if (mWifiCategoryBlackListCache.find(blacklistType) != mWifiCategoryBlackListCache.end()) {
+        LOGE("%{public}s: dont exist wifi bla type", __func__);
+        return -1;
+    }
+    blackListCache = mWifiCategoryBlackListCache[blacklistType];
+    return 0;
+}
+
+void WifiConfigCenter::UpdateWifiConnectFailListCache(int blacklistType, const std::string bssid,
+    const WifiCategoryConnectFailInfo wifiConnectFailInfo)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiConnectFailCache.find(bssid);
+    if (iter != mWifiConnectFailCache.end()
+        && iter->second.actionType >= wifiConnectFailInfo.actionType) {
+        iter->second.connectFailTimes++;
+    } else {
+        mWifiConnectFailCache[bssid] = wifiConnectFailInfo;
+    }
+}
+
+void WifiConfigCenter::RemoveWifiConnectFailListCache(const std::string bssid)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    if (mWifiConnectFailCache.find(bssid) != mWifiConnectFailCache.end()) {
+        mWifiConnectFailCache.erase(bssid);
+    } else {
+        LOGE("%{public}s: don't exist wifi connect fail list, bssid: %{public}s",
+            __func__, MacAnonymize(bssid).c_str());
+        return;
+    }
+}
+
+int WifiConfigCenter::GetWifiConnectFailListCache(std::map<std::string,
+    WifiCategoryConnectFailInfo> &connectFailCache)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    connectFailCache = mWifiConnectFailCache;
     return 0;
 }
 

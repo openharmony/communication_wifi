@@ -40,6 +40,7 @@ static const auto CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
 static const auto CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
 static const auto CMD_SET_AX_BLA_LIST = "SET_AX_BLACKLIST";
 static const auto CMD_SET_AX_CLOSE_HTC = "SET_AX_CLOSE_HTC";
+static const auto CMD_SET_BE_BLA_LIST = "SET_BE_BLACKLIST";
 
 #define MSS_SOFTAP_MAX_IFNAMESIZE 5
 #define MSS_SOFTAP_CMDSIZE 30
@@ -64,6 +65,8 @@ int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, con
         ret = SetAxBlaList(ifName, param);
     } else if (commandId == CMD_AX_SELFCURE) {
         ret = AxSelfcure(ifName, param);
+    } else if (commandId == CMD_BE_BLA_LIST) {
+        ret = SetBeBlaList(ifName, param);
     } else {
         WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
     }
@@ -92,6 +95,9 @@ int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
     privCmd.buf = buf;
     if (strncmp(cmdParm.c_str(), CMD_SET_AX_BLA_LIST, strlen(CMD_SET_AX_BLA_LIST)) == 0) {
         WIFI_LOGI("%{public}s send wifi6 bla list", __FUNCTION__);
+        privCmd.size = static_cast<int>(cmdParm.size());
+    } else if (strncmp(cmdParm.c_str(), CMD_SET_BE_BLA_LIST, strlen(CMD_SET_BE_BLA_LIST)) == 0) {
+        WIFI_LOGI("%{public}s send wifi7 bla list", __FUNCTION__);
         privCmd.size = static_cast<int>(cmdParm.size());
     } else {
         privCmd.size = sizeof(buf);
@@ -168,6 +174,20 @@ int WifiCmdClient::AxSelfcure(const std::string &ifName, const std::string &para
         return -1;
     }
     std::string cmdParm = CMD_SET_AX_CLOSE_HTC;
+    cmdParm.append(" ");
+    cmdParm.append(param);
+    return SendCommandToDriverByInterfaceName(ifName, cmdParm);
+}
+
+int WifiCmdClient::SetBeBlaList(const std::string &ifName, const std::string &param) const
+{
+    WIFI_LOGD("%{public}s enter", __FUNCTION__);
+    if (param.size() > MSS_BLA_LIST_MAX_PARAMSIZE ||
+        param.size() + strlen(CMD_SET_BE_BLA_LIST) > MSS_BLA_LIST_BUFSIZE) {
+        WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
+        return -1;
+    }
+    std::string cmdParm = CMD_SET_BE_BLA_LIST;
     cmdParm.append(" ");
     cmdParm.append(param);
     return SendCommandToDriverByInterfaceName(ifName, cmdParm);

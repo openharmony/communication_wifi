@@ -111,6 +111,7 @@ void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSuppl
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetSupplierInfo.");
+    isWifiAvaliable_ = netSupplierInfo->isAvailable_;
     int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierId, netSupplierInfo);
     WIFI_LOGI("Update network result:%{public}d", result);
 }
@@ -120,7 +121,10 @@ void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
-    
+    if (!isWifiAvaliable_) {
+        WIFI_LOGE("wifi is not avaliable, no need UpdateNetLinkInfo");
+        return;
+    }
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = (std::make_unique<NetManagerStandard::NetLinkInfo>()).release();
     CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
     int32_t result = NetConnClient::GetInstance().UpdateNetLinkInfo(supplierId, netLinkInfo);

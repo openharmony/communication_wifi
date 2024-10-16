@@ -15,13 +15,20 @@
 
 #include "self_cure_service.h"
 #include "self_cure_service_callback.h"
+#include "wifi_config_center.h"
 #include "wifi_logger.h"
 
 DEFINE_WIFILOG_LABEL("SelfCureService");
 
 namespace OHOS {
 namespace Wifi {
-SelfCureService::SelfCureService(int instId) : pSelfCureStateMachine(nullptr), m_instId(instId) {}
+constexpr int32_t P2P_ENHANCE_BC_CONNECT_SUCC = 4;
+constexpr int32_t P2P_ENHANCE_BC_DESTROYED = 10;
+SelfCureService::SelfCureService(int instId) : pSelfCureStateMachine(nullptr), m_instId(instId)
+{
+    WIFI_LOGI("SelfCureService::SelfCureService()");
+    RegisterP2pEnhanceCallback();
+}
 
 SelfCureService::~SelfCureService()
 {
@@ -30,6 +37,7 @@ SelfCureService::~SelfCureService()
         delete pSelfCureStateMachine;
         pSelfCureStateMachine = nullptr;
     }
+    UnRegisterP2pEnhanceCallback();
 }
 
 ErrCode SelfCureService::InitSelfCureService()
@@ -137,5 +145,49 @@ bool SelfCureService::IsSelfCureOnGoing()
     return pSelfCureStateMachine->IsSelfCureOnGoing();
 }
 
+void SelfCureService::RegisterP2pEnhanceCallback()
+{
+    using namespace std::placeholders;
+    p2pEnhanceStateChange_ = std::bind(&SelfCureService::P2pEnhanceStateChange, this, _1, _2);
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("RegisterP2pEnhanceCallback get pEnhanceService failed!");
+        return;
+    }
+    ErrCode ret = pEnhanceService->RegisterP2pEnhanceCallback(p2pEnhanceStateChange_);
+    WIFI_LOGI("RegisterP2pEnhanceCallback result %{public}d", ret);
+}
+
+void SelfCureService::UnRegisterP2pEnhanceCallback()
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("UnRegisterP2pEnhanceCallback get pEnhanceService failed!");
+        return;
+    }
+    pEnhanceService->UnRegisterP2pEnhanceCallback();
+}
+
+void SelfCureService::P2pEnhanceStateChange(const std::string &ifName, int32_t state)
+{
+    WIFI_LOGI("P2pEnhanceStateChange, state %{public}d", state);
+    int32_t p2pEnhanceState = -1;
+    if (state == P2P_ENHANCE_BC_CONNECT_SUCC) {
+        p2pEnhanceState = 1;
+    } else if (state == P2P_ENHANCE_BC_DESTROYED) {
+        p2pEnhanceState = 0;
+    } else {
+        WIFI_LOGD("No need to handle the state");
+    }
+    if ((lastP2pEnhanceState_ != p2pEnhanceState) && (p2pEnhanceState != -1)) {
+        lastP2pEnhanceState_ = p2pEnhanceState;
+        if (pSelfCureStateMachine == nullptr) {
+            WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+            return;
+        }
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_P2P_ENHANCE_STATE_CHANGED, 0, state);
+        WifiConfigCenter::GetInstance().SetP2pEnhanceState(p2pEnhanceState);
+    }
+}
 } //namespace Wifi
 } //namespace OHOS

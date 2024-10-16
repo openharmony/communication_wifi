@@ -510,15 +510,6 @@ template <>
 std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item);
 
 /**
- * @Description Clear and init WifiPortalConf
- *
- * @tparam
- * @param item - WifiPortalConf &item
- */
-template <>
-void ClearTClass<WifiPortalConf>(WifiPortalConf &item);
-
-/**
  * @Description Clear and init PackageFilterConf
  *
  * @tparam
@@ -528,16 +519,13 @@ template <>
 void ClearTClass<PackageFilterConf>(PackageFilterConf &item);
 
 /**
- * @Description Set WifiPortalConf item data
+ * @Description Clear and init VariableConf
  *
  * @tparam
- * @param item - WifiPortalConf &item
- * @param key - WifiPortalConf struct member name
- * @param value - the WifiPortalConf item member value
- * @return int - parse error: 0 Success, >0 parse failed
+ * @param item - VariableConf &item
  */
 template <>
-int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value);
+void ClearTClass<VariableConf>(VariableConf &item);
 
 /**
  * @Description Set PackageFilterConf item data
@@ -552,24 +540,16 @@ template <>
 int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::string &key, const std::string &value);
 
 /**
- * @Description Output WifiPortalConf class name
+ * @Description Set VariableConf item data
  *
  * @tparam
- * @param item - WifiPortalConf &item
- * @return std::string - Class name
+ * @param item - VariableConf &item
+ * @param key - VariableConf struct member name
+ * @param value - the VariableConf item member value
+ * @return int - parse error: 0 Success, >0 parse failed
  */
 template <>
-std::string GetTClassName<WifiPortalConf>();
-
-/**
- * @Description Output the WifiPortalConf item, format: item's member = the member value
- *
- * @tparam
- * @param item - WifiPortalConf &item
- * @return std::string - output total member=value string about the WifiPortalConf item
- */
-template <>
-std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item);
+int SetTClassKeyValue<VariableConf>(VariableConf &item, const std::string &key, const std::string &value);
 /* ----------template function specialization declare end----------- */
 }  // namespace Wifi
 }  // namespace OHOS

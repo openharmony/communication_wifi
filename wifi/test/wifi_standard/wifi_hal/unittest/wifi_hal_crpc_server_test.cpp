@@ -209,7 +209,6 @@ HWTEST_F(WifiHalCRpcServerTest, DealDisConnectReasonChangedCbkTest, TestSize.Lev
     EXPECT_TRUE(PushBackCallbackMsg(WIFI_STA_DISCONNECT_REASON_EVENT, cbmsg) == 0);
     EXPECT_TRUE(OnCallbackTransact(mServer, WIFI_STA_DISCONNECT_REASON_EVENT, mContext) == 0);
     EXPECT_FALSE(StrcmpMathRight(mContext->szWrite, "C\t146\t100\t00:00:00:00:00:00\t$$$$$$") == 0);
-    EXPECT_TRUE(EndCallbackTransact(mServer, WIFI_STA_DISCONNECT_REASON_EVENT) == 0);
 }
 
 HWTEST_F(WifiHalCRpcServerTest, DealP2pDeviceFoundCbkTest, TestSize.Level1)

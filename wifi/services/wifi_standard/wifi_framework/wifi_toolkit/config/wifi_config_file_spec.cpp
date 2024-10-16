@@ -56,6 +56,8 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.callProcessName.clear();
     item.ancoCallProcessName.clear();
     item.randomizedMacSuccessEver = false;
+    item.everConnected = false;
+    item.acceptUnvalidated = false;
     item.macAddress.clear();
     item.internetSelfCureHistory.clear();
     item.isReassocSelfCureWithFactoryMacAddress = 0;
@@ -201,6 +203,7 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     if (SetWifiDeviceConfigOutDated(item, key, value) == 0) {
         return 0;
     }
+    std::string tmpValue = value;
 
     if (key == "instanceId") {
         item.instanceId = std::stoi(value);
@@ -247,6 +250,10 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.version = std::stoi(value);
     } else if (key == "randomizedMacSuccessEver") {
         item.randomizedMacSuccessEver = (std::stoi(value) != 0); /* 0 -> false 1 -> true */
+    } else if (key == "everConnected") {
+        item.everConnected = (CheckDataLegal(tmpValue) != 0);
+    } else if (key == "acceptUnvalidated") {
+        item.acceptUnvalidated = (CheckDataLegal(tmpValue) != 0);
     } else if (key == "macAddress") {
         item.macAddress = value;
     } else if (key == "portalAuthTime") {
@@ -579,6 +586,8 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"callProcessName=" << item.callProcessName << std::endl;
     ss << "    " <<"ancoCallProcessName=" << item.ancoCallProcessName << std::endl;
     ss << "    " <<"randomizedMacSuccessEver=" << item.randomizedMacSuccessEver << std::endl;
+    ss << "    " <<"everConnected=" << item.everConnected << std::endl;
+    ss << "    " <<"acceptUnvalidated=" << item.acceptUnvalidated << std::endl;
     ss << "    " << "macAddress=" << item.macAddress << std::endl;
     ss << "    " <<"</WifiDeviceConfig>" << std::endl;
     return ss.str();
@@ -1604,15 +1613,6 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     return ss.str();
 }
 
-template <> void ClearTClass<WifiPortalConf>(WifiPortalConf &item)
-{
-    item.portalHttpUrl.clear();
-    item.portalHttpsUrl.clear();
-    item.portalBakHttpUrl.clear();
-    item.portalBakHttpsUrl.clear();
-    return;
-}
-
 template <>
 void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
 {
@@ -1622,22 +1622,11 @@ void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
 }
 
 template <>
-int SetTClassKeyValue<WifiPortalConf>(WifiPortalConf &item, const std::string &key, const std::string &value)
+void ClearTClass<VariableConf>(VariableConf &item)
 {
-    int errorKeyValue = 0;
-    if (key == "http") {
-        item.portalHttpUrl = value;
-    } else if (key == "https") {
-        item.portalHttpsUrl = value;
-    } else if (key == "httpbak") {
-        item.portalBakHttpUrl = value;
-    } else if (key == "httpsbak") {
-        item.portalBakHttpsUrl = value;
-    } else {
-        LOGE("Invalid config key value");
-        errorKeyValue++;
-    }
-    return errorKeyValue;
+    item.variableName.clear();
+    item.variableValue.clear();
+    return;
 }
 
 template <>
@@ -1655,17 +1644,19 @@ int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::str
     return errorKeyValue;
 }
 
-template <> std::string GetTClassName<WifiPortalConf>()
+template <>
+int SetTClassKeyValue<VariableConf>(VariableConf &item, const std::string &key, const std::string &value)
 {
-    return "WifiPortalConf";
-}
-
-template <> std::string OutTClassString<WifiPortalConf>(WifiPortalConf &item)
-{
-    std::ostringstream ss;
-    ss << "    " <<"<WifiPortalConf>" << std::endl;
-    ss << "    " <<"http=" << ValidateString(item.portalHttpUrl) << std::endl;
-    return ss.str();
+    int errorKeyValue = 0;
+    if (key == "variableName") {
+        item.variableName = value;
+    } else if (key == "variableValue") {
+        item.variableValue = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
 }
 
 int SetNetworkStatusHistory(WifiDeviceConfig &item, const std::string &value)

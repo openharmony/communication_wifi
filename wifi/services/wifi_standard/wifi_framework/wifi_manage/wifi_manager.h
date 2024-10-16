@@ -66,6 +66,11 @@ struct WifiCloseServiceMsg {
     int instId;
 };
 
+constexpr uint32_t PROP_SUPPORT_SAPCOEXIST_LEN = 10;
+const std::string SUPPORT_SAPCOEXIST_PROP = "const.wifi.support_sapcoexist";
+const std::string SUPPORT_SAPCOEXIST = "true";
+constexpr uint32_t SUPPORT_SAPCOEXIST_LEN = 7;
+
 class WifiManager {
 public:
     static WifiManager &GetInstance();
@@ -132,11 +137,12 @@ private:
     void CheckAndStartSta();
     void AutoStartServiceThread();
     void InitPidfile(void);
-
+    void CheckSapcoExist(void);
 private:
     std::mutex initStatusMutex;
     InitStatus mInitStatus;
     long mSupportedFeatures;
+    bool g_supportsapcoexistflag;
     std::unique_ptr<WifiEventHandler> mCloseServiceThread = nullptr;
     std::unique_ptr<WifiEventHandler> mStartServiceThread = nullptr;
     std::unique_ptr<WifiStaManager> wifiStaManager = nullptr;

@@ -278,6 +278,13 @@ public:
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+        const std::set<int> &wifiLinkedNetworkIds);
+
+    void UpLoadLocalDeviceConfigToCloud();
+#endif
+
 private:
     WifiSettings();
     int IncreaseNumRebootsSinceLastUse();
@@ -312,7 +319,7 @@ private:
     int DecryptionDeviceConfig(WifiDeviceConfig &config);
     bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
-
+    void SyncAfterDecryped(WifiDeviceConfig &config);
 private:
     // STA
     std::mutex mStaMutex;

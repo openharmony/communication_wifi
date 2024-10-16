@@ -757,6 +757,22 @@ const char* HdiSSid2Txt(const uint8_t *ssid, size_t ssidLen)
     return ssid_txt;
 }
 
+char* HdiGetWifiCategoryTxt(char *pos, char* end, const struct HdiElems *elems)
+{
+    int ret = 0;
+    if (elems->ehtCapabilities80211Be != NULL) {
+        ret = HdiTxtPrintf(pos, end - pos, "%s", "[11BE]");
+    } else if (elems->heCapabilities != NULL) {
+        ret = HdiTxtPrintf(pos, end - pos, "%s", "[11AX]");
+    }
+    if (HdiCheckError(end - pos, ret)) {
+        LOGE("HdiGetWifiCategoryTxt HdiCheckError fail");
+        return pos;
+    }
+    pos += ret;
+    return pos;
+}
+
 int8_t IsValidHexCharAndConvert(char c)
 {
     if (c >= '0' && c <= '9') {

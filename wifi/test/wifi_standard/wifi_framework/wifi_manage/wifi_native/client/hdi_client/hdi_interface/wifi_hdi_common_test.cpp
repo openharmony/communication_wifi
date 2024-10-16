@@ -20,6 +20,7 @@ using ::testing::ext::TestSize;
 #define PROTOCOL_80211_IFTYPE_P2P_CLIENT 8
 #define HDI_POS_TEN 10
 #define HDI_POS_FOURTH 4
+#define HDI_SCAN_RESULTS_MAX_LEN_TEST 1024
 class WifiHdiCommonTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -80,6 +81,38 @@ HWTEST_F(WifiHdiCommonTest, HdiSSid2TxtTest, TestSize.Level1)
     size_t ssidLen = 0;
     const char *result = HdiSSid2Txt(ssid, ssidLen);
     EXPECT_STREQ(result, "");
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiGetWifiCategoryTxtTest_11be, TestSize.Level1)
+{
+    char buff[HDI_SCAN_RESULTS_MAX_LEN_TEST] = {0};
+    char *pos = buff;
+    char *end = pos + HDI_SCAN_RESULTS_MAX_LEN_TEST;
+    struct HdiElems elems = {0};
+    elems.ehtCapabilities80211Be = reinterpret_cast<const uint8_t *>("11be");
+    HdiGetWifiCategoryTxt(pos, end, &elems);
+    EXPECT_STREQ(pos, "[11BE]");
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiGetWifiCategoryTxtTest_11ax, TestSize.Level1)
+{
+    char buff[HDI_SCAN_RESULTS_MAX_LEN_TEST] = {0};
+    char *pos = buff;
+    char *end = pos + HDI_SCAN_RESULTS_MAX_LEN_TEST;
+    struct HdiElems elems = {0};
+    elems.heCapabilities = reinterpret_cast<const uint8_t *>("11ax");
+    HdiGetWifiCategoryTxt(pos, end, &elems);
+    EXPECT_STREQ(pos, "[11AX]");
+}
+
+HWTEST_F(WifiHdiCommonTest, HdiGetWifiCategoryTxtTest_default, TestSize.Level1)
+{
+    char buff[HDI_SCAN_RESULTS_MAX_LEN_TEST] = {0};
+    char *pos = buff;
+    char *end = pos + HDI_SCAN_RESULTS_MAX_LEN_TEST;
+    struct HdiElems elems = {0};
+    HdiGetWifiCategoryTxt(pos, end, &elems);
+    EXPECT_STREQ(pos, "");
 }
 
 HWTEST_F(WifiHdiCommonTest, IsValidHexCharAndConvertTest, TestSize.Level1)

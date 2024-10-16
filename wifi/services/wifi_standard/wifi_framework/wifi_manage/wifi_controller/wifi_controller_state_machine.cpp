@@ -32,7 +32,6 @@ namespace Wifi {
 
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
-int WifiControllerMachine::mSoftapStartFailCount{0};
 
 WifiControllerMachine::WifiControllerMachine()
     : StateMachine("WifiControllerMachine"),
@@ -125,7 +124,7 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg
             if (msg->GetParam1()) {
                 int id = msg->GetParam2();
                 pWifiControllerMachine->MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, id);
-                pWifiControllerMachine->StartTimer(CMD_AP_START_TIME, SFOT_AP_TIME_OUT);
+                pWifiControllerMachine->StartTimer(CMD_AP_START_TIME, SOFT_AP_TIME_OUT);
                 pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
             }
             break;
@@ -222,9 +221,6 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
         case CMD_OPEN_WIFI_RETRY:
             pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, 0);
             break;
-        case CMD_AP_SERVICE_START_FAILURE:
-            HandleAPServiceStartFail(msg->GetParam1());
-            break;
         case CMD_STA_REMOVED:
             HandleStaRemoved(msg);
             break;
@@ -320,6 +316,7 @@ bool WifiControllerMachine::SoftApIdExist(int id)
     std::unique_lock<std::mutex> lock(softapManagerMutex);
     for (auto iter = softapManagers.begin(); iter != softapManagers.end(); ++iter) {
         if ((*iter)->mid == id) {
+            WIFI_LOGI("Softap id %{public}d exist.", id);
             return true;
         }
     }
@@ -335,6 +332,7 @@ SoftApManager *WifiControllerMachine::GetSoftApManager(int id)
     std::unique_lock<std::mutex> lock(softapManagerMutex);
     for (auto iter = softapManagers.begin(); iter != softapManagers.end(); ++iter) {
         if ((*iter)->mid == id) {
+            WIFI_LOGI("Get softap manager id %{public}d.", id);
             return *iter;
         }
     }
@@ -370,8 +368,10 @@ bool WifiControllerMachine::HasAnySoftApManager()
 {
     std::unique_lock<std::mutex> lock(softapManagerMutex);
     if (softapManagers.empty()) {
+        WIFI_LOGI("Softap managers is empty");
         return false;
     }
+    WIFI_LOGI("Has softap manager");
     return true;
 }
 #endif
@@ -411,11 +411,9 @@ void WifiControllerMachine::MakeSoftapManager(SoftApManager::Role role, int id)
 
 bool WifiControllerMachine::ShouldEnableSoftap()
 {
-    WIFI_LOGI("Enter ShouldEnableSoftap");
-    if (WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
-        return true;
-    }
-    return false;
+    bool toggledState = WifiConfigCenter::GetInstance().GetSoftapToggledState();
+    WIFI_LOGI("Softap toggled state is %{public}d", toggledState);
+    return toggledState;
 }
 #endif
 
@@ -644,7 +642,7 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(InternalMessagePtr msg)
 {
     int id = msg->GetParam2();
-    WIFI_LOGE("handleSoftapToggleChangeInEnabledState");
+    WIFI_LOGI("handleSoftapToggleChangeInEnabledState");
     if (msg->GetParam1() == 1) {
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
         if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
@@ -675,7 +673,7 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
     }
     if (pWifiControllerMachine->SoftApIdExist(id)) {
         pWifiControllerMachine->StopSoftapManager(id);
-        pWifiControllerMachine->StartTimer(CMD_AP_STOP_TIME, SFOT_AP_TIME_OUT);
+        pWifiControllerMachine->StartTimer(CMD_AP_STOP_TIME, SOFT_AP_TIME_OUT);
         return;
     }
 }
@@ -693,6 +691,15 @@ void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 
 void WifiControllerMachine::EnableState::HandleStaRemoved(InternalMessagePtr msg)
 {
+    {
+        std::unique_lock<std::mutex> lock(pWifiControllerMachine->concreteManagerMutex);
+        for (auto iter = pWifiControllerMachine->concreteManagers.begin();
+            iter != pWifiControllerMachine->concreteManagers.end(); ++iter) {
+            if ((*iter)->mid == msg->GetParam2() && msg->GetParam1() >= 0) {
+                (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STA_REMOVED);
+            }
+        }
+    }
     pWifiControllerMachine->StopConcreteManager(msg->GetParam2());
 }
 
@@ -707,24 +714,14 @@ void WifiControllerMachine::EnableState::HandleConcreteClientRemoved(InternalMes
 
 void WifiControllerMachine::EnableState::HandleAPServiceStartFail(int id)
 {
-    mSoftapStartFailCount++;
-    WIFI_LOGI("Softap start fail count %{public}d", mSoftapStartFailCount);
-    if (mSoftapStartFailCount >= AP_OPEN_RETRY_MAX_COUNT) {
-        WIFI_LOGE("Ap start fail, set softap toggled false");
-        WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-    }
+    WIFI_LOGE("Ap start fail, set softap toggled false");
+    WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
 }
 
 void WifiControllerMachine::ClearWifiStartFailCount()
 {
     WIFI_LOGD("Clear wifi start fail count");
     mWifiStartFailCount = 0;
-}
-
-void WifiControllerMachine::ClearApStartFailCount()
-{
-    WIFI_LOGD("Clear ap start fail count");
-    mSoftapStartFailCount = 0;
 }
 
 void WifiControllerMachine::HandleStaStart(int id)
@@ -750,7 +747,6 @@ void WifiControllerMachine::HandleStaSemiActive(int id)
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleApStart(int id)
 {
-    mSoftapStartFailCount = 0;
     if (!pWifiControllerMachine->ShouldEnableSoftap()) {
         pWifiControllerMachine->StopSoftapManager(id);
         return;

@@ -1531,7 +1531,7 @@ public:
 
     void OnBssidChangedEventLinkSwitch()
     {
-        std::string reason = "LINK_SWITCH_EVENT";
+        std::string reason = "LINK_SWITCH";
         std::string bssid = "12:34:56:78:9A:BC";
         pStaStateMachine->OnBssidChangedEvent(reason, bssid);
     }

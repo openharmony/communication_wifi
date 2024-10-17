@@ -61,7 +61,6 @@ constexpr int WIFI_HDI_MAX_STR_LENGTH = 512;
 constexpr int WIFI_MAX_SCAN_COUNT = 256;
 constexpr int P2P_SUPPLICANT_DISCONNECTED = 0;
 constexpr int P2P_SUPPLICANT_CONNECTED = 1;
-constexpr int SSID_ASSIC_WIDTH = 2;
 constexpr int BAND_WIDTH_OFFSET = 16;
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName, int instId)
@@ -707,26 +706,6 @@ std::string WifiHdiWpaClient::StringCombination(const char* fmt, ...)
     return result;
 }
 
-void WifiHdiWpaClient::ConvertToUtf8(const std::string ssid, std::vector<uint8_t> &ssidUtf8)
-{
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-    std::wstring wideStr = conv.from_bytes(ssid);
-    std::string utf8Str = conv.to_bytes(wideStr);
-    std::vector<uint8_t> utf8U8(utf8Str.begin(), utf8Str.end());
-    ssidUtf8 = utf8U8;
-}
-
-void WifiHdiWpaClient::GetSsidString(std::string &ssidString, std::vector<uint8_t> &ssidUtf8)
-{
-    std::stringstream ss;
-    ss << std::hex;
-    ss << std::setfill('0');
-    for (uint8_t b : ssidUtf8) {
-        ss << std::setw(SSID_ASSIC_WIDTH) << static_cast<unsigned int>(b);
-    }
-    ssidString = ss.str();
-}
-
 bool WifiHdiWpaClient::GetEncryptionString(const HotspotConfig &config, std::string &encryptionString)
 {
     switch (config.GetSecurityType()) {
@@ -799,8 +778,7 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
     std::vector<uint8_t> ssidUtf8;
     std::string modeString;
     std::string fileContext;
-    ConvertToUtf8(config.GetSsid(), ssidUtf8);
-    GetSsidString(ssid2String, ssidUtf8);
+    ssid2String = StringToHex(config.GetSsid());
     if (!GetEncryptionString(config, encryptionString)) {
         LOGE("set psk failed");
         return WIFI_HAL_OPT_FAILED;

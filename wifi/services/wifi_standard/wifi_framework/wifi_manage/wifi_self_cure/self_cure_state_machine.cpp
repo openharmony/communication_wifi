@@ -661,6 +661,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(I
     }
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset() ||
         pSelfCureStateMachine->connectNetworkRetryCnt > CONNECT_NETWORK_RETRY) {
+        WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
         return;
     }
     pSelfCureStateMachine->connectNetworkRetryCnt++;
@@ -1182,6 +1183,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
         GetPublicDnsServers(publicDnsServers);
         UpdateDnsServers(publicDnsServers);
     }
+    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::DNS_ABNORMAL));
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, DNS_UPDATE_CONFIRM_DELAYED_MS);
 }
 
@@ -1414,15 +1416,10 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     WifiLinkedInfo wifiLinkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
     WifiConfigCenter::GetInstance().SetLastNetworkId(wifiLinkedInfo.networkId);
-    WifiConfigCenter::GetInstance().SetWifiSelfcureReset(true);
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
-    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
-    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
-        WIFI_LOGI("GetWifiTogglerManager is nullptr");
-        return;
-    }
-    WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 0);
+    pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState)
+
 }
 
 bool SelfCureStateMachine::InternetSelfCureState::SelectedSelfCureAcceptable()

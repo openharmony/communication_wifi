@@ -59,8 +59,8 @@
 #define AP_IFNAME_COEX "wlan1"
 #define WIFI_DEFAULT_CFG "hostapd.conf"
 #define WIFI_COEX_CFG "hostapd_coex.conf"
-#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"wap_supplicant"WIFI_DEFAULT_CFG
-#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOR_DIR"wap_supplicant"WIFI_COEX_CFG
+#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_DEFAULT_CFG
+#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOR_DIR"/wpa_supplicant/"WIFI_COEX_CFG
 #endif
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";

@@ -54,14 +54,6 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
 AppParser::AppParser()
 {
     WIFI_LOGI("%{public}s enter", __FUNCTION__);
-    if (IsReadCloudConfig()) {
-        ReadPackageCloudFilterConfig();
-    }
-    if (InitAppParser(WIFI_MONITOR_APP_FILE_PATH)) {
-        WIFI_LOGD("%{public}s InitAppParser successful", __FUNCTION__);
-    } else {
-        WIFI_LOGE("%{public}s InitAppParser fail", __FUNCTION__);
-    };
 }
 
 AppParser::~AppParser()
@@ -71,15 +63,24 @@ AppParser::~AppParser()
 
 AppParser &AppParser::GetInstance()
 {
-    static std::mutex xmlMutex;
-    static AppParser *instance;
-    if (instance == nullptr) {
-        std::unique_lock<std::mutex> lock(xmlMutex);
-        if (instance == nullptr) {
-            instance = new (std::nothrow) AppParser();
+    static AppParser instance;
+    return instance;
+}
+
+bool AppParser::Init()
+{
+    if (!initFlag_) {
+        if (IsReadCloudConfig()) {
+            ReadPackageCloudFilterConfig();
         }
+        if (InitAppParser(WIFI_MONITOR_APP_FILE_PATH)) {
+            initFlag_ = true;
+            WIFI_LOGD("%{public}s InitAppParser successful", __FUNCTION__);
+        } else {
+            WIFI_LOGE("%{public}s InitAppParser fail", __FUNCTION__);
+        };
     }
-    return *instance;
+    return initFlag_;
 }
 
 bool AppParser::IsLowLatencyApp(const std::string &bundleName) const

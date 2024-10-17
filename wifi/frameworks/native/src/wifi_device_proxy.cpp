@@ -793,7 +793,7 @@ ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result,
 ErrCode WifiDeviceProxy::SetTxPower(int power)
 {
     if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`, remote service is died!", __func__);
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -944,7 +944,7 @@ ErrCode WifiDeviceProxy::StartRoamToNetwork(const int networkId, const std::stri
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("%{public}s Write interface token error.", __func__);
+        WIFI_LOGE("%{public}s write interface token error.", __func__);
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
@@ -1984,8 +1984,7 @@ ErrCode WifiDeviceProxy::StartPortalCertification()
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;

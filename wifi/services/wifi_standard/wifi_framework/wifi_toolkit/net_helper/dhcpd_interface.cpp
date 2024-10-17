@@ -31,6 +31,7 @@ namespace Wifi {
 const int EU_I64_ADDR_LEN = 64;
 const int GENE_V6_ADDR_LEN = 64; /* Generally, the prefix length cannot exceed 64 characters. */
 const int IP_V6_ADDR_LEN = 128;
+const int MAX_STA_NUMBER = 254 - 3 + 1; /* from DhcpRange.strStartip to DhcpRange.strEndip. */
 const std::string IP_V4_MASK("255.255.255.0");
 const std::string IP_V4_DEFAULT("192.168.62.1");
 
@@ -110,7 +111,7 @@ bool DhcpdInterface::UpdateDefaultConfigFile(const int32_t &leaseTime)
 bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::map<std::string, StationInfo> &result)
 {
     DhcpStationInfo *staInfos = NULL;
-    int staNumber = 10;
+    int staNumber = MAX_STA_NUMBER;
     int staSize = 0;
     staInfos = (struct DhcpStationInfo*)malloc(sizeof(DhcpStationInfo) * staNumber);
     if (staInfos == NULL) {

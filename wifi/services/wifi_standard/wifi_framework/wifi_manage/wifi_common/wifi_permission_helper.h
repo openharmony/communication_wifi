@@ -37,6 +37,15 @@ public:
     static int VerifyPermission(const std::string &permissionName, const int &pid, const int &uid, const int &tokenId);
 
     /**
+     * @Description : Verify Same Process Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifySameProcessPermission(const int &pid, const int &uid);
+
+    /**
      * @Description : Verify Set Wifi Information Permission.
      *
      * @param pid - Process ID.[in]

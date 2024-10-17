@@ -60,6 +60,7 @@
         GetSignalLevel;
         SetLowLatencyMode;
         SetLowTxPower;
+        SetDpiMarkRule;
         IsBandTypeSupported;
         Get5GHzChannelList;
         RegisterWifiEvent;
@@ -67,6 +68,7 @@
         StartPortalCertification;
         EnableSemiWifi;
         GetWifiDetailState;
+        "*CompositeWifiFilter*";
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";
             "OHOS::Wifi::WifiScan::GetInstance(int, int)";
@@ -133,6 +135,7 @@
             "OHOS::Wifi::WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack> &)";
             "OHOS::Wifi::WifiDeviceCallBackStub::IsRemoteDied() const";
             "OHOS::Wifi::WifiDeviceCallBackStub::SetRemoteDied(bool)";
+            "vtable for OHOS::Wifi::NetworkSelection::CompositeWifiFilter";
         };
     local:
         *;

@@ -203,3 +203,19 @@ HWTEST_F(WifiCmdClientTest, AxSelfcureTest002, TestSize.Level1)
     int result = wifiCmdClient_->AxSelfcure(ifName, param);
     EXPECT_EQ(result, -1);
 }
+
+HWTEST_F(WifiCmdClientTest, SetBeBlaListTest001, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param(maxPrivCmdSize, 'a');
+    int result = wifiCmdClient_->SetBeBlaList(ifName, param);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiCmdClientTest, SetBeBlaListTest002, TestSize.Level1)
+{
+    std::string ifName = "ifName";
+    std::string param = "param";
+    int result = wifiCmdClient_->SetBeBlaList(ifName, param);
+    EXPECT_EQ(result, -1);
+}

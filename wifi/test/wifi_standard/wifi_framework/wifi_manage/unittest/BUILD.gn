@@ -30,7 +30,6 @@ config("module_private_config") {
 ohos_unittest("manager_unittest") {
   module_out_path = module_output_path
   sources = [
-    
     "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
@@ -171,7 +170,6 @@ ohos_unittest("manager_unittest") {
     "//base/notification/common_event_service/cesfwk/innerkits/include",
     "//base/notification/common_event_service/cesfwk/kits/native/include",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
     "//base/powermgr/power_manager/interfaces/inner_api/native/include",
     "//base/powermgr/power_manager/services/zidl/include",
     "$WIFI_ROOT_DIR/utils/inc",

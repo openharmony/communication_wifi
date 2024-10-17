@@ -219,7 +219,12 @@ int HttpRequest::HttpDataTransmit(const int &iSockFd)
             buf = nullptr;
             return -1;
         }
-        (void)memset_s(buf, BUFSIZE, 0, BUFSIZE);
+        if (memset_s(buf, BUFSIZE, 0, BUFSIZE) != EOK) {
+            LOGE("HttpDataTransmit memset_s is failed \n");
+            delete[] buf;
+            buf = nullptr;
+            return -1;
+        }
         ret = recv(iSockFd, buf, BUFSIZE, 0);
         if (ret == 0) {
             /* The connection is closed. */

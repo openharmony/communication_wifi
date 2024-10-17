@@ -365,6 +365,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
     }
     if (memcpy_s(cfgData, cfgLen, dataBuffer, cfgLen) != EOK) {
         delete[] cfgData;
+        cfgData = nullptr;
         WIFI_LOGE("memcpy_s failed!");
         return;
     }

@@ -80,7 +80,12 @@ napi_value JsObjectToString(const napi_env& env, const napi_value& object,
             WIFI_LOGE("Js object to str malloc failed");
             return NULL;
         }
-        (void)memset_s(buf, bufLen, 0, bufLen);
+        if (memset_s(buf, bufLen, 0, bufLen) != EOK) {
+            free(buf);
+            buf = nullptr;
+            WIFI_LOGE("Js object memset_s is failed");
+            return NULL;
+        }
         size_t result = 0;
         if (napi_get_value_string_utf8(env, field, buf, bufLen, &result) != napi_ok) {
             free(buf);

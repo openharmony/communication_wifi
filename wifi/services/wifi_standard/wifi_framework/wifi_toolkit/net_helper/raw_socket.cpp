@@ -113,7 +113,10 @@ int RawSocket::Send(uint8_t *buff, int count, uint8_t *destHwaddr)
     }
 
     struct sockaddr_ll rawAddr;
-    (void)memset_s(&rawAddr, sizeof(rawAddr), 0, sizeof(rawAddr));
+    if (memset_s(&rawAddr, sizeof(rawAddr), 0, sizeof(rawAddr)) != EOK) {
+        LOGE("Send memset_s is failed");
+        return OPT_FAIL;
+    }
     rawAddr.sll_ifindex = ifaceIndex_;
     rawAddr.sll_protocol = htons(protocol_);
     rawAddr.sll_family = AF_PACKET;

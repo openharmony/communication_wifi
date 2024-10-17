@@ -138,7 +138,11 @@ int GetIfaceState(const char *ifaceName)
     }
 
     struct ifreq ifr;
-    (void)memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr));
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
+        LOGE("GetIfaceState: memset_s fail");
+        close(sock);
+        return state;
+    }
     if (strcpy_s(ifr.ifr_name, IFNAMSIZ, ifaceName) != EOK) {
         LOGE("GetIfaceState: strcpy_s fail");
         close(sock);

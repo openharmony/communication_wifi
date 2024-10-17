@@ -326,6 +326,13 @@ void StaStateMachine::RegisterStaServiceCallback(const StaServiceCallback &callb
     m_staCallback.insert_or_assign(callback.callbackModuleName, callback);
 }
 
+void StaStateMachine::UnRegisterStaServiceCallback(const StaServiceCallback &callback)
+{
+    WIFI_LOGI("UnRegisterStaServiceCallback, callback module name: %{public}s", callback.callbackModuleName.c_str());
+    std::unique_lock<std::shared_mutex> lock(m_staCallbackMutex);
+    m_staCallback.erase(callback.callbackModuleName);
+}
+
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
     {

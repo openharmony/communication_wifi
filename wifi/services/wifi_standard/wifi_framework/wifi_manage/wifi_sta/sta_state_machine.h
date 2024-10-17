@@ -485,6 +485,13 @@ public:
     void RegisterStaServiceCallback(const StaServiceCallback &callback);
 
     /**
+     * @Description unRegister sta callback function
+     *
+     * @param callback - Callback function pointer storage structure
+     */
+    void UnRegisterStaServiceCallback(const StaServiceCallback &callback);
+
+    /**
      * @Description  Convert the deviceConfig structure and set it to idl structure
      *
      * @param config -The Network info(in)

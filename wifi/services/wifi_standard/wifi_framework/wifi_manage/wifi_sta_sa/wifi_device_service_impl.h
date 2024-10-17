@@ -73,6 +73,8 @@ public:
 
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
+    ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
+
     ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
 
     ErrCode DisableDeviceConfig(int networkId) override;

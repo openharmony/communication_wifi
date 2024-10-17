@@ -29,6 +29,7 @@ class WifiPermissionUtils {
 public:
     static int VerifySetWifiInfoPermission();
     static int VerifyGetWifiInfoPermission();
+    static int VerifySameProcessPermission();
     static int VerifyWifiConnectionPermission();
     static int VerifyGetScanInfosPermission();
     static int VerifyGetWifiLocalMacPermission();

@@ -598,7 +598,7 @@ private:
     void ParseSmallConfig(MessageParcel &reply, std::vector<WifiDeviceConfig> &result, int retSize);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
     sptr<IRemoteObject> remote_ = nullptr;
-    bool mRemoteDied;
+    std::atomic<bool> mRemoteDied;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
 #endif

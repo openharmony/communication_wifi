@@ -454,7 +454,7 @@ void WifiConfigCenter::InsertWifiCategoryBlackListCache(int blacklistType, const
 void WifiConfigCenter::RemoveWifiCategoryBlackListCache(int blacklistType, const std::string bssid)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mWifiCategoryBlackListCache.find(blacklistType) != mWifiCategoryBlackListCache.end()) {
+    if (mWifiCategoryBlackListCache.find(blacklistType) == mWifiCategoryBlackListCache.end()) {
         LOGE("%{public}s: dont exist wifi bla type", __func__);
         return;
     }
@@ -472,7 +472,7 @@ int WifiConfigCenter::GetWifiCategoryBlackListCache(int blacklistType,
     std::map<std::string, WifiCategoryBlackListInfo> &blackListCache)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mWifiCategoryBlackListCache.find(blacklistType) != mWifiCategoryBlackListCache.end()) {
+    if (mWifiCategoryBlackListCache.find(blacklistType) == mWifiCategoryBlackListCache.end()) {
         LOGE("%{public}s: dont exist wifi bla type", __func__);
         return -1;
     }

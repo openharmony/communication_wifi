@@ -67,6 +67,7 @@ void SoftapXmlParser::ParseSoftap(xmlNodePtr innode)
         switch (GetConfigNameAsInt(node)) {
             case HotspotConfigType::SOFTAP_SSID: {
                 hotspotConfig.SetSsid(GetStringValue(node));
+                WIFI_LOGI("Ssid is %{public}s", SsidAnonymize(hotspotConfig.GetSsid()).c_str());
                 break;
             }
             case HotspotConfigType::SECURITYTYPE: {

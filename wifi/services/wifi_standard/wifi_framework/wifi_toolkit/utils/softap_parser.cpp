@@ -16,6 +16,7 @@
 #include "softap_parser.h"
 #include "wifi_logger.h"
 #include "wifi_global_func.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -69,7 +70,9 @@ void SoftapXmlParser::ParseSoftap(xmlNodePtr innode)
                 break;
             }
             case HotspotConfigType::SECURITYTYPE: {
-                if (GetPrimValue<int>(node, PrimType::INT) == SECURITY_TYPE_WPA2_PSK) {
+                int securityType = GetPrimValue<int>(node, PrimType::INT);
+                WIFI_LOGI("SecurityType is %{public}d", securityType);
+                if (securityType == SECURITY_TYPE_WPA2_PSK) {
                     hotspotConfig.SetSecurityType(KeyMgmt::WPA2_PSK);
                 } else {
                     hotspotConfig.SetSecurityType(KeyMgmt::NONE);
@@ -78,6 +81,7 @@ void SoftapXmlParser::ParseSoftap(xmlNodePtr innode)
             }
             case HotspotConfigType::PASSPHRASE: {
                 hotspotConfig.SetPreSharedKey(GetStringValue(node));
+                WIFI_LOGI("PreSharedKey is %{public}s", SsidAnonymize(hotspotConfig.GetPreSharedKey()).c_str());
                 break;
             }
             default: {
@@ -136,6 +140,7 @@ std::vector<HotspotConfig> SoftapXmlParser::GetSoftapConfigs()
 {
     std::vector<HotspotConfig> hotspotConfigs{};
     if (hotspotConfig.GetSecurityType() == KeyMgmt::NONE) {
+        WIFI_LOGE("GetSoftapConfigs security is NONE");
         return hotspotConfigs;
     }
     hotspotConfigs.push_back(hotspotConfig);

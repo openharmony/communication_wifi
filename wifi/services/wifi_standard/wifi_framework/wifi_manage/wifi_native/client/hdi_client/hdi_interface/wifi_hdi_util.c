@@ -417,8 +417,13 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         LOGE("failed to alloc memory");
         return;
     }
-    memset_s(infoElemsTemp, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem),
-        0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem));
+    if (memset_s(infoElemsTemp, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem),
+        0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem)) != EOK) {
+        LOGE("GetInfoElems memset_s is failed");
+        free(infoElemsTemp);
+        infoElemsTemp = NULL;
+        return;
+    }
     while (remainingLength > 1 && start < length) {
         if (srcBuf[start] == '[') {
             ++start;
@@ -782,7 +787,10 @@ int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems
     const struct HdiElem *elem;
     int unknown = 0;
 
-    (void)memset_s(elems, sizeof(*elems), 0, sizeof(*elems));
+    if (memset_s(elems, sizeof(*elems), 0, sizeof(*elems)) != EOK) {
+        LOGE("%{public}s, memset_s is failed", __func__);
+        return false;
+    }
 
     if (!start) {
         return 0;
@@ -1335,8 +1343,13 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
         LOGE("failed to alloc memory");
         return;
     }
-    memset_s(infoElemsTemp, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem),
-        0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem));
+    if (memset_s(infoElemsTemp, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem),
+        0x0, MAX_INFO_ELEMS_SIZE * sizeof(ScanInfoElem)) != EOK) {
+            LOGE("GetScanResultInfoElem memset_s is failed");
+            free(infoElemsTemp);
+            infoElemsTemp = NULL;
+            return;
+        }
     HDI_CHECK_ELEMENT(elem, start, len) {
         if (ieIndex >= MAX_INFO_ELEMS_SIZE) {
             LOGE("ieIndex exceeds the upper limit.");
@@ -1351,6 +1364,11 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
         }
         if (memcpy_s(infoElemsTemp[ieIndex].content, elen+1, elem->data, elen) != EOK) {
             LOGE("memcpy content fail");
+            free(infoElemsTemp[ieIndex].content);
+            infoElemsTemp[ieIndex].content = NULL;
+            free(infoElemsTemp);
+            infoElemsTemp = NULL;
+            return;
         }
         ieIndex++;
     }

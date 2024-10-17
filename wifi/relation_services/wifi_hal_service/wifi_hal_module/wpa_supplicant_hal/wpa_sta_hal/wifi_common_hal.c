@@ -97,7 +97,12 @@ int HalCallbackNotify(const char* event)
         LOGE("create callback message failed!");
         return -1;
     }
-    strcpy_s(pCbMsg->msg.commsg.event, sizeof(pCbMsg->msg.commsg.event), event);
+    if (strcpy_s(pCbMsg->msg.commsg.event, sizeof(pCbMsg->msg.commsg.event), event) != EOK) {
+        LOGE("HalCallbackNotify strcpy_s is failed!");
+        free(pCbMsg);
+        pCbMsg = NULL;
+        return -1;
+    }
     HalEmitEventCallbackMsg(pCbMsg, WIFI_HAL_COMMON_EVENT);
     return 0;
 }
@@ -112,7 +117,12 @@ WifiWpaChbaInterface *GetWifiWpaChbaInterface()
         LOGE("alloc memory for chba interface failed!");
         return NULL;
     }
-    strcpy_s(g_wpaChbaInterface->ifname, sizeof(g_wpaChbaInterface->ifname), "chba0");
+    if (strcpy_s(g_wpaChbaInterface->ifname, sizeof(g_wpaChbaInterface->ifname), "chba0") != EOK) {
+        LOGE("GetWifiWpaChbaInterface strcpy_s is failed!");
+        free(g_wpaChbaInterface);
+        g_wpaChbaInterface = NULL;
+        return NULL;
+    }
     return g_wpaChbaInterface;
 }
 

@@ -329,7 +329,10 @@ static void ParseScanInfo(std::vector<ScanResultsInfo> &scanResultsInfo, std::ve
         int buffLen = HDI_SCAN_RESULTS_MAX_LEN;
         buffLen = GetScanResultText(&wifiScanResultExt, &elems, buff, buffLen);
         ScanInfo scanInfo;
-        (void)memset_s(&scanInfo, sizeof(scanInfo), 0, sizeof(scanInfo));
+        if (memset_s(&scanInfo, sizeof(scanInfo), 0, sizeof(scanInfo)) != EOK) {
+            LOGE("%{public}s: memset_s is failed", __func__);
+            return;
+        }
         if (DelScanInfoLine(&scanInfo, buff, buffLen)) {
             LOGE("%{public}s: failed to obtain the scanning result", __func__);
             continue;

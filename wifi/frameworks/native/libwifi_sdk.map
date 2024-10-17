@@ -68,6 +68,7 @@
         StartPortalCertification;
         EnableSemiWifi;
         GetWifiDetailState;
+        "*CompositeWifiFilter*";
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";
             "OHOS::Wifi::WifiScan::GetInstance(int, int)";
@@ -100,6 +101,7 @@
             OHOS::Wifi::WifiScanCallbackStub::*;
             OHOS::Wifi::NetworkSelection::*;
             "vtable for OHOS::Wifi::NetworkSelection::OrWifiFilter";
+            "vtable for OHOS::Wifi::NetworkSelection::CompositeWifiFilter";
         };
     local:
         *;

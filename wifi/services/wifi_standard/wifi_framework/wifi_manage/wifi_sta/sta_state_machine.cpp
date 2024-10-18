@@ -611,13 +611,13 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const
 {
     std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig(scanInfoList);
     for (auto &scanInfo : scanInfoList) {
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
         if (config.ssid == scanInfo.ssid
             && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
-                || (config.keyMgmt == deviceKeyMgmt))) { // »ìºÏ¼ÓÃÜÄ¿Ç°Ö»Ö§³ÖWPA-PSK+SAE£¬´Ë´¦ÌØÊâ´¦Àí
+                || (config.keyMgmt == deviceKeyMgmt))) { // æ··åˆåŠ å¯†ç›®å‰åªæ”¯æŒWPA-PSK+SAEï¼Œæ­¤å¤„ç‰¹æ®Šå¤„ç†
             AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
             halDeviceConfig.ssid = scanInfo.oriSsid;
             LOGI("ConvertSsidToOriginalSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",

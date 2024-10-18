@@ -483,6 +483,7 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size)
     unsigned char *resultBuff = (unsigned char *)calloc(resultBuffLen, sizeof(unsigned char));
     if (resultBuff == NULL) {
         free(results);
+        results = NULL;
         LOGE("HdiWpaStaGetScanInfos: calloc failed!");
         return NULL;
     }
@@ -503,12 +504,15 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size)
     }
     
     free(resultBuff);
+    resultBuff = NULL;
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiWpaStaGetScanInfos success.");
     return results;
 EXIT:
     free(results);
+    results = NULL;
     free(resultBuff);
+    resultBuff = NULL;
     pthread_mutex_unlock(GetWpaObjMutex());
     return NULL;
 }

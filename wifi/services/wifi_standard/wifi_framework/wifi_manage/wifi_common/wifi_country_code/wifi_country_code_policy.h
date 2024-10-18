@@ -53,7 +53,6 @@ public:
     void HandleScanResultAction();
 private:
     void CreatePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf);
-    void GetWifiCountryCodePolicy();
     ErrCode GetWifiCountryCodeByFactory(std::string &wifiCountryCode);
     ErrCode GetWifiCountryCodeByMcc(std::string &wifiCountryCode);
     ErrCode StatisticCountryCodeFromScanResult(std::string &wifiCountryCode);

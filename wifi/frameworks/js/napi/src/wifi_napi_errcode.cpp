@@ -53,8 +53,8 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { WifiNapiErrCode::WIFI_ERRCODE_NON_SYSTEMAPP, "non-system application." },
     { WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM, "Parameter error." },
     { WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
-    { WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is closed." },
-    { WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is opened." },
+    { WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is being closed." },
+    { WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
 };
 
 static napi_value NapiGetUndefined(const napi_env &env)

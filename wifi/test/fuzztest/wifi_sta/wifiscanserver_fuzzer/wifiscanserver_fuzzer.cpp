@@ -233,7 +233,6 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
     pScanService->SystemScanDisconnectedPolicy(appId, appId);
     pScanService->SetNetworkInterfaceUpDown(true);
-    pScanService->ApplyScanPolices(scanType);
     pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_CHECK_PORTAL);
     pScanService->AllowSystemTimerScan();
     pScanService->AllowExternScan();

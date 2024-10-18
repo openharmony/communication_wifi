@@ -269,12 +269,14 @@ static P2pSupplicantErrCode WpaP2pCliCmdGetDeviceAddress(WifiWpaP2pInterface *th
     if (WpaCliCmd(cmd, buf, P2P_REPLY_BUF_LENGTH) != 0) {
         LOGE("STATUS command failed!");
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char *p = strstr(buf, "p2p_device_address=");
     if (p == NULL) {
         LOGE("Not find device address!");
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     p += strlen("p2p_device_address=");
@@ -285,9 +287,11 @@ static P2pSupplicantErrCode WpaP2pCliCmdGetDeviceAddress(WifiWpaP2pInterface *th
     if (strncpy_s(devAddress, size, p, q - p) != EOK) {
         LOGE("Failed to copy device address!");
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     free(buf);
+    buf = NULL;
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
@@ -467,15 +471,18 @@ static P2pSupplicantErrCode WpaP2pCliCmdSetWfdDeviceInfo(WifiWpaP2pInterface *th
     if (snprintf_s(cmd, len + 1, len, "IFNAME=%s WFD_SUBELEM_SET %s", this->ifName, conf) < 0) {
         LOGE("snprintf err");
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         LOGE("WFD_SUBELEM_SET command failed!");
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     free(cmd);
+    cmd = NULL;
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
@@ -625,15 +632,18 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceAdd(WifiWpaP2pInterface *this, co
     if (res < 0) {
         LOGE("snprintf err");
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         LOGE("P2P_SERVICE_ADD command failed!");
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     free(cmd);
+    cmd = NULL;
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
@@ -668,15 +678,18 @@ static P2pSupplicantErrCode WpaP2pCliCmdServiceDel(WifiWpaP2pInterface *this, co
     if (res < 0) {
         LOGE("snprintf err");
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         LOGE("P2P_SERVICE_DEL command failed!");
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     free(cmd);
+    cmd = NULL;
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
@@ -697,6 +710,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdServDiscReq(
     if (cmd == NULL || snprintf_s(cmd, cmdLen + 1, cmdLen, "IFNAME=%s P2P_SERV_DISC_REQ %s %s", this->ifName, peerBssid,
         tlvs) < 0) {
         free(cmd);
+        cmd = NULL;
         LOGE("snprintf err");
         return P2P_SUP_ERRCODE_FAILED;
     }
@@ -704,9 +718,11 @@ static P2pSupplicantErrCode WpaP2pCliCmdServDiscReq(
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         LOGE("P2P_SERV_DISC_REQ command failed!");
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     free(cmd);
+    cmd = NULL;
     if (strncpy_s(retSeq, size, buf, strlen(buf)) != EOK) {
         LOGE("Failed to copy response about service discovery sequence!");
         return P2P_SUP_ERRCODE_FAILED;
@@ -871,11 +887,13 @@ static P2pSupplicantErrCode WpaP2pCliCmdNetworkList(WifiWpaP2pInterface *this, P
     if (WpaCliCmd(cmd, buf, P2P_REPLY_BUF_LENGTH) != 0) {
         LOGE("LIST_NETWORKS command failed!");
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char *token = strstr(buf, "\n"); /* skip first line */
     if (token == NULL) {
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char *tmpPos = token + 1;
@@ -885,11 +903,13 @@ static P2pSupplicantErrCode WpaP2pCliCmdNetworkList(WifiWpaP2pInterface *this, P
     }
     if (infoList->infoNum <= 0) {
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_SUCCESS;
     }
     infoList->infos = (P2pNetworkInfo *)calloc(infoList->infoNum, sizeof(P2pNetworkInfo));
     if (infoList->infos == NULL) {
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char *tmpBuf = token + 1;
@@ -905,6 +925,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdNetworkList(WifiWpaP2pInterface *this, P
         token = strtok_r(NULL, "\n", &savedPtr);
     }
     free(buf);
+    buf = NULL;
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
@@ -991,15 +1012,18 @@ static P2pSupplicantErrCode WpaP2pCliCmdRespServerDiscovery(WifiWpaP2pInterface 
     if (cmd == NULL || snprintf_s(cmd, len + 1, len, "IFNAME=%s P2P_SERV_DISC_RESP %d %s %d %s", this->ifName,
         info->freq, info->mac, info->dialogToken, info->tlvs) < 0) {
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char buf[P2P_REPLY_BUF_SMALL_LENGTH] = {0};
     if (WpaCliCmd(cmd, buf, sizeof(buf)) != 0) {
         LOGE("P2P_SERV_DISC_RESP command failed!");
         free(cmd);
+        cmd = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     free(cmd);
+    cmd = NULL;
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
@@ -1072,6 +1096,7 @@ static P2pSupplicantErrCode CheckDriverRandomCapcb(WifiWpaP2pInterface *this)
     if (WpaCliCmd(cmd, buf, P2P_REPLY_BUF_LENGTH) != 0) {
         LOGE("DRIVER_FLAGS command failed!");
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     P2pSupplicantErrCode ret;
@@ -1081,6 +1106,7 @@ static P2pSupplicantErrCode CheckDriverRandomCapcb(WifiWpaP2pInterface *this)
         ret = P2P_SUP_ERRCODE_FAILED;
     }
     free(buf);
+    buf = NULL;
     return ret;
 }
 
@@ -1117,10 +1143,12 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetPeer(
     if (WpaCliCmd(cmd, buf, P2P_REPLY_BUF_LENGTH) != 0) {
         LOGE("P2P_PEER command failed!");
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     if (strstr(buf, "\n") == NULL) {
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     char *savedPtr = NULL;
@@ -1146,6 +1174,7 @@ static P2pSupplicantErrCode WpaP2pCliCmdP2pGetPeer(
         token = strtok_r(NULL, "\n", &savedPtr);
     }
     free(buf);
+    buf = NULL;
     return P2P_SUP_ERRCODE_SUCCESS;
 }
 
@@ -1263,10 +1292,12 @@ static P2pSupplicantErrCode WpaP2pCliCmdGetGroupConfig(WifiWpaP2pInterface *this
     if (WpaCliCmd(cmd, buf, P2P_REPLY_BUF_LENGTH) != 0) {
         LOGE("GET_NETWORK command failed!");
         free(buf);
+        buf = NULL;
         return P2P_SUP_ERRCODE_FAILED;
     }
     StrSafeCopy(argv->value, sizeof(argv->value), buf);
     free(buf);
+    buf = NULL;
     if (argv->param == GROUP_CONFIG_SSID) {
         TrimQuotationMark(argv->value, '\"');
     }

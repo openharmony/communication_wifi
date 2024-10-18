@@ -120,6 +120,7 @@ static int WpaCliCmdStatus(WifiWpaStaInterface *this, struct WpaHalCmdStatus *pc
     }
     if (WpaCliCmd(cmd, buf, REPLY_BUF_LENGTH) != 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     char *savedPtr = NULL;
@@ -144,6 +145,7 @@ static int WpaCliCmdStatus(WifiWpaStaInterface *this, struct WpaHalCmdStatus *pc
         key = strtok_r(NULL, "=", &savedPtr);
     }
     free(buf);
+    buf = NULL;
     if (strcmp(pcmd->address, "") == 0) {
         return -1;
     }
@@ -365,14 +367,17 @@ static int WpaCliCmdGetNetwork(
     }
     if (WpaCliCmd(cmd, buf, REPLY_BUF_LENGTH) != 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     if (strncpy_s(pcmd, size, buf, strlen(buf)) != EOK) {
         LOGE("copy set get_network result failed!");
         free(buf);
+        buf = NULL;
         return -1;
     }
     free(buf);
+    buf = NULL;
     return 0;
 }
 
@@ -624,6 +629,7 @@ static int WpaCliCmdListNetworks(WifiWpaStaInterface *this, WifiNetworkInfo *pcm
     }
     if (WpaCliCmd(cmd, buf, REPLY_BUF_LENGTH) != 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     char *savedPtr = NULL;
@@ -636,6 +642,7 @@ static int WpaCliCmdListNetworks(WifiWpaStaInterface *this, WifiNetworkInfo *pcm
             *size = j;
             LOGW("list_networks full!");
             free(buf);
+            buf = NULL;
             return 0;
         }
         int length = strlen(token);
@@ -651,6 +658,7 @@ static int WpaCliCmdListNetworks(WifiWpaStaInterface *this, WifiNetworkInfo *pcm
         LOGW("list_networks empty!");
     }
     free(buf);
+    buf = NULL;
     return 0;
 }
 
@@ -776,20 +784,24 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     if (res < 0) {
         LOGE("snprintf error");
         free(pcmd);
+        pcmd = NULL;
         return -1;
     }
     pos += res;
     if (settings != NULL && ConcatScanSetting(settings, pcmd + pos, len - pos) < 0) {
         LOGE("ConcatScanSetting return failed!");
         free(pcmd);
+        pcmd = NULL;
         return -1;
     }
     char buf[REPLY_BUF_SMALL_LENGTH] = {0};
     if (WpaCliCmd(pcmd, buf, sizeof(buf)) != 0) {
         free(pcmd);
+        pcmd = NULL;
         return -1;
     }
     free(pcmd);
+    pcmd = NULL;
     if (strncmp(buf, "FAIL-BUSY", strlen("FAIL-BUSY")) == 0) {
         return FAIL_BUSY;
     }
@@ -1264,6 +1276,7 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
     }
     if (WpaCliCmd(cmd, buf, REPLY_BUF_LENGTH) != 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     char *savedPtr = NULL;
@@ -1275,6 +1288,7 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
             *size = j;
             LOGE("get scan info full!");
             free(buf);
+            buf = NULL;
             return 0;
         }
         int length = strlen(token);
@@ -1296,6 +1310,7 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
     }
     *size = j;
     free(buf);
+    buf = NULL;
     return 0;
 }
 
@@ -1315,6 +1330,7 @@ static int WpaCliCmdGetSignalInfo(WifiWpaStaInterface *this, WpaSignalInfo *info
     }
     if (WpaCliCmd(cmd, buf, REPLY_BUF_LENGTH) != 0) {
         free(buf);
+        buf = NULL;
         return -1;
     }
     char *savedPtr = NULL;
@@ -1338,6 +1354,7 @@ static int WpaCliCmdGetSignalInfo(WifiWpaStaInterface *this, WpaSignalInfo *info
         token = strtok_r(NULL, "=", &savedPtr);
     }
     free(buf);
+    buf = NULL;
     return 0;
 }
 

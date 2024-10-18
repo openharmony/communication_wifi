@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Wifi {
-
 WifiScanConfig &WifiScanConfig::GetInstance()
 {
     static WifiScanConfig gWifiScanConfig;
@@ -53,6 +52,8 @@ void WifiScanConfig::GetScanDeviceInfo(WifiScanDeviceInfo &scanDeviceInfo)
         mScanDeviceInfo.hid2dInfo.softBusScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID,
         mScanDeviceInfo.hid2dInfo.castScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID,
+        mScanDeviceInfo.hid2dInfo.miraCastScene);
     scanDeviceInfo = mScanDeviceInfo;
 }
 

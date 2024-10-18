@@ -66,7 +66,7 @@ public:
 
     StaServiceCallback GetStaCallback() const;
 
-    void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instd);
+    void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
 private:
     std::unique_ptr<WifiEventHandler> assetServiceThread_ = nullptr;
 

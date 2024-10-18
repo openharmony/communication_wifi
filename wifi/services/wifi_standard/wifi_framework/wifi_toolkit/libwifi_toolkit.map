@@ -80,7 +80,7 @@
         "*CloudAssetSyn*";
         "*WifiAssetManager*GetInstance*";
         "*InitUpLoadLocalDeviceSync*";
-        "*WifiAssetTriggerSync*";
+        "*GetStaCallback*";
     local:
         *;
 };

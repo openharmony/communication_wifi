@@ -237,7 +237,7 @@ WifiAssetManager::WifiAssetManager()
     staCallback_.callbackModuleName = WIFI_ASSET_NETWORK_ON_SYNC;
     staCallback_.OnStaConnChanged = [&](OperateResState state, const WifiLinkedInfo &info, int instId) {
         this->DealStaConnChanged(state, info, instId);
-    }
+    };
     firstSync_.store(false);
 }
 

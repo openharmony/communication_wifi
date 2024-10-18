@@ -792,6 +792,12 @@ int WifiSettings::SyncHotspotConfig()
 int WifiSettings::SetHotspotConfig(const HotspotConfig &config, int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);
+    if (config.GetPreSharedKey() != mHotspotConfig[id].GetPreSharedKey()) {
+        LOGI("Hotspot preShareKey changed to %{public}s", SsidAnonymize(config.GetPreSharedKey()).c_str());
+    }
+    if (config.GetSsid() != mHotspotConfig[id].GetSsid()) {
+        LOGI("Hotspot ssid changed to %{public}s", SsidAnonymize(config.GetSsid()).c_str());
+    }
     mHotspotConfig[id] = config;
     return 0;
 }
@@ -1696,6 +1702,7 @@ void WifiSettings::MergeWifiConfig()
 
 void WifiSettings::MergeSoftapConfig()
 {
+    LOGI("Enter mergeSoftapConfig");
     std::filesystem::path wifiPathNmae = WIFI_CONFIG_FILE_PATH;
     std::filesystem::path hostapdPathName = HOTSPOT_CONFIG_FILE_PATH;
     std::filesystem::path dualApPathName = DUAL_SOFTAP_CONFIG_FILE_PATH;

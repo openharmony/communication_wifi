@@ -315,14 +315,16 @@ public:
 
     std::set<int> GetAllWifiLinkedNetworkId();
 
+    void SetPersistWifiState(int state);
+
+    int GetPersistWifiState();
+
 private:
     WifiConfigCenter();
     bool HasWifiActive();
     void UpdateLinkedInfo(int instId = 0);
     void InitScanControlForbidList();
     void InitScanControlIntervalList();
-    void SetPersistWifiState(int state);
-    int GetPersistWifiState();
     std::string GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
         const WifiMacAddrInfo &macAddrInfo);
     WifiMacAddrErrCode InsertMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,

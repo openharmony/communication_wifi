@@ -454,7 +454,6 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
     if (state == OperateResState::OPEN_WIFI_SUCCEED) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, instId);
-        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
         cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
@@ -483,7 +482,6 @@ void WifiServiceScheduler::DispatchWifiSemiActiveRes(OperateResState state, int 
     if (state == OperateResState::ENABLE_SEMI_WIFI_SUCCEED) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_SEMI_ACTIVE, instId);
-        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_SEMI_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::SEMI_ACTIVE, instId);
         cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
@@ -514,7 +512,6 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
     if (state == OperateResState::CLOSE_WIFI_SUCCEED) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
-        WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_DISABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
         cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);

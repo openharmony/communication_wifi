@@ -1337,7 +1337,7 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
         return;
     }
     const struct HdiElem *elem;
-    unsigned int ieIndex = 0;
+    int ieIndex = 0;
     ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
     if (infoElemsTemp == NULL) {
         LOGE("failed to alloc memory");
@@ -1351,7 +1351,7 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
             return;
         }
     HDI_CHECK_ELEMENT(elem, start, len) {
-        if (ieIndex >= MAX_INFO_ELEMS_SIZE) {
+        if ((unsigned int)ieIndex >= MAX_INFO_ELEMS_SIZE) {
             LOGE("ieIndex exceeds the upper limit.");
             break;
         }

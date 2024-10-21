@@ -1337,7 +1337,7 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
         return;
     }
     const struct HdiElem *elem;
-    int ieIndex = 0;
+    unsigned int ieIndex = 0;
     ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
     if (infoElemsTemp == NULL) {
         LOGE("failed to alloc memory");

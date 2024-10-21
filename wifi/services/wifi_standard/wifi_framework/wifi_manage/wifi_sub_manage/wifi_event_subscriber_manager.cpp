@@ -318,6 +318,8 @@ void WifiEventSubscriberManager::GetAirplaneModeByDatashare()
     WIFI_LOGI("GetAirplaneModeByDatashare, airplaneMode:%{public}s", airplaneMode.c_str());
     if (airplaneMode.compare("1") == 0) {
         WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_OPEN);
+    } else {
+        WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_CLOSE);
     }
     return;
 }

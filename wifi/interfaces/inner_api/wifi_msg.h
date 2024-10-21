@@ -150,7 +150,8 @@ enum class WifiOperateType {
     STA_CONNECT,
     STA_ASSOC,
     STA_AUTH,
-    STA_DHCP
+    STA_DHCP,
+    STA_SEMI_OPEN
 };
 
 enum class WifiOperateState {
@@ -171,6 +172,8 @@ enum class WifiOperateState {
     STA_DHCP_FAIL,
     STA_CLOSING,
     STA_CLOSED,
+    STA_SEMI_OPENING,
+    STA_SEMI_OPENED,
 };
 
 enum class DisconnectDetailReason {

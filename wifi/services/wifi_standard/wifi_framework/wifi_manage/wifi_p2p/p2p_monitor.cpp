@@ -507,8 +507,12 @@ void P2pMonitor::WpaEventGroupStarted(const HalP2pGroupInfo &groupInfo) const
     } else {
         group.SetPassphrase(std::string(groupInfo.psk));
     }
-    group.SetIsPersistent(groupInfo.isPersistent);
-
+    if (groupInfo.isPersistent && groupInfo.psk.empty()) {
+        WIFI_LOGE("groupinfo isPersistent and psk is null");
+        group.SetIsPersistent(0);
+    } else {
+        group.SetIsPersistent(groupInfo.isPersistent);
+    }
     WifiP2pDevice owner;
     owner.SetDeviceAddress(groupInfo.goDeviceAddress);
     owner.SetRandomDeviceAddress(groupInfo.goRandomAddress);

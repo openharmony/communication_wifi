@@ -95,6 +95,7 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetSupplierInfoTest001, TestSize.Le
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo =
         sptr<NetManagerStandard::NetSupplierInfo>(new (std::nothrow) NetManagerStandard::NetSupplierInfo());
     wifiNetAgent.OnStaMachineUpdateNetSupplierInfo(netSupplierInfo);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, OnStaMachineWifiStartTest001, TestSize.Level1)

@@ -1033,7 +1033,7 @@ bool ScanService::AddPnoScanMessageBody(InternalMessagePtr interMessage, const P
 void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
 {
     WIFI_LOGI("Enter HandlePnoScanInfo.\n");
-
+    InitChipsetInfo();
     std::vector<InterScanInfo> filterScanInfo;
     std::vector<InterScanInfo>::iterator iter = scanInfoList.begin();
     for (; iter != scanInfoList.end(); ++iter) {

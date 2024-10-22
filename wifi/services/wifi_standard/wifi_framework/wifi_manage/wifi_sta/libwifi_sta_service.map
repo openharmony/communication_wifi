@@ -2,7 +2,9 @@
     global:
         Create;
         Destroy;
-        "*StaInterface*";
+    extern "C++" {
+        "OHOS::Wifi::StaInterface::StaInterface(int)";
+    };
     local:
         *;
 };

@@ -35,6 +35,7 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int SLEEP_TIME = 2;
+constexpr int TEN = 10;
 
 class ConcreteManagerMachineTest : public testing::Test {
 public:
@@ -126,6 +127,7 @@ public:
     void SetTargetRoleTest()
     {
         pConcreteManagerMachine->SetTargetRole(ConcreteManagerRole::ROLE_UNKNOW);
+        EXPECT_NE(pConcreteManagerMachine->mTargetRole, TEN);
     }
 
     void HandleSwitchToConnectOrMixModeTest()

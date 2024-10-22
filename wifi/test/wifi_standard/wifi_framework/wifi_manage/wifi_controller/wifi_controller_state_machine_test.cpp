@@ -36,6 +36,9 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int TEN = 10;
+
 class WifiControllerMachineTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -155,6 +158,7 @@ public:
     void RemoveConcreteManagerTest()
     {
         pWifiControllerMachine->concreteManagers.RemoveManager(0);
+        EXPECT_NE(pWifiControllerMachine->mWifiStartFailCount, TEN);
     }
 
     void HandleStaCloseTest()
@@ -180,11 +184,13 @@ public:
     void ClearStartFailCountTest()
     {
         pWifiControllerMachine->ClearWifiStartFailCount();
+        EXPECT_EQ(pWifiControllerMachine->mWifiStartFailCount, 0);
     }
 
     void RmoveSoftapManagerTest()
     {
         pWifiControllerMachine->softApManagers.RemoveManager(0);
+        EXPECT_NE(pWifiControllerMachine->mWifiStartFailCount, TEN);
     }
 
     void HandleSoftapStopTest()

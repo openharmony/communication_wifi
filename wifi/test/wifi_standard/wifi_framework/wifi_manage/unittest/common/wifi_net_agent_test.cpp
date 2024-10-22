@@ -90,6 +90,7 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetLinkInfoTest001, TestSize.Level1
 
 HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetSupplierInfoTest001, TestSize.Level1)
 {
+    
     WifiNetAgent wifiNetAgent;
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo;
     wifiNetAgent. OnStaMachineUpdateNetSupplierInfo(netSupplierInfo);

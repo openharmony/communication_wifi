@@ -1597,7 +1597,7 @@ int WifiSettings::ReloadWifiP2pGroupInfoConfig()
         if (passPhrase.empty()) {
             LOGI("ReloadWifiP2pGroupInfoConfig erase invalid networkId:%{public}d", networkId);
             iter = mGroupInfoList.erase(iter);
-            invalidGroupExist = ture;
+            invalidGroupExist = true;
         } else {
             ++iter;
         }

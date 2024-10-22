@@ -1586,10 +1586,26 @@ int WifiSettings::SyncBlockList()
 int WifiSettings::ReloadWifiP2pGroupInfoConfig()
 {
     std::unique_lock<std::mutex> lock(mP2pMutex);
+    int invalidGroupCount = 0;;
     if (mSavedWifiP2pGroupInfo.LoadConfig()) {
         return -1;
     }
     mSavedWifiP2pGroupInfo.GetValue(mGroupInfoList);
+    for (auto iter = mGroupInfoList.begin(); iter != mGroupInfoList.end();) {
+        int networkId = iter->GetNetworkId();
+        std::string passPhrase = iter->GetPassphrase();
+        if (passPhrase.empty()) {
+            LOGI("ReloadWifiP2pGroupInfoConfig erase invalid networkId:%{public}d", networkId);
+            iter = mGroupInfoList.erase(iter);
+            invalidGroupCount++;
+        } else {
+            ++iter;
+        }
+    }
+    if (invalidGroupCount) {
+        mSavedWifiP2pGroupInfo.SetValue(mGroupInfoList);
+        mSavedWifiP2pGroupInfo.SaveConfig();
+    }
     return 0;
 }
 

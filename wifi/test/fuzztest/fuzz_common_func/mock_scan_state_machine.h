@@ -37,11 +37,11 @@ public:
     InternalMessagePtr CreateMessage(int msgName);
 };
 
-class WifiManager {
+class WifiManagers {
 public:
-    WifiManager();
-    ~WifiManager() = default;
-    static WifiManager &GetInstance();
+    WifiManagers();
+    ~WifiManagers() = default;
+    static WifiManagers &GetInstance();
     IScanSerivceCallbacks GetScanCallback();
 
     void DealScanOpenRes(int instId = 0);

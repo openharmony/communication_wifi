@@ -165,7 +165,7 @@ void WifiScanManager::CheckAndStopScanService(int instId)
         return;
     }
     ScanControlInfo info;
-    WifiConfigCenter::GetInstance().GetScanControlInfo(info, instId);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanControlInfo(info, instId);
     if (WifiSettings::GetInstance().GetScanAlwaysState() && IsAllowScanAnyTime(info) &&
         WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_CLOSE &&
         WifiConfigCenter::GetInstance().GetPowerSavingModeState() == MODE_STATE_CLOSE) {
@@ -251,7 +251,7 @@ void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results
 void WifiScanManager::DealStaOpened(int instId)
 {
     WIFI_LOGI("wifi opened id=%{public}d", instId);
-    WifiConfigCenter::GetInstance().CleanWifiCategoryRecord();
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->CleanWifiCategoryRecord();
     CheckAndStartScanService(instId);
 }
 }  // namespace Wifi

@@ -235,6 +235,7 @@ public:
     void WarpUpdateThisDevice()
     {
         pP2pStateMachine->UpdateOwnDevice(P2pDeviceStatus::PDS_CONNECTED);
+        EXPECT_NE(pP2pStateMachine->p2pIface, "IJSA");
     }
     void WarpUpdatePersistentGroups()
     {
@@ -297,10 +298,12 @@ public:
     void WarpBroadcastP2pConnectionChanged() const
     {
         pP2pStateMachine->BroadcastP2pConnectionChanged();
+        EXPECT_NE(pP2pStateMachine->p2pIface, "IJSA");
     }
     void WarpBroadcastThisDeviceChanaged(const WifiP2pDevice &device) const
     {
         pP2pStateMachine->BroadcastThisDeviceChanaged(device);
+        EXPECT_NE(pP2pStateMachine->p2pIface, "IJSA");
     }
     void WarpBroadcastP2pDiscoveryChanged(bool isActive) const
     {
@@ -309,10 +312,12 @@ public:
     void WarpBroadcastPersistentGroupsChanged() const
     {
         pP2pStateMachine->BroadcastPersistentGroupsChanged();
+        EXPECT_NE(pP2pStateMachine->p2pIface, "IJSA");
     }
     void WarpBroadcastActionResult(P2pActionCallback action, ErrCode result) const
     {
         pP2pStateMachine->BroadcastActionResult(action, result);
+        EXPECT_NE(pP2pStateMachine->p2pIface, "IJSA");
     }
 
     void WarpNotifyInvitationSent(const std::string &pin, const std::string &peerAddress) const

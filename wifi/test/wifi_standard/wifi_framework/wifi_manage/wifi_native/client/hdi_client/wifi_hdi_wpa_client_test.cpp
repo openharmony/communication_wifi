@@ -1400,6 +1400,7 @@ HWTEST_F(WifiHdiWpaClientTest, SetWapiConfigTest, TestSize.Level1)
     wifiHdiWpaClient->SetWapiConfig(config, &conf, num);
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     wifiHdiWpaClient->SetWapiConfig(config, &conf, num);
+    EXPECT_NE(num, 0);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqWpaGetPskPassphraseTest, TestSize.Level1)

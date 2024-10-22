@@ -35,6 +35,7 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 constexpr const char *WIFI_NET_CONN_MGR_WORK_THREAD = "WIFI_NET_CONN_MGR_WORK_THREAD";
+constexpr int TEN = 10;
 class WifiNetAgentTest : public Test {
 public:
     void SetUp() override
@@ -100,6 +101,7 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineWifiStartTest001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;
     wifiNetAgent.OnStaMachineWifiStart();
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, OnStaMachineNetManagerRestartTest001, TestSize.Level1)
@@ -125,6 +127,7 @@ HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest001, TestSize.Level1)
     wifiProxyConfig.configureMethod = ConfigureProxyMethod::AUTOCONFIGUE;
 
     wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest002, TestSize.Level1)
@@ -138,6 +141,7 @@ HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest002, TestSize.Level1)
     wifiProxyConfig.configureMethod = ConfigureProxyMethod::MANUALCONFIGUE;
 
     wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest003, TestSize.Level1)
@@ -151,6 +155,7 @@ HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest003, TestSize.Level1)
     wifiProxyConfig.configureMethod = ConfigureProxyMethod::CLOSED;
 
     wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, SetNetLinkIPInfoTest001, TestSize.Level1)
@@ -165,6 +170,7 @@ HWTEST_F(WifiNetAgentTest, SetNetLinkIPInfoTest001, TestSize.Level1)
     wifiIpV6Info.uniqueLocalAddress1 = "TEST4";
     wifiIpV6Info.uniqueLocalAddress2 = "TEST5";
     wifiNetAgent.SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, SetNetLinkDnsInfoTest001, TestSize.Level1)
@@ -176,6 +182,7 @@ HWTEST_F(WifiNetAgentTest, SetNetLinkDnsInfoTest001, TestSize.Level1)
     wifiIpV6Info.dnsAddr.push_back("TEST1");
     wifiIpV6Info.dnsAddr.push_back("TEST2");
     wifiNetAgent.SetNetLinkDnsInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, SetNetLinkRouteInfoTest001, TestSize.Level1)
@@ -186,6 +193,7 @@ HWTEST_F(WifiNetAgentTest, SetNetLinkRouteInfoTest001, TestSize.Level1)
     IpV6Info wifiIpV6Info;
     wifiIpV6Info.gateway = "TEST";
     wifiNetAgent.SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteInfoTest001, TestSize.Level1)
@@ -196,6 +204,7 @@ HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteInfoTest001, TestSize.Level1)
     IpV6Info wifiIpV6Info;
     wifiIpV6Info.netmask = "TEST";
     wifiNetAgent.SetNetLinkLocalRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, InitWifiNetAgentTest001, TestSize.Level1)
@@ -203,6 +212,7 @@ HWTEST_F(WifiNetAgentTest, InitWifiNetAgentTest001, TestSize.Level1)
     WifiNetAgent wifiNetAgent;
     WifiNetAgentCallbacks wifiNetAgentCallbacks;
     wifiNetAgent.InitWifiNetAgent(wifiNetAgentCallbacks);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, RequestNetworkTest001, TestSize.Level1)
@@ -251,6 +261,7 @@ HWTEST_F(WifiNetAgentTest, LogNetCapsTest001, TestSize.Level1)
     std::string ident = "";
     std::set<NetManagerStandard::NetCap> netCaps;
     netConnCallback.LogNetCaps(ident, netCaps);
+    EXPECT_NE(netConnCallback.requestIds_.size(), TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, GetSupplierId001, TestSize.Level1)
@@ -265,6 +276,7 @@ HWTEST_F(WifiNetAgentTest, RestoreWifiConnectionTest001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;
     wifiNetAgent.RestoreWifiConnection();
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 }
 }

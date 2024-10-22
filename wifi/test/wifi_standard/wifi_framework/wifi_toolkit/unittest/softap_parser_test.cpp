@@ -82,12 +82,14 @@ HWTEST_F(SoftapParserTest, GetBandInfoTest, TestSize.Level1)
 {
     WIFI_LOGI("GetBandInfoTest enter");
     m_softapXmlParser->GetBandInfo(nullptr);
+    EXPECT_NE(m_softapXmlParser->hotspotConfig.GetBand(), BandType::BAND_NONE);
 }
 
 HWTEST_F(SoftapParserTest, TransBandinfoTest, TestSize.Level1)
 {
     WIFI_LOGI("TransBandinfoTest enter");
     m_softapXmlParser->TransBandinfo(nullptr);
+    EXPECT_NE(m_softapXmlParser->hotspotConfig.GetBand(), BandType::BAND_NONE);
 }
 
 HWTEST_F(SoftapParserTest, GetSoftapConfigsTest, TestSize.Level1)

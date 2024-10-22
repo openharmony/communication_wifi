@@ -33,6 +33,9 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int TEN = 10;
+
 class SelfCureInterfaceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -94,6 +97,7 @@ public:
         pSelfCureInterface->DealP2pConnChanged(info);
         pSelfCureInterface->pSelfCureService = nullptr;
         pSelfCureInterface->DealP2pConnChanged(info);
+        EXPECT_NE(pSelfCureInterface->m_instId, TEN);
     }
 
     void RegisterSelfCureServiceCallbackTest()

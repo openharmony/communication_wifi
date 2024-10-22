@@ -90,10 +90,10 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetLinkInfoTest001, TestSize.Level1
 
 HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetSupplierInfoTest001, TestSize.Level1)
 {
-    
     WifiNetAgent wifiNetAgent;
-    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo;
-    wifiNetAgent. OnStaMachineUpdateNetSupplierInfo(netSupplierInfo);
+    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo =
+        sptr<NetManagerStandard::NetSupplierInfo>(new (std::nothrow) NetManagerStandard::NetSupplierInfo());
+    wifiNetAgent.OnStaMachineUpdateNetSupplierInfo(netSupplierInfo);
 }
 
 HWTEST_F(WifiNetAgentTest, OnStaMachineWifiStartTest001, TestSize.Level1)
@@ -109,7 +109,8 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineNetManagerRestartTest001, TestSize.Level1
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState == ConnState::CONNECTED;
     WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
-    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo;
+    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo =
+        sptr<NetManagerStandard::NetSupplierInfo>(new (std::nothrow) NetManagerStandard::NetSupplierInfo());
     wifiNetAgent.OnStaMachineNetManagerRestart(netSupplierInfo, instId);
 }
 

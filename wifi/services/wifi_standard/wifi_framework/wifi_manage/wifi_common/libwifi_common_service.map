@@ -104,11 +104,11 @@
         "OHOS::Wifi::WifiInternalEventDispatcher::SetSingleHotspotCallback(OHOS::sptr<OHOS::Wifi::IWifiHotspotCallback> const&, int)";
         "OHOS::Wifi::WifiInternalEventDispatcher::GetSingleHotspotCallback(int) const";
         "OHOS::Wifi::WifiInternalEventDispatcher::RemoveHotspotCallback(OHOS::sptr<OHOS::IRemoteObject> const&, int)";
-        "OHOS::Wifi::WifiInternalEventDispatcher:: HasHotspotRemote(OHOS::sptr<OHOS::IRemoteObject> const&, int)";
+        "OHOS::Wifi::WifiInternalEventDispatcher::HasHotspotRemote(OHOS::sptr<OHOS::IRemoteObject> const&, int)";
         "OHOS::Wifi::WifiInternalEventDispatcher::AddP2pCallback(OHOS::sptr<OHOS::IRemoteObject> const&, OHOS::sptr<OHOS::Wifi::IWifiP2pCallback> const&, int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::WifiInternalEventDispatcher::SetSingleP2pCallback(OHOS::sptr<OHOS::Wifi::IWifiP2pCallback> const&)";
         "OHOS::Wifi::WifiInternalEventDispatcher::RemoveP2pCallback(OHOS::sptr<OHOS::IRemoteObject> const&)";
-        "OHOS::Wifi::WifiInternalEventDispatcher::HasP2pRemote(const OHOS::sptr<OHOS::IRemoteObject> &)";
+        "OHOS::Wifi::WifiInternalEventDispatcher::HasP2pRemote(OHOS::sptr<OHOS::IRemoteObject> const&)";
         "OHOS::Wifi::WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg &)";
         "OHOS::Wifi::WifiInternalEventDispatcher::InvokeDeviceCallbacks(const WifiEventCallbackMsg &)";
         "OHOS::Wifi::WifiInternalEventDispatcher::InvokeHotspotCallbacks(const WifiEventCallbackMsg &)";

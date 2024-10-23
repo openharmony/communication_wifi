@@ -32,6 +32,9 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int TEN = 10;
+
 class StaMonitorTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -79,6 +82,7 @@ HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackTest01, TestSize.Level1)
 HWTEST_F(StaMonitorTest, OnWpaAuthTimeOutCallBackTest01, TestSize.Level1)
 {
     pStaMonitor->OnWpaAuthTimeOutCallBack();
+    EXPECT_NE(pStaMonitor->m_instId, TEN);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaEapSimAuthCallBackTest01, TestSize.Level1)

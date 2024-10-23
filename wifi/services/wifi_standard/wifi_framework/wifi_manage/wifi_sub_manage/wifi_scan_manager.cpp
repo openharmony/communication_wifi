@@ -261,6 +261,9 @@ void WifiScanManager::DealStaOpened(int instId)
 {
     WIFI_LOGI("wifi opened id=%{public}d", instId);
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->CleanWifiCategoryRecord();
+    WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
+    WifiConfigCenter::GetInstance().SetScreenState(MODE_STATE_OPEN);
+    WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
     CheckAndStartScanService(instId);
 }
 }  // namespace Wifi

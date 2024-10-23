@@ -109,8 +109,8 @@ bool WifiP2pServiceImpl::Init()
 
 ErrCode WifiP2pServiceImpl::CheckCanEnableP2p(void)
 {
-    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("EnableP2p:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySameProcessPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableP2p:VerifySameProcessPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     /**
@@ -184,8 +184,8 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
 ErrCode WifiP2pServiceImpl::DisableP2p(void)
 {
     WIFI_LOGI("DisableP2p");
-    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableP2p:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySameProcessPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DisableP2p:VerifySameProcessPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 

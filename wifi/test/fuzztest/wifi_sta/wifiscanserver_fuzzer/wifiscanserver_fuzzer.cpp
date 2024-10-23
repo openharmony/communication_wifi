@@ -52,7 +52,7 @@ void InitParam()
     if (!g_isInsted) {
         pScanService = std::make_unique<ScanService>();
         pScanService->pScanStateMachine = new MockScanStateMachine();
-        pScanService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
+        pScanService->RegisterScanCallbacks(WifiManagers::GetInstance().GetScanCallback());
         pScanInterface = std::make_unique<ScanInterface>();
         if (pScanService == nullptr || pScanInterface) {
             return;

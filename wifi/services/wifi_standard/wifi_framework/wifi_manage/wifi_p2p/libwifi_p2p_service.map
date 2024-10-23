@@ -2,7 +2,9 @@
     global:
         Create;
         Destroy;
-        "*P2pInterface*";
+    extern "C++" {
+        "OHOS::Wifi::P2pInterface::P2pInterface()";
+    };
     local:
         *;
 };

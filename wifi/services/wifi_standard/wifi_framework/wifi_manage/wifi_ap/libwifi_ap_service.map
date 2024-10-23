@@ -2,7 +2,9 @@
     global:
         Create;
         Destroy;
-        "*ApInterface*";
+    extern "C++" {
+        "OHOS::Wifi::ApInterface::ApInterface(int)";
+    };
     local:
         *;
 };

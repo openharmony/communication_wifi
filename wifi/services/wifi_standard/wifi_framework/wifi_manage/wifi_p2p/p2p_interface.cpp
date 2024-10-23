@@ -37,12 +37,13 @@ P2pInterface::P2pInterface()
       p2pIdleState(p2pStateMachine, groupManager, deviceMgr),
       p2pInvitingState(p2pStateMachine, groupManager, deviceMgr),
       p2pProvisionDiscoveryState(p2pStateMachine, groupManager, deviceMgr),
+      p2pGroupRemoveState(),
 
       p2pStateMachine(p2pMonitor, groupManager, deviceMgr, svrMgr, p2pAuthorizingNegotiationRequestState,
           p2pGroupFormedState, p2pGroupNegotiationState, p2pInvitationReceivedState, p2pInvitationRequestState,
           p2pDefaultState, p2pDisabledState, p2pDisablingState, p2pEnabledState, p2pEnablingState,
           p2pGroupFormationState, p2pGroupJoinState, p2pGroupOperatingState, p2pIdleState, p2pInvitingState,
-          p2pProvisionDiscoveryState),
+          p2pProvisionDiscoveryState, p2pGroupRemoveState),
       p2pService(p2pStateMachine, deviceMgr, groupManager, svrMgr)
 {}
 

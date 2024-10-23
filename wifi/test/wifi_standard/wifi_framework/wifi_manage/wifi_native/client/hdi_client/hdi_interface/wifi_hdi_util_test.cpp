@@ -20,6 +20,7 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 const int MAC_SIZE = 6;
+constexpr int TEN = 10;
 class WifiHdiUtilTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -999,6 +1000,7 @@ HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqTest, TestSize.Level1)
     GetChanWidthCenterFreq(&pcmd, nullptr);
     GetChanWidthCenterFreq(nullptr, &iesNeedParse);
     GetChanWidthCenterFreq(&pcmd, &iesNeedParse);
+    EXPECT_NE(pcmd.ieSize, TEN);
 }
 
 extern "C" void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd);

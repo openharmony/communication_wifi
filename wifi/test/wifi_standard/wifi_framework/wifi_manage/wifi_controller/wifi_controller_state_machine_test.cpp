@@ -20,6 +20,7 @@
 #include "mock_softap_manager_state_machine.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
+#include "wifi_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -35,10 +36,21 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int TEN = 10;
+
 class WifiControllerMachineTest : public testing::Test {
 public:
-    static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void SetUpTestCase()
+    {
+        WifiManager::GetInstance().Init();
+    }
+
+    static void TearDownTestCase()
+    {
+        WifiManager::GetInstance().Exit();
+    }
+
     virtual void SetUp()
     {
         pWifiControllerMachine = std::make_unique<WifiControllerMachine>();
@@ -146,6 +158,7 @@ public:
     void RemoveConcreteManagerTest()
     {
         pWifiControllerMachine->concreteManagers.RemoveManager(0);
+        EXPECT_NE(pWifiControllerMachine->mWifiStartFailCount, TEN);
     }
 
     void HandleStaCloseTest()
@@ -171,11 +184,13 @@ public:
     void ClearStartFailCountTest()
     {
         pWifiControllerMachine->ClearWifiStartFailCount();
+        EXPECT_EQ(pWifiControllerMachine->mWifiStartFailCount, 0);
     }
 
     void RmoveSoftapManagerTest()
     {
         pWifiControllerMachine->softApManagers.RemoveManager(0);
+        EXPECT_NE(pWifiControllerMachine->mWifiStartFailCount, TEN);
     }
 
     void HandleSoftapStopTest()
@@ -209,6 +224,17 @@ public:
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
         pWifiControllerMachine->concreteManagers.AddManager(clientmode);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+    }
+
+    void SoftapToggledTest2()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_SOFTAP_TOGGLED);
+        msg->SetParam1(1);
+        msg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pWifiControllerMachine->HasAnyManager());
+        pWifiControllerMachine->ShutdownWifi(true);
     }
 
     void HandleAirplaneOpenTest()
@@ -275,6 +301,90 @@ public:
         msg->SetParam1(0);
         msg->SetParam2(0);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+    }
+
+    void RptStoppedTest()
+    {
+        #ifdef FEATURE_RPT_SUPPORT
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_RPT_STOPPED);
+        msg->SetParam1(0);
+        msg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        #else
+        EXPECT_FALSE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        #endif
+    }
+
+    void P2pStoppedTest()
+    {
+        #ifdef FEATURE_RPT_SUPPORT
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_P2P_STOPPED);
+        msg->SetParam1(0);
+        msg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        #else
+        EXPECT_FALSE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        #endif
+    }
+
+    void RptStartFailureTest()
+    {
+        #ifdef FEATURE_RPT_SUPPORT
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_RPT_START_FAILURE);
+        msg->SetParam1(0);
+        msg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        #else
+        EXPECT_FALSE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+        #endif
+    }
+
+    void MakeConcreteManagerTest()
+    {
+        pWifiControllerMachine->MakeConcreteManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
+        EXPECT_TRUE(pWifiControllerMachine->concreteManagers.HasAnyManager());
+        pWifiControllerMachine->concreteManagers.RemoveManager(0);
+    }
+
+    void MakeSoftapManagerTest()
+    {
+        pWifiControllerMachine->MakeSoftapManager(SoftApManager::Role::ROLE_SOFTAP, 0);
+        EXPECT_TRUE(pWifiControllerMachine->softApManagers.HasAnyManager());
+        pWifiControllerMachine->softApManagers.RemoveManager(0);
+    }
+
+    void MakeRptManagerTest()
+    {
+        #ifdef FEATURE_RPT_SUPPORT
+        pWifiControllerMachine->MakeRptManager(RptManager::Role::ROLE_RPT, 0);
+        EXPECT_TRUE(pWifiControllerMachine->rptManagers.HasAnyManager());
+        pWifiControllerMachine->rptManagers.RemoveManager(0);
+        #endif
+    }
+
+    void GetRptManagerTest()
+    {
+        const int anyId = -1;
+        const int id0 = 0;
+        pWifiControllerMachine->ShouldUseRpt(0);
+        EXPECT_TRUE(pWifiControllerMachine->GetRptManager(anyId) == nullptr);
+        EXPECT_TRUE(pWifiControllerMachine->GetRptManager(id0) == nullptr);
+    }
+
+    void CalculateHotspotModeTest()
+    {
+        using HotspotMode = WifiControllerMachine::HotspotMode;
+        pWifiControllerMachine->hotspotMode = HotspotMode::NONE;
+        pWifiControllerMachine->CalculateHotspotMode(0);
+
+        pWifiControllerMachine->hotspotMode = HotspotMode::SOFTAP;
+        EXPECT_TRUE(pWifiControllerMachine->CalculateHotspotMode(0) == HotspotMode::SOFTAP);
+
+        pWifiControllerMachine->hotspotMode = HotspotMode::RPT;
+        EXPECT_TRUE(pWifiControllerMachine->CalculateHotspotMode(0) == HotspotMode::RPT);
     }
 
     void SoftApIdExistTest()
@@ -427,6 +537,11 @@ HWTEST_F(WifiControllerMachineTest, SoftapToggledTest1, TestSize.Level1)
     SoftapToggledTest1();
 }
 
+HWTEST_F(WifiControllerMachineTest, SoftapToggledTest2, TestSize.Level1)
+{
+    SoftapToggledTest2();
+}
+
 HWTEST_F(WifiControllerMachineTest, HandleAirplaneOpenTest, TestSize.Level1)
 {
     HandleAirplaneOpenTest();
@@ -450,6 +565,46 @@ HWTEST_F(WifiControllerMachineTest, RetryTest, TestSize.Level1)
 HWTEST_F(WifiControllerMachineTest, ApRemoveTest, TestSize.Level1)
 {
     ApRemoveTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, RptStoppedTest, TestSize.Level1)
+{
+    RptStoppedTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, P2pStoppedTest, TestSize.Level1)
+{
+    P2pStoppedTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, RptStartFailureTest, TestSize.Level1)
+{
+    RptStartFailureTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, MakeConcreteManagerTest, TestSize.Level1)
+{
+    MakeConcreteManagerTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, MakeSoftapManagerTest, TestSize.Level1)
+{
+    MakeSoftapManagerTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, MakeRptManagerTest, TestSize.Level1)
+{
+    MakeRptManagerTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, GetRptManagerTest, TestSize.Level1)
+{
+    GetRptManagerTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, CalculateHotspotModeTest, TestSize.Level1)
+{
+    CalculateHotspotModeTest();
 }
 
 HWTEST_F(WifiControllerMachineTest, SoftApIdExistTest, TestSize.Level1)

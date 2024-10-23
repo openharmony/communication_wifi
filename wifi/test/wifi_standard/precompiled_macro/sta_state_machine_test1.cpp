@@ -44,6 +44,7 @@ static const std::string RANDOMMAC_SSID = "testwifi";
 static const std::string RANDOMMAC_PASSWORD = "testwifi";
 static const std::string RANDOMMAC_BSSID = "01:23:45:67:89:a0";
 constexpr int TEST_FAIL_REASON = 16;
+constexpr int TEN = 10;
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -243,6 +244,7 @@ void HandleStaBssidChangedEventTest()
     msg->SetMessageObj(bssid);
     msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
     pStaStateMachine->pApLinkedState->HandleStaBssidChangedEvent(msg);
+    EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
 }
 
 void HandleStaBssidChangedEventTest1()
@@ -252,6 +254,7 @@ void HandleStaBssidChangedEventTest1()
     msg->AddStringMessageBody(reason);
     msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
     pStaStateMachine->pApLinkedState->HandleStaBssidChangedEvent(msg);
+    EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
 }
 
 void ApRoamingStateExeMsgSuccess()
@@ -317,6 +320,7 @@ void OnDhcpOfferResultTest()
     StaStateMachine staStateMachine;
     pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
     pStaStateMachine->pDhcpResultNotify->OnDhcpOfferResult(status, ifname, &result);
+    EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
 }
 
 void DealDhcpResultTest()
@@ -325,6 +329,7 @@ void DealDhcpResultTest()
     StaStateMachine staStateMachine;
     pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
     pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
+    EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
 }
 
 void TryToCloseDhcpClientTest()
@@ -333,6 +338,7 @@ void TryToCloseDhcpClientTest()
     StaStateMachine staStateMachine;
     pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
     pStaStateMachine->pDhcpResultNotify->TryToCloseDhcpClient(ipType);
+    EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
 }
 
 void TryToCloseDhcpClientTest1()
@@ -341,6 +347,7 @@ void TryToCloseDhcpClientTest1()
     StaStateMachine staStateMachine;
     pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
     pStaStateMachine->pDhcpResultNotify->TryToCloseDhcpClient(ipType);
+    EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
 }
 
 void DealDhcpResultFailedTest()
@@ -348,6 +355,7 @@ void DealDhcpResultFailedTest()
     StaStateMachine staStateMachine;
     pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
     pStaStateMachine->pDhcpResultNotify->DealDhcpResultFailed();
+    EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
 }
 
 void DealDhcpOfferResultTest()

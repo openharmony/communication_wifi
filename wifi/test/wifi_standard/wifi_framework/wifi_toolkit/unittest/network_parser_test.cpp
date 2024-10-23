@@ -41,6 +41,7 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("NetworkParserTest");
+constexpr int TEN = 10;
 
 class NetworkParserTest : public testing::Test {
 public:
@@ -160,6 +161,7 @@ HWTEST_F(NetworkParserTest, EnableNetworksTest, TestSize.Level1)
 {
     WIFI_LOGI("EnableNetworksTest enter");
     m_networkXmlParser->EnableNetworks();
+    EXPECT_NE(m_networkXmlParser->wifiConfigs.size(), TEN);
 }
 
 HWTEST_F(NetworkParserTest, ParseInternalTest, TestSize.Level1)

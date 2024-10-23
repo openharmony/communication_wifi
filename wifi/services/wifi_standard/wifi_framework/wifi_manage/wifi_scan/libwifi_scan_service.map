@@ -2,7 +2,9 @@
     global:
         Create;
         Destroy;
-        "*ScanInterface*";
+    extern "C++" {
+        "OHOS::Wifi::ScanInterface::ScanInterface(int)";
+    };
     local:
         *;
 };

@@ -37,6 +37,7 @@ DEFINE_WIFILOG_LABEL("WifiP2pManager");
 
 namespace OHOS {
 namespace Wifi {
+constexpr int32_t P2P_ENABLE_WAIT_MS = 500;
 WifiP2pManager::WifiP2pManager()
 {
     WIFI_LOGI("create WifiP2pManager");
@@ -104,6 +105,8 @@ ErrCode WifiP2pManager::AutoStartP2pService()
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
         return ret;
     }
+    std::unique_lock<std::mutex> locker(p2pEnableMutex);
+    p2pEnableCond.wait_for(locker, std::chrono::milliseconds(P2P_ENABLE_WAIT_MS));
 #ifndef OHOS_ARCH_LITE
     StopUnloadP2PSaTimer();
 #endif
@@ -141,7 +144,8 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
         return ret;
     }
-
+    std::unique_lock<std::mutex> locker(p2pEnableMutex);
+    p2pEnableCond.wait_for(locker, std::chrono::milliseconds(P2P_ENABLE_WAIT_MS));
     return WIFI_OPT_SUCCESS;
 }
 
@@ -206,10 +210,6 @@ void WifiP2pManager::CloseP2pService(void)
     }
 #endif
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
-    if (staState == WifiOprMidState::RUNNING || staState == WifiOprMidState::SEMI_ACTIVE) {
-        AutoStartP2pService();
-        return;
-    }
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close p2p SA!");
@@ -264,10 +264,12 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
     cbMsg.msgData = static_cast<int>(state);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     if (state == P2pState::P2P_STATE_IDLE) {
-        WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::P2P_SERVICE_CLOSE);
+        CloseP2pService();
+        p2pEnableCond.notify_all();
     }
     if (state == P2pState::P2P_STATE_STARTED) {
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
+        p2pEnableCond.notify_all();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
         WIFI_LOGI("DealP2pStateChanged, current sta state:%{public}d", staState);
         if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::CLOSED) {

@@ -47,6 +47,28 @@ bool P2pDefaultState::ExecuteStateMsg(InternalMessagePtr msg)
             p2pStateMachine.serviceManager.RemoveRequestRecord(deviceAddress, msg->GetParam1());
             break;
         }
+        case P2P_STATE_MACHINE_CMD::CMD_REGISTER_SERVICE_CB: {
+            IP2pServiceCallbacks callback;
+            if (!msg->GetMessageObj(callback)) {
+                WIFI_LOGE("Failed to obtain service callback object.");
+                return EXECUTED;
+            }
+            p2pStateMachine.RegisterP2pServiceCallbacks(callback);
+            break;
+        }
+        case P2P_STATE_MACHINE_CMD::CMD_UNREGISTER_SERVICE_CB: {
+            IP2pServiceCallbacks callback;
+            if (!msg->GetMessageObj(callback)) {
+                WIFI_LOGE("Failed to obtain service callback object.");
+                return EXECUTED;
+            }
+            p2pStateMachine.UnRegisterP2pServiceCallbacks(callback);
+            break;
+        }
+        case P2P_STATE_MACHINE_CMD::CMD_CLEAR_SERVICE_CB: {
+            p2pStateMachine.ClearAllP2pServiceCallbacks();
+            break;
+        }
         default:
             WIFI_LOGE("Failed:The  P2P state machine does not process messages: [%{public}d]", msgName);
             return NOT_EXECUTED;

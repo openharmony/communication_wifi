@@ -242,10 +242,8 @@ WifiErrorNo P2pSetRandomMac(int enable)
         LOGE("WpaP2pCliCmdSetRandomMac fail, ret = %{public}d", ret);
         return ConvertP2pErrCode(ret);
     }
-    if (enable) {
-        if (AddP2pRandomMacFlag() != WIFI_HAL_SUCCESS) {
-            LOGW("%{public}s: failed to write %{public}s", __func__, P2P_RANDOM_MAC_FLAG);
-        }
+    if (AddP2pRandomMacFlag() != WIFI_HAL_SUCCESS) {
+        LOGW("%{public}s: failed to write %{public}s", __func__, P2P_RANDOM_MAC_FLAG);
     }
     return WIFI_HAL_SUCCESS;
 }

@@ -636,6 +636,7 @@ void WifiP2pProxy::ReadWifiP2pGroupData(MessageParcel &reply, WifiP2pGroupInfo &
     info.SetP2pGroupStatus(static_cast<P2pGroupStatus>(reply.ReadInt32()));
     info.SetNetworkId(reply.ReadInt32());
     info.SetGoIpAddress(reply.ReadString());
+    info.SetGcIpAddress(reply.ReadString());
 
     constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();

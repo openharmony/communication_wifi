@@ -632,7 +632,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
         SsidAnonymize(halDeviceConfig.ssid).c_str(), MacAnonymize(halDeviceConfig.bssid).c_str());
 
     std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto scanInfo : scanInfoList) {
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
@@ -2815,8 +2815,7 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
     pStaStateMachine->DealSignalPollResult();  // update freq info
     WifiDeviceConfig deviceConfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, deviceConfig,
-        pStaStateMachine->GetInstanceId()) != 0) {
+    if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, deviceConfig) != 0) {
         WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__,
             pStaStateMachine->linkedInfo.networkId);
         return;
@@ -4644,7 +4643,7 @@ void StaStateMachine::UpdateWifiCategory()
 
 void StaStateMachine::SetSupportedWifiCategory()
 {
-    if (m_instId != INSTID_WLAN0) {
+    if (m_instId != 0) {
         return;
     }
     if (linkedInfo.bssid.empty()) {

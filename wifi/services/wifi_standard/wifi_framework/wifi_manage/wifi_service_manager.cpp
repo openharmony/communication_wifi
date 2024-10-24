@@ -36,7 +36,7 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiServiceManager");
 WifiServiceManager &WifiServiceManager::GetInstance()
 {
-    static WifiServiceManager gWifiServiceManager;
+    static WifiServiceManager   gWifiServiceManager;
     return gWifiServiceManager;
 }
 

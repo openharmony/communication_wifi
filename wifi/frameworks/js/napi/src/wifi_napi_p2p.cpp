@@ -83,6 +83,7 @@ static ErrCode GroupInfosToJs(const napi_env& env, const WifiP2pGroupInfo& group
         }
     }
     SetValueUtf8String(env, "goIpAddress", groupInfo.GetGoIpAddress().c_str(), result);
+    SetValueUtf8String(env, "gcIpAddress", groupInfo.GetGcIpAddress().c_str(), result);
     return WIFI_OPT_SUCCESS;
 }
 

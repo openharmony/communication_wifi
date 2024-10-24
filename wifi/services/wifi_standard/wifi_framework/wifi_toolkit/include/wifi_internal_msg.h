@@ -211,6 +211,7 @@ enum class StaApExclusionType {
 struct WifiConfig {
     bool scanAlwaysSwitch; /* scan always switch */
     int staAirplaneMode; /* operator wifi type */
+    int64_t persistWifiTime; /* persist wifi state time */
     bool canOpenStaWhenAirplane; /* if airplane is opened, whether can open sta */
     bool openWifiWhenAirplane;
     bool wifiDisabledByAirplane;
@@ -262,6 +263,7 @@ struct WifiConfig {
     {
         scanAlwaysSwitch = false;
         staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
+        persistWifiTime = 0;
         canOpenStaWhenAirplane = true;
         openWifiWhenAirplane = false;
         wifiDisabledByAirplane = false;

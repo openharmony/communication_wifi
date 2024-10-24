@@ -152,6 +152,13 @@ bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
         return false;
     }
     WIFI_LOGE("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+    switch (msg->GetMessageName()) {
+        case CONCRETE_CMD_STA_STOP:
+            HandleStaStop();
+            break;
+        default:
+            break;
+    }
     return true;
 }
 
@@ -671,6 +678,7 @@ void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessagePtr msg)
 
     WifiConfigCenter::GetInstance().SetWifiStopState(true);
     WIFI_LOGI("Set WifiStopState is true.");
+    SwitchState(pDefaultState);
     if (staState == WifiOprMidState::RUNNING || detailState == WifiDetailState::STATE_SEMI_ACTIVE ||
         detailState == WifiDetailState::STATE_SEMI_ACTIVATING) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);

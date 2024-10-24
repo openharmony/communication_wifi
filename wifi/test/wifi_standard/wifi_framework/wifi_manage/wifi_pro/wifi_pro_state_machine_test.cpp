@@ -130,5 +130,6 @@ HWTEST_F(WifiProStateMachineTest, IsReachWifiScanThresholdTest04, TestSize.Level
     bool ret = pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel);
     EXPECT_EQ(ret, false);
 }
+
 } // namespace Wifi
 } // namespace OHOS

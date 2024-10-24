@@ -18,9 +18,6 @@
 #ifdef TELEPHONE_CORE_SERVICE_ENABLE
 #include "core_service_client.h"
 #endif
-#ifdef I18N_INTL_UTIL_ENABLE
-#include "locale_config.h"
-#endif
 #include "uri.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_global_func.h"
@@ -31,7 +28,7 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCountryCodePolicy");
-
+const int WIFI_COUNTRY_CODE_REGION_SIZE = 5;
 WifiCountryCodePolicy::WifiCountryCodePolicy(std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf)
 {
     CreatePolicy(wifiCountryCodePolicyConf);
@@ -299,9 +296,8 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByRegion(std::string &wifiCount
 {
     // the user selects an area in settings
     std::string tempWifiCountryCode;
-#ifdef I18N_INTL_UTIL_ENABLE
-    tempWifiCountryCode = Global::I18n::LocaleConfig::GetSystemRegion();
-#endif
+    WifiCountryCodeIntlUtils wifiCountryCodeIntlUtils;
+    tempWifiCountryCode = wifiCountryCodeIntlUtils.GetSystemRegion();
     if (tempWifiCountryCode.empty() || !IsValidCountryCode(tempWifiCountryCode)) {
         WIFI_LOGE("get wifi country code by region fail, code=%{public}s", tempWifiCountryCode.c_str());
         return WIFI_OPT_FAILED;
@@ -361,6 +357,24 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByDefault(std::string &wifiCoun
     WIFI_LOGI("get wifi country code by default success, use default code=%{public}s",
         DEFAULT_WIFI_COUNTRY_CODE);
     return WIFI_OPT_SUCCESS;
+}
+
+void* WifiCountryCodeIntlUtils::libHandle_ = nullptr;
+
+std::string WifiCountryCodeIntlUtils::GetSystemRegion()
+{
+    std::string region = "";
+    using GetSystemRegionFunc = void (*)(char *, int);
+    GetSystemRegionFunc getSystemRegion = nullptr;
+    getSystemRegion = reinterpret_cast<GetSystemRegionFunc>(wifiLibraryUtils_.GetFunction("GetSystemRegion"));
+    if (getSystemRegion == nullptr) {
+        WIFI_LOGE("GetSystemRegion function is nullptr");
+        return region;
+    }
+    char regionChar[WIFI_COUNTRY_CODE_REGION_SIZE] = {0};
+    getSystemRegion(regionChar, WIFI_COUNTRY_CODE_REGION_SIZE);
+    region = regionChar;
+    return region;
 }
 }
 }

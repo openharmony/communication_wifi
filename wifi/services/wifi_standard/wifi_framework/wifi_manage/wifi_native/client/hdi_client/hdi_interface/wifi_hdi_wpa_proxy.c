@@ -68,7 +68,7 @@ static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
 static pthread_mutex_t g_ifaceNameMutex = PTHREAD_MUTEX_INITIALIZER;
-static char g_staIfaceName[IFACENAME_LEN] = {0};
+static char g_staIfaceName[STA_INSTANCE_MAX_NUM][IFACENAME_LEN] = {{0}, {0}};
 static char g_p2pIfaceName[IFACENAME_LEN] = {0};
 
 const char *HDI_AP_SERVICE_NAME = "hostapd_interface_service";
@@ -421,36 +421,54 @@ pthread_mutex_t* GetWpaObjMutex(void)
     return &g_wpaObjMutex;
 }
 
-WifiErrorNo SetHdiStaIfaceName(const char *ifaceName)
+WifiErrorNo SetHdiStaIfaceName(const char *ifaceName, int instId)
 {
     pthread_mutex_lock(&g_ifaceNameMutex);
-    if (ifaceName == NULL) {
+    LOGI("SetHdiStaIfaceName enter instId = %{public}d", instId);
+    if (ifaceName == NULL || instId >= STA_INSTANCE_MAX_NUM) {
         pthread_mutex_unlock(&g_ifaceNameMutex);
         return WIFI_HAL_OPT_INVALID_PARAM;
     }
 
-    if (memset_s(g_staIfaceName, IFACENAME_LEN, 0, IFACENAME_LEN) != EOK) {
+    if (memset_s(g_staIfaceName[instId], IFACENAME_LEN, 0, IFACENAME_LEN) != EOK) {
         pthread_mutex_unlock(&g_ifaceNameMutex);
         return WIFI_HAL_OPT_FAILED;
     }
 
-    if (strcpy_s(g_staIfaceName, IFACENAME_LEN, ifaceName) != EOK) {
+    if (strcpy_s(g_staIfaceName[instId], IFACENAME_LEN, ifaceName) != EOK) {
         pthread_mutex_unlock(&g_ifaceNameMutex);
         return WIFI_HAL_OPT_FAILED;
     }
 
-    LOGI("SetHdiStaIfaceName, g_staIfaceName:%{public}s", g_staIfaceName);
+    LOGI("SetHdiStaIfaceName, g_staIfaceName:%{public}s,  instId = %{public}d", g_staIfaceName[instId], instId);
     pthread_mutex_unlock(&g_ifaceNameMutex);
     return WIFI_HAL_OPT_OK;
 }
 
-const char *GetHdiStaIfaceName()
+const char *GetHdiStaIfaceName(int instId)
 {
+    LOGI("GetHdiStaIfaceName enter instId = %{public}d", instId);
     const char *ifaceName = NULL;
+    if (instId >= STA_INSTANCE_MAX_NUM) {
+        LOGE("invalid param instId = %{public}d", instId);
+        return ifaceName;
+    }
+
     pthread_mutex_lock(&g_ifaceNameMutex);
-    ifaceName = g_staIfaceName;
+    ifaceName = g_staIfaceName[instId];
     pthread_mutex_unlock(&g_ifaceNameMutex);
+    LOGI("GetHdiStaIfaceName enter ifaceName = %{public}s", ifaceName);
     return ifaceName;
+}
+
+void ClearHdiStaIfaceName(int instId)
+{
+    pthread_mutex_lock(&g_ifaceNameMutex);
+    if (memset_s(g_staIfaceName[instId], IFACENAME_LEN, 0, IFACENAME_LEN) != EOK) {
+        pthread_mutex_unlock(&g_ifaceNameMutex);
+        return;
+    }
+    pthread_mutex_unlock(&g_ifaceNameMutex);
 }
 
 WifiErrorNo SetHdiP2pIfaceName(const char *ifaceName)

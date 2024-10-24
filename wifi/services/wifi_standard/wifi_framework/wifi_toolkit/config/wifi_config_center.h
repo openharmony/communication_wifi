@@ -304,7 +304,7 @@ public:
 
     bool HasWifiActive();
 	
-	void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
+    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
 	
     void UpdateLinkedInfo(int instId = 0);
 private:

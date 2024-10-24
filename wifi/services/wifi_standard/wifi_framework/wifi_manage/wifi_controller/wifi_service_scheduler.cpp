@@ -103,11 +103,11 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
         WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
         return WIFI_OPT_FAILED;
     }
-    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
-    DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
     if (PostStartWifi(instId) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
     }
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
+    DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaStart(instId);
     return WIFI_OPT_SUCCESS;
@@ -321,16 +321,16 @@ ErrCode WifiServiceScheduler::PostStartWifi(int instId)
             break;
         }
 #ifndef OHOS_ARCH_LITE
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService == nullptr) {
-        WIFI_LOGE("get pEnhance service failed!");
-        return WIFI_OPT_FAILED;
-    }
-    errCode = pService->SetEnhanceService(pEnhanceService);
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService == nullptr) {
+            WIFI_LOGE("get pEnhance service failed!");
+            break;
+        }
+        errCode = pService->SetEnhanceService(pEnhanceService);
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
+            break;
+        }
 #endif
     } while (0);
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();

@@ -599,7 +599,7 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
         if (config.ssid == scanInfo.ssid
             && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
-                || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处理
+                || (config.keyMgmt == deviceKeyMgmt))) {
             AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
             halDeviceConfig.ssid = scanInfo.oriSsid;
             LOGI("ConvertSsidToOriginalSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",

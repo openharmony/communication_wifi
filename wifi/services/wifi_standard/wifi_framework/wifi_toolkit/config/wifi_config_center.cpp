@@ -361,7 +361,6 @@ int WifiConfigCenter::SetMacAddress(const std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     mMacAddress[instId] = macAddress;
-    WIFI_LOGI("SetMacAddress instId:%{public}d, macAddress:%{public}s", instId, macAddress.c_str());
     return 0;
 }
 

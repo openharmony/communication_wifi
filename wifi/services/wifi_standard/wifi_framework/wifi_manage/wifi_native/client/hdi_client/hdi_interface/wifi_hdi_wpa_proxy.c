@@ -449,7 +449,7 @@ const char *GetHdiStaIfaceName(int instId)
 {
     LOGI("GetHdiStaIfaceName enter instId = %{public}d", instId);
     const char *ifaceName = NULL;
-    if (instId >= STA_INSTANCE_MAX_NUM) {
+    if (instId >= STA_INSTANCE_MAX_NUM || instId < 0) {
         LOGE("invalid param instId = %{public}d", instId);
         return ifaceName;
     }

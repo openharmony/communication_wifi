@@ -25,14 +25,13 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int syste
 {
 #ifndef OHOS_ARCH_LITE
     if (instId >= STA_INSTANCE_MAX_NUM) {
-        WIFI_LOGE("  the max obj id is %{public}d, current id is %{public}d", STA_INSTANCE_MAX_NUM, instId);
+        WIFI_LOGE("the max obj id is %{public}d, current id is %{public}d", STA_INSTANCE_MAX_NUM, instId);
         return nullptr;
     }
 #endif
 
     std::shared_ptr<WifiDeviceImpl> device = std::make_shared<WifiDeviceImpl>();
     if (device && device->Init(systemAbilityId, instId)) {
-        WIFI_LOGI("Init instId%{public}d. %{public}d", instId, systemAbilityId);
         return device;
     }
 

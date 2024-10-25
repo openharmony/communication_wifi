@@ -98,7 +98,7 @@ static int GetInstId(const char *ifaceName)
 
 static WifiErrorNo RegisterEventCallback(const char *ifaceName)
 {
-    LOGI("RegisterEventCallback enter! ifaceName = %{puiblic}s", ifaceName);
+    LOGI("RegisterEventCallback enter! ifaceName = %{public}s", ifaceName);
     pthread_mutex_lock(GetWpaObjMutex());
     int instId = GetInstId(ifaceName);
     if (g_hdiWpaStaCallbackObj[instId] == NULL) {
@@ -135,7 +135,7 @@ static WifiErrorNo UnRegisterEventCallback(const char *ifaceName)
     }
     pthread_mutex_lock(GetWpaObjMutex());
     int instId = GetInstId(ifaceName);
-    LOGI("UnRegisterEventCallback enter! instId = %{puiblic}d", instId);
+    LOGI("UnRegisterEventCallback enter! instId = %{public}d", instId);
     if (g_hdiWpaStaCallbackObj[instId] != NULL) {
         struct IWpaInterface *wpaObj = GetWpaInterface();
         if (wpaObj == NULL) {

@@ -1277,7 +1277,6 @@ private:
     std::string &currentMac);
     bool IsGoodSignalQuality();
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
-    void CreateWifi2Config(int &networkId);
 };
 }  // namespace Wifi
 }  // namespace OHOS

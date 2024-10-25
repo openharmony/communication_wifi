@@ -548,6 +548,8 @@ public:
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif
+
+    bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);
 private:
     /**
      * @Description  Destruct state.
@@ -1274,6 +1276,7 @@ private:
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
     bool IsGoodSignalQuality();
+    void CreateWifi2Config(int &networkId);
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -575,6 +575,26 @@ void StaStateMachine::TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig,
     FillWapiCfg(config, halDeviceConfig);
 }
 
+void StaStateMachine::ConvertSsidToOriginalSsid(
+    const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const
+{
+    std::vector<WifiScanInfo> scanInfoList;
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    for (auto &scanInfo : scanInfoList) {
+        std::string deviceKeyMgmt;
+        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (config.ssid == scanInfo.ssid
+            && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
+                || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处理
+            AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
+            halDeviceConfig.ssid = scanInfo.oriSsid;
+            LOGI("ConvertSsidToOriginalSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",
+                SsidAnonymize(halDeviceConfig.ssid).c_str(), halDeviceConfig.keyMgmt.c_str());
+            break;
+        }
+    }
+}
+
 ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
 {
     LOGI("Enter ConvertDeviceCfg.\n");

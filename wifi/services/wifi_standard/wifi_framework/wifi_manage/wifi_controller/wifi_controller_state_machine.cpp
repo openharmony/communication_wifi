@@ -292,7 +292,8 @@ void WifiControllerMachine::HandleAirplaneOpen()
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     StopAllSoftapManagers();
 #endif
-    if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() || !ShouldEnableWifi()) {
+    if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() || !ShouldEnableWifi(INSTID_WLAN0)) {
+        StopAllMultiStaManagers();
         StopAllConcreteManagers();
     }
 }
@@ -425,7 +426,7 @@ bool WifiControllerMachine::HasAnySoftApManager()
 
 bool WifiControllerMachine::HasAnyManager()
 {
-    if (!HasAnyConcreteManager()
+    if (!HasAnyConcreteManager() && !HasAnyMultiStaManager()
 #ifdef FEATURE_AP_SUPPORT
         && !HasAnySoftApManager()
 #endif
@@ -613,6 +614,33 @@ void WifiControllerMachine::StopMultiStaManager(int id)
     }
 }
 
+void WifiControllerMachine::StopAllMultiStaManagers()
+{
+    WIFI_LOGI("Enter StopAllMultiStaManagers");
+    if (!HasAnyMultiStaManager()) {
+        return;
+    }
+    std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+    for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
+        (*iter)->GetMultiStaMachine()->SendMessage(MULTI_STA_CMD_STOP);
+    }
+}
+
+#ifdef FEATURE_AP_SUPPORT
+void WifiControllerMachine::StopSoftapManager(int id)
+{
+    if (!HasAnySoftApManager()) {
+        return;
+    }
+    std::unique_lock<std::mutex> lock(softapManagerMutex);
+    for (auto iter = softapManagers.begin(); iter != softapManagers.end(); ++iter) {
+        if ((*iter)->mid == id) {
+            (*iter)->GetSoftapMachine()->SendMessage(SOFTAP_CMD_STOP);
+            return;
+        }
+    }
+}
+
 void WifiControllerMachine::StopAllSoftapManagers()
 {
     if (!HasAnySoftApManager()) {
@@ -744,7 +772,7 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 
     ConcreteManagerRole presentRole;
     if (pWifiControllerMachine->ShouldDisableWifi(msg)) {
-        pWifiControllerMachine->StopMultiStaManager(INSTID_WLAN1);
+        pWifiControllerMachine->StopAllMultiStaManagers();
         pWifiControllerMachine->StopAllConcreteManagers();
         return;
     }
@@ -791,6 +819,7 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
         if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
             pWifiControllerMachine->HasAnyConcreteManager()) {
+            pWifiControllerMachine->StopAllMultiStaManagers();
             pWifiControllerMachine->StopAllConcreteManagers();
             pWifiControllerMachine->mApidStopWifi = id;
             return;
@@ -845,6 +874,7 @@ void WifiControllerMachine::EnableState::HandleStaRemoved(InternalMessagePtr msg
             }
         }
     }
+    pWifiControllerMachine->StopAllMultiStaManagers();
     pWifiControllerMachine->StopConcreteManager(msg->GetParam2());
 }
 
@@ -1048,6 +1078,7 @@ void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
     StopAllSoftapManagers();
 #endif
     }
+    StopAllConcreteManagers();
     StopAllConcreteManagers();
 }
 } // namespace Wifi

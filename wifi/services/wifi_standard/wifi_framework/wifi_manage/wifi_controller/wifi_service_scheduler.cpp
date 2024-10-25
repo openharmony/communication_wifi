@@ -237,7 +237,6 @@ ErrCode WifiServiceScheduler::AutoStopWifi2Service(int instId)
             return WIFI_OPT_FAILED;
         }
     }
-    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
     DispatchWifi2CloseRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleWifi2Close(instId);
@@ -450,19 +449,19 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             return WIFI_OPT_FAILED;
         }
 #ifndef OHOS_ARCH_LITE
-    errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
-            static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
+        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
 
-    errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
-    if (errCode != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
-            static_cast<int>(errCode));
-        return WIFI_OPT_FAILED;
-    }
+        errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
 #endif
     }
     return WIFI_OPT_SUCCESS;

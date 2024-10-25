@@ -185,14 +185,14 @@ ErrCode StaService::EnableStaService()
     WIFI_LOGI("Enter EnableStaService m_instId:%{public}d\n", m_instId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 #ifndef OHOS_ARCH_LITE
-    // notification of registration country code change
-    std::string moduleName = "StaService_" + std::to_string(m_instId);
-    m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
-    if (m_staObserver == nullptr) {
-        WIFI_LOGI("m_staObserver is null\n");
-        return WIFI_OPT_FAILED;
-    }
     if (m_instId == INSTID_WLAN0) {
+        // notification of registration country code change
+        std::string moduleName = "StaService_" + std::to_string(m_instId);
+        m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
+        if (m_staObserver == nullptr) {
+            WIFI_LOGI("m_staObserver is null\n");
+            return WIFI_OPT_FAILED;
+        }
         WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
     }
 #endif
@@ -204,8 +204,10 @@ ErrCode StaService::DisableStaService() const
 {
     WIFI_LOGI("Enter DisableStaService.\n");
 #ifndef OHOS_ARCH_LITE
-    // deregistration country code change notification
-    WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_staObserver);
+    if (m_instId == INSTID_WLAN0) {
+        // deregistration country code change notification
+        WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_staObserver);
+    }
 #endif
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISABLE_STA);
@@ -292,7 +294,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
         return WIFI_OPT_SUCCESS;
     }
 #endif
-
+	CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);

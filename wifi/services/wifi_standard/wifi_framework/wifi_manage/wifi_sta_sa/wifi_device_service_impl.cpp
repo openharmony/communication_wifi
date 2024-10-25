@@ -1558,7 +1558,7 @@ bool WifiDeviceServiceImpl::IsStaServiceRunning()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
     if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGW("current wifi state is %{public}d", static_cast<int>(curState));
+        WIFI_LOGW("current wifi state is %{public}d, instId: %{public}d", static_cast<int>(curState), m_instId);
         return false;
     }
     return true;
@@ -1765,7 +1765,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     }
 
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
-    if (m_instId >= 0 || m_instId < STA_INSTANCE_MAX_NUM) {
+    if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, m_instId);
     }
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);

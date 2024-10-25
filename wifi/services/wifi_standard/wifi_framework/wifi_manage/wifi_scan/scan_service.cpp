@@ -737,8 +737,8 @@ void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vecto
             WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 storedIter->bssid, "");
 #endif
-            WIFI_LOGI("ScanInfo add new ssid=%{public}s bssid=%{public}s.\n",
-                SsidAnonymize(storedIter->ssid).c_str(), MacAnonymize(storedIter->bssid).c_str());
+            WIFI_LOGI("ScanInfo add new ssid=%{public}s bssid=%{public}s rssi=%{public}d.\n",
+                SsidAnonymize(storedIter->ssid).c_str(), MacAnonymize(storedIter->bssid).c_str(), storedIter->rssi);
         }
         results.push_back(*storedIter);
     }

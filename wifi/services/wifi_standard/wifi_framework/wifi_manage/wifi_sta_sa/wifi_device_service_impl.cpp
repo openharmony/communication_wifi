@@ -1477,6 +1477,10 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
 
 ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
 {
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetSupportedFeatures:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

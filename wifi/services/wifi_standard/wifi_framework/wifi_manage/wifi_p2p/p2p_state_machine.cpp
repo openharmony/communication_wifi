@@ -377,8 +377,7 @@ ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
     }
     WifiP2pDevice device;
     GcInfo gcInfo;
-    bool isFound = IsMatchClientDevice(gcInfos, device, gcInfo);
-    if (!isFound) {
+    if (!IsMatchClientDevice(gcInfos, device, gcInfo)) {
         WIFI_LOGE("current connected device not found the Gc");
         return ErrCode::WIFI_OPT_FAILED;
     }

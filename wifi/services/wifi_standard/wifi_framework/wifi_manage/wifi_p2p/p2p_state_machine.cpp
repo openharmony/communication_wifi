@@ -390,7 +390,7 @@ ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
     WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
     std::string gcDeviceAddr = device.GetDeviceAddress();
     std::string gcHostName = device.GetDeviceName();
-    groupInfo.setGcIpAddress(gcInfo.ip);
+    groupInfo.SetGcIpAddress(gcInfo.ip);
     groupManager.setcurrentGroup(wifiMacAddrInfoType::P2P CURRENT GROUP MACADDR INFO, groupInfo);
     linkedInfo.AddClientInfoList(gcDeviceAddr, gcInfo.ip, gcHostName);
     if (WifiConfigCenter::GetInstance().SaveP2pInfo(linkedInfo) == 0) {

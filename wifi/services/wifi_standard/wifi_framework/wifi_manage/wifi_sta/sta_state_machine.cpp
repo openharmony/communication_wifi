@@ -575,6 +575,20 @@ void StaStateMachine::TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig,
     FillWapiCfg(config, halDeviceConfig);
 }
 
+void StaStateMachine::AppendFastTransitionKeyMgmt(
+    const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const
+{
+    if (scanInfo.capabilities.find("FT/EAP") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-EAP ");
+    } else if (scanInfo.capabilities.find("FT/PSK") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-PSK ");
+    } else if (scanInfo.capabilities.find("FT/SAE") != std::string::npos) {
+        halDeviceConfig.keyMgmt.append(" FT-SAE ");
+    } else {
+        LOGI("No need append ft keyMgmt!");
+    }
+}
+
 void StaStateMachine::ConvertSsidToOriginalSsid(
     const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const
 {

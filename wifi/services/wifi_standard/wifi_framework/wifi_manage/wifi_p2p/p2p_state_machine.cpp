@@ -59,7 +59,7 @@ P2pStateMachine::P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &group
     P2pEnabledState &enabledState, P2pEnablingState &enablingState,
     P2pGroupFormationState &groupFormationState, P2pGroupJoinState &groupJoinState,
     P2pGroupOperatingState &groupOperatingState, P2pIdleState &idleState, P2pInvitingState &invitingState,
-    ProvisionDiscoveryState &provisionDiscoveryState)
+    ProvisionDiscoveryState &provisionDiscoveryState, P2pGroupRemoveState &groupRemoveState)
     : StateMachine("P2pStateMachine"),
       p2pServiceCallbacks(), p2pIface(), savedP2pConfig(),
       p2pMonitor(monitor),
@@ -82,6 +82,7 @@ P2pStateMachine::P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &group
       p2pIdleState(idleState),
       p2pInvitingState(invitingState),
       p2pProvisionDiscoveryState(provisionDiscoveryState),
+      p2pGroupRemoveState(groupRemoveState),
       p2pDevIface()
 {
     Initialize();
@@ -131,6 +132,7 @@ void P2pStateMachine::Initialize()
     StatePlus(&p2pAuthorizingNegotiationRequestState, &p2pGroupFormationState);
     StatePlus(&p2pProvisionDiscoveryState, &p2pGroupFormationState);
     StatePlus(&p2pGroupFormedState, &p2pGroupFormationState);
+    StatePlus(&p2pGroupRemoveState, &p2pGroupOperatingState);
 
     SetFirstState(&p2pDisabledState);
     StartStateMachine();

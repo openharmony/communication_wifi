@@ -584,21 +584,6 @@ void WifiControllerMachine::StopConcreteManager(int id)
     return;
 }
 
-#ifdef FEATURE_AP_SUPPORT
-void WifiControllerMachine::StopSoftapManager(int id)
-{
-    if (!HasAnySoftApManager()) {
-        return;
-    }
-    std::unique_lock<std::mutex> lock(softapManagerMutex);
-    for (auto iter = softapManagers.begin(); iter != softapManagers.end(); ++iter) {
-        if ((*iter)->mid == id) {
-            (*iter)->GetSoftapMachine()->SendMessage(SOFTAP_CMD_STOP);
-            return;
-        }
-    }
-}
-
 void WifiControllerMachine::StopMultiStaManager(int id)
 {
     WIFI_LOGI("Enter StopMultiStaManager, id = %{public}d", id);

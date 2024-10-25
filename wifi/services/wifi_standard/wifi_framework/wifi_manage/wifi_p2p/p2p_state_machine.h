@@ -41,6 +41,7 @@
 #include "abstract_ui.h"
 #include "wifi_hid2d_service_utils.h"
 #include "dhcp_c_api.h"
+#include "p2p_group_remove_state.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -85,6 +86,7 @@ class P2pStateMachine : public StateMachine {
     friend class P2pIdleState;
     friend class P2pInvitingState;
     friend class ProvisionDiscoveryState;
+    friend class P2pGroupRemoveState;
     FRIEND_GTEST(P2pStateMachine);
 
 public:
@@ -95,7 +97,7 @@ public:
         AuthorizingNegotiationRequestState &, GroupFormedState &, GroupNegotiationState &, InvitationReceivedState &,
         InvitationRequestState &, P2pDefaultState &, P2pDisabledState &, P2pDisablingState &, P2pEnabledState &,
         P2pEnablingState &, P2pGroupFormationState &, P2pGroupJoinState &, P2pGroupOperatingState &, P2pIdleState &,
-        P2pInvitingState &, ProvisionDiscoveryState &);
+        P2pInvitingState &, ProvisionDiscoveryState &, P2pGroupRemoveState &);
     /**
      * @Description Destroy the P2pStateMachine object.
      */
@@ -435,6 +437,7 @@ private:
     P2pIdleState &p2pIdleState;
     P2pInvitingState &p2pInvitingState;
     ProvisionDiscoveryState &p2pProvisionDiscoveryState;
+    P2pGroupRemoveState &p2pGroupRemoveState;
     static DHCPTYPE m_isNeedDhcp;
     std::string p2pDevIface;
     static std::mutex m_gcJoinmutex;

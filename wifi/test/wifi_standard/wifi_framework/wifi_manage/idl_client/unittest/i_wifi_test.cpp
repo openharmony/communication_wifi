@@ -1400,6 +1400,7 @@ HWTEST_F(IWifiTest, IdlCbP2pApStaConnectEventTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlCbP2pApStaConnectEvent(mTestContext, event);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pServDiscReqEventTest, TestSize.Level1)

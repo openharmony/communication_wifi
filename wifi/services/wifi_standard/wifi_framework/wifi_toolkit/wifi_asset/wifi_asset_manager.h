@@ -20,7 +20,8 @@
 #include "asset_system_api.h"
 #include "wifi_msg.h"
 #include "wifi_event_handler.h"
- 
+#include "sta_service_callback.h"
+
 namespace OHOS {
 namespace Wifi {
 constexpr uint32_t SIZE_OF_ITEM = 13;
@@ -62,10 +63,16 @@ public:
     bool IsWifiConfigChanged(const WifiDeviceConfig &config, const WifiDeviceConfig &oriConfig);
  
     bool IsWifiConfigUpdated(const std::vector<WifiDeviceConfig> newWifiDeviceConfigs, WifiDeviceConfig &config);
+
+    StaServiceCallback GetStaCallback() const;
+
+    void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
 private:
     std::unique_ptr<WifiEventHandler> assetServiceThread_ = nullptr;
 
     std::atomic<bool> firstSync_ = false;
+
+    StaServiceCallback staCallback_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

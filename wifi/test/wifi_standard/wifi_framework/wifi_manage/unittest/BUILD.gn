@@ -280,11 +280,6 @@ ohos_unittest("manager_unittest") {
     defines += [ "HAS_POWERMGR_PART" ]
   }
 
-  if (defined(global_parts_info) && defined(global_parts_info.global_i18n)) {
-    external_deps += [ "i18n:intl_util" ]
-    defines += [ "I18N_INTL_UTIL_ENABLE" ]
-  }
-
   defines += [
     "FEATURE_AP_SUPPORT",
     "FEATURE_STA_SUPPORT",

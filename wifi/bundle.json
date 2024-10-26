@@ -124,7 +124,7 @@
         "build": {
             "group_type": {
                 "base_group": [
-                    "//foundation/communication/wifi/wifi/utils:wifi_utils"
+                    "//foundation/communication/wifi/wifi/utils/extern_library:wifi_ext_lib"
                 ],
                 "fwk_group": [
                     "//foundation/communication/wifi/wifi/frameworks:wifi_kits",

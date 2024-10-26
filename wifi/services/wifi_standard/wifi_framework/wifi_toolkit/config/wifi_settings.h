@@ -291,6 +291,8 @@ public:
     void UpLoadLocalDeviceConfigToCloud();
 #endif
 
+    int SetWifiToggleCaller(int callerPid, int instId = 0);
+
 private:
     WifiSettings();
     int IncreaseNumRebootsSinceLastUse();

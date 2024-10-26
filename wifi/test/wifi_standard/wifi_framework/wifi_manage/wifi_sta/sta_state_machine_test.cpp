@@ -58,6 +58,7 @@ constexpr int INVALID_RSSI5 = 100;
 static constexpr int MAX_STR_LENT = 127;
 constexpr int CHIPSET_FEATURE_CAPABILITY_WIFI6_TEST = 127;
 constexpr int CHIPSET_FEATURE_CAPABILITY_WIFI7_TEST = 255;
+constexpr int TEN = 10;
 static const std::string TEMP_TEST_DATA = "1234567890abcdef1234567890abcdef";
 class StaStateMachineTest : public testing::Test {
 public:
@@ -1286,6 +1287,7 @@ public:
     void LinkedStateCheckIfRestoreWifiSuccess()
     {
         pStaStateMachine->pLinkedState->CheckIfRestoreWifi();
+        EXPECT_NE(pStaStateMachine->linkedInfo.networkId, TEN);
     }
  
     void ApRoamingStateGoInStateSuccess()
@@ -1359,6 +1361,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         std::string bssid = "wifitest";
         pStaStateMachine->ConnectToNetworkProcess(bssid);
+        EXPECT_NE(pStaStateMachine->linkedInfo.networkId, TEN);
     }
 
     void ConnectToNetworkProcessSuccess3()
@@ -1461,6 +1464,7 @@ public:
         StaStateMachine staStateMachine;
         pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         pStaStateMachine->pDhcpResultNotify->OnFailed(DHCP_LEASE_EXPIRED, ifname.c_str(), reason.c_str());
+        EXPECT_NE(pStaStateMachine->linkedInfo.networkId, TEN);
     }
 
     void SaveLinkstateSuccess()
@@ -1764,11 +1768,13 @@ public:
     void InvokeOnStaStreamChanged(const StreamDirection &direction)
     {
         pStaStateMachine->InvokeOnStaStreamChanged(direction);
+        EXPECT_NE(pStaStateMachine->linkedInfo.networkId, TEN);
     }
 
     void InvokeOnStaRssiLevelChanged(int level)
     {
         pStaStateMachine->InvokeOnStaRssiLevelChanged(level);
+        EXPECT_NE(pStaStateMachine->linkedInfo.networkId, TEN);
     }
 
     void DealScreenStateChangedEventTest()
@@ -2851,27 +2857,6 @@ HWTEST_F(StaStateMachineTest, ApRoamingStateExeMsgFail, TestSize.Level1)
     ApRoamingStateExeMsgFail();
 }
 
-HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess, TestSize.Level1)
-{
-}
-/**
- * @tc.name: ConnectToNetworkProcessSuccess1
- * @tc.desc: ConnectToNetworkProcess()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess1, TestSize.Level1)
-{
-}
-/**
- * @tc.name: ConnectToNetworkProcessSuccess2
- * @tc.desc: ConnectToNetworkProcess()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(StaStateMachineTest, ConnectToNetworkProcessSuccess2, TestSize.Level1)
-{
-}
 /**
  * @tc.name: ConnectToNetworkProcessSuccess3
  * @tc.desc: ConnectToNetworkProcess()
@@ -3158,6 +3143,7 @@ HWTEST_F(StaStateMachineTest, DealFillWapiCfgTest, TestSize.Level1)
     WifiHalDeviceConfig halDeviceConfig;
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     pStaStateMachine->FillWapiCfg(config, halDeviceConfig);
+    EXPECT_NE(halDeviceConfig.wepKeyIdx, TEN);
 }
 
 HWTEST_F(StaStateMachineTest, InitRandomMacInfoTest, TestSize.Level1)

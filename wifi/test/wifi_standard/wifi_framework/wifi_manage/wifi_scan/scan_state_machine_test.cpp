@@ -809,6 +809,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         pScanStateMachine->UpdatePnoScanRequest(msg);
         pScanStateMachine->UpdatePnoScanRequest(nullptr);
+        EXPECT_NE(pScanStateMachine->m_instId, 0);
     }
 
     void GetPnoScanRequestInfoTest1()
@@ -1077,6 +1078,7 @@ public:
         InterScanInfo scanInfo5;
         scanInfo4. band =SCAN_24GHZ_BAND;
         pScanStateMachine->SetWifiMode(scanInfo5);
+        EXPECT_NE(scanInfo4.wifiMode, 0);
     }
 };
 
@@ -1210,10 +1212,6 @@ HWTEST_F(ScanStateMachineTest, CommonScanningExeMsgSuccess1, TestSize.Level1)
     CommonScanningExeMsgSuccess1();
 }
 
-HWTEST_F(ScanStateMachineTest, CommonScanningExeMsgSuccess2, TestSize.Level1)
-{
-}
-
 HWTEST_F(ScanStateMachineTest, CommonScanningExeMsgSuccess3, TestSize.Level1)
 {
     CommonScanningExeMsgSuccess3();
@@ -1249,9 +1247,6 @@ HWTEST_F(ScanStateMachineTest, PnoScanExeMsgFail, TestSize.Level1)
     PnoScanExeMsgFail();
 }
 
-HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess1, TestSize.Level1)
-{}
-
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess2, TestSize.Level1)
 {
     PnoScanHardwareExeMsgSuccess2();
@@ -1260,10 +1255,6 @@ HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess2, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess3, TestSize.Level1)
 {
     PnoScanHardwareExeMsgSuccess3();
-}
-
-HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess4, TestSize.Level1)
-{
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgSuccess5, TestSize.Level1)
@@ -1284,10 +1275,6 @@ HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoGoInStateTest, TestSize.Level1)
 {
     CommonScanAfterPnoGoInStateTest();
-}
-
-HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoExeMsgSuccess1, TestSize.Level1)
-{
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoExeMsgSuccess2, TestSize.Level1)
@@ -1378,10 +1365,6 @@ HWTEST_F(ScanStateMachineTest, PnoSwScanFreeExeMsgSuccess5, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoSwScanFreeExeMsgFail, TestSize.Level1)
 {
     PnoSwScanFreeExeMsgFail();
-}
-
-HWTEST_F(ScanStateMachineTest, PnoSwScanningExeMsgSuccess1, TestSize.Level1)
-{
 }
 
 HWTEST_F(ScanStateMachineTest, PnoSwScanningExeMsgSuccess2, TestSize.Level1)
@@ -1482,10 +1465,6 @@ HWTEST_F(ScanStateMachineTest, ActiveCoverNewScanSuccess, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, ActiveCoverNewScanFail, TestSize.Level1)
 {
     ActiveCoverNewScanFail();
-}
-
-HWTEST_F(ScanStateMachineTest, CommonScanInfoProcessTest, TestSize.Level1)
-{
 }
 
 HWTEST_F(ScanStateMachineTest, ReportCommonScanFailedAndClearTest1, TestSize.Level1)

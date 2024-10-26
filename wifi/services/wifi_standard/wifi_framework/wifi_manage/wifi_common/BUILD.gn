@@ -234,11 +234,6 @@ if (defined(ohos_lite)) {
       defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
     }
 
-    if (defined(global_parts_info) && defined(global_parts_info.global_i18n)) {
-      external_deps += [ "i18n:intl_util" ]
-      defines += [ "I18N_INTL_UTIL_ENABLE" ]
-    }
-
     if (defined(global_parts_info) &&
         defined(global_parts_info.powermgr_battery_manager)) {
       external_deps += [ "battery_manager:batterysrv_client" ]
@@ -300,6 +295,7 @@ if (defined(ohos_lite)) {
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
     ldflags = memory_optimization_ldflags
+    version_script = "libwifi_common_service.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

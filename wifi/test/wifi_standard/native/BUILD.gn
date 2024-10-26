@@ -26,6 +26,10 @@ config("module_private_config") {
 ohos_unittest("native_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_device_callback_stub.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hotspot_callback_stub.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_callback_stub.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_scan_callback_stub.cpp",
     "Mock/mock_wifi_c_device.cpp",
     "wifi_c_device_test.cpp",
     "wifi_c_event_test.cpp",

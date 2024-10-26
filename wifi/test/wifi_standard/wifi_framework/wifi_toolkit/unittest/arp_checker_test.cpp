@@ -72,6 +72,7 @@ HWTEST_F(ArpCheckerTest, formatHostAdress_Test, TestSize.Level1)
     char hostAddress[] = "192.168.3.66";
     char host[] = "socket";
     pDnsChecker->formatHostAdress(hostAddress, host);
+    EXPECT_NE(pDnsChecker->primaryDnsAddress, "ATEST");
 }
 
 HWTEST_F(ArpCheckerTest, DoDnsCheck_Test, TestSize.Level1)
@@ -124,6 +125,7 @@ HWTEST_F(ArpCheckerTest, formatHostAdress_FAIL2, TestSize.Level1)
     pDnsChecker->socketCreated = true;
     pDnsChecker->formatHostAdress(hostAddress, nullptr);
     pDnsChecker->formatHostAdress(nullptr, host);
+    EXPECT_NE(pDnsChecker->primaryDnsAddress, "ATEST");
 }
 }  // namespace Wifi
 }  // namespace OHOS

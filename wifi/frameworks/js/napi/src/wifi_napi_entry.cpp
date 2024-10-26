@@ -187,6 +187,20 @@ static napi_value WifiCategoryInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI6_PLUS), "WIFI6_PLUS");
     return wifiCategory;
 }
+static napi_value WifiDetailStateInit(napi_env env)
+{
+    napi_value wifiDetailState = nullptr;
+    napi_create_object(env, &wifiDetailState);
+    SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::UNKNOWN), "UNKNOWN");
+    SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::INACTIVE), "INACTIVE");
+    SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::ACTIVATED), "ACTIVATED");
+    SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::ACTIVATING), "ACTIVATING");
+    SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::DEACTIVATING), "DEACTIVATING");
+    SetNamedPropertyByInteger(env, wifiDetailState,static_cast<int>(WifiDetailStateJs::SEMI_ACTIVATING),
+        "SEMI_ACTIVATING");
+    SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::SEMI_ACTIVE), "SEMI_ACTIVE");
+    return wifiDetailState;
+}
 static napi_value WifiStandardInit(napi_env env)
 {
     napi_value wifiStandard = nullptr;
@@ -280,6 +294,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value proxyMethodObj = ProxyMethodInit(env);
     napi_value wapiPskTypeObj = WapiPskTypeInit(env);
     napi_value wifiCategoryObj = WifiCategoryInit(env);
+    napi_value wifiDetailStateObj = WifiDetailStateInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
@@ -291,6 +306,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ProxyMethod", proxyMethodObj),
         DECLARE_NAPI_PROPERTY("WapiPskType", wapiPskTypeObj),
         DECLARE_NAPI_PROPERTY("WifiCategory", wifiCategoryObj),
+        DECLARE_NAPI_PROPERTY("WifiDetailState", wifiDetailStateObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),

@@ -186,7 +186,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
         WIFI_LOGE("stop wifi failed.");
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
         if (!WifiConfigCenter::GetInstance().SetWifiMidState(staState, staStateBefore, instId)) {
-            WIFI_LOGE("AutoStopStaService,set wifi mid state closing failed!");
+            WIFI_LOGE("AutoStopStaService, set wifi mid state:%{public}d failed!", staStateBefore);
             return WIFI_OPT_FAILED;
         }
         WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",

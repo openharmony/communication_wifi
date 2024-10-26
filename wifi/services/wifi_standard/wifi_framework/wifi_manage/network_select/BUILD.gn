@@ -132,7 +132,7 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "init:libbegetutil",
     ]
-
+    version_script = "libnetwork_select.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

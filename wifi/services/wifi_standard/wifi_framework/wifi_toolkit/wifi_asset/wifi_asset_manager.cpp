@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Wifi {
 static AssetValue g_userIdValue = {.u32 = USER_ID_DEFAULT};
 static AssetValue g_trustAccountValue = {.u32 = SEC_ASSET_SYNC_TYPE_TRUSTED_ACCOUNT};
+const std::string WIFI_ASSET_NETWORK_ON_SYNC = "WifiAssetNetworkOnSync";
 static void SplitString(const std::string &input, const char spChar, std::vector<std::string> &outArray)
 {
     std::stringstream sstr(input);
@@ -233,6 +234,10 @@ WifiAssetManager::WifiAssetManager()
     if (assetServiceThread_ == nullptr) {
         assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
     }
+    staCallback_.callbackModuleName = WIFI_ASSET_NETWORK_ON_SYNC;
+    staCallback_.OnStaConnChanged = [&](OperateResState state, const WifiLinkedInfo &info, int instId) {
+        this->DealStaConnChanged(state, info, instId);
+    };
     firstSync_.store(false);
 }
 
@@ -512,7 +517,19 @@ bool WifiAssetManager::IsWifiConfigChanged(const WifiDeviceConfig &config, const
     }
     return false;
 }
- 
+
+StaServiceCallback WifiAssetManager::GetStaCallback() const
+{
+    return staCallback_;
+}
+
+void WifiAssetManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
+{
+    if (state == OperateResState::CONNECT_AP_CONNECTED) {
+        LOGI("WifiAsset network connected");
+        WifiAssetTriggerSync();
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

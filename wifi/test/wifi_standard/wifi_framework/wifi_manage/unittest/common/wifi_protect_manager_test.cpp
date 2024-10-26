@@ -32,6 +32,8 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
+constexpr int TEN = 10;
+
 class WifiProtectManagerTest : public Test {
 public:
     void SetUp() override
@@ -298,6 +300,7 @@ HWTEST_F(WifiProtectManagerTest, OnAppDiedTest001, TestSize.Level1)
         WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF, "com.example.app");
     wifiProtectManager.mWifiProtects.push_back(pProtect);
     wifiProtectManager.OnAppDied("com.example.app");
+    EXPECT_NE(wifiProtectManager.mFullHighPerfProtectsAcquired, TEN);
 }
 
 HWTEST_F(WifiProtectManagerTest, OnAppDiedTest002, TestSize.Level1)
@@ -307,6 +310,7 @@ HWTEST_F(WifiProtectManagerTest, OnAppDiedTest002, TestSize.Level1)
         WifiProtectMode::WIFI_PROTECT_FULL_LOW_LATENCY, "com.example.app");
     wifiProtectManager.mWifiProtects.push_back(pProtect);
     wifiProtectManager.OnAppDied("com.example.app");
+    EXPECT_NE(wifiProtectManager.mFullHighPerfProtectsAcquired, TEN);
 }
 
 HWTEST_F(WifiProtectManagerTest, OnAppForegroudChangedTest001, TestSize.Level1)

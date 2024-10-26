@@ -969,6 +969,12 @@ void P2pStateMachine::StartDhcpClientInterface()
         WIFI_LOGE("RegisterDhcpClientCallBack failed!");
         return;
     }
+
+    RouterConfig config;
+    if (memset_s(config.bssid, sizeof(config.bssid), 0, MAC_ADDR_MAX_LEN) == EOK) {
+        config.prohibitUseCacheIp = true;
+        SetConfiguration(groupManager.GetCurrentGroup().GetInterface().c_str(), config);
+    }
     result = StartDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
     if (result != 0) {
         WIFI_LOGE("StartDhcpClient failed!");

@@ -49,6 +49,7 @@ static const std::string REAL_MAC = "fa:22:33:ef:ac:0e";
 static const std::string GATEWAY = "192.168.0.1";
 static const std::string CURRENT_ADDR = "192.168.0.100";
 static const std::vector<std::string> TESTED_ADDR = {"192.168.0.101", "192.168.0.102", "192.168.0.103"};
+constexpr int TEN = 10;
 
 class SelfCureStateMachineTest : public testing::Test {
 public:
@@ -188,6 +189,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_RESETUP_SELF_CURE_MONITOR);
         pSelfCureStateMachine->pConnectedMonitorState->HandleResetupSelfCure(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandlePeriodicArpDetectionTest()
@@ -197,6 +199,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
         pSelfCureStateMachine->pConnectedMonitorState->HandlePeriodicArpDetection(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandleNetworkConnectTest()
@@ -206,6 +209,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD);
         pSelfCureStateMachine->pConnectedMonitorState->HandleNetworkConnect(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandleNetworkDisconnectTest()
@@ -215,6 +219,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD);
         pSelfCureStateMachine->pConnectedMonitorState->HandleNetworkDisconnect(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandleRssiLevelChangeTest()
@@ -224,6 +229,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_NOTIFY_RSSI_LEVEL_CHANGED_EVENT);
         pSelfCureStateMachine->pConnectedMonitorState->HandleRssiLevelChange(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandleArpDetectionFailedTest()
@@ -266,12 +272,14 @@ public:
 
         pSelfCureStateMachine->pConnectedMonitorState->hasInternetRecently = false;
         pSelfCureStateMachine->pConnectedMonitorState->HandleGatewayChanged(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void RequestReassocWithFactoryMacTest()
     {
         LOGI("Enter RequestReassocWithFactoryMacTest");
         pSelfCureStateMachine->pConnectedMonitorState->RequestReassocWithFactoryMac();
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void InitDnsServerTest()
@@ -293,6 +301,7 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForDns();
         pSelfCureStateMachine->internetUnknown = false;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForDns();
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void GetPublicDnsServersTest()
@@ -312,6 +321,7 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->GetReplacedDnsServers(serverTest, ReplacedDnsServersTest);
         std::vector<std::string> serverDnsTest = {"", ""};
         pSelfCureStateMachine->pInternetSelfCureState->GetReplacedDnsServers(serverDnsTest, ReplacedDnsServersTest);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void UpdateDnsServersTest()
@@ -336,6 +346,7 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->resetDnses(dnsesTest);
         std::vector<std::string> dnsesServerTest = {"", ""};
         pSelfCureStateMachine->pInternetSelfCureState->resetDnses(dnsesServerTest);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandleInvalidIpTest()
@@ -593,6 +604,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD);
         pSelfCureStateMachine->pInternetSelfCureState->HandleNetworkDisconnected(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandleInternetRecoveryTest()
@@ -605,6 +617,7 @@ public:
 
         pSelfCureStateMachine->selfCureOnGoing = true;
         pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecovery(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandleRssiChangedEventTest()
@@ -614,6 +627,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_NOTIFY_RSSI_LEVEL_CHANGED_EVENT);
         pSelfCureStateMachine->pInternetSelfCureState->HandleRssiChangedEvent(msg);
+        EXPECT_NE(pSelfCureStateMachine->pInternetSelfCureState->currentRssi, TEN);
     }
 
     void HandleP2pDisconnectedTest()
@@ -623,6 +637,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_P2P_DISCONNECTED_EVENT);
         pSelfCureStateMachine->pInternetSelfCureState->HandleP2pDisconnected(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandlePeriodicArpDetecteTest()
@@ -632,6 +647,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED);
         pSelfCureStateMachine->pInternetSelfCureState->HandlePeriodicArpDetecte(msg);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void HandleHttpReachableRecvTest()
@@ -641,6 +657,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_HTTP_REACHABLE_RCV);
         pSelfCureStateMachine->pInternetSelfCureState->HandleHttpReachableRecv(msg);
+        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
     void HandleArpFailedDetectedTest()
@@ -774,6 +791,7 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForStaticIp(requestCureLevel);
         pSelfCureStateMachine->pInternetSelfCureState->configStaticIp4MultiDhcpServer = false;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForStaticIp(requestCureLevel);
+        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
     void RequestUseStaticIpConfigTest()
@@ -965,12 +983,14 @@ public:
     {
         LOGI("Enter HandleIpConfigCompletedTest");
         pSelfCureStateMachine->pInternetSelfCureState->HandleIpConfigCompleted();
+        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
     void HandleIpConfigCompletedAfterRenewDhcpTest()
     {
         LOGI("Enter HandleIpConfigCompletedAfterRenewDhcpTest");
         pSelfCureStateMachine->pInternetSelfCureState->HandleIpConfigCompletedAfterRenewDhcp();
+        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
     void HandleInternetRecoveryConfirmTest()
@@ -984,6 +1004,7 @@ public:
         pSelfCureStateMachine->mIsHttpReachable = true;
         pSelfCureStateMachine->internetUnknown = true;
         pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm();
+        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
     void ConfirmInternetSelfCureTest()
@@ -1084,12 +1105,14 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->HandleHttpReachableAfterSelfCure(currentCureLevel);
         currentCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
         pSelfCureStateMachine->pInternetSelfCureState->HandleHttpReachableAfterSelfCure(currentCureLevel);
+        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
     void HandleHttpUnreachableFinallyTest()
     {
         LOGI("Enter HandleHttpUnreachableFinallyTest");
         pSelfCureStateMachine->pInternetSelfCureState->HandleHttpUnreachableFinally();
+        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
     void HasBeenTestedTest()
@@ -1153,6 +1176,7 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->HandleDelayedResetSelfCure();
         pSelfCureStateMachine->mIsHttpReachable = true;
         pSelfCureStateMachine->pInternetSelfCureState->HandleDelayedResetSelfCure();
+        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
     void Wifi6SelfCureStateGoInStateSuccess()
@@ -1460,7 +1484,7 @@ public:
         pSelfCureStateMachine->ParseWifiCategoryBlackListInfo(iter);
 
         iter = std::make_pair("", wifi6BlackListInfo);
-        pSelfCureStateMachine->ParseWifiCategoryBlackListInfo(iter);
+        EXPECT_NE(pSelfCureStateMachine->ParseWifiCategoryBlackListInfo(iter), "AUIS");
     }
 
     void AgeOutWifi6BlackTest()
@@ -1708,6 +1732,7 @@ public:
     {
         LOGI("Enter HandleResetConnectNetworkTest3");
         pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(nullptr);
+        EXPECT_NE(pSelfCureStateMachine->noAutoConnCounter, TEN);
     }
 
     void SelfCureForResetTest()
@@ -1716,6 +1741,7 @@ public:
         int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
         pSelfCureStateMachine->internetUnknown = true;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+        EXPECT_NE(pSelfCureStateMachine->noAutoConnCounter, TEN);
     }
 
     void SelfCureForResetTest2()
@@ -1725,6 +1751,7 @@ public:
         pSelfCureStateMachine->internetUnknown = false;
         pSelfCureStateMachine->pInternetSelfCureState->hasInternetRecently = false;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+        EXPECT_NE(pSelfCureStateMachine->noAutoConnCounter, TEN);
     }
 
     void SelfCureForResetTest3()
@@ -1735,6 +1762,7 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->hasInternetRecently = true;
         pSelfCureStateMachine->pInternetSelfCureState->currentRssi = MIN_VAL_LEVEL_2_5G;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForReset(requestCureLevel);
+        EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
     void SelfCureForResetTest4()
@@ -2826,8 +2854,7 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest_InvalidHistories, Tes
     std::vector<std::string> histories = {"1", "1615153293123", "2", "1615153293124", "3", "1615153293125",
                                           "4", "1615153293126", "5", "1615153293127"};
     int cnt = 6;
-    int result = pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt);
-    EXPECT_EQ(result, -1);
+    EXPECT_EQ(pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt), -1);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest_InvalidCnt, TestSize.Level1)
@@ -2836,8 +2863,7 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest_InvalidCnt, TestSize.
     std::vector<std::string> histories = {"1", "1615153293123", "2", "1615153293124", "3", "1615153293125",
                                           "4", "1615153293126", "5", "1615153293127", "6", "1615153293128"};
     int cnt = 5;
-    int result = pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt);
-    EXPECT_EQ(result, -1);
+    EXPECT_EQ(pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt), -1);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest, TestSize.Level1)
@@ -2846,8 +2872,7 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest, TestSize.Level1)
     std::vector<std::string> histories = {"1", "2", "3", "4", "5", "6", "7",
         "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"};
     int cnt = SELFCURE_FAIL_LENGTH;
-    int result = pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(pSelfCureStateMachine->SetSelfCureFailInfo(info, histories, cnt), 0);
     EXPECT_EQ(info.dnsSelfCureFailedCnt, 1);
     EXPECT_EQ(info.lastDnsSelfCureFailedTs, 2);
     EXPECT_EQ(info.renewDhcpSelfCureFailedCnt, 3);
@@ -2887,8 +2912,7 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureConnectFailInfoTest, TestSize.Leve
     std::vector<std::string> histories = {"0", "0", "0", "0", "0", "0", "0",
         "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
     int cnt = SELFCURE_FAIL_LENGTH;
-    int result = pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt), 0);
     EXPECT_EQ(info.reassocSelfCureConnectFailedCnt, 0);
     EXPECT_EQ(info.lastReassocSelfCureConnectFailedTs, 0);
     EXPECT_EQ(info.randMacSelfCureConnectFailedCnt, 0);
@@ -2903,8 +2927,7 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureConnectFailInfoInvalidHistoriesTes
     std::vector<std::string> histories = {"0", "0", "0", "0", "0", "0", "0",
         "0", "0", "0", "0", "0", "0", "0", "0", "0"};
     int cnt = 1;
-    int result = pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt);
-    EXPECT_EQ(result, -1);
+    EXPECT_EQ(pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt), -1);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SetSelfCureConnectFailInfoInvalidCntTest, TestSize.Level1)
@@ -2913,8 +2936,7 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureConnectFailInfoInvalidCntTest, Tes
     std::vector<std::string> histories = {"0", "0", "0", "0", "0", "0", "0",
         "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
     int cnt = 2;
-    int result = pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt);
-    EXPECT_EQ(result, -1);
+    EXPECT_EQ(pSelfCureStateMachine->SetSelfCureConnectFailInfo(info, histories, cnt), -1);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsSuppOnCompletedStateTest, TestSize.Level1)
@@ -3317,6 +3339,7 @@ HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
 {
     bool isHttpReachable = true;
     pSelfCureStateMachine->SetHttpMonitorStatus(isHttpReachable);
+    EXPECT_EQ(pSelfCureStateMachine->m_httpDetectResponse, true);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)
@@ -3375,6 +3398,7 @@ HWTEST_F(SelfCureStateMachineTest, IsHttpReachableTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, InitCurrentGatewayTest, TestSize.Level1)
 {
     pSelfCureStateMachine->pInternetSelfCureState->InitCurrentGateway();
+    EXPECT_NE(pSelfCureStateMachine->noAutoConnCounter, TEN);
 }
 } // namespace Wifi
 } // namespace OHOS

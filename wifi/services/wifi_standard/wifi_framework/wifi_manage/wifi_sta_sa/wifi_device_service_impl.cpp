@@ -121,14 +121,12 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return errCode;
     }
 
-    if (m_instId == 0) {
+    if (m_instId == INSTID_WLAN0) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        WifiManager::GetInstance().GetWifiTogglerManager()->StartWifiToggledTimer();
+        WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
     }
-
-    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
-    wifiTogglerManager->StartWifiToggledTimer();
-    wifiTogglerManager->StopSemiWifiToggledTimer();
-    return wifiTogglerManager->WifiToggled(1, m_instId);
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
@@ -156,10 +154,11 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WifiConfigCenter::GetInstance().SetWifiAllowSemiActive(false);
     }
 
-    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
-    wifiTogglerManager->StopWifiToggledTimer();
-    wifiTogglerManager->StopSemiWifiToggledTimer();
-    return wifiTogglerManager->WifiToggled(0, m_instId);
+    if (m_instId == INSTID_WLAN0) {
+        WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
+        WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
+    }
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
@@ -195,10 +194,11 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
 
-    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
-    wifiTogglerManager->StopWifiToggledTimer();
-    wifiTogglerManager->StartSemiWifiToggledTimer();
-    return wifiTogglerManager->WifiToggled(0, m_instId);
+    if (m_instId == INSTID_WLAN0) {
+        WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
+        WifiManager::GetInstance().GetWifiTogglerManager()->StartSemiWifiToggledTimer();
+    }
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
@@ -1480,6 +1480,10 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
 
 ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
 {
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetSupportedFeatures:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

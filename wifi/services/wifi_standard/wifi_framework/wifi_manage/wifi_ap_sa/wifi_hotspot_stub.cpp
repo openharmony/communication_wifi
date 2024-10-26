@@ -480,15 +480,16 @@ void WifiHotspotStub::OnRegisterCallBack(
         if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
-            {
-                std::unique_lock<std::mutex> lock(deathRecipientMutex);
-                if (deathRecipient_ == nullptr) {
-                    deathRecipient_ = new (std::nothrow) WifiHotspotDeathRecipient();
-                }
+            std::unique_lock<std::mutex> lock(deathRecipientMutex);
+            if (deathRecipient_ == nullptr) {
+                deathRecipient_ = new (std::nothrow) WifiHotspotDeathRecipient();
             }
-            if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
-                WIFI_LOGD("AddDeathRecipient!");
+            // Add death recipient to remote object if this is the first time to register callback.
+            if (remote->IsProxyObject() &&
+                !WifiInternalEventDispatcher::GetInstance().HasHotspotRemote(remote, m_id)) {
+                remote->AddDeathRecipient(deathRecipient_);
             }
+
             if (callback_ != nullptr) {
                 for (const auto &eventName : event) {
                     ret = WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback_, eventName,

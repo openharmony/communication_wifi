@@ -23,9 +23,8 @@ namespace Wifi {
 
 class WifiScanConfig {
 public:
+    WifiScanConfig();
     ~WifiScanConfig();
-
-    static WifiScanConfig &GetInstance();
 
     void GetScanDeviceInfo(WifiScanDeviceInfo &scanDeviceInfo);
 
@@ -39,9 +38,11 @@ public:
 
     void SetStaSceneForbidCount(int count);
 
-    int& GetStaSceneForbidCount();
+    int GetStaSceneForbidCount();
 
-    void SetScanControlInfo(ScanControlInfo scanControlInfo);
+    void SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
+
+    int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
 
     void SetPackageFilter(std::map<std::string, std::vector<std::string>> &filterMap);
 
@@ -59,11 +60,29 @@ public:
 
     time_t GetStaCurrentTime();
 
+    int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
+
+    int ClearScanInfoList();
+
+    int GetScanInfoList(std::vector<WifiScanInfo> &results);
+
+    void GetScanInfoListInner(std::vector<WifiScanInfo> &results);
+
+    void RecordWifiCategory(const std::string bssid, WifiCategory category);
+
+    WifiCategory GetWifiCategoryRecord(const std::string bssid);
+
+    void CleanWifiCategoryRecord();
+
 private:
+    void InitScanControlForbidList();
+    void InitScanControlIntervalList();
+
     std::mutex mScanDeviceInfoMutex;
     WifiScanDeviceInfo mScanDeviceInfo;
-
-    WifiScanConfig();
+    std::mutex mScanMutex;
+    std::map<std::string, WifiCategory> mWifiCategoryRecord;
+    std::vector<WifiScanInfo> mWifiScanInfoList;
 };
 }  // namespace Wifi
 }  // namespace OHOS

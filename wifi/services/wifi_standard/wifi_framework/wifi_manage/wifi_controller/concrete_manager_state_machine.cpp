@@ -312,7 +312,6 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
     ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
-        WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
     }
 }
 
@@ -450,7 +449,6 @@ void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
     ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
-        WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
     }
 }
 
@@ -539,7 +537,6 @@ void ConcreteMangerMachine::HandleStaStart()
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
-            WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
         }
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
         SwitchState(pConnectState);
@@ -554,7 +551,6 @@ void ConcreteMangerMachine::HandleStaStart()
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
-            WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
         }
     }
 }
@@ -575,7 +571,6 @@ void ConcreteMangerMachine::HandleStaSemiActive()
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
-            WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
         }
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE)) {
         WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(mid);
@@ -588,7 +583,6 @@ void ConcreteMangerMachine::HandleStaSemiActive()
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
-            WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
         }
     }
 }

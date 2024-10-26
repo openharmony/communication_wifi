@@ -61,6 +61,7 @@ static constexpr int MIN_5G_FREQUENCY = 5160;
 static constexpr int INVALID_RSSI1 = -128;
 static constexpr int GATE_WAY = 124;
 constexpr int TWO = 2;
+constexpr int TEN = 10;
 
 class StaStateMachineTest : public testing::Test {
 public:
@@ -227,6 +228,7 @@ public:
         DhcpResult destObj;
         DhcpResult sourceObj;
         pStaStateMachine->pDhcpResultNotify->SaveDhcpResult(&destObj, &sourceObj);
+        EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
     }
 
     void SaveDhcpResultExtTest()
@@ -237,6 +239,7 @@ public:
         DhcpResult destObj;
         DhcpResult sourceObj;
         pStaStateMachine->pDhcpResultNotify->SaveDhcpResultExt(&destObj, &sourceObj);
+        EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
     }
 
     void TryToSaveIpV4ResultExtTest()
@@ -247,6 +250,7 @@ public:
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4ResultExt(ipInfo, ipv6Info, result);
         DhcpResult result1;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4ResultExt(ipInfo, ipv6Info, &result1);
+        EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
     }
 
     void TryToSaveIpV4ResultTest()
@@ -257,6 +261,7 @@ public:
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, result);
         DhcpResult result1;
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, &result1);
+        EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
     }
 
     void TryToSaveIpV6ResultTest()
@@ -288,6 +293,7 @@ public:
         StaStateMachine staStateMachine;
         pStaStateMachine->pDhcpResultNotify->SetStaStateMachine(&staStateMachine);
         pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6Result(ipInfo, ipv6Info, &result1);
+        EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
     }
 
     void SetConnectMethodTest()
@@ -296,6 +302,7 @@ public:
         pStaStateMachine->SetConnectMethod(connectMethod);
         connectMethod = NETWORK_SELECTED_BY_USER;
         pStaStateMachine->SetConnectMethod(connectMethod);
+        EXPECT_NE(pStaStateMachine->lastNetworkId, TEN);
     }
 
     void InvokeOnDhcpOfferReportTest()

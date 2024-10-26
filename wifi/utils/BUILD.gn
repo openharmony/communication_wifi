@@ -73,6 +73,7 @@ if (defined(ohos_lite)) {
       "src/wifi_common_util.cpp",
       "src/wifi_event_handler.cpp",
       "src/wifi_hisysevent.cpp",
+      "src/wifi_library_utils.cpp",
       "src/wifi_sa_manager.cpp",
       "src/wifi_timer.cpp",
     ]

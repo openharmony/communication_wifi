@@ -31,6 +31,9 @@
 #else
 #include "wifi_internal_event_dispatcher_lite.h"
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+#include "wifi_asset_manager.h"
+#endif
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
@@ -505,6 +508,15 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
         errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
+#endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        errCode = pService->RegisterStaServiceCallback(WifiAssetManager::GetInstance().GetStaCallback());
+        WIFI_LOGI("WifiAssetManager register");
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("WifiAssetManager register sta service callback failed, ret=%{public}d!",
                 static_cast<int>(errCode));
             return WIFI_OPT_FAILED;
         }

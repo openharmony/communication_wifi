@@ -456,6 +456,7 @@ HWTEST_F(WifiSettingsTest, ConvertBackupCfgToDeviceCfgTest, TestSize.Level1)
     WifiBackupConfig backupCfg;
     WifiDeviceConfig config;
     ConvertBackupCfgToDeviceCfg(backupCfg, config);
+    EXPECT_EQ(backupCfg.instanceId, config.instanceId);
 }
 
 HWTEST_F(WifiSettingsTest, ConvertDeviceCfgToBackupCfgTest, TestSize.Level1)
@@ -464,6 +465,7 @@ HWTEST_F(WifiSettingsTest, ConvertDeviceCfgToBackupCfgTest, TestSize.Level1)
     WifiBackupConfig backupCfg;
     WifiDeviceConfig config;
     ConvertDeviceCfgToBackupCfg(config, backupCfg);
+    EXPECT_EQ(backupCfg.instanceId, config.instanceId);
 }
 
 HWTEST_F(WifiSettingsTest, GetOperatorWifiTypeTest, TestSize.Level1)

@@ -36,7 +36,10 @@ ohos_fuzztest("WifiDeviceCbkStubFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "wifidevicecbkstub_fuzzer.cpp" ]
+  sources = [
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_device_callback_stub.cpp",
+    "wifidevicecbkstub_fuzzer.cpp",
+  ]
 
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
@@ -45,6 +48,7 @@ ohos_fuzztest("WifiDeviceCbkStubFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 

@@ -101,16 +101,21 @@ public:
 
     void RemoveManager(int id)
     {
-        std::unique_lock<std::mutex> lock(mutex_);
-        if (managers.empty()) {
-            return;
-        }
-        for (auto iter = managers.begin(); iter != managers.end(); ++iter) {
-            if ((*iter)->mid == id) {
-                managers.erase(iter);
-                break;
+        std::shared_ptr<T> manager = nullptr;
+        {   // lock begin
+            std::unique_lock<std::mutex> lock(mutex_);
+            if (managers.empty()) {
+                return;
             }
-        }
+            for (auto iter = managers.begin(); iter != managers.end(); ++iter) {
+                if ((*iter)->mid == id) {
+                    manager = *iter;
+                    managers.erase(iter);
+                    break;
+                }
+            }
+        }   // lock end
+        manager = nullptr;  // free manager outsied of lock, in order to avoid deadlock
     }
 
 public:

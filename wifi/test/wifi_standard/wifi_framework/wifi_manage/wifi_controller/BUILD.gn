@@ -51,6 +51,7 @@ ohos_unittest("wifi_controller_unittest") {
     "Mock/mock_softap_manager_state_machine.cpp",
     "concrete_clientmode_manager_test.cpp",
     "concrete_manager_state_machine_test.cpp",
+    "rpt_manager_state_machine_test.cpp",
     "softap_manager_state_machine_test.cpp",
     "softap_manager_test.cpp",
     "wifi_controller_state_machine_test.cpp",

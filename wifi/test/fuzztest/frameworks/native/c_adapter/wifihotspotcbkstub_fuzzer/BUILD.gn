@@ -36,8 +36,10 @@ ohos_fuzztest("WifiHotSpotCbkStubFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "wifihotspotcbkstub_fuzzer.cpp" ]
-
+  sources = [
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hotspot_callback_stub.cpp",
+    "wifihotspotcbkstub_fuzzer.cpp",
+  ]
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -45,6 +47,7 @@ ohos_fuzztest("WifiHotSpotCbkStubFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 

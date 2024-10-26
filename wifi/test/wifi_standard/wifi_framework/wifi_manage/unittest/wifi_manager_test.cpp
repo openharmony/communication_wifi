@@ -539,6 +539,8 @@ HWTEST_F(WifiManagerTest, SetSatelliteStartStateTest, TestSize.Level1)
 {
     WIFI_LOGI("SetSatelliteStartStateTest enter!");
     wifiManager.wifiTogglerManager->SetSatelliteStartState(true);
+    int ten = 10;
+    EXPECT_NE(wifiManager.mSupportedFeatures, ten);
 }
 
 HWTEST_F(WifiManagerTest, CheckSatelliteStateTest, TestSize.Level1)

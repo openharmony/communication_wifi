@@ -332,7 +332,7 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
 ErrCode ScanService::ScanControlInner(ScanType scanType)
 {
     if (scanType == ScanType::SCAN_TYPE_EXTERN) {
-        ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_EXTERN);
+        ErrCode rlt = AllowScanByType(ScanType::SCAN_TYPE_EXTERN);
         if (rlt != WIFI_OPT_SUCCESS) {
             return rlt;
         }
@@ -737,8 +737,8 @@ void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vecto
             WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 storedIter->bssid, "");
 #endif
-            WIFI_LOGI("ScanInfo add new ssid=%{public}s bssid=%{public}s.\n",
-                SsidAnonymize(storedIter->ssid).c_str(), MacAnonymize(storedIter->bssid).c_str());
+            WIFI_LOGI("ScanInfo add new ssid=%{public}s bssid=%{public}s rssi=%{public}d.\n",
+                SsidAnonymize(storedIter->ssid).c_str(), MacAnonymize(storedIter->bssid).c_str(), storedIter->rssi);
         }
         results.push_back(*storedIter);
     }
@@ -912,7 +912,7 @@ bool ScanService::BeginPnoScan()
         return false;
     }
 
-    ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_PNO);
+    ErrCode rlt = AllowScanByType(ScanType::SCAN_TYPE_PNO);
     if (rlt != WIFI_OPT_SUCCESS) {
         return false;
     }
@@ -1033,7 +1033,7 @@ bool ScanService::AddPnoScanMessageBody(InternalMessagePtr interMessage, const P
 void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
 {
     WIFI_LOGI("Enter HandlePnoScanInfo.\n");
-
+    InitChipsetInfo();
     std::vector<InterScanInfo> filterScanInfo;
     std::vector<InterScanInfo>::iterator iter = scanInfoList.begin();
     for (; iter != scanInfoList.end(); ++iter) {
@@ -1249,7 +1249,7 @@ void ScanService::StopSystemScan()
 void ScanService::StartSystemTimerScan(bool scanAtOnce)
 {
     WIFI_LOGI("Enter StartSystemTimerScan, scanAtOnce: %{public}d.", scanAtOnce);
-    ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_SYSTEMTIMER);
+    ErrCode rlt = AllowScanByType(ScanType::SCAN_TYPE_SYSTEMTIMER);
     if (rlt != WIFI_OPT_SUCCESS) {
         return;
     }
@@ -1634,47 +1634,6 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
     return policyResult;
 }
 
-ErrCode ScanService::ApplyScanPolices(ScanType type)
-{
-    LOGD("Enter ApplyScanPolices, type: %{public}d", type);
-    /* Obtains app parameters and scenario status parameters. */
-    auto appPackageName = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetAppPackageName();
-    auto trustListPolicies = WifiSettings::GetInstance().ReloadTrustListPolicies();
-    auto movingFreezePolicy = WifiSettings::GetInstance().ReloadMovingFreezePolicy();
-    ErrCode rlt = WIFI_OPT_SUCCESS;
-    if (appPackageName.empty()) {
-        rlt = AllowScanByType(type);
-        WIFI_LOGD("appPackageName empty, apply scan polices rlt: %{public}d.", static_cast<int>(rlt));
-        if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
-            ReportScanFinishEvent(scanResultBackup);
-        }
-        return rlt;
-    }
-
-    /* Generates an scene id list based on appPackageName. */
-    ClearScanTrustSceneIds();
-    for (auto &policy : trustListPolicies) {
-        if (IsPackageInTrustList(policy.trustList, policy.sceneId, appPackageName)) {
-            AddScanTrustSceneId(policy.sceneId);
-        }
-    }
-    const int movingFreezeSceneId = -1;
-    if (IsPackageInTrustList(movingFreezePolicy.trustList, movingFreezeSceneId, appPackageName)) {
-        AddScanTrustSceneId(movingFreezeSceneId);
-    }
-
-    rlt = ApplyTrustListPolicy(type);
-    if (rlt != WIFI_OPT_SUCCESS) {
-        if (scanResultBackup != -1 && rlt == WIFI_OPT_MOVING_FREEZE_CTRL) {
-            WIFI_LOGE("trust list policy, but moving freeze ctrl failed.");
-            ReportScanFinishEvent(scanResultBackup);
-        }
-        return rlt;
-    }
-    WIFI_LOGD("apply scan policies result: scan control ok.");
-    return WIFI_OPT_SUCCESS;
-}
-
 int ScanService::GetStaScene()
 {
     WIFI_LOGD("Enter GetStaScene.\n");
@@ -1928,7 +1887,7 @@ void ScanService::SetStaCurrentTime()
 
     int state = WifiConfigCenter::GetInstance().GetScreenState();
     if (state == MODE_STATE_CLOSE) {
-        if (ApplyScanPolices(ScanType::SCAN_TYPE_PNO) != WIFI_OPT_SUCCESS) {
+        if (AllowScanByType(ScanType::SCAN_TYPE_PNO) != WIFI_OPT_SUCCESS) {
             EndPnoScan();
             pnoScanFailedNum = 0;
             pScanStateMachine->StopTimer(static_cast<int>(RESTART_PNO_SCAN_TIMER));

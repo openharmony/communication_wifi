@@ -582,15 +582,6 @@ private:
      */
     ErrCode ApplyTrustListPolicy(ScanType scanType);
     /* *
-     * @Description Apply trustlists and moving freeze scanning policies.
-     *
-     * @param scanType - type: 0 - Extern; 1 - SystemTimer 2 Pno
-     * @return WIFI_OPT_SUCCESS: success,
-     * WIFI_OPT_FAILED: general scan control fail,
-     * WIFI_OPT_MOVING_FREEZE_CTRL: moving freeze scan control fail.
-     */
-    ErrCode ApplyScanPolices(ScanType type);
-    /* *
      * @Description  Obtains the current screen.
      *
      * @return success: ScanScene, failed: SCAN_SCENE_MAX

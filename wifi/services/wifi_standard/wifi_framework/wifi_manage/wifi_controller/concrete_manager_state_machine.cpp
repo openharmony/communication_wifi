@@ -424,7 +424,7 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessagePtr 
                 WIFI_LOGI("switch ROLE_CLIENT_MIX_SEMI_ACTIVE");
                 WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
             }
-            WifiManager::GetInstance().GetWifiTogglerManager().StopSemiWifiToggledTimer();
+            WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
             break;
         default:
             break;

@@ -70,54 +70,54 @@ InternalMessagePtr CreateMessage(int msgName)
     return nullptr;
 }
 
-WifiManager &WifiManager::GetInstance()
+WifiManagers &WifiManagers::GetInstance()
 {
-    static WifiManager gWifiManager;
+    static WifiManagers gWifiManager;
     return gWifiManager;
 }
 
-WifiManager::WifiManager()
+WifiManagers::WifiManagers()
 {
     InitScanCallback();
 }
 
-IScanSerivceCallbacks WifiManager::GetScanCallback(void)
+IScanSerivceCallbacks WifiManagers::GetScanCallback(void)
 {
     return mScanCallback;
 }
 
-void WifiManager::InitScanCallback(void)
+void WifiManagers::InitScanCallback(void)
 {
     using namespace std::placeholders;
-    mScanCallback.OnScanStartEvent = std::bind(&WifiManager::DealScanOpenRes, this, _1);
-    mScanCallback.OnScanStopEvent = std::bind(&WifiManager::DealScanCloseRes, this, _1);
-    mScanCallback.OnScanFinishEvent = std::bind(&WifiManager::DealScanFinished, this, _1, _2);
-    mScanCallback.OnScanInfoEvent = std::bind(&WifiManager::DealScanInfoNotify, this, _1, _2);
-    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManager::DealStoreScanInfoEvent, this, _1, _2);
+    mScanCallback.OnScanStartEvent = std::bind(&WifiManagers::DealScanOpenRes, this, _1);
+    mScanCallback.OnScanStopEvent = std::bind(&WifiManagers::DealScanCloseRes, this, _1);
+    mScanCallback.OnScanFinishEvent = std::bind(&WifiManagers::DealScanFinished, this, _1, _2);
+    mScanCallback.OnScanInfoEvent = std::bind(&WifiManagers::DealScanInfoNotify, this, _1, _2);
+    mScanCallback.OnStoreScanInfoEvent = std::bind(&WifiManagers::DealStoreScanInfoEvent, this, _1, _2);
     return;
 }
 
-void WifiManager::DealScanOpenRes(int instId)
+void WifiManagers::DealScanOpenRes(int instId)
 {
     return;
 }
 
-void WifiManager::DealScanCloseRes(int instId)
+void WifiManagers::DealScanCloseRes(int instId)
 {
     return;
 }
 
-void WifiManager::DealScanFinished(int state, int instId)
+void WifiManagers::DealScanFinished(int state, int instId)
 {
     return;
 }
 
-void WifiManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)
+void WifiManagers::DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)
 {
     return;
 }
 
-void WifiManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)
+void WifiManagers::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)
 {
     return;
 }

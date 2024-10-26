@@ -334,11 +334,6 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::ApplyScanPolices(ScanType type)
-{
-    return WIFI_OPT_SUCCESS;
-}
-
 int ScanService::GetStaScene()
 {
     return 0;

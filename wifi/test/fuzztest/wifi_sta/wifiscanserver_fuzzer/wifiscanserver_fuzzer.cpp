@@ -52,7 +52,7 @@ void InitParam()
     if (!g_isInsted) {
         pScanService = std::make_unique<ScanService>();
         pScanService->pScanStateMachine = new MockScanStateMachine();
-        pScanService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
+        pScanService->RegisterScanCallbacks(WifiManagers::GetInstance().GetScanCallback());
         pScanInterface = std::make_unique<ScanInterface>();
         if (pScanService == nullptr || pScanInterface) {
             return;
@@ -233,7 +233,6 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED));
     pScanService->SystemScanDisconnectedPolicy(appId, appId);
     pScanService->SetNetworkInterfaceUpDown(true);
-    pScanService->ApplyScanPolices(scanType);
     pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_CHECK_PORTAL);
     pScanService->AllowSystemTimerScan();
     pScanService->AllowExternScan();

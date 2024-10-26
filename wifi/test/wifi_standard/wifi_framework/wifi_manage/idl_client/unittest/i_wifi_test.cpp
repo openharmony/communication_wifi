@@ -1246,33 +1246,39 @@ HWTEST_F(IWifiTest, IdlCbkStaJoinLeaveTest, TestSize.Level1)
 HWTEST_F(IWifiTest, IdlCbkScanInfoNotifyTest, TestSize.Level1)
 {
     IdlCbkScanInfoNotify(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbkConnectChangedTest, TestSize.Level1)
 {
     IdlCbkConnectChanged(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbkDisConnectReasonNotifyTest, TestSize.Level1)
 {
     IdlCbkDisConnectReasonNotify(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbkBssidChangedTest, TestSize.Level1)
 {
     IdlCbkBssidChanged(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbkApStateChangeTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlCbkApStateChange(mTestContext, event);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbkWpaEventDealTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlCbkWpaEventDeal(mTestContext, event);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlDealStaApEventTest, TestSize.Level1)
@@ -1284,83 +1290,99 @@ HWTEST_F(IWifiTest, IdlDealStaApEventTest, TestSize.Level1)
 HWTEST_F(IWifiTest, IdlCbP2pEventDealTest, TestSize.Level1)
 {
     IdlCbP2pEventDeal(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pSupConnFailedEventTest, TestSize.Level1)
 {
     IdlCbP2pSupConnFailedEvent();
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 
 HWTEST_F(IWifiTest, IdlCbP2pDeviceFoundEventDealTest, TestSize.Level1)
 {
     IdlCbP2pDeviceFoundEventDeal(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pDeviceLostEventDealTest, TestSize.Level1)
 {
     IdlCbP2pDeviceLostEventDeal(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pGoNegotiationRequestEventTest, TestSize.Level1)
 {
     IdlCbP2pGoNegotiationRequestEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pGoNegotiationSuccessEventTest, TestSize.Level1)
 {
     IdlCbP2pGoNegotiationSuccessEvent();
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pGoNegotiationFailureEventTest, TestSize.Level1)
 {
     IdlCbP2pGoNegotiationFailureEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pInvitationReceivedEventTest, TestSize.Level1)
 {
     IdlCbP2pInvitationReceivedEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pInvitationResultEventTest, TestSize.Level1)
 {
     IdlCbP2pInvitationResultEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pGroupFormationSuccessEventTest, TestSize.Level1)
 {
     IdlCbP2pGroupFormationSuccessEvent();
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pGroupFormationFailureEventTest, TestSize.Level1)
 {
     IdlCbP2pGroupFormationFailureEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pGroupStartedEventTest, TestSize.Level1)
 {
     IdlCbP2pGroupStartedEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pGroupRemovedEventTest, TestSize.Level1)
 {
     IdlCbP2pGroupRemovedEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pProvDiscEventTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlCbP2pProvDiscEvent(mTestContext, event);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pProDiscShowPinEventTest, TestSize.Level1)
 {
     IdlCbP2pProDiscShowPinEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pFindStopEventTest, TestSize.Level1)
 {
     IdlCbP2pFindStopEvent();
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pServDiscRespEventTest, TestSize.Level1)
@@ -1371,32 +1393,38 @@ HWTEST_F(IWifiTest, IdlCbP2pServDiscRespEventTest, TestSize.Level1)
 HWTEST_F(IWifiTest, IdlCbP2pProvServDiscFailureEventTest, TestSize.Level1)
 {
     IdlCbP2pProvServDiscFailureEvent();
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pApStaConnectEventTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlCbP2pApStaConnectEvent(mTestContext, event);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pServDiscReqEventTest, TestSize.Level1)
 {
     IdlCbP2pServDiscReqEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pIfaceCreatedEventTest, TestSize.Level1)
 {
     IdlCbP2pIfaceCreatedEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pConnectFailedEventTest, TestSize.Level1)
 {
     IdlCbP2pConnectFailedEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pChannelSwitchEventTest, TestSize.Level1)
 {
     IdlCbP2pChannelSwitchEvent(mTestContext);
+    EXPECT_NE(mTestContext, nullptr);
 }
 
 HWTEST_F(IWifiTest, IdlDealP2pEventFirstTest, TestSize.Level1)

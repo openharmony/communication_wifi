@@ -64,6 +64,7 @@ HWTEST_F(WifiWpaCommonTest, ReleaseWpaCtrlTest, TestSize.Level1)
     char str[] = "A1s62";
     InitWpaCtrl(&pCtrl, str);
     ReleaseWpaCtrl(&pCtrl);
+    EXPECT_NE(str, "A1s62");
 }
 
 HWTEST_F(WifiWpaCommonTest, WpaCliCmdTest_01, TestSize.Level1)
@@ -91,6 +92,7 @@ HWTEST_F(WifiWpaCommonTest, GetStrKeyValTest_01, TestSize.Level1)
     const char split[len] = "string";
     WpaKeyValue out;
     GetStrKeyVal(src, split, &out);
+    EXPECT_NE(split, "string");
 }
 
 HWTEST_F(WifiWpaCommonTest, GetStrKeyValTest_02, TestSize.Level1)
@@ -100,6 +102,7 @@ HWTEST_F(WifiWpaCommonTest, GetStrKeyValTest_02, TestSize.Level1)
     const char split[len] = "in";
     WpaKeyValue out;
     GetStrKeyVal(src, split, &out);
+    EXPECT_NE(src, "string");
 }
 
 HWTEST_F(WifiWpaCommonTest, Hex2DecTest_01, TestSize.Level1)
@@ -115,6 +118,7 @@ HWTEST_F(WifiWpaCommonTest, TrimQuotationMarkTest, TestSize.Level1)
     char str[len] = "string";
     char c = 'A';
     TrimQuotationMark(str, c);
+    EXPECT_NE(str, "string");
 }
 
 HWTEST_F(WifiWpaCommonTest, Hex2numTest_01, TestSize.Level1)
@@ -168,6 +172,7 @@ HWTEST_F(WifiWpaCommonTest, DealSymbolTest_01, TestSize.Level1)
     const char *pos = "!";
     size_t size = 1;
     DealSymbol(buf, &pos, &size);
+    EXPECT_NE(pos, "x");
 }
 
 HWTEST_F(WifiWpaCommonTest, DealSymbolTest_02, TestSize.Level1)
@@ -177,6 +182,7 @@ HWTEST_F(WifiWpaCommonTest, DealSymbolTest_02, TestSize.Level1)
     const char *pos = "x";
     size_t size = 1;
     DealSymbol(buf, &pos, &size);
+    EXPECT_NE(pos, "x");
 }
 
 HWTEST_F(WifiWpaCommonTest, DealSymbolTest_03, TestSize.Level1)
@@ -186,6 +192,7 @@ HWTEST_F(WifiWpaCommonTest, DealSymbolTest_03, TestSize.Level1)
     const char *pos = "e";
     size_t size = 1;
     DealSymbol(buf, &pos, &size);
+    EXPECT_NE(size, 1);
 }
 
 } // namespace Wifi

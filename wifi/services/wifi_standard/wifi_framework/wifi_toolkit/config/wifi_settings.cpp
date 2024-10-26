@@ -1091,7 +1091,6 @@ int WifiSettings::SetWifiToggleCaller(int callerPid, int instId)
     SyncWifiConfig();
     return 0;
 }
-}
 
 bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
 {

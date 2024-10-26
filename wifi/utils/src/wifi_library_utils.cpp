@@ -42,6 +42,7 @@ WifiLibraryUtils::~WifiLibraryUtils()
         } else {
             WIFI_LOGI("Library %s closed successfully", libName_.c_str());
         }
+        libHandle_ = nullptr;
     }
 }
 

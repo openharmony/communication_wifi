@@ -196,7 +196,7 @@ static napi_value WifiDetailStateInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::ACTIVATED), "ACTIVATED");
     SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::ACTIVATING), "ACTIVATING");
     SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::DEACTIVATING), "DEACTIVATING");
-    SetNamedPropertyByInteger(env, wifiDetailState,static_cast<int>(WifiDetailStateJs::SEMI_ACTIVATING),
+    SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::SEMI_ACTIVATING),
         "SEMI_ACTIVATING");
     SetNamedPropertyByInteger(env, wifiDetailState, static_cast<int>(WifiDetailStateJs::SEMI_ACTIVE), "SEMI_ACTIVE");
     return wifiDetailState;

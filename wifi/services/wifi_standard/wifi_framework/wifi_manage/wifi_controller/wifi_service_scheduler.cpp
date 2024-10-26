@@ -194,6 +194,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
         }
         WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
             static_cast<int>(staState));
+        WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
         return WIFI_OPT_FAILED;
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);

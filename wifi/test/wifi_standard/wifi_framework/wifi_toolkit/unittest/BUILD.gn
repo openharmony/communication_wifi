@@ -32,6 +32,7 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_backup_config.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_center.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_file_spec.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_scan_config.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_settings.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/log_helper.c",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/arp_checker.cpp",

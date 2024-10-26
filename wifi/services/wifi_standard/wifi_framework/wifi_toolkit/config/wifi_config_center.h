@@ -24,6 +24,7 @@
 #include <vector>
 #include "wifi_internal_msg.h"
 #include "wifi_settings.h"
+#include "wifi_scan_config.h"
 
 #define SOFT_BUS_SERVICE_UID 1024
 #define CAST_ENGINE_SERVICE_UID 5526
@@ -39,6 +40,8 @@ public:
     ~WifiConfigCenter();
 
     int Init();
+
+    std::unique_ptr<WifiScanConfig>& GetWifiScanConfig();
 
     void SetWifiSelfcureReset(const bool isReset);
 
@@ -108,8 +111,6 @@ public:
 
     int SaveLinkedInfo(const WifiLinkedInfo &info, int instId = 0);
 
-    void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth, int instId = 0);
-
     int SetMacAddress(const std::string &macAddress, int instId = 0);
 
     int GetMacAddress(std::string &macAddress, int instId = 0);
@@ -147,24 +148,6 @@ public:
     bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0);
 
     void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0);
-
-    int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
-
-    int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
-
-    void RecordWifiCategory(const std::string bssid, WifiCategory category);
-
-    void CleanWifiCategoryRecord();
-
-    void SetAbnormalApps(const std::vector<std::string> &abnormalAppList);
-
-    int GetAbnormalApps(std::vector<std::string> &abnormalAppList);
-
-    int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
-
-    int ClearScanInfoList();
-
-    int GetScanInfoList(std::vector<WifiScanInfo> &results);
 
     int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
 
@@ -319,18 +302,18 @@ public:
 
     int GetPersistWifiState();
 
+    bool HasWifiActive();
+	
+    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
+	
+    void UpdateLinkedInfo(int instId = 0);
 private:
     WifiConfigCenter();
-    bool HasWifiActive();
-    void UpdateLinkedInfo(int instId = 0);
-    void InitScanControlForbidList();
-    void InitScanControlIntervalList();
     std::string GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
         const WifiMacAddrInfo &macAddrInfo);
     WifiMacAddrErrCode InsertMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
         const WifiMacAddrInfo &macAddrInfo, std::string& randomMacAddr);
     void DelMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo);
-    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
     WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo,
         std::string randomMacAddr);
 
@@ -364,10 +347,7 @@ private:
     std::mutex mScanMutex;
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
-    std::map<int, ScanControlInfo> mScanControlInfo;
-    std::map<std::string, WifiCategory> mWifiCategoryRecord;
-    std::vector<std::string> mAbnormalAppList;
-    std::vector<WifiScanInfo> mWifiScanInfoList;
+    std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
 
     // AP
     std::mutex mApMutex;

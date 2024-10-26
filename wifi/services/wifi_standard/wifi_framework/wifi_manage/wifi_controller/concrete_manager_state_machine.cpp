@@ -153,6 +153,9 @@ bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
     }
     WIFI_LOGE("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     switch (msg->GetMessageName()) {
+        case CONCRETE_CMD_STOP:
+            CheckAndContinueToStopWifi(msg);
+            break;
         case CONCRETE_CMD_STA_STOP:
             HandleStaStop();
             break;
@@ -469,7 +472,8 @@ bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)
             HandleStaStart();
             return true;
         case CONCRETE_CMD_STOP:
-            checkAndContinueToStopWifi(msg);
+            DelayMessage(msg);
+            SwitchState(pDefaultState);
             return true;
         case CONCRETE_CMD_STA_SEMI_ACTIVE:
             HandleStaSemiActive();
@@ -659,17 +663,17 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
     return WIFI_OPT_SUCCESS;
 }
 
-void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessagePtr msg)
+void ConcreteMangerMachine::CheckAndContinueToStopWifi(InternalMessagePtr msg)
 {
     if (WifiConfigCenter::GetInstance().GetWifiStopState()) {
-        WIFI_LOGE("checkAndContinueToStopWifi: wifi is stoping");
+        WIFI_LOGE("CheckAndContinueToStopWifi: wifi is stoping");
         return;
     }
 
     mTargetRole = static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW);
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
     auto detailState = WifiConfigCenter::GetInstance().GetWifiDetailState(mid);
-    WIFI_LOGI("checkAndContinueToStopWifi: current sta state: %{public}d detailState:%{public}d", staState,
+    WIFI_LOGI("CheckAndContinueToStopWifi: current sta state: %{public}d detailState:%{public}d", staState,
         detailState);
     if (detailState != WifiDetailState::STATE_SEMI_ACTIVE && detailState != WifiDetailState::STATE_SEMI_ACTIVATING &&
         (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::OPENING)) {
@@ -678,7 +682,6 @@ void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessagePtr msg)
 
     WifiConfigCenter::GetInstance().SetWifiStopState(true);
     WIFI_LOGI("Set WifiStopState is true.");
-    SwitchState(pDefaultState);
     if (staState == WifiOprMidState::RUNNING || detailState == WifiDetailState::STATE_SEMI_ACTIVE ||
         detailState == WifiDetailState::STATE_SEMI_ACTIVATING) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);

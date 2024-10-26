@@ -154,10 +154,10 @@ bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
     WIFI_LOGE("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_STOP:
-            CheckAndContinueToStopWifi(msg);
+            pConcreteMangerMachine->CheckAndContinueToStopWifi(msg);
             break;
         case CONCRETE_CMD_STA_STOP:
-            HandleStaStop();
+            pConcreteMangerMachine->HandleStaStop();
             break;
         default:
             break;

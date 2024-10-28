@@ -647,17 +647,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
     LOGI("ConvertDeviceCfg SetDeviceConfig selected network ssid=%{public}s, bssid=%{public}s, instId=%{public}d",
         SsidAnonymize(halDeviceConfig.ssid).c_str(), MacAnonymize(halDeviceConfig.bssid).c_str(), m_instId);
     ConvertSsidToOriginalSsid(config, halDeviceConfig);
-    std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
-    for (auto scanInfo : scanInfoList) {
-        std::string deviceKeyMgmt;
-        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (halDeviceConfig.ssid == scanInfo.ssid && halDeviceConfig.keyMgmt == deviceKeyMgmt) {
-            halDeviceConfig.ssid = scanInfo.oriSsid;
-            LOGI("ConvertDeviceCfg back to oriSsid:%{public}s", SsidAnonymize(halDeviceConfig.ssid).c_str());
-            break;
-        }
-    }
+
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, halDeviceConfig, ifaceName) !=
         WIFI_HAL_OPT_OK) {

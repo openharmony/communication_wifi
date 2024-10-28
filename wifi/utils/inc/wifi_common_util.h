@@ -279,6 +279,8 @@ std::vector<std::string> getAuthInfo(const std::string &input, const std::string
 std::string HexToString(const std::string &str);
 std::string StringToHex(const std::string &data);
 int CheckDataLegal(std::string &data, int base = DECIMAL_NOTATION);
+int CheckDataLegalBin(std::string &data);
+int CheckDataLegalHex(std::string &data);
 unsigned int CheckDataToUint(std::string &data, int base = DECIMAL_NOTATION);
 long long CheckDataTolonglong(std::string &data, int base = DECIMAL_NOTATION);
 }  // namespace Wifi

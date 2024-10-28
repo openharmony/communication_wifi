@@ -708,7 +708,7 @@ unsigned int CheckDataToUint(std::string &data, int base)
         return 0;
     }
     std::regex pattern("\\d+");
-    if (!std::regex_search(data, pattern) || std::regex_search(data, pattern1)) {
+    if (!std::regex_match(data, pattern)) {
         WIFI_LOGE("CheckDataToUint regex unsigned int value fail, data:%{private}s", data.c_str());
         return 0;
     }

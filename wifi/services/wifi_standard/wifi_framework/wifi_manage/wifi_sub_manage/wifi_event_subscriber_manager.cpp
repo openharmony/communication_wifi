@@ -437,14 +437,14 @@ void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
 
     int lastStaState = GetLastStaStateByDatashare();
     if (lastStaState == openWifi) {
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     } else if (lastStaState == openWifiInAirplanemode) {
         WifiSettings::GetInstance().SetWifiFlagOnAirplaneMode(true);
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
     } else if (lastStaState == closeWifiByAirplanemodeOpen) {
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN0);
     }
 }
 

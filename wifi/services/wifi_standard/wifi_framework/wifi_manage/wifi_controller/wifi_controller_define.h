@@ -55,6 +55,12 @@ namespace Wifi {
 #define SOFTAP_CMD_START 0x201
 #define SOFTAP_CMD_STOP 0x202
 
+#define MULTI_STA_CMD_START 0x301
+#define MULTI_STA_CMD_STOP 0x302
+#define MULTI_STA_CMD_STARTED 0x303
+#define MULTI_STA_CMD_STOPPED 0x304
+#define CMD_MULTI_STA_STOPPED 0x305
+
 #define STOP_WIFI_WAIT_TIME 100
 
 struct ConcreteModeCallback {
@@ -64,6 +70,11 @@ struct ConcreteModeCallback {
 };
 
 struct SoftApModeCallback {
+    std::function<void(int)> onStopped;
+    std::function<void(int)> onStartFailure;
+};
+
+struct MultiStaModeCallback {
     std::function<void(int)> onStopped;
     std::function<void(int)> onStartFailure;
 };

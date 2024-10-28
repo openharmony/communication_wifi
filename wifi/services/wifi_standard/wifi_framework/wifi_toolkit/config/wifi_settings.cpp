@@ -186,7 +186,7 @@ void WifiSettings::ClearDeviceConfig(void)
     return;
 }
 
-int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
+int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -195,14 +195,14 @@ int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results)
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         // -1: Connect by system, use default uid.
-        if (iter->second.uid == -1 || iter->second.isShared) {
+        if ((iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
             results.push_back(iter->second);
         }
     }
     return 0;
 }
 
-int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
+int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -210,7 +210,7 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if (iter->second.networkId == networkId) {
+        if (iter->second.networkId == networkId && iter->second.instanceId == instId) {
             config = iter->second;
             SyncAfterDecryped(config);
             return 0;
@@ -219,7 +219,8 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     return -1;
 }
 
-int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config)
+int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType,
+    WifiDeviceConfig &config, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -228,7 +229,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
     std::unique_lock<std::mutex> lock(mStaMutex);
     if (indexType == DEVICE_CONFIG_INDEX_SSID) {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-            if (iter->second.ssid == index) {
+            if (iter->second.ssid == index && iter->second.instanceId == instId) {
                 config = iter->second;
                 SyncAfterDecryped(config);
                 return 0;
@@ -236,7 +237,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         }
     } else {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-            if (iter->second.bssid == index) {
+            if (iter->second.bssid == index && iter->second.instanceId == instId) {
                 config = iter->second;
                 SyncAfterDecryped(config);
                 return 0;
@@ -246,7 +247,8 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
     return -1;
 }
 
-int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config)
+int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt,
+    WifiDeviceConfig &config, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -257,7 +259,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     if (keymgmt.compare("WPA-PSK+SAE") == 0) {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
-                && (iter->second.uid == -1 || iter->second.isShared)) {
+                && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
                 config = iter->second;
                 SyncAfterDecryped(config);
                 return 0;
@@ -266,7 +268,7 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     } else {
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
-                && (iter->second.uid == -1 || iter->second.isShared)) {
+                && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
                 config = iter->second;
                 SyncAfterDecryped(config);
                 return 0;
@@ -475,7 +477,7 @@ int WifiSettings::SyncDeviceConfig()
     std::unique_lock<std::mutex> lock(mStaMutex);
     std::vector<WifiDeviceConfig> tmp;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); ++iter) {
-        if (!iter->second.isEphemeral) {
+        if (!iter->second.isEphemeral && iter->second.instanceId == 0) {
             tmp.push_back(iter->second);
         }
     }

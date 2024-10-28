@@ -67,9 +67,9 @@ public:
 
     bool GetWifiStopState() const;
 
-    void SetStaIfaceName(const std::string &ifaceName);
+    void SetStaIfaceName(const std::string &ifaceName, int instId = 0);
 
-    std::string GetStaIfaceName();
+    std::string GetStaIfaceName(int instId = 0);
 
     int GetWifiState(int instId = 0);
 
@@ -148,6 +148,24 @@ public:
     bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0);
 
     void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0);
+
+    int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
+
+    int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
+
+    void RecordWifiCategory(const std::string bssid, WifiCategory category);
+
+    void CleanWifiCategoryRecord();
+
+    void SetAbnormalApps(const std::vector<std::string> &abnormalAppList);
+
+    int GetAbnormalApps(std::vector<std::string> &abnormalAppList);
+
+    int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
+
+    int ClearScanInfoList();
+
+    int GetScanInfoList(std::vector<WifiScanInfo> &results);
 
     int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
 
@@ -263,9 +281,9 @@ public:
 
     int GetAirplaneModeState() const;
 
-    int GetWifiToggledEnable();
+    int GetWifiToggledEnable(int id = 0);
 
-    void SetWifiToggledState(int state);
+    void SetWifiToggledState(int state, int id = 0);
 
     void SetPowerSavingModeState(const int &state);
 
@@ -298,9 +316,9 @@ public:
 
     std::set<int> GetAllWifiLinkedNetworkId();
 
-    void SetPersistWifiState(int state);
+    void SetPersistWifiState(int state, int instId);
 
-    int GetPersistWifiState();
+    int GetPersistWifiState(int instId);
 
     bool HasWifiActive();
 	
@@ -326,7 +344,7 @@ private:
     std::atomic<int> mSelectedCandidateNetworkId {INVALID_NETWORK_ID};
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
-    std::string mStaIfaceName {"wlan0"};
+    std::vector<std::string> mStaIfaceName = {"wlan0", "wlan1"};
     std::map<int, std::atomic<int>> mWifiState;
     std::map<int, WifiDetailState> mWifiDetailState;
     std::map<int, std::atomic<WifiOprMidState>> mStaMidState;
@@ -348,6 +366,10 @@ private:
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
+    std::map<int, ScanControlInfo> mScanControlInfo;
+    std::map<std::string, WifiCategory> mWifiCategoryRecord;
+    std::vector<std::string> mAbnormalAppList;
+    std::vector<WifiScanInfo> mWifiScanInfoList;
 
     // AP
     std::mutex mApMutex;
@@ -385,7 +407,7 @@ private:
     std::atomic<int> mGnssFixState {MODE_STATE_CLOSE};
     std::atomic<int> mScanGenieState {MODE_STATE_OPEN};
     std::atomic<int> mAirplaneModeState {MODE_STATE_CLOSE};
-    std::atomic<int> mPersistWifiState {WIFI_STATE_DISABLED};
+    std::vector<int> mPersistWifiState {std::vector<int>(2, WIFI_STATE_DISABLED)};
     std::atomic<int> mPowerSavingModeState {MODE_STATE_CLOSE};
     std::atomic<int> mFreezeModeState {MODE_STATE_CLOSE};
     std::atomic<int> mNoChargerPlugModeState {MODE_STATE_CLOSE};

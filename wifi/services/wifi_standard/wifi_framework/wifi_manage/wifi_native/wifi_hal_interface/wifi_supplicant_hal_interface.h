@@ -21,6 +21,7 @@
 #include "wifi_base_hal_interface.h"
 #include "wifi_error_no.h"
 #include "i_wifi_struct.h"
+#include "define.h"
 
 namespace OHOS {
 namespace Wifi {

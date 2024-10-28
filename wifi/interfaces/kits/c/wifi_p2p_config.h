@@ -111,6 +111,7 @@ typedef struct WifiP2pGroupInfo {
     WifiP2pDevice clientDevices[MAX_DEVICES_NUM];
     int clientDevicesSize; /* the true size of clientDevices array */
     char goIpAddress[IP_ADDR_STR_LEN];
+    char gcIpAddress[IP_ADDR_STR_LEN];
 } WifiP2pGroupInfo;
 
 typedef struct WifiP2pLinkedInfo {

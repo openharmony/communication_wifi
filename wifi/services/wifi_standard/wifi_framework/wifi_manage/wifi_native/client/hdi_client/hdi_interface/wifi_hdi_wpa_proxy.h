@@ -101,8 +101,9 @@ WifiErrorNo HdiAddWpaIface(const char *ifName, const char *confName);
  */
 WifiErrorNo HdiRemoveWpaIface(const char *ifName);
 
-WifiErrorNo SetHdiStaIfaceName(const char *ifaceName);
-const char *GetHdiStaIfaceName();
+WifiErrorNo SetHdiStaIfaceName(const char *ifaceName, int instId);
+const char *GetHdiStaIfaceName(int instId);
+void ClearHdiStaIfaceName(int instId);
 WifiErrorNo SetHdiP2pIfaceName(const char *ifaceName);
 const char *GetHdiP2pIfaceName();
 

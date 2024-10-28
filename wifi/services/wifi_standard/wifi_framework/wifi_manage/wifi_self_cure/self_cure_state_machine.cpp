@@ -778,7 +778,6 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     configAuthType = pSelfCureStateMachine->GetAuthType();
     WIFI_LOGI("hasInternetRecently: %{public}d, portalUnthenEver: %{public}d, selfCureHistoryInfo: %{public}s",
         hasInternetRecently, portalUnthenEver, pSelfCureStateMachine->GetSelfCureHistoryInfo().c_str());
-    InitCurrentGateway();
     return;
 }
 

@@ -631,6 +631,9 @@ std::string StringToHex(const std::string &data)
     return ss.str();
 }
 
+
+
+
 int CheckDataLegal(std::string &data, int base)
 {
     std::regex pattern("\\d+");

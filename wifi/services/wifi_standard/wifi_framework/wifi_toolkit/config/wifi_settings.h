@@ -180,6 +180,8 @@ public:
 
     int GetVariableMap(std::map<std::string, std::string> &variableMap);
 
+    std::string GetVariablePackageName(std::string tag);
+
     int SyncHotspotConfig();
 
     int SetHotspotConfig(const HotspotConfig &config, int id = 0);

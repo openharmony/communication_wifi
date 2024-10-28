@@ -540,6 +540,103 @@ void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state, int instId
     }
 }
 
+int WifiConfigCenter::GetScanControlInfo(ScanControlInfo &info, int instId)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    auto iter = mScanControlInfo.find(instId);
+    if (iter != mScanControlInfo.end()) {
+        info = iter->second;
+    }
+    return 0;
+}
+
+int WifiConfigCenter::SetScanControlInfo(const ScanControlInfo &info, int instId)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mScanControlInfo[instId] = info;
+    return 0;
+}
+
+void WifiConfigCenter::RecordWifiCategory(const std::string bssid, WifiCategory category)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    if (bssid.empty()) {
+        return;
+    }
+    auto iter = mWifiCategoryRecord.find(bssid);
+    if (iter != mWifiCategoryRecord.end()) {
+        iter->second = category;
+    } else {
+        mWifiCategoryRecord.emplace(std::make_pair(bssid, category));
+    }
+}
+
+void WifiConfigCenter::CleanWifiCategoryRecord()
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mWifiCategoryRecord.clear();
+}
+
+void WifiConfigCenter::SetAbnormalApps(const std::vector<std::string> &abnormalAppList)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mAbnormalAppList = abnormalAppList;
+}
+
+int WifiConfigCenter::GetAbnormalApps(std::vector<std::string> &abnormalAppList)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    abnormalAppList = mAbnormalAppList;
+    return 0;
+}
+
+int WifiConfigCenter::SaveScanInfoList(const std::vector<WifiScanInfo> &results)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mWifiScanInfoList.clear();
+    mWifiScanInfoList = results;
+    return 0;
+}
+
+int WifiConfigCenter::ClearScanInfoList()
+{
+    if (HasWifiActive()) {
+        return 0;
+    }
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    ClearMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO);
+#endif
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mWifiScanInfoList.clear();
+    return 0;
+}
+
+int WifiConfigCenter::GetScanInfoList(std::vector<WifiScanInfo> &results)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
+    for (auto iter = mWifiScanInfoList.begin(); iter != mWifiScanInfoList.end();) {
+        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+            RemoveMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, iter->bssid);
+#endif
+            LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
+                SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
+            iter = mWifiScanInfoList.erase(iter);
+            continue;
+        }
+        if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
+            results.push_back(*iter);
+        }
+        ++iter;
+    }
+    if (results.empty()) {
+        results.assign(mWifiScanInfoList.begin(), mWifiScanInfoList.end());
+    }
+    LOGI("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
+    return 0;
+}
+
 int WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
 {
     std::vector<WifiScanInfo> wifiScanInfoList;

@@ -143,7 +143,7 @@ public:
      * @param bCreate - whether create the service instance
      * @return int - 0 success; -1 feature service name not correct or load service failed
      */
-    int CheckAndEnforceService(const std::string &name, bool bCreate = true);
+    int CheckAndEnforceService(const std::string &name, int instId = 0, bool bCreate = true);
 
     /**
      * @Description Get the Sta Service Inst object
@@ -214,7 +214,7 @@ public:
 
 private:
     int GetServiceDll(const std::string &name, std::string &dlname);
-    int LoadStaService(const std::string &dlname, bool bCreate);
+    int LoadStaService(const std::string &dlname, int insId, bool bCreate);
     int UnloadStaService(bool bPreLoad, int instId = 0);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     int LoadSelfCureService(const std::string &dlname, bool bCreate);

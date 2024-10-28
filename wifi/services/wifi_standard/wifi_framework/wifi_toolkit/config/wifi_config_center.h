@@ -365,7 +365,10 @@ private:
     std::mutex mScanMutex;
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
-    std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
+    std::map<int, ScanControlInfo> mScanControlInfo;
+    std::map<std::string, WifiCategory> mWifiCategoryRecord;
+    std::vector<std::string> mAbnormalAppList;
+    std::vector<WifiScanInfo> mWifiScanInfoList;
 
     // AP
     std::mutex mApMutex;

@@ -149,6 +149,24 @@ public:
 
     void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0);
 
+    int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
+
+    int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
+
+    void RecordWifiCategory(const std::string bssid, WifiCategory category);
+
+    void CleanWifiCategoryRecord();
+
+    void SetAbnormalApps(const std::vector<std::string> &abnormalAppList);
+
+    int GetAbnormalApps(std::vector<std::string> &abnormalAppList);
+
+    int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
+
+    int ClearScanInfoList();
+
+    int GetScanInfoList(std::vector<WifiScanInfo> &results);
+
     int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
 
     bool CheckScanOnlyAvailable(int instId = 0);

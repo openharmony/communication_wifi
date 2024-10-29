@@ -671,6 +671,7 @@ void WifiP2pStub::WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevi
     reply.WriteInt32(device.GetWpsConfigMethod());
     reply.WriteInt32(device.GetDeviceCapabilitys());
     reply.WriteInt32(device.GetGroupCapabilitys());
+    reply.WriteString(device.GetGroupAddress());
 }
 
 bool WifiP2pStub::ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &info)
@@ -712,6 +713,7 @@ void WifiP2pStub::WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroup
     reply.WriteInt32(static_cast<int>(info.GetP2pGroupStatus()));
     reply.WriteInt32(info.GetNetworkId());
     reply.WriteString(info.GetGoIpAddress());
+    reply.WriteString(info.GetGcIpAddress());
     std::vector<WifiP2pDevice> deviceVec = info.GetClientDevices();
     reply.WriteInt32(deviceVec.size());
     for (auto it = deviceVec.begin(); it != deviceVec.end(); ++it) {

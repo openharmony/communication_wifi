@@ -599,6 +599,7 @@ void WifiP2pProxy::ReadWifiP2pDeviceData(MessageParcel &reply, WifiP2pDevice &de
     device.SetWpsConfigMethod(reply.ReadInt32());
     device.SetDeviceCapabilitys(reply.ReadInt32());
     device.SetGroupCapabilitys(reply.ReadInt32());
+    device.SetGroupAddress(reply.ReadString());
 }
 
 void WifiP2pProxy::WriteWifiP2pGroupData(MessageParcel &data, const WifiP2pGroupInfo &info) const
@@ -635,6 +636,7 @@ void WifiP2pProxy::ReadWifiP2pGroupData(MessageParcel &reply, WifiP2pGroupInfo &
     info.SetP2pGroupStatus(static_cast<P2pGroupStatus>(reply.ReadInt32()));
     info.SetNetworkId(reply.ReadInt32());
     info.SetGoIpAddress(reply.ReadString());
+    info.SetGcIpAddress(reply.ReadString());
 
     constexpr int MAX_SIZE = 512;
     int size = reply.ReadInt32();

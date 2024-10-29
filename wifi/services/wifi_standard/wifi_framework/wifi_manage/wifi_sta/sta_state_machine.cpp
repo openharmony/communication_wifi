@@ -3647,9 +3647,6 @@ void StaStateMachine::LinkedState::GoInState()
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
-#ifdef SUPPORT_ClOUD_WIFI_ASSET
-    WifiAssetManager::GetInstance().WifiAssetTriggerSync();
-#endif
     return;
 }
 

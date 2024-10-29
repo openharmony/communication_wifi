@@ -889,24 +889,20 @@ void WifiControllerMachine::HandleConcreteStop(int id)
 template <class T>
 void WifiControllerMachine::HandleHotspotStop(int id, HotspotMode THotspotMode, ManagerControl<T> &TManagers)
 {
-    ConcreteManagerRole role;
     auto softap = TManagers.GetManager(id);
-    if (softap != nullptr && softap->GetRole() == T::Role::ROLE_HAS_REMOVED) {
-        TManagers.RemoveManager(id);
-        softap = nullptr;
-        if (!TManagers.HasAnyManager() && hotspotMode == THotspotMode) {
-            hotspotMode = HotspotMode::NONE;
-        }
+    bool roleIsRemoved = softap != nullptr && softap->GetRole() == T::Role::ROLE_HAS_REMOVED;
+    softap = nullptr;
+    TManagers.RemoveManager(id);
+    if (hotspotMode == THotspotMode && !TManagers.HasAnyManager()) {
+        hotspotMode = HotspotMode::NONE;
+    }
+    if (roleIsRemoved) {
         if (!HasAnyManager()) {
             SwitchState(pDisableState);
         }
         return;
     }
-    TManagers.RemoveManager(id);
-    softap = nullptr;
-    if (!TManagers.HasAnyManager() && hotspotMode == THotspotMode) {
-        hotspotMode = HotspotMode::NONE;
-    }
+
     if (ShouldEnableSoftap()) {
         MakeHotspotManager(id);
         return;
@@ -915,7 +911,7 @@ void WifiControllerMachine::HandleHotspotStop(int id, HotspotMode THotspotMode, 
         return;
     }
     if (ShouldEnableWifi(INSTID_WLAN0) && !WifiConfigCenter::GetInstance().GetWifiStopState()) {
-        role = GetWifiRole();
+        ConcreteManagerRole role = GetWifiRole();
         if (role == ConcreteManagerRole::ROLE_UNKNOW) {
             WIFI_LOGE("Get unknow wifi role in HandleSoftapStop.");
             return;

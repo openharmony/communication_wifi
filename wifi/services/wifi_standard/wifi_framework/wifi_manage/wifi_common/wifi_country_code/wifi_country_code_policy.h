@@ -23,6 +23,7 @@
 #include "wifi_scan_msg.h"
 #include "wifi_country_code_define.h"
 #include "wifi_scan_msg.h"
+#include "wifi_library_utils.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -71,6 +72,16 @@ private:
     std::map<std::string, std::string> m_bssidAndCountryCodeMap;
     std::string m_wifiCountryCodeFromScanResults;
     std::list<std::function<ErrCode(std::string&)>> m_policyList;
+};
+
+class WifiCountryCodeIntlUtils {
+public:
+    WifiCountryCodeIntlUtils() : wifiLibraryUtils_("libwifi_ext_lib.z.so", libHandle_, true) {}
+    ~WifiCountryCodeIntlUtils() = default;
+    std::string GetSystemRegion();
+private:
+    static void* libHandle_;
+    WifiLibraryUtils wifiLibraryUtils_;
 };
 }
 }

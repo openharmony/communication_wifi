@@ -31,6 +31,9 @@
 #else
 #include "wifi_internal_event_dispatcher_lite.h"
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+#include "wifi_asset_manager.h"
+#endif
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
@@ -91,7 +94,7 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
     WIFI_LOGI("AutoStartStaService, current sta state:%{public}d", staState);
     std::lock_guard<std::mutex> lock(mutex);
     if (staState == WifiOprMidState::RUNNING) {
-        return WIFI_OPT_SUCCESS;
+        WIFI_LOGI("AutoStartStaService, cur sta state is running.");
     }
     if (PreStartWifi(instId, staIfName) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
@@ -128,7 +131,7 @@ ErrCode WifiServiceScheduler::AutoStartWifi2Service(int instId, std::string &sta
     WIFI_LOGI("AutoStartWifi2Service, current sta state:%{public}d", staState);
     std::lock_guard<std::mutex> lock(mutex);
     if (staState == WifiOprMidState::RUNNING) {
-        return WIFI_OPT_SUCCESS;
+        WIFI_LOGI("AutoStartWifi2Service, cur sta2 state is running.");
     }
     if (PreStartWifi(instId, staIfName) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
@@ -156,7 +159,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
     WIFI_LOGI("AutoStopStaService, current sta state:%{public}d", staStateBefore);
     std::lock_guard<std::mutex> lock(mutex);
     if (staStateBefore == WifiOprMidState::CLOSED) {
-        return WIFI_OPT_SUCCESS;
+        WIFI_LOGI("AutoStopStaService, cur sta state is closed.");
     }
     ErrCode ret = WIFI_OPT_FAILED;
 #ifdef FEATURE_P2P_SUPPORT
@@ -191,6 +194,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
         }
         WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
             static_cast<int>(staState));
+        WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
         return WIFI_OPT_FAILED;
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
@@ -207,7 +211,7 @@ ErrCode WifiServiceScheduler::AutoStopWifi2Service(int instId)
         staStateBefore, instId);
     std::lock_guard<std::mutex> lock(mutex);
     if (staStateBefore == WifiOprMidState::CLOSED) {
-        return WIFI_OPT_SUCCESS;
+        WIFI_LOGI("AutoStopWifi2Service, cur sta2 state is closed.");
     }
     ErrCode ret = WIFI_OPT_FAILED;
 
@@ -262,8 +266,7 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
         static_cast<int>(curState), instId);
     std::lock_guard<std::mutex> lock(mutex);
     if (curState != WifiOprMidState::CLOSED && instId == 0) {
-        WIFI_LOGE("ScanOnly State  is not closed, return\n");
-        return WIFI_OPT_SUCCESS;
+        WIFI_LOGE("ScanOnly State  is not closed.");
     }
 
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState(instId) ||
@@ -303,7 +306,7 @@ ErrCode WifiServiceScheduler::AutoStopScanOnly(int instId, bool setIfaceDown)
     WIFI_LOGI("AutoStopScanOnly, current wifi scan only state is %{public}d", static_cast<int>(curState));
     std::lock_guard<std::mutex> lock(mutex);
     if (curState != WifiOprMidState::RUNNING) {
-        return WIFI_OPT_SUCCESS;
+        WIFI_LOGI("AutoStopScanOnly, cur scan only state is not running.");
     }
 
     if (WifiOprMidState::RUNNING == WifiConfigCenter::GetInstance().GetWifiMidState(instId) ||
@@ -334,7 +337,7 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
     WIFI_LOGI("AutoStartSemiStaService, current sta state:%{public}d", staState);
     std::lock_guard<std::mutex> lock(mutex);
     if (staState == WifiOprMidState::SEMI_ACTIVE) {
-        return WIFI_OPT_SUCCESS;
+        WIFI_LOGI("AutoStartSemiStaService, cur sta state is semi active.");
     }
     if (PreStartWifi(instId, staIfName) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
@@ -504,6 +507,15 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
         errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
+#endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        errCode = pService->RegisterStaServiceCallback(WifiAssetManager::GetInstance().GetStaCallback());
+        WIFI_LOGI("WifiAssetManager register");
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("WifiAssetManager register sta service callback failed, ret=%{public}d!",
                 static_cast<int>(errCode));
             return WIFI_OPT_FAILED;
         }

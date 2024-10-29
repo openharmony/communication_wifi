@@ -84,8 +84,9 @@ public:
 
     void WifiToggledTest1()
     {
+        int instId = 0;
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false, instId);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg->SetMessageName(CMD_WIFI_TOGGLED);
@@ -101,8 +102,9 @@ public:
 
     void WifiToggledTest2()
     {
+        int instId = 0;
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false, instId);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg->SetMessageName(CMD_WIFI_TOGGLED);
@@ -120,8 +122,9 @@ public:
 
     void HandleStaStartFail()
     {
+        int instId = 0;
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        WifiConfigCenter::GetInstance().SetWifiToggledState(false);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(false, instId);
         WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg->SetMessageName(CMD_STA_START_FAILURE);
@@ -168,7 +171,6 @@ public:
     void ClearStartFailCountTest()
     {
         pWifiControllerMachine->ClearWifiStartFailCount();
-        pWifiControllerMachine->ClearApStartFailCount();
     }
 
     void RmoveSoftapManagerTest()
@@ -245,10 +247,6 @@ public:
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
         pWifiControllerMachine->concreteManagers.push_back(clientmode);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
-        msg->SetMessageName(CMD_AP_SERVICE_START_FAILURE);
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
-        pWifiControllerMachine->mSoftapStartFailCount = AP_OPEN_RETRY_MAX_COUNT;
-        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
     }
 
     void ApStartTest()
@@ -300,6 +298,7 @@ public:
 
     void ConcreteIdExistTest()
     {
+        int instId = 0;
         ConcreteClientModeManager *clientmode =
             new (std::nothrow) ConcreteClientModeManager(ConcreteManagerRole::ROLE_CLIENT_STA, 0);
         clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
@@ -315,8 +314,15 @@ public:
         pWifiControllerMachine->HandleStaSemiActive(0);
         pWifiControllerMachine->HandleStaClose(0);
         pWifiControllerMachine->SwitchRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
-        WifiConfigCenter::GetInstance().SetWifiToggledState(1);
-        EXPECT_TRUE(pWifiControllerMachine->ShouldEnableWifi());
+        WifiConfigCenter::GetInstance().SetWifiToggledState(1, instId);
+        EXPECT_TRUE(pWifiControllerMachine->ShouldEnableWifi(instId));
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_WIFI_TOGGLED);
+        msg->SetParam2(0);
+        EXPECT_FALSE(pWifiControllerMachine->ShouldDisableWifi(msg));
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
+        EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi(msg));
         pWifiControllerMachine->RemoveConcreteManager(1);
         pWifiControllerMachine->RemoveConcreteManager(0);
         pWifiControllerMachine->ShutdownWifi();
@@ -324,6 +330,7 @@ public:
 
     void GetWifiRoleTest()
     {
+        int instId = 0;
         pWifiControllerMachine->GetWifiRole();
     }
 };
@@ -465,11 +472,12 @@ HWTEST_F(WifiControllerMachineTest, GetWifiRoleTest, TestSize.Level1)
 
 HWTEST_F(WifiControllerMachineTest, HandleApStopTest, TestSize.Level1)
 {
+    int instId = 0;
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(CMD_AP_STOPPED);
     msg->SetParam1(0);
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, instId);
     pWifiControllerMachine->pEnableState->HandleApStop(msg);
 }
 }

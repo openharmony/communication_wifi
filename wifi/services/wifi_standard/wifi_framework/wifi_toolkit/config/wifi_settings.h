@@ -115,13 +115,13 @@ public:
 
     void ClearDeviceConfig(void);
 
-    int GetDeviceConfig(std::vector<WifiDeviceConfig> &results);
+    int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0);
 
-    int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config);
+    int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0);
 
-    int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config);
+    int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0);
 
-    int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config);
+    int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
 
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
@@ -179,6 +179,8 @@ public:
     int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
 
     int GetVariableMap(std::map<std::string, std::string> &variableMap);
+
+    std::string GetVariablePackageName(std::string tag);
 
     int SyncHotspotConfig();
 
@@ -278,6 +280,13 @@ public:
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+        const std::set<int> &wifiLinkedNetworkIds);
+
+    void UpLoadLocalDeviceConfigToCloud();
+#endif
+
 private:
     WifiSettings();
     int IncreaseNumRebootsSinceLastUse();
@@ -312,7 +321,7 @@ private:
     int DecryptionDeviceConfig(WifiDeviceConfig &config);
     bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
-
+    void SyncAfterDecryped(WifiDeviceConfig &config);
 private:
     // STA
     std::mutex mStaMutex;

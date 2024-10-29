@@ -23,6 +23,7 @@
 #include "wifi_logger.h"
 #include "wifi_errcode.h"
 #include "concrete_clientmode_manager.h"
+#include "multi_sta_manager.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "softap_manager.h"
 #endif
@@ -55,6 +56,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void HandleStaStartFailure(int id);
         void HandleStaRemoved(InternalMessagePtr msg);
+        void HandleWifi2Removed(InternalMessagePtr msg);
         void HandleAPServiceStartFail(int id);
         void HandleConcreteClientRemoved(InternalMessagePtr msg);
         
@@ -85,12 +87,14 @@ public:
     ErrCode InitWifiControllerMachine();
 
     void RemoveConcreteManager(int id);
+    void RemoveMultiStaManager(int id);
     void HandleStaClose(int id);
+    void HandleWifi2Close(int id);
     void HandleStaStart(int id);
+    void HandleWifi2Start(int id);
     void HandleStaSemiActive(int id);
     void HandleConcreteStop(int id);
     void ClearWifiStartFailCount();
-    void ClearApStartFailCount();
 #ifdef FEATURE_AP_SUPPORT
     void RmoveSoftapManager(int id);
     void HandleSoftapStop(int id);
@@ -121,9 +125,12 @@ private:
     void BuildStateTree();
     ErrCode InitWifiStates();
     bool HasAnyConcreteManager();
+    bool HasAnyMultiStaManager();
     bool HasAnyManager();
     bool ConcreteIdExist(int id);
+    bool IsWifi2IdExist(int id);
     void MakeConcreteManager(ConcreteManagerRole role, int id);
+    void MakeMultiStaManager(MultiStaManager::Role role, int instId);
 #ifdef FEATURE_AP_SUPPORT
     bool HasAnySoftApManager();
     bool SoftApIdExist(int id);
@@ -133,14 +140,17 @@ private:
     void StopSoftapManager(int id);
     SoftApManager *GetSoftApManager(int id);
 #endif
-    bool ShouldEnableWifi();
+    bool ShouldDisableWifi(InternalMessagePtr msg);
+    bool ShouldEnableWifi(int id = 0);
     ConcreteManagerRole GetWifiRole();
     void StopAllConcreteManagers();
     void StopConcreteManager(int id);
+    void StopAllMultiStaManagers();
+    void StopMultiStaManager(int id);
     void SwitchRole(ConcreteManagerRole role);
     void HandleAirplaneOpen();
     void HandleAirplaneClose();
-    static bool IsWifiEnable();
+    static bool IsWifiEnable(int id = 0);
     static bool IsSemiWifiEnable();
     static bool IsScanOnlyEnable();
 
@@ -153,12 +163,13 @@ private:
     std::vector<ConcreteClientModeManager *> concreteManagers;
     mutable std::mutex concreteManagerMutex;
     static int mWifiStartFailCount;
-    static int mSoftapStartFailCount;
 #ifdef FEATURE_AP_SUPPORT
     std::vector<SoftApManager *> softapManagers;
     mutable std::mutex softapManagerMutex;
     uint64_t stopSoftapTimerId_ {0};
 #endif
+    mutable std::mutex multiStaManagerMutex;
+    std::vector<MultiStaManager *> multiStaManagers;
 };
 }  // namespace Wifi
 }  // namespace OHOS

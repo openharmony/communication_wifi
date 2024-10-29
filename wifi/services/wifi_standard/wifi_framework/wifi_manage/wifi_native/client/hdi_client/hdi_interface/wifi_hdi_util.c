@@ -568,6 +568,10 @@ static int HdiParseExtensionInfo(const uint8_t *pos, size_t elen,
             elems->oci = pos;
             elems->ociLen = elen;
             break;
+        case HDI_EID_EXT_EHT_CAPABILITIES_80211BE:
+            elems->ehtCapabilities80211Be = pos;
+            elems->ehtCapabilities80211BeLen = elen;
+            break;
         default:
             return -1;
     }
@@ -1049,6 +1053,7 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
         return -1;
     }
     pos += ret;
+    pos = HdiGetWifiCategoryTxt(pos, end, elems);
     ie = HdiBssGetVendorIe(scanResult->ie, scanResult->ieLen, HDI_IE_VENDOR_TYPE);
     if (ie)
         pos = HdiGetIeTxt(pos, end, "WPA", ie, HDI_POS_SECOND + ie[1]);

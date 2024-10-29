@@ -33,46 +33,53 @@ public:
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartTest_01, TestSize.Level1)
 {
-    WifiErrorNo result = HdiWpaStaStart(nullptr);
+    WifiErrorNo result = HdiWpaStaStart(nullptr, 0);
+    int instId = 0;
+    std::string ifaceName = "wlan0";
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
-    result = HdiWpaStaStart("wlan0");
+    result = HdiWpaStaStart(ifaceName.c_str(), instId);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStopTest_01, TestSize.Level1)
 {
-    WifiErrorNo result = HdiWpaStaStop();
+    int instId = 0;
+    WifiErrorNo result = HdiWpaStaStop(instId);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaConnectTest, TestSize.Level1)
 {
     int networkId = 1;
-    WifiErrorNo result = HdiWpaStaConnect(networkId);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaConnect(networkId, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaAddNetworkTest, TestSize.Level1)
 {
     int *networkId = nullptr;
-    WifiErrorNo result = HdiWpaStaAddNetwork(networkId);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaAddNetwork(networkId, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
 
     int workld = 1;
-    result = HdiWpaStaAddNetwork(&workld);
+    result = HdiWpaStaAddNetwork(&workld, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaDisableNetworkTest, TestSize.Level1)
 {
     int networkId = 1;
-    WifiErrorNo result = HdiWpaStaDisableNetwork(networkId);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaDisableNetwork(networkId, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSaveConfigTest, TestSize.Level1)
 {
-    WifiErrorNo result = HdiWpaStaSaveConfig();
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaSaveConfig(ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -80,29 +87,32 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartWpsPinModeTest, TestSize.Level1)
 {
     WifiWpsParam config;
     int pinCode;
-    WifiErrorNo result = HdiWpaStaStartWpsPinMode(nullptr, &pinCode);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaStartWpsPinMode(nullptr, &pinCode, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
-    result = HdiWpaStaStartWpsPinMode(&config, nullptr);
+    result = HdiWpaStaStartWpsPinMode(&config, nullptr, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
-    result = HdiWpaStaStartWpsPinMode(nullptr, nullptr);
+    result = HdiWpaStaStartWpsPinMode(nullptr, nullptr, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
-    result = HdiWpaStaStartWpsPinMode(&config, &pinCode);
+    result = HdiWpaStaStartWpsPinMode(&config, &pinCode, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaStartWpsPbcModeTest, TestSize.Level1)
 {
     WifiWpsParam config;
-    WifiErrorNo result = HdiWpaStaStartWpsPbcMode(nullptr);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaStartWpsPbcMode(nullptr, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
-    result = HdiWpaStaStartWpsPbcMode(&config);
+    result = HdiWpaStaStartWpsPbcMode(&config, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetCountryCodeTest, TestSize.Level1)
 {
     char countryCode[10] = "CN";
-    WifiErrorNo result = HdiWpaStaSetCountryCode(countryCode);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaSetCountryCode(countryCode, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -110,14 +120,16 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetCountryCodeTest, TestSize.Level1)
 {
     char countryCode[2];
     uint32_t size = 2;
-    WifiErrorNo result = HdiWpaStaGetCountryCode(countryCode, size);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaGetCountryCode(countryCode, size, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetSuspendModeTest, TestSize.Level1)
 {
     int mode = 1;
-    WifiErrorNo result = HdiWpaStaSetSuspendMode(mode);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaSetSuspendMode(mode, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -125,7 +137,8 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaListNetworksTest, TestSize.Level1)
 {
     struct HdiWifiWpaNetworkInfo networkList[10];
     uint32_t size = 10;
-    WifiErrorNo result = HdiWpaListNetworks(networkList, &size);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaListNetworks(networkList, &size, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -135,7 +148,8 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaGetNetworkTest, TestSize.Level1)
     const char *param = "param";
     char value[10];
     uint32_t valueLen = 10;
-    WifiErrorNo result = HdiWpaGetNetwork(networkId, param, value, valueLen);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaGetNetwork(networkId, param, value, valueLen, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -159,26 +173,30 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetPskPassphraseTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetPowerSaveTest, TestSize.Level1)
 {
     int enable = true;
-    WifiErrorNo result = HdiWpaStaSetPowerSave(enable);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaSetPowerSave(enable, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaBlocklistClearTest, TestSize.Level1)
 {
-    WifiErrorNo result = HdiWpaStaBlocklistClear();
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaBlocklistClear(ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaAutoConnectTest, TestSize.Level1)
 {
     int enable = true;
-    WifiErrorNo result = HdiWpaStaAutoConnect(enable);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaAutoConnect(enable, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiStopWpsStaTest, TestSize.Level1)
 {
-    WifiErrorNo result = HdiStopWpsSta();
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiStopWpsSta(ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -186,21 +204,24 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaSetNetworkTest, TestSize.Level1)
 {
     int networkId = 1;
     int size = 1;
-    WifiErrorNo result = HdiWpaStaSetNetwork(networkId, nullptr, size);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaSetNetwork(networkId, nullptr, size, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaEnableNetworkTest, TestSize.Level1)
 {
     int networkId = 2;
-    WifiErrorNo result = HdiWpaStaEnableNetwork(networkId);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaEnableNetwork(networkId, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaRemoveNetworkTest, TestSize.Level1)
 {
     int networkId = 3;
-    WifiErrorNo result = HdiWpaStaRemoveNetwork(networkId);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaRemoveNetwork(networkId, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -214,10 +235,11 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetDeviceMacAddressTest, TestSize.Level
 {
     char macAddr[18] = {0};
     int macAddrLen = 0;
-    WifiErrorNo result = HdiWpaStaGetDeviceMacAddress(nullptr, macAddrLen);
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaGetDeviceMacAddress(nullptr, macAddrLen, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
 
-    result = HdiWpaStaGetDeviceMacAddress(macAddr, macAddrLen);
+    result = HdiWpaStaGetDeviceMacAddress(macAddr, macAddrLen, ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
@@ -313,33 +335,38 @@ HWTEST_F(WifiHdiWpaStaImplTest, ConvertMacToStrSuccess, TestSize.Level1)
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaDisconnectTest, TestSize.Level1)
 {
-    WifiErrorNo result = HdiWpaStaDisconnect();
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaDisconnect(ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaReassociateTest, TestSize.Level1)
 {
-    WifiErrorNo result = HdiWpaStaReassociate();
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaReassociate(ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaReconnectTest, TestSize.Level1)
 {
-    WifiErrorNo result = HdiWpaStaReconnect();
+    std::string ifaceName = "wlan0";
+    WifiErrorNo result = HdiWpaStaReconnect(ifaceName.c_str());
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetScanInfosTest, TestSize.Level1)
 {
     int *size = nullptr;
-    ScanInfo *result = HdiWpaStaGetScanInfos(size);
+    std::string ifaceName = "wlan0";
+    ScanInfo *result = HdiWpaStaGetScanInfos(size, ifaceName.c_str());
     EXPECT_EQ(result, NULL);
 }
 
 HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetScanInfosTest1, TestSize.Level1)
 {
     int size = 1;
-    ScanInfo *result = HdiWpaStaGetScanInfos(&size);
+    std::string ifaceName = "wlan0";
+    ScanInfo *result = HdiWpaStaGetScanInfos(&size, ifaceName.c_str());
     EXPECT_EQ(result, NULL);
 }
 }

@@ -24,9 +24,12 @@
 #include <vector>
 #include "wifi_internal_msg.h"
 #include "wifi_settings.h"
+#include "wifi_scan_config.h"
 
 #define SOFT_BUS_SERVICE_UID 1024
 #define CAST_ENGINE_SERVICE_UID 5526
+#define MIRACAST_SERVICE_UID 5529
+#define MIRACAST_SERVICE_SA_ID 5527
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
@@ -37,6 +40,8 @@ public:
     ~WifiConfigCenter();
 
     int Init();
+
+    std::unique_ptr<WifiScanConfig>& GetWifiScanConfig();
 
     void SetWifiSelfcureReset(const bool isReset);
 
@@ -62,9 +67,9 @@ public:
 
     bool GetWifiStopState() const;
 
-    void SetStaIfaceName(const std::string &ifaceName);
+    void SetStaIfaceName(const std::string &ifaceName, int instId = 0);
 
-    std::string GetStaIfaceName();
+    std::string GetStaIfaceName(int instId = 0);
 
     int GetWifiState(int instId = 0);
 
@@ -105,8 +110,6 @@ public:
     int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0);
 
     int SaveLinkedInfo(const WifiLinkedInfo &info, int instId = 0);
-
-    void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth, int instId = 0);
 
     int SetMacAddress(const std::string &macAddress, int instId = 0);
 
@@ -278,9 +281,9 @@ public:
 
     int GetAirplaneModeState() const;
 
-    int GetWifiToggledEnable();
+    int GetWifiToggledEnable(int id = 0);
 
-    void SetWifiToggledState(int state);
+    void SetWifiToggledState(int state, int id = 0);
 
     void SetPowerSavingModeState(const int &state);
 
@@ -311,20 +314,24 @@ public:
 
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
 
+    std::set<int> GetAllWifiLinkedNetworkId();
+
+    void SetPersistWifiState(int state, int instId);
+
+    int GetPersistWifiState(int instId);
+
+    bool HasWifiActive();
+	
+    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
+	
+    void UpdateLinkedInfo(int instId = 0);
 private:
     WifiConfigCenter();
-    bool HasWifiActive();
-    void UpdateLinkedInfo(int instId = 0);
-    void InitScanControlForbidList();
-    void InitScanControlIntervalList();
-    void SetPersistWifiState(int state);
-    int GetPersistWifiState();
     std::string GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
         const WifiMacAddrInfo &macAddrInfo);
     WifiMacAddrErrCode InsertMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
         const WifiMacAddrInfo &macAddrInfo, std::string& randomMacAddr);
     void DelMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo);
-    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
     WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo,
         std::string randomMacAddr);
 
@@ -337,7 +344,7 @@ private:
     std::atomic<int> mSelectedCandidateNetworkId {INVALID_NETWORK_ID};
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
-    std::string mStaIfaceName {"wlan0"};
+    std::vector<std::string> mStaIfaceName = {"wlan0", "wlan1"};
     std::map<int, std::atomic<int>> mWifiState;
     std::map<int, WifiDetailState> mWifiDetailState;
     std::map<int, std::atomic<WifiOprMidState>> mStaMidState;
@@ -358,6 +365,7 @@ private:
     std::mutex mScanMutex;
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
+    std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
     std::map<int, ScanControlInfo> mScanControlInfo;
     std::map<std::string, WifiCategory> mWifiCategoryRecord;
     std::vector<std::string> mAbnormalAppList;
@@ -399,7 +407,7 @@ private:
     std::atomic<int> mGnssFixState {MODE_STATE_CLOSE};
     std::atomic<int> mScanGenieState {MODE_STATE_OPEN};
     std::atomic<int> mAirplaneModeState {MODE_STATE_CLOSE};
-    std::atomic<int> mPersistWifiState {WIFI_STATE_DISABLED};
+    std::vector<int> mPersistWifiState {std::vector<int>(2, WIFI_STATE_DISABLED)};
     std::atomic<int> mPowerSavingModeState {MODE_STATE_CLOSE};
     std::atomic<int> mFreezeModeState {MODE_STATE_CLOSE};
     std::atomic<int> mNoChargerPlugModeState {MODE_STATE_CLOSE};

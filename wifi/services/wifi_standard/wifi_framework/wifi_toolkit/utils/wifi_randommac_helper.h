@@ -108,6 +108,14 @@ public:
      * @return std::string - formated string
      */
     static std::string BytesArrayToString(const std::vector<uint8_t> &bytes);
+
+    /**
+    * @Description  change random mac for wifi2
+    *for example, input mac is 00:1a:2b:3c:4d:5e, this func will change pos 3 byte mac from "3c" to "bc" by
+    *performing an XOR operation with 0x80
+    * @param wifi2RandomMac - wifi2RandomMac
+    */
+    static bool GetWifi2RandomMac(std::string &wifi2RandomMac);
 };
 }
 }

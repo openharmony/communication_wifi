@@ -16,6 +16,7 @@
 #ifndef WIFI_COUNTRY_CODE_MANAGER
 #define WIFI_COUNTRY_CODE_MANAGER
 
+#include <bitset>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -130,6 +131,13 @@ public:
      * @Description disable WifiCountryCodeManager equals sign opertaor
      */
     WifiCountryCodeManager &operator=(const WifiCountryCodeManager &) = delete;
+
+    /**
+     * @Description trigger update wifi country code
+     *
+     * @param triggerReason trigger reason
+     */
+    void TriggerUpdateWifiCountryCode(int triggerReason);
 private:
 #ifdef FEATURE_STA_SUPPORT
     StaServiceCallback m_staCallback;
@@ -142,6 +150,7 @@ private:
     std::shared_ptr<WifiCountryCodePolicy> m_wifiCountryCodePolicy;
     std::mutex m_countryCodeMutex;
     bool m_isFirstConnected = false;
+    std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf_;
 
     WifiCountryCodeManager() = default;
     void SendCountryCodeChangeCommonEvent(const std::string &wifiCountryCode);
@@ -156,6 +165,7 @@ private:
     ErrCode UpdateWifiCountryCodeCache(const std::string &wifiCountryCode);
     void NotifyWifiCountryCodeChangeListeners(const std::string &wifiCountryCode);
     ErrCode UnregisterWifiCountryCodeChangeListener(const std::string &moduleName);
+    std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> GetWifiCountryCodePolicy();
 };
 }
 }

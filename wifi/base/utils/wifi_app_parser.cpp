@@ -33,6 +33,7 @@ constexpr auto XML_TAG_SECTION_HEADER_MONITOR_APP = "MonitorAPP";
 constexpr auto XML_TAG_SECTION_HEADER_GAME_INFO = "GameInfo";
 constexpr auto XML_TAG_SECTION_HEADER_APP_WHITE_LIST = "AppWhiteList";
 constexpr auto XML_TAG_SECTION_HEADER_APP_BLACK_LIST = "AppBlackList";
+constexpr auto XML_TAG_SECTION_HEADER_MULTILINK_BLACK_LIST = "MultiLinkBlackList";
 constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
 constexpr auto XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP = "HighTempLimitSpeedApp";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
@@ -45,6 +46,7 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_GAME_INFO, AppType::LOW_LATENCY_APP },
     { XML_TAG_SECTION_HEADER_APP_WHITE_LIST, AppType::WHITE_LIST_APP },
     { XML_TAG_SECTION_HEADER_APP_BLACK_LIST, AppType::BLACK_LIST_APP },
+    { XML_TAG_SECTION_HEADER_MULTILINK_BLACK_LIST, AppType::MULTILINK_BLACK_LIST_APP },
     { XML_TAG_SECTION_HEADER_CHARIOT_APP, AppType::CHARIOT_APP },
     {XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP, AppType::HIGH_TEMP_LIMIT_SPEED_APP},
 };
@@ -97,6 +99,12 @@ bool AppParser::IsBlackListApp(const std::string &bundleName) const
 {
     return std::any_of(m_blackAppVec.begin(), m_blackAppVec.end(),
         [bundleName](const BlackListAppInfo &app) { return app.packageName == bundleName; });
+}
+
+bool AppParser::IsMultiLinkApp(const std::string &bundleName) const
+{
+    return std::any_of(m_multilinkAppVec.begin(), m_multilinkAppVec.end(),
+        [bundleName](const MultiLinkAppInfo &app) { return app.packageName == bundleName; });
 }
 
 bool AppParser::IsChariotApp(const std::string &bundleName) const
@@ -162,6 +170,7 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
     m_lowLatencyAppVec.clear();
     m_whiteAppVec.clear();
     m_blackAppVec.clear();
+    m_multilinkAppVec.clear();
     m_chariotAppVec.clear();
     m_highTempLimitSpeedAppVec.clear();
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
@@ -174,6 +183,9 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
                 break;
             case AppType::BLACK_LIST_APP:
                 m_blackAppVec.push_back(ParseBlackAppInfo(node));
+                break;
+            case AppType::MULTILINK_BLACK_LIST_APP:
+                m_multilinkAppVec.push_back(ParseMultiLinkAppInfo(node));
                 break;
             case AppType::CHARIOT_APP:
                 m_chariotAppVec.push_back(ParseChariotAppInfo(node));
@@ -188,6 +200,8 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
     }
     WIFI_LOGI("%{public}s out,m_highTempLimitSpeedAppVec count:%{public}d!",
         __FUNCTION__, (int)m_highTempLimitSpeedAppVec.size());
+    WIFI_LOGI("%{public}s out,m_multilinkAppVec count:%{public}d!",
+        __FUNCTION__, (int)m_multilinkAppVec.size());
 }
 
 LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
@@ -216,6 +230,17 @@ BlackListAppInfo AppParser::ParseBlackAppInfo(const xmlNodePtr &innode)
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
     std::string packageName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = packageName;
+    xmlFree(value);
+    return appInfo;
+}
+
+MultiLinkAppInfo AppParser::ParseMultiLinkAppInfo(const xmlNodePtr &innode)
+{
+    MultiLinkAppInfo appInfo;
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    WIFI_LOGD("%{public}s packageName:%{public}s", __FUNCTION__, packageName.c_str());
     xmlFree(value);
     return appInfo;
 }

@@ -20,10 +20,10 @@
 namespace OHOS {
 namespace Wifi {
 
-#define SFOT_AP_TIME_OUT 10000
+#define SOFT_AP_TIME_OUT 10000
 #define WIFI_OPEN_RETRY_MAX_COUNT 3
-#define AP_OPEN_RETRY_MAX_COUNT 3
 #define WIFI_OPEN_RETRY_TIMEOUT 1000
+#define WIFI_OPEN_TIMEOUT 5000
 
 #define CMD_WIFI_TOGGLED 0x1
 #define CMD_SOFTAP_TOGGLED 0x2
@@ -34,10 +34,10 @@ namespace Wifi {
 #define CMD_AP_START_FAILURE 0x7
 #define CMD_AP_START 0x8
 #define CMD_AIRPLANE_TOGGLED 0x9
+#define CMD_WIFI_TOGGLED_TIMEOUT 0xA
 #define CMD_AP_START_TIME 0x10
 #define CMD_AP_STOP_TIME 0x11
 #define CMD_OPEN_WIFI_RETRY 0x12
-#define CMD_AP_SERVICE_START_FAILURE 0x13
 #define CMD_STA_REMOVED 0x14
 #define CMD_CONCRETECLIENT_REMOVED 0x15
 #define CMD_AP_REMOVED 0x16
@@ -50,9 +50,16 @@ namespace Wifi {
 #define CONCRETE_CMD_STOP 0x106
 #define CONCRETE_CMD_STA_SEMI_ACTIVE 0x107
 #define CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE 0x108
+#define CONCRETE_CMD_STA_REMOVED 0x109
 
 #define SOFTAP_CMD_START 0x201
 #define SOFTAP_CMD_STOP 0x202
+
+#define MULTI_STA_CMD_START 0x301
+#define MULTI_STA_CMD_STOP 0x302
+#define MULTI_STA_CMD_STARTED 0x303
+#define MULTI_STA_CMD_STOPPED 0x304
+#define CMD_MULTI_STA_STOPPED 0x305
 
 #define STOP_WIFI_WAIT_TIME 100
 
@@ -63,6 +70,11 @@ struct ConcreteModeCallback {
 };
 
 struct SoftApModeCallback {
+    std::function<void(int)> onStopped;
+    std::function<void(int)> onStartFailure;
+};
+
+struct MultiStaModeCallback {
     std::function<void(int)> onStopped;
     std::function<void(int)> onStartFailure;
 };

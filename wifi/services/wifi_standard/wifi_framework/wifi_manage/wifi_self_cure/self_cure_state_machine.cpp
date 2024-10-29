@@ -661,6 +661,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleResetConnectNetwork(I
     }
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset() ||
         pSelfCureStateMachine->connectNetworkRetryCnt > CONNECT_NETWORK_RETRY) {
+        WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
         return;
     }
     pSelfCureStateMachine->connectNetworkRetryCnt++;
@@ -775,6 +776,8 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     userSetStaticIpConfig = ipAssignment == AssignIpMethod::STATIC;
     lastHasInetTime = pSelfCureStateMachine->GetLastHasInternetTime();
     configAuthType = pSelfCureStateMachine->GetAuthType();
+    WIFI_LOGI("hasInternetRecently: %{public}d, portalUnthenEver: %{public}d, selfCureHistoryInfo: %{public}s",
+        hasInternetRecently, portalUnthenEver, pSelfCureStateMachine->GetSelfCureHistoryInfo().c_str());
     return;
 }
 
@@ -1182,6 +1185,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForDns()
         GetPublicDnsServers(publicDnsServers);
         UpdateDnsServers(publicDnsServers);
     }
+    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::DNS_ABNORMAL));
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, DNS_UPDATE_CONFIRM_DELAYED_MS);
 }
 
@@ -1406,7 +1410,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     }
     WIFI_LOGI("begin to self cure for internet access: Reset");
     WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
-    pSelfCureStateMachine->UpdateSelfcureState(static_cast<int>(SelfCureType::SCE_TYPE_RESET), true);
     pSelfCureStateMachine->StopTimer(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK);
     delayedResetSelfCure = false;
     testedSelfCureLevel.push_back(requestCureLevel);
@@ -1414,15 +1417,9 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     WifiLinkedInfo wifiLinkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
     WifiConfigCenter::GetInstance().SetLastNetworkId(wifiLinkedInfo.networkId);
-    WifiConfigCenter::GetInstance().SetWifiSelfcureReset(true);
     pSelfCureStateMachine->UpdateSelfCureHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
     pSelfCureStateMachine->SetSelfCureHistoryInfo(selfCureHistoryInfo.GetSelfCureHistory());
-    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
-    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
-        WIFI_LOGI("GetWifiTogglerManager is nullptr");
-        return;
-    }
-    WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 0);
+    pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
 }
 
 bool SelfCureStateMachine::InternetSelfCureState::SelectedSelfCureAcceptable()
@@ -1473,7 +1470,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleIpConfigTimeout()
     pSelfCureStateMachine->selfCureOnGoing = false;
     isRenewDhcpTimeout = true;
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     if (currentAbnormalType == WIFI_CURE_INTERNET_FAILED_TYPE_ROAMING &&
         pSelfCureStateMachine->IsEncryptedAuthType(configAuthType) &&
         pSelfCureStateMachine->GetBssidCounter(scanResults) <= DEAUTH_BSSID_CNT && !finalSelfCureUsed) {
@@ -2368,7 +2365,7 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
         return false;
     }
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     if (GetBssidCounter(scanResults) < MULTI_BSSID_NUM) {
         WIFI_LOGI("not multi bssid condition!");
         return false;
@@ -2403,21 +2400,25 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
 int SelfCureStateMachine::String2InternetSelfCureHistoryInfo(const std::string selfCureHistory,
                                                              WifiSelfCureHistoryInfo &info)
 {
+    WifiSelfCureHistoryInfo selfCureHistoryInfo;
     if (selfCureHistory.empty()) {
         WIFI_LOGE("InternetSelfCureHistoryInfo is empty!");
+        info = selfCureHistoryInfo;
         return -1;
     }
     std::vector<std::string> histories = TransStrToVec(selfCureHistory, '|');
     if (histories.size() != SELFCURE_HISTORY_LENGTH) {
         WIFI_LOGE("self cure history length = %{public}lu", (unsigned long) histories.size());
+        info = selfCureHistoryInfo;
         return -1;
     }
-    if (SetSelfCureFailInfo(info, histories, SELFCURE_FAIL_LENGTH) != 0) {
+    if (SetSelfCureFailInfo(selfCureHistoryInfo, histories, SELFCURE_FAIL_LENGTH) != 0) {
         WIFI_LOGE("set self cure history information failed!");
     }
-    if (SetSelfCureConnectFailInfo(info, histories, SELFCURE_FAIL_LENGTH) != 0) {
+    if (SetSelfCureConnectFailInfo(selfCureHistoryInfo, histories, SELFCURE_FAIL_LENGTH) != 0) {
         WIFI_LOGE("set self cure connect history information failed!");
     }
+    info = selfCureHistoryInfo;
     return 0;
 }
 

@@ -102,9 +102,11 @@ void HalDeviceManager::StopChipHdi()
 }
 
 bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback,
-                                      const RssiReportCallback &rssiReportCallback, std::string &ifaceName)
+                                      const RssiReportCallback &rssiReportCallback, std::string &ifaceName, int instId)
 {
+    LOGI("CreateStaIface, ifaceName: %{public}s, instId = %{public}d", ifaceName.c_str(), instId);
     if (!CheckReloadChipHdiService()) {
+        LOGE("CreateStaIface CheckReloadChipHdiService failed");
         return false;
     }
 
@@ -117,14 +119,17 @@ bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCa
 
     CHECK_NULL_AND_RETURN(iface, false);
     CHECK_NULL_AND_RETURN(g_chipIfaceCallback, false);
-    int32_t ret = iface->RegisterChipIfaceCallBack(g_chipIfaceCallback);
-    if (ret != HDF_SUCCESS) {
-        LOGE("CreateStaIface, call RegisterChipIfaceCallBack failed! ret:%{public}d", ret);
-        return false;
+    if (instId == INSTID_WLAN0) {
+        int32_t ret = iface->RegisterChipIfaceCallBack(g_chipIfaceCallback);
+        if (ret != HDF_SUCCESS) {
+            LOGE("CreateStaIface, call RegisterChipIfaceCallBack failed! ret:%{public}d", ret);
+            return false;
+        }
+        g_rssiReportCallback = rssiReportCallback;
+    } else {
+        LOGE("CreateStaIface wlan1 skip scan callback instId = %{public}d", instId);
     }
-
-    g_rssiReportCallback = rssiReportCallback;
-
+    
     mIWifiStaIfaces[ifaceName] = iface;
     LOGI("CreateStaIface success! ifaceName:%{public}s", ifaceName.c_str());
     return true;
@@ -490,7 +495,7 @@ bool HalDeviceManager::SetNetworkUpDown(const std::string &ifaceName, bool upDow
     return true;
 }
 
-bool HalDeviceManager::GetChipsetCategory(const std::string &ifaceName, int &chipsetCategory)
+bool HalDeviceManager::GetChipsetCategory(const std::string &ifaceName, uint32_t &chipsetCategory)
 {
     if (!CheckReloadChipHdiService()) {
         return false;
@@ -505,13 +510,11 @@ bool HalDeviceManager::GetChipsetCategory(const std::string &ifaceName, int &chi
     }
 
     CHECK_NULL_AND_RETURN(chip, false);
-    uint32_t capabilities = 0;
-    int32_t ret = chip->GetChipCaps(capabilities);
+    int32_t ret = chip->GetChipCaps(chipsetCategory);
     if (ret != HDF_SUCCESS) {
         LOGE("GetChipsetCategory, call GetChipCaps failed! ret:%{public}d", ret);
         return false;
     }
-    chipsetCategory = capabilities;
     LOGI("GetChipsetCategory success");
     return true;
 }
@@ -1380,7 +1383,7 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
 
     IfaceType ifaceType = IFACE_TYPE_DEFAULT;
     if (!GetIfaceType(iface, ifaceType)) {
-        LOGE("RemoveIface, get iface type failed");
+        LOGI("RemoveIface, get iface type failed");
         return false;
     }
 
@@ -1393,11 +1396,14 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
     CHECK_NULL_AND_RETURN(chip, false);
     int32_t ret = HDF_FAILURE;
     switch (ifaceType) {
-        case IfaceType::STA :
-            if (iface && g_chipIfaceCallback) {
-                iface->UnRegisterChipIfaceCallBack(g_chipIfaceCallback);
+        case IfaceType::STA:
+            if (ifaceName == "wlan0") {
+                LOGE("RemoveIface, IfaceType::STA wlan0");
+                if (iface && g_chipIfaceCallback) {
+                    iface->UnRegisterChipIfaceCallBack(g_chipIfaceCallback);
+                }
+                g_rssiReportCallback = nullptr;
             }
-            g_rssiReportCallback = nullptr;
             ret = chip->RemoveStaService(ifaceName);
             break;
         case IfaceType::AP :

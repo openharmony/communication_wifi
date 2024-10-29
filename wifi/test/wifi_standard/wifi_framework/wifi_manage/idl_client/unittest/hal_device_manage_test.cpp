@@ -32,10 +32,13 @@ void WifiHalDeviceManagerTest::OnRssiReportCallback(int index, int antRssi)
 HWTEST_F(WifiHalDeviceManagerTest, ScanTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
+    HalDeviceManager::g_chipHdiServiceDied = true;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     ScanParams scanParams;
     DelayedSingleton<HalDeviceManager>::GetInstance()->Scan(ifaceName, scanParams);
 }
@@ -43,10 +46,13 @@ HWTEST_F(WifiHalDeviceManagerTest, ScanTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, StartPnoScanTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
+    HalDeviceManager::g_chipHdiServiceDied = true;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     PnoScanParams pnoScanParams;
     DelayedSingleton<HalDeviceManager>::GetInstance()->StartPnoScan(ifaceName, pnoScanParams);
 }
@@ -54,20 +60,24 @@ HWTEST_F(WifiHalDeviceManagerTest, StartPnoScanTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, StopPnoScanTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     DelayedSingleton<HalDeviceManager>::GetInstance()->StopPnoScan(ifaceName);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     std::vector<ScanResultsInfo> scanResultsInfo;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetScanInfos(ifaceName, scanResultsInfo);
 }
@@ -75,10 +85,12 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, GetConnectSignalInfoTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     SignalPollResult signalPollResult;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetConnectSignalInfo(ifaceName, signalPollResult);
 }
@@ -86,10 +98,12 @@ HWTEST_F(WifiHalDeviceManagerTest, GetConnectSignalInfoTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, SetPmModeTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     int mode = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->SetPmMode(ifaceName, mode);
 }
@@ -97,10 +111,12 @@ HWTEST_F(WifiHalDeviceManagerTest, SetPmModeTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, SetDpiMarkRuleTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     int uid = 0;
     int protocol = 0;
     int enable = 0;
@@ -110,10 +126,12 @@ HWTEST_F(WifiHalDeviceManagerTest, SetDpiMarkRuleTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, SetStaMacAddressTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     std::string mac{"12:34:56:78:90:AB"};
     DelayedSingleton<HalDeviceManager>::GetInstance()->SetStaMacAddress(ifaceName, mac);
 }
@@ -128,17 +146,20 @@ HWTEST_F(WifiHalDeviceManagerTest, SetNetworkUpDownTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, GetChipsetCategoryTest, TestSize.Level1)
 {
     std::string ifaceName{"wlan0"};
-    int chipsetCategory = 0;
+    unsigned int chipsetCategory = 0;
+    HalDeviceManager::g_chipHdiServiceDied = true;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetCategory(ifaceName, chipsetCategory);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetChipsetWifiFeatrureCapabilityTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     int chipsetFeatrureCapability = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetWifiFeatrureCapability(
         ifaceName, chipsetFeatrureCapability);
@@ -147,8 +168,11 @@ HWTEST_F(WifiHalDeviceManagerTest, GetChipsetWifiFeatrureCapabilityTest, TestSiz
 HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
-        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
+        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
+        ifaceName,
+        instId);
     int32_t band = 0;
     std::vector<int> frequencies;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies);
@@ -156,7 +180,8 @@ HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest, TestSize.Level1)
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies);
 }
 
@@ -189,7 +214,8 @@ HWTEST_F(WifiHalDeviceManagerTest, SetWifiCountryCodeTest, TestSize.Level1)
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     code = "CN";
     DelayedSingleton<HalDeviceManager>::GetInstance()->SetWifiCountryCode(ifaceName, code);
 }
@@ -206,10 +232,12 @@ HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, SelectInterfacesToDeleteTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     WifiChipInfo wifiChipInfo;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipInfo(0, wifiChipInfo);
     IfaceType ifaceType = IfaceType::STA;
@@ -221,10 +249,12 @@ HWTEST_F(WifiHalDeviceManagerTest, SelectInterfacesToDeleteTest, TestSize.Level1
 HWTEST_F(WifiHalDeviceManagerTest, CreateTheNeedChangeChipModeIfaceDataTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     UsableMode chipMode;
     IfaceCreationData ifaceCreationData;
     WifiChipInfo wifiChipInfo;
@@ -242,10 +272,12 @@ HWTEST_F(WifiHalDeviceManagerTest, CreateTheNeedChangeChipModeIfaceDataTest, Tes
 HWTEST_F(WifiHalDeviceManagerTest, CompareIfaceCreationDataTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     WifiIfaceInfo ifaceInfo;
     IfaceCreationData data1;
     DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipInfo(0, data1.chipInfo);
@@ -271,10 +303,12 @@ HWTEST_F(WifiHalDeviceManagerTest, DispatchIfaceDestoryCallbackTest, TestSize.Le
 {
     IfaceType ifaceType = IfaceType::STA;
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     DelayedSingleton<HalDeviceManager>::GetInstance()->DispatchIfaceDestoryCallback(
         ifaceName, ifaceType, true, ifaceType);
 
@@ -294,10 +328,12 @@ HWTEST_F(WifiHalDeviceManagerTest, DispatchIfaceDestoryCallbackTest, TestSize.Le
 HWTEST_F(WifiHalDeviceManagerTest, RemoveStaIfaceTest, TestSize.Level1)
 {
     std::string ifaceName;
+    int instId = 0;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
 }
 
@@ -320,11 +356,13 @@ HWTEST_F(WifiHalDeviceManagerTest, RemoveP2pIfaceTest, TestSize.Level1)
 HWTEST_F(WifiHalDeviceManagerTest, CreateStaIfaceTest, TestSize.Level1)
 {
     std::string ifaceName = "Wlan0";
+    int instId = 0;
     HalDeviceManager::g_chipHdiServiceDied = true;
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName);
+        ifaceName,
+        instId);
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
     EXPECT_EQ(result, false);
 }

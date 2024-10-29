@@ -131,14 +131,23 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg
 #endif
         case CMD_WIFI_TOGGLED:
         case CMD_SCAN_ALWAYS_MODE_CHANGED:
-            if (pWifiControllerMachine->ShouldEnableWifi()) {
-                ConcreteManagerRole role = pWifiControllerMachine->GetWifiRole();
-                if (role == ConcreteManagerRole::ROLE_UNKNOW) {
+            if (!pWifiControllerMachine->ShouldEnableWifi(msg->GetParam2())) {
+                WIFI_LOGW("keep disable, shouldn't enabled wifi.");
+                break;
+            }
+            if (msg->GetParam2() == INSTID_WLAN1) {
+                pWifiControllerMachine->MakeMultiStaManager(MultiStaManager::Role::ROLE_STA_WIFI_2, msg->GetParam2());
+                pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
+            } else if (msg->GetParam2() == INSTID_WLAN0) {
+                ConcreteManagerRole roleStaWifi1 = pWifiControllerMachine->GetWifiRole();
+                if (roleStaWifi1 == ConcreteManagerRole::ROLE_UNKNOW) {
                     WIFI_LOGE("Get unknow wifi role, break");
                     break;
                 }
-                pWifiControllerMachine->MakeConcreteManager(role, msg->GetParam2());
+                pWifiControllerMachine->MakeConcreteManager(roleStaWifi1, msg->GetParam2());
                 pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
+            } else {
+                WIFI_LOGE("DisableState, invalid instance id");
             }
             break;
         case CMD_AIRPLANE_TOGGLED:
@@ -206,10 +215,14 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
 #endif
         case CMD_STA_START_FAILURE:
-            HandleStaStartFailure(msg->GetParam1());
+            msg->GetParam1() == INSTID_WLAN0 ?
+                HandleStaStartFailure(INSTID_WLAN0) : pWifiControllerMachine->RemoveMultiStaManager(INSTID_WLAN1);
             break;
         case CMD_CONCRETE_STOPPED:
-            pWifiControllerMachine->HandleConcreteStop(msg->GetParam1());
+            pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0);
+            break;
+        case CMD_MULTI_STA_STOPPED:
+            pWifiControllerMachine->RemoveMultiStaManager(INSTID_WLAN1);
             break;
         case CMD_AIRPLANE_TOGGLED:
             if (msg->GetParam1()) {
@@ -222,7 +235,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, 0);
             break;
         case CMD_STA_REMOVED:
-            HandleStaRemoved(msg);
+            INSTID_WLAN0 == msg->GetParam2() ? HandleStaRemoved(msg) : HandleWifi2Removed(msg);
             break;
         case CMD_CONCRETECLIENT_REMOVED:
             HandleConcreteClientRemoved(msg);
@@ -233,7 +246,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
 #endif
             break;
         default:
-            return false;
+            break;
     }
     return true;
 }
@@ -279,8 +292,8 @@ void WifiControllerMachine::HandleAirplaneOpen()
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     StopAllSoftapManagers();
 #endif
-    if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() ||
-        WifiConfigCenter::GetInstance().GetWifiDetailState() == WifiDetailState::STATE_SEMI_ACTIVE) {
+    if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() || !ShouldEnableWifi(INSTID_WLAN0)) {
+        StopAllMultiStaManagers();
         StopAllConcreteManagers();
     }
 }
@@ -291,7 +304,7 @@ void WifiControllerMachine::HandleAirplaneClose()
 #ifndef OHOS_ARCH_LITE
     WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetWifiAllowSemiActiveByDatashare();
 #endif
-    if (!ShouldEnableWifi() || WifiConfigCenter::GetInstance().GetWifiStopState()) {
+    if (!ShouldEnableWifi(INSTID_WLAN0) || WifiConfigCenter::GetInstance().GetWifiStopState()) {
         return;
     }
 #ifdef FEATURE_AP_SUPPORT
@@ -356,6 +369,22 @@ bool WifiControllerMachine::ConcreteIdExist(int id)
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
         if ((*iter)->mid == id) {
+            WIFI_LOGI("concreteManagers is match");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool WifiControllerMachine::IsWifi2IdExist(int id)
+{
+    if (!HasAnyMultiStaManager()) {
+        return false;
+    }
+    std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+    for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
+        if ((*iter)->mid == id) {
+            WIFI_LOGI("multiStaManagers is match");
             return true;
         }
     }
@@ -366,6 +395,17 @@ bool WifiControllerMachine::HasAnyConcreteManager()
 {
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     if (concreteManagers.empty()) {
+        WIFI_LOGE("Enter HasAnyConcreteManager is empty");
+        return false;
+    }
+    return true;
+}
+
+bool WifiControllerMachine::HasAnyMultiStaManager()
+{
+    std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+    if (multiStaManagers.empty()) {
+        WIFI_LOGE("Enter HasAnyMultiStaManager is empty");
         return false;
     }
     return true;
@@ -386,7 +426,7 @@ bool WifiControllerMachine::HasAnySoftApManager()
 
 bool WifiControllerMachine::HasAnyManager()
 {
-    if (!HasAnyConcreteManager()
+    if (!HasAnyConcreteManager() && !HasAnyMultiStaManager()
 #ifdef FEATURE_AP_SUPPORT
         && !HasAnySoftApManager()
 #endif
@@ -404,6 +444,20 @@ void WifiControllerMachine::MakeConcreteManager(ConcreteManagerRole role, int id
     clientmode->InitConcreteManager();
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     concreteManagers.push_back(clientmode);
+}
+
+void WifiControllerMachine::MakeMultiStaManager(MultiStaManager::Role role, int instId)
+{
+    WIFI_LOGI("Enter MakeMultiStaManager");
+    MultiStaManager *multiStaMode = new (std::nothrow) MultiStaManager(role, instId);
+    if (multiStaMode == nullptr) {
+        WIFI_LOGE("new multiStaMode failed");
+        return;
+    }
+    multiStaMode->RegisterCallback(WifiManager::GetInstance().GetWifiTogglerManager()->GetMultiStaCallback());
+    multiStaMode->InitMultiStaManager();
+    std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+    multiStaManagers.push_back(multiStaMode);
 }
 
 #ifdef FEATURE_AP_SUPPORT
@@ -425,15 +479,30 @@ bool WifiControllerMachine::ShouldEnableSoftap()
 }
 #endif
 
-bool WifiControllerMachine::ShouldEnableWifi()
+bool WifiControllerMachine::ShouldDisableWifi(InternalMessagePtr msg)
+{
+    auto currState = WifiConfigCenter::GetInstance().GetWifiDetailState(msg->GetParam2());
+    if (WifiConfigCenter::GetInstance().GetWifiToggledEnable() == WIFI_STATE_SEMI_ENABLED &&
+        (currState == WifiDetailState::STATE_ACTIVATED || currState == WifiDetailState::STATE_ACTIVATING) &&
+        msg->GetMessageName() == CMD_WIFI_TOGGLED && ConcreteIdExist(msg->GetParam2())) {
+        WIFI_LOGI("Should disable wifi");
+        return true;
+    }
+    return !ShouldEnableWifi(msg->GetParam2());
+}
+
+bool WifiControllerMachine::ShouldEnableWifi(int id)
 {
     WIFI_LOGI("Enter ShouldEnableWifi");
+    if (id == INSTID_WLAN1) {
+        return WifiConfigCenter::GetInstance().GetWifiToggledEnable(INSTID_WLAN0) == WIFI_STATE_ENABLED;
+    }
 #ifndef OHOS_ARCH_LITE
     if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
         return false;
     }
 #endif
-    if (WifiConfigCenter::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED || IsScanOnlyEnable()) {
+    if (WifiConfigCenter::GetInstance().GetWifiToggledEnable(id) != WIFI_STATE_DISABLED || IsScanOnlyEnable()) {
         WIFI_LOGI("Should start wifi or scanonly.");
         return true;
     }
@@ -457,9 +526,9 @@ ConcreteManagerRole WifiControllerMachine::GetWifiRole()
     }
 }
 
-bool WifiControllerMachine::IsWifiEnable()
+bool WifiControllerMachine::IsWifiEnable(int id)
 {
-    return WifiConfigCenter::GetInstance().GetWifiToggledEnable() == WIFI_STATE_ENABLED;
+    return WifiConfigCenter::GetInstance().GetWifiToggledEnable(id) == WIFI_STATE_ENABLED;
 }
 
 bool WifiControllerMachine::IsSemiWifiEnable()
@@ -494,6 +563,7 @@ void WifiControllerMachine::StopAllConcreteManagers()
     }
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
+        WIFI_LOGD("Enter StopAllConcreteManagers. mid = %{public}d", (*iter)->mid);
         (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STOP);
     }
 }
@@ -512,6 +582,33 @@ void WifiControllerMachine::StopConcreteManager(int id)
         }
     }
     return;
+}
+
+void WifiControllerMachine::StopMultiStaManager(int id)
+{
+    WIFI_LOGI("Enter StopMultiStaManager, id = %{public}d", id);
+    if (!HasAnyMultiStaManager()) {
+        return;
+    }
+    std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+    for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
+        if ((*iter)->mid == id) {
+            (*iter)->GetMultiStaMachine()->SendMessage(MULTI_STA_CMD_STOP);
+            return;
+        }
+    }
+}
+
+void WifiControllerMachine::StopAllMultiStaManagers()
+{
+    WIFI_LOGI("Enter StopAllMultiStaManagers");
+    if (!HasAnyMultiStaManager()) {
+        return;
+    }
+    std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+    for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
+        (*iter)->GetMultiStaMachine()->SendMessage(MULTI_STA_CMD_STOP);
+    }
 }
 
 #ifdef FEATURE_AP_SUPPORT
@@ -564,6 +661,29 @@ void WifiControllerMachine::RemoveConcreteManager(int id)
     }
 }
 
+void WifiControllerMachine::RemoveMultiStaManager(int id)
+{
+    MultiStaManager *multiStaMgr = nullptr;
+
+    if (!HasAnyMultiStaManager()) {
+        return;
+    }
+    {
+        std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+        for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
+            if ((*iter)->mid == id) {
+                multiStaMgr = *iter;
+                multiStaManagers.erase(iter);
+                break;
+            }
+        }
+    }
+    if (multiStaMgr != nullptr) {
+        delete multiStaMgr;
+        multiStaMgr = nullptr;
+    }
+}
+
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::RmoveSoftapManager(int id)
 {
@@ -600,6 +720,20 @@ void WifiControllerMachine::HandleStaClose(int id)
     }
 }
 
+void WifiControllerMachine::HandleWifi2Close(int id)
+{
+    std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+    if (multiStaManagers.empty()) {
+        return;
+    }
+    for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
+        if ((*iter)->mid == id) {
+            (*iter)->GetMultiStaMachine()->SendMessage(MULTI_STA_CMD_STOPPED);
+            break;
+        }
+    }
+}
+
 void WifiControllerMachine::SwitchRole(ConcreteManagerRole role)
 {
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
@@ -610,8 +744,20 @@ void WifiControllerMachine::SwitchRole(ConcreteManagerRole role)
 
 void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg)
 {
+    if (msg->GetParam2() == INSTID_WLAN1 && msg->GetParam1() == 0) {
+        WIFI_LOGI("Toggle disable wlan1.");
+        pWifiControllerMachine->StopMultiStaManager(INSTID_WLAN1);
+        return;
+    }
+    if (msg->GetParam2() == INSTID_WLAN1 && WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0)
+        == WIFI_STATE_ENABLED && msg->GetParam1() == 1) {
+        pWifiControllerMachine->MakeMultiStaManager(MultiStaManager::Role::ROLE_STA_WIFI_2, msg->GetParam2());
+        return;
+    }
+
     ConcreteManagerRole presentRole;
-    if (!(pWifiControllerMachine->ShouldEnableWifi())) {
+    if (pWifiControllerMachine->ShouldDisableWifi(msg)) {
+        pWifiControllerMachine->StopAllMultiStaManagers();
         pWifiControllerMachine->StopAllConcreteManagers();
         return;
     }
@@ -623,6 +769,9 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
         if (presentRole == ConcreteManagerRole::ROLE_UNKNOW) {
             WIFI_LOGE("Get unknow wifi role in enablestate.");
             return;
+        }
+        if (presentRole != ConcreteManagerRole::ROLE_CLIENT_STA) {
+            pWifiControllerMachine->StopMultiStaManager(INSTID_WLAN1);
         }
         pWifiControllerMachine->SwitchRole(presentRole);
         return;
@@ -655,6 +804,7 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
         if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
             pWifiControllerMachine->HasAnyConcreteManager()) {
+            pWifiControllerMachine->StopAllMultiStaManagers();
             pWifiControllerMachine->StopAllConcreteManagers();
             pWifiControllerMachine->mApidStopWifi = id;
             return;
@@ -667,7 +817,8 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
     }
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
     if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
-        pWifiControllerMachine->ShouldEnableWifi() && !WifiConfigCenter::GetInstance().GetWifiStopState() &&
+        pWifiControllerMachine->ShouldEnableWifi(INSTID_WLAN0) &&
+        !WifiConfigCenter::GetInstance().GetWifiStopState() &&
         pWifiControllerMachine->HasAnyConcreteManager()) {
         ConcreteManagerRole role = pWifiControllerMachine->GetWifiRole();
         if (role != ConcreteManagerRole::ROLE_UNKNOW) {
@@ -692,7 +843,7 @@ void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
     WIFI_LOGE("HandleStaStartFailure");
     pWifiControllerMachine->RemoveConcreteManager(id);
     mWifiStartFailCount++;
-    if (pWifiControllerMachine->ShouldEnableWifi() && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {
+    if (pWifiControllerMachine->ShouldEnableWifi(id) && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {
         pWifiControllerMachine->StartTimer(CMD_OPEN_WIFI_RETRY, WIFI_OPEN_RETRY_TIMEOUT);
     }
 }
@@ -708,7 +859,13 @@ void WifiControllerMachine::EnableState::HandleStaRemoved(InternalMessagePtr msg
             }
         }
     }
+    pWifiControllerMachine->StopAllMultiStaManagers();
     pWifiControllerMachine->StopConcreteManager(msg->GetParam2());
+}
+
+void WifiControllerMachine::EnableState::HandleWifi2Removed(InternalMessagePtr msg)
+{
+    pWifiControllerMachine->StopMultiStaManager(msg->GetParam2());
 }
 
 void WifiControllerMachine::EnableState::HandleConcreteClientRemoved(InternalMessagePtr msg)
@@ -740,6 +897,14 @@ void WifiControllerMachine::HandleStaStart(int id)
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {
         (*iter)->GetConcreteMachine()->SendMessage(CONCRETE_CMD_STA_START);
+    }
+}
+
+void WifiControllerMachine::HandleWifi2Start(int id)
+{
+    std::unique_lock<std::mutex> lock(multiStaManagerMutex);
+    for (auto iter = multiStaManagers.begin(); iter != multiStaManagers.end(); ++iter) {
+        (*iter)->GetMultiStaMachine()->SendMessage(MULTI_STA_CMD_STARTED);
     }
 }
 
@@ -782,6 +947,7 @@ void WifiControllerMachine::EnableState::HandleApStop(InternalMessagePtr msg)
 
 void WifiControllerMachine::HandleConcreteStop(int id)
 {
+    WIFI_LOGD("WifiControllerMachine HandleConcreteStop id = %{public}d", id);
     RemoveConcreteManager(id);
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
     if (!WifiConfigCenter::GetInstance().GetCoexSupport()) {
@@ -794,7 +960,7 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
 #endif
         if (!WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning()) {
-            if (WifiConfigCenter::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
+            if (ShouldEnableWifi(id)) {
                 ConcreteManagerRole presentRole = GetWifiRole();
                 MakeConcreteManager(presentRole, 0);
                 return;
@@ -802,7 +968,7 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
     } else {
 #endif
-        if (WifiConfigCenter::GetInstance().GetWifiToggledEnable() != WIFI_STATE_DISABLED) {
+        if (ShouldEnableWifi(id)) {
             ConcreteManagerRole presentRole = GetWifiRole();
             MakeConcreteManager(presentRole, 0);
             return;
@@ -837,7 +1003,7 @@ void WifiControllerMachine::HandleSoftapStop(int id)
     if (HasAnyManager()) {
         return;
     }
-    if (ShouldEnableWifi() && !WifiConfigCenter::GetInstance().GetWifiStopState()) {
+    if (ShouldEnableWifi(INSTID_WLAN0) && !WifiConfigCenter::GetInstance().GetWifiStopState()) {
         role = GetWifiRole();
         if (role == ConcreteManagerRole::ROLE_UNKNOW) {
             WIFI_LOGE("Get unknow wifi role in HandleSoftapStop.");
@@ -897,6 +1063,7 @@ void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
     StopAllSoftapManagers();
 #endif
     }
+    StopAllConcreteManagers();
     StopAllConcreteManagers();
 }
 } // namespace Wifi

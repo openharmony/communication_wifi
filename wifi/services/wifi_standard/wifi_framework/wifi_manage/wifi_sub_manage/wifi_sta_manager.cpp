@@ -212,6 +212,9 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
 {
     WIFI_LOGD("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
         magic_enum::Enum2Name(state).c_str());
+    if (state == OperateResState::CONNECT_AP_CONNECTED) {
+        WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
+    }
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
     if (isReport && !IgnoreConnStateChange(instId)) {

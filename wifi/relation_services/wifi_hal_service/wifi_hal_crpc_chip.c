@@ -139,6 +139,7 @@ int RpcGetIface(RpcServer *server, Context *context)
         }
         if (ReadStr(context, pstr, len) != 0) {
             free(pstr);
+            pstr = NULL;
             return HAL_FAILURE;
         }
     }
@@ -203,6 +204,7 @@ int RpcRemoveIface(RpcServer *server, Context *context)
         }
         if (ReadStr(context, pstr, len) != 0) {
             free(pstr);
+            pstr = NULL;
             return HAL_FAILURE;
         }
     }

@@ -96,6 +96,11 @@ bool WifiCommonEventHelper::PublishEvent(const std::string &eventAction, const s
     return true;
 }
 
+bool WifiCommonEventHelper::PublishWifi2PowerStateChangeEvent(const int &code, const std::string &data)
+{
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI2_POWER_STATE, code, data);
+}
+
 bool WifiCommonEventHelper::PublishPowerStateChangeEvent(const int &code, const std::string &data)
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_POWER_STATE, code, data);
@@ -120,6 +125,11 @@ bool WifiCommonEventHelper::PublishRssiValueChangedEvent(const std::string &pram
 bool WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(const int &code, const std::string &data)
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WITAS_RSSI_VALUE, code, data);
+}
+
+bool WifiCommonEventHelper::PublishWifi2ConnStateChangedEvent(const int &code, const std::string &data)
+{
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI2_CONN_STATE, code, data);
 }
 
 bool WifiCommonEventHelper::PublishConnStateChangedEvent(const int &code, const std::string &data)

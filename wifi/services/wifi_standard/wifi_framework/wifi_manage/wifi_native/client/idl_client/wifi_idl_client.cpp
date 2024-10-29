@@ -759,6 +759,7 @@ char **WifiIdlClient::ConVectorToCArrayString(const std::vector<std::string> &ve
     if (i < size) {
         for (int j = 0; j <= i; ++j) {
             free(list[j]);
+            list[j] = nullptr;
         }
         free(list);
         list = nullptr;

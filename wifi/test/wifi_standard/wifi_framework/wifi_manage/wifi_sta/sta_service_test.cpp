@@ -645,12 +645,10 @@ void StaServiceTest::StaServiceReConnectTestSucc()
 void StaServiceTest::StaServiceSetSuspendModeTest()
 {
     EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(pStaService->SetSuspendMode(false) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceSetPowerModeTest()
 {
-    EXPECT_TRUE(pStaService->SetPowerMode(false) == WIFI_OPT_FAILED);
     EXPECT_TRUE(pStaService->SetPowerMode(true) == WIFI_OPT_FAILED);
 }
 

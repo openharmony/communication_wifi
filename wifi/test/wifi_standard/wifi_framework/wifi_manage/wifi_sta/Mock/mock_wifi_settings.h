@@ -89,6 +89,7 @@ public:
     virtual int SetStaLastRunState(int bRun, int instId = 0) = 0;
     virtual void SetScanOnlySwitchState(const int &state, int instId = 0) = 0;
     virtual  bool IsModulePreLoad(const std::string &name) = 0;
+    virtual bool GetConfigValueByName(const std::string &name, std::string &value) = 0;
     virtual bool GetDeviceEverConnected(int networkId) = 0;
     virtual int SetDeviceEverConnected(int networkId) = 0;
     virtual bool GetAcceptUnvalidated(int networkId) = 0;
@@ -163,6 +164,7 @@ public:
     MOCK_METHOD2(SetScanOnlySwitchState, void(const int &state, int instId));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD1(IsModulePreLoad,  bool(const std::string &name));
+    MOCK_METHOD2(GetConfigValueByName,  bool(const std::string &name, std::string &value));
     MOCK_METHOD1(GetDeviceEverConnected, bool(int networkId));
     MOCK_METHOD1(SetDeviceEverConnected, int(int networkId));
     MOCK_METHOD1(GetAcceptUnvalidated, bool(int networkId));

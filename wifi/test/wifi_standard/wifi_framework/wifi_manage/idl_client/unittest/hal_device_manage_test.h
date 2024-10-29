@@ -116,6 +116,11 @@ public:
     {
         return 0;
     }
+
+    virtual int32_t SetIfaceState(bool state)
+    {
+        return 0;
+    }
 };
 
 class IConcreteChipTest : public IConcreteChip {

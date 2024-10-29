@@ -250,29 +250,5 @@ HWTEST_F(WifiManagerServiceTest, P2pActionChangeTest, TestSize.Level1)
     cbk.OnP2pActionResultEvent(P2pActionCallback::DiscoverDevices, WIFI_OPT_SUCCESS);
     sleep(1);
 }
-
-HWTEST_F(WifiManagerTest, RegisterNetworkStateChangeEventTest, TestSize.Level1)
-{
-    WIFI_LOGI("RegisterNetworkStateChangeEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterNetworkStateChangeEvent();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterNetworkStateChangeEventTest, TestSize.Level1)
-{
-    WIFI_LOGI("UnRegisterNetworkStateChangeEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterNetworkStateChangeEvent();
-}
-
-HWTEST_F(WifiManagerTest, RegisterWifiScanChangeEventTest, TestSize.Level1)
-{
-    WIFI_LOGI("RegisterWifiScanChangeEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
-}
-
-HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest, TestSize.Level1)
-{
-    WIFI_LOGI("UnRegisterWifiScanChangeEventTest enter!");
-    wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
-}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -441,6 +441,15 @@ HWTEST_F(WifiSettingsTest, OnRestoreTest3, TestSize.Level1)
     remove(BACKUP_CONFIG_FILE_PATH_TEST);
 }
 
+HWTEST_F(WifiSettingsTest, SetBackupReplyCodeTest, TestSize.Level1)
+{
+    WIFI_LOGI("SetBackupReplyCodeTest enter");
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
+    std::string checkReplyCode = R"({"resultInfo":[{"errorCode":"0","errorInfo":"","type":"ErrorInfo"}]})";
+    checkReplyCode += "\n";
+    EXPECT_EQ(replyCode, checkReplyCode);
+}
+
 HWTEST_F(WifiSettingsTest, ConvertBackupCfgToDeviceCfgTest, TestSize.Level1)
 {
     WIFI_LOGI("ConvertBackupCfgToDeviceCfgTest enter");
@@ -589,6 +598,20 @@ HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
 }
+
+HWTEST_F(WifiSettingsTest, GetConfigValueByName, TestSize.Level1)
+{
+    WIFI_LOGI("GetConfigValueByName enter");
+    std::string ancoValue = "";
+    WifiSettings::GetInstance().Init();
+    bool sucess = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", ancoValue);
+    EXPECT_TRUE(sucess);
+    std::string ancoNoValue = "";
+    bool fail = WifiSettings::GetInstance().GetConfigValueByName("Novalue", ancoNoValue);
+    EXPECT_FALSE(fail);
+    EXPECT_EQ(ancoNoValue, "");
+}
+
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
 {

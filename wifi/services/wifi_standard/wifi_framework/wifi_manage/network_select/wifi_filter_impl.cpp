@@ -321,6 +321,9 @@ bool WeakAlgorithmWifiFilter::Filter(NetworkCandidate &networkCandidate)
         return false;
     } else if (scanInfo.securityType == WifiSecurity::PSK
         && scanInfo.capabilities.find("TKIP") != std::string::npos) {
+        if (scanInfo.capabilities.find("CCMP") != std::string::npos) {
+            return true;
+        }
         WIFI_LOGD("WeakAlgorithm: WPA AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
         return false;
     }

@@ -68,6 +68,7 @@ constexpr uint32_t BASE_BIN = 2;
 constexpr uint32_t BASE_HEX = 16;
 constexpr uint32_t MAX_INT32_LENGTH = 11; // -2147483648 ~ 2147483647
 constexpr uint32_t MAX_INT64_LENGTH = 20; // -9223372036854775808 ~ 9223372036854775807
+constexpr uint32_t MAX_UINT32_LENGTH = 10; // 0 ~ 4294967295
 constexpr uint32_t MAX_INT32_LENGTH_BIN = 32;
 constexpr uint32_t MAX_INT32_LENGTH_HEX = 8;
 
@@ -703,7 +704,7 @@ int CheckDataLegal(std::string &data, int base)
 
 unsigned int CheckDataToUint(std::string &data, int base)
 {
-    if (data.empty() || data.size() > MAX_INT32_LENGTH) {
+    if (data.empty() || data.size() > MAX_UINT32_LENGTH) {
         WIFI_LOGE("CheckDataToUint: invalid data:%{private}s", data.c_str());
         return 0;
     }

@@ -305,6 +305,7 @@
         "OHOS::Wifi::WifiSettings::SetOperatorWifiType(int, int)";
         "OHOS::Wifi::WifiSettings::GetLastAirplaneMode(int)";
         "OHOS::Wifi::WifiSettings::SetLastAirplaneMode(int, int)";
+        "OHOS::Wifi::WifiSettings::SetWifiToggleCaller(int, int)";
         "OHOS::Wifi::WifiSettings::GetCanOpenStaWhenAirplaneMode(int)";
         "OHOS::Wifi::WifiSettings::SetWifiFlagOnAirplaneMode(bool, int)";
         "OHOS::Wifi::WifiSettings::GetWifiFlagOnAirplaneMode(int)";

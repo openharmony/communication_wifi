@@ -786,14 +786,33 @@ struct IpV6Info {
     }
 };
 
-struct Wifi6BlackListInfo {
+struct WifiCategoryBlackListInfo {
     /* 0:HTC, 1:WIFI6, -1:invalid */
+    /* 0:MLD, 1:WIFI7, -1:invalid */
     int actionType = -1;
     int64_t updateTime = 0;
 
-    Wifi6BlackListInfo(int type, int64_t time)
+    WifiCategoryBlackListInfo() {}
+
+    WifiCategoryBlackListInfo(int type, int64_t time)
     {
         this->actionType = type;
+        this->updateTime = time;
+    }
+};
+
+struct WifiCategoryConnectFailInfo {
+    /* 0:MLD, 1:WIFI7, 2:Cure Fail,-1:invalid */
+    int actionType = -1;
+    int connectFailTimes = 0;
+    int64_t updateTime = 0;
+
+    WifiCategoryConnectFailInfo() {}
+
+    WifiCategoryConnectFailInfo(int type, int failTimes, int64_t time)
+    {
+        this->actionType = type;
+        this->connectFailTimes = failTimes;
         this->updateTime = time;
     }
 };

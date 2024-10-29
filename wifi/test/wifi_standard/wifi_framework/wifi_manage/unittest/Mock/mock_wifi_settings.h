@@ -91,10 +91,16 @@ public:
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
     virtual void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0) = 0;
-    virtual void InsertWifi6BlackListCache(const std::string currentBssid,
-        const Wifi6BlackListInfo wifi6BlackListInfo) = 0;
-    virtual void RemoveWifi6BlackListCache(const std::string bssid) = 0;
-    virtual int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache) const = 0;
+    virtual void InsertWifiCategoryBlackListCache(int blacklistType, const std::string currentBssid,
+        const WifiCategoryBlackListInfo wifi6BlackListInfo) = 0;
+    virtual void RemoveWifiCategoryBlackListCache(int blacklistType, const std::string bssid) = 0;
+    virtual int GetWifiCategoryBlackListCache(int blacklistType,
+        std::map<std::string, WifiCategoryBlackListInfo> &blackListCache) const = 0;
+    virtual void UpdateWifiConnectFailListCache(int blacklistType, const std::string bssid,
+        const WifiCategoryConnectFailInfo wifiConnectFailInfo) = 0;
+    virtual void RemoveWifiConnectFailListCache(const std::string bssid) = 0;
+    virtual int GetWifiConnectFailListCache(
+        std::map<std::string, WifiCategoryConnectFailInfo> &connectFailCache) const = 0;
     virtual std::string GetStaIfaceName() = 0;
     virtual void SetWifiSelfcureReset(const bool isReset) = 0;
     virtual bool GetWifiSelfcureReset() const = 0;
@@ -255,10 +261,16 @@ public:
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
     MOCK_METHOD2(SaveDisconnectedReason, void(DisconnectedReason discReason, int));
-    MOCK_METHOD2(InsertWifi6BlackListCache, void(const std::string currentBssid,
-        const Wifi6BlackListInfo wifi6BlackListInfo));
-    MOCK_METHOD1(RemoveWifi6BlackListCache, void(const std::string bssid));
-    MOCK_CONST_METHOD1(GetWifi6BlackListCache, int(std::map<std::string, Wifi6BlackListInfo> &blackListCache));
+    MOCK_METHOD3(InsertWifiCategoryBlackListCache, void(int blacklistType, const std::string currentBssid,
+        const WifiCategoryBlackListInfo wifi6BlackListInfo));
+    MOCK_METHOD2(RemoveWifiCategoryBlackListCache, void(int blacklistType, const std::string bssid));
+    MOCK_CONST_METHOD2(GetWifiCategoryBlackListCache, int(int blacklistType,
+        std::map<std::string, WifiCategoryBlackListInfo> &blackListCache));
+    MOCK_METHOD3(UpdateWifiConnectFailListCache, void(int blacklistType, const std::string bssid,
+        const WifiCategoryConnectFailInfo wifiConnectFailInfo));
+    MOCK_METHOD1(RemoveWifiConnectFailListCache, void(const std::string bssid));
+    MOCK_CONST_METHOD1(GetWifiConnectFailListCache, int(
+        std::map<std::string, WifiCategoryConnectFailInfo> &connectFailCache));
     MOCK_METHOD0(GetStaIfaceName, std::string());
     MOCK_METHOD1(SetWifiSelfcureReset, void(const bool isReset));
     MOCK_CONST_METHOD0(GetWifiSelfcureReset, bool());

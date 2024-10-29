@@ -73,6 +73,23 @@ void WifiTogglerManager::OnWifiToggledTimeOut()
     return;
 }
 
+void WifiTogglerManager::StartSemiWifiToggledTimer()
+{
+    WIFI_LOGI("StartSemiWifiToggledTimer");
+    return;
+}
+
+void WifiTogglerManager::StopSemiWifiToggledTimer()
+{
+    WIFI_LOGI("StopSemiWifiToggledTimer");
+    return;
+}
+
+void WifiTogglerManager::OnSemiWifiToggledTimeOut()
+{
+    return;
+}
+
 ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
 {
     return WIFI_OPT_SUCCESS;

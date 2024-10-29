@@ -114,7 +114,10 @@ napi_value JsObjectToInt(const napi_env& env, const napi_value& object, const ch
         NAPI_CALL(env, napi_typeof(env, field, &valueType));
         NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. Number expected.");
         auto ret = napi_get_value_int32(env, field, &fieldRef);
-        WIFI_LOGD("[%{public}s]:%{public}d, fieldStr:%{public}s=>%{public}d.", __FUNCTION__, ret, fieldStr, fieldRef);
+        if (ret) {
+            WIFI_LOGD("[%{public}s]:%{public}d, fieldStr:%{public}s=>%{public}d.", __FUNCTION__, ret, fieldStr,
+                fieldRef);
+        }
     } else {
         WIFI_LOGW("Js to int no property: %{public}s", fieldStr);
     }
@@ -133,7 +136,10 @@ napi_value JsObjectToUint(const napi_env& env, const napi_value& object, const c
         NAPI_CALL(env, napi_typeof(env, field, &valueType));
         NAPI_ASSERT(env, valueType == napi_number, "Wrong argument type. Number expected.");
         auto ret = napi_get_value_uint32(env, field, &fieldRef);
-        WIFI_LOGD("[%{public}s]:%{public}u, fieldStr:%{public}s=>%{public}u.", __FUNCTION__, ret, fieldStr, fieldRef);
+        if (ret) {
+            WIFI_LOGD("[%{public}s]:%{public}u, fieldStr:%{public}s=>%{public}u.", __FUNCTION__, ret, fieldStr,
+                fieldRef);
+        }
     } else {
         WIFI_LOGW("Js to int no property: %{public}s", fieldStr);
     }

@@ -786,6 +786,7 @@ int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems
 {
     const struct HdiElem *elem;
     int unknown = 0;
+    bool found_ssid = false;
 
     if (memset_s(elems, sizeof(*elems), 0, sizeof(*elems)) != EOK) {
         LOGE("%{public}s, memset_s is failed", __func__);
@@ -806,12 +807,16 @@ int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems
 
         switch (id) {
             case HDI_EID_SSID:
+                if (found_ssid) {
+                    break;
+                }
                 if (elen > SSID_MAX_LEN) {
                     LOGI("Ignored too long SSID HdiElem (elen=%{public}u)", elen);
                     break;
                 }
                 elems->ssid = pos;
                 elems->ssidLen = elen;
+                found_ssid = true;
                 break;
             case HDI_EID_SUPP_RATES:
                 elems->suppRates = pos;
@@ -1338,6 +1343,7 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
     }
     const struct HdiElem *elem;
     int ieIndex = 0;
+    bool found_ssid = false;
     ScanInfoElem* infoElemsTemp = (ScanInfoElem *)calloc(MAX_INFO_ELEMS_SIZE, sizeof(ScanInfoElem));
     if (infoElemsTemp == NULL) {
         LOGE("failed to alloc memory");
@@ -1356,6 +1362,12 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
             break;
         }
         uint8_t id = elem->id, elen = elem->datalen;
+        if (id == HDI_EID_SSID) {
+            if (found_ssid) {
+                break;
+            }
+            found_ssid = true;
+        }
         infoElemsTemp[ieIndex].id = id;
         infoElemsTemp[ieIndex].size = elen;
         infoElemsTemp[ieIndex].content = (char *)calloc(elen+1, sizeof(char));

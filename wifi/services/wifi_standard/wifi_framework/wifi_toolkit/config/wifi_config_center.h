@@ -129,11 +129,21 @@ public:
 
     int GetDisconnectedReason(DisconnectedReason &discReason, int instId = 0);
 
-    void InsertWifi6BlackListCache(const std::string currentBssid, const Wifi6BlackListInfo wifi6BlackListInfo);
+    void InsertWifiCategoryBlackListCache(int blacklistType, const std::string currentBssid,
+        const WifiCategoryBlackListInfo wifiBlackListInfo);
 
-    void RemoveWifi6BlackListCache(const std::string bssid);
+    void RemoveWifiCategoryBlackListCache(int blacklistType, const std::string bssid);
 
-    int GetWifi6BlackListCache(std::map<std::string, Wifi6BlackListInfo> &blackListCache);
+    int GetWifiCategoryBlackListCache(int blacklistType,
+        std::map<std::string, WifiCategoryBlackListInfo> &blackListCache);
+
+    void UpdateWifiConnectFailListCache(int blacklistType, const std::string bssid,
+        const WifiCategoryConnectFailInfo wifi7ConnectFailInfo);
+
+    void RemoveWifiConnectFailListCache(const std::string bssid);
+
+    int GetWifiConnectFailListCache(
+        std::map<std::string, WifiCategoryConnectFailInfo> &connectFailCache);
 
     bool EnableNetwork(int networkId, bool disableOthers, int instId = 0);
 
@@ -359,7 +369,8 @@ private:
     std::map<int, time_t> mLastSelectedTimeVal;
     std::map<int, std::pair<std::string, int>> mBssidToTimeoutTime;
     std::map<int, DisconnectedReason> mLastDiscReason;
-    std::map<std::string, Wifi6BlackListInfo> mWifi6BlackListCache;
+    std::map<int, std::map<std::string, WifiCategoryBlackListInfo>> mWifiCategoryBlackListCache;
+    std::map<std::string, WifiCategoryConnectFailInfo> mWifiConnectFailCache;
 
     // SCAN
     std::mutex mScanMutex;

@@ -1084,6 +1084,7 @@ int WifiSettings::SetLastAirplaneMode(int mode, int instId)
     return 0;
 }
 
+#ifndef OHOS_ARCH_LITE
 int WifiSettings::SetWifiToggleCaller(int callerPid, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
@@ -1091,6 +1092,7 @@ int WifiSettings::SetWifiToggleCaller(int callerPid, int instId)
     SyncWifiConfig();
     return 0;
 }
+#endif
 
 bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
 {

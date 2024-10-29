@@ -20,6 +20,7 @@
 #include "wifi_logger.h"
 #include "wifi_country_code_manager.h"
 #include "mock_wifi_manager.h"
+#include "mock_wifi_sta_hal_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -44,6 +45,7 @@ public:
     virtual void SetUp()
     {
         pConcreteManagerMachine = std::make_unique<ConcreteMangerMachine>();
+        pWifiTogglerManager = std::make_unique<WifiTogglerManager>();
         pConcreteManagerMachine->InitConcreteMangerMachine();
         mCb.onStartFailure = DealConcreteStartFailure;
         mCb.onStopped = DealConcreteStop;
@@ -72,6 +74,7 @@ public:
     }
 
     std::unique_ptr<ConcreteMangerMachine> pConcreteManagerMachine;
+    std::unique_ptr<WifiTogglerManager> pWifiTogglerManager;
     ConcreteModeCallback mCb;
 
     void DefaultStateGoInStateSuccess()
@@ -135,6 +138,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
+        MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_FAILED);
         msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
         sleep(1);
         EXPECT_TRUE(pConcreteManagerMachine->pIdleState->ExecuteStateMsg(msg));

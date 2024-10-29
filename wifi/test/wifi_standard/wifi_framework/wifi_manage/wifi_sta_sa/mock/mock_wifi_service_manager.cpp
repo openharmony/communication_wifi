@@ -61,7 +61,7 @@ int WifiServiceManager::CheckPreLoadService(void)
     return 0;
 }
 
-int WifiServiceManager::LoadStaService(const std::string &dlname, bool bCreate)
+int WifiServiceManager::LoadStaService(const std::string &dlname, int instId, bool bCreate)
 {
     WIFI_LOGI("LoadStaService");
     return 0;
@@ -102,7 +102,7 @@ int WifiServiceManager::LoadEnhanceService(const std::string &dlname, bool bCrea
     return 0;
 }
 
-int WifiServiceManager::CheckAndEnforceService(const std::string &name, bool bCreate)
+int WifiServiceManager::CheckAndEnforceService(const std::string &name, int instId, bool bCreate)
 {
     WIFI_LOGD("WifiServiceManager::CheckAndEnforceService name: %{public}s", name.c_str());
     return 0;

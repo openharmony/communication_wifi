@@ -151,8 +151,8 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (m_instId == 0) {
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED);
+    if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, m_instId);
         WifiConfigCenter::GetInstance().SetWifiAllowSemiActive(false);
     }
 
@@ -190,7 +190,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
         return WIFI_OPT_FORBID_AIRPLANE;
     }
 #endif
-    if (m_instId == 0) {
+    if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
     }
 
@@ -409,6 +409,11 @@ bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
 
 ErrCode WifiDeviceServiceImpl::CheckRemoveCandidateConfig(void)
 {
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("CheckRemoveCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -528,6 +533,11 @@ void WifiDeviceServiceImpl::updateStaDeviceMacAddress(WifiDeviceConfig &config)
 
 ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate)
 {
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("AddDeviceConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -731,30 +741,30 @@ void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<Wifi
 
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
-    if (!isCandidate && !WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("GetDeviceConfigs:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-
-        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
-
-    #ifndef SUPPORT_RANDOM_MAC_ADDR
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
+    } else if (apiVersion == API_VERSION_9) {
+#ifndef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
-    #endif
-
-        if (!isCandidate) {
-            if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-                WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-                return WIFI_OPT_PERMISSION_DENIED;
-            }
+#endif
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!isCandidate) {
+        if (!WifiAuthCenter::IsSystemAccess()) {
+            WIFI_LOGE("GetDeviceConfigs:NOT System APP, PERMISSION_DENIED!");
+            return WIFI_OPT_NON_SYSTEMAPP;
+        }
+        if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
         }
     }
 
@@ -863,6 +873,11 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
     if (IsOtherVapConnect()) {
         LOGI("ConnectToNetwork: p2p or hml connected, and hotspot is enable");
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+    }
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
     }
     if (isCandidate) {
         if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -1056,6 +1071,11 @@ ErrCode WifiDeviceServiceImpl::IsConnected(bool &isConnected)
 {
     WifiLinkedInfo linkedInfo;
 
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsConnected:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1151,8 +1171,13 @@ ErrCode WifiDeviceServiceImpl::Disconnect(void)
 
 ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
 {
-    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("StartWps:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetScanOnlyAvailable: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartWps:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1169,8 +1194,13 @@ ErrCode WifiDeviceServiceImpl::StartWps(const WpsConfig &config)
 
 ErrCode WifiDeviceServiceImpl::CancelWps(void)
 {
-    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("CancelWps:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetScanOnlyAvailable: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("CancelWps:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1187,6 +1217,11 @@ ErrCode WifiDeviceServiceImpl::CancelWps(void)
 
 ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
 {
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsWifiActive:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1231,6 +1266,11 @@ ErrCode WifiDeviceServiceImpl::IsMeteredHotspot(bool &bMeteredHotspot)
 
 ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
 {
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetLinkedInfo:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1518,7 +1558,7 @@ bool WifiDeviceServiceImpl::IsStaServiceRunning()
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiMidState(m_instId);
     if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGW("current wifi state is %{public}d", static_cast<int>(curState));
+        WIFI_LOGW("current wifi state is %{public}d, instId: %{public}d", static_cast<int>(curState), m_instId);
         return false;
     }
     return true;
@@ -1600,6 +1640,26 @@ void WifiDeviceServiceImpl::SaBasicDump(std::string& result)
 
 ErrCode WifiDeviceServiceImpl::GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config)
 {
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetChangeDeviceConfig:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetChangeDeviceConfig:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+#ifndef SUPPORT_RANDOM_MAC_ADDR
+        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetChangeDeviceConfig:VerifyGetScanInfosPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
+#endif
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetDeviceConfigs:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+    }
+
     bool result = WifiConfigCenter::GetInstance().GetChangeDeviceConfig(value, config);
     if (!result) {
         WIFI_LOGE("WifiDeviceServiceImpl::GetChangeDeviceConfig failed!");
@@ -1617,7 +1677,7 @@ ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported
 {
     WIFI_LOGI("Enter get bandtype is supported.");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:IsBandTypeSupported() PERMISSION_DENIED!");
+        WIFI_LOGE("WifiDeviceServiceImpl:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1641,12 +1701,12 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
 
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:Get5GHzChannelList() PERMISSION_DENIED!");
+        WIFI_LOGE("Get5GHzChannelList:VerifyGetWifiInfoPermission  PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:Get5GHzChannelList() PERMISSION_DENIED!");
+        WIFI_LOGE("Get5GHzChannelList:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1668,12 +1728,12 @@ ErrCode WifiDeviceServiceImpl::StartPortalCertification()
     }
 
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:StartPortalCertification() PERMISSION_DENIED!");
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:StartPortalCertification() PERMISSION_DENIED!");
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1705,8 +1765,8 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     }
 
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
-    if (m_instId == 0) {
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
+    if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, m_instId);
     }
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);
@@ -1754,7 +1814,7 @@ ErrCode WifiDeviceServiceImpl::HilinkGetMacAddress(WifiDeviceConfig &deviceConfi
     } else {
         WifiStoreRandomMac randomMacInfo;
         std::vector<WifiScanInfo> scanInfoList;
-        WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
         for (auto scanInfo : scanInfoList) {
             if ((deviceConfig.ssid == scanInfo.ssid) &&
                 (ComparedHinlinkKeymgmt(scanInfo.capabilities, deviceConfig.keyMgmt))) {

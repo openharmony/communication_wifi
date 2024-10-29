@@ -290,7 +290,7 @@ ErrCode WifiScanProxy::ParseScanInfos(MessageParcel &reply, std::vector<WifiScan
     std::vector<std::string> tokens;
     SplitStr(net, ";", tokens, true, true);
     int dataRecvLen = 0;
-    for (int i = 0; i < contentSize && dataRecvLen < tokens.size(); ++i) {
+    for (int i = 0; i < contentSize && dataRecvLen < static_cast<int>(tokens.size()); ++i) {
         WifiScanInfo info;
         GetScanInfo(info, tokens, dataRecvLen);
         result.emplace_back(info);

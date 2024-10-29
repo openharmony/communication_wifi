@@ -71,6 +71,7 @@ private:
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;
     WifiP2pServiceManager &serviceManager;
+    bool p2pSmInitFlag;
 };
 } // namespace Wifi
 } // namespace OHOS

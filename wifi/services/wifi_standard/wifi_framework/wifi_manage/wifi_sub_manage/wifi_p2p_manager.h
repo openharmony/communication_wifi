@@ -58,6 +58,8 @@ private:
     uint32_t unloadP2PSaTimerId{0};
     std::mutex unloadP2PSaTimerMutex;
     std::string ifaceName{""};
+    std::mutex p2pEnableMutex;
+    std::condition_variable p2pEnableCond;
 };
 
 }  // namespace Wifi

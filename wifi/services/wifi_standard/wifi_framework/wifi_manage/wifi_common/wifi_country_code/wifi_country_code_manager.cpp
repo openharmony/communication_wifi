@@ -46,7 +46,8 @@ WifiCountryCodeManager &WifiCountryCodeManager::GetInstance()
 ErrCode WifiCountryCodeManager::Init()
 {
     WIFI_LOGI("init");
-    m_wifiCountryCodePolicy = std::make_shared<WifiCountryCodePolicy>();
+    wifiCountryCodePolicyConf_ = GetWifiCountryCodePolicy();
+    m_wifiCountryCodePolicy = std::make_shared<WifiCountryCodePolicy>(wifiCountryCodePolicyConf_);
 #ifdef FEATURE_STA_SUPPORT
     m_staCallback.callbackModuleName = CLASS_NAME;
     m_staCallback.OnStaConnChanged = DealStaConnChanged;
@@ -82,6 +83,18 @@ ErrCode WifiCountryCodeManager::SetWifiCountryCodeFromExternal(const std::string
 {
     WIFI_LOGI("set wifi country code from external, externalCode=%{public}s", wifiCountryCode.c_str());
     return UpdateWifiCountryCode(wifiCountryCode);
+}
+
+void WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int triggerReason)
+{
+    if (triggerReason == TRIGGER_UPDATE_REASON_TEL_NET_CHANGE && wifiCountryCodePolicyConf_[FEATURE_MCC]) {
+        WIFI_LOGI("TEL_NET_CHANGE trigger update country code change");
+        UpdateWifiCountryCode();
+    } else if (triggerReason == TRIGGER_UPDATE_REASON_SCAN_CHANGE &&
+        wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT] && m_wifiCountryCodePolicy != nullptr) {
+        m_wifiCountryCodePolicy->HandleScanResultAction();
+        UpdateWifiCountryCode();
+    }
 }
 
 bool WifiCountryCodeManager::IsAllowUpdateWifiCountryCode()
@@ -123,7 +136,8 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
     if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
         WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
         wifiCountryCode = externalCode;
-    } else if (m_wifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
+    } else if (m_wifiCountryCodePolicy == nullptr ||
+        m_wifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
         WIFI_LOGE("calculate wifi country code failed");
         return WIFI_OPT_FAILED;
     }
@@ -224,6 +238,21 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCodeCache(const std::string &wi
     std::string retStr = ret == 0 ? "success" : "fail, ret=" + std::to_string(ret);
     WIFI_LOGI("update wifi country code cache %{public}s", retStr.c_str());
     return ret == 0 ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
+}
+
+std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> WifiCountryCodeManager::GetWifiCountryCodePolicy()
+{
+    char preValue[WIFI_COUNTRY_CODE_SIZE] = {0};
+    int errorCode = GetParamValue(WIFI_COUNTRY_CODE_CONFIG,
+        WIFI_COUNTRY_CODE_CONFIG_DEFAULT, preValue, WIFI_COUNTRY_CODE_SIZE);
+    int policyConf = 0;
+    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
+        WIFI_LOGI("get wifi country code policy config fail, use policyConf=0");
+        return std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf);
+    }
+    policyConf = ConvertStringToInt(preValue);
+    WIFI_LOGI("get wifi country code policy config is %{public}d", policyConf);
+    return std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf);
 }
 }
 }

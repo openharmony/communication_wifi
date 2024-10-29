@@ -132,9 +132,9 @@ private:
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     static void updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device);
 #endif
-    static void PublishConnStateChangedEvent(int state, const WifiLinkedInfo &info);
-    static void PublishWifiStateChangedEvent(int state);
-    static void PublishRssiValueChangedEvent(int state);
+    static void PublishConnStateChangedEvent(int state, int instId, const WifiLinkedInfo &info);
+    static void PublishWifiStateChangedEvent(int state, int instId);
+    static void PublishRssiValueChangedEvent(int state, int instId);
     static void SendConfigChangeEvent(sptr<IWifiP2pCallback> &callback,  CfgInfo* cfgInfo);
 private:
     std::unique_ptr<WifiEventHandler> mBroadcastThread = nullptr;

@@ -129,19 +129,13 @@ int WifiP2pGroupManager::RemoveClientFromGroup(int networkId, const std::string 
     auto it = groupsInfo.begin();
     for (; it != groupsInfo.end(); ++it) {
         if (networkId == it->GetNetworkId()) {
-            if (it->IsContainsDevice(device)) {
-                it->RemoveClientDevice(device);
+            if (it->IsContainsPersistentDevice(device)) {
+                it->RemovePersistentDevice(device);
             }
-            break;
+            return 0;
         }
     }
-
-    if (it != groupsInfo.end()) {
-        const std::vector<WifiP2pDevice> &clients = it->GetClientDevices();
-        return clients.size();
-    } else {
-        return -1;
-    }
+    return -1;
 }
 
 const std::vector<WifiP2pGroupInfo> &WifiP2pGroupManager::GetGroups()
@@ -158,7 +152,7 @@ int WifiP2pGroupManager::GetNetworkIdFromClients(const WifiP2pDevice &device)
 
     std::unique_lock<std::mutex> lock(groupMutex);
     for (auto it = groupsInfo.begin(); it != groupsInfo.end(); ++it) {
-        const std::vector<WifiP2pDevice> &clients = it->GetClientDevices();
+        const std::vector<WifiP2pDevice> &clients = it->GetPersistentDevices();
         for (auto client = clients.begin(); client != clients.end(); client++) {
             std::string clientAddr = client->GetDeviceAddress();
             std::transform(clientAddr.begin(), clientAddr.end(), clientAddr.begin(), ::tolower);

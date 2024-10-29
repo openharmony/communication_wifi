@@ -68,7 +68,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("IsHotspotDualBandSupported:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
+        WIFI_LOGE("IsHotspotDualBandSupported:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -233,29 +233,30 @@ ErrCode WifiHotspotServiceImpl::SetHotspotIdleTimeout(int time)
 ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetStationList:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
-    if (WifiPermissionUtils::VerifyGetWifiInfoInternalPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetStationList:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
-
-        if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("GetStationList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
-
-    #ifndef SUPPORT_RANDOM_MAC_ADDR
+    if (apiVersion == API_VERSION_9) {
+#ifndef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
             WIFI_LOGE("GetStationList:VerifyGetScanInfosPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
-    #endif
-
-        if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("GetStationList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
+#endif
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetStationList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetStationList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (!IsApServiceRunning()) {
@@ -385,6 +386,17 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         WIFI_LOGI("current power saving mode and can not use ap, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
     }
+
+    if (WifiManager::GetInstance().GetWifiMultiVapManager() == nullptr) {
+        WIFI_LOGE("GetWifiMultiVapManager Fail");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (!WifiManager::GetInstance().GetWifiMultiVapManager()->CheckCanUseSoftAp()) {
+        WIFI_LOGE("SoftAp is not allowed to use");
+        return WIFI_OPT_FAILED;
+    }
+
     return WIFI_OPT_SUCCESS;
 }
 

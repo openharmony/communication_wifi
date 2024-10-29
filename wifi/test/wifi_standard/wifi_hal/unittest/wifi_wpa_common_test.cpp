@@ -81,7 +81,7 @@ HWTEST_F(WifiWpaCommonTest, WpaCliCmdTest_02, TestSize.Level1)
     const char cmd[bufLen] = "ENABLE";
     char buf[bufLen] = "string";
     int result = WpaCliCmd(cmd, buf, bufLen);
-    EXPECT_NE(result, 10);
+    EXPECT_EQ(result, 0);
 }
 
 HWTEST_F(WifiWpaCommonTest, GetStrKeyValTest_01, TestSize.Level1)

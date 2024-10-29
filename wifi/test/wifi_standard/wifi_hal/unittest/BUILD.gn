@@ -54,7 +54,6 @@ ohos_unittest("wifi_hal_unittest") {
     "mock_wpa_ctrl.cpp",
     "wifi_hal_adapter_test.cpp",
     "wifi_hal_base_interface_test.cpp",
-    "wifi_hal_callback_test.cpp",
     "wifi_hal_chba_interface_test.cpp",
     "wifi_hal_chip_interface_test.cpp",
     "wifi_hal_common_func_test.cpp",

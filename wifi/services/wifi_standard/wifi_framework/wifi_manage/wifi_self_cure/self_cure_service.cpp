@@ -98,13 +98,19 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD, info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD, info);
+        if (lastState == OperateResState::CONNECT_OBTAINING_IP) {
+            pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, lastWifiLinkedInfo);
+        }
     } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
         pSelfCureStateMachine->SetHttpMonitorStatus(false);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, 1, info);
     } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
         pSelfCureStateMachine->SetHttpMonitorStatus(true);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);
+    } else if (state == OperateResState::CONNECT_OBTAINING_IP) {
+        lastWifiLinkedInfo = info;
     }
+    lastState = state;
 }
 
 void SelfCureService::HandleStaOpened()

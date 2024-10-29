@@ -64,6 +64,9 @@ constexpr int FREQ_CHANNEL_1 = 2412;
 constexpr int FREQ_CHANNEL_36 = 5180;
 constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
 constexpr int MICROSECOND_TO_NANOSECOND = 1000;
+constexpr char HIDDEN_CHAR_SHOW_AS = '*';
+constexpr int PASSWORD_MIN_LEN = 8;
+constexpr int PASSWORD_NO_HIDDEN_LEN = 2;
 
 const uint32_t BASE64_UNIT_ONE_PADDING = 1;
 const uint32_t BASE64_UNIT_TWO_PADDING = 2;
@@ -142,6 +145,18 @@ std::string SsidAnonymize(const std::string str)
         return s;
     }
     std::for_each(s.begin() + headKeepSize, s.begin() + s.size() - tailKeepSize, func);
+    return s;
+}
+
+std::string PassWordAnonymize(const std::string str)
+{
+    if (str.size() < PASSWORD_MIN_LEN) {
+        WIFI_LOGE("Password should not shorter than 8");
+        return "";
+    }
+    std::string s = str;
+    auto func = [](char& c) { c = HIDDEN_CHAR_SHOW_AS; };
+    std::for_each(s.begin() + PASSWORD_NO_HIDDEN_LEN, s.end() - PASSWORD_NO_HIDDEN_LEN, func);
     return s;
 }
 

@@ -168,6 +168,8 @@ public:
     std::string SetBackupReplyCode(int replyCode);
 
     void RemoveBackupFile();
+
+    int SetWifiToggleCaller(int callerPid, int instId = 0);
 #endif
 
     bool AddRandomMac(WifiStoreRandomMac &randomMacInfo);

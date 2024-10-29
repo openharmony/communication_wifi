@@ -1057,6 +1057,11 @@ int WifiSettings::SetOperatorWifiType(int type, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     mWifiConfig[instId].staAirplaneMode = type;
+    struct timespec times = {0, 0};
+    clock_gettime(CLOCK_REALTIME, &times);
+    int64_t curTimeMs = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
+    LOGI("set persist wifi state, current time is:%{public}lld", curTimeMs);
+    mWifiConfig[instId].persistWifiTime = curTimeMs;
     SyncWifiConfig();
     return 0;
 }
@@ -1078,6 +1083,16 @@ int WifiSettings::SetLastAirplaneMode(int mode, int instId)
     SyncWifiConfig();
     return 0;
 }
+
+#ifndef OHOS_ARCH_LITE
+int WifiSettings::SetWifiToggleCaller(int callerPid, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig[instId].toggleWifiCaller = callerPid;
+    SyncWifiConfig();
+    return 0;
+}
+#endif
 
 bool WifiSettings::GetCanOpenStaWhenAirplaneMode(int instId)
 {

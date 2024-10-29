@@ -809,7 +809,7 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         pScanStateMachine->UpdatePnoScanRequest(msg);
         pScanStateMachine->UpdatePnoScanRequest(nullptr);
-        EXPECT_NE(pScanStateMachine->m_instId, 0);
+        EXPECT_NE(pScanStateMachine->m_instId, TWO);
     }
 
     void GetPnoScanRequestInfoTest1()

@@ -121,16 +121,14 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         return errCode;
     }
 
-    if (m_instId == 0) {
+    if (m_instId == INSTID_WLAN0) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
 #ifndef OHOS_ARCH_LITE
         WifiSettings::GetInstance().SetWifiToggleCaller(GetCallingPid(), m_instId);
 #endif
+        WifiManager::GetInstance().GetWifiTogglerManager()->StartWifiToggledTimer();
     }
-
-    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
-    wifiTogglerManager->StartWifiToggledTimer();
-    return wifiTogglerManager->WifiToggled(1, m_instId);
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::DisableWifi()
@@ -161,9 +159,10 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
 #endif
     }
 
-    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
-    wifiTogglerManager->StopWifiToggledTimer();
-    return wifiTogglerManager->WifiToggled(0, m_instId);
+    if (m_instId == INSTID_WLAN0) {
+        WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
+    }
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
@@ -202,9 +201,10 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
 #endif
     }
 
-    auto &wifiTogglerManager = WifiManager::GetInstance().GetWifiTogglerManager();
-    wifiTogglerManager->StopWifiToggledTimer();
-    return wifiTogglerManager->WifiToggled(0, m_instId);
+    if (m_instId == INSTID_WLAN0) {
+        WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
+    }
+    return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
 
 ErrCode WifiDeviceServiceImpl::InitWifiProtect(const WifiProtectType &protectType, const std::string &protectName)
@@ -1486,6 +1486,10 @@ ErrCode WifiDeviceServiceImpl::GetSignalLevel(const int &rssi, const int &band, 
 
 ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
 {
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetSupportedFeatures:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

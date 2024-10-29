@@ -168,6 +168,7 @@ void WifiTogglerManager::DealMultiStaStartFailure(int id)
 void WifiTogglerManager::DealMultiStaStop(int id)
 {
     return;
+}
 
 void WifiTogglerManager::ForceStopWifi()
 {

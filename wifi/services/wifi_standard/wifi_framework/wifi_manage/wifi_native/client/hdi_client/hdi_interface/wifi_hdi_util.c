@@ -807,11 +807,8 @@ int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems
 
         switch (id) {
             case HDI_EID_SSID:
-                if (found_ssid) {
-                    break;
-                }
-                if (elen > SSID_MAX_LEN) {
-                    LOGI("Ignored too long SSID HdiElem (elen=%{public}u)", elen);
+                if (elen > SSID_MAX_LEN || found_ssid) {
+                    LOGI("Ignored too long SSID HdiElem (elen=%{public}u) or ssid found", elen);
                     break;
                 }
                 elems->ssid = pos;
@@ -1364,7 +1361,7 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
         uint8_t id = elem->id, elen = elem->datalen;
         if (id == HDI_EID_SSID) {
             if (found_ssid) {
-                break;
+                continue;
             }
             found_ssid = true;
         }

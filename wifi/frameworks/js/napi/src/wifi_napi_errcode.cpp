@@ -48,13 +48,13 @@ static std::map<int32_t, int32_t> errCodeMap = {
 
 static std::map<int32_t, std::string> napiErrMsgMap {
     { WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED, "Operation failed." },
-    { WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED, "WIFI doesn't open." },
+    { WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED, "Wi-Fi STA disabled." },
     { WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED, "Permission denied." },
     { WifiNapiErrCode::WIFI_ERRCODE_NON_SYSTEMAPP, "non-system application." },
     { WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM, "Parameter error." },
     { WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
-    { WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Failed for wifi is closing." },
-    { WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Failed for wifi is opening." },
+    { WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is being closed." },
+    { WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
 };
 
 static napi_value NapiGetUndefined(const napi_env &env)

@@ -776,6 +776,8 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
     userSetStaticIpConfig = ipAssignment == AssignIpMethod::STATIC;
     lastHasInetTime = pSelfCureStateMachine->GetLastHasInternetTime();
     configAuthType = pSelfCureStateMachine->GetAuthType();
+    WIFI_LOGI("hasInternetRecently: %{public}d, portalUnthenEver: %{public}d, selfCureHistoryInfo: %{public}s",
+        hasInternetRecently, portalUnthenEver, pSelfCureStateMachine->GetSelfCureHistoryInfo().c_str());
     return;
 }
 
@@ -1408,7 +1410,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
     }
     WIFI_LOGI("begin to self cure for internet access: Reset");
     WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
-    pSelfCureStateMachine->UpdateSelfcureState(static_cast<int>(SelfCureType::SCE_TYPE_RESET), true);
     pSelfCureStateMachine->StopTimer(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK);
     delayedResetSelfCure = false;
     testedSelfCureLevel.push_back(requestCureLevel);
@@ -2399,21 +2400,25 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
 int SelfCureStateMachine::String2InternetSelfCureHistoryInfo(const std::string selfCureHistory,
                                                              WifiSelfCureHistoryInfo &info)
 {
+    WifiSelfCureHistoryInfo selfCureHistoryInfo;
     if (selfCureHistory.empty()) {
         WIFI_LOGE("InternetSelfCureHistoryInfo is empty!");
+        info = selfCureHistoryInfo;
         return -1;
     }
     std::vector<std::string> histories = TransStrToVec(selfCureHistory, '|');
     if (histories.size() != SELFCURE_HISTORY_LENGTH) {
         WIFI_LOGE("self cure history length = %{public}lu", (unsigned long) histories.size());
+        info = selfCureHistoryInfo;
         return -1;
     }
-    if (SetSelfCureFailInfo(info, histories, SELFCURE_FAIL_LENGTH) != 0) {
+    if (SetSelfCureFailInfo(selfCureHistoryInfo, histories, SELFCURE_FAIL_LENGTH) != 0) {
         WIFI_LOGE("set self cure history information failed!");
     }
-    if (SetSelfCureConnectFailInfo(info, histories, SELFCURE_FAIL_LENGTH) != 0) {
+    if (SetSelfCureConnectFailInfo(selfCureHistoryInfo, histories, SELFCURE_FAIL_LENGTH) != 0) {
         WIFI_LOGE("set self cure connect history information failed!");
     }
+    info = selfCureHistoryInfo;
     return 0;
 }
 

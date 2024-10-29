@@ -596,8 +596,7 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const
 {
     std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetWifiScanConfig(scanInfoList);
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanInfoList);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto &scanInfo : scanInfoList) {
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);

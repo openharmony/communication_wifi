@@ -324,7 +324,7 @@ std::string Ipv6Address::GetNetwork() const
 
 std::string Ipv6Address::BinToHex(const std::string &strBin)
 {
-    int addrDec = CheckDataLegal(const_cast<std::string&>(strBin), MAX_BIN);
+    int addrDec = CheckDataLegalBin(strBin);
     std::string addrHex;
     char buf[2] = {0};
     if (addrDec % MAX_HEX < MAX_DEC) {
@@ -340,7 +340,7 @@ std::string Ipv6Address::BinToHex(const std::string &strBin)
 
 std::string Ipv6Address::HexToBin(const std::string &strHex)
 {
-    int addrDec = CheckDataLegal(const_cast<std::string&>(strHex), MAX_HEX);
+    int addrDec = CheckDataLegalHex(strHex);
     std::string addrBin;
     for (int n = addrDec; n; n = n / MAX_BIN) {
         addrBin += ((n % MAX_BIN) ? "1" : "0");

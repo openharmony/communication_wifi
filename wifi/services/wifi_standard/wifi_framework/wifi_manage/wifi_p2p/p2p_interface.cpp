@@ -217,17 +217,6 @@ ErrCode P2pInterface::Hid2dConnect(const Hid2dConnectConfig& config)
     return p2pService.Hid2dConnect(config);
 }
 
-ErrCode P2pInterface::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
-    char cfgData[CFG_DATA_MAX_BYTES], int* getDatValidLen)
-{
-    return p2pService.Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen);
-}
-
-ErrCode P2pInterface::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
-    char cfgData[CFG_DATA_MAX_BYTES], int setDataValidLen)
-{
-    return p2pService.Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen);
-}
 
 ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
 {

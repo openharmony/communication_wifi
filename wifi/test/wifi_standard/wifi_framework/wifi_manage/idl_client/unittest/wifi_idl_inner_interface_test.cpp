@@ -49,6 +49,11 @@ static void OnWpaStateChangedMock(int status)
     LOGI("OnWpaStateChangedMock");
 }
 
+static void OnWpaSsidWrongKeyMock()
+{
+    LOGI("OnWpaSsidWrongKeyMock");
+}
+
 static void OnWpsOverlapMock(int status)
 {
     LOGI("OnWpsOverlapMock");
@@ -165,7 +170,7 @@ static void OnStaDeauthorizedMock(const std::string &address)
     LOGI("OnStaDeauthorizedMock");
 }
 
-static void OnStaAuthorizedMock(const std::string &devAddress, const std::string &groupAddress)
+static void OnStaAuthorizedMock(const std::string &address, const std::string &address1)
 {
     LOGI("OnStaAuthorizedMock");
 }
@@ -200,6 +205,7 @@ public:
         callback->onConnectChanged = OnConnectChangedMock;
         callback->onBssidChanged = OnBssidChangedMock;
         callback->onWpaStateChanged = OnWpaStateChangedMock;
+        callback->onWpaSsidWrongKey = OnWpaSsidWrongKeyMock;
         callback->onWpsOverlap = OnWpsOverlapMock;
         callback->onWpsTimeOut = OnWpsTimeOutMock;
         callback->onWpaConnectionFull = OnWpaConnectionFullMock;
@@ -410,6 +416,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     std::string ifaceName = "wlan0";
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
     OnWpaStateChanged(status);
+    OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
     OnWpaConnectionReject(status);
     OnWpsOverlap(status);
@@ -417,6 +424,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     UnRegisterStaCallbackMock(&callback);
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
     OnWpaStateChanged(status);
+    OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
     OnWpaConnectionReject(status);
     OnWpsOverlap(status);
@@ -763,20 +771,19 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pStaDeauthorizedTest, TestSize.Level1)
 {
     LOGI("OnP2pStaDeauthorizedTest enter");
     char *p2pDeviceAddress = nullptr;
-    char *p2pGroupAddress = nullptr;
+    char *p2pRandomDeviceAddress  = nullptr;
     OnP2pStaDeauthorized(p2pDeviceAddress);
-    OnP2pStaAuthorized(p2pDeviceAddress, p2pGroupAddress);
+    OnP2pStaAuthorized(p2pDeviceAddress, p2pRandomDeviceAddress);
     char p2pDeviceAdd[] = "AA:BB:CC:DD:EE:FF";
-    char p2pGroupAdd[] = "AA:BB:CC:DD:EE:FF";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pStaDeauthorized(p2pDeviceAdd);
-    OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAdd);
+    OnP2pStaAuthorized(p2pDeviceAdd, p2pDeviceAdd);
     UnRegisterP2pCallbackMock(&callback);
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     OnP2pStaDeauthorized(p2pDeviceAdd);
-    OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAdd);
+    OnP2pStaAuthorized(p2pDeviceAdd, p2pDeviceAdd);
 }
 /**
  * @tc.name: OnP2pConnectSupplicantFailedTest

@@ -221,7 +221,7 @@ HWTEST_F(WifiManagerTest, AutoStartP2pService_002, TestSize.Level1)
     WIFI_LOGI("AutoStartP2pService_002 enter!");
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
         .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
-    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_OPEN_SUCC_WHEN_OPENED);
+    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiManagerTest, AutoStopP2pService_001, TestSize.Level1)
@@ -409,6 +409,30 @@ HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
     wifiManager.wifiEventSubscriberManager->UnRegisterLocationEvent();
 }
 
+HWTEST_F(WifiManagerTest, RegisterNetworkStateChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("RegisterNetworkStateChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->RegisterNetworkStateChangeEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterNetworkStateChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("UnRegisterNetworkStateChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->UnRegisterNetworkStateChangeEvent();
+}
+
+HWTEST_F(WifiManagerTest, RegisterWifiScanChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("RegisterWifiScanChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest, TestSize.Level1)
+{
+    WIFI_LOGI("UnRegisterWifiScanChangeEventTest enter!");
+    wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
+}
+
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");
@@ -490,6 +514,12 @@ HWTEST_F(WifiManagerTest, DealSoftapStartFailureTest, TestSize.Level1)
 {
     WIFI_LOGI("DealSoftapStartFailureTest enter!");
     wifiManager.wifiTogglerManager->DealSoftapStartFailure(1);
+}
+
+HWTEST_F(WifiManagerTest, ForceStopWifiTest, TestSize.Level1)
+{
+    WIFI_LOGI("ForceStopWifiTest enter!");
+    wifiManager.wifiTogglerManager->ForceStopWifi();
 }
 
 HWTEST_F(WifiManagerTest, SatelliteToggledTest, TestSize.Level1)

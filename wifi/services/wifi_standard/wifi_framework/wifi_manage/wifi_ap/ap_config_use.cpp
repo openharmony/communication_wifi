@@ -65,10 +65,8 @@ void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig) const
         apConfig.SetChannel(bestChannel);
     }
     JudgeDbacWithP2p(apConfig);
-    WIFI_LOGI("ap config: ssid=%{public}s, preSharedKey=%{public}s, inst_id=%{public}d, band=%{public}d,\
-        channel=%{public}d", SsidAnonymize(apConfig.GetSsid()).c_str(),
-        SsidAnonymize(apConfig.GetPreSharedKey()).c_str(), m_id, static_cast<int>(apConfig.GetBand()),
-        apConfig.GetChannel());
+    WIFI_LOGI("ap config: ssid=%{public}s, inst_id=%{public}d, band=%{public}d, channel=%{public}d",
+        SsidAnonymize(apConfig.GetSsid()).c_str(), m_id, static_cast<int>(apConfig.GetBand()), apConfig.GetChannel());
 }
 
 int ApConfigUse::GetBestChannelFor2G() const
@@ -94,6 +92,7 @@ int ApConfigUse::GetBestChannelFor5G(HotspotConfig &apConfig) const
         WIFI_LOGI("GetBestChannelFor5G BandWidth is 160M");
         return AP_CHANNEL_5G_160M_DEFAULT;
     }
+
     if (channels.empty()) {
         WIFI_LOGI("GetBestChannelFor5G is empty");
         return AP_CHANNEL_INVALID;

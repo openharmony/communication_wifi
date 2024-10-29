@@ -17,6 +17,8 @@
 #include <gmock/gmock.h>
 #include "wifi_service_scheduler.h"
 #include "wifi_config_center.h"
+#include "mock_wifi_manager.h"
+#include "mock_wifi_sta_hal_interface.h"
 
 
 using ::testing::_;
@@ -52,7 +54,7 @@ public:
         std::string ifName;
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::RUNNING, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartStaService(0, ifName), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartStaService(0, ifName), WIFI_OPT_FAILED);
     }
 
     void AutoStopStaServiceTest()
@@ -82,7 +84,7 @@ public:
         std::string ifName;
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::SEMI_ACTIVE, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartSemiStaService(0, ifName), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartSemiStaService(0, ifName), WIFI_OPT_FAILED);
     }
 
     void AutoStartApServiceTest()

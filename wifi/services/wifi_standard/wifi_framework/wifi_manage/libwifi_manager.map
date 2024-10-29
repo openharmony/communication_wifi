@@ -36,6 +36,8 @@
         "OHOS::Wifi::WifiTogglerManager::HasAnyApRuning()";
         "OHOS::Wifi::WifiTogglerManager::StartWifiToggledTimer()";
         "OHOS::Wifi::WifiTogglerManager::StopWifiToggledTimer()";
+        "OHOS::Wifi::WifiTogglerManager::StartSemiWifiToggledTimer()";
+        "OHOS::Wifi::WifiTogglerManager::StopSemiWifiToggledTimer()";
         "OHOS::Wifi::WifiTogglerManager::GetControllerMachine()";
         "OHOS::Wifi::WifiTogglerManager::ForceStopWifi()";
         "OHOS::Wifi::WifiTogglerManager::SatelliteToggled(int)";

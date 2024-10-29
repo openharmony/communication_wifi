@@ -573,4 +573,3 @@ HWTEST_F(ConcreteManagerMachineTest, HandleStaSemiActiveTest3, TestSize.Level1)
 }
 }
 }
-}

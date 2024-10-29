@@ -46,7 +46,7 @@ int WifiAuthCenter::Init()
 }
 
 #ifndef OHOS_ARCH_LITE
-bool WifiAuthCenter::IsSystemAppByToken()
+bool WifiAuthCenter::IsSystemAccess()
 {
     uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
     bool isSystemApp = Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
@@ -55,11 +55,14 @@ bool WifiAuthCenter::IsSystemAppByToken()
         Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     WIFI_LOGI("fullTokenId:%" PRIu64 ", isSystemApp:%{public}d, callingType:%{public}d.",
         fullTokenId, isSystemApp, callingType);
-    if (callingType == Security::AccessToken::TOKEN_HAP && !isSystemApp) {
-        WIFI_LOGE("The caller is not a system app.");
-        return false;
+    if (callingType == Security::AccessToken::TOKEN_NATIVE || callingType == Security::AccessToken::TOKEN_SHELL) {
+        return true;
     }
-    return true;
+    if (callingType == Security::AccessToken::TOKEN_HAP && isSystemApp) {
+        return true;
+    }
+    WIFI_LOGE("The caller is not a system app.");
+    return false;
 }
 bool WifiAuthCenter::IsNativeProcess()
 {

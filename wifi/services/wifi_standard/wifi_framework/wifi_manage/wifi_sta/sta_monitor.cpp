@@ -29,7 +29,9 @@ DEFINE_WIFILOG_LABEL("StaMonitor");
 namespace OHOS {
 namespace Wifi {
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
-{}
+{
+    WIFI_LOGI("StaMonitor constuctor insId %{public}d", instId);
+}
 
 StaMonitor::~StaMonitor()
 {
@@ -56,7 +58,8 @@ ErrCode StaMonitor::InitStaMonitor()
         [this](int reason, const std::string &bssid) { this->OnReportDisConnectReasonCallBack(reason, bssid); },
     };
 
-    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_HAL_OPT_OK) {
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("InitStaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
@@ -67,7 +70,8 @@ NO_SANITIZE("cfi") ErrCode StaMonitor::UnInitStaMonitor() const
 {
     WIFI_LOGI("Enter UnInitStaMonitor.\n");
     WifiEventCallback callBack;
-    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack) != WIFI_HAL_OPT_OK) {
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callBack, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("~StaMonitor RegisterStaEventCallback failed!");
         return WIFI_OPT_FAILED;
     }
@@ -106,10 +110,8 @@ void StaMonitor::OnReportDisConnectReasonCallBack(int reason, const std::string 
 
 void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::string &bssid)
 {
-    WIFI_LOGI("OnConnectChangedCallBack() status:%{public}d,networkId=%{public}d,bssid=%{public}s",
-        status,
-        networkId,
-        MacAnonymize(bssid).c_str());
+    WIFI_LOGI("OnConnectChangedCallBack status:%{public}d, networkId=%{public}d, bssid=%{public}s, instId=%{public}d",
+        status, networkId, MacAnonymize(bssid).c_str(), m_instId);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;
@@ -173,7 +175,6 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
 void StaMonitor::OnWpaHilinkCallBack(const std::string &bssid)
 {
     WIFI_LOGI("OnWpaHilinkCallBack() enter");
-
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS, bssid);
     return;
 }

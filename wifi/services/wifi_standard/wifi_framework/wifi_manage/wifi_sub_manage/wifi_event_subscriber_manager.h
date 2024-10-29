@@ -30,6 +30,10 @@ namespace Wifi {
 #ifdef HAS_POWERMGR_PART
 const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_MANAGER_STATE_CHANGED";
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+inline const std::string COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED = "usual.event.ASSET_SYNC_DATA_CHANGED_SA";
+const int ASSETID = 6226;
+#endif
 const int CAST_ENGINE_SA_ID = 65546;
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
@@ -44,6 +48,7 @@ public:
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
 };
@@ -63,6 +68,28 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+class AssetEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit AssetEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~AssetEventSubscriber();
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+#endif
+
+class NetworkStateChangeSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit NetworkStateChangeSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~NetworkStateChangeSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
+class WifiScanEventChangeSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit WifiScanEventChangeSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~WifiScanEventChangeSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
 
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
@@ -118,16 +145,30 @@ private:
 #ifdef FEATURE_P2P_SUPPORT
     void HandleP2pBusinessChange(int systemAbilityId, bool add);
 #endif
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    void RegisterAssetEvent();
+    void UnRegisterAssetEvent();
+#endif
+    void RegisterNetworkStateChangeEvent();
+    void UnRegisterNetworkStateChangeEvent();
+    void RegisterWifiScanChangeEvent();
+    void UnRegisterWifiScanChangeEvent();
 private:
     std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
     uint32_t notificationTimerId{0};
     uint32_t accessDatashareTimerId{0};
+    uint32_t networkStateChangeTimerId{0};
+    uint32_t wifiScanChangeTimerId{0};
     std::mutex cesEventMutex;
     std::mutex notificationEventMutex;
+    std::mutex networkStateChangeEventMutex;
+    std::mutex wifiScanChangeEventMutex;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
     std::shared_ptr<NotificationEventSubscriber> wifiNotificationSubsciber_ = nullptr;
+    std::shared_ptr<NetworkStateChangeSubscriber> networkStateChangeSubsciber_ = nullptr;
+    std::shared_ptr<WifiScanEventChangeSubscriber> wifiScanEventChangeSubscriber_ = nullptr;
 #ifdef HAS_MOVEMENT_PART
     std::mutex deviceMovementEventMutex;
 #endif
@@ -135,6 +176,11 @@ private:
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;
     std::unique_ptr<WifiEventHandler> mWifiEventSubsThread = nullptr;
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+    std::shared_ptr<AssetEventSubscriber> wifiAssetrEventSubsciber_ = nullptr;
+    std::mutex AssetEventMutex;
+    uint32_t assetMgrId{0};
+#endif
 };
 
 }  // namespace Wifi

@@ -26,6 +26,7 @@ enum class AppType {
     LOW_LATENCY_APP = 0,
     WHITE_LIST_APP,
     BLACK_LIST_APP,
+    MULTILINK_BLACK_LIST_APP,
     CHARIOT_APP,
     HIGH_TEMP_LIMIT_SPEED_APP,
     OTHER_APP
@@ -38,6 +39,7 @@ struct CommonAppInfo {
 struct LowLatencyAppInfo : CommonAppInfo {};
 struct WhiteListAppInfo : CommonAppInfo {};
 struct BlackListAppInfo : CommonAppInfo {};
+struct MultiLinkAppInfo : CommonAppInfo {};
 struct ChariotAppInfo : CommonAppInfo {};
 struct HighTempLimitSpeedAppInfo : CommonAppInfo {};
 
@@ -49,6 +51,7 @@ public:
     bool IsLowLatencyApp(const std::string &bundleName) const;
     bool IsWhiteListApp(const std::string &bundleName) const;
     bool IsBlackListApp(const std::string &bundleName) const;
+    bool IsMultiLinkApp(const std::string &bundleName) const;
     bool IsChariotApp(const std::string &bundleName) const;
     bool IsHighTempLimitSpeedApp(const std::string &bundleName) const;
     bool Init();
@@ -60,6 +63,7 @@ private:
     LowLatencyAppInfo ParseLowLatencyAppInfo(const xmlNodePtr &innode);
     WhiteListAppInfo ParseWhiteAppInfo(const xmlNodePtr &innode);
     BlackListAppInfo ParseBlackAppInfo(const xmlNodePtr &innode);
+    MultiLinkAppInfo ParseMultiLinkAppInfo(const xmlNodePtr &innode);
     ChariotAppInfo ParseChariotAppInfo(const xmlNodePtr &innode);
     HighTempLimitSpeedAppInfo ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
@@ -73,6 +77,7 @@ private:
     std::vector<LowLatencyAppInfo> m_lowLatencyAppVec {};
     std::vector<WhiteListAppInfo> m_whiteAppVec {};
     std::vector<BlackListAppInfo> m_blackAppVec {};
+    std::vector<MultiLinkAppInfo> m_multilinkAppVec {};
     std::vector<ChariotAppInfo> m_chariotAppVec {};
     std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVec {};
     std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVecCloudPush {};

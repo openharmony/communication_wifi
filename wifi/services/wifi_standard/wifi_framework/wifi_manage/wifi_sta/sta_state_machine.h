@@ -107,6 +107,8 @@ constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
 constexpr int DHCP_LEASE_EXPIRED = 6;
 
+constexpr unsigned int BIT_MLO_CONNECT = 0x80;
+
 #define DNS_IP_ADDR_LEN 15
 #define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
 #define WIFI_SECOND_DNS_NAME "const.wifi.wifi_second_dns"
@@ -279,6 +281,7 @@ public:
     private:
         void HandleNetWorkConnectionEvent(InternalMessagePtr msg);
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
+        void HandleLinkSwitchEvent(InternalMessagePtr msg);
     private:
         StaStateMachine *pStaStateMachine;
     };
@@ -485,6 +488,13 @@ public:
     void RegisterStaServiceCallback(const StaServiceCallback &callback);
 
     /**
+     * @Description unRegister sta callback function
+     *
+     * @param callback - Callback function pointer storage structure
+     */
+    void UnRegisterStaServiceCallback(const StaServiceCallback &callback);
+
+    /**
      * @Description  Convert the deviceConfig structure and set it to idl structure
      *
      * @param config -The Network info(in)
@@ -542,6 +552,8 @@ public:
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif
+
+    bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);
 private:
     /**
      * @Description  Destruct state.
@@ -1260,6 +1272,8 @@ private:
     ErrCode ConfigRandMacSelfCure(const int networkId);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
+    void UpdateWifiCategory();
+    void SetSupportedWifiCategory();
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
@@ -1268,6 +1282,8 @@ private:
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
     bool IsGoodSignalQuality();
+    void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
+    void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -49,6 +49,7 @@ WifiTogglerManager::WifiTogglerManager()
 #endif
     InitConcreteCallback();
     InitSoftapCallback();
+    InitMultiStacallback();
     pWifiControllerMachine = std::make_unique<WifiControllerMachine>();
     if (pWifiControllerMachine) {
         pWifiControllerMachine->InitWifiControllerMachine();
@@ -65,18 +66,43 @@ SoftApModeCallback& WifiTogglerManager::GetSoftApCallback()
     return mSoftApModeCb;
 }
 
+MultiStaModeCallback& WifiTogglerManager::GetMultiStaCallback()
+{
+    return mMultiStaModeCb;
+}
+
 ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
 {
     pWifiControllerMachine->ClearWifiStartFailCount();
+    WIFI_LOGI("WifiTogglerManager::WifiToggled, isOpen %{public}d instId: %{public}d", isOpen, id);
     pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
+}
+
+void WifiTogglerManager::StartWifiToggledTimer()
+{
+    WIFI_LOGD("StartWifiToggledTimer");
+    pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+    pWifiControllerMachine->MessageExecutedLater(CMD_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+}
+
+void WifiTogglerManager::StopWifiToggledTimer()
+{
+    WIFI_LOGD("StopWifiToggledTimer");
+    pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+}
+
+void WifiTogglerManager::OnWifiToggledTimeOut()
+{
+    WIFI_LOGE("OnWifiToggledTimeOut");
+    WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
+        "TIME_OUT", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(0)));
 }
 
 ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
 {
     if (isOpen) {
         WIFI_LOGI("set softap toggled true");
-        pWifiControllerMachine->ClearApStartFailCount();
         WifiConfigCenter::GetInstance().SetSoftapToggledState(true);
     } else {
         WIFI_LOGI("set softap toggled false");
@@ -134,6 +160,13 @@ void WifiTogglerManager::InitSoftapCallback()
     mSoftApModeCb.onStopped = std::bind(&WifiTogglerManager::DealSoftapStop, this, _1);
 }
 
+void WifiTogglerManager::InitMultiStacallback()
+{
+    using namespace std::placeholders;
+    mMultiStaModeCb.onStartFailure = std::bind(&WifiTogglerManager::DealMultiStaStartFailure, this, _1);
+    mMultiStaModeCb.onStopped = std::bind(&WifiTogglerManager::DealMultiStaStop, this, _1);
+}
+
 void WifiTogglerManager::DealConcreateStop(int id)
 {
     if (pWifiControllerMachine) {
@@ -166,6 +199,20 @@ void WifiTogglerManager::DealClientRemoved(int id)
 {
     if (pWifiControllerMachine) {
         pWifiControllerMachine->SendMessage(CMD_CONCRETECLIENT_REMOVED, id);
+    }
+}
+
+void WifiTogglerManager::DealMultiStaStartFailure(int id)
+{
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->SendMessage(CMD_STA_START_FAILURE, id);
+    }
+}
+
+void WifiTogglerManager::DealMultiStaStop(int id)
+{
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->SendMessage(CMD_MULTI_STA_STOPPED, id);
     }
 }
 

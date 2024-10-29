@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #ifndef OHOS_MOCK_WIFITOGGLERMANAGER_H
-#define OHOS_WIFI_WIFITOGGLERMANAGER_H
+#define OHOS_MOCK_WIFITOGGLERMANAGER_H
 
 #include <mutex>
 #include <functional>

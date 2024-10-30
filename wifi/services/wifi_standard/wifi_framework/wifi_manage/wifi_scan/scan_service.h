@@ -323,11 +323,11 @@ private:
     /* Stores data that is scanned and controlled regardless of applications. */
     std::vector<SingleAppForbid> fullAppForbidList;
     std::map<int, time_t> customSceneTimeMap; /* Record the time when a scene is entered. */
-    std::vector<std::string> scan_thermal_trust_list;
-    std::vector<std::string> scan_frequency_trust_list;
-    std::vector<std::string> scan_screen_off_trust_list;
-    std::vector<std::string> scan_gps_block_list;
-    std::vector<std::string> scan_hid2d_list;
+    std::vector<PackageInfo> scan_thermal_trust_list;
+    std::vector<PackageInfo> scan_frequency_trust_list;
+    std::vector<PackageInfo> scan_screen_off_trust_list;
+    std::vector<PackageInfo> scan_gps_block_list;
+    std::vector<PackageInfo> scan_hid2d_list;
     int customSceneForbidCount;
     mutable std::mutex scanConfigMapMutex;
     mutable std::mutex scanControlInfoMutex;
@@ -839,7 +839,7 @@ private:
      * @param packageFilter packageFilter[in]
      * @return true: int the list, false: not in the list.
      */
-    bool IsAppInFilterList(const std::vector<std::string> &packageFilter) const;
+    bool IsAppInFilterList(const std::vector<PackageInfo> &packageFilter) const;
     /* *
      * @Description adjust system scan interval when sta connected.
      *

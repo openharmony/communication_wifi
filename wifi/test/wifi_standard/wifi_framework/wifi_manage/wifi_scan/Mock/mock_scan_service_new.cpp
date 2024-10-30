@@ -499,7 +499,7 @@ ErrCode ScanService::SetNetworkInterfaceUpDown(bool upDown)
     return WIFI_OPT_SUCCESS;
 }
 
-bool ScanService::IsAppInFilterList(const std::vector<std::string> &packageFilter) const
+bool ScanService::IsAppInFilterList(const std::vector<PackageInfo> &packageFilter) const
 {
     return false;
 }

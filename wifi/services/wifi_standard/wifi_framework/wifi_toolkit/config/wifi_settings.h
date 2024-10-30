@@ -79,9 +79,8 @@ inline constexpr char WIFI_MOVING_FREEZE_POLICY_FILE_PATH[] = CONFIG_ROOR_DIR"/m
 inline constexpr char WIFI_STA_RANDOM_MAC_FILE_PATH[] = CONFIG_ROOR_DIR"/sta_randomMac.conf";
 inline constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStore.xml";
 inline constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
-inline constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.cfg";
+inline constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.xml";
 inline constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
-inline constexpr char WIFI_VARIABLE_PATH[] = "/system/etc/wifi/wifi_variable.cfg";
 
 namespace OHOS {
 namespace Wifi {
@@ -180,11 +179,9 @@ public:
 
     const MovingFreezePolicy ReloadMovingFreezePolicy();
 
-    int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap);
+    int GetPackageInfoMap(std::map<std::string, std::vector<PackageInfo>> &packageInfoMap);
 
-    int GetVariableMap(std::map<std::string, std::string> &variableMap);
-
-    std::string GetVariablePackageName(std::string tag);
+    std::string GetPackageName(std::string tag);
 
     int SyncHotspotConfig();
 
@@ -284,8 +281,6 @@ public:
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
-    bool GetConfigValueByName(const std::string &name, std::string &value);
-
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
         const std::set<int> &wifiLinkedNetworkIds);
@@ -298,8 +293,7 @@ private:
     int IncreaseNumRebootsSinceLastUse();
     void EncryptionWifiDeviceConfigOnBoot();
     int ReloadStaRandomMac();
-    void InitPackageFilterConfig();
-    void InitVariableConfig();
+    void InitPackageInfoConfig();
     void InitDefaultHotspotConfig();
     void InitHotspotConfig();
     int SyncBlockList();
@@ -346,7 +340,6 @@ private:
     WifiConfigFileImpl<TrustListPolicy> mTrustListPolicies;
     WifiConfigFileImpl<MovingFreezePolicy> mMovingFreezePolicy;
     std::map<std::string, std::vector<std::string>> mFilterMap;
-    WifiConfigFileImpl<PackageFilterConf> mPackageFilterConfig;
 
     // AP
     std::mutex mApMutex;
@@ -365,14 +358,12 @@ private:
     // COMMON
     std::mutex mWifiConfigMutex;
     std::mutex mSyncWifiConfigMutex;
+    std::mutex mPackageConfMutex;
     std::atomic<int> mApMaxConnNum;
     std::atomic<int> mMaxNumConfigs;
     std::map<int, WifiConfig> mWifiConfig;
     WifiConfigFileImpl<WifiConfig> mSavedWifiConfig;
-
-    std::mutex mVariableConfMutex;
-    WifiConfigFileImpl<VariableConf> mVariableConf;
-    std::map<std::string, std::string> mVariableMap;
+    std::map<std::string, std::vector<PackageInfo>> mPackageInfoMap;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -3371,14 +3371,7 @@ bool SelfCureStateMachine::IfMultiGateway()
 
 bool SelfCureStateMachine::IsSettingsPage()
 {
-    std::map<std::string, std::string> variableMap;
-    std::string page;
-    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
-        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
-    }
-    if (variableMap.find("SETTINGS") != variableMap.end()) {
-        page = variableMap["SETTINGS"];
-    }
+    std::string page = WifiSettings::GetInstance().GetPackageName("SETTINGS");
     if (WifiAppStateAware::GetInstance().IsForegroundApp(page)) {
         WIFI_LOGI("settings page, do not allow reset self cure");
         return true;

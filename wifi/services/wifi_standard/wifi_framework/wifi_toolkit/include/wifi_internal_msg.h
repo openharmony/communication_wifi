@@ -340,16 +340,6 @@ struct WifiStoreRandomMac {
     std::string preSharedKey;
     std::unordered_set<std::string> fuzzyBssids;
 };
-
-struct PackageFilterConf {
-    std::string filterName;
-    std::vector<std::string> packageList;
-};
-
-struct VariableConf {
-    std::string variableName;
-    std::string variableValue;
-};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

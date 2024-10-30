@@ -1687,52 +1687,6 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     return ss.str();
 }
 
-template <>
-void ClearTClass<PackageFilterConf>(PackageFilterConf &item)
-{
-    item.filterName.clear();
-    item.packageList.clear();
-    return;
-}
-
-template <>
-void ClearTClass<VariableConf>(VariableConf &item)
-{
-    item.variableName.clear();
-    item.variableValue.clear();
-    return;
-}
-
-template <>
-int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::string &key, const std::string &value)
-{
-    int errorKeyValue = 0;
-    if (key == "filterName") {
-        item.filterName = value;
-    } else if (key == "package") {
-        item.packageList.push_back(value);
-    } else {
-        LOGE("Invalid config key value");
-        errorKeyValue++;
-    }
-    return errorKeyValue;
-}
-
-template <>
-int SetTClassKeyValue<VariableConf>(VariableConf &item, const std::string &key, const std::string &value)
-{
-    int errorKeyValue = 0;
-    if (key == "variableName") {
-        item.variableName = value;
-    } else if (key == "variableValue") {
-        item.variableValue = value;
-    } else {
-        LOGE("Invalid config key value");
-        errorKeyValue++;
-    }
-    return errorKeyValue;
-}
-
 int SetNetworkStatusHistory(WifiDeviceConfig &item, const std::string &value)
 {
     std::string tmpValue = value;

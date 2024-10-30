@@ -1716,8 +1716,10 @@ public:
 
     void IsAppInFilterListTest()
     {
-        std::vector<std::string> packageFilter;
-        packageFilter.push_back("com.test.test");
+        std::vector<PackageInfo> packageFilter;
+        PackageInfo packageInfo;
+        packageInfo.name = "com.test.test";
+        packageFilter.push_back(packageInfo);
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test"));
         EXPECT_TRUE(pScanService->IsAppInFilterList(packageFilter) == false);
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return("com.test.test1"));

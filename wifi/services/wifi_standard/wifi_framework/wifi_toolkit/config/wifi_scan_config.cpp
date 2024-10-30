@@ -111,7 +111,7 @@ int WifiScanConfig::GetScanControlInfo(ScanControlInfo &info, int instId)
     return 0;
 }
 
-void WifiScanConfig::SetPackageFilter(std::map<std::string, std::vector<std::string>> &filterMap)
+void WifiScanConfig::SetPackageInfo(std::map<std::string, std::vector<PackageInfo>> &filterMap)
 {
     std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
     mScanDeviceInfo.scan_thermal_trust_list = filterMap["scan_thermal_filter"];

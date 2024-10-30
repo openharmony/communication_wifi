@@ -1367,16 +1367,16 @@ void ScanService::GetScanControlInfo()
     if (WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanControlInfo(scanControlInfo) != 0) {
         WIFI_LOGE("GetScanControlInfo failed");
     }
-    std::map<std::string, std::vector<std::string>> filterMap;
-    if (WifiSettings::GetInstance().GetPackageFilterMap(filterMap) != 0) {
-        WIFI_LOGE("WifiSettings::GetInstance().GetPackageFilterMap failed");
+    std::map<std::string, std::vector<PackageInfo>> packageInfoMap;
+    if (WifiSettings::GetInstance().GetPackageInfoMap(packageInfoMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetPackageInfoMap failed");
     }
-    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetPackageFilter(filterMap);
-    scan_thermal_trust_list = filterMap["scan_thermal_filter"];
-    scan_frequency_trust_list = filterMap["scan_frequency_filter"];
-    scan_screen_off_trust_list = filterMap["scan_screen_off_filter"];
-    scan_gps_block_list = filterMap["scan_gps_filter"];
-    scan_hid2d_list = filterMap["scan_hid2d_filter"];
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetPackageInfo(packageInfoMap);
+    scan_thermal_trust_list = packageInfoMap["scan_thermal_filter"];
+    scan_frequency_trust_list = packageInfoMap["scan_frequency_filter"];
+    scan_screen_off_trust_list = packageInfoMap["scan_screen_off_filter"];
+    scan_gps_block_list = packageInfoMap["scan_gps_filter"];
+    scan_hid2d_list = packageInfoMap["scan_hid2d_filter"];
     return;
 }
 
@@ -2422,11 +2422,13 @@ ErrCode ScanService::SetNetworkInterfaceUpDown(bool upDown)
     return WIFI_OPT_SUCCESS;
 }
 
-bool ScanService::IsAppInFilterList(const std::vector<std::string> &packageFilter) const
+bool ScanService::IsAppInFilterList(const std::vector<PackageInfo> &packageFilter) const
 {
     std::string packageName = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetAppPackageName();
-    if (std::find(packageFilter.begin(), packageFilter.end(), packageName) != packageFilter.end()) {
-        return true;
+    for (auto iter = packageFilter.begin(); iter != packageFilter.end(); iter++) {
+        if (iter->name == packageName) {
+            return true;
+        }
     }
     return false;
 }

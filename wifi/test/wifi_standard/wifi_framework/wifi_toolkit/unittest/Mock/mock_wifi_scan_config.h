@@ -33,7 +33,7 @@ public:
     virtual void CleanWifiCategoryRecord() = 0;
     virtual void SetAppPackageName(const std::string &name) = 0;
     virtual std::string GetAppPackageName() = 0;
-    virtual void SetPackageFilter(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
+    virtual void SetPackageInfo(std::map<std::string, std::vector<PackageInfo>> &filterMap) = 0;
     virtual void SetAppRunningState(ScanMode appRunMode) = 0;
     virtual ScanMode GetAppRunningState() = 0;
     virtual void RecordWifiCategory(const std::string bssid, WifiCategory category) = 0;
@@ -59,7 +59,7 @@ public:
     MOCK_METHOD0(CleanWifiCategoryRecord, void());
     MOCK_METHOD1(SetAppPackageName, void(const std::string &name));
     MOCK_METHOD0(GetAppPackageName, std::string());
-    MOCK_METHOD1(SetPackageFilter, void(std::map<std::string, std::vector<std::string>> &filterMap));
+    MOCK_METHOD1(SetPackageInfo, void(std::map<std::string, std::vector<PackageInfo>> &filterMap));
     MOCK_METHOD1(SetAppRunningState, void(ScanMode appRunMode));
     MOCK_METHOD0(GetAppRunningState, ScanMode());
     MOCK_METHOD2(RecordWifiCategory, void(const std::string bssid, WifiCategory category));

@@ -247,6 +247,8 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     if (IsAppInCandidateFilterList(uid)) {
         tempDeviceConfig.isShared = true;
         tempDeviceConfig.isEphemeral = false;
+    } else {
+        tempDeviceConfig.isShared = false;
     }
 #endif
     netWorkId = AddDeviceConfig(tempDeviceConfig);

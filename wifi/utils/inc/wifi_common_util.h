@@ -128,6 +128,17 @@ std::string IpAnonymize(const std::string str);
 std::string SsidAnonymize(const std::string str);
 
 /**
+ * @Description Password anonymization
+ *
+ * Length greater than or equal to 8
+ * <p> eg: 12345678 -> 12****78
+ *
+ * @param str - Input Password
+ * @return std::string - Processed Password
+ */
+std::string PassWordAnonymize(const std::string str);
+
+/**
  * @Description Converting string MAC to a C-style MAC address
  *
  * @param strMac - Input MAC address

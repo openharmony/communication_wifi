@@ -830,7 +830,7 @@ int WifiSettings::SetHotspotConfig(const HotspotConfig &config, int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);
     if (config.GetPreSharedKey() != mHotspotConfig[id].GetPreSharedKey()) {
-        LOGI("Hotspot preShareKey changed to %{public}s", SsidAnonymize(config.GetPreSharedKey()).c_str());
+        LOGI("Hotspot preSharedKey changed to %{public}s", PassWordAnonymize(config.GetPreSharedKey()).c_str());
     }
     if (config.GetSsid() != mHotspotConfig[id].GetSsid()) {
         LOGI("Hotspot ssid changed to %{public}s", SsidAnonymize(config.GetSsid()).c_str());

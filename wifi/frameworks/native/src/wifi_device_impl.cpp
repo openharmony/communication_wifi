@@ -401,7 +401,7 @@ ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     long tmpFeatures = 0;
     isSupported = false;
-    ErrCode ret = client_->GetSupportedFeatures(tmpFeatures);
+    ErrCode ret = client_->IsFeatureSupported(tmpFeatures);
     if (ret != WIFI_OPT_SUCCESS) {
         return ret;
     }

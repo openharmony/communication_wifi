@@ -358,6 +358,14 @@ public:
     ErrCode GetSupportedFeatures(long &features) override;
 
     /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @return ErrCode - operation result
+     */
+    ErrCode IsFeatureSupported(long &features) override;
+
+    /**
      * @Description  Get the device MAC address
      *
      * @param result - Get device mac String

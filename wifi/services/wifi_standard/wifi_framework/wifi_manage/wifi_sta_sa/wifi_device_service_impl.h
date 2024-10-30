@@ -151,6 +151,8 @@ public:
 
     ErrCode GetSupportedFeatures(long &features) override;
 
+    ErrCode IsFeatureSupported(long &features) override;
+
     ErrCode GetDeviceMacAddress(std::string &result) override;
 
     bool SetLowLatencyMode(bool enabled) override;

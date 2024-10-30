@@ -355,6 +355,14 @@ public:
     virtual ErrCode GetSupportedFeatures(long &features) = 0;
 
     /**
+     * @Description Check if supported input feature
+     *
+     * @param feature - input feature
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsFeatureSupported(long &features) = 0;
+
+    /**
      * @Description  Get the device MAC address.
      *
      * @param result - Get device mac String

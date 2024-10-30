@@ -1505,6 +1505,20 @@ ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::IsFeatureSupported(long &features)
+{
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    int ret = WifiManager::GetInstance().GetSupportedFeatures(features);
+    if (ret < 0) {
+        WIFI_LOGE("Failed to get supported features!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
 {
     WIFI_LOGI("GetDeviceMacAddress");

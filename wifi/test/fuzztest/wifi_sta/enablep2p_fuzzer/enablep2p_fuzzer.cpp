@@ -115,8 +115,8 @@ bool DoSomethingDeviceStubTest(const uint8_t* data, size_t size)
 }
 
 bool IsFeatureSupportedTest(const uint8_t* data, size_t size)
-{   
-    LOGI("IsFeatureSupportedTest"); // code[0x1001,0x1031]
+{
+    LOGI("IsFeatureSupportedTest");
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
     datas.WriteInt32(0);

@@ -250,6 +250,16 @@ enum class WifiCategoryJs {
     WIFI6_PLUS = 3
 };
 
+enum class WifiDetailStateJs {
+    UNKNOWN = -1,
+    INACTIVE = 0,
+    ACTIVATED = 1,
+    ACTIVATING = 2,
+    DEACTIVATING = 3,
+    SEMI_ACTIVATING = 4,
+    SEMI_ACTIVE = 5
+};
+
 enum class WifiStandardJs {
     WIFI_STANDARD_UNDEFINED = 0,
     WIFI_STANDARD_11A = 1,

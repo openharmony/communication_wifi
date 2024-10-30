@@ -95,6 +95,7 @@ private:
     void OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetDpiMarkRule(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnIsFeatureSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);

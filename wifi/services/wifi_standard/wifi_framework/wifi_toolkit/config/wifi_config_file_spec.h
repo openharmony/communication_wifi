@@ -509,47 +509,6 @@ std::string GetTClassName<WifiStoreRandomMac>();
 template <>
 std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &item);
 
-/**
- * @Description Clear and init PackageFilterConf
- *
- * @tparam
- * @param item - PackageFilterConf &item
- */
-template <>
-void ClearTClass<PackageFilterConf>(PackageFilterConf &item);
-
-/**
- * @Description Clear and init VariableConf
- *
- * @tparam
- * @param item - VariableConf &item
- */
-template <>
-void ClearTClass<VariableConf>(VariableConf &item);
-
-/**
- * @Description Set PackageFilterConf item data
- *
- * @tparam
- * @param item - PackageFilterConf &item
- * @param key - PackageFilterConf struct member name
- * @param value - the PackageFilterConf item member value
- * @return int - parse error: 0 Success, >0 parse failed
- */
-template <>
-int SetTClassKeyValue<PackageFilterConf>(PackageFilterConf &item, const std::string &key, const std::string &value);
-
-/**
- * @Description Set VariableConf item data
- *
- * @tparam
- * @param item - VariableConf &item
- * @param key - VariableConf struct member name
- * @param value - the VariableConf item member value
- * @return int - parse error: 0 Success, >0 parse failed
- */
-template <>
-int SetTClassKeyValue<VariableConf>(VariableConf &item, const std::string &key, const std::string &value);
 /* ----------template function specialization declare end----------- */
 }  // namespace Wifi
 }  // namespace OHOS

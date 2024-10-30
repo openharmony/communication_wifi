@@ -3377,14 +3377,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
         return;
     }
     int netId = m_NetWorkState->GetWifiNetId();
-    std::string bundle;
-    std::map<std::string, std::string> variableMap;
-    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
-        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
-    }
-    if (variableMap.find("BROWSER_BUNDLE") != variableMap.end()) {
-        bundle = variableMap["BROWSER_BUNDLE"];
-    }
+    std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
     AAFwk::Want want;
     want.SetAction(PORTAL_ACTION);
     want.SetUri(mPortalUrl);
@@ -3423,14 +3416,7 @@ void StaStateMachine::ShowPortalNitification()
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
             WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
     } else {
-        std::map<std::string, std::string> variableMap;
-        std::string bundle;
-        if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
-            WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
-        }
-        if (variableMap.find("SETTINGS") != variableMap.end()) {
-            bundle = variableMap["SETTINGS"];
-        }
+        std::string bundle = WifiSettings::GetInstance().GetPackageName("SETTINGS");
         if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
@@ -3587,14 +3573,7 @@ void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
-    std::map<std::string, std::string> variableMap;
-    std::string settings;
-    if (WifiSettings::GetInstance().GetVariableMap(variableMap) != 0) {
-        WIFI_LOGE("WifiSettings::GetInstance().GetVariableMap failed");
-    }
-    if (variableMap.find("SETTINGS") != variableMap.end()) {
-        settings = variableMap["SETTINGS"];
-    }
+    std::string settings = WifiSettings::GetInstance().GetPackageName("SETTINGS");
     if (!WifiSettings::GetInstance().GetDeviceEverConnected(networkId)) {
         if (!hasNet) {
             /*If it is the first time to connect and no network status, a pop-up window is displayed.*/

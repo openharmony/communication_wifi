@@ -57,11 +57,11 @@ struct WifiScanDeviceInfo {
     ScanMode scanMode;
     Hid2dInfo hid2dInfo;
     ScanControlInfo scanControlInfo;
-    std::vector<std::string> scan_thermal_trust_list;
-    std::vector<std::string> scan_frequency_trust_list;
-    std::vector<std::string> scan_screen_off_trust_list;
-    std::vector<std::string> scan_gps_block_list;
-    std::vector<std::string> scan_hid2d_list;
+    std::vector<PackageInfo> scan_thermal_trust_list;
+    std::vector<PackageInfo> scan_frequency_trust_list;
+    std::vector<PackageInfo> scan_screen_off_trust_list;
+    std::vector<PackageInfo> scan_gps_block_list;
+    std::vector<PackageInfo> scan_hid2d_list;
     std::vector<std::string> abnormalAppList;
 
     WifiScanDeviceInfo()

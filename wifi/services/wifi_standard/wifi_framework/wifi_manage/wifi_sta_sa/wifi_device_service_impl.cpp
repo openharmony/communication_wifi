@@ -382,9 +382,8 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
         !config.bssid.empty() || !config.ssid.empty()) {
         return false;
     }
-    std::string ancoWifiValue = "";
-    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", ancoWifiValue);
-    if (success && config.callProcessName == ancoWifiValue) {
+    auto ancoWifiValue = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
+    if (config.callProcessName == ancoWifiValue) {
         SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);
         return true;
     }
@@ -408,11 +407,10 @@ ErrCode WifiDeviceServiceImpl::CheckCallingUid(int &uid)
 bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
 {
 #ifndef OHOS_ARCH_LITE
-   int pid = GetCallingPid();
-   std::string wifiBrokerFrameProcessName = "";
-   bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
+    int pid = GetCallingPid();
+    auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(uid, pid);
-    if (!success || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
         return false;
     }
     return true;
@@ -2248,15 +2246,15 @@ int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, con
         WIFI_LOGI("ProcessPermissionVerify(), PERMISSION_DENIED");
         return PERMISSION_DENIED;
     }
-    std::map<std::string, std::vector<std::string>> filterMap;
-    if (WifiSettings::GetInstance().GetPackageFilterMap(filterMap) != 0) {
-        WIFI_LOGE("WifiSettings::GetInstance().GetPackageFilterMap failed");
+    std::map<std::string, std::vector<PackageInfo>> packageInfoMap;
+    if (WifiSettings::GetInstance().GetPackageInfoMap(packageInfoMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetPackageInfoMap failed");
         return PERMISSION_DENIED;
     }
-    std::vector<std::string> whilteListProcessInfo = filterMap["GetLinkProcessPermissionVerify"];
+    std::vector<PackageInfo> whilteListProcessInfo = packageInfoMap["AclAuthPackages"];
     auto iter = whilteListProcessInfo.begin();
     while (iter != whilteListProcessInfo.end()) {
-        if (*iter == packageName + "|" + appId) {
+        if (iter->name == packageName && iter->appid == appId) {
             return PERMISSION_GRANTED;
         }
         iter++;

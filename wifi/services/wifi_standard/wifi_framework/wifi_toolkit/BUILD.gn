@@ -112,6 +112,7 @@ if (defined(ohos_lite)) {
     sources += [
       "config/wifi_backup_config.cpp",
       "utils/network_parser.cpp",
+      "utils/package_parser.cpp",
       "utils/softap_parser.cpp",
       "utils/wifi_cert_utils.cpp",
     ]

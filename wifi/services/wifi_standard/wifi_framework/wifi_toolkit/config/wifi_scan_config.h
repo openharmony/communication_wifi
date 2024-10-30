@@ -43,7 +43,7 @@ public:
 
     int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
 
-    void SetPackageFilter(std::map<std::string, std::vector<std::string>> &filterMap);
+    void SetPackageInfo(std::map<std::string, std::vector<PackageInfo>> &filterMap);
 
     void SetMovingFreezeScaned(bool scanned);
 

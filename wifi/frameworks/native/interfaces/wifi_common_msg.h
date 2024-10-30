@@ -67,6 +67,11 @@ struct WifiMacAddrInfo {
         return *this;
     }
 };
+
+struct PackageInfo {
+    std::string name;
+    std::string appid;
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

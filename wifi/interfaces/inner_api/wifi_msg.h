@@ -701,7 +701,7 @@ struct WifiDeviceConfig {
         isReassocSelfCureWithFactoryMacAddress = 0;
         version = -1;
         randomizedMacSuccessEver = false;
-        isShared = false;
+        isShared = true;
         everConnected = false;
         acceptUnvalidated = false;
     }

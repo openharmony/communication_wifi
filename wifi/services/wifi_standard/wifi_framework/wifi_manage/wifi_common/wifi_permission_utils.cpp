@@ -33,6 +33,11 @@ int WifiPermissionUtils::VerifyGetWifiInfoPermission()
     return PERMISSION_GRANTED;
 }
 
+int WifiPermissionUtils::VerifySameProcessPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
 int WifiPermissionUtils::VerifyWifiConnectionPermission()
 {
     return PERMISSION_GRANTED;
@@ -105,6 +110,12 @@ int WifiPermissionUtils::VerifySetWifiInfoPermission()
 int WifiPermissionUtils::VerifyGetWifiInfoPermission()
 {
     return WifiAuthCenter::GetInstance().VerifyGetWifiInfoPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::VerifySameProcessPermission()
+{
+    return WifiAuthCenter::GetInstance().VerifySameProcessPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 

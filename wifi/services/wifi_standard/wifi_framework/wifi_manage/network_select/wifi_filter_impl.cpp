@@ -199,6 +199,12 @@ RecoveryWifiFilter::~RecoveryWifiFilter()
 bool RecoveryWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
+    if (NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory)) {
+        InterScanInfo interScanInfo = networkCandidate.interScanInfo;
+        WIFI_LOGI("RecoveryWifiFilter, network history is 0, try reconnect, add candidate network, bssid=%{public}s",
+            MacAnonymize(interScanInfo.bssid).c_str());
+        return true;
+    }
     return wifiDeviceConfig.noInternetAccess && !wifiDeviceConfig.isPortal &&
         NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory);
 }

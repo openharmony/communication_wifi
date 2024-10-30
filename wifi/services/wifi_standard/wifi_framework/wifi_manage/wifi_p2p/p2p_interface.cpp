@@ -217,7 +217,6 @@ ErrCode P2pInterface::Hid2dConnect(const Hid2dConnectConfig& config)
     return p2pService.Hid2dConnect(config);
 }
 
-
 ErrCode P2pInterface::Hid2dRequestGcIp(const std::string& gcMac, std::string& ipAddr)
 {
     return p2pService.Hid2dRequestGcIp(gcMac, ipAddr);

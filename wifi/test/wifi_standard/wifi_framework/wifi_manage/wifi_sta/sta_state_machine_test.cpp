@@ -1918,18 +1918,6 @@ public:
         pStaStateMachine->DealHiLinkDataToWpa(msg);
     }
 
-    void IsStaDisConnectReasonShouldRetryEventSuccessTest()
-    {
-        int event = 0x3018;
-        EXPECT_TRUE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
-    }
-
-    void IsStaDisConnectReasonShouldRetryEventFailedTest()
-    {
-        int event = 0;
-        EXPECT_FALSE(pStaStateMachine->IsStaDisConnectReasonShouldRetryEvent(event));
-    }
-
     void IsDisConnectReasonShouldStopTimerSuccessTest()
     {
         int event = 8;
@@ -2210,16 +2198,6 @@ HWTEST_F(StaStateMachineTest, IsDisConnectReasonShouldStopTimerSuccessTest, Test
 HWTEST_F(StaStateMachineTest, IsDisConnectReasonShouldStopTimerFailedTest, TestSize.Level1)
 {
     IsDisConnectReasonShouldStopTimerFailedTest();
-}
-
-HWTEST_F(StaStateMachineTest, IsStaDisConnectReasonShouldRetryEventSuccessTest, TestSize.Level1)
-{
-    IsStaDisConnectReasonShouldRetryEventSuccessTest();
-}
-
-HWTEST_F(StaStateMachineTest, IsStaDisConnectReasonShouldRetryEventFailedTest, TestSize.Level1)
-{
-    IsStaDisConnectReasonShouldRetryEventFailedTest();
 }
 
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)

@@ -248,7 +248,6 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.lastPacketDirection = 0;
     linkedInfo.lastRxPackets = 0;
     linkedInfo.lastTxPackets = 0;
-    linkedInfo.retryedConnCount = 0;
     linkedInfo.isAncoConnected = 0;
     linkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
     linkedInfo.isMloConnected = false;
@@ -1163,9 +1162,6 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
     int networkId = msg->GetParam1();
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
-    if (connTriggerMode != NETWORK_SELECTED_BY_RETRY) {
-        linkedInfo.retryedConnCount = 0;
-    }
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
     }
@@ -1410,10 +1406,11 @@ bool StaStateMachine::IsDisConnectReasonShouldStopTimer(int reason)
     return reason == DIS_REASON_DISASSOC_STA_HAS_LEFT;
 }
 
-bool StaStateMachine::IsStaDisConnectReasonShouldRetryEvent(int eventName)
+void StaStateMachine::AddRandomMacCure()
 {
-    return eventName == WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT ||
-        eventName == WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT;
+    if (targetNetworkId == mLastConnectNetId) {
+        mConnectFailedCnt++;
+    }
 }
 
 void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
@@ -1425,9 +1422,6 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
     }
     DealSetStaConnectFailedCount(1, false);
     int eventName = msg->GetMessageName();
-    if (IsStaDisConnectReasonShouldRetryEvent(eventName) && DealReconnectSavedNetwork()) {
-        return;
-    }
     bool shouldStopTimer = true;
     if (eventName == WIFI_SVR_CMD_STA_REPORT_DISCONNECT_REASON_EVENT) {
         std::string bssid = msg->GetStringFromMessage();
@@ -1472,6 +1466,7 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
+            AddRandomMacCure();
             break;
         case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
             WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID, ifaceName);
@@ -1481,27 +1476,13 @@ void StaStateMachine::DealWpaLinkFailEvent(InternalMessagePtr msg)
             InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
+            AddRandomMacCure();
             break;
         default:
             LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);
             return;
     }
     linkedInfo.ssid = "";
-}
-
-bool StaStateMachine::DealReconnectSavedNetwork()
-{
-    if (targetNetworkId == mLastConnectNetId) {
-        mConnectFailedCnt++;
-    }
-    linkedInfo.retryedConnCount++;
-    if (linkedInfo.retryedConnCount < MAX_RETRY_COUNT) {
-        SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
-            targetNetworkId, NETWORK_SELECTED_BY_RETRY);
-        WIFI_LOGW("DealConnectTimeOutCmd retry connect to saved network.\n");
-        return true;
-    }
-    return false;
 }
 
 void StaStateMachine::DealSetStaConnectFailedCount(int count, bool set)
@@ -1541,7 +1522,6 @@ void StaStateMachine::DealReConnectCmd(InternalMessagePtr msg)
         StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
         StartTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT), STA_NETWORK_CONNECTTING_DELAY);
     } else {
-        linkedInfo.retryedConnCount++;
         DealSetStaConnectFailedCount(1, false);
         WIFI_LOGE("ReConnect failed!");
     }
@@ -4062,7 +4042,6 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
     if (linkedInfo.networkId == INVALID_NETWORK_ID) {
         if (lastLinkedInfo.networkId != INVALID_NETWORK_ID) {
             /* Update connection information according to the last connecting information. */
-            linkedInfo.retryedConnCount = 0;
             linkedInfo.networkId = lastLinkedInfo.networkId;
             linkedInfo.ssid = lastLinkedInfo.ssid;
             linkedInfo.bssid = lastLinkedInfo.bssid;
@@ -4084,7 +4063,6 @@ void StaStateMachine::SetWifiLinkedInfo(int networkId)
             linkedInfo.detailedState = lastLinkedInfo.detailedState;
             linkedInfo.isAncoConnected = lastLinkedInfo.isAncoConnected;
         } else if (networkId != INVALID_NETWORK_ID) {
-            linkedInfo.retryedConnCount = 0;
             linkedInfo.networkId = networkId;
             WifiDeviceConfig config;
             int ret = WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId);

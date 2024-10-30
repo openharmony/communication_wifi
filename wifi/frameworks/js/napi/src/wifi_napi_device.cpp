@@ -23,7 +23,6 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiNAPIDevice");
-static constexpr int DEFAULT_INVALID_VALUE = -1;
 static const std::string EAP_METHOD[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", "SIM", "AKA", "AKA'" };
 
 std::shared_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
@@ -1336,8 +1335,10 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     SetValueInt32(env, "securityType",
         static_cast<int>(ConvertKeyMgmtToSecType(vecDeviceConfigs[idx].keyMgmt)), result);
     SetValueInt32(env, "creatorUid", vecDeviceConfigs[idx].uid, result);
-    /* not supported currently */
-    SetValueInt32(env, "disableReason", DEFAULT_INVALID_VALUE, result);
+    SetValueInt32(env, "configStatus",
+        static_cast<int>(vecDeviceConfigs[idx].networkSelectionStatus.status), result);
+    SetValueInt32(env, "disableReason",
+        static_cast<int>(vecDeviceConfigs[idx].networkSelectionStatus.networkSelectionDisableReason), result);
     SetValueInt32(env, "netId", vecDeviceConfigs[idx].networkId, result);
     SetValueInt32(env, "randomMacType", static_cast<int>(vecDeviceConfigs[idx].wifiPrivacySetting), result);
     /* not supported currently */

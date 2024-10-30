@@ -58,6 +58,7 @@ bool Handler::InitialHandler(const std::string &name)
     if (pMyTaskQueue == nullptr) {
         pMyTaskQueue = std::make_unique<WifiEventHandler>(name);
     }
+    WifiWatchDogUtils::GetInstance();
 #endif
     LOGI("InitialHandler success: %{public}s", mThreadName.c_str());
     mThreadName = name;

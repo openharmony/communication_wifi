@@ -214,7 +214,6 @@ struct WifiLinkedInfo {
     int lastPacketDirection;
     int lastRxPackets;
     int lastTxPackets;
-    int retryedConnCount;
     bool isAncoConnected;
     WifiCategory supportedWifiCategory;
     bool isMloConnected;
@@ -246,7 +245,6 @@ struct WifiLinkedInfo {
         lastPacketDirection = 0;
         lastRxPackets = 0;
         lastTxPackets = 0;
-        retryedConnCount = 0;
         isAncoConnected = false;
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;

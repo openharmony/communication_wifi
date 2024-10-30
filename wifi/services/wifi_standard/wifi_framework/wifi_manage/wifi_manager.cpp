@@ -106,10 +106,10 @@ int WifiManager::Init()
         !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
         if (IsStartUpWifiEnableSupport()) {
             WIFI_LOGI("It's first start up, need open wifi before oobe");
-            WifiSettings::GetInstance().SetStaLastRunState(WIFI_STATE_ENABLED);
+            WifiConfigCenter::GetInstance().SetPersistWifiState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         }
     }
-    int lastState = WifiSettings::GetInstance().GetStaLastRunState();
+    int lastState = WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0);
     if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
         WifiConfigCenter::GetInstance().SetWifiToggledState(lastState, INSTID_WLAN0);

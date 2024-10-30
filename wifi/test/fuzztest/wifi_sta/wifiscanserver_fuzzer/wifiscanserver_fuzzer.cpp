@@ -25,6 +25,7 @@
 #include "scan_interface.h"
 #include "wifi_internal_msg.h"
 #include "scan_service.h"
+#include "xml_parser.h"
 #include <mutex>
 #include "mock_scan_state_machine.h"
 

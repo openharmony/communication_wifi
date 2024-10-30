@@ -62,7 +62,7 @@ public:
     virtual int GetRealMacAddress(std::string &macAddress, int instId = 0) = 0;
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
-    virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
+    virtual int GetPackageInfoMap(std::map<std::string, std::vector<PackageInfo>> &filterMap) = 0;
     virtual int GetMinRssi2Dot4Ghz(int instId = 0) = 0;
     virtual int GetMinRssi5Ghz(int instId = 0) = 0;
     virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
@@ -89,9 +89,8 @@ public:
     virtual int SetStaLastRunState(int bRun, int instId = 0) = 0;
     virtual void SetScanOnlySwitchState(const int &state, int instId = 0) = 0;
     virtual  bool IsModulePreLoad(const std::string &name) = 0;
-    virtual bool GetConfigValueByName(const std::string &name, std::string &value) = 0;
+    virtual std::string GetPackageName(std::string tag) = 0;
     virtual int GetHotspotConfig(HotspotConfig &config, int id) = 0;
-    virtual int GetVariableMap(std::map<std::string, std::string> &variableMap) = 0;
     virtual bool GetDeviceEverConnected(int networkId) = 0;
     virtual int SetDeviceEverConnected(int networkId) = 0;
     virtual bool GetAcceptUnvalidated(int networkId) = 0;
@@ -139,7 +138,7 @@ public:
     MOCK_METHOD2(GetRealMacAddress, int(std::string &macAddress, int));
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
-    MOCK_METHOD1(GetPackageFilterMap,  int(std::map<std::string, std::vector<std::string>> &filterMap));
+    MOCK_METHOD1(GetPackageInfoMap,  int(std::map<std::string, std::vector<PackageInfo>> &filterMap));
     MOCK_METHOD1(GetMinRssi2Dot4Ghz, int(int));
     MOCK_METHOD1(GetMinRssi5Ghz, int(int));
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
@@ -165,9 +164,8 @@ public:
     MOCK_METHOD2(SetScanOnlySwitchState, void(const int &state, int instId));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD1(IsModulePreLoad,  bool(const std::string &name));
-    MOCK_METHOD2(GetConfigValueByName,  bool(const std::string &name, std::string &value));
+    MOCK_METHOD1(GetPackageName,  std::string(std::string tag));
     MOCK_METHOD2(GetHotspotConfig,  int(HotspotConfig &config, int id));
-    MOCK_METHOD1(GetVariableMap,  int(std::map<std::string, std::string> &variableMap));
     MOCK_METHOD1(GetDeviceEverConnected, bool(int networkId));
     MOCK_METHOD1(SetDeviceEverConnected, int(int networkId));
     MOCK_METHOD1(GetAcceptUnvalidated, bool(int networkId));

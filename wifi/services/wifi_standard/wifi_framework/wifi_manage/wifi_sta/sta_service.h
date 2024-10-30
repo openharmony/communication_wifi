@@ -412,7 +412,7 @@ private:
     StaAppAcceleration *pStaAppAcceleration;
 #endif
     int m_instId;
-    std::vector<std::string> sta_candidate_trust_list;
+    std::vector<PackageInfo> sta_candidate_trust_list;
     bool m_connMangerStatus = true;
 };
 }  // namespace Wifi

@@ -25,6 +25,7 @@
 #include "wifi_country_code_define.h"
 #include "network_parser.h"
 #include "softap_parser.h"
+#include "package_parser.h"
 #include "wifi_backup_config.h"
 #include "json/json.h"
 #endif
@@ -90,8 +91,6 @@ int WifiSettings::Init()
     mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
-    mPackageFilterConfig.SetConfigFilePath(PACKAGE_FILTER_CONFIG_FILE_PATH);
-    mVariableConf.SetConfigFilePath(WIFI_VARIABLE_PATH);
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -107,9 +106,8 @@ int WifiSettings::Init()
     ReloadTrustListPolicies();
     ReloadMovingFreezePolicy();
     ReloadStaRandomMac();
-    InitPackageFilterConfig();
+    InitPackageInfoConfig();
     IncreaseNumRebootsSinceLastUse();
-    InitVariableConfig();
     return 0;
 }
 
@@ -802,10 +800,10 @@ const MovingFreezePolicy WifiSettings::ReloadMovingFreezePolicy()
     return mMovingFreezePolicy.GetValue()[0];
 }
 
-int WifiSettings::GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap)
+int WifiSettings::GetPackageInfoMap(std::map<std::string, std::vector<PackageInfo>> &packageInfoMap)
 {
-    std::unique_lock<std::mutex> lock(mScanMutex);
-    filterMap = mFilterMap;
+    std::unique_lock<std::mutex> lock(mPackageConfMutex);
+    packageInfoMap = mPackageInfoMap;
     return 0;
 }
 
@@ -1493,46 +1491,46 @@ int WifiSettings::ReloadStaRandomMac()
     return 0;
 }
 
-void WifiSettings::InitPackageFilterConfig()
+void WifiSettings::InitPackageInfoConfig()
 {
-    if (mPackageFilterConfig.LoadConfig() >= 0) {
-        std::vector<PackageFilterConf> tmp;
-        mPackageFilterConfig.GetValue(tmp);
-        std::unique_lock<std::mutex> lock(mScanMutex);
-        for (unsigned int i = 0; i < tmp.size(); i++) {
-            mFilterMap.insert(std::make_pair(tmp[i].filterName, tmp[i].packageList));
-        }
+#ifndef OHOS_ARCH_LITE
+    std::unique_ptr<PackageXmlParser> xmlParser = std::make_unique<PackageXmlParser>();
+    bool ret = xmlParser->LoadConfiguration(PACKAGE_FILTER_CONFIG_FILE_PATH);
+    if (!ret) {
+        LOGE("PackageXmlParser load fail");
+        return;
     }
-    return;
+    ret = xmlParser->Parse();
+    if (!ret) {
+        LOGE("PackageXmlParser Parse fail");
+        return;
+    }
+    std::map<std::string, std::vector<PackageInfo>> scanControlPackageMap;
+    std::vector<PackageInfo> candidateList;
+    std::map<std::string, std::vector<PackageInfo>> variableMap;
+    std::vector<PackageInfo> permissionTrustList;
+    xmlParser->GetScanControlPackages(scanControlPackageMap);
+    xmlParser->GetCandidateFilterPackages(candidateList);
+    xmlParser->GetCorePackages(variableMap);
+    xmlParser->GetAclAuthPackages(permissionTrustList);
+    
+    std::unique_lock<std::mutex> lock(mPackageConfMutex);
+    mPackageInfoMap.insert(scanControlPackageMap.begin(), scanControlPackageMap.end());
+    mPackageInfoMap.insert_or_assign("CandidateFilterPackages", candidateList);
+    mPackageInfoMap.insert(variableMap.begin(), variableMap.end());
+    mPackageInfoMap.insert_or_assign("AclAuthPackages", permissionTrustList);
+#endif
 }
 
-int WifiSettings::GetVariableMap(std::map<std::string, std::string> &variableMap)
+std::string WifiSettings::GetPackageName(std::string tag)
 {
-    std::unique_lock<std::mutex> lock(mVariableConfMutex);
-    variableMap = mVariableMap;
-    return 0;
-}
-
-std::string WifiSettings::GetVariablePackageName(std::string tag)
-{
-    std::unique_lock<std::mutex> lock(mVariableConfMutex);
-    if (mVariableMap.find(tag) != mVariableMap.end()) {
-        return mVariableMap[tag];
+    std::unique_lock<std::mutex> lock(mPackageConfMutex);
+    for (auto iter = mPackageInfoMap.begin(); iter != mPackageInfoMap.end(); iter++) {
+        if (iter->first == tag && !iter->second.empty()) {
+            return iter->second[0].name;
+        }
     }
     return "";
-}
-
-void WifiSettings::InitVariableConfig()
-{
-    if (mVariableConf.LoadConfig() >= 0) {
-        std::vector<VariableConf> tmp;
-        mVariableConf.GetValue(tmp);
-        std::unique_lock<std::mutex> lock(mVariableConfMutex);
-        for (unsigned int i = 0; i < tmp.size(); i++) {
-            mVariableMap.insert(std::make_pair(tmp[i].variableName, tmp[i].variableValue));
-        }
-    }
-    return;
 }
 
 void WifiSettings::InitDefaultHotspotConfig()
@@ -2106,25 +2104,6 @@ bool WifiSettings::EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
     return true;
 }
 
-bool WifiSettings::GetConfigValueByName(const std::string &name, std::string &value)
-{
-    if (name.empty()) {
-        LOGE("name empty");
-        return false;
-    }
-    std::unique_lock<std::mutex> lock(mScanMutex);
-    std::vector<std::string> values = mFilterMap[name];
-    if (values.empty()) {
-        LOGE("GetConfigValueByName values is empty");
-        return false;
-    }
-    value = values.front();
-    if (value.empty()) {
-        LOGE("GetConfigValueByName value is empty");
-        return false;
-    }
-    return true;
-}
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,

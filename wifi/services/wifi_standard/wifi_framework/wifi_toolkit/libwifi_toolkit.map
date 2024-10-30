@@ -233,7 +233,7 @@
         "OHOS::Wifi::WifiScanConfig::GetStaSceneForbidCount()";
         "OHOS::Wifi::WifiScanConfig::SetScanControlInfo(OHOS::Wifi::tagScanControlInfo const&, int)";
         "OHOS::Wifi::WifiScanConfig::GetScanControlInfo(OHOS::Wifi::tagScanControlInfo&, int)";
-        "OHOS::Wifi::WifiScanConfig::SetPackageFilter(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>>>>&)";
+        "OHOS::Wifi::WifiScanConfig::SetPackageInfo(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::vector<OHOS::Wifi::PackageInfo, std::__h::allocator<OHOS::Wifi::PackageInfo>>, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, std::__h::vector<OHOS::Wifi::PackageInfo, std::__h::allocator<OHOS::Wifi::PackageInfo>>>>>&)";
         "OHOS::Wifi::WifiScanConfig::SetMovingFreezeScaned(bool)";
         "OHOS::Wifi::WifiScanConfig::GetMovingFreezeScaned()";
         "OHOS::Wifi::WifiScanConfig::SetAbnormalApps(const std::vector<std::string>&)";
@@ -262,7 +262,7 @@
         "OHOS::Wifi::WifiSettings::SetDeviceAfterConnect(int)";
         "OHOS::Wifi::WifiSettings::SetDeviceRandomizedMacSuccessEver(int)";
         "OHOS::Wifi::WifiSettings::SetDeviceEverConnected(int)";
-        "OHOS::Wifi::WifiSettings::GetVariablePackageName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
+        "OHOS::Wifi::WifiSettings::GetPackageName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
         "OHOS::Wifi::WifiSettings::SetAcceptUnvalidated(int)";
         "OHOS::Wifi::WifiSettings::GetDeviceEverConnected(int)";
         "OHOS::Wifi::WifiSettings::GetAcceptUnvalidated(int)";
@@ -284,8 +284,7 @@
         "OHOS::Wifi::WifiSettings::GetRandomMac(OHOS::Wifi::WifiStoreRandomMac&)";
         "OHOS::Wifi::WifiSettings::ReloadTrustListPolicies()";
         "OHOS::Wifi::WifiSettings::ReloadMovingFreezePolicy()";
-        "OHOS::Wifi::WifiSettings::GetPackageFilterMap(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>>>>&)";
-        "OHOS::Wifi::WifiSettings::GetVariableMap(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>>&)";
+        "OHOS::Wifi::WifiSettings::GetPackageInfoMap(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::vector<OHOS::Wifi::PackageInfo, std::__h::allocator<OHOS::Wifi::PackageInfo>>, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, std::__h::vector<OHOS::Wifi::PackageInfo, std::__h::allocator<OHOS::Wifi::PackageInfo>>>>>&)";
         "OHOS::Wifi::WifiSettings::SyncHotspotConfig()";
         "OHOS::Wifi::WifiSettings::SetHotspotConfig(OHOS::Wifi::HotspotConfig const&, int)";
         "OHOS::Wifi::WifiSettings::GetHotspotConfig(OHOS::Wifi::HotspotConfig&, int)";
@@ -335,7 +334,6 @@
         "OHOS::Wifi::WifiSettings::SetScanOnlySwitchState(int const&, int)";
         "OHOS::Wifi::WifiSettings::GetScanOnlySwitchState(int)";
         "OHOS::Wifi::WifiSettings::EncryptionDeviceConfig(OHOS::Wifi::WifiDeviceConfig&) const";
-        "OHOS::Wifi::WifiSettings::GetConfigValueByName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::WifiSettings::UpdateWifiConfigFromCloud(const std::vector<OHOS::Wifi::WifiDeviceConfig> &, const std::set<int> &)";
         "OHOS::Wifi::WifiSettings::UpLoadLocalDeviceConfigToCloud()";
         "OHOS::Wifi::DhcpdInterface::DhcpdInterface()";

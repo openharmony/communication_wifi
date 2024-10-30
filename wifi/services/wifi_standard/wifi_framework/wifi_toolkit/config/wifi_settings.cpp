@@ -1060,7 +1060,7 @@ int WifiSettings::SetOperatorWifiType(int type, int instId)
     struct timespec times = {0, 0};
     clock_gettime(CLOCK_REALTIME, &times);
     int64_t curTimeMs = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
-    LOGI("set persist wifi state, current time is:%{public}lld", curTimeMs);
+    LOGI("set persist wifi state, current time is:%{public}" PRId64, curTimeMs);
     mWifiConfig[instId].persistWifiTime = curTimeMs;
     SyncWifiConfig();
     return 0;

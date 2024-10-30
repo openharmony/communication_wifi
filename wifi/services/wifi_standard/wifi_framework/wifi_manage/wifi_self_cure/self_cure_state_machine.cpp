@@ -47,7 +47,6 @@ DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 const uint32_t CONNECT_NETWORK_RETRY = 1;
 const uint32_t WIFI_SINGLE_ITEM_BYTE_LEN = 8;
 const uint32_t WIFI_SINGLE_MAC_LEN = 6;
-const uint32_t HEXADECIMAL = 16;
 const uint32_t WIFI_MAX_BLA_LIST_NUM = 16;
 const uint32_t DHCP_OFFER_COUNT = 2;
 const int CMD_WIFI_CONNECT_TIMEOUT_SCREEN = 8 * 1000;
@@ -2196,14 +2195,14 @@ std::string SelfCureStateMachine::ParseWifiCategoryBlackListInfo(std::pair<std::
         std::string::size_type npos = currBssid.find(":");
         if (npos != std::string::npos) {
             std::string value = currBssid.substr(0, npos);
-            singleParam.push_back(static_cast<uint8_t>(CheckDataLegal(value, HEXADECIMAL)));
+            singleParam.push_back(static_cast<uint8_t>(CheckDataLegalHex(value)));
             currBssid = currBssid.substr(npos + 1);
         } else {
             if (currBssid.empty()) {
                 WIFI_LOGI("currBssid is empty");
                 break;
             }
-            singleParam.push_back(static_cast<uint8_t>(CheckDataLegal(currBssid, HEXADECIMAL)));
+            singleParam.push_back(static_cast<uint8_t>(CheckDataLegalHex(currBssid)));
         }
     }
     singleParam.push_back(static_cast<uint8_t>(iter.second.actionType));

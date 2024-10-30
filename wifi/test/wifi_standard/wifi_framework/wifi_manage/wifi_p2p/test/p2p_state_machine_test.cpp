@@ -39,6 +39,7 @@
 #include "mock_wifi_p2p_hal_interface.h"
 #include "mock_wifi_settings.h"
 #include "wifi_logger.h"
+#include "mock_p2p_group_remove_state.h"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -79,6 +80,7 @@ public:
         pMockP2pInvitingState = &pMockP2pPendant->GetMockP2pInvitingState();
         pMockProvisionDiscoveryState = &pMockP2pPendant->GetMockProvisionDiscoveryState();
         pMockP2pMonitor = &pMockP2pPendant->GetMockP2pMonitor();
+        pMockP2pGroupRemoveState = &pMockP2pPendant->GetMockP2pGroupRemoveState();
         pP2pStateMachine.reset(new P2pStateMachine(*pMockP2pMonitor,
             groupManager,
             deviceManager,
@@ -98,7 +100,8 @@ public:
             *pMockP2pGroupOperatingState,
             *pMockP2pIdleState,
             *pMockP2pInvitingState,
-            *pMockProvisionDiscoveryState));
+            *pMockProvisionDiscoveryState,
+            *pMockP2pGroupRemoveState));
         pP2pStateMachine->groupManager.Initialize();
     }
     virtual void TearDown()
@@ -126,6 +129,7 @@ public:
         pMockP2pInvitingState = nullptr;
         pMockProvisionDiscoveryState = nullptr;
         pMockP2pMonitor = nullptr;
+        pMockP2pGroupRemoveState = nullptr;
     }
 
 public:
@@ -151,6 +155,7 @@ public:
     MockP2pIdleState *pMockP2pIdleState;
     MockP2pInvitingState *pMockP2pInvitingState;
     MockProvisionDiscoveryState *pMockProvisionDiscoveryState;
+    MockP2pGroupRemoveState *pMockP2pGroupRemoveState;
     MockP2pMonitor *pMockP2pMonitor;
 
 public:

@@ -37,6 +37,7 @@
 #include "p2p_inviting_state.h"
 #include "provision_discovery_state.h"
 #include "wifi_p2p_group_manager.h"
+#include "p2p_group_remove_state.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -359,6 +360,7 @@ private:
     P2pIdleState p2pIdleState;
     P2pInvitingState p2pInvitingState;
     ProvisionDiscoveryState p2pProvisionDiscoveryState;
+    P2pGroupRemoveState p2pGroupRemoveState;
 
     P2pMonitor p2pMonitor;
     P2pStateMachine p2pStateMachine;

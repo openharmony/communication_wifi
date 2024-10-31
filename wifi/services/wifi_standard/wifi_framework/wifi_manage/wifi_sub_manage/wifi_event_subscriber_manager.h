@@ -35,6 +35,8 @@ inline const std::string COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED = "usual.
 const int ASSETID = 6226;
 #endif
 const int CAST_ENGINE_SA_ID = 65546;
+const int SHARE_SERVICE_ID = 2902;
+const int MOUSE_CROSS_SERVICE_ID = 65569;
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -117,6 +119,8 @@ private:
 #endif
     void HandleDistributedKvDataServiceChange(bool add);
     void HandleCastServiceChange(bool add);
+    void HandleShareServiceChange(bool add);
+    void HandleMouseCrossServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void GetCloneDataByDatashare(std::string &cloneData);
     void SetCloneDataByDatashare(const std::string &cloneData);

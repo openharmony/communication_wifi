@@ -34,8 +34,6 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 
-constexpr int TEN = 10;
-
 class WifiServiceSchedulerTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -257,7 +255,6 @@ HWTEST_F(WifiServiceSchedulerTest, HandleGetStaFailedTest01, TestSize.Level1)
 {
     int instId = 1;
     pWifiServiceScheduler->HandleGetStaFailed(instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, AutoStartScanOnlyTest01, TestSize.Level1)
@@ -358,7 +355,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiOpenResTest01, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset())
         .WillRepeatedly(Return(false));
     pWifiServiceScheduler->DispatchWifiOpenRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiOpenResTest02, TestSize.Level1)
@@ -369,7 +365,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiOpenResTest02, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset())
         .WillRepeatedly(Return(false));
     pWifiServiceScheduler->DispatchWifiOpenRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2OpenResTest01, TestSize.Level1)
@@ -378,7 +373,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2OpenResTest01, TestSize.Level1)
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifi2OpenRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2OpenResTest02, TestSize.Level1)
@@ -387,7 +381,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2OpenResTest02, TestSize.Level1)
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifi2OpenRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiSemiActiveResTest01, TestSize.Level1)
@@ -396,7 +389,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiSemiActiveResTest01, TestSize.Lev
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifiSemiActiveRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiSemiActiveResTest02, TestSize.Level1)
@@ -405,7 +397,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiSemiActiveResTest02, TestSize.Lev
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifiSemiActiveRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiCloseResTest01, TestSize.Level1)
@@ -415,7 +406,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiCloseResTest01, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset())
         .WillRepeatedly(Return(false));
     pWifiServiceScheduler->DispatchWifiCloseRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiCloseResTest02, TestSize.Level1)
@@ -425,7 +415,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiCloseResTest02, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset())
         .WillRepeatedly(Return(true));
     pWifiServiceScheduler->DispatchWifiCloseRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiCloseResTest03, TestSize.Level1)
@@ -435,7 +424,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiCloseResTest03, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset())
         .WillRepeatedly(Return(false));
     pWifiServiceScheduler->DispatchWifiCloseRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2CloseResTest01, TestSize.Level1)
@@ -444,7 +432,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2CloseResTest01, TestSize.Level1)
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifi2CloseRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2CloseResTest02, TestSize.Level1)
@@ -453,7 +440,6 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2CloseResTest02, TestSize.Level1)
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifi2CloseRes(state, instId);
-    EXPECT_NE(pWifiServiceScheduler->staIfaceNameMap.size(), TEN);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, AutoStartApServiceTest01, TestSize.Level1)

@@ -135,6 +135,7 @@ private:
     static void PublishConnStateChangedEvent(int state, int instId, const WifiLinkedInfo &info);
     static void PublishWifiStateChangedEvent(int state, int instId);
     static void PublishRssiValueChangedEvent(int state, int instId);
+    static void PublishStaEvent(const WifiEventCallbackMsg &msg);
     static void SendConfigChangeEvent(sptr<IWifiP2pCallback> &callback,  CfgInfo* cfgInfo);
 private:
     std::unique_ptr<WifiEventHandler> mBroadcastThread = nullptr;

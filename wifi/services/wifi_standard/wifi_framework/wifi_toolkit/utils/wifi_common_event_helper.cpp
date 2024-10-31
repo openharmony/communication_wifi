@@ -116,6 +116,15 @@ bool WifiCommonEventHelper::PublishScanStateChangedEvent(const int &code, const 
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_SCAN_STATE, code, data);
 }
 
+bool WifiCommonEventHelper::PublishWifiSemiStateChangedEvent(const int &code, const std::string &data)
+{
+    WIFI_LOGI("PublishWifiSemiStateChangedEvent code:%{public}d", code);
+    std::vector<std::string> permissions;
+    permissions.push_back(COMMON_EVENT_GET_WIFI_INFO_PERMISSION);
+    permissions.push_back(COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION);
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_SEMI_STATE, code, data, permissions);
+}
+
 bool WifiCommonEventHelper::PublishRssiValueChangedEvent(const std::string &pramKey, int paramValue,
     const int &code, const std::string &data)
 {

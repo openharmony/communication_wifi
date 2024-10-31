@@ -612,8 +612,8 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
     for (int32_t i = 0; i < contentSize; ++i) {
         DeviceConfigParcel configParcel = configParcelVec[i];
         if (offset + configParcel.len > ashmemSize) {
-            WIFI_LOGW("%{public}s parcelLen over ssid: %{public}s, ashmemSize:%{public}d, len:%{public}d,
-                offset:%{public}d", __FUNCTION__, SsidAnonymize(result[i].ssid).c_str(), 
+            WIFI_LOGW("%{public}s parcelLen over ssid: %{public}s, ashmemSize:%{public}d,"
+                "len:%{public}d, offset:%{public}d", __FUNCTION__, SsidAnonymize(result[i].ssid).c_str(), 
                 ashmemSize, configParcel.len, offset);
             continue;
         }

@@ -151,6 +151,7 @@ public:
     virtual bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
         const std::string &randomAddr) = 0;
     virtual int GetScanGenieState() const = 0;
+    virtual std::string GetP2pIfaceName() = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -282,6 +283,7 @@ public:
     MOCK_METHOD3(StoreWifiMacAddrPairInfo, bool(WifiMacAddrInfoType type, const std::string &realMacAddr,
         const std::string &randomAddr));
     MOCK_CONST_METHOD0(GetScanGenieState, int());
+    MOCK_METHOD0(GetP2pIfaceName, std::string());
 
 private:
     WifiConfigCenter();

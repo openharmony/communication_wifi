@@ -42,11 +42,8 @@ DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 
 namespace OHOS {
 namespace Wifi {
-    
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
 //miracast
-
-
 const int CMD_TYPE_SET = 2;
 const int DATA_TYPE_P2P_BUSINESS = 1;
 const int ARP_TIMEOUT = 100;
@@ -223,13 +220,16 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
 
     bool isJoin = device.IsGroupOwner();
     std::string groupName = config.GetGroupName();
-
+    WIFI_LOGI("device info IsDeviceLimit: %{public}d, Isinviteable: %{public}d",
+        device.IsDeviceLimit(), device.Isinviteable());
     if (isJoin && !device.IsGroupLimit()) {
         if (groupName.empty()) {
             groupName = device.GetNetworkName();
         }
+        WIFI_LOGI("connect device is go, Groupname is %{private}s", groupName.c_str());
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
+            WIFI_LOGI("find go info from config");
             /**
              * If GO is running on the peer device and the GO has been connected,
              * you can directly connect to the peer device through p2p_group_add.
@@ -254,6 +254,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
         /* Prepare to reinvoke as GC. */
         networkId = groupManager.GetGroupNetworkId(device);
         if (networkId < 0) {
+            WIFI_LOGI("cannot find device from gc devices");
             /**
              * Prepare to reinvoke as GO.
              * Mean that the group is not found when the peer device roles as GO,
@@ -278,6 +279,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
                 return true;
             }
         } else {
+            WIFI_LOGI("cannot find device from go devices");
             config.SetNetId(networkId);
         }
     }

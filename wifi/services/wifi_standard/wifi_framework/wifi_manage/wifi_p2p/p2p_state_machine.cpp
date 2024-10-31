@@ -45,6 +45,8 @@ namespace Wifi {
     
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
 //miracast
+
+
 const int CMD_TYPE_SET = 2;
 const int DATA_TYPE_P2P_BUSINESS = 1;
 const int ARP_TIMEOUT = 100;

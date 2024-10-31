@@ -1027,13 +1027,14 @@ void WifiDeviceStub::OnGetSupportedFeatures(uint32_t code, MessageParcel &data, 
 void WifiDeviceStub::OnIsFeatureSupported(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    long features = 0;
-    int ret = IsFeatureSupported(features);
+    bool isSupported = false;
+    long feature = data.ReadInt64();;
+    int ret = IsFeatureSupported(feature, isSupported);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        reply.WriteInt64(features);
+        reply.WriteInt32(isSupported);
     }
 
     return;

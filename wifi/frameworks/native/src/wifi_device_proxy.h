@@ -361,9 +361,10 @@ public:
      * @Description Check if supported input feature
      *
      * @param feature - input feature
+     * @param isSupported - return true if supported, false if unsupported
      * @return ErrCode - operation result
      */
-    ErrCode IsFeatureSupported(long &features) override;
+    ErrCode IsFeatureSupported(long feature, bool &isSupported) override;
 
     /**
      * @Description  Get the device MAC address

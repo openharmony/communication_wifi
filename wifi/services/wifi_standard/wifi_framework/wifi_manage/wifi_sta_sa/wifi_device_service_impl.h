@@ -151,7 +151,7 @@ public:
 
     ErrCode GetSupportedFeatures(long &features) override;
 
-    ErrCode IsFeatureSupported(long &features) override;
+    ErrCode IsFeatureSupported(long feature, bool &isSupported) override;
 
     ErrCode GetDeviceMacAddress(std::string &result) override;
 

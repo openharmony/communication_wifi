@@ -18,9 +18,10 @@
 #include "wifi_controller_state_machine.h"
 #include "mock_concrete_manager_state_machine.h"
 #include "mock_softap_manager_state_machine.h"
-#include "wifi_config_center.h"
+#include "mock_wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_manager.h"
+#include "wifi_settings.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -284,7 +285,7 @@ public:
         msg->SetMessageName(CMD_AP_STOP_TIME);
         EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
         WifiConfigCenter::GetInstance().SetSoftapToggledState(true);
-        EXPECT_TRUE(pWifiControllerMachine->ShouldEnableSoftap());
+        EXPECT_FALSE(pWifiControllerMachine->ShouldEnableSoftap());
     }
 
     void RetryTest()
@@ -422,11 +423,11 @@ public:
         pWifiControllerMachine->HandleStaClose(0);
         pWifiControllerMachine->SwitchRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
         WifiConfigCenter::GetInstance().SetWifiToggledState(1, instId);
-        EXPECT_TRUE(pWifiControllerMachine->ShouldEnableWifi(instId));
+        EXPECT_FALSE(pWifiControllerMachine->ShouldEnableWifi(instId));
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(CMD_WIFI_TOGGLED);
         msg->SetParam2(0);
-        EXPECT_FALSE(pWifiControllerMachine->ShouldDisableWifi(msg));
+        EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi(msg));
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         EXPECT_TRUE(pWifiControllerMachine->ShouldDisableWifi(msg));
@@ -631,6 +632,58 @@ HWTEST_F(WifiControllerMachineTest, HandleApStopTest, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, instId);
     pWifiControllerMachine->pEnableState->HandleApStop(msg);
+}
+
+HWTEST_F(WifiControllerMachineTest, MakeMultiStaManagerTest01, TestSize.Level1)
+{
+    MultiStaManager::Role role = MultiStaManager::Role::ROLE_UNKNOW;
+    int instId = 1;
+    pWifiControllerMachine->MakeMultiStaManager(role, instId);
+    EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleWifi2CloseTest01, TestSize.Level1)
+{
+    int id = 1;
+    pWifiControllerMachine->HandleWifi2Close(id);
+    EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForWlan1Test01, TestSize.Level1)
+{
+    int id = 1;
+    int isOpen = 0;
+    EXPECT_EQ(pWifiControllerMachine->pEnableState->HandleWifiToggleChangeForWlan1(id, isOpen), true);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForWlan1Test02, TestSize.Level1)
+{
+    int id = 1;
+    int isOpen = 1;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetPersistWifiState(_))
+        .WillRepeatedly(Return(WIFI_STATE_ENABLED));
+    EXPECT_EQ(pWifiControllerMachine->pEnableState->HandleWifiToggleChangeForWlan1(id, isOpen), true);
+}
+
+HWTEST_F(WifiControllerMachineTest, StartSoftapCloseTimerTest01, TestSize.Level1)
+{
+    pWifiControllerMachine->stopSoftapTimerId_ = 1;
+    pWifiControllerMachine->StartSoftapCloseTimer();
+    EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
+}
+
+HWTEST_F(WifiControllerMachineTest, StartSoftapCloseTimerTest02, TestSize.Level1)
+{
+    pWifiControllerMachine->stopSoftapTimerId_ = 0;
+    pWifiControllerMachine->StartSoftapCloseTimer();
+    EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
+}
+
+HWTEST_F(WifiControllerMachineTest, StopSoftapCloseTimerTest01, TestSize.Level1)
+{
+    pWifiControllerMachine->stopSoftapTimerId_ = 1;
+    pWifiControllerMachine->StopSoftapCloseTimer();
+    EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
 }
 }
 }

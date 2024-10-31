@@ -38,12 +38,12 @@ constexpr int TEN = 10;
 
 class WifiServiceSchedulerTest : public testing::Test {
 public:
-    static void SetUpTestCase() 
+    static void SetUpTestCase()
     {
         WifiManager::GetInstance().Init();
     }
 
-    static void TearDownTestCase() 
+    static void TearDownTestCase()
     {
         WifiManager::GetInstance().Exit();
     }

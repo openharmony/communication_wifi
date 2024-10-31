@@ -588,15 +588,10 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
     }
     std::string name = "deviceconfigs";
     int32_t ashmemSize = 1000;
-    std::vector<DeviceConfigParcel> configParcelVec;
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
         WriteWifiDeviceConfig(outParcel, result[i]);
-        DeviceConfigParcel parcelResult;
-        parcelResult.data = reinterpret_cast<void*>(outParcel.GetData());
-        parcelResult.len = static_cast<int>(outParcel.GetDataSize());
-        ashmemSize += parcelResult.len;
-        configParcelVec.push_back(parcelResult);
+        ashmemSize += static_cast<int>(outParcel.GetDataSize());
     }
     sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), ashmemSize);
     if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
@@ -610,16 +605,18 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
     }
     int offset = 0;
     for (int32_t i = 0; i < contentSize; ++i) {
-        DeviceConfigParcel configParcel = configParcelVec[i];
-        if (offset + configParcel.len > ashmemSize) {
+        MessageParcel outParcel;
+        WriteWifiDeviceConfig(outParcel, result[i]);
+        int dataSize = static_cast<int>(outParcel.GetDataSize());
+        if (offset + dataSize > ashmemSize) {
             WIFI_LOGW("%{public}s parcelLen over ssid: %{public}s, ashmemSize:%{public}d,"
-                "len:%{public}d, offset:%{public}d", __FUNCTION__, SsidAnonymize(result[i].ssid).c_str(), 
-                ashmemSize, configParcel.len, offset);
+                "dataSize:%{public}d, offset:%{public}d", __FUNCTION__, SsidAnonymize(result[i].ssid).c_str(), 
+                ashmemSize, dataSize, offset);
             continue;
         }
-        allSize.emplace_back(configParcel.len);
-        ashmem->WriteToAshmem(configParcel.data, configParcel.len, offset);
-        offset += configParcel.len;
+        allSize.emplace_back(dataSize);
+        ashmem->WriteToAshmem(reinterpret_cast<void*>(outParcel.GetData()), dataSize, offset);
+        offset += dataSize;
     }
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteUInt32Vector(allSize);

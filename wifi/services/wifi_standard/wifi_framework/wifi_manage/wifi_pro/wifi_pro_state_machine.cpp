@@ -770,7 +770,7 @@ bool WifiProStateMachine::WifiHasNetState::HandleConnectStateChangedInHasNet(
     } else {
         WIFI_LOGI("HasNetState, network disconnected");
         if (!isWifi2WifiSwitching_) {
-            return false;
+            pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiDisConnectedState_);
         }
     }
     return true;

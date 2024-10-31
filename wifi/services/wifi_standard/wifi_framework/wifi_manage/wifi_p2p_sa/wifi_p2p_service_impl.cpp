@@ -1033,7 +1033,7 @@ bool WifiP2pServiceImpl::IsP2pServiceRunning()
 
 ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
 {
-    WIFI_LOGI("SetP2pDeviceName:%{public}s", deviceName.c_str());
+    WIFI_LOGI("SetP2pDeviceName:%{private}s", deviceName.c_str());
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetP2pDeviceName:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;

@@ -399,14 +399,10 @@ ErrCode WifiDeviceImpl::IsFeatureSupported(long feature, bool &isSupported)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
-    long tmpFeatures = 0;
-    isSupported = false;
-    ErrCode ret = client_->GetSupportedFeatures(tmpFeatures);
+    ErrCode ret = client_->IsFeatureSupported(feature, isSupported);
     if (ret != WIFI_OPT_SUCCESS) {
         return ret;
     }
-    isSupported = ((static_cast<unsigned long>(tmpFeatures) & static_cast<unsigned long>(feature)) ==
-        static_cast<unsigned long>(feature));
     return WIFI_OPT_SUCCESS;
 }
 

@@ -220,13 +220,11 @@ int WifiManager::GetSupportedFeatures(long &features) const
     long supportedFeatures = mSupportedFeatures;
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA_5G);
-    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_PASSPOINT);
     if (g_supportsapcoexistflag) {
         supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_AP_STA);
     }
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SAE);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SUITE_B);
-    supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_OWE);
     features = supportedFeatures;
 
     return 0;

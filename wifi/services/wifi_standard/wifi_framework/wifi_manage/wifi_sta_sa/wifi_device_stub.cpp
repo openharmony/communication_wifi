@@ -125,6 +125,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         MessageParcel &data, MessageParcel &reply) { OnGetDeviceConfig(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_DPI_MARK_RULE)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnSetDpiMarkRule(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_FEATURE_SUPPORTED)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnIsFeatureSupported(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1017,6 +1019,22 @@ void WifiDeviceStub::OnGetSupportedFeatures(uint32_t code, MessageParcel &data, 
 
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt64(features);
+    }
+
+    return;
+}
+
+void WifiDeviceStub::OnIsFeatureSupported(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isSupported = false;
+    long feature = data.ReadInt64();
+    int ret = IsFeatureSupported(feature, isSupported);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(isSupported);
     }
 
     return;

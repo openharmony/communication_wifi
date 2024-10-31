@@ -1603,7 +1603,7 @@ ErrCode WifiDeviceProxy::GetSupportedFeatures(long &features)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::IsFeatureSupported(long &features)
+ErrCode WifiDeviceProxy::IsFeatureSupported(long feature, bool &isSupported)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -1617,6 +1617,7 @@ ErrCode WifiDeviceProxy::IsFeatureSupported(long &features)
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
+    data.WriteInt64(feature);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_FEATURE_SUPPORTED),
         data, reply, option);
     if (error != ERR_NONE) {
@@ -1633,7 +1634,7 @@ ErrCode WifiDeviceProxy::IsFeatureSupported(long &features)
         return ErrCode(ret);
     }
 
-    features = reply.ReadInt64();
+    isSupported = reply.ReadInt32();
     return WIFI_OPT_SUCCESS;
 }
 

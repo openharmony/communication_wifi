@@ -1505,17 +1505,20 @@ ErrCode WifiDeviceServiceImpl::GetSupportedFeatures(long &features)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::IsFeatureSupported(long &features)
+ErrCode WifiDeviceServiceImpl::IsFeatureSupported(long feature, bool &isSupported)
 {
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    int ret = WifiManager::GetInstance().GetSupportedFeatures(features);
+    long tmpFeatures = 0;
+    int ret = WifiManager::GetInstance().GetSupportedFeatures(tmpFeatures);
     if (ret < 0) {
         WIFI_LOGE("Failed to get supported features!");
         return WIFI_OPT_FAILED;
     }
+    isSupported = ((static_cast<unsigned long>(tmpFeatures) & static_cast<unsigned long>(feature)) ==
+        static_cast<unsigned long>(feature));
     return WIFI_OPT_SUCCESS;
 }
 

@@ -40,12 +40,6 @@ static std::map<int, std::string> g_HicollieStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), "WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE"},
 };
 
-struct DeviceConfigParcel
-{
-    void* data;
-    int len;
-};
-
 WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
 {
     WIFI_LOGI("enter WifiDeviceStub!");

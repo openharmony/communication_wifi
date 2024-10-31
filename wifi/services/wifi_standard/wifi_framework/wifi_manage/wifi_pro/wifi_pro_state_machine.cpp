@@ -769,6 +769,7 @@ bool WifiProStateMachine::WifiHasNetState::HandleConnectStateChangedInHasNet(
         }
     } else {
         WIFI_LOGI("HasNetState, network disconnected");
+        return false;
     }
     return true;
 }

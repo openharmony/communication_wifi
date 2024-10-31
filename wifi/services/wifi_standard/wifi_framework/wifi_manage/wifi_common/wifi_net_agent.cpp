@@ -455,16 +455,15 @@ int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
     WIFI_LOGD("Enter NetConnCallback::RequestNetwork");
     LogNetCaps(ident, netCaps);
 #ifndef OHOS_ARCH_LITE
+    int networkId = ConvertStringToInt(netrequest.ident);
+    if (networkId <= INVALID_NETWORK_ID || std::to_string(networkId) != netrequest.ident) {
+        WIFI_LOGD("networkId is invaild.");
+        return -1;
+    }
     if (requestIds_.find(netrequest.requestId) != requestIds_.end()) {
         return -1;
     }
     requestIds_.insert(netrequest.requestId);
-
-    int networkId = ConvertStringToInt(netrequest.ident);
-    if (networkId <= INVALID_NETWORK_ID || std::to_string(networkId) != netrequest.ident) {
-        WIFI_LOGE("networkId is invaild.");
-        return -1;
-    }
 
     WIFI_LOGI("RequestNetwork uid[%{public}d], networkId[%{public}d].", netrequest.uid, networkId);
     if (!WifiAppStateAware::GetInstance().IsForegroundApp(netrequest.uid)) {

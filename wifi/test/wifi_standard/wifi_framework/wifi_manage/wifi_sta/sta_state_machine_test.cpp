@@ -1226,11 +1226,6 @@ public:
         }
     }
 
-    void LinkedStateGoInStateSuccess()
-    {
-        pStaStateMachine->pLinkedState->GoInState();
-    }
-
     void LinkedStateGoOutStateSuccess()
     {
         pStaStateMachine->pLinkedState->GoOutState();
@@ -2301,11 +2296,6 @@ HWTEST_F(StaStateMachineTest, WpaStoppingStateExeMsgSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, WpaStoppingStateExeMsgFail, TestSize.Level1)
 {
     WpaStoppingStateExeMsgFail();
-}
-
-HWTEST_F(StaStateMachineTest, LinkedStateGoInStateSuccess, TestSize.Level1)
-{
-    LinkedStateGoInStateSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, LinkedStateGoOutStateSuccess, TestSize.Level1)

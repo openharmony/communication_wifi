@@ -40,6 +40,12 @@ static std::map<int, std::string> g_HicollieStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), "WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE"},
 };
 
+struct DeviceConfigParcel
+{
+    void* data;
+    int len;
+};
+
 WifiDeviceStub::WifiDeviceStub() : mSingleCallback(false)
 {
     WIFI_LOGI("enter WifiDeviceStub!");
@@ -573,7 +579,7 @@ void WifiDeviceStub::OnRemoveAllDevice(uint32_t code, MessageParcel &data, Messa
 
 void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply)
 {
-    WIFI_LOGI("WifiDeviceStub SendDeviceConfig");
+    WIFI_LOGI("%{public}s, contentSize: %{public}d", __FUNCTION__, contentSize);
     std::vector<uint32_t> allSize;
     if (contentSize == 0) {
         reply.WriteInt32(WIFI_OPT_SUCCESS);
@@ -581,7 +587,17 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
         return;
     }
     std::string name = "deviceconfigs";
-    int32_t ashmemSize = contentSize * sizeof(WifiDeviceConfig);
+    int32_t ashmemSize = 1000;
+    std::vector<DeviceConfigParcel> configParcelVec;
+    for (int32_t i = 0; i < contentSize; ++i) {
+        MessageParcel outParcel;
+        WriteWifiDeviceConfig(outParcel, result[i]);
+        DeviceConfigParcel parcelResult;
+        parcelResult.data = reinterpret_cast<void*>(outParcel.GetData());
+        parcelResult.len = static_cast<int>(outParcel.GetDataSize());
+        ashmemSize += parcelResult.len;
+        configParcelVec.push_back(parcelResult);
+    }
     sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), ashmemSize);
     if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
         reply.WriteInt32(WIFI_OPT_FAILED);
@@ -589,19 +605,21 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
             ashmem->UnmapAshmem();
             ashmem->CloseAshmem();
         }
+        WIFI_LOGE("%{public}s ashmem create fail", __FUNCTION__);
         return;
     }
     int offset = 0;
     for (int32_t i = 0; i < contentSize; ++i) {
-        MessageParcel outParcel;
-        WriteWifiDeviceConfig(outParcel, result[i]);
-        int dataSize = static_cast<int>(outParcel.GetDataSize());
-        if (offset + dataSize > ashmemSize) {
-            break;
+        DeviceConfigParcel configParcel = configParcelVec[i];
+        if (offset + configParcel.len > ashmemSize) {
+            WIFI_LOGW("%{public}s parcelLen over ssid: %{public}s, ashmemSize:%{public}d, len:%{public}d,
+                offset:%{public}d", __FUNCTION__, SsidAnonymize(result[i].ssid).c_str(), 
+                ashmemSize, configParcel.len, offset);
+            continue;
         }
-        allSize.emplace_back(dataSize);
-        ashmem->WriteToAshmem(reinterpret_cast<void*>(outParcel.GetData()), dataSize, offset);
-        offset += dataSize;
+        allSize.emplace_back(configParcel.len);
+        ashmem->WriteToAshmem(configParcel.data, configParcel.len, offset);
+        offset += configParcel.len;
     }
     reply.WriteInt32(WIFI_OPT_SUCCESS);
     reply.WriteUInt32Vector(allSize);

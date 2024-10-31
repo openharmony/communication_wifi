@@ -38,7 +38,7 @@ namespace Wifi {
 
 class MultiStaStateMachineTest : public testing::Test {
 public:
-    static void SetUpTestCase() 
+    static void SetUpTestCase()
     {
         WifiManager::GetInstance().Init();
     }

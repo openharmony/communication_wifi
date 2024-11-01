@@ -604,7 +604,7 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
         int dataSize = static_cast<int>(outParcel.GetDataSize());
         if (offset + dataSize > ashmemSize) {
             WIFI_LOGW("%{public}s parcelLen over ssid: %{public}s, ashmemSize:%{public}d,"
-                "dataSize:%{public}d, offset:%{public}d", __FUNCTION__, SsidAnonymize(result[i].ssid).c_str(), 
+                "dataSize:%{public}d, offset:%{public}d", __FUNCTION__, SsidAnonymize(result[i].ssid).c_str(),
                 ashmemSize, dataSize, offset);
             continue;
         }

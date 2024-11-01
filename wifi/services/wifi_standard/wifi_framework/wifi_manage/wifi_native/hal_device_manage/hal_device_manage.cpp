@@ -68,7 +68,7 @@ bool HalDeviceManager::StartChipHdi()
     std::lock_guard<std::mutex> lock(mMutex);
     LOGI("StartChipHdi start...");
     if (g_IWifi != nullptr) {
-        bool isInit = fase;
+        bool isInit = false;
         g_IWifi->IsInit(isInit);
         if (isInit) {
             LOGI("has start");

@@ -1060,7 +1060,7 @@ WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
     wpsParam.ssid = (uint8_t *)info->ssid;
     wpsParam.ssidLen = strlen(info->ssid) + 1;
     wpsParam.bssid = addr;
-    wpsParam.bssidLen = strlen(info->bssid);
+    wpsParam.bssidLen = ETH_ALEN;
     wpsParam.passphrase = (uint8_t *)info->passphrase;
     wpsParam.passphraseLen = strlen(info->passphrase) + 1;
     wpsParam.frequency = (info->frequency << 16) | (info->isLegacyGo);

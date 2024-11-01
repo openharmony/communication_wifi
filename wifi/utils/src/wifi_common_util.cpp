@@ -630,7 +630,7 @@ std::string HexToString(const std::string &str)
     if (str.length() <= 0) {
         return result;
     }
-    for (size_t i = 0; i < str.length() - STEP_2BIT; i += STEP_2BIT) {
+    for (size_t i = 0; i < str.length() - 1; i += STEP_2BIT) {
         std::string byte = str.substr(i, STEP_2BIT);
         char chr = 0;
         int strTemp = CheckDataLegalHex(byte);

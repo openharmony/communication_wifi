@@ -67,6 +67,14 @@ bool HalDeviceManager::StartChipHdi()
 {
     std::lock_guard<std::mutex> lock(mMutex);
     LOGI("StartChipHdi start...");
+    if (g_IWifi != nullptr) {
+        bool isInit = false;
+        g_IWifi->IsInit(isInit);
+        if (isInit) {
+            LOGI("has start");
+            return true;
+        }
+    }
     g_IWifi = IChipController::Get(CHIP_SERVICE_NAME, false);
     CHECK_NULL_AND_RETURN(g_IWifi, false);
 

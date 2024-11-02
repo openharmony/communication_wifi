@@ -220,11 +220,12 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
 
     bool isJoin = device.IsGroupOwner();
     std::string groupName = config.GetGroupName();
-
+    WIFI_LOGI("IsDeviceLimit: %{public}d, Isinviteable: %{public}d", device.IsDeviceLimit(), device.Isinviteable());
     if (isJoin && !device.IsGroupLimit()) {
         if (groupName.empty()) {
             groupName = device.GetNetworkName();
         }
+        WIFI_LOGI("connect device is go, Groupname is %{private}s", groupName.c_str());
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
             /**
@@ -251,6 +252,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
         /* Prepare to reinvoke as GC. */
         networkId = groupManager.GetGroupNetworkId(device);
         if (networkId < 0) {
+            WIFI_LOGI("cannot find device from gc devices");
             /**
              * Prepare to reinvoke as GO.
              * Mean that the group is not found when the peer device roles as GO,
@@ -275,6 +277,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
                 return true;
             }
         } else {
+            WIFI_LOGI("cannot find device from go devices");
             config.SetNetId(networkId);
         }
     }

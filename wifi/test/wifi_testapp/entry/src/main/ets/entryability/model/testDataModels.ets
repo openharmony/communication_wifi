@@ -1446,6 +1446,13 @@ const p2pManagerTestCase: WifiTest[] = [
 
 const TestComposition: WifiTestComposition[] = [
   {
+    'name': 'new api',
+    'detail': 'wifiManager测试',
+    'url': 'pages/newApi/AllInOneView',
+    'image': $r('app.media.wifi'),
+    'category': Category.NewApi
+  },
+  {
     'name' : 'WIFI' ,
     'detail' : 'wifi发现' ,
     'url' : 'pages/subAppTest/wifiScanTest' ,

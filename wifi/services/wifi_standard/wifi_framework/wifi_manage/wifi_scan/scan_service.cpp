@@ -1033,7 +1033,7 @@ bool ScanService::AddPnoScanMessageBody(InternalMessagePtr interMessage, const P
 void ScanService::HandlePnoScanInfo(std::vector<InterScanInfo> &scanInfoList)
 {
     WIFI_LOGI("Enter HandlePnoScanInfo.\n");
-
+    InitChipsetInfo();
     std::vector<InterScanInfo> filterScanInfo;
     std::vector<InterScanInfo>::iterator iter = scanInfoList.begin();
     for (; iter != scanInfoList.end(); ++iter) {
@@ -1250,35 +1250,36 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
 {
     WIFI_LOGI("Enter StartSystemTimerScan, scanAtOnce: %{public}d.", scanAtOnce);
     ErrCode rlt = ApplyScanPolices(ScanType::SCAN_TYPE_SYSTEMTIMER);
-    if (rlt != WIFI_OPT_SUCCESS) {
+    if (rlt == WIFI_OPT_FAILED) {
         return;
     }
-
-    struct timespec times = { 0, 0 };
-    clock_gettime(CLOCK_MONOTONIC, &times);
-    int64_t nowTime =
-        static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
-    int sinceLastScan = 0;
-    if (lastSystemScanTime != 0) {
-        sinceLastScan = nowTime - lastSystemScanTime;
-    }
-
-    /*
-     * The scan is performed immediately, the first scan is required,
-     * or the time since the last scan is longer than the scan interval.
-     */
     int scanTime = SYSTEM_SCAN_INIT_TIME;
     if (systemScanIntervalMode.scanIntervalMode.interval > 0) {
         scanTime = systemScanIntervalMode.scanIntervalMode.interval;
     }
-    if (scanAtOnce || (lastSystemScanTime == 0) ||
-        (sinceLastScan / SECOND_TO_MILLI_SECOND >= systemScanIntervalMode.scanIntervalMode.interval)) {
-        if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Scan failed.");
+    if (rlt == WIFI_OPT_SUCCESS) {
+        struct timespec times = { 0, 0 };
+        clock_gettime(CLOCK_MONOTONIC, &times);
+        int64_t nowTime =
+            static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
+        int sinceLastScan = 0;
+        if (lastSystemScanTime != 0) {
+            sinceLastScan = nowTime - lastSystemScanTime;
         }
-        lastSystemScanTime = nowTime;
-    } else {
-        scanTime = systemScanIntervalMode.scanIntervalMode.interval - sinceLastScan / SECOND_TO_MILLI_SECOND;
+
+        /*
+        * The scan is performed immediately, the first scan is required,
+        * or the time since the last scan is longer than the scan interval.
+        */
+        if (scanAtOnce || (lastSystemScanTime == 0) ||
+            (sinceLastScan / SECOND_TO_MILLI_SECOND >= systemScanIntervalMode.scanIntervalMode.interval)) {
+            if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("Scan failed.");
+            }
+            lastSystemScanTime = nowTime;
+        } else {
+            scanTime = systemScanIntervalMode.scanIntervalMode.interval - sinceLastScan / SECOND_TO_MILLI_SECOND;
+        }
     }
     WIFI_LOGI("StartSystemTimerScan, scanTime: %{public}d,  interval:%{public}d,  count:%{public}d",
         scanTime,
@@ -1411,12 +1412,10 @@ ErrCode ScanService::AllowSystemTimerScan()
         WIFI_LOGW("system timer scan not allow when wifi disable");
         return WIFI_OPT_FAILED;
     }
-    if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
-        staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
-        WIFI_LOGW("system timer scan not allowed for staStatus: %{public}d.", staStatus);
+    if (!AllowScanByDisableScanCtrl()) {
+        WIFI_LOGW("system timer scan not allow by disable scan control.");
         return WIFI_OPT_FAILED;
     }
-
     /* The network is connected and cannot be automatically switched. */
     autoNetworkSelection = WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover(m_instId);
     if ((staStatus == static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) && (!autoNetworkSelection)) {
@@ -1424,26 +1423,32 @@ ErrCode ScanService::AllowSystemTimerScan()
         return WIFI_OPT_FAILED;
     }
 
+    if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
+        staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
+        WIFI_LOGW("system timer scan not allowed for staStatus: %{public}d.", staStatus);
+        return WIFI_OPT_SCAN_NEXT_PERIOD;
+    }
+
     int staScene = GetStaScene();
     /* Determines whether to allow scanning based on the STA status. */
     if (staScene == SCAN_SCENE_MAX) {
         WIFI_LOGW("system timer scan not allowed for invalid staScene: %{public}d", staScene);
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
     if (!AllowScanByHid2dState()) {
         WIFI_LOGW("system timer scan not allow by hid2d state");
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
     if (!AllowScanDuringStaScene(staScene, ScanMode::SYSTEM_TIMER_SCAN)) {
         WIFI_LOGW("system timer scan not allowed, staScene: %{public}d", staScene);
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
     if (!AllowScanDuringCustomScene(ScanMode::SYSTEM_TIMER_SCAN)) {
         WIFI_LOGW("system timer scan not allowed");
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
 #ifdef SUPPORT_SCAN_CONTROL
@@ -1468,12 +1473,6 @@ ErrCode ScanService::AllowSystemTimerScan()
         }
     }
 #endif
-
-    if (!AllowScanByDisableScanCtrl()) {
-        WIFI_LOGW("system timer scan not allow by disable scan control.");
-        return WIFI_OPT_FAILED;
-    }
-
     WIFI_LOGI("allow system timer scan");
     return WIFI_OPT_SUCCESS;
 }

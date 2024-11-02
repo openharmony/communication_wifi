@@ -132,7 +132,7 @@ public:
 
     int SetDeviceEverConnected(int networkId);
  
-    int SetAcceptUnvalidated(int networkId);
+    int SetAcceptUnvalidated(int networkId, bool state);
  
     bool GetDeviceEverConnected(int networkId);
  

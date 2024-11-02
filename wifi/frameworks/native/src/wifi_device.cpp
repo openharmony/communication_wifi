@@ -21,7 +21,6 @@ DEFINE_WIFILOG_LABEL("WifiDevice");
 
 namespace OHOS {
 namespace Wifi {
-    
 NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId, int instId)
 {
 #ifndef OHOS_ARCH_LITE
@@ -31,13 +30,16 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int syste
     }
 #endif
 
-    std::shared_ptr<WifiDeviceImpl> device = std::make_shared<WifiDeviceImpl>();
+    static std::shared_ptr<WifiDeviceImpl> device = nullptr;
+    if (!device) {
+        device = std::make_shared<WifiDeviceImpl>();
+    }
     if (device && device->Init(systemAbilityId, instId)) {
         return device;
+    } else {
+        WIFI_LOGE("new wifi device failed");
+        return nullptr;
     }
-
-    WIFI_LOGE("new wifi device failed");
-    return nullptr;
 }
 
 WifiDevice::~WifiDevice()

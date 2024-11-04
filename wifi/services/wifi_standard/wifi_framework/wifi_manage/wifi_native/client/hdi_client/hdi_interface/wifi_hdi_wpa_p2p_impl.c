@@ -140,19 +140,63 @@ static WifiErrorNo AddP2pRandomMacFlag()
     return WIFI_HAL_OPT_OK;
 }
 
+bool GetOldMac(char *mac, int len)
+{
+    char line[BUFF_SIZE];
+ 
+    FILE *fp = fopen(P2P_SUPPLICANT_PATH, "r");
+    if (fp == NULL) {
+        return false;
+    }
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        if (strstr(line, PERSISENT_MAC_STRING) != NULL) {
+            if (memcpy_s(mac, len, line, strlen(line)) != EOK) {
+                return false;
+            }
+            return true;
+        }
+    }
+    if (fclose(fp) != 0) {
+        LOGE("close fp failed");
+    }
+    return false;
+}
+ 
+void AppendMac(char *mac, int len)
+{
+    FILE *fp = fopen(P2P_SUPPLICANT_PATH, "a");
+    if (fp == NULL) {
+        LOGE("Error! Could not open file\n");
+        return;
+    }
+    if (fwrite(mac, sizeof(char), len, fp) == 0) {
+        LOGE("write faild");
+    }
+    if (fclose(fp) != 0) {
+        LOGE("close fp failed");
+    }
+}
+
 WifiErrorNo HdiWpaP2pStart(const char *ifaceName)
 {
+    char persisentMac[PERSISENT_MAC_LEN] = {0};
+    bool hasPersisentMac = false;
+
     LOGI("HdiWpaP2pStart enter");
     if (SetHdiP2pIfaceName(ifaceName) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: set p2p iface name failed!");
         return WIFI_HAL_OPT_FAILED;
     }
-
+    if (hasPersisentGroup) {
+        hasPersisentMac = GetOldMac(persisentMac, PERSISENT_MAC_LEN);
+    }
     if (CopyConfigFile("p2p_supplicant.conf") != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: CopyConfigFile failed!");
         return WIFI_HAL_OPT_FAILED;
     }
-
+    if (hasPersisentMac) {
+        AppendMac(persisentMac, PERSISENT_MAC_LEN);
+    }
     if (HdiWpaStart() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: HdiWpaStart failed!");
         return WIFI_HAL_OPT_FAILED;

@@ -131,7 +131,6 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
         WifiAssetManager::GetInstance().WifiAssetAdd(config);
 #endif
-        LogDeviceConfigsChanged();
     }
     return config.networkId;
 }
@@ -209,6 +208,7 @@ int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int in
             results.push_back(iter->second);
         }
     }
+    LogDeviceConfigsChanged();
     return 0;
 }
 
@@ -2168,6 +2168,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         mNetworkId++;
     }
     mWifiDeviceConfig.swap(tempConfigs);
+    LogDeviceConfigsChanged();
 }
 void WifiSettings::UpLoadLocalDeviceConfigToCloud()
 {

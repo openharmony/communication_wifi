@@ -322,6 +322,7 @@ private:
     bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
     void SyncAfterDecryped(WifiDeviceConfig &config);
+    void LogDeviceConfigsChanged();
 private:
     // STA
     std::mutex mStaMutex;

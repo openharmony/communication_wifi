@@ -507,7 +507,6 @@ int WifiSettings::SyncDeviceConfig()
 
 int WifiSettings::ReloadDeviceConfig()
 {
-    LOGI("ReloadDeviceConfig enter");
 #ifndef CONFIG_NO_CONFIG_WRITE
     std::unique_lock<std::mutex> lock(mStaMutex);
     int ret = mSavedDeviceConfig.LoadConfig();
@@ -526,6 +525,7 @@ int WifiSettings::ReloadDeviceConfig()
         item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
+    LOGI("ReloadDeviceConfig load deviceConfig size: %{public}d", static_cast<int>(mWifiDeviceConfig.size()));
     if (!mEncryptionOnBootFalg.test_and_set()) {
         mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
         mWifiEncryptionThread->PostAsyncTask([this]() {
@@ -2151,7 +2151,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
 #ifdef FEATURE_ENCRYPTION_SUPPORT
         EncryptionDeviceConfig(iter);
 #endif
-        LOGI("%{public}s networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s psksize: %{public}d",
+        LOGI("%{public}s networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s, psksize: %{public}d",
             __FUNCTION__, iter.networkId, SsidAnonymize(iter.ssid).c_str(), iter.keyMgmt,
             static_cast<int>((iter.preSharedKey).length()));
         tempConfigs.emplace(std::make_pair(iter.networkId, iter));

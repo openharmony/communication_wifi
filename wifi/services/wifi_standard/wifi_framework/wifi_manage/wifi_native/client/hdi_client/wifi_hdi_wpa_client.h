@@ -17,7 +17,6 @@
 #ifndef OHOS_WIFI_HDI_WPA_CLIENT_H
 #define OHOS_WIFI_HDI_WPA_CLIENT_H
 
-
 #include <string>
 #include <vector>
 #include "wifi_internal_msg.h"
@@ -404,7 +403,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqP2pStart(const std::string &ifaceName);
+    WifiErrorNo ReqP2pStart(const std::string &ifaceName, const bool hasPersisentGroup);
 
     /**
      * @Description P2P stop

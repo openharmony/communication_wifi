@@ -152,9 +152,9 @@ void WifiSettings::SyncAfterDecryped(WifiDeviceConfig &config)
 void WifiSettings::LogDeviceConfigsChanged()
 {
     for (const auto &config : mWifiDeviceConfig) {
-        LOGI("%{public}s: instanceId: %{public}d, networkId: %{public}d, ssid: %{public}s, preSharedKeyLen:%{public}d,"
+        LOGI("%{public}s networkId: %{public}d, ssid: %{public}s, preSharedKeyLen:%{public}d,"
         "keyMgmt: %{public}s, hiddenSSID:%{public}d, uid:%{public}d, version:%{public}d", __FUNCTION__, 
-        config.instanceId, config.networkId, SsidAnonymize(config.ssid).c_str(), config.preSharedKey.length(), 
+        config.networkId, SsidAnonymize(config.ssid).c_str(), config.preSharedKey.length(), 
         config.keyMgmt.c_str(), config.hiddenSSID, config.uid, config.version);
     }
 }
@@ -518,6 +518,7 @@ int WifiSettings::SyncDeviceConfig()
 
 int WifiSettings::ReloadDeviceConfig()
 {
+    LOGI("ReloadDeviceConfig enter");
 #ifndef CONFIG_NO_CONFIG_WRITE
     std::unique_lock<std::mutex> lock(mStaMutex);
     int ret = mSavedDeviceConfig.LoadConfig();

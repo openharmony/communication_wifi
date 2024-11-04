@@ -405,8 +405,8 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
 
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter AddDeviceConfig, ssid:%{public}s, bssid=%{public}s\n",
-        SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str());
+    LOGI("Enter AddDeviceConfig, ssid:%{public}s, bssid=%{public}s, keyMgmt: %{public}s\n",
+        SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str(), config.keyMgmt.c_str());
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = INVALID_NETWORK_ID;
     bool isUpdate = false;
@@ -424,6 +424,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
             pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
         }
         isUpdate = true;
+        LOGI("AddDeviceConfig update device networkId:%{public}d", netWorkId);
     } else {
         netWorkId = WifiSettings::GetInstance().GetNextNetworkId();
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);

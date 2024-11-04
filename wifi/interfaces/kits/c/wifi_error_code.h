@@ -62,6 +62,8 @@ typedef enum {
     ERROR_WIFI_BUSY = -8,
     /** Wi-Fi invalid password */
     ERROR_WIFI_INVALID_PASSWORD = -9,
+    /** Get enhance service failed */
+    ERROR_WIFI_ENHANCE_SVC = -10,
     /** Unknown error */
     ERROR_WIFI_UNKNOWN = -128
 } WifiErrorCode;

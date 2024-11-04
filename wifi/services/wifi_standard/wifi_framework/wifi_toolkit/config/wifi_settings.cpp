@@ -153,9 +153,9 @@ void WifiSettings::LogDeviceConfigsChanged()
 {
     for (const auto &config : mWifiDeviceConfig) {
         LOGI("%{public}s: instanceId: %{public}d, networkId: %{public}d, ssid: %{public}s, preSharedKeyLen:%{public}d,"
-        "hiddenSSID:%{public}d, uid:%{public}d, version:%{public}d", __FUNCTION__, config.instanceId, config.networkId,
-        SsidAnonymize(config.ssid).c_str(), config.preSharedKey.length(), config.hiddenSSID, config.uid, 
-        config.version);
+        "keyMgmt: %{public}s, hiddenSSID:%{public}d, uid:%{public}d, version:%{public}d", __FUNCTION__, 
+        config.instanceId, config.networkId, SsidAnonymize(config.ssid).c_str(), config.preSharedKey.length(), 
+        config.keyMgmt.c_str(), config.hiddenSSID, config.uid, config.version);
     }
 }
 

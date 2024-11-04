@@ -1357,7 +1357,8 @@ ErrCode WifiP2pServiceImpl::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("Get pEnhanceService service failed!");
-        return WIFI_OPT_FAILED;
+        *getDatValidLen = 0;
+        return WIFI_OPT_GET_ENHANCE_SVC_FAILED;
     }
  
     if (pEnhanceService->Hid2dGetSelfWifiCfgInfo(cfgType, cfgData, getDatValidLen) != WIFI_OPT_SUCCESS) {

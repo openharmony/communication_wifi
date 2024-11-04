@@ -43,6 +43,7 @@ enum ErrCode {
     WIFI_OPT_MOVING_FREEZE_CTRL,      /* moving freeze scanning control */
     WIFI_OPT_NON_SYSTEMAPP,           /* not system app denied */
     WIFI_OPT_SCAN_NEXT_PERIOD,
+    WIFI_OPT_GET_ENHANCE_SVC_FAILED,  /* get enhance service failed */
     WIFI_OPT_ENTERPRISE_DENIED = 203, /* mdm forbidden */
 };
 }  // namespace Wifi

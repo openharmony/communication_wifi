@@ -113,8 +113,9 @@ int WifiSettings::Init()
 
 int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 {
-    if (config.ssid.empty()) {
-        LOGE("AddDeviceConfig ssid is empty");
+    if (config.ssid.empty() || (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey.length() == 0)) {
+        LOGE("AddDeviceConfig fail, networkId:%{public}d, keyMgmt:%{public}s",
+            config.networkId, config.keyMgmt.c_str());
         return -1;
     }
     std::unique_lock<std::mutex> lock(mStaMutex);

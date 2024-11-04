@@ -151,8 +151,10 @@ bool GetOldMac(char *mac, int len)
     while (fgets(line, sizeof(line), fp) != NULL) {
         if (strstr(line, PERSISENT_MAC_STRING) != NULL) {
             if (memcpy_s(mac, len, line, strlen(line)) != EOK) {
+                fclose(fp);
                 return false;
             }
+            fclose(fp);
             return true;
         }
     }

@@ -242,6 +242,20 @@ void WifiEventSubscriberManager::HandleCastServiceChange(bool add)
     }
 }
 
+void WifiEventSubscriberManager::HandleShareServiceChange(bool add)
+{
+    if (!add) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SHARE_SERVICE_UID);
+    }
+}
+
+void WifiEventSubscriberManager::HandleMouseCrossServiceChange(bool add)
+{
+    if (!add) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MOUSE_CROSS_SERVICE_UID);
+    }
+}
+
 #ifdef FEATURE_P2P_SUPPORT
 void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
@@ -294,6 +308,12 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
 #endif
         case CAST_ENGINE_SA_ID:
             HandleCastServiceChange(add);
+            break;
+        case SHARE_SERVICE_ID:
+            HandleShareServiceChange(add);
+            break;
+        case MOUSE_CROSS_SERVICE_ID:
+            HandleMouseCrossServiceChange(add);
             break;
         default:
             break;
@@ -481,6 +501,8 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
     SubscribeSystemAbility(CAST_ENGINE_SA_ID);
     SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
+    SubscribeSystemAbility(SHARE_SERVICE_ID);
+    SubscribeSystemAbility(MOUSE_CROSS_SERVICE_ID);
 }
 
 bool WifiEventSubscriberManager::IsDataMgrServiceActive()

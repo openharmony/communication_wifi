@@ -27,6 +27,8 @@ struct Hid2dInfo {
     Hid2dUpperScene softBusScene;
     Hid2dUpperScene castScene;
     Hid2dUpperScene miraCastScene;
+    Hid2dUpperScene shareScene;
+    Hid2dUpperScene mouseCrossScene;
     P2pConnectedState p2pConnectState;
     int p2pEnhanceState;
 

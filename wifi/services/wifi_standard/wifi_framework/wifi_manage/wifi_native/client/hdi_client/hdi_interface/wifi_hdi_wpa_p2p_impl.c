@@ -179,7 +179,7 @@ void AppendMac(char *mac, int len)
     }
 }
 
-WifiErrorNo HdiWpaP2pStart(const char *ifaceName)
+WifiErrorNo HdiWpaP2pStart(const char *ifaceName, const bool hasPersisentGroup)
 {
     char persisentMac[PERSISENT_MAC_LEN] = {0};
     bool hasPersisentMac = false;

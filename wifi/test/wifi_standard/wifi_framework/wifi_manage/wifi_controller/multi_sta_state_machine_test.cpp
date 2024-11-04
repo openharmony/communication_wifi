@@ -60,6 +60,10 @@ public:
     }
 
     std::unique_ptr<MultiStaStateMachine> multiStaStateMachine_;
+
+    static void OnStartFailureTest(int test)
+    {
+    }
 };
 
 HWTEST_F(MultiStaStateMachineTest, DefaultStateExecuteStateMsgTest01, TestSize.Level1)
@@ -78,7 +82,7 @@ HWTEST_F(MultiStaStateMachineTest, IdleStateExecuteStateMsgTest01, TestSize.Leve
     msg->SetMessageName(MULTI_STA_CMD_START);
     int mid = 1;
     msg->SetParam2(mid);
-    
+    multiStaStateMachine_->pIdleState->pMultiStaStateMachine->mcb.onStartFailure = OnStartFailureTest;
     EXPECT_EQ(multiStaStateMachine_->pIdleState->ExecuteStateMsg(msg), true);
 }
 

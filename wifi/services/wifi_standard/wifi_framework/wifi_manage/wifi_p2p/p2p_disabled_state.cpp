@@ -67,8 +67,10 @@ bool P2pDisabledState::ExecuteStateMsg(InternalMessagePtr msg)
             p2pStateMachine.p2pMonitor.MonitorBegins(p2pStateMachine.p2pIface);
             p2pStateMachine.StartTimer(
                 static_cast<int>(P2P_STATE_MACHINE_CMD::ENABLE_P2P_TIMED_OUT), ENABLE_P2P_TIMED_OUT__INTERVAL);
-            if (WifiP2PHalInterface::GetInstance().StartP2p(WifiConfigCenter::GetInstance().GetP2pIfaceName())
-                == WifiErrorNo::WIFI_HAL_OPT_OK) {
+            bool hasPersisentGroup = p2pStateMachine.HasPersisentGroup();
+            WIFI_LOGE("has persisen group %{public}d", hasPersisentGroup);
+            if (WifiP2PHalInterface::GetInstance().StartP2p(WifiConfigCenter::GetInstance().GetP2pIfaceName(),
+                hasPersisentGroup) == WifiErrorNo::WIFI_HAL_OPT_OK) {
                 SetVendorFeatures();
                 p2pStateMachine.SwitchState(&p2pStateMachine.p2pEnablingState);
             } else {

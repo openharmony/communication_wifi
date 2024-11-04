@@ -27,7 +27,6 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-    
 class WifiHdiWpaClientTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -839,7 +838,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqDisconnectStaByMacTEST, TestSize.Level1)
 
 HWTEST_F(WifiHdiWpaClientTest, ReqP2pStartTest, TestSize.Level1)
 {
-    WifiErrorNo result = wifiHdiWpaClient->ReqP2pStart("wlan");
+    WifiErrorNo result = wifiHdiWpaClient->ReqP2pStart("wlan", true);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 

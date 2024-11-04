@@ -405,7 +405,8 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
 
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter AddDeviceConfig, bssid=%{public}s\n", MacAnonymize(config.bssid).c_str());
+    LOGI("Enter AddDeviceConfig, ssid:%{public}s, bssid=%{public}s\n",
+        SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str());
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = INVALID_NETWORK_ID;
     bool isUpdate = false;

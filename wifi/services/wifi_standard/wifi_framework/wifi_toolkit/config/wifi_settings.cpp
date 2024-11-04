@@ -131,6 +131,7 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
         WifiAssetManager::GetInstance().WifiAssetAdd(config);
 #endif
+        LogDeviceConfigsChanged();
     }
     return config.networkId;
 }
@@ -146,6 +147,16 @@ void WifiSettings::SyncAfterDecryped(WifiDeviceConfig &config)
     WifiAssetManager::GetInstance().WifiAssetAdd(config);
 #endif
 #endif
+}
+
+void WifiSettings::LogDeviceConfigsChanged()
+{
+    for (const auto &config : mWifiDeviceConfig) {
+        LOGI("%{public}s: instanceId: %{public}d, networkId: %{public}d, ssid: %{public}s, preSharedKeyLen:%{public}d,"
+        "hiddenSSID:%{public}d, uid:%{public}d, version:%{public}d", __FUNCTION__, config.instanceId, config.networkId,
+        SsidAnonymize(config.ssid).c_str(), config.preSharedKey.length(), config.hiddenSSID, config.uid, 
+        config.version);
+    }
 }
 
 int WifiSettings::RemoveDevice(int networkId)

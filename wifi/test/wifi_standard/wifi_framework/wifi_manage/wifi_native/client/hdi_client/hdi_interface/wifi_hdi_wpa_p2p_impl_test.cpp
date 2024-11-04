@@ -360,33 +360,5 @@ HWTEST_F(WifiHdiWpaP2pImplTest, RegisterHdiWpaP2pEventCallbackTest, TestSize.Lev
     EXPECT_EQ(RegisterHdiWpaP2pEventCallback(nullptr), WIFI_HAL_OPT_INVALID_PARAM);
     EXPECT_EQ(RegisterHdiWpaP2pEventCallback(&callback), WIFI_HAL_OPT_INVALID_PARAM);
 }
-
-int wpas_p2p_mac_setup(struct wpa_supplicant *wpa_s)
-{
-	u8 addr[ETH_ALEN] = {0};
-    bool useRandom = false;
- 
-	if (wpa_s->conf->p2p_device_random_mac_addr == 0)
-		return 0;
-		return 0;
-	}
- 
- 
-#ifdef CONFIG_VENDOR_EXT
-     useRandom = wpa_vendor_ext_is_p2p_enhance_init(wpa_s);
-#endif
- 
-#ifdef CONFIG_LIBWPA_VENDOR
-    if (!is_zero_ether_addr(wpa_s->conf->p2p_device_persistent_mac_addr)
-        && !useRandom) {
-        useRandom = false;
-    }
-#else
-    if(!wpa_s->conf->ssid) {
-        useRandom = true;
-    }
-#endif
-	if (useRandom) {
-		if (random_mac_addr(addr) < 0) {
 }
 }

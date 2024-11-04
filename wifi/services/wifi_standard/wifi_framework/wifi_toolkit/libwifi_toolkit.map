@@ -263,7 +263,7 @@
         "OHOS::Wifi::WifiSettings::SetDeviceRandomizedMacSuccessEver(int)";
         "OHOS::Wifi::WifiSettings::SetDeviceEverConnected(int)";
         "OHOS::Wifi::WifiSettings::GetPackageName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
-        "OHOS::Wifi::WifiSettings::SetAcceptUnvalidated(int)";
+        "OHOS::Wifi::WifiSettings::SetAcceptUnvalidated(int, bool)";
         "OHOS::Wifi::WifiSettings::GetDeviceEverConnected(int)";
         "OHOS::Wifi::WifiSettings::GetAcceptUnvalidated(int)";
         "OHOS::Wifi::WifiSettings::GetCandidateConfig(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Wifi::WifiDeviceConfig&)";

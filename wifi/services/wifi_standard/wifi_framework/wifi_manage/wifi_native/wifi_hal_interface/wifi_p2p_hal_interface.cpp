@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 WifiP2PHalInterface &WifiP2PHalInterface::GetInstance(void)
 {
     static WifiP2PHalInterface inst;

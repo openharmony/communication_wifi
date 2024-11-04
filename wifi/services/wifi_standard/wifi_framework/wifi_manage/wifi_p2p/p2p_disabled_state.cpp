@@ -22,6 +22,7 @@ DEFINE_WIFILOG_P2P_LABEL("P2pDisabledState");
 
 namespace OHOS {
 namespace Wifi {
+    
 P2pDisabledState::P2pDisabledState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
     WifiP2pDeviceManager &deviceMgr, WifiP2pServiceManager &svrMgr)
     : State("P2pDisabledState"),

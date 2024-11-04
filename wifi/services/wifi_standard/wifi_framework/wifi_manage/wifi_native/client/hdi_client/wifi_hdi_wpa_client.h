@@ -17,6 +17,7 @@
 #ifndef OHOS_WIFI_HDI_WPA_CLIENT_H
 #define OHOS_WIFI_HDI_WPA_CLIENT_H
 
+
 #include <string>
 #include <vector>
 #include "wifi_internal_msg.h"

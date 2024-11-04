@@ -21,6 +21,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    
 const int SIZE = 128;
 class WifiHdiWpaP2pImplTest : public testing::Test {
 public:

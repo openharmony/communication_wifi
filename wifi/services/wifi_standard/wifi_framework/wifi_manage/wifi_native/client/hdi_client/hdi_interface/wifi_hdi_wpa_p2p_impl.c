@@ -20,6 +20,7 @@
 #include "stub_collector.h"
 #include "wifi_native_define.h"
 
+
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaP2pImpl"
 #define REPLY_BUF_LENGTH (1024)

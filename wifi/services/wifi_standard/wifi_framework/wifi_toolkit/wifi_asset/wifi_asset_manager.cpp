@@ -193,9 +193,10 @@ static void WifiAssetAttrQuery(const AssetResultSet &resultSet, int32_t userId,
         std::string strAlias =
             std::string(reinterpret_cast<const char *>(checkItem->value.blob.data), checkItem->value.blob.size);
         AssetValue returnValue = {.u32 = SEC_ASSET_RETURN_ALL};
+        AssetValue aliasValue = {.blob = checkItem->value.blob};
         AssetAttr attrSingle[] = {
             {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
-            {.tag = SEC_ASSET_TAG_ALIAS, .value = checkItem->value},
+            {.tag = SEC_ASSET_TAG_ALIAS, .value = aliasValue},
             {.tag = SEC_ASSET_TAG_RETURN_TYPE, .value = returnValue},
         };
         AssetResultSet resultSetSingel = {0};

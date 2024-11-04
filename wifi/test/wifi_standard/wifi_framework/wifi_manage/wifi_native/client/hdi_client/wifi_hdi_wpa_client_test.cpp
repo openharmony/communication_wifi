@@ -27,6 +27,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    
 class WifiHdiWpaClientTest : public testing::Test {
 public:
     static void SetUpTestCase() {}

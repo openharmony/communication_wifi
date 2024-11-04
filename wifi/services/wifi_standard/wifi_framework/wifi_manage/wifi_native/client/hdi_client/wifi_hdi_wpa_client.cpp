@@ -16,6 +16,7 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 #include "wifi_hdi_wpa_client.h"
 
+
 #include <codecvt>
 #include <fstream>
 #include <iostream>

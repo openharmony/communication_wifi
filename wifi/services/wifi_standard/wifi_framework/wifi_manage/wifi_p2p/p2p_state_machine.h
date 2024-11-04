@@ -15,6 +15,7 @@
 #ifndef OHOS_P2P_STATE_MACHINE_H
 #define OHOS_P2P_STATE_MACHINE_H
 
+
 #include <mutex>
 #include "state_machine.h"
 #include "ip2p_service_callbacks.h"

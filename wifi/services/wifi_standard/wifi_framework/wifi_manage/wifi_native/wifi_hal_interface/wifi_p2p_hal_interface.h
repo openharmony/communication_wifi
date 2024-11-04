@@ -20,7 +20,6 @@
 #include <vector>
 #include <map>
 
-
 #include "wifi_base_hal_interface.h"
 #include "wifi_native_struct.h"
 #include "wifi_p2p_event_callback.h"
@@ -36,7 +35,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo StartP2p(const std::string &ifaceName = "p2p0") const;
+    WifiErrorNo StartP2p(const std::string &ifaceName = "p2p0", const bool hasPersisentGroup = false) const;
 
     /**
      * @Description Close p2p

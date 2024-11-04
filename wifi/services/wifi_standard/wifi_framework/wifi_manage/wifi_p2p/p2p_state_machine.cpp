@@ -42,7 +42,6 @@ DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 
 namespace OHOS {
 namespace Wifi {
-    
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
 //miracast
 const int CMD_TYPE_SET = 2;

@@ -148,16 +148,6 @@ void WifiSettings::SyncAfterDecryped(WifiDeviceConfig &config)
 #endif
 }
 
-void WifiSettings::LogDeviceConfigsChanged()
-{
-    for (const auto &config : mWifiDeviceConfig) {
-        LOGI("%{public}s networkId: %{public}d, ssid: %{public}s, preSharedKeyLen:%{public}d,"
-        "keyMgmt: %{public}s, hiddenSSID:%{public}d, uid:%{public}d, version:%{public}d", __FUNCTION__, 
-        config.networkId, SsidAnonymize(config.ssid).c_str(), config.preSharedKey.length(), 
-        config.keyMgmt.c_str(), config.hiddenSSID, config.uid, config.version);
-    }
-}
-
 int WifiSettings::RemoveDevice(int networkId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -208,7 +198,6 @@ int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int in
             results.push_back(iter->second);
         }
     }
-    LogDeviceConfigsChanged();
     return 0;
 }
 
@@ -2157,18 +2146,18 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
-        LOGI("UpdateWifiConfigFromCloud new %{public}s , psksize : %{public}d", SsidAnonymize(iter.ssid).c_str(),
-            static_cast<int>((iter.preSharedKey).length()));
         iter.networkId = mNetworkId;
         iter.version = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
         EncryptionDeviceConfig(iter);
 #endif
+        LOGI("%{public}s networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s psksize: %{public}d",
+            __FUNCTION__, iter.networkId, SsidAnonymize(iter.ssid).c_str(), iter.keyMgmt,
+            static_cast<int>((iter.preSharedKey).length()));
         tempConfigs.emplace(std::make_pair(iter.networkId, iter));
         mNetworkId++;
     }
     mWifiDeviceConfig.swap(tempConfigs);
-    LogDeviceConfigsChanged();
 }
 void WifiSettings::UpLoadLocalDeviceConfigToCloud()
 {

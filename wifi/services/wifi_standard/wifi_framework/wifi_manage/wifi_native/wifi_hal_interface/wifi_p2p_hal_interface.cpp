@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 WifiP2PHalInterface &WifiP2PHalInterface::GetInstance(void)
 {
     static WifiP2PHalInterface inst;
@@ -46,11 +45,11 @@ WifiP2PHalInterface &WifiP2PHalInterface::GetInstance(void)
     return inst;
 }
 
-WifiErrorNo WifiP2PHalInterface::StartP2p(const std::string &ifaceName) const
+WifiErrorNo WifiP2PHalInterface::StartP2p(const std::string &ifaceName, const bool hasPersisentGroup) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqP2pStart(ifaceName);
+    return mHdiWpaClient->ReqP2pStart(ifaceName, hasPersisentGroup);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqP2pStart();

@@ -24,8 +24,7 @@
 extern "C" {
 #endif
 
-
-WifiErrorNo HdiWpaP2pStart(const char *ifaceName);
+WifiErrorNo HdiWpaP2pStart(const char *ifaceName, const bool hasPersisentGroup);
 
 WifiErrorNo HdiWpaP2pStop();
 

@@ -78,6 +78,7 @@ HWTEST_F(MultiStaStateMachineTest, IdleStateExecuteStateMsgTest01, TestSize.Leve
     msg->SetMessageName(MULTI_STA_CMD_START);
     int mid = 1;
     msg->SetParam2(mid);
+    
     EXPECT_EQ(multiStaStateMachine_->pIdleState->ExecuteStateMsg(msg), true);
 }
 

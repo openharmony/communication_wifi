@@ -4029,8 +4029,8 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
         WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
     }
     LOGI("%{public}s: networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s, preSharedKeyLen:%{public}d",
-        __FUNCTION__, config.networkId, SsidAnonymize(config.ssid).c_str(), config.keyMgmt.c_str(),
-        config.preSharedKey.length());
+        __FUNCTION__, deviceConfig.networkId, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
+        static_cast<int>(deviceConfig.preSharedKey.length()));
     UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, ANY_BSSID, ifaceName);

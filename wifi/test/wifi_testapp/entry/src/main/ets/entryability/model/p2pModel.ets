@@ -13,24 +13,25 @@
  * limitations under the License.
  */
 
-import prompt from '@ohos.prompt'
+import promptAction from '@ohos.promptAction'
 import wifi from '@ohos.wifi'
+import wifiManager from '@ohos.wifiManager';
 
 /**
  * P2pModel api Test Page Of wifi test
  */
 
 // 定义 callback 的类型。这里假设它的参数是一个 WifiP2pGroupInfo 类型的数组
-type CallbackType1 = (groups: wifi.WifiP2pGroupInfo[]) => void;
-type CallbackType2 = (groups: wifi.WifiP2pDevice[]) => void;
-const TAG = "[P2pModel]"
+type CallbackType1 = (groups: wifiManager.WifiP2pGroupInfo[]) => void;
+type CallbackType2 = (groups: wifiManager.WifiP2pDevice[]) => void;
+const TAG = "wifiTestApp [P2pModel]"
 
 export class P2pModel {
   getP2pPeerDevices(callback: CallbackType2) {
     console.log(TAG , 'scanP2p begin')
     try {
-      wifi.getP2pPeerDevices((err , wifiP2pDevice) => {
-        let p2pList: wifi.WifiP2pDevice[] = []
+      wifiManager.getP2pPeerDevices((err , wifiP2pDevice) => {
+        let p2pList: wifiManager.WifiP2pDevice[] = []
         if ( err ) {
           console.log(TAG , `scan p2p info err: ${ JSON.stringify(err) }`)
           callback(p2pList)
@@ -44,7 +45,7 @@ export class P2pModel {
             deviceAddress : wifiP2pDevice[ i ].deviceAddress ,
             primaryDeviceType : wifiP2pDevice[ i ].primaryDeviceType ,
             deviceStatus : wifiP2pDevice[ i ].deviceStatus ,
-            groupCapabilitys : wifiP2pDevice[ i ].groupCapabilitys ,
+            groupCapabilities : wifiP2pDevice[ i ].groupCapabilities ,
           })
           console.log(TAG , 'wifiP2pDevice:' + JSON.stringify(wifiP2pDevice[ i ]))
           console.log(TAG , 'p2pList:' + JSON.stringify(p2pList))
@@ -58,15 +59,15 @@ export class P2pModel {
 
   getCurrentGroup(callback: CallbackType1) {
     console.log(TAG , 'scanP2pGroup begin')
-    wifi.getCurrentGroup((err , result) => {
-      let p2pGroupList: wifi.WifiP2pGroupInfo[] = []; // 初始化数组
+    wifiManager.getCurrentGroup((err , result) => {
+      let p2pGroupList: wifiManager.WifiP2pGroupInfo[] = []; // 初始化数组
       if ( err ) {
         console.log(TAG , `scan info err: ${ JSON.stringify(err) }`)
         callback(p2pGroupList); // 在错误回调中返回空数组
         return
       }
       // 如果result是一个对象而不是数组
-      let groupInfo: wifi.WifiP2pGroupInfo = {
+      let groupInfo: wifiManager.WifiP2pGroupInfo = {
         isP2pGo : result.isP2pGo ,
         ownerInfo : result.ownerInfo ,
         passphrase : result.passphrase ,
@@ -82,23 +83,18 @@ export class P2pModel {
     })
   }
 
-  connectP2p(p2pScanInfo: wifi.WifiP2pDevice) {
-    prompt.showToast({ message : 'connecting' })
+  connectP2p(p2pScanInfo: wifiManager.WifiP2pDevice) {
+    promptAction.showToast({ message : 'connecting' })
     console.log(TAG , `connect deviceAddress=${ p2pScanInfo.deviceAddress }`)
     console.log(TAG , `p2pScanInfo:` + JSON.stringify(p2pScanInfo))
-    let config: wifi.WifiP2PConfig = {
+    let config: wifiManager.WifiP2PConfig = {
       deviceAddress : p2pScanInfo.deviceAddress ,
       netId : - 2 ,
       passphrase : "" , //wifiP2pGroupInfo.passphrase
       groupName : "" , //wifiP2pGroupInfo.groupName
       goBand : 0
     }
-
-    if ( wifi.p2pConnect(config) ) {
-      console.log(TAG , `connectP2P success`)
-      wifi.createGroup(config)
-    } else {
-      console.log(TAG , `connectP2P fail`)
-    }
+    console.log(TAG , `connectP2P success`)
+    wifiManager.createGroup(config)
   }
 }

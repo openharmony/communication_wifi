@@ -113,7 +113,7 @@ int WifiSettings::Init()
 
 int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 {
-    if (config.ssid.empty() || (config.keyMgmt != KEY_MGMT_NONE && config.preSharedKey.length() == 0)) {
+    if (config.ssid.empty() || (config.keyMgmt == KEY_MGMT_WPA_PSK && config.preSharedKey.length() == 0)) {
         LOGE("AddDeviceConfig fail, networkId:%{public}d, keyMgmt:%{public}s",
             config.networkId, config.keyMgmt.c_str());
         return -1;

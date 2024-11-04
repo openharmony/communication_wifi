@@ -19,7 +19,6 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
-#include "log_helper.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_country_code_manager.h"

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import router from '@ohos.router';
 import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
@@ -136,7 +136,7 @@ struct p2pManagerConnectScenarioTest {
           .margin({ top : "15vp" , left : "20vp" })
           .align(Alignment.Start)
           .onClick(async(event: ClickEvent) => {
-            prompt.showToast({ message : '开始p2p连接场景测试' })
+            promptAction.showToast({ message : '开始p2p连接场景测试' })
             await this.forLoop()
           })
 

@@ -16,9 +16,9 @@
 
 import ConfigData from '../utils/ConfigData';
 import { TestData , TestApi , TestStress } from '../entryability/model/testData'
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 
-const TAG = "[stressContentTable]"
+const TAG = "wifiTestApp [stressContentTable]"
 
 /**
  * ContentTable
@@ -89,14 +89,14 @@ export struct StressContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast({ message : message });
+          promptAction.showToast({ message : message });
         }
         default: {
           let StartTime = new Date().getTime()
           for ( let indexNumber = 1 ; indexNumber < 101 ; indexNumber ++ ) {
             let message: string = apiItem.api!();
             apiItem.result = message;
-            prompt.showToast({ message : message });
+            promptAction.showToast({ message : message });
             this.currentIndex += 1;
             this.changeIndex = this.currentIndex;
             AppStorage.setOrCreate('stressNumber' , indexNumber);

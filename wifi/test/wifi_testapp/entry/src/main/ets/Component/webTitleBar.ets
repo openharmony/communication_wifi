@@ -17,7 +17,7 @@ import { Browser , LoadingStatus , WebObject , WebKey } from '../entryability/mo
 import fs from '@ohos.file.fs';
 import ConfigData from '../Utils/ConfigData'
 
-const TAG: string = '[webTitleBar]'
+const TAG = 'wifiTestApp [webTitleBar]'
 const BUTTON_WIDTH: number = 22
 const BUTTON_RADIUS: number = 4
 const DOWN_COLOR: string = '#e4e4e4'

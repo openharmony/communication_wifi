@@ -14,7 +14,7 @@
  */
 
 import { TestData , TestApi } from '../entryability/model/testData'
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import ConfigData from '../utils/ConfigData';
 /**
  * AutoVerificationTable of wifi test
@@ -76,7 +76,7 @@ export struct AutoVerificationTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast({ message : message });
+          promptAction.showToast({ message : message });
         }
           break;
       }

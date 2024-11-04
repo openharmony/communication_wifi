@@ -15,7 +15,7 @@
 
 import wifi from '@ohos.wifi'
 
-const TAG = "[basicDataSource]"
+const TAG = "wifiTestApp [basicDataSource]"
 
 /**
  * BasicDataSource page of WiFi test

@@ -18,7 +18,7 @@ import { AvailableWifi } from '../../../Component/availableWifi'
 import { TitleBar } from '../../../Component/titleBar'
 import ConfigData from '../../../Utils/ConfigData'
 
-const TAG = '[wifiFound]'
+const TAG = 'wifiTestApp [wifiFound]'
 
 /**
  * wifi Found Test Page Of Wifi test

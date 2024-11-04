@@ -63,7 +63,7 @@ ErrCode WifiP2pManager::AutoStartP2pService()
 
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (ifaceName.empty() &&
-        !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface([this](std::string &destoryIfaceName,
+        !HalDeviceManager::GetInstance().CreateP2pIface([this](std::string &destoryIfaceName,
         int createIfaceType) { this->IfaceDestoryCallback(destoryIfaceName, createIfaceType); },
         ifaceName)) {
         WIFI_LOGE("AutoStartP2pService, create iface failed!");
@@ -204,7 +204,7 @@ void WifiP2pManager::CloseP2pService(void)
 
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
-        DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveP2pIface(ifaceName);
+        HalDeviceManager::GetInstance().RemoveP2pIface(ifaceName);
         ifaceName.clear();
         WifiConfigCenter::GetInstance().SetP2pIfaceName("");
     }

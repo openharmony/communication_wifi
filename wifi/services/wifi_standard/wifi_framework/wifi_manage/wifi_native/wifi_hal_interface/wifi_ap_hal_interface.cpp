@@ -107,7 +107,7 @@ WifiErrorNo WifiApHalInterface::SetSoftApBlockList(const std::string &ifaceName,
     const std::vector<std::string> &blockList)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetBlockList(ifaceName, ifaceName, blockList)) {
+    if (!HalDeviceManager::GetInstance().SetBlockList(ifaceName, ifaceName, blockList)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -119,7 +119,7 @@ WifiErrorNo WifiApHalInterface::SetSoftApBlockList(const std::string &ifaceName,
 WifiErrorNo WifiApHalInterface::DisAssociateSta(const std::string &ifaceName, const std::string &mac)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->DisAssociateSta(ifaceName, ifaceName, mac)) {
+    if (!HalDeviceManager::GetInstance().DisAssociateSta(ifaceName, ifaceName, mac)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -165,7 +165,7 @@ WifiErrorNo WifiApHalInterface::GetFrequenciesByBand(const std::string &ifaceNam
     std::vector<int> &frequencies)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies)) {
+    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -193,7 +193,7 @@ WifiErrorNo WifiApHalInterface::RegisterApEvent(IWifiApMonitorEventCallback call
 WifiErrorNo WifiApHalInterface::SetWifiCountryCode(const std::string &ifaceName, const std::string &code)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetWifiCountryCode(ifaceName, code)) {
+    if (!HalDeviceManager::GetInstance().SetWifiCountryCode(ifaceName, code)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -226,7 +226,7 @@ const IWifiApMonitorEventCallback &WifiApHalInterface::GetApCallbackInst(int id)
 WifiErrorNo WifiApHalInterface::GetPowerModel(const std::string &ifaceName, int& model)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetPowerModel(ifaceName, model)) {
+    if (!HalDeviceManager::GetInstance().GetPowerModel(ifaceName, model)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -239,7 +239,7 @@ WifiErrorNo WifiApHalInterface::GetPowerModel(const std::string &ifaceName, int&
 WifiErrorNo WifiApHalInterface::SetPowerModel(const std::string &ifaceName, int model)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetPowerModel(ifaceName, model)) {
+    if (!HalDeviceManager::GetInstance().SetPowerModel(ifaceName, model)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -252,7 +252,7 @@ WifiErrorNo WifiApHalInterface::SetPowerModel(const std::string &ifaceName, int 
 WifiErrorNo WifiApHalInterface::SetConnectMacAddr(const std::string &ifaceName, const std::string &mac)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetApMacAddress(ifaceName, mac)) {
+    if (!HalDeviceManager::GetInstance().SetApMacAddress(ifaceName, mac)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;

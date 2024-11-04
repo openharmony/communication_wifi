@@ -297,18 +297,13 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
 
 void WifiEventSubscriberManager::GetAirplaneModeByDatashare()
 {
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("GetAirplaneModeByDatashare, datashareHelper is nullptr!");
-        return;
-    }
-
     std::string airplaneMode;
     Uri uri(SETTINGS_DATASHARE_URL_AIRPLANE_MODE);
-    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_AIRPLANE_MODE, airplaneMode);
+    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri, SETTINGS_DATASHARE_KEY_AIRPLANE_MODE, airplaneMode);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetAirplaneModeByDatashare, Query airplaneMode again!");
-        ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_AIRPLANE_MODE, airplaneMode, true);
+        ret = WifiDataShareHelperUtils::GetInstance().Query(uri,
+            SETTINGS_DATASHARE_KEY_AIRPLANE_MODE, airplaneMode, true);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("GetAirplaneModeByDatashare, Query airplaneMode fail!");
             return;
@@ -326,15 +321,10 @@ void WifiEventSubscriberManager::GetAirplaneModeByDatashare()
 
 void WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()
 {
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("GetWifiAllowSemiActiveByDatashare, datashareHelper is nullptr!");
-        return;
-    }
-
     std::string isAllowed;
     Uri uri(SETTINGS_DATASHARE_URI_WIFI_ALLOW_SEMI_ACTIVE);
-    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ALLOW_SEMI_ACTIVE, isAllowed);
+    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri,
+        SETTINGS_DATASHARE_KEY_WIFI_ALLOW_SEMI_ACTIVE, isAllowed);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetWifiAllowSemiActiveByDatashare, Query wifiAllowSemiActive fail!");
         return;
@@ -347,15 +337,9 @@ void WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()
 
 bool WifiEventSubscriberManager::GetLocationModeByDatashare()
 {
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("GetLocationModeByDatashare, datashareHelper is nullptr!");
-        return false;
-    }
-
     std::string locationMode;
-    Uri uri(datashareHelper->GetLoactionDataShareUri());
-    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_LOCATION_MODE, locationMode);
+    Uri uri(WifiDataShareHelperUtils::GetInstance().GetLoactionDataShareUri());
+    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri, SETTINGS_DATASHARE_KEY_LOCATION_MODE, locationMode);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetLocationModeByDatashare, Query locationMode fail!");
         return false;
@@ -378,14 +362,8 @@ void WifiEventSubscriberManager::DealLocationModeChangeEvent()
 
 void WifiEventSubscriberManager::GetCloneDataByDatashare(std::string &cloneData)
 {
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("GetCloneDataByDatashare, datashareHelper is nullptr!");
-        return;
-    }
-
     Uri uri(SETTINGS_DATASHARE_URI_CLONE_DATA);
-    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_CLONE_DATA, cloneData);
+    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri, SETTINGS_DATASHARE_KEY_CLONE_DATA, cloneData);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetCloneDataByDatashare, Query cloneMode fail!");
         return;
@@ -395,14 +373,8 @@ void WifiEventSubscriberManager::GetCloneDataByDatashare(std::string &cloneData)
 
 void WifiEventSubscriberManager::SetCloneDataByDatashare(const std::string &cloneData)
 {
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("SetCloneDataByDatashare, datashareHelper is nullptr!");
-        return;
-    }
-
     Uri uri(SETTINGS_DATASHARE_URI_CLONE_DATA);
-    int ret = datashareHelper->Update(uri, SETTINGS_DATASHARE_KEY_CLONE_DATA, cloneData);
+    int ret = WifiDataShareHelperUtils::GetInstance().Update(uri, SETTINGS_DATASHARE_KEY_CLONE_DATA, cloneData);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("SetCloneDataByDatashare, Update cloneData fail!");
         return;
@@ -498,18 +470,12 @@ bool WifiEventSubscriberManager::IsDataMgrServiceActive()
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()
 {
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("GetLastStaStateByDatashare, datashareHelper is nullptr!");
-        return 0;
-    }
-
     std::string lastStaState;
     Uri uri(SETTINGS_DATASHARE_URI_WIFI_ON);
-    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ON, lastStaState);
+    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ON, lastStaState);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGW("Query lastStaState fail, query settingsdata again!");
-        ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ON, lastStaState, true);
+        ret = WifiDataShareHelperUtils::GetInstance().Query(uri, SETTINGS_DATASHARE_KEY_WIFI_ON, lastStaState, true);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("GetLastStaStateByDatashare Query lastStaState fail!");
             return 0;
@@ -527,15 +493,9 @@ void WifiEventSubscriberManager::RegisterLocationEvent()
     if (islocationModeObservered) {
         return;
     }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("LocationEvent datashareHelper is nullptr");
-        return;
-    }
     locationModeObserver_ = sptr<WifiLocationModeObserver>(new (std::nothrow)WifiLocationModeObserver());
-    Uri uri(datashareHelper->GetLoactionDataShareUri());
-    datashareHelper->RegisterObserver(uri, locationModeObserver_);
+    Uri uri(WifiDataShareHelperUtils::GetInstance().GetLoactionDataShareUri());
+    WifiDataShareHelperUtils::GetInstance().RegisterObserver(uri, locationModeObserver_);
     islocationModeObservered = true;
     WIFI_LOGI("registerLocationEvent success");
 }
@@ -547,14 +507,8 @@ void WifiEventSubscriberManager::UnRegisterLocationEvent()
         WIFI_LOGE("UnRegisterLocationEvent islocationModeObservered is false");
         return;
     }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("UnRegisterLocationEvent datashareHelper is nullptr");
-        return;
-    }
-    Uri uri(datashareHelper->GetLoactionDataShareUri());
-    datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
+    Uri uri(WifiDataShareHelperUtils::GetInstance().GetLoactionDataShareUri());
+    WifiDataShareHelperUtils::GetInstance().UnRegisterObserver(uri, locationModeObserver_);
     islocationModeObservered = false;
 }
 
@@ -564,15 +518,9 @@ void WifiEventSubscriberManager::RegisterCloneEvent()
     if (cloneModeObserver_) {
         return;
     }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("RegisterCloneEvent datashareHelper is nullptr");
-        return;
-    }
     cloneModeObserver_ = sptr<WifiCloneModeObserver>(new (std::nothrow)WifiCloneModeObserver());
     Uri uri(SETTINGS_DATASHARE_URI_CLONE_DATA);
-    datashareHelper->RegisterObserver(uri, cloneModeObserver_);
+    WifiDataShareHelperUtils::GetInstance().RegisterObserver(uri, cloneModeObserver_);
     WIFI_LOGI("RegisterCloneEvent success");
 }
 
@@ -583,15 +531,8 @@ void WifiEventSubscriberManager::UnRegisterCloneEvent()
         WIFI_LOGE("UnRegisterCloneEvent cloneModeObserver_ is nullptr");
         return;
     }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        cloneModeObserver_ = nullptr;
-        WIFI_LOGE("UnRegisterCloneEvent datashareHelper is nullptr");
-        return;
-    }
     Uri uri(SETTINGS_DATASHARE_URI_CLONE_DATA);
-    datashareHelper->UnRegisterObserver(uri, cloneModeObserver_);
+    WifiDataShareHelperUtils::GetInstance().UnRegisterObserver(uri, cloneModeObserver_);
     cloneModeObserver_ = nullptr;
     WIFI_LOGI("UnRegisterCloneEvent success");
 }

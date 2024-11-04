@@ -63,6 +63,12 @@ HalDeviceManager::~HalDeviceManager()
     ResetHalDeviceManagerInfo(false);
 }
 
+HalDeviceManager &HalDeviceManager::GetInstance()
+{
+    static HalDeviceManager instance;
+    return instance;
+}
+
 bool HalDeviceManager::StartChipHdi()
 {
     std::lock_guard<std::mutex> lock(mMutex);

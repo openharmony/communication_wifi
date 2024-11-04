@@ -155,7 +155,7 @@ WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const 
 WifiErrorNo WifiStaHalInterface::SetWifiCountryCode(const std::string &ifaceName, const std::string &code)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetWifiCountryCode(ifaceName, code)) {
+    if (!HalDeviceManager::GetInstance().SetWifiCountryCode(ifaceName, code)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -169,7 +169,7 @@ WifiErrorNo WifiStaHalInterface::GetSupportFrequencies(const std::string &ifaceN
     std::vector<int> &frequencies)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies)) {
+    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -182,7 +182,7 @@ WifiErrorNo WifiStaHalInterface::GetSupportFrequencies(const std::string &ifaceN
 WifiErrorNo WifiStaHalInterface::SetConnectMacAddr(const std::string &ifaceName, const std::string &mac)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetStaMacAddress(ifaceName, mac)) {
+    if (!HalDeviceManager::GetInstance().SetStaMacAddress(ifaceName, mac)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -228,7 +228,7 @@ WifiErrorNo WifiStaHalInterface::GetSupportFeature(long &feature)
 WifiErrorNo WifiStaHalInterface::SetTxPower(int power)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(power)) {
+    if (!HalDeviceManager::GetInstance().SetTxPower(power)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -244,7 +244,7 @@ WifiErrorNo WifiStaHalInterface::Scan(const std::string &ifaceName, const WifiHa
     ScanParams scanParams;
     scanParams.ssids = scanParam.hiddenNetworkSsid;
     scanParams.freqs = scanParam.scanFreqs;
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->Scan(ifaceName, scanParams)) {
+    if (!HalDeviceManager::GetInstance().Scan(ifaceName, scanParams)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -354,7 +354,7 @@ WifiErrorNo WifiStaHalInterface::QueryScanInfos(const std::string &ifaceName, st
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     std::vector<ScanResultsInfo> scanResultsInfo;
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetScanInfos(ifaceName, scanResultsInfo)) {
+    if (!HalDeviceManager::GetInstance().GetScanInfos(ifaceName, scanResultsInfo)) {
         return WIFI_HAL_OPT_FAILED;
     }
     ParseScanInfo(scanResultsInfo, scanInfos);
@@ -388,7 +388,7 @@ WifiErrorNo WifiStaHalInterface::StartPnoScan(const std::string &ifaceName, cons
     scanParams.hiddenssids = scanParam.hiddenSsid;
     scanParams.savedssids = scanParam.savedSsid;
     scanParams.freqs = scanParam.scanFreqs;
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->StartPnoScan(ifaceName, scanParams)) {
+    if (!HalDeviceManager::GetInstance().StartPnoScan(ifaceName, scanParams)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -401,7 +401,7 @@ WifiErrorNo WifiStaHalInterface::StartPnoScan(const std::string &ifaceName, cons
 WifiErrorNo WifiStaHalInterface::StopPnoScan(const std::string &ifaceName)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->StopPnoScan(ifaceName)) {
+    if (!HalDeviceManager::GetInstance().StopPnoScan(ifaceName)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -621,7 +621,7 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceNa
     }
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     SignalPollResult signalPollResult;
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetConnectSignalInfo(ifaceName, signalPollResult)) {
+    if (!HalDeviceManager::GetInstance().GetConnectSignalInfo(ifaceName, signalPollResult)) {
         return WIFI_HAL_OPT_FAILED;
     }
     info.signal = signalPollResult.currentRssi;
@@ -650,7 +650,7 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceNa
 WifiErrorNo WifiStaHalInterface::SetPmMode(const std::string &ifaceName, int frequency, int mode)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetPmMode(ifaceName, mode)) {
+    if (!HalDeviceManager::GetInstance().SetPmMode(ifaceName, mode)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -663,7 +663,7 @@ WifiErrorNo WifiStaHalInterface::SetPmMode(const std::string &ifaceName, int fre
 WifiErrorNo WifiStaHalInterface::SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetDpiMarkRule(ifaceName, uid, protocol, enable)) {
+    if (!HalDeviceManager::GetInstance().SetDpiMarkRule(ifaceName, uid, protocol, enable)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -690,7 +690,7 @@ WifiErrorNo WifiStaHalInterface::GetChipsetCategory(const std::string &ifaceName
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     unsigned int chipsetCategorySupported = static_cast<unsigned int>(WifiCategory::DEFAULT);
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetCategory(ifaceName, chipsetCategorySupported)) {
+    if (!HalDeviceManager::GetInstance().GetChipsetCategory(ifaceName, chipsetCategorySupported)) {
         return WIFI_HAL_OPT_FAILED;
     }
     if (chipsetCategorySupported & static_cast<unsigned int>(WifiCategory::WIFI7)) {
@@ -712,7 +712,7 @@ WifiErrorNo WifiStaHalInterface::GetChipsetWifiFeatrureCapability(
     const std::string &ifaceName, int& chipsetFeatrureCapability)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetWifiFeatrureCapability(
+    if (!HalDeviceManager::GetInstance().GetChipsetWifiFeatrureCapability(
         ifaceName, chipsetFeatrureCapability)) {
             return WIFI_HAL_OPT_FAILED;
     }
@@ -738,7 +738,7 @@ WifiErrorNo WifiStaHalInterface::ShellCmd(const std::string &ifName, const std::
 WifiErrorNo WifiStaHalInterface::SetNetworkInterfaceUpDown(const std::string &ifaceName, bool upDown)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetNetworkUpDown(ifaceName, upDown)) {
+    if (!HalDeviceManager::GetInstance().SetNetworkUpDown(ifaceName, upDown)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;

@@ -45,7 +45,7 @@ WifiTogglerManager::WifiTogglerManager()
 {
     WIFI_LOGI("create WifiTogglerManager");
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    DelayedSingleton<HalDeviceManager>::GetInstance()->StartChipHdi();
+    HalDeviceManager::GetInstance().StartChipHdi();
 #endif
     InitConcreteCallback();
     InitSoftapCallback();

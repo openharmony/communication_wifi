@@ -47,7 +47,7 @@ MultiStaStateMachine::~MultiStaStateMachine()
     if (!ifaceName.empty()) {
         WIFI_LOGW("~MultiStaStateMachine ifaceName: %{public}s,instId:%{public}d",
             ifaceName.c_str(), mid);
-        DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveStaIface(ifaceName);
+        HalDeviceManager::GetInstance().RemoveStaIface(ifaceName);
         ifaceName.clear();
         WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(mid);
         WifiConfigCenter::GetInstance().SetStaIfaceName("", mid);

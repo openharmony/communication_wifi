@@ -3599,7 +3599,7 @@ void StaStateMachine::UpdateAcceptUnvalidatedState()
     int networkId = linkedInfo.networkId;
     if (WifiSettings::GetInstance().GetAcceptUnvalidated(networkId)) {
         WIFI_LOGI("network is recover, change the value of AcceptUnvalidated to false");
-        // WifiSettings::GetInstance().SetAcceptUnvalidated(networkId, false);
+        WifiSettings::GetInstance().SetAcceptUnvalidated(networkId, false);
         WifiSettings::GetInstance().SyncDeviceConfig();
     }
 }

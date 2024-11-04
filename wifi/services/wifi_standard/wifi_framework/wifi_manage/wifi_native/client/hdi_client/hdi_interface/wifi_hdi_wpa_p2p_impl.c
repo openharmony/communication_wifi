@@ -20,12 +20,14 @@
 #include "stub_collector.h"
 #include "wifi_native_define.h"
 
-
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaP2pImpl"
 #define REPLY_BUF_LENGTH (1024)
 #define BUFF_SIZE 256
 #define P2P_RANDOM_MAC_FLAG "p2p_device_random_mac_addr=1\n"
+#define PERSISENT_MAC_LEN 55
+#define PERSISENT_MAC_STRING "p2p_device_persistent_mac_addr"
+#define P2P_SUPPLICANT_PATH CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
 
 typedef struct HdiP2pWpaNetworkField {
     P2pGroupConfigType field;

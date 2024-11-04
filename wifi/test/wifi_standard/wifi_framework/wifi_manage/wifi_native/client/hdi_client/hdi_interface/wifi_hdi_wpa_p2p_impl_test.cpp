@@ -21,7 +21,6 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-    
 const int SIZE = 128;
 class WifiHdiWpaP2pImplTest : public testing::Test {
 public:
@@ -33,7 +32,7 @@ public:
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiWpaP2pStartTest, TestSize.Level1)
 {
-    WifiErrorNo result = HdiWpaP2pStart("wlan0");
+    WifiErrorNo result = HdiWpaP2pStart("wlan0", true);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 

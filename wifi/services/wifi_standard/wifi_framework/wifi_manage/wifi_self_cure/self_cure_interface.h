@@ -96,20 +96,20 @@ public:
      * @param info -  IpInfo
      */
     void DealDhcpOfferReport(const IpInfo &ipInfo, int instId = 0);
-
-    /**
-     * @Description deal sta open result
-     *
-     * @param instId - instance Id
-     */
-    void DealStaOpened(int instId) override;
-
     /**
      * @Description Is SelfCure On Going
      *
      * @return bool - true: selfcure is ongoing, false: selfcure is not ongoing
     */
     bool IsSelfCureOnGoing() override;
+
+    /**
+     * @Description Check if Selfcure state,
+     *
+     * @param event - event type
+     * @return result - true: no need broadcast state change,  false: broadcast state normally
+     */
+    bool CheckSelfCureWifiResult(int event) override;
 private:
     std::mutex mutex;
     std::vector<SelfCureServiceCallback> mSelfCureCallback;

@@ -90,8 +90,6 @@ bool ProvisionDiscoveryState::ProcessCmdStartListen(InternalMessagePtr msg) cons
 bool ProvisionDiscoveryState::ProcessProvDiscPbcRspEvt(InternalMessagePtr msg) const
 {
     WifiP2pTempDiscEvent provDisc;
-    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::PROV_SCAN_ERROR),
-        static_cast<int>(P2P_ERROR_RES::PROV_SCAN_FAILURE));
     if (!msg->GetMessageObj(provDisc)) {
         WIFI_LOGD("Invalid argument provDisc");
         return EXECUTED;

@@ -505,7 +505,7 @@ void ConcreteMangerMachine::HandleStaStop()
         DelayedSingleton<HalDeviceManager>::GetInstance()->SetNetworkUpDown(
             WifiConfigCenter::GetInstance().GetStaIfaceName(), true);
 #endif
-        SwitchState(pScanonlyState);
+        WIFI_LOGI("HandleStaStop, current role is %{public}d, sta stop success.", mTargetRole);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartStaService(mid, ifaceName);
         if (ret != WIFI_OPT_SUCCESS) {
@@ -555,7 +555,7 @@ void ConcreteMangerMachine::HandleStaStart()
         }
         SwitchState(pScanonlyState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
-        SwitchState(pConnectState);
+        WIFI_LOGI("HandleStaStart, current role is %{public}d, sta start success.", mTargetRole);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
         ret = SwitchSemiFromEnable();
@@ -591,10 +591,10 @@ void ConcreteMangerMachine::HandleStaSemiActive()
         }
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE)) {
         WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(mid);
-        SwitchState(pSemiActiveState);
+        WIFI_LOGI("HandleStaSemiActive, current role is %{public}d, sta semi start success.", mTargetRole);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
         WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(mid);
-        SwitchState(pSemiActiveState);
+        WIFI_LOGI("HandleStaSemiActive, current role is %{public}d, sta semi start success.", mTargetRole);
     } else {
         WIFI_LOGE("Now targetrole is unknow.");
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);

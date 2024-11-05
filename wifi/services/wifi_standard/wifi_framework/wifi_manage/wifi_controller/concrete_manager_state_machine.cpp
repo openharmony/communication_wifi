@@ -323,7 +323,7 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanOnlyState);
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
 void ConcreteMangerMachine::ConnectState::SwitchSemiActiveInConnectState()
@@ -463,7 +463,7 @@ void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
     }
-    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanOnlyState);
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
 bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)

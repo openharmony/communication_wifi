@@ -427,14 +427,14 @@ void P2pMonitor::WpaEventGoNegFailure(int status) const
 {
     WIFI_LOGI("onGoNegotiationFailure callback status:%{public}d", status);
     P2pStatus p2pStatus = IntStatusToP2pStatus(status);
+    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::NEGO_FAILURE_ERROR),
+        static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     Broadcast2SmGoNegFailure(selectIfacName, p2pStatus);
 }
 
 void P2pMonitor::WpaEventInvitationReceived(const HalP2pInvitationInfo &recvInfo) const
 {
     WIFI_LOGI("onInvitationReceived callback");
-    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::NEGO_FAILURE_ERROR),
-        static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     WifiP2pGroupInfo group;
     group.SetNetworkId(recvInfo.persistentNetworkId);
 
@@ -485,14 +485,14 @@ void P2pMonitor::WpaEventGroupFormationFailure(const std::string &failureReason)
 {
     WIFI_LOGD("onGroupFormationFailure callback, failureReason:%{public}s", failureReason.c_str());
     std::string reason(failureReason);
+    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::FORMATION_ERROR),
+        static_cast<int>(P2P_ERROR_RES::FORMATION_FAILURE));
     Broadcast2SmGroupFormationFailure(selectIfacName, reason);
 }
 
 void P2pMonitor::WpaEventGroupStarted(const HalP2pGroupInfo &groupInfo) const
 {
     WIFI_LOGD("onGroupStarted callback");
-    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::FORMATION_ERROR),
-        static_cast<int>(P2P_ERROR_RES::FORMATION_FAILURE));
     if (groupInfo.groupName.empty()) {
         WIFI_LOGE("Missing group interface name.");
         return;
@@ -526,8 +526,6 @@ void P2pMonitor::WpaEventGroupRemoved(const std::string &groupIfName, bool isGo)
 {
     WIFI_LOGD("onGroupRemoved callback, groupIfName:%{private}s, isGo:%{public}s", groupIfName.c_str(),
         (isGo) ? "true" : "false");
-    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::P2P_GROUP_REMOVE_ERROR),
-        static_cast<int>(P2P_ERROR_RES::P2P_GROUP_REMOVE_FAILURE));
     if (groupIfName.empty()) {
         WIFI_LOGE("ERROR! No group name!");
         return;

@@ -131,6 +131,21 @@ enum class SelfCureType {
     SCE_TYPE_RANDMAC = 6,
     SCE_TYPE_RESET = 7,
 };
+
+enum SelfCureState {
+    SCE_WIFI_INVALID_STATE,
+    SCE_WIFI_OFF_STATE,
+    SCE_WIFI_ON_STATE,
+    SCE_WIFI_CONNECT_STATE,
+    SCE_WIFI_REASSOC_STATE,
+};
+
+constexpr int32_t SCE_EVENT_WIFI_STATE_CHANGED = 101;
+constexpr int32_t SCE_EVENT_NET_INFO_CHANGED = 102;
+
+constexpr int32_t SCE_WIFI_STATUS_ABORT = -3;
+constexpr int32_t SCE_WIFI_STATUS_FAIL = -1;
+constexpr int32_t SCE_WIFI_STATUS_SUCC = 0;
 }
 }
 #endif

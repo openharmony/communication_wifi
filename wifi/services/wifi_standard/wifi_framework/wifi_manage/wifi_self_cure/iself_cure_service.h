@@ -19,6 +19,7 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "self_cure_service_callback.h"
+#include "self_cure_msg.h"
 #include "ip2p_service_callbacks.h"
 #include "sta_service_callback.h"
 
@@ -63,11 +64,12 @@ public:
     virtual bool IsSelfCureOnGoing() = 0;
 
     /**
-     * @Description Deal sta opened result
+     * @Description Check if Selfcure state,
      *
-     * @param instId - instance Id
+     * @param event - event type
+     * @return result - true: no need broadcast state change,  false: broadcast state normally
      */
-    virtual void DealStaOpened(int instId) = 0;
+    virtual bool CheckSelfCureWifiResult(int event) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

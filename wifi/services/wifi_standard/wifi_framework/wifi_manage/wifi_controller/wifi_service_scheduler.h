@@ -57,6 +57,7 @@ public:
     void ClearP2pIfaceNameMap(int instId);
     void ClearSoftApIfaceNameMap(int instId);
 private:
+    void BroadCastWifiStateChange(WifiState state, int instId);
     ErrCode PreStartWifi(int instId, std::string &staIfName);
     ErrCode PostStartWifi(int instId);
     ErrCode PostStartWifi2(int instId);

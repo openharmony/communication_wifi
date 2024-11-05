@@ -1186,6 +1186,12 @@ bool P2pStateMachine::IsInterfaceReuse() const
     return !(WifiConfigCenter::GetInstance().GetP2pIfaceName().compare("wlan0"));
 }
 
+bool P2pStateMachine::HasPersisentGroup(void)
+{
+    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
+    return !grpInfo.empty();
+}
+
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");

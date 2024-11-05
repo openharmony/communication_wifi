@@ -197,6 +197,10 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             pWifiControllerMachine->StopTimer(CMD_OPEN_WIFI_RETRY);
             HandleWifiToggleChangeInEnabledState(msg);
             break;
+
+
+
+
 #ifdef FEATURE_AP_SUPPORT
         case CMD_SOFTAP_TOGGLED:
             HandleSoftapToggleChangeInEnabledState(msg);

@@ -30,6 +30,9 @@ Handler::Handler() : pMyQueue(nullptr), handleThread(0), isRunning(true)
 Handler::Handler() : pMyTaskQueue(nullptr)
 {}
 #endif
+
+
+
 Handler::~Handler()
 {
     LOGI("Handler::~Handler");

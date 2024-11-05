@@ -132,12 +132,12 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
         if (!WifiAuthCenter::IsSystemAccess()) {
             WIFI_LOGE("Scan:NOT System APP, PERMISSION_DENIED!");
 #ifndef OHOS_ARCH_LITE
-        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+            WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
 #endif
             return WIFI_OPT_NON_SYSTEMAPP;
         }
         if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("Scan:VerifyGetScanInfosPermission PERMISSION_DENIED!");
+            WIFI_LOGE("Scan:VerifyWifiConnectionPermission PERMISSION_DENIED!");
 #ifndef OHOS_ARCH_LITE
             WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
 #endif

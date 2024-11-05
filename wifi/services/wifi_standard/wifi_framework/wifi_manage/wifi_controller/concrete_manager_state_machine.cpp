@@ -311,7 +311,7 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
 {
     ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
+        WIFI_LOGE("stop sta failed ret =%{public}d", ret);
     }
 }
 
@@ -424,6 +424,7 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessagePtr 
                 WIFI_LOGI("switch ROLE_CLIENT_MIX_SEMI_ACTIVE");
                 WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
             }
+            WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
             break;
         default:
             break;

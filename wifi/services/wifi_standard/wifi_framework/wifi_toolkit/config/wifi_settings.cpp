@@ -2153,7 +2153,7 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         EncryptionDeviceConfig(iter);
 #endif
         LOGI("%{public}s networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s, psksize: %{public}d",
-            __FUNCTION__, iter.networkId, SsidAnonymize(iter.ssid).c_str(), iter.keyMgmt,
+            __FUNCTION__, iter.networkId, SsidAnonymize(iter.ssid).c_str(), iter.keyMgmt.c_str(),
             static_cast<int>((iter.preSharedKey).length()));
         tempConfigs.emplace(std::make_pair(iter.networkId, iter));
         mNetworkId++;

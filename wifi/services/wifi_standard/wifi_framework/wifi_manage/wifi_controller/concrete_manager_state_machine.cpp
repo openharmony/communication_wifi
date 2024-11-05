@@ -584,11 +584,13 @@ void ConcreteMangerMachine::HandleStaSemiActive()
             return;
         }
         WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
+        SwitchState(pConnectState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
         }
+        SwitchState(pScanonlyState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE)) {
         WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(mid);
         WIFI_LOGI("HandleStaSemiActive, current role is %{public}d, sta semi start success.", mTargetRole);

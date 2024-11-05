@@ -63,7 +63,7 @@ int WifiServiceManager::Init()
 #ifdef OHOS_ARCH_LITE
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_STA, "libwifi_sta_service.so"));
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.so"));
-    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_ENHANCE, "libwifi_enhance_service.z.so"));
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_ENHANCE, "libwifi_enhance_interface.z.so"));
 #ifdef FEATURE_AP_SUPPORT
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AP, "libwifi_ap_service.so"));
 #endif
@@ -77,7 +77,7 @@ int WifiServiceManager::Init()
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SELFCURE, "libwifi_self_cure.z.so"));
 #endif
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_SCAN, "libwifi_scan_service.z.so"));
-    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_ENHANCE, "libwifi_enhance_service.z.so"));
+    mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_ENHANCE, "libwifi_enhance_interface.z.so"));
 #ifdef FEATURE_AP_SUPPORT
     mServiceDllMap.insert(std::make_pair(WIFI_SERVICE_AP, "libwifi_ap_service.z.so"));
 #endif

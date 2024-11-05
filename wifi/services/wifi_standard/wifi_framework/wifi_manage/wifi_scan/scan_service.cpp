@@ -737,8 +737,8 @@ void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vecto
             WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
                 storedIter->bssid, "");
 #endif
-            WIFI_LOGI("ScanInfo add new ssid=%{public}s bssid=%{public}s.\n",
-                SsidAnonymize(storedIter->ssid).c_str(), MacAnonymize(storedIter->bssid).c_str());
+            WIFI_LOGI("ScanInfo add new ssid=%{public}s bssid=%{public}s rssi=%{public}d.\n",
+                SsidAnonymize(storedIter->ssid).c_str(), MacAnonymize(storedIter->bssid).c_str(), storedIter->rssi);
         }
         results.push_back(*storedIter);
     }
@@ -2385,9 +2385,9 @@ bool ScanService::AllowScanByHid2dState()
     LOGD("Enter AllowScanByHid2dState.\n");
     Hid2dUpperScene softbusScene;
     Hid2dUpperScene castScene;
-    Hid2dUpperScene miracastScene;
     Hid2dUpperScene shareScene;
     Hid2dUpperScene mouseCrossScene;
+    Hid2dUpperScene miracastScene;
     WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);

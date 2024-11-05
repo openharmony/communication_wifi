@@ -153,7 +153,7 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         return;
     }
     std::string type = notifyParam.substr(0, begPos);
-    int num = stoi(type);
+    int num = CheckDataLegal(type);
     std::string data = notifyParam.substr(begPos + 1);
     if (data.empty()) {
         WIFI_LOGI("OnWpaStaNotifyCallBack() data is empty");

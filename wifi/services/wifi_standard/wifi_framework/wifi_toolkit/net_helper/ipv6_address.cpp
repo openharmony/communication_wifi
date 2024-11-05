@@ -16,6 +16,7 @@
 #include <climits>
 #include "securec.h"
 #include "wifi_log.h"
+#include "wifi_common_util.h"
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_UTIL_Ipv6Address"
@@ -64,7 +65,8 @@ Ipv6Address Ipv6Address::Create(std::string ipv6)
         prefixLength = MAX_IPV6_PREFIX_LENGTH;
     } else {
         ip = std::string(ipv6.begin(), ipv6.begin() + index);
-        prefixLength = static_cast<size_t>(std::stoi(ipv6.substr(index + 1)));
+        std::string ipv6Tmp = ipv6.substr(index + 1);
+        prefixLength = CheckDataToUint(ipv6Tmp);
     }
 
     if (!IsValidIPv6(ip)) {
@@ -322,7 +324,7 @@ std::string Ipv6Address::GetNetwork() const
 
 std::string Ipv6Address::BinToHex(const std::string &strBin)
 {
-    int addrDec = std::stoi(strBin, nullptr, MAX_BIN);
+    int addrDec = CheckDataLegalBin(strBin);
     std::string addrHex;
     char buf[2] = {0};
     if (addrDec % MAX_HEX < MAX_DEC) {
@@ -338,7 +340,7 @@ std::string Ipv6Address::BinToHex(const std::string &strBin)
 
 std::string Ipv6Address::HexToBin(const std::string &strHex)
 {
-    int addrDec = std::stoi(strHex, nullptr, MAX_HEX);
+    int addrDec = CheckDataLegalHex(strHex);
     std::string addrBin;
     for (int n = addrDec; n; n = n / MAX_BIN) {
         addrBin += ((n % MAX_BIN) ? "1" : "0");

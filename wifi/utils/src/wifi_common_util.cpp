@@ -70,8 +70,6 @@ const uint32_t BASE64_UNIT_TWO_PADDING = 2;
 const uint32_t BASE64_SRC_UNIT_SIZE = 3;
 const uint32_t BASE64_DEST_UNIT_SIZE = 4;
 
-const uint32_t DECIMAL_NOTATION = 10;
-
 static std::pair<std::string, int> g_brokerProcessInfo;
 static constexpr uint8_t STEP_2BIT = 2;
 static constexpr uint8_t HEX_OFFSET = 4;
@@ -616,15 +614,42 @@ std::string StringToHex(const std::string &data)
     return ss.str();
 }
 
-int CheckDataLegal(std::string &data)
+int CheckDataLegalHex(const std::string &data)
 {
-    std::regex pattern("\\d+");
-    if (!std::regex_search(data, pattern)) {
+    if (data.empty() || data.size() > MAX_INT32_LENGTH_HEX) {
+        WIFI_LOGE("CheckDataLegalHex: invalid data:%{private}s", data.c_str());
+        return 0;
+    }
+ 
+    std::regex pattern("[0-9|a-f|A-F]+");
+    if (!std::regex_match(data, pattern)) {
         return 0;
     }
     errno = 0;
     char *endptr = nullptr;
-    long int num = std::strtol(data.c_str(), &endptr, DECIMAL_NOTATION);
+    long int num = std::strtol(data.c_str(), &endptr, BASE_HEX);
+    if (errno == ERANGE) {
+        WIFI_LOGE("CheckDataLegalHex errno == ERANGE, data:%{private}s", data.c_str());
+        return 0;
+    }
+ 
+    return static_cast<int>(num);
+}
+
+int CheckDataLegal(std::string &data, int base)
+{
+    if (data.empty() || data.size() > MAX_INT32_LENGTH) {
+        WIFI_LOGE("CheckDataLegal: invalid data:%{private}s", data.c_str());
+        return 0;
+    }
+ 
+    std::regex pattern("-?\\d+");
+    if (!std::regex_match(data, pattern)) {
+        return 0;
+    }
+    errno = 0;
+    char *endptr = nullptr;
+    long int num = std::strtol(data.c_str(), &endptr, base);
     if (errno == ERANGE) {
         WIFI_LOGE("CheckDataLegal errno == ERANGE, data:%{private}s", data.c_str());
         return 0;
@@ -633,17 +658,45 @@ int CheckDataLegal(std::string &data)
     return static_cast<int>(num);
 }
 
-long long CheckDataLegall(std::string &data)
+unsigned int CheckDataToUint(std::string &data, int base)
 {
+    if (data.empty() || data.size() > MAX_UINT32_LENGTH) {
+        WIFI_LOGE("CheckDataToUint: invalid data:%{private}s", data.c_str());
+        return 0;
+    }
     std::regex pattern("\\d+");
-    if (!std::regex_search(data, pattern)) {
+    if (!std::regex_match(data, pattern)) {
+        WIFI_LOGE("CheckDataToUint regex unsigned int value fail, data:%{private}s", data.c_str());
+        return 0;
+    }
+
+    errno = 0;
+    char *endptr = nullptr;
+    unsigned long int num = std::strtoul(data.c_str(), &endptr, base);
+    if (errno == ERANGE) {
+        WIFI_LOGE("CheckDataToUint errno == ERANGE, data:%{private}s", data.c_str());
+        return 0;
+    }
+
+    return static_cast<unsigned int>(num);
+}
+
+long long CheckDataTolonglong(std::string &data, int base)
+{
+    if (data.empty() || data.size() > MAX_INT64_LENGTH) {
+        WIFI_LOGE("CheckDataTolonglong: invalid data:%{private}s", data.c_str());
+        return 0;
+    }
+ 
+    std::regex pattern("-?\\d+");
+    if (!std::regex_match(data, pattern)) {
         return 0;
     }
     errno = 0;
     char *endptr = nullptr;
-    long long int num = std::strtoll(data.c_str(), &endptr, DECIMAL_NOTATION);
+    long long int num = std::strtoll(data.c_str(), &endptr, base);
     if (errno == ERANGE) {
-        WIFI_LOGE("CheckDataLegall errno == ERANGE, data:%{private}s", data.c_str());
+        WIFI_LOGE("CheckDataTolonglong errno == ERANGE, data:%{private}s", data.c_str());
         return 0;
     }
     return num;

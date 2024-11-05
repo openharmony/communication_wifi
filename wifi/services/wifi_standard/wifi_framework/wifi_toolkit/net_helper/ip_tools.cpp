@@ -14,6 +14,7 @@
  */
 
 #include "ip_tools.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -99,8 +100,10 @@ void IpTools::ConvertIpv6Address(const std::string &address, std::vector<unsigne
         if (value.size() != IPV6_DIGIT_NUM_PER_SEG) {
             break;
         }
-        ipv6.push_back(std::stoi(value.substr(POS_0, HEX_BYTE_DIGIT_NUM), nullptr, HEX_FORM));
-        ipv6.push_back(std::stoi(value.substr(POS_2, HEX_BYTE_DIGIT_NUM), nullptr, HEX_FORM));
+        std::string valueFromPos0 = value.substr(POS_0, HEX_BYTE_DIGIT_NUM);
+        std::string valueFromPos2 = value.substr(POS_2, HEX_BYTE_DIGIT_NUM);
+        ipv6.push_back(CheckDataLegalHex(valueFromPos0));
+        ipv6.push_back(CheckDataLegalHex(valueFromPos2));
         tmpAddress = tmpAddress.substr(npos + 1);
     }
 
@@ -110,8 +113,10 @@ void IpTools::ConvertIpv6Address(const std::string &address, std::vector<unsigne
     if (tmpAddress.size() != IPV6_DIGIT_NUM_PER_SEG) {
         return;
     }
-    ipv6.push_back(std::stoi(tmpAddress.substr(POS_0, HEX_BYTE_DIGIT_NUM), nullptr, HEX_FORM));
-    ipv6.push_back(std::stoi(tmpAddress.substr(POS_2, HEX_BYTE_DIGIT_NUM), nullptr, HEX_FORM));
+    std::string addressFromPos0 = tmpAddress.substr(POS_0, HEX_BYTE_DIGIT_NUM);
+    std::string addressFromPos2 = tmpAddress.substr(POS_2, HEX_BYTE_DIGIT_NUM);
+    ipv6.push_back(CheckDataLegalHex(addressFromPos0, HEX_FORM));
+    ipv6.push_back(CheckDataLegalHex(addressFromPos2, HEX_FORM));
 
     addressIpv6.assign(ipv6.begin(), ipv6.end());
     return;

@@ -991,9 +991,9 @@ void P2pStateMachine::StartDhcpClientInterface()
     RouterConfig config;
     if (memset_s(config.bssid, sizeof(config.bssid), 0, MAC_ADDR_MAX_LEN) == EOK) {
         config.prohibitUseCacheIp = true;
-        SetConfiguration(groupManager.GetCurrentGroup().GetInterface().c_str(), config);
     }
-    result = StartDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
+    config.bIpv6 = false;
+    result = StartDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), config);
     if (result != 0) {
         WIFI_LOGE("StartDhcpClient failed!");
         return;

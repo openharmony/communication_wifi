@@ -1056,6 +1056,11 @@ private:
     void HandlePreDhcpSetup();
 
     /**
+     * @Description judge if specific network
+     */
+    void IsSpecificNetwork();
+
+    /**
      * @Description operation after dhcp
      */
     void HandlePostDhcpSetup();

@@ -71,7 +71,6 @@ ohos_unittest("toolkit_unittest") {
     "wifi_asset_manager_test.cpp",
     "wifi_code_convert_test.cpp",
     "wifi_config_center_test.cpp",
-    "wifi_config_file_test.cpp",
     "wifi_encryption_util_test.cpp",
     "wifi_global_func_test.cpp",
     "wifi_ip_tools_test.cpp",

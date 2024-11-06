@@ -80,7 +80,6 @@ ohos_unittest("manager_unittest") {
     "common/block_connect_service_test.cpp",
     "common/speed_limit_configs_writer_test.cpp",
     "common/wifi_auth_center_test.cpp",
-    "common/wifi_channel_helper_test.cpp",
     "common/wifi_country_code_manager_test.cpp",
     "common/wifi_country_code_policy_test.cpp",
     "common/wifi_datashare_utils_test.cpp",

@@ -25,7 +25,8 @@ export enum Category {
   BenchMark ,
   Stress ,
   App ,
-  Stability
+  Stability,
+  NewApi
 }
 
 let NextId = 0;

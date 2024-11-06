@@ -70,6 +70,40 @@ public:
      */
     static std::string GetScoreResultsInfo(const std::vector<ScoreResult> &scoreResults);
 
+    /**
+     * check if wifi is open.
+     *
+     * @param networkCandidate candidate network.
+     * @return return ture if the candidate network is Open, else false.
+     */
+    static bool IsConfigOpenType(const NetworkCandidate &networkCandidate);
+ 
+    /**
+     * check if wifi is Is enterprise.
+     *
+     * @param networkCandidate candidate network.
+     * @return return ture if the candidate network is enterprise, else false.
+     */
+    static bool IsEnterprise(const NetworkCandidate &networkCandidate);
+ 
+    /**
+     * check if wifi is open or enterprise.
+     *
+     * @param networkCandidate candidate network.
+     * @return return ture if the candidate network is enterprise, else false.
+     */
+    static bool IsConfigOpenOrEapType(const NetworkCandidate &networkCandidate);
+ 
+    /**
+     * check if wifi has web keys.
+     *
+     * @param networkCandidate candidate network.
+     * @return return ture if wifi device config has web keys, else false.
+     */
+    static bool HasWepKeys(const WifiDeviceConfig &wifiConfig);
+ 
+    static bool IsSameFreqAsP2p(const NetworkCandidate &networkCandidate);
+
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
     /**
      * Get vendor country from param to determine it is ItDevice.

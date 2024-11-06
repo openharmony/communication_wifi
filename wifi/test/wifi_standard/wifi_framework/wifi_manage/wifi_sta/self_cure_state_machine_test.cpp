@@ -878,10 +878,10 @@ public:
         pSelfCureStateMachine->pInternetSelfCureState->currentRssi = MIN_VAL_LEVEL_4;
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForRandMacReassoc(requestCureLevel);
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForRandMacReassoc(requestCureLevel);
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         pSelfCureStateMachine->pInternetSelfCureState->SelfCureForRandMacReassoc(requestCureLevel);
     }
 
@@ -1044,10 +1044,10 @@ public:
         pSelfCureStateMachine->useWithRandMacAddress = FAC_MAC_REASSOC;
         pSelfCureStateMachine->pInternetSelfCureState->HandleSelfCureFailedForRandMacReassoc();
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         pSelfCureStateMachine->pInternetSelfCureState->HandleSelfCureFailedForRandMacReassoc();
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         pSelfCureStateMachine->pInternetSelfCureState->HandleSelfCureFailedForRandMacReassoc();
 
         pSelfCureStateMachine->useWithRandMacAddress = RAND_MAC_REASSOC;
@@ -1680,10 +1680,10 @@ public:
             Return(MODE_STATE_CLOSE));
         pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
         pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
 
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
     }
 

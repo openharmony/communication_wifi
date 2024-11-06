@@ -18,6 +18,7 @@
 #include "wifi_comparator_impl.h"
 #include "wifi_scorer_impl.h"
 #include "network_selection_utils.h"
+#include "external_wifi_common_builder_manager.h"
 #include "external_wifi_filter_builder_manager.h"
 #include "wifi_filter_impl.h"
 #include "wifi_logger.h"
@@ -53,6 +54,38 @@ AutoConnectIntegrator::AutoConnectIntegrator() : CompositeNetworkSelector(
 }
 
 bool AutoConnectIntegrator::Nominate(NetworkCandidate &networkCandidate)
+{
+    for (auto &networkSelector : subNetworkSelectors) {
+        networkSelector->TryNominate(networkCandidate);
+    }
+    return false;
+}
+
+void Wifi2WifiIntegrator::GetCandidatesFromSubNetworkSelector()
+{
+    for (const auto &subNetworkSelector : subNetworkSelectors) {
+        subNetworkSelector->GetBestCandidates(networkCandidates);
+    }
+}
+
+Wifi2WifiIntegrator::Wifi2WifiIntegrator() : CompositeNetworkSelector("Wifi2WifiIntegrator")
+{
+    auto andFilters = make_shared<AndWifiFilter>();
+    andFilters->AddFilter(make_shared<ValidNetworkIdFilter>());
+    andFilters->AddFilter(make_shared<NotCurrentNetworkFilter>());
+    andFilters->AddFilter(make_shared<NotNetworkBlackListFilter>());
+    ExternalWifiCommonBuildManager::GetInstance().BuildFilter(TagType::NOT_P2P_ENHANCE_FREQ_AT_5G_FILTER_TAG,
+        *andFilters);
+    andFilters->AddFilter(make_shared<NotP2pFreqAt5gFilter>());
+    andFilters->AddFilter(make_shared<SignalLevelFilter>());
+    andFilters->AddFilter(make_shared<WifiSwitchThresholdFilter>());
+    andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
+    SetWifiFilter(andFilters);
+ 
+    AddSubNetworkSelector(make_shared<PreferredApSelector>());
+}
+
+bool Wifi2WifiIntegrator::Nominate(NetworkCandidate &networkCandidate)
 {
     for (auto &networkSelector : subNetworkSelectors) {
         networkSelector->TryNominate(networkCandidate);
@@ -290,6 +323,21 @@ NoInternetNetworkSelector::NoInternetNetworkSelector() : SimpleFilterNetworkSele
 }
 
 bool NoInternetNetworkSelector::Filter(NetworkCandidate &networkCandidate)
+{
+    TryNominate(networkCandidate);
+    return false;
+}
+
+PreferredApSelector::PreferredApSelector() : SimpleFilterNetworkSelector("PreferredApSelector")
+{
+    // The filtering conditions have already been done outside, so no further filtering is needed here.
+    auto networkScoreComparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
+    networkScoreComparator->AddScorer(make_shared<ApQualityScorer>("ApQualityScorer"));
+    networkScoreComparator->AddScorer(make_shared<RssiScorer>());
+    SetWifiComparator(networkScoreComparator);
+}
+
+bool PreferredApSelector::Filter(NetworkCandidate &networkCandidate)
 {
     TryNominate(networkCandidate);
     return false;

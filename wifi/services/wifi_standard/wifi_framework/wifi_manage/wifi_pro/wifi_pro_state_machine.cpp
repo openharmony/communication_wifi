@@ -669,16 +669,20 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
         rssiLevel2Or3ScanedCounter_ < scanMaxCounter) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel2Or3ScanedCounter:%{public}d.", signalLevel, rssiLevel2Or3ScanedCounter_);
-        rssiLevel2Or3ScanedCounter_++;
-        pScanService->Scan(true);
-        isScanTriggered_ = true;
+        auto ret = pScanService->Scan(true);
+        if (ret == WIFI_OPT_SUCCESS) {
+            rssiLevel2Or3ScanedCounter_++;
+            isScanTriggered_ = true;
+        }
         pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
     } else if ((signalLevel < SIG_LEVEL_2) && (rssiLevel0Or1ScanedCounter_ < scanMaxCounter)) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel0Or1ScanedCounter:%{public}d.", signalLevel, rssiLevel0Or1ScanedCounter_);
-        rssiLevel0Or1ScanedCounter_++;
-        pScanService->Scan(true);
-        isScanTriggered_ = true;
+        auto ret = pScanService->Scan(true);
+        if (ret == WIFI_OPT_SUCCESS) {
+            rssiLevel0Or1ScanedCounter_++;
+            isScanTriggered_ = true;
+        }
         pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
     } else {
         WIFI_LOGI("TryStartScan, do not scan, signalLevel:%{public}d,scanMaxCounter:%{public}d.",

@@ -25,6 +25,7 @@
 #endif
 #include "scan_interface.h"
 #include "sta_interface.h"
+#include "wifi_pro_interface.h"
 #ifdef FEATURE_SELF_CURE_SUPPORT
 #include "self_cure_interface.h"
 #endif
@@ -66,6 +67,14 @@ int WifiServiceManager::LoadStaService(const std::string &dlname, int instId, bo
     WIFI_LOGI("LoadStaService");
     return 0;
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+int32_t WifiServiceManager::LoadWifiProService(bool bCreate, int32_t instId)
+{
+    WIFI_LOGI("WifiServiceManager::LoadWifiProService");
+    return 0;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 int WifiServiceManager::LoadSelfCureService(const std::string &dlname, bool bCreate)
@@ -114,6 +123,14 @@ IStaService *WifiServiceManager::GetStaServiceInst(int instId)
     return nullptr;
 }
 
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+IWifiProService *WifiServiceManager::GetWifiProServiceInst(int32_t instId)
+{
+    WIFI_LOGD("WifiServiceManager::GetWifiProServiceInst, instId: %{public}d", instId);
+    return nullptr;
+}
+#endif
+
 #ifdef FEATURE_SELF_CURE_SUPPORT
 ISelfCureService *WifiServiceManager::GetSelfCureServiceInst(int instId)
 {
@@ -152,6 +169,14 @@ IEnhanceService *WifiServiceManager::GetEnhanceServiceInst()
 {
     return nullptr;
 }
+
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+NO_SANITIZE("cfi") int32_t WifiServiceManager::UnloadWifiProService(bool bPreLoad, int32_t instId)
+{
+    WIFI_LOGI("WifiServiceManager::UnloadWifiProService, instId: %{public}d", instId);
+    return 0;
+}
+#endif
 
 #ifdef FEATURE_SELF_CURE_SUPPORT
 NO_SANITIZE("cfi") int WifiServiceManager::UnloadSelfCureService(bool bPreLoad, int instId)

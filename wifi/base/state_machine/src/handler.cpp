@@ -162,7 +162,7 @@ void Handler::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
         return;
     }
 
-    LOGD("%{public}s MessageExecutedLater msg:%{public}d %{public}"PRId64,
+    LOGD("%{public}s MessageExecutedLater msg:%{public}d %{public}" PRId64,
         mThreadName.c_str(), msg->GetMessageName(), delayTimeMs);
     int64_t delayTime = delayTimeMs;
     if (delayTime < 0) {

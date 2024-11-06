@@ -170,6 +170,13 @@ public:
     virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
 
     /**
+     * @Description Check if specific network
+     *
+     * @return true or false
+     */
+    virtual bool IsSpecificNetwork(WifiDeviceConfig &config) = 0;
+
+    /**
      * @Description get the self wifi configuration information
      *
      * @param cfgType - configuration type

@@ -599,6 +599,9 @@ ErrCode ConcreteMangerMachine::SwitchSemiFromEnable()
         WIFI_LOGE("SwitchSemiFromEnable, Instance get sta service is null!");
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, mid);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_STA, mid);
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_WIFIPRO, mid);
+#endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SELFCURE, mid);
 #endif

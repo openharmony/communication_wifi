@@ -18,7 +18,6 @@
 #include <vector>
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
-#include "log_helper.h"
 #include "sta_define.h"
 #include "wifi_internal_msg.h"
 

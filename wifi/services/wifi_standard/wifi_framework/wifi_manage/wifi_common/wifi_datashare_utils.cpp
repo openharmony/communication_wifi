@@ -34,6 +34,12 @@ constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 }
 
+WifiDataShareHelperUtils& WifiDataShareHelperUtils::GetInstance()
+{
+    static WifiDataShareHelperUtils instance;
+    return instance;
+}
+
 std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreateDataShareHelper(bool onlySettingsData)
 {
     auto remote = sptr<IWifiDataShareRemoteBroker>(new (std::nothrow) IRemoteStub<IWifiDataShareRemoteBroker>());

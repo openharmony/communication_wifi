@@ -4647,7 +4647,13 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
 {
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     if (networkStatusHistoryInserted) {
-        if (IsGoodSignalQuality() || (networkStatus == NetworkStatus::HAS_INTERNET) ||
+        auto lastStatus = NetworkStatusHistoryManager::GetLastNetworkStatus(wifiDeviceConfig.networkStatusHistory);
+        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+        if (networkStatus == NetworkStatus::NO_INTERNET && (lastStatus == NetworkStatus::HAS_INTERNET ||
+            screenState == MODE_STATE_CLOSE) {
+            WIFI_LOGI("No updated, current network status is %{public}d, last network status:%{public}d, screen state:%{public}d.",
+                static_cast<int>(networkStatus), static_cast<int>(lastStatus), screenState);
+        }else if (IsGoodSignalQuality() || (networkStatus == NetworkStatus::HAS_INTERNET) ||
             (networkStatus == NetworkStatus::PORTAL)) {
             NetworkStatusHistoryManager::Update(wifiDeviceConfig.networkStatusHistory, networkStatus);
             WIFI_LOGI("After updated, current network status history is %{public}s.",

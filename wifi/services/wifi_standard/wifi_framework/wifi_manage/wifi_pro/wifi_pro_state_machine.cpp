@@ -837,12 +837,6 @@ void WifiProStateMachine::WifiHasNetState::TryWifiHandoverPreferentially(
         return;
     }
 
-    // Non-default network does not switch
-    if (!WifiProUtils::IsDefaultNet()) {
-        WIFI_LOGI("TryWifiHandoverPreferentially, not default network, do not switch wifi.");
-        return;
-    }
-
     WIFI_LOGW("try wifi --> wifi only, current rssi:%{public}d.", signalLevel);
     TryWifiRoveOut(networkSelectionResult);
 }

@@ -24,6 +24,7 @@ import { StabilityTest } from "../Component/stabilityTest"
 import { BenchmarkTest } from '../Component/benchmarkTest';
 import { StressTest } from "../Component/stressTest"
 import ConfigData from '../utils/ConfigData';
+import { NewApiTest } from '../Component/NewApiTest';
 
 const TAG = 'wifiTestApp [homePage]'
 
@@ -38,6 +39,9 @@ struct TestCategory {
   build() {
     Stack() {
       Tabs() {
+        TabContent() {
+          NewApiTest({ testItems: this.testItems.filter(item => (item.category === Category.NewApi))})
+        }.tabBar('新接口测试').margin({ top : $r("app.float.distance_5") })
         TabContent() {
           AppTest({ testItems : this.testItems.filter(item => (item.category === Category.App)) })
         }.tabBar($r("app.string.App")).margin({ top : $r("app.float.distance_5") })

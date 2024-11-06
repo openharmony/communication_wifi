@@ -27,7 +27,6 @@ StaAutoConnectService::StaAutoConnectService(StaStateMachine *staStateMachine, i
     : pStaStateMachine(staStateMachine),
       pSavedDeviceAppraisal(nullptr),
       firmwareRoamFlag(true),
-      maxBlockedBssidNum(BLOCKLIST_INVALID_SIZE),
       selectDeviceLastTime(0),
       pAppraisals {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
       m_instId(instId)
@@ -45,11 +44,6 @@ StaAutoConnectService::~StaAutoConnectService()
 ErrCode StaAutoConnectService::InitAutoConnectService()
 {
     WIFI_LOGI("Enter InitAutoConnectService.\n");
-
-    if (ObtainRoamCapFromFirmware()) {
-        WIFI_LOGI("Succeeded in obtaining firmware roaming information.\n");
-    }
-    SyncBlockedSsidFirmware();
 
     pSavedDeviceAppraisal = new (std::nothrow) StaSavedDeviceAppraisal(firmwareRoamFlag);
     if (pSavedDeviceAppraisal == nullptr) {
@@ -73,7 +67,6 @@ void StaAutoConnectService::SetAutoConnectStateCallback(const std::vector<StaSer
 void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("Enter OnScanInfosReadyHandler.\n");
-    ClearOvertimeBlockedBssid(); /* Refreshing the BSSID Blocklist */
 
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
@@ -86,11 +79,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         return;
     }
 
-    if (info.connState == ConnState::CONNECTED) {
-        ClearAllBlockedBssids();
-    }
     std::vector<std::string> blockedBssids;
-    GetBlockedBssids(blockedBssids);
     if (!AllowAutoSelectDevice(info) || !IsAllowAutoJoin()) {
         return;
     }
@@ -125,206 +114,7 @@ bool StaAutoConnectService::EnableOrDisableBssid(std::string bssid, bool enable,
         return false;
     }
 
-    /* Updating the BSSID Blocklist */
-    if (!AddOrDelBlockedBssids(bssid, enable, reason)) {
-        WIFI_LOGI("The blocklist is not updated.\n");
-        return false;
-    }
-
-    /* The blocklist has been updated, so update the firmware roaming */
-    /* configuration */
-    SyncBlockedSsidFirmware();
     return true;
-}
-
-bool StaAutoConnectService::AddOrDelBlockedBssids(std::string bssid, bool enable, int reason)
-{
-    std::lock_guard<std::mutex> lock(m_blockBssidMapMutex);
-    WIFI_LOGI("Enter AddOrDelBlockedBssids.\n");
-    if (enable) {
-        if (blockedBssidMap.count(bssid) != 0) {
-            /* Removed the BSSID from the blocklist When the BSSID is enabled. */
-            blockedBssidMap.erase(bssid);
-            return true;
-        }
-        return false;
-    }
-
-    BlockedBssidInfo status;
-    auto iter = blockedBssidMap.find(bssid);
-    if (iter == blockedBssidMap.end()) {
-        blockedBssidMap.emplace(bssid, status);
-    }
-    auto iterator = blockedBssidMap.find(bssid);
-    if (iterator == blockedBssidMap.end()) {
-        return false;
-    }
-    iterator->second.count++;
-    time_t now = time(0);
-    iterator->second.blockedTime = (int)now;
-    if (!iterator->second.blockedFlag) {
-        if (iterator->second.count >= MAX_BSSID_BLOCKLIST_COUNT ||
-            reason == AP_CANNOT_HANDLE_NEW_STA) {
-            iterator->second.blockedFlag = true;
-            return true;
-        }
-    }
-    return false;
-}
-
-void StaAutoConnectService::GetBlockedBssids(std::vector<std::string> &blockedBssids)
-{
-    std::lock_guard<std::mutex> lock(m_blockBssidMapMutex);
-    for (auto iter = blockedBssidMap.begin(); iter != blockedBssidMap.end(); ++iter) {
-        blockedBssids.push_back(iter->first);
-    }
-    WIFI_LOGD("GetBlockedBssids, blockedBssids count: %{public}d.", (int)blockedBssids.size());
-    return;
-}
-
-void StaAutoConnectService::ClearAllBlockedBssids()
-{
-    std::lock_guard<std::mutex> lock(m_blockBssidMapMutex);
-    WIFI_LOGI("Enter ClearAllBlockedBssids.\n");
-    blockedBssidMap.clear();
-    return;
-}
-
-void StaAutoConnectService::ClearOvertimeBlockedBssid()
-{
-    std::lock_guard<std::mutex> lock(m_blockBssidMapMutex);
-    WIFI_LOGI("Enter ClearOvertimeBlockedBssid.\n");
-    if (blockedBssidMap.empty()) {
-        WIFI_LOGI("blockedBssidMap is empty !\n");
-        return;
-    }
-    bool updated = false;
-    auto iter = blockedBssidMap.begin();
-    while (iter != blockedBssidMap.end()) {
-        BlockedBssidInfo status = iter->second;
-        time_t now = time(0);
-        int currentTimeStap = (int)now;
-        WIFI_LOGI("blockedFlag:%{public}d, currentTimeStap:%{public}d, blockedTime:%{public}d.\n",
-            status.blockedFlag, currentTimeStap, status.blockedTime);
-        if (status.blockedFlag && ((currentTimeStap - status.blockedTime) >= MAX_BSSID_BLOCKLIST_TIME)) {
-            blockedBssidMap.erase(iter++);
-            updated = true;
-        } else {
-            ++iter;
-        }
-    }
-    if (updated) {
-        SyncBlockedSsidFirmware();
-    }
-    return;
-}
-
-void StaAutoConnectService::ConnectElectedDevice(WifiDeviceConfig &electedDevice)
-{
-    WIFI_LOGI("Enter ConnectElectedDevice.\n");
-    if (electedDevice.bssid.empty()) {
-        WIFI_LOGE("electedDevice bssid is empty.");
-        return;
-    }
-
-    WifiLinkedInfo currentConnectedNetwork;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(currentConnectedNetwork, m_instId);
-    if (currentConnectedNetwork.connState == ConnState::CONNECTED && electedDevice.networkId == INVALID_NETWORK_ID &&
-        currentConnectedNetwork.ssid == electedDevice.ssid && currentConnectedNetwork.bssid != electedDevice.bssid) {
-        /* Frameworks start roaming only when firmware is not supported */
-        if (!firmwareRoamFlag) {
-            WIFI_LOGI("Roaming connectTo, networkId: %{public}d.\n", electedDevice.networkId);
-            pStaStateMachine->StartRoamToNetwork(electedDevice.bssid);
-        }
-    } else if (currentConnectedNetwork.detailedState == DetailedState::DISCONNECTED ||
-        currentConnectedNetwork.detailedState == DetailedState::CONNECTION_TIMEOUT ||
-        currentConnectedNetwork.detailedState == DetailedState::FAILED ||
-        currentConnectedNetwork.detailedState == DetailedState::PASSWORD_ERROR ||
-        currentConnectedNetwork.detailedState == DetailedState::CONNECTION_FULL ||
-        currentConnectedNetwork.detailedState == DetailedState::CONNECTION_REJECT) {
-        pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK,
-            electedDevice.networkId,
-            NETWORK_SELECTED_BY_AUTO);
-        WIFI_LOGI("connectTo save networkId: %{public}d, preShareKey len: %{public}d.\n",
-            electedDevice.networkId, (int)electedDevice.preSharedKey.length());
-    } else {
-        WIFI_LOGE("The current connection status is %{public}d.\n", currentConnectedNetwork.detailedState);
-    }
-    return;
-}
-
-void StaAutoConnectService::SyncBlockedSsidFirmware()
-{
-    WIFI_LOGI("Enter SyncBlockedSsidFirmware.\n");
-    if (!firmwareRoamFlag) {
-        return;
-    }
-    if (maxBlockedBssidNum <= 0) {
-        return;
-    }
-    std::vector<std::string> blockedBssids;
-    GetBlockedBssids(blockedBssids);
-
-    if (static_cast<int>(blockedBssids.size()) > maxBlockedBssidNum) {
-        blockedBssids.resize(maxBlockedBssidNum);
-    }
-
-    if (SetRoamBlockedBssidFirmware(blockedBssids)) {
-        WIFI_LOGE("Set firmware roaming configuration succeeded.\n");
-    } else {
-        WIFI_LOGI("Set firmware roaming configuration failed.\n");
-    }
-    return;
-}
-
-bool StaAutoConnectService::ObtainRoamCapFromFirmware()
-{
-    WIFI_LOGI("Enter ObtainRoamCapFromFirmware.\n");
-
-    unsigned int capabilities;
-    if (WifiStaHalInterface::GetInstance().GetStaCapabilities(capabilities) == WIFI_HAL_OPT_OK) {
-        if ((capabilities & STA_CAP_ROAMING) == 0) {
-            WIFI_LOGE("Firmware roaming is not supported.\n");
-            return false;
-        }
-    }
-
-    WifiHalRoamCapability capability;
-    if (WifiStaHalInterface::GetInstance().GetRoamingCapabilities(capability) == WIFI_HAL_OPT_OK) {
-        if (capability.maxBlocklistSize > 0) {
-            firmwareRoamFlag = true;
-            maxBlockedBssidNum = capability.maxBlocklistSize;
-            WIFI_LOGI("Get firmware roaming capabilities succeeded.\n");
-            return true;
-        }
-        WIFI_LOGE("Invalid firmware roaming capabilities.\n");
-    }
-
-    WIFI_LOGE("Get firmware roaming capabilities failed.\n");
-    return false;
-}
-
-bool StaAutoConnectService::SetRoamBlockedBssidFirmware(const std::vector<std::string> &blocklistBssids) const
-{
-    WIFI_LOGI("Enter SetRoamBlockedBssidFirmware.\n");
-    if (!firmwareRoamFlag) {
-        return false;
-    }
-
-    if (blocklistBssids.empty()) {
-        return false;
-    }
-
-    if (static_cast<int>(blocklistBssids.size()) > maxBlockedBssidNum) {
-        return false;
-    }
-
-    WifiHalRoamConfig capability;
-    capability.blocklistBssids = blocklistBssids;
-    if (WifiStaHalInterface::GetInstance().SetRoamConfig(capability) == WIFI_HAL_OPT_OK) {
-        return true;
-    }
-    return false;
 }
 
 bool StaAutoConnectService::RegisterDeviceAppraisal(StaDeviceAppraisal *appraisal, int priority)
@@ -495,10 +285,8 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
             WIFI_LOGI("Auto Select is allowed, detailedState: %{public}d\n", info.detailedState);
             return true;
         case DetailedState::PASSWORD_ERROR:
-            WIFI_LOGI("Password error, clear blocked bssids, auto connect to ap quickly.\n");
-            ClearAllBlockedBssids();
+            WIFI_LOGI("Password error, auto connect to ap quickly.\n");
             return true;
-
         case DetailedState::NOTWORKING:
             WIFI_LOGI("The current network cannot access the Internet.\n");
             /* Configure whether to automatically switch the network. */

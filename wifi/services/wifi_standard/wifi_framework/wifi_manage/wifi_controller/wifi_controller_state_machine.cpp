@@ -151,8 +151,6 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg
                 }
                 pWifiControllerMachine->MakeConcreteManager(roleStaWifi1, msg->GetParam2());
                 pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
-            } else {
-                WIFI_LOGE("DisableState, invalid instance id");
             }
             break;
         case CMD_AIRPLANE_TOGGLED:
@@ -191,38 +189,15 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
         return false;
     }
     WIFI_LOGE("EnableState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+#ifdef FEATURE_AP_SUPPORT
+    HandleApMsg(msg);
+#endif
     switch (msg->GetMessageName()) {
         case CMD_WIFI_TOGGLED:
         case CMD_SCAN_ALWAYS_MODE_CHANGED:
             pWifiControllerMachine->StopTimer(CMD_OPEN_WIFI_RETRY);
             HandleWifiToggleChangeInEnabledState(msg);
             break;
-
-
-
-
-#ifdef FEATURE_AP_SUPPORT
-        case CMD_SOFTAP_TOGGLED:
-            HandleSoftapToggleChangeInEnabledState(msg);
-            break;
-        case CMD_AP_STOPPED:
-            HandleApStop(msg);
-            break;
-        case CMD_AP_START_FAILURE:
-            HandleAPServiceStartFail(msg->GetParam1());
-            HandleApStop(msg);
-            break;
-        case CMD_AP_START:
-            pWifiControllerMachine->StopTimer(CMD_AP_START_TIME);
-            HandleApStart(msg->GetParam1());
-            break;
-        case CMD_AP_START_TIME:
-            WriteSoftApOpenAndCloseFailedEvent(static_cast<int>(SoftApperateType::OPEN_SOFT_AP_FAILED), "TIME_OUT");
-            break;
-        case CMD_AP_STOP_TIME:
-            WriteSoftApOpenAndCloseFailedEvent(static_cast<int>(SoftApperateType::CLOSE_SOFT_AP_FAILED), "TIME_OUT");
-            break;
-#endif
         case CMD_STA_START_FAILURE:
             msg->GetParam1() == INSTID_WLAN0 ?
                 HandleStaStartFailure(INSTID_WLAN0) : pWifiControllerMachine->RemoveMultiStaManager(INSTID_WLAN1);
@@ -259,6 +234,37 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
     }
     return true;
 }
+
+#ifdef FEATURE_AP_SUPPORT
+bool WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
+{
+    switch (msg->GetMessageName()) {
+        case CMD_SOFTAP_TOGGLED:
+            HandleSoftapToggleChangeInEnabledState(msg);
+            break;
+        case CMD_AP_STOPPED:
+            HandleApStop(msg);
+            break;
+        case CMD_AP_START_FAILURE:
+            HandleAPServiceStartFail(msg->GetParam1());
+            HandleApStop(msg);
+            break;
+        case CMD_AP_START:
+            pWifiControllerMachine->StopTimer(CMD_AP_START_TIME);
+            HandleApStart(msg->GetParam1());
+            break;
+        case CMD_AP_START_TIME:
+            WriteSoftApOpenAndCloseFailedEvent(static_cast<int>(SoftApperateType::OPEN_SOFT_AP_FAILED), "TIME_OUT");
+            break;
+        case CMD_AP_STOP_TIME:
+            WriteSoftApOpenAndCloseFailedEvent(static_cast<int>(SoftApperateType::CLOSE_SOFT_AP_FAILED), "TIME_OUT");
+            break;
+        default:
+            return false;
+    }
+    return true;
+}
+#endif
 
 WifiControllerMachine::DefaultState::DefaultState(WifiControllerMachine *wifiControllerMachine)
     : State("DefaultState"), pWifiControllerMachine(wifiControllerMachine)
@@ -842,6 +848,7 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
 #endif
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(id);
     if (apState == WifiOprMidState::CLOSING || apState == WifiOprMidState::OPENING) {
+        WIFI_LOGI("Current ap state is %{public}d, return", apState);
         return;
     }
     if (pWifiControllerMachine->SoftApIdExist(id)) {
@@ -1004,9 +1011,8 @@ void WifiControllerMachine::HandleSoftapStop(int id)
         RmoveSoftapManager(id);
         if (!HasAnyManager()) {
             SwitchState(pDisableState);
-        } else {
-            return;
         }
+        return;
     }
 
     RmoveSoftapManager(id);
@@ -1077,6 +1083,7 @@ void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
     StopAllSoftapManagers();
 #endif
     }
+    StopAllMultiStaManagers();
     StopAllConcreteManagers();
 }
 } // namespace Wifi

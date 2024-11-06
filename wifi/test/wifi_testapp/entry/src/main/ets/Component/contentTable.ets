@@ -15,10 +15,10 @@
  */
 
 import { TestData , TestApi } from '../entryability/model/testData'
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import ConfigData from '../utils/ConfigData';
 
-const TAG = "[contentTable]"
+const TAG = "wifiTestApp [contentTable]"
 
 /**
  *  ContentTable Component Page Of Wifi test
@@ -92,7 +92,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast({ message : message });
+          promptAction.showToast({ message : message });
         }
           break;
         case "unpairDevice": {
@@ -100,7 +100,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast({ message : message });
+          promptAction.showToast({ message : message });
         }
           break;
         case "getDeviceName": {
@@ -108,7 +108,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast({ message : message });
+          promptAction.showToast({ message : message });
         }
           break;
         case "getDeviceType": {
@@ -116,7 +116,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast({ message : message });
+          promptAction.showToast({ message : message });
         }
           break;
         default: {
@@ -124,7 +124,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          prompt.showToast({ message : message });
+          promptAction.showToast({ message : message });
         }
           break;
       }

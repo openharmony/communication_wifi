@@ -25,7 +25,7 @@ import { BenchmarkTest } from '../Component/benchmarkTest';
 import { StressTest } from "../Component/stressTest"
 import ConfigData from '../utils/ConfigData';
 
-const TAG = '[homePage]'
+const TAG = 'wifiTestApp [homePage]'
 
 /**
  * homepage of wifi test

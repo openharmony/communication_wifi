@@ -20,9 +20,10 @@ import ConfigData from '../../Utils/ConfigData';
 import { TestData } from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import common from '@ohos.app.ability.common';
 import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { BusinessError } from '@ohos.base';
 import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
@@ -35,7 +36,7 @@ interface myParams extends Object {
 /**
  * WiFiConnectStabilityTest Page Of wifi test
  */
-const TAG = '[WiFiConnectStabilityTest]'
+const TAG = 'wifiTestApp [WiFiConnectStabilityTest]'
 
 @Entry
 @Component
@@ -113,7 +114,7 @@ struct WiFiConnectStabilityTest {
           abilityName : (context as common.UIAbilityContext).abilityInfo.name
         }
       ] ,
-      operationType : wantAgent.OperationType.START_ABILITY ,
+      operationType : ohosWantAgentInfo.OperationType.START_ABILITY ,
       requestCode : 0 ,
       wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
     };
@@ -269,7 +270,7 @@ struct WiFiConnectStabilityTest {
 
   onConnectionState() {
     console.log(TAG , "on.wifiConnectionChange start--------")
-    wifi.on("wifiConnectionChange" , (number) => {
+    wifiManager.on("wifiConnectionChange" , (number) => {
       console.log(TAG , " on.wifiConnectionChange --------")
       let wifiConnectionMessage = ""
       switch ( number ) {
@@ -292,11 +293,11 @@ struct WiFiConnectStabilityTest {
       } else if ( number == 0 ) {
         this.disconnect_EndTime = new Date().getTime()
         console.log(TAG , "WIFI断连结束时间: " + this.disconnect_EndTime + "ms")
-        let removeMessage = wifi.removeAllNetwork()
+        let removeMessage = wifiManager.removeAllNetwork()
         console.log(TAG , "移除网络配置接口的调用结果: " + removeMessage)
       }
       console.log(TAG , " on.wifiConnectionChange callback success --------")
-      prompt.showToast({ message : "wifi连接状态: " + wifiConnectionMessage })
+      promptAction.showToast({ message : "wifi连接状态: " + wifiConnectionMessage })
       this.connectionMessage = wifiConnectionMessage
       AppStorage.setOrCreate("connectionMessage" , this.connectionMessage)
       console.log(TAG , " on.wifiConnectionChange callback end--------")
@@ -305,7 +306,7 @@ struct WiFiConnectStabilityTest {
   }
 
   aboutToDisappear() {
-    wifi.off("wifiConnectionChange")
+    wifiManager.off("wifiConnectionChange")
   }
 
   async forLoop() {
@@ -327,7 +328,7 @@ struct WiFiConnectStabilityTest {
       } else {
         let wifiState = wifiManager.isWifiActive()
         if ( !wifiState ) {
-          wifi.enableWifi()
+          wifiManager.enableWifi()
           console.log(TAG , "wifi当前未使能，已经使能，正常开始测试------")
         } else {
           console.log(TAG , "wifi当前使能，正常开始测试------")
@@ -343,7 +344,7 @@ struct WiFiConnectStabilityTest {
         console.log(TAG , "第" + (this.connectNumber + 1) + "次WIFI连接接口的调用")
         await sleep(15)
         this.connectionMessage = AppStorage.get("connectionMessage")! //非空断言操作符
-        // prompt.showToast( { message : funcMessage } )
+        // promptAction.showToast( { message : funcMessage } )
         if ( this.connectionMessage == "connected" ) {
           this.connect_SpendTime = this.connect_EndTime - this.connect_StartTime
           this.connectionMessageLog += "第" + (this.connectNumber + 1) + "次WIFI连接耗时: " + this.connect_SpendTime + "ms; IP: " + this.ipInfo + "\n"
@@ -351,7 +352,7 @@ struct WiFiConnectStabilityTest {
           this.connectSuccessNumber = this.connectSuccessNumber + 1
           this.connectionMessageLog += "连接成功的次数：" + this.connectSuccessNumber + "\n"
           console.log(TAG , "连接成功的次数：" + this.connectSuccessNumber)
-          funcMessage = wifi.disconnect()
+          // funcMessage = wifiManager.disconnect()
           this.disconnectNumber = this.disconnectNumber + 1
           this.disconnect_StartTime = new Date().getTime()
           console.log(TAG , "第" + this.disconnectNumber + "次WIFI断连-----")
@@ -360,7 +361,7 @@ struct WiFiConnectStabilityTest {
           console.log(TAG , "第" + this.disconnectNumber + "次WIFI断连接口的调用结果：" + funcMessage)
           console.log(TAG , "disconnectNumber: " + this.disconnectNumber)
           await sleep(15)
-          // prompt.showToast( { message : funcMessage } )
+          // promptAction.showToast( { message : funcMessage } )
           this.connectionMessage = AppStorage.get("connectionMessage")! //非空断言操作符
           if ( this.connectionMessage == "disconnected" ) {
             this.disconnect_SpendTime = this.disconnect_EndTime - this.disconnect_StartTime

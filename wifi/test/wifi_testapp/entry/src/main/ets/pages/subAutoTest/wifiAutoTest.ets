@@ -20,7 +20,7 @@ import { PageTitle } from '../../Component/pageTitle';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { WifiAutoTestCase , initWifiAutoData } from '../../entryability/model/autoTestDataModels'
 import { AutoContentTable } from '../../Component/autoContentTable'
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 
 interface myParams extends Object {
   testItem: TestData
@@ -162,7 +162,7 @@ struct WifiAutoTest {
           let msg = ""
           msg = "测试"
           console.log(msg)
-          prompt.showToast({ message : msg })
+          promptAction.showToast({ message : msg })
 
           console.log("wifiAutoTest end-------------")
         })

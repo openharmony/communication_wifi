@@ -17,7 +17,7 @@ import { TestData , TestApi } from '../entryability/model/testData'
 import { initHotspotApIData } from '../entryability/model/testDataModels'
 import ConfigData from '../utils/ConfigData';
 
-const TAG = "[filterTable]"
+const TAG = "wifiTestApp [filterTable]"
 /**
  * FilterTable Of WiFi test
  */

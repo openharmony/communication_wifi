@@ -3064,14 +3064,12 @@ void StaStateMachine::GetIpState::GoInState()
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
             SetConfiguration(ifname.c_str(), config);
         }
-
-        if (pStaStateMachine->currentTpType == IPTYPE_IPV4) {
-            dhcpRet = StartDhcpClient(ifname.c_str(), false);
-        } else {
-            dhcpRet = StartDhcpClient(ifname.c_str(), true);
-        }
-        LOGI("StartDhcpClient type:%{public}d dhcpRet:%{public}d isRoam:%{public}d m_instId=%{public}d",
-            pStaStateMachine->currentTpType, dhcpRet, pStaStateMachine->isRoam, pStaStateMachine->GetInstanceId());
+        config.bIpv6 = pStaStateMachine->currentTpType == IPTYPE_IPV4 ? false : true;
+        config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
+        dhcpRet = StartDhcpClient(ifname.c_str(), config);
+        LOGI("StartDhcpClient type:%{public}d dhcpRet:%{public}d isRoam:%{public}d m_instId=%{public}d" \
+            "IsSpecificNetwork %{public}d", pStaStateMachine->currentTpType, dhcpRet, pStaStateMachine->isRoam,
+            pStaStateMachine->GetInstanceId(), config.bSpecificNetwork);
         if (dhcpRet == 0) {
             LOGI("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
             pStaStateMachine->StartTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT),
@@ -4625,6 +4623,17 @@ void StaStateMachine::HandlePreDhcpSetup()
 {
     WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false);
     WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(false);
+}
+
+bool StaStateMachine::IsSpecificNetwork()
+{
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, GetInstanceId());
+    if (enhanceService_ == nullptr) {
+        WIFI_LOGE("IsSpecificNetwork, enhanceService is null");
+        return false;
+    }
+    return enhanceService_->IsSpecificNetwork(config);
 }
 
 void StaStateMachine::HandlePostDhcpSetup()

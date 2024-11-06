@@ -16,7 +16,7 @@
 import image from '@ohos.multimedia.image'
 import fileio from '@ohos.fileio'
 import fs from '@ohos.file.fs';
-import prompt from '@ohos.prompt'
+import promptAction from '@ohos.promptAction'
 import photoAccessHelper from '@ohos.file.photoAccessHelper'
 import DateTimeUtil from './DateTimeUtil'
 
@@ -25,7 +25,7 @@ import DateTimeUtil from './DateTimeUtil'
  * mediaUtils of wifi test
  */
 
-const TAG = "[MediaUtils]"
+const TAG = "wifiTestApp [MediaUtils]"
 
 class MediaUtils {
   async createAndGetFile(context: any) {
@@ -60,7 +60,7 @@ class MediaUtils {
     }
     await fs.close(file.fd);
     console.log(TAG, `write done`)
-    prompt.showToast({
+    promptAction.showToast({
       message: '图片保存成功', duration: 1000
     })
   }

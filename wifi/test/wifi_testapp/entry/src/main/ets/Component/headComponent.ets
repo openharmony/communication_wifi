@@ -16,7 +16,7 @@
 import ConfigData from '../utils/ConfigData';
 import router from '@ohos.router';
 
-const TAG = "[headComponent]"
+const TAG = "wifiTestApp [headComponent]"
 /**
  * head custom component Of WiFi test
  */

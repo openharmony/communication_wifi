@@ -18,7 +18,7 @@ import image from '@ohos.multimedia.image'
 import MediaUtils from '../entryability/model/MediaUtils'
 import ConfigData from '../utils/ConfigData';
 
-const TAG = "[mainPageTitle]"
+const TAG = "wifiTestApp [mainPageTitle]"
 
 /**
  * Main-Page Title Of WiFi test

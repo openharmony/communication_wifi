@@ -16,15 +16,16 @@
 import ConfigData from '../utils/ConfigData';
 import { testOnP2pConnectionChange , testGetCurrentGroupCallback } from '../entryability/model/p2pInterface'
 import wifi from '@ohos.wifi';
+import wifiManager from '@ohos.wifiManager';
 
 /**
  * P2pView Component of p2p test
  */
-const TAG = "[P2pView]"
+const TAG = "wifiTestApp [P2pView]"
 
 @Component
 export struct P2pView {
-  private p2p!: wifi.WifiP2pDevice
+  private p2p!: wifiManager.WifiP2pDevice
   private securityString: Resource = $r('app.string.useful')
   private p2pConnectState: number = 0
   @StorageLink("p2pLinkedDeviceName") p2pLinkedDeviceName: string = ""

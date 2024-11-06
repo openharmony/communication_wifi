@@ -20,7 +20,7 @@ import socket from '@ohos.net.socket';
 import { BusinessError } from '@ohos.base';
 import ConfigData from '../../../Utils/ConfigData'
 
-const TAG = '[login]'
+const TAG = 'wifiTestApp [login]'
 
 interface LocalAddr {
   address: string,

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import router from '@ohos.router';
 import wifi from '@ohos.wifi';
 import LogData from "../../utils/LogData"
@@ -36,7 +36,7 @@ interface WifiDeviceConfig {
   staticIp : wifi.IpConfig
 }
 
-const TAG = "[wifiInterface]";
+const TAG = "wifiTestApp [wifiInterface]";
 /**
  * Wifi api Test Page Of wifi test
  */
@@ -61,13 +61,13 @@ export function testEnableWifi(): string {
       wifiEnable = true;
       AppStorage.setOrCreate( 'wifiIsOn' , wifiEnable );
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testEnableWifi_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testEnableWifi. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testEnableWifi. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -89,13 +89,13 @@ export function testDisableWifi(): string {
       wifiEnable = false;
       AppStorage.setOrCreate( 'wifiIsOn' , wifiEnable );
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testDisableWifi_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testDisableWifi. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testDisableWifi. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -111,13 +111,13 @@ export function testIsWifiActive(): string {
       wifiEnable = false
     }
     message = ( MessageData.testIsActiveResult ) + ret
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testIsWifiActive_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testIsWifiActive. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testIsWifiActive. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -132,15 +132,15 @@ export function testScan(): string {
       let ret = wifi.scan()
       message = ( MessageData.testScanResult ) + ret
       router.pushUrl( { url : PAGE_URI_WIFI_FOUND_MODE } );
-      prompt.showToast( { message : message } )
+      promptAction.showToast( { message : message } )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testScan_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testScan. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testScan. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -151,13 +151,13 @@ export function testForcibleScan(): string {
     console.log( TAG , LogData.testForcibleScan_StartLog )
     let ret = wifi.scan()
     message = ( MessageData.testForcibleScanResult ) + ret
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testForcibleScan_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testForcibleScan. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testForcibleScan. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -185,18 +185,18 @@ export function testGetScanInfosPromise(): string {
         }
         console.log( TAG , LogData.testGetScanInfosPromise_successfulLog )
         message = ( MessageData.testGetScanInfo ) + JSON.stringify( result )
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testGetScanInfosPromise_EndLog )
       } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "testGetScanInfosPromise error:" + error )
       } )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetScanInfosPromise. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetScanInfosPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -230,16 +230,16 @@ export function testGetScanInfosCallback(): string {
         message = ( MessageData.testGetScanInfo ) + JSON.stringify( result )
         let getScanInfoMessage = JSON.stringify( result )
         AppStorage.setOrCreate( "getScanInfoMessage" , getScanInfoMessage )
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testGetScanInfosCallback_EndLog )
       } );
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetScanInfosCallback. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetScanInfosCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -334,18 +334,18 @@ export function testAddDeviceConfigPromise(): string {
         console.log( TAG , LogData.testAddDeviceConfigPromise_successfulLog )
         console.log( TAG , LogData.testAddDeviceConfigLog + result )
         message = ( MessageData.testAddDeviceConfig ) + result
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testAddDeviceConfigPromise_EndLog )
       } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "testAddDeviceConfigPromise error:" + error );
       } )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testAddDeviceConfigPromise. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testAddDeviceConfigPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -407,16 +407,16 @@ export function testAddDeviceConfigCallback(): string {
         console.log( TAG , LogData.testAddDeviceConfigCallback_successfulLog )
         console.log( TAG , LogData.testAddDeviceConfigLog + result )
         message = ( MessageData.testAddDeviceConfig ) + result
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testAddDeviceConfigCallback_EndLog )
       } );
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testAddDeviceConfigCallback. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testAddDeviceConfigCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -434,18 +434,18 @@ export function testAddUntrustedConfigPromise(): string {
         console.log( TAG , LogData.testAddUntrustedConfigPromise_successfulLog )
         console.log( TAG , LogData.testAddUntrustedConfigLog + result )
         message = ( MessageData.testAddUntrustedConfig ) + result
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testAddUntrustedConfigPromise_EndLog )
       } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "testAddUntrustedConfigPromise error:" + error )
       } )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testAddUntrustedConfigPromise. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testAddUntrustedConfigPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -467,16 +467,16 @@ export function testAddUntrustedConfigCallback(): string {
         console.log( TAG , LogData.testAddUntrustedConfigCallback_successfulLog )
         console.log( TAG , LogData.testAddUntrustedConfigLog + result )
         message = ( MessageData.testAddUntrustedConfig ) + result
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testAddUntrustedConfigCallback_EndLog )
       } )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testAddUntrustedConfigCallback. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testAddUntrustedConfigCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -494,18 +494,18 @@ export function testRemoveUntrustedConfigPromise(): string {
         console.log( TAG , LogData.testRemoveUntrustedConfigLog + result )
         console.log( TAG , LogData.testRemoveUntrustedConfigPromise_successfulLog )
         message = ( MessageData.testRemoveUntrustedConfig ) + result
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testRemoveUntrustedConfigPromise_EndLog )
       } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "testRemoveUntrustedConfigPromise error:" + error )
       } )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testRemoveUntrustedConfigPromise. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testRemoveUntrustedConfigPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -527,16 +527,16 @@ export function testRemoveUntrustedConfigCallback(): string {
         console.log( TAG , LogData.testRemoveUntrustedConfigLog + result )
         console.log( TAG , LogData.testRemoveUntrustedConfigCallback_successfulLog )
         message = ( MessageData.testRemoveUntrustedConfig ) + result
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testRemoveUntrustedConfigCallback_EndLog )
       } )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testRemoveUntrustedConfigCallback. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testRemoveUntrustedConfigCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -553,13 +553,13 @@ export function testConnectToNetwork(): string {
       let ret = wifi.connectToNetwork( networkId )
       message = "ConnectToNetwork: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testConnectToNetwork_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testConnectToNetwork. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testConnectToNetwork. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -575,13 +575,13 @@ export function testConnectToDevice(): string {
       let ret = wifi.connectToDevice( wifiDeviceConfig )
       message = "ConnectToDevice: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testConnectToDevice_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testConnectToDevice. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testConnectToDevice. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -596,13 +596,13 @@ export function testDisconnect(): string {
       let ret = wifi.disconnect()
       message = "disconnect: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testDisconnect_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testDisconnect. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testDisconnect. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -618,19 +618,19 @@ export function testGetLinkedInfoPromise(): string {
         console.log( TAG , LogData.testGetLinkedInfoPromise_successfulLog )
         message = "get wifi linked info: " + JSON.stringify( data )
         console.log( TAG , "get wifi linked info: " + JSON.stringify( data ) );
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testGetLinkedInfoPromise_EndLog );
       } ).catch( ( error: BusinessError ) => {
         console.log( TAG , "get linked info error" );
         console.log( TAG , "error:" + error )
       } );
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetLinkedInfoPromise. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetLinkedInfoPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -646,7 +646,7 @@ export function testGetLinkedInfoCallback(): string {
         if ( err ) {
           console.log( TAG , "get linked info error" );
           message = "get linked info error"
-          prompt.showToast( { message : message } )
+          promptAction.showToast( { message : message } )
         }
         console.log( TAG , LogData.testGetLinkedInfoCallback_successfulLog )
         console.log( TAG , "get wifi linked info: " + JSON.stringify( data ) );
@@ -661,16 +661,16 @@ export function testGetLinkedInfoCallback(): string {
         AppStorage.setOrCreate( "w_rssi" , rssi )
         AppStorage.setOrCreate( "w_band" , band )
         AppStorage.setOrCreate( "w_networkId" , networkId )
-        prompt.showToast( { message : message } )
+        promptAction.showToast( { message : message } )
         console.log( TAG , LogData.testGetLinkedInfoCallback_EndLog );
       } )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetLinkedInfoCallback. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetLinkedInfoCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -688,13 +688,13 @@ export function testGetSignalLevel(): string {
       let number = wifi.getSignalLevel( rssi , band )
       message = "getSignalLevel is: " + number
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testGetSignalLevel_EndLog )
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetSignalLevel. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetSignalLevel. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -709,13 +709,13 @@ export function testIsConnected(): string {
       let ret = wifi.isConnected()
       message = "isConnected: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testIsConnected_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testIsConnected. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testIsConnected. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -730,13 +730,13 @@ export function testGetSupportedFeatures(): string {
       let ret = wifi.getSupportedFeatures()
       message = "GetSupportedFeatures: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testGetSupportedFeatures_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetSupportedFeatures. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetSupportedFeatures. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -752,13 +752,13 @@ export function testIsFeatureSupported(): string {
       let ret = wifi.isFeatureSupported( featureId )
       message = "isFeatureSupported: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testIsFeatureSupported_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testIsFeatureSupported. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testIsFeatureSupported. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -773,13 +773,13 @@ export function testGetDeviceMacAddress(): string {
       let macAddress = wifi.getDeviceMacAddress()
       message = "macAddress: " + macAddress
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testGetDeviceMacAddress_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetDeviceMacAddress. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetDeviceMacAddress. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -796,13 +796,13 @@ export function testGetIpInfo(): string {
       let ipInfoMessage = message
       AppStorage.setOrCreate( "ipInfoMessage" , ipInfoMessage )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testGetIpInfo_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetIpInfo. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetIpInfo. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -817,13 +817,13 @@ export function testGetCountryCode(): string {
       let ret = wifi.getCountryCode()
       message = "CountryCode is: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testGetCountryCode_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetCountryCode. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetCountryCode. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -838,13 +838,13 @@ export function testReassociate(): string {
       let ret = wifi.reassociate()
       message = "reassociate is: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testReassociate_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testReassociate. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testReassociate. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -859,13 +859,13 @@ export function testReConnect(): string {
       let ret = wifi.reconnect()
       message = "reConnect is: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testReConnect_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testReConnect. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testReConnect. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -882,13 +882,13 @@ export function testGetDeviceConfigs() {
       let getDeviceConfigsMessage = JSON.stringify( array )
       AppStorage.setOrCreate( "getDeviceConfigsMessage" , getDeviceConfigsMessage )
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testGetDeviceConfigs_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testGetDeviceConfigs. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testGetDeviceConfigs. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -904,13 +904,13 @@ export function testUpdateNetwork() {
       let ret = wifi.updateNetwork( wifiDeviceConfig )
       message = "updateNetwork: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testUpdateNetwork_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testUpdateNetwork. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testUpdateNetwork. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -926,13 +926,13 @@ export function testDisableNetwork() {
       let ret = wifi.disableNetwork( netId )
       message = "disableNetwork: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testDisableNetwork_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testDisableNetwork. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testDisableNetwork. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -947,13 +947,13 @@ export function testRemoveAllNetwork() {
       let ret = wifi.removeAllNetwork()
       message = "removeAllNetwork: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testRemoveAllNetwork_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testRemoveAllNetwork. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testRemoveAllNetwork. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -970,13 +970,13 @@ export function testRemoveDevice() {
       let ret = wifi.removeDevice( id )
       message = "removeDevice: " + ret
     }
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     console.log( TAG , LogData.testRemoveDevice_EndLog );
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testRemoveDevice. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testRemoveDevice. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -990,7 +990,7 @@ export function testOnWifiStateChange(): string {
     console.log( TAG , LogData.testOnWifiStateChange_StartLog );
     if ( wifiStateChange ) {
       wifi.off( "wifiStateChange" , () => {
-        prompt.showToast( { message : ( MessageData.offWifiStateChange ) } )
+        promptAction.showToast( { message : ( MessageData.offWifiStateChange ) } )
       } )
       message = ( MessageData.offWifiStateChangeTest )
     } else {
@@ -1013,18 +1013,18 @@ export function testOnWifiStateChange(): string {
             wifiStateMessage = '未知状态';
             break;
         }
-        prompt.showToast( { message : "wifi状态: " + wifiStateMessage } )
+        promptAction.showToast( { message : "wifi状态: " + wifiStateMessage } )
         console.log( TAG , LogData.testOnWifiStateChange_EndLog );
       } )
       message = ( MessageData.onWifiStateChangeTest )
-      prompt.showToast( { message : message } )
+      promptAction.showToast( { message : message } )
     }
     wifiStateChange = !wifiStateChange
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testOnWifiStateChange. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testOnWifiStateChange. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -1041,7 +1041,7 @@ export function testOnWifiConnectionChange(): string {
     }
     if ( wifiConnectionChange ) {
       wifi.off( "wifiConnectionChange" , () => {
-        prompt.showToast( { message : ( MessageData.offWifiConnectionChange ) } )
+        promptAction.showToast( { message : ( MessageData.offWifiConnectionChange ) } )
       } )
       message = ( MessageData.offWifiConnectionChangeTest )
     } else {
@@ -1058,18 +1058,18 @@ export function testOnWifiConnectionChange(): string {
             wifiConnectionMessage = '未知状态';
             break;
         }
-        prompt.showToast( { message : "连接状态: " + wifiConnectionMessage } )
+        promptAction.showToast( { message : "连接状态: " + wifiConnectionMessage } )
         console.log( TAG , LogData.testOnWifiConnectionChange_EndLog );
       } )
       message = ( MessageData.onWifiConnectionChangeTest )
-      prompt.showToast( { message : message } )
+      promptAction.showToast( { message : message } )
     }
     wifiConnectionChange = !wifiConnectionChange
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testOnWifiConnectionChange. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testOnWifiConnectionChange. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -1086,7 +1086,7 @@ export function testOnWifiScanStateChange(): string {
     }
     if ( wifiScanStateChange ) {
       wifi.off( "wifiScanStateChange" , () => {
-        prompt.showToast( { message : ( MessageData.offWifiScanStateChange ) } )
+        promptAction.showToast( { message : ( MessageData.offWifiScanStateChange ) } )
       } )
       message = ( MessageData.offWifiScanStateChangeTest )
     } else {
@@ -1103,18 +1103,18 @@ export function testOnWifiScanStateChange(): string {
             wifiScanStateMessage = '未知状态';
             break;
         }
-        prompt.showToast( { message : "scan状态: " + wifiScanStateMessage } )
+        promptAction.showToast( { message : "scan状态: " + wifiScanStateMessage } )
         console.log( TAG , LogData.testOnWifiScanStateChange_EndLog );
       } )
       message = ( MessageData.onWifiScanStateChangeTest )
-      prompt.showToast( { message : message } )
+      promptAction.showToast( { message : message } )
     }
     wifiScanStateChange = !wifiScanStateChange
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testOnWifiScanStateChange. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testOnWifiScanStateChange. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -1131,23 +1131,23 @@ export function testOnWifiRssiChange(): string {
     }
     if ( wifiRssiChange ) {
       wifi.off( "wifiRssiChange" , () => {
-        prompt.showToast( { message : "on.wifiRssiChange监听已关闭" } )
+        promptAction.showToast( { message : "on.wifiRssiChange监听已关闭" } )
       } )
       message = "关闭RSSI状态变化事件"
     } else {
       wifi.on( "wifiRssiChange" , ( number ) => {
-        prompt.showToast( { message : "rssi: " + number } )
+        promptAction.showToast( { message : "rssi: " + number } )
       } )
       message = "打开注册RSSI状态变化"
       console.log( TAG , LogData.testOnWifiRssiChange_EndLog );
-      prompt.showToast( { message : message } )
+      promptAction.showToast( { message : message } )
     }
     wifiRssiChange = !wifiRssiChange
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testOnWifiRssiChange. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testOnWifiRssiChange. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }
@@ -1164,7 +1164,7 @@ export function testOnStreamChange() {
     }
     if ( streamChange ) {
       wifi.off( "streamChange" , () => {
-        prompt.showToast( { message : ( MessageData.offStreamChange ) } )
+        promptAction.showToast( { message : ( MessageData.offStreamChange ) } )
       } )
       message = MessageData.offStreamChangeTest
     } else {
@@ -1187,18 +1187,18 @@ export function testOnStreamChange() {
             streamChangeMessage = '未知状态';
             break;
         }
-        prompt.showToast( { message : "stream状态: " + streamChangeMessage } )
+        promptAction.showToast( { message : "stream状态: " + streamChangeMessage } )
         console.log( TAG , LogData.testOnStreamChange_EndLog );
       } )
       message = ( MessageData.onStreamChangeTest )
-      prompt.showToast( { message : message } )
+      promptAction.showToast( { message : message } )
     }
     streamChange = !streamChange
     return message
   } catch( e ) {
     console.log( TAG , `Failed to testOnStreamChange. message: ${ e.message }, code: ${ e.code }` )
     let message = `Failed to testOnStreamChange. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast( { message : message } )
+    promptAction.showToast( { message : message } )
     return message
   }
 }

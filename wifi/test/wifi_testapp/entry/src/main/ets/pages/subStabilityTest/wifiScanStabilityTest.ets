@@ -20,9 +20,10 @@ import ConfigData from '../../Utils/ConfigData';
 import { TestData } from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import common from '@ohos.app.ability.common';
 import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { BusinessError } from '@ohos.base';
 import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
@@ -35,7 +36,7 @@ interface myParams extends Object {
 /**
  * WiFiScanStabilityTest Page Of wifi test
  */
-const TAG = '[wifiTest_WiFiScanStabilityTest]'
+const TAG = 'wifiTestApp [wifiTest_WiFiScanStabilityTest]'
 
 @Entry
 @Component
@@ -104,7 +105,7 @@ struct WiFiScanStabilityTest {
           abilityName : (context as common.UIAbilityContext).abilityInfo.name
         }
       ] ,
-      operationType : wantAgent.OperationType.START_ABILITY ,
+      operationType : ohosWantAgentInfo.OperationType.START_ABILITY ,
       requestCode : 0 ,
       wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
     };
@@ -242,7 +243,7 @@ struct WiFiScanStabilityTest {
 
   onWifiScanState() {
     console.log(TAG , "on.wifiScanStateChange start--------")
-    wifi.on("wifiScanStateChange" , (number) => {
+    wifiManager.on("wifiScanStateChange" , (number) => {
       console.log(TAG , " on.wifiScanStateChange success--------")
       let wifiScanStateMessage = ""
       switch ( number ) {
@@ -267,7 +268,7 @@ struct WiFiScanStabilityTest {
         console.log(TAG , "WIFI扫描还未成功------")
       }
       console.log(TAG , " on.wifiScanStateChange  callback success --------")
-      prompt.showToast({ message : "wifiScan状态: " + wifiScanStateMessage })
+      promptAction.showToast({ message : "wifiScan状态: " + wifiScanStateMessage })
       this.scanStateMessage = wifiScanStateMessage
       AppStorage.setOrCreate("scanStateMessage" , this.scanStateMessage)
       console.log(TAG , " on.wifiStateChange callback end--------")
@@ -276,7 +277,7 @@ struct WiFiScanStabilityTest {
   }
 
   aboutToDisappear() {
-    wifi.off("wifiScanStateChange")
+    wifiManager.off("wifiScanStateChange")
   }
 
   async forLoop() {
@@ -296,7 +297,7 @@ struct WiFiScanStabilityTest {
       } else {
         let wifiState = wifiManager.isWifiActive()
         if ( !wifiState ) {
-          wifi.enableWifi()
+          wifiManager.enableWifi()
           console.log(TAG , "wifi当前未使能，已经使能，正常开始测试------")
         } else {
           console.log(TAG , "wifi当前使能，正常开始测试------")
@@ -330,7 +331,7 @@ struct WiFiScanStabilityTest {
           this.scanStateMessageLog += "第" + (this.openScanNumber + 1) + "次WIFI扫描情况未知" + "\n"
           console.log(TAG , "第" + (this.openScanNumber + 1) + "次扫描后状态不清楚");
         }
-        wifi.off("wifiScanStateChange")
+        wifiManager.off("wifiScanStateChange")
         console.log(TAG , "off.wifiScanStateChange success--------");
         await sleep(5)
       }

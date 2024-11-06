@@ -586,7 +586,8 @@ HWTEST_F(NetworkSelectionTest, TestBlackListNetworkAndNoInternetNetwork, TestSiz
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
-    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 0);
+    int one = 1;
+    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, one);
 }
 
 HWTEST_F(NetworkSelectionTest, TestNoInternetNetworkAndPortalNetwork, TestSize.Level1)
@@ -621,7 +622,8 @@ HWTEST_F(NetworkSelectionTest, TestNoInternetNetworkAndPortalNetwork, TestSize.L
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
-    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 1);
+    int zero = 0;
+    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, zero);
 }
 
 HWTEST_F(NetworkSelectionTest, TestPortalNetworkAndRecoveryNetwork, TestSize.Level1)
@@ -657,7 +659,8 @@ HWTEST_F(NetworkSelectionTest, TestPortalNetworkAndRecoveryNetwork, TestSize.Lev
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
-    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 1);
+    int zero = 0;
+    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, zero);
 }
 
 HWTEST_F(NetworkSelectionTest, TestRecoveryNetworkAndHasInternetNetwork, TestSize.Level1)

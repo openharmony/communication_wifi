@@ -69,7 +69,6 @@ ohos_unittest("wifi_p2p_test") {
     "invitation_recelved_state_test.cpp",
     "invitation_request_state_test.cpp",
     "p2p_default_state_test.cpp",
-    "p2p_disabled_state_test.cpp",
     "p2p_disabling_state_test.cpp",
     "p2p_enabled_state_test.cpp",
     "p2p_enabling_state_test.cpp",

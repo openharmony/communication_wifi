@@ -22,8 +22,10 @@
 namespace OHOS {
 namespace Wifi {
 class MultiGateway {
-    DECLARE_DELAYED_SINGLETON(MultiGateway);
 public:
+    MultiGateway();
+    ~MultiGateway();
+    static MultiGateway& GetInstance();
     void GetGatewayAddr(int32_t instId);
     bool IsMultiGateway();
     std::string GetGatewayIp();

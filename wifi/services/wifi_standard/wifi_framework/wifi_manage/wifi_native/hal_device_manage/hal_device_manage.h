@@ -165,9 +165,17 @@ public:
 };
 
 class HalDeviceManager {
-    DECLARE_DELAYED_SINGLETON(HalDeviceManager)
-
 public:
+    HalDeviceManager();
+
+    ~HalDeviceManager();
+    /**
+     * @Description get instance of HalDeviceManager
+     *
+     * @param
+     * @return HalDeviceManager
+     */
+    static HalDeviceManager &GetInstance();
     /**
      * @Description start chip hdi
      *

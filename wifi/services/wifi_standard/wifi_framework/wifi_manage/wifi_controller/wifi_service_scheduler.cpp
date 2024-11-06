@@ -279,7 +279,7 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
     if (g_staIfaceNameMap.count(instId) > 0) {
         ifaceName = g_staIfaceNameMap[instId];
     }
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+    if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
         ifaceName, instId)) {
@@ -322,7 +322,7 @@ ErrCode WifiServiceScheduler::AutoStopScanOnly(int instId, bool setIfaceDown)
 
     if (setIfaceDown) {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-        DelayedSingleton<HalDeviceManager>::GetInstance()->SetNetworkUpDown(
+        HalDeviceManager::GetInstance().SetNetworkUpDown(
             WifiConfigCenter::GetInstance().GetStaIfaceName(instId), false);
 #endif
     }
@@ -376,7 +376,7 @@ ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
         ifaceName = g_staIfaceNameMap[instId];
         staIfName = ifaceName;
     }
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
+    if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
         ifaceName, instId)) {
@@ -795,7 +795,7 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
     if (g_softApIfaceNameMap.count(instId) > 0) {
         ifaceName = g_softApIfaceNameMap[instId];
     }
-    if (ifaceName.empty() && !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
+    if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateApIface(
         std::bind(&WifiServiceScheduler::SoftApIfaceDestoryCallback,
         this, std::placeholders::_1, std::placeholders::_2),
         ifaceName)) {

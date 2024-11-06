@@ -244,10 +244,8 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
     lastSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
         pSelfCureStateMachine->m_instId);
-    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
-        lastDnsFailedCnt_ = 0;
-        DelayedSingleton<SelfCureUtils>::GetInstance()->ClearDnsFailedCounter();
-    }
+    lastDnsFailedCnt_ = 0;
+    SelfCureUtils::GetInstance().ClearDnsFailedCounter();
     if (pSelfCureStateMachine->useWithRandMacAddress != 0 && pSelfCureStateMachine->selfCureOnGoing == true) {
         pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE, SELF_CURE_DELAYED_MS);
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pInternetSelfCureState);
@@ -500,16 +498,12 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(Interna
 {
     if (lastSignalLevel <= SIGNAL_LEVEL_1) {
         WIFI_LOGI("HandleDnsFailedMonitor, lastSignalLevel <= 1, next peroid.");
-        if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
-            lastDnsFailedCnt_ = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
-        }
+        lastDnsFailedCnt_ = SelfCureUtils::GetInstance().GetCurrentDnsFailedCounter();
         pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_DNS_FAILED_MONITOR, INTERNET_DETECT_INTERVAL_MS);
         return;
     }
     int32_t currentDnsFailedCnt = 0;
-    if (DelayedSingleton<SelfCureUtils>::GetInstance() != nullptr) {
-        currentDnsFailedCnt = DelayedSingleton<SelfCureUtils>::GetInstance()->GetCurrentDnsFailedCounter();
-    }
+    currentDnsFailedCnt = SelfCureUtils::GetInstance().GetCurrentDnsFailedCounter();
     int32_t deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
     WIFI_LOGI("HandleDnsFailedMonitor, deltaFailedDns is %{public}d", deltaFailedDns);
     lastDnsFailedCnt_ = currentDnsFailedCnt;
@@ -1517,15 +1511,9 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
     }
     usedMultiGwSelfcure = true;
     pSelfCureStateMachine->selfCureOnGoing = true;
-    auto pMultiGateway = DelayedSingleton<MultiGateway>::GetInstance();
-    if (pMultiGateway == nullptr) {
-        WIFI_LOGE("pMultiGateway is nullptr");
-        pSelfCureStateMachine->selfCureOnGoing = false;
-        return;
-    }
-    std::string ipAddr = pMultiGateway->GetGatewayIp();
+    std::string ipAddr = MultiGateway::GetInstance().GetGatewayIp();
     std::string macString = "";
-    pMultiGateway->GetNextGatewayMac(macString);
+    MultiGateway::GetInstance().GetNextGatewayMac(macString);
     if (macString.empty() || ipAddr.empty()) {
         WIFI_LOGE("macString or ipAddr is nullptr");
         if (lastMultiGwSelfFailedType != -1) {
@@ -1536,9 +1524,9 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
     }
 
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
-    pMultiGateway->SetStaticArp(ifaceName, ipAddr, macString);
+    MultiGateway::GetInstance().SetStaticArp(ifaceName, ipAddr, macString);
     if (!pSelfCureStateMachine->IsHttpReachable()) {
-        pMultiGateway->DelStaticArp(ifaceName, ipAddr);
+        MultiGateway::GetInstance().DelStaticArp(ifaceName, ipAddr);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_MULTI_GATEWAY);
     } else {
         pSelfCureStateMachine->SwitchState(pSelfCureStateMachine->pConnectedMonitorState);
@@ -3373,13 +3361,8 @@ void SelfCureStateMachine::HandleP2pConnChanged(const WifiP2pLinkedInfo &info)
 
 bool SelfCureStateMachine::IfMultiGateway()
 {
-    auto pMultiGateway = DelayedSingleton<MultiGateway>::GetInstance();
-    if (pMultiGateway == nullptr) {
-        WIFI_LOGE("IfMultiGateway pMultiGateway is nullptr");
-        return false;
-    }
-    pMultiGateway->GetGatewayAddr(m_instId);
-    return pMultiGateway->IsMultiGateway();
+    MultiGateway::GetInstance().GetGatewayAddr(m_instId);
+    return MultiGateway::GetInstance().IsMultiGateway();
 }
 
 bool SelfCureStateMachine::IsSettingsPage()

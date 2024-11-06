@@ -32,18 +32,18 @@ public:
 
 HWTEST_F(MultiGatewayTest, GetGatewayAddr_test, TestSize.Level1)
 {
-    DelayedSingleton<MultiGateway>::GetInstance()->GetGatewayAddr(0);
+    MultiGateway::GetInstance().GetGatewayAddr(0);
 }
 
 HWTEST_F(MultiGatewayTest, IsMultiGateway_test, TestSize.Level1)
 {
-    DelayedSingleton<MultiGateway>::GetInstance()->IsMultiGateway();
+    MultiGateway::GetInstance().IsMultiGateway();
 }
 
 HWTEST_F(MultiGatewayTest, GetNextGatewayMac_test, TestSize.Level1)
 {
     std::string mac = "";
-    DelayedSingleton<MultiGateway>::GetInstance()->GetNextGatewayMac(mac);
+    MultiGateway::GetInstance().GetNextGatewayMac(mac);
 }
 
 HWTEST_F(MultiGatewayTest, SetStaticArp_test, TestSize.Level1)
@@ -51,42 +51,42 @@ HWTEST_F(MultiGatewayTest, SetStaticArp_test, TestSize.Level1)
     std::string iface = "";
     std::string ipAddr = "";
     std::string macAddr = "";
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->SetStaticArp(iface, ipAddr, macAddr) == -1);
+    EXPECT_TRUE(MultiGateway::GetInstance().SetStaticArp(iface, ipAddr, macAddr) == -1);
     iface = "wlan0";
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->SetStaticArp(iface, ipAddr, macAddr) == -1);
+    EXPECT_TRUE(MultiGateway::GetInstance().SetStaticArp(iface, ipAddr, macAddr) == -1);
     ipAddr = "12.12.12.12";
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->SetStaticArp(iface, ipAddr, macAddr) == -1);
+    EXPECT_TRUE(MultiGateway::GetInstance().SetStaticArp(iface, ipAddr, macAddr) == -1);
     macAddr = "00:00:11:11:11:11";
-    DelayedSingleton<MultiGateway>::GetInstance()->SetStaticArp(iface, ipAddr, macAddr);
+    MultiGateway::GetInstance().SetStaticArp(iface, ipAddr, macAddr);
 }
 
 HWTEST_F(MultiGatewayTest, DelStaticArp_test, TestSize.Level1)
 {
     std::string iface = "";
     std::string ipAddr = "";
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->DelStaticArp(iface, ipAddr) == -1);
+    EXPECT_TRUE(MultiGateway::GetInstance().DelStaticArp(iface, ipAddr) == -1);
     iface = "wlan0";
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->DelStaticArp(iface, ipAddr) == -1);
+    EXPECT_TRUE(MultiGateway::GetInstance().DelStaticArp(iface, ipAddr) == -1);
     ipAddr = "12.12.12.12";
-    DelayedSingleton<MultiGateway>::GetInstance()->DelStaticArp(iface, ipAddr);
+    MultiGateway::GetInstance().DelStaticArp(iface, ipAddr);
 }
 
 HWTEST_F(MultiGatewayTest, DoArpItem_test, TestSize.Level1)
 {
     int32_t cmd = 1;
     struct arpreq *req = nullptr;
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->DoArpItem(cmd, req) == -1);
+    EXPECT_TRUE(MultiGateway::GetInstance().DoArpItem(cmd, req) == -1);
 }
 
 HWTEST_F(MultiGatewayTest, GetMacAddr_test, TestSize.Level1)
 {
     char *buff = nullptr;
     const char *macAddr = nullptr;
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->GetMacAddr(buff, macAddr) == -1);
+    EXPECT_TRUE(MultiGateway::GetInstance().GetMacAddr(buff, macAddr) == -1);
     char buff1[NUM_TEN] = {0};
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->GetMacAddr(buff1, macAddr) == -1);
+    EXPECT_TRUE(MultiGateway::GetInstance().GetMacAddr(buff1, macAddr) == -1);
     const char *macAddr1 = "11:22:33:44:55:66";
-    EXPECT_TRUE(DelayedSingleton<MultiGateway>::GetInstance()->GetMacAddr(buff1, macAddr1) == 0);
+    EXPECT_TRUE(MultiGateway::GetInstance().GetMacAddr(buff1, macAddr1) == 0);
 }
 }
 }

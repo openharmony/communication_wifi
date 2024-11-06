@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
+#include "define.h"
 #include "wifi_logger.h"
 #include "wifi_pro_interface.h"
+#include "wifi_pro_service.h"
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("WifiPrWifiProInterfaceoService");
+DEFINE_WIFILOG_LABEL("WifiProInterface");
 
 WifiProInterface::WifiProInterface(int32_t instId) : instId_(instId)
 {
@@ -33,12 +35,26 @@ WifiProInterface::~WifiProInterface()
 ErrCode WifiProInterface::InitWifiProService()
 {
     WIFI_LOGI("Enter WifiProInterface::InitWifiProService");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        pWifiProService_ = std::make_shared<WifiProService>(instId_);
+        if (pWifiProService_ == nullptr) {
+            WIFI_LOGE("Alloc pWifiProService failed.");
+            return WIFI_OPT_FAILED;
+        }
+        InitCallback();
+        if (pWifiProService_->InitWifiProService() != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("InitWifiProService failed.");
+            return WIFI_OPT_FAILED;
+        }
+    }
     return WIFI_OPT_SUCCESS;
 }
 
 void WifiProInterface::InitCallback()
 {
     using namespace std::placeholders;
+    WIFI_LOGI("Enter WifiProInterface::InitCallback");
     staCallback_.callbackModuleName = "WifiProService";
     staCallback_.OnStaConnChanged = [this](OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId) {
         this->DealStaConnChanged(state, linkedInfo, instId);
@@ -48,19 +64,37 @@ void WifiProInterface::InitCallback()
     };
 }
 
-void WifiProInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int32_t instId)
+void WifiProInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId)
 {
     WIFI_LOGI("Enter WifiProInterface::DealStaConnChanged");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return;
+    }
+    pWifiProService_->HandleStaConnChanged(state, linkedInfo);
 }
 
 void WifiProInterface::DealRssiLevelChanged(int32_t rssi, int32_t instId)
 {
     WIFI_LOGI("Enter WifiProInterface::DealRssiLevelChanged");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return;
+    }
+    pWifiProService_->HandleRssiLevelChanged(rssi);
 }
 
 void WifiProInterface::DealScanResult(const std::vector<InterScanInfo> &results)
 {
     WIFI_LOGI("Enter WifiProInterface::DealScanResult");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return;
+    }
+    pWifiProService_->HandleScanResult(results);
 }
 
 StaServiceCallback WifiProInterface::GetStaCallback() const

@@ -28,7 +28,7 @@ public:
     MOCK_METHOD0(EnableStaService, ErrCode());
     MOCK_CONST_METHOD0(DisableStaService, ErrCode());
     MOCK_CONST_METHOD1(ConnectToDevice, ErrCode(const WifiDeviceConfig &config));
-    MOCK_CONST_METHOD1(ConnectToNetwork, ErrCode(int networkId));
+    MOCK_CONST_METHOD2(ConnectToNetwork, ErrCode(int networkId, int type));
     MOCK_CONST_METHOD0(ReConnect, ErrCode());
     MOCK_CONST_METHOD0(Disconnect, ErrCode());
     MOCK_CONST_METHOD0(ReAssociate, ErrCode());

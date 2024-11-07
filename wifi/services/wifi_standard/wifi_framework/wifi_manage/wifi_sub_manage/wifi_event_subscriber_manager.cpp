@@ -971,20 +971,11 @@ PowermgrEventSubscriber::~PowermgrEventSubscriber()
 void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
-    WIFI_LOGI("Receive ForceSleep Event: %{public}s", action.c_str());
 #ifdef FEATURE_HPF_SUPPORT
-    const int enterForceSleep = 0x30;
-    const int exitForceSleep = 0x31;
     if (action == COMMON_EVENT_POWER_MANAGER_STATE_CHANGED) {
+        WIFI_LOGI("Receive power manager state Event: %{public}s", eventData.GetCode());
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-            if (eventData.GetCode() == enterForceSleep) { // STATE_ENTER_FORCESLEEP
-                WIFI_LOGI("Receive ForceSleep Event: %{public}d", enterForceSleep);
-                WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
-            }
-            if (eventData.GetCode() == exitForceSleep) {
-                WIFI_LOGI("Receive ForceSleep Event: %{public}d", exitForceSleep);
-                WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_EXIT_FORCESLEEP, i);
-            }
+            WifiManager::GetInstance().InstallPacketFilterProgram(eventData.GetCode(), i);
         }
     }
 #endif

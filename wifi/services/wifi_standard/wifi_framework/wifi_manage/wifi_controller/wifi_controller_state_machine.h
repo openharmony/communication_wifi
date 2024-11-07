@@ -67,6 +67,7 @@ public:
         void HandleSoftapToggleChangeInEnabledState(InternalMessagePtr msg);
         void HandleApRemoved(InternalMessagePtr msg);
         void HandleApStop(InternalMessagePtr msg);
+        bool HandleApMsg(InternalMessagePtr msg);
 #endif
         WifiControllerMachine *pWifiControllerMachine;
     };

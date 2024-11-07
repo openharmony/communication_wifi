@@ -65,8 +65,10 @@ void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig) const
         apConfig.SetChannel(bestChannel);
     }
     JudgeDbacWithP2p(apConfig);
-    WIFI_LOGI("ap config: ssid=%{public}s, inst_id=%{public}d, band=%{public}d, channel=%{public}d",
-        SsidAnonymize(apConfig.GetSsid()).c_str(), m_id, static_cast<int>(apConfig.GetBand()), apConfig.GetChannel());
+    WIFI_LOGI("ap config: ssid=%{public}s, preSharedKey=%{public}s, inst_id=%{public}d, band=%{public}d,\
+        channel=%{public}d", SsidAnonymize(apConfig.GetSsid()).c_str(),
+        PassWordAnonymize(apConfig.GetPreSharedKey()).c_str(), m_id, static_cast<int>(apConfig.GetBand()),
+        apConfig.GetChannel());
 }
 
 int ApConfigUse::GetBestChannelFor2G() const

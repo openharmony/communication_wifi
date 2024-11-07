@@ -337,7 +337,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
     WIFI_LOGI("Create a hid2d group, frequency: %{public}d, isFreqEnhance: %{public}d.", freq, isFreqEnhance);
     void *handle;
     do {
-        const char *so = "libwifi_enhance_service.z.so";
+        const char *so = "libwifi_enhance_interface.z.so";
         int (*FreqEnhance)(int, bool);
         handle = dlopen(so, RTLD_LAZY);
         if ((handle == nullptr) || (!isFreqEnhance)) {

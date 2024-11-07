@@ -391,7 +391,7 @@ public:
     bool SetApMacAddress(const std::string &ifaceName, const std::string &mac);
 
 private:
-    void ResetHalDeviceManagerInfo();
+    void ResetHalDeviceManagerInfo(bool isRemoteDied);
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();
     bool GetIfaceName(sptr<IChipIface> &iface, std::string &ifaceName);
@@ -428,6 +428,7 @@ private:
     // death recipient
     static void AddChipHdiDeathRecipient();
     static void RemoveChipHdiDeathRecipient();
+    IChipIface *FindIface(const std::string &ifaceName);
 
 private:
     std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> mInterfaceInfoCache;

@@ -52,7 +52,7 @@ HalDeviceManager::~HalDeviceManager()
 {
     LOGI("HalDeviceManager::~HalDeviceManager");
     StopChipHdi();
-    ResetHalDeviceManagerInfo();
+    ResetHalDeviceManagerInfo(false);
 }
 
 bool HalDeviceManager::StartChipHdi()
@@ -456,42 +456,30 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
     return true;
 }
 
+IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
+{
+    auto iter = mIWifiStaIfaces.find(ifaceName);
+    if (iter != mIWifiStaIfaces.end()) {
+        LOGE("find sta iface info");
+        return iter->second;
+    }
+    iter = mIWifiApIfaces.find(ifaceName);
+    if (iter != mIWifiApIfaces.end()) {
+        LOGE("find ap iface info");
+        return iter->second;
+    }
+    return nullptr;
+}
+
 bool HalDeviceManager::SetNetworkUpDown(const std::string &ifaceName, bool upDown)
 {
-    struct ifreq ifr;
-    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
-        LOGE("SetNetworkUpDown, failed to memset ifreq");
+    IChipIface *iface = FindIface(ifaceName);
+    if (iface == nullptr) {
         return false;
     }
-    if (strcpy_s(ifr.ifr_name, sizeof(ifr.ifr_name), ifaceName.c_str()) != EOK) {
-        LOGE("SetNetworkUpDown, failed to strcpy ifr_name");
+    if (iface->SetIfaceState(upDown) != HDF_SUCCESS) {
         return false;
     }
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd < 0) {
-        LOGE("SetNetworkUpDown, failed to create the socket");
-        return false;
-    }
-    int32_t ret = ioctl(fd, SIOCGIFFLAGS, &ifr);
-    if (ret != 0) {
-        LOGE("SetNetworkUpDown, failed to ioctl[SIOCGIFFLAGS], error:%{public}d(%{public}s)", errno, strerror(errno));
-        close(fd);
-        return false;
-    }
-    if (upDown) {
-        ifr.ifr_flags |= IFF_UP;
-    } else {
-        ifr.ifr_flags &= ~IFF_UP;
-    }
-    ret = ioctl(fd, SIOCSIFFLAGS, &ifr);
-    if (ret < 0) {
-        LOGE("SetNetworkUpDown, failed to ioctl[SIOCSIFFLAGS], ifr_flags=%{public}d, error:%{public}d(%{public}s)",
-            ifr.ifr_flags, errno, strerror(errno));
-        close(fd);
-        return false;
-    }
-
-    close(fd);
     return true;
 }
 
@@ -738,12 +726,25 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     return true;
 }
 
-void HalDeviceManager::ResetHalDeviceManagerInfo()
+void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    g_chipControllerCallback = nullptr;
-    g_chipIfaceCallback = nullptr;
-    g_IWifi = nullptr;
+    if (isRemoteDied) {
+        WifiP2PHalInterface::GetInstance().StopP2p();
+        WifiStaHalInterface::GetInstance().StopWifi();
+        WifiApHalInterface::GetInstance().StopAp();
+        ClearStaInfo();
+        ClearApInfo();
+    }
+    if (!g_chipControllerCallback) {
+        g_chipControllerCallback = nullptr;
+    }
+    if (!g_chipIfaceCallback) {
+        g_chipIfaceCallback = nullptr;
+    }
+    if (!g_IWifi) {
+        g_IWifi = nullptr;
+    }
     mInterfaceInfoCache.clear();
     mIWifiStaIfaces.clear();
     mIWifiApIfaces.clear();
@@ -1446,6 +1447,7 @@ void HalDeviceManager::AddChipHdiDeathRecipient()
         .OnRemoteDied = [](HdfDeathRecipient *recipient, HdfRemoteService *service) {
             LOGI("Chip Hdi service died!");
             g_chipHdiServiceDied = true;
+            ResetHalDeviceManagerInfo(true);
             RemoveChipHdiDeathRecipient();
             return;
         }

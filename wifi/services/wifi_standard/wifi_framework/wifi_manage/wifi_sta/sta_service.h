@@ -371,7 +371,7 @@ public:
      * @param enhanceService ISelfCureService object
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode SetSelfCureService(ISelfCureService *selfCureService) = 0;   
+    virtual ErrCode SetSelfCureService(ISelfCureService *selfCureService) = 0;
 #endif
     /**
      * @Description enable hilink

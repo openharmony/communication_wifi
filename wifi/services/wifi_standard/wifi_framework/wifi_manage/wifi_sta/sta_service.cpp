@@ -196,6 +196,7 @@ ErrCode StaService::EnableStaService()
         WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
     }
 #endif
+    WifiSettings::GetInstance().ReloadDeviceConfig();
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
 }
@@ -478,6 +479,9 @@ int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const
 ErrCode StaService::RemoveDevice(int networkId) const
 {
     LOGI("Enter RemoveDevice, networkId = %{public}d m_instId:%{public}d\n", networkId, m_instId);
+
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_NETWORK_REMOVED, networkId);
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (linkedInfo.networkId == networkId) {

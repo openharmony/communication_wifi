@@ -115,8 +115,8 @@ void IpTools::ConvertIpv6Address(const std::string &address, std::vector<unsigne
     }
     std::string addressFromPos0 = tmpAddress.substr(POS_0, HEX_BYTE_DIGIT_NUM);
     std::string addressFromPos2 = tmpAddress.substr(POS_2, HEX_BYTE_DIGIT_NUM);
-    ipv6.push_back(CheckDataLegalHex(addressFromPos0, HEX_FORM));
-    ipv6.push_back(CheckDataLegalHex(addressFromPos2, HEX_FORM));
+    ipv6.push_back(CheckDataLegalHex(addressFromPos0));
+    ipv6.push_back(CheckDataLegalHex(addressFromPos2));
 
     addressIpv6.assign(ipv6.begin(), ipv6.end());
     return;

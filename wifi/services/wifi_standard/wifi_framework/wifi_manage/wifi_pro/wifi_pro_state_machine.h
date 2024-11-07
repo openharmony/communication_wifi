@@ -129,7 +129,6 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr};
-        bool isScanTriggered_ { false };
         bool isWifi2WifiSwitching_ { false };
         bool isDisableWifiAutoSwitch_ { false };
         int32_t rssiLevel2Or3ScanedCounter_ { 0 };

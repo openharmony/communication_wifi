@@ -977,6 +977,8 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
 {
     item.scanAlwaysSwitch = false;
     item.staAirplaneMode = static_cast<int>(OperatorWifiType::WIFI_DISABLED);
+    item.persistWifiTime = 0;
+    item.toggleWifiCaller = 0;
     item.canOpenStaWhenAirplane = false;
     item.openWifiWhenAirplane = false;
     item.wifiDisabledByAirplane = false;
@@ -1032,6 +1034,16 @@ std::map<std::string, Func> g_wifiConfigSetValueMap = {
     {"staAirplaneMode", [](WifiConfig &item, const std::string &value) -> void {
         std::string tmpValue = value;
         item.staAirplaneMode = CheckDataLegal(tmpValue);
+    }},
+    {"persistWifiTime", [](WifiConfig &item, const std::string &value) -> void {
+        LOGI("last set Persist Wifi State time is:%{public}s", value.c_str());
+        std::string tmpValue = value;
+        item.persistWifiTime = CheckDataLegal(tmpValue);
+    }},
+    {"toggleWifiCaller", [](WifiConfig &item, const std::string &value) -> void {
+        LOGI("last toggle wifi caller is:%{public}s", value.c_str());
+        std::string tmpValue = value;
+        item.toggleWifiCaller = CheckDataLegal(tmpValue);
     }},
     {"canOpenStaWhenAirplane", [](WifiConfig &item, const std::string &value) -> void {
         std::string tmpValue = value;
@@ -1222,6 +1234,8 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"<WifiConfig>" << std::endl;
     ss << "    " <<"scanAlwaysSwitch=" << item.scanAlwaysSwitch << std::endl; /* bool false->0 true->1 */
     ss << "    " <<"staAirplaneMode=" << item.staAirplaneMode << std::endl;
+    ss << "    " <<"persistWifiTime=" << item.persistWifiTime << std::endl;
+    ss << "    " <<"toggleWifiCaller=" << item.toggleWifiCaller << std::endl;
     ss << "    " <<"canOpenStaWhenAirplane=" << item.canOpenStaWhenAirplane << std::endl;
     ss << "    " <<"openWifiWhenAirplane=" << item.openWifiWhenAirplane << std::endl;
     ss << "    " <<"wifiDisabledByAirplane=" << item.wifiDisabledByAirplane << std::endl;

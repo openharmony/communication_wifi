@@ -152,6 +152,16 @@ bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
         return false;
     }
     WIFI_LOGE("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+    switch (msg->GetMessageName()) {
+        case CONCRETE_CMD_STOP:
+            pConcreteMangerMachine->CheckAndContinueToStopWifi(msg);
+            break;
+        case CONCRETE_CMD_STA_STOP:
+            pConcreteMangerMachine->HandleStaStop();
+            break;
+        default:
+            break;
+    }
     return true;
 }
 
@@ -462,7 +472,8 @@ bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)
             HandleStaStart();
             return true;
         case CONCRETE_CMD_STOP:
-            checkAndContinueToStopWifi(msg);
+            DelayMessage(msg);
+            SwitchState(pDefaultState);
             return true;
         case CONCRETE_CMD_STA_SEMI_ACTIVE:
             HandleStaSemiActive();
@@ -646,22 +657,23 @@ ErrCode ConcreteMangerMachine::SwitchEnableFromSemi()
         return WIFI_OPT_FAILED;
     }
     WifiServiceScheduler::GetInstance().DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, mid);
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, mid);
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaStart(mid);
     return WIFI_OPT_SUCCESS;
 }
 
-void ConcreteMangerMachine::checkAndContinueToStopWifi(InternalMessagePtr msg)
+void ConcreteMangerMachine::CheckAndContinueToStopWifi(InternalMessagePtr msg)
 {
     if (WifiConfigCenter::GetInstance().GetWifiStopState()) {
-        WIFI_LOGE("checkAndContinueToStopWifi: wifi is stoping");
+        WIFI_LOGE("CheckAndContinueToStopWifi: wifi is stoping");
         return;
     }
 
     mTargetRole = static_cast<int>(ConcreteManagerRole::ROLE_UNKNOW);
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(mid);
     auto detailState = WifiConfigCenter::GetInstance().GetWifiDetailState(mid);
-    WIFI_LOGI("checkAndContinueToStopWifi: current sta state: %{public}d detailState:%{public}d", staState,
+    WIFI_LOGI("CheckAndContinueToStopWifi: current sta state: %{public}d detailState:%{public}d", staState,
         detailState);
     if (detailState != WifiDetailState::STATE_SEMI_ACTIVE && detailState != WifiDetailState::STATE_SEMI_ACTIVATING &&
         (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::OPENING)) {

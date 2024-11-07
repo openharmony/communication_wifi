@@ -166,6 +166,8 @@ public:
     void MergeWifiCloneConfig(std::string &cloneData);
 
     void RemoveBackupFile();
+
+    int SetWifiToggleCaller(int callerPid, int instId = 0);
 #endif
 
     bool AddRandomMac(WifiStoreRandomMac &randomMacInfo);

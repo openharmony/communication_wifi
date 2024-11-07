@@ -1635,7 +1635,7 @@ bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int cu
 
 void SelfCureStateMachine::InternetSelfCureState::HandleConfirmInternetSelfCureFailed(int currentCureLevel)
 {
-    pSelfCureStateMachine->selfCrueOnGoing = false;
+    pSelfCureStateMachine->selfCureOnGoing = false;
     if (currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS && pSelfCureStateMachine->internetUnknown) {
         resetDnses(AssignedDnses);
     }
@@ -3340,7 +3340,7 @@ bool SelfCureStateMachine::CheckSelfCureWifiResult(int event)
         return false;
     }
     selfCureWifiLastState_ = wifiState;
-    return CheckSelfCureWifiResult(event, wifiState);
+    return CheckSelfCureState(event, wifiState);
 }
 
 bool SelfCureStateMachine::CheckSelfCureState(int event,  WifiState wifiState)

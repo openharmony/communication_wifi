@@ -227,11 +227,6 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     return;
 }
 
-void WifiStaManager::NotifyScanServiceConnChanged(OperateResState state, int instId)
-{
-
-}
-
 void WifiStaManager::DealWpsChanged(WpsStartState state, const int pinCode, int instId)
 {
     WifiEventCallbackMsg cbMsg;

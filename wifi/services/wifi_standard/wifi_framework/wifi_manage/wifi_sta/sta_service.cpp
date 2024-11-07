@@ -948,7 +948,7 @@ ErrCode StaService::SetSelfCureService(ISelfCureService *selfCureService)
 {
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SetSelfCureService(selfCureService);
-    return WIFI_OPT_SUCCESS; 
+    return WIFI_OPT_SUCCESS;
 }
 #endif
 

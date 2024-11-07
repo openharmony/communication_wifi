@@ -622,7 +622,7 @@ std::string StringToHex(const std::string &data)
 
 int CheckDataLegalBin(const std::string &data)
 {
-    if (data.empty() || data.size() > MAX_INT32_LENGTH_BIN) {
+    if (data.empty() || data.size() > MAX_INT32_LENGTH_HEX) {
         WIFI_LOGE("CheckDataLegalBin: invalid data:%{private}s", data.c_str());
         return 0;
     }
@@ -633,7 +633,7 @@ int CheckDataLegalBin(const std::string &data)
     }
     errno = 0;
     char *endptr = nullptr;
-    long int num = std::strtol(data.c_str(), &endptr, BASE_BIN);
+    long int num = std::strtol(data.c_str(), &endptr, BASE_HEX);
     if (errno == ERANGE) {
         WIFI_LOGE("CheckDataLegalBin errno == ERANGE, data:%{private}s", data.c_str());
         return 0;

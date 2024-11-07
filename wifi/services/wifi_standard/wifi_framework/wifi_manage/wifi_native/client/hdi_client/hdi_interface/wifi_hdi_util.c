@@ -44,8 +44,12 @@
 #define CMD_FREQ_MAX_LEN 8
 #define MAC_UINT_SIZE 6
 #define MAC_STRING_SIZE 17
-#define HILINK_OUI_HEAD_LEN 9
-#define MASK_HILINK 0xFF
+#define HILINK_OUI_HEAD_LEN 7
+#define HILINK_HEAD_LEN 9
+#define HILINK_OFFSET_LEN 2
+#define HILINK_LOGO_IS_HI 1
+#define HILINK_LOGO_IS_WPS 2
+#define HILINK_LOGO_IS_ENTERPRISE_HI 3
 
 const unsigned int HT_OPER_EID = 61;
 const unsigned int VHT_OPER_EID = 192;
@@ -1366,28 +1370,62 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
     scanInfo->ieSize = ieIndex;
 }
 
-static bool CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
+static uint8_t CheckHiLinkSection(const uint8_t *bytes, uint8_t len)
 {
-    int formatHiLink[] = {0, 0xE0, 0XFC, 0X80, 0, 0, 0, 0X01, 0};
-    int formatHiLinkOUI[] = {0, 0xE0, 0XFC, 0X40, 0, 0, 0, 0X01, 0};
-    if (bytes == NULL || len < HILINK_OUI_HEAD_LEN) {
-        return false;
+    int formatHiLink[] = { 0, 0xE0, 0XFC, 0X80, 0, 0, 0, 0X01, 0 };
+    if (bytes == NULL || len < HILINK_HEAD_LEN) {
+        return 0;
     }
 
-    for (int index = 0; index < HILINK_OUI_HEAD_LEN; index++) {
-        int element = bytes[index] & MASK_HILINK;
-        if (element != formatHiLink[index] && element != formatHiLinkOUI[index]) {
-            return false;
+    for (int index = 0; index < HILINK_HEAD_LEN; index++) {
+        int element = bytes[index];
+        if (element != formatHiLink[index]) {
+            return 0;
         }
     }
 
-    return true;
+    return 1;
+}
+
+static uint8_t CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
+{
+    int formatHiLinkOUI[] = { 0, 0xE0, 0XFC, 0X40, 0, 0, 0 };
+    int okcLogo[] = { 0xF9 };
+    if (bytes == NULL || len < HILINK_OUI_HEAD_LEN) {
+        return 0;
+    }
+
+    for (int index = 0; index < HILINK_OUI_HEAD_LEN; index++) {
+        int element = bytes[index];
+        if (element != formatHiLinkOUI[index]) {
+            return 0;
+        }
+    }
+    /* check hilink ninth data, if equal 0XF9, return eleventh data.else find next data */
+    int index = HILINK_HEAD_LEN;
+    while ((index < len) && (index >= 0)) {
+        int element = bytes[index];
+        if (element != okcLogo[0]) {
+            if (index + 1 >= len) {
+                return 0;
+            }
+            int tlvLength = bytes[index + 1];
+            index = tlvLength + HILINK_OFFSET_LEN + index;
+        } else {
+            if (index + HILINK_OFFSET_LEN >= len) {
+                return 0;
+            }
+            return bytes[index + HILINK_OFFSET_LEN];
+        }
+    }
+
+    return 0;
 }
 
 bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
 {
     const struct HdiElem *elem;
-    bool num = false;
+    uint8_t num = 0;
 
     if (!start) {
         return false;
@@ -1400,9 +1438,13 @@ bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
         uint8_t id = elem->id, elen = elem->datalen;
         const uint8_t *pos = elem->data;
         if (id == HDI_EID_VENDOR_SPECIFIC) {
+            num |= CheckHiLinkSection(pos, elen);
             num |= CheckHiLinkOUISection(pos, elen);
         }
     }
+    if (num == HILINK_LOGO_IS_HI || num == HILINK_LOGO_IS_WPS || num == HILINK_LOGO_IS_ENTERPRISE_HI) {
+        return true;
+    }
 
-    return num;
+    return false;
 }

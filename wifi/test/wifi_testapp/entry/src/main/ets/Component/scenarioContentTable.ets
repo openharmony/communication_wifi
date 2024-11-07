@@ -15,9 +15,9 @@
 
 import ConfigData from '../utils/ConfigData';
 import { TestScenario } from '../entryability/model/testData'
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 
-const TAG = "[scenarioContentTable]"
+const TAG = "wifiTestApp [scenarioContentTable]"
 /**
  *  Scenario Test ContentTable Component Page Of Wifi test
  */

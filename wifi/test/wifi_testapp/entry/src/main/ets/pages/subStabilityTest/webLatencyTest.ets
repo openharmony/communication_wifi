@@ -14,6 +14,7 @@
  */
 
 import wifi from '@ohos.wifi'
+import wifiManager from '@ohos.wifiManager';
 import { PageTitle } from '../../Component/pageTitle';
 import router from '@ohos.router';
 import mediaquery from '@ohos.mediaquery';
@@ -25,15 +26,16 @@ import ConfigData from '../../utils/ConfigData';
 import fs from '@ohos.file.fs';
 import http from '@ohos.net.http';
 import { TestData } from '../../entryability/model/testData'
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import common from '@ohos.app.ability.common';
 import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { BusinessError } from '@ohos.base';
 import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
 import notificationManager from '@ohos.notificationManager';
 
-const TAG = '[webLatencyTest]';
+const TAG = 'wifiTestApp [webLatencyTest]';
 
 interface myParams extends Object {
   testItem: TestData
@@ -105,11 +107,11 @@ struct webLatencyTest {
       console.log(TAG , `getSync unexpected error: ${ e }`);
     }
     console.log(TAG , "aboutToAppear")
-    let wifiState = wifi.isConnected()
+    let wifiState = wifiManager.isConnected()
     console.log(TAG , "aboutToAppear,isConnected:" + wifiState)
     if ( wifiState ) {
       this.wifiConnectionMessage = "connected";
-      wifi.getLinkedInfo((err , data) => {
+      wifiManager.getLinkedInfo((err , data) => {
         if ( err ) {
           console.log(TAG , "get linked info error");
         }
@@ -120,7 +122,7 @@ struct webLatencyTest {
       })
     } else {
       this.wifiConnectionMessage = "disconnected";
-      prompt.showToast({ message : 'wifi还未连接，请先连接WiFi' })
+      promptAction.showToast({ message : 'wifi还未连接，请先连接WiFi' })
     }
     this.filePath = this.pathDir + ("/loadlog.txt");
     console.log(TAG , "沙箱路径为: " + this.filePath)
@@ -174,7 +176,7 @@ struct webLatencyTest {
           abilityName : (context as common.UIAbilityContext).abilityInfo.name
         }
       ] ,
-      operationType : wantAgent.OperationType.START_ABILITY ,
+      operationType : ohosWantAgentInfo.OperationType.START_ABILITY ,
       requestCode : 0 ,
       wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
     };
@@ -244,7 +246,7 @@ struct webLatencyTest {
               .operateButtonStyle($r('app.color.main_blue'))
               .align(Alignment.Center)
               .onClick(async(event: ClickEvent) => {
-                let wifiState = wifi.isConnected()
+                let wifiState = wifiManager.isConnected()
                 if ( wifiState ) {
                   console.log(TAG , "start web test-------------")
                   this.webLoopState = true
@@ -255,7 +257,7 @@ struct webLatencyTest {
                   this.startContinuousTask();
                   await this.forLoop()
                 } else {
-                  prompt.showToast({ message : 'wifi还没连接,请先连接WiFi！' });
+                  promptAction.showToast({ message : 'wifi还没连接,请先连接WiFi！' });
                 }
 
               })

@@ -20,7 +20,7 @@ import image from '@ohos.multimedia.image'
 import MediaUtils from '../entryability/model/MediaUtils'
 import ConfigData from '../utils/ConfigData';
 
-const TAG = "[p2pTitleBar]"
+const TAG = "wifiTestApp [p2pTitleBar]"
 
 /**
  * Page-Title Of Wifi test

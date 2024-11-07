@@ -623,7 +623,7 @@ WifiErrorNo WifiP2PHalInterface::SetRptBlockList(const std::string &ifaceName, c
     const std::vector<std::string> &blockList)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetBlockList(ifaceName, interfaceName, blockList)) {
+    if (!HalDeviceManager::GetInstance().SetBlockList(ifaceName, interfaceName, blockList)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -636,7 +636,7 @@ WifiErrorNo WifiP2PHalInterface::DisAssociateSta(const std::string &ifaceName, c
     const std::string &mac)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->DisAssociateSta(ifaceName, interfaceName, mac)) {
+    if (!HalDeviceManager::GetInstance().DisAssociateSta(ifaceName, interfaceName, mac)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;

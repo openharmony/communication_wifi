@@ -14,25 +14,25 @@
  */
 
 import ConfigData from '../utils/ConfigData';
-import wifi from '@ohos.wifi';
+import wifiManager from '@ohos.wifiManager';
 
 /**
  * WifiView Component of wifi test
  */
 
-const TAG = "[wifiView]"
+const TAG = "wifiTestAppApp [wifiView]"
 
 @Component
 export struct WifiView {
-  private wifi!: wifi.WifiScanInfo;
+  private wifiScanInfo!: wifiManager.WifiScanInfo;
   private securityString: Resource = $r('app.string.encryption')
   @State isLock: boolean = true
 
   aboutToAppear() {
-    console.log(TAG , `aboutToAppear ${ JSON.stringify(this.wifi) }`)
-    if ( this.wifi ) {
-      if ( this.wifi.securityType ) {
-        if ( this.wifi.securityType === 1 ) {
+    console.log(TAG , `aboutToAppear ${ JSON.stringify(this.wifiScanInfo) }`)
+    if ( this.wifiScanInfo ) {
+      if ( this.wifiScanInfo.securityType ) {
+        if ( this.wifiScanInfo.securityType === 1 ) {
           this.securityString = $r('app.string.open')
           this.isLock = false
         } else {
@@ -49,9 +49,9 @@ export struct WifiView {
   build() {
     Row() {
       Column() {
-        if ( this.wifi ) {
-          if ( this.wifi.ssid ) {
-            Text(this.wifi.ssid)
+        if ( this.wifiScanInfo ) {
+          if ( this.wifiScanInfo.ssid ) {
+            Text(this.wifiScanInfo.ssid)
               .fontSize(20)
               .width(ConfigData.WH_100_100)
           }

@@ -153,15 +153,9 @@ ohos_unittest("wifi_controller_unittest") {
     "FEATURE_STA_SUPPORT",
     "FEATURE_P2P_SUPPORT",
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+    "FEATURE_WIFI_PRO_SUPPORT",
+    "FEATURE_RPT_SUPPORT",
   ]
-
-  if (wifi_feature_wifi_pro_ctrl) {
-    defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
-  }
-
-  if (wifi_feature_with_rpt) {
-    defines += [ "FEATURE_RPT_SUPPORT" ]
-  }
 
   part_name = "wifi"
   subsystem_name = "communication"

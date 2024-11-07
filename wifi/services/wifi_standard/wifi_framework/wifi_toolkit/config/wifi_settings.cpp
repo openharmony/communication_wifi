@@ -1846,7 +1846,7 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
         }
     }
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-    LOGE("WifiAsset ConfigsDeduplicateAndSave");
+    LOGD("WifiAsset ConfigsDeduplicateAndSave");
     WifiAssetManager::GetInstance().WifiAssetAddPack(addConfigs);
 #endif
     std::vector<WifiDeviceConfig>().swap(newConfigs);

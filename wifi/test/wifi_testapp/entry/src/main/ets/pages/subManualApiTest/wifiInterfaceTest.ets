@@ -26,7 +26,7 @@ interface myParams extends Object {
   testItem: TestData
 }
 
-const TAG = "[Wifi]"
+const TAG = "wifiTestApp [Wifi]"
 
 /**
  * wifi Test Page Of Wifi test

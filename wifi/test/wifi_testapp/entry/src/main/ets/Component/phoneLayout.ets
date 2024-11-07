@@ -16,7 +16,7 @@ import { Browser } from '../entryability/model/bowser';
 import { WebTab } from './webTitleBar';
 import ConfigData from '../Utils/ConfigData'
 
-const TAG: string = '[PhoneLayout]';
+const TAG = 'wifiTestApp [PhoneLayout]';
 const BUTTON_WIDTH: number = 22;
 const BUTTON_RADIUS: number = 4;
 const DOWN_COLOR: string = '#e4e4e4';

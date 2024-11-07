@@ -33,6 +33,12 @@ SelfCureUtils::~SelfCureUtils()
     WIFI_LOGI("~SelfCureUtils()");
 }
 
+SelfCureUtils& SelfCureUtils::GetInstance()
+{
+    static SelfCureUtils instance;
+    return instance;
+}
+
 void SelfCureUtils::RegisterDnsResultCallback()
 {
     dnsResultCallback_ = std::make_unique<SelfCureDnsResultCallback>().release();

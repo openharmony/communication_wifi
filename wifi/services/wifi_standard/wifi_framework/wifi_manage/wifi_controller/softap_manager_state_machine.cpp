@@ -47,7 +47,7 @@ SoftapManagerMachine::~SoftapManagerMachine()
     ParsePointer(pStartedState);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
-        DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveApIface(ifaceName);
+        HalDeviceManager::GetInstance().RemoveApIface(ifaceName);
         ifaceName.clear();
         WifiServiceScheduler::GetInstance().ClearSoftApIfaceNameMap(mid);
         WifiConfigCenter::GetInstance().SetApIfaceName("");

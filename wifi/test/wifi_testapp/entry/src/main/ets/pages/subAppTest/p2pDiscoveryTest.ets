@@ -14,6 +14,7 @@
  */
 
 import wifi from '@ohos.wifi'
+import wifiManager from '@ohos.wifiManager';
 import { AvailableP2p } from '../../Component/availableP2p'
 import { TestData } from '../../entryability/model/testData'
 import router from '@ohos.router';
@@ -26,7 +27,7 @@ interface myParams extends Object {
   testItem: TestData
 }
 
-const TAG = '[p2pScan]'
+const TAG = 'wifiTestApp [p2pScan]'
 
 /**
  * p2p Found Test Page Of Wifi test
@@ -37,22 +38,33 @@ struct P2pFound {
   private p2pModel: P2pModel = new P2pModel()
   private testItem: TestData = (router.getParams() as myParams).testItem
   private isScanning: boolean = false;
-  @State p2pList: Array<wifi.WifiP2pDevice> = []
+  @State p2pList: Array<wifiManager.WifiP2pDevice> = []
   @State p2pIsLinked: boolean = false
   @State p2pIsSwitchOn: boolean = false
-  @State p2pLinkedInfo: wifi.WifiP2pLinkedInfo = {
-    connectState : wifi.P2pConnectState.DISCONNECTED ,
+  @State p2pLinkedInfo: wifiManager.WifiP2pLinkedInfo = {
+    connectState : wifiManager.P2pConnectState.DISCONNECTED ,
     isGroupOwner : false ,
     groupOwnerAddr : '' ,
   }
 
-  scan() {
+  async scan() {
     if ( !this.isScanning ) {
       return; // 如果不需要扫描，则直接返回
     } else {
-      this.p2pModel.getP2pPeerDevices((result: wifi.WifiP2pDevice[]) => {
+      this.p2pModel.getP2pPeerDevices((result: wifiManager.WifiP2pDevice[]) => {
         if ( this.p2pIsSwitchOn ) {
-          this.p2pList = result
+          result.forEach(item => {
+            if (item.deviceName) {
+              this.p2pList.push({
+                deviceName: item.deviceName,
+                deviceAddress: item.deviceAddress,
+                deviceAddressType: item.deviceAddressType,
+                primaryDeviceType: item.primaryDeviceType,
+                deviceStatus: item.deviceStatus,
+                groupCapabilities: item.groupCapabilities,
+              });
+            }
+          });
           console.log(TAG , 'scan p2pList:' + JSON.stringify(this.p2pList))
           if ( this.isScanning ) { // 再次检查是否还需要继续扫描
             setTimeout(() => {
@@ -65,7 +77,7 @@ struct P2pFound {
   }
 
   getP2pLinkedInfo() {
-    wifi.getP2pLinkedInfo((err , p2pLinkedInfo) => {
+    wifiManager.getP2pLinkedInfo((err , p2pLinkedInfo) => {
       if ( err ) {
         console.log(TAG , `getLinkedInfo err: ${ JSON.stringify(err) }`)
         return
@@ -86,29 +98,32 @@ struct P2pFound {
   }
 
   addP2pListener() {
-    wifi.on('p2pConnectionChange' , wifiP2pLinkedInfo => {
+    wifiManager.on('p2pConnectionChange' , wifiP2pLinkedInfo => {
       let state = wifiP2pLinkedInfo.connectState
       console.log(TAG , `p2pConnectionChange: ${ state }`)
       this.getP2pLinkedInfo()
     })
-    wifi.on('p2pStateChange' , state => {
+    wifiManager.on('p2pStateChange' , state => {
       console.log(TAG , `p2pStateLisener state: ${ state }`)
       this.p2pList = []
-      if ( state === 1 ) { // 1: wifi is enable, 0:wifi is disable
-        wifi.startDiscoverDevices()
+      if ( state === 3 ) { //1: idle, 2: starting, 3:started, 4: closing, 5: closed
+        wifiManager.startDiscoverDevices()
         this.scan()
       }
     })
   }
 
   aboutToAppear() {
-    if ( wifi.isWifiActive() ) {
+    console.log(TAG,"test" + wifiManager.isWifiActive() )
+    if ( wifiManager.isWifiActive() ) {
       console.log(TAG , 'wifi is active')
       this.p2pIsSwitchOn = true
       this.isScanning = true; // 在页面出现时开始扫描
-      wifi.startDiscoverDevices()
+      wifiManager.startDiscoverDevices()
       this.scan()
       this.getP2pLinkedInfo()
+    } else {
+      this.p2pIsSwitchOn = false;
     }
     this.addP2pListener()
   }
@@ -127,21 +142,35 @@ struct P2pFound {
           .layoutWeight(1)
           .align(Alignment.TopStart)
         Column() {
-          Toggle({ type : ToggleType.Switch , isOn : this.p2pIsSwitchOn })
-            .onChange((isOn: boolean) => {
-              console.log(TAG , `wifi swtich is: ${ isOn }`)
+          Toggle({ type : ToggleType.Switch, isOn : this.p2pIsSwitchOn })
+            .onChange(async(isOn: boolean) => {
+              console.log(TAG, `wifi swtich is: ${ isOn }`)
               this.p2pList = []
               if ( isOn ) {
-                this.p2pIsSwitchOn = true
-                wifi.enableWifi()
-                wifi.startDiscoverDevices()
-                this.scan()
-                return
+                try {
+                  this.p2pIsSwitchOn = true
+                  this.isScanning = true;
+                  await wifiManager.enableWifi()
+                  // wifiManager.startDiscoverDevices()
+                  // 延迟执行startScan，确保WiFi服务已经准备好
+                  setTimeout(() => {
+                    this.scan();
+                  }, 2000);
+                } catch( error ) {
+                  console.error(TAG, `Failed to enable Wi-Fi: ${ error }`);
+                }
+              } else {
+                this.p2pIsSwitchOn = false
+                this.p2pIsLinked = false
+                this.isScanning = false;
+                try {
+                  await wifiManager.disconnect();
+                  await wifiManager.disableWifi();
+                } catch( error ) {
+                  console.error(TAG, `Failed to disable Wi-Fi: ${ error }`);
+                }
+                this.p2pList = [];
               }
-              this.p2pIsSwitchOn = false
-              this.p2pIsLinked = false
-              wifi.disconnect()
-              wifi.disableWifi()
             })
         }
       }
@@ -156,7 +185,7 @@ struct P2pFound {
   aboutToDisappear() {
     this.isScanning = false; // 设置标志，告诉scan方法停止新的扫描
     this.p2pIsSwitchOn = false
-    wifi.off('wifiConnectionChange')
-    wifi.off('wifiStateChange')
+    wifiManager.off('p2pConnectionChange')
+    wifiManager.off('p2pStateChange')
   }
 }

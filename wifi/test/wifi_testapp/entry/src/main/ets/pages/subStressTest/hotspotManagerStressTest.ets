@@ -31,7 +31,7 @@ import common from '@ohos.app.ability.common';
 import abilityAccessCtrl , { Context , PermissionRequestResult } from '@ohos.abilityAccessCtrl';
 import { BusinessError } from '@ohos.base';
 
-const TAG = '[Stress]'
+const TAG = 'wifiTestApp [Stress]'
 
 interface DownloadConfig {
   url: string,

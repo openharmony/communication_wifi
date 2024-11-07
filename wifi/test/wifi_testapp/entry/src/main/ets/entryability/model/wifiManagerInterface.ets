@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import router from '@ohos.router';
 import wifiManager from '@ohos.wifiManager';
 import LogDataManager from '../../utils/LogDataManager';
 import MessageDataManager from '../../utils/MessageDataManager';
 import { BusinessError } from '@ohos.base';
 
-const TAG = "[wifiManagerInterface]";
+const TAG = "wifiTestApp [wifiManagerInterface]";
 
 interface WifiDeviceConfigManager {
   ssid: string,
@@ -56,13 +56,13 @@ export function testEnableWifiManager() {
       wifiManagerEnable = true;
       AppStorage.setOrCreate('wifiManagerIsOn' , wifiManagerEnable);
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testEnableWifiManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -80,13 +80,13 @@ export function testDisableWifiManager() {
       wifiManagerEnable = false;
       AppStorage.setOrCreate('wifiManagerIsOn' , wifiManagerEnable);
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testDisableWifiManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testDisableWifiManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testDisableWifiManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -104,13 +104,13 @@ export function testEnableSemiWifiManager() {
       wifiManagerEnable = true;
       AppStorage.setOrCreate('semiWifiManagerIsOn' , wifiManagerEnable);
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testEnableSemiWifi_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -126,13 +126,13 @@ export function testIsWifiActiveManager() {
       wifiManagerEnable = false
     }
     message = (MessageDataManager.testIsActiveResult) + ret
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testIsWifiActiveManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testIsWifiActiveManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testIsWifiActiveManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -148,15 +148,15 @@ export function testScanManager() {
       //scan返回值为void
       message = "scan 调用成功"
       router.pushUrl({ url : PAGE_URI_WIFI_FOUND_MODE });
-      prompt.showToast({ message : message })
+      promptAction.showToast({ message : message })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testScanManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -172,15 +172,15 @@ export function testStartScanManager() {
       //scan返回值为void
       message = "startScan 调用成功"
       router.pushUrl({ url : PAGE_URI_WIFI_FOUND_MODE });
-      prompt.showToast({ message : message })
+      promptAction.showToast({ message : message })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testStartScanManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -195,12 +195,12 @@ export function testGetScanInfoListManager() {
     let getScanInfoManagerMessage = JSON.stringify(ret)
     AppStorage.setOrCreate("getScanInfoManagerMessage" , getScanInfoManagerMessage)
     console.log(TAG , LogDataManager.testGetScanInfoListManager_EndLog);
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -217,18 +217,18 @@ export function testGetScanResultsPromise() {
         console.log(TAG , LogDataManager.testAddCandidateConfigPromiseManager_successfulLog)
         console.log(TAG , LogDataManager.testAddCandidateConfigManagerLog + JSON.stringify(result))
         message = (MessageDataManager.testAddCandidateConfig + JSON.stringify(result))
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testAddCandidateConfigPromiseManager_EndLog)
       }).catch((err: BusinessError) => {
         console.log(TAG , "testAddCandidateConfigManagerPromise err:" + JSON.stringify(err))
       })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -249,16 +249,16 @@ export function testGetScanResultsCallback() {
         console.log(TAG , LogDataManager.testAddCandidateConfigCallbackManager_successfulLog)
         console.log(TAG , LogDataManager.testAddCandidateConfigManagerLog + JSON.stringify(result))
         message = (MessageDataManager.testAddCandidateConfig + JSON.stringify(result))
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testAddCandidateConfigCallbackManager_EndLog)
       })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -273,12 +273,12 @@ export function testGetScanResultsSync() {
     let getScanInfoManagerMessage = JSON.stringify(ret)
     AppStorage.setOrCreate("getScanInfoManagerMessage" , getScanInfoManagerMessage)
     console.log(TAG , LogDataManager.testGetScanInfoListManager_EndLog);
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -318,12 +318,12 @@ export function testGetWifiDetailState() {
     console.log(TAG , "状态为：" + JSON.stringify(ret));
     message = "状态为：" + wifiDetailStateMessage
     console.log(TAG , LogDataManager.testGetScanInfoListManager_EndLog);
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -345,7 +345,7 @@ export function testSetScanAlwaysAllowed() {
   } catch( e ) {
     console.log(`Failed to testGetProfileConnState1. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetProfileConnState1. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -358,12 +358,12 @@ export function testGetScanAlwaysAllowed() {
     console.log(TAG , "获取扫描始终允许标志为：" + JSON.stringify(ret));
     message = "获取扫描始终允许标志为：" + ret
     console.log(TAG , LogDataManager.testGetScanInfoListManager_EndLog);
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -381,18 +381,18 @@ export function testAddDeviceConfigManagerPromise() {
         console.log(TAG , LogDataManager.testAddDeviceConfigPromiseManager_successfulLog)
         console.log(TAG , LogDataManager.testAddDeviceConfigManagerLog + result)
         message = (MessageDataManager.testAddDeviceConfig) + result
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testAddDeviceConfigPromiseManager_EndLog)
       }).catch((err: BusinessError) => {
         console.log(TAG , "testAddDeviceConfigManagerPromise error:" + JSON.stringify(err))
       })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testAddDeviceConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddDeviceConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -415,16 +415,16 @@ export function testAddDeviceConfigManagerCallback() {
         console.log(TAG , LogDataManager.testAddDeviceConfigCallbackManager_successfulLog)
         console.log(TAG , LogDataManager.testAddDeviceConfigManagerLog + result)
         message = (MessageDataManager.testAddDeviceConfig) + result
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testAddDeviceConfigCallbackManager_EndLog)
       });
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testAddDeviceConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddDeviceConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -442,18 +442,18 @@ export function testAddCandidateConfigManagerPromise() {
         console.log(TAG , LogDataManager.testAddCandidateConfigPromiseManager_successfulLog)
         console.log(TAG , LogDataManager.testAddCandidateConfigManagerLog + result)
         message = (MessageDataManager.testAddCandidateConfig + result)
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testAddCandidateConfigPromiseManager_EndLog)
       }).catch((err: BusinessError) => {
         console.log(TAG , "testAddCandidateConfigManagerPromise err:" + JSON.stringify(err))
       })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -476,16 +476,16 @@ export function testAddCandidateConfigManagerCallback() {
         console.log(TAG , LogDataManager.testAddCandidateConfigCallbackManager_successfulLog)
         console.log(TAG , LogDataManager.testAddCandidateConfigManagerLog + result)
         message = (MessageDataManager.testAddCandidateConfig + result)
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testAddCandidateConfigCallbackManager_EndLog)
       })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -503,18 +503,18 @@ export function testRemoveCandidateConfigManagerPromise() {
         console.log(TAG , LogDataManager.testRemoveCandidateConfigPromiseManager_successfulLog)
         console.log(TAG , LogDataManager.testRemoveCandidateConfigManagerLog + result)
         message = MessageDataManager.testRemoveCandidateConfig + result
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testRemoveCandidateConfigPromiseManager_EndLog)
       }).catch((err: BusinessError) => {
         console.log(TAG , "testRemoveCandidateConfigManagerPromise err:" + JSON.stringify(err))
       })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testRemoveCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -536,16 +536,16 @@ export function testRemoveCandidateConfigManagerCallback() {
         console.log(TAG , LogDataManager.testRemoveCandidateConfigCallbackManager_successfulLog)
         console.log(TAG , LogDataManager.testRemoveCandidateConfigManagerLog + result)
         message = (MessageDataManager.testRemoveCandidateConfig + result)
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testRemoveCandidateConfigCallbackManager_EndLog)
       })
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testRemoveCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -557,13 +557,13 @@ export function testGetCandidateConfigsManager() {
     let ret = wifiManager.getCandidateConfigs()
     message = "候选配置：" + JSON.stringify(ret)
     console.log(TAG , "候选配置：" + JSON.stringify(ret));
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetCandidateConfigsManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetCandidateConfigsManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetCandidateConfigsManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -581,13 +581,13 @@ export function testConnectToCandidateConfigManager() {
       message = "connectToCandidateConfig 调用成功"
       console.log(TAG , "connectToCandidateConfig 调用成功")
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testConnectToCandidateConfigManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testConnectToCandidateConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testConnectToCandidateConfigManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -605,13 +605,13 @@ export function testConnectToNetworkManager() {
       message = "ConnectToNetwork 调用成功"
       console.log(TAG , "connectToCandidateConfig 调用成功")
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testConnectToNetworkManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testConnectToNetworkManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testConnectToNetworkManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -629,13 +629,13 @@ export function testConnectToDeviceManager() {
       message = "connectToDevice 调用成功"
       console.log(TAG , "connectToDevice 调用成功")
     }
-    prompt.showToast({ message : message })
-    console.log(TAG , LogDataManager.testConnectToNetworkManager_EndLog)
+    promptAction.showToast({ message : message })
+    console.log(TAG , LogDataManager.testConnectToDeviceManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testConnectToDeviceManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testConnectToDeviceManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -652,13 +652,13 @@ export function testDisconnectManager() {
       message = "disconnect 调用成功"
       console.log(TAG , "disconnect 调用成功")
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testDisconnectManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testDisconnectManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testDisconnectManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -676,13 +676,13 @@ export function testGetSignalLevelManager() {
       message = "getSignalLevel is: " + number
       console.log(TAG , "getSignalLevel is: " + number)
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetSignalLevelManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetSignalLevelManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetSignalLevelManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -698,18 +698,18 @@ export function testGetLinkedInfoManagerPromise() {
         console.log(TAG , LogDataManager.testGetLinkedInfoPromiseManager_successfulLog)
         message = "get wifi linked info: " + JSON.stringify(data)
         console.log(TAG , "get wifi linked info: " + JSON.stringify(data));
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testGetLinkedInfoPromiseManager_EndLog);
       }).catch((err: BusinessError) => {
         console.log(TAG , "get linked info error:" + JSON.stringify(err));
       });
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetLinkedInfoManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetLinkedInfoManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -725,7 +725,7 @@ export function testGetLinkedInfoManagerCallback() {
         if ( err ) {
           console.error("get linked info error");
           message = "get linked info error"
-          prompt.showToast({ message : message })
+          promptAction.showToast({ message : message })
         }
         console.log(TAG , LogDataManager.testGetLinkedInfoCallbackManager_successfulLog)
         console.log(TAG , "get wifi linked info: " + JSON.stringify(data));
@@ -740,16 +740,16 @@ export function testGetLinkedInfoManagerCallback() {
         AppStorage.setOrCreate("w_rssi1" , rssi)
         AppStorage.setOrCreate("w_band1" , band)
         AppStorage.setOrCreate("w_networkIdM" , networkId)
-        prompt.showToast({ message : message })
+        promptAction.showToast({ message : message })
         console.log(TAG , LogDataManager.testGetLinkedInfoCallbackManager_EndLog);
       });
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetLinkedInfoManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetLinkedInfoManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -764,13 +764,13 @@ export function testIsConnectedManager() {
       let ret = wifiManager.isConnected()
       message = "isConnected: " + ret
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testIsConnectedManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testIsConnectedManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testIsConnectedManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -785,13 +785,13 @@ export function testGetSupportedFeaturesManager() {
       let ret = wifiManager.getSupportedFeatures()
       message = "GetSupportedFeatures: " + ret
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetSupportedFeaturesManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetSupportedFeaturesManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetSupportedFeaturesManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -807,13 +807,13 @@ export function testIsFeatureSupportedManager() {
       let ret = wifiManager.isFeatureSupported(featureId)
       message = "isFeatureSupported: " + ret
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetSupportedFeaturesManager_EndLog)
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testIsFeatureSupportedManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testIsFeatureSupportedManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -828,13 +828,13 @@ export function testGetDeviceMacAddressManager() {
       let macAddress = wifiManager.getDeviceMacAddress()
       message = "macAddress: " + macAddress
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetDeviceMacAddressManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetDeviceMacAddressManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetDeviceMacAddressManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -851,13 +851,13 @@ export function testGetIpInfoManager() {
       let ipInfoManagerMessage = IpInfo
       AppStorage.setOrCreate("ipInfoManagerMessage" , ipInfoManagerMessage)
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetIpInfoManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetIpInfoManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetIpInfoManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -868,13 +868,13 @@ export function testGetIpv6Info() {
     console.log(TAG , LogDataManager.testGetCountryCodeManager_StartLog);
     let ret: wifiManager.Ipv6Info = wifiManager.getIpv6Info()
     message = "Ipv6Info: " + ret
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetCountryCodeManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -889,13 +889,13 @@ export function testGetCountryCodeManager() {
       let ret = wifiManager.getCountryCode()
       message = "CountryCode is: " + ret
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetCountryCodeManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -912,13 +912,13 @@ export function testReassociateManager() {
       //      message = "reassociate is: " + ret
       message = "reassociate 调用成功"
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testReassociateManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testReassociateManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testReassociateManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -934,13 +934,13 @@ export function testReconnectManager() {
       //      reconnect的返回值为void
       message = "reconnect 调用成功"
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testReConnectManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testReconnectManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testReconnectManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -957,13 +957,13 @@ export function testGetDeviceConfigsManager() {
       let getDeviceConfigsManagerMessage = JSON.stringify(array)
       AppStorage.setOrCreate("getDeviceConfigsManagerMessage" , getDeviceConfigsManagerMessage)
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testGetDeviceConfigsManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testGetDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -979,13 +979,13 @@ export function testUpdateDeviceConfigManager() {
       let ret: number = wifiManager.updateNetwork(wifiDeviceConfigManager)
       message = "updateNetwork: " + ret
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testUpdateNetworkManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testUpdateDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testUpdateDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1003,13 +1003,13 @@ export function testDisableDeviceConfigManager() {
       message = "disableNetwork: " + ret
       message = "disableNetwork 调用成功"
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testDisableNetworkManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testDisableDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testDisableDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1026,13 +1026,13 @@ export function testRemoveAllDeviceConfigsManager() {
       message = "removeAllNetwork: " + ret
       message = "removeAllDeviceConfigs 调用成功"
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testRemoveAllNetworkManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testRemoveAllDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveAllDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1050,13 +1050,13 @@ export function testRemoveDeviceConfigManager() {
       //      message = "removeDevice " + ret
       message = "removeDeviceConfig 调用成功"
     }
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testRemoveDeviceManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1075,13 +1075,13 @@ export function testGet5GChannelList() {
     let message = ''
     let ret = wifiManager.get5GChannelList()
     message = "get5GChannelList:" + ret
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testRemoveDeviceManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1091,13 +1091,13 @@ export function testGetDisconnectedReason() {
     let message = ''
     let ret = wifiManager.getDisconnectedReason()
     message = "DisconnectedReason:" + ret
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testRemoveDeviceManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1107,13 +1107,13 @@ export function testStartPortalCertification() {
     let message = ''
     wifiManager.startPortalCertification()
     message = "startPortalCertification 调用成功"
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testRemoveDeviceManager_EndLog);
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1126,7 +1126,7 @@ export function testOnWifiStateChangeManager() {
     console.log(TAG , LogDataManager.testOnWifiStateChangeManager_StartLog);
     if ( wifiStateChangeManager ) {
       wifiManager.off("wifiStateChange" , () => {
-        prompt.showToast({ message : "on.WifiStateChange监听已关闭" })
+        promptAction.showToast({ message : "on.WifiStateChange监听已关闭" })
       })
       message = "关闭注册WLAN状态改变事件"
     } else {
@@ -1149,18 +1149,18 @@ export function testOnWifiStateChangeManager() {
             wifiStateMessage = '未知状态';
             break;
         }
-        prompt.showToast({ message : "状态:" + wifiStateMessage })
+        promptAction.showToast({ message : "状态:" + wifiStateMessage })
         console.log(TAG , LogDataManager.testOnWifiStateChangeManager_EndLog);
       })
       message = "打开注册WLAN状态变化"
-      prompt.showToast({ message : message })
+      promptAction.showToast({ message : message })
     }
     wifiStateChangeManager = !wifiStateChangeManager
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testOnWifiStateChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnWifiStateChangeManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1177,7 +1177,7 @@ export function testOnWifiConnectionChangeManager() {
     }
     if ( wifiConnectionChangeManager ) {
       wifiManager.off("wifiConnectionChange" , () => {
-        prompt.showToast({ message : "on.wifiConnectionChange监听已关闭" })
+        promptAction.showToast({ message : "on.wifiConnectionChange监听已关闭" })
       })
       message = "关闭WLAN连接状态改变事件"
     } else {
@@ -1194,18 +1194,18 @@ export function testOnWifiConnectionChangeManager() {
             wifiConnectionMessage = '未知状态';
             break;
         }
-        prompt.showToast({ message : "状态: " + wifiConnectionMessage })
+        promptAction.showToast({ message : "状态: " + wifiConnectionMessage })
         console.log(TAG , LogDataManager.testOnWifiConnectionChangeManager_EndLog);
       })
       message = "打开注册WLAN连接状态变化"
-      prompt.showToast({ message : message })
+      promptAction.showToast({ message : message })
     }
     wifiConnectionChangeManager = !wifiConnectionChangeManager
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testOnWifiConnectionChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnWifiConnectionChangeManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1222,7 +1222,7 @@ export function testOnWifiScanStateChangeManager() {
     }
     if ( wifiScanStateChangeManager ) {
       wifiManager.off("wifiScanStateChange" , () => {
-        prompt.showToast({ message : "on.wifiScanStateChange监听已关闭" })
+        promptAction.showToast({ message : "on.wifiScanStateChange监听已关闭" })
       })
       message = "关闭扫描状态改变事件"
     } else {
@@ -1239,18 +1239,18 @@ export function testOnWifiScanStateChangeManager() {
             wifiScanStateMessage = '未知状态';
             break;
         }
-        prompt.showToast({ message : "状态: " + wifiScanStateMessage })
+        promptAction.showToast({ message : "状态: " + wifiScanStateMessage })
         console.log(TAG , LogDataManager.testOnWifiScanStateChangeManager_EndLog);
       })
       message = "打开注册扫描状态变化"
-      prompt.showToast({ message : message })
+      promptAction.showToast({ message : message })
     }
     wifiScanStateChangeManager = !wifiScanStateChangeManager
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testOnWifiScanStateChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnWifiScanStateChangeManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1267,23 +1267,23 @@ export function testOnWifiRssiChangeManager() {
     }
     if ( wifiRssiChangeManager ) {
       wifiManager.off("wifiRssiChange" , () => {
-        prompt.showToast({ message : "on.wifiRssiChange监听已关闭" })
+        promptAction.showToast({ message : "on.wifiRssiChange监听已关闭" })
       })
       message = "关闭RSSI状态变化事件"
     } else {
       wifiManager.on("wifiRssiChange" , (number) => {
-        prompt.showToast({ message : "rssi: " + number })
+        promptAction.showToast({ message : "rssi: " + number })
       })
       message = "打开注册RSSI状态变化"
       console.log(TAG , LogDataManager.testOnWifiRssiChangeManager_EndLog);
-      prompt.showToast({ message : message })
+      promptAction.showToast({ message : message })
     }
     wifiRssiChangeManager = !wifiRssiChangeManager
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testOnWifiRssiChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnWifiRssiChangeManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1300,7 +1300,7 @@ export function testOnStreamChangeManager() {
     }
     if ( streamChangeManager ) {
       wifiManager.off("streamChange" , () => {
-        prompt.showToast({ message : "on.streamChange监听已关闭" })
+        promptAction.showToast({ message : "on.streamChange监听已关闭" })
       })
       message = "关闭注册流改变事件"
     } else {
@@ -1323,18 +1323,18 @@ export function testOnStreamChangeManager() {
             streamChangeMessage = '未知状态';
             break;
         }
-        prompt.showToast({ message : "状态:" + streamChangeMessage })
+        promptAction.showToast({ message : "状态:" + streamChangeMessage })
         console.log(TAG , LogDataManager.testOnStreamChangeManager_EndLog);
       })
       message = "打开注册流变化"
-      prompt.showToast({ message : message })
+      promptAction.showToast({ message : message })
     }
     streamChangeManager = !streamChangeManager
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testOnStreamChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnStreamChangeManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }
@@ -1352,7 +1352,7 @@ export function testOnDeviceConfigChangeManager() {
     }
     if ( deviceConfigChange ) {
       wifiManager.off("deviceConfigChange" , () => {
-        prompt.showToast({ message : "on.deviceConfigChange监听已关闭" })
+        promptAction.showToast({ message : "on.deviceConfigChange监听已关闭" })
       })
       message = "关闭注册设备配置改变事件"
     } else {
@@ -1372,18 +1372,18 @@ export function testOnDeviceConfigChangeManager() {
             deviceConfigMessage = '未知状态';
             break;
         }
-        prompt.showToast({ message : "状态:" + deviceConfigMessage })
+        promptAction.showToast({ message : "状态:" + deviceConfigMessage })
         console.log(TAG , LogDataManager.testOnDeviceConfigChangeManager_EndLog);
       })
       message = "打开注册设备配置变化"
-      prompt.showToast({ message : message })
+      promptAction.showToast({ message : message })
     }
     deviceConfigChange = !deviceConfigChange
     return message
   } catch( e ) {
     console.log(TAG , `Failed to testOnDeviceConfigChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnDeviceConfigChangeManager. message: ${ e.message }, code: ${ e.code }`
-    prompt.showToast({ message : message })
+    promptAction.showToast({ message : message })
     return message
   }
 }

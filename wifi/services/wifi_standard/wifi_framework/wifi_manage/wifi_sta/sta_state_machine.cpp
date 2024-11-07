@@ -19,7 +19,6 @@
 #include "sta_state_machine.h"
 #include "if_config.h"
 #include "ip_tools.h"
-#include "log_helper.h"
 #include "mac_address.h"
 #include "sta_monitor.h"
 #include "wifi_common_util.h"

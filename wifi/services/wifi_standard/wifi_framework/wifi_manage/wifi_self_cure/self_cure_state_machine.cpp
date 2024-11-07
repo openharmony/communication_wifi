@@ -46,7 +46,6 @@ DEFINE_WIFILOG_LABEL("SelfCureStateMachine");
 const uint32_t CONNECT_NETWORK_RETRY = 1;
 const uint32_t WIFI_SINGLE_ITEM_BYTE_LEN = 8;
 const uint32_t WIFI_SINGLE_MAC_LEN = 6;
-const uint32_t HEXADECIMAL = 16;
 const uint32_t WIFI_MAX_BLA_LIST_NUM = 16;
 const uint32_t DHCP_OFFER_COUNT = 2;
 const int CMD_WIFI_CONNECT_TIMEOUT_SCREEN = 8 * 1000;

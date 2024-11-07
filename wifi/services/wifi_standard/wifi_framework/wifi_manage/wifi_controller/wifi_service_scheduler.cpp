@@ -470,6 +470,14 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
+
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("get selfcure service failed");
+        return WIFI_OPT_FAILED;
+    }
+    pService->SetSelfCureService(pSelfCureService);
+
 #endif
     WIFI_LOGI("StartWifiStaService instId%{public}d successful", instId);
     return WIFI_OPT_SUCCESS;
@@ -582,11 +590,15 @@ ErrCode WifiServiceScheduler::StartWifiProService(int instId)
 #ifdef FEATURE_SELF_CURE_SUPPORT
 ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
 {
+    if (IsFactoryMode()) {
+        WIFI_LOGI("factory mode, not start self cure");
+        return WIFI_OPT_FAILED;
+    }
     char preValue[WIFI_SELFCURE_PROP_SIZE] = {0};
     int errorCode = GetParamValue(WIFI_SELFCURE_PROP_CONFIG, "true", preValue, WIFI_SELFCURE_PROP_SIZE);
     if ((errorCode > 0) && (strcmp(preValue, "false") == 0)) {
         WIFI_LOGI("due to disable selfcure, not start selfcure service");
-        return WIFI_OPT_SUCCESS;
+        return WIFI_OPT_FAILED;
     }
 
     if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SELFCURE) < 0) {

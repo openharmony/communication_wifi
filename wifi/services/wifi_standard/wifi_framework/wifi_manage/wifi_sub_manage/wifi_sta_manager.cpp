@@ -176,23 +176,6 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
     return;
 }
 
-bool WifiStaManager::IgnoreConnStateChange(OperateResState state, int instId)
-{
-    WIFI_LOGD("enter IgnoreConnStateChange");
-#ifdef FEATURE_SELF_CURE_SUPPORT
-    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
-    if (pSelfCureService == nullptr) {
-        WIFI_LOGE("%{public}s: pSelfCureService is null.", __FUNCTION__);
-        return false;
-    }
-    if (pSelfCureService->IsSelfCureOnGoing() && state != OperateResState::CONNECT_AP_CONNECTED) {
-        WIFI_LOGI("selfcure is working, ignore network state changed");
-        return true;
-    }
-#endif
-    return false;
-}
-
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     WIFI_LOGD("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
@@ -200,15 +183,9 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
     }
-    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
-    if (pSelfCureService != nullptr) {
-        if (state == OperateResState::CONNECT_AP_CONNECTED || state == OperateResState::DISCONNECT_DISCONNECTED) {
-            pSelfCureService->CheckSelfCureWifiResult(SCE_EVENT_NET_INFO_CHANGED);
-        }
-    }
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
-    if (isReport && !IgnoreConnStateChange(state, instId)) {
+    if (isReport) {
         WifiEventCallbackMsg cbMsg;
         cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
         cbMsg.msgData = reportStateNum;
@@ -216,7 +193,18 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         cbMsg.id = instId;
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
-    NotifyScanServiceConnChanged(state, instId);
+    if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||
+        state == OperateResState::DISCONNECT_DISCONNECTING || state == OperateResState::DISCONNECT_DISCONNECTED ||
+        state == OperateResState::CONNECT_OBTAINING_IP || state == OperateResState::CONNECT_ASSOCIATING ||
+        state == OperateResState::CONNECT_ASSOCIATED || state == OperateResState::CONNECT_NETWORK_ENABLED ||
+        state == OperateResState::CONNECT_NETWORK_DISABLED || state == OperateResState::SPECIAL_CONNECTED) {
+        if (WifiConfigCenter::GetInstance().GetScanMidState(instId) == WifiOprMidState::RUNNING) {
+            IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
+            if (pService != nullptr) {
+                pService->OnClientModeStatusChanged(static_cast<int>(state));
+            }
+        }
+    }
     PublishWifiOperateStateHiSysEvent(state);
     if (info.connState == ConnState::AUTHENTICATING) {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
@@ -241,18 +229,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
 
 void WifiStaManager::NotifyScanServiceConnChanged(OperateResState state, int instId)
 {
-    if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||
-        state == OperateResState::DISCONNECT_DISCONNECTING || state == OperateResState::DISCONNECT_DISCONNECTED ||
-        state == OperateResState::CONNECT_OBTAINING_IP || state == OperateResState::CONNECT_ASSOCIATING ||
-        state == OperateResState::CONNECT_ASSOCIATED || state == OperateResState::CONNECT_NETWORK_ENABLED ||
-        state == OperateResState::CONNECT_NETWORK_DISABLED || state == OperateResState::SPECIAL_CONNECTED) {
-        if (WifiConfigCenter::GetInstance().GetScanMidState(instId) == WifiOprMidState::RUNNING) {
-            IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
-            if (pService != nullptr) {
-                pService->OnClientModeStatusChanged(static_cast<int>(state));
-            }
-        }
-    }
+
 }
 
 void WifiStaManager::DealWpsChanged(WpsStartState state, const int pinCode, int instId)

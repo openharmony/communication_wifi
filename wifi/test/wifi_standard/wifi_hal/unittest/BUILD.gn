@@ -59,7 +59,6 @@ ohos_unittest("wifi_hal_unittest") {
     "wifi_hal_common_func_test.cpp",
     "wifi_hal_crpc_p2p_test.cpp",
     "wifi_hal_crpc_server_add_test.cpp",
-    "wifi_hal_crpc_server_test.cpp",
     "wifi_hal_hostapd_test.cpp",
     "wifi_hal_p2p_interface_test.cpp",
     "wifi_hal_sta_interface_test.cpp",

@@ -141,6 +141,12 @@ public:
     virtual bool IsWideBandwidthSupported() = 0;
 
     /**
+     * @Description Check if custom network
+     *
+     * @return true or false
+     */
+    virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
+    /**
      * @Description Register P2pEnhance state Callback
      *
      * @param p2pEnhanceCallback - callback
@@ -154,12 +160,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode UnRegisterP2pEnhanceCallback() = 0;
-    /**
-     * @Description Check if custom network
-     *
-     * @return true or false
-     */
-    virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
 
     /**
      * @Description Check Enhance Vap Available
@@ -178,7 +178,7 @@ public:
      */
     virtual ErrCode Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType, char cfgData[CFG_DATA_MAX_BYTES],
         int* getDatValidLen) = 0;
- 
+
     /**
      * @Description set the peer wifi configuration information
      *

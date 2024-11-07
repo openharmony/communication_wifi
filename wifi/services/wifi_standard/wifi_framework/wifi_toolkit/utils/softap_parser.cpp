@@ -82,7 +82,7 @@ void SoftapXmlParser::ParseSoftap(xmlNodePtr innode)
             }
             case HotspotConfigType::PASSPHRASE: {
                 hotspotConfig.SetPreSharedKey(GetStringValue(node));
-                WIFI_LOGI("PreSharedKey is %{public}s", SsidAnonymize(hotspotConfig.GetPreSharedKey()).c_str());
+                WIFI_LOGI("PreSharedKey is %{public}s", PassWordAnonymize(hotspotConfig.GetPreSharedKey()).c_str());
                 break;
             }
             default: {

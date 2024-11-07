@@ -40,7 +40,8 @@ constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int SIX = 6;
 
 MockPendant *pMockPendant = new MockPendant();
-std::shared_ptr<ApService> pApService = std::make_shared<ApService>(pMockPendant->GetMockApStateMachine());
+std::shared_ptr<ApService> pApService = std::make_shared<ApService>(pMockPendant->GetMockApStateMachine(),
+    pMockPendant->GetMockApStartedState());
 std::shared_ptr<ApIdleState> pApIdleState = std::make_shared<ApIdleState>(pMockPendant->GetMockApStateMachine());
 std::shared_ptr<ApInterface> pApInterface = std::make_shared<ApInterface>();
 std::shared_ptr<ApConfigUse> pApConfigUse = std::make_shared<ApConfigUse>();

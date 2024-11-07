@@ -267,8 +267,8 @@ static void GetScanInfo(WifiScanInfo &info, std::vector<std::string> &tokens, in
         }
         info.infoElems.push_back(elem);
     }
-    info.features = CheckDataLegall(tokens[dataRecvLen++]);
-    info.timestamp = CheckDataLegall(tokens[dataRecvLen++]);
+    info.features = CheckDataTolonglong(tokens[dataRecvLen++]);
+    info.timestamp = CheckDataTolonglong(tokens[dataRecvLen++]);
     info.wifiStandard = CheckDataLegal(tokens[dataRecvLen++]);
     info.maxSupportedRxLinkSpeed = CheckDataLegal(tokens[dataRecvLen++]);
     info.maxSupportedTxLinkSpeed = CheckDataLegal(tokens[dataRecvLen++]);

@@ -686,7 +686,7 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
         return;
     }
     std::string type = notifyParam.substr(0, begPos);
-    int num = stoi(type);
+    int num = CheckDataLegal(type);
     switch (num) {
         case static_cast<int>(WpaEventCallback::CSA_CHSWITCH_NUM): {
             std::string::size_type freqPos = 0;
@@ -695,7 +695,7 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
                 return;
             }
             std::string data = notifyParam.substr(freqPos + strlen("freq="));
-            int freq = stoi(data);
+            int freq = CheckDataLegal(data);
             WpaEventP2pChannelSwitch(freq);
             break;
         }

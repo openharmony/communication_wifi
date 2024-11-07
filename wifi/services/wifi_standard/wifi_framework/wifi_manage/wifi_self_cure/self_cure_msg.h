@@ -142,6 +142,7 @@ enum SelfCureState {
 
 constexpr int32_t SCE_EVENT_WIFI_STATE_CHANGED = 101;
 constexpr int32_t SCE_EVENT_NET_INFO_CHANGED = 102;
+constexpr int32_t SCE_EVENT_CONN_CHANGED = 103;
 
 constexpr int32_t SCE_WIFI_STATUS_ABORT = -3;
 constexpr int32_t SCE_WIFI_STATUS_FAIL = -1;

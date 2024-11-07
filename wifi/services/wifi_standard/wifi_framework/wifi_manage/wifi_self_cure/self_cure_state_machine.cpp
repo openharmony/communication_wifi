@@ -899,7 +899,7 @@ int SelfCureStateMachine::InternetSelfCureState::InitSelfCureIssHandleMap()
         this->HandleNetworkDisconnected(msg);
     };
     selfCureIssHandleFuncMap[WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM] = [this](InternalMessagePtr msg) {
-        this->HandleInternetRecovery(msg);
+        this->HandleInternetRecoveryConfirm(msg);
     };
     selfCureIssHandleFuncMap[WIFI_CURE_NOTIFY_RSSI_LEVEL_CHANGED_EVENT] = [this](InternalMessagePtr msg) {
         this->HandleRssiChangedEvent(msg);
@@ -965,15 +965,14 @@ void SelfCureStateMachine::InternetSelfCureState::HandleNetworkDisconnected(Inte
     return;
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecovery(InternalMessagePtr msg)
+void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecoveryConfirm(InternalMessagePtr msg)
 {
-    WIFI_LOGD("enter HandleInternetRecovery.");
-    if (msg == nullptr) {
-        WIFI_LOGE("msg is nullptr.");
-        return;
-    }
-    if (pSelfCureStateMachine->selfCureOnGoing) {
-        HandleInternetRecoveryConfirm();
+    pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(selfCureHistoryInfo, currentSelfCureLevel, true);
+    bool success = ConfirmInternetSelfCure(currentSelfCureLevel);
+    if (success) {
+        currentSelfCureLevel = WIFI_CURE_RESET_LEVEL_IDLE;
+        selfCureFailedCounter = 0;
+        hasInternetRecently = true;
     }
     return;
 }
@@ -1461,8 +1460,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureResultFailed(Int
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int requestCureLevel)
 {
-    if ((currentRssi < MIN_VAL_LEVEL_3) || pSelfCureStateMachine->IfP2pConnected() ||
-        pSelfCureStateMachine->p2pEnhanceConnected_) {
+    if ((currentRssi < MIN_VAL_LEVEL_3) || pSelfCureStateMachine->IfP2pConnected()) {
         pSelfCureStateMachine->selfCureOnGoing = false;
         delayedReassocSelfCure = true;
         return;
@@ -1603,17 +1601,6 @@ void SelfCureStateMachine::InternetSelfCureState::HandleIpConfigCompletedAfterRe
     pSelfCureStateMachine->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM, IP_CONFIG_CONFIRM_DELAYED_MS);
 }
 
-void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecoveryConfirm()
-{
-    pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(selfCureHistoryInfo, currentSelfCureLevel, true);
-    bool success = ConfirmInternetSelfCure(currentSelfCureLevel);
-    if (success) {
-        currentSelfCureLevel = WIFI_CURE_RESET_LEVEL_IDLE;
-        selfCureFailedCounter = 0;
-        hasInternetRecently = true;
-    }
-}
-
 void SelfCureStateMachine::InternetSelfCureState::resetDnses(std::vector<std::string>& dnses)
 {
     if ((!dnses[0].empty()) || (!dnses[1].empty())) {
@@ -1655,6 +1642,7 @@ bool SelfCureStateMachine::InternetSelfCureState::ConfirmInternetSelfCure(int cu
 
 void SelfCureStateMachine::InternetSelfCureState::HandleConfirmInternetSelfCureFailed(int currentCureLevel)
 {
+    pSelfCureStateMachine->selfCrueOnGoing = false;
     if (currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS && pSelfCureStateMachine->internetUnknown) {
         resetDnses(AssignedDnses);
     }
@@ -3364,7 +3352,11 @@ bool SelfCureStateMachine::CheckSelfCureWifiResult(int event)
         return false;
     }
     selfCureWifiLastState_ = wifiState;
+    return CheckSelfCureWifiResult(event, wifiState);
+}
 
+bool SelfCureStateMachine::CheckSelfCureState(int event,  WifiState wifiState)
+{
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info);
     if ((event == SCE_EVENT_NET_INFO_CHANGED) && (selfCureNetworkLastState_ == info.detailedState)) {
@@ -3372,11 +3364,6 @@ bool SelfCureStateMachine::CheckSelfCureWifiResult(int event)
         return false;
     }
     selfCureNetworkLastState_ = info.detailedState;
-    return CheckSelfCureWifiResult(event, wifiState);
-}
-
-bool SelfCureStateMachine::CheckSelfCureState(int event,  WifiState wifiState)
-{
     bool retValue = true;
     switch (selfCureState_) {
         case SelfCureState::SCE_WIFI_OFF_STATE:
@@ -3503,13 +3490,13 @@ void SelfCureStateMachine::SetSelfCureWifiTimeOut(SelfCureState wifiSelfCureStat
             WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_ON_TIMEOUT");
             MessageExecutedLater(WIFI_CURE_RESET_ON_TIMEOUT, WIFI_CURE_ON_TIMEOUT_MS);
             break;
-        case SelfCureState::SCE_WIFI_CONNECT_STATE:
+        case SelfCureState::SCE_WIFI_REASSOC_STATE:
             WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_REASSOC_TIMEOUT");
             MessageExecutedLater(WIFI_CURE_REASSOC_TIMEOUT, WIFI_CURE_REASSOC_TIMEOUT_MS);
             break;
-        case SelfCureState::SCE_WIFI_REASSOC_STATE: {
+        case SelfCureState::SCE_WIFI_CONNECT_STATE: {
             WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_CONNECT_TIMEOUT");
-            int delayMs = WIFI_CURE_CONNECT_TIMEOUT_MS;
+            int32_t delayMs = WIFI_CURE_CONNECT_TIMEOUT_MS;
             if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
                 delayMs += WIFI_CURE_CONNECT_TIMEOUT_MS;
             }
@@ -3555,6 +3542,7 @@ void SelfCureStateMachine::ResetSelfCureParam()
     selfCureNetworkLastState_ = DetailedState::IDLE;
     selfCureWifiLastState_ = WifiState::UNKNOWN;
     connectNetworkRetryCnt = 0;
+    selfCureOnGoing = false;
     WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
     StopTimer(WIFI_CURE_RESET_OFF_TIMEOUT);
     StopTimer(WIFI_CURE_RESET_ON_TIMEOUT);

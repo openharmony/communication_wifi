@@ -234,7 +234,7 @@ public:
         void HandleInternetFailedSelfCure(InternalMessagePtr msg);
         void HandleSelfCureWifiLink(InternalMessagePtr msg);
         void HandleNetworkDisconnected(InternalMessagePtr msg);
-        void HandleInternetRecovery(InternalMessagePtr msg);
+        void HandleInternetRecoveryConfirm(InternalMessagePtr msg);
         void HandleRssiChangedEvent(InternalMessagePtr msg);
         void HandleP2pDisconnected(InternalMessagePtr msg);
         void HandlePeriodicArpDetecte(InternalMessagePtr msg);
@@ -250,7 +250,6 @@ public:
         void SelfCureForReset(int requestCureLevel);
         void HandleIpConfigCompleted();
         void HandleIpConfigCompletedAfterRenewDhcp();
-        void HandleInternetRecoveryConfirm();
         bool ConfirmInternetSelfCure(int currentCureLevel);
         void HandleConfirmInternetSelfCureFailed(int currentCureLevel);
         void HandleInternetFailedAndUserSetStaticIp(int internetFailedType);

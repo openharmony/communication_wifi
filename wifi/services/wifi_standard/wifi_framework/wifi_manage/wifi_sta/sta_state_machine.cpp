@@ -316,6 +316,14 @@ void StaStateMachine::UnRegisterStaServiceCallback(const StaServiceCallback &cal
 
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
+    if (selfCureService_ != nullptr) {
+        selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_CONN_CHANGED);
+        if (selfCureService_->IsSelfCureOnGoing() && (info.detailedState != DetailedState::CONNECTED)) {
+            WIFI_LOGW("selfcure ignore Connnect state changed");
+            return;
+        }
+    }
+
     {
         std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
         for (const auto &callBackItem : m_staCallback) {
@@ -2829,11 +2837,14 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
     /* Save linkedinfo */
     pStaStateMachine->linkedInfo.networkId = pStaStateMachine->targetNetworkId;
     pStaStateMachine->linkedInfo.bssid = bssid;
+    pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
+
 #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
-    WifiConfigCenter::GetInstance().SaveLinkedInfo(
-        pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
+    if (pStaStateMachine->selfCureService_ != nullptr) {
+        pStaStateMachine->selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_CONN_CHANGED);
+    }
 }
 
 void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessagePtr msg)
@@ -4789,6 +4800,11 @@ void StaStateMachine::SetSupportedWifiCategory()
 void StaStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
     enhanceService_ = enhanceService;
+}
+
+void StaStateMachine::SetSelfCureService(ISelfCureService *selfCureService)
+{
+    selfCureService_ = selfCureService;
 }
 #endif
 } // namespace Wifi

@@ -47,6 +47,7 @@ namespace Wifi {
 #endif
 
 constexpr int INVALID_FREQ_OR_CHANNEL = -1;
+const uint32_t DECIMAL_NOTATION = 10;
 
 /* StaCallBackNameEventIdMap */
 static std::map<std::string, int> g_staCallBackNameEventIdMap = {
@@ -288,8 +289,11 @@ std::string EncodeBase64(const std::vector<uint8_t> &input);
 std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter);
 std::string HexToString(const std::string &str);
 std::string StringToHex(const std::string &data);
-int CheckDataLegal(std::string &data);
-long long CheckDataLegall(std::string &data);
+int CheckDataLegal(std::string &data, int base = DECIMAL_NOTATION);
+int CheckDataLegalBin(const std::string &data);
+int CheckDataLegalHex(const std::string &data);
+unsigned int CheckDataToUint(std::string &data, int base = DECIMAL_NOTATION);
+long long CheckDataTolonglong(std::string &data, int base = DECIMAL_NOTATION);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

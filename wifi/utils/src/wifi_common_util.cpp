@@ -620,6 +620,28 @@ std::string StringToHex(const std::string &data)
     return ss.str();
 }
 
+int CheckDataLegalBin(const std::string &data)
+{
+    if (data.empty() || data.size() > MAX_INT32_LENGTH_BIN) {
+        WIFI_LOGE("CheckDataLegalBin: invalid data:%{private}s", data.c_str());
+        return 0;
+    }
+ 
+    std::regex pattern("[0-1]+");
+    if (!std::regex_match(data, pattern)) {
+        return 0;
+    }
+    errno = 0;
+    char *endptr = nullptr;
+    long int num = std::strtol(data.c_str(), &endptr, BASE_BIN);
+    if (errno == ERANGE) {
+        WIFI_LOGE("CheckDataLegalBin errno == ERANGE, data:%{private}s", data.c_str());
+        return 0;
+    }
+ 
+    return static_cast<int>(num);
+}
+
 int CheckDataLegalHex(const std::string &data)
 {
     if (data.empty() || data.size() > MAX_INT32_LENGTH_HEX) {

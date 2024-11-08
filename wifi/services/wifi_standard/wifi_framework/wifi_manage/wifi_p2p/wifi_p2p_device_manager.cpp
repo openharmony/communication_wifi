@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 void WifiP2pDeviceManager::Initialize()
 {}
 
@@ -127,6 +126,7 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
             it->SetDeviceCapabilitys(device.GetDeviceCapabilitys());
             it->SetGroupCapabilitys(device.GetGroupCapabilitys());
             it->SetGroupAddress(device.GetGroupAddress());
+            it->SetWfdInfo(device.GetWfdInfo());
             return true;
         }
     }
@@ -249,5 +249,39 @@ const std::string WifiP2pDeviceManager::GetDeviceName(const std::string &deviceA
     WifiP2pDevice device = GetDevices(deviceAddress);
     return device.IsValid() ? device.GetDeviceName() : deviceAddress;
 }
+#include "wpa_hw_p2p_chr.h"
+#endif
+ 
++#ifdef CONFIG_WIFI_RPT
+#define DEFAULT_RPT_ID -3
++#endif
+static void p2p_state_timeout(void *eloop_ctx, void *timeout_ctx);
+
+wpa_supplicant-2.9_standard/src/p2p/p2p.c
+p2p_init
+#ifdef OPEN_HARMONY_P2P_ONEHOP_FIND
+	p2p->pvt_p2p_service = P2P_NORMAL_FIND;
+#endif
++#ifdef CONFIG_WIFI_RPT
+	p2p->p2p_rpt_net_id = DEFAULT_RPT_ID;
++#endif
+	return p2p;
+
+wpa_supplicant-2.9_standard/wpa_supplicant/ctrl_iface.c
+
+#define DISCOVER_CHANNELID 20000
+ 
++#ifdef CONFIG_WIFI_RPT
+#define DEDAULT_RPT_ID -3
++#endif
+ 
+static int wpa_supplicant_global_iface_list(struct wpa_global *global,
+p2p_ctrl_group_add
+int ret = wpas_p2p_group_add(wpa_s, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		if (ret < 0) {
+			p2p->p2p_rpt = false;
+			+p2p->p2p_rpt_net_id = DEFAULT_RPT_ID;
+		}
+		return ret;
 }  // namespace Wifi
 }  // namespace OHOS

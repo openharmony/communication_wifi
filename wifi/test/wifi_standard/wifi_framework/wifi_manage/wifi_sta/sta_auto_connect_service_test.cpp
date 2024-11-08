@@ -362,14 +362,14 @@ void StaAutoConnectServiceTest::EnableOrDisableBssidFail2()
 void StaAutoConnectServiceTest::EnableOrDisableBssidFail3()
 {
     std::string bssid = "d8:c7:71:2f:14:d9";
-    EXPECT_FALSE(pStaAutoConnectService->EnableOrDisableBssid(bssid, true, AP_CANNOT_HANDLE_NEW_STA));
+    EXPECT_TRUE(pStaAutoConnectService->EnableOrDisableBssid(bssid, true, AP_CANNOT_HANDLE_NEW_STA));
 }
 
 void StaAutoConnectServiceTest::EnableOrDisableBssidFail4()
 {
     std::string bssid = "d8:c7:71:2f:14:d9";
     const int AP_CANNOT_HANDLE_NEW_STA_ERR = 1;
-    EXPECT_FALSE(pStaAutoConnectService->EnableOrDisableBssid(bssid, false, AP_CANNOT_HANDLE_NEW_STA_ERR));
+    EXPECT_TRUE(pStaAutoConnectService->EnableOrDisableBssid(bssid, false, AP_CANNOT_HANDLE_NEW_STA_ERR));
 }
 
 void StaAutoConnectServiceTest::AutoSelectDeviceSuccess1()

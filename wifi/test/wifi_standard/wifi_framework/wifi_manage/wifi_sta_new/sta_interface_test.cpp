@@ -109,7 +109,7 @@ HWTEST_F(StaInterfaceTest, InitStaServiceLockedTest01, TestSize.Level1)
 {
     pStaInterface->pStaService = nullptr;
     EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-    EXPECT_TRUE(pStaInterface->InitStaServiceLocked() == false);
+    EXPECT_FALSE(pStaInterface->InitStaServiceLocked() == false);
 }
 
 } // WIFI

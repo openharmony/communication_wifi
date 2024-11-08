@@ -543,13 +543,13 @@ public:
     void HandleInternetRecoveryTest()
     {
         LOGI("Enter HandleInternetRecoveryTest");
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecovery(nullptr);
+        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm(nullptr);
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM);
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecovery(msg);
+        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm(msg);
 
         pSelfCureStateMachine->selfCureOnGoing = true;
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecovery(msg);
+        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm(msg);
         EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
@@ -923,20 +923,6 @@ public:
     {
         LOGI("Enter HandleIpConfigCompletedAfterRenewDhcpTest");
         pSelfCureStateMachine->pInternetSelfCureState->HandleIpConfigCompletedAfterRenewDhcp();
-        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
-    }
-
-    void HandleInternetRecoveryConfirmTest()
-    {
-        LOGI("Enter HandleInternetRecoveryConfirmTest");
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm();
-        pSelfCureStateMachine->pInternetSelfCureState->currentSelfCureLevel = WIFI_CURE_RESET_LEVEL_IDLE;
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm();
-
-        pSelfCureStateMachine->pInternetSelfCureState->currentSelfCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
-        pSelfCureStateMachine->mIsHttpReachable = true;
-        pSelfCureStateMachine->internetUnknown = true;
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm();
         EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
@@ -2106,11 +2092,6 @@ HWTEST_F(SelfCureStateMachineTest, HandleIpConfigCompletedTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, HandleIpConfigCompletedAfterRenewDhcpTest, TestSize.Level1)
 {
     HandleIpConfigCompletedAfterRenewDhcpTest();
-}
-
-HWTEST_F(SelfCureStateMachineTest, HandleInternetRecoveryConfirmTest, TestSize.Level1)
-{
-    HandleInternetRecoveryConfirmTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, ConfirmInternetSelfCureTest, TestSize.Level1)

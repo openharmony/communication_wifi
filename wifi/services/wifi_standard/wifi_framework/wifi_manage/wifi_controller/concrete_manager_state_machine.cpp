@@ -323,6 +323,7 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
     }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
 void ConcreteMangerMachine::ConnectState::SwitchSemiActiveInConnectState()
@@ -331,6 +332,7 @@ void ConcreteMangerMachine::ConnectState::SwitchSemiActiveInConnectState()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("switch semi wifi failed ret =%{public}d \n", ret);
     }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
 }
 
 ConcreteMangerMachine::ScanonlyState::ScanonlyState(ConcreteMangerMachine *concreteMangerMachine)
@@ -461,6 +463,7 @@ void ConcreteMangerMachine::SemiActiveState::SwitchScanOnlyInSemiActiveState()
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
     }
+    pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
 }
 
 bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)
@@ -502,7 +505,7 @@ void ConcreteMangerMachine::HandleStaStop()
         HalDeviceManager::GetInstance().SetNetworkUpDown(
             WifiConfigCenter::GetInstance().GetStaIfaceName(), true);
 #endif
-        SwitchState(pScanonlyState);
+        WIFI_LOGI("HandleStaStop, current role is %{public}d, sta stop success.", mTargetRole);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartStaService(mid, ifaceName);
         if (ret != WIFI_OPT_SUCCESS) {
@@ -550,14 +553,16 @@ void ConcreteMangerMachine::HandleStaStart()
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
         }
+        SwitchState(pScanonlyState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
-        SwitchState(pConnectState);
+        WIFI_LOGI("HandleStaStart, current role is %{public}d, sta start success.", mTargetRole);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
         ret = SwitchSemiFromEnable();
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("switch semi wifi failed ret = %{public}d", ret);
         }
+        SwitchState(pSemiActiveState);
     } else {
         WIFI_LOGE("Now targetrole is unknow.");
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
@@ -579,17 +584,19 @@ void ConcreteMangerMachine::HandleStaSemiActive()
             return;
         }
         WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
+        SwitchState(pConnectState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop sta failed ret = %{public}d", ret);
         }
+        SwitchState(pScanonlyState);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE)) {
         WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(mid);
-        SwitchState(pSemiActiveState);
+        WIFI_LOGI("HandleStaSemiActive, current role is %{public}d, sta semi start success.", mTargetRole);
     } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
         WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(mid);
-        SwitchState(pSemiActiveState);
+        WIFI_LOGI("HandleStaSemiActive, current role is %{public}d, sta semi start success.", mTargetRole);
     } else {
         WIFI_LOGE("Now targetrole is unknow.");
         ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);

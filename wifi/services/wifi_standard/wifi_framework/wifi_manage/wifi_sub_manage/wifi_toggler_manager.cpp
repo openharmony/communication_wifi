@@ -82,8 +82,13 @@ ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
 void WifiTogglerManager::StartWifiToggledTimer()
 {
     WIFI_LOGD("StartWifiToggledTimer");
-    pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
-    pWifiControllerMachine->MessageExecutedLater(CMD_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+    WifiOprMidState midState = WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN0);
+    if (midState != WifiOprMidState::RUNNING && midState != WifiOprMidState::OPENING) {
+        pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+        pWifiControllerMachine->MessageExecutedLater(CMD_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+    } else {
+        WIFI_LOGW("start wifi when wifi is already opening or opened");
+    }
 }
 
 void WifiTogglerManager::StopWifiToggledTimer()

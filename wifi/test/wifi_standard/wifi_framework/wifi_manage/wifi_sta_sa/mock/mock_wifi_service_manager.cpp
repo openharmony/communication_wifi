@@ -102,6 +102,7 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
 int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
 {
     WIFI_LOGI("WifiServiceManager::LoadP2pService");
+    return 0;
 }
 #endif
 

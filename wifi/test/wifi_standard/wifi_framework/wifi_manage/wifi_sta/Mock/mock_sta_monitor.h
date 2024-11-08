@@ -30,7 +30,7 @@ public:
     virtual void SetStateMachine(StaStateMachine *paraStaStateMachine) = 0;
     virtual void OnConnectChangedCallBack(int status, int networkId, const std::string &bssid) = 0;
     virtual void OnWpaStateChangedCallBack(int status, void *pInstance) = 0;
-    virtual void OnWpaSsidWrongKeyCallBack(int status, void *pInstance) = 0;
+    virtual void OnWpaSsidWrongKeyCallBack(void *pInstance) = 0;
     virtual void OnWpsPbcOverlapCallBack(int status, void *pInstance) = 0;
     virtual void OnWpsTimeOutCallBack(int status, void *pInstance) = 0;
 };
@@ -41,9 +41,9 @@ public:
     MOCK_METHOD0(InitStaMonitor, ErrCode());
     MOCK_CONST_METHOD0(UnInitStaMonitor, ErrCode());
     MOCK_METHOD1(SetStateMachine, void(StaStateMachine *paraStaStateMachine));
-    MOCK_METHOD4(OnConnectChangedCallBack, void(int status, int networkId, const std::string &bssid);
+    MOCK_METHOD4(OnConnectChangedCallBack, void(int status, int networkId, const std::string &bssid));
     MOCK_METHOD2(OnWpaStateChangedCallBack, void(int status, void *pInstance));
-    MOCK_METHOD2(OnWpaSsidWrongKeyCallBack, void(int status, void *pInstance));
+    MOCK_METHOD2(OnWpaSsidWrongKeyCallBack, void(void *pInstance));
     MOCK_METHOD2(OnWpsPbcOverlapCallBack, void(int status, void *pInstance));
     MOCK_METHOD2(OnWpsTimeOutCallBack, void(int status, void *pInstance));
 };

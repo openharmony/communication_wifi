@@ -126,6 +126,7 @@ bool WifiP2pDeviceManager::UpdateDeviceSupplicantInf(const WifiP2pDevice &device
             it->SetDeviceCapabilitys(device.GetDeviceCapabilitys());
             it->SetGroupCapabilitys(device.GetGroupCapabilitys());
             it->SetGroupAddress(device.GetGroupAddress());
+            it->SetWfdInfo(device.GetWfdInfo());
             return true;
         }
     }

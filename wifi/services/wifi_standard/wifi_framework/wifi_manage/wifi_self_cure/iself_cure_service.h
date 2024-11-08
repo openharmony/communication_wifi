@@ -20,7 +20,6 @@
 #include "wifi_msg.h"
 #include "self_cure_service_callback.h"
 #include "self_cure_msg.h"
-#include "ip2p_service_callbacks.h"
 #include "sta_service_callback.h"
 
 namespace OHOS {

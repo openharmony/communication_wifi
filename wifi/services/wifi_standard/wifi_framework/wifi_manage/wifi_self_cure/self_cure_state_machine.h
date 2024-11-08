@@ -426,7 +426,8 @@ private:
     bool IsSettingsPage();
     bool IsMultiDhcpOffer();
     void ClearDhcpOffer();
-    bool CheckSelfCureState(int event,  WifiState wifiState);
+    void CheckSelfCureConnectState();
+    void CheckSelfCureReassocState();
     void UpdateSelfcureState(int selfcureType, bool isSelfCureOnGoing);
     void HandleSelfCureNormal();
     void HandleSelfCureException(int reasonCode);

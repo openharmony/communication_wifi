@@ -911,6 +911,8 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
                 pService->ConnectToNetwork(candidateNetworkId);
             }
         }
+    } else if (action == EVENT_SETTINGS_WLAN_KEEP_CONNECTED) {
+        OnReceiveWlanKeepConnected(eventData);
     } else {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);

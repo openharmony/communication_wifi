@@ -203,8 +203,7 @@ public:
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
     virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
-    virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
-    
+    virtual bool GetSupportHwPnoFlag(int instId = 0) = 0; 
 };
 
 class WifiSettings : public MockWifiSettings {

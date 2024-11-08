@@ -21,6 +21,7 @@
 #ifndef OHOS_ARCH_LITE
 #include "app_state_data.h"
 #include "ienhance_service.h"
+#include "iself_cure_service.h"
 #endif
 #include "wifi_msg.h"
 #include "sta_service_callback.h"

@@ -150,8 +150,8 @@ public:
     virtual int GetNoChargerPlugModeState() const = 0;
     virtual bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
         const std::string &randomAddr) = 0;
+        virtual std::string GetP2pIfaceName() = 0;
     virtual int GetScanGenieState() const = 0;
-    virtual std::string GetP2pIfaceName() = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -282,9 +282,8 @@ public:
     MOCK_CONST_METHOD0(GetNoChargerPlugModeState, int());
     MOCK_METHOD3(StoreWifiMacAddrPairInfo, bool(WifiMacAddrInfoType type, const std::string &realMacAddr,
         const std::string &randomAddr));
-    MOCK_CONST_METHOD0(GetScanGenieState, int());
     MOCK_METHOD0(GetP2pIfaceName, std::string());
-
+    MOCK_CONST_METHOD0(GetScanGenieState, int());
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

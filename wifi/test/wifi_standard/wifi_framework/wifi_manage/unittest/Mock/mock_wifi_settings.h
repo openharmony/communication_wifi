@@ -203,6 +203,7 @@ public:
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
     virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
+    virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     
 };
 
@@ -375,6 +376,7 @@ public:
     MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int));
     MOCK_METHOD1(MergeWifiCloneConfig, void(std::string &cloneData));
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
+    MOCK_METHOD1(GetSupportHwPnoFlag, bool(int instId));
 };
 }  // namespace Wifi
 }  // namespace OHOS

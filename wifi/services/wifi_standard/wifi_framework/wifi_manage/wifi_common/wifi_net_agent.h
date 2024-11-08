@@ -213,6 +213,7 @@ private:
         IpV6Info &wifiIpV6Info);
 private:
     uint32_t supplierId{0};
+    bool isWifiAvaliable_ = false;
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
     std::unique_ptr<WifiEventHandler> netAgentEventHandler_ = nullptr;
 };

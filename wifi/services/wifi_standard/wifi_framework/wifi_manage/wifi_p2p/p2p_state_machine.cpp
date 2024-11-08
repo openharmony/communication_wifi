@@ -221,11 +221,12 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
 
     bool isJoin = device.IsGroupOwner();
     std::string groupName = config.GetGroupName();
-
+    WIFI_LOGI("IsDeviceLimit: %{public}d, Isinviteable: %{public}d", device.IsDeviceLimit(), device.Isinviteable());
     if (isJoin && !device.IsGroupLimit()) {
         if (groupName.empty()) {
             groupName = device.GetNetworkName();
         }
+        WIFI_LOGI("connect device is go, Groupname is %{private}s", groupName.c_str());
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
             /**
@@ -250,14 +251,9 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
          */
         int networkId = -1;
         /* Prepare to reinvoke as GC. */
-        if (config.GetNetId() >= 0) {
-            if (config.GetDeviceAddress() == groupManager.GetGroupOwnerAddr(config.GetNetId())) {
-                networkId = config.GetNetId();
-            }
-        } else {
-            networkId = groupManager.GetGroupNetworkId(device);
-        }
+        networkId = groupManager.GetGroupNetworkId(device);
         if (networkId < 0) {
+            WIFI_LOGI("cannot find device from gc devices");
             /**
              * Prepare to reinvoke as GO.
              * Mean that the group is not found when the peer device roles as GO,
@@ -281,6 +277,9 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
                 config.SetNetId(networkId);
                 return true;
             }
+        } else {
+            WIFI_LOGI("cannot find device from go devices");
+            config.SetNetId(networkId);
         }
     }
 
@@ -1137,6 +1136,12 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
 bool P2pStateMachine::IsInterfaceReuse() const
 {
     return !(WifiConfigCenter::GetInstance().GetP2pIfaceName().compare("wlan0"));
+}
+
+bool P2pStateMachine::HasPersisentGroup(void)
+{
+    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
+    return !grpInfo.empty();
 }
 
 void P2pStateMachine::UpdateGroupInfoToWpa() const

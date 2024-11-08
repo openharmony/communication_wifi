@@ -197,6 +197,15 @@ HWTEST_F(WifiNetAgentTest, SetNetLinkRouteInfoTest001, TestSize.Level1)
     EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
+HWTEST_F(WifiNetAgentTest, SetNetLinkHostRouteInfoTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    wifiNetAgent.SetNetLinkHostRouteInfo(netLinkInfo, wifiIpInfo);
+    EXPECT_NE(wifiNetAgent.supplierId, TEN);
+}
+
 HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteInfoTest001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;

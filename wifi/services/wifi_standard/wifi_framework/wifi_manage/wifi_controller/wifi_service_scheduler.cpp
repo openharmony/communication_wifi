@@ -472,14 +472,14 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
-
+#ifdef FEATURE_SELF_CURE_SUPPORT
     ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
     if (pSelfCureService == nullptr) {
         WIFI_LOGI("get selfcure service failed");
         return WIFI_OPT_FAILED;
     }
     pService->SetSelfCureService(pSelfCureService);
-
+#endif // FEATURE_SELF_CURE_SUPPORT
 #endif
     WIFI_LOGI("StartWifiStaService instId%{public}d successful", instId);
     return WIFI_OPT_SUCCESS;

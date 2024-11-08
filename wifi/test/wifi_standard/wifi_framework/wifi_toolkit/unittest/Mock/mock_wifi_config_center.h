@@ -150,7 +150,7 @@ public:
     virtual int GetNoChargerPlugModeState() const = 0;
     virtual bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
         const std::string &randomAddr) = 0;
-        virtual std::string GetP2pIfaceName() = 0;
+    virtual std::string GetP2pIfaceName() = 0;
     virtual int GetScanGenieState() const = 0;
 };
 

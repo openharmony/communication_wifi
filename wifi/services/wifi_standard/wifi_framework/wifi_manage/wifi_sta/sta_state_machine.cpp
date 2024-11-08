@@ -1948,7 +1948,7 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
         for (auto scanInfo : scanInfoList) {
             std::string deviceKeyMgmt;
             scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-            if ((deviceConfig.ssid == scanInfo.ssid) && (deviceKeyMgmt == deviceConfig.keyMgmt)) {
+            if ((deviceConfig.ssid == scanInfo.ssid) && deviceKeyMgmt.find(deviceConfig.keyMgmt) != std::string::npos) {
                 randomMacInfo.peerBssid = scanInfo.bssid;
                 break;
             }

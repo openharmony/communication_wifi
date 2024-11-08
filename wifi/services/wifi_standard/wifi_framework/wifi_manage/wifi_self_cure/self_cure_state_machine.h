@@ -292,6 +292,8 @@ public:
         SelfCureStateMachine *pSelfCureStateMachine;
         int wifi6HtcArpDetectionFailedCnt = 0;
         int wifi6ArpDetectionFailedCnt = 0;
+        int32_t internetValue_ = 0;
+        bool isForceHttpCheck_ = true;
         void PeriodicWifi6WithHtcArpDetect(InternalMessagePtr msg);
         void PeriodicWifi6WithoutHtcArpDetect(InternalMessagePtr msg);
         void HandleWifi6WithHtcArpFail(InternalMessagePtr msg);

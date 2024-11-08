@@ -534,7 +534,6 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
 {
     rssiLevel0Or1ScanedCounter_ = 0;
     rssiLevel2Or3ScanedCounter_ = 0;
-    isScanTriggered_ = false;
     isWifi2WifiSwitching_ = false;
     targetBssid_ = "";
     pWifiProStateMachine_->isWifiNoInternet_ = false;
@@ -669,16 +668,18 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
         rssiLevel2Or3ScanedCounter_ < scanMaxCounter) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel2Or3ScanedCounter:%{public}d.", signalLevel, rssiLevel2Or3ScanedCounter_);
-        rssiLevel2Or3ScanedCounter_++;
-        pScanService->Scan(true);
-        isScanTriggered_ = true;
+        auto ret = pScanService->Scan(true);
+        if (ret == WIFI_OPT_SUCCESS) {
+            rssiLevel2Or3ScanedCounter_++;
+        }
         pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
     } else if ((signalLevel < SIG_LEVEL_2) && (rssiLevel0Or1ScanedCounter_ < scanMaxCounter)) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel0Or1ScanedCounter:%{public}d.", signalLevel, rssiLevel0Or1ScanedCounter_);
-        rssiLevel0Or1ScanedCounter_++;
-        pScanService->Scan(true);
-        isScanTriggered_ = true;
+        auto ret = pScanService->Scan(true);
+        if (ret == WIFI_OPT_SUCCESS) {
+            rssiLevel0Or1ScanedCounter_++;
+        }
         pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
     } else {
         WIFI_LOGI("TryStartScan, do not scan, signalLevel:%{public}d,scanMaxCounter:%{public}d.",
@@ -695,12 +696,6 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
 
     std::vector<InterScanInfo> scanInfos;
     msg->GetMessageObj(scanInfos);
-
-    if (!isScanTriggered_) {
-        WIFI_LOGI("HandleScanResultInHasNet, scan is not triggered, skip network selection.");
-        return;
-    }
-
     WIFI_LOGI("start to wifi2wifi select network.");
     std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
     NetworkSelectionResult networkSelectionResult;
@@ -710,7 +705,6 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         WIFI_LOGI("Wifi2Wifi select network result, ssid: %{public}s, bssid: %{public}s.",
             SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
         targetBssid_ = networkSelectionResult.interScanInfo.bssid;
-        isScanTriggered_ = false;
         HandleCheckResultInHasNet(networkSelectionResult);
     } else {
         WIFI_LOGI("wifi to wifi step X: Wifi2Wifi select network fail.");
@@ -802,7 +796,6 @@ void WifiProStateMachine::WifiHasNetState::HandleWifi2WifiFailed(bool isConnecte
         networkBlackListManager.CleanTempWifiBlockList();
     }
     isWifi2WifiSwitching_ = false;
-    isScanTriggered_ = false;
     pWifiProStateMachine_->badBssid_ = "";
     targetBssid_ = "";
     if (isConnected) {
@@ -834,12 +827,6 @@ void WifiProStateMachine::WifiHasNetState::TryWifiHandoverPreferentially(
     int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
     if (!pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel)) {
         WIFI_LOGI("TryWifiHandoverPreferentially, do not reach wifi scan threshold.");
-        return;
-    }
-
-    // Non-default network does not switch
-    if (!WifiProUtils::IsDefaultNet()) {
-        WIFI_LOGI("TryWifiHandoverPreferentially, not default network, do not switch wifi.");
         return;
     }
 
@@ -890,7 +877,6 @@ void WifiProStateMachine::WifiHasNetState::TryWifi2Wifi(const NetworkSelectionRe
 void WifiProStateMachine::WifiHasNetState::Wifi2WifiFailed()
 {
     isWifi2WifiSwitching_ = false;
-    isScanTriggered_ = false;
     pWifiProStateMachine_->badBssid_ = "";
     targetBssid_ = "";
 }

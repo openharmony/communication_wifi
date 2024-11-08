@@ -18,10 +18,9 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("BlockConnectService");
 constexpr int FREQUENT_DISCONNECT_COUNT = 5;
-constexpr int64_t MAX_DISABLE_TIME = 30 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MAX = 10 * 60 * 1000 * 1000;
-constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 5 * 60 * 1000 * 1000;
-constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 1 * 60 * 1000 * 1000;
+constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 1 * 60 * 1000 * 1000;
+constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 0.5 * 60 * 1000 * 1000;
 
 BlockConnectService &BlockConnectService::GetInstance()
 {
@@ -75,7 +74,7 @@ BlockConnectService::BlockConnectService()
         static_cast<int>(DisconnectDetailReason::DISASSOC_LOW_ACK)
     };
 
-    mLastConnectedApInfo = {"", -1, 0, 0};
+    mLastConnectedApInfo = {"", -1, 0};
 }
 
 // Destructor
@@ -90,7 +89,7 @@ void BlockConnectService::Exit()
     // Implement the logic to exit the service
     // Clean up any resources
     blockConnectPolicies.clear();
-    mLastConnectedApInfo = {"", -1, 0, 0};
+    mLastConnectedApInfo = {"", -1, 0};
 }
 
 // Method to check if auto connect is enabled for a given WifiDeviceConfig
@@ -124,13 +123,6 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
             LogDisabledConfig(config);
             continue;
         }
-        for (int i = 1; i < mLastConnectedApInfo.sumDisconnectCount; i++) {
-            policy.disableTime = policy.disableTime + policy.disableTime;
-            if (policy.disableTime >= MAX_DISABLE_TIME) {
-                policy.disableTime = MAX_DISABLE_TIME;
-                break;
-            }
-        }
         if (policy.disableStatus == WifiDeviceConfigStatus::ENABLED ||
             timestamp - config.networkSelectionStatus.networkDisableTimeStamp >= policy.disableTime) {
             config.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
@@ -162,8 +154,6 @@ bool BlockConnectService::EnableNetworkSelectStatus(int targetNetworkId)
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WIFI_LOGI("EnableNetworkSelectStatus %{public}d %{public}s enabled",
         targetNetworkId, SsidAnonymize(targetNetwork.ssid).c_str());
-    // user connect to the network, reset the last connected ap info
-    mLastConnectedApInfo.sumDisconnectCount = 0;
     return true;
 }
 
@@ -244,7 +234,6 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason)
     if (mLastConnectedApInfo.bssid != bssid) {
         mLastConnectedApInfo.bssid = bssid;
         mLastConnectedApInfo.alreadyConnectedCount = 1;
-        mLastConnectedApInfo.sumDisconnectCount = 1;
         return false;
     }
 
@@ -259,13 +248,11 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason)
             WIFI_LOGD("isFrequentDisconnect case min %{public}s %{public}d  duration %{public}" PRId64,
                 MacAnonymize(bssid).c_str(), wpaReason, time_duration);
             mLastConnectedApInfo.alreadyConnectedCount++;
-            mLastConnectedApInfo.sumDisconnectCount++;
         }
     } else if (time_duration < FREQUENT_DISCONNECT_TIME_INTERVAL_MID) {
         WIFI_LOGD("isFrequentDisconnect case mid %{public}s %{public}d duration %{public}" PRId64,
             MacAnonymize(bssid).c_str(), wpaReason, time_duration);
         mLastConnectedApInfo.alreadyConnectedCount++;
-        mLastConnectedApInfo.sumDisconnectCount++;
     }
     if (mLastConnectedApInfo.alreadyConnectedCount >= FREQUENT_DISCONNECT_COUNT) {
         WIFI_LOGI("isFrequentDisconnect %{public}s %{public}d count %{public}d",

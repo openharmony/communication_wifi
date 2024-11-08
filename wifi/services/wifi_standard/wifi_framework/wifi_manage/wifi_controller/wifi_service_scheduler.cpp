@@ -370,11 +370,13 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
 
 void WifiServiceScheduler::BroadCastWifiStateChange(WifiState state, int instId)
 {
+#ifdef FEATURE_SELF_CURE_SUPPORT
     ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
     if ((pSelfCureService != nullptr) && (pSelfCureService->CheckSelfCureWifiResult(SCE_EVENT_WIFI_STATE_CHANGED))) {
         WIFI_LOGW("DispatchWifiCloseRes, ignore to send duo to wifi self curing");
         return;
     }
+#endif // FEATURE_SELF_CURE_SUPPORT
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
     cbMsg.id = instId;

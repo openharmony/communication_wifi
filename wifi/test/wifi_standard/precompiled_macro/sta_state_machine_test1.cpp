@@ -52,6 +52,7 @@ static void TearDownTestCase()
 {
     WifiAppStateAware& wifiAppStateAware = WifiAppStateAware::GetInstance();
     wifiAppStateAware.appChangeEventHandler.reset();
+    wifiAppStateAware.mAppStateObserver = nullptr;
 }
 virtual void SetUp()
 {

@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 void WifiP2pDeviceManager::Initialize()
 {}
 

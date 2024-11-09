@@ -348,7 +348,7 @@ public:
      * @param enhanceService IEnhanceService object
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService);
+    virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

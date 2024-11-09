@@ -1058,7 +1058,7 @@ private:
     /**
      * @Description judge if specific network
      */
-    void IsSpecificNetwork();
+    bool IsSpecificNetwork();
 
     /**
      * @Description operation after dhcp

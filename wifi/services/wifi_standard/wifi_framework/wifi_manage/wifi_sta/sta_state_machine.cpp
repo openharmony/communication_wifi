@@ -3062,7 +3062,6 @@ void StaStateMachine::GetIpState::GoInState()
         if (strncpy_s(config.bssid, sizeof(config.bssid),
             pStaStateMachine->linkedInfo.bssid.c_str(), pStaStateMachine->linkedInfo.bssid.size()) == EOK) {
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
-            SetConfiguration(ifname.c_str(), config);
         }
         config.bIpv6 = pStaStateMachine->currentTpType == IPTYPE_IPV4 ? false : true;
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();

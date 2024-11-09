@@ -387,7 +387,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
     WIFI_LOGI("Create a hid2d group, frequency: %{public}d, isFreqEnhance: %{public}d.", freq, isFreqEnhance);
     do {
         if (enhanceService_ == nullptr) {
-            WIFI_LOGE("p2p enhanceSerive_ is nullptr");
+            WIFI_LOGE("p2p enhanceService_ is nullptr");
             break;
         }
         freqEnhance = enhanceService_->FreqEnhance(freq, isFreqEnhance);

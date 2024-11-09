@@ -105,7 +105,7 @@ ErrCode WifiP2pManager::AutoStartP2pService()
             break;
         }
         ret = pService->SetEnhanceService(pEnhanceService);
-        if (errCode != WIFI_OPT_SUCCESS) {
+        if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(ret));
             break;
         }

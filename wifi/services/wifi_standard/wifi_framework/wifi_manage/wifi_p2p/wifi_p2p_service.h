@@ -325,12 +325,6 @@ public:
      */
     virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result) override;
 
-private:
-    /**
-     * @Description - P2P state machine deregistration event callback.
-     */
-    virtual void ClearAllP2pServiceCallbacks();
-
     /**
      * @Description Set EnhanceService to p2p service
      *
@@ -338,6 +332,11 @@ private:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) override;
+private:
+    /**
+     * @Description - P2P state machine deregistration event callback.
+     */
+    virtual void ClearAllP2pServiceCallbacks();
 
 private:
     P2pStateMachine &p2pStateMachine;

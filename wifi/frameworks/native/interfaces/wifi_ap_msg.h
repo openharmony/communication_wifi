@@ -186,6 +186,33 @@ struct StationInfo {
     int bssidType; /* bssid type */
     std::string ipAddr;     /* Device IP address */
 };
+
+struct HotspotMacConfig {
+    inline void SetCallingBundleName(std::string &bundleName)
+    {
+        callingBundleName = bundleName;
+    }
+
+    inline std::string GetCallingBundleName() const
+    {
+        return callingBundleName;
+    }
+
+    inline void SetRandomMac(std::string &mac)
+    {
+        randomMac = mac;
+    }
+
+    inline std::string GetRandomMac() const
+    {
+        return randomMac;
+    }
+
+private:
+    std::string callingBundleName;
+    std::string randomMac;
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

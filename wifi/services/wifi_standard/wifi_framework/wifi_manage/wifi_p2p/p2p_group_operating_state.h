@@ -20,6 +20,7 @@
 #include "p2p_define.h"
 #include "wifi_p2p_group_manager.h"
 #include "wifi_p2p_device_manager.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -63,6 +64,14 @@ public:
      * @return - bool true:success   false:fail
      */
     virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
+
+    /**
+     * @Description Set EnhanceService to p2p service
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual void SetEnhanceService(IEnhanceService* enhanceService);
 
 private:
     /**
@@ -141,6 +150,7 @@ private:
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;
+    IEnhanceService *enhanceSerive_ = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS

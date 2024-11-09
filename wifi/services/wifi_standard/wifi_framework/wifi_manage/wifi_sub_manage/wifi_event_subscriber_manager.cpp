@@ -879,10 +879,10 @@ void NotificationEventSubscriber::OnReceiveWlanKeepConnected(const OHOS::EventFw
     int networkId = linkedInfo.networkId;
     WIFI_LOGI("received the WlanKeepConnected, code == %{public}d", code);
     if (code == 1) { // The user clicks the use button.
-    WifiNetAgent::GetInstance().RestoreWifiConnection();
-    WIFI_LOGI("change the value of AcceptUnvalidated to true");
-    WifiSettings::GetInstance().SetAcceptUnvalidated(networkId);
-    WifiSettings::GetInstance().SyncDeviceConfig();
+        WifiNetAgent::GetInstance().RestoreWifiConnection();
+        WIFI_LOGI("change the value of AcceptUnvalidated to true");
+        WifiSettings::GetInstance().SetAcceptUnvalidated(networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
     }
 }
 

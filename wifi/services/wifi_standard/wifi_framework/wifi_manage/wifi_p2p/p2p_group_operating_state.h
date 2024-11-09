@@ -150,7 +150,7 @@ private:
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;
-    IEnhanceService *enhanceSerive_ = nullptr;
+    IEnhanceService *enhanceService_ = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS

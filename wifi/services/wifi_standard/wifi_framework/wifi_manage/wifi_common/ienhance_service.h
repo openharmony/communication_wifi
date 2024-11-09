@@ -194,8 +194,8 @@ public:
     /**
      * @Description obtain supported frequency
      *
-     * @param cfgType - current use freq
-     * @param cfgData - where use 160M Frequency
+     * @param freq - current use freq
+     * @param is160M - where use 160M Frequency
      * @return int - supported frequency
      */
     virtual int FreqEnhance(int freq, bool is160M) = 0;

@@ -136,6 +136,8 @@ public:
      */
     bool GetConnectedStationInfo(std::map<std::string, StationInfo> &result);
 
+    void SetEnhanceService(IEnhanceService* enhanceService);
+
 private:
     /**
      * @Description Handle event of CMD_DEVICE_DISCOVERS

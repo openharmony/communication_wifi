@@ -140,6 +140,7 @@ void P2pStateMachine::Initialize()
     if (pDhcpResultNotify == nullptr) {
         WIFI_LOGW("pDhcpResultNotify Initialize failed.");
     }
+    p2pGroupOperatingState.SetEnhanceService(enhanceService_);
     return;
 }
 
@@ -1323,6 +1324,11 @@ bool P2pStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo>
     WIFI_LOGE("rpt GetConnectedStationInfo");
     std::string ifaceName = groupManager.GetCurrentGroup().GetInterface();
     return m_DhcpdInterface.GetConnectedStationInfo(ifaceName, result);
+}
+
+void P2pStateMachine:SetEnhanceService(IEnhanceService* enhanceService)
+{
+    enhanceService_ = enhanceService;
 }
 
 } // namespace Wifi

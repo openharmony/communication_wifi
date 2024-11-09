@@ -4626,6 +4626,7 @@ void StaStateMachine::HandlePreDhcpSetup()
 
 bool StaStateMachine::IsSpecificNetwork()
 {
+#ifndef OHOS_ARCH_LITE
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, GetInstanceId());
     if (enhanceService_ == nullptr) {
@@ -4633,6 +4634,9 @@ bool StaStateMachine::IsSpecificNetwork()
         return false;
     }
     return enhanceService_->IsSpecificNetwork(config);
+#else
+    return false;
+#endif
 }
 
 void StaStateMachine::HandlePostDhcpSetup()

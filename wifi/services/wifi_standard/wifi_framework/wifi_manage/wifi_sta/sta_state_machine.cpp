@@ -4047,7 +4047,9 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
 
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig, m_instId) != 0) {
-        WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
+        WIFI_LOGE("%{public}s cannot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
+        DisConnectProcess();
+        return;
     }
     UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);

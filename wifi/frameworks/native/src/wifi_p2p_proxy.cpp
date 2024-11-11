@@ -1594,7 +1594,7 @@ ErrCode WifiP2pProxy::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
     }
     int ret = reply.ReadInt32();
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
-        return WIFI_OPT_FAILED;
+        return ErrCode(ret);
     }
 
     *getDatValidLen = reply.ReadInt32();

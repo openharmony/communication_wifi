@@ -115,7 +115,8 @@
                 "bounds_checking_function",
                 "jsoncpp",
                 "libxml2",
-                "asset"
+                "asset",
+                "icu"
             ],
             "third_party": [
                 "wpa_supplicant"

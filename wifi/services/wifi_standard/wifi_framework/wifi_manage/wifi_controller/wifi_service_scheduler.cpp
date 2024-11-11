@@ -69,8 +69,9 @@ void WifiServiceScheduler::ClearStaIfaceNameMap(int instId)
         if (iter->first == instId) {
             g_staIfaceNameMap.erase(iter);
             break;
+        } else {
+            iter++;
         }
-        iter++;
     }
 }
 
@@ -83,8 +84,9 @@ void WifiServiceScheduler::ClearSoftApIfaceNameMap(int instId)
         if (iter->first == instId) {
             g_softApIfaceNameMap.erase(iter);
             break;
+        } else {
+            iter++;
         }
-        iter++;
     }
 }
 
@@ -622,8 +624,9 @@ void WifiServiceScheduler::StaIfaceDestoryCallback(std::string &destoryIfaceName
                 g_staIfaceNameMap.erase(iter);
             }
             return;
+        } else {
+            iter++;
         }
-        iter++;
     }
 }
 
@@ -909,8 +912,9 @@ void WifiServiceScheduler::SoftApIfaceDestoryCallback(std::string &destoryIfaceN
                 g_softApIfaceNameMap.erase(iter);
             }
             return;
+        } else {
+            iter++;
         }
-        iter++;
     }
 }
 #endif

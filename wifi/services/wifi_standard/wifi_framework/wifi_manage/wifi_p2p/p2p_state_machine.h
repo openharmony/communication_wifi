@@ -295,6 +295,8 @@ private:
 
     void ClearGroup() const;
 
+    bool HasPersisentGroup(void);
+
 private:
     /**
      * @Description - Broadcast state change event.

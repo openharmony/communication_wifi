@@ -35,7 +35,7 @@ public:
         : m_MockApRootState(),
           m_MockApIdleState(m_MockApStateMachine),
           m_MockApStartedState(m_MockApStateMachine, m_MockApConfigUse, m_MockApMonitor),
-          m_MockApService(m_MockApStateMachine, m_MockApStartedState),
+          m_MockApService(m_MockApStateMachine),
           m_MockApStateMachine(
               m_MockApStationsManager, m_MockApRootState, m_MockApIdleState, m_MockApStartedState, m_MockApMonitor),
           m_MockApConfigUse(),

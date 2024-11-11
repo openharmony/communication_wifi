@@ -120,9 +120,6 @@ public:
     {
         return 0;
     }
-    {
-        return 0;
-    }
 };
 
 class IConcreteChipTest : public IConcreteChip {

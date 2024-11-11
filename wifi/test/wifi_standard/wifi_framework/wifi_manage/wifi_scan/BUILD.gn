@@ -26,19 +26,21 @@ config("module_private_config") {
 ohos_unittest("wifi_scan_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
+    "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_channel_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_monitor.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_state_machine.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_state_machine.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
     "Mock/mock_scan_service.cpp",
     "Mock/mock_scan_state_machine.cpp",
     "Mock/mock_wifi_manager.cpp",
     "Mock/mock_wifi_settings.cpp",
-    "Mock/mock_wifi_sta_hal_interface.cpp",
-    "Mock/mock_wifi_supplicant_hal_interface.cpp",
     "global_test.cpp",
+    "scan_interface_test.cpp",
     "scan_monitor_test.cpp",
     "scan_service_test.cpp",
     "scan_state_machine_test.cpp",
@@ -93,7 +95,6 @@ ohos_unittest("wifi_scan_unittest") {
     "--coverage",
   ]
   deps = [
-    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
@@ -106,9 +107,12 @@ ohos_unittest("wifi_scan_unittest") {
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     "private=public",
+    "FEATURE_AP_SUPPORT",
+    "FEATURE_P2P_SUPPORT",
   ]
   external_deps = [
     "ability_base:want",
+    "ability_runtime:app_manager",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",

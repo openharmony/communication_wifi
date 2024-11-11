@@ -54,8 +54,7 @@ public:
     {
         const int SLEEP_TIME = 20;
         pMockPendant = new MockPendant();
-        pApService = new ApService(pMockPendant->GetMockApStateMachine(),
-            pMockPendant->GetMockApStartedState());
+        pApService = new ApService(pMockPendant->GetMockApStateMachine());
         int testMaxConn = 10;
         int channel = 6;
         apInfo.SetSsid(std::string("TEST"));

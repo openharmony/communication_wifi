@@ -132,7 +132,7 @@ private:
     ErrCode InitConcreteMangerStates();
 
     bool HandleCommonMessage(InternalMessagePtr msg);
-    void checkAndContinueToStopWifi(InternalMessagePtr msg);
+    void CheckAndContinueToStopWifi(InternalMessagePtr msg);
     void HandleStaStop();
     void HandleStaStart();
     void HandleStaSemiActive();

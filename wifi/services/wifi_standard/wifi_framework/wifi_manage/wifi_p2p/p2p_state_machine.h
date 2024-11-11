@@ -467,7 +467,6 @@ private:
     static DHCPTYPE m_isNeedDhcp;
     std::string p2pDevIface;
     static std::mutex m_gcJoinmutex;
-    IEnhanceService *enhanceService_ = nullptr;
 
 public:
     std::vector<std::string> curClientList;

@@ -403,7 +403,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqP2pStart(const std::string &ifaceName);
+    WifiErrorNo ReqP2pStart(const std::string &ifaceName, const bool hasPersisentGroup);
 
     /**
      * @Description P2P stop

@@ -25,6 +25,9 @@
 #define REPLY_BUF_LENGTH (1024)
 #define BUFF_SIZE 256
 #define P2P_RANDOM_MAC_FLAG "p2p_device_random_mac_addr=1\n"
+#define PERSISENT_MAC_LEN 55
+#define PERSISENT_MAC_STRING "p2p_device_persistent_mac_addr"
+#define P2P_SUPPLICANT_PATH CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf"
 
 typedef struct HdiP2pWpaNetworkField {
     P2pGroupConfigType field;
@@ -133,19 +136,65 @@ static WifiErrorNo AddP2pRandomMacFlag()
     return WIFI_HAL_OPT_OK;
 }
 
-WifiErrorNo HdiWpaP2pStart(const char *ifaceName)
+bool GetOldMac(char *mac, int len)
 {
+    char line[BUFF_SIZE];
+ 
+    FILE *fp = fopen(P2P_SUPPLICANT_PATH, "r");
+    if (fp == NULL) {
+        return false;
+    }
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        if (strstr(line, PERSISENT_MAC_STRING) != NULL) {
+            if (memcpy_s(mac, len, line, strlen(line)) != EOK) {
+                fclose(fp);
+                return false;
+            }
+            fclose(fp);
+            return true;
+        }
+    }
+    if (fclose(fp) != 0) {
+        LOGE("close fp failed");
+    }
+    return false;
+}
+ 
+void AppendMac(char *mac, int len)
+{
+    FILE *fp = fopen(P2P_SUPPLICANT_PATH, "a");
+    if (fp == NULL) {
+        LOGE("Error! Could not open file\n");
+        return;
+    }
+    if (fwrite(mac, sizeof(char), len, fp) == 0) {
+        LOGE("write faild");
+    }
+    if (fclose(fp) != 0) {
+        LOGE("close fp failed");
+    }
+}
+
+WifiErrorNo HdiWpaP2pStart(const char *ifaceName, const bool hasPersisentGroup)
+{
+    char persisentMac[PERSISENT_MAC_LEN] = {0};
+    bool hasPersisentMac = false;
+
     LOGI("HdiWpaP2pStart enter");
     if (SetHdiP2pIfaceName(ifaceName) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: set p2p iface name failed!");
         return WIFI_HAL_OPT_FAILED;
     }
-
+    if (hasPersisentGroup) {
+        hasPersisentMac = GetOldMac(persisentMac, PERSISENT_MAC_LEN);
+    }
     if (CopyConfigFile("p2p_supplicant.conf") != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: CopyConfigFile failed!");
         return WIFI_HAL_OPT_FAILED;
     }
-
+    if (hasPersisentMac) {
+        AppendMac(persisentMac, PERSISENT_MAC_LEN);
+    }
     if (HdiWpaStart() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: HdiWpaStart failed!");
         return WIFI_HAL_OPT_FAILED;
@@ -1035,7 +1084,7 @@ WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
     wpsParam.ssid = (uint8_t *)info->ssid;
     wpsParam.ssidLen = strlen(info->ssid) + 1;
     wpsParam.bssid = addr;
-    wpsParam.bssidLen = strlen(info->bssid);
+    wpsParam.bssidLen = ETH_ALEN;
     wpsParam.passphrase = (uint8_t *)info->passphrase;
     wpsParam.passphraseLen = strlen(info->passphrase) + 1;
     wpsParam.frequency = (info->frequency << 16) | (info->isLegacyGo);

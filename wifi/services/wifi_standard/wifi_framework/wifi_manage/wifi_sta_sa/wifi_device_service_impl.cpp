@@ -2215,7 +2215,7 @@ int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, con
         return PERMISSION_DENIED;
     }
     std::map<std::string, std::vector<PackageInfo>> packageInfoMap;
-    if (WifiSettings::GetInstance().GetPackageInfoMap(packageInfoMap) != 0) {
+    if (WifiSettings::GetInstance().GetPackageFilterMap(packageInfoMap) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().GetPackageInfoMap failed");
         return PERMISSION_DENIED;
     }

@@ -277,6 +277,12 @@ ErrCode StaInterface::SetEnhanceService(IEnhanceService* enhanceService)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::SetSelfCureService(ISelfCureService *selfCureService)
+{
+    WIFI_LOGI("Enter SetSelfCureService");
+    return WIFI_OPT_SUCCESS;
+}
+
 bool StaInterface::InitStaServiceLocked()
 {
     return true;

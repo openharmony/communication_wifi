@@ -368,6 +368,22 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiServiceScheduler::BroadCastWifiStateChange(WifiState state, int instId)
+{
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+    if ((pSelfCureService != nullptr) && (pSelfCureService->CheckSelfCureWifiResult(SCE_EVENT_WIFI_STATE_CHANGED))) {
+        WIFI_LOGW("DispatchWifiCloseRes, ignore to send duo to wifi self curing");
+        return;
+    }
+#endif // FEATURE_SELF_CURE_SUPPORT
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
+    cbMsg.id = instId;
+    cbMsg.msgData = static_cast<int>(state);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+}
+
 ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
@@ -456,6 +472,14 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("get selfcure service failed");
+        return WIFI_OPT_FAILED;
+    }
+    pService->SetSelfCureService(pSelfCureService);
+#endif // FEATURE_SELF_CURE_SUPPORT
 #endif
     WIFI_LOGI("StartWifiStaService instId%{public}d successful", instId);
     return WIFI_OPT_SUCCESS;
@@ -639,16 +663,10 @@ void WifiServiceScheduler::OnRssiReportCallback(int index, int antRssi)
 void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId)
 {
     WIFI_LOGI("DispatchWifiOpenRes, state:%{public}d", static_cast<int>(state));
-    WifiEventCallbackMsg cbMsg;
-    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-    cbMsg.id = instId;
     if (state == OperateResState::OPEN_WIFI_OPENING) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLING), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATING, instId);
-        cbMsg.msgData = static_cast<int>(WifiState::ENABLING);
-        if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
-            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        }
+        BroadCastWifiStateChange(WifiState::ENABLING, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENING));
         return;
@@ -657,10 +675,7 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::ENABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING, instId);
-        cbMsg.msgData = static_cast<int>(WifiState::ENABLED);
-        if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
-            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        }
+        BroadCastWifiStateChange(WifiState::ENABLED, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENED));
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
@@ -721,16 +736,10 @@ void WifiServiceScheduler::DispatchWifiSemiActiveRes(OperateResState state, int 
 void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instId)
 {
     WIFI_LOGI("DispatchWifiCloseRes, state:%{public}d", static_cast<int>(state));
-    WifiEventCallbackMsg cbMsg;
-    cbMsg.msgCode = WIFI_CBK_MSG_STATE_CHANGE;
-    cbMsg.id = instId;
     if (state == OperateResState::CLOSE_WIFI_CLOSING) {
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLING), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_DEACTIVATING, instId);
-        cbMsg.msgData = static_cast<int>(WifiState::DISABLING);
-        if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
-            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        }
+        BroadCastWifiStateChange(WifiState::DISABLING, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
             static_cast<int>(WifiOperateState::STA_CLOSING));
         return;
@@ -739,16 +748,7 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
-        cbMsg.msgData = static_cast<int>(WifiState::DISABLED);
-        if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
-            WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-        } else {
-            WIFI_LOGI("reset selfcure wifi off->open!");
-            int state = WifiConfigCenter::GetInstance().GetPersistWifiState(instId);
-            state = (state == WIFI_STATE_SEMI_ENABLED) ? WIFI_STATE_SEMI_ENABLED : WIFI_STATE_ENABLED;
-            WifiConfigCenter::GetInstance().SetWifiToggledState(state, instId);
-            WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
-        }
+        BroadCastWifiStateChange(WifiState::DISABLED, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
             static_cast<int>(WifiOperateState::STA_CLOSED));
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);

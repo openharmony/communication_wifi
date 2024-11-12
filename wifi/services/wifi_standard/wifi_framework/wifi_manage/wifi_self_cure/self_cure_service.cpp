@@ -97,6 +97,20 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
         return;
     }
+
+    if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
+        pSelfCureStateMachine->SetHttpMonitorStatus(false);
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, 1, info);
+    } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
+        pSelfCureStateMachine->SetHttpMonitorStatus(true);
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);
+    }
+
+    if (IsSelfCureOnGoing() && info.detailedState != DetailedState::CONNECTED) {
+        WIFI_LOGI("HandleStaConnChanged, selfcure igonre conn state change");
+        return;
+    }
+
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD, info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
@@ -104,25 +118,10 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         if (lastState == OperateResState::CONNECT_OBTAINING_IP) {
             pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, lastWifiLinkedInfo);
         }
-    } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
-        pSelfCureStateMachine->SetHttpMonitorStatus(false);
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, 1, info);
-    } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
-        pSelfCureStateMachine->SetHttpMonitorStatus(true);
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);
     } else if (state == OperateResState::CONNECT_OBTAINING_IP) {
         lastWifiLinkedInfo = info;
     }
     lastState = state;
-}
-
-void SelfCureService::HandleStaOpened()
-{
-    if (pSelfCureStateMachine == nullptr) {
-        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
-        return;
-    }
-    pSelfCureStateMachine->SendMessage(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
 }
 
 void SelfCureService::HandleDhcpOfferReport(const IpInfo &ipInfo)
@@ -152,6 +151,15 @@ bool SelfCureService::IsSelfCureOnGoing()
         return false;
     }
     return pSelfCureStateMachine->IsSelfCureOnGoing();
+}
+
+bool SelfCureService::CheckSelfCureWifiResult(int event)
+{
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return false;
+    }
+    return pSelfCureStateMachine->CheckSelfCureWifiResult(event);
 }
 
 void SelfCureService::RegisterP2pEnhanceCallback()

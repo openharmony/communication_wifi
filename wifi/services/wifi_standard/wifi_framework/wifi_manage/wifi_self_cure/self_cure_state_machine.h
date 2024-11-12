@@ -167,8 +167,6 @@ public:
         void HandleWifi7WithoutMldBackoff(InternalMessagePtr msg);
         void HandleWifi7MldBackoff(InternalMessagePtr msg);
         void HandleNetworkConnectFailCount(InternalMessagePtr msg);
-        void HandleConnectFailed(InternalMessagePtr msg);
-        void HandleResetConnectNetwork(InternalMessagePtr msg);
         SelfCureStateMachine *pSelfCureStateMachine;
         bool setStaticIpConfig = false;
     };
@@ -233,16 +231,16 @@ public:
         SelfCureIssHandleFuncMap selfCureIssHandleFuncMap;
         std::vector<std::string> AssignedDnses;
         int InitSelfCureIssHandleMap();
-        void HandleRandMacSelfCureComplete(InternalMessagePtr msg);
         void HandleInternetFailedSelfCure(InternalMessagePtr msg);
         void HandleSelfCureWifiLink(InternalMessagePtr msg);
         void HandleNetworkDisconnected(InternalMessagePtr msg);
-        void HandleInternetRecovery(InternalMessagePtr msg);
+        void HandleInternetRecoveryConfirm(InternalMessagePtr msg);
         void HandleRssiChangedEvent(InternalMessagePtr msg);
         void HandleP2pDisconnected(InternalMessagePtr msg);
         void HandlePeriodicArpDetecte(InternalMessagePtr msg);
         void HandleArpFailedDetected(InternalMessagePtr msg);
         void HandleHttpReachableRecv(InternalMessagePtr msg);
+        void HandleSelfCureResultFailed(InternalMessagePtr msg);
         void SelectSelfCureByFailedReason(int internetFailedType);
         int SelectBestSelfCureSolution(int internetFailedType);
         int SelectBestSelfCureSolutionExt(int internetFailedType);
@@ -252,7 +250,6 @@ public:
         void SelfCureForReset(int requestCureLevel);
         void HandleIpConfigCompleted();
         void HandleIpConfigCompletedAfterRenewDhcp();
-        void HandleInternetRecoveryConfirm();
         bool ConfirmInternetSelfCure(int currentCureLevel);
         void HandleConfirmInternetSelfCureFailed(int currentCureLevel);
         void HandleInternetFailedAndUserSetStaticIp(int internetFailedType);
@@ -323,6 +320,7 @@ public:
     ErrCode Initialize();
     void SetHttpMonitorStatus(bool isHttpReachable);
     bool IsSelfCureOnGoing();
+    bool CheckSelfCureWifiResult(int event);
 
 private:
 
@@ -428,7 +426,16 @@ private:
     bool IsSettingsPage();
     bool IsMultiDhcpOffer();
     void ClearDhcpOffer();
+    void CheckSelfCureConnectState();
+    void CheckSelfCureReassocState();
     void UpdateSelfcureState(int selfcureType, bool isSelfCureOnGoing);
+    void HandleSelfCureNormal();
+    void HandleSelfCureException(int reasonCode);
+    void StopSelfCureDelay(int status, int delay);
+    void HandleSceStopSelfCure(int status);
+    void SetSelfCureWifiTimeOut(SelfCureState wifiSelfCureState);
+    void ResetSelfCureParam();
+    void NotifySelfCureCompleted(int status);
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap;
@@ -467,6 +474,9 @@ private:
     sptr<NetStateObserver> mNetWorkDetect;
     bool m_httpDetectResponse = false;
     bool p2pEnhanceConnected_ = false;
+    DetailedState selfCureNetworkLastState_ = DetailedState::IDLE;
+    WifiState selfCureWifiLastState_ = WifiState::UNKNOWN;
+    SelfCureState selfCureState_ = SelfCureState::SCE_WIFI_INVALID_STATE;
 };
 } // namespace Wifi
 } // namespace OHOS

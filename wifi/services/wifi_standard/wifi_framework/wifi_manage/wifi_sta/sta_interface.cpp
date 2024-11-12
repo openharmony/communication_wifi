@@ -475,6 +475,14 @@ ErrCode StaInterface::SetEnhanceService(IEnhanceService *enhanceService)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::SetSelfCureService(ISelfCureService *selfCureService)
+{
+    WIFI_LOGI("Enter SetSelfCureService");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->SetSelfCureService(selfCureService);
+    return WIFI_OPT_SUCCESS;
+}
 #endif
 
 ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)

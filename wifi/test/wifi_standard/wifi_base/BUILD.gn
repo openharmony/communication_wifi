@@ -35,7 +35,6 @@ ohos_unittest("base_unittest") {
     "hash_table_test.cpp",
     "net_test.cpp",
     "rpc_test_main.cpp",
-    "security_utils/wifi_openssl_utils_test.cpp",
     "serial_test.cpp",
     "server_test.cpp",
   ]

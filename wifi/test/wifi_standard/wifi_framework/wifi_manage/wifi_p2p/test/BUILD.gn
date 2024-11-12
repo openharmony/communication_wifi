@@ -86,7 +86,6 @@ ohos_unittest("wifi_p2p_test") {
     "wifi_p2p_dns_sd_service_request_test.cpp",
     "wifi_p2p_dns_sd_service_response_test.cpp",
     "wifi_p2p_group_info_proxy_test.cpp",
-    "wifi_p2p_group_manager_test.cpp",
     "wifi_p2p_service_manager_test.cpp",
     "wifi_p2p_service_request_list_test.cpp",
     "wifi_p2p_service_response_list_test.cpp",

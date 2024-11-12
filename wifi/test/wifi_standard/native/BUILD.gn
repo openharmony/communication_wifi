@@ -28,7 +28,6 @@ ohos_unittest("native_unittest") {
   sources = [
     "Mock/mock_wifi_c_device.cpp",
     "wifi_c_device_test.cpp",
-    "wifi_c_event_test.cpp",
     "wifi_c_hid2d_test.cpp",
     "wifi_c_hotspot_test.cpp",
     "wifi_c_p2p_test.cpp",

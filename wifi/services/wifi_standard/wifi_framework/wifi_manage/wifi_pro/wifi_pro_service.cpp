@@ -108,7 +108,7 @@ void WifiProService::NotifyWifiConnectStateChanged(OperateResState state, const 
 
 void WifiProService::NotifyCheckWifiInternetResult(OperateResState state)
 {
-    WIFI_LOGI("NotifyCheckWifiInternetResult: wifi internet result:%{public}d", static_cast<int32_t>(state));
+    WIFI_LOGD("NotifyCheckWifiInternetResult: wifi internet result:%{public}d", static_cast<int32_t>(state));
     pWifiProStateMachine_->SendMessage(EVENT_CHECK_WIFI_INTERNET_RESULT, static_cast<int32_t>(state));
 }
 

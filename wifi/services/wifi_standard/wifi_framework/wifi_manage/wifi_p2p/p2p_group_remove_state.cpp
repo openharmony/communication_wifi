@@ -16,10 +16,9 @@
 #include "p2p_state_machine.h"
 #include "wifi_logger.h"
 
-DEFINE_WIFILOG_P2P_LABEL("P2pGroupRemoveState");
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_P2P_LABEL("P2pGroupRemoveState");
 P2pGroupRemoveState::P2pGroupRemoveState()
     : State("P2pGroupRemoveState")
 {}

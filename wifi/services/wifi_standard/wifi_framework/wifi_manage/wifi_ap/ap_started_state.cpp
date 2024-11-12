@@ -495,7 +495,6 @@ void ApStartedState::ProcessCmdAssociatedStaChanged(InternalMessagePtr msg)
     return;
 }
 
-
 void ApStartedState::ProcessCmdEnableAp(InternalMessagePtr msg)
 {
     WIFI_LOGI("Instance %{public}d %{public}s  GoInState", m_id, GetStateName().c_str());

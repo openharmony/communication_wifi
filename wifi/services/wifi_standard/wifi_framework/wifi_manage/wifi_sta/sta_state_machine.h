@@ -42,6 +42,7 @@
 #include "core_manager_inner.h"
 #include "telephony_errors.h"
 #include "ienhance_service.h"
+#include "iself_cure_service.h"
 #endif
 
 namespace OHOS {
@@ -552,6 +553,7 @@ public:
     void DealNetworkRemoved(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
+    void SetSelfCureService(ISelfCureService *selfCureService);
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif
 
@@ -1199,6 +1201,7 @@ private:
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
+    ISelfCureService *selfCureService_ = nullptr;
 #endif
 
     int lastNetworkId;

@@ -119,6 +119,16 @@ bool SelfCureInterface::IsSelfCureOnGoing()
     return pSelfCureService->IsSelfCureOnGoing();
 }
 
+bool SelfCureInterface::CheckSelfCureWifiResult(int event)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return false;
+    }
+    return pSelfCureService->CheckSelfCureWifiResult(event);
+}
+
 void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     std::lock_guard<std::mutex> lock(mutex);
@@ -137,16 +147,6 @@ void SelfCureInterface::DealDhcpOfferReport(const IpInfo &ipInfo, int instId)
         return;
     }
     pSelfCureService->HandleDhcpOfferReport(ipInfo);
-}
-
-void SelfCureInterface::DealStaOpened(int instId)
-{
-    std::lock_guard<std::mutex> lock(mutex);
-    if (pSelfCureService == nullptr) {
-        WIFI_LOGI("pSelfCureService is null");
-        return;
-    }
-    pSelfCureService->HandleStaOpened();
 }
 
 void SelfCureInterface::DealRssiLevelChanged(int rssi, int instId)

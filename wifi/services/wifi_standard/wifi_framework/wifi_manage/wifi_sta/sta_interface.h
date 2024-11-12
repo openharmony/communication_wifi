@@ -355,6 +355,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) override;
+
+    /**
+     * @Description Set SelfcureService to sta Service.
+     *
+     * @param enhanceService ISelfCureService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetSelfCureService(ISelfCureService *selfCureService) override;
 #endif
 	/**
      * @Description EnableHiLinkHandshake.

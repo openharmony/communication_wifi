@@ -46,6 +46,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
 namespace OHOS {
 namespace Wifi {
+    
 const int STA_JOIN_HANDLE_DELAY = 5 * 1000;
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),

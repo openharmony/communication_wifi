@@ -285,7 +285,7 @@ ErrCode StaInterface::CancelWps()
 
 ErrCode StaInterface::ConnectivityManager(const std::vector<InterScanInfo> &scanInfos)
 {
-    LOGI("Enter Connection management.\n");
+    LOGD("Enter Connection management.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->AutoConnectService(scanInfos) != WIFI_OPT_SUCCESS) {

@@ -154,7 +154,7 @@ void WifiProStateMachine::RefreshConnectedNetWork()
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    WIFI_LOGI("RefreshConnectedNetWork, connState:%{public}d,"
+    WIFI_LOGD("RefreshConnectedNetWork, connState:%{public}d,"
         "supplicantState:%{public}d.", linkedInfo.connState, static_cast<int32_t>(linkedInfo.supplicantState));
     if (!WifiProUtils::IsSupplicantConnecting(linkedInfo.supplicantState)) {
         currentBssid_ = "";
@@ -175,7 +175,7 @@ void WifiProStateMachine::RefreshConnectedNetWork()
     }
     for (auto &wifiDeviceConfig : configs) {
         if (wifiDeviceConfig.networkId == linkedInfo.networkId) {
-            WIFI_LOGI("RefreshConnectedNetWork, find device config.");
+            WIFI_LOGD("RefreshConnectedNetWork, find device config.");
             pCurrWifiDeviceConfig_ = std::make_shared<WifiDeviceConfig>(wifiDeviceConfig);
         }
     }
@@ -183,7 +183,7 @@ void WifiProStateMachine::RefreshConnectedNetWork()
 
 bool WifiProStateMachine::IsReachWifiScanThreshold(int32_t signalLevel)
 {
-    WIFI_LOGI("IsReachWifiScanThreshold, rssiLevel:%{public}d.", signalLevel);
+    WIFI_LOGD("IsReachWifiScanThreshold, rssiLevel:%{public}d.", signalLevel);
     if (signalLevel == SIG_LEVEL_4) {
         return false;
     }
@@ -609,7 +609,7 @@ void WifiProStateMachine::WifiHasNetState::HandleRssiChangedInHasNet(const Inter
     }
 
     if (!pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel)) {
-        WIFI_LOGI("HandleRssiChangedInHasNet, StopTimer EVENT_REQUEST_SCAN_DELAY.");
+        WIFI_LOGD("HandleRssiChangedInHasNet, StopTimer EVENT_REQUEST_SCAN_DELAY.");
         pWifiProStateMachine_->StopTimer(EVENT_REQUEST_SCAN_DELAY);
         return;
     }
@@ -742,7 +742,7 @@ bool WifiProStateMachine::WifiHasNetState::HandleConnectStateChangedInHasNet(
         return true;
     }
 
-    WIFI_LOGI("receive wifi2wifi Result,isWifi2WifiSwitching = %{public}d.", isWifi2WifiSwitching_);
+    WIFI_LOGD("receive wifi2wifi Result,isWifi2WifiSwitching = %{public}d.", isWifi2WifiSwitching_);
     int32_t state = msg->GetParam1();
     std::string bssid;
     msg->GetMessageObj(bssid);

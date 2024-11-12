@@ -99,6 +99,16 @@ ErrCode WifiP2pManager::AutoStartP2pService()
             WIFI_LOGE("service EnableP2p failed, ret %{public}d!", static_cast<int>(ret));
             break;
         }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_ENHANCE);
+            break;
+        }
+        ret = pService->SetEnhanceService(pEnhanceService);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(ret));
+            break;
+        }
     } while (false);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);

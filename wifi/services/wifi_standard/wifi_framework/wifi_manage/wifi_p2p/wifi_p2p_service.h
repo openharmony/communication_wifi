@@ -23,6 +23,7 @@
 #include "p2p_state_machine.h"
 #include "i_wifi_p2p_iface.h"
 #include "wifi_error_no.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -324,6 +325,13 @@ public:
      */
     virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result) override;
 
+    /**
+     * @Description Set EnhanceService to p2p service
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) override;
 private:
     /**
      * @Description - P2P state machine deregistration event callback.

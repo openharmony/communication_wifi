@@ -93,11 +93,15 @@ public:
     /**
      * @Description Construct a new P2pStateMachine object.
      */
-    P2pStateMachine(P2pMonitor &, WifiP2pGroupManager &, WifiP2pDeviceManager &, WifiP2pServiceManager &,
-        AuthorizingNegotiationRequestState &, GroupFormedState &, GroupNegotiationState &, InvitationReceivedState &,
-        InvitationRequestState &, P2pDefaultState &, P2pDisabledState &, P2pDisablingState &, P2pEnabledState &,
-        P2pEnablingState &, P2pGroupFormationState &, P2pGroupJoinState &, P2pGroupOperatingState &, P2pIdleState &,
-        P2pInvitingState &, ProvisionDiscoveryState &, P2pGroupRemoveState &);
+    P2pStateMachine(P2pMonitor &monitor, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &setDeviceMgr,
+        WifiP2pServiceManager &setSvrMgr, AuthorizingNegotiationRequestState &authorizingNegotiationRequestState,
+        GroupFormedState &groupFormedState, GroupNegotiationState &groupNegotiationState,
+        InvitationReceivedState &invltationRecelvedState, InvitationRequestState &invitationRequestState,
+        P2pDefaultState &defaultState, P2pDisabledState &disabledState, P2pDisablingState &disablingState,
+        P2pEnabledState &enabledState, P2pEnablingState &enablingState,
+        P2pGroupFormationState &groupFormationState, P2pGroupJoinState &groupJoinState,
+        P2pGroupOperatingState &groupOperatingState, P2pIdleState &idleState, P2pInvitingState &invitingState,
+        ProvisionDiscoveryState &provisionDiscoveryState, P2pGroupRemoveState &groupRemoveState);
     /**
      * @Description Destroy the P2pStateMachine object.
      */

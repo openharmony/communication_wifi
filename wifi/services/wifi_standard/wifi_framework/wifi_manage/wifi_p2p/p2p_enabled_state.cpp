@@ -125,6 +125,8 @@ void P2pEnabledState::InitProcessMsg()
         [this](InternalMessagePtr msg) { return this->ProcessCmdIncreaseSharedLink(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DECREASE_SHARE_LINK,
         [this](InternalMessagePtr msg) { return this->ProcessCmdDecreaseSharedLink(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_CHR_REPORT,
+        [this](InternalMessagePtr msg) { return this->ProcessChrReport(msg); }));
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
@@ -674,6 +676,15 @@ bool P2pEnabledState::ProcessCmdDecreaseSharedLink(InternalMessagePtr msg) const
     if (SharedLinkManager::GetSharedLinkCount() == 0) {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
     }
+    return EXECUTED;
+}
+
+bool P2pEnabledState::ProcessChrReport(InternalMessagePtr msg) const
+{
+    int errCode = msg->GetParam1();
+    WIFI_LOGI("P2pEnabledState receive chr error code %{public}d", errCode);
+    deviceManager.GetThisDevice().SetChrErrCode(static_cast<P2pChrEvent>(errCode));
+    p2pStateMachine.BroadcastThisDeviceChanaged(deviceManager.GetThisDevice());
     return EXECUTED;
 }
 } // namespace Wifi

@@ -102,6 +102,8 @@ inline const int MAX_RSSI = 200;
 inline const int MAX_RX_SPATIAL_STREAMS = 2;
 inline const int MAX_TX_SPATIAL_STREAMS = 2;
 
+inline const int LOCATOR_SA_UID = 1021;
+
 int WifiMaxThroughput(int wifiStandard, bool is11bMode,
                       WifiChannelWidth channelWidth, int rssiDbm, int maxNumSpatialStream, int channelUtilization);
 

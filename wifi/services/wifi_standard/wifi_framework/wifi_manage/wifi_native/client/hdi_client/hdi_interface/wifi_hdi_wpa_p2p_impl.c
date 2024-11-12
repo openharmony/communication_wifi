@@ -20,7 +20,6 @@
 #include "stub_collector.h"
 #include "wifi_native_define.h"
 
-
 #undef LOG_TAG
 #define LOG_TAG "WifiHdiWpaP2pImpl"
 #define REPLY_BUF_LENGTH (1024)
@@ -168,8 +167,11 @@ void AppendMac(char *mac, int len)
         LOGE("Error! Could not open file\n");
         return;
     }
+    if (fwrite("\n", sizeof(char), strlen("\n"), fp) == 0) {
+        LOGE("write \n faild");
+    }
     if (fwrite(mac, sizeof(char), len, fp) == 0) {
-        LOGE("write faild");
+        LOGE("write mac faild");
     }
     if (fclose(fp) != 0) {
         LOGE("close fp failed");

@@ -58,8 +58,7 @@ public:
 
 class MockApService : public ApService {
 public:
-    explicit MockApService(ApStateMachine &apStateMachine, ApStartedState &apStartedState)
-        : ApService(apStateMachine, apStartedState)
+    explicit MockApService(ApStateMachine &apStateMachine) : ApService(apStateMachine)
     {}
     ErrCode EnableHotspot();
     ErrCode DisableHotspot();
@@ -128,7 +127,7 @@ public:
         : mockApRootState(),
           mockApIdleState(mockApStateMachine),
           mockApStartedState(mockApStateMachine, mockApConfigUse, mockApMonitor),
-          mockApService(mockApStateMachine, mockApStartedState),
+          mockApService(mockApStateMachine),
           mockApStateMachine(
               mockApStationsManager, mockApRootState, mockApIdleState, mockApStartedState, mockApMonitor),
           mockApConfigUse(),

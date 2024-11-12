@@ -123,6 +123,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnGetDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_DPI_MARK_RULE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetDpiMarkRule(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1311,5 +1313,25 @@ void WifiDeviceStub::OnGetDeviceConfig(uint32_t code, MessageParcel &data, Messa
     WriteWifiDeviceConfig(reply, config);
     return;
 }
+
+void WifiDeviceStub::OnSetDpiMarkRule(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = WIFI_OPT_FAILED;
+    const char *readStr = data.ReadCString();
+    int uid = data.ReadInt32();
+    int protocol = data.ReadInt32();
+    int enable = data.ReadInt32();
+    if (readStr == nullptr) {
+        ret = WIFI_OPT_INVALID_PARAM;
+    } else {
+        std::string ifaceName = readStr;
+        ret = SetDpiMarkRule(ifaceName, uid, protocol, enable);
+    }
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

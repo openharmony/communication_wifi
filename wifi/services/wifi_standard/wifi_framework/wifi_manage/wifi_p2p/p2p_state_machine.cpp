@@ -1325,5 +1325,10 @@ bool P2pStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo>
     return m_DhcpdInterface.GetConnectedStationInfo(ifaceName, result);
 }
 
+void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    p2pGroupOperatingState.SetEnhanceService(enhanceService);
+}
+
 } // namespace Wifi
 } // namespace OHOS

@@ -240,7 +240,7 @@ public:
 
 private:
     int GetServiceDll(const std::string &name, std::string &dlname);
-    int LoadStaService(const std::string &dlname, int insId, bool bCreate);
+    int LoadStaService(const std::string &dlname, int instId, bool bCreate);
     int UnloadStaService(bool bPreLoad, int instId = 0);
 #ifdef FEATURE_WIFI_PRO_SUPPORT
     int32_t LoadWifiProService(bool bCreate, int32_t instId = 0);

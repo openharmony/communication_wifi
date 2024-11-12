@@ -1196,7 +1196,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
-    IEnhanceService *enhanceService_;        /* EnhanceService handle */
+    IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
 #endif
 
     int lastNetworkId;

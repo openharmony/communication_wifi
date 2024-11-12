@@ -42,6 +42,7 @@
 #include "wifi_global_func.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_randommac_helper.h"
+#include "wifi_sta_hal_interface.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -49,9 +50,9 @@ namespace Wifi {
 
 constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
-constexpr const char *EXTENSION_SUCCESS = "wifi extension success";
-constexpr const char *EXTENSION_FAIL = "wifi extension fail";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
+constexpr int EXTENSION_ERROR_CODE = 13500099;
+constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
@@ -1289,8 +1290,16 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         }
     }
 
-    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
+    std::string appId = "";
+    std::string packageName = "";
+#ifndef OHOS_ARCH_LITE
+    GetBundleNameByUid(GetCallingUid(), packageName);
+    int32_t userId = static_cast<int32_t>(GetCallingUid() / UID_CALLINGUID_TRANSFORM_DIVISOR);
+    appId = GetBundleAppIdByBundleName(userId, packageName);
+#endif
+    if (ProcessPermissionVerify(appId, packageName) == PERMISSION_DENIED) {
+        if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
 #ifdef SUPPORT_RANDOM_MAC_ADDR
         info.bssid = WifiConfigCenter::GetInstance().GetRandomMacAddr(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
             info.bssid);
@@ -1298,6 +1307,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         /* Clear mac addr */
         info.bssid = "";
 #endif
+        }
     }
 
     WIFI_LOGD("GetLinkedInfo, networkId=%{public}d, ssid=%{public}s, rssi=%{public}d, frequency=%{public}d",
@@ -1677,7 +1687,7 @@ ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported
 {
     WIFI_LOGI("Enter get bandtype is supported.");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        WIFI_LOGE("IsBandTypeSupported:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1701,7 +1711,7 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
 
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("Get5GHzChannelList:VerifyGetWifiInfoPermission  PERMISSION_DENIED!");
+        WIFI_LOGE("Get5GHzChannelList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -2156,13 +2166,13 @@ ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
 ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& reply)
 {
     UniqueFd fd(-1);
-    std::string replyCode = EXTENSION_SUCCESS;
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
     std::string backupInfo = data.ReadString();
     int ret = WifiSettings::GetInstance().OnBackup(fd, backupInfo);
     std::fill(backupInfo.begin(), backupInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnBackup fail: backup data fail!");
-        replyCode = EXTENSION_FAIL;
+        replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
     }
     if (reply.WriteFileDescriptor(fd) == false || reply.WriteString(replyCode) == false) {
         close(fd.Release());
@@ -2178,13 +2188,13 @@ ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& repl
 ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& reply)
 {
     UniqueFd fd(data.ReadFileDescriptor());
-    std::string replyCode = EXTENSION_SUCCESS;
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
     std::string restoreInfo = data.ReadString();
     int ret = WifiSettings::GetInstance().OnRestore(fd, restoreInfo);
     std::fill(restoreInfo.begin(), restoreInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnRestore fail: restore data fail!");
-        replyCode = EXTENSION_FAIL;
+        replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
     }
     if (reply.WriteString(replyCode) == false) {
         close(fd.Release());
@@ -2197,5 +2207,27 @@ ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& rep
     return WIFI_OPT_SUCCESS;
 }
 #endif
+
+int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, const std::string &packageName)
+{
+    if (appId.empty() || packageName.empty()) {
+        WIFI_LOGI("ProcessPermissionVerify(), PERMISSION_DENIED");
+        return PERMISSION_DENIED;
+    }
+    std::map<std::string, std::vector<PackageInfo>> packageInfoMap;
+    if (WifiSettings::GetInstance().GetPackageInfoMap(packageInfoMap) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetPackageInfoMap failed");
+        return PERMISSION_DENIED;
+    }
+    std::vector<PackageInfo> whilteListProcessInfo = packageInfoMap["AclAuthPackages"];
+    auto iter = whilteListProcessInfo.begin();
+    while (iter != whilteListProcessInfo.end()) {
+        if (iter->name == packageName && iter->appid == appId) {
+            return PERMISSION_GRANTED;
+        }
+        iter++;
+    }
+    return PERMISSION_DENIED;
+}
 }  // namespace Wifi
 }  // namespace OHOS

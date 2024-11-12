@@ -55,7 +55,7 @@ constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_
 constexpr int MAX_CHLOAD = 800;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
-#define PBC_ANY_BSSID "any"
+#define ANY_BSSID "any"
 #define PORTAL_ACTION "ohos.want.action.awc"
 #define PORTAL_ENTITY "entity.browser.hbct"
 #define PORTAL_CHECK_TIME (10 * 60)
@@ -1583,9 +1583,9 @@ void StaStateMachine::StartWpsMode(InternalMessagePtr msg)
     wpsConfig.setup = static_cast<SetupMethod>(msg->GetParam1());
     wpsConfig.pin = msg->GetStringFromMessage();
     wpsConfig.bssid = msg->GetStringFromMessage();
-    if (wpsConfig.bssid.length() == 0 || wpsConfig.bssid == PBC_ANY_BSSID) {
+    if (wpsConfig.bssid.length() == 0 || wpsConfig.bssid == ANY_BSSID) {
         wpsParam.anyFlag = 1;
-        wpsParam.bssid = PBC_ANY_BSSID;
+        wpsParam.bssid = ANY_BSSID;
     } else {
         wpsParam.anyFlag = 0;
         wpsParam.bssid = wpsConfig.bssid;
@@ -4013,7 +4013,12 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig, m_instId) != 0) {
         WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
     }
+    LOGI("%{public}s: networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s, preSharedKeyLen:%{public}d",
+        __FUNCTION__, deviceConfig.networkId, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
+        static_cast<int>(deviceConfig.preSharedKey.length()));
     UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, ANY_BSSID, ifaceName);
 
     std::string macAddr;
     std::string realMacAddr;

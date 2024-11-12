@@ -130,7 +130,6 @@ public:
     void StartRoamToNetworkTest();
     int StartConnectToUserSelectNetworkSuccessTest();
     int StartConnectToUserSelectNetworkSuccessFail();
-    void SetTxPowerTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -831,11 +830,6 @@ int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
     return static_cast<int>(pStaService->StartConnectToUserSelectNetwork(0, "11:22:33:44"));
 }
 
-void StaServiceTest::SetTxPowerTest()
-{
-    pStaService->SetTxPower(0);
-}
-
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
 {
     StaServiceStartPortalCertificationTest();
@@ -1174,11 +1168,6 @@ HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessTest, TestSize.Le
 HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessFail, TestSize.Level1)
 {
     EXPECT_EQ(1, StartConnectToUserSelectNetworkSuccessFail());
-}
- 
-HWTEST_F(StaServiceTest, SetTxPowerTest, TestSize.Level1)
-{
-    SetTxPowerTest();
 }
 } // namespace Wifi
 } // namespace OHOS

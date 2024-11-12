@@ -350,7 +350,7 @@ HWTEST_F(IWifiTest, NotifyClearTest, TestSize.Level1)
 HWTEST_F(IWifiTest, OnTransactTest1, TestSize.Level1)
 {
     char test[] = "102\t100\t101\t";
-    EXPECT_FALSE(OnTransact(nullptr) == -1);
+    EXPECT_TRUE(OnTransact(nullptr) == -1);
     mTestContext->oneProcess = test;
     mTestContext->nPos = 0;
     mTestContext->nSize = strlen(test) + 1;

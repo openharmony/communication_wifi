@@ -2214,12 +2214,12 @@ int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, con
         WIFI_LOGI("ProcessPermissionVerify(), PERMISSION_DENIED");
         return PERMISSION_DENIED;
     }
-    std::map<std::string, std::vector<PackageInfo>> packageInfoMap;
-    if (WifiSettings::GetInstance().GetPackageFilterMap(packageInfoMap) != 0) {
+    std::map<std::string, std::vector<std::string>> filterMap;
+    if (WifiSettings::GetInstance().GetPackageFilterMap(filterMap) != 0) {
         WIFI_LOGE("WifiSettings::GetInstance().GetPackageInfoMap failed");
         return PERMISSION_DENIED;
     }
-    std::vector<PackageInfo> whilteListProcessInfo = packageInfoMap["AclAuthPackages"];
+    std::vector<std::string> whilteListProcessInfo = filterMap["GetLinkProcessPermissionVerify"];
     auto iter = whilteListProcessInfo.begin();
     while (iter != whilteListProcessInfo.end()) {
         if (iter->name == packageName && iter->appid == appId) {

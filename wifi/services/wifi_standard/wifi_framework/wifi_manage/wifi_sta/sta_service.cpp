@@ -184,8 +184,8 @@ ErrCode StaService::EnableStaService()
 {
     WIFI_LOGI("Enter EnableStaService m_instId:%{public}d\n", m_instId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-#ifndef OHOS_ARCH_LITE
     if (m_instId == INSTID_WLAN0) {
+#ifndef OHOS_ARCH_LITE
         // notification of registration country code change
         std::string moduleName = "StaService_" + std::to_string(m_instId);
         m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
@@ -194,9 +194,9 @@ ErrCode StaService::EnableStaService()
             return WIFI_OPT_FAILED;
         }
         WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
-    }
 #endif
-    WifiSettings::GetInstance().ReloadDeviceConfig();
+        WifiSettings::GetInstance().ReloadDeviceConfig();
+    }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
 }

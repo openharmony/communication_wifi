@@ -38,8 +38,8 @@ public:
     explicit WifiAppStateAware(int instId = 0);
     ~WifiAppStateAware();
     static WifiAppStateAware &GetInstance();
-    ErrCode InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks);
     sptr<AppExecFwk::IAppMgr> GetAppMgr();
+    ErrCode InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks);
     void RegisterAppStateObserver();
     void UnSubscribeAppState();
     void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);

@@ -230,9 +230,10 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
 
     if (config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
-        const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+        std::string wifiBrokerFrameProcessName = "";
+        bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-        if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+        if (!success || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
             LOGE("AddCandidateConfig unsupport wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
         }
@@ -405,7 +406,8 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
 
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter AddDeviceConfig, bssid=%{public}s\n", MacAnonymize(config.bssid).c_str());
+    LOGI("Enter AddDeviceConfig, ssid:%{public}s, bssid=%{public}s, keyMgmt: %{public}s\n",
+        SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str(), config.keyMgmt.c_str());
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = INVALID_NETWORK_ID;
     bool isUpdate = false;
@@ -417,10 +419,13 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
         status = tempDeviceConfig.status;
-        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
-        bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
-        pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
+        if (m_instId == INSTID_WLAN0) {
+            CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+            bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
+            pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
+        }
         isUpdate = true;
+        LOGI("AddDeviceConfig update device networkId:%{public}d", netWorkId);
     } else {
         netWorkId = WifiSettings::GetInstance().GetNextNetworkId();
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);

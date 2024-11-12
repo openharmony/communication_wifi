@@ -280,6 +280,12 @@ public:
         pSelfCureStateMachine->InitDnsServer();
     }
 
+    void IsCustNetworkSelfCureTest()
+    {
+        LOGI("Enter IsCustNetworkSelfCureTest");
+        pSelfCureStateMachine->IsCustNetworkSelfCure();
+    }
+
     void SelfCureForDnsTest()
     {
         LOGI("Enter SelfCureForDnsTest");
@@ -1948,6 +1954,11 @@ HWTEST_F(SelfCureStateMachineTest, HandleGatewayChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, InitDnsServerTest, TestSize.Level1)
 {
     InitDnsServerTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsCustNetworkSelfCureTest, TestSize.Level1)
+{
+    IsCustNetworkSelfCureTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, SelfCureForDnsTest, TestSize.Level1)

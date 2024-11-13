@@ -22,6 +22,8 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspot");
 
 namespace OHOS {
 namespace Wifi {
+
+std::mutex g_apMutex;
 NO_SANITIZE("cfi") std::shared_ptr<WifiHotspot> WifiHotspot::GetInstance(int systemAbilityId, int id)
 {
     if (id >= AP_INSTANCE_MAX_NUM) {
@@ -29,14 +31,18 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiHotspot> WifiHotspot::GetInstance(int sys
         return nullptr;
     }
 
-    std::shared_ptr<WifiHotspotImpl> hotspot = std::make_shared<WifiHotspotImpl>();
+    static std::shared_ptr<WifiHotspotImpl> hotspot = nullptr;
+    std::lock_guard<std::mutex> lock(g_apMutex);
+    if (!hotspot) {
+        hotspot = std::make_shared<WifiHotspotImpl>();
+    }
     if (hotspot && hotspot->Init(systemAbilityId, id)) {
         WIFI_LOGD("ap obj id:%{public}d succeeded, sa id:%{public}d", id, systemAbilityId);
         return hotspot;
+    } else {
+        WIFI_LOGE("new wifi hotspot id:%{public}d failed, sa id:%{public}d", id, systemAbilityId);
+        return nullptr;
     }
-
-    WIFI_LOGE("new wifi hotspot id:%{public}d failed, sa id:%{public}d", id, systemAbilityId);
-    return nullptr;
 }
 
 WifiHotspot::~WifiHotspot()

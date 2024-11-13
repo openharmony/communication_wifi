@@ -427,7 +427,7 @@ private:
 
     // death recipient
     static void AddChipHdiDeathRecipient();
-    static void RemoveChipHdiDeathRecipient(); 
+    static void RemoveChipHdiDeathRecipient();
 
 private:
     std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> mInterfaceInfoCache;

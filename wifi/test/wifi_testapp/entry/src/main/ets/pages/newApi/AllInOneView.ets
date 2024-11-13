@@ -2,32 +2,38 @@ import { wifiManager } from '@kit.ConnectivityKit'
 import { ChangeNameView } from './ChangeNameView'
 import { NormalNav } from './Components/NormalNav'
 import { JSON } from '@kit.ArkTS'
+import { CreateGroupView } from './CreateGroupView'
+import { GlobalThis } from '../../utils/globalThis'
+import { common } from '@kit.AbilityKit'
 
 
 const TAG = '[AllInOneView]'
+
+const ctx = GlobalThis.getInstance().getContext('context') as common.UIAbilityContext
 
 /*CONNECTED	0	连接状态。
 INVITED	1	邀请状态。
 FAILED	2	失败状态。
 AVAILABLE	3	可用状态。
 UNAVAILABLE	4	不可用状态。*/
-const P2PDeviceStatusInfo = ['连接状态','邀请状态', '失败状态', '可用状态', '不可用状态']
+const P2PDeviceStatusInfo = [$r('app.string.status_connected'), $r('app.string.status_invite'),
+  $r('app.string.status_fail'), $r('app.string.status_available'), $r('app.string.status_unavailable')]
 @Observed
-class P2PDevice {
+export class P2PDevice {
   name: string
   address: string = ''
-  status: string = ''
+  status: number = 0
 
   constructor(name: string) {
     this.name = name
-    this.status = ''
+    this.status = 0
   }
 
   static from(d: wifiManager.WifiP2pDevice):P2PDevice {
     let res = new P2PDevice(d.deviceName)
     res.name = d.deviceName
     res.address = d.deviceAddress
-    res.status = P2PDeviceStatusInfo[d.deviceStatus]
+    res.status = d.deviceStatus
     return res
   }
 }
@@ -159,29 +165,34 @@ export struct AllInOneView {
   }
 
   removeP2PListener() {
-    wifiManager.off('p2pPersistentGroupChange')
-    wifiManager.off('p2pDiscoveryChange')
-    wifiManager.off('p2pPeerDeviceChange')
-    wifiManager.off('p2pConnectionChange')
+    try {
+      wifiManager.off('p2pPersistentGroupChange')
+      wifiManager.off('p2pDiscoveryChange')
+      wifiManager.off('p2pPeerDeviceChange')
+      wifiManager.off('p2pConnectionChange')
+    } catch (e) {
+      console.log(`wifiManager.off Error: ${JSON.stringify(e)}`)
+    }
+
   }
 
   @Builder localDeviceHeaer() {
     Row() {
-      Text('我的设备')
+      Text($r('app.string.my_device'))
         .fontWeight(FontWeight.Bold)
     }.height(60)
   }
 
   @Builder connectedDeviceHeader() {
     Row() {
-      Text('已连接设备设备')
+      Text($r('app.string.connected_device'))
         .fontWeight(FontWeight.Bold)
     }.height(60)
   }
 
   @Builder deviceHeader() {
     Row() {
-      Text('可用设备')
+      Text($r('app.string.available_device'))
         .fontWeight(FontWeight.Bold)
     }
     .height(60)
@@ -189,7 +200,7 @@ export struct AllInOneView {
 
   @Builder groupHeader() {
     Row() {
-      Text('已保存的群组')
+      Text($r('app.string.saved_group'))
         .fontWeight(FontWeight.Bold)
     }
     .height(60)
@@ -198,14 +209,19 @@ export struct AllInOneView {
   build() {
     Navigation(this.pathInfo) {
       Column() {
-        NormalNav({title: '新接口测试'})
-        Button(this.isP2pDiscoverEnable ? '关闭扫描' : '开启扫描')
+        NormalNav({title: $r('app.string.new_api_test_title')})
+        Button(this.isP2pDiscoverEnable ? $r('app.string.stop_scan') : $r('app.string.start_scan'))
           .onClick(() => {
             if (this.isP2pDiscoverEnable) {
               wifiManager.stopDiscoverDevices()
             }
             wifiManager.startDiscoverDevices()
           })
+        Button($r('app.string.create_group_test'))
+          .onClick(() => {
+            this.pathInfo.pushPath({name: 'createGroup'})
+          })
+          .margin({top: 20})
         List({ space: 10 }) {
           if (this.localDevice !== null) {
             ListItemGroup({ header: this.localDeviceHeaer(), style: ListItemGroupStyle.CARD }) {
@@ -240,7 +256,8 @@ export struct AllInOneView {
               }
               .height(110)
               .onClick(async () => {
-                if (device.status === '邀请状态') {
+                console.log(`device.status === ${device.status}`)
+                if (device.status === wifiManager.P2pDeviceStatus.INVITED) {
                   this.cancelConnect(device)
                 } else {
                   await this.connectToDevice(device)
@@ -274,19 +291,21 @@ export struct AllInOneView {
   }
 
   cancelConnect(device: P2PDevice) {
-    const message = `是否取消与${device.name}的连接邀请？`
+    let ctx = GlobalThis.getInstance().getContext('context')
+    let message = ctx!.resourceManager.getStringSync($r("app.string.cancel_connect_alert_str"), device.name)
     AlertDialog.show({
       alignment: DialogAlignment.Bottom,
-      title: "取消邀请",
+      title: $r('app.string.cancel_invite'),
       message,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.cancel_button'),
         action: () => {}
       },
       secondaryButton: {
-        value: '确定',
+        value: $r('app.string.confirm_button'),
         action: () => {
           try {
+            console.log(TAG, `p2pCancelConnect`)
             wifiManager.p2pCancelConnect()
           } catch (e) {
             console.log(TAG, "p2pCancelConnect Error:" + JSON.stringify(e))
@@ -297,19 +316,20 @@ export struct AllInOneView {
   }
 
   disconnect(device: P2PDevice) {
-    const message = `如果断开连接，您与${device.name}的连接将中断`
+    let ctx = GlobalThis.getInstance().getContext('context')
+    let message = ctx!.resourceManager.getStringSync($r("app.string.disconnect_alert_content"), device.name)
     AlertDialog.show({
       alignment: DialogAlignment.Bottom,
-      title: "断开连接",
+      title: $r('app.string.disconnect_alert_title'),
       message,
       primaryButton: {
-        value: '取消',
+        value: $r('app.string.cancel_button'),
         action: () => {
-          console.log('取消')
+          console.log("cancel disconnect")
         }
       },
       secondaryButton: {
-        value: '确定',
+        value: $r('app.string.confirm_button'),
         action: () => {
           try {
             wifiManager.removeGroup()
@@ -324,20 +344,16 @@ export struct AllInOneView {
   deleteGroup(group: P2PGroup) {
     AlertDialog.show({
       alignment: DialogAlignment.Bottom,
-      title: "是否放弃保存所选群组",
+      title: $r("app.string.abandon_group_alert_title"),
       message: '',
       primaryButton: {
-        value: '取消',
+        value: $r("app.string.cancel_button"),
         action: () => {}
       },
       secondaryButton: {
-        value: '确定',
+        value: $r('app.string.confirm_button'),
         action: () => {
-          try {
-            wifiManager.deletePersistentGroup(group.networkId)
-          } catch (e) {
-            console.log("removeGroup err: " + JSON.stringify(e))
-          }
+          wifiManager.deletePersistentGroup(group.networkId)
         }
       }
     })
@@ -364,24 +380,35 @@ export struct AllInOneView {
   @Builder routeMap(name: string) {
     if (name === 'changeName') {
       ChangeNameView()
+    } else if (name === 'createGroup') {
+      CreateGroupView()
     }
   }
 }
 
 @Component
-struct DeviceItemView {
+export struct DeviceItemView {
 
   @ObjectLink device: P2PDevice
+  @State deviceNameTitle: string = ''
+  @State deviceAddrTitle: string = ''
+  @State deviceStatusTitle: string = ''
+
+  async aboutToAppear() {
+    this.deviceNameTitle = await ctx.resourceManager.getStringValue($r('app.string.device_name'))
+    this.deviceAddrTitle = await ctx.resourceManager.getStringValue($r('app.string.device_addr'))
+    this.deviceStatusTitle = await ctx.resourceManager.getStringValue($r('app.string.device_status'))
+  }
 
   build() {
     Row() {
       Column({space: 10}) {
-        Text(`设备名称：${this.device.name}`)
-        Text(`设备地址：${this.device.address}`)
-        Text(`设备状态：${this.device.status}`)
+        Text(`${this.deviceNameTitle}：${this.device.name}`)
+        Text(`${this.deviceAddrTitle}：${this.device.address}`)
+        Text(`${this.deviceStatusTitle}：${ctx.resourceManager.getStringSync(P2PDeviceStatusInfo[this.device.status])}`)
       }.alignItems(HorizontalAlign.Start)
       Blank().layoutWeight(1)
-      if (this.device.status === '邀请状态') {
+      if (this.device.status === wifiManager.P2pDeviceStatus.INVITED) {
         LoadingProgress()
           .width(40)
           .height(40)
@@ -396,11 +423,16 @@ struct DeviceItemView {
 struct GroupItemView {
 
   @ObjectLink group: P2PGroup
+  @State groupTitle: string = ''
+
+  async  aboutToAppear() {
+    this.groupTitle = await ctx.resourceManager.getStringValue($r('app.string.group_name'))
+  }
 
   build() {
     Row() {
       Column({space: 10}) {
-        Text(`组名称：${this.group.name}`)
+        Text(`${this.groupTitle}：${this.group.name}`)
       }.alignItems(HorizontalAlign.Start)
       Blank().layoutWeight(1)
     }

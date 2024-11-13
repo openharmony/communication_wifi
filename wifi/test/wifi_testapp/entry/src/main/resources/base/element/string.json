@@ -1930,6 +1930,10 @@
     {
       "name": "status_unavailable",
       "value": "不可用状态"
+    },
+    {
+      "name": "change_name_tip",
+      "value": "使用蓝牙互联，WLAN直连，热点共享和USB连接时，其他设备将看到此名称."
     }
   ]
 }

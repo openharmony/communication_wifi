@@ -1818,6 +1818,118 @@
     {
       "name": "Input_url",
       "value": "输入网址..."
+    },
+    {
+      "name": "cancel_invite",
+      "value": "取消邀请"
+    },
+    {
+      "name": "cancel_connect_alert_str",
+      "value": "是否取消与%s的连接邀请？"
+    },
+    {
+      "name": "start_scan",
+      "value": "开始扫描"
+    },
+    {
+      "name": "stop_scan",
+      "value": "停止扫描"
+    },
+    {
+      "name": "create_group_test",
+      "value": "创建群组测试"
+    },
+    {
+      "name": "my_device",
+      "value": "我的设备"
+    },
+    {
+      "name": "device_name",
+      "value": "设备名称"
+    },
+    {
+      "name": "device_addr",
+      "value": "设备地址"
+    },
+    {
+      "name": "device_status",
+      "value": "状态"
+    },
+    {
+      "name": "available_device",
+      "value": "可用设备"
+    },
+    {
+      "name": "connected_device",
+      "value": "已连接设备"
+    },
+    {
+      "name": "saved_group",
+      "value": "已保存群组"
+    },
+    {
+      "name": "group_name",
+      "value": "组名称"
+    },
+    {
+      "name": "new_api_test_title",
+      "value": "新接口测试"
+    },
+    {
+      "name": "disconnect_alert_content",
+      "value": "如果断开连接，您与%s的连接将中断"
+    },
+    {
+      "name": "disconnect_alert_title",
+      "value": "断开连接"
+    },
+    {
+      "name": "abandon_group_alert_title",
+      "value": "是否放弃保存所选群组?"
+    },
+    {
+      "name": "input_create_name_tip",
+      "value": "请输入群组名称"
+    },
+    {
+      "name": "input_create_pwd_tip",
+      "value": "请输入群组密码"
+    },
+    {
+      "name": "input_pwd_name_tip",
+      "value": "请输入组名和密码"
+    },
+    {
+      "name": "create_group_test_title",
+      "value": "创建群组测试"
+    },
+    {
+      "name": "create_group",
+      "value": "创建群组"
+    },
+    {
+      "name": "connect_group_test",
+      "value": "连接测试"
+    },
+    {
+      "name": "status_connected",
+      "value": "连接状态"
+    },
+    {
+      "name": "status_invite",
+      "value": "邀请状态"
+    },
+    {
+      "name": "status_fail",
+      "value": "失败状态"
+    },
+    {
+      "name": "status_available",
+      "value": "可用状态"
+    },
+    {
+      "name": "status_unavailable",
+      "value": "不可用状态"
     }
   ]
 }

@@ -293,6 +293,9 @@ bool WifiControllerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
         case CMD_WIFI_TOGGLED_TIMEOUT:
             WifiManager::GetInstance().GetWifiTogglerManager()->OnWifiToggledTimeOut();
             break;
+        case CMD_SEMI_WIFI_TOGGLED_TIMEOUT:
+            WifiManager::GetInstance().GetWifiTogglerManager()->OnSemiWifiToggledTimeOut();
+            break;
         default:
             return false;
     }
@@ -303,6 +306,7 @@ void WifiControllerMachine::HandleAirplaneOpen()
 {
     WIFI_LOGI("airplane open set softap false");
     this->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+    this->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
 #ifdef FEATURE_AP_SUPPORT
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     StopAllSoftapManagers();
@@ -334,6 +338,10 @@ void WifiControllerMachine::HandleAirplaneClose()
     if (role == ConcreteManagerRole::ROLE_UNKNOW) {
         WIFI_LOGE("Get unknow wifi role in HandleAirplaneClose.");
         return;
+    }
+    if (role == ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE ||
+        role == ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE) {
+        WifiManager::GetInstance().GetWifiTogglerManager()->StartSemiWifiToggledTimer();
     }
     if (!HasAnyConcreteManager()) {
         MakeConcreteManager(role, 0);
@@ -932,6 +940,7 @@ void WifiControllerMachine::HandleWifi2Start(int id)
 void WifiControllerMachine::HandleStaSemiActive(int id)
 {
     mWifiStartFailCount = 0;
+    this->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
     this->StopTimer(CMD_OPEN_WIFI_RETRY);
     std::unique_lock<std::mutex> lock(concreteManagerMutex);
     for (auto iter = concreteManagers.begin(); iter != concreteManagers.end(); ++iter) {

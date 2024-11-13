@@ -410,7 +410,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetPmModeTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     int mode = 1;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetPmMode(ifaceName, mode);
     EXPECT_EQ(result, false);
 }
@@ -420,7 +420,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetChipsetWifiFeatrureCapabilityTest_01, Test
     std::string ifaceName = "Wlan0";
     int chipsetFeatrureCapability = 0;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetChipsetWifiFeatrureCapability(
         ifaceName, chipsetFeatrureCapability);
     EXPECT_EQ(result, false);
@@ -430,7 +430,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest_01, TestSize.Level1)
 {
     std::string ifaceName;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    DelayedSingleton<HalDeviceManager>::GetInstance()->ResetHalDeviceManagerInfo(false);
+    DelayedSingleton<HalDeviceManager>::GetInstance()->ResetHalDeviceManagerInfo();
     DelayedSingleton<HalDeviceManager>::GetInstance()->CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
@@ -443,7 +443,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetTxPowerTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     int model = 0;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetTxPower(ifaceName, model);
     EXPECT_EQ(result, false);
 }
@@ -464,7 +464,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetStaMacAddressTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     std::string mac{"12:34:56:78:90:AB"};
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetStaMacAddress(ifaceName, mac);
     EXPECT_EQ(result, false);
 }
@@ -474,7 +474,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetPowerModelTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     int model = 0;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetPowerModel(ifaceName, model);
     EXPECT_EQ(result, false);
 }
@@ -484,7 +484,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetConnectSignalInfoTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     SignalPollResult signalPollResult;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetConnectSignalInfo(ifaceName, signalPollResult);
     EXPECT_EQ(result, false);
 }
@@ -505,7 +505,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest_01, TestSize.Level1)
     int32_t band = 0;
     std::vector<int> frequencies;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    DelayedSingleton<HalDeviceManager>::GetInstance()->ResetHalDeviceManagerInfo(false);
+    DelayedSingleton<HalDeviceManager>::GetInstance()->ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, frequencies);
     EXPECT_EQ(result, false);
 }
@@ -515,7 +515,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetPowerModeTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     int model = 0;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetPowerModel(ifaceName, model);
     EXPECT_EQ(result, false);
 }
@@ -525,7 +525,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetWifiCountryCodeTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     std::string code{"AB"};
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->SetWifiCountryCode(ifaceName, code);
     EXPECT_EQ(result, false);
 }
@@ -537,7 +537,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetIfaceTypeTest_01, TestSize.Level1)
     IChipIfaceTest *data = new IChipIfaceTest;
     sptr<IChipIface> iface = static_cast<IChipIface*>(data);
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->GetIfaceType(iface, ifaceType);
     EXPECT_EQ(result, true);
 }
@@ -546,7 +546,7 @@ HWTEST_F(WifiHalDeviceManagerTest, StopPnoScanTest_01, TestSize.Level1)
 {
     std::string ifaceName = "Wlan0";
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     bool result = DelayedSingleton<HalDeviceManager>::GetInstance()->StopPnoScan(ifaceName);
     EXPECT_EQ(result, false);
 }
@@ -556,7 +556,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest_01, TestSize.Level1)
     std::string ifaceName = "Wlan0";
     std::string mac{"12:34:56:78:90:AB"};
     HalDeviceManager::g_chipHdiServiceDied = false;
-    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo(false);
+    HalDeviceManager::GetInstance().ResetHalDeviceManagerInfo();
     IChipIfaceTest *data = new IChipIfaceTest;
     sptr<IChipIface> iface = static_cast<IChipIface*>(data);
     DelayedSingleton<HalDeviceManager>::GetInstance()->mIWifiApIfaces.insert(

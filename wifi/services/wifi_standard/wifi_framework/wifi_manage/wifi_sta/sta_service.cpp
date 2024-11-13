@@ -230,10 +230,9 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
 
     if (config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
-        std::string wifiBrokerFrameProcessName = "";
-        bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
+        const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-        if (!success || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+        if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
             LOGE("AddCandidateConfig unsupport wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
         }
@@ -419,13 +418,10 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
         netWorkId = tempDeviceConfig.networkId;
         status = tempDeviceConfig.status;
-        if (m_instId == INSTID_WLAN0) {
-            CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
-            bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
-            pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
-        }
+        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+        bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
+        pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
         isUpdate = true;
-        LOGI("AddDeviceConfig update device networkId:%{public}d", netWorkId);
     } else {
         netWorkId = WifiSettings::GetInstance().GetNextNetworkId();
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
@@ -487,12 +483,6 @@ ErrCode StaService::RemoveDevice(int networkId) const
 
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_NETWORK_REMOVED, networkId);
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if (linkedInfo.networkId == networkId) {
-        std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
-        WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName);
-    }
 
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) == 0) {

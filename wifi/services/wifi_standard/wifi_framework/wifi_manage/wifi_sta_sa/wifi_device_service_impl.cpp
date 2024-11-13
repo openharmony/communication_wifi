@@ -2221,8 +2221,8 @@ int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, con
     }
     std::vector<std::string> whilteListProcessInfo = filterMap["GetLinkProcessPermissionVerify"];
     auto iter = whilteListProcessInfo.begin();
-    while (iter != whilteListProcessInfo.end()) {
-        if (iter->name == packageName && iter->appid == appId) {
+    while (iter == whilteListProcessInfo.end()) {
+        if (*iter->name == packageName + "|" + appId) {
             return PERMISSION_GRANTED;
         }
         iter++;

@@ -1932,6 +1932,10 @@
     {
       "name": "status_unavailable",
       "value": "unavailable"
+    },
+    {
+      "name": "change_name_tip",
+      "value": "When using Bluetooth connection, WLAN direct connection, hot spot sharing, and USB connection, other devices will see this name."
     }
   ]
 }

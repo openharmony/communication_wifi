@@ -1771,11 +1771,11 @@
     },
     {
       "name": "cancel_button",
-      "value": "取消"
+      "value": "cancel"
     },
     {
       "name": "confirm_button",
-      "value": "确定"
+      "value": "ok"
     },
     {
       "name": "delete_button",

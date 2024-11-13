@@ -48,6 +48,9 @@ public:
     void StartWifiToggledTimer();
     void StopWifiToggledTimer();
     void OnWifiToggledTimeOut();
+    void StartSemiWifiToggledTimer();
+    void StopSemiWifiToggledTimer();
+    void OnSemiWifiToggledTimeOut();
 private:
     void InitConcreteCallback(void);
     void InitSoftapCallback(void);

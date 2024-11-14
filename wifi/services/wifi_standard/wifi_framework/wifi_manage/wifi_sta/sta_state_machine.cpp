@@ -3065,7 +3065,9 @@ void StaStateMachine::GetIpState::GoInState()
         }
         config.bIpv6 = pStaStateMachine->currentTpType == IPTYPE_IPV4 ? false : true;
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
-        strncpy_s(config.ifname, INTERFACE_MAX_LEN, ifname.c_str(), ifname.length());
+        if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
+            break;
+        }
         dhcpRet = StartDhcpClient(config);
         LOGI("StartDhcpClient type:%{public}d dhcpRet:%{public}d isRoam:%{public}d m_instId=%{public}d" \
             "IsSpecificNetwork %{public}d", pStaStateMachine->currentTpType, dhcpRet, pStaStateMachine->isRoam,

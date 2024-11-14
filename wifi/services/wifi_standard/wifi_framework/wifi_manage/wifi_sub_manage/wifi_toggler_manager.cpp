@@ -99,6 +99,26 @@ void WifiTogglerManager::OnWifiToggledTimeOut()
         "TIME_OUT", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(0)));
 }
 
+void WifiTogglerManager::StartSemiWifiToggledTimer()
+{
+    WIFI_LOGD("StartSemiWifiToggledTimer");
+    pWifiControllerMachine->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
+    pWifiControllerMachine->MessageExecutedLater(CMD_SEMI_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+}
+
+void WifiTogglerManager::StopSemiWifiToggledTimer()
+{
+    WIFI_LOGD("StopSemiWifiToggledTimer");
+    pWifiControllerMachine->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
+}
+
+void WifiTogglerManager::OnSemiWifiToggledTimeOut()
+{
+    WIFI_LOGE("OnSemiWifiToggledTimeOut");
+    WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
+        "TIME_OUT", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN0)));
+}
+
 ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
 {
     if (isOpen) {

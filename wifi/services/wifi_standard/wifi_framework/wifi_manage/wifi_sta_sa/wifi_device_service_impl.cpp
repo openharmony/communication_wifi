@@ -712,15 +712,11 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
         WIFI_LOGE("setTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
-    if (!IsStaServiceRunning()) {
-        return WIFI_OPT_STA_NOT_OPENED;
+    if (WifiStaHalInterface::GetInstance().SetTxPower(power) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("SetTxPower() failed");
+        return WIFI_OPT_FAILED;
     }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if (pService == nullptr) {
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
-    return pService->SetTxPower(power);
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceServiceImpl::SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable)

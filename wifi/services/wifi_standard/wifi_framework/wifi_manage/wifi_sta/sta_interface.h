@@ -241,14 +241,6 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode SetPowerMode(bool mode) override;
-
-    /**
-     * @Description set tx power for sar
-     *
-     * @param power: 1001,1002,1003······
-     * @return WifiErrorNo
-     */
-    virtual ErrCode SetTxPower(int power) override;
     /**
      * @Description systemabilitychanged
      *

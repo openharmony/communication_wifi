@@ -256,15 +256,6 @@ public:
     virtual ErrCode SetPowerMode(bool mode) const;
 
     /**
-     * @Description Set tx power to reduce sar
-     *
-     * @param power: 1001,1002,1003 ，，，，，，，
-     *
-     * @return WifiErrorNo
-     */
-    virtual ErrCode SetTxPower(int power) const;
-
-    /**
      * @Description systemabilitychanged
      *
      * @param mode: true for setup, false for shutdown.

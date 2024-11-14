@@ -1704,7 +1704,7 @@ ErrCode WifiDeviceServiceImpl::IsBandTypeSupported(int bandType, bool &supported
 {
     WIFI_LOGI("Enter get bandtype is supported.");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("WifiDeviceServiceImpl:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        WIFI_LOGE("IsBandTypeSupported:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1728,7 +1728,7 @@ ErrCode WifiDeviceServiceImpl::Get5GHzChannelList(std::vector<int> &result)
     }
 
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("Get5GHzChannelList:VerifyGetWifiInfoPermission  PERMISSION_DENIED!");
+        WIFI_LOGE("Get5GHzChannelList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 

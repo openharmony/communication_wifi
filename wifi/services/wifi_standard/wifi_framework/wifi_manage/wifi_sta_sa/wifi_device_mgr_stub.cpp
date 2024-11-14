@@ -55,7 +55,7 @@ int WifiDeviceMgrStub::OnRemoteRequest(
         reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
-        (this->*(iter->second))(code, data, reply, option);
+        return (this->*(iter->second))(code, data, reply, option);
     }
     return 0;
 }

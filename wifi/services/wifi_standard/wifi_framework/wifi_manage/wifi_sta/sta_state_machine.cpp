@@ -4801,6 +4801,8 @@ void StaStateMachine::SetSupportedWifiCategory()
         } else {
             linkedInfo.isMloConnected = false;
         }
+    } else {
+        linkedInfo.isMloConnected = false;
     }
     WIFI_LOGI("%{public}s supportedWifiCategory:%{public}d, isMloConnected:%{public}d", __FUNCTION__,
         static_cast<int>(linkedInfo.supportedWifiCategory), linkedInfo.isMloConnected);

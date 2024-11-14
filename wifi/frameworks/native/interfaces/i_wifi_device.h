@@ -550,6 +550,15 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description set data packet identification mark rule
+     *
+     * @param uid - target app uid
+     * @param protocol - target protocol type
+     * @return enable - enable/disable dpi mark
+     */
+    virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

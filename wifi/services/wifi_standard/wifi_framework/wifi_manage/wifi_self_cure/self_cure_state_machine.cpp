@@ -1501,7 +1501,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCureLevel)
 {
-    WIFI_LOGI("enter SelfCureForReset, internetUnknown is %{public}d, hasInternetRecently, %{public}d",
+    WIFI_LOGI("enter SelfCureForReset, internetUnknown: %{public}d, hasInternetRecently: %{public}d",
         pSelfCureStateMachine->internetUnknown, hasInternetRecently);
     if ((pSelfCureStateMachine->internetUnknown) || (!hasInternetRecently) ||
         (pSelfCureStateMachine->IsSettingsPage())) {

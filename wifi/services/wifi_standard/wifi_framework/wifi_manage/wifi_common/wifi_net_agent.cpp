@@ -163,7 +163,7 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
     return true;
 }
 
-bool WifiNetAgent::DelInterfaceAddress(const std::string interface, const std::string ipAddress, int prefixLength)
+bool WifiNetAgent::DelInterfaceAddress(const std::string &interface, const std::string &ipAddress, int prefixLength)
 {
     int32_t result = NetConnClient::GetInstance().DelInterfaceAddress(interface, ipAddress, prefixLength);
     if (result == NETMANAGER_SUCCESS) {

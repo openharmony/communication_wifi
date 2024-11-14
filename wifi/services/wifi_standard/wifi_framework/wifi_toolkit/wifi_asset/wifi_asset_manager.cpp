@@ -513,7 +513,6 @@ bool WifiAssetManager::IsWifiConfigChanged(const WifiDeviceConfig &config, const
     }
     return false;
 }
- 
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

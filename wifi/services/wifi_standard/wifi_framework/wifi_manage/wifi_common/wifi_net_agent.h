@@ -91,7 +91,7 @@ public:
      * @param ipAddress IP address
      * @param prefixLength prefix length
      */
-    bool DelInterfaceAddress(const std::string interface, const std::string ipAddress, int prefixLength);
+    bool DelInterfaceAddress(const std::string &interface, const std::string &ipAddress, int prefixLength);
 
     /**
      * Add OnStaMachineUpdateNetLinkInfo

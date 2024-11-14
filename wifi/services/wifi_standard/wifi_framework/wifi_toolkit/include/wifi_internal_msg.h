@@ -116,7 +116,7 @@ enum class OperateResState {
     ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
 };
 
-/* is wps connected to a network  */
+/* is wps connected to a network */
 enum class IsWpsConnected {
     WPS_CONNECTED = 0,
     WPS_INVALID = -1,

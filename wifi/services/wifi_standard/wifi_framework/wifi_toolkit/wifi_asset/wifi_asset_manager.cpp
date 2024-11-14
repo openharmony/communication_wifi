@@ -369,10 +369,10 @@ void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wif
             }
             int32_t ret = WifiAssetAttrAdd(mapConfig, false);
             if (ret != SEC_ASSET_SUCCESS && ret != SEC_ASSET_DUPLICATED) {
-                LOGE("WifiAssetAttrAdd Failed, ret: %{public}d, ssid : %{public}s", ret,
+                LOGE("WifiAssetAddPack Failed, ret: %{public}d, ssid : %{public}s", ret,
                     SsidAnonymize(mapConfig.ssid).c_str());
             } else {
-                LOGI("WifiAssetAttrAdd Success, ssid : %{public}s", SsidAnonymize(mapConfig.ssid).c_str());
+                LOGI("WifiAssetAddPack Success, ssid : %{public}s", SsidAnonymize(mapConfig.ssid).c_str());
             }
         }
         if (flagSync) {

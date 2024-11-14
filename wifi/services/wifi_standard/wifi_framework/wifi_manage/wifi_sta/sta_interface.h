@@ -370,7 +370,7 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid) override;
- 
+
 	/**
      * @Description DeliverStaIfaceData.
      *

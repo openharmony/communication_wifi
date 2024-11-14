@@ -994,7 +994,7 @@ void P2pStateMachine::StartDhcpClientInterface()
     }
     config.bIpv6 = false;
     strncpy(config.ifname, groupManager.GetCurrentGroup().GetInterface().c_str(), INTERFACE_MAX_LEN);
-    result = StartDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), config);
+    result = StartDhcpClient(config);
     if (result != 0) {
         WIFI_LOGE("StartDhcpClient failed!");
         return;

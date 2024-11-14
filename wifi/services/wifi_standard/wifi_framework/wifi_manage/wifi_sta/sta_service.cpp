@@ -482,7 +482,12 @@ ErrCode StaService::RemoveDevice(int networkId) const
     LOGI("Enter RemoveDevice, networkId = %{public}d m_instId:%{public}d\n", networkId, m_instId);
 
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_NETWORK_REMOVED, networkId);
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if (linkedInfo.networkId == networkId) {
+        std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+        WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName);
+    }
 
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) == 0) {

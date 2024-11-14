@@ -1985,7 +1985,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
     if (config.keyMgmt != KEY_MGMT_WAPI_CERT) {
         return;
     }
-
+ 
     EncryptedData *encryWapiAs = new EncryptedData(config.wifiWapiConfig.encryptedAsCertData,
         config.wifiWapiConfig.asCertDataIV);
     std::string decryWapiAs = "";
@@ -2019,7 +2019,6 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         LOGD("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
         return 0;
     }
-    LOGD("DecryptionDeviceConfig start");
     WifiEncryptionInfo mWifiEncryptionInfo;
     mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);

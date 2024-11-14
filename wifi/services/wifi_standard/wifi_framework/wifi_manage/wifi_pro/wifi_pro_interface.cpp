@@ -34,7 +34,7 @@ WifiProInterface::~WifiProInterface()
 
 ErrCode WifiProInterface::InitWifiProService()
 {
-    WIFI_LOGI("Enter WifiProInterface::InitWifiProService");
+    WIFI_LOGI("Enter InitWifiProService");
     std::lock_guard<std::mutex> lock(mutex_);
     if (pWifiProService_ == nullptr) {
         pWifiProService_ = std::make_shared<WifiProService>(instId_);
@@ -54,7 +54,7 @@ ErrCode WifiProInterface::InitWifiProService()
 void WifiProInterface::InitCallback()
 {
     using namespace std::placeholders;
-    WIFI_LOGI("Enter WifiProInterface::InitCallback");
+    WIFI_LOGI("Enter InitCallback");
     staCallback_.callbackModuleName = "WifiProService";
     staCallback_.OnStaConnChanged = [this](OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId) {
         this->DealStaConnChanged(state, linkedInfo, instId);
@@ -66,7 +66,7 @@ void WifiProInterface::InitCallback()
 
 void WifiProInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId)
 {
-    WIFI_LOGI("Enter WifiProInterface::DealStaConnChanged");
+    WIFI_LOGD("Enter DealStaConnChanged");
     std::lock_guard<std::mutex> lock(mutex_);
     if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");
@@ -77,7 +77,7 @@ void WifiProInterface::DealStaConnChanged(OperateResState state, const WifiLinke
 
 void WifiProInterface::DealRssiLevelChanged(int32_t rssi, int32_t instId)
 {
-    WIFI_LOGI("Enter WifiProInterface::DealRssiLevelChanged");
+    WIFI_LOGI("Enter DealRssiLevelChanged");
     std::lock_guard<std::mutex> lock(mutex_);
     if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");
@@ -88,7 +88,7 @@ void WifiProInterface::DealRssiLevelChanged(int32_t rssi, int32_t instId)
 
 void WifiProInterface::DealScanResult(const std::vector<InterScanInfo> &results)
 {
-    WIFI_LOGI("Enter WifiProInterface::DealScanResult");
+    WIFI_LOGI("Enter DealScanResult");
     std::lock_guard<std::mutex> lock(mutex_);
     if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");

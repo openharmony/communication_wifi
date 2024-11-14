@@ -93,7 +93,8 @@ private:
     void OnSetSatelliteState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetLowTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void  OnGetDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetDpiMarkRule(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);

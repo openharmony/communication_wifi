@@ -551,6 +551,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
+
+    /**
+     * @Description set data packet identification mark rule
+     *
+     * @param uid - target app uid
+     * @param protocol - target protocol type
+     * @return enable - enable/disable dpi mark
+     */
+    ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

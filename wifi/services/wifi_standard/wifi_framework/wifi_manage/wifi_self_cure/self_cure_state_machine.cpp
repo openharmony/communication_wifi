@@ -477,11 +477,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
-    if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
-        WIFI_LOGI("current network do not need selfcure");
-        return;
-    }
-
+    WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
     if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
         WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
         return;
@@ -504,6 +500,9 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
     }
     if (!pSelfCureStateMachine->staticIpCureSuccess && msg->GetParam2() == 1) {
         if (hasInternetRecently || portalUnthenEver || pSelfCureStateMachine->internetUnknown) {
+            if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
+                return;
+            }
             pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
             TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
             return;
@@ -2708,7 +2707,7 @@ bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessagePtr msg, st
 int SelfCureStateMachine::GetWifi7SelfCureType(int connectFailTimes, WifiLinkedInfo &info)
 {
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
     int scanRssi = GetScanRssi(info.bssid, scanResults);
     WIFI_LOGI("GetWifi7SelfCureType scanRssi %{public}d", scanRssi);
     if ((info.supportedWifiCategory == WifiCategory::WIFI7

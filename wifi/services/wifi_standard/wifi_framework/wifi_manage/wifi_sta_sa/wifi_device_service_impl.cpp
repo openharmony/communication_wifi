@@ -128,6 +128,7 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
         WifiSettings::GetInstance().SetWifiToggleCaller(GetCallingPid(), m_instId);
 #endif
         WifiManager::GetInstance().GetWifiTogglerManager()->StartWifiToggledTimer();
+        WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
     }
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, m_instId);
 }
@@ -162,6 +163,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
 
     if (m_instId == INSTID_WLAN0) {
         WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
+        WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
     }
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
@@ -204,6 +206,7 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
 
     if (m_instId == INSTID_WLAN0) {
         WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
+        WifiManager::GetInstance().GetWifiTogglerManager()->StartSemiWifiToggledTimer();
     }
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }
@@ -1798,6 +1801,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
         WifiSettings::GetInstance().SetWifiToggleCaller(GetCallingPid(), m_instId);
 #endif
     }
+    WifiManager::GetInstance().GetWifiTogglerManager()->StartSemiWifiToggledTimer();
     WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(m_instId);
     WIFI_LOGI("WifiDeviceServiceImpl curState:%{public}d", curState);

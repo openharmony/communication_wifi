@@ -391,7 +391,7 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         WIFI_LOGE("GetWifiMultiVapManager Fail");
         return WIFI_OPT_FAILED;
     }
-
+    
     if (!WifiManager::GetInstance().GetWifiMultiVapManager()->CheckCanUseSoftAp()) {
         WIFI_LOGE("SoftAp is not allowed to use");
         return WIFI_OPT_FAILED;
@@ -407,6 +407,16 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
+
+    std::string bundleName = "";
+    if (!GetBundleNameByUid(GetCallingUid(), bundleName)) {
+        WIFI_LOGE("GetBundleNameByUid failed");
+    }
+    WIFI_LOGI("%{public}s calling inst %{public}d EnableHotspot", bundleName.c_str(), m_id);
+    HotspotMacConfig config;
+    WifiConfigCenter::GetInstance().GetHotspotMacConfig(config, m_id);
+    config.SetCallingBundleName(bundleName);
+    WifiConfigCenter::GetInstance().SetHotspotMacConfig(config, m_id);
 
     return  WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
 }

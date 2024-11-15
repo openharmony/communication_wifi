@@ -1936,6 +1936,22 @@
     {
       "name": "change_name_tip",
       "value": "When using Bluetooth connection, WLAN direct connection, hot spot sharing, and USB connection, other devices will see this name."
+    },
+    {
+      "name": "pwd_title",
+      "value": "password"
+    },
+    {
+      "name": "created_group_title",
+      "value": "created group"
+    },
+    {
+      "name": "go_name_title",
+      "value": "group owner name"
+    },
+    {
+      "name": "delete_group_title",
+      "value": "delete group"
     }
   ]
 }

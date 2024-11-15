@@ -137,6 +137,9 @@ export struct AllInOneView {
   }
 
   addP2PListener() {
+    wifiManager.on('p2pDeviceChange', () => {
+      console.log(TAG, 'p2pDeviceChange')
+    })
     wifiManager.on('p2pPersistentGroupChange', async () => {
       console.log(TAG, 'p2pPersistentGroupChange')
       let gps = await wifiManager.getP2pGroups()
@@ -154,12 +157,15 @@ export struct AllInOneView {
      })
     wifiManager.on('p2pConnectionChange', async (result: wifiManager.WifiP2pLinkedInfo) => {
       console.log(TAG, 'p2pConnectionChange', JSON.stringify(result))
+      let device = await wifiManager.getP2pLocalDevice()
+      this.localDevice = P2PDevice.from(device)
       if (result.connectState === 0) {
         wifiManager.startDiscoverDevices()
       } else {
         let gp = await wifiManager.getCurrentGroup()
         console.log(TAG, 'currentGroup:', JSON.stringify(gp))
       }
+
     })
 
   }

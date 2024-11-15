@@ -4031,7 +4031,9 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
 
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig, m_instId) != 0) {
-        WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
+        WIFI_LOGE("%{public}s cannot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
+        DisConnectProcess();
+        return;
     }
     LOGI("%{public}s: networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s, preSharedKeyLen:%{public}d",
         __FUNCTION__, deviceConfig.networkId, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
@@ -4793,6 +4795,8 @@ void StaStateMachine::SetSupportedWifiCategory()
         } else {
             linkedInfo.isMloConnected = false;
         }
+    } else {
+        linkedInfo.isMloConnected = false;
     }
     WIFI_LOGI("%{public}s supportedWifiCategory:%{public}d, isMloConnected:%{public}d", __FUNCTION__,
         static_cast<int>(linkedInfo.supportedWifiCategory), linkedInfo.isMloConnected);

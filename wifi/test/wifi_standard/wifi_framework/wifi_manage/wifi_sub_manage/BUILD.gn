@@ -169,10 +169,6 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "SUPPORT_RANDOM_MAC_ADDR",
   ]
 
-  if (defined(global_parts_info) && defined(global_parts_info.msdp_movement)) {
-    external_deps += [ "movement:movement_client" ]
-    defines += [ "HAS_MOVEMENT_PART" ]
-  }
   part_name = "wifi"
   subsystem_name = "communication"
 }

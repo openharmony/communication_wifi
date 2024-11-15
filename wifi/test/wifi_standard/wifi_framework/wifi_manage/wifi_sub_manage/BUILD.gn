@@ -166,7 +166,6 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     "FEATURE_SELF_CURE_SUPPORT",
-    "HAS_MOVEMENT_PART",
     "SUPPORT_RANDOM_MAC_ADDR",
   ]
 

@@ -1934,6 +1934,22 @@
     {
       "name": "change_name_tip",
       "value": "使用蓝牙互联，WLAN直连，热点共享和USB连接时，其他设备将看到此名称."
+    },
+    {
+      "name": "pwd_title",
+      "value": "密码"
+    },
+    {
+      "name": "created_group_title",
+      "value": "已创建组"
+    },
+    {
+      "name": "go_name_title",
+      "value": "go名称"
+    },
+    {
+      "name": "delete_group_title",
+      "value": "删除组"
     }
   ]
 }

@@ -166,6 +166,9 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         case static_cast<int>(WpaEventCallback::EAP_SIM_NUM):
             OnWpaEapSimAuthCallBack(data);
             break;
+        case static_cast<int>(WpaEventCallback::CSA_CHSWITCH_NUM):
+            OnWpaCsaChannelSwitchNotifyCallBack(data);
+            break;
         default:
             WIFI_LOGI("OnWpaStaNotifyCallBack() undefine event:%{public}d", num);
             break;
@@ -318,6 +321,22 @@ void StaMonitor::OnWpaEapSimAuthCallBack(const std::string &notifyParam)
         WIFI_LOGE("Invalid authentication type, authType:%{public}s", results[0].c_str());
         return;
     }
+}
+
+void StaMonitor::OnWpaCsaChannelSwitchNotifyCallBack(const std::string &notifyParam)
+{
+    WIFI_LOGD("%{public}s notifyParam:%{private}s", __FUNCTION__, notifyParam.c_str());
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s The statemachine pointer is null.", __FUNCTION__);
+        return;
+    }
+    std::string::size_type freqPos = 0;
+    if ((freqPos = notifyParam.find("freq=")) == std::string::npos) {
+        WIFI_LOGE("%{public}s csa channel switch notifyParam not find frequency!", __FUNCTION__);
+        return;
+    }
+    std::string data = notifyParam.substr(freqPos + strlen("freq="));
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT, CheckDataLegal(data));
 }
 }  // namespace Wifi
 }  // namespace OHOS

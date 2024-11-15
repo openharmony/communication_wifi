@@ -369,7 +369,7 @@ export struct AllInOneView {
     console.log('connect to device:', JSON.stringify(device))
     let config:wifiManager.WifiP2PConfig = {
       deviceAddress: device.address,
-      netId:-2,
+      netId:-1,
       passphrase:"",
       groupName: "",
       goBand:0,

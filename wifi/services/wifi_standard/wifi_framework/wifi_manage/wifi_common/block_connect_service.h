@@ -25,7 +25,6 @@ struct LastConnectedApInfo {
     std::string bssid;
     int64_t lastDisconnectTimestamp;
     int alreadyConnectedCount;
-    int sumDisconnectCount;
 };
 struct DisablePolicy {
     int64_t disableTime;

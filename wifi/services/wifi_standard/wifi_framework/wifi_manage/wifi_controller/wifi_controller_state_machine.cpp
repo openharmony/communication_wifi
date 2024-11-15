@@ -34,7 +34,6 @@
 
 namespace OHOS {
 namespace Wifi {
-
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
 int WifiControllerMachine::mWifiStartFailCount{0};
 
@@ -230,7 +229,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
 #endif
             break;
         default:
-            break;
+            return false;
     }
     return true;
 }

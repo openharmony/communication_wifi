@@ -95,8 +95,6 @@ public:
 
     static std::vector<int> GetCurrentNetworkStatusHistory2Array(uint32_t networkStatusHistory);
 
-private:
-
     /**
      * get the last network status of the network status records given.
      *
@@ -105,6 +103,7 @@ private:
      */
     static NetworkStatus GetLastNetworkStatus(uint32_t networkHistory);
 
+private:
     /* the num of enum class NetworkStatus values */
     constexpr static int NETWORK_STATUS_NUM = 4;
 

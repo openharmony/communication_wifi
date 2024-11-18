@@ -16,27 +16,40 @@ export struct ChangeNameView {
   build() {
     NavDestination() {
       Column() {
-        NormalNav({title: '设备名称'})
-        TextInput({text: $$this.deviceStr})
-        Text('使用蓝牙互联，WLAN直连，热点共享和USB连接时，其他设备将看到此名称')
+        NormalNav({title: $r('app.string.device_name')})
+        Row() {
+          TextInput({text: $$this.deviceStr})
+        }.padding({left: 20, right: 20})
+        Text($r('app.string.change_name_tip'))
+          .margin({ top: 20, left: 20, right: 20 })
         Blank()
           .layoutWeight(1)
-        Row() {
-          Button('取消')
+        Row({space: 40 }) {
+          Button($r('app.string.cancel_button'))
             .onClick(() => {
               this.pathInfo.pop()
             })
-          Button('确定')
+            .normalButtonStyle()
+          Button($r('app.string.confirm_button'))
             .onClick(() => {
               if (this.deviceStr.length > 0) {
                 wifiManager.setDeviceName(this.deviceStr)
                 this.pathInfo.pop(null, true)
               }
             })
+            .normalButtonStyle()
         }
+        .margin({ bottom: 45 })
       }
     }
     .hideTitleBar(true)
   }
+}
 
+@Extend(Button)
+function normalButtonStyle() {
+  .width(150)
+  .height(40)
+  .backgroundColor('#F2F2F2')
+  .fontColor(Color.Blue)
 }

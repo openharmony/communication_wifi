@@ -44,6 +44,7 @@ public:
     virtual void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies,
         int instId = 0) = 0;
     virtual int SyncHotspotConfig() = 0;
+    
 };
 
 class WifiSettings : public MockWifiSettings {

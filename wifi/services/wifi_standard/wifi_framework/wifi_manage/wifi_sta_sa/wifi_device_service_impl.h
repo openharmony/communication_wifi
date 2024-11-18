@@ -71,9 +71,9 @@ public:
 
     ErrCode SetTxPower(int power) override;
 
-    ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
-
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
+
+    ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
 
@@ -166,9 +166,9 @@ public:
     ErrCode IsBandTypeSupported(int bandType, bool &supported) override;
 
     ErrCode Get5GHzChannelList(std::vector<int> &result) override;
-    
+
     ErrCode StartPortalCertification() override;
-    
+
     static void SaBasicDump(std::string& result);
 
     ErrCode GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) override;

@@ -73,6 +73,7 @@
         "*SetStaCurrentTime*";
    extern "C++" {
         "OHOS::Wifi::WifiCodeConvertUtil::IsUtf8(const std::string&)";
+        "OHOS::Wifi::WifiCodeConvertUtil::Utf8ToGbk(const std::string&)";
         "OHOS::Wifi::WifiCodeConvertUtil::GbkToUtf8(const std::string&)";
         "OHOS::Wifi::WifiAssetManager::GetInstance()";
         "OHOS::Wifi::WifiAssetManager::WifiAssetTriggerSync()";

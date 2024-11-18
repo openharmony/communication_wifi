@@ -391,7 +391,7 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         WIFI_LOGE("GetWifiMultiVapManager Fail");
         return WIFI_OPT_FAILED;
     }
-
+    
     if (!WifiManager::GetInstance().GetWifiMultiVapManager()->CheckCanUseSoftAp()) {
         WIFI_LOGE("SoftAp is not allowed to use");
         return WIFI_OPT_FAILED;

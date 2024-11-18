@@ -101,7 +101,7 @@ void WifiTogglerManager::OnWifiToggledTimeOut()
 {
     WIFI_LOGE("OnWifiToggledTimeOut");
     WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
-        "TIME_OUT", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(0)));
+        "TIME_OUT", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN0)));
 }
 
 void WifiTogglerManager::StartSemiWifiToggledTimer()

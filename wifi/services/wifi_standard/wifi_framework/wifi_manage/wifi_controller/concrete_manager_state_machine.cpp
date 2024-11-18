@@ -321,7 +321,7 @@ void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
 {
     ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopStaService(mid);
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("stop sta failed ret =%{public}d", ret);
+        WIFI_LOGE("stop sta failed ret =%{public}d \n", ret);
     }
 }
 
@@ -329,7 +329,7 @@ void ConcreteMangerMachine::ConnectState::SwitchSemiActiveInConnectState()
 {
     ErrCode ret = pConcreteMangerMachine->SwitchSemiFromEnable();
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("switch semi wifi failed ret =%{public}d \n", ret);
+        WIFI_LOGE("switch semi wifi failed ret = %{public}d \n", ret);
     }
 }
 

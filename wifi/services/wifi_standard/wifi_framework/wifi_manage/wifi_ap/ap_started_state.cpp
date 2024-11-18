@@ -460,16 +460,36 @@ void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessagePtr msg)
 
 void ApStartedState::SetRandomMac() const
 {
+    HotspotMacConfig macConfig;
+    WifiConfigCenter::GetInstance().GetHotspotMacConfig(macConfig, m_id);
     std::string macAddress;
-    WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
-    if (MacAddress::IsValidMac(macAddress.c_str())) {
+    std::string dataCloneProcessName = "";
+    bool success = WifiSettings::GetInstance().GetConfigValueByName("DATA_CLONE", dataCloneProcessName);
+    bool isDataClone = success && (macConfig.GetCallingBundleName() == dataCloneProcessName);
+    if (isDataClone && !macConfig.GetRandomMac().empty()) {
+        macAddress = macConfig.GetRandomMac();
+    } else {
+        WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
+    }
+ 
+    do {
+        if (!MacAddress::IsValidMac(macAddress.c_str())) {
+            WIFI_LOGE("%{public}s: macAddress is invalid", __func__);
+            break;
+        }
+ 
         if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
             WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {
-            LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
+            WIFI_LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
+            break;
         }
-    } else {
-        LOGE("%{public}s: macAddress is invalid", __func__);
-    }
+ 
+        if (isDataClone && macConfig.GetRandomMac().empty()) {
+            macConfig.SetRandomMac(macAddress);
+            WifiConfigCenter::GetInstance().SetHotspotMacConfig(macConfig, m_id);
+        }
+        return;
+    } while (0);
 }
 
 bool ApStartedState::SetCountry()

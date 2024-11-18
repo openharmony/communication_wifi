@@ -337,6 +337,10 @@ public:
     void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
 	
     void UpdateLinkedInfo(int instId = 0);
+
+    int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0);
+ 
+    int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0);
 private:
     WifiConfigCenter();
     std::string GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
@@ -393,6 +397,7 @@ private:
     std::map <int, std::atomic<int>> mHotspotState;
     std::map<int, PowerModel> powerModel;
     std::map<std::string, StationInfo> mConnectStationInfo;
+    std::map<int, HotspotMacConfig> mHotspotMacConfig;
 
     // P2P
     std::mutex mP2pMutex;

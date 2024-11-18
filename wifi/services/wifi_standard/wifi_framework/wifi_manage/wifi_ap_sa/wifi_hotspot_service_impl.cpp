@@ -409,6 +409,16 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
         return errCode;
     }
 
+    std::string bundleName = "";
+    if (!GetBundleNameByUid(GetCallingUid(), bundleName)) {
+        WIFI_LOGE("GetBundleNameByUid failed");
+    }
+    WIFI_LOGI("%{public}s calling inst %{public}d EnableHotspot", bundleName.c_str(), m_id);
+    HotspotMacConfig config;
+    WifiConfigCenter::GetInstance().GetHotspotMacConfig(config, m_id);
+    config.SetCallingBundleName(bundleName);
+    WifiConfigCenter::GetInstance().SetHotspotMacConfig(config, m_id);
+
     return  WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
 }
 

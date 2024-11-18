@@ -438,43 +438,6 @@ public:
         EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(msg));
     }
 
-    void DisconnectedMonitorExeMsgSuccess3()
-    {
-        LOGI("Enter DisconnectedMonitorExeMsgSuccess3");
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetMessageName(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLastNetworkId()).Times(AtLeast(0));
-        EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(msg));
-    }
-
-    void DisconnectedMonitorExeMsgSuccess4()
-    {
-        LOGI("Enter DisconnectedMonitorExeMsgSuccess4");
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetMessageName(WIFI_CURE_CMD_CONN_FAILED_TIMEOUT);
-        pSelfCureStateMachine->useWithRandMacAddress = 0;
-        pSelfCureStateMachine->selfCureOnGoing = false;
-        EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(msg));
-    }
-    
-    void HandleConnectFailedTest()
-    {
-        LOGI("Enter HandleConnectFailedTest");
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleConnectFailed(nullptr);
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetMessageName(WIFI_CURE_CMD_CONN_FAILED_TIMEOUT);
-        pSelfCureStateMachine->useWithRandMacAddress = 0;
-        pSelfCureStateMachine->selfCureOnGoing = true;
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleConnectFailed(msg);
-
-        pSelfCureStateMachine->useWithRandMacAddress = 1;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLastNetworkId()).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleConnectFailed(msg);
-    }
-
     void ConnectionSelfCureGoInStateSuccess()
     {
         LOGI("Enter ConnectionSelfCureGoInStateSuccess");
@@ -537,36 +500,6 @@ public:
         EXPECT_EQ(pSelfCureStateMachine->pInternetSelfCureState->InitSelfCureIssHandleMap(), 0);
     }
 
-    void HandleRandMacSelfCureCompleteTest()
-    {
-        LOGI("Enter HandleRandMacSelfCureCompleteTest");
-        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(nullptr);
-
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetMessageName(WIFI_CURE_CMD_RAND_MAC_SELFCURE_COMPLETE);
-        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(msg);
-
-        pSelfCureStateMachine->mIsHttpReachable = false;
-        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(msg);
-
-        pSelfCureStateMachine->mIsHttpReachable = true;
-        std::string MacAddress = CURR_BSSID;
-        std::string RealMacAddress = REAL_MAC;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).
-            WillRepeatedly(DoAll(SetArgReferee<0>(MacAddress), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).
-            WillRepeatedly(DoAll(SetArgReferee<0>(RealMacAddress), Return(0)));
-        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(msg);
-
-        MacAddress = CURR_BSSID;
-        RealMacAddress = CURR_BSSID;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).
-            WillRepeatedly(DoAll(SetArgReferee<0>(MacAddress), Return(0)));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).
-            WillRepeatedly(DoAll(SetArgReferee<0>(RealMacAddress), Return(0)));
-        pSelfCureStateMachine->pInternetSelfCureState->HandleRandMacSelfCureComplete(msg);
-    }
-
     void HandleInternetFailedSelfCureTest()
     {
         LOGI("Enter HandleInternetFailedSelfCureTest");
@@ -610,13 +543,13 @@ public:
     void HandleInternetRecoveryTest()
     {
         LOGI("Enter HandleInternetRecoveryTest");
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecovery(nullptr);
+        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm(nullptr);
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_INTERNET_RECOVERY_CONFIRM);
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecovery(msg);
+        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm(msg);
 
         pSelfCureStateMachine->selfCureOnGoing = true;
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecovery(msg);
+        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm(msg);
         EXPECT_NE(pSelfCureStateMachine->m_instId, TEN);
     }
 
@@ -990,20 +923,6 @@ public:
     {
         LOGI("Enter HandleIpConfigCompletedAfterRenewDhcpTest");
         pSelfCureStateMachine->pInternetSelfCureState->HandleIpConfigCompletedAfterRenewDhcp();
-        EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
-    }
-
-    void HandleInternetRecoveryConfirmTest()
-    {
-        LOGI("Enter HandleInternetRecoveryConfirmTest");
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm();
-        pSelfCureStateMachine->pInternetSelfCureState->currentSelfCureLevel = WIFI_CURE_RESET_LEVEL_IDLE;
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm();
-
-        pSelfCureStateMachine->pInternetSelfCureState->currentSelfCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
-        pSelfCureStateMachine->mIsHttpReachable = true;
-        pSelfCureStateMachine->internetUnknown = true;
-        pSelfCureStateMachine->pInternetSelfCureState->HandleInternetRecoveryConfirm();
         EXPECT_NE(pSelfCureStateMachine->useWithRandMacAddress, TEN);
     }
 
@@ -1676,65 +1595,6 @@ public:
         EXPECT_TRUE(pSelfCureStateMachine->IsWifi6Network(currConnectedBssid));
     }
 
-    void DisconnectedExeMsgSuccess0()
-    {
-        LOGI("Enter DisconnectedExeMsgSuccess0");
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetMessageName(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset()).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLastNetworkId()).Times(AtLeast(0));
-        EXPECT_TRUE(pSelfCureStateMachine->pDisconnectedMonitorState->ExecuteStateMsg(msg));
-    }
-
-    void HandleResetConnectNetworkTest()
-    {
-        LOGI("Enter HandleResetConnectNetworkTest");
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetMessageName(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset()).Times(AtLeast(0)).WillOnce(Return(false));
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
-
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset()).Times(AtLeast(0)).WillOnce(Return(true));
-        pSelfCureStateMachine->connectNetworkRetryCnt = 0;
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
-
-        pSelfCureStateMachine->connectNetworkRetryCnt = CONNECT_NETWORK_RETRY_CNT;
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
-
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).Times(AtLeast(0)).WillOnce(
-            Return(MODE_STATE_OPEN));
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
-
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).Times(AtLeast(0)).WillOnce(
-            Return(MODE_STATE_CLOSE));
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
-
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
-
-        EXPECT_CALL(*pMockStaService, ConnectToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
-    }
-
-    void HandleResetConnectNetworkTest2()
-    {
-        LOGI("Enter HandleResetConnectNetworkTest2");
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetMessageName(WIFI_CURE_OPEN_WIFI_SUCCEED_RESET);
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiSelfcureReset()).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLastNetworkId()).Times(AtLeast(0));
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(msg);
-    }
-
-    void HandleResetConnectNetworkTest3()
-    {
-        LOGI("Enter HandleResetConnectNetworkTest3");
-        pSelfCureStateMachine->pDisconnectedMonitorState->HandleResetConnectNetwork(nullptr);
-        EXPECT_NE(pSelfCureStateMachine->noAutoConnCounter, TEN);
-    }
-
     void SelfCureForResetTest()
     {
         LOGI("Enter SelfCureForResetTest");
@@ -2054,21 +1914,6 @@ HWTEST_F(SelfCureStateMachineTest, DisconnectedMonitorExeMsgSuccess2, TestSize.L
     DisconnectedMonitorExeMsgSuccess2();
 }
 
-HWTEST_F(SelfCureStateMachineTest, DisconnectedMonitorExeMsgSuccess3, TestSize.Level1)
-{
-    DisconnectedMonitorExeMsgSuccess3();
-}
-
-HWTEST_F(SelfCureStateMachineTest, DisconnectedMonitorExeMsgSuccess4, TestSize.Level1)
-{
-    DisconnectedMonitorExeMsgSuccess4();
-}
-
-HWTEST_F(SelfCureStateMachineTest, HandleConnectFailedTest, TestSize.Level1)
-{
-    HandleConnectFailedTest();
-}
-
 HWTEST_F(SelfCureStateMachineTest, ConnectionSelfCureGoInStateSuccess, TestSize.Level1)
 {
     ConnectionSelfCureGoInStateSuccess();
@@ -2112,11 +1957,6 @@ HWTEST_F(SelfCureStateMachineTest, InternetSelfCureExeMsgSuccess1, TestSize.Leve
 HWTEST_F(SelfCureStateMachineTest, InitSelfCureIssHandleMapTest, TestSize.Level1)
 {
     InitSelfCureIssHandleMapTest();
-}
-
-HWTEST_F(SelfCureStateMachineTest, HandleRandMacSelfCureCompleteTest, TestSize.Level1)
-{
-    HandleRandMacSelfCureCompleteTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, HandleInternetFailedSelfCureTest, TestSize.Level1)
@@ -2252,11 +2092,6 @@ HWTEST_F(SelfCureStateMachineTest, HandleIpConfigCompletedTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, HandleIpConfigCompletedAfterRenewDhcpTest, TestSize.Level1)
 {
     HandleIpConfigCompletedAfterRenewDhcpTest();
-}
-
-HWTEST_F(SelfCureStateMachineTest, HandleInternetRecoveryConfirmTest, TestSize.Level1)
-{
-    HandleInternetRecoveryConfirmTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, ConfirmInternetSelfCureTest, TestSize.Level1)
@@ -2457,26 +2292,6 @@ HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest3, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest4, TestSize.Level1)
 {
     IsWifi6NetworkTest4();
-}
-
-HWTEST_F(SelfCureStateMachineTest, DisconnectedExeMsgSuccess0, TestSize.Level1)
-{
-    DisconnectedExeMsgSuccess0();
-}
-
-HWTEST_F(SelfCureStateMachineTest, HandleResetConnectNetworkTest, TestSize.Level1)
-{
-    HandleResetConnectNetworkTest();
-}
-
-HWTEST_F(SelfCureStateMachineTest, HandleResetConnectNetworkTest2, TestSize.Level1)
-{
-    HandleResetConnectNetworkTest2();
-}
-
-HWTEST_F(SelfCureStateMachineTest, HandleResetConnectNetworkTest3, TestSize.Level1)
-{
-    HandleResetConnectNetworkTest3();
 }
 
 HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest, TestSize.Level1)

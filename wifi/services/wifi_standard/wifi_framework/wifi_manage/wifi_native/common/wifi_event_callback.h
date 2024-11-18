@@ -38,6 +38,7 @@ enum class WpaEventCallback {
     HILINK_NUM = 1,
     EAP_SIM_NUM = 2,
     CSA_CHSWITCH_NUM = 3,
+    CHR_EVENT_NUM = 4,
 };
 
 }  // namespace Wifi

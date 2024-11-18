@@ -13,18 +13,20 @@
  * limitations under the License.
  */
 
-import wifi from '@ohos.wifi'
+import wifiManager from '@ohos.wifiManager'
 import ConfigData from '../utils/ConfigData';
 /**
  * PswDialog page of WiFi test
  */
 
+const TAG = "wifiTestApp [PswDialog]"
+
 @CustomDialog
 export struct PswDialog {
-  private scanInfo!: wifi.WifiScanInfo
+  private scanInfo!: wifiManager.WifiScanInfo
   private psw: string = ''
   private controller: CustomDialogController
-  private action!: (scanInfo: wifi.WifiScanInfo , psw: string) => void
+  private action!: (scanInfo: wifiManager.WifiScanInfo , psw: string) => void
 
   build() {
     Column() {
@@ -39,6 +41,7 @@ export struct PswDialog {
         .width(ConfigData.WH_95_100)
         .onChange((value: string) => {
           this.psw = value
+          console.log(TAG,"this.psw:" + this.psw)
         })
       Row() {
         Button() {
@@ -65,8 +68,9 @@ export struct PswDialog {
         .backgroundColor(Color.White)
         .margin(5)
         .onClick(() => {
-          this.controller.close()
           this.action(this.scanInfo , this.psw)
+          console.log(TAG,"this.scanInfo: " + JSON.stringify(this.scanInfo),"  this.psw:" + this.psw)
+          this.controller.close()
         })
       }
       .width(ConfigData.WH_100_100)

@@ -284,7 +284,6 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg)
      * Removes a current setup group.
      */
     WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
-    WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
     WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
     auto dhcpFunc = [=]() {
         if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
@@ -303,13 +302,8 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg)
         if (p2pStateMachine.p2pDevIface == group.GetInterface()) {
             p2pStateMachine.p2pDevIface = "";
         }
-        if (group.IsGroupOwner()) {
-            WifiNetAgent::GetInstance().DelInterfaceAddress(group.GetInterface(),
-                group.GetGoIpAddress(), P2P_IP_ADDR_PREFIX_LEN);
-        } else {
-            WifiNetAgent::GetInstance().DelInterfaceAddress(group.GetInterface(),
-                group.GetGcIpAddress(), P2P_IP_ADDR_PREFIX_LEN);
-        }
+        WifiNetAgent::GetInstance().DelInterfaceAddress(group.GetInterface(),
+            group.IsGroupOwner() ? group.GetGoIpAddress() : group.GetGcIpAddress(), P2P_IP_ADDR_PREFIX_LEN);
         if (WifiP2PHalInterface::GetInstance().GroupRemove(group.GetInterface())) {
             WIFI_LOGE("P2P group removal failed.");
             dhcpFunc();
@@ -318,11 +312,13 @@ bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg)
             p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_FAILED);
+            WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::P2P_GROUP_REMOVE_ERROR),
+                static_cast<int>(P2P_ERROR_RES::P2P_GROUP_REMOVE_FAILURE));
         } else {
             p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
             WIFI_LOGI("The P2P group is successfully removed.");
             p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_SUCCESS);
-            ret = WifiP2PHalInterface::GetInstance().P2pFlush();
+            WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pFlush();
             if (ret != WifiErrorNo::WIFI_HAL_OPT_OK) {
                 WIFI_LOGE("call P2pFlush() failed, ErrCode: %{public}d", static_cast<int>(ret));
             }
@@ -385,31 +381,19 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
     freq = info.first;
     isFreqEnhance = (info.second == FreqType::FREQUENCY_160M);
     WIFI_LOGI("Create a hid2d group, frequency: %{public}d, isFreqEnhance: %{public}d.", freq, isFreqEnhance);
-    void *handle;
     do {
-        const char *so = "libwifi_enhance_interface.z.so";
-        int (*FreqEnhance)(int, bool);
-        handle = dlopen(so, RTLD_LAZY);
-        if ((handle == nullptr) || (!isFreqEnhance)) {
-            WIFI_LOGE("wifi_enhance_service:P2P enhance is empty or is FreqEnhance is false");
+        if (enhanceService_ == nullptr) {
+            WIFI_LOGE("p2p enhanceService_ is nullptr");
             break;
         }
-        FreqEnhance = (int(*)(int, bool))dlsym(handle, "FreqEnhance");
-        if (FreqEnhance == nullptr) {
-            WIFI_LOGE("wifi_enhance_service:Invalid method '%s' - no FreqEnhance()", so);
-            break;
-        }
-        freqEnhance = FreqEnhance(freq, isFreqEnhance);
+        freqEnhance = enhanceService_->FreqEnhance(freq, isFreqEnhance);
         if (!(static_cast<unsigned int>(freqEnhance) & (static_cast<unsigned int>(P2P_ENHANCE_MASK))) &&
             (static_cast<unsigned int>(freqEnhance) % static_cast<unsigned int>(BAND_MASK != 0))) {
             WIFI_LOGE("FreqEnhance Error :freq = %d, freqEnhance = %d.", freq, freqEnhance);
         } else {
             freq = freqEnhance;
         }
-        FreqEnhance = nullptr;
     } while (0);
-    dlclose(handle);
-    handle = nullptr;
     ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, PERSISTENT_NET_ID, freq);
     if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
         WIFI_LOGE("p2p configure to CreateGroup failed.");
@@ -443,5 +427,11 @@ bool P2pGroupOperatingState::ExecuteStateMsg(InternalMessagePtr msg)
         return NOT_EXECUTED;
     }
 }
+
+void P2pGroupOperatingState::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    enhanceService_ = enhanceService;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

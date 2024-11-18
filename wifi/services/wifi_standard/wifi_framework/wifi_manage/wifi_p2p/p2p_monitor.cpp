@@ -330,6 +330,12 @@ void P2pMonitor::Broadcast2SmChSwitch(const std::string &iface, const WifiP2pGro
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, 0, 0, anyGroup);
 }
 
+void P2pMonitor::Broadcast2SmChrEvent(const std::string &iface, const int &errCode) const
+{
+    std::any anyNone;
+    MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_CHR_REPORT, errCode, 0, anyNone);
+}
+
 void P2pMonitor::WpaEventDeviceFound(const HalP2pDeviceFound &deviceInfo) const
 {
     const int minWfdLength = 6;
@@ -427,14 +433,14 @@ void P2pMonitor::WpaEventGoNegFailure(int status) const
 {
     WIFI_LOGI("onGoNegotiationFailure callback status:%{public}d", status);
     P2pStatus p2pStatus = IntStatusToP2pStatus(status);
+    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::NEGO_FAILURE_ERROR),
+        static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     Broadcast2SmGoNegFailure(selectIfacName, p2pStatus);
 }
 
 void P2pMonitor::WpaEventInvitationReceived(const HalP2pInvitationInfo &recvInfo) const
 {
     WIFI_LOGI("onInvitationReceived callback");
-    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::NEGO_FAILURE_ERROR),
-        static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     WifiP2pGroupInfo group;
     group.SetNetworkId(recvInfo.persistentNetworkId);
 
@@ -485,14 +491,14 @@ void P2pMonitor::WpaEventGroupFormationFailure(const std::string &failureReason)
 {
     WIFI_LOGD("onGroupFormationFailure callback, failureReason:%{public}s", failureReason.c_str());
     std::string reason(failureReason);
+    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::FORMATION_ERROR),
+        static_cast<int>(P2P_ERROR_RES::FORMATION_FAILURE));
     Broadcast2SmGroupFormationFailure(selectIfacName, reason);
 }
 
 void P2pMonitor::WpaEventGroupStarted(const HalP2pGroupInfo &groupInfo) const
 {
     WIFI_LOGD("onGroupStarted callback");
-    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::FORMATION_ERROR),
-        static_cast<int>(P2P_ERROR_RES::FORMATION_FAILURE));
     if (groupInfo.groupName.empty()) {
         WIFI_LOGE("Missing group interface name.");
         return;
@@ -526,8 +532,6 @@ void P2pMonitor::WpaEventGroupRemoved(const std::string &groupIfName, bool isGo)
 {
     WIFI_LOGD("onGroupRemoved callback, groupIfName:%{private}s, isGo:%{public}s", groupIfName.c_str(),
         (isGo) ? "true" : "false");
-    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::P2P_GROUP_REMOVE_ERROR),
-        static_cast<int>(P2P_ERROR_RES::P2P_GROUP_REMOVE_FAILURE));
     if (groupIfName.empty()) {
         WIFI_LOGE("ERROR! No group name!");
         return;
@@ -679,6 +683,12 @@ void P2pMonitor::WpaEventP2pChannelSwitch(int freq) const
     Broadcast2SmChSwitch(selectIfacName, group);
 }
 
+void P2pMonitor::WpaEventP2pChrReport(int errCode) const
+{
+    WIFI_LOGI("WpaEventP2pChrReport callback, errCode:%{public}d", errCode);
+    Broadcast2SmChrEvent(selectIfacName, errCode);
+}
+
 void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
 {
     WIFI_LOGI("WpaEventStaNotifyCallBack callback, notifyParam:%{private}s", notifyParam.c_str());
@@ -703,6 +713,17 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
             std::string data = notifyParam.substr(freqPos + strlen("freq="));
             int freq = stoi(data);
             WpaEventP2pChannelSwitch(freq);
+            break;
+        }
+        case static_cast<int>(WpaEventCallback::CHR_EVENT_NUM): {
+            std::string::size_type codePos = 0;
+            if ((codePos = notifyParam.find("errCode=")) == std::string::npos) {
+                WIFI_LOGE("chr event notifyParam not find errCode!");
+                return;
+            }
+            std::string data = notifyParam.substr(codePos + strlen("errCode="));
+            int errCode = stoi(data);
+            WpaEventP2pChrReport(errCode);
             break;
         }
         default:

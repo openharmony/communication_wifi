@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import prompt from '@ohos.prompt';
+import promptAction from '@ohos.promptAction';
 
 export class WebObject {
   controller: WebController;
@@ -41,7 +41,7 @@ export enum LoadingStatus {
   END
 }
 
-const TAG: string = '[browser]'
+const TAG = 'wifiTestApp [browser]'
 
 export class Browser {
   inputValue: string = ""
@@ -76,7 +76,7 @@ export class Browser {
 
   addTab() {
     if ( this.webArray.length > 10 ) {
-      prompt.showToast({
+      promptAction.showToast({
         message : '页签数量已满'
       })
       return;

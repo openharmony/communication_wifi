@@ -70,8 +70,10 @@
         "*GetSignalLevel*";
         "*GetLinkedInfo*";
         "*DoArpCheck*";
+        "*SetStaCurrentTime*";
    extern "C++" {
         "OHOS::Wifi::WifiCodeConvertUtil::IsUtf8(const std::string&)";
+        "OHOS::Wifi::WifiCodeConvertUtil::Utf8ToGbk(const std::string&)";
         "OHOS::Wifi::WifiCodeConvertUtil::GbkToUtf8(const std::string&)";
         "OHOS::Wifi::WifiAssetManager::GetInstance()";
         "OHOS::Wifi::WifiAssetManager::WifiAssetTriggerSync()";
@@ -147,6 +149,8 @@
         "OHOS::Wifi::WifiConfigCenter::SetApMidState(OHOS::Wifi::WifiOprMidState, int)";
         "OHOS::Wifi::WifiConfigCenter::GetHotspotState(int)";
         "OHOS::Wifi::WifiConfigCenter::SetHotspotState(int, int)";
+        "OHOS::Wifi::WifiConfigCenter::SetHotspotMacConfig(OHOS::Wifi::HotspotMacConfig const&, int)";
+        "OHOS::Wifi::WifiConfigCenter::GetHotspotMacConfig(OHOS::Wifi::HotspotMacConfig&, int)";
         "OHOS::Wifi::WifiConfigCenter::SetPowerModel(OHOS::Wifi::PowerModel const&, int)";
         "OHOS::Wifi::WifiConfigCenter::GetPowerModel(OHOS::Wifi::PowerModel&, int)";
         "OHOS::Wifi::WifiConfigCenter::GetStationList(std::__h::vector<OHOS::Wifi::StationInfo, std::__h::allocator<OHOS::Wifi::StationInfo>>&, int)";
@@ -217,13 +221,6 @@
         "OHOS::Wifi::WifiConfigCenter::GetWifiConnectFailListCache(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryConnectFailInfo, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, OHOS::Wifi::WifiCategoryConnectFailInfo>>>&)";
         "OHOS::Wifi::WifiConfigCenter::UpdateWifiConnectFailListCache(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryConnectFailInfo)";
         "OHOS::Wifi::WifiConfigCenter::RemoveWifiConnectFailListCache(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
-
-
-
-
-
-
-
         "OHOS::Wifi::WifiScanConfig::GetScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
         "OHOS::Wifi::WifiScanConfig::SaveScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
         "OHOS::Wifi::WifiScanConfig::SetAppRunningState(OHOS::Wifi::ScanMode)";

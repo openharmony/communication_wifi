@@ -170,6 +170,13 @@ public:
     virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
 
     /**
+     * @Description Check if specific network
+     *
+     * @return true or false
+     */
+    virtual bool IsSpecificNetwork(WifiDeviceConfig &config) = 0;
+
+    /**
      * @Description get the self wifi configuration information
      *
      * @param cfgType - configuration type
@@ -190,6 +197,15 @@ public:
      */
     virtual ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType, char cfgData[CFG_DATA_MAX_BYTES],
         int setDataValidLen) = 0;
+
+    /**
+     * @Description obtain supported frequency
+     *
+     * @param freq - current use freq
+     * @param is160M - where use 160M Frequency
+     * @return int - supported frequency
+     */
+    virtual int FreqEnhance(int freq, bool is160M) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

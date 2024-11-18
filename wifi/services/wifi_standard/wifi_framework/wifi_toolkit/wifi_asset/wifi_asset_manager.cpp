@@ -193,9 +193,10 @@ static void WifiAssetAttrQuery(const AssetResultSet &resultSet, int32_t userId,
         std::string strAlias =
             std::string(reinterpret_cast<const char *>(checkItem->value.blob.data), checkItem->value.blob.size);
         AssetValue returnValue = {.u32 = SEC_ASSET_RETURN_ALL};
+        AssetValue aliasValue = {.blob = checkItem->value.blob};
         AssetAttr attrSingle[] = {
             {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
-            {.tag = SEC_ASSET_TAG_ALIAS, .value = checkItem->value},
+            {.tag = SEC_ASSET_TAG_ALIAS, .value = aliasValue},
             {.tag = SEC_ASSET_TAG_RETURN_TYPE, .value = returnValue},
         };
         AssetResultSet resultSetSingel = {0};
@@ -368,10 +369,10 @@ void WifiAssetManager::WifiAssetAddPack(const std::vector<WifiDeviceConfig> &wif
             }
             int32_t ret = WifiAssetAttrAdd(mapConfig, false);
             if (ret != SEC_ASSET_SUCCESS && ret != SEC_ASSET_DUPLICATED) {
-                LOGE("WifiAssetAttrAdd Failed, ret: %{public}d, ssid : %{public}s", ret,
+                LOGE("WifiAssetAddPack Failed, ret: %{public}d, ssid : %{public}s", ret,
                     SsidAnonymize(mapConfig.ssid).c_str());
             } else {
-                LOGI("WifiAssetAttrAdd Success, ssid : %{public}s", SsidAnonymize(mapConfig.ssid).c_str());
+                LOGI("WifiAssetAddPack Success, ssid : %{public}s", SsidAnonymize(mapConfig.ssid).c_str());
             }
         }
         if (flagSync) {

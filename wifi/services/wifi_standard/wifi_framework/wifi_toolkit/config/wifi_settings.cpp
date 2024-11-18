@@ -113,8 +113,9 @@ int WifiSettings::Init()
 
 int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 {
-    if (config.ssid.empty()) {
-        LOGE("AddDeviceConfig ssid is empty");
+    if (config.ssid.empty() || (config.keyMgmt == KEY_MGMT_WPA_PSK && config.preSharedKey.length() == 0)) {
+        LOGE("AddDeviceConfig fail, networkId:%{public}d, keyMgmt:%{public}s",
+            config.networkId, config.keyMgmt.c_str());
         return -1;
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -525,6 +526,7 @@ int WifiSettings::ReloadDeviceConfig()
         item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
+    LOGI("ReloadDeviceConfig load deviceConfig size: %{public}d", static_cast<int>(mWifiDeviceConfig.size()));
     if (!mEncryptionOnBootFalg.test_and_set()) {
         mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
         mWifiEncryptionThread->PostAsyncTask([this]() {
@@ -1844,7 +1846,7 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
         }
     }
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-    LOGE("WifiAsset ConfigsDeduplicateAndSave");
+    LOGD("WifiAsset ConfigsDeduplicateAndSave");
     WifiAssetManager::GetInstance().WifiAssetAddPack(addConfigs);
 #endif
     std::vector<WifiDeviceConfig>().swap(newConfigs);
@@ -1983,7 +1985,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
     if (config.keyMgmt != KEY_MGMT_WAPI_CERT) {
         return;
     }
-
+ 
     EncryptedData *encryWapiAs = new EncryptedData(config.wifiWapiConfig.encryptedAsCertData,
         config.wifiWapiConfig.asCertDataIV);
     std::string decryWapiAs = "";
@@ -2017,7 +2019,6 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         LOGD("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
         return 0;
     }
-    LOGD("DecryptionDeviceConfig start");
     WifiEncryptionInfo mWifiEncryptionInfo;
     mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);
@@ -2145,13 +2146,14 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         if (find) {
             continue;
         }
-        LOGI("UpdateWifiConfigFromCloud new %{public}s , psksize : %{public}d", SsidAnonymize(iter.ssid).c_str(),
-            static_cast<int>((iter.preSharedKey).length()));
         iter.networkId = mNetworkId;
         iter.version = 0;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
         EncryptionDeviceConfig(iter);
 #endif
+        LOGI("%{public}s networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s, psksize: %{public}d",
+            __FUNCTION__, iter.networkId, SsidAnonymize(iter.ssid).c_str(), iter.keyMgmt.c_str(),
+            static_cast<int>((iter.preSharedKey).length()));
         tempConfigs.emplace(std::make_pair(iter.networkId, iter));
         mNetworkId++;
     }

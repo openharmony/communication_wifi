@@ -15,7 +15,7 @@
 
 import ConfigData from '../utils/ConfigData';
 
-const TAG = "[subEntryComponent]"
+const TAG = "wifiTestApp [subEntryComponent]"
 /**
  * Sub-Page Entry Component of wifi test
  */

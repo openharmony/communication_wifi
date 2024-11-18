@@ -63,6 +63,12 @@ HalDeviceManager::~HalDeviceManager()
     ResetHalDeviceManagerInfo(false);
 }
 
+HalDeviceManager &HalDeviceManager::GetInstance()
+{
+    static HalDeviceManager instance;
+    return instance;
+}
+
 bool HalDeviceManager::StartChipHdi()
 {
     std::lock_guard<std::mutex> lock(mMutex);
@@ -341,7 +347,7 @@ bool HalDeviceManager::GetScanInfos(const std::string &ifaceName, std::vector<Sc
     }
 
     std::lock_guard<std::mutex> lock(mMutex);
-    LOGI("GetScanInfos, ifaceName:%{public}s", ifaceName.c_str());
+    LOGD("GetScanInfos, ifaceName:%{public}s", ifaceName.c_str());
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter == mIWifiStaIfaces.end()) {
         LOGE("GetScanInfos, not find iface info");

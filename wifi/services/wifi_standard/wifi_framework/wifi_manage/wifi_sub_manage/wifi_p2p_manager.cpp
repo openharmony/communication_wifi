@@ -63,7 +63,7 @@ ErrCode WifiP2pManager::AutoStartP2pService()
 
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (ifaceName.empty() &&
-        !DelayedSingleton<HalDeviceManager>::GetInstance()->CreateP2pIface([this](std::string &destoryIfaceName,
+        !HalDeviceManager::GetInstance().CreateP2pIface([this](std::string &destoryIfaceName,
         int createIfaceType) { this->IfaceDestoryCallback(destoryIfaceName, createIfaceType); },
         ifaceName)) {
         WIFI_LOGE("AutoStartP2pService, create iface failed!");
@@ -97,6 +97,16 @@ ErrCode WifiP2pManager::AutoStartP2pService()
         ret = pService->EnableP2p();
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service EnableP2p failed, ret %{public}d!", static_cast<int>(ret));
+            break;
+        }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_ENHANCE);
+            break;
+        }
+        ret = pService->SetEnhanceService(pEnhanceService);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(ret));
             break;
         }
     } while (false);
@@ -204,7 +214,7 @@ void WifiP2pManager::CloseP2pService(void)
 
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
-        DelayedSingleton<HalDeviceManager>::GetInstance()->RemoveP2pIface(ifaceName);
+        HalDeviceManager::GetInstance().RemoveP2pIface(ifaceName);
         ifaceName.clear();
         WifiConfigCenter::GetInstance().SetP2pIfaceName("");
     }

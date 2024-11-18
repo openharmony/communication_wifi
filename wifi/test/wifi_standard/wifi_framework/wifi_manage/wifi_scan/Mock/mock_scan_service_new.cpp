@@ -15,7 +15,6 @@
 
 #include "scan_service.h"
 #include <cinttypes>
-#include "log_helper.h"
 #include "wifi_global_func.h"
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"

@@ -60,6 +60,12 @@ ErrCode WifiP2pService::DisableP2p()
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiP2pService::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    p2pStateMachine.SetEnhanceService(enhanceService);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiP2pService::DiscoverDevices()
 {
     WIFI_LOGI("DiscoverDevices");

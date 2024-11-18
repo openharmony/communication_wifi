@@ -21,7 +21,7 @@ import MediaUtils from '../entryability/model/MediaUtils'
 
 import ConfigData from '../utils/ConfigData';
 
-const TAG = "[titleBar]"
+const TAG = "wifiTestApp [titleBar]"
 const PAGE_URI_ABOUT_MODE = 'pages/subManualApiTest/subWifiTest/about'
 
 /**

@@ -21,6 +21,7 @@
 #ifndef OHOS_ARCH_LITE
 #include "app_state_data.h"
 #include "ienhance_service.h"
+#include "iself_cure_service.h"
 #endif
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
@@ -362,6 +363,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetEnhanceService(IEnhanceService *enhanceService) = 0;
+
+    /**
+     * @Description Set SelfcureService to sta Service.
+     *
+     * @param enhanceService ISelfCureService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetSelfCureService(ISelfCureService *selfCureService) = 0;
 #endif
     /**
      * @Description enable hilink
@@ -369,7 +378,7 @@ public:
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid) = 0;
- 
+
     /**
      * @Description deliver mac
      *

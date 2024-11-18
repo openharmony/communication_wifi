@@ -44,18 +44,15 @@ class WifiDataShareHelperUtilsTest : public Test {
 public:
     void SetUp() override
     {
-        helper_ = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
         observer = sptr<WifiMockModeObserver>(new (std::nothrow)WifiMockModeObserver());
     }
 
     void TearDown() override
     {
-        helper_.reset();
     }
 
 protected:
     std::string value;
-    std::shared_ptr<WifiDataShareHelperUtils> helper_;
     sptr<WifiMockModeObserver> observer;
 };
 
@@ -64,7 +61,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, Query_ReturnsFailed, TestSize.Level1)
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
     std::string key = "wifi_on";
     bool onlySettingsData = true;
-    ErrCode result = helper_->Query(uri, key, value, onlySettingsData);
+    ErrCode result = WifiDataShareHelperUtils::GetInstance().Query(uri, key, value, onlySettingsData);
     EXPECT_EQ(result, WIFI_OPT_FAILED);
 }
 
@@ -73,7 +70,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, Insert_ReturnsFailed, TestSize.Level1)
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
     std::string key = "wifi_on";
     value = "1";
-    ErrCode result = helper_->Insert(uri, key, value);
+    ErrCode result = WifiDataShareHelperUtils::GetInstance().Insert(uri, key, value);
     EXPECT_EQ(result, WIFI_OPT_FAILED);
 }
 
@@ -82,21 +79,21 @@ HWTEST_F(WifiDataShareHelperUtilsTest, Update_ReturnsFailed, TestSize.Level1)
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
     std::string key = "wifi_on";
     value = "0";
-    ErrCode result = helper_->Update(uri, key, value);
+    ErrCode result = WifiDataShareHelperUtils::GetInstance().Update(uri, key, value);
     EXPECT_EQ(result, WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, RegisterObserver_ReturnsSuccess, TestSize.Level1)
 {
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
-    ErrCode result = helper_->RegisterObserver(uri, observer);
+    ErrCode result = WifiDataShareHelperUtils::GetInstance().RegisterObserver(uri, observer);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, UnRegisterObserver_ReturnsSuccess, TestSize.Level1)
 {
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
-    ErrCode result = helper_->UnRegisterObserver(uri, observer);
+    ErrCode result = WifiDataShareHelperUtils::GetInstance().UnRegisterObserver(uri, observer);
 
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
@@ -104,7 +101,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, UnRegisterObserver_ReturnsSuccess, TestSi
 HWTEST_F(WifiDataShareHelperUtilsTest, ClearResourcesTest, TestSize.Level1)
 {
     bool onlySettingsData = true;
-    auto operatePtr = helper_->WifiCreateDataShareHelper(onlySettingsData);
+    auto operatePtr = WifiDataShareHelperUtils::GetInstance().WifiCreateDataShareHelper(onlySettingsData);
 
     if (operatePtr == nullptr) {
         return;
@@ -117,7 +114,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, ClearResourcesTest, TestSize.Level1)
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
     auto result = operatePtr->Query(uri, predicates, columns);
 
-    helper_->ClearResources(operatePtr, result);
+    WifiDataShareHelperUtils::GetInstance().ClearResources(operatePtr, result);
 }
 }
 }

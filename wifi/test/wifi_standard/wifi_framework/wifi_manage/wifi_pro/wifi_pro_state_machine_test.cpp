@@ -477,7 +477,6 @@ HWTEST_F(WifiProStateMachineTest, WifiHasNetStateExecuteStateMsgTest06, TestSize
     msg->SetMessageName(EVENT_HANDLE_SCAN_RESULT);
     std::vector<InterScanInfo> scanInfos;
     msg->SetMessageObj(scanInfos);
-    wifiHasNetState_->isScanTriggered_ = true;
     EXPECT_EQ(wifiHasNetState_->ExecuteStateMsg(msg), true);
 }
 

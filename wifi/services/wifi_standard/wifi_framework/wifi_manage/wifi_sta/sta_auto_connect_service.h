@@ -23,7 +23,6 @@
 #include "wifi_log.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
-#include "log_helper.h"
 #include "sta_define.h"
 #include "sta_state_machine.h"
 #include "sta_saved_device_appraisal.h"
@@ -132,79 +131,12 @@ private:
     StaDeviceAppraisal *pSavedDeviceAppraisal;
     std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = nullptr;
     bool firmwareRoamFlag;
-    int maxBlockedBssidNum;
     int selectDeviceLastTime;
     StaDeviceAppraisal *pAppraisals[MAX_APPRAISAL_NUM];
     int m_instId;
     std::map<std::string, std::function<bool()>> autoJoinConditionsMap{};
     std::mutex autoJoinMutex;
     std::vector<StaServiceCallback> mStaCallbacks;
-    struct BlockedBssidInfo {
-        int count; /* Number of times the BSSID is rejected. */
-        bool blockedFlag;
-        int blockedTime;
-        BlockedBssidInfo()
-        {
-            count = 0;
-            blockedFlag = false;
-            blockedTime = 0;
-        }
-        ~BlockedBssidInfo(){}
-    };
-    std::unordered_map<std::string, BlockedBssidInfo> blockedBssidMap;
-    std::mutex m_blockBssidMapMutex;
-    /**
-     * @Description  Clear all BSSIDs in BSSID Blocklist
-     *
-     */
-    void ClearAllBlockedBssids();
-    /**
-     * @Description  Refreshing the BSSID Blocklist
-     *
-     */
-    void ClearOvertimeBlockedBssid();
-    /**
-     * @Description  Compiles and returns the hash set of the blocklist BSSID.
-     *
-     * @param blockedBssids - Blocklisted BSSID List(out)
-     */
-    void GetBlockedBssids(std::vector<std::string> &blockedBssids);
-    /**
-     * @Description  Update the BSSID blocklist when the BSSID is enabled or disabled.
-     *
-     * @param bssid - BSSID to be enabled/disabled(in)
-     * @param enable - true: Enable the BSSID. false: disable the BSSID.(in)
-     * @param reasonCode - Enable/Disable reason code.(in)
-     * @Return: If the blocklist is updated, The value is true. Otherwise, the value is false.
-     */
-    bool AddOrDelBlockedBssids(std::string bssid, bool enable, int reason);
-    /**
-     * @Description  If the firmware roaming function is supported,
-                     update the firmware roaming config.
-     *
-     */
-    void SyncBlockedSsidFirmware();
-    /**
-     * @Description  Querying Firmware Information
-     *
-     * @Return: If the operation is successful, true is returned.
-                If firmware roaming is supported but the valid roaming
-                capability cannot be obtained, false is returned.
-     */
-    bool ObtainRoamCapFromFirmware();
-    /**
-     * @Description  Write Firmware Roaming Configuration to Firmware
-     *
-     * @param blocklistBssids - List of BSSIDs to Be Added to the Blocklist(in)
-     * @Return: True if successful, false otherwise
-     */
-    bool SetRoamBlockedBssidFirmware(const std::vector<std::string> &blocklistBssids) const;
-    /**
-     * @Description  Connect to an elected device
-     *
-     * @param electedDevice - Elected Device(in)
-     */
-    void ConnectElectedDevice(WifiDeviceConfig &electedDevice);
     /**
      * @Description  Get available device
      *

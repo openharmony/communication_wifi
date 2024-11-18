@@ -45,6 +45,7 @@
     "pages/subStabilityTest/wifiScanStabilityTest",
     "pages/subStabilityTest/wifiConnectStabilityTest",
     "pages/subStabilityTest/hotspotStabilityTest",
-    "pages/subStabilityTest/webLatencyTest"
+    "pages/subStabilityTest/webLatencyTest",
+    "pages/newApi/AllInOneView"
   ]
 }

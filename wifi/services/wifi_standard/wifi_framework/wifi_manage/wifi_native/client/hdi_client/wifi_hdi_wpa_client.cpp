@@ -866,9 +866,9 @@ WifiErrorNo WifiHdiWpaClient::ReqDisconnectStaByMac(const std::string &mac, int 
     return HdiDisassociateSta(mac.c_str(), id);
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqP2pStart(const std::string &ifaceName)
+WifiErrorNo WifiHdiWpaClient::ReqP2pStart(const std::string &ifaceName, const bool hasPersisentGroup)
 {
-    WifiErrorNo ret = HdiWpaP2pStart(ifaceName.c_str());
+    WifiErrorNo ret = HdiWpaP2pStart(ifaceName.c_str(), hasPersisentGroup);
     if (ret == WIFI_HAL_OPT_OK) {
         OnEventP2pStateChanged(P2P_SUPPLICANT_CONNECTED);
     }

@@ -98,12 +98,6 @@ HWTEST_F(WifiManagerTest, DealStaCloseResTest_001, TestSize.Level1)
     wifiManager.wifiStaManager->DealStaStopped(0);
 }
 
-HWTEST_F(WifiManagerTest, IgnoreConnStateChangeTest, TestSize.Level1)
-{
-    WIFI_LOGI("IgnoreConnStateChangeTest enter!");
-    wifiManager.wifiStaManager->IgnoreConnStateChange(0);
-}
-
 HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStaConnChangedTest enter!");

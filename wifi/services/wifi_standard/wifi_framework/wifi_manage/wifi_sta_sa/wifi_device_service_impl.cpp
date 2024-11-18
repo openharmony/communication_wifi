@@ -40,6 +40,7 @@
 #include "wifi_common_util.h"
 #include "wifi_protect_manager.h"
 #include "wifi_global_func.h"
+#include "wifi_sta_hal_interface.h"
 #include "wifi_randommac_helper.h"
 #include "wifi_sta_hal_interface.h"
 
@@ -715,7 +716,7 @@ ErrCode WifiDeviceServiceImpl::SetTxPower(int power)
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("setTxPower:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (WifiStaHalInterface::GetInstance().SetTxPower(power) != WIFI_HAL_OPT_OK) {
@@ -735,7 +736,6 @@ ErrCode WifiDeviceServiceImpl::SetDpiMarkRule(const std::string &ifaceName, int 
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-
     if (WifiStaHalInterface::GetInstance().SetDpiMarkRule(ifaceName, uid, protocol, enable) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetDpiMarkRule failed");
         return WIFI_OPT_FAILED;
@@ -812,7 +812,6 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
     }
     return WIFI_OPT_SUCCESS;
 }
-
 
 ErrCode WifiDeviceServiceImpl::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)
 {
@@ -1064,7 +1063,6 @@ ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std
     }
     return pService->StartRoamToNetwork(networkId, bssid);
 }
-
 
 ErrCode WifiDeviceServiceImpl::StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate)
 {
@@ -1523,10 +1521,6 @@ ErrCode WifiDeviceServiceImpl::IsFeatureSupported(long feature, bool &isSupporte
 ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
 {
     WIFI_LOGI("GetDeviceMacAddress");
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("GetDeviceMacAddress:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

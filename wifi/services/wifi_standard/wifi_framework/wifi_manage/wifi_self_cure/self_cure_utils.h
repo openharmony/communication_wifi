@@ -22,8 +22,10 @@
 namespace OHOS {
 namespace Wifi {
 class SelfCureUtils {
-    DECLARE_DELAYED_SINGLETON(SelfCureUtils);
 public:
+    SelfCureUtils();
+    ~SelfCureUtils();
+    static SelfCureUtils& GetInstance();
     void RegisterDnsResultCallback();
     void UnRegisterDnsResultCallback();
     int32_t GetCurrentDnsFailedCounter();

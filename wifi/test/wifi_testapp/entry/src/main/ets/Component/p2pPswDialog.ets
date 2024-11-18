@@ -14,6 +14,7 @@
  */
 
 import wifi from '@ohos.wifi'
+import wifiManager from '@ohos.wifiManager';
 import ConfigData from '../utils/ConfigData';
 /**
  * PswDialog page of WiFi test
@@ -21,10 +22,10 @@ import ConfigData from '../utils/ConfigData';
 
 @CustomDialog
 export struct P2pPswDialog {
-  private p2pScanInfo!: wifi.WifiP2pDevice
+  private p2pScanInfo!: wifiManager.WifiP2pDevice
   private psw: string = ''
   private controller: CustomDialogController
-  private action!: (p2pScanInfo: wifi.WifiP2pDevice , psw: string) => void
+  private action!: (p2pScanInfo: wifiManager.WifiP2pDevice , psw: string) => void
 
   build() {
     Column() {

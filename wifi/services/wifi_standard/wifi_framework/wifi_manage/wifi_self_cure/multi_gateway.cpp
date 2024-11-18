@@ -48,6 +48,12 @@ MultiGateway::~MultiGateway()
     WIFI_LOGI("~MultiGateway()");
 }
 
+MultiGateway& MultiGateway::GetInstance()
+{
+    static MultiGateway instance;
+    return instance;
+}
+
 void MultiGateway::GetGatewayAddr(int32_t instId)
 {
     std::string macAddress;

@@ -90,14 +90,14 @@ void WifiChannelHelper::UpdateValidChannels(std::string ifaceName, int instId)
     std::vector<int> freqs5G;
     int band = static_cast<int>(BandType::BAND_2GHZ);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, freqs2G)) {
+    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs2G)) {
         WIFI_LOGE("get 2g frequencies failed.");
         WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G, instId);
     }
 #endif
     band = static_cast<int>(BandType::BAND_5GHZ);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, freqs5G)) {
+    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs5G)) {
         WIFI_LOGE("get 5g frequencies failed.");
     }
 #endif
@@ -130,19 +130,19 @@ void WifiChannelHelper::UpdateValidFreqs()
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     int band = static_cast<int>(ScanBandType::SCAN_BAND_24_GHZ);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, freqs2G)) {
+    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs2G)) {
         WIFI_LOGE("get 2g frequencies failed.");
     }
 #endif
     band = static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, freqs5G)) {
+    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs5G)) {
         WIFI_LOGE("get 5g frequencies failed.");
     }
 #endif
     band = static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ_DFS_ONLY);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->GetFrequenciesByBand(ifaceName, band, freqsDfs)) {
+    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqsDfs)) {
         WIFI_LOGE("get 5g frequencies failed.");
     }
 #endif

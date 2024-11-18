@@ -994,7 +994,7 @@ void P2pStateMachine::StartDhcpClientInterface()
     }
     config.bIpv6 = false;
     if (strncpy_s(config.ifname, sizeof(config.ifname), groupManager.GetCurrentGroup().GetInterface().c_str(),
-        groupManager.GetCurrentGroup().GetInterface().length())) {
+        groupManager.GetCurrentGroup().GetInterface().length()) != EOK) {
             WIFI_LOGE("strncpy_s config.ifname failed!");
             return;  
         }

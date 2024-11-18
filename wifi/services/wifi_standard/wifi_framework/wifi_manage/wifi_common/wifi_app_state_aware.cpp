@@ -74,7 +74,7 @@ sptr<AppExecFwk::IAppMgr> WifiAppStateAware::GetAppMgr()
         WIFI_LOGE("get App Manager Service failed");
         return nullptr;
     }
-    return iface_cast<AppExecFwk::IAppMgr>(remoteObject);;
+    return iface_cast<AppExecFwk::IAppMgr>(remoteObject);
 }
 
 void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
@@ -166,6 +166,7 @@ bool WifiAppStateAware::IsForegroundApp(int32_t uid)
     }
     std::vector<AppExecFwk::AppStateData> curForegroundApps;
     appMgrProxy->GetForegroundApplications(curForegroundApps);
+
     for (auto foregroudApp : curForegroundApps) {
         if (foregroudApp.uid == uid) {
             return true;
@@ -183,7 +184,6 @@ bool WifiAppStateAware::IsForegroundApp(const std::string &bundleName)
     }
     std::vector<AppExecFwk::AppStateData> curForegroundApps;
     appMgrProxy->GetForegroundApplications(curForegroundApps);
-
     for (auto foregroudApp : curForegroundApps) {
         if (foregroudApp.bundleName == bundleName) {
             return true;

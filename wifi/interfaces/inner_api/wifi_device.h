@@ -553,7 +553,7 @@ public:
      *
      * @param uid - target app uid
      * @param protocol - target protocol type
-     * @return enable - enable/disable dpi mark
+     * @param enable - enable/disable dpi mark
      */
     virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
 };

@@ -346,7 +346,7 @@ public:
      */
 #ifndef OHOS_ARCH_LITE
     virtual ErrCode HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData) override;
-    
+
     /**
      * @Description Set EnhanceService to sta Service.
      *

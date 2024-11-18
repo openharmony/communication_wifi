@@ -199,6 +199,12 @@ RecoveryWifiFilter::~RecoveryWifiFilter()
 bool RecoveryWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
+    if (NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory)) {
+        InterScanInfo interScanInfo = networkCandidate.interScanInfo;
+        WIFI_LOGI("RecoveryWifiFilter, network history is 0, try reconnect, add candidate network, bssid=%{public}s",
+            MacAnonymize(interScanInfo.bssid).c_str());
+        return true;
+    }
     return wifiDeviceConfig.noInternetAccess && !wifiDeviceConfig.isPortal &&
         NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory);
 }
@@ -321,6 +327,9 @@ bool WeakAlgorithmWifiFilter::Filter(NetworkCandidate &networkCandidate)
         return false;
     } else if (scanInfo.securityType == WifiSecurity::PSK
         && scanInfo.capabilities.find("TKIP") != std::string::npos) {
+        if (scanInfo.capabilities.find("CCMP") != std::string::npos) {
+            return true;
+        }
         WIFI_LOGD("WeakAlgorithm: WPA AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
         return false;
     }
@@ -444,15 +453,11 @@ bool NotP2pFreqAt5gFilter::Filter(NetworkCandidate &networkCandidate)
 
     Hid2dUpperScene softbusScene;
     Hid2dUpperScene castScene;
-    Hid2dUpperScene shareScene;
-    Hid2dUpperScene mouseCrossScene;
     Hid2dUpperScene miracastScene;
     WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SHARE_SERVICE_UID, shareScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MOUSE_CROSS_SERVICE_UID, mouseCrossScene);
     WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
     if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED
         && WifiConfigCenter::GetInstance().GetP2pEnhanceState() == 0) {
@@ -461,8 +466,7 @@ bool NotP2pFreqAt5gFilter::Filter(NetworkCandidate &networkCandidate)
     // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
     // scene & 0x07 > 0 means one of them takes effect.
     bool isCastScene = false;
-    if ((softbusScene.scene & 0x07) > 0 || (castScene.scene & 0x07) > 0 || (shareScene.scene & 0x07) > 0 ||
-        (mouseCrossScene.scene & 0x07) > 0 || (miracastScene.scene & 0x07) > 0) {
+    if ((softbusScene.scene & 0x07) > 0 || (castScene.scene & 0x07) > 0 || (miracastScene.scene & 0x07) > 0){
         isCastScene = true;
     }
 

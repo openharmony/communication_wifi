@@ -34,7 +34,7 @@
 #include "parameter.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_country_code_manager.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 std::vector<std::string> chinaPublicDnses(SELF_CURE_DNS_SIZE);
@@ -477,7 +477,10 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInvalidIp(InternalMessag
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
-    WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
+    if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
+        WIFI_LOGI("current network do not need selfcure");
+        return;
+    }
     if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
         WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
         return;
@@ -1725,9 +1728,6 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
     pSelfCureStateMachine->selfCureOnGoing = false;
     pSelfCureStateMachine->useWithRandMacAddress = 0;
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
-    if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
-        return;
-    }
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE, WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
     return;
 }
@@ -2707,7 +2707,7 @@ bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessagePtr msg, st
 int SelfCureStateMachine::GetWifi7SelfCureType(int connectFailTimes, WifiLinkedInfo &info)
 {
     std::vector<WifiScanInfo> scanResults;
-    WifiConfigCenter::GetInstance().GetScanInfoList(scanResults);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     int scanRssi = GetScanRssi(info.bssid, scanResults);
     WIFI_LOGI("GetWifi7SelfCureType scanRssi %{public}d", scanRssi);
     if ((info.supportedWifiCategory == WifiCategory::WIFI7

@@ -258,6 +258,7 @@ void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkDnsInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    SetNetLinkHostRouteInfo(netLinkInfo, wifiIpInfo);
     SetNetLinkLocalRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     if (wifiProxyConfig.configureMethod == ConfigureProxyMethod::AUTOCONFIGUE) {
         /* Automatic proxy is not supported */
@@ -291,33 +292,30 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netAddr->prefixlen_ = prefixLength;
     netLinkInfo->netAddrList_.push_back(*netAddr);
 
-    LOGD("SetNetLinkIPInfo %{public}s", wifiIpV6Info.globalIpV6Address.c_str());
-    sptr<NetManagerStandard::INetAddr> netIpv6Addr = nullptr;
+    sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
+    netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
+    netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
+    netIpv6Addr->prefixlen_ = 0;
     if (!wifiIpV6Info.globalIpV6Address.empty()) {
-        netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
         netIpv6Addr->address_ = wifiIpV6Info.globalIpV6Address;
-    }
-    LOGD("SetNetLinkIPInfo randGlobalIpV6Address:%{public}s", wifiIpV6Info.randGlobalIpV6Address.c_str());
-    if (!wifiIpV6Info.randGlobalIpV6Address.empty()) {
-        netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->address_ = wifiIpV6Info.randGlobalIpV6Address;
-    }
-    LOGD("SetNetLinkIPInfo uniqueLocalAddress1:%{public}s", wifiIpV6Info.uniqueLocalAddress1.c_str());
-    if (!wifiIpV6Info.uniqueLocalAddress1.empty()) {
-        netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress1;
-    }
-    LOGD("SetNetLinkIPInfo uniqueLocalAddress2:%{public}s", wifiIpV6Info.uniqueLocalAddress2.c_str());
-    if (!wifiIpV6Info.uniqueLocalAddress2.empty()) {
-        netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
-        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress2;
-    }
-    if (netIpv6Addr != nullptr) {
-        netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
-        netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-        netIpv6Addr->prefixlen_ = 0;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo globalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.globalIpV6Address).c_str());
+    }
+    if (!wifiIpV6Info.randGlobalIpV6Address.empty()) {
+        netIpv6Addr->address_ = wifiIpV6Info.randGlobalIpV6Address;
+        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo randGlobalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.randGlobalIpV6Address).c_str());
+    }
+    if (!wifiIpV6Info.uniqueLocalAddress1.empty()) {
+        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress1;
+        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo LocalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.uniqueLocalAddress1).c_str());
+    }
+    if (!wifiIpV6Info.uniqueLocalAddress2.empty()) {
+        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress2;
+        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo randLocalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.uniqueLocalAddress2).c_str());
     }
 }
 
@@ -343,10 +341,12 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     if (!wifiIpV6Info.primaryDns.empty()) {
         ipv6dns->address_ = wifiIpV6Info.primaryDns;
         netLinkInfo->dnsList_.push_back(*ipv6dns);
+        LOGI("SetNetLinkDnsInfo ipv6:%{public}s", MacAnonymize(wifiIpV6Info.primaryDns).c_str());
     }
     if (!wifiIpV6Info.secondDns.empty()) {
         ipv6dns->address_ = wifiIpV6Info.secondDns;
         netLinkInfo->dnsList_.push_back(*ipv6dns);
+        LOGI("SetNetLinkDnsInfo ipv6:%{public}s", MacAnonymize(wifiIpV6Info.secondDns).c_str());
     }
 }
 
@@ -373,6 +373,21 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
         ipv6route->gateway_.family_ = NetManagerStandard::INetAddr::IPV6;
         netLinkInfo->routeList_.push_back(*ipv6route);
         LOGI("SetNetLinkRouteInfo gateway:%{public}s", MacAnonymize(wifiIpV6Info.gateway).c_str());
+    }
+}
+
+void WifiNetAgent::SetNetLinkHostRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo)
+{
+    if ((wifiIpInfo.ipAddress & wifiIpInfo.netmask) != (wifiIpInfo.gateway & wifiIpInfo.netmask)) {
+        sptr<NetManagerStandard::Route> hostRoute = (std::make_unique<NetManagerStandard::Route>()).release();
+        hostRoute->iface_ = netLinkInfo->ifaceName_;
+        hostRoute->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
+        hostRoute->destination_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
+        hostRoute->destination_.family_ = NetManagerStandard::INetAddr::IPV4;
+        hostRoute->destination_.prefixlen_ = MAX_PREFIX_LEN;
+        hostRoute->gateway_.address_ = "0.0.0.0";
+        netLinkInfo->routeList_.push_back(*hostRoute);
+        LOGI("SetNetLinkHostRouteInfo gateway:%{public}s", IpAnonymize(hostRoute->gateway_.address_).c_str());
     }
 }
 
@@ -420,6 +435,16 @@ void WifiNetAgent::InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCal
     wifiNetAgentCallbacks_ = wifiNetAgentCallbacks;
 }
 
+void WifiNetAgent::ResetSupplierId()
+{
+    supplierId = INVALID_SUPPLIER_ID;
+}
+ 
+uint32_t WifiNetAgent::GetSupplierId()
+{
+    return supplierId;
+}
+
 bool WifiNetAgent::RequestNetwork(const int uid, const int networkId)
 {
     if (!wifiNetAgentCallbacks_.OnRequestNetwork) {
@@ -438,16 +463,6 @@ WifiNetAgent::NetConnCallback::NetConnCallback()
 
 WifiNetAgent::NetConnCallback::~NetConnCallback()
 {}
-
-void WifiNetAgent::ResetSupplierId()
-{
-    supplierId = INVALID_SUPPLIER_ID;
-}
-
-uint32_t WifiNetAgent::GetSupplierId()
-{
-    return supplierId;
-}
 
 int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
     const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps,

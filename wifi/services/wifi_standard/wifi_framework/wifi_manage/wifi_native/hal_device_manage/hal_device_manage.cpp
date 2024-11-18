@@ -27,6 +27,7 @@
 #include "wifi_supplicant_hal_interface.h"
 #include "servmgr_hdi.h"
 #include "hdf_remote_service.h"
+#include "wifi_config_center.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HalDeviceManager"
@@ -59,6 +60,14 @@ bool HalDeviceManager::StartChipHdi()
 {
     std::lock_guard<std::mutex> lock(mMutex);
     LOGI("StartChipHdi start...");
+    if (g_IWifi != nullptr) {
+        bool isInit = false;
+        g_IWifi->IsInit(isInit);
+        if (isInit) {
+            LOGI("has start");
+            return true;
+        }
+    }
     g_IWifi = IChipController::Get(CHIP_SERVICE_NAME, false);
     CHECK_NULL_AND_RETURN(g_IWifi, false);
 
@@ -656,7 +665,6 @@ int32_t HalDeviceManager::IfaceSetTxPower(
     LOGI("can not find iface:%{public}s", ifaceName.c_str());
     return result;
 }
-
 bool HalDeviceManager::GetPowerModel(const std::string &ifaceName, int &model)
 {
     if (!CheckReloadChipHdiService()) {
@@ -755,11 +763,6 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
 void HalDeviceManager::ResetHalDeviceManagerInfo()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    WifiP2PHalInterface::GetInstance().StopP2p();
-    WifiStaHalInterface::GetInstance().StopWifi();
-    WifiApHalInterface::GetInstance().StopAp();
-    ClearStaInfo();
-    ClearApInfo();
     g_chipControllerCallback = nullptr;
     g_chipIfaceCallback = nullptr;
     g_IWifi = nullptr;
@@ -1465,7 +1468,6 @@ void HalDeviceManager::AddChipHdiDeathRecipient()
         .OnRemoteDied = [](HdfDeathRecipient *recipient, HdfRemoteService *service) {
             LOGI("Chip Hdi service died!");
             g_chipHdiServiceDied = true;
-            ResetHalDeviceManagerInfo();
             RemoveChipHdiDeathRecipient();
             return;
         }

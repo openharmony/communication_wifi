@@ -24,6 +24,8 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScan");
 
 namespace OHOS {
 namespace Wifi {
+
+std::mutex g_scanMutex;
 NO_SANITIZE("cfi") std::shared_ptr<WifiScan> WifiScan::GetInstance(int systemAbilityId, int instId)
 {
 #ifndef OHOS_ARCH_LITE
@@ -33,14 +35,18 @@ NO_SANITIZE("cfi") std::shared_ptr<WifiScan> WifiScan::GetInstance(int systemAbi
     }
 #endif
 
-    std::shared_ptr<WifiScanImpl> pImpl = std::make_shared<WifiScanImpl>();
+    static std::shared_ptr<WifiScanImpl> pImpl = nullptr;
+    std::lock_guard<std::mutex> lock(g_scanMutex);
+    if (!pImpl) {
+        pImpl = std::make_shared<WifiScanImpl>();
+    }
     if (pImpl && pImpl->Init(systemAbilityId, instId)) {
         WIFI_LOGD("init scan %{public}d successfully!", instId);
         return pImpl;
+    } else {
+        WIFI_LOGE("new wifi WifiScan failed");
+        return nullptr;
     }
-
-    WIFI_LOGE("new wifi WifiScan failed");
-    return nullptr;
 }
 
 WifiScan::~WifiScan()

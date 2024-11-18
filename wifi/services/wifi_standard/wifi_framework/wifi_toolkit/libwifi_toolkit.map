@@ -70,6 +70,7 @@
         "*GetSignalLevel*";
         "*GetLinkedInfo*";
         "*DoArpCheck*";
+        "*SetStaCurrentTime*";
    extern "C++" {
         "OHOS::Wifi::WifiCodeConvertUtil::IsUtf8(const std::string&)";
         "OHOS::Wifi::WifiCodeConvertUtil::GbkToUtf8(const std::string&)";

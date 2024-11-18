@@ -583,7 +583,7 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
         return;
     }
     std::string name = "deviceconfigs";
-    int32_t ashmemSize = 1000;
+    int32_t ashmemSize = 1000; // add buff for max 1000 device config  
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
         WriteWifiDeviceConfig(outParcel, result[i]);
@@ -979,7 +979,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
         }
         WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
 
-                if (mSingleCallback) {
+        if (mSingleCallback) {
             ret = RegisterCallBack(callback_, event);
         } else {
             std::unique_lock<std::mutex> lock(deathRecipientMutex);
@@ -1272,7 +1272,7 @@ void WifiDeviceStub::OnSetLowTxPower(uint32_t code, MessageParcel &data, Message
 
 void WifiDeviceStub::OnSetTxPower(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__,  code, data.GetRawDataSize());
     int power = data.ReadInt32();
     ErrCode ret = SetTxPower(power);
     reply.WriteInt32(0);

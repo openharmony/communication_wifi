@@ -491,10 +491,10 @@ ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, cons
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->EnableHiLinkHandshake(config, bssid);
- 
+
     return WIFI_OPT_SUCCESS;
 }
- 
+
 ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
 {
     WIFI_LOGI("Enter DeliverStaIfaceData");

@@ -1,6 +1,6 @@
 @Component
 export struct NormalNav {
-  title: string = ''
+  @Require @Prop title: Resource | string
 
   build() {
     Row() {

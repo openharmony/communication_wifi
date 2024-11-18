@@ -1771,11 +1771,11 @@
     },
     {
       "name": "cancel_button",
-      "value": "取消"
+      "value": "cancel"
     },
     {
       "name": "confirm_button",
-      "value": "确定"
+      "value": "ok"
     },
     {
       "name": "delete_button",
@@ -1820,6 +1820,138 @@
     {
       "name": "Input_url",
       "value": "InputUrl"
+    },
+    {
+      "name": "cancel_connect_alert_str",
+      "value": "Would you like to cancel the connection invitation with %s?"
+    },
+    {
+      "name": "cancel_invite",
+      "value": "cancel invite"
+    },
+    {
+      "name": "start_scan",
+      "value": "start scan"
+    },
+    {
+      "name": "stop_scan",
+      "value": "stop scan"
+    },
+    {
+      "name": "create_group_test",
+      "value": "create group test"
+    },
+    {
+      "name": "my_device",
+      "value": "my device"
+    },
+    {
+      "name": "device_name",
+      "value": "device name"
+    },
+    {
+      "name": "device_addr",
+      "value": "device address"
+    },
+    {
+      "name": "device_status",
+      "value": "status"
+    },
+    {
+      "name": "available_device",
+      "value": "available devices"
+    },
+    {
+      "name": "connected_device",
+      "value": "connected device"
+    },
+    {
+      "name": "saved_group",
+      "value": "saved group"
+    },
+    {
+      "name": "group_name",
+      "value": "group name"
+    },
+    {
+      "name": "new_api_test_title",
+      "value": "new api test"
+    },
+    {
+      "name": "disconnect_alert_content",
+      "value": "If the connection is disconnected, the connection between you and %s will be interrupted."
+    },
+    {
+      "name": "disconnect_alert_title",
+      "value": "disconnect"
+    },
+    {
+      "name": "abandon_group_alert_title",
+      "value": "Do you want to abandon saving the selected group?"
+    },
+    {
+      "name": "input_create_name_tip",
+      "value": "please input group name"
+    },
+    {
+      "name": "input_create_pwd_tip",
+      "value": "please input group password"
+    },
+    {
+      "name": "input_pwd_name_tip",
+      "value": "please input group name and password"
+    },
+    {
+      "name": "create_group_test_title",
+      "value": "create group test"
+    },
+    {
+      "name": "create_group",
+      "value": "create group"
+    },
+    {
+      "name": "connect_group_test",
+      "value": "connect test"
+    },
+    {
+      "name": "status_connected",
+      "value": "connected"
+    },
+    {
+      "name": "status_invite",
+      "value": "invited"
+    },
+    {
+      "name": "status_fail",
+      "value": "fail"
+    },
+    {
+      "name": "status_available",
+      "value": "available"
+    },
+    {
+      "name": "status_unavailable",
+      "value": "unavailable"
+    },
+    {
+      "name": "change_name_tip",
+      "value": "When using Bluetooth connection, WLAN direct connection, hot spot sharing, and USB connection, other devices will see this name."
+    },
+    {
+      "name": "pwd_title",
+      "value": "password"
+    },
+    {
+      "name": "created_group_title",
+      "value": "created group"
+    },
+    {
+      "name": "go_name_title",
+      "value": "group owner name"
+    },
+    {
+      "name": "delete_group_title",
+      "value": "delete group"
     }
   ]
 }

@@ -45,11 +45,11 @@ WifiP2PHalInterface &WifiP2PHalInterface::GetInstance(void)
     return inst;
 }
 
-WifiErrorNo WifiP2PHalInterface::StartP2p(const std::string &ifaceName) const
+WifiErrorNo WifiP2PHalInterface::StartP2p(const std::string &ifaceName, const bool hasPersisentGroup) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqP2pStart(ifaceName);
+    return mHdiWpaClient->ReqP2pStart(ifaceName, hasPersisentGroup);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqP2pStart();
@@ -623,7 +623,7 @@ WifiErrorNo WifiP2PHalInterface::SetRptBlockList(const std::string &ifaceName, c
     const std::vector<std::string> &blockList)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->SetBlockList(ifaceName, interfaceName, blockList)) {
+    if (!HalDeviceManager::GetInstance().SetBlockList(ifaceName, interfaceName, blockList)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -636,7 +636,7 @@ WifiErrorNo WifiP2PHalInterface::DisAssociateSta(const std::string &ifaceName, c
     const std::string &mac)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!DelayedSingleton<HalDeviceManager>::GetInstance()->DisAssociateSta(ifaceName, interfaceName, mac)) {
+    if (!HalDeviceManager::GetInstance().DisAssociateSta(ifaceName, interfaceName, mac)) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;

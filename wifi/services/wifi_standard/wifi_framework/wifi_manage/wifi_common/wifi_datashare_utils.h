@@ -51,7 +51,7 @@ constexpr const char *SETTINGS_DATASHARE_KEY_WIFI_ALLOW_SEMI_ACTIVE =
     "settings.collaboration.multi_device_collaboration_service_switch";
 }
 
-class WifiDataShareHelperUtils : DelayedSingleton<WifiDataShareHelperUtils> {
+class WifiDataShareHelperUtils {
 public:
     /**
      * @Description : WifiDataShareHelperUtils constructor
@@ -62,6 +62,13 @@ public:
      * @Description : WifiDataShareHelperUtils destructor
      */
     ~WifiDataShareHelperUtils() = default;
+
+    /**
+     * @Description : Get the instance of WifiDataShareHelperUtils
+     *
+     * @return WifiDataShareHelperUtils instance
+     */
+    static WifiDataShareHelperUtils &GetInstance();
 
     /**
      * @Description : Query function

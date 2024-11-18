@@ -220,11 +220,12 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
 
     bool isJoin = device.IsGroupOwner();
     std::string groupName = config.GetGroupName();
-
+    WIFI_LOGI("IsDeviceLimit: %{public}d, Isinviteable: %{public}d", device.IsDeviceLimit(), device.Isinviteable());
     if (isJoin && !device.IsGroupLimit()) {
         if (groupName.empty()) {
             groupName = device.GetNetworkName();
         }
+        WIFI_LOGI("connect device is go, Groupname is %{private}s", groupName.c_str());
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
             /**
@@ -251,6 +252,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
         /* Prepare to reinvoke as GC. */
         networkId = groupManager.GetGroupNetworkId(device);
         if (networkId < 0) {
+            WIFI_LOGI("cannot find device from gc devices");
             /**
              * Prepare to reinvoke as GO.
              * Mean that the group is not found when the peer device roles as GO,
@@ -275,6 +277,7 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
                 return true;
             }
         } else {
+            WIFI_LOGI("cannot find device from go devices");
             config.SetNetId(networkId);
         }
     }
@@ -988,9 +991,14 @@ void P2pStateMachine::StartDhcpClientInterface()
     RouterConfig config;
     if (memset_s(config.bssid, sizeof(config.bssid), 0, MAC_ADDR_MAX_LEN) == EOK) {
         config.prohibitUseCacheIp = true;
-        SetConfiguration(groupManager.GetCurrentGroup().GetInterface().c_str(), config);
     }
-    result = StartDhcpClient(groupManager.GetCurrentGroup().GetInterface().c_str(), false);
+    config.bIpv6 = false;
+    if (strncpy_s(config.ifname, sizeof(config.ifname), groupManager.GetCurrentGroup().GetInterface().c_str(),
+        groupManager.GetCurrentGroup().GetInterface().length()) != EOK) {
+            WIFI_LOGE("strncpy_s config.ifname failed!");
+            return;  
+        }
+    result = StartDhcpClient(config);
     if (result != 0) {
         WIFI_LOGE("StartDhcpClient failed!");
         return;
@@ -1183,6 +1191,12 @@ bool P2pStateMachine::IsInterfaceReuse() const
     return !(WifiConfigCenter::GetInstance().GetP2pIfaceName().compare("wlan0"));
 }
 
+bool P2pStateMachine::HasPersisentGroup(void)
+{
+    std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
+    return !grpInfo.empty();
+}
+
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
@@ -1314,6 +1328,11 @@ bool P2pStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo>
     WIFI_LOGE("rpt GetConnectedStationInfo");
     std::string ifaceName = groupManager.GetCurrentGroup().GetInterface();
     return m_DhcpdInterface.GetConnectedStationInfo(ifaceName, result);
+}
+
+void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    p2pGroupOperatingState.SetEnhanceService(enhanceService);
 }
 
 } // namespace Wifi

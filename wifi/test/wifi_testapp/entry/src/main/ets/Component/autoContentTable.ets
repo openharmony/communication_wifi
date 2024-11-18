@@ -16,7 +16,7 @@
 import { TestData , TestAuto } from '../entryability/model/testData'
 import ConfigData from '../utils/ConfigData';
 
-const TAG = "[autoContentTable]"
+const TAG = "wifiTestApp [autoContentTable]"
 /**
  *  Auto Test ContentTable Component Page Of WIFI test
  */

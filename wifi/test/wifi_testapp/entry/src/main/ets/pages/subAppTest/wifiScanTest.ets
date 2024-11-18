@@ -14,12 +14,13 @@
  */
 
 import wifi from '@ohos.wifi'
+import wifiManager from '@ohos.wifiManager';
 import { AvailableWifi } from '../../Component/availableWifi'
 import { TitleBar } from '../../Component/titleBar'
 import { WifiModel } from '../../entryability/model/wifiModel'
 import ConfigData from '../../Utils/ConfigData'
 
-const TAG = '[wifiScan]'
+const TAG = 'wifiTestApp [wifiScan]'
 
 /**
  * wifi Found Test Page Of Wifi test
@@ -30,66 +31,82 @@ struct WifiScan {
   private wifiModel: WifiModel = new WifiModel()
   private testItem: string = "Wlan扫描"
   private isScanning: boolean = false;
-  @State wifiList: Array<wifi.WifiScanInfo> = []
+  @State wifiList: Array<wifiManager.WifiScanInfo> = []
   @State isLinked: boolean = false
   @State isSwitchOn: boolean = false
-  @State linkedInfo: wifi.WifiLinkedInfo = {
-    ssid : '' ,
-    bssid : '' ,
-    networkId : 0 ,
-    rssi : 0 ,
-    band : 0 ,
-    linkSpeed : 0 ,
-    frequency : 0 ,
-    isHidden : false ,
-    isRestricted : false ,
-    chload : 0 ,
-    snr : 0 ,
-    macAddress : '' ,
-    ipAddress : 0 ,
-    suppState : wifi.SuppState.DISCONNECTED ,
-    connState : wifi.ConnState.DISCONNECTED
+  @State linkedInfo: wifiManager.WifiLinkedInfo = {
+    ssid: '',
+    bssid: '',
+    networkId: 0,
+    rssi: 0,
+    band: 0,
+    linkSpeed: 0,
+    rxLinkSpeed: 0,
+    maxSupportedTxLinkSpeed: 0,
+    maxSupportedRxLinkSpeed: 0,
+    frequency: 0,
+    isHidden: false,
+    isRestricted: false,
+    chload: 0,
+    snr: 0,
+    macType: 0,
+    macAddress: '',
+    ipAddress: 0,
+    suppState: wifiManager.SuppState.DISCONNECTED,
+    connState: wifiManager.ConnState.DISCONNECTED,
+    channelWidth: wifiManager.WifiChannelWidth.WIDTH_20MHZ,
+    wifiStandard: wifiManager.WifiStandard.WIFI_STANDARD_UNDEFINED,
+    supportedWifiCategory: wifiManager.WifiCategory.DEFAULT,
+    isHiLinkNetwork: false
   }
 
-  scan() {
+  async scan() {
     if ( !this.isScanning ) {
       return; // 如果不需要扫描，则直接返回
     } else {
-      wifi.getScanInfos((err , result) => {
-        if ( err ) {
-          console.log(TAG , `scan info err: ${ JSON.stringify(err) }`)
-          return; // 如果有错误，也停止扫描
-        }
-        console.log(TAG , `scan info call back: ${ result.length }`)
-        for ( let i = 0 ; i < result.length ; ++i ) {
-          this.wifiList.push({
-            ssid : result[ i ].ssid ,
-            bssid : result[ i ].bssid ,
-            capabilities : result[ i ].capabilities ,
-            securityType : result[ i ].securityType ,
-            rssi : result[ i ].rssi ,
-            band : result[ i ].band ,
-            frequency : result[ i ].frequency ,
-            channelWidth : result[ i ].channelWidth ,
-            timestamp : result[ i ].timestamp ,
-          })
-        }
-        console.log(TAG , "wifiList:" + JSON.stringify(this.wifiList))
+      try{
+        let result = await wifiManager.getScanInfoList();
+        console.log(TAG, `scan info call back: ${ result.length }`)
+        result.forEach(item => {
+          if (item.ssid) {
+            this.wifiList.push({
+              ssid: item.ssid,
+              bssid: item.bssid,
+              bssidType: item.bssidType,
+              capabilities: item.capabilities,
+              securityType: item.securityType,
+              rssi: item.rssi,
+              band: item.band,
+              frequency: item.frequency,
+              channelWidth: item.channelWidth,
+              centerFrequency0: item.centerFrequency0,
+              centerFrequency1: item.centerFrequency1,
+              infoElems: item.infoElems,
+              timestamp: item.timestamp,
+              supportedWifiCategory: item.supportedWifiCategory,
+              isHiLinkNetwork: item.isHiLinkNetwork,
+            });
+          }
+        });
+        this.wifiList = [...this.wifiList];
+        console.log(TAG, "wifiList:" + JSON.stringify(this.wifiList))
+      } catch (error) {
+        console.error(TAG, `Error scanning Wi-Fi: ${error}`);
+      }
 
-        if ( this.isScanning ) { // 再次检查是否还需要继续扫描
-          setTimeout(() => {
-            this.scan()
-          } , 2000)
-        }
-      })
+      if ( this.isScanning ) { // 再次检查是否还需要继续扫描
+        setTimeout(() => {
+          this.scan()
+        }, 2000)
+      }
     }
   }
 
   getLinkedInfo() {
-    wifi.getLinkedInfo((err , linkedInfo) => {
+    wifiManager.getLinkedInfo((err , linkedInfo) => {
       if ( err ) {
         console.log(TAG , `getLinkedInfo err: ${ JSON.stringify(err) }`)
-        return
+        return;
       }
       console.log(TAG , `linkedInfo: ${ JSON.stringify(linkedInfo) }`)
       if ( linkedInfo === null || linkedInfo.bssid === '' ) {
@@ -100,38 +117,38 @@ struct WifiScan {
           networkId : 0 ,
           rssi : 0 ,
           band : 0
-        } as wifi.WifiLinkedInfo
-        return
+        } as wifiManager.WifiLinkedInfo
+        return;
       }
       this.isLinked = true
-      this.linkedInfo = linkedInfo as wifi.WifiLinkedInfo;
+      this.linkedInfo = linkedInfo as wifiManager.WifiLinkedInfo;
       console.log("getLinkedInfo this.linkedInfo:" + this.linkedInfo);
     })
   }
 
   addListener() {
-    wifi.on('wifiConnectionChange' , state => {
+    wifiManager.on('wifiConnectionChange' , state => {
       console.log(TAG , `wifiConnectionChange: ${ state }`)
       this.getLinkedInfo()
     })
-    wifi.on('wifiStateChange' , state => {
+    wifiManager.on('wifiStateChange' , state => {
       console.log(TAG , `wifiStateLisener state: ${ state }`)
-      this.wifiList = []
-      if ( state === 1 ) { // 1: wifi is enable, 0:wifi is disable
-        wifi.scan()
-        this.scan()
+      if ( state === 1 ) { //0: inactive, 1: active, 2: activating, 3: de-activating
+        this.scan();
       }
     })
   }
 
   aboutToAppear() {
-    if ( wifi.isWifiActive() ) {
+    if ( wifiManager.isWifiActive() ) {
       console.log(TAG , 'wifi is active')
       this.isSwitchOn = true
       this.isScanning = true; // 在页面出现时开始扫描
-      wifi.scan()
+      // wifiManager.startScan()
       this.scan()
       this.getLinkedInfo()
+    } else {
+      this.isSwitchOn = false;
     }
     this.addListener()
   }
@@ -150,46 +167,61 @@ struct WifiScan {
           .align(Alignment.TopStart)
         Column() {
           Toggle({ type : ToggleType.Switch , isOn : this.isSwitchOn })
-            .onChange((isOn: boolean) => {
+            .onChange(async (isOn: boolean) => {
               console.log(TAG , `wifi swtich is: ${ isOn }`)
               this.wifiList = []
-              if ( isOn ) {
-                this.isSwitchOn = true
-                wifi.enableWifi()
-                wifi.scan()
-                this.scan()
-                return
+              if (isOn) {
+                try {
+                  this.isSwitchOn = true;
+                  this.isScanning = true;
+                  await wifiManager.enableWifi();
+                  // 延迟执行startScan，确保WiFi服务已经准备好
+                  setTimeout(() => {
+                    this.scan();
+                  }, 2000);
+                } catch (error) {
+                  console.error(TAG, `Failed to enable Wi-Fi: ${error}`);
+                }
+              } else {
+                this.isSwitchOn = false;
+                this.isLinked = false;
+                this.isScanning = false;
+                try {
+                  await wifiManager.disconnect();
+                  await wifiManager.disableWifi();
+                } catch (error) {
+                  console.error(TAG, `Failed to disable Wi-Fi: ${error}`);
+                }
+                this.wifiList = [];
               }
-              this.isSwitchOn = false
-              this.isLinked = false
-              wifi.disconnect()
-              wifi.disableWifi()
             })
         }
       }
       .width(ConfigData.WH_95_100)
 
-      if ( this.isLinked ) {
-        Text($r('app.string.wlanIsConnected'))
-          .fontSize(22)
-          .width(ConfigData.WH_95_100)
-          .align(Alignment.TopStart)
-        Row() {
-          Text(this.linkedInfo.ssid)
-            .fontSize(20)
-            .fontColor(Color.Black)
-            .layoutWeight(1)
+      if (this.isSwitchOn) {
+        if ( this.isLinked ) {
           Text($r('app.string.wlanIsConnected'))
-            .fontSize(18)
-            .fontColor(Color.Black)
+            .fontSize(22)
+            .width(ConfigData.WH_95_100)
+            .align(Alignment.TopStart)
+          Row() {
+            Text(this.linkedInfo.ssid)
+              .fontSize(20)
+              .fontColor(Color.Black)
+              .layoutWeight(1)
+            Text($r('app.string.wlanIsConnected'))
+              .fontSize(18)
+              .fontColor(Color.Black)
+          }
+          .width(ConfigData.WH_95_100)
+          .padding(10)
+          .margin(10)
+          .border({ radius : 15 , color : Color.Gray , width : 1 })
+          .backgroundColor(Color.White)
         }
-        .width(ConfigData.WH_95_100)
-        .padding(10)
-        .margin(10)
-        .border({ radius : 15 , color : Color.Gray , width : 1 })
-        .backgroundColor(Color.White)
+        AvailableWifi({ wifiList : $wifiList , linkedInfo : $linkedInfo })
       }
-      AvailableWifi({ wifiList : $wifiList , linkedInfo : $linkedInfo })
     }
     .size({ width : ConfigData.WH_100_100 , height : ConfigData.WH_100_100 })
     .backgroundColor('#F5F5F5')
@@ -198,7 +230,7 @@ struct WifiScan {
   aboutToDisappear() {
     this.isScanning = false; // 设置标志，告诉scan方法停止新的扫描
     this.isSwitchOn = false
-    wifi.off('wifiConnectionChange')
-    wifi.off('wifiStateChange')
+    wifiManager.off('wifiConnectionChange')
+    wifiManager.off('wifiStateChange')
   }
 }

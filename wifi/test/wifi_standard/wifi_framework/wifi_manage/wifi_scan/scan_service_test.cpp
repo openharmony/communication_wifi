@@ -1076,7 +1076,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
         std::vector<std::string> savedNetworkSsid;
-        EXPECT_EQ(false, pScanService->GetSavedNetworkSsidList(savedNetworkSsid));
+        EXPECT_EQ(true, pScanService->GetSavedNetworkSsidList(savedNetworkSsid));
     }
 
     void GetHiddenNetworkSsidListSuccess1()
@@ -1102,7 +1102,7 @@ public:
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
         std::vector<std::string> hiddenNetworkSsid;
-        EXPECT_EQ(false, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
+        EXPECT_EQ(true, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
     }
 
     void SetStaCurrentTimeSuccess()

@@ -29,11 +29,11 @@ public:
     {}
     virtual void SetUp()
     {
-        DelayedSingleton<HalDeviceManager>::GetInstance()->StartChipHdi();
+        HalDeviceManager::GetInstance().StartChipHdi();
     }
     virtual void TearDown()
     {
-        DelayedSingleton<HalDeviceManager>::GetInstance()->StopChipHdi();
+        HalDeviceManager::GetInstance().StopChipHdi();
     }
 
     static void DestoryCallback(std::string &destoryIfaceName, int createIfaceType);

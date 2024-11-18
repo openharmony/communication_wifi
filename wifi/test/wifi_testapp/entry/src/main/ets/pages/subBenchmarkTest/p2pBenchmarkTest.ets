@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import prompt from '@ohos.prompt';
+import promptAction from '@ohos.promptAction';
 import router from '@ohos.router'
 import { PageTitle } from '../../Component/pageTitle'
 import { TestImageDisplay } from '../../Component/testImageDisplay';
@@ -32,7 +32,7 @@ import { BusinessError } from '@ohos.base';
  *  classic p2p benchmark Test Page of wifi test
  */
 
-const TAG = '[Benchmark]'
+const TAG = 'wifiTestApp [Benchmark]'
 
 interface DownloadConfig {
   url: string,

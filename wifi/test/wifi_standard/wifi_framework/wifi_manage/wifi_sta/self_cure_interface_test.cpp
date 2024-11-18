@@ -107,13 +107,6 @@ public:
         callbacks.callbackModuleName = "test";
         EXPECT_EQ(pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks), WIFI_OPT_SUCCESS);
     }
-
-    void DealStaOpenResTest()
-    {
-        pSelfCureInterface->DealStaOpened(0);
-        pSelfCureInterface->pSelfCureService = nullptr;
-        pSelfCureInterface->DealStaOpened(0);
-    }
 };
 
 HWTEST_F(SelfCureInterfaceTest, InitSelfCureServiceTest, TestSize.Level1)
@@ -149,11 +142,6 @@ HWTEST_F(SelfCureInterfaceTest, DealP2pConnChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureInterfaceTest, RegisterSelfCureServiceCallbackTest, TestSize.Level1)
 {
     RegisterSelfCureServiceCallbackTest();
-}
-
-HWTEST_F(SelfCureInterfaceTest, DealStaOpenResTest, TestSize.Level1)
-{
-    DealStaOpenResTest();
 }
 
 HWTEST_F(SelfCureInterfaceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)

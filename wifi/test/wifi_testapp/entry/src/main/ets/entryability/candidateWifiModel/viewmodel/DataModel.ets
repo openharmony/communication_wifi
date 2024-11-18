@@ -17,7 +17,7 @@ import { CommonConstants } from '../common/constant/CommonConstant';
 import Logger from '../common/utils/Logger';
 import TaskItemBean from '../common/bean/TaskItemBean';
 
-const TAG = '[DataModel]';
+const TAG = 'wifiTestApp [DataModel]';
 
 /**
  * Saving and manipulating data displayed on the page.

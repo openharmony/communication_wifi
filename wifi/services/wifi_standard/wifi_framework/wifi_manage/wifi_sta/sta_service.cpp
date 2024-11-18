@@ -184,8 +184,8 @@ ErrCode StaService::EnableStaService()
 {
     WIFI_LOGI("Enter EnableStaService m_instId:%{public}d\n", m_instId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-#ifndef OHOS_ARCH_LITE
     if (m_instId == INSTID_WLAN0) {
+#ifndef OHOS_ARCH_LITE
         // notification of registration country code change
         std::string moduleName = "StaService_" + std::to_string(m_instId);
         m_staObserver = std::make_shared<WifiCountryCodeChangeObserver>(moduleName, *pStaStateMachine);
@@ -194,9 +194,9 @@ ErrCode StaService::EnableStaService()
             return WIFI_OPT_FAILED;
         }
         WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_staObserver);
-    }
 #endif
-    WifiSettings::GetInstance().ReloadDeviceConfig();
+        WifiSettings::GetInstance().ReloadDeviceConfig();
+    }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA, STA_CONNECT_MODE);
     return WIFI_OPT_SUCCESS;
 }
@@ -407,7 +407,8 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
 
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
-    LOGI("Enter AddDeviceConfig, bssid=%{public}s\n", MacAnonymize(config.bssid).c_str());
+    LOGI("Enter AddDeviceConfig, ssid:%{public}s, bssid=%{public}s, keyMgmt: %{public}s\n",
+        SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str(), config.keyMgmt.c_str());
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     int netWorkId = INVALID_NETWORK_ID;
     bool isUpdate = false;
@@ -425,6 +426,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
             pStaAutoConnectService->EnableOrDisableBssid(bssid, true, 0);
         }
         isUpdate = true;
+        LOGI("AddDeviceConfig update device networkId:%{public}d", netWorkId);
     } else {
         netWorkId = WifiSettings::GetInstance().GetNextNetworkId();
         LOGI("AddDeviceConfig alloc new id[%{public}d] succeed!", netWorkId);
@@ -941,6 +943,13 @@ ErrCode StaService::SetEnhanceService(IEnhanceService* enhanceService)
     pStaStateMachine->SetEnhanceService(enhanceService);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaService::SetSelfCureService(ISelfCureService *selfCureService)
+{
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->SetSelfCureService(selfCureService);
+    return WIFI_OPT_SUCCESS;
+}
 #endif
 
 ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd)
@@ -957,12 +966,12 @@ ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const 
 
     return WIFI_OPT_SUCCESS;
 }
- 
+
 ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
 {
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_DELIVER_MAC, currentMac);
- 
+
     return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi

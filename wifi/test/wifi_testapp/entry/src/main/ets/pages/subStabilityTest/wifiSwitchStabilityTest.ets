@@ -20,10 +20,11 @@ import ConfigData from '../../Utils/ConfigData';
 import { TestData } from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import fs from '@ohos.file.fs';
 import common from '@ohos.app.ability.common';
 import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { BusinessError } from '@ohos.base';
 import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
@@ -49,7 +50,7 @@ function operateButtonStyle(color: Resource) {
 /**
  * WiFiSwitchStabilityTest Page Of wifi test
  */
-const TAG = '[WiFiSwitchStabilityTest]'
+const TAG = 'wifiTestApp [WiFiSwitchStabilityTest]'
 
 @Entry
 @Component
@@ -137,7 +138,7 @@ struct WiFiSwitchStabilityTest {
           abilityName : (context as common.UIAbilityContext).abilityInfo.name
         }
       ] ,
-      operationType : wantAgent.OperationType.START_ABILITY ,
+      operationType : ohosWantAgentInfo.OperationType.START_ABILITY ,
       requestCode : 0 ,
       wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
     };
@@ -283,7 +284,7 @@ struct WiFiSwitchStabilityTest {
 
   onWifiState() {
     console.log(TAG , "on.wifiStateChange start--------")
-    wifi.on("wifiStateChange" , (number) => {
+    wifiManager.on("wifiStateChange" , (number) => {
       console.log(TAG , " on.wifiStateChange --------")
       let wifiStateMessage = ""
       switch ( number ) {
@@ -313,7 +314,7 @@ struct WiFiSwitchStabilityTest {
         console.log(TAG , "WIFI去使能结束时间: " + this.close_EndTime + "ms")
       }
       console.log(TAG , " on.wifiStateChange callback success --------")
-      prompt.showToast({ message : "wifi状态: " + wifiStateMessage })
+      promptAction.showToast({ message : "wifi状态: " + wifiStateMessage })
       this.stateMessage = wifiStateMessage
       AppStorage.setOrCreate("stateMessage" , this.stateMessage)
       console.log(TAG , " on.wifiStateChange callback end--------")
@@ -322,7 +323,7 @@ struct WiFiSwitchStabilityTest {
   }
 
   aboutToDisappear() {
-    wifi.off("wifiStateChange")
+    wifiManager.off("wifiStateChange")
   }
 
   async forLoop() {
@@ -345,13 +346,13 @@ struct WiFiSwitchStabilityTest {
       } else {
         let wifiState = wifiManager.isWifiActive()
         if ( wifiState ) {
-          wifi.disableWifi()
+          wifiManager.disableWifi()
           console.log(TAG , "wifi当前已使能，已经去使能，正常开始测试------")
         } else {
           console.log(TAG , "wifi当前未使能，正常开始测试------")
         }
         await sleep(3)
-        funcMessage = wifi.enableWifi()
+        // funcMessage = wifiManager.enableWifi()
         // 打时间戳
         this.open_StartTime = new Date().getTime()
         console.log(TAG , "第" + (this.openWifiNumber + 1) + "次WIFI使能-----")
@@ -367,7 +368,7 @@ struct WiFiSwitchStabilityTest {
           this.openSuccessNumber = this.openSuccessNumber + 1
           this.stateMessageLog += "使能成功的次数：" + this.openSuccessNumber + "\n"
           console.log(TAG , "使能成功的次数：" + this.openSuccessNumber)
-          funcMessage = wifi.disableWifi()
+          // funcMessage = wifiManager.disableWifi()
           this.closeWifiNumber = this.closeWifiNumber + 1
           this.close_StartTime = new Date().getTime()
           console.log(TAG , "第" + this.closeWifiNumber + "次WIFI去使能-----")

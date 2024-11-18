@@ -347,7 +347,7 @@ private:
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
     std::map<std::string, StationInfo> mBlockListInfo;
     WifiConfigFileImpl<StationInfo> mSavedBlockInfo;
-    
+
     // P2P
     std::mutex mP2pMutex;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;

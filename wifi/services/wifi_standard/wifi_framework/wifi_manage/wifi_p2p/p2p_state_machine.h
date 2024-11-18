@@ -136,6 +136,8 @@ public:
      */
     bool GetConnectedStationInfo(std::map<std::string, StationInfo> &result);
 
+    void SetEnhanceService(IEnhanceService* enhanceService);
+
 private:
     /**
      * @Description Handle event of CMD_DEVICE_DISCOVERS
@@ -309,6 +311,8 @@ private:
     bool IsInterfaceReuse() const;
 
     void ClearGroup() const;
+
+    bool HasPersisentGroup(void);
 
 private:
     /**

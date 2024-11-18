@@ -20,9 +20,10 @@ import ConfigData from '../../Utils/ConfigData';
 import { TestData } from '../../entryability/model/testData'
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import prompt from '@system.prompt';
+import promptAction from '@ohos.promptAction'
 import common from '@ohos.app.ability.common';
 import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { BusinessError } from '@ohos.base';
 import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
@@ -35,7 +36,7 @@ interface myParams extends Object {
 /**
  * WiFiSwitchStabilityTest Page Of wifi test
  */
-const TAG = '[HotspotStabilityTest]'
+const TAG = 'wifiTestApp [HotspotStabilityTest]'
 
 @Entry
 @Component
@@ -107,7 +108,7 @@ struct HotspotStabilityTest {
           abilityName : (context as common.UIAbilityContext).abilityInfo.name
         }
       ] ,
-      operationType : wantAgent.OperationType.START_ABILITY ,
+      operationType : ohosWantAgentInfo.OperationType.START_ABILITY ,
       requestCode : 0 ,
       wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
     };
@@ -250,7 +251,7 @@ struct HotspotStabilityTest {
 
   onHotspotStateChange() {
     console.log(TAG , "on.hotspotStateChange start--------")
-    wifi.on("hotspotStateChange" , (number) => {
+    wifiManager.on("hotspotStateChange" , (number) => {
       console.log(TAG , " on.hotspotStateChange --------")
       let hotspotStateMessage = ""
       switch ( number ) {
@@ -280,7 +281,7 @@ struct HotspotStabilityTest {
         console.log(TAG , "热点去使能结束时间: " + this.close_EndTime + "ms")
       }
       console.log(TAG , " on.hotspotStateChange callback success --------")
-      prompt.showToast({ message : "热点状态: " + hotspotStateMessage })
+      promptAction.showToast({ message : "热点状态: " + hotspotStateMessage })
       this.hotspotMessage = hotspotStateMessage
       AppStorage.setOrCreate("hotspotMessage" , this.hotspotMessage)
       console.log(TAG , " on.hotspotStateChange callback end--------")
@@ -290,7 +291,7 @@ struct HotspotStabilityTest {
   }
 
   aboutToDisappear() {
-    wifi.off("hotspotStateChange")
+    wifiManager.off("hotspotStateChange")
   }
 
   async forLoop() {
@@ -312,14 +313,14 @@ struct HotspotStabilityTest {
       } else {
         let wifiState = wifiManager.isWifiActive()
         if ( wifiState ) {
-          wifi.disableWifi()
+          wifiManager.disableWifi()
           console.log(TAG , "wifi当前已使能，已经去使能，正常开始测试------")
         } else {
           console.log(TAG , "wifi当前未使能，正常开始测试------")
         }
         await sleep(3)
 
-        funcMessage = wifi.enableHotspot()
+        // funcMessage = wifiManager.enableHotspot()
         // 打时间戳
         this.open_StartTime = new Date().getTime()
         console.log(TAG , "第" + (this.openHotspotNumber + 1) + "次热点使能-----")
@@ -328,7 +329,7 @@ struct HotspotStabilityTest {
         console.log(TAG , "第" + (this.openHotspotNumber + 1) + "次热点使能结果：" + funcMessage)
         await sleep(10)
         this.hotspotMessage = AppStorage.get("hotspotMessage") ! //非空断言操作符
-        // prompt.showToast( { message : funcMessage } )
+        // promptAction.showToast( { message : funcMessage } )
         if ( this.hotspotMessage == "active" ) {
           this.open_SpendTime = this.open_EndTime - this.open_StartTime
           this.hotspotMessageLog += "第" + (this.openHotspotNumber + 1) + "次热点使能耗时: " + this.open_SpendTime + "ms" + "\n"
@@ -336,7 +337,7 @@ struct HotspotStabilityTest {
           this.openSuccessNumber = this.openSuccessNumber + 1
           this.hotspotMessageLog += "热点使能成功的次数：" + this.openSuccessNumber + "\n"
           console.log(TAG , "热点使能成功的次数：" + this.openSuccessNumber)
-          funcMessage = wifi.disableHotspot()
+          // funcMessage = wifiManager.disableHotspot()
           this.closeHotspotNumber = this.closeHotspotNumber + 1
           this.close_StartTime = new Date().getTime()
           console.log(TAG , "第" + this.closeHotspotNumber + "次热点去使能-----")

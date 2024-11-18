@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import prompt from '@ohos.prompt'
+import promptAction from '@ohos.promptAction'
 import wifi from '@ohos.wifi'
 
 
@@ -21,7 +21,7 @@ import wifi from '@ohos.wifi'
  * wifiTestModel of wifi TEST
  */
 
-const TAG = "[wifiModel]"
+const TAG = "wifiTestApp [wifiModel]"
 
 export class WifiModel {
   getScanInfos(callback) {
@@ -50,7 +50,7 @@ export class WifiModel {
   }
 
   connectNetwork(scanInfo: wifi.WifiDeviceConfig , psw: string) {
-    prompt.showToast({ message : 'connecting' })
+    promptAction.showToast({ message : 'connecting' })
     console.log(TAG , `connectNetwork bssid=${ scanInfo.bssid }`)
     let deviceConfig: any = {
       ssid : scanInfo.ssid ,

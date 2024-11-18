@@ -87,6 +87,7 @@ void WifiP2pCallbackProxy::WriteWifiP2pDeviceData(MessageParcel &data, const Wif
     data.WriteInt32(device.GetWpsConfigMethod());
     data.WriteInt32(device.GetDeviceCapabilitys());
     data.WriteInt32(device.GetGroupCapabilitys());
+    data.WriteInt32(static_cast<int>(device.GetChrErrCode()));
 }
 
 void WifiP2pCallbackProxy::OnP2pThisDeviceChanged(const WifiP2pDevice &device)

@@ -20,16 +20,22 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2p");
 
 namespace OHOS {
 namespace Wifi {
+
+std::mutex g_p2pMutex;
 NO_SANITIZE("cfi") std::shared_ptr<WifiP2p> WifiP2p::GetInstance(int systemAbilityId)
 {
-    std::shared_ptr<WifiP2pImpl> impl = std::make_shared<WifiP2pImpl>();
+    static std::shared_ptr<WifiP2pImpl> impl = nullptr;
+    std::lock_guard<std::mutex> lock(g_p2pMutex);
+    if (!impl) {
+        impl = std::make_shared<WifiP2pImpl>();
+    }
     if (impl && impl->Init(systemAbilityId)) {
         WIFI_LOGD("init p2p successfully!");
         return impl;
+    } else {
+        WIFI_LOGE("new wifi p2p failed");
+        return nullptr;
     }
-
-    WIFI_LOGE("new wifi p2p failed");
-    return nullptr;
 }
 
 WifiP2p::~WifiP2p()

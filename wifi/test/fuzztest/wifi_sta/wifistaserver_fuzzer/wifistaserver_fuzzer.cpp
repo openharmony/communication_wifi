@@ -249,22 +249,12 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->AllowAutoSelectDevice(info);
     pStaAutoConnectService->RoamingEncryptionModeCheck(config, scanInfoList, info);
     pStaAutoConnectService->RoamingSelection(config, scanInfo, info);
-    pStaAutoConnectService->ConnectElectedDevice(config);
-    pStaAutoConnectService->ClearOvertimeBlockedBssid();
-    pStaAutoConnectService->ClearAllBlockedBssids();
-    pStaAutoConnectService->GetBlockedBssids(blocklistBssids);
-    pStaAutoConnectService->AddOrDelBlockedBssids(conditionName, attemptEnable, frequency);
     pStaAutoConnectService->EnableOrDisableBssid(conditionName, attemptEnable, frequency);
-    pStaAutoConnectService->ClearOvertimeBlockedBssid();
     pStaAutoConnectService->firmwareRoamFlag = true;
-    pStaAutoConnectService->SetRoamBlockedBssidFirmware(blocklistBssids);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfo);
-    pStaAutoConnectService->SyncBlockedSsidFirmware();
-    pStaAutoConnectService->ObtainRoamCapFromFirmware();
     pStaAutoConnectService->AutoSelectDevice(config, scanInfo, blocklistBssids, info);
     pStaAutoConnectService->WhetherDevice5GAvailable(scanInfo);
     pStaAutoConnectService->GetAvailableScanInfos(scanInfo, scanInfo, blocklistBssids, info);
-    pStaAutoConnectService->ObtainRoamCapFromFirmware();
     pStaService->AutoConnectService(scanInfo);
 }
 
@@ -279,19 +269,6 @@ void StaAppAccelerationFuzzTest(const uint8_t* data, size_t size)
     pStaAppAcceleration->SetGameBoostMode(enable, uid, type, limitMode);
     pStaAppAcceleration->HighPriorityTransmit(uid, protocol, enable);
     pStaAppAcceleration->StopAllAppAcceleration();
-}
-
-void SyncBlockedSsidFirmwareTest(const uint8_t* data, size_t size)
-{
-    pStaAutoConnectService->maxBlockedBssidNum = TWO;
-    pStaAutoConnectService->SyncBlockedSsidFirmware();
-}
-
-void SetRoamBlockedBssidFirmwareTest(const uint8_t* data, size_t size)
-{
-    std::vector<std::string> blocklistBssids;
-    pStaAutoConnectService->maxBlockedBssidNum = TWO;
-    pStaAutoConnectService->SetRoamBlockedBssidFirmware(blocklistBssids);
 }
 
 void RegisterDeviceAppraisalTest(const uint8_t* data, size_t size)
@@ -510,8 +487,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::StaServerFuzzTest(data, size);
     OHOS::Wifi::StaAutoServerFuzzTest(data, size);
     OHOS::Wifi::StaAppAccelerationFuzzTest(data, size);
-    OHOS::Wifi::SyncBlockedSsidFirmwareTest(data, size);
-    OHOS::Wifi::SetRoamBlockedBssidFirmwareTest(data, size);
     OHOS::Wifi::RegisterDeviceAppraisalTest(data, size);
     OHOS::Wifi::AllowAutoSelectDeviceTest(data, size);
     OHOS::Wifi::StaAutoConnectServiceFuzzTest(data, size);

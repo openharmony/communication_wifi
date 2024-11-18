@@ -285,7 +285,7 @@ ErrCode StaInterface::CancelWps()
 
 ErrCode StaInterface::ConnectivityManager(const std::vector<InterScanInfo> &scanInfos)
 {
-    LOGI("Enter Connection management.\n");
+    LOGD("Enter Connection management.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->AutoConnectService(scanInfos) != WIFI_OPT_SUCCESS) {
@@ -475,6 +475,14 @@ ErrCode StaInterface::SetEnhanceService(IEnhanceService *enhanceService)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::SetSelfCureService(ISelfCureService *selfCureService)
+{
+    WIFI_LOGI("Enter SetSelfCureService");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->SetSelfCureService(selfCureService);
+    return WIFI_OPT_SUCCESS;
+}
 #endif
 
 ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
@@ -483,10 +491,10 @@ ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, cons
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->EnableHiLinkHandshake(config, bssid);
- 
+
     return WIFI_OPT_SUCCESS;
 }
- 
+
 ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
 {
     WIFI_LOGI("Enter DeliverStaIfaceData");

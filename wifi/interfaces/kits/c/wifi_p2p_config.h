@@ -77,6 +77,12 @@ typedef enum P2pConnectionState {
     P2P_CONNECTED,
 } P2pConnectionState;
 
+typedef enum P2pChrEvent {
+    INITIAL_VALUE = 0,
+    GO_NEGOTIATION_PEER_REJECT = 1,
+    GO_NEGOTIATION_WAIT_PEER_READY_TIMEOUT = 2,
+} P2pChrEvent;
+
 typedef struct WifiP2pWfdInfo {
     int wfdEnabled; /* 0: false, 1: true */
     int deviceInfo;
@@ -96,6 +102,7 @@ typedef struct WifiP2pDevice {
     unsigned int supportWpsConfigMethods;
     int deviceCapabilitys;
     int groupCapabilitys;
+    P2pChrEvent chrErrCode;
 } WifiP2pDevice;
 
 typedef struct WifiP2pGroupInfo {

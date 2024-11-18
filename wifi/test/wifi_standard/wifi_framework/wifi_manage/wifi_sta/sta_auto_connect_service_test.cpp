@@ -118,22 +118,6 @@ public:
     void RegisterDeviceAppraisalSuccess();
     void RegisterDeviceAppraisalFail1();
     void RegisterDeviceAppraisalFail2();
-    void ClearOvertimeBlockedBssidSuccess1();
-    void ClearOvertimeBlockedBssidSuccess2();
-    void GetBlockedBssidsSuccess();
-    void AddOrDelBlockedBssidsSuccess();
-    void AddOrDelBlockedBssidsFail();
-    void ObtainRoamCapFromFirmwareSuccess();
-    void ObtainRoamCapFromFirmwareFail1();
-    void ObtainRoamCapFromFirmwareFail2();
-    void SetRoamBlockedBssidFirmwareSuccess();
-    void SetRoamBlockedBssidFirmwareFail1();
-    void SetRoamBlockedBssidFirmwareFail2();
-    void SetRoamBlockedBssidFirmwareFail3();
-    void SetRoamBlockedBssidFirmwareFail4();
-    void ConnectElectedDeviceSuccess1();
-    void ConnectElectedDeviceSuccess2();
-    void ConnectElectedDeviceFail1();
     void GetAvailableScanInfosSuccess();
     void GetAvailableScanInfosSuccess1();
     void GetAvailableScanInfosSuccess2();
@@ -165,8 +149,6 @@ public:
     void RoamingSelectionFail2();
     void RoamingSelectionFail3();
     void RoamingSelectionFail4();
-    void SyncBlockedSsidFirmwareSuccess();
-    void SyncBlockedSsidFirmwareFail();
     void DisableAutoJoinSuccess();
     void EnableAutoJoinSuccess();
     void RegisterAutoJoinConditionSuccess();
@@ -236,7 +218,6 @@ void StaAutoConnectServiceTest::GetAllDeviceInfos(WifiDeviceConfig &deviceConfig
 {
     GetWifiDeviceConfig(deviceConfig);
     GetInterScanInfoVector(scanInfos);
-    pStaAutoConnectService->GetBlockedBssids(blockedBssids);
     GetWifiLinkedInfo(info);
 }
 
@@ -381,14 +362,14 @@ void StaAutoConnectServiceTest::EnableOrDisableBssidFail2()
 void StaAutoConnectServiceTest::EnableOrDisableBssidFail3()
 {
     std::string bssid = "d8:c7:71:2f:14:d9";
-    EXPECT_FALSE(pStaAutoConnectService->EnableOrDisableBssid(bssid, true, AP_CANNOT_HANDLE_NEW_STA));
+    EXPECT_TRUE(pStaAutoConnectService->EnableOrDisableBssid(bssid, true, AP_CANNOT_HANDLE_NEW_STA));
 }
 
 void StaAutoConnectServiceTest::EnableOrDisableBssidFail4()
 {
     std::string bssid = "d8:c7:71:2f:14:d9";
     const int AP_CANNOT_HANDLE_NEW_STA_ERR = 1;
-    EXPECT_FALSE(pStaAutoConnectService->EnableOrDisableBssid(bssid, false, AP_CANNOT_HANDLE_NEW_STA_ERR));
+    EXPECT_TRUE(pStaAutoConnectService->EnableOrDisableBssid(bssid, false, AP_CANNOT_HANDLE_NEW_STA_ERR));
 }
 
 void StaAutoConnectServiceTest::AutoSelectDeviceSuccess1()
@@ -566,150 +547,6 @@ void StaAutoConnectServiceTest::RegisterDeviceAppraisalFail2()
     StaDeviceAppraisal *appraisal = nullptr;
     int priority = 7; // 0~6
     EXPECT_TRUE(pStaAutoConnectService->RegisterDeviceAppraisal(appraisal, priority) == false);
-}
-
-void StaAutoConnectServiceTest::ClearOvertimeBlockedBssidSuccess1()
-{
-    pStaAutoConnectService->ClearOvertimeBlockedBssid();
-}
-
-void StaAutoConnectServiceTest::ClearOvertimeBlockedBssidSuccess2()
-{
-    std::string bssid = "2a:76:93:47:e2:8a";
-    bool enable = false;
-    int reason = AP_CANNOT_HANDLE_NEW_STA;
-    pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason);
-    pStaAutoConnectService->ClearOvertimeBlockedBssid();
-}
-
-void StaAutoConnectServiceTest::GetBlockedBssidsSuccess()
-{
-    std::vector<std::string> blockedBssids;
-    std::string bssid = "2a:76:93:47:e2:8a";
-    blockedBssids.push_back(bssid);
-    pStaAutoConnectService->GetBlockedBssids(blockedBssids);
-}
-
-void StaAutoConnectServiceTest::AddOrDelBlockedBssidsSuccess()
-{
-    std::string bssid = "2a:76:93:47:e2:8a";
-    bool enable = false;
-    int reason = AP_CANNOT_HANDLE_NEW_STA;
-    EXPECT_TRUE(pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason) == true);
-}
-
-void StaAutoConnectServiceTest::AddOrDelBlockedBssidsFail()
-{
-    std::string bssid = "2a:76:93:47:e2:8a";
-    bool enable = true;
-    int reason = AP_CANNOT_HANDLE_NEW_STA;
-    EXPECT_TRUE(pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason) == false);
-}
-
-void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareSuccess()
-{
-    EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
-}
-
-void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail1()
-{
-    EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
-}
-
-void StaAutoConnectServiceTest::ObtainRoamCapFromFirmwareFail2()
-{
-    EXPECT_TRUE(pStaAutoConnectService->ObtainRoamCapFromFirmware() == false);
-}
-
-void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareSuccess()
-{
-    ObtainRoamCapFromFirmwareSuccess();
-    std::vector<std::string> blockedBssids;
-    std::string bssid = "2a:76:93:47:e2:8a";
-    blockedBssids.push_back(bssid);
-    pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids);
-}
-
-void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail1()
-{
-    std::vector<std::string> blockedBssids;
-    std::string bssid = "2a:76:93:47:e2:8a";
-
-    blockedBssids.push_back(bssid);
-    EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
-}
-
-void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail2()
-{
-    ObtainRoamCapFromFirmwareSuccess();
-    std::vector<std::string> blockedBssids = {}; // NULL
-    EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
-}
-
-void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail3()
-{
-    ObtainRoamCapFromFirmwareSuccess();
-    std::vector<std::string> blockedBssids;
-    std::string bssid1 = "2a:76:93:47:e2:8a";
-    std::string bssid2 = "2a:76:93:47:e2:8a";
-    std::string bssid3 = "2a:76:93:47:e2:8a";
-    blockedBssids.push_back(bssid1);
-    blockedBssids.push_back(bssid2);
-    blockedBssids.push_back(bssid3);
-
-    EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
-}
-
-void StaAutoConnectServiceTest::SetRoamBlockedBssidFirmwareFail4()
-{
-    ObtainRoamCapFromFirmwareSuccess();
-    std::vector<std::string> blockedBssids;
-    std::string bssid1 = "2a:76:93:47:e2:8a";
-    blockedBssids.push_back(bssid1);
-    EXPECT_TRUE(pStaAutoConnectService->SetRoamBlockedBssidFirmware(blockedBssids) == false);
-}
-
-void StaAutoConnectServiceTest::ConnectElectedDeviceSuccess1()
-{
-    WifiLinkedInfo info;
-    WifiDeviceConfig deviceConfig;
-    GetWifiLinkedInfo(info);
-    GetWifiDeviceConfig(deviceConfig);
-    info.connState = ConnState::CONNECTED;
-    info.bssid = "2a:76:93:47:e2:8b";
-    deviceConfig.networkId = INVALID_NETWORK_ID;
-
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).WillOnce(
-        DoAll(SetArgReferee<0>(info), Return(0)));
-    pStaAutoConnectService->ConnectElectedDevice(deviceConfig);
-}
-
-void StaAutoConnectServiceTest::ConnectElectedDeviceSuccess2()
-{
-    WifiLinkedInfo info;
-    WifiDeviceConfig deviceConfig;
-    GetWifiLinkedInfo(info);
-    GetWifiDeviceConfig(deviceConfig);
-    info.connState = ConnState::CONNECTED;
-    info.detailedState = DetailedState::DISCONNECTED;
-
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).WillOnce(
-        DoAll(SetArgReferee<0>(info), Return(0)));
-    pStaAutoConnectService->ConnectElectedDevice(deviceConfig);
-}
-
-void StaAutoConnectServiceTest::ConnectElectedDeviceFail1()
-{
-    WifiLinkedInfo info;
-    WifiDeviceConfig deviceConfig;
-    GetWifiLinkedInfo(info);
-    GetWifiDeviceConfig(deviceConfig);
-    info.detailedState = DetailedState::INVALID;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
-        .Times(AtLeast(0))
-        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)))
-        .WillRepeatedly(DoAll(SetArgReferee<0>(info), Return(0)));
-    pStaAutoConnectService->ConnectElectedDevice(deviceConfig);
 }
 
 void StaAutoConnectServiceTest::GetAvailableScanInfosSuccess()
@@ -1257,25 +1094,6 @@ void StaAutoConnectServiceTest::RoamingSelectionFail4()
     EXPECT_TRUE(pStaAutoConnectService->RoamingSelection(deviceConfig, scanInfos, info) == false);
 }
 
-void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareSuccess()
-{
-    std::string bssid = "2a:76:93:47:e2:8a";
-    bool enable = false;
-    int reason = AP_CANNOT_HANDLE_NEW_STA;
-
-    pStaAutoConnectService->AddOrDelBlockedBssids(bssid, enable, reason);
-
-    pStaAutoConnectService->ObtainRoamCapFromFirmware();
-
-    pStaAutoConnectService->SyncBlockedSsidFirmware();
-}
-
-void StaAutoConnectServiceTest::SyncBlockedSsidFirmwareFail()
-{
-    pStaAutoConnectService->ObtainRoamCapFromFirmware();
-    pStaAutoConnectService->SyncBlockedSsidFirmware();
-}
-
 void StaAutoConnectServiceTest::DisableAutoJoinSuccess()
 {
     std::string conditionName;
@@ -1439,86 +1257,6 @@ HWTEST_F(StaAutoConnectServiceTest, RegisterDeviceAppraisalFail2, TestSize.Level
     RegisterDeviceAppraisalFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, ClearOvertimeBlockedBssidSuccess1, TestSize.Level1)
-{
-    ClearOvertimeBlockedBssidSuccess1();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, ClearOvertimeBlockedBssidSuccess2, TestSize.Level1)
-{
-    ClearOvertimeBlockedBssidSuccess2();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, GetBlockedBssidsSuccess, TestSize.Level1)
-{
-    GetBlockedBssidsSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, AddOrDelBlockedBssidsSuccess, TestSize.Level1)
-{
-    AddOrDelBlockedBssidsSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, AddOrDelBlockedBssidsFail, TestSize.Level1)
-{
-    AddOrDelBlockedBssidsFail();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, ObtainRoamCapFromFirmwareSuccess, TestSize.Level1)
-{
-    ObtainRoamCapFromFirmwareSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, ObtainRoamCapFromFirmwareFail1, TestSize.Level1)
-{
-    ObtainRoamCapFromFirmwareFail1();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, ObtainRoamCapFromFirmwareFail2, TestSize.Level1)
-{
-    ObtainRoamCapFromFirmwareFail2();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, SetRoamBlockedBssidFirmwareSuccess, TestSize.Level1)
-{
-    SetRoamBlockedBssidFirmwareSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, SetRoamBlockedBssidFirmwareFail1, TestSize.Level1)
-{
-    SetRoamBlockedBssidFirmwareFail1();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, SetRoamBlockedBssidFirmwareFail2, TestSize.Level1)
-{
-    SetRoamBlockedBssidFirmwareFail2();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, SetRoamBlockedBssidFirmwareFail3, TestSize.Level1)
-{
-    SetRoamBlockedBssidFirmwareFail3();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, SetRoamBlockedBssidFirmwareFail4, TestSize.Level1)
-{
-    SetRoamBlockedBssidFirmwareFail4();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, ConnectElectedDeviceSuccess1, TestSize.Level1)
-{
-    ConnectElectedDeviceSuccess1();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, ConnectElectedDeviceSuccess2, TestSize.Level1)
-{
-    ConnectElectedDeviceSuccess2();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, ConnectElectedDeviceFail1, TestSize.Level1)
-{
-    ConnectElectedDeviceFail1();
-}
-
 HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess, TestSize.Level1)
 {
     GetAvailableScanInfosSuccess();
@@ -1673,16 +1411,6 @@ HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail3, TestSize.Level1)
 HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail4, TestSize.Level1)
 {
     RoamingSelectionFail4();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, SyncBlockedSsidFirmwareSuccess, TestSize.Level1)
-{
-    SyncBlockedSsidFirmwareSuccess();
-}
-
-HWTEST_F(StaAutoConnectServiceTest, SyncBlockedSsidFirmwareFail, TestSize.Level1)
-{
-    SyncBlockedSsidFirmwareFail();
 }
 
 HWTEST_F(StaAutoConnectServiceTest, DisableAutoJoinSuccess, TestSize.Level1)

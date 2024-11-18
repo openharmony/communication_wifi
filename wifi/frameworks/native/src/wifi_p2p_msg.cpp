@@ -296,6 +296,16 @@ bool WifiP2pDevice::WpKeypadSupported() const
     return (supportWpsConfigMethods & static_cast<int>(WpsConfigMethod::WPS_CFG_KEYPAD)) != 0;
 }
 
+void WifiP2pDevice::SetChrErrCode(P2pChrEvent errCode)
+{
+    chrErrCode = errCode;
+}
+
+P2pChrEvent WifiP2pDevice::GetChrErrCode() const
+{
+    return chrErrCode;
+}
+
 bool WifiP2pGroupInfo::operator==(const WifiP2pGroupInfo &group) const
 {
     return networkId == group.GetNetworkId();

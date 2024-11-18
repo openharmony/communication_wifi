@@ -993,8 +993,11 @@ void P2pStateMachine::StartDhcpClientInterface()
         config.prohibitUseCacheIp = true;
     }
     config.bIpv6 = false;
-    strncpy_s(config.ifname, INTERFACE_MAX_LEN, groupManager.GetCurrentGroup().GetInterface().c_str(),
-        groupManager.GetCurrentGroup().GetInterface().length());
+    if (strncpy_s(config.ifname, sizeof(config.ifname), groupManager.GetCurrentGroup().GetInterface().c_str(),
+        groupManager.GetCurrentGroup().GetInterface().length())) {
+            WIFI_LOGE("strncpy_s config.ifname failed!");
+            return;  
+        }
     result = StartDhcpClient(config);
     if (result != 0) {
         WIFI_LOGE("StartDhcpClient failed!");

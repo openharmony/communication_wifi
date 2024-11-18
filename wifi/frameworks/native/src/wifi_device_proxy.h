@@ -557,7 +557,7 @@ public:
      *
      * @param uid - target app uid
      * @param protocol - target protocol type
-     * @return enable - enable/disable dpi mark
+     * @param enable - enable/disable dpi mark
      */
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
 #ifdef OHOS_ARCH_LITE

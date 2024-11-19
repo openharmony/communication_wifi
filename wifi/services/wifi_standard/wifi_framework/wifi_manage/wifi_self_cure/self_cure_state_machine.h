@@ -474,6 +474,7 @@ private:
     sptr<NetStateObserver> mNetWorkDetect;
     bool m_httpDetectResponse = false;
     bool p2pEnhanceConnected_ = false;
+    bool isInternetFailureDetected_ = false;
     DetailedState selfCureNetworkLastState_ = DetailedState::IDLE;
     WifiState selfCureWifiLastState_ = WifiState::UNKNOWN;
     SelfCureState selfCureState_ = SelfCureState::SCE_WIFI_INVALID_STATE;

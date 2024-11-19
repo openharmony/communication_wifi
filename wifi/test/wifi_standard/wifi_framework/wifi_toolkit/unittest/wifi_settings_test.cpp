@@ -80,20 +80,6 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfig3Test, TestSize.Level1)
     EXPECT_EQ(result, WIFI_OPT_RETURN);
 }
 
-HWTEST_F(WifiSettingsTest, SetDeviceStateTest, TestSize.Level1)
-{
-    WIFI_LOGE("SetDeviceStateTest enter!");
-    int result = WifiSettings::GetInstance().SetDeviceState(NETWORK_ID, WIFI_OPT_RETURN, true);
-    EXPECT_EQ(result, WIFI_OPT_RETURN);
-    result = WifiSettings::GetInstance().SetDeviceState(NETWORK_ID, NETWORK_ID, true);
-    EXPECT_EQ(result, WIFI_OPT_RETURN);
-    result = WifiSettings::GetInstance().SetDeviceState(NETWORK_ID, STATE, true);
-    EXPECT_EQ(result, WIFI_OPT_RETURN);
-    result = WifiSettings::GetInstance().SetDeviceState(SCORE, STATE, true);
-    WIFI_LOGE("SetDeviceStateTest result(%{public}d)", result);
-    EXPECT_EQ(result, WIFI_OPT_RETURN);
-}
-
 HWTEST_F(WifiSettingsTest, SetDeviceEphemeralTest, TestSize.Level1)
 {
     WIFI_LOGE("SetDeviceEphemeralTest enter!");
@@ -140,6 +126,38 @@ HWTEST_F(WifiSettingsTest, IncreaseDeviceConnFailedCountTest, TestSize.Level1)
     int result = WifiSettings::GetInstance().IncreaseDeviceConnFailedCount(index, indexType, count);
     WIFI_LOGE("IncreaseDeviceConnFailedCountTest result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, GetCandidateConfigWithoutUidTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetCandidateConfigWithoutUidTest enter!");
+    WifiDeviceConfig config1;
+    config1.ssid = "test";
+    config1.keyMgmt = "SAE";
+    config1.uid  = 1;
+    config1.isShared = false;
+    WifiSettings::GetInstance().AddDeviceConfig(config1);
+ 
+    WifiDeviceConfig config2;
+    int result = WifiSettings::GetInstance().GetCandidateConfigWithoutUid("test", "SAE", config2);
+    WIFI_LOGI("GetCandidateConfigWithoutUidTest result(%{public}d)", result);
+    EXPECT_NE(result, WIFI_OPT_RETURN);
+}
+ 
+HWTEST_F(WifiSettingsTest, GetAllCandidateConfigWithoutUidTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetAllCandidateConfigWithoutUidTest enter!");
+    WifiDeviceConfig config1;
+    config1.ssid = "test";
+    config1.keyMgmt = "SAE";
+    config1.uid  = 1;
+    config1.isShared = false;
+    WifiSettings::GetInstance().AddDeviceConfig(config1);
+ 
+    std::vector<WifiDeviceConfig> config2;
+    int result = WifiSettings::GetInstance().GetAllCandidateConfigWithoutUid(config2);
+    WIFI_LOGI("GetAllCandidateConfigWithoutUidTest result(%{public}d)", result);
+    EXPECT_NE(result, WIFI_OPT_RETURN);
 }
 
 HWTEST_F(WifiSettingsTest, SetDeviceConnFailedCountTest, TestSize.Level1)
@@ -505,17 +523,6 @@ HWTEST_F(WifiSettingsTest, ClearHotspotConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("ClearHotspotConfigTest enter");
     WifiSettings::GetInstance().ClearHotspotConfig();
-}
-
-HWTEST_F(WifiSettingsTest, SetDeviceStateTest1, TestSize.Level1)
-{
-    WIFI_LOGI("SetDeviceStateTest enter");
-    WifiDeviceConfig config;
-    WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, config);
-    int result = WifiSettings::GetInstance().SetDeviceState(SCORE, SCORE, true);
-    EXPECT_EQ(result, 0);
-    result = WifiSettings::GetInstance().SetDeviceState(SCORE, SCORE, false);
-    EXPECT_EQ(result, 0);
 }
 
 HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)

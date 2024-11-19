@@ -42,7 +42,6 @@ local_base_sources = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/wifi_scorer_impl.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/app_network_speed_limit_service.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/speed_limit_configs_writer.cpp",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/block_connect_service.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_black_list/network_black_list_manager.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history/network_status_history_manager.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_app_state_aware.cpp",
@@ -78,6 +77,7 @@ local_base_sources = [
   "Mock/mock_state_machine.cpp",
   "Mock/mock_wifi_chip_hal_interface.cpp",
   "Mock/mock_wifi_settings.cpp",
+  "Mock/mock_block_connect_service.cpp",
 ]
 
 local_base_include_dirs = [

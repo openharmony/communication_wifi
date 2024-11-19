@@ -250,11 +250,11 @@
         "OHOS::Wifi::WifiSettings::AddDeviceConfig(OHOS::Wifi::WifiDeviceConfig const&)";
         "OHOS::Wifi::WifiSettings::RemoveDevice(int)";
         "OHOS::Wifi::WifiSettings::ClearDeviceConfig()";
+        "OHOS::Wifi::WifiSettings::GetCandidateConfigWithoutUid(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Wifi::WifiDeviceConfig&)";
         "OHOS::Wifi::WifiSettings::GetDeviceConfig(std::__h::vector<OHOS::Wifi::WifiDeviceConfig, std::__h::allocator<OHOS::Wifi::WifiDeviceConfig>>&, int)";
         "OHOS::Wifi::WifiSettings::GetDeviceConfig(int const&, OHOS::Wifi::WifiDeviceConfig&, int)";
         "OHOS::Wifi::WifiSettings::GetDeviceConfig(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int const&, OHOS::Wifi::WifiDeviceConfig&, int)";
         "OHOS::Wifi::WifiSettings::GetDeviceConfig(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Wifi::WifiDeviceConfig&, int)";
-        "OHOS::Wifi::WifiSettings::SetDeviceState(int, int, bool)";
         "OHOS::Wifi::WifiSettings::SetDeviceEphemeral(int, bool)";
         "OHOS::Wifi::WifiSettings::SetDeviceAfterConnect(int)";
         "OHOS::Wifi::WifiSettings::SetDeviceRandomizedMacSuccessEver(int)";

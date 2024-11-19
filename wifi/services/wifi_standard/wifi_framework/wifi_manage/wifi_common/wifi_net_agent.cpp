@@ -256,9 +256,9 @@ void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     netLinkInfo->ifaceName_ = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
 
     SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    SetNetLinkHostRouteInfo(netLinkInfo, wifiIpInfo);
     SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkDnsInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
-    SetNetLinkHostRouteInfo(netLinkInfo, wifiIpInfo);
     SetNetLinkLocalRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     if (wifiProxyConfig.configureMethod == ConfigureProxyMethod::AUTOCONFIGUE) {
         /* Automatic proxy is not supported */
@@ -385,7 +385,6 @@ void WifiNetAgent::SetNetLinkHostRouteInfo(sptr<NetManagerStandard::NetLinkInfo>
         hostRoute->destination_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
         hostRoute->destination_.family_ = NetManagerStandard::INetAddr::IPV4;
         hostRoute->destination_.prefixlen_ = MAX_PREFIX_LEN;
-        hostRoute->gateway_.address_ = "0.0.0.0";
         netLinkInfo->routeList_.push_back(*hostRoute);
         LOGI("SetNetLinkHostRouteInfo gateway:%{public}s", IpAnonymize(hostRoute->gateway_.address_).c_str());
     }

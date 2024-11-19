@@ -45,6 +45,14 @@ protected:
     void GetCandidatesFromSubNetworkSelector() override;
 };
 
+class SuggestionNetworkTracker final: public CompositeNetworkSelector {
+public:
+    SuggestionNetworkTracker();
+protected:
+    bool Nominate(NetworkCandidate &networkCandidate) override;
+    void GetCandidatesFromSubNetworkSelector() override;
+};
+
 class SimpleFilterNetworkSelector : public SimpleNetworkSelector, public SimpleWifiFilter {
 public:
     explicit SimpleFilterNetworkSelector(const std::string &networkSelectorName);

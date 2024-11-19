@@ -32,6 +32,7 @@
 #include "wifi_config_center.h"
 #include "external_wifi_filter_builder_manager.h"
 #include "external_wifi_common_builder_manager.h"
+#include "block_connect_service.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -640,12 +641,10 @@ ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
     WIFI_LOGI("Enter EnableDeviceConfig, networkid is %{public}d", networkId);
 
     /* Update wifi status. */
-    if (WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, attemptEnable) <
-        0) {
+    if (!BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId)) {
         WIFI_LOGE("Enable device config failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiSettings::GetInstance().SyncDeviceConfig();
     return WIFI_OPT_SUCCESS;
 }
 
@@ -653,11 +652,11 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
 {
     WIFI_LOGI("Enter DisableDeviceConfig, networkid is %{public}d", networkId);
 
-    if (WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED) < 0) {
+    if (!BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId,
+        DisabledReason::DISABLED_BY_WIFI_MANAGER)) {
         WIFI_LOGE("Disable device config failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiSettings::GetInstance().SyncDeviceConfig();
     return WIFI_OPT_SUCCESS;
 }
 

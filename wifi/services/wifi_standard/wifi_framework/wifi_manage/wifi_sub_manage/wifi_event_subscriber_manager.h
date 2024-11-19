@@ -49,7 +49,6 @@ public:
     void OnReceiveAppEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
@@ -60,6 +59,7 @@ public:
     explicit NotificationEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     virtual ~NotificationEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+    void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
 };
 
 #ifdef HAS_POWERMGR_PART

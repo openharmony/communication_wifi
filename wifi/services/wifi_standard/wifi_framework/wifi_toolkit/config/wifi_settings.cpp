@@ -348,14 +348,14 @@ int WifiSettings::SetDeviceEverConnected(int networkId)
     return 0;
 }
 
-int WifiSettings::SetAcceptUnvalidated(int networkId)
+int WifiSettings::SetAcceptUnvalidated(int networkId, bool state)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mWifiDeviceConfig.find(networkId);
     if (iter == mWifiDeviceConfig.end()) {
         return -1;
     }
-    iter->second.acceptUnvalidated = true;
+    iter->second.acceptUnvalidated = state;
     return 0;
 }
 

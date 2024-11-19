@@ -43,6 +43,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_randommac_helper.h"
 #include "wifi_sta_hal_interface.h"
+#include "block_connect_service.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -948,7 +949,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
             }
         }
         WifiSettings::GetInstance().SetDeviceEphemeral(networkId, false);
-        WifiSettings::GetInstance().SetDeviceState(networkId, static_cast<int>(WifiDeviceConfigStatus::ENABLED), false);
+        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {

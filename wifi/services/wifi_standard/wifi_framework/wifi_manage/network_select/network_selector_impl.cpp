@@ -48,6 +48,7 @@ AutoConnectIntegrator::AutoConnectIntegrator() : CompositeNetworkSelector(
     }
     SetWifiFilter(filters);
     AddSubNetworkSelector(make_shared<SavedNetworkTracker>());
+    AddSubNetworkSelector(make_shared<SuggestionNetworkTracker>());
     auto comparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
     comparator->AddScorer(make_shared<ThroughputScorer>());
     SetWifiComparator(comparator);
@@ -153,6 +154,27 @@ void SavedNetworkTracker::GetCandidatesFromSubNetworkSelector()
             /* abandon networkCandidates from other low-priority networkSelectors */
             return;
         }
+    }
+}
+
+SuggestionNetworkTracker::SuggestionNetworkTracker() : CompositeNetworkSelector("suggestionNetworkTracker")
+{
+    auto andFilter = make_shared<AndWifiFilter>();
+    andFilter->AddFilter(make_shared<SuggestionNetworkWifiFilter>());
+    andFilter->AddFilter(make_shared<DisableWifiFilter>());
+    SetWifiFilter(andFilter);
+}
+ 
+bool SuggestionNetworkTracker::Nominate(NetworkCandidate &networkCandidate)
+{
+    networkCandidates.emplace_back(&networkCandidate);
+    return true;
+}
+ 
+void SuggestionNetworkTracker::GetCandidatesFromSubNetworkSelector()
+{
+    for (const auto &subNetworkSelector : subNetworkSelectors) {
+        subNetworkSelector->GetBestCandidates(networkCandidates);
     }
 }
 

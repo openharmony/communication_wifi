@@ -122,8 +122,6 @@ public:
 
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
 
-    int SetDeviceState(int networkId, int state, bool bSetOther = false);
-
     int SetDeviceEphemeral(int networkId, bool isEphemeral);
 
     int SetDeviceAfterConnect(int networkId);
@@ -137,6 +135,9 @@ public:
     bool GetDeviceEverConnected(int networkId);
  
     bool GetAcceptUnvalidated(int networkId);
+
+    int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
+        WifiDeviceConfig &config);
 
     int GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config);
@@ -322,6 +323,7 @@ private:
     bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
     void SyncAfterDecryped(WifiDeviceConfig &config);
+    int GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> &configs);
 private:
     // STA
     std::mutex mStaMutex;

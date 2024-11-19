@@ -911,7 +911,7 @@ ErrCode WifiHotspotServiceImpl::CfgCheckIpAddress(const std::string &ipAddress)
     }
 
     for (auto str : list) {
-        if (!isNumber(str) || stoi(str) > MAX_IPV4_VALUE || stoi(str) < 0) {
+        if (!isNumber(str) || CheckDataLegal(str) > MAX_IPV4_VALUE || CheckDataLegal(str) < 0) {
             WIFI_LOGE("CfgCheckIpAddress stoi failed.");
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }

@@ -93,6 +93,7 @@ public:
     virtual int GetHotspotConfig(HotspotConfig &config, int id) = 0;
     virtual bool GetDeviceEverConnected(int networkId) = 0;
     virtual int SetDeviceEverConnected(int networkId) = 0;
+    virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
     virtual bool GetAcceptUnvalidated(int networkId) = 0;
 };
 
@@ -168,6 +169,7 @@ public:
     MOCK_METHOD2(GetHotspotConfig,  int(HotspotConfig &config, int id));
     MOCK_METHOD1(GetDeviceEverConnected, bool(int networkId));
     MOCK_METHOD1(SetDeviceEverConnected, int(int networkId));
+    MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
     MOCK_METHOD1(GetAcceptUnvalidated, bool(int networkId));
 };
 }  // namespace OHOS

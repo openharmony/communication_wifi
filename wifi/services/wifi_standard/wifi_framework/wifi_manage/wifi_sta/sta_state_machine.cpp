@@ -3530,6 +3530,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
             StartDetectTimer(DETECT_TYPE_PERIODIC);
         }
 #ifndef OHOS_ARCH_LITE
+        UpdateAcceptUnvalidatedState();
         WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
 #endif
@@ -3575,6 +3576,10 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
 {
+    if (IsFactoryMode()) {
+        WIFI_LOGI("factory version, no need to pop up diag");
+        return;
+    }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
@@ -3586,6 +3591,20 @@ void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
         }
         WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
         WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
+}
+#endif
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::UpdateAcceptUnvalidatedState()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    if (WifiSettings::GetInstance().GetAcceptUnvalidated(networkId)) {
+        WIFI_LOGI("network is recover, change the value of AcceptUnvalidated to false");
+        WifiSettings::GetInstance().SetAcceptUnvalidated(networkId, false);
         WifiSettings::GetInstance().SyncDeviceConfig();
     }
 }

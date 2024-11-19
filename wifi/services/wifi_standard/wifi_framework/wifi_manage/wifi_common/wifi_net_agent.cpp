@@ -256,6 +256,7 @@ void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     netLinkInfo->ifaceName_ = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
 
     SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    SetNetLinkHostRouteInfo(netLinkInfo, wifiIpInfo);
     SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkDnsInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkLocalRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
@@ -373,6 +374,20 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
         ipv6route->gateway_.family_ = NetManagerStandard::INetAddr::IPV6;
         netLinkInfo->routeList_.push_back(*ipv6route);
         LOGI("SetNetLinkRouteInfo gateway:%{public}s", MacAnonymize(wifiIpV6Info.gateway).c_str());
+    }
+}
+
+void WifiNetAgent::SetNetLinkHostRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo)
+{
+    if ((wifiIpInfo.ipAddress & wifiIpInfo.netmask) != (wifiIpInfo.gateway & wifiIpInfo.netmask)) {
+        sptr<NetManagerStandard::Route> hostRoute = (std::make_unique<NetManagerStandard::Route>()).release();
+        hostRoute->iface_ = netLinkInfo->ifaceName_;
+        hostRoute->destination_.type_ = NetManagerStandard::INetAddr::IPV4;
+        hostRoute->destination_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
+        hostRoute->destination_.family_ = NetManagerStandard::INetAddr::IPV4;
+        hostRoute->destination_.prefixlen_ = MAX_PREFIX_LEN;
+        netLinkInfo->routeList_.push_back(*hostRoute);
+        LOGI("SetNetLinkHostRouteInfo gateway:%{public}s", IpAnonymize(hostRoute->gateway_.address_).c_str());
     }
 }
 

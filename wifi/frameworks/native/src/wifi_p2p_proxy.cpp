@@ -1645,7 +1645,11 @@ ErrCode WifiP2pProxy::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    return ErrCode(reply.ReadInt32());
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pProxy::Hid2dSetUpperScene(const std::string& ifName, const Hid2dUpperScene& scene)

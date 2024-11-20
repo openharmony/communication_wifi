@@ -658,8 +658,8 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
             int uid = mScanCallBackInfo[msg.id][remote].callingUid;
             int pid = mScanCallBackInfo[msg.id][remote].callingPid;
             isFrozen = IsAppFrozen(pid);
-            WIFI_LOGD("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
-                %{public}d", uid, pid, isFrozen);
+            WIFI_LOGD("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
+                uid, pid, isFrozen);
 #endif
             if (mScanCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGD("Not registered callback event! msg.msgCode: %{public}d,"
@@ -701,8 +701,8 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
             int uid = mStaCallBackInfo[msg.id][remote].callingUid;
             int pid = mStaCallBackInfo[msg.id][remote].callingPid;
             isFrozen = IsAppFrozen(pid);
-            WIFI_LOGD("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
-                %{public}d", uid, pid, isFrozen);
+            WIFI_LOGD("Check calling APP is hardwareProxied,"
+                "uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d", uid, pid, isFrozen);
 #endif
             if (mStaCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGD("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode: %{public}d,"
@@ -888,8 +888,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 if ((pid != 0) && (uid != 0)) {
                     std::vector<WifiP2pDevice> deviceVec = msg.device;
-                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) ==
-                        PERMISSION_DENIED) {
+                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
                         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
                             __func__, pid, uid);
                         updateP2pDeviceMacAddress(deviceVec);

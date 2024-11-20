@@ -304,18 +304,18 @@ typedef enum HdiPortType {
 } HdiPortType;
 
 typedef enum {
-    PROTOCOL_80211_IFTYPE_UNSPECIFIED, /**< Unspecified type */
-    PROTOCOL_80211_IFTYPE_ADHOC,       /**< Ad hoc network */
-    PROTOCOL_80211_IFTYPE_STATION,     /**< Station */
-    PROTOCOL_80211_IFTYPE_AP,          /**< Access point (AP) */
-    PROTOCOL_80211_IFTYPE_AP_VLAN,     /**< Virtual AP */
-    PROTOCOL_80211_IFTYPE_WDS,         /**< Wireless distributed system */
-    PROTOCOL_80211_IFTYPE_MONITOR,     /**< Listening */
-    PROTOCOL_80211_IFTYPE_MESH_POINT,  /**< Mesh network */
-    PROTOCOL_80211_IFTYPE_P2P_CLIENT,  /**< P2P client */
-    PROTOCOL_80211_IFTYPE_P2P_GO,      /**< P2P group owner */
-    PROTOCOL_80211_IFTYPE_P2P_DEVICE,  /**< P2P device */
-    PROTOCOL_80211_IFTYPE_NUM,         /**< Number of network ports */
+    PROTOCOL_80211_IFTYPE_UNSPECIFIED,
+    PROTOCOL_80211_IFTYPE_ADHOC,
+    PROTOCOL_80211_IFTYPE_STATION,
+    PROTOCOL_80211_IFTYPE_AP,
+    PROTOCOL_80211_IFTYPE_AP_VLAN,
+    PROTOCOL_80211_IFTYPE_WDS,
+    PROTOCOL_80211_IFTYPE_MONITOR,
+    PROTOCOL_80211_IFTYPE_MESH_POINT,
+    PROTOCOL_80211_IFTYPE_P2P_CLIENT,
+    PROTOCOL_80211_IFTYPE_P2P_GO,
+    PROTOCOL_80211_IFTYPE_P2P_DEVICE,
+    PROTOCOL_80211_IFTYPE_NUM,
 } FeatureType;
 #ifdef __cplusplus
 }

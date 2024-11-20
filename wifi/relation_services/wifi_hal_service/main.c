@@ -29,6 +29,7 @@
 #include "wifi_hostapd_hal.h"
 #include "wifi_log.h"
 #include "wifi_hal_module_manage.h"
+
 #undef LOG_TAG
 #define LOG_TAG "WifiHalService"
 
@@ -73,8 +74,7 @@ pid_t GetPID(const char *pidFile)
 void StopProcess(void)
 {
     char pidFile[DIR_MAX_LENGTH] = {0, };
-    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid",
-        CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
+    int n = snprintf_s(pidFile, DIR_MAX_LENGTH, DIR_MAX_LENGTH - 1, "%s/%s.pid", CONFIG_ROOR_DIR, WIFI_MANAGGER_PID_NAME);
     if (n < 0) {
         LOGE("InitPidfile: construct pidFile name failed.");
         return;

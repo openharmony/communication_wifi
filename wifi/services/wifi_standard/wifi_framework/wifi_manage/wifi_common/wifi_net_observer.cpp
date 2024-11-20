@@ -70,7 +70,7 @@ void NetStateObserver::StopNetStateObserver(sptr<NetStateObserver> &netStateObse
 int32_t NetStateObserver::OnNetDetectionResultChanged(
     NetManagerStandard::NetDetectionResultCode detectionResult, const std::string &urlRedirect)
 {
-    WIFI_LOGD("OnNetDetectionResultChanged nettype:%{public}d, url:%{private}s", detectionResult, urlRedirect.c_str());
+    WIFI_LOGD("OnNetDetectionResultChanged nettype:%{private}d, url:%{private}s", detectionResult, urlRedirect.c_str());
     switch (detectionResult) {
         case NetManagerStandard::NET_DETECTION_CAPTIVE_PORTAL: {
             m_callback(SystemNetWorkState::NETWORK_IS_PORTAL, urlRedirect);

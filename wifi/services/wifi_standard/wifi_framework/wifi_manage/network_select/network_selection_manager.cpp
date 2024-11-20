@@ -84,16 +84,17 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
             wifiDeviceConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
             continue;
         }
+
+        // add suggesion network
+        WifiSettings::GetInstance().GetCandidateConfigWithoutUid(scanInfo.ssid, deviceKeyMgmt,
+            networkCandidate.wifiDeviceConfig);
+        if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID &&
+            networkCandidates.back().wifiDeviceConfig.uid != WIFI_INVALID_UID &&
+            networkCandidates.back().wifiDeviceConfig.isShared == false) {
+            wifiCandidateConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
+        }
     }
 
-    // add suggesion network
-    WifiSettings::GetInstance().GetCandidateConfigWithoutUid(scanInfo.ssid, deviceKeyMgmt,
-        networkCandidate.wifiDeviceConfig);
-    if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID &&
-        networkCandidates.back().wifiDeviceConfig.uid != WIFI_INVALID_UID &&
-        networkCandidates.back().wifiDeviceConfig.isShared == IS_SUGGESTION_NETWORK) {
-        wifiCandidateConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
-    }
     std::stringstream wifiDevicesInfo;
     for (auto &pair: wifiDeviceConfigs) {
         if (wifiDevicesInfo.rdbuf() ->in_avail() != 0) {

@@ -683,8 +683,9 @@ bool P2pEnabledState::ProcessChrReport(InternalMessagePtr msg) const
 {
     int errCode = msg->GetParam1();
     WIFI_LOGI("P2pEnabledState receive chr error code %{public}d", errCode);
-    deviceManager.GetThisDevice().SetChrErrCode(static_cast<P2pChrEvent>(errCode));
-    p2pStateMachine.BroadcastThisDeviceChanaged(deviceManager.GetThisDevice());
+    WifiP2pDevice device = deviceManager.GetThisDevice();
+    device.SetChrErrCode(static_cast<P2pChrEvent>(errCode));
+    p2pStateMachine.BroadcastThisDeviceChanaged(device);
     return EXECUTED;
 }
 } // namespace Wifi

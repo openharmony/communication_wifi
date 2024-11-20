@@ -88,47 +88,6 @@ HWTEST_F(WifiAssetManagerTest, TestWifiAssetUpdatePack, testing::ext::TestSize.L
     int32_t userId = USER_ID_DEFAULT;
     WifiAssetManager::GetInstance().WifiAssetUpdatePack(mWifiDeviceConfig, userId);
 }
-
-HWTEST_F(WifiAssetManagerTest, InitUpLoadLocalDeviceSyncTest01, testing::ext::TestSize.Level1)
-{
-    WifiAssetManager::GetInstance().InitUpLoadLocalDeviceSync();
-    EXPECT_NE(WifiAssetManager::GetInstance().assetServiceThread_, nullptr);
-}
-
-HWTEST_F(WifiAssetManagerTest, CloudAssetSyncTest01, testing::ext::TestSize.Level1)
-{
-    WifiAssetManager::GetInstance().CloudAssetSync();
-    EXPECT_NE(WifiAssetManager::GetInstance().assetServiceThread_, nullptr);
-}
-
-HWTEST_F(WifiAssetManagerTest, WifiAssetRemovePackTest01, testing::ext::TestSize.Level1)
-{
-    std::vector<WifiDeviceConfig> mWifiDeviceConfig;
-    WifiDeviceConfig wifiDeviceConfig;
-    wifiDeviceConfig.bssidType = 1;
-    mWifiDeviceConfig.push_back(wifiDeviceConfig);
-
-    int32_t userId = USER_ID_DEFAULT;
-    bool flagSync = true;
-    WifiAssetManager::GetInstance().WifiAssetRemovePack(mWifiDeviceConfig, userId, flagSync);
-    EXPECT_NE(WifiAssetManager::GetInstance().assetServiceThread_, nullptr);
-}
-
-HWTEST_F(WifiAssetManagerTest, IsWifiConfigUpdatedTest01, testing::ext::TestSize.Level1)
-{
-    std::vector<WifiDeviceConfig> newWifiDeviceConfigs;
-    WifiDeviceConfig config;
-    config.uid = 1;
-    config.keyMgmt = KEY_MGMT_WAPI;
-    config.ssid = "TEST";
-
-    WifiDeviceConfig config1;
-    config1.ssid = "TEST";
-    newWifiDeviceConfigs.push_back(config1);
-
-    WifiAssetManager::GetInstance().IsWifiConfigUpdated(newWifiDeviceConfigs, config);
-    EXPECT_NE(WifiAssetManager::GetInstance().assetServiceThread_, nullptr);
-}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

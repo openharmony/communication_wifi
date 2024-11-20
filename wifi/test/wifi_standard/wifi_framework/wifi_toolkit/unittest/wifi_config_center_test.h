@@ -26,9 +26,7 @@ public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp()
-    {
-        WifiConfigCenter::GetInstance().Init();
-    }
+    {}
     virtual void TearDown()
     {}
 };

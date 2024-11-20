@@ -37,7 +37,6 @@ public:
 class BlockConnectService : public MockBlockConnectService {
 public:
     BlockConnectService() = default;
-    ~BlockConnectService() override;
     static BlockConnectService &GetInstance(void);
 
     MOCK_METHOD1(ShouldAutoConnect, bool(const WifiDeviceConfig &config));

@@ -29,6 +29,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 #include "mock_wifi_sta_hal_interface.h"
+#include "mock_block_connect_service.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

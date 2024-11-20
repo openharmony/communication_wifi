@@ -1390,7 +1390,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType,
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("Get pEnhanceService service failed!");
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_GET_ENHANCE_SVC_FAILED;
     }
 
     if (pEnhanceService->Hid2dSetPeerWifiCfgInfo(cfgType, cfgData, setDataValidLen) != WIFI_OPT_SUCCESS) {
@@ -1543,7 +1543,7 @@ ErrCode WifiP2pServiceImpl::Hid2dIsWideBandwidthSupported(bool &isSupport)
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("Hid2dIsWideBandwidthSupported get pEnhanceService service failed!");
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_GET_ENHANCE_SVC_FAILED;
     }
 
     isSupport = pEnhanceService->IsWideBandwidthSupported();

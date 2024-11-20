@@ -28,6 +28,7 @@ DEFINE_WIFILOG_LABEL("StaMonitor");
 
 namespace OHOS {
 namespace Wifi {
+constexpr const char* WPA_CSA_CHANNEL_SWITCH_FREQ_PREFIX = "freq=";
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {
     WIFI_LOGI("StaMonitor constuctor insId %{public}d", instId);
@@ -331,11 +332,11 @@ void StaMonitor::OnWpaCsaChannelSwitchNotifyCallBack(const std::string &notifyPa
         return;
     }
     std::string::size_type freqPos = 0;
-    if ((freqPos = notifyParam.find("freq=")) == std::string::npos) {
+    if ((freqPos = notifyParam.find(WPA_CSA_CHANNEL_SWITCH_FREQ_PREFIX)) == std::string::npos) {
         WIFI_LOGE("%{public}s csa channel switch notifyParam not find frequency!", __FUNCTION__);
         return;
     }
-    std::string data = notifyParam.substr(freqPos + strlen("freq="));
+    std::string data = notifyParam.substr(freqPos + strlen(WPA_CSA_CHANNEL_SWITCH_FREQ_PREFIX));
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT, CheckDataLegal(data));
 }
 }  // namespace Wifi

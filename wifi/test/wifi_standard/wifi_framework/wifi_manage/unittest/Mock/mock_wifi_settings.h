@@ -204,6 +204,7 @@ public:
     virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
+    virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -376,6 +377,7 @@ public:
     MOCK_METHOD1(MergeWifiCloneConfig, void(std::string &cloneData));
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetSupportHwPnoFlag, bool(int instId));
+    MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
 };
 }  // namespace Wifi
 }  // namespace OHOS

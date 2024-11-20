@@ -157,25 +157,12 @@ void SavedNetworkTracker::GetCandidatesFromSubNetworkSelector()
     }
 }
 
-SuggestionNetworkTracker::SuggestionNetworkTracker() : CompositeNetworkSelector("suggestionNetworkTracker")
+SuggestionNetworkTracker::SuggestionNetworkTracker() : SimpleNetworkSelector("suggestionNetworkTracker")
 {
     auto andFilter = make_shared<AndWifiFilter>();
     andFilter->AddFilter(make_shared<SuggestionNetworkWifiFilter>());
     andFilter->AddFilter(make_shared<DisableWifiFilter>());
     SetWifiFilter(andFilter);
-}
- 
-bool SuggestionNetworkTracker::Nominate(NetworkCandidate &networkCandidate)
-{
-    networkCandidates.emplace_back(&networkCandidate);
-    return true;
-}
- 
-void SuggestionNetworkTracker::GetCandidatesFromSubNetworkSelector()
-{
-    for (const auto &subNetworkSelector : subNetworkSelectors) {
-        subNetworkSelector->GetBestCandidates(networkCandidates);
-    }
 }
 
 SimpleFilterNetworkSelector::SimpleFilterNetworkSelector(const std::string &networkSelectorName)

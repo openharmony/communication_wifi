@@ -87,7 +87,8 @@ SavedWifiFilter::~SavedWifiFilter()
 
 bool SavedWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return networkCandidate.wifiDeviceConfig.networkId != INVALID_NETWORK_ID;
+    return networkCandidate.wifiDeviceConfig.networkId != INVALID_NETWORK_ID &&
+        (networkCandidate.wifiDeviceConfig.uid == -1 || networkCandidate.wifiDeviceConfig.isShared == true);
 }
 
 
@@ -568,5 +569,22 @@ bool WifiSwitchThresholdFilter::Filter(NetworkCandidate &networkCandidate)
     }
 
     return true;
+}
+
+SuggestionNetworkWifiFilter::SuggestionNetworkWifiFilter() : SimpleWifiFilter("suggestionNetworkWifiFilter") {}
+ 
+SuggestionNetworkWifiFilter::~SuggestionNetworkWifiFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+ 
+bool SuggestionNetworkWifiFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    return networkCandidate.wifiDeviceConfig.uid != WIFI_INVALID_UID &&
+        networkCandidate.wifiDeviceConfig.isShared == false;
 }
 }

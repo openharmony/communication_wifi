@@ -187,5 +187,13 @@ public:
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
+
+class SuggestionNetworkWifiFilter final : public SimpleWifiFilter {
+public:
+    SuggestionNetworkWifiFilter();
+    ~SuggestionNetworkWifiFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
 }
 #endif //OHOS_WIFI_WIFI_FILTER_H

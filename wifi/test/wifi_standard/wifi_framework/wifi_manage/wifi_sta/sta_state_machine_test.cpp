@@ -29,6 +29,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 #include "mock_wifi_sta_hal_interface.h"
+#include "mock_block_connect_service.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -368,7 +369,6 @@ public:
     void DealConnectToUserSelectedNetworkSuccess()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), EnableNetwork(_, _, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
@@ -394,7 +394,6 @@ public:
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
         pStaStateMachine->linkedInfo.detailedState = DetailedState::OBTAINING_IPADDR;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), EnableNetwork(_, _, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealConnectToUserSelectedNetwork(msg);
         pStaStateMachine->DealConnectToUserSelectedNetwork(nullptr);
@@ -422,7 +421,6 @@ public:
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTING;
         pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), EnableNetwork(_, _, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         pStaStateMachine->DealConnectToUserSelectedNetwork(msg);
     }
@@ -980,7 +978,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(AtLeast(0));
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
         EXPECT_TRUE(pStaStateMachine->pWpsState->ExecuteStateMsg(msg));
@@ -1562,7 +1559,6 @@ public:
     void DealConnectionEventSuccess()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetUserLastSelectedNetworkId(_, _)).Times(testing::AtLeast(0));
@@ -1574,7 +1570,6 @@ public:
     void DealConnectionEventFail()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterConnect(_)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceState(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetUserLastSelectedNetworkId(_, _)).Times(testing::AtLeast(0));

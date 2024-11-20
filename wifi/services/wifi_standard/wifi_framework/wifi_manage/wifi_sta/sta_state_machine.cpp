@@ -1207,7 +1207,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
     }
     SetConnectMethod(connTriggerMode);
     WifiConfigCenter::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
-    WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
+    BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
 }
 
 void StaStateMachine::DealConnectTimeOutCmd(InternalMessagePtr msg)
@@ -3644,8 +3644,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
     }
     WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
-    WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
-        static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
+    BlockConnectService::GetInstance().EnableNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);

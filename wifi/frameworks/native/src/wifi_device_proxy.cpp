@@ -1808,7 +1808,6 @@ ErrCode WifiDeviceProxy::ResetAllFrozenApp()
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data;
     MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);

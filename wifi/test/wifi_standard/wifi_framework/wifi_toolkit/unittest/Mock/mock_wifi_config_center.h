@@ -152,8 +152,6 @@ public:
         const std::string &randomAddr) = 0;
     virtual std::string GetP2pIfaceName() = 0;
     virtual int GetScanGenieState() const = 0;
-    virtual int Init() = 0;
-    virtual void SetFreezeModeState(int state) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -286,8 +284,6 @@ public:
         const std::string &randomAddr));
     MOCK_METHOD0(GetP2pIfaceName, std::string());
     MOCK_CONST_METHOD0(GetScanGenieState, int());
-    MOCK_METHOD0(Init, int());
-    MOCK_METHOD1(SetFreezeModeState, void(int state));
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

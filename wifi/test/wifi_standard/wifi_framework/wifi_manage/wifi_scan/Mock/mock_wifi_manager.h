@@ -54,9 +54,6 @@ public:
     virtual void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0) = 0;
     virtual void PushServiceCloseMsg(WifiCloseServiceCode code, int instId = 0);
     virtual void AutoStartEnhanceService(void) = 0;
-#ifdef FEATURE_HPF_SUPPORT
-    virtual void InstallPacketFilterProgram(int event = 0, int instId = 0) = 0;
-#endif
 };
 
 class WifiManager : public MockWifiManager {
@@ -73,9 +70,6 @@ public:
     MOCK_METHOD2(DealStoreScanInfoEvent, void(std::vector<InterScanInfo> &results, int));
     MOCK_METHOD2(PushServiceCloseMsg, void(WifiCloseServiceCode, int));
     MOCK_METHOD0(AutoStartEnhanceService, void());
-#ifdef FEATURE_HPF_SUPPORT
-    MOCK_METHOD2(InstallPacketFilterProgram, void(int event, int instId));
-#endif
     std::unique_ptr<WifiStaManager>& GetWifiStaManager();
     std::unique_ptr<WifiScanManager>& GetWifiScanManager();
     std::unique_ptr<WifiTogglerManager>& GetWifiTogglerManager();

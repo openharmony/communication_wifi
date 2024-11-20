@@ -26,6 +26,7 @@
 #include "sta_device_appraisal.h"
 #include "wifi_native_struct.h"
 #include "wifi_error_no.h"
+#include "mock_block_connect_service.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

@@ -160,6 +160,7 @@ if (defined(ohos_lite)) {
       "dhcp:dhcp_sdk",
       "dhcp:dhcp_utils",
       "eventhandler:libeventhandler",
+      "icu:shared_icuuc",
       "hilog:libhilog",
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",

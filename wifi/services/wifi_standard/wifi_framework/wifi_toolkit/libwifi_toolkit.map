@@ -206,14 +206,13 @@
         "OHOS::Wifi::WifiConfigCenter::GetThreadStatusFlag() const";
         "OHOS::Wifi::WifiConfigCenter::GetThreadStartTime() const";
         "OHOS::Wifi::WifiConfigCenter::GetRandomMacAddr(OHOS::Wifi::WifiMacAddrInfoType, std::string)";
-        "OHOS::Wifi::WifiConfigCenter::RemoveMacAddrPairs(OHOS::Wifi::WifiMacAddrInfoType, OHOS::Wifi::WifiMacAddrInfo const&)";
         "OHOS::Wifi::WifiConfigCenter::GetMacAddrPairs(OHOS::Wifi::WifiMacAddrInfoType, OHOS::Wifi::WifiMacAddrInfo const&)";
         "OHOS::Wifi::WifiConfigCenter::ClearMacAddrPairs(OHOS::Wifi::WifiMacAddrInfoType)";
         "OHOS::Wifi::WifiConfigCenter::GetAllWifiLinkedNetworkId()";
         "OHOS::Wifi::WifiConfigCenter::SetPersistWifiState(int, int)";
         "OHOS::Wifi::WifiConfigCenter::GetPersistWifiState(int)";
         "OHOS::Wifi::WifiConfigCenter::HasWifiActive()";
-        "OHOS::Wifi::WifiConfigCenter::RemoveMacAddrPairInfo(OHOS::Wifi::WifiMacAddrInfoType, std::string)";
+        "OHOS::Wifi::WifiConfigCenter::RemoveMacAddrPairInfo(OHOS::Wifi::WifiMacAddrInfoType, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, int)";
         "OHOS::Wifi::WifiConfigCenter::UpdateLinkedInfo(int)";
         "OHOS::Wifi::WifiConfigCenter::InsertWifiCategoryBlackListCache(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryBlackListInfo)";
         "OHOS::Wifi::WifiConfigCenter::GetWifiCategoryBlackListCache(int, std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryBlackListInfo, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, OHOS::Wifi::WifiCategoryBlackListInfo>>>&)";

@@ -304,8 +304,6 @@ public:
 
     std::string GetRandomMacAddr(WifiMacAddrInfoType type, std::string bssid);
 
-    int RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
-
     std::string GetMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
 
     void ClearMacAddrPairs(WifiMacAddrInfoType type);
@@ -318,7 +316,7 @@ public:
 
     bool HasWifiActive();
 
-    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
+    void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid, int bssidType);
 
     void UpdateLinkedInfo(int instId = 0);
 
@@ -334,6 +332,7 @@ private:
     void DelMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap, const WifiMacAddrInfo &macAddrInfo);
     WifiMacAddrErrCode AddMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo,
         std::string randomMacAddr);
+    int RemoveMacAddrPairs(WifiMacAddrInfoType type, const WifiMacAddrInfo &macAddrInfo);
 
 private:
     // STA

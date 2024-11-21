@@ -755,15 +755,7 @@ int WifiConfigCenter::ManageStation(const StationInfo &info, int mode, int id)
             mConnectStationInfo.erase(iter);
         }
 #ifdef SUPPORT_RANDOM_MAC_ADDR
-        WifiMacAddrInfo randomMacAddrInfo;
-        randomMacAddrInfo.bssid = info.bssid;
-        randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
-        RemoveMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, randomMacAddrInfo);
-
-        WifiMacAddrInfo realMacAddrInfo;
-        realMacAddrInfo.bssid = info.bssid;
-        realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;
-        RemoveMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, realMacAddrInfo);
+        RemoveMacAddrPairInfo(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, info.bssid, info.bssidType);
 #endif
     } else {
         return -1;
@@ -1340,19 +1332,19 @@ void WifiConfigCenter::DelMacAddrPairs(std::map<WifiMacAddrInfo, std::string>& m
     }
 }
 
-void WifiConfigCenter::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid)
+void WifiConfigCenter::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid, int bssidType)
 {
     LOGD("%{public}s: remove a mac address pair, type:%{public}d, bssid:%{private}s",
         __func__, type, bssid.c_str());
+    WifiMacAddrInfo randomMacAddrInfo;
+    randomMacAddrInfo.bssid = GetRandomMacAddr(type, bssid);
+    randomMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS == bssidType ? RANDOM_DEVICE_ADDRESS : REAL_DEVICE_ADDRESS;
+    RemoveMacAddrPairs(type, randomMacAddrInfo);
+
     WifiMacAddrInfo realMacAddrInfo;
     realMacAddrInfo.bssid = bssid;
-    realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS;
+    realMacAddrInfo.bssidType = REAL_DEVICE_ADDRESS == bssidType ? REAL_DEVICE_ADDRESS : RANDOM_DEVICE_ADDRESS;
     RemoveMacAddrPairs(type, realMacAddrInfo);
-
-    WifiMacAddrInfo randomMacAddrInfo;
-    randomMacAddrInfo.bssid = bssid;
-    randomMacAddrInfo.bssidType = RANDOM_DEVICE_ADDRESS;
-    RemoveMacAddrPairs(type, randomMacAddrInfo);
 }
 
 WifiMacAddrErrCode WifiConfigCenter::AddMacAddrPairs(WifiMacAddrInfoType type,

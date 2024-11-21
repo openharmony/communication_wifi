@@ -809,5 +809,25 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
         g_eventRegisterInfo.erase(iter);
     }
 }
+
+void EventRegister::CleanUp(void *data)
+{
+    std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
+    auto env = *(reinterpret_cast<napi_env*>(data));
+    for (auto &event : g_eventRegisterInfo) {
+        auto &vecRegObjs = event.second;
+        auto iter = vecRegObjs.begin();
+        for (; iter != vecRegObjs.end();) {
+            if (env == iter->m_regEnv) {
+                napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
+                iter = vecRegObjs.erase(iter);
+            } else {
+                ++iter;
+            }
+        }
+    }
+    delete reinterpret_cast<napi_env*>(data);
+    data = nullptr;
+}
 }  // namespace Wifi
 }  // namespace OHOS

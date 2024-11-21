@@ -143,6 +143,7 @@ public:
     }
 
     static EventRegister& GetInstance();
+    static void CleanUp(void *data);
 
     void Register(const napi_env& env, const std::string& type, napi_value handler);
     void Unregister(const napi_env& env, const std::string& type, napi_value handler);

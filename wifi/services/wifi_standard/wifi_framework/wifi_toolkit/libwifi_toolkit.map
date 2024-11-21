@@ -274,7 +274,6 @@
         "OHOS::Wifi::WifiSettings::AddWpsDeviceConfig(OHOS::Wifi::WifiDeviceConfig const&)";
         "OHOS::Wifi::WifiSettings::OnRestore(OHOS::UniqueFdAddDeletor<OHOS::DefaultDeleter>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiSettings::OnBackup(OHOS::UniqueFdAddDeletor<OHOS::DefaultDeleter>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
-        "OHOS::Wifi::WifiSettings::MergeWifiCloneConfig(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::WifiSettings::SetBackupReplyCode(int)";
         "OHOS::Wifi::WifiSettings::RemoveBackupFile()";
         "OHOS::Wifi::WifiSettings::AddRandomMac(OHOS::Wifi::WifiStoreRandomMac&)";

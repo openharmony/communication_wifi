@@ -202,7 +202,6 @@ public:
     virtual int GetHotspotState(int id = 0) = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
-    virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
@@ -376,7 +375,6 @@ public:
     MOCK_METHOD1(GetHotspotState, int(int id));
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
     MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int));
-    MOCK_METHOD1(MergeWifiCloneConfig, void(std::string &cloneData));
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetSupportHwPnoFlag, bool(int instId));
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));

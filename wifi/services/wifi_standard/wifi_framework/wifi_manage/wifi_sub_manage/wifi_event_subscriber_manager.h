@@ -50,6 +50,7 @@ public:
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveDataShareReadyEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
 };
@@ -103,14 +104,13 @@ public:
     void GetWifiAllowSemiActiveByDatashare();
     bool GetLocationModeByDatashare();
     void DealLocationModeChangeEvent();
-    void DealCloneDataChangeEvent();
     void CheckAndStartStaByDatashare();
     bool IsMdmForbidden(void);
+    void AccessDataShare();
+    void RegisterLocationEvent();
 
 private:
-    void DelayedAccessDataShare();
     void InitSubscribeListener();
-    bool IsDataMgrServiceActive();
     void HandleAppMgrServiceChange(bool add);
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
 #ifdef HAS_MOVEMENT_PART
@@ -121,10 +121,6 @@ private:
     void HandleShareServiceChange(bool add);
     void HandleMouseCrossServiceChange(bool add);
     int GetLastStaStateByDatashare();
-    void GetCloneDataByDatashare(std::string &cloneData);
-    void SetCloneDataByDatashare(const std::string &cloneData);
-    void RegisterCloneEvent();
-    void UnRegisterCloneEvent();
     void RegisterCesEvent();
 #ifdef HAS_POWERMGR_PART
     void RegisterPowermgrEvent();
@@ -133,7 +129,6 @@ private:
     std::mutex powermgrEventMutex;
 #endif
     void UnRegisterCesEvent();
-    void RegisterLocationEvent();
     void UnRegisterLocationEvent();
     void RegisterNotificationEvent();
     void UnRegisterNotificationEvent();
@@ -156,8 +151,8 @@ private:
     void UnRegisterNetworkStateChangeEvent();
     void RegisterWifiScanChangeEvent();
     void UnRegisterWifiScanChangeEvent();
+
 private:
-    std::mutex cloneEventMutex;
     uint32_t cesTimerId{0};
     uint32_t notificationTimerId{0};
     uint32_t accessDatashareTimerId{0};
@@ -184,6 +179,9 @@ private:
     std::mutex AssetEventMutex;
     uint32_t assetMgrId{0};
 #endif
+
+    bool accessDataShare_ = false;
+    std::mutex accessDataShareMutex_;
 };
 
 }  // namespace Wifi

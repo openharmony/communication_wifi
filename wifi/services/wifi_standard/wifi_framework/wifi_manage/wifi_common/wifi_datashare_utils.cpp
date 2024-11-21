@@ -45,7 +45,7 @@ WifiDataShareHelperUtils& WifiDataShareHelperUtils::GetInstance()
     return instance;
 }
 
-bool WifiEventSubscriberManager::IsDataMgrServiceActive()
+bool WifiDataShareHelperUtils::IsDataMgrServiceActive()
 {
     sptr<ISystemAbilityManager> saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saMgr == nullptr) {
@@ -60,7 +60,7 @@ bool WifiEventSubscriberManager::IsDataMgrServiceActive()
     return true;
 }
 
-bool WifiEventSubscriberManager::CheckIfSettingsDataReady()
+bool WifiDataShareHelperUtils::CheckIfSettingsDataReady()
 {
     if (isDataShareReady_) {
         return true;
@@ -73,16 +73,16 @@ bool WifiEventSubscriberManager::CheckIfSettingsDataReady()
     auto remote = sptr<IWifiDataShareRemoteBroker>(new (std::nothrow) IRemoteStub<IWifiDataShareRemoteBroker>());
     if (remote == nullptr) {
         WIFI_LOGE("%{public}s remote is nullptr", __func__);
-        return nullptr;
+        return false;
     }
     auto remoteObj = remote->AsObject();
     if (remoteObj == nullptr) {
         WIFI_LOGE("%{public}s remoteObj_ is nullptr", __func__);
-        return nullptr;
+        return false;
     }
 
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
-        DataShare::DataShareHelper::Creator(remoteObj, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
+        DataShare::DataShareHelper::Create(remoteObj, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
     WIFI_LOGI("%{public}s create datashare helper, ret = %{public}d", __func__, ret.first);
 
     if (ret.first == E_DATA_SHARE_NOT_READY) {

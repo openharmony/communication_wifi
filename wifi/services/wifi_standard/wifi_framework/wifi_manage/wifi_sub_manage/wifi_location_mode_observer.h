@@ -28,15 +28,6 @@ public:
 
     void OnChange() override;
 };
-
-class WifiCloneModeObserver : public AAFwk::DataAbilityObserverStub {
-public:
-    WifiCloneModeObserver() = default;
-
-    ~WifiCloneModeObserver() = default;
-
-    void OnChange() override;
-};
 }
 }
 #endif

@@ -84,6 +84,12 @@ bool IpAddressChange(const std::string &interface, const BaseAddress &IpAddress,
 {
     return MockNetworkInterface::GetInstance().IpAddressChange(interface, IpAddress, Action, Dad);
 }
+
+bool FetchApOrP2pIpAddress(
+    const std::string &interfaceName, std::vector<Ipv4Address> &vecipv4, std::vector<Ipv6Address> &vecIPv6)
+{
+    return MockNetworkInterface::GetInstance().FetchApOrP2pIpAddress(interfaceName, vecipv4, vecIPv6);
+}
 } /* namespace NetworkInterface */
 
 MockNetworkInterface &MockNetworkInterface::GetInstance()

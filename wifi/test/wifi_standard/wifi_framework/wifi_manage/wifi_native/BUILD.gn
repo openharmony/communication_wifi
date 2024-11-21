@@ -65,6 +65,7 @@ ohos_unittest("wifi_native_test") {
     "$HDI_ROOT_DIR/wifi_framework/wifi_manage/wifi_native/client/hdi_client/wifi_hdi_wpa_client.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_msg.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
     "Mock/mock_wpa_suppliant.cpp",
     "client/hdi_client/hdi_interface/global_test.cpp",
     "client/hdi_client/hdi_interface/mock_wifi_hdi_wpa_ap_impl.cpp",

@@ -155,7 +155,6 @@ private:
 private:
     uint32_t cesTimerId{0};
     uint32_t notificationTimerId{0};
-    uint32_t accessDatashareTimerId{0};
     uint32_t networkStateChangeTimerId{0};
     uint32_t wifiScanChangeTimerId{0};
     std::mutex cesEventMutex;

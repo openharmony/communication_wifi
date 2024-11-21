@@ -989,6 +989,9 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_COM_STA_ENABLE_HILINK] = [this](InternalMessagePtr msg) {
         return this->DealHiLinkDataToWpa(msg);
     };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealCsaChannelChanged(msg);
+    };
     staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_DELIVER_MAC] = [this](InternalMessagePtr msg) {
         return this->DealHiLinkDataToWpa(msg);
     };
@@ -3885,6 +3888,19 @@ void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
     }
  
     return;
+}
+
+void StaStateMachine::DealCsaChannelChanged(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        LOGE("%{public}s InternalMessage msg is null", __FUNCTION__);
+        return;
+    }
+    int newFreq = msg->GetParam1();
+    WIFI_LOGI("%{public}s update freq from %{public}d to %{public}d", __FUNCTION__, linkedInfo.frequency, newFreq);
+    linkedInfo.frequency = newFreq;
+    // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
+    InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
 }
 /* --------------------------- state machine Roaming State ------------------------------ */
 StaStateMachine::ApRoamingState::ApRoamingState(StaStateMachine *staStateMachine)

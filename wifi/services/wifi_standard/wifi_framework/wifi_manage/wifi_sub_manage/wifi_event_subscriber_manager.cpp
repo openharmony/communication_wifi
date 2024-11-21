@@ -738,9 +738,9 @@ void CesEventSubscriber::OnReceiveDataShareReadyEvent(const OHOS::EventFwk::Comm
 {
     const auto &action = eventData.GetWant().GetAction();
     WIFI_LOGI("OnReceiveDataShareReadyEvent action[%{public}s]", action.c_str());
-    if (WifiManager::GetInstance.GetWifiEventSubscriberManager()) {
-        WifiManager::GetInstance.GetWifiEventSubscriberManager()->AccessDataShare();
-        WifiManager::GetInstance.GetWifiEventSubscriberManager()->RegisterLocationEvent();
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()) {
+        WifiManager::GetInstance().GetWifiEventSubscriberManager()->AccessDataShare();
+        WifiManager::GetInstance().GetWifiEventSubscriberManager()->RegisterLocationEvent();
     }
 }
 

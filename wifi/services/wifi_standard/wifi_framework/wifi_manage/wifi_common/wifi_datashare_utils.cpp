@@ -101,7 +101,7 @@ bool WifiDataShareHelperUtils::CheckIfSettingsDataReady()
 std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreateDataShareHelper(bool onlySettingsData)
 {
     if (!CheckIfSettingsDataReady()) {
-        WIFI_LOGE("%{public}s datashare not ready", __func__);
+        WIFI_LOGE("%{public}s datashare not ready.", __func__);
         return nullptr;
     }
 

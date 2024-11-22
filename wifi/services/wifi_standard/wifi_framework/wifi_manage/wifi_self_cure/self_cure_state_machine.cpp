@@ -481,6 +481,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
         WIFI_LOGI("current network do not need selfcure");
         return;
     }
+
     if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
         WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
         return;
@@ -503,9 +504,6 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
     }
     if (!pSelfCureStateMachine->staticIpCureSuccess && msg->GetParam2() == 1) {
         if (hasInternetRecently || portalUnthenEver || pSelfCureStateMachine->internetUnknown) {
-            if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
-                return;
-            }
             pSelfCureStateMachine->selfCureReason = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
             TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
             return;
@@ -1728,6 +1726,9 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
     pSelfCureStateMachine->selfCureOnGoing = false;
     pSelfCureStateMachine->useWithRandMacAddress = 0;
     pSelfCureStateMachine->SetIsReassocWithFactoryMacAddress(0);
+    if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
+        return;
+    }
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE, WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
     return;
 }

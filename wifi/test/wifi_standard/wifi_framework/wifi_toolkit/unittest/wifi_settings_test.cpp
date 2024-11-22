@@ -335,13 +335,6 @@ HWTEST_F(WifiSettingsTest, MergeSoftapConfigTest, TestSize.Level1)
     WifiSettings::GetInstance().MergeSoftapConfig();
 }
 
-HWTEST_F(WifiSettingsTest, MergeWifiCloneConfigTest, TestSize.Level1)
-{
-    WIFI_LOGI("MergeWifiCloneConfigTest enter");
-    std::string cloneConfig = "wifitest";
-    WifiSettings::GetInstance().MergeWifiCloneConfig(cloneConfig);
-}
-
 HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)
 {
     WIFI_LOGI("ConfigsDeduplicateAndSaveTest enter");

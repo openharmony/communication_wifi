@@ -45,6 +45,7 @@ public:
 
     static void TearDownTestCase()
     {
+        sleep(1);
         WifiManager::GetInstance().Exit();
     }
 

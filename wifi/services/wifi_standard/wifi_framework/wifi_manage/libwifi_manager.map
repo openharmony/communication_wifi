@@ -85,7 +85,6 @@
         "OHOS::Wifi::WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::GetLocationModeByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::DealLocationModeChangeEvent()";
-        "OHOS::Wifi::WifiEventSubscriberManager::DealCloneDataChangeEvent()";
         "OHOS::Wifi::WifiEventSubscriberManager::CheckAndStartStaByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::IsMdmForbidden()";
         "OHOS::Wifi::WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, bool add) override";
@@ -94,7 +93,6 @@
         "OHOS::Wifi::WifiHotspotManager::StartUnloadApSaTimer()";
         "OHOS::Wifi::WifiHotspotManager::CloseApService(int)";
         "OHOS::Wifi::WifiLocationModeObserver::OnChange() override";
-        "OHOS::Wifi::WifiCloneModeObserver::OnChange() override";
         "OHOS::Wifi::WifiMultiVapManager::CheckCanConnectDevice()";
         "OHOS::Wifi::WifiMultiVapManager::CheckCanUseP2p()";
         "OHOS::Wifi::WifiMultiVapManager::CheckCanUseSoftAp()";

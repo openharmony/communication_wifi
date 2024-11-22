@@ -281,13 +281,13 @@ public:
     int GetScanOnlySwitchState(int instId = 0);
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
-
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
         const std::set<int> &wifiLinkedNetworkIds);
 
     void UpLoadLocalDeviceConfigToCloud();
 #endif
+    bool GetConfigValueByName(const std::string &name, std::string &value);
 
 private:
     WifiSettings();

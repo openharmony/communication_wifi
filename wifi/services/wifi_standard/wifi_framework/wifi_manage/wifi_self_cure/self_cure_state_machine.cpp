@@ -529,11 +529,11 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleDnsFailedMonitor(Interna
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
     WIFI_LOGD("HandleInternetFailedDetected, wifi has no internet when connected.");
-    if (pSelfCureStateMachine->IsCustNetworkSelfCure()) {
-        WIFI_LOGI("current network do not need selfcure");
+    if (pSelfCureStateMachine->IsCustNetworkSelfCure() || pSelfCureStateMachine->isInternetFailureDetected_) {
+        WIFI_LOGI("do not need selfcure, %{public}d", pSelfCureStateMachine->isInternetFailureDetected_);
         return;
     }
-
+    pSelfCureStateMachine->isInternetFailureDetected_ = true;
     if (!pSelfCureStateMachine->IsSuppOnCompletedState()) {
         WIFI_LOGI("%{public}s: Wifi connection not completed", __FUNCTION__);
         return;
@@ -630,6 +630,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::GoInState()
     pSelfCureStateMachine->noAutoConnCounter = 0;
     pSelfCureStateMachine->noAutoConnReason = -1;
     pSelfCureStateMachine->connectedTime = 0;
+    pSelfCureStateMachine->isInternetFailureDetected_ = false;
     pSelfCureStateMachine->ClearDhcpOffer();
     return;
 }
@@ -964,6 +965,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleInternetRecoveryConfirm(
     pSelfCureStateMachine->UpdateSelfCureConnectHistoryInfo(selfCureHistoryInfo, currentSelfCureLevel, true);
     bool success = ConfirmInternetSelfCure(currentSelfCureLevel);
     if (success) {
+        pSelfCureStateMachine->isInternetFailureDetected_ = false;
         currentSelfCureLevel = WIFI_CURE_RESET_LEVEL_IDLE;
         selfCureFailedCounter = 0;
         hasInternetRecently = true;
@@ -3535,6 +3537,7 @@ void SelfCureStateMachine::ResetSelfCureParam()
 {
     selfCureNetworkLastState_ = DetailedState::IDLE;
     selfCureWifiLastState_ = WifiState::UNKNOWN;
+    selfCureState_ = SelfCureState::SCE_WIFI_INVALID_STATE;
     connectNetworkRetryCnt = 0;
     WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
     StopTimer(WIFI_CURE_RESET_OFF_TIMEOUT);

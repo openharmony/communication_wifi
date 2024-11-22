@@ -46,6 +46,7 @@ using OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams;
 using OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult;
 using IfaceDestoryCallback = std::function<void(std::string&, int)>;
 using RssiReportCallback = std::function<void(int, int)>;
+using NetlinkReportCallback = std::function<void(int, const std::vector<uint8_t>&)>;
 
 constexpr IfaceType IFACE_TYPE_DEFAULT = (IfaceType)255;
 const std::vector<IfaceType> IFACE_TYPES_BY_PRIORITY = {IfaceType::AP, IfaceType::STA, IfaceType::P2P};
@@ -201,7 +202,7 @@ public:
      * @return bool
      */
     bool CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback, const RssiReportCallback &rssiReportCallback,
-        std::string &ifaceName, int instId);
+        const NetlinkReportCallback &netlinkReportCallback, std::string &ifaceName, int instId);
 
     /**
      * @Description create ap iface

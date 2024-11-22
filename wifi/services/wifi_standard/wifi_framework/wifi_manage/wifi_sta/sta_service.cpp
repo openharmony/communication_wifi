@@ -38,7 +38,6 @@ DEFINE_WIFILOG_LABEL("StaService");
 namespace OHOS {
 namespace Wifi {
 
-constexpr const char *ANCO_SERVICE_BROKER = "anco_service_broker";
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 
 #define EAP_AUTH_IMSI_MCC_POS 0
@@ -230,9 +229,10 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
 
     if (config.keyMgmt == KEY_MGMT_WEP) {
 #ifndef OHOS_ARCH_LITE
-        const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+        std::string wifiBrokerFrameProcessName = "";
+        bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-        if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+        if (!success || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
             LOGE("AddCandidateConfig unsupport wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
         }
@@ -503,9 +503,10 @@ ErrCode StaService::RemoveDevice(int networkId) const
     WifiSettings::GetInstance().SyncDeviceConfig();
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
 #ifndef OHOS_ARCH_LITE
-    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string wifiBrokerFrameProcessName = "";
+    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+    if (success && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;
     } else {
         config.callProcessName = "";
@@ -535,9 +536,10 @@ ErrCode StaService::RemoveAllDevice() const
 #ifndef OHOS_ARCH_LITE
     WifiDeviceConfig config;
     config.networkId = REMOVE_ALL_DEVICECONFIG;
-    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string wifiBrokerFrameProcessName = "";
+    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+    if (success && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;
     } else {
         config.callProcessName = "";
@@ -706,9 +708,10 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
         LOGI("AutoConnectService: p2p or hml connected, and hotspot is enable");
         return WIFI_OPT_FAILED;
     }
-    const std::string wifiBrokerFrameProcessName = ANCO_SERVICE_BROKER;
+    std::string wifiBrokerFrameProcessName = "";
+    bool success = WifiSettings::GetInstance().GetConfigValueByName("anco_broker_name", wifiBrokerFrameProcessName);
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+    if (success && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
         WIFI_LOGD("StaService %{public}s, anco, %{public}d", __func__, m_instId);
     } else {

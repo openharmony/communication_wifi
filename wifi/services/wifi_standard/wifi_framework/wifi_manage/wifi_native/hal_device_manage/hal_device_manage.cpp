@@ -124,7 +124,9 @@ void HalDeviceManager::StopChipHdi()
 }
 
 bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback,
-                                      const RssiReportCallback &rssiReportCallback, std::string &ifaceName, int instId)
+                                      const RssiReportCallback &rssiReportCallback,
+                                      const NetlinkReportCallback &netlinkReportCallback, std::string &ifaceName,
+                                      int instId)
 {
     LOGI("CreateStaIface, ifaceName: %{public}s, instId = %{public}d", ifaceName.c_str(), instId);
     if (!CheckReloadChipHdiService()) {
@@ -148,6 +150,7 @@ bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCa
             return false;
         }
         g_rssiReportCallback = rssiReportCallback;
+        g_netlinkReportCallback = netlinkReportCallback;
     } else {
         LOGE("CreateStaIface wlan1 skip scan callback instId = %{public}d", instId);
     }
@@ -1529,6 +1532,7 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
                     iface->UnRegisterChipIfaceCallBack(g_chipIfaceCallback);
                 }
                 g_rssiReportCallback = nullptr;
+                g_netlinkReportCallback = nullptr;
             }
             ret = chip->RemoveStaService(ifaceName);
             break;
@@ -1613,6 +1617,11 @@ int32_t ChipIfaceCallback::OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c
 
 int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector<uint8_t>& recvMsg)
 {
+    LOGI("OnWifiNetlinkMessage, type:%{public}d", type);
+
+    if (g_netlinkReportCallback) {
+        g_netlinkReportCallback(type, recvMsg);
+    }
     return 0;
 }
 

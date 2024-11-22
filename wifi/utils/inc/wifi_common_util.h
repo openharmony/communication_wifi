@@ -214,6 +214,15 @@ std::string GetBundleAppIdByBundleName(const int userId, const std::string &bund
 ErrCode GetBundleNameByUid(const int uid, std::string &bundleName);
 
 /**
+ * @Description get bundle name by uid
+ *
+ * @param int - uid
+ * @param std::vector<std::string> - bundle name list
+ * @return ErrCode - operation result
+ */
+ErrCode GetAllBundleName(std::vector<std::string> &bundleNameList);
+
+/**
  * @Description get calling pid
  *
  * @return int - calling pid

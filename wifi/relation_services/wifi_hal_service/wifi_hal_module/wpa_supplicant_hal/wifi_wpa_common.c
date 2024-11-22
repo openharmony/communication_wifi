@@ -160,12 +160,10 @@ int InitWpaCtrl(WpaCtrl *pCtrl, const char *ifname)
 int WpaCliCmd(const char *cmd, char *buf, size_t bufLen)
 {
     if (cmd == NULL || buf == NULL || bufLen <= 0) {
-        LOGE("WpaCliCmd, invalid parameters!");
         return -1;
     }
     WpaCtrl *ctrl = GetWpaCtrl();
     if (ctrl == NULL || ctrl->pSend == NULL) {
-        LOGE("WpaCliCmd, ctrl/ctrl->pSend is NULL!");
         return -1;
     }
     size_t len = bufLen - 1;

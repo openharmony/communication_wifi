@@ -477,7 +477,6 @@ void StateMachineHandler::PlaceDelayedMsgQueueTop()
 {
     LOGD("Enter StateMachineHandler::PlaceDelayedMsgQueueTop.");
     if (mDelayedMessages.size() == 0) {
-        LOGD("StateMachineHandler::PlaceDelayedMsgQueueTop mDelayedMessages.size() is 0.");
         return;
     }
     for (int i = mDelayedMessages.size() - 1; i >= 0; i--) {
@@ -496,7 +495,6 @@ void StateMachineHandler::PlaceDelayedMsgQueueTop()
 void StateMachineHandler::ReleaseDelayedMessages()
 {
     if (mDelayedMessages.size() == 0) {
-        LOGD("StateMachineHandler::ReleaseDelayedMessages mDelayedMessages.size() is 0.");
         return;
     }
     for (int i = mDelayedMessages.size() - 1; i >= 0; i--) {

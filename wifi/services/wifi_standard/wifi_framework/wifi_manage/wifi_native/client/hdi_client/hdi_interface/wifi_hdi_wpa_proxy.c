@@ -59,8 +59,8 @@
 #define AP_IFNAME_COEX "wlan1"
 #define WIFI_DEFAULT_CFG "hostapd.conf"
 #define WIFI_COEX_CFG "hostapd_coex.conf"
-#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"wap_supplicant"WIFI_DEFAULT_CFG
-#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOR_DIR"wap_supplicant"WIFI_COEX_CFG
+#define HOSTAPD_DEFAULT_CFG CONFIG_ROOR_DIR"/wap_supplicant/"WIFI_DEFAULT_CFG
+#define HOSTAPD_DEFAULT_CFG_COEX CONFIG_ROOR_DIR"/wap_supplicant/"WIFI_COEX_CFG
 #endif
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
@@ -95,13 +95,13 @@ static bool FindifaceName(const char* ifName)
         LOGI("%{public}s err1", __func__);
         return true;
     }
-    struct IfaceNameInfo* current = g_IfaceNameInfoHead;
-    while (current != NULL) {
-        if (strncmp(current->ifName, ifName, strlen(ifName)) == 0) {
+    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
+    while (currernt != NULL) {
+        if (strncmp(currernt->ifName, ifName, strlen(ifName)) == 0) {
             LOGI("%{public}s out1", __func__);
             return true;
         }
-        current = current->next;
+        currernt = currernt->next;
     }
     LOGI("%{public}s out", __func__);
     return false;
@@ -115,33 +115,33 @@ static void AddIfaceName(const char* ifName)
         return;
     }
     struct IfaceNameInfo* pre = NULL;
-    struct IfaceNameInfo* current = g_IfaceNameInfoHead;
-    while (current != NULL) {
-        pre = current;
-        current = current->next;
+    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
+    while (currernt != NULL) {
+        pre = currernt;
+        currernt = currernt->next;
     }
-    current =(struct IfaceNameInfo*) malloc(sizeof(struct IfaceNameInfo));
-    if (current == NULL) {
+    currernt =(struct IfaceNameInfo*) malloc(sizeof(struct IfaceNameInfo));
+    if (currernt == NULL) {
         LOGI("%{public}s err2", __func__);
         return;
     }
-    if (memset_s(current->ifName, BUFF_SIZE, 0, strlen(ifName)) != EOK) {
-        free(current);
-        current = NULL;
+    if (memset_s(currernt->ifName, BUFF_SIZE, 0, strlen(ifName)) != EOK) {
+        free(currernt);
+        currernt = NULL;
         LOGI("%{public}s err4", __func__);
         return;
     }
-    current->next = NULL;
-    if (strncpy_s(current->ifName, BUFF_SIZE, ifName, strlen(ifName)) != EOK) {
-        free(current);
-        current = NULL;
+    currernt->next = NULL;
+    if (strncpy_s(currernt->ifName, BUFF_SIZE, ifName, strlen(ifName)) != EOK) {
+        free(currernt);
+        currernt = NULL;
         LOGI("%{public}s err3", __func__);
         return;
     }
     if (pre != NULL) {
-        pre->next = current;
+        pre->next = currernt;
     } else {
-        g_IfaceNameInfoHead = current;
+        g_IfaceNameInfoHead = currernt;
     }
     LOGI("%{public}s out", __func__);
     return;
@@ -154,20 +154,20 @@ static void RemoveIfaceName(const char* ifName)
         return;
     }
     struct IfaceNameInfo* pre = NULL;
-    struct IfaceNameInfo* current = g_IfaceNameInfoHead;
-    while (current != NULL) {
-        if (strncmp(current->ifName, ifName, BUFF_SIZE) != 0) {
-            pre = current;
-            current = current->next;
+    struct IfaceNameInfo* currernt = g_IfaceNameInfoHead;
+    while (currernt != NULL) {
+        if (strncmp(currernt->ifName, ifName, BUFF_SIZE) != 0) {
+            pre = currernt;
+            currernt = currernt->next;
             continue;
         }
         if (pre == NULL) {
-            g_IfaceNameInfoHead = current->next;
+            g_IfaceNameInfoHead = currernt->next;
         } else {
-            pre->next = current->next;
+            pre->next = currernt->next;
         }
-        free(current);
-        current = NULL;
+        free(currernt);
+        currernt = NULL;
     }
     LOGI("%{public}s out", __func__);
     return;
@@ -738,7 +738,7 @@ WifiErrorNo HdiApStop(int id)
 
     int32_t ret;
     if (g_apObj == NULL) {
-        LOGI("%{public}s, g_apObj is NULL", __func__);
+        LOGE("%{public}s, g_apObj is NULL", __func__);
         pthread_mutex_unlock(&g_apObjMutex);
         return WIFI_HAL_OPT_OK;
     }
@@ -831,7 +831,7 @@ void SetExecDisable(int execDisable)
 {
     g_execDisable = execDisable;
 }
-
+ 
 int GetExecDisable()
 {
     return g_execDisable;

@@ -218,7 +218,7 @@ void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const Wif
 #ifdef FEATURE_AP_SUPPORT
 void WifiCountryCodeManager::DealApStateChanged(ApState state, int id)
 {
-    WIFI_LOGD("ap state change, state=%{public}d, id=%{public}d", state, id);
+    WIFI_LOGI("ap state change, state=%{public}d, id=%{public}d", state, id);
     if (state == ApState::AP_STATE_STARTED) {
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
     } else if (state != ApState::AP_STATE_STARTING && state != ApState::AP_STATE_STARTED) {

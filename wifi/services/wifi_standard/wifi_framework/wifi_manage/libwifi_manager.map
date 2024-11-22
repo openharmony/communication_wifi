@@ -36,8 +36,6 @@
         "OHOS::Wifi::WifiTogglerManager::HasAnyApRuning()";
         "OHOS::Wifi::WifiTogglerManager::StartWifiToggledTimer()";
         "OHOS::Wifi::WifiTogglerManager::StopWifiToggledTimer()";
-        "OHOS::Wifi::WifiTogglerManager::StartSemiWifiToggledTimer()";
-        "OHOS::Wifi::WifiTogglerManager::StopSemiWifiToggledTimer()";
         "OHOS::Wifi::WifiTogglerManager::GetControllerMachine()";
         "OHOS::Wifi::WifiTogglerManager::ForceStopWifi()";
         "OHOS::Wifi::WifiTogglerManager::SatelliteToggled(int)";
@@ -45,6 +43,8 @@
         "OHOS::Wifi::WifiTogglerManager::GetConcreteCallback()";
         "OHOS::Wifi::WifiTogglerManager::GetSoftApCallback()";
         "OHOS::Wifi::WifiTogglerManager::GetMultiStaCallback()";
+        "OHOS::Wifi::WifiTogglerManager::StartSemiWifiToggledTimer()";
+        "OHOS::Wifi::WifiTogglerManager::StopSemiWifiToggledTimer()";
         "OHOS::Wifi::ConcreteClientModeManager:RegisterCallback(const ConcreteModeCallback&)";
         "OHOS::Wifi::ConcreteClientModeManager::SetRole(ConcreteManagerRole role)";
         "OHOS::Wifi::ConcreteClientModeManager::InitConcreteManager()";

@@ -136,7 +136,7 @@ public:
     virtual ErrCode RemoveAllDevice() = 0;
 
     /**
-     * @Description Set tx power for sar.
+     * @Description set tx power for sar
      *
      * @param power - tx power
      * @return ErrCode - operation result
@@ -358,7 +358,6 @@ public:
      * @Description Check if supported input feature
      *
      * @param feature - input feature
-     * @param isSupported - return true if supported, false if unsupported
      * @return ErrCode - operation result
      */
     virtual ErrCode IsFeatureSupported(long feature, bool &isSupported) = 0;
@@ -511,7 +510,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode LimitSpeed(const int controlId, const int limitMode) = 0;
-
     /**
      * @Description SetLowTxPower
      *
@@ -566,7 +564,7 @@ public:
      *
      * @param uid - target app uid
      * @param protocol - target protocol type
-     * @return enable - enable/disable dpi mark
+     * @param enable - enable/disable dpi mark
      */
     virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
 };

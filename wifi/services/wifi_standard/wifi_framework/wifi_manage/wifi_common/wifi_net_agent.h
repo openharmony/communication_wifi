@@ -73,8 +73,7 @@ public:
      * @param wifiIpV6Info wifi network link IPV6 data information
      * @param wifiProxyConfig wifi network link proxy information
      */
-    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig,
-        int instId = 0);
+    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId = 0);
 
     /**
      * Add route
@@ -92,7 +91,7 @@ public:
      * @param ipAddress IP address
      * @param prefixLength prefix length
      */
-    bool DelInterfaceAddress(const std::string interface, const std::string ipAddress, int prefixLength);
+    bool DelInterfaceAddress(const std::string &interface, const std::string &ipAddress, int prefixLength);
 
     /**
      * Add OnStaMachineUpdateNetLinkInfo

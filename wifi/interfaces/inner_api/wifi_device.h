@@ -293,9 +293,8 @@ public:
     virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) = 0;
 
     /**
-     * @Description Set wifi tx power for sar.
-     *
-     * @param power - 1001,1002,1003......
+     * @Description set tx power for sar
+     * @param power - 1001 1002 1003······
      * @return ErrCode - operation result
      */
     virtual ErrCode SetWifiTxPower(int power) = 0;
@@ -554,7 +553,7 @@ public:
      *
      * @param uid - target app uid
      * @param protocol - target protocol type
-     * @return enable - enable/disable dpi mark
+     * @param enable - enable/disable dpi mark
      */
     virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
 };

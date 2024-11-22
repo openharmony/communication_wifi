@@ -150,8 +150,6 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg
                 }
                 pWifiControllerMachine->MakeConcreteManager(roleStaWifi1, msg->GetParam2());
                 pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
-            } else {
-                WIFI_LOGE("DisableState, invalid instance id");
             }
             break;
         case CMD_AIRPLANE_TOGGLED:
@@ -994,6 +992,7 @@ void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
 #endif
 #endif
     }
+
     multiStaManagers.StopAllManagers();
     concreteManagers.StopAllManagers();
 }

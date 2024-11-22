@@ -126,7 +126,6 @@ public:
 
     /**
      * @Description set tx power for sar
-     *
      * @param power - 1001 1002 1003······
      * @return ErrCode - operation result
      */

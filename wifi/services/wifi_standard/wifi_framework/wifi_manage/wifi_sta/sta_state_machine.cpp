@@ -3498,6 +3498,7 @@ void StaStateMachine::UpdatePortalState(SystemNetWorkState netState, bool &updat
 void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std::string url)
 {
     SendMessage(WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT, netState, 0, url);
+    enhanceService_->NotifyInternetState(static_cast<int>(netState));
 }
 
 void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl)

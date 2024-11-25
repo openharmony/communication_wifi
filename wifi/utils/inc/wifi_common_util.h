@@ -216,7 +216,6 @@ ErrCode GetBundleNameByUid(const int uid, std::string &bundleName);
 /**
  * @Description get bundle name by uid
  *
- * @param int - uid
  * @param std::vector<std::string> - bundle name list
  * @return ErrCode - operation result
  */

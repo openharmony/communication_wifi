@@ -157,7 +157,6 @@ if (defined(ohos_lite)) {
       "wifi_cmd_client.cpp",
       "wifi_country_code/wifi_country_code_manager.cpp",
       "wifi_country_code/wifi_country_code_policy.cpp",
-      "wifi_datashare_utils.cpp",
       "wifi_dumper.cpp",
       "wifi_internal_event_dispatcher.cpp",
       "wifi_net_agent.cpp",

@@ -90,6 +90,14 @@ public:
     virtual bool CheckChbaConncted() = 0;
 
     /**
+     * @Description Stop Get CAC Result And Local CAC
+     *
+     * @param reason - reason
+     * @return void
+     */
+    virtual void StopGetCacResultAndLocalCac(int reason) = 0;
+
+    /**
      * @Description Is external scan allowed.
      *
      * @param scanDeviceInfo - scan device info

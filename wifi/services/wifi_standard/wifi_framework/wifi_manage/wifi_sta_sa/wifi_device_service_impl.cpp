@@ -48,9 +48,8 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
-constexpr const char *EXTENSION_SUCCESS = "wifi extension success";
-constexpr const char *EXTENSION_FAIL = "wifi extension fail";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
+constexpr int EXTENSION_ERROR_CODE = 13500099;
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
@@ -2191,13 +2190,13 @@ ErrCode WifiDeviceServiceImpl::SetSatelliteState(const int state)
 ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& reply)
 {
     UniqueFd fd(-1);
-    std::string replyCode = EXTENSION_SUCCESS;
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
     std::string backupInfo = data.ReadString();
     int ret = WifiSettings::GetInstance().OnBackup(fd, backupInfo);
     std::fill(backupInfo.begin(), backupInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnBackup fail: backup data fail!");
-        replyCode = EXTENSION_FAIL;
+        replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
     }
     if (reply.WriteFileDescriptor(fd) == false || reply.WriteString(replyCode) == false) {
         close(fd.Release());
@@ -2213,13 +2212,13 @@ ErrCode WifiDeviceServiceImpl::OnBackup(MessageParcel& data, MessageParcel& repl
 ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& reply)
 {
     UniqueFd fd(data.ReadFileDescriptor());
-    std::string replyCode = EXTENSION_SUCCESS;
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
     std::string restoreInfo = data.ReadString();
     int ret = WifiSettings::GetInstance().OnRestore(fd, restoreInfo);
     std::fill(restoreInfo.begin(), restoreInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnRestore fail: restore data fail!");
-        replyCode = EXTENSION_FAIL;
+        replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
     }
     if (reply.WriteString(replyCode) == false) {
         close(fd.Release());

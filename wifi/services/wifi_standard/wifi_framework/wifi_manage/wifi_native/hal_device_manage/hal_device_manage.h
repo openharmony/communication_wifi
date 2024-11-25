@@ -427,7 +427,7 @@ private:
         IfaceType createIfaceType);
     bool GetChip(const std::string &removeIfaceName, IfaceType removeIfaceType, sptr<IConcreteChip> &chip);
     bool RemoveIface(sptr<IChipIface> &iface, bool isCallback, IfaceType createIfaceType);
-
+    iChipIface *FindIface(const std::string &ifaceName);
     // death recipient
     static void AddChipHdiDeathRecipient();
     static void RemoveChipHdiDeathRecipient();

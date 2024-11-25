@@ -824,7 +824,7 @@ void StaStateMachine::StopWifiProcess()
     WIFI_LOGI("Stop wifi is in process... m_instId = %{public}d", m_instId);
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     isRoam = false;
-    mPortalUrl = nullptr;
+    mPortalUrl = "";
     WifiConfigCenter::GetInstance().SetMacAddress("", m_instId);
 
     ConnState curConnState = linkedInfo.connState;
@@ -1396,7 +1396,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
     }
 
     isRoam = false;
-    mPortalUrl = nullptr;
+    mPortalUrl = "";
     /* Initialize connection information. */
     std::string ssid = linkedInfo.ssid;
     InitWifiLinkedInfo();
@@ -3535,7 +3535,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         if (getCurrentWifiDeviceConfig().isPortal) {
             StartDetectTimer(DETECT_TYPE_PERIODIC);
         }
-        mPortalUrl = nullptr;
+        mPortalUrl = "";
 #ifndef OHOS_ARCH_LITE
         UpdateAcceptUnvalidatedState();
         WifiNotificationUtil::GetInstance().CancelWifiNotification(

@@ -528,14 +528,15 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddBroadCastMsg, msgcode %{public}d", msg.msgCode);
     if (!mBroadcastThread) {
-        if (msg.cfgInfo->data) {
-            delete[] msg.cfgInfo->data;
-            msg.cfgInfo->data = nullptr;
-            delete msg.cfgInfo;
-            msg.cfgInfo = nullptr;
+        CfgInfo* cfgInfo = msg.cfgInfo;
+        if (cfgInfo->data) {
+            delete[] cfgInfo->data;
+            cfgInfo->data = nullptr;
+            delete cfgInfo;
+           cfgInfo = nullptr;
         } else if (msg.cfgInfo) {
-            delete msg.cfgInfo;
-            msg.cfgInfo = nullptr;
+            delete cfgInfo;
+            cfgInfo = nullptr;
         }
         return 0;
     }
@@ -545,14 +546,15 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
     int delayTime = 0;
     bool result = mBroadcastThread->PostAsyncTask(func, delayTime);
     if (!result) {
-        if (msg.cfgInfo->data) {
-            delete[] msg.cfgInfo->data;
-            msg.cfgInfo->data = nullptr;
-            delete msg.cfgInfo;
-            msg.cfgInfo = nullptr;
+        CfgInfo* cfgInfo = msg.cfgInfo;
+        if (cfgInfo->data) {
+            delete[] cfgInfo->data;
+            cfgInfo->data = nullptr;
+            delete cfgInfo;
+           cfgInfo = nullptr;
         } else if (msg.cfgInfo) {
-            delete msg.cfgInfo;
-            msg.cfgInfo = nullptr;
+            delete cfgInfo;
+            cfgInfo = nullptr;
         }
         WIFI_LOGF("WifiInternalEventDispatcher::AddBroadCastMsg failed %{public}d", msg.msgCode);
         return -1;
@@ -885,14 +887,15 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
     int pid, int uid, int tokenId)
 {
     if (callback == nullptr) {
-        if (msg.cfgInfo->data) {
-            delete[] msg.cfgInfo->data;
-            msg.cfgInfo->data = nullptr;
-            delete msg.cfgInfo;
-            msg.cfgInfo = nullptr;
+        CfgInfo* cfgInfo = msg.cfgInfo;
+        if (cfgInfo->data) {
+            delete[] cfgInfo->data;
+            cfgInfo->data = nullptr;
+            delete cfgInfo;
+           cfgInfo = nullptr;
         } else if (msg.cfgInfo) {
-            delete msg.cfgInfo;
-            msg.cfgInfo = nullptr;
+            delete cfgInfo;
+            cfgInfo = nullptr;
         }
         WIFI_LOGE("%{public}s: callback is null", __func__);
         return;

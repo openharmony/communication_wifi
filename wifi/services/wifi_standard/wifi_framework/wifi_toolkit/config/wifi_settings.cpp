@@ -26,6 +26,7 @@
 #include "network_parser.h"
 #include "softap_parser.h"
 #include "wifi_backup_config.h"
+#include "json/json.h"
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 #include "wifi_asset_manager.h"
@@ -645,6 +646,23 @@ void WifiSettings::MergeWifiCloneConfig(std::string &cloneData)
         return;
     }
     ConfigsDeduplicateAndSave(cloneConfigs);
+}
+
+std::string WifiSettings::SetBackupReplyCode(int replyCode)
+{
+    Json::Value root;
+    Json::Value resultInfo;
+    Json::Value errorInfo;
+
+    errorInfo["type"] = "ErrorInfo";
+    errorInfo["errorCode"] = std::to_string(replyCode);
+    errorInfo["errorInfo"] = "";
+
+    resultInfo.append(errorInfo);
+    root["resultInfo"] = resultInfo;
+
+    Json::FastWriter writer;
+    return writer.write(root);
 }
 
 void WifiSettings::RemoveBackupFile()

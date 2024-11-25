@@ -229,7 +229,7 @@ ohos_unittest("wifi_selfcure_unittest") {
   module_out_path = module_self_cure_output_path
   sources = local_base_sources
   sources += [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_datashare_utils.cpp",
+    "$WIFI_ROOT_DIR/base/utils/wifi_datashare_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_system_ability_listerner.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",

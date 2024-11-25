@@ -165,6 +165,8 @@ public:
 
     void MergeWifiCloneConfig(std::string &cloneData);
 
+    std::string SetBackupReplyCode(int replyCode);
+
     void RemoveBackupFile();
 
     int SetWifiToggleCaller(int callerPid, int instId = 0);

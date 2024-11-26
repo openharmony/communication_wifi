@@ -923,6 +923,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
             return WIFI_OPT_PERMISSION_DENIED;
         }
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_STA_REQUEST);
 
     if (!IsStaServiceRunning()) {
         WIFI_LOGE("ConnectToNetwork: sta service is not running!");
@@ -986,6 +987,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         WIFI_LOGE("ConnectToDevice:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_STA_REQUEST);
 
     if (!CheckConfigPwd(config)) {
         WIFI_LOGE("CheckConfigPwd failed!");

@@ -425,6 +425,7 @@ std::shared_ptr<RptManager> WifiControllerMachine::GetRptManager(int id)
 void WifiControllerMachine::MakeRptManager(RptManager::Role role, int id)
 {
     WIFI_LOGE("Enter MakeRptManager");
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_BRIDGE_REQUEST);
     auto rptmode = std::make_shared<RptManager>(role, id);
     rptmode->RegisterCallback(WifiManager::GetInstance().GetWifiTogglerManager()->GetRptCallback());
     rptmode->InitRptManager();

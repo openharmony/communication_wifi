@@ -408,6 +408,7 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_AP_REQUEST);
 
     std::string bundleName = "";
     if (!GetBundleNameByUid(GetCallingUid(), bundleName)) {

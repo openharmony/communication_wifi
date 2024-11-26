@@ -2078,12 +2078,15 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     }
     if (SetMacToHal(currentMac, realMac, m_instId)) {
         deviceConfig.macAddress = currentMac;
-        
+        deviceConfig.wifiPrivacySetting =
+            (currentMac == realMac) ? WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC;
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
     } else {
         return false;
     }
+    LOGI("SetRandomMac success, wifiPrivacySetting:%{public}d, macAddress:%{public}s",
+        deviceConfig.wifiPrivacySetting, MacAnonymize(deviceConfig.macAddress).c_str());
 #endif
     return true;
 }

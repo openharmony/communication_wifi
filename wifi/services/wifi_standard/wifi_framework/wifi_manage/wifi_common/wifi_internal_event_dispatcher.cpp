@@ -533,7 +533,7 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
             delete[] cfgInfo->data;
             cfgInfo->data = nullptr;
             delete cfgInfo;
-           cfgInfo = nullptr;
+            cfgInfo = nullptr;
         } else if (msg.cfgInfo) {
             delete cfgInfo;
             cfgInfo = nullptr;
@@ -551,7 +551,7 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
             delete[] cfgInfo->data;
             cfgInfo->data = nullptr;
             delete cfgInfo;
-           cfgInfo = nullptr;
+            cfgInfo = nullptr;
         } else if (msg.cfgInfo) {
             delete cfgInfo;
             cfgInfo = nullptr;
@@ -892,7 +892,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             delete[] cfgInfo->data;
             cfgInfo->data = nullptr;
             delete cfgInfo;
-           cfgInfo = nullptr;
+            cfgInfo = nullptr;
         } else if (msg.cfgInfo) {
             delete cfgInfo;
             cfgInfo = nullptr;

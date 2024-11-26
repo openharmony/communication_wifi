@@ -21,6 +21,7 @@
 #endif
 #include "wifi_log.h"
 #include "wifi_logger.h"
+#include "system_ability_definition.h"
 
 DEFINE_WIFILOG_LABEL("WifiDataShareHelperUtils");
 
@@ -32,10 +33,72 @@ constexpr const char *SETTINGS_DATASHARE_URI =
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
+
+// E_OK and E_DATA_SHARE_NOT_READY used to check datashare ready
+constexpr const int32_t E_OK = 0;
+constexpr const int32_t E_DATA_SHARE_NOT_READY = 1055;
+}
+
+bool WifiDataShareHelperUtils::IsDataMgrServiceActive()
+{
+    sptr<ISystemAbilityManager> saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saMgr == nullptr) {
+        WIFI_LOGE("Failed to get SystemAbilityManager!");
+        return false;
+    }
+    sptr<IRemoteObject> object = saMgr->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    if (object == nullptr) {
+        WIFI_LOGE("Failed to get DataMgrService!");
+        return false;
+    }
+    return true;
+}
+
+bool WifiDataShareHelperUtils::CheckIfSettingsDataReady()
+{
+    if (isDataShareReady_) {
+        return true;
+    }
+
+    if (!IsDataMgrServiceActive()) {
+        return false;
+    }
+
+    auto remote = sptr<IWifiDataShareRemoteBroker>(new (std::nothrow) IRemoteStub<IWifiDataShareRemoteBroker>());
+    if (remote == nullptr) {
+        WIFI_LOGE("%{public}s remote is nullptr", __func__);
+        return false;
+    }
+    auto remoteObj = remote->AsObject();
+    if (remoteObj == nullptr) {
+        WIFI_LOGE("%{public}s remoteObj_ is nullptr", __func__);
+        return false;
+    }
+
+    std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
+        DataShare::DataShareHelper::Create(remoteObj, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
+    WIFI_LOGI("%{public}s create datashare helper, ret = %{public}d", __func__, ret.first);
+
+    if (ret.first == E_DATA_SHARE_NOT_READY) {
+        return false;
+    }
+
+    if (ret.first == E_OK) {
+        if (ret.second) {
+            ret.second->Release();
+        }
+        isDataShareReady_ = true;
+    }
+    return true;
 }
 
 std::shared_ptr<DataShare::DataShareHelper> WifiDataShareHelperUtils::WifiCreateDataShareHelper(bool onlySettingsData)
 {
+    if (!CheckIfSettingsDataReady()) {
+        WIFI_LOGE("%{public}s datashare not ready.", __func__);
+        return nullptr;
+    }
+
     auto remote = sptr<IWifiDataShareRemoteBroker>(new (std::nothrow) IRemoteStub<IWifiDataShareRemoteBroker>());
     if (remote == nullptr) {
         WIFI_LOGE("%{public}s remote is nullptr", __func__);

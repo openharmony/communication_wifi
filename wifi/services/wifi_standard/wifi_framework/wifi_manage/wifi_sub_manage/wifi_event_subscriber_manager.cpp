@@ -42,7 +42,6 @@ DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 namespace OHOS {
 namespace Wifi {
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
-constexpr uint32_t TIMEOUT_EVENT_DELAY_ACCESS_DATASHARE = 10 * 1000;
 constexpr uint32_t PROP_LEN = 26;
 constexpr uint32_t PROP_SUBCHIPTYPE_LEN = 10;
 constexpr uint32_t SUPPORT_COEXCHIP_LEN = 7;
@@ -59,7 +58,6 @@ const std::string WIFI_STANDBY_SLEEPING = "sleeping";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
-static sptr<WifiCloneModeObserver> cloneModeObserver_ = nullptr;
 #ifdef HAS_MOVEMENT_PART
 static sptr<DeviceMovementCallback> deviceMovementCallback_ = nullptr;
 #endif
@@ -81,19 +79,14 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED, &
-    CesEventSubscriber::OnReceiveUserUnlockedEvent}
+    CesEventSubscriber::OnReceiveUserUnlockedEvent},
+    {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY, &
+    CesEventSubscriber::OnReceiveDataShareReadyEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
 {
     WIFI_LOGI("create WifiEventSubscriberManager");
-    if (accessDatashareTimerId == 0) {
-        WifiTimer::TimerCallback timeoutCallback = std::bind(&WifiEventSubscriberManager::DelayedAccessDataShare, this);
-        WifiTimer::GetInstance()->Register(
-            timeoutCallback, accessDatashareTimerId, TIMEOUT_EVENT_DELAY_ACCESS_DATASHARE);
-        WIFI_LOGI("DelayedAccessDataShare register success! accessDatashareTimerId:%{public}u", accessDatashareTimerId);
-    }
-    
     RegisterCesEvent();
     RegisterNotificationEvent();
 #ifdef HAS_POWERMGR_PART
@@ -102,13 +95,12 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     RegisterAssetEvent();
 #endif
-    if (IsDataMgrServiceActive()) {
-        RegisterCloneEvent();
-    }
     InitSubscribeListener();
     GetMdmProp();
     GetChipProp();
     RegisterMdmPropListener();
+    RegisterNetworkStateChangeEvent();
+    RegisterWifiScanChangeEvent();
 }
 
 WifiEventSubscriberManager::~WifiEventSubscriberManager()
@@ -119,7 +111,6 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterAssetEvent();
 #endif
     UnRegisterNotificationEvent();
-    UnRegisterCloneEvent();
     UnRegisterLocationEvent();
     UnRegisterNetworkStateChangeEvent();
     UnRegisterWifiScanChangeEvent();
@@ -225,12 +216,20 @@ void WifiEventSubscriberManager::HandleHasMovementPartChange(int systemAbilityId
 
 void WifiEventSubscriberManager::HandleDistributedKvDataServiceChange(bool add)
 {
+    WIFI_LOGI("HandleDistributedKvDataServiceChange, mode=[%{public}d]!", add);
     if (!add) {
-        UnRegisterCloneEvent();
+        UnRegisterLocationEvent();
         return;
     }
-    RegisterLocationEvent();
-    RegisterCloneEvent();
+    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("HandleDistributedKvDataServiceChange, datashareHelper is nullptr!");
+        return;
+    }
+    if (datashareHelper->CheckIfSettingsDataReady()) {
+        AccessDataShare();
+        RegisterLocationEvent();
+    }
 }
 
 void WifiEventSubscriberManager::HandleCastServiceChange(bool add)
@@ -399,56 +398,6 @@ void WifiEventSubscriberManager::DealLocationModeChangeEvent()
     }
 }
 
-void WifiEventSubscriberManager::GetCloneDataByDatashare(std::string &cloneData)
-{
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("GetCloneDataByDatashare, datashareHelper is nullptr!");
-        return;
-    }
-
-    Uri uri(SETTINGS_DATASHARE_URI_CLONE_DATA);
-    int ret = datashareHelper->Query(uri, SETTINGS_DATASHARE_KEY_CLONE_DATA, cloneData);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("GetCloneDataByDatashare, Query cloneMode fail!");
-        return;
-    }
-    WIFI_LOGI("GetCloneDataByDatashare success");
-}
-
-void WifiEventSubscriberManager::SetCloneDataByDatashare(const std::string &cloneData)
-{
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("SetCloneDataByDatashare, datashareHelper is nullptr!");
-        return;
-    }
-
-    Uri uri(SETTINGS_DATASHARE_URI_CLONE_DATA);
-    int ret = datashareHelper->Update(uri, SETTINGS_DATASHARE_KEY_CLONE_DATA, cloneData);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("SetCloneDataByDatashare, Update cloneData fail!");
-        return;
-    }
-    WIFI_LOGI("SetCloneDataByDatashare success");
-}
-
-void WifiEventSubscriberManager::DealCloneDataChangeEvent()
-{
-    WIFI_LOGI("DealCloneDataChangeEvent enter");
-    mWifiEventSubsThread = std::make_unique<WifiEventHandler>("WifiEventSubsThread");
-    mWifiEventSubsThread->PostAsyncTask([this]() {
-        std::string cloneData;
-        GetCloneDataByDatashare(cloneData);
-        if (cloneData.empty()) {
-            return;
-        }
-        WifiSettings::GetInstance().MergeWifiCloneConfig(cloneData);
-        cloneData.clear();
-        SetCloneDataByDatashare("");
-    });
-}
-
 void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
 {
     constexpr int openWifi = 1;
@@ -473,20 +422,24 @@ bool WifiEventSubscriberManager::IsMdmForbidden()
     return mIsMdmForbidden;
 }
 
-void WifiEventSubscriberManager::DelayedAccessDataShare()
+void WifiEventSubscriberManager::AccessDataShare()
 {
-    WIFI_LOGI("DelayedAccessDataShare enter!");
+    WIFI_LOGI("AccessDataShare enter!");
+    {
+        std::unique_lock<std::mutex> lock(accessDataShareMutex_);
+        if (accessDataShare_) {
+            return;
+        }
+        accessDataShare_ = true;
+    }
+
     std::filesystem::path pathName = WIFI_CONFIG_FILE_PATH;
     std::error_code code;
     if (!std::filesystem::exists(pathName, code)) {
         CheckAndStartStaByDatashare();
     }
     GetAirplaneModeByDatashare();
-
-    if (accessDatashareTimerId != 0) {
-        WifiTimer::GetInstance()->UnRegister(accessDatashareTimerId);
-        accessDatashareTimerId = 0;
-    }
+    DealLocationModeChangeEvent();
 }
 
 void WifiEventSubscriberManager::InitSubscribeListener()
@@ -503,21 +456,6 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
     SubscribeSystemAbility(SHARE_SERVICE_ID);
     SubscribeSystemAbility(MOUSE_CROSS_SERVICE_ID);
-}
-
-bool WifiEventSubscriberManager::IsDataMgrServiceActive()
-{
-    sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sa_mgr == nullptr) {
-        WIFI_LOGE("Failed to get SystemAbilityManager!");
-        return false;
-    }
-    sptr<IRemoteObject> object = sa_mgr->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-    if (object == nullptr) {
-        WIFI_LOGE("Failed to get DataMgrService!");
-        return false;
-    }
-    return true;
 }
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()
@@ -580,44 +518,6 @@ void WifiEventSubscriberManager::UnRegisterLocationEvent()
     Uri uri(datashareHelper->GetLoactionDataShareUri());
     datashareHelper->UnRegisterObserver(uri, locationModeObserver_);
     islocationModeObservered = false;
-}
-
-void WifiEventSubscriberManager::RegisterCloneEvent()
-{
-    std::unique_lock<std::mutex> lock(cloneEventMutex);
-    if (cloneModeObserver_) {
-        return;
-    }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        WIFI_LOGE("RegisterCloneEvent datashareHelper is nullptr");
-        return;
-    }
-    cloneModeObserver_ = sptr<WifiCloneModeObserver>(new (std::nothrow)WifiCloneModeObserver());
-    Uri uri(SETTINGS_DATASHARE_URI_CLONE_DATA);
-    datashareHelper->RegisterObserver(uri, cloneModeObserver_);
-    WIFI_LOGI("RegisterCloneEvent success");
-}
-
-void WifiEventSubscriberManager::UnRegisterCloneEvent()
-{
-    std::unique_lock<std::mutex> lock(cloneEventMutex);
-    if (cloneModeObserver_ == nullptr) {
-        WIFI_LOGE("UnRegisterCloneEvent cloneModeObserver_ is nullptr");
-        return;
-    }
-
-    auto datashareHelper = DelayedSingleton<WifiDataShareHelperUtils>::GetInstance();
-    if (datashareHelper == nullptr) {
-        cloneModeObserver_ = nullptr;
-        WIFI_LOGE("UnRegisterCloneEvent datashareHelper is nullptr");
-        return;
-    }
-    Uri uri(SETTINGS_DATASHARE_URI_CLONE_DATA);
-    datashareHelper->UnRegisterObserver(uri, cloneModeObserver_);
-    cloneModeObserver_ = nullptr;
-    WIFI_LOGI("UnRegisterCloneEvent success");
 }
 
 void WifiEventSubscriberManager::GetMdmProp()
@@ -896,6 +796,16 @@ void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEvent
         WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
     } else {
         WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
+    }
+}
+
+void CesEventSubscriber::OnReceiveDataShareReadyEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    WIFI_LOGI("OnReceiveDataShareReadyEvent action[%{public}s]", action.c_str());
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()) {
+        WifiManager::GetInstance().GetWifiEventSubscriberManager()->AccessDataShare();
+        WifiManager::GetInstance().GetWifiEventSubscriberManager()->RegisterLocationEvent();
     }
 }
 

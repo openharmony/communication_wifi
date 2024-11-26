@@ -349,6 +349,11 @@ ErrCode GetBundleNameByUid(const int uid, std::string &bundleName)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode GetAllBundleName(std::vector<std::string> &bundleNameList)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
 int GetCallingPid()
 {
     return IPCSkeleton::GetCallingPid();

@@ -2078,6 +2078,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     }
     if (SetMacToHal(currentMac, realMac, m_instId)) {
         deviceConfig.macAddress = currentMac;
+        
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
     } else {

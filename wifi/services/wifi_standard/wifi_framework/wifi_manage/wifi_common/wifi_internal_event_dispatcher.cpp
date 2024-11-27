@@ -883,21 +883,25 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
 }
 #endif
 
+void WifiInternalEventDispatcher::FreecfgInfo(CfgInfo* cfgInfo)
+{
+    if (cfgInfo && cfgInfo->data) {
+        delete[] cfgInfo->data;
+        cfgInfo->data = nullptr;
+        delete cfgInfo;
+        cfgInfo = nullptr;
+    } else if (cfgInfo) {
+        delete cfgInfo;
+        cfgInfo = nullptr;
+    }
+}
+
 void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
     int pid, int uid, int tokenId)
 {
     if (callback == nullptr) {
-        CfgInfo* cfgInfo = msg.cfgInfo;
-        if (cfgInfo && cfgInfo->data) {
-            delete[] cfgInfo->data;
-            cfgInfo->data = nullptr;
-            delete cfgInfo;
-            cfgInfo = nullptr;
-        } else if (cfgInfo) {
-            delete cfgInfo;
-            cfgInfo = nullptr;
-        }
         WIFI_LOGE("%{public}s: callback is null", __func__);
+        FreecfgInfo(msg.cfgInfo);
         return;
     }
 

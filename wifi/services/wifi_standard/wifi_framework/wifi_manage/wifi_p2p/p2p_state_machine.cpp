@@ -1186,11 +1186,6 @@ bool P2pStateMachine::DealCreateRptGroupWithConfig(const WifiP2pConfigInternal &
     return ret != WIFI_HAL_OPT_FAILED;
 }
 
-bool P2pStateMachine::IsInterfaceReuse() const
-{
-    return !(WifiConfigCenter::GetInstance().GetP2pIfaceName().compare("wlan0"));
-}
-
 bool P2pStateMachine::HasPersisentGroup(void)
 {
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
@@ -1203,9 +1198,6 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
     /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
      * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
      */
-    if (IsInterfaceReuse()) {
-        return;
-    }
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     if (grpInfo.size() > 0) {
         if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_HAL_OPT_OK) {

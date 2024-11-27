@@ -304,12 +304,6 @@ private:
      */
     DHCPTYPE GetIsNeedDhcp() const;
 
-    /**
-     * @Description Is interface reuse.
-     *
-     */
-    bool IsInterfaceReuse() const;
-
     void ClearGroup() const;
 
     bool HasPersisentGroup(void);

@@ -3499,6 +3499,10 @@ void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std:
 {
     SendMessage(WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT, netState, 0, url);
 #ifndef OHOS_ARCH_LITE
+    if (enhanceService_ == nullptr) {
+        WIFI_LOGE("NetStateObserverCallback, enhanceService is null");
+        return;
+    }
     enhanceService_->NotifyInternetState(static_cast<int>(netState));
 #endif
 }

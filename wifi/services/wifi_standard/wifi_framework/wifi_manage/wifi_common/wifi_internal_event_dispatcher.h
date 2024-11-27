@@ -122,7 +122,6 @@ public:
     void SetAppFrozen(std::set<int> pidList, bool isFrozen);
     void ResetAllFrozenApp();
     bool IsAppFrozen(int pid);
-    void FreecfgInfo(CfgInfo* cfgInfo);
 private:
     static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
@@ -138,6 +137,7 @@ private:
     static void PublishRssiValueChangedEvent(int state, int instId);
     static void PublishStaEvent(const WifiEventCallbackMsg &msg);
     static void SendConfigChangeEvent(sptr<IWifiP2pCallback> &callback,  CfgInfo* cfgInfo);
+    static void FreecfgInfo(CfgInfo* cfgInfo);
 private:
     std::unique_ptr<WifiEventHandler> mBroadcastThread = nullptr;
     std::mutex mStaCallbackMutex;

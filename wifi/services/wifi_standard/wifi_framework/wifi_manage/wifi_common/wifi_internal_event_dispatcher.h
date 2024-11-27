@@ -122,6 +122,7 @@ public:
     void SetAppFrozen(std::set<int> pidList, bool isFrozen);
     void ResetAllFrozenApp();
     bool IsAppFrozen(int pid);
+    void FreecfgInfo(CfgInfo* cfgInfo);
 private:
     static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);

@@ -627,27 +627,6 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
     return 0;
 }
 
-void WifiSettings::MergeWifiCloneConfig(std::string &cloneData)
-{
-    LOGI("MergeWifiCloneConfig enter");
-    std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
-    bool ret = xmlParser->LoadConfigurationMemory(cloneData.c_str());
-    if (!ret) {
-        LOGE("MergeWifiCloneConfig load fail");
-        return;
-    }
-    ret = xmlParser->Parse();
-    if (!ret) {
-        LOGE("MergeWifiCloneConfig Parse fail");
-        return;
-    }
-    std::vector<WifiDeviceConfig> cloneConfigs = xmlParser->GetNetworks();
-    if (cloneConfigs.empty()) {
-        return;
-    }
-    ConfigsDeduplicateAndSave(cloneConfigs);
-}
-
 std::string WifiSettings::SetBackupReplyCode(int replyCode)
 {
     Json::Value root;

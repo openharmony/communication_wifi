@@ -38,7 +38,6 @@ public:
 
     static void DestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     static void OnRssiReportCallback(int index, int antRssi);
-    static void OnNetlinkReportCallback(int type, const std::vector<uint8_t>& recvMsg);
 };
 
 class IChipIfaceTest : public IChipIface {

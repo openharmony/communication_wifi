@@ -284,7 +284,6 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
         ifaceName, instId)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -398,7 +397,6 @@ ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
         ifaceName, instId)) {
         WIFI_LOGE("PreStartWifi, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -662,17 +660,6 @@ void WifiServiceScheduler::OnRssiReportCallback(int index, int antRssi)
 
     std::string data = std::to_string(antRssi);
     WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(index, data);
-}
-
-void WifiServiceScheduler::OnNetlinkReportCallback(int type, const std::vector<uint8_t>& recvMsg)
-{
-    WIFI_LOGI("OnNetlinkReportCallback, type:%{public}d", type);
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService == nullptr) {
-        WIFI_LOGE("get pEnhance service failed!");
-        return;
-    }
-    pEnhanceService->ProcessWifiNetlinkReportEvent(type, recvMsg);
 }
 #endif
 

@@ -29,11 +29,6 @@ void WifiHalDeviceManagerTest::OnRssiReportCallback(int index, int antRssi)
     return;
 }
 
-void WifiHalDeviceManagerTest::OnNetlinkReportCallback(int type, const std::vector<uint8_t>& recvMsg)
-{
-    return;
-}
-
 HWTEST_F(WifiHalDeviceManagerTest, ScanTest, TestSize.Level1)
 {
     std::string ifaceName;
@@ -42,7 +37,6 @@ HWTEST_F(WifiHalDeviceManagerTest, ScanTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     ScanParams scanParams;
@@ -57,7 +51,6 @@ HWTEST_F(WifiHalDeviceManagerTest, StartPnoScanTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     PnoScanParams pnoScanParams;
@@ -72,7 +65,6 @@ HWTEST_F(WifiHalDeviceManagerTest, StopPnoScanTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     HalDeviceManager::GetInstance().StopPnoScan(ifaceName);
@@ -86,7 +78,6 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     std::vector<ScanResultsInfo> scanResultsInfo;
@@ -101,7 +92,6 @@ HWTEST_F(WifiHalDeviceManagerTest, GetConnectSignalInfoTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     SignalPollResult signalPollResult;
@@ -116,7 +106,6 @@ HWTEST_F(WifiHalDeviceManagerTest, SetPmModeTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     int mode = 0;
@@ -131,7 +120,6 @@ HWTEST_F(WifiHalDeviceManagerTest, SetDpiMarkRuleTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     int uid = 0;
@@ -148,7 +136,6 @@ HWTEST_F(WifiHalDeviceManagerTest, SetStaMacAddressTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     std::string mac{"12:34:56:78:90:AB"};
@@ -179,7 +166,6 @@ HWTEST_F(WifiHalDeviceManagerTest, GetChipsetWifiFeatrureCapabilityTest, TestSiz
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     int chipsetFeatrureCapability = 0;
@@ -203,7 +189,6 @@ HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies);
@@ -242,7 +227,6 @@ HWTEST_F(WifiHalDeviceManagerTest, SetWifiCountryCodeTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     code = "CN";
@@ -267,7 +251,6 @@ HWTEST_F(WifiHalDeviceManagerTest, SelectInterfacesToDeleteTest, TestSize.Level1
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     WifiChipInfo wifiChipInfo;
@@ -286,7 +269,6 @@ HWTEST_F(WifiHalDeviceManagerTest, CreateTheNeedChangeChipModeIfaceDataTest, Tes
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     UsableMode chipMode;
@@ -311,7 +293,6 @@ HWTEST_F(WifiHalDeviceManagerTest, CompareIfaceCreationDataTest, TestSize.Level1
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     WifiIfaceInfo ifaceInfo;
@@ -344,7 +325,6 @@ HWTEST_F(WifiHalDeviceManagerTest, DispatchIfaceDestoryCallbackTest, TestSize.Le
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     HalDeviceManager::GetInstance().DispatchIfaceDestoryCallback(
@@ -371,7 +351,6 @@ HWTEST_F(WifiHalDeviceManagerTest, RemoveStaIfaceTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     HalDeviceManager::GetInstance().RemoveStaIface(ifaceName);
@@ -403,7 +382,6 @@ HWTEST_F(WifiHalDeviceManagerTest, CreateStaIfaceTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     bool result = HalDeviceManager::GetInstance().RemoveStaIface(ifaceName);
@@ -438,7 +416,6 @@ HWTEST_F(WifiHalDeviceManagerTest, ScanTest_01, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     ScanParams scanParams;
@@ -494,7 +471,6 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest_01, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
     std::vector<ScanResultsInfo> scanResultsInfo;

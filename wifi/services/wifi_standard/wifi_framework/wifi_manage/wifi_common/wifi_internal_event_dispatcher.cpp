@@ -528,16 +528,7 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddBroadCastMsg, msgcode %{public}d", msg.msgCode);
     if (!mBroadcastThread) {
-        CfgInfo* cfgInfo = msg.cfgInfo;
-        if (cfgInfo && cfgInfo->data) {
-            delete[] cfgInfo->data;
-            cfgInfo->data = nullptr;
-            delete cfgInfo;
-            cfgInfo = nullptr;
-        } else if (cfgInfo) {
-            delete cfgInfo;
-            cfgInfo = nullptr;
-        }
+        FreecfgInfo(msg.cfgInfo);
         return 0;
     }
     std::function<void()> func = std::bind([this, msg]() {
@@ -546,16 +537,7 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
     int delayTime = 0;
     bool result = mBroadcastThread->PostAsyncTask(func, delayTime);
     if (!result) {
-        CfgInfo* cfgInfo = msg.cfgInfo;
-        if (cfgInfo && cfgInfo->data) {
-            delete[] cfgInfo->data;
-            cfgInfo->data = nullptr;
-            delete cfgInfo;
-            cfgInfo = nullptr;
-        } else if (cfgInfo) {
-            delete cfgInfo;
-            cfgInfo = nullptr;
-        }
+        FreecfgInfo(msg.cfgInfo);
         WIFI_LOGF("WifiInternalEventDispatcher::AddBroadCastMsg failed %{public}d", msg.msgCode);
         return -1;
     }

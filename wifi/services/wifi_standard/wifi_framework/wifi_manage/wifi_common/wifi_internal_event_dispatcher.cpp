@@ -529,12 +529,12 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
     WIFI_LOGD("WifiInternalEventDispatcher::AddBroadCastMsg, msgcode %{public}d", msg.msgCode);
     if (!mBroadcastThread) {
         CfgInfo* cfgInfo = msg.cfgInfo;
-        if (cfgInfo->data) {
+        if (cfgInfo && cfgInfo->data) {
             delete[] cfgInfo->data;
             cfgInfo->data = nullptr;
             delete cfgInfo;
             cfgInfo = nullptr;
-        } else if (msg.cfgInfo) {
+        } else if (cfgInfo) {
             delete cfgInfo;
             cfgInfo = nullptr;
         }
@@ -547,12 +547,12 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
     bool result = mBroadcastThread->PostAsyncTask(func, delayTime);
     if (!result) {
         CfgInfo* cfgInfo = msg.cfgInfo;
-        if (cfgInfo->data) {
+        if (cfgInfo && cfgInfo->data) {
             delete[] cfgInfo->data;
             cfgInfo->data = nullptr;
             delete cfgInfo;
             cfgInfo = nullptr;
-        } else if (msg.cfgInfo) {
+        } else if (cfgInfo) {
             delete cfgInfo;
             cfgInfo = nullptr;
         }
@@ -888,12 +888,12 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
 {
     if (callback == nullptr) {
         CfgInfo* cfgInfo = msg.cfgInfo;
-        if (cfgInfo->data) {
+        if (cfgInfo && cfgInfo->data) {
             delete[] cfgInfo->data;
             cfgInfo->data = nullptr;
             delete cfgInfo;
             cfgInfo = nullptr;
-        } else if (msg.cfgInfo) {
+        } else if (cfgInfo) {
             delete cfgInfo;
             cfgInfo = nullptr;
         }

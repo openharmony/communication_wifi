@@ -77,7 +77,6 @@ private:
     void P2pIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void SoftApIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void OnRssiReportCallback(int index, int antRssi);
-    void OnNetlinkReportCallback(int type, const std::vector<uint8_t>& recvMsg);
 #endif
     std::map<int, std::string> g_staIfaceNameMap;
     std::map<int, std::string> g_softApIfaceNameMap;

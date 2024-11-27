@@ -722,7 +722,7 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
                 return;
             }
             std::string data = notifyParam.substr(codePos + strlen("errCode="));
-            int errCode = stoi(data);
+            int errCode = CheckDataLegal(data);
             WpaEventP2pChrReport(errCode);
             break;
         }

@@ -23,6 +23,9 @@
 #include "wifi_service_manager.h"
 #include "wifi_pro_utils.h"
 #include "network_black_list_manager.h"
+#include "wifi_manager.h"
+#include "wifi_settings.h"
+#include "network_status_history_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -321,6 +324,57 @@ void WifiProStateMachine::FastScan(std::vector<WifiScanInfo> &scanInfoList)
         SendMessage(EVENT_REQUEST_SCAN_DELAY);
     }
 }
+
+void WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
+{
+    if (isWifi2WifiSwitching_) {
+        WIFI_LOGI("Wifi2Wifi Switching");
+        return;
+    }
+    WIFI_LOGI("TrySelfCure.");
+ 
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId_);
+    do {
+        if (pSelfCureService == nullptr) {
+            WIFI_LOGE("pSelfCureService nullptr.");
+            break;
+        }
+ 
+        if (pSelfCureService->IsSelfCureOnGoing()) {
+            WIFI_LOGI("SelfCureOnGoing.");
+            break;
+        }
+ 
+        if (!WifiProUtils::IsWifiConnected(instId_)) {
+            WIFI_LOGI("WifiDisconnected.");
+            break;
+        }
+ 
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+ 
+        // issatisfy min rssi
+        if (linkedInfo.rssi > SELF_CURE_RSSI_THRESHOLD) {
+            pSelfCureService->NotifyInternetFailureDetected(forceNoHttpCheck);
+        } else {
+            WIFI_LOGI("not reach rssi threshold.");
+        }
+    } while (0);
+    Wifi2WifiFinish();
+}
+ 
+bool WifiProStateMachine::FirstNoNetAndSelfCure()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, instId_);
+    if (NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(config.networkStatusHistory)) {
+        TrySelfCure(true);
+        return true;
+    }
+    return false;
+}
 /* --------------------------- state machine default state ------------------------------ */
 WifiProStateMachine::DefaultState::DefaultState(WifiProStateMachine *pWifiProStateMachine)
     : State("DefaultState"),
@@ -580,8 +634,10 @@ void WifiProStateMachine::WifiConnectedState::HandleHttpResultInConnected(const 
     }
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
-        WIFI_LOGI("state transition: WifiConnectedState -> WifiNoNetState.");
-        pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
+        if (!pWifiProStateMachine_->FirstNoNetAndSelfCure()) {
+            WIFI_LOGI("state transition: WifiConnectedState -> WifiNoNetState.");
+            pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
+        }
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
         WIFI_LOGI("state transition: WifiConnectedState -> WifiPortalState.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiPortalState_);
@@ -732,9 +788,11 @@ void WifiProStateMachine::WifiHasNetState::HandleHttpResultInHasNet(const Intern
     if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
         WIFI_LOGI("HandleHttpResultInHasNet, state transition: WifiHasNetState -> WifiPortalState.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiPortalState_);
-    } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
-        WIFI_LOGI("HandleHttpResultInHasNet, state transition: WifiHasNetState -> WifiNoNetState.");
-        pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
+    } else if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
+        if (!pWifiProStateMachine_->FirstNoNetAndSelfCure()) {
+            WIFI_LOGI("HandleHttpResultInHasNet, state transition: WifiHasNetState -> WifiNoNetState.");
+            pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
+        }
     } else {
         return;
     }
@@ -1050,7 +1108,7 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
             return;
         }
         WIFI_LOGI("NoInternet X: select network fail.");
-        TrySelfCure();
+        pWifiProStateMachine_->TrySelfCure(false);
         return;
     }
  
@@ -1062,7 +1120,7 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
     pWifiProStateMachine_->badBssid_ = pWifiProStateMachine_->currentBssid_;
     pWifiProStateMachine_->badSsid_ = pWifiProStateMachine_->currentSsid_;
     if (!HandleCheckResultInNoNet(pWifiProStateMachine_->networkSelectionResult_)) {
-        TrySelfCure();
+        pWifiProStateMachine_->TrySelfCure(false);
         return;
     }
 }
@@ -1141,7 +1199,7 @@ void WifiProStateMachine::WifiNoNetState::HandleNoNetChanged()
  
     // issatisfy scan
     if (!pWifiProStateMachine_->IsSatisfiedWifiOperationCondition() || WifiProUtils::IsUserSelectNetwork()) {
-        TrySelfCure();
+        pWifiProStateMachine_->TrySelfCure(false);
         return;
     }
  
@@ -1156,47 +1214,6 @@ void WifiProStateMachine::WifiNoNetState::HandleNoNetChanged()
  
     pWifiProStateMachine_->FastScan(scanInfoList);
     return;
-}
-
- 
-void WifiProStateMachine::WifiNoNetState::TrySelfCure()
-
-{
-    if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
-        WIFI_LOGI("Wifi2Wifi Switching");
-        return;
-    }
-    WIFI_LOGI("TrySelfCure.");
- 
-    ISelfCureService *pSelfCureService =
-        WifiServiceManager::GetInstance().GetSelfCureServiceInst(pWifiProStateMachine_->instId_);
-    do {
-        if (pSelfCureService == nullptr) {
-            WIFI_LOGE("pSelfCureService nullptr.");
-            break;
-        }
- 
-        if (pSelfCureService->IsSelfCureOnGoing()) {
-            WIFI_LOGI("SelfCureOnGoing.");
-            break;
-        }
- 
-        if (!WifiProUtils::IsWifiConnected(pWifiProStateMachine_->instId_)) {
-            WIFI_LOGI("WifiDisconnected.");
-            break;
-        }
- 
-        WifiLinkedInfo linkedInfo;
-        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
- 
-        // issatisfy min rssi
-        if (linkedInfo.rssi > SELF_CURE_RSSI_THRESHOLD) {
-            // pSelfCureService->NotifyInternetFailureDetected(false); 自愈的接口还要细化
-        } else {
-            WIFI_LOGI("not reach rssi threshold.");
-        }
-    } while (0);
-    pWifiProStateMachine_->Wifi2WifiFinish();
 }
  
 void WifiProStateMachine::WifiNoNetState::HandleConnectStateChangedInNoNet(const InternalMessagePtr msg)
@@ -1260,8 +1277,10 @@ void WifiProStateMachine::WifiPortalState::HandleHttpResultInPortal(const Intern
         WIFI_LOGI("HandleHttpResultInPortal, state transition: WifiPortalState -> WifiHasNetState.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiHasNetState_);
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
-        WIFI_LOGI("HandleHttpResultInPortal, state transition: WifiPortalState -> WifiNoNetState.");
-        pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
+        if (!pWifiProStateMachine_->FirstNoNetAndSelfCure()) {
+            WIFI_LOGI("HandleHttpResultInPortal, state transition: WifiPortalState -> WifiNoNetState.");
+            pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
+        }
     } else {
         return;
     }

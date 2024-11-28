@@ -132,6 +132,7 @@ public:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr};
         int32_t rssiLevel2Or3ScanedCounter_ { 0 };
         int32_t rssiLevel0Or1ScanedCounter_ { 0 };
+        void WifiHasNetStateInit();
         void HandleCheckResultInHasNet(const NetworkSelectionResult &networkSelectionResult);
         void TryWifiHandoverPreferentially(const NetworkSelectionResult &networkSelectionResult);
         void TryWifiRoveOut(const NetworkSelectionResult &networkSelectionResult);
@@ -145,7 +146,6 @@ public:
         void HandleHttpResultInHasNet(const InternalMessagePtr msg);
         bool HandleWifiToWifi(int32_t switchReason, const NetworkSelectionResult &networkSelectionResult);
         bool TrySwitchWifiNetwork(const NetworkSelectionResult &networkSelectionResult);
-        void WifiHasNetStateInit();
     };
 
     class WifiNoNetState : public State {

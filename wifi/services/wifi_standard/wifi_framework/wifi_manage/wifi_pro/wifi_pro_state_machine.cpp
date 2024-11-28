@@ -1028,7 +1028,6 @@ void WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(const Internal
         WIFI_LOGI("HandleHttpResultInNoNet, state transition: WifiNoNetState -> WifiPortalState.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiPortalState_);
     } else {
-        WifiNoNetState::GoInState();
         return;
     }
 }

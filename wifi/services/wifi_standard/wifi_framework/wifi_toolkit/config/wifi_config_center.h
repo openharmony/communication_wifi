@@ -161,6 +161,8 @@ public:
 
     bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0);
 
+    void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0);
+
     int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
 
     bool CheckScanOnlyAvailable(int instId = 0);

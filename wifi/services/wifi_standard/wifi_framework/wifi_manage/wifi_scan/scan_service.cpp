@@ -254,8 +254,14 @@ ErrCode ScanService::Scan(ScanType scanType)
      * Invoke the interface provided by the configuration center to obtain the
      * hidden network list.
      */
-    if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
-        WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
+    int uid = 0;
+#ifndef OHOS_ARCH_LITE
+    uid = GetCallingUid();
+#endif
+    if (uid != LOCATOR_SA_UID) {
+        if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
+            WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
+        }
     }
 
     scanConfig.scanBand = SCAN_BAND_BOTH_WITH_DFS;

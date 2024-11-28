@@ -2037,7 +2037,6 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
 
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
-    LOGD("enter SetRandomMac.");
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
@@ -2047,7 +2046,6 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     std::string currentMac;
     std::string realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
-    LOGD("%{public}s realMac is %{public}s", __func__, MacAnonymize(realMac).c_str());
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
         currentMac = realMac;
     } else {
@@ -2057,9 +2055,6 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             LOGE("scanInfo has no target wifi and bssid is empty!");
             return false;
         }
-        LOGI("%{public}s randommac, ssid:%{public}s keyMgmt:%{public}s macAddress:%{public}s",
-            __func__, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
-            MacAnonymize(deviceConfig.macAddress).c_str());
         if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
             WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
             if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
@@ -2085,8 +2080,9 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     } else {
         return false;
     }
-    LOGI("SetRandomMac success, wifiPrivacySetting:%{public}d, macAddress:%{public}s",
-        deviceConfig.wifiPrivacySetting, MacAnonymize(deviceConfig.macAddress).c_str());
+    LOGI("SetRandomMac success,wifiPrivacySetting:%{public}d,ssid:%{public}s,keyMgmt:%{public}s,macAddress:%{public}s",
+        deviceConfig.wifiPrivacySetting, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
+        MacAnonymize(deviceConfig.macAddress).c_str());
 #endif
     return true;
 }

@@ -165,7 +165,6 @@ public:
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleHttpResultInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();
-        void TrySelfCure();
         void HandleConnectStateChangedInNoNet(const InternalMessagePtr msg);
     };
 
@@ -258,6 +257,8 @@ private:
     void HandleWifi2WifiSucsess(int64_t blackListTime);
     void HandleWifi2WifiFailed();
     void FastScan(std::vector<WifiScanInfo> &scanInfoList);
+    void TrySelfCure(bool forceNoHttpCheck);
+    bool FirstNoNetAndSelfCure();
 };
 } // namespace Wifi
 } // namespace OHOS

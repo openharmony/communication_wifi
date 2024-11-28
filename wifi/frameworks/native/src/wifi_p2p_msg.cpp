@@ -546,6 +546,16 @@ int WifiP2pGroupInfo::GetCreatorUid()
     return creatorUid;
 }
 
+void WifiP2pGroupInfo::SetPersistentFlag(bool falg)
+{
+    isOldPersistenGroup = falg;
+}
+
+bool WifiP2pGroupInfo::GetPersistentFlag(void)
+{
+    return isOldPersistenGroup;
+}
+
 void WpsInfo::SetWpsMethod(WpsMethod wpsMethod)
 {
     mWpsMethod = wpsMethod;

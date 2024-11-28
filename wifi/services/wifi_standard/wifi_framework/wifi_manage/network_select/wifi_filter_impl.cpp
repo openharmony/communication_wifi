@@ -427,9 +427,12 @@ bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
     int32_t targetSignalLevel = WifiSettings::GetInstance().GetSignalLevel(scanInfo.rssi, scanInfo.band);
     if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(networkCandidate.interScanInfo.bssid) &&
         (targetSignalLevel <= SIGNAL_LEVEL_THREE || targetSignalLevel - curSignalLevel < MIN_SIGNAL_LEVEL_INTERVAL)) {
-        WIFI_LOGI("NotNetworkBlackListFilter, in wifi blocklist, targetSignalLevel:%{public}d, "
+        WIFI_LOGI("NotNetworkBlackListFilter, in wifi blacklist, targetSignalLevel:%{public}d, "
             "curSignalLevel:%{public}d, skip candidate:%{public}s",
             targetSignalLevel, curSignalLevel, networkCandidate.ToString().c_str());
+        if (linkedInfo.detailedState == DetailedState::NOTWORKING && targetSignalLevel >= SIGNAL_LEVEL_THREE) {
+            WIFI_LOGI("NotNetworkBlackListFilter, ignore blacklist, targetSignalLevel >= 3");
+        }
         return false;
     }
     return true;
@@ -554,6 +557,10 @@ bool WifiSwitchThresholdFilter::Filter(NetworkCandidate &networkCandidate)
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t curSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
     auto &interScanInfo = networkCandidate.interScanInfo;
+    if (linkedInfo.detailedState == DetailedState::NOTWORKING) {
+        WIFI_LOGI("WifiSwitchThresholdFilter, current network no net");
+        return true;
+    }
     if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) && curSignalLevel == SIGNAL_LEVEL_THREE &&
         interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
         WIFI_LOGI("WifiSwitchThresholdFilter, current network is 5G and level is three and target network is 2G, "

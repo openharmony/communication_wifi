@@ -58,6 +58,7 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     std::vector<NetworkSelection::NetworkCandidate *> bestNetworkCandidates;
     networkSelector->GetBestCandidates(bestNetworkCandidates);
     if (bestNetworkCandidates.empty()) {
+        WIFI_LOGI("CandidateNetwork empty");
         return false;
     }
 

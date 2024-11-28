@@ -721,8 +721,8 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
     napi_ref handlerRef = nullptr;
     napi_create_reference(env, handler, 1, &handlerRef);
     RegObj regObj(env, handlerRef);
-    int RegisterInfoNumMax = 1000;
-    if (g_eventRegisterInfo.size() < RegisterInfoNumMax) {
+    int RegisterInfoMaxNum = 1000;
+    if (g_eventRegisterInfo.size() <= RegisterInfoMaxNum) {
         auto iter = g_eventRegisterInfo.find(type);
         if (iter == g_eventRegisterInfo.end()) {
             g_eventRegisterInfo[type] = std::vector<RegObj>{regObj};
@@ -730,7 +730,7 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
             iter->second.emplace_back(regObj);
         }
     } else {
-        WIFI_LOGE("Register Num Max!");
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
     }
 }
 

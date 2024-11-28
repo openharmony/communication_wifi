@@ -22,7 +22,6 @@
 #include "state_machine.h"
 #include "wifi_pro_common.h"
 #include "network_selection_manager.h"
-#include "wifi_manager.h"
 
 namespace OHOS {
 namespace Wifi {

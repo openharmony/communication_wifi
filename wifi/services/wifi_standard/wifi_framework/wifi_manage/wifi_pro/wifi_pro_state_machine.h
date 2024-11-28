@@ -22,6 +22,7 @@
 #include "state_machine.h"
 #include "wifi_pro_common.h"
 #include "network_selection_manager.h"
+#include "wifi_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -114,6 +115,7 @@ public:
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         void HandleWifiConnectStateChangedInDisconnected(const InternalMessagePtr msg);
+        void HandleWifi2WifiFailedInDisconnected();
     };
 
     /**
@@ -129,33 +131,22 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr};
-        bool isWifi2WifiSwitching_ { false };
-        bool isDisableWifiAutoSwitch_ { false };
         int32_t rssiLevel2Or3ScanedCounter_ { 0 };
         int32_t rssiLevel0Or1ScanedCounter_ { 0 };
-        std::string targetBssid_;
-        NetworkSelectionResult networkSelectionResult_;
-        void WifiHasNetStateInit();
         void HandleCheckResultInHasNet(const NetworkSelectionResult &networkSelectionResult);
-        bool IsSatisfiedWifiOperationCondition();
-        bool IsFullscreen();
         void TryWifiHandoverPreferentially(const NetworkSelectionResult &networkSelectionResult);
         void TryWifiRoveOut(const NetworkSelectionResult &networkSelectionResult);
         void HandleWifiRoveOut(const NetworkSelectionResult &networkSelectionResult);
-        bool IsCallingInCs();
         void TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
-        bool HandleConnectStateChangedInHasNet(const InternalMessagePtr msg);
+        void HandleConnectStateChangedInHasNet(const InternalMessagePtr msg);
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
         void HandleHttpResultInHasNet(const InternalMessagePtr msg);
-        void HandleWifi2WifiSucsess();
-        void HandleWifi2WifiFailed(bool isConnected);
-        void Wifi2WifiFailed();
         bool HandleWifiToWifi(int32_t switchReason, const NetworkSelectionResult &networkSelectionResult);
-        void UpdateWifiSwitchTimeStamp();
         bool TrySwitchWifiNetwork(const NetworkSelectionResult &networkSelectionResult);
+        void WifiHasNetStateInit();
     };
 
     class WifiNoNetState : public State {
@@ -167,7 +158,15 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
+        bool fullScan_ { false };
+        void HandleWifiNoInternet(const InternalMessagePtr msg);
+        bool HandleCheckResultInNoNet(const NetworkSelectionResult &networkSelectionResult);
+        bool TryNoNetSwitch(const NetworkSelectionResult &networkSelectionResult);
+        void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleHttpResultInNoNet(const InternalMessagePtr msg);
+        void HandleNoNetChanged();
+        void TrySelfCure();
+        void HandleConnectStateChangedInNoNet(const InternalMessagePtr msg);
     };
 
     class WifiPortalState : public State {
@@ -180,6 +179,7 @@ public:
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         void HandleHttpResultInPortal(const InternalMessagePtr msg);
+        void HandleConnectStateChangedInPortalNet(const InternalMessagePtr msg);
     };
 
     ErrCode Initialize();
@@ -239,11 +239,25 @@ private:
     std::string currentSsid_;
     std::shared_ptr<WifiLinkedInfo> pCurrWifiInfo_ { nullptr };
     std::shared_ptr<WifiDeviceConfig> pCurrWifiDeviceConfig_ { nullptr };
+    bool isWifi2WifiSwitching_ { false };
+    bool isDisableWifiAutoSwitch_ { false };
+    std::string targetBssid_ { "" };
+    NetworkSelectionResult networkSelectionResult_;
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
     bool HasWifiSwitchRecord();
     void RefreshConnectedNetWork();
     bool HasAvailableSsidToSwitch();
+    void SetSwitchReason(WifiSwitchReason reason);
+    bool IsSatisfiedWifiOperationCondition();
+    bool IsDisableWifiAutoSwitch();
+    void Wifi2WifiFinish();
+    bool IsFullscreen();
+    bool IsCallingInCs();
+    void UpdateWifiSwitchTimeStamp();
+    void HandleWifi2WifiSucsess(int64_t blackListTime);
+    void HandleWifi2WifiFailed();
+    void FastScan(std::vector<WifiScanInfo> &scanInfoList);
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -746,6 +746,7 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     rssiLevel0Or1ScanedCounter_ = 0;
     rssiLevel2Or3ScanedCounter_ = 0;
     pWifiProStateMachine_->isWifiNoInternet_ = false;
+    pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
 }
 
 void WifiProStateMachine::WifiHasNetState::GoOutState()

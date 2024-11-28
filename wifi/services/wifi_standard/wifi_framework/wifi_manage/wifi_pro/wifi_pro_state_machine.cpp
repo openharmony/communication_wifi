@@ -785,6 +785,11 @@ bool WifiProStateMachine::WifiHasNetState::ExecuteStateMsg(InternalMessagePtr ms
 
 void WifiProStateMachine::WifiHasNetState::HandleHttpResultInHasNet(const InternalMessagePtr msg)
 {
+    WIFI_LOGI("Enter HandleHttpResultInHasNet.");
+    if (msg == nullptr) {
+        WIFI_LOGI("HttpResultInHasNet, msg is nullptr.");
+        return;
+    }
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
         WIFI_LOGI("HandleHttpResultInHasNet, state transition: WifiHasNetState -> WifiPortalState.");

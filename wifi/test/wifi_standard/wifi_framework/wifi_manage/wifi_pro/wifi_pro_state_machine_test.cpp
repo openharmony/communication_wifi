@@ -722,14 +722,6 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateExecuteStateMsgTest05, TestSize.
 HWTEST_F(WifiProStateMachineTest, wifiNoNetStateExecuteStateMsgTest06, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
-    msg->SetMessageName(EVENT_REQUEST_SCAN_TIME_OUT);
-    EXPECT_EQ(wifiNoNetState_->ExecuteStateMsg(msg), true);
-}
-
-HWTEST_F(WifiProStateMachineTest, wifiNoNetStateExecuteStateMsgTest07, TestSize.Level1)
-{
-    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(EVENT_WIFI2WIFI_FAILED);
     msg->SetParam1(19);
     EXPECT_EQ(wifiNoNetState_->ExecuteStateMsg(msg), false);

@@ -519,6 +519,7 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance, con
     } else if (msg.msgCode >= WIFI_CBK_MSG_P2P_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_P2P) {
         DealP2pCallbackMsg(instance, msg);
     } else {
+        FreecfgInfo(msg.cfgInfo);
         WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
     }
     return;
@@ -941,6 +942,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             callback->OnP2pPrivatePeersChanged(msg.privateWfdInfo);
             break;
         default:
+            FreecfgInfo(msg.cfgInfo);
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
             break;
     }

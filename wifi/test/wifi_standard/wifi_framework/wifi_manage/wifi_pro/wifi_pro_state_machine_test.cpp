@@ -31,6 +31,7 @@
 #include "net_conn_client.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
+#include "network_status_history_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -756,7 +757,7 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest01, TestSize.Leve
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
     wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
-    wifiNoNetState_->TrySelfCure();
+    wifiNoNetState_->pWifiProStateMachine_->TrySelfCure(false);
     EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
 
@@ -765,7 +766,7 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest02, TestSize.Leve
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
     wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
-    wifiNoNetState_->TrySelfCure();
+    wifiNoNetState_->pWifiProStateMachine_->TrySelfCure(true);
     EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
 

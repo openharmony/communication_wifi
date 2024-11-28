@@ -348,7 +348,7 @@ int WifiSettings::SetDeviceEverConnected(int networkId)
     iter->second.everConnected = true;
     return 0;
 }
- 
+
 int WifiSettings::SetAcceptUnvalidated(int networkId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -359,7 +359,7 @@ int WifiSettings::SetAcceptUnvalidated(int networkId)
     iter->second.acceptUnvalidated = true;
     return 0;
 }
- 
+
 bool WifiSettings::GetDeviceEverConnected(int networkId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -369,7 +369,7 @@ bool WifiSettings::GetDeviceEverConnected(int networkId)
     }
     return iter->second.everConnected;
 }
- 
+
 bool WifiSettings::GetAcceptUnvalidated(int networkId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -1235,13 +1235,13 @@ bool WifiSettings::IsModulePreLoad(const std::string &name)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     if (name == WIFI_SERVICE_STA) {
-        return mWifiConfig[0].preLoadSta;
+        return true;
     } else if (name == WIFI_SERVICE_SCAN) {
-        return mWifiConfig[0].preLoadScan;
+        return true;
     } else if (name == WIFI_SERVICE_AP) {
         return mWifiConfig[0].preLoadAp;
     } else if (name == WIFI_SERVICE_P2P) {
-        return mWifiConfig[0].preLoadP2p;
+        return true;
     } else if (name == WIFI_SERVICE_AWARE) {
         return mWifiConfig[0].preLoadAware;
     } else if (name == WIFI_SERVICE_ENHANCE) {
@@ -1408,7 +1408,9 @@ void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
 {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     std::unique_lock<std::mutex> lock(mConfigOnBootMutex);
-    mSavedDeviceConfig.LoadConfig();
+    if (mSavedDeviceConfig.LoadConfig() < 0) {
+        return;
+    }
     std::vector<WifiDeviceConfig> tmp;
     mSavedDeviceConfig.GetValue(tmp);
     int count = 0;
@@ -1640,7 +1642,6 @@ void WifiSettings::InitWifiConfig()
 
 int WifiSettings::SyncWifiConfig()
 {
-    std::unique_lock<std::mutex> lock(mSyncWifiConfigMutex);
     std::vector<WifiConfig> tmp;
     for (auto &item : mWifiConfig) {
         tmp.push_back(item.second);
@@ -1946,7 +1947,7 @@ void WifiSettings::DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
     if (config.keyMgmt != KEY_MGMT_WAPI_CERT) {
         return;
     }
-
+ 
     EncryptedData *encryWapiAs = new EncryptedData(config.wifiWapiConfig.encryptedAsCertData,
         config.wifiWapiConfig.asCertDataIV);
     std::string decryWapiAs = "";
@@ -1980,7 +1981,6 @@ int WifiSettings::DecryptionDeviceConfig(WifiDeviceConfig &config)
         LOGD("DecryptionDeviceConfig IsWifiDeviceConfigDeciphered true");
         return 0;
     }
-    LOGD("DecryptionDeviceConfig start");
     WifiEncryptionInfo mWifiEncryptionInfo;
     mWifiEncryptionInfo.SetFile(GetTClassName<WifiDeviceConfig>());
     EncryptedData *encry = new EncryptedData(config.encryptedData, config.IV);

@@ -495,7 +495,7 @@ void WifiEventSubscriberManager::RegisterLocationEvent()
         WIFI_LOGE("LocationEvent datashareHelper is nullptr");
         return;
     }
-    locationModeObserver_ = sptr<WifiLocationModeObserver>(new (std::nothrow)WifiLocationModeObserver());
+    locationModeObserver_ = sptr<WifiLocationModeObserver>(new (std::nothrow) WifiLocationModeObserver());
     Uri uri(datashareHelper->GetLoactionDataShareUri());
     datashareHelper->RegisterObserver(uri, locationModeObserver_);
     islocationModeObservered = true;
@@ -627,11 +627,11 @@ void CesEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &e
 void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
-    WIFI_LOGI("OnReceiveScreenEvent: %{public}s.", action.c_str());
+    WIFI_LOGI("OnReceiveEvent: %{public}s.", action.c_str());
 
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-    int screenStateNew = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON)
-        ? MODE_STATE_OPEN : MODE_STATE_CLOSE;
+    int screenStateNew =
+        (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) ? MODE_STATE_OPEN : MODE_STATE_CLOSE;
     WifiConfigCenter::GetInstance().SetScreenState(screenStateNew);
     if (screenStateNew == screenState) {
         return;
@@ -650,7 +650,6 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
         }
     }
 }
-
 
 void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
@@ -973,7 +972,7 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
     const int exitForceSleep = 0x31;
     if (action == COMMON_EVENT_POWER_MANAGER_STATE_CHANGED) {
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-            if (eventData.GetCode() == enterForceSleep) { // STATE_ENTER_FORCESLEEP
+            if (eventData.GetCode() == enterForceSleep) {  // STATE_ENTER_FORCESLEEP
                 WIFI_LOGI("Receive ForceSleep Event: %{public}d", enterForceSleep);
                 WifiManager::GetInstance().InstallPacketFilterProgram(MODE_STATE_FORCESLEEP, i);
             }
@@ -985,7 +984,6 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
     }
 #endif
 }
-
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 void WifiEventSubscriberManager::RegisterAssetEvent()

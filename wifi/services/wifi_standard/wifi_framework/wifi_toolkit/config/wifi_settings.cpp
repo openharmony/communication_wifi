@@ -119,8 +119,8 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
         return -1;
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
-    int wifiDeviceConfigNumMax = 1000;
-    if (mWifiDeviceConfig.size() < wifiDeviceConfigNumMax) {
+    int wifiDeviceConfigMaxNum = 1000;
+    if (mWifiDeviceConfig.size() <= wifiDeviceConfigMaxNum) {
         auto iter = mWifiDeviceConfig.find(config.networkId);
         if (iter != mWifiDeviceConfig.end()) {
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
@@ -136,7 +136,7 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 #endif
         }
     } else {
-        LOGE("AddDeviceConfig Num Max!");
+        LOGE("AddDeviceConfig Exceeding the maximum value!");
         return -1;
     }
     return config.networkId;

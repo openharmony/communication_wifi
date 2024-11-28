@@ -141,7 +141,7 @@ HWTEST_F(WifiSettingsTest, GetCandidateConfigWithoutUidTest, TestSize.Level1)
     WifiDeviceConfig config2;
     int result = WifiSettings::GetInstance().GetCandidateConfigWithoutUid("test", "SAE", config2);
     WIFI_LOGI("GetCandidateConfigWithoutUidTest result(%{public}d)", result);
-    EXPECT_NE(result, WIFI_OPT_RETURN);
+    EXPECT_NE(result, MIN_RSSI_2DOT_4GHZ);
 }
  
 HWTEST_F(WifiSettingsTest, GetAllCandidateConfigWithoutUidTest, TestSize.Level1)

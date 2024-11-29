@@ -721,8 +721,8 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
     napi_ref handlerRef = nullptr;
     napi_create_reference(env, handler, 1, &handlerRef);
     RegObj regObj(env, handlerRef);
-    int RegisterInfoMaxNum = 1000;
-    if (g_eventRegisterInfo.size() <= RegisterInfoMaxNum) {
+    int registerInfoMaxNum = 1000;
+    if (g_eventRegisterInfo.size() <= registerInfoMaxNum) {
         auto iter = g_eventRegisterInfo.find(type);
         if (iter == g_eventRegisterInfo.end()) {
             g_eventRegisterInfo[type] = std::vector<RegObj>{regObj};

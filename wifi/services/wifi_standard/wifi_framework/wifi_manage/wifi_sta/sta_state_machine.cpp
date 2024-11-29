@@ -3882,7 +3882,11 @@ void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
     networkId = msg->GetParam1();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    RemoveDhcpCache(linkedInfo.ssid.c_str());
+    IpCacheInfo ipCacheInfo;
+    if ((strncpy_s(ipCacheInfo.ssid, SSID_MAX_LEN, linkedInfo.ssid.c_str(), linkedInfo.ssid.size()) == EOK) &&
+        (strncpy_s(ipCacheInfo.bssid, MAC_ADDR_MAX_LEN, linkedInfo.bssid.c_str(), linkedInfo.bssid.size()) == EOK)) {
+        DealWifiDhcpCache(WIFI_DHCP_CACHE_REMOVE, ipCacheInfo);
+    }
     WIFI_LOGI("DealNetworkRemoved networkid = %{public}d linkinfo.networkid = %{public}d targetNetworkId = %{public}d",
         networkId, linkedInfo.networkId, targetNetworkId);
     if ((linkedInfo.networkId == networkId) ||
@@ -4384,7 +4388,13 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
     if (ipType == 0) { /* 0-ipv4,1-ipv6 */
         result = &(StaStateMachine::DhcpResultNotify::DhcpIpv4Result);
         TryToSaveIpV4Result(ipInfo, ipv6Info, result);
-        AddDhcpCache(pStaStateMachine->linkedInfo.ssid.c_str(), pStaStateMachine->linkedInfo.bssid.c_str());
+        IpCacheInfo ipCacheInfo;
+        std::string ssid = pStaStateMachine->linkedInfo.ssid;
+        std::string bssid = pStaStateMachine->linkedInfo.bssid;
+        if ((strncpy_s(ipCacheInfo.ssid, SSID_MAX_LEN, ssid.c_str(), ssid.size()) == EOK) &&
+            (strncpy_s(ipCacheInfo.bssid, MAC_ADDR_MAX_LEN, bssid.c_str(), bssid.size()) == EOK)) {
+            DealWifiDhcpCache(WIFI_DHCP_CACHE_ADD, ipCacheInfo);
+        }
     } else {
         result = &(StaStateMachine::DhcpResultNotify::DhcpIpv6Result);
         TryToSaveIpV6Result(ipInfo, ipv6Info, result);
@@ -4653,7 +4663,8 @@ void StaStateMachine::ReUpdateNetLinkInfo(const WifiDeviceConfig &config)
         WifiDeviceConfig config;
         WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
         if (m_instId == INSTID_WLAN0) {
-            WifiNetAgent::GetInstance().UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, m_instId);
+            WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(
+                wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, m_instId);
         }
     }
 }

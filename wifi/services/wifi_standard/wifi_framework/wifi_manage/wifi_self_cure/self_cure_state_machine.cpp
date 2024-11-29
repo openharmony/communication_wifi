@@ -1374,7 +1374,8 @@ void SelfCureStateMachine::InternetSelfCureState::RequestUseStaticIpConfig(IpInf
     WifiConfigCenter::GetInstance().GetIpv6Info(wifiIpV6Info, pSelfCureStateMachine_->instId_);
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
-    WifiNetAgent::GetInstance().UpdateNetLinkInfo(dhcpResult, wifiIpV6Info, config.wifiProxyconfig,
+    WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(
+        dhcpResult, wifiIpV6Info, config.wifiProxyconfig,
         pSelfCureStateMachine_->instId_);
     linkedInfo.ipAddress = dhcpResult.ipAddress;
     WifiConfigCenter::GetInstance().SaveIpInfo(dhcpResult);

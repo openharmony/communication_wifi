@@ -583,8 +583,6 @@ void WifiProStateMachine::WifiConnectedState::GoInState()
         networkBlackListManager.CleanTempWifiBlockList();
     }
     InitConnectedState();
-    pWifiProStateMachine_->MessageExecutedLater(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL,
-        INTERNET_STATUS_DETECT_INTERVAL_MS);
 }
 
 void WifiProStateMachine::WifiConnectedState::GoOutState()
@@ -627,6 +625,7 @@ void WifiProStateMachine::WifiConnectedState::InitConnectedState()
     } else {
         pWifiProStateMachine_->isWifiNoInternet_ = false;
     }
+    pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);    
 }
 
 void WifiProStateMachine::WifiConnectedState::HandleWifiConnectStateChangedInConnected(const InternalMessagePtr msg)

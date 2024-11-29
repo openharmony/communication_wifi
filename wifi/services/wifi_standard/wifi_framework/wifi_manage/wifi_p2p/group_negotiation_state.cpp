@@ -87,6 +87,9 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
     group.SetCreatorUid(WifiConfigCenter::GetInstance().GetP2pCreatorUid());
     WifiConfigCenter::GetInstance().SaveP2pCreatorUid(-1);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
+    if (p2pStateMachine.CheckIsDisplayDevice(group.GetOwner().GetDeviceAddress())) {
+        group.SetPersistentFlag(true);
+    }
 
     if (groupManager.GetCurrentGroup().IsGroupOwner() &&
         MacAddress::IsValidMac(groupManager.GetCurrentGroup().GetOwner().GetDeviceAddress().c_str())) {
@@ -109,6 +112,17 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
         groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
     }
 
+    DoDhcpInGroupStart();
+    SharedLinkManager::IncreaseSharedLink();
+    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("SetP2pPowerSave() failed!");
+    }
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
+    return EXECUTED;
+}
+
+void GroupNegotiationState::DoDhcpInGroupStart(void) const
+{
     if (groupManager.GetCurrentGroup().IsGroupOwner()) {
         if (!p2pStateMachine.StartDhcpServer()) {
             WIFI_LOGE("failed to startup Dhcp server.");
@@ -147,12 +161,6 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
             WIFI_LOGE("fail:No GO device information is found.");
         }
     }
-    SharedLinkManager::IncreaseSharedLink();
-    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("SetP2pPowerSave() failed!");
-    }
-    p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
-    return EXECUTED;
 }
 
 bool GroupNegotiationState::ProcessGroupFormationFailEvt(InternalMessagePtr msg) const

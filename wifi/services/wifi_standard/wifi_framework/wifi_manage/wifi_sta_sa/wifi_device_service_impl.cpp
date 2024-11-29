@@ -1308,7 +1308,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
     if (info.macType == static_cast<int>(WifiPrivacyConfig::DEVICEMAC)) {
         if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("GetLinkedInfo:VerifyGetWifiLocalMacPermission() PERMISSION_DENIED!");
+            WIFI_LOGD("GetLinkedInfo:VerifyGetWifiLocalMacPermission() PERMISSION_DENIED!");
             /* Clear mac addr */
             info.macAddress = "";
         }
@@ -1323,7 +1323,7 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
 #endif
     if (ProcessPermissionVerify(appId, packageName) == PERMISSION_DENIED) {
         if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
+            WIFI_LOGD("GetLinkedInfo:VerifyGetWifiPeersMacPermission() PERMISSION_DENIED!");
 #ifdef SUPPORT_RANDOM_MAC_ADDR
         info.bssid = WifiConfigCenter::GetInstance().GetRandomMacAddr(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
             info.bssid);
@@ -2259,7 +2259,7 @@ ErrCode WifiDeviceServiceImpl::OnRestore(MessageParcel& data, MessageParcel& rep
 int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, const std::string &packageName)
 {
     if (appId.empty() || packageName.empty()) {
-        WIFI_LOGI("ProcessPermissionVerify(), PERMISSION_DENIED");
+        WIFI_LOGD("ProcessPermissionVerify(), PERMISSION_DENIED");
         return PERMISSION_DENIED;
     }
     std::map<std::string, std::vector<PackageInfo>> packageInfoMap;

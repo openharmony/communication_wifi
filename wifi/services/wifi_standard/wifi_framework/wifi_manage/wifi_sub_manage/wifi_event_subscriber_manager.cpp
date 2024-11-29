@@ -548,7 +548,7 @@ CesEventSubscriber::~CesEventSubscriber()
 void CesEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
-    WIFI_LOGI("CesEventSubscriber OnReceiveEvent: %{public}s", action.c_str());
+    WIFI_LOGD("CesEventSubscriber OnReceiveEvent: %{public}s", action.c_str());
     auto itFunc = CES_REQUEST_MAP.find(action);
     if (itFunc != CES_REQUEST_MAP.end()) {
         auto requestFunc = itFunc->second;

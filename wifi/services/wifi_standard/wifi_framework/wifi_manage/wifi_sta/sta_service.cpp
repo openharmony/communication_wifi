@@ -228,8 +228,9 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         LOGE("AddCandidateConfig failed, exceed max num: %{public}d\n", UID_UNTRUSTED_CONFIG_LEN);
         return WIFI_OPT_FAILED;
     }
-
+    LOGI("AddCandidateConfig config.keyMgmt:%{public}s  KEY_MGMT_WEP:%{public}s", config.keyMgmt, KEY_MGMT_WEP);
     if (config.keyMgmt == KEY_MGMT_WEP) {
+    LOGI("AddCandidateConfig 11.\n");
 #ifndef OHOS_ARCH_LITE
         auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
@@ -242,6 +243,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         return WIFI_OPT_NOT_SUPPORTED;
 #endif
     }
+    LOGI("AddCandidateConfig 00.\n");
     WifiDeviceConfig tempDeviceConfig = config;
     tempDeviceConfig.uid = uid;
 #ifndef OHOS_ARCH_LITE

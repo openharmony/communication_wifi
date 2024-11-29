@@ -228,7 +228,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
         LOGE("AddCandidateConfig failed, exceed max num: %{public}d\n", UID_UNTRUSTED_CONFIG_LEN);
         return WIFI_OPT_FAILED;
     }
-    LOGI("AddCandidateConfig config.keyMgmt:%{public}s  KEY_MGMT_WEP:%{public}s", config.keyMgmt, KEY_MGMT_WEP);
+    LOGI("AddCandidateConfig config.keyMgmt:%{public}s  KEY_MGMT_WEP:%{public}s", config.keyMgmt.c_str(), KEY_MGMT_WEP);
     if (config.keyMgmt == KEY_MGMT_WEP) {
     LOGI("AddCandidateConfig 11.\n");
 #ifndef OHOS_ARCH_LITE

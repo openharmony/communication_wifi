@@ -625,7 +625,7 @@ void WifiProStateMachine::WifiConnectedState::InitConnectedState()
     } else {
         pWifiProStateMachine_->isWifiNoInternet_ = false;
     }
-    pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);    
+    pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
 }
 
 void WifiProStateMachine::WifiConnectedState::HandleWifiConnectStateChangedInConnected(const InternalMessagePtr msg)

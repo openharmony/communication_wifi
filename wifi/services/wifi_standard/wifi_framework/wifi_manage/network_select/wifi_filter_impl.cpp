@@ -427,7 +427,7 @@ bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
     int32_t targetSignalLevel = WifiSettings::GetInstance().GetSignalLevel(scanInfo.rssi, scanInfo.band);
     if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(networkCandidate.interScanInfo.bssid) &&
         (targetSignalLevel <= SIGNAL_LEVEL_THREE || targetSignalLevel - curSignalLevel < MIN_SIGNAL_LEVEL_INTERVAL)) {
-        WIFI_LOGI("NotNetworkBlockListFilter, in wifi blocklist, targetSignalLevel:%{public}d, "
+        WIFI_LOGI("NotNetworkBlackListFilter, in wifi blocklist, targetSignalLevel:%{public}d, "
             "curSignalLevel:%{public}d, skip candidate:%{public}s",
             targetSignalLevel, curSignalLevel, networkCandidate.ToString().c_str());
         if (linkedInfo.detailedState == DetailedState::NOTWORKING && targetSignalLevel >= SIGNAL_LEVEL_THREE) {

@@ -132,6 +132,7 @@ if (defined(ohos_lite)) {
       "ability_runtime:app_manager",
       "hilog:libhilog",
       "init:libbegetutil",
+      "samgr:samgr_proxy",
     ]
     version_script = "libnetwork_select.map"
     part_name = "wifi"

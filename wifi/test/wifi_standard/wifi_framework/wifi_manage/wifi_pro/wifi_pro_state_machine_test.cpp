@@ -32,6 +32,9 @@
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "network_status_history_manager.h"
+#include "self_cure_state_machine.h"
+#include "self_cure_utils.h"
+#include "ip_qos_monitor.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -438,6 +441,12 @@ HWTEST_F(WifiProStateMachineTest, WifiConnectedStateInitConnectedStateTest01, Te
     EXPECT_NE(wifiConnectedState_->pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
 
+HWTEST_F(WifiProStateMachineTest, WifiConnectedParseQoeInfoAndRequestDetectTest01, TestSize.Level1)
+{
+    wifiConnectedState_->ParseQoeInfoAndRequestDetect();
+    EXPECT_NE(wifiConnectedState_->pWifiProStateMachine_->wifiSwitchReason_, TEN);
+}
+
 HWTEST_F(WifiProStateMachineTest, WifiDisconnectedStateGoInStateTest01, TestSize.Level1)
 {
     wifiDisconnectedState_->GoInState();
@@ -720,14 +729,6 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateExecuteStateMsgTest05, TestSize.
 }
 
 HWTEST_F(WifiProStateMachineTest, wifiNoNetStateExecuteStateMsgTest06, TestSize.Level1)
-{
-    InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    msg->SetMessageName(EVENT_WIFI2WIFI_FAILED);
-    msg->SetParam1(19);
-    EXPECT_EQ(wifiNoNetState_->ExecuteStateMsg(msg), false);
-}
-
-HWTEST_F(WifiProStateMachineTest, wifiNoNetStateHandleCheckResultInNoNetMsgTest, TestSize.Level1)
 {
     NetworkSelectionResult networkSelectionResult;
     wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;

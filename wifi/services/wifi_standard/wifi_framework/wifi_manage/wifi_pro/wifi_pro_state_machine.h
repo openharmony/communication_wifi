@@ -95,9 +95,15 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
+        int64_t mLastTcpTxCounter_ { 0 };
+        int64_t mLastTcpRxCounter_ { 0 };
+        int32_t mLastDnsFailedCnt_ { 0 };
+        int netDiasableDetectCount_ { 0 };
         void InitConnectedState();
         void HandleHttpResultInConnected(const InternalMessagePtr msg);
         void HandleWifiConnectStateChangedInConnected(const InternalMessagePtr msg);
+        void RequestHttpDetect();
+        void ParseQoeInfoAndRequestDetect();
     };
 
     /**

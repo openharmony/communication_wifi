@@ -3882,6 +3882,7 @@ void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
     networkId = msg->GetParam1();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    RemoveDhcpCache(linkedInfo.ssid.c_str());
     WIFI_LOGI("DealNetworkRemoved networkid = %{public}d linkinfo.networkid = %{public}d targetNetworkId = %{public}d",
         networkId, linkedInfo.networkId, targetNetworkId);
     if ((linkedInfo.networkId == networkId) ||
@@ -4383,6 +4384,7 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
     if (ipType == 0) { /* 0-ipv4,1-ipv6 */
         result = &(StaStateMachine::DhcpResultNotify::DhcpIpv4Result);
         TryToSaveIpV4Result(ipInfo, ipv6Info, result);
+        AddDhcpCache(pStaStateMachine->linkedInfo.ssid.c_str(), pStaStateMachine->linkedInfo.bssid.c_str());
     } else {
         result = &(StaStateMachine::DhcpResultNotify::DhcpIpv6Result);
         TryToSaveIpV6Result(ipInfo, ipv6Info, result);

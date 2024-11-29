@@ -160,7 +160,7 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
         LOGE("OnEventStateChanged: invalid ifName!");
         return 1;
     }
-    LOGI("OnEventStateChanged: callback enter! ifName = %{public}s", ifName);
+    LOGD("OnEventStateChanged: callback enter! ifName = %{public}s", ifName);
     if (statechangedParam == NULL) {
         LOGE("OnEventStateChanged: invalid parameter!");
         return 1;

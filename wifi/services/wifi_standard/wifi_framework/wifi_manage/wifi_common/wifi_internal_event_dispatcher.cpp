@@ -519,6 +519,7 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance, con
     } else if (msg.msgCode >= WIFI_CBK_MSG_P2P_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_P2P) {
         DealP2pCallbackMsg(instance, msg);
     } else {
+        FreecfgInfo(msg.cfgInfo);
         WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
     }
     return;
@@ -528,6 +529,7 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddBroadCastMsg, msgcode %{public}d", msg.msgCode);
     if (!mBroadcastThread) {
+        FreecfgInfo(msg.cfgInfo);
         return 0;
     }
     std::function<void()> func = std::bind([this, msg]() {
@@ -536,6 +538,7 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
     int delayTime = 0;
     bool result = mBroadcastThread->PostAsyncTask(func, delayTime);
     if (!result) {
+        FreecfgInfo(msg.cfgInfo);
         WIFI_LOGF("WifiInternalEventDispatcher::AddBroadCastMsg failed %{public}d", msg.msgCode);
         return -1;
     }
@@ -863,11 +866,25 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
 }
 #endif
 
+void WifiInternalEventDispatcher::FreecfgInfo(CfgInfo* cfgInfo)
+{
+    if (cfgInfo && cfgInfo->data) {
+        delete[] cfgInfo->data;
+        cfgInfo->data = nullptr;
+        delete cfgInfo;
+        cfgInfo = nullptr;
+    } else if (cfgInfo) {
+        delete cfgInfo;
+        cfgInfo = nullptr;
+    }
+}
+
 void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
     int pid, int uid, int tokenId)
 {
     if (callback == nullptr) {
         WIFI_LOGE("%{public}s: callback is null", __func__);
+        FreecfgInfo(msg.cfgInfo);
         return;
     }
 
@@ -925,6 +942,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             callback->OnP2pPrivatePeersChanged(msg.privateWfdInfo);
             break;
         default:
+            FreecfgInfo(msg.cfgInfo);
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
             break;
     }

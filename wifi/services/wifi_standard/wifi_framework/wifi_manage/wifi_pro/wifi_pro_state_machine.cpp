@@ -682,7 +682,7 @@ void WifiProStateMachine::WifiConnectedState::ParseQoeInfoAndRequestDetect()
     if ((mLastTcpTxCounter_ == 0) || (mLastTcpRxCounter_ == 0)) {
         mLastTcpTxCounter_ = mCurrentTcpTxCounter;
         mLastTcpRxCounter_ = mCurrentTcpRxCounter;
-        WIFI_LOGI("mLastTcpTxCounter = %{public}ld, mLastTcpRxCounter = %{public}ld",
+        WIFI_LOGI("mLastTcpTxCounter = %{public}lld, mLastTcpRxCounter = %{public}lld",
             mLastTcpTxCounter_, mLastTcpRxCounter_);
         return;
     }

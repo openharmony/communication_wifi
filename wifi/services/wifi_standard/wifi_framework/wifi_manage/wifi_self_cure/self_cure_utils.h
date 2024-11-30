@@ -30,7 +30,7 @@ public:
     void UnRegisterDnsResultCallback();
     int32_t GetCurrentDnsFailedCounter();
     void ClearDnsFailedCounter();
-
+    int32_t GetSelfCureType(int32_t currentCureLevel);
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:

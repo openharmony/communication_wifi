@@ -148,6 +148,7 @@ public:
         void HandleGatewayChanged(InternalMessagePtr msg);
         bool IsGatewayChanged();
         void HandleDnsFailedMonitor(InternalMessagePtr msg);
+        bool IsNeedSelfCure();
     };
 
     /* *
@@ -218,7 +219,6 @@ public:
         bool isDelayedRandMacReassocSelfCure_ = false;
         bool isDelayedResetSelfCure_ = false;
         bool isSetStaticIp4InvalidIp_ = false;
-        bool isRenewDhcpTimeout_ = false;
         bool isConfigStaticIp4MultiDhcpServer_ = false;
         std::string unConflictedIp_ = "";
         int lastMultiGwSelfFailedType_ = -1;
@@ -248,12 +248,9 @@ public:
         bool SelectedSelfCureAcceptable();
         void SelfCureForRandMacReassoc(int requestCureLevel);
         void SelfCureForReset(int requestCureLevel);
-        void HandleIpConfigCompleted();
-        void HandleIpConfigCompletedAfterRenewDhcp();
         bool ConfirmInternetSelfCure(int currentCureLevel);
         void HandleConfirmInternetSelfCureFailed(int currentCureLevel);
         void HandleInternetFailedAndUserSetStaticIp(int internetFailedType);
-        void HandleIpConfigTimeout();
         bool HasBeenTested(int cureLevel);
         void HandleHttpUnreachableFinally();
         void HandleHttpReachableAfterSelfCure(int currentCureLevel);
@@ -320,6 +317,8 @@ public:
     ErrCode Initialize();
     void SetHttpMonitorStatus(bool isHttpReachable);
     bool IsSelfCureOnGoing();
+    bool IsSelfCureL2Connecting();
+    void StopSelfCureWifi(int32_t status);
     bool CheckSelfCureWifiResult(int event);
 
 private:
@@ -428,7 +427,7 @@ private:
     void ClearDhcpOffer();
     void CheckSelfCureConnectState();
     void CheckSelfCureReassocState();
-    void UpdateSelfcureState(int selfcureType, bool isSelfCureOnGoing);
+    void UpdateSelfcureState(int currentCureLevel, bool isSelfCureOnGoing);
     void HandleSelfCureNormal();
     void HandleSelfCureException(int reasonCode);
     void StopSelfCureDelay(int status, int delay);
@@ -477,7 +476,7 @@ private:
     bool isInternetFailureDetected_ = false;
     DetailedState selfCureNetworkLastState_ = DetailedState::IDLE;
     WifiState selfCureWifiLastState_ = WifiState::UNKNOWN;
-    SelfCureState selfCureState_ = SelfCureState::SCE_WIFI_INVALID_STATE;
+    SelfCureState selfCureL2State_ = SelfCureState::SCE_WIFI_INVALID_STATE;
 };
 } // namespace Wifi
 } // namespace OHOS

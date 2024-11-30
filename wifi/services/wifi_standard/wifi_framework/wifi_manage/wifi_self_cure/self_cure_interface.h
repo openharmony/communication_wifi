@@ -96,12 +96,28 @@ public:
      * @param info -  IpInfo
      */
     void DealDhcpOfferReport(const IpInfo &ipInfo, int instId = 0);
+
     /**
      * @Description Is SelfCure On Going
      *
      * @return bool - true: selfcure is ongoing, false: selfcure is not ongoing
     */
     bool IsSelfCureOnGoing() override;
+
+    /**
+     * @Description Is SelfCure Connecting
+     *
+     * @return bool - true: selfcure is Connecting, false: selfcure is not Connecting
+    */
+    bool IsSelfCureL2Connecting() override;
+
+    /**
+     * @Description stop selfcure when user disconnect
+     *
+     * @param status - the situation while user disconnect
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode StopSelfCureWifi(int32_t status) override;
 
     /**
      * @Description Check if Selfcure state,

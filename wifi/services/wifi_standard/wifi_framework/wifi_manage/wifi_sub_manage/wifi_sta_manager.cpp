@@ -176,23 +176,6 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
     return;
 }
 
-bool WifiStaManager::IgnoreConnStateChange(const WifiLinkedInfo &info, int instId)
-{
-    WIFI_LOGD("enter IgnoreConnStateChange");
-#ifdef FEATURE_SELF_CURE_SUPPORT
-    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
-    if (pSelfCureService == nullptr) {
-        WIFI_LOGE("%{public}s: pSelfCureService is null.", __FUNCTION__);
-        return false;
-    }
-    if (pSelfCureService->IsSelfCureOnGoing() && info.detailedState != DetailedState::CONNECTED) {
-        WIFI_LOGI("selfcure ignore network state changed");
-        return true;
-    }
-#endif
-    return false;
-}
-
 void WifiStaManager::NotifyScanForStaConnChanged(OperateResState state, int instId)
 {
     if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||
@@ -216,18 +199,10 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
     }
-#ifdef FEATURE_SELF_CURE_SUPPORT
-    if ((state == OperateResState::CONNECT_AP_CONNECTED) || (state == OperateResState::CONNECT_AP_CONNECTED)
-        || (state == OperateResState::CONNECT_AP_CONNECTED)) {
-        ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
-        if (pSelfCureService != nullptr) {
-            pSelfCureService->CheckSelfCureWifiResult(SCE_EVENT_NET_INFO_CHANGED);
-        }
-    }
-#endif
+
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
-    if (isReport && !IgnoreConnStateChange(info, instId)) {
+    if (isReport) {
         WifiEventCallbackMsg cbMsg;
         cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
         cbMsg.msgData = reportStateNum;

@@ -815,6 +815,8 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     rssiLevel2Or3ScanedCounter_ = 0;
     pWifiProStateMachine_->isWifiNoInternet_ = false;
     pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
+    pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
+    pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
 }
 
 void WifiProStateMachine::WifiHasNetState::GoOutState()

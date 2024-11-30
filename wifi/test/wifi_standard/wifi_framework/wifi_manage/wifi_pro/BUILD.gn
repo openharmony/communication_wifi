@@ -10,19 +10,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 module_output_path = "wifi/wifi_pro_unittest"
 defines = []
- 
+
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_pro",
   ]
 }
- 
+
 ohos_unittest("wifi_pro_unittest") {
   module_out_path = module_output_path
   sources = [
@@ -38,25 +38,25 @@ ohos_unittest("wifi_pro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/wifi_filter_impl.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/wifi_scorer_impl.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history/network_status_history_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_pro_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_pro_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_pro_utils.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_file_spec.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ip_tools.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/unittest/Mock/mock_wifi_settings.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock/mock_scan_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_sta_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/mock/mock_wifi_service_manager.cpp",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
     "mock/mock_wifi_pro_interface.cpp",
     "wifi_pro_interface_test.cpp",
     "wifi_pro_service_test.cpp",
     "wifi_pro_state_machine_test.cpp",
   ]
- 
+
   include_dirs = [
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
@@ -96,7 +96,7 @@ ohos_unittest("wifi_pro_unittest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock",
   ]
- 
+
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
@@ -106,7 +106,7 @@ ohos_unittest("wifi_pro_unittest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
- 
+
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
@@ -137,19 +137,19 @@ ohos_unittest("wifi_pro_unittest") {
     "samgr:samgr_proxy",
     "time_service:time_client",
   ]
- 
+
   if (wifi_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
     defines += [ "WIFI_FFRT_ENABLE" ]
   }
- 
+
   defines += [
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     "private=public",
     "SUPPORT_RANDOM_MAC_ADDR",
     "FEATURE_SELF_CURE_SUPPORT",
   ]
- 
+
   if (wifi_feature_wifi_pro_ctrl) {
     defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
   }

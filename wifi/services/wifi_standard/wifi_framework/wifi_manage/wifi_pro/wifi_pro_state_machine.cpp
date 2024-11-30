@@ -700,10 +700,11 @@ void WifiProStateMachine::WifiConnectedState::ParseQoeInfoAndRequestDetect()
         deltaTcpTxPkts, deltaTcpRxPkts, deltaFailedDns, netDiasableDetectCount_);
  
     // if Rx = 0 Tx >=2  Count++, if Count >= 2 detect network
-    if (deltaTcpRxPkts == 0 && deltaTcpTxPkts >= MIN_TCP_TX &&
-        ++netDiasableDetectCount_ >= DEFAULT_NET_DISABLE_DETECT_COUNT) {
-        WIFI_LOGI("Rx = 0 && Tx >=2 detect");
-        pWifiProStateMachine_->SendMessage(EVENT_REQUEST_NETWORK_DETECT);
+    if (deltaTcpRxPkts == 0 && deltaTcpTxPkts >= MIN_TCP_TX) {
+        netDiasableDetectCount_++;
+        if (netDiasableDetectCount_ >= DEFAULT_NET_DISABLE_DETECT_COUNT) {
+            pWifiProStateMachine_->SendMessage(EVENT_REQUEST_NETWORK_DETECT);
+        }
         return;
     }
     netDiasableDetectCount_ = 0;
@@ -1189,7 +1190,6 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
     std::string &ssid = pWifiProStateMachine_->networkSelectionResult_.interScanInfo.ssid;
     WIFI_LOGI("NoNetSwitch 1: select network result, ssid: %{public}s, bssid: %{public}s.",
         SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
-    pWifiProStateMachine_->targetBssid_ = bssid;
     pWifiProStateMachine_->badBssid_ = pWifiProStateMachine_->currentBssid_;
     pWifiProStateMachine_->badSsid_ = pWifiProStateMachine_->currentSsid_;
     if (!HandleCheckResultInNoNet(pWifiProStateMachine_->networkSelectionResult_)) {
@@ -1233,6 +1233,7 @@ bool WifiProStateMachine::WifiNoNetState::TryNoNetSwitch(const NetworkSelectionR
             return false;
         }
         pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
+        pWifiProStateMachine_->targetBssid_ = networkSelectionResult.wifiDeviceConfig.bssid;
         if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_AUTO) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("NoNetSwitch 3: ConnectToNetwork failed.");
             pWifiProStateMachine_->isWifi2WifiSwitching_ = false;

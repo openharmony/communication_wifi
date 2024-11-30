@@ -119,25 +119,23 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
         return -1;
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
-    int wifiDeviceConfigMaxNum = 1000;
-    if (mWifiDeviceConfig.size() <= wifiDeviceConfigMaxNum) {
-        auto iter = mWifiDeviceConfig.find(config.networkId);
-        if (iter != mWifiDeviceConfig.end()) {
+    auto iter = mWifiDeviceConfig.find(config.networkId);
+    if (iter != mWifiDeviceConfig.end()) {
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-            if (WifiAssetManager::GetInstance().IsWifiConfigChanged(config, iter->second)) {
-                WifiAssetManager::GetInstance().WifiAssetUpdate(config);
-            }
-#endif
-            iter->second = config;
-        } else {
-            mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
-#ifdef SUPPORT_ClOUD_WIFI_ASSET
-            WifiAssetManager::GetInstance().WifiAssetAdd(config);
-#endif
+        if (WifiAssetManager::GetInstance().IsWifiConfigChanged(config, iter->second)) {
+            WifiAssetManager::GetInstance().WifiAssetUpdate(config);
         }
+#endif
+        iter->second = config;
     } else {
-        LOGE("AddDeviceConfig Exceeding the maximum value!");
-        return -1;
+        if (mWifiDeviceConfig.size() > WIFI_DEVICE_CONFIG_MAX_MUN) {
+            LOGE("AddDeviceConfig Exceeding the maximum value!");
+            return -1;
+        }
+        mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
+#ifdef SUPPORT_ClOUD_WIFI_ASSET
+        WifiAssetManager::GetInstance().WifiAssetAdd(config);
+#endif
     }
     return config.networkId;
 }

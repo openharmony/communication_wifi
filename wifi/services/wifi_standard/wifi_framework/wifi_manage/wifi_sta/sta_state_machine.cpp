@@ -315,6 +315,18 @@ void StaStateMachine::UnRegisterStaServiceCallback(const StaServiceCallback &cal
 
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
+#ifndef OHOS_ARCH_LITE
+    if (selfCureService_ != nullptr) {
+        if ((state == OperateResState::DISCONNECT_DISCONNECTED) || (state == OperateResState::CONNECT_AP_CONNECTED)
+            || (state == OperateResState::CONNECT_CONNECTION_REJECT)) {
+            selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_NET_INFO_CHANGED);
+        }
+        if (selfCureService_->IsSelfCureL2Connecting()) {
+            WIFI_LOGI("selfcure ignore network state changed");
+            return;
+        }
+    }
+#endif
     {
         std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
         for (const auto &callBackItem : m_staCallback) {
@@ -3886,6 +3898,11 @@ void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
         networkId, linkedInfo.networkId, targetNetworkId);
     if ((linkedInfo.networkId == networkId) ||
         ((targetNetworkId == networkId) && (linkedInfo.connState == ConnState::CONNECTING))) {
+    #ifndef OHOS_ARCH_LITE
+        if ((selfCureService_ != nullptr) && (selfCureService_->IsSelfCureL2Connecting())) {
+            selfCureService_->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
+        }
+    #endif
         std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
         WIFI_LOGI("Enter DisConnectProcess ifaceName:%{public}s!", ifaceName.c_str());
         WifiStaHalInterface::GetInstance().Disconnect(ifaceName);

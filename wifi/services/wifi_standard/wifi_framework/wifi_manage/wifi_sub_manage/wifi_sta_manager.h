@@ -40,7 +40,6 @@ public:
 
 private:
     void InitStaCallback(void);
-    bool IgnoreConnStateChange(const WifiLinkedInfo &info, int instId = 0);
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
     void DealStreamChanged(StreamDirection direction, int instId = 0);

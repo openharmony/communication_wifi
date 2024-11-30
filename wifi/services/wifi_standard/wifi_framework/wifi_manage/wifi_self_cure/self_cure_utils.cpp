@@ -17,6 +17,8 @@
 #include "net_conn_client.h"
 #include "net_handle.h"
 #include "netsys_controller.h"
+#include "self_cure_common.h"
+#include "self_cure_msg.h"
 #include "wifi_logger.h"
 
 namespace OHOS {
@@ -106,6 +108,37 @@ int32_t SelfCureUtils::SelfCureDnsResultCallback::GetDefaultNetId()
     NetHandle defaultNet;
     NetConnClient::GetInstance().GetDefaultNet(defaultNet);
     return defaultNet.GetNetId();
+}
+
+int32_t SelfCureUtils::GetSelfCureType(int32_t currentCureLevel)
+{
+    SelfCureType ret = SelfCureType::SCE_TYPE_INVALID;
+    switch (currentCureLevel) {
+        case WIFI_CURE_RESET_LEVEL_LOW_1_DNS:
+            ret = SelfCureType::SCE_TYPE_DNS;
+            break;
+        case WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC:
+            ret = SelfCureType::SCE_TYPE_REASSOC;
+            break;
+        case WIFI_CURE_RESET_LEVEL_WIFI6:
+            ret = SelfCureType::SCE_TYPE_WIFI6;
+            break;
+        case WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP:
+            ret = SelfCureType::SCE_TYPE_STATIC_IP;
+            break;
+        case WIFI_CURE_RESET_LEVEL_MULTI_GATEWAY:
+            ret = SelfCureType::SCE_TYPE_MULTI_GW;
+            break;
+        case WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC:
+            ret = SelfCureType::SCE_TYPE_RANDMAC;
+            break;
+        case WIFI_CURE_RESET_LEVEL_HIGH_RESET:
+            ret = SelfCureType::SCE_TYPE_RESET;
+            break;
+        default:
+            break;
+    }
+    return static_cast<int32_t>(ret);
 }
 } // namespace Wifi
 } // namespace OHOS

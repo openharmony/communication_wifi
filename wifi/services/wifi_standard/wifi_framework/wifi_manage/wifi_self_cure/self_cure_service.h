@@ -40,6 +40,8 @@ public:
     void HandleDhcpOfferReport(const IpInfo &ipInfo);
     void NotifyInternetFailureDetected(int forceNoHttpCheck);
     bool IsSelfCureOnGoing();
+    bool IsSelfCureL2Connecting();
+    void StopSelfCureWifi(int32_t status);
     bool CheckSelfCureWifiResult(int event);
 private:
     void RegisterP2pEnhanceCallback();

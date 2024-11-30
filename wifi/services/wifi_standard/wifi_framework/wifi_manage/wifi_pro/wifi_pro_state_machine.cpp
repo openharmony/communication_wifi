@@ -625,6 +625,7 @@ void WifiProStateMachine::WifiConnectedState::InitConnectedState()
     } else {
         pWifiProStateMachine_->isWifiNoInternet_ = false;
     }
+    pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
     pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
 }
 
@@ -675,7 +676,9 @@ void WifiProStateMachine::WifiConnectedState::RequestHttpDetect()
  
 void WifiProStateMachine::WifiConnectedState::ParseQoeInfoAndRequestDetect()
 {
-    WIFI_LOGI("Enter ParseQoeInfo.");
+    pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
+    pWifiProStateMachine_->MessageExecutedLater(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL,
+        INTERNET_STATUS_DETECT_INTERVAL_MS);
     int64_t mCurrentTcpTxCounter = IpQosMonitor::GetInstance().GetCurrentTcpTxCounter();
     int64_t mCurrentTcpRxCounter = IpQosMonitor::GetInstance().GetCurrentTcpRxCounter();
     int32_t mCurrentDnsFailedCnt = SelfCureUtils::GetInstance().GetCurrentDnsFailedCounter();
@@ -692,17 +695,20 @@ void WifiProStateMachine::WifiConnectedState::ParseQoeInfoAndRequestDetect()
     mLastTcpTxCounter_ = mCurrentTcpTxCounter;
     mLastTcpRxCounter_ = mCurrentTcpRxCounter;
     mLastDnsFailedCnt_ = mCurrentDnsFailedCnt;
-    pWifiProStateMachine_->MessageExecutedLater(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL,
-        INTERNET_STATUS_DETECT_INTERVAL_MS);
+    WIFI_LOGI("deltaTcpTxPkts = %{public}lld, deltaTcpRxPkts = %{public}lld, deltaFailedDns = %{public}d"
+              "nedisable = %{public}d",
+        deltaTcpTxPkts, deltaTcpRxPkts, deltaFailedDns, netDiasableDetectCount_);
  
     // if Rx = 0 Tx >=2  Count++, if Count >= 2 detect network
     if (deltaTcpRxPkts == 0 && deltaTcpTxPkts >= MIN_TCP_TX &&
         ++netDiasableDetectCount_ >= DEFAULT_NET_DISABLE_DETECT_COUNT) {
+        WIFI_LOGI("Rx = 0 && Tx >=2 detect");
         pWifiProStateMachine_->SendMessage(EVENT_REQUEST_NETWORK_DETECT);
         return;
     }
     netDiasableDetectCount_ = 0;
-    if (deltaTcpRxPkts == 0 && deltaFailedDns > MIN_DNS_FAILED_CNT) {
+    if (deltaTcpRxPkts == 0 && deltaFailedDns >= MIN_DNS_FAILED_CNT) {
+        WIFI_LOGI("Rx = 0 && DNSFailed > 2 detect");
         pWifiProStateMachine_->SendMessage(EVENT_REQUEST_NETWORK_DETECT);
     }
     return;
@@ -720,6 +726,7 @@ WifiProStateMachine::WifiDisconnectedState::~WifiDisconnectedState() {}
 void WifiProStateMachine::WifiDisconnectedState::GoInState()
 {
     WIFI_LOGI("WifiDisconnectedState GoInState function.");
+    pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
 }
 
 void WifiProStateMachine::WifiDisconnectedState::GoOutState()
@@ -1186,7 +1193,6 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
     pWifiProStateMachine_->badBssid_ = pWifiProStateMachine_->currentBssid_;
     pWifiProStateMachine_->badSsid_ = pWifiProStateMachine_->currentSsid_;
     if (!HandleCheckResultInNoNet(pWifiProStateMachine_->networkSelectionResult_)) {
-        pWifiProStateMachine_->TrySelfCure(false);
         return;
     }
 }

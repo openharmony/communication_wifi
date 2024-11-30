@@ -211,6 +211,7 @@ void WifiManager::CheckSapcoExist()
     WIFI_LOGI("GetSupportedFeatures preValue = %{public}s.", preValue);
     if (strncmp(preValue, SUPPORT_SAPCOEXIST.c_str(), SUPPORT_SAPCOEXIST_LEN) == 0) {
         g_supportsapcoexistflag = true;
+        WifiConfigCenter::GetInstance().SetCoexSupport(true);
     }
     return;
 }

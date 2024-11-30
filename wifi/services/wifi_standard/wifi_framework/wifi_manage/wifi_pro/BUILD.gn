@@ -85,8 +85,8 @@ ohos_static_library("wifi_pro") {
 
   external_deps = [
     "ability_runtime:app_manager",
-    "dhcp:dhcp_sdk",
     "c_utils:utils",
+    "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "init:libbegetutil",
     "netmanager_base:net_conn_manager_if",

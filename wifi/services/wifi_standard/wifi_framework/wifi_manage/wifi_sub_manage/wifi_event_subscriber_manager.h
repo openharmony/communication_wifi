@@ -133,7 +133,6 @@ private:
     void RegisterNotificationEvent();
     void UnRegisterNotificationEvent();
     void GetMdmProp();
-    void GetChipProp();
     void RegisterMdmPropListener();
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);
 #ifdef HAS_MOVEMENT_PART

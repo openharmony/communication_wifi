@@ -696,7 +696,7 @@ void WifiProStateMachine::WifiConnectedState::ParseQoeInfoAndRequestDetect()
     mLastTcpRxCounter_ = mCurrentTcpRxCounter;
     mLastDnsFailedCnt_ = mCurrentDnsFailedCnt;
     WIFI_LOGI("deltaTcpTxPkts = %{public}lld, deltaTcpRxPkts = %{public}lld, deltaFailedDns = %{public}d"
-              "nedisable = %{public}d",
+              ", nedisable = %{public}d",
         deltaTcpTxPkts, deltaTcpRxPkts, deltaFailedDns, netDiasableDetectCount_);
  
     // if Rx = 0 Tx >=2  Count++, if Count >= 2 detect network

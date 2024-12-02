@@ -41,7 +41,7 @@ void ExternalWifiFilterBuildManager::RegisterFilterBuilder(const FilterTag &filt
     WIFI_LOGI("RegisterFilterBuilder for filterTag: %{public}d, filterName: %{public}s",
               static_cast<int>(filterTag),
               filterName.c_str());
-    if (filterBuilders.size() > WIFI_MAX_REGISTER_NUM) {
+    if (filterBuilders.size() > REGISTERINFO_MAX_NUM) {
         WIFI_LOGW("%{public}s fail filterBuilders size is: %{public}d, over 1000",
             __FUNCTION__, static_cast<int>(filterBuilders.size()));
         return;

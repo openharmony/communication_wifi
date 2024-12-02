@@ -88,7 +88,7 @@ void WifiProInterface::DealRssiLevelChanged(int32_t rssi, int32_t instId)
 
 void WifiProInterface::DealScanResult(const std::vector<InterScanInfo> &results)
 {
-    WIFI_LOGI("Enter DealScanResult");
+    WIFI_LOGD("Enter DealScanResult");
     std::lock_guard<std::mutex> lock(mutex_);
     if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");

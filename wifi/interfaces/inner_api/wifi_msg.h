@@ -41,7 +41,7 @@ namespace Wifi {
 #define WIFI_EAP_CLOSE_EXTERNAL_SIM 0
 #define WIFI_PASSWORD_LEN 128
 #define MAX_PID_LIST_SIZE 128
-#define WIFI_MAX_REGISTER_NUM 1000
+#define REGISTERINFO_MAX_NUM 1000
 
 inline const std::string KEY_MGMT_NONE = "NONE";
 inline const std::string KEY_MGMT_WEP = "WEP";

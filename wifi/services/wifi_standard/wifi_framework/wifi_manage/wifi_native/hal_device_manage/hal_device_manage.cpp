@@ -269,7 +269,7 @@ bool HalDeviceManager::Scan(const std::string &ifaceName, const ScanParams &scan
     }
 
     std::lock_guard<std::mutex> lock(mMutex);
-    LOGI("Scan, ifaceName:%{public}s", ifaceName.c_str());
+    LOGD("Scan, ifaceName:%{public}s", ifaceName.c_str());
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter == mIWifiStaIfaces.end()) {
         LOGE("Scan, not find iface info");

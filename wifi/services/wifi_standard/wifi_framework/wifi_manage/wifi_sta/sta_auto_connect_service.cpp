@@ -66,7 +66,7 @@ void StaAutoConnectService::SetAutoConnectStateCallback(const std::vector<StaSer
 
 void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter OnScanInfosReadyHandler.\n");
+    WIFI_LOGD("Enter OnScanInfosReadyHandler.\n");
 
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);

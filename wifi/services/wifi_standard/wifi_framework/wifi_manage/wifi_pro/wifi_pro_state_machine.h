@@ -263,7 +263,6 @@ private:
     void HandleWifi2WifiFailed();
     void FastScan(std::vector<WifiScanInfo> &scanInfoList);
     void TrySelfCure(bool forceNoHttpCheck);
-    bool FirstNoNetAndSelfCure();
 };
 } // namespace Wifi
 } // namespace OHOS

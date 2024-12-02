@@ -26,6 +26,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotMgrServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiHotspotMgrServiceImpl::g_instanceLock;
+std::mutex WifiHotspotMgrServiceImpl::g_hotspotMutex;
 sptr<WifiHotspotMgrServiceImpl> WifiHotspotMgrServiceImpl::g_instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(
     WifiHotspotMgrServiceImpl::GetInstance().GetRefPtr());
@@ -82,6 +83,7 @@ void WifiHotspotMgrServiceImpl::OnStop()
 
 bool WifiHotspotMgrServiceImpl::Init()
 {
+    std::lock_guard<std::mutex> lock(g_hotspotMutex);
     if (!mPublishFlag) {
         for (int i = 0; i < AP_INSTANCE_MAX_NUM; i++) {
             sptr<WifiHotspotServiceImpl> wifi = new WifiHotspotServiceImpl(i);
@@ -104,6 +106,7 @@ bool WifiHotspotMgrServiceImpl::Init()
 
 sptr<IRemoteObject> WifiHotspotMgrServiceImpl::GetWifiRemote(int id)
 {
+    std::lock_guard<std::mutex> lock(g_hotspotMutex);
     auto iter = mWifiService.find(id);
     if (iter != mWifiService.end()) {
         return mWifiService[id];

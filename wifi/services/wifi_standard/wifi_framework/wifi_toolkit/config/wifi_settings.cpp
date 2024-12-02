@@ -128,6 +128,10 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 #endif
         iter->second = config;
     } else {
+        if (mWifiDeviceConfig.size() > WIFI_DEVICE_CONFIG_MAX_MUN) {
+            LOGE("AddDeviceConfig Exceeding the maximum value!");
+            return -1;
+        }
         mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
         WifiAssetManager::GetInstance().WifiAssetAdd(config);

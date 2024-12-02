@@ -1412,6 +1412,8 @@ int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::strin
         item.SetGoIpAddress(value);
     } else if (SetWifiP2pGroupInfoDev(item, key, value) == 0) {
         return errorKeyValue;
+    } else if (key == "isOldPersistenGroup") {
+        item.SetPersistentFlag(true);
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -1475,6 +1477,9 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
         ss << "    " <<"vecDev_=" << i << std::endl;
         const WifiP2pDevice &tmp = item.GetPersistentDevices().at(i);
         ss << OutWifiP2pDeviceClassString(tmp, prefix);
+    }
+    if (item.GetPersistentFlag()) {
+        ss << "    " << "isOldPersistenGroup=" << 1 << std::endl;
     }
     ss << "    " <<"</WifiP2pGroupInfo>" << std::endl;
     return ss.str();

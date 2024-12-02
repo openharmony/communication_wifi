@@ -64,7 +64,9 @@ constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
+constexpr int WIFI_DEVICE_CONFIG_MAX_MUN = 1000;
 constexpr uint32_t COMPARE_MAC_OFFSET = 2;
+/* Plaintext string length */
 constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
 
 inline constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";

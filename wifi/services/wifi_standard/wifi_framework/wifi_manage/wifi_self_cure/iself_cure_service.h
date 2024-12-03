@@ -62,6 +62,21 @@ public:
      */
     virtual bool IsSelfCureOnGoing() = 0;
 
+     /**
+     * @Description Is SelfCure Connecting
+     *
+     * @return bool - true: selfcure is Connecting, false: selfcure is not Connecting
+     */
+    virtual bool IsSelfCureL2Connecting() = 0;
+
+    /**
+     * @Description stop selfcure when user disconnect
+     *
+     * @param status - the situation while user disconnect
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StopSelfCureWifi(int32_t status) = 0;
+
     /**
      * @Description Check if Selfcure state,
      *

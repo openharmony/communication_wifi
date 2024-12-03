@@ -38,6 +38,11 @@ void ExternalWifiCommonBuildManager::RegisterCommonBuilder(const TagType &tagTyp
     std::lock_guard<std::mutex> lock(mutex);
     WIFI_LOGI("RegisterCommonBuilder for tagType: %{public}d, tagName: %{public}s",
               static_cast<int>(tagType), tagName.c_str());
+    if (commonBuilders.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGW("%{public}s fail commonBuilders size is: %{public}d, over 1000",
+            __FUNCTION__, static_cast<int>(commonBuilders.size()));
+        return;
+    }
     commonBuilders.insert_or_assign({tagType, tagName}, commonBuilder);
 }
 

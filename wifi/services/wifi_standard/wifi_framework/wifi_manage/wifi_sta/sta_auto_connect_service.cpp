@@ -462,6 +462,11 @@ void StaAutoConnectService::RegisterAutoJoinCondition(const std::string &conditi
     }
     std::lock_guard<std::mutex> lock(autoJoinMutex);
     WIFI_LOGI("Auto Join condition of %{public}s is registered.", conditionName.c_str());
+    if (autoJoinConditionsMap.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGW("%{public}s fail autoJoinConditionsMap size is: %{public}d, over 1000",
+            __FUNCTION__, static_cast<int>(autoJoinConditionsMap.size()));
+        return;
+    }
     autoJoinConditionsMap.insert_or_assign(conditionName, autoJoinCondition);
 }
 

@@ -500,7 +500,7 @@ ErrCode WifiServiceScheduler::StartDependentService(int instId)
     }
 #endif
 #ifdef FEATURE_SELF_CURE_SUPPORT
-    if (StartSelfCureService(instId) != WIFI_OPT_SUCCESS) {
+    if (StartSelfCureService(instId) == WIFI_OPT_FAILED) {
         WIFI_LOGE("StartSelfCureService failed!");
         return WIFI_OPT_FAILED;
     }
@@ -596,13 +596,13 @@ ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
 {
     if (IsFactoryMode()) {
         WIFI_LOGI("factory mode, not start selfcure service");
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_NOT_SUPPORTED;
     }
     char preValue[WIFI_SELFCURE_PROP_SIZE] = {0};
     int errorCode = GetParamValue(WIFI_SELFCURE_PROP_CONFIG, "true", preValue, WIFI_SELFCURE_PROP_SIZE);
     if ((errorCode > 0) && (strcmp(preValue, "false") == 0)) {
         WIFI_LOGI("due to disable selfcure, not start selfcure service");
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_NOT_SUPPORTED;
     }
 
     if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_SELFCURE) < 0) {

@@ -119,6 +119,27 @@ bool SelfCureInterface::IsSelfCureOnGoing()
     return pSelfCureService->IsSelfCureOnGoing();
 }
 
+bool SelfCureInterface::IsSelfCureL2Connecting()
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return false;
+    }
+    return pSelfCureService->IsSelfCureL2Connecting();
+}
+
+ErrCode SelfCureInterface::StopSelfCureWifi(int32_t status)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return WIFI_OPT_FAILED;
+    }
+    pSelfCureService->StopSelfCureWifi(status);
+    return WIFI_OPT_SUCCESS;
+}
+
 bool SelfCureInterface::CheckSelfCureWifiResult(int event)
 {
     std::lock_guard<std::mutex> lock(mutex);

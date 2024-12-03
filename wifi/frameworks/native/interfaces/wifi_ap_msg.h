@@ -36,7 +36,6 @@ namespace Wifi {
 #define AP_CHANNEL_5G_160M_DEFAULT 36
 #define AP_CHANNEL_5G_160M_SET_BEGIN 36
 #define AP_CHANNEL_5G_160M_SET_END 48
-
 enum class ApState {
     AP_STATE_NONE = 0,
     AP_STATE_IDLE,
@@ -119,7 +118,6 @@ struct HotspotConfig {
     {
         return band;
     }
-
     inline void SetBandWidth(int32_t BandWidth)
     {
         apBandWidth = BandWidth;
@@ -128,7 +126,7 @@ struct HotspotConfig {
     {
         return apBandWidth;
     }
-    
+
     inline void SetChannel(int32_t newchannel)
     {
         channel = newchannel;
@@ -190,17 +188,17 @@ struct HotspotMacConfig {
     {
         callingBundleName = bundleName;
     }
- 
+
     inline std::string GetCallingBundleName() const
     {
         return callingBundleName;
     }
- 
+
     inline void SetRandomMac(std::string &mac)
     {
         randomMac = mac;
     }
- 
+
     inline std::string GetRandomMac() const
     {
         return randomMac;

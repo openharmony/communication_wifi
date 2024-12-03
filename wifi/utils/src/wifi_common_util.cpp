@@ -68,10 +68,11 @@ constexpr char HIDDEN_CHAR_SHOW_AS = '*';
 constexpr int PASSWORD_MIN_LEN = 8;
 constexpr int PASSWORD_NO_HIDDEN_LEN = 2;
 
+constexpr uint32_t BASE_BIN = 2;
 constexpr uint32_t BASE_HEX = 16;
 constexpr uint32_t MAX_INT32_LENGTH = 11; // -2147483648 ~ 2147483647
 constexpr uint32_t MAX_INT64_LENGTH = 20; // -9223372036854775808 ~ 9223372036854775807
-constexpr uint32_t MAX_UINT32_LENGTH = 10; // 0 ~ 4294967295
+constexpr uint32_t MAX_INT32_LENGTH_BIN = 32;
 constexpr uint32_t MAX_INT32_LENGTH_HEX = 8;
 
 const uint32_t BASE64_UNIT_ONE_PADDING = 1;
@@ -625,15 +626,13 @@ std::vector<std::string> getAuthInfo(const std::string &input, const std::string
 std::string HexToString(const std::string &str)
 {
     std::string result;
-    uint8_t hexDecimal = 16;
-    uint8_t hexStep = 2;
     if (str.length() <= 0) {
         return result;
     }
     for (size_t i = 0; i < str.length() - 1; i += STEP_2BIT) {
-        std::string byte = str.substr(i, hexStep);
+        std::string byte = str.substr(i, STEP_2BIT);
         char chr = 0;
-        long strTemp = strtol(byte.c_str(), nullptr, hexDecimal);
+        int strTemp = CheckDataLegalHex(byte);
         if (strTemp > 0) {
             chr = static_cast<char>(strTemp);
         }
@@ -654,7 +653,7 @@ std::string StringToHex(const std::string &data)
 
 int CheckDataLegalBin(const std::string &data)
 {
-    if (data.empty() || data.size() > MAX_INT32_LENGTH_HEX) {
+    if (data.empty() || data.size() > MAX_INT32_LENGTH_BIN) {
         WIFI_LOGE("CheckDataLegalBin: invalid data:%{private}s", data.c_str());
         return 0;
     }
@@ -665,7 +664,7 @@ int CheckDataLegalBin(const std::string &data)
     }
     errno = 0;
     char *endptr = nullptr;
-    long int num = std::strtol(data.c_str(), &endptr, BASE_HEX);
+    long int num = std::strtol(data.c_str(), &endptr, BASE_BIN);
     if (errno == ERANGE) {
         WIFI_LOGE("CheckDataLegalBin errno == ERANGE, data:%{private}s", data.c_str());
         return 0;
@@ -673,7 +672,7 @@ int CheckDataLegalBin(const std::string &data)
  
     return static_cast<int>(num);
 }
-
+ 
 int CheckDataLegalHex(const std::string &data)
 {
     if (data.empty() || data.size() > MAX_INT32_LENGTH_HEX) {
@@ -720,12 +719,9 @@ int CheckDataLegal(std::string &data, int base)
 
 unsigned int CheckDataToUint(std::string &data, int base)
 {
-    if (data.empty() || data.size() > MAX_UINT32_LENGTH) {
-        WIFI_LOGE("CheckDataToUint: invalid data:%{private}s", data.c_str());
-        return 0;
-    }
     std::regex pattern("\\d+");
-    if (!std::regex_match(data, pattern)) {
+    std::regex pattern1("\\d+");
+    if (!std::regex_search(data, pattern) || !std::regex_search(data, pattern1)) {
         WIFI_LOGE("CheckDataToUint regex unsigned int value fail, data:%{private}s", data.c_str());
         return 0;
     }

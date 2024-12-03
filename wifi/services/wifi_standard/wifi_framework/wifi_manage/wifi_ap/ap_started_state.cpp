@@ -471,19 +471,19 @@ void ApStartedState::SetRandomMac() const
     } else {
         WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
     }
- 
+
     do {
         if (!MacAddress::IsValidMac(macAddress.c_str())) {
             WIFI_LOGE("%{public}s: macAddress is invalid", __func__);
             break;
         }
- 
+
         if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
             WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {
             WIFI_LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
             break;
         }
- 
+
         if (isDataClone && macConfig.GetRandomMac().empty()) {
             macConfig.SetRandomMac(macAddress);
             WifiConfigCenter::GetInstance().SetHotspotMacConfig(macConfig, m_id);

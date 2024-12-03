@@ -281,13 +281,15 @@ public:
     int GetScanOnlySwitchState(int instId = 0);
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
+
+    bool GetConfigValueByName(const std::string &name, std::string &value);
+
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
         const std::set<int> &wifiLinkedNetworkIds);
 
     void UpLoadLocalDeviceConfigToCloud();
 #endif
-    bool GetConfigValueByName(const std::string &name, std::string &value);
 
 private:
     WifiSettings();
@@ -350,7 +352,7 @@ private:
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
     std::map<std::string, StationInfo> mBlockListInfo;
     WifiConfigFileImpl<StationInfo> mSavedBlockInfo;
-    
+
     // P2P
     std::mutex mP2pMutex;
     std::vector<WifiP2pGroupInfo> mGroupInfoList;
@@ -360,7 +362,6 @@ private:
 
     // COMMON
     std::mutex mWifiConfigMutex;
-    std::mutex mSyncWifiConfigMutex;
     std::atomic<int> mApMaxConnNum;
     std::atomic<int> mMaxNumConfigs;
     std::map<int, WifiConfig> mWifiConfig;

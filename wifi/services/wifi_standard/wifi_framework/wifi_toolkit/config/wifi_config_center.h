@@ -25,7 +25,9 @@
 #include "wifi_internal_msg.h"
 #include "wifi_settings.h"
 #include "wifi_scan_config.h"
-
+#ifndef STA_INSTANCE_MAX_NUM
+#define STA_INSTANCE_MAX_NUM 2
+#endif
 #define SOFT_BUS_SERVICE_UID 1024
 #define CAST_ENGINE_SERVICE_UID 5526
 #define MIRACAST_SERVICE_UID 5529
@@ -160,24 +162,6 @@ public:
     bool SetWifiScanOnlyMidState(WifiOprMidState expState, WifiOprMidState state, int instId = 0);
 
     void SetWifiScanOnlyMidState(WifiOprMidState state, int instId = 0);
-
-    int GetScanControlInfo(ScanControlInfo &info, int instId = 0);
-
-    int SetScanControlInfo(const ScanControlInfo &info, int instId = 0);
-
-    void RecordWifiCategory(const std::string bssid, WifiCategory category);
-
-    void CleanWifiCategoryRecord();
-
-    void SetAbnormalApps(const std::vector<std::string> &abnormalAppList);
-
-    int GetAbnormalApps(std::vector<std::string> &abnormalAppList);
-
-    int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
-
-    int ClearScanInfoList();
-
-    int GetScanInfoList(std::vector<WifiScanInfo> &results);
 
     int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
 
@@ -333,13 +317,13 @@ public:
     int GetPersistWifiState(int instId);
 
     bool HasWifiActive();
-	
+
     void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid);
-	
+
     void UpdateLinkedInfo(int instId = 0);
 
     int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0);
- 
+
     int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0);
 private:
     WifiConfigCenter();
@@ -383,10 +367,6 @@ private:
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
-    std::map<int, ScanControlInfo> mScanControlInfo;
-    std::map<std::string, WifiCategory> mWifiCategoryRecord;
-    std::vector<std::string> mAbnormalAppList;
-    std::vector<WifiScanInfo> mWifiScanInfoList;
 
     // AP
     std::mutex mApMutex;

@@ -145,7 +145,7 @@ if (defined(ohos_lite)) {
     ldflags += [
       "-fPIC",
       "-Wl,-E",
-      "-Iwpa_client",
+      "-lwpa_client",
     ]
   }
 } else {

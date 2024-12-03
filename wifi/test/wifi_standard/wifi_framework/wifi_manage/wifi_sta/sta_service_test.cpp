@@ -24,6 +24,7 @@
 #include "wifi_msg.h"
 #include "wifi_internal_msg.h"
 #include "wifi_error_no.h"
+#include "mock_block_connect_service.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -397,47 +398,45 @@ void StaServiceTest::StaServiceEnableDeviceConfigSuccess()
 {
     int networkId = NETWORK_ID;
     bool attemptEnable = true;
-    EXPECT_CALL(WifiSettings::GetInstance(),
-        SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, attemptEnable))
-        .WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_SUCCESS);
+    EXPECT_CALL(BlockConnectService::GetInstance(),
+        EnableNetworkSelectStatus(networkId)).WillRepeatedly(Return(0));
+    EXPECT_FALSE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceEnableDeviceConfigFail1()
 {
     int networkId = NETWORK_ID;
     bool attemptEnable = true;
-    EXPECT_CALL(WifiSettings::GetInstance(),
-        SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, attemptEnable))
-        .WillRepeatedly(Return(-1));
-    EXPECT_TRUE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
+    EXPECT_CALL(BlockConnectService::GetInstance(),
+        EnableNetworkSelectStatus(networkId)).WillRepeatedly(Return(-1));
+    EXPECT_FALSE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceEnableDeviceConfigFail2()
 {
     int networkId = NETWORK_ID;
     bool attemptEnable = true;
-    EXPECT_TRUE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceDisableDeviceConfigSuccess()
 {
     int networkId = NETWORK_ID;
     bool attemptEnable = false;
-    EXPECT_CALL(WifiSettings::GetInstance(),
-        SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED, attemptEnable))
+    EXPECT_CALL(BlockConnectService::GetInstance(),
+        UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_WIFI_MANAGER))
         .WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceDisableDeviceConfigFail1()
 {
     int networkId = NETWORK_ID;
     bool attemptEnable = false;
-    EXPECT_CALL(WifiSettings::GetInstance(),
-        SetDeviceState(networkId, (int)WifiDeviceConfigStatus::DISABLED, attemptEnable))
+    EXPECT_CALL(BlockConnectService::GetInstance(),
+        UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_WIFI_MANAGER))
         .WillRepeatedly(Return(-1));
-    EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceDisconnectSuccess()

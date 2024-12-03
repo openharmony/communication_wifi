@@ -46,7 +46,8 @@ public:
         const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0) = 0;
     virtual int GetDeviceConfig(
         const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0) = 0;
-    virtual int SetDeviceState(int networkId, int state, bool bSetOther = false) = 0;
+    virtual int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
+        WifiDeviceConfig &config) = 0;
     virtual int SyncDeviceConfig() = 0;
     virtual int ReloadDeviceConfig() = 0;
     virtual int GetIpInfo(IpInfo &info, int instId = 0) = 0;
@@ -201,7 +202,6 @@ public:
     virtual int GetHotspotState(int id = 0) = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
     virtual int GetScanControlInfo(ScanControlInfo &info, int instId = 0) = 0;
-    virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
@@ -220,7 +220,8 @@ public:
         GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int));
     MOCK_METHOD4(
         GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
-    MOCK_METHOD3(SetDeviceState, int(int networkId, int state, bool bSetOther));
+    MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
+        WifiDeviceConfig &config));
     MOCK_METHOD0(SyncDeviceConfig, int());
     MOCK_METHOD0(ReloadDeviceConfig, int());
     MOCK_METHOD2(GetIpInfo, int(IpInfo &info, int));
@@ -374,7 +375,6 @@ public:
     MOCK_METHOD1(GetHotspotState, int(int id));
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
     MOCK_METHOD2(GetScanControlInfo, int(ScanControlInfo &info, int));
-    MOCK_METHOD1(MergeWifiCloneConfig, void(std::string &cloneData));
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetSupportHwPnoFlag, bool(int instId));
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));

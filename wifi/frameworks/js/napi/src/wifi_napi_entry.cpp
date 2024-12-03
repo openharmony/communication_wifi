@@ -357,6 +357,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getIpInfo", GetIpInfo),
         DECLARE_NAPI_FUNCTION("getIpv6Info", GetIpv6Info),
         DECLARE_NAPI_FUNCTION("getLinkedInfo", GetLinkedInfo),
+        DECLARE_NAPI_FUNCTION("getLinkedInfoSync", GetLinkedInfoSync),
         DECLARE_NAPI_FUNCTION("getDisconnectedReason", GetDisconnectedReason),
         DECLARE_NAPI_FUNCTION("isMeteredHotspot", IsMeteredHotspot),
         DECLARE_NAPI_FUNCTION("removeDevice", RemoveDevice),
@@ -420,6 +421,16 @@ static napi_value Init(napi_env env, napi_value exports) {
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
+    napi_env *pEnv = new (std::nothrow) napi_env;
+    if (pEnv != nullptr) {
+        *pEnv = env;
+        auto ret = napi_add_env_cleanup_hook(env, EventRegister::CleanUp, reinterpret_cast<void*>(pEnv));
+        if (ret != napi_status::napi_ok) {
+            WIFI_LOGI("Init, napi_add_env_cleanup_hook failed");
+        }
+    } else {
+        WIFI_LOGI("Init, pEnv is nullptr");
+    }
     return exports;
 }
 

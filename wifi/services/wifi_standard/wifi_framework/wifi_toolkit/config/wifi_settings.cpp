@@ -128,6 +128,10 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 #endif
         iter->second = config;
     } else {
+        if (mWifiDeviceConfig.size() > WIFI_DEVICE_CONFIG_MAX_MUN) {
+            LOGE("AddDeviceConfig Exceeding the maximum value!");
+            return -1;
+        }
         mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
         WifiAssetManager::GetInstance().WifiAssetAdd(config);
@@ -279,27 +283,6 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     return -1;
 }
 
-int WifiSettings::SetDeviceState(int networkId, int state, bool bSetOther)
-{
-    if (state < 0 || state >= (int)WifiDeviceConfigStatus::UNKNOWN) {
-        return -1;
-    }
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    auto iter = mWifiDeviceConfig.find(networkId);
-    if (iter == mWifiDeviceConfig.end()) {
-        return -1;
-    }
-    iter->second.status = state;
-    if (bSetOther && state == (int)WifiDeviceConfigStatus::ENABLED) {
-        for (iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); ++iter) {
-            if (iter->first != networkId && iter->second.status == state) {
-                iter->second.status = 1;
-            }
-        }
-    }
-    return 0;
-}
-
 int WifiSettings::SetDeviceEphemeral(int networkId, bool isEphemeral)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -379,6 +362,23 @@ bool WifiSettings::GetAcceptUnvalidated(int networkId)
     return iter->second.acceptUnvalidated;
 }
 
+int WifiSettings::GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
+    WifiDeviceConfig &config)
+{
+    std::vector<WifiDeviceConfig> configs;
+    if (GetAllCandidateConfigWithoutUid(configs) != 0) {
+        return -1;
+    }
+    for (const auto &it : configs) {
+        // -1: Connect by system, use default uid.
+        if (it.uid != -1 && !(it.isShared) && it.ssid == ssid && it.keyMgmt == keymgmt) {
+            config = it;
+            return it.networkId;
+        }
+    }
+    return -1;
+}
+
 int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
     WifiDeviceConfig &config)
 {
@@ -410,6 +410,24 @@ int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDe
         }
     }
     return -1;
+}
+
+int WifiSettings::GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> &configs)
+{
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGD("Reload wifi config");
+        ReloadDeviceConfig();
+    }
+ 
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    bool found = false;
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if (iter->second.uid != -1 && !iter->second.isShared) {
+            configs.push_back(iter->second);
+            found = true;
+        }
+    }
+    return found ? 0 : -1;
 }
 
 int WifiSettings::GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs)
@@ -641,27 +659,6 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
     }
     LOGI("OnBackup end. Backup count: %{public}d, fd: %{public}d.", static_cast<int>(backupConfigs.size()), fd.Get());
     return 0;
-}
-
-void WifiSettings::MergeWifiCloneConfig(std::string &cloneData)
-{
-    LOGI("MergeWifiCloneConfig enter");
-    std::unique_ptr<NetworkXmlParser> xmlParser = std::make_unique<NetworkXmlParser>();
-    bool ret = xmlParser->LoadConfigurationMemory(cloneData.c_str());
-    if (!ret) {
-        LOGE("MergeWifiCloneConfig load fail");
-        return;
-    }
-    ret = xmlParser->Parse();
-    if (!ret) {
-        LOGE("MergeWifiCloneConfig Parse fail");
-        return;
-    }
-    std::vector<WifiDeviceConfig> cloneConfigs = xmlParser->GetNetworks();
-    if (cloneConfigs.empty()) {
-        return;
-    }
-    ConfigsDeduplicateAndSave(cloneConfigs);
 }
 
 std::string WifiSettings::SetBackupReplyCode(int replyCode)

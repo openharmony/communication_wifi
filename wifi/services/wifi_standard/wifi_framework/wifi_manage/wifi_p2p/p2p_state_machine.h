@@ -304,16 +304,11 @@ private:
      */
     DHCPTYPE GetIsNeedDhcp() const;
 
-    /**
-     * @Description Is interface reuse.
-     *
-     */
-    bool IsInterfaceReuse() const;
-
     void ClearGroup() const;
 
     bool HasPersisentGroup(void);
 
+    bool CheckIsDisplayDevice(const std::string &mac) const;
 private:
     /**
      * @Description - Broadcast state change event.
@@ -433,6 +428,7 @@ private:
     GcInfo MatchDevInGcInfos(const std::string &deviceAddr, const std::string &groupAddr, std::vector<GcInfo> &gcInfos);
     void StopP2pDhcpClient();
     void DoP2pArp(std::string serverIp, std::string clientIp);
+    bool ReinvokeGroup(WifiP2pConfigInternal &config, int networkId, const WifiP2pDevice &device) const;
 
 private:
     mutable std::mutex cbMapMutex;

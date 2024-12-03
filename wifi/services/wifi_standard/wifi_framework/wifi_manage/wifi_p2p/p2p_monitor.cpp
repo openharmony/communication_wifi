@@ -711,7 +711,7 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
                 return;
             }
             std::string data = notifyParam.substr(freqPos + strlen("freq="));
-            int freq = stoi(data);
+            int freq = CheckDataLegal(data);
             WpaEventP2pChannelSwitch(freq);
             break;
         }
@@ -722,7 +722,7 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
                 return;
             }
             std::string data = notifyParam.substr(codePos + strlen("errCode="));
-            int errCode = stoi(data);
+            int errCode = CheckDataLegal(data);
             WpaEventP2pChrReport(errCode);
             break;
         }

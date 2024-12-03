@@ -64,7 +64,9 @@ constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
+constexpr int WIFI_DEVICE_CONFIG_MAX_MUN = 1000;
 constexpr uint32_t COMPARE_MAC_OFFSET = 2;
+/* Plaintext string length */
 constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
 
 inline constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
@@ -122,8 +124,6 @@ public:
 
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
 
-    int SetDeviceState(int networkId, int state, bool bSetOther = false);
-
     int SetDeviceEphemeral(int networkId, bool isEphemeral);
 
     int SetDeviceAfterConnect(int networkId);
@@ -137,6 +137,9 @@ public:
     bool GetDeviceEverConnected(int networkId);
  
     bool GetAcceptUnvalidated(int networkId);
+
+    int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
+        WifiDeviceConfig &config);
 
     int GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config);
@@ -161,8 +164,6 @@ public:
     int OnRestore(UniqueFd &fd, const std::string &restoreInfo);
 
     int OnBackup(UniqueFd &fd, const std::string &backupInfo);
-
-    void MergeWifiCloneConfig(std::string &cloneData);
 
     std::string SetBackupReplyCode(int replyCode);
 
@@ -322,6 +323,7 @@ private:
     bool EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
 #endif
     void SyncAfterDecryped(WifiDeviceConfig &config);
+    int GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> &configs);
 private:
     // STA
     std::mutex mStaMutex;

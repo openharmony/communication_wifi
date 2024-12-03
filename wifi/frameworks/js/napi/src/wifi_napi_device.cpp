@@ -1076,6 +1076,27 @@ NO_SANITIZE("cfi") napi_value GetLinkedInfo(napi_env env, napi_callback_info inf
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
+/* This interface has not been fully implemented */
+NO_SANITIZE("cfi") napi_value GetLinkedInfoSync(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 2;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    WifiLinkedInfo linkedInfo;
+    ErrCode ret = wifiDevicePtr->GetLinkedInfo(linkedInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get SyncGetLinkedInfo value fail:%{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value result;
+    napi_create_object(env, &result);
+    LinkedInfoToJs(env, linkedInfo, result);
+    return result;
+}
+
 NO_SANITIZE("cfi") napi_value GetDisconnectedReason(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;

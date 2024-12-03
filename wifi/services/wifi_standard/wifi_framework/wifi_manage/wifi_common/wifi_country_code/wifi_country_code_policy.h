@@ -76,7 +76,7 @@ private:
 
 class WifiCountryCodeIntlUtils {
 public:
-    WifiCountryCodeIntlUtils() : wifiLibraryUtils_("libwifi_ext_lib.z.so", libHandle_, true) {}
+    WifiCountryCodeIntlUtils() : wifiLibraryUtils_("libwifi_ext_lib.z.so", libHandle_, false) {}
     ~WifiCountryCodeIntlUtils() = default;
     std::string GetSystemRegion();
 private:

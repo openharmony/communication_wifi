@@ -149,7 +149,7 @@ public:
     ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) override;
 
     /**
-     * @Description set wifi tx power for sar
+     * @Description set tx power for sar
      *
      * @param power - txpower
      * @return ErrCode - operation result
@@ -566,7 +566,7 @@ public:
      *
      * @param uid - target app uid
      * @param protocol - target protocol type
-     * @return enable - enable/disable dpi mark
+     * @param enable - enable/disable dpi mark
      */
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
 #ifdef OHOS_ARCH_LITE

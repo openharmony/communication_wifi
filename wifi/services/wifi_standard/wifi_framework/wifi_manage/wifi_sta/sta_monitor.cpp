@@ -175,6 +175,7 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
 void StaMonitor::OnWpaHilinkCallBack(const std::string &bssid)
 {
     WIFI_LOGI("OnWpaHilinkCallBack() enter");
+
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS, bssid);
     return;
 }

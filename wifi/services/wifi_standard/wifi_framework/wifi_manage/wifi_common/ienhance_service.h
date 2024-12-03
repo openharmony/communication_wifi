@@ -146,6 +146,7 @@ public:
      * @return true or false
      */
     virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
+
     /**
      * @Description Register P2pEnhance state Callback
      *

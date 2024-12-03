@@ -29,7 +29,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
 namespace OHOS {
 namespace Wifi {
-const std::string DHCP_IP_V4_DEFAULT = "192.168.62.1";
+const std::string DHCP_IP_V4_DEFAULT = "192.168.43.1";
 std::shared_ptr<WifiDevice> wifiDeviceSharedPtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 
 WifiHotspotStub::WifiHotspotStub():mSingleCallback(false), m_id(0)

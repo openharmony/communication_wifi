@@ -43,16 +43,11 @@ namespace OHOS {
 namespace Wifi {
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
 constexpr uint32_t PROP_LEN = 26;
-constexpr uint32_t PROP_SUBCHIPTYPE_LEN = 10;
-constexpr uint32_t SUPPORT_COEXCHIP_LEN = 7;
 constexpr uint32_t PROP_TRUE_LEN = 4;
 constexpr uint32_t PROP_FALSE_LEN = 5;
 const std::string PROP_TRUE = "true";
 const std::string PROP_FALSE = "false";
-const std::string SUBCHIP_WIFI_PROP = "ohos.boot.odm.conn.schiptype";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
-const std::string SUPPORT_COEXCHIP = "";
-const std::string COEX_IFACENAME = "wlan1";
 const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
 
@@ -97,7 +92,6 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 #endif
     InitSubscribeListener();
     GetMdmProp();
-    GetChipProp();
     RegisterMdmPropListener();
     RegisterNetworkStateChangeEvent();
     RegisterWifiScanChangeEvent();
@@ -463,18 +457,6 @@ void WifiEventSubscriberManager::GetMdmProp()
     if (errorCode > 0) {
         if (strncmp(preValue, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0) {
             mIsMdmForbidden = true;
-        }
-    }
-}
-
-void WifiEventSubscriberManager::GetChipProp()
-{
-    char preValue[PROP_SUBCHIPTYPE_LEN] = {0};
-    int errorCode = GetParamValue(SUBCHIP_WIFI_PROP.c_str(), 0, preValue, PROP_SUBCHIPTYPE_LEN);
-    if (errorCode > 0) {
-        if (strncmp(preValue, SUPPORT_COEXCHIP.c_str(), SUPPORT_COEXCHIP_LEN) == 0) {
-            WifiConfigCenter::GetInstance().SetApIfaceName(COEX_IFACENAME);
-            WifiConfigCenter::GetInstance().SetCoexSupport(true);
         }
     }
 }

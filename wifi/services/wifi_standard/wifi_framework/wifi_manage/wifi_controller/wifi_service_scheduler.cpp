@@ -908,7 +908,6 @@ void WifiServiceScheduler::SoftApIfaceDestoryCallback(std::string &destoryIfaceN
             auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
             ins->SendMessage(CMD_AP_REMOVED, createIfaceType, iter->first);
             if (createIfaceType >= 0) {
-                WifiConfigCenter::GetInstance().SetApIfaceName("");
                 softApIfaceNameMap.erase(iter);
             }
             return;

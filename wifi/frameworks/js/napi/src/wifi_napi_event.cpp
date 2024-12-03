@@ -74,7 +74,7 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
         WIFI_LOGE("asyncEvent is null!");
         return;
     }
-    WIFI_LOGI("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
+    WIFI_LOGD("Enter wifi event notify, eventType: %{public}s", asyncEvent->eventType.c_str());
 
     auto task = [asyncEvent]() {
         napi_value handler = nullptr;
@@ -723,6 +723,10 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
     RegObj regObj(env, handlerRef);
     auto iter = g_eventRegisterInfo.find(type);
     if (iter == g_eventRegisterInfo.end()) {
+        if (g_eventRegisterInfo.size() > REGISTERINFO_MAX_NUM) {
+            WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+            return;
+        }
         g_eventRegisterInfo[type] = std::vector<RegObj>{regObj};
     } else {
         iter->second.emplace_back(regObj);
@@ -808,6 +812,26 @@ void EventRegister::Unregister(const napi_env& env, const std::string& type, nap
     if (iter->second.empty()) {
         g_eventRegisterInfo.erase(iter);
     }
+}
+
+void EventRegister::CleanUp(void *data)
+{
+    std::unique_lock<std::shared_mutex> guard(g_regInfoMutex);
+    auto env = *(reinterpret_cast<napi_env*>(data));
+    for (auto &event : g_eventRegisterInfo) {
+        auto &vecRegObjs = event.second;
+        auto iter = vecRegObjs.begin();
+        for (; iter != vecRegObjs.end();) {
+            if (env == iter->m_regEnv) {
+                napi_delete_reference(iter->m_regEnv, iter->m_regHanderRef);
+                iter = vecRegObjs.erase(iter);
+            } else {
+                ++iter;
+            }
+        }
+    }
+    delete reinterpret_cast<napi_env*>(data);
+    data = nullptr;
 }
 }  // namespace Wifi
 }  // namespace OHOS

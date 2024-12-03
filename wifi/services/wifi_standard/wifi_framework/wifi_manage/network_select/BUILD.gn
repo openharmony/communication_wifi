@@ -20,7 +20,6 @@ if (defined(ohos_lite)) {
 }
 
 local_base_sources = [
-  "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
   "external_wifi_common_builder_manager.cpp",
   "external_wifi_filter_builder_manager.cpp",
   "network_selection_manager.cpp",
@@ -62,6 +61,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -118,6 +118,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",

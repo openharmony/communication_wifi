@@ -28,6 +28,7 @@ constexpr int SUFFICIENT_RSSI_2G = -73;
 constexpr int RSSI_SCORE_OFFSET = 85;
 constexpr int RSSI_SCORE_SLOPE_IS_4 = 4;
 constexpr int TOP_TIME_BASE_SCORE = 1000000;
+constexpr int BOTTOM_TIME_BASE_SCORE = -1000000;
 constexpr int MAX_RECENT_SELECTION_SECONDS = 8 * 60 * 60;
 constexpr int MIN_5G_FREQUENCY = 5160;
 constexpr int MAX_5G_FREQUENCY = 5865;
@@ -127,16 +128,24 @@ bool ThroughputScorer::IsSecurityNetwork(NetworkCandidate &networkCandidate) con
 
 void ThroughputScorer::DoScore(NetworkCandidate &networkCandidate, ScoreResult &scoreResult)
 {
+    scoreResult.scorerName = "ThroughputScorer";
     double rssiBaseScore = GetRssiBaseScore(networkCandidate);
     double savedNetworkAward = GetSavedNetworkAward(networkCandidate);
-    scoreResult.scorerName = "ThroughputScorer";
-    if (IsRecentUserSelected(networkCandidate)) {
-        scoreResult.score = TOP_TIME_BASE_SCORE + rssiBaseScore + savedNetworkAward;
-        return;
-    }
     scoreResult.score = rssiBaseScore + savedNetworkAward;
     if (IsSecurityNetwork(networkCandidate)) {
         scoreResult.score += SECURITY_AWARD_SCORE;
+    }
+
+    // It is suggestion network that the network priority be very low.
+    if (networkCandidate.wifiDeviceConfig.uid != -1 &&
+        networkCandidate.wifiDeviceConfig.isShared == 0) {
+        scoreResult.score += BOTTOM_TIME_BASE_SCORE;
+        return;
+    }
+
+    if (IsRecentUserSelected(networkCandidate)) {
+        scoreResult.score = TOP_TIME_BASE_SCORE + rssiBaseScore + savedNetworkAward;
+        return;
     }
 }
 

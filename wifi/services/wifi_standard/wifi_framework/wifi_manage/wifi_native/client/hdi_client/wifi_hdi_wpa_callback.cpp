@@ -160,7 +160,7 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
         LOGE("OnEventStateChanged: invalid ifName!");
         return 1;
     }
-    LOGI("OnEventStateChanged: callback enter! ifName = %{public}s", ifName);
+    LOGD("OnEventStateChanged: callback enter! ifName = %{public}s", ifName);
     if (statechangedParam == NULL) {
         LOGE("OnEventStateChanged: invalid parameter!");
         return 1;
@@ -619,8 +619,8 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
     if (groupStartedParam == nullptr) {
         return 1;
     }
-    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     char tempSsid[WIFI_SSID_LENGTH] = {0};
+    const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onGroupStarted) {
         OHOS::Wifi::HalP2pGroupInfo cbInfo;
         cbInfo.isGo = groupStartedParam->isGo;

@@ -315,6 +315,18 @@ void StaStateMachine::UnRegisterStaServiceCallback(const StaServiceCallback &cal
 
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
+#ifndef OHOS_ARCH_LITE
+    if (selfCureService_ != nullptr) {
+        if ((state == OperateResState::DISCONNECT_DISCONNECTED) || (state == OperateResState::CONNECT_AP_CONNECTED)
+            || (state == OperateResState::CONNECT_CONNECTION_REJECT)) {
+            selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_NET_INFO_CHANGED);
+        }
+        if (selfCureService_->IsSelfCureL2Connecting()) {
+            WIFI_LOGI("selfcure ignore network state changed");
+            return;
+        }
+    }
+#endif
     {
         std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
         for (const auto &callBackItem : m_staCallback) {
@@ -824,6 +836,7 @@ void StaStateMachine::StopWifiProcess()
     WIFI_LOGI("Stop wifi is in process... m_instId = %{public}d", m_instId);
     StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
     isRoam = false;
+    mPortalUrl = "";
     WifiConfigCenter::GetInstance().SetMacAddress("", m_instId);
 
     ConnState curConnState = linkedInfo.connState;
@@ -988,6 +1001,9 @@ int StaStateMachine::InitStaSMHandleMap()
 #endif
     staSmHandleFuncMap[WIFI_SVR_COM_STA_ENABLE_HILINK] = [this](InternalMessagePtr msg) {
         return this->DealHiLinkDataToWpa(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealCsaChannelChanged(msg);
     };
     staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_DELIVER_MAC] = [this](InternalMessagePtr msg) {
         return this->DealHiLinkDataToWpa(msg);
@@ -1207,7 +1223,7 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
     }
     SetConnectMethod(connTriggerMode);
     WifiConfigCenter::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
-    WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
+    BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
 }
 
 void StaStateMachine::DealConnectTimeOutCmd(InternalMessagePtr msg)
@@ -1392,7 +1408,7 @@ void StaStateMachine::DealDisconnectEvent(InternalMessagePtr msg)
     }
 
     isRoam = false;
-
+    mPortalUrl = "";
     /* Initialize connection information. */
     std::string ssid = linkedInfo.ssid;
     InitWifiLinkedInfo();
@@ -2034,7 +2050,6 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
 
 bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
 {
-    LOGD("enter SetRandomMac.");
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
@@ -2044,7 +2059,6 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     std::string currentMac;
     std::string realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
-    LOGD("%{public}s realMac is %{public}s", __func__, MacAnonymize(realMac).c_str());
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
         currentMac = realMac;
     } else {
@@ -2054,9 +2068,6 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
             LOGE("scanInfo has no target wifi and bssid is empty!");
             return false;
         }
-        LOGI("%{public}s randommac, ssid:%{public}s keyMgmt:%{public}s macAddress:%{public}s",
-            __func__, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
-            MacAnonymize(deviceConfig.macAddress).c_str());
         if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
             WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
             if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
@@ -2075,11 +2086,16 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
     }
     if (SetMacToHal(currentMac, realMac, m_instId)) {
         deviceConfig.macAddress = currentMac;
+        deviceConfig.wifiPrivacySetting =
+            (currentMac == realMac) ? WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC;
         WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
         WifiSettings::GetInstance().SyncDeviceConfig();
     } else {
         return false;
     }
+    LOGI("SetRandomMac success,wifiPrivacySetting:%{public}d,ssid:%{public}s,keyMgmt:%{public}s,macAddress:%{public}s",
+        deviceConfig.wifiPrivacySetting, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
+        MacAnonymize(deviceConfig.macAddress).c_str());
 #endif
     return true;
 }
@@ -3513,7 +3529,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
         return;
     }
-    mPortalUrl = portalUrl;
+    if (!portalUrl.empty()) {
+        mPortalUrl = portalUrl;
+    }
     bool updatePortalAuthTime = false;
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
         mIsWifiInternetCHRFlag = false;
@@ -3529,6 +3547,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         if (getCurrentWifiDeviceConfig().isPortal) {
             StartDetectTimer(DETECT_TYPE_PERIODIC);
         }
+        mPortalUrl = "";
 #ifndef OHOS_ARCH_LITE
         UpdateAcceptUnvalidatedState();
         WifiNotificationUtil::GetInstance().CancelWifiNotification(
@@ -3644,8 +3663,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
     }
     WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
-    WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
-        static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
+    BlockConnectService::GetInstance().EnableNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
@@ -3880,12 +3898,30 @@ void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
         networkId, linkedInfo.networkId, targetNetworkId);
     if ((linkedInfo.networkId == networkId) ||
         ((targetNetworkId == networkId) && (linkedInfo.connState == ConnState::CONNECTING))) {
+    #ifndef OHOS_ARCH_LITE
+        if ((selfCureService_ != nullptr) && (selfCureService_->IsSelfCureL2Connecting())) {
+            selfCureService_->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
+        }
+    #endif
         std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
         WIFI_LOGI("Enter DisConnectProcess ifaceName:%{public}s!", ifaceName.c_str());
         WifiStaHalInterface::GetInstance().Disconnect(ifaceName);
     }
  
     return;
+}
+
+void StaStateMachine::DealCsaChannelChanged(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        LOGE("%{public}s InternalMessage msg is null", __FUNCTION__);
+        return;
+    }
+    int newFreq = msg->GetParam1();
+    WIFI_LOGI("%{public}s update freq from %{public}d to %{public}d", __FUNCTION__, linkedInfo.frequency, newFreq);
+    linkedInfo.frequency = newFreq;
+    // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
+    InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
 }
 /* --------------------------- state machine Roaming State ------------------------------ */
 StaStateMachine::ApRoamingState::ApRoamingState(StaStateMachine *staStateMachine)

@@ -42,7 +42,6 @@ public:
     virtual int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs) = 0;
     virtual int SetAcceptUnvalidated(int networkId) = 0;
     virtual int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0) = 0;
-    virtual void MergeWifiCloneConfig(std::string &cloneData) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0) = 0;
     virtual bool GetWifiFlagOnAirplaneMode(int instId = 0) = 0;
@@ -69,7 +68,6 @@ public:
     MOCK_METHOD2(GetAllCandidateConfig, int(const int uid, std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD1(SetAcceptUnvalidated, int(int networkId));
     MOCK_METHOD2(SetWifiFlagOnAirplaneMode, int(bool ifOpen, int instId));
-    MOCK_METHOD1(MergeWifiCloneConfig, void(std::string &cloneData));
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD3(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));
     MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));

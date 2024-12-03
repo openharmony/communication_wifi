@@ -72,25 +72,49 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
                                                   const std::vector<InterScanInfo> &scanInfos)
 {
     std::map<int, std::size_t> wifiDeviceConfigs;
+    std::map<int, std::size_t> wifiCandidateConfigs;
     for (auto &scanInfo : scanInfos) {
         auto& networkCandidate = networkCandidates.emplace_back(scanInfo);
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
         WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeyMgmt, networkCandidate.wifiDeviceConfig);
+
         // save the indexes of saved network candidate in networkCandidates;
         if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID) {
             wifiDeviceConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
+            continue;
+        }
+
+        // add suggesion network
+        WifiSettings::GetInstance().GetCandidateConfigWithoutUid(scanInfo.ssid, deviceKeyMgmt,
+            networkCandidate.wifiDeviceConfig);
+        if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID &&
+            networkCandidates.back().wifiDeviceConfig.uid != WIFI_INVALID_UID &&
+            networkCandidates.back().wifiDeviceConfig.isShared == false) {
+            wifiCandidateConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
         }
     }
+
     std::stringstream wifiDevicesInfo;
     for (auto &pair: wifiDeviceConfigs) {
         if (wifiDevicesInfo.rdbuf() ->in_avail() != 0) {
             wifiDevicesInfo << ",";
         }
         wifiDevicesInfo << "\"" << pair.first << "_" <<
-            SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "\"";
+            SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "_" <<
+            networkCandidates.at(pair.second).wifiDeviceConfig.keyMgmt << "\"";
     }
     WIFI_LOGI("Find savedNetworks in scanInfos: [%{public}s]", wifiDevicesInfo.str().c_str());
+
+    std::stringstream wifiCandidateInfos;
+    for (auto &pair: wifiCandidateConfigs) {
+        if (wifiCandidateInfos.rdbuf() ->in_avail() != 0) {
+            wifiCandidateInfos << ",";
+        }
+        wifiCandidateInfos << "\"" << pair.first << "_" <<
+            SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "\"";
+    }
+    WIFI_LOGI("Find suggestion networks in scanInfos: [%{public}s]", wifiCandidateInfos.str().c_str());
 }
 
 void NetworkSelectionManager::TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,

@@ -163,7 +163,7 @@ bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAdd
     return true;
 }
 
-bool WifiNetAgent::DelInterfaceAddress(const std::string interface, const std::string ipAddress, int prefixLength)
+bool WifiNetAgent::DelInterfaceAddress(const std::string &interface, const std::string &ipAddress, int prefixLength)
 {
     int32_t result = NetConnClient::GetInstance().DelInterfaceAddress(interface, ipAddress, prefixLength);
     if (result == NETMANAGER_SUCCESS) {
@@ -256,9 +256,9 @@ void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     netLinkInfo->ifaceName_ = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
 
     SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    SetNetLinkHostRouteInfo(netLinkInfo, wifiIpInfo);
     SetNetLinkRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     SetNetLinkDnsInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
-    SetNetLinkHostRouteInfo(netLinkInfo, wifiIpInfo);
     SetNetLinkLocalRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
     if (wifiProxyConfig.configureMethod == ConfigureProxyMethod::AUTOCONFIGUE) {
         /* Automatic proxy is not supported */
@@ -267,7 +267,7 @@ void WifiNetAgent::CreateNetLinkInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
         wifiProxyConfig.manualProxyConfig.GetExclusionObjectList(exclusionList);
         std::list<std::string> tmpExclusionList;
         std::copy_if(exclusionList.begin(), exclusionList.end(), std::back_inserter(tmpExclusionList),
-            [](const std::string &str) { return !str.empty(); });
+            [](const std::string &str) { return !str.empty(); } );
         netLinkInfo->httpProxy_.SetHost(std::move(wifiProxyConfig.manualProxyConfig.serverHostName));
         netLinkInfo->httpProxy_.SetPort(wifiProxyConfig.manualProxyConfig.serverPort);
         netLinkInfo->httpProxy_.SetExclusionList(tmpExclusionList);

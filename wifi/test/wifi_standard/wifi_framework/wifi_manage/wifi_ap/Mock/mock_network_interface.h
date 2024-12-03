@@ -45,6 +45,8 @@ public:
     MOCK_METHOD3(SaveIpAddress, bool(struct ifaddrs *ifa, Ipv4Address &ipv4, std::vector<Ipv6Address> &vecIPv6));
     MOCK_METHOD4(
         IpAddressChange, bool(const std::string &interface, const BaseAddress &IpAddress, bool Action, bool Dad));
+    MOCK_METHOD3(FetchApOrP2pIpAddress,
+        bool(const std::string &interfaceName, std::vector<Ipv4Address> &vecipv4, std::vector<Ipv6Address> &vecIPv6));
     static MockNetworkInterface &GetInstance(void);
 
 private:

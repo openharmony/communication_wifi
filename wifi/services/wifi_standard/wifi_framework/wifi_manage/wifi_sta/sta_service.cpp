@@ -136,7 +136,6 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
             return WIFI_OPT_FAILED;
         }
         pStaAutoConnectService->SetAutoConnectStateCallback(callbacks);
-        pStaStateMachine->SetAutoConnectService(pStaAutoConnectService);
 #ifndef OHOS_ARCH_LITE
         pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
         if (pStaAppAcceleration == nullptr) {

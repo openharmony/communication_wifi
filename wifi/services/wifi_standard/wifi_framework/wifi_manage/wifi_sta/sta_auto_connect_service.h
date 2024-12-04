@@ -224,7 +224,7 @@ private:
      * @param candidate chosen by autoConnectSelector
      * @Return true if candidate be overrid otherwise false
      */
-    bool OverrideCandidateWithUserSelectChoice(const NetworkSelectionResult &candidate);
+    bool OverrideCandidateWithUserSelectChoice(NetworkSelectionResult &candidate);
 };
 }  // namespace Wifi
 }  // namespace OHOS

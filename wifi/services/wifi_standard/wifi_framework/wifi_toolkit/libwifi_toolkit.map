@@ -267,6 +267,12 @@
           "OHOS::Wifi::WifiSettings::GetConfigValueByName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
           "OHOS::Wifi::WifiSettings::UpdateWifiConfigFromCloud(const std::vector<OHOS::Wifi::WifiDeviceConfig> &, const std::set<int> &)";
           "OHOS::Wifi::WifiSettings::UpLoadLocalDeviceConfigToCloud()";
+          "OHOS::Wifi::WifiSettings::SetUserConnectChoice(int)";
+          "OHOS::Wifi::WifiSettings::ClearNetworkConnectChoice()";
+          "OHOS::Wifi::WifiSettings::ClearNetworkConnectChoice(int)";
+          "OHOS::Wifi::WifiSettings::SetNetworkConnectChoice(int, int, int)";
+          "OHOS::Wifi::WifiSettings::ClearNetworkCandidateScanResult(int)";
+          "OHOS::Wifi::WifiSettings::SetNetworkCandidateScanResult(int)";
           "OHOS::Wifi::DhcpdInterface::DhcpdInterface()";
           "OHOS::Wifi::DhcpdInterface::~DhcpdInterface()";
           "OHOS::Wifi::DhcpdInterface::RegisterDhcpCallBack(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, ServerCallBack&)";

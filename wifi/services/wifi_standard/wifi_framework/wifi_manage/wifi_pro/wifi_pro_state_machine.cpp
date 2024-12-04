@@ -1001,7 +1001,7 @@ void WifiProStateMachine::WifiHasNetState::ParseQoeInfoAndRequestDetect()
     mLastTcpTxCounter_ = mCurrentTcpTxCounter;
     mLastTcpRxCounter_ = mCurrentTcpRxCounter;
     mLastDnsFailedCnt_ = mCurrentDnsFailedCnt;
-    WIFI_LOGI("deltaTcpTxPkts = %{public}ld, deltaTcpRxPkts = %{public}ld, deltaFailedDns = %{public}d"
+    WIFI_LOGI("deltaTcpTxPkts = %{public}lld, deltaTcpRxPkts = %{public}lld, deltaFailedDns = %{public}d"
               ", nedisable = %{public}d",
         deltaTcpTxPkts, deltaTcpRxPkts, deltaFailedDns, netDiasableDetectCount_);
 

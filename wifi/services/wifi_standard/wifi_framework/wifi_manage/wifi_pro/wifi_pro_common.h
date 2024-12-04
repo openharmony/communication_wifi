@@ -64,6 +64,8 @@ enum WifiSwitchReason {
     WIFI_SWITCH_REASON_POOR_RSSI_INTERNET_SLOW = 4,
     // current ap triggers wifi switch because of checking wifi in background
     WIFI_SWITCH_REASON_BACKGROUND_CHECK_AVAILABLE_WIFI = 5,
+    // current ap triggers wifi switch because of qoe slow
+    WIFI_SWITCH_REASON_QOE_SLOW = 6,
 };
 
 }  // namespace Wifi

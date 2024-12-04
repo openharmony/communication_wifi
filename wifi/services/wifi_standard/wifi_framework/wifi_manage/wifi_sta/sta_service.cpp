@@ -198,7 +198,7 @@ ErrCode StaService::EnableStaService()
 #endif
         WifiSettings::GetInstance().ReloadDeviceConfig();
     }
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA, STA_CONNECT_MODE);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_ENABLE_STA);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -951,12 +951,13 @@ ErrCode StaService::SetSelfCureService(ISelfCureService *selfCureService)
 }
 #endif
 
-ErrCode StaService::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &cmd)
+ErrCode StaService::EnableHiLinkHandshake(bool uiFlag, const WifiDeviceConfig &config, const std::string &cmd)
 {
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     msg->SetMessageName(WIFI_SVR_COM_STA_ENABLE_HILINK);
     msg->SetParam1(config.bssidType);
+    msg->SetParam2(uiFlag);
     msg->AddStringMessageBody(config.ssid);
     msg->AddStringMessageBody(config.bssid);
     msg->AddStringMessageBody(config.keyMgmt);

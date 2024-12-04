@@ -1945,7 +1945,7 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
             return WIFI_OPT_FAILED;
         }
         g_hiLinkActive = uiFlag;
-        pService->EnableHiLinkHandshake(deviceConfig, cmd);
+        pService->EnableHiLinkHandshake(uiFlag, deviceConfig, cmd);
         return WIFI_OPT_SUCCESS;
     }
     if (!g_hiLinkActive) {
@@ -1953,7 +1953,7 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
             WIFI_LOGE("g_hiLinkActive copy enable and bssid error!");
             return WIFI_OPT_FAILED;
         }
-        pService->EnableHiLinkHandshake(deviceConfig, cmd);
+        pService->EnableHiLinkHandshake(uiFlag, deviceConfig, cmd);
     }
 
     std::string currentMac;

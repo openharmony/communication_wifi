@@ -2781,6 +2781,11 @@ StaStateMachine::ApLinkedState::~ApLinkedState()
 void StaStateMachine::ApLinkedState::GoInState()
 {
     WIFI_LOGI("ApLinkedState GoInState function.");
+    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
+        pStaStateMachine->enableSignalPoll = false;
+    } else {
+        pStaStateMachine->enableSignalPoll = true;
+    }
     return;
 }
 

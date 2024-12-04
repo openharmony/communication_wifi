@@ -67,15 +67,6 @@ public:
     void UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
 
     /**
-     * Update link information
-     *
-     * @param wifiIpInfo wifi network link data information
-     * @param wifiIpV6Info wifi network link IPV6 data information
-     * @param wifiProxyConfig wifi network link proxy information
-     */
-    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig, int instId = 0);
-
-    /**
      * Add route
      *
      * @param interface interface name
@@ -213,6 +204,16 @@ private:
 
     void SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
         IpV6Info &wifiIpV6Info);
+
+    /**
+     * Update link information
+     *
+     * @param wifiIpInfo wifi network link data information
+     * @param wifiIpV6Info wifi network link IPV6 data information
+     * @param wifiProxyConfig wifi network link proxy information
+     */
+    void UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig,
+        int instId = 0);
 private:
     uint32_t supplierId{0};
     bool isWifiAvaliable_ = false;

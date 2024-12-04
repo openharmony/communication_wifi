@@ -94,16 +94,10 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
-        WifiProStateMachine *pWifiProStateMachine_ { nullptr };
-        int64_t mLastTcpTxCounter_ { 0 };
-        int64_t mLastTcpRxCounter_ { 0 };
-        int32_t mLastDnsFailedCnt_ { 0 };
-        int netDiasableDetectCount_ { 0 };
+        WifiProStateMachine *pWifiProStateMachine_{nullptr};
         void InitConnectedState();
-        void HandleHttpResultInConnected(const InternalMessagePtr msg);
+        void HandleHttpResult(const InternalMessagePtr msg);
         void HandleWifiConnectStateChangedInConnected(const InternalMessagePtr msg);
-        void RequestHttpDetect();
-        void ParseQoeInfoAndRequestDetect();
     };
 
     /**
@@ -120,7 +114,7 @@ public:
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         void HandleWifiConnectStateChangedInDisconnected(const InternalMessagePtr msg);
-        void HandleWifi2WifiFailedInDisconnected();
+        void HandleWifi2WifiFailedEvent();
     };
 
     /**
@@ -138,20 +132,17 @@ public:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr};
         int32_t rssiLevel2Or3ScanedCounter_ { 0 };
         int32_t rssiLevel0Or1ScanedCounter_ { 0 };
-        void WifiHasNetStateInit();
-        void HandleCheckResultInHasNet(const NetworkSelectionResult &networkSelectionResult);
-        void TryWifiHandoverPreferentially(const NetworkSelectionResult &networkSelectionResult);
-        void TryWifiRoveOut(const NetworkSelectionResult &networkSelectionResult);
-        void HandleWifiRoveOut(const NetworkSelectionResult &networkSelectionResult);
-        void TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
-        void HandleConnectStateChangedInHasNet(const InternalMessagePtr msg);
+        int64_t mLastTcpTxCounter_ { 0 };
+        int64_t mLastTcpRxCounter_ { 0 };
+        int32_t mLastDnsFailedCnt_ { 0 };
+        int netDiasableDetectCount_ { 0 };
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
-        void HandleHttpResultInHasNet(const InternalMessagePtr msg);
-        bool HandleWifiToWifi(int32_t switchReason, const NetworkSelectionResult &networkSelectionResult);
-        bool TrySwitchWifiNetwork(const NetworkSelectionResult &networkSelectionResult);
+        void WifiHasNetStateInit();
+        void RequestHttpDetect();
+        void ParseQoeInfoAndRequestDetect();
     };
 
     class WifiNoNetState : public State {
@@ -165,12 +156,8 @@ public:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         bool fullScan_ { false };
         void HandleWifiNoInternet(const InternalMessagePtr msg);
-        bool HandleCheckResultInNoNet(const NetworkSelectionResult &networkSelectionResult);
-        bool TryNoNetSwitch(const NetworkSelectionResult &networkSelectionResult);
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
-        void HandleHttpResultInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();
-        void HandleConnectStateChangedInNoNet(const InternalMessagePtr msg);
     };
 
     class WifiPortalState : public State {
@@ -182,8 +169,6 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
-        void HandleHttpResultInPortal(const InternalMessagePtr msg);
-        void HandleConnectStateChangedInPortalNet(const InternalMessagePtr msg);
     };
 
     ErrCode Initialize();
@@ -247,13 +232,14 @@ private:
     bool isDisableWifiAutoSwitch_ { false };
     std::string targetBssid_ { "" };
     NetworkSelectionResult networkSelectionResult_;
+
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
     bool HasWifiSwitchRecord();
     void RefreshConnectedNetWork();
     bool HasAvailableSsidToSwitch();
     void SetSwitchReason(WifiSwitchReason reason);
-    bool IsSatisfiedWifiOperationCondition();
+    bool IsSwitchingOrSelfCuring();
     bool IsDisableWifiAutoSwitch();
     void Wifi2WifiFinish();
     bool IsFullscreen();
@@ -263,6 +249,10 @@ private:
     void HandleWifi2WifiFailed();
     void FastScan(std::vector<WifiScanInfo> &scanInfoList);
     void TrySelfCure(bool forceNoHttpCheck);
+    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, NetworkSelectType networkSelectType,
+        std::vector<InterScanInfo> &scanInfos);
+    bool IsSatisfiedWifi2WifiCondition();
+    bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
 };
 } // namespace Wifi
 } // namespace OHOS

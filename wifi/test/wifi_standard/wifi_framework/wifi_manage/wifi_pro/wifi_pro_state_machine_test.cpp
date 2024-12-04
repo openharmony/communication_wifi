@@ -192,7 +192,6 @@ HWTEST_F(WifiProStateMachineTest, RefreshConnectedNetWorkTest02, TestSize.Level1
 
 HWTEST_F(WifiProStateMachineTest, SetSwitchReasonTest01, TestSize.Level1)
 {
-
     pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
     EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, WIFI_SWITCH_REASON_POOR_RSSI);
 }

@@ -124,13 +124,13 @@ public:
 
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
 
-    bool SetUserConnectChoice(int networkId);
+    void SetUserConnectChoice(int networkId);
 
     void ClearNetworkConnectChoice();
 
-    bool ClearNetworkConnectChoice(const int networkId);
+    bool ClearNetworkConnectChoice(int networkId);
 
-    bool SetNetworkConnectChoice(const int networkId, const int selectNetworkId, const long timestamp);
+    bool SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp);
 
     /**
      * @Description this invoked by network selector at the start of every selection procedure to clear all candidate

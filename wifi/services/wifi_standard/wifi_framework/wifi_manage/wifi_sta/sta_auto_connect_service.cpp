@@ -18,6 +18,7 @@
 #include "wifi_config_center.h"
 #include "wifi_common_util.h"
 #include "block_connect_service.h"
+#include <sys/time.h>
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -76,21 +77,25 @@ bool StaAutoConnectService::OverrideCandidateWithUserSelectChoice(NetworkSelecti
     while (tmpConfig.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
         curentLoopIdx++;
         if (curentLoopIdx > CONNECT_CHOICE_MAX_LOOP_TIMES) {
-            WIFI_LOGI("%{public}s reach max loop threshold connectChoice: %{public}d", tmpConfig.networkId);
+            WIFI_LOGI("%{public}s reach max loop threshold connectChoice: %{public}d",
+                __FUNCTION__, tmpConfig.networkId);
             break;
         }
-        long choiceSetToGet = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs() -
-            tmpConfig.networkSelectionStatus.connectChoiceTimestamp;
+        struct timespec times = {0, 0};
+        clock_gettime(CLOCK_BOOTTIME, &times);
+        long currentTime = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
+        long choiceSetToGet = currentTime - tmpConfig.networkSelectionStatus.connectChoiceTimestamp;
         if (choiceSetToGet < CONNECT_CHOICE_INVALID || choiceSetToGet > CONNECT_CHOICE_TIMEOUT_MS) {
-            WIFI_LOGI("%{public}s connectChoice: %{public}d update time is expired: %{public}d", tmpConfig.networkId);
+            WIFI_LOGI("%{public}s connectChoice: %{public}d update time is expired", __FUNCTION__, tmpConfig.networkId);
             break;
         }
         if (WifiSettings::GetInstance().GetDeviceConfig(tmpConfig.networkId, tmpConfig) != 0) {
-            WIFI_LOGI("%{public}s cannot find connectChoice: %{public}d", tmpConfig.networkId);
+            WIFI_LOGI("%{public}s cannot find connectChoice: %{public}d", __FUNCTION__, tmpConfig.networkId);
             break;
         }
         if (tmpConfig.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
-            WIFI_LOGI("%{public}s cannot seen connectChoice in last auto connect: %{public}d", tmpConfig.networkId);
+            WIFI_LOGI("%{public}s cannot seen connectChoice in last auto connect: %{public}d",
+                __FUNCTION__, tmpConfig.networkId);
             break;
         }
         if (tmpConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) {
@@ -99,7 +104,7 @@ bool StaAutoConnectService::OverrideCandidateWithUserSelectChoice(NetworkSelecti
     }
     if (candidate.wifiDeviceConfig.networkId != originalCandidateNetwordId) {
         WIFI_LOGE("%{public}s original networdId:%{public}d, override networkId %{public}d, ssid: %{public}s",
-            originalCandidateNetwordId, candidate.wifiDeviceConfig.networkId,
+            __FUNCTION__, originalCandidateNetwordId, candidate.wifiDeviceConfig.networkId,
             SsidAnonymize(candidate.wifiDeviceConfig.ssid).c_str());
         return true;
     }
@@ -128,8 +133,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
-        bool isOverrideCandidate = OverrideCandidateWithUserSelectChoice(networkSelectionResult);
-        std::string &bssid = "";
+        std::string bssid = "";
         if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
             bssid = networkSelectionResult.interScanInfo.bssid;
         }

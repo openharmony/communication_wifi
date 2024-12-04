@@ -283,6 +283,110 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     return -1;
 }
 
+bool WifiSettings::SetUserConnectChoice(int networkId)
+{
+    WIFI_LOGI("%{public}s enter, networkId:%{public}d", __FUNCTION__, networkId);
+    WifiDeviceConfig selectConfig;
+    if (GetDeviceConfig(networkId, selectConfig) != 0 || selectConfig.ssid.empty()) {
+        WIFI_LOGE("%{public}s, not find networkId:%{public}d", __FUNCTION__, networkId);
+        return false;
+    }
+    if (selectConfig.networkSelectionStatus.status != WifiDeviceConfigStatus::ENABLED) {
+        config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
+    }
+    bool change = false;
+    struct timespec times = {0, 0};
+    clock_gettime(CLOCK_REALTIME, &times);
+    long currentTime = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
+    std::vector<WifiDeviceConfig> savedNetwork;
+    GetDeviceConfig(savedNetwork);
+    for (const auto &config : savedNetwork) {
+        if (config.networkId == selectConfig.networkId) {
+            if (config.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
+                WIFI_LOGI("%{public}s remove user select preference of %{public}s,"
+                    "set time %{public}ld from %{public}s, networkId: %{public}d", __FUNCTION__,
+                    config.networkSelectionStatus.connectChoice, currentTime, SsidAnonymize(config.ssid).c_str(),
+                    config.networkId);
+                ClearNetworkConnectChoice(config.networkId);
+                change = true;
+            }
+            continue;
+        }
+        if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+            WIFI_LOGI("%{public}s add select net:%{public}d set time:%{public}ld to %{public}d with ssid:%{public}s",
+                __FUNCTION__, selectConfig.networkId, currentTime, config.networkId,
+                SsidAnonymize(config.ssid).c_str());
+            SetNetworkConnectChoice(config.networkId, selectConfig.networkId, currentTime);
+            change = true;
+        }
+    }
+    return change;
+}
+
+void WifiSettings::ClearNetworkConnectChoice()
+{
+    std::vector<WifiDeviceConfig> savedNetwork;
+    if (GetDeviceConfig(savedNetwork) != 0) {
+        LOGI("%{public}s all cannot find networkId %{public}d", __FUNCTION__, networkId);
+        return false;
+    }
+    for (const auto &config : savedNetwork) {
+        config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
+        config.networkSelectionStatus.connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
+        AddDeviceConfig(config);
+    }
+}
+
+bool WifiSettings::ClearNetworkConnectChoice(const int networkId)
+{
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGI("%{public}s, cannot find networkId %{public}d", __FUNCTION__, networkId);
+        return false;
+    }
+    config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
+    config.networkSelectionStatus.connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
+    AddDeviceConfig(config);
+    return true;
+}
+
+bool WifiSettings::SetNetworkConnectChoice(const int networkId, const int selectNetworkId, const long timestamp)
+{
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGI("%{public}s, not find networkId %{public}d", __FUNCTION__, networkId);
+        return false;
+    }
+    config.networkSelectionStatus.connectChoice = selectNetworkId;
+    config.networkSelectionStatus.connectChoiceTimestamp = timestamp;
+    AddDeviceConfig(config);
+    return true;
+}
+
+bool WifiSettings::ClearNetworkCandidateScanResult(int networkId)
+{
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGI("%{public}s, not find networkId %{public}d", __FUNCTION__, networkId);
+        return false;
+    }
+    config.networkSelectionStatus.seenInLastQualifiedNetworkSelection = false;
+    AddDeviceConfig(config);
+    return true;
+}
+
+bool WifiSettings::SetNetworkCandidateScanResult(int networkId)
+{
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        LOGI("%{public}s, not find networkId %{public}d", __FUNCTION__, networkId);
+        return false;
+    }
+    config.networkSelectionStatus.seenInLastQualifiedNetworkSelection = true;
+    AddDeviceConfig(config);
+    return true;
+}
+
 int WifiSettings::SetDeviceEphemeral(int networkId, bool isEphemeral)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

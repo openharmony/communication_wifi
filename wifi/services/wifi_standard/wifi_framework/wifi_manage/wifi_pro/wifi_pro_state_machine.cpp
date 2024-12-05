@@ -323,7 +323,7 @@ void WifiProStateMachine::FastScan(std::vector<WifiScanInfo> &scanInfoList)
     }
     params.scanStyle = 0;
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
-    if (pScanService->ScanWithParam(params, true) != WIFI_OPT_SUCCESS) {
+    if (pScanService == nullptr || pScanService->ScanWithParam(params, true) != WIFI_OPT_SUCCESS) {
         WIFI_LOGI("FastScan error, do full channel scan.");
         SendMessage(EVENT_REQUEST_SCAN_DELAY);
     }

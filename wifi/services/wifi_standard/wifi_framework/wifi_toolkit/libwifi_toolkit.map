@@ -270,6 +270,7 @@
           "OHOS::Wifi::WifiSettings::SetUserConnectChoice(int)";
           "OHOS::Wifi::WifiSettings::ClearNetworkConnectChoice()";
           "OHOS::Wifi::WifiSettings::ClearNetworkConnectChoice(int)";
+          "OHOS::Wifi::WifiSettings::RemoveConnectChoiceFromAllNetwork(int)";
           "OHOS::Wifi::WifiSettings::SetNetworkConnectChoice(int, int, int)";
           "OHOS::Wifi::WifiSettings::ClearNetworkCandidateScanResult(int)";
           "OHOS::Wifi::WifiSettings::SetNetworkCandidateScanResult(int)";

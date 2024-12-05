@@ -232,7 +232,7 @@ private:
     bool isDisableWifiAutoSwitch_ { false };
     std::string targetBssid_ { "" };
     NetworkSelectionResult networkSelectionResult_;
-
+    WifiProState currentState;
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
     bool HasWifiSwitchRecord();

@@ -94,6 +94,13 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
+class SettingsEnterSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit SettingsEnterSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~SettingsEnterSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
@@ -150,21 +157,26 @@ private:
     void UnRegisterNetworkStateChangeEvent();
     void RegisterWifiScanChangeEvent();
     void UnRegisterWifiScanChangeEvent();
+    void RegisterSettingsEnterEvent();
+    void UnRegisterSettingsEnterEvent();
 
 private:
     uint32_t cesTimerId{0};
     uint32_t notificationTimerId{0};
     uint32_t networkStateChangeTimerId{0};
     uint32_t wifiScanChangeTimerId{0};
+    uint32_t settingsTimerId{0};
     std::mutex cesEventMutex;
     std::mutex notificationEventMutex;
     std::mutex networkStateChangeEventMutex;
     std::mutex wifiScanChangeEventMutex;
+    std::mutex settingsEnterEventMutex;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
     std::shared_ptr<NotificationEventSubscriber> wifiNotificationSubsciber_ = nullptr;
     std::shared_ptr<NetworkStateChangeSubscriber> networkStateChangeSubsciber_ = nullptr;
     std::shared_ptr<WifiScanEventChangeSubscriber> wifiScanEventChangeSubscriber_ = nullptr;
+    std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
 #ifdef HAS_MOVEMENT_PART
     std::mutex deviceMovementEventMutex;
 #endif

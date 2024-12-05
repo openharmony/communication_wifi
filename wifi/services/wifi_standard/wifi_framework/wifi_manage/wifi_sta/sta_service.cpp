@@ -500,7 +500,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     }
     /* Remove network configuration directly without notification to InterfaceService. */
     WifiSettings::GetInstance().RemoveDevice(networkId);
-    RemoveConnectChoiceFromAllNetwork(networkId);
+    WifiSettings::GetInstance().RemoveConnectChoiceFromAllNetwork(networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
 #ifndef OHOS_ARCH_LITE

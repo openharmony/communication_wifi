@@ -268,7 +268,7 @@
           "OHOS::Wifi::WifiSettings::UpdateWifiConfigFromCloud(const std::vector<OHOS::Wifi::WifiDeviceConfig> &, const std::set<int> &)";
           "OHOS::Wifi::WifiSettings::UpLoadLocalDeviceConfigToCloud()";
           "OHOS::Wifi::WifiSettings::SetUserConnectChoice(int)";
-          "OHOS::Wifi::WifiSettings::ClearNetworkConnectChoice()";
+          "OHOS::Wifi::WifiSettings::ClearAllNetworkConnectChoice()";
           "OHOS::Wifi::WifiSettings::ClearNetworkConnectChoice(int)";
           "OHOS::Wifi::WifiSettings::RemoveConnectChoiceFromAllNetwork(int)";
           "OHOS::Wifi::WifiSettings::SetNetworkConnectChoice(int, int, int)";

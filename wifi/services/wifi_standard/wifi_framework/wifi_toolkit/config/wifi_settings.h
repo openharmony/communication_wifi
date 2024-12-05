@@ -126,7 +126,7 @@ public:
 
     void SetUserConnectChoice(int networkId);
 
-    void ClearNetworkConnectChoice();
+    void ClearAllNetworkConnectChoice();
 
     bool ClearNetworkConnectChoice(int networkId);
 

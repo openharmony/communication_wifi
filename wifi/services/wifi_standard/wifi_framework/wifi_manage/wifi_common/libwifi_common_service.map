@@ -19,6 +19,7 @@
         "OHOS::Wifi::AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &)";
         "OHOS::Wifi::AppNetworkSpeedLimitService::LimitSpeed(int, int)";
         "OHOS::Wifi::BlockConnectService::ShouldAutoConnect(const WifiDeviceConfig&)";
+        "OHOS::Wifi::BlockConnectService::OnReceiveSettingsEnterEvent(bool)";
         "OHOS::Wifi::BlockConnectService::UpdateAllNetworkSelectStatus()";
         "OHOS::Wifi::BlockConnectService::EnableNetworkSelectStatus(int)";
         "OHOS::Wifi::BlockConnectService::UpdateNetworkSelectStatus(int, OHOS::Wifi::DisabledReason, int)";

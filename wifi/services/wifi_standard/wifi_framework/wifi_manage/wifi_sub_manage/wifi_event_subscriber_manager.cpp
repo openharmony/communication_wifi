@@ -28,6 +28,7 @@
 #include "wifi_notification_util.h"
 #include "wifi_app_state_aware.h"
 #include "wifi_net_agent.h"
+#include "block_connect_service.h"
 #ifdef HAS_MOVEMENT_PART
 #include "wifi_msdp_state_listener.h"
 #endif
@@ -50,6 +51,8 @@ const std::string PROP_FALSE = "false";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
 const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
+const std::string ENTER_SETTINGS = "usual.event.wlan.ENTER_SETTINGS_WLAN_PAGE";
+const std::string WLAN_PAGE_ENTER = "enterWlanPage";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
@@ -95,6 +98,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     RegisterMdmPropListener();
     RegisterNetworkStateChangeEvent();
     RegisterWifiScanChangeEvent();
+    RegisterSettingsEnterEvent();
 }
 
 WifiEventSubscriberManager::~WifiEventSubscriberManager()
@@ -108,6 +112,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterLocationEvent();
     UnRegisterNetworkStateChangeEvent();
     UnRegisterWifiScanChangeEvent();
+    UnRegisterSettingsEnterEvent();
 }
 
 void WifiEventSubscriberManager::RegisterCesEvent()
@@ -1089,6 +1094,66 @@ void WifiScanEventChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventDa
         WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_SCAN_CHANGE);
     }
 }
+
+void WifiEventSubscriberManager::RegisterSettingsEnterEvent()
+{
+    WIFI_LOGI("RegisterSettingsEnterEvent enter");
+    std::unique_lock<std::mutex> lock(settingsEnterEventMutex);
+    if (settingsTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(settingsTimerId);
+    }
+    if (settingsEnterSubscriber_) {
+        return;
+    }
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(ENTER_SETTINGS);
+    OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfo.SetPermission("ohos.permission.SET_WIFI_CONFIG");
+    settingsEnterSubscriber_ = std::make_shared<SettingsEnterSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(settingsEnterSubscriber_)) {
+        WIFI_LOGE("RegisterSettingsEnterEvent failed");
+        settingsEnterSubscriber_ = nullptr;
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterSettingsEnterEvent(); };
+        WifiTimer::GetInstance()->Register(timeoutCallBack, settingsTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WIFI_LOGI("RegisterSettingsEnterEvent retry, settingsTimerId = %{public}u", settingsTimerId);
+    } else {
+        WIFI_LOGI("RegisterSettingsEnterEvent success");
+    }
+}
+
+void WifiEventSubscriberManager::UnRegisterSettingsEnterEvent()
+{
+    std::unique_lock<std::mutex> lock(settingsEnterEventMutex);
+    if (settingsTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(settingsTimerId);
+    }
+    if (!settingsEnterSubscriber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(settingsEnterSubscriber_)) {
+        WIFI_LOGE("UnRegisterSettingsEnterEvent failed");
+    }
+    settingsEnterSubscriber_ = nullptr;
+    WIFI_LOGI("UnRegisterSettingsEnterEvent finished");
+}
+
+SettingsEnterSubscriber::SettingsEnterSubscriber(
+    const EventFwk::CommonEventSubscribeInfo &subscriberInfo) : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("SettingsEnterSubscriber enter");
+}
+
+void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    WIFI_LOGI("SettingsEnterSubscriber OnReceiveEvent: %{public}s", action.c_str());
+    if (action == ENTER_SETTINGS) {
+        bool isSettingsEnter = eventData.GetWant().GetBoolParam(WLAN_PAGE_ENTER, false);
+        BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
+    }
+}
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -3769,6 +3769,19 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             pStaStateMachine->HandlePortalNetworkPorcess();
             break;
         }
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+        case WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT: {
+            int status = msg->GetParam1();
+            LOGI("Report Wpa status: %{public}d", status);
+            if (status == static_cast<int>(SupplicantState::COMPLETED)) {
+                WifiLinkedInfo linkedInfo;
+                WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+                pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
+                LOGI("DealWpaStateChange completed");
+            }
+            break;
+        }
+#endif        
         default:
             WIFI_LOGD("NOT handle this event!");
             break;

@@ -620,6 +620,7 @@ WifiProStateMachine::WifiConnectedState::~WifiConnectedState() {}
 void WifiProStateMachine::WifiConnectedState::GoInState()
 {
     WIFI_LOGI("WifiConnectedState GoInState function.");
+    pWifiProStateMachine_->currentState = WifiProState::WIFI_CONNECTED;
     pWifiProStateMachine_->RefreshConnectedNetWork();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
@@ -671,13 +672,16 @@ void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMes
         return;
     }
     int32_t state = msg->GetParam1();
-    if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
+    if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED) &&
+        (pWifiProStateMachine_->currentState != WifiProState::WIFI_NONET)) {
         WIFI_LOGI("state transition: WifiConnectedState -> WifiNoNetState.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
-    } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
+    } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL) &&
+        (pWifiProStateMachine_->currentState != WifiProState::WIFI_PORTAL)) {
         WIFI_LOGI("state transition: WifiConnectedState -> WifiPortalState.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiPortalState_);
-    } else if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_ENABLED)) {
+    } else if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_ENABLED) &&
+        (pWifiProStateMachine_->currentState != WifiProState::WIFI_HASNET)) {
         WIFI_LOGI("state transition: WifiConnectedState -> WifiHasNetState.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiHasNetState_);
     }
@@ -710,6 +714,7 @@ WifiProStateMachine::WifiDisconnectedState::~WifiDisconnectedState() {}
 void WifiProStateMachine::WifiDisconnectedState::GoInState()
 {
     WIFI_LOGI("WifiDisconnectedState GoInState function.");
+    pWifiProStateMachine_->currentState = WifiProState::WIFI_DISCONNECTED;
     auto &networkBlackListManager = NetworkBlockListManager::GetInstance();
     networkBlackListManager.CleanAbnormalWifiBlocklist();
 }
@@ -800,6 +805,7 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     mLastDnsFailedCnt_ = 0;
     pWifiProStateMachine_->isWifiNoInternet_ = false;
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+    pWifiProStateMachine_->currentState = WifiProState::WIFI_HASNET;
     pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
     pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
 }
@@ -1125,6 +1131,7 @@ void WifiProStateMachine::WifiNoNetState::HandleNoNetChanged()
     fullScan_ = false;
     pWifiProStateMachine_->isWifiNoInternet_ = true;
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+    pWifiProStateMachine_->currentState = WifiProState::WIFI_NONET;
     pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_NO_INTERNET);
 
     // issatisfy scan
@@ -1160,6 +1167,7 @@ void WifiProStateMachine::WifiPortalState::GoInState()
 {
     WIFI_LOGI("WifiPortalState GoInState function.");
     pWifiProStateMachine_->isWifiNoInternet_ = false;
+    pWifiProStateMachine_->currentState = WifiProState::WIFI_PORTAL;
 }
 
 void WifiProStateMachine::WifiPortalState::GoOutState()

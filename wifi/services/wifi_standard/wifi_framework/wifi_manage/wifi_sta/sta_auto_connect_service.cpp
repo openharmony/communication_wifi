@@ -89,11 +89,12 @@ bool StaAutoConnectService::OverrideCandidateWithUserSelectChoice(NetworkSelecti
             WIFI_LOGI("%{public}s connectChoice: %{public}d update time is expired", __FUNCTION__, tmpConfig.networkId);
             break;
         }
-        if (WifiSettings::GetInstance().GetDeviceConfig(tmpConfig.networkId, tmpConfig) != 0) {
+        if (WifiSettings::GetInstance().GetDeviceConfig(tmpConfig.networkSelectionStatus.connectChoice,
+            tmpConfig) != 0) {
             WIFI_LOGI("%{public}s cannot find connectChoice: %{public}d", __FUNCTION__, tmpConfig.networkId);
             break;
         }
-        if (tmpConfig.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+        if (!tmpConfig.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
             WIFI_LOGI("%{public}s cannot seen connectChoice in last auto connect: %{public}d",
                 __FUNCTION__, tmpConfig.networkId);
             break;

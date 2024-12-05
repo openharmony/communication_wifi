@@ -543,7 +543,6 @@ struct NetworkSelectionStatus {
 
     /**
      * Connect Choice over this configuration
-     * 
      * when current wifi config is visible to the user but user explicitly choose to connect to another network X,
      * the another network X's config network ID will be stored here. We will consider user has a preference of X
      * over this network. And in the future, network Select will always give X a higher preference over this config
@@ -556,7 +555,7 @@ struct NetworkSelectionStatus {
     long connectChoiceTimestamp;
 
     /**
-     * Indicate whether this network is visible in last Qualified Network Selection. This means there is scan result 
+     * Indicate whether this network is visible in last Qualified Network Selection. This means there is scan result
      * found to this WifiDeviceConfig and meet the minimum requirement.
      */
     bool seenInLastQualifiedNetworkSelection;

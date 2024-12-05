@@ -319,7 +319,7 @@ void WifiSettings::SetUserConnectChoice(int networkId)
     }
 }
 
-void WifiSettings::ClearNetworkConnectChoice()
+void WifiSettings::ClearAllNetworkConnectChoice()
 {
     std::vector<WifiDeviceConfig> savedNetwork;
     if (GetDeviceConfig(savedNetwork) != 0) {

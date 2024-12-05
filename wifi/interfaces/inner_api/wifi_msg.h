@@ -62,7 +62,7 @@ inline const std::string EAP_METHOD_SIM = "SIM";
 inline const std::string EAP_METHOD_AKA = "AKA";
 inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
-inline const long INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
+inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 
 enum class SupplicantState {
     DISCONNECTED = 0,

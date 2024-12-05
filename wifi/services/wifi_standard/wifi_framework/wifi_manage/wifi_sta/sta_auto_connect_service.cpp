@@ -139,7 +139,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
             bssid = networkSelectionResult.interScanInfo.bssid;
         }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
-        std::string &ssid = networkSelectionResult.interScanInfo.ssid;
+        std::string &ssid = networkSelectionResult.wifiDeviceConfig.ssid;
         WIFI_LOGI("AutoSelectDevice networkId: %{public}d, ssid: %{public}s, bssid: %{public}s.", networkId,
                   SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);

@@ -1226,7 +1226,6 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
         WifiConfigCenter::GetInstance().EnableNetwork(networkId, true, m_instId);
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     }
-    BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
 }
 
 void StaStateMachine::DealConnectTimeOutCmd(InternalMessagePtr msg)

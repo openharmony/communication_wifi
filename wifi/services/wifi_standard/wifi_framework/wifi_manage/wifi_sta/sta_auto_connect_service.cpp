@@ -104,7 +104,7 @@ bool StaAutoConnectService::OverrideCandidateWithUserSelectChoice(NetworkSelecti
         }
     }
     if (candidate.wifiDeviceConfig.networkId != originalCandidateNetwordId) {
-        WIFI_LOGE("%{public}s original networdId:%{public}d, override networkId %{public}d, ssid: %{public}s",
+        WIFI_LOGI("%{public}s original networdId:%{public}d, override networkId %{public}d, ssid: %{public}s",
             __FUNCTION__, originalCandidateNetwordId, candidate.wifiDeviceConfig.networkId,
             SsidAnonymize(candidate.wifiDeviceConfig.ssid).c_str());
         return true;

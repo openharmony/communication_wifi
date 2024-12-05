@@ -3885,6 +3885,13 @@ void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
     }
     int status = msg->GetParam1();
     LOGI("DealWpaStateChange status: %{public}d", status);
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    if (status == static_cast<int>(SupplicantState::COMPLETED) && GetCurStateName() == "LinkedState") {
+        LOGI("Report wifi reauth");
+        InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
+    }
+    LOGI("DealWpaStateChange completed for reauth");
+#endif
     linkedInfo.supplicantState = static_cast<SupplicantState>(status);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
 }

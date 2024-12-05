@@ -285,12 +285,13 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
 
 void WifiSettings::SetUserConnectChoice(int networkId)
 {
-    LOGI("%{public}s enter, networkId:%{public}d", __FUNCTION__, networkId);
     WifiDeviceConfig selectConfig;
     if (GetDeviceConfig(networkId, selectConfig) != 0 || selectConfig.ssid.empty()) {
         LOGE("%{public}s, not find networkId:%{public}d", __FUNCTION__, networkId);
         return;
     }
+    LOGI("%{public}s enter, networkId:%{public}d, ssid: %{public}s", __FUNCTION__, networkId,
+        SsidAnonymize(selectConfig.ssid).c_str());
     if (selectConfig.networkSelectionStatus.status != WifiDeviceConfigStatus::ENABLED) {
         selectConfig.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
     }
@@ -311,7 +312,7 @@ void WifiSettings::SetUserConnectChoice(int networkId)
             continue;
         }
         if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
-            LOGI("%{public}s add select net:%{public}d set time:%{public}ld to %{public}d with ssid:%{public}s",
+            LOGI("%{public}s add select net:%{public}d set time:%{public}ld to net:%{public}d with ssid:%{public}s",
                 __FUNCTION__, selectConfig.networkId, currentTime, config.networkId,
                 SsidAnonymize(config.ssid).c_str());
             SetNetworkConnectChoice(config.networkId, selectConfig.networkId, currentTime);

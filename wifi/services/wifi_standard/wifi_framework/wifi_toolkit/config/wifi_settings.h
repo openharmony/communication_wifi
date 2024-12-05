@@ -130,6 +130,14 @@ public:
 
     bool ClearNetworkConnectChoice(int networkId);
 
+    /**
+     * @Description Iterate through all the saved networks and remove the provided config from the connectChoice.
+     * This is invoked when a network is removed from records
+     *
+     * @param networkId - deviceConfig's networkId corresponding to the network that is being removed
+     */
+    void RemoveConnectChoiceFromAllNetwork(int networkId);
+
     bool SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp);
 
     /**

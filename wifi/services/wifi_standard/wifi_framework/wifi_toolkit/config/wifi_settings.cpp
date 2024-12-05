@@ -327,16 +327,18 @@ void WifiSettings::ClearNetworkConnectChoice()
         return;
     }
     for (auto &config : savedNetwork) {
-        config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
-        config.networkSelectionStatus.connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
-        AddDeviceConfig(config);
+        if (config.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
+            config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
+            config.networkSelectionStatus.connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
+            AddDeviceConfig(config);
+        }
     }
 }
 
 bool WifiSettings::ClearNetworkConnectChoice(int networkId)
 {
     WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+    if (GetDeviceConfig(networkId, config) != 0) {
         LOGI("%{public}s, cannot find networkId %{public}d", __FUNCTION__, networkId);
         return false;
     }
@@ -344,6 +346,24 @@ bool WifiSettings::ClearNetworkConnectChoice(int networkId)
     config.networkSelectionStatus.connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
     AddDeviceConfig(config);
     return true;
+}
+
+void WifiSettings::RemoveConnectChoiceFromAllNetwork(int networkId)
+{
+    if (networkId == INVALID_NETWORK_ID) {
+        LOGE("%{public}s network is invalid %{public}d", __FUNCTION__, networkId);
+        return;
+    }
+    std::vector<WifiDeviceConfig> savedConfig;
+    if (GetDeviceConfig(savedConfig) != 0) {
+        LOGI("%{public}s GetDeviceConfig fail", __FUNCTION__);
+        return;
+    }
+    for (auto &config : savedConfig) {
+        if (config.networkSelectionStatus.connectChoice == networkId) {
+            ClearNetworkConnectChoice(config.networkId);
+        }
+    }
 }
 
 bool WifiSettings::SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp)

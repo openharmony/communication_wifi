@@ -229,11 +229,11 @@ public:
         GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
     MOCK_METHOD1(SetUserConnectChoice, void(int networkId));
     MOCK_METHOD0(ClearAllNetworkConnectChoice, void());
-    MOCK_METHOD0(ClearNetworkConnectChoice, bool(int networkId));
-    MOCK_METHOD0(RemoveConnectChoiceFromAllNetwork, void(int networkId));
-    MOCK_METHOD0(SetNetworkConnectChoice, bool(int networkId, int selectNetworkId, long timestamp));
-    MOCK_METHOD0(ClearNetworkCandidateScanResult, bool(int networkId));
-    MOCK_METHOD0(SetNetworkCandidateScanResult, bool(int networkId));
+    MOCK_METHOD1(ClearNetworkConnectChoice, bool(int networkId));
+    MOCK_METHOD1(RemoveConnectChoiceFromAllNetwork, void(int networkId));
+    MOCK_METHOD3(SetNetworkConnectChoice, bool(int networkId, int selectNetworkId, long timestamp));
+    MOCK_METHOD1(ClearNetworkCandidateScanResult, bool(int networkId));
+    MOCK_METHOD1(SetNetworkCandidateScanResult, bool(int networkId));
     MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config));
     MOCK_METHOD0(SyncDeviceConfig, int());

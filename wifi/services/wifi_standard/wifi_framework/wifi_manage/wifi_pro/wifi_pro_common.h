@@ -72,7 +72,7 @@ enum WifiSwitchReason {
 enum WifiProState {
     WIFI_DEFAULT = 0,
     WIFI_PRO_ENABLE,
-    WIFI_PRO_DISABLE
+    WIFI_PRO_DISABLE,
     WIFI_CONNECTED,
     WIFI_HASNET,
     WIFI_NONET,

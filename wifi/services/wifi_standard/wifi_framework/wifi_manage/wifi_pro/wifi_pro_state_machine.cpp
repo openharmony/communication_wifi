@@ -731,7 +731,7 @@ bool WifiProStateMachine::WifiDisconnectedState::ExecuteStateMsg(InternalMessage
             HandleWifiConnectStateChangedInDisconnected(msg);
             break;
         case EVENT_WIFI2WIFI_FAILED:
-            HandleWifi2WifiFailedEvent(const InternalMessagePtr msg);
+            HandleWifi2WifiFailedEvent(msg);
             break;
         default:
             return false;
@@ -872,7 +872,8 @@ void WifiProStateMachine::WifiHasNetState::HandleRssiChangedInHasNet(const Inter
         return;
     }
 
-    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId_);
+    ISelfCureService *pSelfCureService =
+        WifiServiceManager::GetInstance().GetSelfCureServiceInst(pWifiProStateMachine_->instId_);
     if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing()) {
         WIFI_LOGI("self cure ongoing.");
         return;
@@ -1137,7 +1138,8 @@ void WifiProStateMachine::WifiNoNetState::HandleNoNetChanged()
     pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_NO_INTERNET);
  
     // issatisfy scan
-    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId_);
+    ISelfCureService *pSelfCureService =
+        WifiServiceManager::GetInstance().GetSelfCureServiceInst(pWifiProStateMachine_->instId_);
     if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing()) {
         WIFI_LOGI("self cure ongoing.");
         return;

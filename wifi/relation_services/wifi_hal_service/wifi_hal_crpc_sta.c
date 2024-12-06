@@ -762,11 +762,13 @@ static char **ReadRoamBlockList(Context *context, int size)
             break;
         }
         if (ReadStr(context, list[i], len) != 0) {
+            free(list[i]);
+            list[i] = NULL;
             break;
         }
     }
     if (i < size) {
-        for (int j = 0; j <= i; ++j) {
+        for (int j = 0; j < i; ++j) {
             free(list[j]);
             list[j] = NULL;
         }

@@ -873,11 +873,6 @@ void WifiProStateMachine::WifiHasNetState::HandleRssiChangedInHasNet(const Inter
         return;
     }
 
-    if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
-        WIFI_LOGI("wifi2Wifi is switching.");
-        return false;
-    }
-
     ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId_);
     if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing()) {
         WIFI_LOGI("self cure ongoing.");

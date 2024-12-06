@@ -19,6 +19,7 @@
 #include <bitset>
 #include <list>
 #include <string>
+#include <mutex>
 #include "wifi_errcode.h"
 #include "wifi_scan_msg.h"
 #include "wifi_country_code_define.h"
@@ -68,6 +69,7 @@ private:
     ErrCode GetWifiCountryCodeByDefault(std::string &wifiCountryCode);
     bool IsContainBssid(const std::vector<std::string> &bssidList, const std::string &bssid);
 
+    std::mutex countryCodeFromScanResult;
     std::vector<std::vector<std::string>> m_allBssidVector;
     std::map<std::string, std::string> m_bssidAndCountryCodeMap;
     std::string m_wifiCountryCodeFromScanResults;

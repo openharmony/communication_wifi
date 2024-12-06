@@ -62,6 +62,8 @@ inline const std::string EAP_METHOD_SIM = "SIM";
 inline const std::string EAP_METHOD_AKA = "AKA";
 inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
+inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
+
 enum class SupplicantState {
     DISCONNECTED = 0,
     INTERFACE_DISABLED = 1,
@@ -538,12 +540,34 @@ struct NetworkSelectionStatus {
     DisabledReason networkSelectionDisableReason;
     int64_t networkDisableTimeStamp;
     int networkDisableCount;
+
+    /**
+     * Connect Choice over this configuration
+     * when current wifi config is visible to the user but user explicitly choose to connect to another network X,
+     * the another network X's config network ID will be stored here. We will consider user has a preference of X
+     * over this network. And in the future, network Select will always give X a higher preference over this config
+     */
+    int connectChoice;
+
+    /**
+     * The system timestamp when we records the connectChoice. Used to calculate if timeout of network selected by user
+     */
+    long connectChoiceTimestamp;
+
+    /**
+     * Indicate whether this network is visible in last Qualified Network Selection. This means there is scan result
+     * found to this WifiDeviceConfig and meet the minimum requirement.
+     */
+    bool seenInLastQualifiedNetworkSelection;
     NetworkSelectionStatus()
     {
         status = WifiDeviceConfigStatus::ENABLED;
         networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
         networkDisableTimeStamp = -1;
         networkDisableCount = 0;
+        connectChoice = INVALID_NETWORK_ID;
+        connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
+        seenInLastQualifiedNetworkSelection = false;
     }
 };
 

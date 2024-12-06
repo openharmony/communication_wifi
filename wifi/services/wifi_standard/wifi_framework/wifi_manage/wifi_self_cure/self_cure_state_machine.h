@@ -320,7 +320,7 @@ public:
     bool IsSelfCureL2Connecting();
     void StopSelfCureWifi(int32_t status);
     bool CheckSelfCureWifiResult(int event);
-
+    void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
 private:
 
     /* *
@@ -419,7 +419,6 @@ private:
     static void UpdateSelfCureHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, bool success);
     static void UpdateSelfCureConnectHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel,
                                                  bool success);
-    void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     bool IfMultiGateway();
     void InitDnsServer();
     bool IsSettingsPage();

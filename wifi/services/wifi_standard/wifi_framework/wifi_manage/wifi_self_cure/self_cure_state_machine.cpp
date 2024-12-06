@@ -327,7 +327,7 @@ int SelfCureStateMachine::ConnectedMonitorState::InitSelfCureCmsHandleMap()
 
 void SelfCureStateMachine::ConnectedMonitorState::TransitionToSelfCureState(int reason)
 {
-    if (isMobileHotspot_) {
+    if (isMobileHotspot_ || pSelfCureStateMachine_->IsCustNetworkSelfCure()) {
         WIFI_LOGW("transitionToSelfCureState, don't support SCE, do nothing");
         return;
     }
@@ -1361,8 +1361,9 @@ void SelfCureStateMachine::InternetSelfCureState::RequestUseStaticIpConfig(IpInf
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForReassoc(int requestCureLevel)
 {
-    if ((currentRssi_ < MIN_VAL_LEVEL_3) || pSelfCureStateMachine_->IfP2pConnected()) {
-        WIFI_LOGI("isDelayedReassocSelfCure_.");
+    if ((currentRssi_ < MIN_VAL_LEVEL_3) || pSelfCureStateMachine_->IfP2pConnected() ||
+        pSelfCureStateMachine_->isP2pEnhanceConnected_) {
+        WIFI_LOGI("delay reassoc selfcure");
         isDelayedReassocSelfCure_ = true;
         return;
     }
@@ -1429,13 +1430,15 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureResultFailed(Int
 
 void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int requestCureLevel)
 {
-    if ((currentRssi_ < MIN_VAL_LEVEL_3) || pSelfCureStateMachine_->IfP2pConnected()) {
-        isDelayedReassocSelfCure_ = true;
+    if ((currentRssi_ < MIN_VAL_LEVEL_3) || pSelfCureStateMachine_->IfP2pConnected() ||
+        pSelfCureStateMachine_->isP2pEnhanceConnected_) {
+        isDelayedRandMacReassocSelfCure_ = true;
+        WIFI_LOGW("delay randmac self cure");
         return;
     }
     WIFI_LOGI("begin to self cure for internet access: RandMacReassoc");
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC, true);
-    isDelayedReassocSelfCure_ = false;
+    isDelayedRandMacReassocSelfCure_ = false;
     pSelfCureStateMachine_->useWithRandMacAddress_ = FAC_MAC_REASSOC;
     pSelfCureStateMachine_->SetIsReassocWithFactoryMacAddress(FAC_MAC_REASSOC);
     WifiLinkedInfo linkedInfo;
@@ -1692,13 +1695,12 @@ bool SelfCureStateMachine::InternetSelfCureState::HasBeenTested(int cureLevel)
 
 void SelfCureStateMachine::InternetSelfCureState::HandleRssiChanged()
 {
-    if (pSelfCureStateMachine_->isP2pEnhanceConnected_) {
-        WIFI_LOGE("no need deal rssi change");
+    if (currentRssi_ < MIN_VAL_LEVEL_3_5 || pSelfCureStateMachine_->isP2pEnhanceConnected_ ||
+        pSelfCureStateMachine_->isP2pConnected_) {
+        WIFI_LOGW("no need deal rssi change");
         return;
     }
-    if ((currentRssi_ < MIN_VAL_LEVEL_3_5) && (!pSelfCureStateMachine_->IfP2pConnected())) {
-        return;
-    }
+
     if (isDelayedResetSelfCure_) {
         HandleDelayedResetSelfCure();
         return;

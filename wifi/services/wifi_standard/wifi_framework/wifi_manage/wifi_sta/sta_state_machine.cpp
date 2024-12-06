@@ -1222,8 +1222,10 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
         return;
     }
     SetConnectMethod(connTriggerMode);
-    WifiConfigCenter::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
-    BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
+    if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
+        WifiConfigCenter::GetInstance().EnableNetwork(networkId, true, m_instId);
+        WifiSettings::GetInstance().SetUserConnectChoice(networkId);
+    }
 }
 
 void StaStateMachine::DealConnectTimeOutCmd(InternalMessagePtr msg)
@@ -1296,7 +1298,7 @@ void StaStateMachine::HilinkSaveConfig(void)
     } else {
         m_hilinkDeviceConfig.networkId = WifiSettings::GetInstance().GetNextNetworkId();
     }
-
+    WifiSettings::GetInstance().SetUserConnectChoice(m_hilinkDeviceConfig.networkId);
     targetNetworkId = m_hilinkDeviceConfig.networkId;
 
     WifiStaHalInterface::GetInstance().GetPskPassphrase("wlan0", m_hilinkDeviceConfig.preSharedKey);
@@ -3668,6 +3670,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
     }
     WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
+    WifiSettings::GetInstance().ClearAllNetworkConnectChoice();
     BlockConnectService::GetInstance().EnableNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);

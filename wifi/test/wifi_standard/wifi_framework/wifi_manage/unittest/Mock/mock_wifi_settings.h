@@ -46,6 +46,13 @@ public:
         const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0) = 0;
     virtual int GetDeviceConfig(
         const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0) = 0;
+    virtual void SetUserConnectChoice(int networkId) = 0;
+    virtual void ClearAllNetworkConnectChoice() = 0;
+    virtual bool ClearNetworkConnectChoice(int networkId) = 0;
+    virtual void RemoveConnectChoiceFromAllNetwork(int networkId) = 0;
+    virtual bool SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp) = 0;
+    virtual bool ClearNetworkCandidateScanResult(int networkId) = 0;
+    virtual bool SetNetworkCandidateScanResult(int networkId) = 0;
     virtual int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config) = 0;
     virtual int SyncDeviceConfig() = 0;
@@ -220,6 +227,13 @@ public:
         GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int));
     MOCK_METHOD4(
         GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
+    MOCK_METHOD1(SetUserConnectChoice, void(int networkId));
+    MOCK_METHOD0(ClearAllNetworkConnectChoice, void());
+    MOCK_METHOD1(ClearNetworkConnectChoice, bool(int networkId));
+    MOCK_METHOD1(RemoveConnectChoiceFromAllNetwork, void(int networkId));
+    MOCK_METHOD3(SetNetworkConnectChoice, bool(int networkId, int selectNetworkId, long timestamp));
+    MOCK_METHOD1(ClearNetworkCandidateScanResult, bool(int networkId));
+    MOCK_METHOD1(SetNetworkCandidateScanResult, bool(int networkId));
     MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config));
     MOCK_METHOD0(SyncDeviceConfig, int());

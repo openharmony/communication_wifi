@@ -502,6 +502,14 @@ public:
     ErrCode FactoryReset() override;
 
     /**
+     * @Description Accept network control information from RSS.
+     *
+     * @param networkControlInfo - structure of network control infomation
+     * @return ErrCode - operation result
+     */
+    ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) override;
+
+    /**
      * @Description  limit speed
      *
      * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit

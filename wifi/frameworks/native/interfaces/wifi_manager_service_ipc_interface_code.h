@@ -76,6 +76,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_START_CONNECT_TO_USER_SELECT_NETWORK = 0x1043,     /* connect to user select target bssid */
     WIFI_SVR_CMD_SET_DPI_MARK_RULE = 0x1044,         /* set dpi mark rule */
     WIFI_SVR_CMD_IS_FEATURE_SUPPORTED = 0x1045,         /*is supported input feature */
+    WIFI_SVR_CMD_GET_NET_CONTROL_INFO = 0x1046, /* Accept network control information from RSS */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

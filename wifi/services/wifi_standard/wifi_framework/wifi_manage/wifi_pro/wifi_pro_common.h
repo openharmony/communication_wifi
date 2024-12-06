@@ -68,12 +68,16 @@ enum WifiSwitchReason {
     WIFI_SWITCH_REASON_QOE_SLOW = 6,
 };
 
+// current state in wifiPro
 enum WifiProState {
-    WIFI_CONNECTED = 1,
-    WIFI_HASNET = 2,
-    WIFI_NONET = 3,
-    WIFI_PORTAL = 4,
-    WIFI_DISCONNECTED = 5,
+    WIFI_DEFAULT = 0,
+    WIFI_PRO_ENABLE,
+    WIFI_PRO_DISABLE
+    WIFI_CONNECTED,
+    WIFI_HASNET,
+    WIFI_NONET,
+    WIFI_PORTAL,
+    WIFI_DISCONNECTED,
 };
 }  // namespace Wifi
 }  // namespace OHOS

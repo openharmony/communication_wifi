@@ -114,7 +114,7 @@ public:
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         void HandleWifiConnectStateChangedInDisconnected(const InternalMessagePtr msg);
-        void HandleWifi2WifiFailedEvent();
+        void HandleWifi2WifiFailedEvent(const InternalMessagePtr msg);
     };
 
     /**
@@ -232,14 +232,13 @@ private:
     bool isDisableWifiAutoSwitch_ { false };
     std::string targetBssid_ { "" };
     NetworkSelectionResult networkSelectionResult_;
-    WifiProState currentState;
+    WifiProState currentState_;
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
     bool HasWifiSwitchRecord();
     void RefreshConnectedNetWork();
     bool HasAvailableSsidToSwitch();
     void SetSwitchReason(WifiSwitchReason reason);
-    bool IsSwitchingOrSelfCuring();
     bool IsDisableWifiAutoSwitch();
     void Wifi2WifiFinish();
     bool IsFullscreen();

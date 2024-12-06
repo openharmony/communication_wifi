@@ -18,6 +18,7 @@
         "OHOS::Wifi::AppNetworkSpeedLimitService::GetStaCallback() const";
         "OHOS::Wifi::AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &)";
         "OHOS::Wifi::AppNetworkSpeedLimitService::LimitSpeed(int, int)";
+        "OHOS::Wifi::AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(OHOS::Wifi::WifiNetworkControlInfo const&)";
         "OHOS::Wifi::BlockConnectService::ShouldAutoConnect(const WifiDeviceConfig&)";
         "OHOS::Wifi::BlockConnectService::OnReceiveSettingsEnterEvent(bool)";
         "OHOS::Wifi::BlockConnectService::UpdateAllNetworkSelectStatus()";

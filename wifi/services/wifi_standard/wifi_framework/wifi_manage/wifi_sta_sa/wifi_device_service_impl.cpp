@@ -53,6 +53,7 @@ constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 constexpr int EXTENSION_ERROR_CODE = 13500099;
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+constexpr int RSS_UID = 1096;
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
@@ -1975,6 +1976,27 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
 }
 
 #ifndef OHOS_ARCH_LITE
+ErrCode WifiDeviceServiceImpl::ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
+{
+    WIFI_LOGD("Enter ReceiveNetworkControlInfo.");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    int callingUid = GetCallingUid();
+    if (callingUid != RSS_UID) {
+        WIFI_LOGE("%{public}s This interface is only for RSS, and uid: %{public}d can't be called!",
+            __FUNCTION__, callingUid);
+        return WIFI_OPT_FAILED;
+    }
+    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
 #ifndef OHOS_ARCH_LITE

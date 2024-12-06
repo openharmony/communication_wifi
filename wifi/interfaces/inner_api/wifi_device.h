@@ -556,6 +556,14 @@ public:
      * @param enable - enable/disable dpi mark
      */
     virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
+
+    /**
+     * @Description Accept network control information from RSS.
+     *
+     * @param networkControlInfo - structure of network control infomation
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

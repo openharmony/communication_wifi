@@ -807,7 +807,6 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     pWifiProStateMachine_->isWifiNoInternet_ = false;
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
-    pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
     pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
 }
 

@@ -109,6 +109,17 @@ ErrCode SelfCureInterface::NotifyInternetFailureDetected(int forceNoHttpCheck)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode SelfCureInterface::NotifyP2pConnectStateChanged(const WifiP2pLinkedInfo &info)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return WIFI_OPT_FAILED;
+    }
+    pSelfCureService->NotifyP2pConnectStateChanged(info);
+    return WIFI_OPT_SUCCESS;
+}
+
 bool SelfCureInterface::IsSelfCureOnGoing()
 {
     std::lock_guard<std::mutex> lock(mutex);
@@ -178,27 +189,6 @@ void SelfCureInterface::DealRssiLevelChanged(int rssi, int instId)
         return;
     }
     pSelfCureService->HandleRssiLevelChanged(rssi);
-}
-
-void SelfCureInterface::DealP2pConnChanged(const WifiP2pLinkedInfo &info)
-{
-    std::lock_guard<std::mutex> lock(mutex);
-    if (pSelfCureService == nullptr) {
-        WIFI_LOGI("pSelfCureService is null");
-        return;
-    }
-    pSelfCureService->HandleP2pConnChanged(info);
-}
-
-ErrCode SelfCureInterface::RegisterSelfCureServiceCallback(const SelfCureServiceCallback &callbacks)
-{
-    for (SelfCureServiceCallback cb : mSelfCureCallback) {
-        if (strcasecmp(callbacks.callbackModuleName.c_str(), cb.callbackModuleName.c_str()) == 0) {
-            return WIFI_OPT_SUCCESS;
-        }
-    }
-    mSelfCureCallback.push_back(callbacks);
-    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

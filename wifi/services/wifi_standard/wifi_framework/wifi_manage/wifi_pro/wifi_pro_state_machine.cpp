@@ -29,6 +29,7 @@
 #include "self_cure_state_machine.h"
 #include "self_cure_utils.h"
 #include "ip_qos_monitor.h"
+#include "wifi_global_func.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -432,6 +433,10 @@ WifiProStateMachine::DefaultState::~DefaultState() {}
 void WifiProStateMachine::DefaultState::GoInState()
 {
     WIFI_LOGI("Enter DefaultState GoInState function.");
+    if (IsFactoryMode()) {
+        WIFI_LOGI("factory mode, not start wifipro");
+        pWifiProStateMachine_->isWifiProEnabled_ = false;
+    }
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_DEFAULT;
 }
 
@@ -474,9 +479,18 @@ void WifiProStateMachine::DefaultState::HandleRemoveBlockList(const InternalMess
 void WifiProStateMachine::DefaultState::HandleWifiProSwitchChanged(const InternalMessagePtr msg)
 {
     // the wifiPro switch is on by default
-    pWifiProStateMachine_->isWifiProEnabled_ = true;
-    WIFI_LOGI("state transition: DefaultState -> WifiProEnableState.");
-    pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiProEnableState_);
+    if (msg == nullptr) {
+        WIFI_LOGI("DefaultState, msg is nullptr.");
+        return;
+    }
+    pWifiProStateMachine_->isWifiProEnabled_ = static_cast<bool>(msg->GetParam1());
+    if (pWifiProStateMachine_->isWifiProEnabled_) {
+        WIFI_LOGI("state transition: DefaultState -> WifiProEnableState.");
+        pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiProEnableState_);
+    } else {
+        WIFI_LOGI("state transition: DefaultState -> WifiProDisableState.");
+        pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiProDisabledState_);
+    }
 }
 
 /* --------------------------- state machine enbale state ------------------------------ */
@@ -963,6 +977,11 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         return;
     }
 
+    if (!pWifiProStateMachine_->isWifiProEnabled_) {
+        WIFI_LOGI("HandleScanResultInHasNet WifiPro disable.");
+        return;
+    }
+
     WIFI_LOGI("wifi to wifi step 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_,
         NetworkSelectType::WIFI2WIFI, scanInfos)) {
@@ -1085,7 +1104,12 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
         WIFI_LOGI("HandleWifiNoInternet Wifi2WifiSwitching.");
         return;
     }
-    
+
+    if (!pWifiProStateMachine_->isWifiProEnabled_) {
+        WIFI_LOGI("HandleScanResultInHasNet WifiPro disable.");
+        return;
+    }
+
     WIFI_LOGI("NoNetSwitch 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_,
         NetworkSelectType::WIFI2WIFI, scanInfos)) {

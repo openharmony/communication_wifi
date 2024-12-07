@@ -269,6 +269,18 @@ void OnIsHotspotDualBandSupportedFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED), datas);
 }
 
+void OnIsHotspotSupportedFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_SUPPORTED), datas);
+}
+
 void OnSetApIdleTimeoutFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
@@ -433,6 +445,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetPowerModelFuzzTest(data, size);
     OHOS::Wifi::OnSetPowerModelFuzzTest(data, size);
     OHOS::Wifi::OnIsHotspotDualBandSupportedFuzzTest(data, size);
+    OHOS::Wifi::OnIsHotspotSupportedFuzzTest(data, size);
     OHOS::Wifi::OnSetApIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::OnGetApIfaceNameFuzzTest(data, size);
     OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);

@@ -455,11 +455,6 @@ bool WifiControllerMachine::ShouldUseRpt(int id)
         return false;
     }
 
-    if (rptManagers.HasAnyManager()) {
-        WIFI_LOGI("ShouldUseRpt rpt is running");
-        return false;
-    }
-
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (linkedInfo.connState != ConnState::CONNECTED) {

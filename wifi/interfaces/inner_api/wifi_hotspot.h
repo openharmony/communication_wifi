@@ -48,6 +48,16 @@ public:
     virtual ErrCode IsHotspotDualBandSupported(bool &isSupported) = 0;
 
     /**
+     * @Description Check whether Wi-Fi hotspot is can be operated under some situation. For example, When the airplane
+     * mode is turned on and does not support the coexistence of softap and sta, nor does it support signal bridge,
+     * the hotspot switch cannot be operated.
+     *
+     * @param isSupported - Supported / NOT Supported
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsHotspotSupported(bool &isSupported) = 0;
+
+    /**
      * @Description Get the Hotspot Config object
      *
      * @param state - Result of obtaining the hotspot status

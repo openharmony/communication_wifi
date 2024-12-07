@@ -57,6 +57,12 @@ NO_SANITIZE("cfi") WifiErrorCode IsHotspotDualBandSupported(bool &isSupported)
     return GetCErrorCode(hotspotPtr->IsHotspotDualBandSupported(isSupported));
 }
 
+NO_SANITIZE("cfi") WifiErrorCode IsHotspotSupported(bool &isSupported)
+{
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(hotspotPtr->IsHotspotSupported(isSupported));
+}
+
 /* Others type is not support for AP */
 static std::map<WifiSecurityType, OHOS::Wifi::KeyMgmt> g_mapSecTypeToKeyMgmt = {
     {WifiSecurityType::WIFI_SEC_TYPE_OPEN, OHOS::Wifi::KeyMgmt::NONE},

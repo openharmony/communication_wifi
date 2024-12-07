@@ -254,6 +254,17 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+        if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+            WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(instId);
+            if (curState == WifiOprMidState::RUNNING) {
+                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, instId);
+            }
+#ifdef FEATURE_RPT_SUPPORT
+            if (WifiManager::GetInstance().GetRptInterface(instId)->IsRptRunning()) {
+                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, instId);
+            }
+#endif
+        }
     }
 #endif
     return;

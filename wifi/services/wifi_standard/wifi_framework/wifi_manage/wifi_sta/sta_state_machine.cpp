@@ -40,6 +40,7 @@
 #include "wifi_system_timer.h"
 #include "wifi_notification_util.h"
 #include "wifi_net_stats_manager.h"
+#include "read_wifi_mac.h"
 #endif // OHOS_ARCH_LITE
 
 #include "wifi_channel_helper.h"
@@ -698,6 +699,20 @@ void StaStateMachine::StartWifiProcess()
     } else {
         WIFI_LOGI("GetStaDeviceMacAddress failed!");
     }
+
+#ifndef OHOS_ARCH_LITE
+    if (m_instId == INSTID_WLAN0 && IsPcDevice()) {
+        WIFI_LOGI("read mac from oem for pc");
+        std::string mac;
+        std::shared_ptr<IReadMac> pReadWifiMac = std::make_shared<ReadWifiMac>();
+        if (pReadWifiMac) {
+            pReadWifiMac->GetConstantMac(mac);
+        }
+        if (!mac.empty()) {
+            WifiSettings::GetInstance().SetRealMacAddress(mac, m_instId);
+        }
+    }
+#endif
 
     if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE

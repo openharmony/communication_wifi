@@ -349,6 +349,15 @@ bool IsValidCountryCode(const std::string &wifiCountryCode);
  * @return false - convert fail
  */
 bool ConvertMncToIso(int mnc, std::string &wifiCountryCode);
+
+/**
+ * @Description check current device is pc.
+ *
+ * @return true - is pc device
+ * @return false - not pc device
+ */
+bool IsPcDevice();
+
 #endif
 
 /**

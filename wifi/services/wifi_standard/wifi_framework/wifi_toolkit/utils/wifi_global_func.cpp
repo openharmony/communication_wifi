@@ -457,6 +457,27 @@ bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
     }
     return false;
 }
+
+bool IsPcDevice()
+{
+#ifdef INIT_LIB_ENABLE
+    const char deviceClass[] = "const.product.devicetype";
+    constexpr const int32_t SYS_PARAMETER_SIZE = 256;
+    constexpr const int32_t SYSTEM_PARAMETER_ERROR_CODE = 0;
+    char param[SYS_PARAMETER_SIZE] = { 0 };
+    int errorCode = GetParameter(deviceClass, NULL, param, SYS_PARAMETER_SIZE);
+    if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
+        LOGE("get devicetype fail, errorCode: %{public}d", errorCode);
+        return false;
+    }
+    LOGI("devicetype: %{public}s, Code: %{public}d.", param, errorCode);
+    auto iter = std::string(param).find("2in1");
+    return iter != std::string::npos;
+#else
+    return false;
+#endif
+}
+
 #endif
 
 void StrToUpper(std::string &str)

@@ -433,10 +433,6 @@ WifiProStateMachine::DefaultState::~DefaultState() {}
 void WifiProStateMachine::DefaultState::GoInState()
 {
     WIFI_LOGI("Enter DefaultState GoInState function.");
-    if (IsFactoryMode()) {
-        WIFI_LOGI("factory mode, not start wifipro");
-        pWifiProStateMachine_->isWifiProEnabled_ = false;
-    }
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_DEFAULT;
 }
 
@@ -977,11 +973,6 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         return;
     }
 
-    if (!pWifiProStateMachine_->isWifiProEnabled_) {
-        WIFI_LOGI("HandleScanResultInHasNet WifiPro disable.");
-        return;
-    }
-
     WIFI_LOGI("wifi to wifi step 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_,
         NetworkSelectType::WIFI2WIFI, scanInfos)) {
@@ -1102,11 +1093,6 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
 
     if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
         WIFI_LOGI("HandleWifiNoInternet Wifi2WifiSwitching.");
-        return;
-    }
-
-    if (!pWifiProStateMachine_->isWifiProEnabled_) {
-        WIFI_LOGI("HandleScanResultInHasNet WifiPro disable.");
         return;
     }
 

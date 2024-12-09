@@ -18,6 +18,7 @@
 
 #include "i_read_mac.h"
 #include <dlfcn.h>
+#include "securec.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -44,7 +45,6 @@ private:
     bool OpenFacsignedapiLib();
     void CloseFacsignedapiLib();
     int ReadWifiMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
-    int ReadMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
     bool ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
     bool CharToBeJudged(char c);
     void MacDataUpper(char (&nvMacBuf)[NV_MACADDR_LENGTH]);

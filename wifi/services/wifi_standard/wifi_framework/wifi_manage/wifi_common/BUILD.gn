@@ -153,7 +153,6 @@ if (defined(ohos_lite)) {
       "block_connect_service.cpp",
       "network_black_list/network_black_list_manager.cpp",
       "network_status_history/network_status_history_manager.cpp",
-      "wifi_read_mac/read_wifi_mac.cpp",
       "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",
       "wifi_channel_helper.cpp",
@@ -172,6 +171,7 @@ if (defined(ohos_lite)) {
       "wifi_permission_utils.cpp",
       "wifi_protect.cpp",
       "wifi_protect_manager.cpp",
+      "wifi_read_mac/read_wifi_mac.cpp",
       "wifi_system_ability_listerner.cpp",
       "wifi_system_timer.cpp",
     ]

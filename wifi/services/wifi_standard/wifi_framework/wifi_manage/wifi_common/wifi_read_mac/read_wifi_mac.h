@@ -13,13 +13,8 @@
  * limitations under the License.
  */
 
-<<<<<<< HEAD
-#ifndef READ_OEM_MAC_H
-#define READ_OEM_MAC_H
-=======
  #ifndef READ_OEM_MAC_H
  #define READ_OEM_MAC_H
->>>>>>> 6e0fb86e8bb0f2620a8eeaf7f724b1a862d04d8d
 
 #include "i_read_mac.h"
 #include <dlfcn.h>

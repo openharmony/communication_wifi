@@ -22,8 +22,7 @@
 namespace OHOS {
 namespace Wifi {
 
-class IReadMac
-{
+class IReadMac {
 public:
     IReadMac() = default;
     virtual ~IReadMac() = default;

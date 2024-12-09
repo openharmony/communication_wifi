@@ -23,8 +23,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr int REAL_MACADDR_LENGTH = 18; // length of mac string, eg "11:22:33:44:55:66"
 constexpr int NV_MACADDR_LENGTH = 13; // length of mac string  without ':'
-class ReadWifiMac : public IReadMac
-{
+class ReadWifiMac : public IReadMac {
 public:
     enum GetMacErrType {
         GET_MAC_SUCCESS,
@@ -38,7 +37,7 @@ public:
         GET_MAC_ERROR_MEMORY_FAIL,
     };
     ReadWifiMac();
-    virtual ~ReadWifiMac();
+    ~ReadWifiMac() override;
     int GetConstantMac(std::string &constantWifiMac) override;
 
 private:

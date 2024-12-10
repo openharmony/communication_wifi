@@ -588,29 +588,8 @@ bool WifiProStateMachine::WifiProDisabledState::ExecuteStateMsg(InternalMessageP
         return false;
     }
     WIFI_LOGD("WifiProDisabledState-msgCode=%{public}d is received.", msg->GetMessageName());
-    switch (msg->GetMessageName()) {
-        case EVENT_NOTIFY_WIFI_PRO_SWITCH_CHANGED:
-            HandleWifiProSwitchChanged(msg);
-            break;
-        default:
-            return false;
-    }
-    return true;
+    return false;
 }
-
-void WifiProStateMachine::WifiProDisabledState::HandleWifiProSwitchChanged(const InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        WIFI_LOGI("DisabledState, msg is nullptr.");
-        return;
-    }
-    pWifiProStateMachine_->isWifiProEnabled_ = static_cast<bool>(msg->GetParam1());
-    if (pWifiProStateMachine_->isWifiProEnabled_) {
-        WIFI_LOGI("state transition: WifiProDisabledState -> WifiProEnableState.");
-        pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiProEnableState_);
-    }
-}
-
 /* --------------------------- state machine connected state ------------------------------ */
 WifiProStateMachine::WifiConnectedState::WifiConnectedState(WifiProStateMachine *pWifiProStateMachine)
     : State("WifiConnectedState"),

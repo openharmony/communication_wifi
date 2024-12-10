@@ -701,15 +701,18 @@ void StaStateMachine::StartWifiProcess()
     }
 
 #ifndef OHOS_ARCH_LITE
-    if (m_instId == INSTID_WLAN0 && IsPcDevice()) {
+    if (m_instId == INSTID_WLAN0 && IsPcDevice() && !mRealMacObtain) {
         WIFI_LOGI("read mac from oem for pc");
-        std::string mac;
+        std::string oemMac;
         std::shared_ptr<IReadMac> pReadWifiMac = std::make_shared<ReadWifiMac>();
         if (pReadWifiMac) {
-            pReadWifiMac->GetConstantMac(mac);
+            pReadWifiMac->GetConstantMac(oemMac);
+            int ret = pReadWifiMac->GetConstantMac(oemMac);
+            WIFI_LOGI("Read wifi mac fail, ret: %{public}d", ret);
         }
-        if (!mac.empty()) {
-            WifiSettings::GetInstance().SetRealMacAddress(mac, m_instId);
+        if (!oemMac.empty()) {
+            WifiSettings::GetInstance().SetRealMacAddress(oemMac, m_instId);
+            mRealMacObtain = true;
         }
     }
 #endif

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- #include <gmock/gmock.h>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
 #include "wifi_log.h"

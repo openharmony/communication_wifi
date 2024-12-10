@@ -1253,6 +1253,7 @@ private:
     std::string mPortalUrl;
     int mLastConnectNetId;      /* last request connect netword id */
     int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
+    bool mRealMacObtain = false; /* pc device obtain mac flag*/
     /**
      * @Description Replace empty dns
      */

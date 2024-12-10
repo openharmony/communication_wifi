@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
- #ifndef READ_OEM_MAC_H
- #define READ_OEM_MAC_H
+#ifndef READ_WIFI_MAC_H
+#define READ_WIFI_MAC_H
 
 #include "i_read_mac.h"
 #include <dlfcn.h>
@@ -47,7 +47,7 @@ private:
     int ReadWifiMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
     bool ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
     bool CharToBeJudged(char c);
-    void MacDataUpper(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
+    void MacDataTolower(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
     int Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destStr)[REAL_MACADDR_LENGTH]);
 
 private:

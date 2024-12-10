@@ -21,6 +21,9 @@
 #include "wifi_code_convert.h"
 #include "wifi_config_center.h"
 #include "define.h"
+#ifdef READ_MAC_FROM_OEM
+#include "read_wifi_mac.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "WifiStaHalInterface"
@@ -141,6 +144,24 @@ WifiErrorNo WifiStaHalInterface::GetStaCapabilities(unsigned int &capabilities)
 #endif
 }
 
+#ifdef READ_MAC_FROM_OEM
+WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName, bool fromIface)
+{
+    if (!fromIface && ifaceName == WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0)) {
+        mac = GetConstantMac();
+    }
+    if (!mac.empty()) {
+        return WIFI_HAL_OPT_OK;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->GetStaDeviceMacAddress(mac, ifaceName.c_str());
+#else
+    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
+    return mIdlClient->GetStaDeviceMacAddress(mac);
+#endif
+}
+#else
 WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
@@ -151,6 +172,26 @@ WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const 
     return mIdlClient->GetStaDeviceMacAddress(mac);
 #endif
 }
+#endif
+
+#ifdef READ_MAC_FROM_OEM
+std::string WifiStaHalInterface::GetConstantMac()
+{
+    LOGI("read mac from oem");
+    std::shared_ptr<IReadMac> pReadWifiMac = std::make_shared<ReadWifiMac>();
+    if (!pReadWifiMac) {
+        LOGE("pReadWifiMac is nullptr");
+        return std::string("");
+    }
+    std::string oemMac = "";
+    int ret = pReadWifiMac->GetConstantMac(oemMac);
+    if (ret != 0) {
+        LOGE("GetConstantMac fail, ret = %{public}d", ret);
+        return std::string("");
+    }
+    return oemMac;
+}
+#endif
 
 WifiErrorNo WifiStaHalInterface::SetWifiCountryCode(const std::string &ifaceName, const std::string &code)
 {

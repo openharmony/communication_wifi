@@ -54,6 +54,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac/read_wifi_mac.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_system_timer.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",
@@ -184,7 +185,6 @@ ohos_unittest("manager_unittest") {
 
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p:wifi_p2p_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",

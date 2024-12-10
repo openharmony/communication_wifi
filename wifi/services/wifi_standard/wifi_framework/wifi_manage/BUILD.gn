@@ -639,6 +639,11 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_vap_manager) {
       defines += [ "FEATURE_VAP_MANAGER_SUPPORT" ]
     }
+
+    if (wifi_feature_read_wifi_mac_from_oem) {
+      define += [ "READ_MAC_FROM_OEM" ]
+    }
+
     version_script = "libwifi_manager.map"
     part_name = "wifi"
     subsystem_name = "communication"

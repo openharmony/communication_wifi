@@ -40,7 +40,6 @@
 #include "wifi_system_timer.h"
 #include "wifi_notification_util.h"
 #include "wifi_net_stats_manager.h"
-#include "read_wifi_mac.h"
 #endif // OHOS_ARCH_LITE
 
 #include "wifi_channel_helper.h"
@@ -689,7 +688,11 @@ void StaStateMachine::StartWifiProcess()
     /* Sets the MAC address of WifiSettings. */
     std::string mac;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+#ifdef READ_MAC_FROM_OEM
+    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName, false)) == WIFI_HAL_OPT_OK) {
+#else
     if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName)) == WIFI_HAL_OPT_OK) {
+#endif
         WifiConfigCenter::GetInstance().SetMacAddress(mac, m_instId);
         std::string realMacAddress;
         WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, m_instId);
@@ -699,24 +702,6 @@ void StaStateMachine::StartWifiProcess()
     } else {
         WIFI_LOGI("GetStaDeviceMacAddress failed!");
     }
-
-#ifndef OHOS_ARCH_LITE
-    if (m_instId == INSTID_WLAN0 && IsPcDevice() && !mRealMacObtain) {
-        WIFI_LOGI("read mac from oem for pc");
-        std::string oemMac;
-        std::shared_ptr<IReadMac> pReadWifiMac = std::make_shared<ReadWifiMac>();
-        if (pReadWifiMac) {
-            pReadWifiMac->GetConstantMac(oemMac);
-            int ret = pReadWifiMac->GetConstantMac(oemMac);
-            WIFI_LOGI("Read wifi mac fail, ret: %{public}d", ret);
-        }
-        if (!oemMac.empty()) {
-            WifiSettings::GetInstance().SetRealMacAddress(oemMac, m_instId);
-            mRealMacObtain = true;
-        }
-    }
-#endif
-
     if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
         WIFI_LOGI("Register netsupplier");

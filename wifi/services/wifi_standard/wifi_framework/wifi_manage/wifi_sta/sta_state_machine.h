@@ -1272,6 +1272,9 @@ private:
     void ShowPortalNitification();
     void UpdateWifiCategory();
     void SetSupportedWifiCategory();
+#ifdef READ_MAC_FROM_OEM
+    void GetConstantMac();
+#endif
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;

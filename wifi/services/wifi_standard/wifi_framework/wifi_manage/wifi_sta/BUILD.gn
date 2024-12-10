@@ -42,7 +42,6 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
@@ -101,6 +100,9 @@ if (defined(ohos_lite)) {
     ]
 
     defines = [ "OHOS_ARCH_LITE" ]
+    if (wifi_feature_read_wifi_mac_from_oem) {
+      defines += [ "READ_MAC_FROM_OEM" ]
+    }
     ldflags += [
       "-fPIC",
       "-Wl,-E",
@@ -159,6 +161,9 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_HPF_SUPPORT" ]
     }
 
+    if (wifi_feature_read_wifi_mac_from_oem) {
+      defines += [ "READ_MAC_FROM_OEM" ]
+    }
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",

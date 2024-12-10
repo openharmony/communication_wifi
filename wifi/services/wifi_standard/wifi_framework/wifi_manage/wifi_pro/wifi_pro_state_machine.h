@@ -79,7 +79,6 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr};
-        void HandleWifiProSwitchChanged(const InternalMessagePtr msg);
     };
 
     /**

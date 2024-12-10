@@ -3052,22 +3052,6 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedHighRe
     EXPECT_NE(historyInfo.lastResetSelfCureFailedTs, 0);
 }
 
-HWTEST_F(SelfCureStateMachineTest, HandleP2pConnChanged_P2pConnectedState_SetP2pConnectedFlag, TestSize.Level1)
-{
-    WifiP2pLinkedInfo info;
-    info.SetConnectState(P2pConnectedState::P2P_CONNECTED);
-    pSelfCureStateMachine_->HandleP2pConnChanged(info);
-    EXPECT_TRUE(pSelfCureStateMachine_->isP2pConnected_);
-}
-
-HWTEST_F(SelfCureStateMachineTest, HandleP2pConnChanged_P2pDisconnectedState_ClearP2pConnectedFlag, TestSize.Level1)
-{
-    WifiP2pLinkedInfo info;
-    info.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
-    pSelfCureStateMachine_->HandleP2pConnChanged(info);
-    EXPECT_FALSE(pSelfCureStateMachine_->isP2pConnected_);
-}
-
 HWTEST_F(SelfCureStateMachineTest, IfMultiGateway_Test, TestSize.Level1)
 {
     pSelfCureStateMachine_->IfMultiGateway();

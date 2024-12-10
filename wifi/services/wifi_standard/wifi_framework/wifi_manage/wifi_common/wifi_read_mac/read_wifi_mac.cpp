@@ -129,7 +129,7 @@ int ReadWifiMac::Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destSt
         srcStr[6], srcStr[7], srcStr[8], srcStr[9], srcStr[10], srcStr[11]); // copy nv mac to real mac
 }
 
-void ReadWifiMac::MacDataUpper(char (&nvMacBuf)[NV_MACADDR_LENGTH])
+void ReadWifiMac::MacDataTolower(char (&nvMacBuf)[NV_MACADDR_LENGTH])
 {
     for (int i = 0; i < NV_MACADDR_LENGTH - 1; i++) {
         if (nvMacBuf[i] >= 'A' && nvMacBuf[i] <= 'F') {

@@ -14,17 +14,17 @@
  */
 
 #include "read_wifi_mac.h"
-#include "wifi_logger.h"
 #include <dlfcn.h>
+#include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("ReadWifiMac");
 
-constexpr int PC_NV_PHYNUM_MAC_WIFI_NUMBER = 193;
-constexpr const char* DLOPEN_LIBFACSIGNEDAPI_PATH = "libfacsignedapi_shared.so";
-constexpr const char* OEM_INFO_FUNC_NAME = "ReadSignedValueNvmeOeminfo";
-constexpr const char* CLEAR_SSL_FUNC_NAME = "OPENSSL_thread_stop";
+static constexpr int PC_NV_PHYNUM_MAC_WIFI_NUMBER = 193;
+static constexpr const char* DLOPEN_LIBFACSIGNEDAPI_PATH = "libfacsignedapi_shared.so";
+static constexpr const char* OEM_INFO_FUNC_NAME = "ReadSignedValueNvmeOeminfo";
+static constexpr const char* CLEAR_SSL_FUNC_NAME = "OPENSSL_thread_stop";
 
 ReadWifiMac::ReadWifiMac()
 {

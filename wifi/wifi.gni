@@ -55,6 +55,7 @@ declare_args() {
     wifi_feature_with_hdi_chip_supported = true
   }
   wifi_feature_with_vap_manager = true
+  wifi_feature_read_wifi_mac_from_oem = false
 }
 
 memory_optimization_cflags = [

@@ -388,7 +388,6 @@
           "OHOS::Wifi::WifiSettings::GetCandidateConfigWithoutUid(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Wifi::WifiDeviceConfig&)"; 
           "OHOS::Wifi::WifiCodeConvertUtil::Utf8ToGbk(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
           "vtable for OHOS::Wifi::NetworkXmlParser";
-          "OHOS::Wifi::IsPcDevice()"
    };
     local:
         *;

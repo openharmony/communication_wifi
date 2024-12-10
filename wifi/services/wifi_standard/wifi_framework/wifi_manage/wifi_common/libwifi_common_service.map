@@ -182,8 +182,6 @@
         "OHOS::Wifi::WifiProtectManager::RegisterAppStateObserver()";
         "OHOS::Wifi::WifiProtectManager::OnAppDied(const std::string)";
         "OHOS::Wifi::WifiProtectManager::OnAppForegroudChanged(const std::string &, int)";
-        "OHOS::Wifi::GetWifiConstantMac(unsigned int, char*, int)";
-        "OHOS::Wifi::ReadWifiMac::ReadWifiMac()"
     };
     local:
         *;

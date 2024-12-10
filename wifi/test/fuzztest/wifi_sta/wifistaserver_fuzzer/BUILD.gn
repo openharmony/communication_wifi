@@ -59,7 +59,6 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_black_list",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func",
   ]
 
@@ -96,7 +95,6 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/wifi_filter_impl.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/wifi_scorer_impl.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history/network_status_history_manager.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac/read_wifi_mac.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/multi_sta_manager.cpp",
@@ -131,6 +129,10 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_sta_state_machine.cpp",
     "wifistaserver_fuzzer.cpp",
   ]
+
+  if (wifi_feature_read_wifi_mac_from_oem) {
+    defines += [ "READ_MAC_FROM_OEM" ]
+  }
 
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",

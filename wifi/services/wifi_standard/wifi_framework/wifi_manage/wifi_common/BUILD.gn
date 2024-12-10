@@ -90,6 +90,11 @@ if (defined(ohos_lite)) {
       defines += [ "PERMISSION_ALWAYS_GRANT" ]
     }
 
+    if (wifi_feature_read_wifi_mac_from_oem) {
+      include_dirs += ["$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac",]
+      sources += ["wifi_read_mac/read_wifi_mac.cpp",]
+    }
+
     configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
       "-std=c++17",
@@ -123,7 +128,6 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
@@ -171,7 +175,6 @@ if (defined(ohos_lite)) {
       "wifi_permission_utils.cpp",
       "wifi_protect.cpp",
       "wifi_protect_manager.cpp",
-      "wifi_read_mac/read_wifi_mac.cpp",
       "wifi_system_ability_listerner.cpp",
       "wifi_system_timer.cpp",
     ]
@@ -295,6 +298,11 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_network_selection) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
+    }
+
+    if (wifi_feature_read_wifi_mac_from_oem) {
+      include_dirs += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac", ]
+      sources += [ "wifi_read_mac/read_wifi_mac.cpp", ]
     }
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc

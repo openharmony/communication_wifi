@@ -51,7 +51,7 @@ int ReadWifiMac::GetConstantMac(std::string &constantWifiMac)
     }
     CloseFacsignedapiLib();
 
-    MacDataUpper(nvMac);
+    MacDataTolower(nvMac);
     if (!ValidateAddr(nvMac)) {
         WIFI_LOGE("mac read from nv is invalid");
         return GET_MAC_ERROR_MAC_INVALID;
@@ -64,7 +64,6 @@ int ReadWifiMac::GetConstantMac(std::string &constantWifiMac)
     constantWifiMac = macBuf;
     WIFI_LOGI("get nv mac success");
     return GET_MAC_SUCCESS;
-
 }
 
 bool ReadWifiMac::OpenFacsignedapiLib()
@@ -120,7 +119,7 @@ int ReadWifiMac::ReadWifiMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH])
 
 bool ReadWifiMac::CharToBeJudged(char c)
 {
-    return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'));
+    return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
 }
 
 int ReadWifiMac::Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destStr)[REAL_MACADDR_LENGTH])
@@ -133,8 +132,8 @@ int ReadWifiMac::Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destSt
 void ReadWifiMac::MacDataUpper(char (&nvMacBuf)[NV_MACADDR_LENGTH])
 {
     for (int i = 0; i < NV_MACADDR_LENGTH - 1; i++) {
-        if (nvMacBuf[i] >= 'a' && nvMacBuf[i] <= 'f') {
-            nvMacBuf[i] = std::toupper(nvMacBuf[i]);
+        if (nvMacBuf[i] >= 'A' && nvMacBuf[i] <= 'F') {
+            nvMacBuf[i] = std::tolower(nvMacBuf[i]);
         }
     }
 }
@@ -142,7 +141,6 @@ void ReadWifiMac::MacDataUpper(char (&nvMacBuf)[NV_MACADDR_LENGTH])
 bool ReadWifiMac::ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH])
 {
     int i = 0;
-    int wifiAllZeroFlag = 0;
 
     char c = nvMacBuf[i];
     while (c != '\0' && i < NV_MACADDR_LENGTH) {
@@ -150,17 +148,8 @@ bool ReadWifiMac::ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH])
             WIFI_LOGE("error mac address from nv, invalid addr number");
             return false;
         }
-        wifiAllZeroFlag = wifiAllZeroFlag + static_cast<int>(c - '0');
         c = nvMacBuf[++i];
     }
-
-    /*LAP rangs from 9E8B00 to 9E8B3F belongs to reserved address defined by wifi sig*/
-    if (wifiAllZeroFlag == 0 || (((nvMacBuf[1] - '0') <= 9) && (((nvMacBuf[1] - '0') / 2) * 2 != (nvMacBuf[1] - '0'))) ||
-        (((nvMacBuf[1] - '0') > 9) && (((nvMacBuf[1] - 'A') / 2) * 2 != (nvMacBuf[1] - 'A')))) {
-            WIFI_LOGE("error mac address, illeagle mac address");
-            return false;
-    }
-
     return true;
 }
 

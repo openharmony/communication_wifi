@@ -3781,7 +3781,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             }
             break;
         }
-#endif        
+#endif
         default:
             WIFI_LOGD("NOT handle this event!");
             break;

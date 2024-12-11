@@ -35,6 +35,8 @@ enum WifiProCommond {
     EVENT_HTTP_REACHABLE_RESULT = 8,
     EVENT_REQUEST_SCAN_DELAY = 9,
     EVENT_REMOVE_BLOCK_LIST = 10,
+    EVENT_REQUEST_NETWORK_DETECT = 11,
+    EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL = 12,
 };
 
 enum SigLevel {
@@ -62,8 +64,21 @@ enum WifiSwitchReason {
     WIFI_SWITCH_REASON_POOR_RSSI_INTERNET_SLOW = 4,
     // current ap triggers wifi switch because of checking wifi in background
     WIFI_SWITCH_REASON_BACKGROUND_CHECK_AVAILABLE_WIFI = 5,
+    // current ap triggers wifi switch because of qoe slow
+    WIFI_SWITCH_REASON_QOE_SLOW = 6,
 };
 
+// current state in wifiPro
+enum WifiProState {
+    WIFI_DEFAULT = 0,
+    WIFI_PRO_ENABLE,
+    WIFI_PRO_DISABLE,
+    WIFI_CONNECTED,
+    WIFI_HASNET,
+    WIFI_NONET,
+    WIFI_PORTAL,
+    WIFI_DISCONNECTED,
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

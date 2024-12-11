@@ -58,6 +58,7 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     std::vector<NetworkSelection::NetworkCandidate *> bestNetworkCandidates;
     networkSelector->GetBestCandidates(bestNetworkCandidates);
     if (bestNetworkCandidates.empty()) {
+        WIFI_LOGI("CandidateNetwork empty");
         return false;
     }
 
@@ -100,8 +101,9 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
         if (wifiDevicesInfo.rdbuf() ->in_avail() != 0) {
             wifiDevicesInfo << ",";
         }
-        wifiDevicesInfo << "\"" << pair.first << "_" <<
-            SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "\"";
+        wifiDevicesInfo << "\"" << pair.first << "_"
+                        << SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "_"
+                        << networkCandidates.at(pair.second).wifiDeviceConfig.keyMgmt << "\"";
     }
     WIFI_LOGI("Find savedNetworks in scanInfos: [%{public}s]", wifiDevicesInfo.str().c_str());
 

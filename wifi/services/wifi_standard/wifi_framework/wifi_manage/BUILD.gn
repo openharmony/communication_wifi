@@ -641,7 +641,7 @@ if (defined(ohos_lite)) {
     }
 
     if (wifi_feature_read_wifi_mac_from_oem) {
-      define += [ "READ_MAC_FROM_OEM" ]
+      defines += [ "READ_MAC_FROM_OEM" ]
     }
 
     version_script = "libwifi_manager.map"

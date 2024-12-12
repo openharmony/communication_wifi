@@ -96,6 +96,7 @@ public:
     virtual int SetDeviceEverConnected(int networkId) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
     virtual bool GetAcceptUnvalidated(int networkId) = 0;
+    
 };
 
 class WifiSettings : public MockWifiSettings {

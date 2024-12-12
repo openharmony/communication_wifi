@@ -65,19 +65,19 @@ std::string GetRandomStr(int len)
     char rndbuf[MAX_PSK_LEN + 1] = {0};
     int rndnum;
     if (len > MAX_PSK_LEN) {
-        len = MAX_PSK_LEN;
+        len = static_cast<int>(MAX_PSK_LEN);
     }
     for (int n = 0; n < len; ++n) {
-        rndnum = std::abs((int)rd());
+        rndnum = std::abs(static_cast<int>(rd()));
         switch (rndnum % HEX_TYPE_LEN) {
             case 0:
-                rndbuf[n] = ((rndnum % ('z' - 'a' + 1)) + 'a');
+                rndbuf[n] = static_cast<char>((rndnum % ('z' - 'a' + 1)) + 'a');
                 break;
             case 1:
-                rndbuf[n] = ((rndnum % ('Z' - 'A' + 1)) + 'A');
+                rndbuf[n] = static_cast<char>((rndnum % ('Z' - 'A' + 1)) + 'A');
                 break;
             default:
-                rndbuf[n] = ((rndnum % ('9' - '0' + 1)) + '0');
+                rndbuf[n] = static_cast<char>((rndnum % ('9' - '0' + 1)) + '0');
                 break;
         }
     }

@@ -324,15 +324,15 @@ bool NetworkInterface::IpAddressChange(
             ipAddress.GetAddressWithString().c_str(), ipAddress.GetAddressPrefixLength());
         return false;
     }
-    std::string IpAddr;
-    std::string Mask;
+    std::string ipAddr;
+    std::string mask;
     if (action) {
         Ipv4Address ipv4 = Ipv4Address::Create(ipAddress.GetAddressWithString(), ipAddress.GetAddressPrefixLength());
-        IpAddr = ipv4.GetAddressWithString();
-        Mask = ipv4.GetMaskWithString();
+        ipAddr = ipv4.GetAddressWithString();
+        mask = ipv4.GetMaskWithString();
     } else {
-        IpAddr = "0.0.0.0";
-        Mask = "0.0.0.0";
+        ipAddr = "0.0.0.0";
+        mask = "0.0.0.0";
     }
 
     struct ifreq ifr;
@@ -348,7 +348,7 @@ bool NetworkInterface::IpAddressChange(
 
     struct sockaddr_in *sin = (struct sockaddr_in *)&ifr.ifr_addr;
     sin->sin_family = AF_INET;
-    if (inet_aton(IpAddr.c_str(), &(sin->sin_addr)) < 0) {
+    if (inet_aton(ipAddr.c_str(), &(sin->sin_addr)) < 0) {
         close(fd);
         return false;
     }
@@ -357,7 +357,7 @@ bool NetworkInterface::IpAddressChange(
         WIFI_LOGE("ioctl set ip address failed, error is: %{public}d.", errno);
         return false;
     }
-    if (inet_aton(Mask.c_str(), &(sin->sin_addr)) < 0) {
+    if (inet_aton(mask.c_str(), &(sin->sin_addr)) < 0) {
         close(fd);
         return false;
     }

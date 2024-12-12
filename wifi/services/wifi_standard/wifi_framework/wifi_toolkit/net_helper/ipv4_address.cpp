@@ -32,7 +32,7 @@ const Ipv4Address Ipv4Address::defaultInetAddress("192.168.49.1", MAX_IPV4_PREFI
 bool Ipv4Address::IsValidIPv4(const std::string &ipv4)
 {
     struct in_addr ipv4Addr = {INADDR_ANY};
-    if (inet_pton(AF_INET, ipv4.c_str(), (void *)&ipv4Addr) != 1 ||
+    if (inet_pton(AF_INET, ipv4.c_str(), static_cast<void*>(&ipv4Addr)) != 1 ||
         ipv4 == invalidInetAddress.GetAddressWithString()) {
         return false;
     } else {

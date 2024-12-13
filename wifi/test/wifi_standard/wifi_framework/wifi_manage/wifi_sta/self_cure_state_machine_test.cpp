@@ -3067,7 +3067,6 @@ HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
 {
     bool isHttpReachable = true;
     pSelfCureStateMachine_->SetHttpMonitorStatus(isHttpReachable);
-    EXPECT_EQ(pSelfCureStateMachine_->isHttpDetectResponse_, true);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)

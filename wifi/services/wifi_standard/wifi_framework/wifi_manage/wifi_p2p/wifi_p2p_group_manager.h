@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 const int CREDENTIAL_MAX_NUM = 32;
 class WifiP2pGroupManager {
 FRIEND_GTEST(WifiP2pGroupManager);
@@ -214,6 +213,7 @@ public:
      */
     void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group);
 #endif
+    bool IsOldPersistentGroup(int id);
 private:
     /**
      * @Description - Synchronize from the current group to all registry groups.

@@ -2047,8 +2047,8 @@ void SelfCureStateMachine::AgeOutWifiConnectFailList()
 
 void SelfCureStateMachine::SetHttpMonitorStatus(bool isHttpReachable)
 {
-    isHttpDetectResponse_ = true;
     isHttpReachable_ = isHttpReachable;
+    detectionCond_.notify_all();
 }
 
 int SelfCureStateMachine::GetCurSignalLevel()
@@ -2063,21 +2063,14 @@ int SelfCureStateMachine::GetCurSignalLevel()
 bool SelfCureStateMachine::IsHttpReachable()
 {
     WIFI_LOGI("IsHttpReachable network detect start");
-    isHttpDetectResponse_ = false;
     if (mNetWorkDetect_ == nullptr) {
         WIFI_LOGI("mNetWorkDetect_");
         return isHttpReachable_;
     }
     mNetWorkDetect_->StartWifiDetection();
-    int64_t timeOut = GetNowMilliSeconds() + HTTP_DETECT_TIMEOUT;
-    while (timeOut > GetNowMilliSeconds()) {
-        if (isHttpDetectResponse_) {
-            isHttpDetectResponse_ = false;
-            break;
-        }
-        usleep(HTTP_DETECT_USLEEP_TIME);
-    }
-    WIFI_LOGI("IsHttpReachable network detect end");
+    std::unique_lock<std::mutex> locker(detectionMtx_);
+    detectionCond_.wait_for(locker, std::chrono::milliseconds(HTTP_DETECT_TIMEOUT));
+    WIFI_LOGI("IsHttpReachable network detect end, resuil is %{public}d", isHttpReachable_);
     return isHttpReachable_;
 }
 

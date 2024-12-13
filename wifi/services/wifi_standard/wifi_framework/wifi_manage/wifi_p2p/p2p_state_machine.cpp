@@ -239,7 +239,6 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
         if (groupName.empty()) {
             groupName = device.GetNetworkName();
         }
-        WIFI_LOGI("connect device is go, Groupname is %{private}s", groupName.c_str());
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
             /**
@@ -268,7 +267,13 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
          */
         int networkId = -1;
         /* Prepare to reinvoke as GC. */
-        networkId = groupManager.GetGroupNetworkId(device);
+        if (config.GetNetId() >= 0) {
+            if (config.GetDeviceAddress() == groupManager.GetGroupOwnerAddr(config.GetNetId())) {
+                networkId = config.GetNetId();
+            }
+        } else {
+            networkId = groupManager.GetGroupNetworkId(device);
+        }
         if (networkId < 0) {
             WIFI_LOGI("cannot find device from gc devices");
             /**
@@ -284,22 +289,28 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
              * If a persistent group that has been connected to the peer device exists,
              * the reinvoke process is triggered.
              */
-            if (WifiErrorNo::WIFI_HAL_OPT_OK !=
-                WifiP2PHalInterface::GetInstance().Reinvoke(networkId, device.GetDeviceAddress())) {
-                WIFI_LOGE("Failed to reinvoke.");
-                UpdateGroupManager();
-                UpdatePersistentGroups();
-                return false;
-            } else {
-                config.SetNetId(networkId);
-                return true;
-            }
+            return ReinvokeGroup(config, networkId, device);
         } else {
             config.SetNetId(networkId);
         }
     }
 
     return false;
+}
+
+bool P2pStateMachine::ReinvokeGroup(WifiP2pConfigInternal &config, int networkId,
+    const WifiP2pDevice &device) const
+{
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
+        WifiP2PHalInterface::GetInstance().Reinvoke(networkId, device.GetDeviceAddress())) {
+        WIFI_LOGE("Failed to reinvoke.");
+        UpdateGroupManager();
+        UpdatePersistentGroups();
+        return false;
+    } else {
+        config.SetNetId(networkId);
+        return true;
+    }
 }
 
 WifiP2pDevice P2pStateMachine::FetchNewerDeviceInfo(const std::string &deviceAddr) const

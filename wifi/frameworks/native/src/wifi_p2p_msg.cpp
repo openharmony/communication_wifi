@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 void WifiP2pWfdInfo::SetWfdEnabled(bool value)
 {
     wfdEnabled = value;
@@ -535,6 +534,16 @@ void WifiP2pGroupInfo::SetCreatorUid(int uid)
 int WifiP2pGroupInfo::GetCreatorUid()
 {
     return creatorUid;
+}
+
+void WifiP2pGroupInfo::SetPersistentFlag(bool flag)
+{
+    isOldPersistenGroup = flag;
+}
+ 
+bool WifiP2pGroupInfo::GetPersistentFlag(void)
+{
+    return isOldPersistenGroup;
 }
 
 void WpsInfo::SetWpsMethod(WpsMethod wpsMethod)

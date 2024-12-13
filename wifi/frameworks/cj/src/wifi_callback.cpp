@@ -376,6 +376,10 @@ public:
     {
     }
 
+    void OnP2pChrErrCodeReport(const int errCode) override
+    {
+    }
+
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override
     {
         return nullptr;

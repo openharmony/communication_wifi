@@ -33,6 +33,7 @@ ohos_shared_library("wifi_p2p_service") {
     "group_negotiation_state.cpp",
     "invitation_received_state.cpp",
     "invitation_request_state.cpp",
+    "p2p_chr_reporter.cpp",
     "p2p_default_state.cpp",
     "p2p_disabled_state.cpp",
     "p2p_disabling_state.cpp",

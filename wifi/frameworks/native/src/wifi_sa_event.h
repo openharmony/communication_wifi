@@ -118,6 +118,8 @@ public:
 
     void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override;
 
+    void OnP2pChrErrCodeReport(const int errCode) override;
+
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
 
 public:
@@ -129,6 +131,7 @@ public:
         peersChangeCb = nullptr;
         privatepeerChangeCb = nullptr;
         cfgChangeCallback = nullptr;
+        p2pChrErrCodeReportCb = nullptr;
     }
 
     virtual ~WifiP2pCEventCallback() {
@@ -141,6 +144,7 @@ public:
     P2pPeersChangedCallback peersChangeCb;
     P2pPrivatePeersChangedCallback privatepeerChangeCb;
     WifiCfgChangCallback cfgChangeCallback;
+    P2pChrErrCodeReportCallback p2pChrErrCodeReportCb;
 
 private:
     std::mutex p2pCallbackMutex;

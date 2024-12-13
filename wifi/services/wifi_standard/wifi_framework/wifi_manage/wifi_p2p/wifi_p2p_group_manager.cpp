@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 WifiP2pGroupManager::WifiP2pGroupManager() : groupsInfo(), currentGroup(), groupMutex(), p2pConnInfo()
 {}
 
@@ -241,6 +240,16 @@ void WifiP2pGroupManager::SaveP2pInfo(const WifiP2pLinkedInfo &linkedInfo)
 {
     std::unique_lock<std::mutex> lock(groupMutex);
     p2pConnInfo = linkedInfo;
+}
+
+bool WifiP2pGroupManager::IsOldPersistentGroup(int id)
+{
+    for (auto it = groupsInfo.begin(); it != groupsInfo.end(); ++it) {
+        if (it->GetNetworkId() == id) {
+            return it->GetPersistentFlag();
+        }
+    }
+    return false;
 }
 
 const WifiP2pLinkedInfo &WifiP2pGroupManager::GetP2pInfo() const

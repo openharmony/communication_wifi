@@ -410,7 +410,8 @@ public:
      * @param frequencies - Frequency list.
      * @return WifiErrorNo
      */
-    WifiErrorNo P2pGetSupportFrequenciesByBand(int band, std::vector<int> &frequencies) const;
+    WifiErrorNo P2pGetSupportFrequenciesByBand(const std::string &ifaceName, int band,
+        std::vector<int> &frequencies) const;
 
     /**
      * @Description Setting the P2P single config.

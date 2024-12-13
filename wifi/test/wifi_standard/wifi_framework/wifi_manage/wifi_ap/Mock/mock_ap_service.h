@@ -23,6 +23,7 @@
 #include "ap_service.h"
 namespace OHOS {
 namespace Wifi {
+    
 class MockApService : public ApService {
 public:
     MockApService(ApStateMachine &apStateMachine) : ApService(apStateMachine)

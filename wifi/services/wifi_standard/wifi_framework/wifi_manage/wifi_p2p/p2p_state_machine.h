@@ -45,6 +45,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 const int MIN_GROUP_NAME_LENGTH = 9;
 const int MAX_GROUP_NAME_LENGTH = 32;
 const int DISC_TIMEOUT_S = 120;
@@ -286,12 +287,6 @@ private:
      *
      */
     DHCPTYPE GetIsNeedDhcp() const;
-
-    /**
-     * @Description Is interface reuse.
-     *
-     */
-    bool IsInterfaceReuse() const;
 
     void ClearGroup() const;
 

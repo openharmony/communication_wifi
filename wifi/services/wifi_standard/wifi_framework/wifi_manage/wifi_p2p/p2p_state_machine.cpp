@@ -41,6 +41,7 @@ DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 
 namespace OHOS {
 namespace Wifi {
+    
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
 //miracast
 const int CMD_TYPE_SET = 2;
@@ -1133,11 +1134,6 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
     return (ret == WIFI_HAL_OPT_FAILED) ? false : true;
 }
 
-bool P2pStateMachine::IsInterfaceReuse() const
-{
-    return !(WifiConfigCenter::GetInstance().GetP2pIfaceName().compare("wlan0"));
-}
-
 bool P2pStateMachine::HasPersisentGroup(void)
 {
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
@@ -1147,12 +1143,6 @@ bool P2pStateMachine::HasPersisentGroup(void)
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
-    /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
-     * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
-     */
-    if (IsInterfaceReuse()) {
-        return;
-    }
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     if (grpInfo.size() > 0) {
         if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_HAL_OPT_OK) {

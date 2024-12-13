@@ -25,6 +25,7 @@
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {
 namespace Wifi {
+    
 ApService::ApService(ApStateMachine &apStateMachine, int id)
     : m_ApStateMachine(apStateMachine), m_id(id)
 {}

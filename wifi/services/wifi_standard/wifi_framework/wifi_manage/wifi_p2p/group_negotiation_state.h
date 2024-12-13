@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 class P2pStateMachine;
 class GroupNegotiationState : public State {
     FRIEND_GTEST(GroupNegotiationState);

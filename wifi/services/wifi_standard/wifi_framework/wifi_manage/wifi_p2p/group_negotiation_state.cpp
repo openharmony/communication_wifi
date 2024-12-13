@@ -25,6 +25,7 @@ DEFINE_WIFILOG_P2P_LABEL("GroupNegotiationState");
 
 namespace OHOS {
 namespace Wifi {
+    
 GroupNegotiationState::GroupNegotiationState(
     P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr)
     : State("GroupNegotiationState"), mProcessFunMap(), p2pStateMachine(stateMachine), groupManager(groupMgr), deviceManager(deviceMgr)

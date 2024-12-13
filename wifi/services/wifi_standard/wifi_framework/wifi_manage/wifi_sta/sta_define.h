@@ -80,7 +80,7 @@ namespace Wifi {
 
 #define BSSID_LEN 17
 #define KEY_LEN 128
-#define SSID_LEN 30
+#define SSID_LEN 32
 #define VALUE_LIMIT_MIN_RSSI (-100)
 #define VALUE_LIMIT_MAX_RSSI (-55)
 

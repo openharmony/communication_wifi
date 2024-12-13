@@ -83,6 +83,21 @@ public:
     virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
     
     /**
+     * @Description Notify internet state
+     *
+     * @param netState - net state
+     */
+    virtual void NotifyInternetState(const int netState) = 0;
+    
+    /**
+     * @Description Notify wifi netlink message
+     *
+     * @param type - wifi netlink message type
+     * @param recvMsg - wifi netlink message
+     */
+    virtual void ProcessWifiNetlinkReportEvent(const int type, const std::vector<uint8_t>& recvMsg) = 0;
+
+    /**
      * @Description Check Chba conncted
      *
      * @return true: conncted, false: not conncted

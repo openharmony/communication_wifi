@@ -365,7 +365,7 @@ public:
     {
         WifiDeviceConfig config;
         std::string bssid = "01:23:45:67:89:ab";
-        pStaInterface->EnableHiLinkHandshake(config, bssid);
+        pStaInterface->EnableHiLinkHandshake(true, config, bssid);
     }
 
     void DeliverStaIfaceDataSuceess()

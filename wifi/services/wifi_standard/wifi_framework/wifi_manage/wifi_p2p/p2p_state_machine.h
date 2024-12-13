@@ -45,7 +45,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 const int MIN_GROUP_NAME_LENGTH = 9;
 const int MAX_GROUP_NAME_LENGTH = 32;
 const int DISC_TIMEOUT_S = 120;
@@ -292,6 +291,7 @@ private:
 
     bool HasPersisentGroup(void);
 
+    bool CheckIsDisplayDevice(const std::string &mac) const;
 private:
     /**
      * @Description - Broadcast state change event.

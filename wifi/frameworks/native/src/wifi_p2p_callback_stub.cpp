@@ -58,6 +58,8 @@ void WifiP2pCallbackStub::InitHandleMap()
         &WifiP2pCallbackStub::RemoteOnP2pGcLeaveGroup;
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_PRIVATE_PEER_CHANGE)] =
         &WifiP2pCallbackStub::RemoteOnP2pPrivatePeersChanged;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CHR_ERRCODE_REPORT)] =
+        &WifiP2pCallbackStub::RemoteOnP2pChrErrCodeReport;
     return;
 }
 
@@ -205,6 +207,14 @@ void WifiP2pCallbackStub::OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info)
     WIFI_LOGD("WifiP2pCallbackStub::OnP2pGcLeaveGroup");
     if (userCallback_) {
         userCallback_->OnP2pGcLeaveGroup(info);
+    }
+}
+
+void WifiP2pCallbackStub::OnP2pChrErrCodeReport(const int errCode)
+{
+    WIFI_LOGD("WifiP2pCallbackStub::OnP2pChrErrCodeReport, %{public}d", errCode);
+    if (userCallback_) {
+        userCallback_->OnP2pChrErrCodeReport(errCode);
     }
 }
 
@@ -393,6 +403,13 @@ void WifiP2pCallbackStub::RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &
     info.ip = data.ReadString();
     info.host = data.ReadString();
     OnP2pGcLeaveGroup(info);
+}
+
+void WifiP2pCallbackStub::RemoteOnP2pChrErrCodeReport(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int errCode = data.ReadInt32();
+    OnP2pChrErrCodeReport(errCode);
 }
 }  // namespace Wifi
 }  // namespace OHOS

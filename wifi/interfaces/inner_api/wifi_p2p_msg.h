@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 constexpr int WIFI_STR_MAC_LENGTH = 17;
 constexpr int MAX_PASSPHRASE_LENGTH = 127;
 constexpr int DEVICE_NAME_LENGTH = 32;
@@ -295,6 +294,8 @@ public:
     void SetExplicitGroup(bool isExplicit);
     void SetCreatorUid(int uid);
     int GetCreatorUid();
+    void SetPersistentFlag(bool flag);
+    bool GetPersistentFlag(void);
 
 private:
     WifiP2pDevice owner;
@@ -312,6 +313,7 @@ private:
     std::string gcIpAddress;
     bool explicitGroup;
     int creatorUid = -1;
+    bool isOldPersistenGroup = false;
 };
 
 class WpsInfo {

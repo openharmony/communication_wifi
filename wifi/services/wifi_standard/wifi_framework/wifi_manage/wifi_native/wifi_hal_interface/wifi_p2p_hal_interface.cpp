@@ -537,14 +537,17 @@ WifiErrorNo WifiP2PHalInterface::GetChba0Freq(int &chba0Freq) const
 #endif
 }
 
-WifiErrorNo WifiP2PHalInterface::P2pGetSupportFrequenciesByBand(int band, std::vector<int> &frequencies) const
+WifiErrorNo WifiP2PHalInterface::P2pGetSupportFrequenciesByBand(const std::string &ifaceName, int band,
+    std::vector<int> &frequencies) const
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqP2pGetSupportFrequencies(band, frequencies);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqP2pGetSupportFrequencies(band, frequencies);
+    return mIdlClient->GetSupportFrequencies(band, frequencies);
 #endif
 }
 

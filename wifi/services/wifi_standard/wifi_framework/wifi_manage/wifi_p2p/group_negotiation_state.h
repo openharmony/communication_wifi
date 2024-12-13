@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Wifi {
-    
 class P2pStateMachine;
 class GroupNegotiationState : public State {
     FRIEND_GTEST(GroupNegotiationState);
@@ -129,6 +128,7 @@ private:
      */
     virtual void Init();
 
+    void DoDhcpInGroupStart(void) const;
 private:
     using ProcessFun = bool (GroupNegotiationState::*)(InternalMessagePtr msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;

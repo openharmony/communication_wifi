@@ -23,7 +23,7 @@ ApInterface::ApInterface(int id)
       m_ApIdleState(m_ApStateMachine, id),
       m_ApMonitor(id),
       m_ApStateMachine(m_ApStationsManager, m_ApRootState, m_ApIdleState, m_ApStartedState, m_ApMonitor, id),
-      m_ApService(m_ApStateMachine, id),
+      m_ApService(m_ApStateMachine, m_ApStartedState id),
       m_ApStationsManager(id),
       m_ApConfigUse(id)
 {}

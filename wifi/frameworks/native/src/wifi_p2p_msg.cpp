@@ -17,6 +17,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 void WifiP2pWfdInfo::SetWfdEnabled(bool value)
 {
     wfdEnabled = value;

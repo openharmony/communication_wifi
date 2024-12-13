@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace Wifi {
+    
 const int CREDENTIAL_MAX_NUM = 32;
 class WifiP2pGroupManager {
 FRIEND_GTEST(WifiP2pGroupManager);

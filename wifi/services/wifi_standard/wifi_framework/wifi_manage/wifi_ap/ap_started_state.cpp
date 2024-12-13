@@ -46,6 +46,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
 namespace OHOS {
 namespace Wifi {
+    
 const std::string AP_DEFAULT_IP = "192.168.43.1";
 const int STA_JOIN_HANDLE_DELAY = 5 * 1000;
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)

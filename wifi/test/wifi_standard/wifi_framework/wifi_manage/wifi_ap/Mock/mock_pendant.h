@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace Wifi {
 
+
 class MockPendant {
 public:
     MockPendant()

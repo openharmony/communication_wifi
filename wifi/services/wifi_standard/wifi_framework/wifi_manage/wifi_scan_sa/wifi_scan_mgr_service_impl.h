@@ -47,6 +47,7 @@ private:
     static sptr<WifiScanMgrServiceImpl> g_instance;
     std::map<int, sptr<IRemoteObject>> mWifiService;
     static std::mutex g_instanceLock;
+    static std::mutex g_scanMutex;
     bool mPublishFlag;
     ServiceRunningState mState;
 };

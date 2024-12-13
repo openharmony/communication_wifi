@@ -29,6 +29,7 @@ public:
 
     static bool IsUtf8(const std::string &stf);
     static std::string GbkToUtf8(const std::string &strGbk);
+    static std::string Utf8ToGbk(const std::string &strUtf8);
 private:
     static std::string Convert(const std::string &str, const std::string &fromCharset,
     const std::string &toCharset);

@@ -2857,7 +2857,7 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
 #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
-	pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
+    pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(
         pStaStateMachine->linkedInfo, pStaStateMachine->GetInstanceId());
 #ifndef OHOS_ARCH_LITE

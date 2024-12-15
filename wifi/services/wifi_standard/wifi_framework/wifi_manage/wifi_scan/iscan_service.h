@@ -45,12 +45,26 @@ public:
      */
     virtual ErrCode Scan(bool externFlag) = 0;
     /**
+     * @Description Processes interface service internal scan request.
+     *
+     * @param mScanType it is from ScanType
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode Scan(ScanType mScanType) = 0;
+    /**
      * @Description Processes interface service scan with param request.
      *
      * @param wifiScanParams Parameters in the scan request[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag) = 0;
+    /**
+     * @Description Processes interface service internal scan with param request.
+     *
+     * @param wifiScanParams Parameters in the scan request[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode ScanWithParam(const WifiScanParams &wifiScanParams, ScanType mScanType) = 0;
     /**
      * @Description Disable/Restore the scanning operation.
      *

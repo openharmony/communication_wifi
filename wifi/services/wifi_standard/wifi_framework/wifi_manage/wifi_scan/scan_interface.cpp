@@ -82,6 +82,14 @@ ErrCode ScanInterface::Scan(bool externFlag)
     return pScanService->Scan(externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN);
 }
 
+ErrCode ScanInterface::Scan(ScanType mScanType)
+{
+    WIFI_LOGI("Enter ScanInterface::Scan internal\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    return pScanService->Scan(mScanType);
+}
+
 ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag)
 {
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
@@ -89,6 +97,14 @@ ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool 
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     return pScanService->ScanWithParam(wifiScanParams,
         externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN);
+}
+
+ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, ScanType mScanType)
+{
+    WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    return pScanService->ScanWithParam(wifiScanParams, mScanType);
 }
 
 ErrCode ScanInterface::DisableScan(bool disable)

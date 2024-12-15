@@ -1590,7 +1590,7 @@ ErrCode ScanService::AllowScanByType(ScanType scanType)
             allScanResult = AllowDefaultScan();
             break;
     }
- 
+
     WIFI_LOGI("AllowScanByType, scanType:%{public}d, allScanResult:%{public}d",
         scanType, static_cast<int>(allScanResult));
     return allScanResult;

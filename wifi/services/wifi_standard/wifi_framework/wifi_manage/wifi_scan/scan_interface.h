@@ -50,12 +50,26 @@ public:
      */
     ErrCode Scan(bool externFlag) override;
     /**
+     * @Description Processes interface service internal scan request.
+     *
+     * @param mScanType it is from ScanType
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode Scan(ScanType mScanType) override;
+    /**
      * @Description Processes interface service scan with param request.
      *
      * @param wifiScanParams Parameters in the scan request[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     ErrCode ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag) override;
+    /**
+     * @Description Processes interface service internal scan with param request.
+     *
+     * @param wifiScanParams Parameters in the scan request[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode ScanWithParam(const WifiScanParams &wifiScanParams, ScanType mScanType) override;
     /**
      * @Description Disable/Restore the scanning operation.
      *

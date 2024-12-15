@@ -1534,7 +1534,8 @@ ErrCode ScanService::AllowWifiProScan()
         return WIFI_OPT_FAILED;
     }
  
-    if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
+    if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
+        staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
         WIFI_LOGW("NOT allow scan for staStatus: %{public}d", staStatus);
         return WIFI_OPT_FAILED;
     }

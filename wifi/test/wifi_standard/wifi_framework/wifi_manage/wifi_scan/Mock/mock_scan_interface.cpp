@@ -43,7 +43,19 @@ ErrCode ScanInterface::Scan(bool externFlag)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanInterface::Scan(ScanType mScanType)
+{
+    WIFI_LOGI("Enter ScanInterface::Scan\n");
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag)
+{
+    WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, ScanType mScanType)
 {
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
     return WIFI_OPT_SUCCESS;

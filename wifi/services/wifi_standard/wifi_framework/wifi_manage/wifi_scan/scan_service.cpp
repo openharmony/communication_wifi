@@ -1408,8 +1408,7 @@ ErrCode ScanService::AllowSystemTimerScan()
         return WIFI_OPT_FAILED;
     }
 
-    if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
-        staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
+    if (staStatus == static_cast<int>(OperateResState::CONNECT_CONNECTING)) {
         WIFI_LOGW("system timer scan not allowed for staStatus: %{public}d.", staStatus);
         return WIFI_OPT_SCAN_NEXT_PERIOD;
     }

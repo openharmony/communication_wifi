@@ -133,6 +133,7 @@ ohos_unittest("toolkit_unittest") {
     "certificate_manager:cert_manager_sdk",
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",
+    "icu:shared_icuuc",
     "hilog:libhilog",
     "ipc:ipc_single",
     "jsoncpp:jsoncpp",

@@ -99,7 +99,7 @@ std::string WifiCodeConvertUtil::Convert(const std::string &str, const std::stri
 
     char *outbufbak = outbuf;
     std::vector<char> inbuf(str.begin(), str.end());
-    if (iconv(cd, &inbuf.data(), &inlen, &outbuf, &outlen) == static_cast<size_t>(-1)) {
+    if (iconv(cd, &inbuf[0], &inlen, &outbuf, &outlen) == static_cast<size_t>(-1)) {
         delete[] outbufbak;
         outbufbak = nullptr;
         iconv_close(cd);

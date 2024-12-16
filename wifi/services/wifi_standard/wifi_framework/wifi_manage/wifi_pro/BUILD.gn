@@ -66,6 +66,7 @@ ohos_static_library("wifi_pro") {
     "hilog:libhilog",
     "init:libbegetutil",
     "netmanager_base:net_conn_manager_if",
+    "samgr:samgr_proxy",
   ]
 
   defines = []

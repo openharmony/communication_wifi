@@ -84,6 +84,7 @@ ohos_shared_library("wifi_ap_service") {
     "hilog:libhilog",
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
+    "samgr:samgr_proxy",
   ]
 
   deps = [

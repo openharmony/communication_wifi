@@ -147,8 +147,9 @@ WifiErrorNo WifiStaHalInterface::GetStaCapabilities(unsigned int &capabilities)
 #ifdef READ_MAC_FROM_OEM
 WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName, bool fromIface)
 {
+    LOGI("GetStaDeviceMacAddress oem enter, %{public}d", fromIface);
     if (!fromIface && ifaceName == WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0)) {
-        mac = GetConstantMac();
+        mac = GetWifiOeminfoMac();
     }
     if (!mac.empty()) {
         return WIFI_HAL_OPT_OK;
@@ -175,18 +176,14 @@ WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const 
 #endif
 
 #ifdef READ_MAC_FROM_OEM
-std::string WifiStaHalInterface::GetConstantMac()
+std::string WifiStaHalInterface::GetWifiOeminfoMac()
 {
     LOGI("read mac from oem");
-    std::shared_ptr<IReadMac> pReadWifiMac = std::make_shared<ReadWifiMac>();
-    if (!pReadWifiMac) {
-        LOGE("pReadWifiMac is nullptr");
-        return std::string("");
-    }
+    WifiOeminfoMac oeminfoMac;
     std::string oemMac = "";
-    int ret = pReadWifiMac->GetConstantMac(oemMac);
+    int ret = pReadWifiMac->GetOeminfoMac(oemMac);
     if (ret != 0) {
-        LOGE("GetConstantMac fail, ret = %{public}d", ret);
+        LOGE("GetOeminfoMac fail, ret = %{public}d", ret);
         return std::string("");
     }
     return oemMac;

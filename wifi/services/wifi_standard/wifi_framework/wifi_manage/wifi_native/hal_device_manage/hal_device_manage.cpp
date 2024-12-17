@@ -490,6 +490,11 @@ IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
         LOGE("find ap iface info");
         return iter->second;
     }
+    iter = mIWifiP2pIfaces.find(ifaceName);
+    if (iter != mIWifiP2pIfaces.end()) {
+        LOGE("find p2p iface info");
+        return iter->second;
+    }
     return nullptr;
 }
 
@@ -564,37 +569,17 @@ bool HalDeviceManager::GetFrequenciesByBand(const std::string &ifaceName, int32_
 
     std::lock_guard<std::mutex> lock(mMutex);
     LOGI("GetFrequenciesByBand, ifaceName:%{public}s, band:%{public}d", ifaceName.c_str(), band);
-    auto staIter = mIWifiStaIfaces.find(ifaceName);
-    if (staIter != mIWifiStaIfaces.end()) {
-        sptr<IChipIface> &iface = staIter->second;
-        CHECK_NULL_AND_RETURN(iface, false);
-        std::vector<uint32_t> uifrequenciesSta;
-        int32_t ret = iface->GetSupportFreqs(band, uifrequenciesSta);
+    auto iter = FindIface(ifaceName);
+    if (iter != nullptr) {
+        std::vector<uint32_t> uifrequencies;
+        int32_t ret = iter->GetSupportFreqs(band, uifrequencies);
         if (ret != HDF_SUCCESS) {
             LOGE("GetFrequenciesByBand, call GetSupportFreqs failed! ret:%{public}d", ret);
             return false;
         }
-        for (auto item : uifrequenciesSta) {
+        for (auto item : uifrequencies) {
             frequencies.emplace_back(item);
         }
-        LOGI("Sta getFrequenciesByBand success");
-        return true;
-    }
-
-    auto apIter = mIWifiApIfaces.find(ifaceName);
-    if (apIter != mIWifiApIfaces.end()) {
-        sptr<IChipIface> &iface = apIter->second;
-        CHECK_NULL_AND_RETURN(iface, false);
-        std::vector<uint32_t> uifrequenciesAp;
-        int32_t ret = iface->GetSupportFreqs(band, uifrequenciesAp);
-        if (ret != HDF_SUCCESS) {
-            LOGE("GetFrequenciesByBand, call GetSupportFreqs failed! ret:%{public}d", ret);
-            return false;
-        }
-        for (auto item : uifrequenciesAp) {
-            frequencies.emplace_back(item);
-        }
-        LOGI("Ap getFrequenciesByBand success");
         return true;
     }
     LOGI("GetFrequenciesByBand failed");

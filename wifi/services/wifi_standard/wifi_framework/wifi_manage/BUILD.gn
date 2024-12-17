@@ -269,6 +269,7 @@ if (defined(ohos_lite)) {
       "huks:libhukssdk",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
+      "samgr:samgr_proxy",
     ]
   }
   ohos_source_set("wifi_device_service_impl") {
@@ -339,6 +340,7 @@ if (defined(ohos_lite)) {
       "huks:libhukssdk",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
+      "samgr:samgr_proxy",
     ]
   }
   ohos_source_set("wifi_hotspot_service_impl") {
@@ -382,6 +384,7 @@ if (defined(ohos_lite)) {
       "huks:libhukssdk",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
+      "samgr:samgr_proxy",
     ]
 
     defines = [
@@ -440,6 +443,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "netmanager_base:net_conn_manager_if",
       "safwk:system_ability_fwk",
+      "samgr:samgr_proxy",
     ]
     defines = [
       "FEATURE_P2P_SUPPORT",
@@ -533,6 +537,7 @@ if (defined(ohos_lite)) {
       "dhcp:dhcp_sdk",
       "hilog:libhilog",
       "ipc:ipc_single",
+      "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_native_manager_if",
       "power_manager:powermgr_client",
@@ -639,11 +644,6 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_vap_manager) {
       defines += [ "FEATURE_VAP_MANAGER_SUPPORT" ]
     }
-
-    if (wifi_feature_read_wifi_mac_from_oem) {
-      defines += [ "READ_MAC_FROM_OEM" ]
-    }
-
     version_script = "libwifi_manager.map"
     part_name = "wifi"
     subsystem_name = "communication"

@@ -419,7 +419,7 @@ public:
 
 private:
 #ifdef READ_MAC_FROM_OEM
-    std::string GetConstantMac();
+    std::string GetWifiOeminfoMac();
 #endif
 
 private:

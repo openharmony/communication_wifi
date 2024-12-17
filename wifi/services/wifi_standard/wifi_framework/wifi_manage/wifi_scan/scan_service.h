@@ -493,6 +493,7 @@ private:
      *
      */
     void RestartPnoScanTimeOut();
+    ErrCode ScanControlInner(ScanType scanType);
     /**
      * @Description System scanning failed, Restart after a delay.
      */
@@ -528,17 +529,11 @@ private:
      */
     ErrCode AllowWifiProScan();
     /**
-     * @Description Determines whether to allow 5GAp scanning based on the scanning policy.
+     * @Description Determines whether to allow 5G Ap scanning based on the scanning policy.
      *
      * @return success: true, failed: false
      */
     ErrCode Allow5GApScan();
-    /**
-     * @Description Determines whether to allow the scanning policy(Default).
-     *
-     * @return success: true, failed: false
-     */
-    ErrCode AllowDefaultScan();
     /**
      * @Description Determines whether to allow scanning based on the scanning type..
      *

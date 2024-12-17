@@ -723,6 +723,10 @@ void EventRegister::Register(const napi_env& env, const std::string& type, napi_
     RegObj regObj(env, handlerRef);
     auto iter = g_eventRegisterInfo.find(type);
     if (iter == g_eventRegisterInfo.end()) {
+        if (g_eventRegisterInfo.size() > REGISTERINFO_MAX_NUM) {
+            WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+            return;
+        }
         g_eventRegisterInfo[type] = std::vector<RegObj>{regObj};
     } else {
         iter->second.emplace_back(regObj);

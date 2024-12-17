@@ -16,6 +16,8 @@
 #ifndef OHOS_SELF_CURE_STATE_MACHINE_H
 #define OHOS_SELF_CURE_STATE_MACHINE_H
 
+#include <condition_variable>
+#include <mutex>
 #include "define.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
@@ -431,12 +433,13 @@ private:
     std::map<std::string, int> autoConnectFailedNetworksRssi_;
     std::atomic<bool> isWifiBackground_ = false;
     sptr<NetStateObserver> mNetWorkDetect_;
-    bool isHttpDetectResponse_ = false;
     bool isP2pEnhanceConnected_ = false;
     bool isInternetFailureDetected_ = false;
     DetailedState selfCureNetworkLastState_ = DetailedState::IDLE;
     WifiState selfCureWifiLastState_ = WifiState::UNKNOWN;
     SelfCureState selfCureL2State_ = SelfCureState::SCE_WIFI_INVALID_STATE;
+    std::mutex detectionMtx_;
+    std::condition_variable detectionCond_;
 };
 } // namespace Wifi
 } // namespace OHOS

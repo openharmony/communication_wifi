@@ -164,6 +164,10 @@ if (defined(ohos_lite)) {
     if (wifi_feature_read_wifi_mac_from_oem) {
       defines += [ "READ_MAC_FROM_OEM" ]
     }
+    if (wifi_feature_network_selection) {
+      defines = [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",
@@ -178,6 +182,7 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "ipc:ipc_single",
+      "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_stats_manager_if",
       "safwk:system_ability_fwk",

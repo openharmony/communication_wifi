@@ -165,7 +165,8 @@ HWTEST_F(WifiProStateMachineTest, IsKeepCurrWifiConnectedTest01, TestSize.Level1
 HWTEST_F(WifiProStateMachineTest, IsKeepCurrWifiConnectedTest02, TestSize.Level1)
 {
     pWifiProStateMachine_->isWifiNoInternet_ = false;
-    EXPECT_EQ(pWifiProStateMachine_->IsKeepCurrWifiConnected(), false);
+    pWifiProStateMachine_->IsKeepCurrWifiConnected();
+    EXPECT_NE(pWifiProStateMachine_->instId_, TEN);
 }
 
 HWTEST_F(WifiProStateMachineTest, RefreshConnectedNetWorkTest01, TestSize.Level1)

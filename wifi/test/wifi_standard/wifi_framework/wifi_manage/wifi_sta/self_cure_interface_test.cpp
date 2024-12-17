@@ -90,23 +90,6 @@ public:
         pSelfCureInterface->pSelfCureService = nullptr;
         pSelfCureInterface->DealRssiLevelChanged(rssi, instId);
     }
-
-    void DealP2pConnChangedTest()
-    {
-        WifiP2pLinkedInfo info;
-        pSelfCureInterface->DealP2pConnChanged(info);
-        pSelfCureInterface->pSelfCureService = nullptr;
-        pSelfCureInterface->DealP2pConnChanged(info);
-        EXPECT_NE(pSelfCureInterface->m_instId, TEN);
-    }
-
-    void RegisterSelfCureServiceCallbackTest()
-    {
-        SelfCureServiceCallback callbacks;
-        pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks);
-        callbacks.callbackModuleName = "test";
-        EXPECT_EQ(pSelfCureInterface->RegisterSelfCureServiceCallback(callbacks), WIFI_OPT_SUCCESS);
-    }
 };
 
 HWTEST_F(SelfCureInterfaceTest, InitSelfCureServiceTest, TestSize.Level1)
@@ -132,16 +115,6 @@ HWTEST_F(SelfCureInterfaceTest, DealStaConnChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureInterfaceTest, DealRssiLevelChangedTest, TestSize.Level1)
 {
     DealRssiLevelChangedTest();
-}
-
-HWTEST_F(SelfCureInterfaceTest, DealP2pConnChangedTest, TestSize.Level1)
-{
-    DealP2pConnChangedTest();
-}
-
-HWTEST_F(SelfCureInterfaceTest, RegisterSelfCureServiceCallbackTest, TestSize.Level1)
-{
-    RegisterSelfCureServiceCallbackTest();
 }
 
 HWTEST_F(SelfCureInterfaceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)

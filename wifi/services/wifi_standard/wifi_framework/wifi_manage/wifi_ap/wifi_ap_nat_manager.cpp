@@ -118,6 +118,7 @@ bool WifiApNatManager::SetInterfaceNat(bool enable, const std::string &outInterf
     /* Clearing the Firewalls */
     iptablesCmd.push_back(SYSTEM_COMMAND_IPTABLES);
     iptablesCmd.push_back("-F");
+    iptablesCmd.push_back("-w 5");
     IfConfig::GetInstance().ExecCommand(iptablesCmd);
 
     /* iptable forward ACCEPT */
@@ -126,6 +127,7 @@ bool WifiApNatManager::SetInterfaceNat(bool enable, const std::string &outInterf
     iptablesCmd.push_back("-P");
     iptablesCmd.push_back("FORWARD");
     iptablesCmd.push_back(enable ? "ACCEPT" : "DROP");
+    iptablesCmd.push_back("-w 5");
     IfConfig::GetInstance().ExecCommand(iptablesCmd);
 
     /* Setting NAT Rules */
@@ -139,6 +141,7 @@ bool WifiApNatManager::SetInterfaceNat(bool enable, const std::string &outInterf
     iptablesCmd.push_back(outInterfaceName);
     iptablesCmd.push_back("-j");
     iptablesCmd.push_back("MASQUERADE");
+    iptablesCmd.push_back("-w 5");
     IfConfig::GetInstance().ExecCommand(iptablesCmd);
 
     return true;

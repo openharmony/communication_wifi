@@ -159,7 +159,7 @@ if (defined(ohos_lite)) {
     }
 
     if (wifi_feature_network_selection) {
-      defines = [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
+      defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
     }
 
     external_deps = [

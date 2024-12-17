@@ -330,6 +330,9 @@ ErrCode WifiServiceScheduler::AutoStopScanOnly(int instId, bool setIfaceDown)
     }
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(instId);
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
+#ifdef DYNAMIC_UNLOAD_SA
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::SCAN_SERVICE_CLOSE, instId);
+#endif
     return WIFI_OPT_SUCCESS;
 }
 

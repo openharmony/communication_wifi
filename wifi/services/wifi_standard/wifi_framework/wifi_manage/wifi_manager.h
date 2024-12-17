@@ -62,6 +62,8 @@ enum class WifiCloseServiceCode {
     SERVICE_THREAD_EXIT,
     STA_MSG_OPENED,
     STA_MSG_STOPED,
+    STA_CLOSE_DHCP_SA,
+    AP_CLOSE_DHCP_SA,
 };
 
 struct WifiCloseServiceMsg {
@@ -142,6 +144,7 @@ private:
     void AutoStartServiceThread();
     void InitPidfile(void);
     void CheckSapcoExist(void);
+    void ProcessExtMsg(WifiCloseServiceCode code);
 private:
     std::mutex initStatusMutex;
     InitStatus mInitStatus;

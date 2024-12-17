@@ -52,7 +52,7 @@ config("wifi_fw_common_header") {
     ]
   }
   if (wifi_feature_read_wifi_mac_from_oem) {
-    include_dirs += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac" ]
+    include_dirs += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_oem_mac" ]
   }
 }
 
@@ -131,7 +131,7 @@ if (defined(ohos_lite)) {
     ]
 
     if (wifi_feature_read_wifi_mac_from_oem) {
-      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac/read_wifi_mac.cpp" ]
+      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_oem_mac/read_oeminfo_mac.cpp" ]
       defines += [ "READ_MAC_FROM_OEM" ]
     }
     configs -= [
@@ -214,6 +214,7 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
+      "samgr:samgr_proxy",
     ]
 
     if (wifi_feature_with_local_random_mac) {
@@ -232,7 +233,7 @@ if (defined(ohos_lite)) {
     }
 
     if (wifi_feature_read_wifi_mac_from_oem) {
-      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac/read_wifi_mac.cpp" ]
+      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_oem_mac/read_oeminfo_mac.cpp" ]
       defines += [ "READ_MAC_FROM_OEM" ]
     }
     cflags = memory_optimization_cflags

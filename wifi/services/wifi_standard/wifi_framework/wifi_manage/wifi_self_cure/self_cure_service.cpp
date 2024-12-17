@@ -58,15 +58,6 @@ ErrCode SelfCureService::InitSelfCureService()
     return WIFI_OPT_SUCCESS;
 }
 
-void SelfCureService::RegisterSelfCureServiceCallback(const std::vector<SelfCureServiceCallback> &callbacks) const
-{
-    WIFI_LOGI("Enter RegisterSelfCureServiceCallback.");
-    if (pSelfCureStateMachine == nullptr) {
-        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
-        return;
-    }
-}
-
 void SelfCureService::HandleRssiLevelChanged(int rssi)
 {
     WIFI_LOGD("HandleRssiLevelChanged, %{public}d.\n", rssi);
@@ -82,11 +73,6 @@ void SelfCureService::HandleRssiLevelChanged(int rssi)
     msg->SetMessageName(WIFI_CURE_NOTIFY_RSSI_LEVEL_CHANGED_EVENT);
     msg->SetParam1(rssi);
     pSelfCureStateMachine->SendMessage(msg);
-}
-
-void SelfCureService::HandleP2pConnChanged(const WifiP2pLinkedInfo &info)
-{
-    WIFI_LOGD("self cure p2p connection state change, connectState = %{public}d", info.GetConnectState());
 }
 
 void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
@@ -134,6 +120,16 @@ void SelfCureService::NotifyInternetFailureDetected(int forceNoHttpCheck)
         return;
     }
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, forceNoHttpCheck);
+}
+
+void SelfCureService::NotifyP2pConnectStateChanged(const WifiP2pLinkedInfo &info)
+{
+    WIFI_LOGI("Enter NotifyP2pConnectStateChanged, state is %{public}d", info.GetConnectState());
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return;
+    }
+    pSelfCureStateMachine->HandleP2pConnChanged(info);
 }
 
 bool SelfCureService::IsSelfCureOnGoing()

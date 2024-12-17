@@ -1080,7 +1080,8 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         WIFI_LOGE("Not 2.4GHz or 5GHz band!");
         return 0;
     }
-    if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(static_cast<int>(band), freqList) ==
+    if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(
+        WifiConfigCenter::GetInstance().GetP2pIfaceName(), static_cast<int>(band), freqList) ==
         WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         constexpr int DEFAULT_5G_FREQUENCY = 5745; // channal:149, frequency:5745
         if (band == GroupOwnerBand::GO_BAND_5GHZ) {
@@ -1095,9 +1096,19 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         WIFI_LOGE("Cannot get support frequencies according to band, choose random frequency");
         return 0;
     }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int retFreq = 0;
+    if (linkedInfo.connState == CONNECTED) {
+        auto it = std::find(freqList.begin(), freqList.end(), linkedInfo.frequency);
+        if (it != freqList.end()) {
+            retFreq = linkedInfo.frequency;
+            return retFreq;
+        }
+    }
     std::random_device rd;
     int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % freqList.size());
-    int retFreq = freqList.at(randomIndex);
+    retFreq = freqList.at(randomIndex);
     return retFreq;
 }
 

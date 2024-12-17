@@ -116,6 +116,7 @@ if (defined(ohos_lite)) {
       "libxml2:libxml2",
       "openssl:libcrypto_shared",
       "openssl:libssl_shared",
+      "samgr:samgr_proxy",
     ]
     if (wifi_ffrt_enable) {
       external_deps += [ "ffrt:libffrt" ]

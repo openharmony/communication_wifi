@@ -154,6 +154,8 @@ public:
     virtual int GetScanGenieState() const = 0;
     virtual int Init() = 0;
     virtual void SetFreezeModeState(int state) = 0;
+    virtual int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0) = 0;
+    virtual int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -288,6 +290,8 @@ public:
     MOCK_CONST_METHOD0(GetScanGenieState, int());
     MOCK_METHOD0(Init, int());
     MOCK_METHOD1(SetFreezeModeState, void(int state));
+    MOCK_METHOD2(GetHotspotMacConfig, int(HotspotMacConfig &config, int id));
+    MOCK_METHOD2(SetHotspotMacConfig, int(const HotspotMacConfig &config, int id));
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

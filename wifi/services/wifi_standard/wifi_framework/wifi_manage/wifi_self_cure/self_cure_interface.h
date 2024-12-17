@@ -40,14 +40,6 @@ public:
     virtual ErrCode InitSelfCureService() override;
 
     /**
-    * @Description  Register self cure callback function.
-    *
-    * @param callbacks - Callback function pointer storage structure
-    * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-    */
-    virtual ErrCode RegisterSelfCureServiceCallback(const SelfCureServiceCallback &callbacks) override;
-
-    /**
      * @Description Get register sta callback
      *
      * @return StaServiceCallback - sta callback
@@ -60,6 +52,14 @@ public:
      * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
     */
     virtual ErrCode NotifyInternetFailureDetected(int forceNoHttpCheck) override;
+
+    /**
+     * @Description Notify P2p connect state changed to selfcure
+     *
+     * @param info - p2p connect state
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode NotifyP2pConnectStateChanged(const WifiP2pLinkedInfo &info) override;
 
     /**
     * @Description  init callback function.
@@ -82,13 +82,6 @@ public:
      * @param rssi
      */
     void DealRssiLevelChanged(int rssi, int instId = 0);
-
-    /**
-     * @Description deal p2p connection change
-     *
-     * @param info -  const WifiP2pLinkedInfo
-     */
-    void DealP2pConnChanged(const WifiP2pLinkedInfo &info);
 
     /**
      * @Description deal dhcp offer report

@@ -355,7 +355,12 @@ void WifiP2pManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
         WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_SUC_CNT));
     }
-
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(0);
+        if (pSelfCureService != nullptr) {
+            pSelfCureService->NotifyP2pConnectStateChanged(info);
+        }
+#endif
     auto rptManager = WifiManager::GetInstance().GetRptInterface();
     if (rptManager != nullptr) {
         rptManager->OnP2pConnectionChanged(info.GetConnectState());

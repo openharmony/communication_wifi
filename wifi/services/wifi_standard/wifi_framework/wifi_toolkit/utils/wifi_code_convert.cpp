@@ -96,10 +96,10 @@ std::string WifiCodeConvertUtil::Utf8ToGbk(const std::string &strUtf8)
     if (strUtf8.length() == 0 || !IsUtf8(strUtf8)) {
         return strUtf8;
     }
+
     std::string result = Convert(strUtf8, "utf8", "gb2312");
     if (result.length() == 0) {
         return strUtf8;
-
     }
     return result;
 #endif // OHOS_ARCH_LITE

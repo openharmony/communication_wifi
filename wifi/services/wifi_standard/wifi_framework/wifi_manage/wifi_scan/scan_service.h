@@ -523,6 +523,18 @@ private:
      */
     ErrCode AllowPnoScan();
     /**
+     * @Description Determines whether to allow WifiPro scanning based on the scanning policy.
+     *
+     * @return success: true, failed: false
+     */
+    ErrCode AllowWifiProScan();
+    /**
+     * @Description Determines whether to allow 5G Ap scanning based on the scanning policy.
+     *
+     * @return success: true, failed: false
+     */
+    ErrCode Allow5GApScan();
+    /**
      * @Description Determines whether to allow scanning based on the scanning type..
      *
      * @param scanType - scan type: 0 - Extern; 1 - SystemTimer 2 Pno

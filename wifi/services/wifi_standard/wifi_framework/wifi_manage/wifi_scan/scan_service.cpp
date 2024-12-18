@@ -341,6 +341,11 @@ ErrCode ScanService::ScanControlInner(ScanType scanType)
         if (rlt != WIFI_OPT_SUCCESS) {
             return rlt;
         }
+    } else if (scanType == ScanType::SCAN_TYPE_WIFIPRO || scanType == ScanType::SCAN_TYPE_5G_AP) {
+        ErrCode rlt = AllowScanByType(scanType);
+        if (rlt != WIFI_OPT_SUCCESS) {
+            return rlt;
+        }
     } else {
         if (!AllowScanByDisableScanCtrl()) {
             WIFI_LOGW("internal scan not allow by disable scan control.");
@@ -1541,6 +1546,37 @@ ErrCode ScanService::AllowPnoScan()
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanService::AllowWifiProScan()
+{
+    if (!AllowScanByHid2dState()) {
+        WIFI_LOGW("internal scan not allow by hid2d state");
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int state = WifiConfigCenter::GetInstance().GetScreenState();
+    if (state == MODE_STATE_CLOSE) {
+        WIFI_LOGW("internal scan not allow by Screen Off");
+        return WIFI_OPT_FAILED;
+    }
+ 
+    if (staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
+        WIFI_LOGW("NOT allow scan for staStatus: %{public}d", staStatus);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode ScanService::Allow5GApScan()
+{
+    if (AllowWifiProScan() == WIFI_OPT_FAILED) {
+        return WIFI_OPT_FAILED;
+    }
+ 
+    // game optimization going
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode ScanService::AllowScanByType(ScanType scanType)
 {
     ErrCode allScanResult = WIFI_OPT_SUCCESS;
@@ -1553,6 +1589,12 @@ ErrCode ScanService::AllowScanByType(ScanType scanType)
             break;
         case ScanType::SCAN_TYPE_PNO:
             allScanResult = AllowPnoScan();
+            break;
+        case ScanType::SCAN_TYPE_WIFIPRO:
+            allScanResult = AllowWifiProScan();
+            break;
+        case ScanType::SCAN_TYPE_5G_AP:
+            allScanResult = Allow5GApScan();
             break;
         default:
             LOGE("scanType error.\n");

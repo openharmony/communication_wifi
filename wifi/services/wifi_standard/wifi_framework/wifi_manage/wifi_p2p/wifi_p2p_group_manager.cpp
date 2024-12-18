@@ -343,17 +343,13 @@ void WifiP2pGroupManager::RemoveMacAddrPairInfo(WifiMacAddrInfoType type, const 
     WIFI_LOGD("%{public}s del mac address, type:%{public}d, GOName:%{private}s, addr:%{private}s, addrType:%{public}d",
         __func__, type, owner.GetDeviceName().c_str(),
         owner.GetDeviceAddress().c_str(), owner.GetDeviceAddressType());
-    WifiMacAddrInfo macAddrInfo;
-    macAddrInfo.bssid = owner.GetDeviceAddress();
-    macAddrInfo.bssidType = owner.GetDeviceAddressType();
-    WifiConfigCenter::GetInstance().RemoveMacAddrPairs(type, macAddrInfo);
+    WifiConfigCenter::GetInstance().RemoveMacAddrPairInfo(type,
+        owner.GetDeviceAddress(), owner.GetDeviceAddressType());
 
     std::vector<WifiP2pDevice> clientVec = group.GetClientDevices();
     for (auto iter = clientVec.begin(); iter != clientVec.end(); ++iter) {
-        WifiMacAddrInfo clientMacAddrInfo;
-        clientMacAddrInfo.bssid = iter->GetDeviceAddress();
-        clientMacAddrInfo.bssidType = iter->GetDeviceAddressType();
-        WifiConfigCenter::GetInstance().RemoveMacAddrPairs(type, clientMacAddrInfo);
+        WifiConfigCenter::GetInstance().RemoveMacAddrPairInfo(type,
+            iter->GetDeviceAddress(), iter->GetDeviceAddressType());
     }
 }
 #endif

@@ -47,6 +47,8 @@ const int CMD_TYPE_SET = 2;
 const int DATA_TYPE_P2P_BUSINESS = 1;
 const int ARP_TIMEOUT = 100;
 const std::string CARRY_DATA_MIRACAST = "1";
+const std::string PRIMARY_PC_TYPE = "1";
+const std::string PRIMARY_DISPLAY_TYPE = "7";
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
 DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
@@ -211,6 +213,18 @@ void P2pStateMachine::UpdatePersistentGroups() const
     BroadcastPersistentGroupsChanged();
 }
 
+bool P2pStateMachine::CheckIsDisplayDevice(const std::string &mac) const
+{
+    WifiP2pDevice dev = deviceManager.GetDevices(mac);
+    std::string primaryType = dev.GetPrimaryDeviceType();
+    std::vector<std::string> type = StrSplit(primaryType, "-");
+    if (!type.empty() && (type[0] == PRIMARY_PC_TYPE || type[0] == PRIMARY_DISPLAY_TYPE)) {
+        WIFI_LOGI("peer is a dispaly type");
+        return true;
+    }
+    return false;
+}
+
 bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) const
 {
     const WifiP2pDevice device = FetchNewerDeviceInfo(config.GetDeviceAddress());
@@ -221,18 +235,20 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
 
     bool isJoin = device.IsGroupOwner();
     std::string groupName = config.GetGroupName();
-    WIFI_LOGI("IsDeviceLimit: %{public}d, Isinviteable: %{public}d", device.IsDeviceLimit(), device.Isinviteable());
     if (isJoin && !device.IsGroupLimit()) {
         if (groupName.empty()) {
             groupName = device.GetNetworkName();
         }
-        WIFI_LOGI("connect device is go, Groupname is %{private}s", groupName.c_str());
         int networkId = groupManager.GetGroupNetworkId(device, groupName);
         if (networkId >= 0) {
             /**
              * If GO is running on the peer device and the GO has been connected,
              * you can directly connect to the peer device through p2p_group_add.
              */
+            if (CheckIsDisplayDevice(config.GetDeviceAddress()) && !groupManager.IsOldPersistentGroup(networkId)) {
+                WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId);
+                return false;
+            }
             if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().GroupAdd(true, networkId, 0)) {
                 return false;
             }
@@ -251,7 +267,13 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
          */
         int networkId = -1;
         /* Prepare to reinvoke as GC. */
-        networkId = groupManager.GetGroupNetworkId(device);
+        if (config.GetNetId() >= 0) {
+            if (config.GetDeviceAddress() == groupManager.GetGroupOwnerAddr(config.GetNetId())) {
+                networkId = config.GetNetId();
+            }
+        } else {
+            networkId = groupManager.GetGroupNetworkId(device);
+        }
         if (networkId < 0) {
             WIFI_LOGI("cannot find device from gc devices");
             /**
@@ -267,23 +289,28 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
              * If a persistent group that has been connected to the peer device exists,
              * the reinvoke process is triggered.
              */
-            if (WifiErrorNo::WIFI_HAL_OPT_OK !=
-                WifiP2PHalInterface::GetInstance().Reinvoke(networkId, device.GetDeviceAddress())) {
-                WIFI_LOGE("Failed to reinvoke.");
-                UpdateGroupManager();
-                UpdatePersistentGroups();
-                return false;
-            } else {
-                config.SetNetId(networkId);
-                return true;
-            }
+            return ReinvokeGroup(config, networkId, device);
         } else {
-            WIFI_LOGI("cannot find device from go devices");
             config.SetNetId(networkId);
         }
     }
 
     return false;
+}
+
+bool P2pStateMachine::ReinvokeGroup(WifiP2pConfigInternal &config, int networkId,
+    const WifiP2pDevice &device) const
+{
+    if (WifiErrorNo::WIFI_HAL_OPT_OK !=
+        WifiP2PHalInterface::GetInstance().Reinvoke(networkId, device.GetDeviceAddress())) {
+        WIFI_LOGE("Failed to reinvoke.");
+        UpdateGroupManager();
+        UpdatePersistentGroups();
+        return false;
+    } else {
+        config.SetNetId(networkId);
+        return true;
+    }
 }
 
 WifiP2pDevice P2pStateMachine::FetchNewerDeviceInfo(const std::string &deviceAddr) const
@@ -1133,11 +1160,6 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
     return (ret == WIFI_HAL_OPT_FAILED) ? false : true;
 }
 
-bool P2pStateMachine::IsInterfaceReuse() const
-{
-    return !(WifiConfigCenter::GetInstance().GetP2pIfaceName().compare("wlan0"));
-}
-
 bool P2pStateMachine::HasPersisentGroup(void)
 {
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
@@ -1147,12 +1169,6 @@ bool P2pStateMachine::HasPersisentGroup(void)
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
-    /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
-     * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
-     */
-    if (IsInterfaceReuse()) {
-        return;
-    }
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     if (grpInfo.size() > 0) {
         if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_HAL_OPT_OK) {

@@ -20,6 +20,7 @@
 #include "i_ap_service.h"
 #include "i_ap_service_callbacks.h"
 #include "i_wifi_country_code_change_listener.h"
+#include "ap_started_state.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -33,7 +34,7 @@ public:
      * @param None
      * @return None
      */
-    explicit ApService(ApStateMachine &apStateMachine, int id = 0);
+    explicit ApService(ApStateMachine &apStateMachine, ApStartedState &apStartedState, int id = 0);
 
     /**
      * @Description  destructor method.
@@ -160,6 +161,7 @@ private:
         std::string GetListenerModuleName() override;
     };
     ApStateMachine &m_ApStateMachine;
+    ApStartedState &apStartedState_;
     int m_id;
     std::shared_ptr<IWifiCountryCodeChangeListener> m_apObserver;
 };

@@ -71,7 +71,6 @@ public:
      */
     virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
-private:
     /**
      * @Description  Called inside the state，The processing function of
                      the HAL layer when the AP is turned on.
@@ -89,6 +88,21 @@ private:
     bool StopAp() const;
 
     /**
+     * @Description  Start ap monitor.
+     * @param None
+     * @return None
+     */
+    void StartMonitor() const;
+ 
+    bool SetConfig();
+ 
+    void SetRandomMac() const;
+ 
+    bool SetCountry();
+ 
+private:
+
+    /**
      * @Description  Called inside the state，processing function
                      configured.
      * @param apConfig - Hotspot Configure
@@ -96,27 +110,12 @@ private:
      */
     bool SetConfig(HotspotConfig &apConfig);
 
-     /**
-     * @Description  Called inside the state，processing function
-                     configured when the AP is turned on.
-     * @param None
-     * @return true: Set successfully    false: Set failed
-     */
-    bool SetConfig();
-
     /**
      * @Description  Status update notification APSERVICE.
      * @param state - New state
      * @return None
      */
     void OnApStateChange(const ApState &state) const;
-
-    /**
-     * @Description  Start ap monitor.
-     * @param None
-     * @return None
-     */
-    void StartMonitor() const;
 
     /**
      * @Description  Stop ap monitor.
@@ -246,10 +245,9 @@ private:
      */
     bool UpdatMacAddress(const std::string ssid, KeyMgmt securityType);
 
-    void SetRandomMac() const;
-    bool SetCountry();
     void ProcessCmdHotspotChannelChanged(InternalMessagePtr msg);
     void ProcessCmdAssociatedStaChanged(InternalMessagePtr msg);
+    void ProcessCmdEnableAp(InternalMessagePtr msg);
 
 private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result

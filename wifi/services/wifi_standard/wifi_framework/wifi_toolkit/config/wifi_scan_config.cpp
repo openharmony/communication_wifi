@@ -323,7 +323,7 @@ int WifiScanConfig::GetScanInfoList(std::vector<WifiScanInfo> &results)
         if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
 #ifdef SUPPORT_RANDOM_MAC_ADDR
             WifiConfigCenter::GetInstance().RemoveMacAddrPairInfo(
-                WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, iter->bssid);
+                WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, iter->bssid, iter->bssidType);
 #endif
             LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
                 SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());

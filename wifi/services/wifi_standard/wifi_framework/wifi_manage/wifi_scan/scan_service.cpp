@@ -25,7 +25,7 @@
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_event_helper.h"
-
+#include "wifi_code_convert.h"
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
 #define MIN(A, B) (((A) >= (B)) ? (B) : (A))
@@ -1908,6 +1908,11 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
     });
     for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
         hiddenNetworkSsid.push_back(iter->ssid);
+        // for gbk hiddenNetworkSsID
+        std::string gbkSsid = WifiCodeConvertUtil::Utf8ToGbk(iter->ssid);
+        if (gbkSsid != iter->ssid && !gbkSsid.empty()) {
+            hiddenNetworkSsid.push_back(gbkSsid);
+        }
     }
 
     WIFI_LOGI("Find %{public}d hidden NetworkSsid.\n", (int)hiddenNetworkSsid.size());

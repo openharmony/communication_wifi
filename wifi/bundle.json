@@ -52,6 +52,7 @@
             "wifi_feature_with_auth_disable",
             "wifi_feature_with_dhcp_disable",
             "wifi_feature_with_encryption",
+            "wifi_feature_with_wifi_hdi",
             "wifi_feature_with_ap_extension",
             "wifi_feature_with_app_frozen",
             "wifi_feature_non_seperate_p2p",
@@ -60,8 +61,8 @@
             "wifi_feature_with_local_random_mac",
             "wifi_feature_sta_ap_exclusion",
             "wifi_feature_with_random_mac_addr",
-            "wifi_feature_with_hdi_wpa_supported",
             "wifi_feature_with_scan_control",
+            "wifi_feature_with_hdi_wpa_supported",
             "wifi_feature_network_selection",
             "wifi_feature_with_hdi_chip_supported",
             "wifi_feature_with_vap_manager",
@@ -115,7 +116,8 @@
                 "bounds_checking_function",
                 "jsoncpp",
                 "libxml2",
-                "asset"
+                "asset",
+                "icu"
             ],
             "third_party": [
               "wpa_supplicant"

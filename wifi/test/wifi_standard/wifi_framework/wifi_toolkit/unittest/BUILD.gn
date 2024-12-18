@@ -134,6 +134,7 @@ ohos_unittest("toolkit_unittest") {
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",
     "hilog:libhilog",
+    "icu:shared_icuuc",
     "ipc:ipc_single",
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",

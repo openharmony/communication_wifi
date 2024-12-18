@@ -91,10 +91,13 @@ enum class WifiCategory {
 };
 
 enum class ScanType {
-    SCAN_TYPE_EXTERN = 0,
+    SCAN_DEFAULT = 0,
+    SCAN_TYPE_EXTERN,
     SCAN_TYPE_NATIVE_EXTERN,
     SCAN_TYPE_SYSTEMTIMER,
     SCAN_TYPE_PNO,
+    SCAN_TYPE_WIFIPRO,
+    SCAN_TYPE_5G_AP,
 };
 
 enum ScanBandType {

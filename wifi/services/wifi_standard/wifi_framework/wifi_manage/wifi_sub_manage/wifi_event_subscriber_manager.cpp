@@ -765,8 +765,8 @@ void CesEventSubscriber::OnReceiveThermalEvent(const OHOS::EventFwk::CommonEvent
     std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("ThermalLevelSubscriber::OnReceiveEvent: %{public}s.", action.c_str());
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED) {
-        static const std::string THERMAL_EVENT_ID = "0";
-        int level = eventData.GetWant().GetIntParam(THERMAL_EVENT_ID, 0);
+        static const std::string kThermalEventId = "0";
+        int level = eventData.GetWant().GetIntParam(kThermalEventId, 0);
         WifiConfigCenter::GetInstance().SetThermalLevel(level);
         WIFI_LOGI("ThermalLevelSubscriber SetThermalLevel: %{public}d.", level);
     }

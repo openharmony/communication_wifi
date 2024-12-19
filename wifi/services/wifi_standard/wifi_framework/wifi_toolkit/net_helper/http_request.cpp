@@ -59,7 +59,7 @@ int HttpRequest::HttpRequestExec(
     }
 
     /* Limit the URL length. */
-    if (URLSIZE < strUrl.length()) {
+    if (strUrl.length() > URLSIZE) {
         LOGE("HttpRequest::HttpRequestExec URL length > %{public}d, error\n", URLSIZE);
         return -1;
     }
@@ -287,14 +287,14 @@ void HttpRequest::GetPortFromUrl()
     }
 }
 
-std::mutex gMutex;
-std::unordered_set<HostData*> gHostDataSet;
+std::mutex g_mutex;
+std::unordered_set<HostData*> g_HostDataSet;
 void GetHostThread(HostData* pThreadData)
 {
     std::string ipOrDomain;
     {
-        std::unique_lock<std::mutex> lck(gMutex);
-        if (gHostDataSet.find(pThreadData) == gHostDataSet.end()) {
+        std::unique_lock<std::mutex> lck(g_mutex);
+        if (g_HostDataSet.find(pThreadData) == g_HostDataSet.end()) {
             LOGE("GetHostThread Error.");
             return;
         }
@@ -324,8 +324,8 @@ void GetHostThread(HostData* pThreadData)
     freeaddrinfo(res);
     LOGE("GetHostThread ipaddr is %{public}s.", pThreadData->strIp.c_str());
 
-    pThreadData->bIp = true;
-    pThreadData->mWait_timeout.notify_one();
+    pThreadData->isIp = true;
+    pThreadData->waitTimeout.notify_one();
     return;
 }
 
@@ -346,13 +346,13 @@ int HttpRequest::GetIPFromUrl()
         LOGI("GetIPFromUrl Url maybe contain Domain.");
         HostData* pData = nullptr;
         {
-            std::unique_lock<std::mutex> lck(gMutex);
+            std::unique_lock<std::mutex> lck(g_mutex);
             pData = new HostData;
             if (pData == nullptr) {
                 LOGE("GetIPFromUrl new HostData error.\n");
                 return -1;
             }
-            gHostDataSet.emplace(pData);
+            g_HostDataSet.emplace(pData);
             pData->strIpOrDomain = strIpOrDomain;
         }
 
@@ -364,15 +364,15 @@ int HttpRequest::GetIPFromUrl()
         bool bTimeOut = false;
         const int timeoutMs = 150;
         {
-            std::unique_lock<std::mutex> lck(gMutex);
-            if (pData->mWait_timeout.wait_for(lck, std::chrono::milliseconds(timeoutMs)) == std::cv_status::timeout) {
+            std::unique_lock<std::mutex> lck(g_mutex);
+            if (pData->waitTimeout.wait_for(lck, std::chrono::milliseconds(timeoutMs)) == std::cv_status::timeout) {
                 bTimeOut = true;
             }
         }
 
         if (!bTimeOut) {
-            std::unique_lock<std::mutex> lck(gMutex);
-            if (gHostDataSet.find(pData) == gHostDataSet.end()) {
+            std::unique_lock<std::mutex> lck(g_mutex);
+            if (g_HostDataSet.find(pData) == g_HostDataSet.end()) {
                 if (pData != nullptr) {
                     delete pData;
                     pData = nullptr;
@@ -380,10 +380,10 @@ int HttpRequest::GetIPFromUrl()
                 LOGD("GetHostThread None.");
                 return -1;
             }
-            if (pData->bIp) {
+            if (pData->isIp) {
                 iRlt = 0;
                 strIp = pData->strIp;
-                gHostDataSet.erase(pData);
+                g_HostDataSet.erase(pData);
                 delete pData;
                 pData = nullptr;
                 LOGD("Get ip ok.");

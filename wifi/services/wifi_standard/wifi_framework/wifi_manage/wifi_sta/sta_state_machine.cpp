@@ -99,7 +99,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define UMTS_AUTH_REQUEST_CONTENT_LEN (UMTS_AUTH_CHALLENGE_RAND_LEN + UMTS_AUTH_CHALLENGE_AUTN_LEN + 2)
 
 // res[9] + ck[17] + ik[17] + unknown[9]
-#define UMTS_AUTH_RESPONSE_CONENT_LEN 52
+#define UMTS_AUTH_RESPONSE_CONTENT_LEN 52
 
 #define MAX_RES_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RES_LEN)
 #define MAX_CK_STR_LEN (2 * UMTS_AUTH_CHALLENGE_CK_LEN)
@@ -999,7 +999,7 @@ int StaStateMachine::InitStaSMHandleMap()
     return WIFI_OPT_SUCCESS;
 }
 
-int setRssi(int rssi)
+int SetRssi(int rssi)
 {
     if (rssi < INVALID_RSSI_VALUE) {
         rssi = INVALID_RSSI_VALUE;
@@ -1016,9 +1016,9 @@ int StaStateMachine::UpdateLinkInfoRssi(int inRssi)
     int outRssi = 0;
     if (inRssi > INVALID_RSSI_VALUE && inRssi < MAX_RSSI_VALUE) {
         if (inRssi > 0) {
-            outRssi = setRssi((inRssi - SIGNAL_INFO));
+            outRssi = SetRssi((inRssi - SIGNAL_INFO));
         } else {
-            outRssi = setRssi(inRssi);
+            outRssi = SetRssi(inRssi);
         }
     } else {
         outRssi = INVALID_RSSI_VALUE;
@@ -1084,9 +1084,9 @@ void StaStateMachine::UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo)
     int currentSignalLevel = 0;
     if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
         if (signalInfo.signal > 0) {
-            linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
+            linkedInfo.rssi = SetRssi((signalInfo.signal - SIGNAL_INFO));
         } else {
-            linkedInfo.rssi = setRssi(signalInfo.signal);
+            linkedInfo.rssi = SetRssi(signalInfo.signal);
         }
         currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
         if (currentSignalLevel != lastSignalLevel_) {
@@ -1803,10 +1803,10 @@ void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)
     for (int i = 0; i < macBitSize; i++) {
         if (i != firstBit) {
             std::uniform_int_distribution<> distribution(0, hexBase - 1);
-            ret = sprintf_s(strMacTmp, arraySize, "%x", distribution(gen));
+            ret = sprintf_s(strMacTmp, arraySize - 1, "%x", distribution(gen));
         } else {
             std::uniform_int_distribution<> distribution(0, octBase - 1);
-            ret = sprintf_s(strMacTmp, arraySize, "%x", two * distribution(gen));
+            ret = sprintf_s(strMacTmp, arraySize - 1, "%x", two * distribution(gen));
         }
         if (ret == -1) {
             LOGE("StaStateMachine::MacAddressGenerate failed, sprintf_s return -1!\n");
@@ -2501,8 +2501,9 @@ std::string StaStateMachine::ParseAndFillUmtsAuthParam(std::vector<uint8_t> &non
     std::string authReq;
     uint8_t tag = nonce[UMTS_AUTH_CHALLENGE_RESULT_INDEX]; // nonce[0]: the 1st byte is authentication type
     if (tag == UMTS_AUTH_TYPE_TAG) {
-        char nonceBuf[UMTS_AUTH_RESPONSE_CONENT_LEN * 2 + 1] = { 0 }; // length of auth data
-        Byte2HexString(&nonce[0], UMTS_AUTH_RESPONSE_CONENT_LEN, nonceBuf, sizeof(nonceBuf));
+        constexpr size_t nonceBufSize = 2 * UMTS_AUTH_RESPONSE_CONTENT_LEN + 1;
+        char nonceBuf[nonceBufSize] = { 0 }; // length of auth data
+        Byte2HexString(&nonce[0], UMTS_AUTH_RESPONSE_CONTENT_LEN, nonceBuf, sizeof(nonceBuf));
         LOGD("Raw Response: %{private}s", nonceBuf);
 
         authReq = "UMTS-AUTH:";

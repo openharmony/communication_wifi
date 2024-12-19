@@ -270,11 +270,13 @@ WifiEventHandler::WifiEventHandler(const std::string &threadName, const Callback
 
 WifiEventHandler::~WifiEventHandler()
 {
+    std::lock_guard<std::mutex> lock(handlerMutex);
     ptr.reset();
 }
 
 bool WifiEventHandler::PostSyncTask(const Callback &callback)
 {
+    std::lock_guard<std::mutex> lock(handlerMutex);
     if (ptr == nullptr) {
         WIFI_LOGE("PostSyncTask: ptr is nullptr!");
         return false;
@@ -284,6 +286,7 @@ bool WifiEventHandler::PostSyncTask(const Callback &callback)
 
 bool WifiEventHandler::PostAsyncTask(const Callback &callback, int64_t delayTime)
 {
+    std::lock_guard<std::mutex> lock(handlerMutex);
     if (ptr == nullptr) {
         WIFI_LOGE("PostAsyncTask: ptr is nullptr!");
         return false;
@@ -293,6 +296,7 @@ bool WifiEventHandler::PostAsyncTask(const Callback &callback, int64_t delayTime
 
 bool WifiEventHandler::PostAsyncTask(const Callback &callback, const std::string &name, int64_t delayTime)
 {
+    std::lock_guard<std::mutex> lock(handlerMutex);
     if (ptr == nullptr) {
         WIFI_LOGE("PostAsyncTask: ptr is nullptr!");
         return false;
@@ -301,6 +305,7 @@ bool WifiEventHandler::PostAsyncTask(const Callback &callback, const std::string
 }
 void WifiEventHandler::RemoveAsyncTask(const std::string &name)
 {
+    std::lock_guard<std::mutex> lock(handlerMutex);
     if (ptr == nullptr) {
         WIFI_LOGE("RemoveAsyncTask: ptr is nullptr!");
         return;

@@ -20,6 +20,7 @@
 #include <memory>
 #include <chrono>
 #include <future>
+#include <mutex>
 
 namespace OHOS {
 namespace Wifi {
@@ -76,6 +77,7 @@ public:
 private:
     class WifiEventHandlerImpl;
     std::unique_ptr<WifiEventHandlerImpl> ptr;
+    std::mutex handlerMutex {};
 };
 } // namespace Wifi
 } // namespace OHOS

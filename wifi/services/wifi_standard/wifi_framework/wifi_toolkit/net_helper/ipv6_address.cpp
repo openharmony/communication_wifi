@@ -151,7 +151,7 @@ Ipv6Address Ipv6Address::Create(std::string ipv6, const std::string &mask)
 
     size_t count = 0;
     for (unsigned int n = 0; n < maskBin.size(); ++n) {
-        if (maskBin[n] == '1') {
+        if (maskBin.at(n) == '1') {
             ++count;
         }
     }

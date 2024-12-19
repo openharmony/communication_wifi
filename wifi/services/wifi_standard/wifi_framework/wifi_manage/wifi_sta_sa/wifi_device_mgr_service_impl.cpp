@@ -26,8 +26,8 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiDeviceMgrServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
-const std::string K_EXTENSION_BACKUP = "backup";
-const std::string K_EXTENSION_RESTORE = "restore";
+const std::string EXTENSION_BACKUP = "backup";
+const std::string EXTENSION_RESTORE = "restore";
 std::mutex WifiDeviceMgrServiceImpl::g_instanceLock;
 std::mutex WifiDeviceMgrServiceImpl::g_initMutex;
 sptr<WifiDeviceMgrServiceImpl> WifiDeviceMgrServiceImpl::g_instance;
@@ -143,9 +143,9 @@ int32_t WifiDeviceMgrServiceImpl::Dump(int32_t fd, const std::vector<std::u16str
 int32_t WifiDeviceMgrServiceImpl::OnExtension(const std::string& extension, MessageParcel& data, MessageParcel& reply)
 {
     WIFI_LOGI("extension is %{public}s.", extension.c_str());
-    if (extension == K_EXTENSION_BACKUP) {
+    if (extension == EXTENSION_BACKUP) {
         return WifiDeviceServiceImpl::OnBackup(data, reply);
-    } else if (extension == K_EXTENSION_RESTORE) {
+    } else if (extension == EXTENSION_RESTORE) {
         return WifiDeviceServiceImpl::OnRestore(data, reply);
     }
     return 0;

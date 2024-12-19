@@ -219,11 +219,11 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     LOGI("Enter AddCandidateConfig.\n");
 
     netWorkId = INVALID_NETWORK_ID;
-    constexpr int UID_UNTRUSTED_CONFIG_LEN = 16;
+    constexpr int kUidUntrustedConfigLen = 16;
     std::vector<WifiDeviceConfig> tempConfigs;
     WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
-    if (tempConfigs.size() >= UID_UNTRUSTED_CONFIG_LEN) {
-        LOGE("AddCandidateConfig failed, exceed max num: %{public}d\n", UID_UNTRUSTED_CONFIG_LEN);
+    if (tempConfigs.size() >= kUidUntrustedConfigLen) {
+        LOGE("AddCandidateConfig failed, exceed max num: %{public}d\n", kUidUntrustedConfigLen);
         return WIFI_OPT_FAILED;
     }
 
@@ -439,7 +439,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         config.wifiEapConfig.clientCert.empty() && config.wifiEapConfig.privateKey.empty()) {
         std::string uri;
         std::string formatSsid = config.ssid;
-        for (int i = 0; i < (int)formatSsid.size(); i++) {
+        for (int i = 0; i < static_cast<int>(formatSsid.size()); i++) {
             // other char is invalid in certificate manager
             if (!isalnum(formatSsid[i]) && formatSsid[i] != '_') {
                 formatSsid[i] = '_';

@@ -34,15 +34,15 @@ static WifiScanCallbackStub g_wifiScanCallbackStub;
 static ErrCode ParseScanInfos(IpcIo *reply, std::vector<WifiScanInfo> &infos)
 {
     constexpr int MAX_SIZE = 4096;
-    int tmpsize = 0;
-    (void)ReadInt32(reply, &tmpsize);
-    if (tmpsize > MAX_SIZE) {
-        WIFI_LOGE("Scan info size exceeds maximum allowed size: %{public}d", tmpsize);
+    int tmpSize = 0;
+    (void)ReadInt32(reply, &tmpSize);
+    if (tmpSize > MAX_SIZE) {
+        WIFI_LOGE("Scan info size exceeds maximum allowed size: %{public}d", tmpSize);
         return WIFI_OPT_FAILED;
     }
 
     size_t readLen;
-    for (int i = 0; i < tmpsize; ++i) {
+    for (int i = 0; i < tmpSize; ++i) {
         WifiScanInfo info;
         info.bssid = (char *)ReadString(reply, &readLen);
         info.ssid = (char *)ReadString(reply, &readLen);
@@ -65,10 +65,10 @@ static ErrCode ParseScanInfos(IpcIo *reply, std::vector<WifiScanInfo> &infos)
         (void)ReadInt64(reply, &features);
         info.features = features;
 
-        constexpr int IE_SIZE_MAX = 256;
+        constexpr int kIESizeMax = 256;
         int ieSize = 0;
         (void)ReadInt32(reply, &ieSize);
-        if (ieSize > IE_SIZE_MAX) {
+        if (ieSize > kIESizeMax) {
             WIFI_LOGE("ie size error: %{public}d", ieSize);
             return WIFI_OPT_FAILED;
         }
@@ -113,7 +113,7 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES): {
             int64_t features = 0;
             (void)ReadInt64(reply, &features);
-            *((long *)data->variable) = features;
+            *(static_cast<long *>(data->variable)) = features;
             break;
         }
         case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST): {

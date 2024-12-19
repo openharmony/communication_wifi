@@ -856,13 +856,13 @@ int WifiSettings::ManageBlockList(const StationInfo &info, int mode, int id)
     std::unique_lock<std::mutex> lock(mApMutex);
     auto iter = mBlockListInfo.find(info.bssid);
     if (MODE_ADD == mode || MODE_UPDATE == mode) {
-        if (iter != mBlockListInfo.end()) {
+        if (mBlockListInfo.end() != iter) {
             iter->second = info;
         } else {
             mBlockListInfo.emplace(std::make_pair(info.bssid, info));
         }
     } else if (MODE_DEL == mode) {
-        if (iter != mBlockListInfo.end()) {
+        if (mBlockListInfo.end() != iter) {
             mBlockListInfo.erase(iter);
         }
     } else {

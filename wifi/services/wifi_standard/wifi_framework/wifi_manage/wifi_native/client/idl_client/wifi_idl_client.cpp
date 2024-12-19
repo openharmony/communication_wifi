@@ -117,7 +117,7 @@ WifiErrorNo WifiIdlClient::ReqDisconnect(void)
 WifiErrorNo WifiIdlClient::GetStaCapabilities(unsigned int &capabilities)
 {
     CHECK_CLIENT_NOT_NULL;
-    return GetCapabilities((uint32_t *)&capabilities);
+    return GetCapabilities(static_cast<uint32_t *>(&capabilities));
 }
 
 WifiErrorNo WifiIdlClient::GetStaDeviceMacAddress(std::string &mac)
@@ -163,7 +163,9 @@ WifiErrorNo WifiIdlClient::SetConnectMacAddr(const std::string &mac, const int p
         }
     }
     int len = mac.length();
-    return SetAssocMacAddr((unsigned char *)mac.c_str(), len, portType);
+    std::vector<unsigned char> macBytes(mac.begin(), mac.end());
+    unsigned char* macStr = macBytes.data();
+    return SetAssocMacAddr(macStr, len, portType);
 }
 
 WifiErrorNo WifiIdlClient::SetScanMacAddress(const std::string &mac)
@@ -173,7 +175,9 @@ WifiErrorNo WifiIdlClient::SetScanMacAddress(const std::string &mac)
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return SetScanningMacAddress((unsigned char *)mac.c_str(), len);
+    std::vector<unsigned char> macBytes(mac.begin(), mac.end());
+    unsigned char* macStr = macBytes.data();
+    return SetScanningMacAddress(macStr, len);
 }
 
 WifiErrorNo WifiIdlClient::DisconnectLastRoamingBssid(const std::string &mac)
@@ -183,7 +187,9 @@ WifiErrorNo WifiIdlClient::DisconnectLastRoamingBssid(const std::string &mac)
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return DeauthLastRoamingBssid((unsigned char *)mac.c_str(), len);
+    std::vector<unsigned char> macBytes(mac.begin(), mac.end());
+    unsigned char* macStr = macBytes.data();
+    return DeauthLastRoamingBssid(macStr, len);
 }
 
 WifiErrorNo WifiIdlClient::ReqGetSupportFeature(long &feature)
@@ -195,7 +201,7 @@ WifiErrorNo WifiIdlClient::ReqGetSupportFeature(long &feature)
 WifiErrorNo WifiIdlClient::SetTxPower(int power)
 {
     CHECK_CLIENT_NOT_NULL;
-    return SetWifiTxPower((int32_t)power);
+    return SetWifiTxPower(static_cast<int32_t>(power));
 }
 
 WifiErrorNo WifiIdlClient::Scan(const WifiHalScanParam &scanParam)
@@ -917,7 +923,9 @@ WifiErrorNo WifiIdlClient::AddBlockByMac(const std::string &mac, int id)
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return SetMacFilter((unsigned char *)mac.c_str(), len, id);
+    std::vector<unsigned char> macBytes(mac.begin(), mac.end());
+    unsigned char* macStr = macBytes.data();
+    return SetMacFilter(macStr, len, id);
 }
 
 WifiErrorNo WifiIdlClient::DelBlockByMac(const std::string &mac, int id)
@@ -927,7 +935,9 @@ WifiErrorNo WifiIdlClient::DelBlockByMac(const std::string &mac, int id)
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return DelMacFilter((unsigned char *)mac.c_str(), len, id);
+    std::vector<unsigned char> macBytes(mac.begin(), mac.end());
+    unsigned char* macStr = macBytes.data();
+    return DelMacFilter(macStr, len, id);
 }
 
 WifiErrorNo WifiIdlClient::RemoveStation(const std::string &mac, int id)
@@ -937,7 +947,9 @@ WifiErrorNo WifiIdlClient::RemoveStation(const std::string &mac, int id)
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
     }
     int len = mac.length();
-    return DisassociateSta((unsigned char *)mac.c_str(), len, id);
+    std::vector<unsigned char> macBytes(mac.begin(), mac.end());
+    unsigned char* macStr = macBytes.data();
+    return DisassociateSta(macStr, len, id);
 }
 
 WifiErrorNo WifiIdlClient::GetFrequenciesByBand(int32_t band, std::vector<int> &frequencies, int id)
@@ -987,7 +999,9 @@ WifiErrorNo WifiIdlClient::ReqDisconnectStaByMac(const std::string &mac, int id)
     if (CheckMacIsValid(mac) != 0) {
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
     }
-    return DisassociateSta((unsigned char *)mac.c_str(), strlen(mac.c_str()), id);
+    std::vector<unsigned char> macBytes(mac.begin(), mac.end());
+    unsigned char* macStr = macBytes.data();
+    return DisassociateSta(macStr, strlen(mac.c_str()), id);
 }
 
 WifiErrorNo WifiIdlClient::ReqGetPowerModel(int& model, int id)
@@ -1134,8 +1148,9 @@ WifiErrorNo WifiIdlClient::ReqDisconnectSupplicant(void)
 WifiErrorNo WifiIdlClient::ReqRequestToSupplicant(const std::string &request)
 {
     CHECK_CLIENT_NOT_NULL;
-    unsigned char *p = (unsigned char *)request.c_str();
-    return RequestToSupplicant(p, request.length());
+    std::vector<unsigned char> requestBytes(request.begin(), request.end());
+    unsigned char* requestStr = requestBytes.data();
+    return RequestToSupplicant(requestStr, request.length());
 }
 
 WifiErrorNo WifiIdlClient::ReqRegisterSupplicantEventCallback(SupplicantEventCallback &callback)

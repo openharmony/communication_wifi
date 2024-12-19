@@ -33,7 +33,7 @@ constexpr int MAX_HEX = 16;
 constexpr int BUFFER_SIZE = 32;
 constexpr int HALF_PREFIX_LENGTH = 64;
 constexpr int MASK_FILTER = 0x7;
-#define DEFAULT_IPV6_ANY_INIT_ADDR "::"
+const char* const DEFAULT_IPV6_ANY_INIT_ADDR = "::";
 const Ipv6Address Ipv6Address::INVALID_INET6_ADDRESS(std::string("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"),
     MAX_IPV6_PREFIX_LENGTH);
 
@@ -133,20 +133,20 @@ Ipv6Address Ipv6Address::Create(std::string ipv6, const std::string &mask)
     }
     std::transform(ipv6.begin(), ipv6.end(), ipv6.begin(), ::tolower);
     std::string copyMask = mask;
-    unsigned int n = 0;
-    while (n < copyMask.size()) {
-        if (copyMask.at(n) == ':') {
-            copyMask.erase(n, 1);
+    unsigned int i = 0;
+    while (i < copyMask.size()) {
+        if (copyMask.at(i) == ':') {
+            copyMask.erase(i, 1);
         } else {
-            ++n;
+            ++i;
         }
     }
 
     std::string maskBin;
-    std::string binBuf;
+    std::string binBuffer;
     for (unsigned int n = 0; n < copyMask.size(); ++n) {
-        binBuf = copyMask.substr(n, 1);
-        maskBin += HexToBin(binBuf);
+        binBuffer = copyMask.substr(n, 1);
+        maskBin += HexToBin(binBuffer);
     }
 
     size_t count = 0;

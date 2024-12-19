@@ -160,8 +160,11 @@ bool StaAutoConnectService::AddOrDelBlockedBssids(std::string bssid, bool enable
         return false;
     }
     iterator->second.count++;
-    time_t now = time(0);
-    iterator->second.blockedTime = (int)now;
+    time_t now = time(nullptr);
+    if (now == static_cast<time_t>(-1)) {
+        return false;
+    }
+    iterator->second.blockedTime = static_cast<int>(now);
     if (!iterator->second.blockedFlag) {
         if (iterator->second.count >= MAX_BSSID_BLOCKLIST_COUNT ||
             reason == AP_CANNOT_HANDLE_NEW_STA) {
@@ -202,8 +205,8 @@ void StaAutoConnectService::ClearOvertimeBlockedBssid()
     auto iter = blockedBssidMap.begin();
     while (iter != blockedBssidMap.end()) {
         BlockedBssidInfo status = iter->second;
-        time_t now = time(0);
-        int currentTimeStap = (int)now;
+        time_t now = time(nullptr);
+        int currentTimeStap = static_cast<int>(now);
         WIFI_LOGI("blockedFlag:%{public}d, currentTimeStap:%{public}d, blockedTime:%{public}d.\n",
             status.blockedFlag, currentTimeStap, status.blockedTime);
         if (status.blockedFlag && ((currentTimeStap - status.blockedTime) >= MAX_BSSID_BLOCKLIST_TIME)) {
@@ -372,7 +375,7 @@ ErrCode StaAutoConnectService::AutoSelectDevice(WifiDeviceConfig &electedDevice,
         if (registeredAppraisal != nullptr) {
             ErrCode code = registeredAppraisal->DeviceAppraisals(electedDevice, availableScanInfos, info);
             if (code == WIFI_OPT_SUCCESS) {
-                time_t now = time(0);
+                time_t now = time(nullptr);
                 selectDeviceLastTime = static_cast<int>(now);
                 WIFI_LOGI("electedDevice generation.\n");
                 return WIFI_OPT_SUCCESS;
@@ -474,7 +477,7 @@ bool StaAutoConnectService::AllowAutoSelectDevice(const std::vector<InterScanInf
             }
             /* Indicates whether the minimum interval is the minimum interval since the last network selection. */
             if (selectDeviceLastTime != 0) {
-                int gap = static_cast<int>(time(0)) - selectDeviceLastTime;
+                int gap = static_cast<int>(time(nullptr)) - selectDeviceLastTime;
                 if (gap < MIN_SELECT_NETWORK_TIME) {
                     WIFI_LOGE("%ds time before we selected the network(30s).\n", gap);
                     return false;
@@ -531,7 +534,7 @@ bool StaAutoConnectService::CurrentDeviceGoodEnough(const std::vector<InterScanI
     if (userLastSelectedNetworkId != INVALID_NETWORK_ID && userLastSelectedNetworkId == network.networkId) {
         time_t userLastSelectedNetworkTimeVal = WifiConfigCenter::GetInstance().GetUserLastSelectedNetworkTimeVal(
             m_instId);
-        time_t now = time(0);
+        time_t now = time(nullptr);
         int interval = static_cast<int>(now - userLastSelectedNetworkTimeVal);
         if (interval <= TIME_FROM_LAST_SELECTION) {
             WIFI_LOGI("(60s)Current user recent selections time is %ds.\n", interval);

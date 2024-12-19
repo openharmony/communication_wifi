@@ -65,7 +65,7 @@ std::string GetRandomStr(int len)
     char rndbuf[MAX_PSK_LEN + 1] = {0};
     int rndnum;
     if (len > MAX_PSK_LEN) {
-        len = static_cast<int>(MAX_PSK_LEN);
+        len = MAX_PSK_LEN;
     }
     for (int n = 0; n < len; ++n) {
         rndnum = std::abs(static_cast<int>(rd()));

@@ -219,8 +219,8 @@ std::string WifiDataShareHelperUtils::GetLoactionDataShareUri()
         userId = std::to_string(accountIds[0]);
     }
 
-    std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
-        + userId + "?Proxy=true&key=location_enable";
+    std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_" +
+        userId + "?Proxy=true&key=location_enable";
     return uri;
 }
 

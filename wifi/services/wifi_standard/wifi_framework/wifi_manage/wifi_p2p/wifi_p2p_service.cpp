@@ -377,14 +377,14 @@ ErrCode WifiP2pService::HandleBusinessSAException(int systemAbilityId)
 int WifiP2pService::GetP2pRecommendChannel(void)
 {
     WIFI_LOGI("GetP2pRecommendChannel");
-    const int COMMON_USING_2G_CHANNEL = 6;
+    const int commonUsing2gChannel = 6;
     std::string countryCode;
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
     if (countryCode == COUNTRY_CODE_JAPAN_C || countryCode == COUNTRY_CODE_JAPAN_L) {
-        return COMMON_USING_2G_CHANNEL;
+        return commonUsing2gChannel;
     }
     int channel = 0; // 0 is invalid channel
-    int COMMON_USING_5G_CHANNEL = 149;
+    int commonUsing5gChannel = 149;
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (linkedInfo.connState == CONNECTED) {
@@ -397,7 +397,7 @@ int WifiP2pService::GetP2pRecommendChannel(void)
                 return channel;
             }
             // when connectted 5g sta whith radar channel then recommend channel on 36.
-            COMMON_USING_5G_CHANNEL = 36;
+            commonUsing5gChannel = 36;
         }
     }
 
@@ -409,16 +409,16 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     }
 
     if (!vec5GChannels.empty()) {
-        auto it = std::find(vec5GChannels.begin(), vec5GChannels.end(), COMMON_USING_5G_CHANNEL);
+        auto it = std::find(vec5GChannels.begin(), vec5GChannels.end(), commonUsing5gChannel);
         if (it != vec5GChannels.end()) {
-            channel = COMMON_USING_5G_CHANNEL;
+            channel = commonUsing5gChannel;
         } else {
             channel = vec5GChannels[0];
         }
         WIFI_LOGI("Recommend 5G channel: %{public}d", channel);
         return channel;
     }
-    channel = (channel == 0) ? COMMON_USING_2G_CHANNEL : channel;
+    channel = (channel == 0) ? commonUsing2gChannel : channel;
     WIFI_LOGI("Recommend 2G channel: %{public}d", channel);
     return channel;
 }

@@ -483,6 +483,7 @@ IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
     if (ifaceName.empty()) {
         LOGE("find iface is empty");
         return nullptr;
+        
     }
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter != mIWifiStaIfaces.end()) {

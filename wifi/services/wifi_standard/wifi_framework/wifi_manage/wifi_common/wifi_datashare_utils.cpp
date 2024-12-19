@@ -220,7 +220,7 @@ std::string WifiDataShareHelperUtils::GetLoactionDataShareUri()
     }
 
     std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_" +
-                        userId + "?Proxy=true&key=location_enable";
+        userId + "?Proxy=true&key=location_enable";
     return uri;
 }
 

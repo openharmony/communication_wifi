@@ -344,10 +344,14 @@ void WifiEventSubscriberManager::DealLocationModeChangeEvent()
 {
     if (GetLocationModeByDatashare()) {
         WIFI_LOGI("DealLocationModeChangeEvent open");
-        WifiManager::GetInstance().GetWifiTogglerManager()->ScanOnlyToggled(1);
+        if（WifiManager::GetInstance().GetWifiTogglerManager()）{
+            WifiManager::GetInstance().GetWifiTogglerManager()->ScanOnlyToggled(1);
+        }
     } else {
         WIFI_LOGI("DealLocationModeChangeEvent close");
-        WifiManager::GetInstance().GetWifiTogglerManager()->ScanOnlyToggled(0);
+        if（WifiManager::GetInstance().GetWifiTogglerManager()）{
+            WifiManager::GetInstance().GetWifiTogglerManager()->ScanOnlyToggled(0);
+        }
     }
 }
 

@@ -154,10 +154,10 @@ private:
     std::string httpHead;
 };
 struct HostData {
-    bool bIp = false;
+    bool isIp = false;
     std::string strIp;
     std::string strIpOrDomain;
-    std::condition_variable mWait_timeout;
+    std::condition_variable waitTimeout;
 };
 }
 } /* namespace OHOS */

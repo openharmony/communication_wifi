@@ -89,7 +89,8 @@ void DnsChecker::Start(std::string priDns, std::string secondDns)
         dnsSocket = 0;
         return;
     }
-    if (setsockopt(dnsSocket, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifaceReq, sizeof(ifaceReq)) == -1) {
+    if (setsockopt(dnsSocket, SOL_SOCKET, SO_BINDTODEVICE, reinterpret_cast<char *>(&ifaceReq),
+        sizeof(ifaceReq)) == -1) {
         LOGE("DnsChecker start SO_BINDTODEVICE error:%{public}d.", errno);
         close(dnsSocket);
         dnsSocket = 0;
@@ -136,7 +137,7 @@ void DnsChecker::StopDnsCheck()
 bool DnsChecker::DoDnsCheck(std::string url, int timeoutMillis)
 {
     LOGI("DoDnsCheck Enter.");
-    int len1 = (int)url.find("/generate_204");
+    int len1 = static_cast<int>(url.find("/generate_204"));
     int len =  len1 - strlen("http://");
     std::string host = url.substr(strlen("http://"), len);
     host = host + ".";
@@ -197,13 +198,14 @@ bool DnsChecker::checkDnsValid(std::string host, std::string dnsAddress, int tim
     dns->id = (unsigned short)htons(getpid());
     dns->rd = 1;
     dns->qCount = htons(1);
-    char* hostAddress = (char*)&buff[sizeof(struct DNS_HEADER)];
+    char* hostAddress = static_cast<char*>(&buff[sizeof(struct DNS_HEADER)]);
     formatHostAdress(hostAddress, host.c_str());
     struct QUESTION *qinfo = (struct QUESTION *)&buff[sizeof(struct DNS_HEADER) +
-        (strlen((const char*)hostAddress) + 1)];
+        (strlen(static_cast<const char*>(hostAddress)) + 1)];
     qinfo->qtype = htons(DNS_ADDRESS_TYPE);
     qinfo->qclass = htons(1);
-    int len = (int)(sizeof(struct DNS_HEADER) + (strlen((const char*)hostAddress) + 1) + sizeof(QUESTION));
+    int len = static_cast<int>(sizeof(struct DNS_HEADER) +
+        (strlen(static_cast<const char*>(hostAddress) + 1) + sizeof(QUESTION)));
     if (sendto(dnsSocket, buff, len, 0, (struct sockaddr*)&dest, sizeof(dest)) < 0) {
         LOGE("send dns data failed.");
         return false;
@@ -214,7 +216,7 @@ bool DnsChecker::checkDnsValid(std::string host, std::string dnsAddress, int tim
     while (leftMillis > 0 && isRunning) {
         int readLen = recvDnsData(buff, sizeof(buff), leftMillis);
         if (readLen >= static_cast<int>(sizeof(struct DNS_HEADER))) {
-            dns = (struct DNS_HEADER*)buff;
+            dns = reinterpret_cast<struct DNS_HEADER*>(buff);
             LOGI("dns recv ansCount:%{public}d", dns->ansCount);
             return dns->ansCount > 0;
         }

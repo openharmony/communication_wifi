@@ -145,7 +145,7 @@ void StaSavedDeviceAppraisal::AppraiseDeviceQuality(int &score, InterScanInfo &s
     if (userLastSelectedNetworkId != INVALID_NETWORK_ID && userLastSelectedNetworkId == device.networkId) {
         time_t userLastSelectedNetworkTimeVal = WifiConfigCenter::GetInstance().GetUserLastSelectedNetworkTimeVal(
             m_instId);
-        time_t now = time(0);
+        time_t now = time(nullptr);
         time_t timeDifference = now - userLastSelectedNetworkTimeVal;
         /*
          * Basic score of the device selected by the user: 120.

@@ -170,7 +170,7 @@ std::string SelfCureUtils::GetNextIpAddr(const std::string& gateway, const std::
             srand(now);
         }
         uint32_t randomNum = 0;
-        uint32_t fd = open("/dev/random", O_RDONLY); /* Obtain the random number by reading /dev/random */
+        int32_t fd = open("/dev/random", O_RDONLY); /* Obtain the random number by reading /dev/random */
         if (fd > 0) {
             read(fd, &randomNum, sizeof(uint32_t));
         }
@@ -305,7 +305,7 @@ void SelfCureUtils::UpdateSelfCureConnectHistoryInfo(WifiSelfCureHistoryInfo &hi
 bool AllowSelfCure(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel)
 {
     auto now = std::chrono::system_clock::now();
-    uint64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
         if ((historyInfo.reassocSelfCureConnectFailedCnt == 0) ||
             ((historyInfo.reassocSelfCureConnectFailedCnt >= 1) &&

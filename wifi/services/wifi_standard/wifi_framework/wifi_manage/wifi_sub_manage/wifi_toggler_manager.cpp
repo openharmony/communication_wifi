@@ -81,6 +81,14 @@ ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
 {
     pWifiControllerMachine->ClearWifiStartFailCount();
     WIFI_LOGI("WifiTogglerManager::WifiToggled, isOpen %{public}d instId: %{public}d", isOpen, id);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (isOpen == 0) {
+        ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(id);
+        if (pSelfCureService != nullptr) {
+            pSelfCureService->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
+        }
+    }
+#endif // FEATURE_SELF_CURE_SUPPORT
     pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
 }

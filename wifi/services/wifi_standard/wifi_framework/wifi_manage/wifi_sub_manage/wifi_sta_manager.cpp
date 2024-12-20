@@ -29,6 +29,7 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
+#include "dhcp_c_api.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #include "wifi_notification_util.h"
@@ -52,6 +53,9 @@ StaServiceCallback& WifiStaManager::GetStaCallback()
 #ifndef OHOS_ARCH_LITE
 static void UnloadStaSaTimerCallback()
 {
+#ifdef DYNAMIC_UNLOAD_SA
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_CLOSE_DHCP_SA);
+#endif
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_DEVICE_ABILITY_ID);
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 }
@@ -106,6 +110,17 @@ void WifiStaManager::CloseStaService(int instId)
     return;
 }
 
+void WifiStaManager::StaCloseDhcpSa(void)
+{
+#ifdef DYNAMIC_UNLOAD_SA
+    int state = WifiConfigCenter::GetInstance().GetHotspotState(0);
+    if (state == static_cast<int>(ApState::AP_STATE_CLOSED)) {
+        StopDhcpdServerSa();
+    }
+    StopDhcpdClientSa();
+#endif
+}
+
 void WifiStaManager::InitStaCallback(void)
 {
     using namespace std::placeholders;
@@ -136,12 +151,20 @@ void WifiStaManager::DealStaOpened(int instId)
         IScanSerivceCallbacks &scanCallback = WifiManager::GetInstance().GetWifiScanManager()->GetScanCallback();
         scanCallback.OnScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_OK), instId);
     }
+#ifdef DYNAMIC_UNLOAD_SA
+    if (instId == 0) {
+        StopUnloadStaSaTimer();
+    }
+#endif
 }
 
 void WifiStaManager::DealStaStopped(int instId)
 {
 #ifdef FEATURE_STA_SUPPORT
     WifiCountryCodeManager::GetInstance().DealStaStopped(instId);
+#endif
+#ifdef DYNAMIC_UNLOAD_SA
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE, instId);
 #endif
 }
 

@@ -175,6 +175,8 @@ public:
 
     ErrCode FactoryReset() override;
 
+    ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) override;
+
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 
     ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;

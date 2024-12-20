@@ -86,6 +86,7 @@ private:
     void OnDisableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnEnableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);

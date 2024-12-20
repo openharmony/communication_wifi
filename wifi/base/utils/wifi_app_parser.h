@@ -29,6 +29,9 @@ enum class AppType {
     MULTILINK_BLACK_LIST_APP,
     CHARIOT_APP,
     HIGH_TEMP_LIMIT_SPEED_APP,
+    KEY_FOREGROUND_LIST_APP,
+    BACKGROUND_LIMIT_LIST_APP,
+    ASYNC_DELAY_TIME,
     OTHER_APP
 };
 
@@ -42,6 +45,8 @@ struct BlackListAppInfo : CommonAppInfo {};
 struct MultiLinkAppInfo : CommonAppInfo {};
 struct ChariotAppInfo : CommonAppInfo {};
 struct HighTempLimitSpeedAppInfo : CommonAppInfo {};
+struct KeyForegroundListAppInfo : CommonAppInfo {};
+struct BackgroundLimitListAppInfo : CommonAppInfo {};
 
 class AppParser : public XmlParser {
 public:
@@ -54,18 +59,25 @@ public:
     bool IsMultiLinkApp(const std::string &bundleName) const;
     bool IsChariotApp(const std::string &bundleName) const;
     bool IsHighTempLimitSpeedApp(const std::string &bundleName) const;
+    bool IsKeyForegroundApp(const std::string &bundleName) const;
+    bool IsBackgroundLimitApp(const std::string &bundleName) const;
+    std::string GetAsyncLimitSpeedDelayTime() const;
     bool Init();
 
 private:
     bool InitAppParser(const char *appXmlFilePath);
     bool ParseInternal(xmlNodePtr node) override;
     void ParseAppList(const xmlNodePtr &innode);
+    void ParseNetworkControlAppList(const xmlNodePtr &innode);
     LowLatencyAppInfo ParseLowLatencyAppInfo(const xmlNodePtr &innode);
     WhiteListAppInfo ParseWhiteAppInfo(const xmlNodePtr &innode);
     BlackListAppInfo ParseBlackAppInfo(const xmlNodePtr &innode);
     MultiLinkAppInfo ParseMultiLinkAppInfo(const xmlNodePtr &innode);
     ChariotAppInfo ParseChariotAppInfo(const xmlNodePtr &innode);
     HighTempLimitSpeedAppInfo ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode);
+    KeyForegroundListAppInfo ParseKeyForegroundListAppInfo(const xmlNodePtr &innode);
+    BackgroundLimitListAppInfo ParseBackgroundLimitListAppInfo(const xmlNodePtr &innode);
+    void ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
     bool ReadPackageCloudFilterConfig();
     bool IsReadCloudConfig();
@@ -81,6 +93,9 @@ private:
     std::vector<ChariotAppInfo> m_chariotAppVec {};
     std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVec {};
     std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVecCloudPush {};
+    std::vector<KeyForegroundListAppInfo> m_keyForegroundListAppVec {};
+    std::vector<BackgroundLimitListAppInfo> m_backgroundLimitListAppVec {};
+    std::string m_delayTime = "";
     bool mIshighTempLimitSpeedReadCloudPush = false;
     bool initFlag_ = false;
 };

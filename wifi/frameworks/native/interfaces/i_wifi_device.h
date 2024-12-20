@@ -505,6 +505,14 @@ public:
     virtual ErrCode FactoryReset() = 0;
 
     /**
+     * @Description Accept network control information from RSS.
+     *
+     * @param networkControlInfo - structure of network control infomation
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) = 0;
+
+    /**
      * @Description LimitSpeed
      *
      * @return ErrCode - operation result

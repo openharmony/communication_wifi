@@ -546,6 +546,13 @@ ErrCode WifiDeviceImpl::FactoryReset()
     return client_->FactoryReset();
 }
 
+ErrCode WifiDeviceImpl::ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->ReceiveNetworkControlInfo(networkControlInfo);
+}
+
 ErrCode WifiDeviceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
     std::lock_guard<std::mutex> lock(mutex_);

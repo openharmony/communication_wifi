@@ -614,6 +614,24 @@ struct IpInfo {
     }
 };
 
+/* Network control information */
+struct WifiNetworkControlInfo {
+    int uid;
+    int pid;
+    std::string bundleName;
+    int state;
+    int sceneId;
+
+    WifiNetworkControlInfo()
+    {
+        uid = -1;
+        pid = -1;
+        bundleName = "";
+        state = -1;
+        sceneId = -1;
+    }
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
@@ -866,6 +884,9 @@ typedef enum {
     BG_LIMIT_CONTROL_ID_GAME = 1,
     BG_LIMIT_CONTROL_ID_STREAM,
     BG_LIMIT_CONTROL_ID_TEMP,
+    BG_LIMIT_CONTROL_ID_KEY_FG_APP,
+    BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK,
+    BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE,
     BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT,
 } BgLimitControl;
 

@@ -127,6 +127,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         MessageParcel &data, MessageParcel &reply) { OnSetDpiMarkRule(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_FEATURE_SUPPORTED)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnIsFeatureSupported(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_NET_CONTROL_INFO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnReceiveNetworkControlInfo(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1192,6 +1194,21 @@ void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageP
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = FactoryReset();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.uid = data.ReadInt32();
+    networkControlInfo.pid = data.ReadInt32();
+    networkControlInfo.bundleName = data.ReadString();
+    networkControlInfo.state = data.ReadInt32();
+    networkControlInfo.sceneId = data.ReadInt32();
+    ErrCode ret = ReceiveNetworkControlInfo(networkControlInfo);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

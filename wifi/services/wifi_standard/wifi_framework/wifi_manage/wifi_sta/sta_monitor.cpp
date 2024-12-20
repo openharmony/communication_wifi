@@ -345,7 +345,7 @@ void StaMonitor::OnWpaCsaChannelSwitchNotifyCallBack(const std::string &notifyPa
 
 void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
 {
-    WIFI_LOGD("%{public}s, notifyParam=%{public}s", __FUNCTION__, notifyParam.c_str());
+    WIFI_LOGD("%{public}s notifyParam=%{public}s", __FUNCTION__, notifyParam.c_str());
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("%{public}s The statemachine pointer is null.", __FUNCTION__);
         return;
@@ -364,9 +364,9 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
     }
 
     MloStateParam mloParam = {0};
-    mloParam.mloState = CheckDataLegal(mloStateStr);
-    mloParam.reasonCode = CheckDataLegal(reasonCodeStr);
-    WIFI_LOGI("%{public}s mloState:%{public}d reasonCode:%{public}d", __FUNCTION__,
+    mloParam.mloState = CheckDataToUint(mloStateStr);
+    mloParam.reasonCode = CheckDataToUint(reasonCodeStr);
+    WIFI_LOGI("%{public}s mloState:%{public}u reasonCode:%{public}u", __FUNCTION__,
         mloParam.mloState, mloParam.reasonCode);
 
     /* Notify sta state machine mlo state changed event. */

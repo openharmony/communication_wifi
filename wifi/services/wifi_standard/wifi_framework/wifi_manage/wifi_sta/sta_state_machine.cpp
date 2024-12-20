@@ -3934,16 +3934,16 @@ void StaStateMachine::DealMloStateChange(InternalMessagePtr msg)
     uint8_t state = param.mloState;
     uint16_t reasonCode = param.reasonCode;
     LOGI("DealMloStateChange mloState=%{public}d reasonCode=%{public}d", state, reasonCode);
-    if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == SINGLE_RADIO) {
+    if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == WIFI7_MLO_STATE_SINGLE_RADIO) {
         linkedInfo.mloState = SINGLE_RADIO;
-    } else if (state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLSR) {
+    } else if ((state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLO_STATE_MLSR) {
         linkedInfo.mloState = WIFI7_MLSR;
-    } else if (state & WIFI7_MLO_STATE_EMLSR) == WIFI7_EMLSR) {
+    } else if ((state & WIFI7_MLO_STATE_EMLSR) == WIFI7_MLO_STATE_EMLSR) {
         linkedInfo.mloState = WIFI7_EMLSR;
-    } else if (state & WIFI7_MLO_STATE_STR) == WIFI7_STR) {
+    } else if ((state & WIFI7_MLO_STATE_STR) == WIFI7_MLO_STATE_STR) {
         linkedInfo.mloState = WIFI7_STR;
     }
-    if (state & WIFI7_MLO_STATE_WUR) == WUR_STATE) {
+    if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
         linkedInfo.wurEn = true;
     }
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);

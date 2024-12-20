@@ -138,12 +138,10 @@ enum ConnState {
 };
 
 enum MloState {
-    SINGLE_RADIO - 0,
+    SINGLE_RADIO = 0,
     WIFI7_MLSR = 1,
     WIFI7_EMLSR = 2,
     WIFI7_STR = 3,
-
-    WUR_STATE = 7,
 
     WIFI7_INVALID = 0xFF,
 };

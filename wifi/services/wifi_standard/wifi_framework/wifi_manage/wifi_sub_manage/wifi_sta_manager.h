@@ -37,6 +37,7 @@ public:
     void StopSatelliteTimer(void);
     void DealStaOpened(int instId);
     void DealStaStopped(int instId);
+    void StaCloseDhcpSa(void);
 
 private:
     void InitStaCallback(void);

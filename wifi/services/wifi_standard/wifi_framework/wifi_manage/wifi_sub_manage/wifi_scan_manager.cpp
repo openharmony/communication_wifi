@@ -111,6 +111,9 @@ void WifiScanManager::CheckAndStartScanService(int instId)
 #ifndef OHOS_ARCH_LITE
     WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();
 #endif
+#ifdef DYNAMIC_UNLOAD_SA
+    StopUnloadScanSaTimer();
+#endif
     return;
 }
 
@@ -187,8 +190,6 @@ void WifiScanManager::CheckAndStopScanService(int instId)
 void WifiScanManager::CloseScanService(int instId)
 {
     WIFI_LOGI("close scan service");
-    WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN, instId);
-    WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::CLOSED, instId);
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     WIFI_LOGI("CloseScanService, current sta state:%{public}d", staState);
     if (staState == WifiOprMidState::OPENING || staState == WifiOprMidState::RUNNING) {

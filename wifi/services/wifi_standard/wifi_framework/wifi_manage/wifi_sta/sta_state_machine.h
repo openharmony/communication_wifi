@@ -548,6 +548,7 @@ public:
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
+    void DealMloStateChange(InternalMessagePtr msg);
     void DealNetworkRemoved(InternalMessagePtr msg);
     void DealCsaChannelChanged(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE

@@ -106,6 +106,12 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
+#define WIFI7_MLO_STATE_SINGLE_RADIO BIT(0)
+#define WIFI7_MLO_STATE_MLSR BIT(1)
+#define WIFI7_MLO_STATE_EMLSR BIT(2)
+#define WIFI7_MLO_STATE_STR BIT(3)
+#define WIFI7_MLO_STATE_WUR BIT(7)
+
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
     {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -1013,6 +1019,9 @@ int StaStateMachine::InitStaSMHandleMap()
     };
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = [this](InternalMessagePtr msg) {
         return this->DealWpaStateChange(msg);
+    };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_MLO_WORK_STATE_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealMloStateChange(msg);
     };
     staSmHandleFuncMap[WIFI_SVR_COM_STA_NETWORK_REMOVED] = [this](InternalMessagePtr msg) {
         return this->DealNetworkRemoved(msg);
@@ -3909,6 +3918,34 @@ void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
     int status = msg->GetParam1();
     LOGI("DealWpaStateChange status: %{public}d", status);
     linkedInfo.supplicantState = static_cast<SupplicantState>(status);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+}
+
+void StaStateMachine::DealMloStateChange(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        LOGE("DealMloStateChange InternalMessage msg is null.");
+        return;
+    }
+
+    MloStateParam param = {0};
+    msg->GetMessageObj(param);
+
+    uint8_t state = param.mloState;
+    uint16_t reasonCode = param.reasonCode;
+    LOGI("DealMloStateChange mloState=%{public}d reasonCode=%{public}d", state, reasonCode);
+    if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == SINGLE_RADIO) {
+        linkedInfo.mloState = SINGLE_RADIO;
+    } else if (state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLSR) {
+        linkedInfo.mloState = WIFI7_MLSR;
+    } else if (state & WIFI7_MLO_STATE_EMLSR) == WIFI7_EMLSR) {
+        linkedInfo.mloState = WIFI7_EMLSR;
+    } else if (state & WIFI7_MLO_STATE_STR) == WIFI7_STR) {
+        linkedInfo.mloState = WIFI7_STR;
+    }
+    if (state & WIFI7_MLO_STATE_WUR) == WUR_STATE) {
+        linkedInfo.wurEn = true;
+    }
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
 }
 

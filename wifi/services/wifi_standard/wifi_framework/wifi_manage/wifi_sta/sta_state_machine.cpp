@@ -249,6 +249,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.portalUrl = "";
     linkedInfo.supplicantState = SupplicantState::DISCONNECTED;
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
+    linkedInfo.mloState = MloState::SINGLE_RADIO;
     linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     linkedInfo.lastPacketDirection = 0;
     linkedInfo.lastRxPackets = 0;
@@ -256,6 +257,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isAncoConnected = 0;
     linkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
     linkedInfo.isMloConnected = false;
+    linkedInfo.wurEn = false;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -3735,6 +3737,12 @@ void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
     pStaStateMachine->HandleNetCheckResult(netstate, url);
 }
 
+void StaStateMachine::LinkedState::UpdateRoamInfo()
+{
+    pStaStateMachine->linkedInfo.mloState = MloState::SINGLE_RADIO;
+    pStaStateMachine->linkedInfo.wurEn = false;
+}
+
 bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
@@ -3762,6 +3770,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             }
             pStaStateMachine->isRoam = true;
             pStaStateMachine->linkedInfo.bssid = bssid;
+            UpdateRoamInfo();
 #ifndef OHOS_ARCH_LITE
             pStaStateMachine->UpdateWifiCategory();
             pStaStateMachine->SetSupportedWifiCategory();
@@ -3934,13 +3943,13 @@ void StaStateMachine::DealMloStateChange(InternalMessagePtr msg)
     uint8_t state = param.mloState;
     uint16_t reasonCode = param.reasonCode;
     if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == WIFI7_MLO_STATE_SINGLE_RADIO) {
-        linkedInfo.mloState = SINGLE_RADIO;
+        linkedInfo.mloState = MloState::SINGLE_RADIO;
     } else if ((state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLO_STATE_MLSR) {
-        linkedInfo.mloState = WIFI7_MLSR;
+        linkedInfo.mloState = MloState::WIFI7_MLSR;
     } else if ((state & WIFI7_MLO_STATE_EMLSR) == WIFI7_MLO_STATE_EMLSR) {
-        linkedInfo.mloState = WIFI7_EMLSR;
+        linkedInfo.mloState = MloState::WIFI7_EMLSR;
     } else if ((state & WIFI7_MLO_STATE_STR) == WIFI7_MLO_STATE_STR) {
-        linkedInfo.mloState = WIFI7_STR;
+        linkedInfo.mloState = MloState::WIFI7_STR;
     }
     if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
         linkedInfo.wurEn = true;

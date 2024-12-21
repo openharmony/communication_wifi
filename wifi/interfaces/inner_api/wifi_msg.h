@@ -133,7 +133,7 @@ enum ConnState {
     UNKNOWN
 };
 
-enum MloState {
+enum class MloState {
     SINGLE_RADIO = 0,
     WIFI7_MLSR = 1,
     WIFI7_EMLSR = 2,

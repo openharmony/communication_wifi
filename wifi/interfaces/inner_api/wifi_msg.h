@@ -43,10 +43,6 @@ namespace Wifi {
 #define MAX_PID_LIST_SIZE 128
 #define REGISTERINFO_MAX_NUM 1000
 
-#ifndef BIT
-#define BIT(x) (1U << (x))
-#endif
-
 inline const std::string KEY_MGMT_NONE = "NONE";
 inline const std::string KEY_MGMT_WEP = "WEP";
 inline const std::string KEY_MGMT_WPA_PSK = "WPA-PSK";

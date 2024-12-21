@@ -106,11 +106,11 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
-#define WIFI7_MLO_STATE_SINGLE_RADIO BIT(0)
-#define WIFI7_MLO_STATE_MLSR BIT(1)
-#define WIFI7_MLO_STATE_EMLSR BIT(2)
-#define WIFI7_MLO_STATE_STR BIT(3)
-#define WIFI7_MLO_STATE_WUR BIT(7)
+#define WIFI7_MLO_STATE_SINGLE_RADIO 0x01
+#define WIFI7_MLO_STATE_MLSR 0x02
+#define WIFI7_MLO_STATE_EMLSR 0x04
+#define WIFI7_MLO_STATE_STR 0x08
+#define WIFI7_MLO_STATE_WUR 0x80
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -3933,7 +3933,6 @@ void StaStateMachine::DealMloStateChange(InternalMessagePtr msg)
 
     uint8_t state = param.mloState;
     uint16_t reasonCode = param.reasonCode;
-    LOGI("DealMloStateChange mloState=%{public}d reasonCode=%{public}d", state, reasonCode);
     if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == WIFI7_MLO_STATE_SINGLE_RADIO) {
         linkedInfo.mloState = SINGLE_RADIO;
     } else if ((state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLO_STATE_MLSR) {
@@ -3946,6 +3945,8 @@ void StaStateMachine::DealMloStateChange(InternalMessagePtr msg)
     if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
         linkedInfo.wurEn = true;
     }
+    LOGI("DealMloStateChange mloState=%{public}d wurEn=%{public}d reasonCode=%{public}u",
+        linkedInfo.mloState, linkedInfo.wurEn, reasonCode);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
 }
 

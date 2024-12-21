@@ -64,6 +64,16 @@ public:
     WifiErrorNo SetSoftApConfig(const std::string &ifName, const HotspotConfig &config, int id = 0);
 
     /**
+     * @Description Set Max ConnectNum.
+     *
+     * @param ifName ifaceName
+     * @param channel chanel of apconfig
+     * @param maxConn max Connect num
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetMaxConnectNum(const std::string &ifName, int32_t channel, int32_t maxConn);
+
+    /**
      * @Description Obtains information about all connected STAs.
      *
      * @param result - Returns the obtained STA information list.

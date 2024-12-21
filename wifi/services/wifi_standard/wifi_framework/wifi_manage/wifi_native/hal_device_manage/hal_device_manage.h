@@ -422,6 +422,15 @@ public:
      */
     bool DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName, std::string mac);
 
+    /**
+     * @Description Set Max ConnectNum
+     * @param interfaceName interfaceName
+     * @param channel channel config
+     * @param MaxConn Max Connect Num
+     * @return bool
+     */
+    bool SetMaxConnectNum(const std::string &ifaceName, int32_t channel, int32_t maxConn);
+
 private:
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();

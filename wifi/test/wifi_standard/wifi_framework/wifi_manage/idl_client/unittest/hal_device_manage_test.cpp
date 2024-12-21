@@ -757,6 +757,14 @@ HWTEST_F(WifiHalDeviceManagerTest, MakeMacFilterStringTest_03, TestSize.Level1)
     std::string result = HalDeviceManager::GetInstance().MakeMacFilterString(blockList);
     EXPECT_EQ(result, "MAC_MODE=1,MAC_CNT=2,MAC=AABB,MAC=CCDD");
 }
+
+HWTEST_F(WifiHalDeviceManagerTest, SetMaxConnectNumTest_01, TestSize.Level1)
+{
+    std::string ifaceName = "";
+    EXPECT_FALSE(HalDeviceManager::GetInstance().SetMaxConnectNum(ifaceName, 1, 1));
+    ifaceName = "wlan1";
+    HalDeviceManager::GetInstance().SetMaxConnectNum(ifaceName, 1, 1);
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

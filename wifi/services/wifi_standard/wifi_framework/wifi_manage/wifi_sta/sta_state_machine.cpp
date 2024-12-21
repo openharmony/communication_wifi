@@ -3945,6 +3945,7 @@ void StaStateMachine::DealMloStateChange(InternalMessagePtr msg)
     if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
         linkedInfo.wurEn = true;
     }
+
     LOGI("DealMloStateChange mloState=%{public}d wurEn=%{public}d reasonCode=%{public}u",
         linkedInfo.mloState, linkedInfo.wurEn, reasonCode);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);

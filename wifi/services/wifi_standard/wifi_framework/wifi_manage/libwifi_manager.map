@@ -25,7 +25,7 @@
         "OHOS::Wifi::WifiServiceManager::CheckPreLoadService()";
         "OHOS::Wifi::WifiServiceManager::GetStaServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::GetSelfCureServiceInst(int)";
-        "OHOS::Wifi::WifiServiceManager::GetWifiProServiceInst(int32_t)";
+        "OHOS::Wifi::WifiServiceManager::GetWifiProServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::GetScanServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::GetApServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::ApServiceSetHotspotConfig(OHOS::Wifi::HotspotConfig const&, int)";

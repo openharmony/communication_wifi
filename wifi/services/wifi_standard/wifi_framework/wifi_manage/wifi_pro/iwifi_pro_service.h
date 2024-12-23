@@ -45,6 +45,11 @@ public:
      * @return results - scan results
      */
     virtual void DealScanResult(const std::vector<InterScanInfo> &results) = 0;
+ 
+    /**
+     * @Description deal app qoe slow
+     */
+    virtual void DealQoeSlowResult() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

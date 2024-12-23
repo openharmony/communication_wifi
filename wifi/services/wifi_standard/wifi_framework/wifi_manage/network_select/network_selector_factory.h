@@ -24,7 +24,9 @@
 namespace OHOS::Wifi {
 enum class NetworkSelectType {
     AUTO_CONNECT,
-    WIFI2WIFI
+    WIFI2WIFI,
+    WIFI2WIFI_NONET,
+    WIFI2WIFI_QOE_BAD,
 };
 
 class NetworkSelectorFactory {
@@ -52,6 +54,18 @@ public:
      * @return the network selector
      */
     std::unique_ptr<NetworkSelection::INetworkSelector> CreateWifi2WifiNetworkSelector();
+ 
+    /**
+     * the function to create wifi2wifi no net networkSelector
+     * @return the network selector
+     */
+    std::unique_ptr<NetworkSelection::INetworkSelector> CreateWifi2WifiNoNetNetworkSelector();
+ 
+    /**
+     * the function to create wifi2wifi qoes low networkSelector
+     * @return the network selector
+     */
+    std::unique_ptr<NetworkSelection::INetworkSelector> CreateWifi2WifiQoeSlowNetworkSelector();
 private:
     HandleFuncMap handleFuncMap;
 };

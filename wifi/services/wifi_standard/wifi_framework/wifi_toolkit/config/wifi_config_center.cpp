@@ -812,7 +812,6 @@ int WifiConfigCenter::SetHid2dSceneLastSetTime(int64_t setTime)
 
 int64_t WifiConfigCenter::GetHid2dSceneLastSetTime()
 {
-    LOGD("GetHid2dSceneLastSetTime : %{public}ld", mHid2dSceneLastSetTime.load());
     return mHid2dSceneLastSetTime.load();
 }
 

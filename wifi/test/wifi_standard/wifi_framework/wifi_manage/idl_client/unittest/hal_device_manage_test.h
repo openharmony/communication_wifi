@@ -137,6 +137,11 @@ public:
     {
         return 0;
     }
+    virtual int32_t SetProjectionScreenParam(const std::string& ifName,
+        const OHOS::HDI::Wlan::Chip::V1_0::ProjectionScreenCmdParam& param)
+    {
+        return 0;
+    }
 };
 
 class IConcreteChipTest : public IConcreteChip {

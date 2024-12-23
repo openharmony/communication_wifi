@@ -34,6 +34,7 @@
 #define MIRACAST_SERVICE_SA_ID 5527
 #define SHARE_SERVICE_UID 5520
 #define MOUSE_CROSS_SERVICE_UID 6699
+#define HID2D_TIMEOUT_INTERVAL (10 * 1000)
 namespace OHOS {
 namespace Wifi {
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
@@ -208,6 +209,10 @@ public:
     int SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene);
 
     int GetHid2dUpperScene(int uid, Hid2dUpperScene &scene);
+
+    int SetHid2dSceneLastSetTime(int64_t setTime);
+    
+    int64_t GetHid2dSceneLastSetTime();
 
     void ClearLocalHid2dInfo(int uid = 0);
 
@@ -386,6 +391,7 @@ private:
     std::string mP2pIfaceName {"p2p-dev-wlan0"};
 #endif
     std::map<int, Hid2dUpperScene> mHid2dUpperScenePair;
+    std::atomic<int64_t> mHid2dSceneLastSetTime {0};
     std::atomic<WifiOprMidState> mP2pMidState {WifiOprMidState::CLOSED};
     std::atomic<int> mP2pState {static_cast<int>(P2pState::P2P_STATE_CLOSED)};
     std::atomic<int> mP2pEnhanceState {0};

@@ -2299,5 +2299,47 @@ int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, con
     }
     return PERMISSION_DENIED;
 }
+
+ErrCode WifiDeviceServiceImpl::UpdateNetworkLagInfo(const NetworkLagType networkLagType,
+    const NetworkLagInfo &networkLagInfo)
+{
+    // permission check
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("UpdateNetworkLagInfo, uid:%{public}d.", GetCallingUid());
+#endif
+ 
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("UpdateNetworkLagInfo:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+ 
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("UpdateNetworkLagInfo: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+ 
+    // date distribute
+    ErrCode ret = WIFI_OPT_SUCCESS;
+    switch (networkLagType) {
+        case NetworkLagType::WIFIPRO_QOE_SLOW:
+            ret = HandleWifiProQoeSlow(networkLagInfo);
+            break;
+        default:
+            return WIFI_OPT_FAILED;
+    }
+    return ret;
+}
+ 
+ErrCode WifiDeviceServiceImpl::HandleWifiProQoeSlow(const NetworkLagInfo &networkLagInfo)
+{
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
+    if (pWifiProService == nullptr) {
+        return WIFI_OPT_FAILED;
+    }
+    pWifiProService->DealQoeSlowResult();
+#endif
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

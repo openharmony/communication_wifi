@@ -309,6 +309,9 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_local_random_mac) {
       defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
     }
+    if (wifi_feature_wifi_pro_ctrl) {
+      defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
+    }
     deps = [
       ":wifi_manager_service",
       "$WIFI_ROOT_DIR/base:wifi_base",

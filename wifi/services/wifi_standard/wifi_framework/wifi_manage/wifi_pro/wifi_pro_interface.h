@@ -50,6 +50,10 @@ public:
      */
     void DealScanResult(const std::vector<InterScanInfo> &results) override;
 
+    /**
+     * @Description deal qoe slow
+     */
+    void DealQoeSlowResult() override;
 private:
     /**
      * @Description deal sta connection change

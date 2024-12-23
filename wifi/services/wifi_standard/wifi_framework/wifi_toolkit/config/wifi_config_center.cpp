@@ -790,7 +790,9 @@ int WifiConfigCenter::SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene)
     LOGD("SetHid2dUpperScene uid: %{public}d", uid);
     std::unique_lock<std::mutex> lock(mP2pMutex);
     mHid2dUpperScenePair.insert_or_assign(uid, scene);
-    mHid2dSceneLastSetTime = scene.setTime;
+    if (scene.setTime != 0) {
+        mHid2dSceneLastSetTime = scene.setTime;
+    }
     return 0;
 }
 

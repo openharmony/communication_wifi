@@ -2045,6 +2045,7 @@ ErrCode WifiDeviceProxy::ReceiveNetworkControlInfo(const WifiNetworkControlInfo&
     data.WriteString(networkControlInfo.bundleName);
     data.WriteInt32(networkControlInfo.state);
     data.WriteInt32(networkControlInfo.sceneId);
+    data.WriteInt32(networkControlInfo.rtt);
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_NET_CONTROL_INFO), data, reply, option);
     if (error != ERR_NONE) {

@@ -88,6 +88,7 @@
           "OHOS::Wifi::WifiConfigCenter::GetP2pIfaceName()";
           "OHOS::Wifi::WifiConfigCenter::SetHid2dUpperScene(int, OHOS::Wifi::Hid2dUpperScene const&)";
           "OHOS::Wifi::WifiConfigCenter::GetHid2dUpperScene(int, OHOS::Wifi::Hid2dUpperScene&)";
+          "OHOS::Wifi::WifiConfigCenter::SetHid2dSceneLastSetTime(long long)";
           "OHOS::Wifi::WifiConfigCenter::SetHid2dSceneLastSetTime(long)";
           "OHOS::Wifi::WifiConfigCenter::GetHid2dSceneLastSetTime()";
           "OHOS::Wifi::WifiConfigCenter::ClearLocalHid2dInfo(int)";

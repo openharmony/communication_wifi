@@ -46,6 +46,7 @@
         GetDeviceConfigs;
         GetDeviceConfig;
         RemoveDevice;
+        AllowAutoConnect;
         DisableDeviceConfig;
         EnableDeviceConfig;
         ConnectTo;

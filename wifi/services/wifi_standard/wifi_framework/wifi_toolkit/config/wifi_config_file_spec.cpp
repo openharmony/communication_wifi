@@ -62,6 +62,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isReassocSelfCureWithFactoryMacAddress = 0;
     item.isShared = true;
     item.lastTrySwitchWifiTimestamp = -1;
+    item.isAllowAutoConnect = true;
     return;
 }
 
@@ -196,6 +197,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.isShared = CheckDataLegal(tmpValue);
     } else if (key == "lastTrySwitchWifiTimestamp") {
         item.lastTrySwitchWifiTimestamp = static_cast<int64_t>(CheckDataTolonglong(tmpValue));
+    } else if (key == "isAllowAutoConnect") {
+        item.isAllowAutoConnect = (CheckDataLegal(tmpValue) != 0);
     } else {
         return -1;
     }
@@ -587,6 +590,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
        << std::endl;
     ss << "    " <<"isShared=" << item.isShared << std::endl;
     ss << "    " <<"lastTrySwitchWifiTimestamp=" << item.lastTrySwitchWifiTimestamp << std::endl;
+    ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else

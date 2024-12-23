@@ -284,6 +284,11 @@ NO_SANITIZE("cfi") WifiErrorCode RemoveDevice(int networkId)
     return GetCErrorCode(wifiDevicePtr->RemoveDevice(networkId));
 }
 
+WifiErrorCode AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
+}
+
 WifiErrorCode DisableDeviceConfig(int networkId)
 {
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);

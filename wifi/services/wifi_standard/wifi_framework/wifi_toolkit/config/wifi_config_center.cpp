@@ -804,7 +804,7 @@ int WifiConfigCenter::GetHid2dUpperScene(int uid, Hid2dUpperScene &scene)
     return 0;
 }
 
-int WifiConfigCenter::SetHid2dSceneLastSetTime(int64_t)
+int WifiConfigCenter::SetHid2dSceneLastSetTime(int64_t setTime)
 {
     mHid2dSceneLastSetTime = setTime;
     return 0;

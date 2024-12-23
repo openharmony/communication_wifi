@@ -141,6 +141,7 @@ public:
     virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
     virtual int GetThermalLevel() const = 0;
     virtual int GetHid2dUpperScene(int uid, Hid2dUpperScene &scene) = 0;
+    virtual int64_t GetHid2dSceneLastSetTime() const = 0;
     virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
     virtual int SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene) = 0;
     virtual int SetWifiDetailState(WifiDetailState state, int instId) = 0;
@@ -320,6 +321,7 @@ public:
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
     MOCK_CONST_METHOD0(GetThermalLevel, int());
     MOCK_METHOD2(GetHid2dUpperScene, int(int uid, Hid2dUpperScene &scene));
+    MOCK_CONST_METHOD0(GetHid2dSceneLastSetTime, int64_t());
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
     MOCK_METHOD2(SetHid2dUpperScene, int(int uid, const Hid2dUpperScene &scene));
     MOCK_METHOD2(SetWifiDetailState, int(WifiDetailState state, int instId));

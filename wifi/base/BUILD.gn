@@ -101,6 +101,7 @@ if (defined(ohos_lite)) {
 
     sources += [
       "utils/wifi_app_parser.cpp",
+      "utils/wifi_datashare_utils.cpp",
       "utils/xml_parser.cpp",
     ]
     include_dirs = local_base_include_dirs
@@ -111,8 +112,11 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "c_utils:utils",
+      "data_share:datashare_common",
+      "data_share:datashare_consumer",
       "hicollie:libhicollie",
       "hilog:libhilog",
+      "ipc:ipc_single",
       "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "openssl:libcrypto_shared",

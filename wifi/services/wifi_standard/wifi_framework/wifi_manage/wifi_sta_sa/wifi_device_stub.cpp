@@ -883,6 +883,8 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteBool(wifiInfo.isAncoConnected);
         reply.WriteInt32((int)wifiInfo.supportedWifiCategory);
         reply.WriteBool(wifiInfo.isHiLinkNetwork);
+        reply.WriteInt32(wifiInfo.lastRxPackets);
+        reply.WriteInt32(wifiInfo.lastTxPackets);
     }
 
     return;

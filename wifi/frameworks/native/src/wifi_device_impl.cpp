@@ -622,5 +622,12 @@ ErrCode WifiDeviceImpl::SetDpiMarkRule(const std::string &ifaceName, int uid, in
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->SetDpiMarkRule(ifaceName, uid, protocol, enable);
 }
+ 
+ErrCode WifiDeviceImpl::UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->UpdateNetworkLagInfo(networkLagType, networkLagInfo);
+}
 }  // namespace Wifi
 }  // namespace OHOS

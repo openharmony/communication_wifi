@@ -26,6 +26,10 @@ NetworkSelectorFactory::NetworkSelectorFactory()
         &NetworkSelectorFactory::CreateAutoConnectNetworkSelector;
     handleFuncMap[static_cast<uint32_t>(NetworkSelectType::WIFI2WIFI)] =
         &NetworkSelectorFactory::CreateWifi2WifiNetworkSelector;
+    handleFuncMap[static_cast<uint32_t>(NetworkSelectType::WIFI2WIFI_NONET)] =
+        &NetworkSelectorFactory::CreateWifi2WifiNoNetNetworkSelector;
+    handleFuncMap[static_cast<uint32_t>(NetworkSelectType::WIFI2WIFI_QOE_BAD)] =
+        &NetworkSelectorFactory::CreateWifi2WifiQoeSlowNetworkSelector;
 }
 
 std::optional<std::unique_ptr<NetworkSelection::INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(
@@ -47,5 +51,15 @@ std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::Crea
 std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateWifi2WifiNetworkSelector()
 {
     return std::make_unique<NetworkSelection::Wifi2WifiIntegrator>();
+}
+
+std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateWifi2WifiNoNetNetworkSelector()
+{
+    return std::make_unique<NetworkSelection::Wifi2WifiNoNetIntegrator>();
+}
+ 
+std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateWifi2WifiQoeSlowNetworkSelector()
+{
+    return std::make_unique<NetworkSelection::Wifi2WifiQoeSlowIntegrator>();
 }
 } // namespace OHOS::Wifi

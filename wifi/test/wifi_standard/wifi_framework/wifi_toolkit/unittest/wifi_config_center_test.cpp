@@ -276,7 +276,7 @@ HWTEST_F(WifiConfigCenterTest, GetHid2dUpperSceneTest01, TestSize.Level1)
 HWTEST_F(WifiConfigCenterTest, GetHid2dSceneLastSetTimeTest01, TestSize.Level1)
 {
     int64_t setTime = 0;
-    WifiConfigCenter::GetInstance().SetHid2dUpperScene(setTime);
+    WifiConfigCenter::GetInstance().SetHid2dSceneLastSetTime(setTime);
     EXPECT_EQ(WifiConfigCenter::GetInstance().GetHid2dSceneLastSetTime(), 0);
 }
 

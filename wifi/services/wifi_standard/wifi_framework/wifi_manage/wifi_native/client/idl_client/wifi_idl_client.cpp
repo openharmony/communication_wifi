@@ -964,7 +964,7 @@ WifiErrorNo WifiIdlClient::RegisterApEvent(IWifiApMonitorEventCallback callback,
     if (memset_s(&cEventCallback, sizeof(cEventCallback), 0, sizeof(cEventCallback)) != EOK) {
         return WIFI_HAL_OPT_FAILED;
     }
-    if (callback.onStaJoinOrLeave != nullptr) {
+    if (callback.onApEnableOrDisable != nullptr && callback.onStaJoinOrLeave != nullptr) {
         cEventCallback.onStaJoinOrLeave = OnApStaJoinOrLeave;
         cEventCallback.onApEnableOrDisable = OnApEnableOrDisable;
     }

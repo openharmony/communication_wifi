@@ -334,7 +334,7 @@ public:
 #endif
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
-        void UpdateRoamInfo();
+        void UpdateWifi7WurInfo();
         StaStateMachine *pStaStateMachine;
     };
     /**

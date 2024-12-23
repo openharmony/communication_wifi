@@ -234,7 +234,7 @@ struct WifiLinkedInfo {
     WifiCategory supportedWifiCategory;
     bool isMloConnected;
     bool isHiLinkNetwork;
-    bool wurEn;
+    bool isWurEnable;
     int c0Rssi;
     int c1Rssi;
     WifiLinkedInfo()

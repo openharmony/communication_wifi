@@ -257,7 +257,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isAncoConnected = 0;
     linkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
     linkedInfo.isMloConnected = false;
-    linkedInfo.wurEn = false;
+    linkedInfo.isWurEnable = false;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -3737,10 +3737,10 @@ void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
     pStaStateMachine->HandleNetCheckResult(netstate, url);
 }
 
-void StaStateMachine::LinkedState::UpdateRoamInfo()
+void StaStateMachine::LinkedState::UpdateWifi7WurInfo()
 {
     pStaStateMachine->linkedInfo.mloState = MloState::SINGLE_RADIO;
-    pStaStateMachine->linkedInfo.wurEn = false;
+    pStaStateMachine->linkedInfo.isWurEnable = false;
 }
 
 bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -3770,8 +3770,8 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             }
             pStaStateMachine->isRoam = true;
             pStaStateMachine->linkedInfo.bssid = bssid;
-            UpdateRoamInfo();
 #ifndef OHOS_ARCH_LITE
+            UpdateWifi7WurInfo();
             pStaStateMachine->UpdateWifiCategory();
             pStaStateMachine->SetSupportedWifiCategory();
 #endif
@@ -3952,11 +3952,11 @@ void StaStateMachine::DealMloStateChange(InternalMessagePtr msg)
         linkedInfo.mloState = MloState::WIFI7_STR;
     }
     if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
-        linkedInfo.wurEn = true;
+        linkedInfo.isWurEnable = true;
     }
 
-    LOGI("DealMloStateChange mloState=%{public}d wurEn=%{public}d reasonCode=%{public}u",
-        linkedInfo.mloState, linkedInfo.wurEn, reasonCode);
+    LOGI("DealMloStateChange mloState=%{public}d isWurEnable=%{public}d reasonCode=%{public}u",
+        linkedInfo.mloState, linkedInfo.isWurEnable, reasonCode);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
 }
 

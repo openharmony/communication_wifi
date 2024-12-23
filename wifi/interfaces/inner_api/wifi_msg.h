@@ -267,7 +267,7 @@ struct WifiLinkedInfo {
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         isMloConnected = false;
-        wurEn = false;
+        isWurEnable = false;
         c0Rssi = 0;
         c1Rssi = 0;
     }

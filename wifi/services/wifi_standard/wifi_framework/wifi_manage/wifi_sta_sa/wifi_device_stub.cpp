@@ -1340,7 +1340,6 @@ void WifiDeviceStub::OnUpdateNetworkLagInfo(uint32_t code, MessageParcel &data, 
     NetworkLagType networkLagType = static_cast<NetworkLagType>(data.ReadInt32());
     NetworkLagInfo networkLagInfo;
     networkLagInfo.uid = static_cast<uint32_t>(data.ReadInt32());
- 
     ErrCode ret = UpdateNetworkLagInfo(networkLagType, networkLagInfo);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);

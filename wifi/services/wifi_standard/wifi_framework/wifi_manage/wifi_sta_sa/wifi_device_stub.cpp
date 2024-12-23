@@ -1208,6 +1208,7 @@ void WifiDeviceStub::OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &d
     networkControlInfo.bundleName = data.ReadString();
     networkControlInfo.state = data.ReadInt32();
     networkControlInfo.sceneId = data.ReadInt32();
+    networkControlInfo.rtt = data.ReadInt32();
     ErrCode ret = ReceiveNetworkControlInfo(networkControlInfo);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);

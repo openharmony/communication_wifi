@@ -790,6 +790,9 @@ int WifiConfigCenter::SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene)
     LOGD("SetHid2dUpperScene uid: %{public}d", uid);
     std::unique_lock<std::mutex> lock(mP2pMutex);
     mHid2dUpperScenePair.insert_or_assign(uid, scene);
+    if (scene.setTime != 0) {
+        mHid2dSceneLastSetTime = scene.setTime;
+    }
     return 0;
 }
 
@@ -801,6 +804,17 @@ int WifiConfigCenter::GetHid2dUpperScene(int uid, Hid2dUpperScene &scene)
         scene = iter->second;
     }
     return 0;
+}
+
+int WifiConfigCenter::SetHid2dSceneLastSetTime(int64_t setTime)
+{
+    mHid2dSceneLastSetTime = setTime;
+    return 0;
+}
+
+int64_t WifiConfigCenter::GetHid2dSceneLastSetTime()
+{
+    return mHid2dSceneLastSetTime.load();
 }
 
 void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
@@ -819,6 +833,7 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
         mHid2dUpperScenePair.insert_or_assign(MIRACAST_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(SHARE_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(MOUSE_CROSS_SERVICE_UID, scene);
+        SetHid2dSceneLastSetTime(0);
     }
 }
 

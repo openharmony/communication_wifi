@@ -564,6 +564,10 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
 #ifdef FEATURE_WIFI_PRO_SUPPORT
 ErrCode WifiServiceScheduler::StartWifiProService(int instId)
 {
+    if (IsFactoryMode()) {
+        WIFI_LOGI("factory mode, not start wifipro service");
+        return WIFI_OPT_FAILED;
+    }
     if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_WIFIPRO) < 0) {
         WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_WIFIPRO);
         return WIFI_OPT_FAILED;

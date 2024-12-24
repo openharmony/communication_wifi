@@ -76,6 +76,20 @@ const std::string SUPPORT_SAPCOEXIST_PROP = "const.wifi.support_sapcoexist";
 const std::string SUPPORT_SAPCOEXIST = "true";
 constexpr uint32_t SUPPORT_SAPCOEXIST_LEN = 7;
 
+const int CAC_STOP_BY_DEFAULT_REASON = 0;
+const int CAC_STOP_BY_SCAN_REQUEST = 1;
+const int CAC_STOP_BY_RADAR_DETECT = 2;
+const int CAC_STOP_BY_P2P_REQUEST = 3;
+const int CAC_STOP_BY_HID2D_REQUEST = 4;
+const int CAC_STOP_BY_AP_REQUEST = 5;
+const int CAC_STOP_BY_HML_REQUEST = 6;
+const int CAC_STOP_BY_STA_REQUEST = 7;
+const int CAC_STOP_BY_BRIDGE_REQUEST = 8;
+const int CAC_STOP_BY_WIFI2_REQUEST = 9;
+const int CAC_STOP_BY_SCREEN_OFF = 10;
+const int CAC_STOP_BY_SHARE_REQUEST = 11;
+const int CAC_STOP_BY_SETTING_ON = 12;
+
 class WifiManager {
 public:
     static WifiManager &GetInstance();
@@ -136,6 +150,7 @@ public:
     void InstallPacketFilterProgram(int screenState, int instId);
 #endif
     void OnNativeProcessStatusChange(int status);
+    void StopGetCacResultAndLocalCac(int reason);
 
 private:
     WifiManager();

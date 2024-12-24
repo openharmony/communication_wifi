@@ -577,6 +577,15 @@ public:
      * @param enable - enable/disable dpi mark
      */
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
+ 
+    /**
+     * @Description Update Network Lag Info
+     *
+     * @param networkLagType - recv networkLagType
+     * @param networkLagInfo - recv networkLagInfo
+     * @return ErrCode - operation result
+     */
+    ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

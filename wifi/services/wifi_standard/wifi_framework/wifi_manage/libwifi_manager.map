@@ -15,8 +15,9 @@
         "OHOS::Wifi::WifiManager::GetWifiEventSubscriberManager()";
         "OHOS::Wifi::WifiManager::GetWifiMultiVapManager()";
         "OHOS::Wifi::WifiManager::GetRptInterface(int)";
-        "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(int screenState, int instId)";
-        "OHOS::Wifi::WifiManager::OnNativeProcessStatusChange(int status)";
+        "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(int, int)";
+        "OHOS::Wifi::WifiManager::OnNativeProcessStatusChange(int)";
+        "OHOS::Wifi::WifiManager::StopGetCacResultAndLocalCac(int)";
         "OHOS::Wifi::WifiServiceManager::GetInstance()";
         "OHOS::Wifi::WifiServiceManager::Init()";
         "OHOS::Wifi::WifiServiceManager::GetP2pServiceInst()";

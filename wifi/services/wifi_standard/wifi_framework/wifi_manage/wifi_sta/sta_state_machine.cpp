@@ -3377,6 +3377,11 @@ void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
         WIFI_LOGE("msg is null\n");
     }
     WirteConnectTypeHiSysEvent("REASSOC");
+    if (linkedInfo.isMloConnected && WifiStaHalInterface::GetInstance().SetBssid(
+        WPA_DEFAULT_NETWORKID, linkedInfo.bssid,
+        WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId)) == WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("Reassociate to same bssid for wifi7 mlo!\n");
+    }
     if (WifiStaHalInterface::GetInstance().Reassociate() == WIFI_HAL_OPT_OK) {
         /* Callback result to InterfaceService */
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);

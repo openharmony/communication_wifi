@@ -195,6 +195,7 @@ public:
         void DealConnectTimeOutCmd(InternalMessagePtr msg);
         void DealNetworkRemoved(InternalMessagePtr msg);
         void DealWpaStateChange(InternalMessagePtr msg);
+        void DealMloStateChange(InternalMessagePtr msg);
     };
     /**
      * @Description  Definition of member function of SeparatedState class in StaStateMachine.
@@ -288,6 +289,7 @@ public:
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
+        void UpdateWifi7WurInfo();
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -422,7 +424,7 @@ public:
     void DealApRoamingStateTimeout(InternalMessagePtr msg);
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
-    void DealWpaStateChange(InternalMessagePtr msg);
+    void DealWpaStateChange(InternalMessagePtr msg);+
     void DealCsaChannelChanged(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);

@@ -130,6 +130,7 @@ int WifiManager::InitPart1()
 #ifdef FEATURE_P2P_SUPPORT
     wifiP2pManager = std::make_unique<WifiP2pManager>();
 #endif
+    return 0;
 }
 
 void WifiManager::Exit()

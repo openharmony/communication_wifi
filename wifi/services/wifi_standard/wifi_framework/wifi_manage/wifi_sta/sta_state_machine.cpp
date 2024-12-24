@@ -679,21 +679,21 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
     uint8_t state = param.mloState;
     uint16_t reasonCode = param.reasonCode;
     if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == WIFI7_MLO_STATE_SINGLE_RADIO) {
-        linkedInfo.mloState = MloState::SINGLE_RADIO;
+        pStaStateMachine->linkedInfo.mloState = MloState::SINGLE_RADIO;
     } else if ((state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLO_STATE_MLSR) {
-        linkedInfo.mloState = MloState::WIFI7_MLSR;
+        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_MLSR;
     } else if ((state & WIFI7_MLO_STATE_EMLSR) == WIFI7_MLO_STATE_EMLSR) {
-        linkedInfo.mloState = MloState::WIFI7_EMLSR;
+        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_EMLSR;
     } else if ((state & WIFI7_MLO_STATE_STR) == WIFI7_MLO_STATE_STR) {
-        linkedInfo.mloState = MloState::WIFI7_STR;
+        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_STR;
     }
     if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
-        linkedInfo.isWurEnable = true;
+        pStaStateMachine->linkedInfo.isWurEnable = true;
     }
 
     LOGI("DealMloStateChange mloState=%{public}d isWurEnable=%{public}d reasonCode=%{public}u",
-        linkedInfo.mloState, linkedInfo.isWurEnable, reasonCode);
-    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
+        pStaStateMachine->linkedInfo.mloState, pStaStateMachine->linkedInfo.isWurEnable, reasonCode);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
 }
 
 void StaStateMachine::LinkState::DealConnectTimeOutCmd(InternalMessagePtr msg)

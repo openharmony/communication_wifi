@@ -164,7 +164,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->DisableAutoJoin(config.keyMgmt);
     pStaInterface->EnableAutoJoin(conditionName);
     pStaInterface->StartPortalCertification();
-    pStaInterface->EnableHiLinkHandshake(config, conditionName);
+    pStaInterface->EnableHiLinkHandshake(true, config, conditionName);
     pStaInterface->DeregisterFilterBuilder(filterTag, conditionName);
     pStaService->UpdateEapConfig(config, config.wifiEapConfig);
     pStaService->RemoveCandidateConfig(uid, networkId);
@@ -192,7 +192,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->DisableAutoJoin(conditionName);
     pStaService->EnableAutoJoin(conditionName);
     pStaService->StartPortalCertification();
-    pStaService->EnableHiLinkHandshake(config, conditionName);
+    pStaService->EnableHiLinkHandshake(true, config, conditionName);
     pStaService->DeliverStaIfaceData(conditionName);
     pStaService->GetDataSlotId(index);
     pStaService->AddDeviceConfig(config);

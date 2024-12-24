@@ -23,7 +23,7 @@ namespace Wifi {
 struct WifiEventCallback {
     std::function<void(int, int, const std::string &)> onConnectChanged;
     std::function<void(const std::string &, const std::string &)> onBssidChanged;
-    std::function<void(int)> onWpaStateChanged;
+    std::function<void(int, const std::string &)> onWpaStateChanged;
     std::function<void(void)> onWpaSsidWrongKey;
     std::function<void(int)> onWpsOverlap;
     std::function<void(int)> onWpsTimeOut;

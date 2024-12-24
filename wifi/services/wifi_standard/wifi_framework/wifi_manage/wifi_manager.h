@@ -106,6 +106,7 @@ public:
      * @return int - Init result, when 0 means success, other means some fails happened.
      */
     int Init();
+    int InitNdefArchLite();
 
     /**
      * @Description When exiting, the system exits each submodule and then exits the message processing thread.

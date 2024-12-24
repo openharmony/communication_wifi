@@ -96,6 +96,11 @@ enum class ThermalLevel {
     EMERGENCY = 6,
 };
 
+enum class SystemMode {
+    DEFAULT = 1,
+    FACTORY_MODE = 2,
+};
+
 enum WifiMacAddrErrCode {
     WIFI_MACADDR_OPER_SUCCESS = 0,
     WIFI_MACADDR_HAS_EXISTED = 1,
@@ -316,6 +321,10 @@ public:
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
+    void SetSystemMode(SystemMode systemMode);
+
+    SystemMode GetSystemMode();
+
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
         const std::set<int> &wifiLinkedNetworkIds);
@@ -370,6 +379,7 @@ private:
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
+    SystemMode mSystemMode {SystemMode::DEFAULT};
 
     // SCAN
     std::mutex mScanMutex;

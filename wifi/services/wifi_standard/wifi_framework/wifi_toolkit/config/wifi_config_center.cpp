@@ -129,7 +129,7 @@ void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)
 
 bool WifiConfigCenter::GetWifiAllowSemiActive() const
 {
-    if (IsFactoryMode()) {
+    if (WifiSettings::GetInstance().GetSystemMode() == SystemMode::FACTORY_MODE) {
         WIFI_LOGI("factory mode, not allow semi active.");
         return false;
     }

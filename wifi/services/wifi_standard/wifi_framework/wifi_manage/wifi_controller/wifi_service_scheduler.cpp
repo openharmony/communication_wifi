@@ -564,7 +564,7 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
 #ifdef FEATURE_WIFI_PRO_SUPPORT
 ErrCode WifiServiceScheduler::StartWifiProService(int instId)
 {
-    if (IsFactoryMode()) {
+    if (WifiSettings::GetInstance().GetSystemMode() == SystemMode::FACTORY_MODE) {
         WIFI_LOGI("factory mode, not start wifipro service");
         return WIFI_OPT_FAILED;
     }
@@ -603,7 +603,7 @@ ErrCode WifiServiceScheduler::StartWifiProService(int instId)
 #ifdef FEATURE_SELF_CURE_SUPPORT
 ErrCode WifiServiceScheduler::StartSelfCureService(int instId)
 {
-    if (IsFactoryMode()) {
+    if (WifiSettings::GetInstance().GetSystemMode() == SystemMode::FACTORY_MODE) {
         WIFI_LOGI("factory mode, not start selfcure service");
         return WIFI_OPT_NOT_SUPPORTED;
     }

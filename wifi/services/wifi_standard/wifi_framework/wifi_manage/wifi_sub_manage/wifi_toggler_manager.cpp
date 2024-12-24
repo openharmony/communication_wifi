@@ -198,7 +198,7 @@ void WifiTogglerManager::InitMultiStacallback()
 {
     using namespace std::placeholders;
     mMultiStaModeCb.onStartFailure = [this](int id){ this->DealMultiStaStartFailure(id); };
-    mMultiStaModeCb.onStartFailure = [this](int id){ this->DealMultiStaStop(id); };
+    mMultiStaModeCb.onStopped = [this](int id){ this->DealMultiStaStop(id); };
 }
 
 void WifiTogglerManager::InitRptCallback()

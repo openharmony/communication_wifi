@@ -831,6 +831,13 @@ private:
     bool AllowScanByHid2dState();
 
     /**
+     * @Description Get interval time between currentMs and startTime.
+     *
+     * @return int64_t: millisecond difference between two time point.
+     */
+    int64_t GetIntervalTime(int64_t startTime);
+
+    /**
      * @Description Is the app in the trustlist?
      *
      * @param trustList trustlist[in]

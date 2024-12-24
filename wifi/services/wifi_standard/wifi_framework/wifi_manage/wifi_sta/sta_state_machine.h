@@ -778,6 +778,11 @@ private:
      */
     void HandlePostDhcpSetup();
 
+    /**
+     * @Description Get Wifi7 MLO link info.
+     */
+    void DealMloConnectionLinkInfo(void);
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get slot id.

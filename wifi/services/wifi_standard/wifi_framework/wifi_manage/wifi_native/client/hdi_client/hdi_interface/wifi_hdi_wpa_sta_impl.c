@@ -1184,4 +1184,24 @@ WifiErrorNo HdiSetNativeProcessCallback(void (*callback)(int))
     return SetNativeProcessCallback(callback);
 }
 
+WifiErrorNo HdiWpaGetMloLinkedInfo(const char *ifName, const char *staParam, char *staData,
+    uint32_t staDataLen)
+{
+    pthread_mutex_lock(GetWpaObjMutex());
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("%{public}s: wpaObj is NULL", __func__);
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    int result = wpaObj->GetWpaStaData(wpaObj, ifName, staParam, staData, staDataLen);
+    if (result != HDF_SUCCESS) {
+        LOGE("%{public}s: failed to GetWpaStaData, result:%{public}d", __func__, result);
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("GetWpaStaData for mlo success.");
+    return WIFI_HAL_OPT_OK;
+}
 #endif

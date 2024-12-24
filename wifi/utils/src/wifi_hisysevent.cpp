@@ -312,5 +312,10 @@ void WriteWifiSelfcureHisysevent(int type)
     root["WIFI_SELFCURE_TYPE"] = type;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SELFCURE", "EVENT_VALUE", writer.write(root));
 }
+
+uint32_t GenerateStandardErrCode(int subSystem, uint16_t errCode)
+{
+    return (WIFI_SYSTEM_ID << SYSTEM_OFFSET | subSystem << SUB_SYSTEM_OFFSET | errCode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

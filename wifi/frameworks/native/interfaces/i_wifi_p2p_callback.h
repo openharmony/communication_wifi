@@ -118,6 +118,13 @@ public:
      */
     virtual void OnP2pGcLeaveGroup(const GcInfo &info) = 0;
 
+    /**
+     * @Description report p2p chr error code
+     *
+     * @param errCode - chr error code
+     */
+    virtual void OnP2pChrErrCodeReport(const int errCode) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiP2pCallback");
 };

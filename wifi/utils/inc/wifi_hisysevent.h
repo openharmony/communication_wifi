@@ -17,6 +17,9 @@
 #define OHOS_WIFI_HISYSEVENT_H
 
 #include <string>
+#include <map>
+#include "wifi_scan_msg.h"
+#include "wifi_scan_control_msg.h"
 
 #define AP_ERR_CODE 3
 #define AP_STA_PSK_MISMATCH_CNT 1
@@ -64,6 +67,11 @@ inline const std::string HISYS_SERVICE_TYPE_STA = "STA";
 inline const std::string HISYS_SERVICE_TYPE_AP = "AP";
 inline const std::string HISYS_SERVICE_TYPE_P2P = "P2P";
 
+inline const std::string SCAN_INITIATOR_SYSTEM_SCAN = "SYSTEM_SCAN";
+inline const std::string SCAN_INITIATOR_PNO_SCAN = "PNO_SCAN";
+inline const std::string SCAN_INITIATOR_WIFIPRO = "WIFIPRO_SCAN";
+inline const std::string SCAN_INITIATOR_5G_AP = "5G_AP_SCAN";
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
 void WriteWifiApStateHiSysEvent(int32_t state);
@@ -71,6 +79,19 @@ void WriteWifiApStateHiSysEvent(int32_t state);
 void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t state);
 
 void WriteWifiConnectionHiSysEvent(const WifiConnectionType& type, const std::string& pkgName);
+
+void WriteAuthFailHiSysEvent(const std::string &authFailReason, int subErrCode = 0);
+
+void WriteAssocFailHiSysEvent(const std::string &assocFailReason, int subErrCode = 0);
+
+void WriteDhcpFailHiSysEvent(const std::string &dhcpFailReason, int subErrCode = 0);
+
+void WriteScanLimitHiSysEvent(const WifiScanDeviceInfo &wifiScanDeviceInfo, const ScanLimitType &scanLimitType);
+
+void WriteScanLimitHiSysEvent(const std::string &scanInitiator, const ScanLimitType &scanLimitType,
+    bool isForeground = false);
+
+void WriteAutoConnectFailEvent(const std::string &failReason, const std::string &subReason = "");
 
 void WriteWifiScanHiSysEvent(const int result, const std::string& pkgName);
 
@@ -96,8 +117,6 @@ void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason);
 
 void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server);
 
-void WriteWifiConnectFailedEventHiSysEvent(int operateType);
-
 void WriteP2pKpiCountHiSysEvent(int eventType);
 
 void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes);
@@ -110,7 +129,9 @@ void WriteIsInternetHiSysEvent(int isInternet);
 
 void WriteSoftApConnectFailHiSysEvent(int errorCnt);
 
-void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason);
+void WriteWifiScanApiFailHiSysEvent(const WifiScanDeviceInfo &scanDeviceInfo, const WifiScanFailReason failReason);
+
+void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, const WifiScanFailReason failReason);
 
 void WriteWifiEncryptionFailHiSysEvent(int event, const std::string &maskSsid,
     const std::string &keyMgmt, int encryptedModule);
@@ -121,7 +142,9 @@ void WriteArpInfoHiSysEvent(uint64_t arpRtt, int arpFailedCount);
 
 void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed);
 
-void WirteConnectTypeHiSysEvent(std::string connectType);
+void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect = false);
+
+void WriteStaConnectIface(const std::string &ifName);
 
 void WriteWifiWpaStateHiSysEvent(int state);
 

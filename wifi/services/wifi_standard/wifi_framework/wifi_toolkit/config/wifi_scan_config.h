@@ -33,6 +33,16 @@ public:
 
     ScanMode GetAppRunningState();
 
+    void SetScanType(ScanType scanType);
+
+    ScanType GetScanType();
+
+    void SetScanInitiatorUid(int initiatorUid);
+
+    int GetScanInitiatorUid();
+
+    WifiScanDeviceInfo GetScanDeviceInfo();
+
     void SetStaScene(const int &scene);
 
     void SetStaSceneForbidCount(int count);

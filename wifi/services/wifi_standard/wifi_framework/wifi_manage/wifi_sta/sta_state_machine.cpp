@@ -1188,7 +1188,6 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
     }
-    WriteWifiConnectionInfoHiSysEvent(networkId);
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
         LOGE("GetDeviceConfig failed!");
@@ -1207,12 +1206,9 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
             return;
         }
     }
-    std::string connectType = config.lastConnectTime <= 0 ? "FIRST_CONNECT" :
-        connTriggerMode == NETWORK_SELECTED_BY_AUTO ? "AUTO_CONNECT" :
-        connTriggerMode == NETWORK_SELECTED_BY_USER ? "SELECT_CONNECT" : "";
-    if (!connectType.empty()) {
-        WirteConnectTypeHiSysEvent(connectType);
-    }
+    WriteWifiConnectionInfoHiSysEvent(networkId);
+    WriteConnectTypeHiSysEvent(connTriggerMode, config.lastConnectTime <= 0);
+    WriteStaConnectIface(m_instId == INSTID_WLAN0 ? "wlan0" : "wlan1");
     SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     SaveLinkstate(ConnState::CONNECTING, DetailedState::CONNECTING);
     networkStatusHistoryInserted = false;
@@ -1255,6 +1251,7 @@ void StaStateMachine::DealConnectTimeOutCmd(InternalMessagePtr msg)
     InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTING_TIMEOUT, linkedInfo);
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, linkedInfo);
     linkedInfo.ssid = "";
+    WriteAssocFailHiSysEvent("WPA_TIMEOUT");
 }
 
 bool StaStateMachine::CheckRoamingBssidIsSame(std::string bssid)
@@ -1557,7 +1554,7 @@ void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
-    WirteConnectTypeHiSysEvent("REASSOC");
+    WriteConnectTypeHiSysEvent(NETWORK_SELECTED_BY_REASSOC);
     if (WifiStaHalInterface::GetInstance().Reassociate() == WIFI_HAL_OPT_OK) {
         /* Callback result to InterfaceService */
         InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, linkedInfo);
@@ -1737,6 +1734,7 @@ void StaStateMachine::DealStartRoamCmd(InternalMessagePtr msg)
     }
     std::string bssid = msg->GetStringFromMessage();
     targetRoamBssid = bssid;
+    WriteConnectTypeHiSysEvent(NETWORK_SELECTED_BY_ROAM);
     WIFI_LOGI("%{public}s target bssid:%{public}s,", __FUNCTION__, MacAnonymize(linkedInfo.bssid).c_str());
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, targetRoamBssid, ifaceName)
@@ -3108,6 +3106,7 @@ void StaStateMachine::GetIpState::GoInState()
             return;
         }
     } while (0);
+    WriteDhcpFailHiSysEvent("DHCP_TIMEOUT");
     WIFI_LOGE("Dhcp connection failed, isRoam:%{public}d", pStaStateMachine->isRoam);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
@@ -4253,6 +4252,7 @@ void StaStateMachine::DealGetDhcpIpTimeout(InternalMessagePtr msg)
                                                                  DisabledReason::DISABLED_DHCP_FAILURE);
     StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     DisConnectProcess();
+    WriteDhcpFailHiSysEvent("DHCP_TIMEOUT");
 }
 
 void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
@@ -4403,7 +4403,6 @@ void StaStateMachine::DhcpResultNotify::OnSuccess(int status, const char *ifname
         result->strOptRouter1, result->strOptRouter2, result->strOptDns1, result->strOptDns2, result->strOptVendor,
         result->uOptLeasetime, result->uAddTime, result->uGetTime, pStaStateMachine->currentTpType);
 
-    WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DHCP_SUCCESS));
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_DHCP),
         static_cast<int>(WifiOperateState::STA_DHCP_SUCCESS));
     if (result->iptype == 0) { /* 0-ipv4,1-ipv6 */
@@ -4613,7 +4612,7 @@ void StaStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname,
     }
     LOGI("Enter DhcpResultNotify::OnFailed. ifname=%{public}s, status=%{public}d, reason=%{public}s, state=%{public}d",
         ifname, status, reason, static_cast<int>(pStaStateMachine->linkedInfo.detailedState));
-    WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DHCP_FAIL));
+    WriteDhcpFailHiSysEvent("DHCP_FAIL", status);
     pStaStateMachine->OnDhcpResultNotifyEvent(DhcpReturnCode::DHCP_FAIL);
 }
 

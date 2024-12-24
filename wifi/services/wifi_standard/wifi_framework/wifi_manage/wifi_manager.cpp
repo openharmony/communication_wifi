@@ -61,9 +61,6 @@ int WifiManager::Init()
 {
     std::unique_lock<std::mutex> lock(initStatusMutex);
     WifiSettings::GetInstance().SetSystemMode(IsFactoryMode() ? SystemMode::FACTORY_MODE : SystemMode::DEFAULT);
-#ifndef OHOS_ARCH_LITE
-    WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
-#endif
     if (mInitStatus == INIT_OK) {
         WIFI_LOGI("WifiManager already init!");
         return 0;
@@ -83,10 +80,6 @@ int WifiManager::Init()
     WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(
         [this](int status) { this->OnNativeProcessStatusChange(status); });
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
-#ifndef OHOS_ARCH_LITE
-    wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
-    wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
-#endif
     wifiStaManager = std::make_unique<WifiStaManager>();
     wifiScanManager = std::make_unique<WifiScanManager>();
     wifiTogglerManager = std::make_unique<WifiTogglerManager>();
@@ -127,12 +120,20 @@ int WifiManager::Init()
         }
     }
 #ifndef OHOS_ARCH_LITE
-    WifiConfigCenter::GetInstance().SetScreenState(
-        PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
+    InitNdefArchLite();
 #endif
     InitPidfile();
     CheckSapcoExist();
     return 0;
+}
+
+int WifiManager::InitNdefArchLite()
+{
+    WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
+    wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
+    wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
+    WifiConfigCenter::GetInstance().SetScreenState(
+        PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
 }
 
 void WifiManager::Exit()

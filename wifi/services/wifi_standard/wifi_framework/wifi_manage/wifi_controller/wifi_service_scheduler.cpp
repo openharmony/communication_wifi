@@ -283,9 +283,9 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
     }
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
         [this](std::string &destoryIfaceName, int createIfaceType) {
-            this->StaIfaceDestoryCallback(destoryIfaceName,createIfaceType);
+            this->StaIfaceDestoryCallback(destoryIfaceName, createIfaceType);
         },
-        [this](int index, int antRssi) { this->OnRssiReportCallback(index,antRssi); },
+        [this](int index, int antRssi) { this->OnRssiReportCallback(index, antRssi);},
         std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
         ifaceName, instId)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");
@@ -824,7 +824,7 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
     }
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateApIface(
         [this](std::string &destoryIfaceName, int createIfaceType) {
-            this->SoftApIfaceDestoryCallback(destoryIfaceName,createIfaceType);
+            this->SoftApIfaceDestoryCallback(destoryIfaceName, createIfaceType);
         },
         ifaceName)) {
         WIFI_LOGE("AutoStartApService, create iface failed!");

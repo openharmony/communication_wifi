@@ -337,6 +337,19 @@ struct PnoScanIntervalMode {
         fixedScanCount = 0;
     }
 };
+
+enum class WifiScanFailReason {
+    DEFAULT = -1,
+    PROXY_FAIL,
+    PERMISSION_DENIED,
+    SCAN_SERVICE_NOT_RUNNING,
+    SERVICE_SCAN_FAIL,
+    SERVICE_ADVANCE_SCAN_FAIL,
+    HDI_SERVICE_DIED,
+    HDI_SCAN_FAIL,
+    HDI_PNO_SCAN_FAIL,
+    HDI_GET_SCAN_INFOS_FAIL
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

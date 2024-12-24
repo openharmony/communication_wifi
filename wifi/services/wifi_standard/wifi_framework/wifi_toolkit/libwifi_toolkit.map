@@ -152,6 +152,11 @@
           "OHOS::Wifi::WifiScanConfig::SaveScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
           "OHOS::Wifi::WifiScanConfig::SetAppRunningState(OHOS::Wifi::ScanMode)";
           "OHOS::Wifi::WifiScanConfig::GetAppRunningState()";
+          "OHOS::Wifi::WifiScanConfig::SetScanType(OHOS::Wifi::ScanType)";
+          "OHOS::Wifi::WifiScanConfig::GetScanType()";
+          "OHOS::Wifi::WifiScanConfig::SetScanInitiatorUid(int)";
+          "OHOS::Wifi::WifiScanConfig::GetScanInitiatorUid()";
+          "OHOS::Wifi::WifiScanConfig::GetScanDeviceInfo()";
           "OHOS::Wifi::WifiScanConfig::SetStaScene(int const&)";
           "OHOS::Wifi::WifiScanConfig::SetStaSceneForbidCount(int)";
           "OHOS::Wifi::WifiScanConfig::GetStaSceneForbidCount()";

@@ -238,6 +238,7 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
 ErrCode ScanService::Scan(ScanType scanType)
 {
     WIFI_LOGI("Enter Scan, scanType:%{public}d.\n", static_cast<int>(scanType));
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(scanType);
     if (!scanStartedFlag) {
         WIFI_LOGE("Scan service has not started.\n");
         return WIFI_OPT_FAILED;
@@ -278,7 +279,7 @@ ErrCode ScanService::Scan(ScanType scanType)
 ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanType)
 {
     WIFI_LOGI("Enter ScanWithParam, freqs num:%{public}d.\n", (int)params.freqs.size());
-
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(scanType);
     if (!scanStartedFlag) {
         WIFI_LOGE("Scan service has not started.\n");
         return WIFI_OPT_FAILED;
@@ -349,6 +350,8 @@ ErrCode ScanService::ScanControlInner(ScanType scanType)
     } else {
         if (!AllowScanByDisableScanCtrl()) {
             WIFI_LOGW("internal scan not allow by disable scan control.");
+            WriteScanLimitHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+                ScanLimitType::SCAN_DISABLE);
             return WIFI_OPT_FAILED;
         }
         if (!AllowScanByHid2dState()) {
@@ -916,6 +919,7 @@ void ScanService::ReportStoreScanInfos(std::vector<InterScanInfo> &interScanList
 bool ScanService::BeginPnoScan()
 {
     WIFI_LOGI("Enter BeginPnoScan.\n");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(ScanType::SCAN_TYPE_PNO);
 
     if (isPnoScanBegined) {
         WIFI_LOGI("PNO scan has started.\n");
@@ -1259,6 +1263,7 @@ void ScanService::StopSystemScan()
 void ScanService::StartSystemTimerScan(bool scanAtOnce)
 {
     WIFI_LOGI("Enter StartSystemTimerScan, scanAtOnce: %{public}d.", scanAtOnce);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(ScanType::SCAN_TYPE_SYSTEMTIMER);
     ErrCode rlt = AllowScanByType(ScanType::SCAN_TYPE_SYSTEMTIMER);
     if (rlt == WIFI_OPT_FAILED) {
         return;
@@ -1402,11 +1407,15 @@ ErrCode ScanService::AllowExternScan()
 
     if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_ORIGIN, scanMode)) {
         WIFI_LOGW("extern scan not allow by origin interval mode");
+        WriteScanLimitHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::INTERVAL);
         return WIFI_OPT_FAILED;
     }
 
     if (!AllowScanByDisableScanCtrl()) {
         WIFI_LOGW("extern scan not allow by disable scan control.");
+        WriteScanLimitHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::SCAN_DISABLE);
         return WIFI_OPT_FAILED;
     }
 
@@ -1420,22 +1429,26 @@ ErrCode ScanService::AllowSystemTimerScan()
 
     if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
         WIFI_LOGW("system timer scan not allow when wifi disable");
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::WIFI_DISABLE);
         return WIFI_OPT_FAILED;
     }
     if (!AllowScanByDisableScanCtrl()) {
         WIFI_LOGW("system timer scan not allow by disable scan control.");
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::SCAN_DISABLE);
         return WIFI_OPT_FAILED;
     }
     /* The network is connected and cannot be automatically switched. */
     autoNetworkSelection = WifiSettings::GetInstance().GetWhetherToAllowNetworkSwitchover(m_instId);
     if ((staStatus == static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) && (!autoNetworkSelection)) {
         WIFI_LOGW("system timer scan not allowed for CONNECT_AP_CONNECTED");
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::CANNOT_SWITCH_AP);
         return WIFI_OPT_FAILED;
     }
 
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) &&
         staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
         WIFI_LOGW("system timer scan not allowed for staStatus: %{public}d.", staStatus);
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::STA_STATE);
         return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
@@ -1443,6 +1456,7 @@ ErrCode ScanService::AllowSystemTimerScan()
     /* Determines whether to allow scanning based on the STA status. */
     if (staScene == SCAN_SCENE_MAX) {
         WIFI_LOGW("system timer scan not allowed for invalid staScene: %{public}d", staScene);
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::STA_STATE);
         return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
@@ -1453,11 +1467,13 @@ ErrCode ScanService::AllowSystemTimerScan()
 
     if (!AllowScanDuringStaScene(staScene, ScanMode::SYSTEM_TIMER_SCAN)) {
         WIFI_LOGW("system timer scan not allowed, staScene: %{public}d", staScene);
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::DURING_STA);
         return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
     if (!AllowScanDuringCustomScene(ScanMode::SYSTEM_TIMER_SCAN)) {
         WIFI_LOGW("system timer scan not allowed");
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::CUSTOM_SCENE);
         return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
@@ -1466,6 +1482,7 @@ ErrCode ScanService::AllowSystemTimerScan()
         systemScanIntervalMode.scanIntervalMode.count);
 #else
     if (!AllowScanByMovingFreeze(ScanMode::SYSTEM_TIMER_SCAN)) {
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::MOVING_FREEZE);
         return WIFI_OPT_MOVING_FREEZE_CTRL;
     }
 
@@ -1477,6 +1494,7 @@ ErrCode ScanService::AllowSystemTimerScan()
                 iter->isSingle == false) {
                 if (!SystemScanByInterval(systemScanIntervalMode.expScanCount,
                     systemScanIntervalMode.scanIntervalMode.interval, systemScanIntervalMode.scanIntervalMode.count)) {
+                    WriteScanLimitHiSysEvent(SCAN_INITIATOR_SYSTEM_SCAN, ScanLimitType::INTERVAL);
                     return WIFI_OPT_FAILED;
                 }
             }
@@ -1493,10 +1511,12 @@ ErrCode ScanService::AllowPnoScan()
 
     if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
         WIFI_LOGW("pnoScan not allow when wifi disable");
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_PNO_SCAN, ScanLimitType::WIFI_DISABLE);
         return WIFI_OPT_FAILED;
     }
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
         WIFI_LOGE("NOT allow PNO scan for staStatus: %{public}d", staStatus);
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_PNO_SCAN, ScanLimitType::STA_STATE);
         return WIFI_OPT_FAILED;
     }
 
@@ -1507,14 +1527,17 @@ ErrCode ScanService::AllowPnoScan()
     int staScene = GetStaScene();
     if (staScene == SCAN_SCENE_MAX) {
         WIFI_LOGE("NOT allow PNO scan for staScene: %{public}d", staScene);
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_PNO_SCAN, ScanLimitType::STA_STATE);
         return WIFI_OPT_FAILED;
     }
     if (!AllowScanDuringStaScene(staScene, ScanMode::PNO_SCAN)) {
         WIFI_LOGW("pnoScan is not allowed for forbid map, staScene is %{public}d", staScene);
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_PNO_SCAN, ScanLimitType::DURING_STA);
         return WIFI_OPT_FAILED;
     }
     if (!AllowScanDuringCustomScene(ScanMode::PNO_SCAN)) {
         WIFI_LOGD("pnoScan is not allowed for forbid map");
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_PNO_SCAN, ScanLimitType::CUSTOM_SCENE);
         return WIFI_OPT_FAILED;
     }
 
@@ -1530,6 +1553,7 @@ ErrCode ScanService::AllowPnoScan()
                 if (!PnoScanByInterval(pnoScanIntervalMode.fixedScanCount, pnoScanIntervalMode.fixedCurrentTime,
                     pnoScanIntervalMode.scanIntervalMode.interval, pnoScanIntervalMode.scanIntervalMode.count)) {
                     WIFI_LOGW("pnoScan is not allowed for interval mode");
+                    WriteScanLimitHiSysEvent(SCAN_INITIATOR_PNO_SCAN, ScanLimitType::INTERVAL);
                     return WIFI_OPT_FAILED;
                 }
             }
@@ -1539,6 +1563,7 @@ ErrCode ScanService::AllowPnoScan()
 
     if (!AllowScanByDisableScanCtrl()) {
         WIFI_LOGW("pnoScan not allow by disable scan control.");
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_PNO_SCAN, ScanLimitType::SCAN_DISABLE);
         return WIFI_OPT_FAILED;
     }
 
@@ -1556,11 +1581,13 @@ ErrCode ScanService::AllowWifiProScan()
     int state = WifiConfigCenter::GetInstance().GetScreenState();
     if (state == MODE_STATE_CLOSE) {
         WIFI_LOGW("internal scan not allow by Screen Off");
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_WIFIPRO, ScanLimitType::SCREEN_OFF);
         return WIFI_OPT_FAILED;
     }
  
     if (staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
         WIFI_LOGW("NOT allow scan for staStatus: %{public}d", staStatus);
+        WriteScanLimitHiSysEvent(SCAN_INITIATOR_WIFIPRO, ScanLimitType::STA_STATE);
         return WIFI_OPT_FAILED;
     }
  
@@ -1670,6 +1697,7 @@ ErrCode ScanService::ApplyTrustListPolicy(ScanType scanType)
     ErrCode policyResult = WIFI_OPT_SUCCESS;
 
     SetScanTrustMode();
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(scanType);
     policyResult = AllowScanByType(scanType);
     if (policyResult != WIFI_OPT_SUCCESS) {
         WIFI_LOGW("AllowScanByType failed.");
@@ -1938,6 +1966,7 @@ void ScanService::SetStaCurrentTime()
 
     int state = WifiConfigCenter::GetInstance().GetScreenState();
     if (state == MODE_STATE_CLOSE) {
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(ScanType::SCAN_TYPE_PNO);
         if (AllowScanByType(ScanType::SCAN_TYPE_PNO) != WIFI_OPT_SUCCESS) {
             EndPnoScan();
             pnoScanFailedNum = 0;
@@ -2421,18 +2450,28 @@ bool ScanService::AllowScanByHid2dState()
     // scene & 0x07 > 0 means one of them takes effect.
     if ((softbusScene.scene & 0x07) > 0) {
         WIFI_LOGW("Scan is not allowed in softbus hid2d.");
+        WriteScanLimitHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::HID2D_SOFTBUS);
         return false;
     } else if ((castScene.scene & 0x07) > 0) {
         WIFI_LOGW("Scan is not allowed in csat hid2d.");
+        WriteScanLimitHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::HID2D_CAST);
         return false;
     } else if ((miracastScene.scene & 0x07) > 0) {
         WIFI_LOGW("Scan is not allowed in miracast hid2d.");
+        WriteScanLimitHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::HID2D_MIRACAST);
         return false;
     } else if ((shareScene.scene & 0x07) > 0) {
         WIFI_LOGW("Scan is not allowed in share hid2d.");
+        WriteScanLimitHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::HID2D_SHARE);
         return false;
     } else if ((mouseCrossScene.scene & 0x07) > 0) {
         WIFI_LOGW("Scan is not allowed in mouse cross hid2d.");
+        WriteScanLimitHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::HID2D_CROSS);
         return false;
     } else {
         WIFI_LOGD("allow hid2d scan");

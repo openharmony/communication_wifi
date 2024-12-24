@@ -415,12 +415,9 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     bool isUpdate = false;
     std::string bssid;
     std::string userSelectbssid = config.bssid;
-    int status = config.status;
     WifiDeviceConfig tempDeviceConfig;
     tempDeviceConfig.instanceId = config.instanceId;
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
-        netWorkId = tempDeviceConfig.networkId;
-        status = tempDeviceConfig.status;
         if (m_instId == INSTID_WLAN0) {
             CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
             bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
@@ -436,7 +433,6 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     tempDeviceConfig.numAssociation = 0;
     tempDeviceConfig.instanceId = m_instId;
     tempDeviceConfig.networkId = netWorkId;
-    tempDeviceConfig.status = status;
     tempDeviceConfig.userSelectBssid = userSelectbssid;
     if (!bssid.empty()) {
         tempDeviceConfig.bssid = bssid;

@@ -94,7 +94,6 @@ static void PrintfDeviceConfigs(vector<WifiDeviceConfig> &configs)
         ss << " ssid:" << config.ssid << endl;
         ss << " bssid:" << config.bssid << endl;
         ss << " keyMgmt:" << config.keyMgmt << endl;
-        ss << " status:" << config.status << endl;
         idx++;
     }
     Logd("%s", ss.str().c_str());

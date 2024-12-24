@@ -334,7 +334,6 @@ public:
 #endif
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
-        void UpdateWifi7WurInfo();
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -549,7 +548,6 @@ public:
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
-    void DealMloStateChange(InternalMessagePtr msg);
     void DealNetworkRemoved(InternalMessagePtr msg);
     void DealCsaChannelChanged(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE

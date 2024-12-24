@@ -2845,7 +2845,7 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     }
 }
 
-ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
+ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const
 {
     WIFI_LOGI("Enter ConvertDeviceCfg.\n");
     WifiHalDeviceConfig halDeviceConfig;
@@ -2855,7 +2855,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config) const
         halDeviceConfig.authAlgorithms = 0x02;
     }
 
-    if (IsWpa3Transition(config.ssid)) {
+    if (IsWpa3Transition(config.ssid, bssid)) {
         if (IsInWpa3BlackMap(config.ssid)) {
             halDeviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
         } else {
@@ -3427,7 +3427,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         WIFI_LOGE("StartConnectToNetwork GetNextNetworkId failed!");
         return WIFI_OPT_FAILED;
     }
-    ConvertDeviceCfg(deviceConfig);
+    ConvertDeviceCfg(deviceConfig, bssid);
     if (bssid.empty()) {
         // user select connect
         WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
@@ -3558,7 +3558,7 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
         WIFI_LOGE("OnWifiWpa3SelfCure, get deviceconfig failed");
         return;
     }
-    if (!IsWpa3Transition(config.ssid)) {
+    if (!IsWpa3Transition(config.ssid, config.bssid)) {
         WIFI_LOGE("OnWifiWpa3SelfCure, is not wpa3 transition");
         return;
     }
@@ -3580,15 +3580,25 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
     SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
 }
 
-bool StaStateMachine::IsWpa3Transition(std::string ssid) const
+bool StaStateMachine::IsWpa3Transition(std::string ssid, , std::string bssid) const
 {
     std::vector<WifiScanInfo> scanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto scanInfo : scanInfoList) {
-        if ((ssid == scanInfo.ssid) &&
-            (scanInfo.capabilities.find("PSK+SAE") != std::string::npos)) {
-            WIFI_LOGI("IsWpa3Transition, check is transition");
-            return true;
+        if (ssid != scanInfo.ssid) {
+            continue;
+        }
+        if (bssid.empty()) {
+            if (scanInfo.capabilities.find("PSK+SAE") != std::string::npos) {
+                LOGI("IsWpa3Transition, check is transition ");
+                return true;
+            }
+        } else {
+            if ((bssid == scanInfo.bssid) &&
+                (scanInfo.capabilities.find("PSK+SAE") != std::string::npos)) {
+                LOGI("IsWpa3Transition, check is transition bssid same");
+                return true;
+            }
         }
     }
     return false;

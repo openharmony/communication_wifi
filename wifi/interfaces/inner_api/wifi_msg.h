@@ -43,6 +43,7 @@ namespace Wifi {
 #define WIFI_PASSWORD_LEN 128
 #define MAX_PID_LIST_SIZE 128
 #define REGISTERINFO_MAX_NUM 1000
+#define WIFI_MAX_MLO_LINK_NUM 2
 
 inline const std::string KEY_MGMT_NONE = "NONE";
 inline const std::string KEY_MGMT_WEP = "WEP";

@@ -767,5 +767,19 @@ WifiErrorNo WifiStaHalInterface::RegisterNativeProcessCallback(const std::functi
 #endif
     return WIFI_HAL_OPT_OK;
 }
+
+WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &ifName,
+    std::vector<WifiLinkedInfo> &mloLinkInfo)
+{
+    if (ifName.length() <= 0) {
+        return WIFI_HAL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->GetMloLinkedInfo(ifName, mloLinkInfo);
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
 }  // namespace Wifi
 }  // namespace OHOS

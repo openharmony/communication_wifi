@@ -37,10 +37,10 @@ void InvitationRequestState::GoInState()
 
         p2pStateMachine.BroadcastP2pPeersChanged();
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_SUCCESS);
-    } else {
-        WIFI_LOGE("Invitation failed.");
-        p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
-        p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
+            } else {
+                WIFI_LOGE("Invitation failed.");
+                p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
+                p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     }
 }
 

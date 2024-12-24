@@ -44,7 +44,7 @@ unsigned int IpTools::ConvertIpv4Address(const std::string &address)
             break;
         }
         std::string value = tmpAddress.substr(0, npos);
-        unsigned int tmp = CheckDataLegal(value);
+        unsigned int tmp = CheckDataToUint(value);
         if ((tmp < MIN_BYTE) || (tmp > MAX_BYTE)) {
             break;
         }

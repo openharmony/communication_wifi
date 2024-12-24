@@ -70,33 +70,23 @@ int WifiManager::Init()
         WIFI_LOGE("WifiCommonServiceManager Init failed!");
         return -1;
     }
-
     if (WifiServiceManager::GetInstance().Init() < 0) {
         WIFI_LOGE("WifiServiceManager Init failed!");
         mInitStatus = SERVICE_MANAGER_INIT_FAILED;
         return -1;
     }
-
     WifiStaHalInterface::GetInstance().RegisterNativeProcessCallback(
         [this](int status) { this->OnNativeProcessStatusChange(status); });
     mCloseServiceThread = std::make_unique<WifiEventHandler>("CloseServiceThread");
     wifiStaManager = std::make_unique<WifiStaManager>();
     wifiScanManager = std::make_unique<WifiScanManager>();
     wifiTogglerManager = std::make_unique<WifiTogglerManager>();
-#ifdef FEATURE_AP_SUPPORT
-    wifiHotspotManager = std::make_unique<WifiHotspotManager>();
-#endif
-#ifdef FEATURE_P2P_SUPPORT
-    wifiP2pManager = std::make_unique<WifiP2pManager>();
-#endif
-
     if (WifiServiceManager::GetInstance().CheckPreLoadService() < 0) {
         WIFI_LOGE("WifiServiceManager check preload feature service failed!");
         WifiManager::GetInstance().Exit();
         return -1;
     }
     mInitStatus = INIT_OK;
-
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && !std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH) &&
         !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
         if (IsStartUpWifiEnableSupport()) {
@@ -104,6 +94,14 @@ int WifiManager::Init()
             WifiConfigCenter::GetInstance().SetPersistWifiState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         }
     }
+    InitPart1();
+    InitPidfile();
+    CheckSapcoExist();
+    return 0;
+}
+
+int WifiManager::InitPart1()
+{
     int lastState = WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0);
     if (lastState != WIFI_STATE_DISABLED && WifiSettings::GetInstance().GetSystemMode() != SystemMode::FACTORY_MODE) {
         /* Automatic startup upon startup */
@@ -120,20 +118,18 @@ int WifiManager::Init()
         }
     }
 #ifndef OHOS_ARCH_LITE
-    InitNdefArchLite();
-#endif
-    InitPidfile();
-    CheckSapcoExist();
-    return 0;
-}
-
-int WifiManager::InitNdefArchLite()
-{
     WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
     wifiEventSubscriberManager = std::make_unique<WifiEventSubscriberManager>();
     wifiMultiVapManager = std::make_unique<WifiMultiVapManager>();
     WifiConfigCenter::GetInstance().SetScreenState(
         PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
+#endif
+#ifdef FEATURE_AP_SUPPORT
+    wifiHotspotManager = std::make_unique<WifiHotspotManager>();
+#endif
+#ifdef FEATURE_P2P_SUPPORT
+    wifiP2pManager = std::make_unique<WifiP2pManager>();
+#endif
 }
 
 void WifiManager::Exit()

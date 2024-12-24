@@ -256,6 +256,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
     linkedInfo.isMloConnected = false;
     linkedInfo.isWurEnable = false;
+    linkedInfo.isHilinkNetwork = false;
 }
 
 /* --------------------------- state machine Init State ------------------------------ */
@@ -1806,7 +1807,11 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
-        InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
+        if (linkedInfo.isHilinkNetwork) {
+            InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
+        } else {
+            InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
+        }
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
 #ifndef OHOS_ARCH_LITE
@@ -1899,6 +1904,16 @@ void StaStateMachine::LinkedState::GoInState()
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+    std::vector<WifiScanInfo> wifiScanInfoList;
+    WifiConfigCenter::GetInstance(),GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
+    for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
+        if (iter->bssid == pStaStateMachine->linkedInfo.bssid) {
+            pStaStateMachine->linkedInfo.isHilinkNetwork = iter->isHilinkNetwork;
+            WIFI_LOGI("set hilink=%{public}d, bssid=%{public}s", iter->isHilinkNetwork,
+                MacAnonymize(pStaStateMachine->linkedInfo.bssid).c_str());
+            break;
+        }
+    }
     return;
 }
 
@@ -3403,6 +3418,7 @@ void StaStateMachine::HilinkSaveConfig(void)
     WifiSettings::GetInstance().SyncDeviceConfig();
 
     WifiConfigCenter::GetInstance().SetMacAddress(m_hilinkDeviceConfig.macAddress, m_instId);
+    linkedInfo.isHilinkNetwork = true;
     m_hilinkFlag = false;
 }
 

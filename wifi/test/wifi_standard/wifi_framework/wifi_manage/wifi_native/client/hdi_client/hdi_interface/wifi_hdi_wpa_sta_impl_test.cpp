@@ -381,3 +381,4 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaGetMloLinkedInfoTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 }
+}

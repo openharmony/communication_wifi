@@ -134,6 +134,15 @@ enum ConnState {
     UNKNOWN
 };
 
+enum class MloState {
+    SINGLE_RADIO = 0,
+    WIFI7_MLSR = 1,
+    WIFI7_EMLSR = 2,
+    WIFI7_STR = 3,
+
+    WIFI7_INVALID = 0xFF,
+};
+
 enum class DisconnectedReason {
     /* Default reason */
     DISC_REASON_DEFAULT = 0,
@@ -214,6 +223,7 @@ struct WifiLinkedInfo {
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
+    MloState mloState; /* MLO connected state */
     int wifiStandard;                /* wifi standard */
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
@@ -225,6 +235,7 @@ struct WifiLinkedInfo {
     WifiCategory supportedWifiCategory;
     bool isMloConnected;
     bool isHiLinkNetwork;
+    bool isWurEnable;
     int c0Rssi;
     int c1Rssi;
     WifiLinkedInfo()
@@ -245,6 +256,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
+        mloState = MloState::SINGLE_RADIO;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
@@ -256,6 +268,7 @@ struct WifiLinkedInfo {
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         isMloConnected = false;
+        isWurEnable = false;
         c0Rssi = 0;
         c1Rssi = 0;
     }
@@ -879,6 +892,11 @@ struct EapSimUmtsAuthParam {
         rand = "";
         autn = "";
     }
+};
+
+struct MloStateParam {
+    uint8_t mloState;
+    uint16_t reasonCode;
 };
 
 typedef enum {

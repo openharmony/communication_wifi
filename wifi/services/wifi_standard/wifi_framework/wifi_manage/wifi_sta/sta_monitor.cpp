@@ -155,6 +155,9 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         case static_cast<int>(WpaEventCallback::CSA_CHSWITCH_NUM):
             OnWpaCsaChannelSwitchNotifyCallBack(data);
             break;
+        case static_cast<int>(WpaEventCallback::MLO_STATE_NUM):
+            OnWpaMloStateNotifyCallBack(data);
+            break;
         default:
             WIFI_LOGI("OnWpaStaNotifyCallBack() undefine event:%{public}d", num);
             break;
@@ -336,6 +339,36 @@ void StaMonitor::OnWpaCsaChannelSwitchNotifyCallBack(const std::string &notifyPa
     }
     std::string data = notifyParam.substr(freqPos + strlen(WPA_CSA_CHANNEL_SWITCH_FREQ_PREFIX));
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT, CheckDataLegal(data));
+}
+
+void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
+{
+    WIFI_LOGD("%{public}s notifyParam=%{public}s", __FUNCTION__, notifyParam.c_str());
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s The statemachine pointer is null.", __FUNCTION__);
+        return;
+    }
+
+    std::string::size_type begPos = 0;
+    if ((begPos = notifyParam.find(":")) == std::string::npos) {
+        WIFI_LOGE("%{public}s notifyParam not find :", __FUNCTION__);
+        return;
+    }
+    std::string mloStateStr = notifyParam.substr(0, begPos);
+    std::string reasonCodeStr = notifyParam.substr(begPos + 1);
+    if (reasonCodeStr.empty()) {
+        WIFI_LOGE("%{public}s reasonCodeStr is empty", __FUNCTION__);
+        return;
+    }
+
+    MloStateParam mloParam = {0};
+    mloParam.mloState = CheckDataToUint(mloStateStr);
+    mloParam.reasonCode = CheckDataToUint(reasonCodeStr);
+    WIFI_LOGI("%{public}s mloState:%{public}u reasonCode:%{public}u", __FUNCTION__,
+        mloParam.mloState, mloParam.reasonCode);
+
+    /* Notify sta state machine mlo state changed event. */
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_MLO_WORK_STATE_EVENT, mloParam);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -465,7 +465,7 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
 
     sptr<IChipIface> &iface = iter->second;
     CHECK_NULL_AND_RETURN(iface, false);
-    if (!SetNetworkUpDown(ifaceName, false)) {
+    if (iface->SetIfaceState(false) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network down fail");
         return false;
     }
@@ -473,7 +473,7 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
     if (ret != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, call SetMacAddress failed! ret:%{public}d", ret);
     }
-    if (!SetNetworkUpDown(ifaceName, true)) {
+    if (iface->SetIfaceState(true) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network up fail");
         return false;
     }
@@ -484,6 +484,10 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
 
 IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
 {
+    if (ifaceName.empty()) {
+        LOGE("find iface is empty");
+        return nullptr;
+    }
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter != mIWifiStaIfaces.end()) {
         LOGE("find sta iface info");
@@ -504,6 +508,7 @@ IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
 
 bool HalDeviceManager::SetNetworkUpDown(const std::string &ifaceName, bool upDown)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     IChipIface *iface = FindIface(ifaceName);
     if (iface == nullptr) {
         return false;
@@ -734,7 +739,7 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
 
     sptr<IChipIface> &iface = iter->second;
     CHECK_NULL_AND_RETURN(iface, false);
-    if (!SetNetworkUpDown(ifaceName, false)) {
+    if (iface->SetIfaceState(false) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network down fail");
         return false;
     }
@@ -742,7 +747,7 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     if (ret != HDF_SUCCESS) {
         LOGE("SetApMacAddress, call SetMacAddress failed! ret:%{public}d", ret);
     }
-    if (!SetNetworkUpDown(ifaceName, true)) {
+    if (iface->SetIfaceState(true) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network up fail");
         return false;
     }

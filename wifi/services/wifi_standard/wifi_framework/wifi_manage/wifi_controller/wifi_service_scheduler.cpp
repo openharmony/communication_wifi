@@ -286,7 +286,9 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
             this->StaIfaceDestoryCallback(destoryIfaceName, createIfaceType);
         },
         [this](int index, int antRssi) { this->OnRssiReportCallback(index, antRssi);},
-        std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
+        [this](int type, const std::vector<uint8_t>& recvMsg) {
+            this->OnNetlinkReportCallback(type, recvMsg);
+        },
         ifaceName, instId)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -405,7 +407,9 @@ ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
             this->StaIfaceDestoryCallback(destoryIfaceName, createIfaceType);
         },
         [this](int index, int antRssi) { this->OnRssiReportCallback(index, antRssi);},
-        std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
+        [this](int type, const std::vector<uint8_t>& recvMsg) {
+            this->OnNetlinkReportCallback(type, recvMsg);
+        },
         ifaceName, instId)) {
         WIFI_LOGE("PreStartWifi, create iface failed!");
         return WIFI_OPT_FAILED;

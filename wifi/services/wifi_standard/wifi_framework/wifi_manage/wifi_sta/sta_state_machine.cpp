@@ -3227,8 +3227,7 @@ int StaStateMachine::UpdateLinkInfoRssi(int inRssi)
 
 void StaStateMachine::DealSignalPollResult()
 {
-    WIFI_LOGD("enter SignalPoll.");
-    WifiHalWpaSignalInfo signalInfo;
+    WifiSignalPollInfo signalInfo;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(
         WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), linkedInfo.bssid, signalInfo);
     if (ret != WIFI_HAL_OPT_OK) {
@@ -3255,7 +3254,6 @@ void StaStateMachine::DealSignalPollResult()
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
-
     WIFI_LOGI("SignalPoll,bssid:%{public}s,ssid:%{public}s,networkId:%{public}d,band:%{public}d,freq:%{public}d,"
         "rssi:%{public}d,noise:%{public}d,chload:%{public}d,snr:%{public}d,ulDelay:%{public}d,txLinkSpeed:%{public}d,"
         "rxLinkSpeed:%{public}d,txBytes:%{public}d,rxBytes:%{public}d,txFailed:%{public}d,txPackets:%{public}d,"
@@ -3267,11 +3265,15 @@ void StaStateMachine::DealSignalPollResult()
         signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets, linkedInfo.wifiStandard,
         linkedInfo.maxSupportedRxLinkSpeed, linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.connState,
         linkedInfo.detailedState, lastSignalLevel_, signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
-
-    WriteLinkInfoHiSysEvent(lastSignalLevel_, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
+    
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
-
+#ifndef OHOS_ARCH_LITE
+    if (enhanceService_ != nullptr) {
+        enhanceService_->SetEnhanceSignalPollInfo(signalInfo);
+    }
+#endif
+    WriteLinkInfoHiSysEvent(lastSignalLevel_, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
@@ -3279,7 +3281,7 @@ void StaStateMachine::DealSignalPollResult()
     }
 }
 
-void StaStateMachine::UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo)
+void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo)
 {
     int currentSignalLevel = 0;
     if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {

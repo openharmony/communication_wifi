@@ -814,7 +814,7 @@ WifiErrorNo WifiIdlClient::ReqSetRoamConfig(const WifiHalRoamConfig &config)
     return err;
 }
 
-WifiErrorNo WifiIdlClient::ReqGetConnectSignalInfo(const std::string &endBssid, WifiHalWpaSignalInfo &info) const
+WifiErrorNo WifiIdlClient::ReqGetConnectSignalInfo(const std::string &endBssid, WifiSignalPollInfo &info) const
 {
     CHECK_CLIENT_NOT_NULL;
     WpaSignalInfo req = {0};

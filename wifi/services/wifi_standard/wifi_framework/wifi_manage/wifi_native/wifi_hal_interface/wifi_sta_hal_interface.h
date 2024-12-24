@@ -333,7 +333,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,
-        WifiHalWpaSignalInfo &info);
+        WifiSignalPollInfo &info);
 
     /**
      * @Description set power save mode

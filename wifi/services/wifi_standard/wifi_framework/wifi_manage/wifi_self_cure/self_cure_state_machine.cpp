@@ -557,7 +557,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
         }
         return;
     }
-    if (pSelfCureStateMachine_->isHttpReachable_) {
+    if (pSelfCureStateMachine_->IsHttpReachable()) {
         WIFI_LOGI("http is reachable, no need self cure");
         pSelfCureStateMachine_->noTcpRxCounter_ = 0;
         return;

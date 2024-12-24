@@ -4267,6 +4267,14 @@ void StaStateMachine::InvokeOnStaStreamChanged(StreamDirection direction)
 void StaStateMachine::InvokeOnStaRssiLevelChanged(int level)
 {
     std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
+#ifndef OHOS_ARCH_LITE
+    if (selfCureService_ != nullptr) {
+        if (selfCureService_->IsSelfCureL2Connecting()) {
+            WIFI_LOGI("selfcure ignore rssi changed");
+            return;
+        }
+    }
+#endif
     for (const auto &callBackItem : m_staCallback) {
         if (callBackItem.second.OnStaRssiLevelChanged != nullptr) {
             callBackItem.second.OnStaRssiLevelChanged(level, m_instId);

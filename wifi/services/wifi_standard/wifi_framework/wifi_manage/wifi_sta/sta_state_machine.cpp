@@ -3580,7 +3580,7 @@ void StaStateMachine::OnWifiWpa3SelfCure(int failreason, int networkId)
     SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
 }
 
-bool StaStateMachine::IsWpa3Transition(std::string ssid, , std::string bssid) const
+bool StaStateMachine::IsWpa3Transition(std::string ssid, std::string bssid) const
 {
     std::vector<WifiScanInfo> scanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);

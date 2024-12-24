@@ -369,5 +369,16 @@ HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaStaGetScanInfosTest1, TestSize.Level1)
     ScanInfo *result = HdiWpaStaGetScanInfos(&size, ifaceName.c_str());
     EXPECT_EQ(result, NULL);
 }
+
+HWTEST_F(WifiHdiWpaStaImplTest, HdiWpaGetMloLinkedInfoTest, TestSize.Level1)
+{
+    std::string ifaceName = "wlan0";
+    char staParam[] = "MLO_STATUS";
+    char staData[WIFI_MAX_WPA_STA_BUF_SIZE] = {0};
+    uint32_t staDataLen = WIFI_MAX_WPA_STA_BUF_SIZE;
+    WifiErrorNo result = HdiWpaGetMloLinkedInfo(ifaceName.c_str(), staParam, staData,
+        staDataLen);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
 }
 }

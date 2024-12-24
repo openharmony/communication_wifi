@@ -966,6 +966,7 @@ void StaStateMachine::ApLinkingState::HandleStaBssidChangedEvent(InternalMessage
 #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
+    pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     /* BSSID change is not received during roaming, only set BSSID */
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
@@ -1134,7 +1135,7 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
         pStaStateMachine->selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_CONN_CHANGED);
     }
     #endif
-
+    pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
     if (pStaStateMachine->m_instId == INSTID_WLAN0) {
         pStaStateMachine->mConnectFailedCnt = 0;
@@ -1161,6 +1162,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
+    pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     /* BSSID change is not received during roaming, only set BSSID */
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
@@ -1935,6 +1937,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             pStaStateMachine->UpdateWifiCategory();
             pStaStateMachine->SetSupportedWifiCategory();
 #endif
+            pStaStateMachine->DealMloConnectionLinkInfo();
             WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo,
                 pStaStateMachine->m_instId);
             break;
@@ -3127,6 +3130,23 @@ bool StaStateMachine::IsGoodSignalQuality()
     }
     return isGoodSignal;
 }
+
+void StaStateMachine::DealMloConnectionLinkInfo()
+{
+    if (linkedInfo.supportedWifiCategory != WifiCategory::WIFI7
+        && linkedInfo.supportedWifiCategory != WifiCategory::WIFI7_PLUS) {
+        WIFI_LOGI("%{public}s not support wifi7", __FUNCTION__);
+        return;
+    }
+    std::vector<WifiLinkedInfo> mloLinkedInfo;
+    std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (WifiStaHalInterface::GetInstance().GetConnectionMloLinkedInfo(ifname, mloLinkedInfo) != 0) {
+        WIFI_LOGI("%{public}s GetConnectionMloLinkedInfo from wpas fail", __FUNCTION__);
+        return;
+    }
+    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
+}
+
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::UpdateWifiCategory()
 {

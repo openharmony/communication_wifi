@@ -116,6 +116,10 @@ public:
 
     int SaveLinkedInfo(const WifiLinkedInfo &info, int instId = 0);
 
+    int GetMloLinkedInfo(std::vector<WifiLinkedInfo> &mloInfo, int instId = 0);
+
+    int SaveMloLinkedInfo(const std::vector<WifiLinkedInfo> &mloInfo, int instId = 0);
+
     int SetMacAddress(const std::string &macAddress, int instId = 0);
 
     int GetMacAddress(std::string &macAddress, int instId = 0);
@@ -358,6 +362,7 @@ private:
     std::map<int, IpInfo> mWifiIpInfo;
     std::map<int, IpV6Info> mWifiIpV6Info;
     std::map<int, WifiLinkedInfo> mWifiLinkedInfo;
+    std::map<int, std::vector<WifiLinkedInfo>> mWifiMloLinkedInfo;
     std::map<int, std::string> mMacAddress;
     std::map<int, int> mLastSelectedNetworkId;
     std::map<int, time_t> mLastSelectedTimeVal;

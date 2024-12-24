@@ -1492,6 +1492,38 @@ public:
         EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::WIFI7);
         EXPECT_EQ(pStaStateMachine->linkedInfo.isMloConnected, true);
     }
+
+    void DealMloConnectionLinkTestWifi6()
+    {
+        pStaStateMachine->linkedInfo.supportedWifiCategory = WifiCategory::WIFI6;
+        pStaStateMachine->linkedInfo.isMloConnected = false;
+        pStaStateMachine->linkedInfo.bssid = "123";
+
+        pStaStateMachine->DealMloConnectionLinkInfo();
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
+            .WillRepeatedly(Return(0));
+    }
+
+    void DealMloConnectionLinkTestWifi7NotMlo()
+    {
+        pStaStateMachine->linkedInfo.supportedWifiCategory = WifiCategory::WIFI7;
+        pStaStateMachine->linkedInfo.isMloConnected = false;
+        pStaStateMachine->linkedInfo.bssid = "123";
+
+        pStaStateMachine->DealMloConnectionLinkInfo();
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
+            .WillRepeatedly(Return(0));
+    }
+
+    void DealMloConnectionLinkTestWifi7IsMlo()
+    {
+        pStaStateMachine->linkedInfo.supportedWifiCategory = WifiCategory::WIFI7;
+        pStaStateMachine->linkedInfo.isMloConnected = true;
+        pStaStateMachine->linkedInfo.bssid = "123";
+        pStaStateMachine->DealMloConnectionLinkInfo();
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
+            .WillRepeatedly(Return(0));
+    }
 };
 
 HWTEST_F(StaStateMachineTest, ShouldUseFactoryMacSuccess, TestSize.Level1)
@@ -2287,6 +2319,21 @@ HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7NotMlo, TestSize.
 HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7IsMlo, TestSize.Level1)
 {
     SetSupportedWifiCategoryTestWifi7IsMlo();
+}
+
+HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi6, TestSize.Level1)
+{
+    DealMloConnectionLinkTestWifi6();
+}
+
+HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7NotMlo, TestSize.Level1)
+{
+    DealMloConnectionLinkTestWifi7NotMlo();
+}
+
+HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7IsMlo, TestSize.Level1)
+{
+    DealMloConnectionLinkTestWifi7IsMlo();
 }
 } // namespace Wifi
 } // namespace OHOS

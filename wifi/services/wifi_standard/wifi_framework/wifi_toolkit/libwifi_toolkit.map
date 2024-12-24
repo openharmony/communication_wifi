@@ -44,6 +44,8 @@
           "OHOS::Wifi::WifiConfigCenter::SaveIpV6Info(OHOS::Wifi::IpV6Info const&, int)";
           "OHOS::Wifi::WifiConfigCenter::GetAllWifiLinkedInfo()";
           "OHOS::Wifi::WifiConfigCenter::SaveLinkedInfo(OHOS::Wifi::WifiLinkedInfo const&, int)";
+          "OHOS::Wifi::WifiConfigCenter::SaveMloLinkedInfo(std::__h::vector<OHOS::Wifi::WifiLinkedInfo, std::__h::allocator<OHOS::Wifi::WifiLinkedInfo>> const&, int)";
+          "OHOS::Wifi::WifiConfigCenter::GetMloLinkedInfo(std::__h::vector<OHOS::Wifi::WifiLinkedInfo, std::__h::allocator<OHOS::Wifi::WifiLinkedInfo>>&, int)";
           "OHOS::Wifi::WifiConfigCenter::SetMacAddress(const std::string&, int)";
           "OHOS::Wifi::WifiConfigCenter::GetMacAddress(std::string&, int)";
           "OHOS::Wifi::WifiConfigCenter::SetUserLastSelectedNetworkId(int, int)";

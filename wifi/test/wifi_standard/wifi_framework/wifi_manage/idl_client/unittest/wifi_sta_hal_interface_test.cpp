@@ -28,9 +28,9 @@ void OnConnectChanged(int status, int networkId, const std::string &bssid)
     LOGD("OnConnectChanged status %d, networkid %d, bssid %s", status, networkId, bssid.c_str());
 }
 
-void OnWpaStateChanged(int status)
+void OnWpaStateChanged(int status, const std::string &ssid)
 {
-    LOGD("OnWpaStateChanged status %d", status);
+    LOGD("OnWpaStateChanged status %d, ssid %s", status, ssid.c_str());
 }
 
 void OnWpaSsidWrongKey()

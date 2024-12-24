@@ -126,7 +126,7 @@ public:
         LOGI("Mock OnBssidChangedTest!");
     }
 
-    static void OnWpaStateChangedTest(int status)
+    static void OnWpaStateChangedTest(int status, const char *ssid)
     {
         LOGI("Mock OnWpaStateChangedTest!");
     }

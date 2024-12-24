@@ -317,7 +317,7 @@ static void IdlCbkWpaEventDeal(Context *context, int event)
         callback->onSsidWrongkey();
     }
     if (event == HAL_CBK_CMD_WPA_STATE_CHANGEM && callback->onWpaStateChanged != NULL) {
-        callback->onWpaStateChanged(status);
+        callback->onWpaStateChanged(status, "");
     }
     if (event == HAL_CBK_CMD_WPS_CONNECTION_FULL && callback->onWpsConnectionFull != NULL) {
         callback->onWpsConnectionFull(status);

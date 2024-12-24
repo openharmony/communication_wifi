@@ -285,7 +285,7 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
         [this](std::string &destoryIfaceName, int createIfaceType) {
             this->StaIfaceDestoryCallback(destoryIfaceName,createIfaceType);
         },
-        [this](int index, int antRssi){ this->OnRssiReportCallback(index,antRssi); },
+        [this](int index, int antRssi) { this->OnRssiReportCallback(index,antRssi); },
         std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
         ifaceName, instId)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");

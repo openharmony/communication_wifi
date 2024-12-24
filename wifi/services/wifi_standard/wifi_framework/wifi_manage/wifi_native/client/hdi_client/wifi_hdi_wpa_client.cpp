@@ -448,7 +448,7 @@ WifiErrorNo WifiHdiWpaClient::ReqSetRoamConfig(const WifiHalRoamConfig &config)
     return WIFI_HAL_OPT_NOT_SUPPORT;
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqGetConnectSignalInfo(const std::string &endBssid, WifiHalWpaSignalInfo &info) const
+WifiErrorNo WifiHdiWpaClient::ReqGetConnectSignalInfo(const std::string &endBssid, WifiSignalPollInfo &info) const
 {
     return WIFI_HAL_OPT_NOT_SUPPORT;
 }

@@ -938,6 +938,20 @@ enum class WifiSelfcureType {
     RESET_SELFCURE_SUCC,
     REDHCP_SELFCURE_SUCC,
 };
+
+enum class NetworkLagType {
+    DEFAULT = 0,
+    WIFIPRO_QOE_SLOW,
+};
+ 
+struct NetworkLagInfo {
+    uint32_t uid { 0 };
+ 
+    NetworkLagInfo()
+    {
+        uid = 0;
+    }
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

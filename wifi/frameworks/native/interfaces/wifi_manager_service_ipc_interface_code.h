@@ -77,6 +77,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_SET_DPI_MARK_RULE = 0x1044,         /* set dpi mark rule */
     WIFI_SVR_CMD_IS_FEATURE_SUPPORTED = 0x1045,         /*is supported input feature */
     WIFI_SVR_CMD_GET_NET_CONTROL_INFO = 0x1046, /* Accept network control information from RSS */
+    WIFI_SVR_CMD_NETWORK_LAG_INFO = 0x1047,             /* update network lag info */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

@@ -32,6 +32,7 @@ namespace Wifi {
 #define WIFI_COUNTRY_CODE_LEN 2
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
+#define UNKNOWN_HILINK_NETWORK_ID (-2)
 #define WIFI_INVALID_UID (-1)
 #define INVALID_SIGNAL_LEVEL (-1)
 #define IPV4_ADDRESS_TYPE 0
@@ -954,6 +955,20 @@ enum class WifiSelfcureType {
     REASSOC_SELFCURE_SUCC,
     RESET_SELFCURE_SUCC,
     REDHCP_SELFCURE_SUCC,
+};
+
+enum class NetworkLagType {
+    DEFAULT = 0,
+    WIFIPRO_QOE_SLOW,
+};
+ 
+struct NetworkLagInfo {
+    uint32_t uid { 0 };
+ 
+    NetworkLagInfo()
+    {
+        uid = 0;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

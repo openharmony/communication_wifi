@@ -924,6 +924,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
             return WIFI_OPT_PERMISSION_DENIED;
         }
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_STA_REQUEST);
 
     if (!IsStaServiceRunning()) {
         WIFI_LOGE("ConnectToNetwork: sta service is not running!");
@@ -987,6 +988,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)
         WIFI_LOGE("ConnectToDevice:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_STA_REQUEST);
 
     if (!CheckConfigPwd(config)) {
         WIFI_LOGE("CheckConfigPwd failed!");
@@ -1944,7 +1946,7 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
             return WIFI_OPT_FAILED;
         }
         g_hiLinkActive = uiFlag;
-        pService->EnableHiLinkHandshake(deviceConfig, cmd);
+        pService->EnableHiLinkHandshake(uiFlag, deviceConfig, cmd);
         return WIFI_OPT_SUCCESS;
     }
     if (!g_hiLinkActive) {
@@ -1952,7 +1954,7 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
             WIFI_LOGE("g_hiLinkActive copy enable and bssid error!");
             return WIFI_OPT_FAILED;
         }
-        pService->EnableHiLinkHandshake(deviceConfig, cmd);
+        pService->EnableHiLinkHandshake(uiFlag, deviceConfig, cmd);
     }
 
     std::string currentMac;
@@ -2298,6 +2300,48 @@ int WifiDeviceServiceImpl::ProcessPermissionVerify(const std::string &appId, con
         iter++;
     }
     return PERMISSION_DENIED;
+}
+
+ErrCode WifiDeviceServiceImpl::UpdateNetworkLagInfo(const NetworkLagType networkLagType,
+    const NetworkLagInfo &networkLagInfo)
+{
+    // permission check
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("UpdateNetworkLagInfo, uid:%{public}d.", GetCallingUid());
+#endif
+ 
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("UpdateNetworkLagInfo:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+ 
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("UpdateNetworkLagInfo: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+ 
+    // date distribute
+    ErrCode ret = WIFI_OPT_SUCCESS;
+    switch (networkLagType) {
+        case NetworkLagType::WIFIPRO_QOE_SLOW:
+            ret = HandleWifiProQoeSlow(networkLagInfo);
+            break;
+        default:
+            return WIFI_OPT_FAILED;
+    }
+    return ret;
+}
+ 
+ErrCode WifiDeviceServiceImpl::HandleWifiProQoeSlow(const NetworkLagInfo &networkLagInfo)
+{
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
+    if (pWifiProService == nullptr) {
+        return WIFI_OPT_FAILED;
+    }
+    pWifiProService->DealQoeSlowResult();
+#endif
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -101,5 +101,11 @@ HWTEST_F(WifiProServiceTest, HandleScanResultTest01, TestSize.Level1)
     wifiProService_->HandleScanResult(scanInfos);
     EXPECT_NE(wifiProService_->instId_, TEN);
 }
+
+HWTEST_F(WifiProServiceTest, HandleQoeSlowResultTest01, TestSize.Level1)
+{
+    wifiProService_->HandleQoeSlowResult();
+    EXPECT_NE(wifiProService_->instId_, TEN);
+}
 } // namespace Wifi
 } // namespace OHOS

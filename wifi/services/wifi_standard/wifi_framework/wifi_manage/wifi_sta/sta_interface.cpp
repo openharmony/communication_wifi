@@ -485,12 +485,12 @@ ErrCode StaInterface::SetSelfCureService(ISelfCureService *selfCureService)
 }
 #endif
 
-ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
+ErrCode StaInterface::EnableHiLinkHandshake(bool uiFlag, const WifiDeviceConfig &config, const std::string &bssid)
 {
     WIFI_LOGI("Enter EnableHiLinkHandshake");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    pStaService->EnableHiLinkHandshake(config, bssid);
+    pStaService->EnableHiLinkHandshake(uiFlag, config, bssid);
 
     return WIFI_OPT_SUCCESS;
 }

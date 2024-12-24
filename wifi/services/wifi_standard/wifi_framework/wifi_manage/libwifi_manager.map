@@ -15,8 +15,9 @@
         "OHOS::Wifi::WifiManager::GetWifiEventSubscriberManager()";
         "OHOS::Wifi::WifiManager::GetWifiMultiVapManager()";
         "OHOS::Wifi::WifiManager::GetRptInterface(int)";
-        "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(int screenState, int instId)";
-        "OHOS::Wifi::WifiManager::OnNativeProcessStatusChange(int status)";
+        "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(int, int)";
+        "OHOS::Wifi::WifiManager::OnNativeProcessStatusChange(int)";
+        "OHOS::Wifi::WifiManager::StopGetCacResultAndLocalCac(int)";
         "OHOS::Wifi::WifiServiceManager::GetInstance()";
         "OHOS::Wifi::WifiServiceManager::Init()";
         "OHOS::Wifi::WifiServiceManager::GetP2pServiceInst()";
@@ -25,7 +26,7 @@
         "OHOS::Wifi::WifiServiceManager::CheckPreLoadService()";
         "OHOS::Wifi::WifiServiceManager::GetStaServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::GetSelfCureServiceInst(int)";
-        "OHOS::Wifi::WifiServiceManager::GetWifiProServiceInst(int32_t)";
+        "OHOS::Wifi::WifiServiceManager::GetWifiProServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::GetScanServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::GetApServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::ApServiceSetHotspotConfig(OHOS::Wifi::HotspotConfig const&, int)";

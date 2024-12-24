@@ -44,11 +44,11 @@ ErrCode StaMonitor::InitStaMonitor()
     WIFI_LOGI("Enter InitStaMonitor.\n");
     using namespace std::placeholders;
     WifiEventCallback callBack = {
-        [this](int status, int networkId, const std::string &bssid) {
-            this->OnConnectChangedCallBack(status, networkId, bssid);
+        [this](int status, int code, const std::string &bssid) {
+            this->OnConnectChangedCallBack(status, code, bssid);
         },
         [this](const std::string &reason, const std::string &bssid) { this->OnBssidChangedCallBack(reason, bssid); },
-        [this](int status) { this->OnWpaStateChangedCallBack(status); },
+        [this](int status, const std::string &ssid) { this->OnWpaStateChangedCallBack(status, ssid); },
         [this]() { this->OnWpaSsidWrongKeyCallBack(); },
         [this](int status) { this->OnWpsPbcOverlapCallBack(status); },
         [this](int status) { this->OnWpsTimeOutCallBack(status); },
@@ -56,7 +56,7 @@ ErrCode StaMonitor::InitStaMonitor()
         [this](int status) { this->OnWpaConnectionFullCallBack(status); },
         [this](int status) { this->OnWpaConnectionRejectCallBack(status); },
         [this](const std::string &notifyParam) { this->OnWpaStaNotifyCallBack(notifyParam); },
-        [this](int reason, const std::string &bssid) { this->OnReportDisConnectReasonCallBack(reason, bssid); },
+        [this](int reason, const std::string &bssid) {},
     };
 
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
@@ -89,52 +89,37 @@ void StaMonitor::SetStateMachine(StaStateMachine *paraStaStateMachine)
     return;
 }
 
-void StaMonitor::OnReportDisConnectReasonCallBack(int reason, const std::string &bssid)
+void StaMonitor::OnConnectChangedCallBack(int status, int code, const std::string &bssid)
 {
-    WIFI_LOGI("OnReportDisConnectReasonCallBack() reason=%{public}d, bssid=%{public}s",
-        reason, MacAnonymize(bssid).c_str());
-    if (pStaStateMachine == nullptr) {
-        WIFI_LOGE("OnReportDisConnectReasonCallBack pStaStateMachine is nullptr");
-        return;
-    }
-
-    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
-    if (msg == nullptr) {
-        WIFI_LOGE("OnReportDisConnectReasonCallBack CreateMessage failed");
-        return;
-    }
-    msg->SetMessageName(static_cast<int>(WIFI_SVR_CMD_STA_REPORT_DISCONNECT_REASON_EVENT));
-    msg->AddStringMessageBody(bssid);
-    msg->AddIntMessageBody(reason);
-    pStaStateMachine->SendMessage(msg);
-}
-
-void StaMonitor::OnConnectChangedCallBack(int status, int networkId, const std::string &bssid)
-{
-    WIFI_LOGI("OnConnectChangedCallBack status:%{public}d, networkId=%{public}d, bssid=%{public}s, instId=%{public}d",
-        status, networkId, MacAnonymize(bssid).c_str(), m_instId);
+    WIFI_LOGI("OnConnectChangedCallBack status:%{public}d, code=%{public}d, bssid=%{public}s, instId=%{public}d",
+        status, code, MacAnonymize(bssid).c_str(), m_instId);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
-    if (status == HAL_WPA_CB_ASSOCIATING || status == HAL_WPA_CB_ASSOCIATED) {
-        pStaStateMachine->OnNetworkHiviewEvent(status);
-    }
-
     switch (status) {
         case HAL_WPA_CB_CONNECTED: {
-            pStaStateMachine->OnNetworkConnectionEvent(networkId, bssid);
+            InternalMessagePtr msg = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
+            if (msg == nullptr) {
+                WIFI_LOGE("CreateMessage failed");
+                return;
+            }
+            msg->SetParam1(code);
+            msg->AddStringMessageBody(bssid);
+            pStaStateMachine->SendMessage(msg);
             break;
         }
         case HAL_WPA_CB_DISCONNECTED: {
-            pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT, bssid);
-            pStaStateMachine->OnNetworkDisconnectEvent(networkId);
+            InternalMessagePtr msg = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT);
+            if (msg == nullptr) {
+                WIFI_LOGE("CreateMessage failed");
+                return;
+            }
+            msg->SetParam1(code);
+            msg->AddStringMessageBody(bssid);
+            pStaStateMachine->SendMessage(msg);
             break;
         }
-        case HAL_WPA_CB_ASSOCIATING:
-        case HAL_WPA_CB_ASSOCIATED:
-            pStaStateMachine->OnNetworkAssocEvent(status, bssid, pStaStateMachine);
-            break;
         default:
             break;
     }
@@ -195,26 +180,39 @@ void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::st
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
-
-    WifiLinkedInfo linkedInfo;
-    pStaStateMachine->GetLinkedInfo(linkedInfo);
-    if (linkedInfo.bssid == bssid) {
-        WIFI_LOGW("Sta ignored the event for bssid is the same.");
-        return;
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
+    if (msg == nullptr) {
+    WIFI_LOGE("CreateMessage failed");
+    return;
     }
-    pStaStateMachine->OnBssidChangedEvent(reason, bssid);
+
+    if (strcmp(reason.c_str(), "LINK_SWITCH") == 0) {
+        msg->SetMessageName(WIFI_SVR_CMD_STA_LINK_SWITCH_EVENT);
+    } else {
+        msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+        msg->AddStringMessageBody(reason);
+    }
+    msg->AddStringMessageBody(bssid);
+    pStaStateMachine->SendMessage(msg);
 }
 
-void StaMonitor::OnWpaStateChangedCallBack(int status)
+void StaMonitor::OnWpaStateChangedCallBack(int status, const std::string &ssid)
 {
-    WIFI_LOGI("OnWpaStateChangedCallBack() status:%{public}d\n", status);
+    WIFI_LOGI("OnWpaStateChangedCallBack() status:%{public}d, ssid=%{public}s", status, SsidAnonymize(ssid).c_str());
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
     WriteWifiWpaStateHiSysEvent(status);
     /* Notification state machine wpa state changed event. */
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT, status);
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT);
+    if (msg == nullptr) {
+        WIFI_LOGE("CreateMessage failed");
+        return;
+    }
+    msg->SetParam1(status);
+    msg->AddStringMessageBody(ssid);
+    pStaStateMachine->SendMessage(msg);
 }
 
 void StaMonitor::OnWpaSsidWrongKeyCallBack()

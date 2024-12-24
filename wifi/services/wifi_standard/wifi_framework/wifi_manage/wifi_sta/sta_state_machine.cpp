@@ -106,12 +106,6 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
-#define WIFI7_MLO_STATE_SINGLE_RADIO 0x01
-#define WIFI7_MLO_STATE_MLSR 0x02
-#define WIFI7_MLO_STATE_EMLSR 0x04
-#define WIFI7_MLO_STATE_STR 0x08
-#define WIFI7_MLO_STATE_WUR 0x80
-
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
     {MAC_AUTH_RSP2_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -249,7 +243,6 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.portalUrl = "";
     linkedInfo.supplicantState = SupplicantState::DISCONNECTED;
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
-    linkedInfo.mloState = MloState::SINGLE_RADIO;
     linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     linkedInfo.lastPacketDirection = 0;
     linkedInfo.lastRxPackets = 0;
@@ -257,7 +250,6 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isAncoConnected = 0;
     linkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
     linkedInfo.isMloConnected = false;
-    linkedInfo.isWurEnable = false;
 }
 
 void StaStateMachine::InitLastWifiLinkedInfo()
@@ -1021,9 +1013,6 @@ int StaStateMachine::InitStaSMHandleMap()
     };
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = [this](InternalMessagePtr msg) {
         return this->DealWpaStateChange(msg);
-    };
-    staSmHandleFuncMap[WIFI_SVR_CMD_STA_MLO_WORK_STATE_EVENT] = [this](InternalMessagePtr msg) {
-        return this->DealMloStateChange(msg);
     };
     staSmHandleFuncMap[WIFI_SVR_COM_STA_NETWORK_REMOVED] = [this](InternalMessagePtr msg) {
         return this->DealNetworkRemoved(msg);
@@ -3737,12 +3726,6 @@ void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
     pStaStateMachine->HandleNetCheckResult(netstate, url);
 }
 
-void StaStateMachine::LinkedState::UpdateWifi7WurInfo()
-{
-    pStaStateMachine->linkedInfo.mloState = MloState::SINGLE_RADIO;
-    pStaStateMachine->linkedInfo.isWurEnable = false;
-}
-
 bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
@@ -3771,7 +3754,6 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             pStaStateMachine->isRoam = true;
             pStaStateMachine->linkedInfo.bssid = bssid;
 #ifndef OHOS_ARCH_LITE
-            UpdateWifi7WurInfo();
             pStaStateMachine->UpdateWifiCategory();
             pStaStateMachine->SetSupportedWifiCategory();
 #endif
@@ -3927,36 +3909,6 @@ void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
     int status = msg->GetParam1();
     LOGI("DealWpaStateChange status: %{public}d", status);
     linkedInfo.supplicantState = static_cast<SupplicantState>(status);
-    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-}
-
-void StaStateMachine::DealMloStateChange(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        LOGE("DealMloStateChange InternalMessage msg is null.");
-        return;
-    }
-
-    MloStateParam param = {0};
-    msg->GetMessageObj(param);
-
-    uint8_t state = param.mloState;
-    uint16_t reasonCode = param.reasonCode;
-    if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == WIFI7_MLO_STATE_SINGLE_RADIO) {
-        linkedInfo.mloState = MloState::SINGLE_RADIO;
-    } else if ((state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLO_STATE_MLSR) {
-        linkedInfo.mloState = MloState::WIFI7_MLSR;
-    } else if ((state & WIFI7_MLO_STATE_EMLSR) == WIFI7_MLO_STATE_EMLSR) {
-        linkedInfo.mloState = MloState::WIFI7_EMLSR;
-    } else if ((state & WIFI7_MLO_STATE_STR) == WIFI7_MLO_STATE_STR) {
-        linkedInfo.mloState = MloState::WIFI7_STR;
-    }
-    if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
-        linkedInfo.isWurEnable = true;
-    }
-
-    LOGI("DealMloStateChange mloState=%{public}d isWurEnable=%{public}d reasonCode=%{public}u",
-        linkedInfo.mloState, linkedInfo.isWurEnable, reasonCode);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
 }
 

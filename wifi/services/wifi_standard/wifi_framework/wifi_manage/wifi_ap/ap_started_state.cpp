@@ -181,6 +181,7 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         }
     }
 #endif
+    WifiApHalInterface::GetInstance().SetMaxConnectNum(ifName, apConfig.GetChannel(), apConfig.GetMaxConn());
     if (WifiApHalInterface::GetInstance().EnableAp(m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Enableap failed.");
         return false;

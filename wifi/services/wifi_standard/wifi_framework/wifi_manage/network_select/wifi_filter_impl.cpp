@@ -430,6 +430,9 @@ bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
         WIFI_LOGI("NotNetworkBlackListFilter, in wifi blocklist, targetSignalLevel:%{public}d, "
             "curSignalLevel:%{public}d, skip candidate:%{public}s",
             targetSignalLevel, curSignalLevel, networkCandidate.ToString().c_str());
+        if (linkedInfo.detailedState == DetailedState::NOTWORKING && targetSignalLevel >= SIGNAL_LEVEL_THREE) {
+            WIFI_LOGI("NotNetworkBlockListFilter, ignore blocklist, targetSignalLevel >= 3");
+        }
         return false;
     }
     return true;
@@ -586,5 +589,37 @@ bool SuggestionNetworkWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     return networkCandidate.wifiDeviceConfig.uid != WIFI_INVALID_UID &&
         networkCandidate.wifiDeviceConfig.isShared == false;
+}
+
+WifiSwitchThresholdQoeFilter::WifiSwitchThresholdQoeFilter() : SimpleWifiFilter("WifiSwitchThresholdQoeFilter") {}
+ 
+WifiSwitchThresholdQoeFilter::~WifiSwitchThresholdQoeFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+ 
+bool WifiSwitchThresholdQoeFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    auto &interScanInfo = networkCandidate.interScanInfo;
+ 
+    if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
+        interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
+        return false;
+    }
+ 
+    if (interScanInfo.rssi < linkedInfo.rssi) {
+        WIFI_LOGI("WifiSwitchThresholdFilter, scan info rssi:%{public}d,"
+            "cur rssi:%{public}d, skip candidate:%{public}s",
+            interScanInfo.rssi, linkedInfo.rssi, networkCandidate.ToString().c_str());
+        return false;
+    }
+ 
+    return true;
 }
 }

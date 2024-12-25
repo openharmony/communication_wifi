@@ -85,17 +85,17 @@ void WifiProService::HandleStaConnChanged(OperateResState state, const WifiLinke
         case OperateResState::CONNECT_PASSWORD_WRONG:
             FALLTHROUGH_INTENDED;
         case OperateResState::CONNECT_OBTAINING_IP_FAILED:
-            NotifyWifi2WifiFailed();
+            NotifyWifi2WifiFailed(state);
             break;
         default:
             break;
     }
 }
 
-void WifiProService::NotifyWifi2WifiFailed()
+void WifiProService::NotifyWifi2WifiFailed(OperateResState state)
 {
     WIFI_LOGI("NotifyWifi2WifiFailed: wifi2wifi failed");
-    pWifiProStateMachine_->SendMessage(EVENT_WIFI2WIFI_FAILED);
+    pWifiProStateMachine_->SendMessage(EVENT_WIFI2WIFI_FAILED, static_cast<int32_t>(state));
 }
 
 void WifiProService::NotifyWifiConnectStateChanged(OperateResState state, const WifiLinkedInfo &linkedInfo)
@@ -132,6 +132,17 @@ void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfo
     }
 
     pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
+}
+
+void WifiProService::HandleQoeSlowResult()
+{
+    WIFI_LOGI("Enter WifiProService::HandleQoeSlowResult.");
+    if (pWifiProStateMachine_ == nullptr) {
+        WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
+        return;
+    }
+ 
+    pWifiProStateMachine_->SendMessage(EVENT_QOE_APP_SLOW);
 }
 }  // namespace Wifi
 }  // namespace OHOS

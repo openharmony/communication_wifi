@@ -502,6 +502,14 @@ public:
     ErrCode FactoryReset() override;
 
     /**
+     * @Description Accept network control information from RSS.
+     *
+     * @param networkControlInfo - structure of network control infomation
+     * @return ErrCode - operation result
+     */
+    ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) override;
+
+    /**
      * @Description  limit speed
      *
      * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit
@@ -584,6 +592,16 @@ public:
      * @return enable - enable/disable dpi mark
      */
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
+
+    /**
+     * @Description Update Network Lag Info
+     *
+     * @param networkLagType - recv networkLagType
+     * @param networkLagInfo - recv networkLagInfo
+     * @return ErrCode - operation result
+     */
+    ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) override;
+
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

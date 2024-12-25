@@ -175,6 +175,8 @@ public:
 
     ErrCode FactoryReset() override;
 
+    ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) override;
+
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 
     ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
@@ -188,6 +190,8 @@ public:
     ErrCode SetSatelliteState(const int state) override;
 
     ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
+
+    ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);
@@ -207,6 +211,7 @@ private:
     void ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result);
     void updateStaDeviceMacAddress(WifiDeviceConfig &config);
     int ProcessPermissionVerify(const std::string &appId, const std::string &packageName);
+    ErrCode HandleWifiProQoeSlow(const NetworkLagInfo &networkLagInfo);
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;
     static constexpr int MAX_HEX_LEN = 64;

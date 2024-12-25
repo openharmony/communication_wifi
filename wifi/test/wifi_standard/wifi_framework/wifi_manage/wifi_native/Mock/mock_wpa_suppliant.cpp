@@ -19,9 +19,9 @@
 #include "securec.h"
 #include "v1_0/ihostapd_interface.h"
 #include "v1_0/ihostapd_callback.h"
-#include "v1_1/iwpa_interface.h"
-#include "v1_1/iwpa_callback.h"
-#include "v1_1/wpa_types.h"
+#include "v1_2/iwpa_interface.h"
+#include "v1_2/iwpa_callback.h"
+#include "v1_2/wpa_types.h"
 
 static const int ETH_ADDR_LEN = 6;
 #define WIFI_P2P_DEVICE_TYPE_LENGTH 64
@@ -619,6 +619,12 @@ int32_t UnregisterWpaEventCallback(struct IWpaInterface *self, struct IWpaCallba
     return 0;
 }
 
+int32_t GetWpaStaData(struct IWpaInterface *self, const char* ifName, const char* staParam,
+    char* staData, uint32_t staDataLen)
+{
+    return 0;
+}
+
 struct HdfRemoteService*  AsWapObject(struct IWpaInterface *self)
 {
     return nullptr;
@@ -760,6 +766,7 @@ struct IWpaInterface *IWpaInterfaceGet(bool isStub)
     g_IWpaInterface.DeliverP2pData = DeliverP2pData;
     g_IWpaInterface.RegisterWpaEventCallback = RegisterWpaEventCallback;
     g_IWpaInterface.UnregisterWpaEventCallback = UnregisterWpaEventCallback;
+    g_IWpaInterface.GetWpaStaData = GetWpaStaData;
     return &g_IWpaInterface;
 }
 

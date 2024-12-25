@@ -341,6 +341,11 @@ ErrCode ScanService::ScanControlInner(ScanType scanType)
         if (rlt != WIFI_OPT_SUCCESS) {
             return rlt;
         }
+    } else if (scanType == ScanType::SCAN_TYPE_WIFIPRO || scanType == ScanType::SCAN_TYPE_5G_AP) {
+        ErrCode rlt = AllowScanByType(scanType);
+        if (rlt != WIFI_OPT_SUCCESS) {
+            return rlt;
+        }
     } else {
         if (!AllowScanByDisableScanCtrl()) {
             WIFI_LOGW("internal scan not allow by disable scan control.");
@@ -1541,6 +1546,37 @@ ErrCode ScanService::AllowPnoScan()
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanService::AllowWifiProScan()
+{
+    if (!AllowScanByHid2dState()) {
+        WIFI_LOGW("internal scan not allow by hid2d state");
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int state = WifiConfigCenter::GetInstance().GetScreenState();
+    if (state == MODE_STATE_CLOSE) {
+        WIFI_LOGW("internal scan not allow by Screen Off");
+        return WIFI_OPT_FAILED;
+    }
+ 
+    if (staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
+        WIFI_LOGW("NOT allow scan for staStatus: %{public}d", staStatus);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode ScanService::Allow5GApScan()
+{
+    if (AllowWifiProScan() == WIFI_OPT_FAILED) {
+        return WIFI_OPT_FAILED;
+    }
+ 
+    // game optimization going
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode ScanService::AllowScanByType(ScanType scanType)
 {
     ErrCode allScanResult = WIFI_OPT_SUCCESS;
@@ -1553,6 +1589,12 @@ ErrCode ScanService::AllowScanByType(ScanType scanType)
             break;
         case ScanType::SCAN_TYPE_PNO:
             allScanResult = AllowPnoScan();
+            break;
+        case ScanType::SCAN_TYPE_WIFIPRO:
+            allScanResult = AllowWifiProScan();
+            break;
+        case ScanType::SCAN_TYPE_5G_AP:
+            allScanResult = Allow5GApScan();
             break;
         default:
             LOGE("scanType error.\n");
@@ -1834,8 +1876,7 @@ bool ScanService::GetSavedNetworkSsidList(std::vector<std::string> &savedNetwork
         return deviceA.lastConnectTime > deviceB.lastConnectTime;
     });
     for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
-        if ((iter->status == static_cast<int>(WifiDeviceConfigStatus::ENABLED)) && (!(iter->isPasspoint)) &&
-            (!(iter->isEphemeral))) {
+        if ((!(iter->isPasspoint)) && (!(iter->isEphemeral))) {
             savedNetworkSsid.push_back(iter->ssid);
         }
     }
@@ -2352,11 +2393,7 @@ bool ScanService::AllowScanByMovingFreeze(ScanMode appRunMode)
 bool ScanService::AllowScanByHid2dState()
 {
     LOGD("Enter AllowScanByHid2dState.\n");
-    Hid2dUpperScene softbusScene;
-    Hid2dUpperScene castScene;
-    Hid2dUpperScene shareScene;
-    Hid2dUpperScene mouseCrossScene;
-    Hid2dUpperScene miracastScene;
+    Hid2dUpperScene softbusScene, castScene, shareScene, mouseCrossScene, miracastScene;
     WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
@@ -2369,7 +2406,15 @@ bool ScanService::AllowScanByHid2dState()
         WIFI_LOGI("ScanService::AllowScanByHid2dState, no need to control this scan");
         return true;
     }
-    if (linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED
+    int64_t hid2dSceneLastSetTime = WifiConfigCenter::GetInstance().GetHid2dSceneLastSetTime();
+    int64_t intervalTime = GetIntervalTime(hid2dSceneLastSetTime);
+    if (intervalTime < 0) {
+      WIFI_LOGE("time error, abandon this scan and reset the hid2dSceneLastSetTime.");
+      WifiConfigCenter::GetInstance().SetHid2dSceneLastSetTime(0);
+      return false;
+    }
+    if (hid2dSceneLastSetTime != 0 && intervalTime > HID2D_TIMEOUT_INTERVAL
+        && linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED
         && WifiConfigCenter::GetInstance().GetP2pEnhanceState() == 0) {
         WIFI_LOGW("allow scan, and clear scene.");
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
@@ -2396,6 +2441,13 @@ bool ScanService::AllowScanByHid2dState()
         WIFI_LOGD("allow hid2d scan");
     }
     return true;
+}
+
+int64_t ScanService::GetIntervalTime(int64_t startTime)
+{
+  auto now = std::chrono::system_clock::now();
+  int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+  return currentMs - startTime;
 }
 
 bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId,

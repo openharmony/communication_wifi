@@ -27,7 +27,6 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
 {
     item.instanceId = 0;
     item.networkId = 0;
-    item.status = 0;
     item.bssid.clear();
     item.ssid.clear();
     item.band = 0;
@@ -215,7 +214,7 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     } else if (key == "networkId") {
         item.networkId = CheckDataLegal(tmpValue);
     } else if (key == "status") {
-        item.status = CheckDataLegal(tmpValue);
+        //@deprecated
     } else if (key == "bssid") {
         item.bssid = value;
     } else if (key == "ssid") {
@@ -566,7 +565,6 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"version=" << item.version << std::endl;
     ss << "    " <<"instanceId=" << item.instanceId << std::endl;
     ss << "    " <<"uid=" << item.uid << std::endl;
-    ss << "    " <<"status=" << item.status << std::endl;
     ss << "    " <<"bssid=" << item.bssid << std::endl;
     ss << "    " <<"userSelectBssid=" << item.userSelectBssid << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
@@ -1725,7 +1723,6 @@ static void ClearWifiBackupConfig(WifiBackupConfig &item)
 {
     item.instanceId = 0;
     item.uid = -1;
-    item.status = 0;
     item.bssid.clear();
     item.userSelectBssid.clear();
     item.ssid.clear();
@@ -1759,7 +1756,7 @@ static int SetWifiBackupConfigFirst(WifiBackupConfig &item, const std::string &k
     } else if (key == "uid") {
         item.uid = CheckDataLegal(tmpValue);
     } else if (key == "status") {
-        item.status = CheckDataLegal(tmpValue);
+        //@deprecated
     } else if (key == "bssid") {
         item.bssid = value;
     } else if (key == "userSelectBssid") {
@@ -1832,7 +1829,6 @@ static std::string OutPutWifiBackupConfig(WifiBackupConfig &item)
     ss << "    " <<"<WifiDeviceConfig>" << std::endl;
     ss << "    " <<"instanceId=" << item.instanceId << std::endl;
     ss << "    " <<"uid=" << item.uid << std::endl;
-    ss << "    " <<"status=" << item.status << std::endl;
     ss << "    " <<"bssid=" << item.bssid << std::endl;
     ss << "    " <<"userSelectBssid=" << item.userSelectBssid << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;

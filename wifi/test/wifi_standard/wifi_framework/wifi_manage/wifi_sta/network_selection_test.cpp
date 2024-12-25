@@ -46,7 +46,6 @@ HWTEST_F(NetworkSelectionTest, TestHiddenNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     NetworkSelectionManager selectionManager;
@@ -71,7 +70,6 @@ HWTEST_F(NetworkSelectionTest, TestMinRssiFor24G, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     NetworkSelectionManager selectionManager;
@@ -96,7 +94,6 @@ HWTEST_F(NetworkSelectionTest, TestMinRssiFor5G, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     NetworkSelectionManager selectionManager;
@@ -125,7 +122,6 @@ HWTEST_F(NetworkSelectionTest, TestUnSavedNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -149,7 +145,6 @@ HWTEST_F(NetworkSelectionTest, TestPasspointNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         wifiDeviceConfig.isPasspoint = true;
         return 0;
     }));
@@ -159,7 +154,6 @@ HWTEST_F(NetworkSelectionTest, TestPasspointNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         wifiDeviceConfig.isPasspoint = false;
         return 0;
     }));
@@ -184,7 +178,6 @@ HWTEST_F(NetworkSelectionTest, TestEphemeralNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         wifiDeviceConfig.isEphemeral = true;
         return 0;
     }));
@@ -194,7 +187,6 @@ HWTEST_F(NetworkSelectionTest, TestEphemeralNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         wifiDeviceConfig.isEphemeral = false;
         return 0;
     }));
@@ -219,7 +211,6 @@ HWTEST_F(NetworkSelectionTest, TestEnableNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
         return 0;
     }));
     NetworkSelectionManager selectionManager;
@@ -228,7 +219,6 @@ HWTEST_F(NetworkSelectionTest, TestEnableNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::UNKNOWN);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -236,7 +226,6 @@ HWTEST_F(NetworkSelectionTest, TestEnableNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -261,7 +250,6 @@ HWTEST_F(NetworkSelectionTest, TestMatchUserSelectBssidNetwork, TestSize.Level1)
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
         wifiDeviceConfig.networkId = 0;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         wifiDeviceConfig.userSelectBssid = "22:22:22:22:22";
         return 0;
     }));
@@ -305,7 +293,6 @@ HWTEST_F(NetworkSelectionTest, TestBlackListNetworks, TestSize.Level1)
             wifiDeviceConfig.networkId = 2;
         }
         wifiDeviceConfig.connFailedCount = 3;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -339,7 +326,6 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksByDifferentHistoryStatus, 
             wifiDeviceConfig.networkId = 1;
             wifiDeviceConfig.networkStatusHistory = 0b01;
         }
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -373,7 +359,6 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentSignalLevels,
             wifiDeviceConfig.networkId = 1;
         }
         wifiDeviceConfig.networkStatusHistory = 0b01;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -408,7 +393,6 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentSecurities, T
             wifiDeviceConfig.networkId = 1;
         }
         wifiDeviceConfig.networkStatusHistory = 0b01;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -442,7 +426,6 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentBands, TestSi
             wifiDeviceConfig.networkId = 1;
         }
         wifiDeviceConfig.networkStatusHistory = 0b01;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -476,7 +459,6 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentBandsAndDiffe
             wifiDeviceConfig.networkId = 1;
         }
         wifiDeviceConfig.networkStatusHistory = 0b01;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -510,7 +492,6 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDiffrentRssi, TestSize
             wifiDeviceConfig.networkId = 1;
         }
         wifiDeviceConfig.networkStatusHistory = 0b01;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -547,7 +528,6 @@ HWTEST_F(NetworkSelectionTest, TestPortalNetworks, TestSize.Level1)
         }
         wifiDeviceConfig.isPortal = true;
         wifiDeviceConfig.networkStatusHistory = 0b01;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
@@ -582,7 +562,6 @@ HWTEST_F(NetworkSelectionTest, TestBlackListNetworkAndNoInternetNetwork, TestSiz
             wifiDeviceConfig.networkId = 1;
             wifiDeviceConfig.noInternetAccess = true;
         }
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
@@ -618,7 +597,6 @@ HWTEST_F(NetworkSelectionTest, TestNoInternetNetworkAndPortalNetwork, TestSize.L
             wifiDeviceConfig.networkId = 1;
             wifiDeviceConfig.isPortal = true;
         }
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
@@ -655,7 +633,6 @@ HWTEST_F(NetworkSelectionTest, TestPortalNetworkAndRecoveryNetwork, TestSize.Lev
             wifiDeviceConfig.noInternetAccess = true;
             wifiDeviceConfig.networkStatusHistory = 0b0111;
         }
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
@@ -692,7 +669,6 @@ HWTEST_F(NetworkSelectionTest, TestRecoveryNetworkAndHasInternetNetwork, TestSiz
             wifiDeviceConfig.networkId = 1;
             wifiDeviceConfig.networkStatusHistory = 0b0101;
         }
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
@@ -728,7 +704,6 @@ HWTEST_F(NetworkSelectionTest, TestRecentUserSelectNetwork, TestSize.Level1)
             wifiDeviceConfig.networkId = 1;
         }
         wifiDeviceConfig.networkStatusHistory = 0b0101;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);
@@ -764,7 +739,6 @@ HWTEST_F(NetworkSelectionTest, TestHighSecurityNetwork, TestSize.Level1)
             wifiDeviceConfig.keyMgmt = "WEP";
         }
         wifiDeviceConfig.networkStatusHistory = 0b0101;
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         return 0;
     }));
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos);

@@ -381,7 +381,6 @@ void WifiDeviceStub::ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapCo
 void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config)
 {
     config.networkId = data.ReadInt32();
-    config.status = data.ReadInt32();
     config.bssid = data.ReadString();
     config.bssidType = data.ReadInt32();
     config.ssid = data.ReadString();
@@ -487,7 +486,6 @@ void WifiDeviceStub::BigDataWriteEapConfig(const WifiEapConfig &wifiEapConfig, s
 void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config)
 {
     reply.WriteInt32(config.networkId);
-    reply.WriteInt32(config.status);
     reply.WriteString(config.bssid);
     reply.WriteInt32(config.bssidType);
     reply.WriteString(config.ssid);

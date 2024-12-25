@@ -282,7 +282,6 @@ HWTEST_F(NetworkParserTest, ParseStatusTest, TestSize.Level1)
     xmlNodePtr textNode = xmlNewText(BAD_CAST "NETWORK_SELECTION_ENABLED");
     xmlAddChild(target, textNode);
     m_networkXmlParser->ParseStatus(target, config);
-    EXPECT_TRUE(config.status == 0);
     xmlFreeNode(root);
 }
 

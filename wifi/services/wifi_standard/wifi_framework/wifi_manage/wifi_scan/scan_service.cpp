@@ -1876,8 +1876,7 @@ bool ScanService::GetSavedNetworkSsidList(std::vector<std::string> &savedNetwork
         return deviceA.lastConnectTime > deviceB.lastConnectTime;
     });
     for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
-        if ((iter->status == static_cast<int>(WifiDeviceConfigStatus::ENABLED)) && (!(iter->isPasspoint)) &&
-            (!(iter->isEphemeral))) {
+        if ((!(iter->isPasspoint)) && (!(iter->isEphemeral))) {
             savedNetworkSsid.push_back(iter->ssid);
         }
     }

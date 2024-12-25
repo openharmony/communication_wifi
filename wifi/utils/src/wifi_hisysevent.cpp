@@ -18,6 +18,7 @@
 #include "sta_define.h"
 #include "wifi_logger.h"
 #include "json/json.h"
+#include <map>
 
 namespace OHOS {
 namespace Wifi {
@@ -199,39 +200,7 @@ void WriteDhcpFailHiSysEvent(const std::string &dhcpFailReason, int subErrCode)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_DHCP_FAIL_INFO", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteScanLimitHiSysEvent(const WifiScanDeviceInfo &wifiScanDeviceInfo, const ScanLimitType &scanLimitType)
-{
-    std::string scanInitiator = "";
-    bool isForeground = false;
-    switch (wifiScanDeviceInfo.scanType) {
-        case ScanType::SCAN_DEFAULT:
-            break;
-        case ScanType::SCAN_TYPE_EXTERN:
-        case ScanType::SCAN_TYPE_NATIVE_EXTERN:
-            scanInitiator = wifiScanDeviceInfo.packageName.empty() ?
-                std::to_string(wifiScanDeviceInfo.initiatorUid) : wifiScanDeviceInfo.packageName;
-            isForeground = ((wifiScanDeviceInfo.scanMode == ScanMode::APP_FOREGROUND_SCAN) ||
-                (wifiScanDeviceInfo.scanMode == ScanMode::SYS_FOREGROUND_SCAN));
-            break;
-        case ScanType::SCAN_TYPE_SYSTEMTIMER:
-            scanInitiator = SCAN_INITIATOR_SYSTEM_SCAN;
-            break;
-        case ScanType::SCAN_TYPE_PNO:
-            scanInitiator = SCAN_INITIATOR_PNO_SCAN;
-            break;
-        case ScanType::SCAN_TYPE_WIFIPRO:
-            scanInitiator = SCAN_INITIATOR_WIFIPRO;
-            break;
-        case ScanType::SCAN_TYPE_5G_AP:
-            scanInitiator = SCAN_INITIATOR_5G_AP;
-            break;
-        default:
-            break;
-    }
-    WriteScanLimitHiSysEvent(scanInitiator, scanLimitType, isForeground);
-}
-
-void WriteScanLimitHiSysEvent(const std::string &scanInitiator, const ScanLimitType &scanLimitType, bool isForeground)
+void WriteScanLimitHiSysEvent(const std::string &scanInitiator, int scanLimitType, bool isForeground)
 {
     if (scanInitiator.empty()) {
         return;
@@ -240,7 +209,7 @@ void WriteScanLimitHiSysEvent(const std::string &scanInitiator, const ScanLimitT
     Json::FastWriter writer;
     root["SCAN_INITIATOR"] = scanInitiator;
     root["IS_FOREGROUND"] = isForeground;
-    root["SCAN_LIMIT_TYPE"] = static_cast<int>(scanLimitType);
+    root["SCAN_LIMIT_TYPE"] = scanLimitType;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SCAN_LIMIT_STATISTICS", "EVENT_VALUE", writer.write(root));
 }
 

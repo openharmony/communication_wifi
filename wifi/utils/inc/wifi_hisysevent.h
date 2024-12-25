@@ -17,9 +17,6 @@
 #define OHOS_WIFI_HISYSEVENT_H
 
 #include <string>
-#include <map>
-#include "wifi_scan_msg.h"
-#include "wifi_scan_control_msg.h"
 
 #define AP_ERR_CODE 3
 #define AP_STA_PSK_MISMATCH_CNT 1
@@ -72,6 +69,19 @@ inline const std::string SCAN_INITIATOR_PNO_SCAN = "PNO_SCAN";
 inline const std::string SCAN_INITIATOR_WIFIPRO = "WIFIPRO_SCAN";
 inline const std::string SCAN_INITIATOR_5G_AP = "5G_AP_SCAN";
 
+enum class WifiScanFailReason {
+    DEFAULT = -1,
+    PROXY_FAIL,
+    PERMISSION_DENIED,
+    SCAN_SERVICE_NOT_RUNNING,
+    SERVICE_SCAN_FAIL,
+    SERVICE_ADVANCE_SCAN_FAIL,
+    HDI_SERVICE_DIED,
+    HDI_SCAN_FAIL,
+    HDI_PNO_SCAN_FAIL,
+    HDI_GET_SCAN_INFOS_FAIL
+};
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
 void WriteWifiApStateHiSysEvent(int32_t state);
@@ -86,10 +96,7 @@ void WriteAssocFailHiSysEvent(const std::string &assocFailReason, int subErrCode
 
 void WriteDhcpFailHiSysEvent(const std::string &dhcpFailReason, int subErrCode = 0);
 
-void WriteScanLimitHiSysEvent(const WifiScanDeviceInfo &wifiScanDeviceInfo, const ScanLimitType &scanLimitType);
-
-void WriteScanLimitHiSysEvent(const std::string &scanInitiator, const ScanLimitType &scanLimitType,
-    bool isForeground = false);
+void WriteScanLimitHiSysEvent(const std::string &scanInitiator, int scanLimitType, bool isForeground = false);
 
 void WriteAutoConnectFailEvent(const std::string &failReason, const std::string &subReason = "");
 

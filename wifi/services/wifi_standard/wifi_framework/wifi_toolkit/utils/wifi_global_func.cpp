@@ -457,7 +457,6 @@ bool ConvertMncToIso(int mnc, std::string &wifiCountryCode)
     }
     return false;
 }
-
 #endif
 
 void StrToUpper(std::string &str)

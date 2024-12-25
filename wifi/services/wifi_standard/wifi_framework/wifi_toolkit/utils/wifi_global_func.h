@@ -349,7 +349,6 @@ bool IsValidCountryCode(const std::string &wifiCountryCode);
  * @return false - convert fail
  */
 bool ConvertMncToIso(int mnc, std::string &wifiCountryCode);
-
 #endif
 
 /**

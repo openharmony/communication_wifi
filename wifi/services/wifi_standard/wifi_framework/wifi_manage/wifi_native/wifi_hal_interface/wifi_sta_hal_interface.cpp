@@ -22,7 +22,7 @@
 #include "wifi_config_center.h"
 #include "define.h"
 #ifdef READ_MAC_FROM_OEM
-#include "read_wifi_mac.h"
+#include "wifi_oeminfo_mac.h"
 #endif
 
 #undef LOG_TAG
@@ -181,7 +181,7 @@ std::string WifiStaHalInterface::GetWifiOeminfoMac()
     LOGI("read mac from oem");
     WifiOeminfoMac oeminfoMac;
     std::string oemMac = "";
-    int ret = pReadWifiMac->GetOeminfoMac(oemMac);
+    int ret = pWifiOeminfoMac->GetOeminfoMac(oemMac);
     if (ret != 0) {
         LOGE("GetOeminfoMac fail, ret = %{public}d", ret);
         return std::string("");

@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef READ_WIFI_MAC_H
-#define READ_WIFI_MAC_H
+#ifndef WIFI_OEMINFO_MAC_H
+#define WIFI_OEMINFO_MAC_H
 
-#include "i_read_mac.h"
+#include <string>
 #include <dlfcn.h>
 #include "securec.h"
 
@@ -24,12 +24,10 @@ namespace OHOS {
 namespace Wifi {
 constexpr int REAL_MACADDR_LENGTH = 18; // length of mac string, eg "11:22:33:44:55:66"
 constexpr int NV_MACADDR_LENGTH = 13; // length of mac string  without ':'
-class ReadWifiMac : public IReadMac {
+class WifiOeminfoMac {
 public:
-    enum GetMacErrType {
+    enum ErrType {
         GET_MAC_SUCCESS,
-        GET_MAC_ERROR_BUFFER_ILLEGAL,
-        GET_MAC_ERROR_TYPE_INVALID,
         GET_MAC_ERROR_LOAD_SO_FAIL,
         GET_MAC_ERROR_DLSYM_FAIL,
         GET_MAC_ERROR_READ_NV_FAIL,
@@ -37,14 +35,14 @@ public:
         GET_MAC_ERROR_C_TO_STR_FAIL,
         GET_MAC_ERROR_MEMORY_FAIL,
     };
-    ReadWifiMac();
-    ~ReadWifiMac() override;
-    int GetConstantMac(std::string &constantWifiMac) override;
+    WifiOeminfoMac();
+    ~WifiOeminfoMac() override;
+    int GetOeminfoMac(std::string &constantWifiMac) override;
 
 private:
-    bool OpenFacsignedapiLib();
-    void CloseFacsignedapiLib();
-    int ReadWifiMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
+    bool OpenFacsignedapiLib(void **handler);
+    void CloseFacsignedapiLib(void *handler);
+    int WifiOeminfoMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH], void *handler);
     bool ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
     bool CharToBeJudged(char c);
     void MacDataTolower(char (&nvMacBuf)[NV_MACADDR_LENGTH]);

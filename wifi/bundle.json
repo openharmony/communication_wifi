@@ -45,6 +45,7 @@
             "SystemCapability.Communication.WiFi.AP.Extension = false"
         ],
         "features": [
+            "wifi_feature_dynamic_unload_sa",
             "wifi_feature_with_p2p",
             "wifi_feature_with_ap_intf",
             "wifi_feature_with_ap_num",

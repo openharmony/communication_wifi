@@ -28,9 +28,9 @@ void OnConnectChanged(int status, int networkId, const std::string &bssid)
     LOGD("OnConnectChanged status %d, networkid %d, bssid %s", status, networkId, bssid.c_str());
 }
 
-void OnWpaStateChanged(int status)
+void OnWpaStateChanged(int status, const std::string &ssid)
 {
-    LOGD("OnWpaStateChanged status %d", status);
+    LOGD("OnWpaStateChanged status %d, ssid %s", status, ssid.c_str());
 }
 
 void OnWpaSsidWrongKey()
@@ -364,7 +364,7 @@ HWTEST_F(WifiStaHalInterfaceTest, WpaBlocklistClearTest, TestSize.Level1)
 HWTEST_F(WifiStaHalInterfaceTest, GetConnectSignalInfoTest, TestSize.Level1)
 {
     std::string endBssid;
-    WifiHalWpaSignalInfo info;
+    WifiSignalPollInfo info;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo("wlan0", endBssid, info);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_INPUT_MAC_INVALID);
     endBssid = "00:00:00:00:00:00";

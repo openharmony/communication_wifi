@@ -82,6 +82,14 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
+class WifiSwitchThresholdQoeFilter final : public SimpleWifiFilter {
+public:
+    WifiSwitchThresholdQoeFilter();
+    ~WifiSwitchThresholdQoeFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
 class SignalStrengthWifiFilter final : public SimpleWifiFilter {
 public:
     SignalStrengthWifiFilter();

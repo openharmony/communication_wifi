@@ -20,9 +20,9 @@
 #include <pthread.h>
 #include "v1_0/ihostapd_interface.h"
 #include "v1_0/ihostapd_callback.h"
-#include "v1_1/iwpa_interface.h"
-#include "v1_1/iwpa_callback.h"
-#include "v1_1/wpa_types.h"
+#include "v1_2/iwpa_interface.h"
+#include "v1_2/iwpa_callback.h"
+#include "v1_2/wpa_types.h"
 #include "wifi_error_no.h"
 #include "securec.h"
 #include "wifi_common_def.h"

@@ -57,18 +57,10 @@ public:
      * @Description : Callback of the connection state change event.
      *
      * @param status : status codes [in]
-     * @param networkId - network id [in]
+     * @param code - network id  or disconnect reason[in]
      * @param bssid - bssid of the network [in]
      */
-    void OnConnectChangedCallBack(int status, int networkId,const std::string &bssid);
-
-    /**
-     * @Description : Callback of the connection state change event.
-     *
-     * @param reason - reason id [in]
-     * @param bssid - bssid of the network [in]
-     */
-    void OnReportDisConnectReasonCallBack(int reason, const std::string &bssid);
+    void OnConnectChangedCallBack(int status, int code, const std::string &bssid);
 
     /**
      * @Description : Callback of the hilink trigger boardcast and wps.
@@ -89,8 +81,9 @@ public:
      * @Description : Callback of the wpa state change event.
      *
      * @param status - status codes [in]
+     * @param ssid - ssid of the network [in]
      */
-    void OnWpaStateChangedCallBack(int status);
+    void OnWpaStateChangedCallBack(int status, const std::string &ssid);
 
     /**
      * @Description : Callback of the Wpa ssid wrong key event.
@@ -150,6 +143,13 @@ public:
      * @param notifyParam - authentication information [in]
      */
     void OnWpaCsaChannelSwitchNotifyCallBack(const std::string &notifyParam);
+
+    /**
+     * @Description : Callback of the Mlo Work State
+     *
+     * @param notifyParam - mlo state and reason code [in]
+     */
+    void OnWpaMloStateNotifyCallBack(const std::string &notifyParam);
 
 private:
     StaStateMachine *pStaStateMachine;

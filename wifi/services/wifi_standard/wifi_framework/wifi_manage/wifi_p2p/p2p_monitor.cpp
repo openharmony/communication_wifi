@@ -31,6 +31,7 @@ P2pMonitor::P2pMonitor() : selectIfacName(), setMonitorIface(), mapHandler()
 
 P2pMonitor::~P2pMonitor() __attribute__((no_sanitize("cfi")))
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     P2pHalCallback callback;
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     setMonitorIface.clear();
@@ -42,6 +43,7 @@ void P2pMonitor::Initialize()
 void P2pMonitor::MonitorBegins(const std::string &iface)
 {
     using namespace std::placeholders;
+    std::lock_guard<std::mutex> lock(monitorMutex);
     selectIfacName = iface;
     setMonitorIface.insert(iface);
 
@@ -86,6 +88,7 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
 
 void P2pMonitor::MonitorEnds(const std::string &iface)
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     P2pHalCallback callback;
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     setMonitorIface.erase(iface);
@@ -93,6 +96,7 @@ void P2pMonitor::MonitorEnds(const std::string &iface)
 
 void P2pMonitor::RegisterIfaceHandler(const std::string &iface, const std::function<HandlerMethod> &handler)
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     auto iter = mapHandler.find(iface);
     if (iter != mapHandler.end()) {
         iter->second = handler;
@@ -103,6 +107,7 @@ void P2pMonitor::RegisterIfaceHandler(const std::string &iface, const std::funct
 
 void P2pMonitor::UnregisterHandler(const std::string &iface)
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     auto iter = mapHandler.find(iface);
     if (iter != mapHandler.end()) {
         mapHandler.erase(iter);
@@ -112,6 +117,7 @@ void P2pMonitor::UnregisterHandler(const std::string &iface)
 void P2pMonitor::MessageToStateMachine(
     const std::string &iface, P2P_STATE_MACHINE_CMD msgName, int param1, int param2, const std::any &messageObj) const
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     if (setMonitorIface.count(iface) > 0) {
         auto iter = mapHandler.find(iface);
         if (iter != mapHandler.end()) {

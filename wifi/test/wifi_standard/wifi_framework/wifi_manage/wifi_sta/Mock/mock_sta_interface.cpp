@@ -259,7 +259,7 @@ ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStat
 }
 #endif
 
-ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
+ErrCode StaInterface::EnableHiLinkHandshake(bool uiFlag, const WifiDeviceConfig &config, const std::string &bssid)
 {
     WIFI_LOGI("Enter EnableHiLinkHandshake");
     return WIFI_OPT_SUCCESS;

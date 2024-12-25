@@ -44,7 +44,7 @@ static void OnBssidChangedMock(const std::string &reason, const std::string &bss
     LOGI("OnBssidChangedMock");
 }
 
-static void OnWpaStateChangedMock(int status)
+static void OnWpaStateChangedMock(int status, const std::string &ssid)
 {
     LOGI("OnWpaStateChangedMock");
 }
@@ -415,7 +415,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     RegisterStaCallbackMock(&callback);
     std::string ifaceName = "wlan0";
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
-    OnWpaStateChanged(status);
+    OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
     OnWpaConnectionReject(status);
@@ -423,7 +423,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     OnWpsTimeOut(status);
     UnRegisterStaCallbackMock(&callback);
     WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
-    OnWpaStateChanged(status);
+    OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
     OnWpaConnectionReject(status);

@@ -546,6 +546,13 @@ ErrCode WifiDeviceImpl::FactoryReset()
     return client_->FactoryReset();
 }
 
+ErrCode WifiDeviceImpl::ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->ReceiveNetworkControlInfo(networkControlInfo);
+}
+
 ErrCode WifiDeviceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -614,6 +621,13 @@ ErrCode WifiDeviceImpl::SetDpiMarkRule(const std::string &ifaceName, int uid, in
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->SetDpiMarkRule(ifaceName, uid, protocol, enable);
+}
+ 
+ErrCode WifiDeviceImpl::UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->UpdateNetworkLagInfo(networkLagType, networkLagInfo);
 }
 }  // namespace Wifi
 }  // namespace OHOS

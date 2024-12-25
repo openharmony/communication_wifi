@@ -24,6 +24,7 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
+#include "dhcp_c_api.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #endif
@@ -46,6 +47,9 @@ IApServiceCallbacks& WifiHotspotManager::GetApCallback()
 #ifndef OHOS_ARCH_LITE
 static void UnloadHotspotSaTimerCallback()
 {
+#ifdef DYNAMIC_UNLOAD_SA
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_CLOSE_DHCP_SA);
+#endif
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
     WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
 }
@@ -79,6 +83,16 @@ void WifiHotspotManager::StartUnloadApSaTimer(void)
     return;
 }
 #endif
+
+void WifiHotspotManager::ApCloseDhcpSa(void)
+{
+#ifdef DYNAMIC_UNLOAD_SA
+    int state = WifiConfigCenter::GetInstance().GetP2pState();
+    if (state == static_cast<int>(P2pState::P2P_STATE_CLOSED)) {
+        StopDhcpdServerSa();
+    }
+#endif
+}
 
 void WifiHotspotManager::CloseApService(int id)
 {

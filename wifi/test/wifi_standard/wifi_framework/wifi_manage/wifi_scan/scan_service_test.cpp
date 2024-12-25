@@ -514,7 +514,6 @@ public:
         pScanService->isPnoScanBegined = false;
         std::vector<WifiDeviceConfig> results;
         WifiDeviceConfig cfg;
-        cfg.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
         cfg.isPasspoint = false;
         cfg.isEphemeral = false;
         results.push_back(cfg);

@@ -13,43 +13,44 @@
  * limitations under the License.
  */
 
-#include "read_wifi_mac.h"
+#include "wifi_oeminfo_mac.h"
 #include <dlfcn.h>
 #include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {
-DEFINE_WIFILOG_LABEL("ReadWifiMac");
+DEFINE_WIFILOG_LABEL("WifiOeminfoMac");
 
 static constexpr int PC_NV_PHYNUM_MAC_WIFI_NUMBER = 193;
 static constexpr const char* DLOPEN_LIBFACSIGNEDAPI_PATH = "libfacsignedapi_shared.so";
 static constexpr const char* OEM_INFO_FUNC_NAME = "ReadSignedValueNvmeOeminfo";
 static constexpr const char* CLEAR_SSL_FUNC_NAME = "OPENSSL_thread_stop";
 
-ReadWifiMac::ReadWifiMac()
+WifiOeminfoMac::WifiOeminfoMac()
 {
-    WIFI_LOGI("enter ReadWifiMac");
+    WIFI_LOGI("enter WifiOeminfoMac");
 }
 
-ReadWifiMac::~ReadWifiMac()
+WifiOeminfoMac::~WifiOeminfoMac()
 {
-    WIFI_LOGI("enter ~ReadWifiMac");
+    WIFI_LOGI("enter ~WifiOeminfoMac");
 }
 
-int ReadWifiMac::GetConstantMac(std::string &constantWifiMac)
+int WifiOeminfoMac::GetOeminfoMac(std::string &constantWifiMac)
 {
     constantWifiMac = "";
-    if (!OpenFacsignedapiLib()) {
+    void* handler = nullptr;
+    if (!OpenFacsignedapiLib(&handler)) {
         return GET_MAC_ERROR_LOAD_SO_FAIL;
     }
     char nvMac[NV_MACADDR_LENGTH] = {0};
-    int ret = ReadWifiMacFromNv(nvMac);
+    int ret = WifiOeminfoMacFromNv(nvMac, handler);
     if (ret != GET_MAC_SUCCESS) {
         WIFI_LOGE("mac read from nv fail");
-        CloseFacsignedapiLib();
+        CloseFacsignedapiLib(handler);
         return ret;
     }
-    CloseFacsignedapiLib();
+    CloseFacsignedapiLib(handler);
 
     MacDataTolower(nvMac);
     if (!ValidateAddr(nvMac)) {
@@ -66,42 +67,42 @@ int ReadWifiMac::GetConstantMac(std::string &constantWifiMac)
     return GET_MAC_SUCCESS;
 }
 
-bool ReadWifiMac::OpenFacsignedapiLib()
+bool WifiOeminfoMac::OpenFacsignedapiLib(void **handler)
 {
-    libFacSignedHandle_ = dlopen(DLOPEN_LIBFACSIGNEDAPI_PATH, RTLD_LAZY);
-    if (libFacSignedHandle_ == nullptr) {
+    *handler = dlopen(DLOPEN_LIBFACSIGNEDAPI_PATH, RTLD_LAZY);
+    if (*handler == nullptr) {
         WIFI_LOGE("failed to dlopen libfacsignedapi_share.so, reason %{public}s", dlerror());
         return false;
     }
     return true;
 }
 
-void ReadWifiMac::CloseFacsignedapiLib()
+void WifiOeminfoMac::CloseFacsignedapiLib(void *handler)
 {
-    if (libFacSignedHandle_ == nullptr) {
-        WIFI_LOGE("libFacSignedHandle_ is NULL, no need close");
+    if (handler == nullptr) {
+        WIFI_LOGE("handler is NULL, no need close");
         return;
     }
 
     CLEAR_OPEN_SSL_FUN dlClearOpenSsl =
-        reinterpret_cast<CLEAR_OPEN_SSL_FUN>(dlsym(libFacSignedHandle_, CLEAR_SSL_FUNC_NAME));
+        reinterpret_cast<CLEAR_OPEN_SSL_FUN>(dlsym(handler, CLEAR_SSL_FUNC_NAME));
     if (dlClearOpenSsl == nullptr) {
         WIFI_LOGE("failed to dlsym FacStopOpenSSLThread");
         return;
     }
 
     dlClearOpenSsl();
-    dlclose(libFacSignedHandle_);
-    libFacSignedHandle_ = nullptr;
+    dlclose(handler);
+    handler = nullptr;
 }
 
-int ReadWifiMac::ReadWifiMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH])
+int WifiOeminfoMac::WifiOeminfoMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH], void *handler)
 {
-    if (libFacSignedHandle_ == nullptr) {
+    if (handler == nullptr) {
         return GET_MAC_ERROR_LOAD_SO_FAIL;
     }
 
-    READ_OEMINFO_FUN dlReadOemInfo = reinterpret_cast<READ_OEMINFO_FUN>(dlsym(libFacSignedHandle_, OEM_INFO_FUNC_NAME));
+    READ_OEMINFO_FUN dlReadOemInfo = reinterpret_cast<READ_OEMINFO_FUN>(dlsym(handler, OEM_INFO_FUNC_NAME));
     if (dlReadOemInfo == nullptr) {
         WIFI_LOGE("failed to dlsym ReadSignedValueNvmeOeminfo");
         return GET_MAC_ERROR_DLSYM_FAIL;
@@ -117,19 +118,19 @@ int ReadWifiMac::ReadWifiMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH])
     return GET_MAC_SUCCESS;
 }
 
-bool ReadWifiMac::CharToBeJudged(char c)
+bool WifiOeminfoMac::CharToBeJudged(char c)
 {
     return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
 }
 
-int ReadWifiMac::Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destStr)[REAL_MACADDR_LENGTH])
+int WifiOeminfoMac::Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destStr)[REAL_MACADDR_LENGTH])
 {
     return sprintf_s(destStr, REAL_MACADDR_LENGTH, "%c%c:%c%c:%c%c:%c%c:%c%c:%c%c",
         srcStr[0], srcStr[1], srcStr[2], srcStr[3], srcStr[4], srcStr[5], // copy nv mac to real mac
         srcStr[6], srcStr[7], srcStr[8], srcStr[9], srcStr[10], srcStr[11]); // copy nv mac to real mac
 }
 
-void ReadWifiMac::MacDataTolower(char (&nvMacBuf)[NV_MACADDR_LENGTH])
+void WifiOeminfoMac::MacDataTolower(char (&nvMacBuf)[NV_MACADDR_LENGTH])
 {
     for (int i = 0; i < NV_MACADDR_LENGTH - 1; i++) {
         if (nvMacBuf[i] >= 'A' && nvMacBuf[i] <= 'F') {
@@ -138,7 +139,7 @@ void ReadWifiMac::MacDataTolower(char (&nvMacBuf)[NV_MACADDR_LENGTH])
     }
 }
 
-bool ReadWifiMac::ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH])
+bool WifiOeminfoMac::ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH])
 {
     int i = 0;
 

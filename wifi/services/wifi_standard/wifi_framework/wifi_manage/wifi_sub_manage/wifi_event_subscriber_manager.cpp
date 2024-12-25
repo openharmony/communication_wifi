@@ -111,14 +111,15 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterNetworkStateChangeEvent();
     UnRegisterWifiScanChangeEvent();
     UnRegisterSettingsEnterEvent();
+    UnRegisterDataShareReadyEvent();
 }
 
 void WifiEventSubscriberManager::Init()
 {
-    WIFI_LOGI("Init WifiEventSubscriberManager");
+    WIFI_LOGI("WifiEventSubscriberManager Init");
     // Subscribe and register operation after wifiManager init completed.
     SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
-    RegisterDataShareReadyEvent()
+    RegisterDataShareReadyEvent();
 }
 
 void WifiEventSubscriberManager::RegisterCesEvent()
@@ -1152,7 +1153,7 @@ void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &ev
 void WifiEventSubscriberManager::RegisterDataShareReadyEvent()
 {
     WIFI_LOGI("RegisterDataShareReadyEvent enter");
-    std::unique_lock<std::mutex> lock(dataShareReadySubscriber_);
+    std::unique_lock<std::mutex> lock(dataShareReadyEventMutex_);
     if (dataShareReadyTimerId_ != 0) {
         WifiTimer::GetInstance()->UnRegister(dataShareReadyTimerId_);
     }
@@ -1176,7 +1177,7 @@ void WifiEventSubscriberManager::RegisterDataShareReadyEvent()
 
 void WifiEventSubscriberManager::UnRegisterDataShareReadyEvent()
 {
-    std::unique_lock<std::mutex> lock(dataShareReadySubscriber_);
+    std::unique_lock<std::mutex> lock(dataShareReadyEventMutex_);
     if (dataShareReadyTimerId_ != 0) {
         WifiTimer::GetInstance()->UnRegister(dataShareReadyTimerId_);
     }

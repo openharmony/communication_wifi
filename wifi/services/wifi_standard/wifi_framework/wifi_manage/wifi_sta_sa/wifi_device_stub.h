@@ -86,6 +86,7 @@ private:
     void OnDisableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnEnableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -96,6 +97,7 @@ private:
     void OnGetDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetDpiMarkRule(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsFeatureSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnUpdateNetworkLagInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);

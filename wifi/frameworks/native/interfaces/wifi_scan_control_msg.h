@@ -31,11 +31,13 @@ struct Hid2dInfo {
     Hid2dUpperScene miraCastScene;
     P2pConnectedState p2pConnectState;
     int p2pEnhanceState;
+    int64_t hid2dSceneLastSetTime;
 
     Hid2dInfo()
     {
         p2pConnectState = P2pConnectedState::P2P_DISCONNECTED;
         p2pEnhanceState = 0;
+        hid2dSceneLastSetTime = 0;
     }
 };
 

@@ -104,7 +104,6 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
     for (int i = 0; i < retSize; ++i) {
         WifiDeviceConfig config;
         (void)ReadInt32(reply, &config.networkId);
-        (void)ReadInt32(reply, &config.status);
         config.bssid = (char *)ReadString(reply, &readLen);
         config.ssid = (char *)ReadString(reply, &readLen);
         (void)ReadInt32(reply, &config.band);
@@ -573,7 +572,6 @@ void WifiDeviceProxy::WriteEapConfig(IpcIo &req, const WifiEapConfig &wifiEapCon
 void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &req)
 {
     (void)WriteInt32(&req, config.networkId);
-    (void)WriteInt32(&req, config.status);
     (void)WriteString(&req, config.bssid.c_str());
     (void)WriteString(&req, config.ssid.c_str());
     (void)WriteInt32(&req, config.band);

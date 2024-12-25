@@ -284,6 +284,7 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
+        std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
         ifaceName, instId)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -330,6 +331,9 @@ ErrCode WifiServiceScheduler::AutoStopScanOnly(int instId, bool setIfaceDown)
     }
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStopScanService(instId);
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::CLOSED, instId);
+#ifdef DYNAMIC_UNLOAD_SA
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::SCAN_SERVICE_CLOSE, instId);
+#endif
     return WIFI_OPT_SUCCESS;
 }
 
@@ -397,6 +401,7 @@ ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
+        std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
         ifaceName, instId)) {
         WIFI_LOGE("PreStartWifi, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -559,6 +564,10 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
 #ifdef FEATURE_WIFI_PRO_SUPPORT
 ErrCode WifiServiceScheduler::StartWifiProService(int instId)
 {
+    if (IsFactoryMode()) {
+        WIFI_LOGI("factory mode, not start wifipro service");
+        return WIFI_OPT_FAILED;
+    }
     if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_WIFIPRO) < 0) {
         WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_WIFIPRO);
         return WIFI_OPT_FAILED;
@@ -660,6 +669,17 @@ void WifiServiceScheduler::OnRssiReportCallback(int index, int antRssi)
 
     std::string data = std::to_string(antRssi);
     WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(index, data);
+}
+
+void WifiServiceScheduler::OnNetlinkReportCallback(int type, const std::vector<uint8_t>& recvMsg)
+{
+    WIFI_LOGI("OnNetlinkReportCallback, type:%{public}d", type);
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("get pEnhance service failed!");
+        return;
+    }
+    pEnhanceService->ProcessWifiNetlinkReportEvent(type, recvMsg);
 }
 #endif
 

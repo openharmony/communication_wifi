@@ -34,6 +34,7 @@ public:
     void StopUnloadApSaTimer(void);
     void StartUnloadApSaTimer(void);
     void CloseApService(int id = 0);
+    void ApCloseDhcpSa(void);
 
 private:
     void InitApCallback(void);

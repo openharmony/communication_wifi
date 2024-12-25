@@ -18,7 +18,7 @@
 #include <string>
 #include <map>
 #include <set>
-
+#include <mutex>
 #include "p2p_macro.h"
 #include "p2p_define.h"
 #include "wifi_p2p_event_callback.h"
@@ -462,6 +462,7 @@ private:
     std::string selectIfacName;
     std::set<std::string> setMonitorIface;
     std::map<std::string, std::function<HandlerMethod>> mapHandler;
+    mutable std::mutex monitorMutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

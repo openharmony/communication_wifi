@@ -703,14 +703,14 @@ void StaServiceTest::EnableHiLinkHandshakeFailTest()
 {
     WifiDeviceConfig config;
     std::string cmd = "ENABLE=1 BSSID=01:23:45:67:89:AB";
-    pStaService->EnableHiLinkHandshake(config, cmd);
+    pStaService->EnableHiLinkHandshake(true, config, cmd);
 }
 
 void StaServiceTest::EnableHiLinkHandshakeSuceessTest()
 {
     WifiDeviceConfig config;
     std::string cmd = "ENABLE=0 BSSID=01:23:45:67:89:AB";
-    pStaService->EnableHiLinkHandshake(config, cmd);
+    pStaService->EnableHiLinkHandshake(true, config, cmd);
 }
 
 void StaServiceTest::DeliverStaIfaceDataSuccessTest()
@@ -777,7 +777,7 @@ void StaServiceTest::EnableHiLinkHandshakeTest()
 {
     WifiDeviceConfig config;
     std::string bssid = "11:22:33:44";
-    pStaService->EnableHiLinkHandshake(config, bssid);
+    pStaService->EnableHiLinkHandshake(true, config, bssid);
 }
 
 void StaServiceTest::DeliverStaIfaceDataTest()

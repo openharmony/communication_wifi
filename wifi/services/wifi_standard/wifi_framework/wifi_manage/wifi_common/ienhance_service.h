@@ -83,11 +83,34 @@ public:
     virtual ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) = 0;
     
     /**
+     * @Description Notify internet state
+     *
+     * @param netState - net state
+     */
+    virtual void NotifyInternetState(const int netState) = 0;
+    
+    /**
+     * @Description Notify wifi netlink message
+     *
+     * @param type - wifi netlink message type
+     * @param recvMsg - wifi netlink message
+     */
+    virtual void ProcessWifiNetlinkReportEvent(const int type, const std::vector<uint8_t>& recvMsg) = 0;
+
+    /**
      * @Description Check Chba conncted
      *
      * @return true: conncted, false: not conncted
      */
     virtual bool CheckChbaConncted() = 0;
+
+    /**
+     * @Description Stop Get CAC Result And Local CAC
+     *
+     * @param reason - reason
+     * @return void
+     */
+    virtual void StopGetCacResultAndLocalCac(int reason) = 0;
 
     /**
      * @Description Is external scan allowed.
@@ -206,6 +229,14 @@ public:
      * @return int - supported frequency
      */
     virtual int FreqEnhance(int freq, bool is160M) = 0;
+
+    /**
+     * @Description set the enhance signal poll info
+     *
+     * @param info - signal info
+     * @return void
+     */
+    virtual void SetEnhanceSignalPollInfo(WifiSignalPollInfo &info) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

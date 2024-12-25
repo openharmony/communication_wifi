@@ -127,6 +127,10 @@ void WifiDeviceStub::InitHandleMapEx2()
         MessageParcel &data, MessageParcel &reply) { OnSetDpiMarkRule(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_FEATURE_SUPPORTED)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnIsFeatureSupported(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_NET_CONTROL_INFO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnReceiveNetworkControlInfo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_NETWORK_LAG_INFO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnUpdateNetworkLagInfo(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -377,7 +381,6 @@ void WifiDeviceStub::ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapCo
 void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config)
 {
     config.networkId = data.ReadInt32();
-    config.status = data.ReadInt32();
     config.bssid = data.ReadString();
     config.bssidType = data.ReadInt32();
     config.ssid = data.ReadString();
@@ -483,7 +486,6 @@ void WifiDeviceStub::BigDataWriteEapConfig(const WifiEapConfig &wifiEapConfig, s
 void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config)
 {
     reply.WriteInt32(config.networkId);
-    reply.WriteInt32(config.status);
     reply.WriteString(config.bssid);
     reply.WriteInt32(config.bssidType);
     reply.WriteString(config.ssid);
@@ -881,6 +883,8 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteBool(wifiInfo.isAncoConnected);
         reply.WriteInt32((int)wifiInfo.supportedWifiCategory);
         reply.WriteBool(wifiInfo.isHiLinkNetwork);
+        reply.WriteInt32(wifiInfo.lastRxPackets);
+        reply.WriteInt32(wifiInfo.lastTxPackets);
     }
 
     return;
@@ -1197,6 +1201,22 @@ void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageP
     return;
 }
 
+void WifiDeviceStub::OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.uid = data.ReadInt32();
+    networkControlInfo.pid = data.ReadInt32();
+    networkControlInfo.bundleName = data.ReadString();
+    networkControlInfo.state = data.ReadInt32();
+    networkControlInfo.sceneId = data.ReadInt32();
+    networkControlInfo.rtt = data.ReadInt32();
+    ErrCode ret = ReceiveNetworkControlInfo(networkControlInfo);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
 void WifiDeviceStub::OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -1315,5 +1335,16 @@ void WifiDeviceStub::OnSetDpiMarkRule(uint32_t code, MessageParcel &data, Messag
     return;
 }
 
+void WifiDeviceStub::OnUpdateNetworkLagInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    NetworkLagType networkLagType = static_cast<NetworkLagType>(data.ReadInt32());
+    NetworkLagInfo networkLagInfo;
+    networkLagInfo.uid = static_cast<uint32_t>(data.ReadInt32());
+    ErrCode ret = UpdateNetworkLagInfo(networkLagType, networkLagInfo);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
 }  // namespace Wifi
 }  // namespace OHOS

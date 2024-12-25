@@ -39,7 +39,9 @@ constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
 constexpr auto XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP = "HighTempLimitSpeedApp";
 constexpr auto XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST = "KeyAppForegroundList";
 constexpr auto XML_TAG_SECTION_HEADER_APP_BACKGROUND_LIMIT_LIST = "BackgroundLimitListApp";
+constexpr auto XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST = "AppLiveStream";
 constexpr auto XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME = "AsyncDelayTime";
+constexpr auto XML_TAG_SECTION_KEY_GAME_RTT = "mGameRtt";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
 constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
 constexpr auto XML_TAG_SECTION_KEY_DELAY_TIME = "delayTime";
@@ -57,6 +59,8 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST, AppType::KEY_FOREGROUND_LIST_APP},
     { XML_TAG_SECTION_HEADER_APP_BACKGROUND_LIMIT_LIST, AppType::BACKGROUND_LIMIT_LIST_APP},
     { XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME, AppType::ASYNC_DELAY_TIME},
+    { XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST, AppType::LIVE_STREAM_APP},
+    { XML_TAG_SECTION_KEY_GAME_RTT, AppType::GAME_RTT},
 };
 
 AppParser::AppParser()
@@ -144,6 +148,20 @@ bool AppParser::IsBackgroundLimitApp(const std::string &bundleName) const
         [bundleName](const BackgroundLimitListAppInfo &app) { return app.packageName == bundleName; });
 }
 
+bool AppParser::IsLiveStreamApp(const std::string &bundleName) const
+{
+    return std::any_of(m_liveStreamAppVec.begin(), m_liveStreamAppVec.end(),
+        [bundleName](const LiveStreamAppInfo &app) { return app.packageName == bundleName; });
+}
+
+bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) const
+{
+    if (m_gameRtt.find(bundleName) == m_gameRtt.end()) {
+        return false;
+    }
+    return m_gameRtt.at(bundleName) <= gameRtt;
+}
+
 std::string AppParser::GetAsyncLimitSpeedDelayTime() const
 {
     return m_delayTime;
@@ -195,7 +213,6 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
     }
     m_lowLatencyAppVec.clear();
     m_whiteAppVec.clear();
-    m_blackAppVec.clear();
     m_multilinkAppVec.clear();
     m_chariotAppVec.clear();
     m_highTempLimitSpeedAppVec.clear();
@@ -207,9 +224,6 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
                 break;
             case AppType::WHITE_LIST_APP:
                 m_whiteAppVec.push_back(ParseWhiteAppInfo(node));
-                break;
-            case AppType::BLACK_LIST_APP:
-                m_blackAppVec.push_back(ParseBlackAppInfo(node));
                 break;
             case AppType::MULTILINK_BLACK_LIST_APP:
                 m_multilinkAppVec.push_back(ParseMultiLinkAppInfo(node));
@@ -239,6 +253,9 @@ void AppParser::ParseNetworkControlAppList(const xmlNodePtr &innode)
     }
     m_keyForegroundListAppVec.clear();
     m_backgroundLimitListAppVec.clear();
+    m_blackAppVec.clear();
+    m_liveStreamAppVec.clear();
+
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetAppTypeAsInt(node)) {
             case AppType::KEY_FOREGROUND_LIST_APP:
@@ -246,6 +263,12 @@ void AppParser::ParseNetworkControlAppList(const xmlNodePtr &innode)
                 break;
             case AppType::BACKGROUND_LIMIT_LIST_APP:
                 m_backgroundLimitListAppVec.push_back(ParseBackgroundLimitListAppInfo(node));
+                break;
+            case AppType::BLACK_LIST_APP:
+                m_blackAppVec.push_back(ParseBlackAppInfo(node));
+                break;
+            case AppType::LIVE_STREAM_APP:
+                m_liveStreamAppVec.push_back(ParseLiveStreamAppInfo(node));
                 break;
             case AppType::ASYNC_DELAY_TIME:
                 ParseAsyncLimitSpeedDelayTime(node);
@@ -267,7 +290,19 @@ LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME));
     std::string gameName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = gameName;
-    xmlFree(value);
+    if (value != nullptr) {
+        xmlFree(value);
+    }
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
+        if (GetAppTypeAsInt(node) == AppType::GAME_RTT) {
+            xmlChar *rttValue = xmlNodeGetContent(node);
+            std::string rtt = std::string(reinterpret_cast<char *>(rttValue));
+            m_gameRtt[gameName] = CheckDataLegal(rtt);
+            if (rttValue != nullptr) {
+                xmlFree(rttValue);
+            }
+        }
+    }
     return appInfo;
 }
 
@@ -339,6 +374,18 @@ BackgroundLimitListAppInfo AppParser::ParseBackgroundLimitListAppInfo(const xmlN
     std::string packageName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = packageName;
     xmlFree(value);
+    return appInfo;
+}
+
+LiveStreamAppInfo AppParser::ParseLiveStreamAppInfo(const xmlNodePtr &innode)
+{
+    LiveStreamAppInfo appInfo;
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    if (value != nullptr) {
+        xmlFree(value);
+    }
     return appInfo;
 }
 

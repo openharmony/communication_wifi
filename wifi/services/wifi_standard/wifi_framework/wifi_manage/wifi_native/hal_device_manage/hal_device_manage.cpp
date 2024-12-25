@@ -47,6 +47,8 @@ std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiP2pIfaces;
 sptr<IChipController> HalDeviceManager::g_IWifi = nullptr;
 sptr<ChipControllerCallback> HalDeviceManager::g_chipControllerCallback = nullptr;
 sptr<ChipIfaceCallback> HalDeviceManager::g_chipIfaceCallback = nullptr;
+constexpr int32_t CMD_SET_MAX_CONNECT = 102;
+constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -815,6 +817,17 @@ bool HalDeviceManager::DisAssociateSta(const std::string &ifaceName, const std::
     const int disAssociateStaCmd = 101;
     mac.erase(std::remove(mac.begin(), mac.end(), ':'), mac.end());
     return SendCmdToDriver(ifaceName, interfaceName, disAssociateStaCmd, mac);
+}
+
+bool HalDeviceManager::SetMaxConnectNum(const std::string &ifaceName, int32_t channel, int32_t maxConn)
+{
+    if (maxConn > MAX_CONNECT_DEFAULT) {
+        LOGW("SetMaxConnectNum maxConn is over MAX_CONNECT_DEFAULT, maxConn is %{public}d", maxConn);
+        maxConn = MAX_CONNECT_DEFAULT;
+    }
+    std::string param = std::to_string(channel) + '.' + std::to_string(maxConn);
+    LOGI("SetMaxConnectNum param is %{public}s", param.c_str());
+    return SendCmdToDriver(ifaceName, ifaceName, CMD_SET_MAX_CONNECT, param);
 }
 
 void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)

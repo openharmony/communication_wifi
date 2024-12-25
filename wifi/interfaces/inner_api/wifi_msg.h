@@ -636,6 +636,7 @@ struct WifiNetworkControlInfo {
     std::string bundleName;
     int state;
     int sceneId;
+    int rtt;
 
     WifiNetworkControlInfo()
     {
@@ -644,6 +645,7 @@ struct WifiNetworkControlInfo {
         bundleName = "";
         state = -1;
         sceneId = -1;
+        rtt = -1;
     }
 };
 

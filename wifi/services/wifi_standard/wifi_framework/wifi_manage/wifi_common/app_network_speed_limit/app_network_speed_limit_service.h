@@ -28,6 +28,15 @@ namespace OHOS {
 namespace Wifi {
 constexpr const int UNKNOWN_UID = -1;
 
+enum GameSceneId : int {
+    MSG_GAME_STATE_START = 0,
+    MSG_GAME_STATE_END = 1,
+    MSG_GAME_ENTER_PVP_BATTLE = 2,
+    MSG_GAME_EXIT_PVP_BATTLE = 3,
+    MSG_GAME_STATE_FOREGROUND = 4,
+    MSG_GAME_STATE_BACKGROUND = 5,
+};
+
 struct AsyncParamInfo {
     int controlId;
     int limitMode;
@@ -65,18 +74,22 @@ private:
     int GetBgLimitMaxMode();
     ErrCode GetAppList(std::vector<AppExecFwk::RunningProcessInfo> &appList, bool getFgAppFlag);
     bool CheckNetWorkCanBeLimited(const int controlId);
-    void UpdateSpeedLimitConfigs(const int controlId, const int limitMode);
+    void UpdateSpeedLimitConfigs(const int controlId, const int limitMode, const int enable);
     void UpdateNoSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
-    bool IsLimitSpeedBgApp(const int controlId, const std::string &bundleName);
+    bool IsLimitSpeedBgApp(const int controlId, const std::string &bundleName, const int enable);
     void AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo);
     void WifiConnectStateChanged();
     void ForegroundAppChangedAction(const std::string &bundleName);
     void HandleRequest(const AsyncParamInfo &asyncParamInfo);
-    void SendLimitCmd2Drv(const int controlId, const int limitMode);
+    void SendLimitCmd2Drv(const int controlId, const int limitMode, const int uid = -1,
+        const int enable = 0);
+    void HighPriorityTransmit(int uid, int protocol, int enable);
+    void GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
 
 private:
     StaServiceCallback m_staCallback;
     std::atomic<bool> m_isWifiConnected = false;
+    int m_isHighPriorityTransmit = 0;
     std::map<int, int> m_bgLimitRecordMap;
     int m_limitSpeedMode{0};
     std::unordered_set<int> m_bgUidSet;

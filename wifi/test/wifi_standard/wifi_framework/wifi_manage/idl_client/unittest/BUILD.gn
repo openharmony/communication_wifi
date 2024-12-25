@@ -127,11 +127,6 @@ ohos_unittest("idl_client_unittest") {
     external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
   }
 
-  if (wifi_feature_read_wifi_mac_from_oem) {
-    include_dirs += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac" ]
-    sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_read_mac/read_wifi_mac.cpp" ]
-  }
-
   configs = [ ":module_private_config" ]
 
   part_name = "wifi"

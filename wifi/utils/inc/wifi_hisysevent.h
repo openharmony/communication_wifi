@@ -129,6 +129,8 @@ void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, time_t connTi
     time_t portalAuthTime, bool isNotificationClicked);
 
 void WriteWifiSelfcureHisysevent(int type);
+
+void Write3VapConflictHisysevent(int type);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

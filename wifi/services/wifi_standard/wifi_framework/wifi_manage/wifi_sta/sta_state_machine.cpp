@@ -1848,7 +1848,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
     if (!config.isPortal || linkedInfo.connState != ConnState::CONNECTED) {
         return;
     }
-    bool needChangePortalFlag = false'
+    bool needChangePortalFlag = false;
     switch (netState) {
         case SystemNetWorkState::NETWORK_NOTWORKING:
             if (NetworkStatusHistoryManager::IsPortalByHistory(config.networkStatusHistory)) {
@@ -1889,7 +1889,6 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
         WifiSettings::GetInstance().SyncDeviceConfig();
     }
 }
-
 
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)

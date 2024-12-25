@@ -2330,6 +2330,8 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
     config.networkSelectionStatus.status = WifiDeviceConfigStatus(reply.ReadInt32());
     config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason(reply.ReadInt32());
     config.networkSelectionStatus.seenInLastQualifiedNetworkSelection = reply.ReadBool();
+    config.isPortal = reply.ReadBool();
+    config.noInternetAccess = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)

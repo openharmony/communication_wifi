@@ -528,6 +528,8 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteInt32((int)config.networkSelectionStatus.status);
     reply.WriteInt32((int)config.networkSelectionStatus.networkSelectionDisableReason);
     reply.WriteBool(config.networkSelectionStatus.seenInLastQualifiedNetworkSelection);
+    reply.WriteBool(config.isPortal);
+    reply.WriteBool(config.noInternetAccess);
     return;
 }
 

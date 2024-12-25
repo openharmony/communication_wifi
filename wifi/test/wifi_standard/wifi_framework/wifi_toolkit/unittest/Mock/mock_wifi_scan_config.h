@@ -72,7 +72,7 @@ public:
     MOCK_METHOD1(SetScanInitiatorUid, void(int));
     MOCK_METHOD0(GetScanInitiatorUid, int());
     MOCK_METHOD0(GetScanDeviceInfo, WifiScanDeviceInfo());
-    MOCK_METHOD2(RecordWifiCategory, vid(const std::string bssid, WifiCategory category));
+    MOCK_METHOD2(RecordWifiCategory, void(const std::string bssid, WifiCategory category));
     MOCK_METHOD1(GetWifiCategoryRecord, WifiCategory(const std::string bssid));
     MOCK_METHOD1(GetScanInfoListInner, void(std::vector<WifiScanInfo> &results));
     MOCK_METHOD1(SetStaScene, void(const int &scene));

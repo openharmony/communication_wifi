@@ -33,6 +33,7 @@ private:
     bool CheckStaConnected();
     bool CheckP2pConnected();
     bool CheckSoftApStarted();
+    bool CheckEnhanceWifiConnected();
     void ForceStopSoftAp();
     void ShowToast();
 };

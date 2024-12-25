@@ -25,6 +25,7 @@
 #include "wifi_msg.h"
 #include "wifi_internal_msg.h"
 #include "wifi_ap_msg.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {

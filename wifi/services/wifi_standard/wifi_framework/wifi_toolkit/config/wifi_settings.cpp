@@ -1817,9 +1817,7 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
         return 1;
     }
     sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
-        if (a.status != b.status) {
-            return (a.status == 0) < (b.status == 0);
-        } else if (a.lastConnectTime != b.lastConnectTime) {
+        if (a.lastConnectTime != b.lastConnectTime) {
             return a.lastConnectTime < b.lastConnectTime;
         } else if (a.numRebootsSinceLastUse != b.numRebootsSinceLastUse) {
             return a.numRebootsSinceLastUse > b.numRebootsSinceLastUse;

@@ -63,6 +63,11 @@ void WifiProInterface::DealScanResult(const std::vector<InterScanInfo> &results)
     WIFI_LOGI("Enter WifiProInterface::DealScanResult");
 }
 
+void WifiProInterface::DealQoeSlowResult()
+{
+    WIFI_LOGI("Enter WifiProInterface::DealQoeSlowResult");
+}
+
 StaServiceCallback WifiProInterface::GetStaCallback() const
 {
     return staCallback_;

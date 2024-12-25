@@ -33,10 +33,11 @@ public:
     void HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo);
     void HandleRssiLevelChanged(int32_t rssi);
     void HandleScanResult(const std::vector<InterScanInfo> &scanInfos);
+    void HandleQoeSlowResult();
 private:
     std::shared_ptr<WifiProStateMachine> pWifiProStateMachine_ { nullptr };
     int32_t instId_ { 0 };
-    void NotifyWifi2WifiFailed();
+    void NotifyWifi2WifiFailed(OperateResState state);
     void NotifyWifiConnectStateChanged(OperateResState state, const WifiLinkedInfo &linkedInfo);
     void NotifyCheckWifiInternetResult(OperateResState state);
 };

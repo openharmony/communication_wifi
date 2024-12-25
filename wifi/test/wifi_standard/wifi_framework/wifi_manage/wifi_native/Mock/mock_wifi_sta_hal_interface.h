@@ -80,7 +80,7 @@ public:
     WifiErrorNo WpaBlocklistClear();
     WifiErrorNo GetNetworkList(std::vector<WifiHalWpaNetworkInfo> &networkList);
     WifiErrorNo GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,
-        WifiHalWpaSignalInfo &info);
+        WifiSignalPollInfo &info);
     WifiErrorNo SetPmMode(const std::string &ifaceName, int frequency, int mode);
     WifiErrorNo SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable);
     WifiErrorNo ShellCmd(const std::string &ifName, const std::string &cmd);
@@ -92,7 +92,7 @@ public:
     const std::function<void(int)> &GetDeathCallbackInst(void) const;
     WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
 public:
-    WifiHalWpaSignalInfo mInfo;
+    WifiSignalPollInfo mInfo;
 private:
     WifiEventCallback mStaCallback;
     std::function<void(int)> mDeathCallback;

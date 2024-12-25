@@ -39,6 +39,7 @@ std::atomic_bool HalDeviceManager::g_chipHdiServiceDied = false;
 std::mutex HalDeviceManager::mMutex;
 static HdfRemoteService *g_chipHdiService = nullptr;
 static RssiReportCallback g_rssiReportCallback = nullptr;
+static NetlinkReportCallback g_netlinkReportCallback = nullptr;
 std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> HalDeviceManager::mInterfaceInfoCache;
 std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiStaIfaces;
 std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiApIfaces;
@@ -46,6 +47,8 @@ std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiP2pIfaces;
 sptr<IChipController> HalDeviceManager::g_IWifi = nullptr;
 sptr<ChipControllerCallback> HalDeviceManager::g_chipControllerCallback = nullptr;
 sptr<ChipIfaceCallback> HalDeviceManager::g_chipIfaceCallback = nullptr;
+constexpr int32_t CMD_SET_MAX_CONNECT = 102;
+constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -124,7 +127,9 @@ void HalDeviceManager::StopChipHdi()
 }
 
 bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback,
-                                      const RssiReportCallback &rssiReportCallback, std::string &ifaceName, int instId)
+                                      const RssiReportCallback &rssiReportCallback,
+                                      const NetlinkReportCallback &netlinkReportCallback, std::string &ifaceName,
+                                      int instId)
 {
     LOGI("CreateStaIface, ifaceName: %{public}s, instId = %{public}d", ifaceName.c_str(), instId);
     if (!CheckReloadChipHdiService()) {
@@ -148,6 +153,7 @@ bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCa
             return false;
         }
         g_rssiReportCallback = rssiReportCallback;
+        g_netlinkReportCallback = netlinkReportCallback;
     } else {
         LOGE("CreateStaIface wlan1 skip scan callback instId = %{public}d", instId);
     }
@@ -461,7 +467,7 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
 
     sptr<IChipIface> &iface = iter->second;
     CHECK_NULL_AND_RETURN(iface, false);
-    if (!SetNetworkUpDown(ifaceName, false)) {
+    if (iface->SetIfaceState(false) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network down fail");
         return false;
     }
@@ -469,7 +475,7 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
     if (ret != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, call SetMacAddress failed! ret:%{public}d", ret);
     }
-    if (!SetNetworkUpDown(ifaceName, true)) {
+    if (iface->SetIfaceState(true) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network up fail");
         return false;
     }
@@ -480,6 +486,10 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
 
 IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
 {
+    if (ifaceName.empty()) {
+        LOGE("find iface is empty");
+        return nullptr;
+    }
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter != mIWifiStaIfaces.end()) {
         LOGE("find sta iface info");
@@ -500,6 +510,7 @@ IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
 
 bool HalDeviceManager::SetNetworkUpDown(const std::string &ifaceName, bool upDown)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     IChipIface *iface = FindIface(ifaceName);
     if (iface == nullptr) {
         return false;
@@ -730,7 +741,7 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
 
     sptr<IChipIface> &iface = iter->second;
     CHECK_NULL_AND_RETURN(iface, false);
-    if (!SetNetworkUpDown(ifaceName, false)) {
+    if (iface->SetIfaceState(false) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network down fail");
         return false;
     }
@@ -738,7 +749,7 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     if (ret != HDF_SUCCESS) {
         LOGE("SetApMacAddress, call SetMacAddress failed! ret:%{public}d", ret);
     }
-    if (!SetNetworkUpDown(ifaceName, true)) {
+    if (iface->SetIfaceState(true) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network up fail");
         return false;
     }
@@ -806,6 +817,17 @@ bool HalDeviceManager::DisAssociateSta(const std::string &ifaceName, const std::
     const int disAssociateStaCmd = 101;
     mac.erase(std::remove(mac.begin(), mac.end(), ':'), mac.end());
     return SendCmdToDriver(ifaceName, interfaceName, disAssociateStaCmd, mac);
+}
+
+bool HalDeviceManager::SetMaxConnectNum(const std::string &ifaceName, int32_t channel, int32_t maxConn)
+{
+    if (maxConn > MAX_CONNECT_DEFAULT) {
+        LOGW("SetMaxConnectNum maxConn is over MAX_CONNECT_DEFAULT, maxConn is %{public}d", maxConn);
+        maxConn = MAX_CONNECT_DEFAULT;
+    }
+    std::string param = std::to_string(channel) + '.' + std::to_string(maxConn);
+    LOGI("SetMaxConnectNum param is %{public}s", param.c_str());
+    return SendCmdToDriver(ifaceName, ifaceName, CMD_SET_MAX_CONNECT, param);
 }
 
 void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
@@ -1514,6 +1536,7 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
                     iface->UnRegisterChipIfaceCallBack(g_chipIfaceCallback);
                 }
                 g_rssiReportCallback = nullptr;
+                g_netlinkReportCallback = nullptr;
             }
             ret = chip->RemoveStaService(ifaceName);
             break;
@@ -1598,6 +1621,11 @@ int32_t ChipIfaceCallback::OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c
 
 int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector<uint8_t>& recvMsg)
 {
+    LOGI("OnWifiNetlinkMessage, type:%{public}d", type);
+
+    if (g_netlinkReportCallback) {
+        g_netlinkReportCallback(type, recvMsg);
+    }
     return 0;
 }
 

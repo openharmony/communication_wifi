@@ -198,6 +198,18 @@ void WifiManager::OnNativeProcessStatusChange(int status)
     }
 }
 
+void WifiManager::StopGetCacResultAndLocalCac(int reason)
+{
+    WIFI_LOGI("StopGetCacResultAndLocalCac reason: %{public}d", reason);
+ 
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (!pEnhanceService) {
+        WIFI_LOGE("IEnhanceService pEnhanceService is null, StopGetCacResultAndLocalCac failed");
+        return;
+    }
+    pEnhanceService->StopGetCacResultAndLocalCac(reason);
+}
+
 void WifiManager::CheckSapcoExist()
 {
     char preValue[PROP_SUPPORT_SAPCOEXIST_LEN] = {0};
@@ -279,10 +291,31 @@ void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
             WIFI_LOGI("DealCloseServiceMsg exit!");
             return;
         default:
-            WIFI_LOGW("Unknown message code, %{public}d", static_cast<int>(code));
+            ProcessExtMsg(code);
             break;
     }
     return;
+}
+
+void WifiManager::ProcessExtMsg(WifiCloseServiceCode code)
+{
+    switch (code) {
+        case WifiCloseServiceCode::STA_CLOSE_DHCP_SA:
+            mCloseServiceThread->PostAsyncTask([this]() {
+                wifiStaManager->StaCloseDhcpSa();
+            });
+            break;
+#ifdef FEATURE_AP_SUPPORT
+        case WifiCloseServiceCode::AP_CLOSE_DHCP_SA:
+            mCloseServiceThread->PostAsyncTask([this]() {
+                wifiHotspotManager->ApCloseDhcpSa();
+            });
+            break;
+#endif
+        default:
+            WIFI_LOGW("Unknown message code, %{public}d", static_cast<int>(code));
+            break;
+    }
 }
 
 void WifiManager::AutoStartEnhanceService(void)

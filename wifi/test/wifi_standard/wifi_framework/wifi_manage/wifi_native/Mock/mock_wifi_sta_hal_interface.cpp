@@ -280,7 +280,7 @@ WifiErrorNo WifiStaHalInterface::WpaBlocklistClear()
 }
 
 WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,
-    WifiHalWpaSignalInfo &info)
+    WifiSignalPollInfo &info)
 {
     info = mInfo;
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?

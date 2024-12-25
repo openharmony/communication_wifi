@@ -32,6 +32,7 @@ namespace Wifi {
 #define WIFI_COUNTRY_CODE_LEN 2
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
+#define UNKNOWN_HILINK_NETWORK_ID (-2)
 #define WIFI_INVALID_UID (-1)
 #define INVALID_SIGNAL_LEVEL (-1)
 #define IPV4_ADDRESS_TYPE 0
@@ -42,6 +43,7 @@ namespace Wifi {
 #define WIFI_PASSWORD_LEN 128
 #define MAX_PID_LIST_SIZE 128
 #define REGISTERINFO_MAX_NUM 1000
+#define WIFI_MAX_MLO_LINK_NUM 2
 
 inline const std::string KEY_MGMT_NONE = "NONE";
 inline const std::string KEY_MGMT_WEP = "WEP";
@@ -133,6 +135,15 @@ enum ConnState {
     UNKNOWN
 };
 
+enum class MloState {
+    SINGLE_RADIO = 0,
+    WIFI7_MLSR = 1,
+    WIFI7_EMLSR = 2,
+    WIFI7_STR = 3,
+
+    WIFI7_INVALID = 0xFF,
+};
+
 enum class DisconnectedReason {
     /* Default reason */
     DISC_REASON_DEFAULT = 0,
@@ -213,6 +224,7 @@ struct WifiLinkedInfo {
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
+    MloState mloState; /* MLO connected state */
     int wifiStandard;                /* wifi standard */
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
@@ -224,6 +236,7 @@ struct WifiLinkedInfo {
     WifiCategory supportedWifiCategory;
     bool isMloConnected;
     bool isHiLinkNetwork;
+    bool isWurEnable;
     int c0Rssi;
     int c1Rssi;
     WifiLinkedInfo()
@@ -244,6 +257,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
+        mloState = MloState::SINGLE_RADIO;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
@@ -255,6 +269,7 @@ struct WifiLinkedInfo {
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         isMloConnected = false;
+        isWurEnable = false;
         c0Rssi = 0;
         c1Rssi = 0;
     }
@@ -614,12 +629,31 @@ struct IpInfo {
     }
 };
 
+/* Network control information */
+struct WifiNetworkControlInfo {
+    int uid;
+    int pid;
+    std::string bundleName;
+    int state;
+    int sceneId;
+    int rtt;
+
+    WifiNetworkControlInfo()
+    {
+        uid = -1;
+        pid = -1;
+        bundleName = "";
+        state = -1;
+        sceneId = -1;
+        rtt = -1;
+    }
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
     int networkId;
-    /* 0: CURRENT, using 1: DISABLED 2: ENABLED */
-    int status;
+    /* int status; @deprecated : CURRENT, using 1: DISABLED 2: ENABLED */
     /*  network selection status*/
     NetworkSelectionStatus networkSelectionStatus;
     /* mac address */
@@ -697,7 +731,6 @@ struct WifiDeviceConfig {
     {
         instanceId = 0;
         networkId = INVALID_NETWORK_ID;
-        status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
         bssidType = REAL_DEVICE_ADDRESS;
         band = 0;
         channel = 0;
@@ -862,10 +895,18 @@ struct EapSimUmtsAuthParam {
     }
 };
 
+struct MloStateParam {
+    uint8_t mloState;
+    uint16_t reasonCode;
+};
+
 typedef enum {
     BG_LIMIT_CONTROL_ID_GAME = 1,
     BG_LIMIT_CONTROL_ID_STREAM,
     BG_LIMIT_CONTROL_ID_TEMP,
+    BG_LIMIT_CONTROL_ID_KEY_FG_APP,
+    BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK,
+    BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE,
     BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT,
 } BgLimitControl;
 
@@ -915,6 +956,49 @@ enum class WifiSelfcureType {
     REASSOC_SELFCURE_SUCC,
     RESET_SELFCURE_SUCC,
     REDHCP_SELFCURE_SUCC,
+};
+
+enum class NetworkLagType {
+    DEFAULT = 0,
+    WIFIPRO_QOE_SLOW,
+};
+ 
+struct NetworkLagInfo {
+    uint32_t uid { 0 };
+ 
+    NetworkLagInfo()
+    {
+        uid = 0;
+    }
+};
+
+struct WifiSignalPollInfo {
+    int signal;
+    int txrate;
+    int rxrate;
+    int noise;
+    int frequency;
+    int txPackets;
+    int rxPackets;
+    int snr;
+    int chload;
+    int ulDelay;
+    int txBytes;
+    int rxBytes;
+    int txFailed;
+    int chloadSelf;
+    int c0Rssi;
+    int c1Rssi;
+    uint8_t* ext;
+    int extLen;
+
+    WifiSignalPollInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0),
+        txPackets(0), rxPackets(0), snr(0), chload(0), ulDelay(0), txBytes(0), rxBytes(0),
+        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(nullptr), extLen(0)
+    {}
+
+    ~WifiSignalPollInfo()
+    {}
 };
 }  // namespace Wifi
 }  // namespace OHOS

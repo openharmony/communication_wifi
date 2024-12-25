@@ -93,7 +93,7 @@ struct WifiScanDeviceInfo {
     {
         std::string scanInitiatorName = "";
         if (packageName.empty()) {
-            scanInitiatorName = std::to_string(scanDeviceInfo.initiatorUid);
+            scanInitiatorName = std::to_string(initiatorUid);
         } else {
             scanInitiatorName = packageName;
         }

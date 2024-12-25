@@ -161,7 +161,7 @@ bool WifiMultiVapManager::CheckEnhanceWifiConnected()
         int family = ifa->ifa_addr->sa_family;
         char ipAddress[NI_MAXHOST] = {0};
         if (family == AF_INET) {
-            ret = getnameinfo(ifa->ifa_addr, 
+            ret = getnameinfo(ifa->ifa_addr,
                 sizeof(struct sockaddr_in),
                 ipAddress,
                 NI_MAXHOST,

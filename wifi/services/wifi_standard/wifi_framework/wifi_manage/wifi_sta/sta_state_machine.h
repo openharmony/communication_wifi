@@ -594,7 +594,7 @@ private:
      *
      * @param  signalInfo - SignalPoll Result
      */
-    void UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo);
+    void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo);
 
     /**
      * @Description : Converting frequencies to channels.

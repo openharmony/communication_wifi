@@ -1087,7 +1087,7 @@ public:
 
     void UpdateLinkRssiTest()
     {
-        WifiHalWpaSignalInfo signalInfo;
+        WifiSignalPollInfo signalInfo;
         signalInfo.signal = INVALID_RSSI1;
         pStaStateMachine->UpdateLinkRssi(signalInfo);
 

@@ -398,7 +398,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqSetRoamConfigTEST, TestSize.Level1)
 HWTEST_F(WifiHdiWpaClientTest, ReqGetConnectSignalInfoTEST, TestSize.Level1)
 {
     std::string endBssid = "00:11:22:33:44:55";
-    WifiHalWpaSignalInfo info;
+    WifiSignalPollInfo info;
     WifiErrorNo result = wifiHdiWpaClient->ReqGetConnectSignalInfo(endBssid, info);
     EXPECT_EQ(result, WIFI_HAL_OPT_NOT_SUPPORT);
 }

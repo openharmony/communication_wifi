@@ -88,6 +88,17 @@ struct WifiScanDeviceInfo {
         packageName = "";
         initiatorUid = -1;
     }
+
+    std::string GetScanInitiatorName()
+    {
+        std::string scanInitiatorName = "";
+        if (packageName.empty()) {
+            scanInitiatorName = std::to_string(scanDeviceInfo.initiatorUid);
+        } else {
+            scanInitiatorName = packageName;
+        }
+        return scanInitiatorName;
+    }
 };
 
 enum class ScanLimitType {

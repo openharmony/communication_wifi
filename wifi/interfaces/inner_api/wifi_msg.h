@@ -971,6 +971,35 @@ struct NetworkLagInfo {
         uid = 0;
     }
 };
+
+struct WifiSignalPollInfo {
+    int signal;
+    int txrate;
+    int rxrate;
+    int noise;
+    int frequency;
+    int txPackets;
+    int rxPackets;
+    int snr;
+    int chload;
+    int ulDelay;
+    int txBytes;
+    int rxBytes;
+    int txFailed;
+    int chloadSelf;
+    int c0Rssi;
+    int c1Rssi;
+    uint8_t* ext;
+    int extLen;
+
+    WifiSignalPollInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0),
+        txPackets(0), rxPackets(0), snr(0), chload(0), ulDelay(0), txBytes(0), rxBytes(0),
+        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(nullptr), extLen(0)
+    {}
+
+    ~WifiSignalPollInfo()
+    {}
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

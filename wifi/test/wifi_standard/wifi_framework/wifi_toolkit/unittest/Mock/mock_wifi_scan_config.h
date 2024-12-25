@@ -36,6 +36,11 @@ public:
     virtual void SetPackageInfo(std::map<std::string, std::vector<PackageInfo>> &filterMap) = 0;
     virtual void SetAppRunningState(ScanMode appRunMode) = 0;
     virtual ScanMode GetAppRunningState() = 0;
+    virtual void SetScanType(ScanType scanType) = 0;
+    virtual ScanType GetScanType() = 0;
+    virtual void SetScanInitiatorUid(int initiatorUid) = 0;
+    virtual int GetScanInitiatorUid() = 0;
+    virtual WifiScanDeviceInfo GetScanDeviceInfo() = 0;
     virtual void RecordWifiCategory(const std::string bssid, WifiCategory category) = 0;
     virtual WifiCategory GetWifiCategoryRecord(const std::string bssid) = 0;
     virtual void GetScanInfoListInner(std::vector<WifiScanInfo> &results) = 0;
@@ -62,7 +67,12 @@ public:
     MOCK_METHOD1(SetPackageInfo, void(std::map<std::string, std::vector<PackageInfo>> &filterMap));
     MOCK_METHOD1(SetAppRunningState, void(ScanMode appRunMode));
     MOCK_METHOD0(GetAppRunningState, ScanMode());
-    MOCK_METHOD2(RecordWifiCategory, void(const std::string bssid, WifiCategory category));
+    MOCK_METHOD1(SetScanType, void(ScanType scanType));
+    MOCK_METHOD0(GetScanType, ScanType());
+    MOCK_METHOD1(SetScanInitiatorUid, void(int));
+    MOCK_METHOD0(GetScanInitiatorUid, int());
+    MOCK_METHOD0(GetScanDeviceInfo, WifiScanDeviceInfo());
+    MOCK_METHOD2(RecordWifiCategory, vid(const std::string bssid, WifiCategory category));
     MOCK_METHOD1(GetWifiCategoryRecord, WifiCategory(const std::string bssid));
     MOCK_METHOD1(GetScanInfoListInner, void(std::vector<WifiScanInfo> &results));
     MOCK_METHOD1(SetStaScene, void(const int &scene));

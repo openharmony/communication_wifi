@@ -64,11 +64,6 @@ inline const std::string HISYS_SERVICE_TYPE_STA = "STA";
 inline const std::string HISYS_SERVICE_TYPE_AP = "AP";
 inline const std::string HISYS_SERVICE_TYPE_P2P = "P2P";
 
-inline const std::string SCAN_INITIATOR_SYSTEM_SCAN = "SYSTEM_SCAN";
-inline const std::string SCAN_INITIATOR_PNO_SCAN = "PNO_SCAN";
-inline const std::string SCAN_INITIATOR_WIFIPRO = "WIFIPRO_SCAN";
-inline const std::string SCAN_INITIATOR_5G_AP = "5G_AP_SCAN";
-
 enum class WifiScanFailReason {
     DEFAULT = -1,
     PROXY_FAIL,

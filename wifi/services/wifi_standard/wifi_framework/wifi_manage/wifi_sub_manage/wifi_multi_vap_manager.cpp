@@ -101,13 +101,6 @@ bool WifiMultiVapManager::CheckP2pConnected()
         WIFI_LOGI("CheckP2pConnected: P2p is created group!");
         return true;
     }
-
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService && pEnhanceService->CheckChbaConncted()) {
-        WIFI_LOGI("CheckP2pConnected: Chba is connected!");
-        return true;
-    }
-
     WIFI_LOGI("CheckP2pConnected: P2p is not connected!");
     return false;
 }

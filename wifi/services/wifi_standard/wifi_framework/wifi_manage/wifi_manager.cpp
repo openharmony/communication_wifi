@@ -102,8 +102,10 @@ int WifiManager::Init()
         return -1;
     }
     mInitStatus = INIT_OK;
-    wifiEventSubscriberManager->Init();
 
+#ifndef OHOS_ARCH_LITE
+    wifiEventSubscriberManager->Init();
+#endif
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && !std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH) &&
         !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
         if (IsStartUpWifiEnableSupport()) {

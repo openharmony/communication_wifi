@@ -273,20 +273,7 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CONNECT_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteWifiScanApiFailHiSysEvent(const WifiScanDeviceInfo &scanDeviceInfo, const WifiScanFailReason failReason)
-{
-#ifndef OHOS_ARCH_LITE
-    std::string pkgName = "";
-    if (scanDeviceInfo.packageName.empty()) {
-        pkgName = std::to_string(scanDeviceInfo.initiatorUid);
-    } else {
-        pkgName = scanDeviceInfo.packageName;
-    }
-    WriteWifiScanApiFailHiSysEvent(pkgName, failReason);
-#endif
-}
-
-void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, WifiScanFailReason failReason)
+void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, const WifiScanFailReason failReason)
 {
 #ifndef OHOS_ARCH_LITE
     Json::Value root;

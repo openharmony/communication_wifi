@@ -170,8 +170,9 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
 
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     g_currentWpaStatus = statechangedParam->status;
+    std::string ssid = std::string(statechangedParam->ssid, statechangedParam->ssid + statechangedParam->ssidLen);
     if (cbk.onWpaStateChanged) {
-        cbk.onWpaStateChanged(g_currentWpaStatus);
+        cbk.onWpaStateChanged(g_currentWpaStatus, ssid);
     }
     LOGI("OnEventStateChanged:callback out status = %{public}d, ifName = %{public}s", g_currentWpaStatus, ifName);
     return 0;

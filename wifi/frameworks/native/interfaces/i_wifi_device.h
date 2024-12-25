@@ -575,6 +575,15 @@ public:
      * @param enable - enable/disable dpi mark
      */
     virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
+ 
+    /**
+     * @Description Update Network Lag Info
+     *
+     * @param networkLagType - recv networkLagType
+     * @param networkLagInfo - recv networkLagInfo
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

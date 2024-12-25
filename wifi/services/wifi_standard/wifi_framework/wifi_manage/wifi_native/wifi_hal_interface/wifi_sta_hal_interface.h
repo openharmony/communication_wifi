@@ -413,6 +413,15 @@ public:
      */
     WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
 
+    /**
+     * @Description get wifi7 mlo link info
+     *
+     * @param ifName - interface name
+     * @param mloLinkInfo - MLO link info
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetConnectionMloLinkedInfo(const std::string &ifName, std::vector<WifiLinkedInfo> &mloLinkInfo);
+
 private:
     WifiEventCallback mStaCallback[2];
     std::function<void(int)> mDeathCallback;

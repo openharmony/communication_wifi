@@ -965,7 +965,7 @@ enum class Wifi3VapConflictType {
     HML_SOFTAP_STA_CONFLICT_CNT,
     P2P_SOFTAP_STA_CONFLICT_CNT,
     P2P_HML_STA_CONFLICT_CNT,
-}
+};
 
 enum class NetworkLagType {
     DEFAULT = 0,

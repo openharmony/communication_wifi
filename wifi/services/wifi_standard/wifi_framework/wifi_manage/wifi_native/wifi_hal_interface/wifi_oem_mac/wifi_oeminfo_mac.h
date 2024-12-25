@@ -33,11 +33,10 @@ public:
         GET_MAC_ERROR_READ_NV_FAIL,
         GET_MAC_ERROR_MAC_INVALID,
         GET_MAC_ERROR_C_TO_STR_FAIL,
-        GET_MAC_ERROR_MEMORY_FAIL,
     };
     WifiOeminfoMac();
-    ~WifiOeminfoMac() override;
-    int GetOeminfoMac(std::string &constantWifiMac) override;
+    ~WifiOeminfoMac();
+    int GetOeminfoMac(std::string &constantWifiMac);
 
 private:
     bool OpenFacsignedapiLib(void **handler);
@@ -49,7 +48,6 @@ private:
     int Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destStr)[REAL_MACADDR_LENGTH]);
 
 private:
-    void* libFacSignedHandle_ = nullptr;
     using READ_OEMINFO_FUN = int (*) (int, char*, int);
     using CLEAR_OPEN_SSL_FUN = void (*) (void);
 };

@@ -21,7 +21,7 @@
 #include "wifi_notification_util.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_logger.h"
-#include "parameter.h"
+#include "parameters.h"
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <netdb.h>

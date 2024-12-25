@@ -335,8 +335,49 @@ void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr
         WIFI_LOGE("HandleNetWorkConnectionEvent, msg is nullptr.\n");
         return;
     }
-    pStaStateMachine->DelayMessage(msg);
-    pStaStateMachine->SwitchState(pStaStateMachine->pApLinkedState);
+    WIFI_LOGI("enter HandleNetWorkConnectionEvent m_instId = %{public}d", pStaStateMachine->m_instId);
+    std::string bssid = msg->GetStringFromMessage();
+    pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
+    if (pStaStateMachine->m_hilinkFlag) {
+        pStaStateMachine->HilinkSaveConfig();
+    }
+    WifiDeviceConfig deviceConfig;
+    int networkId = pStaStateMachine->targetNetworkId_;
+    int instId = pStaStateMachine->m_instId;
+    if (networkId == INVALID_NETWORK_ID ||
+        WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, instId) != 0) {
+        WIFI_LOGE("%{public}s can not find config for networkId = %{public}d", __FUNCTION__, networkId);
+        WifiStaHalInterface::GetInstance().Disconnect(WifiConfigCenter::GetInstance().GetStaIfaceName(instId));
+        pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
+        return;
+    }
+    if (pStaStateMachine->CurrentIsRandomizedMac()) {
+        WifiSettings::GetInstance().SetDeviceRandomizedMacSuccessEver(networkId);
+    }
+    /* Save linkedinfo */
+    pStaStateMachine->linkedInfo.networkId = pStaStateMachine->targetNetworkId_;
+    pStaStateMachine->AfterApLinkedprocess(bssid);
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
+    pStaStateMachine->lastSignalLevel_ = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
+    pStaStateMachine->DealSignalPollResult();
+
+    #ifndef OHOS_ARCH_LITE
+    pStaStateMachine->SaveWifiConfigForUpdate(pStaStateMachine->targetNetworkId_);
+    pStaStateMachine->SetSupportedWifiCategory();
+    if (pStaStateMachine->selfCureService_ != nullptr) {
+        pStaStateMachine->selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_CONN_CHANGED);
+    }
+    #endif
+    pStaStateMachine->DealMloConnectionLinkInfo();
+    WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
+    if (pStaStateMachine->m_instId == INSTID_WLAN0) {
+        pStaStateMachine->mConnectFailedCnt = 0;
+        /* The current state of StaStateMachine transfers to GetIpState. */
+        pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+    } else {
+        pStaStateMachine->mConnectFailedCnt = 0;
+        pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+    }
 }
 
 void StaStateMachine::InitState::UpdateCountryCode(InternalMessagePtr msg)
@@ -395,9 +436,11 @@ void StaStateMachine::InitState::StartWifiProcess()
 void StaStateMachine::InitState::StopWifiProcess()
 {
 #ifndef OHOS_ARCH_LITE
-    WifiNetAgent::GetInstance().UnregisterNetSupplier();
-    if (pStaStateMachine->m_NetWorkState != nullptr) {
-        pStaStateMachine->m_NetWorkState->StopNetStateObserver(pStaStateMachine->m_NetWorkState);
+    if (pStaStateMachine->m_instId == INSTID_WLAN0) {
+        WifiNetAgent::GetInstance().UnregisterNetSupplier();
+        if (pStaStateMachine->m_NetWorkState != nullptr) {
+            pStaStateMachine->m_NetWorkState->StopNetStateObserver(pStaStateMachine->m_NetWorkState);
+        }
     }
 #endif
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
@@ -973,7 +1016,6 @@ void StaStateMachine::ApLinkingState::HandleStaBssidChangedEvent(InternalMessage
         WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId)) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetBssid return fail.");
     }
-    pStaStateMachine->SwitchState(pStaStateMachine->pApLinkedState);
 }
 
 void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr msg)
@@ -1102,49 +1144,10 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
         WIFI_LOGE("HandleNetWorkConnectionEvent, msg is nullptr.\n");
         return;
     }
-    WIFI_LOGI("enter HandleNetWorkConnectionEvent m_instId = %{public}d", pStaStateMachine->m_instId);
     std::string bssid = msg->GetStringFromMessage();
-    pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
-    if (pStaStateMachine->m_hilinkFlag) {
-        pStaStateMachine->HilinkSaveConfig();
-    }
-    WifiDeviceConfig deviceConfig;
-    int networkId = pStaStateMachine->targetNetworkId_;
-    int instId = pStaStateMachine->m_instId;
-    if (networkId == INVALID_NETWORK_ID ||
-        WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, instId) != 0) {
-        WIFI_LOGE("%{public}s can not find config for networkId = %{public}d", __FUNCTION__, networkId);
-        WifiStaHalInterface::GetInstance().Disconnect(WifiConfigCenter::GetInstance().GetStaIfaceName(instId));
-        pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
-        return;
-    }
-    if (pStaStateMachine->CurrentIsRandomizedMac()) {
-        WifiSettings::GetInstance().SetDeviceRandomizedMacSuccessEver(networkId);
-    }
-    /* Save linkedinfo */
-    pStaStateMachine->linkedInfo.networkId = pStaStateMachine->targetNetworkId_;
-    pStaStateMachine->AfterApLinkedprocess(bssid);
-    WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
-    pStaStateMachine->lastSignalLevel_ = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
+    WIFI_LOGI("ApLinkedState reveived network connection event,bssid:%{public}s, ignore it.\n",
+        MacAnonymize(bssid).c_str());
     pStaStateMachine->DealSignalPollResult();
-
-    #ifndef OHOS_ARCH_LITE
-    pStaStateMachine->SaveWifiConfigForUpdate(pStaStateMachine->targetNetworkId_);
-    pStaStateMachine->SetSupportedWifiCategory();
-    if (pStaStateMachine->selfCureService_ != nullptr) {
-        pStaStateMachine->selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_CONN_CHANGED);
-    }
-    #endif
-    pStaStateMachine->DealMloConnectionLinkInfo();
-    WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
-    if (pStaStateMachine->m_instId == INSTID_WLAN0) {
-        pStaStateMachine->mConnectFailedCnt = 0;
-        /* The current state of StaStateMachine transfers to GetIpState. */
-        pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
-    } else {
-        pStaStateMachine->mConnectFailedCnt = 0;
-        pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
-    }
 }
 
 void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessagePtr msg)

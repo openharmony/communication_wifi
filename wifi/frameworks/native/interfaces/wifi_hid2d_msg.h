@@ -170,6 +170,8 @@ public:
     int fps;
     /* band width, valid only in video scenes, the default value is 0 */
     unsigned int bw;
+    /* record the timeStamp when set Hid2dUpperScene */
+    int64_t setTime;
 };
 }  // namespace Wifi
 }  // namespace OHOS

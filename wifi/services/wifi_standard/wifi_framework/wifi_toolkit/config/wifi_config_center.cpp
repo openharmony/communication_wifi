@@ -50,6 +50,7 @@ WifiConfigCenter::WifiConfigCenter()
     mWifiIpInfo.emplace(0, IpInfo());
     mWifiIpV6Info.emplace(0, IpV6Info());
     mWifiLinkedInfo.emplace(0, WifiLinkedInfo());
+    mWifiMloLinkedInfo.emplace(0, std::vector<WifiLinkedInfo>());
     mLastSelectedNetworkId.emplace(0, INVALID_NETWORK_ID);
     mLastSelectedTimeVal.emplace(0, time(NULL));
     mBssidToTimeoutTime.emplace(0, std::make_pair("", 0));
@@ -348,6 +349,26 @@ int WifiConfigCenter::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
     return 0;
 }
 
+int WifiConfigCenter::GetMloLinkedInfo(std::vector<WifiLinkedInfo> &mloInfo, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiMloLinkedInfo.find(instId);
+    if (iter != mWifiMloLinkedInfo.end()) {
+        mloInfo = iter->second;
+    }
+    return 0;
+}
+
+int WifiConfigCenter::SaveMloLinkedInfo(const std::vector<WifiLinkedInfo> &mloInfo, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    if (mloInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
+        return 0;
+    }
+    mWifiMloLinkedInfo[instId] = mloInfo;
+
+    return 0;
+}
 int WifiConfigCenter::SetMacAddress(const std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -790,6 +811,9 @@ int WifiConfigCenter::SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene)
     LOGD("SetHid2dUpperScene uid: %{public}d", uid);
     std::unique_lock<std::mutex> lock(mP2pMutex);
     mHid2dUpperScenePair.insert_or_assign(uid, scene);
+    if (scene.setTime != 0) {
+        mHid2dSceneLastSetTime = scene.setTime;
+    }
     return 0;
 }
 
@@ -801,6 +825,17 @@ int WifiConfigCenter::GetHid2dUpperScene(int uid, Hid2dUpperScene &scene)
         scene = iter->second;
     }
     return 0;
+}
+
+int WifiConfigCenter::SetHid2dSceneLastSetTime(int64_t setTime)
+{
+    mHid2dSceneLastSetTime = setTime;
+    return 0;
+}
+
+int64_t WifiConfigCenter::GetHid2dSceneLastSetTime()
+{
+    return mHid2dSceneLastSetTime.load();
 }
 
 void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
@@ -819,6 +854,7 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
         mHid2dUpperScenePair.insert_or_assign(MIRACAST_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(SHARE_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(MOUSE_CROSS_SERVICE_UID, scene);
+        SetHid2dSceneLastSetTime(0);
     }
 }
 

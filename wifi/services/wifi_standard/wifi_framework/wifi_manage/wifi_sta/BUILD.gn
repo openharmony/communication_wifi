@@ -99,7 +99,10 @@ if (defined(ohos_lite)) {
       "-fno-rtti",
     ]
 
-    defines = [ "OHOS_ARCH_LITE" ]
+    defines = [
+      "OHOS_ARCH_LITE",
+      "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+    ]
     ldflags += [
       "-fPIC",
       "-Wl,-E",

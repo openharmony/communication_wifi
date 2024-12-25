@@ -32,6 +32,7 @@ namespace Wifi {
 #define WIFI_COUNTRY_CODE_LEN 2
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
+#define UNKNOWN_HILINK_NETWORK_ID (-2)
 #define WIFI_INVALID_UID (-1)
 #define INVALID_SIGNAL_LEVEL (-1)
 #define IPV4_ADDRESS_TYPE 0
@@ -42,6 +43,7 @@ namespace Wifi {
 #define WIFI_PASSWORD_LEN 128
 #define MAX_PID_LIST_SIZE 128
 #define REGISTERINFO_MAX_NUM 1000
+#define WIFI_MAX_MLO_LINK_NUM 2
 
 inline const std::string KEY_MGMT_NONE = "NONE";
 inline const std::string KEY_MGMT_WEP = "WEP";
@@ -133,6 +135,15 @@ enum ConnState {
     UNKNOWN
 };
 
+enum class MloState {
+    SINGLE_RADIO = 0,
+    WIFI7_MLSR = 1,
+    WIFI7_EMLSR = 2,
+    WIFI7_STR = 3,
+
+    WIFI7_INVALID = 0xFF,
+};
+
 enum class DisconnectedReason {
     /* Default reason */
     DISC_REASON_DEFAULT = 0,
@@ -213,6 +224,7 @@ struct WifiLinkedInfo {
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
+    MloState mloState; /* MLO connected state */
     int wifiStandard;                /* wifi standard */
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
@@ -224,6 +236,7 @@ struct WifiLinkedInfo {
     WifiCategory supportedWifiCategory;
     bool isMloConnected;
     bool isHiLinkNetwork;
+    bool isWurEnable;
     int c0Rssi;
     int c1Rssi;
     WifiLinkedInfo()
@@ -244,6 +257,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
+        mloState = MloState::SINGLE_RADIO;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
@@ -255,6 +269,7 @@ struct WifiLinkedInfo {
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         isMloConnected = false;
+        isWurEnable = false;
         c0Rssi = 0;
         c1Rssi = 0;
     }
@@ -880,6 +895,11 @@ struct EapSimUmtsAuthParam {
     }
 };
 
+struct MloStateParam {
+    uint8_t mloState;
+    uint16_t reasonCode;
+};
+
 typedef enum {
     BG_LIMIT_CONTROL_ID_GAME = 1,
     BG_LIMIT_CONTROL_ID_STREAM,
@@ -936,6 +956,20 @@ enum class WifiSelfcureType {
     REASSOC_SELFCURE_SUCC,
     RESET_SELFCURE_SUCC,
     REDHCP_SELFCURE_SUCC,
+};
+
+enum class NetworkLagType {
+    DEFAULT = 0,
+    WIFIPRO_QOE_SLOW,
+};
+ 
+struct NetworkLagInfo {
+    uint32_t uid { 0 };
+ 
+    NetworkLagInfo()
+    {
+        uid = 0;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

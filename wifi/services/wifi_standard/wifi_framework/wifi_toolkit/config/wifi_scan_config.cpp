@@ -38,6 +38,7 @@ void WifiScanConfig::GetScanDeviceInfo(WifiScanDeviceInfo &scanDeviceInfo)
 #endif
     mScanDeviceInfo.hid2dInfo.p2pConnectState = linkedInfo.GetConnectState();
     mScanDeviceInfo.hid2dInfo.p2pEnhanceState = WifiConfigCenter::GetInstance().GetP2pEnhanceState();
+    mScanDeviceInfo.hid2dInfo.hid2dSceneLastSetTime = WifiConfigCenter::GetInstance().GetHid2dSceneLastSetTime();
     mScanDeviceInfo.idelState = WifiConfigCenter::GetInstance().GetPowerIdelState();
     mScanDeviceInfo.thermalLevel = WifiConfigCenter::GetInstance().GetThermalLevel();
     mScanDeviceInfo.screenState = WifiConfigCenter::GetInstance().GetScreenState();

@@ -198,6 +198,18 @@ void WifiManager::OnNativeProcessStatusChange(int status)
     }
 }
 
+void WifiManager::StopGetCacResultAndLocalCac(int reason)
+{
+    WIFI_LOGI("StopGetCacResultAndLocalCac reason: %{public}d", reason);
+ 
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (!pEnhanceService) {
+        WIFI_LOGE("IEnhanceService pEnhanceService is null, StopGetCacResultAndLocalCac failed");
+        return;
+    }
+    pEnhanceService->StopGetCacResultAndLocalCac(reason);
+}
+
 void WifiManager::CheckSapcoExist()
 {
     char preValue[PROP_SUPPORT_SAPCOEXIST_LEN] = {0};

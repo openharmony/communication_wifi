@@ -1202,6 +1202,8 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.isAncoConnected = reply.ReadBool();
     info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
     info.isHiLinkNetwork = reply.ReadBool();
+    info.lastRxPackets = reply.ReadInt32();
+    info.lastTxPackets = reply.ReadInt32();
 }
 
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
@@ -2400,5 +2402,35 @@ ErrCode WifiDeviceProxy::SetDpiMarkRule(const std::string &ifaceName, int uid, i
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int32_t>(networkLagType));
+    data.WriteInt32(static_cast<int32_t>(networkLagInfo.uid));
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_NETWORK_LAG_INFO), data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_NETWORK_LAG_INFO),
+            error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
 }  // namespace Wifi
 }  // namespace OHOS

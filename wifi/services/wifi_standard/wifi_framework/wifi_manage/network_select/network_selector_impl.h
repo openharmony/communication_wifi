@@ -37,6 +37,24 @@ protected:
     void GetCandidatesFromSubNetworkSelector() override;
 };
 
+class Wifi2WifiNoNetIntegrator : public CompositeNetworkSelector {
+public:
+    Wifi2WifiNoNetIntegrator();
+    ~Wifi2WifiNoNetIntegrator() = default;
+protected:
+    bool Nominate(NetworkCandidate &networkCandidate) override;
+    void GetCandidatesFromSubNetworkSelector() override;
+};
+ 
+class Wifi2WifiQoeSlowIntegrator : public CompositeNetworkSelector {
+public:
+    Wifi2WifiQoeSlowIntegrator();
+    ~Wifi2WifiQoeSlowIntegrator() = default;
+protected:
+    bool Nominate(NetworkCandidate &networkCandidate) override;
+    void GetCandidatesFromSubNetworkSelector() override;
+};
+
 class SavedNetworkTracker final: public CompositeNetworkSelector {
 public:
     SavedNetworkTracker();

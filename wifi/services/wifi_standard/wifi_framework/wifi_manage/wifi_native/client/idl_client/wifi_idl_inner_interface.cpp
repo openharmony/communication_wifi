@@ -96,12 +96,12 @@ void OnBssidChanged(const char *reason, const char *bssid)
     }
 }
 
-void OnWpaStateChanged(int status)
+void OnWpaStateChanged(int status, const char *ssid)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
         OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpaStateChanged) {
-        cbk.onWpaStateChanged(status);
+        cbk.onWpaStateChanged(status, ssid);
     }
 }
 

@@ -181,7 +181,7 @@ std::string WifiStaHalInterface::GetWifiOeminfoMac()
     LOGI("read mac from oem");
     WifiOeminfoMac oeminfoMac;
     std::string oemMac = "";
-    int ret = pWifiOeminfoMac->GetOeminfoMac(oemMac);
+    int ret = oeminfoMac.GetOeminfoMac(oemMac);
     if (ret != 0) {
         LOGE("GetOeminfoMac fail, ret = %{public}d", ret);
         return std::string("");

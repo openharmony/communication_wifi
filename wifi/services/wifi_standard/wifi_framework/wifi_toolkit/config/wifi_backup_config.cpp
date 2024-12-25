@@ -21,7 +21,6 @@ void ConvertBackupCfgToDeviceCfg(const WifiBackupConfig &backupCfg, WifiDeviceCo
 {
     config.instanceId = backupCfg.instanceId;
     config.uid = backupCfg.uid;
-    config.status = backupCfg.status;
     config.bssid = backupCfg.bssid;
     config.userSelectBssid = backupCfg.userSelectBssid;
     config.ssid = backupCfg.ssid;
@@ -46,7 +45,6 @@ void ConvertDeviceCfgToBackupCfg(const WifiDeviceConfig &config, WifiBackupConfi
 {
     backupCfg.instanceId = config.instanceId;
     backupCfg.uid = config.uid;
-    backupCfg.status = config.status;
     backupCfg.bssid = config.bssid;
     backupCfg.userSelectBssid = config.userSelectBssid;
     backupCfg.ssid = config.ssid;

@@ -88,7 +88,6 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     int tmpInt;
     size_t size;
     (void)ReadInt32(req, &config.networkId);
-    (void)ReadInt32(req, &config.status);
     config.bssid = (char *)ReadString(req, &size);
     config.ssid = (char *)ReadString(req, &size);
     (void)ReadInt32(req, &config.band);
@@ -167,7 +166,6 @@ void WifiDeviceStub::WriteEapConfig(IpcIo *reply, const WifiEapConfig &wifiEapCo
 void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig &config)
 {
     (void)WriteInt32(reply, config.networkId);
-    (void)WriteInt32(reply, config.status);
     (void)WriteString(reply, config.bssid.c_str());
     (void)WriteString(reply, config.ssid.c_str());
     (void)WriteInt32(reply, config.band);

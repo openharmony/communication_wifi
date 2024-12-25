@@ -28,7 +28,7 @@ public:
     bool CheckCanConnectDevice();
     bool CheckCanUseP2p();
     bool CheckCanUseSoftAp();
-
+    void VapConflictReport();
 private:
     bool CheckStaConnected();
     bool CheckP2pConnected();

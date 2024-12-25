@@ -958,6 +958,15 @@ enum class WifiSelfcureType {
     REDHCP_SELFCURE_SUCC,
 };
 
+enum class Wifi3VapConflictType {
+    STA_HML_SOFTAP_CONFLICT_CNT,
+    STA_P2P_SOFTAP_CONFLICT_CNT,
+    P2P_HML_SOFTAP_CONFLICT_CNT,
+    HML_SOFTAP_STA_CONFLICT_CNT,
+    P2P_SOFTAP_STA_CONFLICT_CNT,
+    P2P_HML_STA_CONFLICT_CNT,
+}
+
 enum class NetworkLagType {
     DEFAULT = 0,
     WIFIPRO_QOE_SLOW,

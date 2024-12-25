@@ -1832,7 +1832,64 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     SyncDeviceEverConnectedState(true);
 #endif
     portalFlag = true;
+    TryModifyPortalAttribute(netState);
 }
+
+void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
+{
+    if (linkedInfo.networkId == INVALID_NETWORK_ID) {
+        return;
+    }
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId) != 0) {
+        WIFI_LOGE("%{public}s, GetDeviceConfig failed", __func__);
+        return;
+    }
+    if (!config.isPortal || linkedInfo.connState != ConnState::CONNECTED) {
+        return;
+    }
+    bool needChangePortalFlag = false'
+    switch (netState) {
+        case SystemNetWorkState::NETWORK_NOTWORKING:
+            if (NetworkStatusHistoryManager::IsPortalByHistory(config.networkStatusHistory)) {
+                WIFI_LOGI("%{public}s, no internet and has portal status in history", __func__);
+                break;
+            }
+            needChangePortalFlag = true;
+            break;
+        case SystemNetWorkState::NETWORK_IS_WORKING:
+            if (config.keyMgmt == KEY_MGMT_NONE || config.portalAuthTime == -1 ||
+                config.portalAuthTime > time(nullptr)) {
+                break;
+            }
+            if (!linkedInfo.isHilinkNetwork) {
+                WIFI_LOGI("%{public}s, has internet and not hilink network", __func__);
+                break;
+            }
+            if (NetworkStatusHistoryManager::IsPortalByHistory(config.networkStatusHistory)) {
+                WIFI_LOGI("%{public}s, has internet and has portal status in history", __func__);
+                break;
+            }
+            needChangePortalFlag = true;
+            break;
+        case SystemNetWorkState::NETWORK_IS_PORTAL:
+            if (!linkedInfo.isHilinkNetwork) {
+                WIFI_LOGI("%{public}s, portal and not hilink network", __func__);
+                break;
+            }
+            needChangePortalFlag = true;
+            break;
+        default:
+            break;
+    }
+    if (needChangePortalFlag) {
+        WIFI_LOGI("%{public}s, modify the portal attribute", __func__);
+        config.isPortal = false;
+        WifiSettings::GetInstance().AddDeviceConfig(config);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
+}
+
 
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)

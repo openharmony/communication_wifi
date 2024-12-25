@@ -202,6 +202,13 @@ enum class DisconnectDetailReason {
     DISASSOC_LOW_ACK = 34
 };
 
+enum class ProductDeviceType {
+    DEFAULT = -1,
+    PHONE = 0,
+    TABLET = 1,
+    WEARABLE = 2,
+};
+
 struct WifiLinkedInfo {
     int networkId;
     std::string ssid;

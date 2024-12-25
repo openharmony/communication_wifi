@@ -2224,6 +2224,37 @@ bool WifiSettings::EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
 }
 
 #endif
+
+void WifiSettings::SetDeviceType(int deviceType)
+{
+    switch (deviceType) {
+        case static_cast<int>(ProductDeviceType::PHONE):
+            mDeviceType = ProductDeviceType::PHONE;
+            break;
+        case static_cast<int>(ProductDeviceType::TABLET):
+            mDeviceType = ProductDeviceType::TABLET;
+            break;
+        case static_cast<int>(ProductDeviceType::WEARABLE):
+            mDeviceType = ProductDeviceType::WEARABLE;
+            break;
+        default:
+            mDeviceType = ProductDeviceType::DEFAULT;
+            break;
+    }
+}
+
+bool WifiSettings::IsAllowPopUp()
+{
+    switch (mDeviceType) {
+        case ProductDeviceType::WEARABLE:
+            LOGI("Not allow pop up dialog, device type:%{public}d", static_cast<int>(mDeviceType));
+            return false;
+        default:
+            LOGI("Allow pop up dialog, device type:%{public}d", static_cast<int>(mDeviceType));
+            return true;
+    }
+}
+
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
     const std::set<int> &wifiLinkedNetworkIds)

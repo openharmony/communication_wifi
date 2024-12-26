@@ -66,5 +66,10 @@ HWTEST_F(WifiHisyseventTest, WriteWifiStateHiSysEventTest, TestSize.Level1)
     WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
 }
 
+HWTEST_F(WifiHisyseventTest, Write3VapConflictHisyseventTest, TestSize.Level1)
+{
+    Write3VapConflictHisysevent(0);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

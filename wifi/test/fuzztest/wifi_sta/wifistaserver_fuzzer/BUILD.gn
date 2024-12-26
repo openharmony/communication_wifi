@@ -130,7 +130,7 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "wifistaserver_fuzzer.cpp",
   ]
 
-  if (wifi_feature_read_wifi_mac_from_oem) {
+  if (wifi_feature_with_wifi_oeminfo_mac) {
     defines += [ "READ_MAC_FROM_OEM" ]
   }
 

@@ -40,7 +40,7 @@ public:
 
 private:
     bool OpenFacsignedapiLib(void **handler);
-    void CloseFacsignedapiLib(void *handler);
+    void CloseFacsignedapiLib(void **handler);
     int WifiOeminfoMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH], void *handler);
     bool ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
     bool CharToBeJudged(char c);

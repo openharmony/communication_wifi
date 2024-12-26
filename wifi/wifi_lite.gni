@@ -30,7 +30,7 @@ declare_args() {
   wifi_feature_with_hdi_wpa_supported = false
   wifi_feature_with_vap_manager = false
   wifi_feature_wifi_pro_ctrl = true
-  wifi_feature_read_wifi_mac_from_oem = false
+  wifi_feature_with_wifi_oeminfo_mac = false
 }
 
 memory_optimization_cflags = [

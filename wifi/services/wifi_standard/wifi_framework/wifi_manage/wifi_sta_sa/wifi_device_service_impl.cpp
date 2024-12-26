@@ -902,7 +902,9 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
     if (IsOtherVapConnect()) {
         LOGI("ConnectToNetwork: p2p or hml connected, and hotspot is enable");
+#ifndef OHOS_ARCH_LITE
         WifiManager::GetInstance().GetWifiMultiVapManager()->VapConflictReport();
+#endif
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
     }
     int apiVersion = WifiPermissionUtils::GetApiVersion();

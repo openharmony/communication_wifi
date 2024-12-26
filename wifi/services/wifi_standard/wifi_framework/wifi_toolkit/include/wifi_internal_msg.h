@@ -116,7 +116,7 @@ enum class OperateResState {
     ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
 };
 
-enum class ProductDeviceType {
+enum class ProductDeviceType : int {
     DEFAULT = -1,
     PHONE = 0,
     TABLET = 1,

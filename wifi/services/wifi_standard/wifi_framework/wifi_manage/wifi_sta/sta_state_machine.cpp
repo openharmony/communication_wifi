@@ -1882,10 +1882,10 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
         default:
             break;
     }
-    ChangePortalAttribute(needChangePortalFlag);
+    ChangePortalAttribute(needChangePortalFlag, config);
 }
 
-void StateMachine::ChangePortalAttribute(bool isNeedChange)
+void StateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig config)
 {
     if (!isNeedChange) {
         return;
@@ -1966,6 +1966,7 @@ void StaStateMachine::LinkedState::GoInState()
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+
     std::vector<WifiScanInfo> wifiScanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
     for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {

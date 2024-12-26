@@ -38,7 +38,7 @@ HWTEST_F(WifiHisyseventTest, WriteLinkInfoHiSysEventTest, TestSize.Level1)
 
 HWTEST_F(WifiHisyseventTest, WirteConnectTypeHiSysEventTest, TestSize.Level1)
 {
-    WirteConnectTypeHiSysEvent("");
+    WriteConnectTypeHiSysEvent(0);
 }
 
 HWTEST_F(WifiHisyseventTest, WriteWifiWpaStateHiSysEventTest, TestSize.Level1)

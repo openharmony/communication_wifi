@@ -918,7 +918,7 @@ void WifiEventSubscriberManager::RegisterAssetEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiAssetrEventSubsciber_)) {
         WIFI_LOGE("AssetCloud SubscribeCommonEvent() failed");
         wifiAssetrEventSubsciber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterAssetEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterAssetEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, assetMgrId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterAssetEvent retry, powerMgrId = %{public}u", assetMgrId);
     } else {
@@ -999,8 +999,7 @@ void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(networkStateChangeSubsciber_)) {
         WIFI_LOGE("network state change subscribe failed");
         networkStateChangeSubsciber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack =
-            std::bind(&WifiEventSubscriberManager::RegisterNetworkStateChangeEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterNetworkStateChangeEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, networkStateChangeTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterNetworkStateChangeEvent retry, timerId = %{public}u", networkStateChangeTimerId);
     } else {
@@ -1055,8 +1054,7 @@ void WifiEventSubscriberManager::RegisterWifiScanChangeEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiScanEventChangeSubscriber_)) {
         WIFI_LOGE("network state change subscribe failed");
         wifiScanEventChangeSubscriber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack =
-            std::bind(&WifiEventSubscriberManager::RegisterWifiScanChangeEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() {this->RegisterWifiScanChangeEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, wifiScanChangeTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterWifiScanChangeEvent retry, wifiScanChangeTimerId = %{public}u", wifiScanChangeTimerId);
     } else {

@@ -96,11 +96,6 @@ enum class ThermalLevel {
     EMERGENCY = 6,
 };
 
-enum class SystemMode {
-    DEFAULT = 1,
-    FACTORY_MODE = 2,
-};
-
 enum WifiMacAddrErrCode {
     WIFI_MACADDR_OPER_SUCCESS = 0,
     WIFI_MACADDR_HAS_EXISTED = 1,
@@ -323,7 +318,7 @@ public:
 
     void SetSystemMode(SystemMode systemMode);
 
-    SystemMode GetSystemMode();
+    int GetSystemMode();
 
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,

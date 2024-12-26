@@ -261,13 +261,14 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessagePtr msg) const
         WIFI_LOGD("curClientList(%s) has been erased", device.GetDeviceAddress().c_str());
     }
     p2pStateMachine.BroadcastP2pPeersChanged();
-    p2pStateMachine.BroadcastP2pConnectionChanged();
     p2pStateMachine.BroadcastP2pGcLeaveGroup(device);
     p2pStateMachine.BroadcastP2pPeerJoinOrLeave(false, device.GetDeviceAddress());
     deviceManager.RemoveDevice(device);
     if (groupManager.IsCurrGroupClientEmpty() && !groupManager.GetCurrentGroup().IsExplicitGroup()) {
         WIFI_LOGE("Clients empty, remove p2p group.");
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
+    } else {
+        p2pStateMachine.BroadcastP2pConnectionChanged();
     }
     return EXECUTED;
 }

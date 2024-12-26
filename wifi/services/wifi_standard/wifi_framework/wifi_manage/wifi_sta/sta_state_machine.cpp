@@ -1885,7 +1885,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
     ChangePortalAttribute(needChangePortalFlag, config);
 }
 
-void StateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig config)
+void StaStateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig config)
 {
     if (!isNeedChange) {
         return;

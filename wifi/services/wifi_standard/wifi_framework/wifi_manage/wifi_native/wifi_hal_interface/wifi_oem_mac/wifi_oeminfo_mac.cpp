@@ -47,10 +47,10 @@ int WifiOeminfoMac::GetOeminfoMac(std::string &constantWifiMac)
     int ret = WifiOeminfoMacFromNv(nvMac, handler);
     if (ret != GET_MAC_SUCCESS) {
         WIFI_LOGE("mac read from nv fail");
-        CloseFacsignedapiLib(handler);
+        CloseFacsignedapiLib(&handler);
         return ret;
     }
-    CloseFacsignedapiLib(handler);
+    CloseFacsignedapiLib(&handler);
 
     MacDataTolower(nvMac);
     if (!ValidateAddr(nvMac)) {
@@ -77,23 +77,23 @@ bool WifiOeminfoMac::OpenFacsignedapiLib(void **handler)
     return true;
 }
 
-void WifiOeminfoMac::CloseFacsignedapiLib(void *handler)
+void WifiOeminfoMac::CloseFacsignedapiLib(void **handler)
 {
-    if (handler == nullptr) {
+    if (*handler == nullptr) {
         WIFI_LOGE("handler is NULL, no need close");
         return;
     }
 
     CLEAR_OPEN_SSL_FUN dlClearOpenSsl =
-        reinterpret_cast<CLEAR_OPEN_SSL_FUN>(dlsym(handler, CLEAR_SSL_FUNC_NAME));
+        reinterpret_cast<CLEAR_OPEN_SSL_FUN>(dlsym(*handler, CLEAR_SSL_FUNC_NAME));
     if (dlClearOpenSsl == nullptr) {
         WIFI_LOGE("failed to dlsym FacStopOpenSSLThread");
         return;
     }
 
     dlClearOpenSsl();
-    dlclose(handler);
-    handler = nullptr;
+    dlclose(*handler);
+    *handler = nullptr;
 }
 
 int WifiOeminfoMac::WifiOeminfoMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH], void *handler)

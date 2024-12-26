@@ -144,16 +144,18 @@ WifiErrorNo WifiStaHalInterface::GetStaCapabilities(unsigned int &capabilities)
 #endif
 }
 
-#ifdef READ_MAC_FROM_OEM
-WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName, bool fromIface)
+WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName, int macSrc)
 {
-    LOGI("GetStaDeviceMacAddress oem enter, %{public}d", fromIface);
-    if (!fromIface && ifaceName == WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0)) {
+#ifdef READ_MAC_FROM_OEM
+    LOGI("GetStaDeviceMacAddress oem enter, %{public}d", macSrc);
+    if (macSrc == WIFI_OEMINFO_MAC &&
+        ifaceName == WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0)) {
         mac = GetWifiOeminfoMac();
     }
     if (!mac.empty()) {
         return WIFI_HAL_OPT_OK;
     }
+#endif
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->GetStaDeviceMacAddress(mac, ifaceName.c_str());
@@ -162,18 +164,6 @@ WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const 
     return mIdlClient->GetStaDeviceMacAddress(mac);
 #endif
 }
-#else
-WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName)
-{
-#ifdef HDI_WPA_INTERFACE_SUPPORT
-    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->GetStaDeviceMacAddress(mac, ifaceName.c_str());
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->GetStaDeviceMacAddress(mac);
-#endif
-}
-#endif
 
 #ifdef READ_MAC_FROM_OEM
 std::string WifiStaHalInterface::GetWifiOeminfoMac()
@@ -183,7 +173,7 @@ std::string WifiStaHalInterface::GetWifiOeminfoMac()
     std::string oemMac = "";
     int ret = oeminfoMac.GetOeminfoMac(oemMac);
     if (ret != 0) {
-        LOGE("GetOeminfoMac fail, ret = %{public}d", ret);
+        LOGE("GetWifiOeminfoMac fail, ret = %{public}d", ret);
         return std::string("");
     }
     return oemMac;

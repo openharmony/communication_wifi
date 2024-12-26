@@ -316,10 +316,6 @@ public:
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
-    void SetDeviceType(int deviceType);
-
-    bool IsAllowPopUp();
-
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
         const std::set<int> &wifiLinkedNetworkIds);
@@ -374,7 +370,6 @@ private:
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
-    ProductDeviceType mDeviceType {ProductDeviceType::DEFAULT};
 
     // SCAN
     std::mutex mScanMutex;

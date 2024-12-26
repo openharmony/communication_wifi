@@ -127,7 +127,7 @@ int WifiManager::Init()
 #ifndef OHOS_ARCH_LITE
     WifiConfigCenter::GetInstance().SetScreenState(
         PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
-    WifiSettings::GetInstance().SetDeviceType(GetDeviceType());
+    WifiConfigCenter::GetInstance().SetDeviceType(GetDeviceType());
 #endif
     InitPidfile();
     CheckSapcoExist();

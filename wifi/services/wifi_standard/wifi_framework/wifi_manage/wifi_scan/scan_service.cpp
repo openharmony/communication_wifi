@@ -1400,7 +1400,7 @@ ErrCode ScanService::AllowExternScan()
     ScanMode scanMode = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetAppRunningState();
     WIFI_LOGI("AllowExternScan, scanMode is %{public}d", (int)scanMode);
     if (WifiConfigCenter::GetInstance().GetSystemMode() == static_cast<int>(SystemMode::FACTORY_MODE)) {
-        WIFI_LOGI("Enter AllowExternScan FactoryMode, extern scan has allowed.\n");
+        WIFI_LOGI("Enter AllowExternScan FactoryMode, extern scan has allowed.");
         return WIFI_OPT_SUCCESS;
     }
 

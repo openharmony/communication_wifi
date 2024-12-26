@@ -571,16 +571,16 @@ int GetDeviceType()
         PRODUCT_DEVICE_TYPE, DEFAULT_PRODUCT_DEVICE_TYPE, preValue, PROP_PRODUCT_DEVICE_TYPE_LEN);
     if (errCode > 0) {
         if (strncmp(preValue, PHONE_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
-            return static_cast<int>(ProductDeviceType::PHONE);
+            return ProductDeviceType::PHONE;
         }
         if (strncmp(preValue, WEARABLE_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
-            return static_cast<int>(ProductDeviceType::WEARABLE);
+            return ProductDeviceType::WEARABLE;
         }
         if (strncmp(preValue, TABLET_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
-            return static_cast<int>(ProductDeviceType::TABLET);
+            return ProductDeviceType::TABLET;
         }
     }
-    return static_cast<int>(ProductDeviceType::DEFAULT);
+    return ProductDeviceType::DEFAULT;
 }
 
 bool IsStartUpWifiEnableSupport()

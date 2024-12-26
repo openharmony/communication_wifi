@@ -329,7 +329,7 @@ public:
 
     int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0);
 
-    void SetSystemMode(SystemMode systemMode);
+    void SetSystemMode(int systemMode);
 
     int GetSystemMode();
 private:

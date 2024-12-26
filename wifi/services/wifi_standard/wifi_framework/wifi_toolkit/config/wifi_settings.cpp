@@ -1475,7 +1475,7 @@ void WifiSettings::SetScanOnlySwitchState(const int &state, int instId)
 int WifiSettings::GetScanOnlySwitchState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    if (WifiSettings::GetInstance().GetSystemMode() == static_cast<int>(SystemMode::FACTORY_MODE)) {
+    if (WifiConfigCenter::GetInstance().GetSystemMode() == static_cast<int>(SystemMode::FACTORY_MODE)) {
         LOGI("factory mode, not allow scan only.");
         return 0;
     }

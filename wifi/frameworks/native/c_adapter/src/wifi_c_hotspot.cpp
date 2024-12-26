@@ -182,6 +182,7 @@ static WifiErrorCode GetStaListFromCpp(const std::vector<OHOS::Wifi::StationInfo
             return ERROR_WIFI_UNKNOWN;
         }
         result->ipAddress = OHOS::Wifi::Ip2Number(each.ipAddr);
+        ++result;
     }
     return WIFI_SUCCESS;
 }

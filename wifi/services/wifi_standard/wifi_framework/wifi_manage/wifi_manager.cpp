@@ -60,8 +60,7 @@ WifiManager::~WifiManager()
 int WifiManager::Init()
 {
     std::unique_lock<std::mutex> lock(initStatusMutex);
-    WifiConfigCenter::GetInstance().SetSystemMode(
-        IsFactoryMode() ? static_cast<int>(SystemMode::FACTORY_MODE) : static_cast<int>(SystemMode::DEFAULT));
+    WifiConfigCenter::GetInstance().SetSystemMode(IsFactoryMode() ? SystemMode::M_FACTORY_MODE : SystemMode::M_DEFAULT);
 #ifndef OHOS_ARCH_LITE
     WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
 #endif
@@ -114,7 +113,7 @@ int WifiManager::Init()
     }
     int lastState = WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0);
     if (lastState != WIFI_STATE_DISABLED 
-        && WifiConfigCenter::GetInstance().GetSystemMode() != static_cast<int>(SystemMode::FACTORY_MODE)) {
+        && WifiConfigCenter::GetInstance().GetSystemMode() != SystemMode::M_FACTORY_MODE) {
         /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
         WifiConfigCenter::GetInstance().SetWifiToggledState(lastState, INSTID_WLAN0);

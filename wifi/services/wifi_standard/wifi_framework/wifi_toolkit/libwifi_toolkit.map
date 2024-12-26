@@ -370,7 +370,7 @@
           "OHOS::Wifi::WifiCommonEventHelper::PublishHotspotStateChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
           "OHOS::Wifi::WifiAssetManager::GetStaCallback() const";
           "OHOS::Wifi::IsFactoryMode()";
-          "OHOS::Wifi::WifiConfigCenter::SetSystemMode(OHOS::Wifi::SystemMode)";
+          "OHOS::Wifi::WifiConfigCenter::SetSystemMode(int)";
           "OHOS::Wifi::WifiConfigCenter::GetSystemMode()";
           "OHOS::Wifi::WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
           "OHOS::Wifi::WifiAssetManager::InitUpLoadLocalDeviceSync()";

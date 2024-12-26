@@ -50,10 +50,8 @@ bool WifiMultiVapManager::CheckCanUseSoftAp()
 {
 #ifdef FEATURE_VAP_MANAGER_SUPPORT
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    auto isBishengChip = OHOS::system::GetParameter("ohos.boot.odm.conn.schiptype", "unknown") == "bisheng";
-    auto isMp17cChip = OHOS::system::GetParameter("ohos.boot.odm.conn.schiptype", "unknown") == "mp17c";
     if (pEnhanceService) {
-        if (!pEnhanceService->CheckEnhanceVapAvailable() && (isBishengChip || isMp17cChip)) {
+        if (!pEnhanceService->CheckEnhanceVapAvailable()) {
             if (CheckP2pConnected() && !CheckEnhanceWifiConnected()) {
                 Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_P2P_SOFTAP_CONFLICT_CNT));
             } else if (!CheckP2pConnected() && CheckEnhanceWifiConnected()) {

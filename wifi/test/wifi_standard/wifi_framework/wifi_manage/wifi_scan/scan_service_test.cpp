@@ -1707,6 +1707,14 @@ public:
             WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization);
     }
 
+    void RecordScanLimitInfoTest()
+    {
+        WifiScanDeviceInfo info;
+        info.packageName = "123.test";
+        pScanService->RecordScanLimitInfo(info, ScanLimitType::WIFI_DISABLE);
+        EXPECT_EQ(info.GetScanInitiatorName(), "123.test");
+    }
+
     void IsPackageInTrustListTest()
     {
         EXPECT_TRUE(pScanService->IsPackageInTrustList("123456|", 0, "123456") == true);
@@ -2769,6 +2777,16 @@ HWTEST_F(ScanServiceTest, HandleNetworkQualityChangedTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, WifiMaxThroughputTest, TestSize.Level1)
 {
     WifiMaxThroughputTest();
+}
+/**
+ * @tc.name: RecordScanLimitInfoTest
+ * @tc.desc: RecordScanLimitInfoTest()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(ScanServiceTest, RecordScanLimitInfoTest, TestSize.Level1)
+{
+    RecordScanLimitInfoTest();
 }
 /**
  * @tc.name: IsPackageInTrustListTest

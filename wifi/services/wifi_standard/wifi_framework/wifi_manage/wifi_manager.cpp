@@ -114,7 +114,7 @@ int WifiManager::Init()
     }
     int lastState = WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0);
     if (lastState != WIFI_STATE_DISABLED 
-        && WifiSettings::GetInstance().GetSystemMode() != static_cast<int>(SystemMode::FACTORY_MODE)) {
+        && WifiConfigCenter::GetInstance().GetSystemMode() != static_cast<int>(SystemMode::FACTORY_MODE)) {
         /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
         WifiConfigCenter::GetInstance().SetWifiToggledState(lastState, INSTID_WLAN0);

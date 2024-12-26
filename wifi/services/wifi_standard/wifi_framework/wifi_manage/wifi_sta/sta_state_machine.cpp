@@ -1790,7 +1790,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
 {
-    if (WifiConfigCenter::GetInstance().GetSystemMode() == static_cast<int>(SystemMode::FACTORY_MODE)) {
+    if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
         WIFI_LOGI("factory version, no need to pop up diag");
         return;
     }

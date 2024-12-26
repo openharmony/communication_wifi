@@ -1321,7 +1321,7 @@ void StaStateMachine::GetIpState::GoInState()
             return;
         }
     } while (0);
-    WriteDhcpFailHiSysEvent("DHCP_TIMEOUT");
+    WriteDhcpFailHiSysEvent("START_DHCP_CLIENT_FAIL");
     WIFI_LOGE("Dhcp connection failed, isRoam:%{public}d", pStaStateMachine->isRoam);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,

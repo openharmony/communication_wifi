@@ -99,13 +99,14 @@ if (defined(ohos_lite)) {
       "-fno-rtti",
     ]
 
-    if (wifi_feature_read_wifi_mac_from_oem) {
-      defines += [ "READ_MAC_FROM_OEM" ]
-    }
     defines = [
       "OHOS_ARCH_LITE",
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
     ]
+
+    if (wifi_feature_read_wifi_mac_from_oem) {
+      defines += [ "READ_MAC_FROM_OEM" ]
+    }
     ldflags += [
       "-fPIC",
       "-Wl,-E",

@@ -431,7 +431,7 @@ private:
     std::map<WifiMacAddrInfo, std::string> mP2pDeviceMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pGroupsInfoMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
-    int mDeviceType = static_cast<int>(ProductDeviceType::DEFAULT);
+    int mDeviceType = ProductDeviceType::DEFAULT;
 };
 } // namespace Wifi
 } // namespace OHOS

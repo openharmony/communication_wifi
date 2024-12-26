@@ -1445,7 +1445,7 @@ void WifiConfigCenter::SetDeviceType(int deviceType)
 bool WifiConfigCenter::IsAllowPopUp()
 {
     switch (mDeviceType) {
-        case static_cast<int>(ProductDeviceType::WEARABLE):
+        case ProductDeviceType::WEARABLE:
             LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
             return false;
         default:

@@ -1399,7 +1399,7 @@ ErrCode ScanService::AllowExternScan()
 #endif
     ScanMode scanMode = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetAppRunningState();
     WIFI_LOGI("AllowExternScan, scanMode is %{public}d", (int)scanMode);
-    if (WifiSettings::GetInstance().GetSystemMode() == SystemMode::FACTORY_MODE) {
+    if (WifiSettings::GetInstance().GetSystemMode() == static_cast<int>(SystemMode::FACTORY_MODE)) {
         WIFI_LOGI("Enter AllowExternScan FactoryMode, extern scan has allowed.\n");
         return WIFI_OPT_SUCCESS;
     }

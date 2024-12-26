@@ -414,6 +414,11 @@ enum class Phase2Method {
     AKA_PRIME = 7   // only EAP-PEAP support this mode
 };
 
+enum class SystemMode {
+    DEFAULT = 1,
+    FACTORY_MODE = 2,
+};
+
 class WifiEapConfig {
 public:
     std::string eap;                        /* EAP authentication mode:PEAP/TLS/TTLS/PWD/SIM/AKA/AKA' */

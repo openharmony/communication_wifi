@@ -18,6 +18,7 @@
 
 #include <gmock/gmock.h>
 #include "wifi_internal_msg.h"
+#include "wifi_scan_control_msg.h"
 
 namespace OHOS {
 namespace Wifi {

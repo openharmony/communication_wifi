@@ -2084,19 +2084,6 @@ int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceCon
     return 0;
 }
 #endif
-
-void WifiSettings::SetSystemMode(SystemMode systemMode)
-{
-    mSystemMode = systemMode;
-    LOGI("SetSystemMode %{public}d", static_cast<int>(mSystemMode));
-}
-
-int WifiSettings::GetSystemMode()
-{
-    LOGI("GetSystemMode %{public}d", static_cast<int>(mSystemMode));
-    return static_cast<int>(mSystemMode);
-}
-
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 bool WifiSettings::IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const
 {

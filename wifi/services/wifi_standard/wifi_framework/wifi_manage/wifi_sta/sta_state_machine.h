@@ -366,6 +366,7 @@ public:
         void DhcpResultNotifyEvent(DhcpReturnCode result, int ipType = -1);
         static StaStateMachine *pStaStateMachineList[STA_INSTANCE_MAX_NUM];
         StaStateMachine *pStaStateMachine;
+        std::mutex dhcpResultMutex;
         DhcpResult DhcpIpv4Result;
         DhcpResult DhcpIpv6Result;
         DhcpResult DhcpOfferInfo;

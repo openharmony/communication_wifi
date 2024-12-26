@@ -2203,7 +2203,6 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessagePtr msg)
     return ret;
 }
 
-
 void StaStateMachine::ApRoamingState::DealApRoamingStateTimeout(InternalMessagePtr msg)
 {
     if (msg == nullptr) {

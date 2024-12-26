@@ -116,6 +116,11 @@ enum class OperateResState {
     ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
 };
 
+enum class SystemMode {
+    DEFAULT = 1,
+    FACTORY_MODE = 2,
+};
+
 struct WifiCallingInfo {
     int callingUid;
     int callingPid;

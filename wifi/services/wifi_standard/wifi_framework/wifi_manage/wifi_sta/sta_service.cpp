@@ -294,7 +294,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
 #ifndef OHOS_ARCH_LITE
     if (config.lastConnectTime <= 0) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
-        if (WifiSettings::GetInstance().IsAllowPopUp()) {
+        if (WifiConfigCenter::GetInstance().IsAllowPopUp()) {
             WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
         }
         return WIFI_OPT_SUCCESS;

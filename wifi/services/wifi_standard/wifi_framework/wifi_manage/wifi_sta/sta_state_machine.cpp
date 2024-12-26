@@ -745,7 +745,7 @@ void StaStateMachine::LinkState::DealConnectTimeOutCmd(InternalMessagePtr msg)
     if (msg == nullptr) {
         WIFI_LOGE("msg is nul\n");
     }
-
+    WriteAssocFailHiSysEvent("WPA_TIMEOUT");
     if (pStaStateMachine->targetNetworkId_ == pStaStateMachine->mLastConnectNetId) {
         pStaStateMachine->mConnectFailedCnt++;
     }
@@ -1188,6 +1188,7 @@ void StaStateMachine::ApLinkedState::DealStartRoamCmdInApLinkedState(InternalMes
         WIFI_LOGE("%{public}s msg is null", __FUNCTION__);
         return;
     }
+    WriteConnectTypeHiSysEvent(NETWORK_SELECTED_BY_ROAM);
     std::string bssid = msg->GetStringFromMessage();
     pStaStateMachine->targetRoamBssid = bssid;
     WIFI_LOGI("%{public}s target bssid:%{public}s,", __FUNCTION__,
@@ -1323,6 +1324,7 @@ void StaStateMachine::GetIpState::GoInState()
             return;
         }
     } while (0);
+    WriteDhcpFailHiSysEvent("START_DHCP_CLIENT_FAIL");
     WIFI_LOGE("Dhcp connection failed, isRoam:%{public}d", pStaStateMachine->isRoam);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
@@ -1401,6 +1403,7 @@ void StaStateMachine::GetIpState::DealGetDhcpIpTimeout(InternalMessagePtr msg)
                                                                  DisabledReason::DISABLED_DHCP_FAILURE);
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     pStaStateMachine->StartDisConnectToNetwork();
+    WriteDhcpFailHiSysEvent("DHCP_TIMEOUT");
 }
 
 bool StaStateMachine::GetIpState::IsPublicESS()
@@ -2472,7 +2475,6 @@ void StaStateMachine::DhcpResultNotify::OnSuccessDhcpResult(int status, const ch
         result->strOptDns2, result->strOptVendor, result->uOptLeasetime, result->uAddTime,
         result->uGetTime, pStaStateMachine->currentTpType);
 
-    WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DHCP_SUCCESS));
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_DHCP),
         static_cast<int>(WifiOperateState::STA_DHCP_SUCCESS));
     if (result->iptype == 0) { /* 0-ipv4,1-ipv6 */
@@ -2729,7 +2731,7 @@ void StaStateMachine::DhcpResultNotify::OnFailedDhcpResult(int status, const cha
     }
     WIFI_LOGI("Enter DhcpResultNotify::OnFailed. ifname=%{public}s, status=%{public}d, reason=%{public}s",
         ifname, status, reason);
-    WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DHCP_FAIL));
+    WriteDhcpFailHiSysEvent("DHCP_FAIL", status);
     DhcpResultNotifyEvent(DhcpReturnCode::DHCP_FAIL);
 }
 
@@ -3448,7 +3450,7 @@ void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
     if (msg == nullptr) {
         WIFI_LOGE("msg is null\n");
     }
-    WirteConnectTypeHiSysEvent("REASSOC");
+    WriteConnectTypeHiSysEvent(NETWORK_SELECTED_BY_REASSOC);
     if (linkedInfo.isMloConnected && WifiStaHalInterface::GetInstance().SetBssid(
         WPA_DEFAULT_NETWORKID, linkedInfo.bssid,
         WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId)) == WIFI_HAL_OPT_OK) {
@@ -3485,14 +3487,10 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     }
-    WriteWifiConnectionInfoHiSysEvent(networkId);
-    std::string connectType = deviceConfig.lastConnectTime <= 0 ? "FIRST_CONNECT" :
-        connTriggerMode == NETWORK_SELECTED_BY_AUTO ? "AUTO_CONNECT" :
-        connTriggerMode == NETWORK_SELECTED_BY_USER ? "SELECT_CONNECT" : "";
-    if (!connectType.empty()) {
-        WirteConnectTypeHiSysEvent(connectType);
-    }
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    WriteWifiConnectionInfoHiSysEvent(networkId);
+    WriteConnectTypeHiSysEvent(connTriggerMode, deviceConfig.lastConnectTime <= 0);
+    WriteStaConnectIface(ifaceName);
     WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName);
     int wpaNetworkId = WPA_DEFAULT_NETWORKID;
     if (WifiStaHalInterface::GetInstance().GetNextNetworkId(wpaNetworkId, ifaceName) != WIFI_HAL_OPT_OK) {

@@ -333,8 +333,13 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
         }
 #ifndef WIFI_DHCP_DISABLED
         m_ApStateMachine.StopDhcpServer();
-        m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress(), m_hotspotConfig.GetLeaseTime());
+        if (m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress(), m_hotspotConfig.GetLeaseTime())) {
+            m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
+        }
+#else
+        m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
 #endif
+        WifiSettings::GetInstance().SyncHotspotConfig();
     } else {
         WIFI_LOGI("Ap disabled, set softap toggled false");
         WifiConfigCenter::GetInstance().SetSoftapToggledState(false);

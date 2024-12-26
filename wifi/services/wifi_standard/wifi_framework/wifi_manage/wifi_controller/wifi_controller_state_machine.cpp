@@ -822,7 +822,6 @@ void WifiControllerMachine::EnableState::HandleApStart(int id)
         pWifiControllerMachine->softApManagers.StopManager(id);
         return;
     }
-    pWifiControllerMachine->StartSoftapCloseTimer();
 }
 
 void WifiControllerMachine::EnableState::HandleApRemoved(InternalMessagePtr msg)
@@ -837,7 +836,6 @@ void WifiControllerMachine::EnableState::HandleApRemoved(InternalMessagePtr msg)
 void WifiControllerMachine::EnableState::HandleApStop(InternalMessagePtr msg)
 {
     pWifiControllerMachine->StopTimer(CMD_AP_STOP_TIME);
-    pWifiControllerMachine->StopSoftapCloseTimer();
     pWifiControllerMachine->HandleSoftapStop(msg->GetParam1());
 }
 
@@ -941,44 +939,6 @@ void WifiControllerMachine::HandleRptStop(int id)
     HandleHotspotStop(id, HotspotMode::RPT, rptManagers);
 }
 #endif
-
-static void AlarmStopSoftap()
-{
-    WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
-}
-
-void WifiControllerMachine::StartSoftapCloseTimer()
-{
-    WIFI_LOGI("enter softapCloseTimer");
-    int mTimeoutDelay = WifiConfigCenter::GetInstance().GetHotspotIdleTimeout();
-    if (stopSoftapTimerId_ != 0) {
-        return;
-    }
-#ifdef HAS_BATTERY_MANAGER_PART
-    auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
-    auto batteryPluggedType = batterySrvClient.GetPluggedType();
-    if (batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_USB) {
-        WIFI_LOGI("usb connect do not start timer");
-        return;
-    }
-#endif
-    std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, false, false);
-    wifiSysTimer->SetCallbackInfo(AlarmStopSoftap);
-    stopSoftapTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
-    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
-    MiscServices::TimeServiceClient::GetInstance()->StartTimer(stopSoftapTimerId_, currentTime + mTimeoutDelay);
-}
-
-void WifiControllerMachine::StopSoftapCloseTimer()
-{
-    WIFI_LOGI("enter StopSoftapCloseTimer");
-    if (stopSoftapTimerId_ == 0) {
-        return;
-    }
-    MiscServices::TimeServiceClient::GetInstance()->StopTimer(stopSoftapTimerId_);
-    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(stopSoftapTimerId_);
-    stopSoftapTimerId_ = 0;
-}
 #endif
 
 void WifiControllerMachine::ShutdownWifi(bool shutDownAp)

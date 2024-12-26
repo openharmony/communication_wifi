@@ -250,8 +250,8 @@ unsigned int Ip2Number(const std::string& strIp)
 
     std::string ip(strIp + '.');
     while ((back = ip.find_first_of('.', back)) != (std::string::size_type)std::string::npos) {
-        number |= static_cast<unsigned long>(std::stol(ip.substr(front, back - front).c_str()) <<
-            (size -= sectionSize));
+        std::string ipSubStr = ip.substr(front, back - front);
+        number |= static_cast<unsigned long>(CheckDataLegal(ipSubStr) << (size -= sectionSize));
         front = ++back;
     }
     return number;

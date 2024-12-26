@@ -256,7 +256,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
     linkedInfo.isMloConnected = false;
     linkedInfo.isWurEnable = false;
-    linkedInfo.isHilinkNetwork = false;
+    linkedInfo.isHiLinkNetwork = false;
 }
 
 /* --------------------------- state machine Init State ------------------------------ */
@@ -1807,7 +1807,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
-        if (linkedInfo.isHilinkNetwork) {
+        if (linkedInfo.isHiLinkNetwork) {
             InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         } else {
             InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
@@ -1862,7 +1862,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
                 config.portalAuthTime > time(nullptr)) {
                 break;
             }
-            if (!linkedInfo.isHilinkNetwork) {
+            if (!linkedInfo.isHiLinkNetwork) {
                 WIFI_LOGI("%{public}s, has internet and not hilink network", __func__);
                 break;
             }
@@ -1873,7 +1873,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
             needChangePortalFlag = true;
             break;
         case SystemNetWorkState::NETWORK_IS_PORTAL:
-            if (!linkedInfo.isHilinkNetwork) {
+            if (!linkedInfo.isHiLinkNetwork) {
                 WIFI_LOGI("%{public}s, portal and not hilink network", __func__);
                 break;
             }
@@ -1882,12 +1882,18 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
         default:
             break;
     }
-    if (needChangePortalFlag) {
-        WIFI_LOGI("%{public}s, modify the portal attribute", __func__);
-        config.isPortal = false;
-        WifiSettings::GetInstance().AddDeviceConfig(config);
-        WifiSettings::GetInstance().SyncDeviceConfig();
+    ChangePortalAttribute(needChangePortalFlag);
+}
+
+void StateMachine::ChangePortalAttribute(bool isNeedChange)
+{
+    if (!isNeedChange) {
+        return;
     }
+    WIFI_LOGI("%{public}s, modify the portal attribute", __func__);
+    config.isPortal = false;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    WifiSettings::GetInstance().SyncDeviceConfig();
 }
 
 #ifndef OHOS_ARCH_LITE
@@ -1961,11 +1967,11 @@ void StaStateMachine::LinkedState::GoInState()
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
     std::vector<WifiScanInfo> wifiScanInfoList;
-    WifiConfigCenter::GetInstance(),GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
     for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
         if (iter->bssid == pStaStateMachine->linkedInfo.bssid) {
-            pStaStateMachine->linkedInfo.isHilinkNetwork = iter->isHilinkNetwork;
-            WIFI_LOGI("set hilink=%{public}d, bssid=%{public}s", iter->isHilinkNetwork,
+            pStaStateMachine->linkedInfo.isHiLinkNetwork = iter->isHiLinkNetwork;
+            WIFI_LOGI("set hilink=%{public}d, bssid=%{public}s", iter->isHiLinkNetwork,
                 MacAnonymize(pStaStateMachine->linkedInfo.bssid).c_str());
             break;
         }
@@ -3474,7 +3480,7 @@ void StaStateMachine::HilinkSaveConfig(void)
     WifiSettings::GetInstance().SyncDeviceConfig();
 
     WifiConfigCenter::GetInstance().SetMacAddress(m_hilinkDeviceConfig.macAddress, m_instId);
-    linkedInfo.isHilinkNetwork = true;
+    linkedInfo.isHiLinkNetwork = true;
     m_hilinkFlag = false;
 }
 

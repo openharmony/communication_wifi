@@ -580,7 +580,7 @@ int GetDeviceType()
             return static_cast<int>(ProductDeviceType::TABLET);
         }
     }
-    return return static_cast<int>(ProductDeviceType::DEFAULT);
+    return static_cast<int>(ProductDeviceType::DEFAULT);
 }
 
 bool IsStartUpWifiEnableSupport()

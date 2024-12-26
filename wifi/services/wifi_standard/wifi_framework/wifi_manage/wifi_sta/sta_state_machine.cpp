@@ -1834,7 +1834,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
 {
     if (IsFactoryMode() || !WifiConfigCenter::GetInstance().IsAllowPopUp()) {
-        WIFI_LOGI("factory version, no need to pop up diag");
+        WIFI_LOGI("factory version or device type no need to pop up diag");
         return;
     }
     WifiLinkedInfo linkedInfo;

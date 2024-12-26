@@ -31,16 +31,16 @@ void InvitationRequestState::GoInState()
         p2pStateMachine.savedP2pConfig.GetDeviceAddress())) {
         if (deviceManager.UpdateDeviceStatus(
             p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED)) {
-                WIFI_LOGE("UpdateDeviceStatus failed.");
-                return;
+            WIFI_LOGE("UpdateDeviceStatus failed.");
+            return;
         }
 
         p2pStateMachine.BroadcastP2pPeersChanged();
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_SUCCESS);
-            } else {
-                WIFI_LOGE("Invitation failed.");
-                p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
-                p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
+    } else {
+        WIFI_LOGE("Invitation failed.");
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
+        p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     }
 }
 

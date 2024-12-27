@@ -25,6 +25,16 @@ config("module_private_config") {
 
 ohos_unittest("wifi_pro_unittest") {
   module_out_path = module_output_path
+
+  sanitize = {
+    cfi = true
+    boundary_sanitize = true
+    cfi_cross_dso = true
+    integer_overflow = true
+    ubsan = true
+    debug = false
+  }
+
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",

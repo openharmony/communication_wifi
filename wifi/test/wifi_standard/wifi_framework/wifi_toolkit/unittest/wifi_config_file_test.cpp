@@ -91,7 +91,6 @@ HWTEST_F(WifiConfigFileTest, SaveDeviceConfig, TestSize.Level1)
 HWTEST_F(WifiConfigFileTest, SaveDeviceValueCheck, TestSize.Level1)
 {
     WifiDeviceConfig tmp;
-    tmp.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     tmp.bssid = "01:xx:xx:xx:xx:06";
     tmp.ssid = "my wifi";
     tmp.band = static_cast<int>(BandType::BAND_2GHZ);
@@ -116,7 +115,6 @@ HWTEST_F(WifiConfigFileTest, SaveDeviceValueCheck, TestSize.Level1)
     mDeviceCfg.GetValue(vec);
     EXPECT_TRUE(vec.size() == 1);
     WifiDeviceConfig ldCfg = vec[0];
-    EXPECT_TRUE(tmp.status == ldCfg.status);
     EXPECT_TRUE(tmp.bssid == ldCfg.bssid);
     EXPECT_TRUE(tmp.ssid == ldCfg.ssid);
     EXPECT_TRUE(tmp.isPasspoint == ldCfg.isPasspoint);

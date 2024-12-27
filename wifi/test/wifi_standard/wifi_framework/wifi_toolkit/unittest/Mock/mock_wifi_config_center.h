@@ -50,6 +50,8 @@ public:
     virtual std::map<int, WifiLinkedInfo> GetAllWifiLinkedInfo() = 0;
     virtual int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0) = 0;
     virtual int SaveLinkedInfo(const WifiLinkedInfo &info, int instId = 0) = 0;
+    virtual int GetMloLinkedInfo(std::vector<WifiLinkedInfo> &info, int instId = 0) = 0;
+    virtual int SaveMloLinkedInfo(const std::vector<WifiLinkedInfo> &info, int instId = 0) = 0;
     virtual void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth, int instId = 0) = 0;
     virtual int SetMacAddress(const std::string &macAddress, int instId = 0) = 0;
     virtual int GetMacAddress(std::string &macAddress, int instId = 0) = 0;
@@ -188,6 +190,8 @@ public:
     MOCK_METHOD0(GetAllWifiLinkedInfo, std::map<int, WifiLinkedInfo> ());
     MOCK_METHOD2(GetLinkedInfo, int(WifiLinkedInfo &info, int));
     MOCK_METHOD2(SaveLinkedInfo, int(const WifiLinkedInfo &info, int));
+    MOCK_METHOD2(GetMloLinkedInfo, int(std::vector<WifiLinkedInfo> &info, int));
+    MOCK_METHOD2(SaveMloLinkedInfo, int(const std::vector<WifiLinkedInfo> &info, int));
     MOCK_METHOD3(UpdateLinkedChannelWidth, void(std::string bssid, WifiChannelWidth channelWidth, int instId));
     MOCK_METHOD2(SetMacAddress, int(const std::string &macAddress, int));
     MOCK_METHOD2(GetMacAddress, int(std::string &macAddress, int));

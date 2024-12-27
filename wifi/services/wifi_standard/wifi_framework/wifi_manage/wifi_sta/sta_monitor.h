@@ -144,6 +144,13 @@ public:
      */
     void OnWpaCsaChannelSwitchNotifyCallBack(const std::string &notifyParam);
 
+    /**
+     * @Description : Callback of the Mlo Work State
+     *
+     * @param notifyParam - mlo state and reason code [in]
+     */
+    void OnWpaMloStateNotifyCallBack(const std::string &notifyParam);
+
 private:
     StaStateMachine *pStaStateMachine;
     int m_instId;

@@ -64,6 +64,19 @@ inline const std::string HISYS_SERVICE_TYPE_STA = "STA";
 inline const std::string HISYS_SERVICE_TYPE_AP = "AP";
 inline const std::string HISYS_SERVICE_TYPE_P2P = "P2P";
 
+enum class WifiScanFailReason {
+    DEFAULT = -1,
+    PROXY_FAIL,
+    PERMISSION_DENIED,
+    SCAN_SERVICE_NOT_RUNNING,
+    SERVICE_SCAN_FAIL,
+    SERVICE_ADVANCE_SCAN_FAIL,
+    HDI_SERVICE_DIED,
+    HDI_SCAN_FAIL,
+    HDI_PNO_SCAN_FAIL,
+    HDI_GET_SCAN_INFOS_FAIL
+};
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
 void WriteWifiApStateHiSysEvent(int32_t state);
@@ -71,6 +84,16 @@ void WriteWifiApStateHiSysEvent(int32_t state);
 void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t state);
 
 void WriteWifiConnectionHiSysEvent(const WifiConnectionType& type, const std::string& pkgName);
+
+void WriteAuthFailHiSysEvent(const std::string &authFailReason, int subErrCode = 0);
+
+void WriteAssocFailHiSysEvent(const std::string &assocFailReason, int subErrCode = 0);
+
+void WriteDhcpFailHiSysEvent(const std::string &dhcpFailReason, int subErrCode = 0);
+
+void WriteScanLimitHiSysEvent(const std::string &scanInitiator, int scanLimitType, bool isForeground = false);
+
+void WriteAutoConnectFailEvent(const std::string &failReason, const std::string &subReason = "");
 
 void WriteWifiScanHiSysEvent(const int result, const std::string& pkgName);
 
@@ -96,8 +119,6 @@ void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason);
 
 void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server);
 
-void WriteWifiConnectFailedEventHiSysEvent(int operateType);
-
 void WriteP2pKpiCountHiSysEvent(int eventType);
 
 void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes);
@@ -110,7 +131,7 @@ void WriteIsInternetHiSysEvent(int isInternet);
 
 void WriteSoftApConnectFailHiSysEvent(int errorCnt);
 
-void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason);
+void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, const WifiScanFailReason failReason);
 
 void WriteWifiEncryptionFailHiSysEvent(int event, const std::string &maskSsid,
     const std::string &keyMgmt, int encryptedModule);
@@ -121,7 +142,9 @@ void WriteArpInfoHiSysEvent(uint64_t arpRtt, int arpFailedCount);
 
 void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed);
 
-void WirteConnectTypeHiSysEvent(std::string connectType);
+void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect = false);
+
+void WriteStaConnectIface(const std::string &ifName);
 
 void WriteWifiWpaStateHiSysEvent(int state);
 
@@ -129,6 +152,8 @@ void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, time_t connTi
     time_t portalAuthTime, bool isNotificationClicked);
 
 void WriteWifiSelfcureHisysevent(int type);
+
+void Write3VapConflictHisysevent(int type);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

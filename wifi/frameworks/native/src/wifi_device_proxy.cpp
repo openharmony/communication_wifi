@@ -306,7 +306,6 @@ void WifiDeviceProxy::WriteEapConfig(MessageParcel &data, const WifiEapConfig &w
 void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data)
 {
     data.WriteInt32(config.networkId);
-    data.WriteInt32(config.status);
     data.WriteString(config.bssid);
     data.WriteInt32(config.bssidType);
     data.WriteString(config.ssid);
@@ -2047,6 +2046,7 @@ ErrCode WifiDeviceProxy::ReceiveNetworkControlInfo(const WifiNetworkControlInfo&
     data.WriteString(networkControlInfo.bundleName);
     data.WriteInt32(networkControlInfo.state);
     data.WriteInt32(networkControlInfo.sceneId);
+    data.WriteInt32(networkControlInfo.rtt);
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_NET_CONTROL_INFO), data, reply, option);
     if (error != ERR_NONE) {
@@ -2289,7 +2289,6 @@ ErrCode WifiDeviceProxy::GetWifiDetailState(WifiDetailState &state)
 void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config)
 {
     config.networkId = reply.ReadInt32();
-    config.status = reply.ReadInt32();
     config.bssid = reply.ReadString();
     config.bssidType = reply.ReadInt32();
     config.ssid = reply.ReadString();
@@ -2329,6 +2328,9 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
     config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
     config.networkSelectionStatus.status = WifiDeviceConfigStatus(reply.ReadInt32());
     config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason(reply.ReadInt32());
+    config.networkSelectionStatus.seenInLastQualifiedNetworkSelection = reply.ReadBool();
+    config.isPortal = reply.ReadBool();
+    config.noInternetAccess = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)

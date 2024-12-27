@@ -741,7 +741,7 @@ HWTEST_F(WifiIdlClientTest, ReqSetRoamConfigTest4, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqGetConnectSignalInfoTest2, TestSize.Level1)
 {
     std::string endBssid = "aa::bb::cc:dd::ee:ff";
-    WifiHalWpaSignalInfo info;
+    WifiSignalPollInfo info;
     mClient.ReqGetConnectSignalInfo(endBssid, info);
     MockWifiPublic::SetMockFlag(true);
     EXPECT_TRUE(mClient.ReqGetConnectSignalInfo(endBssid, info) == WIFI_HAL_OPT_FAILED);

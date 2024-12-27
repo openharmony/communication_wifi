@@ -229,6 +229,14 @@ public:
      * @return int - supported frequency
      */
     virtual int FreqEnhance(int freq, bool is160M) = 0;
+
+    /**
+     * @Description set the enhance signal poll info
+     *
+     * @param info - signal info
+     * @return void
+     */
+    virtual void SetEnhanceSignalPollInfo(WifiSignalPollInfo &info) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

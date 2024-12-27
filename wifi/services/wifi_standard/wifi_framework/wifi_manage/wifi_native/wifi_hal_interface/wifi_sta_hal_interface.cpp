@@ -614,7 +614,7 @@ WifiErrorNo WifiStaHalInterface::WpaBlocklistClear()
 }
 
 WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,
-    WifiHalWpaSignalInfo &info)
+    WifiSignalPollInfo &info)
 {
     if (endBssid.length() != HAL_BSSID_LENGTH) {
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
@@ -640,6 +640,8 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceNa
     info.chloadSelf = signalPollResult.chloadSelf;
     info.c0Rssi = signalPollResult.c0Rssi;
     info.c1Rssi = signalPollResult.c1Rssi;
+    info.ext = signalPollResult.ext.data();
+    info.extLen = signalPollResult.ext.size();
     return WIFI_HAL_OPT_OK;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
@@ -766,6 +768,20 @@ WifiErrorNo WifiStaHalInterface::RegisterNativeProcessCallback(const std::functi
     return mHdiWpaClient->ReqRegisterNativeProcessCallback(callback);
 #endif
     return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &ifName,
+    std::vector<WifiLinkedInfo> &mloLinkInfo)
+{
+    if (ifName.length() <= 0) {
+        return WIFI_HAL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->GetMloLinkedInfo(ifName, mloLinkInfo);
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

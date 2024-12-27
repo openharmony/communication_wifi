@@ -97,6 +97,7 @@
         "OHOS::Wifi::WifiMultiVapManager::CheckCanConnectDevice()";
         "OHOS::Wifi::WifiMultiVapManager::CheckCanUseP2p()";
         "OHOS::Wifi::WifiMultiVapManager::CheckCanUseSoftAp()";
+        "OHOS::Wifi::WifiMultiVapManager::VapConflictReport()";
         "OHOS::Wifi::WifiP2pManager::GetP2pCallback()";
         "OHOS::Wifi::WifiP2pManager::AutoStartP2pService()";
         "OHOS::Wifi::WifiP2pManager::AutoStopP2pService()";

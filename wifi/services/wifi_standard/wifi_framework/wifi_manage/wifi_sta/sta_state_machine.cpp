@@ -1161,6 +1161,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     }
     // do not switch to roaming state when it is not directed to roam by framework
     pStaStateMachine->linkedInfo.bssid = bssid;
+    pStaStateMachine->UpdateHiLinkAttribute();
 #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SetSupportedWifiCategory();
 #endif

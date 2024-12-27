@@ -1447,6 +1447,8 @@ int WifiConfigCenter::GetSystemMode()
 {
     LOGI("GetSystemMode %{public}d", systemMode_);
     return systemMode_;
+}
+
 void WifiConfigCenter::SetDeviceType(int deviceType)
 {
     mDeviceType = deviceType;

@@ -1892,7 +1892,7 @@ void StaStateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig 
     if (!isNeedChange) {
         return;
     }
-    WIFI_LOGI("change the value of the portal attribute to false, bssid=%{public}s", __func__,
+    WIFI_LOGI("change the value of the portal attribute to false, bssid=%{public}s",
         MacAnonymize(config.bssid).c_str());
     config.isPortal = false;
     WifiSettings::GetInstance().AddDeviceConfig(config);

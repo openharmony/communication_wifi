@@ -1418,14 +1418,14 @@ int WifiConfigCenter::GetHotspotMacConfig(HotspotMacConfig &config, int id)
 
 void WifiConfigCenter::SetSystemMode(int systemMode)
 {
-    mSystemMode = systemMode;
+    systemMode_ = systemMode;
     LOGI("SetSystemMode %{public}d", mSystemMode);
 }
 
 int WifiConfigCenter::GetSystemMode()
 {
-    LOGI("GetSystemMode %{public}d", mSystemMode);
-    return mSystemMode;
+    LOGI("GetSystemMode %{public}d", systemMode_);
+    return systemMode_;
 }
 }  // namespace Wifi
 }  // namespace OHOS

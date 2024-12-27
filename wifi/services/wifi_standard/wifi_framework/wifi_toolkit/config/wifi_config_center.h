@@ -426,7 +426,7 @@ private:
     std::map<WifiMacAddrInfo, std::string> mP2pDeviceMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pGroupsInfoMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
-    int mSystemMode = SystemMode::M_DEFAULT;
+    int systemMode_ = SystemMode::M_DEFAULT;
 };
 } // namespace Wifi
 } // namespace OHOS

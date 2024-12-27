@@ -1419,7 +1419,7 @@ int WifiConfigCenter::GetHotspotMacConfig(HotspotMacConfig &config, int id)
 void WifiConfigCenter::SetSystemMode(int systemMode)
 {
     systemMode_ = systemMode;
-    LOGI("SetSystemMode %{public}d", mSystemMode);
+    LOGI("SetSystemMode %{public}d", systemMode_);
 }
 
 int WifiConfigCenter::GetSystemMode()

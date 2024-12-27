@@ -339,6 +339,14 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) override;
+
+    /**
+     * @Description Set EnhanceService to p2p service
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) override;
 private:
     WifiP2pGroupManager groupManager;    /* group manager */
     WifiP2pDeviceManager deviceMgr;  /* device manager */

@@ -20,6 +20,7 @@
 #include "p2p_define.h"
 #include "wifi_p2p_group_manager.h"
 #include "wifi_p2p_device_manager.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -128,12 +129,21 @@ private:
      */
     virtual bool ProcessCmdHid2dCreateGroup(const InternalMessagePtr msg) const;
 
+    /**
+     * @Description Set EnhanceService to p2p service
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual void SetEnhanceService(IEnhanceService* enhanceService);
+
 private:
     using ProcessFun = bool (P2pGroupOperatingState::*)(const InternalMessagePtr msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;
+    IEnhanceService *enhanceService_ = nullptr;
 };
 } // namespace Wifi
 } // namespace OHOS

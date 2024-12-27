@@ -1282,5 +1282,10 @@ void P2pStateMachine::DoP2pArp(std::string serverIp, std::string clientIp)
     arpChecker.Start(ifName, macAddress, clientIp, serverIp);
     arpChecker.DoArpCheck(ARP_TIMEOUT, true);
 }
+
+void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    p2pGroupOperatingState.SetEnhanceService(enhanceService);
+}
 } // namespace Wifi
 } // namespace OHOS

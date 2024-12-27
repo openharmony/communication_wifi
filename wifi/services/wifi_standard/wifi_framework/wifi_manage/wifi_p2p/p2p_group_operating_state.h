@@ -65,6 +65,14 @@ public:
      */
     virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
+    /**
+     * @Description Set EnhanceService to p2p service
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual void SetEnhanceService(IEnhanceService* enhanceService);
+
 private:
     /**
      * @Description Initialization
@@ -128,14 +136,6 @@ private:
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessCmdHid2dCreateGroup(const InternalMessagePtr msg) const;
-
-    /**
-     * @Description Set EnhanceService to p2p service
-     *
-     * @param enhanceService IEnhanceService object
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual void SetEnhanceService(IEnhanceService* enhanceService);
 
 private:
     using ProcessFun = bool (P2pGroupOperatingState::*)(const InternalMessagePtr msg) const;

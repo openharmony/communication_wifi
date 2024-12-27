@@ -171,7 +171,9 @@ bool SelfCureService::CheckSelfCureWifiResult(int event)
 void SelfCureService::RegisterP2pEnhanceCallback()
 {
     using namespace std::placeholders;
-    p2pEnhanceStateChange_ = std::bind(&SelfCureService::P2pEnhanceStateChange, this, _1, _2);
+    p2pEnhanceStateChange_ = [this](const std::string &ifName, int32_t state) {
+        this->P2pEnhanceStateChange(ifName, state);
+    };
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("RegisterP2pEnhanceCallback get pEnhanceService failed!");

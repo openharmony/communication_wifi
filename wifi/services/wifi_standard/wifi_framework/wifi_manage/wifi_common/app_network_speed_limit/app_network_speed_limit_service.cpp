@@ -16,6 +16,8 @@
 #include "app_network_speed_limit_service.h"
 #include "wifi_logger.h"
 #include "wifi_app_parser.h"
+#include "wifi_config_center.h"
+#include "wifi_sta_hal_interface.h"
 #include "app_mgr_client.h"
 #include "speed_limit_configs_writer.h"
 #include "wifi_app_state_aware.h"
@@ -34,6 +36,9 @@ namespace {
     const std::string HANDLE_FOREGROUND_APP_CHANGED = "HandleForegroundAppChangedAction";
     const std::string LIMIT_SPEED = "LimitSpeed";
     const std::string RECEIVE_NETWORK_CONTROL = "ReceiveNetworkControlInfo";
+    const int GAME_BOOST_ENABLE = 1;
+    const int GAME_BOOST_DISABLE = 0;
+    const int BOOST_UDP_TYPE = 17;
 }
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService()
@@ -182,7 +187,7 @@ bool AppNetworkSpeedLimitService::CheckNetWorkCanBeLimited(const int controlId)
     return false;
 }
 
-void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int controlId, const int limitMode)
+void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int controlId, const int limitMode, const int enable)
 {
     m_bgLimitRecordMap[controlId] = limitMode;
     m_bgUidSet.clear();
@@ -204,7 +209,7 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int controlId, c
             continue;
         }
         for (auto iter = bgAppList.begin(); iter != bgAppList.end(); ++iter) {
-            if (IsLimitSpeedBgApp(record.first, iter->processName_)) {
+            if (IsLimitSpeedBgApp(record.first, iter->processName_, enable)) {
                 m_bgUidSet.insert(iter->uid_);
                 m_bgPidSet.insert(iter->pid_);
             }
@@ -217,17 +222,20 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int controlId, c
     for (auto iter = fgAppList.begin(); iter != fgAppList.end(); ++iter) {
         m_fgUidSet.insert(iter->uid_);
     }
-    if (controlId == BG_LIMIT_CONTROL_ID_KEY_FG_APP &&
-        m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] == BG_LIMIT_OFF) {
-        FilterLimitSpeedConfigs();
-    }
+
+    FilterLimitSpeedConfigs();
 }
 
-bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const std::string &bundleName)
+bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const std::string &bundleName,
+    const int enable)
 {
     switch (controlId) {
         case BgLimitControl::BG_LIMIT_CONTROL_ID_GAME:
-            return AppParser::GetInstance().IsBlackListApp(bundleName);
+            if (enable == GAME_BOOST_ENABLE) {
+                return AppParser::GetInstance().IsLiveStreamApp(bundleName) ? false : true;
+            } else {
+                return AppParser::GetInstance().IsBlackListApp(bundleName);
+            }
         case BgLimitControl::BG_LIMIT_CONTROL_ID_STREAM:
         case BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP:
             return AppParser::GetInstance().IsHighTempLimitSpeedApp(bundleName);
@@ -258,19 +266,21 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
     } else if (asyncParamInfo.funcName == LIMIT_SPEED) {
         SendLimitCmd2Drv(asyncParamInfo.controlId, asyncParamInfo.limitMode);
     } else if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL) {
-        UpdateNoSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
-        if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] == BG_LIMIT_OFF) {
-            return;
+        if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
+            GameNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
+        } else {
+            UpdateNoSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         }
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP]);
     }
 }
 
-void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const int limitMode)
+void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const int limitMode, const int uid,
+    const int enable)
 {
+    UpdateSpeedLimitConfigs(controlId, limitMode, enable);
     m_asyncSendLimit->RemoveAsyncTask(ASYNC_WORK_NAME);
-    m_asyncSendLimit->PostAsyncTask([controlId, limitMode, this]() {
-            this->UpdateSpeedLimitConfigs(controlId, limitMode);
+    m_asyncSendLimit->PostAsyncTask([uid, enable, this]() {
+            this->HighPriorityTransmit(uid, BOOST_UDP_TYPE, enable);
             this->SendLimitInfo();
         }, ASYNC_WORK_NAME, CheckDataTolonglong(m_delayTime));
 }
@@ -285,12 +295,13 @@ void AppNetworkSpeedLimitService::SendLimitInfo()
     SetBgLimitIdList(std::vector<int>(m_bgUidSet.begin(), m_bgUidSet.end()), SET_BG_UID);
     SetBgLimitIdList(std::vector<int>(m_bgPidSet.begin(), m_bgPidSet.end()), SET_BG_PID);
     SetBgLimitIdList(std::vector<int>(m_fgUidSet.begin(), m_fgUidSet.end()), SET_FG_UID);
+    WIFI_LOGI("%{public}s set limit mode %{public}d", __FUNCTION__, m_limitSpeedMode);
 }
 
 void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo)
 {
-    if (!AppParser::GetInstance().IsBackgroundLimitApp(networkControlInfo.bundleName)) {
-        WIFI_LOGD("%{public}s It's not speed limit scene.", __FUNCTION__);
+    if (!(AppParser::GetInstance().IsBackgroundLimitApp(networkControlInfo.bundleName) ||
+        networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME)) {
         return;
     }
     AsyncParamInfo asyncParamInfo;
@@ -325,6 +336,10 @@ void AppNetworkSpeedLimitService::UpdateNoSpeedLimitConfigs(const WifiNetworkCon
             m_additionalWindowUidSet.erase(networkControlInfo.uid);
             m_additionalWindowPidSet.erase(networkControlInfo.pid);
         }
+    }
+
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP]);
     }
 }
 
@@ -365,6 +380,51 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
     } else if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
         WIFI_LOGI("%{public}s top app speed limit is turnning off, update background app list", __FUNCTION__);
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_OFF);
+    }
+}
+
+void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
+{
+    WIFI_LOGI("%{public}s enter game limit configs", __FUNCTION__);
+    switch (networkControlInfo.state) {
+        case GameSceneId::MSG_GAME_STATE_START:
+            if (AppParser::GetInstance().IsOverGameRtt(networkControlInfo.bundleName, networkControlInfo.rtt)) {
+                SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, networkControlInfo.uid,
+                    GAME_BOOST_ENABLE);
+            } else {
+                SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, networkControlInfo.uid,
+                    GAME_BOOST_DISABLE);
+            }
+            break;
+        case GameSceneId::MSG_GAME_STATE_BACKGROUND:
+        case GameSceneId::MSG_GAME_STATE_END:
+            SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, networkControlInfo.uid, GAME_BOOST_DISABLE);
+            break;
+        case GameSceneId::MSG_GAME_ENTER_PVP_BATTLE:
+            SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, networkControlInfo.uid, GAME_BOOST_ENABLE);
+            break;
+        case GameSceneId::MSG_GAME_EXIT_PVP_BATTLE:
+            SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, networkControlInfo.uid, GAME_BOOST_DISABLE);
+            break;
+        default:
+            WIFI_LOGE("%{public}s there is no such state.", __FUNCTION__);
+            break;
+    }
+}
+
+void AppNetworkSpeedLimitService::HighPriorityTransmit(int uid, int protocol, int enable)
+{
+    if (m_isHighPriorityTransmit == enable || uid == -1) {
+        WIFI_LOGI("%{public}s HighPriorityTransmit was setted %{public}d or uid == -1", __FUNCTION__, enable);
+        return;
+    }
+    m_isHighPriorityTransmit = enable;
+    WIFI_LOGI("%{public}s enter HighPriorityTransmit.", __FUNCTION__);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetDpiMarkRule(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(), uid, protocol, enable);
+    if (ret != 0) {
+        WIFI_LOGE("%{public}s highPriorityTransmit failed, ret = %{public}d.", __FUNCTION__, ret);
+        return;
     }
 }
 } // namespace Wifi

@@ -195,6 +195,7 @@ public:
         void DealConnectTimeOutCmd(InternalMessagePtr msg);
         void DealNetworkRemoved(InternalMessagePtr msg);
         void DealWpaStateChange(InternalMessagePtr msg);
+        void DealMloStateChange(InternalMessagePtr msg);
     };
     /**
      * @Description  Definition of member function of SeparatedState class in StaStateMachine.
@@ -288,6 +289,7 @@ public:
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
+        void UpdateWifi7WurInfo();
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -364,6 +366,7 @@ public:
         void DhcpResultNotifyEvent(DhcpReturnCode result, int ipType = -1);
         static StaStateMachine *pStaStateMachineList[STA_INSTANCE_MAX_NUM];
         StaStateMachine *pStaStateMachine;
+        std::mutex dhcpResultMutex;
         DhcpResult DhcpIpv4Result;
         DhcpResult DhcpIpv6Result;
         DhcpResult DhcpOfferInfo;
@@ -495,7 +498,7 @@ private:
      * @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config) const;
+    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const;
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -592,7 +595,7 @@ private:
      *
      * @param  signalInfo - SignalPoll Result
      */
-    void UpdateLinkRssi(const WifiHalWpaSignalInfo &signalInfo);
+    void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo);
 
     /**
      * @Description : Converting frequencies to channels.
@@ -676,7 +679,7 @@ private:
      *
      * @param ssid - ssid
      */
-    bool IsWpa3Transition(std::string ssid) const;
+    bool IsWpa3Transition(std::string ssid, std::string bssid) const;
 
     /**
      * @Description : get wpa3 failreason connect fail count
@@ -775,6 +778,11 @@ private:
      * @Description operation after dhcp
      */
     void HandlePostDhcpSetup();
+
+    /**
+     * @Description Get Wifi7 MLO link info.
+     */
+    void DealMloConnectionLinkInfo(void);
 
 #ifndef OHOS_ARCH_LITE
     /**

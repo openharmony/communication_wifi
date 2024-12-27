@@ -28,6 +28,7 @@
 #include "servmgr_hdi.h"
 #include "hdf_remote_service.h"
 #include "wifi_config_center.h"
+#include "wifi_hisysevent.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HalDeviceManager"
@@ -47,6 +48,8 @@ std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiP2pIfaces;
 sptr<IChipController> HalDeviceManager::g_IWifi = nullptr;
 sptr<ChipControllerCallback> HalDeviceManager::g_chipControllerCallback = nullptr;
 sptr<ChipIfaceCallback> HalDeviceManager::g_chipIfaceCallback = nullptr;
+constexpr int32_t CMD_SET_MAX_CONNECT = 102;
+constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -269,6 +272,7 @@ bool HalDeviceManager::RemoveP2pIface(const std::string &ifaceName)
 bool HalDeviceManager::Scan(const std::string &ifaceName, const ScanParams &scanParams)
 {
     if (!CheckReloadChipHdiService()) {
+        WriteWifiScanApiFailHiSysEvent("HAL_SCAN", WifiScanFailReason::HDI_SERVICE_DIED);
         return false;
     }
 
@@ -285,6 +289,7 @@ bool HalDeviceManager::Scan(const std::string &ifaceName, const ScanParams &scan
     int32_t ret = iface->StartScan(scanParams);
     if (ret != HDF_SUCCESS) {
         LOGE("Scan, call StartScan failed! ret:%{public}d", ret);
+        WriteWifiScanApiFailHiSysEvent("HAL_SCAN", WifiScanFailReason::HDI_SCAN_FAIL);
         return false;
     }
 
@@ -295,6 +300,7 @@ bool HalDeviceManager::Scan(const std::string &ifaceName, const ScanParams &scan
 bool HalDeviceManager::StartPnoScan(const std::string &ifaceName, const PnoScanParams &scanParams)
 {
     if (!CheckReloadChipHdiService()) {
+        WriteWifiScanApiFailHiSysEvent("HAL_PNO_SCAN", WifiScanFailReason::HDI_SERVICE_DIED);
         return false;
     }
 
@@ -311,6 +317,7 @@ bool HalDeviceManager::StartPnoScan(const std::string &ifaceName, const PnoScanP
     int32_t ret = iface->StartPnoScan(scanParams);
     if (ret != HDF_SUCCESS) {
         LOGE("StartPnoScan, call StartPnoScan failed! ret:%{public}d", ret);
+        WriteWifiScanApiFailHiSysEvent("HAL_PNO_SCAN", WifiScanFailReason::HDI_PNO_SCAN_FAIL);
         return false;
     }
 
@@ -321,6 +328,7 @@ bool HalDeviceManager::StartPnoScan(const std::string &ifaceName, const PnoScanP
 bool HalDeviceManager::StopPnoScan(const std::string &ifaceName)
 {
     if (!CheckReloadChipHdiService()) {
+        WriteWifiScanApiFailHiSysEvent("HAL_PNO_SCAN", WifiScanFailReason::HDI_SERVICE_DIED);
         return false;
     }
 
@@ -347,6 +355,7 @@ bool HalDeviceManager::StopPnoScan(const std::string &ifaceName)
 bool HalDeviceManager::GetScanInfos(const std::string &ifaceName, std::vector<ScanResultsInfo> &scanResultsInfo)
 {
     if (!CheckReloadChipHdiService()) {
+        WriteWifiScanApiFailHiSysEvent("HAL_GET_SCAN_INFOS", WifiScanFailReason::HDI_SERVICE_DIED);
         return false;
     }
 
@@ -363,6 +372,7 @@ bool HalDeviceManager::GetScanInfos(const std::string &ifaceName, std::vector<Sc
     int32_t ret = iface->GetScanInfos(scanResultsInfo);
     if (ret != HDF_SUCCESS) {
         LOGE("GetScanInfos, call GetScanInfos failed! ret:%{public}d", ret);
+        WriteWifiScanApiFailHiSysEvent("HAL_GET_SCAN_INFOS", WifiScanFailReason::HDI_GET_SCAN_INFOS_FAIL);
         return false;
     }
 
@@ -465,7 +475,7 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
 
     sptr<IChipIface> &iface = iter->second;
     CHECK_NULL_AND_RETURN(iface, false);
-    if (!SetNetworkUpDown(ifaceName, false)) {
+    if (iface->SetIfaceState(false) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network down fail");
         return false;
     }
@@ -473,7 +483,7 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
     if (ret != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, call SetMacAddress failed! ret:%{public}d", ret);
     }
-    if (!SetNetworkUpDown(ifaceName, true)) {
+    if (iface->SetIfaceState(true) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network up fail");
         return false;
     }
@@ -484,6 +494,10 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
 
 IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
 {
+    if (ifaceName.empty()) {
+        LOGE("find iface is empty");
+        return nullptr;
+    }
     auto iter = mIWifiStaIfaces.find(ifaceName);
     if (iter != mIWifiStaIfaces.end()) {
         LOGE("find sta iface info");
@@ -504,6 +518,7 @@ IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
 
 bool HalDeviceManager::SetNetworkUpDown(const std::string &ifaceName, bool upDown)
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     IChipIface *iface = FindIface(ifaceName);
     if (iface == nullptr) {
         return false;
@@ -734,7 +749,7 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
 
     sptr<IChipIface> &iface = iter->second;
     CHECK_NULL_AND_RETURN(iface, false);
-    if (!SetNetworkUpDown(ifaceName, false)) {
+    if (iface->SetIfaceState(false) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network down fail");
         return false;
     }
@@ -742,7 +757,7 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     if (ret != HDF_SUCCESS) {
         LOGE("SetApMacAddress, call SetMacAddress failed! ret:%{public}d", ret);
     }
-    if (!SetNetworkUpDown(ifaceName, true)) {
+    if (iface->SetIfaceState(true) != HDF_SUCCESS) {
         LOGE("SetStaMacAddress, set network up fail");
         return false;
     }
@@ -810,6 +825,17 @@ bool HalDeviceManager::DisAssociateSta(const std::string &ifaceName, const std::
     const int disAssociateStaCmd = 101;
     mac.erase(std::remove(mac.begin(), mac.end(), ':'), mac.end());
     return SendCmdToDriver(ifaceName, interfaceName, disAssociateStaCmd, mac);
+}
+
+bool HalDeviceManager::SetMaxConnectNum(const std::string &ifaceName, int32_t channel, int32_t maxConn)
+{
+    if (maxConn > MAX_CONNECT_DEFAULT) {
+        LOGW("SetMaxConnectNum maxConn is over MAX_CONNECT_DEFAULT, maxConn is %{public}d", maxConn);
+        maxConn = MAX_CONNECT_DEFAULT;
+    }
+    std::string param = std::to_string(channel) + '.' + std::to_string(maxConn);
+    LOGI("SetMaxConnectNum param is %{public}s", param.c_str());
+    return SendCmdToDriver(ifaceName, ifaceName, CMD_SET_MAX_CONNECT, param);
 }
 
 void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)

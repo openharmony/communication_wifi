@@ -149,19 +149,19 @@ public:
     {
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
     }
 
     void ConvertDeviceCfgFail1()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
     }
 
     void ConvertDeviceCfgFail2()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
     }
 
     void StartWifiProcessSuccess()
@@ -1087,7 +1087,7 @@ public:
 
     void UpdateLinkRssiTest()
     {
-        WifiHalWpaSignalInfo signalInfo;
+        WifiSignalPollInfo signalInfo;
         signalInfo.signal = INVALID_RSSI1;
         pStaStateMachine->UpdateLinkRssi(signalInfo);
 
@@ -1178,7 +1178,7 @@ public:
 
     void IsWpa3TransitionTest()
     {
-        pStaStateMachine->IsWpa3Transition(RANDOMMAC_SSID);
+        pStaStateMachine->IsWpa3Transition(RANDOMMAC_SSID, RANDOMMAC_BSSID);
     }
 
     void InvokeOnStaConnChanged(const OperateResState &state, WifiLinkedInfo &info)
@@ -1491,6 +1491,38 @@ public:
         pStaStateMachine->SetSupportedWifiCategory();
         EXPECT_EQ(pStaStateMachine->linkedInfo.supportedWifiCategory, WifiCategory::WIFI7);
         EXPECT_EQ(pStaStateMachine->linkedInfo.isMloConnected, true);
+    }
+
+    void DealMloConnectionLinkTestWifi6()
+    {
+        pStaStateMachine->linkedInfo.supportedWifiCategory = WifiCategory::WIFI6;
+        pStaStateMachine->linkedInfo.isMloConnected = false;
+        pStaStateMachine->linkedInfo.bssid = "123";
+
+        pStaStateMachine->DealMloConnectionLinkInfo();
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
+            .WillRepeatedly(Return(0));
+    }
+
+    void DealMloConnectionLinkTestWifi7NotMlo()
+    {
+        pStaStateMachine->linkedInfo.supportedWifiCategory = WifiCategory::WIFI7;
+        pStaStateMachine->linkedInfo.isMloConnected = false;
+        pStaStateMachine->linkedInfo.bssid = "123";
+
+        pStaStateMachine->DealMloConnectionLinkInfo();
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
+            .WillRepeatedly(Return(0));
+    }
+
+    void DealMloConnectionLinkTestWifi7IsMlo()
+    {
+        pStaStateMachine->linkedInfo.supportedWifiCategory = WifiCategory::WIFI7;
+        pStaStateMachine->linkedInfo.isMloConnected = true;
+        pStaStateMachine->linkedInfo.bssid = "123";
+        pStaStateMachine->DealMloConnectionLinkInfo();
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
+            .WillRepeatedly(Return(0));
     }
 };
 
@@ -2287,6 +2319,21 @@ HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7NotMlo, TestSize.
 HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7IsMlo, TestSize.Level1)
 {
     SetSupportedWifiCategoryTestWifi7IsMlo();
+}
+
+HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi6, TestSize.Level1)
+{
+    DealMloConnectionLinkTestWifi6();
+}
+
+HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7NotMlo, TestSize.Level1)
+{
+    DealMloConnectionLinkTestWifi7NotMlo();
+}
+
+HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7IsMlo, TestSize.Level1)
+{
+    DealMloConnectionLinkTestWifi7IsMlo();
 }
 } // namespace Wifi
 } // namespace OHOS

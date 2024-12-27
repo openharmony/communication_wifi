@@ -104,6 +104,9 @@ int WifiManager::Init()
     }
     mInitStatus = INIT_OK;
 
+#ifndef OHOS_ARCH_LITE
+    wifiEventSubscriberManager->Init();
+#endif
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && !std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH) &&
         !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
         if (IsStartUpWifiEnableSupport()) {
@@ -130,6 +133,7 @@ int WifiManager::Init()
 #ifndef OHOS_ARCH_LITE
     WifiConfigCenter::GetInstance().SetScreenState(
         PowerMgr::PowerMgrClient::GetInstance().IsScreenOn() ? MODE_STATE_OPEN : MODE_STATE_CLOSE);
+    WifiConfigCenter::GetInstance().SetDeviceType(GetDeviceType());
 #endif
     InitPidfile();
     CheckSapcoExist();

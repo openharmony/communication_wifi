@@ -191,7 +191,7 @@ public:
         config.ssid = "123";
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(TWO)
             .WillOnce(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
-        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config, temp.bssid));
     }
 
     void GetGsmAuthResponseWithoutLengthTest()
@@ -340,7 +340,7 @@ public:
         config.ssid = "123";
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
             .WillRepeatedly(DoAll(SetArgReferee<0>(scanInfoList), Return(0)));
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, temp.bssid));
     }
 
     void SetExternalSimTest1()
@@ -964,7 +964,7 @@ HWTEST_F(StaStateMachineTest, ConvertDeviceCfgTest01, TestSize.Level1)
     wifiScanInfo.capabilities = "PSK+SAE";
     scanInfoList.push_back(wifiScanInfo);
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanInfoList(scanInfoList);
-    pStaStateMachine->ConvertDeviceCfg(config);
+    pStaStateMachine->ConvertDeviceCfg(config, wifiScanInfo.ssid);
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 

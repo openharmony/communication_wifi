@@ -44,6 +44,8 @@
           "OHOS::Wifi::WifiConfigCenter::SaveIpV6Info(OHOS::Wifi::IpV6Info const&, int)";
           "OHOS::Wifi::WifiConfigCenter::GetAllWifiLinkedInfo()";
           "OHOS::Wifi::WifiConfigCenter::SaveLinkedInfo(OHOS::Wifi::WifiLinkedInfo const&, int)";
+          "OHOS::Wifi::WifiConfigCenter::SaveMloLinkedInfo(std::__h::vector<OHOS::Wifi::WifiLinkedInfo, std::__h::allocator<OHOS::Wifi::WifiLinkedInfo>> const&, int)";
+          "OHOS::Wifi::WifiConfigCenter::GetMloLinkedInfo(std::__h::vector<OHOS::Wifi::WifiLinkedInfo, std::__h::allocator<OHOS::Wifi::WifiLinkedInfo>>&, int)";
           "OHOS::Wifi::WifiConfigCenter::SetMacAddress(const std::string&, int)";
           "OHOS::Wifi::WifiConfigCenter::GetMacAddress(std::string&, int)";
           "OHOS::Wifi::WifiConfigCenter::SetUserLastSelectedNetworkId(int, int)";
@@ -155,6 +157,11 @@
           "OHOS::Wifi::WifiScanConfig::SaveScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
           "OHOS::Wifi::WifiScanConfig::SetAppRunningState(OHOS::Wifi::ScanMode)";
           "OHOS::Wifi::WifiScanConfig::GetAppRunningState()";
+          "OHOS::Wifi::WifiScanConfig::SetScanType(OHOS::Wifi::ScanType)";
+          "OHOS::Wifi::WifiScanConfig::GetScanType()";
+          "OHOS::Wifi::WifiScanConfig::SetScanInitiatorUid(int)";
+          "OHOS::Wifi::WifiScanConfig::GetScanInitiatorUid()";
+          "OHOS::Wifi::WifiScanConfig::GetScanDeviceInfo()";
           "OHOS::Wifi::WifiScanConfig::SetStaScene(int const&)";
           "OHOS::Wifi::WifiScanConfig::SetStaSceneForbidCount(int)";
           "OHOS::Wifi::WifiScanConfig::GetStaSceneForbidCount()";
@@ -372,6 +379,9 @@
           "OHOS::Wifi::IsFactoryMode()";
           "OHOS::Wifi::WifiConfigCenter::SetSystemMode(int)";
           "OHOS::Wifi::WifiConfigCenter::GetSystemMode()";
+          "OHOS::Wifi::GetDeviceType()";
+          "OHOS::Wifi::WifiConfigCenter::SetDeviceType(int)";
+          "OHOS::Wifi::WifiConfigCenter::IsAllowPopUp()";
           "OHOS::Wifi::WifiCommonEventHelper::PublishWiTasRssiValueChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
           "OHOS::Wifi::WifiAssetManager::InitUpLoadLocalDeviceSync()";
           "OHOS::Wifi::WatchParamValue(char const*, void (*)(char const*, char const*, void*), void*)";

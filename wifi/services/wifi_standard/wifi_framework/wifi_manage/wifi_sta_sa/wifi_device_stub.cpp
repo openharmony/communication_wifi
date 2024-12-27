@@ -381,7 +381,6 @@ void WifiDeviceStub::ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapCo
 void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig &config)
 {
     config.networkId = data.ReadInt32();
-    config.status = data.ReadInt32();
     config.bssid = data.ReadString();
     config.bssidType = data.ReadInt32();
     config.ssid = data.ReadString();
@@ -487,7 +486,6 @@ void WifiDeviceStub::BigDataWriteEapConfig(const WifiEapConfig &wifiEapConfig, s
 void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDeviceConfig &config)
 {
     reply.WriteInt32(config.networkId);
-    reply.WriteInt32(config.status);
     reply.WriteString(config.bssid);
     reply.WriteInt32(config.bssidType);
     reply.WriteString(config.ssid);
@@ -527,6 +525,9 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteInt32(config.wifiWapiConfig.wapiPskType);
     reply.WriteInt32((int)config.networkSelectionStatus.status);
     reply.WriteInt32((int)config.networkSelectionStatus.networkSelectionDisableReason);
+    reply.WriteBool(config.networkSelectionStatus.seenInLastQualifiedNetworkSelection);
+    reply.WriteBool(config.isPortal);
+    reply.WriteBool(config.noInternetAccess);
     return;
 }
 
@@ -1212,6 +1213,7 @@ void WifiDeviceStub::OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &d
     networkControlInfo.bundleName = data.ReadString();
     networkControlInfo.state = data.ReadInt32();
     networkControlInfo.sceneId = data.ReadInt32();
+    networkControlInfo.rtt = data.ReadInt32();
     ErrCode ret = ReceiveNetworkControlInfo(networkControlInfo);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);

@@ -32,6 +32,8 @@ enum class AppType {
     KEY_FOREGROUND_LIST_APP,
     BACKGROUND_LIMIT_LIST_APP,
     ASYNC_DELAY_TIME,
+    GAME_RTT,
+    LIVE_STREAM_APP,
     OTHER_APP
 };
 
@@ -47,6 +49,7 @@ struct ChariotAppInfo : CommonAppInfo {};
 struct HighTempLimitSpeedAppInfo : CommonAppInfo {};
 struct KeyForegroundListAppInfo : CommonAppInfo {};
 struct BackgroundLimitListAppInfo : CommonAppInfo {};
+struct LiveStreamAppInfo : CommonAppInfo {};
 
 class AppParser : public XmlParser {
 public:
@@ -62,6 +65,8 @@ public:
     bool IsKeyForegroundApp(const std::string &bundleName) const;
     bool IsBackgroundLimitApp(const std::string &bundleName) const;
     std::string GetAsyncLimitSpeedDelayTime() const;
+    bool IsLiveStreamApp(const std::string &bundleName) const;
+    bool IsOverGameRtt(const std::string &bundleName, const int gameRtt) const;
     bool Init();
 
 private:
@@ -77,6 +82,7 @@ private:
     HighTempLimitSpeedAppInfo ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode);
     KeyForegroundListAppInfo ParseKeyForegroundListAppInfo(const xmlNodePtr &innode);
     BackgroundLimitListAppInfo ParseBackgroundLimitListAppInfo(const xmlNodePtr &innode);
+    LiveStreamAppInfo ParseLiveStreamAppInfo(const xmlNodePtr &innode);
     void ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
     bool ReadPackageCloudFilterConfig();
@@ -95,6 +101,8 @@ private:
     std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVecCloudPush {};
     std::vector<KeyForegroundListAppInfo> m_keyForegroundListAppVec {};
     std::vector<BackgroundLimitListAppInfo> m_backgroundLimitListAppVec {};
+    std::vector<LiveStreamAppInfo> m_liveStreamAppVec {};
+    std::unordered_map<std::string, int> m_gameRtt {};
     std::string m_delayTime = "";
     bool mIshighTempLimitSpeedReadCloudPush = false;
     bool initFlag_ = false;

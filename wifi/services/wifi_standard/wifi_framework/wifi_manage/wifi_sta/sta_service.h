@@ -189,6 +189,14 @@ public:
      */
     virtual ErrCode DisableDeviceConfig(int networkId) const;
     /**
+     * @Description Set whether to allow automatic connect by networkid.
+     *
+     * @param networkId - Identifies the network to be set. The value of networkId cannot be less thann 0.
+     * @param isAllowed - Identifies whether allow auto connect or not.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) const;
+    /**
      * @Description  Start WPS Connection
      *
      * @Output: Return operating results to Interface Service after enable wifi

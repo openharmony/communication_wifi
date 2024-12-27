@@ -587,10 +587,22 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 
     WifiLinkedInfo linkedInfo;
+    std::vector<WifiLinkedInfo> mloInfo;
+    bool isMloBssid = false;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId);
+    for (auto iter : mloInfo) {
+        if (iter.bssid == bssid) {
+            isMloBssid = true;
+            break;
+        }
+    }
     if (networkId == linkedInfo.networkId) {
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+        } else if (linkedInfo.mloState == MloState::WIFI7_EMLSR && isMloBssid) {
+            LOGI("%{public}s current linkedBssid is emlsr, forbid link switch", __FUNCTION__);
+            return WIFI_OPT_NOT_SUPPORTED;
         } else {
             LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
                 __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());

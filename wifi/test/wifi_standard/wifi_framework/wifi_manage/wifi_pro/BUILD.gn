@@ -25,6 +25,8 @@ config("module_private_config") {
 
 ohos_unittest("wifi_pro_unittest") {
   module_out_path = module_output_path
+
+
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",

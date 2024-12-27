@@ -20,6 +20,7 @@
 #include "wifi_msg.h"
 #include "ip2p_service_callbacks.h"
 #include "wifi_hid2d_msg.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -325,6 +326,14 @@ public:
      * @return ErrCode - operate result
      */
     virtual ErrCode SetGcIpAddress(const IpAddrInfo& ipInfo) = 0;
+
+    /**
+     * @Description Set EnhanceService to p2p service
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

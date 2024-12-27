@@ -267,5 +267,10 @@ ErrCode P2pInterface::SetGcIpAddress(const IpAddrInfo& ipInfo)
 {
     return p2pService.SetGcIpAddress(ipInfo);
 }
+
+ErrCode P2pInterface::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    return p2pService.SetEnhanceService(enhanceService);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -669,13 +669,15 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
 ErrCode StaService::Disconnect() const
 {
     WIFI_LOGI("Enter Disconnect.\n");
-    CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
-    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
-        WIFI_LOGI("The blocklist is updated.\n");
+    if (m_instId == INSTID_WLAN0) {
+        CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+        if (pStaAutoConnectService->EnableOrDisableBssid(linkedInfo.bssid, false, AP_CANNOT_HANDLE_NEW_STA)) {
+            WIFI_LOGI("The blocklist is updated.\n");
+        }
     }
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISCONNECT);
     return WIFI_OPT_SUCCESS;
 }
@@ -842,17 +844,19 @@ std::string StaService::WifiCountryCodeChangeObserver::GetListenerModuleName()
  
 void StaService::HandleScreenStatusChanged(int screenState)
 {
-    WIFI_LOGI("Enter HandleScreenStatusChanged screenState:%{public}d.", screenState);
+    WIFI_LOGD("Enter HandleScreenStatusChanged screenState:%{public}d, instId:%{public}d", screenState, m_instId);
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("pStaStateMachine is null!");
         return;
     }
     pStaStateMachine->SendMessage(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT, screenState);
-    if (screenState == MODE_STATE_OPEN) {
-        pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
-    } else {
-        pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
+    if (m_instId == INSTID_WLAN0) {
+        if (screenState == MODE_STATE_OPEN) {
+            pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);
+        } else {
+            pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
+        }
     }
     if (pStaAppAcceleration != nullptr) {
         pStaAppAcceleration->HandleScreenStatusChanged(screenState);

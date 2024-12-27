@@ -929,7 +929,7 @@ private:
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
     void TryModifyPortalAttribute(SystemNetWorkState netState);
-    void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig config);
+    void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
     void UpdateHiLinkAttribute();
 private:
     std::shared_mutex m_staCallbackMutex;

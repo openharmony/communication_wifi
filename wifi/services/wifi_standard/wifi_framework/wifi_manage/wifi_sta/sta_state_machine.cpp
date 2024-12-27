@@ -1886,7 +1886,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
     ChangePortalAttribute(needChangePortalFlag, config);
 }
 
-void StaStateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig config)
+void StaStateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config)
 {
     if (!isNeedChange) {
         return;
@@ -3473,7 +3473,6 @@ void StaStateMachine::HilinkSaveConfig(void)
     WifiSettings::GetInstance().SyncDeviceConfig();
 
     WifiConfigCenter::GetInstance().SetMacAddress(m_hilinkDeviceConfig.macAddress, m_instId);
-    linkedInfo.isHiLinkNetwork = true;
     m_hilinkFlag = false;
 }
 

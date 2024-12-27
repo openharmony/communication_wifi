@@ -130,6 +130,7 @@ public:
      */
     void SetIsNeedDhcp(DHCPTYPE dhcpType);
 
+    void SetEnhanceService(IEnhanceService* enhanceService);
 private:
     /**
      * @Description Handle event of CMD_DEVICE_DISCOVERS

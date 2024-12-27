@@ -336,6 +336,7 @@ public:
     void SetSystemMode(int systemMode);
 
     int GetSystemMode();
+
     void SetDeviceType(int deviceType);
 
     bool IsAllowPopUp();

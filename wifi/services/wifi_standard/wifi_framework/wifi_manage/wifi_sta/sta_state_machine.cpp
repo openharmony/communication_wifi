@@ -1811,7 +1811,8 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
         UpdatePortalState(netState, updatePortalAuthTime);
 #ifndef OHOS_ARCH_LITE
-        if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK) {
+        if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK
+            && WifiConfigCenter::GetInstance().IsAllowPopUp()) {
             ShowPortalNitification();
         }
 #endif
@@ -1851,8 +1852,8 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
 {
-    if (IsFactoryMode()) {
-        WIFI_LOGI("factory version, no need to pop up diag");
+    if (IsFactoryMode() || !WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+        WIFI_LOGI("factory version or device type no need to pop up diag");
         return;
     }
     WifiLinkedInfo linkedInfo;

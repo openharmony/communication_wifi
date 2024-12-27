@@ -1436,5 +1436,22 @@ int WifiConfigCenter::GetHotspotMacConfig(HotspotMacConfig &config, int id)
     }
     return 0;
 }
+
+void WifiConfigCenter::SetDeviceType(int deviceType)
+{
+    mDeviceType = deviceType;
+}
+
+bool WifiConfigCenter::IsAllowPopUp()
+{
+    switch (mDeviceType) {
+        case ProductDeviceType::WEARABLE:
+            LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
+            return false;
+        default:
+            LOGI("Allow pop up dialog, device type:%{public}d", mDeviceType);
+            return true;
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS

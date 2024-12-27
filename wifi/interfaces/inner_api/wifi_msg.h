@@ -726,6 +726,7 @@ struct WifiDeviceConfig {
     IpInfo lastDhcpResult;
     bool isShared;
     int64_t lastTrySwitchWifiTimestamp { -1 };
+    bool isAllowAutoConnect { true };
 
     WifiDeviceConfig()
     {

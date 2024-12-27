@@ -671,6 +671,34 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
+{
+    WIFI_LOGI("Enter AllowAutoConnect, networkid is %{public}d, isAllowed is %{public}d", networkId, isAllowed);
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, targetNetwork)) {
+        WIFI_LOGE("AllowAutoConnect, failed tot get device config");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (targetNetwork.isAllowAutoConnect == isAllowed) {
+        return WIFI_OPT_FAILED;
+    }
+
+    targetNetwork.isAllowAutoConnect = isAllowed;
+    WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    if (!isAllowed) {
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+        if (linkedInfo.networkId != networkId) {
+            WIFI_LOGI("AllowAutoConnect, networkid is not correct, linked networkid:%{public}d", linkedInfo.networkId);
+            return WIFI_OPT_FAILED;
+        }
+        Disconnect();
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::Disconnect() const
 {
     WIFI_LOGI("Enter Disconnect.\n");

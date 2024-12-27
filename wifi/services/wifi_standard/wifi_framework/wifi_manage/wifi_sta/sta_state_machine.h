@@ -529,6 +529,8 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
+
+    void SetAllowAutoConnectStatus(int32_t networkId, bool status);
  
     /**
      * @Description  Disconnect network

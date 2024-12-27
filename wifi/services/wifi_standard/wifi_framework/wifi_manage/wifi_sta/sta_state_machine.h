@@ -498,7 +498,7 @@ private:
      * @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config) const;
+    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const;
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -679,7 +679,7 @@ private:
      *
      * @param ssid - ssid
      */
-    bool IsWpa3Transition(std::string ssid) const;
+    bool IsWpa3Transition(std::string ssid, std::string bssid) const;
 
     /**
      * @Description : get wpa3 failreason connect fail count

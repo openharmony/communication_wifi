@@ -476,9 +476,21 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
     int networkId = msg->GetParam1();
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
+
+    if (networkId == pStaStateMachine->targetNetworkId_) {
+        WIFI_LOGI("This network is connecting and does not need to be reconnected m_instId = %{public}d",
+            pStaStateMachine->m_instId);
+        return;
+    }
+
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, pStaStateMachine->m_instId) != 0) {
+        WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", networkId);
+        return;
+    }
     
-    if (networkId == pStaStateMachine->linkedInfo.networkId || networkId == pStaStateMachine->targetNetworkId_) {
-        WIFI_LOGI("This network is connected or connecting and does not need to be reconnected m_instId = %{public}d",
+    if (networkId == pStaStateMachine->linkedInfo.networkId && config.isReassocSelfCureWithFactoryMacAddress == 0) {
+        WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
         return;
     }
@@ -630,10 +642,10 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         if (shouldStopTimer) {
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
         }
-        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
             DisabledReason::DISABLED_DISASSOC_REASON, reason);
         if (BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, reason)) {
-            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
+            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
                 DisabledReason::DISABLED_CONSECUTIVE_FAILURES);
         }
         WriteWifiAbnormalDisconnectHiSysEvent(reason);
@@ -1148,6 +1160,7 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
     WIFI_LOGI("ApLinkedState reveived network connection event,bssid:%{public}s, ignore it.\n",
         MacAnonymize(bssid).c_str());
     pStaStateMachine->DealSignalPollResult();
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }
 
 void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessagePtr msg)
@@ -2415,7 +2428,7 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(DhcpResult *dest, Dhcp
         WIFI_LOGE("SaveDhcpResultExt strOptLocalAddr2 strcpy_s failed!");
         return;
     }
-    if (source->dnsList.dnsNumber > 0) {
+    if (source->dnsList.dnsNumber > 0 && source->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         dest->dnsList.dnsNumber = 0;
         for (uint32_t i = 0; i < source->dnsList.dnsNumber; i++) {
             if (memcpy_s(dest->dnsList.dnsAddr[i], DHCP_LEASE_DATA_MAX_LEN, source->dnsList.dnsAddr[i],
@@ -2480,8 +2493,12 @@ void StaStateMachine::DhcpResultNotify::OnSuccessDhcpResult(int status, const ch
     if (result->iptype == 0) { /* 0-ipv4,1-ipv6 */
         WIFI_LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT OnSuccess");
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
-        SaveDhcpResult(&DhcpIpv4Result, result);
+        {
+            std::unique_lock<std::mutex> lock(dhcpResultMutex);
+            SaveDhcpResult(&DhcpIpv4Result, result);
+        }
     } else {
+        std::unique_lock<std::mutex> lock(dhcpResultMutex);
         SaveDhcpResult(&DhcpIpv6Result, result);
     }
     DhcpResultNotifyEvent(DhcpReturnCode::DHCP_RESULT, result->iptype);
@@ -2508,7 +2525,10 @@ void StaStateMachine::DhcpResultNotify::OnDhcpOfferResult(int status, const char
         return;
     }
     WIFI_LOGI("DhcpResultNotify TYPE_DHCP_OFFER");
-    SaveDhcpResult(&DhcpOfferInfo, result);
+    {
+        std::unique_lock<std::mutex> lock(dhcpResultMutex);
+        SaveDhcpResult(&DhcpOfferInfo, result);
+    }
     DhcpResultNotifyEvent(DhcpReturnCode::DHCP_OFFER_REPORT, result->iptype);
 }
 
@@ -2520,8 +2540,11 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
     WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, pStaStateMachine->m_instId);
     WifiConfigCenter::GetInstance().GetIpv6Info(ipv6Info, pStaStateMachine->m_instId);
     if (ipType == 0) { /* 0-ipv4,1-ipv6 */
-        result = &(StaStateMachine::DhcpResultNotify::DhcpIpv4Result);
-        TryToSaveIpV4Result(ipInfo, ipv6Info, result);
+        {
+            std::unique_lock<std::mutex> lock(dhcpResultMutex);
+            result = &(StaStateMachine::DhcpResultNotify::DhcpIpv4Result);
+            TryToSaveIpV4Result(ipInfo, ipv6Info, result);
+        }
         IpCacheInfo ipCacheInfo;
         std::string ssid = pStaStateMachine->linkedInfo.ssid;
         std::string bssid = pStaStateMachine->linkedInfo.bssid;
@@ -2530,6 +2553,7 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
             DealWifiDhcpCache(WIFI_DHCP_CACHE_ADD, ipCacheInfo);
         }
     } else {
+        std::unique_lock<std::mutex> lock(dhcpResultMutex);
         result = &(StaStateMachine::DhcpResultNotify::DhcpIpv6Result);
         TryToSaveIpV6Result(ipInfo, ipv6Info, result);
     }
@@ -2559,7 +2583,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4ResultExt(IpInfo &ipInfo, I
     ipInfo.secondDns = IpTools::ConvertIpv4Address(result->strOptDns2);
     ipInfo.serverIp = IpTools::ConvertIpv4Address(result->strOptServerId);
     ipInfo.leaseDuration = result->uOptLeasetime;
-    if (result->dnsList.dnsNumber > 0) {
+    if (result->dnsList.dnsNumber > 0 && result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         ipInfo.dnsAddr.clear();
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
             unsigned int ipv4Address = IpTools::ConvertIpv4Address(result->dnsList.dnsAddr[i]);
@@ -2639,7 +2663,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         ipv6Info.secondDns = result->strOptDns2;
         ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
         ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
-        if (result->dnsList.dnsNumber > 0) {
+        if (result->dnsList.dnsNumber > 0 && result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
             ipv6Info.dnsAddr.clear();
             for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
                 ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
@@ -2754,21 +2778,23 @@ void StaStateMachine::DhcpResultNotify::DealDhcpOfferResult()
 {
     WIFI_LOGI("DhcpResultNotify DealDhcpOfferResult enter");
     IpInfo ipInfo;
-    ipInfo.ipAddress = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptClientId);
-    ipInfo.gateway = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptRouter1);
-    ipInfo.netmask = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptSubnet);
-    ipInfo.primaryDns = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptDns1);
-    ipInfo.secondDns = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptDns2);
-    ipInfo.serverIp = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptServerId);
-    ipInfo.leaseDuration = DhcpOfferInfo.uOptLeasetime;
-    if (DhcpOfferInfo.dnsList.dnsNumber > 0) {
-        ipInfo.dnsAddr.clear();
-        for (uint32_t i = 0; i < DhcpOfferInfo.dnsList.dnsNumber; i++) {
-            uint32_t ipv4Address = IpTools::ConvertIpv4Address(DhcpOfferInfo.dnsList.dnsAddr[i]);
-            ipInfo.dnsAddr.push_back(ipv4Address);
+    {
+        std::unique_lock<std::mutex> lock(dhcpResultMutex);
+        ipInfo.ipAddress = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptClientId);
+        ipInfo.gateway = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptRouter1);
+        ipInfo.netmask = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptSubnet);
+        ipInfo.primaryDns = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptDns1);
+        ipInfo.secondDns = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptDns2);
+        ipInfo.serverIp = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptServerId);
+        ipInfo.leaseDuration = DhcpOfferInfo.uOptLeasetime;
+        if (DhcpOfferInfo.dnsList.dnsNumber > 0 && DhcpOfferInfo.dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
+            ipInfo.dnsAddr.clear();
+            for (uint32_t i = 0; i < DhcpOfferInfo.dnsList.dnsNumber; i++) {
+                uint32_t ipv4Address = IpTools::ConvertIpv4Address(DhcpOfferInfo.dnsList.dnsAddr[i]);
+                ipInfo.dnsAddr.push_back(ipv4Address);
+            }
         }
     }
-
     pStaStateMachine->InvokeOnDhcpOfferReport(ipInfo);
 }
 

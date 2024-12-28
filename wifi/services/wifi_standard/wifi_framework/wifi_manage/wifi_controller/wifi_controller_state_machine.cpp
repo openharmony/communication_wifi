@@ -992,5 +992,10 @@ void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
     multiStaManagers.StopAllManagers();
     concreteManagers.StopAllManagers();
 }
+
+void WifiControllerMachine::SelfcureResetWifi(int id)
+{
+    concreteManagers.SendMessage(CONCRETE_CMD_RESET_STA, id);
+}
 } // namespace Wifi
 } // namespace OHOS

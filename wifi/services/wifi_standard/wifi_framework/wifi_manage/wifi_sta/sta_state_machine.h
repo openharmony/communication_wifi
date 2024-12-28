@@ -931,6 +931,9 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    void TryModifyPortalAttribute(SystemNetWorkState netState);
+    void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
+    void UpdateHiLinkAttribute();
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;

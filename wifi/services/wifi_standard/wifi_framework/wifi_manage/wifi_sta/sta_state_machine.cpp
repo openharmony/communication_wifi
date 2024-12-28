@@ -4435,10 +4435,10 @@ void StaStateMachine::UpdateHiLinkAttribute()
     std::vector<WifiScanInfo> wifiScanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
     for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
-        if (iter->bssid == pStaStateMachine->linkedInfo.bssid) {
-            pStaStateMachine->linkedInfo.isHiLinkNetwork = iter->isHiLinkNetwork;
+        if (iter->bssid == linkedInfo.bssid) {
+            linkedInfo.isHiLinkNetwork = iter->isHiLinkNetwork;
             WIFI_LOGI("set hilink=%{public}d, bssid=%{public}s", iter->isHiLinkNetwork,
-                MacAnonymize(pStaStateMachine->linkedInfo.bssid).c_str());
+                MacAnonymize(linkedInfo.bssid).c_str());
             break;
         }
     }

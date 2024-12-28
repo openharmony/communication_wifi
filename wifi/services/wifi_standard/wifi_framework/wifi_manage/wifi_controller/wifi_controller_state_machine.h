@@ -119,6 +119,7 @@ public:
     void StartSoftapCloseTimer();
     void StopSoftapCloseTimer();
 #ifdef FEATURE_RPT_SUPPORT
+    bool ShouldUseRpt(int id);
     void HandleRptStop(int id);
     std::shared_ptr<RptManager> GetRptManager(int id);
 #endif
@@ -154,7 +155,6 @@ private:
     HotspotMode CalculateHotspotMode(int id);
     bool ShouldEnableSoftap();
 #ifdef FEATURE_RPT_SUPPORT
-    bool ShouldUseRpt(int id);
     void MakeRptManager(RptManager::Role role, int id);
 #endif
 #endif

@@ -125,6 +125,7 @@ public:
 #endif
 #endif
     void ShutdownWifi(bool shutDownAp = true);
+    void SelfcureResetWifi(int id);
 private:
     template <typename T>
     inline void ParsePointer(T *&pointer)

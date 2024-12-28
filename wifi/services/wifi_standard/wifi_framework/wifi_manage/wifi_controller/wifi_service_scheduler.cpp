@@ -90,7 +90,7 @@ void WifiServiceScheduler::ClearSoftApIfaceNameMap(int instId)
     }
 }
 
-ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIfName)
+ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIfName, int type)
 {
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     WIFI_LOGI("AutoStartStaService, current sta state:%{public}d", staState);
@@ -122,8 +122,10 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
-    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaStartSuccess(instId);
+    if (type != RESET_STA_TYPE_SELFCURE) {
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        ins->HandleStaStartSuccess(instId);
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -155,7 +157,7 @@ ErrCode WifiServiceScheduler::AutoStartWifi2Service(int instId, std::string &sta
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
+ErrCode WifiServiceScheduler::AutoStopStaService(int instId, int type)
 {
     WifiOprMidState staStateBefore = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     WIFI_LOGI("AutoStopStaService, current sta state:%{public}d", staStateBefore);
@@ -201,8 +203,10 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
     DispatchWifiCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
-    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaClose(instId);
+    if (type != RESET_STA_TYPE_SELFCURE) {
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        ins->HandleStaClose(instId);
+    }
     return WIFI_OPT_SUCCESS;
 }
 

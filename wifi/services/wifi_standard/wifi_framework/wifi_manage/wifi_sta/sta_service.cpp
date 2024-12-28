@@ -420,6 +420,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     WifiDeviceConfig tempDeviceConfig;
     tempDeviceConfig.instanceId = config.instanceId;
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
+        netWorkId = tempDeviceConfig.networkId;
         if (m_instId == INSTID_WLAN0) {
             CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
             bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;

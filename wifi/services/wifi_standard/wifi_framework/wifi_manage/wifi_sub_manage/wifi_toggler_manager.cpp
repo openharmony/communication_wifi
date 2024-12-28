@@ -144,6 +144,11 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
         WIFI_LOGE("Airplane mode do not start scanonly.");
         return WIFI_OPT_FAILED;
     }
+    if (!WifiConfigCenter::GetInstance().GetCoexSupport() && HasAnyApRuning() &&
+        WifiConfigCenter::GetInstance().GetApIfaceName() == "wlan0") {
+        WIFI_LOGE("Softap(wlan0) mode do not start scanonly.");
+        return WIFI_OPT_FAILED;
+    }
     pWifiControllerMachine->SendMessage(CMD_SCAN_ALWAYS_MODE_CHANGED, isOpen, 0);
     return WIFI_OPT_SUCCESS;
 }

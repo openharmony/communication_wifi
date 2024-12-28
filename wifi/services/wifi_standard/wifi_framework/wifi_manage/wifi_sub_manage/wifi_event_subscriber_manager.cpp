@@ -858,7 +858,7 @@ void NotificationEventSubscriber::OnReceiveWlanKeepConnected(const OHOS::EventFw
     if (code == 1) { // The user clicks the use button.
         WifiNetAgent::GetInstance().RestoreWifiConnection();
         WIFI_LOGI("change the value of AcceptUnvalidated to true");
-        WifiSettings::GetInstance().SetAcceptUnvalidated(networkId);
+        WifiSettings::GetInstance().SetAcceptUnvalidated(networkId, true);
         WifiSettings::GetInstance().SyncDeviceConfig();
     }
 }

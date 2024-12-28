@@ -140,8 +140,6 @@ enum PortalState {
     EXPERIED
 };
 
-/* Signal levels are classified into: 0 1 2 3 4 ,the max is 4. */
-constexpr int MAX_LEVEL = 4;
 const std::string WPA_BSSID_ANY = "any";
 
 class StaStateMachine : public StateMachine {
@@ -553,6 +551,7 @@ public:
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SyncDeviceEverConnectedState(bool hasNet);
+    void UpdateAcceptUnvalidatedState();
 #endif
 
     bool SetMacToHal(const std::string &currentMac, const std::string &realMac, int instId);

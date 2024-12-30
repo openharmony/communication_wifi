@@ -21,6 +21,7 @@
 #include <singleton.h>
 #include <utility>
 #include <vector>
+#include <mutex>
 
 #include "i_net_conn_service.h"
 #include "net_all_capabilities.h"
@@ -45,18 +46,18 @@ public:
      *
      * @return true if register success else return false;
      */
-    bool RegisterNetSupplier();
+    bool RegisterNetSupplier(int instId);
     /**
      * Register the network callback with the network management module
      *
      * @return true if register success else return false;
      */
-    bool RegisterNetSupplierCallback();
+    bool RegisterNetSupplierCallback(int instId);
 
     /**
      * Cancel the registration information to the network management
      */
-    void UnregisterNetSupplier();
+    void UnregisterNetSupplier(int instId);
 
     /**
      * Update network information
@@ -64,7 +65,7 @@ public:
      * @param supplierId network unique identity id returned after network registration
      * @param netSupplierInfo network data information
      */
-    void UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
+    void UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo, int instId);
 
     /**
      * Add route
@@ -99,14 +100,14 @@ public:
      *
      * @param netSupplierInfo net Supplier Info
      */
-    void OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo);
+    void OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo, int instId);
 
     /**
      * Add OnStaMachineWifiStart
      *
      * @param
      */
-    void OnStaMachineWifiStart();
+    void OnStaMachineWifiStart(int instId);
 
     /**
      * Add OnStaMachineNetManagerRestart
@@ -216,9 +217,11 @@ private:
         int instId = 0);
 private:
     uint32_t supplierId{0};
+    uint32_t supplierIdForWlan1{0};
     bool isWifiAvaliable_ = false;
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
     std::unique_ptr<WifiEventHandler> netAgentEventHandler_ = nullptr;
+    std::mutex netAgentMutex_;
 };
 } // namespace Wifi
 } // namespace OHOS

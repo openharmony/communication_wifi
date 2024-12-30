@@ -115,6 +115,7 @@ ohos_unittest("toolkit_unittest") {
     "-Wl,--wrap=SetDhcpRange",
     "-Wl,--wrap=SetDhcpName",
     "-Wl,--wrap=GetDhcpClientInfos",
+    
   ]
 
   deps = [

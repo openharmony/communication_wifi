@@ -205,6 +205,29 @@ void WifiStaManager::NotifyScanForStaConnChanged(OperateResState state, int inst
     }
 }
 
+static void HandleStaDisconnected(int instId)
+{
+    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+        if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+            WIFI_LOGE("GetWifiTogglerManager failed!");
+            return;
+        }
+        WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(instId);
+        if (curState == WifiOprMidState::RUNNING) {
+            WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, instId);
+        }
+#ifdef FEATURE_RPT_SUPPORT
+        if (WifiManager::GetInstance().GetRptInterface(instId) == nullptr) {
+            WIFI_LOGE("GetRptInterface failed!");
+            return;
+        }
+        if (WifiManager::GetInstance().GetRptInterface(instId)->IsRptRunning()) {
+            WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, instId);
+        }
+#endif
+    }
+}
+
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     WIFI_LOGD("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
@@ -242,17 +265,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
-        if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-            WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(instId);
-            if (curState == WifiOprMidState::RUNNING) {
-                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, instId);
-            }
-#ifdef FEATURE_RPT_SUPPORT
-            if (WifiManager::GetInstance().GetRptInterface(instId)->IsRptRunning()) {
-                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, instId);
-            }
-#endif
-        }
+        HandleStaDisconnected(instId);
     }
 #endif
     return;

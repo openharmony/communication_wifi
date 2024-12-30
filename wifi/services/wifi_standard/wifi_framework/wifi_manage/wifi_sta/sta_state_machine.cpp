@@ -422,8 +422,8 @@ void StaStateMachine::InitState::StartWifiProcess()
     }
 
 #ifndef OHOS_ARCH_LITE
-      WIFI_LOGI("Register netsupplier %{public}d", pStaStateMachine->m_instId);
-      WifiNetAgent::GetInstance().OnStaMachineWifiStart(pStaStateMachine->m_instId);
+    WIFI_LOGI("Register netsupplier %{public}d", pStaStateMachine->m_instId);
+    WifiNetAgent::GetInstance().OnStaMachineWifiStart(pStaStateMachine->m_instId);
 #endif
 
     pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);

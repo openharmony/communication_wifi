@@ -60,7 +60,7 @@ bool WifiNetAgent::RegisterNetSupplier(int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplier.");
-    std::unique<std::mutex> lock(netAgentMutex_);
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
 
     std::string ident = "wifi";
     using NetManagerStandard::NetBearType;
@@ -86,7 +86,7 @@ bool WifiNetAgent::RegisterNetSupplierCallback(int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplierCallback.");
-    std::unique<std::mutex> lock(netAgentMutex_);
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     sptr<NetConnCallback> pNetConnCallback = (std::make_unique<NetConnCallback>()).release();
     if (pNetConnCallback == nullptr) {
         WIFI_LOGE("pNetConnCallback is null\n");
@@ -107,7 +107,7 @@ void WifiNetAgent::UnregisterNetSupplier(int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UnregisterNetSupplier.");
-    std::unique<std::mutex> lock(netAgentMutex_);
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
     int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(supplierIdNow);
     WIFI_LOGI("Unregister network result:%{public}d", result);
@@ -118,7 +118,7 @@ void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSuppl
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetSupplierInfo.");
-    std::unique<std::mutex> lock(netAgentMutex_);
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     isWifiAvaliable_ = netSupplierInfo->isAvailable_;
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
     int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierIdNow, netSupplierInfo);
@@ -130,7 +130,7 @@ void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
-    std::unique<std::mutex> lock(netAgentMutex_);
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     if (!isWifiAvaliable_) {
         WIFI_LOGE("wifi is not avaliable, no need UpdateNetLinkInfo");
         return;

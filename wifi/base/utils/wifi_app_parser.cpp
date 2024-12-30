@@ -286,21 +286,25 @@ void AppParser::ParseNetworkControlAppList(const xmlNodePtr &innode)
 
 LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
 {
-    LowLatencyAppInfo appInfo;
+    LowLatencyAppInfo appInfo{};
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME));
+    if (value == NULL) {
+        WIFI_LOGE("%{public}s xml parser low latency app info error.", __FUNCTION__);
+        return appInfo;
+    }
     std::string gameName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = gameName;
-    if (value != nullptr) {
-        xmlFree(value);
-    }
+    xmlFree(value);
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         if (GetAppTypeAsInt(node) == AppType::GAME_RTT) {
             xmlChar *rttValue = xmlNodeGetContent(node);
+            if (rttValue == NULL) {
+                WIFI_LOGE("%{public}s xml parser game rtt info error.", __FUNCTION__);
+                break;
+            }
             std::string rtt = std::string(reinterpret_cast<char *>(rttValue));
             m_gameRtt[gameName] = CheckDataLegal(rtt);
-            if (rttValue != nullptr) {
-                xmlFree(rttValue);
-            }
+            xmlFree(rttValue);
         }
     }
     return appInfo;
@@ -379,13 +383,15 @@ BackgroundLimitListAppInfo AppParser::ParseBackgroundLimitListAppInfo(const xmlN
 
 LiveStreamAppInfo AppParser::ParseLiveStreamAppInfo(const xmlNodePtr &innode)
 {
-    LiveStreamAppInfo appInfo;
+    LiveStreamAppInfo appInfo{};
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    if (value == NULL) {
+        WIFI_LOGE("%{public}s xml parser live stream app info error.", __FUNCTION__);
+        return appInfo;
+    }
     std::string packageName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = packageName;
-    if (value != nullptr) {
-        xmlFree(value);
-    }
+    xmlFree(value);
     return appInfo;
 }
 

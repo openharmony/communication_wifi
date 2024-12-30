@@ -130,6 +130,7 @@ void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
+    std::unique<std::mutex> lock(netAgentMutex_);
     if (!isWifiAvaliable_) {
         WIFI_LOGE("wifi is not avaliable, no need UpdateNetLinkInfo");
         return;

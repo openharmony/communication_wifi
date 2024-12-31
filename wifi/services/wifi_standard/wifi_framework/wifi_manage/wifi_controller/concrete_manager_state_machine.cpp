@@ -485,6 +485,9 @@ bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)
         case CONCRETE_CMD_STA_REMOVED:
             ClearIfaceName();
             return true;
+        case CONCRETE_CMD_RESET_STA:
+            HandleSelfcureResetSta(msg);
+            return true;
         default:
             return false;
     }
@@ -708,6 +711,21 @@ void ConcreteMangerMachine::CheckAndContinueToStopWifi(InternalMessagePtr msg)
 void ConcreteMangerMachine::ClearIfaceName()
 {
     ifaceName.clear();
+}
+
+void ConcreteMangerMachine::HandleSelfcureResetSta(InternalMessagePtr msg)
+{
+    int id = msg->GetParam1();
+    ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopStaService(id, RESET_STA_TYPE_SELFCURE);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("HandleSelfcureResetSta AutoStopStaService failed ret =%{public}d \n", ret);
+        return;
+    }
+    ret = WifiServiceScheduler::GetInstance().AutoStartStaService(id, ifaceName, RESET_STA_TYPE_SELFCURE);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("HandleSelfcureResetSta AutoStartStaService failed ret =%{public}d \n", ret);
+        return;
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

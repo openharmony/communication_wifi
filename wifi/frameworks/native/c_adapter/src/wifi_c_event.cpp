@@ -167,7 +167,6 @@ static OHOS::Wifi::ErrCode ConvertStationInfo(const OHOS::Wifi::StationInfo& sta
     return OHOS::Wifi::WIFI_OPT_SUCCESS;
 }
 
-
 void WifiCHotspotEventCallback::OnHotspotStaJoin(const OHOS::Wifi::StationInfo &info)
 {
     std::unique_lock<std::mutex> lock(EventManager::callbackMutex);

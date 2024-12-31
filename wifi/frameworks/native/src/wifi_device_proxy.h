@@ -174,6 +174,15 @@ public:
     ErrCode DisableDeviceConfig(int networkId) override;
 
     /**
+     * @Description Set whether to allow automatic connect by networkid.
+     *
+     * @param networkId - Identifies the network to be set. The value of networkId cannot be less thann 0.
+     * @param isAllowed - Identifies whether allow auto connect or not.
+     * @return ErrCode - operation result
+     */
+    ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) override;
+
+    /**
      * @Description Connecting to a Specified Network
      *
      * @param networkId - network id

@@ -90,7 +90,7 @@ void WifiServiceScheduler::ClearSoftApIfaceNameMap(int instId)
     }
 }
 
-ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIfName)
+ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIfName, int type)
 {
     WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     WIFI_LOGI("AutoStartStaService, current sta state:%{public}d", staState);
@@ -122,8 +122,10 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
-    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaStartSuccess(instId);
+    if (type != RESET_STA_TYPE_SELFCURE) {
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        ins->HandleStaStartSuccess(instId);
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -155,7 +157,7 @@ ErrCode WifiServiceScheduler::AutoStartWifi2Service(int instId, std::string &sta
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
+ErrCode WifiServiceScheduler::AutoStopStaService(int instId, int type)
 {
     WifiOprMidState staStateBefore = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
     WIFI_LOGI("AutoStopStaService, current sta state:%{public}d", staStateBefore);
@@ -201,8 +203,10 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId)
     }
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
     DispatchWifiCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
-    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    ins->HandleStaClose(instId);
+    if (type != RESET_STA_TYPE_SELFCURE) {
+        auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        ins->HandleStaClose(instId);
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -282,9 +286,13 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
         ifaceName = staIfaceNameMap[instId];
     }
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
-        std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
+        [this](std::string &destoryIfaceName, int createIfaceType) {
+            this->StaIfaceDestoryCallback(destoryIfaceName, createIfaceType);
+        },
+        [this](int index, int antRssi) { this->OnRssiReportCallback(index, antRssi);},
+        [this](int type, const std::vector<uint8_t>& recvMsg) {
+            this->OnNetlinkReportCallback(type, recvMsg);
+        },
         ifaceName, instId)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -399,9 +407,13 @@ ErrCode WifiServiceScheduler::PreStartWifi(int instId, std::string &staIfName)
         staIfName = ifaceName;
     }
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateStaIface(
-        std::bind(&WifiServiceScheduler::StaIfaceDestoryCallback, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&WifiServiceScheduler::OnRssiReportCallback, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&WifiServiceScheduler::OnNetlinkReportCallback, this, std::placeholders::_1, std::placeholders::_2),
+        [this](std::string &destoryIfaceName, int createIfaceType) {
+            this->StaIfaceDestoryCallback(destoryIfaceName, createIfaceType);
+        },
+        [this](int index, int antRssi) { this->OnRssiReportCallback(index, antRssi);},
+        [this](int type, const std::vector<uint8_t>& recvMsg) {
+            this->OnNetlinkReportCallback(type, recvMsg);
+        },
         ifaceName, instId)) {
         WIFI_LOGE("PreStartWifi, create iface failed!");
         return WIFI_OPT_FAILED;
@@ -823,8 +835,9 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
         ifaceName = softApIfaceNameMap[instId];
     }
     if (ifaceName.empty() && !HalDeviceManager::GetInstance().CreateApIface(
-        std::bind(&WifiServiceScheduler::SoftApIfaceDestoryCallback,
-        this, std::placeholders::_1, std::placeholders::_2),
+        [this](std::string &destoryIfaceName, int createIfaceType) {
+            this->SoftApIfaceDestoryCallback(destoryIfaceName, createIfaceType);
+        },
         ifaceName)) {
         WIFI_LOGE("AutoStartApService, create iface failed!");
         return WIFI_OPT_FAILED;

@@ -161,6 +161,8 @@ void WifiDeviceStub::InitHandleMap()
         MessageParcel &data, MessageParcel &reply) { OnEnableDeviceConfig(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnDisableDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ALLOW_AUTO_CONNECT)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnAllowAutoConnect(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnConnectTo(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = [this](uint32_t code,
@@ -525,6 +527,10 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteInt32(config.wifiWapiConfig.wapiPskType);
     reply.WriteInt32((int)config.networkSelectionStatus.status);
     reply.WriteInt32((int)config.networkSelectionStatus.networkSelectionDisableReason);
+    reply.WriteBool(config.networkSelectionStatus.seenInLastQualifiedNetworkSelection);
+    reply.WriteBool(config.isPortal);
+    reply.WriteBool(config.noInternetAccess);
+    reply.WriteBool(config.isAllowAutoConnect);
     return;
 }
 
@@ -661,6 +667,18 @@ void WifiDeviceStub::OnDisableDeviceConfig(uint32_t code, MessageParcel &data, M
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int networkId = data.ReadInt32();
     ErrCode ret = DisableDeviceConfig(networkId);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    return;
+}
+
+void WifiDeviceStub::OnAllowAutoConnect(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int32_t networkId = data.ReadInt32();
+    bool isAllowed = data.ReadBool();
+    ErrCode ret = AllowAutoConnect(networkId, isAllowed);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

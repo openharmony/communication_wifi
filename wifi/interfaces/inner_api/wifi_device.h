@@ -308,6 +308,15 @@ public:
     virtual ErrCode DisableDeviceConfig(int networkId) = 0;
 
     /**
+     * @Description Set whether to allow automatic connect by networkid.
+     *
+     * @param networkId - Identifies the network to be set. The value of networkId cannot be less thann 0.
+     * @param isAllowed - Identifies whether allow auto connect or not.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) = 0;
+
+    /**
      * @Description Obtaining ip Request Information
      *
      * @param info - IpInfo object

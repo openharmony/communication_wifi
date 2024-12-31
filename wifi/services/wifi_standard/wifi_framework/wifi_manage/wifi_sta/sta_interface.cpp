@@ -259,6 +259,14 @@ ErrCode StaInterface::DisableDeviceConfig(int networkId)
     return pStaService->DisableDeviceConfig(networkId);
 }
 
+ErrCode StaInterface::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    LOGI("Enter AllowAutoConnect.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->AllowAutoConnect(networkId, isAllowed);
+}
+
 ErrCode StaInterface::StartWps(const WpsConfig &config)
 {
     LOGI("Enter StartWps.\n");

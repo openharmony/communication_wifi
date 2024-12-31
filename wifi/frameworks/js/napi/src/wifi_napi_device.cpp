@@ -1155,6 +1155,32 @@ NO_SANITIZE("cfi") napi_value RemoveAllNetwork(napi_env env, napi_callback_info 
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
+NO_SANITIZE("cfi") napi_value AllowAutoConnect(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    const int PARAMS_NUM = 2;
+    napi_value argv[PARAMS_NUM];
+    size_t argc = 2;
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc == PARAMS_NUM, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    napi_valuetype valueType1;
+    napi_valuetype valueType2;
+    napi_typeof(env, argv[0], &valueType1);
+    napi_typeof(env, argv[1], &valueType2);
+    WIFI_NAPI_ASSERT(env, valueType1 == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, valueType2 == napi_boolean, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+
+    int32_t networkId = -1;
+    bool isAllowed  = false;
+    napi_get_value_int32(env, argv[0], &networkId);
+    napi_get_value_bool(env, argv[1], &isAllowed);
+    ErrCode ret = wifiDevicePtr->AllowAutoConnect(networkId, isAllowed);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
 NO_SANITIZE("cfi") napi_value DisableNetwork(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
@@ -1387,6 +1413,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     }
 
     WapiConfigToJs(env, vecDeviceConfigs[idx], result);
+    SetValueBool(env, "isAllowAutoConnect", vecDeviceConfigs[idx].isAllowAutoConnect, result);
 
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {

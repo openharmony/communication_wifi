@@ -175,12 +175,6 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
                 static_cast<int>(WifiOperateState::STA_DISCONNECTED));
             break;
-        case OperateResState::CONNECT_ASSOCIATING:
-            WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_ASSOCIATING));
-            break;
-        case OperateResState::CONNECT_ASSOCIATED:
-            WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_ASSOCIATED));
-            break;
         case OperateResState::CONNECT_CONNECTION_FULL:
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
                 static_cast<int>(WifiOperateState::STA_ASSOC_FULL_REJECT));
@@ -188,10 +182,6 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
         case OperateResState::CONNECT_OBTAINING_IP:
             WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_DHCP),
                 static_cast<int>(WifiOperateState::STA_DHCP));
-            break;
-        case OperateResState::DISCONNECT_DISCONNECTING:
-        case OperateResState::CONNECT_CONNECTING_TIMEOUT:
-            WriteWifiConnectFailedEventHiSysEvent(static_cast<int>(WifiOperateState::STA_DISCONNECT));
             break;
         default:
             break;
@@ -252,6 +242,17 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+        if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
+            WifiOprMidState curState = WifiConfigCenter::GetInstance().GetApMidState(instId);
+            if (curState == WifiOprMidState::RUNNING) {
+                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, instId);
+            }
+#ifdef FEATURE_RPT_SUPPORT
+            if (WifiManager::GetInstance().GetRptInterface(instId)->IsRptRunning()) {
+                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, instId);
+            }
+#endif
+        }
     }
 #endif
     return;

@@ -941,7 +941,7 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
         rssiLevel2Or3ScanedCounter_ < scanMaxCounter) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel2Or3ScanedCounter:%{public}d.", signalLevel, rssiLevel2Or3ScanedCounter_);
-        auto ret = pScanService->Scan(true);
+        auto ret = pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
         if (ret == WIFI_OPT_SUCCESS) {
             rssiLevel2Or3ScanedCounter_++;
         }
@@ -949,7 +949,7 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
     } else if ((signalLevel < SIG_LEVEL_2) && (rssiLevel0Or1ScanedCounter_ < scanMaxCounter)) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel0Or1ScanedCounter:%{public}d.", signalLevel, rssiLevel0Or1ScanedCounter_);
-        auto ret = pScanService->Scan(true);
+        auto ret = pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
         if (ret == WIFI_OPT_SUCCESS) {
             rssiLevel0Or1ScanedCounter_++;
         }
@@ -1033,7 +1033,7 @@ void WifiProStateMachine::WifiHasNetState::ParseQoeInfoAndRequestDetect()
     mLastTcpTxCounter_ = mCurrentTcpTxCounter;
     mLastTcpRxCounter_ = mCurrentTcpRxCounter;
     mLastDnsFailedCnt_ = mCurrentDnsFailedCnt;
-    WIFI_LOGI("deltaTcpTxPkts = %{public}lld, deltaTcpRxPkts = %{public}lld, deltaFailedDns = %{public}d"
+    WIFI_LOGI("deltaTcpTxPkts = %{public}" PRId64 ", deltaTcpRxPkts = %{public}" PRId64 ", deltaFailedDns = %{public}d"
               ", nedisable = %{public}d",
         deltaTcpTxPkts, deltaTcpRxPkts, deltaFailedDns, netDiasableDetectCount_);
 

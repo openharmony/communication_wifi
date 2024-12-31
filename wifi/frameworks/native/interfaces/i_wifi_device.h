@@ -170,6 +170,15 @@ public:
     virtual ErrCode DisableDeviceConfig(int networkId) = 0;
 
     /**
+     * @Description Set whther to allow automatic connect by networkId.
+     *
+     * @param networkId - Identifies the network to be set. The value of networkId cannot be less than 0.
+     * @param isAllowed - Identifies whether allow auto connect or not.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) = 0;
+
+    /**
      * @Description Connecting to a Specified Network
      *
      * @param networkId - network id

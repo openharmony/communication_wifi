@@ -250,6 +250,13 @@ ErrCode WifiDeviceImpl::DisableDeviceConfig(int networkId)
     return client_->DisableDeviceConfig(networkId);
 }
 
+ErrCode WifiDeviceImpl::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->AllowAutoConnect(networkId, isAllowed);
+}
+
 ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
     std::lock_guard<std::mutex> lock(mutex_);

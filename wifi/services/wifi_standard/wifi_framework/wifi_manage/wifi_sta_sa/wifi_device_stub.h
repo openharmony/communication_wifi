@@ -53,6 +53,7 @@ private:
     void OnGetChangeDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnAllowAutoConnect(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnectTo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnect2To(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnStartRoamToNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply);

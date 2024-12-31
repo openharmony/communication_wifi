@@ -78,6 +78,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_IS_FEATURE_SUPPORTED = 0x1045,         /*is supported input feature */
     WIFI_SVR_CMD_GET_NET_CONTROL_INFO = 0x1046, /* Accept network control information from RSS */
     WIFI_SVR_CMD_NETWORK_LAG_INFO = 0x1047,             /* update network lag info */
+    WIFI_SVR_CMD_ALLOW_AUTO_CONNECT = 0x1048, /* allow auto connect */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */
@@ -113,6 +114,7 @@ enum class  HotspotInterfaceCode {
     WIFI_SVR_CMD_IS_HOTSPOT_DUAL_BAND_SUPPORTED = 0x1114, /* whether dual band is supported */
     WIFI_SVR_CMD_SETTIMEOUT_AP = 0x1115,             /* set hotspot idle timeout */
     WIFI_SVR_CMD_GET_IFACE_NAME = 0x1116,            /* get hotspot iface name */
+    WIFI_SVR_CMD_IS_HOTSPOT_SUPPORTED = 0x1117, /* whether hotspot is supported */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */

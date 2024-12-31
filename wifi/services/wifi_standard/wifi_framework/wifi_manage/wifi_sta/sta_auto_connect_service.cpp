@@ -149,6 +149,18 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         pStaStateMachine->SendMessage(message);
     } else {
         WIFI_LOGI("AutoSelectDevice return fail.");
+        std::vector<WifiDeviceConfig> savedConfigs;
+        WifiSettings::GetInstance().GetDeviceConfig(savedConfigs);
+        bool hasSavedConfigSeen = false;
+        for (const auto &config : savedConfigs) {
+            if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+                hasSavedConfigSeen = true;
+                break;
+            }
+        }
+        if (hasSavedConfigSeen) {
+            WriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
+        }
     }
     for (const auto &callBackItem : mStaCallbacks) {
         if (callBackItem.OnAutoSelectNetworkRes != nullptr) {

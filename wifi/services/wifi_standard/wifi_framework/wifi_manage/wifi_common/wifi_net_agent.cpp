@@ -56,40 +56,45 @@ WifiNetAgent::~WifiNetAgent()
     }
 }
 
-bool WifiNetAgent::RegisterNetSupplier()
+bool WifiNetAgent::RegisterNetSupplier(int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplier.");
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
 
     std::string ident = "wifi";
     using NetManagerStandard::NetBearType;
     using NetManagerStandard::NetCap;
     std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
-    if (supplierId != INVALID_SUPPLIER_ID) {
+    uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
+    std::string supplierIdStr = (instId == 0) ? "supplierIdForWlan0" : "supplierIdForWlan1";
+    if (supplierIdNow != INVALID_SUPPLIER_ID) {
         WIFI_LOGI("RegisterNetSupplier supplierId alread exist.");
         return true;
     }
     int32_t result = NetConnClient::GetInstance().RegisterNetSupplier(NetBearType::BEARER_WIFI,
-                                                                      ident, netCaps, supplierId);
+                                                                      ident, netCaps, supplierIdNow);
     if (result == NETMANAGER_SUCCESS) {
-        WIFI_LOGI("Register NetSupplier successful, supplierId is [%{public}d]", supplierId);
+        WIFI_LOGI("Register %{public}s successful, supplierId is [%{public}d]", supplierIdStr.c_str(), supplierIdNow);
         return true;
     }
     WIFI_LOGI("Register NetSupplier failed");
     return false;
 }
 
-bool WifiNetAgent::RegisterNetSupplierCallback()
+bool WifiNetAgent::RegisterNetSupplierCallback(int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplierCallback.");
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     sptr<NetConnCallback> pNetConnCallback = (std::make_unique<NetConnCallback>()).release();
     if (pNetConnCallback == nullptr) {
         WIFI_LOGE("pNetConnCallback is null\n");
         return false;
     }
 
-    int32_t result = NetConnClient::GetInstance().RegisterNetSupplierCallback(supplierId, pNetConnCallback);
+    uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
+    int32_t result = NetConnClient::GetInstance().RegisterNetSupplierCallback(supplierIdNow, pNetConnCallback);
     if (result == NETMANAGER_SUCCESS) {
         WIFI_LOGI("Register NetSupplierCallback successful");
         return true;
@@ -98,21 +103,25 @@ bool WifiNetAgent::RegisterNetSupplierCallback()
     return false;
 }
 
-void WifiNetAgent::UnregisterNetSupplier()
+void WifiNetAgent::UnregisterNetSupplier(int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UnregisterNetSupplier.");
-    int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(supplierId);
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
+    uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
+    int32_t result = NetConnClient::GetInstance().UnregisterNetSupplier(supplierIdNow);
     WIFI_LOGI("Unregister network result:%{public}d", result);
-    supplierId = INVALID_SUPPLIER_ID;
+    supplierIdNow = INVALID_SUPPLIER_ID;
 }
 
-void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo, int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetSupplierInfo.");
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     isWifiAvaliable_ = netSupplierInfo->isAvailable_;
-    int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierId, netSupplierInfo);
+    uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
+    int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierIdNow, netSupplierInfo);
     WIFI_LOGI("Update network result:%{public}d", result);
 }
 
@@ -121,13 +130,15 @@ void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     if (!isWifiAvaliable_) {
         WIFI_LOGE("wifi is not avaliable, no need UpdateNetLinkInfo");
         return;
     }
     sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = (std::make_unique<NetManagerStandard::NetLinkInfo>()).release();
     CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
-    int32_t result = NetConnClient::GetInstance().UpdateNetLinkInfo(supplierId, netLinkInfo);
+    uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
+    int32_t result = NetConnClient::GetInstance().UpdateNetLinkInfo(supplierIdNow, netLinkInfo);
     WIFI_LOGI("UpdateNetLinkInfo result:%{public}d", result);
 }
 
@@ -189,29 +200,30 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
     }
 }
 
-void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo)
+void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo,
+    int instId)
 {
     if (netAgentEventHandler_) {
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
-        netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo]() {
+        netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo, m_instId = instId]() {
 #else
-        netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo]() {
+        netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo, m_instId = instId]() {
 #endif
-           this->UpdateNetSupplierInfo(netInfo);
+           this->UpdateNetSupplierInfo(netInfo, m_instId);
         });
     }
 }
 
-void WifiNetAgent::OnStaMachineWifiStart()
+void WifiNetAgent::OnStaMachineWifiStart(int instId)
 {
     if (netAgentEventHandler_) {
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
-        netAgentEventHandler_->PostSyncTask([this]() {
+        netAgentEventHandler_->PostSyncTask([this, m_instId = instId]() {
 #else
-        netAgentEventHandler_->PostAsyncTask([this]() {
+        netAgentEventHandler_->PostAsyncTask([this, m_instId = instId]() {
 #endif
-            this->RegisterNetSupplier();
-            this->RegisterNetSupplierCallback();
+            this->RegisterNetSupplier(m_instId);
+            this->RegisterNetSupplierCallback(m_instId);
         });
     }
 }
@@ -228,15 +240,15 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
 #else
     netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
 #endif
-        this->RegisterNetSupplier();
-        this->RegisterNetSupplierCallback();
+        this->RegisterNetSupplier(m_instId);
+        this->RegisterNetSupplierCallback(m_instId);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.connState == ConnState::CONNECTED) {
 #ifndef OHOS_ARCH_LITE
             if (supplierInfo != nullptr) {
                 TimeStats timeStats("Call UpdateNetSupplierInfo");
-                this->UpdateNetSupplierInfo(supplierInfo);
+                this->UpdateNetSupplierInfo(supplierInfo, m_instId);
             }
 #endif
             IpInfo wifiIpInfo;

@@ -898,10 +898,44 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
     return pService->DisableDeviceConfig(networkId);
 }
 
+ErrCode WifiDeviceServiceImpl::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("AllowAutoConnect:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AllowAutoConnect:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AllowAutoConnect:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->AllowAutoConnect(networkId, isAllowed);
+}
+
 ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
     if (IsOtherVapConnect()) {
         LOGI("ConnectToNetwork: p2p or hml connected, and hotspot is enable");
+#ifndef OHOS_ARCH_LITE
+        WifiManager::GetInstance().GetWifiMultiVapManager()->VapConflictReport();
+#endif
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
     }
     int apiVersion = WifiPermissionUtils::GetApiVersion();

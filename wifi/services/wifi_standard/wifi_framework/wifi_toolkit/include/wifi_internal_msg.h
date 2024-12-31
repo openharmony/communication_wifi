@@ -116,6 +116,13 @@ enum class OperateResState {
     ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
 };
 
+enum ProductDeviceType : int {
+    DEFAULT = -1,
+    PHONE = 0,
+    TABLET = 1,
+    WEARABLE = 2,
+};
+
 struct WifiCallingInfo {
     int callingUid;
     int callingPid;

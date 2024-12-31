@@ -140,6 +140,13 @@ ErrCode StaInterface::DisableDeviceConfig(int networkId)
     LOGI("Enter DisableDeviceConfig.\n");
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    LOGI("Enter AllowAutoConnect.\n");
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::StartWps(const WpsConfig &config)
 {
     LOGI("Enter StartWps.\n");

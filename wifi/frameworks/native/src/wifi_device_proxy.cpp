@@ -781,6 +781,35 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
     return ErrCode(reply.ReadInt32());
 }
 
+ErrCode WifiDeviceProxy::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(networkId);
+    data.WriteBool(isAllowed);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ALLOW_AUTO_CONNECT), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_ALLOW_AUTO_CONNECT), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
 ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
 {
     if (mRemoteDied) {
@@ -2328,6 +2357,10 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
     config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
     config.networkSelectionStatus.status = WifiDeviceConfigStatus(reply.ReadInt32());
     config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason(reply.ReadInt32());
+    config.networkSelectionStatus.seenInLastQualifiedNetworkSelection = reply.ReadBool();
+    config.isPortal = reply.ReadBool();
+    config.noInternetAccess = reply.ReadBool();
+    config.isAllowAutoConnect = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)

@@ -366,6 +366,7 @@ public:
         void DhcpResultNotifyEvent(DhcpReturnCode result, int ipType = -1);
         static StaStateMachine *pStaStateMachineList[STA_INSTANCE_MAX_NUM];
         StaStateMachine *pStaStateMachine;
+        std::mutex dhcpResultMutex;
         DhcpResult DhcpIpv4Result;
         DhcpResult DhcpIpv6Result;
         DhcpResult DhcpOfferInfo;
@@ -497,7 +498,7 @@ private:
      * @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config) const;
+    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const;
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -528,6 +529,8 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
+
+    void SetAllowAutoConnectStatus(int32_t networkId, bool status);
  
     /**
      * @Description  Disconnect network
@@ -678,7 +681,7 @@ private:
      *
      * @param ssid - ssid
      */
-    bool IsWpa3Transition(std::string ssid) const;
+    bool IsWpa3Transition(std::string ssid, std::string bssid) const;
 
     /**
      * @Description : get wpa3 failreason connect fail count
@@ -928,6 +931,9 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    void TryModifyPortalAttribute(SystemNetWorkState netState);
+    void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
+    void UpdateHiLinkAttribute();
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;

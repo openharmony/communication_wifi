@@ -726,6 +726,7 @@ struct WifiDeviceConfig {
     IpInfo lastDhcpResult;
     bool isShared;
     int64_t lastTrySwitchWifiTimestamp { -1 };
+    bool isAllowAutoConnect { true };
 
     WifiDeviceConfig()
     {
@@ -956,6 +957,15 @@ enum class WifiSelfcureType {
     REASSOC_SELFCURE_SUCC,
     RESET_SELFCURE_SUCC,
     REDHCP_SELFCURE_SUCC,
+};
+
+enum class Wifi3VapConflictType {
+    STA_HML_SOFTAP_CONFLICT_CNT,
+    STA_P2P_SOFTAP_CONFLICT_CNT,
+    P2P_HML_SOFTAP_CONFLICT_CNT,
+    HML_SOFTAP_STA_CONFLICT_CNT,
+    P2P_SOFTAP_STA_CONFLICT_CNT,
+    P2P_HML_STA_CONFLICT_CNT,
 };
 
 enum class NetworkLagType {

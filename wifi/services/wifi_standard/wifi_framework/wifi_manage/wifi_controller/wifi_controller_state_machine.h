@@ -117,11 +117,13 @@ public:
     template <class T> void HandleHotspotStop(int id, HotspotMode THotspotMode, ManagerControl<T> &TManagers);
     void HandleSoftapStop(int id);
 #ifdef FEATURE_RPT_SUPPORT
+    bool ShouldUseRpt(int id);
     void HandleRptStop(int id);
     std::shared_ptr<RptManager> GetRptManager(int id);
 #endif
 #endif
     void ShutdownWifi(bool shutDownAp = true);
+    void SelfcureResetWifi(int id);
 private:
     template <typename T>
     inline void ParsePointer(T *&pointer)
@@ -152,7 +154,6 @@ private:
     HotspotMode CalculateHotspotMode(int id);
     bool ShouldEnableSoftap();
 #ifdef FEATURE_RPT_SUPPORT
-    bool ShouldUseRpt(int id);
     void MakeRptManager(RptManager::Role role, int id);
 #endif
 #endif

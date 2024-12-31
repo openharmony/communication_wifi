@@ -81,6 +81,14 @@ ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
 {
     pWifiControllerMachine->ClearWifiStartFailCount();
     WIFI_LOGI("WifiTogglerManager::WifiToggled, isOpen %{public}d instId: %{public}d", isOpen, id);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (isOpen == 0) {
+        ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(id);
+        if (pSelfCureService != nullptr) {
+            pSelfCureService->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
+        }
+    }
+#endif // FEATURE_SELF_CURE_SUPPORT
     pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
 }
@@ -197,15 +205,15 @@ void WifiTogglerManager::InitSoftapCallback()
 void WifiTogglerManager::InitMultiStacallback()
 {
     using namespace std::placeholders;
-    mMultiStaModeCb.onStartFailure = std::bind(&WifiTogglerManager::DealMultiStaStartFailure, this, _1);
-    mMultiStaModeCb.onStopped = std::bind(&WifiTogglerManager::DealMultiStaStop, this, _1);
+    mMultiStaModeCb.onStartFailure = [this](int id){ this->DealMultiStaStartFailure(id); };
+    mMultiStaModeCb.onStopped = [this](int id){ this->DealMultiStaStop(id); };
 }
 
 void WifiTogglerManager::InitRptCallback()
 {
     using namespace std::placeholders;
-    mRptModeCb.onStartFailure = std::bind(&WifiTogglerManager::DealRptStartFailure, this, _1);
-    mRptModeCb.onStopped = std::bind(&WifiTogglerManager::DealRptStop, this, _1);
+    mRptModeCb.onStartFailure = [this](int id){ this->DealRptStartFailure(id); };
+    mRptModeCb.onStopped = [this](int id){ this->DealRptStop(id); };
 }
 
 void WifiTogglerManager::DealConcreateStop(int id)

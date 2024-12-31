@@ -77,9 +77,7 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED, &
-    CesEventSubscriber::OnReceiveUserUnlockedEvent},
-    {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY, &
-    CesEventSubscriber::OnReceiveDataShareReadyEvent}
+    CesEventSubscriber::OnReceiveUserUnlockedEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -113,6 +111,15 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterNetworkStateChangeEvent();
     UnRegisterWifiScanChangeEvent();
     UnRegisterSettingsEnterEvent();
+    UnRegisterDataShareReadyEvent();
+}
+
+void WifiEventSubscriberManager::Init()
+{
+    WIFI_LOGI("WifiEventSubscriberManager Init");
+    // Subscribe and register operation after wifiManager init completed.
+    SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
+    RegisterDataShareReadyEvent();
 }
 
 void WifiEventSubscriberManager::RegisterCesEvent()
@@ -402,7 +409,6 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 #ifdef HAS_MOVEMENT_PART
     SubscribeSystemAbility(MSDP_MOVEMENT_SERVICE_ID);
 #endif
-    SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);  // subscribe data management service done
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
     SubscribeSystemAbility(CAST_ENGINE_SA_ID);
     SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
@@ -586,9 +592,6 @@ void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEven
             /* open airplane mode */
             if (WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_OPEN)) {
                 WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(1);
-            } else {
-                WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-                WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0);
             }
         } else {
             /* close airplane mode */
@@ -688,16 +691,6 @@ void CesEventSubscriber::OnReceiveStandbyEvent(const OHOS::EventFwk::CommonEvent
         WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_OPEN);
     } else {
         WifiConfigCenter::GetInstance().SetPowerIdelState(MODE_STATE_CLOSE);
-    }
-}
-
-void CesEventSubscriber::OnReceiveDataShareReadyEvent(const OHOS::EventFwk::CommonEventData &eventData)
-{
-    const auto &action = eventData.GetWant().GetAction();
-    WIFI_LOGI("OnReceiveDataShareReadyEvent action[%{public}s]", action.c_str());
-    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()) {
-        WifiManager::GetInstance().GetWifiEventSubscriberManager()->AccessDataShare();
-        WifiManager::GetInstance().GetWifiEventSubscriberManager()->RegisterLocationEvent();
     }
 }
 
@@ -888,7 +881,7 @@ void WifiEventSubscriberManager::RegisterAssetEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiAssetrEventSubsciber_)) {
         WIFI_LOGE("AssetCloud SubscribeCommonEvent() failed");
         wifiAssetrEventSubsciber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterAssetEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterAssetEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, assetMgrId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterAssetEvent retry, powerMgrId = %{public}u", assetMgrId);
     } else {
@@ -969,8 +962,7 @@ void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(networkStateChangeSubsciber_)) {
         WIFI_LOGE("network state change subscribe failed");
         networkStateChangeSubsciber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack =
-            std::bind(&WifiEventSubscriberManager::RegisterNetworkStateChangeEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterNetworkStateChangeEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, networkStateChangeTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterNetworkStateChangeEvent retry, timerId = %{public}u", networkStateChangeTimerId);
     } else {
@@ -1025,8 +1017,7 @@ void WifiEventSubscriberManager::RegisterWifiScanChangeEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiScanEventChangeSubscriber_)) {
         WIFI_LOGE("network state change subscribe failed");
         wifiScanEventChangeSubscriber_ = nullptr;
-        WifiTimer::TimerCallback timeoutCallBack =
-            std::bind(&WifiEventSubscriberManager::RegisterWifiScanChangeEvent, this);
+        WifiTimer::TimerCallback timeoutCallBack = [this]() {this->RegisterWifiScanChangeEvent(); };
         WifiTimer::GetInstance()->Register(timeoutCallBack, wifiScanChangeTimerId, TIMEOUT_EVENT_SUBSCRIBER, false);
         WIFI_LOGI("RegisterWifiScanChangeEvent retry, wifiScanChangeTimerId = %{public}u", wifiScanChangeTimerId);
     } else {
@@ -1121,6 +1112,63 @@ void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &ev
     if (action == ENTER_SETTINGS) {
         bool isSettingsEnter = eventData.GetWant().GetBoolParam(WLAN_PAGE_ENTER, false);
         BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
+    }
+}
+
+void WifiEventSubscriberManager::RegisterDataShareReadyEvent()
+{
+    WIFI_LOGI("RegisterDataShareReadyEvent enter");
+    std::unique_lock<std::mutex> lock(dataShareReadyEventMutex_);
+    if (dataShareReadyTimerId_ != 0) {
+        WifiTimer::GetInstance()->UnRegister(dataShareReadyTimerId_);
+    }
+    if (dataShareReadySubscriber_) {
+        return;
+    }
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    dataShareReadySubscriber_ = std::make_shared<DataShareReadySubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(dataShareReadySubscriber_)) {
+        WIFI_LOGE("RegisterDataShareReadyEvent failed");
+        dataShareReadySubscriber_ = nullptr;
+        WifiTimer::TimerCallback timeoutCallBack = [this]() { this->RegisterDataShareReadyEvent(); };
+        WifiTimer::GetInstance()->Register(timeoutCallBack, dataShareReadyTimerId_, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WIFI_LOGI("RegisterDataShareReadyEvent retry, dataShareReadyTimerId_ = %{public}u", dataShareReadyTimerId_);
+    } else {
+        WIFI_LOGI("RegisterDataShareReadyEvent success");
+    }
+}
+
+void WifiEventSubscriberManager::UnRegisterDataShareReadyEvent()
+{
+    std::unique_lock<std::mutex> lock(dataShareReadyEventMutex_);
+    if (dataShareReadyTimerId_ != 0) {
+        WifiTimer::GetInstance()->UnRegister(dataShareReadyTimerId_);
+    }
+    if (!dataShareReadySubscriber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(dataShareReadySubscriber_)) {
+        WIFI_LOGE("UnRegisterDataShareReadyEvent failed");
+    }
+    dataShareReadySubscriber_ = nullptr;
+    WIFI_LOGI("UnRegisterDataShareReadyEvent finished");
+}
+
+DataShareReadySubscriber::DataShareReadySubscriber(
+    const EventFwk::CommonEventSubscribeInfo &subscriberInfo) : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("DataShareReadySubscriber enter");
+}
+
+void DataShareReadySubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventData)
+{
+    const auto &action = eventData.GetWant().GetAction();
+    WIFI_LOGI("DataShareReadySubscriber OnReceiveEvent: %{public}s", action.c_str());
+    if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
+        WifiManager::GetInstance().GetWifiEventSubscriberManager()->AccessDataShare();
+        WifiManager::GetInstance().GetWifiEventSubscriberManager()->RegisterLocationEvent();
     }
 }
 

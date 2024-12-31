@@ -140,6 +140,7 @@ private:
     ErrCode SwitchEnableFromSemi();
     void ReportClose();
     void ClearIfaceName();
+    void HandleSelfcureResetSta(InternalMessagePtr msg);
 
     DefaultState *pDefaultState;
     IdleState *pIdleState;

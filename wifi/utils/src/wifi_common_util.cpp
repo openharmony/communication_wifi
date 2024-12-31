@@ -86,6 +86,15 @@ static constexpr uint8_t STEP_2BIT = 2;
 static constexpr uint8_t HEX_OFFSET = 4;
 static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
 
+constexpr int IP_ADDRESS_FIRST_BYTE_OFFSET = 24;
+constexpr int IP_ADDRESS_SECOND_BYTE_OFFSET = 16;
+constexpr int IP_ADDRESS_THIRD_BYTE_OFFSET = 8;
+constexpr int IP_ADDRESS_BYTE_LEN = 4;
+constexpr int IP_ADDRESS_FIRST_BYTE_INDEX = 0;
+constexpr int IP_ADDRESS_SECOND_BYTE_INDEX = 1;
+constexpr int IP_ADDRESS_THIRD_BYTE_INDEX = 2;
+constexpr int IP_ADDRESS_FOURTH_BYTE_INDEX = 3;
+
 static std::string DataAnonymize(const std::string str, const char delim,
     const char hiddenCh, const int startIdx = 0)
 {
@@ -242,33 +251,37 @@ bool IsMacArrayEmpty(const unsigned char mac[WIFI_MAC_LEN])
 
 unsigned int Ip2Number(const std::string& strIp)
 {
-    std::string::size_type front = 0;
-    std::string::size_type back = 0;
-    unsigned int number = 0;
-    int size = 32;
-    constexpr int sectionSize = 8;
-
+    std::string::size_type start = 0;
+    std::string::size_type end = 0;
+    std::vector<std::string> subStrList;
     std::string ip(strIp + '.');
-    while ((back = ip.find_first_of('.', back)) != (std::string::size_type)std::string::npos) {
-        std::string ipSubStr = ip.substr(front, back - front);
-        number |= static_cast<unsigned long>(CheckDataLegal(ipSubStr) << (size -= sectionSize));
-        front = ++back;
+    while ((end = ip.find_first_of('.', start)) != (std::string::size_type)std::string::npos) {
+        subStrList.push_back(ip.substr(start, end - start));
+        start = end + 1;
     }
+
+    unsigned int number = 0;
+    if (subStrList.size() != IP_ADDRESS_BYTE_LEN) {
+        WIFI_LOGE("ip address format check error");
+        return number;
+    }
+
+    number = static_cast<unsigned long>(
+        (CheckDataLegal(subStrList[IP_ADDRESS_FIRST_BYTE_INDEX]) << IP_ADDRESS_FIRST_BYTE_OFFSET) |
+        (CheckDataLegal(subStrList[IP_ADDRESS_SECOND_BYTE_INDEX]) << IP_ADDRESS_SECOND_BYTE_OFFSET) |
+        (CheckDataLegal(subStrList[IP_ADDRESS_THIRD_BYTE_INDEX]) << IP_ADDRESS_THIRD_BYTE_OFFSET) |
+        CheckDataLegal(subStrList[IP_ADDRESS_FOURTH_BYTE_INDEX]));
     return number;
 }
 
 std::string Number2Ip(unsigned int intIp)
 {
-    constexpr int fourthPartMoveLen = 24;
-    constexpr int thirdPartMoveLen = 16;
-    constexpr int secondPartMoveLen = 8;
-
     std::string ip;
-    ip.append(std::to_string((intIp & 0xff000000) >> fourthPartMoveLen));
+    ip.append(std::to_string((intIp & 0xff000000) >> IP_ADDRESS_FIRST_BYTE_OFFSET));
     ip.push_back('.');
-    ip.append(std::to_string((intIp & 0x00ff0000) >> thirdPartMoveLen));
+    ip.append(std::to_string((intIp & 0x00ff0000) >> IP_ADDRESS_SECOND_BYTE_OFFSET));
     ip.push_back('.');
-    ip.append(std::to_string((intIp & 0x0000ff00) >> secondPartMoveLen));
+    ip.append(std::to_string((intIp & 0x0000ff00) >> IP_ADDRESS_THIRD_BYTE_OFFSET));
     ip.push_back('.');
     ip.append(std::to_string(intIp & 0x000000ff));
     return ip;

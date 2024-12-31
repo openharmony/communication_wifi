@@ -294,7 +294,9 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
 #ifndef OHOS_ARCH_LITE
     if (config.lastConnectTime <= 0) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
-        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
+        if (WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+            WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
+        }
         return WIFI_OPT_SUCCESS;
     }
 #endif
@@ -418,6 +420,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     WifiDeviceConfig tempDeviceConfig;
     tempDeviceConfig.instanceId = config.instanceId;
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
+        netWorkId = tempDeviceConfig.networkId;
         if (m_instId == INSTID_WLAN0) {
             CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
             bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
@@ -587,10 +590,22 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 
     WifiLinkedInfo linkedInfo;
+    std::vector<WifiLinkedInfo> mloInfo;
+    bool isMloBssid = false;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId);
+    for (auto iter : mloInfo) {
+        if (iter.bssid == bssid) {
+            isMloBssid = true;
+            break;
+        }
+    }
     if (networkId == linkedInfo.networkId) {
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+        } else if (linkedInfo.mloState == MloState::WIFI7_EMLSR && isMloBssid) {
+            LOGI("%{public}s current linkedBssid is emlsr, forbid link switch", __FUNCTION__);
+            return WIFI_OPT_NOT_SUPPORTED;
         } else {
             LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
                 __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
@@ -653,6 +668,34 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
         DisabledReason::DISABLED_BY_WIFI_MANAGER)) {
         WIFI_LOGE("Disable device config failed!");
         return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
+{
+    WIFI_LOGI("Enter AllowAutoConnect, networkid is %{public}d, isAllowed is %{public}d", networkId, isAllowed);
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, targetNetwork)) {
+        WIFI_LOGE("AllowAutoConnect, failed tot get device config");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (targetNetwork.isAllowAutoConnect == isAllowed) {
+        return WIFI_OPT_FAILED;
+    }
+
+    targetNetwork.isAllowAutoConnect = isAllowed;
+    WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    if (!isAllowed) {
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+        if (linkedInfo.networkId != networkId) {
+            WIFI_LOGI("AllowAutoConnect, networkid is not correct, linked networkid:%{public}d", linkedInfo.networkId);
+            return WIFI_OPT_FAILED;
+        }
+        Disconnect();
     }
     return WIFI_OPT_SUCCESS;
 }

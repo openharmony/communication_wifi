@@ -33,6 +33,7 @@
         GetHotspotConfig;
         IsHotspotActive;
         GetStationList;
+        GetStationNum;
         DisassociateSta;
         AddTxPowerInfo;
         SetBand;
@@ -46,6 +47,7 @@
         GetDeviceConfigs;
         GetDeviceConfig;
         RemoveDevice;
+        AllowAutoConnect;
         DisableDeviceConfig;
         EnableDeviceConfig;
         ConnectTo;

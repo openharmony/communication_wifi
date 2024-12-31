@@ -68,6 +68,7 @@
         "OHOS::Wifi::WifiChannelHelper::IsValid5GChannel(int)";
         "OHOS::Wifi::WifiCmdClient::GetInstance()";
         "OHOS::Wifi::WifiCmdClient::SendCmdToDriver(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&) const";
+        "OHOS::Wifi::WifiCmdClient::VoWifiDetectInternal(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
         "OHOS::Wifi::WifiConfigUpdate::SaveWifiConfig(char const*, char const*, char const*)";
         "OHOS::Wifi::WifiConfigUpdate::handle_";
         "OHOS::Wifi::WifiCountryCodeManager::GetInstance()";

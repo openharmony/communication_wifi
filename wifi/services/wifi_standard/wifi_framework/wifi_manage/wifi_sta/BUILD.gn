@@ -161,6 +161,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_HPF_SUPPORT" ]
     }
 
+    if (wifi_feature_voicewifi_enable) {
+      defines += [ "FEATURE_VOWIFI_SUPPORT" ]
+    }
+
     if (wifi_feature_network_selection) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
     }

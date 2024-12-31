@@ -692,6 +692,13 @@ void WifiServiceScheduler::OnNetlinkReportCallback(int type, const std::vector<u
         return;
     }
     pEnhanceService->ProcessWifiNetlinkReportEvent(type, recvMsg);
+
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pStaService == nullptr) {
+        WIFI_LOGE("Instance get Sta service is null!");
+        return;
+    }
+    pStaService->ProcessVoWifiNetlinkReportEvent(type);
 }
 #endif
 

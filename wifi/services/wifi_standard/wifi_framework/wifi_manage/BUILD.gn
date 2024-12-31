@@ -581,6 +581,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
     }
 
+    if (wifi_feature_voicewifi_enable) {
+      defines += [ "FEATURE_VOWIFI_SUPPORT" ]
+    }
+
     if (defined(global_parts_info) &&
         defined(global_parts_info.telephony_core_service)) {
       external_deps += [ "core_service:tel_core_service_api" ]

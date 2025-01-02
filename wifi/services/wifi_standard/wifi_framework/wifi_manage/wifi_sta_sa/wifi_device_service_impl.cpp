@@ -2433,5 +2433,6 @@ ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
         WIFI_LOGE("StartPortalCertification:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
 }  // namespace Wifi
 }  // namespace OHOS

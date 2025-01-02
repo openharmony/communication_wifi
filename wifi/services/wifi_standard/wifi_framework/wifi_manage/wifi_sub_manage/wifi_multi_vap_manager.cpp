@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -131,7 +130,7 @@ void WifiMultiVapManager::ForceStopSoftAp()
 
 void WifiMultiVapManager::ShowToast()
 {
-    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::THREE_VAP);
+    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::THREE_VAP, "");
 }
 
 bool WifiMultiVapManager::CheckEnhanceWifiConnected()

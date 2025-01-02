@@ -35,11 +35,23 @@ bool NetworkSelectionUtils::IsOpenNetwork(const NetworkCandidate &networkCandida
     return networkCandidate.wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE;
 };
 
-bool NetworkSelectionUtils::IsOpenAndMaybePortal(const NetworkCandidate &networkCandidate)
+bool NetworkSelectionUtils::IsOpenAndMaybePortal(NetworkCandidate &networkCandidate,
+    const std::string &filterName)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    return IsOpenNetwork(networkCandidate) && !wifiDeviceConfig.noInternetAccess
-        && NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory);
+    if (!IsOpenNetwork(networkCandidate)) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NOT_OPEN_NETWORK);
+        return false;
+    }
+    if (wifiDeviceConfig.noInternetAccess) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NO_INTERNET);
+        return false;
+    }
+    if (!NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory)) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::HAS_NETWORK_HISTORY);
+        return false;
+    }
+    return true;
 }
 
 bool NetworkSelectionUtils::IsScanResultForOweNetwork(const NetworkCandidate &networkCandidate)

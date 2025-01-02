@@ -46,13 +46,17 @@ HiddenWifiFilter::~HiddenWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGD("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
 bool HiddenWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return !networkCandidate.interScanInfo.ssid.empty();
+    if (networkCandidate.interScanInfo.ssid.empty()) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::HIDDEN_NETWORK);
+        return false;
+    }
+    return true;
 }
 
 
@@ -71,7 +75,11 @@ bool SignalStrengthWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &scanInfo = networkCandidate.interScanInfo;
     auto rssiThreshold = scanInfo.frequency < MIN_5GHZ_BAND_FREQUENCY ? MIN_RSSI_VALUE_24G : MIN_RSSI_VALUE_5G;
-    return scanInfo.rssi >= rssiThreshold;
+    if (scanInfo.rssi < rssiThreshold) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::POOR_SIGNAL);
+        return false;
+    }
+    return true;
 }
 
 SavedWifiFilter::SavedWifiFilter() : SimpleWifiFilter("savedWifiFilter") {}
@@ -81,14 +89,21 @@ SavedWifiFilter::~SavedWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
 bool SavedWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return networkCandidate.wifiDeviceConfig.networkId != INVALID_NETWORK_ID &&
-        (networkCandidate.wifiDeviceConfig.uid == -1 || networkCandidate.wifiDeviceConfig.isShared == true);
+    if (networkCandidate.wifiDeviceConfig.networkId == INVALID_NETWORK_ID) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NETWORK_ID_INVALID);
+        return false;
+    }
+    if (networkCandidate.wifiDeviceConfig.uid != -1 && networkCandidate.wifiDeviceConfig.isShared == false) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NOT_SYSTEM_NETWORK);
+        return false;
+    }
+    return true;
 }
 
 
@@ -99,13 +114,17 @@ EphemeralWifiFilter::~EphemeralWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
 bool EphemeralWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return !networkCandidate.wifiDeviceConfig.isEphemeral;
+    if (networkCandidate.wifiDeviceConfig.isEphemeral) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::EPHEMERAL_NETWORK);
+        return false;
+    }
+    return true;
 }
 
 PassPointWifiFilter::PassPointWifiFilter() : SimpleWifiFilter("notPassPoint") {}
@@ -115,13 +134,17 @@ PassPointWifiFilter::~PassPointWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
 bool PassPointWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return !networkCandidate.wifiDeviceConfig.isPasspoint;
+    if (networkCandidate.wifiDeviceConfig.isPasspoint) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::PASSPOINT_NETWORK);
+        return false;
+    }
+    return true;
 }
 
 
@@ -132,14 +155,21 @@ DisableWifiFilter::~DisableWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
 bool DisableWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return networkCandidate.wifiDeviceConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED &&
-        networkCandidate.wifiDeviceConfig.isAllowAutoConnect;
+    if (networkCandidate.wifiDeviceConfig.networkSelectionStatus.status != WifiDeviceConfigStatus::ENABLED) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NETWORK_STATUS_DISABLE);
+        return false;
+    }
+    if (!networkCandidate.wifiDeviceConfig.isAllowAutoConnect) {
+    	networkCandidate.filtedReason[filterName].push_back(FiltedReason::NOT_ALLOW_AUTO_CONNECT);
+    	return false;
+    }
+    return true;
 }
 
 MatchedUserSelectBssidWifiFilter::MatchedUserSelectBssidWifiFilter() : SimpleWifiFilter("matchUserSelect") {}
@@ -149,7 +179,7 @@ MatchedUserSelectBssidWifiFilter::~MatchedUserSelectBssidWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
@@ -158,7 +188,11 @@ bool MatchedUserSelectBssidWifiFilter::Filter(NetworkCandidate &networkCandidate
     if (networkCandidate.wifiDeviceConfig.userSelectBssid.empty()) {
         return true;
     }
-    return networkCandidate.interScanInfo.bssid == networkCandidate.wifiDeviceConfig.userSelectBssid;
+    if (networkCandidate.interScanInfo.bssid != networkCandidate.wifiDeviceConfig.userSelectBssid) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::UNEXPECTED_NETWORK_BY_USER);
+        return false;
+    }
+    return true;
 }
 
 HasInternetWifiFilter::HasInternetWifiFilter() : SimpleWifiFilter("hasInternet") {}
@@ -168,23 +202,33 @@ HasInternetWifiFilter::~HasInternetWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
 bool HasInternetWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    if (wifiDeviceConfig.noInternetAccess || wifiDeviceConfig.isPortal) {
+    if (wifiDeviceConfig.noInternetAccess) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NO_INTERNET);
+        return false;
+    }
+    if (wifiDeviceConfig.isPortal) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::PORTAL_NETWORK);
         return false;
     }
     if (NetworkStatusHistoryManager::IsInternetAccessByHistory(wifiDeviceConfig.networkStatusHistory)) {
         return true;
     }
     if (NetworkSelectionUtils::IsOpenNetwork(networkCandidate)) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::OPEN_NETWORK);
         return false;
     }
-    return NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory);
+    if (!NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory)) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::HAS_NETWORK_HISTORY);
+        return false;
+    }
+    return true;
 }
 
 RecoveryWifiFilter::RecoveryWifiFilter() : SimpleWifiFilter("recovery") {}
@@ -194,7 +238,7 @@ RecoveryWifiFilter::~RecoveryWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
@@ -207,8 +251,19 @@ bool RecoveryWifiFilter::Filter(NetworkCandidate &networkCandidate)
             MacAnonymize(interScanInfo.bssid).c_str());
         return true;
     }
-    return wifiDeviceConfig.noInternetAccess && !wifiDeviceConfig.isPortal &&
-        NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory);
+    if (!wifiDeviceConfig.noInternetAccess) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::HAS_INTERNET);
+        return false;
+    }
+    if (wifiDeviceConfig.isPortal) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::PORTAL_NETWORK);
+        return false;
+    }
+    if (!NetworkStatusHistoryManager::IsAllowRecoveryByHistory(wifiDeviceConfig.networkStatusHistory)) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::UNRECOVERABLE_NETWORK);
+        return false;
+    }
+    return true;
 }
 
 PoorPortalWifiFilter::PoorPortalWifiFilter() : SimpleWifiFilter("notPoorPortal") {}
@@ -218,7 +273,7 @@ PoorPortalWifiFilter::~PoorPortalWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
@@ -229,6 +284,8 @@ bool PoorPortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
         networkCandidate.wifiDeviceConfig.noInternetAccess &&
         !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
             networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
+        networkCandidate.filtedReason[filterName] = {FiltedReason::PORTAL_NETWORK, FiltedReason::NO_INTERNET,
+            FiltedReason::UNRECOVERABLE_NETWORK};
         return false;
     }
     int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(interScanInfo.rssi, interScanInfo.band);
@@ -236,15 +293,21 @@ bool PoorPortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
         return true;
     }
     if (currentSignalLevel < SIGNAL_LEVEL_TWO) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::POOR_SIGNAL);
         return false;
     }
     auto lastHasInternetTime = networkCandidate.wifiDeviceConfig.lastHasInternetTime;
     auto now = time(nullptr);
     if (now < 0) {
         WIFI_LOGW("time return invalid!\n.");
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::TIME_INVALID);
         return false;
     }
-    return (now - lastHasInternetTime) <= POOR_PORTAL_RECHECK_DELAYED_SECONDS;
+    if ((now - lastHasInternetTime) > POOR_PORTAL_RECHECK_DELAYED_SECONDS) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::TIMEOUT_AND_NEED_RECHECK);
+        return false;
+    }
+    return true;
 }
 
 PortalWifiFilter::PortalWifiFilter() : SimpleWifiFilter("portalWifiFilter") {}
@@ -254,7 +317,7 @@ PortalWifiFilter::~PortalWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
@@ -264,9 +327,15 @@ bool PortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
         networkCandidate.wifiDeviceConfig.noInternetAccess &&
         !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
             networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
+        networkCandidate.filtedReason[filterName] = {FiltedReason::PORTAL_NETWORK, FiltedReason::NO_INTERNET,
+            FiltedReason::UNRECOVERABLE_NETWORK};
         return false;
     }
-    return networkCandidate.wifiDeviceConfig.isPortal;
+    if (!networkCandidate.wifiDeviceConfig.isPortal) {
+        networkCandidate.filtedReason[filterName].push_back(NOT_PORTAL_NETWORK);
+        return false;
+    }
+    return true;
 }
 
 MaybePortalWifiFilter::MaybePortalWifiFilter() : SimpleWifiFilter("maybePortal") {}
@@ -276,17 +345,27 @@ MaybePortalWifiFilter::~MaybePortalWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
 bool MaybePortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return !NetworkSelectionUtils::IsScanResultForOweNetwork(networkCandidate) &&
-        NetworkSelectionUtils::IsOpenAndMaybePortal(networkCandidate) &&
-        (!networkCandidate.wifiDeviceConfig.noInternetAccess ||
-        NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
-            networkCandidate.wifiDeviceConfig.networkStatusHistory));
+    if (NetworkSelectionUtils::IsScanResultForOweNetwork(networkCandidate)) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::OWE_NETWORK);
+        return false;
+    }
+    if (!NetworkSelectionUtils::IsOpenAndMaybePortal(networkCandidate, filterName)) {
+        //The filtering reason has been added to this IsOpenAndMaybePortal interface.
+        return false;
+    }
+    if (networkCandidate.wifiDeviceConfig.noInternetAccess &&
+        !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
+            networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
+        networkCandidate.filtedReason[filterName] = {FiltedReason::NO_INTERNET, FiltedReason::UNRECOVERABLE_NETWORK};
+        return false;
+    }
+    return true;
 }
 
 
@@ -297,14 +376,18 @@ NoInternetWifiFilter::~NoInternetWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
 bool NoInternetWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    return NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
+    if (!NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory)) {
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NO_INTERNET);
+        return false;
+    }
+    return true;
 }
 
 WeakAlgorithmWifiFilter::WeakAlgorithmWifiFilter() : SimpleWifiFilter("noWeakAlgorithm") {}
@@ -314,7 +397,7 @@ WeakAlgorithmWifiFilter::~WeakAlgorithmWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
 }
 
@@ -323,9 +406,11 @@ bool WeakAlgorithmWifiFilter::Filter(NetworkCandidate &networkCandidate)
     auto &scanInfo = networkCandidate.interScanInfo;
     if (scanInfo.securityType == WifiSecurity::WEP) {
         WIFI_LOGD("WeakAlgorithm: WEP AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::WEAK_ALGORITHM_WEP_SECURITY);
         return false;
     } else if (scanInfo.securityType == WifiSecurity::OPEN) {
         WIFI_LOGD("WeakAlgorithm: OPEN AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::OPEN_NETWORK);
         return false;
     } else if (scanInfo.securityType == WifiSecurity::PSK
         && scanInfo.capabilities.find("TKIP") != std::string::npos) {
@@ -333,6 +418,7 @@ bool WeakAlgorithmWifiFilter::Filter(NetworkCandidate &networkCandidate)
             return true;
         }
         WIFI_LOGD("WeakAlgorithm: WPA AP(%{public}s) is ignored", networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::WEAK_ALGORITHM_WPA_SECURITY);
         return false;
     }
     return true;

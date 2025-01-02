@@ -34,9 +34,10 @@ public:
      * the function to determine whether the network is Open and maybe portal.
      *
      * @param networkCandidate candidate network.
+     * @param filterName wififilter name
      * @return return ture if the candidate network is Open and maybe portal.
      */
-    static bool IsOpenAndMaybePortal(const NetworkCandidate &networkCandidate);
+    static bool IsOpenAndMaybePortal(NetworkCandidate &networkCandidate, const std::string &filterName = "");
 
     /**
      * the function to determine whether the network is owe network.

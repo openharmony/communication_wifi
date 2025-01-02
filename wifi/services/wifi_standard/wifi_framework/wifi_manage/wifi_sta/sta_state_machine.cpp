@@ -1214,7 +1214,7 @@ void StaStateMachine::ApLinkedState::DealStartRoamCmdInApLinkedState(InternalMes
     }
     WIFI_LOGI("%{public}s START_ROAM-ReAssociate() succeeded!", __FUNCTION__);
     /* Start roaming */
-    /* 只处理主动漫?*/
+    /* 只处理主动漫游*/
     pStaStateMachine->SwitchState(pStaStateMachine->pApRoamingState);
 }
 
@@ -1768,6 +1768,13 @@ void StaStateMachine::UpdatePortalState(SystemNetWorkState netState, bool &updat
 void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std::string url)
 {
     SendMessage(WIFI_SVR_CMD_STA_NET_DETECTION_NOTIFY_EVENT, netState, 0, url);
+#ifndef OHOS_ARCH_LITE
+    if (enhanceService_ == nullptr) {
+        WIFI_LOGE("NetStateObserverCallback, enhanceService is null");
+        return;
+    }
+    enhanceService_->NotifyInternetState(static_cast<int>(netState));
+#endif
 }
 
 void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl)
@@ -2980,7 +2987,7 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
         if (config.ssid == scanInfo.ssid
             && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
-                || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处?
+                || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处理
             AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
             halDeviceConfig.ssid = scanInfo.oriSsid;
             WIFI_LOGI("ConvertSsidToOriginalSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",

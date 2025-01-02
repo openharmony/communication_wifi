@@ -2438,6 +2438,6 @@ ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
         WIFI_LOGE("pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    return pService
+    return pService->IsSupportVoWifiDetect(isSupported);
 }  // namespace Wifi
 }  // namespace OHOS

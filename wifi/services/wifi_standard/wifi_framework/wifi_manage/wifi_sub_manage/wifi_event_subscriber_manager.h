@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,6 +60,10 @@ public:
     virtual ~NotificationEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
     void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
+private:
+    void OnReceiveNotificationEvent(int notificationId);
+    void OnReceiveDialogAcceptEvent(int dialogType);
+    void OnReceiveDialogRejectEvent(int dialogType);
 };
 
 #ifdef HAS_POWERMGR_PART

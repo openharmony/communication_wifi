@@ -57,10 +57,10 @@ NO_SANITIZE("cfi") WifiErrorCode IsHotspotDualBandSupported(bool &isSupported)
     return GetCErrorCode(hotspotPtr->IsHotspotDualBandSupported(isSupported));
 }
 
-NO_SANITIZE("cfi") WifiErrorCode IsHotspotSupported(bool &isSupported)
+NO_SANITIZE("cfi") WifiErrorCode IsOpenSoftApAllowed(bool &isSupported)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
-    return GetCErrorCode(hotspotPtr->IsHotspotSupported(isSupported));
+    return GetCErrorCode(hotspotPtr->IsOpenSoftApAllowed(isSupported));
 }
 
 /* Others type is not support for AP */

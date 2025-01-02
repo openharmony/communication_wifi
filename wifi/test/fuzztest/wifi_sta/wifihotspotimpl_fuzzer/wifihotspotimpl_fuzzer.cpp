@@ -78,10 +78,10 @@ int IsHotspotDualBandSupportedFuzzTest(const uint8_t* data, size_t size)
     return 0;
 }
 
-int IsHotspotSupportedFuzzTest(const uint8_t* data, size_t size)
+int IsOpenSoftApAllowedFuzzTest(const uint8_t* data, size_t size)
 {
     bool status = true;
-    pWifiHotspotServiceImpl->IsHotspotSupported(status);
+    pWifiHotspotServiceImpl->IsOpenSoftApAllowed(status);
     return 0;
 }
 
@@ -168,7 +168,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     OHOS::Wifi::TransRandomToRealMacFuzzTest(data, size);
     OHOS::Wifi::IsHotspotDualBandSupportedFuzzTest(data, size);
-    OHOS::Wifi::IsHotspotSupportedFuzzTest(data, size);
+    OHOS::Wifi::IsOpenSoftApAllowedFuzzTest(data, size);
     OHOS::Wifi::SetHotspotConfigFuzzTest(data, size);
     OHOS::Wifi::SetHotspotIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::DisassociateStaFuzzTest(data, size);

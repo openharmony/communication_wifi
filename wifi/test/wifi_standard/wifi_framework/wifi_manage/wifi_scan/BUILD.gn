@@ -1,4 +1,3 @@
-
 # Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +27,7 @@ ohos_unittest("wifi_scan_unittest") {
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/base/shared_util/wifi_watchdog_utils.cpp",
+    "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
@@ -128,6 +128,7 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -151,6 +152,7 @@ ohos_unittest("wifi_scan_unittest") {
     "ability_runtime:connection_obs_manager",
     "ability_runtime:dataobs_manager",
     "ability_runtime:wantagent_innerkits",
+    "ability_runtime:extension_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
@@ -160,6 +162,7 @@ ohos_unittest("wifi_scan_unittest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
+    "distributed_notification_service:ans_innerkits",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "ipc:ipc_single",

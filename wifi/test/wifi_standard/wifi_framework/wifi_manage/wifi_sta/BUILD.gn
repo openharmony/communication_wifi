@@ -1,4 +1,3 @@
-
 # Copyright (C) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +30,7 @@ local_base_sources = [
   "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
   "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
   "$WIFI_ROOT_DIR/base/utils/xml_parser.cpp",
+  "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
   "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/external_wifi_common_builder_manager.cpp",
@@ -57,7 +57,6 @@ local_base_sources = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_net_observer.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_netlink.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats/wifi_net_stats_manager.cpp",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_notification_util.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_helper.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_utils.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect.cpp",
@@ -95,6 +94,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/base/cRPC/include",
   "$WIFI_ROOT_DIR/base/utils",
   "$WIFI_ROOT_DIR/base/state_machine/include",
+  "$WIFI_ROOT_DIR/base/shared_util",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
@@ -170,6 +170,7 @@ local_base_external_deps = [
   "core_service:tel_core_service_api",
   "data_share:datashare_consumer",
   "dhcp:dhcp_sdk",
+  "distributed_notification_service:ans_innerkits",
   "hilog:libhilog",
   "init:libbegetutil",
   "ipc:ipc_single",
@@ -207,6 +208,7 @@ ohos_unittest("wifi_sta_unittest") {
   deps = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",

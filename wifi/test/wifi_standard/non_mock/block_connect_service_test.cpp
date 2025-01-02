@@ -210,5 +210,20 @@ HWTEST_F(BlockConnectServiceTest, IsWrongPassword_ReturnsTrueWhenBlockedDueToWro
     result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
     EXPECT_EQ(result, false);
 }
+
+HWTEST_F(BlockConnectServiceTest, OnReceiveSettingsEnterEvent_EnablesAllNetworksWhenEnteringSettings, TestSize.Level1)
+{
+    // Test logic here
+    int targetNetworkId = 1;
+    DisabledReason reason = DisabledReason::DISABLED_AUTHENTICATION_FAILURE;
+    bool result = BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId, reason);
+    EXPECT_EQ(result, true);
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
+    BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(true);
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
 }
-}
+} // namespace Wifi
+} // namespace OHOS

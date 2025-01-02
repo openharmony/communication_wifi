@@ -296,7 +296,7 @@ WifiErrorNo WpaGetCountryCode(char *countryCode, int codeSize)
     }
     ReadClientEnd(client);
     UnlockRpcClient(client);
-    if (strlen(countryCode) <= 0) {
+    if (countryCode == NULL || strlen(countryCode) <= 0) {
         return WIFI_HAL_OPT_FAILED;
     }
     return result;

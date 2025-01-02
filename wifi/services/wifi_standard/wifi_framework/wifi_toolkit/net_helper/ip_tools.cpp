@@ -44,7 +44,7 @@ unsigned int IpTools::ConvertIpv4Address(const std::string &address)
             break;
         }
         std::string value = tmpAddress.substr(0, npos);
-        unsigned int tmp = std::atoi(value.c_str());
+        unsigned int tmp = CheckDataToUint(value);
         if ((tmp < MIN_BYTE) || (tmp > MAX_BYTE)) {
             break;
         }
@@ -55,7 +55,7 @@ unsigned int IpTools::ConvertIpv4Address(const std::string &address)
     if (i != IPV4_DOT_NUM) {
         return 0;
     }
-    int tmp = std::atoi(tmpAddress.c_str());
+    int tmp = CheckDataLegal(tmpAddress);
     if ((tmp < MIN_BYTE) || (tmp > MAX_BYTE)) {
         return 0;
     }

@@ -33,6 +33,10 @@
 
 WifiErrorNo StartSoftAp(int id, char *ifaceName)
 {
+    if (ifaceName == NULL) {
+        LOGI("ifaceName is NULL!");
+        return WIFI_HAL_INVALID_PARAM;
+    }
     LOGI("Ready to start hostapd: %{public}d, %{public}s", id, ifaceName);
     InitCfg(ifaceName);
     if (StartHostapd() != WIFI_HAL_SUCCESS) {

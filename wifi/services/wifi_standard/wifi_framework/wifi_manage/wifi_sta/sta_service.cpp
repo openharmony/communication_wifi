@@ -27,6 +27,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_cert_utils.h"
+#include "wifi_cmd_client.h"
 #include "wifi_common_util.h"
 #include "network_selection_manager.h"
 #include "wifi_config_center.h"
@@ -58,6 +59,11 @@ constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 #define EAP_AUTH_WLAN_MNC "@wlan.mnc"
 #define EAP_AUTH_WLAN_MCC ".mcc"
 #define EAP_AUTH_PERMANENT_SUFFIX ".3gppnetwork.org"
+
+const int WIFI_DETECT_MODE_LOW = 1;
+const int WIFI_DETECT_MODE_HIGH = 2;
+ 
+const std::string VOWIFI_DETECT_SET_PREFIX = "VOWIFI_DETECT SET ";
 
 StaService::StaService(int instId)
     : pStaStateMachine(nullptr),
@@ -1013,6 +1019,127 @@ ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_DELIVER_MAC, currentMac);
 
     return WIFI_OPT_SUCCESS;
+}
+
+std::string StaService::VoWifiDetect(std::string cmd)
+{
+    std::unique_lock<std::shared_mutex> lock(m_voWifiCallbackMutex);
+    std::string result = WifiCmdClient::GetInstance().VoWifiDetectInternal(cmd);
+    return result;
+}
+ 
+VoWifiSignalInfo StaService::FetchWifiSignalInfoForVoWiFi()
+{
+    LOGD("Enter FetchWifiSignalInfoForVoWiFi.");
+    VoWifiSignalInfo m_voWifiSignalInfo;
+ 
+    int linkSpeed = -1;
+    int frequency = -1;
+    int rssi = -1;
+    int noise = -1;
+ 
+    WifiSignalPollInfo signalInfo;
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), linkedInfo.bssid, signalInfo);
+    WIFI_LOGI("FetchWifiSignalInfoForVoWiFi GetConnectSignalInfo result: %{public}d.", ret);
+    
+    linkSpeed = signalInfo.txrate;
+    frequency = signalInfo.frequency;
+    rssi = signalInfo.c0Rssi;
+ 
+    int txPacketCounter = signalInfo.txPackets;
+    int nativeTxFailed = signalInfo.txFailed;
+    int nativeTxSuccessed = txPacketCounter - nativeTxFailed;
+ 
+    // set rssi
+    m_voWifiSignalInfo.rssi = rssi;
+ 
+    // set noise
+    noise = 0; // stub
+    m_voWifiSignalInfo.noise = noise;
+ 
+    // set bler
+    int bler = static_cast<int>((static_cast<double>(nativeTxFailed) / static_cast<double>(txPacketCounter)) * 100);
+    m_voWifiSignalInfo.bler = bler;
+ 
+    // delta tx packet count
+    int deltaTxPacketCounter = nativeTxSuccessed - mLastTxPktCnt_;
+    mLastTxPktCnt_ = nativeTxSuccessed;
+    m_voWifiSignalInfo.deltaTxPacketCounter = deltaTxPacketCounter;
+ 
+    // access type
+    int accessType = ConvertToAccessType(linkSpeed, frequency);
+    m_voWifiSignalInfo.accessType = accessType;
+ 
+    // reserve
+    m_voWifiSignalInfo.reverse = 0;
+ 
+    // tx successed packet count
+    m_voWifiSignalInfo.txGood = nativeTxSuccessed;
+ 
+    // tx fialed packet count
+    m_voWifiSignalInfo.txBad = nativeTxFailed;
+ 
+    // max address
+    std::string bssid = linkedInfo.bssid;
+    std::string macStr = "ffffffffffff";
+    std::string::size_type pos = 0;
+    while ((pos = bssid.find(':', pos)) != std::string::npos) {
+        bssid.replace(pos, 1, "");
+        pos++;
+    }
+    const char* charArray = macStr.data();
+    unsigned char* macBytes = reinterpret_cast<unsigned char*>(const_cast<char*>(charArray));
+    std::string macAddressStr(reinterpret_cast<char*>(macBytes));
+    m_voWifiSignalInfo.macAddress = macAddressStr;
+ 
+    WIFI_LOGI("VoWifiSignalInfo: rssi:%{public}d, nativeTxFailed:%{public}d, nativeTxSuccessed:%{public}d,"
+        "deltaTxPacketCounter:%{public}d, linkSpeed:%{public}d, frequency:%{public}d, noise:%{public}d, mac:%{public}s",
+        rssi, nativeTxFailed, nativeTxSuccessed, deltaTxPacketCounter, linkSpeed, frequency, noise,
+        MacAnonymize(macAddressStr).c_str());
+    return m_voWifiSignalInfo;
+}
+ 
+int StaService::ConvertToAccessType(int linkSpeed, int frequency)
+{
+    // RESERVE
+    return 0;
+}
+ 
+void StaService::ProcessSetVoWifiDetectMode(WifiDetectConfInfo info)
+{
+    WIFI_LOGI("Enter ProcessSetVoWifiDetectMode: set VoWifi detect mode: %{public}d", info.wifiDetectMode);
+    bool ret = false;
+ 
+    if (info.wifiDetectMode == WIFI_DETECT_MODE_LOW) {
+        ret = VoWifiDetectSet("LOW_THRESHOLD " + std::to_string(info.threshold));
+    } else if (info.wifiDetectMode == WIFI_DETECT_MODE_HIGH) {
+        ret = VoWifiDetectSet("HIGH_THRESHOLD " + std::to_string(info.threshold));
+    } else {
+        ret = VoWifiDetectSet("MODE " + std::to_string(info.wifiDetectMode));
+    }
+ 
+    if (ret && VoWifiDetectSet("TRIGGER_COUNT " + std::to_string(info.envalueCount))) {
+        ret = VoWifiDetectSet("MODE " + std::to_string(info.wifiDetectMode));
+    }
+ 
+    WIFI_LOGI("set VoWifi detect mode result: %{public}d.", ret);
+}
+ 
+void StaService::ProcessSetVoWifiDetectPeriod(int period)
+{
+    WIFI_LOGI("Enter ProcessSetVoWifiDetectPeriod: set VoWifiDetect Period %{public}d", period);
+    bool ret = VoWifiDetectSet("PERIOD " + std::to_string(period));
+    WIFI_LOGI("Set VoWifi Detect Period result: %{public}d, period = %{public}d", ret, period);
+}
+ 
+bool StaService::VoWifiDetectSet(std::string cmd)
+{
+    std::string ret = VoWifiDetect(VOWIFI_DETECT_SET_PREFIX + cmd);
+    WIFI_LOGI("VoWifiDetectSet ret : %{public}s", ret.c_str());
+    return (!ret.empty() && (ret == "true" || ret == "OK"));
 }
 }  // namespace Wifi
 }  // namespace OHOS

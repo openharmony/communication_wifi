@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -1214,7 +1215,7 @@ void StaStateMachine::ApLinkedState::DealStartRoamCmdInApLinkedState(InternalMes
     }
     WIFI_LOGI("%{public}s START_ROAM-ReAssociate() succeeded!", __FUNCTION__);
     /* Start roaming */
-    /* 只处理主动漫游*/
+    /* 只处理主动漫�?*/
     pStaStateMachine->SwitchState(pStaStateMachine->pApRoamingState);
 }
 
@@ -2980,7 +2981,7 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
         if (config.ssid == scanInfo.ssid
             && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
-                || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处理
+                || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处�?
             AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
             halDeviceConfig.ssid = scanInfo.oriSsid;
             WIFI_LOGI("ConvertSsidToOriginalSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",

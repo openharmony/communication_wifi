@@ -383,6 +383,7 @@ void WifiScanConfig::RecordWifiCategory(const std::string bssid, WifiCategory ca
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     if (bssid.empty()) {
+        LOGE ("bassid is NULL!");
         return;
     }
     mWifiCategoryRecord.insert_or_assign(bssid, category);

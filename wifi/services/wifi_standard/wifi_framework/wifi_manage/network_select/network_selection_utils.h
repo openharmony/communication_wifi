@@ -59,9 +59,11 @@ public:
      * transfer the info of candidate networks to json format string.
      *
      * @param networkCandidates candidate network
+     * @param filterName wififilter Name
      * @return json format string
      */
-    static std::string GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates);
+    static std::string GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates,
+        const std::string &filterName = "");
 
     /**
      * transfer the info of candidate networks to json format string.

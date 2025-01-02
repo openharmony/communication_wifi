@@ -65,7 +65,8 @@ bool NetworkSelectionUtils::IsBlackListNetwork(const NetworkCandidate &networkCa
     return networkCandidate.wifiDeviceConfig.connFailedCount >= maxRetryCount;
 }
 
-std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates)
+std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates,
+    const std::string &filterName)
 {
     std::stringstream networkCandidatesInfo;
     networkCandidatesInfo << "[";
@@ -73,7 +74,7 @@ std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<Ne
         if (networkCandidates.at(i)->wifiDeviceConfig.networkId == INVALID_NETWORK_ID) {
             continue;
         }
-        networkCandidatesInfo << "\"" << networkCandidates.at(i)->ToString() << "\"";
+        networkCandidatesInfo << "\"" << networkCandidates.at(i)->ToString(filterName) << "\"";
         if (i < networkCandidates.size() - 1) {
             networkCandidatesInfo << ", ";
         }

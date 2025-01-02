@@ -20,6 +20,8 @@
 #include "system_ability_definition.h"
 #include "wifi_notification_util.h"
 #include "wifi_logger.h"
+#include "notification_helper.h"
+#include "string_wrapper.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -48,25 +50,64 @@ void WifiNotificationUtil::PublishWifiNotification(WifiNotificationId notificati
     want.SetParam("status", status);
     want.SetParam("ssid", ssid);
     auto result = StartAbility(want);
-    isNtfPublished = true;
+    switch (notificationId) {
+        case WIFI_PORTAL_NOTIFICATION_ID:
+            isPortalNtfPublished = true;
+            break;
+        case WIFI_5G_CONN_NOTIFICATION_ID:
+            is5gConnNtfPublished = true;
+            break;
+        default: {
+            break;
+        }
+    }
     WIFI_LOGI("Publishing wifi notification End, result = %{public}d", result);
 }
 
 void WifiNotificationUtil::CancelWifiNotification(WifiNotificationId notificationId)
 {
     WIFI_LOGI("Cancel notification, id [%{public}d]", static_cast<int>(notificationId));
-    if (!isNtfPublished) {
-        return;
+    switch (notificationId) {
+        case WIFI_PORTAL_NOTIFICATION_ID:
+            if (!isPortalNtfPublished) {
+                WIFI_LOGE("Portal notification is canceled");
+                return;
+            }
+            isPortalNtfPublished = false;
+            break;
+        case WIFI_5G_CONN_NOTIFICATION_ID:
+            if (!is5gConnNtfPublished) {
+                WIFI_LOGE("5g Conn notification is canceled");
+                return;
+            }
+            is5gConnNtfPublished = false;
+            break;
+        default: {
+            break;
+        }
     }
     AAFwk::Want want;
     want.SetElementName("com.ohos.locationdialog", "WifiServiceAbility");
     want.SetParam("operateType", static_cast<int>(WifiNotificationOpetationType::CANCEL));
     want.SetParam("notificationId", static_cast<int>(notificationId));
     auto result = StartAbility(want);
-    isNtfPublished = false;
     WIFI_LOGI("Cancel notification End, result = %{public}d", result);
 }
 
+void WifiNotificationUtil::DisplaySettingWlanPage()
+{
+    WIFI_LOGI("Display setting wlan page");
+    AAFwk::Want want;
+    std::string bundleName = "com.huawei.hmos.settings";
+    std::string abilityName = "com.huawei.hmos.settings.MainAbility";
+    std::string navEntryKey = "wifi_entry";
+    AppExecFwk::ElementName element("", bundleName, abilityName);
+    want.SetElement(element);
+    want.SetUri(navEntryKey);
+    auto result = StartAbility(want);
+    WIFI_LOGI("Display setting wlan page end, result = %{public}d", result);
+}
+ 
 int32_t WifiNotificationUtil::StartAbility(OHOS::AAFwk::Want& want)
 {
     sptr<ISystemAbilityManager> systemAbilityManager =
@@ -112,7 +153,7 @@ int32_t WifiNotificationUtil::StartAbility(OHOS::AAFwk::Want& want)
     return reply.ReadInt32();
 }
 
-void WifiNotificationUtil::ShowDialog(WifiDialogType type)
+void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string ssid)
 {
     WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
     AAFwk::Want want;
@@ -122,6 +163,14 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type)
     nlohmann::json param;
     param["ability.want.params.uiExtensionType"] = "sysDialog/common";
     param["wifiDialogType"] = static_cast<int32_t>(type);
+    switch (type) {
+        case AUTO_IDENTIFY_CONN:
+            param["wifi5gSsid"] = ssid;
+            break;
+        default: {
+            break;
+        }
+    }
     std::string cmdData = param.dump();
     sptr<UIExtensionAbilityConnection> connection(
         new (std::nothrow) UIExtensionAbilityConnection(cmdData, "com.ohos.locationdialog", "WifiUIExtAbility"));
@@ -186,5 +235,5 @@ void UIExtensionAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::Ele
 {
     WIFI_LOGI("on ability disconnected");
 }
-}
-}
+}  // namespace Wifi
+}  // namespace OHOS

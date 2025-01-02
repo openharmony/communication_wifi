@@ -1376,5 +1376,90 @@ void WifiDeviceStub::OnUpdateNetworkLagInfo(uint32_t code, MessageParcel &data, 
     reply.WriteInt32(ret);
     return;
 }
+
+void WifiDeviceStub::OnFetchWifiSignalInfoForVoWiFi(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    VoWifiSignalInfo signalInfo;
+    ErrCode ret = FetchWifiSignalInfoForVoWiFi(signalInfo);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(signalInfo.rssi);
+        reply.WriteInt32(signalInfo.noise);
+        reply.WriteInt32(signalInfo.bler);
+        reply.WriteInt32(signalInfo.deltaTxPacketCounter);
+        reply.WriteInt32(signalInfo.accessType);
+        reply.WriteInt32(signalInfo.reverse);
+        reply.WriteInt64(signalInfo.txGood);
+        reply.WriteInt64(signalInfo.txBad);
+        reply.WriteString(signalInfo.macAddress);
+    }
+    return;
+}
+ 
+void WifiDeviceStub::OnIsSupportVoWifiDetect(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isSupported;
+    ErrCode ret = IsSupportVoWifiDetect(isSupported);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(isSupported);
+    }
+    return;
+}
+ 
+void WifiDeviceStub::OnSetVoWifiDetectMode(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiDetectConfInfo info;
+    info.wifiDetectMode = data.ReadInt32();
+    info.threshold = data.ReadInt32();
+    info.envalueCount = data.ReadInt32();
+    ErrCode ret = SetVoWifiDetectMode(info);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+ 
+void WifiDeviceStub::OnGetVoWifiDetectMode(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiDetectConfInfo info;
+    ErrCode ret = GetVoWifiDetectMode(info);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(info.wifiDetectMode);
+        reply.WriteInt32(info.threshold);
+        reply.WriteInt32(info.envalueCount);
+    }
+    return;
+}
+ 
+void WifiDeviceStub::OnSetVoWifiDetectPeriod(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int period = data.ReadInt32();
+    ErrCode ret = SetVoWifiDetectPeriod(period);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+ 
+void WifiDeviceStub::OnGetVoWifiDetectPeriod(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int period;
+    ErrCode ret = GetVoWifiDetectPeriod(period);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(period);
+    }
+    return;
+}
 }  // namespace Wifi
 }  // namespace OHOS

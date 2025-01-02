@@ -113,7 +113,7 @@ void WifiHotspotStub::InitHandleMap()
         };
     handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_SUPPORTED)] =
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
-            OnIsHotspotSupported(code, data, reply, option);
+            OnIsOpenSoftApAllowed(code, data, reply, option);
         };
     handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply,
@@ -173,12 +173,12 @@ void WifiHotspotStub::OnIsHotspotDualBandSupported(uint32_t code, MessageParcel 
     return;
 }
 
-void WifiHotspotStub::OnIsHotspotSupported(uint32_t code, MessageParcel &data,
+void WifiHotspotStub::OnIsOpenSoftApAllowed(uint32_t code, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool isSupported = false;
-    ErrCode ret = IsHotspotSupported(isSupported);
+    ErrCode ret = IsOpenSoftApAllowed(isSupported);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {

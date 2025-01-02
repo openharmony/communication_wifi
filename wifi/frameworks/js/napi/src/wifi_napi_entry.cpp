@@ -379,7 +379,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getDeviceMacAddress", GetDeviceMacAddress),
         DECLARE_NAPI_FUNCTION("isHotspotActive", IsHotspotActive),
         DECLARE_NAPI_FUNCTION("isHotspotDualBandSupported", IsHotspotDualBandSupported),
-        DECLARE_NAPI_FUNCTION("isHotspotSupported", IsHotspotSupported),
+        DECLARE_NAPI_FUNCTION("isOpenSoftApAllowed", IsOpenSoftApAllowed),
         DECLARE_NAPI_FUNCTION("setHotspotIdleTimeout", SetHotspotIdleTimeout),
         DECLARE_NAPI_FUNCTION("enableHotspot", EnableHotspot),
         DECLARE_NAPI_FUNCTION("disableHotspot", DisableHotspot),

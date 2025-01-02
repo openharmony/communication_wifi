@@ -24,7 +24,7 @@ napi_value EnableHotspot(napi_env env, napi_callback_info info);
 napi_value DisableHotspot(napi_env env, napi_callback_info info);
 napi_value IsHotspotActive(napi_env env, napi_callback_info info);
 napi_value IsHotspotDualBandSupported(napi_env env, napi_callback_info info);
-napi_value IsHotspotSupported(napi_env env, napi_callback_info info);
+napi_value IsOpenSoftApAllowed(napi_env env, napi_callback_info info);
 napi_value SetHotspotIdleTimeout(napi_env env, napi_callback_info info);
 napi_value SetHotspotConfig(napi_env env, napi_callback_info info);
 napi_value GetHotspotConfig(napi_env env, napi_callback_info info);

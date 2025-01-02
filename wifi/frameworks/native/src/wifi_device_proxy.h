@@ -595,8 +595,6 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) override;
-
-    void ReadSignalInfoForVoWiFi(MessageParcel &reply, VoWifiSignalInfo &signalInfo);
  
     /**
      * @Description Get Vowifi Signal Info.
@@ -682,6 +680,7 @@ private:
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
     void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
+    void ReadSignalInfoForVoWiFi(MessageParcel &reply, VoWifiSignalInfo &signalInfo);
     void RemoveDeathRecipient(void);
     static BrokerDelegator<WifiDeviceProxy> g_delegator;
     sptr<IRemoteObject> remote_ = nullptr;

@@ -2434,5 +2434,9 @@ ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
 }  // namespace Wifi
 }  // namespace OHOS

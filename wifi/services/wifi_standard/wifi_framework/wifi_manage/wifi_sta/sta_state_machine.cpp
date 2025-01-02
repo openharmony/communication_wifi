@@ -650,6 +650,8 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->InitWifiLinkedInfo();
         pStaStateMachine->StopDhcp();
         WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
+        pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
+            pStaStateMachine->linkedInfo);
     }
     return;
 }
@@ -2826,6 +2828,8 @@ void StaStateMachine::DhcpResultNotify::OnFailedDhcpResult(int status, const cha
 void StaStateMachine::DhcpResultNotify::DealDhcpResultFailed()
 {
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
+        DisabledReason::DISABLED_DHCP_FAILURE);
 
     WIFI_LOGI("DhcpResultNotify OnFailed type: %{public}d, sucNum: %{public}d, failNum: %{public}d",
         pStaStateMachine->currentTpType, pStaStateMachine->getIpSucNum, pStaStateMachine->getIpFailNum);

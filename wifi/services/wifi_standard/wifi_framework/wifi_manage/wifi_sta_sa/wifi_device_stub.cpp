@@ -131,6 +131,18 @@ void WifiDeviceStub::InitHandleMapEx2()
         MessageParcel &data, MessageParcel &reply) { OnReceiveNetworkControlInfo(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_NETWORK_LAG_INFO)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnUpdateNetworkLagInfo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_FETCH_SIGNALINFO_VOWIFI)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnFetchWifiSignalInfoForVoWiFi(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SUPPORT_VOWIFI_DETECT)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnIsSupportVoWifiDetect(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_VOWIFI_DETECT_MODE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetVoWifiDetectMode(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_VOWIFI_DETECT_MODE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetVoWifiDetectMode(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_VOWIFI_DETECT_PERIOD)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetVoWifiDetectPeriod(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetVoWifiDetectPeriod(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()

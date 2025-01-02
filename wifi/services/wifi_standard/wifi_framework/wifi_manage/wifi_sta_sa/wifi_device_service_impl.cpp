@@ -2439,5 +2439,117 @@ ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
         return WIFI_OPT_STA_NOT_OPENED;
     }
     return pService->IsSupportVoWifiDetect(isSupported);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    WIFI_LOGI("Enter StartPortalCertification.");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("StartPortalCertification: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->IsSupportVoWifiDetect(isSupported);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    WIFI_LOGI("Enter StartPortalCertification.");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("StartPortalCertification: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->IsSupportVoWifiDetect(isSupported);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    WIFI_LOGI("Enter StartPortalCertification.");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("StartPortalCertification: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->IsSupportVoWifiDetect(isSupported);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    WIFI_LOGI("Enter StartPortalCertification.");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("StartPortalCertification: NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("StartPortalCertification:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->IsSupportVoWifiDetect(isSupported);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
 }  // namespace Wifi
 }  // namespace OHOS

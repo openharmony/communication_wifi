@@ -392,6 +392,8 @@ int RpcSetAssocMacAddr(RpcServer *server, Context *context)
     }
     int portType = -1;
     if (ReadInt(context, &portType) < 0) {
+        free(mac);
+        mac = NULL;
         return HAL_FAILURE;
     }
     WifiErrorNo err = SetAssocMacAddr(mac, maxSize, portType);

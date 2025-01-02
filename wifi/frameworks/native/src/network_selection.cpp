@@ -17,7 +17,7 @@
 
 namespace OHOS::Wifi::NetworkSelection {
 
-std::string NetworkCandidate::ToString() const
+std::string NetworkCandidate::ToString(const std::string &filterName) const
 {
     std::stringstream networkCandidateInfo;
     networkCandidateInfo << wifiDeviceConfig.networkId << "_";
@@ -27,7 +27,20 @@ std::string NetworkCandidate::ToString() const
     } else {
         networkCandidateInfo << interScanInfo.bssid.substr(interScanInfo.bssid.size() - BSSID_MIN_SIZE);
     }
-    return networkCandidateInfo.str();
+    if (filterName.empty()) {
+        return networkCandidateInfo.str();
+    }
+    std::vector<FiltedReason> reasons = filtedReason.at(filterName);
+    if (reasons.empty()) {
+        return networkCandidateInfo.str();
+    }
+    networkCandidateInfo << "_";
+    for (const auto &reason: reasons) {
+        networkCandidateInfo << reason << "&";
+    }
+    std::string candidateInfoStr = networkCandidateInfo.str();
+    candidateInfoStr.erase(candidateInfoStr.size() - 1);
+    return candidateInfoStr;
 }
 
 std::string ScoreResult::ToString() const

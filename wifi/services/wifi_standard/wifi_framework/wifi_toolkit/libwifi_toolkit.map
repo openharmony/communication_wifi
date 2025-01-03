@@ -377,6 +377,8 @@
           "OHOS::Wifi::WifiCommonEventHelper::PublishHotspotStateChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
           "OHOS::Wifi::WifiAssetManager::GetStaCallback() const";
           "OHOS::Wifi::IsFactoryMode()";
+          "OHOS::Wifi::WifiConfigCenter::SetSystemMode(int)";
+          "OHOS::Wifi::WifiConfigCenter::GetSystemMode()";
           "OHOS::Wifi::GetDeviceType()";
           "OHOS::Wifi::WifiConfigCenter::SetDeviceType(int)";
           "OHOS::Wifi::WifiConfigCenter::IsAllowPopUp()";

@@ -38,6 +38,7 @@
 #if defined(FEATURE_ENCRYPTION_SUPPORT) || defined(SUPPORT_LOCAL_RANDOM_MAC)
 #include "wifi_encryption_util.h"
 #endif
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1475,7 +1476,7 @@ void WifiSettings::SetScanOnlySwitchState(const int &state, int instId)
 int WifiSettings::GetScanOnlySwitchState(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
-    if (IsFactoryMode()) {
+    if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
         LOGI("factory mode, not allow scan only.");
         return 0;
     }
@@ -2082,7 +2083,6 @@ int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceCon
     return 0;
 }
 #endif
-
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 bool WifiSettings::IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const
 {

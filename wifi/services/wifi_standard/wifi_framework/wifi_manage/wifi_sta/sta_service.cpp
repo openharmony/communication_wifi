@@ -808,10 +808,7 @@ ErrCode StaService::SetPowerMode(bool mode) const
     if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(mode, m_instId) != WIFI_HAL_OPT_OK) {
         LOGE("SetPowerMode() failed!");
         return WIFI_OPT_FAILED;
-<<<<<<< HEAD
     }
-=======
->>>>>>> fc13134645d3076c6c80904d1806a0ddc13913c4
     return WIFI_OPT_SUCCESS;
 }
 

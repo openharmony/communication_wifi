@@ -103,10 +103,6 @@ if (defined(ohos_lite)) {
       "OHOS_ARCH_LITE",
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
     ]
-
-    if (wifi_feature_with_wifi_oeminfo_mac) {
-      defines += [ "READ_MAC_FROM_OEM" ]
-    }
     ldflags += [
       "-fPIC",
       "-Wl,-E",
@@ -165,9 +161,6 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_HPF_SUPPORT" ]
     }
 
-    if (wifi_feature_with_wifi_oeminfo_mac) {
-      defines += [ "READ_MAC_FROM_OEM" ]
-    }
     if (wifi_feature_network_selection) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
     }

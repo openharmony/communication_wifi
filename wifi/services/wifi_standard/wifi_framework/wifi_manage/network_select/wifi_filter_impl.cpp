@@ -166,8 +166,8 @@ bool DisableWifiFilter::Filter(NetworkCandidate &networkCandidate)
         return false;
     }
     if (!networkCandidate.wifiDeviceConfig.isAllowAutoConnect) {
-    	networkCandidate.filtedReason[filterName].push_back(FiltedReason::NOT_ALLOW_AUTO_CONNECT);
-    	return false;
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NOT_ALLOW_AUTO_CONNECT);
+        return false;
     }
     return true;
 }

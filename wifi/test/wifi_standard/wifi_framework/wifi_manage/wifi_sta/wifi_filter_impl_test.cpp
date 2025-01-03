@@ -299,6 +299,9 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter, TestSize.Level1) {
     networkCandidate2.wifiDeviceConfig.noInternetAccess = 0;
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(1));
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate2));
+}
+
+HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter1, TestSize.Level1) {
     //5g wifi
     InterScanInfo scanInfo4;
     scanInfo4.bssid = "xs";

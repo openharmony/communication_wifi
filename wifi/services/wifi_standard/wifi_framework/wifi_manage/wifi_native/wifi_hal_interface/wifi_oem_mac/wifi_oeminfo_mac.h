@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr int REAL_MACADDR_LENGTH = 18; // length of mac string, eg "11:22:33:44:55:66"
-constexpr int NV_MACADDR_LENGTH = 13; // length of mac string  without ':'
+constexpr int OEMINFO_MACADDR_LENGTH = 13;
+constexpr int UNSIGNED_CHAR_MACADDR_LENGTH = 6;
 class WifiOeminfoMac {
 public:
     enum ErrType {
@@ -36,16 +36,15 @@ public:
     };
     WifiOeminfoMac();
     ~WifiOeminfoMac();
-    int GetOeminfoMac(std::string &constantWifiMac);
+    int GetOeminfoMac(std::string &wifiOemMac);
 
 private:
     bool OpenFacsignedapiLib(void **handler);
     void CloseFacsignedapiLib(void **handler);
-    int WifiOeminfoMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH], void *handler);
-    bool ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
-    bool CharToBeJudged(char c);
-    void MacDataTolower(char (&nvMacBuf)[NV_MACADDR_LENGTH]);
-    int Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destStr)[REAL_MACADDR_LENGTH]);
+    int WifiOeminfoMacFromNv(std::string &macFromOem, void *handler);
+    void MacDataTolower(std::string &macFromOem);
+    bool FormatStrToMac(std::string &macFromOem, const std::string &delimiter);
+    bool CheckCharOfMac(char c);
 
 private:
     using READ_OEMINFO_FUN = int (*) (int, char*, int);

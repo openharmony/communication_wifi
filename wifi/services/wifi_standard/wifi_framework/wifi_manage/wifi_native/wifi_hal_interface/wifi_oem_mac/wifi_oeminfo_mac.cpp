@@ -36,15 +36,15 @@ WifiOeminfoMac::~WifiOeminfoMac()
     WIFI_LOGI("enter ~WifiOeminfoMac");
 }
 
-int WifiOeminfoMac::GetOeminfoMac(std::string &constantWifiMac)
+int WifiOeminfoMac::GetOeminfoMac(std::string &wifiOemMac)
 {
-    constantWifiMac = "";
+    wifiOemMac = "";
     void* handler = nullptr;
     if (!OpenFacsignedapiLib(&handler)) {
         return GET_MAC_ERROR_LOAD_SO_FAIL;
     }
-    char nvMac[NV_MACADDR_LENGTH] = {0};
-    int ret = WifiOeminfoMacFromNv(nvMac, handler);
+    std::string macFromOem;
+    int ret = WifiOeminfoMacFromNv(macFromOem, handler);
     if (ret != GET_MAC_SUCCESS) {
         WIFI_LOGE("mac read from nv fail");
         CloseFacsignedapiLib(&handler);
@@ -52,17 +52,12 @@ int WifiOeminfoMac::GetOeminfoMac(std::string &constantWifiMac)
     }
     CloseFacsignedapiLib(&handler);
 
-    MacDataTolower(nvMac);
-    if (!ValidateAddr(nvMac)) {
-        WIFI_LOGE("mac read from nv is invalid");
+    MacDataTolower(macFromOem);
+    if (!FormatStrToMac(macFromOem, ":")) {
+        WIFI_LOGE("FormatStrToMac fail");
         return GET_MAC_ERROR_MAC_INVALID;
     }
-    char macBuf[REAL_MACADDR_LENGTH];
-    if (Char2Str(nvMac, macBuf) < 0) {
-        WIFI_LOGE("Char2Str fail");
-        return GET_MAC_ERROR_C_TO_STR_FAIL;
-    }
-    constantWifiMac = macBuf;
+    wifiOemMac = macFromOem;
     WIFI_LOGI("get nv mac success");
     return GET_MAC_SUCCESS;
 }
@@ -96,7 +91,7 @@ void WifiOeminfoMac::CloseFacsignedapiLib(void **handler)
     *handler = nullptr;
 }
 
-int WifiOeminfoMac::WifiOeminfoMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH], void *handler)
+int WifiOeminfoMac::WifiOeminfoMacFromNv(std::string &macFromOem, void *handler)
 {
     if (handler == nullptr) {
         return GET_MAC_ERROR_LOAD_SO_FAIL;
@@ -108,50 +103,52 @@ int WifiOeminfoMac::WifiOeminfoMacFromNv(char (&nvMacBuf)[NV_MACADDR_LENGTH], vo
         return GET_MAC_ERROR_DLSYM_FAIL;
     }
 
-    int ret = dlReadOemInfo(PC_NV_PHYNUM_MAC_WIFI_NUMBER, nvMacBuf, NV_MACADDR_LENGTH - 1);
+    char oemMac[OEMINFO_MACADDR_LENGTH] = {0};
+    int ret = dlReadOemInfo(PC_NV_PHYNUM_MAC_WIFI_NUMBER, oemMac, OEMINFO_MACADDR_LENGTH - 1);
     if (ret != 0) {
         WIFI_LOGE("read nv mac fail");
         return GET_MAC_ERROR_READ_NV_FAIL;
     }
 
+    macFromOem = oemMac;
     WIFI_LOGI("read nv mac success");
     return GET_MAC_SUCCESS;
 }
 
-bool WifiOeminfoMac::CharToBeJudged(char c)
+bool WifiOeminfoMac::CheckCharOfMac(char c)
 {
     return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
 }
 
-int WifiOeminfoMac::Char2Str(const char (&srcStr)[NV_MACADDR_LENGTH], char (&destStr)[REAL_MACADDR_LENGTH])
+void WifiOeminfoMac::FormatStrToMac(std::string &macFromOem, const std::string &delimiter)
 {
-    return sprintf_s(destStr, REAL_MACADDR_LENGTH, "%c%c:%c%c:%c%c:%c%c:%c%c:%c%c",
-        srcStr[0], srcStr[1], srcStr[2], srcStr[3], srcStr[4], srcStr[5], // copy nv mac to real mac
-        srcStr[6], srcStr[7], srcStr[8], srcStr[9], srcStr[10], srcStr[11]); // copy nv mac to real mac
-}
-
-void WifiOeminfoMac::MacDataTolower(char (&nvMacBuf)[NV_MACADDR_LENGTH])
-{
-    for (int i = 0; i < NV_MACADDR_LENGTH - 1; i++) {
-        if (nvMacBuf[i] >= 'A' && nvMacBuf[i] <= 'F') {
-            nvMacBuf[i] = std::tolower(nvMacBuf[i]);
-        }
+    if (macFromOem.size() != OEMINFO_MACADDR_LENGTH - 1) {
+        WIFI_LOGE("mac str length is illegal");
+        return false;
     }
-}
 
-bool WifiOeminfoMac::ValidateAddr(char (&nvMacBuf)[NV_MACADDR_LENGTH])
-{
-    int i = 0;
-
-    char c = nvMacBuf[i];
-    while (c != '\0' && i < NV_MACADDR_LENGTH) {
-        if (!CharToBeJudged(c)) {
-            WIFI_LOGE("error mac address from nv, invalid addr number");
+    for (int i = 0; i < OEMINFO_MACADDR_LENGTH - 1; i++) {
+        if (!CheckCharOfMac(macFromOem[i])) {
+            WIFI_LOGE("mac char %{public}c is illegal", macFromOem[i]);
             return false;
         }
-        c = nvMacBuf[++i];
     }
+
+    int byteOfUnsignedChar = 2;
+    for (int i = UNSIGNED_CHAR_MACADDR_LENGTH - 1; i > 0; i--) {
+        macFromOem.insert(byteOfUnsignedChar * i, delimiter);
+    }
+
     return true;
+}
+
+bool WifiOeminfoMac::MacDataTolower(std::string &macFromOem)
+{
+    for (int i = 0; i < OEMINFO_MACADDR_LENGTH - 1; i++) {
+        if (macFromOem[i] >= 'A' && macFromOem[i] <= 'F') {
+            macFromOem[i] = std::tolower(macFromOem[i]);
+        }
+    }
 }
 
 } // Wifi

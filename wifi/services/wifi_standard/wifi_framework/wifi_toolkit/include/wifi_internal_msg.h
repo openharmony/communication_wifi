@@ -116,6 +116,11 @@ enum class OperateResState {
     ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
 };
 
+enum SystemMode : int {
+    M_DEFAULT = 1,
+    M_FACTORY_MODE = 2,
+};
+
 enum ProductDeviceType : int {
     DEFAULT = -1,
     PHONE = 0,

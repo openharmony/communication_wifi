@@ -188,6 +188,7 @@ static WifiErrorCode GetStaListFromCpp(const std::vector<OHOS::Wifi::StationInfo
             return ERROR_WIFI_UNKNOWN;
         }
         result->ipAddress = OHOS::Wifi::Ip2Number(each.ipAddr);
+       ++result;
     }
     return WIFI_SUCCESS;
 }
@@ -207,6 +208,16 @@ NO_SANITIZE("cfi") WifiErrorCode GetStationList(StationInfo *result, unsigned in
             return retValue;
         }
     }
+    return GetCErrorCode(ret);
+}
+
+NO_SANITIZE("cfi") WifiErrorCode GetStationNum(unsigned int *number)
+{
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(number, ERROR_WIFI_INVALID_ARGS);
+    std::vector<OHOS::Wifi::StationInfo> vecStaList;
+    OHOS::Wifi::ErrCode ret = hotspotPtr->GetStationList(vecStaList);
+    *number = (int)vecStaList.size();
     return GetCErrorCode(ret);
 }
 

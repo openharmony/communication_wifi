@@ -59,7 +59,6 @@ ErrCode ApService::EnableHotspot()
             WIFI_LOGE("wifi_settings.hotspotconfig is error.");
             break;
         }
-        m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
         m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
         return ErrCode::WIFI_OPT_SUCCESS;
     } while (0);

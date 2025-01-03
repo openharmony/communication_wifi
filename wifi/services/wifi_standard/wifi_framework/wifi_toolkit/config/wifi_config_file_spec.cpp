@@ -1363,8 +1363,8 @@ static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key
         } else {
             std::string keyTmp = key.substr(strlen(CLIENT_PREFIX_NAME), (pos - strlen(CLIENT_PREFIX_NAME)));
             unsigned long index = static_cast<unsigned long>(CheckDataLegal(keyTmp));
-            if (index < item.GetPersistenDevics().size()) {
-                std::vector<WifiP2pDevice> clients = item.GetPersistenDevics();
+            if (index < item.GetPersistenDevies().size()) {
+                std::vector<WifiP2pDevice> clients = item.GetPersistenDevies();
                 SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value);
                 item.SetPersistentDevices(clients);
             }

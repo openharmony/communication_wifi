@@ -261,12 +261,12 @@ static WifiErrorNo RegistHdfDeathCallBack()
 
 static void RemoveLostCtrl(void)
 {
-    DIR*dir = NULL;
+    DIR *dir = NULL;
     char path(CTRL_LEN);
     struct dirent *entry;
 
     dir = opendir(CONFIG_ROOR_DIR);
-    if(dir == NULL) {
+    if (dir == NULL) {
         LOGE("can not open wifi dir");
         return;
     }

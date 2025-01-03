@@ -302,6 +302,7 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter, TestSize.Level1) {
 }
 
 HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter1, TestSize.Level1) {
+    auto wifiFilter = std::make_shared<NetworkSelection::PoorPortalWifiFilter>();
     //5g wifi
     InterScanInfo scanInfo4;
     scanInfo4.bssid = "xs";

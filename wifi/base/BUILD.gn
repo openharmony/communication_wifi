@@ -21,7 +21,6 @@ if (defined(ohos_lite)) {
 
 local_base_sources = [
   "security_utils/src/wifi_openssl_utils.cpp",
-  "shared_util/wifi_notification_util.cpp",
   "shared_util/wifi_watchdog_utils.cpp",
   "state_machine/src/handler.cpp",
   "state_machine/src/internal_message.cpp",
@@ -104,6 +103,7 @@ if (defined(ohos_lite)) {
       "utils/wifi_app_parser.cpp",
       "utils/wifi_datashare_utils.cpp",
       "utils/xml_parser.cpp",
+      "shared_util/wifi_notification_util.cpp",
     ]
     include_dirs = local_base_include_dirs
     include_dirs += [ "$WIFI_ROOT_DIR/base/utils" ]

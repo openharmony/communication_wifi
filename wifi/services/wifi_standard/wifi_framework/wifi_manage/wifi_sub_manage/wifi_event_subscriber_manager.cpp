@@ -801,7 +801,7 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
     std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("OnReceiveNotificationEvent action[%{public}s]", action.c_str());
     if (action == WIFI_EVENT_TAP_NOTIFICATION) {
-       int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
+        int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
         WIFI_LOGI("notificationId[%{public}d]", notificationId);
         OnReceiveNotificationEvent(notificationId);
     } else if (action == WIFI_EVENT_DIALOG_ACCEPT) {

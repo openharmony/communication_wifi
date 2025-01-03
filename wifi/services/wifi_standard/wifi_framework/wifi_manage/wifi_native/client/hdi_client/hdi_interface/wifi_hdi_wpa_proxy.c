@@ -16,6 +16,7 @@
 #ifdef HDI_WPA_INTERFACE_SUPPORT
 
 #include <dlfcn.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -258,6 +259,33 @@ static WifiErrorNo RegistHdfDeathCallBack()
     return WIFI_HAL_OPT_OK;
 }
 
+static void RemoveLostCtrl(void)
+{
+    DIR*dir = NULL;
+    char path(CTRL_LEN);
+    struct dirent *entry;
+
+    dir = opendir(CONFIG_ROOR_DIR);
+    if(dir == NULL) {
+        LOGE("can not open wifi dir");
+        return;
+    }
+    while ((entry = readdir(dir)) != NULL) {
+        if (strncmp(entry->d_name, "wpa_ctrl_", strlen("wpa_ctrl_")) != 0) {
+            continue;
+        }
+        int ret = sprintf_s(path, sizeof(path), "%s/%s", CONFIG_ROOR_DIR, entry->d_name);
+        if (ret == -1) {
+            LOGE("sprintf_s dir name fail");
+            break;
+        }
+        if (entry->d_type != DT_DIR) {
+            remove(path);
+        }
+    }
+    closedir(dir);
+}
+
 WifiErrorNo HdiWpaStart()
 {
     LOGI("HdiWpaStart start...");
@@ -294,7 +322,7 @@ WifiErrorNo HdiWpaStart()
         LOGE("%{public}s WpaInterfaceGetInstance failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
-
+    RemoveLostCtrl();
     int32_t ret = g_wpaObj->Start(g_wpaObj);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);

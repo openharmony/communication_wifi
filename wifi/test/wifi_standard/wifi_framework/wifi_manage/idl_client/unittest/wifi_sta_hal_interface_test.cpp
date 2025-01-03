@@ -123,7 +123,7 @@ HWTEST_F(WifiStaHalInterfaceTest, GetStaDeviceMacAddressTest, TestSize.Level1)
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 
 #ifdef READ_MAC_FROM_OEM
-    ret = WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName, false);
+    ret = WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName, 1);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 #endif
 }

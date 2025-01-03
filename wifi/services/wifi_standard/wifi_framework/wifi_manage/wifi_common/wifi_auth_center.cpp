@@ -48,7 +48,7 @@ int WifiAuthCenter::Init()
 bool WifiAuthCenter::IsSystemAccess()
 {
     uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
-    bool isSystemApp = Security::AccessToken::AccessTokenKit::sSystemAppByFullTokenID(fullTokenId);
+    bool isSystemApp = Security::AccessToken::AccessTokenKit::IsSystemAppByFullTokenID(fullTokenId);
     uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
     Security::AccessToken::ATokenTypeEnum callingType =
         Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);

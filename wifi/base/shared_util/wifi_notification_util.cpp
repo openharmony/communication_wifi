@@ -98,8 +98,8 @@ void WifiNotificationUtil::DisplaySettingWlanPage()
 {
     WIFI_LOGI("Display setting wlan page");
     AAFwk::Want want;
-    std::string bundleName = "com.huawei.hmos.settings";
-    std::string abilityName = "com.huawei.hmos.settings.MainAbility";
+    std::string bundleName = "com.example.hmos.settings";
+    std::string abilityName = "com.example.hmos.settings.MainAbility";
     std::string navEntryKey = "wifi_entry";
     AppExecFwk::ElementName element("", bundleName, abilityName);
     want.SetElement(element);

@@ -1317,7 +1317,7 @@ ErrCode WifiDeviceServiceImpl::IsMeteredHotspot(bool &bMeteredHotspot)
 
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
-    WIFI_LOGI("%{public}s, connState=%{public}d, detailedState=%{public}d",
+    WIFI_LOGD("%{public}s, connState=%{public}d, detailedState=%{public}d",
         __func__, info.connState, info.detailedState);
     if (info.connState != ConnState::CONNECTED) {
         return WIFI_OPT_FAILED;

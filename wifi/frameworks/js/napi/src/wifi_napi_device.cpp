@@ -1288,7 +1288,7 @@ static void ProxyConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDev
     SetValueInt32(env, "proxyMethod", static_cast<int>(wifiDeviceConfig.wifiProxyconfig.configureMethod), proxyCfgObj);
     switch (wifiDeviceConfig.wifiProxyconfig.configureMethod) {
         case ConfigureProxyMethod::CLOSED:
-            WIFI_LOGI("%{public}s get config method closed", __FUNCTION__);
+            WIFI_LOGD("%{public}s get config method closed", __FUNCTION__);
             break;
         case ConfigureProxyMethod::AUTOCONFIGUE:
             SetValueUtf8String(env, "preSharedKey",

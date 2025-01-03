@@ -56,7 +56,7 @@ public:
      * @param isSupported - Supported / NOT supported
      * @return ErrCode - operation result
      */
-    virtual ErrCode IsHotspotSupported(bool &isSupported) = 0;
+    virtual ErrCode IsOpenSoftApAllowed(bool &isSupported) = 0;
 
     /**
      * @Description Get the Hotspot Config object

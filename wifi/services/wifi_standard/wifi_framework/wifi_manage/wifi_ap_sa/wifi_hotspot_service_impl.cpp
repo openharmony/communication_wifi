@@ -100,20 +100,20 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::IsHotspotSupported(bool &isSupported)
+ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
 {
-    WIFI_LOGI("IsHotspotSupported enter");
+    WIFI_LOGI("IsOpenSoftApAllowed enter");
     if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("IsHotspotSupported:NOT System APP, PERMISSION_DENIED!");
+        WIFI_LOGE("IsOpenSoftApAllowed:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("IsHotspotSupported:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("IsOpenSoftApAllowed:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("IsHotspotSupported:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        WIFI_LOGE("IsOpenSoftApAllowed:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
@@ -133,7 +133,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotSupported(bool &isSupported)
     }
 #ifdef FEATURE_RPT_SUPPORT
     if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
-        WIFI_LOGE("IsHotspotSupported, GetWifiTogglerManager get failed");
+        WIFI_LOGE("IsOpenSoftApAllowed, GetWifiTogglerManager get failed");
         return WIFI_OPT_FAILED;
     }
     auto &wifiControllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
@@ -142,7 +142,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotSupported(bool &isSupported)
         return WIFI_OPT_SUCCESS;
     }
 #endif
-    WIFI_LOGI("IsHotspotSupported: false");
+    WIFI_LOGI("IsOpenSoftApAllowed: false");
     return WIFI_OPT_SUCCESS;
 }
 

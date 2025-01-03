@@ -1255,7 +1255,11 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForStaticIp(int reques
     }
     bool isMultiDhcpServer = isConfigStaticIp4MultiDhcpServer_ ? true : false;
     bool startSelfcure = true;
-    pEnhanceService->GetStaticIpConfig(isMultiDhcpServer, startSelfcure, dhcpResult);
+    if (isMultiDhcpServer) {
+        pEnhanceService->GetStaticIpConfig(isMultiDhcpServer, startSelfcure, dhcpResult);
+    } else {
+        dhcpResult = GetRecordDhcpResults();
+    }
     if (dhcpResult.gateway == 0 || dhcpResult.ipAddress == 0) {
         WIFI_LOGE("%{public}s: dhcpResult is null", __FUNCTION__);
         return;

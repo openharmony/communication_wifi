@@ -16,7 +16,6 @@
 #ifndef OHOS_ARCH_LITE
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
-#include "tokenid_kit.h"
 #endif
 #include "wifi_auth_center.h"
 

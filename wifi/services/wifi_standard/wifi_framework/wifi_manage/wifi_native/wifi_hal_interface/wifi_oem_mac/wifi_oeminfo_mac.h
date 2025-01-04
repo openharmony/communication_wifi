@@ -18,7 +18,9 @@
 
 #include <string>
 #include <dlfcn.h>
+#include <memory>
 #include "securec.h"
+#include "wifi_library_utils.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -39,9 +41,8 @@ public:
     int GetOeminfoMac(std::string &wifiOemMac);
 
 private:
-    bool OpenFacsignedapiLib(void **handler);
-    void CloseFacsignedapiLib(void **handler);
-    int WifiOeminfoMacFromNv(std::string &macFromOem, void *handler);
+    void ClearOpenSsl(std::unique_ptr<WifiLibraryUtils> &libraryUtilsPtr);
+    int WifiOeminfoMacFromNv(std::string &macFromOem, std::unique_ptr<WifiLibraryUtils> &libraryUtilsPtr);
     void MacDataTolower(std::string &macFromOem);
     bool FormatStrToMac(std::string &macFromOem, const std::string &delimiter);
     bool CheckCharOfMac(char c);

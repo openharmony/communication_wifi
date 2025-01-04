@@ -39,18 +39,19 @@ WifiOeminfoMac::~WifiOeminfoMac()
 int WifiOeminfoMac::GetOeminfoMac(std::string &wifiOemMac)
 {
     wifiOemMac = "";
-    void* handler = nullptr;
-    if (!OpenFacsignedapiLib(&handler)) {
+    void* handle = nullptr;
+    auto libraryUtilsPtr = std::make_unique<WifiLibraryUtils>(DLOPEN_LIBFACSIGNEDAPI_PATH, handle, true);
+    if (!libraryUtilsPtr) {
         return GET_MAC_ERROR_LOAD_SO_FAIL;
     }
     std::string macFromOem;
-    int ret = WifiOeminfoMacFromNv(macFromOem, handler);
+    int ret = WifiOeminfoMacFromNv(macFromOem, libraryUtilsPtr);
     if (ret != GET_MAC_SUCCESS) {
         WIFI_LOGE("mac read from nv fail");
-        CloseFacsignedapiLib(&handler);
+        ClearOpenSsl(libraryUtilsPtr);
         return ret;
     }
-    CloseFacsignedapiLib(&handler);
+    ClearOpenSsl(libraryUtilsPtr);
 
     MacDataTolower(macFromOem);
     if (!FormatStrToMac(macFromOem, ":")) {
@@ -62,42 +63,31 @@ int WifiOeminfoMac::GetOeminfoMac(std::string &wifiOemMac)
     return GET_MAC_SUCCESS;
 }
 
-bool WifiOeminfoMac::OpenFacsignedapiLib(void **handler)
+void WifiOeminfoMac::ClearOpenSsl(std::unique_ptr<WifiLibraryUtils> &libraryUtilsPtr)
 {
-    *handler = dlopen(DLOPEN_LIBFACSIGNEDAPI_PATH, RTLD_LAZY);
-    if (*handler == nullptr) {
-        WIFI_LOGE("failed to dlopen libfacsignedapi_share.so, reason %{public}s", dlerror());
-        return false;
-    }
-    return true;
-}
-
-void WifiOeminfoMac::CloseFacsignedapiLib(void **handler)
-{
-    if (*handler == nullptr) {
-        WIFI_LOGE("handler is NULL, no need close");
+    if (libraryUtilsPtr == nullptr) {
+        WIFI_LOGE("handler is NULL, no need clear");
         return;
     }
 
     CLEAR_OPEN_SSL_FUN dlClearOpenSsl =
-        reinterpret_cast<CLEAR_OPEN_SSL_FUN>(dlsym(*handler, CLEAR_SSL_FUNC_NAME));
+        reinterpret_cast<CLEAR_OPEN_SSL_FUN>(libraryUtilsPtr->GetFunction(CLEAR_SSL_FUNC_NAME));
     if (dlClearOpenSsl == nullptr) {
         WIFI_LOGE("failed to dlsym FacStopOpenSSLThread");
         return;
     }
 
     dlClearOpenSsl();
-    dlclose(*handler);
-    *handler = nullptr;
 }
 
-int WifiOeminfoMac::WifiOeminfoMacFromNv(std::string &macFromOem, void *handler)
+int WifiOeminfoMac::WifiOeminfoMacFromNv(std::string &macFromOem, std::unique_ptr<WifiLibraryUtils> &libraryUtilsPtr)
 {
-    if (handler == nullptr) {
+    if (libraryUtilsPtr == nullptr) {
         return GET_MAC_ERROR_LOAD_SO_FAIL;
     }
 
-    READ_OEMINFO_FUN dlReadOemInfo = reinterpret_cast<READ_OEMINFO_FUN>(dlsym(handler, OEM_INFO_FUNC_NAME));
+    READ_OEMINFO_FUN dlReadOemInfo =
+        reinterpret_cast<READ_OEMINFO_FUN>(libraryUtilsPtr->GetFunction(OEM_INFO_FUNC_NAME));
     if (dlReadOemInfo == nullptr) {
         WIFI_LOGE("failed to dlsym ReadSignedValueNvmeOeminfo");
         return GET_MAC_ERROR_DLSYM_FAIL;

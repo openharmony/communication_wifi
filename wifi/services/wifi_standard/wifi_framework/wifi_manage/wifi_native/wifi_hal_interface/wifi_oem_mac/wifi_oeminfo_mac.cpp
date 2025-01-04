@@ -120,7 +120,7 @@ bool WifiOeminfoMac::CheckCharOfMac(char c)
     return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
 }
 
-void WifiOeminfoMac::FormatStrToMac(std::string &macFromOem, const std::string &delimiter)
+bool WifiOeminfoMac::FormatStrToMac(std::string &macFromOem, const std::string &delimiter)
 {
     if (macFromOem.size() != OEMINFO_MACADDR_LENGTH - 1) {
         WIFI_LOGE("mac str length is illegal");
@@ -142,7 +142,7 @@ void WifiOeminfoMac::FormatStrToMac(std::string &macFromOem, const std::string &
     return true;
 }
 
-bool WifiOeminfoMac::MacDataTolower(std::string &macFromOem)
+void WifiOeminfoMac::MacDataTolower(std::string &macFromOem)
 {
     for (int i = 0; i < OEMINFO_MACADDR_LENGTH - 1; i++) {
         if (macFromOem[i] >= 'A' && macFromOem[i] <= 'F') {

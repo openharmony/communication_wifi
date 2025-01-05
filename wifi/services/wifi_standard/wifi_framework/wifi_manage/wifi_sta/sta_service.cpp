@@ -1023,7 +1023,7 @@ ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
 
 std::string StaService::VoWifiDetect(std::string cmd)
 {
-    std::unique_lock<std::shared_mutex> lock(m_voWifiCallbackMutex);
+    std::unique_lock<std::shared_mutex> lock(voWifiCallbackMutex_);
     std::string result = WifiCmdClient::GetInstance().VoWifiDetectInternal(cmd);
     return result;
 }
@@ -1031,7 +1031,7 @@ std::string StaService::VoWifiDetect(std::string cmd)
 VoWifiSignalInfo StaService::FetchWifiSignalInfoForVoWiFi()
 {
     LOGD("Enter FetchWifiSignalInfoForVoWiFi.");
-    VoWifiSignalInfo m_voWifiSignalInfo;
+    VoWifiSignalInfo voWifiSignalInfo;
  
     int linkSpeed = -1;
     int frequency = -1;
@@ -1047,40 +1047,40 @@ VoWifiSignalInfo StaService::FetchWifiSignalInfoForVoWiFi()
     
     linkSpeed = signalInfo.txrate;
     frequency = signalInfo.frequency;
-    rssi = signalInfo.c0Rssi;
+    rssi = signalInfo.signal;
  
     int txPacketCounter = signalInfo.txPackets;
     int nativeTxFailed = signalInfo.txFailed;
     int nativeTxSuccessed = txPacketCounter - nativeTxFailed;
  
     // set rssi
-    m_voWifiSignalInfo.rssi = rssi;
+    voWifiSignalInfo.rssi = rssi;
  
     // set noise
     noise = 0; // stub
-    m_voWifiSignalInfo.noise = noise;
+    voWifiSignalInfo.noise = noise;
  
     // set bler
     int bler = static_cast<int>((static_cast<double>(nativeTxFailed) / static_cast<double>(txPacketCounter)) * 100);
-    m_voWifiSignalInfo.bler = bler;
+    voWifiSignalInfo.bler = bler;
  
     // delta tx packet count
-    int deltaTxPacketCounter = nativeTxSuccessed - mLastTxPktCnt_;
-    mLastTxPktCnt_ = nativeTxSuccessed;
-    m_voWifiSignalInfo.deltaTxPacketCounter = deltaTxPacketCounter;
+    int deltaTxPacketCounter = nativeTxSuccessed - lastTxPktCnt_;
+    lastTxPktCnt_ = nativeTxSuccessed;
+    voWifiSignalInfo.deltaTxPacketCounter = deltaTxPacketCounter;
  
     // access type
     int accessType = ConvertToAccessType(linkSpeed, frequency);
-    m_voWifiSignalInfo.accessType = accessType;
+    voWifiSignalInfo.accessType = accessType;
  
     // reserve
-    m_voWifiSignalInfo.reverse = 0;
+    voWifiSignalInfo.reverse = 0;
  
     // tx successed packet count
-    m_voWifiSignalInfo.txGood = nativeTxSuccessed;
+    voWifiSignalInfo.txGood = nativeTxSuccessed;
  
     // tx fialed packet count
-    m_voWifiSignalInfo.txBad = nativeTxFailed;
+    voWifiSignalInfo.txBad = nativeTxFailed;
  
     // max address
     std::string bssid = linkedInfo.bssid;
@@ -1093,13 +1093,13 @@ VoWifiSignalInfo StaService::FetchWifiSignalInfoForVoWiFi()
     const char* charArray = macStr.data();
     unsigned char* macBytes = reinterpret_cast<unsigned char*>(const_cast<char*>(charArray));
     std::string macAddressStr(reinterpret_cast<char*>(macBytes));
-    m_voWifiSignalInfo.macAddress = macAddressStr;
+    voWifiSignalInfo.macAddress = macAddressStr;
  
     WIFI_LOGI("VoWifiSignalInfo: rssi:%{public}d, nativeTxFailed:%{public}d, nativeTxSuccessed:%{public}d,"
         "deltaTxPacketCounter:%{public}d, linkSpeed:%{public}d, frequency:%{public}d, noise:%{public}d, mac:%{public}s",
         rssi, nativeTxFailed, nativeTxSuccessed, deltaTxPacketCounter, linkSpeed, frequency, noise,
         MacAnonymize(macAddressStr).c_str());
-    return m_voWifiSignalInfo;
+    return voWifiSignalInfo;
 }
  
 int StaService::ConvertToAccessType(int linkSpeed, int frequency)

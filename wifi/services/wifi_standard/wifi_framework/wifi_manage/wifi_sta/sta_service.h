@@ -456,8 +456,8 @@ private:
     int m_instId;
     std::vector<PackageInfo> sta_candidate_trust_list;
     bool m_connMangerStatus = true;
-    std::shared_mutex m_voWifiCallbackMutex;
-    int mLastTxPktCnt_ = 0;
+    std::shared_mutex voWifiCallbackMutex_;
+    int lastTxPktCnt_ = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

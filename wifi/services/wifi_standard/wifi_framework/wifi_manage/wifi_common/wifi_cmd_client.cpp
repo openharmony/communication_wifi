@@ -34,8 +34,6 @@ static const int MSS_BLA_LIST_MAX_PARAMSIZE = 129;
 static const int MSS_BLA_LIST_BUFSIZE = 192;
 static const int TINY_BUFF_SIZE = 64;
 
-const char P2P_INTERFACE_NAME[IFNAMSIZ] = "p2p0";
-
 static const auto RX_LISTEN_ON = "Y";
 static const auto RX_LISTEN_OFF = "N";
 static const auto CMD_SET_RX_LISTEN_ON = "SET_RX_LISTEN_PS_SWITCH 1";
@@ -44,19 +42,6 @@ static const auto CMD_SET_AX_BLA_LIST = "SET_AX_BLACKLIST";
 static const auto CMD_SET_AX_CLOSE_HTC = "SET_AX_CLOSE_HTC";
 static const auto CMD_SET_BE_BLA_LIST = "SET_BE_BLACKLIST";
 static const auto CMD_SET_EMLSR_MODE = "SET_EMLSR_SWITCH";
-
-/* common related interface */
-enum WifiDriverClientResultCode {
-    RET_CODE_SUCCESS = 0,
-    RET_CODE_FAILURE = -1,
-    RET_CODE_NOT_SUPPORT = -2,
-    RET_CODE_INVALID_PARAM = -3,
-    RET_CODE_MISUSE = -4, /* incorrectly API used */
-    RET_CODE_NOT_AVAILABLE = -5,
-    RET_CODE_NOMEM = -6,
-    RET_CODE_DEVICE_BUSY = -16,
-    RET_CODE_NETDOWN = -211,
-};
 
 #define MSS_SOFTAP_MAX_IFNAMESIZE 5
 #define MSS_SOFTAP_CMDSIZE 30
@@ -90,8 +75,9 @@ int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, con
     }
     return ret;
 }
+
 int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
-    const std::string &cmdParm) const
+    const std::string &cmdParm, char *out) const
 {
     int ret = -1;
     if (ifName.size() + 1 > IFNAMSIZ) {
@@ -139,66 +125,22 @@ int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
         WIFI_LOGE("%{public}s ioctl failed, error is: %{public}d.", __FUNCTION__, errno);
     }
     close(sock);
+    if (out != nullptr) {
+        if (memset_s(out, len, 0, len) != EOK) {
+            WIFI_LOGE("%{public}s memset_s cmd fail", __FUNCTION__);
+        }
+        if (memcpy_s(out, len, privCmd.buf, len - 1) != EOK) {
+            WIFI_LOGE("%{public}s memcpy_s cmd fail", __FUNCTION__);
+        }
+    }
     return ret;
 }
 
-int WifiCmdClient::SendCommandToDriverWithReply(const char *cmd, uint32_t len, const char *ifName, char *out)
-{
-    struct ifreq ifr;
-    WifiPrivCmd privCmd = {0};
-    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
-    int32_t ret = RET_CODE_FAILURE;
-    if (cmd == nullptr || len > MAX_PRIV_CMD_SIZE) {
-        WIFI_LOGI("Enter WifiP2pEnhance::SendCommandToDriver cmd Empty OR len too large");
-        return RET_CODE_INVALID_PARAM;
-    }
-    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
-        WIFI_LOGE("Enter WifiP2pEnhance::memset_s EOK");
-        return RET_CODE_FAILURE;
-    }
-    if (memcpy_s(buf, MAX_PRIV_CMD_SIZE, cmd, len) != EOK) {
-        WIFI_LOGE("Enter WifiP2pEnhance::memcpy_s EOK");
-        return RET_CODE_FAILURE;
-    }
-    privCmd.buf = buf;
-    privCmd.size = sizeof(buf);
-    privCmd.len = len;
-    WIFI_LOGI("privCmd.size=%{public}d, privCmd.len=%{public}d", privCmd.size, privCmd.len);
-    ifr.ifr_data = reinterpret_cast<char *>(&privCmd);
-    if (strcpy_s(ifr.ifr_name, IFNAMSIZ, ifName) != EOK) {
-        WIFI_LOGE("Enter WifiP2pEnhance::strcpy_s EOK");
-        return RET_CODE_FAILURE;
-    }
-    int32_t sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) {
-        WIFI_LOGE("Enter WifiP2pEnhance::socket failed ret=%{public}d", ret);
-        return ret;
-    }
-    do {
-        ret = ioctl(sock, SIOCDEVPRIVATE + 1, &ifr);
-        WIFI_LOGI("Enter WifiP2pEnhance::closeGoCac socketid = %{public}d,ret=%{public}d", sock, ret);
-        if (ret < 0) {
-            ret = (errno == EOPNOTSUPP) ? RET_CODE_NOT_SUPPORT : RET_CODE_FAILURE;
-            WIFI_LOGE("Enter WifiP2pEnhance::closeGoCac failed ioctl error ret=%{public}d,error=%{public}s(%{public}d)",
-                ret, strerror(errno), errno);
-            break;
-        }
-    } while (0);
-    close(sock);
-    if (memset_s(out, len, 0, len) != EOK) {
-        WIFI_LOGE("%{public}s memset_s cmd fail", __FUNCTION__);
-    }
-    if (memcpy_s(out, len, privCmd.buf, len - 1) != EOK) {
-        WIFI_LOGE("%{public}s memcpy_s cmd fail", __FUNCTION__);
-    }
-    return ret;
-}
- 
 std::string WifiCmdClient::VoWifiDetectInternal(std::string cmd)
 {
-    const char *cmdBuf = cmd.data();
+    std::string ifName = "wlan0";
     char out[MAX_PRIV_CMD_SIZE] = {};
-    int ret = SendCommandToDriverWithReply(cmdBuf, TINY_BUFF_SIZE, P2P_INTERFACE_NAME, out);
+    int ret = SendCommandToDriverByInterfaceName(ifName, cmd, out);
     if (ret == 0) {
         std::string reply = out;
         return reply;

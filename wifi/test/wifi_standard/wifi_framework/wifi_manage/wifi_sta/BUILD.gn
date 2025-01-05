@@ -26,11 +26,11 @@ config("module_private_config") {
 }
 
 local_base_sources = [
+  "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
   "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
   "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
   "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
   "$WIFI_ROOT_DIR/base/utils/xml_parser.cpp",
-  "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
   "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
   "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/external_wifi_common_builder_manager.cpp",
@@ -93,8 +93,8 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/interface",
   "$WIFI_ROOT_DIR/base/cRPC/include",
   "$WIFI_ROOT_DIR/base/utils",
-  "$WIFI_ROOT_DIR/base/state_machine/include",
   "$WIFI_ROOT_DIR/base/shared_util",
+  "$WIFI_ROOT_DIR/base/state_machine/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
@@ -206,9 +206,9 @@ ohos_unittest("wifi_sta_unittest") {
   include_dirs = local_base_include_dirs
   ldflags = local_base_ldflags
   deps = [
+    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-    "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",

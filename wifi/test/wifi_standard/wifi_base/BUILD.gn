@@ -33,13 +33,13 @@ ohos_unittest("base_unittest") {
     "$WIFI_ROOT_DIR/base/shared_util/wifi_watchdog_utils.cpp",
     "context_test.cpp",
     "hash_table_test.cpp",
+    "mock_wifi_settings.cpp",
     "net_test.cpp",
     "rpc_test_main.cpp",
     "security_utils/wifi_openssl_utils_test.cpp",
     "serial_test.cpp",
     "server_test.cpp",
     "wifi_notification_util_test.cpp",
-    "mock_wifi_settings.cpp",
   ]
 
   defines = [
@@ -67,12 +67,12 @@ ohos_unittest("base_unittest") {
   ]
 
   external_deps = [
+    "ability_runtime:ability_manager",
     "c_utils:utils",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "openssl:libcrypto_shared",
     "openssl:libssl_shared",
-    "ability_runtime:ability_manager",
   ]
   configs = [ ":module_private_config" ]
 

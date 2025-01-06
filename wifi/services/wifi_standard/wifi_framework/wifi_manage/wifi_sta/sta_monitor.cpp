@@ -133,9 +133,9 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         return;
     }
 
-    std::string::size_type begPos = 0;
-    if ((begPos = notifyParam.find(":")) == std::string::npos) {
-        WIFI_LOGI("OnWpaStaNotifyCallBack() notifyParam not find :");
+    std::string::size_type begPos = notifyParam.find(":");
+    if ((begPos == std::string::npos) || (begPos == notifyParam.length() - 1)) {
+        WIFI_LOGI("OnWpaStaNotifyCallBack() notifyParam not find : or : is the last character");
         return;
     }
     std::string type = notifyParam.substr(0, begPos);
@@ -353,21 +353,21 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
         return;
     }
 
-    std::string::size_type begPos = 0;
-    if ((begPos = notifyParam.find(":")) == std::string::npos) {
-        WIFI_LOGE("%{public}s notifyParam not find :", __FUNCTION__);
+    std::string::size_type begPos = notifyParam.find(":");
+    if ((begPos == std::string::npos) || (begPos == notifyParam.length() - 1)) {
+        WIFI_LOGE("%{public}s notifyParam not find : or : is the last character", __FUNCTION__);
         return;
     }
     std::string featureStr = notifyParam.substr(0, begPos);
     std::string notifyParam2 = notifyParam.substr(begPos + 1);
     if (notifyParam2.empty()) {
-        WIFI_LOGE("%{public}s reasonCodeStr is empty", __FUNCTION__);
+        WIFI_LOGE("%{public}s notifyParam2 is empty", __FUNCTION__);
         return;
     }
 
-    std::string::size_type begPos2 = 0;
-    if ((begPos2 = notifyParam2.find(":")) == std::string::npos) {
-        WIFI_LOGE("%{public}s notifyParam2 not find :", __FUNCTION__);
+    std::string::size_type begPos2 = notifyParam2.find(":");
+    if ((begPos2 == std::string::npos) || (begPos2 == notifyParam2.length() - 1)) {
+        WIFI_LOGE("%{public}s notifyParam2 not find : or : is the last character", __FUNCTION__);
         return;
     }
     std::string featureStateStr = notifyParam2.substr(0, begPos2);

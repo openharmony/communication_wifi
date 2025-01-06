@@ -117,7 +117,7 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
     for (auto &config : results) {
         WifiSettings::GetInstance().ClearNetworkCandidateScanResult(config.networkId);
         if (config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED &&
-+            config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE)) {
++            config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE) {
             continue;
         }
         DisablePolicy policy = CalculateDisablePolicy(config.networkSelectionStatus.networkSelectionDisableReason);

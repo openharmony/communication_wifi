@@ -262,7 +262,7 @@ static WifiErrorNo RegistHdfDeathCallBack()
 static void RemoveLostCtrl(void)
 {
     DIR *dir = NULL;
-    char path(CTRL_LEN);
+    char path[CTRL_LEN];
     struct dirent *entry;
 
     dir = opendir(CONFIG_ROOR_DIR);

@@ -183,11 +183,11 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
 #endif
 }
 
-WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const
+WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode, int instId) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqSetPowerSave(mode, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
+    return mHdiWpaClient->ReqSetPowerSave(mode, WifiConfigCenter::GetInstance().GetStaIfaceName(instId).c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqWpaSetPowerMode(!mode);   // idl impl need revese power mode

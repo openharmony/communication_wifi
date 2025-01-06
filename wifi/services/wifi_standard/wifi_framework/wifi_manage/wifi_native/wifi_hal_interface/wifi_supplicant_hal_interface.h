@@ -132,7 +132,7 @@ public:
      *
      * @Return success: WIFI_OPT_SUCCESS, fail: WIFI_OPT_FAILED
      */
-    WifiErrorNo WpaSetPowerMode(bool mode) const;
+    WifiErrorNo WpaSetPowerMode(bool mode, int instId) const;
 
     void NotifyScanResultEvent();
 private:

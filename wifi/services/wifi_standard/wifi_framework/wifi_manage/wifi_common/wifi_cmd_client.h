@@ -43,7 +43,8 @@ public:
     std::string VoWifiDetectInternal(std::string cmd);
 
 private:
-    int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm, char *out = nullptr) const;
+    int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm,
+        char *out = nullptr) const;
     int SetRxListen(const std::string &ifName, const std::string &param) const;
     int Set2gSoftapMss(const std::string &ifName, const std::string &param) const;
     int SetAxBlaList(const std::string &ifName, const std::string &param) const;

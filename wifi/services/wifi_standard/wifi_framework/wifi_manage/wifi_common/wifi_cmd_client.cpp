@@ -126,10 +126,10 @@ int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
     }
     close(sock);
     if (out != nullptr) {
-        if (memset_s(out, len, 0, len) != EOK) {
+        if (memset_s(out, TINY_BUFF_SIZE, 0, TINY_BUFF_SIZE) != EOK) {
             WIFI_LOGE("%{public}s memset_s cmd fail", __FUNCTION__);
         }
-        if (memcpy_s(out, len, privCmd.buf, len - 1) != EOK) {
+        if (memcpy_s(out, TINY_BUFF_SIZE, privCmd.buf, TINY_BUFF_SIZE - 1) != EOK) {
             WIFI_LOGE("%{public}s memcpy_s cmd fail", __FUNCTION__);
         }
     }

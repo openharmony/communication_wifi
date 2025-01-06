@@ -110,6 +110,11 @@ enum Wpa3ConnectFailReason {
     WPA3_FAIL_REASON_MAX
 };
 
+enum class CoFeatureType {
+    COFEATURE_TYPE_MLO = 0,
+    COFEATURE_TYPE_WUR = 1,
+};
+
 typedef enum EnumDhcpReturnCode {
     DHCP_RESULT,
     DHCP_JUMP,

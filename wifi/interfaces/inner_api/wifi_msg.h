@@ -136,12 +136,11 @@ enum ConnState {
 };
 
 enum class MloState {
-    SINGLE_RADIO = 0,
-    WIFI7_MLSR = 1,
-    WIFI7_EMLSR = 2,
-    WIFI7_STR = 3,
-
-    WIFI7_INVALID = 0xFF,
+    WIFI7_LEGACY = 0,
+    WIFI7_SINGLE_LINK = 1,
+    WIFI7_MLSR = 2,
+    WIFI7_EMLSR = 3,
+    WIFI7_STR = 4
 };
 
 enum class DisconnectedReason {
@@ -257,7 +256,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
-        mloState = MloState::SINGLE_RADIO;
+        mloState = MloState::WIFI7_MLSR;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
@@ -897,7 +896,8 @@ struct EapSimUmtsAuthParam {
 };
 
 struct MloStateParam {
-    uint8_t mloState;
+    uint8_t feature;
+    uint8_t state;
     uint16_t reasonCode;
 };
 

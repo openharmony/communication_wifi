@@ -109,11 +109,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
-#define WIFI7_MLO_STATE_SINGLE_RADIO 0x01
-#define WIFI7_MLO_STATE_MLSR 0x02
-#define WIFI7_MLO_STATE_EMLSR 0x04
-#define WIFI7_MLO_STATE_STR 0x08
-#define WIFI7_MLO_STATE_WUR 0x80
+#define WUR_DISABLE 0
+#define WUR_ENABLE 1
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -247,7 +244,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.portalUrl = "";
     linkedInfo.supplicantState = SupplicantState::DISCONNECTED;
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
-    linkedInfo.mloState = MloState::SINGLE_RADIO;
+    linkedInfo.mloState = MloState::WIFI7_MLSR;
     linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     linkedInfo.lastPacketDirection = 0;
     linkedInfo.lastRxPackets = 0;
@@ -728,19 +725,18 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
     MloStateParam param = {0};
     msg->GetMessageObj(param);
 
-    uint8_t state = param.mloState;
+    CoFeatureType feature = static_cast<CoFeatureType>(param.feature);
+    uint8_t state = param.state;
     uint16_t reasonCode = param.reasonCode;
-    if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == WIFI7_MLO_STATE_SINGLE_RADIO) {
-        pStaStateMachine->linkedInfo.mloState = MloState::SINGLE_RADIO;
-    } else if ((state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLO_STATE_MLSR) {
-        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_MLSR;
-    } else if ((state & WIFI7_MLO_STATE_EMLSR) == WIFI7_MLO_STATE_EMLSR) {
-        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_EMLSR;
-    } else if ((state & WIFI7_MLO_STATE_STR) == WIFI7_MLO_STATE_STR) {
-        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_STR;
+    if (feature == CoFeatureType::COFEATURE_TYPE_MLO) {
+        pStaStateMachine->linkedInfo.mloState = static_cast<MloState>(state);
     }
-    if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
-        pStaStateMachine->linkedInfo.isWurEnable = true;
+    if (feature == CoFeatureType::COFEATURE_TYPE_WUR) {
+        if (state == WUR_ENABLE) {
+            pStaStateMachine->linkedInfo.isWurEnable = true;
+        } else {
+            pStaStateMachine->linkedInfo.isWurEnable = false;
+        }
     }
 
     LOGI("DealMloStateChange mloState=%{public}d isWurEnable=%{public}d reasonCode=%{public}u",
@@ -2121,7 +2117,7 @@ void StaStateMachine::LinkedState::DealNetworkCheck(InternalMessagePtr msg)
 
 void StaStateMachine::LinkedState::UpdateWifi7WurInfo()
 {
-    pStaStateMachine->linkedInfo.mloState = MloState::SINGLE_RADIO;
+    pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_MLSR;
     pStaStateMachine->linkedInfo.isWurEnable = false;
 }
 

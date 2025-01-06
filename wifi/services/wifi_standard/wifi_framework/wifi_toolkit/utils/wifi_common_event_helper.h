@@ -46,6 +46,8 @@ inline const std::string COMMON_EVENT_WIFI_SELF_CURE_STATE_CHANGED = "usual.even
 inline const std::string COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION = "ohos.permission.SET_WIFI_CONFIG";
 inline const std::string COMMON_EVENT_GET_WIFI_INFO_PERMISSION = "ohos.permission.GET_WIFI_INFO";
 inline const std::string COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION = "ohos.permission.MANAGE_WIFI_CONNECTION";
+inline const std::string COMMON_EVENT_NOT_AVAILABLE_DIALOG = "event.settings.wlan.close_not_available_dialog";
+inline const int CANCEL_DIAG = 0;
 
 class WifiCommonEventHelper {
 public:
@@ -78,6 +80,7 @@ public:
     static bool PublishP2pCurrentDeviceStateChangedEvent(const int &code, const std::string &data);
     static bool PublishP2pGroupStateChangedEvent(const int &code, const std::string &data);
     static bool PublishSelfcureStateChangedEvent(const int &pid, const int &code, bool isSelfCureOnGoing);
+    static bool PublishNotAvailableDialog();
 };
 }  // namespace Wifi
 }  // namespace OHOS

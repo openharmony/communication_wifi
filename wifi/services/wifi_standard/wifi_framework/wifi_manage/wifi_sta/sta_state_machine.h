@@ -43,6 +43,7 @@
 #include "telephony_errors.h"
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
+#include "wifi_common_event_helper.h"
 #endif
 
 namespace OHOS {
@@ -900,6 +901,7 @@ private:
      * @param networkId - current connected networkId;
      */
     void SaveWifiConfigForUpdate(int networkId);
+    void CloseNoWifiDialog();
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif // OHOS_ARCH_LITE
     bool IsNewConnectionInProgress();
@@ -940,6 +942,7 @@ private:
     bool m_hilinkFlag = false;
     WifiDeviceConfig m_hilinkDeviceConfig;
 #ifndef OHOS_ARCH_LITE
+    bool m_hasNoWifiDialog = false;
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */

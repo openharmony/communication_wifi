@@ -348,24 +348,41 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
         WIFI_LOGE("%{public}s The statemachine pointer is null.", __FUNCTION__);
         return;
     }
+    if (notifyParam.empty()) {
+        WIFI_LOGI("OnWpaMloStateNotifyCallBack() notifyParam is empty");
+        return;
+    }
 
     std::string::size_type begPos = 0;
     if ((begPos = notifyParam.find(":")) == std::string::npos) {
         WIFI_LOGE("%{public}s notifyParam not find :", __FUNCTION__);
         return;
     }
-    std::string mloStateStr = notifyParam.substr(0, begPos);
-    std::string reasonCodeStr = notifyParam.substr(begPos + 1);
+    std::string featureStr = notifyParam.substr(0, begPos);
+    std::string notifyParam2 = notifyParam.substr(begPos + 1);
+    if (notifyParam2.empty()) {
+        WIFI_LOGE("%{public}s reasonCodeStr is empty", __FUNCTION__);
+        return;
+    }
+
+    std::string::size_type begPos2 = 0;
+    if ((begPos2 = notifyParam2.find(":")) == std::string::npos) {
+        WIFI_LOGE("%{public}s notifyParam2 not find :", __FUNCTION__);
+        return;
+    }
+    std::string stateStr = notifyParam2.substr(0, begPos);
+    std::string reasonCodeStr = notifyParam2.substr(begPos + 1);
     if (reasonCodeStr.empty()) {
         WIFI_LOGE("%{public}s reasonCodeStr is empty", __FUNCTION__);
         return;
     }
 
     MloStateParam mloParam = {0};
-    mloParam.mloState = CheckDataToUint(mloStateStr);
+    mloParam.feature = CheckDataToUint(featureStr);
+    mloParam.state = CheckDataToUint(stateStr);
     mloParam.reasonCode = CheckDataToUint(reasonCodeStr);
-    WIFI_LOGI("%{public}s mloState:%{public}u reasonCode:%{public}u", __FUNCTION__,
-        mloParam.mloState, mloParam.reasonCode);
+    WIFI_LOGI("%{public}s feature:%{public}d state:%{public}u reasonCode:%{public}u", __FUNCTION__,
+        mloParam.feature, mloParam.mloState, mloParam.reasonCode);
 
     /* Notify sta state machine mlo state changed event. */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_MLO_WORK_STATE_EVENT, mloParam);

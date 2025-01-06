@@ -425,6 +425,7 @@ public:
 private:
 #ifdef READ_MAC_FROM_OEM
     std::string GetWifiOeminfoMac();
+    std::string wifiOemMac_ = "";
 #endif
 
 private:

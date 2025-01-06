@@ -370,8 +370,8 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
         WIFI_LOGE("%{public}s notifyParam2 not find :", __FUNCTION__);
         return;
     }
-    std::string stateStr = notifyParam2.substr(0, begPos);
-    std::string reasonCodeStr = notifyParam2.substr(begPos + 1);
+    std::string featureStateStr = notifyParam2.substr(0, begPos2);
+    std::string reasonCodeStr = notifyParam2.substr(begPos2 + 1);
     if (reasonCodeStr.empty()) {
         WIFI_LOGE("%{public}s reasonCodeStr is empty", __FUNCTION__);
         return;
@@ -379,10 +379,10 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
 
     MloStateParam mloParam = {0};
     mloParam.feature = CheckDataToUint(featureStr);
-    mloParam.state = CheckDataToUint(stateStr);
+    mloParam.state = CheckDataToUint(featureStateStr);
     mloParam.reasonCode = CheckDataToUint(reasonCodeStr);
     WIFI_LOGI("%{public}s feature:%{public}d state:%{public}u reasonCode:%{public}u", __FUNCTION__,
-        mloParam.feature, mloParam.mloState, mloParam.reasonCode);
+        mloParam.feature, mloParam.state, mloParam.reasonCode);
 
     /* Notify sta state machine mlo state changed event. */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_MLO_WORK_STATE_EVENT, mloParam);

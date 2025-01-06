@@ -150,9 +150,10 @@ WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const 
     LOGI("GetStaDeviceMacAddress oem enter, %{public}d", macSrc);
     if (macSrc == WIFI_OEMINFO_MAC &&
         ifaceName == WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0)) {
-        mac = GetWifiOeminfoMac();
+        mac = wifiOemMac_ == ""? GetWifiOeminfoMac() : wifiOemMac_;
     }
     if (!mac.empty()) {
+        wifiOemMac_ = mac;
         return WIFI_HAL_OPT_OK;
     }
 #endif

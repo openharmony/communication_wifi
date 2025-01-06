@@ -1524,6 +1524,10 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
             .WillRepeatedly(Return(0));
     }
+    void CloseNoWifiDialogTest()
+    {
+        pStaStateMachine-> CloseNoWifiDialog();
+    }
 };
 
 HWTEST_F(StaStateMachineTest, ShouldUseFactoryMacSuccess, TestSize.Level1)
@@ -2319,6 +2323,11 @@ HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7NotMlo, TestSize.
 HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7IsMlo, TestSize.Level1)
 {
     SetSupportedWifiCategoryTestWifi7IsMlo();
+}
+
+HWTEST_F(StaStateMachineTest, CloseNoWifiDialogTest, TestSize.Level1)
+{
+    CloseNoWifiDialogTest();
 }
 
 HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi6, TestSize.Level1)

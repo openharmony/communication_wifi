@@ -2415,9 +2415,11 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
 #ifndef OHOS_ARCH_LITE
     WifiProtectManager::GetInstance().HandleScreenStateChanged(screenState == MODE_STATE_OPEN);
 #endif
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
-        != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("WpaSetSuspendMode failed!");
+    if (m_instId == INSTID_WLAN0) {
+        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
+            != WIFI_HAL_OPT_OK) {
+            WIFI_LOGE("WpaSetSuspendMode failed!");
+        }
     }
     return;
 }
@@ -3105,8 +3107,10 @@ void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
 
 void StaStateMachine::HandlePreDhcpSetup()
 {
-    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false);
-    WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(false);
+    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false, m_instId);
+    if (m_instId == INSTID_WLAN0) {
+        WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(false);
+    }
 }
 
 bool StaStateMachine::IsSpecificNetwork()
@@ -3126,9 +3130,11 @@ bool StaStateMachine::IsSpecificNetwork()
 
 void StaStateMachine::HandlePostDhcpSetup()
 {
-    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true);
-    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-    WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true, m_instId);
+    if (m_instId == INSTID_WLAN0) {
+        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+        WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+    }
 }
 
 WifiDeviceConfig StaStateMachine::getCurrentWifiDeviceConfig()

@@ -901,7 +901,7 @@ private:
      * @param networkId - current connected networkId;
      */
     void SaveWifiConfigForUpdate(int networkId);
-    void CloseNoWifiDialog();
+    void CloseNoInternetDialog();
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif // OHOS_ARCH_LITE
     bool IsNewConnectionInProgress();
@@ -942,7 +942,7 @@ private:
     bool m_hilinkFlag = false;
     WifiDeviceConfig m_hilinkDeviceConfig;
 #ifndef OHOS_ARCH_LITE
-    bool m_hasNoWifiDialog = false;
+    bool hasNoInternetDialog_ = false;
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */

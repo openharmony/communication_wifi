@@ -36,6 +36,7 @@
 #include "arp_checker.h"
 #include "mac_address.h"
 #include "wifi_settings.h"
+#include "p2p_chr_reporter.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -878,6 +879,7 @@ void P2pStateMachine::ChangeConnectedStatus(P2pConnectedState connectedState)
         ClearWifiP2pInfo();
         BroadcastP2pConnectionChanged();
         deviceManager.UpdateAllDeviceStatus(P2pDeviceStatus::PDS_AVAILABLE);
+        P2pChrReporter::GetInstance().UploadP2pChrErrEvent();
     }
     return;
 }

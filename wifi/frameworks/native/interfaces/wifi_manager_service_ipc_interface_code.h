@@ -186,6 +186,7 @@ enum class  P2PInterfaceCode {
     WIFI_CBK_CMD_P2P_GC_JOIN_GROUP = 0x3209,    /* Gc joined group and obtained IP */
     WIFI_CBK_CMD_P2P_GC_LEAVE_GROUP = 0x3210,    /* Gc disconnected */
     WIFI_CBK_CMD_PRIVATE_PEER_CHANGE = 0x3211,
+    WIFI_CBK_CMD_CHR_ERRCODE_REPORT = 0x3212,
 };
 
 /* SAID: 1124 */

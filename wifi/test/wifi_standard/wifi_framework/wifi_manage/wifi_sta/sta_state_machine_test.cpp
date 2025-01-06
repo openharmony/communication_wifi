@@ -1527,7 +1527,7 @@ public:
 
     void CloseNoWifiDialogTest()
     {
-        pStaStateMachine-> CloseNoWifiDialog();
+        pStaStateMachine-> CloseNoInternetDialog();
     }
 };
 
@@ -2341,9 +2341,9 @@ HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7IsMlo, TestSize.Leve
     DealMloConnectionLinkTestWifi7IsMlo();
 }
 
-HWTEST_F(StaStateMachineTest, CloseNoWifiDialogTest, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, CloseNoInternetDialogTest, TestSize.Level1)
 {
-    CloseNoWifiDialogTest();
+    CloseNoInternetDialogTest();
 }
 } // namespace Wifi
 } // namespace OHOS

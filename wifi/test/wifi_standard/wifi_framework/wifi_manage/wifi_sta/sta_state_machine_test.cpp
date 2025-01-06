@@ -1524,6 +1524,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
             .WillRepeatedly(Return(0));
     }
+
     void CloseNoWifiDialogTest()
     {
         pStaStateMachine-> CloseNoWifiDialog();

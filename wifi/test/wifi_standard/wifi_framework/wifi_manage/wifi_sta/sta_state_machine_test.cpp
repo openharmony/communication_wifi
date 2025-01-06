@@ -2325,11 +2325,6 @@ HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestWifi7IsMlo, TestSize.L
     SetSupportedWifiCategoryTestWifi7IsMlo();
 }
 
-HWTEST_F(StaStateMachineTest, CloseNoWifiDialogTest, TestSize.Level1)
-{
-    CloseNoWifiDialogTest();
-}
-
 HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi6, TestSize.Level1)
 {
     DealMloConnectionLinkTestWifi6();
@@ -2343,6 +2338,11 @@ HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7NotMlo, TestSize.Lev
 HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7IsMlo, TestSize.Level1)
 {
     DealMloConnectionLinkTestWifi7IsMlo();
+}
+
+HWTEST_F(StaStateMachineTest, CloseNoWifiDialogTest, TestSize.Level1)
+{
+    CloseNoWifiDialogTest();
 }
 } // namespace Wifi
 } // namespace OHOS

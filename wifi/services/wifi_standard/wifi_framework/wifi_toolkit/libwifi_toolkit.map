@@ -397,6 +397,7 @@
           "OHOS::Wifi::IsStartUpWifiEnableSupport()";
           "OHOS::Wifi::ArpChecker::GetGwMacAddrList(int, bool, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&)";
           "OHOS::Wifi::WifiCommonEventHelper::PublishSelfcureStateChangedEvent(int const&, int const&, bool)";
+          "OHOS::Wifi::WifiCommonEventHelper::PublishNotAvailableDialog()";
           "OHOS::Wifi::WifiSettings::SetP2pDeviceName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
           "OHOS::Wifi::WifiConfigCenter::SetP2pBusinessType(OHOS::Wifi::P2pBusinessType const&)";
           "OHOS::Wifi::HexStringToVec(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<char, std::__h::allocator<char>>&)";

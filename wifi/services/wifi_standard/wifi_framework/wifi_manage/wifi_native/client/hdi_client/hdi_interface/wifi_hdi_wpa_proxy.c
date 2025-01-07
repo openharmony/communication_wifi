@@ -681,7 +681,7 @@ static WifiErrorNo StartApHdi(int id, const char *ifaceName)
     int32_t ret = g_apObj->StartApWithCmd(g_apObj, ifaceName, id);
     if (ret != HDF_SUCCESS) {
         LOGE("%{public}s Start failed: %{public}d", __func__, ret);
-        IHostapdInterfaceGetInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
+        IHostapdInterfaceReleaseInstance(HDI_AP_SERVICE_NAME, g_apObj, false);
         g_apObj = NULL;
         if (g_apDevMgr != NULL) {
             g_apDevMgr->UnloadDevice(g_apDevMgr, HDI_AP_SERVICE_NAME);

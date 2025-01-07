@@ -106,13 +106,6 @@ static WifiErrorCode GetHotspotConfigFromC(const HotspotConfig *config, OHOS::Wi
         return ERROR_WIFI_INVALID_ARGS;
     }
     hotspotConfig.SetIpAddress(config->ipAddress);
-    hotspotConfig.SetMaxConn(config->maxConn);
-    int value = config->leaseTime;
-    if (value < static_cast<int>(DHCP_LEASE_TIME_MIN)) {
-        value = static_cast<int>(DHCP_LEASE_TIME);
-    }
-    hotspotConfig.SetLeaseTime(value);
-    hotspotConfig.SetBandWidth(config->apBandWidth);
     return WIFI_SUCCESS;
 }
 

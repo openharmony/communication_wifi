@@ -270,6 +270,13 @@ private:
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessCmdDecreaseSharedLink(InternalMessagePtr msg) const;
+
+    /**
+     * @Description Process the chr event received by the state machine
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessChrReport(InternalMessagePtr msg) const;
 private:
     using ProcessFun = bool (P2pEnabledState::*)(InternalMessagePtr msg) const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;

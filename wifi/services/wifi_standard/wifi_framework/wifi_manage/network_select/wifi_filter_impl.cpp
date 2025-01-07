@@ -332,7 +332,7 @@ bool PortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
         return false;
     }
     if (!networkCandidate.wifiDeviceConfig.isPortal) {
-        networkCandidate.filtedReason[filterName].push_back(NOT_PORTAL_NETWORK);
+        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NOT_PORTAL_NETWORK);
         return false;
     }
     return true;

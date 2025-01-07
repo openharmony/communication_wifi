@@ -98,6 +98,7 @@ enum class ScanType {
     SCAN_TYPE_PNO,
     SCAN_TYPE_WIFIPRO,
     SCAN_TYPE_5G_AP,
+    SCAN_TYPE_HIDDEN_AP,
 };
 
 enum ScanBandType {

@@ -537,7 +537,6 @@ bool StaInterface::InitStaServiceLocked()
 
 ErrCode StaInterface::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
 {
-    LOGD("Enter FetchWifiSignalInfoForVoWiFi.");
     if (pStaService == nullptr) {
         WIFI_LOGE("pStaService is null.");
         return WIFI_OPT_FAILED;
@@ -548,7 +547,6 @@ ErrCode StaInterface::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
  
 ErrCode StaInterface::IsSupportVoWifiDetect(bool &isSupported)
 {
-    // check is system app
     if (pStaService == nullptr) {
         WIFI_LOGE("pStaService is null.");
         return WIFI_OPT_FAILED;
@@ -604,7 +602,6 @@ ErrCode StaInterface::GetVoWifiDetectPeriod(int &period)
  
 void StaInterface::ProcessVoWifiNetlinkReportEvent(const int type)
 {
-    WIFI_LOGI("Enter ProcessVoWifiNetlinkReportEvent");
     if (type == VDR_VOWIFI_SYNC_REPORT) {
         if (pStaService == nullptr) {
             WIFI_LOGE("pVoWifiService_ is null.");

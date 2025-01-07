@@ -114,6 +114,7 @@ enum class OperateResState {
     ENABLE_SEMI_WIFI_OPENING,               /* enable semi wifi opening */
     ENABLE_SEMI_WIFI_SUCCEED,               /* enable semi wifi succeed */
     ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
+    SCAN_TO_FIND_HIDDEN_NETWOKR,                 /* scan to find hidden network */
 };
 
 enum SystemMode : int {

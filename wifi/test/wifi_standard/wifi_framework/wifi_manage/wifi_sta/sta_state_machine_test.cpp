@@ -1525,7 +1525,7 @@ public:
             .WillRepeatedly(Return(0));
     }
 
-    void CloseNoWifiDialogTest()
+    void CloseNoInternetDialogTest()
     {
         pStaStateMachine-> CloseNoInternetDialog();
     }

@@ -688,6 +688,21 @@
         "OHOS::Wifi::WifiProtectManager::RegisterAppStateObserver()";
         "OHOS::Wifi::WifiProtectManager::OnAppDied(const std::string)";
         "OHOS::Wifi::WifiProtectManager::OnAppForegroudChanged(const std::string &, int)";
+        "OHOS::Wifi::Perf5gHandoverService::Perf5gHandoverService()";
+        "OHOS::Wifi::Perf5gHandoverService::~Perf5gHandoverService()";
+        "OHOS::Wifi::Perf5gHandoverService::NetworkStatusChanged(OHOS::Wifi::NetworkStatus)";
+        "OHOS::Wifi::Perf5gHandoverService::HandleSignalInfoChange(std::__h::shared_ptr<OHOS::Wifi::InternalMessage>)";
+        "OHOS::Wifi::Perf5gHandoverService::ScanResultUpdated(std::__h::vector<OHOS::Wifi::InterScanInfo, std::__h::allocator<OHOS::Wifi::InterScanInfo>>&)";
+        "OHOS::Wifi::Perf5gHandoverService::Switch5g()";
+        "OHOS::Wifi::Perf5gHandoverService::OnConnected(OHOS::Wifi::WifiLinkedInfo&)";
+        "OHOS::Wifi::Perf5gHandoverService::QoeUpdate(std::__h::shared_ptr<OHOS::Wifi::InternalMessage>)";
+        "OHOS::Wifi::Perf5gHandoverService::OnDisconnected()";
+        "OHOS::Wifi::Perf5gHandoverService::Initialize()";
+        "OHOS::Wifi::StrongRssiScanStrategy::StrongRssiScanStrategy()";
+        "OHOS::Wifi::PeriodicScanStrategy::PeriodicScanStrategy()";
+        "OHOS::Wifi::WifiScanController::WifiScanController(std::__h::vector<OHOS::Wifi::IDualBandScanStrategy*, std::__h::allocator<OHOS::Wifi::IDualBandScanStrategy*>>)";
+        "OHOS::Wifi::IsValid5GHz(int)";
+        "OHOS::Wifi::IsValid24GHz(int)";
     };
     local:
         *;

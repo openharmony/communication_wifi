@@ -41,7 +41,7 @@ WifiProService::~WifiProService()
 
 ErrCode WifiProService::InitWifiProService()
 {
-    WIFI_LOGI("Enter InitSelfCureService.");
+    WIFI_LOGI("Enter InitWifiProService.");
     pWifiProStateMachine_ = std::make_shared<WifiProStateMachine>(instId_);
     if (pWifiProStateMachine_ == nullptr) {
         WIFI_LOGE("Alloc WifiProStateMachine failed.");
@@ -103,7 +103,7 @@ void WifiProService::NotifyWifiConnectStateChanged(OperateResState state, const 
     WIFI_LOGI("NotifyWifiConnectStateChanged: ssid:%{public}s, bssid:%{public}s",
         MacAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkedInfo.bssid).c_str());
     pWifiProStateMachine_->SendMessage(EVENT_WIFI_CONNECT_STATE_CHANGED, static_cast<int32_t>(state),
-        linkedInfo.networkId, linkedInfo.bssid);
+        linkedInfo.networkId, linkedInfo);
 }
 
 void WifiProService::NotifyCheckWifiInternetResult(OperateResState state)
@@ -134,15 +134,25 @@ void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfo
     pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
 }
 
-void WifiProService::HandleQoeSlowResult()
+void WifiProService::HandleQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo)
 {
-    WIFI_LOGI("Enter WifiProService::HandleQoeSlowResult.");
     if (pWifiProStateMachine_ == nullptr) {
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
         return;
     }
+    switch (networkLagType) {
+        case NetworkLagType::WIFIPRO_QOE_SLOW:
+            pWifiProStateMachine_->SendMessage(EVENT_QOE_APP_SLOW);
+            break;
+        default:
+            break;
+    }
  
-    pWifiProStateMachine_->SendMessage(EVENT_QOE_APP_SLOW);
+    pWifiProStateMachine_->SendMessage(EVENT_QOE_REPORT, networkLagInfo);
+}
+void WifiProService::HandleWifiHalSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo)
+{
+    pWifiProStateMachine_->SendMessage(EVENT_SIGNAL_INFO_CHANGE, wifiSignalPollInfo);
 }
 }  // namespace Wifi
 }  // namespace OHOS

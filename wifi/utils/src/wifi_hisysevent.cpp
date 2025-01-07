@@ -392,5 +392,9 @@ void Write3VapConflictHisysevent(int type)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_3VAP_CONFLICT", "EVENT_VALUE", writer.write(root));
 }
 
+uint32_t GenerateStandardErrCode(int subSystem, uint16_t errCode)
+{
+    return (WIFI_SYSTEM_ID << SYSTEM_OFFSET | subSystem << SUB_SYSTEM_OFFSET | errCode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

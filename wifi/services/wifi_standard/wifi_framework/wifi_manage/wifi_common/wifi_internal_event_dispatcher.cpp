@@ -941,6 +941,9 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
         case WIFI_CBK_MSG_PRIVATE_PEER_CHANGE:
             callback->OnP2pPrivatePeersChanged(msg.privateWfdInfo);
             break;
+        case WIFI_CBK_MSG_P2P_CHR_ERRCODE_REPORT:
+            callback->OnP2pChrErrCodeReport(msg.errCode);
+            break;
         default:
             FreecfgInfo(msg.cfgInfo);
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);

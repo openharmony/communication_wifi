@@ -28,6 +28,11 @@
 #define SOFTAP_MOUDLE_EVENT 0
 #define STA_MOUDLE_EVENT 1
 
+#define WIFI_SYSTEM_ID 202
+#define P2P_SUB_SYSTEM_ID 2
+#define SYSTEM_OFFSET 21
+#define SUB_SYSTEM_OFFSET 16
+
 namespace OHOS {
 namespace Wifi {
 enum class WifiOperType {
@@ -154,6 +159,8 @@ void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, time_t connTi
 void WriteWifiSelfcureHisysevent(int type);
 
 void Write3VapConflictHisysevent(int type);
+
+uint32_t GenerateStandardErrCode(int subSystem, uint16_t errCode);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

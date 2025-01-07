@@ -44,7 +44,7 @@ HiddenWifiFilter::HiddenWifiFilter() : SimpleWifiFilter("notHidden") {}
 HiddenWifiFilter::~HiddenWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGD("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -65,7 +65,7 @@ SignalStrengthWifiFilter::SignalStrengthWifiFilter(): SimpleWifiFilter("notSigna
 SignalStrengthWifiFilter::~SignalStrengthWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGD("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
     }
@@ -87,7 +87,7 @@ SavedWifiFilter::SavedWifiFilter() : SimpleWifiFilter("savedWifiFilter") {}
 SavedWifiFilter::~SavedWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -132,7 +132,7 @@ PassPointWifiFilter::PassPointWifiFilter() : SimpleWifiFilter("notPassPoint") {}
 PassPointWifiFilter::~PassPointWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -153,7 +153,7 @@ DisableWifiFilter::DisableWifiFilter() : SimpleWifiFilter("enableWifi") {}
 DisableWifiFilter::~DisableWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -177,7 +177,7 @@ MatchedUserSelectBssidWifiFilter::MatchedUserSelectBssidWifiFilter() : SimpleWif
 MatchedUserSelectBssidWifiFilter::~MatchedUserSelectBssidWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -200,7 +200,7 @@ HasInternetWifiFilter::HasInternetWifiFilter() : SimpleWifiFilter("hasInternet")
 HasInternetWifiFilter::~HasInternetWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -236,7 +236,7 @@ RecoveryWifiFilter::RecoveryWifiFilter() : SimpleWifiFilter("recovery") {}
 RecoveryWifiFilter::~RecoveryWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -271,7 +271,7 @@ PoorPortalWifiFilter::PoorPortalWifiFilter() : SimpleWifiFilter("notPoorPortal")
 PoorPortalWifiFilter::~PoorPortalWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -315,7 +315,7 @@ PortalWifiFilter::PortalWifiFilter() : SimpleWifiFilter("portalWifiFilter") {}
 PortalWifiFilter::~PortalWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -343,7 +343,7 @@ MaybePortalWifiFilter::MaybePortalWifiFilter() : SimpleWifiFilter("maybePortal")
 MaybePortalWifiFilter::~MaybePortalWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -374,7 +374,7 @@ NoInternetWifiFilter::NoInternetWifiFilter() : SimpleWifiFilter("noInternet") {}
 NoInternetWifiFilter::~NoInternetWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }
@@ -395,7 +395,7 @@ WeakAlgorithmWifiFilter::WeakAlgorithmWifiFilter() : SimpleWifiFilter("noWeakAlg
 WeakAlgorithmWifiFilter::~WeakAlgorithmWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }

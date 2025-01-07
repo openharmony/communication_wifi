@@ -295,12 +295,14 @@ WifiErrorNo HdiWpaStart()
         LOGI("%{public}s wpa hdi already started", __func__);
         return WIFI_HAL_OPT_OK;
     }
+
     g_devMgr = HDIDeviceManagerGet();
     if (g_devMgr == NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s HDIDeviceManagerGet failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
+
     HDF_STATUS retDevice = g_devMgr->LoadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
     if (retDevice == HDF_ERR_DEVICE_BUSY) {
         LOGE("%{public}s LoadDevice busy: %{public}d", __func__, retDevice);
@@ -311,6 +313,7 @@ WifiErrorNo HdiWpaStart()
         LOGE("%{public}s LoadDevice failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
+
     g_wpaObj = IWpaInterfaceGetInstance(HDI_WPA_SERVICE_NAME, false);
     if (g_wpaObj == NULL) {
         if (g_devMgr != NULL) {
@@ -322,6 +325,7 @@ WifiErrorNo HdiWpaStart()
         LOGE("%{public}s WpaInterfaceGetInstance failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
+
     RemoveLostCtrl();
     int32_t ret = g_wpaObj->Start(g_wpaObj);
     if (ret != HDF_SUCCESS) {
@@ -336,6 +340,7 @@ WifiErrorNo HdiWpaStart()
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_HAL_OPT_FAILED;
     }
+    
     RegistHdfDeathCallBack();
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("HdiWpaStart start success!");

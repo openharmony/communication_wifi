@@ -177,6 +177,7 @@ public:
         void UpdateCountryCode(InternalMessagePtr msg);
         bool AllowAutoConnect();
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
+        bool NotExistInScanList(WifiDeviceConfig &config);
         StaStateMachine *pStaStateMachine;
     };
 

@@ -494,6 +494,14 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         WIFI_LOGI("SupplicantState is TransientState, refuse auto connect");
         return;
     }
+
+    if (config.hiddenSSID && NotExistInScanList(config)) {
+        pStaStateMachine->InvokeOnStaConnChanged(
+            OperateResState::CONNECT_MISS_MATCH, pStaStateMachine->linkedInfo);
+        WifiSettings::GetInstance().SetUserConnectChoice(networkId);
+        return;
+    }
+    
     if (pStaStateMachine->StartConnectToNetwork(networkId, bssid, connTriggerMode) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to network failed: %{public}d.\n", networkId);
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::FAILED);
@@ -506,6 +514,23 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
     return;
 }
 
+bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
+{
+    WIFI_LOGI("NotExistInScanList, networkId = %{public}d, ssid = %{public}s, km = %{public}s.",
+        config.networkId, SsidAnonymize(config.ssid).c_str(), (config.keyMgmt).c_str());
+    std::vector<WifiScanInfo> scanInfoList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
+    std::string scanMgmt = "";
+    for (auto item : scanInfoList) {
+        item.GetDeviceMgmt(scanMgmt);
+        if (((scanMgmt.compare("WPA-PSK+SAE") == 0) && item.ssid == config.ssid &&
+            (scanMgmt.find(config.keyMgmt) != std::string::npos)) ||
+            (item.ssid == config.ssid && scanMgmt == config.keyMgmt)) {
+                return false;
+        }
+    }
+    return true;
+}
 /* --------------------------- state machine link State ------------------------------ */
 StaStateMachine::LinkState::LinkState(StaStateMachine *staStateMachine)
     : State("LinkState"), pStaStateMachine(staStateMachine)

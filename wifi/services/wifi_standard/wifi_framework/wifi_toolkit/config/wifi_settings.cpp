@@ -312,7 +312,7 @@ void WifiSettings::SetUserConnectChoice(int networkId)
             }
             continue;
         }
-        if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+        if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection || config.hiddenSSID) {
             LOGI("%{public}s add select net:%{public}d set time:%{public}ld to net:%{public}d with ssid:%{public}s",
                 __FUNCTION__, selectConfig.networkId, currentTime, config.networkId,
                 SsidAnonymize(config.ssid).c_str());

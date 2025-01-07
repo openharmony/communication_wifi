@@ -17,6 +17,32 @@
 
 namespace OHOS::Wifi::NetworkSelection {
 
+std::map<FiltedReason, std::string> filtReasonToString = {
+    {FiltedReason::UNKNOW, "UNKNOW"},
+    {FiltedReason::HIDDEN_NETWORK, "HIDDEN_NETWORK"},
+    {FiltedReason::OPEN_NETWORK, "OPEN_NETWORK"},
+    {FiltedReason::NOT_OPEN_NETWORK, "NOT_OPEN_NETWORK"},
+    {FiltedReason::WEAK_ALGORITHM_WEP_SECURITY, "WEAK_ALGORITHM_WEP_SECURITY"},
+    {FiltedReason::WEAK_ALGORITHM_WPA_SECURITY, "WEAK_ALGORITHM_WPA_SECURITY"},
+    {FiltedReason::HAS_NETWORK_HISTORY, "HAS_NETWORK_HISTORY"},
+    {FiltedReason::PORTAL_NETWORK, "PORTAL_NETWORK"},
+    {FiltedReason::NOT_PORTAL_NETWORK, "NOT_PORTAL_NETWORK"},
+    {FiltedReason::OWE_NETWORK, "OWE_NETWORK"},
+    {FiltedReason::UNRECOVERABLE_NETWORK, "UNRECOVERABLE_NETWORK"},
+    {FiltedReason::NETWORK_STATUS_DISABLE, "NETWORK_STATUS_DISABLE"},
+    {FiltedReason::UNEXPECTED_NETWORK_BY_USER, "UNEXPECTED_NETWORK_BY_USER"},
+    {FiltedReason::NO_INTERNET, "NO_INTERNET"},
+    {FiltedReason::HAS_INTERNET, "HAS_INTERNET"},
+    {FiltedReason::NETWORK_ID_INVALID, "NETWORK_ID_INVALID"},
+    {FiltedReason::NOT_SYSTEM_NETWORK, "NOT_SYSTEM_NETWORK"},
+    {FiltedReason::TIME_INVALID, "TIME_INVALID"},
+    {FiltedReason::EPHEMERAL_NETWORK, "EPHEMERAL_NETWORK"},
+    {FiltedReason::PASSPOINT_NETWORK, "PASSPOINT_NETWORK"},
+    {FiltedReason::POOR_SIGNAL, "POOR_SIGNAL"},
+    {FiltedReason::TIMEOUT_AND_NEED_RECHECK, "TIMEOUT_AND_NEED_RECHECK"},
+    {FiltedReason::NOT_ALLOW_AUTO_CONNECT, "NOT_ALLOW_AUTO_CONNECT"},
+};
+
 std::string NetworkCandidate::ToString(const std::string &filterName) const
 {
     std::stringstream networkCandidateInfo;
@@ -36,7 +62,7 @@ std::string NetworkCandidate::ToString(const std::string &filterName) const
     }
     networkCandidateInfo << "_";
     for (const auto &reason: reasons) {
-        networkCandidateInfo << reason << "&";
+        networkCandidateInfo << filtReasonToString[reason] << "&";
     }
     std::string candidateInfoStr = networkCandidateInfo.str();
     candidateInfoStr.erase(candidateInfoStr.size() - 1);

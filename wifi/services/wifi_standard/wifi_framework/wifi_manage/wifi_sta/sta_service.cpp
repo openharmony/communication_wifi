@@ -1030,9 +1030,8 @@ std::string StaService::VoWifiDetect(std::string cmd)
  
 VoWifiSignalInfo StaService::FetchWifiSignalInfoForVoWiFi()
 {
-    LOGD("Enter FetchWifiSignalInfoForVoWiFi.");
     VoWifiSignalInfo voWifiSignalInfo;
- 
+
     int linkSpeed = -1;
     int frequency = -1;
     int rssi = -1;
@@ -1095,9 +1094,9 @@ VoWifiSignalInfo StaService::FetchWifiSignalInfoForVoWiFi()
     std::string macAddressStr(reinterpret_cast<char*>(macBytes));
     voWifiSignalInfo.macAddress = macAddressStr;
  
-    WIFI_LOGI("VoWifiSignalInfo: rssi:%{public}d, nativeTxFailed:%{public}d, nativeTxSuccessed:%{public}d,"
-        "deltaTxPacketCounter:%{public}d, linkSpeed:%{public}d, frequency:%{public}d, noise:%{public}d, mac:%{public}s",
-        rssi, nativeTxFailed, nativeTxSuccessed, deltaTxPacketCounter, linkSpeed, frequency, noise,
+    WIFI_LOGI("rssi:%{public}d, nativeTxFailed:%{public}d, nativeTxSuccessed:%{public}d,"
+        "deltaTxPacketCounter:%{public}d, linkSpeed:%{public}d, frequency:%{public}d, mac:%{public}s",
+        rssi, nativeTxFailed, nativeTxSuccessed, deltaTxPacketCounter, linkSpeed, frequency,
         MacAnonymize(macAddressStr).c_str());
     return voWifiSignalInfo;
 }
@@ -1110,9 +1109,8 @@ int StaService::ConvertToAccessType(int linkSpeed, int frequency)
  
 void StaService::ProcessSetVoWifiDetectMode(WifiDetectConfInfo info)
 {
-    WIFI_LOGI("Enter ProcessSetVoWifiDetectMode: set VoWifi detect mode: %{public}d", info.wifiDetectMode);
     bool ret = false;
- 
+
     if (info.wifiDetectMode == WIFI_DETECT_MODE_LOW) {
         ret = VoWifiDetectSet("LOW_THRESHOLD " + std::to_string(info.threshold));
     } else if (info.wifiDetectMode == WIFI_DETECT_MODE_HIGH) {
@@ -1125,12 +1123,11 @@ void StaService::ProcessSetVoWifiDetectMode(WifiDetectConfInfo info)
         ret = VoWifiDetectSet("MODE " + std::to_string(info.wifiDetectMode));
     }
  
-    WIFI_LOGI("set VoWifi detect mode result: %{public}d.", ret);
+    WIFI_LOGI("set VoWifi detect mode: %{public}d, result: %{public}d.", info.wifiDetectMode, ret);
 }
  
 void StaService::ProcessSetVoWifiDetectPeriod(int period)
 {
-    WIFI_LOGI("Enter ProcessSetVoWifiDetectPeriod: set VoWifiDetect Period %{public}d", period);
     bool ret = VoWifiDetectSet("PERIOD " + std::to_string(period));
     WIFI_LOGI("Set VoWifi Detect Period result: %{public}d, period = %{public}d", ret, period);
 }

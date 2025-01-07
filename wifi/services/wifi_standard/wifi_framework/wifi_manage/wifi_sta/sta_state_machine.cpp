@@ -434,6 +434,9 @@ void StaStateMachine::InitState::StopWifiProcess()
     if (pStaStateMachine->m_NetWorkState != nullptr) {
         pStaStateMachine->m_NetWorkState->StopNetStateObserver(pStaStateMachine->m_NetWorkState);
     }
+    if (pStaStateMachine->hasNoInternetDialog_) {
+        pStaStateMachine->CloseNoInternetDialog();
+    }
 #endif
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
 }
@@ -626,6 +629,11 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
     
     pStaStateMachine->mIsWifiInternetCHRFlag = false;
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->hasNoInternetDialog_) {
+        pStaStateMachine->CloseNoInternetDialog();
+    }
+#endif
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
@@ -1801,6 +1809,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         UpdateAcceptUnvalidatedState();
         WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+        if (hasNoInternetDialog_) {
+            CloseNoInternetDialog();
+        }
 #endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         WifiLinkedInfo linkedInfo;
@@ -1928,6 +1939,7 @@ void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
         if (!hasNet) {
             /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
             WifiNotificationUtil::GetInstance().ShowSettingsDialog(WifiDialogType::CDD, settings);
+            hasNoInternetDialog_ = true;
         }
         WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
         WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);
@@ -1950,6 +1962,14 @@ void StaStateMachine::UpdateAcceptUnvalidatedState()
 }
 #endif
 
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::CloseNoInternetDialog()
+{
+    bool sendsuccess = WifiCommonEventHelper::PublishNotAvailableDialog();
+    hasNoInternetDialog_ = false;
+    WIFI_LOGI("Notification cancellation SettingsDialog is %{public}d", sendsuccess);
+}
+#endif
 /* --------------------------- state machine Connected State ------------------------------ */
 StaStateMachine::LinkedState::LinkedState(StaStateMachine *staStateMachine)
     : State("LinkedState"), pStaStateMachine(staStateMachine)

@@ -109,11 +109,8 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
-#define WIFI7_MLO_STATE_SINGLE_RADIO 0x01
-#define WIFI7_MLO_STATE_MLSR 0x02
-#define WIFI7_MLO_STATE_EMLSR 0x04
-#define WIFI7_MLO_STATE_STR 0x08
-#define WIFI7_MLO_STATE_WUR 0x80
+#define WUR_DISABLE 0
+#define WUR_ENABLE 1
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -247,7 +244,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.portalUrl = "";
     linkedInfo.supplicantState = SupplicantState::DISCONNECTED;
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
-    linkedInfo.mloState = MloState::SINGLE_RADIO;
+    linkedInfo.mloState = MloState::WIFI7_MLSR;
     linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     linkedInfo.lastPacketDirection = 0;
     linkedInfo.lastRxPackets = 0;
@@ -436,6 +433,9 @@ void StaStateMachine::InitState::StopWifiProcess()
     WifiNetAgent::GetInstance().UnregisterNetSupplier(pStaStateMachine->m_instId);
     if (pStaStateMachine->m_NetWorkState != nullptr) {
         pStaStateMachine->m_NetWorkState->StopNetStateObserver(pStaStateMachine->m_NetWorkState);
+    }
+    if (pStaStateMachine->hasNoInternetDialog_) {
+        pStaStateMachine->CloseNoInternetDialog();
     }
 #endif
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
@@ -629,6 +629,11 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
     
     pStaStateMachine->mIsWifiInternetCHRFlag = false;
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->hasNoInternetDialog_) {
+        pStaStateMachine->CloseNoInternetDialog();
+    }
+#endif
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
@@ -650,6 +655,8 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->InitWifiLinkedInfo();
         pStaStateMachine->StopDhcp();
         WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
+        pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
+            pStaStateMachine->linkedInfo);
     }
     return;
 }
@@ -726,19 +733,18 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
     MloStateParam param = {0};
     msg->GetMessageObj(param);
 
-    uint8_t state = param.mloState;
+    CoFeatureType feature = static_cast<CoFeatureType>(param.feature);
+    uint8_t state = param.state;
     uint16_t reasonCode = param.reasonCode;
-    if ((state & WIFI7_MLO_STATE_SINGLE_RADIO) == WIFI7_MLO_STATE_SINGLE_RADIO) {
-        pStaStateMachine->linkedInfo.mloState = MloState::SINGLE_RADIO;
-    } else if ((state & WIFI7_MLO_STATE_MLSR) == WIFI7_MLO_STATE_MLSR) {
-        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_MLSR;
-    } else if ((state & WIFI7_MLO_STATE_EMLSR) == WIFI7_MLO_STATE_EMLSR) {
-        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_EMLSR;
-    } else if ((state & WIFI7_MLO_STATE_STR) == WIFI7_MLO_STATE_STR) {
-        pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_STR;
+    if (feature == CoFeatureType::COFEATURE_TYPE_MLO) {
+        pStaStateMachine->linkedInfo.mloState = static_cast<MloState>(state);
     }
-    if ((state & WIFI7_MLO_STATE_WUR) == WIFI7_MLO_STATE_WUR) {
-        pStaStateMachine->linkedInfo.isWurEnable = true;
+    if (feature == CoFeatureType::COFEATURE_TYPE_WUR) {
+        if (state == WUR_ENABLE) {
+            pStaStateMachine->linkedInfo.isWurEnable = true;
+        } else {
+            pStaStateMachine->linkedInfo.isWurEnable = false;
+        }
     }
 
     LOGI("DealMloStateChange mloState=%{public}d isWurEnable=%{public}d reasonCode=%{public}u",
@@ -1803,6 +1809,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         UpdateAcceptUnvalidatedState();
         WifiNotificationUtil::GetInstance().CancelWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+        if (hasNoInternetDialog_) {
+            CloseNoInternetDialog();
+        }
 #endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         WifiLinkedInfo linkedInfo;
@@ -1917,7 +1926,8 @@ void StaStateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig 
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
 {
-    if (IsFactoryMode() || !WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+    if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE
+        || !WifiConfigCenter::GetInstance().IsAllowPopUp()) {
         WIFI_LOGI("factory version or device type no need to pop up diag");
         return;
     }
@@ -1929,6 +1939,7 @@ void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
         if (!hasNet) {
             /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
             WifiNotificationUtil::GetInstance().ShowSettingsDialog(WifiDialogType::CDD, settings);
+            hasNoInternetDialog_ = true;
         }
         WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
         WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);
@@ -1951,6 +1962,14 @@ void StaStateMachine::UpdateAcceptUnvalidatedState()
 }
 #endif
 
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::CloseNoInternetDialog()
+{
+    bool sendsuccess = WifiCommonEventHelper::PublishNotAvailableDialog();
+    hasNoInternetDialog_ = false;
+    WIFI_LOGI("Notification cancellation SettingsDialog is %{public}d", sendsuccess);
+}
+#endif
 /* --------------------------- state machine Connected State ------------------------------ */
 StaStateMachine::LinkedState::LinkedState(StaStateMachine *staStateMachine)
     : State("LinkedState"), pStaStateMachine(staStateMachine)
@@ -2118,7 +2137,7 @@ void StaStateMachine::LinkedState::DealNetworkCheck(InternalMessagePtr msg)
 
 void StaStateMachine::LinkedState::UpdateWifi7WurInfo()
 {
-    pStaStateMachine->linkedInfo.mloState = MloState::SINGLE_RADIO;
+    pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_MLSR;
     pStaStateMachine->linkedInfo.isWurEnable = false;
 }
 
@@ -2412,9 +2431,11 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
 #ifndef OHOS_ARCH_LITE
     WifiProtectManager::GetInstance().HandleScreenStateChanged(screenState == MODE_STATE_OPEN);
 #endif
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
-        != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("WpaSetSuspendMode failed!");
+    if (m_instId == INSTID_WLAN0) {
+        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE)
+            != WIFI_HAL_OPT_OK) {
+            WIFI_LOGE("WpaSetSuspendMode failed!");
+        }
     }
     return;
 }
@@ -2826,6 +2847,8 @@ void StaStateMachine::DhcpResultNotify::OnFailedDhcpResult(int status, const cha
 void StaStateMachine::DhcpResultNotify::DealDhcpResultFailed()
 {
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
+        DisabledReason::DISABLED_DHCP_FAILURE);
 
     WIFI_LOGI("DhcpResultNotify OnFailed type: %{public}d, sucNum: %{public}d, failNum: %{public}d",
         pStaStateMachine->currentTpType, pStaStateMachine->getIpSucNum, pStaStateMachine->getIpFailNum);
@@ -3100,8 +3123,10 @@ void StaStateMachine::SaveWifiConfigForUpdate(int networkId)
 
 void StaStateMachine::HandlePreDhcpSetup()
 {
-    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false);
-    WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(false);
+    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false, m_instId);
+    if (m_instId == INSTID_WLAN0) {
+        WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(false);
+    }
 }
 
 bool StaStateMachine::IsSpecificNetwork()
@@ -3121,9 +3146,11 @@ bool StaStateMachine::IsSpecificNetwork()
 
 void StaStateMachine::HandlePostDhcpSetup()
 {
-    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true);
-    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-    WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+    WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true, m_instId);
+    if (m_instId == INSTID_WLAN0) {
+        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+        WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+    }
 }
 
 WifiDeviceConfig StaStateMachine::getCurrentWifiDeviceConfig()

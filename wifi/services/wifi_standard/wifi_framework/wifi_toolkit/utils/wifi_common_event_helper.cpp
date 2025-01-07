@@ -196,6 +196,11 @@ bool WifiCommonEventHelper::PublishP2pGroupStateChangedEvent(const int &code, co
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED, code, data);
 }
 
+bool WifiCommonEventHelper::PublishNotAvailableDialog()
+{
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_NOT_AVAILABLE_DIALOG, CANCEL_DIAG, "NotAvailableDialog");
+}
+
 bool WifiCommonEventHelper::PublishSelfcureStateChangedEvent(const int &pid, const int &code, bool isSelfCureOnGoing)
 {
 #ifndef OHOS_ARCH_LITE

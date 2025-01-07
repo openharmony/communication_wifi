@@ -53,7 +53,7 @@ public:
      * @param isSupported - Supported / NOT Supported
      * @return ErrCode - operation result
      */
-    ErrCode IsHotspotSupported(bool &isSupported) override;
+    ErrCode IsOpenSoftApAllowed(bool &isSupported) override;
 
     /**
      * @Description Get the Hotspot Config object

@@ -60,6 +60,7 @@ WifiManager::~WifiManager()
 int WifiManager::Init()
 {
     std::unique_lock<std::mutex> lock(initStatusMutex);
+    WifiConfigCenter::GetInstance().SetSystemMode(IsFactoryMode() ? SystemMode::M_FACTORY_MODE : SystemMode::M_DEFAULT);
 #ifndef OHOS_ARCH_LITE
     WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
 #endif
@@ -114,7 +115,9 @@ int WifiManager::Init()
         }
     }
     int lastState = WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0);
-    if (lastState != WIFI_STATE_DISABLED && !IsFactoryMode()) { /* Automatic startup upon startup */
+    if (lastState != WIFI_STATE_DISABLED
+        && WifiConfigCenter::GetInstance().GetSystemMode() != SystemMode::M_FACTORY_MODE) {
+        /* Automatic startup upon startup */
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
         WifiConfigCenter::GetInstance().SetWifiToggledState(lastState, INSTID_WLAN0);
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
@@ -405,6 +408,10 @@ std::unique_ptr<WifiMultiVapManager>& WifiManager::GetWifiMultiVapManager()
 #ifdef FEATURE_HPF_SUPPORT
 void WifiManager::InstallPacketFilterProgram(int event, int instId)
 {
+    if (instId == INSTID_WLAN1) {
+        WIFI_LOGD("instdId: %{public}d, %{public}s only support filter wlan0", instId, __FUNCTION__);
+        return;
+    }
     WIFI_LOGD("%{public}s enter event: %{public}d, instId: %{public}d", __FUNCTION__, event, instId);
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
@@ -414,7 +421,7 @@ void WifiManager::InstallPacketFilterProgram(int event, int instId)
     // fill mac address arr
     unsigned char macAddr[WIFI_MAC_LEN] = {0};
     std::string macStr;
-    WifiSettings::GetInstance().GetRealMacAddress(macStr, instId);
+    WifiConfigCenter::GetInstance().GetMacAddress(macStr, instId);
     WIFI_LOGD("%{public}s convert mac from str to arr success, macStr: %{public}s",
         __FUNCTION__, OHOS::Wifi::MacAnonymize(macStr).c_str());
     if (OHOS::Wifi::MacStrToArray(macStr, macAddr) != EOK) {

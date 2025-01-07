@@ -1524,6 +1524,11 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
             .WillRepeatedly(Return(0));
     }
+
+    void CloseNoInternetDialogTest()
+    {
+        pStaStateMachine-> CloseNoInternetDialog();
+    }
 };
 
 HWTEST_F(StaStateMachineTest, ShouldUseFactoryMacSuccess, TestSize.Level1)
@@ -2334,6 +2339,11 @@ HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7NotMlo, TestSize.Lev
 HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7IsMlo, TestSize.Level1)
 {
     DealMloConnectionLinkTestWifi7IsMlo();
+}
+
+HWTEST_F(StaStateMachineTest, CloseNoInternetDialogTest, TestSize.Level1)
+{
+    CloseNoInternetDialogTest();
 }
 } // namespace Wifi
 } // namespace OHOS

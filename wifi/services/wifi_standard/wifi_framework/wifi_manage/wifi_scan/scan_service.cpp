@@ -1404,6 +1404,10 @@ ErrCode ScanService::AllowExternScan()
 #endif
     ScanMode scanMode = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetAppRunningState();
     WIFI_LOGI("AllowExternScan, scanMode is %{public}d", (int)scanMode);
+    if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
+        WIFI_LOGI("Enter AllowExternScan FactoryMode, extern scan has allowed.");
+        return WIFI_OPT_SUCCESS;
+    }
 
     if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_ORIGIN, scanMode)) {
         WIFI_LOGW("extern scan not allow by origin interval mode");

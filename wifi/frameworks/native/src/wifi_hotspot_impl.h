@@ -64,7 +64,7 @@ public:
      * @param isSupported - the flag of whether dual band is supported.
      * @return ErrCode - operation result
      */
-    ErrCode IsHotspotSupported(bool &isSupported) override;
+    ErrCode IsOpenSoftApAllowed(bool &isSupported) override;
 
     /**
      * @Description Get the Hotspot Config object

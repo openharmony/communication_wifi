@@ -377,6 +377,8 @@
           "OHOS::Wifi::WifiCommonEventHelper::PublishHotspotStateChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
           "OHOS::Wifi::WifiAssetManager::GetStaCallback() const";
           "OHOS::Wifi::IsFactoryMode()";
+          "OHOS::Wifi::WifiConfigCenter::SetSystemMode(int)";
+          "OHOS::Wifi::WifiConfigCenter::GetSystemMode()";
           "OHOS::Wifi::GetDeviceType()";
           "OHOS::Wifi::WifiConfigCenter::SetDeviceType(int)";
           "OHOS::Wifi::WifiConfigCenter::IsAllowPopUp()";
@@ -396,6 +398,7 @@
           "OHOS::Wifi::ArpChecker::GetGwMacAddrList(int, bool, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&)";
           "OHOS::Wifi::WifiCommonEventHelper::PublishSelfcureStateChangedEvent(int const&, int const&, bool)";
           "OHOS::Wifi::WifiCommonEventHelper::PublishVoWifiSignalDetectInterruptEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+          "OHOS::Wifi::WifiCommonEventHelper::PublishNotAvailableDialog()";
           "OHOS::Wifi::WifiSettings::SetP2pDeviceName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
           "OHOS::Wifi::WifiConfigCenter::SetP2pBusinessType(OHOS::Wifi::P2pBusinessType const&)";
           "OHOS::Wifi::HexStringToVec(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<char, std::__h::allocator<char>>&)";

@@ -2393,7 +2393,6 @@ ErrCode WifiDeviceServiceImpl::HandleWifiProQoeSlow(const NetworkLagInfo &networ
 ErrCode WifiDeviceServiceImpl::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    WIFI_LOGI("Enter FetchWifiSignalInfoForVoWiFi.");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("FetchWifiSignalInfoForVoWiFi: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -2420,7 +2419,6 @@ ErrCode WifiDeviceServiceImpl::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &si
 ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    WIFI_LOGI("Enter IsSupportVoWifiDetect.");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("IsSupportVoWifiDetect: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -2447,7 +2445,6 @@ ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
 ErrCode WifiDeviceServiceImpl::SetVoWifiDetectMode(WifiDetectConfInfo info)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    WIFI_LOGI("Enter SetVoWifiDetectMode.");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetVoWifiDetectMode: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -2474,7 +2471,6 @@ ErrCode WifiDeviceServiceImpl::SetVoWifiDetectMode(WifiDetectConfInfo info)
 ErrCode WifiDeviceServiceImpl::GetVoWifiDetectMode(WifiDetectConfInfo &info)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    WIFI_LOGI("Enter GetVoWifiDetectMode.");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetVoWifiDetectMode: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -2501,7 +2497,6 @@ ErrCode WifiDeviceServiceImpl::GetVoWifiDetectMode(WifiDetectConfInfo &info)
 ErrCode WifiDeviceServiceImpl::SetVoWifiDetectPeriod(int period)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    WIFI_LOGI("Enter SetVoWifiDetectPeriod.");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetVoWifiDetectPeriod: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -2528,7 +2523,6 @@ ErrCode WifiDeviceServiceImpl::SetVoWifiDetectPeriod(int period)
 ErrCode WifiDeviceServiceImpl::GetVoWifiDetectPeriod(int &period)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    WIFI_LOGI("Enter GetVoWifiDetectPeriod.");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetVoWifiDetectPeriod: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;

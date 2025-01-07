@@ -434,6 +434,12 @@ public:
     {
         WIFI_LOGI("received OnP2pPrivatePeersChanged event");
     }
+
+    void OnP2pChrErrCodeReport(const int errCode) override
+    {
+        WIFI_LOGI("received OnP2pChrErrCodeReport event");
+    }
+
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }

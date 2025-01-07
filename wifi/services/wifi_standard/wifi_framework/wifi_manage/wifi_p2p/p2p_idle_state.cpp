@@ -19,6 +19,7 @@
 #include "wifi_p2p_temp_disc_event.h"
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
+#include "p2p_chr_reporter.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pIdleState");
 
@@ -41,6 +42,7 @@ void P2pIdleState::GoInState()
     p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE), P2P_REMOVE_DEVICE_TIMEOUT);
     p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_INVALID);
     SharedLinkManager::ClearSharedLinkCount();
+    P2pChrReporter::GetInstance().ResetState();
 }
 
 void P2pIdleState::GoOutState()
@@ -234,6 +236,7 @@ bool P2pIdleState::ProcessCmdHid2dConnect(InternalMessagePtr msg) const
     int callingUid = msg->GetParam1();
     SharedLinkManager::SetGroupUid(callingUid);
     hasConnect = true;
+    P2pChrReporter::GetInstance().SetWpsSuccess(true);
     return EXECUTED;
 }
 

@@ -123,6 +123,13 @@ public:
      */
     void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override;
 
+    /**
+     * @Description Report p2p chr error code.
+     *
+     * @param errCode - chr error code
+     */
+    void OnP2pChrErrCodeReport(const int errCode) override;
+
     void RegisterCallBack(const sptr<IWifiP2pCallback> &userCallback);
     bool IsRemoteDied() const;
     void SetRemoteDied(bool val);
@@ -142,6 +149,7 @@ private:
     void RemoteOnP2pGcJoinGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pGcLeaveGroup(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void RemoteOnP2pPrivatePeersChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void RemoteOnP2pChrErrCodeReport(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     HandleFuncMap handleFuncMap;

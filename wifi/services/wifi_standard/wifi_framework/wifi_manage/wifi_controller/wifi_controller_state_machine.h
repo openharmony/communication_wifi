@@ -116,8 +116,6 @@ public:
 #ifdef FEATURE_AP_SUPPORT
     template <class T> void HandleHotspotStop(int id, HotspotMode THotspotMode, ManagerControl<T> &TManagers);
     void HandleSoftapStop(int id);
-    void StartSoftapCloseTimer();
-    void StopSoftapCloseTimer();
 #ifdef FEATURE_RPT_SUPPORT
     bool ShouldUseRpt(int id);
     void HandleRptStop(int id);
@@ -182,7 +180,6 @@ private:
     ManagerControl<RptManager> rptManagers{RPT_CMD_STOP};
 #endif
     ManagerControl<SoftApManager> softApManagers{SOFTAP_CMD_STOP};
-    uint64_t stopSoftapTimerId_{0};
     HotspotMode hotspotMode {HotspotMode::NONE};
 #endif
     ManagerControl<MultiStaManager> multiStaManagers{MULTI_STA_CMD_STOP};

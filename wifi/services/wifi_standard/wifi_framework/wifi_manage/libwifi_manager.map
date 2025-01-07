@@ -80,8 +80,6 @@
         "OHOS::Wifi::WifiControllerMachine::HandleSoftapStop(int id)";
         "OHOS::Wifi::WifiControllerMachine::ShutdownWifi(bool shutDownAp = true)";
         "OHOS::Wifi::WifiControllerMachine::ClearWifiStartFailCount()";
-        "OHOS::Wifi::WifiControllerMachine::StartSoftapCloseTimer()";
-        "OHOS::Wifi::WifiControllerMachine::StopSoftapCloseTimer()";
         "OHOS::Wifi::WifiControllerMachine::ShouldUseRpt(int)";
         "OHOS::Wifi::WifiEventSubscriberManager::GetAirplaneModeByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()";

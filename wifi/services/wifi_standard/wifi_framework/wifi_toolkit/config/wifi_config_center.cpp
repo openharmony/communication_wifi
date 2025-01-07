@@ -130,7 +130,7 @@ void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)
 
 bool WifiConfigCenter::GetWifiAllowSemiActive() const
 {
-    if (IsFactoryMode()) {
+    if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
         WIFI_LOGI("factory mode, not allow semi active.");
         return false;
     }
@@ -1435,6 +1435,18 @@ int WifiConfigCenter::GetHotspotMacConfig(HotspotMacConfig &config, int id)
         config = iter->second;
     }
     return 0;
+}
+
+void WifiConfigCenter::SetSystemMode(int systemMode)
+{
+    systemMode_ = systemMode;
+    LOGI("SetSystemMode %{public}d", systemMode_);
+}
+
+int WifiConfigCenter::GetSystemMode()
+{
+    LOGI("GetSystemMode %{public}d", systemMode_);
+    return systemMode_;
 }
 
 void WifiConfigCenter::SetDeviceType(int deviceType)

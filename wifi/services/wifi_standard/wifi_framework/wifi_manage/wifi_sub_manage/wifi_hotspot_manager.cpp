@@ -164,7 +164,6 @@ void WifiHotspotManager::DealApGetStaJoin(const StationInfo &info, int id)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("ApStaJoined") + std::string("id = ") + std::to_string(id);
     WifiCommonEventHelper::PublishApStaJoinEvent(0, msg);
-    WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine()->StopSoftapCloseTimer();
     return;
 }
 
@@ -177,19 +176,6 @@ void WifiHotspotManager::DealApGetStaLeave(const StationInfo &info, int id)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("ApStaLeaved") + std::string("id = ") + std::to_string(id);
     WifiCommonEventHelper::PublishApStaLeaveEvent(0, msg);
-    std::vector<StationInfo> result;
-    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(id);
-    if (pService == nullptr) {
-        WIFI_LOGE("Instance %{public}d get hotspot service is null!", id);
-        return;
-    }
-    ErrCode errCode = pService->GetStationList(result);
-    if (errCode != ErrCode::WIFI_OPT_SUCCESS) {
-        return;
-    }
-    if (result.empty()) {
-        WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine()->StartSoftapCloseTimer();
-    }
     return;
 }
 

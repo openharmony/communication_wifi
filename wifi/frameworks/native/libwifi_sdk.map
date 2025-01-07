@@ -33,6 +33,7 @@
         GetHotspotConfig;
         IsHotspotActive;
         GetStationList;
+        GetStationNum;
         DisassociateSta;
         AddTxPowerInfo;
         SetBand;

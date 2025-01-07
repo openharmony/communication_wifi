@@ -43,6 +43,7 @@
 #include "telephony_errors.h"
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
+#include "wifi_common_event_helper.h"
 #endif
 
 namespace OHOS {
@@ -108,6 +109,11 @@ enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,
     WPA3_ASSOC_TIMEOUT,
     WPA3_FAIL_REASON_MAX
+};
+
+enum class CoFeatureType {
+    COFEATURE_TYPE_MLO = 0,
+    COFEATURE_TYPE_WUR = 1,
 };
 
 typedef enum EnumDhcpReturnCode {
@@ -900,6 +906,7 @@ private:
      * @param networkId - current connected networkId;
      */
     void SaveWifiConfigForUpdate(int networkId);
+    void CloseNoInternetDialog();
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif // OHOS_ARCH_LITE
     bool IsNewConnectionInProgress();
@@ -940,6 +947,7 @@ private:
     bool m_hilinkFlag = false;
     WifiDeviceConfig m_hilinkDeviceConfig;
 #ifndef OHOS_ARCH_LITE
+    bool hasNoInternetDialog_ = false;
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */

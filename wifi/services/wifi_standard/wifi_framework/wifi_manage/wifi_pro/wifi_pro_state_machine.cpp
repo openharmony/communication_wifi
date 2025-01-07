@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "block_connect_service.h"
 #include "iscan_service.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
@@ -373,6 +374,7 @@ bool WifiProStateMachine::SelectNetwork(NetworkSelectionResult &networkSelection
     } else {
         mNetworkSelectType = NetworkSelectType::WIFI2WIFI;
     }
+    BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, mNetworkSelectType, scanInfos)) {
         WIFI_LOGI("Wifi2Wifi select network result, ssid: %{public}s, bssid: %{public}s.",

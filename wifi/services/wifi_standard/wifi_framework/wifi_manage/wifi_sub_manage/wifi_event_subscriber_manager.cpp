@@ -611,37 +611,7 @@ void CesEventSubscriber::OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEvent
     } else if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_DISCONNECTED) {
         WifiConfigCenter::GetInstance().SetNoChargerPlugModeState(MODE_STATE_OPEN);
     }
-    for (int i = 0; i < AP_INSTANCE_MAX_NUM; ++i) {
-        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(i);
-        if (pService == nullptr) {
-            WIFI_LOGE("ap service is NOT start!");
-            return;
-        }
 
-        if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_CONNECTED) {
-            WIFI_LOGE("usb connect do not stop hostapd!");
-            WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine()->StopSoftapCloseTimer();
-            return;
-        }
-
-        if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_DISCONNECTED) {
-            WIFI_LOGE("usb disconnect stop hostapd!");
-            std::vector<StationInfo> result;
-            IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(0);
-            if (pService == nullptr) {
-                WIFI_LOGE("get hotspot service is null!");
-                return;
-            }
-            ErrCode errCode = pService->GetStationList(result);
-            if (errCode != ErrCode::WIFI_OPT_SUCCESS) {
-                return;
-            }
-            if (result.empty()) {
-                WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine()->StartSoftapCloseTimer();
-            }
-            return;
-        }
-    }
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
         if (pScanService == nullptr) {

@@ -2393,8 +2393,8 @@ ErrCode WifiDeviceServiceImpl::HandleWifiProQoeSlow(const NetworkLagInfo &networ
 ErrCode WifiDeviceServiceImpl::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("FetchWifiSignalInfoForVoWiFi: NOT System APP, PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("FetchWifiSignalInfoForVoWiFi: NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -2419,8 +2419,8 @@ ErrCode WifiDeviceServiceImpl::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &si
 ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("IsSupportVoWifiDetect: NOT System APP, PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("IsSupportVoWifiDetect: NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -2445,16 +2445,16 @@ ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
 ErrCode WifiDeviceServiceImpl::SetVoWifiDetectMode(WifiDetectConfInfo info)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("SetVoWifiDetectMode: NOT System APP, PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("SetVoWifiDetectMode: NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetVoWifiDetectMode:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetVoWifiDetectMode:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetVoWifiDetectMode:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetVoWifiDetectMode:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
@@ -2471,8 +2471,8 @@ ErrCode WifiDeviceServiceImpl::SetVoWifiDetectMode(WifiDetectConfInfo info)
 ErrCode WifiDeviceServiceImpl::GetVoWifiDetectMode(WifiDetectConfInfo &info)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("GetVoWifiDetectMode: NOT System APP, PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("GetVoWifiDetectMode: NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -2497,16 +2497,16 @@ ErrCode WifiDeviceServiceImpl::GetVoWifiDetectMode(WifiDetectConfInfo &info)
 ErrCode WifiDeviceServiceImpl::SetVoWifiDetectPeriod(int period)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("SetVoWifiDetectPeriod: NOT System APP, PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("SetVoWifiDetectPeriod: NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetVoWifiDetectPeriod:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetVoWifiDetectPeriod:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetVoWifiDetectPeriod:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetVoWifiDetectPeriod:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
@@ -2523,8 +2523,8 @@ ErrCode WifiDeviceServiceImpl::SetVoWifiDetectPeriod(int period)
 ErrCode WifiDeviceServiceImpl::GetVoWifiDetectPeriod(int &period)
 {
 #ifdef FEATURE_VOWIFI_SUPPORT
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("GetVoWifiDetectPeriod: NOT System APP, PERMISSION_DENIED!");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("GetVoWifiDetectPeriod: NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {

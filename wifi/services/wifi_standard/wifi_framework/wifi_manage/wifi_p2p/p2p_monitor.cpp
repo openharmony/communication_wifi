@@ -324,6 +324,12 @@ void P2pMonitor::Broadcast2SmChSwitch(const std::string &iface, const WifiP2pGro
     MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_CH_SWITCH, 0, 0, anyGroup);
 }
 
+void P2pMonitor::Broadcast2SmChrEvent(const std::string &iface, const int &errCode) const
+{
+    std::any anyNone;
+    MessageToStateMachine(iface, P2P_STATE_MACHINE_CMD::P2P_EVENT_CHR_REPORT, errCode, 0, anyNone);
+}
+
 void P2pMonitor::WpaEventDeviceFound(const HalP2pDeviceFound &deviceInfo) const
 {
     const int minWfdLength = 6;
@@ -671,6 +677,12 @@ void P2pMonitor::WpaEventP2pChannelSwitch(int freq) const
     Broadcast2SmChSwitch(selectIfacName, group);
 }
 
+void P2pMonitor::WpaEventP2pChrReport(int errCode) const
+{
+    WIFI_LOGI("WpaEventP2pChrReport callback, errCode:%{public}d", errCode);
+    Broadcast2SmChrEvent(selectIfacName, errCode);
+}
+
 void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
 {
     WIFI_LOGI("WpaEventStaNotifyCallBack callback, notifyParam:%{private}s", notifyParam.c_str());
@@ -695,6 +707,17 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
             std::string data = notifyParam.substr(freqPos + strlen("freq="));
             int freq = CheckDataLegal(data);
             WpaEventP2pChannelSwitch(freq);
+            break;
+        }
+        case static_cast<int>(WpaEventCallback::CHR_EVENT_NUM): {
+            std::string::size_type codePos = 0;
+            if ((codePos = notifyParam.find("errCode=")) == std::string::npos) {
+                WIFI_LOGE("chr event notifyParam not find errCode!");
+                return;
+            }
+            std::string data = notifyParam.substr(codePos + strlen("errCode="));
+            int errCode = CheckDataLegal(data);
+            WpaEventP2pChrReport(errCode);
             break;
         }
         default:

@@ -97,12 +97,6 @@ typedef struct {
     char preSharedKey[WIFI_MAX_KEY_LEN];
     /* dhcp server ipv4 address  */
     char ipAddress[WIFI_MAX_IPV4_LEN];
-    /* maximum number of allowed connections */
-    int maxConn;
-    /* lease time */
-    int leaseTime;
-    /* band width */
-    int apBandWidth;
 } HotspotConfig;
 
 /**

@@ -110,7 +110,7 @@ HWTEST_F(NetworkSelectionUtilsTest, IsOpenAndMaybePortal4, TestSize.Level1) {
     filternetworkCandidate.wifiDeviceConfig.noInternetAccess = 0;
     filternetworkCandidate.wifiDeviceConfig.networkStatusHistory = 0;
     filternetworkCandidate.wifiDeviceConfig.keyMgmt = KEY_MGMT_NONE;
-    filternetworkCandidate.filtedReason["hasInternet"].push_back(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
+    filternetworkCandidate.filtedReason["hasInternet"].insert(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
     filterName = "hasInternet";
     EXPECT_TRUE(NetworkSelection::NetworkSelectionUtils::IsOpenAndMaybePortal(filternetworkCandidate, filterName));
 }

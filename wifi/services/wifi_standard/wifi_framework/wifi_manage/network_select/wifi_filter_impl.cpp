@@ -112,7 +112,7 @@ EphemeralWifiFilter::EphemeralWifiFilter() : SimpleWifiFilter("notEphemeral") {}
 EphemeralWifiFilter::~EphemeralWifiFilter()
 {
     if (!filteredNetworkCandidates.empty()) {
-        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+        WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
                   NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
     }

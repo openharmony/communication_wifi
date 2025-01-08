@@ -130,7 +130,7 @@ void WifiMultiVapManager::ForceStopSoftAp()
 
 void WifiMultiVapManager::ShowToast()
 {
-    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::THREE_VAP, "");
+    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::THREE_VAP);
 }
 
 bool WifiMultiVapManager::CheckEnhanceWifiConnected()

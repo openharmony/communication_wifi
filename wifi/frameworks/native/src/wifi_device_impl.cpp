@@ -636,5 +636,48 @@ ErrCode WifiDeviceImpl::UpdateNetworkLagInfo(const NetworkLagType networkLagType
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->UpdateNetworkLagInfo(networkLagType, networkLagInfo);
 }
+
+ErrCode WifiDeviceImpl::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->FetchWifiSignalInfoForVoWiFi(signalInfo);
+}
+ 
+ErrCode WifiDeviceImpl::IsSupportVoWifiDetect(bool &isSupported)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->IsSupportVoWifiDetect(isSupported);
+}
+ 
+ErrCode WifiDeviceImpl::SetVoWifiDetectMode(WifiDetectConfInfo info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetVoWifiDetectMode(info);
+}
+ 
+ErrCode WifiDeviceImpl::GetVoWifiDetectMode(WifiDetectConfInfo &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetVoWifiDetectMode(info);
+}
+ 
+ErrCode WifiDeviceImpl::SetVoWifiDetectPeriod(int period)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetVoWifiDetectPeriod(period);
+}
+ 
+ErrCode WifiDeviceImpl::GetVoWifiDetectPeriod(int &period)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetVoWifiDetectPeriod(period);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

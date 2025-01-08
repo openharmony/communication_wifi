@@ -611,6 +611,48 @@ public:
      */
     ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) override;
 
+    /**
+     * @Description Get Vowifi Signal Info.
+     *
+     * @return VoWifiSignalInfo : wifi signal info
+     */
+    ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) override;
+ 
+    /**
+     * @Description Check Is Support VoWifi Detect.
+     *
+     * @return bool - supported: true, unsupported: false.
+     */
+    ErrCode IsSupportVoWifiDetect(bool &isSupported) override;
+ 
+    /**
+     * @Description set VoWifi detect mode.
+     *
+     * @param info WifiDetectConfInfo
+     */
+    ErrCode SetVoWifiDetectMode(WifiDetectConfInfo info) override;
+ 
+    /**
+     * indicate VoWifiDetectMode
+     *
+     * @return VoWifiDetectMode
+     */
+    ErrCode GetVoWifiDetectMode(WifiDetectConfInfo &info) override;
+ 
+    /**
+     * @Description set vowifi detect period.
+     *
+     * @param period period of vowifi detect
+     */
+    ErrCode SetVoWifiDetectPeriod(int period) override;
+ 
+    /**
+     * @Description Get vowifi detection period
+     *
+     * @return vowifi detection period
+     */
+    ErrCode GetVoWifiDetectPeriod(int &period) override;
+
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

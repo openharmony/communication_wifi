@@ -34,6 +34,7 @@ declare_args() {
   wifi_feature_non_hdf_driver = false
   wifi_feature_with_local_random_mac = true
   wifi_feature_wifi_pro_ctrl = true
+  wifi_feature_voicewifi_enable = true
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_efficiency_manager)) {
     wifi_feature_with_app_frozen = true

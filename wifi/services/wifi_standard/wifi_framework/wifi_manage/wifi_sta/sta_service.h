@@ -394,6 +394,30 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac);
+
+    /* VOWIFI */
+    virtual std::string VoWifiDetect(std::string cmd);
+ 
+    /**
+     * @Description  wifiPro service initialization function.
+     *
+     * @return std::vector<unsigned char> : wifi signal info
+     */
+    virtual VoWifiSignalInfo FetchWifiSignalInfoForVoWiFi();
+ 
+    /**
+     * @Description  set VoWifi detect mode.
+     *
+     * @param info WifiDetectConfInfo
+     */
+    virtual void ProcessSetVoWifiDetectMode(WifiDetectConfInfo info);
+ 
+    /**
+     * @Description  set vowifi detect period.
+     *
+     * @param period period of vowifi detect
+     */
+    virtual void ProcessSetVoWifiDetectPeriod(int period);
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
@@ -404,6 +428,8 @@ private:
     std::string GetMcc(const std::string &imsi) const;
     std::string GetMnc(const std::string &imsi, const int mncLen) const;
     void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;
+    int ConvertToAccessType(int linkSpeed, int frequency);
+    bool VoWifiDetectSet(std::string cmd);
 #ifndef OHOS_ARCH_LITE
     void GetStaControlInfo();
     bool IsAppInCandidateFilterList(int uid) const;
@@ -430,6 +456,8 @@ private:
     int m_instId;
     std::vector<PackageInfo> sta_candidate_trust_list;
     bool m_connMangerStatus = true;
+    std::shared_mutex voWifiCallbackMutex_;
+    int lastTxPktCnt_ = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -310,6 +310,24 @@ enum class ConfigChange {
     CONFIG_REMOVE = 2,
 };
 
+struct VoWifiSignalInfo {
+    int rssi;
+    int noise;
+    int bler;
+    int deltaTxPacketCounter;
+    int accessType;
+    int reverse;
+    int64_t txGood;
+    int64_t txBad;
+    std::string macAddress;
+};
+ 
+struct WifiDetectConfInfo {
+    int wifiDetectMode;
+    int threshold;
+    int envalueCount;
+};
+
 class WifiIpAddress {
 public:
     int family;                             /* ip type */

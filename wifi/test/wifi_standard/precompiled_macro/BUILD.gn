@@ -26,6 +26,7 @@ config("module_private_config") {
 ohos_unittest("precompiled_macro_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
     "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
@@ -46,7 +47,6 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_net_observer.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_netlink.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats/wifi_net_stats_manager.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_notification_util.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect.cpp",

@@ -148,12 +148,6 @@
         "OHOS::Wifi::WifiNetLink::ProcessQueryTcp(int32_t)";
         "OHOS::Wifi::WifiNetLink::SendQoeCmd(int, int)";
         "OHOS::Wifi::WifiNetLink::ProcessReportMsg(int32_t, int32_t)";
-        "OHOS::Wifi::WifiNotificationUtil::GetInstance()";
-        "OHOS::Wifi::WifiNotificationUtil::PublishWifiNotification(OHOS::Wifi::WifiNotificationId, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, OHOS::Wifi::WifiNotificationStatus)";
-        "OHOS::Wifi::WifiNotificationUtil::CancelWifiNotification(OHOS::Wifi::WifiNotificationId)";
-        "OHOS::Wifi::WifiNotificationUtil::StartAbility(OHOS::AAFwk::Want&)";
-        "OHOS::Wifi::WifiNotificationUtil::ShowDialog(OHOS::Wifi::WifiDialogType)";
-        "OHOS::Wifi::WifiNotificationUtil::ShowSettingsDialog(OHOS::Wifi::WifiDialogType, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
         "OHOS::Wifi::WifiNetStatsManager::StopNetStats()";
         "OHOS::Wifi::WifiNetStatsManager::StartNetStats()";
         "OHOS::Wifi::WifiSystemAbilityListener::SubscribeSystemAbility(int)";

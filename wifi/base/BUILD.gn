@@ -100,6 +100,7 @@ if (defined(ohos_lite)) {
     sources = local_base_sources
 
     sources += [
+      "shared_util/wifi_notification_util.cpp",
       "utils/wifi_app_parser.cpp",
       "utils/wifi_datashare_utils.cpp",
       "utils/xml_parser.cpp",
@@ -111,6 +112,7 @@ if (defined(ohos_lite)) {
     defines = []
 
     external_deps = [
+      "ability_runtime:extension_manager",
       "c_utils:utils",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
@@ -121,6 +123,7 @@ if (defined(ohos_lite)) {
       "libxml2:libxml2",
       "openssl:libcrypto_shared",
       "openssl:libssl_shared",
+      "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]
     if (wifi_ffrt_enable) {

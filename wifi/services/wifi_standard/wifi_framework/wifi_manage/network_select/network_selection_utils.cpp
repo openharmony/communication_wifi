@@ -40,15 +40,15 @@ bool NetworkSelectionUtils::IsOpenAndMaybePortal(NetworkCandidate &networkCandid
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
     if (!IsOpenNetwork(networkCandidate)) {
-        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NOT_OPEN_NETWORK);
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_OPEN_NETWORK);
         return false;
     }
     if (wifiDeviceConfig.noInternetAccess) {
-        networkCandidate.filtedReason[filterName].push_back(FiltedReason::NO_INTERNET);
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NO_INTERNET);
         return false;
     }
     if (!NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory)) {
-        networkCandidate.filtedReason[filterName].push_back(FiltedReason::HAS_NETWORK_HISTORY);
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::HAS_NETWORK_HISTORY);
         return false;
     }
     return true;

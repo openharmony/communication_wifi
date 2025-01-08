@@ -51,7 +51,7 @@ enum WifiNotificationOpetationType {
 enum WifiDialogType {
     CDD = 0,
     THREE_VAP = 1,
-   CANDIDATE_CONNECT = 2,
+    CANDIDATE_CONNECT = 2,
     AUTO_IDENTIFY_CONN = 3
 };
 
@@ -63,11 +63,11 @@ public:
 
     void CancelWifiNotification(WifiNotificationId notificationId);
 
-    void DisplaySettingWlanPage();
-
+    void DisplaySettingWlanPage(std::string bundleName, std::string abilityName, std::string navEntryKey);
+ 
     int32_t StartAbility(OHOS::AAFwk::Want& want);
 
-    void ShowDialog(WifiDialogType type, std::string ssid);
+    void ShowDialog(WifiDialogType type, std::string comInfo = "");
 
     void ShowSettingsDialog(WifiDialogType type, std::string settings);
 

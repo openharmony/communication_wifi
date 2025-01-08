@@ -362,7 +362,8 @@ bool MaybePortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
     if (networkCandidate.wifiDeviceConfig.noInternetAccess &&
         !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
             networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
-        networkCandidate.filtedReason[filterName].insert({FiltedReason::NO_INTERNET, FiltedReason::UNRECOVERABLE_NETWORK});
+        networkCandidate.filtedReason[filterName].insert({FiltedReason::NO_INTERNET,
+            FiltedReason::UNRECOVERABLE_NETWORK});
         return false;
     }
     return true;

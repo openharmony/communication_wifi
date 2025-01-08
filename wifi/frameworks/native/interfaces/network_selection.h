@@ -49,7 +49,8 @@ enum FiltedReason {
 };
 
 struct FiltedReasonComparator {
-    bool operator()(const FiltedReason& lhs, const FiltedReason& rhs) const {
+    bool operator()(const FiltedReason& lhs, const FiltedReason& rhs) const
+    {
         return static_cast<int>(lhs) < static_cast<int>(rhs);
     }
 };

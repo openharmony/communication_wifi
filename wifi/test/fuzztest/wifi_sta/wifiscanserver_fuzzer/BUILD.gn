@@ -164,6 +164,7 @@ ohos_fuzztest("WifiScanServerFuzzTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libdm_lite",
   ]
 
   part_name = "wifi"

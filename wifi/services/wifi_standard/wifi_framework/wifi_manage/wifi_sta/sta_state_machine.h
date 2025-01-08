@@ -125,6 +125,13 @@ typedef enum EnumDhcpReturnCode {
     DHCP_OFFER_REPORT,
 } DhcpReturnCode;
 
+enum FoldStatus {
+    UNKONWN = 0,
+    EXPAND,
+    FOLDED,
+    HALF_FOLD,
+};
+
 inline const int DETECT_TYPE_DEFAULT = 0;
 inline const int DETECT_TYPE_PERIODIC = 1;
 inline const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
@@ -287,7 +294,9 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-
+        void UpdateExpandOffset();
+        int foldStatus_ = 0;
+        int halfFoldUpdateRssi_ = 0;
     private:
 #ifndef OHOS_ARCH_LITE
         void CheckIfRestoreWifi();
@@ -296,7 +305,12 @@ public:
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
         void UpdateWifi7WurInfo();
+        void FoldStatusNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
+        int halfFoldRssi_ = 0;
+        int expandRssi_ = 0;
+        int rssiOffset_ = 6;
+        bool isExpandUpdateRssi_ = true;
     };
     /**
      * @Description  Definition of member function of ApRoamingState class in StaStateMachine.
@@ -603,7 +617,7 @@ private:
      *
      * @param  signalInfo - SignalPoll Result
      */
-    void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo);
+    void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStatusRssi = INVALID_RSSI_VALUE);
 
     /**
      * @Description : Converting frequencies to channels.

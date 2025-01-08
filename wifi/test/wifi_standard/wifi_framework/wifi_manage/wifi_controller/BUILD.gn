@@ -138,6 +138,7 @@ ohos_unittest("wifi_controller_unittest") {
     "netstack:http_client",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libdm_lite",
   ]
 
   if (wifi_ffrt_enable) {

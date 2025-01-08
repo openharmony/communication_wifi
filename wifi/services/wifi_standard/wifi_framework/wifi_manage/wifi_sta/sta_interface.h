@@ -387,11 +387,19 @@ public:
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &bssid) override;
 
+	/**
+     * @Description OnFoldStateChanged.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnFoldStateChanged(const int foldStatus) override;
+
     /**
      * @Description Fetch Wifi SignalInfo For VoWiFi.
      *
      * @return VoWifiSignalInfo : wifi signal info
      */
+    
     ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) override;
  
     /**

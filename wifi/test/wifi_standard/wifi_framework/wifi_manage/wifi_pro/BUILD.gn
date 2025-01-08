@@ -149,6 +149,7 @@ ohos_unittest("wifi_pro_unittest") {
     "power_manager:powermgr_client",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libdm_lite",
   ]
 
   if (wifi_ffrt_enable) {

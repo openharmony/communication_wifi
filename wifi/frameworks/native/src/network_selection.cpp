@@ -56,7 +56,7 @@ std::string NetworkCandidate::ToString(const std::string &filterName) const
     if (filterName.empty()) {
         return networkCandidateInfo.str();
     }
-    std::set<FiltedReason, FiltedReasonComparator> reasons = filtedReason.at(filterName);
+    std::set<FiltedReason, FiltedReasonComparator, std::allocator<FiltedReason>> reasons = filtedReason.at(filterName);
     if (reasons.empty()) {
         return networkCandidateInfo.str();
     }

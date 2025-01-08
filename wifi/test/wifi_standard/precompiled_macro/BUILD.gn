@@ -175,7 +175,6 @@ ohos_unittest("precompiled_macro_unittest") {
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
-    "distributed_notification_service:ans_innerkits",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

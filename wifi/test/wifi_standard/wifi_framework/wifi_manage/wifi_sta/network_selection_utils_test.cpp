@@ -49,7 +49,7 @@ HWTEST_F(NetworkSelectionUtilsTest, GetNetworkCandidatesInfo, TestSize.Level1) {
     filternetworkCandidate.wifiDeviceConfig.ssid = "xx";
     filternetworkCandidate.wifiDeviceConfig.bssid = "11:11:11:11:11";
     filternetworkCandidate.wifiDeviceConfig.networkId = 1;
-    filternetworkCandidate.filtedReason["hasInternet"].push_back(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
+    filternetworkCandidate.filtedReason["hasInternet"].insert(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
     networkCandidates.emplace_back(&filternetworkCandidate);
     NetworkSelection::NetworkSelectionUtils::GetNetworkCandidatesInfo(networkCandidates,
         filterName);
@@ -66,7 +66,7 @@ HWTEST_F(NetworkSelectionUtilsTest, IsOpenAndMaybePortal1, TestSize.Level1) {
     filternetworkCandidate.wifiDeviceConfig.bssid = "11:11:11:11:11";
     filternetworkCandidate.wifiDeviceConfig.networkId = 1;
     filternetworkCandidate.wifiDeviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
-    filternetworkCandidate.filtedReason["hasInternet"].push_back(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
+    filternetworkCandidate.filtedReason["hasInternet"].insert(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
     filterName = "";
     EXPECT_FALSE(NetworkSelection::NetworkSelectionUtils::IsOpenAndMaybePortal(filternetworkCandidate, filterName));
 }
@@ -80,7 +80,7 @@ HWTEST_F(NetworkSelectionUtilsTest, IsOpenAndMaybePortal2, TestSize.Level1) {
     filternetworkCandidate.wifiDeviceConfig.networkId = 1;
     filternetworkCandidate.wifiDeviceConfig.noInternetAccess = 1;
     filternetworkCandidate.wifiDeviceConfig.keyMgmt = KEY_MGMT_NONE;
-    filternetworkCandidate.filtedReason["hasInternet"].push_back(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
+    filternetworkCandidate.filtedReason["hasInternet"].insert(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
     filterName = "hasInternet";
     EXPECT_FALSE(NetworkSelection::NetworkSelectionUtils::IsOpenAndMaybePortal(filternetworkCandidate, filterName));
 }
@@ -95,7 +95,7 @@ HWTEST_F(NetworkSelectionUtilsTest, IsOpenAndMaybePortal3, TestSize.Level1) {
     filternetworkCandidate.wifiDeviceConfig.noInternetAccess = 0;
     filternetworkCandidate.wifiDeviceConfig.networkStatusHistory = 3;
     filternetworkCandidate.wifiDeviceConfig.keyMgmt = KEY_MGMT_NONE;
-    filternetworkCandidate.filtedReason["hasInternet"].push_back(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
+    filternetworkCandidate.filtedReason["hasInternet"].insert(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
     filterName = "hasInternet";
     EXPECT_FALSE(NetworkSelection::NetworkSelectionUtils::IsOpenAndMaybePortal(filternetworkCandidate, filterName));
 }

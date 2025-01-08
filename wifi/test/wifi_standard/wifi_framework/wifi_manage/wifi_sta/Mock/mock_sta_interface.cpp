@@ -59,6 +59,12 @@ ErrCode StaInterface::StartRoamToNetwork(const int networkId, const std::string 
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::OnFoldStateChanged(const int foldStatus)
+{
+    LOGD("Enter OnFoldStateChanged");
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::StartConnectToUserSelectNetwork(int networkId, std::string bssid)
 {
     LOGD("Enter StartConnectToUserSelectNetwork");

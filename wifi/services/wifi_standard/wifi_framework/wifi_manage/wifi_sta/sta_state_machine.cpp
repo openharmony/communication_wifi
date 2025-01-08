@@ -2065,6 +2065,11 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             DealNetworkCheck(msg);
             break;
         }
+        case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            FoldStatusNotify(msg);
+            break;
+        }
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
         case WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT: {
             ret = EXECUTED;
@@ -2105,6 +2110,39 @@ void StaStateMachine::LinkedState::DhcpResultNotify(InternalMessagePtr msg)
     }
 }
 
+void StaStateMachine::LinkedState::FoldStatusNotify(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("msg is nullptr.");
+        return;
+    }
+    foldStatus_ = msg->GetParam1();
+    if (foldStatus_ == HALF_FOLD) {
+        isExpandUpdateRssi_ = true;
+        halfFoldRssi_ = pStaStateMachine->linkedInfo.rssi;
+
+        if (halfFoldRssi_ + rssiOffset_ < 0) {
+            halfFoldUpdateRssi_ = halfFoldRssi_ + rssiOffset_;
+        } else {
+            halfFoldUpdateRssi_ = halfFoldRssi_;
+        }
+        pStaStateMachine->StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+        pStaStateMachine->DealSignalPollResult();
+    } else if (foldStatus_ == EXPAND) {
+        isExpandUpdateRssi_ = false;
+    } else {
+        isExpandUpdateRssi_ = true;
+    }
+}
+
+void StaStateMachine::LinkedState::UpdateExpandOffset()
+{
+    if (!isExpandUpdateRssi_) {
+        expandRssi_ = pStaStateMachine->linkedInfo.rssi;;
+        rssiOffset_ = expandRssi_ - halfFoldRssi_;
+    }
+    isExpandUpdateRssi_ = true;
+}
 void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
@@ -3377,7 +3415,12 @@ void StaStateMachine::DealSignalPollResult()
         linkedInfo.frequency = signalInfo.frequency;
     }
     ConvertFreqToChannel();
-    UpdateLinkRssi(signalInfo);
+    if (pLinkedState->foldStatus_ == HALF_FOLD) {
+        UpdateLinkRssi(signalInfo, pLinkedState->halfFoldUpdateRssi_);
+    } else {
+        UpdateLinkRssi(signalInfo);
+    }
+    
     if (signalInfo.txrate > 0) {
         linkedInfo.txLinkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
         linkedInfo.linkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
@@ -3392,6 +3435,7 @@ void StaStateMachine::DealSignalPollResult()
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
+    pLinkedState->UpdateExpandOffset();
     WIFI_LOGI("SignalPoll,bssid:%{public}s,ssid:%{public}s,networkId:%{public}d,band:%{public}d,freq:%{public}d,"
         "rssi:%{public}d,noise:%{public}d,chload:%{public}d,snr:%{public}d,ulDelay:%{public}d,txLinkSpeed:%{public}d,"
         "rxLinkSpeed:%{public}d,txBytes:%{public}d,rxBytes:%{public}d,txFailed:%{public}d,txPackets:%{public}d,"
@@ -3419,24 +3463,30 @@ void StaStateMachine::DealSignalPollResult()
     }
 }
 
-void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo)
+void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStatusRssi)
 {
     int currentSignalLevel = 0;
-    if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
+    if (foldStateRssi != INVALID_RSSI_VALUE) {
+        linkedInfo.rssi = setRssi(foldStatusRssi);
+    } else if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
         if (signalInfo.signal > 0) {
             linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
         } else {
             linkedInfo.rssi = setRssi(signalInfo.signal);
         }
+    } else {
+        linkedInfo.rssi = INVALID_RSSI_VALUE;
+    }
+
+    if (linkedInfo.rssi != INVALID_RSSI_VALUE) {
         currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
         if (currentSignalLevel != lastSignalLevel_) {
             WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
             InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
             lastSignalLevel_ = currentSignalLevel;
         }
-    } else {
-        linkedInfo.rssi = INVALID_RSSI_VALUE;
     }
+    
     linkedInfo.c0Rssi = UpdateLinkInfoRssi(signalInfo.c0Rssi);
     linkedInfo.c1Rssi = UpdateLinkInfoRssi(signalInfo.c1Rssi);
 }

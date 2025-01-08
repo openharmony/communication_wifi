@@ -118,7 +118,8 @@
                 "jsoncpp",
                 "libxml2",
                 "asset",
-                "icu"
+                "icu",
+                "window_manager"
             ],
             "third_party": [
                 "wpa_supplicant"

@@ -157,6 +157,7 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "power_manager:powermgr_client",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libdm_lite",
   ]
 
   ldflags = [

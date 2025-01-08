@@ -535,6 +535,19 @@ bool StaInterface::InitStaServiceLocked()
     return true;
 }
 
+ErrCode StaInterface::OnFoldStateChange(const int foldStatus)
+{
+    WIFI_LOGI("Enter OnFoldStateChange, foldStatus = %{public}d", foldStatus);
+    if (foldStatus != MODE_STATE_EXPAND && foldStatus != MODE_STATE_FOLDED && foldStatus != MODE_STATE_HALF_FOLD) {
+        WIFI_LOGE("foldStatus param is error");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->HandleFoldStatusChanged(foldStatus);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
 {
     if (pStaService == nullptr) {

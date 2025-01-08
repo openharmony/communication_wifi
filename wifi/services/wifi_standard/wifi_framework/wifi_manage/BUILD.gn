@@ -270,6 +270,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
+      "window_manager::libdm_lite",
     ]
   }
   ohos_source_set("wifi_device_service_impl") {
@@ -345,6 +346,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
+      "window_manager::libdm_lite",
     ]
   }
   ohos_source_set("wifi_hotspot_service_impl") {
@@ -389,6 +391,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
+      "window_manager::libdm_lite",
     ]
 
     defines = [
@@ -452,6 +455,7 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_conn_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
+      "window_manager::libdm_lite",
     ]
     defines = [
       "FEATURE_P2P_SUPPORT",
@@ -552,6 +556,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",
+      "window_manager::libdm_lite",
     ]
     if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
       external_deps += [ "huks:libhukssdk" ]

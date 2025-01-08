@@ -442,6 +442,12 @@ public:
      * @param type - wifi netlink message type
      */
     virtual void ProcessVoWifiNetlinkReportEvent(const int type) = 0;
+    /**
+     * @Description fold status
+     *
+     * @param success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual void OnFoldStateChanged(const int foldStatus) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

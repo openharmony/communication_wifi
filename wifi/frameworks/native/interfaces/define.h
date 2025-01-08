@@ -107,6 +107,10 @@
 #define MODE_STATE_FREEZE (5)
 #define MODE_STATE_NO_CHARGER_PLUG (6)
 
+#define MODE_STATE_EXPAND (1)
+#define MODE_STATE_FOLDED (2)
+#define MODE_STATE_HALF_FOLD (3)
+
 #define MODE_STATE_DEFAULT (-1)
 /* Begin apf filter */
 #define MODE_STATE_OPEN (1)

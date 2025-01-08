@@ -112,19 +112,10 @@ if (defined(ohos_lite)) {
     defines = []
 
     external_deps = [
-      "ability_base:want",
-      "ability_base:zuri",
-      "ability_runtime:ability_manager",
-      "ability_runtime:app_context",
-      "ability_runtime:app_manager",
-      "ability_runtime:connection_obs_manager",
-      "ability_runtime:dataobs_manager",
       "ability_runtime:extension_manager",
-      "ability_runtime:wantagent_innerkits",
       "c_utils:utils",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
-      "distributed_notification_service:ans_innerkits",
       "hicollie:libhicollie",
       "hilog:libhilog",
       "ipc:ipc_single",

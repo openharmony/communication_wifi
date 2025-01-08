@@ -160,7 +160,7 @@ void Handler::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
 #ifdef OHOS_ARCH_LITE
     /* Obtains the current time, accurate to milliseconds. */
     struct timespec curTime = {0, 0};
-    if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
+    if (clock_gettime(CLOCK_BOOTTIME, &curTime) != 0) {
         LOGE("clock_gettime failed.");
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;
@@ -207,7 +207,7 @@ void Handler::MessageExecutedAtTime(InternalMessagePtr msg, int64_t execTime)
 #else
     /* Obtains the current time, accurate to milliseconds. */
     struct timespec curTime = {0, 0};
-    if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
+    if (clock_gettime(CLOCK_BOOTTIME, &curTime) != 0) {
         LOGE("clock_gettime failed.");
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;

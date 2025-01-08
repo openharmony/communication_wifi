@@ -771,26 +771,17 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
     std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("OnReceiveNotificationEvent action[%{public}s]", action.c_str());
     if (action == WIFI_EVENT_TAP_NOTIFICATION) {
-        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
-            if (pService != nullptr) {
-                pService->StartPortalCertification();
-            }
-        }
+        int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
+        WIFI_LOGI("notificationId[%{public}d]", notificationId);
+        OnReceiveNotificationEvent(notificationId);
     } else if (action == WIFI_EVENT_DIALOG_ACCEPT) {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);
-        if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
-            int candidateNetworkId = WifiConfigCenter::GetInstance().GetSelectedCandidateNetworkId();
-            if (candidateNetworkId == INVALID_NETWORK_ID) {
-                WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");
-                return;
-            }
-            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
-            if (pService != nullptr) {
-                pService->ConnectToNetwork(candidateNetworkId);
-            }
-        }
+        OnReceiveDialogAcceptEvent(dialogType);
+    } else if (action == WIFI_EVENT_DIALOG_REJECT) {
+        int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
+        WIFI_LOGI("dialogType[%{public}d]", dialogType);
+        OnReceiveDialogRejectEvent(dialogType);
     } else if (action == EVENT_SETTINGS_WLAN_KEEP_CONNECTED) {
         OnReceiveWlanKeepConnected(eventData);
     } else {
@@ -802,6 +793,53 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
     }
 }
 
+void NotificationEventSubscriber::OnReceiveNotificationEvent(int notificationId)
+{
+    if (notificationId == static_cast<int>(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID)) {
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+            if (pService != nullptr) {
+                pService->StartPortalCertification();
+            }
+        }
+    } else if (notificationId == static_cast<int>(WifiNotificationId::WIFI_5G_CONN_NOTIFICATION_ID)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnNotificationReceive();
+        }
+    }
+}
+ 
+void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
+{
+    if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
+        int candidateNetworkId = WifiConfigCenter::GetInstance().GetSelectedCandidateNetworkId();
+        if (candidateNetworkId == INVALID_NETWORK_ID) {
+            WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");
+            return;
+        }
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+        if (pService != nullptr) {
+            pService->ConnectToNetwork(candidateNetworkId);
+        }
+    } else if (dialogType == static_cast<int>(WifiDialogType::AUTO_IDENTIFY_CONN)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnDialogClick(true);
+        }
+    }
+}
+ 
+void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
+{
+    if (dialogType == static_cast<int>(WifiDialogType::AUTO_IDENTIFY_CONN)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnDialogClick(false);
+        }
+    }
+}
+ 
 #ifdef HAS_POWERMGR_PART
 void WifiEventSubscriberManager::RegisterPowermgrEvent()
 {

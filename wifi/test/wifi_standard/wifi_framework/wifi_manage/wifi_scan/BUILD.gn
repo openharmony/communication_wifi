@@ -26,6 +26,7 @@ config("module_private_config") {
 ohos_unittest("wifi_scan_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
     "$WIFI_ROOT_DIR/base/shared_util/wifi_watchdog_utils.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
@@ -149,6 +150,7 @@ ohos_unittest("wifi_scan_unittest") {
     "ability_runtime:app_manager",
     "ability_runtime:connection_obs_manager",
     "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",

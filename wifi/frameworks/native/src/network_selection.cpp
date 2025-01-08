@@ -46,7 +46,7 @@ std::map<FiltedReason, std::string> filtReasonToString = {
 std::string NetworkCandidate::ToString(const std::string &filterName) const
 {
     std::stringstream networkCandidateInfo;
-    networkCandidateInfo << wifiDeviceConfig.networkId << "_";
+    networkCandidateInfo << wifiDeviceConfig.networkId << "-";
     constexpr int BSSID_MIN_SIZE = 2;
     if (interScanInfo.bssid.size() <= BSSID_MIN_SIZE) {
         networkCandidateInfo << interScanInfo.bssid;
@@ -60,7 +60,7 @@ std::string NetworkCandidate::ToString(const std::string &filterName) const
     if (reasons.empty()) {
         return networkCandidateInfo.str();
     }
-    networkCandidateInfo << "_";
+    networkCandidateInfo << "-";
     for (const auto &reason: reasons) {
         networkCandidateInfo << filtReasonToString[reason] << "&";
     }

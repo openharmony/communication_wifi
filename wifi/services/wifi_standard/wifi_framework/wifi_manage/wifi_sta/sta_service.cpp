@@ -295,7 +295,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     if (config.lastConnectTime <= 0) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
         if (WifiConfigCenter::GetInstance().IsAllowPopUp()) {
-            WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT, "");
+            WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
         }
         return WIFI_OPT_SUCCESS;
     }

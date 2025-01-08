@@ -59,7 +59,7 @@ struct NetworkCandidate {
     const InterScanInfo &interScanInfo;
     WifiDeviceConfig wifiDeviceConfig;
     explicit NetworkCandidate(const InterScanInfo &interScanInfo) : interScanInfo(interScanInfo), wifiDeviceConfig() {}
-    std::map<std::string, std::set<FiltedReason, FiltedReasonComparator>> filtedReason;
+    std::map<std::string, std::set<FiltedReason, FiltedReasonComparator, std::allocator<FiltedReason>>> filtedReason;
     std::string ToString(const std::string &filterName = "") const;
 };
 

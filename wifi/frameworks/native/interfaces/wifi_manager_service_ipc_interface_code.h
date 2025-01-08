@@ -75,10 +75,17 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_SET_LOW_TX_POWER = 0x1042,          /* set low tx power */
     WIFI_SVR_CMD_START_CONNECT_TO_USER_SELECT_NETWORK = 0x1043,     /* connect to user select target bssid */
     WIFI_SVR_CMD_SET_DPI_MARK_RULE = 0x1044,         /* set dpi mark rule */
-    WIFI_SVR_CMD_IS_FEATURE_SUPPORTED = 0x1045,         /*is supported input feature */
+    WIFI_SVR_CMD_IS_FEATURE_SUPPORTED = 0x1045,         /* is supported input feature */
     WIFI_SVR_CMD_GET_NET_CONTROL_INFO = 0x1046, /* Accept network control information from RSS */
     WIFI_SVR_CMD_NETWORK_LAG_INFO = 0x1047,             /* update network lag info */
     WIFI_SVR_CMD_ALLOW_AUTO_CONNECT = 0x1048, /* allow auto connect */
+    /* VOWIFI */
+    WIFI_SVR_CMD_FETCH_SIGNALINFO_VOWIFI = 0x1049,      /* FetchWifiSignalInfoForVoWiFi */
+    WIFI_SVR_CMD_IS_SUPPORT_VOWIFI_DETECT = 0x104A,     /* IsSupportVoWifiDetect */
+    WIFI_SVR_CMD_SET_VOWIFI_DETECT_MODE = 0x104B,       /* SetVoWifiDetectMode */
+    WIFI_SVR_CMD_GET_VOWIFI_DETECT_MODE = 0x104C,       /* GetVoWifiDetectMode */
+    WIFI_SVR_CMD_SET_VOWIFI_DETECT_PERIOD = 0x104D,     /* SetVoWifiDetectPeriod */
+    WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD = 0x104E,     /* GetVoWifiDetectPeriod */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

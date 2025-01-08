@@ -43,6 +43,9 @@ inline const std::string COMMON_EVENT_WIFI_P2P_CURRENT_DEVICE_STATE_CHANGED =
     "usual.event.wifi.p2p.CURRENT_DEVICE_CHANGE";
 inline const std::string COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED = "usual.event.wifi.p2p.GROUP_STATE_CHANGED";
 inline const std::string COMMON_EVENT_WIFI_SELF_CURE_STATE_CHANGED = "usual.event.wifi.selfcure.STATE_CHANGED";
+inline const std::string COMMON_EVENT_VOWIFI_SIGNAL_DETECT_INTERRUPT =
+    "usual.event.wifi.VOWIFI_SIGNAL_DETECT_INTERRUPT";
+inline const std::string COMMON_EVENT_GET_WIFI_CONFIG_PERMISSION = "ohos.permission.GET_WIFI_CONFIG";
 inline const std::string COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION = "ohos.permission.SET_WIFI_CONFIG";
 inline const std::string COMMON_EVENT_GET_WIFI_INFO_PERMISSION = "ohos.permission.GET_WIFI_INFO";
 inline const std::string COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION = "ohos.permission.MANAGE_WIFI_CONNECTION";
@@ -80,6 +83,7 @@ public:
     static bool PublishP2pCurrentDeviceStateChangedEvent(const int &code, const std::string &data);
     static bool PublishP2pGroupStateChangedEvent(const int &code, const std::string &data);
     static bool PublishSelfcureStateChangedEvent(const int &pid, const int &code, bool isSelfCureOnGoing);
+    static bool PublishVoWifiSignalDetectInterruptEvent(const int &code, const std::string &data);
     static bool PublishNotAvailableDialog();
 };
 }  // namespace Wifi

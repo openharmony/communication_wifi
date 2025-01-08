@@ -48,11 +48,17 @@ enum FiltedReason {
     NOT_ALLOW_AUTO_CONNECT,
 };
 
+struct FiltedReasonComparator {
+    bool operator()(const FiltedReason& lhs, const FiltedReason& rhs) const {
+        return static_cast<int>(lhs) < static_cast<int>(rhs);
+    }
+};
+
 struct NetworkCandidate {
     const InterScanInfo &interScanInfo;
     WifiDeviceConfig wifiDeviceConfig;
     explicit NetworkCandidate(const InterScanInfo &interScanInfo) : interScanInfo(interScanInfo), wifiDeviceConfig() {}
-    std::map<std::string, std::vector<FiltedReason>> filtedReason;
+    std::map<std::string, std::set<FiltedReason, FiltedReasonComparator>> filtedReason;
     std::string ToString(const std::string &filterName = "") const;
 };
 

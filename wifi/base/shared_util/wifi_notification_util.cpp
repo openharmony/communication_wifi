@@ -20,8 +20,6 @@
 #include "system_ability_definition.h"
 #include "wifi_notification_util.h"
 #include "wifi_logger.h"
-#include "notification_helper.h"
-#include "string_wrapper.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -94,13 +92,10 @@ void WifiNotificationUtil::CancelWifiNotification(WifiNotificationId notificatio
     WIFI_LOGI("Cancel notification End, result = %{public}d", result);
 }
 
-void WifiNotificationUtil::DisplaySettingWlanPage()
+void WifiNotificationUtil::DisplaySettingWlanPage(
+    std::string bundleName, std::string abilityName, std::string navEntryKey)
 {
-    WIFI_LOGI("Display setting wlan page");
     AAFwk::Want want;
-    std::string bundleName = "com.example.hmos.settings";
-    std::string abilityName = "com.example.hmos.settings.MainAbility";
-    std::string navEntryKey = "wifi_entry";
     AppExecFwk::ElementName element("", bundleName, abilityName);
     want.SetElement(element);
     want.SetUri(navEntryKey);
@@ -153,7 +148,7 @@ int32_t WifiNotificationUtil::StartAbility(OHOS::AAFwk::Want& want)
     return reply.ReadInt32();
 }
 
-void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string ssid)
+void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
 {
     WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
     AAFwk::Want want;
@@ -165,7 +160,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string ssid)
     param["wifiDialogType"] = static_cast<int32_t>(type);
     switch (type) {
         case AUTO_IDENTIFY_CONN:
-            param["wifi5gSsid"] = ssid;
+            param["wifi5gSsid"] = comInfo;
             break;
         default: {
             break;

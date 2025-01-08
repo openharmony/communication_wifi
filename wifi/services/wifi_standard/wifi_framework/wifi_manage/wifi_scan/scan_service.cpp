@@ -547,7 +547,7 @@ int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const Inte
     storeScanConfig.scanFreqs.assign(interConfig.scanFreqs.begin(), interConfig.scanFreqs.end());
 
     struct timespec times = {0, 0};
-    clock_gettime(CLOCK_MONOTONIC, &times);
+    clock_gettime(CLOCK_BOOTTIME, &times);
     storeScanConfig.scanTime =
         static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND + times.tv_nsec / SECOND_TO_MILLI_SECOND;
     storeScanConfig.fullScanFlag = scanConfig.fullScanFlag;
@@ -599,7 +599,7 @@ void ScanService::HandleCommonScanInfo(
         TryToRestoreSavedNetwork();
     }
     struct timespec times = {0, 0};
-    clock_gettime(CLOCK_MONOTONIC, &times);
+    clock_gettime(CLOCK_BOOTTIME, &times);
     int64_t availableTime = static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND +
         times.tv_nsec / SECOND_TO_MILLI_SECOND;
     if (mEnhanceService != nullptr) {
@@ -953,7 +953,7 @@ bool ScanService::PnoScan(const PnoScanConfig &pnoScanConfig, const InterScanCon
     WIFI_LOGI("End: send message.");
 
     struct timespec times = {0, 0};
-    clock_gettime(CLOCK_MONOTONIC, &times);
+    clock_gettime(CLOCK_BOOTTIME, &times);
     pnoScanStartTime =
         static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
 
@@ -1199,7 +1199,7 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
     }
 
     struct timespec times = { 0, 0 };
-    clock_gettime(CLOCK_MONOTONIC, &times);
+    clock_gettime(CLOCK_BOOTTIME, &times);
     int64_t nowTime =
         static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
     int sinceLastScan = 0;

@@ -122,7 +122,7 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
     WriteInt(context, err);
     struct timespec clockTime = {0, 0};
     const int secComplex = 1000;
-    clock_gettime(CLOCK_MONOTONIC, &clockTime);
+    clock_gettime(CLOCK_BOOTTIME, &clockTime);
     if (err == WIFI_HAL_SUCCESS) {
         WriteInt(context, maxSize);
         for (int i = 0; i < maxSize; ++i) {

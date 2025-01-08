@@ -17,6 +17,7 @@
 #define OHOS_WIFI_NETWORK_SELECTION_H
 #include <functional>
 #include <memory>
+#include <set>
 #include "wifi_msg.h"
 #include "inter_scan_info.h"
 

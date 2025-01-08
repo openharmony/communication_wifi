@@ -213,7 +213,6 @@ ohos_unittest("manager_unittest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
-    "distributed_notification_service:ans_innerkits",
     "eventhandler:libeventhandler",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",

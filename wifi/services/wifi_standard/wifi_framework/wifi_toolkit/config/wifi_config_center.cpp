@@ -73,7 +73,11 @@ int WifiConfigCenter::Init()
     }
     wifiScanConfig = std::make_unique<WifiScanConfig>();
     ClearLocalHid2dInfo();
-    mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
+    if (systemMode_ == SystemMode::M_FACTORY_MODE) {
+        mPersistWifiState[INSTID_WLAN0] = WIFI_STATE_DISABLED;
+    } else {
+        mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
+    }
     mAirplaneModeState = WifiSettings::GetInstance().GetLastAirplaneMode();
     return 0;
 }

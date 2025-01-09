@@ -439,6 +439,21 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     }
     return true;
 }
+
+bool WifiProStateMachine::FirstNoNetAndSelfCure()
+{
+    WIFI_LOGI("FirstNoNetAndSelfCure.");
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, instId_);
+    if (NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(config.networkStatusHistory)) {
+        WIFI_LOGI("FirstNoNet TrySelfCure.");
+        TrySelfCure(true);
+        return true;
+    }
+    return false;
+}
 /* --------------------------- state machine default state ------------------------------ */
 WifiProStateMachine::DefaultState::DefaultState(WifiProStateMachine *pWifiProStateMachine)
     : State("DefaultState"),
@@ -673,11 +688,13 @@ void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMes
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED) &&
         (pWifiProStateMachine_->currentState_ != WifiProState::WIFI_NONET)) {
-        WIFI_LOGI("state transition: WifiConnectedState -> WifiNoNetState.");
-        if (pWifiProStateMachine_->currentState_ == WifiProState::WIFI_HASNET) {
-            pWifiProStateMachine_->isHasNetToNoNet_ = true;
+        if (!pWifiProStateMachine_->FirstNoNetAndSelfCure()) {
+            WIFI_LOGI("state transition: WifiConnectedState -> WifiNoNetState.");
+            if (pWifiProStateMachine_->currentState_ == WifiProState::WIFI_HASNET) {
+                pWifiProStateMachine_->isHasNetToNoNet_ = true;
+            }
+            pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
         }
-        pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL) &&
         (pWifiProStateMachine_->currentState_ != WifiProState::WIFI_PORTAL)) {
         WIFI_LOGI("state transition: WifiConnectedState -> WifiPortalState.");

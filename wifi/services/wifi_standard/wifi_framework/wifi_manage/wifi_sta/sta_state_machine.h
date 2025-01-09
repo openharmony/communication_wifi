@@ -624,7 +624,7 @@ private:
      *
      * @param  signalInfo -JudgeEnableSignalPoll
      */
-    void JudgeEnableSignalPoll(const WifiSignalPollInfo &signalInfo);
+    void JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo);
     /**
      * @Description : Converting frequencies to channels.
      *

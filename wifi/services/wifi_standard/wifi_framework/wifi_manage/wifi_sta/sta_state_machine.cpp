@@ -3452,7 +3452,7 @@ void StaStateMachine::DealSignalPollResult()
     JudgeEnableSignalPoll(signalInfo);
 }
 
-void StaStateMachine::JudgeEnableSignalPoll(const WifiSignalPollInfo &signalInfo)
+void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
 {
 #ifndef OHOS_ARCH_LITE
     if (enhanceService_ != nullptr) {

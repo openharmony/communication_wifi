@@ -106,12 +106,14 @@ public:
     ~DataShareReadySubscriber() = default;
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
-class WifiFoldStateListener : public Rosen::DisplayManagerLite::IFoldStatusListener{
+
+class WifiFoldStateListener : public Rosen::DisplayManagerLite::IFoldStatusListener {
 public:
     WifiFoldStateListener();
     ~WifiFoldStateListener() = default;
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
-}
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();

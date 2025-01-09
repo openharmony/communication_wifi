@@ -442,7 +442,6 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
 
 bool WifiProStateMachine::FirstNoNetAndSelfCure()
 {
-    WIFI_LOGI("FirstNoNetAndSelfCure.");
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     WifiDeviceConfig config;

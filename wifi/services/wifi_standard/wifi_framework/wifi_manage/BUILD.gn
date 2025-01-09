@@ -200,7 +200,6 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/wifi_asset",
-      "//foundation/window/window_manager/utils/include",
     ]
   }
 
@@ -559,6 +558,7 @@ if (defined(ohos_lite)) {
       "time_service:time_client",
       "window_manager:libdm_lite",
     ]
+
     if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {
       external_deps += [ "huks:libhukssdk" ]
     }

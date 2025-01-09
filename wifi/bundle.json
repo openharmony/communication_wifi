@@ -120,8 +120,7 @@
                 "asset",
                 "icu",
                 "window_manager",
-                "ace_engine",
-                "napi"
+                "ace_engine"
             ],
             "third_party": [
                 "wpa_supplicant"

@@ -447,7 +447,6 @@ bool WifiProStateMachine::FirstNoNetAndSelfCure()
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, instId_);
     if (NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(config.networkStatusHistory)) {
-        WIFI_LOGI("FirstNoNet TrySelfCure.");
         TrySelfCure(true);
         return true;
     }

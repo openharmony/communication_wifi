@@ -741,8 +741,7 @@ bool WifiHdiWpaClient::GetEncryptionString(const HotspotConfig &config, std::str
             encryptionString = StringCombination(
                 "wpa=2\n"
                 "rsn_pairwise=CCMP\n"
-                "wpa_passphrase=%s\n"
-                "ieee80211w=1",
+                "wpa_passphrase=%s",
                 config.GetPreSharedKey().c_str());
             break;
         default:

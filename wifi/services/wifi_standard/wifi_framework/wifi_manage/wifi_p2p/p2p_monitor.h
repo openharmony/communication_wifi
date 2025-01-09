@@ -265,6 +265,14 @@ private:
     virtual void Broadcast2SmConnectFailed(const std::string &iface, int reason, const WifiP2pDevice &device) const;
 
     /**
+     * @Description Broadcast p2p chr event.
+     *
+     * @param iface - network interface for event processing
+     * @param group - group information
+     */
+    virtual void Broadcast2SmChrEvent(const std::string &iface, const int &errCode) const;
+
+    /**
      * @Description Broadcast p2p channel switch event.
      *
      * @param iface - network interface for event processing
@@ -441,6 +449,12 @@ private:
      * @param freq - data param
      */
     void WpaEventStaNotifyCallBack(const std::string &notifyParam) const;
+
+    /**
+     * @Description Register the callback function for p2p chr event
+     * @param errCode - chr evnet code
+     */
+    void WpaEventP2pChrReport(int errCode) const;
 private:
     /**
      * The current implementation cannot obtain abundant HAL instances like Andoird and cannot distinguish which

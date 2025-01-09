@@ -238,6 +238,7 @@ void WifiP2pCallbackStub::ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevi
     device.SetWpsConfigMethod(data.ReadInt32());
     device.SetDeviceCapabilitys(data.ReadInt32());
     device.SetGroupCapabilitys(data.ReadInt32());
+    device.SetChrErrCode(static_cast<P2pChrEvent>(data.ReadInt32()));
 }
 
 void WifiP2pCallbackStub::RemoteOnP2pThisDeviceChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)

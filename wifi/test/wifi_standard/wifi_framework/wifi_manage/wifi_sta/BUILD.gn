@@ -183,7 +183,7 @@ local_base_external_deps = [
   "samgr:samgr_proxy",
   "time_service:time_client",
   "window_manager:libdm_lite",
-  "ace_engine:ace_kit_config",
+  "ace_engine:ace_kit",
 ]
 
 ohos_unittest("wifi_sta_unittest") {

@@ -1222,7 +1222,7 @@ void WifiEventSubscriberManager::UnRegisterFoldStatusListener()
         return;
     }
 
-    auto ret = Rosen::DisplayManagerLite::GetInstance().UnRegisterFoldStatusListener(foldStatusListener_);
+    auto ret = Rosen::DisplayManagerLite::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
         WIFI_LOGE("UnRegisterFoldStatusListener fail");
     }

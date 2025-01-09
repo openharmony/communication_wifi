@@ -618,13 +618,13 @@ private:
      * @param  signalInfo - SignalPoll Result
      */
     void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi = INVALID_RSSI_VALUE);
-    /
+
     /**
      * @Description : JudgeEnableSignalPoll.
      *
      * @param  signalInfo -JudgeEnableSignalPoll
      */
-    void StaStateMachine::JudgeEnableSignalPoll()
+    void JudgeEnableSignalPoll();
     /**
      * @Description : Converting frequencies to channels.
      *

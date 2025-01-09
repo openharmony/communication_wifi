@@ -535,9 +535,9 @@ bool StaInterface::InitStaServiceLocked()
     return true;
 }
 
-ErrCode StaInterface::OnFoldStateChange(const int foldStatus)
+ErrCode StaInterface::OnFoldStateChanged(const int foldStatus)
 {
-    WIFI_LOGI("Enter OnFoldStateChange, foldStatus = %{public}d", foldStatus);
+    WIFI_LOGI("Enter OnFoldStateChanged, foldStatus = %{public}d", foldStatus);
     if (foldStatus != MODE_STATE_EXPAND && foldStatus != MODE_STATE_FOLDED && foldStatus != MODE_STATE_HALF_FOLD) {
         WIFI_LOGE("foldStatus param is error");
         return WIFI_OPT_INVALID_PARAM;

@@ -3463,11 +3463,11 @@ void StaStateMachine::DealSignalPollResult()
     }
 }
 
-void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStatusRssi)
+void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)
 {
     int currentSignalLevel = 0;
     if (foldStateRssi != INVALID_RSSI_VALUE) {
-        linkedInfo.rssi = setRssi(foldStatusRssi);
+        linkedInfo.rssi = setRssi(foldStateRssi);
     } else if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
         if (signalInfo.signal > 0) {
             linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));

@@ -447,7 +447,7 @@ public:
      *
      * @param success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual void OnFoldStateChanged(const int foldStatus) = 0;
+    virtual ErrCode OnFoldStateChanged(const int foldStatus) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

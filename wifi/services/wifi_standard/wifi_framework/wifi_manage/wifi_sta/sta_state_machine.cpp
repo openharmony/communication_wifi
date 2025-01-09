@@ -3449,10 +3449,10 @@ void StaStateMachine::DealSignalPollResult()
         linkedInfo.detailedState, lastSignalLevel_, signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
-    JudgeEnableSignalPoll();
+    JudgeEnableSignalPoll(signalInfo);
 }
 
-void StaStateMachine::JudgeEnableSignalPoll()
+void StaStateMachine::JudgeEnableSignalPoll(const WifiSignalPollInfo &signalInfo)
 {
 #ifndef OHOS_ARCH_LITE
     if (enhanceService_ != nullptr) {

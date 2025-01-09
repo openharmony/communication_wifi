@@ -95,10 +95,6 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
             mHttpDetectedAllowed = false;
             return;
         }
-        if (AllowSelfCureNetwork(currentRssi)) {
-            pSelfCureService->NotifyInternetFailureDetected(0);
-            mInternetSelfCureAllowed = false;
-        }
     }
 }
 

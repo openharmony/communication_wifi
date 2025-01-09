@@ -1026,7 +1026,7 @@ void StaService::HandleFoldStatusChanged(int foldstatus)
 {
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("pStaStateMachine is null!");
-        return WIFI_OPT_FAILED;
+        return;
     }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT, foldstatus);
 }

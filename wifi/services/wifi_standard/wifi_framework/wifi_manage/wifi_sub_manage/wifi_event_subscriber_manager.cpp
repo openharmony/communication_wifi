@@ -97,7 +97,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     RegisterNetworkStateChangeEvent();
     RegisterWifiScanChangeEvent();
     RegisterSettingsEnterEvent();
-    if (IsSiganlSmoothingEnable()) {
+    if (IsSignalSmoothingEnable()) {
         RegisterFoldStatusListener();
     }
 }
@@ -115,7 +115,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterWifiScanChangeEvent();
     UnRegisterSettingsEnterEvent();
     UnRegisterDataShareReadyEvent();
-    if (IsSiganlSmoothingEnable()) {
+    if (IsSignalSmoothingEnable()) {
         UnRegisterFoldStatusListener();
     }
 }
@@ -1188,7 +1188,7 @@ void WifiFoldStateListener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
         if (pService != nullptr) {
-            pService->OnFoldStatusChanged(static_cast<int>(foldStatus));
+            pService->OnFoldStateChanged(static_cast<int>(foldStatus));
         }
     }
 }
@@ -1217,10 +1217,6 @@ void WifiEventSubscriberManager::RegisterFoldStatusListener()
 void WifiEventSubscriberManager::UnRegisterFoldStatusListener()
 {
     std::unique_lock<std::mutex> lock(foldStatusListenerMutex_);
-    if (foldStatusListener_ != nullptr) {
-        return;
-    }
-    foldStatusListener_ = new(std::nothrow) WifiFoldStateListener();
     if (foldStatusListener_ == nullptr) {
         WIFI_LOGE("RegisterFoldStatusListener fail");
         return;
@@ -1228,7 +1224,7 @@ void WifiEventSubscriberManager::UnRegisterFoldStatusListener()
 
     auto ret = Rosen::DisplayManagerLite::GetInstance().UnRegisterFoldStatusListener(foldStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
-        WIFI_LOGE("RegisterFoldStatusListener fail");
+        WIFI_LOGE("UnRegisterFoldStatusListener fail");
     }
     foldStatusListener_ = nullptr;
     WIFI_LOGI("UnRegisterDisplayMode finished");

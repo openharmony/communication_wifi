@@ -515,7 +515,7 @@ private:
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
      *
-     * @param config -The Network info(in)
+     --=* @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const;
@@ -617,7 +617,8 @@ private:
      *
      * @param  signalInfo - SignalPoll Result
      */
-    void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStatusRssi = INVALID_RSSI_VALUE);
+    void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi = INVALID_RSSI_VALUE);
+    /
 
     /**
      * @Description : Converting frequencies to channels.

@@ -93,7 +93,7 @@ ohos_static_library("wifi_pro") {
     "netmanager_base:net_stats_manager_if",
     "netmanager_base:netsys_controller",
     "samgr:samgr_proxy",
-    "window_manager::libdm_lite",
+    "window_manager:libdm_lite",
   ]
 
   defines = []

@@ -133,6 +133,12 @@ enum class P2pGroupCapability {
     PGC_IP_ADDR_ALLOC = 1 << 7
 };
 
+enum class P2pChrEvent {
+    INITIAL_VALUE = 0,
+    GO_NEGOTIATION_PEER_REJECT = 1,
+    GO_NEGOTIATION_WAIT_PEER_READY_TIMEOUT = 2,
+};
+
 struct GcInfo {
     std::string ip;
     std::string mac;
@@ -182,7 +188,8 @@ public:
           status(P2pDeviceStatus::PDS_UNAVAILABLE),
           supportWpsConfigMethods(0),
           deviceCapabilitys(0),
-          groupCapabilitys(0)
+          groupCapabilitys(0),
+          chrErrCode(P2pChrEvent::INITIAL_VALUE)
     {}
     ~WifiP2pDevice()
     {}
@@ -222,6 +229,8 @@ public:
     bool WpKeypadSupported() const;
     void SetGroupAddress(const std::string &groupAddress);
     const std::string &GetGroupAddress() const;
+    void SetChrErrCode(P2pChrEvent errCode);
+    P2pChrEvent GetChrErrCode() const;
 
 private:
     std::string deviceName; /* the value range is 0 to 32 characters. */
@@ -237,6 +246,7 @@ private:
     unsigned int supportWpsConfigMethods;
     int deviceCapabilitys;
     int groupCapabilitys;
+    P2pChrEvent chrErrCode;
 };
 
 const int TEMPORARY_NET_ID = -1;

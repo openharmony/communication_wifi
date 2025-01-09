@@ -381,8 +381,8 @@ bool WifiProStateMachine::SelectNetwork(NetworkSelectionResult &networkSelection
     std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, mNetworkSelectType, scanInfos)) {
         WIFI_LOGI("Wifi2Wifi select network result, ssid: %{public}s, bssid: %{public}s.",
-            SsidAnonymize(networkSelectionResult.interScanInfo.bssid).c_str(),
-            MacAnonymize(networkSelectionResult.interScanInfo.ssid).c_str());
+            SsidAnonymize(networkSelectionResult.interScanInfo.ssid).c_str(),
+            MacAnonymize(networkSelectionResult.interScanInfo.bssid).c_str());
         return true;
     }
  

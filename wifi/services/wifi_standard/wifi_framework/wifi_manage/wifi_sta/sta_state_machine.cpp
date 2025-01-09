@@ -2138,7 +2138,7 @@ void StaStateMachine::LinkedState::FoldStatusNotify(InternalMessagePtr msg)
 void StaStateMachine::LinkedState::UpdateExpandOffset()
 {
     if (!isExpandUpdateRssi_) {
-        expandRssi_ = pStaStateMachine->linkedInfo.rssi;;
+        expandRssi_ = pStaStateMachine->linkedInfo.rssi;
         rssiOffset_ = expandRssi_ - halfFoldRssi_;
     }
     isExpandUpdateRssi_ = true;
@@ -3447,9 +3447,13 @@ void StaStateMachine::DealSignalPollResult()
         signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets, linkedInfo.wifiStandard,
         linkedInfo.maxSupportedRxLinkSpeed, linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.connState,
         linkedInfo.detailedState, lastSignalLevel_, signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
-    
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
+    JudgeEnableSignalPoll();
+}
+
+void StaStateMachine::JudgeEnableSignalPoll()
+{
 #ifndef OHOS_ARCH_LITE
     if (enhanceService_ != nullptr) {
         enhanceService_->SetEnhanceSignalPollInfo(signalInfo);

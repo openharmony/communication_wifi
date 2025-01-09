@@ -832,8 +832,8 @@ int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
 
 void StaServiceTest::HandleFoldStatusChangedTest()
 {
-   int foldStatus = MODE_STATE_EXPAND;
-   pStaService->HandleFoldStatusChangedTest(foldStatus);
+    int foldStatus = MODE_STATE_EXPAND;
+    pStaService->HandleFoldStatusChangedTest(foldStatus);
 }
 
 HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level1)

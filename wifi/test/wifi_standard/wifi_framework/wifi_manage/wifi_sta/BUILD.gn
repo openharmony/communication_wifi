@@ -193,12 +193,14 @@ ohos_unittest("wifi_sta_unittest") {
     "Mock/mock_sta_auto_connect_service.cpp",
     "Mock/mock_wifi_manager.cpp",
     "network_selection_test.cpp",
+    "network_selection_utils_test.cpp",
     "sta_auto_connect_service_test.cpp",
     "sta_interface_test.cpp",
     "sta_monitor_test.cpp",
     "sta_saved_device_appraisal_test.cpp",
     "sta_service_test.cpp",
     "sta_state_machine_test.cpp",
+    "wifi_filter_impl_test.cpp",
   ]
 
   include_dirs = local_base_include_dirs

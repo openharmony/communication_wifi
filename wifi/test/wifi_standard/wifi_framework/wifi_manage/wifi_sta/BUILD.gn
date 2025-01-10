@@ -126,8 +126,6 @@ local_base_include_dirs = [
   "//commonlibrary/c_utils/base/include",
   "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  "//foundation/arkui/ace_engine/frameworks/base/utils",
-  "//foundation/arkui/ace_engine/frameworks",
   "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",

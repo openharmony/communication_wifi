@@ -1047,8 +1047,6 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr ms
         case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
             pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
             pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
-            pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG,
-                pStaStateMachine->linkedInfo);
             if (BlockConnectService::GetInstance().IsWrongPassword(pStaStateMachine->targetNetworkId_)) {
                 BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
                     DisabledReason::DISABLED_BY_WRONG_PASSWORD);
@@ -1056,24 +1054,26 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr ms
                 BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
                     DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
             }
+            pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG,
+                pStaStateMachine->linkedInfo);
             break;
         case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
             pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_FULL);
             pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
-            pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL,
-                pStaStateMachine->linkedInfo);
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
             pStaStateMachine->AddRandomMacCure();
+            pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL,
+                pStaStateMachine->linkedInfo);
             break;
         case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
             pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_REJECTED);
             pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
-            pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT,
-                pStaStateMachine->linkedInfo);
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
             pStaStateMachine->AddRandomMacCure();
+            pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT,
+                pStaStateMachine->linkedInfo);
             break;
         default:
             WIFI_LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);

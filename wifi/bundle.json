@@ -122,6 +122,7 @@
                 "window_manager"
             ],
             "third_party": [
+                "googletest",
                 "wpa_supplicant"
             ]
         },

@@ -97,18 +97,18 @@ if (defined(ohos_lite)) {
     ]
   }
 } else {
-  ohos_shared_library("wifi_common_service") {
+  ohos_static_library("wifi_common_service") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
-    install_enable = true
     include_dirs = [
       "network_black_list",
       "network_status_history",
@@ -174,11 +174,6 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
-      "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-      "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
-      "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
@@ -296,7 +291,6 @@ if (defined(ohos_lite)) {
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
     ldflags = memory_optimization_ldflags
-    version_script = "libwifi_common_service.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

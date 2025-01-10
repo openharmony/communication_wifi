@@ -87,11 +87,7 @@ ohos_unittest("wifi_hal_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
   ]
 
-  deps = [
-    "$WIFI_ROOT_DIR/base/cRPC:crpc_server",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/base/cRPC:crpc_server" ]
 
   cflags = [ "-Wno-deprecated-non-prototype" ]
   ldflags = [
@@ -101,6 +97,8 @@ ohos_unittest("wifi_hal_unittest") {
 
   external_deps = [
     "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
   ]
 

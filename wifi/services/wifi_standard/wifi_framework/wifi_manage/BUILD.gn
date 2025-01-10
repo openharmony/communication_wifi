@@ -226,10 +226,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     part_name = "wifi"
@@ -248,8 +249,6 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
     defines = [
@@ -277,10 +276,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     part_name = "wifi"
@@ -317,9 +317,6 @@ if (defined(ohos_lite)) {
     deps = [
       ":wifi_manager_service",
       "$WIFI_ROOT_DIR/base:wifi_base",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
@@ -353,10 +350,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     part_name = "wifi"
@@ -377,8 +375,6 @@ if (defined(ohos_lite)) {
       ":wifi_manager_service",
       "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
@@ -420,10 +416,11 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     part_name = "wifi"
@@ -441,7 +438,6 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
@@ -472,10 +468,11 @@ if (defined(ohos_lite)) {
 
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
 
@@ -513,6 +510,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/init:etc",
       "$WIFI_ROOT_DIR/services/wifi_standard/etc/param:etc",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select:network_select",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap:wifi_ap_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
@@ -676,17 +674,17 @@ if (defined(ohos_lite)) {
 
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     install_enable = true
     deps = [
       ":wifi_device_service_impl",
       ":wifi_manager_service",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     ]
     external_deps = [ "hilog:libhilog" ]
     shlib_type = "sa"
@@ -699,17 +697,18 @@ if (defined(ohos_lite)) {
 
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     install_enable = true
     deps = [
       ":wifi_manager_service",
       ":wifi_scan_service_impl",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
+      "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     ]
     external_deps = [ "hilog:libhilog" ]
     shlib_type = "sa"
@@ -722,17 +721,17 @@ if (defined(ohos_lite)) {
 
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
     install_enable = true
     deps = [
       ":wifi_hotspot_service_impl",
       ":wifi_manager_service",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     ]
     external_deps = [ "hilog:libhilog" ]
     shlib_type = "sa"
@@ -746,17 +745,17 @@ if (defined(ohos_lite)) {
 
       sanitize = {
         cfi = true  # Enable/disable control flow integrity detection
-        boundary_sanitize = true  # Enable boundary san detection
+        boundary_sanitize = false  # Enable boundary san detection
         cfi_cross_dso = true  # Cross-SO CFI Checks
-        integer_overflow = true  # Enable integer overflow detection
-        ubsan = true  # Enable some Ubsan options
+        integer_overflow = false  # Enable integer overflow detection
+        ubsan = false  # Enable some Ubsan options
+        cfi_vcall_icall_only = true
         debug = false
       }
       install_enable = true
       deps = [
         ":wifi_manager_service",
         ":wifi_p2p_service_impl",
-        "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       ]
       external_deps = [ "hilog:libhilog" ]
       shlib_type = "sa"

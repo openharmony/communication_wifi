@@ -65,7 +65,7 @@ WifiErrorNo WifiStaHalInterface::StopWifi(int instId)
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiStaHalInterface::Connect(int networkId)
+WifiErrorNo WifiStaHalInterface::Connect(int networkId, const std::string &ifaceName)
 {
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
@@ -77,7 +77,7 @@ WifiErrorNo WifiStaHalInterface::Reconnect(void)
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiStaHalInterface::Reassociate(void)
+WifiErrorNo WifiStaHalInterface::Reassociate(const std::string &ifaceName)
 {
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
@@ -346,6 +346,12 @@ WifiErrorNo WifiStaHalInterface::RegisterNativeProcessCallback(const std::functi
     mDeathCallback = callback;
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
+}
+WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &ifName,
+    std::vector<WifiLinkedInfo> &mloLinkInfo)
+{
+    return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
+    WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -15,7 +15,6 @@
 
 #include "wifi_common_service_manager.h"
 #include <dirent.h>
-#include <iconv.h>
 #include "wifi_auth_center.h"
 #include "wifi_config_center.h"
 #include "wifi_global_func.h"

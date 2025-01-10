@@ -115,6 +115,13 @@ public:
      */
     void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override;
 
+    /**
+     * @Description p2p chr error code report.
+     *
+     * @param errCode - p2p chr error code
+     */
+    void OnP2pChrErrCodeReport(const int errCode) override;
+
 private:
     void WriteWifiP2pDeviceData(MessageParcel &data, const WifiP2pDevice &device);
 

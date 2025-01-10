@@ -29,8 +29,11 @@ void InvitationRequestState::GoInState()
     WIFI_LOGI("             GoInState");
     if (WifiErrorNo::WIFI_HAL_OPT_OK == WifiP2PHalInterface::GetInstance().Invite(groupManager.GetCurrentGroup(),
         p2pStateMachine.savedP2pConfig.GetDeviceAddress())) {
-        deviceManager.UpdateDeviceStatus(
-            p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED);
+        if (deviceManager.UpdateDeviceStatus(
+            p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED)) {
+            WIFI_LOGE("UpdateDeviceStatus failed.");
+            return;
+        }
 
         p2pStateMachine.BroadcastP2pPeersChanged();
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_SUCCESS);

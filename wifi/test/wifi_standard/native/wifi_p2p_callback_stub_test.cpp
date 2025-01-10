@@ -123,6 +123,11 @@ public:
         WIFI_LOGI("OnP2pGcLeaveGroup Mock");
     }
 
+    void OnP2pChrErrCodeReport(const int errCode) override
+    {
+        WIFI_LOGI("OnP2pChrErrCodeReport Mock");
+    }
+
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override
     {
         return nullptr;

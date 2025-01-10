@@ -32,13 +32,15 @@ inline const std::string WIFI_EVENT_DIALOG_ACCEPT = "ohos.event.wifi.DIALOG_ACCE
 inline const std::string WIFI_EVENT_DIALOG_REJECT = "ohos.event.wifi.DIALOG_REJECT";
 inline const std::string EVENT_SETTINGS_WLAN_KEEP_CONNECTED = "event.settings.wlan.keep_connected";
 enum WifiNotificationId {
-    WIFI_PORTAL_NOTIFICATION_ID = 101000
+    WIFI_PORTAL_NOTIFICATION_ID = 101000,
+    WIFI_5G_CONN_NOTIFICATION_ID = 101001
 };
 
 enum WifiNotificationStatus {
     WIFI_PORTAL_CONNECTED = 0,
     WIFI_PORTAL_TIMEOUT = 1,
-    WIFI_PORTAL_FOUND = 2
+    WIFI_PORTAL_FOUND = 2,
+    WIFI_5G_CONN_FOUND = 3
 };
 
 enum WifiNotificationOpetationType {
@@ -49,7 +51,8 @@ enum WifiNotificationOpetationType {
 enum WifiDialogType {
     CDD = 0,
     THREE_VAP = 1,
-    CANDIDATE_CONNECT = 2
+    CANDIDATE_CONNECT = 2,
+    AUTO_IDENTIFY_CONN = 3
 };
 
 class WifiNotificationUtil {
@@ -60,14 +63,17 @@ public:
 
     void CancelWifiNotification(WifiNotificationId notificationId);
 
+    void DisplaySettingWlanPage(std::string bundleName, std::string abilityName, std::string navEntryKey);
+ 
     int32_t StartAbility(OHOS::AAFwk::Want& want);
 
-    void ShowDialog(WifiDialogType type);
+    void ShowDialog(WifiDialogType type, std::string comInfo = "");
 
     void ShowSettingsDialog(WifiDialogType type, std::string settings);
 
 private:
-    std::atomic<bool> isNtfPublished {false};
+    std::atomic<bool> isPortalNtfPublished {false};
+    std::atomic<bool> is5gConnNtfPublished {false};
 
     WifiNotificationUtil();
     ~WifiNotificationUtil();
@@ -91,6 +97,6 @@ private:
     std::string bundleName_;
     std::string abilityName_;
 };
-}
-}
+}  // namespace Wifi
+}  // namespace OHOS
 #endif

@@ -42,7 +42,7 @@
 /**
  * @brief Defines the maximum number of stations connected to a hotspot.
  */
-#define WIFI_MAX_STA_NUM 6
+#define WIFI_MAX_STA_NUM 8
 
 /**
  * @brief Enumerates received signal strength indicator (RSSI) levels.

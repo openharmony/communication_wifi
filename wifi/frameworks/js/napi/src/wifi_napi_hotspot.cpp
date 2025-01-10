@@ -75,6 +75,17 @@ NO_SANITIZE("cfi") napi_value IsHotspotDualBandSupported(napi_env env, napi_call
     return result;
 }
 
+NO_SANITIZE("cfi") napi_value IsOpenSoftApAllowed(napi_env env, napi_callback_info info)
+{
+    WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+    bool isSupported = false;
+    ErrCode ret = wifiHotspotPtr->IsOpenSoftApAllowed(isSupported);
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
+    napi_value result;
+    napi_get_boolean(env, isSupported, &result);
+    return result;
+}
+
 static KeyMgmt GetKeyMgmtFromJsSecurityType(int secType)
 {
     std::map<SecTypeJs, KeyMgmt>::iterator iter = g_mapSecTypeToKeyMgmt.find(SecTypeJs(secType));

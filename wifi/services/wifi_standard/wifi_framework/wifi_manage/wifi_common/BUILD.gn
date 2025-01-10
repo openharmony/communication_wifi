@@ -164,7 +164,6 @@ if (defined(ohos_lite)) {
       "wifi_net_observer.cpp",
       "wifi_netlink.cpp",
       "wifi_network_stats/wifi_net_stats_manager.cpp",
-      "wifi_notification_util.cpp",
       "wifi_permission_helper.cpp",
       "wifi_permission_utils.cpp",
       "wifi_protect.cpp",

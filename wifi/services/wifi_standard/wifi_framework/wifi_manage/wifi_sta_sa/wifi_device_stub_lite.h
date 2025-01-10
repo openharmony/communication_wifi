@@ -48,6 +48,7 @@ private:
     void OnGetDeviceConfigs(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnEnableDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnDisableDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply);
+    void OnAllowAutoConnect(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnConnectTo(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnConnect2To(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnReConnect(uint32_t code, IpcIo *req, IpcIo *reply);

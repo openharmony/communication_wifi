@@ -75,8 +75,9 @@ int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, con
     }
     return ret;
 }
+
 int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
-    const std::string &cmdParm) const
+    const std::string &cmdParm, char *out) const
 {
     int ret = -1;
     if (ifName.size() + 1 > IFNAMSIZ) {
@@ -124,7 +125,27 @@ int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
         WIFI_LOGE("%{public}s ioctl failed, error is: %{public}d.", __FUNCTION__, errno);
     }
     close(sock);
+    if (out != nullptr) {
+        if (memset_s(out, TINY_BUFF_SIZE, 0, TINY_BUFF_SIZE) != EOK) {
+            WIFI_LOGE("%{public}s memset_s cmd fail", __FUNCTION__);
+        }
+        if (memcpy_s(out, TINY_BUFF_SIZE, privCmd.buf, TINY_BUFF_SIZE - 1) != EOK) {
+            WIFI_LOGE("%{public}s memcpy_s cmd fail", __FUNCTION__);
+        }
+    }
     return ret;
+}
+
+std::string WifiCmdClient::VoWifiDetectInternal(std::string cmd)
+{
+    std::string ifName = "wlan0";
+    char out[MAX_PRIV_CMD_SIZE] = {};
+    int ret = SendCommandToDriverByInterfaceName(ifName, cmd, out);
+    if (ret == 0) {
+        std::string reply = out;
+        return reply;
+    }
+    return "";
 }
 
 int WifiCmdClient::SetRxListen(const std::string &ifName, const std::string &param) const

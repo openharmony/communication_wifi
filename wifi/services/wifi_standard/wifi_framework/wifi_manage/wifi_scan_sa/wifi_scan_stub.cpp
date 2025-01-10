@@ -166,8 +166,10 @@ int WifiScanStub::OnScan(uint32_t code, MessageParcel &data, MessageParcel &repl
     WIFI_LOGD("run OnScan code %{public}u, datasize %{public}zu, compatible:%{public}d",
         code, data.GetRawDataSize(), compatible);
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(name);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(GetCallingUid());
     ErrCode ret = Scan(compatible);
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName("");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(-1);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 
@@ -198,8 +200,10 @@ int WifiScanStub::OnScanByParams(uint32_t code, MessageParcel &data, MessageParc
     std::string name = data.ReadString();
 
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(name);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(GetCallingUid());
     ErrCode ret = AdvanceScan(params);
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName("");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(-1);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

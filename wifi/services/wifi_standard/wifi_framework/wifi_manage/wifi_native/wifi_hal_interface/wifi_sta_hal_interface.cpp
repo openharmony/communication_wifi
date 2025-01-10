@@ -110,11 +110,11 @@ WifiErrorNo WifiStaHalInterface::Reconnect(void)
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::Reassociate(void)
+WifiErrorNo WifiStaHalInterface::Reassociate(const std::string &ifaceName)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqReassociate(WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
+    return mHdiWpaClient->ReqReassociate(ifaceName.c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqReassociate();

@@ -199,11 +199,6 @@ public:
         pWifiControllerMachine->HandleSoftapStop(0);
     }
 
-    void StopSoftapCloseTimerTest()
-    {
-        pWifiControllerMachine->StopSoftapCloseTimer();
-    }
-
     void SoftapToggledTest1()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
@@ -528,11 +523,6 @@ HWTEST_F(WifiControllerMachineTest, HandleSoftapStopTest, TestSize.Level1)
     HandleSoftapStopTest();
 }
 
-HWTEST_F(WifiControllerMachineTest, StopSoftapCloseTimerTest, TestSize.Level1)
-{
-    StopSoftapCloseTimerTest();
-}
-
 HWTEST_F(WifiControllerMachineTest, SoftapToggledTest1, TestSize.Level1)
 {
     SoftapToggledTest1();
@@ -663,27 +653,6 @@ HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForWlan1Test02, TestSi
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetPersistWifiState(_))
         .WillRepeatedly(Return(WIFI_STATE_ENABLED));
     EXPECT_EQ(pWifiControllerMachine->pEnableState->HandleWifiToggleChangeForWlan1(id, isOpen), true);
-}
-
-HWTEST_F(WifiControllerMachineTest, StartSoftapCloseTimerTest01, TestSize.Level1)
-{
-    pWifiControllerMachine->stopSoftapTimerId_ = 1;
-    pWifiControllerMachine->StartSoftapCloseTimer();
-    EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
-}
-
-HWTEST_F(WifiControllerMachineTest, StartSoftapCloseTimerTest02, TestSize.Level1)
-{
-    pWifiControllerMachine->stopSoftapTimerId_ = 0;
-    pWifiControllerMachine->StartSoftapCloseTimer();
-    EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
-}
-
-HWTEST_F(WifiControllerMachineTest, StopSoftapCloseTimerTest01, TestSize.Level1)
-{
-    pWifiControllerMachine->stopSoftapTimerId_ = 1;
-    pWifiControllerMachine->StopSoftapCloseTimer();
-    EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
 }
 }
 }

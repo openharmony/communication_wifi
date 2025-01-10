@@ -40,9 +40,11 @@ class WifiCmdClient {
 public:
     static WifiCmdClient &GetInstance();
     int SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const;
+    std::string VoWifiDetectInternal(std::string cmd);
 
 private:
-    int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm) const;
+    int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm,
+        char *out = nullptr) const;
     int SetRxListen(const std::string &ifName, const std::string &param) const;
     int Set2gSoftapMss(const std::string &ifName, const std::string &param) const;
     int SetAxBlaList(const std::string &ifName, const std::string &param) const;

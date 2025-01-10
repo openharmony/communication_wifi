@@ -298,7 +298,7 @@ public:
     const std::vector<WifiP2pDevice> &GetClientDevices() const;
     const std::vector<WifiP2pDevice> &GetPersistentDevices() const;
     void SetClientDevices(const std::vector<WifiP2pDevice> &devices);
-    void SetClientPersistentDevices(const std::vector<WifiP2pDevice> &devices);
+    void SetPersistentDevices(const std::vector<WifiP2pDevice> &devices);
     void ClearClientDevices();
     bool IsExplicitGroup(void) const;
     void SetExplicitGroup(bool isExplicit);

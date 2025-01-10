@@ -71,6 +71,11 @@ void WriteWifiApStateHiSysEvent(int32_t state)
     WriteEventBehavior("WIFI_AP_STATE", "STATE", state);
 }
 
+void WriteWifiBridgeStateHiSysEvent(int32_t state)
+{
+    WriteEventBehavior("WIFI_BRIDGE_STATE", "STATE", state);
+}
+
 void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t state)
 {
     WriteEventBehavior("WIFI_P2P_STATE", "INTERFACE", inter, "P2PTYPE", type, "STATE", state);

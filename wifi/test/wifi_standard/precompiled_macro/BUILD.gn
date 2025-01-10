@@ -185,6 +185,7 @@ ohos_unittest("precompiled_macro_unittest") {
     "netmanager_base:net_stats_manager_if",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libdm_lite",
   ]
 
   defines = [

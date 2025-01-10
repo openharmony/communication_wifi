@@ -228,6 +228,7 @@ ohos_unittest("manager_unittest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libdm_lite",
   ]
   external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
   external_deps += [ "drivers_interface_wlan:libwpa_proxy_1.2" ]

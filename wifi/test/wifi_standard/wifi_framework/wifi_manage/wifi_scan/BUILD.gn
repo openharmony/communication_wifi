@@ -170,6 +170,7 @@ ohos_unittest("wifi_scan_unittest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libdm_lite",
   ]
   part_name = "wifi"
   subsystem_name = "communication"

@@ -82,6 +82,7 @@ ohos_static_library("wifi_self_cure") {
     "netmanager_base:netsys_controller",
     "netstack:http_client",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   defines = [ "FEATURE_SELF_CURE_SUPPORT" ]

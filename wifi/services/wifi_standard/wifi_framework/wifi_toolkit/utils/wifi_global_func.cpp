@@ -62,6 +62,11 @@ constexpr const char* PHONE_PRODUCT_DEVICE_TYPE = "phone";
 constexpr const char* WEARABLE_PRODUCT_DEVICE_TYPE = "wearable";
 constexpr const char* TABLET_PRODUCT_DEVICE_TYPE = "table";
 
+constexpr int PROP_FSS_ENABLE_LEN = 16;
+constexpr int FSS_ENABLE_LEN = 4;
+constexpr const char* PROP_FSS_ENABLE = "const.wifi.hw_fss_enable";
+constexpr const char* DEFAULT_FSS_ENABLE = "false";
+constexpr const char* FSS_ENABLE = "true";
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
@@ -592,6 +597,21 @@ bool IsStartUpWifiEnableSupport()
     if (errCode > 0) {
         if (strncmp(preValue, STARTUP_WIFI_ENABLE, STARTUP_WIFI_ENABLE_LEN) == 0) {
             LOGI("param startup_wifi_enable is true.");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsSignalSmoothingEnable()
+{
+    LOGI("Enter IsSignalSmoothingEnable");
+    char preValue[PROP_FSS_ENABLE_LEN] = {0};
+    int errCode = GetParamValue(PROP_FSS_ENABLE, DEFAULT_FSS_ENABLE,
+        preValue, PROP_FSS_ENABLE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, FSS_ENABLE, FSS_ENABLE_LEN) == 0) {
+            LOGI("param fss_enable is true.");
             return true;
         }
     }

@@ -119,8 +119,7 @@
                 "libxml2",
                 "asset",
                 "icu",
-                "window_manager",
-                "ace_engine"
+                "window_manager"
             ],
             "third_party": [
                 "wpa_supplicant"

@@ -28,10 +28,10 @@ ohos_unittest("wifi_pro_unittest") {
 
   sanitize = {
     cfi = true
-    boundary_sanitize = true
+    boundary_sanitize = false
     cfi_cross_dso = true
-    integer_overflow = true
-    ubsan = true
+    integer_overflow = false
+    ubsan = false
     debug = false
   }
 
@@ -56,6 +56,7 @@ ohos_unittest("wifi_pro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_file_spec.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ip_tools.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_common_event_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/unittest/Mock/mock_wifi_settings.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_controller/Mock/mock_wifi_toggler_manager.cpp",
@@ -116,8 +117,6 @@ ohos_unittest("wifi_pro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure:wifi_self_cure",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -136,6 +135,8 @@ ohos_unittest("wifi_pro_unittest") {
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

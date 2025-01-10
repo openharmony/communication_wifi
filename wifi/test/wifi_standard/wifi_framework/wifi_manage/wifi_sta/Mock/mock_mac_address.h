@@ -23,15 +23,14 @@ class MockMacAddress {
 public:
     virtual ~MockMacAddress() = default;
 
-    virtual bool IsValidMac(const char *mac) = 0;
+    virtual bool IsValidMac(const std::string &mac) = 0;
 
 };
 
 class MacAddress : public MockMacAddress {
 public:
     static MacAddress &GetInstance(void);
-
-    MOCK_METHOD1(IsValidMac, bool(const char *mac));
+    MOCK_METHOD1(IsValidMac, bool(const std::string &mac));
 };
 }  // namespace Wifi
 }  // namespace OHOS

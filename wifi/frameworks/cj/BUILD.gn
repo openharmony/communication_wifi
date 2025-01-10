@@ -19,10 +19,10 @@ ohos_shared_library("cj_wifi_ffi") {
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
     debug = false
   }
   install_enable = true

@@ -14,18 +14,18 @@
 import("//build/ohos.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
-ohos_shared_library("wifi_ap_service") {
+ohos_static_library("wifi_ap_service") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
+    cfi_vcall_icall_only = true
     debug = false
   }
-  install_enable = true
   sources = [
     "ap_config_use.cpp",
     "ap_idle_state.cpp",
@@ -80,6 +80,7 @@ ohos_shared_library("wifi_ap_service") {
     "ability_base:base",
     "ability_base:want",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "libxml2:libxml2",
@@ -89,10 +90,6 @@ ohos_shared_library("wifi_ap_service") {
 
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
 
@@ -126,5 +123,4 @@ ohos_shared_library("wifi_ap_service") {
 
   part_name = "wifi"
   subsystem_name = "communication"
-  version_script = "libwifi_ap_service.map"
 }

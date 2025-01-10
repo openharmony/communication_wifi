@@ -19,10 +19,10 @@ ohos_static_library("wifi_self_cure") {
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
     debug = false
   }
   include_dirs = [
@@ -66,8 +66,6 @@ ohos_static_library("wifi_self_cure") {
 
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
 

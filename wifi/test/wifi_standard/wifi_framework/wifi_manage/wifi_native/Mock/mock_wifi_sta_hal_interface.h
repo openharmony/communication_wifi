@@ -44,9 +44,9 @@ public:
     static WifiStaHalInterface &GetInstance(void);
     WifiErrorNo StartWifi(const std::string &ifaceName = "wlan0", int instId = 0);
     WifiErrorNo StopWifi(int instId = 0);
-    WifiErrorNo Connect(int networkId);
+    WifiErrorNo Connect(int networkId, const std::string &ifaceName);
     WifiErrorNo Reconnect(void);
-    WifiErrorNo Reassociate(void);
+    WifiErrorNo Reassociate(const std::string &ifaceName);
     WifiErrorNo Disconnect(const std::string &ifaceName);
     WifiErrorNo GetStaCapabilities(unsigned int &capabilities);
     WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName);
@@ -91,6 +91,8 @@ public:
     const WifiEventCallback &GetCallbackInst(const std::string &ifaceName) const;
     const std::function<void(int)> &GetDeathCallbackInst(void) const;
     WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
+    WifiErrorNo GetConnectionMloLinkedInfo(const std::string &ifName,
+    std::vector<WifiLinkedInfo> &mloLinkInfo);
 public:
     WifiSignalPollInfo mInfo;
 private:

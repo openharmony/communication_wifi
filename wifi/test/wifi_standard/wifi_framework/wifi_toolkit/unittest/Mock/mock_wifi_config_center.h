@@ -160,6 +160,12 @@ public:
     virtual int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0) = 0;
     virtual void SetSystemMode(int systemMode) = 0;
     virtual int GetSystemMode() = 0;
+    virtual bool GetWifiSelfcureResetEntered() const = 0;
+    virtual int SetHotspotIdleTimeout(int time) = 0;
+    virtual bool IsAllowPopUp() = 0;
+    virtual void SetDeviceType(int deviceType) = 0;
+    virtual int64_t GetHid2dSceneLastSetTime() = 0;
+    virtual int SetHid2dSceneLastSetTime(int64_t setTime) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -300,6 +306,12 @@ public:
     MOCK_METHOD2(SetHotspotMacConfig, int(const HotspotMacConfig &config, int id));
     MOCK_METHOD1(SetSystemMode, void(int));
     MOCK_METHOD0(GetSystemMode, int());
+    MOCK_METHOD0(GetHid2dSceneLastSetTime, int64_t());
+    MOCK_METHOD1(SetHid2dSceneLastSetTime, int(int64_t setTime));
+    MOCK_METHOD0(IsAllowPopUp, bool());
+    MOCK_METHOD1(SetDeviceType, void(int deviceType));
+    MOCK_METHOD1(SetHotspotIdleTimeout, int(int time));
+    MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

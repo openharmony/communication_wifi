@@ -76,13 +76,11 @@ public:
 
     void GetScanControlInfoSuccess()
     {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(0));
         pScanService->GetScanControlInfo();
     }
 
     void GetScanControlInfoFail()
     {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).WillRepeatedly(Return(-1));
         pScanService->GetScanControlInfo();
     }
 

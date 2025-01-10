@@ -68,6 +68,9 @@ memory_optimization_cflags_cc = [
   "-fvisibility-inlines-hidden",
   "-fdata-sections",
   "-ffunction-sections",
+  "-fno-asynchronous-unwind-tables",
+  "-fno-unwind-tables",
+  "-fno-merge-all-constants",
   "-Os",
 ]
 

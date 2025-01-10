@@ -183,7 +183,7 @@ HWTEST_F(ApStartedState_test, GoInState_SUCCESS,TestSize.Level1)
     std::string countryCode = "CN";
     EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(Eq("")))
         .WillRepeatedly(DoAll(testing::SetArgReferee<0>(countryCode), Return(0)));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(Eq(countryCode), 0))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(StrEq("CN"), StrEq(countryCode)))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(A<HotspotConfig &>(), 0))
         .WillRepeatedly(DoAll(SetArgReferee<0>(apcfg), Return(0)));
@@ -202,7 +202,7 @@ HWTEST_F(ApStartedState_test, GoInState_SUCCESS,TestSize.Level1)
 HWTEST_F(ApStartedState_test, GoInState_FAILED1,TestSize.Level1)
 {
     std::vector<StationInfo> results;
-
+    std::string countryCode = "CN";
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), SetHotspotState(A<int>(), 0)).WillRepeatedly(Return(0));
     EXPECT_CALL(*pMockApMonitor, StartMonitor()).WillRepeatedly(Return());
@@ -215,11 +215,11 @@ HWTEST_F(ApStartedState_test, GoInState_FAILED1,TestSize.Level1)
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(StrEq("")))
         .WillRepeatedly(DoAll(SetArgReferee<0>("CN"), Return(0)));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(StrEq("CN"), 0))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(StrEq("CN"), StrEq(countryCode)))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     pApStartedState->GoInState();
 
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(StrEq("CN"), 0))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(StrEq("CN"), StrEq(countryCode)))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(A<HotspotConfig &>(), 0)).WillRepeatedly(Return(1));
     pApStartedState->GoInState();
@@ -422,8 +422,9 @@ HWTEST_F(ApStartedState_test, SetConfig_004, TestSize.Level1)
 
 HWTEST_F(ApStartedState_test, SetConfigs_001, TestSize.Level1)
 {
+std::string countryCode = "CN";
     EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, 0))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, StrEq(countryCode)))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(_, 0)).WillRepeatedly(Return(0));
     EXPECT_FALSE(pApStartedState->SetConfig());
@@ -437,16 +438,18 @@ HWTEST_F(ApStartedState_test, SetConfigs_002, TestSize.Level1)
 
 HWTEST_F(ApStartedState_test, SetConfigs_003, TestSize.Level1)
 {
+    std::string countryCode = "CN";
     EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, 0))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, StrEq(countryCode)))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_FALSE(pApStartedState->SetConfig());
 }
 
 HWTEST_F(ApStartedState_test, SetConfigs_004, TestSize.Level1)
 {
+    std::string countryCode = "CN";
     EXPECT_CALL(WifiSettings::GetInstance(), GetCountryCode(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, 0))
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, StrEq(countryCode)))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(_, 0)).WillRepeatedly(Return(1));
     EXPECT_FALSE(pApStartedState->SetConfig());
@@ -501,7 +504,6 @@ HWTEST_F(ApStartedState_test, AssociatedStaLeaveTest, TestSize.Level1)
     pApStartedState->ProcessCmdAssociatedStaChanged(msg);
 }
 
-
 HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), StopAp(_))
@@ -520,9 +522,9 @@ HWTEST_F(ApStartedState_test, EnableInterfaceNat_001, TestSize.Level1)
 
 HWTEST_F(ApStartedState_test, ProcessCmdUpdateCountryCodeTest, TestSize.Level1)
 {
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, 0))
-        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     std::string countryCode = "CN";
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetWifiCountryCode(_, StrEq(countryCode)))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     msg->ClearMessageBody();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(countryCode);

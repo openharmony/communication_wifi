@@ -94,18 +94,18 @@ if (defined(ohos_lite)) {
     ]
   }
 } else {
-  ohos_shared_library("wifi_toolkit") {
+  ohos_static_library("wifi_toolkit") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = true  # Enable boundary san detection
+      boundary_sanitize = false  # Enable boundary san detection
       cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = true  # Enable integer overflow detection
-      ubsan = true  # Enable some Ubsan options
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
       debug = false
     }
-    install_enable = true
     sources = local_base_sources
     sources += [
       "config/wifi_backup_config.cpp",
@@ -125,7 +125,6 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
-      "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
@@ -199,7 +198,6 @@ if (defined(ohos_lite)) {
       "-fPIC",
       "-Wl,-E",
     ]
-    version_script = "libwifi_toolkit.map"
     part_name = "wifi"
     subsystem_name = "communication"
   }

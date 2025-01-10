@@ -47,7 +47,7 @@ public:
     WifiErrorNo WpaGetCountryCode(std::string &countryCode) const;
     const SupplicantEventCallback &GetCallbackInst(void) const;
     WifiErrorNo WpaSetSuspendMode(bool mode) const;
-    WifiErrorNo WpaSetPowerMode(bool mode) const;
+    WifiErrorNo WpaSetPowerMode(bool mode, int instId) const;
     void NotifyScanResultEvent();
 private:
     SupplicantEventCallback mCallback;

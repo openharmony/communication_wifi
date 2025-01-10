@@ -191,6 +191,14 @@ public:
      */
     virtual ErrCode DisableDeviceConfig(int networkId) = 0;
     /**
+     * @Description Set whether to allow automatic connect by networkid.
+     *
+     * @param networkId - Identifies the network to be set. The value of networkId cannot be less thann 0.
+     * @param isAllowed - Identifies whether allow auto connect or not.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) = 0;
+    /**
      * @Description  Start WPS Connection
      *
      * @Output: Return operating results to Interface Service after enable wifi
@@ -385,6 +393,55 @@ public:
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac) = 0;
+
+    /**
+     * @Description  wifiPro service initialization function.
+     *
+     * @return VoWifiSignalInfo : wifi signal info
+     */
+    virtual ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) = 0;
+ 
+    /**
+     * @Description  Check Is Support VoWifi Detect.
+     *
+     * @return bool - supported: true, unsupported: false.
+     */
+    virtual ErrCode IsSupportVoWifiDetect(bool &isSupported) = 0;
+ 
+    /**
+     * @Description  set VoWifi detect mode.
+     *
+     * @param info WifiDetectConfInfo
+     */
+    virtual ErrCode SetVoWifiDetectMode(WifiDetectConfInfo info) = 0;
+ 
+    /**
+     * indicate VoWifiDetectMode
+     *
+     * @return VoWifiDetectMode
+     */
+    virtual ErrCode GetVoWifiDetectMode(WifiDetectConfInfo &info) = 0;
+ 
+    /**
+     * @Description  set vowifi detect period.
+     *
+     * @param period period of vowifi detect
+     */
+    virtual ErrCode SetVoWifiDetectPeriod(int period) = 0;
+ 
+    /**
+     * Get vowifi detection period
+     *
+     * @return vowifi detection period
+     */
+    virtual ErrCode GetVoWifiDetectPeriod(int &period) = 0;
+ 
+    /**
+     * @Description Notify vowifi signal detect interrupt message from netlink.
+     *
+     * @param type - wifi netlink message type
+     */
+    virtual void ProcessVoWifiNetlinkReportEvent(const int type) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -27,6 +27,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 #include "wifi_cert_utils.h"
+#include "wifi_cmd_client.h"
 #include "wifi_common_util.h"
 #include "network_selection_manager.h"
 #include "wifi_config_center.h"
@@ -58,6 +59,11 @@ constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 #define EAP_AUTH_WLAN_MNC "@wlan.mnc"
 #define EAP_AUTH_WLAN_MCC ".mcc"
 #define EAP_AUTH_PERMANENT_SUFFIX ".3gppnetwork.org"
+
+const int WIFI_DETECT_MODE_LOW = 1;
+const int WIFI_DETECT_MODE_HIGH = 2;
+ 
+const std::string VOWIFI_DETECT_SET_PREFIX = "VOWIFI_DETECT SET ";
 
 StaService::StaService(int instId)
     : pStaStateMachine(nullptr),
@@ -294,7 +300,9 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
 #ifndef OHOS_ARCH_LITE
     if (config.lastConnectTime <= 0) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
-        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
+        if (WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+            WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT);
+        }
         return WIFI_OPT_SUCCESS;
     }
 #endif
@@ -418,6 +426,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     WifiDeviceConfig tempDeviceConfig;
     tempDeviceConfig.instanceId = config.instanceId;
     if (FindDeviceConfig(config, tempDeviceConfig) == 0) {
+        netWorkId = tempDeviceConfig.networkId;
         if (m_instId == INSTID_WLAN0) {
             CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
             bssid = config.bssid.empty() ? tempDeviceConfig.bssid : config.bssid;
@@ -587,10 +596,22 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 
     WifiLinkedInfo linkedInfo;
+    std::vector<WifiLinkedInfo> mloInfo;
+    bool isMloBssid = false;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId);
+    for (auto iter : mloInfo) {
+        if (iter.bssid == bssid) {
+            isMloBssid = true;
+            break;
+        }
+    }
     if (networkId == linkedInfo.networkId) {
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+        } else if (linkedInfo.mloState == MloState::WIFI7_EMLSR && isMloBssid) {
+            LOGI("%{public}s current linkedBssid is emlsr, forbid link switch", __FUNCTION__);
+            return WIFI_OPT_NOT_SUPPORTED;
         } else {
             LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
                 __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
@@ -653,6 +674,34 @@ ErrCode StaService::DisableDeviceConfig(int networkId) const
         DisabledReason::DISABLED_BY_WIFI_MANAGER)) {
         WIFI_LOGE("Disable device config failed!");
         return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
+{
+    WIFI_LOGI("Enter AllowAutoConnect, networkid is %{public}d, isAllowed is %{public}d", networkId, isAllowed);
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, targetNetwork)) {
+        WIFI_LOGE("AllowAutoConnect, failed tot get device config");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (targetNetwork.isAllowAutoConnect == isAllowed) {
+        return WIFI_OPT_FAILED;
+    }
+
+    targetNetwork.isAllowAutoConnect = isAllowed;
+    WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
+    WifiSettings::GetInstance().SyncDeviceConfig();
+    if (!isAllowed) {
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+        if (linkedInfo.networkId != networkId) {
+            WIFI_LOGI("AllowAutoConnect, networkid is not correct, linked networkid:%{public}d", linkedInfo.networkId);
+            return WIFI_OPT_FAILED;
+        }
+        Disconnect();
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -750,9 +799,11 @@ ErrCode StaService::ReConnect() const
 ErrCode StaService::SetSuspendMode(bool mode) const
 {
     LOGI("Enter SetSuspendMode, mode=[%{public}d]!", mode);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(mode) != WIFI_HAL_OPT_OK) {
-        LOGE("WpaSetSuspendMode() failed!");
-        return WIFI_OPT_FAILED;
+    if (m_instId == INSTID_WLAN0) {
+        if (WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(mode) != WIFI_HAL_OPT_OK) {
+            LOGE("WpaSetSuspendMode() failed!");
+            return WIFI_OPT_FAILED;
+        }
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -760,7 +811,7 @@ ErrCode StaService::SetSuspendMode(bool mode) const
 ErrCode StaService::SetPowerMode(bool mode) const
 {
     LOGI("Enter SetPowerMode, mode=[%{public}d]!", mode);
-    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(mode) != WIFI_HAL_OPT_OK) {
+    if (WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(mode, m_instId) != WIFI_HAL_OPT_OK) {
         LOGE("SetPowerMode() failed!");
         return WIFI_OPT_FAILED;
     }
@@ -970,6 +1021,124 @@ ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_DELIVER_MAC, currentMac);
 
     return WIFI_OPT_SUCCESS;
+}
+
+std::string StaService::VoWifiDetect(std::string cmd)
+{
+    std::unique_lock<std::shared_mutex> lock(voWifiCallbackMutex_);
+    std::string result = WifiCmdClient::GetInstance().VoWifiDetectInternal(cmd);
+    return result;
+}
+ 
+VoWifiSignalInfo StaService::FetchWifiSignalInfoForVoWiFi()
+{
+    VoWifiSignalInfo voWifiSignalInfo;
+
+    int linkSpeed = -1;
+    int frequency = -1;
+    int rssi = -1;
+    int noise = -1;
+ 
+    WifiSignalPollInfo signalInfo;
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetConnectSignalInfo(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), linkedInfo.bssid, signalInfo);
+    WIFI_LOGI("FetchWifiSignalInfoForVoWiFi GetConnectSignalInfo result: %{public}d.", ret);
+    
+    linkSpeed = signalInfo.txrate;
+    frequency = signalInfo.frequency;
+    rssi = signalInfo.signal;
+ 
+    int txPacketCounter = signalInfo.txPackets;
+    int nativeTxFailed = signalInfo.txFailed;
+    int nativeTxSuccessed = txPacketCounter - nativeTxFailed;
+ 
+    // set rssi
+    voWifiSignalInfo.rssi = rssi;
+ 
+    // set noise
+    noise = 0; // stub
+    voWifiSignalInfo.noise = noise;
+ 
+    // set bler
+    int bler = static_cast<int>((static_cast<double>(nativeTxFailed) / static_cast<double>(txPacketCounter)) * 100);
+    voWifiSignalInfo.bler = bler;
+ 
+    // delta tx packet count
+    int deltaTxPacketCounter = nativeTxSuccessed - lastTxPktCnt_;
+    lastTxPktCnt_ = nativeTxSuccessed;
+    voWifiSignalInfo.deltaTxPacketCounter = deltaTxPacketCounter;
+ 
+    // access type
+    int accessType = ConvertToAccessType(linkSpeed, frequency);
+    voWifiSignalInfo.accessType = accessType;
+ 
+    // reserve
+    voWifiSignalInfo.reverse = 0;
+ 
+    // tx successed packet count
+    voWifiSignalInfo.txGood = nativeTxSuccessed;
+ 
+    // tx fialed packet count
+    voWifiSignalInfo.txBad = nativeTxFailed;
+ 
+    // max address
+    std::string bssid = linkedInfo.bssid;
+    std::string macStr = "ffffffffffff";
+    std::string::size_type pos = 0;
+    while ((pos = bssid.find(':', pos)) != std::string::npos) {
+        bssid.replace(pos, 1, "");
+        pos++;
+    }
+    const char* charArray = macStr.data();
+    unsigned char* macBytes = reinterpret_cast<unsigned char*>(const_cast<char*>(charArray));
+    std::string macAddressStr(reinterpret_cast<char*>(macBytes));
+    voWifiSignalInfo.macAddress = macAddressStr;
+ 
+    WIFI_LOGI("rssi:%{public}d, nativeTxFailed:%{public}d, nativeTxSuccessed:%{public}d,"
+        "deltaTxPacketCounter:%{public}d, linkSpeed:%{public}d, frequency:%{public}d, mac:%{public}s",
+        rssi, nativeTxFailed, nativeTxSuccessed, deltaTxPacketCounter, linkSpeed, frequency,
+        MacAnonymize(macAddressStr).c_str());
+    return voWifiSignalInfo;
+}
+ 
+int StaService::ConvertToAccessType(int linkSpeed, int frequency)
+{
+    // RESERVE
+    return 0;
+}
+ 
+void StaService::ProcessSetVoWifiDetectMode(WifiDetectConfInfo info)
+{
+    bool ret = false;
+
+    if (info.wifiDetectMode == WIFI_DETECT_MODE_LOW) {
+        ret = VoWifiDetectSet("LOW_THRESHOLD " + std::to_string(info.threshold));
+    } else if (info.wifiDetectMode == WIFI_DETECT_MODE_HIGH) {
+        ret = VoWifiDetectSet("HIGH_THRESHOLD " + std::to_string(info.threshold));
+    } else {
+        ret = VoWifiDetectSet("MODE " + std::to_string(info.wifiDetectMode));
+    }
+ 
+    if (ret && VoWifiDetectSet("TRIGGER_COUNT " + std::to_string(info.envalueCount))) {
+        ret = VoWifiDetectSet("MODE " + std::to_string(info.wifiDetectMode));
+    }
+ 
+    WIFI_LOGI("set VoWifi detect mode: %{public}d, result: %{public}d.", info.wifiDetectMode, ret);
+}
+ 
+void StaService::ProcessSetVoWifiDetectPeriod(int period)
+{
+    bool ret = VoWifiDetectSet("PERIOD " + std::to_string(period));
+    WIFI_LOGI("Set VoWifi Detect Period result: %{public}d, period = %{public}d", ret, period);
+}
+ 
+bool StaService::VoWifiDetectSet(std::string cmd)
+{
+    std::string ret = VoWifiDetect(VOWIFI_DETECT_SET_PREFIX + cmd);
+    WIFI_LOGI("VoWifiDetectSet ret : %{public}s", ret.c_str());
+    return (!ret.empty() && (ret == "true" || ret == "OK"));
 }
 }  // namespace Wifi
 }  // namespace OHOS

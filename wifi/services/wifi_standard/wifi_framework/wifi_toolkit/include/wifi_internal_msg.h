@@ -116,6 +116,18 @@ enum class OperateResState {
     ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
 };
 
+enum SystemMode : int {
+    M_DEFAULT = 1,
+    M_FACTORY_MODE = 2,
+};
+
+enum ProductDeviceType : int {
+    DEFAULT = -1,
+    PHONE = 0,
+    TABLET = 1,
+    WEARABLE = 2,
+};
+
 struct WifiCallingInfo {
     int callingUid;
     int callingPid;
@@ -171,6 +183,7 @@ struct WifiEventCallbackMsg {
     CfgInfo* cfgInfo;
     GcInfo gcInfo;
     std::string privateWfdInfo;
+    int errCode;
     WifiEventCallbackMsg()
     {
         msgCode = 0;
@@ -178,6 +191,7 @@ struct WifiEventCallbackMsg {
         id = 0;
         p2pAction = P2pActionCallback::UNKNOWN;
         cfgInfo = nullptr;
+        errCode = 0;
     }
 };
 

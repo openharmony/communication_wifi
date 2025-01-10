@@ -408,6 +408,10 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
+
+    if (wifi_feature_with_rpt) {
+      defines += [ "FEATURE_RPT_SUPPORT" ]
+    }
   }
   ohos_source_set("wifi_p2p_service_impl") {
     branch_protector_ret = "pac_ret"
@@ -575,6 +579,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_wifi_pro_ctrl) {
       defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
+    }
+
+    if (wifi_feature_voicewifi_enable) {
+      defines += [ "FEATURE_VOWIFI_SUPPORT" ]
     }
 
     if (defined(global_parts_info) &&

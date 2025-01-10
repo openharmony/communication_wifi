@@ -452,6 +452,13 @@ bool IsPskEncryption(const std::string &keyMgmt);
 bool IsFactoryMode();
 
 /**
+ * @Description get device type
+ *
+ * @return int - DEFAULT -1, PHONE 0, TABLET 1, WEARABLE 2
+ */
+int GetDeviceType();
+
+/**
  * @Description is wifi support opening automatically when first start up
  *
  * @return true - open

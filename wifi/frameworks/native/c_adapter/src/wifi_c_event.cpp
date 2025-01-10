@@ -149,14 +149,70 @@ NO_SANITIZE("cfi") void WifiCHotspotEventCallback::OnHotspotStateChanged(int sta
     }
 }
 
+static OHOS::Wifi::ErrCode ConvertStationInfo(const OHOS::Wifi::StationInfo& staInfo, StationInfo *cStaInfo)
+{
+    if (cStaInfo == nullptr || cStaInfo->name == nullptr) {
+        WIFI_LOGE("Error: the ptr is null!");
+        return OHOS::Wifi::WIFI_OPT_INVALID_PARAM;
+    }
+
+    if (memcpy_s(cStaInfo->name, DEVICE_NAME_LEN, staInfo.deviceName.c_str(), staInfo.deviceName.size() + 1) != EOK) {
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (OHOS::Wifi::MacStrToArray(staInfo.bssid, cStaInfo->macAddress) != EOK) {
+        WIFI_LOGE("StationInfo bssid Convert to c struct error!");
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    cStaInfo->ipAddress = OHOS::Wifi::Ip2Number(staInfo.ipAddr);
+    return OHOS::Wifi::WIFI_OPT_SUCCESS;
+}
+
 void WifiCHotspotEventCallback::OnHotspotStaJoin(const OHOS::Wifi::StationInfo &info)
 {
+    std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
     WIFI_LOGI("Hotspot received sta join event");
+    StationInfo cStaInfo;
+    cStaInfo.name = (char *)malloc(DEVICE_NAME_LEN);
+    if (cStaInfo.name == nullptr) {
+        WIFI_LOGE("Malloc failed");
+        return;
+    }
+    OHOS::Wifi::ErrCode retValue = ConvertStationInfo(info, &cStaInfo);
+    if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get station info from cpp error");
+        free(cStaInfo.name);
+        cStaInfo.name = nullptr;
+        return;
+    }
+    if (EventManager::g_wifiEvent.OnHotspotStaJoin) {
+        EventManager::g_wifiEvent.OnHotspotStaJoin(&cStaInfo);
+    }
+    free(cStaInfo.name);
+    cStaInfo.name = nullptr;
 }
 
 void WifiCHotspotEventCallback::OnHotspotStaLeave(const OHOS::Wifi::StationInfo &info)
 {
+    std::unique_lock<std::mutex> lock(EventManager::callbackMutex);
     WIFI_LOGI("Hotspot received sta leave event");
+    StationInfo cStaInfo;
+    cStaInfo.name = (char *)malloc(DEVICE_NAME_LEN);
+    if (cStaInfo.name == nullptr) {
+        WIFI_LOGE("Malloc failed");
+        return;
+    }
+    OHOS::Wifi::ErrCode retValue = ConvertStationInfo(info, &cStaInfo);
+    if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get station info from cpp error");
+        free(cStaInfo.name);
+        cStaInfo.name = nullptr;
+        return;
+    }
+    if (EventManager::g_wifiEvent.OnHotspotStaLeave) {
+        EventManager::g_wifiEvent.OnHotspotStaLeave(&cStaInfo);
+    }
+    free(cStaInfo.name);
+    cStaInfo.name = nullptr;
 }
 
 OHOS::sptr<OHOS::IRemoteObject> WifiCHotspotEventCallback::AsObject()

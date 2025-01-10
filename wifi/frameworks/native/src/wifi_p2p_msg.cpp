@@ -525,7 +525,7 @@ void WifiP2pGroupInfo::SetClientDevices(const std::vector<WifiP2pDevice> &device
     clientDevices = devices;
 }
 
-void WifiP2pGroupInfo::SetClientPersistentDevices(const std::vector<WifiP2pDevice> &devices)
+void WifiP2pGroupInfo::SetPersistentDevices(const std::vector<WifiP2pDevice> &devices)
 {
     persistentClients = devices;
 }

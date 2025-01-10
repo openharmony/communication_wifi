@@ -395,6 +395,7 @@
           "OHOS::Wifi::IsAllowScanAnyTime(OHOS::Wifi::tagScanControlInfo const&)";
           "OHOS::Wifi::ConvertConnStateInternal(OHOS::Wifi::OperateResState, bool&)";
           "OHOS::Wifi::IsStartUpWifiEnableSupport()";
+          "OHOS::Wifi::IsSignalSmoothingEnable()";
           "OHOS::Wifi::ArpChecker::GetGwMacAddrList(int, bool, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&)";
           "OHOS::Wifi::WifiCommonEventHelper::PublishSelfcureStateChangedEvent(int const&, int const&, bool)";
           "OHOS::Wifi::WifiCommonEventHelper::PublishVoWifiSignalDetectInterruptEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";

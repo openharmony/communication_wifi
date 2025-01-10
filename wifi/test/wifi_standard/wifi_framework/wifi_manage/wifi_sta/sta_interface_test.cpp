@@ -392,6 +392,12 @@ public:
         pStaInterface->StartConnectToUserSelectNetwork(0, bssid);
     }
 
+    void OnFoldStateChanged()
+    {
+        int foldStatus = MODE_STATE_EXPAND;
+        pStaInterface->OnFoldStateChanged(foldStatus);
+    }
+    
     void SetPowerMode()
     {
         pStaInterface->SetPowerMode(0);
@@ -737,6 +743,11 @@ HWTEST_F(StaInterfaceTest, SetPowerMode, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, OnSystemAbilityChanged, TestSize.Level1)
 {
     OnSystemAbilityChanged();
+}
+
+HWTEST_F(StaInterfaceTest, OnFoldStateChanged, TestSize.Level1)
+{
+    OnFoldStateChanged();
 }
 
 } // namespace Wifi

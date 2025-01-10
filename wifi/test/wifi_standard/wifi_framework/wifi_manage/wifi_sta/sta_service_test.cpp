@@ -131,6 +131,7 @@ public:
     void StartRoamToNetworkTest();
     int StartConnectToUserSelectNetworkSuccessTest();
     int StartConnectToUserSelectNetworkSuccessFail();
+    void HandleFoldStatusChangedTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -827,6 +828,17 @@ int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(1)));
     return static_cast<int>(pStaService->StartConnectToUserSelectNetwork(0, "11:22:33:44"));
+}
+
+void StaServiceTest::HandleFoldStatusChangedTest()
+{
+    int foldStatus = MODE_STATE_EXPAND;
+    pStaService->HandleFoldStatusChanged(foldStatus);
+}
+
+HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level1)
+{
+    HandleFoldStatusChangedTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)

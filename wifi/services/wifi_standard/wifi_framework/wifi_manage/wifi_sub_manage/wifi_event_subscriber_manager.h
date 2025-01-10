@@ -24,7 +24,7 @@
 #include "wifi_system_ability_listerner.h"
 #include "common_event_manager.h"
 #include "wifi_event_handler.h"
-
+#include "display_manager_lite.h"
 namespace OHOS {
 namespace Wifi {
 #ifdef HAS_POWERMGR_PART
@@ -111,6 +111,13 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
+class WifiFoldStateListener : public Rosen::DisplayManagerLite::IFoldStatusListener {
+public:
+    WifiFoldStateListener();
+    ~WifiFoldStateListener() = default;
+    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
@@ -172,6 +179,8 @@ private:
     void UnRegisterSettingsEnterEvent();
     void RegisterDataShareReadyEvent();
     void UnRegisterDataShareReadyEvent();
+    void RegisterFoldStatusListener();
+    void UnRegisterFoldStatusListener();
 
 private:
     uint32_t cesTimerId{0};
@@ -208,6 +217,8 @@ private:
 
     bool accessDataShare_ = false;
     std::mutex accessDataShareMutex_;
+    sptr<Rosen::DisplayManagerLite::IFoldStatusListener> foldStatusListener_ = nullptr;
+    std::mutex foldStatusListenerMutex_;
 };
 
 }  // namespace Wifi

@@ -944,6 +944,7 @@ private:
     bool CanArpReachable();
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
+    void UpdateLinkedBssid(std::string &bssid);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void UpdateWifiCategory();

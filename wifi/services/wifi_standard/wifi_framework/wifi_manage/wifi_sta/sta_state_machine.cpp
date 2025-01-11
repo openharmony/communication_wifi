@@ -1176,6 +1176,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     // do not switch to roaming state when it is not directed to roam by framework
     pStaStateMachine->linkedInfo.bssid = bssid;
     pStaStateMachine->UpdateHiLinkAttribute();
+    pStaStateMachine->UpdateLinkedBssid(bssid);
 #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
@@ -2042,6 +2043,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             }
             pStaStateMachine->linkedInfo.bssid = bssid;
             pStaStateMachine->UpdateHiLinkAttribute();
+            pStaStateMachine->UpdateLinkedBssid(bssid);
 #ifndef OHOS_ARCH_LITE
             UpdateWifi7WurInfo();
             pStaStateMachine->UpdateWifiCategory();
@@ -3308,6 +3310,16 @@ void StaStateMachine::DealMloConnectionLinkInfo()
         return;
     }
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
+}
+
+void StaStateMachine::UpdateLinkedBssid(std::string &bssid)
+{
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    WIFI_LOGI("linked bssid changed, %{public}s", MacAnonymize(bssid).c_str());
+    WifiConfigCenter::GetInstance().StoreWifiMacAddrPairInfo(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+        bssid, "");
+#endif
+    return;
 }
 
 #ifndef OHOS_ARCH_LITE

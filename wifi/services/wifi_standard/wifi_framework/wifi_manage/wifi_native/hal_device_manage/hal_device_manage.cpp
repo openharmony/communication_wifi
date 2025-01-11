@@ -48,6 +48,7 @@ std::map<std::string, sptr<IChipIface>> HalDeviceManager::mIWifiP2pIfaces;
 sptr<IChipController> HalDeviceManager::g_IWifi = nullptr;
 sptr<ChipControllerCallback> HalDeviceManager::g_chipControllerCallback = nullptr;
 sptr<ChipIfaceCallback> HalDeviceManager::g_chipIfaceCallback = nullptr;
+OnChipServiceDied HalDeviceManager::g_chipHdiServiceDiedCb = nullptr;
 constexpr int32_t CMD_SET_MAX_CONNECT = 102;
 constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 
@@ -845,8 +846,6 @@ void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
         WifiP2PHalInterface::GetInstance().StopP2p();
         WifiStaHalInterface::GetInstance().StopWifi();
         WifiApHalInterface::GetInstance().StopAp();
-        ClearStaInfo();
-        ClearApInfo();
     }
     if (!g_chipControllerCallback) {
         g_chipControllerCallback = nullptr;
@@ -861,36 +860,10 @@ void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
     mIWifiStaIfaces.clear();
     mIWifiApIfaces.clear();
     mIWifiP2pIfaces.clear();
+    if (g_chipHdiServiceDiedCb && isRemoteDied) {
+        g_chipHdiServiceDiedCb();
+    }
     return;
-}
-
-void HalDeviceManager::NotifyDestory(std::string &ifaceName, IfaceType type)
-{
-    auto iter = mInterfaceInfoCache.find(std::pair<std::string, IfaceType>(ifaceName, type));
-    if (iter != mInterfaceInfoCache.end()) {
-        for (auto &callback : iter->second.ifaceDestoryCallback) {
-            if (callback) {
-                callback(ifaceName, static_cast<int>(type));
-            }
-        }
-        mInterfaceInfoCache.erase(iter);
-    }
-}
- 
-void HalDeviceManager::ClearStaInfo()
-{
-    for (auto &it : mIWifiStaIfaces) {
-        std::string ifaceName = it.first;
-        NotifyDestory(ifaceName, IfaceType::STA);
-    }
-}
- 
-void HalDeviceManager::ClearApInfo()
-{
-    for (auto &it : mIWifiApIfaces) {
-        std::string ifaceName = it.first;
-        NotifyDestory(ifaceName, IfaceType::AP);
-    }
 }
 
 bool HalDeviceManager::CheckReloadChipHdiService()
@@ -1608,6 +1581,12 @@ void HalDeviceManager::RemoveChipHdiDeathRecipient()
         g_chipHdiService = nullptr;
     }
     return;
+}
+
+void HalDeviceManager::RegisterChipHdiDeathCallback(OnChipServiceDied cb)
+{
+    std::lock_guard<std::mutex> lock(mMutex);
+    g_chipHdiServiceDiedCb = cb;
 }
 
 int32_t ChipIfaceCallback::OnScanResultsCallback(uint32_t event)

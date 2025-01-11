@@ -362,9 +362,6 @@ void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr
     #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SaveWifiConfigForUpdate(pStaStateMachine->targetNetworkId_);
     pStaStateMachine->SetSupportedWifiCategory();
-    if (pStaStateMachine->selfCureService_ != nullptr) {
-        pStaStateMachine->selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_CONN_CHANGED);
-    }
     #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
@@ -1160,6 +1157,8 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
     WIFI_LOGI("ApLinkedState reveived network connection event,bssid:%{public}s, ignore it.\n",
         MacAnonymize(bssid).c_str());
     pStaStateMachine->DealSignalPollResult();
+    pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }
 

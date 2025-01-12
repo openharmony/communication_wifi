@@ -989,14 +989,19 @@ enum class Wifi3VapConflictType {
 enum class NetworkLagType {
     DEFAULT = 0,
     WIFIPRO_QOE_SLOW,
+    WIFIPRO_QOE_REPORT,
 };
  
 struct NetworkLagInfo {
     uint32_t uid { 0 };
+    uint32_t rssi { 0 };
+    uint32_t tcpRtt { 0 };
  
     NetworkLagInfo()
     {
         uid = 0;
+        rssi = 0;
+        tcpRtt = 0;
     }
 };
 

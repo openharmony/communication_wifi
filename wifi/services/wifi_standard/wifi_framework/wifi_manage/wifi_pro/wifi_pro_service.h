@@ -33,7 +33,8 @@ public:
     void HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo);
     void HandleRssiLevelChanged(int32_t rssi);
     void HandleScanResult(const std::vector<InterScanInfo> &scanInfos);
-    void HandleQoeSlowResult();
+    void HandleWifiHalSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo);
+    void HandleQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo);
 private:
     std::shared_ptr<WifiProStateMachine> pWifiProStateMachine_ { nullptr };
     int32_t instId_ { 0 };

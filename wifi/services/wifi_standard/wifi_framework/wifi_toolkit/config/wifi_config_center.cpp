@@ -73,7 +73,11 @@ int WifiConfigCenter::Init()
     }
     wifiScanConfig = std::make_unique<WifiScanConfig>();
     ClearLocalHid2dInfo();
-    mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
+    if (systemMode_ == SystemMode::M_FACTORY_MODE) {
+        mPersistWifiState[INSTID_WLAN0] = WIFI_STATE_DISABLED;
+    } else {
+        mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
+    }
     mAirplaneModeState = WifiSettings::GetInstance().GetLastAirplaneMode();
     return 0;
 }
@@ -130,7 +134,7 @@ void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)
 
 bool WifiConfigCenter::GetWifiAllowSemiActive() const
 {
-    if (IsFactoryMode()) {
+    if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
         WIFI_LOGI("factory mode, not allow semi active.");
         return false;
     }
@@ -1435,6 +1439,35 @@ int WifiConfigCenter::GetHotspotMacConfig(HotspotMacConfig &config, int id)
         config = iter->second;
     }
     return 0;
+}
+
+void WifiConfigCenter::SetSystemMode(int systemMode)
+{
+    systemMode_ = systemMode;
+    LOGI("SetSystemMode %{public}d", systemMode_);
+}
+
+int WifiConfigCenter::GetSystemMode()
+{
+    LOGI("GetSystemMode %{public}d", systemMode_);
+    return systemMode_;
+}
+
+void WifiConfigCenter::SetDeviceType(int deviceType)
+{
+    mDeviceType = deviceType;
+}
+
+bool WifiConfigCenter::IsAllowPopUp()
+{
+    switch (mDeviceType) {
+        case ProductDeviceType::WEARABLE:
+            LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
+            return false;
+        default:
+            LOGI("Allow pop up dialog, device type:%{public}d", mDeviceType);
+            return true;
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

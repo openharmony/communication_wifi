@@ -74,15 +74,15 @@ private:
     int GetBgLimitMaxMode();
     ErrCode GetAppList(std::vector<AppExecFwk::RunningProcessInfo> &appList, bool getFgAppFlag);
     bool CheckNetWorkCanBeLimited(const int controlId);
-    void UpdateSpeedLimitConfigs(const int controlId, const int limitMode, const int enable);
+    void UpdateSpeedLimitConfigs(const int enable);
     void UpdateNoSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     bool IsLimitSpeedBgApp(const int controlId, const std::string &bundleName, const int enable);
     void AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo);
     void WifiConnectStateChanged();
     void ForegroundAppChangedAction(const std::string &bundleName);
     void HandleRequest(const AsyncParamInfo &asyncParamInfo);
-    void SendLimitCmd2Drv(const int controlId, const int limitMode, const int uid = -1,
-        const int enable = 0);
+    void SendLimitCmd2Drv(const int controlId, const int limitMode, const int enable,
+        const int uid = -1);
     void HighPriorityTransmit(int uid, int protocol, int enable);
     void GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
 
@@ -95,12 +95,16 @@ private:
     std::unordered_set<int> m_bgUidSet;
     std::unordered_set<int> m_bgPidSet;
     std::unordered_set<int> m_fgUidSet;
+    int m_lastLimitSpeedMode{0};
+    std::unordered_set<int> m_lastBgUidSet;
+    std::unordered_set<int> m_lastBgPidSet;
+    std::unordered_set<int> m_lastFgUidSet;
     std::unordered_set<int> m_bgAudioPlaybackUidSet;
     std::unordered_set<int> m_bgAudioPlaybackPidSet;
     std::unordered_set<int> m_additionalWindowUidSet;
     std::unordered_set<int> m_additionalWindowPidSet;
     std::unique_ptr<WifiEventHandler> m_asyncSendLimit = nullptr;
-    std::string m_delayTime;
+    int64_t m_delayTime;
 };
 } // namespace Wifi
 } // namespace OHOS

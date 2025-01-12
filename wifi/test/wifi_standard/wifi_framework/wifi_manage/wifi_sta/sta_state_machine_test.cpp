@@ -149,19 +149,19 @@ public:
     {
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
     }
 
     void ConvertDeviceCfgFail1()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
     }
 
     void ConvertDeviceCfgFail2()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
     }
 
     void StartWifiProcessSuccess()
@@ -1178,7 +1178,7 @@ public:
 
     void IsWpa3TransitionTest()
     {
-        pStaStateMachine->IsWpa3Transition(RANDOMMAC_SSID);
+        pStaStateMachine->IsWpa3Transition(RANDOMMAC_SSID, RANDOMMAC_BSSID);
     }
 
     void InvokeOnStaConnChanged(const OperateResState &state, WifiLinkedInfo &info)
@@ -1523,6 +1523,11 @@ public:
         pStaStateMachine->DealMloConnectionLinkInfo();
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveMloLinkedInfo(_, _))
             .WillRepeatedly(Return(0));
+    }
+
+    void CloseNoInternetDialogTest()
+    {
+        pStaStateMachine-> CloseNoInternetDialog();
     }
 };
 
@@ -2334,6 +2339,11 @@ HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7NotMlo, TestSize.Lev
 HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7IsMlo, TestSize.Level1)
 {
     DealMloConnectionLinkTestWifi7IsMlo();
+}
+
+HWTEST_F(StaStateMachineTest, CloseNoInternetDialogTest, TestSize.Level1)
+{
+    CloseNoInternetDialogTest();
 }
 } // namespace Wifi
 } // namespace OHOS

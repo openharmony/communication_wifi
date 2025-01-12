@@ -85,10 +85,11 @@ public:
     ~WifiNetAgent();
     void OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info, WifiProxyConfig &wifiProxyConfig,
         int instId = 0);
-    void OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo);
+    void OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+        int instId = 0);
     void OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
         int instId = 0);
-    void OnStaMachineWifiStart();
+    void OnStaMachineWifiStart(int instId = 0);
 };
 
 struct NetworkSelectionResult {

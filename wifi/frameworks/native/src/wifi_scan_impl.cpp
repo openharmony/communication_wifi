@@ -82,14 +82,14 @@ bool WifiScanImpl::GetWifiScanProxy()
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sa_mgr == nullptr) {
         WIFI_LOGE("failed to get SystemAbilityManager");
-        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), WifiScanFailReason::PROXY_FAIL);
         return false;
     }
 
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get SCAN_SERVICE");
-        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), WifiScanFailReason::PROXY_FAIL);
         return false;
     }
 
@@ -99,14 +99,14 @@ bool WifiScanImpl::GetWifiScanProxy()
     }
     if (scanMgr == nullptr) {
         WIFI_LOGE("wifi scan init failed, %{public}d", systemAbilityId_.load());
-        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), WifiScanFailReason::PROXY_FAIL);
         return false;
     }
 
     sptr<IRemoteObject> service = scanMgr->GetWifiRemote(instId_);
     if (service == nullptr) {
         WIFI_LOGE("wifi scan remote obj is null, %{public}d", instId_);
-        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), WifiScanFailReason::PROXY_FAIL);
         return false;
     }
 
@@ -116,7 +116,7 @@ bool WifiScanImpl::GetWifiScanProxy()
     }
     if (client_ == nullptr) {
         WIFI_LOGE("wifi scan instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_.load());
-        WriteWifiScanApiFailHiSysEvent(GetBundleName(), -1);
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), WifiScanFailReason::PROXY_FAIL);
         return false;
     }
     return true;

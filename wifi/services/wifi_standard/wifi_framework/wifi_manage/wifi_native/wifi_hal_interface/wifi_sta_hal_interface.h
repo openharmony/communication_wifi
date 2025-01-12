@@ -68,7 +68,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo Reassociate(void);
+    WifiErrorNo Reassociate(const std::string &ifaceName);
 
     /**
      * @Description Disconnect Wifi.

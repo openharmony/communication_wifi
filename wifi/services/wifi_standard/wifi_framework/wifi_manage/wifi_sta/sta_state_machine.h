@@ -43,6 +43,7 @@
 #include "telephony_errors.h"
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
+#include "wifi_common_event_helper.h"
 #endif
 
 namespace OHOS {
@@ -108,6 +109,11 @@ enum Wpa3ConnectFailReason {
     WPA3_AUTH_TIMEOUT,
     WPA3_ASSOC_TIMEOUT,
     WPA3_FAIL_REASON_MAX
+};
+
+enum class CoFeatureType {
+    COFEATURE_TYPE_MLO = 0,
+    COFEATURE_TYPE_WUR = 1,
 };
 
 typedef enum EnumDhcpReturnCode {
@@ -366,6 +372,7 @@ public:
         void DhcpResultNotifyEvent(DhcpReturnCode result, int ipType = -1);
         static StaStateMachine *pStaStateMachineList[STA_INSTANCE_MAX_NUM];
         StaStateMachine *pStaStateMachine;
+        std::mutex dhcpResultMutex;
         DhcpResult DhcpIpv4Result;
         DhcpResult DhcpIpv6Result;
         DhcpResult DhcpOfferInfo;
@@ -497,7 +504,7 @@ private:
      * @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config) const;
+    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const;
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -528,6 +535,8 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
+
+    void SetAllowAutoConnectStatus(int32_t networkId, bool status);
  
     /**
      * @Description  Disconnect network
@@ -678,7 +687,7 @@ private:
      *
      * @param ssid - ssid
      */
-    bool IsWpa3Transition(std::string ssid) const;
+    bool IsWpa3Transition(std::string ssid, std::string bssid) const;
 
     /**
      * @Description : get wpa3 failreason connect fail count
@@ -897,6 +906,7 @@ private:
      * @param networkId - current connected networkId;
      */
     void SaveWifiConfigForUpdate(int networkId);
+    void CloseNoInternetDialog();
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif // OHOS_ARCH_LITE
     bool IsNewConnectionInProgress();
@@ -928,12 +938,16 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    void TryModifyPortalAttribute(SystemNetWorkState netState);
+    void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
+    void UpdateHiLinkAttribute();
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
     bool m_hilinkFlag = false;
     WifiDeviceConfig m_hilinkDeviceConfig;
 #ifndef OHOS_ARCH_LITE
+    bool hasNoInternetDialog_ = false;
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */

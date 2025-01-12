@@ -67,12 +67,12 @@ public:
     StaServiceCallback GetStaCallback() const;
 
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
+
 private:
     std::unique_ptr<WifiEventHandler> assetServiceThread_ = nullptr;
-
     std::atomic<bool> firstSync_ = false;
-
     StaServiceCallback staCallback_;
+    int currentConnectedNetworkId_ = -1;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -874,6 +874,15 @@ private:
      * @param count adjust count[in]
      */
     void SystemScanDisconnectedPolicy(int &interval, int &count);
+
+    /**
+     * @Description record scan limit info
+     *
+     * @param WifiScanDeviceInfo wifiScanDeviceInfo[in]
+     * @param ScanLimitType scanLimitType[in]
+     */
+    void RecordScanLimitInfo(const WifiScanDeviceInfo &wifiScanDeviceInfo, const ScanLimitType &scanLimitType);
+
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
     public:

@@ -15,12 +15,25 @@
 
 #include "wifi_hisysevent.h"
 #include "hisysevent.h"
+#include "sta_define.h"
 #include "wifi_logger.h"
 #include "json/json.h"
+#include <map>
 
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiHiSysEvent");
+
+const std::map<int, std::string> g_connectTypeTransMap {
+    { NETWORK_SELECTED_BY_UNKNOWN, "UNKNOWN" },
+    { NETWORK_SELECTED_BY_AUTO, "AUTO_CONNECT" },
+    { NETWORK_SELECTED_BY_USER, "SELECT_CONNECT" },
+    { NETWORK_SELECTED_BY_RETRY, "RETRY_CONNECT" },
+    { NETWORK_SELECTED_BY_WIFIPRO, "WIFIPRO_CONNECT" },
+    { NETWORK_SELECTED_BY_SELFCURE, "SELFCURE_CONNECT" },
+    { NETWORK_SELECTED_BY_ROAM, "ROMA_CONNECT" },
+    { NETWORK_SELECTED_BY_REASSOC, "REASSOC" },
+};
 
 template<typename... Types>
 static void WriteEvent(const std::string& eventType, Types... args)
@@ -160,12 +173,53 @@ void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BROWSER_FAILED_FOR_PORTAL", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteWifiConnectFailedEventHiSysEvent(int operateType)
+void WriteAuthFailHiSysEvent(const std::string &authFailReason, int subErrCode)
 {
     Json::Value root;
     Json::FastWriter writer;
-    root["OPERATE_TYPE"] = operateType;
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONNECT_FAILED_EVENT", "EVENT_VALUE", writer.write(root));
+    root["FAIL_REASON"] = authFailReason;
+    root["SUB_ERR_CODE"] = subErrCode;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_AUTH_FAIL_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteAssocFailHiSysEvent(const std::string &assocFailReason, int subErrCode)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["FAIL_REASON"] = assocFailReason;
+    root["SUB_ERR_CODE"] = subErrCode;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ASSOC_FAIL_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteDhcpFailHiSysEvent(const std::string &dhcpFailReason, int subErrCode)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["FAIL_REASON"] = dhcpFailReason;
+    root["SUB_ERR_CODE"] = subErrCode;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_DHCP_FAIL_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteScanLimitHiSysEvent(const std::string &scanInitiator, int scanLimitType, bool isForeground)
+{
+    if (scanInitiator.empty()) {
+        return;
+    }
+    Json::Value root;
+    Json::FastWriter writer;
+    root["SCAN_INITIATOR"] = scanInitiator;
+    root["IS_FOREGROUND"] = isForeground;
+    root["SCAN_LIMIT_TYPE"] = scanLimitType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SCAN_LIMIT_STATISTICS", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteAutoConnectFailEvent(const std::string &failReason, const std::string &subReason)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["FAIL_REASON"] = failReason;
+    root["SUB_REASON"] = subReason;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_AUTO_RECONNECT_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteP2pKpiCountHiSysEvent(int eventType)
@@ -219,13 +273,15 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CONNECT_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, int failReason)
+void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, const WifiScanFailReason failReason)
 {
+#ifndef OHOS_ARCH_LITE
     Json::Value root;
     Json::FastWriter writer;
     root["PKG_NAME"] = pkgName;
-    root["FAIL_REASON"] = failReason;
+    root["FAIL_REASON"] = static_cast<int>(failReason);
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFISCANCONTROL_TRIGGER_API_FAIL", "EVENT_VALUE", writer.write(root));
+#endif
 }
 
 void WriteWifiEncryptionFailHiSysEvent(int event, const std::string& maskSsid, const std::string &keyMgmt, int encryptedModule)
@@ -267,12 +323,27 @@ void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_LINK_INFO", "EVENT_VALUE", writer.write(root));
 }
 
-void WirteConnectTypeHiSysEvent(std::string connectType)
+void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect)
 {
     Json::Value root;
     Json::FastWriter writer;
-    root["CONNECT_TYPE"] = connectType;
+    std::string connectTypeStr = "";
+    if (g_connectTypeTransMap.find(connectType) != g_connectTypeTransMap.end()) {
+        connectTypeStr = g_connectTypeTransMap.at(connectType);
+    }
+    if (isFirstConnect) {
+        connectTypeStr = "FIRST_CONNECT";
+    }
+    root["CONNECT_TYPE"] = connectTypeStr;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_CONNECT_TYPE", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteStaConnectIface(const std::string &ifName)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["IFACE_NAME"] = ifName;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_STA_CONNECT_IFNAME", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteWifiWpaStateHiSysEvent(int state)
@@ -311,6 +382,19 @@ void WriteWifiSelfcureHisysevent(int type)
     Json::FastWriter writer;
     root["WIFI_SELFCURE_TYPE"] = type;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SELFCURE", "EVENT_VALUE", writer.write(root));
+}
+
+void Write3VapConflictHisysevent(int type)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["WIFI_3VAP_CONFLICT_TYPE"] = type;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_3VAP_CONFLICT", "EVENT_VALUE", writer.write(root));
+}
+
+uint32_t GenerateStandardErrCode(int subSystem, uint16_t errCode)
+{
+    return (WIFI_SYSTEM_ID << SYSTEM_OFFSET | subSystem << SUB_SYSTEM_OFFSET | errCode);
 }
 }  // namespace Wifi
 }  // namespace OHOS

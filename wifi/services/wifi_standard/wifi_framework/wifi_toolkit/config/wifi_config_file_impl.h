@@ -153,11 +153,6 @@ public:
             LOGE("File name is empty.");
             return -1;
         }
-        FILE* fp = fopen(mFileName.c_str(), "w");
-        if (!fp) {
-            LOGE("Save config file: %{public}s, fopen() failed!", mFileName.c_str());
-            return -1;
-        }
         std::string content;
         std::lock_guard<std::mutex> lock(valueMutex_);
         {
@@ -183,6 +178,11 @@ public:
             content = mEncry.encryptedPassword;
         }
 #endif
+        FILE* fp = fopen(mFileName.c_str(), "w");
+        if (!fp) {
+            LOGE("Save config file: %{public}s, fopen() failed!", mFileName.c_str());
+            return -1;
+        }
         size_t ret = fwrite(content.c_str(), 1, content.length(), fp);
         if (ret != content.length()) {
             LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());

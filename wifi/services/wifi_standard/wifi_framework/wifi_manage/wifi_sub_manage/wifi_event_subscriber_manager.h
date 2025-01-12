@@ -50,7 +50,6 @@ public:
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    void OnReceiveDataShareReadyEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
 };
@@ -61,6 +60,10 @@ public:
     virtual ~NotificationEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
     void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
+private:
+    void OnReceiveNotificationEvent(int notificationId);
+    void OnReceiveDialogAcceptEvent(int dialogType);
+    void OnReceiveDialogRejectEvent(int dialogType);
 };
 
 #ifdef HAS_POWERMGR_PART
@@ -101,11 +104,19 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
+class DataShareReadySubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit DataShareReadySubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~DataShareReadySubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
     virtual ~WifiEventSubscriberManager();
 
+    void Init();
     void OnSystemAbilityChanged(int systemAbilityId, bool add) override;
     void GetAirplaneModeByDatashare();
     void GetWifiAllowSemiActiveByDatashare();
@@ -159,6 +170,8 @@ private:
     void UnRegisterWifiScanChangeEvent();
     void RegisterSettingsEnterEvent();
     void UnRegisterSettingsEnterEvent();
+    void RegisterDataShareReadyEvent();
+    void UnRegisterDataShareReadyEvent();
 
 private:
     uint32_t cesTimerId{0};
@@ -166,17 +179,20 @@ private:
     uint32_t networkStateChangeTimerId{0};
     uint32_t wifiScanChangeTimerId{0};
     uint32_t settingsTimerId{0};
+    uint32_t dataShareReadyTimerId_{0};
     std::mutex cesEventMutex;
     std::mutex notificationEventMutex;
     std::mutex networkStateChangeEventMutex;
     std::mutex wifiScanChangeEventMutex;
     std::mutex settingsEnterEventMutex;
+    std::mutex dataShareReadyEventMutex_;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
     std::shared_ptr<NotificationEventSubscriber> wifiNotificationSubsciber_ = nullptr;
     std::shared_ptr<NetworkStateChangeSubscriber> networkStateChangeSubsciber_ = nullptr;
     std::shared_ptr<WifiScanEventChangeSubscriber> wifiScanEventChangeSubscriber_ = nullptr;
     std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
+    std::shared_ptr<DataShareReadySubscriber> dataShareReadySubscriber_ = nullptr;
 #ifdef HAS_MOVEMENT_PART
     std::mutex deviceMovementEventMutex;
 #endif

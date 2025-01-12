@@ -81,6 +81,36 @@ ScanMode WifiScanConfig::GetAppRunningState()
     return mScanDeviceInfo.scanMode;
 }
 
+void WifiScanConfig::SetScanType(ScanType scanType)
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    mScanDeviceInfo.scanType = scanType;
+}
+
+ScanType WifiScanConfig::GetScanType()
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    return mScanDeviceInfo.scanType;
+}
+
+void WifiScanConfig::SetScanInitiatorUid(int initiatorUid)
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    mScanDeviceInfo.initiatorUid = initiatorUid;
+}
+
+int WifiScanConfig::GetScanInitiatorUid()
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    return mScanDeviceInfo.initiatorUid;
+}
+
+WifiScanDeviceInfo WifiScanConfig::GetScanDeviceInfo()
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    return mScanDeviceInfo;
+}
+
 void WifiScanConfig::SetStaScene(const int &scene)
 {
     std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
@@ -353,6 +383,7 @@ void WifiScanConfig::RecordWifiCategory(const std::string bssid, WifiCategory ca
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     if (bssid.empty()) {
+        LOGE ("bassid is NULL!");
         return;
     }
     mWifiCategoryRecord.insert_or_assign(bssid, category);

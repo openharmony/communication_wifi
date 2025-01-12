@@ -21,11 +21,19 @@
 #include "wifi_notification_util.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_logger.h"
+#include "parameters.h"
+#include <ifaddrs.h>
+#include <net/if.h>
+#include <netdb.h>
 
 DEFINE_WIFILOG_LABEL("WifiMultiVapManager");
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int PRIFIX_IP_LEN = 3;
+constexpr int PRIFIX_CHBA_LEN = 4;
+
 bool WifiMultiVapManager::CheckCanConnectDevice()
 {
     // to be implemented
@@ -43,6 +51,15 @@ bool WifiMultiVapManager::CheckCanUseSoftAp()
 #ifdef FEATURE_VAP_MANAGER_SUPPORT
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService) {
+        if (!pEnhanceService->CheckEnhanceVapAvailable()) {
+            if (CheckP2pConnected() && !CheckEnhanceWifiConnected()) {
+                Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_P2P_SOFTAP_CONFLICT_CNT));
+            } else if (!CheckP2pConnected() && CheckEnhanceWifiConnected()) {
+                Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_HML_SOFTAP_CONFLICT_CNT));
+            } else if (CheckP2pConnected() && CheckEnhanceWifiConnected()) {
+                Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::P2P_HML_SOFTAP_CONFLICT_CNT));
+            }
+        }
         return pEnhanceService->CheckEnhanceVapAvailable();
     } else {
         // to be implemented
@@ -82,13 +99,6 @@ bool WifiMultiVapManager::CheckP2pConnected()
         WIFI_LOGI("CheckP2pConnected: P2p is created group!");
         return true;
     }
-
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService && pEnhanceService->CheckChbaConncted()) {
-        WIFI_LOGI("CheckP2pConnected: Chba is connected!");
-        return true;
-    }
-
     WIFI_LOGI("CheckP2pConnected: P2p is not connected!");
     return false;
 }
@@ -121,6 +131,58 @@ void WifiMultiVapManager::ForceStopSoftAp()
 void WifiMultiVapManager::ShowToast()
 {
     WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::THREE_VAP);
+}
+
+bool WifiMultiVapManager::CheckEnhanceWifiConnected()
+{
+    WIFI_LOGI("Enter CheckEnhanceWifiConnected");
+    int n;
+    int ret;
+    struct ifaddrs *ifaddr = nullptr;
+    struct ifaddrs *ifa = nullptr;
+    bool enhanceWifiConnected = false;
+    if (getifaddrs(&ifaddr) == -1) {
+        WIFI_LOGE("getifaddrs failed, error is %{public}d", errno);
+        return false;
+    }
+    for (ifa = ifaddr, n = 0; ifa != nullptr; ifa = ifa->ifa_next, n++) {
+        if (ifa->ifa_addr == nullptr) {
+            continue;
+        }
+        int family = ifa->ifa_addr->sa_family;
+        char ipAddress[NI_MAXHOST] = {0};
+        if (family == AF_INET) {
+            ret = getnameinfo(ifa->ifa_addr,
+                sizeof(struct sockaddr_in),
+                ipAddress,
+                NI_MAXHOST,
+                nullptr,
+                0,
+                NI_NUMERICHOST);
+            if (ret != 0) {
+                WIFI_LOGE("getnameinfo() failed: %{public}s\n", gai_strerror(ret));
+                return false;
+            }
+        }
+        if (strncmp("172", ipAddress, PRIFIX_IP_LEN) != 0) {
+            continue;
+        }
+        if (strncmp("chba", ifa->ifa_name, PRIFIX_CHBA_LEN) == 0) {
+            enhanceWifiConnected = true;
+        }
+    }
+    freeifaddrs(ifaddr);
+    return enhanceWifiConnected;
+}
+
+void WifiMultiVapManager::VapConflictReport()
+{
+    WIFI_LOGI("Enter VapConflictReport");
+    if (CheckEnhanceWifiConnected() && !CheckP2pConnected()) {
+        Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::HML_SOFTAP_STA_CONFLICT_CNT));
+    } else if (!CheckEnhanceWifiConnected() && CheckP2pConnected()) {
+        Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::P2P_SOFTAP_STA_CONFLICT_CNT));
+    }
 }
 
 }  // namespace Wifi

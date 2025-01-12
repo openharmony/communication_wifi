@@ -332,6 +332,14 @@ public:
     int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0);
 
     int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0);
+
+    void SetSystemMode(int systemMode);
+
+    int GetSystemMode();
+
+    void SetDeviceType(int deviceType);
+
+    bool IsAllowPopUp();
 private:
     WifiConfigCenter();
     std::string GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
@@ -427,6 +435,8 @@ private:
     std::map<WifiMacAddrInfo, std::string> mP2pDeviceMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pGroupsInfoMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
+    int systemMode_ = SystemMode::M_DEFAULT;
+    int mDeviceType = ProductDeviceType::DEFAULT;
 };
 } // namespace Wifi
 } // namespace OHOS

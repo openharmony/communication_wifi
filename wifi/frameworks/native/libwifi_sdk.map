@@ -33,6 +33,7 @@
         GetHotspotConfig;
         IsHotspotActive;
         GetStationList;
+        GetStationNum;
         DisassociateSta;
         AddTxPowerInfo;
         SetBand;
@@ -46,6 +47,7 @@
         GetDeviceConfigs;
         GetDeviceConfig;
         RemoveDevice;
+        AllowAutoConnect;
         DisableDeviceConfig;
         EnableDeviceConfig;
         ConnectTo;
@@ -69,6 +71,12 @@
         EnableSemiWifi;
         GetWifiDetailState;
         UpdateNetworkLagInfo;
+        FetchWifiSignalInfoForVoWiFi;
+        IsSupportVoWifiDetect;
+        SetVoWifiDetectMode;
+        GetVoWifiDetectMode;
+        SetVoWifiDetectPeriod;
+        GetVoWifiDetectPeriod;
         "*CompositeWifiFilter*";
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";

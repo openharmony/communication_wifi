@@ -53,6 +53,7 @@ napi_value GetDisconnectedReason(napi_env env, napi_callback_info info);
 napi_value IsMeteredHotspot(napi_env env, napi_callback_info info);
 napi_value RemoveDevice(napi_env env, napi_callback_info info);
 napi_value RemoveAllNetwork(napi_env env, napi_callback_info info);
+napi_value AllowAutoConnect(napi_env env, napi_callback_info info);
 napi_value DisableNetwork(napi_env env, napi_callback_info info);
 napi_value GetCountryCode(napi_env env, napi_callback_info info);
 napi_value GetDeviceConfigs(napi_env env, napi_callback_info info);

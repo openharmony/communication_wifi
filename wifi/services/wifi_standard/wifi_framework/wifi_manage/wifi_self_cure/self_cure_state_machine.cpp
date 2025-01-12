@@ -1255,7 +1255,11 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForStaticIp(int reques
     }
     bool isMultiDhcpServer = isConfigStaticIp4MultiDhcpServer_ ? true : false;
     bool startSelfcure = true;
-    pEnhanceService->GetStaticIpConfig(isMultiDhcpServer, startSelfcure, dhcpResult);
+    if (isMultiDhcpServer) {
+        pEnhanceService->GetStaticIpConfig(isMultiDhcpServer, startSelfcure, dhcpResult);
+    } else {
+        dhcpResult = GetRecordDhcpResults();
+    }
     if (dhcpResult.gateway == 0 || dhcpResult.ipAddress == 0) {
         WIFI_LOGE("%{public}s: dhcpResult is null", __FUNCTION__);
         return;
@@ -1431,7 +1435,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
         WIFI_LOGE("selfcureForReset, wifiControllerMachine get failed");
         return;
     }
-    wifiControllerMachine->ShutdownWifi(false);
+    wifiControllerMachine->SelfcureResetWifi(pSelfCureStateMachine_->instId_);
 }
 
 bool SelfCureStateMachine::InternetSelfCureState::SelectedSelfCureAcceptable()
@@ -2731,6 +2735,10 @@ bool SelfCureStateMachine::IsSelfCureL2Connecting()
 
 void SelfCureStateMachine::StopSelfCureWifi(int32_t status)
 {
+    if (GetCurStateName() != pDisconnectedMonitorState_->GetStateName()) {
+        WIFI_LOGI("stop selfcure");
+        SwitchState(pDisconnectedMonitorState_);
+    }
     if (selfCureL2State_ == SelfCureState::SCE_WIFI_INVALID_STATE) {
         return;
     }
@@ -2782,6 +2790,9 @@ void SelfCureStateMachine::UpdateSelfcureState(int currentCureLevel, bool isSelf
 
 bool SelfCureStateMachine::CheckSelfCureWifiResult(int event)
 {
+    if (selfCureL2State_ == SelfCureState::SCE_WIFI_INVALID_STATE) {
+        return false;
+    }
     WifiState wifiState = static_cast<WifiState>(WifiConfigCenter::GetInstance().GetWifiState(instId_));
     if (wifiState == WifiState::DISABLING) {
         if ((selfCureL2State_ != SelfCureState::SCE_WIFI_INVALID_STATE) &&

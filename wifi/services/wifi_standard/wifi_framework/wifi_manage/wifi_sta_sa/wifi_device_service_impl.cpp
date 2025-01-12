@@ -898,10 +898,44 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
     return pService->DisableDeviceConfig(networkId);
 }
 
+ErrCode WifiDeviceServiceImpl::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("AllowAutoConnect:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AllowAutoConnect:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("AllowAutoConnect:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (networkId < 0) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->AllowAutoConnect(networkId, isAllowed);
+}
+
 ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 {
     if (IsOtherVapConnect()) {
         LOGI("ConnectToNetwork: p2p or hml connected, and hotspot is enable");
+#ifndef OHOS_ARCH_LITE
+        WifiManager::GetInstance().GetWifiMultiVapManager()->VapConflictReport();
+#endif
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
     }
     int apiVersion = WifiPermissionUtils::GetApiVersion();
@@ -1283,7 +1317,7 @@ ErrCode WifiDeviceServiceImpl::IsMeteredHotspot(bool &bMeteredHotspot)
 
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
-    WIFI_LOGI("%{public}s, connState=%{public}d, detailedState=%{public}d",
+    WIFI_LOGD("%{public}s, connState=%{public}d, detailedState=%{public}d",
         __func__, info.connState, info.detailedState);
     if (info.connState != ConnState::CONNECTED) {
         return WIFI_OPT_FAILED;
@@ -2354,6 +2388,162 @@ ErrCode WifiDeviceServiceImpl::HandleWifiProQoeSlow(const NetworkLagInfo &networ
     pWifiProService->DealQoeSlowResult();
 #endif
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("FetchWifiSignalInfoForVoWiFi: NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("FetchWifiSignalInfoForVoWiFi:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("FetchWifiSignalInfoForVoWiFi:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->FetchWifiSignalInfoForVoWiFi(signalInfo);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::IsSupportVoWifiDetect(bool &isSupported)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("IsSupportVoWifiDetect: NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsSupportVoWifiDetect:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsSupportVoWifiDetect:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->IsSupportVoWifiDetect(isSupported);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::SetVoWifiDetectMode(WifiDetectConfInfo info)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("SetVoWifiDetectMode: NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetVoWifiDetectMode:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetVoWifiDetectMode:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->SetVoWifiDetectMode(info);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::GetVoWifiDetectMode(WifiDetectConfInfo &info)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("GetVoWifiDetectMode: NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetVoWifiDetectMode:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetVoWifiDetectMode:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->GetVoWifiDetectMode(info);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::SetVoWifiDetectPeriod(int period)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("SetVoWifiDetectPeriod: NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetVoWifiDetectPeriod:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetVoWifiDetectPeriod:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->SetVoWifiDetectPeriod(period);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::GetVoWifiDetectPeriod(int &period)
+{
+#ifdef FEATURE_VOWIFI_SUPPORT
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("GetVoWifiDetectPeriod: NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetVoWifiDetectPeriod:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetVoWifiDetectPeriod:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->GetVoWifiDetectPeriod(period);
+#else
+    return WIFI_OPT_SUCCESS;
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

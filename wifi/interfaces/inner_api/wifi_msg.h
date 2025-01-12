@@ -136,12 +136,11 @@ enum ConnState {
 };
 
 enum class MloState {
-    SINGLE_RADIO = 0,
-    WIFI7_MLSR = 1,
-    WIFI7_EMLSR = 2,
-    WIFI7_STR = 3,
-
-    WIFI7_INVALID = 0xFF,
+    WIFI7_LEGACY = 0,
+    WIFI7_SINGLE_LINK = 1,
+    WIFI7_MLSR = 2,
+    WIFI7_EMLSR = 3,
+    WIFI7_STR = 4
 };
 
 enum class DisconnectedReason {
@@ -257,7 +256,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
-        mloState = MloState::SINGLE_RADIO;
+        mloState = MloState::WIFI7_MLSR;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
@@ -309,6 +308,24 @@ enum class ConfigChange {
     CONFIG_ADD = 0,
     CONFIG_UPDATE = 1,
     CONFIG_REMOVE = 2,
+};
+
+struct VoWifiSignalInfo {
+    int rssi;
+    int noise;
+    int bler;
+    int deltaTxPacketCounter;
+    int accessType;
+    int reverse;
+    int64_t txGood;
+    int64_t txBad;
+    std::string macAddress;
+};
+ 
+struct WifiDetectConfInfo {
+    int wifiDetectMode;
+    int threshold;
+    int envalueCount;
 };
 
 class WifiIpAddress {
@@ -726,6 +743,7 @@ struct WifiDeviceConfig {
     IpInfo lastDhcpResult;
     bool isShared;
     int64_t lastTrySwitchWifiTimestamp { -1 };
+    bool isAllowAutoConnect { true };
 
     WifiDeviceConfig()
     {
@@ -896,7 +914,8 @@ struct EapSimUmtsAuthParam {
 };
 
 struct MloStateParam {
-    uint8_t mloState;
+    uint8_t feature;
+    uint8_t state;
     uint16_t reasonCode;
 };
 
@@ -956,6 +975,15 @@ enum class WifiSelfcureType {
     REASSOC_SELFCURE_SUCC,
     RESET_SELFCURE_SUCC,
     REDHCP_SELFCURE_SUCC,
+};
+
+enum class Wifi3VapConflictType {
+    STA_HML_SOFTAP_CONFLICT_CNT,
+    STA_P2P_SOFTAP_CONFLICT_CNT,
+    P2P_HML_SOFTAP_CONFLICT_CNT,
+    HML_SOFTAP_STA_CONFLICT_CNT,
+    P2P_SOFTAP_STA_CONFLICT_CNT,
+    P2P_HML_STA_CONFLICT_CNT,
 };
 
 enum class NetworkLagType {

@@ -140,6 +140,13 @@ ErrCode StaInterface::DisableDeviceConfig(int networkId)
     LOGI("Enter DisableDeviceConfig.\n");
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    LOGI("Enter AllowAutoConnect.\n");
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::StartWps(const WpsConfig &config)
 {
     LOGI("Enter StartWps.\n");
@@ -286,6 +293,47 @@ ErrCode StaInterface::SetSelfCureService(ISelfCureService *selfCureService)
 bool StaInterface::InitStaServiceLocked()
 {
     return true;
+}
+
+ErrCode StaInterface::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
+{
+    WIFI_LOGI("Enter FetchWifiSignalInfoForVoWiFi");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::IsSupportVoWifiDetect(bool &isSupported)
+{
+    WIFI_LOGI("Enter IsSupportVoWifiDetect");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::SetVoWifiDetectMode(WifiDetectConfInfo info)
+{
+    WIFI_LOGI("Enter SetVoWifiDetectMode");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::GetVoWifiDetectMode(WifiDetectConfInfo &info)
+{
+    WIFI_LOGI("Enter GetVoWifiDetectMode");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::SetVoWifiDetectPeriod(int period)
+{
+    WIFI_LOGI("Enter SetVoWifiDetectPeriod");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::GetVoWifiDetectPeriod(int &period)
+{
+    WIFI_LOGI("Enter GetVoWifiDetectPeriod");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+void StaInterface::ProcessVoWifiNetlinkReportEvent(const int type)
+{
+    WIFI_LOGI("Enter ProcessVoWifiNetlinkReportEvent");
 }
 }  // namespace Wifi
 }  // namespace OHOS

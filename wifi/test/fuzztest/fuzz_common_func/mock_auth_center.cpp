@@ -155,10 +155,11 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &w
     WifiProxyConfig &wifiProxyConfig, int instId)
 {}
 
-void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo)
+void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+    int instId)
 {}
 
-void WifiNetAgent::OnStaMachineWifiStart()
+void WifiNetAgent::OnStaMachineWifiStart(int instId)
 {}
 
 void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,

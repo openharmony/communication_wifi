@@ -222,6 +222,18 @@ public:
         int setDataValidLen) = 0;
 
     /**
+     * @Description on notification receive
+     */
+    virtual void OnNotificationReceive() = 0;
+ 
+    /**
+     * @Description on dialog receive
+     *
+     * @param click - user click accept or reject
+     */
+    virtual void OnDialogClick(bool click) = 0;
+
+    /**
      * @Description obtain supported frequency
      *
      * @param freq - current use freq

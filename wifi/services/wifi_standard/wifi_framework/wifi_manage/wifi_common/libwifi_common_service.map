@@ -170,6 +170,13 @@
         "OHOS::Wifi::WifiProtectManager::RegisterAppStateObserver()";
         "OHOS::Wifi::WifiProtectManager::OnAppDied(const std::string)";
         "OHOS::Wifi::WifiProtectManager::OnAppForegroudChanged(const std::string &, int)";
+        "OHOS::Wifi::WifiRdbManager::GetInstance()";
+        "OHOS::Wifi::WifiRdbManager::ExecuteSql(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<OHOS::NativeRdb::ValueObject, std::__h::allocator<OHOS::NativeRdb::ValueObject>> const&)";
+        "OHOS::Wifi::WifiRdbManager::Query(OHOS::NativeRdb::AbsRdbPredicates const&, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> const&)";
+        "OHOS::Wifi::WifiRdbManager::Delete(int&, OHOS::NativeRdb::AbsRdbPredicates const&)";
+        "OHOS::Wifi::WifiRdbManager::Update(OHOS::NativeRdb::ValuesBucket const&, OHOS::NativeRdb::AbsRdbPredicates const&)";
+        "OHOS::Wifi::WifiRdbManager::Insert(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::NativeRdb::ValuesBucket const&)";
+        "OHOS::Wifi::WifiRdbManager::GetRdbManger(OHOS::Wifi::RdbType const&)";
     };
     local:
         *;

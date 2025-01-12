@@ -2368,26 +2368,14 @@ ErrCode WifiDeviceServiceImpl::UpdateNetworkLagInfo(const NetworkLagType network
  
     // date distribute
     ErrCode ret = WIFI_OPT_SUCCESS;
-    switch (networkLagType) {
-        case NetworkLagType::WIFIPRO_QOE_SLOW:
-            ret = HandleWifiProQoeSlow(networkLagInfo);
-            break;
-        default:
-            return WIFI_OPT_FAILED;
-    }
-    return ret;
-}
- 
-ErrCode WifiDeviceServiceImpl::HandleWifiProQoeSlow(const NetworkLagInfo &networkLagInfo)
-{
 #ifdef FEATURE_WIFI_PRO_SUPPORT
     IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
     if (pWifiProService == nullptr) {
         return WIFI_OPT_FAILED;
     }
-    pWifiProService->DealQoeSlowResult();
+    pWifiProService->DealQoeReport(networkLagType, networkLagInfo);
 #endif
-    return WIFI_OPT_SUCCESS;
+    return ret;
 }
 
 ErrCode WifiDeviceServiceImpl::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)

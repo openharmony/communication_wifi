@@ -47,6 +47,7 @@ using OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult;
 using IfaceDestoryCallback = std::function<void(std::string&, int)>;
 using RssiReportCallback = std::function<void(int, int)>;
 using NetlinkReportCallback = std::function<void(int, const std::vector<uint8_t>&)>;
+using OnChipServiceDied = std::function<void(void)>;
 
 constexpr IfaceType IFACE_TYPE_DEFAULT = (IfaceType)255;
 const std::vector<IfaceType> IFACE_TYPES_BY_PRIORITY = {IfaceType::AP, IfaceType::STA, IfaceType::P2P};
@@ -431,6 +432,7 @@ public:
      */
     bool SetMaxConnectNum(const std::string &ifaceName, int32_t channel, int32_t maxConn);
 
+    void RegisterChipHdiDeathCallback(OnChipServiceDied cb);
 private:
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();
@@ -467,10 +469,7 @@ private:
     bool SendCmdToDriver(const std::string &ifaceName, const std::string &interfaceName,
         int cmd, const std::string &param);
     std::string MakeMacFilterString(const std::vector<std::string> &blockList);
-    static void ClearStaInfo();
-    static void ClearApInfo();
     static void ResetHalDeviceManagerInfo(bool isRemoteDied);
-    static void NotifyDestory(std::string &ifaceName, IfaceType type);
 
     // death recipient
     static void AddChipHdiDeathRecipient();
@@ -486,6 +485,7 @@ private:
     static sptr<ChipControllerCallback> g_chipControllerCallback;
     static sptr<ChipIfaceCallback> g_chipIfaceCallback;
     static std::atomic_bool g_chipHdiServiceDied;
+    static OnChipServiceDied g_chipHdiServiceDiedCb;
     static std::mutex mMutex;
 };
 

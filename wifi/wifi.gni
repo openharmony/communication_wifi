@@ -76,6 +76,6 @@ memory_optimization_cflags_cc = [
 ]
 
 memory_optimization_ldflags = [
-  "-Wl,--exclude-libs=ALL",
+  "-Wl,--whole-archive",
   "-Wl,--gc-sections",
 ]

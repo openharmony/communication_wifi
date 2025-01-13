@@ -90,6 +90,14 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
+class WifiSwitch5GNot2GFilter final : public SimpleWifiFilter {
+public:
+    WifiSwitch5GNot2GFilter();
+    ~WifiSwitch5GNot2GFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
 class SignalStrengthWifiFilter final : public SimpleWifiFilter {
 public:
     SignalStrengthWifiFilter();

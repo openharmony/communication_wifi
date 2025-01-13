@@ -35,7 +35,6 @@ constexpr int SIGNAL_LEVEL_TWO = 2;
 constexpr int POOR_PORTAL_RECHECK_DELAYED_SECONDS = 2 * RECHECK_DELAYED_SECONDS;
 constexpr int32_t MIN_SIGNAL_LEVEL_INTERVAL = 2;
 constexpr int32_t SIGNAL_LEVEL_THREE = 3;
-constexpr int32_t SIGNAL_LEVEL_FOUR = 4;
 constexpr int32_t MIN_RSSI_INTERVAL = 8;
 }
 
@@ -644,19 +643,11 @@ bool WifiSwitchThresholdFilter::Filter(NetworkCandidate &networkCandidate)
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    int32_t curSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band);
     auto &interScanInfo = networkCandidate.interScanInfo;
-    if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) && curSignalLevel == SIGNAL_LEVEL_THREE &&
-        interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
-        WIFI_LOGI("WifiSwitchThresholdFilter, current network is 5G and level is three and target network is 2G, "
-            "skip candidate:%{public}s", networkCandidate.ToString().c_str());
-        return false;
-    }
 
-    if (curSignalLevel == SIGNAL_LEVEL_FOUR || (interScanInfo.rssi - linkedInfo.rssi < MIN_RSSI_INTERVAL)) {
-        WIFI_LOGI("WifiSwitchThresholdFilter, curSignalLevel:%{public}d, scan info rssi:%{public}d,"
-            "cur rssi:%{public}d, skip candidate:%{public}s",
-            curSignalLevel, interScanInfo.rssi, linkedInfo.rssi, networkCandidate.ToString().c_str());
+    if (interScanInfo.rssi - linkedInfo.rssi < MIN_RSSI_INTERVAL) {
+        WIFI_LOGI("WifiSwitchThresholdFilter, scan rssi:%{public}d, cur rssi:%{public}d, skip candidate:%{public}s",
+            interScanInfo.rssi, linkedInfo.rssi, networkCandidate.ToString().c_str());
         return false;
     }
 
@@ -697,15 +688,35 @@ bool WifiSwitchThresholdQoeFilter::Filter(NetworkCandidate &networkCandidate)
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     auto &interScanInfo = networkCandidate.interScanInfo;
  
-    if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
-        interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
-        return false;
-    }
- 
     if (interScanInfo.rssi < linkedInfo.rssi) {
         WIFI_LOGI("WifiSwitchThresholdFilter, scan info rssi:%{public}d,"
             "cur rssi:%{public}d, skip candidate:%{public}s",
             interScanInfo.rssi, linkedInfo.rssi, networkCandidate.ToString().c_str());
+        return false;
+    }
+ 
+    return true;
+}
+
+WifiSwitch5GNot2GFilter::WifiSwitch5GNot2GFilter() : SimpleWifiFilter("WifiSwitch5GNot2GFilter") {}
+ 
+WifiSwitch5GNot2GFilter::~WifiSwitch5GNot2GFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+ 
+bool WifiSwitch5GNot2GFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    auto &interScanInfo = networkCandidate.interScanInfo;
+ 
+    if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
+        interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
         return false;
     }
  

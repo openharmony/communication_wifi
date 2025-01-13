@@ -30,7 +30,7 @@ namespace {
 constexpr int RECHECK_DELAYED_SECONDS = 1 * 60 * 60;
 constexpr int MIN_5GHZ_BAND_FREQUENCY = 5000;
 constexpr int MIN_RSSI_VALUE_24G = -80;
-constexpr int MIN_RSSI_VALUE_5G = -770;
+constexpr int MIN_RSSI_VALUE_5G = -77;
 constexpr int SIGNAL_LEVEL_TWO = 2;
 constexpr int POOR_PORTAL_RECHECK_DELAYED_SECONDS = 2 * RECHECK_DELAYED_SECONDS;
 constexpr int32_t MIN_SIGNAL_LEVEL_INTERVAL = 2;

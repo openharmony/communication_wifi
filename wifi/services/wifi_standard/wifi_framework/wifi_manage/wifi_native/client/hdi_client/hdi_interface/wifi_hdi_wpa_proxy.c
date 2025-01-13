@@ -292,7 +292,7 @@ static void UnloadDeviceInfo(void)
     if (g_devMgr != NULL) {
         g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
         HDIDeviceManagerRelease(g_devMgr);
-        g_deMgr = NULL;
+        g_devMgr = NULL;
     }
 }
 

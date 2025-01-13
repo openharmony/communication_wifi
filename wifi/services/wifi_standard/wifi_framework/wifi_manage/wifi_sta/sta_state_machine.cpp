@@ -407,7 +407,8 @@ void StaStateMachine::InitState::StartWifiProcess()
     /* Sets the MAC address of WifiSettings. */
     std::string mac;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
-    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName)) == WIFI_HAL_OPT_OK) {
+    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName, WIFI_OEMINFO_MAC))
+        == WIFI_HAL_OPT_OK) {
         WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
         std::string realMacAddress;
         WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, pStaStateMachine->m_instId);
@@ -2346,7 +2347,6 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessagePtr msg)
     }
     return ret;
 }
-
 
 void StaStateMachine::ApRoamingState::DealApRoamingStateTimeout(InternalMessagePtr msg)
 {

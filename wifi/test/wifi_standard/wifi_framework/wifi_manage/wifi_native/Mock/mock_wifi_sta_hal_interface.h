@@ -49,7 +49,7 @@ public:
     WifiErrorNo Reassociate(const std::string &ifaceName);
     WifiErrorNo Disconnect(const std::string &ifaceName);
     WifiErrorNo GetStaCapabilities(unsigned int &capabilities);
-    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName);
+    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName, int macSrc);
     WifiErrorNo SetWifiCountryCode(const std::string &ifaceName, const std::string &code);
     WifiErrorNo GetSupportFrequencies(const std::string &ifaceName, int band, std::vector<int> &frequencies);
     WifiErrorNo SetConnectMacAddr(const std::string &ifaceName, const std::string &mac);

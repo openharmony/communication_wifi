@@ -979,6 +979,10 @@ bool StaStateMachine::ApLinkingState::ExecuteStateMsg(InternalMessagePtr msg)
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_DISCONNECT: {
             ret = EXECUTED;
+            if (pStaStateMachine->selfCureService_ != nullptr &&
+                pStaStateMachine->selfCureService_->IsSelfCureL2Connecting()) {
+                pStaStateMachine->selfCureService_->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
+            }
             pStaStateMachine->StartDisConnectToNetwork();
             break;
         }
@@ -1113,6 +1117,10 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_DISCONNECT: {
             ret = EXECUTED;
+            if (pStaStateMachine->selfCureService_ != nullptr &&
+                pStaStateMachine->selfCureService_->IsSelfCureL2Connecting()) {
+                pStaStateMachine->selfCureService_->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
+            }
             pStaStateMachine->StartDisConnectToNetwork();
             break;
         }

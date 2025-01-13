@@ -68,6 +68,7 @@
             "wifi_feature_with_vap_manager",
             "wifi_feature_with_sta_asset",
             "wifi_feature_wifi_pro_ctrl",
+            "wifi_feature_with_wifi_oeminfo_mac",
             "wifi_feature_voicewifi_enable"
         ],
         "adapted_system_type": [

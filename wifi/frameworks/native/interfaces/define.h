@@ -130,4 +130,6 @@
 #define STA_INSTANCE_MAX_NUM (2)
 #endif
 
+#define WIFI_OEMINFO_MAC (1)
+
 #endif

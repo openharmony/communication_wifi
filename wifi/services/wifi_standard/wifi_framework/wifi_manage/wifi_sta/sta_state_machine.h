@@ -64,6 +64,7 @@ constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
+constexpr int STA_SIGNAL_POLL_DELAY_WITH_TASK = 1 * 1000;
 constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
 
 /* pincode length */

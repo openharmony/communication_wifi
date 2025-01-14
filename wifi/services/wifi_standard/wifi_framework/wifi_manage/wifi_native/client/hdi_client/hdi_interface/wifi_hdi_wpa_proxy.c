@@ -284,7 +284,6 @@ static void RemoveLostCtrl(void)
         }
     }
     closedir(dir);
-
 }
 
 static void UnloadDeviceInfo(void)

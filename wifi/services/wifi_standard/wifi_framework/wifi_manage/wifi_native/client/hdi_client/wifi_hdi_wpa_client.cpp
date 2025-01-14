@@ -1144,6 +1144,11 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRemoveGroup(const std::string &groupInterfac
     return HdiP2pRemoveGroup(groupInterface.c_str());
 }
 
+WifiErrorNo WifiHdiWpaClient::ReqP2pRemoveGroupClient(const std::string &deviceMac, const std::string &ifName) const
+{
+    return HdiP2pRemoveGroupClient(deviceMac.c_str(), ifName.c_str());
+}
+
 WifiErrorNo WifiHdiWpaClient::ReqP2pInvite(const WifiP2pGroupInfo &group, const std::string &deviceAddr) const
 {
     return HdiP2pInvite(deviceAddr.c_str(), group.GetOwner().GetDeviceAddress().c_str(),

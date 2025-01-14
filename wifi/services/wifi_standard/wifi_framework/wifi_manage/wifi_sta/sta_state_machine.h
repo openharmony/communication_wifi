@@ -614,6 +614,11 @@ private:
     void DealSignalPollResult();
 
     /**
+     * @Description : Check If Has Foreground App.
+     */
+    bool HasAppForeground();
+
+    /**
      * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
      *
      * @param  signalInfo - SignalPoll Result

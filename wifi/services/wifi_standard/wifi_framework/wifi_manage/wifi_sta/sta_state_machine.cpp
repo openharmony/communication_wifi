@@ -54,6 +54,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
+constexpr const char* SCENEBOARD_PROCESS_NAME = "com.ohos.sceneboard";
 constexpr int MAX_CHLOAD = 800;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
@@ -3482,7 +3483,8 @@ bool StaStateMachine::HasAppForeground()
         return false;
     }
     for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-        if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
+        if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND &&
+            iter->processName_ != SCENEBOARD_PROCESS_NAME) {
             return true;
         }
     }

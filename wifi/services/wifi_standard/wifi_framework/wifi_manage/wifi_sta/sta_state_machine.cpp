@@ -3465,8 +3465,29 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
+        if (HasAppForeground()) {
+            StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY_WITH_TASK);
+        } else {
+            StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
+        }
     }
+}
+
+bool StaStateMachine::HasAppForeground()
+{
+#ifndef OHOS_ARCH_LITE
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    if (WifiAppStateAware::GetInstance().GetProcessRunningInfos(infos) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetProcessRunningInfosByUserId failed.");
+        return false;
+    }
+    for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
+        if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
+            return true;
+        }
+    }
+#endif
+    return false;
 }
 
 void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)

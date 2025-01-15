@@ -80,6 +80,7 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
         // save the indexes of saved network candidate in networkCandidates;
         if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID) {
             wifiDeviceConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
+			WifiSettings::GetInstance().SetNetworkCandidateScanResult(networkCandidate.wifiDeviceConfig.networkId);
         }
     }
     std::stringstream wifiDevicesInfo;

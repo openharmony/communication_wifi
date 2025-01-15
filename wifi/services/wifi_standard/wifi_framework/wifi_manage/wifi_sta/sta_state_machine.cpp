@@ -3476,7 +3476,7 @@ void StaStateMachine::HandleForegroundAppChangedAction(const AppExecFwk::AppStat
     if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) &&
         appStateData.isFocused) {
         curForegroundAppBundleName_ = appStateData.bundleName;
-        if (curForegroundAppBundleName_ != SCENEBOARD_BUNDLE_NAME) {
+        if (curForegroundAppBundleName_ != "" && curForegroundAppBundleName_ != SCENEBOARD_BUNDLE_NAME) {
             staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY_WITH_TASK;
         } else {
             staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;

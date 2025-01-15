@@ -83,6 +83,8 @@ public:
 
     void CleanWifiCategoryRecord();
 
+    void RemoveWifiCategoryRecord(const std::string bssid);
+
 private:
     void InitScanControlForbidList();
     void InitScanControlIntervalList();

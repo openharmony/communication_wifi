@@ -44,6 +44,7 @@
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
 #include "wifi_common_event_helper.h"
+#include "appmgr/app_mgr_interface.h"
 #endif
 
 namespace OHOS {
@@ -452,6 +453,13 @@ public:
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);
     void UpdateAcceptUnvalidatedState();
+
+    /**
+     * @Description: Handle Foreground App Changed Action
+     *
+     * @param appStateData - App State Data
+     */
+    void HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
 #endif
 /* ------------------ state machine private function ----------------- */
 private:
@@ -612,11 +620,6 @@ private:
      * @Description : Deal SignalPoll Result.
      */
     void DealSignalPollResult();
-
-    /**
-     * @Description : Check If Has Foreground App.
-     */
-    bool HasAppForeground();
 
     /**
      * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
@@ -1015,6 +1018,8 @@ private:
     std::string mPortalUrl;
     int mLastConnectNetId;      /* last request connect netword id */
     int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
+    std::string curForegroundAppBundleName_ = "";
+    int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
 };
 }  // namespace Wifi
 }  // namespace OHOS

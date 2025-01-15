@@ -45,7 +45,6 @@
         "OHOS::Wifi::WifiAppStateAware::UnSubscribeAppState()";
         "OHOS::Wifi::WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &, const int)";
         "OHOS::Wifi::WifiAppStateAware::GetProcessRunningInfos(std::vector<AppExecFwk::RunningProcessInfo> &)";
-        "OHOS::Wifi::WifiAppStateAware::GetProcessRunningInfos(std::__h::vector<OHOS::AppExecFwk::RunningProcessInfo, std::__h::allocator<OHOS::AppExecFwk::RunningProcessInfo>>&)";
         "OHOS::Wifi::WifiAppStateAware::GetForegroundApp()";
         "OHOS::Wifi::WifiAppStateAware::IsForegroundApp(int)";
         "OHOS::Wifi::WifiAppStateAware::IsForegroundApp(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";

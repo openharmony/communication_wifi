@@ -54,7 +54,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
-constexpr const char* SCENEBOARD_PROCESS_NAME = "com.ohos.sceneboard";
+constexpr const char* SCENEBOARD_BUNDLE_NAME = "com.ohos.sceneboard";
 constexpr int MAX_CHLOAD = 800;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
@@ -3466,31 +3466,30 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-        if (HasAppForeground()) {
-            StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY_WITH_TASK);
-        } else {
-            StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
-        }
+        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), staSignalPollDelayTime_);
     }
 }
 
-bool StaStateMachine::HasAppForeground()
-{
 #ifndef OHOS_ARCH_LITE
-    std::vector<AppExecFwk::RunningProcessInfo> infos;
-    if (WifiAppStateAware::GetInstance().GetProcessRunningInfos(infos) != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("GetProcessRunningInfosByUserId failed.");
-        return false;
-    }
-    for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-        if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND &&
-            iter->processName_ != SCENEBOARD_PROCESS_NAME) {
-            return true;
+void StaStateMachine::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
+{
+    if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) &&
+        appStateData.isFocused) {
+        curForegroundAppBundleName_ = appStateData.bundleName;
+        if (curForegroundAppBundleName_ == "") {
+            if (WifiAppStateAware::GetInstance().IsForegroundApp(SCENEBOARD_BUNDLE_NAME)) {
+                staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
+            }
+        } else {
+            if (curForegroundAppBundleName_ != SCENEBOARD_BUNDLE_NAME) {
+                staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY_WITH_TASK;
+            } else {
+                staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
+            }
         }
     }
-#endif
-    return false;
 }
+#endif
 
 void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)
 {

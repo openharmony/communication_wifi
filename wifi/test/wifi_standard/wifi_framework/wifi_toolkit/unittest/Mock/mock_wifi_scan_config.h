@@ -53,6 +53,7 @@ public:
     virtual void SetAbnormalApps(const std::vector<std::string> &abnormalAppList) = 0;
     virtual void SetStaCurrentTime(time_t time) = 0;
     virtual time_t GetStaCurrentTime() = 0;
+    virtual void RemoveWifiCategoryRecord(const std::string bssid) = 0;
 };
 
 class WifiScanConfig : public MockWifiScanConfig {
@@ -84,6 +85,7 @@ public:
     MOCK_METHOD1(SetAbnormalApps, void(const std::vector<std::string> &abnormalAppList));
     MOCK_METHOD1(SetStaCurrentTime, void(time_t time));
     MOCK_METHOD0(GetStaCurrentTime, time_t());
+    MOCK_METHOD1(RemoveWifiCategoryRecord, void(const std::string bssid));
 };
 }  // namespace OHOS
 }  // namespace Wifi

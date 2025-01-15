@@ -1111,6 +1111,12 @@ public:
         pStaStateMachine->DealSignalPacketChanged(0, 0);
     }
 
+    void HandleForegroundAppChangedActionTest()
+    {
+        AppExecFwk::AppStateData appData;
+        pStaStateMachine->HandleForegroundAppChangedAction(appData);
+    }
+
     void DealSignalPacketChangedTest()
     {
         pStaStateMachine->linkedInfo.lastTxPackets = -1;
@@ -2067,6 +2073,18 @@ HWTEST_F(StaStateMachineTest, DealSignalPollResultTest, TestSize.Level1)
 {
     DealSignalPollResultTest();
 }
+
+/**
+ * @tc.name: HandleForegroundAppChangedActionTest
+ * @tc.desc: HandleForegroundAppChangedAction()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, HandleForegroundAppChangedActionTest, TestSize.Level1)
+{
+    HandleForegroundAppChangedActionTest();
+}
+
 /**
  * @tc.name: DealSignalPacketChangedTest
  * @tc.desc: DealSignalPacketChanged()

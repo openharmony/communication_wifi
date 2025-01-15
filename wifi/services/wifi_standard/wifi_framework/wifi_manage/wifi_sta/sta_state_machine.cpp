@@ -731,11 +731,11 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
     MloStateParam param = {0};
     msg->GetMessageObj(param);
 
-    CoFeatureType feature = static_cast<CoFeatureType>(param.feature);
+    uint8_t feature = param.feature;
     uint8_t state = param.state;
     uint16_t reasonCode = param.reasonCode;
     if (feature == CoFeatureType::COFEATURE_TYPE_MLO) {
-        pStaStateMachine->linkedInfo.mloState = static_cast<MloState>(state);
+        pStaStateMachine->linkedInfo.mloState = {state};
     }
     if (feature == CoFeatureType::COFEATURE_TYPE_WUR) {
         if (state == WUR_ENABLE) {

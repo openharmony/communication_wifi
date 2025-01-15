@@ -111,7 +111,7 @@ enum Wpa3ConnectFailReason {
     WPA3_FAIL_REASON_MAX
 };
 
-enum class CoFeatureType {
+enum CoFeatureType:uint8_t {
     COFEATURE_TYPE_MLO = 0,
     COFEATURE_TYPE_WUR = 1,
 };

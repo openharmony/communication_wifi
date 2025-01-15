@@ -290,7 +290,7 @@ void StaMonitor::OnWpaEapSimAuthCallBack(const std::string &notifyParam)
     }
 
     std::string delimiter = ":";
-    std::vector<std::string> results = getAuthInfo(notifyParam, delimiter);
+    std::vector<std::string> results = GetSplitInfo(notifyParam, delimiter);
     int size = results.size();
     if (results[0] == "GSM-AUTH") {
         if ((size != WIFI_SIM_GSM_AUTH_MIN_PARAM_COUNT) && (size != WIFI_SIM_GSM_AUTH_MAX_PARAM_COUNT)) {
@@ -349,38 +349,23 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
         return;
     }
     if (notifyParam.empty()) {
-        WIFI_LOGI("OnWpaMloStateNotifyCallBack() notifyParam is empty");
+        WIFI_LOGE("%{public}s notifyParam is empty", __FUNCTION__);
         return;
     }
 
-    std::string::size_type begPos = notifyParam.find(":");
-    if ((begPos == std::string::npos) || (begPos == notifyParam.length() - 1)) {
-        WIFI_LOGE("%{public}s notifyParam not find : or : is the last character", __FUNCTION__);
-        return;
-    }
-    std::string featureStr = notifyParam.substr(0, begPos);
-    std::string notifyParam2 = notifyParam.substr(begPos + 1);
-    if (notifyParam2.empty()) {
-        WIFI_LOGE("%{public}s notifyParam2 is empty", __FUNCTION__);
-        return;
-    }
-
-    std::string::size_type begPos2 = notifyParam2.find(":");
-    if ((begPos2 == std::string::npos) || (begPos2 == notifyParam2.length() - 1)) {
-        WIFI_LOGE("%{public}s notifyParam2 not find : or : is the last character", __FUNCTION__);
-        return;
-    }
-    std::string featureStateStr = notifyParam2.substr(0, begPos2);
-    std::string reasonCodeStr = notifyParam2.substr(begPos2 + 1);
-    if (reasonCodeStr.empty()) {
-        WIFI_LOGE("%{public}s reasonCodeStr is empty", __FUNCTION__);
+    std::string delimiter = ":";
+    std::vector<std::string> results = GetSplitInfo(notifyParam, delimiter);
+    int size = results.size();
+    if (size < WIFI_MLO_STATE_PARAM_COUNT) {
+        WIFI_LOGE("%{public}s invalid notifyParam:%{public}s, size:%{public}d", __FUNCTION__,
+            notifyParam.c_str(), size);
         return;
     }
 
     MloStateParam mloParam = {0};
-    mloParam.feature = CheckDataToUint(featureStr);
-    mloParam.state = CheckDataToUint(featureStateStr);
-    mloParam.reasonCode = CheckDataToUint(reasonCodeStr);
+    mloParam.feature = CheckDataToUint(results[0]);
+    mloParam.state = CheckDataToUint(results[1]);
+    mloParam.reasonCode = CheckDataToUint(results[WIFI_MLO_STATE_PARAM_COUNT - 1]);
     WIFI_LOGI("%{public}s feature:%{public}d state:%{public}u reasonCode:%{public}u", __FUNCTION__,
         mloParam.feature, mloParam.state, mloParam.reasonCode);
 

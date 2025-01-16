@@ -44,6 +44,7 @@
 #include "wifi_randommac_helper.h"
 #include "wifi_sta_hal_interface.h"
 #include "block_connect_service.h"
+#include "wifi_history_record_manager.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -1881,6 +1882,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     // wifi device
     WifiSettings::GetInstance().ClearDeviceConfig();
     WifiSettings::GetInstance().SyncDeviceConfig();
+    WifiHistoryRecordManager::GetInstance().DelectAllApInfo();
     /* p2p */
     WifiSettings::GetInstance().RemoveWifiP2pGroupInfo();
     WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();

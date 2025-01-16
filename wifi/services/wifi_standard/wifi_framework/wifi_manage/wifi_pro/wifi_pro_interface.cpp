@@ -62,6 +62,9 @@ void WifiProInterface::InitCallback()
     staCallback_.OnStaRssiLevelChanged = [this](int32_t rssi, int32_t instId) {
         this->DealRssiLevelChanged(rssi, instId);
     };
+    staCallback_.OnWifiHalSignalInfoChange = [this](const WifiSignalPollInfo &wifiSignalPollInfo) {
+        this->HandleSignalInfoChange(wifiSignalPollInfo);
+    };
 }
 
 void WifiProInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId)
@@ -97,15 +100,24 @@ void WifiProInterface::DealScanResult(const std::vector<InterScanInfo> &results)
     pWifiProService_->HandleScanResult(results);
 }
 
-void WifiProInterface::DealQoeSlowResult()
+void WifiProInterface::DealQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo)
 {
-    WIFI_LOGI("Enter DealQoeSlowResult");
     std::lock_guard<std::mutex> lock(mutex_);
     if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");
         return;
     }
-    pWifiProService_->HandleQoeSlowResult();
+    pWifiProService_->HandleQoeReport(networkLagType, networkLagInfo);
+}
+
+void WifiProInterface::HandleSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("HandleSignalInfoChange, pWifiProService is null");
+        return;
+    }
+    pWifiProService_->HandleWifiHalSignalInfoChange(wifiSignalPollInfo);
 }
 
 StaServiceCallback WifiProInterface::GetStaCallback() const

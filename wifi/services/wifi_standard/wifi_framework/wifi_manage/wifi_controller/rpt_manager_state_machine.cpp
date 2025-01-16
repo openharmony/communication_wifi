@@ -188,6 +188,7 @@ RptManagerMachine::StartingState::~StartingState()
 void RptManagerMachine::StartingState::GoInState()
 {
     WIFI_LOGE("StartingState GoInState function.\n");
+    WriteWifiBridgeStateHiSysEvent(P2P_BRIDGE_ON);
     StartRpt();
 }
 
@@ -455,6 +456,7 @@ RptManagerMachine::StoppedState::~StoppedState()
 void RptManagerMachine::StoppedState::GoInState()
 {
     WIFI_LOGE("StoppedState GoInState function.\n");
+    WriteWifiBridgeStateHiSysEvent(P2P_BRIDGE_OFF);
     pRptManagerMachine->mcb.onStopped(mid);
 }
 

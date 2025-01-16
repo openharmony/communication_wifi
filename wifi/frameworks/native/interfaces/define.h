@@ -107,6 +107,10 @@
 #define MODE_STATE_FREEZE (5)
 #define MODE_STATE_NO_CHARGER_PLUG (6)
 
+#define MODE_STATE_EXPAND (1)
+#define MODE_STATE_FOLDED (2)
+#define MODE_STATE_HALF_FOLD (3)
+
 #define MODE_STATE_DEFAULT (-1)
 /* Begin apf filter */
 #define MODE_STATE_OPEN (1)
@@ -125,5 +129,7 @@
 #ifndef STA_INSTANCE_MAX_NUM
 #define STA_INSTANCE_MAX_NUM (2)
 #endif
+
+#define WIFI_OEMINFO_MAC (1)
 
 #endif

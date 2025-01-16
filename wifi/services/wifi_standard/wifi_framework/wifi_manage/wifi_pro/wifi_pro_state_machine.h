@@ -22,6 +22,7 @@
 #include "state_machine.h"
 #include "wifi_pro_common.h"
 #include "network_selection_manager.h"
+#include "perf_5g_handover_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -234,6 +235,7 @@ private:
     std::string targetBssid_ { "" };
     NetworkSelectionResult networkSelectionResult_;
     WifiProState currentState_;
+    Perf5gHandoverService perf5gHandoverService_;
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
     bool HasWifiSwitchRecord();
@@ -254,6 +256,7 @@ private:
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
     bool FirstNoNetAndSelfCure();
+    void HandleConnectedPerf5g(WifiLinkedInfo &wifiLinkedInfo);
 };
 } // namespace Wifi
 } // namespace OHOS

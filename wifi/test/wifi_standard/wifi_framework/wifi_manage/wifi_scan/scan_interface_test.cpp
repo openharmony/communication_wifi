@@ -53,16 +53,8 @@ public:
     std::unique_ptr<ScanInterface> pScanInterface;
 };
 
-extern "C" IScanService *Create(void);
-extern "C" void Destroy(IScanService *pservice);
-
 std::vector<TrustListPolicy> refVecTrustList;
 MovingFreezePolicy defaultValue;
-HWTEST_F(ScanInterfaceTest, GCreateDestroy, TestSize.Level1)
-{
-    auto p = Create();
-    Destroy(p);
-}
 
 HWTEST_F(ScanInterfaceTest, UnInitTest, TestSize.Level1)
 {

@@ -134,7 +134,7 @@ public:
     virtual int SaveScanInfoList(const std::vector<WifiScanInfo> &results) = 0;
     virtual int GetMinRssi2Dot4Ghz(int instId = 0) = 0;
     virtual int GetMinRssi5Ghz(int instId = 0) = 0;
-    virtual ScanMode GetAppRunningState() const = 0;
+    virtual ScanMode GetAppRunningState() = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual const std::string GetAppPackageName() const = 0;
     virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
@@ -214,6 +214,7 @@ public:
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
+    virtual int GetHotspotConfig(HotspotConfig &hotspotConfig, int id) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -316,7 +317,7 @@ public:
     MOCK_METHOD1(SaveScanInfoList, int(const std::vector<WifiScanInfo> &results));
     MOCK_METHOD1(GetMinRssi2Dot4Ghz, int(int));
     MOCK_METHOD1(GetMinRssi5Ghz, int(int));
-    MOCK_CONST_METHOD0(GetAppRunningState, ScanMode());
+    MOCK_METHOD0(GetAppRunningState, ScanMode());
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_CONST_METHOD0(GetAppPackageName, const std::string());
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
@@ -396,6 +397,7 @@ public:
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetSupportHwPnoFlag, bool(int instId));
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
+    MOCK_METHOD2(GetHotspotConfig, int(HotspotConfig &hotspotConfig, int id));
 };
 }  // namespace Wifi
 }  // namespace OHOS

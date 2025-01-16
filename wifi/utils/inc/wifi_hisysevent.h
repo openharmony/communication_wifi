@@ -86,6 +86,8 @@ void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operT
 
 void WriteWifiApStateHiSysEvent(int32_t state);
 
+void WriteWifiBridgeStateHiSysEvent(int32_t state);
+
 void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t state);
 
 void WriteWifiConnectionHiSysEvent(const WifiConnectionType& type, const std::string& pkgName);

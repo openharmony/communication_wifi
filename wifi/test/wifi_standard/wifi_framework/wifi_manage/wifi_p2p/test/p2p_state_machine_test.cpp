@@ -742,7 +742,7 @@ HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand1, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand2, TestSize.Level1)
 {
     GroupOwnerBand band = GroupOwnerBand::GO_BAND_2GHZ;
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _))
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _, _))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_GE(WarpGetAvailableFreqByBand(band), 0);
 }
@@ -752,8 +752,8 @@ HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand3, TestSize.Level1)
     GroupOwnerBand band = GroupOwnerBand::GO_BAND_2GHZ;
     std::vector<int> freqList;
     freqList.push_back(2412);
-    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(freqList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(freqList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     WarpGetAvailableFreqByBand(band);
 }
 

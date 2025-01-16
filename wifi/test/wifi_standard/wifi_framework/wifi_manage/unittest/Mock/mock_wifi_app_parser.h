@@ -31,6 +31,7 @@ public:
     virtual bool IsHighTempLimitSpeedApp(const std::string &bundleName) const = 0;
     virtual bool IsKeyForegroundApp(const std::string &bundleName) const = 0;
     virtual bool IsBackgroundLimitApp(const std::string &bundleName) const = 0;
+    virtual bool IsLiveStreamApp(const std::string &bundleName) const = 0;
 };
 
 class AppParser : public MockWifiAppParser {
@@ -43,6 +44,7 @@ public:
     MOCK_CONST_METHOD1(IsHighTempLimitSpeedApp, bool(const std::string &bundleName));
     MOCK_CONST_METHOD1(IsKeyForegroundApp, bool(const std::string &bundleName));
     MOCK_CONST_METHOD1(IsBackgroundLimitApp, bool(const std::string &bundleName));
+    MOCK_CONST_METHOD1(IsLiveStreamApp, bool(const std::string &bundleName));
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

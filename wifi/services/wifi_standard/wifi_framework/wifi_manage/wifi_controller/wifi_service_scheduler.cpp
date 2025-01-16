@@ -859,7 +859,6 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
     }
     ErrCode errCode = TryToStartApService(instId);
     if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, instId);
         return errCode;
     }

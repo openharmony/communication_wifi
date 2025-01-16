@@ -41,6 +41,7 @@ public:
     static int VerifyGetWifiInfoInternalPermission();
     static int VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
     static int VerifyManageWifiHotspotExtPermission();
+    static int VerifyEnterpriseWifiConnectionPermission();
     static int GetApiVersion();
 };
 }  // namespace Wifi

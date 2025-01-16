@@ -38,6 +38,7 @@
 #include "hal_device_manage.h"
 #endif
 #include "wifi_global_func.h"
+#include "wifi_history_record_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -569,6 +570,11 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             return WIFI_OPT_FAILED;
         }
 #endif
+        errCode = pService->RegisterStaServiceCallback(WifiHistoryRecordManager::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("WifiHistoryRecordManager register callback failed, ret=%{public}d", static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
     }
     return WIFI_OPT_SUCCESS;
 }

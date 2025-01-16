@@ -23,6 +23,7 @@ namespace OHOS {
 namespace Wifi {
 enum RdbType {
     WIFI_PRO,
+    WIFI_HISTORY_RECORD,
 };
 
 class WifiRdbManager {
@@ -35,6 +36,13 @@ public:
         int32_t OnUpgrade(NativeRdb::RdbStore &rdbStore, int32_t currentVersion, int32_t targetVersion) override;
     };
 
+    class WifiHistoryRecordRdbCallback : public NativeRdb::RdbOpenCallback {
+    public:
+        WifiHistoryRecordRdbCallback() = default;
+        virtual ~WifiHistoryRecordRdbCallback() = default;
+        int32_t OnCreate(NativeRdb::RdbStore &rdbStore) override;
+        int32_t OnUpgrade(NativeRdb::RdbStore &rdbStore, int32_t currentVersion, int32_t targetVersion) override;
+    };
 public:
     static std::shared_ptr<WifiRdbManager> GetRdbManger(const RdbType &rdbType);
     WifiRdbManager(std::string rdbPath, int32_t rdbVersion,

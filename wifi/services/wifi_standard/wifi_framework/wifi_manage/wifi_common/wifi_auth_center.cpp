@@ -187,5 +187,13 @@ int WifiAuthCenter::VerifyManageWifiHotspotExtPermission(const int &pid, const i
     }
     return WifiPermissionHelper::VerifyManageWifiHotspotExtPermission(pid, uid);
 }
+
+int WifiAuthCenter::VerifyEnterpriseWifiConnectionPermission(const int &pid, const int &uid)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifyEnterpriseWifiConnectionPermission(pid, uid);
+}
 } // namespace Wifi
 } // namespace OHOS

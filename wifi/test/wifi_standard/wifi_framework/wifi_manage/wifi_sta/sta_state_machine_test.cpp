@@ -1529,6 +1529,12 @@ public:
     {
         pStaStateMachine-> CloseNoInternetDialog();
     }
+
+    void UpdateLinkedBssidTest()
+    {
+        std::string bssid = "11:22:33:44:55:66";
+        pStaStateMachine->UpdateLinkedBssid(bssid);
+    }
 };
 
 HWTEST_F(StaStateMachineTest, ShouldUseFactoryMacSuccess, TestSize.Level1)
@@ -2344,6 +2350,11 @@ HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7IsMlo, TestSize.Leve
 HWTEST_F(StaStateMachineTest, CloseNoInternetDialogTest, TestSize.Level1)
 {
     CloseNoInternetDialogTest();
+}
+
+HWTEST_F(StaStateMachineTest, UpdateLinkedBssidTest, TestSize.Level1)
+{
+    UpdateLinkedBssidTest();
 }
 } // namespace Wifi
 } // namespace OHOS

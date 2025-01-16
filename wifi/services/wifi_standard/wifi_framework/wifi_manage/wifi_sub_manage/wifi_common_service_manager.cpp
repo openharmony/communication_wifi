@@ -32,6 +32,7 @@
 #ifdef FEATURE_SELF_CURE_SUPPORT
 #include "ip_qos_monitor.h"
 #endif
+#include "wifi_history_record_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -92,6 +93,10 @@ InitStatus WifiCommonServiceManager::Init()
 
     if (WifiInternalEventDispatcher::GetInstance().Init() < 0) {
         WIFI_LOGE("WifiInternalEventDispatcher Init failed!");
+        return EVENT_BROADCAST_INIT_FAILED;
+    }
+    if (WifiHistoryRecordManager::GetInstance().Init() != 0) {
+        WIFI_LOGE("WifiHistoryRecordManager Init failed!");
         return EVENT_BROADCAST_INIT_FAILED;
     }
     return INIT_OK;

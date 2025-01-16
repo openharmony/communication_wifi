@@ -1146,6 +1146,12 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             pStaStateMachine->DealSignalPollResult();
             break;
+#ifndef OHOS_ARCH_LITE
+        case WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT:
+            ret = EXECUTED;
+            pStaStateMachine->HandleForegroundAppChangedAction(msg);
+            break;
+#endif
         case WIFI_SVR_COM_STA_START_ROAM:
             ret = EXECUTED;
             DealStartRoamCmdInApLinkedState(msg);
@@ -3484,9 +3490,31 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), STA_SIGNAL_POLL_DELAY);
+        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), staSignalPollDelayTime_);
     }
 }
+
+#ifndef OHOS_ARCH_LITE
+void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
+{
+    AppExecFwk::AppStateData appStateData;
+    if (!msg->GetMessageObj(appStateData)) {
+        WIFI_LOGE("Failed to obtain appStateData information");
+        return;
+    }
+    if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) &&
+        appStateData.isFocused) {
+        curForegroundAppBundleName_ = appStateData.bundleName;
+        std::string sceneboardBundle = WifiSettings::GetInstance().GetPackageName("SCENEBOARD_BUNDLE");
+        if (curForegroundAppBundleName_ != "" && sceneboardBundle != "" &&
+            curForegroundAppBundleName_ != sceneboardBundle) {
+            staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY_WITH_TASK;
+        } else {
+            staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
+        }
+    }
+}
+#endif
 
 void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)
 {

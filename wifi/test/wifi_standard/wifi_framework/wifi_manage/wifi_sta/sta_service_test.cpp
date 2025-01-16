@@ -25,6 +25,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_error_no.h"
 #include "mock_block_connect_service.h"
+#include "wifi_history_record_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

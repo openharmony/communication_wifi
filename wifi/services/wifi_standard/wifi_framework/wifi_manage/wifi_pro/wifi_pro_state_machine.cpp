@@ -217,19 +217,16 @@ bool WifiProStateMachine::IsReachWifiScanThreshold(int32_t signalLevel)
     }
 
     if (signalLevel < SIG_LEVEL_3) {
-        SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
         return true;
     }
 
     if (HasWifiSwitchRecord()) {
         WIFI_LOGI("IsReachWifiScanThreshold, ap is not strong enough, and has switch record.");
-        SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
         return true;
     }
 
     if (HasAvailableSsidToSwitch()) {
         WIFI_LOGI("IsReachWifiScanThreshold, ap is not strong enough, and has available ap.");
-        SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
         return true;
     }
 
@@ -950,6 +947,7 @@ void WifiProStateMachine::WifiHasNetState::HandleReuqestScanInHasNet(const Inter
         return;
     }
 
+    pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
     TryStartScan(hasSwitchRecord, signalLevel);
 }
 

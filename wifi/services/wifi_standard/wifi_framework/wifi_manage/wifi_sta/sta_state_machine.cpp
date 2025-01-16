@@ -3480,7 +3480,7 @@ void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
 {
     AppExecFwk::AppStateData appStateData;
     if (!msg->GetMessageObj(appStateData)) {
-        WIFI_LOGE("Failed to obtain apppStateData information");
+        WIFI_LOGE("Failed to obtain appStateData information");
         return;
     }
     if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) &&

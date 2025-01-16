@@ -366,7 +366,7 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
     mloParam.feature = CheckDataToUint(results[0]);
     mloParam.state = CheckDataToUint(results[1]);
     mloParam.reasonCode = CheckDataToUint(results[WIFI_MLO_STATE_PARAM_COUNT - 1]);
-    WIFI_LOGI("%{public}s feature:%{public}d state:%{public}u reasonCode:%{public}u", __FUNCTION__,
+    WIFI_LOGI("%{public}s feature:%{public}u state:%{public}u reasonCode:%{public}u", __FUNCTION__,
         mloParam.feature, mloParam.state, mloParam.reasonCode);
 
     /* Notify sta state machine mlo state changed event. */

@@ -1351,7 +1351,7 @@ static int SetWifiP2pGroupInfoEncrypt(WifiP2pGroupInfo &item, const std::string 
 
 static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key, const std::string &value)
 {
-    if (key.compare(0, strlen(OWNER_DEV_PREFIX_NAME), CLIENT_PREFIX_NAME) == 0) {
+    if (key.compare(0, strlen(OWNER_DEV_PREFIX_NAME), OWNER_DEV_PREFIX_NAME) == 0) {
         WifiP2pDevice owner = item.GetOwner();
         SetWifiP2pDevicClassKeyValue(owner, key.substr(strlen(OWNER_DEV_PREFIX_NAME)), value);
         item.SetOwner(owner);

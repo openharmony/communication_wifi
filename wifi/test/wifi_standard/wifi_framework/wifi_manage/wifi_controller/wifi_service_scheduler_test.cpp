@@ -19,7 +19,7 @@
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_manager.h"
 #include "mock_wifi_sta_hal_interface.h"
-
+#include "wifi_history_record_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

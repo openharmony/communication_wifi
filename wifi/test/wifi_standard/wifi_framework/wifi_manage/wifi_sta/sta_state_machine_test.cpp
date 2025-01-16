@@ -1111,6 +1111,17 @@ public:
         pStaStateMachine->DealSignalPacketChanged(0, 0);
     }
 
+    void HandleForegroundAppChangedActionTest()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT);
+        AppExecFwk::AppStateData appStateData;
+        appStateData.bundleName = "com.ohos.sceneboard";
+        appStateData.isFocused = true;
+        msg->SetMessageObj(appStateData);
+        pStaStateMachine->HandleForegroundAppChangedAction(msg);
+    }
+
     void DealSignalPacketChangedTest()
     {
         pStaStateMachine->linkedInfo.lastTxPackets = -1;
@@ -2073,6 +2084,18 @@ HWTEST_F(StaStateMachineTest, DealSignalPollResultTest, TestSize.Level1)
 {
     DealSignalPollResultTest();
 }
+
+/**
+ * @tc.name: HandleForegroundAppChangedActionTest
+ * @tc.desc: HandleForegroundAppChangedAction()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, HandleForegroundAppChangedActionTest, TestSize.Level1)
+{
+    HandleForegroundAppChangedActionTest();
+}
+
 /**
  * @tc.name: DealSignalPacketChangedTest
  * @tc.desc: DealSignalPacketChanged()

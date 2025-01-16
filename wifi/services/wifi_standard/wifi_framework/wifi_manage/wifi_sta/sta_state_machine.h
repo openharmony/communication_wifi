@@ -44,6 +44,7 @@
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
 #include "wifi_common_event_helper.h"
+#include "appmgr/app_mgr_interface.h"
 #endif
 
 namespace OHOS {
@@ -64,6 +65,7 @@ constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
+constexpr int STA_SIGNAL_POLL_DELAY_WITH_TASK = 1 * 1000;
 constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
 
 /* pincode length */
@@ -451,6 +453,13 @@ public:
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);
     void UpdateAcceptUnvalidatedState();
+
+    /**
+     * @Description: Handle Foreground App Changed Action
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void HandleForegroundAppChangedAction(InternalMessagePtr msg);
 #endif
 /* ------------------ state machine private function ----------------- */
 private:
@@ -1010,6 +1019,8 @@ private:
     std::string mPortalUrl;
     int mLastConnectNetId;      /* last request connect netword id */
     int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
+    std::string curForegroundAppBundleName_ = "";
+    int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
 };
 }  // namespace Wifi
 }  // namespace OHOS

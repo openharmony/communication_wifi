@@ -13,6 +13,7 @@
         "*WifiSysTimer*";
         "*HasHotspotRemote*";
         "*HasP2pRemote*";
+        "*WifiHistoryRecordManager*";
    extern "C++" {
         "OHOS::Wifi::AppNetworkSpeedLimitService::GetInstance()";
         "OHOS::Wifi::AppNetworkSpeedLimitService::GetStaCallback() const";
@@ -83,6 +84,12 @@
         "OHOS::Wifi::WifiCountryCodeManager::DealStaStopped(int)";
         "OHOS::Wifi::WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int)";
         "OHOS::Wifi::WifiCountryCodePolicy::CalculateWifiCountryCode(std::string &)";
+        "OHOS::Wifi::WifiHistoryRecordManager::GetInstance()";
+        "OHOS::Wifi::WifiHistoryRecordManager::Init()";
+        "OHOS::Wifi::WifiHistoryRecordManager::DelectApInfo(const std::string &, const std::string &)";
+        "OHOS::Wifi::WifiHistoryRecordManager::DelectAllApInfo()";
+        "OHOS::Wifi::WifiHistoryRecordManager::IsHomeAp(const std::string &)";
+        "OHOS::Wifi::WifiHistoryRecordManager::IsHomeRouter(const std::string &)";
         "OHOS::Wifi::WifiInternalEventDispatcher::GetInstance()";
         "OHOS::Wifi::WifiInternalEventDispatcher::Init()";
         "OHOS::Wifi::WifiInternalEventDispatcher::SendSystemNotifyMsg()";

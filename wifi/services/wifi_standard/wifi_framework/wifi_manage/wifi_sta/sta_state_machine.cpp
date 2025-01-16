@@ -3487,7 +3487,8 @@ void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
         appStateData.isFocused) {
         curForegroundAppBundleName_ = appStateData.bundleName;
         std::string sceneboardBundle = WifiSettings::GetInstance().GetPackageName("SCENEBOARD_BUNDLE");
-        if (curForegroundAppBundleName_ != "" && curForegroundAppBundleName_ != SCENEBOARD_BUNDLE_NAME) {
+        if (curForegroundAppBundleName_ != "" && sceneboardBundle != "" &&
+            curForegroundAppBundleName_ != sceneboardBundle) {
             staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY_WITH_TASK;
         } else {
             staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;

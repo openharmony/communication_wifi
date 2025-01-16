@@ -93,6 +93,11 @@ int WifiPermissionUtils::VerifyManageWifiHotspotExtPermission()
     return PERMISSION_GRANTED;
 }
 
+int WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
 int WifiPermissionUtils::GetApiVersion()
 {
     return API_VERSION_INVALID;
@@ -181,6 +186,12 @@ int WifiPermissionUtils::VerifyGetWifiInfoInternalPermission()
 int WifiPermissionUtils::VerifyManageWifiHotspotExtPermission()
 {
     return WifiAuthCenter::GetInstance().VerifyManageWifiHotspotExtPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission()
+{
+    return WifiAuthCenter::GetInstance().VerifyEnterpriseWifiConnectionPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 

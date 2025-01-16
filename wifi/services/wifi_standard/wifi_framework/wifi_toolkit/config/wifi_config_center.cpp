@@ -1335,7 +1335,7 @@ std::string WifiConfigCenter::GetPairMacAddress(std::map<WifiMacAddrInfo, std::s
             __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, iter->second.c_str());
         return iter->second;
     } else {
-        LOGD("%{public}s: record not found.", __func__);
+        LOGE("%{public}s: record not found, macaddr: %{public}s", __func__, MacAnonymize(macAddrInfo.bssid).c_str());
     }
     return "";
 }

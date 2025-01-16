@@ -34,9 +34,10 @@ public:
      * the function to determine whether the network is Open and maybe portal.
      *
      * @param networkCandidate candidate network.
+     * @param filterName wififilter name
      * @return return ture if the candidate network is Open and maybe portal.
      */
-    static bool IsOpenAndMaybePortal(const NetworkCandidate &networkCandidate);
+    static bool IsOpenAndMaybePortal(NetworkCandidate &networkCandidate, const std::string &filterName = "");
 
     /**
      * the function to determine whether the network is owe network.
@@ -58,9 +59,11 @@ public:
      * transfer the info of candidate networks to json format string.
      *
      * @param networkCandidates candidate network
+     * @param filterName wififilter Name
      * @return json format string
      */
-    static std::string GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates);
+    static std::string GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates,
+        const std::string &filterName = "");
 
     /**
      * transfer the info of candidate networks to json format string.

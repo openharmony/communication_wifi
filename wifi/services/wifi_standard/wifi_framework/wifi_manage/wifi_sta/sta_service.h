@@ -394,6 +394,12 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac);
+/**
+     * @Description fold status
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual void HandleFoldStatusChanged(int foldstatus);
 
     /* VOWIFI */
     virtual std::string VoWifiDetect(std::string cmd);

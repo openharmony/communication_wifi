@@ -17,16 +17,51 @@
 #define OHOS_WIFI_NETWORK_SELECTION_H
 #include <functional>
 #include <memory>
+#include <set>
 #include "wifi_msg.h"
 #include "inter_scan_info.h"
 
 namespace OHOS::Wifi {
 namespace NetworkSelection {
+enum FiltedReason {
+    UNKNOW = 0,
+    HIDDEN_NETWORK,
+    OPEN_NETWORK,
+    NOT_OPEN_NETWORK,
+    WEAK_ALGORITHM_WEP_SECURITY,
+    WEAK_ALGORITHM_WPA_SECURITY,
+    HAS_NETWORK_HISTORY,
+    PORTAL_NETWORK,
+    NOT_PORTAL_NETWORK,
+    OWE_NETWORK,
+    UNRECOVERABLE_NETWORK,
+    NETWORK_STATUS_DISABLE,
+    UNEXPECTED_NETWORK_BY_USER,
+    NO_INTERNET,
+    HAS_INTERNET,
+    NETWORK_ID_INVALID,
+    NOT_SYSTEM_NETWORK,
+    TIME_INVALID,
+    EPHEMERAL_NETWORK,
+    PASSPOINT_NETWORK,
+    POOR_SIGNAL,
+    TIMEOUT_AND_NEED_RECHECK,
+    NOT_ALLOW_AUTO_CONNECT,
+};
+
+struct FiltedReasonComparator {
+    bool operator()(const FiltedReason& lhs, const FiltedReason& rhs) const
+    {
+        return static_cast<int>(lhs) < static_cast<int>(rhs);
+    }
+};
+
 struct NetworkCandidate {
     const InterScanInfo &interScanInfo;
     WifiDeviceConfig wifiDeviceConfig;
     explicit NetworkCandidate(const InterScanInfo &interScanInfo) : interScanInfo(interScanInfo), wifiDeviceConfig() {}
-    std::string ToString() const;
+    std::map<std::string, std::set<FiltedReason, FiltedReasonComparator, std::allocator<FiltedReason>>> filtedReason;
+    std::string ToString(const std::string &filterName = "") const;
 };
 
 struct ScoreResult {

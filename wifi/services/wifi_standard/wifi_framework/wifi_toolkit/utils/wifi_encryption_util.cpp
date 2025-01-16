@@ -287,9 +287,9 @@ int32_t ImportKey(const WifiEncryptionInfo &wifiEncryptionInfo, const std::strin
     HksBuildParamSet(&encryParamSet);
 
     int32_t keyExist = HksKeyExist(&authId, encryParamSet);
-    (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
     if (keyExist == HKS_ERROR_NOT_EXIST) {
         int32_t ret = HksImportKey(&authId, encryParamSet, &hksKey);
+        (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
         if (ret != HKS_SUCCESS) {
             WIFI_LOGE("ImportKey failed: %{public}d.", ret);
         }
@@ -297,10 +297,12 @@ int32_t ImportKey(const WifiEncryptionInfo &wifiEncryptionInfo, const std::strin
         return ret;
     } else if (keyExist == HKS_SUCCESS) {
         WIFI_LOGI("ImportKey key is exist, donot need import key.");
+        (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
         HksFreeParamSet(&encryParamSet);
         return HKS_SUCCESS;
     }
     WIFI_LOGE("ImportKey HksKeyExist check failed: %{public}d.", keyExist);
+    (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
     HksFreeParamSet(&encryParamSet);
     return keyExist;
 }

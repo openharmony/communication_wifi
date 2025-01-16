@@ -1022,7 +1022,14 @@ ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
 
     return WIFI_OPT_SUCCESS;
 }
-
+void StaService::HandleFoldStatusChanged(int foldstatus)
+{
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null!");
+        return;
+    }
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT, foldstatus);
+}
 std::string StaService::VoWifiDetect(std::string cmd)
 {
     std::unique_lock<std::shared_mutex> lock(voWifiCallbackMutex_);

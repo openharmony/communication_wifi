@@ -103,6 +103,9 @@ public:
     virtual bool SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp) = 0;
     virtual bool ClearNetworkCandidateScanResult(int networkId) = 0;
     virtual bool SetNetworkCandidateScanResult(int networkId) = 0;
+    virtual bool GetWifiFlagOnAirplaneMode(int instId) = 0;
+    virtual int GetScanOnlySwitchState(int instId) = 0;
+    virtual bool GetScanAlwaysState(int instId) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -187,6 +190,9 @@ public:
     MOCK_METHOD3(SetNetworkConnectChoice, bool(int networkId, int selectNetworkId, long timestamp));
     MOCK_METHOD1(ClearNetworkCandidateScanResult, bool(int networkId));
     MOCK_METHOD1(SetNetworkCandidateScanResult, bool(int networkId));
+    MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
+    MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
+    MOCK_METHOD1(GetScanOnlySwitchState, int(int instId));
 };
 }  // namespace OHOS
 }  // namespace Wifi

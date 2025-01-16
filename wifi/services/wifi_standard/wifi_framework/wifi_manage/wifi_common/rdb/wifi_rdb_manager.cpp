@@ -23,6 +23,13 @@ DEFINE_WIFILOG_LABEL("WifiRdbManager");
 const std::string WIFI_DATABASE_PATH = "/data/service/el1/public/wifi";
 const std::string WIFI_PRO_RDB_NAME = "/wifi_pro.db";
 constexpr int32_t WIFI_PRO_DATABASE_VERSION = 1;
+const std::string WIFI_HISTORY_RECORD_DATEBASE_PATH = "/data/service/el1/public/wifi";
+const std::string WIFI_HISTORY_RECORD_DATEBASE_NAME = "/wifi_history_record.db";
+const std::string WIFI_HISTORY_RECORD_CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS ap_connection_duration_info "
+    " (networkId INTEGER, ssid STRING, bssid STRING, keyMgmt STRING, firstConnectedTime BIGINT, "
+    "currentConnectedTime BIGINT, totalUseTime BIGINT, totalUseTimeAtNight BIGINT, totalUseTimeAtWeekend BIGINT, "
+    "markedAsHomeApTime BIGINT);";
+constexpr int WIFI_HISTORY_RECORD_DATEBASE_VERSION = 1;
 
 static std::map<RdbType, std::shared_ptr<WifiRdbManager>> g_rdbManagerInstanceMap;
 static std::mutex g_mutex;
@@ -37,6 +44,15 @@ std::shared_ptr<WifiRdbManager> WifiRdbManager::GetRdbManger(const RdbType &rdbT
                         WIFI_PRO_DATABASE_VERSION, std::make_shared<WifiRdbManager::WifiProRdbOpenCallback>()));
             }
             return g_rdbManagerInstanceMap[RdbType::WIFI_PRO];
+        case RdbType::WIFI_HISTORY_RECORD:
+            if (g_rdbManagerInstanceMap.find(RdbType::WIFI_HISTORY_RECORD) == g_rdbManagerInstanceMap.end()) {
+                g_rdbManagerInstanceMap.insert_or_assign(RdbType::WIFI_HISTORY_RECORD,
+                    std::make_shared<WifiRdbManager>(
+                        WIFI_HISTORY_RECORD_DATEBASE_PATH + WIFI_HISTORY_RECORD_DATEBASE_NAME,
+                        WIFI_HISTORY_RECORD_DATEBASE_VERSION,
+                        std::make_shared<WifiRdbManager::WifiHistoryRecordRdbCallback>()));
+            }
+            return g_rdbManagerInstanceMap[RdbType::WIFI_HISTORY_RECORD];
         default :
             return nullptr;
     }
@@ -169,5 +185,23 @@ int32_t WifiRdbManager::WifiProRdbOpenCallback::OnUpgrade(NativeRdb::RdbStore &r
     return NativeRdb::E_OK;
 }
 
+int32_t WifiRdbManager::WifiHistoryRecordRdbCallback::OnCreate(NativeRdb::RdbStore &rdbStore)
+{
+    WIFI_LOGI("WifiHistoryRecordRdbCallback OnCreate");
+    int32_t ret = rdbStore.ExecuteSql(WIFI_HISTORY_RECORD_CREATE_TABLE_SQL);
+    if (ret != NativeRdb::E_OK) {
+        WIFI_LOGE("WifiHistoryRecordRdbCallback CreateTable ExecuteSql is err: %{public}d ", ret);
+        return NativeRdb::E_ERROR;
+    }
+    WIFI_LOGI("WifiHistoryRecordRdbCallback CreateTable ExecuteSql success");
+    return NativeRdb::E_OK;
+}
+ 
+int32_t WifiRdbManager::WifiHistoryRecordRdbCallback::OnUpgrade(NativeRdb::RdbStore &rdbStore, int32_t currentVersion,
+    int32_t targetVersion)
+{
+    WIFI_LOGI("WifiHistoryRecordRdbCallback OnUpgrade");
+    return NativeRdb::E_OK;
+}
 }  // namespace Wifi
 }  // namespace OHOS

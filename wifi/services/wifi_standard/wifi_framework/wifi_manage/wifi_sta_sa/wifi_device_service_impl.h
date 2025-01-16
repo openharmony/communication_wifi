@@ -209,6 +209,7 @@ public:
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);
+    ErrCode CheckCanAddDeviceConfig(const bool isCandidate);
     bool IsStaServiceRunning();
     bool IsScanServiceRunning();
     bool CheckConfigEap(const WifiDeviceConfig &config);

@@ -1113,8 +1113,13 @@ public:
 
     void HandleForegroundAppChangedActionTest()
     {
-        AppExecFwk::AppStateData appData;
-        pStaStateMachine->HandleForegroundAppChangedAction(appData);
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT);
+        AppExecFwk::AppStateData appStateData;
+        appStateData.bundleName = "com.ohos.sceneboard";
+        appStateData.isFocused = true;
+        msg->SetMessageObj(appStateData);
+        pStaStateMachine->HandleForegroundAppChangedAction(msg);
     }
 
     void DealSignalPacketChangedTest()

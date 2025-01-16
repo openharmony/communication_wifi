@@ -457,9 +457,9 @@ public:
     /**
      * @Description: Handle Foreground App Changed Action
      *
-     * @param appStateData - App State Data
+     * @param msg - Message body received by the state machine[in]
      */
-    void HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
+    void HandleForegroundAppChangedAction(InternalMessagePtr msg);
 #endif
 /* ------------------ state machine private function ----------------- */
 private:

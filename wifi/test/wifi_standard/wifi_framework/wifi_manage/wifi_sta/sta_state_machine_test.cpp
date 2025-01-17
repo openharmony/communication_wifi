@@ -766,70 +766,79 @@ public:
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
     }
 
-    void TestTryModifyPortalAttribute()
+    void TestTryModifyPortalAttribute1()
     {
         pStaStateMachine->linkedInfo.networkId = INVALID_NETWORK_ID;
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_NOTWORKING);
- 
+
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).WillOnce(Return(-1));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_NOTWORKING);
- 
+    }
+
+    void TestTryModifyPortalAttribute2()
+    {
         // SystemNetWorkState::NETWORK_NOTWORKING
         WifiDeviceConfig wifiDeviceConfig1;
-        wifiDeviceConfig1.networkStatusHistory = 149;  // 10010101
+        wifiDeviceConfig1.networkStatusHistory = 149;  // 149: convert to binary 10010101
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig1), Return(0)));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_NOTWORKING);
- 
+
         WifiDeviceConfig wifiDeviceConfig2;
-        wifiDeviceConfig2.networkStatusHistory = 21;  // 010101
+        wifiDeviceConfig2.networkStatusHistory = 21;  // 21: convert to binary 010101
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig2), Return(0)));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_NOTWORKING);
- 
+    }
+
+    void TestTryModifyPortalAttribute3()
+    {
         // SystemNetWorkState::NETWORK_IS_WORKING
         WifiDeviceConfig wifiDeviceConfig3;
-        wifiDeviceConfig3.networkStatusHistory = 149;  // 10010101
+        wifiDeviceConfig3.networkStatusHistory = 149;  // 149: convert to binary 10010101
         wifiDeviceConfig3.keyMgmt == KEY_MGMT_NONE;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig3), Return(0)));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_IS_WORKING);
- 
+
         WifiDeviceConfig wifiDeviceConfig4;
-        wifiDeviceConfig4.networkStatusHistory = 149;  // 10010101
+        wifiDeviceConfig4.networkStatusHistory = 149;  // 149: convert to binary 10010101
         wifiDeviceConfig4.keyMgmt == KEY_MGMT_WPA_PSK;
         pStaStateMachine->linkedInfo.isHiLinkNetwork = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig4), Return(0)));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_IS_WORKING);
- 
+
         WifiDeviceConfig wifiDeviceConfig5;
-        wifiDeviceConfig5.networkStatusHistory = 149;  // 10010101
+        wifiDeviceConfig5.networkStatusHistory = 149;  // 149: convert to binary 10010101
         wifiDeviceConfig5.keyMgmt == KEY_MGMT_WPA_PSK;
         pStaStateMachine->linkedInfo.isHiLinkNetwork = true;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig5), Return(0)));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_IS_WORKING);
- 
+
         WifiDeviceConfig wifiDeviceConfig6;
-        wifiDeviceConfig6.networkStatusHistory = 21;  // 010101
+        wifiDeviceConfig6.networkStatusHistory = 21;  // 21: convert to binary 010101
         wifiDeviceConfig6.keyMgmt == KEY_MGMT_WPA_PSK;
         pStaStateMachine->linkedInfo.isHiLinkNetwork = true;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig6), Return(0)));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_IS_WORKING);
- 
+    }
+
+    void TestTryModifyPortalAttribute4()
+    {
         // SystemNetWorkState::NETWORK_IS_PORTAL
         WifiDeviceConfig wifiDeviceConfig7;
-        wifiDeviceConfig7.networkStatusHistory = 21;  // 010101
+        wifiDeviceConfig7.networkStatusHistory = 21;  // 21: convert to binary 010101
         wifiDeviceConfig7.keyMgmt == KEY_MGMT_WPA_PSK;
         pStaStateMachine->linkedInfo.isHiLinkNetwork = false;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig7), Return(0)));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_IS_PORTAL);
- 
+
         WifiDeviceConfig wifiDeviceConfig8;
-        wifiDeviceConfig8.networkStatusHistory = 21;  // 010101
+        wifiDeviceConfig8.networkStatusHistory = 21;  // 21: convert to binary 010101
         wifiDeviceConfig8.keyMgmt == KEY_MGMT_WPA_PSK;
         pStaStateMachine->linkedInfo.isHiLinkNetwork = true;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
@@ -1996,7 +2005,10 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, TestTryModifyPortalAttribute, TestSize.Level1)
 {
-    TestTryModifyPortalAttribute();
+    TestTryModifyPortalAttribute1();
+    TestTryModifyPortalAttribute2();
+    TestTryModifyPortalAttribute3();
+    TestTryModifyPortalAttribute4();
 }
  
 HWTEST_F(StaStateMachineTest, TestChangePortalAttribute, TestSize.Level1)

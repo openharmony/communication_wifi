@@ -170,12 +170,12 @@ void WifiHistoryRecordManager::HandleWifiConnectedMsg(const WifiLinkedInfo &info
     UpdateConnectionTime(true);
 }
  
- bool WifiHistoryRecordManager::IsEnterprise(const WifiDeviceConfig &config)
- {
+bool WifiHistoryRecordManager::IsEnterprise(const WifiDeviceConfig &config)
+{
     bool isEnterpriseSecurityType = (config.keyMgmt == KEY_MGMT_EAP) ||
         (config.keyMgmt == KEY_MGMT_SUITE_B_192) || (config.keyMgmt == KEY_MGMT_WAPI_CERT);
     return isEnterpriseSecurityType && (config.wifiEapConfig.eap != EAP_METHOD_NONE);
- }
+}
  
 void WifiHistoryRecordManager::NextUpdateApInfoTimer()
 {
@@ -223,8 +223,7 @@ bool WifiHistoryRecordManager::CheckIsHomeAp()
     double homeTimeFloat = static_cast<double>(homeTime);
     double totalUseTimeFloat = static_cast<double>(connectedApInfo_.totalUseTime);
     if (!IsFloatEqual(totalUseTimeFloat, INVALID_TIME_POINT)) {
-        const int oneHundred = 100;  // Keep two decimal places
-        restTimeRate = std::round((homeTimeFloat / totalUseTimeFloat) * oneHundred) / oneHundred;
+        restTimeRate = std::round((homeTimeFloat / totalUseTimeFloat) * 100) / 100;  // 100:Keep two decimal places
     }
  
     // The conditions for determining homeAp must simultaneously meet:
@@ -269,17 +268,17 @@ void WifiHistoryRecordManager::UpdateConnectionTime(bool isNeedNext)
     if (!IsAbnormalTimeRecords()) {
         // After caching the last statistics time, refresh the current round of statistics time point
         int lastRecordDayInWeek = connectedApInfo_.currentRecordDayInWeek;
-        long lastSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR
-            + connectedApInfo_.currentRecordMinute * SECOND_OF_ONE_MINUTE
-            + connectedApInfo_.currentRecordSecond;
+        long lastSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
+            connectedApInfo_.currentRecordMinute * SECOND_OF_ONE_MINUTE +
+            connectedApInfo_.currentRecordSecond;
  
         std::time_t currentTime = std::time(nullptr);
         WIFI_LOGI("%{public}s start, last=%{public}ld, current=%{public}ld",
             __func__, connectedApInfo_.currenttStaticTimePoint, currentTime);
         UpdateStaticTimePoint(currentTime);
-        long currentSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR
-            + connectedApInfo_.currentRecordMinute * SECOND_OF_ONE_MINUTE
-            + connectedApInfo_.currentRecordSecond;
+        long currentSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
+            connectedApInfo_.currentRecordMinute * SECOND_OF_ONE_MINUTE +
+            connectedApInfo_.currentRecordSecond;
  
         // Determine whether the statistical cycle spans 0 o'clock
         if (connectedApInfo_.currentRecordDayInWeek != lastRecordDayInWeek) {
@@ -373,8 +372,8 @@ void WifiHistoryRecordManager::StaticDurationInNightAndWeekend(int day, int star
             restTime += REST_TIME_END_PAST_SECONDS - startTime;
             restTime += endTime - REST_TIME_BEGIN_PAST_SECONDS;
         }
-    } else if (startTime < REST_TIME_BEGIN_PAST_SECONDS
-        && endTime >= REST_TIME_BEGIN_PAST_SECONDS) {  // 7:00 =< startTime < 20:00 && endTime >= 20:00
+    } else if (startTime < REST_TIME_BEGIN_PAST_SECONDS &&
+        endTime >= REST_TIME_BEGIN_PAST_SECONDS) {  // 7:00 =< startTime < 20:00 && endTime >= 20:00
         restTime += endTime - REST_TIME_BEGIN_PAST_SECONDS;
     } else if (startTime >= REST_TIME_BEGIN_PAST_SECONDS) {  // StartTime >= 20:00 && endTime < 24:00
         restTime += endTime - startTime;

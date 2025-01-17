@@ -644,7 +644,7 @@ public:
     }
 
     void GetIpStateStateExeMsgFail()
-    {   
+    {
         EXPECT_CALL(BlockConnectService::GetInstance(),
         UpdateNetworkSelectStatus(_, _))
         .WillRepeatedly(Return(-1));

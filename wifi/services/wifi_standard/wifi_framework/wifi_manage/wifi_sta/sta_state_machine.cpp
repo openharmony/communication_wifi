@@ -652,11 +652,11 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
-        pStaStateMachine->InitWifiLinkedInfo();
         pStaStateMachine->StopDhcp();
-        WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
+        pStaStateMachine->InitWifiLinkedInfo();
+        WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     }
     return;
 }

@@ -19,7 +19,6 @@
 #include <string>
 #include <cstdint>
 #include "wifi_msg.h"
-#include "rdb_helper.h"
 #include "sta_service_callback.h"
 #include "wifi_event_handler.h"
 #include "wifi_rdb_manager.h"

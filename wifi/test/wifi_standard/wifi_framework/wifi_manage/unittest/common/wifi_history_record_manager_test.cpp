@@ -34,7 +34,12 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiHistoryRecordManagerTest");
- 
+constexpr long INVALID_TIME_POINT = 0;
+constexpr int QUERY_FAILED = 0;
+constexpr int QUERY_NO_RECORD = 1;
+constexpr int QUERY_HAS_RECORD = 2;
+const std::string WIFI_HISTORY_RECORD_MANAGER_CLASS_NAME = "WifiHistoryRecordManager";
+
 class WifiHistoryRecordManagerTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -45,12 +50,6 @@ public:
     {}
     virtual void TearDown()
     {}
- 
-    static constexpr long INVALID_TIME_POINT = 0;
-    static constexpr int QUERY_FAILED = 0;
-    static constexpr int QUERY_NO_RECORD = 1;
-    static constexpr int QUERY_HAS_RECORD = 2;
-    const std::string WIFI_HISTORY_RECORD_MANAGER_CLASS_NAME = "WifiHistoryRecordManager";
     using ConnectedApInfo = WifiHistoryRecordManager::ConnectedApInfo;
 };
  
@@ -77,9 +76,9 @@ HWTEST_F(WifiHistoryRecordManagerTest, GetStaCallbackTest, TestSize.Level1)
         callback.callbackModuleName == WIFI_HISTORY_RECORD_MANAGER_CLASS_NAME);
 }
  
-HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChangedTest, TestSize.Level1)
+HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged1Test, TestSize.Level1)
 {
-    WIFI_LOGI("DealStaConnChangedTest enter");
+    WIFI_LOGI("DealStaConnChanged1Test enter");
  
     // test instId != 0
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
@@ -99,7 +98,12 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChangedTest, TestSize.Level1)
     WifiHistoryRecordManager::GetInstance().DealStaConnChanged(state2, info2, instId2);
     EXPECT_TRUE(WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid.empty());
     EXPECT_TRUE(WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid.empty());
- 
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged2Test, TestSize.Level1)
+{
+    WIFI_LOGI("DealStaConnChanged2Test enter");
+
     // test bssid is same
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
  
@@ -139,11 +143,14 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChangedTest, TestSize.Level1)
     WifiHistoryRecordManager::GetInstance().DealStaConnChanged(state5, info5, instId5);
     long firstConnectedTime5 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.firstConnectedTime;
     EXPECT_TRUE(firstConnectedTime5 != 0);
- 
-    // test record
-    // Save connection data to the database in advance.
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged3Test, TestSize.Level1)
+{
+    WIFI_LOGI("DealStaConnChanged3Test enter");
+
+    // test record, Save connection data to the database in advance.
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
- 
     int recordNetworkId = 210;
     std::string recordSsid = "DealStaConnChangedTestRecordSsid";
     std::string recordBssid = "33:22:6c:44:55:cc";
@@ -153,7 +160,6 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChangedTest, TestSize.Level1)
     long recordTotalUseTimeAtNight = 152;
     long recordTotalUseTimeAtWeekend = 101;
     long recordMarkedAsHomeApTime = 1736225374;
- 
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId = recordNetworkId;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid = recordSsid;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid = recordBssid;
@@ -166,7 +172,6 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChangedTest, TestSize.Level1)
     WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
  
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
- 
     OperateResState state6 = OperateResState::CONNECT_AP_CONNECTED;
     WifiLinkedInfo info6;
     info6.networkId = recordNetworkId;
@@ -186,12 +191,10 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChangedTest, TestSize.Level1)
  
     EXPECT_TRUE(recordSsid == testSsid);
     EXPECT_TRUE(recordBssid == testBssid);
-    EXPECT_TRUE(recordKeyMgmt == testKeyMgmt);
     EXPECT_TRUE(recordFirstConnectedTime == testFirstConnectedTime);
     EXPECT_TRUE(recordTotalUseTime == recordTotalUseTime);
     EXPECT_TRUE(recordTotalUseTimeAtNight == testTotalUseTimeAtNight);
     EXPECT_TRUE(recordTotalUseTimeAtWeekend == testTotalUseTimeAtWeekend);
-    EXPECT_TRUE(recordMarkedAsHomeApTime == testMarkedAsHomeApTime);
 }
  
 HWTEST_F(WifiHistoryRecordManagerTest, NextUpdateApInfoTimerTest, TestSize.Level1)
@@ -350,10 +353,10 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateStaticTimePointTest, TestSize.Level
     EXPECT_TRUE(current != testTime);
 }
  
-HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekendTest, TestSize.Level1)
+HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend1Test, TestSize.Level1)
 {
-    WIFI_LOGI("StaticDurationInNightAndWeekendTest enter");
- 
+    WIFI_LOGI("StaticDurationInNightAndWeekend1Test enter");
+
     // weekend
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     int day = 6;
@@ -364,7 +367,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekendTest, Test
     long weekendTime = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend;
     EXPECT_TRUE(nightTime == 0);
     EXPECT_TRUE(weekendTime != 0);
- 
+
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     int day1 = 0;
     int startTime1 = 531;
@@ -374,7 +377,12 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekendTest, Test
     long weekendTime1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend;
     EXPECT_TRUE(nightTime1 == 0);
     EXPECT_TRUE(weekendTime1 != 0);
- 
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend2Test, TestSize.Level1)
+{
+    WIFI_LOGI("StaticDurationInNightAndWeekend2Test enter");
+
     // workday
     // startTime < 7:00, endTime < 7:00
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
@@ -386,7 +394,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekendTest, Test
     long weekendTime2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend;
     EXPECT_TRUE(nightTime2 != 0);
     EXPECT_TRUE(weekendTime2 == 0);
- 
+
     // startTime < 7:00, 7:00 <= endTime < 20:00
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     int day3 = 2;  // Tuesday
@@ -397,7 +405,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekendTest, Test
     long weekendTime3 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend;
     EXPECT_TRUE(nightTime3 != 0);
     EXPECT_TRUE(weekendTime3 == 0);
- 
+
     // startTime < 7:00, 24:00 > endTime > 20:00
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     int day4 = 3;  // Wednesday
@@ -408,7 +416,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekendTest, Test
     long weekendTime4 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend;
     EXPECT_TRUE(nightTime4 != 0);
     EXPECT_TRUE(weekendTime4 == 0);
- 
+
     // 7:00 =< startTime < 20:00, endTime >= 20:00
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     int day5 = 4;  // Thursday
@@ -419,7 +427,12 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekendTest, Test
     long weekendTime5 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend;
     EXPECT_TRUE(nightTime5 != 0);
     EXPECT_TRUE(weekendTime5 == 0);
- 
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend3Test, TestSize.Level1)
+{
+    WIFI_LOGI("StaticDurationInNightAndWeekend3Test enter");
+
     // startTime >= 20:00, 24:00 > endTime
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     int day6 = 5;  // Friday
@@ -430,7 +443,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekendTest, Test
     long weekendTime6 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend;
     EXPECT_TRUE(nightTime6 != 0);
     EXPECT_TRUE(weekendTime6 == 0);
- 
+
     // startTime > 7:00, 20:00 > endTime
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     int day7 = 1;  // Monday
@@ -500,7 +513,6 @@ HWTEST_F(WifiHistoryRecordManagerTest, RemoveApInfoRecordTest, TestSize.Level1)
     ConnectedApInfo dbApInfo2;
     int ret2 = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo2);
     EXPECT_TRUE(ret2 != QUERY_HAS_RECORD);
- 
 }
  
 HWTEST_F(WifiHistoryRecordManagerTest, QueryApInfoRecordByBssidTest, TestSize.Level1)

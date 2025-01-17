@@ -224,7 +224,8 @@ bool WifiHistoryRecordManager::CheckIsHomeAp()
     double homeTimeFloat = static_cast<double>(homeTime);
     double totalUseTimeFloat = static_cast<double>(connectedApInfo_.totalUseTime);
     if (!IsFloatEqual(totalUseTimeFloat, INVALID_TIME_POINT)) {
-        restTimeRate = std::round((homeTimeFloat / totalUseTimeFloat) * 100) / 100;  // 100:Keep two decimal places
+        const int TO_KEEP_TWO_DECIMAL = 100;
+        restTimeRate = std::round((homeTimeFloat / totalUseTimeFloat) * TO_KEEP_TWO_DECIMAL) / TO_KEEP_TWO_DECIMAL;
     }
 
     // The conditions for determining homeAp must simultaneously meet:
@@ -274,7 +275,7 @@ void WifiHistoryRecordManager::UpdateConnectionTime(bool isNeedNext)
             connectedApInfo_.currentRecordSecond;
 
         std::time_t currentTime = std::time(nullptr);
-        WIFI_LOGI("%{public}s start, last=%{public}ld, current=%{public}ld",
+        WIFI_LOGI("%{public}s start, last=%{public}ld, current=%{public}lld",
             __func__, connectedApInfo_.currenttStaticTimePoint, currentTime);
         UpdateStaticTimePoint(currentTime);
         long currentSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
@@ -308,7 +309,7 @@ bool WifiHistoryRecordManager::IsAbnormalTimeRecords()
         ret = true;
     } else if (currentTime < connectedApInfo_.firstConnectedTime) {
         WIFI_LOGE("%{public}s, currentTime time is less than firstConnectedTime time, "
-            "reset to zero and recalculate, currentTime=%{public}ld s, firstConnectedTime=%{public}ld s",
+            "reset to zero and recalculate, currentTime=%{public}lld s, firstConnectedTime=%{public}ld s",
             __func__, currentTime, connectedApInfo_.firstConnectedTime);
         connectedApInfo_.firstConnectedTime = currentTime;
         connectedApInfo_.currentConnectedTime = currentTime;
@@ -320,7 +321,7 @@ bool WifiHistoryRecordManager::IsAbnormalTimeRecords()
         ret = true;
     } else if (statisticalTimeInterval >= SECOND_OF_ONE_DAY || statisticalTimeInterval < 0) {
         WIFI_LOGE("%{public}s, statisticalTimeInterval is greater than 1 day or less than 0, "
-            "last=%{public}ld s, current=%{public}ld s",
+            "last=%{public}ld s, current=%{public}lld s",
             __func__, connectedApInfo_.currenttStaticTimePoint, currentTime);
         UpdateStaticTimePoint(currentTime);
         ret = true;
@@ -500,7 +501,7 @@ int WifiHistoryRecordManager::QueryAllApInfoRecord(std::vector<ConnectedApInfo> 
         dbApInfoVector.push_back(dbApInfo);
     } while (resultSet->GoToNextRow() == NativeRdb::E_OK);
     resultSet->Close();
-    WIFI_LOGI("%{public}s success, count=%{public}ld", __func__, dbApInfoVector.size());
+    WIFI_LOGI("%{public}s success, count=%{public}u", __func__, dbApInfoVector.size());
     return QUERY_HAS_RECORD;
 }
 
@@ -579,7 +580,7 @@ void WifiHistoryRecordManager::DelectAllApInfo()
         WIFI_LOGE("%{public}s, no ap record", __func__);
         return;
     }
-    WIFI_LOGE("%{public}s, size=%{public}ld", __func__, dbApInfoVector.size());
+    WIFI_LOGE("%{public}s, size=%{public}u", __func__, dbApInfoVector.size());
     for (const ConnectedApInfo &item : dbApInfoVector) {
         RemoveApInfoRecord(item.bssid);
     }

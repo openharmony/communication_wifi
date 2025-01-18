@@ -22,6 +22,7 @@
 #include "core_service_client.h"
 #include "cellular_data_client.h"
 #include "wifi_notification_util.h"
+#include "wifi_history_record_manager.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
@@ -34,7 +35,6 @@
 #include "external_wifi_filter_builder_manager.h"
 #include "external_wifi_common_builder_manager.h"
 #include "block_connect_service.h"
-#include "wifi_history_record_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -508,9 +508,9 @@ ErrCode StaService::RemoveDevice(int networkId) const
     WifiSettings::GetInstance().RemoveDevice(networkId);
     WifiSettings::GetInstance().RemoveConnectChoiceFromAllNetwork(networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
-    WifiHistoryRecordManager::GetInstance().DelectApInfo(config.ssid, config.bssid);
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
 #ifndef OHOS_ARCH_LITE
+    WifiHistoryRecordManager::GetInstance().DelectApInfo(config.ssid, config.bssid);
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (!wifiBrokerFrameProcessName.empty() && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
@@ -539,9 +539,9 @@ ErrCode StaService::RemoveAllDevice() const
         LOGE("RemoveAllDevice-SyncDeviceConfig() failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiHistoryRecordManager::GetInstance().DelectAllApInfo();
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
 #ifndef OHOS_ARCH_LITE
+    WifiHistoryRecordManager::GetInstance().DelectAllApInfo();
     WifiDeviceConfig config;
     config.networkId = REMOVE_ALL_DEVICECONFIG;
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");

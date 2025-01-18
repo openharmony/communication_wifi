@@ -588,14 +588,6 @@ NO_SANITIZE("cfi") WifiErrorCode RegisterP2pChrErrCodeReportCallback(const P2pCh
     return WIFI_SUCCESS;
 }
 
-NO_SANITIZE("cfi") WifiErrorCode UnregisterP2pChrErrCodeReportCallback(void)
-{
-    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
-    sptrCallback->p2pChrErrCodeReportCb = nullptr;
-    EventManager::GetInstance().RemoveP2PCallbackEvent(EVENT_P2P_CHR_ERRCODE_REPORT);
-    return WIFI_SUCCESS;
-}
-
 NO_SANITIZE("cfi") WifiErrorCode DiscoverPeers(int32_t channelid)
 {
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);

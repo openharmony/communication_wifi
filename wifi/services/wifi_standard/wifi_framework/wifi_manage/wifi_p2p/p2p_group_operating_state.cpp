@@ -408,6 +408,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
             static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT), cgTimedOut);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_SUCCESS);
     }
+    P2pChrReporter::GetInstance().SetWpsSuccess(true);
     return EXECUTED;
 }
 

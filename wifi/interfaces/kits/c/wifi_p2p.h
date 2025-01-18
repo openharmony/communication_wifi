@@ -227,14 +227,6 @@ WifiErrorCode RegisterP2pPrivatePeersChangedCallback(const P2pPrivatePeersChange
 WifiErrorCode RegisterP2pChrErrCodeReportCallback(const P2pChrErrCodeReportCallback callback);
 
 /**
- * @Description unregister p2p chr error code report event
- *
- * @param callback - callback function
- * @return ErrCode - operation result
- */
-WifiErrorCode UnregisterP2pChrErrCodeReportCallback(void);
-
-/**
  * @Description Remove a P2P Group.
  *
  * @return WifiErrorCode - operation result

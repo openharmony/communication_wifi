@@ -48,6 +48,10 @@ namespace Wifi {
 
 constexpr int INVALID_FREQ_OR_CHANNEL = -1;
 const uint32_t DECIMAL_NOTATION = 10;
+inline const uint8_t WIFI_SYSTEM_ID = 202;
+inline const uint8_t P2P_SUB_SYSTEM_ID = 2;
+inline const int SYSTEM_OFFSET = 21;
+inline const int SUB_SYSTEM_OFFSET = 16;
 
 /* StaCallBackNameEventIdMap */
 static std::map<std::string, int> g_staCallBackNameEventIdMap = {
@@ -303,6 +307,7 @@ int CheckDataLegalBin(const std::string &data);
 int CheckDataLegalHex(const std::string &data);
 unsigned int CheckDataToUint(std::string &data, int base = DECIMAL_NOTATION);
 long long CheckDataTolonglong(std::string &data, int base = DECIMAL_NOTATION);
+uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

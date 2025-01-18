@@ -779,5 +779,11 @@ long long CheckDataTolonglong(std::string &data, int base)
     }
     return num;
 }
+
+uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode)
+{
+    uint8_t standardSubSystem = subSystem & 0x1F;
+    return (WIFI_SYSTEM_ID << SYSTEM_OFFSET | standardSubSystem << SUB_SYSTEM_OFFSET | errCode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

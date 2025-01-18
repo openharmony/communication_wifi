@@ -1888,14 +1888,13 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     SyncDeviceEverConnectedState(true);
 #endif
     portalFlag = true;
-    TryModifyPortalAttribute(netState);
+    if (linkedInfo.networkId == INVALID_NETWORK_ID) {
+        TryModifyPortalAttribute(netState);
+    }
 }
 
 void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
 {
-    if (linkedInfo.networkId == INVALID_NETWORK_ID) {
-        return;
-    }
     WifiDeviceConfig config;
     int ret = WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
     if (ret != 0 || !config.isPortal) {

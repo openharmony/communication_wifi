@@ -28,11 +28,6 @@ namespace Wifi {
 class WifiHistoryRecordManager {
 public:
     /**
-     * WifiHistoryRecordManager constructor
-     */
-    WifiHistoryRecordManager() = default;
-
-    /**
      * @Description WifiHistoryRecordManager deconstruct
      */
     ~WifiHistoryRecordManager();
@@ -43,18 +38,6 @@ public:
      * @return WifiHistoryRecordManager
      */
     static WifiHistoryRecordManager &GetInstance();
-
-    /**
-     * @Description disable WifiHistoryRecordManager construct
-     *
-     * @param WifiHistoryRecordManager - WifiHistoryRecordManager obj
-     */
-    WifiHistoryRecordManager(const WifiHistoryRecordManager&) = delete;
-
-    /**
-     * @Description disable WifiHistoryRecordManager equals sign opertaor
-     */
-    WifiHistoryRecordManager &operator=(const WifiHistoryRecordManager &) = delete;
 
     /**
      * @Description get sta change Callback
@@ -119,6 +102,10 @@ private:
         int currentRecordMinute = 0;
         int currentRecordSecond = 0;
     };
+
+    WifiHistoryRecordManager() = default;
+    WifiHistoryRecordManager(const WifiHistoryRecordManager&) = delete;
+    WifiHistoryRecordManager &operator=(const WifiHistoryRecordManager &) = delete;
     int GetUpdateConnectTimeRecordInterval();
     void CreateTable();
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);

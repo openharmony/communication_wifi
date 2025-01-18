@@ -239,8 +239,9 @@ bool WifiHistoryRecordManager::CheckIsHomeAp()
         ret = true;
     }
     WIFI_LOGI("%{public}s, ret=%{public}d, totalUseTime=%{public}" PRId64"s, restTimeRate=%{public}.2f, "
-        "dayAvgRestTime=%{public}d s, totalUseTimeAtNight=%{public}" PRId64"s, totalUseTimeAtWeekend=%{public}" PRId64"s, "
-        "currenttStaticTimePoint=%{public}" PRId64", firstConnectedTime=%{public}" PRId64,
+        "dayAvgRestTime=%{public}d s, totalUseTimeAtNight=%{public}" PRId64"s, "
+        "totalUseTimeAtWeekend=%{public}" PRId64"s, currenttStaticTimePoint=%{public}" PRId64", "
+        "firstConnectedTime=%{public}" PRId64,
         __func__, ret, connectedApInfo_.totalUseTime, restTimeRate, dayAvgRestTime,
         connectedApInfo_.totalUseTimeAtNight, connectedApInfo_.totalUseTimeAtWeekend,
         connectedApInfo_.currenttStaticTimePoint, connectedApInfo_.firstConnectedTime);

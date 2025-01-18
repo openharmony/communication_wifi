@@ -306,8 +306,8 @@ HWTEST_F(WifiHalP2pInterfaceTest, P2pForceStopTest, TestSize.Level1)
 HWTEST_F(WifiHalP2pInterfaceTest, P2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1)
 {
     char type[] = "P2pSetWpsDeviceType";
-    P2pSetWpsSecondaryDeviceType(NULL);
-    P2pSetWpsSecondaryDeviceType(type);
+    EXPECT_NE(P2pSetWpsSecondaryDeviceType(NULL),0);
+    EXPECT_NE(P2pSetWpsSecondaryDeviceType(type),0);  
 }
 
 HWTEST_F(WifiHalP2pInterfaceTest, P2pGetPeerTest, TestSize.Level1)

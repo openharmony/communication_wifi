@@ -44,15 +44,15 @@ const std::string TOTAL_USE_TIME_AT_WEEKEND = "totalUseTimeAtWeekend";
 const std::string MARKED_AS_HOME_AP_TIME = "markedAsHomeApTime";
 inline constexpr const char* UPDATE_CONNECT_TIME_RECORD_INTERVAL = "const.wifi.update_connect_time_record_interval";
 inline constexpr const char* UPDATE_CONNECT_TIME_RECORD_INTERVAL_DEFAULT = "1800000";  // 30min
-constexpr long SECOND_OF_ONE_DAY = 60 * 60 * 24;
-constexpr long SECOND_OF_HALF_HOUR = 30 * 60;
-constexpr long SECOND_OF_ONE_HOUR = 60 * 60;
-constexpr long SECOND_OF_ONE_MINUTE = 60;
-constexpr long START_SECOND_OF_DAY = 0;
-constexpr long END_SECONDS_OF_DAY = (23 * SECOND_OF_ONE_HOUR + 59 * SECOND_OF_ONE_MINUTE + 59);
-constexpr long REST_TIME_END_PAST_SECONDS = 7 * SECOND_OF_ONE_HOUR;
-constexpr long REST_TIME_BEGIN_PAST_SECONDS = 20 * SECOND_OF_ONE_HOUR;
-constexpr long INVALID_TIME_POINT = 0;
+constexpr int64_t SECOND_OF_ONE_DAY = 60 * 60 * 24;
+constexpr int64_t SECOND_OF_HALF_HOUR = 30 * 60;
+constexpr int64_t SECOND_OF_ONE_HOUR = 60 * 60;
+constexpr int64_t SECOND_OF_ONE_MINUTE = 60;
+constexpr int64_t START_SECOND_OF_DAY = 0;
+constexpr int64_t END_SECONDS_OF_DAY = (23 * SECOND_OF_ONE_HOUR + 59 * SECOND_OF_ONE_MINUTE + 59);
+constexpr int64_t REST_TIME_END_PAST_SECONDS = 7 * SECOND_OF_ONE_HOUR;
+constexpr int64_t REST_TIME_BEGIN_PAST_SECONDS = 20 * SECOND_OF_ONE_HOUR;
+constexpr int64_t INVALID_TIME_POINT = 0;
 constexpr float HOME_AP_MIN_TIME_RATE = 0.5;
 constexpr int QUERY_FAILED = 0;
 constexpr int QUERY_NO_RECORD = 1;
@@ -208,12 +208,12 @@ bool WifiHistoryRecordManager::IsFloatEqual(double a, double b)
 
 bool WifiHistoryRecordManager::CheckIsHomeAp()
 {
-    long totalPassTime = connectedApInfo_.currenttStaticTimePoint - connectedApInfo_.firstConnectedTime;
+    int64_t totalPassTime = connectedApInfo_.currenttStaticTimePoint - connectedApInfo_.firstConnectedTime;
     if (totalPassTime <= INVALID_TIME_POINT) {
         return false;
     }
 
-    long homeTime = connectedApInfo_.totalUseTimeAtNight + connectedApInfo_.totalUseTimeAtWeekend;
+    int64_t homeTime = connectedApInfo_.totalUseTimeAtNight + connectedApInfo_.totalUseTimeAtWeekend;
     int dayAvgRestTime = INVALID_TIME_POINT;
     int passDays = totalPassTime / SECOND_OF_ONE_DAY;
     if (passDays != INVALID_TIME_POINT) {
@@ -270,15 +270,15 @@ void WifiHistoryRecordManager::UpdateConnectionTime(bool isNeedNext)
     if (!IsAbnormalTimeRecords()) {
         // After caching the last statistics time, refresh the current round of statistics time point
         int lastRecordDayInWeek = connectedApInfo_.currentRecordDayInWeek;
-        long lastSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
+        int64_t lastSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
             connectedApInfo_.currentRecordMinute * SECOND_OF_ONE_MINUTE +
             connectedApInfo_.currentRecordSecond;
 
         std::time_t currentTime = std::time(nullptr);
-        WIFI_LOGI("%{public}s start, last=%{public}ld, current=%{public}lld",
+        WIFI_LOGI("%{public}s start, last=%{public}ld, current=%{public}ld",
             __func__, connectedApInfo_.currenttStaticTimePoint, currentTime);
         UpdateStaticTimePoint(currentTime);
-        long currentSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
+        int64_t currentSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
             connectedApInfo_.currentRecordMinute * SECOND_OF_ONE_MINUTE +
             connectedApInfo_.currentRecordSecond;
 
@@ -302,14 +302,14 @@ bool WifiHistoryRecordManager::IsAbnormalTimeRecords()
 {
     bool ret = false;
     std::time_t currentTime = std::time(nullptr);
-    long statisticalTimeInterval = currentTime - connectedApInfo_.currenttStaticTimePoint;
+    int64_t statisticalTimeInterval = currentTime - connectedApInfo_.currenttStaticTimePoint;
     if (connectedApInfo_.currenttStaticTimePoint == INVALID_TIME_POINT) {  // Maybe just connected
         WIFI_LOGI("%{public}s, currenttStaticTimePoint is zero, skip this round of statistics", __func__);
         UpdateStaticTimePoint(currentTime);
         ret = true;
     } else if (currentTime < connectedApInfo_.firstConnectedTime) {
         WIFI_LOGE("%{public}s, currentTime time is less than firstConnectedTime time, "
-            "reset to zero and recalculate, currentTime=%{public}lld s, firstConnectedTime=%{public}ld s",
+            "reset to zero and recalculate, currentTime=%{public}ld s, firstConnectedTime=%{public}ld s",
             __func__, currentTime, connectedApInfo_.firstConnectedTime);
         connectedApInfo_.firstConnectedTime = currentTime;
         connectedApInfo_.currentConnectedTime = currentTime;
@@ -321,7 +321,7 @@ bool WifiHistoryRecordManager::IsAbnormalTimeRecords()
         ret = true;
     } else if (statisticalTimeInterval >= SECOND_OF_ONE_DAY || statisticalTimeInterval < 0) {
         WIFI_LOGE("%{public}s, statisticalTimeInterval is greater than 1 day or less than 0, "
-            "last=%{public}ld s, current=%{public}lld s",
+            "last=%{public}ld s, current=%{public}ld s",
             __func__, connectedApInfo_.currenttStaticTimePoint, currentTime);
         UpdateStaticTimePoint(currentTime);
         ret = true;
@@ -501,7 +501,7 @@ int WifiHistoryRecordManager::QueryAllApInfoRecord(std::vector<ConnectedApInfo> 
         dbApInfoVector.push_back(dbApInfo);
     } while (resultSet->GoToNextRow() == NativeRdb::E_OK);
     resultSet->Close();
-    WIFI_LOGI("%{public}s success, count=%{public}u", __func__, dbApInfoVector.size());
+    WIFI_LOGI("%{public}s success, count=%{public}lu", __func__, dbApInfoVector.size());
     return QUERY_HAS_RECORD;
 }
 
@@ -580,7 +580,7 @@ void WifiHistoryRecordManager::DelectAllApInfo()
         WIFI_LOGE("%{public}s, no ap record", __func__);
         return;
     }
-    WIFI_LOGE("%{public}s, size=%{public}u", __func__, dbApInfoVector.size());
+    WIFI_LOGE("%{public}s, size=%{public}lu", __func__, dbApInfoVector.size());
     for (const ConnectedApInfo &item : dbApInfoVector) {
         RemoveApInfoRecord(item.bssid);
     }

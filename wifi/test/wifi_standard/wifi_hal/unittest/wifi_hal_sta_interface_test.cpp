@@ -260,7 +260,8 @@ HWTEST_F(WifiHalStaInterfaceTest, DelScanInfoLineTest, TestSize.Level1)
     char srcBuf[] = "00:00:00:00\tfreq=1024\trssid=70\tflags=WPA=PSK\t\t\t[ 255sdF1dwxansa][ 61sdF1dwansa]"
                     "[ 1sdFe1dansas][ 50sdF1dwansas][ 0sdF1dwansas][ 42sdF1dwansas]\t";
     int length = g_lenth;
-    DelScanInfoLine(&pcmd, srcBuf, length);
+    int result = DelScanInfoLine(&pcmd, srcBuf, length);
+    EXPECT_EQ(result,0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

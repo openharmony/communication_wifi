@@ -25,6 +25,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_app_parser.h"
+#include "wifi_history_record_manager.h"
 #endif
 #include "wifi_common_def.h"
 #include "wifi_common_util.h"
@@ -32,7 +33,6 @@
 #ifdef FEATURE_SELF_CURE_SUPPORT
 #include "ip_qos_monitor.h"
 #endif
-#include "wifi_history_record_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -95,10 +95,12 @@ InitStatus WifiCommonServiceManager::Init()
         WIFI_LOGE("WifiInternalEventDispatcher Init failed!");
         return EVENT_BROADCAST_INIT_FAILED;
     }
+#ifndef OHOS_ARCH_LITE
     if (WifiHistoryRecordManager::GetInstance().Init() != 0) {
         WIFI_LOGE("WifiHistoryRecordManager Init failed!");
         return EVENT_BROADCAST_INIT_FAILED;
     }
+#endif
     return INIT_OK;
 }
 #ifndef OHOS_ARCH_LITE

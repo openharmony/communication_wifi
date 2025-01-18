@@ -12,17 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef WIFI_HISTORY_RECORD_MANAGER_H
 #define WIFI_HISTORY_RECORD_MANAGER_H
- 
+
 #include <string>
 #include <cstdint>
 #include "wifi_msg.h"
 #include "sta_service_callback.h"
 #include "wifi_event_handler.h"
 #include "wifi_rdb_manager.h"
- 
+
 namespace OHOS {
 namespace Wifi {
 class WifiHistoryRecordManager {
@@ -31,45 +31,45 @@ public:
      * WifiHistoryRecordManager constructor
      */
     WifiHistoryRecordManager() = default;
- 
+
     /**
      * @Description WifiHistoryRecordManager deconstruct
      */
     ~WifiHistoryRecordManager();
- 
+
     /**
      * @Description get WifiHistoryRecordManager instance
      *
      * @return WifiHistoryRecordManager
      */
     static WifiHistoryRecordManager &GetInstance();
- 
+
     /**
      * @Description disable WifiHistoryRecordManager construct
      *
      * @param WifiHistoryRecordManager - WifiHistoryRecordManager obj
      */
     WifiHistoryRecordManager(const WifiHistoryRecordManager&) = delete;
- 
+
     /**
      * @Description disable WifiHistoryRecordManager equals sign opertaor
      */
     WifiHistoryRecordManager &operator=(const WifiHistoryRecordManager &) = delete;
- 
+
     /**
      * @Description get sta change Callback
      *
      * @return callBack obj
      */
     StaServiceCallback GetStaCallback() const;
- 
+
     /**
      * @Description init WifiHistoryRecordManager
      *
      * @return is success or not
      */
     int Init();
- 
+
     /**
      * @Description is Home Ap
      *
@@ -77,19 +77,19 @@ public:
      * @return is home ap
      */
     bool IsHomeAp(const std::string &bssid);
- 
+
     /**
      * @Description is Home router
      *
      * @return is home router
      */
     bool IsHomeRouter(const std::string &portalUrl);
- 
+
     /**
      * @Description Delect All ApInfo
      */
     void DelectAllApInfo();
- 
+
     /**
      * @Description Delect ApInfo
      *
@@ -105,19 +105,19 @@ private:
         std::string ssid = "";
         std::string bssid = "";
         std::string keyMgmt = "";
-        long firstConnectedTime = 0;
-        long currentConnectedTime = 0;
-        long totalUseTime = 0;
-        long totalUseTimeAtNight = 0;
-        long totalUseTimeAtWeekend = 0;
-        long markedAsHomeApTime = 0;
- 
+        int64_t firstConnectedTime = 0;
+        int64_t currentConnectedTime = 0;
+        int64_t totalUseTime = 0;
+        int64_t totalUseTimeAtNight = 0;
+        int64_t totalUseTimeAtWeekend = 0;
+        int64_t markedAsHomeApTime = 0;
+
         // temporary attribute
-        long currenttStaticTimePoint = 0;
+        int64_t currenttStaticTimePoint = 0;
         int currentRecordDayInWeek = 0;  // record the day of the week
-        long currentRecordHour = 0;
-        long currentRecordMinute = 0;
-        long currentRecordSecond = 0;
+        int currentRecordHour = 0;
+        int currentRecordMinute = 0;
+        int currentRecordSecond = 0;
     };
     int GetUpdateConnectTimeRecordInterval();
     void CreateTable();
@@ -139,7 +139,7 @@ private:
     NativeRdb::ValuesBucket CreateApInfoBucket(const ConnectedApInfo &apInfo);
     void ClearConnectedApInfo();
     bool IsFloatEqual(double a, double b);
- 
+
     std::shared_ptr<WifiRdbManager> wifiDataBaseUtils_;
     StaServiceCallback staCallback_;
     ConnectedApInfo connectedApInfo_;

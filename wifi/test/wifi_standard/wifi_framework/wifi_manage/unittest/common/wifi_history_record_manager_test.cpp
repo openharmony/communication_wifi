@@ -617,25 +617,25 @@ HWTEST_F(WifiHistoryRecordManagerTest, ClearConnectedApInfoTest, TestSize.Level1
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
 }
  
-HWTEST_F(WifiHistoryRecordManagerTest, DelectAllApInfoTest, TestSize.Level1)
+HWTEST_F(WifiHistoryRecordManagerTest, DeleteAllApInfoTest, TestSize.Level1)
 {
-    WIFI_LOGI("DelectAllApInfoTest enter");
-    WifiHistoryRecordManager::GetInstance().DelectAllApInfo();
+    WIFI_LOGI("DeleteAllApInfoTest enter");
+    WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
  
     std::vector<ConnectedApInfo> dbApInfoVector;
     int ret = WifiHistoryRecordManager::GetInstance().QueryAllApInfoRecord(dbApInfoVector);
     EXPECT_TRUE(ret == QUERY_NO_RECORD);
 }
  
-HWTEST_F(WifiHistoryRecordManagerTest, DelectApInfoTest, TestSize.Level1)
+HWTEST_F(WifiHistoryRecordManagerTest, DeleteApInfoTest, TestSize.Level1)
 {
-    WIFI_LOGI("DelectApInfoTest enter");
+    WIFI_LOGI("DeleteApInfoTest enter");
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
  
-    std::string testSsid = "DelectApInfoTest";
+    std::string testSsid = "DeleteApInfoTest";
     std::string testBssid = "23:bb:9c:55:aa:cc";
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId = 33;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid = "DelectApInfoTest";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid = "DeleteApInfoTest";
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid = testBssid;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt = "SAE";
     WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
@@ -644,7 +644,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, DelectApInfoTest, TestSize.Level1)
     int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo);
     EXPECT_TRUE(ret == QUERY_HAS_RECORD);
  
-    WifiHistoryRecordManager::GetInstance().DelectApInfo(testSsid, testBssid);
+    WifiHistoryRecordManager::GetInstance().DeleteApInfo(testSsid, testBssid);
  
     ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo);
     EXPECT_TRUE(ret != QUERY_HAS_RECORD);

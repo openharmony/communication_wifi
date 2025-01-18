@@ -572,7 +572,7 @@ void WifiHistoryRecordManager::ClearConnectedApInfo()
     connectedApInfo_.currentRecordSecond = INVALID_TIME_POINT;
 }
 
-void WifiHistoryRecordManager::DelectAllApInfo()
+void WifiHistoryRecordManager::DeleteAllApInfo()
 {
     std::vector<ConnectedApInfo> dbApInfoVector;
     int ret = QueryAllApInfoRecord(dbApInfoVector);
@@ -586,7 +586,7 @@ void WifiHistoryRecordManager::DelectAllApInfo()
     }
 }
 
-void WifiHistoryRecordManager::DelectApInfo(const std::string &ssid, const std::string &bssid)
+void WifiHistoryRecordManager::DeleteApInfo(const std::string &ssid, const std::string &bssid)
 {
     WIFI_LOGI("%{public}s, ssid=%{public}s, bssid=%{public}s",
         __func__, SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());

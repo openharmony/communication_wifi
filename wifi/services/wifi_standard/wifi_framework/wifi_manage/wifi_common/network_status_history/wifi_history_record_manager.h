@@ -69,17 +69,17 @@ public:
     bool IsHomeRouter(const std::string &portalUrl);
 
     /**
-     * @Description Delect All ApInfo
+     * @Description Delete All ApInfo
      */
-    void DelectAllApInfo();
+    void DeleteAllApInfo();
 
     /**
-     * @Description Delect ApInfo
+     * @Description Delete ApInfo
      *
      * @param ssid ap ssid
      * @param bssid ap bssid
      */
-    void DelectApInfo(const std::string &ssid, const std::string &bssid);
+    void DeleteApInfo(const std::string &ssid, const std::string &bssid);
 private:
     class ConnectedApInfo {
     public:

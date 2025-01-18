@@ -71,12 +71,12 @@ public:
 
     int GetWpsSuccess()
     {
-        return P2pChrReporter::GetInstance().mWpsSuccess;
+        return P2pChrReporter::GetInstance().wpsSuccess_;
     }
 
     int GetDeviceRole()
     {
-        return P2pChrReporter::GetInstance().mRole;
+        return P2pChrReporter::GetInstance().role_;
     }
 };
 
@@ -172,7 +172,7 @@ HWTEST_F(P2pChrReporterTest, ReportP2pAbnormalDisconnect, TestSize.Level1)
 HWTEST_F(P2pChrReporterTest, GetP2pSpecificError, TestSize.Level1)
 {
     P2pChrReporter::GetInstance().SetDeviceRole(UNKNOWN_ROLE);
-    EXPECT_EQ(GetP2pSpecificError(P2P_INVITATION, P2pChrReporter::P2P_STATUS_SUCCESS), 0);
+    EXPECT_EQ(GetP2pSpecificError(DEVICE_DISCOVERY, P2pChrReporter::P2P_STATUS_SUCCESS), 0);
 }
 
 HWTEST_F(P2pChrReporterTest, IsNormalErrCode, TestSize.Level1)

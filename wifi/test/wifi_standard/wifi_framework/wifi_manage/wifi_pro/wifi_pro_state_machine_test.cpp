@@ -105,8 +105,6 @@ HWTEST_F(WifiProStateMachineTest, IsReachWifiScanThresholdTest01, TestSize.Level
     int32_t signalLevel = SIG_LEVEL_4;
     int32_t ret = pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel);
     EXPECT_EQ(ret, false);
-
-    
 }
 
 HWTEST_F(WifiProStateMachineTest, IsReachWifiScanThresholdTest02, TestSize.Level1)

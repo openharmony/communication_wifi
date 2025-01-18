@@ -43,6 +43,7 @@
 #endif
 #include "wifi_notification_util.h"
 #include "wifi_net_stats_manager.h"
+#include "wifi_history_record_manager.h"
 #endif // OHOS_ARCH_LITE
 
 #include "wifi_channel_helper.h"
@@ -50,7 +51,6 @@
 #else
 #include "mock_dhcp_service.h"
 #endif
-#include "wifi_history_record_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1853,12 +1853,17 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
             HandlePortalNetworkPorcess();
             portalFlag = true;
         }
-
+        bool isHomeAp = false;
+        bool isHomeRouter = false;
+#ifndef OHOS_ARCH_LITE
+        isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
+        isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
+#endif
         WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
-        if (linkedInfo.isHiLinkNetwork || WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid) ||
-            WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl)) {
+    
+        if (linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) {
             InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         } else {
             InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
@@ -1897,8 +1902,12 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
         return;
     }
     bool needChangePortalFlag = false;
-    bool isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
-    bool isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
+#ifndef OHOS_ARCH_LITE
+    bool isHomeAp = false;
+    bool isHomeRouter = false;
+#endif
+    isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
+    isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
     bool isPortalByHistory = NetworkStatusHistoryManager::IsPortalByHistory(config.networkStatusHistory);
     switch (netState) {
         case SystemNetWorkState::NETWORK_NOTWORKING:

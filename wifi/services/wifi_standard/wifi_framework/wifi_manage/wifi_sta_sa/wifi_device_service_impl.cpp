@@ -31,6 +31,7 @@
 #include "wifi_p2p_service_impl.h"
 #include "wifi_country_code_manager.h"
 #include "app_network_speed_limit_service.h"
+#include "wifi_history_record_manager.h"
 #endif
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
@@ -44,7 +45,6 @@
 #include "wifi_randommac_helper.h"
 #include "wifi_sta_hal_interface.h"
 #include "block_connect_service.h"
-#include "wifi_history_record_manager.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -1882,7 +1882,9 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     // wifi device
     WifiSettings::GetInstance().ClearDeviceConfig();
     WifiSettings::GetInstance().SyncDeviceConfig();
-    WifiHistoryRecordManager::GetInstance().DelectAllApInfo();
+#ifndef OHOS_ARCH_LITE
+    WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
+#endif
     /* p2p */
     WifiSettings::GetInstance().RemoveWifiP2pGroupInfo();
     WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();

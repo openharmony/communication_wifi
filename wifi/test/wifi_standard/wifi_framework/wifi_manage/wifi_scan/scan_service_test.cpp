@@ -679,6 +679,11 @@ public:
         pScanService->SystemScanProcess(true);
     }
 
+    void SystemSingleScanProcessSuccess()
+    {
+        pScanService->SystemSingleScanProcess();
+    }
+
     void StopSystemScanSuccess()
     {
         pScanService->StopSystemScan();
@@ -2217,6 +2222,11 @@ HWTEST_F(ScanServiceTest, SystemScanProcessSuccess2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, SystemScanProcessSuccess3, TestSize.Level1)
 {
     SystemScanProcessSuccess3();
+}
+
+HWTEST_F(ScanServiceTest, SystemSingleScanProcessSuccess, TestSize.Level1)
+{
+    SystemSingleScanProcessSuccess();
 }
 
 HWTEST_F(ScanServiceTest, StopSystemScanSuccess, TestSize.Level1)

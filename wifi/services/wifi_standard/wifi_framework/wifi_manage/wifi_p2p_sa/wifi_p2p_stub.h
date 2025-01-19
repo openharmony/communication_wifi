@@ -23,6 +23,8 @@
 
 namespace OHOS {
 namespace Wifi {
+inline const int SECOND_TO_MICRO_SECOND = 1000000;
+inline const int SECOND_TO_MILLI_SECOND = 1000;
 class WifiP2pStub : public IRemoteStub<IWifiP2p> {
 public:
     using handleFunc = std::function<void

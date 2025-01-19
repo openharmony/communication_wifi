@@ -90,6 +90,13 @@ if (!(ptr)) { \
     return retValue; \
 }
 #endif
+#ifndef CHECK_NULL_AND_RETURN_NULL
+#define CHECK_NULL_AND_RETURN_NULL(ptr) \
+if (!(ptr)) { \
+    LOGI("Pointer %{public}s in %{public}s is NULL!", #ptr, __func__); \
+    return; \
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

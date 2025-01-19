@@ -129,6 +129,8 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
 void ScanService::UnInitScanService()
 {
     WIFI_LOGI("Enter UnInitScanService.\n");
+    UnRegisterP2pEnhanceCallback();
+    UnRegisterP2pEnhanceActionListenCallback();
 #ifndef OHOS_ARCH_LITE
     // deregistration country code change notification
     WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(m_scanObserver);
@@ -140,6 +142,82 @@ void ScanService::UnInitScanService()
     pScanStateMachine->SendMessage(static_cast<int>(CMD_SCAN_FINISH));
     scanStartedFlag = false;
     return;
+}
+
+void ScanService::RegisterP2pEnhanceCallback()
+{
+    using namespace std::placeholders;
+    P2pEnhanceStateChange_ = [this](const std::string &ifName, int32_t state, int32_t frequency) {
+        this->P2pEnhanceStateChange(ifName, state, frequency);
+    };
+    if (mEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
+        return;
+    }
+    ErrCode ret = mEnhanceService->RegisterP2pEnhanceCallback(WIFI_SERVICE_SCAN, p2pEnhanceStateChange_);
+    WIFI_LOGI("%{public}s, result %{public}d.", __FUNCTION__, ret);
+}
+
+void ScanService::UnRegisterP2pEnhanceCallback()
+{
+    WIFI_LOGI("%{public}s.", __FUNCTION__);
+    if (mEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
+        return;
+    }
+    mEnhanceService->UnRegisterP2pEnhanceCallback(WIFI_SERVICE_SCAN);
+}
+
+void ScanService::P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency)
+{
+    WIFI_LOGI("P2pEnhanceStateChange, state %{public}d, frequency %{public}d.", state, frequency);
+    int p2pEnhanceState = -1;
+    int p2pEnahnceFreq = 0;
+    if (state == P2P_ENHANCE_BC_CONNECT_SUCC || state == P2P_ENHANCE_BC_SWITCH_NOTIFY_SUCC) {
+        p2pEnhanceState = 1;
+        p2pEnahnceFreq = frequency;
+    } else if (state == P2P_ENHANCE_BC_DESTROYED) {
+        p2pEnhanceState = 0;
+        p2pEnahnceFreq = 0;
+    } else {
+        WIFI_LOGD("No need to handle the state");
+    }
+    if ((lastP2pEnhanceState != p2pEnhanceState) && (p2pEnhanceState != -1)) {
+        lastP2pEnhanceState = p2pEnhanceState;
+        WifiConfigCenter::GetInstance().SetP2pEnhanceState(p2pEnhanceState);
+        WifiConfigCenter::GetInstance().SetP2pEnhanceFreq(p2pEnahnceFreq);
+    }
+}
+
+void ScanService::RegisterP2pEnhanceActionListenCallback()
+{
+    using namespace std::placeholders;
+    P2pEnhanceActionListenChange_ = [this](int listenChannel) {
+        this->P2pEnhanceActionListenChange(listenChannel);
+    };
+    if (mEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
+        return;
+    }
+    ErrCode ret = mEnhanceService->RegisterP2pEnhanceActionListenCallback(
+        WIFI_SERVICE_SCAN, P2pEnhanceActionListenChange_);
+    WIFI_LOGI("%{public}s, result %{public}d.", __FUNCTION__, ret);
+}
+
+void ScanService::UnRegisterP2pEnhanceActionListenCallback()
+{
+    WIFI_LOGI("%{public}s.", __FUNCTION__);
+    if (mEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
+        return;
+    }
+    mEnhanceService->UnRegisterP2pEnhanceActionListenCallback(WIFI_SERVICE_SCAN);
+}
+
+void ScanService::P2pEnhanceActionListenChange(int listenChannel)
+{
+    WIFI_LOGI("%{public}s, listenChannel %{public}d.", __FUNCTION__, listenChannel);
+    WifiConfigCenter::GetInstance().SetP2pEnhanceActionListenChannel(listenChannel);
 }
 
 void ScanService::RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSerivceCallbacks)
@@ -162,6 +240,8 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
                 WIFI_LOGE("HandleScanStatusReport-SCAN_STARTED_STATUS pScanStateMachine is null\n");
                 return;
             }
+            RegisterP2pEnhanceCallback();
+            RegisterP2pEnhanceActionListenCallback();
             scanStartedFlag = true;
             /* Pno scan maybe has started, stop it first. */
             pScanStateMachine->SendMessage(CMD_STOP_PNO_SCAN);
@@ -227,6 +307,10 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
         }
         case RESTART_SYSTEM_SCAN_TIMER: {
             RestartSystemScanTimeOut();
+            break;
+        }
+        case SYSTEM_SINGLE_SCAN_TIMER: {
+            HandleSystemSingleScanTimeOut();
             break;
         }
         default: {
@@ -356,6 +440,10 @@ ErrCode ScanService::ScanControlInner(ScanType scanType)
         }
         if (!AllowScanByHid2dState()) {
             WIFI_LOGW("internal scan not allow by hid2d state");
+            return WIFI_OPT_FAILED;
+        }
+        if (!AllowScanByActionListen()) {
+            WIFI_LOGW("internal scan not allow by ActionListen condition");
             return WIFI_OPT_FAILED;
         }
     }
@@ -1099,6 +1187,7 @@ void ScanService::HandleScreenStatusChanged()
 {
     WIFI_LOGI("Enter HandleScreenStatusChanged.");
     SystemScanProcess(staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED));
+    SystemSingleScanProcess();
     return;
 }
 
@@ -1111,10 +1200,12 @@ void ScanService::HandleStaStatusChanged(int status)
         case static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED): {
             DisconnectedTimerScan();
             SystemScanProcess(true);
+            SystemSingleScanProcess();
             break;
         }
         case static_cast<int>(OperateResState::CONNECT_AP_CONNECTED): {
             SystemScanProcess(false);
+            SystemSingleScanProcess();
             std::unique_lock<std::mutex> lock(scanConfigMapMutex);
             scanConfigMap.clear();
             break;
@@ -1241,6 +1332,130 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
         }
     }
 
+    return;
+}
+
+void ScanService::ResetSingleScanCountAndMessage()
+{
+    currSingleScanCount = 0;
+    pScanStateMachine->StopTimer(static_cast<int>(SYSTEM_SINGLE_SCAN_TIMER));
+}
+
+void ScanService::AddSingleScanCountAndMessage(int delaySeconds)
+{
+    currSingleScanCount++;
+    pScanStateMachine->StartTimer(static_cast<int>(SYSTEM_SINGLE_SCAN_TIMER), delaySeconds * SECOND_TO_MILLI_SECOND);
+}
+
+void ScanService::SystemSingleScanProcess()
+{
+    if (AllowSystemSingleScan()) {
+        WIFI_LOGI("%{public}s : allowSingleScan success.", __FUNCTION__);
+        StartSingleScanWithoutControlTimer();
+    } else {
+        WIFI_LOGD("%{public}s : not allow single scan.", __FUNCTION__);
+    }
+    return;
+}
+
+void ScanService::GetRelatedFreqs(int &lastStaFreq, int &p2pFreq, int &p2pEnhanceFreq)
+{
+    WifiDeviceConfig config;
+    int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        WIFI_LOGE("%{public}s : GetDeviceConfig failed!.", __FUNCTION__);
+        return;
+    }
+    lastStaFreq = config.frequency;
+    WifiP2pGroupInfo currentP2pGroupInfo = WifiConfigCenter::GetInstance().GetCurrentP2pGroupInfo();
+    p2pFreq = currentP2pGroupInfo.GetFrequency();
+    p2pEnhanceFreq = WifiConfigCenter::GetInstance().GetP2pEnhanceFreq();
+    return;
+}
+
+void ScanService::StartSingleScanWithoutControlTimer()
+{
+    int lastStaFreq = 0, p2pFreq = 0, p2pEnhanceFreq = 0;
+    GetRelatedFreqs(lastStaFreq, p2pFreq, p2pEnhanceFreq);
+    WIFI_LOGI("%{public}s : lastStaFreq = %{public}d, p2pFreq = %{public}d, p2pEnhanceFreq = %{public}d."
+        "currSingleScanCount = %{public}d",
+        __FUNCTION__, lastStaFreq, p2pFreq, p2pEnhanceFreq, currSingleScanCount.load());
+
+    if (!AllowSystemSingleScan()) {
+        WIFI_LOGE("%{public}s : not allow single scan, clear timer and currSingleScanCount.", __FUNCTION__);
+        ResetSingleScanCountAndMessage();
+        return;
+    }
+
+    SelectTheFreqToSingleScan(lastStaFreq, p2pFreq, p2pEnhanceFreq);
+}
+
+void ScanService::SelectTheFreqToSingleScan(const int lastStaFreq, const int p2pFreq, const int p2pEnhanceFreq)
+{
+    std::vector<int32_t> freqs;
+    if (WifiChannelHelper::GetInstance().IsValidFreq(p2pFreq) &&
+        currSingleScanCount.load() == SCAN_P2P_BEFORE_ALL_FREQ_SCAN) {
+    /* scan p2pFreq first */
+        StartSingleScanWithoutControl(p2pFreq);
+        AddSingleScanCountAndMessage(DELAY_FIVE_SECONDS);
+    } else if (WifiChannelHelper::GetInstance().IsValidFreq(p2pEnhanceFreq) &&
+        (p2pFreq != p2pEnhanceFreq) && currSingleScanCount.load() == SCAN_P2PENHANCE_BEFORE_ALL_FREQ_SCAN) {
+    /* scan p2pEnhanceFreq second if (p2pFreq != p2pEnhanceFreq) */
+        StartSingleScanWithoutControl(p2pEnhanceFreq);
+        AddSingleScanCountAndMessage(DELAY_FIVE_SECONDS);
+    } else if (WifiChannelHelper::GetInstance().IsValidFreq(lastStaFreq) &&
+        currSingleScanCount.load() == SCAN_STA_BEFORE_ALL_FREQ_SCAN) {
+    /* scan lastStaFreq second third */
+        StartSingleScanWithoutControl(lastStaFreq);
+        AddSingleScanCountAndMessage(DELAY_FIVE_SECONDS);
+    } else if (currSingleScanCount.load() > SCAN_STA_BEFORE_ALL_FREQ_SCAN) {
+    /* scan all freqs in a single scan way */
+        if (WifiChannelHelper::GetInstance().GetAvailableScanFreqs(SCAN_BAND_BOTH, freqs)) {
+            WIFI_LOGI("%{public}s : get all freq fail.", __FUNCTION__);
+        }
+        if (currSingleScanCount.load() - SCAN_STA_BEFORE_ALL_FREQ_SCAN < static_cast<int>(freqs.size())) {
+            StartSingleScanWithoutControl(freqs[currSingleScanCount.load() - SCAN_STA_BEFORE_ALL_FREQ_SCAN]);
+            AddSingleScanCountAndMessage(DELAY_ONE_SECOND);
+        } else {
+           WIFI_LOGI("%{public}s : all single scan done, clear timer and currSingleScanCount.", __FUNCTION__);
+           ResetSingleScanCountAndMessage();
+        }
+    } else {
+    /* lastStaFreq or p2pFreq or p2pEnhance is not valid, just add currSingleScanCount and try next single scan */
+        currSingleScanCount++;
+        pScanStateMachine->StartTimer(static_cast<int>(SYSTEM_SINGLE_SCAN_TIMER), 0);
+    }
+}
+
+void ScanService::StartSingleScanWithoutControl(int freq)
+{
+    WifiScanParams params;
+    if (!scanStartedFlag) {
+        WIFI_LOGE("%{public}s scan service has not started.", __FUNCTION__);
+        return;
+    }
+
+    params.ssid = "";
+    params.bssid = "";
+    params.band = SCAN_BAND_UNSPECIFIED;
+    params.freqs.push_back(freq);
+
+    ScanConfig scanConfig;
+    if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
+        WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
+    }
+
+    scanConfig.scanBand = static_cast<ScanBandType>(params.band);
+    scanConfig.scanFreqs.assign(params.freqs.begin(), params.freqs.end());
+    scanConfig.ssid = params.ssid;
+    scanConfig.bssid = params.bssid;
+    scanConfig.scanType = ScanType::SCAN_TYPE_SYSTEM_SINGLE_TIMER;
+    scanConfig.scanningWithParamFlag = true;
+    scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
+    if (!SingleScan(scanConfig)) {
+        WIFI_LOGE("SingleScan failed.\n");
+        return;
+    }
     return;
 }
 
@@ -1374,6 +1589,11 @@ void ScanService::RestartSystemScanTimeOut()
     }
 }
 
+void ScanService::HandleSystemSingleScanTimeOut()
+{
+    StartSingleScanWithoutControlTimer();
+}
+
 void ScanService::GetScanControlInfo()
 {
     WIFI_LOGI("Enter GetScanControlInfo.\n");
@@ -1469,6 +1689,11 @@ ErrCode ScanService::AllowSystemTimerScan()
         return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
 
+    if (!AllowScanByActionListen()) {
+        WIFI_LOGW("system timer scan not allow by ActionListen condition");
+        return WIFI_OPT_SCAN_NEXT_PERIOD;
+    }
+
     if (!AllowScanDuringStaScene(staScene, ScanMode::SYSTEM_TIMER_SCAN)) {
         WIFI_LOGW("system timer scan not allowed, staScene: %{public}d", staScene);
         WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::DURING_STA));
@@ -1528,6 +1753,10 @@ ErrCode ScanService::AllowPnoScan()
         WIFI_LOGW("pnoScan scan not allow by hid2d state");
         return WIFI_OPT_FAILED;
     }
+    if (!AllowScanByActionListen()) {
+        WIFI_LOGW("pnoScan scan not allow by ActionListen condition");
+        return WIFI_OPT_FAILED;
+    }
     int staScene = GetStaScene();
     if (staScene == SCAN_SCENE_MAX) {
         WIFI_LOGE("NOT allow PNO scan for staScene: %{public}d", staScene);
@@ -1581,6 +1810,11 @@ ErrCode ScanService::AllowWifiProScan()
         WIFI_LOGW("internal scan not allow by hid2d state");
         return WIFI_OPT_FAILED;
     }
+
+    if (!AllowScanByActionListen()) {
+        WIFI_LOGW("internal scan not allow by ActionListen condition");
+        return WIFI_OPT_FAILED;
+    }
  
     int state = WifiConfigCenter::GetInstance().GetScreenState();
     if (state == MODE_STATE_CLOSE) {
@@ -1606,6 +1840,21 @@ ErrCode ScanService::Allow5GApScan()
  
     // game optimization going
     return WIFI_OPT_SUCCESS;
+}
+
+bool ScanService::AllowSystemSingleScan()
+{
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+    if (screenState != MODE_STATE_OPEN) {
+        return false;
+    }
+    if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
+        return false;
+    }
+    if (AllowScanByHid2dState() && AllowScanByActionListen()) {
+        return false;
+    }
+    return true;
 }
 
 ErrCode ScanService::AllowScanByType(ScanType scanType)
@@ -2486,10 +2735,21 @@ bool ScanService::AllowScanByHid2dState()
     return true;
 }
 
+bool ScanService::AllowScanByActionListen()
+{
+    if (WifiConfigCenter::GetInstance().GetP2pEnhanceActionListenChannel() != 0) {
+        WIFI_LOGW("Scan is not allowed in ActionListen condition.");
+        return false;
+    }
+    return true;
+}
+
 int64_t ScanService::GetIntervalTime(int64_t startTime)
 {
-  auto now = std::chrono::system_clock::now();
-  int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+  struct timespec times = {0, 0};
+  clock_gettime(CLOCK_MONOTONIC, &times);
+  int64_t currentMs =
+    static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
   return currentMs - startTime;
 }
 

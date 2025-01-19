@@ -62,6 +62,7 @@
         "OHOS::Wifi::WifiChannelHelper::TransformChannelToFrequency(int)";
         "OHOS::Wifi::WifiChannelHelper::TransformFreqToBand(int)";
         "OHOS::Wifi::WifiChannelHelper::TransformChannelToBand(int)";
+        "OHOS::Wifi::WifiChannelHelper::IsValidFreq(int)";
         "OHOS::Wifi::WifiChannelHelper::IsValid5GHz(int)";
         "OHOS::Wifi::WifiChannelHelper::IsValid24GHz(int)";
         "OHOS::Wifi::WifiChannelHelper::IsValid24GChannel(int)";

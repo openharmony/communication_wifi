@@ -684,6 +684,14 @@ public:
         pScanService->SystemSingleScanProcess();
     }
 
+    void GetRelatedFreqsSuccess()
+    {
+        int lastStaFreq = 0;
+        int p2pFreq = 0;
+        int p2pEnhanceFreq = 0;
+        pScanService->GetRelatedFreqs(lastStaFreq, p2pFreq, p2pEnhanceFreq);
+    }
+
     void StopSystemScanSuccess()
     {
         pScanService->StopSystemScan();
@@ -2227,6 +2235,11 @@ HWTEST_F(ScanServiceTest, SystemScanProcessSuccess3, TestSize.Level1)
 HWTEST_F(ScanServiceTest, SystemSingleScanProcessSuccess, TestSize.Level1)
 {
     SystemSingleScanProcessSuccess();
+}
+
+HWTEST_F(ScanServiceTest, GetRelatedFreqsSuccess, TestSize.Level1)
+{
+    GetRelatedFreqsSuccess();
 }
 
 HWTEST_F(ScanServiceTest, StopSystemScanSuccess, TestSize.Level1)

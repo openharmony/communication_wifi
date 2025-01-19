@@ -173,13 +173,6 @@ public:
     virtual ErrCode RegisterP2pEnhanceCallback(const std::string &name, P2pEnhanceCallback callback) = 0;
 
     /**
-     * @Description unRegister P2pEnhance state Callback
-     * @param name - unregistrant name
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode UnRegisterP2pEnhanceCallback(const std::string &name) = 0;
-
-    /**
      * @Description Register P2pEnhance state Callback
      * @param name - registrant name
      * @param P2pEnhanceActionListenCallback - callback
@@ -188,12 +181,6 @@ public:
     virtual ErrCode RegisterP2pEnhanceActionListenCallback(
         const std::string &name, P2pEnhanceActionListenCallback callback) = 0;
 
-    /**
-     * @Description unRegister P2pEnhance state Callback
-     * @param name - unregistrant name
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode UnRegisterP2pEnhanceActionListenCallback(const std::string &name) = 0;
     /**
      * @Description Check Enhance Vap Available
      *

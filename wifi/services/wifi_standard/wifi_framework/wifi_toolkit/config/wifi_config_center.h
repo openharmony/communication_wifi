@@ -220,6 +220,10 @@ public:
 
     void ClearLocalHid2dInfo(int uid = 0);
 
+    int SetLastConnStaFreq(int freq);
+
+    int GetLastConnStaFreq();
+
     int SetP2pEnhanceState(int state);
 
     int GetP2pEnhanceState();
@@ -365,6 +369,7 @@ private:
     std::atomic<bool> mWifiSelfcureReset {false};
     std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
+    std::atomic<int> lastConnStaFreq_ {INVALID_NETWORK_ID};
     std::atomic<int> mSelectedCandidateNetworkId {INVALID_NETWORK_ID};
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
@@ -415,7 +420,7 @@ private:
     std::atomic<int64_t> mHid2dSceneLastSetTime {0};
     std::atomic<WifiOprMidState> mP2pMidState {WifiOprMidState::CLOSED};
     std::atomic<int> mP2pState {static_cast<int>(P2pState::P2P_STATE_CLOSED)};
-    std::atomic<int> mP2pEnhanceState {0};
+    std::atomic<int> p2pEnhanceState_ {0};
     std::atomic<int> p2pEnhanceFreq_ {0};
     std::atomic<int> p2pEnhanceActionListenChannel_ {0};
     std::atomic<int> mP2pDiscoverState {0};

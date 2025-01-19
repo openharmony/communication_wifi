@@ -98,6 +98,8 @@
         "OHOS::Wifi::WifiConfigCenter::ClearLocalHid2dInfo(int)";
         "OHOS::Wifi::WifiConfigCenter::SetP2pEnhanceState(int)";
         "OHOS::Wifi::WifiConfigCenter::GetP2pEnhanceState()";
+        "OHOS::Wifi::WifiConfigCenter::SetLastConnStaFreq(int)";
+        "OHOS::Wifi::WifiConfigCenter::GetLastConnStaFreq()";
         "OHOS::Wifi::WifiConfigCenter::SetP2pEnhanceActionListenChannel(int)";
         "OHOS::Wifi::WifiConfigCenter::GetP2pEnhanceActionListenChannel()";
         "OHOS::Wifi::WifiConfigCenter::SetP2pEnhanceFreq(int)";

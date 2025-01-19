@@ -237,6 +237,11 @@ void ScanService::SystemScanProcess(bool scanAtOnce)
     return;
 }
 
+void ScanService::SystemSingleScanProcess()
+{
+    return;
+}
+
 void ScanService::StopSystemScan()
 {
     return;
@@ -285,6 +290,11 @@ ErrCode ScanService::AllowSystemTimerScan()
 ErrCode ScanService::AllowPnoScan()
 {
     return WIFI_OPT_SUCCESS;
+}
+
+bool ScanService::AllowSystemSingleScan()
+{
+    return true;
 }
 
 ErrCode ScanService::AllowScanByType(ScanType scanType)

@@ -45,7 +45,7 @@ public:
 private:
     void RegisterP2pEnhanceCallback();
     void UnRegisterP2pEnhanceCallback();
-    void P2pEnhanceStateChange(const std::string &ifName, int32_t state);
+    void P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency);
 private:
     SelfCureStateMachine *pSelfCureStateMachine;
     int m_instId;

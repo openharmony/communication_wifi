@@ -39,6 +39,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void StaService1Callback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int FREQUENCY = 2437;
@@ -53,6 +58,7 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        LOG_SetCallback(StaService1Callback);
         pStaService = std::make_unique<StaService>();
         pStaService->pStaStateMachine = new StaStateMachine();
         pStaService->pStaAutoConnectService = new MockStaAutoConnectService(pStaService->pStaStateMachine);
@@ -989,16 +995,19 @@ HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackSuccess, TestSize.L
 HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackFail, TestSize.Level1)
 {
     StaServiceRegisterStaServiceCallbackFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestSucc, TestSize.Level1)
 {
     StaServiceAddCandidateConfigTestSucc();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail0, TestSize.Level1)
 {
     StaServiceAddCandidateConfigTestFail0();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail1, TestSize.Level1)
@@ -1104,11 +1113,13 @@ HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level1)
 {
     EnableHiLinkHandshakeFailTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level1)
 {
     DeliverStaIfaceDataSuccessTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, GetDataSlotIdTest, TestSize.Level1)
@@ -1139,36 +1150,43 @@ HWTEST_F(StaServiceTest, GetMncTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, UpdateEapConfigTest, TestSize.Level1)
 {
     UpdateEapConfigTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level1)
 {
     OnWifiCountryCodeChangedTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StartPortalCertificationTest, TestSize.Level1)
 {
     StartPortalCertificationTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, HandleForegroundAppChangedActionTest, TestSize.Level1)
 {
     HandleForegroundAppChangedActionTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, EnableHiLinkHandshakeTest, TestSize.Level1)
 {
     EnableHiLinkHandshakeTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
 {
     DeliverStaIfaceDataTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StartRoamToNetworkTest, TestSize.Level1)
 {
     StartRoamToNetworkTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessTest, TestSize.Level1)

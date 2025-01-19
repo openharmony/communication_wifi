@@ -51,7 +51,8 @@ bool WifiMultiVapManager::CheckCanUseSoftAp()
 #ifdef FEATURE_VAP_MANAGER_SUPPORT
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService) {
-        if (!pEnhanceService->CheckEnhanceVapAvailable()) {
+        bool enhanceVapAvailable = pEnhanceService->CheckEnhanceVapAvailable();
+        if (!enhanceVapAvailable) {
             if (CheckP2pConnected() && !CheckEnhanceWifiConnected()) {
                 Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_P2P_SOFTAP_CONFLICT_CNT));
             } else if (!CheckP2pConnected() && CheckEnhanceWifiConnected()) {
@@ -60,7 +61,7 @@ bool WifiMultiVapManager::CheckCanUseSoftAp()
                 Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::P2P_HML_SOFTAP_CONFLICT_CNT));
             }
         }
-        return pEnhanceService->CheckEnhanceVapAvailable();
+        return enhanceVapAvailable;
     } else {
         // to be implemented
         return true;

@@ -1369,9 +1369,7 @@ void ScanService::GetRelatedFreqs(int &lastStaFreq, int &p2pFreq, int &p2pEnhanc
 
 void ScanService::StartSingleScanWithoutControlTimer()
 {
-    int lastStaFreq = 0;
-    int p2pFreq = 0;
-    int p2pEnhanceFreq = 0;
+    int lastStaFreq = 0, p2pFreq = 0, p2pEnhanceFreq = 0;
     GetRelatedFreqs(lastStaFreq, p2pFreq, p2pEnhanceFreq);
     WIFI_LOGI("%{public}s : lastStaFreq = %{public}d, p2pFreq = %{public}d, p2pEnhanceFreq = %{public}d."
         "currSingleScanCount = %{public}d",

@@ -364,12 +364,19 @@ HWTEST_F(WifiProStateMachineTest, WifiProEnableStateHandleWifiConnectStateChange
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetParam1(17);
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.ssid = "test";
+    msg->SetMessageObj(linkedInfo);
     wifiProEnableState_->HandleWifiConnectStateChangedInEnable(msg);
-
+ 
     msg->SetParam1(23);
+    linkedInfo.ssid = "test1";
+    msg->SetMessageObj(linkedInfo);
     wifiProEnableState_->HandleWifiConnectStateChangedInEnable(msg);
-
+ 
     msg->SetParam1(0);
+    linkedInfo.ssid = "test2";
+    msg->SetMessageObj(linkedInfo);
     wifiProEnableState_->HandleWifiConnectStateChangedInEnable(msg);
     EXPECT_NE(wifiProEnableState_->pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }

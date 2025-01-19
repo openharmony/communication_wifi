@@ -103,6 +103,13 @@ HWTEST_F(WifiConfigCenterTest, GetLinkedInfoTest01, TestSize.Level1)
     EXPECT_EQ(WifiConfigCenter::GetInstance().GetLinkedInfo(info1, instId), 0);
 }
 
+HWTEST_F(WifiConfigCenterTest, GetLastConnStaFreqTest01, TestSize.Level1)
+{
+    int lastConnStaFreq = 5200;
+    WifiConfigCenter::GetInstance().SetLastConnStaFreq(lastConnStaFreq);
+    EXPECT_EQ(WifiConfigCenter::GetInstance().GetLastConnStaFreq(), lastConnStaFreq);
+}
+
 HWTEST_F(WifiConfigCenterTest, GetMacAddressTest01, TestSize.Level1)
 {
     std::string macAddress = "TEST";

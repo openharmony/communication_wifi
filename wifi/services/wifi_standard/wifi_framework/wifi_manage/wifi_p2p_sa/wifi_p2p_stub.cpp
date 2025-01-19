@@ -1077,7 +1077,6 @@ void WifiP2pStub::OnHid2dSetUpperScene(
         if (scene.scene == 0) {
             scene.setTime = 0;
         } else {
-            scene.setTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
             scene.setTime =
                 static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
         }

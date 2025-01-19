@@ -106,7 +106,7 @@ inline const int LOCATOR_SA_UID = 1021;
 
 inline constexpr int P2P_ENHANCE_BC_CONNECT_SUCC = 4;
 inline constexpr int P2P_ENHANCE_BC_DESTROYED = 10;
-inline constexpr int P2P_ENHANCE_BC_SWICTH_NOTIFY_SUCC = 11;
+inline constexpr int P2P_ENHANCE_BC_SWITCH_NOTIFY_SUCC = 11;
 
 int WifiMaxThroughput(int wifiStandard, bool is11bMode,
                       WifiChannelWidth channelWidth, int rssiDbm, int maxNumSpatialStream, int channelUtilization);
@@ -137,13 +137,9 @@ public:
 
     void RegisterP2pEnhanceCallback();
 
-    void UnRegisterP2pEnhanceCallback();
-
     void P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency);
 
-    void RegisterP2pEnhanceActionLIstenCallback();
-
-    void UnRegisterP2pEnhanceActionLIstenCallback();
+    void RegisterP2pEnhanceActionListenCallback();
 
     void P2pEnhanceActionListenChange(int listenChannel);
     /**
@@ -225,9 +221,9 @@ public:
 
     /**
      * @Description Get some related freqs.
-     * @param lastStaFreq - The frequency of last connected STA.[in]
-     * @param p2pFreq - The frequency of current connected P2P.[in]
-     * @param p2pEnhanceFreq - The frequency of current connected P2PEnhance.[in]
+     * @param lastStaFreq - The frequency of last connected STA.[out]
+     * @param p2pFreq - The frequency of current connected P2P.[out]
+     * @param p2pEnhanceFreq - The frequency of current connected P2PEnhance.[out]
      */
     void GetRelatedFreqs(int &lastStaFreq, int &p2pFreq, int &p2pEnhanceFreq);
 
@@ -394,8 +390,6 @@ private:
     bool isChipsetInfoObtained;
     std::atomic<int> currSingleScanCount {0};
     int lastP2pEnhanceState {0};
-    P2pEnhanceCallback P2pEnhanceStateChange_;
-    P2pEnhanceActionListenCallback P2pEnhanceActionListenChange_;
     /**
      * @Description Obtains the frequency of a specified band.
      *

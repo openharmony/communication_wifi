@@ -862,20 +862,31 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
     }
 }
 
+int WifiConfigCenter::SetLastConnStaFreq(int freq)
+{
+    lastConnStaFreq_.store(freq);
+    return 0;
+}
+
+int WifiConfigCenter::GetLastConnStaFreq()
+{
+    return lastConnStaFreq_.load();
+}
+
 int WifiConfigCenter::SetP2pEnhanceState(int state)
 {
-    mP2pEnhanceState = state;
+    p2pEnhanceState_.store(state);
     return 0;
 }
 
 int WifiConfigCenter::GetP2pEnhanceState()
 {
-    return mP2pEnhanceState.load();
+    return p2pEnhanceState_.load();
 }
 
 int WifiConfigCenter::SetP2pEnhanceActionListenChannel(int channel)
 {
-    p2pEnhanceActionListenChannel_ = channel;
+    p2pEnhanceActionListenChannel_.store(channel);
     return 0;
 }
 
@@ -886,7 +897,7 @@ int WifiConfigCenter::GetP2pEnhanceActionListenChannel()
 
 int WifiConfigCenter::SetP2pEnhanceFreq(int freq)
 {
-    p2pEnhanceFreq_ = freq;
+    p2pEnhanceFreq_.store(freq);
     return 0;
 }
 

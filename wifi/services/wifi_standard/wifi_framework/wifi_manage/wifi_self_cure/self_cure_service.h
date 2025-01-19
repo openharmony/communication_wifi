@@ -44,12 +44,10 @@ public:
     bool CheckSelfCureWifiResult(int event);
 private:
     void RegisterP2pEnhanceCallback();
-    void UnRegisterP2pEnhanceCallback();
     void P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency);
 private:
     SelfCureStateMachine *pSelfCureStateMachine;
     int m_instId;
-    P2pEnhanceCallback p2pEnhanceStateChange_;
     int32_t lastP2pEnhanceState_ = -1;
     OperateResState lastState = OperateResState::DISCONNECT_DISCONNECTED;
     WifiLinkedInfo lastWifiLinkedInfo;

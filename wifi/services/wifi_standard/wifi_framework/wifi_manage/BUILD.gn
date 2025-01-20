@@ -596,12 +596,6 @@ if (defined(ohos_lite)) {
     }
 
     if (defined(global_parts_info) &&
-        defined(global_parts_info.powermgr_battery_manager)) {
-      external_deps += [ "battery_manager:batterysrv_client" ]
-      defines += [ "HAS_BATTERY_MANAGER_PART" ]
-    }
-
-    if (defined(global_parts_info) &&
         defined(global_parts_info.msdp_movement)) {
       external_deps += [ "movement:movement_client" ]
       defines += [ "HAS_MOVEMENT_PART" ]

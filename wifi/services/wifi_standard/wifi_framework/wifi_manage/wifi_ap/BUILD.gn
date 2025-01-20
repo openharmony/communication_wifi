@@ -115,12 +115,6 @@ ohos_static_library("wifi_ap_service") {
     external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
   }
 
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.powermgr_battery_manager)) {
-    external_deps += [ "battery_manager:batterysrv_client" ]
-    defines += [ "HAS_BATTERY_MANAGER_PART" ]
-  }
-
   part_name = "wifi"
   subsystem_name = "communication"
 }

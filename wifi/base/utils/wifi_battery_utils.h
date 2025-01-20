@@ -21,10 +21,8 @@ namespace Wifi {
 class BatteryUtils {
 public:
     static BatteryUtils &GetInstance();
-#ifdef HAS_BATTERY_MANAGER_PART
     bool IsChargedPlugIn();
     int GetBatteryCapacity();
-#endif
 
 private:
     BatteryUtils();

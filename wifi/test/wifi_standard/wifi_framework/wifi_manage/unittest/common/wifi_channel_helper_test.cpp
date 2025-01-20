@@ -47,6 +47,7 @@ HWTEST_F(WifiChannelHelperTest, TestGetValidBands, TestSize.Level1)
 {
     std::vector<BandType> bands = {};
     WifiChannelHelper::GetInstance().GetValidBands(bands);
+    EXPECT_EQ(WifiChannelHelper::GetInstance().GetValidBands(bands),0);
 }
 
 HWTEST_F(WifiChannelHelperTest, TestSetValidChannels, TestSize.Level1)
@@ -55,12 +56,14 @@ HWTEST_F(WifiChannelHelperTest, TestSetValidChannels, TestSize.Level1)
         { BandType::BAND_2GHZ, { 2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472 }},
         { BandType::BAND_5GHZ, { 5180, 5200, 5220, 5240, 5745, 5765, 5785, 5805, 5825 }}};
     WifiChannelHelper::GetInstance().SetValidChannels(validChannels);
+    EXPECT_EQ(WifiChannelHelper::GetInstance().SetValidChannels(validChannels),0);
 }
 
 HWTEST_F(WifiChannelHelperTest, TestGetValidChannels, TestSize.Level1)
 {
     ChannelsTable validChannels;
     WifiChannelHelper::GetInstance().GetValidChannels(validChannels);
+    EXPECT_EQ(WifiChannelHelper::GetInstance().GetValidChannels(validChannels),0);
 }
 
 HWTEST_F(WifiChannelHelperTest, TestUpdateValidChannels, TestSize.Level1)
@@ -81,6 +84,7 @@ HWTEST_F(WifiChannelHelperTest, GetAvailableScanFreqsTest, TestSize.Level1)
 {
     std::vector<int32_t> freqs;
     WifiChannelHelper::GetInstance().GetAvailableScanFreqs(ScanBandType::SCAN_BAND_24_GHZ, freqs);
+    EXPECT_EQ(WifiChannelHelper::GetInstance().GetAvailableScanFreqs(ScanBandType::SCAN_BAND_24_GHZ, freqs),true);
 }
 
 HWTEST_F(WifiChannelHelperTest, IsFreqDbacTest, TestSize.Level1)
@@ -143,6 +147,7 @@ HWTEST_F(WifiChannelHelperTest, TransformFrequencyIntoChannelTest4, TestSize.Lev
 HWTEST_F(WifiChannelHelperTest, TransformChannelToFrequencyTest, TestSize.Level1)
 {
     WifiChannelHelper::GetInstance().TransformChannelToFrequency(1);
+    EXPECT_EQ(WifiChannelHelper::GetInstance().TransformChannelToFrequency(1),-1);
 }
 
 HWTEST_F(WifiChannelHelperTest, TransformFreqToBandTest, TestSize.Level1)

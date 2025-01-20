@@ -27,11 +27,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-    static std::string g_errLog;
-    void P2pDisablingStateCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
-    {
-        g_errLog = msg;
-    }
+    static std::string g_errLog = "wifitest";
 class P2pDisablingStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -62,13 +58,13 @@ public:
 HWTEST_F(P2pDisablingStateTest, GoInState, TestSize.Level1)
 {
     pP2pDisablingState->GoInState();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pDisablingStateTest, GoOutState, TestSize.Level1)
 {
     pP2pDisablingState->GoOutState();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pDisablingStateTest, ExecuteStateMsg, TestSize.Level1)

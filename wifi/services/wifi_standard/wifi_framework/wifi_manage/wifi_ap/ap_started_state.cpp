@@ -39,7 +39,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_randommac_helper.h"
 #ifdef HAS_BATTERY_MANAGER_PART
-#include "battery_srv_client.h"
+#include "wifi_battery_utils.h"
 #define SET_DUAL_ANTENNAS 45
 #endif
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
@@ -173,7 +173,7 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         return false;
     }
 #ifdef HAS_BATTERY_MANAGER_PART
-    if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
+    if (BatteryUtils::GetInstance().GetBatteryCapacity() > SET_DUAL_ANTENNAS) {
         HotspotConfig hotspotConfig;
         WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
         if (hotspotConfig.GetBand() == BandType::BAND_2GHZ) {

@@ -105,6 +105,7 @@ if (defined(ohos_lite)) {
       "utils/wifi_app_parser.cpp",
       "utils/wifi_datashare_utils.cpp",
       "utils/xml_parser.cpp",
+      "utils/wifi_battery_utils.cpp",
     ]
     include_dirs = local_base_include_dirs
     include_dirs += [ "$WIFI_ROOT_DIR/base/utils" ]
@@ -130,6 +131,10 @@ if (defined(ohos_lite)) {
     if (wifi_ffrt_enable) {
       external_deps += [ "ffrt:libffrt" ]
       defines += [ "WIFI_FFRT_ENABLE" ]
+    }
+    if (defined(global_parts_info) && defined(global_parts_info.powermgr_battery_manager)) {
+      external_deps += [ "battery_manager:batterysrv_client" ]
+      defines += [ "HAS_BATTERY_MANAGER_PART" ]
     }
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc

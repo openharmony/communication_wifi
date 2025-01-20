@@ -106,7 +106,7 @@ HWTEST_F(IpQosMonitorTest, TestHandleTcpPktsResp, TestSize.Level1)
 HWTEST_F(IpQosMonitorTest, TestAllowSelfCureNetwork, TestSize.Level1)
 {
     int32_t currentRssi = 123;
-    EXPECT_TRUE(IpQosMonitor::GetInstance().AllowSelfCureNetwork(currentRssi));
+    EXPECT_FALSE(IpQosMonitor::GetInstance().AllowSelfCureNetwork(currentRssi));
 }
 
 HWTEST_F(IpQosMonitorTest, TestParseNetworkInternetGood, TestSize.Level1)

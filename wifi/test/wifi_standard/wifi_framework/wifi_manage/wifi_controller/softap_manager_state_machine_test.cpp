@@ -33,6 +33,12 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+        static std::string g_errLog;
+    void SoftapManagerMachineCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
+
 class SoftapManagerMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -44,6 +50,7 @@ public:
         mCb.onStartFailure = DealSoftapStartFailure;
         mCb.onStopped = DealSoftapStop;
         pSoftapManagerMachine->RegisterCallback(mCb);
+        LOG_SetCallback(SoftapManagerMachineCallback);
     }
 
     virtual void TearDown()
@@ -132,31 +139,37 @@ public:
 HWTEST_F(SoftapManagerMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
 {
     DefaultStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SoftapManagerMachineTest, DefaultStateGoOutStateSuccess, TestSize.Level1)
 {
     DefaultStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SoftapManagerMachineTest, IdleStateGoInStateSuccess, TestSize.Level1)
 {
     IdleStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SoftapManagerMachineTest, IdleStateGoOutStateSuccess, TestSize.Level1)
 {
     IdleStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SoftapManagerMachineTest, StartedStateGoInStateSuccess, TestSize.Level1)
 {
     StartedStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SoftapManagerMachineTest, StartedStateGoOutStateSuccess, TestSize.Level1)
 {
     StartedStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SoftapManagerMachineTest, HandleStartInIdleStateTest, TestSize.Level1)

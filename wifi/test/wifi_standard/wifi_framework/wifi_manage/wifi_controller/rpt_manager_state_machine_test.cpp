@@ -30,6 +30,11 @@ using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
 namespace OHOS::Wifi {
+        static std::string g_errLog;
+    void RptManagerMachineCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class RptManagerMachineTest : public testing::Test {
 public:
     std::unique_ptr<RptManagerMachine> pRptManagerMachine;
@@ -44,6 +49,7 @@ public:
         mCb.onStartFailure = DealRptStartFailure;
         mCb.onStopped = DealRptStop;
         pRptManagerMachine->RegisterCallback(mCb);
+        LOG_SetCallback(RptManagerMachineCallback);
     }
 
     virtual void TearDown()
@@ -107,6 +113,7 @@ HWTEST_F(RptManagerMachineTest, StateChangeSuccess, TestSize.Level1)
         state->GoInState();
         state->GoOutState();
     }
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(RptManagerMachineTest, ExecuteStateMsg_Msg_Is_Null, TestSize.Level1)

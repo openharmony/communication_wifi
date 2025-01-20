@@ -103,9 +103,9 @@ if (defined(ohos_lite)) {
     sources += [
       "shared_util/wifi_notification_util.cpp",
       "utils/wifi_app_parser.cpp",
+      "utils/wifi_battery_utils.cpp",
       "utils/wifi_datashare_utils.cpp",
       "utils/xml_parser.cpp",
-      "utils/wifi_battery_utils.cpp",
     ]
     include_dirs = local_base_include_dirs
     include_dirs += [ "$WIFI_ROOT_DIR/base/utils" ]

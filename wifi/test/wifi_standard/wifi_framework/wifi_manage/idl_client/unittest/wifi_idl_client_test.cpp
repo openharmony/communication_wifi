@@ -32,6 +32,7 @@ constexpr int BIT1 = 2;
 constexpr int BIT2 = 4;
 constexpr int TEN = 4;
 constexpr int MAX_TIME = 65546;
+static std::string g_errLog = "wifitest";
 
 HWTEST_F(WifiIdlClientTest, StartWifiTest, TestSize.Level1)
 {
@@ -392,6 +393,7 @@ HWTEST_F(WifiIdlClientTest, ExitAllClientTest, TestSize.Level1)
     MockWifiPublic::SetMockFlag(true);
     mClient.ExitAllClient();
     MockWifiPublic::SetMockFlag(false);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqConnectTest, TestSize.Level1)
@@ -546,7 +548,7 @@ HWTEST_F(WifiIdlClientTest, GetNextNetworkIdTest1, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqEnableNetworkTest1, TestSize.Level1)
 {
     int networkId = 1;
-    mClient.ReqEnableNetwork(networkId);
+    EXPECT_TRUE(mClient.ReqEnableNetwork(networkId)== WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqDisableNetworkTest1, TestSize.Level1)
@@ -690,7 +692,7 @@ HWTEST_F(WifiIdlClientTest, ReqStartWpsPinModeTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqStopWpsTest, TestSize.Level1)
 {
-    mClient.ReqStopWps();
+    EXPECT_TRUE(mClient.ReqStopWps() == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqGetRoamingCapabilitiesTest, TestSize.Level1)
@@ -973,17 +975,17 @@ HWTEST_F(WifiIdlClientTest, ReqStartSupplicantTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqStopSupplicantTest, TestSize.Level1)
 {
-    mClient.ReqStopSupplicant();
+    EXPECT_TRUE(mClient.ReqStopSupplicant() == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqConnectSupplicantTest, TestSize.Level1)
 {
-    mClient.ReqConnectSupplicant();
+    EXPECT_TRUE(mClient.ReqConnectSupplicant() == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqDisconnectSupplicantTest, TestSize.Level1)
 {
-    mClient.ReqDisconnectSupplicant();
+    EXPECT_TRUE(mClient.ReqDisconnectSupplicant() == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqRequestToSupplicantTest, TestSize.Level1)
@@ -1029,7 +1031,7 @@ HWTEST_F(WifiIdlClientTest, ReqWpaGetCountryCodeTest2, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqWpaGetCountryCodeTest, TestSize.Level1)
 {
     std::string countryCode = "ad";
-    mClient.ReqWpaGetCountryCode(countryCode);
+    EXPECT_TRUE(mClient.ReqWpaGetCountryCode(countryCode) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqWpaBlocklistClearTest, TestSize.Level1)
@@ -1044,13 +1046,13 @@ HWTEST_F(WifiIdlClientTest, ReqWpaBlocklistClearTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqP2pStopTest, TestSize.Level1)
 {
-    mClient.ReqP2pStop();
+    EXPECT_TRUE(mClient.ReqP2pStop() == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetWpsDeviceTypeTest, TestSize.Level1)
 {
     std::string type = "tv";
-    mClient.ReqP2pSetWpsDeviceType(type);
+    EXPECT_TRUE(mClient.ReqP2pSetWpsDeviceType(type) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1)
@@ -1065,7 +1067,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSaveConfigTest, TestSize.Level1)
 {
-    mClient.ReqP2pSaveConfig();
+    EXPECT_TRUE(mClient.ReqP2pSaveConfig() == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetupWpsPbcTest, TestSize.Level1)
@@ -1133,13 +1135,13 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetPowerSaveTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqP2pSetWfdEnableTest, TestSize.Level1)
 {
     bool enable = true;
-    mClient.ReqP2pSetWfdEnable(enable);
+    EXPECT_TRUE(mClient.ReqP2pSetWfdEnable(enable) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetWfdDeviceConfigTest, TestSize.Level1)
 {
     std::string config = "abcde";
-    mClient.ReqP2pSetWfdDeviceConfig(config);
+    EXPECT_TRUE(mClient.ReqP2pSetWfdDeviceConfig(config) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pStartFindTest, TestSize.Level1)
@@ -1154,7 +1156,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pStartFindTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqP2pStopFindTest, TestSize.Level1)
 {
-    mClient.ReqP2pStopFind();
+    EXPECT_TRUE(mClient.ReqP2pStopFind() == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetExtListenTest, TestSize.Level1)
@@ -1371,7 +1373,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pCancelServiceDiscoveryTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqP2pSetMiracastTypeTest, TestSize.Level1)
 {
     int type = 1;
-    mClient.ReqP2pSetMiracastType(type);
+    EXPECT_TRUE(mClient.ReqP2pSetMiracastType(type)== WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqRespServiceDiscoveryTest, TestSize.Level1)
@@ -1456,7 +1458,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pHid2dConnectTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqWpaSetSuspendModeTest, TestSize.Level1)
 {
     bool mode = true;
-    mClient.ReqWpaSetSuspendMode(mode);
+    EXPECT_TRUE(mClient.ReqWpaSetSuspendMode(mode) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, QueryScanInfosTest, TestSize.Level1)
@@ -1505,7 +1507,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pListNetworksTest, TestSize.Level1)
 
 HWTEST_F(WifiIdlClientTest, ReqWpaAutoConnectTest, TestSize.Level1)
 {
-    mClient.ReqWpaAutoConnect(0);
+    EXPECT_TRUE(mClient.ReqWpaAutoConnect(0) == WIFI_HAL_OPT_FAILED);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pStartTest, TestSize.Level1)

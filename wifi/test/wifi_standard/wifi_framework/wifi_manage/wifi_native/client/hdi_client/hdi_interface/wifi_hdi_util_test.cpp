@@ -14,18 +14,27 @@
  */
 #include <gtest/gtest.h>
 #include "wifi_hdi_util.h"
+#include "log.h"
 
 using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void WifiHdiLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 const int MAC_SIZE = 6;
 constexpr int TEN = 10;
 class WifiHdiUtilTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    void SetUp() override {}
+    void SetUp() override 
+    {
+        LOG_SetCallback(WifiHdiLogCallback);
+    }
     void TearDown() override {}
 };
 
@@ -1017,6 +1026,7 @@ HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest1, TestSize.Level1)
     char srcBuf[10] = "[123";
     ScanInfo pcmd;
     GetInfoElems(length, end, srcBuf, &pcmd);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest2, TestSize.Level1)
@@ -1026,6 +1036,7 @@ HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest2, TestSize.Level1)
     char srcBuf[10] = "123";
     ScanInfo pcmd;
     GetInfoElems(length, end, srcBuf, &pcmd);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest3, TestSize.Level1)
@@ -1035,6 +1046,7 @@ HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest3, TestSize.Level1)
     char srcBuf[10] = "123[";
     ScanInfo pcmd;
     GetInfoElems(length, end, srcBuf, &pcmd);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest4, TestSize.Level1)
@@ -1044,6 +1056,7 @@ HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest4, TestSize.Level1)
     char srcBuf[10] = "123[]";
     ScanInfo pcmd;
     GetInfoElems(length, end, srcBuf, &pcmd);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest5, TestSize.Level1)
@@ -1062,6 +1075,7 @@ HWTEST_F(WifiHdiUtilTest, GetScanResultInfoElemTest, TestSize.Level1)
     uint8_t *start = NULL;
     size_t len = 0;
     GetScanResultInfoElem(&scanInfo, start, len);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHdiUtilTest, GetScanResultInfoElemTest1, TestSize.Level1)
@@ -1070,6 +1084,7 @@ HWTEST_F(WifiHdiUtilTest, GetScanResultInfoElemTest1, TestSize.Level1)
     uint8_t start[] = {0x01, 0x02, 0x03};
     size_t len = sizeof(start);
     GetScanResultInfoElem(&scanInfo, start, len);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHdiUtilTest, RouterSupportHiLinkByWifiInfoTest, TestSize.Level1)

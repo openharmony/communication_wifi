@@ -91,6 +91,7 @@ HWTEST_F(WifiWatchDogUtilsTest, StartAllWatchDogTest, TestSize.Level1)
 
     // Call the StartAllWatchDog function
     wifiWatchDogUtils->StartAllWatchDog();
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 // Test case for WifiWatchDogUtils::ReportResetEvent()

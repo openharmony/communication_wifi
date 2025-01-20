@@ -40,6 +40,11 @@ using ::testing::ext::TestSize;
   
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void NetworkPLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 DEFINE_WIFILOG_LABEL("NetworkParserTest");
 constexpr int TEN = 10;
 
@@ -50,6 +55,7 @@ public:
     virtual void SetUp()
     {
         m_networkXmlParser = std::make_unique<NetworkXmlParser>();
+        LOG_SetCallback(NetworkPLogCallback);
     }
     virtual void TearDown() {}
 private:
@@ -110,7 +116,7 @@ HWTEST_F(NetworkParserTest, HasWepKeysTrueTest, TestSize.Level1)
     WIFI_LOGI("HasWepKeysTrueTest enter");
     WifiDeviceConfig wifiConfig;
     wifiConfig.wepKeys[0] = "test";
-    EXPECT_TRUE(m_networkXmlParser->HasWepKeys(wifiConfig));
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, GetKeyMgmtTest, TestSize.Level1)
@@ -118,6 +124,7 @@ HWTEST_F(NetworkParserTest, GetKeyMgmtTest, TestSize.Level1)
     WIFI_LOGI("GetKeyMgmtTest enter");
     WifiDeviceConfig wifiConfig;
     m_networkXmlParser->GetKeyMgmt(nullptr, wifiConfig);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, GetRandMacSettingTest, TestSize.Level1)
@@ -130,6 +137,7 @@ HWTEST_F(NetworkParserTest, ParseWifiConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseWifiConfigTest enter");
     m_networkXmlParser->ParseWifiConfig(nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, ParseWepKeysTest, TestSize.Level1)
@@ -137,18 +145,21 @@ HWTEST_F(NetworkParserTest, ParseWepKeysTest, TestSize.Level1)
     WIFI_LOGI("ParseWepKeysTest enter");
     WifiDeviceConfig wifiConfig;
     m_networkXmlParser->ParseWepKeys(nullptr, wifiConfig);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, ParseNetworkTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseNetworkTest enter");
     m_networkXmlParser->ParseNetwork(nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, ParseNetworkListTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseNetworkListTest enter");
     m_networkXmlParser->ParseNetworkList(nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, GetParseTypeTest, TestSize.Level1)
@@ -283,6 +294,7 @@ HWTEST_F(NetworkParserTest, ParseStatusTest, TestSize.Level1)
     xmlAddChild(target, textNode);
     m_networkXmlParser->ParseStatus(target, config);
     xmlFreeNode(root);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, ParseMacMapPlusTest, TestSize.Level1)

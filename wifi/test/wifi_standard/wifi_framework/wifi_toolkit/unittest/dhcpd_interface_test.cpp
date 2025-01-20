@@ -27,6 +27,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void DhcpdInterfaceLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 class DhcpdInterfaceTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -36,6 +41,7 @@ public:
     virtual void SetUp()
     {
         pDhcpdInterface = std::make_unique<DhcpdInterface>();
+        LOG_SetCallback(DhcpdInterfaceLogCallback);
     }
     virtual void TearDown()
     {
@@ -79,6 +85,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_001, TestSize.Level1)
 {
     WIFI_LOGI("StartDhcpServer_001 enter");
     StartDhcpServerTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: StartDhcpServer_002
@@ -94,6 +101,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_002, TestSize.Level1)
     Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
+    EXPECT_NE(pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4),true);
 }
 /**
  * @tc.name: StartDhcpServer_003
@@ -110,6 +118,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_003, TestSize.Level1)
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     std::string ipAddress = "10";
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
+    EXPECT_NE(pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, isIpV4),false);
 }
 /**
  * @tc.name: StartDhcpServer_004
@@ -126,6 +135,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_004, TestSize.Level1)
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     std::string ipAddress = "192.168.62.0";
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, isIpV4);
+    EXPECT_NE(pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, ipAddress, isIpV4),false);
 }
 /**
  * @tc.name: StartDhcpServer_005
@@ -141,6 +151,7 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_005, TestSize.Level1)
     Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
     Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
+    EXPECT_NE(pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4),true);
 }
 
 /**

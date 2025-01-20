@@ -14,14 +14,21 @@
  */
 #include <gtest/gtest.h>
 #include "wifi_asset_manager.h"
+#include "log.h"
  
 using namespace testing::ext;
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void WifiAssetLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 class WifiAssetManagerTest : public testing::Test {
 protected:
     void SetUp() override {
+        LOG_SetCallback(WifiAssetLogCallback);
         // Set up code here
     }
  
@@ -35,6 +42,7 @@ HWTEST_F(WifiAssetManagerTest, TestWifiAssetUpdate, testing::ext::TestSize.Level
     WifiDeviceConfig config;
     int32_t userId = USER_ID_DEFAULT;
     WifiAssetManager::GetInstance().WifiAssetUpdate(config, userId);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  
 HWTEST_F(WifiAssetManagerTest, TestWifiAssetAdd, testing::ext::TestSize.Level1)
@@ -43,12 +51,14 @@ HWTEST_F(WifiAssetManagerTest, TestWifiAssetAdd, testing::ext::TestSize.Level1)
     int32_t userId = USER_ID_DEFAULT;
     bool flagSync = true;
     WifiAssetManager::GetInstance().WifiAssetAdd(config, userId, flagSync);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  
 HWTEST_F(WifiAssetManagerTest, TestWifiAssetQuery, testing::ext::TestSize.Level1)
 {
     int32_t userId = USER_ID_DEFAULT;
     WifiAssetManager::GetInstance().WifiAssetQuery(userId);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  
 HWTEST_F(WifiAssetManagerTest, TestWifiAssetRemove, testing::ext::TestSize.Level1)
@@ -57,6 +67,7 @@ HWTEST_F(WifiAssetManagerTest, TestWifiAssetRemove, testing::ext::TestSize.Level
     int32_t userId = USER_ID_DEFAULT;
     bool flagSync = true;
     WifiAssetManager::GetInstance().WifiAssetRemove(config, userId, flagSync);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  
 HWTEST_F(WifiAssetManagerTest, TestWifiAssetAddPack, testing::ext::TestSize.Level1)
@@ -65,6 +76,7 @@ HWTEST_F(WifiAssetManagerTest, TestWifiAssetAddPack, testing::ext::TestSize.Leve
     int32_t userId = USER_ID_DEFAULT;
     bool flagSync = true;
     WifiAssetManager::GetInstance().WifiAssetAddPack(mWifiDeviceConfig, userId, flagSync);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  
 HWTEST_F(WifiAssetManagerTest, TestWifiAssetRemovePack, testing::ext::TestSize.Level1)
@@ -73,6 +85,7 @@ HWTEST_F(WifiAssetManagerTest, TestWifiAssetRemovePack, testing::ext::TestSize.L
     int32_t userId = USER_ID_DEFAULT;
     bool flagSync = true;
     WifiAssetManager::GetInstance().WifiAssetRemovePack(mWifiDeviceConfig, userId, flagSync);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  
 HWTEST_F(WifiAssetManagerTest, TestWifiAssetRemoveAll, testing::ext::TestSize.Level1)
@@ -80,6 +93,7 @@ HWTEST_F(WifiAssetManagerTest, TestWifiAssetRemoveAll, testing::ext::TestSize.Le
     int32_t userId = USER_ID_DEFAULT;
     bool flagSync = true;
     WifiAssetManager::GetInstance().WifiAssetRemoveAll(userId, flagSync);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  
 HWTEST_F(WifiAssetManagerTest, TestWifiAssetUpdatePack, testing::ext::TestSize.Level1)
@@ -87,6 +101,7 @@ HWTEST_F(WifiAssetManagerTest, TestWifiAssetUpdatePack, testing::ext::TestSize.L
     std::vector<WifiDeviceConfig> mWifiDeviceConfig;
     int32_t userId = USER_ID_DEFAULT;
     WifiAssetManager::GetInstance().WifiAssetUpdatePack(mWifiDeviceConfig, userId);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiAssetManagerTest, InitUpLoadLocalDeviceSyncTest01, testing::ext::TestSize.Level1)

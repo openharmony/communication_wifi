@@ -85,7 +85,7 @@ HWTEST_F(WifiP2pServiceResponseListTest, MergerAndDeduplicate1, TestSize.Level1)
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     responseList.SetDevice(device);
     WifiP2pServiceResponse resp;
-    pWifiP2pServiceResponseList->MergerAndDeduplicate(responseList);
+    EXPECT_FALSE(pWifiP2pServiceResponseList->MergerAndDeduplicate(responseList));
 }
 
 HWTEST_F(WifiP2pServiceResponseListTest, MergerAndDeduplicate2, TestSize.Level1)
@@ -96,7 +96,7 @@ HWTEST_F(WifiP2pServiceResponseListTest, MergerAndDeduplicate2, TestSize.Level1)
     responseList.SetDevice(device);
     WifiP2pServiceResponse resp;
     pWifiP2pServiceResponseList->SetDevice(device);
-    pWifiP2pServiceResponseList->MergerAndDeduplicate(responseList);
+    EXPECT_TRUE(pWifiP2pServiceResponseList->MergerAndDeduplicate(responseList));
 }
 
 HWTEST_F(WifiP2pServiceResponseListTest, MergerAndDeduplicate3, TestSize.Level1)
@@ -107,8 +107,8 @@ HWTEST_F(WifiP2pServiceResponseListTest, MergerAndDeduplicate3, TestSize.Level1)
     responseList.SetDevice(device);
     WifiP2pServiceResponse resp;
     pWifiP2pServiceResponseList->SetDevice(device);
-    responseList.AddServiceResponse(resp);
-    pWifiP2pServiceResponseList->MergerAndDeduplicate(responseList);
+    EXPECT_TRUE(responseList.AddServiceResponse(resp));
+    EXPECT_TRUE(pWifiP2pServiceResponseList->MergerAndDeduplicate(responseList));
 }
 
 HWTEST_F(WifiP2pServiceResponseListTest, MergerAndDeduplicate4, TestSize.Level1)

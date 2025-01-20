@@ -61,6 +61,7 @@ public:
 HWTEST_F(WifiP2pDeviceManagerTest, Initialize_SUCCESS, TestSize.Level1)
 {
     pWifiP2pDeviceManager->Initialize();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pDeviceManagerTest, AddDevice_SUCCESS, TestSize.Level1)

@@ -29,6 +29,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class P2pIdleStateTest : public testing::Test {
     const int TEST_CONFIG_METHOD1 = 8;
     const int TEST_CONFIG_METHOD2 = 128;
@@ -117,11 +118,13 @@ public:
 HWTEST_F(P2pIdleStateTest, GoInState, TestSize.Level1)
 {
     pP2pIdleState->GoInState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pIdleStateTest, GoOutState, TestSize.Level1)
 {
     pP2pIdleState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pIdleStateTest, ExecuteStateMsg1, TestSize.Level1)

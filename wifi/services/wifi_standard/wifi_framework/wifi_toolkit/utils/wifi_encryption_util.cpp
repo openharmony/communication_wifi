@@ -100,6 +100,7 @@ int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::
     int32_t ret = HksGenerateRandom(NULL, &randomIV);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("wifi encryption generate IV failed");
+        (void)memset_s(&plainText, sizeof(plainText), 0, sizeof(plainText));
         return ret;
     }
     struct HksParam IVParam[] = {
@@ -115,6 +116,8 @@ int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::
     ret = GetKeyByAlias(&authId, encryParamSet);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("wifi encryption failed");
+        (void)memset_s(&plainText, sizeof(plainText), 0, sizeof(plainText));
+        HksFreeParamSet(&encryParamSet);
         return ret;
     }
 
@@ -127,11 +130,14 @@ int32_t WifiEncryption(const WifiEncryptionInfo &wifiEncryptionInfo, const std::
     ret = HksEncrypt(&authId, encryParamSet, &plainText, &cipherData);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("Hks encryption failed");
+        (void)memset_s(&plainText, sizeof(plainText), 0, sizeof(plainText));
+        HksFreeParamSet(&encryParamSet);
         return ret;
     }
 
     encryptedData.encryptedPassword = ConvertArrayToHex(cipherBuf, cipherData.size);
     encryptedData.IV = ConvertArrayToHex(nonce, NONCE_SIZE);
+    (void)memset_s(&plainText, sizeof(plainText), 0, sizeof(plainText));
     HksFreeParamSet(&encryParamSet);
     return ret;
 }
@@ -147,6 +153,7 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     uint32_t length = AES_COMMON_SIZE;
     int32_t retStrToArrat = HexStringToVec(encryptedData.encryptedPassword, cipherBuf, AES_COMMON_SIZE, length);
     if (retStrToArrat != 0) {
+        (void)memset_s(cipherBuf, AES_COMMON_SIZE, 0, AES_COMMON_SIZE);
         return HKS_FAILURE;
     }
 
@@ -154,6 +161,7 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     uint32_t lengthIV = NONCE_SIZE;
     retStrToArrat = HexStringToVec(encryptedData.IV, nonce, NONCE_SIZE, lengthIV);
     if (retStrToArrat != 0) {
+        (void)memset_s(cipherBuf, AES_COMMON_SIZE, 0, AES_COMMON_SIZE);
         return HKS_FAILURE;
     }
     struct HksParam IVParam[] = {
@@ -171,6 +179,8 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     int32_t ret = HksKeyExist(&authId, decryParamSet);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("wifi decryption key not exist");
+        (void)memset_s(cipherBuf, AES_COMMON_SIZE, 0, AES_COMMON_SIZE);
+        HksFreeParamSet(&decryParamSet);
         return ret;
     }
     uint8_t plainBuff[AES_COMMON_SIZE] = {0};
@@ -182,11 +192,16 @@ int32_t WifiDecryption(const WifiEncryptionInfo &wifiEncryptionInfo, const Encry
     ret = HksDecrypt(&authId, decryParamSet, &cipherData, &plainText);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("Hks decryption failed");
+        (void)memset_s(cipherBuf, AES_COMMON_SIZE, 0, AES_COMMON_SIZE);
+        HksFreeParamSet(&decryParamSet);
         return ret;
     }
 
     std::string temp(plainText.data, plainText.data + plainText.size);
     decryptedData = temp;
+    std::fill(temp.begin(), temp.end(), 0);
+    (void)memset_s(cipherBuf, AES_COMMON_SIZE, 0, AES_COMMON_SIZE);
+    (void)memset_s(&plainText, sizeof(plainText), 0, sizeof(plainText));
     HksFreeParamSet(&decryParamSet);
     return ret;
 }
@@ -207,6 +222,7 @@ int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSe
         outDataSeg.data = (uint8_t *)malloc(outDataSeg.size);
         if (outDataSeg.data == nullptr) {
             WIFI_LOGE("HksUpdateAndFinish malloc failed.");
+            (void)memset_s(&inDataSeg, sizeof(inDataSeg), 0, sizeof(inDataSeg));
             return HKS_FAILURE;
         }
         int32_t hksResult = 0;
@@ -217,18 +233,21 @@ int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSe
         }
         if (hksResult != HKS_SUCCESS) {
             WIFI_LOGE("HksUpdateAndFinish do HksUpdate or HksFinish failed: %{public}d.", hksResult);
+            (void)memset_s(&inDataSeg, sizeof(inDataSeg), 0, sizeof(inDataSeg));
             free(outDataSeg.data);
             outDataSeg.data = nullptr;
             return HKS_FAILURE;
         }
         if (handledOutDataSize + outDataSeg.size > outData->size) {
             WIFI_LOGE("HksUpdateAndFinish outData->size is too small.");
+            (void)memset_s(&inDataSeg, sizeof(inDataSeg), 0, sizeof(inDataSeg));
             free(outDataSeg.data);
             outDataSeg.data = nullptr;
             return HKS_FAILURE;
         }
         if (memcpy_s(handledOutData, outDataSeg.size, outDataSeg.data, outDataSeg.size) != EOK) {
             WIFI_LOGE("HksUpdateAndFinish memcpy_s failed.");
+            (void)memset_s(&inDataSeg, sizeof(inDataSeg), 0, sizeof(inDataSeg));
             free(outDataSeg.data);
             outDataSeg.data = nullptr;
             return HKS_FAILURE;
@@ -242,6 +261,7 @@ int32_t HksUpdateAndFinish(const struct HksBlob *handle, const struct HksParamSe
     }
     outData->size = handledOutDataSize;
     WIFI_LOGI("HksUpdateAndFinish outData.size: %{public}d.", static_cast<int>(outData->size));
+    (void)memset_s(&inDataSeg, sizeof(inDataSeg), 0, sizeof(inDataSeg));
     return HKS_SUCCESS;
 }
 
@@ -269,19 +289,21 @@ int32_t ImportKey(const WifiEncryptionInfo &wifiEncryptionInfo, const std::strin
     int32_t keyExist = HksKeyExist(&authId, encryParamSet);
     if (keyExist == HKS_ERROR_NOT_EXIST) {
         int32_t ret = HksImportKey(&authId, encryParamSet, &hksKey);
-        if (memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey)) != EOK) {
-            WIFI_LOGE("ImportKey memset_s return error!");
-            return HKS_FAILURE;
-        }
+        (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
         if (ret != HKS_SUCCESS) {
             WIFI_LOGE("ImportKey failed: %{public}d.", ret);
         }
+        HksFreeParamSet(&encryParamSet);
         return ret;
     } else if (keyExist == HKS_SUCCESS) {
         WIFI_LOGI("ImportKey key is exist, donot need import key.");
+        (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
+        HksFreeParamSet(&encryParamSet);
         return HKS_SUCCESS;
     }
     WIFI_LOGE("ImportKey HksKeyExist check failed: %{public}d.", keyExist);
+    (void)memset_s(aesKey, sizeof(aesKey), 0, sizeof(aesKey));
+    HksFreeParamSet(&encryParamSet);
     return keyExist;
 }
 
@@ -304,12 +326,15 @@ int32_t DeleteKey(const WifiEncryptionInfo &wifiEncryptionInfo)
         if (ret != HKS_SUCCESS) {
             WIFI_LOGE("DeleteKey failed: %{public}d.", ret);
         }
+        HksFreeParamSet(&encryParamSet);
         return ret;
     } else if (keyExist == HKS_ERROR_NOT_EXIST) {
         WIFI_LOGI("DeleteKey key is not exist, donot need delete key.");
+        HksFreeParamSet(&encryParamSet);
         return HKS_SUCCESS;
     }
     WIFI_LOGE("DeleteKey HksKeyExist check failed: %{public}d.", keyExist);
+    HksFreeParamSet(&encryParamSet);
     return keyExist;
 }
 
@@ -337,6 +362,7 @@ int32_t EncryptParamSet(struct HksParamSet **encryParamSet, const WifiEncryption
     int32_t ret = HksKeyExist(&authId, *encryParamSet);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("EncryptParamSet Key is not exist.");
+        HksFreeParamSet(encryParamSet);
         return ret;
     }
     return HKS_SUCCESS;
@@ -374,6 +400,7 @@ int32_t DecryptParamSet(struct HksParamSet **decryParamSet, const WifiEncryption
     int32_t ret = HksKeyExist(&authId, *decryParamSet);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("DecryptParamSet Key is not exist.");
+        HksFreeParamSet(decryParamSet);
         return ret;
     }
     return HKS_SUCCESS;
@@ -400,6 +427,7 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
     ret = HksInit(&authId, encryParamSet, &handleEncrypt, nullptr);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("WifiLoopEncrypt HksInit failed: %{public}d.", ret);
+        HksFreeParamSet(&encryParamSet);
         return ret;
     }
 
@@ -407,12 +435,17 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
     uint8_t *cipherBuf = (uint8_t *)malloc(inputString.length() + AEAD_SIZE);
     if (cipherBuf == nullptr) {
         WIFI_LOGE("WifiLoopEncrypt malloc failed.");
+        (void)memset_s(&inData, sizeof(inData), 0, sizeof(inData));
+        HksFreeParamSet(&encryParamSet);
         return HKS_FAILURE;
     }
     struct HksBlob outData = { inputString.length() + AEAD_SIZE, cipherBuf };
     ret = HksUpdateAndFinish(&handleEncrypt, encryParamSet, &inData, &outData);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("WifiLoopEncrypt HksUpdateAndFinish failed: %{public}d.", ret);
+        (void)memset_s(&inData, sizeof(inData), 0, sizeof(inData));
+        (void)memset_s(&outData, sizeof(outData), 0, sizeof(outData));
+        HksFreeParamSet(&encryParamSet);
         free(cipherBuf);
         cipherBuf = nullptr;
         return ret;
@@ -420,6 +453,9 @@ int32_t WifiLoopEncrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const std:
 
     std::string temp(outData.data, outData.data + outData.size);
     encryptedData.encryptedPassword = temp;
+    std::fill(temp.begin(), temp.end(), 0);
+    (void)memset_s(&inData, sizeof(inData), 0, sizeof(inData));
+    (void)memset_s(&outData, sizeof(outData), 0, sizeof(outData));
     HksFreeParamSet(&encryParamSet);
     free(cipherBuf);
     cipherBuf = nullptr;
@@ -447,6 +483,7 @@ int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const Encr
     ret = HksInit(&authId, decryParamSet, &handleDecrypt, nullptr);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("WifiLoopDecrypt HksInit failed: %{public}d.", ret);
+        HksFreeParamSet(&decryParamSet);
         return ret;
     }
 
@@ -456,19 +493,26 @@ int32_t WifiLoopDecrypt(const WifiEncryptionInfo &wifiEncryptionInfo, const Encr
     uint8_t *plainBuf = (uint8_t *)malloc(cipherLength);
     if (plainBuf == nullptr) {
         WIFI_LOGE("WifiLoopDecrypt malloc failed.");
+        (void)memset_s(&inData, sizeof(inData), 0, sizeof(inData));
+        HksFreeParamSet(&decryParamSet);
         return HKS_FAILURE;
     }
     struct HksBlob outData = { cipherLength, plainBuf };
     ret = HksUpdateAndFinish(&handleDecrypt, decryParamSet, &inData, &outData);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("WifiLoopDecrypt HksUpdateAndFinish failed: %{public}d.", ret);
+        (void)memset_s(&inData, sizeof(inData), 0, sizeof(inData));
+        (void)memset_s(&outData, sizeof(outData), 0, sizeof(outData));
+        HksFreeParamSet(&decryParamSet);
         free(plainBuf);
         plainBuf = nullptr;
         return ret;
     }
     std::string temp(outData.data, outData.data + outData.size);
-    if (memset_s(outData.data, outData.size, 0, outData.size) != EOK) {
+    if (memset_s(outData.data, outData.size, 0, outData.size) != EOK ||
+        memset_s(inData.data, inData.size, 0, inData.size) != EOK) {
         WIFI_LOGE("WifiLoopDecrypt memset_s return error!");
+        HksFreeParamSet(&decryParamSet);
         free(plainBuf);
         plainBuf = nullptr;
         return HKS_FAILURE;
@@ -539,6 +583,7 @@ int32_t WifiGenerateMacRandomizationSecret(const std::string &keyName,
     ret = GetKeyByAlias(&keyAlias, hmacParamSet);
     if (ret == HKS_ERROR_NOT_EXIST) {
         WIFI_LOGE("%{public}s GetKeyByAlias:[%{public}s] failed:%{public}d", __func__, keyName.c_str(), ret);
+        HksFreeParamSet(&hmacParamSet);
         return ret;
     }
 
@@ -554,6 +599,7 @@ int32_t WifiGenerateMacRandomizationSecret(const std::string &keyName,
     ret = CalculateHksHmac(&keyAlias, hmacParamSet, &inData, &hashText);
     if (ret != HKS_SUCCESS) {
         WIFI_LOGE("%{public}s HksHmacTest failed :%{public}d", __func__, ret);
+        HksFreeParamSet(&hmacParamSet);
         return ret;
     }
 

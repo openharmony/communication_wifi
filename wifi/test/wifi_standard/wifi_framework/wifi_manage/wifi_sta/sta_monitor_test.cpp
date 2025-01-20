@@ -31,12 +31,18 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void StaMonitorCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 class StaMonitorTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        LOG_SetCallback(StaMonitorCallback);
         pStaMonitor = std::make_unique<StaMonitor>();
         pStaMonitor->pStaStateMachine = new StaStateMachine();
         InitStaMonitorSuccess();
@@ -83,8 +89,6 @@ public:
     void OnWpaStaNotifyCallBackFail();
     void OnWpaStaNotifyCallBackFail1();
     void OnWpaStaNotifyCallBackFail2();
-    void OnReportDisConnectReasonCallBackSuccess();
-    void OnReportDisConnectReasonCallBackFail();
 };
 
 void StaMonitorTest::InitStaMonitorSuccess()
@@ -176,14 +180,14 @@ void StaMonitorTest::OnConnectChangedCallBackFail3()
 void StaMonitorTest::OnWpaStateChangedCallBackSuccess()
 {
     int status = 1;
-    pStaMonitor->OnWpaStateChangedCallBack(status);
+    pStaMonitor->OnWpaStateChangedCallBack(status, "test");
 }
 
 void StaMonitorTest::OnWpaStateChangedCallBackFail1()
 {
     int status = 1;
     pStaMonitor->pStaStateMachine = nullptr;
-    pStaMonitor->OnWpaStateChangedCallBack(status);
+    pStaMonitor->OnWpaStateChangedCallBack(status, "test");
 }
 
 void StaMonitorTest::OnWpaSsidWrongKeyCallBackSuccess()
@@ -319,179 +323,184 @@ void StaMonitorTest::OnWpaStaNotifyCallBackFail2()
     pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
 }
 
-void StaMonitorTest::OnReportDisConnectReasonCallBackSuccess()
-{
-    int reason = 1;
-    std::string bssid = "02:42:ac:11:00:04";
-    pStaMonitor->OnReportDisConnectReasonCallBack(reason, bssid);
-}
-
-void StaMonitorTest::OnReportDisConnectReasonCallBackFail()
-{
-    int reason = 1;
-    std::string bssid = "02:42:ac:11:00:04";
-    pStaMonitor->pStaStateMachine = nullptr;
-    pStaMonitor->OnReportDisConnectReasonCallBack(reason, bssid);
-}
-
 HWTEST_F(StaMonitorTest, InitStaMonitorSuccess, TestSize.Level1)
 {
     InitStaMonitorSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, InitStaMonitorFail, TestSize.Level1)
 {
     InitStaMonitorFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, UnInitStaMonitorSuccess, TestSize.Level1)
 {
     UnInitStaMonitorSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, UnInitStaMonitorFail, TestSize.Level1)
 {
     UnInitStaMonitorFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackFail1, TestSize.Level1)
 {
     OnConnectChangedCallBackFail1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackFail2, TestSize.Level1)
 {
     OnConnectChangedCallBackFail2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackSuccess1, TestSize.Level1)
 {
     OnConnectChangedCallBackSuccess1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackSuccess2, TestSize.Level1)
 {
     OnConnectChangedCallBackSuccess2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnConnectChangedCallBackSuccess3, TestSize.Level1)
 {
     OnConnectChangedCallBackSuccess3();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaStateChangedCallBackSuccess, TestSize.Level1)
 {
     OnWpaStateChangedCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaStateChangedCallBackFail1, TestSize.Level1)
 {
     OnWpaStateChangedCallBackFail1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackSuccess, TestSize.Level1)
 {
     OnWpaSsidWrongKeyCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaSsidWrongKeyCallBackFail, TestSize.Level1)
 {
     OnWpaSsidWrongKeyCallBackFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpsPbcOverlapCallBackSuccess, TestSize.Level1)
 {
     OnWpsPbcOverlapCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpsPbcOverlapCallBackFail1, TestSize.Level1)
 {
     OnWpsPbcOverlapCallBackFail1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpsTimeOutCallBackSuccess, TestSize.Level1)
 {
     OnWpsTimeOutCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpsTimeOutCallBackFail1, TestSize.Level1)
 {
     OnWpsTimeOutCallBackFail1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnBssidChangedCallBackSuccess, TestSize.Level1)
 {
     OnBssidChangedCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnBssidChangedCallBackFail, TestSize.Level1)
 {
     OnBssidChangedCallBackFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnBssidChangedCallBackFail1, TestSize.Level1)
 {
     OnBssidChangedCallBackFail1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnBssidChangedCallBackFail2, TestSize.Level1)
 {
     OnBssidChangedCallBackFail2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaConnectionFullCallBackSuccess, TestSize.Level1)
 {
     OnWpaConnectionFullCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaConnectionFullCallBackFail, TestSize.Level1)
 {
     OnWpaConnectionFullCallBackFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaConnectionRejectCallBackSuccess, TestSize.Level1)
 {
     OnWpaConnectionRejectCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaConnectionRejectCallBackFail, TestSize.Level1)
 {
     OnWpaConnectionRejectCallBackFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaHilinkCallBackSuccess, TestSize.Level1)
 {
     OnWpaHilinkCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackSuccess, TestSize.Level1)
 {
     OnWpaStaNotifyCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail, TestSize.Level1)
 {
     OnWpaStaNotifyCallBackFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail1, TestSize.Level1)
 {
     OnWpaStaNotifyCallBackFail1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail2, TestSize.Level1)
 {
     OnWpaStaNotifyCallBackFail2();
-}
-
-HWTEST_F(StaMonitorTest, OnReportDisConnectReasonCallBackSuccess, TestSize.Level1)
-{
-    OnReportDisConnectReasonCallBackSuccess();
-}
-
-HWTEST_F(StaMonitorTest, OnReportDisConnectReasonCallBackFail, TestSize.Level1)
-{
-    OnReportDisConnectReasonCallBackFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 } // WIFI
 } // OHOS

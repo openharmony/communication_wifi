@@ -82,6 +82,7 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
         // save the indexes of saved network candidate in networkCandidates;
         if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID) {
             wifiDeviceConfigs.insert({networkCandidate.wifiDeviceConfig.networkId, networkCandidates.size() - 1});
+            WifiSettings::GetInstance().SetNetworkCandidateScanResult(networkCandidate.wifiDeviceConfig.networkId);
             continue;
         }
 
@@ -101,7 +102,8 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
             wifiDevicesInfo << ",";
         }
         wifiDevicesInfo << "\"" << pair.first << "_" <<
-            SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "\"";
+            SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "_" <<
+            networkCandidates.at(pair.second).wifiDeviceConfig.keyMgmt << "\"";
     }
     WIFI_LOGI("Find savedNetworks in scanInfos: [%{public}s]", wifiDevicesInfo.str().c_str());
 

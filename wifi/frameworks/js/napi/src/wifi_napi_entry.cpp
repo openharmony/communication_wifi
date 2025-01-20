@@ -185,6 +185,8 @@ static napi_value WifiCategoryInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::DEFAULT), "DEFAULT");
     SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI6), "WIFI6");
     SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI6_PLUS), "WIFI6_PLUS");
+    SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI7), "WIFI7");
+    SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI7_PLUS), "WIFI7_PLUS");
     return wifiCategory;
 }
 static napi_value WifiDetailStateInit(napi_env env)
@@ -357,12 +359,14 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getIpInfo", GetIpInfo),
         DECLARE_NAPI_FUNCTION("getIpv6Info", GetIpv6Info),
         DECLARE_NAPI_FUNCTION("getLinkedInfo", GetLinkedInfo),
+        DECLARE_NAPI_FUNCTION("getLinkedInfoSync", GetLinkedInfoSync),
         DECLARE_NAPI_FUNCTION("getDisconnectedReason", GetDisconnectedReason),
         DECLARE_NAPI_FUNCTION("isMeteredHotspot", IsMeteredHotspot),
         DECLARE_NAPI_FUNCTION("removeDevice", RemoveDevice),
         DECLARE_NAPI_FUNCTION("removeDeviceConfig", RemoveDevice),
         DECLARE_NAPI_FUNCTION("removeAllNetwork", RemoveAllNetwork),
         DECLARE_NAPI_FUNCTION("removeAllDeviceConfigs", RemoveAllNetwork),
+        DECLARE_NAPI_FUNCTION("allowAutoConnect", AllowAutoConnect),
         DECLARE_NAPI_FUNCTION("disableNetwork", DisableNetwork),
         DECLARE_NAPI_FUNCTION("disableDeviceConfig", DisableNetwork),
         DECLARE_NAPI_FUNCTION("getWifiDetailState", GetWifiDetailState),
@@ -375,6 +379,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getDeviceMacAddress", GetDeviceMacAddress),
         DECLARE_NAPI_FUNCTION("isHotspotActive", IsHotspotActive),
         DECLARE_NAPI_FUNCTION("isHotspotDualBandSupported", IsHotspotDualBandSupported),
+        DECLARE_NAPI_FUNCTION("isOpenSoftApAllowed", IsOpenSoftApAllowed),
         DECLARE_NAPI_FUNCTION("setHotspotIdleTimeout", SetHotspotIdleTimeout),
         DECLARE_NAPI_FUNCTION("enableHotspot", EnableHotspot),
         DECLARE_NAPI_FUNCTION("disableHotspot", DisableHotspot),

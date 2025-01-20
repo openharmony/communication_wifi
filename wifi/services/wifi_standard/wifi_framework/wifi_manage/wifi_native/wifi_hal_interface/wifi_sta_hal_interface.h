@@ -68,7 +68,7 @@ public:
      *
      * @return WifiErrorNo
      */
-    WifiErrorNo Reassociate(void);
+    WifiErrorNo Reassociate(const std::string &ifaceName);
 
     /**
      * @Description Disconnect Wifi.
@@ -91,8 +91,8 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName);
-    
+    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName, int macSrc = 0);
+
     /**
      * @Description Sets the Wi-Fi country code.
      *
@@ -333,7 +333,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,
-        WifiHalWpaSignalInfo &info);
+        WifiSignalPollInfo &info);
 
     /**
      * @Description set power save mode
@@ -412,6 +412,21 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
+
+    /**
+     * @Description get wifi7 mlo link info
+     *
+     * @param ifName - interface name
+     * @param mloLinkInfo - MLO link info
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetConnectionMloLinkedInfo(const std::string &ifName, std::vector<WifiLinkedInfo> &mloLinkInfo);
+
+private:
+#ifdef READ_MAC_FROM_OEM
+    std::string GetWifiOeminfoMac();
+    std::string wifiOemMac_ = "";
+#endif
 
 private:
     WifiEventCallback mStaCallback[2];

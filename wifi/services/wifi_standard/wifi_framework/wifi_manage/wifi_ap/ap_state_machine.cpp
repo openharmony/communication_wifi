@@ -131,7 +131,6 @@ bool ApStateMachine::StartDhcpServer(const std::string &ipAddress, const int32_t
     WifiNetAgent::GetInstance().AddRoute(ifaceName, ipv4.GetAddressWithString(), ipv4.GetAddressPrefixLength());
     hotspotConfig.SetIpAddress(ipv4.GetAddressWithString());
     WifiSettings::GetInstance().SetHotspotConfig(hotspotConfig, m_id);
-    WifiSettings::GetInstance().SyncHotspotConfig();
     WIFI_LOGI("Start dhcp server for AP finished.");
     return true;
 #else

@@ -528,7 +528,12 @@ void WifiAssetManager::DealStaConnChanged(OperateResState state, const WifiLinke
 {
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         LOGI("WifiAsset network connected");
-        WifiAssetTriggerSync();
+        if (info.networkId != currentConnectedNetworkId_) {
+            WifiAssetTriggerSync();
+        }
+        currentConnectedNetworkId_ = info.networkId;
+    } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        currentConnectedNetworkId_ = -1;
     }
 }
 }  // namespace Wifi

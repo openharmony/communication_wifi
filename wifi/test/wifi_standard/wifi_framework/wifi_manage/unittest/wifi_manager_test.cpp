@@ -476,6 +476,16 @@ HWTEST_F(WifiManagerTest, CheckSoftApStartedTest, TestSize.Level1)
     wifiManager.wifiMultiVapManager->CheckSoftApStarted();
 }
 
+HWTEST_F(WifiManagerTest, CheckEnhanceWifiConnectedTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->CheckEnhanceWifiConnected();
+}
+
+HWTEST_F(WifiManagerTest, VapConflictReportTest, TestSize.Level1)
+{
+    wifiManager.wifiMultiVapManager->VapConflictReport();
+}
+
 HWTEST_F(WifiManagerTest, ForceStopSoftApTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->ForceStopSoftAp();

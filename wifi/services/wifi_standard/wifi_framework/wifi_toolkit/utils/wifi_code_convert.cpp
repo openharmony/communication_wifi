@@ -113,9 +113,6 @@ std::string WifiCodeConvertUtil::Convert(const std::string &str, const std::stri
     UErrorCode status = U_ZERO_ERROR;
     int32_t resultlen  = ucnv_convert(toCharset.c_str(), fromCharset.c_str(), nullptr, 0, str.c_str(),
         str.length(), &status);
-    if (U_FAILURE(status)) {
-        return str;
-    }
     std::unique_ptr<char[]> result = std::make_unique<char[]>(resultlen + 1);
     memset_s(result.get(), resultlen + 1, 0, resultlen + 1);
     status = U_ZERO_ERROR;

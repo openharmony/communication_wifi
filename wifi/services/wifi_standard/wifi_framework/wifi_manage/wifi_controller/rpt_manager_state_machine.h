@@ -28,6 +28,11 @@
 
 namespace OHOS::Wifi {
 
+enum {
+    P2P_BRIDGE_OFF,
+    P2P_BRIDGE_ON
+};
+
 class RptManagerMachine : public StateMachine {
 public:
     RptManagerMachine();

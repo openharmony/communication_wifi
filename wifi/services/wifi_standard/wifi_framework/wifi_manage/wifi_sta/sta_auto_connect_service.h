@@ -217,6 +217,14 @@ private:
      * @Return success : true  failed : false
      */
     bool Whether5GDevice(int frequency);
+
+    /**
+     * @Description  override the candidate chosen by autoConnectSelector with the user chosen if one exists
+     *
+     * @param candidate chosen by autoConnectSelector
+     * @Return true if candidate be overrid otherwise false
+     */
+    bool OverrideCandidateWithUserSelectChoice(NetworkSelectionResult &candidate);
 };
 }  // namespace Wifi
 }  // namespace OHOS

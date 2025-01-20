@@ -31,6 +31,8 @@ public:
     void ParseTcpReportMsg(const std::vector<int64_t> &elems, int32_t cmd);
     void HandleTcpPktsResp(const std::vector<int64_t> &elems);
     bool ParseNetworkInternetGood(const std::vector<int64_t> &elems);
+    int64_t GetCurrentTcpTxCounter();
+    int64_t GetCurrentTcpRxCounter();
 private:
     bool AllowSelfCureNetwork(int32_t currentRssi);
     int32_t mInstId = 0;

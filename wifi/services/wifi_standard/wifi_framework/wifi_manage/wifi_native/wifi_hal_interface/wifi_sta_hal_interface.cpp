@@ -21,6 +21,9 @@
 #include "wifi_code_convert.h"
 #include "wifi_config_center.h"
 #include "define.h"
+#ifdef READ_MAC_FROM_OEM
+#include "wifi_oeminfo_mac.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "WifiStaHalInterface"
@@ -107,11 +110,11 @@ WifiErrorNo WifiStaHalInterface::Reconnect(void)
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::Reassociate(void)
+WifiErrorNo WifiStaHalInterface::Reassociate(const std::string &ifaceName)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqReassociate(WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
+    return mHdiWpaClient->ReqReassociate(ifaceName.c_str());
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqReassociate();
@@ -141,8 +144,19 @@ WifiErrorNo WifiStaHalInterface::GetStaCapabilities(unsigned int &capabilities)
 #endif
 }
 
-WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName)
+WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName, int macSrc)
 {
+#ifdef READ_MAC_FROM_OEM
+    LOGI("GetStaDeviceMacAddress oem enter, %{public}d", macSrc);
+    if (macSrc == WIFI_OEMINFO_MAC &&
+        ifaceName == WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0)) {
+        mac = wifiOemMac_ == ""? GetWifiOeminfoMac() : wifiOemMac_;
+    }
+    if (!mac.empty()) {
+        wifiOemMac_ = mac;
+        return WIFI_HAL_OPT_OK;
+    }
+#endif
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->GetStaDeviceMacAddress(mac, ifaceName.c_str());
@@ -151,6 +165,21 @@ WifiErrorNo WifiStaHalInterface::GetStaDeviceMacAddress(std::string &mac, const 
     return mIdlClient->GetStaDeviceMacAddress(mac);
 #endif
 }
+
+#ifdef READ_MAC_FROM_OEM
+std::string WifiStaHalInterface::GetWifiOeminfoMac()
+{
+    LOGI("read mac from oem");
+    WifiOeminfoMac oeminfoMac;
+    std::string oemMac = "";
+    int ret = oeminfoMac.GetOeminfoMac(oemMac);
+    if (ret != 0) {
+        LOGE("GetWifiOeminfoMac fail, ret = %{public}d", ret);
+        return std::string("");
+    }
+    return oemMac;
+}
+#endif
 
 WifiErrorNo WifiStaHalInterface::SetWifiCountryCode(const std::string &ifaceName, const std::string &code)
 {
@@ -614,7 +643,7 @@ WifiErrorNo WifiStaHalInterface::WpaBlocklistClear()
 }
 
 WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,
-    WifiHalWpaSignalInfo &info)
+    WifiSignalPollInfo &info)
 {
     if (endBssid.length() != HAL_BSSID_LENGTH) {
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
@@ -640,6 +669,8 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceNa
     info.chloadSelf = signalPollResult.chloadSelf;
     info.c0Rssi = signalPollResult.c0Rssi;
     info.c1Rssi = signalPollResult.c1Rssi;
+    info.ext = signalPollResult.ext.data();
+    info.extLen = signalPollResult.ext.size();
     return WIFI_HAL_OPT_OK;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
@@ -766,6 +797,20 @@ WifiErrorNo WifiStaHalInterface::RegisterNativeProcessCallback(const std::functi
     return mHdiWpaClient->ReqRegisterNativeProcessCallback(callback);
 #endif
     return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &ifName,
+    std::vector<WifiLinkedInfo> &mloLinkInfo)
+{
+    if (ifName.length() <= 0) {
+        return WIFI_HAL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->GetMloLinkedInfo(ifName, mloLinkInfo);
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

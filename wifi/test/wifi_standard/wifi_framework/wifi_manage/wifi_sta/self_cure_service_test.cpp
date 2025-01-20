@@ -53,22 +53,10 @@ public:
         pSelfCureService->InitSelfCureService();
     }
 
-    void RegisterSelfCureServiceCallbackTest()
-    {
-        std::vector<SelfCureServiceCallback> callbacks;
-        pSelfCureService->RegisterSelfCureServiceCallback(callbacks);
-    }
-
     void HandleRssiLevelChangedTest()
     {
         int rssi = MIN_VAL_LEVEL_4;
         pSelfCureService->HandleRssiLevelChanged(rssi);
-    }
-
-    void HandleP2pConnChangedTest()
-    {
-        WifiP2pLinkedInfo info;
-        pSelfCureService->HandleP2pConnChanged(info);
     }
 
     void HandleStaConnChangedTest()
@@ -112,19 +100,9 @@ HWTEST_F(SelfCureServiceTest, InitSelfCureServiceTest, TestSize.Level1)
     InitSelfCureServiceTest();
 }
 
-HWTEST_F(SelfCureServiceTest, RegisterSelfCureServiceCallbackTest, TestSize.Level1)
-{
-    RegisterSelfCureServiceCallbackTest();
-}
-
 HWTEST_F(SelfCureServiceTest, HandleRssiLevelChangedTest, TestSize.Level1)
 {
     HandleRssiLevelChangedTest();
-}
-
-HWTEST_F(SelfCureServiceTest, HandleP2pConnChangedTest, TestSize.Level1)
-{
-    HandleP2pConnChangedTest();
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest, TestSize.Level1)

@@ -134,7 +134,6 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess1()
     GetInterScanInfoVector(scanInfos);
     GetWifiLinkedInfo(info);
 
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     deviceConfig.networkId = 0;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _, _))
@@ -160,7 +159,6 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess2()
 
     deviceConfig.isPasspoint = false;
     deviceConfig.isEphemeral = false;
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     deviceConfig.networkId = 0;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _, _))
@@ -183,7 +181,6 @@ void StaSavedDeviceAppraisalTest::SaveNetworkEvaluatorSuccess3()
 
     deviceConfig.isPasspoint = false;
     deviceConfig.isEphemeral = false;
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     deviceConfig.networkId = 0;
 
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(scanInfos[0].ssid, DEVICE_CONFIG_INDEX_SSID, _, _))
@@ -314,7 +311,6 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess1()
     GetWifiDeviceConfig(deviceConfig);
     deviceConfig.isPasspoint = false;
     deviceConfig.isEphemeral = false;
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
 
     EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == false);
 }
@@ -325,7 +321,6 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess2()
     GetWifiDeviceConfig(deviceConfig);
     deviceConfig.isPasspoint = false;
     deviceConfig.isEphemeral = false;
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetConnectTimeoutBssid(_))
         .Times(AtLeast(1))
         .WillRepeatedly(Return("2a:76:93:47:e2:8a"));
@@ -338,7 +333,6 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceSuccess3()
     GetWifiDeviceConfig(deviceConfig);
     deviceConfig.isPasspoint = false;
     deviceConfig.isEphemeral = false;
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetConnectTimeoutBssid(_))
         .Times(AtLeast(1))
         .WillRepeatedly(Return("2a:76:93:00:52:2a"));
@@ -351,7 +345,6 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceFail1()
     GetWifiDeviceConfig(deviceConfig);
     deviceConfig.isPasspoint = true;
     deviceConfig.isEphemeral = true;
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == true);
 }
 
@@ -361,7 +354,6 @@ void StaSavedDeviceAppraisalTest::WhetherSkipDeviceFail2()
     GetWifiDeviceConfig(deviceConfig);
     deviceConfig.isPasspoint = false;
     deviceConfig.isEphemeral = true;
-    deviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
     EXPECT_TRUE(pStaSavedDeviceAppraisal->WhetherSkipDevice(deviceConfig) == true);
 }
 

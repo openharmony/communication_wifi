@@ -121,6 +121,16 @@ int IsHotspotActive(void);
 WifiErrorCode GetStationList(StationInfo *result, unsigned int *size);
 
 /**
+ * @brief Obtains the number of stations connected to this hotspot.
+ *
+ * @param number Indicates stations number.
+ * @return Returns {@link WIFI_SUCCESS} if the number of stations connected to this hotspot is obtained;
+ *  returns an error code defined in {@link WifiErrorCode} otherwise.
+ * @since 16
+ */
+WifiErrorCode GetStationNum(unsigned int *number);
+
+/**
  * @brief Disconnects from the station with a specified MAC address.
  *
  * @param mac Indicates the pointer to the MAC address of the station.

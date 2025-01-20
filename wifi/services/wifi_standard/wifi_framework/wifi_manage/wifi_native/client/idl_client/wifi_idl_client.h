@@ -331,7 +331,7 @@ public:
      * @param info - signal info
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiHalWpaSignalInfo &info) const;
+    WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiSignalPollInfo &info) const;
 
     /**
      * @Description set power save mode

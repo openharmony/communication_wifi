@@ -105,10 +105,6 @@ bool StaSavedDeviceAppraisal::WhetherSkipDevice(WifiDeviceConfig &device)
         return true;
     }
 
-    if (device.status == static_cast<int>(WifiDeviceConfigStatus::DISABLED)) {
-        WIFI_LOGI("Skip disabled Network %{public}s.", SsidAnonymize(device.ssid).c_str());
-        return true;
-    }
     std::string bssid = WifiConfigCenter::GetInstance().GetConnectTimeoutBssid(m_instId);
     if (!bssid.empty() && bssid == device.bssid) {
         WIFI_LOGI("Skip the connect timeout Network %{public}s.", SsidAnonymize(device.ssid).c_str());

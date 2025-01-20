@@ -168,6 +168,7 @@ bool WifiCountryCodePolicy::IsContainBssid(const std::vector<std::string> &bssid
 
 ErrCode WifiCountryCodePolicy::StatisticCountryCodeFromScanResult(std::string &wifiCountryCode)
 {
+    std::lock_guard<std::mutex> guard(countryCodeFromScanResult);
     std::vector<WifiScanInfo> results;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(results);
     if (results.size() == 0) {

@@ -525,7 +525,7 @@ void WifiP2pGroupInfo::SetClientDevices(const std::vector<WifiP2pDevice> &device
     clientDevices = devices;
 }
 
-void WifiP2pGroupInfo::SetClientPersistentDevices(const std::vector<WifiP2pDevice> &devices)
+void WifiP2pGroupInfo::SetPersistentDevices(const std::vector<WifiP2pDevice> &devices)
 {
     persistentClients = devices;
 }
@@ -544,6 +544,16 @@ void WifiP2pGroupInfo::SetCreatorUid(int uid)
 int WifiP2pGroupInfo::GetCreatorUid()
 {
     return creatorUid;
+}
+
+void WifiP2pGroupInfo::SetPersistentFlag(bool falg)
+{
+    isOldPersistenGroup = falg;
+}
+
+bool WifiP2pGroupInfo::GetPersistentFlag(void)
+{
+    return isOldPersistenGroup;
 }
 
 void WpsInfo::SetWpsMethod(WpsMethod wpsMethod)

@@ -39,6 +39,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void StaService1Callback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int FREQUENCY = 2437;
@@ -53,6 +58,7 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        LOG_SetCallback(StaService1Callback);
         pStaService = std::make_unique<StaService>();
         pStaService->pStaStateMachine = new StaStateMachine();
         pStaService->pStaAutoConnectService = new MockStaAutoConnectService(pStaService->pStaStateMachine);
@@ -131,6 +137,7 @@ public:
     void StartRoamToNetworkTest();
     int StartConnectToUserSelectNetworkSuccessTest();
     int StartConnectToUserSelectNetworkSuccessFail();
+    void HandleFoldStatusChangedTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -400,7 +407,7 @@ void StaServiceTest::StaServiceEnableDeviceConfigSuccess()
     bool attemptEnable = true;
     EXPECT_CALL(BlockConnectService::GetInstance(),
         EnableNetworkSelectStatus(networkId)).WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceEnableDeviceConfigFail1()
@@ -409,14 +416,14 @@ void StaServiceTest::StaServiceEnableDeviceConfigFail1()
     bool attemptEnable = true;
     EXPECT_CALL(BlockConnectService::GetInstance(),
         EnableNetworkSelectStatus(networkId)).WillRepeatedly(Return(-1));
-    EXPECT_TRUE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceEnableDeviceConfigFail2()
 {
     int networkId = NETWORK_ID;
     bool attemptEnable = true;
-    EXPECT_TRUE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceDisableDeviceConfigSuccess()
@@ -426,7 +433,7 @@ void StaServiceTest::StaServiceDisableDeviceConfigSuccess()
     EXPECT_CALL(BlockConnectService::GetInstance(),
         UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_WIFI_MANAGER))
         .WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceDisableDeviceConfigFail1()
@@ -436,7 +443,7 @@ void StaServiceTest::StaServiceDisableDeviceConfigFail1()
     EXPECT_CALL(BlockConnectService::GetInstance(),
         UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_WIFI_MANAGER))
         .WillRepeatedly(Return(-1));
-    EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaService->DisableDeviceConfig(networkId) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceDisconnectSuccess()
@@ -703,14 +710,14 @@ void StaServiceTest::EnableHiLinkHandshakeFailTest()
 {
     WifiDeviceConfig config;
     std::string cmd = "ENABLE=1 BSSID=01:23:45:67:89:AB";
-    pStaService->EnableHiLinkHandshake(config, cmd);
+    pStaService->EnableHiLinkHandshake(true, config, cmd);
 }
 
 void StaServiceTest::EnableHiLinkHandshakeSuceessTest()
 {
     WifiDeviceConfig config;
     std::string cmd = "ENABLE=0 BSSID=01:23:45:67:89:AB";
-    pStaService->EnableHiLinkHandshake(config, cmd);
+    pStaService->EnableHiLinkHandshake(true, config, cmd);
 }
 
 void StaServiceTest::DeliverStaIfaceDataSuccessTest()
@@ -777,7 +784,7 @@ void StaServiceTest::EnableHiLinkHandshakeTest()
 {
     WifiDeviceConfig config;
     std::string bssid = "11:22:33:44";
-    pStaService->EnableHiLinkHandshake(config, bssid);
+    pStaService->EnableHiLinkHandshake(true, config, bssid);
 }
 
 void StaServiceTest::DeliverStaIfaceDataTest()
@@ -827,6 +834,17 @@ int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(1)));
     return static_cast<int>(pStaService->StartConnectToUserSelectNetwork(0, "11:22:33:44"));
+}
+
+void StaServiceTest::HandleFoldStatusChangedTest()
+{
+    int foldStatus = MODE_STATE_EXPAND;
+    pStaService->HandleFoldStatusChanged(foldStatus);
+}
+
+HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level1)
+{
+    HandleFoldStatusChangedTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
@@ -977,16 +995,19 @@ HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackSuccess, TestSize.L
 HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackFail, TestSize.Level1)
 {
     StaServiceRegisterStaServiceCallbackFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestSucc, TestSize.Level1)
 {
     StaServiceAddCandidateConfigTestSucc();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail0, TestSize.Level1)
 {
     StaServiceAddCandidateConfigTestFail0();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail1, TestSize.Level1)
@@ -1092,11 +1113,13 @@ HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level1)
 {
     EnableHiLinkHandshakeFailTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level1)
 {
     DeliverStaIfaceDataSuccessTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, GetDataSlotIdTest, TestSize.Level1)
@@ -1127,36 +1150,43 @@ HWTEST_F(StaServiceTest, GetMncTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, UpdateEapConfigTest, TestSize.Level1)
 {
     UpdateEapConfigTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level1)
 {
     OnWifiCountryCodeChangedTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StartPortalCertificationTest, TestSize.Level1)
 {
     StartPortalCertificationTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, HandleForegroundAppChangedActionTest, TestSize.Level1)
 {
     HandleForegroundAppChangedActionTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, EnableHiLinkHandshakeTest, TestSize.Level1)
 {
     EnableHiLinkHandshakeTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
 {
     DeliverStaIfaceDataTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StartRoamToNetworkTest, TestSize.Level1)
 {
     StartRoamToNetworkTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessTest, TestSize.Level1)

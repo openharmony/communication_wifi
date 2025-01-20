@@ -50,6 +50,7 @@ WifiConfigCenter::WifiConfigCenter()
     mWifiIpInfo.emplace(0, IpInfo());
     mWifiIpV6Info.emplace(0, IpV6Info());
     mWifiLinkedInfo.emplace(0, WifiLinkedInfo());
+    mWifiMloLinkedInfo.emplace(0, std::vector<WifiLinkedInfo>());
     mLastSelectedNetworkId.emplace(0, INVALID_NETWORK_ID);
     mLastSelectedTimeVal.emplace(0, time(NULL));
     mBssidToTimeoutTime.emplace(0, std::make_pair("", 0));
@@ -72,7 +73,11 @@ int WifiConfigCenter::Init()
     }
     wifiScanConfig = std::make_unique<WifiScanConfig>();
     ClearLocalHid2dInfo();
-    mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
+    if (systemMode_ == SystemMode::M_FACTORY_MODE) {
+        mPersistWifiState[INSTID_WLAN0] = WIFI_STATE_DISABLED;
+    } else {
+        mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
+    }
     mAirplaneModeState = WifiSettings::GetInstance().GetLastAirplaneMode();
     return 0;
 }
@@ -129,7 +134,7 @@ void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)
 
 bool WifiConfigCenter::GetWifiAllowSemiActive() const
 {
-    if (IsFactoryMode()) {
+    if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
         WIFI_LOGI("factory mode, not allow semi active.");
         return false;
     }
@@ -348,6 +353,26 @@ int WifiConfigCenter::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
     return 0;
 }
 
+int WifiConfigCenter::GetMloLinkedInfo(std::vector<WifiLinkedInfo> &mloInfo, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiMloLinkedInfo.find(instId);
+    if (iter != mWifiMloLinkedInfo.end()) {
+        mloInfo = iter->second;
+    }
+    return 0;
+}
+
+int WifiConfigCenter::SaveMloLinkedInfo(const std::vector<WifiLinkedInfo> &mloInfo, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    if (mloInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
+        return 0;
+    }
+    mWifiMloLinkedInfo[instId] = mloInfo;
+
+    return 0;
+}
 int WifiConfigCenter::SetMacAddress(const std::string &macAddress, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -790,6 +815,9 @@ int WifiConfigCenter::SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene)
     LOGD("SetHid2dUpperScene uid: %{public}d", uid);
     std::unique_lock<std::mutex> lock(mP2pMutex);
     mHid2dUpperScenePair.insert_or_assign(uid, scene);
+    if (scene.setTime != 0) {
+        mHid2dSceneLastSetTime = scene.setTime;
+    }
     return 0;
 }
 
@@ -801,6 +829,17 @@ int WifiConfigCenter::GetHid2dUpperScene(int uid, Hid2dUpperScene &scene)
         scene = iter->second;
     }
     return 0;
+}
+
+int WifiConfigCenter::SetHid2dSceneLastSetTime(int64_t setTime)
+{
+    mHid2dSceneLastSetTime = setTime;
+    return 0;
+}
+
+int64_t WifiConfigCenter::GetHid2dSceneLastSetTime()
+{
+    return mHid2dSceneLastSetTime.load();
 }
 
 void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
@@ -819,6 +858,7 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
         mHid2dUpperScenePair.insert_or_assign(MIRACAST_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(SHARE_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(MOUSE_CROSS_SERVICE_UID, scene);
+        SetHid2dSceneLastSetTime(0);
     }
 }
 
@@ -1295,7 +1335,7 @@ std::string WifiConfigCenter::GetPairMacAddress(std::map<WifiMacAddrInfo, std::s
             __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, iter->second.c_str());
         return iter->second;
     } else {
-        LOGD("%{public}s: record not found.", __func__);
+        LOGE("%{public}s: record not found, macaddr: %{public}s", __func__, MacAnonymize(macAddrInfo.bssid).c_str());
     }
     return "";
 }
@@ -1399,6 +1439,35 @@ int WifiConfigCenter::GetHotspotMacConfig(HotspotMacConfig &config, int id)
         config = iter->second;
     }
     return 0;
+}
+
+void WifiConfigCenter::SetSystemMode(int systemMode)
+{
+    systemMode_ = systemMode;
+    LOGI("SetSystemMode %{public}d", systemMode_);
+}
+
+int WifiConfigCenter::GetSystemMode()
+{
+    LOGI("GetSystemMode %{public}d", systemMode_);
+    return systemMode_;
+}
+
+void WifiConfigCenter::SetDeviceType(int deviceType)
+{
+    mDeviceType = deviceType;
+}
+
+bool WifiConfigCenter::IsAllowPopUp()
+{
+    switch (mDeviceType) {
+        case ProductDeviceType::WEARABLE:
+            LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
+            return false;
+        default:
+            LOGI("Allow pop up dialog, device type:%{public}d", mDeviceType);
+            return true;
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

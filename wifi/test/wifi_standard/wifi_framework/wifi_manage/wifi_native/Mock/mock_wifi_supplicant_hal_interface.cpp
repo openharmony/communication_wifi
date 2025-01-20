@@ -116,7 +116,7 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode) const
+WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode, int instId) const
 {
     return (MockWifiSupplicantHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;

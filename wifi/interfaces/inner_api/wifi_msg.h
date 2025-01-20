@@ -32,6 +32,7 @@ namespace Wifi {
 #define WIFI_COUNTRY_CODE_LEN 2
 #define WEPKEYS_SIZE 4
 #define INVALID_NETWORK_ID (-1)
+#define UNKNOWN_HILINK_NETWORK_ID (-2)
 #define WIFI_INVALID_UID (-1)
 #define INVALID_SIGNAL_LEVEL (-1)
 #define IPV4_ADDRESS_TYPE 0
@@ -41,6 +42,8 @@ namespace Wifi {
 #define WIFI_EAP_CLOSE_EXTERNAL_SIM 0
 #define WIFI_PASSWORD_LEN 128
 #define MAX_PID_LIST_SIZE 128
+#define REGISTERINFO_MAX_NUM 1000
+#define WIFI_MAX_MLO_LINK_NUM 2
 
 inline const std::string KEY_MGMT_NONE = "NONE";
 inline const std::string KEY_MGMT_WEP = "WEP";
@@ -60,6 +63,8 @@ inline const std::string EAP_METHOD_PWD = "PWD";
 inline const std::string EAP_METHOD_SIM = "SIM";
 inline const std::string EAP_METHOD_AKA = "AKA";
 inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
+
+inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 
 enum class SupplicantState {
     DISCONNECTED = 0,
@@ -128,6 +133,14 @@ enum ConnState {
 
     /** Failed to set up the Wi-Fi connection. */
     UNKNOWN
+};
+
+enum class MloState {
+    WIFI7_LEGACY = 0,
+    WIFI7_SINGLE_LINK = 1,
+    WIFI7_MLSR = 2,
+    WIFI7_EMLSR = 3,
+    WIFI7_STR = 4
 };
 
 enum class DisconnectedReason {
@@ -210,6 +223,7 @@ struct WifiLinkedInfo {
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
+    MloState mloState; /* MLO connected state */
     int wifiStandard;                /* wifi standard */
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
@@ -221,6 +235,7 @@ struct WifiLinkedInfo {
     WifiCategory supportedWifiCategory;
     bool isMloConnected;
     bool isHiLinkNetwork;
+    bool isWurEnable;
     int c0Rssi;
     int c1Rssi;
     WifiLinkedInfo()
@@ -241,6 +256,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
+        mloState = MloState::WIFI7_MLSR;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
@@ -252,6 +268,7 @@ struct WifiLinkedInfo {
         isHiLinkNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         isMloConnected = false;
+        isWurEnable = false;
         c0Rssi = 0;
         c1Rssi = 0;
     }
@@ -291,6 +308,24 @@ enum class ConfigChange {
     CONFIG_ADD = 0,
     CONFIG_UPDATE = 1,
     CONFIG_REMOVE = 2,
+};
+
+struct VoWifiSignalInfo {
+    int rssi;
+    int noise;
+    int bler;
+    int deltaTxPacketCounter;
+    int accessType;
+    int reverse;
+    int64_t txGood;
+    int64_t txBad;
+    std::string macAddress;
+};
+ 
+struct WifiDetectConfInfo {
+    int wifiDetectMode;
+    int threshold;
+    int envalueCount;
 };
 
 class WifiIpAddress {
@@ -537,12 +572,34 @@ struct NetworkSelectionStatus {
     DisabledReason networkSelectionDisableReason;
     int64_t networkDisableTimeStamp;
     int networkDisableCount;
+
+    /**
+     * Connect Choice over this configuration
+     * when current wifi config is visible to the user but user explicitly choose to connect to another network X,
+     * the another network X's config network ID will be stored here. We will consider user has a preference of X
+     * over this network. And in the future, network Select will always give X a higher preference over this config
+     */
+    int connectChoice;
+
+    /**
+     * The system timestamp when we records the connectChoice. Used to calculate if timeout of network selected by user
+     */
+    long connectChoiceTimestamp;
+
+    /**
+     * Indicate whether this network is visible in last Qualified Network Selection. This means there is scan result
+     * found to this WifiDeviceConfig and meet the minimum requirement.
+     */
+    bool seenInLastQualifiedNetworkSelection;
     NetworkSelectionStatus()
     {
         status = WifiDeviceConfigStatus::ENABLED;
         networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
         networkDisableTimeStamp = -1;
         networkDisableCount = 0;
+        connectChoice = INVALID_NETWORK_ID;
+        connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
+        seenInLastQualifiedNetworkSelection = false;
     }
 };
 
@@ -589,12 +646,31 @@ struct IpInfo {
     }
 };
 
+/* Network control information */
+struct WifiNetworkControlInfo {
+    int uid;
+    int pid;
+    std::string bundleName;
+    int state;
+    int sceneId;
+    int rtt;
+
+    WifiNetworkControlInfo()
+    {
+        uid = -1;
+        pid = -1;
+        bundleName = "";
+        state = -1;
+        sceneId = -1;
+        rtt = -1;
+    }
+};
+
 /* Network configuration information */
 struct WifiDeviceConfig {
     int instanceId;
     int networkId;
-    /* 0: CURRENT, using 1: DISABLED 2: ENABLED */
-    int status;
+    /* int status; @deprecated : CURRENT, using 1: DISABLED 2: ENABLED */
     /*  network selection status*/
     NetworkSelectionStatus networkSelectionStatus;
     /* mac address */
@@ -667,12 +743,12 @@ struct WifiDeviceConfig {
     IpInfo lastDhcpResult;
     bool isShared;
     int64_t lastTrySwitchWifiTimestamp { -1 };
+    bool isAllowAutoConnect { true };
 
     WifiDeviceConfig()
     {
         instanceId = 0;
         networkId = INVALID_NETWORK_ID;
-        status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
         bssidType = REAL_DEVICE_ADDRESS;
         band = 0;
         channel = 0;
@@ -837,10 +913,19 @@ struct EapSimUmtsAuthParam {
     }
 };
 
+struct MloStateParam {
+    uint8_t feature;
+    uint8_t state;
+    uint16_t reasonCode;
+};
+
 typedef enum {
     BG_LIMIT_CONTROL_ID_GAME = 1,
     BG_LIMIT_CONTROL_ID_STREAM,
     BG_LIMIT_CONTROL_ID_TEMP,
+    BG_LIMIT_CONTROL_ID_KEY_FG_APP,
+    BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK,
+    BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE,
     BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT,
 } BgLimitControl;
 
@@ -890,6 +975,63 @@ enum class WifiSelfcureType {
     REASSOC_SELFCURE_SUCC,
     RESET_SELFCURE_SUCC,
     REDHCP_SELFCURE_SUCC,
+};
+
+enum class Wifi3VapConflictType {
+    STA_HML_SOFTAP_CONFLICT_CNT,
+    STA_P2P_SOFTAP_CONFLICT_CNT,
+    P2P_HML_SOFTAP_CONFLICT_CNT,
+    HML_SOFTAP_STA_CONFLICT_CNT,
+    P2P_SOFTAP_STA_CONFLICT_CNT,
+    P2P_HML_STA_CONFLICT_CNT,
+};
+
+enum class NetworkLagType {
+    DEFAULT = 0,
+    WIFIPRO_QOE_SLOW,
+    WIFIPRO_QOE_REPORT,
+};
+ 
+struct NetworkLagInfo {
+    uint32_t uid { 0 };
+    uint32_t rssi { 0 };
+    uint32_t tcpRtt { 0 };
+ 
+    NetworkLagInfo()
+    {
+        uid = 0;
+        rssi = 0;
+        tcpRtt = 0;
+    }
+};
+
+struct WifiSignalPollInfo {
+    int signal;
+    int txrate;
+    int rxrate;
+    int noise;
+    int frequency;
+    int txPackets;
+    int rxPackets;
+    int snr;
+    int chload;
+    int ulDelay;
+    int txBytes;
+    int rxBytes;
+    int txFailed;
+    int chloadSelf;
+    int c0Rssi;
+    int c1Rssi;
+    uint8_t* ext;
+    int extLen;
+
+    WifiSignalPollInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0),
+        txPackets(0), rxPackets(0), snr(0), chload(0), ulDelay(0), txBytes(0), rxBytes(0),
+        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(nullptr), extLen(0)
+    {}
+
+    ~WifiSignalPollInfo()
+    {}
 };
 }  // namespace Wifi
 }  // namespace OHOS

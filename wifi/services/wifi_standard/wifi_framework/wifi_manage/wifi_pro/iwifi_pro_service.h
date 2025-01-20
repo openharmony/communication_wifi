@@ -45,6 +45,11 @@ public:
      * @return results - scan results
      */
     virtual void DealScanResult(const std::vector<InterScanInfo> &results) = 0;
+ 
+    /**
+     * @Description deal wifi channel qoe
+     */
+    virtual void DealQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -28,7 +28,8 @@ namespace OHOS {
 namespace Wifi {
 
 struct WifiAppStateAwareCallbacks {
-    std::function<void(const AppExecFwk::AppStateData &appStateData, const int mInstId)> OnForegroundAppChanged;
+    std::function<void(const AppExecFwk::AppStateData &appStateData,
+        const int mInstId)> OnForegroundAppChanged;
 };
 class AppStateObserver;
 
@@ -37,8 +38,8 @@ public:
     explicit WifiAppStateAware(int instId = 0);
     ~WifiAppStateAware();
     static WifiAppStateAware &GetInstance();
-    ErrCode InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks);
     sptr<AppExecFwk::IAppMgr> GetAppMgr();
+    ErrCode InitAppStateAware(const WifiAppStateAwareCallbacks &wifiAppStateAwareCallbacks);
     void RegisterAppStateObserver();
     void UnSubscribeAppState();
     void OnForegroundAppChanged(const AppExecFwk::AppStateData &appStateData, const int mInstId = 0);
@@ -46,7 +47,6 @@ public:
     bool IsForegroundApp(int32_t uid);
     bool IsForegroundApp(const std::string &bundleName);
     std::string GetRunningProcessNameByPid(const int uid, const int pid);
-
 private:
     void RegisterAppStateChangedCallback(const int64_t delayTime = 0);
     std::mutex mutex_ {};

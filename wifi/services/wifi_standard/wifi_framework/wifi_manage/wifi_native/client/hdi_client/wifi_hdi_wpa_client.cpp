@@ -448,7 +448,7 @@ WifiErrorNo WifiHdiWpaClient::ReqSetRoamConfig(const WifiHalRoamConfig &config)
     return WIFI_HAL_OPT_NOT_SUPPORT;
 }
 
-WifiErrorNo WifiHdiWpaClient::ReqGetConnectSignalInfo(const std::string &endBssid, WifiHalWpaSignalInfo &info) const
+WifiErrorNo WifiHdiWpaClient::ReqGetConnectSignalInfo(const std::string &endBssid, WifiSignalPollInfo &info) const
 {
     return WIFI_HAL_OPT_NOT_SUPPORT;
 }
@@ -720,8 +720,7 @@ bool WifiHdiWpaClient::GetEncryptionString(const HotspotConfig &config, std::str
             encryptionString = StringCombination(
                 "wpa=2\n"
                 "rsn_pairwise=CCMP\n"
-                "wpa_passphrase=%s\n"
-                "ieee80211w=1",
+                "wpa_passphrase=%s",
                 config.GetPreSharedKey().c_str());
             break;
         default:
@@ -1461,6 +1460,60 @@ WifiErrorNo WifiHdiWpaClient::ReqRegisterNativeProcessCallback(const std::functi
         return HdiSetNativeProcessCallback(OnNativeProcessDeath);
     }
     return WIFI_HAL_OPT_FAILED;
+}
+
+bool WifiHdiWpaClient::HandleMloLinkData(char *staData, uint32_t staDataLen, std::vector<WifiLinkedInfo> &mloLinkInfo)
+{
+    if (staData == NULL || staDataLen == 0) {
+        LOGE("%{public}s: hdiInfo null or length err copy", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    char *savedPtr = NULL;
+    char *value = NULL;
+    char *token = strtok_r(staData, "=", &savedPtr);
+    WifiLinkedInfo linkInfo;
+    while (token != NULL) {
+        value = strtok_r(NULL, "\n", &savedPtr);
+        if (strcmp(token, "freq") == 0) {
+            linkInfo.frequency = atoi(value);
+        } else if (strcmp(token, "ap_link_addr") == 0) {
+            linkInfo.bssid = value;
+        } else if (strcmp(token, "sta_link_addr") == 0) {
+            linkInfo.macAddress = value;
+            mloLinkInfo.push_back(linkInfo);
+        }
+        token = strtok_r(NULL, "=", &savedPtr);
+    }
+    if (mloLinkInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
+        LOGE("%{public}s: err link num", __func__);
+        mloLinkInfo.clear();
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::GetMloLinkedInfo(const std::string &ifName,
+    std::vector<WifiLinkedInfo> &mloLinkInfo)
+{
+    char ifNameBuf[MAX_IFACENAME_LEN];
+    char staParam[] = "MLO_STATUS";
+    char staData[WIFI_MAX_WPA_STA_BUF_SIZE] = {0};
+    uint32_t staDataLen = WIFI_MAX_WPA_STA_BUF_SIZE;
+    if (strncpy_s(ifNameBuf, sizeof(ifNameBuf), ifName.c_str(), ifName.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    if (HdiWpaGetMloLinkedInfo(ifNameBuf, staParam, staData, staDataLen) != WIFI_HAL_OPT_OK) {
+        LOGE("%{public}s: failed", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    if (!HandleMloLinkData(staData, staDataLen, mloLinkInfo)) {
+        LOGE("%{public}s: HandleMloLinkData failed", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -80,6 +80,7 @@ Wifi2WifiIntegrator::Wifi2WifiIntegrator() : CompositeNetworkSelector("Wifi2Wifi
     andFilters->AddFilter(make_shared<NotP2pFreqAt5gFilter>());
     andFilters->AddFilter(make_shared<SignalLevelFilter>());
     andFilters->AddFilter(make_shared<WifiSwitchThresholdFilter>());
+    andFilters->AddFilter(make_shared<WifiSwitch5GNot2GFilter>());
     andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
     SetWifiFilter(andFilters);
  
@@ -92,6 +93,70 @@ bool Wifi2WifiIntegrator::Nominate(NetworkCandidate &networkCandidate)
         networkSelector->TryNominate(networkCandidate);
     }
     return false;
+}
+
+bool Wifi2WifiNoNetIntegrator::Nominate(NetworkCandidate &networkCandidate)
+{
+    for (auto &networkSelector : subNetworkSelectors) {
+        networkSelector->TryNominate(networkCandidate);
+    }
+    return false;
+}
+ 
+void Wifi2WifiNoNetIntegrator::GetCandidatesFromSubNetworkSelector()
+{
+    for (const auto &subNetworkSelector : subNetworkSelectors) {
+        subNetworkSelector->GetBestCandidates(networkCandidates);
+    }
+}
+ 
+Wifi2WifiNoNetIntegrator::Wifi2WifiNoNetIntegrator() : CompositeNetworkSelector("Wifi2WifiNoNetIntegrator")
+{
+    auto andFilters = make_shared<AndWifiFilter>();
+    andFilters->AddFilter(make_shared<ValidNetworkIdFilter>());
+    andFilters->AddFilter(make_shared<NotCurrentNetworkFilter>());
+    andFilters->AddFilter(make_shared<NotNetworkBlackListFilter>());
+    ExternalWifiCommonBuildManager::GetInstance().BuildFilter(TagType::NOT_P2P_ENHANCE_FREQ_AT_5G_FILTER_TAG,
+        *andFilters);
+    andFilters->AddFilter(make_shared<NotP2pFreqAt5gFilter>());
+    andFilters->AddFilter(make_shared<SignalLevelFilter>());
+    andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
+    SetWifiFilter(andFilters);
+ 
+    AddSubNetworkSelector(make_shared<PreferredApSelector>());
+}
+ 
+bool Wifi2WifiQoeSlowIntegrator::Nominate(NetworkCandidate &networkCandidate)
+{
+    for (auto &networkSelector : subNetworkSelectors) {
+        networkSelector->TryNominate(networkCandidate);
+    }
+    return false;
+}
+ 
+void Wifi2WifiQoeSlowIntegrator::GetCandidatesFromSubNetworkSelector()
+{
+    for (const auto &subNetworkSelector : subNetworkSelectors) {
+        subNetworkSelector->GetBestCandidates(networkCandidates);
+    }
+}
+ 
+Wifi2WifiQoeSlowIntegrator::Wifi2WifiQoeSlowIntegrator() : CompositeNetworkSelector("Wifi2WifiQoeSlowIntegrator")
+{
+    auto andFilters = make_shared<AndWifiFilter>();
+    andFilters->AddFilter(make_shared<ValidNetworkIdFilter>());
+    andFilters->AddFilter(make_shared<NotCurrentNetworkFilter>());
+    andFilters->AddFilter(make_shared<NotNetworkBlackListFilter>());
+    ExternalWifiCommonBuildManager::GetInstance().BuildFilter(TagType::NOT_P2P_ENHANCE_FREQ_AT_5G_FILTER_TAG,
+        *andFilters);
+    andFilters->AddFilter(make_shared<NotP2pFreqAt5gFilter>());
+    andFilters->AddFilter(make_shared<SignalLevelFilter>());
+    andFilters->AddFilter(make_shared<WifiSwitchThresholdQoeFilter>());
+    andFilters->AddFilter(make_shared<WifiSwitch5GNot2GFilter>());
+    andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
+    SetWifiFilter(andFilters);
+ 
+    AddSubNetworkSelector(make_shared<PreferredApSelector>());
 }
 
 SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetworkTracker")

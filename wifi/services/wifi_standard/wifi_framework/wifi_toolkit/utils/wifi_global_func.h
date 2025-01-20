@@ -452,13 +452,26 @@ bool IsPskEncryption(const std::string &keyMgmt);
 bool IsFactoryMode();
 
 /**
+ * @Description get device type
+ *
+ * @return int - DEFAULT -1, PHONE 0, TABLET 1, WEARABLE 2
+ */
+int GetDeviceType();
+
+/**
  * @Description is wifi support opening automatically when first start up
  *
  * @return true - open
  * @return false - close
  */
 bool IsStartUpWifiEnableSupport();
-
+/**
+ * @Description is fold product supprt signal smoothe
+ *
+ * @return true - smoothe
+ * @return false - not smoothe
+ */
+bool IsSignalSmoothingEnable();
 #ifndef OHOS_ARCH_LITE
 /**
  * @Description Parse json string, find key by type, get value by key

@@ -76,18 +76,7 @@ void StaAppAcceleration::HandleScreenStatusChanged(int screenState)
 
 #ifndef OHOS_ARCH_LITE
 void StaAppAcceleration::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
-{
-    if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND)
-        && appStateData.isFocused) {
-        if (AppParser::GetInstance().IsLowLatencyApp(appStateData.bundleName)) {
-            WIFI_LOGI("target app on the foreground.");
-            StartGameBoost(appStateData.uid);
-        } else {
-            StopGameBoost(appStateData.uid);
-        }
-    }
-    return;
-}
+{}
 #endif
 
 void StaAppAcceleration::SetPmMode(int mode)

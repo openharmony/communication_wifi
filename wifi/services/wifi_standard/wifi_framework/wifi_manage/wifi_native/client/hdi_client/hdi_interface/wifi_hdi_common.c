@@ -13,6 +13,13 @@
  * limitations under the License.
  */
 
+
+#include <unistd.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <pthread.h>
+
 #include "securec.h"
 #include "wifi_hdi_common.h"
 
@@ -557,7 +564,7 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
         data->hasGroup = 1;
         if (!HdiCheckValidGroup(data->groupCipher)) {
             LOGI("invalid group cipher 0x%{public}x (%08x)", data->groupCipher,
-            HdiGetBe32(pos));
+                   HdiGetBe32(pos));
             return -1;
         }
         pos += HDI_SELECTOR_LEN;
@@ -634,16 +641,18 @@ int HdiParseIe(const uint8_t *hdiIe, size_t wpaIeLen,
 {
     if (wpaIeLen >= HDI_POS_FIRST && hdiIe[0] == HDI_EID_RSN) {
         return HdiConvertIeRsn(hdiIe, wpaIeLen, data);
-    }
+    }       
     if (wpaIeLen >= HDI_POS_SIX && hdiIe[0] == HDI_EID_VENDOR_SPECIFIC &&
         hdiIe[1] >= HDI_POS_FOURTH && HdiGetBe32(&hdiIe[HDI_POS_SECOND]) == HDI_OSEN_IE_VENDOR_TYPE) {
         return HdiConvertIeRsn(hdiIe, wpaIeLen, data);
-    } else {
+    }
+    else {
         return HdiConvertIe(hdiIe, wpaIeLen, data);
     }
 }
 
-char* HdiGetIeTxt(char *pos, char *end, const char *proto, const uint8_t *ie, size_t ieLen)
+char* HdiGetIeTxt(char *pos, char *end, const char *proto,
+                    const uint8_t *ie, size_t ieLen)
 {
     struct HdiIeData data;
     char *start;

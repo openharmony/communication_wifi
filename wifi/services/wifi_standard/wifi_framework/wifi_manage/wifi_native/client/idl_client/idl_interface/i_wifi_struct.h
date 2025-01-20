@@ -36,6 +36,7 @@ extern "C" {
 #define WIFI_PIN_CODE_LENGTH 8
 #define WIFI_MAX_TLVS_LENGTH 4096
 #define WIFI_MAX_CHIP_IDS 4096
+#define WIFI_MAX_WPA_STA_BUF_SIZE 2048
 
 /* IWifiIface */
 /*

@@ -49,7 +49,7 @@ RpcClient *GetStaRpcClient(void);
 
 void OnConnectChanged(int status, int networkId, const char *mac);
 void OnBssidChanged(const char *reason, const char *bssid);
-void OnWpaStateChanged(int status);
+void OnWpaStateChanged(int status, const char *ssid);
 void OnWpaSsidWrongKey();
 void OnWpsOverlap(int status);
 void OnWpsTimeOut(int status);

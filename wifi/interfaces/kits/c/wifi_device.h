@@ -136,6 +136,17 @@ WifiErrorCode GetDeviceConfigs(WifiDeviceConfig *result, unsigned int *size);
 WifiErrorCode RemoveDevice(int networkId);
 
 /**
+ * @brief Set whether to allow automatic connect by networkid.
+ *
+ * @param networkId Identifies the network to be set. The value of networkId cannot be less thann 0.
+ * @param isAllowed Identifies whether allow auto connect or not.
+ * @return Returns {@link WIFI_SUCCESS} if set success; returns an error code defined in
+ * {@link WifiErrorCode} otherwise.
+ * @since 16
+ */
+WifiErrorCode AllowAutoConnect(int32_t networkId, bool isAllowed);
+
+/**
  * @brief Disable a hotspot configuration matching a specified <b>networkId</b>. If the config is disabled, it will
  * not be auto connected.
  *

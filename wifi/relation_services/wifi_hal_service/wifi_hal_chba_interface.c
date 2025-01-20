@@ -113,8 +113,7 @@ static WifiErrorNo AddChbaIface(void)
     }
     AddInterfaceArgv argv;
     if (strcpy_s(argv.name, sizeof(argv.name), "chba0") != EOK ||
-        strcpy_s(argv.confName, sizeof(argv.confName),
-            "/data/service/el1/public/wifi/wpa_supplicant/p2p_supplicant.conf") != EOK) {
+        strcpy_s(argv.confName, sizeof(argv.confName), "/data/service/el1/public/wifi/wpa_supplicant/p2p_supplicant.conf") != EOK) {
         return WIFI_HAL_FAILED;
     }
     if (pWpaInterface->wpaCliAddIface(pWpaInterface, &argv, true) < 0) {

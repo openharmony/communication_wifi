@@ -23,7 +23,6 @@ namespace Wifi {
 struct WifiBackupConfig {
     int instanceId;
     int uid;
-    int status;
     std::string bssid;
     std::string userSelectBssid;
     std::string ssid;
@@ -44,7 +43,6 @@ struct WifiBackupConfig {
     {
         instanceId = 0;
         uid = WIFI_INVALID_UID;
-        status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
         priority = 0;
         hiddenSSID = false;
         networkStatusHistory = 0;

@@ -29,7 +29,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotStub");
 
 namespace OHOS {
 namespace Wifi {
-const std::string DHCP_IP_V4_DEFAULT = "192.168.62.1";
+const std::string DHCP_IP_V4_DEFAULT = "192.168.43.1";
 std::shared_ptr<WifiDevice> wifiDeviceSharedPtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 
 WifiHotspotStub::WifiHotspotStub():mSingleCallback(false), m_id(0)
@@ -111,6 +111,10 @@ void WifiHotspotStub::InitHandleMap()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
             OnIsHotspotDualBandSupported(code, data, reply, option);
         };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_IS_HOTSPOT_SUPPORTED)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnIsOpenSoftApAllowed(code, data, reply, option);
+        };
     handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_SETTIMEOUT_AP)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply,
         MessageOption &option) { OnSetApIdleTimeout(code, data, reply, option); };
@@ -161,6 +165,20 @@ void WifiHotspotStub::OnIsHotspotDualBandSupported(uint32_t code, MessageParcel 
     WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool isSupported = false;
     ErrCode ret = IsHotspotDualBandSupported(isSupported);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(isSupported ? 1 : 0);
+    }
+    return;
+}
+
+void WifiHotspotStub::OnIsOpenSoftApAllowed(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isSupported = false;
+    ErrCode ret = IsOpenSoftApAllowed(isSupported);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {

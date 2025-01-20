@@ -22,6 +22,9 @@ DEFINE_WIFILOG_LABEL("WifiLibraryUtils");
 WifiLibraryUtils::WifiLibraryUtils(const std::string &libName, void*& libHandle, bool isDlClose)
     : libHandle_(libHandle), libName_(libName), isDlClose_(isDlClose)
 {
+    if (libName.empty()) {
+        return;
+    }
     if (libHandle_ != nullptr) {
         WIFI_LOGI("Library %s has been loaded", libName.c_str());
         return;

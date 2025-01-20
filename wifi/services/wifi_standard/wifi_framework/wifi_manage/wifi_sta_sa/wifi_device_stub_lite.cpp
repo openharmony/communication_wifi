@@ -88,7 +88,6 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     int tmpInt;
     size_t size;
     (void)ReadInt32(req, &config.networkId);
-    (void)ReadInt32(req, &config.status);
     config.bssid = (char *)ReadString(req, &size);
     config.ssid = (char *)ReadString(req, &size);
     (void)ReadInt32(req, &config.band);
@@ -167,7 +166,6 @@ void WifiDeviceStub::WriteEapConfig(IpcIo *reply, const WifiEapConfig &wifiEapCo
 void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig &config)
 {
     (void)WriteInt32(reply, config.networkId);
-    (void)WriteInt32(reply, config.status);
     (void)WriteString(reply, config.bssid.c_str());
     (void)WriteString(reply, config.ssid.c_str());
     (void)WriteInt32(reply, config.band);
@@ -202,6 +200,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig 
     (void)WriteInt32(reply, (int)config.wifiPrivacySetting);
     (void)WriteInt32(reply, (int)config.uid);
     (void)WriteInt32(reply, (int)config.wifiWapiConfig.wapiPskType);
+    (void)WriteBool(reply, config.isAllowAutoConnect);
 }
 
 void WifiDeviceStub::OnEnableWifi(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -343,6 +342,18 @@ void WifiDeviceStub::OnDisableDeviceConfig(uint32_t code, IpcIo *req, IpcIo *rep
     int networkId = 0;
     (void)ReadInt32(req, &networkId);
     ErrCode ret = DisableDeviceConfig(networkId);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
+}
+
+void WifiDeviceStub::OnAllowAutoConnect(uint32_t code, IpcIo *req, IpcIo *reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    int32_t networkId = 0;
+    bool isAllowed  = false;
+    (void)ReadInt32(req, &networkId);
+    (void)ReadBool(req, &isAllowed);
+    ErrCode ret = AllowAutoConnect(networkId, isAllowed);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
 }
@@ -706,6 +717,8 @@ void WifiDeviceStub::InitHandleMap()
         &WifiDeviceStub::OnEnableDeviceConfig;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE)] =
         &WifiDeviceStub::OnDisableDeviceConfig;
+    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ALLOW_AUTO_CONNECT)] =
+        &WifiDeviceStub::OnAllowAutoConnect;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = &WifiDeviceStub::OnConnectTo;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = &WifiDeviceStub::OnConnect2To;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = &WifiDeviceStub::OnReConnect;

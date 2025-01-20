@@ -16,7 +16,6 @@
 #include <unordered_map>
 #include "wifi_common_def.h"
 #include "wifi_config_file_impl.h"
-#include <algorithm>
 #include "wifi_logger.h"
 #include "json/json.h"
 
@@ -25,19 +24,27 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppXmlParser");
 
 constexpr auto WIFI_MONITOR_APP_FILE_PATH = "/system/etc/wifi/wifi_monitor_apps.xml";
+constexpr auto WIFI_NETWORK_CONTROL_APP_FILE_PATH = "/system/etc/wifi/wifi_network_control_apps.xml";
 constexpr auto WIFI_MONITOR_CLOUD_PUSH_INSTALL_PATH = "/data/service/el1/public/update/param_service/install/system/";
 constexpr auto WIFI_MONITOR_CLOUD_PUSH_FILE_PATH = "etc/WifiHighTemSpeedLimit/";
 constexpr auto WIFI_MONITOR_CLOUD_PUSH_VERIOSN_FILE_NAME = "version.txt";
 constexpr auto WIFI_MONITOR_CLOUD_PUSH_FILE_NAME = "HighTemperatureSpeedLimit.json";
 constexpr auto XML_TAG_SECTION_HEADER_MONITOR_APP = "MonitorAPP";
+constexpr auto XML_TAG_SECTION_HEADER_NETWORK_CONTROL_APP = "NetworkControlAPP";
 constexpr auto XML_TAG_SECTION_HEADER_GAME_INFO = "GameInfo";
 constexpr auto XML_TAG_SECTION_HEADER_APP_WHITE_LIST = "AppWhiteList";
 constexpr auto XML_TAG_SECTION_HEADER_APP_BLACK_LIST = "AppBlackList";
 constexpr auto XML_TAG_SECTION_HEADER_MULTILINK_BLACK_LIST = "MultiLinkBlackList";
 constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
 constexpr auto XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP = "HighTempLimitSpeedApp";
+constexpr auto XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST = "KeyAppForegroundList";
+constexpr auto XML_TAG_SECTION_HEADER_APP_BACKGROUND_LIMIT_LIST = "BackgroundLimitListApp";
+constexpr auto XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST = "AppLiveStream";
+constexpr auto XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME = "AsyncDelayTime";
+constexpr auto XML_TAG_SECTION_KEY_GAME_RTT = "mGameRtt";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
 constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
+constexpr auto XML_TAG_SECTION_KEY_DELAY_TIME = "delayTime";
 constexpr auto VERSION_FILE_MAX_LINE = 50;
 constexpr auto VERSION_FILE_KEY_WORD = "version=";
 const char* XML_VERSION_NODE_NAME = "HighTempLimitSpeedAppVersionInfo";
@@ -49,6 +56,11 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_MULTILINK_BLACK_LIST, AppType::MULTILINK_BLACK_LIST_APP },
     { XML_TAG_SECTION_HEADER_CHARIOT_APP, AppType::CHARIOT_APP },
     {XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP, AppType::HIGH_TEMP_LIMIT_SPEED_APP},
+    { XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST, AppType::KEY_FOREGROUND_LIST_APP},
+    { XML_TAG_SECTION_HEADER_APP_BACKGROUND_LIMIT_LIST, AppType::BACKGROUND_LIMIT_LIST_APP},
+    { XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME, AppType::ASYNC_DELAY_TIME},
+    { XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST, AppType::LIVE_STREAM_APP},
+    { XML_TAG_SECTION_KEY_GAME_RTT, AppType::GAME_RTT},
 };
 
 AppParser::AppParser()
@@ -73,7 +85,7 @@ bool AppParser::Init()
         if (IsReadCloudConfig()) {
             ReadPackageCloudFilterConfig();
         }
-        if (InitAppParser(WIFI_MONITOR_APP_FILE_PATH)) {
+        if (InitAppParser(WIFI_MONITOR_APP_FILE_PATH) && InitAppParser(WIFI_NETWORK_CONTROL_APP_FILE_PATH)) {
             initFlag_ = true;
             WIFI_LOGD("%{public}s InitAppParser successful", __FUNCTION__);
         } else {
@@ -124,6 +136,37 @@ bool AppParser::IsHighTempLimitSpeedApp(const std::string &bundleName) const
     }
 }
 
+bool AppParser::IsKeyForegroundApp(const std::string &bundleName) const
+{
+    return std::any_of(m_keyForegroundListAppVec.begin(), m_keyForegroundListAppVec.end(),
+        [bundleName](const KeyForegroundListAppInfo &app) { return app.packageName == bundleName; });
+}
+
+bool AppParser::IsBackgroundLimitApp(const std::string &bundleName) const
+{
+    return std::any_of(m_backgroundLimitListAppVec.begin(), m_backgroundLimitListAppVec.end(),
+        [bundleName](const BackgroundLimitListAppInfo &app) { return app.packageName == bundleName; });
+}
+
+bool AppParser::IsLiveStreamApp(const std::string &bundleName) const
+{
+    return std::any_of(m_liveStreamAppVec.begin(), m_liveStreamAppVec.end(),
+        [bundleName](const LiveStreamAppInfo &app) { return app.packageName == bundleName; });
+}
+
+bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) const
+{
+    if (m_gameRtt.find(bundleName) == m_gameRtt.end()) {
+        return false;
+    }
+    return m_gameRtt.at(bundleName) <= gameRtt;
+}
+
+std::string AppParser::GetAsyncLimitSpeedDelayTime() const
+{
+    return m_delayTime;
+}
+
 bool AppParser::InitAppParser(const char *appXmlFilePath)
 {
     if (appXmlFilePath == nullptr) {
@@ -158,6 +201,7 @@ bool AppParser::ParseInternal(xmlNodePtr node)
         return false;
     }
     ParseAppList(node);
+    ParseNetworkControlAppList(node);
     return true;
 }
 
@@ -169,10 +213,10 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
     }
     m_lowLatencyAppVec.clear();
     m_whiteAppVec.clear();
-    m_blackAppVec.clear();
     m_multilinkAppVec.clear();
     m_chariotAppVec.clear();
     m_highTempLimitSpeedAppVec.clear();
+
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetAppTypeAsInt(node)) {
             case AppType::LOW_LATENCY_APP:
@@ -180,9 +224,6 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
                 break;
             case AppType::WHITE_LIST_APP:
                 m_whiteAppVec.push_back(ParseWhiteAppInfo(node));
-                break;
-            case AppType::BLACK_LIST_APP:
-                m_blackAppVec.push_back(ParseBlackAppInfo(node));
                 break;
             case AppType::MULTILINK_BLACK_LIST_APP:
                 m_multilinkAppVec.push_back(ParseMultiLinkAppInfo(node));
@@ -204,13 +245,68 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
         __FUNCTION__, (int)m_multilinkAppVec.size());
 }
 
+void AppParser::ParseNetworkControlAppList(const xmlNodePtr &innode)
+{
+    if (xmlStrcmp(innode->name, BAD_CAST(XML_TAG_SECTION_HEADER_NETWORK_CONTROL_APP)) != 0) {
+        WIFI_LOGE("innode name=%{public}s not equal NetworkControlAPP", innode->name);
+        return;
+    }
+    m_keyForegroundListAppVec.clear();
+    m_backgroundLimitListAppVec.clear();
+    m_blackAppVec.clear();
+    m_liveStreamAppVec.clear();
+
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
+        switch (GetAppTypeAsInt(node)) {
+            case AppType::KEY_FOREGROUND_LIST_APP:
+                m_keyForegroundListAppVec.push_back(ParseKeyForegroundListAppInfo(node));
+                break;
+            case AppType::BACKGROUND_LIMIT_LIST_APP:
+                m_backgroundLimitListAppVec.push_back(ParseBackgroundLimitListAppInfo(node));
+                break;
+            case AppType::BLACK_LIST_APP:
+                m_blackAppVec.push_back(ParseBlackAppInfo(node));
+                break;
+            case AppType::LIVE_STREAM_APP:
+                m_liveStreamAppVec.push_back(ParseLiveStreamAppInfo(node));
+                break;
+            case AppType::ASYNC_DELAY_TIME:
+                ParseAsyncLimitSpeedDelayTime(node);
+                break;
+            default:
+                WIFI_LOGD("app type: %{public}s is not limited", GetNodeValue(node).c_str());
+                break;
+        }
+    }
+    WIFI_LOGI("%{public}s out,m_keyForegroundListAppVec count:%{public}d!",
+        __FUNCTION__, (int)m_keyForegroundListAppVec.size());
+    WIFI_LOGI("%{public}s out,m_backgroundLimitListAppVec count:%{public}d!",
+        __FUNCTION__, (int)m_backgroundLimitListAppVec.size());
+}
+
 LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
 {
-    LowLatencyAppInfo appInfo;
+    LowLatencyAppInfo appInfo{};
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_GAME_NAME));
+    if (value == NULL) {
+        WIFI_LOGE("%{public}s xml parser low latency app info error.", __FUNCTION__);
+        return appInfo;
+    }
     std::string gameName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = gameName;
     xmlFree(value);
+    for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
+        if (GetAppTypeAsInt(node) == AppType::GAME_RTT) {
+            xmlChar *rttValue = xmlNodeGetContent(node);
+            if (rttValue == NULL) {
+                WIFI_LOGE("%{public}s xml parser game rtt info error.", __FUNCTION__);
+                break;
+            }
+            std::string rtt = std::string(reinterpret_cast<char *>(rttValue));
+            m_gameRtt[gameName] = CheckDataLegal(rtt);
+            xmlFree(rttValue);
+        }
+    }
     return appInfo;
 }
 
@@ -263,6 +359,50 @@ HighTempLimitSpeedAppInfo AppParser::ParseHighTempLimitSpeedAppInfo(const xmlNod
     appInfo.packageName = packageName;
     xmlFree(value);
     return appInfo;
+}
+
+KeyForegroundListAppInfo AppParser::ParseKeyForegroundListAppInfo(const xmlNodePtr &innode)
+{
+    KeyForegroundListAppInfo appInfo;
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
+    return appInfo;
+}
+
+BackgroundLimitListAppInfo AppParser::ParseBackgroundLimitListAppInfo(const xmlNodePtr &innode)
+{
+    BackgroundLimitListAppInfo appInfo;
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
+    return appInfo;
+}
+
+LiveStreamAppInfo AppParser::ParseLiveStreamAppInfo(const xmlNodePtr &innode)
+{
+    LiveStreamAppInfo appInfo{};
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    if (value == NULL) {
+        WIFI_LOGE("%{public}s xml parser live stream app info error.", __FUNCTION__);
+        return appInfo;
+    }
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
+    return appInfo;
+}
+
+void AppParser::ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode)
+{
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_DELAY_TIME));
+    m_delayTime = std::string(reinterpret_cast<char *>(value));
+    if (m_delayTime.empty()) {
+        WIFI_LOGE("%{public}s delay time is null, will set 0.", __FUNCTION__);
+        m_delayTime = "0";
+    }
 }
 
 AppType AppParser::GetAppTypeAsInt(const xmlNodePtr &innode)

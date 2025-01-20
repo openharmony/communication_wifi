@@ -56,6 +56,16 @@ HWTEST_F(WifiInnerHotspotTest, IsHotspotDualBandSupportedTest, TestSize.Level1)
     EXPECT_TRUE(result);
 }
 
+HWTEST_F(WifiInnerHotspotTest, IsOpenSoftApAllowedTest, TestSize.Level1)
+{
+    WIFI_LOGE("IsOpenSoftApAllowedTest enter!");
+    EXPECT_TRUE(devicePtr != nullptr);
+    bool isSupported;
+    ErrCode result = devicePtr->IsOpenSoftApAllowed(isSupported);
+    WIFI_LOGE("IsOpenSoftApAllowedTest result(0x%{public}x)", result);
+    EXPECT_TRUE(result);
+}
+
 HWTEST_F(WifiInnerHotspotTest, GetHotspotStateTest, TestSize.Level1)
 {
     WIFI_LOGE("GetHotspotStateTest enter!");

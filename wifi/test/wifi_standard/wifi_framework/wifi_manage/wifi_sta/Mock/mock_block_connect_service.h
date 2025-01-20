@@ -32,6 +32,7 @@ public:
     virtual bool EnableNetworkSelectStatus(int targetNetworkId) = 0;
     virtual bool IsFrequentDisconnect(std::string bssid, int wpaReason) = 0;
     virtual bool IsWrongPassword(int targetNetworkId) = 0;
+    virtual void OnReceiveSettingsEnterEvent(bool isEnter) = 0;
 };
  
 class BlockConnectService : public MockBlockConnectService {
@@ -46,6 +47,7 @@ public:
     MOCK_METHOD1(EnableNetworkSelectStatus, bool(int targetNetworkId));
     MOCK_METHOD2(IsFrequentDisconnect, bool(std::string bssid, int wpaReason));
     MOCK_METHOD1(IsWrongPassword, bool(int targetNetworkId));
+    MOCK_METHOD1(OnReceiveSettingsEnterEvent, void(bool isEnter));
 };
 }  // namespace OHOS
 }  // namespace Wifi

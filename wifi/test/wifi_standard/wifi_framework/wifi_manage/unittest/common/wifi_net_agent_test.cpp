@@ -49,24 +49,27 @@ public:
 
 HWTEST_F(WifiNetAgentTest, RegisterNetSupplier_ReturnsFalseWhenRegistrationFails, TestSize.Level1)
 {
-    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplier());
+    int instId = 0;
+    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplier(instId));
 }
 
 HWTEST_F(WifiNetAgentTest, RegisterNetSupplierCallback_ReturnsFalseWhenRegistrationFails, TestSize.Level1)
 {
-    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplierCallback());
+    int instId = 0;
+    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplierCallback(instId));
 }
 
 HWTEST_F(WifiNetAgentTest, UnregisterNetSupplier_CallsUnregisterNetSupplier, TestSize.Level1)
 {
-    WifiNetAgent::GetInstance().UnregisterNetSupplier();
+    int instId = 0;
+    WifiNetAgent::GetInstance().UnregisterNetSupplier(instId);
 }
 
 HWTEST_F(WifiNetAgentTest, UpdateNetSupplierInfo_CallsUpdateNetSupplierInfo, TestSize.Level1)
 {
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo = new NetManagerStandard::NetSupplierInfo();
-
-    WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netSupplierInfo);
+    int instId = 0;
+    WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netSupplierInfo, instId);
 }
 
 HWTEST_F(WifiNetAgentTest, UpdateNetLinkInfo_CallsUpdateNetLinkInfo, TestSize.Level1)
@@ -94,14 +97,16 @@ HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetSupplierInfoTest001, TestSize.Le
     WifiNetAgent wifiNetAgent;
     sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo =
         sptr<NetManagerStandard::NetSupplierInfo>(new (std::nothrow) NetManagerStandard::NetSupplierInfo());
-    wifiNetAgent.OnStaMachineUpdateNetSupplierInfo(netSupplierInfo);
+    int instId = 0;
+    wifiNetAgent.OnStaMachineUpdateNetSupplierInfo(netSupplierInfo, instId);
     EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
 HWTEST_F(WifiNetAgentTest, OnStaMachineWifiStartTest001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;
-    wifiNetAgent.OnStaMachineWifiStart();
+    int instId = 0;
+    wifiNetAgent.OnStaMachineWifiStart(instId);
     EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 

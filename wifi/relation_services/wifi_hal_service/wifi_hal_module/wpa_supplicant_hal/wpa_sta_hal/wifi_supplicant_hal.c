@@ -753,7 +753,6 @@ static int WpaCliCmdBssFlush(WifiWpaStaInterface *this)
 static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings)
 {
     if (this == NULL) {
-        LOGE("WpaCliCmdScan, this is NULL!");
         return -1;
     }
 
@@ -769,7 +768,6 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     }
     char *pcmd = (char *)calloc(len, sizeof(char));
     if (pcmd == NULL) {
-        LOGE("WpaCliCmdScan, pcmd is NULL!");
         return -1;
     }
     int pos = 0;
@@ -784,7 +782,7 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
         }
     }
     if (res < 0) {
-        LOGE("WpaCliCmdScan, snprintf_s error!");
+        LOGE("snprintf error!");
         free(pcmd);
         pcmd = NULL;
         return -1;
@@ -805,7 +803,6 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
     free(pcmd);
     pcmd = NULL;
     if (strncmp(buf, "FAIL-BUSY", strlen("FAIL-BUSY")) == 0) {
-        LOGE("WpaCliCmdScan, WpaCliCmd return FAIL-BUSY!");
         return FAIL_BUSY;
     }
     return 0;
@@ -1006,15 +1003,15 @@ static bool GetChanWidthCenterFreqHe(ScanInfo *pcmd, ScanInfoElem* infoElem)
     bool isVhtInfoExist = (content[COLUMN_INDEX_ONE] & VHT_OPER_INFO_EXTST_MASK) != 0;
     bool is6GhzInfoExist = (content[COLUMN_INDEX_TWO] & GHZ_HE_INFO_EXIST_MASK_6) != 0;
     bool coHostedBssPresent = (content[COLUMN_INDEX_ONE] & BSS_EXIST_MASK) != 0;
-    int expectedLen = HE_OPER_BASIC_LEN + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0) +
-        (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? COLUMN_INDEX_FIVE : 0);
+    int expectedLen = HE_OPER_BASIC_LEN + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0)
+        + (coHostedBssPresent ? 1 : 0) + (is6GhzInfoExist ? COLUMN_INDEX_FIVE : 0);
     pcmd->isHeInfoExist = 1;
     if (infoElem->size < expectedLen) {
         return false;
     }
     if (is6GhzInfoExist) {
-        int startIndx = VHT_OPER_INFO_BEGIN_INDEX + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0) +
-            (coHostedBssPresent ? 1 : 0);
+        int startIndx = VHT_OPER_INFO_BEGIN_INDEX + (isVhtInfoExist ? COLUMN_INDEX_THREE : 0)
+            + (coHostedBssPresent ? 1 : 0);
         int heChannelWidth = content[startIndx + 1] & GHZ_HE_WIDTH_MASK_6;
         int centerSegFreq0 = content[startIndx + COLUMN_INDEX_TWO] & UINT8_MASK;
         int centerSegFreq1 = content[startIndx + COLUMN_INDEX_THREE] & UINT8_MASK;
@@ -1302,8 +1299,8 @@ static int WpaCliCmdScanInfo(WifiWpaStaInterface *this, ScanInfo *pcmd, int *siz
             LOGE("parse scan result line failed!");
             break;
         }
-        LOGD("-->>%{public}2d %{private}s %{private}s %{public}d %{public}d %{public}d %{public}d %{public}d \
-         %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d",
+        LOGD("-->>%{public}2d %{private}s %{private}s %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d \
+         %{public}d %{public}d %{public}d %{public}d %{public}d",
              j, pcmd[j].ssid, pcmd[j].bssid, pcmd[j].freq, pcmd[j].siglv,
              pcmd[j].centerFrequency0, pcmd[j].centerFrequency1, pcmd[j].channelWidth,
              pcmd[j].isVhtInfoExist, pcmd[j].isHtInfoExist, pcmd[j].isHeInfoExist, pcmd[j].isErpExist,

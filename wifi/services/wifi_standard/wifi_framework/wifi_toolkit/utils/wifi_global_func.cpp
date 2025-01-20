@@ -54,6 +54,19 @@ constexpr int STARTUP_WIFI_ENABLE_LEN = 4;
 constexpr const char* PROP_STARTUP_WIFI_ENABLE = "const.wifi.startup_wifi_enable";
 constexpr const char* DEFAULT_STARTUP_WIFI_ENABLE = "false";
 constexpr const char* STARTUP_WIFI_ENABLE = "true";
+constexpr int PROP_PRODUCT_DEVICE_TYPE_LEN = 30;
+constexpr int PRODUCT_DEVICE_TYPE_LEN = 5;
+constexpr const char* PRODUCT_DEVICE_TYPE = "const.product.devicetype";
+constexpr const char* DEFAULT_PRODUCT_DEVICE_TYPE = "default";
+constexpr const char* PHONE_PRODUCT_DEVICE_TYPE = "phone";
+constexpr const char* WEARABLE_PRODUCT_DEVICE_TYPE = "wearable";
+constexpr const char* TABLET_PRODUCT_DEVICE_TYPE = "table";
+
+constexpr int PROP_FSS_ENABLE_LEN = 16;
+constexpr int FSS_ENABLE_LEN = 4;
+constexpr const char* PROP_FSS_ENABLE = "const.wifi.hw_fss_enable";
+constexpr const char* DEFAULT_FSS_ENABLE = "false";
+constexpr const char* FSS_ENABLE = "true";
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
@@ -556,6 +569,25 @@ bool IsFactoryMode()
     return false;
 }
 
+int GetDeviceType()
+{
+    char preValue[PROP_PRODUCT_DEVICE_TYPE_LEN] = {0};
+    int errCode = GetParamValue(
+        PRODUCT_DEVICE_TYPE, DEFAULT_PRODUCT_DEVICE_TYPE, preValue, PROP_PRODUCT_DEVICE_TYPE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, PHONE_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
+            return ProductDeviceType::PHONE;
+        }
+        if (strncmp(preValue, WEARABLE_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
+            return ProductDeviceType::WEARABLE;
+        }
+        if (strncmp(preValue, TABLET_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
+            return ProductDeviceType::TABLET;
+        }
+    }
+    return ProductDeviceType::DEFAULT;
+}
+
 bool IsStartUpWifiEnableSupport()
 {
     LOGI("Enter IsStartUpWifiEnableSupport");
@@ -565,6 +597,21 @@ bool IsStartUpWifiEnableSupport()
     if (errCode > 0) {
         if (strncmp(preValue, STARTUP_WIFI_ENABLE, STARTUP_WIFI_ENABLE_LEN) == 0) {
             LOGI("param startup_wifi_enable is true.");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsSignalSmoothingEnable()
+{
+    LOGI("Enter IsSignalSmoothingEnable");
+    char preValue[PROP_FSS_ENABLE_LEN] = {0};
+    int errCode = GetParamValue(PROP_FSS_ENABLE, DEFAULT_FSS_ENABLE,
+        preValue, PROP_FSS_ENABLE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, FSS_ENABLE, FSS_ENABLE_LEN) == 0) {
+            LOGI("param fss_enable is true.");
             return true;
         }
     }

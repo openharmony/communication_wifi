@@ -106,6 +106,13 @@ ErrCode WifiHotspotImpl::IsHotspotDualBandSupported(bool &isSupported)
     return client_->IsHotspotDualBandSupported(isSupported);
 }
 
+ErrCode WifiHotspotImpl::IsOpenSoftApAllowed(bool &isSupported)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    return client_->IsOpenSoftApAllowed(isSupported);
+}
+
 ErrCode WifiHotspotImpl::GetHotspotState(int &state)
 {
     std::lock_guard<std::mutex> lock(mutex_);

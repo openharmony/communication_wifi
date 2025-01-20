@@ -54,6 +54,7 @@ private:
     static sptr<WifiHotspotMgrServiceImpl> g_instance;
     std::map<int, sptr<IRemoteObject>> mWifiService;
     static std::mutex g_instanceLock;
+    static std::mutex g_hotspotMutex;
     bool mPublishFlag;
     ServiceRunningState mState;
 };

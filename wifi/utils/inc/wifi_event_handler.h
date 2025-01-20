@@ -66,6 +66,15 @@ public:
     void RemoveAsyncTask(const std::string &name);
 
     /**
+    * @Check if Has Async Task
+    *
+    * @param name
+    * @param hasTask
+    * @return int - 0: supported, -1: unsupported
+    */
+    int HasAsyncTask(const std::string &name, bool &hasTask);
+
+    /**
     * @submit sync timeout task to Handler
     *
     * @param callback - Input task

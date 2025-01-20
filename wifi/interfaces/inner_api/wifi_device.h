@@ -293,9 +293,8 @@ public:
     virtual ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) = 0;
 
     /**
-     * @Description Set wifi tx power for sar.
-     *
-     * @param power - 1001,1002,1003......
+     * @Description set tx power for sar
+     * @param power - 1001 1002 1003······
      * @return ErrCode - operation result
      */
     virtual ErrCode SetWifiTxPower(int power) = 0;
@@ -307,6 +306,15 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode DisableDeviceConfig(int networkId) = 0;
+
+    /**
+     * @Description Set whether to allow automatic connect by networkid.
+     *
+     * @param networkId - Identifies the network to be set. The value of networkId cannot be less thann 0.
+     * @param isAllowed - Identifies whether allow auto connect or not.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) = 0;
 
     /**
      * @Description Obtaining ip Request Information
@@ -554,9 +562,68 @@ public:
      *
      * @param uid - target app uid
      * @param protocol - target protocol type
-     * @return enable - enable/disable dpi mark
+     * @param enable - enable/disable dpi mark
      */
     virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
+
+    /**
+     * @Description Accept network control information from RSS.
+     *
+     * @param networkControlInfo - structure of network control infomation
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) = 0;
+
+    /**
+     * @Description Update Network Lag Info
+     *
+     * @param networkLagType - recv networkLagType
+     * @param networkLagInfo - recv networkLagInfo
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) = 0;
+
+    /**
+     * @Description Get Vowifi Signal Info.
+     *
+     * @return VoWifiSignalInfo : wifi signal info
+     */
+    virtual ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) = 0;
+ 
+    /**
+     * @Description Check Is Support VoWifi Detect.
+     *
+     * @return bool - supported: true, unsupported: false.
+     */
+    virtual ErrCode IsSupportVoWifiDetect(bool &isSupported) = 0;
+ 
+    /**
+     * @Description set VoWifi detect mode.
+     *
+     * @param info WifiDetectConfInfo
+     */
+    virtual ErrCode SetVoWifiDetectMode(WifiDetectConfInfo info) = 0;
+ 
+    /**
+     * indicate VoWifiDetectMode
+     *
+     * @return VoWifiDetectMode
+     */
+    virtual ErrCode GetVoWifiDetectMode(WifiDetectConfInfo &info) = 0;
+ 
+    /**
+     * @Description set vowifi detect period.
+     *
+     * @param period period of vowifi detect
+     */
+    virtual ErrCode SetVoWifiDetectPeriod(int period) = 0;
+ 
+    /**
+     * @Description Get vowifi detection period
+     *
+     * @return vowifi detection period
+     */
+    virtual ErrCode GetVoWifiDetectPeriod(int &period) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

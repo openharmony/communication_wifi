@@ -464,11 +464,7 @@ void NetworkXmlParser::ParseStatus(xmlNodePtr node, WifiDeviceConfig& wifiDevice
         return;
     }
     std::string status = GetStringValue(node);
-    if (status.compare("NETWORK_SELECTION_ENABLED")) {
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::DISABLED);
-    } else {
-        wifiDeviceConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
-    }
+    //@deprecated NETWORK_SELECTION_ENABLED
 }
 
 
@@ -653,9 +649,7 @@ bool NetworkXmlParser::ParseInternal(xmlNodePtr node)
 
 void NetworkXmlParser::EnableNetworks()
 {
-    for (auto &wifiConfig : wifiConfigs) {
-        wifiConfig.status = static_cast<int>(WifiDeviceConfigStatus::ENABLED);
-    }
+    //@deprecated
 }
 
 bool NetworkXmlParser::IsWifiConfigValid(WifiDeviceConfig wifiConfig)

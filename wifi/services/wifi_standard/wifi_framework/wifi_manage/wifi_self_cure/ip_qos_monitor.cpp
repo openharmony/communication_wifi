@@ -147,5 +147,15 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
     }
     return true;
 }
+
+int64_t IpQosMonitor::GetCurrentTcpTxCounter()
+{
+    return mLastTcpTxCounter;
+}
+ 
+int64_t IpQosMonitor::GetCurrentTcpRxCounter()
+{
+    return mLastTcpRxCounter;
+}
 } // namespace Wifi
 } // namespace OHOS

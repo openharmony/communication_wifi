@@ -333,5 +333,27 @@ void WifiP2pCallbackProxy::OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info)
     }
     return;
 }
+
+void WifiP2pCallbackProxy::OnP2pChrErrCodeReport(const int errCode)
+{
+    WIFI_LOGD("WifiP2pCallbackProxy::OnP2pChrErrCodeReport");
+	MessageOption option = {MessageOption::TF_ASYNC};
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(errCode);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_CBK_CMD_CHR_ERRCODE_REPORT),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code %{public}d",
+            P2PInterfaceCode::WIFI_CBK_CMD_CHR_ERRCODE_REPORT, error);
+        return;
+    }
+    return;
+}
 }  // namespace Wifi
 }  // namespace OHOS

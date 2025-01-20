@@ -242,6 +242,16 @@ void WifiP2pGroupManager::SaveP2pInfo(const WifiP2pLinkedInfo &linkedInfo)
     p2pConnInfo = linkedInfo;
 }
 
+bool WifiP2pGroupManager::IsOldPersistentGroup(int id)
+{
+    for (auto it = groupsInfo.begin(); it != groupsInfo.end(); ++it) {
+        if (it->GetNetworkId() == id) {
+            return it->GetPersistentFlag();
+        }
+    }
+    return false;
+}
+
 const WifiP2pLinkedInfo &WifiP2pGroupManager::GetP2pInfo() const
 {
     return p2pConnInfo;

@@ -21,6 +21,7 @@
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
 #include "wifi_event_callback.h"
+#include "p2p_chr_reporter.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pMonitor");
 
@@ -31,6 +32,7 @@ P2pMonitor::P2pMonitor() : selectIfacName(), setMonitorIface(), mapHandler()
 
 P2pMonitor::~P2pMonitor() __attribute__((no_sanitize("cfi")))
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     P2pHalCallback callback;
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     setMonitorIface.clear();
@@ -42,6 +44,7 @@ void P2pMonitor::Initialize()
 void P2pMonitor::MonitorBegins(const std::string &iface)
 {
     using namespace std::placeholders;
+    std::lock_guard<std::mutex> lock(monitorMutex);
     selectIfacName = iface;
     setMonitorIface.insert(iface);
 
@@ -86,6 +89,7 @@ void P2pMonitor::MonitorBegins(const std::string &iface)
 
 void P2pMonitor::MonitorEnds(const std::string &iface)
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     P2pHalCallback callback;
     WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
     setMonitorIface.erase(iface);
@@ -93,6 +97,7 @@ void P2pMonitor::MonitorEnds(const std::string &iface)
 
 void P2pMonitor::RegisterIfaceHandler(const std::string &iface, const std::function<HandlerMethod> &handler)
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     auto iter = mapHandler.find(iface);
     if (iter != mapHandler.end()) {
         iter->second = handler;
@@ -103,6 +108,7 @@ void P2pMonitor::RegisterIfaceHandler(const std::string &iface, const std::funct
 
 void P2pMonitor::UnregisterHandler(const std::string &iface)
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     auto iter = mapHandler.find(iface);
     if (iter != mapHandler.end()) {
         mapHandler.erase(iter);
@@ -112,6 +118,7 @@ void P2pMonitor::UnregisterHandler(const std::string &iface)
 void P2pMonitor::MessageToStateMachine(
     const std::string &iface, P2P_STATE_MACHINE_CMD msgName, int param1, int param2, const std::any &messageObj) const
 {
+    std::lock_guard<std::mutex> lock(monitorMutex);
     if (setMonitorIface.count(iface) > 0) {
         auto iter = mapHandler.find(iface);
         if (iter != mapHandler.end()) {
@@ -433,9 +440,9 @@ void P2pMonitor::WpaEventGoNegFailure(int status) const
 {
     WIFI_LOGI("onGoNegotiationFailure callback status:%{public}d", status);
     P2pStatus p2pStatus = IntStatusToP2pStatus(status);
-    WriteP2pAbDisConnectHiSysEvent(static_cast<int>(P2P_ERROR_CODE::NEGO_FAILURE_ERROR),
-        static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     Broadcast2SmGoNegFailure(selectIfacName, p2pStatus);
+    P2pChrReporter::GetInstance().ReportErrCodeBeforeGroupFormationSucc(GROUP_OWNER_NEGOTIATION, status,
+        P2P_CHR_DEFAULT_REASON_CODE);
 }
 
 void P2pMonitor::WpaEventInvitationReceived(const HalP2pInvitationInfo &recvInfo) const
@@ -471,6 +478,7 @@ void P2pMonitor::WpaEventInvitationReceived(const HalP2pInvitationInfo &recvInfo
     group.SetOwner(owner);
 
     Broadcast2SmInvitationReceived(selectIfacName, group);
+    P2pChrReporter::GetInstance().SetWpsSuccess(true);
 }
 
 void P2pMonitor::WpaEventInvitationResult(const std::string &bssid, int status) const
@@ -491,9 +499,11 @@ void P2pMonitor::WpaEventGroupFormationFailure(const std::string &failureReason)
 {
     WIFI_LOGD("onGroupFormationFailure callback, failureReason:%{public}s", failureReason.c_str());
     std::string reason(failureReason);
-    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::FORMATION_ERROR),
-        static_cast<int>(P2P_ERROR_RES::FORMATION_FAILURE));
     Broadcast2SmGroupFormationFailure(selectIfacName, reason);
+    if (failureReason == "FREQ_CONFLICT") {
+        P2pChrReporter::GetInstance().ReportErrCodeBeforeGroupFormationSucc(GROUP_FORMATION,
+            static_cast<int>(P2pStatus::NO_COMMON_CHANNELS), P2P_CHR_DEFAULT_REASON_CODE);
+    }
 }
 
 void P2pMonitor::WpaEventGroupStarted(const HalP2pGroupInfo &groupInfo) const
@@ -592,8 +602,6 @@ void P2pMonitor::WpaEventProvDiscShowPin(const std::string &p2pDeviceAddress, co
 void P2pMonitor::WpaEventProvDiscFailure(void) const
 {
     WIFI_LOGD("onProvisionDiscoveryFailure callback");
-    WriteP2pConnectFailedHiSysEvent(static_cast<int>(P2P_ERROR_CODE::P2P_DISCOVER_FAILURE_ERROR),
-        static_cast<int>(P2P_ERROR_RES::P2P_DISCOVERY_FAILURE));
     Broadcast2SmProvDiscFailure(selectIfacName);
 }
 
@@ -647,6 +655,8 @@ void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress, con
     device.SetGroupAddress(p2pGroupAddress);
     device.SetRandomDeviceAddress(p2pGroupAddress);
     Broadcast2SmApStaConnected(selectIfacName, device);
+    P2pChrReporter::GetInstance().ReportP2pInterfaceStateChange(static_cast<int>(P2pChrState::GC_CONNECTED),
+        P2P_CHR_DEFAULT_REASON_CODE, P2P_CHR_DEFAULT_REASON_CODE);
 }
 
 void P2pMonitor::OnConnectSupplicantFailed(void) const
@@ -711,19 +721,19 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
                 return;
             }
             std::string data = notifyParam.substr(freqPos + strlen("freq="));
-            int freq = stoi(data);
+            int freq = CheckDataLegal(data);
             WpaEventP2pChannelSwitch(freq);
             break;
         }
         case static_cast<int>(WpaEventCallback::CHR_EVENT_NUM): {
             std::string::size_type codePos = 0;
-            if ((codePos = notifyParam.find("errCode=")) == std::string::npos) {
-                WIFI_LOGE("chr event notifyParam not find errCode!");
-                return;
+            if ((codePos = notifyParam.find("errCode=")) != std::string::npos) {
+                std::string data = notifyParam.substr(codePos + strlen("errCode="));
+                int errCode = stoi(data);
+                WpaEventP2pChrReport(errCode);
+            } else {
+                P2pChrReporter::GetInstance().ProcessChrEvent(notifyParam.substr(begPos + 1));
             }
-            std::string data = notifyParam.substr(codePos + strlen("errCode="));
-            int errCode = stoi(data);
-            WpaEventP2pChrReport(errCode);
             break;
         }
         default:

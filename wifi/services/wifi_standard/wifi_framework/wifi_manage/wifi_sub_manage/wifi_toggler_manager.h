@@ -25,6 +25,10 @@
 
 namespace OHOS {
 namespace Wifi {
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+using OnChipHdiServiceCallback = std::function<void(void)>;
+#endif
+
 class WifiTogglerManager {
 public:
     WifiTogglerManager();
@@ -57,6 +61,10 @@ private:
     void InitSoftapCallback(void);
     void InitMultiStacallback();
     void InitRptCallback(void);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    void InitChipHdiCallback(void);
+    void DealChipServiceDied(void);
+#endif
     void DealConcreateStop(int id = 0);
     void DealConcreateStartFailure(int id = 0);
     void DealSoftapStop(int id = 0);
@@ -74,6 +82,9 @@ private:
     SoftApModeCallback mSoftApModeCb;
     MultiStaModeCallback mMultiStaModeCb;
     RptModeCallback mRptModeCb;
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    OnChipHdiServiceCallback mChipHdiServiceCb;
+#endif
     std::unique_ptr<WifiControllerMachine> pWifiControllerMachine = nullptr;
 };
 

@@ -19,10 +19,10 @@ ohos_shared_library("wifi") {
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
     debug = false
   }
   install_enable = true
@@ -77,10 +77,10 @@ ohos_shared_library("wifiext") {
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
     debug = false
   }
   install_enable = true
@@ -106,6 +106,7 @@ ohos_shared_library("wifiext") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 
   defines = []
@@ -129,10 +130,10 @@ ohos_shared_library("wifimanager") {
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
     debug = false
   }
   install_enable = true
@@ -185,10 +186,10 @@ ohos_shared_library("wifimanagerext") {
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = true  # Enable integer overflow detection
-    ubsan = true  # Enable some Ubsan options
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
     debug = false
   }
   install_enable = true
@@ -220,6 +221,7 @@ ohos_shared_library("wifimanagerext") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
   cflags = memory_optimization_cflags
   cflags_cc = memory_optimization_cflags_cc

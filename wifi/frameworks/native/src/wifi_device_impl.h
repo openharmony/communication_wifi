@@ -126,8 +126,7 @@ public:
 
     /**
      * @Description set tx power for sar.
-     *
-     * @param power - 1001,1002,1003......
+     * @param power - 1001 1002 1003······
      * @return ErrCode - operation result
      */
     ErrCode SetWifiTxPower(int power) override;
@@ -308,6 +307,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode DisableDeviceConfig(int networkId) override;
+
+    /**
+     * @Description Set whether to allow automatic connect by networkid.
+     *
+     * @param networkId - Identifies the network to be set. The value of networkId cannot be less thann 0.
+     * @param isAllowed - Identifies whether allow auto connect or not.
+     * @return ErrCode - operation result
+     */
+    ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) override;
 
     /**
      * @Description Obtaining ip Request Information
@@ -503,6 +511,14 @@ public:
     ErrCode FactoryReset() override;
 
     /**
+     * @Description Accept network control information from RSS.
+     *
+     * @param networkControlInfo - structure of network control infomation
+     * @return ErrCode - operation result
+     */
+    ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) override;
+
+    /**
      * @Description  limit speed
      *
      * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit
@@ -585,6 +601,58 @@ public:
      * @return enable - enable/disable dpi mark
      */
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
+
+    /**
+     * @Description Update Network Lag Info
+     *
+     * @param networkLagType - recv networkLagType
+     * @param networkLagInfo - recv networkLagInfo
+     * @return ErrCode - operation result
+     */
+    ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) override;
+
+    /**
+     * @Description Get Vowifi Signal Info.
+     *
+     * @return VoWifiSignalInfo : wifi signal info
+     */
+    ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) override;
+ 
+    /**
+     * @Description Check Is Support VoWifi Detect.
+     *
+     * @return bool - supported: true, unsupported: false.
+     */
+    ErrCode IsSupportVoWifiDetect(bool &isSupported) override;
+ 
+    /**
+     * @Description set VoWifi detect mode.
+     *
+     * @param info WifiDetectConfInfo
+     */
+    ErrCode SetVoWifiDetectMode(WifiDetectConfInfo info) override;
+ 
+    /**
+     * indicate VoWifiDetectMode
+     *
+     * @return VoWifiDetectMode
+     */
+    ErrCode GetVoWifiDetectMode(WifiDetectConfInfo &info) override;
+ 
+    /**
+     * @Description set vowifi detect period.
+     *
+     * @param period period of vowifi detect
+     */
+    ErrCode SetVoWifiDetectPeriod(int period) override;
+ 
+    /**
+     * @Description Get vowifi detection period
+     *
+     * @return vowifi detection period
+     */
+    ErrCode GetVoWifiDetectPeriod(int &period) override;
+
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

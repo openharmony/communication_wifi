@@ -36,6 +36,7 @@
 #define MOUSE_CROSS_SERVICE_UID 6699
 namespace OHOS {
 namespace Wifi {
+const int HID2D_TIMEOUT_INTERVAL = 10 * 1000;
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 
 class WifiConfigCenter {
@@ -114,6 +115,10 @@ public:
     int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0);
 
     int SaveLinkedInfo(const WifiLinkedInfo &info, int instId = 0);
+
+    int GetMloLinkedInfo(std::vector<WifiLinkedInfo> &mloInfo, int instId = 0);
+
+    int SaveMloLinkedInfo(const std::vector<WifiLinkedInfo> &mloInfo, int instId = 0);
 
     int SetMacAddress(const std::string &macAddress, int instId = 0);
 
@@ -208,6 +213,10 @@ public:
     int SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene);
 
     int GetHid2dUpperScene(int uid, Hid2dUpperScene &scene);
+
+    int SetHid2dSceneLastSetTime(int64_t setTime);
+    
+    int64_t GetHid2dSceneLastSetTime();
 
     void ClearLocalHid2dInfo(int uid = 0);
 
@@ -323,6 +332,14 @@ public:
     int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0);
 
     int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0);
+
+    void SetSystemMode(int systemMode);
+
+    int GetSystemMode();
+
+    void SetDeviceType(int deviceType);
+
+    bool IsAllowPopUp();
 private:
     WifiConfigCenter();
     std::string GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
@@ -353,6 +370,7 @@ private:
     std::map<int, IpInfo> mWifiIpInfo;
     std::map<int, IpV6Info> mWifiIpV6Info;
     std::map<int, WifiLinkedInfo> mWifiLinkedInfo;
+    std::map<int, std::vector<WifiLinkedInfo>> mWifiMloLinkedInfo;
     std::map<int, std::string> mMacAddress;
     std::map<int, int> mLastSelectedNetworkId;
     std::map<int, time_t> mLastSelectedTimeVal;
@@ -386,6 +404,7 @@ private:
     std::string mP2pIfaceName {"p2p-dev-wlan0"};
 #endif
     std::map<int, Hid2dUpperScene> mHid2dUpperScenePair;
+    std::atomic<int64_t> mHid2dSceneLastSetTime {0};
     std::atomic<WifiOprMidState> mP2pMidState {WifiOprMidState::CLOSED};
     std::atomic<int> mP2pState {static_cast<int>(P2pState::P2P_STATE_CLOSED)};
     std::atomic<int> mP2pEnhanceState {0};
@@ -416,6 +435,8 @@ private:
     std::map<WifiMacAddrInfo, std::string> mP2pDeviceMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pGroupsInfoMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
+    int systemMode_ = SystemMode::M_DEFAULT;
+    int mDeviceType = ProductDeviceType::DEFAULT;
 };
 } // namespace Wifi
 } // namespace OHOS

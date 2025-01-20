@@ -446,6 +446,7 @@ private:
 private:
     static sptr<WifiP2pServiceImpl> instance;
     static std::mutex instanceLock;
+    static std::mutex g_p2pMutex;
     bool mPublishFlag;
     ServiceRunningState mState;
     static constexpr int WIFI_P2P_PASSPHRASE_MIN_LEN = 8;

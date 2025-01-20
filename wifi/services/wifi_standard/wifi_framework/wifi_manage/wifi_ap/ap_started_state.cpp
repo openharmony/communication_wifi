@@ -181,6 +181,7 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         }
     }
 #endif
+    WifiApHalInterface::GetInstance().SetMaxConnectNum(ifName, apConfig.GetChannel(), apConfig.GetMaxConn());
     if (WifiApHalInterface::GetInstance().EnableAp(m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Enableap failed.");
         return false;
@@ -226,8 +227,6 @@ bool ApStartedState::StopAp() const
     if (retCode != WifiErrorNo::WIFI_HAL_OPT_OK) {
         return false;
     }
-    WifiStaHalInterface::GetInstance().SetNetworkInterfaceUpDown(
-        WifiConfigCenter::GetInstance().GetApIfaceName(), false);
     WriteWifiApStateHiSysEvent(0);
     return true;
 }
@@ -334,8 +333,13 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
         }
 #ifndef WIFI_DHCP_DISABLED
         m_ApStateMachine.StopDhcpServer();
-        m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress(), m_hotspotConfig.GetLeaseTime());
+        if (m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress(), m_hotspotConfig.GetLeaseTime())) {
+            m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
+        }
+#else
+        m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
 #endif
+        WifiSettings::GetInstance().SyncHotspotConfig();
     } else {
         WIFI_LOGI("Ap disabled, set softap toggled false");
         WifiConfigCenter::GetInstance().SetSoftapToggledState(false);

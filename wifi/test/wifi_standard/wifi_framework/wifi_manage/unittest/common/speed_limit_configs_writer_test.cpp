@@ -30,10 +30,17 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
+static std::string g_errLog;
+void SpeedLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+     g_errLog = msg;
+}
+
 class SpeedLimitConfigsWriterTest : public Test {
 public:
     void SetUp() override
     {
+        LOG_SetCallback(SpeedLogCallback);
         // Set up any necessary dependencies or configurations for the tests
     }
 
@@ -52,6 +59,7 @@ HWTEST_F(SpeedLimitConfigsWriterTest, SetBgLimitIdList_DoesNotCallSetUidPidsWhen
 {
     std::vector<int> idList = {10, 11, 12};
     SetBgLimitIdList(idList, 999);
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SpeedLimitConfigsWriterTest, SetUidPids_WritesIdStrToFileWhenFileOpenSucceeds, TestSize.Level1)
@@ -60,6 +68,7 @@ HWTEST_F(SpeedLimitConfigsWriterTest, SetUidPids_WritesIdStrToFileWhenFileOpenSu
     const int idArray[] = {1, 2, 3};
     const int size = sizeof(idArray) / sizeof(idArray[0]);
     SetUidPids(filePath, idArray, size);
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SpeedLimitConfigsWriterTest, SetUidPids_DoesNotWriteIdStrToFileWhenFileOpenFails, TestSize.Level1)
@@ -68,4 +77,5 @@ HWTEST_F(SpeedLimitConfigsWriterTest, SetUidPids_DoesNotWriteIdStrToFileWhenFile
     const int idArray[] = {4, 5, 6};
     const int size = sizeof(idArray) / sizeof(idArray[0]);
     SetUidPids(filePath, idArray, size);
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }

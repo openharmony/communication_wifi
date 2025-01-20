@@ -39,6 +39,11 @@ using ::testing::ext::TestSize;
   
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void SoftapParLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 DEFINE_WIFILOG_LABEL("SoftapParserTest");
 
 class SoftapParserTest : public testing::Test {
@@ -48,6 +53,7 @@ public:
     virtual void SetUp()
     {
         m_softapXmlParser  = std::make_unique<SoftapXmlParser>();
+        LOG_SetCallback(SoftapParLogCallback);
     }
     virtual void TearDown() {}
 private:
@@ -70,6 +76,7 @@ HWTEST_F(SoftapParserTest, ParseSoftapTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseSoftapTest enter");
     m_softapXmlParser->ParseSoftap(nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SoftapParserTest, GetConfigNameAsIntTest, TestSize.Level1)

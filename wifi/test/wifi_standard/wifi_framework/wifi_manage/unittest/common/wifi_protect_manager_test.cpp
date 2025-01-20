@@ -317,6 +317,7 @@ HWTEST_F(WifiProtectManagerTest, OnAppForegroudChangedTest001, TestSize.Level1)
 {
     WifiProtectManager wifiProtectManager;
     wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app");
+    EXPECT_EQ(wifiProtectManager.InitWifiProtect(WifiProtectType::WIFI_PROTECT_COMMON, "com.example.app"),true);
     wifiProtectManager.OnAppForegroudChanged("com.example.app", 1);
 }
 // Add more test cases as needed

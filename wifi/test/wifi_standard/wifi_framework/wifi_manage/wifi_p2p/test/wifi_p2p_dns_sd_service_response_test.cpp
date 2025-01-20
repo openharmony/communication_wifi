@@ -19,6 +19,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class WifiP2pDnsSdServiceResponseTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -199,6 +200,7 @@ HWTEST_F(WifiP2pDnsSdServiceResponseTest, ParseData, TestSize.Level1)
 HWTEST_F(WifiP2pDnsSdServiceResponseTest, FetchTxtData, TestSize.Level1)
 {
     WarpFetchTxtData();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

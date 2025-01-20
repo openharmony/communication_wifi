@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Wifi {
 const int SET_FREQUENCY = 6;
 const int SET_NETWORKID = 10;
+static std::string g_errLog = "wifitest";
 
 class WifiP2pGroupManagerTest : public testing::Test {
 public:
@@ -67,11 +68,13 @@ public:
 HWTEST_F(WifiP2pGroupManagerTest, Initialize_SUCCESS, TestSize.Level1)
 {
     pWifiP2pGroupManager->Initialize();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pGroupManagerTest, StashGroups_SUCCESS, TestSize.Level1)
 {
     pWifiP2pGroupManager->StashGroups();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pGroupManagerTest, AddGroup_SUCCESS, TestSize.Level1)
@@ -97,6 +100,7 @@ HWTEST_F(WifiP2pGroupManagerTest, UpdateWpaGroup_SUCCESS, TestSize.Level1)
 {
     pWifiP2pGroupManager->UpdateWpaGroup(groupInfo);
     pWifiP2pGroupManager->UpdateWpaGroup(groupInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pGroupManagerTest, RemoveClientFromGroup_SUCCESS, TestSize.Level1)

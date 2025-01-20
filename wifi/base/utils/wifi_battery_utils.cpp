@@ -38,21 +38,25 @@ BatteryUtils &BatteryUtils::GetInstance()
     return instance;
 }
 
-#ifdef HAS_BATTERY_MANAGER_PART
 bool BatteryUtils::IsChargedPlugIn()
 {
+#ifdef HAS_BATTERY_MANAGER_PART
     auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
     auto batteryPluggedType = batterySrvClient.GetPluggedType();
     if (batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_USB) {
         return true;
     }
+#endif
     return false;
 }
 
 int BatteryUtils::GetBatteryCapacity()
 {
+#ifdef HAS_BATTERY_MANAGER_PART
     return PowerMgr::BatterySrvClient::GetInstance().GetCapacity();
-}
+#else
+    return 0;
 #endif
+}
 }   // namespace Wifi
 }   // namespace OHOS

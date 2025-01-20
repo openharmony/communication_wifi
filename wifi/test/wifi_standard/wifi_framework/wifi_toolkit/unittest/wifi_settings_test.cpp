@@ -45,11 +45,19 @@ constexpr int WIFI_OPT_RETURN = -1;
 constexpr int MIN_RSSI_2DOT_4GHZ = -80;
 constexpr int MIN_RSSI_5GZ = -77;
 constexpr char BACKUP_CONFIG_FILE_PATH_TEST[] = CONFIG_ROOR_DIR"/backup_config_test.conf";
+static std::string g_errLog;
+void WifiSetLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 class WifiSettingsTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {}
+    virtual void SetUp() 
+    {
+        LOG_SetCallback(WifiSetLogCallback);
+    }
     virtual void TearDown() {}
 };
 
@@ -306,12 +314,14 @@ HWTEST_F(WifiSettingsTest, SetDefaultFrequenciesByCountryBandTest, TestSize.Leve
     WIFI_LOGE("SetDefaultFrequenciesByCountryBandTest enter!");
     std::vector<int> frequencies;
     WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, frequencies);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiSettingsTest, SetScanOnlySwitchStateTest, TestSize.Level1)
 {
     WIFI_LOGE("SetScanOnlySwitchStateTest enter!");
     WifiSettings::GetInstance().SetScanOnlySwitchState(STATE);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiSettingsTest, GetScanOnlySwitchStateTest, TestSize.Level1)
@@ -327,12 +337,14 @@ HWTEST_F(WifiSettingsTest, MergeWifiConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("MergeWifiConfigTest enter");
     WifiSettings::GetInstance().MergeWifiConfig();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiSettingsTest, MergeSoftapConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("MergeSoftapConfigTest enter");
     WifiSettings::GetInstance().MergeSoftapConfig();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)
@@ -344,6 +356,7 @@ HWTEST_F(WifiSettingsTest, ConfigsDeduplicateAndSaveTest, TestSize.Level1)
     std::vector<WifiDeviceConfig> configs;
     configs.push_back(config);
     WifiSettings::GetInstance().ConfigsDeduplicateAndSave(configs);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiSettingsTest, OnBackupTest1, TestSize.Level1)
@@ -484,12 +497,14 @@ HWTEST_F(WifiSettingsTest, GetOperatorWifiTypeTest, TestSize.Level1)
     WIFI_LOGI("GetOperatorWifiTypeTest enter");
     WifiSettings::GetInstance().GetOperatorWifiType();
     WifiSettings::GetInstance().GetOperatorWifiType(NETWORK_ID);
+    EXPECT_FALSE(WifiSettings::GetInstance().GetOperatorWifiType(NETWORK_ID));
 }
 
 HWTEST_F(WifiSettingsTest, GetCanOpenStaWhenAirplaneModeTest, TestSize.Level1)
 {
     WIFI_LOGI("GetCanOpenStaWhenAirplaneModeTest enter");
     WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(NETWORK_ID);
+    EXPECT_EQ(WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(NETWORK_ID),true);
 }
 
 HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
@@ -516,6 +531,7 @@ HWTEST_F(WifiSettingsTest, ClearHotspotConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("ClearHotspotConfigTest enter");
     WifiSettings::GetInstance().ClearHotspotConfig();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
@@ -540,12 +556,14 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
 HWTEST_F(WifiSettingsTest, RemoveWifiP2pSupplicantGroupInfoTets, TestSize.Level1)
 {
     WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();
+    EXPECT_NE(WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo(),0);
 }
 
 HWTEST_F(WifiSettingsTest, EncryptionWifiDeviceConfigOnBootTest, TestSize.Level1)
 {
     WIFI_LOGI("EncryptionWifiDeviceConfigOnBootTest enter");
     WifiSettings::GetInstance().EncryptionWifiDeviceConfigOnBoot();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiSettingsTest, EncryptionDeviceConfigTest, TestSize.Level1)
@@ -554,6 +572,7 @@ HWTEST_F(WifiSettingsTest, EncryptionDeviceConfigTest, TestSize.Level1)
     WifiDeviceConfig config;
     config.preSharedKey = "12345678";
     WifiSettings::GetInstance().EncryptionDeviceConfig(config);
+    EXPECT_NE(WifiSettings::GetInstance().EncryptionDeviceConfig(config),false);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionDeviceConfigTest, TestSize.Level1)
@@ -562,6 +581,7 @@ HWTEST_F(WifiSettingsTest, DecryptionDeviceConfigTest, TestSize.Level1)
     WifiDeviceConfig config;
     config.preSharedKey = "12345678";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
+    EXPECT_NE(WifiSettings::GetInstance().DecryptionDeviceConfig(config),-1);
 }
 
 HWTEST_F(WifiSettingsTest, IsWifiDeviceConfigDecipheredTest, TestSize.Level1)
@@ -570,6 +590,7 @@ HWTEST_F(WifiSettingsTest, IsWifiDeviceConfigDecipheredTest, TestSize.Level1)
     WifiDeviceConfig config;
     config.preSharedKey = "12345678";
     WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config);
+    EXPECT_EQ(WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config),true);
 }
 
 HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest, TestSize.Level1)
@@ -579,6 +600,7 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest, TestSize.Level1)
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().EncryptionDeviceConfig(config);
+    EXPECT_EQ(WifiSettings::GetInstance().EncryptionDeviceConfig(config),false);
 }
 
 HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)
@@ -590,6 +612,7 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     config.wifiWapiConfig.wapiAsCertData = "abcdefg";
     WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config);
+    EXPECT_NE(WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config),true);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)
@@ -599,6 +622,7 @@ HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
+    EXPECT_NE(WifiSettings::GetInstance().DecryptionDeviceConfig(config),-1);
 }
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)

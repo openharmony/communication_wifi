@@ -645,6 +645,9 @@ public:
 
     void GetIpStateStateExeMsgFail()
     {
+        EXPECT_CALL(BlockConnectService::GetInstance(),
+        UpdateNetworkSelectStatus(_, _))
+        .WillRepeatedly(Return(-1));
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         StaStateMachine staStateMachine;
         pStaStateMachine->pGetIpState->pStaStateMachine = &staStateMachine;

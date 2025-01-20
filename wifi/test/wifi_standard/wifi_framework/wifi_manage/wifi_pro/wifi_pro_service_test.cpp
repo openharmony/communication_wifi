@@ -108,6 +108,7 @@ HWTEST_F(WifiProServiceTest, HandleQoeReportTest01, TestSize.Level1)
     NetworkLagInfo networkLagInfo;
     wifiProService_->HandleQoeReport(networkLagType, networkLagInfo);
     EXPECT_NE(wifiProService_->instId_, TEN);
+    
 }
 } // namespace Wifi
 } // namespace OHOS

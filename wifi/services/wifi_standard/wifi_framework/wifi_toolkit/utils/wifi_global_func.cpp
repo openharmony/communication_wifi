@@ -70,6 +70,7 @@ constexpr const char* FSS_ENABLE = "true";
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
+constexpr int ASCALL_MINUS_SIGN_INDEX = 45;
 
 std::string GetRandomStr(int len)
 {
@@ -274,8 +275,10 @@ bool IsValidateNum(const std::string &str)
     if (str.empty()) {
         return false;
     }
-    for (char item : str) {
-        if (item >= ASCALL_NUM_START_INDEX && item <= ASCALL_NUM_END_INDEX) {
+    for (auto it = str.begin(); it != str.end(); ++it) {
+        if (it == str.begin() && *it == ASCALL_MINUS_SIGN_INDEX) {
+            continue;
+        } else if (*it >= ASCALL_NUM_START_INDEX && *it <= ASCALL_NUM_END_INDEX) {
             continue;
         } else {
             return false;

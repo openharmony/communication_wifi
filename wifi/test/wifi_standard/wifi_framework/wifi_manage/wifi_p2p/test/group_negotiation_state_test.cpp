@@ -25,6 +25,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog;
+    void GroupNegotiationStateCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class GroupNegotiationStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -37,6 +42,7 @@ public:
         pGroupNegotiationState.reset(
             new GroupNegotiationState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager));
         pGroupNegotiationState->Init();
+        LOG_SetCallback(GroupNegotiationStateCallback);
     }
     virtual void TearDown()
     {
@@ -77,11 +83,13 @@ public:
 HWTEST_F(GroupNegotiationStateTest, GoInState, TestSize.Level1)
 {
     pGroupNegotiationState->GoInState();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(GroupNegotiationStateTest, GoOutState, TestSize.Level1)
 {
     pGroupNegotiationState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg1, TestSize.Level1)

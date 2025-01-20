@@ -25,6 +25,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog;
+    void InvitationReceivedStateCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class InvitationReceivedStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -38,6 +43,7 @@ public:
             new InvitationReceivedState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager));
         pGroupFormedState.reset(
             new GroupFormedState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager));
+            LOG_SetCallback(InvitationReceivedStateCallback);
     }
     virtual void TearDown()
     {
@@ -69,6 +75,7 @@ public:
 HWTEST_F(InvitationReceivedStateTest, GoInState, TestSize.Level1)
 {
     pInvitationReceivedState->GoInState();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(InvitationReceivedStateTest, GoOutState, TestSize.Level1)
@@ -91,14 +98,14 @@ HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
-    pInvitationReceivedState->ExecuteStateMsg(msg);
+    EXPECT_TRUE(pInvitationReceivedState->ExecuteStateMsg(msg)); 
 }
 
 HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg3, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
-    pInvitationReceivedState->ExecuteStateMsg(msg);
+    EXPECT_FALSE(pInvitationReceivedState->ExecuteStateMsg(msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

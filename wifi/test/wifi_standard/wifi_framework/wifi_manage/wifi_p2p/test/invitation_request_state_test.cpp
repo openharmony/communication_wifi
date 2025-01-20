@@ -25,6 +25,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+        static std::string g_errLog;
+    void InvitationRequestStateCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class InvitationRequestStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -36,6 +41,7 @@ public:
         pMockP2pPendant.reset(new MockP2pPendant());
         pInvitationRequestState.reset(
             new InvitationRequestState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager));
+            LOG_SetCallback(InvitationRequestStateCallback);
     }
     virtual void TearDown()
     {
@@ -70,6 +76,7 @@ HWTEST_F(InvitationRequestStateTest, GoInState, TestSize.Level1)
 HWTEST_F(InvitationRequestStateTest, GoOutState, TestSize.Level1)
 {
     pInvitationRequestState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(InvitationRequestStateTest, ProcessInvitationResultEvt1, TestSize.Level1)

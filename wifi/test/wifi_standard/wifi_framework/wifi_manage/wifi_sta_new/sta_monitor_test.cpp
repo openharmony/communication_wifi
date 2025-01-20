@@ -71,12 +71,14 @@ HWTEST_F(StaMonitorTest, OnConnectChangedCallBackTest01, TestSize.Level1)
     pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
     status = HAL_WPA_CB_ASSOCIATING;
     pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    EXPECT_NE(pStaMonitor->m_instId, TEN);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackTest01, TestSize.Level1)
 {
     std::string notifyParam = "02:23:45:67:89:AB";
     pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
+    EXPECT_NE(pStaMonitor->m_instId, TEN);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaAuthTimeOutCallBackTest01, TestSize.Level1)
@@ -90,12 +92,14 @@ HWTEST_F(StaMonitorTest, OnWpaEapSimAuthCallBackTest01, TestSize.Level1)
     std::string notifyParam = "01:23:45:67:89:AB";
     pStaMonitor->pStaStateMachine = nullptr;
     pStaMonitor->OnWpaEapSimAuthCallBack(notifyParam);
+    EXPECT_NE(pStaMonitor->m_instId, TEN);
 }
 
 HWTEST_F(StaMonitorTest, OnWpaEapSimAuthCallBackTest02, TestSize.Level1)
 {
     std::string notifyParam = "01:23:45:67:89:AB";
     pStaMonitor->OnWpaEapSimAuthCallBack(notifyParam);
+    EXPECT_NE(pStaMonitor->m_instId, TEN);
 }
 
 } // WIFI

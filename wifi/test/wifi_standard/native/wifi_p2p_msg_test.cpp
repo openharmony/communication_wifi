@@ -62,6 +62,7 @@ HWTEST_F(WifiP2PMsgTest, isSessionAvailableTest, TestSize.Level1)
 {
     bool enabled = true;
     pWifiP2pWfdInfo->setSessionAvailable(enabled);
+    EXPECT_TRUE(pWifiP2pWfdInfo->isSessionAvailable());
     enabled = false;
     pWifiP2pWfdInfo->setSessionAvailable(enabled);
     EXPECT_FALSE(pWifiP2pWfdInfo->isSessionAvailable());

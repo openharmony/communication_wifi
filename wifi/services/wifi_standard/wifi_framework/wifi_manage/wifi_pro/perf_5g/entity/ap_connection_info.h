@@ -61,8 +61,8 @@ private:
     std::vector<double> otaPktVolumes_;
     std::vector<double> otaBadPktProducts_;
     std::list<LinkQuality> linkQualitys_;
-    steady_clock::time_point connectedTime_;
-    long totalUseTime_;
+    steady_clock::time_point connectedTime_ = steady_clock::time_point::min();
+    long totalUseTime_ = 0L;
 
     bool IsSatisfyRttThreshold(long windowRttProductTotal,
         long windowRttPacketVolumeTotal, long rttThreshold, int rssiIndex);

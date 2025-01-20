@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <vector>
 #include "network_status_history_manager.h"
+#include "log.h"
 
 using ::testing::_;
 using ::testing::Return;
@@ -23,11 +24,18 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog;
+    void NetworkStatusHistoryManagerCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class NetworkStatusHistoryManagerTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {}
+    virtual void SetUp() {
+        LOG_SetCallback(NetworkStatusHistoryManagerCallback);
+    }
     virtual void TearDown() {}
 };
 
@@ -36,6 +44,7 @@ HWTEST_F(NetworkStatusHistoryManagerTest, UpdateTest01, TestSize.Level1)
     uint32_t networkStatusHistory = 0b11;
     NetworkStatus networkStatus = NetworkStatus::UNKNOWN;
     NetworkStatusHistoryManager::Update(networkStatusHistory, networkStatus);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(NetworkStatusHistoryManagerTest, IsInternetAccessByHistory01, TestSize.Level1)

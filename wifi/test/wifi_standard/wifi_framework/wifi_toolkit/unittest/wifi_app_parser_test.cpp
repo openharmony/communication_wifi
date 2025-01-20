@@ -170,6 +170,7 @@ HWTEST_F(AppParserTest, IsReadCloudConfig, TestSize.Level1)
 {
     WIFI_LOGI("IsReadCloudConfig enter");
     m_appXmlParser->IsReadCloudConfig();
+    EXPECT_FALSE(m_appXmlParser->IsReadCloudConfig());
 }
  
 HWTEST_F(AppParserTest, GetCloudPushFileVersion, TestSize.Level1)

@@ -27,6 +27,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void WificHostLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+        g_errLog = msg;
+}
 unsigned int g_status = 17;
 unsigned char g_result = 5;
 int g_mode = 1;
@@ -36,7 +41,10 @@ class WifiHotspotTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {}
+    virtual void SetUp() 
+    {
+        LOG_SetCallback(WificHostLogCallback);
+    }
     virtual void TearDown() {}
 
 public:
@@ -86,6 +94,7 @@ public:
 HWTEST_F(WifiHotspotTest, EnableHotspotTest, TestSize.Level1)
 {
     EnableHotspotTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHotspotTest, DisableHotspotTest, TestSize.Level1)
@@ -113,6 +122,7 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsNormal, TestSize.Level1)
     memcpy_s(config.ipAddress, WIFI_MAX_IPV4_LEN, "192.168.1.12", 12);
     config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
     SetHotspotConfig(&config);
+    EXPECT_FALSE(SetHotspotConfig(&config) == 0);
 }
 
 /**
@@ -159,6 +169,7 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException03, TestSize.Level1)
     config.securityType = WifiSecurityType::WIFI_SEC_TYPE_PSK;
     memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen65, WIFI_MAX_KEY_LEN);
     SetHotspotConfig(&config);
+    EXPECT_FALSE(SetHotspotConfig(&config) == 0);
 }
 
 /**
@@ -176,26 +187,31 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException04, TestSize.Level1)
     memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, g_testDataLen60, 60);
     memcpy_s(config.ipAddress, WIFI_MAX_IPV4_LEN, "192.168.1.1222555454545", WIFI_MAX_IPV4_LEN);
     SetHotspotConfig(&config);
+    EXPECT_TRUE(SetHotspotConfig(&config) != 0);
 }
 
 HWTEST_F(WifiHotspotTest, GetHotspotConfigTests, TestSize.Level1)
 {
     GetHotspotConfigTests();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHotspotTest, GetStationListTests, TestSize.Level1)
 {
     GetStationListTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHotspotTest, DisassociateStaTests, TestSize.Level1)
 {
     DisassociateStaTests();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHotspotTest, AddTxPowerInfoTests, TestSize.Level1)
 {
     AddTxPowerInfoTests();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 }
 }

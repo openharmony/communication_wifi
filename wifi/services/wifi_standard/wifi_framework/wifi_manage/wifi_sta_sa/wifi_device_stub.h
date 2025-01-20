@@ -53,6 +53,7 @@ private:
     void OnGetChangeDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnAllowAutoConnect(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnectTo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnConnect2To(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnStartRoamToNetwork(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -86,6 +87,7 @@ private:
     void OnDisableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnEnableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableSemiWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -96,6 +98,13 @@ private:
     void OnGetDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetDpiMarkRule(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsFeatureSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnUpdateNetworkLagInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnFetchWifiSignalInfoForVoWiFi(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnIsSupportVoWifiDetect(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetVoWifiDetectMode(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetVoWifiDetectMode(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnSetVoWifiDetectPeriod(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetVoWifiDetectPeriod(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);

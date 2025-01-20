@@ -37,6 +37,7 @@ public:
     MOCK_CONST_METHOD1(RemoveDevice, ErrCode(int networkId));
     MOCK_CONST_METHOD2(EnableDeviceConfig, ErrCode(int networkId, bool attemptEnable));
     MOCK_CONST_METHOD1(DisableDeviceConfig, ErrCode(int networkId));
+    MOCK_CONST_METHOD2(AllowAutoConnect, ErrCode(int32_t networkId, bool isAllowed));
     MOCK_CONST_METHOD1(StartWps, ErrCode(const WpsConfig &config));
     MOCK_CONST_METHOD0(CancelWps, ErrCode());
     MOCK_METHOD1(AutoConnectService, ErrCode(const std::vector<InterScanInfo> &scanInfos));

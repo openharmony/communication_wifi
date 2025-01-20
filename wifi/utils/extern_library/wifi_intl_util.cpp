@@ -28,7 +28,7 @@ extern "C" void GetSystemRegion(char *region, int size)
         WIFI_LOGE("Get system region failed");
         return;
     }
-    if (regionStr.size() > size) {
+    if (static_cast<int>(regionStr.size()) > size) {
         WIFI_LOGE("Region size is too small");
         return;
     }

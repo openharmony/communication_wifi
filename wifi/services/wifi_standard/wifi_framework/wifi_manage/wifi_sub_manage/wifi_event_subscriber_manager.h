@@ -24,7 +24,7 @@
 #include "wifi_system_ability_listerner.h"
 #include "common_event_manager.h"
 #include "wifi_event_handler.h"
-
+#include "display_manager_lite.h"
 namespace OHOS {
 namespace Wifi {
 #ifdef HAS_POWERMGR_PART
@@ -50,7 +50,6 @@ public:
     void OnReceiveThermalEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
-    void OnReceiveDataShareReadyEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
 };
@@ -61,6 +60,10 @@ public:
     virtual ~NotificationEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
     void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
+private:
+    void OnReceiveNotificationEvent(int notificationId);
+    void OnReceiveDialogAcceptEvent(int dialogType);
+    void OnReceiveDialogRejectEvent(int dialogType);
 };
 
 #ifdef HAS_POWERMGR_PART
@@ -94,11 +97,33 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 
+class SettingsEnterSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit SettingsEnterSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~SettingsEnterSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
+class DataShareReadySubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit DataShareReadySubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    ~DataShareReadySubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
+class WifiFoldStateListener : public Rosen::DisplayManagerLite::IFoldStatusListener {
+public:
+    WifiFoldStateListener();
+    ~WifiFoldStateListener() = default;
+    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
     virtual ~WifiEventSubscriberManager();
 
+    void Init();
     void OnSystemAbilityChanged(int systemAbilityId, bool add) override;
     void GetAirplaneModeByDatashare();
     void GetWifiAllowSemiActiveByDatashare();
@@ -133,7 +158,6 @@ private:
     void RegisterNotificationEvent();
     void UnRegisterNotificationEvent();
     void GetMdmProp();
-    void GetChipProp();
     void RegisterMdmPropListener();
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);
 #ifdef HAS_MOVEMENT_PART
@@ -151,21 +175,33 @@ private:
     void UnRegisterNetworkStateChangeEvent();
     void RegisterWifiScanChangeEvent();
     void UnRegisterWifiScanChangeEvent();
+    void RegisterSettingsEnterEvent();
+    void UnRegisterSettingsEnterEvent();
+    void RegisterDataShareReadyEvent();
+    void UnRegisterDataShareReadyEvent();
+    void RegisterFoldStatusListener();
+    void UnRegisterFoldStatusListener();
 
 private:
     uint32_t cesTimerId{0};
     uint32_t notificationTimerId{0};
     uint32_t networkStateChangeTimerId{0};
     uint32_t wifiScanChangeTimerId{0};
+    uint32_t settingsTimerId{0};
+    uint32_t dataShareReadyTimerId_{0};
     std::mutex cesEventMutex;
     std::mutex notificationEventMutex;
     std::mutex networkStateChangeEventMutex;
     std::mutex wifiScanChangeEventMutex;
+    std::mutex settingsEnterEventMutex;
+    std::mutex dataShareReadyEventMutex_;
     bool isCesEventSubscribered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
     std::shared_ptr<NotificationEventSubscriber> wifiNotificationSubsciber_ = nullptr;
     std::shared_ptr<NetworkStateChangeSubscriber> networkStateChangeSubsciber_ = nullptr;
     std::shared_ptr<WifiScanEventChangeSubscriber> wifiScanEventChangeSubscriber_ = nullptr;
+    std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
+    std::shared_ptr<DataShareReadySubscriber> dataShareReadySubscriber_ = nullptr;
 #ifdef HAS_MOVEMENT_PART
     std::mutex deviceMovementEventMutex;
 #endif
@@ -181,6 +217,8 @@ private:
 
     bool accessDataShare_ = false;
     std::mutex accessDataShareMutex_;
+    sptr<Rosen::DisplayManagerLite::IFoldStatusListener> foldStatusListener_ = nullptr;
+    std::mutex foldStatusListenerMutex_;
 };
 
 }  // namespace Wifi

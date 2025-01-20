@@ -28,6 +28,7 @@ inline const int CMD_SET_SOFTAP_2G_MSS = 106;
 inline const int CMD_AX_BLA_LIST = 131;
 inline const int CMD_AX_SELFCURE = 132;
 inline const int CMD_BE_BLA_LIST = 221;
+inline const int CMD_EMLSR_MODE = 222;
 
 struct WifiPrivCmd {
     uint8_t *buf;
@@ -39,14 +40,17 @@ class WifiCmdClient {
 public:
     static WifiCmdClient &GetInstance();
     int SendCmdToDriver(const std::string &ifName, int commandId, const std::string &param) const;
+    std::string VoWifiDetectInternal(std::string cmd);
 
 private:
-    int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm) const;
+    int SendCommandToDriverByInterfaceName(const std::string &ifName, const std::string &cmdParm,
+        char *out = nullptr) const;
     int SetRxListen(const std::string &ifName, const std::string &param) const;
     int Set2gSoftapMss(const std::string &ifName, const std::string &param) const;
     int SetAxBlaList(const std::string &ifName, const std::string &param) const;
     int AxSelfcure(const std::string &ifName, const std::string &param) const;
     int SetBeBlaList(const std::string &ifName, const std::string &param) const;
+    int SetEmlsrMode(const std::string &ifName, const std::string &param) const;
 };
 } // namespace Wifi
 } // namespace OHOS

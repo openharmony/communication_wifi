@@ -122,7 +122,7 @@ int RpcGetScanInfos(RpcServer *server, Context *context)
     WriteInt(context, err);
     struct timespec clockTime = {0, 0};
     const int secComplex = 1000;
-    clock_gettime(CLOCK_MONOTONIC, &clockTime);
+    clock_gettime(CLOCK_BOOTTIME, &clockTime);
     if (err == WIFI_HAL_SUCCESS) {
         WriteInt(context, maxSize);
         for (int i = 0; i < maxSize; ++i) {
@@ -392,6 +392,8 @@ int RpcSetAssocMacAddr(RpcServer *server, Context *context)
     }
     int portType = -1;
     if (ReadInt(context, &portType) < 0) {
+        free(mac);
+        mac = NULL;
         return HAL_FAILURE;
     }
     WifiErrorNo err = SetAssocMacAddr(mac, maxSize, portType);
@@ -764,11 +766,11 @@ static char **ReadRoamBlockList(Context *context, int size)
         if (ReadStr(context, list[i], len) != 0) {
             free(list[i]);
             list[i] = NULL;
-            return NULL;
+            break;
         }
     }
     if (i < size) {
-        for (int j = 0; j <= i; ++j) {
+        for (int j = 0; j < i; ++j) {
             free(list[j]);
             list[j] = NULL;
         }

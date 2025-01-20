@@ -519,6 +519,7 @@ void WifiInternalEventDispatcher::Run(WifiInternalEventDispatcher &instance, con
     } else if (msg.msgCode >= WIFI_CBK_MSG_P2P_STATE_CHANGE && msg.msgCode <= WIFI_CBK_MSG_MAX_INVALID_P2P) {
         DealP2pCallbackMsg(instance, msg);
     } else {
+        FreecfgInfo(msg.cfgInfo);
         WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
     }
     return;
@@ -528,6 +529,7 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddBroadCastMsg, msgcode %{public}d", msg.msgCode);
     if (!mBroadcastThread) {
+        FreecfgInfo(msg.cfgInfo);
         return 0;
     }
     std::function<void()> func = std::bind([this, msg]() {
@@ -536,6 +538,7 @@ int WifiInternalEventDispatcher::AddBroadCastMsg(const WifiEventCallbackMsg &msg
     int delayTime = 0;
     bool result = mBroadcastThread->PostAsyncTask(func, delayTime);
     if (!result) {
+        FreecfgInfo(msg.cfgInfo);
         WIFI_LOGF("WifiInternalEventDispatcher::AddBroadCastMsg failed %{public}d", msg.msgCode);
         return -1;
     }
@@ -658,8 +661,8 @@ void WifiInternalEventDispatcher::InvokeScanCallbacks(const WifiEventCallbackMsg
             int uid = mScanCallBackInfo[msg.id][remote].callingUid;
             int pid = mScanCallBackInfo[msg.id][remote].callingPid;
             isFrozen = IsAppFrozen(pid);
-            WIFI_LOGD("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
-                %{public}d", uid, pid, isFrozen);
+            WIFI_LOGD("APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
+                uid, pid, isFrozen);
 #endif
             if (mScanCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGD("Not registered callback event! msg.msgCode: %{public}d,"
@@ -701,8 +704,8 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
             int uid = mStaCallBackInfo[msg.id][remote].callingUid;
             int pid = mStaCallBackInfo[msg.id][remote].callingPid;
             isFrozen = IsAppFrozen(pid);
-            WIFI_LOGD("Check calling APP is hardwareProxied, uid: %{public}d, pid: %{public}d, hardwareProxied:
-                %{public}d", uid, pid, isFrozen);
+            WIFI_LOGD("Check calling APP is hardwareProxied,"
+                "uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d", uid, pid, isFrozen);
 #endif
             if (mStaCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGD("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode: %{public}d,"
@@ -863,11 +866,25 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
 }
 #endif
 
+void WifiInternalEventDispatcher::FreecfgInfo(CfgInfo* cfgInfo)
+{
+    if (cfgInfo && cfgInfo->data) {
+        delete[] cfgInfo->data;
+        cfgInfo->data = nullptr;
+        delete cfgInfo;
+        cfgInfo = nullptr;
+    } else if (cfgInfo) {
+        delete cfgInfo;
+        cfgInfo = nullptr;
+    }
+}
+
 void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
     int pid, int uid, int tokenId)
 {
     if (callback == nullptr) {
         WIFI_LOGE("%{public}s: callback is null", __func__);
+        FreecfgInfo(msg.cfgInfo);
         return;
     }
 
@@ -888,8 +905,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             #ifdef SUPPORT_RANDOM_MAC_ADDR
                 if ((pid != 0) && (uid != 0)) {
                     std::vector<WifiP2pDevice> deviceVec = msg.device;
-                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) ==
-                        PERMISSION_DENIED) {
+                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
                         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
                             __func__, pid, uid);
                         updateP2pDeviceMacAddress(deviceVec);
@@ -925,7 +941,11 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
         case WIFI_CBK_MSG_PRIVATE_PEER_CHANGE:
             callback->OnP2pPrivatePeersChanged(msg.privateWfdInfo);
             break;
+        case WIFI_CBK_MSG_P2P_CHR_ERRCODE_REPORT:
+            callback->OnP2pChrErrCodeReport(msg.errCode);
+            break;
         default:
+            FreecfgInfo(msg.cfgInfo);
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
             break;
     }

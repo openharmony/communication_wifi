@@ -64,7 +64,9 @@ constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
+constexpr int WIFI_DEVICE_CONFIG_MAX_MUN = 1000;
 constexpr uint32_t COMPARE_MAC_OFFSET = 2;
+/* Plaintext string length */
 constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
 
 inline constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
@@ -121,6 +123,40 @@ public:
     int GetDeviceConfig(const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0);
 
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
+
+    void SetUserConnectChoice(int networkId);
+
+    void ClearAllNetworkConnectChoice();
+
+    bool ClearNetworkConnectChoice(int networkId);
+
+    /**
+     * @Description Iterate through all the saved networks and remove the provided config from the connectChoice.
+     * This is invoked when a network is removed from records
+     *
+     * @param networkId - deviceConfig's networkId corresponding to the network that is being removed
+     */
+    void RemoveConnectChoiceFromAllNetwork(int networkId);
+
+    bool SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp);
+
+    /**
+     * @Description this invoked by network selector at the start of every selection procedure to clear all candidate
+     * seen flag
+     *
+     * @param networkId - deviceConfig's networkId
+     * @Return true if the network was found, false otherwise
+     */
+    bool ClearNetworkCandidateScanResult(int networkId);
+
+    /**
+     * @Description this invoked by network selector when match deviceconfig from scanresults to update if deviceconfig
+     * can be seen for user
+     *
+     * @param networkId - deviceConfig's networkId
+     * @Return true if the network was found, false otherwise
+     */
+    bool SetNetworkCandidateScanResult(int networkId);
 
     int SetDeviceEphemeral(int networkId, bool isEphemeral);
 

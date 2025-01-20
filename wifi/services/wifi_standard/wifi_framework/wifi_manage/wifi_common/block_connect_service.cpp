@@ -115,7 +115,9 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
         return false;
     }
     for (auto &config : results) {
-        if (config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) {
+        WifiSettings::GetInstance().ClearNetworkCandidateScanResult(config.networkId);
+        if ((config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) &&
++            (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE)) {
             continue;
         }
         DisablePolicy policy = CalculateDisablePolicy(config.networkSelectionStatus.networkSelectionDisableReason);
@@ -277,6 +279,43 @@ bool BlockConnectService::IsWrongPassword(int targetNetworkId)
         return true;
     }
     return false;
+}
+
+void BlockConnectService::EnableAllNetworksByEnteringSettings(std::vector<DisabledReason> enableReasons)
+{
+    WIFI_LOGI("ENTER EnableAllNetworksByEnteringSettings");
+    std::vector<WifiDeviceConfig> results;
+    if (WifiSettings::GetInstance().GetDeviceConfig(results) != 0) {
+        WIFI_LOGE("Failed to get device config");
+        return;
+    }
+    for (auto &config : results) {
+        if (config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) {
+            continue;
+        }
+        if (std::find(enableReasons.begin(), enableReasons.end(),
+            config.networkSelectionStatus.networkSelectionDisableReason) != enableReasons.end()) {
+            config.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
+            config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
+            config.networkSelectionStatus.networkDisableTimeStamp = -1;
+            config.networkSelectionStatus.networkDisableCount = 0;
+            WifiSettings::GetInstance().AddDeviceConfig(config);
+        }
+    }
+}
+
+void BlockConnectService::OnReceiveSettingsEnterEvent(bool isEnter)
+{
+    WIFI_LOGI("ENTER OnReceiveSettingsEnterEvent %{public}d", static_cast<int>(isEnter));
+    if (isEnter) {
+        std::vector<DisabledReason> enableReasons = {
+            DisabledReason::DISABLED_AUTHENTICATION_FAILURE,
+            DisabledReason::DISABLED_ASSOCIATION_REJECTION,
+            DisabledReason::DISABLED_DHCP_FAILURE,
+            DisabledReason::DISABLED_CONSECUTIVE_FAILURES,
+        };
+        EnableAllNetworksByEnteringSettings(enableReasons);
+    }
 }
 
 void BlockConnectService::LogDisabledConfig(const WifiDeviceConfig &config)

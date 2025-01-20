@@ -24,6 +24,7 @@
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
+#include "dhcp_c_api.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #endif
@@ -46,6 +47,9 @@ IApServiceCallbacks& WifiHotspotManager::GetApCallback()
 #ifndef OHOS_ARCH_LITE
 static void UnloadHotspotSaTimerCallback()
 {
+#ifdef DYNAMIC_UNLOAD_SA
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_CLOSE_DHCP_SA);
+#endif
     WifiSaLoadManager::GetInstance().UnloadWifiSa(WIFI_HOTSPOT_ABILITY_ID);
     WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
 }
@@ -79,6 +83,16 @@ void WifiHotspotManager::StartUnloadApSaTimer(void)
     return;
 }
 #endif
+
+void WifiHotspotManager::ApCloseDhcpSa(void)
+{
+#ifdef DYNAMIC_UNLOAD_SA
+    int state = WifiConfigCenter::GetInstance().GetP2pState();
+    if (state == static_cast<int>(P2pState::P2P_STATE_CLOSED)) {
+        StopDhcpdServerSa();
+    }
+#endif
+}
 
 void WifiHotspotManager::CloseApService(int id)
 {
@@ -150,7 +164,6 @@ void WifiHotspotManager::DealApGetStaJoin(const StationInfo &info, int id)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("ApStaJoined") + std::string("id = ") + std::to_string(id);
     WifiCommonEventHelper::PublishApStaJoinEvent(0, msg);
-    WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine()->StopSoftapCloseTimer();
     return;
 }
 
@@ -163,19 +176,6 @@ void WifiHotspotManager::DealApGetStaLeave(const StationInfo &info, int id)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("ApStaLeaved") + std::string("id = ") + std::to_string(id);
     WifiCommonEventHelper::PublishApStaLeaveEvent(0, msg);
-    std::vector<StationInfo> result;
-    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(id);
-    if (pService == nullptr) {
-        WIFI_LOGE("Instance %{public}d get hotspot service is null!", id);
-        return;
-    }
-    ErrCode errCode = pService->GetStationList(result);
-    if (errCode != ErrCode::WIFI_OPT_SUCCESS) {
-        return;
-    }
-    if (result.empty()) {
-        WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine()->StartSoftapCloseTimer();
-    }
     return;
 }
 

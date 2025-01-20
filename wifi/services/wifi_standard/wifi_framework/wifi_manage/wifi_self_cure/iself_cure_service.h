@@ -28,13 +28,6 @@ class ISelfCureService {
 public:
     virtual ~ISelfCureService() = default;
     /**
-    * @Description  Register self cure callback function.
-    *
-    * @param callbacks - Callback function pointer storage structure
-    * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
-    */
-    virtual ErrCode RegisterSelfCureServiceCallback(const SelfCureServiceCallback &callbacks) = 0;
-    /**
      * @Description  self cure service initialization function.
      *
      * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
@@ -48,19 +41,42 @@ public:
      */
     virtual StaServiceCallback GetStaCallback() const = 0;
 
-     /**
+    /**
      * @Description Notify Internet Failure Detected
      *
      * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode NotifyInternetFailureDetected(int forceNoHttpCheck) = 0;
 
-     /**
+    /**
+     * @Description Notify P2p connect state changed to selfcure
+     *
+     * @param info - p2p connect state
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode NotifyP2pConnectStateChanged(const WifiP2pLinkedInfo &info) = 0;
+
+    /**
      * @Description Is SelfCure On Going
      *
      * @return bool - true: selfcure is ongoing, false: selfcure is not ongoing
      */
     virtual bool IsSelfCureOnGoing() = 0;
+
+    /**
+     * @Description Is SelfCure Connecting
+     *
+     * @return bool - true: selfcure is Connecting, false: selfcure is not Connecting
+     */
+    virtual bool IsSelfCureL2Connecting() = 0;
+
+    /**
+     * @Description stop selfcure when user disconnect
+     *
+     * @param status - the situation while user disconnect
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StopSelfCureWifi(int32_t status) = 0;
 
     /**
      * @Description Check if Selfcure state,

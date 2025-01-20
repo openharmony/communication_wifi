@@ -105,6 +105,14 @@ public:
     virtual bool CheckChbaConncted() = 0;
 
     /**
+     * @Description Stop Get CAC Result And Local CAC
+     *
+     * @param reason - reason
+     * @return void
+     */
+    virtual void StopGetCacResultAndLocalCac(int reason) = 0;
+
+    /**
      * @Description Is external scan allowed.
      *
      * @param scanDeviceInfo - scan device info
@@ -214,6 +222,18 @@ public:
         int setDataValidLen) = 0;
 
     /**
+     * @Description on notification receive
+     */
+    virtual void OnNotificationReceive() = 0;
+ 
+    /**
+     * @Description on dialog receive
+     *
+     * @param click - user click accept or reject
+     */
+    virtual void OnDialogClick(bool click) = 0;
+
+    /**
      * @Description obtain supported frequency
      *
      * @param freq - current use freq
@@ -221,6 +241,14 @@ public:
      * @return int - supported frequency
      */
     virtual int FreqEnhance(int freq, bool is160M) = 0;
+
+    /**
+     * @Description set the enhance signal poll info
+     *
+     * @param info - signal info
+     * @return void
+     */
+    virtual void SetEnhanceSignalPollInfo(WifiSignalPollInfo &info) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

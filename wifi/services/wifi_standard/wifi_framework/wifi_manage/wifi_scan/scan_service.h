@@ -523,6 +523,18 @@ private:
      */
     ErrCode AllowPnoScan();
     /**
+     * @Description Determines whether to allow WifiPro scanning based on the scanning policy.
+     *
+     * @return success: true, failed: false
+     */
+    ErrCode AllowWifiProScan();
+    /**
+     * @Description Determines whether to allow 5G Ap scanning based on the scanning policy.
+     *
+     * @return success: true, failed: false
+     */
+    ErrCode Allow5GApScan();
+    /**
      * @Description Determines whether to allow scanning based on the scanning type..
      *
      * @param scanType - scan type: 0 - Extern; 1 - SystemTimer 2 Pno
@@ -819,6 +831,13 @@ private:
     bool AllowScanByHid2dState();
 
     /**
+     * @Description Get interval time between currentMs and startTime.
+     *
+     * @return int64_t: millisecond difference between two time point.
+     */
+    int64_t GetIntervalTime(int64_t startTime);
+
+    /**
      * @Description Is the app in the trustlist?
      *
      * @param trustList trustlist[in]
@@ -855,6 +874,15 @@ private:
      * @param count adjust count[in]
      */
     void SystemScanDisconnectedPolicy(int &interval, int &count);
+
+    /**
+     * @Description record scan limit info
+     *
+     * @param WifiScanDeviceInfo wifiScanDeviceInfo[in]
+     * @param ScanLimitType scanLimitType[in]
+     */
+    void RecordScanLimitInfo(const WifiScanDeviceInfo &wifiScanDeviceInfo, const ScanLimitType &scanLimitType);
+
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
     public:

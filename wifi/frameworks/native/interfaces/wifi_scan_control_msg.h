@@ -31,11 +31,13 @@ struct Hid2dInfo {
     Hid2dUpperScene miraCastScene;
     P2pConnectedState p2pConnectState;
     int p2pEnhanceState;
+    int64_t hid2dSceneLastSetTime;
 
     Hid2dInfo()
     {
         p2pConnectState = P2pConnectedState::P2P_DISCONNECTED;
         p2pEnhanceState = 0;
+        hid2dSceneLastSetTime = 0;
     }
 };
 
@@ -50,11 +52,13 @@ struct WifiScanDeviceInfo {
     int noChargerState;
     int gnssFixState;
     std::string packageName;
+    int initiatorUid;
     time_t staCurrentTime;
     bool isAbsFreezeScaned;
     bool externScan;
     bool isSystemApp;
     ScanMode scanMode;
+    ScanType scanType;
     Hid2dInfo hid2dInfo;
     ScanControlInfo scanControlInfo;
     std::vector<PackageInfo> scan_thermal_trust_list;
@@ -74,6 +78,7 @@ struct WifiScanDeviceInfo {
         freezeState = MODE_STATE_CLOSE;
         noChargerState = MODE_STATE_CLOSE;
         scanMode = ScanMode::SCAN_MODE_MAX;
+        scanType = ScanType::SCAN_DEFAULT;
         isAbsFreezeScaned = false;
         staSceneForbidCount = 0;
         externScan = false;
@@ -81,7 +86,41 @@ struct WifiScanDeviceInfo {
         staCurrentTime = 0;
         gnssFixState = 0;
         packageName = "";
+        initiatorUid = -1;
     }
+
+    std::string GetScanInitiatorName()
+    {
+        std::string scanInitiatorName = "";
+        if (packageName.empty()) {
+            scanInitiatorName = std::to_string(initiatorUid);
+        } else {
+            scanInitiatorName = packageName;
+        }
+        return scanInitiatorName;
+    }
+};
+
+enum class ScanLimitType {
+    INVALID = -1,
+    INTERVAL,
+    SCAN_DISABLE,
+    WIFI_DISABLE,
+    HID2D_SOFTBUS,
+    HID2D_CAST,
+    HID2D_MIRACAST,
+    HID2D_SHARE,
+    HID2D_CROSS,
+    THERMAL,
+    SCREEN_OFF,
+    SCHED_STRATEGY,
+    DURING_STA,
+    CUSTOM_SCENE,
+    GNSS_FIX,
+    MOVING_FREEZE,
+    ABNORMAL_APP,
+    CANNOT_SWITCH_AP,
+    STA_STATE
 };
 }  // namespace Wifi
 }  // namespace OHOS

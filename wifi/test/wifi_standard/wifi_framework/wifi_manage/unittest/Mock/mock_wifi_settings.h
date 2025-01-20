@@ -46,6 +46,13 @@ public:
         const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0) = 0;
     virtual int GetDeviceConfig(
         const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0) = 0;
+    virtual void SetUserConnectChoice(int networkId) = 0;
+    virtual void ClearAllNetworkConnectChoice() = 0;
+    virtual bool ClearNetworkConnectChoice(int networkId) = 0;
+    virtual void RemoveConnectChoiceFromAllNetwork(int networkId) = 0;
+    virtual bool SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp) = 0;
+    virtual bool ClearNetworkCandidateScanResult(int networkId) = 0;
+    virtual bool SetNetworkCandidateScanResult(int networkId) = 0;
     virtual int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config) = 0;
     virtual int SyncDeviceConfig() = 0;
@@ -127,13 +134,15 @@ public:
     virtual int SaveScanInfoList(const std::vector<WifiScanInfo> &results) = 0;
     virtual int GetMinRssi2Dot4Ghz(int instId = 0) = 0;
     virtual int GetMinRssi5Ghz(int instId = 0) = 0;
-    virtual ScanMode GetAppRunningState() const = 0;
+    virtual ScanMode GetAppRunningState() = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual const std::string GetAppPackageName() const = 0;
     virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
     virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
     virtual int GetThermalLevel() const = 0;
     virtual int GetHid2dUpperScene(int uid, Hid2dUpperScene &scene) = 0;
+    virtual int64_t GetHid2dSceneLastSetTime() const = 0;
+    virtual int SetHid2dSceneLastSetTime(int64_t setTime) = 0;
     virtual int GetP2pBusinessType(P2pBusinessType &type) = 0;
     virtual int SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene) = 0;
     virtual int SetWifiDetailState(WifiDetailState state, int instId) = 0;
@@ -205,6 +214,7 @@ public:
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
+    virtual int GetHotspotConfig(HotspotConfig &hotspotConfig, int id) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -220,6 +230,13 @@ public:
         GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int));
     MOCK_METHOD4(
         GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
+    MOCK_METHOD1(SetUserConnectChoice, void(int networkId));
+    MOCK_METHOD0(ClearAllNetworkConnectChoice, void());
+    MOCK_METHOD1(ClearNetworkConnectChoice, bool(int networkId));
+    MOCK_METHOD1(RemoveConnectChoiceFromAllNetwork, void(int networkId));
+    MOCK_METHOD3(SetNetworkConnectChoice, bool(int networkId, int selectNetworkId, long timestamp));
+    MOCK_METHOD1(ClearNetworkCandidateScanResult, bool(int networkId));
+    MOCK_METHOD1(SetNetworkCandidateScanResult, bool(int networkId));
     MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config));
     MOCK_METHOD0(SyncDeviceConfig, int());
@@ -300,12 +317,14 @@ public:
     MOCK_METHOD1(SaveScanInfoList, int(const std::vector<WifiScanInfo> &results));
     MOCK_METHOD1(GetMinRssi2Dot4Ghz, int(int));
     MOCK_METHOD1(GetMinRssi5Ghz, int(int));
-    MOCK_CONST_METHOD0(GetAppRunningState, ScanMode());
+    MOCK_METHOD0(GetAppRunningState, ScanMode());
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_CONST_METHOD0(GetAppPackageName, const std::string());
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
     MOCK_CONST_METHOD0(GetThermalLevel, int());
     MOCK_METHOD2(GetHid2dUpperScene, int(int uid, Hid2dUpperScene &scene));
+    MOCK_CONST_METHOD0(GetHid2dSceneLastSetTime, int64_t());
+    MOCK_METHOD1(SetHid2dSceneLastSetTime, int(int64_t setTime));
     MOCK_METHOD1(GetP2pBusinessType, int(P2pBusinessType &type));
     MOCK_METHOD2(SetHid2dUpperScene, int(int uid, const Hid2dUpperScene &scene));
     MOCK_METHOD2(SetWifiDetailState, int(WifiDetailState state, int instId));
@@ -378,6 +397,7 @@ public:
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetSupportHwPnoFlag, bool(int instId));
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
+    MOCK_METHOD2(GetHotspotConfig, int(HotspotConfig &hotspotConfig, int id));
 };
 }  // namespace Wifi
 }  // namespace OHOS

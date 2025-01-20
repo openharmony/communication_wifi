@@ -50,6 +50,10 @@ public:
      */
     void DealScanResult(const std::vector<InterScanInfo> &results) override;
 
+    /**
+     * @Description deal wifi channel qoe
+     */
+    void DealQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo) override;
 private:
     /**
      * @Description deal sta connection change
@@ -65,6 +69,12 @@ private:
      * @param rssi
      */
     void DealRssiLevelChanged(int32_t rssi, int32_t instId = 0);
+    /**
+     * @Description signal info change
+     *
+     * @param wifiSignalPollInfo
+     */
+    void HandleSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo);
 private:
     std::mutex mutex_;
     std::shared_ptr<WifiProService> pWifiProService_ { nullptr };

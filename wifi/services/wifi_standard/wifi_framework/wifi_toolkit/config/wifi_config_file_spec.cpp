@@ -21,13 +21,15 @@
 #endif
 #include "wifi_log.h"
 
+#define CLIENT_PREFIX_NAME "vecDev_"
+#define OWNER_DEV_PREFIX_NAME "ownerDev."
+
 namespace OHOS {
 namespace Wifi {
 static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
 {
     item.instanceId = 0;
     item.networkId = 0;
-    item.status = 0;
     item.bssid.clear();
     item.ssid.clear();
     item.band = 0;
@@ -63,6 +65,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isReassocSelfCureWithFactoryMacAddress = 0;
     item.isShared = true;
     item.lastTrySwitchWifiTimestamp = -1;
+    item.isAllowAutoConnect = true;
     return;
 }
 
@@ -197,6 +200,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.isShared = CheckDataLegal(tmpValue);
     } else if (key == "lastTrySwitchWifiTimestamp") {
         item.lastTrySwitchWifiTimestamp = static_cast<int64_t>(CheckDataTolonglong(tmpValue));
+    } else if (key == "isAllowAutoConnect") {
+        item.isAllowAutoConnect = (CheckDataLegal(tmpValue) != 0);
     } else {
         return -1;
     }
@@ -215,7 +220,7 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     } else if (key == "networkId") {
         item.networkId = CheckDataLegal(tmpValue);
     } else if (key == "status") {
-        item.status = CheckDataLegal(tmpValue);
+        //@deprecated
     } else if (key == "bssid") {
         item.bssid = value;
     } else if (key == "ssid") {
@@ -566,7 +571,6 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"version=" << item.version << std::endl;
     ss << "    " <<"instanceId=" << item.instanceId << std::endl;
     ss << "    " <<"uid=" << item.uid << std::endl;
-    ss << "    " <<"status=" << item.status << std::endl;
     ss << "    " <<"bssid=" << item.bssid << std::endl;
     ss << "    " <<"userSelectBssid=" << item.userSelectBssid << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
@@ -589,6 +593,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
        << std::endl;
     ss << "    " <<"isShared=" << item.isShared << std::endl;
     ss << "    " <<"lastTrySwitchWifiTimestamp=" << item.lastTrySwitchWifiTimestamp << std::endl;
+    ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else
@@ -1346,22 +1351,22 @@ static int SetWifiP2pGroupInfoEncrypt(WifiP2pGroupInfo &item, const std::string 
 
 static int SetWifiP2pGroupInfoDev(WifiP2pGroupInfo &item, const std::string &key, const std::string &value)
 {
-    if (key.compare(0, strlen("ownerDev."), "ownerDev.") == 0) {
+    if (key.compare(0, strlen(OWNER_DEV_PREFIX_NAME), OWNER_DEV_PREFIX_NAME) == 0) {
         WifiP2pDevice owner = item.GetOwner();
-        SetWifiP2pDevicClassKeyValue(owner, key.substr(strlen("ownerDev.")), value);
+        SetWifiP2pDevicClassKeyValue(owner, key.substr(strlen(OWNER_DEV_PREFIX_NAME)), value);
         item.SetOwner(owner);
-    } else if (key.compare(0, strlen("vecDev_"), "vecDev_") == 0) {
+    } else if (key.compare(0, strlen(CLIENT_PREFIX_NAME), CLIENT_PREFIX_NAME) == 0) {
         std::string::size_type pos = key.find(".");
         if (pos == std::string::npos) {
             WifiP2pDevice device;
             item.AddPersistentDevice(device);
         } else {
-            std::string keyTmp = key.substr(strlen("vecDev_"), pos);
+            std::string keyTmp = key.substr(strlen(CLIENT_PREFIX_NAME), (pos - strlen(CLIENT_PREFIX_NAME)));
             unsigned long index = static_cast<unsigned long>(CheckDataLegal(keyTmp));
-            if (index < item.GetClientDevices().size()) {
-                std::vector<WifiP2pDevice> clients = item.GetClientDevices();
+            if (index < item.GetPersistentDevices().size()) {
+                std::vector<WifiP2pDevice> clients = item.GetPersistentDevices();
                 SetWifiP2pDevicClassKeyValue(clients[index], key.substr(pos + 1), value);
-                item.SetClientPersistentDevices(clients);
+                item.SetPersistentDevices(clients);
             }
         }
     } else {
@@ -1412,6 +1417,8 @@ int SetTClassKeyValue<WifiP2pGroupInfo>(WifiP2pGroupInfo &item, const std::strin
         item.SetGoIpAddress(value);
     } else if (SetWifiP2pGroupInfoDev(item, key, value) == 0) {
         return errorKeyValue;
+    } else if (key == "isOldPersistenGroup") {
+        item.SetPersistentFlag(true);
     } else {
         LOGE("Invalid config key value");
         errorKeyValue++;
@@ -1475,6 +1482,9 @@ std::string OutTClassString<WifiP2pGroupInfo>(WifiP2pGroupInfo &item)
         ss << "    " <<"vecDev_=" << i << std::endl;
         const WifiP2pDevice &tmp = item.GetPersistentDevices().at(i);
         ss << OutWifiP2pDeviceClassString(tmp, prefix);
+    }
+    if (item.GetPersistentFlag()) {
+        ss << "    " << "isOldPersistenGroup=" << 1 << std::endl;
     }
     ss << "    " <<"</WifiP2pGroupInfo>" << std::endl;
     return ss.str();
@@ -1720,7 +1730,6 @@ static void ClearWifiBackupConfig(WifiBackupConfig &item)
 {
     item.instanceId = 0;
     item.uid = -1;
-    item.status = 0;
     item.bssid.clear();
     item.userSelectBssid.clear();
     item.ssid.clear();
@@ -1754,7 +1763,7 @@ static int SetWifiBackupConfigFirst(WifiBackupConfig &item, const std::string &k
     } else if (key == "uid") {
         item.uid = CheckDataLegal(tmpValue);
     } else if (key == "status") {
-        item.status = CheckDataLegal(tmpValue);
+        //@deprecated
     } else if (key == "bssid") {
         item.bssid = value;
     } else if (key == "userSelectBssid") {
@@ -1827,7 +1836,6 @@ static std::string OutPutWifiBackupConfig(WifiBackupConfig &item)
     ss << "    " <<"<WifiDeviceConfig>" << std::endl;
     ss << "    " <<"instanceId=" << item.instanceId << std::endl;
     ss << "    " <<"uid=" << item.uid << std::endl;
-    ss << "    " <<"status=" << item.status << std::endl;
     ss << "    " <<"bssid=" << item.bssid << std::endl;
     ss << "    " <<"userSelectBssid=" << item.userSelectBssid << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;

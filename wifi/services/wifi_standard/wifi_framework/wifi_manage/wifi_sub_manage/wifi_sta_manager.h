@@ -37,10 +37,10 @@ public:
     void StopSatelliteTimer(void);
     void DealStaOpened(int instId);
     void DealStaStopped(int instId);
+    void StaCloseDhcpSa(void);
 
 private:
     void InitStaCallback(void);
-    bool IgnoreConnStateChange(const WifiLinkedInfo &info, int instId = 0);
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0);
     void DealStreamChanged(StreamDirection direction, int instId = 0);

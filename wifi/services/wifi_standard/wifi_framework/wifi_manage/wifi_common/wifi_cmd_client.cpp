@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2023-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,6 +41,7 @@ static const auto CMD_SET_RX_LISTEN_OFF = "SET_RX_LISTEN_PS_SWITCH 0";
 static const auto CMD_SET_AX_BLA_LIST = "SET_AX_BLACKLIST";
 static const auto CMD_SET_AX_CLOSE_HTC = "SET_AX_CLOSE_HTC";
 static const auto CMD_SET_BE_BLA_LIST = "SET_BE_BLACKLIST";
+static const auto CMD_SET_EMLSR_MODE = "SET_EMLSR_SWITCH";
 
 #define MSS_SOFTAP_MAX_IFNAMESIZE 5
 #define MSS_SOFTAP_CMDSIZE 30
@@ -67,13 +68,16 @@ int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, con
         ret = AxSelfcure(ifName, param);
     } else if (commandId == CMD_BE_BLA_LIST) {
         ret = SetBeBlaList(ifName, param);
+    } else if (commandId == CMD_EMLSR_MODE) {
+        ret = SetEmlsrMode(ifName, param);
     } else {
         WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
     }
     return ret;
 }
+
 int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
-    const std::string &cmdParm) const
+    const std::string &cmdParm, char *out) const
 {
     int ret = -1;
     if (ifName.size() + 1 > IFNAMSIZ) {
@@ -121,7 +125,27 @@ int WifiCmdClient::SendCommandToDriverByInterfaceName(const std::string &ifName,
         WIFI_LOGE("%{public}s ioctl failed, error is: %{public}d.", __FUNCTION__, errno);
     }
     close(sock);
+    if (out != nullptr) {
+        if (memset_s(out, TINY_BUFF_SIZE, 0, TINY_BUFF_SIZE) != EOK) {
+            WIFI_LOGE("%{public}s memset_s cmd fail", __FUNCTION__);
+        }
+        if (memcpy_s(out, TINY_BUFF_SIZE, privCmd.buf, TINY_BUFF_SIZE - 1) != EOK) {
+            WIFI_LOGE("%{public}s memcpy_s cmd fail", __FUNCTION__);
+        }
+    }
     return ret;
+}
+
+std::string WifiCmdClient::VoWifiDetectInternal(std::string cmd)
+{
+    std::string ifName = "wlan0";
+    char out[MAX_PRIV_CMD_SIZE] = {};
+    int ret = SendCommandToDriverByInterfaceName(ifName, cmd, out);
+    if (ret == 0) {
+        std::string reply = out;
+        return reply;
+    }
+    return "";
 }
 
 int WifiCmdClient::SetRxListen(const std::string &ifName, const std::string &param) const
@@ -196,5 +220,18 @@ int WifiCmdClient::SetBeBlaList(const std::string &ifName, const std::string &pa
     return SendCommandToDriverByInterfaceName(ifName, cmdParm);
 }
 
+int WifiCmdClient::SetEmlsrMode(const std::string &ifName, const std::string &param) const
+{
+    WIFI_LOGD("%{public}s enter", __FUNCTION__);
+    if (param.size() > TINY_BUFF_SIZE ||
+        param.size() + strlen(CMD_SET_EMLSR_MODE) > TINY_BUFF_SIZE) {
+        WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
+        return -1;
+    }
+    std::string cmdParm = CMD_SET_EMLSR_MODE;
+    cmdParm.append(" ");
+    cmdParm.append(param);
+    return SendCommandToDriverByInterfaceName(ifName, cmdParm);
+}
 } // namespace Wifi
 } // namespace OHOS

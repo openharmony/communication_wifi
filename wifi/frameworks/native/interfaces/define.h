@@ -48,6 +48,7 @@
 #define WIFI_CBK_MSG_P2P_GC_JOIN_GROUP 0x4010
 #define WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP 0x4011
 #define WIFI_CBK_MSG_PRIVATE_PEER_CHANGE 0x4012
+#define WIFI_CBK_MSG_P2P_CHR_ERRCODE_REPORT 0x4013
 #define WIFI_CBK_MSG_MAX_INVALID_P2P 0x4FFF /* P2P invalid value */
 
 /* -----------Callback event name define-------------- */
@@ -74,7 +75,8 @@
 #define EVENT_P2P_CONFIG_CHANGE "p2pConfigChange"
 #define EVENT_P2P_GC_JOIN_GROUP "p2pGcJoinGroup"
 #define EVENT_P2P_GC_LEAVE_GROUP "p2pGcLeaveGroup"
-#define EVENT_P2P_PRIVATE_PEER_DEVICE_CHANGE "p2pPrivatePeerDeviceChange" /* P2P */
+#define EVENT_P2P_PRIVATE_PEER_DEVICE_CHANGE "p2pPrivatePeerDeviceChange"
+#define EVENT_P2P_CHR_ERRCODE_REPORT "p2pChrErrCodeReport" /* P2P */
 
 /* -----------Feature service name-------------- */
 #define WIFI_SERVICE_STA "StaService"     /* STA */
@@ -105,6 +107,10 @@
 #define MODE_STATE_FREEZE (5)
 #define MODE_STATE_NO_CHARGER_PLUG (6)
 
+#define MODE_STATE_EXPAND (1)
+#define MODE_STATE_FOLDED (2)
+#define MODE_STATE_HALF_FOLD (3)
+
 #define MODE_STATE_DEFAULT (-1)
 /* Begin apf filter */
 #define MODE_STATE_OPEN (1)
@@ -123,5 +129,7 @@
 #ifndef STA_INSTANCE_MAX_NUM
 #define STA_INSTANCE_MAX_NUM (2)
 #endif
+
+#define WIFI_OEMINFO_MAC (1)
 
 #endif

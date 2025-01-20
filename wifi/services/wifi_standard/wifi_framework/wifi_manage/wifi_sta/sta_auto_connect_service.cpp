@@ -18,11 +18,16 @@
 #include "wifi_config_center.h"
 #include "wifi_common_util.h"
 #include "block_connect_service.h"
+#include <sys/time.h>
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
 namespace OHOS {
 namespace Wifi {
+constexpr int CONNECT_CHOICE_INVALID = 0;
+constexpr int CONNECT_CHOICE_TIMEOUT_MS = 50 * 1000;
+constexpr int CONNECT_CHOICE_MAX_LOOP_TIMES = 2;
+
 StaAutoConnectService::StaAutoConnectService(StaStateMachine *staStateMachine, int instId)
     : pStaStateMachine(staStateMachine),
       pSavedDeviceAppraisal(nullptr),
@@ -64,9 +69,52 @@ void StaAutoConnectService::SetAutoConnectStateCallback(const std::vector<StaSer
     mStaCallbacks = callbacks;
 }
 
+bool StaAutoConnectService::OverrideCandidateWithUserSelectChoice(NetworkSelectionResult &candidate)
+{
+    WifiDeviceConfig tmpConfig = candidate.wifiDeviceConfig;
+    int originalCandidateNetwordId = candidate.wifiDeviceConfig.networkId;
+    int curentLoopIdx = 0;
+    while (tmpConfig.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
+        curentLoopIdx++;
+        if (curentLoopIdx > CONNECT_CHOICE_MAX_LOOP_TIMES) {
+            WIFI_LOGI("%{public}s reach max loop threshold connectChoice: %{public}d",
+                __FUNCTION__, tmpConfig.networkId);
+            break;
+        }
+        struct timespec times = {0, 0};
+        clock_gettime(CLOCK_BOOTTIME, &times);
+        long currentTime = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
+        long choiceSetToGet = currentTime - tmpConfig.networkSelectionStatus.connectChoiceTimestamp;
+        if (choiceSetToGet < CONNECT_CHOICE_INVALID || choiceSetToGet > CONNECT_CHOICE_TIMEOUT_MS) {
+            WIFI_LOGI("%{public}s connectChoice: %{public}d update time is expired", __FUNCTION__, tmpConfig.networkId);
+            break;
+        }
+        if (WifiSettings::GetInstance().GetDeviceConfig(tmpConfig.networkSelectionStatus.connectChoice,
+            tmpConfig) != 0) {
+            WIFI_LOGI("%{public}s cannot find connectChoice: %{public}d", __FUNCTION__, tmpConfig.networkId);
+            break;
+        }
+        if (!tmpConfig.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+            WIFI_LOGI("%{public}s cannot seen connectChoice in last auto connect: %{public}d",
+                __FUNCTION__, tmpConfig.networkId);
+            break;
+        }
+        if (tmpConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) {
+            candidate.wifiDeviceConfig = tmpConfig;
+        }
+    }
+    if (candidate.wifiDeviceConfig.networkId != originalCandidateNetwordId) {
+        WIFI_LOGI("%{public}s original networdId:%{public}d, override networkId %{public}d, ssid: %{public}s",
+            __FUNCTION__, originalCandidateNetwordId, candidate.wifiDeviceConfig.networkId,
+            SsidAnonymize(candidate.wifiDeviceConfig.ssid).c_str());
+        return true;
+    }
+    return false;
+}
+
 void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter OnScanInfosReadyHandler.\n");
+    WIFI_LOGD("Enter OnScanInfosReadyHandler.\n");
 
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
@@ -86,9 +134,12 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
+        std::string bssid = "";
+        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
+            bssid = networkSelectionResult.interScanInfo.bssid;
+        }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
-        std::string &bssid = networkSelectionResult.interScanInfo.bssid;
-        std::string &ssid = networkSelectionResult.interScanInfo.ssid;
+        std::string &ssid = networkSelectionResult.wifiDeviceConfig.ssid;
         WIFI_LOGI("AutoSelectDevice networkId: %{public}d, ssid: %{public}s, bssid: %{public}s.", networkId,
                   SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
@@ -98,6 +149,18 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         pStaStateMachine->SendMessage(message);
     } else {
         WIFI_LOGI("AutoSelectDevice return fail.");
+        std::vector<WifiDeviceConfig> savedConfigs;
+        WifiSettings::GetInstance().GetDeviceConfig(savedConfigs);
+        bool hasSavedConfigSeen = false;
+        for (const auto &config : savedConfigs) {
+            if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+                hasSavedConfigSeen = true;
+                break;
+            }
+        }
+        if (hasSavedConfigSeen) {
+            WriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
+        }
     }
     for (const auto &callBackItem : mStaCallbacks) {
         if (callBackItem.OnAutoSelectNetworkRes != nullptr) {
@@ -462,6 +525,11 @@ void StaAutoConnectService::RegisterAutoJoinCondition(const std::string &conditi
     }
     std::lock_guard<std::mutex> lock(autoJoinMutex);
     WIFI_LOGI("Auto Join condition of %{public}s is registered.", conditionName.c_str());
+    if (autoJoinConditionsMap.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGW("%{public}s fail autoJoinConditionsMap size is: %{public}d, over 1000",
+            __FUNCTION__, static_cast<int>(autoJoinConditionsMap.size()));
+        return;
+    }
     autoJoinConditionsMap.insert_or_assign(conditionName, autoJoinCondition);
 }
 

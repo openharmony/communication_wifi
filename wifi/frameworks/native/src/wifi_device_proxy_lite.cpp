@@ -104,7 +104,6 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
     for (int i = 0; i < retSize; ++i) {
         WifiDeviceConfig config;
         (void)ReadInt32(reply, &config.networkId);
-        (void)ReadInt32(reply, &config.status);
         config.bssid = (char *)ReadString(reply, &readLen);
         config.ssid = (char *)ReadString(reply, &readLen);
         (void)ReadInt32(reply, &config.band);
@@ -145,6 +144,7 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
         config.wifiPrivacySetting = WifiPrivacyConfig(privacyConfig);
         (void)ReadInt32(reply, &config.uid);
         (void)ReadInt32(reply, &config.wifiWapiConfig.wapiPskType);
+        (void)ReadBool(reply, &config.isAllowAutoConnect);
         result.emplace_back(config);
         std::string().swap(config.preSharedKey);
     }
@@ -573,7 +573,6 @@ void WifiDeviceProxy::WriteEapConfig(IpcIo &req, const WifiEapConfig &wifiEapCon
 void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &req)
 {
     (void)WriteInt32(&req, config.networkId);
-    (void)WriteInt32(&req, config.status);
     (void)WriteString(&req, config.bssid.c_str());
     (void)WriteString(&req, config.ssid.c_str());
     (void)WriteInt32(&req, config.band);
@@ -845,6 +844,41 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
     if (error != EC_SUCCESS) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE), error);
+        return WIFI_OPT_FAILED;
+    }
+
+    if (owner.exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(owner.retCode);
+}
+
+ErrCode WifiDeviceProxy::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    if (remoteDied_ || remote_ == nullptr) {
+        WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
+            __func__, remoteDied_, remote_ == nullptr);
+        return WIFI_OPT_FAILED;
+    }
+
+    IpcIo req;
+    char data[IPC_DATA_SIZE_SMALL];
+    struct IpcOwner owner = {.exception = -1, .retCode = 0, .variable = nullptr};
+
+    IpcIoInit(&req, data, IPC_DATA_SIZE_SMALL, MAX_IPC_OBJ_COUNT);
+    if (!WriteInterfaceToken(&req, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    (void)WriteInt32(&req, 0);
+    (void)WriteInt32(&req, networkId);
+    (void)WriteBool(&req, isAllowed);
+    owner.funcId = static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_ALLOW_AUTO_CONNECT);
+    int error = remote_->Invoke(remote_, static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_ALLOW_AUTO_CONNECT), &req,
+        &owner, IpcCallback);
+    if (error != EC_SUCCESS) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_ALLOW_AUTO_CONNECT), error);
         return WIFI_OPT_FAILED;
     }
 

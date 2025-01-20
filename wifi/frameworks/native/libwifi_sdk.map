@@ -33,6 +33,7 @@
         GetHotspotConfig;
         IsHotspotActive;
         GetStationList;
+        GetStationNum;
         DisassociateSta;
         AddTxPowerInfo;
         SetBand;
@@ -46,6 +47,7 @@
         GetDeviceConfigs;
         GetDeviceConfig;
         RemoveDevice;
+        AllowAutoConnect;
         DisableDeviceConfig;
         EnableDeviceConfig;
         ConnectTo;
@@ -68,6 +70,13 @@
         StartPortalCertification;
         EnableSemiWifi;
         GetWifiDetailState;
+        UpdateNetworkLagInfo;
+        FetchWifiSignalInfoForVoWiFi;
+        IsSupportVoWifiDetect;
+        SetVoWifiDetectMode;
+        GetVoWifiDetectMode;
+        SetVoWifiDetectPeriod;
+        GetVoWifiDetectPeriod;
         "*CompositeWifiFilter*";
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";
@@ -136,6 +145,18 @@
             "OHOS::Wifi::WifiDeviceCallBackStub::IsRemoteDied() const";
             "OHOS::Wifi::WifiDeviceCallBackStub::SetRemoteDied(bool)";
             "vtable for OHOS::Wifi::NetworkSelection::CompositeWifiFilter";
+            "OHOS::Wifi::WifiEapConfig::Str2EapMethod(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Wifi::Hid2dConnectConfig::GetSsid() const";
+            "OHOS::Wifi::Hid2dConnectConfig::GetBssid() const";
+            "OHOS::Wifi::Hid2dConnectConfig::GetPreSharedKey() const";
+            "OHOS::Wifi::Hid2dConnectConfig::GetFrequency() const";
+            "OHOS::Wifi::Hid2dConnectConfig::GetDhcpMode() const";
+            "OHOS::Wifi::Hid2dConnectConfig::SetSsid(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Wifi::Hid2dConnectConfig::SetBssid(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Wifi::Hid2dConnectConfig::SetPreSharedKey(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Wifi::Hid2dConnectConfig::SetFrequency(int)";
+            "OHOS::Wifi::Hid2dConnectConfig::SetDhcpMode(OHOS::Wifi::DhcpMode)";
+            "vtable for OHOS::Wifi::NetworkSelection::AndWifiFilter";
         };
     local:
         *;

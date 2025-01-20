@@ -38,6 +38,7 @@ void WifiScanConfig::GetScanDeviceInfo(WifiScanDeviceInfo &scanDeviceInfo)
 #endif
     mScanDeviceInfo.hid2dInfo.p2pConnectState = linkedInfo.GetConnectState();
     mScanDeviceInfo.hid2dInfo.p2pEnhanceState = WifiConfigCenter::GetInstance().GetP2pEnhanceState();
+    mScanDeviceInfo.hid2dInfo.hid2dSceneLastSetTime = WifiConfigCenter::GetInstance().GetHid2dSceneLastSetTime();
     mScanDeviceInfo.idelState = WifiConfigCenter::GetInstance().GetPowerIdelState();
     mScanDeviceInfo.thermalLevel = WifiConfigCenter::GetInstance().GetThermalLevel();
     mScanDeviceInfo.screenState = WifiConfigCenter::GetInstance().GetScreenState();
@@ -78,6 +79,36 @@ ScanMode WifiScanConfig::GetAppRunningState()
 {
     std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
     return mScanDeviceInfo.scanMode;
+}
+
+void WifiScanConfig::SetScanType(ScanType scanType)
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    mScanDeviceInfo.scanType = scanType;
+}
+
+ScanType WifiScanConfig::GetScanType()
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    return mScanDeviceInfo.scanType;
+}
+
+void WifiScanConfig::SetScanInitiatorUid(int initiatorUid)
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    mScanDeviceInfo.initiatorUid = initiatorUid;
+}
+
+int WifiScanConfig::GetScanInitiatorUid()
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    return mScanDeviceInfo.initiatorUid;
+}
+
+WifiScanDeviceInfo WifiScanConfig::GetScanDeviceInfo()
+{
+    std::unique_lock<std::mutex> lock(mScanDeviceInfoMutex);
+    return mScanDeviceInfo;
 }
 
 void WifiScanConfig::SetStaScene(const int &scene)
@@ -328,6 +359,7 @@ int WifiScanConfig::GetScanInfoList(std::vector<WifiScanInfo> &results)
             LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
                 SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
             iter = mWifiScanInfoList.erase(iter);
+            mWifiCategoryRecord.erase(iter->bssid);
             continue;
         }
         if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
@@ -352,6 +384,7 @@ void WifiScanConfig::RecordWifiCategory(const std::string bssid, WifiCategory ca
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     if (bssid.empty()) {
+        LOGE ("bassid is NULL!");
         return;
     }
     mWifiCategoryRecord.insert_or_assign(bssid, category);
@@ -371,7 +404,13 @@ void WifiScanConfig::CleanWifiCategoryRecord()
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     mWifiCategoryRecord.clear();
+    std::vector<WifiScanInfo>().swap(mWifiScanInfoList);
 }
 
+void WifiScanConfig::RemoveWifiCategoryRecord(const std::string bssid)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mWifiCategoryRecord.erase(bssid);
+}
 }  // namespace Wifi
 }  // namespace OHOS

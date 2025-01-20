@@ -39,9 +39,9 @@ public:
     static WifiServiceScheduler &GetInstance();
     explicit WifiServiceScheduler();
     ~WifiServiceScheduler();
-    ErrCode AutoStartStaService(int instId, std::string &staIfName);
+    ErrCode AutoStartStaService(int instId, std::string &staIfName, int type = 0);
     ErrCode AutoStartWifi2Service(int instId, std::string &staIfName);
-    ErrCode AutoStopStaService(int instId);
+    ErrCode AutoStopStaService(int instId, int type = 0);
     ErrCode AutoStopWifi2Service(int instId);
     ErrCode AutoStartScanOnly(int instId, std::string &staIfName);
     ErrCode AutoStopScanOnly(int instId, bool setIfaceDown);
@@ -56,6 +56,8 @@ public:
     void ClearStaIfaceNameMap(int instId);
     void ClearP2pIfaceNameMap(int instId);
     void ClearSoftApIfaceNameMap(int instId);
+    void SelfcureResetSta(int instId);
+
 private:
     void BroadCastWifiStateChange(WifiState state, int instId);
     ErrCode PreStartWifi(int instId, std::string &staIfName);
@@ -79,8 +81,8 @@ private:
     void OnRssiReportCallback(int index, int antRssi);
     void OnNetlinkReportCallback(int type, const std::vector<uint8_t>& recvMsg);
 #endif
-    std::map<int, std::string> g_staIfaceNameMap;
-    std::map<int, std::string> g_softApIfaceNameMap;
+    std::map<int, std::string> staIfaceNameMap;
+    std::map<int, std::string> softApIfaceNameMap;
     std::mutex mutex;
 };
 }

@@ -62,7 +62,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, LimitSpeed_HighTemp, TestSize.Level1)
 {
     WIFI_LOGI("LimitSpeed_HighTemp enter");
     AppNetworkSpeedLimitService::GetInstance().LimitSpeed(BG_LIMIT_CONTROL_ID_TEMP, BG_LIMIT_LEVEL_3);
-    EXPECT_EQ(BG_LIMIT_LEVEL_3,
+    EXPECT_EQ(BG_LIMIT_OFF,
         AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP]);
 }
 
@@ -140,9 +140,9 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, IsLimitSpeedBgApp, TestSize.Level1)
     WIFI_LOGI("IsLimitSpeedBgApp enter");
     // Prepare
     int controlId = BG_LIMIT_CONTROL_ID_GAME;
-
+    int enable = 1;
     // Execute
-    bool result = AppNetworkSpeedLimitService::GetInstance().IsLimitSpeedBgApp(controlId, "com.ohos.wifi");
+    bool result = AppNetworkSpeedLimitService::GetInstance().IsLimitSpeedBgApp(controlId, "com.ohos.wifi", enable);
 
     // Verify
     EXPECT_FALSE(result);

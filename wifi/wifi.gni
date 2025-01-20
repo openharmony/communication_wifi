@@ -19,6 +19,7 @@ DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"
 CONFIG_CTRL_IFACE = "unix"
 
 declare_args() {
+  wifi_feature_dynamic_unload_sa = false
   wifi_feature_with_p2p = true
   wifi_feature_with_rpt = true
   wifi_feature_with_ap_intf = "wlan"
@@ -33,6 +34,7 @@ declare_args() {
   wifi_feature_non_hdf_driver = false
   wifi_feature_with_local_random_mac = true
   wifi_feature_wifi_pro_ctrl = true
+  wifi_feature_voicewifi_enable = true
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_efficiency_manager)) {
     wifi_feature_with_app_frozen = true
@@ -55,6 +57,7 @@ declare_args() {
     wifi_feature_with_hdi_chip_supported = true
   }
   wifi_feature_with_vap_manager = true
+  wifi_feature_with_wifi_oeminfo_mac = false
 }
 
 memory_optimization_cflags = [
@@ -66,10 +69,13 @@ memory_optimization_cflags_cc = [
   "-fvisibility-inlines-hidden",
   "-fdata-sections",
   "-ffunction-sections",
+  "-fno-asynchronous-unwind-tables",
+  "-fno-unwind-tables",
+  "-fno-merge-all-constants",
   "-Os",
 ]
 
 memory_optimization_ldflags = [
-  "-Wl,--exclude-libs=ALL",
+  "-Wl,--whole-archive",
   "-Wl,--gc-sections",
 ]

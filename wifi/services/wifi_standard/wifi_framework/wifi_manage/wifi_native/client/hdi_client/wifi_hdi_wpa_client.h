@@ -264,7 +264,7 @@ public:
      * @param info - signal info
      * @return WifiErrorNo
      */
-    WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiHalWpaSignalInfo &info) const;
+    WifiErrorNo ReqGetConnectSignalInfo(const std::string &endBssid, WifiSignalPollInfo &info) const;
 
     /**
      * @Description Wpa_s disable/enable(0/1) automatic reconnection.
@@ -835,6 +835,16 @@ public:
      */
     WifiErrorNo ReqRegisterNativeProcessCallback(const std::function<void(int)> &callback) const;
 
+    /**
+     * @Description get wifi7 mlo link info
+     *
+     * @param ifName - interface name
+     * @param mloLinkInfo - MLO link info
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetMloLinkedInfo(const std::string &ifName,
+        std::vector<WifiLinkedInfo> &mloLinkInfo);
+
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;
@@ -849,6 +859,7 @@ private:
     std::string StringCombination(const char* fmt, ...);
     void AppendStr(std::string &dst, const char* format, va_list args);
     bool WriteConfigToFile(const std::string &fileContext);
+    bool HandleMloLinkData(char *staData, uint32_t staDataLen, std::vector<WifiLinkedInfo> &mloLinkInfo);
 };
 }  // namespace Wifi
 }  // namespace OHOS

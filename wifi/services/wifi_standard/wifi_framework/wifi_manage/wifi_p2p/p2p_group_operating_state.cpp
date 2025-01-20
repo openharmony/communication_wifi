@@ -22,6 +22,7 @@
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #include "wifi_net_agent.h"
+#include "p2p_chr_reporter.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupOperatingState");
 
@@ -394,7 +395,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
             freq = freqEnhance;
         }
     } while (0);
-    ret = WifiP2PHalInterface::GetInstance().GroupAdd(true, PERSISTENT_NET_ID, freq);
+    ret = WifiP2PHalInterface::GetInstance().GroupAdd(false, PERSISTENT_NET_ID, freq);
     if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
         WIFI_LOGE("p2p configure to CreateGroup failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_FAILED);

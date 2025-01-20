@@ -76,6 +76,11 @@ public:
     {
         WIFI_LOGE("WifiEventHandlerImpl RemoveAsyncTask Unsupported in lite.");
     }
+    int HasAsyncTask(const std::string &name, bool &hasTask)
+    {
+        WIFI_LOGE("WifiEventHandlerImpl HasAsyncTask Unsupported in lite.");
+        return -1;
+    }
 private:
     static  void Run(WifiEventHandlerImpl &instance)
     {
@@ -197,6 +202,18 @@ public:
             taskMap_.erase(iter);
         }
     }
+    int HasAsyncTask(const std::string &name, bool &hasTask)
+    {
+        std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
+        WIFI_LOGD("HasAsyncTask Enter %{public}s", name.c_str());
+        auto iter = taskMap_.find(name);
+        if (iter != taskMap_.end() && iter->second != nullptr && eventQueue != nullptr) {
+            hasTask = true;
+        } else {
+            hasTask = false;
+        }
+        return 0;
+    }
 private:
     std::shared_ptr<ffrt::queue> eventQueue = nullptr;
     mutable ffrt::mutex eventQurueMutex;
@@ -258,6 +275,11 @@ public:
         }
         eventHandler->RemoveTask(name);
     }
+    int HasAsyncTask(const std::string &name, bool &hasTask)
+    {
+        WIFI_LOGE("WifiEventHandlerImpl HasAsyncTask Unsupported in this mode.");
+        return -1;
+    }
 private:
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
@@ -313,6 +335,14 @@ void WifiEventHandler::RemoveAsyncTask(const std::string &name)
     ptr->RemoveAsyncTask(name);
 }
 
+int WifiEventHandler::HasAsyncTask(const std::string &name, bool &hasTask)
+{
+    if (ptr == nullptr) {
+        WIFI_LOGE("HasAsyncTask: ptr is nullptr!");
+        return -1;
+    }
+    return ptr->HasAsyncTask(name, hasTask);
+}
 
 bool WifiEventHandler::PostSyncTimeOutTask(const Callback &callback, uint64_t waitTime)
 {

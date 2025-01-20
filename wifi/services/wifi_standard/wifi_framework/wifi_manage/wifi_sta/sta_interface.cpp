@@ -16,11 +16,15 @@
 #include "sta_interface.h"
 #include "sta_service.h"
 #include "wifi_logger.h"
+#include "wifi_common_event_helper.h"
 
 DEFINE_WIFILOG_LABEL("StaInterface");
 
 namespace OHOS {
 namespace Wifi {
+
+const uint32_t VDR_VOWIFI_SYNC_REPORT = 302;
+
 StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId)
 {
     WIFI_LOGI("StaInterface constuctor instId %{public}d", instId);
@@ -259,6 +263,14 @@ ErrCode StaInterface::DisableDeviceConfig(int networkId)
     return pStaService->DisableDeviceConfig(networkId);
 }
 
+ErrCode StaInterface::AllowAutoConnect(int32_t networkId, bool isAllowed)
+{
+    LOGI("Enter AllowAutoConnect.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->AllowAutoConnect(networkId, isAllowed);
+}
+
 ErrCode StaInterface::StartWps(const WpsConfig &config)
 {
     LOGI("Enter StartWps.\n");
@@ -485,12 +497,12 @@ ErrCode StaInterface::SetSelfCureService(ISelfCureService *selfCureService)
 }
 #endif
 
-ErrCode StaInterface::EnableHiLinkHandshake(const WifiDeviceConfig &config, const std::string &bssid)
+ErrCode StaInterface::EnableHiLinkHandshake(bool uiFlag, const WifiDeviceConfig &config, const std::string &bssid)
 {
     WIFI_LOGI("Enter EnableHiLinkHandshake");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    pStaService->EnableHiLinkHandshake(config, bssid);
+    pStaService->EnableHiLinkHandshake(uiFlag, config, bssid);
 
     return WIFI_OPT_SUCCESS;
 }
@@ -521,6 +533,97 @@ bool StaInterface::InitStaServiceLocked()
         }
     }
     return true;
+}
+
+ErrCode StaInterface::OnFoldStateChanged(const int foldStatus)
+{
+    WIFI_LOGI("Enter OnFoldStateChanged, foldStatus = %{public}d", foldStatus);
+    if (foldStatus != MODE_STATE_EXPAND && foldStatus != MODE_STATE_FOLDED && foldStatus != MODE_STATE_HALF_FOLD) {
+        WIFI_LOGE("foldStatus param is error");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->HandleFoldStatusChanged(foldStatus);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
+{
+    if (pStaService == nullptr) {
+        WIFI_LOGE("pStaService is null.");
+        return WIFI_OPT_FAILED;
+    }
+    signalInfo = pStaService->FetchWifiSignalInfoForVoWiFi();
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::IsSupportVoWifiDetect(bool &isSupported)
+{
+    if (pStaService == nullptr) {
+        WIFI_LOGE("pStaService is null.");
+        return WIFI_OPT_FAILED;
+    }
+    std::string ret = pStaService->VoWifiDetect("VoWIFI_DETECT VOWIFI_IS_SUPPORT");
+    WIFI_LOGD("IsSupportVoWifiDetect ret: %{public}s", ret.c_str());
+    isSupported = (!ret.empty() && (ret == "true" || ret == "ok"));
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::SetVoWifiDetectMode(WifiDetectConfInfo info)
+{
+    if (!(m_wifiDetectConfInfo.wifiDetectMode == info.wifiDetectMode &&
+        m_wifiDetectConfInfo.envalueCount == info.envalueCount && m_wifiDetectConfInfo.threshold == info.threshold)) {
+        m_wifiDetectConfInfo.wifiDetectMode = info.wifiDetectMode;
+        m_wifiDetectConfInfo.envalueCount = info.envalueCount;
+        m_wifiDetectConfInfo.threshold = info.threshold;
+        if (pStaService == nullptr) {
+            WIFI_LOGE("SetVoWifiDetectMode: pStaService is null.");
+            return WIFI_OPT_FAILED;
+        }
+        pStaService->ProcessSetVoWifiDetectMode(info);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::GetVoWifiDetectMode(WifiDetectConfInfo &info)
+{
+    info.wifiDetectMode = m_wifiDetectConfInfo.wifiDetectMode;
+    info.envalueCount = m_wifiDetectConfInfo.envalueCount;
+    info.threshold = m_wifiDetectConfInfo.threshold;
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::SetVoWifiDetectPeriod(int period)
+{
+    if (period != m_wifiDetectperiod) {
+        m_wifiDetectperiod = period;
+        if (pStaService == nullptr) {
+            WIFI_LOGE("SetVoWifiDetectPeriod: pStaService is null.");
+            return WIFI_OPT_FAILED;
+        }
+        pStaService->ProcessSetVoWifiDetectPeriod(period);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode StaInterface::GetVoWifiDetectPeriod(int &period)
+{
+    period = m_wifiDetectperiod;
+    return WIFI_OPT_SUCCESS;
+}
+ 
+void StaInterface::ProcessVoWifiNetlinkReportEvent(const int type)
+{
+    if (type == VDR_VOWIFI_SYNC_REPORT) {
+        if (pStaService == nullptr) {
+            WIFI_LOGE("pVoWifiService_ is null.");
+            return;
+        }
+        int index = 0;
+        std::string data;
+        WifiCommonEventHelper::PublishVoWifiSignalDetectInterruptEvent(index, data);
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

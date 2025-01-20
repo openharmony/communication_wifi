@@ -398,7 +398,7 @@ HWTEST_F(WifiHdiWpaClientTest, ReqSetRoamConfigTEST, TestSize.Level1)
 HWTEST_F(WifiHdiWpaClientTest, ReqGetConnectSignalInfoTEST, TestSize.Level1)
 {
     std::string endBssid = "00:11:22:33:44:55";
-    WifiHalWpaSignalInfo info;
+    WifiSignalPollInfo info;
     WifiErrorNo result = wifiHdiWpaClient->ReqGetConnectSignalInfo(endBssid, info);
     EXPECT_EQ(result, WIFI_HAL_OPT_NOT_SUPPORT);
 }
@@ -1487,6 +1487,14 @@ HWTEST_F(WifiHdiWpaClientTest, PushDeviceConfigParseMaskTest, TestSize.Level1)
     mask = 0x0;
     result = wifiHdiWpaClient->PushDeviceConfigParseMask(&pConfig, type, mask, parseStr, size);
     EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiHdiWpaClientTest, GetMloLinkedInfoTest, TestSize.Level1)
+{
+    std::string ifaceName = "wlan0";
+    std::vector<WifiLinkedInfo> mloLinkInfo;
+    WifiErrorNo result = wifiHdiWpaClient->GetMloLinkedInfo(ifaceName, mloLinkInfo);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
 } // namespace Wifi
 } // namespace OHOS

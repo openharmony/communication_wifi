@@ -50,6 +50,8 @@ public:
     virtual std::map<int, WifiLinkedInfo> GetAllWifiLinkedInfo() = 0;
     virtual int GetLinkedInfo(WifiLinkedInfo &info, int instId = 0) = 0;
     virtual int SaveLinkedInfo(const WifiLinkedInfo &info, int instId = 0) = 0;
+    virtual int GetMloLinkedInfo(std::vector<WifiLinkedInfo> &info, int instId = 0) = 0;
+    virtual int SaveMloLinkedInfo(const std::vector<WifiLinkedInfo> &info, int instId = 0) = 0;
     virtual void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth, int instId = 0) = 0;
     virtual int SetMacAddress(const std::string &macAddress, int instId = 0) = 0;
     virtual int GetMacAddress(std::string &macAddress, int instId = 0) = 0;
@@ -154,6 +156,16 @@ public:
     virtual int GetScanGenieState() const = 0;
     virtual int Init() = 0;
     virtual void SetFreezeModeState(int state) = 0;
+    virtual int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0) = 0;
+    virtual int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0) = 0;
+    virtual void SetSystemMode(int systemMode) = 0;
+    virtual int GetSystemMode() = 0;
+    virtual bool GetWifiSelfcureResetEntered() const = 0;
+    virtual int SetHotspotIdleTimeout(int time) = 0;
+    virtual bool IsAllowPopUp() = 0;
+    virtual void SetDeviceType(int deviceType) = 0;
+    virtual int64_t GetHid2dSceneLastSetTime() = 0;
+    virtual int SetHid2dSceneLastSetTime(int64_t setTime) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -184,6 +196,8 @@ public:
     MOCK_METHOD0(GetAllWifiLinkedInfo, std::map<int, WifiLinkedInfo> ());
     MOCK_METHOD2(GetLinkedInfo, int(WifiLinkedInfo &info, int));
     MOCK_METHOD2(SaveLinkedInfo, int(const WifiLinkedInfo &info, int));
+    MOCK_METHOD2(GetMloLinkedInfo, int(std::vector<WifiLinkedInfo> &info, int));
+    MOCK_METHOD2(SaveMloLinkedInfo, int(const std::vector<WifiLinkedInfo> &info, int));
     MOCK_METHOD3(UpdateLinkedChannelWidth, void(std::string bssid, WifiChannelWidth channelWidth, int instId));
     MOCK_METHOD2(SetMacAddress, int(const std::string &macAddress, int));
     MOCK_METHOD2(GetMacAddress, int(std::string &macAddress, int));
@@ -288,6 +302,16 @@ public:
     MOCK_CONST_METHOD0(GetScanGenieState, int());
     MOCK_METHOD0(Init, int());
     MOCK_METHOD1(SetFreezeModeState, void(int state));
+    MOCK_METHOD2(GetHotspotMacConfig, int(HotspotMacConfig &config, int id));
+    MOCK_METHOD2(SetHotspotMacConfig, int(const HotspotMacConfig &config, int id));
+    MOCK_METHOD1(SetSystemMode, void(int));
+    MOCK_METHOD0(GetSystemMode, int());
+    MOCK_METHOD0(GetHid2dSceneLastSetTime, int64_t());
+    MOCK_METHOD1(SetHid2dSceneLastSetTime, int(int64_t setTime));
+    MOCK_METHOD0(IsAllowPopUp, bool());
+    MOCK_METHOD1(SetDeviceType, void(int deviceType));
+    MOCK_METHOD1(SetHotspotIdleTimeout, int(int time));
+    MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

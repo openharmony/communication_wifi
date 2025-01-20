@@ -40,6 +40,7 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiP2pServiceImpl::instanceLock;
+std::mutex WifiP2pServiceImpl::g_p2pMutex;
 sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiP2pServiceImpl::GetInstance().GetRefPtr());
 
@@ -96,6 +97,7 @@ void WifiP2pServiceImpl::OnStop()
 
 bool WifiP2pServiceImpl::Init()
 {
+    std::lock_guard<std::mutex> lock(g_p2pMutex);
     if (!mPublishFlag) {
         bool ret = Publish(WifiP2pServiceImpl::GetInstance());
         if (!ret) {
@@ -430,6 +432,8 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_P2P_REQUEST);
+
     uint32_t passLen = config.GetPassphrase().length();
     if ((!config.GetPassphrase().empty()) &&
         (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN)) {
@@ -557,6 +561,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         WIFI_LOGE("P2pConnect:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_P2P_REQUEST);
 
     if (CheckMacIsValid(config.GetDeviceAddress()) != 0) {
         WIFI_LOGE("P2pConnect:VerifyDeviceAddress failed!");
@@ -1176,6 +1181,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);
 
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
@@ -1215,6 +1221,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         WIFI_LOGE("Hid2dConnect:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);
 
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not running!");
@@ -1283,6 +1290,8 @@ ErrCode WifiP2pServiceImpl::Hid2dGetRecommendChannel(const RecommendChannelReque
         WIFI_LOGE("Hid2dGetRecommendChannel:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);
+
     if (!IsP2pServiceRunning()) {
         WIFI_LOGE("P2pService is not runing!");
         return WIFI_OPT_P2P_NOT_OPENED;

@@ -96,6 +96,16 @@ public:
     virtual int SetDeviceEverConnected(int networkId) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
     virtual bool GetAcceptUnvalidated(int networkId) = 0;
+    virtual void SetUserConnectChoice(int networkId) = 0;
+    virtual void ClearAllNetworkConnectChoice() = 0;
+    virtual bool ClearNetworkConnectChoice(int networkId) = 0;
+    virtual void RemoveConnectChoiceFromAllNetwork(int networkId) = 0;
+    virtual bool SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp) = 0;
+    virtual bool ClearNetworkCandidateScanResult(int networkId) = 0;
+    virtual bool SetNetworkCandidateScanResult(int networkId) = 0;
+    virtual bool GetWifiFlagOnAirplaneMode(int instId) = 0;
+    virtual int GetScanOnlySwitchState(int instId) = 0;
+    virtual bool GetScanAlwaysState(int instId) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -173,6 +183,16 @@ public:
     MOCK_METHOD1(SetDeviceEverConnected, int(int networkId));
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
     MOCK_METHOD1(GetAcceptUnvalidated, bool(int networkId));
+    MOCK_METHOD1(SetUserConnectChoice, void(int networkId));
+    MOCK_METHOD0(ClearAllNetworkConnectChoice, void());
+    MOCK_METHOD1(ClearNetworkConnectChoice, bool(int networkId));
+    MOCK_METHOD1(RemoveConnectChoiceFromAllNetwork, void(int networkId));
+    MOCK_METHOD3(SetNetworkConnectChoice, bool(int networkId, int selectNetworkId, long timestamp));
+    MOCK_METHOD1(ClearNetworkCandidateScanResult, bool(int networkId));
+    MOCK_METHOD1(SetNetworkCandidateScanResult, bool(int networkId));
+    MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
+    MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
+    MOCK_METHOD1(GetScanOnlySwitchState, int(int instId));
 };
 }  // namespace OHOS
 }  // namespace Wifi

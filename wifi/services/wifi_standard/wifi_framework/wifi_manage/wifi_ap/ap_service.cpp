@@ -59,15 +59,17 @@ ErrCode ApService::EnableHotspot()
             WIFI_LOGE("wifi_settings.hotspotconfig is error.");
             break;
         }
-        m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
         m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
         return ErrCode::WIFI_OPT_SUCCESS;
     } while (0);
     WIFI_LOGI("Ap disabled, set softap toggled false");
+    WifiCountryCodeManager::GetInstance()
+        .UnregisterWifiCountryCodeChangeListener(m_apObserver);
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     if (!(apStartedState_.StopAp())) {
         WIFI_LOGE("StopAp not going well.");
     }
+    m_ApStateMachine.OnApStateChange(ApState::AP_STATE_IDLE);
     return WIFI_OPT_FAILED;
 }
 

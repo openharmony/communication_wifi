@@ -100,6 +100,52 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
+{
+    WIFI_LOGI("IsOpenSoftApAllowed enter");
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("IsOpenSoftApAllowed:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsOpenSoftApAllowed:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsOpenSoftApAllowed:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
+    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() != MODE_STATE_OPEN) {
+        isSupported = true;
+        return WIFI_OPT_SUCCESS;
+    }
+    long features = 0;
+    WifiManager::GetInstance().GetSupportedFeatures(features);
+    if (features & static_cast<long>(WifiFeatures::WIFI_FEATURE_AP_STA)) {
+        WifiLinkedInfo linkInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
+        if (linkInfo.connState == ConnState::CONNECTED) {
+            isSupported = true;
+            return WIFI_OPT_SUCCESS;
+        }
+    }
+#ifdef FEATURE_RPT_SUPPORT
+    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+        WIFI_LOGE("IsOpenSoftApAllowed, GetWifiTogglerManager get failed");
+        return WIFI_OPT_FAILED;
+    }
+    auto &wifiControllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    if (wifiControllerMachine != nullptr && wifiControllerMachine->ShouldUseRpt(0)) {
+        isSupported = true;
+        return WIFI_OPT_SUCCESS;
+    }
+#endif
+    WIFI_LOGI("IsOpenSoftApAllowed: false");
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiHotspotServiceImpl::GetHotspotState(int &state)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
@@ -378,11 +424,6 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
-    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
-        WIFI_LOGI("current airplane mode and can not use ap, open failed!");
-        return WIFI_OPT_FORBID_AIRPLANE;
-    }
     if (WifiConfigCenter::GetInstance().GetPowerSavingModeState() == 1) {
         WIFI_LOGI("current power saving mode and can not use ap, open failed!");
         return WIFI_OPT_FORBID_POWSAVING;
@@ -408,6 +449,7 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_AP_REQUEST);
 
     std::string bundleName = "";
     if (!GetBundleNameByUid(GetCallingUid(), bundleName)) {
@@ -911,7 +953,7 @@ ErrCode WifiHotspotServiceImpl::CfgCheckIpAddress(const std::string &ipAddress)
     }
 
     for (auto str : list) {
-        if (!isNumber(str) || stoi(str) > MAX_IPV4_VALUE || stoi(str) < 0) {
+        if (!isNumber(str) || CheckDataLegal(str) > MAX_IPV4_VALUE || CheckDataLegal(str) < 0) {
             WIFI_LOGE("CfgCheckIpAddress stoi failed.");
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }

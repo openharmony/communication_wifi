@@ -132,14 +132,6 @@ HWTEST_F(WifiStaManagerTest, PublishWifiOperateStateHiSysEventTest05, TestSize.L
     EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
 }
 
-HWTEST_F(WifiStaManagerTest, IgnoreConnStateChangeTest01, TestSize.Level1)
-{
-    WifiLinkedInfo info;
-    int instId = 1;
-    wifiStaManager_->IgnoreConnStateChange(info, instId);
-    EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
-}
-
 HWTEST_F(WifiStaManagerTest, DealStaConnChangedTest01, TestSize.Level1)
 {
     OperateResState state = OperateResState::CONNECT_AP_CONNECTED;

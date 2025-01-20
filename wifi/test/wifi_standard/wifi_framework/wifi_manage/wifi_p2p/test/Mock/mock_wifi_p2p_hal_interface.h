@@ -30,7 +30,9 @@ namespace Wifi {
 class MockWifiP2PHalInterface {
 public:
     virtual ~MockWifiP2PHalInterface() = default;
-    virtual WifiErrorNo StartP2p(void) const = 0;
+    virtual WifiErrorNo StartP2p(const std::string &ifaceName, const bool hasPersisentGroup) const = 0;
+    virtual WifiErrorNo GetChba0Freq(int &chba0Freq) const=0;
+    virtual WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const=0;
     virtual WifiErrorNo StopP2p(void) const = 0;
     virtual WifiErrorNo ListNetworks(std::map<int, WifiP2pGroupInfo> &value) const = 0;
     virtual WifiErrorNo StartWpsPbc(const std::string &groupInterface, const std::string &bssid) const = 0;
@@ -74,7 +76,8 @@ public:
         const WifiP2pDevice &device, int frequency, int dialogToken, const std::vector<unsigned char> &tlvs) const = 0;
     virtual WifiErrorNo SetServiceDiscoveryExternal(bool isExternalProcess) const = 0;
     virtual WifiErrorNo GetP2pPeer(const std::string &deviceAddress, WifiP2pDevice &device) const = 0;
-    virtual WifiErrorNo P2pGetSupportFrequenciesByBand(int band, std::vector<int> &frequencies) const = 0;
+    virtual WifiErrorNo P2pGetSupportFrequenciesByBand(const std::string &ifaceName, int band,
+        std::vector<int> &frequencies) const = 0;
     virtual WifiErrorNo P2pSetGroupConfig(int networkId, const HalP2pGroupConfig &config) const = 0;
     virtual WifiErrorNo P2pSetSingleConfig(int networkId, const std::string &key, const std::string &value) const = 0;
     virtual WifiErrorNo SetRptBlockList(const std::string &ifaceName, const std::string &interfaceName,
@@ -87,6 +90,7 @@ public:
     virtual WifiErrorNo SetP2pSecondaryDeviceType(const std::string &type) = 0;
     virtual WifiErrorNo Hid2dConnect(const Hid2dConnectConfig &config) const = 0;
     virtual const P2pHalCallback &GetP2pCallbackInst(void) const = 0;
+    virtual WifiErrorNo GroupClientRemove(const std::string &deviceMac) const = 0;
 };
 
 class WifiP2PHalInterface : public MockWifiP2PHalInterface {
@@ -94,7 +98,9 @@ public:
     static WifiP2PHalInterface &GetInstance();
 
 public:
-    MOCK_CONST_METHOD0(StartP2p, WifiErrorNo());
+    MOCK_CONST_METHOD2(StartP2p, WifiErrorNo(const std::string &ifaceName, const bool hasPersisentGroup));
+    MOCK_CONST_METHOD3(DeliverP2pData, WifiErrorNo(int32_t cmdType, int32_t dataType, const std::string& carryData));
+    MOCK_CONST_METHOD1(GetChba0Freq, WifiErrorNo(int &chba0Freq));
     MOCK_CONST_METHOD0(StopP2p, WifiErrorNo());
     MOCK_CONST_METHOD1(ListNetworks, WifiErrorNo(std::map<int, WifiP2pGroupInfo> &value));
     MOCK_CONST_METHOD2(StartWpsPbc, WifiErrorNo(const std::string &groupInterface, const std::string &bssid));
@@ -138,7 +144,8 @@ public:
                                                  const std::vector<unsigned char> &tlvs));
     MOCK_CONST_METHOD1(SetServiceDiscoveryExternal, WifiErrorNo(bool));
     MOCK_CONST_METHOD2(GetP2pPeer, WifiErrorNo(const std::string &deviceAddress, WifiP2pDevice &device));
-    MOCK_CONST_METHOD2(P2pGetSupportFrequenciesByBand, WifiErrorNo(int band, std::vector<int> &frequencies));
+    MOCK_CONST_METHOD3(P2pGetSupportFrequenciesByBand, WifiErrorNo(const std::string &ifaceName, int band,
+        std::vector<int> &frequencies));
     MOCK_CONST_METHOD2(P2pSetGroupConfig, WifiErrorNo(int networkId, const HalP2pGroupConfig &config));
     MOCK_CONST_METHOD2(P2pGetGroupConfig, WifiErrorNo(int networkId, HalP2pGroupConfig &config));
     MOCK_CONST_METHOD1(P2pAddNetwork, WifiErrorNo(int &networkId));
@@ -152,6 +159,7 @@ public:
         const std::vector<std::string> &blockList));
     MOCK_METHOD3(DisAssociateSta, WifiErrorNo(const std::string &ifaceName, const std::string &interfaceName,
         const std::string &mac));
+    MOCK_CONST_METHOD1(GroupClientRemove, WifiErrorNo(const std::string &deviceMac));
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -58,15 +58,6 @@ ErrCode SelfCureService::InitSelfCureService()
     return WIFI_OPT_SUCCESS;
 }
 
-void SelfCureService::RegisterSelfCureServiceCallback(const std::vector<SelfCureServiceCallback> &callbacks) const
-{
-    WIFI_LOGI("Enter RegisterSelfCureServiceCallback.");
-    if (pSelfCureStateMachine == nullptr) {
-        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
-        return;
-    }
-}
-
 void SelfCureService::HandleRssiLevelChanged(int rssi)
 {
     WIFI_LOGD("HandleRssiLevelChanged, %{public}d.\n", rssi);
@@ -84,12 +75,6 @@ void SelfCureService::HandleRssiLevelChanged(int rssi)
     pSelfCureStateMachine->SendMessage(msg);
 }
 
-void SelfCureService::HandleP2pConnChanged(const WifiP2pLinkedInfo &info)
-{
-    WIFI_LOGD("self cure p2p connection state change, connectState = %{public}d", info.GetConnectState());
-}
-
-
 void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
     WIFI_LOGD("self cure wifi connection state change, state = %{public}d", state);
@@ -98,28 +83,22 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         return;
     }
 
-    if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
-        pSelfCureStateMachine->SetHttpMonitorStatus(false);
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, 1, info);
-    } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
-        pSelfCureStateMachine->SetHttpMonitorStatus(true);
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);
-    }
-
-    if (IsSelfCureOnGoing() && info.detailedState != DetailedState::CONNECTED) {
-        WIFI_LOGI("HandleStaConnChanged, selfcure igonre conn state change");
-        return;
-    }
-
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD, info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        pSelfCureStateMachine->SetHttpMonitorStatus(false);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD, info);
         if (lastState == OperateResState::CONNECT_OBTAINING_IP) {
             pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, lastWifiLinkedInfo);
         }
     } else if (state == OperateResState::CONNECT_OBTAINING_IP) {
         lastWifiLinkedInfo = info;
+    } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
+        pSelfCureStateMachine->SetHttpMonitorStatus(false);
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, 1, info);
+    } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
+        pSelfCureStateMachine->SetHttpMonitorStatus(true);
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);
     }
     lastState = state;
 }
@@ -144,6 +123,16 @@ void SelfCureService::NotifyInternetFailureDetected(int forceNoHttpCheck)
     pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, forceNoHttpCheck);
 }
 
+void SelfCureService::NotifyP2pConnectStateChanged(const WifiP2pLinkedInfo &info)
+{
+    WIFI_LOGI("Enter NotifyP2pConnectStateChanged, state is %{public}d", info.GetConnectState());
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return;
+    }
+    pSelfCureStateMachine->HandleP2pConnChanged(info);
+}
+
 bool SelfCureService::IsSelfCureOnGoing()
 {
     if (pSelfCureStateMachine == nullptr) {
@@ -151,6 +140,24 @@ bool SelfCureService::IsSelfCureOnGoing()
         return false;
     }
     return pSelfCureStateMachine->IsSelfCureOnGoing();
+}
+
+bool SelfCureService::IsSelfCureL2Connecting()
+{
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return false;
+    }
+    return pSelfCureStateMachine->IsSelfCureL2Connecting();
+}
+
+void SelfCureService::StopSelfCureWifi(int32_t status)
+{
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return;
+    }
+    pSelfCureStateMachine->StopSelfCureWifi(status);
 }
 
 bool SelfCureService::CheckSelfCureWifiResult(int event)
@@ -165,7 +172,9 @@ bool SelfCureService::CheckSelfCureWifiResult(int event)
 void SelfCureService::RegisterP2pEnhanceCallback()
 {
     using namespace std::placeholders;
-    p2pEnhanceStateChange_ = std::bind(&SelfCureService::P2pEnhanceStateChange, this, _1, _2);
+    p2pEnhanceStateChange_ = [this](const std::string &ifName, int32_t state) {
+        this->P2pEnhanceStateChange(ifName, state);
+    };
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("RegisterP2pEnhanceCallback get pEnhanceService failed!");

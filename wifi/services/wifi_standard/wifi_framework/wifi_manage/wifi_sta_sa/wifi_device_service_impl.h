@@ -79,6 +79,8 @@ public:
 
     ErrCode DisableDeviceConfig(int networkId) override;
 
+    ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) override;
+
     ErrCode ConnectToNetwork(int networkId, bool isCandidate) override;
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
@@ -175,6 +177,8 @@ public:
 
     ErrCode FactoryReset() override;
 
+    ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) override;
+
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;
 
     ErrCode SetLowTxPower(const WifiLowPowerParam wifiLowPowerParam) override;
@@ -188,6 +192,20 @@ public:
     ErrCode SetSatelliteState(const int state) override;
 
     ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
+
+    ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) override;
+
+    ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) override;
+ 
+    ErrCode IsSupportVoWifiDetect(bool &isSupported) override;
+ 
+    ErrCode SetVoWifiDetectMode(WifiDetectConfInfo info) override;
+ 
+    ErrCode GetVoWifiDetectMode(WifiDetectConfInfo &info) override;
+ 
+    ErrCode SetVoWifiDetectPeriod(int period) override;
+ 
+    ErrCode GetVoWifiDetectPeriod(int &period) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

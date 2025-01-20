@@ -70,8 +70,12 @@ public:
     // Check if the given targetNetworkId is blocked due to wrong password
     bool IsWrongPassword(int targetNetworkId);
 
+    // Enable all networks by entering settings
+    void OnReceiveSettingsEnterEvent(bool isEnter);
+
 private:
     DisablePolicy CalculateDisablePolicy(DisabledReason disableReason);
+    void EnableAllNetworksByEnteringSettings(std::vector<DisabledReason> enableReasons);
     void LogDisabledConfig(const WifiDeviceConfig& config);
     LastConnectedApInfo mLastConnectedApInfo;
     std::map<DisabledReason, DisablePolicy> blockConnectPolicies;

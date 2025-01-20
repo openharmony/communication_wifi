@@ -33,13 +33,14 @@ public:
     explicit SelfCureService(int instId = 0);
     virtual ~SelfCureService();
     virtual ErrCode InitSelfCureService();
-    virtual void RegisterSelfCureServiceCallback(const std::vector<SelfCureServiceCallback> &callbacks) const;
     void HandleRssiLevelChanged(int rssi);
     void HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &info);
-    void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
     void HandleDhcpOfferReport(const IpInfo &ipInfo);
     void NotifyInternetFailureDetected(int forceNoHttpCheck);
+    void NotifyP2pConnectStateChanged(const WifiP2pLinkedInfo &info);
     bool IsSelfCureOnGoing();
+    bool IsSelfCureL2Connecting();
+    void StopSelfCureWifi(int32_t status);
     bool CheckSelfCureWifiResult(int event);
 private:
     void RegisterP2pEnhanceCallback();

@@ -101,5 +101,13 @@ HWTEST_F(WifiProServiceTest, HandleScanResultTest01, TestSize.Level1)
     wifiProService_->HandleScanResult(scanInfos);
     EXPECT_NE(wifiProService_->instId_, TEN);
 }
+
+HWTEST_F(WifiProServiceTest, HandleQoeReportTest01, TestSize.Level1)
+{
+    NetworkLagType networkLagType = NetworkLagType::WIFIPRO_QOE_REPORT;
+    NetworkLagInfo networkLagInfo;
+    wifiProService_->HandleQoeReport(networkLagType, networkLagInfo);
+    EXPECT_NE(wifiProService_->instId_, TEN);
+}
 } // namespace Wifi
 } // namespace OHOS

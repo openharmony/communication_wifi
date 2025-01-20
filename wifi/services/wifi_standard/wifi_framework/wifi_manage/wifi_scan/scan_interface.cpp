@@ -32,16 +32,6 @@ ScanInterface::~ScanInterface()
     }
 }
 
-extern "C" IScanService *Create(int instId = 0)
-{
-    return new ScanInterface(instId);
-}
-extern "C" void Destroy(ScanInterface *scanInterface)
-{
-    delete scanInterface;
-    scanInterface = nullptr;
-}
-
 ErrCode ScanInterface::Init()
 {
     WIFI_LOGI("Enter ScanInterface::Init.\n");
@@ -74,19 +64,25 @@ ErrCode ScanInterface::UnInit()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanInterface::Scan(bool externFlag)
+ErrCode ScanInterface::Scan(bool externFlag, ScanType scanType)
 {
     WIFI_LOGI("Enter ScanInterface::Scan\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    if (scanType != ScanType::SCAN_DEFAULT) {
+        return pScanService->Scan(scanType);
+    }
     return pScanService->Scan(externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN);
 }
 
-ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag)
+ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag, ScanType scanType)
 {
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    if (scanType != ScanType::SCAN_DEFAULT) {
+        return pScanService->ScanWithParam(wifiScanParams, scanType);
+    }
     return pScanService->ScanWithParam(wifiScanParams,
         externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN);
 }

@@ -134,6 +134,7 @@ ErrCode WifiProStateMachine::Initialize()
 
 bool WifiProStateMachine::IsKeepCurrWifiConnected()
 {
+    // connectedState to noNetState, do not switch
     if (currentState_ == WifiProState::WIFI_NONET && !isHasNetToNoNet_) {
         WIFI_LOGI("IsKeepCurrWifiConnected, NoNet before select.");
         return true;
@@ -325,11 +326,11 @@ void WifiProStateMachine::FastScan(std::vector<WifiScanInfo> &scanInfoList)
     }
 }
 
-void WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
+bool WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
 {
     if (isWifi2WifiSwitching_) {
         WIFI_LOGI("Wifi2Wifi Switching");
-        return;
+        return false;
     }
     WIFI_LOGI("TrySelfCure.");
 
@@ -360,7 +361,7 @@ void WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
             WIFI_LOGI("not reach rssi threshold.");
         }
     } while (0);
-    Wifi2WifiFinish();
+    return true;
 }
 
 bool WifiProStateMachine::SelectNetwork(NetworkSelectionResult &networkSelectionResult,

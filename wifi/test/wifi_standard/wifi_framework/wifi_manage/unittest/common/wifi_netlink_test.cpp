@@ -52,18 +52,21 @@ HWTEST_F(WifiNetLinkTest, TestSendCmdKernel, TestSize.Level1)
     int32_t cmd = 456;
     int32_t flag = 789;
     WifiNetLink::GetInstance().SendCmdKernel(sockFd, cmd, flag);
+    EXPECT_NE(WifiNetLink::GetInstance().SendCmdKernel(sockFd, cmd, flag),-1);
 }
 
 HWTEST_F(WifiNetLinkTest, TestStartMonitor, TestSize.Level1)
 {
     int32_t sockFd = 123;
     WifiNetLink::GetInstance().StartMonitor(sockFd);
+    EXPECT_NE(WifiNetLink::GetInstance().StartMonitor(sockFd),-1);
 }
 
 HWTEST_F(WifiNetLinkTest, TestProcessQueryTcp, TestSize.Level1)
 {
     int32_t sockFd = 123;
     WifiNetLink::GetInstance().ProcessQueryTcp(sockFd);
+    EXPECT_NE(WifiNetLink::GetInstance().ProcessQueryTcp(sockFd),-1);
 }
 
 HWTEST_F(WifiNetLinkTest, TestSendQoeCmd, TestSize.Level1)
@@ -71,6 +74,7 @@ HWTEST_F(WifiNetLinkTest, TestSendQoeCmd, TestSize.Level1)
     int32_t cmd = 123;
     int32_t arg = 456;
     WifiNetLink::GetInstance().SendQoeCmd(cmd, arg);
+    EXPECT_NE(WifiNetLink::GetInstance().SendQoeCmd(cmd, arg),-1);
 }
 
 HWTEST_F(WifiNetLinkTest, TestProcessReportMsg, TestSize.Level1)
@@ -78,6 +82,7 @@ HWTEST_F(WifiNetLinkTest, TestProcessReportMsg, TestSize.Level1)
     int32_t sockFd = 123;
     int32_t cmd = 456;
     WifiNetLink::GetInstance().ProcessReportMsg(sockFd, cmd);
+    EXPECT_NE(WifiNetLink::GetInstance().ProcessReportMsg(sockFd, cmd),-1);
 }
 
 HWTEST_F(WifiNetLinkTest, SendQoeCmdTest001, TestSize.Level1)
@@ -85,4 +90,5 @@ HWTEST_F(WifiNetLinkTest, SendQoeCmdTest001, TestSize.Level1)
     int32_t cmd = CMD_START_MONITOR;
     int32_t arg = 456;
     WifiNetLink::GetInstance().SendQoeCmd(cmd, arg);
+    EXPECT_NE(WifiNetLink::GetInstance().SendQoeCmd(cmd, arg),-1);
 }

@@ -255,7 +255,6 @@ private:
         std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
-    bool FirstNoNetAndSelfCure();
     void HandleConnectedPerf5g(WifiLinkedInfo &wifiLinkedInfo);
 };
 } // namespace Wifi

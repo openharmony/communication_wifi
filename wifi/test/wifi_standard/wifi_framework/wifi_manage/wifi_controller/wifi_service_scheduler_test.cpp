@@ -34,6 +34,11 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 
+static std::string g_errLog;
+    void WifiServiceSchedulerCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class WifiServiceSchedulerTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -49,6 +54,7 @@ public:
     virtual void SetUp()
     {
         pWifiServiceScheduler = std::make_unique<WifiServiceScheduler>();
+        LOG_SetCallback(WifiServiceSchedulerCallback);
     }
 
     virtual void TearDown()
@@ -255,6 +261,7 @@ HWTEST_F(WifiServiceSchedulerTest, HandleGetStaFailedTest01, TestSize.Level1)
 {
     int instId = 1;
     pWifiServiceScheduler->HandleGetStaFailed(instId);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, AutoStartScanOnlyTest01, TestSize.Level1)
@@ -373,6 +380,7 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2OpenResTest01, TestSize.Level1)
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifi2OpenRes(state, instId);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2OpenResTest02, TestSize.Level1)
@@ -381,6 +389,7 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2OpenResTest02, TestSize.Level1)
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifi2OpenRes(state, instId);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiSemiActiveResTest01, TestSize.Level1)
@@ -389,6 +398,7 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiSemiActiveResTest01, TestSize.Lev
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifiSemiActiveRes(state, instId);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiSemiActiveResTest02, TestSize.Level1)
@@ -397,6 +407,7 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifiSemiActiveResTest02, TestSize.Lev
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifiSemiActiveRes(state, instId);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifiCloseResTest01, TestSize.Level1)
@@ -432,6 +443,7 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2CloseResTest01, TestSize.Level1)
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifi2CloseRes(state, instId);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2CloseResTest02, TestSize.Level1)
@@ -440,6 +452,7 @@ HWTEST_F(WifiServiceSchedulerTest, DispatchWifi2CloseResTest02, TestSize.Level1)
     int instId = 1;
 
     pWifiServiceScheduler->DispatchWifi2CloseRes(state, instId);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, AutoStartApServiceTest01, TestSize.Level1)

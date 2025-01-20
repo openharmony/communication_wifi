@@ -134,9 +134,9 @@ ErrCode WifiProStateMachine::Initialize()
 
 bool WifiProStateMachine::IsKeepCurrWifiConnected()
 {
-    // connectedState to noNetState, do not switch
-    if (currentState_ == WifiProState::WIFI_NONET && !isHasNetToNoNet_) {
-        WIFI_LOGI("IsKeepCurrWifiConnected, NoNet before select.");
+    // First detect nonet and user select, do not switch
+    if (currentState_ == WifiProState::WIFI_NONET && WifiProUtils::IsUserSelectNetwork() && isFirstDectectNoNet_) {
+        WIFI_LOGI("IsKeepCurrWifiConnected, user select and nonet.");
         return true;
     }
 
@@ -667,6 +667,7 @@ void WifiProStateMachine::WifiConnectedState::InitConnectedState()
     if (pWifiProStateMachine_->duanBandHandoverType_ == ROAM_SCENE) {
         pWifiProStateMachine_->duanBandHandoverType_ = 0;
     }
+    pWifiProStateMachine_->isFirstDectectNoNet_ = true;
 }
 
 void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMessagePtr msg)
@@ -680,9 +681,6 @@ void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMes
     if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED) &&
         (pWifiProStateMachine_->currentState_ != WifiProState::WIFI_NONET)) {
         WIFI_LOGI("state transition: WifiConnectedState -> WifiNoNetState.");
-        if (pWifiProStateMachine_->currentState_ == WifiProState::WIFI_HASNET) {
-            pWifiProStateMachine_->isHasNetToNoNet_ = true;
-        }
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL) &&
         (pWifiProStateMachine_->currentState_ != WifiProState::WIFI_PORTAL)) {
@@ -837,6 +835,7 @@ void WifiProStateMachine::WifiHasNetState::GoOutState()
 {
     WIFI_LOGI("WifiHasNetState GoOutState function.");
     pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
+    pWifiProStateMachine_->isFirstDectectNoNet_ = false;
     return;
 }
 
@@ -1109,7 +1108,7 @@ void WifiProStateMachine::WifiNoNetState::GoInState()
 void WifiProStateMachine::WifiNoNetState::GoOutState()
 {
     WIFI_LOGI("WifiNoNetState GoOutState function.");
-    pWifiProStateMachine_->isHasNetToNoNet_ = false;
+    pWifiProStateMachine_->isFirstDectectNoNet_ = false;
 }
 
 bool WifiProStateMachine::WifiNoNetState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -1154,13 +1153,17 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
             return;
         }
         WIFI_LOGI("NoInternet X: select network fail.");
-        pWifiProStateMachine_->TrySelfCure(false);
+        if (pWifiProStateMachine_->TrySelfCure(false)) {
+            pWifiProStateMachine_->Wifi2WifiFinish();
+        }
         return;
     }
 
     WIFI_LOGI("NoNetSwitch 2: receive good ap.");
     if (!pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition()) {
-        pWifiProStateMachine_->TrySelfCure(false);
+        if (pWifiProStateMachine_->TrySelfCure(false)) {
+            pWifiProStateMachine_->Wifi2WifiFinish();
+        }
         return;
     }
 
@@ -1237,6 +1240,7 @@ void WifiProStateMachine::WifiPortalState::GoInState()
 void WifiProStateMachine::WifiPortalState::GoOutState()
 {
     WIFI_LOGI("WifiPortalState GoOutState function.");
+    pWifiProStateMachine_->isFirstDectectNoNet_ = false;
 }
 
 bool WifiProStateMachine::WifiPortalState::ExecuteStateMsg(InternalMessagePtr msg)

@@ -221,7 +221,7 @@ private:
     int32_t wiFiNoInternetReason_ { 0 };
     bool disconnectToConnectedState_ { false };
     bool isWifiProEnabled_ { true }; // enabled by default, it should be assigned according to the settings.
-    bool isHasNetToNoNet_ { false };
+    bool isFirstDectectNoNet_ { true };
     std::string badBssid_ { 0 };
     std::string badSsid_ { 0 };
     WifiSwitchReason wifiSwitchReason_ { WifiSwitchReason::WIFI_SWITCH_REASON_DEFAULT };

@@ -27,6 +27,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog;
+    void P2pGroupRemoveStateCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class P2pGroupRemoveStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -35,6 +40,7 @@ public:
     {}
     virtual void SetUp()
     {
+        LOG_SetCallback(P2pGroupRemoveStateCallback);
         pMockP2pPendant.reset(new MockP2pPendant());
         p2pGroupRemoveState.reset(new P2pGroupRemoveState());
     }
@@ -53,11 +59,13 @@ public:
 HWTEST_F(P2pGroupRemoveStateTest, GoInState, TestSize.Level1)
 {
     p2pGroupRemoveState->GoInState();
+    EXPECT_TRUE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(P2pGroupRemoveStateTest, GoOutState, TestSize.Level1)
 {
     p2pGroupRemoveState->GoOutState();
+    EXPECT_TRUE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(P2pGroupRemoveStateTest, ExecuteStateMsg, TestSize.Level1)
@@ -65,6 +73,7 @@ HWTEST_F(P2pGroupRemoveStateTest, ExecuteStateMsg, TestSize.Level1)
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
     p2pGroupRemoveState->ExecuteStateMsg(msg);
+    EXPECT_TRUE(g_errLog.find("service is null")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

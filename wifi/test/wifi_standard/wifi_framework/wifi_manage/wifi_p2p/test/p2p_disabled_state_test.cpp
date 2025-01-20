@@ -27,6 +27,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog;
+    void P2pDisabledStateCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class P2pDisabledStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -39,6 +44,7 @@ public:
         pMockMonitor = &pMockP2pPendant->GetMockP2pMonitor();
         pP2pDisabledState.reset(
             new P2pDisabledState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager, serviceManager));
+            LOG_SetCallback(P2pDisabledStateCallback);
     }
     virtual void TearDown()
     {
@@ -60,11 +66,13 @@ public:
 HWTEST_F(P2pDisabledStateTest, GoInState, TestSize.Level1)
 {
     pP2pDisabledState->GoInState();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(P2pDisabledStateTest, GoOutState, TestSize.Level1)
 {
     pP2pDisabledState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(P2pDisabledStateTest, ProcessCmdP2pEnable1, TestSize.Level1)

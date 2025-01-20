@@ -30,6 +30,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+        static std::string g_errLog;
+    void ConcreteClientModeManagerCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class ConcreteClientModeManagerTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -42,6 +47,8 @@ public:
         }
         pConcreteModeManager->GetMachine()->SendMessage(CONCRETE_CMD_START,
             static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA), 0);
+            LOG_SetCallback(ConcreteClientModeManagerCallback);
+    }
     }
 
     virtual void TearDown()
@@ -73,6 +80,7 @@ public:
 HWTEST_F(ConcreteClientModeManagerTest, SetRoleTest, TestSize.Level1)
 {
     SetRoleTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteClientModeManagerTest, RegisterCallbackTest, TestSize.Level1)

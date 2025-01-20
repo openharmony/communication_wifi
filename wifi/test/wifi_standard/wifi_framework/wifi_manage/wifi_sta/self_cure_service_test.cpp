@@ -32,6 +32,11 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog;
+    void SelfCureServiceCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 class SelfCureServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -39,6 +44,7 @@ public:
     virtual void SetUp()
     {
         pSelfCureService = std::make_unique<SelfCureService>();
+        LOG_SetCallback(SelfCureServiceCallback);
     }
 
     virtual void TearDown()
@@ -98,31 +104,37 @@ public:
 HWTEST_F(SelfCureServiceTest, InitSelfCureServiceTest, TestSize.Level1)
 {
     InitSelfCureServiceTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleRssiLevelChangedTest, TestSize.Level1)
 {
     HandleRssiLevelChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest, TestSize.Level1)
 {
     HandleStaConnChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest2, TestSize.Level1)
 {
     HandleStaConnChangedTest2();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest3, TestSize.Level1)
 {
     HandleStaConnChangedTest3();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest4, TestSize.Level1)
 {
     HandleStaConnChangedTest4();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest5, TestSize.Level1)
@@ -134,6 +146,7 @@ HWTEST_F(SelfCureServiceTest, NotifyInternetFailureDetectedTest, TestSize.Level1
 {
     int forceNoHttpCheck = 0;
     pSelfCureService->NotifyInternetFailureDetected(forceNoHttpCheck);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, IsSelfCureOnGoingTest, TestSize.Level1)

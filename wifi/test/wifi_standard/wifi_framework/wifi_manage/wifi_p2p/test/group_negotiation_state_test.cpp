@@ -25,11 +25,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-    static std::string g_errLog;
-    void GroupNegotiationStateCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
-    {
-        g_errLog = msg;
-    }
+    static std::string g_errLog = "wifitest";
 class GroupNegotiationStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -83,13 +79,13 @@ public:
 HWTEST_F(GroupNegotiationStateTest, GoInState, TestSize.Level1)
 {
     pGroupNegotiationState->GoInState();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(GroupNegotiationStateTest, GoOutState, TestSize.Level1)
 {
     pGroupNegotiationState->GoOutState();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(GroupNegotiationStateTest, ExecuteStateMsg1, TestSize.Level1)

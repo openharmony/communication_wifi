@@ -347,10 +347,10 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnConnectChangedTest, TestSize.Level1)
     std::string ifaceName = "wlan0";
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnConnectChanged(status, networkId, mac1);
     UnRegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnConnectChanged(status, networkId, mac1);
 }
 
@@ -370,10 +370,10 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnDisConnectReasonCallbackTest, TestSize.Lev
     std::string ifaceName = "wlan0";
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnDisConnectReasonCallback(reason, mac1);
     UnRegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnDisConnectReasonCallback(reason, mac1);
 }
 
@@ -395,10 +395,10 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnBssidChangedTest, TestSize.Level1)
     WifiEventCallback callback;
     std::string ifaceName = "wlan0";
     RegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnBssidChanged(reason, bssid);
     UnRegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnBssidChanged(reason, bssid);
 }
 /**
@@ -414,7 +414,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
     std::string ifaceName = "wlan0";
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
@@ -422,7 +422,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     OnWpsOverlap(status);
     OnWpsTimeOut(status);
     UnRegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);

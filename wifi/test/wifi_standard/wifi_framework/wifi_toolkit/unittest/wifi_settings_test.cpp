@@ -556,7 +556,7 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
 HWTEST_F(WifiSettingsTest, RemoveWifiP2pSupplicantGroupInfoTets, TestSize.Level1)
 {
     WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();
-    EXPECT_NE(WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo(),0);
+    EXPECT_NE(WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo(), 0);
 }
 
 HWTEST_F(WifiSettingsTest, EncryptionWifiDeviceConfigOnBootTest, TestSize.Level1)

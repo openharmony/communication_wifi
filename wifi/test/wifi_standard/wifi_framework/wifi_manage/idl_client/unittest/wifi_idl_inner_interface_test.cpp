@@ -397,10 +397,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnBssidChangedTest, TestSize.Level1)
     WifiEventCallback callback;
     std::string ifaceName = "wlan0";
     RegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnBssidChanged(reason, bssid);
     UnRegisterStaCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnBssidChanged(reason, bssid);
 }
 /**

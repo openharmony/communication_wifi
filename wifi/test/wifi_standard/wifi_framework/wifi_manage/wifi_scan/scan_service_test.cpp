@@ -45,7 +45,9 @@ constexpr int INVAL = 0x0fffff;
 constexpr int MAX_THROUGH = -90;
 constexpr int TIMES_TAMP = 1000;
 static std::string g_errLog;
-void ScanServiceCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void ScanServiceCallback(const LogType type, const LogLevel level,
+                         const unsigned int domain, const char *tag,
+                         const char *msg)
 {
     g_errLog = msg;
 }

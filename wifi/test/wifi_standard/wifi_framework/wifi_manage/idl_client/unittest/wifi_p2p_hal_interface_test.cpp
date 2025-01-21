@@ -341,7 +341,7 @@ HWTEST_F(WifiP2pHalInterfaceTest, Connect_SUCCESS, TestSize.Level1)
 
 HWTEST_F(WifiP2pHalInterfaceTest, CancelConnect_SUCCESS, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK,WifiP2PHalInterface::GetInstance().CancelConnect());
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().CancelConnect());
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, ProvisionDiscovery_SUCCESS, TestSize.Level1)
@@ -465,7 +465,7 @@ HWTEST_F(WifiP2pHalInterfaceTest, CancalReqServiceDiscovery_SUCCESS, TestSize.Le
  */
 HWTEST_F(WifiP2pHalInterfaceTest, StoreConfig_SUCCESS, TestSize.Level1)
 {
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK,WifiP2PHalInterface::GetInstance().SaveConfig());
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().SaveConfig());
 }
 
 HWTEST_F(WifiP2pHalInterfaceTest, SetRandomMacAddr_SUCCESS, TestSize.Level1)

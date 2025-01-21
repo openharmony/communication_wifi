@@ -585,7 +585,7 @@
         "OHOS::Wifi::WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int)";
         "OHOS::Wifi::WifiCountryCodePolicy::CalculateWifiCountryCode(std::string &)";
         "OHOS::Wifi::WifiHistoryRecordManager::GetInstance()";
-        "OHOS::Wifi::WifiHistoryRecordManager::DelectAllApInfo()";
+        "OHOS::Wifi::WifiHistoryRecordManager::DeleteAllApInfo()";
         "OHOS::Wifi::WifiDataShareHelperUtils::GetInstance()";
         "OHOS::Wifi::WifiDataShareHelperUtils::CheckIfSettingsDataReady()";
         "OHOS::Wifi::WifiDataShareHelperUtils::GetLoactionDataShareUri()";

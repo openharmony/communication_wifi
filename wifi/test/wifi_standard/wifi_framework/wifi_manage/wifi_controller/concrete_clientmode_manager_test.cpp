@@ -50,7 +50,6 @@ public:
             static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA), 0);
             LOG_SetCallback(ConcreteClientModeManagerCallback);
     }
-    }
 
     virtual void TearDown()
     {

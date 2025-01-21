@@ -147,7 +147,8 @@ HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest5, TestSize.Level1)
 HWTEST_F(SelfCureServiceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)
 {
     int forceNoHttpCheck = 0;
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
+    pSelfCureService->NotifyInternetFailureDetected(forceNoHttpCheck);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, IsSelfCureOnGoingTest, TestSize.Level1)

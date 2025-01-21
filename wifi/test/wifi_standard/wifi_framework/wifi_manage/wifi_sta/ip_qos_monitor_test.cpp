@@ -30,8 +30,9 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 static std::string g_errLog;
-    void IpQosMonitorCallback(const LogType type, const LogLevel level, const unsigned int domain,
-    const char *tag,const char *msg)
+    void IpQosMonitorCallback(const LogType type, const LogLevel level,
+                              const unsigned int domain, const char *tag,
+                              const char *msg)
     {
         g_errLog = msg;
     }

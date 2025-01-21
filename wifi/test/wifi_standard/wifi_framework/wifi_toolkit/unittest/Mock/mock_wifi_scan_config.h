@@ -55,7 +55,7 @@ public:
     virtual time_t GetStaCurrentTime() = 0;
     virtual void RemoveWifiCategoryRecord(const std::string bssid) = 0;
     virtual void RecordHilinkAbility(const std::string &bssid, bool isSupportHilink) = 0;
-    virtual void GetHilinkAbility(const std::string &bssid) = 0;
+    virtual bool GetHilinkAbility(const std::string &bssid) = 0;
 };
 
 class WifiScanConfig : public MockWifiScanConfig {

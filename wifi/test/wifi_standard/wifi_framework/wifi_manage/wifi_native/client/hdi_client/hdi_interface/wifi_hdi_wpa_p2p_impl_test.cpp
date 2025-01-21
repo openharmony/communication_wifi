@@ -202,7 +202,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pFlushTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pFlushServiceTest, TestSize.Level1)
 {
     HdiP2pFlushService();
-    EXPECT_EQ(HdiP2pFlushService(),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pFlushService(), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRemoveNetworkTest, TestSize.Level1)
@@ -289,7 +289,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetServDiscExternalTest, TestSize.Level1)
 {
     int mode = 1;
     HdiP2pSetServDiscExternal(mode);
-    EXPECT_EQ(HdiP2pSetServDiscExternal(mode),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pSetServDiscExternal(mode), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRemoveGroupTest, TestSize.Level1)

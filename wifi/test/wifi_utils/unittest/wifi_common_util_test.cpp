@@ -56,7 +56,7 @@ HWTEST_F(WifiCommonUtilTest, MacStrToArrayTest, TestSize.Level1)
     std::string strmac = "00:55:DD:ff:MM";
     unsigned char mac[WIFI_MAC_LENS];
     MacStrToArray(strmac, mac);
-    EXPECT_EQ(MacStrToArray(strmac, mac),EOK);
+    EXPECT_EQ(MacStrToArray(strmac, mac), EOK);
 }
 
 HWTEST_F(WifiCommonUtilTest, Ip2NumberTest, TestSize.Level1)

@@ -305,10 +305,10 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnApStaJoinOrLeaveTest, TestSize.Level1)
     }
     IWifiApMonitorEventCallback callback;
     RegisterApCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiApHalInterface::GetInstance().RegisterApEvent(callback));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiApHalInterface::GetInstance().RegisterApEvent(callback));
     OnApStaJoinOrLeave(&infomation, id);
     UnRegisterApCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiApHalInterface::GetInstance().RegisterApEvent(callback));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiApHalInterface::GetInstance().RegisterApEvent(callback));
     OnApStaJoinOrLeave(&infomation, id);
 }
 /**
@@ -324,10 +324,10 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnApEnableOrDisableTest, TestSize.Level1)
     int id = 1;
     IWifiApMonitorEventCallback callback;
     RegisterApCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiApHalInterface::GetInstance().RegisterApEvent(callback));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiApHalInterface::GetInstance().RegisterApEvent(callback));
     OnApEnableOrDisable(status, id);
     UnRegisterApCallbackMock(&callback);
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,WifiApHalInterface::GetInstance().RegisterApEvent(callback));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiApHalInterface::GetInstance().RegisterApEvent(callback));
     OnApEnableOrDisable(status, id);
 }
 /**

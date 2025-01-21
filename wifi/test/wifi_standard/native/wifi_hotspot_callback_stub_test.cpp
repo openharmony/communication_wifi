@@ -178,7 +178,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_004, TestSize.Level1)
     }
     data.WriteInt32(0);
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option),1);
+    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
 /**
  * @tc.name: OnHotspotStateChanged_001
@@ -203,7 +203,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option),1);
+    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
 /**
  * @tc.name: OnHotspotStaJoin_001
@@ -228,7 +228,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option),1);
+    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
 /**
  * @tc.name: OnHotspotStaLeave_001
@@ -253,7 +253,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option),1);
+    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
 
 }  // namespace Wifi

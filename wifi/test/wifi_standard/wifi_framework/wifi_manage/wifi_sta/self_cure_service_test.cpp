@@ -146,7 +146,7 @@ HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest5, TestSize.Level1)
 HWTEST_F(SelfCureServiceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)
 {
     int forceNoHttpCheck = 0;
-    EXPECT_EQ(WIFI_OPT_SUCCESS,pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
 }
 
 HWTEST_F(SelfCureServiceTest, IsSelfCureOnGoingTest, TestSize.Level1)

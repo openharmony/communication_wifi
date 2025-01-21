@@ -492,7 +492,7 @@ HWTEST_F(WifiManagerTest, CheckCanConnectDeviceTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, CheckCanUseP2pTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->CheckCanUseP2p();
-    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckCanUseP2p(),true);
+    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckCanUseP2p(), true);
 }
 
 HWTEST_F(WifiManagerTest, CheckCanUseSoftApTest, TestSize.Level1)
@@ -613,7 +613,7 @@ HWTEST_F(WifiManagerTest, IsInterfaceUpTest, TestSize.Level1)
     WIFI_LOGI("IsInterfaceUpTest enter!");
     std::string iface = "wlan0";
     wifiManager.wifiTogglerManager->IsInterfaceUp(iface);
-    EXPECT_EQ(wifiManager.wifiTogglerManager->IsInterfaceUp(iface),false);
+    EXPECT_EQ(wifiManager.wifiTogglerManager->IsInterfaceUp(iface), false);
 }
 
 HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_WpaDeath, TestSize.Level1)

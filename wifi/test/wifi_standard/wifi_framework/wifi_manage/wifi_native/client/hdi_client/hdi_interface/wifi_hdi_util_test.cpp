@@ -31,7 +31,7 @@ class WifiHdiUtilTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    void SetUp() override 
+    void SetUp() override
     {
         LOG_SetCallback(WifiHdiLogCallback);
     }

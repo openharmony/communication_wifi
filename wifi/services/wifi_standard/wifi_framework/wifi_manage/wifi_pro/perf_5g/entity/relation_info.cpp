@@ -36,7 +36,9 @@ constexpr int MAX_DALTA_TARGET_RSSI = 5;
 constexpr int BSSID_RSSI_STEP_DBM = 5;
 constexpr int BSSID_RSSI_OVERFLOW_DBM = 10;
 
-RelationInfo::RelationInfo() : id_(-1)
+RelationInfo::RelationInfo() : id_(-1), relateType_(NO_SAME_ROUTER_AP), maxScanRssi_(INVALID_RSSI),
+    minTargetRssi_(INVALID_RSSI), meanPversion_(0), maxRssi_(INVALID_RSSI), relationRssiWhenMaxRssi_(INVALID_RSSI),
+    maxRelationRssi_(INVALID_RSSI), rssiWhenMaxRelationRssi_(INVALID_RSSI)
 {}
 RelationInfo::RelationInfo(std::string bssid, std::string relationBssid, std::string scanRssiThreshold)
     : bssid24g_(bssid), relationBssid5g_(relationBssid)
@@ -52,10 +54,13 @@ RelationInfo::RelationInfo(std::string bssid, std::string relationBssid, std::st
     rssiWhenMaxRelationRssi_ = INVALID_RSSI;
     if (DualBandUtils::IsSameRouterAp(bssid, relationBssid)) {
         relateType_ = MAYBE_SAME_ROUTER_AP;
+        int size = RSSI_RANGE_HIGH_DBM - RSSI_RANGE_LOW_DBM + 1;
+        for (int index = 0; index < size; index++) {
+            sameApTriggerScanRssiThreshold_.push_back(RSSI_RANGE_LOW_DBM + index);
+        }
     } else {
         relateType_ = NO_SAME_ROUTER_AP;
     }
-    SetSameApTriggerScanRssiThreshold(scanRssiThreshold);
 }
 RelationInfo::~RelationInfo()
 {}
@@ -137,26 +142,21 @@ int RelationInfo::UpdateSameApTriggerScanRssiThreshold(int triggerScanRssiThresh
     if (switchRssiThreshold == RSSI_RANGE_HIGH_DBM) {
         return triggerScanRssiThreshold;
     }
-    int size = RSSI_RANGE_HIGH_DBM - RSSI_RANGE_LOW_DBM + 1;
+    int size = static_cast<int>(sameApTriggerScanRssiThreshold_.size());
     for (int index = 0; index < size; ++index) {
+        int baseRssiTh = (RSSI_RANGE_HIGH_DBM - switchRssiThreshold) + newTriggerScanRssiTh;
+        if (baseRssiTh == 0) {
+            continue;
+        }
         sameApTriggerScanRssiThreshold_[index] =
             ((RSSI_RANGE_HIGH_DBM - newTriggerScanRssiTh) *
-                (sameApTriggerScanRssiThreshold_[index] - switchRssiThreshold))
-                    / (RSSI_RANGE_HIGH_DBM - switchRssiThreshold) + newTriggerScanRssiTh;
+                (sameApTriggerScanRssiThreshold_[index] - switchRssiThreshold)) / baseRssiTh;
     }
     return GetSameApScanRssiThreshold(switchRssiThreshold);
 }
 void RelationInfo::SetSameApTriggerScanRssiThreshold(std::string scanRssiThreshold)
 {
-    if (!IsOnSameRouter()) {
-        return;
-    }
-    if (scanRssiThreshold.empty()) {
-        int size = RSSI_RANGE_HIGH_DBM - RSSI_RANGE_LOW_DBM + 1;
-        for (int index = 0; index < size; index++) {
-            sameApTriggerScanRssiThreshold_.push_back(RSSI_RANGE_LOW_DBM + index);
-        }
-    } else {
+    if (!scanRssiThreshold.empty()) {
         sameApTriggerScanRssiThreshold_ = SplitStringToIntVector(scanRssiThreshold, ",");
     }
 }

@@ -18,6 +18,7 @@
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_scan_state_machine.h"
+#include <log.h>
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -43,14 +44,18 @@ constexpr int MAX_SCAN_CONFIG = 10000;
 constexpr int INVAL = 0x0fffff;
 constexpr int MAX_THROUGH = -90;
 constexpr int TIMES_TAMP = 1000;
-
-
+static std::string g_errLog;
+void ScanServiceCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 class ScanServiceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        LOG_SetCallback(ScanServiceCallback);
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetHid2dUpperScene(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pBusinessType(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppPackageName()).WillRepeatedly(Return(""));
@@ -1882,6 +1887,7 @@ HWTEST_F(ScanServiceTest, InitScanServiceSuccess2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, UnInitScanServiceSuccess, TestSize.Level1)
 {
     UnInitScanServiceSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleScanStatusReportSuccess1, TestSize.Level1)
@@ -1922,6 +1928,7 @@ HWTEST_F(ScanServiceTest, HandleScanStatusReportSuccess7, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleScanStatusReportFail, TestSize.Level1)
 {
     HandleScanStatusReportFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess1, TestSize.Level1)
@@ -1932,6 +1939,7 @@ HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess1, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess2, TestSize.Level1)
 {
     HandleInnerEventReportSuccess2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess3, TestSize.Level1)
@@ -1942,6 +1950,7 @@ HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess3, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleInnerEventReportFail, TestSize.Level1)
 {
     HandleInnerEventReportFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, ScanSuccess, TestSize.Level1)
@@ -2042,6 +2051,7 @@ HWTEST_F(ScanServiceTest, AddScanMessageBodyFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, StoreRequestScanConfigSuccess, TestSize.Level1)
 {
     StoreRequestScanConfigSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: StoreRequestScanConfigFail
@@ -2077,11 +2087,13 @@ HWTEST_F(ScanServiceTest, HandleCommonScanFailedSuccess4, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleCommonScanInfoSuccess1, TestSize.Level1)
 {
     HandleCommonScanInfoSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleCommonScanInfoSuccess2, TestSize.Level1)
 {
     HandleCommonScanInfoSuccess2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleCommonScanInfoSuccess3, TestSize.Level1)
@@ -2102,6 +2114,7 @@ HWTEST_F(ScanServiceTest, StoreFullScanInfoFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, StoreUserScanInfoSuccess1, TestSize.Level1)
 {
     StoreUserScanInfoSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, StoreUserScanInfoSuccess2, TestSize.Level1)
@@ -2167,6 +2180,7 @@ HWTEST_F(ScanServiceTest, EndPnoScanFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, EndPnoScanFail2, TestSize.Level1)
 {
     EndPnoScanFail2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleScreenStatusChangedSuccess, TestSize.Level1)
@@ -2222,6 +2236,7 @@ HWTEST_F(ScanServiceTest, SystemScanProcessSuccess3, TestSize.Level1)
 HWTEST_F(ScanServiceTest, StopSystemScanSuccess, TestSize.Level1)
 {
     StopSystemScanSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, StartSystemTimerScanFail1, TestSize.Level1)
@@ -2267,11 +2282,13 @@ HWTEST_F(ScanServiceTest, HandleSystemScanTimeoutSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, DisconnectedTimerScanSuccess, TestSize.Level1)
 {
     DisconnectedTimerScanSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutSuccess, TestSize.Level1)
 {
     HandleDisconnectedScanTimeoutSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: HandleDisconnectedScanTimeoutFail1
@@ -2282,6 +2299,7 @@ HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutFail1, TestSize.Level1)
 {
     HandleDisconnectedScanTimeoutFail1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: HandleDisconnectedScanTimeoutFail2
@@ -2292,6 +2310,7 @@ HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutFail1, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutFail2, TestSize.Level1)
 {
     HandleDisconnectedScanTimeoutFail2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutSuccess, TestSize.Level1)
@@ -2317,11 +2336,13 @@ HWTEST_F(ScanServiceTest, GetScanControlInfoFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowExternScanSuccess, TestSize.Level1)
 {
     AllowExternScanSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanFail1, TestSize.Level1)
 {
     AllowExternScanFail1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanFail2, TestSize.Level1)
@@ -2362,6 +2383,7 @@ HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail5, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowPnoScanSuccess, TestSize.Level1)
 {
     AllowPnoScanSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, GetStaSceneSuccess1, TestSize.Level1)
@@ -2412,6 +2434,7 @@ HWTEST_F(ScanServiceTest, IsExternScanningFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess, TestSize.Level1)
 {
     GetAllowBandFreqsControlInfoSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, ConvertBandNotAllow24GSuccess1, TestSize.Level1)
@@ -2452,11 +2475,13 @@ HWTEST_F(ScanServiceTest, ConvertBandNotAllow5GFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, Delete24GhzFreqsSuccess, TestSize.Level1)
 {
     Delete24GhzFreqsSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, Delete5GhzFreqsSuccess, TestSize.Level1)
 {
     Delete5GhzFreqsSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, GetSavedNetworkSsidListSuccess, TestSize.Level1)
@@ -2762,11 +2787,13 @@ HWTEST_F(ScanServiceTest, HandleMovingFreezeChangedTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleAutoConnectStateChangedTest, TestSize.Level1)
 {
     HandleAutoConnectStateChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleNetworkQualityChangedTest, TestSize.Level1)
 {
     HandleNetworkQualityChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: WifiMaxThroughputTest
@@ -2777,6 +2804,7 @@ HWTEST_F(ScanServiceTest, HandleNetworkQualityChangedTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, WifiMaxThroughputTest, TestSize.Level1)
 {
     WifiMaxThroughputTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: RecordScanLimitInfoTest
@@ -2787,6 +2815,7 @@ HWTEST_F(ScanServiceTest, WifiMaxThroughputTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, RecordScanLimitInfoTest, TestSize.Level1)
 {
     RecordScanLimitInfoTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: IsPackageInTrustListTest
@@ -2797,6 +2826,7 @@ HWTEST_F(ScanServiceTest, RecordScanLimitInfoTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, IsPackageInTrustListTest, TestSize.Level1)
 {
     IsPackageInTrustListTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: IsAppInFilterListTest
@@ -2807,6 +2837,7 @@ HWTEST_F(ScanServiceTest, IsPackageInTrustListTest, TestSize.Level1)
 HWTEST_F(ScanServiceTest, IsAppInFilterListTest, TestSize.Level1)
 {
     IsAppInFilterListTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: AllowScanByMovingFreeze_001
@@ -2832,16 +2863,19 @@ HWTEST_F(ScanServiceTest, AllowScanByMovingFreeze_002, TestSize.Level1)
 HWTEST_F(ScanServiceTest, SetScanTrustMode_001, TestSize.Level1)
 {
     SetScanTrustModeTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, ResetToNonTrustMode_001, TestSize.Level1)
 {
     ResetToNonTrustModeTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, IsScanningWithParam_001, TestSize.Level1)
 {
     IsScanningWithParamTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: AllowCustomSceneCheck_001
@@ -2852,6 +2886,7 @@ HWTEST_F(ScanServiceTest, IsScanningWithParam_001, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_001, TestSize.Level1)
 {
     AllowCustomSceneCheckTest1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: AllowCustomSceneCheck_002
@@ -2872,6 +2907,7 @@ HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_002, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_003, TestSize.Level1)
 {
     AllowCustomSceneCheckTest3();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: AllowCustomSceneCheck_004
@@ -2882,6 +2918,7 @@ HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_003, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_004, TestSize.Level1)
 {
     AllowCustomSceneCheckTest4();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 /**
@@ -2893,6 +2930,7 @@ HWTEST_F(ScanServiceTest, AllowCustomSceneCheck_004, TestSize.Level1)
 HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess1, TestSize.Level1)
 {
     GetAllowBandFreqsControlInfoSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: GetAllowBandFreqsControlInfoSuccess2
@@ -2903,6 +2941,7 @@ HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess1, TestSize.Level1)
 HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess2, TestSize.Level1)
 {
     GetAllowBandFreqsControlInfoSuccess2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: AllowScanDuringCustomSceneSuccess2
@@ -2913,6 +2952,7 @@ HWTEST_F(ScanServiceTest, GetAllowBandFreqsControlInfoSuccess2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneSuccess1, TestSize.Level1)
 {
     AllowScanDuringCustomSceneSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: AllowScanDuringCustomSceneSuccess2
@@ -2923,41 +2963,49 @@ HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneSuccess1, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowScanDuringCustomSceneSuccess2, TestSize.Level1)
 {
     AllowScanDuringCustomSceneSuccess2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoTest, TestSize.Level1)
 {
     GetScanControlInfoTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, ClearScanTrustSceneIdsTest, TestSize.Level1)
 {
     ClearScanTrustSceneIdsTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, ApplyTrustListPolicyTest, TestSize.Level1)
 {
     ApplyTrustListPolicyTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, SetNetworkInterfaceUpDownTest, TestSize.Level1)
 {
     SetNetworkInterfaceUpDownTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, SystemScanConnectedPolicyTest, TestSize.Level1)
 {
     SystemScanConnectedPolicyTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, SystemScanDisconnectedPolicyTest, TestSize.Level1)
 {
     SystemScanDisconnectedPolicyTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level1)
 {
     OnWifiCountryCodeChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 } // namespace Wifi

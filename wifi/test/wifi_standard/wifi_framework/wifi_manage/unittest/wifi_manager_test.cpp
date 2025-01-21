@@ -553,7 +553,7 @@ HWTEST_F(WifiManagerTest, HasAnyApRuningTest, TestSize.Level1)
 {
     WIFI_LOGI("HasAnyApRuningTest enter!");
     wifiManager.wifiTogglerManager->HasAnyApRuning();
-    EXPECT_EQ(wifiManager.wifiTogglerManager->HasAnyApRuning(),false);
+    EXPECT_EQ(wifiManager.wifiTogglerManager->HasAnyApRuning(), false);
 }
 
 HWTEST_F(WifiManagerTest, DealConcreateStartFailureTest, TestSize.Level1)

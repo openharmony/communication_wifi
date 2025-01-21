@@ -35,7 +35,7 @@ class NetworkStatusHistoryManagerTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() 
+    virtual void SetUp()
     {
         LOG_SetCallback(NetworkCallback);
     }

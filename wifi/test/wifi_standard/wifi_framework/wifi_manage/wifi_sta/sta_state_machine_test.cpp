@@ -2383,9 +2383,9 @@ HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess4, TestSize.Level1)
 }
 
 HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgLinkSwitch, TestSize.Level1)
-EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 {
     ApLinkedStateExeMsgLinkSwitch();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest4, TestSize.Level1)

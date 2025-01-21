@@ -84,7 +84,7 @@ HWTEST_F(WifiChannelHelperTest, GetAvailableScanFreqsTest, TestSize.Level1)
 {
     std::vector<int32_t> freqs;
     WifiChannelHelper::GetInstance().GetAvailableScanFreqs(ScanBandType::SCAN_BAND_24_GHZ, freqs);
-    EXPECT_EQ(WifiChannelHelper::GetInstance().GetAvailableScanFreqs(ScanBandType::SCAN_BAND_24_GHZ, freqs),true);
+    EXPECT_EQ(WifiChannelHelper::GetInstance().GetAvailableScanFreqs(ScanBandType::SCAN_BAND_24_GHZ, freqs), true);
 }
 
 HWTEST_F(WifiChannelHelperTest, IsFreqDbacTest, TestSize.Level1)

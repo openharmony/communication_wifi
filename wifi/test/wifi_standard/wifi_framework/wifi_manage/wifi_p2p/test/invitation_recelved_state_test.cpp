@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Wifi {
 static std::string g_errLog;
 void InvitationReceivedStateCallback(const LogType type, const LogLevel level, const unsigned int domain,
-const char *tag, const char *msg)
+                                     const char *tag, const char *msg)
 {
     g_errLog = msg;
 }

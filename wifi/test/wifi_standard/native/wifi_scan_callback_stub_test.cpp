@@ -100,7 +100,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
         return;
     }
     pWifiScan->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(pWifiScan->OnRemoteRequest(code, data, reply, option),1);
+    EXPECT_EQ(pWifiScan->OnRemoteRequest(code, data, reply, option), 1);
 }
 
 HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
@@ -120,7 +120,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
         return;
     }
     pWifiScan->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(pWifiScan->OnRemoteRequest(code, data, reply, option),1);
+    EXPECT_EQ(pWifiScan->OnRemoteRequest(code, data, reply, option), 1);
 }
 
 }  // namespace Wifi

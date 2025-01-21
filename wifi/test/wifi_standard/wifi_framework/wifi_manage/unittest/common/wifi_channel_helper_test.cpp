@@ -147,7 +147,7 @@ HWTEST_F(WifiChannelHelperTest, TransformFrequencyIntoChannelTest4, TestSize.Lev
 HWTEST_F(WifiChannelHelperTest, TransformChannelToFrequencyTest, TestSize.Level1)
 {
     WifiChannelHelper::GetInstance().TransformChannelToFrequency(1);
-    EXPECT_EQ(WifiChannelHelper::GetInstance().TransformChannelToFrequency(1),-1);
+    EXPECT_EQ(WifiChannelHelper::GetInstance().TransformChannelToFrequency(1), -1);
 }
 
 HWTEST_F(WifiChannelHelperTest, TransformFreqToBandTest, TestSize.Level1)

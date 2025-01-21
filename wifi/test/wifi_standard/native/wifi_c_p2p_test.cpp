@@ -112,7 +112,7 @@ HWTEST_F(WifiP2pTest, CreateGroupTests, TestSize.Level1)
     WifiP2pConfig config;
     config.netId = g_networkid;
     CreateGroup(&config);
-    EXPECT_NE(CreateGroup(&config),0);
+    EXPECT_NE(CreateGroup(&config), 0);
 }
 
 HWTEST_F(WifiP2pTest, RemoveGroupTests, TestSize.Level1)

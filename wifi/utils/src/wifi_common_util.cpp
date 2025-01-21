@@ -621,7 +621,7 @@ std::string EncodeBase64(const std::vector<uint8_t> &input)
 #endif
 }
 
-std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter)
+std::vector<std::string> GetSplitInfo(const std::string &input, const std::string &delimiter)
 {
     size_t pos = 0;
     std::string token;

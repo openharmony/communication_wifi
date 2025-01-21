@@ -99,7 +99,7 @@ HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg2, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
-    EXPECT_TRUE(pInvitationReceivedState->ExecuteStateMsg(msg)); 
+    EXPECT_TRUE(pInvitationReceivedState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg3, TestSize.Level1)

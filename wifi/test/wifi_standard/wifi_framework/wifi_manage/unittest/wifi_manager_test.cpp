@@ -588,9 +588,9 @@ HWTEST_F(WifiManagerTest, SatelliteToggledTest, TestSize.Level1)
 {
     WIFI_LOGI("SatelliteToggledTest enter!");
     wifiManager.wifiTogglerManager->SatelliteToggled(3011);
-    EXPECT_EQ(wifiManager.wifiTogglerManager->SatelliteToggled(3011),WIFI_OPT_SUCCESS);
+    EXPECT_EQ(wifiManager.wifiTogglerManager->SatelliteToggled(3011), WIFI_OPT_SUCCESS);
     wifiManager.wifiTogglerManager->SatelliteToggled(3012);
-    EXPECT_EQ(wifiManager.wifiTogglerManager->SatelliteToggled(3012),WIFI_OPT_SUCCESS);
+    EXPECT_EQ(wifiManager.wifiTogglerManager->SatelliteToggled(3012), WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiManagerTest, SetSatelliteStartStateTest, TestSize.Level1)

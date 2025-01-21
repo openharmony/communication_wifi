@@ -85,6 +85,10 @@ public:
 
     void RemoveWifiCategoryRecord(const std::string bssid);
 
+    void RecordHilinkAbility(const std::string &bssid, bool isSupportHilink);
+
+    void GetHilinkAbility(const std::string &bssid);
+
 private:
     void InitScanControlForbidList();
     void InitScanControlIntervalList();
@@ -94,6 +98,7 @@ private:
     std::mutex mScanMutex;
     std::map<std::string, WifiCategory> mWifiCategoryRecord;
     std::vector<WifiScanInfo> mWifiScanInfoList;
+    std::map<std::string, bool> hilinkAbilityRecord;
 };
 }  // namespace Wifi
 }  // namespace OHOS

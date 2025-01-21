@@ -27,7 +27,8 @@ namespace Wifi {
  * @tc.require: issueI5LC60
  */
 static std::string g_errLog;
-void WifiDisLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void WifiDisLogCallback(const LogType type, const LogLevel level,
+                        const unsigned int domain  ,const char *tag, const char *msg)
 {
     g_errLog = msg;
 }

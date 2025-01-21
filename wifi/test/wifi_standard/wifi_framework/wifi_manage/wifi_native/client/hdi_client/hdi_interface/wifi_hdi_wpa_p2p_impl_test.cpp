@@ -82,7 +82,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetPersistentReconnectTest, TestSize.Level
 {
     int status = 1;
     HdiP2pSetPersistentReconnect(status);
-    EXPECT_EQ(HdiP2pSetPersistentReconnect(status),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pSetPersistentReconnect(status), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1)
@@ -136,14 +136,14 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetRandomMacTest, TestSize.Level1)
 {
     int enable = 1;
     HdiP2pSetRandomMac(enable);
-    EXPECT_EQ(HdiP2pSetRandomMac(enable),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pSetRandomMac(enable), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pStartFindTest, TestSize.Level1)
 {
     int timeout = 120;
     HdiP2pStartFind(timeout);
-    EXPECT_EQ(HdiP2pStartFind(timeout),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pStartFind(timeout), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetExtListenTest, TestSize.Level1)
@@ -190,7 +190,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pAddServiceTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pStopFindTest, TestSize.Level1)
 {
     HdiP2pStopFind();
-    EXPECT_EQ(HdiP2pStopFind(),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pStopFind(), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pFlushTest, TestSize.Level1)

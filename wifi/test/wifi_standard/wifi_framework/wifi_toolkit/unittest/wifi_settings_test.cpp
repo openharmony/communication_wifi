@@ -612,7 +612,7 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     config.wifiWapiConfig.wapiAsCertData = "abcdefg";
     WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config);
-    EXPECT_NE(WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config),true);
+    EXPECT_NE(WifiSettings::GetInstance().EncryptionWapiConfig(wifiEncryptionInfo, config), true);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)

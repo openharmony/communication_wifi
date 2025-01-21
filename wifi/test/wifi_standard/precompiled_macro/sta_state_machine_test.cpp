@@ -57,7 +57,8 @@ namespace OHOS {
 namespace Wifi {
 static std::string g_errLog;
 void StaMachineLogCallback(const LogType type, const LogLevel level,
-                            const unsigned int domain, const char *tag, const char *msg)
+                           const unsigned int domain, const char *tag,
+                           const char *msg)
 {
     g_errLog = msg;
 }
@@ -527,7 +528,7 @@ HWTEST_F(StaStateMachineTest, ConfigStaticIpAddressFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ReplaceEmptyDnsTest, TestSize.Level1)
 {
     ReplaceEmptyDnsTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);   
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SetExternalSimTest, TestSize.Level1)

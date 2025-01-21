@@ -63,7 +63,7 @@ HWTEST_F(WifiCommonUtilTest, Ip2NumberTest, TestSize.Level1)
 {
     std::string strIp = "00:55:DD:ff:MM";
     Ip2Number(strIp);
-    EXPECT_EQ(Ip2Number(strIp),0);
+    EXPECT_EQ(Ip2Number(strIp), 0);
 }
 
 HWTEST_F(WifiCommonUtilTest, GetBrokerProcessNameByPidTest, TestSize.Level1)

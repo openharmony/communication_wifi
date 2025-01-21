@@ -392,12 +392,34 @@ public:
         pStaInterface->StartConnectToUserSelectNetwork(0, bssid);
     }
 
-    void OnFoldStateChanged()
+    void OnFoldStateChangedTest1()
     {
         int foldStatus = MODE_STATE_EXPAND;
-        pStaInterface->OnFoldStateChanged(foldStatus);
+        int result = pStaInterface->OnFoldStateChanged(foldStatus);
+        EXPECT_EQ(result, WIFI_OPT_SUCCESS);
     }
     
+    void OnFoldStateChangedTest2()
+    {
+        int foldStatus = MODE_STATE_FOLDED;
+        int result = pStaInterface->OnFoldStateChanged(foldStatus);
+        EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    }
+
+    void OnFoldStateChangedTest3()
+    {
+        int foldStatus = MODE_STATE_HALF_FOLD;
+        int result = pStaInterface->OnFoldStateChanged(foldStatus);
+        EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    }
+
+    void OnFoldStateChangedTest4()
+    {
+        int foldStatus = 100;
+        int result = pStaInterface->OnFoldStateChanged(foldStatus);
+        EXPECT_EQ(result, WIFI_OPT_INVALID_PARAM);
+    }
+
     void SetPowerMode()
     {
         pStaInterface->SetPowerMode(0);
@@ -745,10 +767,24 @@ HWTEST_F(StaInterfaceTest, OnSystemAbilityChanged, TestSize.Level1)
     OnSystemAbilityChanged();
 }
 
-HWTEST_F(StaInterfaceTest, OnFoldStateChanged, TestSize.Level1)
+HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest1, TestSize.Level1)
 {
-    OnFoldStateChanged();
+    OnFoldStateChangedTest1();
 }
 
+HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest2, TestSize.Level1)
+{
+    OnFoldStateChangedTest2();
+}
+
+HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest3, TestSize.Level1)
+{
+    OnFoldStateChangedTest3();
+}
+
+HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest4, TestSize.Level1)
+{
+    OnFoldStateChangedTest4();
+}
 } // namespace Wifi
 } // namespace OHOS

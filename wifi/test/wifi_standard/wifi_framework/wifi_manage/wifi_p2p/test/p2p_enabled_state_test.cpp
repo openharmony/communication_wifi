@@ -204,26 +204,26 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg7, TestSize.Level1)
     WifiP2pDevice device;
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST));
     msg->SetMessageObj(device);
-    EXPECT_EQ(EXECUTED,pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 
     AddDevice();
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     msg->SetMessageObj(device);
-    EXPECT_EQ(EXECUTED,pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg8, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_FIND_STOPPED));
-    EXPECT_EQ(EXECUTED,pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg9, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
-    EXPECT_EQ(EXECUTED,pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 
 }
 
@@ -310,7 +310,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg15, TestSize.Level1)
         P2pServicerProtocolType::SERVICE_TYPE_BONJOUR, P2pServiceStatus::PSRS_SERVICE_PROTOCOL_NOT_AVAILABLE, 0, data);
     respList.AddServiceResponse(resp);
     msg->SetMessageObj(respList);
-    EXPECT_EQ(EXECUTED,pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg16, TestSize.Level1)
@@ -326,7 +326,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg17, TestSize.Level1)
     WifiP2pServiceInfo service;
     msg->SetMessageObj(service);
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE));
-    EXPECT_EQ(EXECUTED,pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg18, TestSize.Level1)
@@ -499,7 +499,7 @@ HWTEST_F(P2pEnabledStateTest, ProcessPriDeviceFoundEvtTest001, TestSize.Level1)
     WifiP2pDevice device;
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
     msg->SetMessageObj(device);
-    EXPECT_EQ(EXECUTED,pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 } // namespace Wifi
 } // namespace OHOS

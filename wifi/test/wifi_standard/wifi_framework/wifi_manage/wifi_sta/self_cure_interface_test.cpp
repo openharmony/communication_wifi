@@ -36,7 +36,8 @@ namespace Wifi {
 
 constexpr int TEN = 10;
 static std::string g_errLog;
-    void SelfCureInterfaceCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    void SelfCureInterfaceCallback(const LogType type,const LogLevel level,
+    const unsigned int domain ,const char *tag,const char *msg)
     {
         g_errLog = msg;
     }
@@ -130,9 +131,9 @@ HWTEST_F(SelfCureInterfaceTest, DealRssiLevelChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureInterfaceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)
 {
     int forceNoHttpCheck = 0;
-    EXPECT_EQ(WIFI_OPT_FAILED,pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
+    EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
     pSelfCureInterface->pSelfCureService = nullptr;
-    EXPECT_EQ(WIFI_OPT_FAILED,pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
+    EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
 }
 
 HWTEST_F(SelfCureInterfaceTest, IsSelfCureOnGoingTest, TestSize.Level1)

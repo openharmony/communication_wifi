@@ -152,7 +152,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetExtListenTest, TestSize.Level1)
     int period = 1;
     int interval = 1;
     HdiP2pSetExtListen(enable, period, interval);
-    EXPECT_EQ(HdiP2pSetExtListen(enable, period, interval),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pSetExtListen(enable, period, interval), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetListenChannelTest, TestSize.Level1)
@@ -245,7 +245,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pGetDeviceAddressTest, TestSize.Level1)
 {
     char deviceAddress[SIZE] = {0};
     HdiP2pGetDeviceAddress(deviceAddress, SIZE);
-    EXPECT_EQ(HdiP2pGetDeviceAddress(deviceAddress, SIZE),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pGetDeviceAddress(deviceAddress, SIZE), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pReqServiceDiscoveryTest, TestSize.Level1)
@@ -341,13 +341,13 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pListNetworksTest, TestSize.Level1)
 {
     struct HdiP2pNetworkList infoList;
     HdiP2pListNetworks(&infoList);
-    EXPECT_EQ(HdiP2pListNetworks(&infoList),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pListNetworks(&infoList), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSaveConfigTest, TestSize.Level1)
 {
     HdiP2pSaveConfig();
-    EXPECT_EQ(HdiP2pSaveConfig(),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pSaveConfig(), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiDeliverP2pDataTest, TestSize.Level1)

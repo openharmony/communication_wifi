@@ -505,7 +505,7 @@ HWTEST_F(WifiSettingsTest, GetCanOpenStaWhenAirplaneModeTest, TestSize.Level1)
 {
     WIFI_LOGI("GetCanOpenStaWhenAirplaneModeTest enter");
     WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(NETWORK_ID);
-    EXPECT_EQ(WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(NETWORK_ID),true);
+    EXPECT_EQ(WifiSettings::GetInstance().GetCanOpenStaWhenAirplaneMode(NETWORK_ID), true);
 }
 
 HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
@@ -573,7 +573,7 @@ HWTEST_F(WifiSettingsTest, EncryptionDeviceConfigTest, TestSize.Level1)
     WifiDeviceConfig config;
     config.preSharedKey = "12345678";
     WifiSettings::GetInstance().EncryptionDeviceConfig(config);
-    EXPECT_NE(WifiSettings::GetInstance().EncryptionDeviceConfig(config),false);
+    EXPECT_NE(WifiSettings::GetInstance().EncryptionDeviceConfig(config), false);
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionDeviceConfigTest, TestSize.Level1)
@@ -591,7 +591,7 @@ HWTEST_F(WifiSettingsTest, IsWifiDeviceConfigDecipheredTest, TestSize.Level1)
     WifiDeviceConfig config;
     config.preSharedKey = "12345678";
     WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config);
-    EXPECT_EQ(WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config),true);
+    EXPECT_EQ(WifiSettings::GetInstance().IsWifiDeviceConfigDeciphered(config), true);
 }
 
 HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest, TestSize.Level1)
@@ -601,7 +601,7 @@ HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest, TestSize.Level1)
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().EncryptionDeviceConfig(config);
-    EXPECT_EQ(WifiSettings::GetInstance().EncryptionDeviceConfig(config),false);
+    EXPECT_EQ(WifiSettings::GetInstance().EncryptionDeviceConfig(config), false);
 }
 
 HWTEST_F(WifiSettingsTest, EncryptionWapiConfigTest_001, TestSize.Level1)

@@ -30,12 +30,12 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-        static std::string g_errLog;
-    void ConcreteClientModeManagerCallback(const LogType type, const LogLevel level, 
+static std::string g_errLog;
+void ConcreteClientModeManagerCallback(const LogType type, const LogLevel level, 
     const unsigned int domain, const char *tag, const char *msg)
-    {
-        g_errLog = msg;
-    }
+{
+    g_errLog = msg;
+}
 class ConcreteClientModeManagerTest : public testing::Test {
 public:
     static void SetUpTestCase() {}

@@ -63,7 +63,8 @@ constexpr int TEN = 10;
 static const std::string TEMP_TEST_DATA = "1234567890abcdef1234567890abcdef";
 static std::string g_errLog;
     void StaStateMachineCallback(const LogType type, const LogLevel level,
-                                 const unsigned int domain, const char *tag, const char *msg)
+                                 const unsigned int domain, const char *tag, 
+                                 const char *msg)
     {
         g_errLog = msg;
     }
@@ -1582,13 +1583,13 @@ HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, InitStateGoInStateSuccess, TestSize.Level1)
 {
     InitStateGoInStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, InitStateGoOutStateSuccess, TestSize.Level1)
 {
     InitStateGoOutStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, InitStateExeMsgSuccess, TestSize.Level1)
@@ -1659,19 +1660,19 @@ HWTEST_F(StaStateMachineTest, StopWifiProcessFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail, TestSize.Level1)
 {
     LinkedStateExeMsgFail();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgSuccess, TestSize.Level1)
 {
     LinkedStateExeMsgSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail4, TestSize.Level1)
 {
     LinkedStateExeMsgFail4();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail3, TestSize.Level1)
@@ -1717,7 +1718,7 @@ HWTEST_F(StaStateMachineTest, DealReassociateCmdFail1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealReassociateCmdFail2, TestSize.Level1)
 {
     DealReassociateCmdFail2();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealStartRoamCmdInApLinkedStateSuccess, TestSize.Level1)
@@ -1728,7 +1729,7 @@ HWTEST_F(StaStateMachineTest, DealStartRoamCmdInApLinkedStateSuccess, TestSize.L
 HWTEST_F(StaStateMachineTest, DealStartRoamCmdInApLinkedStateFail1, TestSize.Level1)
 {
     DealStartRoamCmdInApLinkedStateFail1();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealStartRoamCmdInApLinkedStateFail2, TestSize.Level1)
@@ -1784,13 +1785,13 @@ HWTEST_F(StaStateMachineTest, SetRandomMacFail2, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, StartRoamToNetworkSuccess, TestSize.Level1)
 {
     StartRoamToNetworkSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SeparatedStateGoInStateSuccess, TestSize.Level1)
 {
     SeparatedStateGoInStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SeparatedStateGoOutStateSuccess, TestSize.Level1)
@@ -1821,7 +1822,7 @@ HWTEST_F(StaStateMachineTest, ApLinkedStateGoInStateSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ApLinkedStateGoOutStateSuccess, TestSize.Level1)
 {
     ApLinkedStateGoOutStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess1, TestSize.Level1)
@@ -1847,13 +1848,13 @@ HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgFai2, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, StartDisConnectToNetworkSuccess, TestSize.Level1)
 {
     StartDisConnectToNetworkSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, StartDisConnectToNetworkFail, TestSize.Level1)
 {
     StartDisConnectToNetworkFail();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetIpStateStateGoInStateSuccess1, TestSize.Level1)
@@ -1874,13 +1875,13 @@ HWTEST_F(StaStateMachineTest, GetIpStateStateGoInStateSuccess3, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, GetIpStateStateGoOutStateSuccess, TestSize.Level1)
 {
     GetIpStateStateGoOutStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetIpStateStateExeMsgSuccess, TestSize.Level1)
 {
     GetIpStateStateExeMsgSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetIpStateStateExeMsgFail, TestSize.Level1)
@@ -1931,7 +1932,7 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess4, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
 {
     HandleNetCheckResultFail();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, TestUpdatePortalState1, TestSize.Level1)
@@ -1961,13 +1962,13 @@ HWTEST_F(StaStateMachineTest, TestUpdatePortalState2, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ApRoamingStateGoInStateSuccess, TestSize.Level1)
 {
     ApRoamingStateGoInStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, ApRoamingStateGoOutStateSuccess, TestSize.Level1)
 {
     ApRoamingStateGoOutStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, ApRoamingStateExeMsgSuccess, TestSize.Level1)
@@ -2034,19 +2035,19 @@ HWTEST_F(StaStateMachineTest, ConvertFreqToChannelTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, LinkStateGoInStateSuccess, TestSize.Level1)
 {
     LinkStateGoInStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, LinkStateGoOutStateSuccess, TestSize.Level1)
 {
     LinkStateGoOutStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, LinkStateExeMsgSuccess, TestSize.Level1)
 {
     LinkStateExeMsgSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, LinkStateExeMsgFail, TestSize.Level1)
@@ -2067,7 +2068,7 @@ HWTEST_F(StaStateMachineTest, OnNetManagerRestartFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealReConnectCmdFail, TestSize.Level1)
 {
     DealReConnectCmdFail();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealReConnectCmdSuccess, TestSize.Level1)
@@ -2099,7 +2100,7 @@ HWTEST_F(StaStateMachineTest, UpdateLinkInfoRssiTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, UpdateLinkRssiTest, TestSize.Level1)
 {
     UpdateLinkRssiTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 /**
@@ -2133,68 +2134,68 @@ HWTEST_F(StaStateMachineTest, HandleForegroundAppChangedActionTest, TestSize.Lev
 HWTEST_F(StaStateMachineTest, DealSignalPacketChangedTest, TestSize.Level1)
 {
     DealSignalPacketChangedTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetWpa3FailCountSuccessTest, TestSize.Level1)
 {
     GetWpa3FailCountSuccessTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetWpa3FailCountFailTest, TestSize.Level1)
 {
     GetWpa3FailCountFailTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, AddWpa3FailCountSuccessTest, TestSize.Level1)
 {
     AddWpa3FailCountSuccessTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, AddWpa3FailCountFailTest, TestSize.Level1)
 {
     AddWpa3FailCountFailTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, AddWpa3BlackMapTest, TestSize.Level1)
 {
     AddWpa3BlackMapTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, IsInWpa3BlackMapTest, TestSize.Level1)
 {
     IsInWpa3BlackMapTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, OnWifiWpa3SelfCureSuccessTest, TestSize.Level1)
 {
     OnWifiWpa3SelfCureSuccessTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, OnWifiWpa3SelfCureFailTest, TestSize.Level1)
 {
     OnWifiWpa3SelfCureFailTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, IsWpa3TransitionTest, TestSize.Level1)
 {
     IsWpa3TransitionTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaConnChangedTest, TestSize.Level1)
 {
     WifiLinkedInfo linkedInfo;
     InvokeOnStaConnChanged(OperateResState::OPEN_WIFI_SUCCEED, linkedInfo);
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnStaStreamChangedTest, TestSize.Level1)
@@ -2206,43 +2207,43 @@ HWTEST_F(StaStateMachineTest, InvokeOnStaRssiLevelChangedTest, TestSize.Level1)
 {
     int rssi = -61;
     InvokeOnStaRssiLevelChanged(rssi);
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealNetworkRemovedFailTest, TestSize.Level1)
 {
     DealNetworkRemovedFailTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealNetworkRemovedSuccessTest, TestSize.Level1)
 {
     DealNetworkRemovedSuccessTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaFailTest, TestSize.Level1)
 {
     DealHiLinkDataToWpaFailTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest1, TestSize.Level1)
 {
     DealHiLinkDataToWpaSuccessTest1();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest2, TestSize.Level1)
 {
     DealHiLinkDataToWpaSuccessTest2();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest3, TestSize.Level1)
 {
     DealHiLinkDataToWpaSuccessTest3();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealFillWapiCfgTest, TestSize.Level1)
@@ -2257,31 +2258,31 @@ HWTEST_F(StaStateMachineTest, DealFillWapiCfgTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, InitRandomMacInfoTest, TestSize.Level1)
 {
     InitRandomMacInfoTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetDataSlotIdTest, TestSize.Level1)
 {
     GetDataSlotIdTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetCardTypeTest, TestSize.Level1)
 {
     GetCardTypeTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetDefaultIdTest, TestSize.Level1)
 {
     GetDefaultIdTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetSimCardStateTest, TestSize.Level1)
 {
     GetSimCardStateTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, IsValidSimIdTest, TestSize.Level1)
@@ -2292,7 +2293,7 @@ HWTEST_F(StaStateMachineTest, IsValidSimIdTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, IsMultiSimEnabledTest, TestSize.Level1)
 {
     IsMultiSimEnabledTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SimAkaAuthTest, TestSize.Level1)
@@ -2313,7 +2314,7 @@ HWTEST_F(StaStateMachineTest, GetGsmAuthResponseWithoutLengthTest, TestSize.Leve
 HWTEST_F(StaStateMachineTest, PreWpaEapUmtsAuthEventTest, TestSize.Level1)
 {
     PreWpaEapUmtsAuthEventTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, FillUmtsAuthReqTest, TestSize.Level1)
@@ -2324,7 +2325,7 @@ HWTEST_F(StaStateMachineTest, FillUmtsAuthReqTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ParseAndFillUmtsAuthParamTest, TestSize.Level1)
 {
     ParseAndFillUmtsAuthParamTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, GetUmtsAuthResponseTest, TestSize.Level1)
@@ -2335,13 +2336,13 @@ HWTEST_F(StaStateMachineTest, GetUmtsAuthResponseTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealWpaEapSimAuthEventTest, TestSize.Level1)
 {
     DealWpaEapSimAuthEventTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, HandlePortalNetworkPorcessTests, TestSize.Level1)
 {
     HandlePortalNetworkPorcessTests();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealWpaEapUmtsAuthEventTest, TestSize.Level1)
@@ -2352,37 +2353,37 @@ HWTEST_F(StaStateMachineTest, DealWpaEapUmtsAuthEventTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, HilinkSaveConfigTest, TestSize.Level1)
 {
     HilinkSaveConfigTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SyncDeviceEverConnectedStateTest, TestSize.Level1)
 {
     bool hasNet = false;
     SyncDeviceEverConnectedStateTest(hasNet);
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, ReplaceEmptyDnsTest, TestSize.Level1)
 {
     ReplaceEmptyDnsTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 
 HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess3, TestSize.Level1)
 {
     ApLinkedStateExeMsgSuccess3();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess4, TestSize.Level1)
 {
     ApLinkedStateExeMsgSuccess4();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgLinkSwitch, TestSize.Level1)
-EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 {
     ApLinkedStateExeMsgLinkSwitch();
 }
@@ -2390,13 +2391,13 @@ EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest4, TestSize.Level1)
 {
     DealHiLinkDataToWpaSuccessTest4();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealHiLinkDataToWpaSuccessTest5, TestSize.Level1)
 {
     DealHiLinkDataToWpaSuccessTest5();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SetSupportedWifiCategoryTestBssidIsEmpty, TestSize.Level1)

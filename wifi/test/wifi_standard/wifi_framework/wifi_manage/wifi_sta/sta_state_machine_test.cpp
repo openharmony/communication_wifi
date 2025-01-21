@@ -63,7 +63,7 @@ constexpr int TEN = 10;
 static const std::string TEMP_TEST_DATA = "1234567890abcdef1234567890abcdef";
 static std::string g_errLog;
     void StaStateMachineCallback(const LogType type, const LogLevel level,
-     const unsigned int domain, const char *tag, const char *msg)
+                                 const unsigned int domain, const char *tag, const char *msg)
     {
         g_errLog = msg;
     }

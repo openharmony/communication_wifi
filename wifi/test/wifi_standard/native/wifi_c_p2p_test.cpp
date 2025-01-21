@@ -53,44 +53,44 @@ void WifiCfgChangCallback(CfgType, char* data, int dataLen)
 HWTEST_F(WifiP2pTest, EnableP2pTest, TestSize.Level1)
 {
     EnableP2p();
-    EXPECT_NE(EnableP2p(),0);
+    EXPECT_NE(EnableP2p(), 0);
 }
 
 HWTEST_F(WifiP2pTest, DisableP2pTest, TestSize.Level1)
 {
     DisableP2p();
-    EXPECT_NE(DisableP2p(),0);
+    EXPECT_NE(DisableP2p(), 0);
 }
 
 HWTEST_F(WifiP2pTest, GetP2pEnableStatusTests, TestSize.Level1)
 {
     P2pState* state = &g_moded;
     GetP2pEnableStatus(state);
-    EXPECT_NE(GetP2pEnableStatus(state),0);
+    EXPECT_NE(GetP2pEnableStatus(state), 0);
 }
 
 HWTEST_F(WifiP2pTest, DiscoverDevicesTest, TestSize.Level1)
 {
     DiscoverDevices();
-    EXPECT_NE(DiscoverDevices(),0);
+    EXPECT_NE(DiscoverDevices(), 0);
 }
 
 HWTEST_F(WifiP2pTest, StopDiscoverDevicesTest, TestSize.Level1)
 {
     StopDiscoverDevices();
-    EXPECT_NE(StopDiscoverDevices(),0);
+    EXPECT_NE(StopDiscoverDevices(), 0);
 }
 
 HWTEST_F(WifiP2pTest, DiscoverServicesTest, TestSize.Level1)
 {
     DiscoverServices();
-    EXPECT_NE(DiscoverServices(),0);
+    EXPECT_NE(DiscoverServices(), 0);
 }
 
 HWTEST_F(WifiP2pTest, StopDiscoverServicesTest, TestSize.Level1)
 {
     StopDiscoverServices();
-    EXPECT_NE(StopDiscoverServices(),0);
+    EXPECT_NE(StopDiscoverServices(), 0);
 }
 
 HWTEST_F(WifiP2pTest, StartP2pListenTest, TestSize.Level1)
@@ -98,13 +98,13 @@ HWTEST_F(WifiP2pTest, StartP2pListenTest, TestSize.Level1)
     int period = 0;
     int interval = 0;
     StartP2pListen(period, interval);
-    EXPECT_NE(StartP2pListen(period, interval),0);
+    EXPECT_NE(StartP2pListen(period, interval), 0);
 }
 
 HWTEST_F(WifiP2pTest, StopP2pListenTests, TestSize.Level1)
 {
     StopP2pListen();
-    EXPECT_NE(StopP2pListen(),0);
+    EXPECT_NE(StopP2pListen(), 0);
 }
 
 HWTEST_F(WifiP2pTest, CreateGroupTests, TestSize.Level1)
@@ -118,7 +118,7 @@ HWTEST_F(WifiP2pTest, CreateGroupTests, TestSize.Level1)
 HWTEST_F(WifiP2pTest, RemoveGroupTests, TestSize.Level1)
 {
     RemoveGroup();
-    EXPECT_NE(RemoveGroup(),0);
+    EXPECT_NE(RemoveGroup(), 0);
 }
 
 HWTEST_F(WifiP2pTest, DeleteGroupTests, TestSize.Level1)
@@ -126,7 +126,7 @@ HWTEST_F(WifiP2pTest, DeleteGroupTests, TestSize.Level1)
     WifiP2pGroupInfo group;
     group.networkId = g_networkid;
     DeleteGroup(&group);
-    EXPECT_NE(DeleteGroup(&group),0);
+    EXPECT_NE(DeleteGroup(&group), 0);
 }
 
 HWTEST_F(WifiP2pTest, P2pConnectTests, TestSize.Level1)
@@ -134,13 +134,13 @@ HWTEST_F(WifiP2pTest, P2pConnectTests, TestSize.Level1)
     WifiP2pConfig config;
     config.netId = g_networkid;
     P2pConnect(&config);
-    EXPECT_NE(P2pConnect(&config),0);
+    EXPECT_NE(P2pConnect(&config), 0);
 }
 
 HWTEST_F(WifiP2pTest, P2pCancelConnectTests, TestSize.Level1)
 {
     P2pCancelConnect();
-    EXPECT_NE(P2pCancelConnect(),0);
+    EXPECT_NE(P2pCancelConnect(), 0);
 }
 
 HWTEST_F(WifiP2pTest, GetCurrentGroupTests, TestSize.Level1)
@@ -148,14 +148,14 @@ HWTEST_F(WifiP2pTest, GetCurrentGroupTests, TestSize.Level1)
     WifiP2pGroupInfo groupInfo;
     groupInfo.networkId = g_networkid;
     GetCurrentGroup(&groupInfo);
-    EXPECT_NE(GetCurrentGroup(&groupInfo),0);
+    EXPECT_NE(GetCurrentGroup(&groupInfo), 0);
 }
 
 HWTEST_F(WifiP2pTest, GetP2pConnectedStatusTests, TestSize.Level1)
 {
     int* status = &g_networkid;
     GetP2pConnectedStatus(status);
-    EXPECT_NE(GetP2pConnectedStatus(status),0);
+    EXPECT_NE(GetP2pConnectedStatus(status), 0);
 }
 
 HWTEST_F(WifiP2pTest, QueryP2pDevicesTests, TestSize.Level1)
@@ -189,7 +189,7 @@ HWTEST_F(WifiP2pTest, QueryP2pLocalDeviceTests, TestSize.Level1)
         return;
     }
     QueryP2pLocalDevice(&deviceInfo);
-    EXPECT_NE(QueryP2pLocalDevice(&deviceInfo),1);
+    EXPECT_NE(QueryP2pLocalDevice(&deviceInfo), 1);
 }
 
 HWTEST_F(WifiP2pTest, QueryP2pGroupsTests, TestSize.Level1)
@@ -233,7 +233,7 @@ HWTEST_F(WifiP2pTest, UnregisterCfgChangCallbackTest, TestSize.Level1)
 HWTEST_F(WifiP2pTest, CheckCanUseP2pTest, TestSize.Level1)
 {
     CheckCanUseP2p();
-    EXPECT_NE(CheckCanUseP2p(),0);
+    EXPECT_NE(CheckCanUseP2p(), 0);
 }
 }
 }

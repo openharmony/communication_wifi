@@ -29,7 +29,8 @@ DEFINE_WIFILOG_LABEL("WifiScanCallbackStubTest");
 namespace OHOS {
 namespace Wifi {
 static std::string g_errLog;
-void WifiScanLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void WifiScanLogCallback(const LogType type, const LogLevel level, const unsigned int domain,
+                         const char *tag, const char *msg)
 {
     g_errLog = msg;
 }

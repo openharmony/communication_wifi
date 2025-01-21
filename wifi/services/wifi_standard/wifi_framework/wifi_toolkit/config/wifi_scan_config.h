@@ -87,7 +87,7 @@ public:
 
     void RecordHilinkAbility(const std::string &bssid, bool isSupportHilink);
 
-    void GetHilinkAbility(const std::string &bssid);
+    bool GetHilinkAbility(const std::string &bssid);
 
 private:
     void InitScanControlForbidList();

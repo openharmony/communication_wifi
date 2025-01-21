@@ -34,11 +34,11 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
         static std::string g_errLog;
-    void SoftapManagerMachineCallback(const LogType type, const LogLevel level, 
-    const unsigned int domain, const char *tag, const char *msg)
-    {
-        g_errLog = msg;
-    }
+void SoftapManagerMachineCallback(const LogType type, const LogLevel level, 
+                                  const unsigned int domain, const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 
 class SoftapManagerMachineTest : public testing::Test {
 public:

@@ -45,7 +45,7 @@ HWTEST_F(WifiHid2dTest, Hid2dRequestGcIpTests, TestSize.Level1)
     unsigned char gcMac[MAC_LEN];
     unsigned int ipAddr[IPV4_ARRAY_LEN];
     Hid2dRequestGcIp(gcMac, ipAddr);
-    EXPECT_EQ(Hid2dRequestGcIp(gcMac, ipAddr),-128);
+    EXPECT_EQ(Hid2dRequestGcIp(gcMac, ipAddr), -128);
 }
 
 HWTEST_F(WifiHid2dTest, Hid2dSharedlinkIncreaseTests, TestSize.Level1)
@@ -72,7 +72,7 @@ HWTEST_F(WifiHid2dTest, Hid2dRemoveGcGroupTests, TestSize.Level1)
 {
     char gcIfName[IF_NAME_LEN];
     Hid2dRemoveGcGroup(gcIfName);
-    EXPECT_EQ(Hid2dRemoveGcGroup(gcIfName),-128);
+    EXPECT_EQ(Hid2dRemoveGcGroup(gcIfName), -128);
 }
 
 HWTEST_F(WifiHid2dTest, Hid2dConnectTests, TestSize.Level1)

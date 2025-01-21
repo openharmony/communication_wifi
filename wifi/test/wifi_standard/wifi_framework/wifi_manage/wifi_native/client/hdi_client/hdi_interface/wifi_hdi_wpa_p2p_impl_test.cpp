@@ -196,7 +196,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pStopFindTest, TestSize.Level1)
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pFlushTest, TestSize.Level1)
 {
     HdiP2pFlush();
-    EXPECT_EQ(HdiP2pFlush(),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pFlush(), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pFlushServiceTest, TestSize.Level1)

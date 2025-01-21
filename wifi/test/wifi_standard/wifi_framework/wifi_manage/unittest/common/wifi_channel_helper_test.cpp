@@ -47,7 +47,7 @@ HWTEST_F(WifiChannelHelperTest, TestGetValidBands, TestSize.Level1)
 {
     std::vector<BandType> bands = {};
     WifiChannelHelper::GetInstance().GetValidBands(bands);
-    EXPECT_EQ(WifiChannelHelper::GetInstance().GetValidBands(bands),0);
+    EXPECT_EQ(WifiChannelHelper::GetInstance().GetValidBands(bands), 0);
 }
 
 HWTEST_F(WifiChannelHelperTest, TestSetValidChannels, TestSize.Level1)

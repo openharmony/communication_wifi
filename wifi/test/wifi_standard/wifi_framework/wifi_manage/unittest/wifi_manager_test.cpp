@@ -395,7 +395,7 @@ HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGI("GetLastStaStateByDatashareTest enter!");
     wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare();
-    EXPECT_EQ(wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare(),true);
+    EXPECT_EQ(wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare(), true);
 }
 
 HWTEST_F(WifiManagerTest, RegisterCesEventTest, TestSize.Level1)

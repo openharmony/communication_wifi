@@ -20,6 +20,7 @@
 #include "kits/c/wifi_device_config.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "log.h"
 
 using ::testing::_;
 using ::testing::Return;
@@ -28,11 +29,10 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 static std::string g_errLog;
-void WificHostLogCallback(const LogType type, const LogLevel level,
-                          unsigned int domain, const char *tag,
-                          const char *msg)
+void WificHostLogCallback(const LogType type, const LogLevel level, unsigned int domain,
+    const char *tag, const char *msg)
 {
-        g_errLog = msg;
+    g_errLog = msg;
 }
 unsigned int g_status = 17;
 unsigned char g_result = 5;

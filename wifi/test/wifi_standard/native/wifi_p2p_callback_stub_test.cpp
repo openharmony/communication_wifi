@@ -142,7 +142,7 @@ HWTEST_F(WifiP2pCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
     MessageParcel reply;
     MessageOption option;
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, OnRemoteRequestTest2, TestSize.Level1)
@@ -157,7 +157,7 @@ HWTEST_F(WifiP2pCallbackStubTest, OnRemoteRequestTest2, TestSize.Level1)
     }
     data.WriteInt32(1);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pStateChangedTest, TestSize.Level1)
@@ -178,7 +178,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pStateChangedTest, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPersistentGroupsChangedTest, TestSize.Level1)
@@ -198,7 +198,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPersistentGroupsChangedTest, TestSi
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pThisDeviceChangedTest, TestSize.Level1)
@@ -218,7 +218,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pThisDeviceChangedTest, TestSize.Lev
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest, TestSize.Level1)
@@ -240,7 +240,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest2, TestSize.Level1)
@@ -256,7 +256,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pPeersChangedTest2, TestSize.Level1)
     data.WriteInt32(0);
     data.WriteInt32(BUFFER_1K);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest, TestSize.Level1)
@@ -278,7 +278,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest, TestSize.Level
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest2, TestSize.Level1)
@@ -294,7 +294,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pServicesChangedTest2, TestSize.Leve
     data.WriteInt32(0);
     data.WriteInt32(BUFFER_1K);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pConnectionChangedTest, TestSize.Level1)
@@ -314,7 +314,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pConnectionChangedTest, TestSize.Lev
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pDiscoveryChangedTest, TestSize.Level1)
@@ -353,7 +353,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pActionResultTest, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest, TestSize.Level1)
@@ -369,7 +369,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest, TestSize.Level1)
     data.WriteInt32(0);
     data.WriteInt32(0);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest1, TestSize.Level1)
@@ -386,7 +386,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest1, TestSize.Level1)
     data.WriteInt32(1);
     data.WriteInt32(1);
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest2, TestSize.Level1)
@@ -410,7 +410,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnConfigChangedTest2, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pGcJoinGroupTest, TestSize.Level1)
@@ -430,7 +430,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pGcJoinGroupTest, TestSize.Level1)
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
+    EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option), 0);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, IsRemoteDiedTest, TestSize.Level1)

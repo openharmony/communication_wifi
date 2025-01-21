@@ -126,7 +126,6 @@ public:
     void OnP2pChrErrCodeReport(const int errCode) override
     {
         WIFI_LOGI("OnP2pChrErrCodeReport Mock");
-        EXPECT_NE(pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option),0);
     }
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override

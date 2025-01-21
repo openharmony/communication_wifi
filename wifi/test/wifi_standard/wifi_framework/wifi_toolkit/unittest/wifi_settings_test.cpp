@@ -582,7 +582,7 @@ HWTEST_F(WifiSettingsTest, DecryptionDeviceConfigTest, TestSize.Level1)
     WifiDeviceConfig config;
     config.preSharedKey = "12345678";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
-    EXPECT_NE(WifiSettings::GetInstance().DecryptionDeviceConfig(config),-1);
+    EXPECT_NE(WifiSettings::GetInstance().DecryptionDeviceConfig(config), -1);
 }
 
 HWTEST_F(WifiSettingsTest, IsWifiDeviceConfigDecipheredTest, TestSize.Level1)

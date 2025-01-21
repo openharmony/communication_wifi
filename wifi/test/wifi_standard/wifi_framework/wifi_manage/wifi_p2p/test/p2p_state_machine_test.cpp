@@ -476,7 +476,7 @@ HWTEST_F(P2pStateMachineTest, RemoveGroupByNetworkId, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, SetWifiP2pInfoOnGroupFormed, TestSize.Level1)
 {
     WarpSetWifiP2pInfoOnGroupFormed("AA:BB:CC:DD:EE:FF");
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, InitializeThisDevice1, TestSize.Level1)
@@ -486,7 +486,7 @@ HWTEST_F(P2pStateMachineTest, InitializeThisDevice1, TestSize.Level1)
     vendorconfig.SetPrimaryDeviceType("DeviceType");
     vendorconfig.SetRandomMacSupport(true);
     WarpInitializeThisDevice();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, InitializeThisDevice2, TestSize.Level1)
@@ -496,7 +496,7 @@ HWTEST_F(P2pStateMachineTest, InitializeThisDevice2, TestSize.Level1)
     vendorconfig.SetPrimaryDeviceType("DeviceType");
     vendorconfig.SetRandomMacSupport(true);
     WarpInitializeThisDevice();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, IsUsableGroupName, TestSize.Level1)
@@ -584,7 +584,7 @@ HWTEST_F(P2pStateMachineTest, BroadcastP2pPeersChanged, TestSize.Level1)
     callback.OnP2pPeersChangedEvent = [](const std::vector<WifiP2pDevice> &) { WIFI_LOGI("lamda"); };
     pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpBroadcastP2pPeersChanged();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, BroadcastP2pServicesChanged, TestSize.Level1)
@@ -593,7 +593,7 @@ HWTEST_F(P2pStateMachineTest, BroadcastP2pServicesChanged, TestSize.Level1)
     callback.OnP2pServicesChangedEvent = [](const std::vector<WifiP2pServiceInfo> &) { WIFI_LOGI("lamda"); };
     pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpBroadcastP2pServicesChanged();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, BroadcastP2pConnectionChanged, TestSize.Level1)
@@ -602,7 +602,7 @@ HWTEST_F(P2pStateMachineTest, BroadcastP2pConnectionChanged, TestSize.Level1)
     callback.OnP2pConnectionChangedEvent = [](const WifiP2pLinkedInfo &) { WIFI_LOGI("lamda"); };
     pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpBroadcastP2pConnectionChanged();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, BroadcastThisDeviceChanaged, TestSize.Level1)
@@ -628,7 +628,7 @@ HWTEST_F(P2pStateMachineTest, BroadcastPersistentGroupsChanged, TestSize.Level1)
     callback.OnP2pGroupsChangedEvent = []() { WIFI_LOGI("lamda"); };
     pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpBroadcastPersistentGroupsChanged();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, BroadcastActionResult, TestSize.Level1)
@@ -644,7 +644,7 @@ HWTEST_F(P2pStateMachineTest, NotifyUserProvDiscShowPinRequestMessage, TestSize.
     std::string pin;
     const std::string peerAddress;
     WarpNotifyP2pProvDiscShowPinRequest(pin, peerAddress);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, NotifyInvitationSent, TestSize.Level1)
@@ -652,31 +652,31 @@ HWTEST_F(P2pStateMachineTest, NotifyInvitationSent, TestSize.Level1)
     std::string pin;
     const std::string peerAddress;
     WarpNotifyInvitationSent(pin, peerAddress);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, NotifyInvitationReceived1, TestSize.Level1)
 {
     WarpNotifyInvitationReceived();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, NotifyInvitationReceived2, TestSize.Level1)
 {
     WarpNotifyInvitationReceived2();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, NotifyInvitationReceived3, TestSize.Level1)
 {
     WarpNotifyInvitationReceived3();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, ClearWifiP2pInfo, TestSize.Level1)
 {
     WarpClearWifiP2pInfo();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup1, TestSize.Level1)
@@ -736,7 +736,7 @@ HWTEST_F(P2pStateMachineTest, ReinvokePersistentGroup4, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, StartDhcpServer, TestSize.Level1)
 {
     WarpStartDhcpServer();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, DhcpResultNotifyOnFailed, TestSize.Level1)
@@ -882,7 +882,7 @@ HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp1, TestSize.Level1)
     resp.SetServiceStatus(P2pServiceStatus::PSRS_SERVICE_PROTOCOL_NOT_AVAILABLE);
     WifiP2pDevice dev;
     WarpHandleP2pServiceResp(resp, dev);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp2, TestSize.Level1)
@@ -892,8 +892,7 @@ HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp2, TestSize.Level1)
     resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_BONJOUR);
     WifiP2pDevice dev;
     WarpHandleP2pServiceResp(resp, dev);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-    
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp3, TestSize.Level1)
@@ -903,7 +902,7 @@ HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp3, TestSize.Level1)
     resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_UP_NP);
     WifiP2pDevice dev;
     WarpHandleP2pServiceResp(resp, dev);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp4, TestSize.Level1)
@@ -913,13 +912,13 @@ HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp4, TestSize.Level1)
     resp.SetProtocolType(P2pServicerProtocolType::SERVICE_TYPE_VENDOR_SPECIFIC);
     WifiP2pDevice dev;
     WarpHandleP2pServiceResp(resp, dev);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, OnSuccessTest, TestSize.Level1)
 {
     OnSuccessTest();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

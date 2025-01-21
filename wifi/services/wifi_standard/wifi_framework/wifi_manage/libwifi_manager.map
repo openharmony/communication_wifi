@@ -7,7 +7,6 @@
         "*WifiPermissionUtils*";
         "*HasHotspotRemote*";
         "*HasP2pRemote*";
-        "*WifiHistoryRecordManager*";
    extern "C++" {
         "OHOS::Wifi::IsSignalSmoothingEnable()";
         "OHOS::Wifi::WifiScanConfig::GetScanDeviceInfo()";
@@ -586,11 +585,7 @@
         "OHOS::Wifi::WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int)";
         "OHOS::Wifi::WifiCountryCodePolicy::CalculateWifiCountryCode(std::string &)";
         "OHOS::Wifi::WifiHistoryRecordManager::GetInstance()";
-        "OHOS::Wifi::WifiHistoryRecordManager::Init()";
-        "OHOS::Wifi::WifiHistoryRecordManager::DelectApInfo(const std::string &, const std::string &)";
         "OHOS::Wifi::WifiHistoryRecordManager::DelectAllApInfo()";
-        "OHOS::Wifi::WifiHistoryRecordManager::IsHomeAp(const std::string &)";
-        "OHOS::Wifi::WifiHistoryRecordManager::IsHomeRouter(const std::string &)";
         "OHOS::Wifi::WifiDataShareHelperUtils::GetInstance()";
         "OHOS::Wifi::WifiDataShareHelperUtils::CheckIfSettingsDataReady()";
         "OHOS::Wifi::WifiDataShareHelperUtils::GetLoactionDataShareUri()";

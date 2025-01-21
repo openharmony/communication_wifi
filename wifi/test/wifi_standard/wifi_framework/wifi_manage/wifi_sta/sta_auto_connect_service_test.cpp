@@ -48,11 +48,11 @@ constexpr int FREQUENCY = 5200;
 constexpr int INVALIDRSSI = -90;
 constexpr int TWO = 2;
 static std::string g_errLog;
-    void StaAutoConnectServiceCallback(const LogType type, const LogLevel level, const unsigned int domain,
-    const char *tag, const char *msg)
-    {
-        g_errLog = msg;
-    }
+void StaAutoConnectServiceCallback(const LogType type, const LogLevel level, const unsigned int domain,
+                                   const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 
 class StaAutoConnectServiceTest : public testing::Test {
 public:

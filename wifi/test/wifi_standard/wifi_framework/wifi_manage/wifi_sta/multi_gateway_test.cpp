@@ -24,8 +24,9 @@ namespace OHOS {
 namespace Wifi {
 constexpr int32_t NUM_TEN = 10;
     static std::string g_errLog;
-    void GatewayCallback(const LogType type, const LogLevel level, const unsigned int domain,
-                         const char *tag, const char *msg)
+    void MultiGatewayCallback(const LogType type, const LogLevel level,
+                              const unsigned int domain, const char *tag,
+                              const char *msg)
     {
         g_errLog = msg;
     }

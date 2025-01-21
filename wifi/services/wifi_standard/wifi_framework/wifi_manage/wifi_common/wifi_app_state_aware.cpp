@@ -30,7 +30,6 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
-constexpr const int APP_INFO_USERID = 100;
 constexpr int64_t WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY = 3 * 1000;
 WifiAppStateAware::WifiAppStateAware(int instId)
 {
@@ -148,7 +147,7 @@ ErrCode WifiAppStateAware::GetProcessRunningInfos(std::vector<AppExecFwk::Runnin
         WIFI_LOGE("%{public}s GetAppMgr failed", __FUNCTION__);
         return WIFI_OPT_FAILED;
     }
-    if (appMgrProxy->GetProcessRunningInfosByUserId(info, APP_INFO_USERID)
+    if (appMgrProxy->GetAllRunningProcesses(info)
         != AppExecFwk::AppMgrResultCode::RESULT_OK) {
         WIFI_LOGE("%{public}s GetProcessRunningInfoByUserId failed", __FUNCTION__);
         return WIFI_OPT_FAILED;

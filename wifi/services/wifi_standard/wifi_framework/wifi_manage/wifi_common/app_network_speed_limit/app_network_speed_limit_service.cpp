@@ -233,13 +233,13 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
             if (enable == GAME_BOOST_ENABLE) {
                 return AppParser::GetInstance().IsLiveStreamApp(bundleName) ? false : true;
             } else {
-                return AppParser::GetInstance().IsBlackListApp(bundleName);
+                return AppParser::GetInstance().IsGameBackgroundLimitApp(bundleName);
             }
         case BgLimitControl::BG_LIMIT_CONTROL_ID_STREAM:
         case BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP:
             return AppParser::GetInstance().IsHighTempLimitSpeedApp(bundleName);
         case BgLimitControl::BG_LIMIT_CONTROL_ID_KEY_FG_APP:
-            return AppParser::GetInstance().IsBackgroundLimitApp(bundleName);
+            return AppParser::GetInstance().IsKeyBackgroundLimitApp(bundleName);
         case BgLimitControl::BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT:
             return true;
         default:
@@ -304,16 +304,25 @@ void AppNetworkSpeedLimitService::SendLimitInfo()
     }
 
     if (m_lastBgUidSet != m_bgUidSet) {
+        if (m_bgUidSet.empty()) {
+            m_bgUidSet.insert(UNKNOWN_UID);
+        }
         SetBgLimitIdList(std::vector<int>(m_bgUidSet.begin(), m_bgUidSet.end()), SET_BG_UID);
         m_lastBgUidSet = m_bgUidSet;
     }
 
     if (m_lastBgPidSet != m_bgPidSet) {
+        if (m_bgPidSet.empty()) {
+            m_bgPidSet.insert(UNKNOWN_UID);
+        }
         SetBgLimitIdList(std::vector<int>(m_bgPidSet.begin(), m_bgPidSet.end()), SET_BG_PID);
         m_lastBgPidSet = m_bgPidSet;
     }
 
     if (m_lastFgUidSet != m_fgUidSet) {
+        if (m_fgUidSet.empty()) {
+            m_fgUidSet.insert(UNKNOWN_UID);
+        }
         SetBgLimitIdList(std::vector<int>(m_fgUidSet.begin(), m_fgUidSet.end()), SET_FG_UID);
         m_lastFgUidSet = m_fgUidSet;
     }
@@ -321,7 +330,7 @@ void AppNetworkSpeedLimitService::SendLimitInfo()
 
 void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo)
 {
-    if (!(AppParser::GetInstance().IsBackgroundLimitApp(networkControlInfo.bundleName) ||
+    if (!(AppParser::GetInstance().IsKeyBackgroundLimitApp(networkControlInfo.bundleName) ||
         networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME)) {
         return;
     }

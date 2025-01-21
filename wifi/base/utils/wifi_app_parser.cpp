@@ -38,8 +38,9 @@ constexpr auto XML_TAG_SECTION_HEADER_MULTILINK_BLACK_LIST = "MultiLinkBlackList
 constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
 constexpr auto XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP = "HighTempLimitSpeedApp";
 constexpr auto XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST = "KeyAppForegroundList";
-constexpr auto XML_TAG_SECTION_HEADER_APP_BACKGROUND_LIMIT_LIST = "BackgroundLimitListApp";
+constexpr auto XML_TAG_SECTION_HEADER_APP_KEY_BACKGROUND_LIMIT_LIST = "KeyBackgroundLimitListApp";
 constexpr auto XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST = "AppLiveStream";
+constexpr auto XML_TAG_SECTION_HEADER_APP_GAME_BACKGROUND_LIMIT_LIST = "GameBackgroundLimitListApp";
 constexpr auto XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME = "AsyncDelayTime";
 constexpr auto XML_TAG_SECTION_KEY_GAME_RTT = "mGameRtt";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
@@ -57,9 +58,10 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_CHARIOT_APP, AppType::CHARIOT_APP },
     {XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP, AppType::HIGH_TEMP_LIMIT_SPEED_APP},
     { XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST, AppType::KEY_FOREGROUND_LIST_APP},
-    { XML_TAG_SECTION_HEADER_APP_BACKGROUND_LIMIT_LIST, AppType::BACKGROUND_LIMIT_LIST_APP},
+    { XML_TAG_SECTION_HEADER_APP_KEY_BACKGROUND_LIMIT_LIST, AppType::KEY_BACKGROUND_LIMIT_LIST_APP},
     { XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME, AppType::ASYNC_DELAY_TIME},
     { XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST, AppType::LIVE_STREAM_APP},
+    { XML_TAG_SECTION_HEADER_APP_GAME_BACKGROUND_LIMIT_LIST, AppType::GAME_BACKGROUND_LIMIT_LIST_APP},
     { XML_TAG_SECTION_KEY_GAME_RTT, AppType::GAME_RTT},
 };
 
@@ -142,16 +144,22 @@ bool AppParser::IsKeyForegroundApp(const std::string &bundleName) const
         [bundleName](const KeyForegroundListAppInfo &app) { return app.packageName == bundleName; });
 }
 
-bool AppParser::IsBackgroundLimitApp(const std::string &bundleName) const
+bool AppParser::IsKeyBackgroundLimitApp(const std::string &bundleName) const
 {
-    return std::any_of(m_backgroundLimitListAppVec.begin(), m_backgroundLimitListAppVec.end(),
-        [bundleName](const BackgroundLimitListAppInfo &app) { return app.packageName == bundleName; });
+    return std::any_of(m_keyBackgroundLimitListAppVec.begin(), m_keyBackgroundLimitListAppVec.end(),
+        [bundleName](const KeyBackgroundLimitListAppInfo &app) { return app.packageName == bundleName; });
 }
 
 bool AppParser::IsLiveStreamApp(const std::string &bundleName) const
 {
     return std::any_of(m_liveStreamAppVec.begin(), m_liveStreamAppVec.end(),
         [bundleName](const LiveStreamAppInfo &app) { return app.packageName == bundleName; });
+}
+
+bool AppParser::IsGameBackgroundLimitApp(const std::string &bundleName) const
+{
+    return std::any_of(m_gameBackgroundLimitListAppVec.begin(), m_gameBackgroundLimitListAppVec.end(),
+        [bundleName](const GameBackgroundLimitListAppInfo &app) { return app.packageName == bundleName; });
 }
 
 bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) const
@@ -215,6 +223,7 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
     m_whiteAppVec.clear();
     m_multilinkAppVec.clear();
     m_chariotAppVec.clear();
+    m_blackAppVec.clear();
     m_highTempLimitSpeedAppVec.clear();
 
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
@@ -227,6 +236,9 @@ void AppParser::ParseAppList(const xmlNodePtr &innode)
                 break;
             case AppType::MULTILINK_BLACK_LIST_APP:
                 m_multilinkAppVec.push_back(ParseMultiLinkAppInfo(node));
+                break;
+            case AppType::BLACK_LIST_APP:
+                m_blackAppVec.push_back(ParseBlackAppInfo(node));
                 break;
             case AppType::CHARIOT_APP:
                 m_chariotAppVec.push_back(ParseChariotAppInfo(node));
@@ -252,20 +264,20 @@ void AppParser::ParseNetworkControlAppList(const xmlNodePtr &innode)
         return;
     }
     m_keyForegroundListAppVec.clear();
-    m_backgroundLimitListAppVec.clear();
-    m_blackAppVec.clear();
+    m_keyBackgroundLimitListAppVec.clear();
     m_liveStreamAppVec.clear();
+    m_gameBackgroundLimitListAppVec.clear();
 
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetAppTypeAsInt(node)) {
             case AppType::KEY_FOREGROUND_LIST_APP:
                 m_keyForegroundListAppVec.push_back(ParseKeyForegroundListAppInfo(node));
                 break;
-            case AppType::BACKGROUND_LIMIT_LIST_APP:
-                m_backgroundLimitListAppVec.push_back(ParseBackgroundLimitListAppInfo(node));
+            case AppType::KEY_BACKGROUND_LIMIT_LIST_APP:
+                m_keyBackgroundLimitListAppVec.push_back(ParseKeyBackgroundLimitListAppInfo(node));
                 break;
-            case AppType::BLACK_LIST_APP:
-                m_blackAppVec.push_back(ParseBlackAppInfo(node));
+            case AppType::GAME_BACKGROUND_LIMIT_LIST_APP:
+                m_gameBackgroundLimitListAppVec.push_back(ParseGameBackgroundLimitListAppInfo(node));
                 break;
             case AppType::LIVE_STREAM_APP:
                 m_liveStreamAppVec.push_back(ParseLiveStreamAppInfo(node));
@@ -280,8 +292,8 @@ void AppParser::ParseNetworkControlAppList(const xmlNodePtr &innode)
     }
     WIFI_LOGI("%{public}s out,m_keyForegroundListAppVec count:%{public}d!",
         __FUNCTION__, (int)m_keyForegroundListAppVec.size());
-    WIFI_LOGI("%{public}s out,m_backgroundLimitListAppVec count:%{public}d!",
-        __FUNCTION__, (int)m_backgroundLimitListAppVec.size());
+    WIFI_LOGI("%{public}s out,m_keyBackgroundLimitListAppVec count:%{public}d!",
+        __FUNCTION__, (int)m_keyBackgroundLimitListAppVec.size());
 }
 
 LowLatencyAppInfo AppParser::ParseLowLatencyAppInfo(const xmlNodePtr &innode)
@@ -371,9 +383,9 @@ KeyForegroundListAppInfo AppParser::ParseKeyForegroundListAppInfo(const xmlNodeP
     return appInfo;
 }
 
-BackgroundLimitListAppInfo AppParser::ParseBackgroundLimitListAppInfo(const xmlNodePtr &innode)
+KeyBackgroundLimitListAppInfo AppParser::ParseKeyBackgroundLimitListAppInfo(const xmlNodePtr &innode)
 {
-    BackgroundLimitListAppInfo appInfo;
+    KeyBackgroundLimitListAppInfo appInfo;
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
     std::string packageName = std::string(reinterpret_cast<char *>(value));
     appInfo.packageName = packageName;
@@ -387,6 +399,20 @@ LiveStreamAppInfo AppParser::ParseLiveStreamAppInfo(const xmlNodePtr &innode)
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
     if (value == NULL) {
         WIFI_LOGE("%{public}s xml parser live stream app info error.", __FUNCTION__);
+        return appInfo;
+    }
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
+    return appInfo;
+}
+
+GameBackgroundLimitListAppInfo AppParser::ParseGameBackgroundLimitListAppInfo(const xmlNodePtr &innode)
+{
+    GameBackgroundLimitListAppInfo appInfo{};
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    if (value == NULL) {
+        WIFI_LOGE("%{public}s xml parser game background limit app info error.", __FUNCTION__);
         return appInfo;
     }
     std::string packageName = std::string(reinterpret_cast<char *>(value));

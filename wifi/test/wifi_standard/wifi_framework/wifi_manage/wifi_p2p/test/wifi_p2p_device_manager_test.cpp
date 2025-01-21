@@ -16,11 +16,19 @@
 
 #include "wifi_p2p_device_manager.h"
 #include "wifi_logger.h"
+#include "log.h"
 
 using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void WifiP2pDLogCallback(const LogType type, const LogLevel level,
+                         const unsigned int domain, const char *tag,
+                         const char *msg)
+{
+    g_errLog = msg;
+}
 class WifiP2pDeviceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(){}
@@ -46,6 +54,7 @@ public:
         device2.SetP2pDeviceStatus(P2pDeviceStatus::PDS_UNAVAILABLE);
         device2.SetPrimaryDeviceType("Test2 Type");
         device2.SetWpsConfigMethod(static_cast<int>(WpsConfigMethod::WPS_CFG_INVALID));
+        LOG_SetCallback(WifiP2pDLogCallback);
     };
     virtual void TearDown()
     {

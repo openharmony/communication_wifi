@@ -37,7 +37,6 @@ public:
         pMockP2pPendant.reset(new MockP2pPendant());
         pInvitationRequestState.reset(
             new InvitationRequestState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager));
-            LOG_SetCallback(InvitationRequestStateCallback);
     }
     virtual void TearDown()
     {

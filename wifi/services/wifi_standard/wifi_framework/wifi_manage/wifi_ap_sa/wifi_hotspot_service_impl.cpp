@@ -123,7 +123,7 @@ ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
     }
     long features = 0;
     WifiManager::GetInstance().GetSupportedFeatures(features);
-    if (features & static_cast<long>(WifiFeatures::WIFI_FEATURE_AP_STA)) {
+    if (static_cast<uint64_t>(features) & static_cast<uint64_t>(WifiFeatures::WIFI_FEATURE_AP_STA)) {
         WifiLinkedInfo linkInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
         if (linkInfo.connState == ConnState::CONNECTED) {

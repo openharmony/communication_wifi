@@ -46,7 +46,8 @@ constexpr int MIN_RSSI_2DOT_4GHZ = -80;
 constexpr int MIN_RSSI_5GZ = -77;
 constexpr char BACKUP_CONFIG_FILE_PATH_TEST[] = CONFIG_ROOR_DIR"/backup_config_test.conf";
 static std::string g_errLog;
-void WifiSetLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void WifiSetLogCallback(const LogType type, const LogLevel level,
+ const unsigned int domain, const char *tag, const char *msg)
 {
     g_errLog = msg;
 }

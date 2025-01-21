@@ -39,11 +39,11 @@ using ::testing::ext::TestSize;
 using namespace OHOS::Wifi;
 using namespace testing;
 static std::string g_errLog;
-    void StaAppAccelerationallback(const LogType type,const LogLevel level,
-    const unsigned int domain ,const char *tag,const char *msg)
-    {
-        g_errLog = msg;
-    }
+void StaAppAccelerationallback(const LogType type,const LogLevel level,
+                            const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 
 class StaAppAccelerationTest : public Test {
 public:

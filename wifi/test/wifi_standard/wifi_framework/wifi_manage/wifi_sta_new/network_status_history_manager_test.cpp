@@ -25,7 +25,8 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
     static std::string g_errLog;
-    void NetworkStatusHistoryManagerCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    void NetworkCallback(const LogType type, const LogLevel level, 
+                        const unsigned int domain,const char *tag,const char *msg)
     {
         g_errLog = msg;
     }
@@ -34,7 +35,7 @@ public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp() {
-        LOG_SetCallback(NetworkStatusHistoryManagerCallback);
+        LOG_SetCallback(NetworkCallback);
     }
     virtual void TearDown() {}
 };

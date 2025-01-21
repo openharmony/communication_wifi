@@ -416,7 +416,8 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
     std::string ifaceName = "wlan0";
-    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);

@@ -623,7 +623,7 @@ HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     config.wifiWapiConfig.wapiUserCertData = "12345678";
     WifiSettings::GetInstance().DecryptionDeviceConfig(config);
-    EXPECT_NE(WifiSettings::GetInstance().DecryptionDeviceConfig(config),-1);
+    EXPECT_NE(WifiSettings::GetInstance().DecryptionDeviceConfig(config), -1);
 }
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)

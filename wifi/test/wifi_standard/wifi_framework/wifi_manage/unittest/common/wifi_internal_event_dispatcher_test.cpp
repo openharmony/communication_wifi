@@ -28,7 +28,8 @@ namespace Wifi {
  */
 static std::string g_errLog;
 void WifiDisLogCallback(const LogType type, const LogLevel level,
-                        const unsigned int domain  ,const char *tag, const char *msg)
+                        const unsigned int domain, const char *tag,
+                        const char *msg)
 {
     g_errLog = msg;
 }

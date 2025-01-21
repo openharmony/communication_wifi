@@ -356,7 +356,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiDeliverP2pDataTest, TestSize.Level1)
     int32_t dataType = 1;
     const char *carryData = "1";
     HdiDeliverP2pData(cmdType, dataType, carryData);
-    EXPECT_EQ(HdiDeliverP2pData(cmdType, dataType, carryData),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiDeliverP2pData(cmdType, dataType, carryData), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRemoveServiceTest, TestSize.Level1)

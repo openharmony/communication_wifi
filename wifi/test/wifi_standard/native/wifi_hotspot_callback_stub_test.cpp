@@ -30,7 +30,9 @@ DEFINE_WIFILOG_LABEL("WifiHotspotCallbackStubTest");
 namespace OHOS {
 namespace Wifi {
 static std::string g_errLog;
-void WifiHostLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void WifiHostLogCallback(const LogType type, const LogLevel level, 
+                         const unsigned int domain, const char *tag,
+                         const char *msg)
 {
         g_errLog = msg;
 }

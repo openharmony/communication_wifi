@@ -37,11 +37,12 @@ namespace Wifi {
 
 constexpr int SLEEP_TIME = 2;
 constexpr int TEN = 10;
-    static std::string g_errLog;
-    void ConcreteManagerMachineCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
-    {
-        g_errLog = msg;
-    }
+static std::string g_errLog;
+void ConcreteManagerMachineCallback(const LogType type, const LogLevel level,
+    const unsigned int domain, const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 
 class ConcreteManagerMachineTest : public testing::Test {
 public:

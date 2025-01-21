@@ -510,25 +510,25 @@ HWTEST_F(WifiManagerTest, CheckCanUseSoftApTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, CheckStaConnectedTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->CheckStaConnected();
-    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckStaConnected(),false);
+    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckStaConnected(), false);
 }
 
 HWTEST_F(WifiManagerTest, CheckP2pConnectedTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->CheckP2pConnected();
-    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckP2pConnected(),false);
+    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckP2pConnected(), false);
 }
 
 HWTEST_F(WifiManagerTest, CheckSoftApStartedTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->CheckSoftApStarted();
-    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckSoftApStarted(),false);
+    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckSoftApStarted(), false);
 }
 
 HWTEST_F(WifiManagerTest, CheckEnhanceWifiConnectedTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->CheckEnhanceWifiConnected();
-    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckEnhanceWifiConnected(),true);
+    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckEnhanceWifiConnected(), true);
 }
 
 HWTEST_F(WifiManagerTest, VapConflictReportTest, TestSize.Level1)

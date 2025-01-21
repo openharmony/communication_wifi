@@ -36,7 +36,6 @@ public:
     {
         pMockP2pPendant.reset(new MockP2pPendant());
         pDefaultState.reset(new P2pDefaultState(pMockP2pPendant->GetP2pStateMachine()));
-        LOG_SetCallback(P2pDefaultStateCallback);
     }
     virtual void TearDown()
     {

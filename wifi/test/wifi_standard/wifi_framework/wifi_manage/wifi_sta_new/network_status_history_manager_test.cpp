@@ -37,7 +37,7 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-        LOG_SetCallback(NetworkCallback);
+        LOG_SetCallback(NetworkStatusManagerCallback);
     }
     virtual void TearDown() {}
 };

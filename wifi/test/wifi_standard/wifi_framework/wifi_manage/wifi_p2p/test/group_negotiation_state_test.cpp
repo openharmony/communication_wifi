@@ -38,7 +38,6 @@ public:
         pGroupNegotiationState.reset(
             new GroupNegotiationState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager));
         pGroupNegotiationState->Init();
-        LOG_SetCallback(GroupNegotiationStateCallback);
     }
     virtual void TearDown()
     {

@@ -29,14 +29,14 @@ HWTEST_F(WifiEventHandlerTest, PostAsyncTaskTest, TestSize.Level1)
 {
     std::function<void()> callback = EventHandlerCallback;
     testEventHandler->PostAsyncTask(callback, 0);
-    EXPECT_EQ(testEventHandler->PostAsyncTask(callback, 0),true);
+    EXPECT_EQ(testEventHandler->PostAsyncTask(callback, 0), true);
 }
 
 HWTEST_F(WifiEventHandlerTest, PostAsyncTaskAndNameTest, TestSize.Level1)
 {
     std::function<void()> callback = EventHandlerCallback;
     testEventHandler->PostAsyncTask(callback, "callback");
-    EXPECT_EQ(testEventHandler->PostAsyncTask(callback, "callback"),true);
+    EXPECT_EQ(testEventHandler->PostAsyncTask(callback, "callback"), true);
 }
 
 HWTEST_F(WifiEventHandlerTest, RemoveAsyncTaskTest, TestSize.Level1)

@@ -75,14 +75,14 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetWfdEnableTest, TestSize.Level1)
 {
     int enable = 1;
     HdiP2pSetWfdEnable(enable);
-    EXPECT_EQ(HdiP2pSetWfdEnable(enable),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pSetWfdEnable(enable), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetPersistentReconnectTest, TestSize.Level1)
 {
     int status = 1;
     HdiP2pSetPersistentReconnect(status);
-    EXPECT_EQ(HdiP2pSetPersistentReconnect(status),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pSetPersistentReconnect(status), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetWpsSecondaryDeviceTypeTest, TestSize.Level1)
@@ -289,7 +289,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pSetServDiscExternalTest, TestSize.Level1)
 {
     int mode = 1;
     HdiP2pSetServDiscExternal(mode);
-    EXPECT_EQ(HdiP2pSetServDiscExternal(mode),WIFI_HAL_OPT_OK);
+    EXPECT_EQ(HdiP2pSetServDiscExternal(mode), WIFI_HAL_OPT_OK);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRemoveGroupTest, TestSize.Level1)

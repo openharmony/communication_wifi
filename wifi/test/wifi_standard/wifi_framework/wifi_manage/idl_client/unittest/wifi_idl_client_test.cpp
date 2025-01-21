@@ -393,7 +393,7 @@ HWTEST_F(WifiIdlClientTest, ExitAllClientTest, TestSize.Level1)
     MockWifiPublic::SetMockFlag(true);
     mClient.ExitAllClient();
     MockWifiPublic::SetMockFlag(false);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqConnectTest, TestSize.Level1)

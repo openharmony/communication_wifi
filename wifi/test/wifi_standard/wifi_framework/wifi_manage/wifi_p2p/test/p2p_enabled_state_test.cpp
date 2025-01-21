@@ -224,7 +224,6 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg9, TestSize.Level1)
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
     EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
-
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg10, TestSize.Level1)

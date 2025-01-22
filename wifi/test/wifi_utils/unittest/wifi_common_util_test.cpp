@@ -233,5 +233,12 @@ HWTEST_F(WifiCommonUtilTest, GetAuthInfoTest_1, TestSize.Level1)
     std::vector<std::string> result = getAuthInfo(input, delimiter);
     EXPECT_EQ(result.size(), 1);
 }
+
+HWTEST_F(WifiCommonUtilTest, GetCurrentTimeSecondsTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetCurrentTimeSecondsTest enter");
+    int64_t result = GetCurrentTimeSeconds();
+    EXPECT_TURE(result != 0);
+}
 }  // namespace Wifi
 }  // namespace OHOS

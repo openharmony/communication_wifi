@@ -21,9 +21,7 @@
 #include "wifi_system_timer.h"
 #include "wifi_hisysevent.h"
 #include "wifi_global_func.h"
-#ifdef HAS_BATTERY_MANAGER_PART
-#include "battery_srv_client.h"
-#endif
+#include "wifi_battery_utils.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif

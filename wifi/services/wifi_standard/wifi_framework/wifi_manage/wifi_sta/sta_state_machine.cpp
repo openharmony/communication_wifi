@@ -1171,6 +1171,7 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
     std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("ApLinkedState reveived network connection event,bssid:%{public}s, ignore it.\n",
         MacAnonymize(bssid).c_str());
+    pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);

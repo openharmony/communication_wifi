@@ -36,7 +36,7 @@
 #define MOUSE_CROSS_SERVICE_UID 6699
 namespace OHOS {
 namespace Wifi {
-const int HID2D_TIMEOUT_INTERVAL = 10 * 1000;
+inline const int HID2D_TIMEOUT_INTERVAL = 10 * 1000;
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 
 class WifiConfigCenter {
@@ -220,9 +220,21 @@ public:
 
     void ClearLocalHid2dInfo(int uid = 0);
 
+    int SetLastConnStaFreq(int freq);
+
+    int GetLastConnStaFreq();
+
     int SetP2pEnhanceState(int state);
 
     int GetP2pEnhanceState();
+
+    int SetP2pEnhanceActionListenChannel(int channel);
+
+    int GetP2pEnhanceActionListenChannel();
+
+    int SetP2pEnhanceFreq(int freq);
+
+    int GetP2pEnhanceFreq();
 
     WifiOprMidState GetP2pMidState();
 
@@ -357,6 +369,7 @@ private:
     std::atomic<bool> mWifiSelfcureReset {false};
     std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
+    std::atomic<int> lastConnStaFreq_ {INVALID_NETWORK_ID};
     std::atomic<int> mSelectedCandidateNetworkId {INVALID_NETWORK_ID};
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
@@ -407,7 +420,9 @@ private:
     std::atomic<int64_t> mHid2dSceneLastSetTime {0};
     std::atomic<WifiOprMidState> mP2pMidState {WifiOprMidState::CLOSED};
     std::atomic<int> mP2pState {static_cast<int>(P2pState::P2P_STATE_CLOSED)};
-    std::atomic<int> mP2pEnhanceState {0};
+    std::atomic<int> p2pEnhanceState_ {0};
+    std::atomic<int> p2pEnhanceFreq_ {0};
+    std::atomic<int> p2pEnhanceActionListenChannel_ {0};
     std::atomic<int> mP2pDiscoverState {0};
     std::atomic<P2pBusinessType> mP2pBusinessType {P2pBusinessType::INVALID};
     std::atomic<int> mP2pCreatorUid {-1};

@@ -24,6 +24,7 @@
 #include "define.h"
 #include "wifi_config_center.h"
 #include "wifi_global_func.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -62,6 +63,8 @@ constexpr int DAY_VALUE_SUNDAY_CALENDAR = 0;
 constexpr int UPDATE_CONNECT_TIME_RECORD_INTERVAL_SIZE = 16;
 constexpr int GET_DEVICE_CONFIG_SUCCESS = 0;
 constexpr int TO_KEEP_TWO_DECIMAL = 100;
+constexpr int INVALID_TIME_RECORD_INTERVAL = 0;
+constexpr int TEN_DAY = 10;
 
 WifiHistoryRecordManager::~WifiHistoryRecordManager()
 {
@@ -98,9 +101,15 @@ int WifiHistoryRecordManager::GetUpdateConnectTimeRecordInterval()
         UPDATE_CONNECT_TIME_RECORD_INTERVAL_DEFAULT, preValue, UPDATE_CONNECT_TIME_RECORD_INTERVAL_SIZE);
     if (errorCode <= 0) {
         WIFI_LOGI("get UPDATE_CONNECT_TIME_RECORD_INTERVAL fail, take effect in 30 min");
-        return ConvertStringToInt(UPDATE_CONNECT_TIME_RECORD_INTERVAL_DEFAULT);
+        std::string intervalDefaultStr(UPDATE_CONNECT_TIME_RECORD_INTERVAL_DEFAULT);
+        return CheckDataLegal(intervalDefaultStr);
     }
-    int intervalValue = ConvertStringToInt(preValue);
+    std::string preValueStr(preValue);
+    int intervalValue = CheckDataLegal(preValueStr);
+    if (intervalValue == INVALID_TIME_RECORD_INTERVAL) {
+        std::string intervalDefaultStr(UPDATE_CONNECT_TIME_RECORD_INTERVAL_DEFAULT);
+        return CheckDataLegal(intervalDefaultStr);
+    }
     WIFI_LOGI("get UPDATE_CONNECT_TIME_RECORD_INTERVAL is %{public}d", intervalValue);
     return intervalValue;
 }
@@ -115,7 +124,6 @@ void WifiHistoryRecordManager::DealStaConnChanged(OperateResState state, const W
     if (instId != INSTID_WLAN0) {
         return;
     }
-    std::lock_guard<std::mutex> lock(dealStaConnChangedMutex_);
     WifiDeviceConfig config;
     int ret = WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config, instId);
     if (IsEnterprise(config)) {
@@ -140,44 +148,44 @@ void WifiHistoryRecordManager::DealStaConnChanged(OperateResState state, const W
 
 void WifiHistoryRecordManager::HandleWifiConnectedMsg(const WifiLinkedInfo &info, const WifiDeviceConfig &config)
 {
-    if (info.bssid.empty() || info.bssid == connectedApInfo_.bssid) {
+    if (info.bssid.empty() || info.bssid == connectedApInfo_.bssid_) {
         return;
     }
     WIFI_LOGI("deal connected, ssid=%{public}s, bssid=%{public}s", SsidAnonymize(info.ssid).c_str(),
         MacAnonymize(info.bssid).c_str());
-    if (info.networkId == connectedApInfo_.networkId) {
+    if (info.networkId == connectedApInfo_.networkId_) {
         WIFI_LOGI("roam, networkId=%{public}d, last bssid=%{public}s", info.networkId,
-            MacAnonymize(connectedApInfo_.bssid).c_str());
+            MacAnonymize(connectedApInfo_.bssid_).c_str());
         StopUpdateApInfoTimer();
         UpdateConnectionTime(false);
     }
     ClearConnectedApInfo();
-    std::time_t currentTime = std::time(nullptr);
-    connectedApInfo_.networkId = info.networkId;
-    connectedApInfo_.ssid = info.ssid;
-    connectedApInfo_.bssid = info.bssid;
-    connectedApInfo_.currentConnectedTime = currentTime;
+    int64_t currentTime = GetCurrentTimeSeconds();
+    connectedApInfo_.networkId_ = info.networkId;
+    connectedApInfo_.ssid_ = info.ssid;
+    connectedApInfo_.bssid_ = info.bssid;
+    connectedApInfo_.currentConnectedTime_ = currentTime;
     ConnectedApInfo dbApInfo;
-    int queryRet = QueryApInfoRecordByBssid(connectedApInfo_.bssid, dbApInfo);
+    int queryRet = QueryApInfoRecordByBssid(connectedApInfo_.bssid_, dbApInfo);
     if (queryRet == QUERY_NO_RECORD) {  // First connect
-        connectedApInfo_.keyMgmt = config.keyMgmt;
-        connectedApInfo_.firstConnectedTime = currentTime;
+        connectedApInfo_.keyMgmt_ = config.keyMgmt;
+        connectedApInfo_.firstConnectedTime_ = currentTime;
     } else {
-        connectedApInfo_.keyMgmt = dbApInfo.keyMgmt;
-        connectedApInfo_.firstConnectedTime = dbApInfo.firstConnectedTime;
-        connectedApInfo_.totalUseTime = dbApInfo.totalUseTime;
-        connectedApInfo_.totalUseTimeAtNight = dbApInfo.totalUseTimeAtNight;
-        connectedApInfo_.totalUseTimeAtWeekend = dbApInfo.totalUseTimeAtWeekend;
-        connectedApInfo_.markedAsHomeApTime = dbApInfo.markedAsHomeApTime;
+        connectedApInfo_.keyMgmt_ = dbApInfo.keyMgmt_;
+        connectedApInfo_.firstConnectedTime_ = dbApInfo.firstConnectedTime_;
+        connectedApInfo_.totalUseTime_ = dbApInfo.totalUseTime_;
+        connectedApInfo_.totalUseTimeAtNight_ = dbApInfo.totalUseTimeAtNight_;
+        connectedApInfo_.totalUseTimeAtWeekend_ = dbApInfo.totalUseTimeAtWeekend_;
+        connectedApInfo_.markedAsHomeApTime_ = dbApInfo.markedAsHomeApTime_;
     }
     UpdateConnectionTime(true);
 }
 
 bool WifiHistoryRecordManager::IsEnterprise(const WifiDeviceConfig &config)
 {
-bool isEnterpriseSecurityType = (config.keyMgmt == KEY_MGMT_EAP) ||
-    (config.keyMgmt == KEY_MGMT_SUITE_B_192) || (config.keyMgmt == KEY_MGMT_WAPI_CERT);
-return isEnterpriseSecurityType && (config.wifiEapConfig.eap != EAP_METHOD_NONE);
+    bool isEnterpriseSecurityType = (config.keyMgmt == KEY_MGMT_EAP) ||
+        (config.keyMgmt == KEY_MGMT_SUITE_B_192) || (config.keyMgmt == KEY_MGMT_WAPI_CERT);
+    return isEnterpriseSecurityType && (config.wifiEapConfig.eap != EAP_METHOD_NONE);
 }
 
 void WifiHistoryRecordManager::NextUpdateApInfoTimer()
@@ -209,12 +217,12 @@ bool WifiHistoryRecordManager::IsFloatEqual(double a, double b)
 
 bool WifiHistoryRecordManager::CheckIsHomeAp()
 {
-    int64_t totalPassTime = connectedApInfo_.currenttStaticTimePoint - connectedApInfo_.firstConnectedTime;
+    int64_t totalPassTime = connectedApInfo_.currenttStaticTimePoint_ - connectedApInfo_.firstConnectedTime_;
     if (totalPassTime <= INVALID_TIME_POINT) {
         return false;
     }
 
-    int64_t homeTime = connectedApInfo_.totalUseTimeAtNight + connectedApInfo_.totalUseTimeAtWeekend;
+    int64_t homeTime = connectedApInfo_.totalUseTimeAtNight_ + connectedApInfo_.totalUseTimeAtWeekend_;
     int dayAvgRestTime = INVALID_TIME_POINT;
     int passDays = totalPassTime / SECOND_OF_ONE_DAY;
     if (passDays != INVALID_TIME_POINT) {
@@ -223,7 +231,7 @@ bool WifiHistoryRecordManager::CheckIsHomeAp()
 
     double restTimeRate = 0.0;
     double homeTimeFloat = static_cast<double>(homeTime);
-    double totalUseTimeFloat = static_cast<double>(connectedApInfo_.totalUseTime);
+    double totalUseTimeFloat = static_cast<double>(connectedApInfo_.totalUseTime_);
     if (!IsFloatEqual(totalUseTimeFloat, INVALID_TIME_POINT)) {
         restTimeRate = std::round((homeTimeFloat / totalUseTimeFloat) * TO_KEEP_TWO_DECIMAL) / TO_KEEP_TWO_DECIMAL;
     }
@@ -233,8 +241,7 @@ bool WifiHistoryRecordManager::CheckIsHomeAp()
     // 2.The duration of night and weekend use should account for more than 50% of the total usage time
     // 3.On average, it takes 30 minutes to use at night and 30 minutes on weekends
     bool ret = false;
-    const int tenDay = 10;
-    if ((connectedApInfo_.totalUseTime > SECOND_OF_ONE_HOUR * tenDay) && (restTimeRate > HOME_AP_MIN_TIME_RATE) &&
+    if ((connectedApInfo_.totalUseTime_ > SECOND_OF_ONE_HOUR * TEN_DAY) && (restTimeRate > HOME_AP_MIN_TIME_RATE) &&
         (dayAvgRestTime >= SECOND_OF_HALF_HOUR)) {
         ret = true;
     }
@@ -242,24 +249,24 @@ bool WifiHistoryRecordManager::CheckIsHomeAp()
         "dayAvgRestTime=%{public}d s, totalUseTimeAtNight=%{public}" PRId64"s, "
         "totalUseTimeAtWeekend=%{public}" PRId64"s, currenttStaticTimePoint=%{public}" PRId64", "
         "firstConnectedTime=%{public}" PRId64,
-        __func__, ret, connectedApInfo_.totalUseTime, restTimeRate, dayAvgRestTime,
-        connectedApInfo_.totalUseTimeAtNight, connectedApInfo_.totalUseTimeAtWeekend,
-        connectedApInfo_.currenttStaticTimePoint, connectedApInfo_.firstConnectedTime);
+        __func__, ret, connectedApInfo_.totalUseTime_, restTimeRate, dayAvgRestTime,
+        connectedApInfo_.totalUseTimeAtNight_, connectedApInfo_.totalUseTimeAtWeekend_,
+        connectedApInfo_.currenttStaticTimePoint_, connectedApInfo_.firstConnectedTime_);
     return ret;
 }
 
 void WifiHistoryRecordManager::HomeApJudgeProcess()
 {
     if (CheckIsHomeAp()) {
-        if (connectedApInfo_.markedAsHomeApTime == INVALID_TIME_POINT) {
-            connectedApInfo_.markedAsHomeApTime = std::time(nullptr);
+        if (connectedApInfo_.markedAsHomeApTime_ == INVALID_TIME_POINT) {
+            connectedApInfo_.markedAsHomeApTime_ = GetCurrentTimeSeconds();
             WIFI_LOGI("%{public}s, set homeAp flag", __func__);
         }
     } else {
-        if (connectedApInfo_.markedAsHomeApTime != INVALID_TIME_POINT) {
+        if (connectedApInfo_.markedAsHomeApTime_ != INVALID_TIME_POINT) {
             WIFI_LOGI("%{public}s, remove homeAp flag", __func__);
         }
-        connectedApInfo_.markedAsHomeApTime = INVALID_TIME_POINT;
+        connectedApInfo_.markedAsHomeApTime_ = INVALID_TIME_POINT;
     }
     AddOrUpdateApInfoRecord();
 }
@@ -270,26 +277,26 @@ void WifiHistoryRecordManager::UpdateConnectionTime(bool isNeedNext)
 
     if (!IsAbnormalTimeRecords()) {
         // After caching the last statistics time, refresh the current round of statistics time point
-        int lastRecordDayInWeek = connectedApInfo_.currentRecordDayInWeek;
-        int64_t lastSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
-            connectedApInfo_.currentRecordMinute * SECOND_OF_ONE_MINUTE +
-            connectedApInfo_.currentRecordSecond;
+        int lastRecordDayInWeek = connectedApInfo_.currentRecordDayInWeek_;
+        int64_t lastSecondsOfDay = connectedApInfo_.currentRecordHour_ * SECOND_OF_ONE_HOUR +
+            connectedApInfo_.currentRecordMinute_ * SECOND_OF_ONE_MINUTE +
+            connectedApInfo_.currentRecordSecond_;
 
-        std::time_t currentTime = std::time(nullptr);
+        int64_t currentTime = GetCurrentTimeSeconds();
         WIFI_LOGI("%{public}s start, last=%{public}" PRId64", current=%{public}" PRId64,
-            __func__, connectedApInfo_.currenttStaticTimePoint, currentTime);
+            __func__, connectedApInfo_.currenttStaticTimePoint_, currentTime);
         UpdateStaticTimePoint(currentTime);
-        int64_t currentSecondsOfDay = connectedApInfo_.currentRecordHour * SECOND_OF_ONE_HOUR +
-            connectedApInfo_.currentRecordMinute * SECOND_OF_ONE_MINUTE +
-            connectedApInfo_.currentRecordSecond;
+        int64_t currentSecondsOfDay = connectedApInfo_.currentRecordHour_ * SECOND_OF_ONE_HOUR +
+            connectedApInfo_.currentRecordMinute_ * SECOND_OF_ONE_MINUTE +
+            connectedApInfo_.currentRecordSecond_;
 
         // Determine whether the statistical cycle spans 0 o'clock
-        if (connectedApInfo_.currentRecordDayInWeek != lastRecordDayInWeek) {
+        if (connectedApInfo_.currentRecordDayInWeek_ != lastRecordDayInWeek) {
             StaticDurationInNightAndWeekend(lastRecordDayInWeek, lastSecondsOfDay, END_SECONDS_OF_DAY);  // First day
-            StaticDurationInNightAndWeekend(connectedApInfo_.currentRecordDayInWeek,
+            StaticDurationInNightAndWeekend(connectedApInfo_.currentRecordDayInWeek_,
                 START_SECOND_OF_DAY, currentSecondsOfDay);  // Second day
         } else {
-            StaticDurationInNightAndWeekend(connectedApInfo_.currentRecordDayInWeek,
+            StaticDurationInNightAndWeekend(connectedApInfo_.currentRecordDayInWeek_,
                 lastSecondsOfDay, currentSecondsOfDay);
         }
         HomeApJudgeProcess();
@@ -302,59 +309,68 @@ void WifiHistoryRecordManager::UpdateConnectionTime(bool isNeedNext)
 bool WifiHistoryRecordManager::IsAbnormalTimeRecords()
 {
     bool ret = false;
-    std::time_t currentTime = std::time(nullptr);
-    int64_t statisticalTimeInterval = currentTime - connectedApInfo_.currenttStaticTimePoint;
-    if (connectedApInfo_.currenttStaticTimePoint == INVALID_TIME_POINT) {  // Maybe just connected
+    int64_t currentTime = GetCurrentTimeSeconds();
+    int64_t statisticalTimeInterval = currentTime - connectedApInfo_.currenttStaticTimePoint_;
+    if (connectedApInfo_.currenttStaticTimePoint_ == INVALID_TIME_POINT) {  // Maybe just connected
         WIFI_LOGI("%{public}s, currenttStaticTimePoint is zero, skip this round of statistics", __func__);
         UpdateStaticTimePoint(currentTime);
         ret = true;
-    } else if (currentTime < connectedApInfo_.firstConnectedTime) {
+    } else if (currentTime < connectedApInfo_.firstConnectedTime_) {
         WIFI_LOGE("%{public}s, currentTime time is less than firstConnectedTime time, "
             "reset to zero and recalculate, currentTime=%{public}" PRId64"s, firstConnectedTime=%{public}" PRId64"s",
-            __func__, currentTime, connectedApInfo_.firstConnectedTime);
-        connectedApInfo_.firstConnectedTime = currentTime;
-        connectedApInfo_.currentConnectedTime = currentTime;
-        connectedApInfo_.totalUseTime = INVALID_TIME_POINT;
-        connectedApInfo_.totalUseTimeAtNight = INVALID_TIME_POINT;
-        connectedApInfo_.totalUseTimeAtWeekend = INVALID_TIME_POINT;
-        connectedApInfo_.markedAsHomeApTime = INVALID_TIME_POINT;
+            __func__, currentTime, connectedApInfo_.firstConnectedTime_);
+        connectedApInfo_.firstConnectedTime_ = currentTime;
+        connectedApInfo_.currentConnectedTime_ = currentTime;
+        connectedApInfo_.totalUseTime_ = INVALID_TIME_POINT;
+        connectedApInfo_.totalUseTimeAtNight_ = INVALID_TIME_POINT;
+        connectedApInfo_.totalUseTimeAtWeekend_ = INVALID_TIME_POINT;
+        connectedApInfo_.markedAsHomeApTime_ = INVALID_TIME_POINT;
         UpdateStaticTimePoint(currentTime);
         ret = true;
     } else if (statisticalTimeInterval >= SECOND_OF_ONE_DAY || statisticalTimeInterval < 0) {
         WIFI_LOGE("%{public}s, statisticalTimeInterval is greater than 1 day or less than 0, "
             "last=%{public}" PRId64"s, current=%{public}" PRId64"s",
-            __func__, connectedApInfo_.currenttStaticTimePoint, currentTime);
+            __func__, connectedApInfo_.currenttStaticTimePoint_, currentTime);
         UpdateStaticTimePoint(currentTime);
         ret = true;
     }
     return ret;
 }
 
-void WifiHistoryRecordManager::UpdateStaticTimePoint(const std::time_t &currentTime)
+void WifiHistoryRecordManager::UpdateStaticTimePoint(const int64_t &currentTimeInt)
 {
+    std::time_t currentTime;
+    if (std::numeric_limits<std::time_t>::is_signed &&
+        currentTimeInt > static_cast<uint64_t>(std::numeric_limits<std::time_t>::max())) {
+        auto now = std::chrono::system_clock::now();
+        auto nowMs = std::chrono::time_point_cast<std::chrono::seconds>(now);
+        currentTime = nowMs.time_since_epoch().count();
+    } else {
+        currentTime = static_cast<std::time_t>(currentTimeInt);
+    }
     std::tm* localTime = std::localtime(&currentTime);
-    connectedApInfo_.currenttStaticTimePoint = currentTime;
-    connectedApInfo_.currentRecordDayInWeek = localTime->tm_wday;
-    connectedApInfo_.currentRecordHour = localTime->tm_hour;
-    connectedApInfo_.currentRecordMinute = localTime->tm_min;
-    connectedApInfo_.currentRecordSecond = localTime->tm_sec;
+    connectedApInfo_.currenttStaticTimePoint_ = currentTime;
+    connectedApInfo_.currentRecordDayInWeek_ = localTime->tm_wday;
+    connectedApInfo_.currentRecordHour_ = localTime->tm_hour;
+    connectedApInfo_.currentRecordMinute_ = localTime->tm_min;
+    connectedApInfo_.currentRecordSecond_ = localTime->tm_sec;
 }
 
-void WifiHistoryRecordManager::StaticDurationInNightAndWeekend(int day, int startTime, int endTime)
+void WifiHistoryRecordManager::StaticDurationInNightAndWeekend(int day, int64_t startTime, int64_t endTime)
 {
     // A week starts on Sunday(0) and ends on Saturday(6)
     if (startTime >= endTime || startTime < 0 || endTime > END_SECONDS_OF_DAY ||
         (day > DAY_VALUE_SATURDAY_CALENDAR || day < DAY_VALUE_SUNDAY_CALENDAR)) {
-        WIFI_LOGE("static duration invalid, day=%{public}d, startTime=%{public}d, endTime=%{public}d",
+        WIFI_LOGE("static duration invalid, day=%{public}d, startTime=%{public}" PRId64", endTime=%{public}" PRId64,
             day, startTime, endTime);
         return;
     }
-    connectedApInfo_.totalUseTime += endTime - startTime;
+    connectedApInfo_.totalUseTime_ += endTime - startTime;
 
     // Statistics weekend time, including nighttime time
     if (day == DAY_VALUE_SUNDAY_CALENDAR || day == DAY_VALUE_SATURDAY_CALENDAR) {
-        connectedApInfo_.totalUseTimeAtWeekend += endTime - startTime;
-        WIFI_LOGI("add %{public}d seconds to the weekend usage time", endTime - startTime);
+        connectedApInfo_.totalUseTimeAtWeekend_ += endTime - startTime;
+        WIFI_LOGI("add %{public}" PRId64" seconds to the weekend usage time", endTime - startTime);
         return;
     }
 
@@ -364,7 +380,7 @@ void WifiHistoryRecordManager::StaticDurationInNightAndWeekend(int day, int star
     }
 
     // Statistics of nighttime, from 20:00 to 7:00
-    int restTime = INVALID_TIME_POINT;
+    int64_t restTime = INVALID_TIME_POINT;
     if (startTime < REST_TIME_END_PAST_SECONDS) {  // StartTime < 7:00
         if (endTime < REST_TIME_END_PAST_SECONDS) {  // EndTime < 7:00
             restTime += endTime - startTime;
@@ -380,20 +396,20 @@ void WifiHistoryRecordManager::StaticDurationInNightAndWeekend(int day, int star
     } else if (startTime >= REST_TIME_BEGIN_PAST_SECONDS) {  // StartTime >= 20:00 && endTime < 24:00
         restTime += endTime - startTime;
     }
-    connectedApInfo_.totalUseTimeAtNight += restTime;
-    WIFI_LOGI("add %{public}d seconds to the nighttime usage time", restTime);
+    connectedApInfo_.totalUseTimeAtNight_ += restTime;
+    WIFI_LOGI("add %{public}" PRId64" seconds to the nighttime usage time", restTime);
 }
 
 void WifiHistoryRecordManager::AddOrUpdateApInfoRecord()
 {
     std::lock_guard<std::recursive_mutex> lock(updateApInfoMutex_);
-    if (connectedApInfo_.ssid.empty() || wifiDataBaseUtils_ == nullptr) {
+    if (connectedApInfo_.ssid_.empty() || wifiDataBaseUtils_ == nullptr) {
         WIFI_LOGE("AddOrUpdateApInfoRecord fail, wifiDataBaseUtils_ is nullptr or not connected, ssid=%{public}s",
-            SsidAnonymize(connectedApInfo_.ssid).c_str());
+            SsidAnonymize(connectedApInfo_.ssid_).c_str());
         return;
     }
     ConnectedApInfo dbApInfo;
-    int queryRet = QueryApInfoRecordByBssid(connectedApInfo_.bssid, dbApInfo);
+    int queryRet = QueryApInfoRecordByBssid(connectedApInfo_.bssid_, dbApInfo);
     if (queryRet == QUERY_NO_RECORD) {
         bool executeRet = wifiDataBaseUtils_->Insert(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
             CreateApInfoBucket(connectedApInfo_));
@@ -401,8 +417,8 @@ void WifiHistoryRecordManager::AddOrUpdateApInfoRecord()
         return;
     } else if (queryRet == QUERY_HAS_RECORD) {
         NativeRdb::AbsRdbPredicates predicates(AP_CONNECTION_DURATION_INFO_TABLE_NAME);
-        predicates.EqualTo(SSID, connectedApInfo_.ssid);
-        predicates.EqualTo(BSSID, connectedApInfo_.bssid);
+        predicates.EqualTo(SSID, connectedApInfo_.ssid_);
+        predicates.EqualTo(BSSID, connectedApInfo_.bssid_);
         NativeRdb::ValuesBucket values = CreateApInfoBucket(connectedApInfo_);
         bool executeRet = wifiDataBaseUtils_->Update(values, predicates);
         WIFI_LOGI("update ap info, ret=%{public}d", executeRet);
@@ -449,19 +465,19 @@ int WifiHistoryRecordManager::QueryApInfoRecordByBssid(const std::string &bssid,
         return QUERY_NO_RECORD;
     }
     int32_t columnCnt = 0;
-    resultSet->GetInt(columnCnt++, dbApInfo.networkId);
-    resultSet->GetString(columnCnt++, dbApInfo.ssid);
-    resultSet->GetString(columnCnt++, dbApInfo.bssid);
-    resultSet->GetString(columnCnt++, dbApInfo.keyMgmt);
-    resultSet->GetLong(columnCnt++, dbApInfo.firstConnectedTime);
-    resultSet->GetLong(columnCnt++, dbApInfo.currentConnectedTime);
-    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTime);
-    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtNight);
-    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtWeekend);
-    resultSet->GetLong(columnCnt++, dbApInfo.markedAsHomeApTime);
+    resultSet->GetInt(columnCnt++, dbApInfo.networkId_);
+    resultSet->GetString(columnCnt++, dbApInfo.ssid_);
+    resultSet->GetString(columnCnt++, dbApInfo.bssid_);
+    resultSet->GetString(columnCnt++, dbApInfo.keyMgmt_);
+    resultSet->GetLong(columnCnt++, dbApInfo.firstConnectedTime_);
+    resultSet->GetLong(columnCnt++, dbApInfo.currentConnectedTime_);
+    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTime_);
+    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtNight_);
+    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtWeekend_);
+    resultSet->GetLong(columnCnt++, dbApInfo.markedAsHomeApTime_);
     resultSet->Close();
     WIFI_LOGI("%{public}s success, ssid=%{public}s, bssid=%{public}s",
-        __func__, SsidAnonymize(dbApInfo.ssid).c_str(), MacAnonymize(dbApInfo.bssid).c_str());
+        __func__, SsidAnonymize(dbApInfo.ssid_).c_str(), MacAnonymize(dbApInfo.bssid_).c_str());
     return QUERY_HAS_RECORD;
 }
 
@@ -489,16 +505,16 @@ int WifiHistoryRecordManager::QueryAllApInfoRecord(std::vector<ConnectedApInfo> 
     do {
         int32_t columnCnt = 0;
         ConnectedApInfo dbApInfo;
-        resultSet->GetInt(columnCnt++, dbApInfo.networkId);
-        resultSet->GetString(columnCnt++, dbApInfo.ssid);
-        resultSet->GetString(columnCnt++, dbApInfo.bssid);
-        resultSet->GetString(columnCnt++, dbApInfo.keyMgmt);
-        resultSet->GetLong(columnCnt++, dbApInfo.firstConnectedTime);
-        resultSet->GetLong(columnCnt++, dbApInfo.currentConnectedTime);
-        resultSet->GetLong(columnCnt++, dbApInfo.totalUseTime);
-        resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtNight);
-        resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtWeekend);
-        resultSet->GetLong(columnCnt++, dbApInfo.markedAsHomeApTime);
+        resultSet->GetInt(columnCnt++, dbApInfo.networkId_);
+        resultSet->GetString(columnCnt++, dbApInfo.ssid_);
+        resultSet->GetString(columnCnt++, dbApInfo.bssid_);
+        resultSet->GetString(columnCnt++, dbApInfo.keyMgmt_);
+        resultSet->GetLong(columnCnt++, dbApInfo.firstConnectedTime_);
+        resultSet->GetLong(columnCnt++, dbApInfo.currentConnectedTime_);
+        resultSet->GetLong(columnCnt++, dbApInfo.totalUseTime_);
+        resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtNight_);
+        resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtWeekend_);
+        resultSet->GetLong(columnCnt++, dbApInfo.markedAsHomeApTime_);
         dbApInfoVector.push_back(dbApInfo);
     } while (resultSet->GoToNextRow() == NativeRdb::E_OK);
     resultSet->Close();
@@ -508,25 +524,25 @@ int WifiHistoryRecordManager::QueryAllApInfoRecord(std::vector<ConnectedApInfo> 
 NativeRdb::ValuesBucket WifiHistoryRecordManager::CreateApInfoBucket(const ConnectedApInfo &apInfo)
 {
     NativeRdb::ValuesBucket apInfoBucket;
-    apInfoBucket.PutInt(NETWORK_ID, apInfo.networkId);
-    apInfoBucket.PutString(SSID, apInfo.ssid);
-    apInfoBucket.PutString(BSSID, apInfo.bssid);
-    apInfoBucket.PutString(KEY_MGMT, apInfo.keyMgmt);
-    apInfoBucket.PutLong(FIRST_CONNECTED_TIME, apInfo.firstConnectedTime);
-    apInfoBucket.PutLong(CURRENT_CONNECTED_TIME, apInfo.currentConnectedTime);
-    apInfoBucket.PutLong(TOTAL_USE_TIME, apInfo.totalUseTime);
-    apInfoBucket.PutLong(TOTAL_USE_TIME_AT_NIGHT, apInfo.totalUseTimeAtNight);
-    apInfoBucket.PutLong(TOTAL_USE_TIME_AT_WEEKEND, apInfo.totalUseTimeAtWeekend);
-    apInfoBucket.PutLong(MARKED_AS_HOME_AP_TIME, apInfo.markedAsHomeApTime);
+    apInfoBucket.PutInt(NETWORK_ID, apInfo.networkId_);
+    apInfoBucket.PutString(SSID, apInfo.ssid_);
+    apInfoBucket.PutString(BSSID, apInfo.bssid_);
+    apInfoBucket.PutString(KEY_MGMT, apInfo.keyMgmt_);
+    apInfoBucket.PutLong(FIRST_CONNECTED_TIME, apInfo.firstConnectedTime_);
+    apInfoBucket.PutLong(CURRENT_CONNECTED_TIME, apInfo.currentConnectedTime_);
+    apInfoBucket.PutLong(TOTAL_USE_TIME, apInfo.totalUseTime_);
+    apInfoBucket.PutLong(TOTAL_USE_TIME_AT_NIGHT, apInfo.totalUseTimeAtNight_);
+    apInfoBucket.PutLong(TOTAL_USE_TIME_AT_WEEKEND, apInfo.totalUseTimeAtWeekend_);
+    apInfoBucket.PutLong(MARKED_AS_HOME_AP_TIME, apInfo.markedAsHomeApTime_);
     return apInfoBucket;
 }
 
 bool WifiHistoryRecordManager::IsHomeAp(const std::string &bssid)
 {
-    if (connectedApInfo_.bssid.empty() || bssid.empty() || connectedApInfo_.bssid != bssid) {
+    if (connectedApInfo_.bssid_.empty() || bssid.empty() || connectedApInfo_.bssid_ != bssid) {
         return false;
     }
-    return connectedApInfo_.markedAsHomeApTime != INVALID_TIME_POINT;
+    return connectedApInfo_.markedAsHomeApTime_ != INVALID_TIME_POINT;
 }
 
 bool WifiHistoryRecordManager::IsHomeRouter(const std::string &portalUrl)
@@ -540,6 +556,8 @@ bool WifiHistoryRecordManager::IsHomeRouter(const std::string &portalUrl)
         WIFI_LOGE("%{public}s, GetPackageInfoMap failed", __func__);
         return false;
     }
+
+    // Obtain the portal redirection address from the XML file
     std::vector<PackageInfo> homeRouterList = packageInfoMap["HOME_ROUTER_REDIRECTED_URL"];
     std::regex reg(portalUrl);
     for (const PackageInfo &info : homeRouterList) {
@@ -554,22 +572,22 @@ bool WifiHistoryRecordManager::IsHomeRouter(const std::string &portalUrl)
 
 void WifiHistoryRecordManager::ClearConnectedApInfo()
 {
-    connectedApInfo_.networkId = INVALID_NETWORK_ID;
-    connectedApInfo_.ssid = "";
-    connectedApInfo_.bssid = "";
-    connectedApInfo_.keyMgmt = "";
-    connectedApInfo_.firstConnectedTime = INVALID_TIME_POINT;
-    connectedApInfo_.currentConnectedTime = INVALID_TIME_POINT;
-    connectedApInfo_.totalUseTime = INVALID_TIME_POINT;
-    connectedApInfo_.totalUseTimeAtNight = INVALID_TIME_POINT;
-    connectedApInfo_.totalUseTimeAtWeekend = INVALID_TIME_POINT;
-    connectedApInfo_.markedAsHomeApTime = INVALID_TIME_POINT;
+    connectedApInfo_.networkId_ = INVALID_NETWORK_ID;
+    connectedApInfo_.ssid_ = "";
+    connectedApInfo_.bssid_ = "";
+    connectedApInfo_.keyMgmt_ = "";
+    connectedApInfo_.firstConnectedTime_ = INVALID_TIME_POINT;
+    connectedApInfo_.currentConnectedTime_ = INVALID_TIME_POINT;
+    connectedApInfo_.totalUseTime_ = INVALID_TIME_POINT;
+    connectedApInfo_.totalUseTimeAtNight_ = INVALID_TIME_POINT;
+    connectedApInfo_.totalUseTimeAtWeekend_ = INVALID_TIME_POINT;
+    connectedApInfo_.markedAsHomeApTime_ = INVALID_TIME_POINT;
 
-    connectedApInfo_.currenttStaticTimePoint = INVALID_TIME_POINT;
-    connectedApInfo_.currentRecordDayInWeek = INVALID_TIME_POINT;
-    connectedApInfo_.currentRecordHour = INVALID_TIME_POINT;
-    connectedApInfo_.currentRecordMinute = INVALID_TIME_POINT;
-    connectedApInfo_.currentRecordSecond = INVALID_TIME_POINT;
+    connectedApInfo_.currenttStaticTimePoint_ = INVALID_TIME_POINT;
+    connectedApInfo_.currentRecordDayInWeek_ = INVALID_TIME_POINT;
+    connectedApInfo_.currentRecordHour_ = INVALID_TIME_POINT;
+    connectedApInfo_.currentRecordMinute_ = INVALID_TIME_POINT;
+    connectedApInfo_.currentRecordSecond_ = INVALID_TIME_POINT;
 }
 
 void WifiHistoryRecordManager::DeleteAllApInfo()
@@ -582,7 +600,7 @@ void WifiHistoryRecordManager::DeleteAllApInfo()
     }
     WIFI_LOGE("%{public}s", __func__);
     for (const ConnectedApInfo &item : dbApInfoVector) {
-        RemoveApInfoRecord(item.bssid);
+        RemoveApInfoRecord(item.bssid_);
     }
 }
 

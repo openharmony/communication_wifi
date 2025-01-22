@@ -404,7 +404,6 @@ void WifiScanConfig::CleanWifiCategoryRecord()
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     mWifiCategoryRecord.clear();
-    std::vector<WifiScanInfo>().swap(mWifiScanInfoList);
 }
 
 void WifiScanConfig::RemoveWifiCategoryRecord(const std::string bssid)

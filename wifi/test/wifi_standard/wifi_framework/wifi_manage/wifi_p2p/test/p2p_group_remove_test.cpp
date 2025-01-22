@@ -36,7 +36,6 @@ public:
     {}
     virtual void SetUp()
     {
-        LOG_SetCallback(P2pGroupRemoveStateCallback);
         pMockP2pPendant.reset(new MockP2pPendant());
         p2pGroupRemoveState.reset(new P2pGroupRemoveState());
     }

@@ -31,6 +31,8 @@ int g_bigDataRecvLen = 0;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
     sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());
+static sptr<WifiInternalCallback> g_InternalCallback =
+    sptr<WifiInternalCallback>(new (std::nothrow) WifiInternalCallback());
 
 WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiDevice>(impl),
     remote_(nullptr), mRemoteDied(false), deathRecipient_(nullptr)
@@ -51,6 +53,7 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
         }
         remote_ = impl;
         WIFI_LOGD("AddDeathRecipient success! ");
+        InitWifiState();
     }
 }
 
@@ -58,6 +61,44 @@ WifiDeviceProxy::~WifiDeviceProxy()
 {
     WIFI_LOGD("enter ~WifiDeviceProxy!");
     RemoveDeathRecipient();
+}
+
+void WifiDeviceProxy::InitWifiState()
+{
+    auto callBack = sptr<IWifiDeviceCallBack>(new WifiInternalCallback());
+    const std::vector<std::string> event = {EVENT_STA_POWER_STATE_CHANGE};
+    RegisterCallBack(callBack, event);
+
+    f (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), data, reply,
+        option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), error);
+        return;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return;
+    }
+
+    bActive = reply.ReadBool();
+    g_deviceCallBackStub->SetWifiState(bActive);
+    return;
 }
 
 void WifiDeviceProxy::RemoveDeathRecipient(void)
@@ -1119,6 +1160,10 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
+    if (g_deviceCallBackStub->GetWifiState() != DEFAULT_VALUES) {
+        bActive = g_deviceCallBackStub->GetWifiState();
+        return WIFI_OPT_SUCCESS;
+    }
     MessageOption option;
     MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
@@ -1143,6 +1188,7 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
     }
 
     bActive = reply.ReadBool();
+    g_deviceCallBackStub->SetWifiState(bActive);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1500,6 +1546,13 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
     }
     g_deviceCallBackStub->RegisterUserCallBack(callback);
 
+    std::vector<std::string> trace;
+    std::copy(event.begin(), event.end(), std::back_inserter(trace));
+    auto it = std::find(trace.begin(), trace.end(), EVENT_STA_POWER_STATE_CHANGE);
+    if (it == trace.end()) {
+        trace.push_back(EVENT_STA_POWER_STATE_CHANGE);
+    }
+
     if (!data.WriteRemoteObject(g_deviceCallBackStub->AsObject())) {
         WIFI_LOGE("WifiDeviceProxy::RegisterCallBack WriteRemoteObject failed!");
         return WIFI_OPT_FAILED;
@@ -1509,10 +1562,10 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
     data.WriteInt32(pid);
     int tokenId = GetCallingTokenId();
     data.WriteInt32(tokenId);
-    int eventNum = static_cast<int>(event.size());
+    int eventNum = static_cast<int>(trace.size());
     data.WriteInt32(eventNum);
     if (eventNum > 0) {
-        for (auto &eventName : event) {
+        for (auto &eventName : trace) {
             data.WriteString(eventName);
         }
     }
@@ -2673,6 +2726,36 @@ ErrCode WifiDeviceProxy::GetVoWifiDetectPeriod(int &period)
     }
     period = reply.ReadInt32();
     return WIFI_OPT_SUCCESS;
+}
+
+void WifiInternalCallback::OnWifiStateChanged(int state)
+{
+    WIFI_LOGI("WifiInternalCallback::OnWifiStateChanged, state %{public}d", state);
+    if (state == static_cast<int>(WifiState::ENABLED)) {
+        g_deviceCallBackStub->SetWifiState(true);
+    } else {
+        g_deviceCallBackStub->SetWifiState(false);
+    }
+}
+
+void WifiInternalCallback::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
+{
+}
+
+void WifiInternalCallback::OnWifiRssiChanged(int rssi)
+{
+}
+
+void WifiInternalCallback::OnWifiWpsStateChanged(int state, const std::string &pinCode)
+{
+}
+
+void WifiInternalCallback::OnStreamChanged(int direction)
+{
+}
+
+void WifiInternalCallback::OnDeviceConfigChanged(ConfigChange value)
+{
 }
 
 }  // namespace Wifi

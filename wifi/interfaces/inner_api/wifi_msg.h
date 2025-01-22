@@ -135,7 +135,7 @@ enum ConnState {
     UNKNOWN
 };
 
-enum class MloState {
+enum MloState:uint8_t {
     WIFI7_LEGACY = 0,
     WIFI7_SINGLE_LINK = 1,
     WIFI7_MLSR = 2,

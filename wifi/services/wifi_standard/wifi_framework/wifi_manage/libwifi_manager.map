@@ -98,6 +98,12 @@
         "OHOS::Wifi::WifiConfigCenter::ClearLocalHid2dInfo(int)";
         "OHOS::Wifi::WifiConfigCenter::SetP2pEnhanceState(int)";
         "OHOS::Wifi::WifiConfigCenter::GetP2pEnhanceState()";
+        "OHOS::Wifi::WifiConfigCenter::SetLastConnStaFreq(int)";
+        "OHOS::Wifi::WifiConfigCenter::GetLastConnStaFreq()";
+        "OHOS::Wifi::WifiConfigCenter::SetP2pEnhanceActionListenChannel(int)";
+        "OHOS::Wifi::WifiConfigCenter::GetP2pEnhanceActionListenChannel()";
+        "OHOS::Wifi::WifiConfigCenter::SetP2pEnhanceFreq(int)";
+        "OHOS::Wifi::WifiConfigCenter::GetP2pEnhanceFreq()";
         "OHOS::Wifi::WifiConfigCenter::GetP2pMidState()";
         "OHOS::Wifi::WifiConfigCenter::SetP2pMidState(OHOS::Wifi::WifiOprMidState, OHOS::Wifi::WifiOprMidState)";
         "OHOS::Wifi::WifiConfigCenter::SetP2pMidState(OHOS::Wifi::WifiOprMidState)";
@@ -394,6 +400,8 @@
         "OHOS::Wifi::WifiSettings::SetP2pDeviceName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiConfigCenter::SetP2pBusinessType(OHOS::Wifi::P2pBusinessType const&)";
         "OHOS::Wifi::HexStringToVec(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<char, std::__h::allocator<char>>&)";
+        "OHOS::Wifi::HalDeviceManager::GetInstance()";
+        "OHOS::Wifi::HalDeviceManager::GetFrequenciesByBand(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, std::__h::vector<int, std::__h::allocator<int>>&)";
         "OHOS::Wifi::WifiSettings::GetCandidateConfigWithoutUid(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Wifi::WifiDeviceConfig&)"; 
         "OHOS::Wifi::WifiCodeConvertUtil::Utf8ToGbk(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "vtable for OHOS::Wifi::NetworkXmlParser";

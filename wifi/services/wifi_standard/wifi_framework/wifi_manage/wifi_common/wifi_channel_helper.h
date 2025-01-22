@@ -52,6 +52,8 @@ public:
 
     BandType TransformChannelToBand(int channel);
 
+    bool IsValidFreq(int freq);
+
     bool IsValid5GHz(int freq);
 
     bool IsValid24GHz(int freq);

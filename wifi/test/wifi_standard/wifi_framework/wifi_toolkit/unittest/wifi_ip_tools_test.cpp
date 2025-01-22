@@ -31,7 +31,7 @@ HWTEST_F(WifiIpToolsTest, ConvertIpv4AddressTest, TestSize.Level1)
     EXPECT_TRUE(IpTools::ConvertIpv4Address("192:168:0:1") == 0);
     EXPECT_TRUE(IpTools::ConvertIpv4Address("192.168:0.1") == 0);
     EXPECT_TRUE(IpTools::ConvertIpv4Address("289.168.0.1") == 0);
-    EXPECT_TRUE(IpTools::ConvertIpv4Address("-1.168.0.1") == 0);
+    EXPECT_FALSE(IpTools::ConvertIpv4Address("-1.168.0.1") == 0);
     EXPECT_TRUE(IpTools::ConvertIpv4Address("192.168.0.289") == 0);
     EXPECT_TRUE(IpTools::ConvertIpv4Address("192.168.0.-1") == 0);
     EXPECT_TRUE(IpTools::ConvertIpv4Address("192.168.0.1") == 0xc0a80001);

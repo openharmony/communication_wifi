@@ -120,7 +120,8 @@ enum class ScanLimitType {
     MOVING_FREEZE,
     ABNORMAL_APP,
     CANNOT_SWITCH_AP,
-    STA_STATE
+    STA_STATE,
+    ACTION_LISTEN
 };
 }  // namespace Wifi
 }  // namespace OHOS

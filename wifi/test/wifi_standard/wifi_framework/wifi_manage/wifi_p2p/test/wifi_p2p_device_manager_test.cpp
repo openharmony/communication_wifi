@@ -22,7 +22,6 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-static std::string g_errLog;
 static std::string g_errLog = "wifitest";
 class WifiP2pDeviceManagerTest : public testing::Test {
 public:
@@ -49,7 +48,6 @@ public:
         device2.SetP2pDeviceStatus(P2pDeviceStatus::PDS_UNAVAILABLE);
         device2.SetPrimaryDeviceType("Test2 Type");
         device2.SetWpsConfigMethod(static_cast<int>(WpsConfigMethod::WPS_CFG_INVALID));
-        LOG_SetCallback(WifiP2pDLogCallback);
     };
     virtual void TearDown()
     {

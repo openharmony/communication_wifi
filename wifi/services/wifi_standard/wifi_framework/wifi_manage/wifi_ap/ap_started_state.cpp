@@ -38,10 +38,8 @@
 #include "wifi_cmd_client.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_randommac_helper.h"
-#ifdef HAS_BATTERY_MANAGER_PART
-#include "battery_srv_client.h"
+#include "wifi_battery_utils.h"
 #define SET_DUAL_ANTENNAS 45
-#endif
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
 namespace OHOS {
@@ -172,15 +170,13 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         WIFI_LOGE("set hostapd config failed.");
         return false;
     }
-#ifdef HAS_BATTERY_MANAGER_PART
-    if (PowerMgr::BatterySrvClient::GetInstance().GetCapacity() > SET_DUAL_ANTENNAS) {
+    if (BatteryUtils::GetInstance().GetBatteryCapacity() > SET_DUAL_ANTENNAS) {
         HotspotConfig hotspotConfig;
         WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
         if (hotspotConfig.GetBand() == BandType::BAND_2GHZ) {
             WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_SOFTAP_2G_MSS, CMD_SET_SOFTAP_MIMOMODE);
         }
     }
-#endif
     WifiApHalInterface::GetInstance().SetMaxConnectNum(ifName, apConfig.GetChannel(), apConfig.GetMaxConn());
     if (WifiApHalInterface::GetInstance().EnableAp(m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Enableap failed.");

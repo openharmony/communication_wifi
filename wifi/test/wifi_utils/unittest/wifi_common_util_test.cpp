@@ -238,7 +238,7 @@ HWTEST_F(WifiCommonUtilTest, GetCurrentTimeSecondsTest, TestSize.Level1)
 {
     WIFI_LOGI("GetCurrentTimeSecondsTest enter");
     int64_t result = GetCurrentTimeSeconds();
-    EXPECT_TURE(result != 0);
+    EXPECT_TRUE(result != 0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

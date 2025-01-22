@@ -66,12 +66,6 @@ constexpr int TO_KEEP_TWO_DECIMAL = 100;
 constexpr int INVALID_TIME_RECORD_INTERVAL = 0;
 constexpr int TEN_DAY = 10;
 
-WifiHistoryRecordManager::~WifiHistoryRecordManager()
-{
-    StopUpdateApInfoTimer();
-    ClearConnectedApInfo();
-}
-
 WifiHistoryRecordManager &WifiHistoryRecordManager::GetInstance()
 {
     static WifiHistoryRecordManager gWifiHistoryRecordManager;

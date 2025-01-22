@@ -30,7 +30,7 @@ public:
     /**
      * @Description WifiHistoryRecordManager deconstruct
      */
-    ~WifiHistoryRecordManager();
+    ~WifiHistoryRecordManager() = default;
 
     /**
      * @Description get WifiHistoryRecordManager instance

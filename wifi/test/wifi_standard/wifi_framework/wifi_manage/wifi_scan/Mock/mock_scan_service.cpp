@@ -57,6 +57,11 @@ void MockScanService::SystemScanProcess(bool scanAtOnce)
     WIFI_LOGI("Enter MockScanService::SystemScanProcess");
 }
 
+void MockScanService::SystemSingleScanProcess()
+{
+    WIFI_LOGI("Enter MockScanService::SystemSingleScanProcess");
+}
+
 void MockScanService::HandleScreenStatusChanged()
 {
     WIFI_LOGI("Enter MockScanService::HandleScreenStatusChanged");

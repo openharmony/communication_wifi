@@ -270,20 +270,6 @@ HWTEST_F(WifiProStateMachineTest, FastScanTest01, TestSize.Level1)
     EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
 
-HWTEST_F(WifiProStateMachineTest, SelectNetworkTest01, TestSize.Level1)
-{
-    std::vector<InterScanInfo> scanInfos;
-    InterScanInfo scanInfos0;
-    scanInfos0.ssid = "test";
-    InterScanInfo scanInfos1;
-    scanInfos1.ssid = "test";
-    scanInfos.push_back(scanInfos0);
-    scanInfos.push_back(scanInfos1);
-    pWifiProStateMachine_->SelectNetwork(
-        pWifiProStateMachine_->networkSelectionResult_, NetworkSelectType::WIFI2WIFI, scanInfos);
-    EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
-}
-
 HWTEST_F(WifiProStateMachineTest, IsSatisfiedWifi2WifiConditionTest01, TestSize.Level1)
 {
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;

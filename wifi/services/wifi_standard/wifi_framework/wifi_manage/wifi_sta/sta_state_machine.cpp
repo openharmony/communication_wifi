@@ -731,11 +731,11 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
     MloStateParam param = {0};
     msg->GetMessageObj(param);
 
-    CoFeatureType feature = static_cast<CoFeatureType>(param.feature);
+    uint8_t feature = param.feature;
     uint8_t state = param.state;
     uint16_t reasonCode = param.reasonCode;
     if (feature == CoFeatureType::COFEATURE_TYPE_MLO) {
-        pStaStateMachine->linkedInfo.mloState = static_cast<MloState>(state);
+        pStaStateMachine->linkedInfo.mloState = {state};
     }
     if (feature == CoFeatureType::COFEATURE_TYPE_WUR) {
         if (state == WUR_ENABLE) {
@@ -1171,6 +1171,7 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
     std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("ApLinkedState reveived network connection event,bssid:%{public}s, ignore it.\n",
         MacAnonymize(bssid).c_str());
+    pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);

@@ -1072,13 +1072,15 @@ void WifiP2pStub::OnHid2dSetUpperScene(
         scene.scene = data.ReadUint32();
         scene.fps = data.ReadInt32();
         scene.bw = data.ReadUint32();
-        ret = Hid2dSetUpperScene(ifName, scene);
-        auto now = std::chrono::system_clock::now();
+        struct timespec times = {0, 0};
+        clock_gettime(CLOCK_MONOTONIC, &times);
         if (scene.scene == 0) {
             scene.setTime = 0;
         } else {
-            scene.setTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+            scene.setTime =
+                static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
         }
+        ret = Hid2dSetUpperScene(ifName, scene);
     }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);

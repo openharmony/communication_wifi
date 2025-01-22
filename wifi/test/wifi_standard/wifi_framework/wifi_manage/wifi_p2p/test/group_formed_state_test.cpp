@@ -39,7 +39,6 @@ public:
         pGroupFormedState.reset(
             new GroupFormedState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager));
         pGroupFormedState->Init();
-        LOG_SetCallback(GroupFormedStateCallback);
     }
     virtual void TearDown()
     {

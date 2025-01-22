@@ -84,23 +84,23 @@ private:
     class ConnectedApInfo {
     public:
         // archive attribute
-        int networkId = 0;
-        std::string ssid = "";
-        std::string bssid = "";
-        std::string keyMgmt = "";
-        int64_t firstConnectedTime = 0;
-        int64_t currentConnectedTime = 0;
-        int64_t totalUseTime = 0;
-        int64_t totalUseTimeAtNight = 0;
-        int64_t totalUseTimeAtWeekend = 0;
-        int64_t markedAsHomeApTime = 0;
+        int networkId_ = 0;
+        std::string ssid_ = "";
+        std::string bssid_ = "";
+        std::string keyMgmt_ = "";
+        int64_t firstConnectedTime_ = 0;
+        int64_t currentConnectedTime_ = 0;
+        int64_t totalUseTime_ = 0;
+        int64_t totalUseTimeAtNight_ = 0;
+        int64_t totalUseTimeAtWeekend_ = 0;
+        int64_t markedAsHomeApTime_ = 0;
 
         // temporary attribute
-        int64_t currenttStaticTimePoint = 0;
-        int currentRecordDayInWeek = 0;  // record the day of the week
-        int currentRecordHour = 0;
-        int currentRecordMinute = 0;
-        int currentRecordSecond = 0;
+        int64_t currenttStaticTimePoint_ = 0;
+        int currentRecordDayInWeek_ = 0;  // record the day of the week
+        int currentRecordHour_ = 0;
+        int currentRecordMinute_ = 0;
+        int currentRecordSecond_ = 0;
     };
 
     WifiHistoryRecordManager() = default;
@@ -118,7 +118,7 @@ private:
     void UpdateConnectionTime(bool isNeedNext);
     bool IsAbnormalTimeRecords();
     void UpdateStaticTimePoint(const std::time_t &currentTime);
-    void StaticDurationInNightAndWeekend(int day, int startTime, int endTime);
+    void StaticDurationInNightAndWeekend(int day, int64_t startTime, int64_t endTime);
     void AddOrUpdateApInfoRecord();
     void RemoveApInfoRecord(const std::string &bssid);
     int QueryApInfoRecordByBssid(const std::string &bssid, ConnectedApInfo &dbApInfo);
@@ -132,7 +132,6 @@ private:
     ConnectedApInfo connectedApInfo_;
     std::recursive_mutex updateApInfoMutex_;
     std::mutex updateApInfoTimerMutex_;
-    std::mutex dealStaConnChangedMutex_;
     std::unique_ptr<WifiEventHandler> periodicUpdateApInfoThread_ = nullptr;
     int updateConnectTimeRecordInterval_ = 0;
 };

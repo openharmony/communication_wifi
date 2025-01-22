@@ -295,6 +295,14 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
     return { first, last };
 }
 
+int64_t GetCurrentTimeSeconds()
+{
+    auto now = std::chrono::system_clock::now();
+    auto nowMs = std::chrono::time_point_cast<std::chrono::seconds>(now);
+    auto value = nowMs.time_since_epoch();
+    return value.count();
+}
+
 int64_t GetElapsedMicrosecondsSinceBoot()
 {
     struct timespec times = {0, 0};

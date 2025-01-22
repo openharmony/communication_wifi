@@ -40,7 +40,6 @@ public:
         pMockMonitor = &pMockP2pPendant->GetMockP2pMonitor();
         pP2pDisabledState.reset(
             new P2pDisabledState(pMockP2pPendant->GetP2pStateMachine(), groupManager, deviceManager, serviceManager));
-            LOG_SetCallback(P2pDisabledStateCallback);
     }
     virtual void TearDown()
     {

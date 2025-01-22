@@ -14,6 +14,8 @@
  */
 
 #include "p2p_chr_reporter.h"
+
+#include <regex>
 #include "define.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
@@ -29,15 +31,31 @@ namespace Wifi {
 void P2pChrReporter::ProcessChrEvent(const std::string &notifyParam)
 {
     WIFI_LOGD("ProcessChrEvent notifyParam:%{public}s", notifyParam.c_str());
+    if (notifyParam.empty()) {
+        WIFI_LOGE("ProcessChrEvent notifyParam is empty");
+        return;
+    }
+    std::string chrEvent = notifyParam;
     size_t start = 0;
     size_t end = 0;
     std::vector<std::string> eventVector;
 
-    while ((end = notifyParam.find('_', start)) != std::string::npos) {
-        eventVector.push_back(notifyParam.substr(start, end - start));
+    chrEvent += "_";
+    std::regex pureNumber("-?\\d+");
+    while ((end = chrEvent.find('_', start)) != std::string::npos) {
+        std::string subNumber = chrEvent.substr(start, end - start);
+        if (subNumber.empty() || !std::regex_match(subNumber, pureNumber)) {
+            WIFI_LOGE("ProcessChrEvent subNumber is illegal, which is %{public}s", subNumber.c_str());
+            return;
+        }
+        eventVector.push_back(subNumber);
         start = end + 1;
     }
-    eventVector.push_back(notifyParam.substr(start));
+
+    if (eventVector.size() != INDEX_MINOR_CODE + 1) {
+        WIFI_LOGE("ProcessChrEvent number size is not right");
+        return;
+    }
 
     int eventType = CheckDataLegal(eventVector[INDEX_EVENT_TYPE]);
     int state = CheckDataLegal(eventVector[INDEX_STATE]);
@@ -60,7 +78,7 @@ void P2pChrReporter::ReportErrCodeBeforeGroupFormationSucc(int state, int errCod
 {
     if (errCode == P2P_STATUS_SUCCESS) {
         if (state == P2P_INVITATION) {
-            mWpsSuccess = true;
+            wpsSuccess_ = true;
         }
         return;
     }
@@ -69,12 +87,12 @@ void P2pChrReporter::ReportErrCodeBeforeGroupFormationSucc(int state, int errCod
 
 void P2pChrReporter::ReportP2pInterfaceStateChange(int state, int errCode, int minorCode)
 {
-    if (!mWpsSuccess && errCode != DR_TO_SWITCH_MGMT) {
-        WIFI_LOGI("mWpsSuccess:%{public}d not success", mWpsSuccess);
+    if (!wpsSuccess_ && errCode != DR_TO_SWITCH_MGMT) {
+        WIFI_LOGI("wpsSuccess_:%{public}d not success", wpsSuccess_);
         return;
     }
     if (errCode == DR_TO_SWITCH_MGMT) {
-        mWpsSuccess = true;
+        wpsSuccess_ = true;
         return;
     }
     UpdateErrorMessage(state, errCode, minorCode);
@@ -83,54 +101,54 @@ void P2pChrReporter::ReportP2pInterfaceStateChange(int state, int errCode, int m
 void P2pChrReporter::UpdateErrorMessage(int state, int errCode, int minorCode)
 {
     if (state != P2P_INTERFACE_STATE_DISCONNECTED) {
-        mLastP2pState = state;
-        mLastErrCode = errCode;
-        mLastMinorCode = minorCode;
+        lastP2pState_ = state;
+        lastErrCode_ = errCode;
+        lastMinorCode_ = minorCode;
         return;
     }
 
-    if (!IsNormalErrCode(mLastErrCode)) {
+    if (!IsNormalErrCode(lastErrCode_)) {
         return;
     }
     WIFI_LOGI("Update errCode:%{public}d, minorCode:%{public}d", errCode, minorCode);
-    mLastErrCode = errCode;
-    mLastMinorCode = minorCode;
+    lastErrCode_ = errCode;
+    lastMinorCode_ = minorCode;
 }
 
 void P2pChrReporter::UploadP2pChrErrEvent()
 {
-    if (!mWpsSuccess) {
-        WIFI_LOGI("mWpsSuccess:%{public}d not success", mWpsSuccess);
+    if (!wpsSuccess_) {
+        WIFI_LOGI("wpsSuccess_:%{public}d not success", wpsSuccess_);
         return;
     }
-    if (IsNormalErrCode(mLastErrCode)) {
+    if (IsNormalErrCode(lastErrCode_)) {
         WIFI_LOGI("Disconnected with normal error code");
         return;
     }
 
-    if (mLastP2pState == P2P_INTERFACE_STATE_COMPLETED || mLastP2pState == GC_CONNECTED) {
-        ReportP2pAbnormalDisconnect(mLastP2pState, mLastErrCode, mLastMinorCode);
+    if (lastP2pState_ == P2P_INTERFACE_STATE_COMPLETED || lastP2pState_ == GC_CONNECTED) {
+        ReportP2pAbnormalDisconnect(lastP2pState_, lastErrCode_, lastMinorCode_);
     }
-    if (mLastP2pState >= P2P_INTERFACE_STATE_SCANNING && mLastP2pState <= P2P_INTERFACE_STATE_GROUP_HANDSHAKE) {
-        ReportP2pConnectFailed(mLastP2pState, mLastErrCode, mLastMinorCode);
+    if (lastP2pState_ >= P2P_INTERFACE_STATE_SCANNING && lastP2pState_ <= P2P_INTERFACE_STATE_GROUP_HANDSHAKE) {
+        ReportP2pConnectFailed(lastP2pState_, lastErrCode_, lastMinorCode_);
     }
 }
 
 void P2pChrReporter::ResetState()
 {
     WIFI_LOGI("ResetState");
-    mWpsSuccess = false;
-    mRole = UNKNOWN_ROLE;
-    mLastP2pState = DEVICE_DISCOVERY;
-    mLastErrCode = P2P_CHR_DEFAULT_REASON_CODE;
-    mLastMinorCode = P2P_CHR_DEFAULT_REASON_CODE;
+    wpsSuccess_ = false;
+    role_ = UNKNOWN_ROLE;
+    lastP2pState_ = DEVICE_DISCOVERY;
+    lastErrCode_ = P2P_CHR_DEFAULT_REASON_CODE;
+    lastMinorCode_ = P2P_CHR_DEFAULT_REASON_CODE;
 }
 
 void P2pChrReporter::ReportP2pConnectFailed(int state, int errCode, int minorCode)
 {
     int standErrCode = GenerateStandardErrCode(P2P_SUB_SYSTEM_ID, GetP2pSpecificError(state, errCode));
-    WIFI_LOGI("P2pConnectFailed state:%{public}d, err:%{public}d, minorErr:%{public}d,"
-        "DeviceRole:%{public}d, standErrCode:%{public}d", state, errCode, minorCode, mRole, standErrCode);
+    WIFI_LOGI("P2pConnectFailed state:%{public}d, err:%{public}d, minorErr:%{public}d, "
+        "DeviceRole:%{public}d, standErrCode:%{public}d", state, errCode, minorCode, role_, standErrCode);
     WriteP2pConnectFailedHiSysEvent(standErrCode, minorCode);
     OnP2pChrErrCodeReport(standErrCode);
 }
@@ -138,27 +156,30 @@ void P2pChrReporter::ReportP2pConnectFailed(int state, int errCode, int minorCod
 void P2pChrReporter::ReportP2pAbnormalDisconnect(int state, int errCode, int minorCode)
 {
     int standErrCode = GenerateStandardErrCode(P2P_SUB_SYSTEM_ID, GetP2pSpecificError(state, errCode));
-    WIFI_LOGI("P2pAbnormalDisconnect state:%{public}d, err:%{public}d, minorErr:%{public}d,"
-        "DeviceRole:%{public}d, standErrCode:%{public}d", state, errCode, minorCode, mRole, standErrCode);
+    WIFI_LOGI("P2pAbnormalDisconnect state:%{public}d, err:%{public}d, minorErr:%{public}d, "
+        "DeviceRole:%{public}d, standErrCode:%{public}d", state, errCode, minorCode, role_, standErrCode);
     WriteP2pAbDisConnectHiSysEvent(standErrCode, minorCode);
     OnP2pChrErrCodeReport(standErrCode);
 }
 
 uint16_t P2pChrReporter::GetP2pSpecificError(int state, int errCode)
 {
-    return (state << STATE_OFFSET) | (mRole << DEVICE_ROLE_OFFSET) | errCode;
+    uint8_t standardState = static_cast<uint8_t>(state & 0x1F);
+    uint8_t standardRole = static_cast<uint8_t>(role_);
+    uint16_t standardErrCode = static_cast<uint16_t>(errCode & 0x1FF);
+    return (standardState << STATE_OFFSET) | (standardRole << DEVICE_ROLE_OFFSET) | standardErrCode;
 }
 
 void P2pChrReporter::SetWpsSuccess(bool success)
 {
-    WIFI_LOGI("set wpa success, %{public}d -> %{public}d", mWpsSuccess, success);
-    mWpsSuccess = success;
+    WIFI_LOGI("set wpa success, %{public}d -> %{public}d", wpsSuccess_, success);
+    wpsSuccess_ = success;
 }
 
 void P2pChrReporter::SetDeviceRole(DeviceRole role)
 {
-    WIFI_LOGI("set device role, %{public}d -> %{public}d", mRole, role);
-    mRole = role;
+    WIFI_LOGI("set device role, %{public}d -> %{public}d", role_, role);
+    role_ = role;
 }
 
 bool P2pChrReporter::IsNormalErrCode(int errCode)

@@ -86,6 +86,7 @@ public:
     void UploadP2pChrErrEvent();
 
 private:
+    P2pChrReporter() {};
     void UpdateErrorMessage(int state, int errCode, int minorCode);
     void ReportP2pConnectFailed(int state, int errCode, int minorCode);
     void ReportP2pAbnormalDisconnect(int state, int errCode, int minorCode);
@@ -93,11 +94,11 @@ private:
     bool IsNormalErrCode(int errCode);
     void OnP2pChrErrCodeReport(int errCode);
 
-    bool mWpsSuccess = false;
-    DeviceRole mRole = UNKNOWN_ROLE;
-    int mLastP2pState = DEVICE_DISCOVERY;
-    int mLastErrCode = P2P_CHR_DEFAULT_REASON_CODE;
-    int mLastMinorCode = P2P_CHR_DEFAULT_REASON_CODE;
+    bool wpsSuccess_ = false;
+    DeviceRole role_ = UNKNOWN_ROLE;
+    int lastP2pState_ = DEVICE_DISCOVERY;
+    int lastErrCode_ = P2P_CHR_DEFAULT_REASON_CODE;
+    int lastMinorCode_ = P2P_CHR_DEFAULT_REASON_CODE;
 };
 
 } // namespace Wifi

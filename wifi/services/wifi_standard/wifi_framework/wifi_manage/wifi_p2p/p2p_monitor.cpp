@@ -487,6 +487,9 @@ void P2pMonitor::WpaEventInvitationResult(const std::string &bssid, int status) 
         MacAnonymize(bssid).c_str(), status);
     P2pStatus p2pStatus = IntStatusToP2pStatus(status);
     Broadcast2SmInvitationResult(selectIfacName, p2pStatus);
+    if (p2pStatus == P2pStatus::SUCCESS) {
+        P2pChrReporter::GetInstance().SetWpsSuccess(true);
+    }
 }
 
 void P2pMonitor::WpaEventGroupFormationSuccess(void) const
@@ -729,10 +732,11 @@ void P2pMonitor::WpaEventStaNotifyCallBack(const std::string &notifyParam) const
             std::string::size_type codePos = 0;
             if ((codePos = notifyParam.find("errCode=")) != std::string::npos) {
                 std::string data = notifyParam.substr(codePos + strlen("errCode="));
-                int errCode = stoi(data);
+                int errCode = CheckDataLegal(data);
                 WpaEventP2pChrReport(errCode);
             } else {
-                P2pChrReporter::GetInstance().ProcessChrEvent(notifyParam.substr(begPos + 1));
+                std::string subString = notifyParam.substr(begPos + 1);
+                P2pChrReporter::GetInstance().ProcessChrEvent(subString);
             }
             break;
         }

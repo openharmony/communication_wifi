@@ -167,7 +167,7 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         case static_cast<int>(WpaEventCallback::EAP_SIM_NUM):
             OnWpaEapSimAuthCallBack(data);
             break;
-		case static_cast<int>(WpaEventCallback::CSA_CHSWITCH_NUM):
+        case static_cast<int>(WpaEventCallback::CSA_CHSWITCH_NUM):
             OnWpaCsaChannelSwitchNotifyCallBack(data);
             break;
         default:

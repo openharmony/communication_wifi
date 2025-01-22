@@ -115,7 +115,7 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
         return false;
     }
     for (auto &config : results) {
-		WifiSettings::GetInstance().ClearNetworkCandidateScanResult(config.networkId);
+        WifiSettings::GetInstance().ClearNetworkCandidateScanResult(config.networkId);
         if (config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) {
             continue;
         }

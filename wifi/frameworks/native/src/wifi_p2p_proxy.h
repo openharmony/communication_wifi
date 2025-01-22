@@ -27,6 +27,7 @@ public:
     explicit WifiP2pProxy(const sptr<IRemoteObject> &impl);
     ~WifiP2pProxy();
 
+    void InitWifiState();
     /**
      * @Description Enabling the P2P Mode
      *
@@ -438,6 +439,23 @@ private:
     sptr<IRemoteObject> remote_ = nullptr;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
+};
+class WifiInternalCallback : public IWifiDeviceCallBack {
+public:
+    WifiInternalCallback() = default;
+    ~WifiInternalCallback() = default;
+    void OnWifiStateChanged(int state) override;
+    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override;
+    void OnWifiRssiChanged(int rssi) override;
+    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override;
+    void OnStreamChanged(int direction) override;
+    void OnDeviceConfigChanged(ConfigChange value) override;
+#ifndef OHOS_ARCH_LITE
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
+    {
+        return nullptr;
+    }
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

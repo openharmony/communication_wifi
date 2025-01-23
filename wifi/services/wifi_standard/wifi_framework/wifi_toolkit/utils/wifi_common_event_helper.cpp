@@ -222,5 +222,12 @@ bool WifiCommonEventHelper::PublishSelfcureStateChangedEvent(const int &pid, con
 #endif
     return true;
 }
+
+bool WifiCommonEventHelper::PublishVoWifiSignalDetectInterruptEvent(const int &code, const std::string &data)
+{
+    std::vector<std::string> permissions;
+    permissions.push_back(COMMON_EVENT_GET_WIFI_CONFIG_PERMISSION);
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_VOWIFI_SIGNAL_DETECT_INTERRUPT, code, data, permissions);
+}
 }  // namespace Wifi
 }  // namespace OHOS

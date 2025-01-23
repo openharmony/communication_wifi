@@ -29,6 +29,7 @@ typedef void (*P2pPersistentGroupsChangedCallback)(void);
 typedef void (*P2pConnectionChangedCallback)(const WifiP2pLinkedInfo info);
 typedef void (*P2pPeersChangedCallback)(WifiP2pDevice* devices, int len);
 typedef void (*P2pPrivatePeersChangedCallback)(char* priWfdInfo);
+typedef void (*P2pChrErrCodeReportCallback)(const int errCode);
 
 /**
  * @Description Enabling the P2P Mode.
@@ -216,6 +217,14 @@ WifiErrorCode RegisterP2pPeersChangedCallback(const P2pPeersChangedCallback call
  * @return ErrCode - operation result
  */
 WifiErrorCode RegisterP2pPrivatePeersChangedCallback(const P2pPrivatePeersChangedCallback callback);
+
+/**
+ * @Description register p2p chr error code report event
+ *
+ * @param callback - callback function
+ * @return ErrCode - operation result
+ */
+WifiErrorCode RegisterP2pChrErrCodeReportCallback(const P2pChrErrCodeReportCallback callback);
 
 /**
  * @Description Remove a P2P Group.

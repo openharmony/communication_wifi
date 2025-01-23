@@ -35,6 +35,13 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int TEN = 10;
+static std::string g_errLog;
+void SelfCureInterfaceCallback(const LogType type, const LogLevel level,
+                               const unsigned int domain, const char *tag,
+                               const char *msg)
+{
+        g_errLog = msg;
+}
 
 class SelfCureInterfaceTest : public testing::Test {
 public:
@@ -46,6 +53,7 @@ public:
         if (pSelfCureInterface != nullptr) {
             pSelfCureInterface->InitSelfCureService();
         }
+        LOG_SetCallback(SelfCureInterfaceCallback);
     }
 
     virtual void TearDown()
@@ -95,11 +103,13 @@ public:
 HWTEST_F(SelfCureInterfaceTest, InitSelfCureServiceTest, TestSize.Level1)
 {
     InitSelfCureServiceTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureInterfaceTest, InitCallbackTest, TestSize.Level1)
 {
     InitCallbackTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureInterfaceTest, GetStaCallbackTest, TestSize.Level1)
@@ -110,19 +120,21 @@ HWTEST_F(SelfCureInterfaceTest, GetStaCallbackTest, TestSize.Level1)
 HWTEST_F(SelfCureInterfaceTest, DealStaConnChangedTest, TestSize.Level1)
 {
     DealStaConnChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureInterfaceTest, DealRssiLevelChangedTest, TestSize.Level1)
 {
     DealRssiLevelChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureInterfaceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)
 {
     int forceNoHttpCheck = 0;
-    pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck);
+    EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
     pSelfCureInterface->pSelfCureService = nullptr;
-    pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck);
+    EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyInternetFailureDetected(forceNoHttpCheck));
 }
 
 HWTEST_F(SelfCureInterfaceTest, IsSelfCureOnGoingTest, TestSize.Level1)

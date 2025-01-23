@@ -19,6 +19,7 @@
 namespace OHOS {
 namespace Wifi {
 #define FRIEND_GTEST(test_typename) friend class test_typename##Test
+#define INVALID_RSSI (-127)
 
 constexpr int32_t ROAM_SCENE = 1;
 constexpr int64_t WIFI_SWITCH_RECORD_MAX_TIME = 1000 * 60 * 60 * 24 * 14; // 14天,单位:ms
@@ -38,6 +39,8 @@ enum WifiProCommond {
     EVENT_REQUEST_NETWORK_DETECT = 11,
     EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL = 12,
     EVENT_QOE_APP_SLOW = 13,
+    EVENT_SIGNAL_INFO_CHANGE = 14,
+    EVENT_QOE_REPORT = 15,
 };
 
 enum SigLevel {
@@ -81,6 +84,22 @@ enum WifiProState {
     WIFI_NONET,
     WIFI_PORTAL,
     WIFI_DISCONNECTED,
+};
+enum Perf5gSwitchResult {
+    SUCCESS,
+    TIMEOUT,
+    NO_PERF_5G_AP,
+};
+struct LinkQuality {
+    int signal;
+    int txrate;
+    int rxrate;
+    int txBytes;
+    int rxBytes;
+    LinkQuality() : signal(0), txrate(0), rxrate(0), txBytes(0), rxBytes(0)
+    {}
+    ~LinkQuality()
+    {}
 };
 }  // namespace Wifi
 }  // namespace OHOS

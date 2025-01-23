@@ -51,6 +51,10 @@ WifiTogglerManager::WifiTogglerManager()
     InitSoftapCallback();
     InitMultiStacallback();
     InitRptCallback();
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    InitChipHdiCallback();
+    HalDeviceManager::GetInstance().RegisterChipHdiDeathCallback(mChipHdiServiceCb);
+#endif
     pWifiControllerMachine = std::make_unique<WifiControllerMachine>();
     if (pWifiControllerMachine) {
         pWifiControllerMachine->InitWifiControllerMachine();
@@ -230,6 +234,13 @@ void WifiTogglerManager::DealConcreateStartFailure(int id)
     }
 }
 
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+void WifiTogglerManager::InitChipHdiCallback(void)
+{
+    mChipHdiServiceCb = [this](){ this->DealChipServiceDied(); };
+}
+#endif
+
 void WifiTogglerManager::DealSoftapStop(int id)
 {
     if (pWifiControllerMachine) {
@@ -285,6 +296,15 @@ void WifiTogglerManager::ForceStopWifi()
         pWifiControllerMachine->ShutdownWifi(false);
     }
 }
+
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+void WifiTogglerManager::DealChipServiceDied(void)
+{
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->ShutdownWifi(true);
+    }
+}
+#endif
 
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiTogglerManager::SatelliteToggled(int state)

@@ -71,6 +71,11 @@ void WriteWifiApStateHiSysEvent(int32_t state)
     WriteEventBehavior("WIFI_AP_STATE", "STATE", state);
 }
 
+void WriteWifiBridgeStateHiSysEvent(int32_t state)
+{
+    WriteEventBehavior("WIFI_BRIDGE_STATE", "STATE", state);
+}
+
 void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t state)
 {
     WriteEventBehavior("WIFI_P2P_STATE", "INTERFACE", inter, "P2PTYPE", type, "STATE", state);
@@ -391,6 +396,5 @@ void Write3VapConflictHisysevent(int type)
     root["WIFI_3VAP_CONFLICT_TYPE"] = type;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_3VAP_CONFLICT", "EVENT_VALUE", writer.write(root));
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

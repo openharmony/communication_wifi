@@ -84,9 +84,11 @@ HWTEST_F(WifiProInterfaceTest, DealScanResultTest01, TestSize.Level1)
     EXPECT_NE(wifiProInterface_->instId_, TEN);
 }
 
-HWTEST_F(WifiProInterfaceTest, DealQoeSlowResultTest01, TestSize.Level1)
+HWTEST_F(WifiProInterfaceTest, DealQoeReportTest01, TestSize.Level1)
 {
-    wifiProInterface_->DealQoeSlowResult();
+    NetworkLagType networkLagType = NetworkLagType::WIFIPRO_QOE_REPORT;
+    NetworkLagInfo networkLagInfo;
+    wifiProInterface_->DealQoeReport(networkLagType, networkLagInfo);
     EXPECT_NE(wifiProInterface_->instId_, TEN);
 }
 

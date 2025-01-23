@@ -109,7 +109,8 @@ int WifiManager::Init()
 #endif
     if (!std::filesystem::exists(WIFI_CONFIG_FILE_PATH) && !std::filesystem::exists(DUAL_WIFI_CONFIG_FILE_PATH) &&
         !std::filesystem::exists(DUAL_SOFTAP_CONFIG_FILE_PATH)) {
-        if (IsStartUpWifiEnableSupport()) {
+        if (IsStartUpWifiEnableSupport()
+            && WifiConfigCenter::GetInstance().GetSystemMode() != SystemMode::M_FACTORY_MODE) {
             WIFI_LOGI("It's first start up, need open wifi before oobe");
             WifiConfigCenter::GetInstance().SetPersistWifiState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         }

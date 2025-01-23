@@ -30,6 +30,7 @@ public:
     ErrCode Scan(ScanType scanType);
     ErrCode ScanWithParam(const WifiScanParams &params, ScanType scanType);
     void SystemScanProcess(bool scanAtOnce);
+    void SystemSingleScanProcess();
     void HandleScreenStatusChanged();
     void HandleStaStatusChanged(int status);
     void HandleCustomStatusChanged(int customScene, int customSceneStatus);

@@ -44,6 +44,7 @@
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
 #include "wifi_common_event_helper.h"
+#include "appmgr/app_mgr_interface.h"
 #endif
 
 namespace OHOS {
@@ -64,6 +65,7 @@ constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
+constexpr int STA_SIGNAL_POLL_DELAY_WITH_TASK = 1 * 1000;
 constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
 
 /* pincode length */
@@ -111,7 +113,7 @@ enum Wpa3ConnectFailReason {
     WPA3_FAIL_REASON_MAX
 };
 
-enum class CoFeatureType {
+enum CoFeatureType:uint8_t {
     COFEATURE_TYPE_MLO = 0,
     COFEATURE_TYPE_WUR = 1,
 };
@@ -124,6 +126,13 @@ typedef enum EnumDhcpReturnCode {
     DHCP_FAIL,
     DHCP_OFFER_REPORT,
 } DhcpReturnCode;
+
+enum FoldStatus {
+    UNKONWN = 0,
+    EXPAND,
+    FOLDED,
+    HALF_FOLD,
+};
 
 inline const int DETECT_TYPE_DEFAULT = 0;
 inline const int DETECT_TYPE_PERIODIC = 1;
@@ -288,7 +297,9 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-
+        void UpdateExpandOffset();
+        int foldStatus_ = 0;
+        int halfFoldUpdateRssi_ = 0;
     private:
 #ifndef OHOS_ARCH_LITE
         void CheckIfRestoreWifi();
@@ -297,7 +308,12 @@ public:
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
         void UpdateWifi7WurInfo();
+        void FoldStatusNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
+        int halfFoldRssi_ = 0;
+        int expandRssi_ = 0;
+        int rssiOffset_ = 6;
+        bool isExpandUpdateRssi_ = true;
     };
     /**
      * @Description  Definition of member function of ApRoamingState class in StaStateMachine.
@@ -438,6 +454,13 @@ public:
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);
     void UpdateAcceptUnvalidatedState();
+
+    /**
+     * @Description: Handle Foreground App Changed Action
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void HandleForegroundAppChangedAction(InternalMessagePtr msg);
 #endif
 /* ------------------ state machine private function ----------------- */
 private:
@@ -502,7 +525,7 @@ private:
     /**
      * @Description  Convert the deviceConfig structure and set it to wpa_supplicant
      *
-     * @param config -The Network info(in)
+     --=* @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const;
@@ -604,8 +627,14 @@ private:
      *
      * @param  signalInfo - SignalPoll Result
      */
-    void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo);
+    void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi = INVALID_RSSI_VALUE);
 
+    /**
+     * @Description : JudgeEnableSignalPoll.
+     *
+     * @param  signalInfo -JudgeEnableSignalPoll
+     */
+    void JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo);
     /**
      * @Description : Converting frequencies to channels.
      *
@@ -925,6 +954,7 @@ private:
     bool CanArpReachable();
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
+    void UpdateLinkedBssid(std::string &bssid);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void UpdateWifiCategory();
@@ -942,6 +972,7 @@ private:
     void TryModifyPortalAttribute(SystemNetWorkState netState);
     void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
     void UpdateHiLinkAttribute();
+    void LogSignalInfo(WifiSignalPollInfo &signalInfo);
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
@@ -989,6 +1020,8 @@ private:
     std::string mPortalUrl;
     int mLastConnectNetId;      /* last request connect netword id */
     int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
+    std::string curForegroundAppBundleName_ = "";
+    int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
 };
 }  // namespace Wifi
 }  // namespace OHOS

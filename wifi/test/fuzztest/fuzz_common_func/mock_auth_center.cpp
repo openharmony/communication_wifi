@@ -155,15 +155,23 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &w
     WifiProxyConfig &wifiProxyConfig, int instId)
 {}
 
-void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
+void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo,
     int instId)
 {}
 
 void WifiNetAgent::OnStaMachineWifiStart(int instId)
 {}
 
+bool WifiNetAgent::DelInterfaceAddress(const std::string &interface, const std::string &ipAddress, int prefixLength)
+{
+    return true;
+}
+
 void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::NetSupplierInfo> &netSupplierInfo,
     int instId)
+{}
+
+void WifiNetAgent::UnregisterNetSupplier(int instId)
 {}
 
 } // namespace Wifi

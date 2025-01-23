@@ -283,6 +283,11 @@ BandType WifiChannelHelper::TransformChannelToBand(int channel)
     return BandType::BAND_NONE;  // not supported currently 6/60GHZ
 }
 
+bool WifiChannelHelper::IsValidFreq(int freq)
+{
+    return IsValid24GHz(freq) && IsValid5GHz(freq);
+}
+
 bool WifiChannelHelper::IsValid24GHz(int freq)
 {
     return freq > FREQ_2G_MIN_RANGE && freq < FREQ_2G_MAX_RANGE;

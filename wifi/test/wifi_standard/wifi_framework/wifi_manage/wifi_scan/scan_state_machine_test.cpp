@@ -41,6 +41,11 @@ constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int TWO = 2;
 constexpr int ONE = 1;
+static std::string g_errLog;
+void ScanStateMachineCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+    {
+        g_errLog = msg;
+    }
 
 class ScanStateMachineTest : public testing::Test {
 public:
@@ -48,6 +53,7 @@ public:
     static void TearDownTestCase() {}
     void SetUp() override
     {
+        LOG_SetCallback(ScanStateMachineCallback);
         EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(0));
         pScanStateMachine = std::make_unique<ScanStateMachine>();
         pScanStateMachine->InitScanStateMachine();
@@ -1085,6 +1091,7 @@ public:
 HWTEST_F(ScanStateMachineTest, InitGoInStateTest, TestSize.Level1)
 {
     InitGoInStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, InitGoOutStateTest, TestSize.Level1)
@@ -1170,11 +1177,13 @@ HWTEST_F(ScanStateMachineTest, HardwareReadyExeMsgFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, CommonScanGoInStateTest, TestSize.Level1)
 {
     CommonScanGoInStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanGoOutStateTest, TestSize.Level1)
 {
     CommonScanGoOutStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanExeMsgSuccess, TestSize.Level1)
@@ -1275,6 +1284,7 @@ HWTEST_F(ScanStateMachineTest, PnoScanHardwareExeMsgFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoGoInStateTest, TestSize.Level1)
 {
     CommonScanAfterPnoGoInStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoExeMsgSuccess2, TestSize.Level1)
@@ -1310,6 +1320,7 @@ HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoExeMsgFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoScanSoftwareGoInStateTest, TestSize.Level1)
 {
     PnoScanSoftwareGoInStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanSoftwareExeMsgSuccess1, TestSize.Level1)
@@ -1330,11 +1341,13 @@ HWTEST_F(ScanStateMachineTest, PnoScanSoftwareExeMsgFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoSwScanFreeGoInStateTest, TestSize.Level1)
 {
     PnoSwScanFreeGoInStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, PnoSwScanFreeGoOutStateTest, TestSize.Level1)
 {
     PnoSwScanFreeGoOutStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, PnoSwScanFreeExeMsgSuccess1, TestSize.Level1)
@@ -1435,6 +1448,7 @@ HWTEST_F(ScanStateMachineTest, GetCommonScanConfigFail3, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, StartNewCommonScanTest1, TestSize.Level1)
 {
     StartNewCommonScanTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StartNewCommonScanTest2, TestSize.Level1)
@@ -1445,6 +1459,7 @@ HWTEST_F(ScanStateMachineTest, StartNewCommonScanTest2, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, StartSingleCommonScanSuccess, TestSize.Level1)
 {
     StartSingleCommonScanSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StartSingleCommonScanFail, TestSize.Level1)
@@ -1455,36 +1470,43 @@ HWTEST_F(ScanStateMachineTest, StartSingleCommonScanFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, CommonScanWhenRunningFail, TestSize.Level1)
 {
     CommonScanWhenRunningFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, ActiveCoverNewScanSuccess, TestSize.Level1)
 {
     ActiveCoverNewScanSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, ActiveCoverNewScanFail, TestSize.Level1)
 {
     ActiveCoverNewScanFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, ReportCommonScanFailedAndClearTest1, TestSize.Level1)
 {
     ReportCommonScanFailedAndClearTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, ReportCommonScanFailedAndClearTest2, TestSize.Level1)
 {
     ReportCommonScanFailedAndClearTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetRunningIndexListTest, TestSize.Level1)
 {
     GetRunningIndexListTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetWaitingIndexListTest, TestSize.Level1)
 {
     GetWaitingIndexListTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, VerifyScanStyleSuccess, TestSize.Level1)
@@ -1530,16 +1552,19 @@ HWTEST_F(ScanStateMachineTest, MergeScanStyleTest3, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoScanRequestProcessTest, TestSize.Level1)
 {
     PnoScanRequestProcessTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareProcessTest1, TestSize.Level1)
 {
     PnoScanHardwareProcessTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanHardwareProcessTest2, TestSize.Level1)
 {
     PnoScanHardwareProcessTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StartPnoScanHardwareSuccess1, TestSize.Level1)
@@ -1560,161 +1585,193 @@ HWTEST_F(ScanStateMachineTest, StartPnoScanHardwareSuccess3, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, StopPnoScanHardwareTest1, TestSize.Level1)
 {
     StopPnoScanHardwareTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StopPnoScanHardwareTest2, TestSize.Level1)
 {
     StopPnoScanHardwareTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StopPnoScanHardwareTest3, TestSize.Level1)
 {
     StopPnoScanHardwareTest3();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, UpdatePnoScanRequestTest, TestSize.Level1)
 {
     UpdatePnoScanRequestTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetPnoScanRequestInfoTest1, TestSize.Level1)
 {
     GetPnoScanRequestInfoTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetPnoScanRequestInfoTest2, TestSize.Level1)
 {
     GetPnoScanRequestInfoTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetPnoScanConfigSuccess, TestSize.Level1)
 {
     GetPnoScanConfigSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetPnoScanConfigFail1, TestSize.Level1)
 {
     GetPnoScanConfigFail1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetPnoScanConfigFail2, TestSize.Level1)
 {
     GetPnoScanConfigFail2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest1, TestSize.Level1)
 {
     HwPnoScanInfoProcessTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest2, TestSize.Level1)
 {
     HwPnoScanInfoProcessTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, HwPnoScanInfoProcessTest3, TestSize.Level1)
 {
     HwPnoScanInfoProcessTest3();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, ReportPnoScanInfosTest, TestSize.Level1)
 {
     ReportPnoScanInfosTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, NeedCommonScanAfterPnoTest, TestSize.Level1)
 {
     NeedCommonScanAfterPnoTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoProcessTest1, TestSize.Level1)
 {
     CommonScanAfterPnoProcessTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoProcessTest2, TestSize.Level1)
 {
     CommonScanAfterPnoProcessTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest1, TestSize.Level1)
 {
     CommonScanAfterPnoResultTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, CommonScanAfterPnoResultTest2, TestSize.Level1)
 {
     CommonScanAfterPnoResultTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosSuccess, TestSize.Level1)
 {
     GetScanInfosSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetScanInfosFail, TestSize.Level1)
 {
     GetScanInfosFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetSecurityTypeAndBandTest, TestSize.Level1)
 {
     GetSecurityTypeAndBandTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StartNewSoftwareScanTest, TestSize.Level1)
 {
     StartNewSoftwareScanTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, RepeatStartCommonScanTest1, TestSize.Level1)
 {
     RepeatStartCommonScanTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, RepeatStartCommonScanTest2, TestSize.Level1)
 {
     RepeatStartCommonScanTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, RepeatStartCommonScanTest3, TestSize.Level1)
 {
     RepeatStartCommonScanTest3();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StopPnoScanSoftwareTest, TestSize.Level1)
 {
     StopPnoScanSoftwareTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanSoftwareProcessTest1, TestSize.Level1)
 {
     PnoScanSoftwareProcessTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanSoftwareProcessTest2, TestSize.Level1)
 {
     PnoScanSoftwareProcessTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, PnoScanSoftwareProcessTest3, TestSize.Level1)
 {
     PnoScanSoftwareProcessTest3();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, SoftwareScanInfoProcessTest1, TestSize.Level1)
 {
     SoftwareScanInfoProcessTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, SoftwareScanInfoProcessTest2, TestSize.Level1)
 {
     SoftwareScanInfoProcessTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, InitCommonScanStateTest, TestSize.Level1)
 {
     InitCommonScanStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, InitPnoScanState, TestSize.Level1)
@@ -1725,6 +1782,7 @@ HWTEST_F(ScanStateMachineTest, InitPnoScanState, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, PnoScanRequestProcessFail, TestSize.Level1)
 {
     PnoScanRequestProcessFail();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StartPnoScanHardwareFail, TestSize.Level1)
@@ -1735,21 +1793,25 @@ HWTEST_F(ScanStateMachineTest, StartPnoScanHardwareFail, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, RecordFilteredScanResultTest, TestSize.Level1)
 {
     RecordFilteredScanResultTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, GetFilteredScanResultMsgTest, TestSize.Level1)
 {
     GetFilteredScanResultMsgTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, FilterScanResultTest, TestSize.Level1)
 {
     FilterScanResultTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, SetWifiModeTest, TestSize.Level1)
 {
     SetWifiModeTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

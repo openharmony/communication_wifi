@@ -48,6 +48,10 @@ namespace Wifi {
 
 constexpr int INVALID_FREQ_OR_CHANNEL = -1;
 const uint32_t DECIMAL_NOTATION = 10;
+inline const uint8_t WIFI_SYSTEM_ID = 202;
+inline const uint8_t P2P_SUB_SYSTEM_ID = 2;
+inline const int SYSTEM_OFFSET = 21;
+inline const int SUB_SYSTEM_OFFSET = 16;
 
 /* StaCallBackNameEventIdMap */
 static std::map<std::string, int> g_staCallBackNameEventIdMap = {
@@ -81,6 +85,7 @@ static std::map<std::string, int> g_p2pCallBackNameEventIdMap = {
     { EVENT_P2P_GC_JOIN_GROUP, WIFI_CBK_MSG_P2P_GC_JOIN_GROUP},
     { EVENT_P2P_GC_LEAVE_GROUP, WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP},
     { EVENT_P2P_PRIVATE_PEER_DEVICE_CHANGE, WIFI_CBK_MSG_PRIVATE_PEER_CHANGE},
+    { EVENT_P2P_CHR_ERRCODE_REPORT, WIFI_CBK_MSG_P2P_CHR_ERRCODE_REPORT},
 };
 
 /**
@@ -294,7 +299,7 @@ int HexString2Byte(const char *hex, uint8_t *buf, size_t len);
 void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t hexstrLen);
 bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);
 std::string EncodeBase64(const std::vector<uint8_t> &input);
-std::vector<std::string> getAuthInfo(const std::string &input, const std::string &delimiter);
+std::vector<std::string> GetSplitInfo(const std::string &input, const std::string &delimiter);
 std::string HexToString(const std::string &str);
 std::string StringToHex(const std::string &data);
 int CheckDataLegal(std::string &data, int base = DECIMAL_NOTATION);
@@ -302,6 +307,7 @@ int CheckDataLegalBin(const std::string &data);
 int CheckDataLegalHex(const std::string &data);
 unsigned int CheckDataToUint(std::string &data, int base = DECIMAL_NOTATION);
 long long CheckDataTolonglong(std::string &data, int base = DECIMAL_NOTATION);
+uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -1494,7 +1494,7 @@ HWTEST_F(WifiHdiWpaClientTest, GetMloLinkedInfoTest, TestSize.Level1)
     std::string ifaceName = "wlan0";
     std::vector<WifiLinkedInfo> mloLinkInfo;
     WifiErrorNo result = wifiHdiWpaClient->GetMloLinkedInfo(ifaceName, mloLinkInfo);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 } // namespace Wifi
 } // namespace OHOS

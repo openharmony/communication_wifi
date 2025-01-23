@@ -386,9 +386,68 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &bssid) override;
+
+	/**
+     * @Description OnFoldStateChanged.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnFoldStateChanged(const int foldStatus) override;
+
+    /**
+     * @Description Fetch Wifi SignalInfo For VoWiFi.
+     *
+     * @return VoWifiSignalInfo : wifi signal info
+     */
+    
+    ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) override;
+ 
+    /**
+     * @Description Check Is Support VoWifi Detect.
+     *
+     * @return bool - supported: true, unsupported: false.
+     */
+    ErrCode IsSupportVoWifiDetect(bool &isSupported) override;
+ 
+    /**
+     * @Description Set VoWifi detect mode.
+     *
+     * @param info WifiDetectConfInfo
+     */
+    ErrCode SetVoWifiDetectMode(WifiDetectConfInfo info) override;
+ 
+    /**
+     * indicate VoWifiDetectMode
+     *
+     * @return VoWifiDetectMode
+     */
+    ErrCode GetVoWifiDetectMode(WifiDetectConfInfo &info) override;
+ 
+    /**
+     * @Description Set vowifi detect period.
+     *
+     * @param period period of vowifi detect
+     */
+    ErrCode SetVoWifiDetectPeriod(int period) override;
+ 
+    /**
+     * Get vowifi detection period
+     *
+     * @return vowifi detection period
+     */
+    ErrCode GetVoWifiDetectPeriod(int &period) override;
+ 
+    /**
+     * @Description Notify vowifi signal detect interrupt message from netlink.
+     *
+     * @param type - wifi netlink message type
+     */
+    void ProcessVoWifiNetlinkReportEvent(const int type) override;
 private:
     bool InitStaServiceLocked();
     std::vector<StaServiceCallback> m_staCallback;
+    WifiDetectConfInfo m_wifiDetectConfInfo;
+    int m_wifiDetectperiod = -1;
     StaService *pStaService;
     std::mutex mutex;
     int m_instId;

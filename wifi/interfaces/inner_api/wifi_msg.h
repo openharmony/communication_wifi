@@ -135,7 +135,7 @@ enum ConnState {
     UNKNOWN
 };
 
-enum class MloState {
+enum MloState:uint8_t {
     WIFI7_LEGACY = 0,
     WIFI7_SINGLE_LINK = 1,
     WIFI7_MLSR = 2,
@@ -308,6 +308,24 @@ enum class ConfigChange {
     CONFIG_ADD = 0,
     CONFIG_UPDATE = 1,
     CONFIG_REMOVE = 2,
+};
+
+struct VoWifiSignalInfo {
+    int rssi;
+    int noise;
+    int bler;
+    int deltaTxPacketCounter;
+    int accessType;
+    int reverse;
+    int64_t txGood;
+    int64_t txBad;
+    std::string macAddress;
+};
+ 
+struct WifiDetectConfInfo {
+    int wifiDetectMode;
+    int threshold;
+    int envalueCount;
 };
 
 class WifiIpAddress {
@@ -971,14 +989,19 @@ enum class Wifi3VapConflictType {
 enum class NetworkLagType {
     DEFAULT = 0,
     WIFIPRO_QOE_SLOW,
+    WIFIPRO_QOE_REPORT,
 };
  
 struct NetworkLagInfo {
     uint32_t uid { 0 };
+    uint32_t rssi { 0 };
+    uint32_t tcpRtt { 0 };
  
     NetworkLagInfo()
     {
         uid = 0;
+        rssi = 0;
+        tcpRtt = 0;
     }
 };
 

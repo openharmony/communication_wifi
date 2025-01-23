@@ -35,11 +35,23 @@ bool NetworkSelectionUtils::IsOpenNetwork(const NetworkCandidate &networkCandida
     return networkCandidate.wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE;
 };
 
-bool NetworkSelectionUtils::IsOpenAndMaybePortal(const NetworkCandidate &networkCandidate)
+bool NetworkSelectionUtils::IsOpenAndMaybePortal(NetworkCandidate &networkCandidate,
+    const std::string &filterName)
 {
     auto &wifiDeviceConfig = networkCandidate.wifiDeviceConfig;
-    return IsOpenNetwork(networkCandidate) && !wifiDeviceConfig.noInternetAccess
-        && NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory);
+    if (!IsOpenNetwork(networkCandidate)) {
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_OPEN_NETWORK);
+        return false;
+    }
+    if (wifiDeviceConfig.noInternetAccess) {
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NO_INTERNET);
+        return false;
+    }
+    if (!NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory)) {
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::HAS_NETWORK_HISTORY);
+        return false;
+    }
+    return true;
 }
 
 bool NetworkSelectionUtils::IsScanResultForOweNetwork(const NetworkCandidate &networkCandidate)
@@ -53,7 +65,8 @@ bool NetworkSelectionUtils::IsBlackListNetwork(const NetworkCandidate &networkCa
     return networkCandidate.wifiDeviceConfig.connFailedCount >= maxRetryCount;
 }
 
-std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates)
+std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates,
+    const std::string &filterName)
 {
     std::stringstream networkCandidatesInfo;
     networkCandidatesInfo << "[";
@@ -61,7 +74,7 @@ std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<Ne
         if (networkCandidates.at(i)->wifiDeviceConfig.networkId == INVALID_NETWORK_ID) {
             continue;
         }
-        networkCandidatesInfo << "\"" << networkCandidates.at(i)->ToString() << "\"";
+        networkCandidatesInfo << "\"" << networkCandidates.at(i)->ToString(filterName) << "\"";
         if (i < networkCandidates.size() - 1) {
             networkCandidatesInfo << ", ";
         }

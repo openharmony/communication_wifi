@@ -593,6 +593,48 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) = 0;
+
+    /**
+     * @Description Get Vowifi Signal Info.
+     *
+     * @return VoWifiSignalInfo : wifi signal info
+     */
+    virtual ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) = 0;
+ 
+    /**
+     * @Description Check Is Support VoWifi Detect.
+     *
+     * @return bool - supported: true, unsupported: false.
+     */
+    virtual ErrCode IsSupportVoWifiDetect(bool &isSupported) = 0;
+ 
+    /**
+     * @Description set VoWifi detect mode.
+     *
+     * @param info WifiDetectConfInfo
+     */
+    virtual ErrCode SetVoWifiDetectMode(WifiDetectConfInfo info) = 0;
+ 
+    /**
+     * indicate VoWifiDetectMode
+     *
+     * @return VoWifiDetectMode
+     */
+    virtual ErrCode GetVoWifiDetectMode(WifiDetectConfInfo &info) = 0;
+ 
+    /**
+     * @Description set vowifi detect period.
+     *
+     * @param period period of vowifi detect
+     */
+    virtual ErrCode SetVoWifiDetectPeriod(int period) = 0;
+ 
+    /**
+     * @Description Get vowifi detection period
+     *
+     * @return vowifi detection period
+     */
+    virtual ErrCode GetVoWifiDetectPeriod(int &period) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

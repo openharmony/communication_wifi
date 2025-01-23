@@ -462,6 +462,15 @@ void WifiP2pCEventCallback::OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info)
     WIFI_LOGI("%{public}s, received p2p gcLeave event", __func__);
 }
 
+void WifiP2pCEventCallback::OnP2pChrErrCodeReport(const int errCode)
+{
+    WIFI_LOGI("%{public}s, received p2p chr errCode event, %{public}d", __func__, errCode);
+    std::unique_lock<std::mutex> lock(p2pCallbackMutex);
+    if (p2pChrErrCodeReportCb) {
+        p2pChrErrCodeReportCb(errCode);
+    }
+}
+
 OHOS::sptr<OHOS::IRemoteObject> WifiP2pCEventCallback::AsObject()
 {
     return nullptr;
@@ -563,6 +572,19 @@ NO_SANITIZE("cfi") WifiErrorCode UnregisterCfgChangCallback(void)
     CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
     sptrCallback->cfgChangeCallback = nullptr;
     EventManager::GetInstance().RemoveP2PCallbackEvent(EVENT_P2P_CONFIG_CHANGE);
+    return WIFI_SUCCESS;
+}
+
+NO_SANITIZE("cfi") WifiErrorCode RegisterP2pChrErrCodeReportCallback(const P2pChrErrCodeReportCallback callback)
+{
+    CHECK_PTR_RETURN(callback, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(sptrCallback, ERROR_WIFI_NOT_AVAILABLE);
+    EventManager::GetInstance().Init();
+    sptrCallback->p2pChrErrCodeReportCb = callback;
+    std::vector<std::string> event = {EVENT_P2P_CHR_ERRCODE_REPORT};
+    wifiP2pPtr->RegisterCallBack(sptrCallback, event);
+    EventManager::GetInstance().SetP2PCallbackEvent(sptrCallback, EVENT_P2P_CHR_ERRCODE_REPORT);
     return WIFI_SUCCESS;
 }
 

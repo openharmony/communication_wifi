@@ -17,11 +17,20 @@
 #include "wifi_global_func.h"
 #include "wifi_country_code_define.h"
 #include "wifi_ap_msg.h"
+#include "log.h"
 
 using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+
+static std::string g_errLog;
+void WifiGloLogCallback(const LogType type, const LogLevel level,
+                        const unsigned int domain, const char *tag,
+                        const char *msg)
+{
+    g_errLog = msg;
+}
 
 constexpr int FREP_2G_MIN = 2412;
 constexpr int FREP_5G_MIN = 5170;
@@ -296,6 +305,7 @@ HWTEST_F(WifiGlobalFuncTest, ConvertStrToUpperTest, TestSize.Level1)
 {
     string code = "cn";
     StrToUpper(code);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiGlobalFuncTest, ConvertConvertCharToIntTest, TestSize.Level1)

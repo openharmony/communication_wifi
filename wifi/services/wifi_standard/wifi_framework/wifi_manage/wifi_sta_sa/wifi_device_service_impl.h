@@ -194,6 +194,18 @@ public:
     ErrCode GetDeviceConfig(const int &networkId, WifiDeviceConfig &config) override;
 
     ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) override;
+
+    ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) override;
+ 
+    ErrCode IsSupportVoWifiDetect(bool &isSupported) override;
+ 
+    ErrCode SetVoWifiDetectMode(WifiDetectConfInfo info) override;
+ 
+    ErrCode GetVoWifiDetectMode(WifiDetectConfInfo &info) override;
+ 
+    ErrCode SetVoWifiDetectPeriod(int period) override;
+ 
+    ErrCode GetVoWifiDetectPeriod(int &period) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);
@@ -213,7 +225,6 @@ private:
     void ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result);
     void updateStaDeviceMacAddress(WifiDeviceConfig &config);
     int ProcessPermissionVerify(const std::string &appId, const std::string &packageName);
-    ErrCode HandleWifiProQoeSlow(const NetworkLagInfo &networkLagInfo);
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;
     static constexpr int MAX_HEX_LEN = 64;

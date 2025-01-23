@@ -15,16 +15,27 @@
 #include <gtest/gtest.h>
 #include "wifi_hdi_wpa_proxy.h"
 #include "hdf_remote_service.h"
+#include "log.h"
 
 using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void WifiHdiProLogCallback(const LogType type, const LogLevel level,
+                           const unsigned int domain, const char *tag,
+                           const char *msg)
+{
+    g_errLog = msg;
+}
 class WifiHdiWpaProxyTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    void SetUp() override {}
+    void SetUp() override
+    {
+        LOG_SetCallback(WifiHdiProLogCallback);
+    }
     void TearDown() override {}
 };
 
@@ -96,6 +107,7 @@ HWTEST_F(WifiHdiWpaProxyTest, ProxyOnApRemoteDiedTest, TestSize.Level1)
     ProxyOnApRemoteDied(nullptr, &service);
     ProxyOnApRemoteDied(&recipient, nullptr);
     ProxyOnApRemoteDied(nullptr, nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 extern "C" WifiErrorNo RegistHdfApDeathCallBack();
@@ -111,6 +123,7 @@ HWTEST_F(WifiHdiWpaProxyTest, RemoveIfaceNameTest, TestSize.Level1)
     RemoveIfaceName(nullptr);
     RemoveIfaceName("");
     RemoveIfaceName("wlan");
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 extern "C" void AddIfaceName(const char* ifName);
@@ -119,12 +132,14 @@ HWTEST_F(WifiHdiWpaProxyTest, AddIfaceNameTest, TestSize.Level1)
     AddIfaceName(nullptr);
     AddIfaceName("");
     AddIfaceName("wlan");
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 extern "C" void HdiApResetGlobalObj();
 HWTEST_F(WifiHdiWpaProxyTest, HdiApResetGlobalObjTest, TestSize.Level1)
 {
     HdiApResetGlobalObj();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 extern "C" bool FindifaceName(const char* ifName);
@@ -146,6 +161,7 @@ HWTEST_F(WifiHdiWpaProxyTest, ProxyOnRemoteDiedTest, TestSize.Level1)
     ProxyOnRemoteDied(nullptr, &service);
     ProxyOnRemoteDied(&recipient, nullptr);
     ProxyOnRemoteDied(nullptr, nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 }
 }

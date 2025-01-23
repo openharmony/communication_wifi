@@ -120,8 +120,8 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
         WIFI_LOGE("AutoStartStaService PostStartWifi instId:%{public}d", instId);
         return WIFI_OPT_FAILED;
     }
-    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     DispatchWifiOpenRes(OperateResState::OPEN_WIFI_SUCCEED, instId);
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     if (type != RESET_STA_TYPE_SELFCURE) {
         auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
         ins->HandleStaStartSuccess(instId);
@@ -201,8 +201,8 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId, int type)
         WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
         return WIFI_OPT_FAILED;
     }
-    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
     DispatchWifiCloseRes(OperateResState::CLOSE_WIFI_SUCCEED, instId);
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_STOPED, instId);
     if (type != RESET_STA_TYPE_SELFCURE) {
         auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
         ins->HandleStaClose(instId);
@@ -375,8 +375,8 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
         WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
         return WIFI_OPT_FAILED;
     }
-    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     DispatchWifiSemiActiveRes(OperateResState::ENABLE_SEMI_WIFI_SUCCEED, instId);
+    WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_MSG_OPENED, instId);
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     ins->HandleStaSemiActive(instId);
     return WIFI_OPT_SUCCESS;
@@ -692,6 +692,13 @@ void WifiServiceScheduler::OnNetlinkReportCallback(int type, const std::vector<u
         return;
     }
     pEnhanceService->ProcessWifiNetlinkReportEvent(type, recvMsg);
+
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pStaService == nullptr) {
+        WIFI_LOGE("Instance get Sta service is null!");
+        return;
+    }
+    pStaService->ProcessVoWifiNetlinkReportEvent(type);
 }
 #endif
 
@@ -783,6 +790,8 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
+        WifiConfigCenter::GetInstance().SetP2pEnhanceActionListenChannel(0);
         BroadCastWifiStateChange(WifiState::DISABLED, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
             static_cast<int>(WifiOperateState::STA_CLOSED));
@@ -852,7 +861,6 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
     }
     ErrCode errCode = TryToStartApService(instId);
     if (errCode != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, instId);
         return errCode;
     }

@@ -305,10 +305,10 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnApStaJoinOrLeaveTest, TestSize.Level1)
     }
     IWifiApMonitorEventCallback callback;
     RegisterApCallbackMock(&callback);
-    WifiApHalInterface::GetInstance().RegisterApEvent(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiApHalInterface::GetInstance().RegisterApEvent(callback));
     OnApStaJoinOrLeave(&infomation, id);
     UnRegisterApCallbackMock(&callback);
-    WifiApHalInterface::GetInstance().RegisterApEvent(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiApHalInterface::GetInstance().RegisterApEvent(callback));
     OnApStaJoinOrLeave(&infomation, id);
 }
 /**
@@ -324,10 +324,10 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnApEnableOrDisableTest, TestSize.Level1)
     int id = 1;
     IWifiApMonitorEventCallback callback;
     RegisterApCallbackMock(&callback);
-    WifiApHalInterface::GetInstance().RegisterApEvent(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiApHalInterface::GetInstance().RegisterApEvent(callback));
     OnApEnableOrDisable(status, id);
     UnRegisterApCallbackMock(&callback);
-    WifiApHalInterface::GetInstance().RegisterApEvent(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, WifiApHalInterface::GetInstance().RegisterApEvent(callback));
     OnApEnableOrDisable(status, id);
 }
 /**
@@ -347,10 +347,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnConnectChangedTest, TestSize.Level1)
     std::string ifaceName = "wlan0";
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
-    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnConnectChanged(status, networkId, mac1);
     UnRegisterStaCallbackMock(&callback);
-    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnConnectChanged(status, networkId, mac1);
 }
 
@@ -370,10 +372,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnDisConnectReasonCallbackTest, TestSize.Lev
     std::string ifaceName = "wlan0";
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
-    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnDisConnectReasonCallback(reason, mac1);
     UnRegisterStaCallbackMock(&callback);
-    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnDisConnectReasonCallback(reason, mac1);
 }
 
@@ -395,10 +399,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnBssidChangedTest, TestSize.Level1)
     WifiEventCallback callback;
     std::string ifaceName = "wlan0";
     RegisterStaCallbackMock(&callback);
-    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnBssidChanged(reason, bssid);
     UnRegisterStaCallbackMock(&callback);
-    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnBssidChanged(reason, bssid);
 }
 /**
@@ -414,7 +420,8 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
     std::string ifaceName = "wlan0";
-    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
@@ -422,7 +429,8 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     OnWpsOverlap(status);
     OnWpsTimeOut(status);
     UnRegisterStaCallbackMock(&callback);
-    WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+            WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
@@ -448,10 +456,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pDeviceFoundTest, TestSize.Level1)
     information.wfdLength = LENTH1;
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pDeviceFound(&information);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pDeviceFound(&information);
 }
 /**
@@ -468,10 +478,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pDeviceLostTest, TestSize.Level1)
     char p2pDeviceAddress[] = "00:00:AA:BB:CC:DD";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pDeviceLost(p2pDeviceAddress);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pDeviceLost(p2pDeviceAddress);
 }
 /**
@@ -489,10 +501,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pGoNegotiationRequestTest, TestSize.Leve
     char srcAddress[] = "00:00:AA:BB:CC:DD";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGoNegotiationRequest(srcAddress, passwordId);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGoNegotiationRequest(srcAddress, passwordId);
 }
 /**
@@ -506,10 +520,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pGoNegotiationSuccessTest, TestSize.Leve
     LOGI("OnP2pGoNegotiationSuccessTest enter");
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGoNegotiationSuccess();
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGoNegotiationSuccess();
 }
 /**
@@ -524,10 +540,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pGoNegotiationFailureTest, TestSize.Leve
     int status = 1;
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGoNegotiationFailure(status);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGoNegotiationFailure(status);
 }
 /**
@@ -545,10 +563,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pInvitationResultTest, TestSize.Level1)
     char bssid[] = "00:00:AA:BB:CC:DD";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pInvitationResult(bssid, status);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pInvitationResult(bssid, status);
 }
 /**
@@ -568,10 +588,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pInvitationReceivedTest, TestSize.Level1
     information.operatingFrequency = 1;
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pInvitationReceived(&information);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pInvitationReceived(&information);
 }
 /**
@@ -585,10 +607,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pGroupFormationSuccessTest, TestSize.Lev
     LOGI("OnP2pGroupFormationSuccessTest enter");
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGroupFormationSuccess();
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGroupFormationSuccess();
 }
 /**
@@ -605,10 +629,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pGroupFormationFailureTest, TestSize.Lev
     char failureReason[] = "test";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGroupFormationFailure(failureReason);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGroupFormationFailure(failureReason);
 }
 /**
@@ -628,10 +654,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pGroupStartedTest, TestSize.Level1)
     groupInfo.frequency = 1;
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGroupStarted(&groupInfo);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGroupStarted(&groupInfo);
 }
 /**
@@ -649,10 +677,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pGroupRemovedTest, TestSize.Level1)
     char groupIfName[] = "P2pGroupRemoved";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGroupRemoved(groupIfName, isGo);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pGroupRemoved(groupIfName, isGo);
 }
 /**
@@ -671,12 +701,14 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pProvisionDiscoveryTest, TestSize.Level1
     char p2pDeviceAddress[] = "00:22:AA:BB:CC:DD";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pProvisionDiscoveryPbcRequest(p2pDeviceAddress);
     OnP2pProvisionDiscoveryPbcResponse(p2pDeviceAddress);
     OnP2pProvisionDiscoveryEnterPin(p2pDeviceAddress);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pProvisionDiscoveryPbcRequest(p2pDeviceAddress);
     OnP2pProvisionDiscoveryPbcResponse(p2pDeviceAddress);
     OnP2pProvisionDiscoveryEnterPin(p2pDeviceAddress);
@@ -698,10 +730,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pProvisionDiscoveryShowPinTest, TestSize
     char pin[] = "test";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pProvisionDiscoveryShowPin(p2pDeviceAdd, pin);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pProvisionDiscoveryShowPin(p2pDeviceAdd, pin);
 }
 /**
@@ -715,10 +749,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pProvisionDiscoveryFailureTest, TestSize
     LOGI("OnP2pProvisionDiscoveryFailureTest enter");
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pProvisionDiscoveryFailure();
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pProvisionDiscoveryFailure();
 }
 /**
@@ -732,10 +768,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pFindStoppedTest, TestSize.Level1)
     LOGI("OnP2pFindStoppedTest enter");
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pFindStopped();
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pFindStopped();
 }
 /**
@@ -755,10 +793,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pServiceDiscoveryResponseTest, TestSize.
     char srcAddress[] = "AA:BB:CC:DD:EE:FF";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pServiceDiscoveryResponse(srcAddress, updateIndicator, tlvs, tlvsLength);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pServiceDiscoveryResponse(srcAddress, updateIndicator, tlvs, tlvsLength);
 }
 /**
@@ -778,11 +818,13 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pStaDeauthorizedTest, TestSize.Level1)
     char p2pGroupAdd[] = "AA:BB:CC:DD:EE:FF";
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pStaDeauthorized(p2pDeviceAdd);
     OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAdd);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pStaDeauthorized(p2pDeviceAdd);
     OnP2pStaAuthorized(p2pDeviceAdd, p2pGroupAdd);
 }
@@ -797,10 +839,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pConnectSupplicantFailedTest, TestSize.L
     LOGI("OnP2pConnectSupplicantFailedTest enter");
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pConnectSupplicantFailed();
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pConnectSupplicantFailed();
 }
 /**
@@ -821,10 +865,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pServDiscReqTest, TestSize.Level1)
     }
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pServDiscReq(&infomation);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pServDiscReq(&infomation);
 }
 /**
@@ -840,10 +886,12 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnP2pIfaceCreatedTest, TestSize.Level1)
     int isGo = 1;
     P2pHalCallback callback;
     RegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pIfaceCreated(ifName, isGo);
     UnRegisterP2pCallbackMock(&callback);
-    WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback);
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
+              WifiP2PHalInterface::GetInstance().RegisterP2pCallback(callback));
     OnP2pIfaceCreated(ifName, isGo);
 }
 }  // namespace Wifi

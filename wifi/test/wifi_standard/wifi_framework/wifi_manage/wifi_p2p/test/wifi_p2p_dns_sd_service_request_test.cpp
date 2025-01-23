@@ -20,6 +20,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class WifiP2pDnsSdServiceRequestTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -35,14 +36,17 @@ public:
     void WarpCreate1()
     {
         WifiP2pDnsSdServiceRequest::Create();
+        EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
     }
     void WarpCreate2()
     {
         WifiP2pDnsSdServiceRequest::Create("serviceType");
+        EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
     }
     void WarpCreate3()
     {
         WifiP2pDnsSdServiceRequest::Create("instanceName", "serviceType");
+        EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
     }
 };
 

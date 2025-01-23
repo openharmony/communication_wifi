@@ -28,12 +28,18 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void ScanMonitorCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+{
+    g_errLog = msg;
+}
 class ScanMonitorTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     void SetUp() override
     {
+        LOG_SetCallback(ScanMonitorCallback);
         pScanMonitor = std::make_unique<ScanMonitor>();
         pScanStateMachine = std::make_unique<MockScanStateMachine>();
         pScanMonitor->SetScanStateMachine(pScanStateMachine.get());
@@ -108,6 +114,7 @@ HWTEST_F(ScanMonitorTest, InitScanMonitorFailTest, TestSize.Level1)
 HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest1, TestSize.Level1)
 {
     ProcessReceiveScanEventTest1();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest2, TestSize.Level1)
@@ -118,26 +125,31 @@ HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest2, TestSize.Level1)
 HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest3, TestSize.Level1)
 {
     ProcessReceiveScanEventTest3();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest4, TestSize.Level1)
 {
     ProcessReceiveScanEventTest4();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanMonitorTest, SendScanInfoEventTest, TestSize.Level1)
 {
     SendScanInfoEventTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanMonitorTest, SendPnoScanInfoEventTest, TestSize.Level1)
 {
     SendPnoScanInfoEventTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanMonitorTest, SendScanFailedEventTest, TestSize.Level1)
 {
     SendScanFailedEventTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

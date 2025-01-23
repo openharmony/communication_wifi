@@ -73,7 +73,11 @@ int WifiConfigCenter::Init()
     }
     wifiScanConfig = std::make_unique<WifiScanConfig>();
     ClearLocalHid2dInfo();
-    mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
+    if (systemMode_ == SystemMode::M_FACTORY_MODE) {
+        mPersistWifiState[INSTID_WLAN0] = WIFI_STATE_DISABLED;
+    } else {
+        mPersistWifiState[INSTID_WLAN0] = WifiSettings::GetInstance().GetOperatorWifiType(INSTID_WLAN0);
+    }
     mAirplaneModeState = WifiSettings::GetInstance().GetLastAirplaneMode();
     return 0;
 }
@@ -858,15 +862,48 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
     }
 }
 
+int WifiConfigCenter::SetLastConnStaFreq(int freq)
+{
+    lastConnStaFreq_.store(freq);
+    return 0;
+}
+
+int WifiConfigCenter::GetLastConnStaFreq()
+{
+    return lastConnStaFreq_.load();
+}
+
 int WifiConfigCenter::SetP2pEnhanceState(int state)
 {
-    mP2pEnhanceState = state;
+    p2pEnhanceState_.store(state);
     return 0;
 }
 
 int WifiConfigCenter::GetP2pEnhanceState()
 {
-    return mP2pEnhanceState.load();
+    return p2pEnhanceState_.load();
+}
+
+int WifiConfigCenter::SetP2pEnhanceActionListenChannel(int channel)
+{
+    p2pEnhanceActionListenChannel_.store(channel);
+    return 0;
+}
+
+int WifiConfigCenter::GetP2pEnhanceActionListenChannel()
+{
+    return p2pEnhanceActionListenChannel_.load();
+}
+
+int WifiConfigCenter::SetP2pEnhanceFreq(int freq)
+{
+    p2pEnhanceFreq_.store(freq);
+    return 0;
+}
+
+int WifiConfigCenter::GetP2pEnhanceFreq()
+{
+    return p2pEnhanceFreq_.load();
 }
 
 WifiOprMidState WifiConfigCenter::GetP2pMidState()
@@ -1331,7 +1368,7 @@ std::string WifiConfigCenter::GetPairMacAddress(std::map<WifiMacAddrInfo, std::s
             __func__, macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, iter->second.c_str());
         return iter->second;
     } else {
-        LOGD("%{public}s: record not found.", __func__);
+        LOGE("%{public}s: record not found, macaddr: %{public}s", __func__, MacAnonymize(macAddrInfo.bssid).c_str());
     }
     return "";
 }

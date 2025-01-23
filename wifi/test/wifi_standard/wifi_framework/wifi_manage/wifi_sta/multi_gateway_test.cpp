@@ -16,34 +16,47 @@
 #include <gtest/gtest.h>
 #include "mock_wifi_settings.h"
 #include "multi_gateway.h"
+#include "log.h"
 
 using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
 constexpr int32_t NUM_TEN = 10;
+    static std::string g_errLog;
+    void MultiGatewayCallback(const LogType type, const LogLevel level,
+                              const unsigned int domain, const char *tag,
+                              const char *msg)
+    {
+        g_errLog = msg;
+    }
 class MultiGatewayTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {}
+    virtual void SetUp()
+    {
+        LOG_SetCallback(MultiGatewayCallback);
+    }
     virtual void TearDown() {}
 };
 
 HWTEST_F(MultiGatewayTest, GetGatewayAddr_test, TestSize.Level1)
 {
     MultiGateway::GetInstance().GetGatewayAddr(0);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(MultiGatewayTest, IsMultiGateway_test, TestSize.Level1)
 {
-    MultiGateway::GetInstance().IsMultiGateway();
+    EXPECT_TRUE(MultiGateway::GetInstance().IsMultiGateway());
 }
 
 HWTEST_F(MultiGatewayTest, GetNextGatewayMac_test, TestSize.Level1)
 {
     std::string mac = "";
     MultiGateway::GetInstance().GetNextGatewayMac(mac);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(MultiGatewayTest, SetStaticArp_test, TestSize.Level1)

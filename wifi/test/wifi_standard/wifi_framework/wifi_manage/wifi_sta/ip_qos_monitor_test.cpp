@@ -29,11 +29,20 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+static std::string g_errLog;
+    void IpQosMonitorCallback(const LogType type, const LogLevel level,
+                              const unsigned int domain, const char *tag,
+                              const char *msg)
+    {
+        g_errLog = msg;
+    }
 
 class IpQosMonitorTest : public testing::Test {
 public:
     void SetUp() override
-    {}
+    {
+        LOG_SetCallback(IpQosMonitorCallback);
+    }
 
     void TearDown() override
     {}
@@ -47,6 +56,7 @@ HWTEST_F(IpQosMonitorTest, TestStartMonitor, TestSize.Level1)
 {
     int32_t arg = 0;
     IpQosMonitor::GetInstance().StartMonitor(arg);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(IpQosMonitorTest, TestQueryPackets, TestSize.Level1)
@@ -58,6 +68,7 @@ HWTEST_F(IpQosMonitorTest, TestQueryPackets, TestSize.Level1)
         std::bind(&IpQosMonitorTest::OnTcpReportMsgCompleteTest, this, _1, _2, _3);
     WifiNetLink::GetInstance().InitWifiNetLink(mWifiNetLinkCallbacks);
     IpQosMonitor::GetInstance().QueryPackets(arg);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(IpQosMonitorTest, TestHandleTcpReportMsgComplete, TestSize.Level1)
@@ -78,6 +89,7 @@ HWTEST_F(IpQosMonitorTest, TestParseTcpReportMsg, TestSize.Level1)
 
     elems = {};
     IpQosMonitor::GetInstance().ParseTcpReportMsg(elems, cmd);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(IpQosMonitorTest, TestHandleTcpPktsResp, TestSize.Level1)
@@ -96,13 +108,13 @@ HWTEST_F(IpQosMonitorTest, TestHandleTcpPktsResp, TestSize.Level1)
 HWTEST_F(IpQosMonitorTest, TestAllowSelfCureNetwork, TestSize.Level1)
 {
     int32_t currentRssi = 123;
-    IpQosMonitor::GetInstance().AllowSelfCureNetwork(currentRssi);
+    EXPECT_FALSE(IpQosMonitor::GetInstance().AllowSelfCureNetwork(currentRssi));
 }
 
 HWTEST_F(IpQosMonitorTest, TestParseNetworkInternetGood, TestSize.Level1)
 {
     std::vector<int64_t> elems = {1, 2, 3};
-    IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems);
+    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems));
     elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 0};
-    IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems);
+    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems));
 }

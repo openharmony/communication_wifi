@@ -1116,7 +1116,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
             validFreqs.push_back(*it);
         }
     }
-    if(validFreqs.empty()) {
+    if (validFreqs.empty()) {
         return 0;
     }
     int randomIndex = GetRandomInt(0, validFreqs.size() - 1);

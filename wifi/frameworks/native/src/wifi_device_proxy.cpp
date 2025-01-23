@@ -69,7 +69,7 @@ void WifiDeviceProxy::InitWifiState()
     const std::vector<std::string> event = {EVENT_STA_POWER_STATE_CHANGE};
     RegisterCallBack(callBack, event);
 
-    f (mRemoteDied) {
+    if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return;
     }
@@ -97,7 +97,7 @@ void WifiDeviceProxy::InitWifiState()
         return;
     }
 
-    bActive = reply.ReadBool();
+    bool bActive = reply.ReadBool();
     g_deviceCallBackStub->SetWifiState(bActive);
     return;
 }

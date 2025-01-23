@@ -688,6 +688,25 @@ private:
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
 #endif
+private:
+    void InitWifiState();
+};
+class WifiInternalCallback : public IWifiDeviceCallBack {
+public:
+    WifiInternalCallback() = default;
+    ~WifiInternalCallback() = default;
+    void OnWifiStateChanged(int state) override;
+    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override;
+    void OnWifiRssiChanged(int rssi) override;
+    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override;
+    void OnStreamChanged(int direction) override;
+    void OnDeviceConfigChanged(ConfigChange value) override;
+#ifndef OHOS_ARCH_LITE
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
+    {
+        return nullptr;
+    }
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

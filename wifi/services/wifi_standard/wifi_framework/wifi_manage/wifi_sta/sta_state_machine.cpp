@@ -587,7 +587,10 @@ bool StaStateMachine::IsNewConnectionInProgress()
     if (targetId == INVALID_NETWORK_ID) {
         return false;
     }
-
+    if (selfCureService_ != nullptr && selfCureService_->IsSelfCureL2Connecting()) {
+        WIFI_LOGI("IsNewConnectionInProgress, selfcure is ongoing");
+        return true;
+    }
     std::string targetSsid = "";
     // Get the target network's SSID, can get empty result if it is hillink network
     if (!m_hilinkFlag) {

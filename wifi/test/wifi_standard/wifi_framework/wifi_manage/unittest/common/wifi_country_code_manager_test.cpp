@@ -40,6 +40,12 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void WifiManLogCallback(const LogType type, const LogLevel level,
+    const unsigned int domain, const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 DEFINE_WIFILOG_LABEL("WifiCountryCodeManagerTest");
 
 class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
@@ -78,6 +84,7 @@ public:
     virtual void SetUp()
     {
         m_mockStateMachine = new (std::nothrow) MockStateMachine("MockStateMachine");
+        LOG_SetCallback(WifiManLogCallback);
     }
     virtual void TearDown()
     {
@@ -94,6 +101,7 @@ HWTEST_F(WifiCountryCodeManagerTest, GetInstanceTest, TestSize.Level1)
 {
     WIFI_LOGI("GetInstanceTest enter");
     WifiCountryCodeManager::GetInstance();
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, InitTest, TestSize.Level1)
@@ -106,12 +114,14 @@ HWTEST_F(WifiCountryCodeManagerTest, GetStaCallbackTest, TestSize.Level1)
 {
     WIFI_LOGI("GetStaCallbackTest enter");
     WifiCountryCodeManager::GetInstance().GetStaCallback();
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, GetApCallbackTest, TestSize.Level1)
 {
     WIFI_LOGI("GetApCallbackTest enter");
     WifiCountryCodeManager::GetInstance().GetApCallback();
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, GetWifiCountryCodeTest, TestSize.Level1)
@@ -119,6 +129,7 @@ HWTEST_F(WifiCountryCodeManagerTest, GetWifiCountryCodeTest, TestSize.Level1)
     WIFI_LOGI("GetWifiCountryCodeTest enter");
     std::string code = "CN";
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(code);
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, SetWifiCountryCodeFromExternalSuccessTest, TestSize.Level1)
@@ -134,6 +145,7 @@ HWTEST_F(WifiCountryCodeManagerTest, TriggerUpdateWifiCountryCodeTest, TestSize.
         std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(31);  // 31: all the algorithms will take effect
     WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_TEL_NET_CHANGE);
     WifiCountryCodeManager::GetInstance().TriggerUpdateWifiCountryCode(TRIGGER_UPDATE_REASON_SCAN_CHANGE);
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, IsAllowUpdateWifiCountryCodeTest, TestSize.Level1)
@@ -155,6 +167,7 @@ HWTEST_F(WifiCountryCodeManagerTest, GetWifiCountryCodePolicySuccessTest, TestSi
 {
     WIFI_LOGI("GetWifiCountryCodePolicySuccessTest enter");
     WifiCountryCodeManager::GetInstance().GetWifiCountryCodePolicy();
+    EXPECT_FALSE(WifiCountryCodeManager::GetInstance().IsAllowUpdateWifiCountryCode());
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, UpdateWifiCountryCodeTest, TestSize.Level1)
@@ -188,6 +201,7 @@ HWTEST_F(WifiCountryCodeManagerTest, NotifyWifiCountryCodeChangeListenersTest, T
     WifiCountryCodeManager::GetInstance().RegisterWifiCountryCodeChangeListener(m_apObserver);
     std::string code = "CN";
     WifiCountryCodeManager::GetInstance().NotifyWifiCountryCodeChangeListeners(code);
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, RegisterWifiCountryCodeChangeListenerTest, TestSize.Level1)
@@ -249,6 +263,7 @@ HWTEST_F(WifiCountryCodeManagerTest, DealStaConnChangedTest, TestSize.Level1)
     WifiCountryCodeManager::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
     WifiCountryCodeManager::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, info, 0);
     WifiCountryCodeManager::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, DealApStateChangedTest, TestSize.Level1)

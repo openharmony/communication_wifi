@@ -15,35 +15,49 @@
 
 #include "wifi_hisysevent_test.h"
 #include <limits>
+#include "log.h"
 
 using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
 
+static std::string g_errLog;
+void WifiHisLogCallback(const LogType type, const LogLevel level,
+                        const unsigned int domain, const char *tag,
+                        const char *msg)
+{
+    g_errLog = msg;
+}
+
 HWTEST_F(WifiHisyseventTest, WritePortalStateHiSysEventTest, TestSize.Level1)
 {
     WritePortalStateHiSysEvent(0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHisyseventTest, WriteArpInfoHiSysEventTest, TestSize.Level1)
 {
     WriteArpInfoHiSysEvent(0, 0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHisyseventTest, WriteLinkInfoHiSysEventTest, TestSize.Level1)
 {
     WriteLinkInfoHiSysEvent(0, 0, 0, 0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHisyseventTest, WirteConnectTypeHiSysEventTest, TestSize.Level1)
 {
     WriteConnectTypeHiSysEvent(0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHisyseventTest, WriteWifiWpaStateHiSysEventTest, TestSize.Level1)
 {
     WriteWifiWpaStateHiSysEvent(0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHisyseventTest, WritePortalAuthExpiredHisyseventTest, TestSize.Level1)
@@ -64,11 +78,13 @@ HWTEST_F(WifiHisyseventTest, WritePortalAuthExpiredHisyseventTes01, TestSize.Lev
 HWTEST_F(WifiHisyseventTest, WriteWifiStateHiSysEventTest, TestSize.Level1)
 {
     WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHisyseventTest, Write3VapConflictHisyseventTest, TestSize.Level1)
 {
     Write3VapConflictHisysevent(0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 }  // namespace Wifi

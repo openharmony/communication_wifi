@@ -56,12 +56,14 @@ HWTEST_F(WifiCommonUtilTest, MacStrToArrayTest, TestSize.Level1)
     std::string strmac = "00:55:DD:ff:MM";
     unsigned char mac[WIFI_MAC_LENS];
     MacStrToArray(strmac, mac);
+    EXPECT_EQ(MacStrToArray(strmac, mac), EOK);
 }
 
 HWTEST_F(WifiCommonUtilTest, Ip2NumberTest, TestSize.Level1)
 {
     std::string strIp = "00:55:DD:ff:MM";
     Ip2Number(strIp);
+    EXPECT_EQ(Ip2Number(strIp), 0);
 }
 
 HWTEST_F(WifiCommonUtilTest, GetBrokerProcessNameByPidTest, TestSize.Level1)

@@ -27,6 +27,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class WifiP2pServiceTest : public testing::Test {
 public:
     WifiP2pServiceTest() : groupManager(), deviceManager(), svrManager()
@@ -227,6 +228,7 @@ HWTEST_F(WifiP2pServiceTest, HiD2dSharedLinkTest, TestSize.Level1)
     int callingUid = 0;
     pWifiP2pService->IncreaseSharedLink(callingUid);
     pWifiP2pService->DecreaseSharedLink(callingUid);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 
@@ -292,6 +294,7 @@ HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest001, TestSize.Level1)
     int callingUid = 0;
     pWifiP2pService->IncreaseSharedLink(callingUid);
     pWifiP2pService->HandleBusinessSAException(systemAbilityId);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest003, TestSize.Level1)

@@ -29,6 +29,7 @@ const char *g_pIface = "test0";
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class P2pMonitorTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -350,11 +351,13 @@ HWTEST_F(P2pMonitorTest, RegisterHandler_SUCCESS, TestSize.Level1)
     const std::string iface = g_pIface;
     const std::function<HandlerMethod> mapHandler;
     pP2pMonitor->RegisterIfaceHandler(iface, mapHandler);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(P2pMonitorTest, UnregisterHandler_SUCCESS, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     pP2pMonitor->UnregisterHandler(iface);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WrapMethod_test, TestSize.Level1)
@@ -365,6 +368,7 @@ HWTEST_F(P2pMonitorTest, WrapMethod_test, TestSize.Level1)
     constexpr int param2 = 1;
     const std::any anyObj = std::string("test_any");
     WrapMethodMessageToStateMachine(iface, msgName, param1, param2, anyObj);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WrapMethod_data, TestSize.Level1)
@@ -378,6 +382,7 @@ HWTEST_F(P2pMonitorTest, WrapMethod_data, TestSize.Level1)
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), RegisterP2pCallback(_));
     pP2pMonitor->MonitorBegins(iface);
     EXPECT_TRUE(setMonitorIface.count(iface) == 1);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, IntStatusToP2pStatus, TestSize.Level1)
@@ -415,12 +420,14 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmGoNegRequest, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pConfigInternal testConfig;
     WrapMethodBroadcast2SmGoNegRequest(iface, testConfig);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmGoNegSuccess, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmGoNegSuccess(iface);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmGoNegFailure, TestSize.Level1)
@@ -428,6 +435,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmGoNegFailure, TestSize.Level1)
     const std::string iface = g_pIface;
     P2pStatus testStatus = P2pStatus::SUCCESS;
     WrapMethodBroadcast2SmGoNegFailure(iface, testStatus);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmInvitationReceived, TestSize.Level1)
@@ -435,6 +443,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmInvitationReceived, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pGroupInfo testGroup;
     WrapMethodBroadcast2SmInvitationReceived(iface, testGroup);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmInvitationResult, TestSize.Level1)
@@ -442,12 +451,14 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmInvitationResult, TestSize.Level1)
     const std::string iface = g_pIface;
     P2pStatus testStatus = P2pStatus::SUCCESS;
     WrapMethodBroadcast2SmInvitationResult(iface, testStatus);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmGroupFormationSuccess, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmGroupFormationSuccess(iface);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmGroupFormationFailure, TestSize.Level1)
@@ -455,6 +466,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmGroupFormationFailure, TestSize.Level1)
     const std::string iface = g_pIface;
     const std::string reason("P2pUnitTest");
     WrapMethodBroadcast2SmGroupFormationFailure(iface, reason);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmGroupStarted, TestSize.Level1)
@@ -462,6 +474,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmGroupStarted, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pGroupInfo testGroup;
     WrapMethodBroadcast2SmGroupStarted(iface, testGroup);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmGroupRemoved, TestSize.Level1)
@@ -469,6 +482,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmGroupRemoved, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pGroupInfo testGroup;
     WrapMethodBroadcast2SmGroupRemoved(iface, testGroup);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscPbcReq, TestSize.Level1)
@@ -476,6 +490,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscPbcReq, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pTempDiscEvent testEvent;
     WrapMethodBroadcast2SmProvDiscPbcReq(iface, testEvent);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscPbcResp, TestSize.Level1)
@@ -483,6 +498,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscPbcResp, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pTempDiscEvent testEvent;
     WrapMethodBroadcast2SmProvDiscPbcResp(iface, testEvent);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscEnterPin, TestSize.Level1)
@@ -490,6 +506,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscEnterPin, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pTempDiscEvent testEvent;
     WrapMethodBroadcast2SmProvDiscEnterPin(iface, testEvent);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscShowPin, TestSize.Level1)
@@ -497,54 +514,63 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscShowPin, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pTempDiscEvent testEvent;
     WrapMethodBroadcast2SmProvDiscShowPin(iface, testEvent);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmProvDiscFailure, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmProvDiscFailure(iface);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmFindStopped, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmFindStopped(iface);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(P2pMonitorTest, Broadcast2SmServDiscReq, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WifiP2pServiceRequestList testRequeList;
     WrapMethodBroadcast2SmServDiscReq(iface, testRequeList);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(P2pMonitorTest, Broadcast2SmServDiscResp, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WifiP2pServiceResponseList testRespList;
     WrapMethodBroadcast2SmServDiscResp(iface, testRespList);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmApStaDisconnected, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmApStaDisconnected(iface, testDevice);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmApStaConnected, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmApStaConnected(iface, testDevice);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmConnectSupplicantFailed, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmConnectSupplicantFailed(iface);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, OnConnectSupplicant, TestSize.Level1)
 {
     int status = 1;
     WrapMethodOnConnectSupplicant(status);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventDeviceFound1, TestSize.Level1)
@@ -566,6 +592,7 @@ HWTEST_F(P2pMonitorTest, WpaEventDeviceFound1, TestSize.Level1)
     deviceInfo.wfdDeviceInfo.push_back('8');
     deviceInfo.wfdDeviceInfo.push_back('8');
     WrapMethodWpaEventDeviceFound(deviceInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventDeviceFound2, TestSize.Level1)
@@ -587,41 +614,48 @@ HWTEST_F(P2pMonitorTest, WpaEventDeviceFound2, TestSize.Level1)
     deviceInfo.wfdDeviceInfo.push_back('8');
     deviceInfo.wfdDeviceInfo.push_back('8');
     WrapMethodWpaEventDeviceFound(deviceInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventDeviceLost1, TestSize.Level1)
 {
     std::string p2pDeviceAddress("ff:ff:ff:ff:ff:ff");
     WrapMethodWpaEventDeviceLost(p2pDeviceAddress);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventDeviceLost2, TestSize.Level1)
 {
     std::string p2pDeviceAddress("");
     WrapMethodWpaEventDeviceLost(p2pDeviceAddress);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest1, TestSize.Level1)
 {
     short testPasswordId = 8;
     WrapMethodWpaEventGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest2, TestSize.Level1)
 {
     short testPasswordId = 1;
     WrapMethodWpaEventGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest3, TestSize.Level1)
 {
     short testPasswordId = 4;
     WrapMethodWpaEventGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest4, TestSize.Level1)
 {
     short testPasswordId = 5;
     WrapMethodWpaEventGoNegRequest("ff:ff:ff:ff:ff:ff", testPasswordId);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest5, TestSize.Level1)
@@ -629,16 +663,19 @@ HWTEST_F(P2pMonitorTest, WpaEventGoNegRequest5, TestSize.Level1)
     short testPasswordId = 8;
     std::string srcAddress("");
     WrapMethodWpaEventGoNegRequest(srcAddress, testPasswordId);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(P2pMonitorTest, WpaEventGoNegSuccess, TestSize.Level1)
 {
     WrapMethodWpaEventGoNegSuccess();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGoNegFailure, TestSize.Level1)
 {
     int testStatus = 1;
     WrapMethodWpaEventGoNegFailure(testStatus);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived1, TestSize.Level1)
@@ -650,6 +687,7 @@ HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived1, TestSize.Level1)
     testRecvInfo.goDeviceAddress = "ff:ff:ff:ff:ff:fe";
     testRecvInfo.bssid = "ff:ff:ff:ff:ff:ef";
     WrapMethodWpaEventInvitationReceived(testRecvInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived2, TestSize.Level1)
@@ -661,6 +699,7 @@ HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived2, TestSize.Level1)
     testRecvInfo.goDeviceAddress = "ff:ff:ff:ff:ff:fe";
     testRecvInfo.bssid = "ff:ff:ff:ff:ff:ef";
     WrapMethodWpaEventInvitationReceived(testRecvInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived3, TestSize.Level1)
@@ -671,22 +710,26 @@ HWTEST_F(P2pMonitorTest, WpaEventInvitationReceived3, TestSize.Level1)
     testRecvInfo.srcAddress = "ff:ff:ff:ff:ff:ff";
     testRecvInfo.bssid = "ff:ff:ff:ff:ff:ef";
     WrapMethodWpaEventInvitationReceived(testRecvInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventInvitationResult, TestSize.Level1)
 {
     int testStatus = 1;
     WrapMethodWpaEventInvitationResult("ff:ff:ff:ff:ff:ff", testStatus);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupFormationSuccess, TestSize.Level1)
 {
     WrapMethodWpaEventGroupFormationSuccess();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupFormationFailure, TestSize.Level1)
 {
     WrapMethodWpaEventGroupFormationFailure("P2pUnitTestReason");
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupStarted1, TestSize.Level1)
@@ -701,6 +744,7 @@ HWTEST_F(P2pMonitorTest, WpaEventGroupStarted1, TestSize.Level1)
     testGroupInfo.passphrase =  "TestPassphrase";
     testGroupInfo.goDeviceAddress = "ff:ff:ff:ff:ff:ff";
     WrapMethodWpaEventGroupStarted(testGroupInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupStarted2, TestSize.Level1)
@@ -715,6 +759,7 @@ HWTEST_F(P2pMonitorTest, WpaEventGroupStarted2, TestSize.Level1)
     testGroupInfo.passphrase =  "TestPassphrase";
     testGroupInfo.goDeviceAddress = "ff:ff:ff:ff:ff:ff";
     WrapMethodWpaEventGroupStarted(testGroupInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupStarted3, TestSize.Level1)
@@ -728,12 +773,14 @@ HWTEST_F(P2pMonitorTest, WpaEventGroupStarted3, TestSize.Level1)
     testGroupInfo.passphrase =  "TestPassphrase";
     testGroupInfo.goDeviceAddress = "ff:ff:ff:ff:ff:ff";
     WrapMethodWpaEventGroupStarted(testGroupInfo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupRemoved1, TestSize.Level1)
 {
     bool isGo = true;
     WrapMethodWpaEventGroupRemoved("P2pUnitTestWlan", isGo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventGroupRemoved2, TestSize.Level1)
@@ -741,36 +788,43 @@ HWTEST_F(P2pMonitorTest, WpaEventGroupRemoved2, TestSize.Level1)
     bool isGo = true;
     std::string groupIfName("");
     WrapMethodWpaEventGroupRemoved(groupIfName, isGo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscPbcReq, TestSize.Level1)
 {
     WrapMethodWpaEventProvDiscPbcReq("ff:ff:ff:ff:ff:ff");
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscPbcResp, TestSize.Level1)
 {
     WrapMethodWpaEventProvDiscPbcResp("ff:ff:ff:ff:ff:ff");
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscEnterPin, TestSize.Level1)
 {
     WrapMethodWpaEventProvDiscEnterPin("ff:ff:ff:ff:ff:ff");
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscShowPin, TestSize.Level1)
 {
     WrapMethodWpaEventProvDiscShowPin("ff:ff:ff:ff:ff:ff", "TestGeneratedPin");
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventProvDiscFailure, TestSize.Level1)
 {
     WrapMethodWpaEventProvDiscFailure();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventFindStopped, TestSize.Level1)
 {
     WrapMethodWpaEventFindStopped();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventServDiscReq, TestSize.Level1)
@@ -783,6 +837,7 @@ HWTEST_F(P2pMonitorTest, WpaEventServDiscReq, TestSize.Level1)
     tList.push_back(0x00);
     info.tlvList = tList;
     WrapMethodWpaEventServDiscReq(info);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventServDiscResp, TestSize.Level1)
@@ -795,21 +850,25 @@ HWTEST_F(P2pMonitorTest, WpaEventServDiscResp, TestSize.Level1)
     testTlvs.push_back(0x00);
     testTlvs.push_back(0x00);
     WrapMethodWpaEventServDiscResp("ff:ff:ff:ff:ff:ff", testUpdateIndicator, testTlvs);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventApStaDisconnected, TestSize.Level1)
 {
     WrapMethodWpaEventApStaDisconnected("ff:ff:ff:ff:ff:ff");
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventApStaConnected, TestSize.Level1)
 {
     WrapMethodWpaEventApStaConnected("ff:ff:ff:ff:ff:ff", "ff:ff:ff:ff:ff:ff");
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, OnConnectSupplicantFailed, TestSize.Level1)
 {
     WrapMethodOnConnectSupplicantFailed();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmP2pIfaceCreatedTest001, TestSize.Level1)
@@ -818,6 +877,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmP2pIfaceCreatedTest001, TestSize.Level1)
     int type = 0;
     const std::string event = "";
     WrapBroadcast2SmP2pIfaceCreated(iface, type, event);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmConnectFailedTest001, TestSize.Level1)
@@ -825,6 +885,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmConnectFailedTest001, TestSize.Level1)
     const std::string iface = g_pIface;
     int reason = 0;
     WrapBroadcast2SmConnectFailed(iface, reason, testDevice);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmChSwitchTest001, TestSize.Level1)
@@ -832,6 +893,7 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmChSwitchTest001, TestSize.Level1)
     const std::string iface = g_pIface;
     WifiP2pGroupInfo testGroup;
     WrapBroadcast2SmChSwitch(iface, testGroup);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventP2pIfaceCreatedTest001, TestSize.Level1)
@@ -839,6 +901,7 @@ HWTEST_F(P2pMonitorTest, WpaEventP2pIfaceCreatedTest001, TestSize.Level1)
     const std::string ifName = "";
     int isGo = 0;
     WrapWpaEventP2pIfaceCreated(ifName, isGo);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventP2pConnectFailedTest001, TestSize.Level1)
@@ -846,18 +909,21 @@ HWTEST_F(P2pMonitorTest, WpaEventP2pConnectFailedTest001, TestSize.Level1)
     const std::string bssid = "";
     int reason = 0;
     WrapWpaEventP2pConnectFailed(bssid, reason);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventP2pChannelSwitchTest001, TestSize.Level1)
 {
     int freq = 0;
     WrapWpaEventP2pChannelSwitch(freq);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, WpaEventStaNotifyCallBackTest001, TestSize.Level1)
 {
     const std::string notifyParam = "";
     WrapWpaEventStaNotifyCallBack(notifyParam);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

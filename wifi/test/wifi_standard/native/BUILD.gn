@@ -59,6 +59,7 @@ ohos_unittest("native_unittest") {
     "//third_party/googletest/googlemock/include",
     "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/utils/inc",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
   ]
   ldflags = [
     "-fPIC",

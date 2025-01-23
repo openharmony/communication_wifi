@@ -29,6 +29,8 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
+
 class P2pEnabledStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -104,6 +106,7 @@ HWTEST_F(P2pEnabledStateTest, GoInState, TestSize.Level1)
 HWTEST_F(P2pEnabledStateTest, GoOutState, TestSize.Level1)
 {
     pP2pEnabledState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg, TestSize.Level1)
@@ -201,27 +204,26 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg7, TestSize.Level1)
     WifiP2pDevice device;
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_LOST));
     msg->SetMessageObj(device);
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 
     AddDevice();
     device.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
     msg->SetMessageObj(device);
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg8, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_FIND_STOPPED));
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg9, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP));
-    pP2pEnabledState->ExecuteStateMsg(msg);
-
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg10, TestSize.Level1)
@@ -307,7 +309,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg15, TestSize.Level1)
         P2pServicerProtocolType::SERVICE_TYPE_BONJOUR, P2pServiceStatus::PSRS_SERVICE_PROTOCOL_NOT_AVAILABLE, 0, data);
     respList.AddServiceResponse(resp);
     msg->SetMessageObj(respList);
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg16, TestSize.Level1)
@@ -323,7 +325,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg17, TestSize.Level1)
     WifiP2pServiceInfo service;
     msg->SetMessageObj(service);
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_PUT_LOCAL_SERVICE));
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg18, TestSize.Level1)
@@ -382,7 +384,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg21, TestSize.Level1)
     WifiP2pServiceRequestList reqList;
     msg->SetMessageObj(reqList);
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_SERV_DISC_REQ));
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg22, TestSize.Level1)
@@ -401,7 +403,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg23, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::EXCEPTION_TIMED_OUT));
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessCmdSetDeviceName1, TestSize.Level1)
@@ -496,7 +498,7 @@ HWTEST_F(P2pEnabledStateTest, ProcessPriDeviceFoundEvtTest001, TestSize.Level1)
     WifiP2pDevice device;
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
     msg->SetMessageObj(device);
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_EQ(EXECUTED, pP2pEnabledState->ExecuteStateMsg(msg));
 }
 } // namespace Wifi
 } // namespace OHOS

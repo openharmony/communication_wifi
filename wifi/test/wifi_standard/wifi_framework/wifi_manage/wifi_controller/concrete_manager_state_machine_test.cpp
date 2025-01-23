@@ -37,6 +37,13 @@ namespace Wifi {
 
 constexpr int SLEEP_TIME = 2;
 constexpr int TEN = 10;
+static std::string g_errLog;
+void ConcreteManagerMachineCallback(const LogType type, const LogLevel level,
+                                    const unsigned int domain, const char *tag,
+                                    const char *msg)
+{
+    g_errLog = msg;
+}
 
 class ConcreteManagerMachineTest : public testing::Test {
 public:
@@ -51,6 +58,7 @@ public:
         mCb.onStopped = DealConcreteStop;
         mCb.onRemoved = DealClientRemoved;
         pConcreteManagerMachine->RegisterCallback(mCb);
+        LOG_SetCallback(ConcreteManagerMachineCallback);
     }
 
     virtual void TearDown()
@@ -448,51 +456,61 @@ public:
 HWTEST_F(ConcreteManagerMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
 {
     DefaultStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, DefaultStateGoOutStateSuccess, TestSize.Level1)
 {
     DefaultStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, IdleStateGoInStateSuccess, TestSize.Level1)
 {
     IdleStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, IdleStateGoOutStateSuccess, TestSize.Level1)
 {
     IdleStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, ConnectStateGoInStateSuccess, TestSize.Level1)
 {
     ConnectStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, ConnectStateGoOutStateSuccess, TestSize.Level1)
 {
     ConnectStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, ScanOnlyStateGoInStateSuccess, TestSize.Level1)
 {
     ScanOnlyStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, ScanOnlyStateGoOutStateSuccess, TestSize.Level1)
 {
     ScanOnlyStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, SemiActiveStateGoInStateSuccess, TestSize.Level1)
 {
     SemiActiveStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, SemiActiveStateGoOutStateSuccess, TestSize.Level1)
 {
     SemiActiveStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(ConcreteManagerMachineTest, SetTargetRoleTest, TestSize.Level1)

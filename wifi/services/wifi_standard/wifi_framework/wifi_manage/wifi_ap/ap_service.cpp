@@ -63,10 +63,13 @@ ErrCode ApService::EnableHotspot()
         return ErrCode::WIFI_OPT_SUCCESS;
     } while (0);
     WIFI_LOGI("Ap disabled, set softap toggled false");
+    WifiCountryCodeManager::GetInstance()
+        .UnregisterWifiCountryCodeChangeListener(m_apObserver);
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     if (!(apStartedState_.StopAp())) {
         WIFI_LOGE("StopAp not going well.");
     }
+    m_ApStateMachine.OnApStateChange(ApState::AP_STATE_IDLE);
     return WIFI_OPT_FAILED;
 }
 

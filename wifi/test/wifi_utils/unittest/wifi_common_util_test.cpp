@@ -56,12 +56,14 @@ HWTEST_F(WifiCommonUtilTest, MacStrToArrayTest, TestSize.Level1)
     std::string strmac = "00:55:DD:ff:MM";
     unsigned char mac[WIFI_MAC_LENS];
     MacStrToArray(strmac, mac);
+    EXPECT_EQ(MacStrToArray(strmac, mac), EOK);
 }
 
 HWTEST_F(WifiCommonUtilTest, Ip2NumberTest, TestSize.Level1)
 {
     std::string strIp = "00:55:DD:ff:MM";
     Ip2Number(strIp);
+    EXPECT_EQ(Ip2Number(strIp), 0);
 }
 
 HWTEST_F(WifiCommonUtilTest, GetBrokerProcessNameByPidTest, TestSize.Level1)
@@ -216,21 +218,21 @@ HWTEST_F(WifiCommonUtilTest, EncodeDecodeBase64TestFail, TestSize.Level1)
     EXPECT_NE(srcStr, std::string(destVec.begin(), destVec.end()));
 }
 
-HWTEST_F(WifiCommonUtilTest, GetAuthInfoTest, TestSize.Level1)
+HWTEST_F(WifiCommonUtilTest, GetSplitInfoTest, TestSize.Level1)
 {
-    WIFI_LOGI("GetAuthInfoTest enter");
+    WIFI_LOGI("GetSplitInfoTest enter");
     std::string input = "00::55::DD::ff::MM";
     std::string delimiter = "::";
-    std::vector<std::string> result = getAuthInfo(input, delimiter);
+    std::vector<std::string> result = GetSplitInfo(input, delimiter);
     EXPECT_EQ(result.size(), 5);
 }
 
-HWTEST_F(WifiCommonUtilTest, GetAuthInfoTest_1, TestSize.Level1)
+HWTEST_F(WifiCommonUtilTest, GetSplitInfoTest_1, TestSize.Level1)
 {
-    WIFI_LOGI("GetAuthInfoTest_1 enter");
+    WIFI_LOGI("GetSplitInfoTest_1 enter");
     std::string input = "00";
     std::string delimiter = "::";
-    std::vector<std::string> result = getAuthInfo(input, delimiter);
+    std::vector<std::string> result = GetSplitInfo(input, delimiter);
     EXPECT_EQ(result.size(), 1);
 }
 }  // namespace Wifi

@@ -20,6 +20,7 @@
 #include "p2p_define.h"
 #include "wifi_hisysevent.h"
 #include "wifi_config_center.h"
+#include "p2p_chr_reporter.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupNegotiationState");
 
@@ -174,7 +175,6 @@ bool GroupNegotiationState::ProcessNegotFailEvt(InternalMessagePtr msg) const
 {
     int status = msg->GetParam1();
     WIFI_LOGE("Negotiation failure. Error code: %{public}d", status);
-    WriteP2pConnectFailedHiSysEvent(status, static_cast<int>(P2P_ERROR_RES::NEGO_FAILURE));
     p2pStateMachine.DealGroupCreationFailed();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     return EXECUTED;
@@ -202,6 +202,8 @@ bool GroupNegotiationState::ProcessInvitationResultEvt(InternalMessagePtr msg) c
     } else if (status == P2pStatus::NO_COMMON_CHANNELS) {
         WIFI_LOGE("fail:There is no common channel.");
     } else {
+        P2pChrReporter::GetInstance().ReportErrCodeBeforeGroupFormationSucc(P2P_INVITATION, msg->GetParam1(),
+            P2P_CHR_DEFAULT_REASON_CODE);
         p2pStateMachine.DealGroupCreationFailed();
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     }

@@ -52,12 +52,20 @@ static const std::string CURRENT_ADDR = "192.168.0.100";
 static const std::vector<std::string> TESTED_ADDR = {"192.168.0.101", "192.168.0.102", "192.168.0.103"};
 constexpr int TEN = 10;
 
+static std::string g_errLog;
+void SelfCureStateMachineCallBack(const LogType type, const LogLevel level,
+                                  const unsigned int domain,
+                                  const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 class SelfCureStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        LOG_SetCallback(SelfCureStateMachineCallBack);
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillOnce(Return(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiSelfcureReset(_)).Times(AtLeast(0));
@@ -474,6 +482,7 @@ public:
     {
         LOGI("Enter InternetSelfCureGoOutStateSuccess");
         pSelfCureStateMachine_->pInternetSelfCureState_->GoOutState();
+        EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
     }
 
     void InternetSelfCureExeMsgFail()
@@ -1695,11 +1704,13 @@ public:
 HWTEST_F(SelfCureStateMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
 {
     DefaultStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, DefaultStateGoOutStateSuccess, TestSize.Level1)
 {
     DefaultStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, DefaultStateExeMsgFail, TestSize.Level1)
@@ -1730,6 +1741,7 @@ HWTEST_F(SelfCureStateMachineTest, ConnectedMonitorStateExeMsgFail, TestSize.Lev
 HWTEST_F(SelfCureStateMachineTest, ConnectedMonitorStateExeMsgSuccess1, TestSize.Level1)
 {
     ConnectedMonitorStateExeMsgSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, InitSelfCureCmsHandleMapTest, TestSize.Level1)
@@ -1785,6 +1797,7 @@ HWTEST_F(SelfCureStateMachineTest, RequestReassocWithFactoryMacTest, TestSize.Le
 HWTEST_F(SelfCureStateMachineTest, IsGatewayChangedTest, TestSize.Level1)
 {
     IsGatewayChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, HandleGatewayChangedTest, TestSize.Level1)
@@ -1795,11 +1808,13 @@ HWTEST_F(SelfCureStateMachineTest, HandleGatewayChangedTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, InitDnsServerTest, TestSize.Level1)
 {
     InitDnsServerTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsCustNetworkSelfCureTest, TestSize.Level1)
 {
     IsCustNetworkSelfCureTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SelfCureForDnsTest, TestSize.Level1)
@@ -1810,6 +1825,7 @@ HWTEST_F(SelfCureStateMachineTest, SelfCureForDnsTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, GetPublicDnsServersTest, TestSize.Level1)
 {
     GetPublicDnsServersTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetReplacedDnsServersTest, TestSize.Level1)
@@ -1845,56 +1861,67 @@ HWTEST_F(SelfCureStateMachineTest, HandleTcpQualityQueryTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, DisconnectedMonitorGoInStateSuccess, TestSize.Level1)
 {
     DisconnectedMonitorGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, DisconnectedMonitorGoOutStateSuccess, TestSize.Level1)
 {
     DisconnectedMonitorGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, DisconnectedMonitorExeMsgFail, TestSize.Level1)
 {
     DisconnectedMonitorExeMsgFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, DisconnectedMonitorExeMsgSuccess1, TestSize.Level1)
 {
     DisconnectedMonitorExeMsgSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, DisconnectedMonitorExeMsgSuccess2, TestSize.Level1)
 {
     DisconnectedMonitorExeMsgSuccess2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, ConnectionSelfCureGoInStateSuccess, TestSize.Level1)
 {
     ConnectionSelfCureGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, ConnectionSelfCureGoOutStateSuccess, TestSize.Level1)
 {
     ConnectionSelfCureGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, ConnectionSelfCureExeMsgFail, TestSize.Level1)
 {
     ConnectionSelfCureExeMsgFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, ConnectionSelfCureExeMsgSuccess1, TestSize.Level1)
 {
     ConnectionSelfCureExeMsgSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, InternetSelfCureGoInStateSuccess, TestSize.Level1)
 {
     InternetSelfCureGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, InternetSelfCureGoOutStateSuccess, TestSize.Level1)
 {
     InternetSelfCureGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, InternetSelfCureExeMsgFail, TestSize.Level1)
@@ -1975,11 +2002,13 @@ HWTEST_F(SelfCureStateMachineTest, SelectBestSelfCureSolutionExtTest, TestSize.L
 HWTEST_F(SelfCureStateMachineTest, GetNextTestDhcpResultsTest, TestSize.Level1)
 {
     GetNextTestDhcpResultsTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetRecordDhcpResultsTest, TestSize.Level1)
 {
     GetRecordDhcpResultsTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SelfCureWifiLinkTest, TestSize.Level1)
@@ -2075,11 +2104,13 @@ HWTEST_F(SelfCureStateMachineTest, HandleDelayedResetSelfCureTest, TestSize.Leve
 HWTEST_F(SelfCureStateMachineTest, Wifi6SelfCureStateGoInStateSuccess, TestSize.Level1)
 {
     Wifi6SelfCureStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, Wifi6SelfCureStateGoOutStateSuccess, TestSize.Level1)
 {
     Wifi6SelfCureStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, InitExeMsgFail, TestSize.Level1)
@@ -2265,16 +2296,19 @@ HWTEST_F(SelfCureStateMachineTest, SelfCureForResetTest6, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, IsSettingsPageTest, TestSize.Level1)
 {
     IsSettingsPageTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, NoInternetStateGoInStateSuccess, TestSize.Level1)
 {
     NoInternetStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, NoInternetStateGoOutStateSuccess, TestSize.Level1)
 {
     NoInternetStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, NoInternetStateExeMsgFail, TestSize.Level1)
@@ -2325,13 +2359,13 @@ HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest, TestSize.Level1)
 {
     IpInfo dhcpResults;
     dhcpResults.gateway = 0;
-    pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults);
+    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), 0);
 
     dhcpResults.ipAddress = 0;
-    pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults);
+    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), 0);
 
     dhcpResults.ipAddress = 1;
-    pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults);
+    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), 0);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest1, TestSize.Level1)
@@ -2897,6 +2931,7 @@ HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_HighReset_ReturnsTrue, Tes
 HWTEST_F(SelfCureStateMachineTest, HandleNetworkConnectedTest, TestSize.Level1)
 {
     pSelfCureStateMachine_->HandleNetworkConnected();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Success_Reassoc, TestSize.Level1)
@@ -3055,7 +3090,7 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedHighRe
 
 HWTEST_F(SelfCureStateMachineTest, IfMultiGateway_Test, TestSize.Level1)
 {
-    pSelfCureStateMachine_->IfMultiGateway();
+    EXPECT_EQ(pSelfCureStateMachine_->IfMultiGateway(), true);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsSelfCureOnGoing_Test, TestSize.Level1)
@@ -3071,12 +3106,12 @@ HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)
 {
-    pSelfCureStateMachine_->GetCurrentRssi();
+    EXPECT_EQ(pSelfCureStateMachine_->GetCurrentRssi(), 1);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetIsReassocWithFactoryMacAddressTest, TestSize.Level1)
 {
-    pSelfCureStateMachine_->GetIsReassocWithFactoryMacAddress();
+    EXPECT_EQ(pSelfCureStateMachine_->GetIsReassocWithFactoryMacAddress(), 0);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsEncryptedAuthTypeTest, TestSize.Level1)
@@ -3110,11 +3145,13 @@ HWTEST_F(SelfCureStateMachineTest, IsSoftApSsidSameWithWifiTest, TestSize.Level1
 HWTEST_F(SelfCureStateMachineTest, CheckConflictIpForSoftApTest, TestSize.Level1)
 {
     pSelfCureStateMachine_->CheckConflictIpForSoftAp();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  
 HWTEST_F(SelfCureStateMachineTest, RecoverySoftApTest, TestSize.Level1)
 {
     pSelfCureStateMachine_->RecoverySoftAp();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsHttpReachableTest, TestSize.Level1)

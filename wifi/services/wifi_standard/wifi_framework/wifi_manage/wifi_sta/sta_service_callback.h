@@ -34,6 +34,7 @@ struct StaServiceCallback {
     std::function<void(OperateResState, int)> OnStaSemiActiveRes { nullptr };
     std::function<void(IpInfo, int)> OnDhcpOfferReport { nullptr };
     std::function<void(int, int)> OnAutoSelectNetworkRes { nullptr };
+    std::function<void(const WifiSignalPollInfo &)> OnWifiHalSignalInfoChange { nullptr };
 };
 }  // namespace Wifi
 }  // namespace OHOS

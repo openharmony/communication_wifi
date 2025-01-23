@@ -24,7 +24,7 @@
 #include "wifi_system_ability_listerner.h"
 #include "common_event_manager.h"
 #include "wifi_event_handler.h"
-
+#include "display_manager_lite.h"
 namespace OHOS {
 namespace Wifi {
 #ifdef HAS_POWERMGR_PART
@@ -60,6 +60,10 @@ public:
     virtual ~NotificationEventSubscriber();
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
     void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
+private:
+    void OnReceiveNotificationEvent(int notificationId);
+    void OnReceiveDialogAcceptEvent(int dialogType);
+    void OnReceiveDialogRejectEvent(int dialogType);
 };
 
 #ifdef HAS_POWERMGR_PART
@@ -105,6 +109,13 @@ public:
     explicit DataShareReadySubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     ~DataShareReadySubscriber() = default;
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+
+class WifiFoldStateListener : public Rosen::DisplayManagerLite::IFoldStatusListener {
+public:
+    WifiFoldStateListener();
+    ~WifiFoldStateListener() = default;
+    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
 };
 
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
@@ -168,6 +179,8 @@ private:
     void UnRegisterSettingsEnterEvent();
     void RegisterDataShareReadyEvent();
     void UnRegisterDataShareReadyEvent();
+    void RegisterFoldStatusListener();
+    void UnRegisterFoldStatusListener();
 
 private:
     uint32_t cesTimerId{0};
@@ -204,6 +217,8 @@ private:
 
     bool accessDataShare_ = false;
     std::mutex accessDataShareMutex_;
+    sptr<Rosen::DisplayManagerLite::IFoldStatusListener> foldStatusListener_ = nullptr;
+    std::mutex foldStatusListenerMutex_;
 };
 
 }  // namespace Wifi

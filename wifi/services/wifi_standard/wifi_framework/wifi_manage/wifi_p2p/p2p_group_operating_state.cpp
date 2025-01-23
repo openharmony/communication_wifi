@@ -22,6 +22,7 @@
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
 #include "wifi_net_agent.h"
+#include "p2p_chr_reporter.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupOperatingState");
 
@@ -407,6 +408,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
             static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT), cgTimedOut);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_SUCCESS);
     }
+    P2pChrReporter::GetInstance().SetWpsSuccess(true);
     return EXECUTED;
 }
 

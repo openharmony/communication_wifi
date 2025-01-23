@@ -71,6 +71,12 @@
         EnableSemiWifi;
         GetWifiDetailState;
         UpdateNetworkLagInfo;
+        FetchWifiSignalInfoForVoWiFi;
+        IsSupportVoWifiDetect;
+        SetVoWifiDetectMode;
+        GetVoWifiDetectMode;
+        SetVoWifiDetectPeriod;
+        GetVoWifiDetectPeriod;
         "*CompositeWifiFilter*";
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";

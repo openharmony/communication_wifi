@@ -465,7 +465,13 @@ int GetDeviceType();
  * @return false - close
  */
 bool IsStartUpWifiEnableSupport();
-
+/**
+ * @Description is fold product supprt signal smoothe
+ *
+ * @return true - smoothe
+ * @return false - not smoothe
+ */
+bool IsSignalSmoothingEnable();
 #ifndef OHOS_ARCH_LITE
 /**
  * @Description Parse json string, find key by type, get value by key

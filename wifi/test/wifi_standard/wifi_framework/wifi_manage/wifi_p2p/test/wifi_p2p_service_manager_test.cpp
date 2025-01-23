@@ -22,6 +22,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class WifiP2pServiceManagerTest : public testing::Test {
 public:
     WifiP2pServiceManagerTest()
@@ -45,6 +46,7 @@ public:
 HWTEST_F(WifiP2pServiceManagerTest, Init, TestSize.Level1)
 {
     pWifiP2pServiceManager->Init();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pServiceManagerTest, SetQueryId, TestSize.Level1)
@@ -136,6 +138,7 @@ HWTEST_F(WifiP2pServiceManagerTest, GetServiceResponseList, TestSize.Level1)
     WifiP2pServiceResponseList respList;
     respLists.push_back(respList);
     pWifiP2pServiceManager->GetServiceResponseList(respLists);
+    EXPECT_TRUE(pWifiP2pServiceManager->GetServiceResponseList(respLists));
 }
 
 HWTEST_F(WifiP2pServiceManagerTest, AddServiceResponse_SUCCESS, TestSize.Level1)
@@ -202,6 +205,7 @@ HWTEST_F(WifiP2pServiceManagerTest, AddRequestRecord, TestSize.Level1)
     pWifiP2pServiceManager->AddRequestRecord("AA:BB:CC:DD:EE:FF", 10);
     pWifiP2pServiceManager->AddRequestRecord("AA:BB:CC:DD:EE:FF", 10);
     pWifiP2pServiceManager->AddRequestRecord("AA:BB:CC:DD:EE:FF", 11);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pServiceManagerTest, IsRecordedRequest, TestSize.Level1)
@@ -223,6 +227,7 @@ HWTEST_F(WifiP2pServiceManagerTest, RemoveRequestRecord, TestSize.Level1)
 
     pWifiP2pServiceManager->RemoveRequestRecord("AA:BB:CC:DD:EE:FF", 10);
     pWifiP2pServiceManager->RemoveRequestRecord("AA:BB:CC:DD:EE:FF", 11);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pServiceManagerTest, UpdateServiceName1, TestSize.Level1)

@@ -35,6 +35,7 @@ ohos_unittest("utils_unittest") {
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/utils/inc",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
   ]
 
   ldflags = [
@@ -43,11 +44,7 @@ ohos_unittest("utils_unittest") {
     "--coverage",
   ]
 
-  deps = [
-    "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
 
   external_deps = [
     "ability_base:want",
@@ -56,6 +53,8 @@ ohos_unittest("utils_unittest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_single",

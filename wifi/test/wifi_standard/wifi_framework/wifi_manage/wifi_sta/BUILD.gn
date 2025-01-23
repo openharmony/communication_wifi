@@ -26,6 +26,7 @@ config("module_private_config") {
 }
 
 local_base_sources = [
+  "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
   "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
   "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
   "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
@@ -56,7 +57,6 @@ local_base_sources = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_net_observer.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_netlink.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats/wifi_net_stats_manager.cpp",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_notification_util.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_helper.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_permission_utils.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect.cpp",
@@ -126,11 +126,10 @@ local_base_include_dirs = [
   "//commonlibrary/c_utils/base/include",
   "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  "//foundation/arkui/ace_engine/frameworks/base/utils",
-  "//foundation/arkui/ace_engine/frameworks",
   "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
+  "$WIFI_ROOT_DIR/base/shared_util/",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
 ]
 
@@ -161,14 +160,18 @@ local_base_external_deps = [
   "ability_runtime:extension_manager",
   "ability_runtime:wantagent_innerkits",
   "access_token:libaccesstoken_sdk",
-  "access_token:libtokenid_sdk",
   "bundle_framework:appexecfwk_base",
   "bundle_framework:appexecfwk_core",
   "c_utils:utils",
   "cellular_data:tel_cellular_data_api",
+  "certificate_manager:cert_manager_sdk",
   "core_service:tel_core_service_api",
   "data_share:datashare_consumer",
   "dhcp:dhcp_sdk",
+  "dhcp:dhcp_sdk",
+  "dhcp:dhcp_utils",
+  "googletest:gmock_main",
+  "googletest:gtest_main",
   "hilog:libhilog",
   "init:libbegetutil",
   "ipc:ipc_single",
@@ -182,6 +185,7 @@ local_base_external_deps = [
   "power_manager:powermgr_client",
   "samgr:samgr_proxy",
   "time_service:time_client",
+  "window_manager:libdm_lite",
 ]
 
 ohos_unittest("wifi_sta_unittest") {
@@ -190,26 +194,31 @@ ohos_unittest("wifi_sta_unittest") {
   sources = local_base_sources
   sources += [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/arp_checker.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/base_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ip_tools.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ipv6_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/mac_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_cert_utils.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_common_event_helper.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_randommac_helper.cpp",
     "Mock/mock_sta_auto_connect_service.cpp",
     "Mock/mock_wifi_manager.cpp",
     "network_selection_test.cpp",
+    "network_selection_utils_test.cpp",
     "sta_auto_connect_service_test.cpp",
     "sta_interface_test.cpp",
     "sta_monitor_test.cpp",
     "sta_saved_device_appraisal_test.cpp",
     "sta_service_test.cpp",
     "sta_state_machine_test.cpp",
+    "wifi_filter_impl_test.cpp",
   ]
 
   include_dirs = local_base_include_dirs
   ldflags = local_base_ldflags
-  deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-    "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
   external_deps = local_base_external_deps
 
   if (wifi_ffrt_enable) {
@@ -231,6 +240,8 @@ ohos_unittest("wifi_selfcure_unittest") {
   sources = local_base_sources
   sources += [
     "$WIFI_ROOT_DIR/base/utils/wifi_datashare_utils.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/wifi_msg.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_system_ability_listerner.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",
@@ -256,6 +267,16 @@ ohos_unittest("wifi_selfcure_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_scan_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_toggler_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/arp_checker.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/base_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ip_tools.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ipv6_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/mac_address.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_cert_utils.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_common_event_helper.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_randommac_helper.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_ap/Mock/mock_wifi_ap_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock/mock_scan_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_sta_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/mock/mock_wifi_service_manager.cpp",
@@ -272,15 +293,12 @@ ohos_unittest("wifi_selfcure_unittest") {
     "$WIFI_ROOT_DIR/base/shared_util",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+    "$WIFI_ROOT_DIR/frameworks/native/src",
   ]
   ldflags = local_base_ldflags
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = local_base_external_deps
 

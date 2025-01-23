@@ -38,12 +38,19 @@ using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 using namespace OHOS::Wifi;
 using namespace testing;
+static std::string g_errLog;
+void StaAppAccelerationallback(const LogType type, const LogLevel level,
+    const unsigned int domain, const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 
 class StaAppAccelerationTest : public Test {
 public:
     void SetUp() override
     {
         staAppAcceleration_.reset(new StaAppAcceleration());
+        LOG_SetCallback(StaAppAccelerationallback);
     }
 
     void TearDown() override
@@ -61,12 +68,14 @@ HWTEST_F(StaAppAccelerationTest, HandleScreenStatusChangedTest01, TestSize.Level
     staAppAcceleration_->HandleScreenStatusChanged(screenState);
     screenState = MODE_STATE_CLOSE;
     staAppAcceleration_->HandleScreenStatusChanged(screenState);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAppAccelerationTest, SetPmModeTest01, TestSize.Level1)
 {
     int mode = 0;
     staAppAcceleration_->SetPmMode(mode);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAppAccelerationTest, StartGameBoostTest01, TestSize.Level1)
@@ -74,8 +83,10 @@ HWTEST_F(StaAppAccelerationTest, StartGameBoostTest01, TestSize.Level1)
     int uid = 1;
     staAppAcceleration_->gameBoostingFlag = false;
     staAppAcceleration_->StartGameBoost(uid);
+    EXPECT_TRUE(staAppAcceleration_->gameBoostingFlag);
     staAppAcceleration_->gameBoostingFlag = true;
     staAppAcceleration_->StartGameBoost(uid);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAppAccelerationTest, StopGameBoostTest01, TestSize.Level1)
@@ -83,6 +94,7 @@ HWTEST_F(StaAppAccelerationTest, StopGameBoostTest01, TestSize.Level1)
     int uid = 1;
     staAppAcceleration_->gameBoostingFlag = true;
     staAppAcceleration_->StopGameBoost(uid);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAppAccelerationTest, SetGameBoostModeTest01, TestSize.Level1)
@@ -92,6 +104,7 @@ HWTEST_F(StaAppAccelerationTest, SetGameBoostModeTest01, TestSize.Level1)
     int type = 1;
     int limitMode = 1;
     staAppAcceleration_->SetGameBoostMode(enable, uid, type, limitMode);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAppAccelerationTest, HighPriorityTransmitTest01, TestSize.Level1)
@@ -100,9 +113,11 @@ HWTEST_F(StaAppAccelerationTest, HighPriorityTransmitTest01, TestSize.Level1)
     int protocol = 1;
     int enable = 1;
     staAppAcceleration_->HighPriorityTransmit(uid, protocol, enable);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAppAccelerationTest, StopAllAppAccelerationTest01, TestSize.Level1)
 {
     staAppAcceleration_->StopAllAppAcceleration();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }

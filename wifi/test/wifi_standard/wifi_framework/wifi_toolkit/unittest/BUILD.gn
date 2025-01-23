@@ -92,6 +92,8 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/utils/inc",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/hal_device_manager",
   ]
 
   ldflags = [
@@ -116,8 +118,6 @@ ohos_unittest("toolkit_unittest") {
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   defines = [
     "private = public",
@@ -129,6 +129,8 @@ ohos_unittest("toolkit_unittest") {
     "certificate_manager:cert_manager_sdk",
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "icu:shared_icuuc",
     "ipc:ipc_single",

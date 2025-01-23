@@ -26,6 +26,7 @@ config("module_private_config") {
 ohos_unittest("wifi_scan_unittest") {
   module_out_path = module_output_path
   sources = [
+    "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
     "$WIFI_ROOT_DIR/base/shared_util/wifi_watchdog_utils.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",
@@ -128,8 +129,6 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   defines = [
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
@@ -149,9 +148,9 @@ ohos_unittest("wifi_scan_unittest") {
     "ability_runtime:app_manager",
     "ability_runtime:connection_obs_manager",
     "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
-    "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
@@ -159,6 +158,8 @@ ohos_unittest("wifi_scan_unittest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -168,6 +169,7 @@ ohos_unittest("wifi_scan_unittest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "window_manager:libdm_lite",
   ]
   part_name = "wifi"
   subsystem_name = "communication"

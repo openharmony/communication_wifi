@@ -359,6 +359,7 @@ int WifiScanConfig::GetScanInfoList(std::vector<WifiScanInfo> &results)
             LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
                 SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
             iter = mWifiScanInfoList.erase(iter);
+            mWifiCategoryRecord.erase(iter->bssid);
             continue;
         }
         if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
@@ -405,5 +406,10 @@ void WifiScanConfig::CleanWifiCategoryRecord()
     mWifiCategoryRecord.clear();
 }
 
+void WifiScanConfig::RemoveWifiCategoryRecord(const std::string bssid)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    mWifiCategoryRecord.erase(bssid);
+}
 }  // namespace Wifi
 }  // namespace OHOS

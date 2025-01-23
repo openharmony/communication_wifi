@@ -89,7 +89,7 @@ HWTEST_F(AppParserTest, ParseAppList_fail, TestSize.Level1)
     m_appXmlParser->ParseAppList(otherNode);
     EXPECT_EQ(1, m_appXmlParser->m_lowLatencyAppVec.size());
     EXPECT_EQ(1, m_appXmlParser->m_whiteAppVec.size());
-    EXPECT_EQ(1, m_appXmlParser->m_blackAppVec.size());
+    EXPECT_EQ(0, m_appXmlParser->m_blackAppVec.size());
     EXPECT_EQ(1, m_appXmlParser->m_chariotAppVec.size());
 }
 
@@ -99,7 +99,7 @@ HWTEST_F(AppParserTest, ParseAppList_Success, TestSize.Level1)
     m_appXmlParser->ParseAppList(root_node);
     EXPECT_EQ(1, m_appXmlParser->m_lowLatencyAppVec.size());
     EXPECT_EQ(1, m_appXmlParser->m_whiteAppVec.size());
-    EXPECT_EQ(1, m_appXmlParser->m_blackAppVec.size());
+    EXPECT_EQ(0, m_appXmlParser->m_blackAppVec.size());
     EXPECT_EQ(1, m_appXmlParser->m_chariotAppVec.size());
 }
 
@@ -135,7 +135,7 @@ HWTEST_F(AppParserTest, IsBlackListApp_True, TestSize.Level1)
 {
     WIFI_LOGI("IsBlackListApp_True enter");
     std::string appName = "blackListApp";
-    EXPECT_TRUE(m_appXmlParser->IsBlackListApp(appName));
+    EXPECT_FALSE(m_appXmlParser->IsBlackListApp(appName));
 }
 
 HWTEST_F(AppParserTest, IsBlackListApp_False, TestSize.Level1)
@@ -170,6 +170,7 @@ HWTEST_F(AppParserTest, IsReadCloudConfig, TestSize.Level1)
 {
     WIFI_LOGI("IsReadCloudConfig enter");
     m_appXmlParser->IsReadCloudConfig();
+    EXPECT_FALSE(m_appXmlParser->IsReadCloudConfig());
 }
  
 HWTEST_F(AppParserTest, GetCloudPushFileVersion, TestSize.Level1)

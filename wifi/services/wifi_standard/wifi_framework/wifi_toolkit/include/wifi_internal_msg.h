@@ -184,6 +184,7 @@ struct WifiEventCallbackMsg {
     CfgInfo* cfgInfo;
     GcInfo gcInfo;
     std::string privateWfdInfo;
+    int errCode;
     WifiEventCallbackMsg()
     {
         msgCode = 0;
@@ -191,6 +192,7 @@ struct WifiEventCallbackMsg {
         id = 0;
         p2pAction = P2pActionCallback::UNKNOWN;
         cfgInfo = nullptr;
+        errCode = 0;
     }
 };
 

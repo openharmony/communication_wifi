@@ -44,17 +44,6 @@ SelfCureInterface::~SelfCureInterface()
     }
 }
 
-extern "C" ISelfCureService *Create(int instId = 0)
-{
-    return new (std::nothrow) SelfCureInterface(instId);
-}
-
-extern "C" void Destroy(ISelfCureService *pservice)
-{
-    delete pservice;
-    pservice = nullptr;
-}
-
 ErrCode SelfCureInterface::InitSelfCureService()
 {
     WIFI_LOGD("Enter SelfCureInterface::InitSelfCureService");

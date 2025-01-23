@@ -106,6 +106,8 @@ public:
     virtual int GetThermalLevel() const = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
     virtual void SetWifiToggledState(int state, int id = 0) = 0;
+    virtual int SetLastConnStaFreq(int freq) = 0;
+    virtual int SetP2pEnhanceActionListenChannel(int channel) = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual void SetThreadStatusFlag(bool state) = 0;
     virtual int SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config) = 0;
@@ -160,6 +162,12 @@ public:
     virtual int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0) = 0;
     virtual void SetSystemMode(int systemMode) = 0;
     virtual int GetSystemMode() = 0;
+    virtual bool GetWifiSelfcureResetEntered() const = 0;
+    virtual int SetHotspotIdleTimeout(int time) = 0;
+    virtual bool IsAllowPopUp() = 0;
+    virtual void SetDeviceType(int deviceType) = 0;
+    virtual int64_t GetHid2dSceneLastSetTime() = 0;
+    virtual int SetHid2dSceneLastSetTime(int64_t setTime) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -246,6 +254,8 @@ public:
     MOCK_CONST_METHOD0(GetThermalLevel, int());
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
     MOCK_METHOD2(SetWifiToggledState, void(int state, int));
+    MOCK_METHOD1(SetLastConnStaFreq, int(int freq));
+    MOCK_METHOD1(SetP2pEnhanceActionListenChannel, int(int channel));
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_METHOD1(SetThreadStatusFlag, void(bool state));
     MOCK_METHOD2(SetChangeDeviceConfig, int(ConfigChange value, const WifiDeviceConfig &config));
@@ -300,6 +310,12 @@ public:
     MOCK_METHOD2(SetHotspotMacConfig, int(const HotspotMacConfig &config, int id));
     MOCK_METHOD1(SetSystemMode, void(int));
     MOCK_METHOD0(GetSystemMode, int());
+    MOCK_METHOD0(GetHid2dSceneLastSetTime, int64_t());
+    MOCK_METHOD1(SetHid2dSceneLastSetTime, int(int64_t setTime));
+    MOCK_METHOD0(IsAllowPopUp, bool());
+    MOCK_METHOD1(SetDeviceType, void(int deviceType));
+    MOCK_METHOD1(SetHotspotIdleTimeout, int(int time));
+    MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

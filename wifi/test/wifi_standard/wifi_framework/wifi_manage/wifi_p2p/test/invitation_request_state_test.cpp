@@ -25,6 +25,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class InvitationRequestStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -70,6 +71,7 @@ HWTEST_F(InvitationRequestStateTest, GoInState, TestSize.Level1)
 HWTEST_F(InvitationRequestStateTest, GoOutState, TestSize.Level1)
 {
     pInvitationRequestState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(InvitationRequestStateTest, ProcessInvitationResultEvt1, TestSize.Level1)

@@ -23,8 +23,8 @@ DEFINE_WIFILOG_LABEL("SelfCureService");
 
 namespace OHOS {
 namespace Wifi {
-constexpr int32_t P2P_ENHANCE_BC_CONNECT_SUCC = 4;
-constexpr int32_t P2P_ENHANCE_BC_DESTROYED = 10;
+inline constexpr int32_t P2P_ENHANCE_BC_CONNECT_SUCC = 4;
+inline constexpr int32_t P2P_ENHANCE_BC_DESTROYED = 10;
 SelfCureService::SelfCureService(int instId) : pSelfCureStateMachine(nullptr), m_instId(instId)
 {
     WIFI_LOGI("SelfCureService::SelfCureService()");
@@ -38,7 +38,6 @@ SelfCureService::~SelfCureService()
         delete pSelfCureStateMachine;
         pSelfCureStateMachine = nullptr;
     }
-    UnRegisterP2pEnhanceCallback();
     SelfCureUtils::GetInstance().UnRegisterDnsResultCallback();
 }
 
@@ -86,6 +85,7 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD, info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        pSelfCureStateMachine->SetHttpMonitorStatus(false);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD, info);
         if (lastState == OperateResState::CONNECT_OBTAINING_IP) {
             pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, lastWifiLinkedInfo);
@@ -170,30 +170,20 @@ bool SelfCureService::CheckSelfCureWifiResult(int event)
 
 void SelfCureService::RegisterP2pEnhanceCallback()
 {
-    using namespace std::placeholders;
-    p2pEnhanceStateChange_ = [this](const std::string &ifName, int32_t state) {
-        this->P2pEnhanceStateChange(ifName, state);
+    P2pEnhanceCallback p2pEnhanceStateChangeCallback = [this](const std::string &ifName, int32_t state,
+        int32_t frequency) {
+            this->P2pEnhanceStateChange(ifName, state, frequency);
     };
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("RegisterP2pEnhanceCallback get pEnhanceService failed!");
         return;
     }
-    ErrCode ret = pEnhanceService->RegisterP2pEnhanceCallback(p2pEnhanceStateChange_);
+    ErrCode ret = pEnhanceService->RegisterP2pEnhanceCallback(WIFI_SERVICE_SELFCURE, p2pEnhanceStateChangeCallback);
     WIFI_LOGI("RegisterP2pEnhanceCallback result %{public}d", ret);
 }
 
-void SelfCureService::UnRegisterP2pEnhanceCallback()
-{
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService == nullptr) {
-        WIFI_LOGE("UnRegisterP2pEnhanceCallback get pEnhanceService failed!");
-        return;
-    }
-    pEnhanceService->UnRegisterP2pEnhanceCallback();
-}
-
-void SelfCureService::P2pEnhanceStateChange(const std::string &ifName, int32_t state)
+void SelfCureService::P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency)
 {
     WIFI_LOGI("P2pEnhanceStateChange, state %{public}d", state);
     int32_t p2pEnhanceState = -1;

@@ -17,12 +17,15 @@
 #include <gtest/gtest.h>
 #include <cstddef>
 #include <cstdint>
+#include "log.h"
 
 using ::testing::Return;
 using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
+
 class WifiStaIfaceTest : public testing::Test {
 public:
     static void SetUpTestCase(){};
@@ -64,22 +67,27 @@ public:
 HWTEST_F(WifiStaIfaceTest, StartScanTest, TestSize.Level1)
 {
     StartScanTest();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(WifiStaIfaceTest, StartPnoScanTest, TestSize.Level1)
 {
     StartPnoScanTest();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(WifiStaIfaceTest, StartWpsPbcModeTest, TestSize.Level1)
 {
     StartWpsPbcModeTest();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(WifiStaIfaceTest, StartWpsPinModeTest, TestSize.Level1)
 {
     StartWpsPinModeTest();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(WifiStaIfaceTest, GetRoamingCapabilitiesTest, TestSize.Level1)
 {
     GetRoamingCapabilitiesTest();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

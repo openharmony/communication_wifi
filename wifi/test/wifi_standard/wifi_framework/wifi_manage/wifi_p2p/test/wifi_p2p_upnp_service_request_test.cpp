@@ -20,6 +20,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class WifiP2pUpnpServiceRequestTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -43,6 +44,7 @@ public:
 HWTEST_F(WifiP2pUpnpServiceRequestTest, Create, TestSize.Level1)
 {
     WarpCreate();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -32,16 +32,6 @@ ScanInterface::~ScanInterface()
     }
 }
 
-extern "C" IScanService *Create(int instId = 0)
-{
-    return new ScanInterface(instId);
-}
-extern "C" void Destroy(ScanInterface *scanInterface)
-{
-    delete scanInterface;
-    scanInterface = nullptr;
-}
-
 ErrCode ScanInterface::Init()
 {
     WIFI_LOGI("Enter ScanInterface::Init.\n");

@@ -104,6 +104,10 @@ inline const int MAX_TX_SPATIAL_STREAMS = 2;
 
 inline const int LOCATOR_SA_UID = 1021;
 
+inline constexpr int P2P_ENHANCE_BC_CONNECT_SUCC = 4;
+inline constexpr int P2P_ENHANCE_BC_DESTROYED = 10;
+inline constexpr int P2P_ENHANCE_BC_SWITCH_NOTIFY_SUCC = 11;
+
 int WifiMaxThroughput(int wifiStandard, bool is11bMode,
                       WifiChannelWidth channelWidth, int rssiDbm, int maxNumSpatialStream, int channelUtilization);
 
@@ -130,6 +134,14 @@ public:
      * @param scanSerivceCallbacks callback function
      */
     virtual void RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSerivceCallbacks);
+
+    void RegisterP2pEnhanceCallback();
+
+    void P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency);
+
+    void RegisterP2pEnhanceActionListenCallback();
+
+    void P2pEnhanceActionListenChange(int listenChannel);
     /**
      * @Description Start a complete Wi-Fi scan.
      *
@@ -196,6 +208,38 @@ public:
      * @param scanAtOnce - Whether to start scanning immediately[in]
      */
     virtual void SystemScanProcess(bool scanAtOnce);
+
+    void ResetSingleScanCountAndMessage();
+
+    void AddSingleScanCountAndMessage(int delaySeconds);
+
+    /**
+     * @Description The system single scans when sta disconnected &&
+     *              screen On && scan is forbidden by Hid2dScene.
+     */
+    void SystemSingleScanProcess();
+
+    /**
+     * @Description Get some related freqs.
+     * @param lastStaFreq - The frequency of last connected STA.[out]
+     * @param p2pFreq - The frequency of current connected P2P.[out]
+     * @param p2pEnhanceFreq - The frequency of current connected P2PEnhance.[out]
+     */
+    void GetRelatedFreqs(int &lastStaFreq, int &p2pFreq, int &p2pEnhanceFreq);
+
+    /**
+     * @Description The timeout processing of system single scan, which ignoring scan control.
+     */
+    void StartSingleScanWithoutControlTimer();
+
+    void SelectTheFreqToSingleScan(const int lastStaFreq, const int p2pFreq, const int p2pEnhanceFreq);
+
+    /**
+     * @Description Start single periodic scanning.
+     * @param freq - Single scan frequency.[in]
+     */
+    void StartSingleScanWithoutControl(int freq);
+
     /**
      * @Description Status reported by the state machine.
      *
@@ -344,6 +388,8 @@ private:
     int chipsetCategory;
     int chipsetFeatrureCapability;
     bool isChipsetInfoObtained;
+    std::atomic<int> currSingleScanCount {0};
+    int lastP2pEnhanceState {0};
     /**
      * @Description Obtains the frequency of a specified band.
      *
@@ -499,6 +545,10 @@ private:
      */
     void RestartSystemScanTimeOut();
     /**
+     * @Description System single freq scanning timer expiration processing.
+     */
+    void HandleSystemSingleScanTimeOut();
+    /**
      * @Description Determines whether external scanning is allowed based on the scanning policy.
      *
      * @return success: true, failed: false
@@ -534,6 +584,13 @@ private:
      * @return success: true, failed: false
      */
     ErrCode Allow5GApScan();
+    /**
+     * @Description Determines whether to allow single frequency scan based on
+     *              screenState && staState && Hid2dScanControl.
+     *
+     * @return success: true, failed: false
+     */
+    bool AllowSystemSingleScan();
     /**
      * @Description Determines whether to allow scanning based on the scanning type..
      *
@@ -829,7 +886,12 @@ private:
      * @return true: allow, false: not allowed.
      */
     bool AllowScanByHid2dState();
-
+    /**
+     * @Description Determines whether scanning is allowed in ActionListen state.
+     *
+     * @return true: allow, false: not allowed.
+     */
+    bool AllowScanByActionListen();
     /**
      * @Description Get interval time between currentMs and startTime.
      *

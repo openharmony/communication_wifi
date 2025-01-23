@@ -235,6 +235,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         magic_enum::Enum2Name(state).c_str());
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
+        WifiConfigCenter::GetInstance().SetLastConnStaFreq(info.frequency);
     }
 
     bool isReport = true;

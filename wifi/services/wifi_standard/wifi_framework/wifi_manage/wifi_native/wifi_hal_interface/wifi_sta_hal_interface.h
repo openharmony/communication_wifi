@@ -91,8 +91,8 @@ public:
      * @param mac
      * @return WifiErrorNo
      */
-    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName);
-    
+    WifiErrorNo GetStaDeviceMacAddress(std::string &mac, const std::string &ifaceName, int macSrc = 0);
+
     /**
      * @Description Sets the Wi-Fi country code.
      *
@@ -421,6 +421,12 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo GetConnectionMloLinkedInfo(const std::string &ifName, std::vector<WifiLinkedInfo> &mloLinkInfo);
+
+private:
+#ifdef READ_MAC_FROM_OEM
+    std::string GetWifiOeminfoMac();
+    std::string wifiOemMac_ = "";
+#endif
 
 private:
     WifiEventCallback mStaCallback[2];

@@ -28,6 +28,11 @@ inline const int MIN_SYSTEM_SCAN_INTERVAL = 20;
 inline const int MAX_SYSTEM_SCAN_INTERVAL = 160;
 inline const int MAX_SCAN_CONFIG_STORE_INDEX = 10000;
 inline const int SECOND_TO_MILLI_SECOND = 1000;
+inline const int DELAY_FIVE_SECONDS = 5;
+inline const int DELAY_ONE_SECOND = 1;
+inline const int SCAN_P2P_BEFORE_ALL_FREQ_SCAN = 0;
+inline const int SCAN_P2PENHANCE_BEFORE_ALL_FREQ_SCAN = 1;
+inline const int SCAN_STA_BEFORE_ALL_FREQ_SCAN = 2;
 
 /* Scan Parameter Configuration */
 struct ScanConfig {
@@ -153,6 +158,7 @@ enum ScanInnerEventType {
     DISCONNECTED_SCAN_TIMER = 201, /* Automatic scanning in disconnected state */
     RESTART_PNO_SCAN_TIMER = 202,  /* Restart after PNO scanning fails */
     RESTART_SYSTEM_SCAN_TIMER = 203,
+    SYSTEM_SINGLE_SCAN_TIMER = 204, /* Automatic scanning in sta disconnected && screen on && hid2d scan controled */
     SCAN_INNER_EVENT_INVALID       /* Invalid value */
 };
 

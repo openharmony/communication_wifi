@@ -28,6 +28,12 @@ DEFINE_WIFILOG_LABEL("WifiScanCallbackStubTest");
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void WifiScanLogCallback(const LogType type, const LogLevel level, const unsigned int domain,
+                         const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 constexpr int NUMBER = 2;
 class WifiScanCallbackStubTest : public testing::Test {
 public:
@@ -36,6 +42,7 @@ public:
     virtual void SetUp()
     {
         pWifiScan = std::make_unique<WifiScanCallbackStub>();
+        LOG_SetCallback(WifiScanLogCallback);
     }
     virtual void TearDown()
     {
@@ -73,6 +80,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnWifiScanStateChangedTest, TestSize.Level1)
 {
     int state = NUMBER;
     pWifiScan->OnWifiScanStateChanged(state);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
@@ -80,6 +88,7 @@ HWTEST_F(WifiScanCallbackStubTest, RegisterCallBackTest, TestSize.Level1)
     sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallbackMock();
     pWifiScan->RegisterCallBack(userCallback);
     pWifiScan->RegisterCallBack(userCallback);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
@@ -92,6 +101,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
         return;
     }
     pWifiScan->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(pWifiScan->OnRemoteRequest(code, data, reply, option), 1);
 }
 
 HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
@@ -111,6 +121,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
         return;
     }
     pWifiScan->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(pWifiScan->OnRemoteRequest(code, data, reply, option), 1);
 }
 
 }  // namespace Wifi

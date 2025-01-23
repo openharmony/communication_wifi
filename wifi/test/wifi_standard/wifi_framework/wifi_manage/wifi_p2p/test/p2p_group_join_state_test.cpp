@@ -27,6 +27,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class P2pGroupJoinStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -86,11 +87,13 @@ public:
 HWTEST_F(P2pGroupJoinStateTest, GoInState, TestSize.Level1)
 {
     pP2pGroupJoinState->GoInState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pGroupJoinStateTest, GoOutState, TestSize.Level1)
 {
     pP2pGroupJoinState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pGroupJoinStateTest, ExecuteStateMsg, TestSize.Level1)
@@ -121,7 +124,7 @@ HWTEST_F(P2pGroupJoinStateTest, ProcessCmdP2pDisable, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    pP2pGroupJoinState->ExecuteStateMsg(msg);
+    EXPECT_TRUE(pP2pGroupJoinState->ExecuteStateMsg(msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

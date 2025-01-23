@@ -23,6 +23,13 @@ DEFINE_WIFILOG_DHCP_LABEL("IfconfigTest");
 using namespace testing::ext;
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void IfConfigLogCallback(const LogType type, const LogLevel level,
+                         const unsigned int domain, const char *tag,
+                         const char *msg)
+{
+    g_errLog = msg;
+}
 class IfconfigTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -30,7 +37,9 @@ public:
     static void TearDownTestCase()
     {}
     virtual void SetUp()
-    {}
+    {
+        LOG_SetCallback(IfConfigLogCallback);
+    }
     virtual void TearDown()
     {}
 };
@@ -64,6 +73,7 @@ HWTEST_F(IfconfigTest, AddIpAddr_001, TestSize.Level1)
     std::string mask = "";
     int ipType = static_cast<int>(IpType::IPTYPE_IPV4);
     IfConfig::GetInstance().AddIpAddr(ifName, ipAddr, mask, ipType);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: AddIpAddr_002
@@ -79,6 +89,7 @@ HWTEST_F(IfconfigTest, AddIpAddr_002, TestSize.Level1)
     std::string mask = "";
     int ipType = static_cast<int>(IpType::IPTYPE_IPV6);
     IfConfig::GetInstance().AddIpAddr(ifName, ipAddr, mask, ipType);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: AddIpAddr_003
@@ -94,6 +105,7 @@ HWTEST_F(IfconfigTest, AddIpAddr_003, TestSize.Level1)
     std::string mask = "";
     int ipType = static_cast<int>(IpType::IPTYPE_IPV4);
     IfConfig::GetInstance().AddIpAddr(ifName, ipAddr, mask, ipType);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: SetProxy_001
@@ -106,6 +118,7 @@ HWTEST_F(IfconfigTest, SetProxy_001, TestSize.Level1)
     WIFI_LOGI("SetProxy_001");
     bool isAuto = false;
     IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", " ", "pac");
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: SetProxy_002
@@ -118,6 +131,7 @@ HWTEST_F(IfconfigTest, SetProxy_002, TestSize.Level1)
     WIFI_LOGI("SetProxy_002");
     bool isAuto = true;
     IfConfig::GetInstance().SetProxy(isAuto, "proxy", "8080", "  ", "pac");
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: SetProxy_003
@@ -130,6 +144,7 @@ HWTEST_F(IfconfigTest, SetProxy_003, TestSize.Level1)
     WIFI_LOGI("SetProxy_003");
     bool isAuto = true;
     IfConfig::GetInstance().SetProxy(isAuto, "", "8080", "noProxys", "pac");
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: FlushIpAddr_001
@@ -143,6 +158,7 @@ HWTEST_F(IfconfigTest, FlushIpAddr_001, TestSize.Level1)
     std::string ifName = "test";
     int ipType = static_cast<int>(IpType::IPTYPE_IPV6);
     IfConfig::GetInstance().FlushIpAddr(ifName, ipType);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -142,6 +142,7 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/utils/inc",
+    "$WIFI_ROOT_DIR/base/cRPC/include",
   ]
 
   deps = [

@@ -26,6 +26,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+    static std::string g_errLog = "wifitest";
 class GroupFormedStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -88,11 +89,13 @@ HWTEST_F(GroupFormedStateTest, GoInState, TestSize.Level1)
 {
     AddGroupManager();
     pGroupFormedState->GoInState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(GroupFormedStateTest, GoOutState, TestSize.Level1)
 {
     pGroupFormedState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(GroupFormedStateTest, ExecuteStateMsg1, TestSize.Level1)

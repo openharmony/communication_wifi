@@ -29,6 +29,13 @@ DEFINE_WIFILOG_LABEL("WifiHotspotCallbackStubTest");
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void WifiHostLogCallback(const LogType type, const LogLevel level,
+                         const unsigned int domain, const char *tag,
+                         const char *msg)
+{
+        g_errLog = msg;
+}
 class WifiHotspotCallbackStubTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -36,6 +43,7 @@ public:
     virtual void SetUp()
     {
         pWifiHotspot = std::make_unique<WifiHotspotCallbackStub>();
+        LOG_SetCallback(WifiHostLogCallback);
     }
     virtual void TearDown()
     {
@@ -88,6 +96,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBack_001, TestSize.Level1)
 {
     WIFI_LOGI("RegisterCallBack_001 enter");
     pWifiHotspot->RegisterCallBack(nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: RegisterCallBack_002
@@ -100,6 +109,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, RegisterCallBack_002, TestSize.Level1)
     WIFI_LOGI("RegisterCallBack_002 enter");
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
     pWifiHotspot->RegisterCallBack(userCallback);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: OnRemoteRequest_001
@@ -170,6 +180,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_004, TestSize.Level1)
     }
     data.WriteInt32(0);
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
 /**
  * @tc.name: OnHotspotStateChanged_001
@@ -194,6 +205,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
 /**
  * @tc.name: OnHotspotStaJoin_001
@@ -218,6 +230,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
 /**
  * @tc.name: OnHotspotStaLeave_001
@@ -242,6 +255,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
         return;
     }
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
 
 }  // namespace Wifi

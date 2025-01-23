@@ -38,6 +38,14 @@ using ::testing::ext::TestSize;
   
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void XmlParserLogCallback(const LogType type, const LogLevel level,
+                          const unsigned int domain, const char *tag,
+                          const char *msg)
+{
+    g_errLog = msg;
+}
+
 DEFINE_WIFILOG_LABEL("XmlParserTest");
 
 class MockXmlParser : public XmlParser {
@@ -55,6 +63,7 @@ public:
     virtual void SetUp()
     {
         m_xmlParser  = std::make_unique<MockXmlParser>();
+        LOG_SetCallback(XmlParserLogCallback);
     }
     virtual void TearDown() {}
 private:
@@ -65,6 +74,7 @@ HWTEST_F(XmlParserTest, DestroyTest, TestSize.Level1)
 {
     WIFI_LOGI("DestroyTest enter");
     m_xmlParser->Destroy();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(XmlParserTest, LoadConfigurationTest, TestSize.Level1)

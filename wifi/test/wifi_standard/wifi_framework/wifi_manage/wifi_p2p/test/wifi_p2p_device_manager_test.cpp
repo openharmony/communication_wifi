@@ -16,11 +16,13 @@
 
 #include "wifi_p2p_device_manager.h"
 #include "wifi_logger.h"
+#include "log.h"
 
 using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog = "wifitest";
 class WifiP2pDeviceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(){}
@@ -61,6 +63,7 @@ public:
 HWTEST_F(WifiP2pDeviceManagerTest, Initialize_SUCCESS, TestSize.Level1)
 {
     pWifiP2pDeviceManager->Initialize();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pDeviceManagerTest, AddDevice_SUCCESS, TestSize.Level1)

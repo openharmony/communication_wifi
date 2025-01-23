@@ -40,6 +40,13 @@ namespace Wifi {
 
 constexpr int TEN = 10;
 
+static std::string g_errLog;
+void WifiControllerMachineCallback(const LogType type, const LogLevel level,
+    const unsigned int domain, const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
+
 class WifiControllerMachineTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -56,6 +63,7 @@ public:
     {
         pWifiControllerMachine = std::make_unique<WifiControllerMachine>();
         pWifiControllerMachine->InitWifiControllerMachine();
+        LOG_SetCallback(WifiControllerMachineCallback);
     }
 
     virtual void TearDown()
@@ -441,31 +449,37 @@ public:
 HWTEST_F(WifiControllerMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
 {
     DefaultStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, DefaultStateGoOutStateSuccess, TestSize.Level1)
 {
     DefaultStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, EnableStateGoInStateSuccess, TestSize.Level1)
 {
     EnableStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, EnableStateGoOutStateSuccess, TestSize.Level1)
 {
     EnableStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, DisableStateGoInStateSuccess, TestSize.Level1)
 {
     DisableStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, DisableStateGoOutStateSuccess, TestSize.Level1)
 {
     DisableStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, WifiToggledTest1, TestSize.Level1)
@@ -491,21 +505,25 @@ HWTEST_F(WifiControllerMachineTest, RemoveConcreteManagerTest, TestSize.Level1)
 HWTEST_F(WifiControllerMachineTest, HandleStaCloseTest, TestSize.Level1)
 {
     HandleStaCloseTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, HandleStaStartSuccessTest, TestSize.Level1)
 {
     HandleStaStartSuccessTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, HandleStaSemiActiveTest, TestSize.Level1)
 {
     HandleStaSemiActiveTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, HandleConcreteStopTest, TestSize.Level1)
 {
     HandleConcreteStopTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, ClearStartFailCountTest, TestSize.Level1)
@@ -521,6 +539,7 @@ HWTEST_F(WifiControllerMachineTest, RmoveSoftapManagerTest, TestSize.Level1)
 HWTEST_F(WifiControllerMachineTest, HandleSoftapStopTest, TestSize.Level1)
 {
     HandleSoftapStopTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, SoftapToggledTest1, TestSize.Level1)
@@ -611,6 +630,7 @@ HWTEST_F(WifiControllerMachineTest, ConcreteIdExistTest, TestSize.Level1)
 HWTEST_F(WifiControllerMachineTest, GetWifiRoleTest, TestSize.Level1)
 {
     GetWifiRoleTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, HandleApStopTest, TestSize.Level1)
@@ -622,6 +642,7 @@ HWTEST_F(WifiControllerMachineTest, HandleApStopTest, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, instId);
     pWifiControllerMachine->pEnableState->HandleApStop(msg);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiControllerMachineTest, MakeMultiStaManagerTest01, TestSize.Level1)

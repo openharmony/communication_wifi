@@ -47,6 +47,12 @@ constexpr int SMALLER_THAN_RSSI_DELIMITING_VALUE = -66;
 constexpr int FREQUENCY = 5200;
 constexpr int INVALIDRSSI = -90;
 constexpr int TWO = 2;
+static std::string g_errLog;
+void StaAutoConnectServiceCallback(const LogType type, const LogLevel level, const unsigned int domain,
+                                   const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 
 class StaAutoConnectServiceTest : public testing::Test {
 public:
@@ -58,6 +64,7 @@ public:
         pStaAutoConnectService = new (std::nothrow) StaAutoConnectService(pStaStateMachine);
         pMockDeviceAppraisal = new (std::nothrow) MockDeviceAppraisal();
         InitAutoConnectService();
+        LOG_SetCallback(StaAutoConnectServiceCallback);
     }
     virtual void TearDown()
     {
@@ -1417,21 +1424,25 @@ HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail4, TestSize.Level1)
 HWTEST_F(StaAutoConnectServiceTest, DisableAutoJoinSuccess, TestSize.Level1)
 {
     DisableAutoJoinSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAutoConnectServiceTest, EnableAutoJoinSuccess, TestSize.Level1)
 {
     EnableAutoJoinSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAutoConnectServiceTest, RegisterAutoJoinConditionSuccess, TestSize.Level1)
 {
     RegisterAutoJoinConditionSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaAutoConnectServiceTest, DeregisterAutoJoinConditionSuccess, TestSize.Level1)
 {
     DeregisterAutoJoinConditionSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 } // Wifi
 } // OHOS

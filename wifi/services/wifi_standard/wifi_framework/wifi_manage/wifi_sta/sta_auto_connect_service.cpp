@@ -94,7 +94,7 @@ bool StaAutoConnectService::OverrideCandidateWithUserSelectChoice(NetworkSelecti
             WIFI_LOGI("%{public}s cannot find connectChoice: %{public}d", __FUNCTION__, tmpConfig.networkId);
             break;
         }
-        if (!tmpConfig.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+        if (!tmpConfig.networkSelectionStatus.seenInLastQualifiedNetworkSelection && !tmpConfig.hiddenSSID) {
             WIFI_LOGI("%{public}s cannot seen connectChoice in last auto connect: %{public}d",
                 __FUNCTION__, tmpConfig.networkId);
             break;

@@ -215,8 +215,8 @@ bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, Disable
     if (targetNetwork.networkSelectionStatus.networkDisableCount >= disablePolicy.disableCount) {
         targetNetwork.networkSelectionStatus.status = disablePolicy.disableStatus;
         targetNetwork.networkSelectionStatus.networkSelectionDisableReason = disableReason;
-        targetNetwork.networkSelectionStatus.networkDisableTimeStamp = timestamp;
     }
+    targetNetwork.networkSelectionStatus.networkDisableTimeStamp = timestamp;
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WIFI_LOGI("updateNetworkSelectStatus networkId %{public}d %{public}s %{public}d",
         targetNetworkId, SsidAnonymize(targetNetwork.ssid).c_str(), disableReason);

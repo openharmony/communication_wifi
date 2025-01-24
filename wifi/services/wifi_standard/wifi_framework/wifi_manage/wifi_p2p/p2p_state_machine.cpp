@@ -1098,6 +1098,9 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         WIFI_LOGE("Cannot get support frequencies according to band, choose random frequency");
         return 0;
     }
+    if (freqList.empty()) {
+        return 0;
+    }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int retFreq = 0;

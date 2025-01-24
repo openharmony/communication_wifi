@@ -373,6 +373,7 @@ public:
     {
         MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
         pStaStateMachine->CurrentIsRandomizedMac();
+        EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
     }
 
     void HilinkSaveConfigTest()
@@ -633,11 +634,13 @@ HWTEST_F(StaStateMachineTest, HilinkSaveConfigTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest, TestSize.Level1)
 {
     DealScreenStateChangedEventTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, InvokeOnDhcpOfferReportTest, TestSize.Level1)
 {
     InvokeOnDhcpOfferReportTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, CanArpReachableTest, TestSize.Level1)
@@ -648,6 +651,7 @@ HWTEST_F(StaStateMachineTest, CanArpReachableTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, PortalExpiredDetectTest, TestSize.Level1)
 {
     PortalExpiredDetectTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealWpaWrongPskEventFail1, TestSize.Level1)
@@ -1040,6 +1044,7 @@ HWTEST_F(StaStateMachineTest, DealGetDhcpIpTimeoutTest, TestSize.Level1)
     InternalMessagePtr msg1 = std::make_shared<InternalMessage>();
     msg1->SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT);
     pStaStateMachine->pGetIpState->DealGetDhcpIpTimeout(msg1);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 }

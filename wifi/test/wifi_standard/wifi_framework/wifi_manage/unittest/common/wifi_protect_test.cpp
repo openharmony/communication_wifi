@@ -35,6 +35,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 DEFINE_WIFILOG_LABEL("WifiProtectTest");
 class WifiProtectTest : public testing::Test {
 public:
@@ -79,6 +80,7 @@ HWTEST_F(WifiProtectTest, OnAppForegroudChangedTest, TestSize.Level1)
     WifiProtectMode::WIFI_PROTECT_FULL_HIGH_PERF, "wifiprotect");
     WifiProtectManager::GetInstance().mWifiProtects.push_back(pProtect);
     WifiProtectManager::GetInstance().OnAppForegroudChanged("wifiprotext", 0);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

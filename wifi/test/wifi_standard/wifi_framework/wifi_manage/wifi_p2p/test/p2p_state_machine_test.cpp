@@ -51,7 +51,7 @@ using ::testing::ext::TestSize;
 DEFINE_WIFILOG_P2P_LABEL("p2pStateMachineTest");
 namespace OHOS {
 namespace Wifi {
-    static std::string g_errLog = "wifitest";
+const std::string g_errLog = "wifitest";
 class P2pStateMachineTest : public testing::Test {
 public:
     ~P2pStateMachineTest()
@@ -309,6 +309,7 @@ public:
     void WarpBroadcastP2pDiscoveryChanged(bool isActive) const
     {
         pP2pStateMachine->BroadcastP2pDiscoveryChanged(isActive);
+        EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
     }
     void WarpBroadcastPersistentGroupsChanged() const
     {
@@ -576,6 +577,7 @@ HWTEST_F(P2pStateMachineTest, BroadcastP2pStatusChanged, TestSize.Level1)
     callback.OnP2pStateChangedEvent = [](P2pState state) { WIFI_LOGI("lamda"); };
     pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpBroadcastP2pStatusChanged(P2pState::P2P_STATE_STARTED);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, BroadcastP2pPeersChanged, TestSize.Level1)
@@ -620,6 +622,7 @@ HWTEST_F(P2pStateMachineTest, BroadcastP2pDiscoveryChanged, TestSize.Level1)
     callback.OnP2pDiscoveryChangedEvent = [](bool) { WIFI_LOGI("lamda"); };
     pP2pStateMachine->RegisterP2pServiceCallbacks(callback);
     WarpBroadcastP2pDiscoveryChanged(true);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(P2pStateMachineTest, BroadcastPersistentGroupsChanged, TestSize.Level1)

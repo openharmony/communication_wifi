@@ -32,6 +32,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 class WifiMockModeObserver : public AAFwk::DataAbilityObserverStub {
 public:
     WifiMockModeObserver() = default;
@@ -115,6 +116,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, ClearResourcesTest, TestSize.Level1)
     auto result = operatePtr->Query(uri, predicates, columns);
 
     WifiDataShareHelperUtils::GetInstance().ClearResources(operatePtr, result);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }
 }

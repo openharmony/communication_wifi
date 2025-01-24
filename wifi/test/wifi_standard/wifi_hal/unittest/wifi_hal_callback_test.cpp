@@ -29,7 +29,9 @@ const int STATUS_MSG = 0;
 const int NET_WORK = 5;
 const int DISASSOC_STA_HAS_LEFT = 0;
 static std::string g_errLog;
-void MyLogCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void MyLogCallback(const LogType type, const LogLevel level,
+                   const unsigned int domain, const char *tag,
+                   const char *msg)
 {
     g_errLog = msg;
 }
@@ -110,6 +112,7 @@ HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyConnectionRejectTest, TestSize.Leve
 {
     int status = STATUS_MSG;
     WifiHalCbNotifyConnectionReject(status);
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(WifiHalCallbackTest, WifiHalCbNotifyWpsOverlapTest, TestSize.Level1)

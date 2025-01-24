@@ -42,6 +42,7 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 
+const std::string g_errLog = "wifitest";
 class IWifiTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -1236,11 +1237,13 @@ HWTEST_F(IWifiTest, IdlCbkAddRemoveIfaceTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlCbkAddRemoveIface(mTestContext, event);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(IWifiTest, IdlCbkStaJoinLeaveTest, TestSize.Level1)
 {
     IdlCbkStaJoinLeave(mTestContext);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(IWifiTest, IdlCbkScanInfoNotifyTest, TestSize.Level1)
@@ -1285,6 +1288,7 @@ HWTEST_F(IWifiTest, IdlDealStaApEventTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlDealStaApEvent(mTestContext, event);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pEventDealTest, TestSize.Level1)
@@ -1388,6 +1392,7 @@ HWTEST_F(IWifiTest, IdlCbP2pFindStopEventTest, TestSize.Level1)
 HWTEST_F(IWifiTest, IdlCbP2pServDiscRespEventTest, TestSize.Level1)
 {
     IdlCbP2pServDiscRespEvent(mTestContext);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(IWifiTest, IdlCbP2pProvServDiscFailureEventTest, TestSize.Level1)
@@ -1431,18 +1436,21 @@ HWTEST_F(IWifiTest, IdlDealP2pEventFirstTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlDealP2pEventFirst(mTestContext, event);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(IWifiTest, IdlDealP2pEventSecondTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlDealP2pEventSecond(mTestContext, event);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(IWifiTest, IdlDealP2pEventTest, TestSize.Level1)
 {
     int32_t event = 1;
     IdlDealP2pEvent(mTestContext, event);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

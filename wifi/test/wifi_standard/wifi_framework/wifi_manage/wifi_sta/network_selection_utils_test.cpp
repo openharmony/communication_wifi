@@ -51,11 +51,11 @@ HWTEST_F(NetworkSelectionUtilsTest, GetNetworkCandidatesInfo, TestSize.Level1) {
     filternetworkCandidate.wifiDeviceConfig.networkId = 1;
     filternetworkCandidate.filtedReason["hasInternet"].insert(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
     networkCandidates.emplace_back(&filternetworkCandidate);
-    NetworkSelection::NetworkSelectionUtils::GetNetworkCandidatesInfo(networkCandidates,
-        filterName);
+    EXPECT_NE(NetworkSelection::NetworkSelectionUtils::GetNetworkCandidatesInfo(networkCandidates,
+        filterName),"");
     filterName = "hasInternet";
-    NetworkSelection::NetworkSelectionUtils::GetNetworkCandidatesInfo(networkCandidates,
-        filterName);
+    EXPECT_NE(NetworkSelection::NetworkSelectionUtils::GetNetworkCandidatesInfo(networkCandidates,
+        filterName),"");
 }
 
 HWTEST_F(NetworkSelectionUtilsTest, IsOpenAndMaybePortal1, TestSize.Level1) {

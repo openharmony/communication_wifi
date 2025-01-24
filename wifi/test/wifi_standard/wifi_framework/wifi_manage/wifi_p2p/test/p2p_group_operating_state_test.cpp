@@ -27,6 +27,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 class P2pGroupOperatingStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -75,11 +76,13 @@ public:
 HWTEST_F(P2pGroupOperatingStateTest, GoInState, TestSize.Level1)
 {
     pP2pGroupOperatingState->GoInState();
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, GoOutState, TestSize.Level1)
 {
     pP2pGroupOperatingState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 
 HWTEST_F(P2pGroupOperatingStateTest, ProcessCmdCreateGroup1, TestSize.Level1)

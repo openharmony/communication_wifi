@@ -91,6 +91,7 @@ HWTEST_F(NetworkParserTest, ParseIpConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseIpConfigTest enter");
     m_networkXmlParser->ParseIpConfig(nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, GetProxyMethodTest, TestSize.Level1)
@@ -103,6 +104,7 @@ HWTEST_F(NetworkParserTest, ParseProxyConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("ParseProxyConfigTest enter");
     m_networkXmlParser->ParseProxyConfig(nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(NetworkParserTest, HasWepKeysFalseTest, TestSize.Level1)

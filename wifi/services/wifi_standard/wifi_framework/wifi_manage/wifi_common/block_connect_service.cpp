@@ -117,7 +117,7 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
     for (auto &config : results) {
         WifiSettings::GetInstance().ClearNetworkCandidateScanResult(config.networkId);
         if ((config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) &&
-+            (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE)) {
+            (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE)) {
             continue;
         }
         DisablePolicy policy = CalculateDisablePolicy(config.networkSelectionStatus.networkSelectionDisableReason);
@@ -126,7 +126,8 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
             continue;
         }
         if (policy.disableStatus == WifiDeviceConfigStatus::ENABLED ||
-            timestamp - config.networkSelectionStatus.networkDisableTimeStamp >= policy.disableTime) {
+            (config.networkSelectionStatus.networkDisableTimeStamp > 0 &&
+            timestamp - config.networkSelectionStatus.networkDisableTimeStamp >= policy.disableTime)) {
             config.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
             config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
             config.networkSelectionStatus.networkDisableTimeStamp = -1;

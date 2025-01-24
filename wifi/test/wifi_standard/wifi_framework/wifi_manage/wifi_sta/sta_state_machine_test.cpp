@@ -1677,6 +1677,7 @@ HWTEST_F(StaStateMachineTest, InitStateGoInStateSuccess, TestSize.Level1)
 {
     InitStateGoInStateSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, InitStateGoOutStateSuccess, TestSize.Level1)
@@ -1796,6 +1797,7 @@ HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmdSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmdFail, TestSize.Level1)
 {
     DealConnectTimeOutCmdFail();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealReassociateCmdSuccess, TestSize.Level1)
@@ -1890,6 +1892,7 @@ HWTEST_F(StaStateMachineTest, SeparatedStateGoInStateSuccess, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, SeparatedStateGoOutStateSuccess, TestSize.Level1)
 {
     SeparatedStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SeparatedStateExeMsgSuccess1, TestSize.Level1)
@@ -1910,6 +1913,7 @@ HWTEST_F(StaStateMachineTest, SeparatedStateExeMsgFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ApLinkedStateGoInStateSuccess, TestSize.Level1)
 {
     ApLinkedStateGoInStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, ApLinkedStateGoOutStateSuccess, TestSize.Level1)
@@ -2229,6 +2233,7 @@ HWTEST_F(StaStateMachineTest, DealSignalPollResultTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, HandleForegroundAppChangedActionTest, TestSize.Level1)
 {
     HandleForegroundAppChangedActionTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 /**
@@ -2544,11 +2549,13 @@ HWTEST_F(StaStateMachineTest, DealMloConnectionLinkTestWifi7IsMlo, TestSize.Leve
 HWTEST_F(StaStateMachineTest, CloseNoInternetDialogTest, TestSize.Level1)
 {
     CloseNoInternetDialogTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, UpdateLinkedBssidTest, TestSize.Level1)
 {
     UpdateLinkedBssidTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

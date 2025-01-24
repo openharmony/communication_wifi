@@ -35,6 +35,7 @@ constexpr int STATUS = 17;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 
 class ScanServiceTest : public testing::Test {
 public:
@@ -143,24 +144,29 @@ HWTEST_F(ScanServiceTest, SystemScanByIntervalSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, SetEnhanceServiceTest, TestSize.Level1)
 {
     SetEnhanceServiceTest();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoSuccess, TestSize.Level1)
 {
     GetScanControlInfoSuccess();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoFail, TestSize.Level1)
 {
     GetScanControlInfoFail();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, StopPnoScanTest, TestSize.Level1)
+EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 {
     StopPnoScanTest();
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanSuccess, TestSize.Level1)
+EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 {
     AllowExternScanSuccess();
 }
@@ -168,21 +174,25 @@ HWTEST_F(ScanServiceTest, AllowExternScanSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowExternScanFail1, TestSize.Level1)
 {
     AllowExternScanFail1();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanFail2, TestSize.Level1)
 {
     AllowExternScanFail2();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanFail3, TestSize.Level1)
 {
     AllowExternScanFail3();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanFail4, TestSize.Level1)
 {
     AllowExternScanFail4();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

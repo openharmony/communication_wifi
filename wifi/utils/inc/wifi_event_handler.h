@@ -55,7 +55,8 @@ public:
      * @param delayTime - Wait delayTime ms excute task
      * @return bool - true: submit success, false: submit failed
      */
-    bool PostAsyncTask(const Callback &callback, const std::string &name, int64_t delayTime = 0);
+    bool PostAsyncTask(const Callback &callback, const std::string &name,
+        int64_t delayTime = 0, bool isHighPriority = false);
 
     /**
      * @Remove Async task

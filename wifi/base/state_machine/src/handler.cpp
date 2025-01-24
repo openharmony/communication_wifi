@@ -232,7 +232,17 @@ void Handler::PlaceMessageTopOfQueue(InternalMessagePtr msg)
         return;
     }
 #else
-    MessageExecutedLater(msg, 0);
+    if (pMyTaskQueue == nullptr) {
+        LOGE("%{public}s pMyQueue is null.\n", mThreadName.c_str());
+        MessageManage::GetInstance().ReclaimMsg(msg);
+        return;
+    }
+    std::function<void()> func = std::bind([this, msg]() {
+        LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
+        ExecuteMessage(msg);
+        MessageManage::GetInstance().ReclaimMsg(msg);
+    });
+    pMyTaskQueue->PostAsyncTask(func, std::to_string(msg->GetMessageName()), 0, true);
 #endif
     return;
 }

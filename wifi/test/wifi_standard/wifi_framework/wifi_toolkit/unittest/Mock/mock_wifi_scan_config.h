@@ -54,6 +54,8 @@ public:
     virtual void SetStaCurrentTime(time_t time) = 0;
     virtual time_t GetStaCurrentTime() = 0;
     virtual void RemoveWifiCategoryRecord(const std::string bssid) = 0;
+    virtual void RecordHilinkAbility(const std::string &bssid, bool isSupportHilink) = 0;
+    virtual bool GetHilinkAbility(const std::string &bssid) = 0;
 };
 
 class WifiScanConfig : public MockWifiScanConfig {
@@ -86,6 +88,8 @@ public:
     MOCK_METHOD1(SetStaCurrentTime, void(time_t time));
     MOCK_METHOD0(GetStaCurrentTime, time_t());
     MOCK_METHOD1(RemoveWifiCategoryRecord, void(const std::string bssid));
+    MOCK_METHOD2(RecordHilinkAbility, void(const std::string &bssid, bool isSupportHilink));
+    MOCK_METHOD1(GetHilinkAbility, bool(const std::string &bssid));
 };
 }  // namespace OHOS
 }  // namespace Wifi

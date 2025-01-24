@@ -369,6 +369,11 @@ static void ParseScanInfo(std::vector<ScanResultsInfo> &scanResultsInfo, std::ve
         GetScanResultInfoElem(&scanInfo, scanResult.ie.data(), scanResult.ie.size());
         scanInfo.timestamp = scanResult.tsf;
         scanInfo.isHiLinkNetwork = RouterSupportHiLinkByWifiInfo(scanResult.ie.data(), scanResult.ie.size());
+        if (scanInfo.isHiLinkNetwork) {
+            WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordHilinkAbility(scanInfo.bssid, true);
+        } else if (WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetHilinkAbility(scanInfo.bssid)) {
+            scanInfo.isHiLinkNetwork = true;
+        }
         LOGD("%{public}s: bssid:%{private}s, ssid:%{private}s isHiLinkNetwork:%{public}d, flags:%{public}s",
             __func__, scanInfo.bssid, scanInfo.ssid, scanInfo.isHiLinkNetwork, scanInfo.flags);
         InterScanInfo interScanInfo;

@@ -356,6 +356,7 @@ int WifiScanConfig::GetScanInfoList(std::vector<WifiScanInfo> &results)
             WifiConfigCenter::GetInstance().RemoveMacAddrPairInfo(
                 WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO, iter->bssid, iter->bssidType);
 #endif
+            hilinkAbilityRecord.erase(iter->bssid);
             LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
                 SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
             iter = mWifiScanInfoList.erase(iter);
@@ -378,6 +379,26 @@ void WifiScanConfig::GetScanInfoListInner(std::vector<WifiScanInfo> &results)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     results = mWifiScanInfoList;
+}
+
+void WifiScanConfig::RecordHilinkAbility(const std::string &bssid, bool isSupportHilink)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    if (bssid.empty()) {
+        LOGE ("RecordHilinkAbility bssid is NULL!");
+        return;
+    }
+    hilinkAbilityRecord.insert_or_assign(bssid, isSupportHilink);
+}
+
+bool WifiScanConfig::GetHilinkAbility(const std::string &bssid)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    auto iter = hilinkAbilityRecord.find(bssid);
+    if (iter != hilinkAbilityRecord.end()) {
+        return iter->second;
+    }
+    return false;
 }
 
 void WifiScanConfig::RecordWifiCategory(const std::string bssid, WifiCategory category)

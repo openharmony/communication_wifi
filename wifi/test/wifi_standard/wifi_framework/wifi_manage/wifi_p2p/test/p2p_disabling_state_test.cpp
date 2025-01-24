@@ -71,10 +71,10 @@ HWTEST_F(P2pDisablingStateTest, ExecuteStateMsg, TestSize.Level1)
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetParam1(1);
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::WPA_CONNECTED_EVENT));
-    pP2pDisablingState->ExecuteStateMsg(msg);
+    EXPECT_TRUE(pP2pDisablingState->ExecuteStateMsg(msg));
 
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    pP2pDisablingState->ExecuteStateMsg(msg);
+    EXPECT_TRUE(pP2pDisablingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pDisablingStateTest, ExecuteStateMsg2, TestSize.Level1)

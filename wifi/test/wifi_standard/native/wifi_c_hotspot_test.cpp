@@ -102,11 +102,13 @@ HWTEST_F(WifiHotspotTest, EnableHotspotTest, TestSize.Level1)
 HWTEST_F(WifiHotspotTest, DisableHotspotTest, TestSize.Level1)
 {
     DisableHotspotTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHotspotTest, IsHotspotActiveTest, TestSize.Level1)
 {
     IsHotspotActiveTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 /**

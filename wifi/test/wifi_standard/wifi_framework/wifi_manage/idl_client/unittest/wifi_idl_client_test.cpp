@@ -1016,6 +1016,7 @@ HWTEST_F(WifiIdlClientTest, ReqSetPowerSaveTest2, TestSize.Level1)
 {
     bool enable = false;
     mClient.ReqSetPowerSave(enable);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqWpaSetCountryCodeTest1, TestSize.Level1)
@@ -1526,6 +1527,7 @@ HWTEST_F(WifiIdlClientTest, ReqWpaAutoConnectTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqP2pStartTest, TestSize.Level1)
 {
     mClient.ReqP2pStart();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetDeviceNameTest, TestSize.Level1)
@@ -1550,6 +1552,7 @@ HWTEST_F(WifiIdlClientTest, ReqP2pSetWpsConfigMethodsTest, TestSize.Level1)
 {
     std::string config = "10.26.120.74";
     mClient.ReqP2pSetWpsConfigMethods(config);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pFlushTest, TestSize.Level1)

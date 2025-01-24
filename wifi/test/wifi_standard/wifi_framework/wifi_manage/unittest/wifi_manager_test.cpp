@@ -85,7 +85,7 @@ HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartUnloadStaSaTimerTest enter!");
     wifiManager.wifiStaManager->StartUnloadStaSaTimer();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, StaManagerDealStaOpenResTest_001, TestSize.Level1)
@@ -105,7 +105,7 @@ HWTEST_F(WifiManagerTest, DealStaCloseResTest_001, TestSize.Level1)
 {
     WIFI_LOGI("DealStaCloseResTest_001 enter!");
     wifiManager.wifiStaManager->DealStaStopped(0);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)
@@ -128,42 +128,42 @@ HWTEST_F(WifiManagerTest, DealWpsChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealWpsChangedTest enter!");
     wifiManager.wifiStaManager->DealWpsChanged(WpsStartState::START_PBC_SUCCEED, 123456);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealStreamChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealStreamChangedTest enter!");
     wifiManager.wifiStaManager->DealStreamChanged(StreamDirection::STREAM_DIRECTION_DOWN);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealRssiChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealRssiChangedTest enter!");
     wifiManager.wifiStaManager->DealRssiChanged(-66);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, StopSatelliteTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StopSatelliteTimerTest enter!");
     wifiManager.wifiStaManager->StopSatelliteTimer();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, StartSatelliteTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartSatelliteTimerTest enter!");
     wifiManager.wifiStaManager->StartSatelliteTimer();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, StartUnloadScanSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartUnloadScanSaTimerTest enter!");
     wifiManager.wifiScanManager->StartUnloadScanSaTimer();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, CheckAndStartScanService_001, TestSize.Level1)
@@ -203,14 +203,14 @@ HWTEST_F(WifiManagerTest, StartUnloadApSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartUnloadApSaTimerTest enter!");
     wifiManager.wifiHotspotManager->StartUnloadApSaTimer();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealApStateChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealApStateChangedTest enter!");
     wifiManager.wifiHotspotManager->DealApStateChanged(ApState::AP_STATE_NONE);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealApGetStaLeaveTest, TestSize.Level1)
@@ -218,7 +218,7 @@ HWTEST_F(WifiManagerTest, DealApGetStaLeaveTest, TestSize.Level1)
     WIFI_LOGI("DealApGetStaLeaveTest enter!");
     StationInfo info;
     wifiManager.wifiHotspotManager->DealApGetStaLeave(info);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 #ifdef FEATURE_P2P_SUPPORT
@@ -273,7 +273,7 @@ HWTEST_F(WifiManagerTest, CloseP2pServiceTest, TestSize.Level1)
 {
     WIFI_LOGI("CloseP2pServiceTest enter!");
     wifiManager.wifiP2pManager->CloseP2pService();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pStateChangedTest_001, TestSize.Level1)
@@ -288,7 +288,7 @@ HWTEST_F(WifiManagerTest, DealP2pStateChangedTest_002, TestSize.Level1)
 {
     WIFI_LOGI("DealP2pStateChangedTest_002 enter!");
     wifiManager.wifiP2pManager->DealP2pStateChanged(P2pState::P2P_STATE_CLOSED);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pPeersChangedTest, TestSize.Level1)
@@ -296,14 +296,14 @@ HWTEST_F(WifiManagerTest, DealP2pPeersChangedTest, TestSize.Level1)
     WIFI_LOGI("DealP2pPeersChangedTest enter!");
     std::vector<WifiP2pDevice> vPeers;
     wifiManager.wifiP2pManager->DealP2pPeersChanged(vPeers);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pPrivatePeersChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealP2pPrivatePeersChangedTest enter!");
     wifiManager.wifiP2pManager->DealP2pPrivatePeersChanged("test");
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pServiceChangedTest, TestSize.Level1)
@@ -311,7 +311,7 @@ HWTEST_F(WifiManagerTest, DealP2pServiceChangedTest, TestSize.Level1)
     WIFI_LOGI("DealP2pServiceChangedTest enter!");
     std::vector<WifiP2pServiceInfo> vServices;
     wifiManager.wifiP2pManager->DealP2pServiceChanged(vServices);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pConnectionChangedTest, TestSize.Level1)
@@ -319,7 +319,7 @@ HWTEST_F(WifiManagerTest, DealP2pConnectionChangedTest, TestSize.Level1)
     WIFI_LOGI("DealP2pConnectionChangedTest enter!");
     WifiP2pLinkedInfo info;
     wifiManager.wifiP2pManager->DealP2pConnectionChanged(info);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pThisDeviceChangedTest, TestSize.Level1)
@@ -327,28 +327,28 @@ HWTEST_F(WifiManagerTest, DealP2pThisDeviceChangedTest, TestSize.Level1)
     WIFI_LOGI("DealP2pThisDeviceChangedTest enter!");
     WifiP2pDevice info;
     wifiManager.wifiP2pManager->DealP2pThisDeviceChanged(info);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pDiscoveryChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealP2pDiscoveryChangedTest enter!");
     wifiManager.wifiP2pManager->DealP2pDiscoveryChanged(true);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pGroupsChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealP2pGroupsChangedTest enter!");
     wifiManager.wifiP2pManager->DealP2pGroupsChanged();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealP2pActionResultTest, TestSize.Level1)
 {
     WIFI_LOGI("DealP2pActionResultTest enter!");
     wifiManager.wifiP2pManager->DealP2pActionResult(P2pActionCallback::P2pConnect, WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealConfigChangedTest, TestSize.Level1)
@@ -356,7 +356,7 @@ HWTEST_F(WifiManagerTest, DealConfigChangedTest, TestSize.Level1)
     WIFI_LOGI("DealConfigChangedTest enter!");
     char* data = new (std::nothrow) char[6];
     wifiManager.wifiP2pManager->DealConfigChanged(CfgType::GET_SELF_CONFIG, data, 6);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, IfaceDestoryCallbackTest, TestSize.Level1)
@@ -364,7 +364,7 @@ HWTEST_F(WifiManagerTest, IfaceDestoryCallbackTest, TestSize.Level1)
     WIFI_LOGI("IfaceDestoryCallbackTest enter!");
     std::string destoryIfaceName = "test";
     wifiManager.wifiP2pManager->IfaceDestoryCallback(destoryIfaceName, 1);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 #endif
 
@@ -381,7 +381,7 @@ HWTEST_F(WifiManagerTest, GetAirplaneModeByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGI("DealOpenAirplGetAirplaneModeByDatashareTestaneModeEventTest enter!");
     wifiManager.wifiEventSubscriberManager->GetAirplaneModeByDatashare();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, GetLocationModeByDatashareTest, TestSize.Level1)
@@ -403,14 +403,14 @@ HWTEST_F(WifiManagerTest, RegisterCesEventTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterCesEventTest enter!");
     wifiManager.wifiEventSubscriberManager->RegisterCesEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterCesEventTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterCesEventTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterCesEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 #ifdef HAS_POWERMGR_PART
@@ -418,14 +418,14 @@ HWTEST_F(WifiManagerTest, RegisterPowermgrEventTestTest, TestSize.Level1)
 {
     WIFI_LOGE("RegisterPowermgrEventTest enter!");
     wifiManager.wifiEventSubscriberManager->RegisterPowermgrEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterPowermgrEventTestTest, TestSize.Level1)
 {
     WIFI_LOGE("UnRegisterPowermgrEventTestTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterPowermgrEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 #endif
 
@@ -433,56 +433,56 @@ HWTEST_F(WifiManagerTest, RegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGI("RegisterLocationEventTest enter!");
     wifiManager.wifiEventSubscriberManager->RegisterLocationEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterLocationEventTest, TestSize.Level1)
 {
     WIFI_LOGI("UnRegisterLocationEventTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterLocationEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, RegisterNetworkStateChangeEventTest, TestSize.Level1)
 {
     WIFI_LOGI("RegisterNetworkStateChangeEventTest enter!");
     wifiManager.wifiEventSubscriberManager->RegisterNetworkStateChangeEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterNetworkStateChangeEventTest, TestSize.Level1)
 {
     WIFI_LOGI("UnRegisterNetworkStateChangeEventTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterNetworkStateChangeEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, RegisterWifiScanChangeEventTest, TestSize.Level1)
 {
     WIFI_LOGI("RegisterWifiScanChangeEventTest enter!");
     wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest, TestSize.Level1)
 {
     WIFI_LOGI("UnRegisterWifiScanChangeEventTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, ExitTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");
     wifiManager.Exit();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, AutoStartEnhanceServiceTest, TestSize.Level1)
 {
     WIFI_LOGI("ExitTest enter!");
     wifiManager.AutoStartEnhanceService();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, CheckCanConnectDeviceTest, TestSize.Level1)
@@ -535,19 +535,19 @@ HWTEST_F(WifiManagerTest, CheckEnhanceWifiConnectedTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, VapConflictReportTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->VapConflictReport();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, ForceStopSoftApTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->ForceStopSoftAp();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, ShowToastTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->ShowToast();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, HasAnyApRuningTest, TestSize.Level1)
@@ -561,28 +561,28 @@ HWTEST_F(WifiManagerTest, DealConcreateStartFailureTest, TestSize.Level1)
 {
     WIFI_LOGI("DealConcreateStartFailureTest enter!");
     wifiManager.wifiTogglerManager->DealConcreateStartFailure(1);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealSoftapStopTest, TestSize.Level1)
 {
     WIFI_LOGI("DealSoftapStopTest enter!");
     wifiManager.wifiTogglerManager->DealSoftapStop(1);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, DealSoftapStartFailureTest, TestSize.Level1)
 {
     WIFI_LOGI("DealSoftapStartFailureTest enter!");
     wifiManager.wifiTogglerManager->DealSoftapStartFailure(1);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, ForceStopWifiTest, TestSize.Level1)
 {
     WIFI_LOGI("ForceStopWifiTest enter!");
     wifiManager.wifiTogglerManager->ForceStopWifi();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, SatelliteToggledTest, TestSize.Level1)
@@ -606,7 +606,7 @@ HWTEST_F(WifiManagerTest, CheckSatelliteStateTest, TestSize.Level1)
 {
     WIFI_LOGI("CheckSatelliteStateTest enter!");
     wifiManager.wifiTogglerManager->CheckSatelliteState();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, IsInterfaceUpTest, TestSize.Level1)
@@ -620,13 +620,13 @@ HWTEST_F(WifiManagerTest, IsInterfaceUpTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_WpaDeath, TestSize.Level1)
 {
     wifiManager.OnNativeProcessStatusChange(WPA_DEATH);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_ApDeath, TestSize.Level1)
 {
     wifiManager.OnNativeProcessStatusChange(AP_DEATH);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

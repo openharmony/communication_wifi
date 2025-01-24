@@ -28,6 +28,7 @@
 #include "wifi_common_util.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_internal_event_dispatcher.h"
+#include "wifi_history_record_manager.h"
 #else
 #include "wifi_internal_event_dispatcher_lite.h"
 #endif
@@ -557,6 +558,11 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
                 static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
+        errCode = pService->RegisterStaServiceCallback(WifiHistoryRecordManager::GetInstance().GetStaCallback());
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("WifiHistoryRecordManager register callback failed, ret=%{public}d", static_cast<int>(errCode));
             return WIFI_OPT_FAILED;
         }
 #endif

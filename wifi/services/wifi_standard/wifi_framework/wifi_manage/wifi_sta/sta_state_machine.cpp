@@ -43,6 +43,7 @@
 #endif
 #include "wifi_notification_util.h"
 #include "wifi_net_stats_manager.h"
+#include "wifi_history_record_manager.h"
 #endif // OHOS_ARCH_LITE
 
 #include "wifi_channel_helper.h"
@@ -50,6 +51,7 @@
 #else
 #include "mock_dhcp_service.h"
 #endif
+
 namespace OHOS {
 namespace Wifi {
 namespace {
@@ -653,11 +655,11 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
-        pStaStateMachine->InitWifiLinkedInfo();
         pStaStateMachine->StopDhcp();
-        WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
+        pStaStateMachine->InitWifiLinkedInfo();
+        WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     }
     return;
 }
@@ -1855,11 +1857,17 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
             HandlePortalNetworkPorcess();
             portalFlag = true;
         }
-
+        bool isHomeAp = false;
+        bool isHomeRouter = false;
+#ifndef OHOS_ARCH_LITE
+        isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
+        isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
+#endif
         WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
-        if (linkedInfo.isHiLinkNetwork) {
+    
+        if (linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) {
             InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         } else {
             InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
@@ -1889,21 +1897,22 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 
 void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
 {
-    if (linkedInfo.networkId == INVALID_NETWORK_ID) {
-        return;
-    }
     WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId) != 0) {
-        WIFI_LOGE("%{public}s, GetDeviceConfig failed", __func__);
-        return;
-    }
-    if (!config.isPortal) {
+    int ret = WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
+    if (linkedInfo.networkId == INVALID_NETWORK_ID || ret != 0 || !config.isPortal) {
         return;
     }
     bool needChangePortalFlag = false;
+#ifndef OHOS_ARCH_LITE
+    bool isHomeAp = false;
+    bool isHomeRouter = false;
+#endif
+    isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
+    isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
+    bool isPortalByHistory = NetworkStatusHistoryManager::IsPortalByHistory(config.networkStatusHistory);
     switch (netState) {
         case SystemNetWorkState::NETWORK_NOTWORKING:
-            if (NetworkStatusHistoryManager::IsPortalByHistory(config.networkStatusHistory)) {
+            if (isPortalByHistory) {
                 WIFI_LOGI("%{public}s, no internet and has portal status in history, not modify", __func__);
                 break;
             }
@@ -1914,19 +1923,19 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
                 WIFI_LOGI("%{public}s, has internet and open network, not modify", __func__);
                 break;
             }
-            if (!linkedInfo.isHiLinkNetwork) {
-                WIFI_LOGI("%{public}s, has internet and not hilink network, not modify", __func__);
+            if (!linkedInfo.isHiLinkNetwork && !isHomeAp && !isHomeRouter) {
+                WIFI_LOGI("%{public}s, has internet and not hilink/homeAp/homeRouter network, not modify", __func__);
                 break;
             }
-            if (NetworkStatusHistoryManager::IsPortalByHistory(config.networkStatusHistory)) {
+            if (isPortalByHistory) {
                 WIFI_LOGI("%{public}s, has internet and has portal status in history, not modify", __func__);
                 break;
             }
             needChangePortalFlag = true;
             break;
         case SystemNetWorkState::NETWORK_IS_PORTAL:
-            if (!linkedInfo.isHiLinkNetwork) {
-                WIFI_LOGI("%{public}s, portal and not hilink network, not modify", __func__);
+            if (!linkedInfo.isHiLinkNetwork && !isHomeAp && !isHomeRouter) {
+                WIFI_LOGI("%{public}s, portal and not hilink/homeAp/homeRouter network, not modify", __func__);
                 break;
             }
             needChangePortalFlag = true;

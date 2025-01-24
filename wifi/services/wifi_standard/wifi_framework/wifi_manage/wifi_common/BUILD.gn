@@ -153,6 +153,7 @@ if (defined(ohos_lite)) {
       "block_connect_service.cpp",
       "network_black_list/network_black_list_manager.cpp",
       "network_status_history/network_status_history_manager.cpp",
+      "network_status_history/wifi_history_record_manager.cpp",
       "rdb/wifi_rdb_manager.cpp",
       "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",

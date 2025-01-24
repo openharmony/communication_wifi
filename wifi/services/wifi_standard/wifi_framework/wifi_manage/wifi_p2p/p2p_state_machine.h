@@ -138,7 +138,7 @@ public:
 
     void SetEnhanceService(IEnhanceService* enhanceService);
 
-    int GetRadnomSocialFreq(const std::vector<int> &freqList);
+    int GetRadnomSocialFreq(const std::vector<int> &freqList) const;
 
 private:
     /**

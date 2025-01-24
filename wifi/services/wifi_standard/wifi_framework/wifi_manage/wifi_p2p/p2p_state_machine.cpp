@@ -1108,11 +1108,19 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
             return retFreq;
         }
     }
-    if (band != GroupOwnerBand::GO_BAND_2GHZ) {
-        return 0;
+    std::random_device rd;
+    int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % freqList.
+    size());
+    retFreq = freqList.at(randomIndex);
+    if (band == GroupOwnerBand::GO_BAND_5GHZ) {
+        return retFreq;
     }
-    retFreq = GetRadnomSocialFreq(freqList);
-    return retFreq;
+    int randomFreq = GetRadnomSocialFreq(freqList);
+    if (randomFreq == 0) {
+        WIFI_LOGE("Cannot get 1 6 11 channel frequency");
+        return retFreq;
+    }
+    return randomFreq;
 }
 
 bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool newGroup) const
@@ -1364,11 +1372,8 @@ void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
     p2pGroupOperatingState.SetEnhanceService(enhanceService);
 }
-int P2pStateMachine::GetRadnomSocialFreq(const std::vector<int> &freqList)
+int P2pStateMachine::GetRadnomSocialFreq(const std::vector<int> &freqList) const
 {
-    if (freqList.empty()) {
-        return 0;
-    }
     std::vector<int> filteredFreqs = {2412, 2437, 2462};
     std::vector<int> validFreqs;
     for (auto freq : filteredFreqs) {
@@ -1378,8 +1383,8 @@ int P2pStateMachine::GetRadnomSocialFreq(const std::vector<int> &freqList)
         }
     }
     if (validFreqs.empty()) {
-        int randomIndex = GetRandomInt(0, freqList.size() - 1);
-        return freqList[randomIndex];
+        WIFI_LOGE("validFreqs is empty");
+        return 0;
     }
     int randomIndex = GetRandomInt(0, validFreqs.size() - 1);
     if (randomIndex < 0 || randomIndex > validFreqs.size() - 1) {

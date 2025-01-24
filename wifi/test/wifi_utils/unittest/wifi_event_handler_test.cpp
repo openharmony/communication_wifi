@@ -19,6 +19,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 HWTEST_F(WifiEventHandlerTest, PostSyncTaskTest, TestSize.Level1)
 {
     std::function<void()> callback = EventHandlerCallback;
@@ -42,6 +43,7 @@ HWTEST_F(WifiEventHandlerTest, PostAsyncTaskAndNameTest, TestSize.Level1)
 HWTEST_F(WifiEventHandlerTest, RemoveAsyncTaskTest, TestSize.Level1)
 {
     testEventHandler->RemoveAsyncTask("callback");
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiEventHandlerTest, PostSyncTimeOutTaskTest, TestSize.Level1)

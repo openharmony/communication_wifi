@@ -25,6 +25,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_error_no.h"
 #include "mock_block_connect_service.h"
+#include "wifi_history_record_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -40,7 +41,9 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 static std::string g_errLog;
-void StaService1Callback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void StaService1Callback(const LogType type, const LogLevel level,
+                         const unsigned int domain, const char *tag,
+                         const char *msg)
 {
     g_errLog = msg;
 }

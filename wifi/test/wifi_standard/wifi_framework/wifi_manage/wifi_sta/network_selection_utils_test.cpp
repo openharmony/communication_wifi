@@ -52,10 +52,10 @@ HWTEST_F(NetworkSelectionUtilsTest, GetNetworkCandidatesInfo, TestSize.Level1) {
     filternetworkCandidate.filtedReason["hasInternet"].insert(NetworkSelection::WEAK_ALGORITHM_WEP_SECURITY);
     networkCandidates.emplace_back(&filternetworkCandidate);
     EXPECT_NE(NetworkSelection::NetworkSelectionUtils::GetNetworkCandidatesInfo(networkCandidates,
-        filterName),"");
+        filterName), "");
     filterName = "hasInternet";
     EXPECT_NE(NetworkSelection::NetworkSelectionUtils::GetNetworkCandidatesInfo(networkCandidates,
-        filterName),"");
+        filterName), "");
 }
 
 HWTEST_F(NetworkSelectionUtilsTest, IsOpenAndMaybePortal1, TestSize.Level1) {

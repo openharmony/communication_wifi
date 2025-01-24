@@ -67,7 +67,7 @@ public:
         mCondition.notify_one();
         return true;
     }
-    bool PostAsyncTask(Callback &callback, const std::string &name, int64_t delayTime = 0)
+    bool PostAsyncTask(Callback &callback, const std::string &name, int64_t delayTime = 0, bool isHighPriority = false)
     {
         WIFI_LOGE("WifiEventHandlerImpl PostAsyncTask with name Unsupported in lite.");
         return false;
@@ -107,6 +107,7 @@ private:
 };
 #elif WIFI_FFRT_ENABLE
 constexpr int WIFI_THREAD_TIMEOUT_LIMIT = 30 * 1000 * 1000; // 30s
+constexpr int WIFI_THREAD_MAX_CONCURRENCY = 1;
 class WifiEventHandler::WifiEventHandlerImpl {
 public:
     WifiEventHandlerImpl(const std::string &threadName, const Callback &timeOutFunc = nullptr)
@@ -117,11 +118,12 @@ public:
             return;
         }
         if (timeOutFunc == nullptr) {
-            eventQueue = std::make_shared<ffrt::queue>(threadName.c_str());
+            eventQueue = std::make_shared<ffrt::queue>(ffrt::queue_concurrent, threadName.c_str(),
+                ffrt::queue_attr().max_concurrency(WIFI_THREAD_MAX_CONCURRENCY));
             WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue, threadName:%{public}s", threadName.c_str());
         } else {
-            eventQueue = std::make_shared<ffrt::queue>(threadName.c_str(),
-            ffrt::queue_attr().callback(timeOutFunc));
+            eventQueue = std::make_shared<ffrt::queue>(ffrt::queue_concurrent, threadName.c_str(),
+            ffrt::queue_attr().callback(timeOutFunc).max_concurrency(WIFI_THREAD_MAX_CONCURRENCY));
             WIFI_LOGI("WifiEventHandlerImpl: Create a new eventQueue with callback,"
                 "threadName:%{public}s", threadName.c_str());
         }
@@ -172,7 +174,7 @@ public:
         ffrt::task_handle handle = eventQueue->submit_h(callback, ffrt::task_attr().delay(delayTimeUs));
         return handle != nullptr;
     }
-    bool PostAsyncTask(Callback &callback, const std::string &name, int64_t delayTime = 0)
+    bool PostAsyncTask(Callback &callback, const std::string &name, int64_t delayTime = 0, bool isHighPriority = false)
     {
         std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
         if (eventQueue == nullptr) {
@@ -181,8 +183,13 @@ public:
         }
         int64_t delayTimeUs = delayTime * 1000;
         WIFI_LOGD("PostAsyncTask Enter %{public}s", name.c_str());
-        ffrt::task_handle handle = eventQueue->submit_h(
-            callback, ffrt::task_attr().name(name.c_str()).delay(delayTimeUs));
+        ffrt::task_handle handle = nullptr;
+        if (isHighPriority) {
+            handle = eventQueue->submit_h(callback,
+                ffrt::task_attr().name(name.c_str()).delay(delayTimeUs).priority(ffrt_queue_priority_immediate));
+        } else {
+            handle = eventQueue->submit_h(callback, ffrt::task_attr().name(name.c_str()).delay(delayTimeUs));
+        }
         if (handle == nullptr) {
             return false;
         }
@@ -259,11 +266,14 @@ public:
         }
         return eventHandler->PostTask(callback, delayTime, AppExecFwk::EventHandler::Priority::HIGH);
     }
-    bool PostAsyncTask(Callback &callback, const std::string &name, int64_t delayTime = 0)
+    bool PostAsyncTask(Callback &callback, const std::string &name, int64_t delayTime = 0, bool isHighPriority = false)
     {
         if (eventHandler == nullptr) {
             WIFI_LOGE("PostSyncTask: eventHandler is nullptr!");
             return false;
+        }
+        if (isHighPriority) {
+            return eventHandler->PostTask(callback, name, delayTime, AppExecFwk::EventHandler::Priority::IMMEDIATE);
         }
         return eventHandler->PostTask(callback, name, delayTime, AppExecFwk::EventHandler::Priority::HIGH);
     }
@@ -313,13 +323,14 @@ bool WifiEventHandler::PostAsyncTask(const Callback &callback, int64_t delayTime
     return ptr->PostAsyncTask(const_cast<Callback &>(callback), delayTime);
 }
 
-bool WifiEventHandler::PostAsyncTask(const Callback &callback, const std::string &name, int64_t delayTime)
+bool WifiEventHandler::PostAsyncTask(const Callback &callback, const std::string &name,
+    int64_t delayTime, bool isHighPriority)
 {
     if (ptr == nullptr) {
         WIFI_LOGE("PostAsyncTask: ptr is nullptr!");
         return false;
     }
-    return ptr->PostAsyncTask(const_cast<Callback &>(callback), name, delayTime);
+    return ptr->PostAsyncTask(const_cast<Callback &>(callback), name, delayTime, isHighPriority);
 }
 void WifiEventHandler::RemoveAsyncTask(const std::string &name)
 {

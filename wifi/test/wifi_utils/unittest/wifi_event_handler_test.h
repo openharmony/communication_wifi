@@ -28,6 +28,7 @@ public:
     virtual void SetUp()
     {
         testEventHandler = std::make_unique<WifiEventHandler>("WifiEventHandlerTest");
+        result = 0;
     }
     
     virtual void TearDown()
@@ -37,9 +38,9 @@ public:
         }
     }
 
-    static void EventHandlerCallback() {}
-
+    static void EventHandlerCallback() { result = 1; }
 public:
+    static int result;
     std::unique_ptr<WifiEventHandler> testEventHandler = nullptr;
 };
 }  // namespace Wifi

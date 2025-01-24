@@ -1112,8 +1112,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         }
     }
     std::random_device rd;
-    int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % freqList.
-    size());
+    int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % freqList.size());
     retFreq = freqList.at(randomIndex);
     if (band == GroupOwnerBand::GO_BAND_5GHZ) {
         return retFreq;

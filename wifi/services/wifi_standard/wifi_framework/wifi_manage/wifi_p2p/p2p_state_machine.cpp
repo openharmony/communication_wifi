@@ -1108,22 +1108,10 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
             return retFreq;
         }
     }
-    std::vector<int> filteredFreqs = {2412, 2437, 2462};
-    std::vector<int> validFreqs;
-    for (auto freq : filteredFreqs) {
-        auto it = std::find(freqList.begin(), freqList.end(), freq);
-        if (it != freqList.end()) {
-            validFreqs.push_back(*it);
-        }
-    }
-    if (validFreqs.empty()) {
+    if (band != GroupOwnerBand::GO_BAND_2GHZ) {
         return 0;
     }
-    int randomIndex = GetRandomInt(0, validFreqs.size() - 1);
-    if (randomIndex < 0 || randomIndex > validFreqs.size() - 1) {
-        return 0;
-    }
-    retFreq = validFreqs[randomIndex];
+    retFreq = GetRadnomSocialFreq(freqList);
     return retFreq;
 }
 
@@ -1376,6 +1364,28 @@ void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
     p2pGroupOperatingState.SetEnhanceService(enhanceService);
 }
-
+int P2pStateMachine::GetRadnomSocialFreq(const std::vector<int> &freqList)
+{
+    if (freqList.empty()) {
+        return 0;
+    }
+    std::vector<int> filteredFreqs = {2412, 2437, 2462};
+    std::vector<int> validFreqs;
+    for (auto freq : filteredFreqs) {
+        auto it = std::find(freqList.begin(), freqList.end(), freq);
+        if (it != freqList.end()) {
+            validFreqs.push_back(*it);
+        }
+    }
+    if (validFreqs.empty()) {
+        int randomIndex = GetRandomInt(0, freqList.size() - 1);
+        return freqList[randomIndex];
+    }
+    int randomIndex = GetRandomInt(0, validFreqs.size() - 1);
+    if (randomIndex < 0 || randomIndex > validFreqs.size() - 1) {
+        return 0;
+    }
+    return validFreqs[randomIndex];
+}
 } // namespace Wifi
 } // namespace OHOS

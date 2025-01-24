@@ -160,15 +160,15 @@ HWTEST_F(ScanServiceTest, GetScanControlInfoFail, TestSize.Level1)
 }
 
 HWTEST_F(ScanServiceTest, StopPnoScanTest, TestSize.Level1)
-EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 {
     StopPnoScanTest();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanSuccess, TestSize.Level1)
-EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 {
     AllowExternScanSuccess();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowExternScanFail1, TestSize.Level1)

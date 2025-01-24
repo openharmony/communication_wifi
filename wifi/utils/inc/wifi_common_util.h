@@ -194,6 +194,13 @@ std::string Number2Ip(unsigned int intIp);
 std::vector<std::string> StrSplit(const std::string& str, const std::string& delim);
 
 /**
+  * @brief Returns the time, in seconds, since 1970-01-01 00:00:00 GMT
+  *
+  * @return Returns the time, in seconds
+  */
+int64_t GetCurrentTimeSeconds();
+
+/**
  * @Description GetElapsedMicrosecondsSinceBoot
  *
  * @return microseconds;

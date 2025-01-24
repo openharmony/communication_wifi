@@ -139,7 +139,6 @@ public:
     void SetEnhanceService(IEnhanceService* enhanceService);
 
     int GetRadnomSocialFreq(const std::vector<int> &freqList) const;
-
 private:
     /**
      * @Description Handle event of CMD_DEVICE_DISCOVERS

@@ -1117,7 +1117,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     if (band == GroupOwnerBand::GO_BAND_5GHZ) {
         return retFreq;
     }
-    int randomFreq = GetRadnomSocialFreq(freqList);
+    int randomFreq = GetRandomSocialFreq(freqList);
     if (randomFreq == 0) {
         WIFI_LOGE("Cannot get 1 6 11 channel frequency");
         return retFreq;

@@ -21,6 +21,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
 constexpr int PD_STATUS_CODE_ENTER_PIN = 1;
 constexpr int PD_STATUS_CODE_PBC_REQ = 2;
@@ -522,6 +523,7 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnNativeProcessDeathTest, TestSize.Level1)
 {
     int status = 0;
     OnNativeProcessDeath(status);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

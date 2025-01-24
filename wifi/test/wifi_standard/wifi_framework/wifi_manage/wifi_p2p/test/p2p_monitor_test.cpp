@@ -345,6 +345,7 @@ public:
 HWTEST_F(P2pMonitorTest, Initialize_SUCCESS, TestSize.Level1)
 {
     pP2pMonitor->Initialize();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 HWTEST_F(P2pMonitorTest, RegisterHandler_SUCCESS, TestSize.Level1)
 {
@@ -401,18 +402,21 @@ HWTEST_F(P2pMonitorTest, Broadcast2SmConnectSupplicant, TestSize.Level1)
     const std::string iface = g_pIface;
     int status = 1;
     WrapMethodBroadcast2SmConnectSupplicant(iface, status);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmDeviceFound, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmDeviceFound(iface, testDevice);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmDeviceLost, TestSize.Level1)
 {
     const std::string iface = g_pIface;
     WrapMethodBroadcast2SmDeviceLost(iface, testDevice);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(P2pMonitorTest, Broadcast2SmGoNegRequest, TestSize.Level1)

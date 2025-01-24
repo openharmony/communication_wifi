@@ -30,7 +30,6 @@ static std::map<std::string, std::string> gSupportedCmd;
 
 void MockSetWpaExpectCmdResponse(const std::string &cmd, const std::string &response)
 {
-    
     gSupportedCmd[cmd] = response;
 }
 

@@ -33,6 +33,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 using namespace NetManagerStandard;
 DEFINE_WIFILOG_LABEL("WifiNetObserverTest");
 class WifiNetObserverTest : public testing::Test {
@@ -67,12 +68,14 @@ HWTEST_F(WifiNetObserverTest, NetWifiObserverStartTest, TestSize.Level1)
 {
     WIFI_LOGI("StartNetStateObserver enter!");
     netStateObserver->StartNetStateObserver(netStateObserver);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiNetObserverTest, NetWifiObserverStopTest, TestSize.Level1)
 {
     WIFI_LOGI("StopNetStateObserver enter!");
     netStateObserver->StopNetStateObserver(netStateObserver);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 // Test case for handling net detection result

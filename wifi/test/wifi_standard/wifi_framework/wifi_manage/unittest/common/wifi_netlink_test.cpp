@@ -30,6 +30,7 @@ enum CmdWord {
     CMD_START_MONITOR = 10,
 };
 
+static std::string g_errLog = "wifitest";
 class WifiNetLinkTest : public testing::Test {
 protected:
     void SetUp() override
@@ -43,6 +44,7 @@ HWTEST_F(WifiNetLinkTest, TestInitWifiNetLink, TestSize.Level1)
 {
     WifiNetLinkCallbacks callbacks;
     WifiNetLink::GetInstance().InitWifiNetLink(callbacks);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiNetLinkTest, TestSendCmdKernel, TestSize.Level1)

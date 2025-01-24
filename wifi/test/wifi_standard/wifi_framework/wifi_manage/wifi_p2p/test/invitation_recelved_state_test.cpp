@@ -77,6 +77,7 @@ HWTEST_F(InvitationReceivedStateTest, GoInState, TestSize.Level1)
 HWTEST_F(InvitationReceivedStateTest, GoOutState, TestSize.Level1)
 {
     pInvitationReceivedState->GoOutState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(InvitationReceivedStateTest, ExecuteStateMsg1, TestSize.Level1)

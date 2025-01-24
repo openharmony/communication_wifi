@@ -30,6 +30,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 constexpr int TIMES = 253;
 constexpr unsigned char DATA = 0x12;
 class WifiP2PMsgTest : public testing::Test {
@@ -74,6 +75,7 @@ HWTEST_F(WifiP2PMsgTest, AddClientDeviceTest, TestSize.Level1)
     clientDevice.SetDeviceName("AddClientDeviceTest");
     pWifiP2pGroupInfo->AddClientDevice(clientDevice);
     pWifiP2pGroupInfo->AddClientDevice(clientDevice);
+    EXPECT_FALSE(g_errLog.find("WifiP2PMsgTest")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2PMsgTest, RemoveClientDeviceTest, TestSize.Level1)
@@ -84,6 +86,7 @@ HWTEST_F(WifiP2PMsgTest, RemoveClientDeviceTest, TestSize.Level1)
     WifiP2pDevice clientDevice1;
     clientDevice1.SetDeviceName("clientDevice1");
     pWifiP2pGroupInfo->RemoveClientDevice(clientDevice1);
+    EXPECT_FALSE(g_errLog.find("WifiP2PMsgTest")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2PMsgTest, IsContainsDeviceTest, TestSize.Level1)
@@ -129,6 +132,7 @@ HWTEST_F(WifiP2PMsgTest, WifiP2pServiceResponseTest, TestSize.Level1)
     }
     pWifiP2pServiceResponse->SetData(data);
     pWifiP2pServiceResponse->GetTlv();
+    EXPECT_FALSE(g_errLog.find("WifiP2PMsgTest")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

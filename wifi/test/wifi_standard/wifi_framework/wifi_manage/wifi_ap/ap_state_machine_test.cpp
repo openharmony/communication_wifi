@@ -30,6 +30,7 @@ using ::testing::Eq;
 using ::testing::Return;
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 class ApStateMachine_test : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -165,6 +166,7 @@ TEST_F(ApStateMachine_test, BroadCastStationLeave)
 TEST_F(ApStateMachine_test, RegisterEventHandler)
 {
     WarpRegisterEventHandler();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

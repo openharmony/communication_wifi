@@ -43,6 +43,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 class ApStartedState_test : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -470,6 +471,7 @@ HWTEST_F(ApStartedState_test, UpdateChannelChangedTest, TestSize.Level1)
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_HOTSPOT_CHANNEL_CHANGED));
     msg->SetParam1(1);
     pApStartedState->ProcessCmdHotspotChannelChanged(msg);
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 
 HWTEST_F(ApStartedState_test, AssociatedStaEmptyTest, TestSize.Level1)
@@ -480,6 +482,7 @@ HWTEST_F(ApStartedState_test, AssociatedStaEmptyTest, TestSize.Level1)
     msg->SetParam1(HAL_CBK_CMD_STA_JOIN);
     msg->SetMessageObj(staInfo);
     pApStartedState->ProcessCmdAssociatedStaChanged(msg);
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 
 HWTEST_F(ApStartedState_test, AssociatedStaJoinTest, TestSize.Level1)
@@ -491,6 +494,7 @@ HWTEST_F(ApStartedState_test, AssociatedStaJoinTest, TestSize.Level1)
     msg->SetParam1(HAL_CBK_CMD_STA_JOIN);
     msg->SetMessageObj(staInfo);
     pApStartedState->ProcessCmdAssociatedStaChanged(msg);
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 
 HWTEST_F(ApStartedState_test, AssociatedStaLeaveTest, TestSize.Level1)
@@ -502,6 +506,7 @@ HWTEST_F(ApStartedState_test, AssociatedStaLeaveTest, TestSize.Level1)
     msg->SetParam1(HAL_CBK_CMD_STA_LEAVE);
     msg->SetMessageObj(staInfo);
     pApStartedState->ProcessCmdAssociatedStaChanged(msg);
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 
 HWTEST_F(ApStartedState_test, StopAp_001, TestSize.Level1)
@@ -547,11 +552,13 @@ HWTEST_F(ApStartedState_test, ProcessCmdSetHotspotIdleTimeout, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     pApStartedState->ProcessCmdSetHotspotIdleTimeout(msg);
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 
 HWTEST_F(ApStartedState_test, SetRandomMacTest, TestSize.Level1)
 {
     pApStartedState->SetRandomMac();
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

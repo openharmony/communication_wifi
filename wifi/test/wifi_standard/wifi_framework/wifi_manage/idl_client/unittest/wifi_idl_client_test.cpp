@@ -1016,7 +1016,7 @@ HWTEST_F(WifiIdlClientTest, ReqSetPowerSaveTest2, TestSize.Level1)
 {
     bool enable = false;
     mClient.ReqSetPowerSave(enable);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqWpaSetCountryCodeTest1, TestSize.Level1)

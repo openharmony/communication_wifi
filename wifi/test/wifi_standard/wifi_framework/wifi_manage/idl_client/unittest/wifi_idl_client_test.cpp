@@ -1527,7 +1527,7 @@ HWTEST_F(WifiIdlClientTest, ReqWpaAutoConnectTest, TestSize.Level1)
 HWTEST_F(WifiIdlClientTest, ReqP2pStartTest, TestSize.Level1)
 {
     mClient.ReqP2pStart();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(WifiIdlClientTest, ReqP2pSetDeviceNameTest, TestSize.Level1)

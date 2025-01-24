@@ -169,6 +169,7 @@ HWTEST_F(DhcpdInterfaceTest, SetDhcpEventFunc_004, TestSize.Level1)
     std::unique_ptr<DhcpNotifyMock> pResultNotify =  std::make_unique<DhcpNotifyMock>();
     StartDhcpServerTest();
     pResultNotify.reset();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 /**

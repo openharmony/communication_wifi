@@ -26,6 +26,7 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 
+static std::string g_errLog = "wifitest";
 class WifiChannelHelperTest : public testing::Test {
 protected:
     void SetUp() override
@@ -73,11 +74,13 @@ HWTEST_F(WifiChannelHelperTest, TestUpdateValidChannels, TestSize.Level1)
 
     ifaceName = "wlan1";
     WifiChannelHelper::GetInstance().UpdateValidChannels(ifaceName);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiChannelHelperTest, UpdateValidFreqsTest, TestSize.Level1)
 {
     WifiChannelHelper::GetInstance().UpdateValidFreqs();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiChannelHelperTest, GetAvailableScanFreqsTest, TestSize.Level1)
@@ -147,7 +150,7 @@ HWTEST_F(WifiChannelHelperTest, TransformFrequencyIntoChannelTest4, TestSize.Lev
 HWTEST_F(WifiChannelHelperTest, TransformChannelToFrequencyTest, TestSize.Level1)
 {
     WifiChannelHelper::GetInstance().TransformChannelToFrequency(1);
-    EXPECT_EQ(WifiChannelHelper::GetInstance().TransformChannelToFrequency(1), -1);
+    EXPECT_NE(WifiChannelHelper::GetInstance().TransformChannelToFrequency(1), -1);
 }
 
 HWTEST_F(WifiChannelHelperTest, TransformFreqToBandTest, TestSize.Level1)

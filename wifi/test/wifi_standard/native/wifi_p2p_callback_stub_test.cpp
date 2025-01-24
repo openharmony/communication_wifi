@@ -31,6 +31,7 @@ using ::testing::ext::TestSize;
 DEFINE_WIFILOG_LABEL("WifiP2pCallbackStubTest");
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 constexpr int BUFFER_1K = 1024;
 class WifiP2pCallbackStubTest : public testing::Test {
 public:
@@ -334,6 +335,7 @@ HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pDiscoveryChangedTest, TestSize.Leve
         return;
     }
     pWifiP2pCallbackStub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_FALSE(g_errLog.find("WifiP2PMsgTest")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pCallbackStubTest, RemoteOnP2pActionResultTest, TestSize.Level1)

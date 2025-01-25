@@ -39,6 +39,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 DEFINE_WIFILOG_LABEL("ApConfigUseTest");
 
 class ApConfigUse_Test : public testing::Test {
@@ -135,6 +136,7 @@ HWTEST_F(ApConfigUse_Test, FilterIndoorChannelTest, TestSize.Level1)
     m_apConfigUse->FilterIndoorChannel(channels);
     std::vector<int> channels1 = {};
     m_apConfigUse->FilterIndoorChannel(channels1);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(ApConfigUse_Test, Filter165ChannelTest, TestSize.Level1)

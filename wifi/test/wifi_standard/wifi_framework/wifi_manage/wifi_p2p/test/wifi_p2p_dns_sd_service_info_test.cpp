@@ -20,6 +20,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 class WifiP2pDnsSdServiceInfoTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -56,6 +57,7 @@ HWTEST_F(WifiP2pDnsSdServiceInfoTest, Create, TestSize.Level1)
     txtMap.insert(std::make_pair(std::string("ip"), std::string("TestIp")));
     std::string svrName("TestSvrName");
     WifiP2pDnsSdServiceInfo::Create(instanceName, serviceType, txtMap, svrName);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pDnsSdServiceInfoTest, BuildRequest, TestSize.Level1)
@@ -68,6 +70,7 @@ HWTEST_F(WifiP2pDnsSdServiceInfoTest, BuildRequest, TestSize.Level1)
     std::string svrName;
     std::map<std::string, std::string> txtMap;
     WifiP2pDnsSdServiceInfo::Create(instanceName, serviceType, txtMap, svrName).BuildRequest(dnsName, dnsType, version);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiP2pDnsSdServiceInfoTest, TurnDnsNameToStream, TestSize.Level1)

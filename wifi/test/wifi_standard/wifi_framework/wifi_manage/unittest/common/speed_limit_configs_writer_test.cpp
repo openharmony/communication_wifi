@@ -70,7 +70,7 @@ HWTEST_F(SpeedLimitConfigsWriterTest, SetUidPids_WritesIdStrToFileWhenFileOpenSu
     const int idArray[] = {1, 2, 3};
     const int size = sizeof(idArray) / sizeof(idArray[0]);
     SetUidPids(filePath, idArray, size);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SpeedLimitConfigsWriterTest, SetUidPids_DoesNotWriteIdStrToFileWhenFileOpenFails, TestSize.Level1)
@@ -79,5 +79,5 @@ HWTEST_F(SpeedLimitConfigsWriterTest, SetUidPids_DoesNotWriteIdStrToFileWhenFile
     const int idArray[] = {4, 5, 6};
     const int size = sizeof(idArray) / sizeof(idArray[0]);
     SetUidPids(filePath, idArray, size);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }

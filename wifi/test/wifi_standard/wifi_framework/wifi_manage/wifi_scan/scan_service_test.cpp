@@ -1938,6 +1938,7 @@ HWTEST_F(ScanServiceTest, HandleScanStatusReportSuccess6, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleScanStatusReportSuccess7, TestSize.Level1)
 {
     HandleScanStatusReportSuccess7();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleScanStatusReportFail, TestSize.Level1)
@@ -2190,6 +2191,7 @@ HWTEST_F(ScanServiceTest, EndPnoScanSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, EndPnoScanFail, TestSize.Level1)
 {
     EndPnoScanFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, EndPnoScanFail2, TestSize.Level1)
@@ -2251,11 +2253,13 @@ HWTEST_F(ScanServiceTest, SystemScanProcessSuccess3, TestSize.Level1)
 HWTEST_F(ScanServiceTest, SystemSingleScanProcessSuccess, TestSize.Level1)
 {
     SystemSingleScanProcessSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, GetRelatedFreqsSuccess, TestSize.Level1)
 {
     GetRelatedFreqsSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, StopSystemScanSuccess, TestSize.Level1)

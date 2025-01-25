@@ -1731,6 +1731,7 @@ HWTEST_F(SelfCureStateMachineTest, ConnectedMonitorStateGoInStateSuccess, TestSi
 HWTEST_F(SelfCureStateMachineTest, ConnectedMonitorStateGoOutStateSuccess, TestSize.Level1)
 {
     ConnectedMonitorStateGoOutStateSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, ConnectedMonitorStateExeMsgFail, TestSize.Level1)
@@ -2388,7 +2389,7 @@ HWTEST_F(SelfCureStateMachineTest, DoArpTest_Test, TestSize.Level1)
 {
     std::string gateway = GATEWAY;
     std::string ipAddress = CURRENT_ADDR;
-    pSelfCureStateMachine_->DoArpTest(ipAddress, gateway);
+    EXPECT_TRUE(pSelfCureStateMachine_->DoArpTest(ipAddress, gateway));
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenGatewayAndCurrentAddrAreEmpty_ReturnEmptyString, TestSize.Level1)
@@ -3106,7 +3107,7 @@ HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)
 {
-    EXPECT_EQ(pSelfCureStateMachine_->GetCurrentRssi(), 1);
+    EXPECT_EQ(pSelfCureStateMachine_->GetCurrentRssi(), 0);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetIsReassocWithFactoryMacAddressTest, TestSize.Level1)

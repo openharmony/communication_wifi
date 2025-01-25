@@ -76,6 +76,7 @@ HWTEST_F(IpQosMonitorTest, TestHandleTcpReportMsgComplete, TestSize.Level1)
     std::vector<int64_t> elems = {1, 2, 3};
     int32_t cmd = 0;
     IpQosMonitor::GetInstance().HandleTcpReportMsgComplete(elems, cmd);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(IpQosMonitorTest, TestParseTcpReportMsg, TestSize.Level1)

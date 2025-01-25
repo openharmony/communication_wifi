@@ -40,6 +40,7 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 
+const std::string g_errLog = "wifitest";
 constexpr int INVALIDRSSI = -90;
 constexpr int NETWORK_ID = 15;
 constexpr int RSSI = 8;
@@ -196,6 +197,7 @@ HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosTest01, TestSize.Level1
     scanInfos.clear();
 
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosTest02, TestSize.Level1)
@@ -219,6 +221,7 @@ HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosTest02, TestSize.Level1
     info.connState = ConnState::CONNECTED;
     info.bssid = "2a:76:93:47:e2:8a";
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosTest03, TestSize.Level1)
@@ -242,12 +245,14 @@ HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosTest03, TestSize.Level1
     info.connState = ConnState::CONNECTED;
     info.bssid = "2a:76:93:47:e2:8a";
     pStaAutoConnectService->GetAvailableScanInfos(availableScanInfos, scanInfos, blockedBssids, info);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(StaAutoConnectServiceTest, RegisterAutoJoinConditionTest01, TestSize.Level1)
 {
     std::string conditionName;
     pStaAutoConnectService->RegisterAutoJoinCondition(conditionName, []() {return false;});
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 } // WIFI

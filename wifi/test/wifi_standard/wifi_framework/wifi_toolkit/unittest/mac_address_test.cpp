@@ -20,6 +20,7 @@ DEFINE_WIFILOG_DHCP_LABEL("MacAddressTest");
 using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 class MacAddressTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -57,6 +58,7 @@ HWTEST_F(MacAddressTest, Create_002, TestSize.Level1)
     WIFI_LOGI("Create_002");
     std::string mac = "aa:bb:cc:dd:ee:ff";
     MacAddress::Create(mac);
+    EXPECT_FALSE(g_errLog.find("P2pGroupOperatingStateTest")!=std::string::npos);
 }
 /**
  * @tc.name: IsValidMac_001

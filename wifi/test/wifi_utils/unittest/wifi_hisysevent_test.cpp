@@ -63,6 +63,7 @@ HWTEST_F(WifiHisyseventTest, WriteWifiWpaStateHiSysEventTest, TestSize.Level1)
 HWTEST_F(WifiHisyseventTest, WritePortalAuthExpiredHisyseventTest, TestSize.Level1)
 {
     WritePortalAuthExpiredHisysevent(0, 0, 0, 0, false);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHisyseventTest, WritePortalAuthExpiredHisyseventTes01, TestSize.Level1)
@@ -73,6 +74,7 @@ HWTEST_F(WifiHisyseventTest, WritePortalAuthExpiredHisyseventTes01, TestSize.Lev
             WritePortalAuthExpiredHisysevent(0, 0, i, j, false);
         }
     }
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHisyseventTest, WriteWifiStateHiSysEventTest, TestSize.Level1)

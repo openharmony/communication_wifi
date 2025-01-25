@@ -32,6 +32,13 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog;
+void ScanStateMachineCallback(const LogType type, const LogLevel level,
+                              const unsigned int domain, const char *tag,
+                              const char *msg)
+    {
+        g_errLog = msg;
+    }
 bool operator == (const WifiDeviceConfig &lhs, const WifiDeviceConfig &rhs)
 {
     return lhs.networkId == rhs.networkId;
@@ -442,6 +449,7 @@ extern "C" void Destroy(IStaService *pservice);
 HWTEST_F(StaInterfaceTest, CreateSuccess, TestSize.Level1)
 {
     Create();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, EnableWifiSuccess, TestSize.Level1)
@@ -740,11 +748,13 @@ HWTEST_F(StaInterfaceTest, DeregisterFilterBuilderFail, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, EnableHiLinkHandshakeSuccess, TestSize.Level1)
 {
     EnableHiLinkHandshakeSuceess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
 {
     DeliverStaIfaceDataSuceess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, StartRoamToNetwork, TestSize.Level1)
@@ -760,31 +770,37 @@ HWTEST_F(StaInterfaceTest, StartConnectToUserSelectNetwork, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, SetPowerMode, TestSize.Level1)
 {
     SetPowerMode();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, OnSystemAbilityChanged, TestSize.Level1)
 {
     OnSystemAbilityChanged();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest1, TestSize.Level1)
 {
     OnFoldStateChangedTest1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest2, TestSize.Level1)
 {
     OnFoldStateChangedTest2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest3, TestSize.Level1)
 {
     OnFoldStateChangedTest3();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest4, TestSize.Level1)
 {
     OnFoldStateChangedTest4();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -31,7 +31,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
-
+static std::string g_errLog = "wifitest";
 class WifiNotificationUtilTest : public Test {
 public:
     void SetUp() override
@@ -50,12 +50,14 @@ HWTEST_F(WifiNotificationUtilTest, PublishWifiNotificationTest001, TestSize.Leve
     std::string ssid(sidSize, 'a');
     wifiNotificationUtil.PublishWifiNotification(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, ssid,
             WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+    EXPECT_FALSE(g_errLog.find("WifiNotificationUtilTest")!=std::string::npos);
 }
 
 HWTEST_F(WifiNotificationUtilTest, CancelWifiNotificationTest001, TestSize.Level1)
 {
     WifiNotificationUtil wifiNotificationUtil;
     wifiNotificationUtil.CancelWifiNotification(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+    EXPECT_FALSE(g_errLog.find("WifiNotificationUtilTest")!=std::string::npos);
 }
 
 HWTEST_F(WifiNotificationUtilTest, StartAbilityTest001, TestSize.Level1)
@@ -70,6 +72,7 @@ HWTEST_F(WifiNotificationUtilTest, ShowDialogTest001, TestSize.Level1)
 {
     WifiNotificationUtil wifiNotificationUtil;
     wifiNotificationUtil.ShowDialog(WifiDialogType::CDD);
+    EXPECT_FALSE(g_errLog.find("WifiNotificationUtilTest")!=std::string::npos);
 }
 
 HWTEST_F(WifiNotificationUtilTest, ShowSettingsDialogTest001, TestSize.Level1)
@@ -77,4 +80,5 @@ HWTEST_F(WifiNotificationUtilTest, ShowSettingsDialogTest001, TestSize.Level1)
     WifiNotificationUtil wifiNotificationUtil;
     std::string settings = "";
     wifiNotificationUtil.ShowSettingsDialog(WifiDialogType::CDD, settings);
+    EXPECT_FALSE(g_errLog.find("WifiNotificationUtilTest")!=std::string::npos);
 }

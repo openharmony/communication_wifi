@@ -66,6 +66,7 @@ HWTEST_F(WifiSettingsTest, ClearDeviceConfigTest, TestSize.Level1)
 {
     WIFI_LOGE("ClearDeviceConfigTest enter!");
     WifiSettings::GetInstance().ClearDeviceConfig();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiSettingsTest, GetDeviceConfig2Test, TestSize.Level1)

@@ -449,6 +449,7 @@ HWTEST_F(StaStateMachineTest, DealDhcpResultFailedTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealDhcpOfferResultTest, TestSize.Level1)
 {
     DealDhcpOfferResultTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SetRandomMacSuccess1, TestSize.Level1)

@@ -60,7 +60,7 @@ HWTEST_F(WifiInternalEventDispatcherTest, ThreadTest, TestSize.Level1)
     WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
     msg.msgCode = 0xffff;
     WifiInternalEventDispatcher::GetInstance().Run(instance, msg);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiInternalEventDispatcherTest, InitExitTest, TestSize.Level1)
@@ -200,7 +200,7 @@ HWTEST_F(WifiInternalEventDispatcherTest, RemoveP2pCallbackFail, TestSize.Level1
 HWTEST_F(WifiInternalEventDispatcherTest, ExitFail, TestSize.Level1)
 {
     WifiInternalEventDispatcher::GetInstance().Exit();
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

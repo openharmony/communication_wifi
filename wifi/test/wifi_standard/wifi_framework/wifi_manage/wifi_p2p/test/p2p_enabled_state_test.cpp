@@ -29,8 +29,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-    static std::string g_errLog = "wifitest";
-
+const std::string g_errLog = "wifitest";
 class P2pEnabledStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -184,7 +183,7 @@ HWTEST_F(P2pEnabledStateTest, ProcessDeviceFoundEvt1, TestSize.Level1)
     WifiP2pDevice device;
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_DEVICE_FOUND));
     msg->SetMessageObj(device);
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ProcessDeviceFoundEvt2, TestSize.Level1)

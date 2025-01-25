@@ -30,7 +30,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-const std::string g_errLog = "wifitest";
+const std::string errLog = "wifitest";
 class ApIdleState_test : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -66,12 +66,12 @@ public:
 HWTEST_F(ApIdleState_test, GoInState, TestSize.Level1)
 {
     pApIdleState->GoInState();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 HWTEST_F(ApIdleState_test, GoOutState, TestSize.Level1)
 {
     pApIdleState->GoOutState();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(ApIdleState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)

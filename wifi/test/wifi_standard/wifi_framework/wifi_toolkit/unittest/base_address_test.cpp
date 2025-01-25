@@ -25,7 +25,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
-const std::string errLog = "wifitest";
+static std::string g_errLog = "wifitest";
 class BaseAddressTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -66,7 +66,7 @@ HWTEST_F(BaseAddressTest, DumpTest, TestSize.Level1)
     ipv6.Dump();
     BaseAddressSubClass mBaseAddressSubClass;
     mBaseAddressSubClass.Dump();
-    EXPECT_FALSE(errLog.find("BaseAddressSubClassTest") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("BaseAddressSubClassTest") != std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

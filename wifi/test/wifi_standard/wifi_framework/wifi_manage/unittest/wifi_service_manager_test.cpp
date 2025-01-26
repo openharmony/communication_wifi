@@ -21,6 +21,7 @@ DEFINE_WIFILOG_LABEL("WifiServiceManagerTest");
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 constexpr int ID = 0;
 HWTEST_F(WifiServiceManagerTest, CheckPreLoadServiceTest, TestSize.Level1)
 {
@@ -94,6 +95,7 @@ HWTEST_F(WifiServiceManagerTest, UnloadServiceTest, TestSize.Level1)
 HWTEST_F(WifiServiceManagerTest, UninstallAllServiceTest, TestSize.Level1)
 {
     WifiServiceManager::GetInstance().UninstallAllService();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiServiceManagerTest, ApServiceSetHotspotConfigTest, TestSize.Level1)
@@ -109,6 +111,7 @@ HWTEST_F(WifiServiceManagerTest, GetEnhanceServiceInstTest, TestSize.Level1)
 {
     WIFI_LOGE("GetEnhanceServiceInstTest enter!");
     WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

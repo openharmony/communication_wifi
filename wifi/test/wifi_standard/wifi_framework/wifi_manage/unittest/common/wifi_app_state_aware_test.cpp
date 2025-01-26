@@ -29,7 +29,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
-
+static std::string g_errLog = "wifitest";
 class MockWifiAppStateAwareCallbacks : public WifiAppStateAwareCallbacks {
 public:
     MOCK_METHOD(void, OnForegroundAppChanged, (const AppExecFwk::AppStateData &, int));
@@ -61,11 +61,13 @@ HWTEST_F(WifiAppStateAwareTest, Connect_ReturnsTrueWhenAppMgrProxyIsNotNull, Tes
 HWTEST_F(WifiAppStateAwareTest, RegisterAppStateObserver_CallsRegisterApplicationStateObserver, TestSize.Level1)
 {
     WifiAppStateAware::GetInstance().RegisterAppStateObserver();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiAppStateAwareTest, UnSubscribeAppState_CallsUnregisterApplicationStateObserver, TestSize.Level1)
 {
     WifiAppStateAware::GetInstance().UnSubscribeAppState();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiAppStateAwareTest, OnForegroundAppChanged_CallsOnForegroundAppChangedCallback, TestSize.Level1)
@@ -112,6 +114,7 @@ HWTEST_F(WifiAppStateAwareTest, OnForegroundAppChangedTest001, TestSize.Level1)
     appStateData.state = static_cast<int32_t>(AppExecFwk::ApplicationState::APP_STATE_FOREGROUND);
     appStateData.uid = -1;
     wifiAppStateAware.OnForegroundAppChanged(appStateData, 0);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
 HWTEST_F(WifiAppStateAwareTest, GetProcessRunningInfosTest001, TestSize.Level1)

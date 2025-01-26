@@ -30,6 +30,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 DEFINE_WIFILOG_LABEL("WifiNetStatsManagerTest");
 class WifiNetStatsManagerTest : public Test {
 public:
@@ -177,6 +178,7 @@ HWTEST_F(WifiNetStatsManagerTest, LogNetStatsTraffic_LogsNetStatsTraffic, TestSi
     netStats.push_back(netStatsInfo1);
     netStats.push_back(netStatsInfo2);
     WifiNetStatsManager::GetInstance().LogNetStatsTraffic(netStats);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

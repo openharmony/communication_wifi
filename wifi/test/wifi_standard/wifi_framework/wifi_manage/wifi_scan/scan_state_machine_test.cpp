@@ -42,7 +42,9 @@ constexpr int BAND = 2;
 constexpr int TWO = 2;
 constexpr int ONE = 1;
 static std::string g_errLog;
-void ScanStateMachineCallback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void ScanStateMachineCallback(const LogType type, const LogLevel level,
+                              const unsigned int domain, const char *tag,
+                              const char *msg)
     {
         g_errLog = msg;
     }
@@ -1097,6 +1099,7 @@ HWTEST_F(ScanStateMachineTest, InitGoInStateTest, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, InitGoOutStateTest, TestSize.Level1)
 {
     InitGoOutStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, InitExeMsgSuccess1, TestSize.Level1)
@@ -1454,6 +1457,7 @@ HWTEST_F(ScanStateMachineTest, StartNewCommonScanTest1, TestSize.Level1)
 HWTEST_F(ScanStateMachineTest, StartNewCommonScanTest2, TestSize.Level1)
 {
     StartNewCommonScanTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanStateMachineTest, StartSingleCommonScanSuccess, TestSize.Level1)

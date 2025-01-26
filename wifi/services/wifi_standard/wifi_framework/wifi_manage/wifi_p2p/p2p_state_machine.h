@@ -309,6 +309,8 @@ private:
     bool HasPersisentGroup(void);
 
     bool CheckIsDisplayDevice(const std::string &mac) const;
+
+    int GetRandomSocialFreq(const std::vector<int> &freqList) const;
 private:
     /**
      * @Description - Broadcast state change event.

@@ -51,6 +51,7 @@ const int ARP_TIMEOUT = 100;
 const std::string CARRY_DATA_MIRACAST = "1";
 const std::string PRIMARY_PC_TYPE = "1";
 const std::string PRIMARY_DISPLAY_TYPE = "7";
+const std::vector<int> FILTERED_FREQS = {2412, 2437, 2462};
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
 DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
@@ -1098,6 +1099,9 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         WIFI_LOGE("Cannot get support frequencies according to band, choose random frequency");
         return 0;
     }
+    if (freqList.empty()) {
+        return 0;
+    }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int retFreq = 0;
@@ -1111,7 +1115,15 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     std::random_device rd;
     int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % freqList.size());
     retFreq = freqList.at(randomIndex);
-    return retFreq;
+    if (band == GroupOwnerBand::GO_BAND_5GHZ) {
+        return retFreq;
+    }
+    int randomFreq = GetRandomSocialFreq(freqList);
+    if (randomFreq == 0) {
+        WIFI_LOGE("Cannot get 1 6 11 channel frequency");
+        return retFreq;
+    }
+    return randomFreq;
 }
 
 bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool newGroup) const
@@ -1363,6 +1375,24 @@ void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
     p2pGroupOperatingState.SetEnhanceService(enhanceService);
 }
-
+int P2pStateMachine::GetRandomSocialFreq(const std::vector<int> &freqList) const
+{
+    std::vector<int> validFreqs;
+    for (auto freq : FILTERED_FREQS) {
+        auto it = std::find(freqList.begin(), freqList.end(), freq);
+        if (it != freqList.end()) {
+            validFreqs.push_back(*it);
+        }
+    }
+    if (validFreqs.empty()) {
+        WIFI_LOGE("validFreqs is empty");
+        return 0;
+    }
+    int randomIndex = GetRandomInt(0, validFreqs.size() - 1);
+    if (randomIndex < 0 || static_cast<size_t>(randomIndex) >= validFreqs.size()) {
+        return 0;
+    }
+    return validFreqs[randomIndex];
+}
 } // namespace Wifi
 } // namespace OHOS

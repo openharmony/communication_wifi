@@ -402,6 +402,8 @@ ErrCode ScanService::ScanControlInner(ScanType scanType)
         if (rlt != WIFI_OPT_SUCCESS) {
             return rlt;
         }
+    } else if (scanType == ScanType::SCAN_TYPE_HIDDEN_AP) {
+        return WIFI_OPT_SUCCESS;
     } else {
         if (!AllowScanByDisableScanCtrl()) {
             WIFI_LOGW("internal scan not allow by disable scan control.");

@@ -1019,6 +1019,7 @@ HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest, TestSize.Level1)
 {
     char srcBuf[10] = "";
     GetInfoElems(0, 0, srcBuf, nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest1, TestSize.Level1)
@@ -1069,6 +1070,7 @@ HWTEST_F(WifiHdiUtilTest, GetInfoElemsTest5, TestSize.Level1)
     ScanInfo pcmd;
     pcmd.infoElems = (ScanInfoElem *)calloc(256, sizeof(ScanInfoElem));
     GetInfoElems(length, end, srcBuf, &pcmd);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiHdiUtilTest, GetScanResultInfoElemTest, TestSize.Level1)

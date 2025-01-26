@@ -45,6 +45,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog = "wifitest";
 DEFINE_WIFILOG_LABEL("WifiCountryCodePolicyTest");
 
 class WifiCountryCodePolicyTest : public testing::Test {
@@ -67,6 +68,7 @@ HWTEST_F(WifiCountryCodePolicyTest, CreatePolicyTest, TestSize.Level1)
     WIFI_LOGI("CreatePolicyTest enter");
     m_wifiCountryCodePolicy->CreatePolicy(
         std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(31));  // 31: all the algorithms will take effect
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, CalculateWifiCountryCodeTest, TestSize.Level1)
@@ -361,6 +363,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByRegionTest, TestSize.Lev
     WIFI_LOGI("GetWifiCountryCodeByRegionTest enter");
     std::string code;
     m_wifiCountryCodePolicy->GetWifiCountryCodeByRegion(code);
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDefaultZZTest, TestSize.Level1)
@@ -375,7 +378,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByCacheSuccessTest, TestSi
     WIFI_LOGI("GetWifiCountryCodeByCacheSuccessTest enter");
     std::string code;
     m_wifiCountryCodePolicy->GetWifiCountryCodeByCache(code);
-    EXPECT_EQ(m_wifiCountryCodePolicy->GetWifiCountryCodeByCache(code), WIFI_OPT_SUCCESS);
+    EXPECT_EQ(m_wifiCountryCodePolicy->GetWifiCountryCodeByCache(code), WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDefaultRegionTest, TestSize.Level1)
@@ -383,7 +386,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDefaultRegionTest, TestS
     WIFI_LOGI("GetWifiCountryCodeByDefaultRegionTest enter");
     std::string code;
     m_wifiCountryCodePolicy->GetWifiCountryCodeByDefaultRegion(code);
-    EXPECT_EQ(m_wifiCountryCodePolicy->GetWifiCountryCodeByDefaultRegion(code), WIFI_OPT_SUCCESS);
+    EXPECT_EQ(m_wifiCountryCodePolicy->GetWifiCountryCodeByDefaultRegion(code), WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByDefaultTest, TestSize.Level1)

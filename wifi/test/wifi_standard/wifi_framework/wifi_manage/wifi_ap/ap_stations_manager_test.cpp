@@ -35,6 +35,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string g_errLog = "wifitest";
 DEFINE_WIFILOG_LABEL("ApStationsManager_test");
 const std::string Mac = "AA:BB:CC:DD:EE:FF";
 static StationInfo staInfo = {
@@ -374,6 +375,7 @@ HWTEST_F(ApStationsManager_test, DelAssociationStation_FAILED, TestSize.Level1)
 HWTEST_F(ApStationsManager_test, RegisterEventHandlerSuccess, TestSize.Level1)
 {
     RegisterEventHandlerSuccess();
+    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -58,7 +58,7 @@ MovingFreezePolicy defaultValue;
 
 HWTEST_F(ScanInterfaceTest, UnInitTest, TestSize.Level1)
 {
-    pScanInterface->UnInit();
+    EXPECT_EQ(pScanInterface->UnInit(), WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(ScanInterfaceTest, ScanSuccess, TestSize.Level1)
@@ -194,7 +194,7 @@ HWTEST_F(ScanInterfaceTest, SetEnhanceServiceTest, TestSize.Level1)
 
 HWTEST_F(ScanInterfaceTest, SetNetworkInterfaceUpDownTest, TestSize.Level1)
 {
-    pScanInterface->SetNetworkInterfaceUpDown(false);
+    EXPECT_EQ(pScanInterface->SetNetworkInterfaceUpDown(false), WIFI_OPT_FAILED);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -41,7 +41,9 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 static std::string g_errLog;
-void StaService1Callback(const LogType type,const LogLevel level,const unsigned int domain ,const char *tag,const char *msg)
+void StaService1Callback(const LogType type, const LogLevel level,
+                         const unsigned int domain, const char *tag,
+                         const char *msg)
 {
     g_errLog = msg;
 }
@@ -846,6 +848,7 @@ void StaServiceTest::HandleFoldStatusChangedTest()
 HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level1)
 {
     HandleFoldStatusChangedTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
@@ -991,6 +994,7 @@ HWTEST_F(StaServiceTest, StaServiceAutoConnectServiceSuccess, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackSuccess, TestSize.Level1)
 {
     StaServiceRegisterStaServiceCallbackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackFail, TestSize.Level1)
@@ -1109,6 +1113,7 @@ HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level1)
 HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level1)
 {
     EnableHiLinkHandshakeSuceessTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level1)
@@ -1126,6 +1131,7 @@ HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level1)
 HWTEST_F(StaServiceTest, GetDataSlotIdTest, TestSize.Level1)
 {
     GetDataSlotIdTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, GetImsiTest, TestSize.Level1)

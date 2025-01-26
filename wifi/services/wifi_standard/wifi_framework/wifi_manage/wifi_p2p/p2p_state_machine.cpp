@@ -51,6 +51,7 @@ const int ARP_TIMEOUT = 100;
 const std::string CARRY_DATA_MIRACAST = "1";
 const std::string PRIMARY_PC_TYPE = "1";
 const std::string PRIMARY_DISPLAY_TYPE = "7";
+const std::vector<int> FILTERED_FREQS = {2412, 2437, 2462};
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
 DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
@@ -1376,9 +1377,8 @@ void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 }
 int P2pStateMachine::GetRandomSocialFreq(const std::vector<int> &freqList) const
 {
-    std::vector<int> filteredFreqs = {2412, 2437, 2462};
     std::vector<int> validFreqs;
-    for (auto freq : filteredFreqs) {
+    for (auto freq : FILTERED_FREQS) {
         auto it = std::find(freqList.begin(), freqList.end(), freq);
         if (it != freqList.end()) {
             validFreqs.push_back(*it);

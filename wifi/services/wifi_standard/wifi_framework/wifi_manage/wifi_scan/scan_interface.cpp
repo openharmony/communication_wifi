@@ -136,6 +136,8 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
     if (staStatus == static_cast<int>(OperateResState::CONNECT_NETWORK_DISABLED)
         || staStatus == static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED)) {
         pScanService->HandleNetworkQualityChanged(staStatus);
+    } else if (staStatus == static_cast<int>(OperateResState::CONNECT_MISS_MATCH)) {
+        pScanService->Scan(ScanType::SCAN_TYPE_HIDDEN_AP);
     } else {
         pScanService->HandleStaStatusChanged(staStatus);
         pScanService->SetStaCurrentTime();

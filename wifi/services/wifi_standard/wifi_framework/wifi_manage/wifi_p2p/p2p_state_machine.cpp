@@ -1389,7 +1389,7 @@ int P2pStateMachine::GetRandomSocialFreq(const std::vector<int> &freqList) const
         return 0;
     }
     int randomIndex = GetRandomInt(0, validFreqs.size() - 1);
-    if (randomIndex < 0 || static_cast<unsigned int>(randomIndex) > validFreqs.size() - 1) {
+    if (randomIndex < 0 || static_cast<size_t>(randomIndex) >= validFreqs.size()) {
         return 0;
     }
     return validFreqs[randomIndex];

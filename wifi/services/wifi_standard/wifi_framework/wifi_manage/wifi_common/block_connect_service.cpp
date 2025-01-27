@@ -117,7 +117,7 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
     for (auto &config : results) {
         WifiSettings::GetInstance().ClearNetworkCandidateScanResult(config.networkId);
         if ((config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) &&
-+            (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE)) {
+            (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE)) {
             continue;
         }
         DisablePolicy policy = CalculateDisablePolicy(config.networkSelectionStatus.networkSelectionDisableReason);
@@ -126,7 +126,8 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
             continue;
         }
         if (policy.disableStatus == WifiDeviceConfigStatus::ENABLED ||
-            timestamp - config.networkSelectionStatus.networkDisableTimeStamp >= policy.disableTime) {
+            (config.networkSelectionStatus.networkDisableTimeStamp > 0 &&
+            timestamp - config.networkSelectionStatus.networkDisableTimeStamp >= policy.disableTime)) {
             config.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
             config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
             config.networkSelectionStatus.networkDisableTimeStamp = -1;
@@ -214,8 +215,8 @@ bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, Disable
     if (targetNetwork.networkSelectionStatus.networkDisableCount >= disablePolicy.disableCount) {
         targetNetwork.networkSelectionStatus.status = disablePolicy.disableStatus;
         targetNetwork.networkSelectionStatus.networkSelectionDisableReason = disableReason;
-        targetNetwork.networkSelectionStatus.networkDisableTimeStamp = timestamp;
     }
+    targetNetwork.networkSelectionStatus.networkDisableTimeStamp = timestamp;
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WIFI_LOGI("updateNetworkSelectStatus networkId %{public}d %{public}s %{public}d",
         targetNetworkId, SsidAnonymize(targetNetwork.ssid).c_str(), disableReason);

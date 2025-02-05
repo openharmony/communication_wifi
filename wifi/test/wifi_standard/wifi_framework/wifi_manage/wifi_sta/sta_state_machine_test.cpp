@@ -384,7 +384,7 @@ public:
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        pStaStateMachine->SetRandomMac(0, "");
+        pStaStateMachine->SetRandomMac(deviceConfig, "");
     }
 
     void SetRandomMacFail1()
@@ -401,7 +401,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(-1)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        pStaStateMachine->SetRandomMac(0, "");
+        pStaStateMachine->SetRandomMac(deviceConfig, "");
     }
 
     void SetRandomMacFail2()
@@ -415,7 +415,7 @@ public:
             WillRepeatedly(DoAll(SetArgReferee<0>(MacAddress), Return(0)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
-        pStaStateMachine->SetRandomMac(0, "");
+        pStaStateMachine->SetRandomMac(deviceConfig, "");
     }
 
     void StartRoamToNetworkSuccess()

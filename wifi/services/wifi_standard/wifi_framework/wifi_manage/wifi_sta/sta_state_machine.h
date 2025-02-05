@@ -693,9 +693,10 @@ private:
     /**
      * @Description  Set a random MAC address.
      *
-     * @param networkId - network id[in]
+     * @param deviceConfig - deviceConfig[in]
+     * @param bssid - bssid[in]
      */
-    bool SetRandomMac(int networkId, const std::string &bssid);
+    bool SetRandomMac(WifiDeviceConfig &deviceConfig, const std::string &bssid);
 
     /**
      * @Description  Generate a random MAC address.

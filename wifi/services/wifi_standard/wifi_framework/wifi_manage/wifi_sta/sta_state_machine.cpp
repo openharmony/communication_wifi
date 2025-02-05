@@ -830,14 +830,9 @@ void StaStateMachine::StopDhcp()
 #endif
 }
 
-bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
+bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::string &bssid)
 {
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
-    WifiDeviceConfig deviceConfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
-        LOGE("SetRandomMac : GetDeviceConfig failed!");
-        return false;
-    }
     std::string currentMac, realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
@@ -846,8 +841,7 @@ bool StaStateMachine::SetRandomMac(int networkId, const std::string &bssid)
         WifiStoreRandomMac randomMacInfo;
         InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
         if (randomMacInfo.peerBssid.empty()) {
-            LOGE("scanInfo has no target wifi and bssid is empty!");
-            return false;
+            LOGI("scanInfo has no target wifi and bssid is empty!");
         }
         if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
             WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
@@ -3734,7 +3728,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         return WIFI_OPT_FAILED;
     }
     targetNetworkId_ = networkId;
-    SetRandomMac(targetNetworkId_, bssid);
+    SetRandomMac(deviceConfig, bssid);
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(bssid).c_str());
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
@@ -3960,7 +3954,7 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
         for (auto scanInfo : scanInfoList) {
             std::string deviceKeyMgmt;
             scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-            if ((deviceConfig.ssid == scanInfo.ssid) && (deviceKeyMgmt == deviceConfig.keyMgmt)) {
+            if ((deviceConfig.ssid == scanInfo.ssid) && deviceKeyMgmt.find(deviceConfig.keyMgmt) != std::string::npos) {
                 randomMacInfo.peerBssid = scanInfo.bssid;
                 break;
             }

@@ -19,25 +19,41 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Wifi {
+int WifiEventHandlerTest::result = 0;
 const std::string g_errLog = "wifitest";
 HWTEST_F(WifiEventHandlerTest, PostSyncTaskTest, TestSize.Level1)
 {
     std::function<void()> callback = EventHandlerCallback;
+    result = 0;
     EXPECT_EQ(testEventHandler->PostSyncTask(callback), true);
+    EXPECT_EQ(result, 1);
 }
 
 HWTEST_F(WifiEventHandlerTest, PostAsyncTaskTest, TestSize.Level1)
 {
     std::function<void()> callback = EventHandlerCallback;
-    testEventHandler->PostAsyncTask(callback, 0);
+    result = 0;
     EXPECT_EQ(testEventHandler->PostAsyncTask(callback, 0), true);
+    sleep(1);
+    EXPECT_EQ(result, 1);
 }
 
 HWTEST_F(WifiEventHandlerTest, PostAsyncTaskAndNameTest, TestSize.Level1)
 {
     std::function<void()> callback = EventHandlerCallback;
-    testEventHandler->PostAsyncTask(callback, "callback");
+    result = 0;
     EXPECT_EQ(testEventHandler->PostAsyncTask(callback, "callback"), true);
+    sleep(1);
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(WifiEventHandlerTest, PostAsyncTaskWithHigerPriorityAndNameTest, TestSize.Level1)
+{
+    std::function<void()> callback = EventHandlerCallback;
+    result = 0;
+    EXPECT_EQ(testEventHandler->PostAsyncTask(callback, "callback", true), true);
+    sleep(1);
+    EXPECT_EQ(result, 1);
 }
 
 HWTEST_F(WifiEventHandlerTest, RemoveAsyncTaskTest, TestSize.Level1)

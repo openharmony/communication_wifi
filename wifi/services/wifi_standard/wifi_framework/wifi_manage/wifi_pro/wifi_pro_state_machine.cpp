@@ -135,7 +135,7 @@ ErrCode WifiProStateMachine::Initialize()
 bool WifiProStateMachine::IsKeepCurrWifiConnected()
 {
     // First detect nonet and user select, do not switch
-    if (currentState_ == WifiProState::WIFI_NONET && WifiProUtils::IsUserSelectNetwork() && isFirstDectectNoNet_) {
+    if (currentState_ == WifiProState::WIFI_NONET && WifiProUtils::IsUserSelectNetwork() && isFirstNetDectect_) {
         WIFI_LOGI("IsKeepCurrWifiConnected, user select and nonet.");
         return true;
     }
@@ -667,7 +667,7 @@ void WifiProStateMachine::WifiConnectedState::InitConnectedState()
     if (pWifiProStateMachine_->duanBandHandoverType_ == ROAM_SCENE) {
         pWifiProStateMachine_->duanBandHandoverType_ = 0;
     }
-    pWifiProStateMachine_->isFirstDectectNoNet_ = true;
+    pWifiProStateMachine_->isFirstNetDectect_ = true;
 }
 
 void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMessagePtr msg)
@@ -835,7 +835,7 @@ void WifiProStateMachine::WifiHasNetState::GoOutState()
 {
     WIFI_LOGI("WifiHasNetState GoOutState function.");
     pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
-    pWifiProStateMachine_->isFirstDectectNoNet_ = false;
+    pWifiProStateMachine_->isFirstNetDectect_ = false;
     return;
 }
 
@@ -1108,7 +1108,7 @@ void WifiProStateMachine::WifiNoNetState::GoInState()
 void WifiProStateMachine::WifiNoNetState::GoOutState()
 {
     WIFI_LOGI("WifiNoNetState GoOutState function.");
-    pWifiProStateMachine_->isFirstDectectNoNet_ = false;
+    pWifiProStateMachine_->isFirstNetDectect_ = false;
 }
 
 bool WifiProStateMachine::WifiNoNetState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -1240,7 +1240,7 @@ void WifiProStateMachine::WifiPortalState::GoInState()
 void WifiProStateMachine::WifiPortalState::GoOutState()
 {
     WIFI_LOGI("WifiPortalState GoOutState function.");
-    pWifiProStateMachine_->isFirstDectectNoNet_ = false;
+    pWifiProStateMachine_->isFirstNetDectect_ = false;
 }
 
 bool WifiProStateMachine::WifiPortalState::ExecuteStateMsg(InternalMessagePtr msg)

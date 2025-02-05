@@ -286,11 +286,11 @@ HWTEST_F(WifiProStateMachineTest, TryNoNetSwitchTest, TestSize.Level1)
 {
     NetworkSelectionResult networkSelectionResult;
     networkSelectionResult.wifiDeviceConfig.networkId = 1;
-    wifiNoNetState_->pWifiProStateMachine_->isFirstDectectNoNet_ = false;
+    wifiNoNetState_->pWifiProStateMachine_->isFirstNetDectect_ = false;
     wifiNoNetState_->pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_NO_INTERNET;
     wifiNoNetState_->pWifiProStateMachine_->TryWifi2Wifi(networkSelectionResult);
 
-    wifiNoNetState_->pWifiProStateMachine_->isFirstDectectNoNet_ = true;
+    wifiNoNetState_->pWifiProStateMachine_->isFirstNetDectect_ = true;
     wifiNoNetState_->pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_NO_INTERNET;
     wifiNoNetState_->pWifiProStateMachine_->TryWifi2Wifi(networkSelectionResult);
 
@@ -665,7 +665,7 @@ HWTEST_F(WifiProStateMachineTest, WifiPortalStateGoInStateTest01, TestSize.Level
 {
     wifiPortalState_->GoInState();
     wifiPortalState_->GoOutState();
-    EXPECT_EQ(wifiPortalState_->pWifiProStateMachine_->isFirstDectectNoNet_, false);
+    EXPECT_EQ(wifiPortalState_->pWifiProStateMachine_->isFirstNetDectect_, false);
 }
 
 HWTEST_F(WifiProStateMachineTest, WifiPortalStateExecuteStateMsgTest01, TestSize.Level1)

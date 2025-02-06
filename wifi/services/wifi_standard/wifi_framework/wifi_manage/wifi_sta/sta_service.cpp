@@ -70,9 +70,6 @@ StaService::StaService(int instId)
     : pStaStateMachine(nullptr),
       pStaMonitor(nullptr),
       pStaAutoConnectService(nullptr),
-#ifndef OHOS_ARCH_LITE
-      pStaAppAcceleration(nullptr),
-#endif
       m_instId(instId)
 {}
 
@@ -94,13 +91,6 @@ StaService::~StaService()
         delete pStaStateMachine;
         pStaStateMachine = nullptr;
     }
-
-#ifndef OHOS_ARCH_LITE
-    if (pStaAppAcceleration != nullptr) {
-        delete pStaAppAcceleration;
-        pStaAppAcceleration = nullptr;
-    }
-#endif
 }
 
 ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callbacks)
@@ -144,17 +134,6 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
         }
         pStaAutoConnectService->SetAutoConnectStateCallback(callbacks);
 #ifndef OHOS_ARCH_LITE
-        pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
-        if (pStaAppAcceleration == nullptr) {
-            WIFI_LOGE("Alloc pStaAppAcceleration failed.\n");
-        }
-
-        if (pStaAppAcceleration->InitAppAcceleration() != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("InitAppAcceleration failed.\n");
-        }
-        std::vector<StaServiceCallback> appAccelerationStaCallBacks;
-        appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
-        RegisterStaServiceCallback(appAccelerationStaCallBacks);
         GetStaControlInfo();
 #endif
     }
@@ -902,9 +881,6 @@ void StaService::HandleScreenStatusChanged(int screenState)
             pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
         }
     }
-    if (pStaAppAcceleration != nullptr) {
-        pStaAppAcceleration->HandleScreenStatusChanged(screenState);
-    }
 #endif
     return;
 }
@@ -979,8 +955,8 @@ ErrCode StaService::StartPortalCertification()
 #ifndef OHOS_ARCH_LITE
 ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
-    if (pStaAppAcceleration == nullptr) {
-        WIFI_LOGE("pStaAppAcceleration is null");
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null");
         return WIFI_OPT_FAILED;
     }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT, appStateData);

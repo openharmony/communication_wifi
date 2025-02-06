@@ -42,7 +42,6 @@ constexpr int STATE = 20;
 static std::unique_ptr<StaInterface> pStaInterface = nullptr;
 static std::unique_ptr<StaAutoConnectService> pStaAutoConnectService = nullptr;
 static std::unique_ptr<StaService> pStaService = nullptr;
-static std::unique_ptr<StaAppAcceleration> pStaAppAcceleration = nullptr;
 static std::unique_ptr<IWifiCountryCodeChangeListener> pStaObserver = nullptr;
 StaServiceCallback mStaCallback;
 
@@ -50,7 +49,6 @@ void MyExit()
 {
     pStaInterface.reset();
     pStaAutoConnectService.reset();
-    pStaAppAcceleration.reset();
     pStaObserver.reset();
     pStaService.reset();
     sleep(U32_AT_SIZE_ZERO);
@@ -256,19 +254,6 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->WhetherDevice5GAvailable(scanInfo);
     pStaAutoConnectService->GetAvailableScanInfos(scanInfo, scanInfo, blocklistBssids, info);
     pStaService->AutoConnectService(scanInfo);
-}
-
-void StaAppAccelerationFuzzTest(const uint8_t* data, size_t size)
-{
-    int index = 0;
-    int uid = static_cast<int>(data[index++]);
-    int enable = static_cast<int>(data[index++]);
-    int type = static_cast<int>(data[index++]);
-    int limitMode = static_cast<int>(data[index++]);
-    int protocol = static_cast<int>(data[index++]);
-    pStaAppAcceleration->SetGameBoostMode(enable, uid, type, limitMode);
-    pStaAppAcceleration->HighPriorityTransmit(uid, protocol, enable);
-    pStaAppAcceleration->StopAllAppAcceleration();
 }
 
 void RegisterDeviceAppraisalTest(const uint8_t* data, size_t size)
@@ -486,7 +471,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     OHOS::Wifi::StaServerFuzzTest(data, size);
     OHOS::Wifi::StaAutoServerFuzzTest(data, size);
-    OHOS::Wifi::StaAppAccelerationFuzzTest(data, size);
     OHOS::Wifi::RegisterDeviceAppraisalTest(data, size);
     OHOS::Wifi::AllowAutoSelectDeviceTest(data, size);
     OHOS::Wifi::StaAutoConnectServiceFuzzTest(data, size);

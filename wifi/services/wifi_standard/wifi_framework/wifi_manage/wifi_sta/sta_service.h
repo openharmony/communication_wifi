@@ -24,7 +24,6 @@
 #include "network_selection.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
-#include "sta_app_acceleration.h"
 #endif
 
 namespace OHOS {
@@ -456,9 +455,7 @@ private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
-#ifndef OHOS_ARCH_LITE
-    StaAppAcceleration *pStaAppAcceleration;
-#endif
+
     int m_instId;
     std::vector<PackageInfo> sta_candidate_trust_list;
     bool m_connMangerStatus = true;

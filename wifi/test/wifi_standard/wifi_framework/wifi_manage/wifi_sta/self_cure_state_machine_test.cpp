@@ -3103,6 +3103,7 @@ HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
 {
     bool isHttpReachable = true;
     pSelfCureStateMachine_->SetHttpMonitorStatus(isHttpReachable);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)

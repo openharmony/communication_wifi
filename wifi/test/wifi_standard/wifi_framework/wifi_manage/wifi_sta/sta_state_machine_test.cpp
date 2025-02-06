@@ -1772,6 +1772,7 @@ HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail4, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail3, TestSize.Level1)
 {
     LinkedStateExeMsgFail3();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, LinkedStateExeMsgFail2, TestSize.Level1)
@@ -2043,6 +2044,7 @@ HWTEST_F(StaStateMachineTest, TestTryModifyPortalAttribute, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, TestChangePortalAttribute, TestSize.Level1)
 {
     TestChangePortalAttribute();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, TestUpdatePortalState1, TestSize.Level1)

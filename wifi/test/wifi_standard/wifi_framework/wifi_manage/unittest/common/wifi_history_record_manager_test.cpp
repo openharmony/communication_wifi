@@ -39,6 +39,13 @@ constexpr int QUERY_FAILED = 0;
 constexpr int QUERY_NO_RECORD = 1;
 constexpr int QUERY_HAS_RECORD = 2;
 const std::string WIFI_HISTORY_RECORD_MANAGER_CLASS_NAME = "WifiHistoryRecordManager";
+static std::string g_errLog;
+    void WifiHistoryRecordManagerCallback(const LogType type, const LogLevel level,
+                                 const unsigned int domain, const char *tag,
+                                 const char *msg)
+    {
+        g_errLog = msg;
+    }
 
 class WifiHistoryRecordManagerTest : public testing::Test {
 public:
@@ -47,7 +54,9 @@ public:
     static void TearDownTestCase()
     {}
     virtual void SetUp()
-    {}
+    {
+        LOG_SetCallback(WifiHistoryRecordManagerCallback);
+    }
     virtual void TearDown()
     {}
     std::time_t GetCurrentTimeStampSeconds()
@@ -573,6 +582,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, CreateApInfoBucketTest, TestSize.Level1)
     WIFI_LOGI("CreateApInfoBucketTest enter");
     ConnectedApInfo apInfo;
     WifiHistoryRecordManager::GetInstance().CreateApInfoBucket(apInfo);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiHistoryRecordManagerTest, IsHomeApTest, TestSize.Level1)
@@ -621,6 +631,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, ClearConnectedApInfoTest, TestSize.Level1
 {
     WIFI_LOGI("ClearConnectedApInfoTest enter");
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiHistoryRecordManagerTest, DeleteAllApInfoTest, TestSize.Level1)

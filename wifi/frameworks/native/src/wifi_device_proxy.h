@@ -690,23 +690,34 @@ private:
 #endif
 private:
     void InitWifiState();
+    void OnWifiStateChanged(int state);
 };
 class WifiInternalCallback : public IWifiDeviceCallBack {
 public:
-    WifiInternalCallback() = default;
-    ~WifiInternalCallback() = default;
-    void OnWifiStateChanged(int state) override;
-    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override;
-    void OnWifiRssiChanged(int rssi) override;
-    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override;
-    void OnStreamChanged(int direction) override;
-    void OnDeviceConfigChanged(ConfigChange value) override;
+    WifiInternalCallback() {
+    }
+    ~WifiInternalCallback() {
+    }
+    void OnWifiStateChanged(int state) override
+    {
+        if (wifiStateChangeCallback == nullptr) {
+            return;
+        }
+        wifiStateChangeCallback(state);
+        return;
+    }
+    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {}
+    void OnWifiRssiChanged(int rssi) override {}
+    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override {}
+    void OnStreamChanged(int direction) override {}
+    void OnDeviceConfigChanged(ConfigChange value) override {}
 #ifndef OHOS_ARCH_LITE
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override
     {
         return nullptr;
     }
 #endif
+    std::function<void(int state)> wifiStateChangeCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

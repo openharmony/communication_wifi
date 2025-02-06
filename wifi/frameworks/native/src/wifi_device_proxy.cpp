@@ -65,7 +65,10 @@ WifiDeviceProxy::~WifiDeviceProxy()
 
 void WifiDeviceProxy::InitWifiState()
 {
-    auto callBack = sptr<IWifiDeviceCallBack>(new WifiInternalCallback());
+    auto callBack = sptr<WifiInternalCallback>(new WifiInternalCallback());
+    callBack->wifiStateChangeCallback = [=](int state) {
+        this->OnWifiStateChanged(state);
+    };
     const std::vector<std::string> event = {EVENT_STA_POWER_STATE_CHANGE};
     RegisterCallBack(callBack, event);
 
@@ -97,7 +100,7 @@ void WifiDeviceProxy::InitWifiState()
         return;
     }
 
-    bool bActive = reply.ReadBool();
+    boolbActive = reply.ReadBool();
     g_deviceCallBackStub->SetWifiState(bActive);
     return;
 }
@@ -2729,35 +2732,14 @@ ErrCode WifiDeviceProxy::GetVoWifiDetectPeriod(int &period)
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiInternalCallback::OnWifiStateChanged(int state)
+void WifiDeviceProxy::OnWifiStateChanged(int state)
 {
-    WIFI_LOGI("WifiInternalCallback::OnWifiStateChanged, state %{public}d", state);
+    WIFI_LOGI("WifiDeviceProxy::OnWifiStateChanged, state %{public}d", state);
     if (state == static_cast<int>(WifiState::ENABLED)) {
         g_deviceCallBackStub->SetWifiState(true);
     } else {
         g_deviceCallBackStub->SetWifiState(false);
     }
 }
-
-void WifiInternalCallback::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
-{
-}
-
-void WifiInternalCallback::OnWifiRssiChanged(int rssi)
-{
-}
-
-void WifiInternalCallback::OnWifiWpsStateChanged(int state, const std::string &pinCode)
-{
-}
-
-void WifiInternalCallback::OnStreamChanged(int direction)
-{
-}
-
-void WifiInternalCallback::OnDeviceConfigChanged(ConfigChange value)
-{
-}
-
 }  // namespace Wifi
 }  // namespace OHOS

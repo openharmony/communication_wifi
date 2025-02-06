@@ -20,6 +20,7 @@
 #include "if_config.h"
 #include "ip_tools.h"
 #include "mac_address.h"
+#include "sta_define.h"
 #include "sta_monitor.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
@@ -940,6 +941,11 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessagePtr msg)
         case WIFI_SVR_CMD_STA_RECONNECT_NETWORK: {
             ret = EXECUTED;
             DealReConnectCmdInSeparatedState(msg);
+            break;
+        }
+        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            pStaStateMachine->DealScreenStateChangedEvent(msg);
             break;
         }
         default:

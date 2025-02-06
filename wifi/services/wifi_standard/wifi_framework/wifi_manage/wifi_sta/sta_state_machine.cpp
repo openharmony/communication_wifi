@@ -942,6 +942,11 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessagePtr msg)
             DealReConnectCmdInSeparatedState(msg);
             break;
         }
+        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            pStaStateMachine->DealScreenStateChangedEvent(msg);
+            break;
+        }
         default:
             break;
     }

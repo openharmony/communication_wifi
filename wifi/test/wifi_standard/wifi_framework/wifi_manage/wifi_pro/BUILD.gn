@@ -77,6 +77,15 @@ ohos_unittest("wifi_pro_unittest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/mock/mock_wifi_service_manager.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
     "mock/mock_wifi_pro_interface.cpp",
+    "pref_5g/ap_connection_info_test.cpp",
+    "pref_5g/dual_band_learning_alg_service_test.cpp",
+    "pref_5g/dual_band_repostitory_test.cpp",
+    "pref_5g/dual_band_selector_test.cpp",
+    "pref_5g/dual_band_utils_test.cpp",
+    "pref_5g/perf_5g_handover_service_test.cpp",
+    "pref_5g/relation_ap_test.cpp",
+    "pref_5g/relation_info_test.cpp",
+    "pref_5g/wifi_scan_controller_test.cpp",
     "wifi_pro_interface_test.cpp",
     "wifi_pro_service_test.cpp",
     "wifi_pro_state_machine_test.cpp",
@@ -126,6 +135,7 @@ ohos_unittest("wifi_pro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/perf_5g/repostitory",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/perf_5g/service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/rdb",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_pro/mock",
   ]
 
   deps = [

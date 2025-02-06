@@ -40,12 +40,12 @@ constexpr int QUERY_NO_RECORD = 1;
 constexpr int QUERY_HAS_RECORD = 2;
 const std::string WIFI_HISTORY_RECORD_MANAGER_CLASS_NAME = "WifiHistoryRecordManager";
 static std::string g_errLog;
-    void WifiHistoryRecordManagerCallback(const LogType type, const LogLevel level,
-                                 const unsigned int domain, const char *tag,
-                                 const char *msg)
-    {
-        g_errLog = msg;
-    }
+void WifiHistoryRecordManagerCallback(const LogType type, const LogLevel level,
+                                      const unsigned int domain, const char *tag,
+                                      const char *msg)
+{
+    g_errLog = msg;
+}
 
 class WifiHistoryRecordManagerTest : public testing::Test {
 public:

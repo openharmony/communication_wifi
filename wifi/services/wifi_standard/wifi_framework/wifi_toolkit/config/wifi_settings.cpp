@@ -817,6 +817,10 @@ bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
     std::string fuzzyBssid = "";
     if (IsPskEncryption(randomMacInfo.keyMgmt)) {
         fuzzyBssid = FuzzyBssid(randomMacInfo.peerBssid);
+        if (fuzzyBssid.empty()) {
+            LOGI("AddRandomMac fuzzyBssid is empty.");
+            return false;
+        }
     }
     
     for (auto &ele : mWifiStoreRandomMac) {
@@ -862,6 +866,10 @@ bool WifiSettings::GetRandomMac(WifiStoreRandomMac &randomMacInfo)
     std::string fuzzyBssid = "";
     if (IsPskEncryption(randomMacInfo.keyMgmt)) {
         fuzzyBssid = FuzzyBssid(randomMacInfo.peerBssid);
+        if (fuzzyBssid.empty()) {
+            LOGI("GetStaRandomMac fuzzyBssid is empty.");
+            return false;
+        }
     }
 
     for (auto &item : mWifiStoreRandomMac) {

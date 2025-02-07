@@ -665,6 +665,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
+    linkedInfo.wifiLinkType = WifiLinkType::DISCONNECT;
     WriteWifiLinkTypeHiSysEvent(linkedInfo.ssid, linkedInfo.wifiLinkType);
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
@@ -1209,6 +1210,7 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
     pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
+    pStaStateMachine->linkedInfo.wifiLinkType = WifiLinkType::DEFAULT_LINK;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }
@@ -2508,6 +2510,7 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
         static_cast<int>(WifiPrivacyConfig::DEVICEMAC) : static_cast<int>(WifiPrivacyConfig::RANDOMMAC));
     linkedInfo.macAddress = macAddr;
     linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
+    linkedInfo.wifiLinkType = WifiLinkType::DEFAULT_LINK;
 }
 
 void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)

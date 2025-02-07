@@ -144,6 +144,12 @@ public:
      */
     void OnWpaStaNotifyCallBack(const std::string &notifyParam);
 
+    /**
+     * @Description : Callback of the Csa channel switch
+     *
+     * @param notifyParam - authentication information [in]
+     */
+    void OnWpaCsaChannelSwitchNotifyCallBack(const std::string &notifyParam);
 private:
     StaStateMachine *pStaStateMachine;
     int m_instId;

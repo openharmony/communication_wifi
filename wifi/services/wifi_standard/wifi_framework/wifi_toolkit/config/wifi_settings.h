@@ -125,6 +125,40 @@ public:
 
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
 
+    void SetUserConnectChoice(int networkId);
+
+    void ClearAllNetworkConnectChoice();
+
+    bool ClearNetworkConnectChoice(int networkId);
+
+    /**
+     * @Description Iterate through all the saved networks and remove the provided config from the connectChoice.
+     * This is invoked when a network is removed from records
+     *
+     * @param networkId - deviceConfig's networkId corresponding to the network that is being removed
+     */
+    void RemoveConnectChoiceFromAllNetwork(int networkId);
+
+    bool SetNetworkConnectChoice(int networkId, int selectNetworkId, long timestamp);
+
+    /**
+     * @Description this invoked by network selector at the start of every selection procedure to clear all candidate
+     * seen flag
+     *
+     * @param networkId - deviceConfig's networkId
+     * @Return true if the network was found, false otherwise
+     */
+    bool ClearNetworkCandidateScanResult(int networkId);
+
+    /**
+     * @Description this invoked by network selector when match deviceconfig from scanresults to update if deviceconfig
+     * can be seen for user
+     *
+     * @param networkId - deviceConfig's networkId
+     * @Return true if the network was found, false otherwise
+     */
+    bool SetNetworkCandidateScanResult(int networkId);
+
     int SetDeviceState(int networkId, int state, bool bSetOther = false);
 
     int SetDeviceEphemeral(int networkId, bool isEphemeral);

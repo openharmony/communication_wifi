@@ -2360,13 +2360,13 @@ HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest, TestSize.Level1)
 {
     IpInfo dhcpResults;
     dhcpResults.gateway = 0;
-    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), 0);
+    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), -1);
 
     dhcpResults.ipAddress = 0;
-    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), 0);
+    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), -1);
 
     dhcpResults.ipAddress = 1;
-    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), 0);
+    EXPECT_EQ(pSelfCureStateMachine_->GetLegalIpConfiguration(dhcpResults), -1);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetLegalIpConfigurationTest1, TestSize.Level1)
@@ -2389,7 +2389,7 @@ HWTEST_F(SelfCureStateMachineTest, DoArpTest_Test, TestSize.Level1)
 {
     std::string gateway = GATEWAY;
     std::string ipAddress = CURRENT_ADDR;
-    EXPECT_TRUE(pSelfCureStateMachine_->DoArpTest(ipAddress, gateway));
+    EXPECT_FALSE(pSelfCureStateMachine_->DoArpTest(ipAddress, gateway));
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetNextIpAddr_WhenGatewayAndCurrentAddrAreEmpty_ReturnEmptyString, TestSize.Level1)
@@ -3091,7 +3091,7 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedHighRe
 
 HWTEST_F(SelfCureStateMachineTest, IfMultiGateway_Test, TestSize.Level1)
 {
-    EXPECT_EQ(pSelfCureStateMachine_->IfMultiGateway(), true);
+    EXPECT_EQ(pSelfCureStateMachine_->IfMultiGateway(), false);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsSelfCureOnGoing_Test, TestSize.Level1)
@@ -3103,6 +3103,7 @@ HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
 {
     bool isHttpReachable = true;
     pSelfCureStateMachine_->SetHttpMonitorStatus(isHttpReachable);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)

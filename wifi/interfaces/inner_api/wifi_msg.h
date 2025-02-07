@@ -135,8 +135,9 @@ enum ConnState {
     UNKNOWN
 };
 
-enum MloState:uint8_t {
-    WIFI7_LEGACY = 0,
+enum WifiLinkType:int32_t {
+    DISCONNECT = -1,
+    DEFAULT_LINK = 0,
     WIFI7_SINGLE_LINK = 1,
     WIFI7_MLSR = 2,
     WIFI7_EMLSR = 3,
@@ -223,7 +224,7 @@ struct WifiLinkedInfo {
     std::string portalUrl;
     SupplicantState supplicantState; /* wpa_supplicant state */
     DetailedState detailedState;     /* connection state */
-    MloState mloState; /* MLO connected state */
+    WifiLinkType wifiLinkType; /* MLO connected state */
     int wifiStandard;                /* wifi standard */
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
@@ -256,7 +257,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
-        mloState = MloState::WIFI7_MLSR;
+        WifiLinkType = WifiLinkType::WIFI7_MLSR;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;

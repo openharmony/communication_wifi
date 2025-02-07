@@ -246,7 +246,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.portalUrl = "";
     linkedInfo.supplicantState = SupplicantState::DISCONNECTED;
     linkedInfo.detailedState = DetailedState::DISCONNECTED;
-    linkedInfo.mloState = MloState::WIFI7_MLSR;
+    linkedInfo.wifiLinkType = WifiLinkType::DEFAULT_LINK;
     linkedInfo.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     linkedInfo.lastPacketDirection = 0;
     linkedInfo.lastRxPackets = 0;
@@ -665,6 +665,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
+    WriteWifiLinkTypeHiSysEvent(linkedInfo.ssid, linkedInfo.wifiLinkType);
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
         if (shouldStopTimer) {
@@ -765,7 +766,17 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
     uint8_t state = param.state;
     uint16_t reasonCode = param.reasonCode;
     if (feature == CoFeatureType::COFEATURE_TYPE_MLO) {
-        pStaStateMachine->linkedInfo.mloState = {state};
+        if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR &&
+            static_cast<int32_t>(state) != WifiLinkType::WIFI7_EMLSR) {
+            WriteEmlsrExitReasonHiSysEvent(linkedInfo.ssid, static_cast<int32_t>(reasonCode));
+        }
+        pStaStateMachine->linkedInfo.wifiLinkType = static_cast<int32_t>(state);
+        WriteWifiLinkTypeHiSysEvent(linkedInfo.ssid, linkedInfo.wifiLinkType);
+#ifndef OHOS_ARCH_LITE
+        if (enhanceService_ != nullptr) {
+            enhanceService_->OnWifiLinkTypeChanged(linkedInfo.wifiLinkType);
+        }
+#endif
     }
     if (feature == CoFeatureType::COFEATURE_TYPE_WUR) {
         if (state == WUR_ENABLE) {
@@ -775,8 +786,8 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
         }
     }
 
-    LOGI("DealMloStateChange mloState=%{public}d isWurEnable=%{public}d reasonCode=%{public}u",
-        pStaStateMachine->linkedInfo.mloState, pStaStateMachine->linkedInfo.isWurEnable, reasonCode);
+    LOGI("DealMloStateChange wifiLinkType=%{public}d isWurEnable=%{public}d reasonCode=%{public}u",
+        pStaStateMachine->linkedInfo.wifiLinkType, pStaStateMachine->linkedInfo.isWurEnable, reasonCode);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
 }
 
@@ -2037,6 +2048,7 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function. m_instId = %{public}d", pStaStateMachine->m_instId);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
+    WriteWifiLinkTypeHiSysEvent(linkedInfo.ssid, linkedInfo.wifiLinkType);
 #ifndef OHOS_ARCH_LITE
     CheckIfRestoreWifi();
 #endif
@@ -2230,7 +2242,6 @@ void StaStateMachine::LinkedState::DealNetworkCheck(InternalMessagePtr msg)
 
 void StaStateMachine::LinkedState::UpdateWifi7WurInfo()
 {
-    pStaStateMachine->linkedInfo.mloState = MloState::WIFI7_MLSR;
     pStaStateMachine->linkedInfo.isWurEnable = false;
 }
 

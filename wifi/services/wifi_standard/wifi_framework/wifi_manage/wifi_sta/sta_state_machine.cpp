@@ -985,6 +985,9 @@ int StaStateMachine::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_COM_STA_ENABLE_HILINK] = [this](InternalMessagePtr msg) {
         return this->DealHiLinkDataToWpa(msg);
     };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealCsaChannelChanged(msg);
+    };
     staSmHandleFuncMap[WIFI_SVR_COM_STA_HILINK_DELIVER_MAC] = [this](InternalMessagePtr msg) {
         return this->DealHiLinkDataToWpa(msg);
     };
@@ -1202,8 +1205,10 @@ void StaStateMachine::DealConnectToUserSelectedNetwork(InternalMessagePtr msg)
         OnConnectFailed(networkId);
         return;
     }
-    SetConnectMethod(connTriggerMode);
-    WifiConfigCenter::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
+    if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
+        WifiConfigCenter::GetInstance().EnableNetwork(networkId, true, m_instId);
+        WifiSettings::GetInstance().SetUserConnectChoice(networkId);
+    }
     WifiSettings::GetInstance().SetDeviceState(networkId, (int)WifiDeviceConfigStatus::ENABLED, false);
 }
 
@@ -1278,6 +1283,7 @@ void StaStateMachine::HilinkSaveConfig(void)
         m_hilinkDeviceConfig.networkId = WifiSettings::GetInstance().GetNextNetworkId();
     }
 
+    WifiSettings::GetInstance().SetUserConnectChoice(m_hilinkDeviceConfig.networkId);
     targetNetworkId = m_hilinkDeviceConfig.networkId;
 
     WifiStaHalInterface::GetInstance().GetPskPassphrase("wlan0", m_hilinkDeviceConfig.preSharedKey);
@@ -3646,6 +3652,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
     }
     WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
+    WifiSettings::GetInstance().ClearAllNetworkConnectChoice();
     WifiSettings::GetInstance().SetDeviceState(pStaStateMachine->linkedInfo.networkId,
         static_cast<int32_t>(WifiDeviceConfigStatus::ENABLED), false);
     WifiSettings::GetInstance().SyncDeviceConfig();
@@ -3888,6 +3895,19 @@ void StaStateMachine::DealNetworkRemoved(InternalMessagePtr msg)
  
     return;
 }
+
+void StaStateMachine::DealCsaChannelChanged(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        LOGE("%{public}s InternalMessage msg is null", __FUNCTION__);
+        return;
+    }
+    int newFreq = msg->GetParam1();
+    WIFI_LOGI("%{public}s update freq from %{public}d to %{public}d", __FUNCTION__, linkedInfo.frequency, newFreq);
+    linkedInfo.frequency = newFreq;
+    // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
+    InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
+}
 /* --------------------------- state machine Roaming State ------------------------------ */
 StaStateMachine::ApRoamingState::ApRoamingState(StaStateMachine *staStateMachine)
     : State("ApRoamingState"), pStaStateMachine(staStateMachine)
@@ -4053,6 +4073,9 @@ void StaStateMachine::ConnectToNetworkProcess(std::string bssid)
     if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, deviceConfig, m_instId) != 0) {
         WIFI_LOGE("%{public}s cnanot find config for networkId = %{public}d", __FUNCTION__, targetNetworkId);
     }
+    LOGI("%{public}s: networkId: %{public}d, ssid: %{public}s, keyMgmt: %{public}s, preSharedKeyLen:%{public}d",
+        __FUNCTION__, deviceConfig.networkId, SsidAnonymize(deviceConfig.ssid).c_str(), deviceConfig.keyMgmt.c_str(),
+        static_cast<int>(deviceConfig.preSharedKey.length()));
     UpdateDeviceConfigAfterWifiConnected(deviceConfig, bssid);
 
     std::string macAddr;

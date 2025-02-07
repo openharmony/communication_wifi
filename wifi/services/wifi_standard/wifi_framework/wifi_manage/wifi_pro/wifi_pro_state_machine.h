@@ -221,7 +221,7 @@ private:
     int32_t wiFiNoInternetReason_ { 0 };
     bool disconnectToConnectedState_ { false };
     bool isWifiProEnabled_ { true }; // enabled by default, it should be assigned according to the settings.
-    bool isWifiNoInternet_ { false };
+    bool isFirstNetDectect_ { true };
     std::string badBssid_ { 0 };
     std::string badSsid_ { 0 };
     WifiSwitchReason wifiSwitchReason_ { WifiSwitchReason::WIFI_SWITCH_REASON_DEFAULT };
@@ -250,7 +250,7 @@ private:
     void HandleWifi2WifiSucsess(int64_t blackListTime);
     void HandleWifi2WifiFailed();
     void FastScan(std::vector<WifiScanInfo> &scanInfoList);
-    void TrySelfCure(bool forceNoHttpCheck);
+    bool TrySelfCure(bool forceNoHttpCheck);
     bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, NetworkSelectType networkSelectType,
         std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();

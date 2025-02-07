@@ -612,7 +612,7 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     if (networkId == linkedInfo.networkId) {
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
-        } else if (linkedInfo.mloState == MloState::WIFI7_EMLSR && isMloBssid) {
+        } else if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR && isMloBssid) {
             LOGI("%{public}s current linkedBssid is emlsr, forbid link switch", __FUNCTION__);
             return WIFI_OPT_NOT_SUPPORTED;
         } else {

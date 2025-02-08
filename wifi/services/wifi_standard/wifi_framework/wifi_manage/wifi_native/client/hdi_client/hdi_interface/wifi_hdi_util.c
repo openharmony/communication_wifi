@@ -1225,7 +1225,7 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
     if (infoEle) {
         unsigned int len = infoEle[1];
         if (len > 1) {
-            ret = HdiTxtPrintf(pos, end - pos, "[%d %d ",
+            ret = HdiTxtPrintf(pos, end - pos, "[%d %02x",
                 HDI_EID_EXTENSION, HDI_EID_EXT_HE_OPERATION);
             if (HdiCheckError(end - pos, ret)) {
                 return -1;

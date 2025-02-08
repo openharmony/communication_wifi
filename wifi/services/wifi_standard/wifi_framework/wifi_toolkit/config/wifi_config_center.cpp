@@ -629,19 +629,6 @@ int WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
     return 0;
 }
 
-int WifiConfigCenter::SetWifiStandard(WifiLinkedInfo &linkInfo)
-{
-    std::vector<WifiScanInfo> wifiScanInfoList;
-    wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
-    for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
-        if (iter->bssid == linkInfo.bssid) {
-            linkInfo.wifiStandard = iter->wifiStandard;
-            break;
-        }
-    }
-    return 0;
-}
-
 bool WifiConfigCenter::CheckScanOnlyAvailable(int instId)
 {
     return (WifiSettings::GetInstance().GetScanOnlySwitchState(instId)) && (GetAirplaneModeState() == MODE_STATE_CLOSE);

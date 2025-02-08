@@ -225,6 +225,14 @@ private:
      * @Return true if candidate be overrid otherwise false
      */
     bool OverrideCandidateWithUserSelectChoice(NetworkSelectionResult &candidate);
+
+    /**
+     * @Description whether hml filter cause auto connect fail
+     *
+     * @param scanInfos WifiScanInfo list of all APs in the range(in)
+     * @Return true if hml filter cause auto connect fail otherwise false
+     */
+     bool IsAutoConnectFailByHmlFilter(const std::vector<InterScanInfo> &scanInfos)
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -27,6 +27,7 @@
 #include "wifi_native_struct.h"
 #include "wifi_error_no.h"
 #include "mock_block_connect_service.h"
+#include "mock_wifi_p2p_hal_interface.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

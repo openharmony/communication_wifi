@@ -18,6 +18,7 @@
 #include "wifi_config_center.h"
 #include "wifi_common_util.h"
 #include "block_connect_service.h"
+#include "wifi_p2p_hal_interface.h"
 #include <sys/time.h>
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
@@ -158,7 +159,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
                 break;
             }
         }
-        if (hasSavedConfigSeen) {
+        if (hasSavedConfigSeen && !IsAutoConnectFailByHmlFilter(scanInfos)) {
             WriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
         }
     }
@@ -167,6 +168,49 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
             callBackItem.OnAutoSelectNetworkRes(networkSelectionResult.wifiDeviceConfig.networkId, m_instId);
         }
     }
+}
+
+bool StaAutoConnectService::IsAutoConnectFailByHmlFilter(const std::vector<InterScanInfo &scanInfos>) {
+    std::vector<WifiDeviceConfig> deviceConfigs;
+    if (WifiSettings:GetInstance.GetDeviceConfig(deviceConfigs) != 0) {
+        WIFI_LOGE("GetDeviceConfig failed");
+        return false;
+    }
+
+    /* Get saved Networks */
+    std::vector<std::string> savedNetworkSsid;
+    for (auto iter = deviceConfig.begin(); iter != deviceConfigs.end(); ++iter) {
+        if((!(iter->isPasspoint) && (!(iter->isEphemeral)))) {
+            savedNetworkSsid.push_back(iter->ssid);
+        }
+    }
+
+    /* Saved networks are matched in the scanning result */
+    std::vector<InterScanInfo> candicateNetwork;
+    for (auto &scanInfo : scanInfos) {
+        for (auto &ssid : savedNetworkSsid) {
+            if (strcmp(scanInfo.ssid.c_str(), ssid.c_str()) == 0)
+                candicateNetwork.push_back(scanInfo);
+        }
+    }
+
+    int freq = 0;
+    bool isMatched = false;
+    WifiP2pHalInterface::GetInstance().GetChba0Freq(freq);
+    if (!Whether5GDevice(freq)) {
+        return false;
+    }
+    for (auto &network : candicateNetwork) {
+        if (Whether24GDevice(network.frequency) || network.frequency == freq) {
+            isMatched = true;
+            break;
+        }
+    }
+    if (!isMatched) {
+        WriteAutoConnectFailEvent("AUTO_SELECT_FAIL", "HML_DBAC_FILTER");
+        return true;
+    }
+    return false;
 }
 
 bool StaAutoConnectService::EnableOrDisableBssid(std::string bssid, bool enable, int reason)

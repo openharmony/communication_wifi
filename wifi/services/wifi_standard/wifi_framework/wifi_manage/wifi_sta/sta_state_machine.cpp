@@ -1285,8 +1285,6 @@ void StaStateMachine::StartDisConnectToNetwork()
     if (WifiStaHalInterface::GetInstance().Disconnect(ifaceName) == WIFI_HAL_OPT_OK) {
         WIFI_LOGI("Disconnect() succeed!");
         WifiStaHalInterface::GetInstance().DisableNetwork(WPA_DEFAULT_NETWORKID, ifaceName);
-        /* The current state of StaStateMachine transfers to SeparatedState. */
-        SwitchState(pSeparatedState);
     } else {
         SaveLinkstate(ConnState::DISCONNECTING, DetailedState::FAILED);
         InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECT_FAILED, linkedInfo);

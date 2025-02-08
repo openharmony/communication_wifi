@@ -915,6 +915,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
         reply.WriteBool(wifiInfo.isHiLinkNetwork);
         reply.WriteInt32(wifiInfo.lastRxPackets);
         reply.WriteInt32(wifiInfo.lastTxPackets);
+        reply.WriteInt32(static_cast<int>(wifiInfo.wifiLinkType));
     }
 
     return;

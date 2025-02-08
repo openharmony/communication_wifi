@@ -665,8 +665,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
-    linkedInfo.wifiLinkType = WifiLinkType::DISCONNECT;
-    WriteWifiLinkTypeHiSysEvent(linkedInfo.ssid, linkedInfo.wifiLinkType);
+    WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1);
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
         if (shouldStopTimer) {
@@ -767,15 +766,15 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
     uint8_t state = param.state;
     uint16_t reasonCode = param.reasonCode;
     if (feature == CoFeatureType::COFEATURE_TYPE_MLO) {
-        if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR &&
+        if (pStaStateMachine->linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR &&
             static_cast<int32_t>(state) != WifiLinkType::WIFI7_EMLSR) {
-            WriteEmlsrExitReasonHiSysEvent(linkedInfo.ssid, static_cast<int32_t>(reasonCode));
+            WriteEmlsrExitReasonHiSysEvent(pStaStateMachine->linkedInfo.ssid, static_cast<int>(reasonCode));
         }
-        pStaStateMachine->linkedInfo.wifiLinkType = static_cast<int32_t>(state);
-        WriteWifiLinkTypeHiSysEvent(linkedInfo.ssid, linkedInfo.wifiLinkType);
+        pStaStateMachine->linkedInfo.wifiLinkType = static_cast<WifiLinkType>(state);
+        WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, pStaStateMachine->linkedInfo.wifiLinkType);
 #ifndef OHOS_ARCH_LITE
-        if (enhanceService_ != nullptr) {
-            enhanceService_->OnWifiLinkTypeChanged(linkedInfo.wifiLinkType);
+        if (pStaStateMachine->enhanceService_ != nullptr) {
+            pStaStateMachine->enhanceService_->OnWifiLinkTypeChanged(pStaStateMachine->linkedInfo.wifiLinkType);
         }
 #endif
     }
@@ -1210,7 +1209,6 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
     pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
-    pStaStateMachine->linkedInfo.wifiLinkType = WifiLinkType::DEFAULT_LINK;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }
@@ -2050,7 +2048,7 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function. m_instId = %{public}d", pStaStateMachine->m_instId);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
-    WriteWifiLinkTypeHiSysEvent(linkedInfo.ssid, linkedInfo.wifiLinkType);
+    WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, pStaStateMachine->linkedInfo.wifiLinkType);
 #ifndef OHOS_ARCH_LITE
     CheckIfRestoreWifi();
 #endif
@@ -2510,7 +2508,6 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
         static_cast<int>(WifiPrivacyConfig::DEVICEMAC) : static_cast<int>(WifiPrivacyConfig::RANDOMMAC));
     linkedInfo.macAddress = macAddr;
     linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
-    linkedInfo.wifiLinkType = WifiLinkType::DEFAULT_LINK;
 }
 
 void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)

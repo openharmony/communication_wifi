@@ -257,7 +257,7 @@ struct WifiLinkedInfo {
         isDataRestricted = 0;
         supplicantState = SupplicantState::INVALID;
         detailedState = DetailedState::INVALID;
-        WifiLinkType = WifiLinkType::DEFAULT_LINK;
+        wifiLinkType = WifiLinkType::DEFAULT_LINK;
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;

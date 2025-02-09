@@ -42,6 +42,7 @@ public:
     sptr<IRemoteObject> GetWifiRemote(int instId) override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     std::map<int, sptr<IRemoteObject>>& GetDeviceServiceMgr();
+    int32_t OnSvcCmd(int32_t fd, const std::vector<std::u16string>& args) override;
 
 private:
     bool Init();

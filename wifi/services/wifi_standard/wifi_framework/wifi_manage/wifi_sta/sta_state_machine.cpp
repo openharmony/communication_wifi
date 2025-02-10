@@ -773,6 +773,11 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
         } else {
             pStaStateMachine->linkedInfo.isWurEnable = false;
         }
+#ifndef OHOS_ARCH_LITE
+        if (pStaStateMachine->enhanceService_ != nullptr) {
+            pStaStateMachine->enhanceService_->NotifyWurState(state == WUR_ENABLE, reasonCode);
+        }
+#endif
     }
 
     LOGI("DealMloStateChange mloState=%{public}d isWurEnable=%{public}d reasonCode=%{public}u",

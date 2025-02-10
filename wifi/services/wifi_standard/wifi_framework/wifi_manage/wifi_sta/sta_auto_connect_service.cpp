@@ -170,7 +170,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     }
 }
 
-bool StaAutoConnectService::IsAutoConnectFailByHmlFilter(const std::vector<InterScanInfo &scanInfos>)
+bool StaAutoConnectService::IsAutoConnectFailByHmlFilter(const std::vector<InterScanInfo> &scanInfos)
 {
     std::vector<WifiDeviceConfig> deviceConfigs;
     if (WifiSettings:GetInstance.GetDeviceConfig(deviceConfigs) != 0) {

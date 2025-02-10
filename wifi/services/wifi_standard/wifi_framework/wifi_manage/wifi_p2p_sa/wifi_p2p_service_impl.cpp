@@ -948,7 +948,7 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
                 owner.SetDeviceAddressType(RANDOM_DEVICE_ADDRESS);
                 group->SetOwner(owner);
 
-                std::vector<WifiP2pDevice> vecClientDevice = group->GetClientDevices();
+                std::vector<WifiP2pDevice> vecClientDevice = group->GetPersistentDevices();
                 for (auto iter = vecClientDevice.begin(); iter != vecClientDevice.end(); ++iter) {
                     WifiMacAddrInfo clientMacAddrInfo;
                     clientMacAddrInfo.bssid = iter->GetDeviceAddress();

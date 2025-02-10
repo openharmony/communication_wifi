@@ -18,7 +18,6 @@
 #include "wifi_config_center.h"
 #include "wifi_common_util.h"
 #include "block_connect_service.h"
-#include "wifi_p2p_hal_interface.h"
 #include <sys/time.h>
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
@@ -159,7 +158,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
                 break;
             }
         }
-        if (hasSavedConfigSeen && !IsAutoConnectFailByHmlFilter(scanInfos)) {
+        if (hasSavedConfigSeen && !IsAutoConnectFailByP2PEnhanceFilter(scanInfos)) {
             WriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
         }
     }
@@ -170,45 +169,36 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     }
 }
 
-bool StaAutoConnectService::IsAutoConnectFailByHmlFilter(const std::vector<InterScanInfo> &scanInfos)
+bool StaAutoConnectService::IsAutoConnectFailByP2PEnhanceFilter(const std::vector<InterScanInfo> &scanInfos)
 {
-    std::vector<WifiDeviceConfig> deviceConfigs;
-    if (WifiSettings::GetInstance().GetDeviceConfig(deviceConfigs) != 0) {
-        WIFI_LOGE("GetDeviceConfig failed");
-        return false;
-    }
-
-    /* Get saved Networks */
-    std::vector<std::string> savedNetworkSsid;
-    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
-        if (!(iter->isPasspoint) && !(iter->isEphemeral)) {
-            savedNetworkSsid.push_back(iter->ssid);
-        }
-    }
-
     /* Saved networks are matched in the scanning result */
-    std::vector<InterScanInfo> candicateNetwork;
+    std::vector<InterScanInfo> savedNetworks;
     for (auto &scanInfo : scanInfos) {
-        for (auto &ssid : savedNetworkSsid) {
-            if (strcmp(scanInfo.ssid.c_str(), ssid.c_str()) == 0)
-                candicateNetwork.push_back(scanInfo);
+        WifiDeviceConfig device;
+        std::string deviceKeymgmt;
+        scanInfo.GetDeviceMgmt(deviceKeymgmt);
+        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeymgmt, device) != 0) {
+            WIFI_LOGD("Skip unsaved ssid network %{public}s", SsidAnonymize(scanInfo.ssid).c_str());
+            continue;
         }
+        savedNetworks.push_back(scanInfo);
     }
 
-    int freq = 0;
+    int p2pEnhancefreq = 0;
     bool isMatched = false;
-    WifiP2PHalInterface::GetInstance().GetChba0Freq(freq);
-    if (!Whether5GDevice(freq)) {
+    WifiP2PHalInterface::GetInstance().GetChba0Freq(p2pEnhancefreq);
+    WIFI_LOGD("p2pEnhanceFreq is %{public}d", p2pEnhancefreq);
+    if (!Whether5GDevice(p2pEnhancefreq)) {
         return false;
     }
-    for (auto &network : candicateNetwork) {
-        if (Whether24GDevice(network.frequency) || network.frequency == freq) {
+    for (auto &network : savedNetworks) {
+        if (Whether24GDevice(network.frequency) || network.frequency == p2pEnhancefreq) {
             isMatched = true;
             break;
         }
     }
     if (!isMatched) {
-        WriteAutoConnectFailEvent("AUTO_SELECT_FAIL", "HML_DBAC_FILTER");
+        WriteAutoConnectFailEvent("AUTO_SELECT_FAIL", "P2P_ENHANCE_FILTER");
         return true;
     }
     return false;

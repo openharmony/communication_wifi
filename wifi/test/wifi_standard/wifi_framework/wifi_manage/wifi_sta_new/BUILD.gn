@@ -50,7 +50,6 @@ ohos_unittest("wifi_sta_new_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/arp_checker.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_supplicant_hal_interface.cpp",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/test/Mock/mock_wifi_p2p_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_if_config.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_wifi_settings.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
@@ -109,7 +108,6 @@ ohos_unittest("wifi_sta_new_unittest") {
     "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/test/Mock",
   ]
 
   deps = [

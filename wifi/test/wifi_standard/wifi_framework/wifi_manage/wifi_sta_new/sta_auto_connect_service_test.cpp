@@ -18,7 +18,6 @@
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_device_appraisal.h"
-#include "mock_wifi_p2p_hal_interface.h"
 #include <gtest/gtest.h>
 #include <vector>
 

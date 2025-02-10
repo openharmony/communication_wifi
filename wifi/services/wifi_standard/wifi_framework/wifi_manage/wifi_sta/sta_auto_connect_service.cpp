@@ -173,14 +173,14 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
 bool StaAutoConnectService::IsAutoConnectFailByHmlFilter(const std::vector<InterScanInfo> &scanInfos)
 {
     std::vector<WifiDeviceConfig> deviceConfigs;
-    if (WifiSettings:GetInstance.GetDeviceConfig(deviceConfigs) != 0) {
+    if (WifiSettings::GetInstance().GetDeviceConfig(deviceConfigs) != 0) {
         WIFI_LOGE("GetDeviceConfig failed");
         return false;
     }
 
     /* Get saved Networks */
     std::vector<std::string> savedNetworkSsid;
-    for (auto iter = deviceConfig.begin(); iter != deviceConfigs.end(); ++iter) {
+    for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
         if (!(iter->isPasspoint) && !(iter->isEphemeral)) {
             savedNetworkSsid.push_back(iter->ssid);
         }
@@ -197,7 +197,7 @@ bool StaAutoConnectService::IsAutoConnectFailByHmlFilter(const std::vector<Inter
 
     int freq = 0;
     bool isMatched = false;
-    WifiP2pHalInterface::GetInstance().GetChba0Freq(freq);
+    WifiP2PHalInterface::GetInstance().GetChba0Freq(freq);
     if (!Whether5GDevice(freq)) {
         return false;
     }

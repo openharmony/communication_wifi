@@ -343,6 +343,24 @@ void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_CONNECT_TYPE", "EVENT_VALUE", writer.write(root));
 }
 
+void WriteWifiLinkTypeHiSysEvent(const std::string &ssid, int32_t wifiLinkType)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["SSID"] = ssid;
+    root["WIFI_LINK_TYPE"] = wifiLinkType;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WIFI_LINK_TYPE_UPDATE", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteEmlsrExitReasonHiSysEvent(const std::string &ssid, int32_t reason)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["SSID"] = ssid;
+    root["EMLSR_EXIT_REASON"] = reason;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WIFI_EMLSR_EXIT_REASON", "EVENT_VALUE", writer.write(root));
+}
+
 void WriteStaConnectIface(const std::string &ifName)
 {
     Json::Value root;

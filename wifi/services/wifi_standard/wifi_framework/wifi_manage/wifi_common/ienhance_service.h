@@ -260,6 +260,14 @@ public:
      * @return void
      */
     virtual void SetEnhanceSignalPollInfo(WifiSignalPollInfo &info) = 0;
+
+    /**
+     * @Description notify wifi link type changed
+     *
+     * @param wifiLinkType - wifiLinkType
+     * @return void
+     */
+    virtual void OnWifiLinkTypeChanged(const WifiLinkType &wifiLinkType);
 };
 }  // namespace Wifi
 }  // namespace OHOS

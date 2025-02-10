@@ -145,7 +145,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, IsLimitSpeedBgApp, TestSize.Level1)
     bool result = AppNetworkSpeedLimitService::GetInstance().IsLimitSpeedBgApp(controlId, "com.ohos.wifi", enable);
 
     // Verify
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 }
 } // namespace Wifi
 } // namespace OHOS

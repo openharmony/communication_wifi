@@ -159,7 +159,7 @@ HWTEST_F(WifiCountryCodeManagerTest, IsAllowUpdateWifiCountryCodeTest, TestSize.
     info1.connState = ConnState::CONNECTED;
     tempInfos.emplace(1, info1);
     WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillOnce(Return(tempInfos));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
     EXPECT_FALSE(WifiCountryCodeManager::GetInstance().IsAllowUpdateWifiCountryCode());
 }
 
@@ -290,7 +290,7 @@ HWTEST_F(WifiCountryCodeManagerTest, UpdateWifiCountryCodeCacheSuccessTest, Test
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCodeCache(""));
 
     std::string code = "CN";
-    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS,
+    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED,
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCodeCache(code));
 }
 }

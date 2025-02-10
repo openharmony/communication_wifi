@@ -47,10 +47,6 @@ WifiHotspotServiceImpl::~WifiHotspotServiceImpl()
 ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("IsHotspotActive:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsHotspotActive:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

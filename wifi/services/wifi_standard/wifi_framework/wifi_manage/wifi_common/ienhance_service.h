@@ -89,6 +89,14 @@ public:
      * @param netState - net state
      */
     virtual void NotifyInternetState(const int netState) = 0;
+
+    /**
+     * @Description Notify wur state
+     *
+     * @param isWurEnabled - wur state
+     * @param reasonCode - reason code
+     */
+    virtual void NotifyWurState(const bool isWurEnabled, const uint16_t reasonCode) = 0;
     
     /**
      * @Description Notify wifi netlink message

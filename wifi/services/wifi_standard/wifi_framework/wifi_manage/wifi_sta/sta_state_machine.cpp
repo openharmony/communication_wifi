@@ -323,26 +323,13 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             HandleNetworkConnectionEvent(msg);
             break;
         }
-        default:
-            ProcessOtherMessage(msg);
-            WIFI_LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
-            break;
-    }
-    return ret;
-}
-
-bool StaStateMachine::InitState::ProcessOtherMessage(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        return false;
-    }
-    bool ret = NOT_EXECUTED;
-    switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT:
+        case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: {
             ret = EXECUTED;
             SaveFoldStatus(msg);
             break;
+        }
         default:
+            WIFI_LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;

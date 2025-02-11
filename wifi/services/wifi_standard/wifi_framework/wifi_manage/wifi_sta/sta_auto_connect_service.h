@@ -227,12 +227,12 @@ private:
     bool OverrideCandidateWithUserSelectChoice(NetworkSelectionResult &candidate);
 
     /**
-     * @Description whether hml filter cause auto connect fail
+     * @Description whether p2p enhance filter cause auto connect fail
      *
      * @param scanInfos WifiScanInfo list of all APs in the range(in)
-     * @Return true if hml filter cause auto connect fail otherwise false
+     * @Return true if p2p enhance filter cause auto connect fail otherwise false
      */
-    bool IsAutoConnectFailByHmlFilter(const std::vector<InterScanInfo> &scanInfos);
+    bool IsAutoConnectFailByP2PEnhanceFilter(const std::vector<InterScanInfo> &scanInfos)
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1106,50 +1106,50 @@ public:
 
     void UpdateExpandOffsetRange()
     {
-        pStaStateMachine->pLinkState->isExpandUpdateRssi_ = false;
+        pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
         pStaStateMachine->linkedInfo.rssi = 7;
         pStaStateMachine->foldStatus_ = 1;
         pStaStateMachine->pLinkedState->halfFoldRssi_ = 2;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkState->rssiOffset_, 5);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, 5);
     }
 
     void UpdateExpandOffsetMin()
     {
-        pStaStateMachine->pLinkState->isExpandUpdateRssi_ = false;
+        pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
         pStaStateMachine->linkedInfo.rssi = 1;
         pStaStateMachine->foldStatus_ = 1;
         pStaStateMachine->pLinkedState->halfFoldRssi_ = 2;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkState->rssiOffset_, 5);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, 5);
     }
 
     void UpdateExpandOffsetDefault()
     {
-        pStaStateMachine->pLinkState->isExpandUpdateRssi_ = false;
+        pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
         pStaStateMachine->linkedInfo.rssi = 5;
         pStaStateMachine->foldStatus_ = 1;
         pStaStateMachine->pLinkedState->halfFoldRssi_ = 2;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkState->rssiOffset_, 3);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, 3);
     }
 
     void UpdateExpandOffsetMax()
     {
-        pStaStateMachine->pLinkState->isExpandUpdateRssi_ = false;
+        pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
         pStaStateMachine->linkedInfo.rssi = 15;
         pStaStateMachine->foldStatus_ = 1;
         pStaStateMachine->pLinkedState->halfFoldRssi_ = 2;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkState->rssiOffset_, 10);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, 10);
     }
 
     void FoldStatusNotifyHalfFold()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetParam1(HALF_FOLD);
-        pStaStateMachine->pLinkState->FoldStatusNotify(msg);
-        EXPECT_TRUE(pStaStateMachine->pLinkState->isExpandUpdateRssi_);
+        pStaStateMachine->pLinkedState->FoldStatusNotify(msg);
+        EXPECT_TRUE(pStaStateMachine->pLinkedState->isExpandUpdateRssi_);
         EXPECT_EQ(pStaStateMachine->foldStatus_, HALF_FOLD);
     }
 
@@ -1157,8 +1157,8 @@ public:
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetParam1(EXPAND);
-        pStaStateMachine->pLinkState->FoldStatusNotify(msg);
-        EXPECT_FALSE(pStaStateMachine->pLinkState->isExpandUpdateRssi_);
+        pStaStateMachine->pLinkedState->FoldStatusNotify(msg);
+        EXPECT_FALSE(pStaStateMachine->pLinkedState->isExpandUpdateRssi_);
         EXPECT_EQ(pStaStateMachine->foldStatus_, EXPAND);
     }
 
@@ -1166,8 +1166,8 @@ public:
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetParam1(FOLDED);
-        pStaStateMachine->pLinkState->FoldStatusNotify(msg);
-        EXPECT_TRUE(pStaStateMachine->pLinkState->isExpandUpdateRssi_);
+        pStaStateMachine->pLinkedState->FoldStatusNotify(msg);
+        EXPECT_TRUE(pStaStateMachine->pLinkedState->isExpandUpdateRssi_);
         EXPECT_NE(pStaStateMachine->foldStatus_, HALF_FOLD);
         EXPECT_NE(pStaStateMachine->foldStatus_, EXPAND);
     }

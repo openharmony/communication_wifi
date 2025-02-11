@@ -1106,42 +1106,52 @@ public:
 
     void UpdateExpandOffsetRange()
     {
+        const int RSSI_THRESHOLD = 7;
+        const int HALF_FOLD_RSSI_VALUE = 2;
         pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
-        pStaStateMachine->linkedInfo.rssi = 7;
-        pStaStateMachine->foldStatus_ = 1;
-        pStaStateMachine->pLinkedState->halfFoldRssi_ = 2;
+        pStaStateMachine->linkedInfo.rssi = RSSI_THRESHOLD;
+        pStaStateMachine->foldStatus_ = EXPAND;
+        pStaStateMachine->pLinkedState->halfFoldRssi_ = HALF_FOLD_RSSI_VALUE;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, 5);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_DEFAULT);
     }
 
     void UpdateExpandOffsetMin()
     {
+        const int HALF_FOLD_RSSI_VALUE = 2;
+        const int RSSI_THRESHOLD = 1;
         pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
-        pStaStateMachine->linkedInfo.rssi = 1;
-        pStaStateMachine->foldStatus_ = 1;
-        pStaStateMachine->pLinkedState->halfFoldRssi_ = 2;
+        pStaStateMachine->linkedInfo.rssi = RSSI_THRESHOLD;
+        pStaStateMachine->foldStatus_ = EXPAND;
+        pStaStateMachine->pLinkedState->halfFoldRssi_ = HALF_FOLD_RSSI_VALUE;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, 5);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_DEFAULT);
     }
 
     void UpdateExpandOffsetDefault()
     {
+        const int RSSI_THRESHOLD = 5;
+        const int HALF_FOLD_RSSI_VALUE = 2;
+        const int RSSI_OFFSET_EXPECTED = 3;
         pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
-        pStaStateMachine->linkedInfo.rssi = 5;
-        pStaStateMachine->foldStatus_ = 1;
-        pStaStateMachine->pLinkedState->halfFoldRssi_ = 2;
+        pStaStateMachine->linkedInfo.rssi = RSSI_THRESHOLD;
+        pStaStateMachine->foldStatus_ = EXPAND;
+        pStaStateMachine->pLinkedState->halfFoldRssi_ = HALF_FOLD_RSSI_VALUE;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, 3);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_EXPECTED);
     }
 
     void UpdateExpandOffsetMax()
     {
+        const int HALF_FOLD_RSSI = 2;
+        const int RSSI_OFFSET_EXPECTED = 10;
+        const int RSSI_VALUE = 15;
         pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
-        pStaStateMachine->linkedInfo.rssi = 15;
-        pStaStateMachine->foldStatus_ = 1;
-        pStaStateMachine->pLinkedState->halfFoldRssi_ = 2;
+        pStaStateMachine->linkedInfo.rssi = RSSI_VALUE;
+        pStaStateMachine->foldStatus_ = EXPAND;
+        pStaStateMachine->pLinkedState->halfFoldRssi_ = HALF_FOLD_RSSI;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, 10);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_EXPECTED);
     }
 
     void FoldStatusNotifyHalfFold()

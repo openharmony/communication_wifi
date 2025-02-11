@@ -1457,23 +1457,6 @@ std::set<int> WifiConfigCenter::GetAllWifiLinkedNetworkId()
     return wifiLinkedNetworkId;
 }
 
-int WifiConfigCenter::SetHotspotMacConfig(const HotspotMacConfig &config, int id)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    mHotspotMacConfig[id] = config;
-    return 0;
-}
-
-int WifiConfigCenter::GetHotspotMacConfig(HotspotMacConfig &config, int id)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    auto iter = mHotspotMacConfig.find(id);
-    if (iter != mHotspotMacConfig.end()) {
-        config = iter->second;
-    }
-    return 0;
-}
-
 void WifiConfigCenter::SetSystemMode(int systemMode)
 {
     systemMode_ = systemMode;

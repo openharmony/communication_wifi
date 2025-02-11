@@ -339,12 +339,12 @@ bool StaStateMachine::InitState::ProcessOtherMessage(InternalMessagePtr msg)
     }
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: 
+        case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT:
             ret = EXECUTED;
             SaveFoldStatus(msg);
             break;
         default:
-            break;    
+            break;
     }
     ret = EXECUTED;
     return ret;

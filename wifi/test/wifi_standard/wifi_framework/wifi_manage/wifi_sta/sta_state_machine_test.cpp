@@ -1104,6 +1104,84 @@ public:
         EXPECT_FALSE(pStaStateMachine->pLinkState->ExecuteStateMsg(nullptr));
     }
 
+    void UpdateExpandOffsetRange()
+    {
+        const int rssiThreshold = 7;
+        const int halfFoldRssiValue = 2;
+        pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
+        pStaStateMachine->linkedInfo.rssi = rssiThreshold;
+        pStaStateMachine->foldStatus_ = EXPAND;
+        pStaStateMachine->pLinkedState->halfFoldRssi_ = halfFoldRssiValue;
+        pStaStateMachine->pLinkedState->UpdateExpandOffset();
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_DEFAULT);
+    }
+
+    void UpdateExpandOffsetMin()
+    {
+        const int halfFoldRssiValue = 2;
+        const int rssiThreshold = 1;
+        pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
+        pStaStateMachine->linkedInfo.rssi = rssiThreshold;
+        pStaStateMachine->foldStatus_ = EXPAND;
+        pStaStateMachine->pLinkedState->halfFoldRssi_ = halfFoldRssiValue;
+        pStaStateMachine->pLinkedState->UpdateExpandOffset();
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_DEFAULT);
+    }
+
+    void UpdateExpandOffsetDefault()
+    {
+        const int rssiThreshold = 5;
+        const int halfFoldRssiValue = 2;
+        const int rssiExpected = 3;
+        pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
+        pStaStateMachine->linkedInfo.rssi = rssiThreshold;
+        pStaStateMachine->foldStatus_ = EXPAND;
+        pStaStateMachine->pLinkedState->halfFoldRssi_ = halfFoldRssiValue;
+        pStaStateMachine->pLinkedState->UpdateExpandOffset();
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, rssiExpected);
+    }
+
+    void UpdateExpandOffsetMax()
+    {
+        const int halfFoldRssiValue = 2;
+        const int rssiExpected = 10;
+        const int rssiThreshold = 15;
+        pStaStateMachine->pLinkedState->isExpandUpdateRssi_ = false;
+        pStaStateMachine->linkedInfo.rssi = rssiThreshold;
+        pStaStateMachine->foldStatus_ = EXPAND;
+        pStaStateMachine->pLinkedState->halfFoldRssi_ = halfFoldRssiValue;
+        pStaStateMachine->pLinkedState->UpdateExpandOffset();
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, rssiExpected);
+    }
+
+    void FoldStatusNotifyHalfFold()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetParam1(HALF_FOLD);
+        pStaStateMachine->pLinkedState->FoldStatusNotify(msg);
+        EXPECT_TRUE(pStaStateMachine->pLinkedState->isExpandUpdateRssi_);
+        EXPECT_EQ(pStaStateMachine->foldStatus_, HALF_FOLD);
+    }
+
+    void FoldStatusNotifyExpand()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetParam1(EXPAND);
+        pStaStateMachine->pLinkedState->FoldStatusNotify(msg);
+        EXPECT_FALSE(pStaStateMachine->pLinkedState->isExpandUpdateRssi_);
+        EXPECT_EQ(pStaStateMachine->foldStatus_, EXPAND);
+    }
+
+    void FoldStatusNotifyOtherStatus()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetParam1(FOLDED);
+        pStaStateMachine->pLinkedState->FoldStatusNotify(msg);
+        EXPECT_TRUE(pStaStateMachine->pLinkedState->isExpandUpdateRssi_);
+        EXPECT_NE(pStaStateMachine->foldStatus_, HALF_FOLD);
+        EXPECT_NE(pStaStateMachine->foldStatus_, EXPAND);
+    }
+
     void DealNetworkRemovedSuccessTest()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
@@ -1647,6 +1725,41 @@ public:
         pStaStateMachine->UpdateLinkedBssid(bssid);
     }
 };
+
+HWTEST_F(StaStateMachineTest, UpdateExpandOffsetRange, TestSize.Level1)
+{
+    UpdateExpandOffsetRange();
+}
+
+HWTEST_F(StaStateMachineTest, UpdateExpandOffsetMin, TestSize.Level1)
+{
+    UpdateExpandOffsetMin();
+}
+
+HWTEST_F(StaStateMachineTest, UpdateExpandOffsetDefault, TestSize.Level1)
+{
+    UpdateExpandOffsetDefault();
+}
+
+HWTEST_F(StaStateMachineTest, UpdateExpandOffsetMax, TestSize.Level1)
+{
+    UpdateExpandOffsetMax();
+}
+
+HWTEST_F(StaStateMachineTest, FoldStatusNotifyHalfFold, TestSize.Level1)
+{
+    FoldStatusNotifyHalfFold();
+}
+
+HWTEST_F(StaStateMachineTest, FoldStatusNotifyExpand, TestSize.Level1)
+{
+    FoldStatusNotifyExpand();
+}
+
+HWTEST_F(StaStateMachineTest, FoldStatusNotifyOtherStatus, TestSize.Level1)
+{
+    FoldStatusNotifyOtherStatus();
+}
 
 HWTEST_F(StaStateMachineTest, ShouldUseFactoryMacSuccess, TestSize.Level1)
 {

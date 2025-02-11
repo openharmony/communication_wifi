@@ -323,12 +323,27 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             HandleNetworkConnectionEvent(msg);
             break;
         }
+        case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            SaveFoldStatus(msg);
+            break;
+        }
         default:
             WIFI_LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;
 }
+
+void StaStateMachine::InitState::SaveFoldStatus(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("SaveFoldStatus, msg is nullptr");
+        return;
+    }
+    pStaStateMachine->foldStatus_ = msg->GetParam1();
+}
+
 void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
@@ -2191,19 +2206,12 @@ void StaStateMachine::LinkedState::FoldStatusNotify(InternalMessagePtr msg)
         WIFI_LOGE("msg is nullptr.");
         return;
     }
-    foldStatus_ = msg->GetParam1();
-    if (foldStatus_ == HALF_FOLD) {
+    pStaStateMachine->foldStatus_ = msg->GetParam1();
+    if (pStaStateMachine->foldStatus_ == HALF_FOLD) {
         isExpandUpdateRssi_ = true;
-        halfFoldRssi_ = pStaStateMachine->linkedInfo.rssi;
-
-        if (halfFoldRssi_ + rssiOffset_ < 0) {
-            halfFoldUpdateRssi_ = halfFoldRssi_ + rssiOffset_;
-        } else {
-            halfFoldUpdateRssi_ = halfFoldRssi_;
-        }
         pStaStateMachine->StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
         pStaStateMachine->DealSignalPollResult();
-    } else if (foldStatus_ == EXPAND) {
+    } else if (pStaStateMachine->foldStatus_ == EXPAND) {
         isExpandUpdateRssi_ = false;
     } else {
         isExpandUpdateRssi_ = true;
@@ -2215,6 +2223,13 @@ void StaStateMachine::LinkedState::UpdateExpandOffset()
     if (!isExpandUpdateRssi_) {
         expandRssi_ = pStaStateMachine->linkedInfo.rssi;
         rssiOffset_ = expandRssi_ - halfFoldRssi_;
+    }
+    WIFI_LOGI("LinkedState, UpdateExpandOffset rssiOffset_:%{public}d, foldStatus_:%{public}d\n",
+        rssiOffset_, pStaStateMachine->foldStatus_);
+    if (rssiOffset_ < RSSI_OFFSET_MIN) {
+        rssiOffset_ = RSSI_OFFSET_MIN;
+    } else if (rssiOffset_ >= RSSI_OFFSET_MAX) {
+        rssiOffset_ = RSSI_OFFSET_MAX;
     }
     isExpandUpdateRssi_ = true;
 }
@@ -3498,7 +3513,15 @@ void StaStateMachine::DealSignalPollResult()
         linkedInfo.frequency = signalInfo.frequency;
     }
     ConvertFreqToChannel();
-    if (pLinkedState->foldStatus_ == HALF_FOLD) {
+    if (foldStatus_ == HALF_FOLD) {
+        pLinkedState->halfFoldRssi_ = signalInfo.signal;
+        WIFI_LOGI("rssiOffset_: %{public}d, halfFoldRssi_: %{public}d, foldStatus_: %{public}d\n",
+            pLinkedState->rssiOffset_, pLinkedState->halfFoldRssi_, foldStatus_);
+        if (pLinkedState->halfFoldRssi_ + pLinkedState->rssiOffset_ < 0) {
+            pLinkedState->halfFoldUpdateRssi_ = pLinkedState->halfFoldRssi_ + pLinkedState->rssiOffset_;
+        } else {
+            pLinkedState->halfFoldUpdateRssi_ = pLinkedState->halfFoldRssi_;
+        }
         UpdateLinkRssi(signalInfo, pLinkedState->halfFoldUpdateRssi_);
     } else {
         UpdateLinkRssi(signalInfo);

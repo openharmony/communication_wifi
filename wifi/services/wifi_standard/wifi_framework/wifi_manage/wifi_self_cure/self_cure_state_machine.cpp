@@ -1389,7 +1389,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
         WIFI_LOGE("Get pStaService failed!");
         return;
     }
-    if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+    if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_SELFCURE) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("ConnectToNetwork failed.\n");
         pSelfCureStateMachine_->HandleSelfCureException(SCE_WIFI_STATUS_FAIL);
         return;
@@ -1581,7 +1581,7 @@ void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureFailedForRandMac
             WIFI_LOGE("Get pStaService failed!");
             return;
         }
-        if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+        if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_SELFCURE) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("ConnectToNetwork failed.\n");
             pSelfCureStateMachine_->HandleSelfCureException(SCE_WIFI_STATUS_FAIL);
         }
@@ -2891,7 +2891,7 @@ void SelfCureStateMachine::HandleSelfCureNormal()
                 WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
                 return;
             }
-            if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+            if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_SELFCURE) != WIFI_OPT_SUCCESS) {
                 WIFI_LOGE("connect to network failed");
                 HandleSelfCureException(SCE_WIFI_STATUS_FAIL);
                 return;
@@ -2944,7 +2944,7 @@ void SelfCureStateMachine::HandleSelfCureException(int reasonCode)
                 WIFI_LOGE("pStaService get failed");
                 return;
             }
-            if (pStaService->ConnectToNetwork(networkId) != WIFI_OPT_SUCCESS) {
+            if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_SELFCURE) != WIFI_OPT_SUCCESS) {
                 WIFI_LOGE("connect to network failed");
                 StopSelfCureDelay(SCE_WIFI_STATUS_FAIL, 0);
                 return;

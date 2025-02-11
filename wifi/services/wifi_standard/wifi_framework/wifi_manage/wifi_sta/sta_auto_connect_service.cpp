@@ -186,7 +186,7 @@ bool StaAutoConnectService::IsAutoConnectFailByP2PEnhanceFilter(const std::vecto
 
     int p2pEnhancefreq = 0;
     bool isMatched = false;
-    WifiP2PHalInterface::GetInstance().GetChba0Freq(p2pEnhancefreq);
+    p2pEnhancefreq = WifiConfigCenter::GetInstance().GetP2pEnhanceFreq();
     WIFI_LOGD("p2pEnhanceFreq is %{public}d", p2pEnhancefreq);
     if (!Whether5GDevice(p2pEnhancefreq)) {
         return false;

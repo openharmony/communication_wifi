@@ -349,7 +349,7 @@ void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterSucc1()
 {
     std::vector<InterScanInfo> scanInfos;
     scanInfos.emplace_back();
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Retur(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Return(0)));
     EXPECT_FALSE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));
 }
 
@@ -357,8 +357,8 @@ void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterSucc2()
 {
     std::vector<InterScanInfo> scanInfos;
     scanInfos.emplace_back();
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Retur(5180)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(1))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Return(FREQUENCY)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(1));
     EXPECT_TRUE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));   
 }
 
@@ -366,8 +366,8 @@ void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterFail1()
 {
     std::vector<InterScanInfo> scanInfos;
     scanInfos.emplace_back();
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Retur(5180)));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(0)
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Return(FREQUENCY)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(0);
     EXPECT_FALSE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));     
 }
 

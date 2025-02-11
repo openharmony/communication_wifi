@@ -346,7 +346,6 @@ bool StaStateMachine::InitState::ProcessOtherMessage(InternalMessagePtr msg)
         default:
             break;
     }
-    ret = EXECUTED;
     return ret;
 }
 

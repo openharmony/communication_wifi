@@ -4582,7 +4582,7 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
             || (state == OperateResState::CONNECT_CONNECTION_REJECT)) {
             selfCureService_->CheckSelfCureWifiResult(SCE_EVENT_NET_INFO_CHANGED);
         }
-        if (selfCureService_->IsSelfCureL2Connecting()) {
+        if (selfCureService_->IsSelfCureL2Connecting() && info.detailedState != DetailedState::CONNECTED) {
             WIFI_LOGI("selfcure ignore network state changed");
             return;
         }

@@ -2242,7 +2242,7 @@ void StaStateMachine::LinkedState::UpdateExpandOffset()
     WIFI_LOGI("LinkedState, UpdateExpandOffset rssiOffset_:%{public}d, foldStatus_:%{public}d\n",
         rssiOffset_, pStaStateMachine->foldStatus_);
     if (rssiOffset_ < RSSI_OFFSET_MIN) {
-        rssiOffset_ = RSSI_OFFSET_DEFAULT;
+        rssiOffset_ = RSSI_OFFSET_MIN;
     } else if (rssiOffset_ >= RSSI_OFFSET_MAX) {
         rssiOffset_ = RSSI_OFFSET_MAX;
     }

@@ -1023,12 +1023,12 @@ struct WifiSignalPollInfo {
     int chloadSelf;
     int c0Rssi;
     int c1Rssi;
-    uint8_t* ext;
+    std::vector<uint8_t> ext;
     int extLen;
 
     WifiSignalPollInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0),
         txPackets(0), rxPackets(0), snr(0), chload(0), ulDelay(0), txBytes(0), rxBytes(0),
-        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(nullptr), extLen(0)
+        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(), extLen(0)
     {}
 
     ~WifiSignalPollInfo()

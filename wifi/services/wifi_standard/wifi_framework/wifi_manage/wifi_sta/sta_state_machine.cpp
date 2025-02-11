@@ -20,7 +20,6 @@
 #include "if_config.h"
 #include "ip_tools.h"
 #include "mac_address.h"
-#include "sta_define.h"
 #include "sta_monitor.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"

@@ -674,8 +674,8 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceNa
     info.chloadSelf = signalPollResult.chloadSelf;
     info.c0Rssi = signalPollResult.c0Rssi;
     info.c1Rssi = signalPollResult.c1Rssi;
-    info.ext = signalPollResult.ext.data();
-    info.extLen = signalPollResult.ext.size();
+    info.ext.assign(signalPollResult.ext.begin(), signalPollResult.ext.end());
+    info.extLen = info.ext.size();
     return WIFI_HAL_OPT_OK;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);

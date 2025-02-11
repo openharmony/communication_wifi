@@ -100,6 +100,10 @@ constexpr int MAC_ASSOC_RSP_TIMEOUT = 5203;
 constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
 constexpr int DHCP_LEASE_EXPIRED = 6;
+/* FoldState Status*/
+constexpr int RSSI_OFFSET_MIN = 0;
+constexpr int RSSI_OFFSET_DEFAULT = 5;
+constexpr int RSSI_OFFSET_MAX = 10;
 
 constexpr unsigned int BIT_MLO_CONNECT = 0x80;
 
@@ -155,6 +159,7 @@ public:
     ~StaStateMachine();
     using staSmHandleFunc = std::function<void(InternalMessagePtr)>;
     using StaSmHandleFuncMap = std::map<int, staSmHandleFunc>;
+    int foldStatus_ = 0;
     /**
      * @Description  Definition of member function of State base class in StaStateMachine.
      *
@@ -178,7 +183,7 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-
+        bool ProcessOtherMessage(InternalMessagePtr msg);
     private:
         void StartWifiProcess();
         void StopWifiProcess();
@@ -186,6 +191,7 @@ public:
         void UpdateCountryCode(InternalMessagePtr msg);
         bool AllowAutoConnect();
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
+        void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
         StaStateMachine *pStaStateMachine;
     };
@@ -298,8 +304,11 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void UpdateExpandOffset();
-        int foldStatus_ = 0;
         int halfFoldUpdateRssi_ = 0;
+        int halfFoldRssi_ = 0;
+        int expandRssi_ = 0;
+        int rssiOffset_ = RSSI_OFFSET_DEFAULT;
+        bool isExpandUpdateRssi_ = true;
     private:
 #ifndef OHOS_ARCH_LITE
         void CheckIfRestoreWifi();
@@ -310,10 +319,6 @@ public:
         void UpdateWifi7WurInfo();
         void FoldStatusNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
-        int halfFoldRssi_ = 0;
-        int expandRssi_ = 0;
-        int rssiOffset_ = 6;
-        bool isExpandUpdateRssi_ = true;
     };
     /**
      * @Description  Definition of member function of ApRoamingState class in StaStateMachine.

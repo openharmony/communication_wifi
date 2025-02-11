@@ -183,7 +183,6 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-        bool ProcessOtherMessage(InternalMessagePtr msg);
     private:
         void StartWifiProcess();
         void StopWifiProcess();

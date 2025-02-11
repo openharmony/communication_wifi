@@ -1153,7 +1153,7 @@ public:
         EXPECT_EQ(pStaStateMachine->foldStatus_, HALF_FOLD);
     }
 
-    void FoldStatusNotifyHalfExpand()
+    void FoldStatusNotifyExpand()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetParam1(EXPAND);

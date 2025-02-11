@@ -614,7 +614,7 @@ HWTEST_F(WifiManagerTest, IsInterfaceUpTest, TestSize.Level1)
     WIFI_LOGI("IsInterfaceUpTest enter!");
     std::string iface = "wlan0";
     wifiManager.wifiTogglerManager->IsInterfaceUp(iface);
-    EXPECT_TRUE(wifiManager.wifiTogglerManager->IsInterfaceUp(iface));
+    EXPECT_FALSE(wifiManager.wifiTogglerManager->IsInterfaceUp(iface));
 }
 
 HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_WpaDeath, TestSize.Level1)

@@ -108,6 +108,13 @@ private:
 #elif WIFI_FFRT_ENABLE
 constexpr int WIFI_THREAD_TIMEOUT_LIMIT = 30 * 1000 * 1000; // 30s
 constexpr int WIFI_THREAD_MAX_CONCURRENCY = 1;
+inline ffrt_queue_t* TransferQueuePtr(std::shared_ptr<ffrt::queue> queue)
+{
+    if (queue) {
+        return reinterpret_cast<ffrt_queue_t*>(queue.get());
+    }
+    return nullptr;
+}
 class WifiEventHandler::WifiEventHandlerImpl {
 public:
     WifiEventHandlerImpl(const std::string &threadName, const Callback &timeOutFunc = nullptr)
@@ -212,13 +219,14 @@ public:
     int HasAsyncTask(const std::string &name, bool &hasTask)
     {
         std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
-        WIFI_LOGD("HasAsyncTask Enter %{public}s", name.c_str());
-        auto iter = taskMap_.find(name);
-        if (iter != taskMap_.end() && iter->second != nullptr && eventQueue != nullptr) {
-            hasTask = true;
-        } else {
-            hasTask = false;
+        ffrt_queue_t* queue = TransferQueuePtr(eventQueue);
+        if (queue == nullptr) {
+            WIFI_LOGE("HasAsyncTask is unavailable.");
+            return -1;
         }
+        bool result = ffrt_queue_has_task(*queue, name.c_str());
+        WIFI_LOGD("HasAsyncTask Enter %{public}s %{public}d", name.c_str(), static_cast<int>(result));
+        hasTask = result;
         return 0;
     }
 private:

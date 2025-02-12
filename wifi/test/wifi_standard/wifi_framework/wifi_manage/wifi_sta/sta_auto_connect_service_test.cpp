@@ -359,7 +359,7 @@ void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterSucc2()
     scanInfos.emplace_back();
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Return(FREQUENCY)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(1));
-    EXPECT_TRUE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));   
+    EXPECT_TRUE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));
 }
 
 void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterFail1()
@@ -368,7 +368,7 @@ void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterFail1()
     scanInfos.emplace_back();
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Return(FREQUENCY)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(0);
-    EXPECT_FALSE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));     
+    EXPECT_FALSE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));
 }
 
 void StaAutoConnectServiceTest::EnableOrDisableBssidSuccess1()

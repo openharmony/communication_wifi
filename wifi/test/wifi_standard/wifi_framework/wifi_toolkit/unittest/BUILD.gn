@@ -133,6 +133,7 @@ ohos_unittest("toolkit_unittest") {
     "googletest:gtest_main",
     "hilog:libhilog",
     "icu:shared_icuuc",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",

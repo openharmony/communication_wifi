@@ -135,7 +135,7 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
         }
         mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-        WifiAssetManager::GetInstance().WifiAssetAdd(config);
+        WifiAssetManager::GetInstance().WifiAssetAdd(config, false);
 #endif
     }
     return config.networkId;

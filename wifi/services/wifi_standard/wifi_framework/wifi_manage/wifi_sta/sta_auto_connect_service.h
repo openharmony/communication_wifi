@@ -232,7 +232,7 @@ private:
      * @param scanInfos WifiScanInfo list of all APs in the range(in)
      * @Return true if p2p enhance filter cause auto connect fail otherwise false
      */
-    bool IsAutoConnectFailByP2PEnhanceFilter(const std::vector<InterScanInfo> &scanInfos)
+    bool IsAutoConnectFailByP2PEnhanceFilter(const std::vector<InterScanInfo> &scanInfos);
 };
 }  // namespace Wifi
 }  // namespace OHOS

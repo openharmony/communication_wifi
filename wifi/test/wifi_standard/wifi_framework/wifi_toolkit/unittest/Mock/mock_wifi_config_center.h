@@ -316,7 +316,7 @@ public:
     MOCK_METHOD0(IsAllowPopUp, bool());
     MOCK_METHOD1(SetDeviceType, void(int deviceType));
     MOCK_METHOD1(SetHotspotIdleTimeout, int(int time));
-    MOCK_METHOD1(GetP2pEnhanceFreq, int());
+    MOCK_METHOD0(GetP2pEnhanceFreq, int());
     MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());
 private:
     WifiConfigCenter();

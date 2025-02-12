@@ -175,24 +175,24 @@ bool StaAutoConnectService::IsAutoConnectFailByP2PEnhanceFilter(const std::vecto
     std::vector<InterScanInfo> savedNetworks;
     for (auto &scanInfo : scanInfos) {
         WifiDeviceConfig device;
-        std::string deviceKeymgmt;
-        scanInfo.GetDeviceMgmt(deviceKeymgmt);
-        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeymgmt, device) != 0) {
+        std::string deviceKeyMgmt;
+        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeyMgmt, device) != 0) {
             WIFI_LOGD("Skip unsaved ssid network %{public}s", SsidAnonymize(scanInfo.ssid).c_str());
             continue;
         }
         savedNetworks.push_back(scanInfo);
     }
 
-    int p2pEnhancefreq = 0;
+    int p2pEnhanceFreq = 0;
     bool isMatched = false;
-    p2pEnhancefreq = WifiConfigCenter::GetInstance().GetP2pEnhanceFreq();
-    WIFI_LOGD("p2pEnhanceFreq is %{public}d", p2pEnhancefreq);
-    if (!Whether5GDevice(p2pEnhancefreq)) {
+    p2pEnhanceFreq = WifiConfigCenter::GetInstance().GetP2pEnhanceFreq();
+    WIFI_LOGD("p2pEnhanceFreq is %{public}d", p2pEnhanceFreq);
+    if (!Whether5GDevice(p2pEnhanceFreq)) {
         return false;
     }
     for (auto &network : savedNetworks) {
-        if (Whether24GDevice(network.frequency) || network.frequency == p2pEnhancefreq) {
+        if (Whether24GDevice(network.frequency) || network.frequency == p2pEnhanceFreq) {
             isMatched = true;
             break;
         }

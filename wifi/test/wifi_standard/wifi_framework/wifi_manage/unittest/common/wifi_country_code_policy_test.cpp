@@ -93,7 +93,7 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByMccTest, TestSize.Level1
     std::string code;
 
     // The current OH_hone cannot reside in the cellular network without card insertion
-    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, m_wifiCountryCodePolicy->GetWifiCountryCodeByMcc(code));
+    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByMcc(code));
 }
 
 HWTEST_F(WifiCountryCodePolicyTest, HandleScanResultActionTest, TestSize.Level1)

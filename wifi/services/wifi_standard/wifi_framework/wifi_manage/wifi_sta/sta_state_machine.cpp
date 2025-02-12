@@ -2531,6 +2531,7 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
         static_cast<int>(WifiPrivacyConfig::DEVICEMAC) : static_cast<int>(WifiPrivacyConfig::RANDOMMAC));
     linkedInfo.macAddress = macAddr;
     linkedInfo.ifHiddenSSID = deviceConfig.hiddenSSID;
+    WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
 }
 
 void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)

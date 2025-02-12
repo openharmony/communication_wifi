@@ -278,6 +278,10 @@ NO_SANITIZE("cfi") WifiErrorCode GetCurrentGroup(WifiP2pGroupInfo* groupInfo)
     CHECK_PTR_RETURN(groupInfo, ERROR_WIFI_INVALID_ARGS);
     OHOS::Wifi::WifiP2pGroupInfo cppGroupInfo;
     OHOS::Wifi::ErrCode ret = wifiP2pPtr->GetCurrentGroup(cppGroupInfo);
+    if (ret == OHOS::Wifi::WIFI_OPT_FAILED) {
+        WIFI_LOGE("P2P_GROUP_AVAILABLE failed!");
+        return ERROR_P2P_GROUP_NOT_AVAILABLE;
+    }
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
         WIFI_LOGE("get current group info failed!");
         return ERROR_WIFI_NOT_AVAILABLE;

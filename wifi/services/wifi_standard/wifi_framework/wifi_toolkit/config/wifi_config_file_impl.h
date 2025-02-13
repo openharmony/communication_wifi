@@ -48,6 +48,23 @@ static inline void TrimString(std::string &str)
     str = ((i > j) ? "" : str.substr(i, j - i + 1));
 }
 
+/**
+ * @Description Delete comment message begin with ; and #
+ *
+ * @param str - String
+ */
+static inline void DelComment(std::string &str)
+{
+    std::string::size_type i = 0;
+    for (; i < str.length(); ++i) {
+        if (str[i] == ';' || str[i] == '#') {
+            str = str.substr(0, i);
+            break;
+        }
+    }
+    return;
+}
+
 template<typename T>
 class WifiConfigFileImpl {
 public:

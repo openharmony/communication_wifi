@@ -470,6 +470,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     }
 
     UpdateEapConfig(config, tempDeviceConfig.wifiEapConfig);
+    WifiSettings::GetInstance().SetKeyMgmtBitset(tempDeviceConfig);
 
     /* Add the new network to WifiSettings. */
     if (!WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {

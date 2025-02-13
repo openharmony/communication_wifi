@@ -176,7 +176,7 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
         {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value = g_trustAccountValue},
     };
     ret = AssetAdd(attr, sizeof(attr) / sizeof(attr[0]));
-    if (flagSync) {
+    if (flagSync && ret == SEC_ASSET_SUCCESS) {
         WifiAssetManager::GetInstance().WifiAssetTriggerSync();
     }
     return ret;

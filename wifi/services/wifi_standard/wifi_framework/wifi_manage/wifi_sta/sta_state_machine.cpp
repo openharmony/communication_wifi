@@ -538,10 +538,9 @@ bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
     std::string scanMgmt = "";
     for (auto item : scanInfoList) {
         item.GetDeviceMgmt(scanMgmt);
-        if (item.ssid == config.ssid &&
-            WifiSettings::GetInstance().InKeyMgmtBitset(config, scanMgmt)) {
-                return false;
-            }
+        if (item.ssid == config.ssid && WifiSettings::GetInstance().InKeyMgmtBitset(config, scanMgmt)) {
+            return false;
+        }
     }
     return true;
 }
@@ -3139,7 +3138,7 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     }
 }
 
-statoc bool WpaCompare(const std::string& a, const std::string& b)
+static bool WpaCompare(const std::string& a, const std::string& b)
 {
     const std::unordered_map<std::string, int> priority = {
         {KEY_MGMT_SAE, 2},
@@ -3164,32 +3163,25 @@ std::string StaStateMachine::DetermineWinner(std::vector<std::string>& candidate
     return candidates.front();
 }
 
-std::string StaStateMachine::MatchBestEncryption(WifiDeviceConfig &config, std::string bssid) const
+std::string StaStateMachine::MatchBestEncryption(const WifiDeviceConfig &config, const std::string bssid) const
 {
     std::vector<WifiScanInfo> scanInfoList;
-    std::string finalKeyMgmt = config.keyMgmt;
     std::vector<std::string> candidateKeyMgmtList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto scanInfo : scanInfoList) {
-        if (config.ssid != scanInfo.ssid) {
-            continue;
-        }
-        // allow bssid.empty()
-        if (!bssid.empty() && bssid != scanInfo.bssid) {
-            continue;
-        }
-
-        std::string deviceKeyMgmt;
-        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
-            candidateKeyMgmtList = WifiSettings::GetInstance().GetAllSuitableEncryption(config, deviceKeyMgmt);
-            break;
+        if (config.ssid == scanInfo.ssid && (bssid.empty() || bssid == scanInfo.bssid)) {
+            std::string deviceKeyMgmt;
+            scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+            if (WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
+                candidateKeyMgmtList = WifiSettings::GetInstance().GetAllSuitableEncryption(config, deviceKeyMgmt);
+                break;
+            }
         }
     }
     if (candidateKeyMgmtList.size() != 0) {
-        finalKeyMgmt = DetermineWinner(candidateKeyMgmtList, WpaCompare);
+        return config.keyMgmt;
     }
-    return finalKeyMgmt;
+    return DetermineWinner(candidateKeyMgmtList, WpaCompare);
 }
 
 ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const

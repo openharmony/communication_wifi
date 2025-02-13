@@ -54,7 +54,17 @@ inline const std::string KEY_MGMT_SUITE_B_192 = "WPA-EAP-SUITE-B-192";
 inline const std::string KEY_MGMT_WAPI_CERT = "WAPI-CERT";
 inline const std::string KEY_MGMT_WAPI_PSK = "WAPI-PSK";
 inline const std::string KEY_MGMT_WAPI = "WAPI";
-
+inline const int KEY_MGMT_TOTAL_NUM = 8;
+inline const std::string KEY_MGMT_ARRAY[KEY_MGMT_TOTAL_NUM] = {
+    KEY_MGMT_NONE,
+    KEY_MGMT_WEP,
+    KEY_MGMT_WPA_PSK,
+    KEY_MGMT_SAE,
+    KEY_MGMT_EAP,
+    KEY_MGMT_SUITE_B_192,
+    KEY_MGMT_WAPI_CERT,
+    KEY_MGMT_WAPI_PSK
+};
 inline const std::string EAP_METHOD_NONE = "NONE";
 inline const std::string EAP_METHOD_PEAP = "PEAP";
 inline const std::string EAP_METHOD_TLS = "TLS";
@@ -704,6 +714,8 @@ struct WifiDeviceConfig {
     std::string IV;
     /* Encryption Mode */
     std::string keyMgmt;
+    /* Available Encryption Mode */
+    int keyMgmtBitset;
     /* WEP mode key, max size: 4 */
     std::string wepKeys[WEPKEYS_SIZE];
     /* use WEP key index */

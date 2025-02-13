@@ -37,6 +37,10 @@ public:
     virtual int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config) = 0;
     virtual int SyncDeviceConfig() = 0;
+    virtual bool InKeyMgmtBitset(const WifiDeviceConfig &config, const std::string &keyMgmt) = 0;
+    virtual void SetKeyMgmtBitset(WifiDeviceConfig &config) = 0;
+    virtual std::vector<std::string> GetAllSuitableEncryption(const WifiDeviceConfig &config,
+        const std::string &keyMgmt) = 0;
     virtual int ReloadDeviceConfig() = 0;
     virtual int SetCountryCode(const std::string &countryCode) = 0;
     virtual int GetCountryCode(std::string &countryCode) = 0;
@@ -125,6 +129,10 @@ public:
     MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config));
     MOCK_METHOD0(SyncDeviceConfig, int());
+    MOCK_METHOD2(InKeyMgmtBitset, bool(const WifiDeviceConfig &config, const std::string &keyMgmt));
+    MOCK_METHOD1(SetKeyMgmtBitset, void(WifiDeviceConfig &config));
+    MOCK_METHOD2(GetAllSuitableEncryption, std::vector<std::string>(const WifiDeviceConfig &config,
+        const std::string &keyMgmt));
     MOCK_METHOD0(ReloadDeviceConfig, int());
     MOCK_METHOD1(SetCountryCode, int(const std::string &countryCode));
     MOCK_METHOD1(GetCountryCode, int(std::string &countryCode));

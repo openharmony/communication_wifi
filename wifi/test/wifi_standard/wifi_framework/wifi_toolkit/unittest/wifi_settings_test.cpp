@@ -656,5 +656,63 @@ HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
     EXPECT_EQ(updatedConfig.preSharedKey, "123456789");
 }
 #endif
+
+HWTEST_F(WifiSettingsTest, InKeyMgmtBitsetTest, TestSize.Level1)
+{
+    WIFI_LOGE("InKeyMgmtBitsetTest enter!");
+    WifiDeviceConfig config;
+    std::string keyMgmt;
+    keyMgmt = "ABC";
+    config.keyMgmtBitset = 1;
+    EXPECT_FALSE(WifiSettings::GetInstance().InKeyMgmtBitset(config, keyMgmt));
+    keyMgmt = "WPA-PSK";
+    config.keyMgmtBitset = 4;
+    EXPECT_TRUE(WifiSettings::GetInstance().InKeyMgmtBitset(config, keyMgmt));
+    config.keyMgmtBitset = 1;
+    EXPECT_FALSE(WifiSettings::GetInstance().InKeyMgmtBitset(config, keyMgmt));
+    keyMgmt = "WPA-PSK+SAE";
+    config.keyMgmtBitset = 4;
+    EXPECT_TRUE(WifiSettings::GetInstance().InKeyMgmtBitset(config, keyMgmt));
+    config.keyMgmtBitset = 12;
+    EXPECT_TRUE(WifiSettings::GetInstance().InKeyMgmtBitset(config, keyMgmt));
+    config.keyMgmtBitset = 1;
+    EXPECT_FALSE(WifiSettings::GetInstance().InKeyMgmtBitset(config, keyMgmt));
+}
+ 
+HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetKeyMgmtBitset enter!");
+    WifiDeviceConfig config;
+    config.keyMgmt = "WPA-PSK";
+    config.keyMgmtBitset = 0;
+    WifiSettings::GetInstance().SetKeyMgmtBitset(config);
+    EXPECT_EQ(config.keyMgmtBitset, 12);
+    config.keyMgmt = "SAE";
+    config.keyMgmtBitset = 0;
+    WifiSettings::GetInstance().SetKeyMgmtBitset(config);
+    EXPECT_EQ(config.keyMgmtBitset, 8);
+}
+ 
+HWTEST_F(WifiSettingsTest, GetAllSuitableEncryptionTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetAllSuitableEncryptionTest enter!");
+    WifiDeviceConfig config;
+    std::string keyMgmt;
+    std::vector<std::string> result;
+    keyMgmt = "WPA-PSK+SAE";
+    config.keyMgmtBitset = 4;
+    result = WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt);
+    EXPECT_EQ(result.front(), "WPA-PSK");
+    config.keyMgmtBitset = 8;
+    result = WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt);
+    EXPECT_EQ(result.front(), "SAE");
+    config.keyMgmtBitset = 1;
+    result = WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt);
+    EXPECT_EQ(result.size(), 0);
+    config.keyMgmt = "WPA-PSK";
+    config.keyMgmtBitset = 4;
+    result = WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt);
+    EXPECT_EQ(result.front(), "WPA-PSK");
+}
 }  // namespace Wifi
 }  // namespace OHO

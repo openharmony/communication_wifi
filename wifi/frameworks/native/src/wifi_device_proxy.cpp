@@ -100,7 +100,7 @@ void WifiDeviceProxy::InitWifiState()
         return;
     }
 
-    boolbActive = reply.ReadBool();
+    bool bActive = reply.ReadBool();
     g_deviceCallBackStub->SetWifiState(bActive);
     return;
 }

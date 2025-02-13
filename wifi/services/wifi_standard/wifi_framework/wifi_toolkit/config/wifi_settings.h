@@ -188,6 +188,12 @@ public:
 
     int SyncDeviceConfig();
 
+    bool InKeyMgmtBitset(const WifiDeviceConfig& config, const std::string& keyMgmt);
+
+    void SetKeyMgmtBitset(WifiDeviceConfig &config);
+
+    std::vector<std::string> GetAllSuitableEncryption(const WifiDeviceConfig &config, const std::string &deviceKeyMgmt);
+
     int ReloadDeviceConfig();
 
     int GetNextNetworkId();
@@ -317,6 +323,9 @@ public:
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
+    void ApplyCloudWifiConfig(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+        const std::set<int> &wifiLinkedNetworkIds, std::map<int, WifiDeviceConfig> &tempConfigs);
+
     void UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
         const std::set<int> &wifiLinkedNetworkIds);
 

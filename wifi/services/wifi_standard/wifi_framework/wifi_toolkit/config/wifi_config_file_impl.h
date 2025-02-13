@@ -155,7 +155,7 @@ public:
         if (ret != content.length()) {
             LOGE("Save config file: %{public}s, fwrite() failed!", tempFileName.c_str());
             (void)fclose(fp);
-            remove(tempFileName);
+            remove(tempFileName.c_str());
             return -1;
         }
         (void)fflush(fp);
@@ -164,13 +164,12 @@ public:
 
         if (rename(tempFileName.c_str(), mFileName.c_str()) != 0) {
             LOGE("Save config file: %{public}s, rename() failed!", mFileName.c_str());
-            remove(tempFileName);
+            remove(tempFileName.c_str());
             return -1;
         }
-        remove(tempFileName);
+        remove(tempFileName.c_str());
         return 0;
     }
-
 
     /**
      * @Description read and parses the ini config file, need call SetConfigFilePath first

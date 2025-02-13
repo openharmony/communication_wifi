@@ -160,7 +160,7 @@ int32_t WifiDeviceMgrServiceImpl::OnSvcCmd(int32_t fd, const std::vector<std::u1
     std::lock_guard<std::mutex> lock(g_initMutex);
     if (args.empty() || args.size() != 1) {
         std::string error = "wrong parameter size, correct parameter size: 1\n"
-            "hdc shell svc wifi help:\n"
+            " hdc shell svc wifi help:\n"
             " hdc shell svc wifi enable: enable wifi device\n"
             " hdc shell svc wifi disable: disable wifi device\n";
         if (!SaveStringToFd(fd, error)) {

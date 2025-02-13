@@ -115,9 +115,9 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
     if (callback_) {
         callback_->OnWifiStateChanged(state);
         if (state == static_cast<int>(WifiState::ENABLED)) {
-            mState = true;
+            mState_ = true;
         } else {
-            mState = false;
+            mState_ = false;
         }
     }
     WriteWifiEventReceivedHiSysEvent(HISYS_STA_POWER_STATE_CHANGE, state);

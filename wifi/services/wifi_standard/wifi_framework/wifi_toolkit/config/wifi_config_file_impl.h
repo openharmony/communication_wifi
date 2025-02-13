@@ -167,7 +167,6 @@ public:
             (void)remove(tempFileName.c_str());
             return -1;
         }
-        (void)remove(tempFileName.c_str());
         return 0;
     }
 

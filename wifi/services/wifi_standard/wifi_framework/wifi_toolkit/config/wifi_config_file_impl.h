@@ -48,19 +48,6 @@ static inline void TrimString(std::string &str)
     str = ((i > j) ? "" : str.substr(i, j - i + 1));
 }
 
-/**
- * @Description Delete comment message begin with ; and #
- *
- * @param str - String
- */
-static int WriteConfigToFile(const std::string &fileName, const std::string &content)
-{
-    if () {
-
-    }
-}
-
-
 template<typename T>
 class WifiConfigFileImpl {
 public:

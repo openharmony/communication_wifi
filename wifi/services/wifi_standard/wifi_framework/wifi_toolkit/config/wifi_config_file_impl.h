@@ -134,9 +134,9 @@ public:
     }
 
     /**
-     * @Description use temp file to write ini config file
+     * @Description Write to temp file, then rename to ini config file
      *
-     * @param results - output config values
+     * @param content - write data
      * @return int - 0 Success
      */
     int WriteFile(const std::string &content)

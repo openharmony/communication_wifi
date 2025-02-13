@@ -3139,7 +3139,60 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     }
 }
 
-ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const
+statoc bool WpaCompare(const std::string& a, const std::string& b)
+{
+    const std::unordered_map<std::string, int> priority = {
+        {KEY_MGMT_SAE, 2},
+        {KEY_MGMT_WPA_PSK, 1}
+    };
+
+    auto positionA = priority.find(a);
+    auto positionB = priority.find(b);
+    if (positionA != priority.end() && positionB != priority.end()) {
+        return positionA->second > positionB->second;
+    }
+    return false;
+}
+
+std::string StaStateMachine::DetermineWinner(std::vector<std::string>& candidates,
+    bool (*compare)(const std::string&, const std::string&)) const
+{
+    if (candidates.size() == 1) {
+        return candidates.front();
+    }
+    std::sort(candidates.begin(), candidates.end(), compare);
+    return candidates.front();
+}
+
+std::string StaStateMachine::MatchBestEncryption(WifiDeviceConfig &config, std::string bssid) const
+{
+    std::vector<WifiScanInfo> scanInfoList;
+    std::string finalKeyMgmt = config.keyMgmt;
+    std::vector<std::string> candidateKeyMgmtList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
+    for (auto scanInfo : scanInfoList) {
+        if (config.ssid != scanInfo.ssid) {
+            continue;
+        }
+        // allow bssid.empty()
+        if (!bssid.empty() && bssid != scanInfo.bssid) {
+            continue;
+        }
+
+        std::string deviceKeyMgmt;
+        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
+            candidateKeyMgmtList = WifiSettings::GetInstance().GetAllSuitableEncryption(config, deviceKeyMgmt);
+            break;
+        }
+    }
+    if (candidateKeyMgmtList.size() != 0) {
+        finalKeyMgmt = DetermineWinner(candidateKeyMgmtList, WpaCompare);
+    }
+    return finalKeyMgmt;
+}
+
+ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const
 {
     WIFI_LOGI("Enter ConvertDeviceCfg.\n");
     WifiHalDeviceConfig halDeviceConfig;
@@ -3149,20 +3202,11 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config, std::s
         halDeviceConfig.authAlgorithms = 0x02;
     }
 
-    if (IsWpa3Transition(config.ssid, bssid)) {
-        if (IsInWpa3BlackMap(config.ssid)) {
-            halDeviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
-        } else {
-            halDeviceConfig.keyMgmt = KEY_MGMT_SAE;
-        }
-        halDeviceConfig.isRequirePmf = false;
-    }
+    halDeviceConfig.keyMgmt = MatchBestEncryption(config, bssid);
+    config.keyMgmt = halDeviceConfig.keyMgmt;
 
-    if (config.keyMgmt.find("SAE") != std::string::npos) {
-        halDeviceConfig.isRequirePmf = true;
-    }
-
-    if (halDeviceConfig.keyMgmt.find("SAE") != std::string::npos) {
+    halDeviceConfig.isRequirePmf = halDeviceConfig.keyMgmt == KEY_MGMT_SAE;
+    if (halDeviceConfig.isRequirePmf) {
         halDeviceConfig.allowedProtocols = 0x02; // RSN
         halDeviceConfig.allowedPairwiseCiphers = 0x2c; // CCMP|GCMP|GCMP-256
         halDeviceConfig.allowedGroupCiphers = 0x2c; // CCMP|GCMP|GCMP-256
@@ -3794,14 +3838,14 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid, ifaceName);
         deviceConfig.userSelectBssid = "";
-        WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
-        WifiSettings::GetInstance().SyncDeviceConfig();
     } else {
         // auto connect
         WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName);
     }
 
+    WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
+    WifiSettings::GetInstance().SyncDeviceConfig();
     if (WifiStaHalInterface::GetInstance().Connect(WPA_DEFAULT_NETWORKID, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Connect failed!");
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);

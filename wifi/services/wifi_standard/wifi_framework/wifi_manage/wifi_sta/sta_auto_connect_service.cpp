@@ -158,7 +158,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
                 break;
             }
         }
-        if (hasSavedConfigSeen) {
+        if (hasSavedConfigSeen && !IsAutoConnectFailByP2PEnhanceFilter(scanInfos)) {
             WriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
         }
     }
@@ -167,6 +167,41 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
             callBackItem.OnAutoSelectNetworkRes(networkSelectionResult.wifiDeviceConfig.networkId, m_instId);
         }
     }
+}
+
+bool StaAutoConnectService::IsAutoConnectFailByP2PEnhanceFilter(const std::vector<InterScanInfo> &scanInfos)
+{
+    /* Saved networks are matched in the scanning result */
+    std::vector<InterScanInfo> savedNetworks;
+    for (auto &scanInfo : scanInfos) {
+        WifiDeviceConfig device;
+        std::string deviceKeyMgmt;
+        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeyMgmt, device) != 0) {
+            WIFI_LOGD("Skip unsaved ssid network %{public}s", SsidAnonymize(scanInfo.ssid).c_str());
+            continue;
+        }
+        savedNetworks.push_back(scanInfo);
+    }
+
+    int p2pEnhanceFreq = 0;
+    bool isMatched = false;
+    p2pEnhanceFreq = WifiConfigCenter::GetInstance().GetP2pEnhanceFreq();
+    WIFI_LOGD("p2pEnhanceFreq is %{public}d", p2pEnhanceFreq);
+    if (!Whether5GDevice(p2pEnhanceFreq)) {
+        return false;
+    }
+    for (auto &network : savedNetworks) {
+        if (Whether24GDevice(network.frequency) || network.frequency == p2pEnhanceFreq) {
+            isMatched = true;
+            break;
+        }
+    }
+    if (!isMatched) {
+        WriteAutoConnectFailEvent("AUTO_SELECT_FAIL", "P2P_ENHANCE_FILTER");
+        return true;
+    }
+    return false;
 }
 
 bool StaAutoConnectService::EnableOrDisableBssid(std::string bssid, bool enable, int reason)

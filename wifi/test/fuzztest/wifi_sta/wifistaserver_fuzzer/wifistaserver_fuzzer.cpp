@@ -255,6 +255,7 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->AutoSelectDevice(config, scanInfo, blocklistBssids, info);
     pStaAutoConnectService->WhetherDevice5GAvailable(scanInfo);
     pStaAutoConnectService->GetAvailableScanInfos(scanInfo, scanInfo, blocklistBssids, info);
+    pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfo);
     pStaService->AutoConnectService(scanInfo);
 }
 

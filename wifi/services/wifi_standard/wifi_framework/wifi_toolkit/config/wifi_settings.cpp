@@ -661,13 +661,19 @@ bool WifiSettings::InKeyMgmtBitset(const WifiDeviceConfig& config, const std::st
  
 void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
 {
-    if (!config.keyMgmt.empty() && !InKeyMgmtBitset(config, config.keyMgmt)) {
-        int index = FindKeyMgmtPosition(config.keyMgmt);
+    // Currently only set when keyMgmtBitset does not match keyMgmt
+    if (InKeyMgmtBitset(config, config.keyMgmt)) {
+        return;
+    }
+    int index = FindKeyMgmtPosition(config.keyMgmt);
+    // Invalid keyMgmt
+    if (index >= KEY_MGMT_TOTAL_NUM) {
+        return;
+    }
+    config.keyMgmtBitset |= (1 << index);
+    if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
+        index = FindKeyMgmtPosition(KEY_MGMT_SAE);
         config.keyMgmtBitset |= (1 << index);
-        if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
-            index = FindKeyMgmtPosition(KEY_MGMT_SAE);
-            config.keyMgmtBitset |= (1 << index);
-        }
     }
 }
  

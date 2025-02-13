@@ -54,7 +54,7 @@ private:
     sptr<IWifiDeviceCallBack> callback_;
 
     bool mRemoteDied;
-    std::atomic<int> mState = DEFAULT_VALUES;
+    std::atomic<int> mState_ = DEFAULT_VALUES;
 };
 }  // namespace Wifi
 }  // namespace OHOS

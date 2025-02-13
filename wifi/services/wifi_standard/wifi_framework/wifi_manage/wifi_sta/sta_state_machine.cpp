@@ -538,11 +538,10 @@ bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
     std::string scanMgmt = "";
     for (auto item : scanInfoList) {
         item.GetDeviceMgmt(scanMgmt);
-        if ((scanMgmt.compare("WPA-PSK+SAE") == 0 && item.ssid == config.ssid &&
-            scanMgmt.find(config.keyMgmt) != std::string::npos) ||
-            (item.ssid == config.ssid && scanMgmt == config.keyMgmt)) {
+        if (item.ssid == config.ssid &&
+            WifiSettings::GetInstance().InKeyMgmtBitset(config, scanMgmt)) {
                 return false;
-        }
+            }
     }
     return true;
 }

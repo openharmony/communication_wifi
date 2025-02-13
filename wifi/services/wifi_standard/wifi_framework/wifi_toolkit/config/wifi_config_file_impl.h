@@ -53,17 +53,13 @@ static inline void TrimString(std::string &str)
  *
  * @param str - String
  */
-static inline void DelComment(std::string &str)
+static int WriteConfigToFile(const std::string &fileName, const std::string &content)
 {
-    std::string::size_type i = 0;
-    for (; i < str.length(); ++i) {
-        if (str[i] == ';' || str[i] == '#') {
-            str = str.substr(0, i);
-            break;
-        }
+    if () {
+
     }
-    return;
 }
+
 
 template<typename T>
 class WifiConfigFileImpl {
@@ -134,6 +130,45 @@ public:
     }
 
     /**
+     * @Description use temp file to write ini config file
+     *
+     * @param results - output config values
+     * @return int - 0 Success
+     */
+    int WriteFile(const std::string &content)
+    {
+        if (mFileName.empty()) {
+            LOGE("File name is empty.");
+            return -1;
+        }
+        std::string tempFileName = mFileName + ".temp";
+        FILE* fp = fopen(tempFileName.c_str(), "w");
+        if (!fp) {
+            LOGE("Save config file: %{public}s, fopen() failed!", tempFileName.c_str());
+            return -1;
+        }
+        size_t ret = fwrite(content.c_str(), 1, content.length(), fp);
+        if (ret != content.length()) {
+            LOGE("Save config file: %{public}s, fwrite() failed!", tempFileName.c_str());
+            (void)fclose(fp);
+            remove(tempFileName);
+            return -1;
+        }
+        (void)fflush(fp);
+        (void)fsync(fileno(fp));
+        (void)fclose(fp);
+
+        if (rename(tempFileName.c_str(), mFileName.c_str()) != 0) {
+            LOGE("Save config file: %{public}s, rename() failed!", mFileName.c_str());
+            remove(tempFileName);
+            return -1;
+        }
+        remove(tempFileName);
+        return 0;
+    }
+
+
+    /**
      * @Description read and parses the ini config file, need call SetConfigFilePath first
      * need call SetEncryptionInfo first when load encrypted config file
      *
@@ -149,10 +184,6 @@ public:
      */
     int SaveConfig()
     {
-        if (mFileName.empty()) {
-            LOGE("File name is empty.");
-            return -1;
-        }
         std::string content;
         std::lock_guard<std::mutex> lock(valueMutex_);
         {
@@ -178,19 +209,10 @@ public:
             content = mEncry.encryptedPassword;
         }
 #endif
-        FILE* fp = fopen(mFileName.c_str(), "w");
-        if (!fp) {
-            LOGE("Save config file: %{public}s, fopen() failed!", mFileName.c_str());
+        mValues.clear(); /* clear values */
+        if (WriteFile(content) != 0) {
             return -1;
         }
-        size_t ret = fwrite(content.c_str(), 1, content.length(), fp);
-        if (ret != content.length()) {
-            LOGE("Save config file: %{public}s, fwrite() failed!", mFileName.c_str());
-        }
-        (void)fflush(fp);
-        (void)fsync(fileno(fp));
-        (void)fclose(fp);
-        mValues.clear(); /* clear values */
         return 0;
     }
 

@@ -438,7 +438,7 @@ void WifiP2pStub::OnGetCurrentGroup(uint32_t code, MessageParcel &data, MessageP
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        WriteWifiP2pGroupData(reply, config);
+        WriteWifiP2pGroupData(reply, config, false);
     }
     return;
 }
@@ -528,7 +528,7 @@ void WifiP2pStub::OnQueryP2pGroups(uint32_t code, MessageParcel &data, MessagePa
         int size = static_cast<int>(groups.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; ++i) {
-            WriteWifiP2pGroupData(reply, groups[i]);
+            WriteWifiP2pGroupData(reply, groups[i], true);
         }
     }
     return;
@@ -701,7 +701,7 @@ bool WifiP2pStub::ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &in
     return true;
 }
 
-void WifiP2pStub::WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroupInfo &info)
+void WifiP2pStub::WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroupInfo &info, bool isPersistent)
 {
     reply.WriteBool(info.IsGroupOwner());
     WriteWifiP2pDeviceData(reply, info.GetOwner());
@@ -714,7 +714,12 @@ void WifiP2pStub::WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroup
     reply.WriteInt32(info.GetNetworkId());
     reply.WriteString(info.GetGoIpAddress());
     reply.WriteString(info.GetGcIpAddress());
-    std::vector<WifiP2pDevice> deviceVec = info.GetPersistentDevices();
+    std::vector<WifiP2pDevice> deviceVec;
+    if (isPersistent) {
+        deviceVec = info.GetPersistentDevices();
+    } else {
+        deviceVec = info.GetClientDevices();
+    }
     reply.WriteInt32(deviceVec.size());
     for (auto it = deviceVec.begin(); it != deviceVec.end(); ++it) {
         WriteWifiP2pDeviceData(reply, *it);

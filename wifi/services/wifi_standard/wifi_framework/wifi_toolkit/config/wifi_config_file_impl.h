@@ -148,12 +148,12 @@ public:
         std::string tempFileName = mFileName + ".temp";
         FILE* fp = fopen(tempFileName.c_str(), "w");
         if (!fp) {
-            LOGE("Save config file: %{public}s, fopen() failed!", tempFileName.c_str());
+            LOGE("Temp config file: %{public}s, fopen() failed!", tempFileName.c_str());
             return -1;
         }
         size_t ret = fwrite(content.c_str(), 1, content.length(), fp);
         if (ret != content.length()) {
-            LOGE("Save config file: %{public}s, fwrite() failed!", tempFileName.c_str());
+            LOGE("Temp config file: %{public}s, fwrite() failed!", tempFileName.c_str());
             (void)fclose(fp);
             (void)remove(tempFileName.c_str());
             return -1;

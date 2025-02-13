@@ -100,12 +100,12 @@ void WifiDeviceCallBackStub::SetRemoteDied(bool val)
 }
 void WifiDeviceCallBackStub::SetWifiState(int val)
 {
-    mState = val;
+    mState_ = val;
 }
 
 int WifiDeviceCallBackStub::GetWifiState()
 {
-    return mState;
+    return mState_;
 }
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)

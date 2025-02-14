@@ -644,7 +644,7 @@ static int FindKeyMgmtPosition(const std::string& keyMgmt)
     }
     return -1;
 }
- 
+
 bool WifiSettings::InKeyMgmtBitset(const WifiDeviceConfig& config, const std::string& keyMgmt)
 {
     if (keyMgmt != "WPA-PSK+SAE") {
@@ -657,7 +657,7 @@ bool WifiSettings::InKeyMgmtBitset(const WifiDeviceConfig& config, const std::st
         return InKeyMgmtBitset(config, KEY_MGMT_WPA_PSK) || InKeyMgmtBitset(config, KEY_MGMT_SAE);
     }
 }
- 
+
 void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
 {
     // Currently only set when keyMgmtBitset does not match keyMgmt
@@ -675,7 +675,7 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
         config.keyMgmtBitset |= (1 << index);
     }
 }
- 
+
 void WifiSettings::GetAllSuitableEncryption(const WifiDeviceConfig &config,
     const std::string &keyMgmt, std::vector<std::string> &candidateKeyMgmtList)
 {

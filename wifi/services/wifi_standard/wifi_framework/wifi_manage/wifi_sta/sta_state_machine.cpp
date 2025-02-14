@@ -1919,8 +1919,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         WriteIsInternetHiSysEvent(NETWORK);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
-    
-        if (linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) {
+        WifiDeviceConfig config;
+        WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
+        if ((linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) && config.keyMgmt != KEY_MGMT_NONE) {
             InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         } else {
             InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
@@ -1952,16 +1953,19 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
 {
     WifiDeviceConfig config;
     int ret = WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
-    if (linkedInfo.networkId == INVALID_NETWORK_ID || ret != 0 || !config.isPortal) {
+    if (linkedInfo.networkId == INVALID_NETWORK_ID || ret != 0 || !config.isPortal ||
+        config.keyMgmt == KEY_MGMT_NONE) {
+        WIFI_LOGI("%{public}s, not modify, networkId=%{public}d, ret=%{public}d, isPortal=%{public}d, "
+            "keyMgmt=%{public}s", __func__, linkedInfo.networkId, ret, config.isPortal, config.keyMgmt.c_str());
         return;
     }
     bool needChangePortalFlag = false;
-#ifndef OHOS_ARCH_LITE
     bool isHomeAp = false;
     bool isHomeRouter = false;
-#endif
+#ifndef OHOS_ARCH_LITE
     isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
     isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
+#endif
     bool isPortalByHistory = NetworkStatusHistoryManager::IsPortalByHistory(config.networkStatusHistory);
     switch (netState) {
         case SystemNetWorkState::NETWORK_NOTWORKING:
@@ -1972,10 +1976,6 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
             needChangePortalFlag = true;
             break;
         case SystemNetWorkState::NETWORK_IS_WORKING:
-            if (config.keyMgmt == KEY_MGMT_NONE) {
-                WIFI_LOGI("%{public}s, has internet and open network, not modify", __func__);
-                break;
-            }
             if (!linkedInfo.isHiLinkNetwork && !isHomeAp && !isHomeRouter) {
                 WIFI_LOGI("%{public}s, has internet and not hilink/homeAp/homeRouter network, not modify", __func__);
                 break;

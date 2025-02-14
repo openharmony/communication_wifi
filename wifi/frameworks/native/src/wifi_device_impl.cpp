@@ -75,7 +75,6 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
 #ifdef OHOS_ARCH_LITE
     return (client_ != nullptr);
 #else
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     if (IsRemoteDied() == false) {
         return true;
     }
@@ -89,7 +88,12 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get DEVICE_SERVICE");
-        return false;
+        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+        object = sa_mgr->GetSystemAbility(systemAbilityId_);
+        if (object == nullptr) {
+            WIFI_LOGE("failed to get DEVICE_SERVICE again!");
+            return false;
+        }
     }
 
     sptr<IWifiDeviceMgr> deviceMgr = iface_cast<IWifiDeviceMgr>(object);

@@ -98,6 +98,15 @@ void WifiDeviceCallBackStub::SetRemoteDied(bool val)
     WIFI_LOGI("SetRemoteDied, state:%{public}d!", val);
     mRemoteDied = val;
 }
+void WifiDeviceCallBackStub::SetWifiState(int val)
+{
+    mState_ = val;
+}
+
+int WifiDeviceCallBackStub::GetWifiState()
+{
+    return mState_;
+}
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 {
@@ -105,6 +114,11 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 
     if (callback_) {
         callback_->OnWifiStateChanged(state);
+        if (state == static_cast<int>(WifiState::ENABLED)) {
+            mState_ = true;
+        } else {
+            mState_ = false;
+        }
     }
     WriteWifiEventReceivedHiSysEvent(HISYS_STA_POWER_STATE_CHANGE, state);
 }

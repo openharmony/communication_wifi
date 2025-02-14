@@ -715,7 +715,7 @@ struct WifiDeviceConfig {
     /* Encryption Mode */
     std::string keyMgmt;
     /* Available Encryption Mode */
-    int keyMgmtBitset;
+    uint32_t keyMgmtBitset;
     /* WEP mode key, max size: 4 */
     std::string wepKeys[WEPKEYS_SIZE];
     /* use WEP key index */

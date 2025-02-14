@@ -974,9 +974,7 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
-    std::string DetermineWinner(std::vector<std::string>& candidates,
-        bool (*compare)(const std::string&, const std::string&)) const;
-    std::string MatchBestEncryption(const WifiDeviceConfig &config, const std::string bssid) const;
+    std::string GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfig &config, const std::string bssid) const;
     void TryModifyPortalAttribute(SystemNetWorkState netState);
     void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
     void UpdateHiLinkAttribute();

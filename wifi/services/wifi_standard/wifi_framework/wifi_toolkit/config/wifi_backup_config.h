@@ -29,7 +29,7 @@ struct WifiBackupConfig {
     int priority;
     bool hiddenSSID;
     std::string keyMgmt;
-    int keyMgmtBitset;
+    uint32_t keyMgmtBitset;
     unsigned int networkStatusHistory;
     bool isPortal;
     time_t lastHasInternetTime;

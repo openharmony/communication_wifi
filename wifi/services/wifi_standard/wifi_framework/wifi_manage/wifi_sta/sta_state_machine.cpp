@@ -1955,8 +1955,6 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
     int ret = WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
     if (linkedInfo.networkId == INVALID_NETWORK_ID || ret != 0 || !config.isPortal ||
         config.keyMgmt == KEY_MGMT_NONE) {
-        WIFI_LOGI("%{public}s, not modify, networkId=%{public}d, ret=%{public}d, isPortal=%{public}d, "
-            "keyMgmt=%{public}s", __func__, linkedInfo.networkId, ret, config.isPortal, config.keyMgmt.c_str());
         return;
     }
     bool needChangePortalFlag = false;

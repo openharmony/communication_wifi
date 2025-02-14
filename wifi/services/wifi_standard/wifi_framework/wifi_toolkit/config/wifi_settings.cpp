@@ -637,20 +637,19 @@ int WifiSettings::SyncDeviceConfig()
 
 static int FindKeyMgmtPosition(const std::string& keyMgmt)
 {
-    int index = 0;
-    for (; index < KEY_MGMT_TOTAL_NUM; ++index) {
+    for (int index = 0; index < KEY_MGMT_TOTAL_NUM; ++index) {
         if (KEY_MGMT_ARRAY[index] == keyMgmt) {
-            break;
+            return index;
         }
     }
-    return index;
+    return -1;
 }
  
 bool WifiSettings::InKeyMgmtBitset(const WifiDeviceConfig& config, const std::string& keyMgmt)
 {
     if (keyMgmt != "WPA-PSK+SAE") {
         int index = FindKeyMgmtPosition(keyMgmt);
-        if (index >= KEY_MGMT_TOTAL_NUM) {
+        if (index < 0) {
             return false;
         }
         return (config.keyMgmtBitset & (1 << index)) != 0;
@@ -667,7 +666,7 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
     }
     int index = FindKeyMgmtPosition(config.keyMgmt);
     // Invalid keyMgmt
-    if (index >= KEY_MGMT_TOTAL_NUM) {
+    if (index < 0) {
         return;
     }
     config.keyMgmtBitset |= (1 << index);
@@ -677,10 +676,9 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
     }
 }
  
-std::vector<std::string> WifiSettings::GetAllSuitableEncryption(const WifiDeviceConfig &config,
-    const std::string &keyMgmt)
+void WifiSettings::GetAllSuitableEncryption(const WifiDeviceConfig &config,
+    const std::string &deviceKeyMgmt, std::vector<std::string> &candidateKeyMgmtList)
 {
-    std::vector<std::string> candidateKeyMgmtList;
     if (keyMgmt == "WPA-PSK+SAE") {
         if (InKeyMgmtBitset(config, KEY_MGMT_WPA_PSK)) {
             candidateKeyMgmtList.emplace_back(KEY_MGMT_WPA_PSK);
@@ -693,7 +691,6 @@ std::vector<std::string> WifiSettings::GetAllSuitableEncryption(const WifiDevice
             candidateKeyMgmtList.emplace_back(keyMgmt);
         }
     }
-    return candidateKeyMgmtList;
 }
 
 int WifiSettings::ReloadDeviceConfig()

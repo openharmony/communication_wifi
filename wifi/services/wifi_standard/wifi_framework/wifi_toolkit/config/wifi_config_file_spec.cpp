@@ -246,7 +246,7 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
     } else if (key == "keyMgmt") {
         item.keyMgmt = value;
     } else if (key == "keyMgmtBitset") {
-        item.keyMgmtBitset = CheckDataLegal(tmpValue);
+        item.keyMgmtBitset = static_cast<uint32_t>(CheckDataLegal(tmpValue));
     } else if (key == "wepTxKeyIndex") {
         item.wepTxKeyIndex = CheckDataLegal(tmpValue);
     } else if (key == "priority") {
@@ -1789,7 +1789,7 @@ static int SetWifiBackupConfigFirst(WifiBackupConfig &item, const std::string &k
     } else if (key == "keyMgmt") {
         item.keyMgmt = value;
     } else if (key == "keyMgmtBitset") {
-        item.keyMgmtBitset = CheckDataLegal(tmpValue);
+        item.keyMgmtBitset = static_cast<uint32_t>(CheckDataLegal(tmpValue));
     } else {
         return -1;
     }

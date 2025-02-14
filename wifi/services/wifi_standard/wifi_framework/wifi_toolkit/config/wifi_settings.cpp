@@ -677,7 +677,7 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
 }
  
 void WifiSettings::GetAllSuitableEncryption(const WifiDeviceConfig &config,
-    const std::string &deviceKeyMgmt, std::vector<std::string> &candidateKeyMgmtList)
+    const std::string &keyMgmt, std::vector<std::string> &candidateKeyMgmtList)
 {
     if (keyMgmt == "WPA-PSK+SAE") {
         if (InKeyMgmtBitset(config, KEY_MGMT_WPA_PSK)) {

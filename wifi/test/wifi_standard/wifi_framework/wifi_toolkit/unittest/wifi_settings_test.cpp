@@ -678,7 +678,7 @@ HWTEST_F(WifiSettingsTest, InKeyMgmtBitsetTest, TestSize.Level1)
     config.keyMgmtBitset = 1;
     EXPECT_FALSE(WifiSettings::GetInstance().InKeyMgmtBitset(config, keyMgmt));
 }
- 
+
 HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
 {
     WIFI_LOGE("SetKeyMgmtBitset enter!");
@@ -700,7 +700,7 @@ HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
     WifiSettings::GetInstance().SetKeyMgmtBitset(config);
     EXPECT_EQ(config.keyMgmtBitset, 0);
 }
- 
+
 HWTEST_F(WifiSettingsTest, GetAllSuitableEncryptionTest, TestSize.Level1)
 {
     WIFI_LOGE("GetAllSuitableEncryptionTest enter!");

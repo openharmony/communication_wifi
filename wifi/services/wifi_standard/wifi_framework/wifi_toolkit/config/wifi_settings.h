@@ -192,7 +192,7 @@ public:
 
     void SetKeyMgmtBitset(WifiDeviceConfig &config);
 
-    void GetAllSuitableEncryption(const WifiDeviceConfig &config, const std::string &deviceKeyMgmt,
+    void GetAllSuitableEncryption(const WifiDeviceConfig &config, const std::string &keyMgmt,
         std::vector<std::string> &candidateKeyMgmtList);
 
     int ReloadDeviceConfig();

@@ -1895,37 +1895,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         }
 #endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
-        WifiLinkedInfo linkedInfo;
-        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-        UpdatePortalState(netState, updatePortalAuthTime);
-#ifndef OHOS_ARCH_LITE
-        if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK
-            && WifiConfigCenter::GetInstance().IsAllowPopUp()) {
-            ShowPortalNitification();
-        }
-#endif
-        if (portalFlag == false) {
-            WriteIsInternetHiSysEvent(NO_NETWORK);
-            WritePortalStateHiSysEvent(HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED);
-            HandlePortalNetworkPorcess();
-            portalFlag = true;
-        }
-        bool isHomeAp = false;
-        bool isHomeRouter = false;
-#ifndef OHOS_ARCH_LITE
-        isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
-        isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
-#endif
-        WriteIsInternetHiSysEvent(NETWORK);
-        SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
-        InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
-        WifiDeviceConfig config;
-        WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
-        if ((linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) && config.keyMgmt != KEY_MGMT_NONE) {
-            InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
-        } else {
-            InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
-        }
+        HandleNetCheckResultIsPortal(netState, updatePortalAuthTime);
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
 #ifndef OHOS_ARCH_LITE
@@ -1947,6 +1917,41 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
     portalFlag = true;
     TryModifyPortalAttribute(netState);
+}
+
+void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    UpdatePortalState(netState, updatePortalAuthTime);
+#ifndef OHOS_ARCH_LITE
+    if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK
+        && WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+        ShowPortalNitification();
+    }
+#endif
+    if (portalFlag == false) {
+        WriteIsInternetHiSysEvent(NO_NETWORK);
+        WritePortalStateHiSysEvent(HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED);
+        HandlePortalNetworkPorcess();
+        portalFlag = true;
+    }
+    bool isHomeAp = false;
+    bool isHomeRouter = false;
+#ifndef OHOS_ARCH_LITE
+    isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
+    isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
+#endif
+    WriteIsInternetHiSysEvent(NETWORK);
+    SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
+    InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
+    if ((linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) && config.keyMgmt != KEY_MGMT_NONE) {
+        InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
+    } else {
+        InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
+    }
 }
 
 void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)

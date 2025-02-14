@@ -3138,32 +3138,8 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     }
 }
 
-static bool WpaCompare(const std::string& a, const std::string& b)
-{
-    const std::unordered_map<std::string, int> priority = {
-        {KEY_MGMT_SAE, 2},
-        {KEY_MGMT_WPA_PSK, 1}
-    };
-
-    auto positionA = priority.find(a);
-    auto positionB = priority.find(b);
-    if (positionA != priority.end() && positionB != priority.end()) {
-        return positionA->second > positionB->second;
-    }
-    return false;
-}
-
-std::string StaStateMachine::DetermineWinner(std::vector<std::string>& candidates,
-    bool (*compare)(const std::string&, const std::string&)) const
-{
-    if (candidates.size() == 1) {
-        return candidates.front();
-    }
-    std::sort(candidates.begin(), candidates.end(), compare);
-    return candidates.front();
-}
-
-std::string StaStateMachine::MatchBestEncryption(const WifiDeviceConfig &config, const std::string bssid) const
+std::string StaStateMachine::GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfig &config,
+    const std::string bssid) const
 {
     std::vector<WifiScanInfo> scanInfoList;
     std::vector<std::string> candidateKeyMgmtList;
@@ -3173,15 +3149,17 @@ std::string StaStateMachine::MatchBestEncryption(const WifiDeviceConfig &config,
             std::string deviceKeyMgmt;
             scanInfo.GetDeviceMgmt(deviceKeyMgmt);
             if (WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
-                candidateKeyMgmtList = WifiSettings::GetInstance().GetAllSuitableEncryption(config, deviceKeyMgmt);
+                WifiSettings::GetInstance().GetAllSuitableEncryption(config, deviceKeyMgmt, candidateKeyMgmtList);
                 break;
             }
         }
     }
-    if (candidateKeyMgmtList.size() != 0) {
-        return config.keyMgmt;
+    for (auto keyMgmt : candidateKeyMgmtList) {
+        if (keyMgmt == KEY_MGMT_SAE) {
+            return KEY_MGMT_SAE;
+        }
     }
-    return DetermineWinner(candidateKeyMgmtList, WpaCompare);
+    return KEY_MGMT_WPA_PSK;
 }
 
 ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const
@@ -3194,14 +3172,15 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string 
         halDeviceConfig.authAlgorithms = 0x02;
     }
 
-    halDeviceConfig.keyMgmt = MatchBestEncryption(config, bssid);
-    config.keyMgmt = halDeviceConfig.keyMgmt;
-
-    halDeviceConfig.isRequirePmf = halDeviceConfig.keyMgmt == KEY_MGMT_SAE;
-    if (halDeviceConfig.isRequirePmf) {
-        halDeviceConfig.allowedProtocols = 0x02; // RSN
-        halDeviceConfig.allowedPairwiseCiphers = 0x2c; // CCMP|GCMP|GCMP-256
-        halDeviceConfig.allowedGroupCiphers = 0x2c; // CCMP|GCMP|GCMP-256
+    if (config.keyMgmt == KEY_MGMT_WPA_PSK || config.keyMgmt == KEY_MGMT_SAE) {
+        halDeviceConfig.keyMgmt = MatchBestEncryption(config, bssid);
+        config.keyMgmt = halDeviceConfig.keyMgmt;
+        halDeviceConfig.isRequirePmf = halDeviceConfig.keyMgmt == KEY_MGMT_SAE;
+        if (halDeviceConfig.isRequirePmf) {
+            halDeviceConfig.allowedProtocols = 0x02; // RSN
+            halDeviceConfig.allowedPairwiseCiphers = 0x2c; // CCMP|GCMP|GCMP-256
+            halDeviceConfig.allowedGroupCiphers = 0x2c; // CCMP|GCMP|GCMP-256
+        }
     }
 
     for (int i = 0; i < HAL_MAX_WEPKEYS_SIZE; i++) {

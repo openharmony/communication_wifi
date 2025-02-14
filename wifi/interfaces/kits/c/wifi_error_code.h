@@ -65,7 +65,10 @@ typedef enum {
     /** Get enhance service failed */
     ERROR_WIFI_ENHANCE_SVC = -10,
     /** Unknown error */
-    ERROR_WIFI_UNKNOWN = -128
+    ERROR_WIFI_UNKNOWN = -128,
+    /** P2P error num */
+    /** P2P is running but has no group */
+    ERROR_P2P_GROUP_NOT_AVAILABLE = -200,
 } WifiErrorCode;
 
 #endif // WIFI_ERROR_CODE_C_H

@@ -709,17 +709,20 @@ HWTEST_F(WifiSettingsTest, GetAllSuitableEncryptionTest, TestSize.Level1)
     std::vector<std::string> result;
     keyMgmt = "WPA-PSK+SAE";
     config.keyMgmtBitset = 4;
-    result = WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt);
+    WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt, result);
     EXPECT_EQ(result.front(), "WPA-PSK");
+    result.clear();
     config.keyMgmtBitset = 8;
-    result = WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt);
+    WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt, result);
     EXPECT_EQ(result.front(), "SAE");
+    result.clear();
     config.keyMgmtBitset = 1;
-    result = WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt);
+    WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt, result);
     EXPECT_EQ(result.size(), 0);
+    result.clear();
     config.keyMgmt = "WPA-PSK";
     config.keyMgmtBitset = 4;
-    result = WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt);
+    WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt, result);
     EXPECT_EQ(result.front(), "WPA-PSK");
 }
 }  // namespace Wifi

@@ -3173,7 +3173,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string 
     }
 
     if (config.keyMgmt == KEY_MGMT_WPA_PSK || config.keyMgmt == KEY_MGMT_SAE) {
-        halDeviceConfig.keyMgmt = MatchBestEncryption(config, bssid);
+        halDeviceConfig.keyMgmt = GetSuitableKeyMgmtForWpaMixed(config, bssid);
         config.keyMgmt = halDeviceConfig.keyMgmt;
         halDeviceConfig.isRequirePmf = halDeviceConfig.keyMgmt == KEY_MGMT_SAE;
         if (halDeviceConfig.isRequirePmf) {

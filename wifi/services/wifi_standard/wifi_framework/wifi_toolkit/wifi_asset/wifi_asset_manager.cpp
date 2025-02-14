@@ -17,6 +17,7 @@
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
 #include "wifi_config_center.h"
+#include "parameters.h"
  
 namespace OHOS {
 namespace Wifi {
@@ -175,7 +176,7 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
         {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value = g_trustAccountValue},
     };
     ret = AssetAdd(attr, sizeof(attr) / sizeof(attr[0]));
-    if (flagSync) {
+    if (flagSync && ret == SEC_ASSET_SUCCESS) {
         WifiAssetManager::GetInstance().WifiAssetTriggerSync();
     }
     return ret;
@@ -528,7 +529,8 @@ void WifiAssetManager::DealStaConnChanged(OperateResState state, const WifiLinke
 {
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         LOGI("WifiAsset network connected");
-        if (info.networkId != currentConnectedNetworkId_) {
+        if (info.networkId != currentConnectedNetworkId_ &&
+            system::GetParameter("persist.wifi.is_connect_from_user", "") == "1") {
             WifiAssetTriggerSync();
         }
         currentConnectedNetworkId_ = info.networkId;

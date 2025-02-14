@@ -3174,13 +3174,18 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string 
 
     if (config.keyMgmt == KEY_MGMT_WPA_PSK || config.keyMgmt == KEY_MGMT_SAE) {
         halDeviceConfig.keyMgmt = GetSuitableKeyMgmtForWpaMixed(config, bssid);
-        config.keyMgmt = halDeviceConfig.keyMgmt;
-        halDeviceConfig.isRequirePmf = halDeviceConfig.keyMgmt == KEY_MGMT_SAE;
-        if (halDeviceConfig.isRequirePmf) {
-            halDeviceConfig.allowedProtocols = 0x02; // RSN
-            halDeviceConfig.allowedPairwiseCiphers = 0x2c; // CCMP|GCMP|GCMP-256
-            halDeviceConfig.allowedGroupCiphers = 0x2c; // CCMP|GCMP|GCMP-256
+        if (config.keyMgmt != halDeviceConfig.keyMgmt) {
+            config.keyMgmt = halDeviceConfig.keyMgmt;
+            WifiSettings::GetInstance().AddDeviceConfig(config);
+            WifiSettings::GetInstance().SyncDeviceConfig();
         }
+    }
+
+    halDeviceConfig.isRequirePmf = halDeviceConfig.keyMgmt == KEY_MGMT_SAE;
+    if (halDeviceConfig.isRequirePmf) {
+        halDeviceConfig.allowedProtocols = 0x02; // RSN
+        halDeviceConfig.allowedPairwiseCiphers = 0x2c; // CCMP|GCMP|GCMP-256
+        halDeviceConfig.allowedGroupCiphers = 0x2c; // CCMP|GCMP|GCMP-256
     }
 
     for (int i = 0; i < HAL_MAX_WEPKEYS_SIZE; i++) {
@@ -3809,14 +3814,14 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid, ifaceName);
         deviceConfig.userSelectBssid = "";
+        WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
+        WifiSettings::GetInstance().SyncDeviceConfig();
     } else {
         // auto connect
         WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName);
     }
 
-    WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
-    WifiSettings::GetInstance().SyncDeviceConfig();
     if (WifiStaHalInterface::GetInstance().Connect(WPA_DEFAULT_NETWORKID, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Connect failed!");
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);

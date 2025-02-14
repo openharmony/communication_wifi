@@ -2353,12 +2353,7 @@ ErrCode WifiDeviceServiceImpl::UpdateNetworkLagInfo(const NetworkLagType network
         WIFI_LOGE("UpdateNetworkLagInfo:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
- 
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("UpdateNetworkLagInfo: NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
- 
+
     // date distribute
     ErrCode ret = WIFI_OPT_SUCCESS;
 #ifdef FEATURE_WIFI_PRO_SUPPORT

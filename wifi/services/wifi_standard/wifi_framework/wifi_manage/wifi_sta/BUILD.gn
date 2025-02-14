@@ -123,7 +123,6 @@ if (defined(ohos_lite)) {
       debug = false
     }
     sources = local_base_sources
-    sources += [ "sta_app_acceleration.cpp" ]
 
     include_dirs = local_base_include_dirs
     cflags = memory_optimization_cflags

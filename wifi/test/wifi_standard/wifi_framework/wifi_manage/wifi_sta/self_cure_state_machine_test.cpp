@@ -288,71 +288,10 @@ public:
         EXPECT_NE(pSelfCureStateMachine_->instId_, TEN);
     }
 
-    void InitDnsServerTest()
-    {
-        LOGI("Enter InitDnsServerTest");
-        SelfCureUtils::GetInstance().InitDnsServer();
-    }
-
     void IsCustNetworkSelfCureTest()
     {
         LOGI("Enter IsCustNetworkSelfCureTest");
         pSelfCureStateMachine_->IsCustNetworkSelfCure();
-    }
-
-    void SelfCureForDnsTest()
-    {
-        LOGI("Enter SelfCureForDnsTest");
-        pSelfCureStateMachine_->isInternetUnknown_ = true;
-        pSelfCureStateMachine_->pInternetSelfCureState_->SelfCureForDns();
-        pSelfCureStateMachine_->isInternetUnknown_ = false;
-        pSelfCureStateMachine_->pInternetSelfCureState_->SelfCureForDns();
-        EXPECT_NE(pSelfCureStateMachine_->instId_, TEN);
-    }
-
-    void GetPublicDnsServersTest()
-    {
-        LOGI("Enter GetPublicDnsServersTest");
-        std::string countryCode;
-        std::vector<std::string> publicDnsServersTest;
-        WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
-        SelfCureUtils::GetInstance().GetPublicDnsServers(publicDnsServersTest);
-    }
-
-    void GetReplacedDnsServersTest()
-    {
-        LOGI("Enter GetReplacedDnsServersTest");
-        std::vector<std::string> serverTest = {"180.76.76.76", "223.5.5.5"};
-        std::vector<std::string> ReplacedDnsServersTest;
-        SelfCureUtils::GetInstance().GetReplacedDnsServers(serverTest, ReplacedDnsServersTest);
-        std::vector<std::string> serverDnsTest = {"", ""};
-        SelfCureUtils::GetInstance().GetReplacedDnsServers(serverDnsTest, ReplacedDnsServersTest);
-        EXPECT_NE(pSelfCureStateMachine_->instId_, TEN);
-    }
-
-    void UpdateDnsServersTest()
-    {
-        LOGI("Enter UpdateDnsServersTest");
-        IpInfo ipInfo;
-        IpV6Info ipV6Info;
-        WifiDeviceConfig config;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _)).Times(AtLeast(0));
-        WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipV6Info, config.wifiProxyconfig, 0);
-        std::vector<std::string> dnsServerTest = {"180.76.76.76", "223.5.5.5"};
-        pSelfCureStateMachine_->pInternetSelfCureState_->UpdateDnsServers(dnsServerTest);
-        std::vector<std::string> dnsesServerTest = {"", ""};
-        pSelfCureStateMachine_->pInternetSelfCureState_->UpdateDnsServers(dnsesServerTest);
-    }
-
-    void ResetDnsesTest()
-    {
-        LOGI("Enter resetDnsesTest");
-        std::vector<std::string> dnsesTest = {"180.76.76.76", "223.5.5.5"};
-        pSelfCureStateMachine_->pInternetSelfCureState_->resetDnses(dnsesTest);
-        std::vector<std::string> dnsesServerTest = {"", ""};
-        pSelfCureStateMachine_->pInternetSelfCureState_->resetDnses(dnsesServerTest);
-        EXPECT_NE(pSelfCureStateMachine_->instId_, TEN);
     }
 
     void HandleInvalidIpTest()
@@ -846,11 +785,8 @@ public:
         pSelfCureStateMachine_->pInternetSelfCureState_->currentAbnormalType_ = WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY;
         pSelfCureStateMachine_->pInternetSelfCureState_->SelectedSelfCureAcceptable();
         
-        pSelfCureStateMachine_->pInternetSelfCureState_->selfCureHistoryInfo_.dnsSelfCureFailedCnt =
+        pSelfCureStateMachine_->pInternetSelfCureState_->selfCureHistoryInfo_.resetSelfCureFailedCnt =
             SELFCURE_FAILED_CNT;
-        SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(pSelfCureStateMachine_->pInternetSelfCureState_->
-            selfCureHistoryInfo_, WIFI_CURE_RESET_LEVEL_LOW_1_DNS, false);
-        pSelfCureStateMachine_->pInternetSelfCureState_->SelectedSelfCureAcceptable();
 
         pSelfCureStateMachine_->pInternetSelfCureState_->currentAbnormalType_ = WIFI_CURE_INTERNET_FAILED_TYPE_TCP;
         pSelfCureStateMachine_->pInternetSelfCureState_->SelectedSelfCureAcceptable();
@@ -897,7 +833,6 @@ public:
         pSelfCureStateMachine_->pInternetSelfCureState_->ConfirmInternetSelfCure(currentCureLevel);
         
         pSelfCureStateMachine_->isHttpReachable_ = true;
-        pSelfCureStateMachine_->pInternetSelfCureState_->currentSelfCureLevel_ = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
         pSelfCureStateMachine_->isInternetUnknown_ = true;
 
         currentCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
@@ -980,8 +915,6 @@ public:
         pSelfCureStateMachine_->pInternetSelfCureState_->isSetStaticIp4InvalidIp_ = true;
         pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
 
-        currentCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
-        pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
         currentCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
         pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
         currentCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
@@ -1806,42 +1739,10 @@ HWTEST_F(SelfCureStateMachineTest, HandleGatewayChangedTest, TestSize.Level1)
     HandleGatewayChangedTest();
 }
 
-HWTEST_F(SelfCureStateMachineTest, InitDnsServerTest, TestSize.Level1)
-{
-    InitDnsServerTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
-}
-
 HWTEST_F(SelfCureStateMachineTest, IsCustNetworkSelfCureTest, TestSize.Level1)
 {
     IsCustNetworkSelfCureTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
-}
-
-HWTEST_F(SelfCureStateMachineTest, SelfCureForDnsTest, TestSize.Level1)
-{
-    SelfCureForDnsTest();
-}
-
-HWTEST_F(SelfCureStateMachineTest, GetPublicDnsServersTest, TestSize.Level1)
-{
-    GetPublicDnsServersTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
-}
-
-HWTEST_F(SelfCureStateMachineTest, GetReplacedDnsServersTest, TestSize.Level1)
-{
-    GetReplacedDnsServersTest();
-}
-
-HWTEST_F(SelfCureStateMachineTest, UpdateDnsServersTest, TestSize.Level1)
-{
-    UpdateDnsServersTest();
-}
-
-HWTEST_F(SelfCureStateMachineTest, ResetDnsesTest, TestSize.Level1)
-{
-    ResetDnsesTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, HandleInvalidIpTest, TestSize.Level1)
@@ -2661,10 +2562,6 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest, TestSize.Level1)
         "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"};
     int cnt = SELFCURE_FAIL_LENGTH;
     EXPECT_EQ(SelfCureUtils::GetInstance().SetSelfCureFailInfo(info, histories, cnt), 0);
-    EXPECT_EQ(info.dnsSelfCureFailedCnt, 1);
-    EXPECT_EQ(info.lastDnsSelfCureFailedTs, 2);
-    EXPECT_EQ(info.renewDhcpSelfCureFailedCnt, 3);
-    EXPECT_EQ(info.lastRenewDhcpSelfCureFailedTs, 4);
     EXPECT_EQ(info.staticIpSelfCureFailedCnt, 5);
     EXPECT_EQ(info.lastStaticIpSelfCureFailedTs, 6);
     EXPECT_EQ(info.reassocSelfCureFailedCnt, 7);
@@ -2884,15 +2781,6 @@ HWTEST_F(SelfCureStateMachineTest, GetCurrentWifiDeviceConfigTest, TestSize.Leve
     pSelfCureStateMachine_->GetCurrentWifiDeviceConfig(config);
 }
 
-HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_Dns_ReturnsTrue, TestSize.Level1)
-{
-    WifiSelfCureHistoryInfo historyInfo;
-    historyInfo.dnsSelfCureFailedCnt = 0;
-    int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
-    bool result = SelfCureUtils::GetInstance().SelfCureAcceptable(historyInfo, requestCureLevel);
-    ASSERT_TRUE(result);
-}
-
 HWTEST_F(SelfCureStateMachineTest, SelfCureAcceptable_StaticIp_ReturnsTrue, TestSize.Level1)
 {
     WifiSelfCureHistoryInfo historyInfo;
@@ -2992,38 +2880,13 @@ HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureConnectHistoryInfo_Failure_Rese
     ASSERT_EQ(historyInfo.resetSelfCureConnectFailedCnt, 1);
 }
 
-
-HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureHistoryInfo_Success_DnsSelfCureFailedCntZero, TestSize.Level1)
-{
-    WifiSelfCureHistoryInfo historyInfo;
-    historyInfo.dnsSelfCureFailedCnt = 1;
-    historyInfo.lastDnsSelfCureFailedTs = 1234567890;
-    int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
-    bool success = true;
-    SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
-    EXPECT_EQ(historyInfo.dnsSelfCureFailedCnt, 0);
-    EXPECT_EQ(historyInfo.lastDnsSelfCureFailedTs, 0);
-}
-
-HWTEST_F(SelfCureStateMachineTest, UpdateSelfCureHistoryInfo_Failure_DnsSelfCureFailedCntIncremented, TestSize.Level1)
-{
-    WifiSelfCureHistoryInfo historyInfo;
-    historyInfo.dnsSelfCureFailedCnt = 1;
-    historyInfo.lastDnsSelfCureFailedTs = 1234567890;
-    int requestCureLevel = WIFI_CURE_RESET_LEVEL_LOW_1_DNS;
-    bool success = false;
-    SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
-    EXPECT_EQ(historyInfo.dnsSelfCureFailedCnt, 2);
-    EXPECT_NE(historyInfo.lastDnsSelfCureFailedTs, 0);
-}
-
 HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_SuccessfulReassoc, TestSize.Level1)
 {
     WifiSelfCureHistoryInfo historyInfo;
     int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
     bool success = true;
 
-    SelfCureUtils::GetInstance().UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+    SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
 
     EXPECT_EQ(historyInfo.reassocSelfCureFailedCnt, 0);
     EXPECT_EQ(historyInfo.lastReassocSelfCureFailedTs, 0);
@@ -3035,7 +2898,7 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedReasso
     int requestCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
     bool success = false;
 
-    SelfCureUtils::GetInstance().UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+    SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
 
     EXPECT_EQ(historyInfo.reassocSelfCureFailedCnt, 1);
     EXPECT_NE(historyInfo.lastReassocSelfCureFailedTs, 0);
@@ -3047,7 +2910,7 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_SuccessfulRa
     int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
     bool success = true;
 
-    SelfCureUtils::GetInstance().UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+    SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
 
     EXPECT_EQ(historyInfo.randMacSelfCureFailedCnt, 0);
     EXPECT_EQ(historyInfo.lastRandMacSelfCureFailedCntTs, 0);
@@ -3059,7 +2922,7 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedRandMa
     int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
     bool success = false;
 
-    SelfCureUtils::GetInstance().UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+    SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
 
     EXPECT_EQ(historyInfo.randMacSelfCureFailedCnt, 1);
     EXPECT_NE(historyInfo.lastRandMacSelfCureFailedCntTs, 0);
@@ -3071,7 +2934,7 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_SuccessfulHi
     int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
     bool success = true;
 
-    SelfCureUtils::GetInstance().UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+    SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
 
     EXPECT_EQ(historyInfo.resetSelfCureFailedCnt, 0);
     EXPECT_EQ(historyInfo.lastResetSelfCureFailedTs, 0);
@@ -3083,7 +2946,7 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedHighRe
     int requestCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
     bool success = false;
 
-    SelfCureUtils::GetInstance().UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
+    SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(historyInfo, requestCureLevel, success);
 
     EXPECT_EQ(historyInfo.resetSelfCureFailedCnt, 1);
     EXPECT_NE(historyInfo.lastResetSelfCureFailedTs, 0);

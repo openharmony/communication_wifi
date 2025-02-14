@@ -978,6 +978,7 @@ private:
     void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
     void UpdateHiLinkAttribute();
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
+    void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;

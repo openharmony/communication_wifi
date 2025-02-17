@@ -1109,7 +1109,6 @@ void OnFetchWifiSignalInfoForVoWiFiTest(const uint8_t* data, size_t size)
 
 void OnIsSupportVoWifiDetectTest(const uint8_t* data, size_t size)
 {
-    StopMonitor();
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");

@@ -369,7 +369,7 @@ bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
         }
         return true;
     }
-    int minLen = config.keyMgmt == KEY_MGMT_SAE ? MIN_SAE_LEN : MIN_PSK_LEN;
+    int minLen = MIN_SAE_LEN;
     int maxLen = isAllHex ? MAX_HEX_LEN : MAX_PRESHAREDKEY_LEN;
     if (len < minLen || len > maxLen) {
         WIFI_LOGE("CheckConfigPwd: preSharedKey length error: %{public}d", len);

@@ -538,10 +538,8 @@ bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
     std::string scanMgmt = "";
     for (auto item : scanInfoList) {
         item.GetDeviceMgmt(scanMgmt);
-        if ((scanMgmt.compare("WPA-PSK+SAE") == 0 && item.ssid == config.ssid &&
-            scanMgmt.find(config.keyMgmt) != std::string::npos) ||
-            (item.ssid == config.ssid && scanMgmt == config.keyMgmt)) {
-                return false;
+        if (item.ssid == config.ssid && WifiSettings::GetInstance().InKeyMgmtBitset(config, scanMgmt)) {
+            return false;
         }
     }
     return true;
@@ -3140,7 +3138,32 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     }
 }
 
-ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const
+std::string StaStateMachine::GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfig &config,
+    const std::string &bssid) const
+{
+    std::vector<WifiScanInfo> scanInfoList;
+    std::vector<std::string> candidateKeyMgmtList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
+    for (auto scanInfo : scanInfoList) {
+        // bssid.empty or match scanInfo's bssid
+        if (config.ssid == scanInfo.ssid && (bssid.empty() || bssid == scanInfo.bssid)) {
+            std::string deviceKeyMgmt;
+            scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+            if (WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
+                WifiSettings::GetInstance().GetAllSuitableEncryption(config, deviceKeyMgmt, candidateKeyMgmtList);
+                break;
+            }
+        }
+    }
+    for (auto keyMgmt : candidateKeyMgmtList) {
+        if (keyMgmt == KEY_MGMT_SAE) {
+            return KEY_MGMT_SAE;
+        }
+    }
+    return KEY_MGMT_WPA_PSK;
+}
+
+ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const
 {
     WIFI_LOGI("Enter ConvertDeviceCfg.\n");
     WifiHalDeviceConfig halDeviceConfig;
@@ -3150,20 +3173,17 @@ ErrCode StaStateMachine::ConvertDeviceCfg(const WifiDeviceConfig &config, std::s
         halDeviceConfig.authAlgorithms = 0x02;
     }
 
-    if (IsWpa3Transition(config.ssid, bssid)) {
-        if (IsInWpa3BlackMap(config.ssid)) {
-            halDeviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
-        } else {
-            halDeviceConfig.keyMgmt = KEY_MGMT_SAE;
+    if (config.keyMgmt == KEY_MGMT_WPA_PSK || config.keyMgmt == KEY_MGMT_SAE) {
+        halDeviceConfig.keyMgmt = GetSuitableKeyMgmtForWpaMixed(config, bssid);
+        if (config.keyMgmt != halDeviceConfig.keyMgmt) {
+            config.keyMgmt = halDeviceConfig.keyMgmt;
+            WifiSettings::GetInstance().AddDeviceConfig(config);
+            WifiSettings::GetInstance().SyncDeviceConfig();
         }
-        halDeviceConfig.isRequirePmf = false;
     }
 
-    if (config.keyMgmt.find("SAE") != std::string::npos) {
-        halDeviceConfig.isRequirePmf = true;
-    }
-
-    if (halDeviceConfig.keyMgmt.find("SAE") != std::string::npos) {
+    halDeviceConfig.isRequirePmf = halDeviceConfig.keyMgmt == KEY_MGMT_SAE;
+    if (halDeviceConfig.isRequirePmf) {
         halDeviceConfig.allowedProtocols = 0x02; // RSN
         halDeviceConfig.allowedPairwiseCiphers = 0x2c; // CCMP|GCMP|GCMP-256
         halDeviceConfig.allowedGroupCiphers = 0x2c; // CCMP|GCMP|GCMP-256

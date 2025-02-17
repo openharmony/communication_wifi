@@ -532,7 +532,7 @@ private:
      --=* @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const;
+    ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const;
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -974,6 +974,7 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    std::string GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfig &config, const std::string &bssid) const;
     void TryModifyPortalAttribute(SystemNetWorkState netState);
     void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
     void UpdateHiLinkAttribute();

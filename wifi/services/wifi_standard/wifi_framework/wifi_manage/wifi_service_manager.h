@@ -22,6 +22,7 @@
 
 #include "ista_service.h"
 #include "iscan_service.h"
+#include "wifi_library_utils.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service.h"
 #endif
@@ -287,6 +288,19 @@ private:
 #endif
     EnhanceServiceHandle mEnhanceServiceHandle;
 };
+
+#ifdef FEATURE_AP_SUPPORT
+class WifiApServiceUtil {
+public:
+    WifiApServiceUtil() : wifiLibraryUtils_ ("libwifi_ap_service.z.so", libApServiceHandle_, false) {}
+    ~WifiApServiceUtil() {}
+    IApService *CreateApInterface(int id);
+    void DestroyApInterface(IApService *apService);
+private:
+    WifiLibraryUtils wifiLibraryUtils_;
+    static void* libApServiceHandle_;
+};
+#endif
 } // namespace Wifi
 } // namespace OHOS
 #endif

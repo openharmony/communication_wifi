@@ -185,7 +185,12 @@ int WifiServiceManager::LoadApService(const std::string &dlname, bool bCreate)
     if (mApServiceHandle.pService[0]) {
         return 0;
     }
-    IApService *service = new ApInterface();
+    WifiApServiceUtil wifiApServiceUtil;
+    IApService *service = wifiApServiceUtil.CreateApInterface(0);
+    if (service == nullptr) {
+        WIFI_LOGE("WifiServiceManager::LoadApService create service failed");
+        return -1;
+    }
     mApServiceHandle.pService[0] = service;
     WifiManager::GetInstance().GetWifiHotspotManager()->StopUnloadApSaTimer();
     return 0;
@@ -477,7 +482,8 @@ NO_SANITIZE("cfi") int WifiServiceManager::UnloadApService(bool bPreLoad, int id
     auto iter = mApServiceHandle.pService.find(id);
     if (iter != mApServiceHandle.pService.end()) {
         if (iter->second != nullptr) {
-            delete iter->second;
+            WifiApServiceUtil wifiApServiceUtil;
+            wifiApServiceUtil.DestroyApInterface(iter->second);
             iter->second = nullptr;
         }
         mApServiceHandle.pService.erase(id);
@@ -585,5 +591,35 @@ void WifiServiceManager::UninstallAllService()
 #endif
     return;
 }
+#ifdef FEATURE_AP_SUPPORT
+void* WifiApServiceUtil::libApServiceHandle_ = nullptr;
+IApService *WifiApServiceUtil::CreateApInterface(int id)
+{
+    if (libApServiceHandle_ == nullptr) {
+        return nullptr;
+    }
+    using CreateApInterfaceFunc = IApService *(*)(int);
+    CreateApInterfaceFunc createApInterface =
+        reinterpret_cast<CreateApInterfaceFunc>(wifiLibraryUtils_.GetFunction("CreateApInterface"));
+    if (createApInterface == nullptr) {
+        return nullptr;
+    }
+    return createApInterface(id);
+}
+
+void WifiApServiceUtil::DestroyApInterface(IApService *service)
+{
+    if (libApServiceHandle_ == nullptr) {
+        return;
+    }
+    using DestroyApInterfaceFunc = void (*)(IApService *);
+    DestroyApInterfaceFunc destroyApInterface =
+        reinterpret_cast<DestroyApInterfaceFunc>(wifiLibraryUtils_.GetFunction("DestroyApInterface"));
+    if (destroyApInterface == nullptr) {
+        return;
+    }
+    destroyApInterface(service);
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

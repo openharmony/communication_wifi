@@ -3139,12 +3139,13 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
 }
 
 std::string StaStateMachine::GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfig &config,
-    const std::string bssid) const
+    const std::string &bssid) const
 {
     std::vector<WifiScanInfo> scanInfoList;
     std::vector<std::string> candidateKeyMgmtList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     for (auto scanInfo : scanInfoList) {
+        // bssid.empty or match scanInfo's bssid
         if (config.ssid == scanInfo.ssid && (bssid.empty() || bssid == scanInfo.bssid)) {
             std::string deviceKeyMgmt;
             scanInfo.GetDeviceMgmt(deviceKeyMgmt);

@@ -355,17 +355,32 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateStaticTimePointTest, TestSize.Level
     WIFI_LOGI("UpdateStaticTimePointTest enter");
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
 
-    std::time_t testTime = 315559083;  // 1980-01-01
-    std::tm* localTime = std::localtime(&testTime);
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.currenttStaticTimePoint_ = testTime;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordDayInWeek_ = localTime->tm_wday;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordHour_ = localTime->tm_hour;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordMinute_ = localTime->tm_min;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordSecond_ = localTime->tm_sec;
-    WifiHistoryRecordManager::GetInstance().UpdateStaticTimePoint(GetCurrentTimeStampSeconds());
+    // test valid time
+    int64_t validTime = = 315559083;  // 1980-01-01
+    WifiHistoryRecordManager::GetInstance().UpdateStaticTimePoint(validTime);
+    int64_t current1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentConnectedTime_;
+    int64_t dayIntWeek1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordDayInWeek_;
+    int64_t hour1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordHour_;
+    int64_t minute1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordMinute_;
+    int64_t second1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordSecond_ ;
 
-    long current = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currenttStaticTimePoint_;
-    EXPECT_TRUE(current != testTime);
+    std::tm* localTime = std::localTime(&validTime);
+    int dayIntWeek2 = localTime->tm_wday;
+    int hour2 = localTime->tm_hour;
+    int minute2 = localTime->tm_min;
+    int second2 = localTime->tm_sec;
+
+    EXPECT_TRUE(current1 == validTime);
+    EXPECT_TRUE(dayIntWeek1 == dayIntWeek2);
+    EXPECT_TRUE(hour1 == hour2);
+    EXPECT_TRUE(minute1 == minute2);
+    EXPECT_TRUE(second1 == second2);
+
+    // test invalid time
+    int64_t invalidTime = -10;
+    WifiHistoryRecordManager::GetInstance().UpdateStaticTimePoint(invalidTime);
+    int64_t current2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentConnectedTime_
+    EXPECT_TRUE(current2 > 0);
 }
 
 HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend1Test, TestSize.Level1)

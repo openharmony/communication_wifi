@@ -47,7 +47,7 @@ declare_args() {
   wifi_feature_with_random_mac_addr = true
   wifi_feature_with_hpf_supported = true
   wifi_feature_with_scan_control = true
-  wifi_feature_with_hdi_wpa_supported = false
+  wifi_feature_with_hdi_wpa_supported = true
   wifi_feature_network_selection = false
   wifi_feature_p2p_random_mac_addr = true
   wifi_feature_powermgr_support = false

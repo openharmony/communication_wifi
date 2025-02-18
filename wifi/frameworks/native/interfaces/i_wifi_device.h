@@ -635,6 +635,14 @@ public:
      * @return vowifi detection period
      */
     virtual ErrCode GetVoWifiDetectPeriod(int &period) = 0;
+
+    /**
+     * @Description Obtains the current Wi-Fi connection information
+     *
+     * @param mutilLinkedInfo - wifi mlo linked info
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

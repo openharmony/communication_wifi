@@ -817,5 +817,17 @@ WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &i
     return WIFI_HAL_OPT_FAILED;
 #endif
 }
+WifiErrorNo WifiStaHalInterface::GetConnectionMloSignalInfo(const std::string &ifName,
+    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+{
+    if (ifName.length() <= 0) {
+        return WIFI_HAL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->GetMloSignalPollInfo(ifName, mloSignalInfo);
+#else
+    return WIFI_HAL_OPT_FAILED;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -3549,6 +3549,48 @@ void StaStateMachine::DealSignalPollResult()
     JudgeEnableSignalPoll(signalInfo);
 }
 
+void StaStateMachine::DealMloLinkSignalPollResult()
+{
+    if (linkedInfo.wifiLinkType != WifiLinkType::WIFI7_EMLSR) {
+        WIFI_LOGD("%{public}s current linkType is not EMLSR", __FUNCTION__)
+        return;
+    }
+    std::vector<WifiMloSignalInfo> mloSignalInfo;
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (WifiStaHalInterface::GetInstance().GetConnectionMloSignalInfo(ifName, mloSignalInfo) != WIFI_HAL_OPT_OK ||
+        mloSignalInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
+        return;
+    }
+    std::vector<WifiLinkedInfo> mloLInkedInfo;
+    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLInkedInfo, m_instId);
+    int32_t maxRssi = INVALID_RSSI_VALUE;
+    for (auto linkInfo : mloLInkedInfo) {
+        bool isLinkedMatch = false;
+        for (auto signalInfo : mloSignalInfo) {
+            if (signalInfo.linkId != linkInfo.linkId) {
+                continue;
+            }
+            isLinkedMatch = true;
+            linkInfo.rssi = UpdateLinkInfoRssi(signalInfo.rssi);
+            maxRssi = linkInfo.rssi > maxRssi ? linkInfo.rssi : maxRssi;
+            linkInfo.frequency = signalInfo.frequency;
+            linkInfo.linkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;;
+            linkInfo.txLinkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;;
+            linkInfo.rxLinkSpeed = signalInfo.rxLinkSpeed / TRANSFORMATION_TO_MBPS;;
+            WIFI_LOGI("%{public}s networkId:%{public}d, ssid:%{public}s, linkId:%{public}d, rssi: %{public}d,"
+                "fre: %{public}d, txSpeed: %{public}d, rxSpeed: %{public}d", __FUNCTION__,
+                linkedInfo.networkId, SsidAnonymize(linkedInfo.ssid).c_str(), linkInfo.linkId, linkInfo.rssi,
+                linkInfo.frequency, linkInfo.txLinkSpeed, linkInfo.rxLinkSpeed);
+        }
+        if (!isLinkedMatch) {
+            WIFI_LOGE("%{public}s linkId:%{public}d not match", __FUNCTION__, linkInfo.linkId);
+            return;
+        }
+    }
+    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
+    linkedInfo.rssi = maxRssi;
+}
+
 void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
 {
 #ifndef OHOS_ARCH_LITE

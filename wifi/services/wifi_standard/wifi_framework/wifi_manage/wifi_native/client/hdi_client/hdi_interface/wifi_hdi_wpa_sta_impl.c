@@ -1198,7 +1198,7 @@ WifiErrorNo HdiWpaGetMloLinkedInfo(const char *ifName, const char *staParam, cha
     if (result != HDF_SUCCESS) {
         LOGE("%{public}s: failed to GetWpaStaData, result:%{public}d", __func__, result);
         pthread_mutex_unlock(GetWpaObjMutex());
-        return WIFI_HAL_OPT_FAILED;
+        return result;
     }
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("GetWpaStaData for mlo success.");

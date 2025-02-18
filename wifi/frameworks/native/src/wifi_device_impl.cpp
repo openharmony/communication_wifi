@@ -683,5 +683,12 @@ ErrCode WifiDeviceImpl::GetVoWifiDetectPeriod(int &period)
     return client_->GetVoWifiDetectPeriod(period);
 }
 
+ErrCode WifiDeviceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetMultiLinkedInfo(mutilLinkedInfo);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

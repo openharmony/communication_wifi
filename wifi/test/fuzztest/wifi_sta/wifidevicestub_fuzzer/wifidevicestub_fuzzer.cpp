@@ -1047,6 +1047,114 @@ void RegisterFilterBuilderTest(const uint8_t* data, size_t size)
     pWifiDeviceServiceImpl->RegisterFilterBuilder(filterTag, bssid, filterBuilder);
 }
 
+void OnGetDeviceConfigTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG), datas);
+}
+
+void OnIsFeatureSupportedTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_FEATURE_SUPPORTED), datas);
+}
+
+void OnUpdateNetworkLagInfoTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_NETWORK_LAG_INFO), datas);
+}
+
+void OnReceiveNetworkControlInfoTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_NET_CONTROL_INFO), datas);
+}
+
+void OnFetchWifiSignalInfoForVoWiFiTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_FETCH_SIGNALINFO_VOWIFI), datas);
+}
+
+void OnIsSupportVoWifiDetectTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SUPPORT_VOWIFI_DETECT), datas);
+}
+
+void OnSetVoWifiDetectModeTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_VOWIFI_DETECT_MODE), datas);
+}
+
+void OnSetVoWifiDetectPeriodTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_VOWIFI_DETECT_PERIOD), datas);
+}
+
+void OnGetVoWifiDetectPeriodTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD), datas);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -1121,6 +1229,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::EnableHiLinkHandshakeTest(data, size);
     OHOS::Wifi::RegisterFilterBuilderTest(data, size);
     OHOS::Wifi::OnSetDpiMarkRuleTest(data, size);
+    OHOS::Wifi::OnGetDeviceConfigTest(data, size);
+    OHOS::Wifi::OnIsFeatureSupportedTest(data, size);
+    OHOS::Wifi::OnUpdateNetworkLagInfoTest(data, size);
+    OHOS::Wifi::OnReceiveNetworkControlInfoTest(data, size);
+    OHOS::Wifi::OnFetchWifiSignalInfoForVoWiFiTest(data, size);
+    OHOS::Wifi::OnIsSupportVoWifiDetectTest(data, size);
+    OHOS::Wifi::OnSetVoWifiDetectModeTest(data, size);
+    OHOS::Wifi::OnSetVoWifiDetectPeriodTest(data, size);
+    OHOS::Wifi::OnGetVoWifiDetectPeriodTest(data, size);
     sleep(4);
     return 0;
 }

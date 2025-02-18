@@ -440,10 +440,10 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
         }
         RemoveIfaceName(ifName);
     }
-    if (strcmp(ifName, "p2p0", strlen("p2p0")) == 0) {
+    if (strncmp(ifName, "p2p0", strlen("p2p0")) == 0) {
         ReleaseP2pCallback();
     }
-    if (strcmp(ifName, "wlan0", strlen("wlan0")) == 0) {
+    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
         ReleaseP2pCallback(ifName);
     }
     pthread_mutex_unlock(&g_wpaObjMutex);

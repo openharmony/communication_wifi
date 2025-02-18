@@ -51,7 +51,7 @@ static struct IWpaCallback *g_hdiWpaP2pCallbackObj = NULL;
 
 void ReleaseP2pCallback(void)
 {
-    StubCollectorRemoveObject(IWPACALL_INTERFACE_DESC, g_hdiWpaP2PCallbackObj);
+    StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaP2PCallbackObj);
     free(g_hdiWpaP2PCallbackObj);
     g_hdiWpaP2PCallbackObj = NULL;
 }

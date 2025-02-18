@@ -332,6 +332,7 @@ public:
 
     void UpLoadLocalDeviceConfigToCloud();
 #endif
+    std::string GetDefaultApSsid();
 
 private:
     WifiSettings();

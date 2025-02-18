@@ -444,7 +444,7 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
         ReleaseP2pCallback();
     }
     if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
-        ReleaseP2pCallback(ifName);
+        ReleaseStaCallback(ifName);
     }
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("%{public}s RemoveWpaIface success!", __func__);

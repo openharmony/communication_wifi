@@ -1233,6 +1233,12 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState == CONNECTED && linkedInfo.bssid == config.GetBssid()) {
+        WIFI_LOGI("Connect mac sta has connected");
+        return WIFI_OPT_STA_AND_P2P_MAC_SAME;
+    }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));
     return pService->Hid2dConnect(config);

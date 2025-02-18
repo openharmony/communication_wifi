@@ -52,8 +52,8 @@ static struct IWpaCallback *g_hdiWpaP2pCallbackObj = NULL;
 void ReleaseP2pCallback(void)
 {
     StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaP2pCallbackObj);
-    free(g_hdiWpaP2PCallbackObj);
-    g_hdiWpaP2PCallbackObj = NULL;
+    free(g_hdiWpaP2pCallbackObj);
+    g_hdiWpaP2pCallbackObj = NULL;
 }
 
 static WifiErrorNo RegisterP2pEventCallback()

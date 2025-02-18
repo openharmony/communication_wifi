@@ -776,6 +776,33 @@ public:
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
     }
 
+    void TestHandleNetCheckResultIsPortal1()
+    {
+        // test hilink and not open
+        WifiLinkedInfo linkedInfo1;
+        linkedInfo1.isHiLinkNetwork = true;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo1), Return(0)));
+        WifiDeviceConfig wifiDeviceConfig1;
+        wifiDeviceConfig1.networkStatusHistory = 149;  // 149: convert to binary 10010101
+        wifiDeviceConfig1.keyMgmt = KEY_MGMT_WPA_PSK;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
+            WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig1), Return(0)));
+        pStaStateMachine->HandleNetCheckResultIsPortal(SystemNetWorkState::NETWORK_IS_WORKING, false);
+
+        // tet not hilink and open
+        WifiLinkedInfo linkedInfo2;
+        linkedInfo1.isHiLinkNetwork = false;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).
+            WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo2), Return(0)));
+        WifiDeviceConfig wifiDeviceConfig2;
+        wifiDeviceConfig2.networkStatusHistory = 149;  // 149: convert to binary 10010101
+        wifiDeviceConfig2.keyMgmt = KEY_MGMT_NONE;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
+            WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig2), Return(0)));
+        pStaStateMachine->HandleNetCheckResultIsPortal(SystemNetWorkState::NETWORK_IS_WORKING, false);
+    }
+
     void TestTryModifyPortalAttribute1()
     {
         pStaStateMachine->linkedInfo.networkId = INVALID_NETWORK_ID;
@@ -2144,6 +2171,11 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
 {
     HandleNetCheckResultFail();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, TestHandleNetCheckResultIsPortal, TestSize.Level1)
+{
+    TestHandleNetCheckResultIsPortal1();
 }
 
 HWTEST_F(StaStateMachineTest, TestTryModifyPortalAttribute, TestSize.Level1)

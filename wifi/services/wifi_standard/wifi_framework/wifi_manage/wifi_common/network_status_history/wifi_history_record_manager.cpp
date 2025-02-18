@@ -334,11 +334,9 @@ bool WifiHistoryRecordManager::IsAbnormalTimeRecords()
 void WifiHistoryRecordManager::UpdateStaticTimePoint(const int64_t &currentTimeInt)
 {
     std::time_t currentTime;
-    if (std::numeric_limits<std::time_t>::is_signed &&
-        currentTimeInt > static_cast<uint64_t>(std::numeric_limits<std::time_t>::max())) {
-        auto now = std::chrono::system_clock::now();
-        auto nowMs = std::chrono::time_point_cast<std::chrono::seconds>(now);
-        currentTime = nowMs.time_since_epoch().count();
+    if (currentTimeInt < INVALID_TIME_POINT ||
+        currentTimeInt > static_cast<int64_t>(std::numeric_limits<std::time_t>::max())) {
+        currentTime = GetCurrentTimeSeconds();
     } else {
         currentTime = static_cast<std::time_t>(currentTimeInt);
     }

@@ -166,5 +166,13 @@ int WifiPermissionHelper::VerifyManageWifiHotspotExtPermission(const int &pid, c
     }
     return PERMISSION_GRANTED;
 }
+
+int WifiPermissionHelper::VerifyEnterpriseWifiConnectionPermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.MANAGE_ENTERPRISE_WIFI_CONNECTION", pid, uid, 0) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
 }  // namespace Wifi
 }  // namespace OHOS

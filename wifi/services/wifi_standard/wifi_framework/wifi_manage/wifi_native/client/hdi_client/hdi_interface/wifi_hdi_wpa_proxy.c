@@ -443,7 +443,7 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
     if (strncmp(ifName, "p2p0", strlen("p2p0")) == 0) {
         ReleaseP2pCallback();
     }
-    if (strncmp(ifName, "wlan0", strlen("wlan0")) == 0) {
+    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
         ReleaseStaCallback(ifName);
     }
     pthread_mutex_unlock(&g_wpaObjMutex);

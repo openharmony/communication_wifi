@@ -84,8 +84,6 @@
         "OHOS::Wifi::WifiConfigCenter::SetApMidState(OHOS::Wifi::WifiOprMidState, int)";
         "OHOS::Wifi::WifiConfigCenter::GetHotspotState(int)";
         "OHOS::Wifi::WifiConfigCenter::SetHotspotState(int, int)";
-        "OHOS::Wifi::WifiConfigCenter::SetHotspotMacConfig(OHOS::Wifi::HotspotMacConfig const&, int)";
-        "OHOS::Wifi::WifiConfigCenter::GetHotspotMacConfig(OHOS::Wifi::HotspotMacConfig&, int)";
         "OHOS::Wifi::WifiConfigCenter::SetPowerModel(OHOS::Wifi::PowerModel const&, int)";
         "OHOS::Wifi::WifiConfigCenter::GetPowerModel(OHOS::Wifi::PowerModel&, int)";
         "OHOS::Wifi::WifiConfigCenter::GetStationList(std::__h::vector<OHOS::Wifi::StationInfo, std::__h::allocator<OHOS::Wifi::StationInfo>>&, int)";

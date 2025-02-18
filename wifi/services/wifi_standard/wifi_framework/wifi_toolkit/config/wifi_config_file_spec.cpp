@@ -770,6 +770,7 @@ void ClearTClass<HotspotConfig>(HotspotConfig &item)
     item.SetMaxConn(0);
     item.SetIpAddress("");
     item.SetLeaseTime((int)DHCP_LEASE_TIME);
+    item.SetRandomMac("");
     return;
 }
 
@@ -838,9 +839,10 @@ int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key
         item.SetIpAddress(value);
     } else if (key == "leaseTime") {
         item.SetLeaseTime(CheckDataLegal(tmpValue));
+    } else if (key == "randomMac") {
+        item.SetRandomMac(value);
     } else {
         LOGE("Invalid config key value");
-        errorKeyValue++;
     }
     return errorKeyValue;
 }
@@ -879,6 +881,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
     ss << "    " <<"maxConn=" << item.GetMaxConn() << std::endl;
     ss << "    " <<"ipAddress=" << item.GetIpAddress() << std::endl;
     ss << "    " <<"leaseTime=" << static_cast<int>(item.GetLeaseTime()) << std::endl;
+    ss << "    " <<"randomMac=" << item.GetRandomMac() << std::endl;
     ss << "    " <<"</HotspotConfig>" << std::endl;
     return ss.str();
 }

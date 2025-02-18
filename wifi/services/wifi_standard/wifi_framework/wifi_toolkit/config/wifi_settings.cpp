@@ -1004,11 +1004,9 @@ int WifiSettings::SyncHotspotConfig()
 int WifiSettings::SetHotspotConfig(const HotspotConfig &config, int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);
-    if (config.GetPreSharedKey() != mHotspotConfig[id].GetPreSharedKey()) {
-        LOGI("Hotspot preSharedKey changed to %{public}s", PassWordAnonymize(config.GetPreSharedKey()).c_str());
-    }
-    if (config.GetSsid() != mHotspotConfig[id].GetSsid()) {
-        LOGI("Hotspot ssid changed to %{public}s", SsidAnonymize(config.GetSsid()).c_str());
+    if (id < 0 || id >= AP_INSTANCE_MAX_NUM) {
+        LOGE("SetHotspotConfig id is out of range");
+        return -1;
     }
     mHotspotConfig[id] = config;
     return 0;
@@ -1020,10 +1018,10 @@ int WifiSettings::GetHotspotConfig(HotspotConfig &config, int id)
     auto iter = mHotspotConfig.find(id);
     if (iter != mHotspotConfig.end()) {
         config = iter->second;
+        return 0;
     }
-    return 0;
+    return -1;
 }
-
 
 void WifiSettings::ClearHotspotConfig()
 {

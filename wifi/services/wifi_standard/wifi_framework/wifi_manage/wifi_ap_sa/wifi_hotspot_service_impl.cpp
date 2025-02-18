@@ -198,6 +198,39 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
+    ErrCode validRetval = VerifyConfigValidity(config);
+    if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetHotspotConfig:VerifyConfigValidity failed!");
+        return validRetval;
+    }
+    HotspotConfig lastConfig;
+    if (WifiSettings::GetInstance().GetHotspotConfig(lastConfig, m_id) != 0) {
+        WIFI_LOGE("Instance %{public}d %{public}s GetHotspotConfig error", m_id, __func__);
+        return WIFI_OPT_FAILED;
+    }
+    HotspotConfig innerConfig = config;
+    if (lastConfig.GetRandomMac() != "") {
+        std::string mac = "";
+        if (config.GetSsid() != lastConfig.GetSsid() ||
+            config.GetSecurityType() != lastConfig.GetSecurityType()) {
+            WifiRandomMacHelper::GenerateRandomMacAddress(mac);
+            WIFI_LOGI("Generate new random mac:%{public}s", MacAnonymize(mac).c_str());
+        } else {
+            mac = lastConfig.GetRandomMac();
+        }
+        innerConfig.SetRandomMac(mac);
+    }
+
+    if (!IsApServiceRunning() ||
+        WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(innerConfig, m_id) == false) {
+        WifiSettings::GetInstance().SetHotspotConfig(innerConfig, m_id);
+        WifiSettings::GetInstance().SyncHotspotConfig();
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiHotspotServiceImpl::VerifyConfigValidity(const HotspotConfig &config)
+{
     if (!mGetChannels) {
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
         if (IsApServiceRunning() && pService != nullptr) {
@@ -233,12 +266,6 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
             WIFI_LOGE("set ssid equal current linked ap ssid, no permission!");
             return WIFI_OPT_INVALID_PARAM;
         }
-    }
-
-    if (!IsApServiceRunning() ||
-        WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(config, m_id) == false) {
-        WifiSettings::GetInstance().SetHotspotConfig(config, m_id);
-        WifiSettings::GetInstance().SyncHotspotConfig();
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -446,16 +473,6 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
         return errCode;
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_AP_REQUEST);
-
-    std::string bundleName = "";
-    if (!GetBundleNameByUid(GetCallingUid(), bundleName)) {
-        WIFI_LOGE("GetBundleNameByUid failed");
-    }
-    WIFI_LOGI("%{public}s calling inst %{public}d EnableHotspot", bundleName.c_str(), m_id);
-    HotspotMacConfig config;
-    WifiConfigCenter::GetInstance().GetHotspotMacConfig(config, m_id);
-    config.SetCallingBundleName(bundleName);
-    WifiConfigCenter::GetInstance().SetHotspotMacConfig(config, m_id);
 
     return  WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
 }
@@ -895,7 +912,7 @@ bool WifiHotspotServiceImpl::IsRemoteDied(void)
 ErrCode WifiHotspotServiceImpl::CfgCheckSsid(const HotspotConfig &cfg)
 {
     if (cfg.GetSsid().length() < MIN_SSID_LEN || cfg.GetSsid().length() > MAX_SSID_LEN) {
-        LOGE("Config ssid length is invalid!");
+        WIFI_LOGE("Config ssid length is invalid!");
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -905,7 +922,7 @@ ErrCode WifiHotspotServiceImpl::CfgCheckPsk(const HotspotConfig &cfg)
 {
     size_t len = cfg.GetPreSharedKey().length();
     if (len < MIN_PSK_LEN || len > MAX_PSK_LEN) {
-        LOGE("PreSharedKey length error! invalid len: %{public}zu", len);
+        WIFI_LOGE("PreSharedKey length error! invalid len: %{public}zu", len);
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
     return ErrCode::WIFI_OPT_SUCCESS;
@@ -918,7 +935,7 @@ ErrCode WifiHotspotServiceImpl::CfgCheckBand(const HotspotConfig &cfg, std::vect
             return ErrCode::WIFI_OPT_SUCCESS;
         }
     }
-    LOGE("Hotspot config band is invalid!");
+    WIFI_LOGE("Hotspot config band is invalid!");
     return ErrCode::WIFI_OPT_INVALID_PARAM;
 }
 
@@ -971,7 +988,7 @@ ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, c
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
     if (cfg.GetMaxConn() <= 0 || cfg.GetMaxConn() > MAX_AP_CONN) {
-        LOGE("Open hotspot maxConn is illegal %{public}d !", cfg.GetMaxConn());
+        WIFI_LOGE("Open hotspot maxConn is illegal %{public}d !", cfg.GetMaxConn());
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
     if (CfgCheckSsid(cfg) == ErrCode::WIFI_OPT_INVALID_PARAM) {
@@ -980,7 +997,7 @@ ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, c
 
     if (cfg.GetSecurityType() == KeyMgmt::NONE) {
         if (cfg.GetPreSharedKey().length() > 0) {
-            LOGE("Open hotspot PreSharedKey length is non-zero error!");
+            WIFI_LOGE("Open hotspot PreSharedKey length is non-zero error!");
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }
     } else if (cfg.GetSecurityType() == KeyMgmt::WPA_PSK || cfg.GetSecurityType() == KeyMgmt::WPA2_PSK) {
@@ -988,7 +1005,7 @@ ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, c
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }
     } else {
-        LOGE("Hotspot securityType is not supported!");
+        WIFI_LOGE("Hotspot securityType is not supported!");
         return ErrCode::WIFI_OPT_INVALID_PARAM;
     }
 
@@ -997,7 +1014,15 @@ ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, c
             return ErrCode::WIFI_OPT_INVALID_PARAM;
         }
     }
-
+    if (cfg.GetPreSharedKey() != cfgFromCenter.GetPreSharedKey()) {
+        WIFI_LOGI("ApConfig preSharedKey changed from %{public}s to %{public}s",
+            PassWordAnonymize(cfgFromCenter.GetPreSharedKey()).c_str(),
+            PassWordAnonymize(cfg.GetPreSharedKey()).c_str());
+    }
+    if (cfg.GetSsid() != cfgFromCenter.GetSsid()) {
+        WIFI_LOGI("ApConfig ssid changed from %{public}s to %{public}s",
+            SsidAnonymize(cfgFromCenter.GetSsid()).c_str(), SsidAnonymize(cfg.GetSsid()).c_str());
+    }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

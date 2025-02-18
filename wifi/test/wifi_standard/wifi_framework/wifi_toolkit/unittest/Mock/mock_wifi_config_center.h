@@ -158,8 +158,6 @@ public:
     virtual int GetScanGenieState() const = 0;
     virtual int Init() = 0;
     virtual void SetFreezeModeState(int state) = 0;
-    virtual int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0) = 0;
-    virtual int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0) = 0;
     virtual void SetSystemMode(int systemMode) = 0;
     virtual int GetSystemMode() = 0;
     virtual bool GetWifiSelfcureResetEntered() const = 0;
@@ -307,8 +305,6 @@ public:
     MOCK_CONST_METHOD0(GetScanGenieState, int());
     MOCK_METHOD0(Init, int());
     MOCK_METHOD1(SetFreezeModeState, void(int state));
-    MOCK_METHOD2(GetHotspotMacConfig, int(HotspotMacConfig &config, int id));
-    MOCK_METHOD2(SetHotspotMacConfig, int(const HotspotMacConfig &config, int id));
     MOCK_METHOD1(SetSystemMode, void(int));
     MOCK_METHOD0(GetSystemMode, int());
     MOCK_METHOD0(GetHid2dSceneLastSetTime, int64_t());

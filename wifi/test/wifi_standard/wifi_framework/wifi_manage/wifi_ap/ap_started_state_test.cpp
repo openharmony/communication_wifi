@@ -536,18 +536,6 @@ HWTEST_F(ApStartedState_test, ProcessCmdUpdateCountryCodeTest, TestSize.Level1)
     pApStartedState->ProcessCmdUpdateCountryCode(msg);
 }
 
-HWTEST_F(ApStartedState_test, UpdatMacAddressTest, TestSize.Level1)
-{
-    std::string ssid = "1234";
-    KeyMgmt securityType = KeyMgmt::WPA2_PSK;
-    HotspotConfig curApConfig;
-    curApConfig.SetSsid("1234");
-    curApConfig.SetSecurityType(KeyMgmt::WPA2_PSK);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(_, 0))
-        .WillOnce(DoAll(SetArgReferee<0>(curApConfig), Return(0)));
-    pApStartedState->UpdatMacAddress(ssid, securityType);
-}
-
 HWTEST_F(ApStartedState_test, ProcessCmdSetHotspotIdleTimeout, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();

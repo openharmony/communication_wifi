@@ -118,6 +118,8 @@ WifiErrorNo HdiP2pSaveConfig();
 
 WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData);
 
+void ReleaseP2pCallback(void);
+
 #ifdef __cplusplus
 }
 #endif

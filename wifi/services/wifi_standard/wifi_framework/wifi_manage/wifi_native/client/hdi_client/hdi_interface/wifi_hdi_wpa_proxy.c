@@ -29,6 +29,8 @@
 #include "hdf_remote_service.h"
 #include "osal_mem.h"
 #include "wifi_native_define.h"
+#include "wifi_hdi_wpa_sta_impl.h"
+#include "wifi_hdi_wpa_p2p_impl.h"
 #ifndef UT_TEST
 #include "wifi_log.h"
 #else
@@ -437,6 +439,12 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
             return WIFI_HAL_OPT_FAILED;
         }
         RemoveIfaceName(ifName);
+    }
+    if (strcmp(ifName, "p2p0", strlen("p2p0")) == 0){
+        ReleaseP2pCallback();
+    }
+    if (strcmp(ifName, "wlan0", strlen("wlan0")) == 0){
+        ReleaseP2pCallback(ifName);
     }
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("%{public}s RemoveWpaIface success!", __func__);

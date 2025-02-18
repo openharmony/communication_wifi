@@ -842,8 +842,9 @@ public:
      * @param mloLinkInfo - MLO link info
      * @return WifiErrorNo
      */
-    WifiErrorNo GetMloLinkedInfo(const std::string &ifName,
-        std::vector<WifiLinkedInfo> &mloLinkInfo);
+    WifiErrorNo GetMloLinkedInfo(const std::string &ifName, std::vector<WifiLinkedInfo> &mloLinkInfo);
+
+    WifiErrorNo GetMloSignalPollInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
 
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
@@ -859,7 +860,9 @@ private:
     std::string StringCombination(const char* fmt, ...);
     void AppendStr(std::string &dst, const char* format, va_list args);
     bool WriteConfigToFile(const std::string &fileContext);
-    bool HandleMloLinkData(char *staData, uint32_t staDataLen, std::vector<WifiLinkedInfo> &mloLinkInfo);
+    WifiErrorNo HandleMloLinkData(char *staData, uint32_t staDataLen, std::vector<WifiLinkedInfo> &mloLinkInfo);
+    WifiErrorNo HandleMloSignalPollData(char *staData, uint32_t staDataLen,
+        std::vector<WifiMloSignalInfo> &mloSignalInfo);
 };
 }  // namespace Wifi
 }  // namespace OHOS

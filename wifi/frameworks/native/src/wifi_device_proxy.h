@@ -638,6 +638,14 @@ public:
      */
     ErrCode GetVoWifiDetectPeriod(int &period) override;
 
+    /**
+     * @Description Obtains the MLO Wi-Fi connection information
+     *
+     * @param mutilLinkedInfo - MLO wifiLinkedInfo
+     * @return ErrCode - operation result
+     */
+    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo) override;
+
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.
@@ -679,6 +687,7 @@ private:
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
+    void ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> result);
     void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     void ReadSignalInfoForVoWiFi(MessageParcel &reply, VoWifiSignalInfo &signalInfo);
     void RemoveDeathRecipient(void);

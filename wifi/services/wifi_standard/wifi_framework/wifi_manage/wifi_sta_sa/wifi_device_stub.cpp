@@ -143,6 +143,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetVoWifiDetectPeriod(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetVoWifiDetectPeriod(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_MULTI_LINKED_INFO)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetMultiLinkedInfo(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -877,6 +879,40 @@ void WifiDeviceStub::OnIsMeteredHotspot(uint32_t code, MessageParcel &data, Mess
     return;
 }
 
+void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedInfo &wifiLinkedInfo)
+{
+    reply.WriteInt32(wifiInfo.networkId);
+    reply.WriteString(wifiInfo.ssid);
+    reply.WriteString(wifiInfo.bssid);
+    reply.WriteInt32(wifiInfo.rssi);
+    reply.WriteInt32(wifiInfo.band);
+    reply.WriteInt32(wifiInfo.frequency);
+    reply.WriteInt32(wifiInfo.linkSpeed);
+    reply.WriteString(wifiInfo.macAddress);
+    reply.WriteInt32(wifiInfo.macType);
+    reply.WriteInt32(wifiInfo.ipAddress);
+    reply.WriteInt32(static_cast<int>(wifiInfo.connState));
+    reply.WriteBool(wifiInfo.ifHiddenSSID);
+    reply.WriteInt32(wifiInfo.rxLinkSpeed);
+    reply.WriteInt32(wifiInfo.txLinkSpeed);
+    reply.WriteInt32(wifiInfo.chload);
+    reply.WriteInt32(wifiInfo.snr);
+    reply.WriteInt32(wifiInfo.isDataRestricted);
+    reply.WriteString(wifiInfo.portalUrl);
+    reply.WriteInt32(static_cast<int>(wifiInfo.supplicantState));
+    reply.WriteInt32(static_cast<int>(wifiInfo.detailedState));
+    reply.WriteInt32(static_cast<int>(wifiInfo.wifiStandard));
+    reply.WriteInt32(static_cast<int>(wifiInfo.maxSupportedRxLinkSpeed));
+    reply.WriteInt32(static_cast<int>(wifiInfo.maxSupportedTxLinkSpeed));
+    reply.WriteInt32(static_cast<int>(wifiInfo.channelWidth));
+    reply.WriteBool(wifiInfo.isAncoConnected);
+    reply.WriteInt32(static_cast<int>(wifiInfo.supportedWifiCategory));
+    reply.WriteBool(wifiInfo.isHiLinkNetwork);
+    reply.WriteInt32(wifiInfo.lastRxPackets);
+    reply.WriteInt32(wifiInfo.lastTxPackets);
+    reply.WriteInt32(static_cast<int>(wifiInfo.wifiLinkType));
+}
+
 void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -886,39 +922,72 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        reply.WriteInt32(wifiInfo.networkId);
-        reply.WriteString(wifiInfo.ssid);
-        reply.WriteString(wifiInfo.bssid);
-        reply.WriteInt32(wifiInfo.rssi);
-        reply.WriteInt32(wifiInfo.band);
-        reply.WriteInt32(wifiInfo.frequency);
-        reply.WriteInt32(wifiInfo.linkSpeed);
-        reply.WriteString(wifiInfo.macAddress);
-        reply.WriteInt32(wifiInfo.macType);
-        reply.WriteInt32(wifiInfo.ipAddress);
-        reply.WriteInt32((int)wifiInfo.connState);
-        reply.WriteBool(wifiInfo.ifHiddenSSID);
-        reply.WriteInt32(wifiInfo.rxLinkSpeed);
-        reply.WriteInt32(wifiInfo.txLinkSpeed);
-        reply.WriteInt32(wifiInfo.chload);
-        reply.WriteInt32(wifiInfo.snr);
-        reply.WriteInt32(wifiInfo.isDataRestricted);
-        reply.WriteString(wifiInfo.portalUrl);
-        reply.WriteInt32((int)wifiInfo.supplicantState);
-        reply.WriteInt32((int)wifiInfo.detailedState);
-        reply.WriteInt32((int)wifiInfo.wifiStandard);
-        reply.WriteInt32((int)wifiInfo.maxSupportedRxLinkSpeed);
-        reply.WriteInt32((int)wifiInfo.maxSupportedTxLinkSpeed);
-        reply.WriteInt32((int)wifiInfo.channelWidth);
-        reply.WriteBool(wifiInfo.isAncoConnected);
-        reply.WriteInt32((int)wifiInfo.supportedWifiCategory);
-        reply.WriteBool(wifiInfo.isHiLinkNetwork);
-        reply.WriteInt32(wifiInfo.lastRxPackets);
-        reply.WriteInt32(wifiInfo.lastTxPackets);
-        reply.WriteInt32(static_cast<int>(wifiInfo.wifiLinkType));
+        WriteWifiLinkedInfo(reply, wifiInfo);
     }
-
     return;
+}
+
+void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<WifiLinkedInfo> multiLinkedInfo;
+    ErrCode ret = GetMultiLinkedInfo(multiLinkedInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(ret);
+    }
+    uint32_t size = static_cast<uint32_t>(multiLinkedInfo.size());
+    if (size > WIFI_MAX_MLO_LINK_NUM) {
+        size = WIFI_MAX_MLO_LINK_NUM;
+    }
+    SendMultiLinkedInfo(size, multiLinkedInfo, reply);
+}
+
+void WifiDeviceStub::SendMultiLinkedInfo(uint32_t contentSize, std::vector<WifiLinkedInfo> &result, MessageParcel &reply)
+{
+    WIFI_LOGI("%{public}s, ashemeSize: %{public}d", __FUNCTION__, ashemeSize);
+    std::vector<uint32_t> allSize;
+    if (ashemeSize == 0) {
+        reply.WriteInt32(WIFI_OPT_SUCCESS);
+        reply.WriteUInt32Vector(allSize);
+        return;
+    }
+    std::string name = "multiLinkedInfo";
+    int32_t ashmemSize = WIFI_MAX_MLO_LINK_NUM;
+    for (int32_t i = 0; i < contentSize; i++) {
+        MessageParcel outParcel;
+        WriteWifiLinkedInfo(outParcel, result[i]);
+        ashmemSize += static_cast<int>(outParcel.GetDataSize());
+    }
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), ashmemSize);
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        reply.WriteInt32(WIFI_OPT_FAILED);
+        if (ashmem != nullptr) {
+            ashmem->UnmapAshmem();
+            ashmem->CloseAshmem();
+        }
+        WIFI_LOGE("%{public}s ashmem create fail", __FUNCTION__);
+        return;
+    }
+    int offset = 0;
+    for (uint32_t i = 0; i < contentSize; ++i) {
+        MessageParcel outParcel;
+        WriteWifiLinkedInfo(outParcel, result[i]);
+        int dataSize = static_cast<int>(outParcel.GetDataSize());
+        if (offset + dataSize > ashmemSize) {
+            WIFI_LOGW("%{public}s parcelLen over ssid: %{public}s, ashmemSize:%{public}d,"
+                "dataSize:%{public}d, offset:%{public}d", __FUNCTION__, SsidAnonymize(result[i].ssid).c_str(),
+                ashmemSize, dataSize, offset);
+            continue;
+        }
+        allSize.emplace_back(dataSize);
+        ashmem->WriteToAshmem(reinterpret_cast<void*>(outParcel.GetData()), dataSize, offset);
+        offset += dataSize;
+    }
+    reply.WriteInt32(WIFI_OPT_SUCCESS);
+    reply.WriteUInt32Vector(allSize);
+    reply.WriteAshmem(ashmem);
+    ashmem->UnmapAshmem();
+    ashmem->CloseAshmem();
 }
 
 void WifiDeviceStub::OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)

@@ -86,6 +86,8 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_VOWIFI_DETECT_MODE = 0x104C,       /* GetVoWifiDetectMode */
     WIFI_SVR_CMD_SET_VOWIFI_DETECT_PERIOD = 0x104D,     /* SetVoWifiDetectPeriod */
     WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD = 0x104E,     /* GetVoWifiDetectPeriod */
+    /* MLO connect */
+    WIFI_SVR_CMD_GET_MULTI_LINKED_INFO = 0x104F,
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

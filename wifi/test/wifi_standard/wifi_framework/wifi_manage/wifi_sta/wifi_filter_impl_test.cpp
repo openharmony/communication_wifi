@@ -22,7 +22,6 @@
 #include "network_selection.h"
 #include "network_selection_manager.h"
 #include "network_selection_utils.h"
-#include "wifi_logger.h"
 
 using ::testing::_;
 using ::testing::Return;
@@ -30,8 +29,6 @@ using ::testing::An;
 using ::testing::ext::TestSize;
 using ::testing::ReturnRoundRobin;
 using ::testing::Invoke;
-
-DEFINE_WIFILOG_LABEL("WifiFilterImplTest")
 
 namespace OHOS {
 namespace Wifi {
@@ -47,6 +44,9 @@ public:
 
 HWTEST_F(WifiFilterImplTest, HiddenWifiFilter, TestSize.Level1) {
     NetworkSelection::HiddenWifiFilter* wifiFilter = new NetworkSelection::HiddenWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.frequency = 2407;
@@ -59,6 +59,9 @@ HWTEST_F(WifiFilterImplTest, HiddenWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, HiddenWifiFilter1, TestSize.Level1) {
     NetworkSelection::HiddenWifiFilter* wifiFilter = new NetworkSelection::HiddenWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo2;
     scanInfo2.bssid = "11:22:11:11:22";
     scanInfo2.frequency = 2407;
@@ -72,6 +75,9 @@ HWTEST_F(WifiFilterImplTest, HiddenWifiFilter1, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, SignalStrengthWifiFilter, TestSize.Level1) {
     NetworkSelection::SignalStrengthWifiFilter* wifiFilter = new NetworkSelection::SignalStrengthWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "x";
@@ -103,6 +109,9 @@ HWTEST_F(WifiFilterImplTest, SignalStrengthWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, SavedWifiFilter, TestSize.Level1) {
     NetworkSelection::SavedWifiFilter* wifiFilter = new NetworkSelection::SavedWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
@@ -131,6 +140,9 @@ HWTEST_F(WifiFilterImplTest, SavedWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, EphemeralWifiFilter, TestSize.Level1) {
     NetworkSelection::EphemeralWifiFilter* wifiFilter = new NetworkSelection::EphemeralWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
@@ -150,6 +162,9 @@ HWTEST_F(WifiFilterImplTest, EphemeralWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, PassPointWifiFilter, TestSize.Level1) {
     NetworkSelection::PassPointWifiFilter* wifiFilter = new NetworkSelection::PassPointWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
@@ -169,6 +184,9 @@ HWTEST_F(WifiFilterImplTest, PassPointWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, DisableWifiFilter, TestSize.Level1) {
     NetworkSelection::DisableWifiFilter* wifiFilter = new NetworkSelection::DisableWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
@@ -190,6 +208,9 @@ HWTEST_F(WifiFilterImplTest, DisableWifiFilter, TestSize.Level1) {
 HWTEST_F(WifiFilterImplTest, MatchedUserSelectBssidWifiFilter, TestSize.Level1) {
     NetworkSelection::MatchedUserSelectBssidWifiFilter* wifiFilter =
         new NetworkSelection::MatchedUserSelectBssidWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
@@ -206,6 +227,9 @@ HWTEST_F(WifiFilterImplTest, MatchedUserSelectBssidWifiFilter, TestSize.Level1) 
 
 HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {
     NetworkSelection::HasInternetWifiFilter* wifiFilter = new NetworkSelection::HasInternetWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
@@ -255,6 +279,9 @@ HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, RecoveryWifiFilter, TestSize.Level1) {
     NetworkSelection::RecoveryWifiFilter* wifiFilter = new NetworkSelection::RecoveryWifiFilter();
+    if (wifiFilter == nullptr) {
+        return;
+    }
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
     scanInfo1.bssid = "99:11:11:11:99";
@@ -291,7 +318,7 @@ HWTEST_F(WifiFilterImplTest, RecoveryWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter, TestSize.Level1) {
     NetworkSelection::PoorPortalWifiFilter* wifiFilter = new NetworkSelection::PoorPortalWifiFilter();
-    if (wifiFilter == NULL) {
+    if (wifiFilter == nullptr) {
         return;
     }
     WIFI_LOGI("lgx PoorPortalWifiFilter   ");
@@ -329,12 +356,11 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter, TestSize.Level1) {
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(1));
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate2));
     delete wifiFilter;
-    WIFI_LOGI("lgx PoorPortalWifiFilter   ");
 }
 
 HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter1, TestSize.Level1) {
     NetworkSelection::PoorPortalWifiFilter* wifiFilter = new NetworkSelection::PoorPortalWifiFilter();
-    if (wifiFilter == NULL) {
+    if (wifiFilter == nullptr) {
         return;
     }
     //5g wifi
@@ -378,7 +404,7 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter1, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, PortalWifiFilter, TestSize.Level1) {
     NetworkSelection::PortalWifiFilter* wifiFilter = new NetworkSelection::PortalWifiFilter();
-    if (wifiFilter == NULL) {
+    if (wifiFilter == nullptr) {
         return;
     }
     InterScanInfo scanInfo1;
@@ -413,7 +439,7 @@ HWTEST_F(WifiFilterImplTest, PortalWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, MaybePortalWifiFilter, TestSize.Level1) {
     NetworkSelection::MaybePortalWifiFilter* wifiFilter = new NetworkSelection::MaybePortalWifiFilter();
-    if (wifiFilter == NULL) {
+    if (wifiFilter == nullptr) {
         return;
     }
     InterScanInfo scanInfo1;
@@ -466,7 +492,7 @@ HWTEST_F(WifiFilterImplTest, MaybePortalWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, NoInternetWifiFilter, TestSize.Level1) {
     NetworkSelection::NoInternetWifiFilter* wifiFilter = new NetworkSelection::NoInternetWifiFilter();
-    if (wifiFilter == NULL) {
+    if (wifiFilter == nullptr) {
         return;
     }
     InterScanInfo scanInfo1;
@@ -489,7 +515,7 @@ HWTEST_F(WifiFilterImplTest, NoInternetWifiFilter, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, WeakAlgorithmWifiFilter, TestSize.Level1) {
     NetworkSelection::WeakAlgorithmWifiFilter* wifiFilter = new NetworkSelection::WeakAlgorithmWifiFilter();
-    if (wifiFilter == NULL) {
+    if (wifiFilter == nullptr) {
         return;
     }
     InterScanInfo scanInfo1;

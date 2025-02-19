@@ -1235,7 +1235,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
     }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState == CONNECTED && linkedInfo.bssid == config.GetBssid()) {
+    if (linkedInfo.bssid == config.GetBssid()) {
         WIFI_LOGI("Connect mac sta has connected");
         return WIFI_OPT_STA_AND_P2P_MAC_SAME;
     }

@@ -321,7 +321,6 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter, TestSize.Level1) {
     if (wifiFilter == nullptr) {
         return;
     }
-    WIFI_LOGI("lgx PoorPortalWifiFilter   ");
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";

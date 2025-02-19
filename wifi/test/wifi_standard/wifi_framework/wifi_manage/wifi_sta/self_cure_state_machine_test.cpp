@@ -3166,5 +3166,44 @@ HWTEST_F(SelfCureStateMachineTest, InitCurrentGatewayTest, TestSize.Level1)
     pSelfCureStateMachine_->pInternetSelfCureState_->InitCurrentGateway();
     EXPECT_NE(pSelfCureStateMachine_->noAutoConnCounter_, TEN);
 }
+
+HWTEST_F(SelfCureStateMachineTest, UpdateSelfcureStateTest, TestSize.Level1)
+{
+    pSelfCureStateMachine_->isSelfCureOnGoing_ = false;
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_IDLE, true);
+    EXPECT_TRUE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_IDLE, false);
+    EXPECT_FALSE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_WIFI6, true);
+    EXPECT_TRUE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_WIFI6, false);
+    EXPECT_FALSE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP, true);
+    EXPECT_TRUE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP, false);
+    EXPECT_FALSE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC, true);
+    EXPECT_TRUE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC, false);
+    EXPECT_FALSE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MULTI_GATEWAY, true);
+    EXPECT_TRUE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MULTI_GATEWAY, false);
+    EXPECT_FALSE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC, true);
+    EXPECT_TRUE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC, false);
+    EXPECT_FALSE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON, true);
+    EXPECT_TRUE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON, false);
+    EXPECT_FALSE(pSelfCureStateMachine_->isSelfCureOnGoing_);
+}
 } // namespace Wifi
 } // namespace OHOS

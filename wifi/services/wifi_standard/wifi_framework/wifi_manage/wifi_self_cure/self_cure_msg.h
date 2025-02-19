@@ -130,6 +130,7 @@ enum class SelfCureType {
     SCE_TYPE_MULTI_GW = 5,
     SCE_TYPE_RANDMAC = 6,
     SCE_TYPE_RESET = 7,
+    SCE_TYPE_RESET_WIFI_ON = 8,
 };
 
 enum SelfCureState {

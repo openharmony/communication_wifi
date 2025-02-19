@@ -143,6 +143,9 @@ int32_t SelfCureUtils::GetSelfCureType(int32_t currentCureLevel)
         case WIFI_CURE_RESET_LEVEL_HIGH_RESET:
             ret = SelfCureType::SCE_TYPE_RESET;
             break;
+        case WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON:
+            ret = SelfCureType::SCE_TYPE_RESET_WIFI_ON;
+            break;
         default:
             break;
     }

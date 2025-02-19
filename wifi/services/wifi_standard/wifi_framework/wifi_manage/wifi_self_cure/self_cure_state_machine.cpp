@@ -2772,7 +2772,7 @@ void SelfCureStateMachine::ClearDhcpOffer()
 
 void SelfCureStateMachine::UpdateSelfcureState(int currentCureLevel, bool isSelfCureOnGoing)
 {
-    if (isSelfCureOnGoing_ == isSelfCureOnGoing) {
+    if (isSelfCureOnGoing_ == isSelfCureOnGoing && currentCureLevel != WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON) {
         WIFI_LOGW("selfCureOnGoing state is not change");
         return;
     }
@@ -2885,6 +2885,7 @@ void SelfCureStateMachine::HandleSelfCureNormal()
         }
         case SelfCureState::SCE_WIFI_ON_STATE: {
             WIFI_LOGI("HandleSelfCureNormal wifi on OK! -> wifi connect");
+            UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON, true);
             int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
             IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(instId_);
             if (pStaService == nullptr) {

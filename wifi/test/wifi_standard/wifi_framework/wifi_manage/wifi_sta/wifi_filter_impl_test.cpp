@@ -22,6 +22,7 @@
 #include "network_selection.h"
 #include "network_selection_manager.h"
 #include "network_selection_utils.h"
+#include "wifi_logger.h"
 
 using ::testing::_;
 using ::testing::Return;
@@ -29,6 +30,8 @@ using ::testing::An;
 using ::testing::ext::TestSize;
 using ::testing::ReturnRoundRobin;
 using ::testing::Invoke;
+
+DEFINE_WIFILOG_LABEL("WifiFilterImplTest")
 
 namespace OHOS {
 namespace Wifi {
@@ -43,60 +46,72 @@ public:
 };
 
 HWTEST_F(WifiFilterImplTest, HiddenWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::HiddenWifiFilter>();
+    NetworkSelection::HiddenWifiFilter* wifiFilter = new NetworkSelection::HiddenWifiFilter();
     InterScanInfo scanInfo1;
     scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.frequency = 2407;
+    scanInfo1.rssi = -77;
     NetworkSelection::NetworkCandidate networkCandidate(scanInfo1);
     networkCandidate.wifiDeviceConfig.networkId = 1;
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate));
+    delete wifiFilter;
+}
 
-    scanInfo1.ssid = "x";
-    NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
-    networkCandidate1.wifiDeviceConfig.networkId = 1;
+HWTEST_F(WifiFilterImplTest, HiddenWifiFilter1, TestSize.Level1) {
+    NetworkSelection::HiddenWifiFilter* wifiFilter = new NetworkSelection::HiddenWifiFilter();
+    InterScanInfo scanInfo2;
+    scanInfo2.bssid = "11:22:11:11:22";
+    scanInfo2.frequency = 2407;
+    scanInfo2.rssi = -77;
+    scanInfo2.ssid = "sssx";
+    NetworkSelection::NetworkCandidate networkCandidate1(scanInfo2);
+    networkCandidate1.wifiDeviceConfig.networkId = 5;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate1));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, SignalStrengthWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::SignalStrengthWifiFilter>();
+    NetworkSelection::SignalStrengthWifiFilter* wifiFilter = new NetworkSelection::SignalStrengthWifiFilter();
     InterScanInfo scanInfo1;
     scanInfo1.bssid = "11:11:11:11:11";
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     //2.4g wifi
     scanInfo1.frequency = 2503;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -85;
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = 1;
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     scanInfo1.rssi = -70;
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo1);
-    networkCandidate2.wifiDeviceConfig.networkId = 1;
+    networkCandidate2.wifiDeviceConfig.networkId = 2;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate2));
 
     //5g wifi
-    scanInfo1.frequency = 2503;
+    scanInfo1.frequency = 5003;
     scanInfo1.rssi = -82;
     NetworkSelection::NetworkCandidate networkCandidate3(scanInfo1);
-    networkCandidate3.wifiDeviceConfig.networkId = 1;
+    networkCandidate3.wifiDeviceConfig.networkId = 3;
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate3));
 
     scanInfo1.rssi = -70;
     NetworkSelection::NetworkCandidate networkCandidate4(scanInfo1);
-    networkCandidate4.wifiDeviceConfig.networkId = 1;
+    networkCandidate4.wifiDeviceConfig.networkId = 4;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate4));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, SavedWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::SavedWifiFilter>();
+    NetworkSelection::SavedWifiFilter* wifiFilter = new NetworkSelection::SavedWifiFilter();
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = -1;
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.ssid = "x";
     scanInfo2.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.networkStatusHistory = 255;
@@ -106,17 +121,18 @@ HWTEST_F(WifiFilterImplTest, SavedWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate2));
 
     InterScanInfo scanInfo3;
-    scanInfo3.bssid = "x";
+    scanInfo3.ssid = "x";
     scanInfo3.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate3(scanInfo3);
     networkCandidate3.wifiDeviceConfig.networkId = 1;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate3));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, EphemeralWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::EphemeralWifiFilter>();
+    NetworkSelection::EphemeralWifiFilter* wifiFilter = new NetworkSelection::EphemeralWifiFilter();
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = 1;
@@ -124,17 +140,18 @@ HWTEST_F(WifiFilterImplTest, EphemeralWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.bssid = "xx";
     scanInfo2.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
-    networkCandidate2.wifiDeviceConfig.networkId = 1;
+    networkCandidate2.wifiDeviceConfig.networkId = 2;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate2));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, PassPointWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::PassPointWifiFilter>();
+    NetworkSelection::PassPointWifiFilter* wifiFilter = new NetworkSelection::PassPointWifiFilter();
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = 1;
@@ -142,17 +159,18 @@ HWTEST_F(WifiFilterImplTest, PassPointWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.ssid = "x";
     scanInfo2.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.networkId = 1;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate2));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, DisableWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::DisableWifiFilter>();
+    NetworkSelection::DisableWifiFilter* wifiFilter = new NetworkSelection::DisableWifiFilter();
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = 1;
@@ -160,18 +178,20 @@ HWTEST_F(WifiFilterImplTest, DisableWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.ssid = "x";
     scanInfo2.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.networkId = 1;
     networkCandidate2.wifiDeviceConfig.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate2));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, MatchedUserSelectBssidWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::MatchedUserSelectBssidWifiFilter>();
+    NetworkSelection::MatchedUserSelectBssidWifiFilter* wifiFilter =
+        new NetworkSelection::MatchedUserSelectBssidWifiFilter();
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate(scanInfo1);
     networkCandidate.wifiDeviceConfig.networkId = 1;
@@ -181,12 +201,13 @@ HWTEST_F(WifiFilterImplTest, MatchedUserSelectBssidWifiFilter, TestSize.Level1) 
     networkCandidate1.wifiDeviceConfig.networkId = 1;
     networkCandidate1.wifiDeviceConfig.userSelectBssid = "11:22:11:11:11";
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::HasInternetWifiFilter>();
+    NetworkSelection::HasInternetWifiFilter* wifiFilter = new NetworkSelection::HasInternetWifiFilter();
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = 1;
@@ -194,7 +215,7 @@ HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.ssid = "x";
     scanInfo2.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.isPortal = 1;
@@ -203,7 +224,7 @@ HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate2));
 
     InterScanInfo scanInfo3;
-    scanInfo3.bssid = "x";
+    scanInfo3.ssid = "x";
     scanInfo3.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate3(scanInfo3);
     networkCandidate3.wifiDeviceConfig.networkId = 1;
@@ -212,7 +233,7 @@ HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate3));
 
     InterScanInfo scanInfo4;
-    scanInfo4.bssid = "x";
+    scanInfo4.ssid = "x";
     scanInfo4.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate4(scanInfo4);
     networkCandidate4.wifiDeviceConfig.keyMgmt = KEY_MGMT_NONE;
@@ -221,7 +242,7 @@ HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate4));
 
     InterScanInfo scanInfo5;
-    scanInfo5.bssid = "x";
+    scanInfo5.ssid = "x";
     scanInfo5.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate5(scanInfo5);
     networkCandidate5.wifiDeviceConfig.keyMgmt = KEY_MGMT_WEP;
@@ -229,12 +250,13 @@ HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {
     networkCandidate5.wifiDeviceConfig.noInternetAccess = 0;
     networkCandidate5.wifiDeviceConfig.networkStatusHistory = 15;
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate5));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, RecoveryWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::RecoveryWifiFilter>();
+    NetworkSelection::RecoveryWifiFilter* wifiFilter = new NetworkSelection::RecoveryWifiFilter();
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "99:11:11:11:99";
     NetworkSelection::NetworkCandidate networkCandidate(scanInfo1);
     networkCandidate.wifiDeviceConfig.networkId = 1;
@@ -264,12 +286,17 @@ HWTEST_F(WifiFilterImplTest, RecoveryWifiFilter, TestSize.Level1) {
     networkCandidate4.wifiDeviceConfig.noInternetAccess = 1;
     networkCandidate4.wifiDeviceConfig.isPortal = 0;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate4));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::PoorPortalWifiFilter>();
+    NetworkSelection::PoorPortalWifiFilter* wifiFilter = new NetworkSelection::PoorPortalWifiFilter();
+    if (wifiFilter == NULL) {
+        return;
+    }
+    WIFI_LOGI("lgx PoorPortalWifiFilter   ");
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate(scanInfo1);
     networkCandidate.wifiDeviceConfig.isPortal = 1;
@@ -279,10 +306,11 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate));
     //2.4g wifi
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "xs";
+    scanInfo2.ssid = "xs";
     scanInfo2.bssid = "11:11:11:11:33";
     scanInfo2.rssi = -50;
     scanInfo2.band = 1;
+    scanInfo2.frequency = 2640;
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo2);
     networkCandidate1.wifiDeviceConfig.networkId = 1;
     networkCandidate1.wifiDeviceConfig.noInternetAccess = 0;
@@ -290,22 +318,28 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter, TestSize.Level1) {
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo3;
-    scanInfo3.bssid = "xs";
+    scanInfo3.ssid = "xs";
     scanInfo3.bssid = "11:11:11:11:33";
     scanInfo3.rssi = -86;
     scanInfo3.band = 1;
+    scanInfo3.frequency = 2640;
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo3);
     networkCandidate2.wifiDeviceConfig.networkId = 1;
     networkCandidate2.wifiDeviceConfig.noInternetAccess = 0;
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(1));
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate2));
+    delete wifiFilter;
+    WIFI_LOGI("lgx PoorPortalWifiFilter   ");
 }
 
 HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter1, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::PoorPortalWifiFilter>();
+    NetworkSelection::PoorPortalWifiFilter* wifiFilter = new NetworkSelection::PoorPortalWifiFilter();
+    if (wifiFilter == NULL) {
+        return;
+    }
     //5g wifi
     InterScanInfo scanInfo4;
-    scanInfo4.bssid = "xs";
+    scanInfo4.ssid = "xs";
     scanInfo4.bssid = "11:11:11:11:33";
     scanInfo4.rssi = -50;
     scanInfo4.band = 2;
@@ -316,10 +350,11 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter1, TestSize.Level1) {
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate3));
 
     InterScanInfo scanInfo5;
-    scanInfo5.bssid = "xs";
+    scanInfo5.ssid = "xs";
     scanInfo5.bssid = "11:11:11:11:33";
     scanInfo5.rssi = -85;
     scanInfo5.band = 2;
+    scanInfo5.frequency = 5640;
     NetworkSelection::NetworkCandidate networkCandidate4(scanInfo5);
     networkCandidate4.wifiDeviceConfig.networkId = 1;
     networkCandidate4.wifiDeviceConfig.noInternetAccess = 0;
@@ -327,22 +362,27 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter1, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate4));
 
     InterScanInfo scanInfo6;
-    scanInfo6.bssid = "xs";
+    scanInfo6.ssid = "xs";
     scanInfo6.bssid = "11:11:11:11:33";
     scanInfo6.rssi = -79;
     scanInfo6.band = 2;
+    scanInfo6.frequency = 5640;
     NetworkSelection::NetworkCandidate networkCandidate5(scanInfo6);
     networkCandidate5.wifiDeviceConfig.networkId = 1;
     networkCandidate5.wifiDeviceConfig.noInternetAccess = 0;
     networkCandidate5.wifiDeviceConfig.lastHasInternetTime = 1735366164;
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(2));
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate5));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, PortalWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::PortalWifiFilter>();
+    NetworkSelection::PortalWifiFilter* wifiFilter = new NetworkSelection::PortalWifiFilter();
+    if (wifiFilter == NULL) {
+        return;
+    }
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.isPortal = 1;
@@ -352,7 +392,7 @@ HWTEST_F(WifiFilterImplTest, PortalWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.ssid = "x";
     scanInfo2.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.isPortal = 0;
@@ -361,19 +401,23 @@ HWTEST_F(WifiFilterImplTest, PortalWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate2));
 
     InterScanInfo scanInfo3;
-    scanInfo3.bssid = "x";
+    scanInfo3.ssid = "x";
     scanInfo3.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate3(scanInfo3);
     networkCandidate3.wifiDeviceConfig.isPortal = 1;
     networkCandidate3.wifiDeviceConfig.networkId = 1;
     networkCandidate3.wifiDeviceConfig.noInternetAccess = 0;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate3));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, MaybePortalWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::MaybePortalWifiFilter>();
+    NetworkSelection::MaybePortalWifiFilter* wifiFilter = new NetworkSelection::MaybePortalWifiFilter();
+    if (wifiFilter == NULL) {
+        return;
+    }
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.capabilities = "OWE";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
@@ -381,7 +425,7 @@ HWTEST_F(WifiFilterImplTest, MaybePortalWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.ssid = "x";
     scanInfo2.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.keyMgmt = KEY_MGMT_WEP;
@@ -390,7 +434,7 @@ HWTEST_F(WifiFilterImplTest, MaybePortalWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate2));
 
     InterScanInfo scanInfo3;
-    scanInfo3.bssid = "x";
+    scanInfo3.ssid = "x";
     scanInfo3.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate3(scanInfo3);
     networkCandidate3.wifiDeviceConfig.keyMgmt = KEY_MGMT_NONE;
@@ -399,7 +443,7 @@ HWTEST_F(WifiFilterImplTest, MaybePortalWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate3));
 
     InterScanInfo scanInfo4;
-    scanInfo4.bssid = "x";
+    scanInfo4.ssid = "x";
     scanInfo4.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate4(scanInfo4);
     networkCandidate4.wifiDeviceConfig.keyMgmt = KEY_MGMT_NONE;
@@ -409,7 +453,7 @@ HWTEST_F(WifiFilterImplTest, MaybePortalWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate4));
 
     InterScanInfo scanInfo5;
-    scanInfo5.bssid = "x";
+    scanInfo5.ssid = "x";
     scanInfo5.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate5(scanInfo5);
     networkCandidate5.wifiDeviceConfig.keyMgmt = KEY_MGMT_NONE;
@@ -417,12 +461,16 @@ HWTEST_F(WifiFilterImplTest, MaybePortalWifiFilter, TestSize.Level1) {
     networkCandidate5.wifiDeviceConfig.noInternetAccess = 0;
     networkCandidate5.wifiDeviceConfig.networkStatusHistory = 0;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate5));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, NoInternetWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::NoInternetWifiFilter>();
+    NetworkSelection::NoInternetWifiFilter* wifiFilter = new NetworkSelection::NoInternetWifiFilter();
+    if (wifiFilter == NULL) {
+        return;
+    }
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkStatusHistory = 255;
@@ -430,18 +478,22 @@ HWTEST_F(WifiFilterImplTest, NoInternetWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.ssid = "x";
     scanInfo2.bssid = "11:11:11:11:11";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.networkStatusHistory = 5;
     networkCandidate2.wifiDeviceConfig.networkId = 1;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate2));
+    delete wifiFilter;
 }
 
 HWTEST_F(WifiFilterImplTest, WeakAlgorithmWifiFilter, TestSize.Level1) {
-    auto wifiFilter = std::make_shared<NetworkSelection::WeakAlgorithmWifiFilter>();
+    NetworkSelection::WeakAlgorithmWifiFilter* wifiFilter = new NetworkSelection::WeakAlgorithmWifiFilter();
+    if (wifiFilter == NULL) {
+        return;
+    }
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "x";
+    scanInfo1.ssid = "x";
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.securityType = WifiSecurity::WEP;
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
@@ -449,7 +501,7 @@ HWTEST_F(WifiFilterImplTest, WeakAlgorithmWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate1));
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "x";
+    scanInfo2.ssid = "x";
     scanInfo2.bssid = "11:11:11:11:11";
     scanInfo2.securityType = WifiSecurity::OPEN;
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
@@ -457,7 +509,7 @@ HWTEST_F(WifiFilterImplTest, WeakAlgorithmWifiFilter, TestSize.Level1) {
     EXPECT_FALSE(wifiFilter->DoFilter(networkCandidate2));
 
     InterScanInfo scanInfo4;
-    scanInfo4.bssid = "x";
+    scanInfo4.ssid = "x";
     scanInfo4.bssid = "11:11:11:11:11";
     scanInfo4.securityType = WifiSecurity::PSK;
     scanInfo4.capabilities = "CCMPTKIP";
@@ -466,12 +518,13 @@ HWTEST_F(WifiFilterImplTest, WeakAlgorithmWifiFilter, TestSize.Level1) {
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate4));
 
     InterScanInfo scanInfo5;
-    scanInfo5.bssid = "x";
+    scanInfo5.ssid = "x";
     scanInfo5.bssid = "11:11:11:11:11";
     scanInfo5.securityType = WifiSecurity::EAP;
     NetworkSelection::NetworkCandidate networkCandidate5(scanInfo5);
     networkCandidate5.wifiDeviceConfig.networkId = 1;
     EXPECT_TRUE(wifiFilter->DoFilter(networkCandidate5));
+    delete wifiFilter;
 }
 
 }

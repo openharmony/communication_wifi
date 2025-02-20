@@ -21,7 +21,6 @@ module_output_path = "wifi/manager_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/unittest",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/unittest/Mock",
   ]
@@ -171,18 +170,8 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/hal_device_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface",
     "$WIFI_ROOT_DIR/base/cRPC/include",
-    "//commonlibrary/c_utils/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/notification/common_event_service/cesfwk/innerkits/include",
-    "//base/notification/common_event_service/cesfwk/kits/native/include",
-    "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
-    "//base/powermgr/power_manager/interfaces/inner_api/native/include",
-    "//base/powermgr/power_manager/services/zidl/include",
     "$WIFI_ROOT_DIR/utils/inc",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/systemabilitymgr/samgr/utils/native/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client",
   ]
 
@@ -229,6 +218,7 @@ ohos_unittest("manager_unittest") {
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
     "netmanager_base:net_stats_manager_if",
+    "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",

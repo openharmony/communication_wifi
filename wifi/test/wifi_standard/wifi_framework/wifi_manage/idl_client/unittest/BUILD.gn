@@ -17,10 +17,7 @@ module_output_path = "wifi/idl_client_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest",
-  ]
+  include_dirs = [ "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest" ]
 }
 
 ohos_unittest("idl_client_unittest") {
@@ -83,10 +80,6 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/utils/inc",
-    "//commonlibrary/c_utils/base/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
   ]
 
   defines = [
@@ -100,7 +93,6 @@ ohos_unittest("idl_client_unittest") {
     "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client",
   ]
 
   ldflags = [
@@ -153,8 +145,6 @@ ohos_unittest("mock_wifi_hal_service") {
   ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/base/cRPC/include",

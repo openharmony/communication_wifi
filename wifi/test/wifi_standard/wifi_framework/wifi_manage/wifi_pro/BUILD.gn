@@ -92,8 +92,6 @@ ohos_unittest("wifi_pro_unittest") {
   ]
 
   include_dirs = [
-    "//third_party/googletest/googlemock/include",
-    "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/include",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",

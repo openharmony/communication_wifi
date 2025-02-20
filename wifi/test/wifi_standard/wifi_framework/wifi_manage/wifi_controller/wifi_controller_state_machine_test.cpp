@@ -660,6 +660,24 @@ HWTEST_F(WifiControllerMachineTest, HandleWifi2CloseTest01, TestSize.Level1)
     EXPECT_NE(pWifiControllerMachine->pEnableState, nullptr);
 }
 
+HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForRptTest01, TestSize.Level1)
+{
+    int id = 1;
+    int isOpen = 0;
+    int msgName = CMD_WIFI_TOGGLED;
+ 
+    pWifiControllerMachine->pEnableState->HandleWifiToggleChangeForRpt(id, isOpen, msgName);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForRptTest02, TestSize.Level1)
+{
+    int id = 1;
+    int isOpen = 0;
+    int msgName = CMD_SCAN_ALWAYS_MODE_CHANGED;
+ 
+    pWifiControllerMachine->pEnableState->HandleWifiToggleChangeForRpt(id, isOpen, msgName);
+}
+
 HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForWlan1Test01, TestSize.Level1)
 {
     int id = 1;

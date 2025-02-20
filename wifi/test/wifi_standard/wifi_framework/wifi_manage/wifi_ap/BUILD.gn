@@ -16,7 +16,6 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
   ]
 }
@@ -75,8 +74,6 @@ ohos_unittest("WifiApServiceTest") {
     "../",
     "./Mock/",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock",
-    "//commonlibrary/c_utils/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/base/cRPC/include",
@@ -96,10 +93,6 @@ ohos_unittest("WifiApServiceTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/utils/inc",
-    "$DHCP_ROOT_DIR/interfaces/inner_api/include",
-    "$DHCP_ROOT_DIR/interfaces/inner_api/interfaces",
-    "//third_party/googletest/googlemock/include",
-    "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_ap/Mock",

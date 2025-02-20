@@ -121,12 +121,19 @@ const std::map<int, int> wpa3FailreasonMap {
     {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
 };
 
+const std::map<int, int> portalEventValues = {
+    {PortalState::NOT_PORTAL, HISYS_EVENT_PROTAL_STATE_NOT_PORTAL},
+    {PortalState::UNAUTHED, HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED},
+    {PortalState::AUTHED, HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED},
+    {PortalState::EXPERIED, HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED}
+};
+
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       targetNetworkId_(INVALID_NETWORK_ID),
       lastSignalLevel_(INVALID_SIGNAL_LEVEL), targetRoamBssid(WPA_BSSID_ANY), currentTpType(IPTYPE_IPV4),
       getIpSucNum(0), getIpFailNum(0), enableSignalPoll(true), isRoam(false),
-      lastTimestamp(0), portalFlag(true), portalState(PortalState::UNCHECKED), detectNum(0),
+      lastTimestamp(0), autoPullBrowserFlag(true), portalState(PortalState::UNCHECKED), detectNum(0),
       portalExpiredDetectCount(0), mIsWifiInternetCHRFlag(false), networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr), pInitState(nullptr),
       pLinkState(nullptr), pSeparatedState(nullptr), pApLinkingState(nullptr),
@@ -1748,7 +1755,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
 
 void StaStateMachine::SetPortalBrowserFlag(bool flag)
 {
-    portalFlag = flag;
+    autoPullBrowserFlag = flag;
     mIsWifiInternetCHRFlag = false;
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
@@ -1774,7 +1781,7 @@ void StaStateMachine::ShowPortalNitification()
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_CONNECTED);
-            portalFlag = false;
+            autoPullBrowserFlag = false;
         } else {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
@@ -1841,6 +1848,8 @@ void StaStateMachine::UpdatePortalState(SystemNetWorkState netState, bool &updat
         }
         PortalExpiredDetect();
     }
+    WritePortalStateHiSysEvent(portalEventValues.count(portalState) > 0 ?
+        portalEventValues.at(portalState) : HISYS_EVENT_DEFAULT_VALUE);
 }
 
 void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std::string url)
@@ -1874,8 +1883,6 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         UpdatePortalState(netState, updatePortalAuthTime);
         /* Save connection information to WifiSettings. */
         WriteIsInternetHiSysEvent(NETWORK);
-        WritePortalStateHiSysEvent(portalFlag ? HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED
-                                              : HISYS_EVENT_PROTAL_STATE_NOT_PORTAL);
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
@@ -1913,7 +1920,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #ifndef OHOS_ARCH_LITE
     SyncDeviceEverConnectedState(true);
 #endif
-    portalFlag = true;
+    autoPullBrowserFlag = true;
     TryModifyPortalAttribute(netState);
 }
 
@@ -1928,11 +1935,10 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
         ShowPortalNitification();
     }
 #endif
-    if (portalFlag == false) {
+    if (autoPullBrowserFlag == false) {
         WriteIsInternetHiSysEvent(NO_NETWORK);
-        WritePortalStateHiSysEvent(HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED);
         HandlePortalNetworkPorcess();
-        portalFlag = true;
+        autoPullBrowserFlag = true;
     }
     bool isHomeAp = false;
     bool isHomeRouter = false;

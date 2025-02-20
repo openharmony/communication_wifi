@@ -2225,8 +2225,6 @@ void StaStateMachine::LinkedState::UpdateExpandOffset()
         expandRssi_ = pStaStateMachine->linkedInfo.rssi;
         rssiOffset_ = expandRssi_ - halfFoldRssi_;
     }
-    WIFI_LOGI("LinkedState, UpdateExpandOffset rssiOffset_:%{public}d, foldStatus_:%{public}d\n",
-        rssiOffset_, pStaStateMachine->foldStatus_);
     if (rssiOffset_ < RSSI_OFFSET_MIN) {
         rssiOffset_ = RSSI_OFFSET_MIN;
     } else if (rssiOffset_ >= RSSI_OFFSET_MAX) {

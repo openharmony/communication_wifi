@@ -245,7 +245,6 @@ HWTEST_F(WifiFilterImplTest, MatchedUserSelectBssidWifiFilter, TestSize.Level1) 
     networkCandidate1.wifiDeviceConfig.userSelectBssid = "11:22:11:11:11";
     EXPECT_FALSE(systemNetworkWifiFilter->DoFilter(networkCandidate1));
     systemNetworkWifiFilter.reset();
-
 }
 
 HWTEST_F(WifiFilterImplTest, HasInternetWifiFilter, TestSize.Level1) {

@@ -1746,6 +1746,19 @@ public:
         pStaStateMachine-> CloseNoInternetDialog();
     }
 
+    void AddSignalPollInfoArrayTest()
+    {
+        WifiSignalPollInfo signalInfo;
+        pStaStateMachine->AddSignalPollInfoArray(signalInfo);
+    }
+ 
+    void GetSignalPollInfoArrayTest()
+    {
+        std::vector<WifiSignalPollInfo> wifiSignalPollInfos;
+        int length = 6;
+        pStaStateMachine->GetSignalPollInfoArray(wifiSignalPollInfos, length);
+    }
+
     void UpdateLinkedBssidTest()
     {
         std::string bssid = "11:22:33:44:55:66";
@@ -2702,6 +2715,18 @@ HWTEST_F(StaStateMachineTest, CloseNoInternetDialogTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, UpdateLinkedBssidTest, TestSize.Level1)
 {
     UpdateLinkedBssidTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, AddSignalPollInfoArrayTest, TestSize.Level1)
+{
+    AddSignalPollInfoArrayTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+ 
+HWTEST_F(StaStateMachineTest, GetSignalPollInfoArraysTest, TestSize.Level1)
+{
+    GetSignalPollInfoArrayTest();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 } // namespace Wifi

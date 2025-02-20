@@ -1285,6 +1285,28 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.wifiLinkType = static_cast<WifiLinkType>(reply.ReadInt32());
 }
 
+void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply,
+                                             std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    for (int index = 0; index < length; index++) {
+        WifiSignalPollInfo signInfo;
+        signInfo.signal = reply.ReadInt32();
+        signInfo.txrate = reply.ReadInt32();
+        signInfo.rxrate = reply.ReadInt32();
+        signInfo.noise = reply.ReadInt32();
+        signInfo.txPackets = reply.ReadInt32();
+        signInfo.rxPackets = reply.ReadInt32();
+        signInfo.snr = reply.ReadInt32();
+        signInfo.chload = reply.ReadInt32();
+        signInfo.ulDelay = reply.ReadInt32();
+        signInfo.txBytes = reply.ReadInt32();
+        signInfo.rxBytes = reply.ReadInt32();
+        signInfo.txFailed = reply.ReadInt32();
+        signInfo.chloadSelf = reply.ReadInt32();
+        wifiSignalPollInfos.push_back(signInfo);
+    }
+}
+
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
 {
     if (mRemoteDied) {
@@ -1387,6 +1409,42 @@ ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
     }
 
     ReadLinkedInfo(reply, info);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(length);
+    
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY), error);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    ReadWifiSignalPollInfo(reply, wifiSignalPollInfos, length);
     return WIFI_OPT_SUCCESS;
 }
 

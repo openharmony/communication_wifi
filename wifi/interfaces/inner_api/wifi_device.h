@@ -217,6 +217,8 @@ public:
      */
     virtual ErrCode GetLinkedInfo(WifiLinkedInfo &info) = 0;
 
+    virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) = 0;
+
     /**
      * @Description Obtains the disconnected reason
      *

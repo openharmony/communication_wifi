@@ -227,6 +227,8 @@ public:
      */
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
+    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
+
     /**
      * @Description Obtains the disconnected reason information
      *

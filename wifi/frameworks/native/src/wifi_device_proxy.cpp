@@ -2795,7 +2795,7 @@ ErrCode WifiDeviceProxy::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLi
         return ErrCode(ret);
     }
 
-    ReadLinkedInfo(reply, info); // TODO
+    ParseMultiLinkedInfo(reply, mutilLinkedInfo);
     return WIFI_OPT_SUCCESS;
 }
 

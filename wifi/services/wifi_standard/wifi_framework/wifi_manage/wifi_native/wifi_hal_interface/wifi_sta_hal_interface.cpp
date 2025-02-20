@@ -828,6 +828,7 @@ WifiErrorNo WifiStaHalInterface::GetConnectionMloSignalInfo(const std::string &i
     return mHdiWpaClient->GetMloSignalPollInfo(ifName, mloSignalInfo);
 #else
     return WIFI_HAL_OPT_FAILED;
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -879,7 +879,7 @@ void WifiDeviceStub::OnIsMeteredHotspot(uint32_t code, MessageParcel &data, Mess
     return;
 }
 
-void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedInfo &wifiLinkedInfo)
+void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedInfo &wifiInfo)
 {
     reply.WriteInt32(wifiInfo.networkId);
     reply.WriteString(wifiInfo.ssid);
@@ -944,16 +944,16 @@ void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, Me
 
 void WifiDeviceStub::SendMultiLinkedInfo(uint32_t contentSize, std::vector<WifiLinkedInfo> &result, MessageParcel &reply)
 {
-    WIFI_LOGI("%{public}s, ashemeSize: %{public}d", __FUNCTION__, ashemeSize);
+    WIFI_LOGI("%{public}s, contentSize: %{public}d", __FUNCTION__, contentSize);
     std::vector<uint32_t> allSize;
-    if (ashemeSize == 0) {
+    if (contentSize == 0) {
         reply.WriteInt32(WIFI_OPT_SUCCESS);
         reply.WriteUInt32Vector(allSize);
         return;
     }
     std::string name = "multiLinkedInfo";
     int32_t ashmemSize = WIFI_MAX_MLO_LINK_NUM;
-    for (int32_t i = 0; i < contentSize; i++) {
+    for (uint32_t i = 0; i < contentSize; i++) {
         MessageParcel outParcel;
         WriteWifiLinkedInfo(outParcel, result[i]);
         ashmemSize += static_cast<int>(outParcel.GetDataSize());

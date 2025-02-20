@@ -66,7 +66,7 @@ public:
 
     private:
         void HandleApStart(int id);
-        void HandleWifiToggleChangeForRpt(int id, int isOpen);
+        void HandleWifiToggleChangeForRpt(int id, int isOpen, int msgName);
         bool HandleWifiToggleChangeForWlan1(int id, int isOpen);
         void HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg);
 #ifdef FEATURE_AP_SUPPORT

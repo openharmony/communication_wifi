@@ -1524,7 +1524,7 @@ WifiErrorNo WifiHdiWpaClient::GetMloSignalPollInfo(const std::string &ifName,
     char ifNameBuf[MAX_IFACENAME_LEN];
     char staParam[] = "MLO_SIGNAL_POLL";
     char staData[WIFI_MAX_WPA_STA_BUF_SIZE] = {0};
-    uint32_t staDataLen = WIFI_MAX_WPA_STA_BUF_SIZE；
+    uint32_t staDataLen = WIFI_MAX_WPA_STA_BUF_SIZE;
     if (strncpy_s(ifNameBuf, sizeof(ifNameBuf), ifName.c_str(), ifName.length()) != EOK) {
         LOGE("%{public}s: failed to copy", __func__);
         return WIFI_HAL_OPT_FAILED;
@@ -1548,7 +1548,7 @@ WifiErrorNo WifiHdiWpaClient::HandleMloSignalPollData(char *staData, uint32_t st
         LOGE("%{public}s: hdiInfo null or length err copy", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
-    char *savePtr = NULL;
+    char *savedPtr = NULL;
     std::string value = "";
     char *token = strtok_r(staData, "=", &savedPtr);
     WifiMloSignalInfo signalInfo;

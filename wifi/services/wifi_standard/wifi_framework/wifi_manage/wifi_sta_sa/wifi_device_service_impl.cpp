@@ -1343,6 +1343,28 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
         return WIFI_OPT_STA_NOT_OPENED;
     }
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
+    UpdateWifiLinkInfo(info);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo)
+{
+    if (VerifyGetLinkedInfofoPermission() != WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsStaServiceRunning()) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    std::vector<WifiLinkedInfo> mloLinkInfo;
+    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkInfo, m_instId);
+    for (auto &info : mloLinkInfo) {
+        UpdateWifiLinkInfo(info);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+void WifiDeviceServiceImpl::UpdateWifiLinkInfo(WifiLinkedInfo &info)
+{
     if (info.macType == static_cast<int>(WifiPrivacyConfig::DEVICEMAC)) {
         if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED) {
             WIFI_LOGD("GetLinkedInfo:VerifyGetWifiLocalMacPermission() PERMISSION_DENIED!");
@@ -1383,17 +1405,6 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
               info.connState, info.supplicantState, info.detailedState, info.wifiStandard,
               info.maxSupportedRxLinkSpeed, info.maxSupportedTxLinkSpeed, info.rxLinkSpeed, info.txLinkSpeed);
     info.isAncoConnected = WifiConfigCenter::GetInstance().GetWifiConnectedMode(m_instId);
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode WifiDeviceServiceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo)
-{
-    if (VerifyGetLinkedInfofoPermission() != WIFI_OPT_SUCCESS) {
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
-    if (!IsStaServiceRunning()) {
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
 }
 
 ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)

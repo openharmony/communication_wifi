@@ -3547,12 +3547,13 @@ void StaStateMachine::DealSignalPollResult()
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
     JudgeEnableSignalPoll(signalInfo);
+    DealMloLinkSignalPollResult();
 }
 
 void StaStateMachine::DealMloLinkSignalPollResult()
 {
     if (linkedInfo.wifiLinkType != WifiLinkType::WIFI7_EMLSR) {
-        WIFI_LOGD("%{public}s current linkType is not EMLSR", __FUNCTION__)
+        WIFI_LOGD("%{public}s current linkType is not EMLSR", __FUNCTION__);
         return;
     }
     std::vector<WifiMloSignalInfo> mloSignalInfo;
@@ -3561,10 +3562,10 @@ void StaStateMachine::DealMloLinkSignalPollResult()
         mloSignalInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
         return;
     }
-    std::vector<WifiLinkedInfo> mloLInkedInfo;
-    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLInkedInfo, m_instId);
+    std::vector<WifiLinkedInfo> mloLinkedInfo;
+    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkedInfo, m_instId);
     int32_t maxRssi = INVALID_RSSI_VALUE;
-    for (auto linkInfo : mloLInkedInfo) {
+    for (auto linkInfo : mloLinkedInfo) {
         bool isLinkedMatch = false;
         for (auto signalInfo : mloSignalInfo) {
             if (signalInfo.linkId != linkInfo.linkId) {

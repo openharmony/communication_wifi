@@ -1107,11 +1107,14 @@ NO_SANITIZE("cfi") napi_value GetMultiLinkedInfo(napi_env env, napi_callback_inf
         WIFI_LOGE("GetMultiLinkedInfo value fail:%{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
-    WIFI_LOGI("%{public}s get multi linkedInfo size: %{public}zu", wifiMultiLinkedInfo.size());
+    WIFI_LOGI("%{public}s get multi linkedInfo size: %{public}zu", __FUNCTION__, wifiMultiLinkedInfo.size());
     napi_value arrayResult;
     napi_create_array_with_length(env, wifiMultiLinkedInfo.size(), &arrayResult);
     for (size_t i = 0; i < wifiMultiLinkedInfo.size(); i++) {
-        LinkedInfoToJs(env, wifiMultiLinkedInfo, i , arrayResult);
+        napi_value result;
+        napi_create_object(env, &result);
+        LinkedInfoToJs(env, wifiMultiLinkedInfo[i], result);
+        napi_status status = napi_set_element(env, arrayResult, i, result);
     }
     return arrayResult;
 }

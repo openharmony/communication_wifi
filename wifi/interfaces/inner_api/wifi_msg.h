@@ -213,7 +213,7 @@ struct WifiMloSignalInfo {
     int32_t rxPackets {0};
     int32_t txPackets {0};
     WifiChannelWidth channelWidth {WifiChannelWidth::WIDTH_INVALID};
-}
+};
 
 struct WifiLinkedInfo {
     int networkId;

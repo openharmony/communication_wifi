@@ -66,7 +66,7 @@ SignalStrengthWifiFilter::~SignalStrengthWifiFilter()
     if (!filteredNetworkCandidates.empty()) {
         WIFI_LOGI("%{public}s: %{public}s",
                   filterName.c_str(),
-                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates, filterName).c_str());
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
     }
 }
 

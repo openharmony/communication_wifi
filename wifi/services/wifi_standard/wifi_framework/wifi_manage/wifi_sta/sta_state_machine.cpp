@@ -695,6 +695,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
         pStaStateMachine->StopDhcp();
+        pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
         pStaStateMachine->InitWifiLinkedInfo();
@@ -925,6 +926,7 @@ void StaStateMachine::SeparatedState::GoInState()
     pStaStateMachine->isRoam = false;
     pStaStateMachine->mPortalUrl = "";
     /* Callback result to InterfaceService. */
+    pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, pStaStateMachine->linkedInfo);
     /* clear connection information. */
     pStaStateMachine->InitWifiLinkedInfo();

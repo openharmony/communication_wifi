@@ -1115,6 +1115,9 @@ NO_SANITIZE("cfi") napi_value GetMultiLinkedInfo(napi_env env, napi_callback_inf
         napi_create_object(env, &result);
         LinkedInfoToJs(env, wifiMultiLinkedInfo[i], result);
         napi_status status = napi_set_element(env, arrayResult, i, result);
+        if (status != napi_ok) {
+            WIFI_LOGE("%{public}s set list element error: %{public}d", __FUNCTION__, status);
+        }
     }
     return arrayResult;
 }

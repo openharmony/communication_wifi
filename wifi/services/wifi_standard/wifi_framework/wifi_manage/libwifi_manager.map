@@ -319,6 +319,7 @@
         "OHOS::Wifi::StrToUpper(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::SetParamValue(char const*, char const*)";
         "OHOS::Wifi::WifiConfigCenter::GetLinkedInfo(OHOS::Wifi::WifiLinkedInfo&, int)";
+        "OHOS::Wifi::WifiConfigCenter::GetMloLinkedInfo(std::__h::vector<OHOS::Wifi::WifiLinkedInfo, std::__h::allocator<OHOS::Wifi::WifiLinkedInfo>>&, int)";
         "OHOS::Wifi::ConvertMncToIso(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::WifiCommonEventHelper::PublishScanStateChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiCommonEventHelper::PublishWifiSemiStateChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";

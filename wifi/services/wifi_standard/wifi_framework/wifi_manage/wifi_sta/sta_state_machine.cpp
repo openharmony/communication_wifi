@@ -3572,16 +3572,21 @@ void StaStateMachine::DealMloLinkSignalPollResult()
                 continue;
             }
             isLinkedMatch = true;
-            linkInfo.rssi = UpdateLinkInfoRssi(signalInfo.rssi);
+            int rssi = UpdateLinkInfoRssi(signalInfo.rssi);
+            WIFI_LOGI("MloSignalPollResult ssid:%{public}s, bssid:%{public}s, linkId:%{public}d, rssi: %{public}d,"
+                "fre: %{public}d, txSpeed: %{public}d, rxSpeed: %{public}d, deltaTxPackets: %{public}d, deltaRxPackets:"
+                "%{public}d", SsidAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkedInfo.bssid).c_str(),
+                linkInfo.linkId, rssi, signalInfo.frequency, signalInfo.txLinkSpeed, signalInfo.rxLinkSpeed,
+                signalInfo.txPackets - linkInfo.lastTxPackets, signalInfo.rxPackets - linkInfo.lastRxPackets);
+
+            linkInfo.rssi = rssi;
             maxRssi = linkInfo.rssi > maxRssi ? linkInfo.rssi : maxRssi;
             linkInfo.frequency = signalInfo.frequency;
-            linkInfo.linkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;;
-            linkInfo.txLinkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;;
-            linkInfo.rxLinkSpeed = signalInfo.rxLinkSpeed / TRANSFORMATION_TO_MBPS;;
-            WIFI_LOGI("%{public}s networkId:%{public}d, ssid:%{public}s, linkId:%{public}d, rssi: %{public}d,"
-                "fre: %{public}d, txSpeed: %{public}d, rxSpeed: %{public}d", __FUNCTION__,
-                linkedInfo.networkId, SsidAnonymize(linkedInfo.ssid).c_str(), linkInfo.linkId, linkInfo.rssi,
-                linkInfo.frequency, linkInfo.txLinkSpeed, linkInfo.rxLinkSpeed);
+            linkInfo.linkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;
+            linkInfo.txLinkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;
+            linkInfo.rxLinkSpeed = signalInfo.rxLinkSpeed / TRANSFORMATION_TO_MBPS;
+            linkInfo.lastTxPackets = signalInfo.txPackets;
+            linkInfo.lastRxPackets = signalInfo.rxPackets;
         }
         if (!isLinkedMatch) {
             WIFI_LOGE("%{public}s linkId:%{public}d not match", __FUNCTION__, linkInfo.linkId);

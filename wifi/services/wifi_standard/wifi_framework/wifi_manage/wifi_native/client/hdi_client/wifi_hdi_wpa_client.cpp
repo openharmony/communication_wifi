@@ -1511,7 +1511,7 @@ WifiErrorNo WifiHdiWpaClient::GetMloLinkedInfo(const std::string &ifName,
         return WIFI_HAL_OPT_FAILED;
     }
 
-    if (!HandleMloLinkData(staData, staDataLen, mloLinkInfo)) {
+    if (HandleMloLinkData(staData, staDataLen, mloLinkInfo) != WIFI_HAL_OPT_OK) {
         LOGE("%{public}s: HandleMloLinkData failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
@@ -1534,7 +1534,7 @@ WifiErrorNo WifiHdiWpaClient::GetMloSignalPollInfo(const std::string &ifName,
         return WIFI_HAL_OPT_FAILED;
     }
 
-    if (!HandleMloSignalPollData(staData, staDataLen, mloSignalInfo)) {
+    if (HandleMloSignalPollData(staData, staDataLen, mloSignalInfo) != WIFI_HAL_OPT_OK) {
         LOGE("%{public}s: HandleMloLinkData failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }

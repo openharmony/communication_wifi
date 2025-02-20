@@ -256,6 +256,8 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isMloConnected = false;
     linkedInfo.isWurEnable = false;
     linkedInfo.isHiLinkNetwork = false;
+    std::vector<WifiLinkedInfo> emptyMloLinkInfo;
+    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(emptyMloLinkInfo, m_instId);
 }
 
 /* --------------------------- state machine Init State ------------------------------ */
@@ -3563,9 +3565,12 @@ void StaStateMachine::DealMloLinkSignalPollResult()
         return;
     }
     std::vector<WifiLinkedInfo> mloLinkedInfo;
-    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkedInfo, m_instId);
+    if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkedInfo, m_instId) < 0) {
+        WIFI_LOGE("%{public}s get mlo linkInfo fail", __FUNCTION__);
+        return;
+    }
     int32_t maxRssi = INVALID_RSSI_VALUE;
-    for (auto linkInfo : mloLinkedInfo) {
+    for (auto &linkInfo : mloLinkedInfo) {
         bool isLinkedMatch = false;
         for (auto signalInfo : mloSignalInfo) {
             if (signalInfo.linkId != linkInfo.linkId) {
@@ -3575,7 +3580,7 @@ void StaStateMachine::DealMloLinkSignalPollResult()
             int rssi = UpdateLinkInfoRssi(signalInfo.rssi);
             WIFI_LOGI("MloSignalPollResult ssid:%{public}s, bssid:%{public}s, linkId:%{public}d, rssi: %{public}d,"
                 "fre: %{public}d, txSpeed: %{public}d, rxSpeed: %{public}d, deltaTxPackets: %{public}d, deltaRxPackets:"
-                "%{public}d", SsidAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkedInfo.bssid).c_str(),
+                "%{public}d", SsidAnonymize(linkInfo.ssid).c_str(), MacAnonymize(linkInfo.bssid).c_str(),
                 linkInfo.linkId, rssi, signalInfo.frequency, signalInfo.txLinkSpeed, signalInfo.rxLinkSpeed,
                 signalInfo.txPackets - linkInfo.lastTxPackets, signalInfo.rxPackets - linkInfo.lastRxPackets);
 

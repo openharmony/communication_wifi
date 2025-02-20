@@ -911,6 +911,7 @@ void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedI
     reply.WriteInt32(wifiInfo.lastRxPackets);
     reply.WriteInt32(wifiInfo.lastTxPackets);
     reply.WriteInt32(static_cast<int>(wifiInfo.wifiLinkType));
+    reply.WriteInt32(wifiInfo.linkId);
 }
 
 void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)

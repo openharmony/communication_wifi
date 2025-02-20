@@ -1315,6 +1315,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.lastRxPackets = reply.ReadInt32();
     info.lastTxPackets = reply.ReadInt32();
     info.wifiLinkType = static_cast<WifiLinkType>(reply.ReadInt32());
+    info.linkId = reply.ReadInt32();
 }
 
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)

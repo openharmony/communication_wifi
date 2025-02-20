@@ -38,7 +38,8 @@ class WifiFilterImplTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
         hiddenWifiFilter = std::make_shared<NetworkSelection::HiddenWifiFilter>();
         signalStrengthWifiFilter = std::make_shared<NetworkSelection::SignalStrengthWifiFilter>();
         savedWifiFilter = std::make_shared<NetworkSelection::SavedWifiFilter>();

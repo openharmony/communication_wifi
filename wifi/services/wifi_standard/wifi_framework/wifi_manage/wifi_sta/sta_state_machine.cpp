@@ -3567,9 +3567,30 @@ void StaStateMachine::DealSignalPollResult()
     }
     pLinkedState->UpdateExpandOffset();
     LogSignalInfo(signalInfo);
+    AddSignalPollInfoArray(signalInfo);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
     JudgeEnableSignalPoll(signalInfo);
+}
+
+void StaStateMachine::AddSignalPollInfoArray(WifiSignalPollInfo signalInfo)
+{
+    int length = SIGNALARR_LENGTH;
+    for (int index = length - 1; index > 0; index--) {
+        signalPollInfoArray[index] = signalPollInfoArray[index-1];
+    }
+    signalPollInfoArray[0] = signalInfo;
+}
+ 
+void StaStateMachine::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    WIFI_LOGI("get SignalInfos");
+    if (length > SIGNALARR_LENGTH) {
+        length = SIGNALARR_LENGTH;
+    }
+    for (int index = 0; index < length; index++) {
+        wifiSignalPollInfos.push_back(signalPollInfoArray[index]);
+    }
 }
 
 void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)

@@ -400,6 +400,8 @@ public:
      */
     virtual void HandleFoldStatusChanged(int foldstatus);
 
+    virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
+
     /* VOWIFI */
     virtual std::string VoWifiDetect(std::string cmd);
  

@@ -442,6 +442,9 @@ public:
      * @param type - wifi netlink message type
      */
     virtual void ProcessVoWifiNetlinkReportEvent(const int type) = 0;
+
+    virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) = 0;
+
     /**
      * @Description fold status
      *

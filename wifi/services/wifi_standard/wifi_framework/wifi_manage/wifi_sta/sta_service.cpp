@@ -1120,6 +1120,13 @@ void StaService::ProcessSetVoWifiDetectPeriod(int period)
     bool ret = VoWifiDetectSet("PERIOD " + std::to_string(period));
     WIFI_LOGI("Set VoWifi Detect Period result: %{public}d, period = %{public}d", ret, period);
 }
+
+ErrCode StaService::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->GetSignalPollInfoArray(wifiSignalPollInfos, length);
+    return WIFI_OPT_SUCCESS;
+}
  
 bool StaService::VoWifiDetectSet(std::string cmd)
 {

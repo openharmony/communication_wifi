@@ -1386,6 +1386,15 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceServiceImpl::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->GetSignalPollInfoArray(wifiSignalPollInfos, length);
+}
+
 ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
 {
     if (!WifiAuthCenter::IsSystemAccess()) {

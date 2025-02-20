@@ -109,6 +109,8 @@ public:
 
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
+    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
+
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
 
     ErrCode GetIpInfo(IpInfo &info) override;

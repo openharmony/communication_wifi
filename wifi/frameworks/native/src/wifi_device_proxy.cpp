@@ -2766,7 +2766,7 @@ ErrCode WifiDeviceProxy::GetVoWifiDetectPeriod(int &period)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo)
+ErrCode WifiDeviceProxy::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -2797,7 +2797,7 @@ ErrCode WifiDeviceProxy::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLi
         return ErrCode(ret);
     }
 
-    ParseMultiLinkedInfo(reply, mutilLinkedInfo);
+    ParseMultiLinkedInfo(reply, multiLinkedInfo);
     return WIFI_OPT_SUCCESS;
 }
 

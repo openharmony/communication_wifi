@@ -48,6 +48,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/base/state_machine/include",
       "$WIFI_ROOT_DIR/base/cRPC/include",
       "$WIFI_ROOT_DIR/base/utils",
+      "$WIFI_ROOT_DIR/base/inner_api",
       "$WIFI_ROOT_DIR/interfaces/inner_api",
       "$WIFI_ROOT_DIR/frameworks/native/include",
       "$WIFI_ROOT_DIR/frameworks/native/interfaces",

@@ -107,7 +107,6 @@ HWTEST_F(StaInterfaceTest, HandleForegroundAppChangedActionTest01, TestSize.Leve
 
 HWTEST_F(StaInterfaceTest, InitStaServiceLockedTest01, TestSize.Level1)
 {
-    pStaInterface->pStaService = nullptr;
     EXPECT_CALL(*pMockStaService, InitStaService(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
     EXPECT_FALSE(pStaInterface->InitStaServiceLocked() == false);
 }

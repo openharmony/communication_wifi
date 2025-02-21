@@ -328,6 +328,11 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             SaveFoldStatus(msg);
             break;
         }
+        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            pStaStateMachine->DealScreenStateChangedEvent(msg);
+            break;
+        }
         default:
             WIFI_LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
@@ -590,9 +595,6 @@ int StaStateMachine::LinkState::InitStaSMHandleMap()
     };
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK] = [this](InternalMessagePtr msg) {
         return this->pStaStateMachine->DealReassociateCmd(msg);
-    };
-    staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = [this](InternalMessagePtr msg) {
-        return this->pStaStateMachine->DealScreenStateChangedEvent(msg);
     };
 #ifndef OHOS_ARCH_LITE
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT] = [this](InternalMessagePtr msg) {
@@ -971,11 +973,6 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessagePtr msg)
         case WIFI_SVR_CMD_STA_RECONNECT_NETWORK: {
             ret = EXECUTED;
             DealReConnectCmdInSeparatedState(msg);
-            break;
-        }
-        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
-            ret = EXECUTED;
-            pStaStateMachine->DealScreenStateChangedEvent(msg);
             break;
         }
         default:

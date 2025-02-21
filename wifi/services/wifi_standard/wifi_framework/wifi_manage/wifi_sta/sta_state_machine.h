@@ -1003,7 +1003,7 @@ private:
     bool isRoam;
     bool isCurrentRoaming_ = false;
     int64_t lastTimestamp;
-    bool portalFlag;
+    bool autoPullBrowserFlag;
     PortalState portalState;
     int detectNum;
     int portalExpiredDetectCount;

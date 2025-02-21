@@ -1462,7 +1462,8 @@ WifiErrorNo WifiHdiWpaClient::ReqRegisterNativeProcessCallback(const std::functi
     return WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiHdiWpaClient::HandleMloLinkData(char *staData, uint32_t staDataLen, std::vector<WifiLinkedInfo> &mloLinkInfo)
+WifiErrorNo WifiHdiWpaClient::HandleMloLinkData(char *staData, uint32_t staDataLen,
+    std::vector<WifiLinkedInfo> &mloLinkInfo)
 {
     if (staData == NULL || staDataLen == 0) {
         LOGE("%{public}s: hdiInfo null or length err copy", __func__);

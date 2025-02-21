@@ -591,8 +591,8 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
                 LOGE("%{public}s get mlo connect info failed", __FUNCTION__);
                 return WIFI_OPT_FAILED;
             }
-            if (std::find_if(mloInfo.begin(), mloInfo.end(), [bssid](WifiLinkedInfo &info)
-                { return bssid == info.bssid; }) == mloInfo.end()) {
+            if (std::find_if(mloInfo.begin(), mloInfo.end(),
+                [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
                 pStaStateMachine->StartRoamToNetwork(bssid);
                 return WIFI_OPT_SUCCESS;
             }

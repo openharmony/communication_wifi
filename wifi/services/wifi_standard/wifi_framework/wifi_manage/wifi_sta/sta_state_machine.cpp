@@ -3569,7 +3569,6 @@ void StaStateMachine::DealMloLinkSignalPollResult()
         WIFI_LOGE("%{public}s get mlo linkInfo fail", __FUNCTION__);
         return;
     }
-    int32_t maxRssi = INVALID_RSSI_VALUE;
     for (auto &linkInfo : mloLinkedInfo) {
         bool isLinkedMatch = false;
         for (auto signalInfo : mloSignalInfo) {
@@ -3585,7 +3584,6 @@ void StaStateMachine::DealMloLinkSignalPollResult()
                 signalInfo.txPackets - linkInfo.lastTxPackets, signalInfo.rxPackets - linkInfo.lastRxPackets);
 
             linkInfo.rssi = rssi;
-            maxRssi = linkInfo.rssi > maxRssi ? linkInfo.rssi : maxRssi;
             linkInfo.frequency = signalInfo.frequency;
             linkInfo.linkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;
             linkInfo.txLinkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;
@@ -3599,7 +3597,6 @@ void StaStateMachine::DealMloLinkSignalPollResult()
         }
     }
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
-    linkedInfo.rssi = maxRssi;
 }
 
 void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)

@@ -24,6 +24,15 @@ config("module_private_config") {
 }
 
 ohos_unittest("precompiled_macro_unittest") {
+  sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = false  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
+      debug = false
+    }
   module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",

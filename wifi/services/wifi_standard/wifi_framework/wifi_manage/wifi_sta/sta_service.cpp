@@ -580,26 +580,31 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (networkId == linkedInfo.networkId) {
+        LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
+            __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
-        } else if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR linkedInfo.wifiLinkType ==
-            WifiLinkType::WIFI7_MLSR) {
-            LOGI("%{public}s current linkedBssid is emlsr, check can link switch", __FUNCTION__);
+            return WIFI_OPT_SUCCESS;
+        } else if (linkedInfo.isMloConnected) {
             std::vector<WifiLinkedInfo> mloInfo;
-            WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId);
+            if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId) < 0) {
+                LOGE("%{public}s get mlo connect info failed", __FUNCTION__);
+                return WIFI_OPT_FAILED;
+            }
             for (auto iter : mloInfo) {
                 if (iter.bssid == bssid) {
-                    WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_MLD_LINK_SWITCH, bssid);
-                    return WIFI_OPT_SUCCESS;
+                    if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {
+                        WifiCmdClient::GetInstance().SendCmdToDriver(
+                            WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), CMD_MLD_LINK_SWITCH, bssid);
+                        return WIFI_OPT_SUCCESS;
+                    } else if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR) {
+                        LOGI("%{public}s emlsr not support linkSwitch", __FUNCTION__);
+                        return WIFI_OPT_SUCCESS;
+                    }
                 }
             }
-            LOGE("%{public}s target bssid is not MLD bssid", __FUNCTION__);
-            return WIFI_OPT_FAILED;
-        } else {
-            LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
-                __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
-            pStaStateMachine->StartRoamToNetwork(bssid);
         }
+        pStaStateMachine->StartRoamToNetwork(bssid);
     } else {
         LOGI("%{public}s switch to target network", __FUNCTION__);
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);

@@ -943,7 +943,8 @@ void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, Me
     SendMultiLinkedInfo(size, multiLinkedInfo, reply);
 }
 
-void WifiDeviceStub::SendMultiLinkedInfo(uint32_t contentSize, std::vector<WifiLinkedInfo> &result, MessageParcel &reply)
+void WifiDeviceStub::SendMultiLinkedInfo(uint32_t contentSize, std::vector<WifiLinkedInfo> &result,
+    MessageParcel &reply)
 {
     WIFI_LOGI("%{public}s, contentSize: %{public}d", __FUNCTION__, contentSize);
     std::vector<uint32_t> allSize;

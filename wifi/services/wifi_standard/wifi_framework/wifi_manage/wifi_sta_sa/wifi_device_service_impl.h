@@ -109,7 +109,7 @@ public:
 
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
-    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo) override;
+    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mloLinkInfo) override;
 
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
 

@@ -1347,16 +1347,22 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo)
+ErrCode WifiDeviceServiceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mloLinkInfo)
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("GetMultiLinkedInfo, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     if (VerifyGetLinkedInfofoPermission() != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    std::vector<WifiLinkedInfo> mloLinkInfo;
-    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkInfo, m_instId);
+    if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkInfo, m_instId) < 0) {
+        WIFI_LOGE("GetMultiLinkedInfo failed, not find valid mloLinkInfo");
+        return WIFI_OPT_FAILED;
+    }
     for (auto &info : mloLinkInfo) {
         UpdateWifiLinkInfo(info);
     }

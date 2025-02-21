@@ -3580,7 +3580,7 @@ void StaStateMachine::DealMloLinkSignalPollResult()
             int rssi = UpdateLinkInfoRssi(signalInfo.rssi);
             WIFI_LOGI("MloSignalPollResult ssid:%{public}s, bssid:%{public}s, linkId:%{public}d, rssi: %{public}d,"
                 "fre: %{public}d, txSpeed: %{public}d, rxSpeed: %{public}d, deltaTxPackets: %{public}d, deltaRxPackets:"
-                "%{public}d", SsidAnonymize(linkInfo.ssid).c_str(), MacAnonymize(linkInfo.bssid).c_str(),
+                "%{public}d", SsidAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkInfo.bssid).c_str(),
                 linkInfo.linkId, rssi, signalInfo.frequency, signalInfo.txLinkSpeed, signalInfo.rxLinkSpeed,
                 signalInfo.txPackets - linkInfo.lastTxPackets, signalInfo.rxPackets - linkInfo.lastRxPackets);
 

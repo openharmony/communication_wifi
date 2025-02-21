@@ -11,10 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ability_runtime_services_path = "//foundation/ability/ability_runtime/services"
-ability_runtime_innerkits_path =
-    "//foundation/ability/ability_runtime/interfaces/inner_api"
-
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
 DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"

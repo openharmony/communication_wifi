@@ -628,10 +628,10 @@ public:
     /**
      * @Description Obtains the MLO Wi-Fi connection information
      *
-     * @param mutilLinkedInfo - Wifi MLO Linked Info
+     * @param multiLinkedInfo - Wifi MLO Linked Info
      * @return ErrCode - operation result
      */
-    virtual ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo) = 0;
+    virtual ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

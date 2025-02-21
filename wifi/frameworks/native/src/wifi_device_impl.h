@@ -656,10 +656,10 @@ public:
     /**
      * @Description Obtains the MLO Wi-Fi connection information
      *
-     * @param mutilLinkedInfo - Wifi MLO Linked Info
+     * @param multiLinkedInfo - Wifi MLO Linked Info
      * @return ErrCode - operation result
      */
-    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo) override;
+    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) override;
 
 private:
     bool GetWifiDeviceProxy();

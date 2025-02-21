@@ -641,10 +641,10 @@ public:
     /**
      * @Description Obtains the MLO Wi-Fi connection information
      *
-     * @param mutilLinkedInfo - MLO wifiLinkedInfo
+     * @param multiLinkedInfo - MLO wifiLinkedInfo
      * @return ErrCode - operation result
      */
-    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mutilLinkedInfo) override;
+    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) override;
 
 #ifdef OHOS_ARCH_LITE
     /**

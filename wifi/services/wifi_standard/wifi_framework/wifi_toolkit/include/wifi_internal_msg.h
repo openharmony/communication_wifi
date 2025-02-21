@@ -94,6 +94,7 @@ enum class OperateResState {
     CONNECT_CHECK_PORTAL,              /* check connect to a portal hotspot */
     CONNECT_NETWORK_ENABLED,           /* can visit internet */
     CONNECT_NETWORK_DISABLED,          /* cannot visit internet */
+    CONNECT_NETWORK_NORELATED,
     DISCONNECT_DISCONNECTING,          /* disconnecting */
     DISCONNECT_DISCONNECT_FAILED,      /* disconnect failed */
     DISCONNECT_DISCONNECTED,           /* disconnect succeed */

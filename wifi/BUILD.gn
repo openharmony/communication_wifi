@@ -12,6 +12,7 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
+
   import("//build/lite/config/component/lite_component.gni")
   import("//foundation/communication/wifi/wifi/wifi_lite.gni")
 

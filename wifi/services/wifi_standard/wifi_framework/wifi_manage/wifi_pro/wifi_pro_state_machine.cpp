@@ -428,10 +428,10 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     int32_t networkId = networkSelectionResult.wifiDeviceConfig.networkId;
     badBssid_ = currentBssid_;
     badSsid_ = currentSsid_;
-    targetBssid_ = networkSelectionResult.wifiDeviceConfig.bssid;
+    targetBssid_ = networkSelectionResult.interScanInfo.bssid;
     isWifi2WifiSwitching_ = true;
     WIFI_LOGE("TryWifi2Wifi: Switch reason : %{public}s", (g_switchReason[wifiSwitchReason_]).c_str());
-    if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_AUTO) != WIFI_OPT_SUCCESS) {
+    if (pStaService->StartConnectToBssid(networkId, targetBssid_, NETWORK_SELECTED_BY_AUTO) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("TryWifi2Wifi: ConnectToNetwork failed.");
         return false;
     }

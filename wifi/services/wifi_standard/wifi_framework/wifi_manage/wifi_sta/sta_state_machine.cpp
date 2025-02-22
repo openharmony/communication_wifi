@@ -453,6 +453,7 @@ void StaStateMachine::InitState::StopWifiProcess()
         pStaStateMachine->CloseNoInternetDialog();
     }
 #endif
+    WifiChrUtils::ClearSignalPollInfoArray();
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
 }
 
@@ -678,6 +679,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
+    WifiChrUtils::ClearSignalPollInfoArray();
     WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1);
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
@@ -3566,31 +3568,12 @@ void StaStateMachine::DealSignalPollResult()
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
     pLinkedState->UpdateExpandOffset();
+    WifiChrUtils::AddSignalPollInfoArray(signalInfo);
     LogSignalInfo(signalInfo);
     AddSignalPollInfoArray(signalInfo);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
     JudgeEnableSignalPoll(signalInfo);
-}
-
-void StaStateMachine::AddSignalPollInfoArray(WifiSignalPollInfo signalInfo)
-{
-    int length = SIGNALARR_LENGTH;
-    for (int index = length - 1; index > 0; index--) {
-        signalPollInfoArray[index] = signalPollInfoArray[index-1];
-    }
-    signalPollInfoArray[0] = signalInfo;
-}
- 
-void StaStateMachine::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
-{
-    WIFI_LOGI("get SignalInfos");
-    if (length > SIGNALARR_LENGTH) {
-        length = SIGNALARR_LENGTH;
-    }
-    for (int index = 0; index < length; index++) {
-        wifiSignalPollInfos.push_back(signalPollInfoArray[index]);
-    }
 }
 
 void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)

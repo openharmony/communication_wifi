@@ -568,16 +568,16 @@ ErrCode StaService::ConnectToNetwork(int networkId, int type) const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bssid) const
+ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::string bssid, int32_t type) const
 {
-    LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
+    LOGI("Enter StartConnectToBssid, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
         LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
         return WIFI_OPT_FAILED;
     }
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-
+ 
     WifiLinkedInfo linkedInfo;
     std::vector<WifiLinkedInfo> mloInfo;
     bool isMloBssid = false;
@@ -598,13 +598,13 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
         } else {
             LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
                 __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
-            pStaStateMachine->StartRoamToNetwork(bssid);
+            pStaStateMachine->StartConnectToBssid(bssid);
         }
     } else {
         LOGI("%{public}s switch to target network", __FUNCTION__);
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
         message->SetParam1(networkId);
-        message->SetParam2(NETWORK_SELECTED_BY_USER);
+        message->SetParam2(type);
         message->AddStringMessageBody(bssid);
         pStaStateMachine->SendMessage(message);
     }

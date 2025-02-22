@@ -104,13 +104,13 @@ ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::StartRoamToNetwork(const int networkId, const std::string bssid)
+ErrCode StaInterface::StartConnectToBssid(const int32_t networkId, const std::string bssid, int32_t type)
 {
-    LOGD("Enter StartRoamToNetwork");
+    LOGD("Enter StartConnectToBssid");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->StartRoamToNetwork(networkId, bssid) != WIFI_OPT_SUCCESS) {
-        LOGI("StartRoamToNetwork failed");
+    if (pStaService->StartConnectToBssid(networkId, bssid, type) != WIFI_OPT_SUCCESS) {
+        LOGI("StartConnectToBssid failed");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

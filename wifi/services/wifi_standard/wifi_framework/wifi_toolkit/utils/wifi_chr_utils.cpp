@@ -32,9 +32,6 @@ void WifiChrUtils::AddSignalPollInfoArray(WifiSignalPollInfo signalInfo)
     } else {
         signalPollInfoArray.push_back(signalInfo);
     }
-    for (int i = 0; i < signalPollInfoArray.size(); ++i) {
-        LOGE("yyb txpkts is %{public}d.", signalPollInfoArray[i].txPackets);
-    }
 }
 
 void WifiChrUtils::ClearSignalPollInfoArray()

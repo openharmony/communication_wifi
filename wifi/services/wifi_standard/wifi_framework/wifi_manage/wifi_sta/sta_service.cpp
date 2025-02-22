@@ -577,7 +577,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
         return WIFI_OPT_FAILED;
     }
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
- 
+
     WifiLinkedInfo linkedInfo;
     std::vector<WifiLinkedInfo> mloInfo;
     bool isMloBssid = false;

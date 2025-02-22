@@ -144,25 +144,15 @@ bool Perf5gHandoverService::Switch5g()
         WIFI_LOGE("Switch5g: pStaService is invalid");
         return false;
     }
-    int ret;
-    if (DualBandUtils::IsSameSsidAp(connectedAp_->apInfo, selectRelationAp_->apInfo.ssid,
-        selectRelationAp_->apInfo.bssid, selectRelationAp_->apInfo.keyMgmt)) {
-        WIFI_LOGI("Switch5g startRoamToNetwork. bssid(%{public}s)",
-            MacAnonymize(selectRelationAp_->apInfo.bssid).data());
-        ret = pStaService->StartRoamToNetwork(selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid);
-        if (ret == WIFI_OPT_SUCCESS) {
-            return true;
-        }
-        WIFI_LOGW("Switch5g, StartRoamToNetwork fail, ret = %{public}d", ret);
-    } else {
-        WIFI_LOGI("Switch5g ConnectToNetwork. bssid(%{public}s)",
-            MacAnonymize(selectRelationAp_->apInfo.bssid).data());
-        ret = pStaService->ConnectToNetwork(selectRelationAp_->apInfo.networkId, NETWORK_SELECTED_BY_AUTO);
-        if (ret == WIFI_OPT_SUCCESS) {
-            return true;
-        }
-        WIFI_LOGW("Switch5g, ConnectToNetwork fail, ret = %{public}d", ret);
+    int32_t ret;
+ 
+    WIFI_LOGI("Switch5g StartConnectToBssid. bssid(%{public}s)", MacAnonymize(selectRelationAp_->apInfo.bssid).data());
+    ret = pStaService->StartConnectToBssid(
+        selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, NETWORK_SELECTED_BY_AUTO);
+    if (ret == WIFI_OPT_SUCCESS) {
+        return true;
     }
+    WIFI_LOGW("Switch5g, StartConnectToBssid fail, ret = %{public}d", ret);
     selectRelationAp_.reset();
     return false;
 }
@@ -342,7 +332,7 @@ void Perf5gHandoverService::AddRelationAp(std::vector<WifiDeviceConfig> &wifiDev
         AddRelationApInfo(sameSsidAp);
     }
 }
-bool Perf5gHandoverService::IsRelationFreq(int frequency)
+bool Perf5gHandoverService::IsRelationFreq(int32_t frequency)
 {
     if (IsValid5GHz(connectedAp_->apInfo.frequency)) {
         return IsValid24GHz(frequency);
@@ -439,13 +429,13 @@ void Perf5gHandoverService::StopMonitor()
         monitorApIndexs_.clear();
     }
 }
-void Perf5gHandoverService::ActiveScan(int rssi)
+void Perf5gHandoverService::ActiveScan(int32_t rssi)
 {
     if (pWifiScanController_ == nullptr) {
         return;
     }
     bool needScanInMonitor = false;
-    std::unordered_set<int> monitorFreqs;
+    std::unordered_set<int32_t> monitorFreqs;
     for (auto &monitorApIndex : monitorApIndexs_) {
         monitorFreqs.insert(relationAps_[monitorApIndex].apInfo_.frequency);
         if (!needScanInMonitor && relationAps_[monitorApIndex].CanTriggerScan(rssi)) {
@@ -568,7 +558,7 @@ void Perf5gHandoverService::UpdateTriggerScanRssiThreshold()
         }
     }
 }
-void Perf5gHandoverService::RssiUpdate(int rssi)
+void Perf5gHandoverService::RssiUpdate(int32_t rssi)
 {
     if (connectedAp_->canNotPerf) {
         return;

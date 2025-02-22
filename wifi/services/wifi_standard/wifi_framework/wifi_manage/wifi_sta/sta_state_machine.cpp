@@ -3570,7 +3570,6 @@ void StaStateMachine::DealSignalPollResult()
     pLinkedState->UpdateExpandOffset();
     WifiChrUtils::AddSignalPollInfoArray(signalInfo);
     LogSignalInfo(signalInfo);
-    AddSignalPollInfoArray(signalInfo);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
     JudgeEnableSignalPoll(signalInfo);

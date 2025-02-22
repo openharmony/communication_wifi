@@ -1303,6 +1303,7 @@ void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply,
         signInfo.rxBytes = reply.ReadInt32();
         signInfo.txFailed = reply.ReadInt32();
         signInfo.chloadSelf = reply.ReadInt32();
+        signInfo.timeStamp = reply.ReadInt64();
         wifiSignalPollInfos.push_back(signInfo);
     }
 }

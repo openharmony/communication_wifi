@@ -22,6 +22,7 @@
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
 #include "network_selection.h"
+#include "wifi_chr_utils.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
 #endif

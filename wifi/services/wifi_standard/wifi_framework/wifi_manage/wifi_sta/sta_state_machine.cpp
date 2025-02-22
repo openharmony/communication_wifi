@@ -4115,7 +4115,7 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     }
 }
 
-void StaStateMachine::StartRoamToNetwork(std::string bssid)
+void StaStateMachine::StartConnectToBssid(std::string bssid)
 {
     InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {

@@ -144,15 +144,15 @@ bool WifiRdbManager::Delete(int &deletedRowCount, const NativeRdb::AbsRdbPredica
 
 std::shared_ptr<NativeRdb::RdbStore> WifiRdbManager::GetRdbStore()
 {
-    if (rdbStore_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutexLock_);
-        if (rdbStore_ == nullptr) {
-            NativeRdb::RdbStoreConfig rdbStoreConfig(rdbPath_);
-            int32_t errCode = NativeRdb::E_OK;
-            rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, rdbVersion_,
-                *pRdbOpenCallback_, errCode);
-        }
+    std::lock_guard<std::mutex> lock(mutexLock_);
+    if (rdbStore_ != nullptr) {
+        return rdbStore_;
     }
+    NativeRdb::RdbStoreConfig rdbStoreConfig(rdbPath_);
+    int32_t errCode = NativeRdb::E_OK;
+    rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, rdbVersion_,
+        *pRdbOpenCallback_, errCode);
+    DelayCloseRdbStore();
     return rdbStore_;
 }
 
@@ -203,5 +203,22 @@ int32_t WifiRdbManager::WifiHistoryRecordRdbCallback::OnUpgrade(NativeRdb::RdbSt
     WIFI_LOGI("WifiHistoryRecordRdbCallback OnUpgrade");
     return NativeRdb::E_OK;
 }
+
+void WifiRdbManager::DelayCloseRdbStore()
+{
+    WIFI_LOGI("DelayCloseRdbStore");
+    std::weak_ptr<WifiRdbManager> weakPtr = shared_from_this();
+    std::thread([weakPtr]() {
+        WIFI_LOGI("DelayCloseRdbStore thread begin");
+        constexpr int CLOSE_RDB_STORE_DELAY_TIME = 20;
+        std::this_thread::sleep_for(std::chrono::seconds(CLOSE_RDB_STORE_DELAY_TIME));
+        auto sharedPtr = weakPtr.lock();
+        if (sharedPtr != nullptr) {
+            std::lock_guard<std::mutex> lock(sharedPtr->mutexLock_);
+            sharedPtr->rdbStore_ = nullptr;
+        }
+    }).detach();
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -31,6 +31,7 @@
 #include "sta_define.h"
 #include "network_status_history_manager.h"
 #include "wifi_native_struct.h"
+#include "wifi_chr_utils.h"
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"
@@ -67,8 +68,6 @@ constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY_WITH_TASK = 1 * 1000;
 constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
-
-constexpr int SIGNALARR_LENGTH = 6;
 
 /* pincode length */
 constexpr int PIN_CODE_LEN = 8;
@@ -456,7 +455,6 @@ public:
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
     void DealCsaChannelChanged(InternalMessagePtr msg);
-    void GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);
@@ -982,14 +980,12 @@ private:
     void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
     void UpdateHiLinkAttribute();
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
-    void AddSignalPollInfoArray(WifiSignalPollInfo signalInfo);
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
     bool m_hilinkFlag = false;
     WifiDeviceConfig m_hilinkDeviceConfig;
-    WifiSignalPollInfo signalPollInfoArray[SIGNALARR_LENGTH];
 #ifndef OHOS_ARCH_LITE
     bool hasNoInternetDialog_ = false;
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;

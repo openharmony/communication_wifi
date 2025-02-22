@@ -343,12 +343,13 @@ void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_CONNECT_TYPE", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteWifiLinkTypeHiSysEvent(const std::string &ssid, int32_t wifiLinkType)
+void WriteWifiLinkTypeHiSysEvent(const std::string &ssid, int32_t wifiLinkType, const std::string &triggerReason)
 {
     Json::Value root;
     Json::FastWriter writer;
     root["SSID"] = ssid;
     root["WIFI_LINK_TYPE"] = wifiLinkType;
+    root["TRIGGER_REASON"] = triggerReason;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WIFI_LINK_TYPE_UPDATE", "EVENT_VALUE", writer.write(root));
 }
 

@@ -54,7 +54,7 @@ public:
     MOCK_METHOD3(RegisterFilterBuilder, ErrCode(const FilterTag &, const std::string &, const FilterBuilder &));
     MOCK_METHOD2(DeregisterFilterBuilder, ErrCode(const FilterTag &, const std::string &));
     MOCK_METHOD0(StartHttpDetect, ErrCode());
-    MOCK_CONST_METHOD2(StartRoamToNetwork, ErrCode(const int networkId, const std::string bssid));
+    MOCK_CONST_METHOD3(StartConnectToBssid, ErrCode(const int networkId, const std::string bssid, int32_t type));
     MOCK_CONST_METHOD2(StartConnectToUserSelectNetwork, ErrCode(const int networkId, const std::string bssid));
     MOCK_CONST_METHOD1(SetPowerMode, ErrCode(bool mode));
     MOCK_CONST_METHOD1(SetTxPower, ErrCode(int power));

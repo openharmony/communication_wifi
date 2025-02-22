@@ -53,9 +53,9 @@ ErrCode StaInterface::ConnectToDevice(const WifiDeviceConfig &config)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::StartRoamToNetwork(const int networkId, const std::string bssid)
+ErrCode StaInterface::StartConnectToBssid(const int32_t networkId, const std::string bssid, int32_t type)
 {
-    LOGD("Enter StartRoamToNetwork");
+    LOGD("Enter StartConnectToBssid");
     return WIFI_OPT_SUCCESS;
 }
 

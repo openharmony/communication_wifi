@@ -295,6 +295,8 @@ public:
      */
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
+    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
+
     /**
      * @Description Obtains the disconnected reason
      *
@@ -685,6 +687,7 @@ private:
     void ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEapConfig);
     void BigDataReadEapConfig(WifiEapConfig &wifiEapConfig, std::vector<std::string> &tokens);
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
+    void ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
     void ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> &result);

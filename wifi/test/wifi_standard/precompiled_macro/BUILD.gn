@@ -35,6 +35,7 @@ ohos_unittest("precompiled_macro_unittest") {
       cfi_vcall_icall_only = true
       debug = false
     }
+    
   sources = [
     "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",

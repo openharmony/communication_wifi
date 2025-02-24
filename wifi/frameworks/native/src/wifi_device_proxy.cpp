@@ -28,6 +28,7 @@ namespace Wifi {
 
 constexpr int MAX_SIZE = 256;
 int g_bigDataRecvLen = 0;
+constexpr int SIGNALARR_LENGTH = 6;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
     sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());
@@ -1288,6 +1289,9 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
 void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply,
                                              std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
 {
+    if (length > SIGNALARR_LENGTH) {
+        length = SIGNALARR_LENGTH;
+    }
     for (int index = 0; index < length; index++) {
         WifiSignalPollInfo signInfo;
         signInfo.signal = reply.ReadInt32();

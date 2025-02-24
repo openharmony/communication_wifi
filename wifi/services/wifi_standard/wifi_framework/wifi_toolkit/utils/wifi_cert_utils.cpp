@@ -14,6 +14,7 @@
  */
 
 #include "wifi_cert_utils.h"
+#include <unistd.h>
 #include "cert_manager_api.h"
 #include "securec.h"
 #include "wifi_log.h"

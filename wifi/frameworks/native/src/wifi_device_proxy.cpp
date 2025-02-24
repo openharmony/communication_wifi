@@ -704,7 +704,7 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
     return;
 }
 
-void WifiDeviceProxy::WifiDeviceProxy::ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> result)
+void WifiDeviceProxy::WifiDeviceProxy::ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> &result)
 {
     std::vector<uint32_t> allSize;
     reply.ReadUInt32Vector(&allSize);

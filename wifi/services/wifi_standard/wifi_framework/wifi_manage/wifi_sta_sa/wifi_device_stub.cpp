@@ -933,6 +933,7 @@ void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, Me
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::vector<WifiLinkedInfo> multiLinkedInfo;
     ErrCode ret = GetMultiLinkedInfo(multiLinkedInfo);
+    reply.WriteInt32(0);
     if (ret != WIFI_OPT_SUCCESS) {
         reply.WriteInt32(ret);
     }

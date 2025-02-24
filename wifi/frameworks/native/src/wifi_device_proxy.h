@@ -687,7 +687,7 @@ private:
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
-    void ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> result);
+    void ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> &result);
     void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     void ReadSignalInfoForVoWiFi(MessageParcel &reply, VoWifiSignalInfo &signalInfo);
     void RemoveDeathRecipient(void);

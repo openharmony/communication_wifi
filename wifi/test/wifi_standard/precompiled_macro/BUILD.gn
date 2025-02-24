@@ -24,6 +24,8 @@ config("module_private_config") {
 }
 
 ohos_unittest("precompiled_macro_unittest") {
+  module_out_path = module_output_path
+
   sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
       boundary_sanitize = false  # Enable boundary san detection
@@ -33,7 +35,6 @@ ohos_unittest("precompiled_macro_unittest") {
       cfi_vcall_icall_only = true
       debug = false
     }
-  module_out_path = module_output_path
   sources = [
     "$WIFI_ROOT_DIR/base/shared_util/wifi_notification_util.cpp",
     "$WIFI_ROOT_DIR/base/state_machine/src/internal_message.cpp",

@@ -88,11 +88,7 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
         ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
         if (ret == IPC_ERROR_CODE) {
             usleep(RETRY_INTERVAL);
-<<<<<<< HEAD
             LOGE("CmInstallAppCert ipc fail, retry %{public}d.", i + 1);
-=======
-            LOGE("CmInstallAppCert fail, retry %{public}d.", i + 1);
->>>>>>> 420a385112d4f7117df69c536ad556a594f8f3f8
             continue;
         }
         break;

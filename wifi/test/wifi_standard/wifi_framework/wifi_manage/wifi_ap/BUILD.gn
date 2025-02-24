@@ -30,7 +30,7 @@ ohos_unittest("WifiApServiceTest") {
     ubsan = false  # Enable some Ubsan options
     cfi_vcall_icall_only = true
     debug = false
-   }
+  }
 
   sources = [
     "$WIFI_ROOT_DIR/base/state_machine/src/state.cpp",

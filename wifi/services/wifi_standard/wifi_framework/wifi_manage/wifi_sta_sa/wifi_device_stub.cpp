@@ -30,6 +30,8 @@ DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 namespace OHOS {
 namespace Wifi {
 
+constexpr int SIGNALARR_LENGTH = 6;
+
 static std::map<int, std::string> g_HicollieStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
@@ -929,6 +931,9 @@ void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data
     reply.WriteInt32(0);
     std::vector<WifiSignalPollInfo> wifiSignalPollInfos;
     int length = data.ReadInt32();
+    if (length > SIGNALARR_LENGTH) {
+        length = SIGNALARR_LENGTH;
+    }
     ErrCode ret = GetSignalPollInfoArray(wifiSignalPollInfos, length);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {

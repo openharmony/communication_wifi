@@ -1819,6 +1819,8 @@ bool ScanService::AllowSystemSingleScan()
     Hid2dUpperScene shareScene;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SHARE_SERVICE_UID, shareScene);
     if ((shareScene.scene & 0x01) > 0) {
+        RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig->GetScanDeviceInfo(),
+            scanLimitType::HID2D_CLONE);
         return false;
     }
     // single scan requires controled by Hid2d or ActionListen

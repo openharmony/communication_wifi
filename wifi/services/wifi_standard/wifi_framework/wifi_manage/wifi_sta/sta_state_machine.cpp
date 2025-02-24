@@ -462,6 +462,7 @@ void StaStateMachine::InitState::StopWifiProcess()
         pStaStateMachine->CloseNoInternetDialog();
     }
 #endif
+    WifiChrUtils::ClearSignalPollInfoArray();
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
 }
 
@@ -687,6 +688,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
+    WifiChrUtils::ClearSignalPollInfoArray();
     WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
@@ -3581,6 +3583,7 @@ void StaStateMachine::DealSignalPollResult()
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
     pLinkedState->UpdateExpandOffset();
+    WifiChrUtils::AddSignalPollInfoArray(signalInfo);
     LogSignalInfo(signalInfo);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);

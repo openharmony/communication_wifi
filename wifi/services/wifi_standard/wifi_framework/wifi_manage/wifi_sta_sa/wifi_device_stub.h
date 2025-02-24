@@ -67,6 +67,7 @@ private:
     void OnIsMeteredHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpV6Info(uint32_t code, MessageParcel &data, MessageParcel &reply);

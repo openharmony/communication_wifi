@@ -54,6 +54,7 @@
         ConnectToDevice;
         Disconnect;
         GetLinkedInfo;
+        GetSignalPollInfoArray;
         GetDisconnectedReason;
         GetDeviceMacAddress;
         GetApIfaceName;

@@ -1413,6 +1413,23 @@ void WifiDeviceServiceImpl::UpdateWifiLinkInfo(WifiLinkedInfo &info)
     info.isAncoConnected = WifiConfigCenter::GetInstance().GetWifiConnectedMode(m_instId);
 }
 
+ErrCode WifiDeviceServiceImpl::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("%{public}s NOT NATIVE PROCESS, PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetSignalPollInfoArray:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    return pService->GetSignalPollInfoArray(wifiSignalPollInfos, length);
+}
+
 ErrCode WifiDeviceServiceImpl::GetDisconnectedReason(DisconnectedReason &reason)
 {
     if (!WifiAuthCenter::IsSystemAccess()) {

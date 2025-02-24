@@ -30,6 +30,8 @@ DEFINE_WIFILOG_LABEL("WifiDeviceStub");
 namespace OHOS {
 namespace Wifi {
 
+constexpr int SIGNALARR_LENGTH = 6;
+
 static std::map<int, std::string> g_HicollieStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
@@ -143,6 +145,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetVoWifiDetectPeriod(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetVoWifiDetectPeriod(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetSignalPollInfoArray(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_MULTI_LINKED_INFO)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetMultiLinkedInfo(code, data, reply); };
 }
@@ -928,6 +932,37 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, Message
     return;
 }
 
+void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGI("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    reply.WriteInt32(0);
+    std::vector<WifiSignalPollInfo> wifiSignalPollInfos;
+    int length = data.ReadInt32();
+    if (length > SIGNALARR_LENGTH) {
+        length = SIGNALARR_LENGTH;
+    }
+    ErrCode ret = GetSignalPollInfoArray(wifiSignalPollInfos, length);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        for (int index  = 0 ; index < length ; index++) {
+            reply.WriteInt32(wifiSignalPollInfos[index].signal);
+            reply.WriteInt32(wifiSignalPollInfos[index].txrate);
+            reply.WriteInt32(wifiSignalPollInfos[index].rxrate);
+            reply.WriteInt32(wifiSignalPollInfos[index].noise);
+            reply.WriteInt32(wifiSignalPollInfos[index].txPackets);
+            reply.WriteInt32(wifiSignalPollInfos[index].rxPackets);
+            reply.WriteInt32(wifiSignalPollInfos[index].snr);
+            reply.WriteInt32(wifiSignalPollInfos[index].chload);
+            reply.WriteInt32(wifiSignalPollInfos[index].ulDelay);
+            reply.WriteInt32(wifiSignalPollInfos[index].txBytes);
+            reply.WriteInt32(wifiSignalPollInfos[index].rxBytes);
+            reply.WriteInt32(wifiSignalPollInfos[index].txFailed);
+            reply.WriteInt32(wifiSignalPollInfos[index].chloadSelf);
+            reply.WriteInt64(wifiSignalPollInfos[index].timeStamp);
+        }
+    }
+    return;
+}
 void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());

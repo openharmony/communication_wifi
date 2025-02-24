@@ -1097,6 +1097,31 @@ NO_SANITIZE("cfi") napi_value GetLinkedInfoSync(napi_env env, napi_callback_info
     return result;
 }
 
+NO_SANITIZE("cfi") napi_value GetMultiLinkedInfo(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    std::vector<WifiLinkedInfo> wifiMultiLinkedInfo;
+    ErrCode ret = wifiDevicePtr->GetMultiLinkedInfo(wifiMultiLinkedInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetMultiLinkedInfo value fail:%{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    WIFI_LOGI("%{public}s get multi linkedInfo size: %{public}zu", __FUNCTION__, wifiMultiLinkedInfo.size());
+    napi_value arrayResult;
+    napi_create_array_with_length(env, wifiMultiLinkedInfo.size(), &arrayResult);
+    for (size_t i = 0; i < wifiMultiLinkedInfo.size(); i++) {
+        napi_value result;
+        napi_create_object(env, &result);
+        LinkedInfoToJs(env, wifiMultiLinkedInfo[i], result);
+        napi_status status = napi_set_element(env, arrayResult, i, result);
+        if (status != napi_ok) {
+            WIFI_LOGE("%{public}s set list element error: %{public}d", __FUNCTION__, status);
+        }
+    }
+    return arrayResult;
+}
+
 NO_SANITIZE("cfi") napi_value GetDisconnectedReason(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;

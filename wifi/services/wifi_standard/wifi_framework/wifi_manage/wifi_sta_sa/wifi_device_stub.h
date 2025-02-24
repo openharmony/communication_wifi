@@ -67,6 +67,7 @@ private:
     void OnIsMeteredHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpV6Info(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -116,6 +117,8 @@ private:
     void WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address);
     void BigDataWriteIpAddress(const WifiIpAddress &address, std::stringstream &bigDataStream);
     void SendDeviceConfig(int32_t ashmemSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
+    void WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedInfo &wifiInfo);
+    void SendMultiLinkedInfo(uint32_t contentSize, std::vector<WifiLinkedInfo> &result, MessageParcel &reply);
 
 private:
     HandleFuncMap handleFuncMap;

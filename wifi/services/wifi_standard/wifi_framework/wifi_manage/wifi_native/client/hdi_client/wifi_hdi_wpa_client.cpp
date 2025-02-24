@@ -1467,20 +1467,23 @@ WifiErrorNo WifiHdiWpaClient::ReqRegisterNativeProcessCallback(const std::functi
     return WIFI_HAL_OPT_FAILED;
 }
 
-bool WifiHdiWpaClient::HandleMloLinkData(char *staData, uint32_t staDataLen, std::vector<WifiLinkedInfo> &mloLinkInfo)
+WifiErrorNo WifiHdiWpaClient::HandleMloLinkData(char *staData, uint32_t staDataLen,
+    std::vector<WifiLinkedInfo> &mloLinkInfo)
 {
     if (staData == NULL || staDataLen == 0) {
         LOGE("%{public}s: hdiInfo null or length err copy", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
     char *savedPtr = NULL;
-    char *value = NULL;
+    std::string value = "";
     char *token = strtok_r(staData, "=", &savedPtr);
     WifiLinkedInfo linkInfo;
     while (token != NULL) {
         value = strtok_r(NULL, "\n", &savedPtr);
         if (strcmp(token, "freq") == 0) {
-            linkInfo.frequency = atoi(value);
+            linkInfo.frequency = CheckDataLegal(value);
+        } else if (strcmp(token, "link_id") == 0) {
+            linkInfo.linkId = CheckDataLegal(value);
         } else if (strcmp(token, "ap_link_addr") == 0) {
             linkInfo.bssid = value;
         } else if (strcmp(token, "sta_link_addr") == 0) {
@@ -1514,12 +1517,74 @@ WifiErrorNo WifiHdiWpaClient::GetMloLinkedInfo(const std::string &ifName,
         return WIFI_HAL_OPT_FAILED;
     }
 
-    if (!HandleMloLinkData(staData, staDataLen, mloLinkInfo)) {
+    if (HandleMloLinkData(staData, staDataLen, mloLinkInfo) != WIFI_HAL_OPT_OK) {
         LOGE("%{public}s: HandleMloLinkData failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
 }
-}  // namespace Wifi
+
+WifiErrorNo WifiHdiWpaClient::GetMloSignalPollInfo(const std::string &ifName,
+    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+{
+    char ifNameBuf[MAX_IFACENAME_LEN];
+    char staParam[] = "MLO_SIGNAL_POLL";
+    char staData[WIFI_MAX_WPA_STA_BUF_SIZE] = {0};
+    uint32_t staDataLen = WIFI_MAX_WPA_STA_BUF_SIZE;
+    if (strncpy_s(ifNameBuf, sizeof(ifNameBuf), ifName.c_str(), ifName.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    if (HdiWpaGetMloLinkedInfo(ifNameBuf, staParam, staData, staDataLen) != WIFI_HAL_OPT_OK) {
+        LOGE("%{public}s: failed", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    if (HandleMloSignalPollData(staData, staDataLen, mloSignalInfo) != WIFI_HAL_OPT_OK) {
+        LOGE("%{public}s: HandleMloLinkData failed", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::HandleMloSignalPollData(char *staData, uint32_t staDataLen,
+    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+{
+    if (staData == NULL || staDataLen == 0) {
+        LOGE("%{public}s: hdiInfo null or length err copy", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    char *savedPtr = NULL;
+    std::string value = "";
+    char *token = strtok_r(staData, "=", &savedPtr);
+    WifiMloSignalInfo signalInfo;
+    while (token != NULL) {
+        value = strtok_r(NULL, "\n", &savedPtr);
+        if (strcmp(token, "LINK_ID") == 0) {
+            signalInfo.linkId = CheckDataLegal(value);
+        } else if (strcmp(token, "RSSI") == 0) {
+            signalInfo.rssi = CheckDataLegal(value);
+        } else if (strcmp(token, "FREQUENCY") == 0) {
+            signalInfo.frequency = CheckDataLegal(value);
+        } else if (strcmp(token, "TXLINKSPEED") == 0) {
+            signalInfo.txLinkSpeed = CheckDataLegal(value);
+        } else if (strcmp(token, "RXLINKSPEED") == 0) {
+            signalInfo.rxLinkSpeed = CheckDataLegal(value);
+        } else if (strcmp(token, "TXPACKETS") == 0) {
+            signalInfo.txPackets = CheckDataLegal(value);
+        } else if (strcmp(token, "RXPACKETS") == 0) {
+            signalInfo.rxPackets = CheckDataLegal(value);
+            mloSignalInfo.push_back(signalInfo);
+        }
+        token = strtok_r(NULL, "=", &savedPtr);
+    }
+    if (mloSignalInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
+        LOGE("%{public}s: invalid link num: %{public}zu", __func__, mloSignalInfo.size());
+        mloSignalInfo.clear();
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+}
+} // namespace Wifi
 }  // namespace OHOS
 #endif

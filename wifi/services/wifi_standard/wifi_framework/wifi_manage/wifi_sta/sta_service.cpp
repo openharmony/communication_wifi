@@ -579,26 +579,32 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 
     WifiLinkedInfo linkedInfo;
-    std::vector<WifiLinkedInfo> mloInfo;
-    bool isMloBssid = false;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId);
-    for (auto iter : mloInfo) {
-        if (iter.bssid == bssid) {
-            isMloBssid = true;
-            break;
-        }
-    }
     if (networkId == linkedInfo.networkId) {
+        LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
+            __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
-        } else if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR && isMloBssid) {
-            LOGI("%{public}s current linkedBssid is emlsr, forbid link switch", __FUNCTION__);
-            return WIFI_OPT_NOT_SUPPORTED;
-        } else {
-            LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
-                __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
-            pStaStateMachine->StartRoamToNetwork(bssid);
+            return WIFI_OPT_SUCCESS;
+        } else if (linkedInfo.isMloConnected) {
+            std::vector<WifiLinkedInfo> mloInfo;
+            if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId) < 0) {
+                LOGE("%{public}s get mlo connect info failed", __FUNCTION__);
+                return WIFI_OPT_FAILED;
+            }
+            if (std::find_if(mloInfo.begin(), mloInfo.end(),
+                [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
+                pStaStateMachine->StartRoamToNetwork(bssid);
+                return WIFI_OPT_SUCCESS;
+            }
+            if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {
+                WifiCmdClient::GetInstance().SendCmdToDriver(
+                    WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), CMD_MLD_LINK_SWITCH, bssid);
+                return WIFI_OPT_SUCCESS;
+            } else if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR) {
+                LOGI("%{public}s emlsr not support linkSwitch", __FUNCTION__);
+                return WIFI_OPT_SUCCESS;
+            }
         }
     } else {
         LOGI("%{public}s switch to target network", __FUNCTION__);

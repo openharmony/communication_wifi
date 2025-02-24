@@ -448,7 +448,7 @@ public:
      *
      */
     void HandlePortalNetworkPorcess();
-    
+
     void SetPortalBrowserFlag(bool flag);
     void DealApRoamingStateTimeout(InternalMessagePtr msg);
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
@@ -566,7 +566,7 @@ private:
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
 
     void SetAllowAutoConnectStatus(int32_t networkId, bool status);
- 
+
     /**
      * @Description  Disconnect network
      *
@@ -626,6 +626,8 @@ private:
      * @Description : Deal SignalPoll Result.
      */
     void DealSignalPollResult();
+
+    void DealMloLinkSignalPollResult();
 
     /**
      * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
@@ -762,7 +764,7 @@ private:
      * @param networkId - networkId
      */
     void OnWifiWpa3SelfCure(int failreason, int networkId);
-	
+
     /**
      * @Description : Deal screen state change event.
      *
@@ -1004,7 +1006,7 @@ private:
     bool isRoam;
     bool isCurrentRoaming_ = false;
     int64_t lastTimestamp;
-    bool portalFlag;
+    bool autoPullBrowserFlag;
     PortalState portalState;
     int detectNum;
     int portalExpiredDetectCount;
@@ -1030,6 +1032,7 @@ private:
     int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
     std::string curForegroundAppBundleName_ = "";
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
+    OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
 };
 }  // namespace Wifi
 }  // namespace OHOS

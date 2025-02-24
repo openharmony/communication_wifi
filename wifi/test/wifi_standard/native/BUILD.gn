@@ -17,10 +17,7 @@ module_output_path = "wifi/native_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "$WIFI_ROOT_DIR/test/wifi_standard/native",
-  ]
+  include_dirs = [ "$WIFI_ROOT_DIR/test/wifi_standard/native" ]
 }
 
 ohos_unittest("native_unittest") {
@@ -50,14 +47,11 @@ ohos_unittest("native_unittest") {
   ]
 
   include_dirs = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/interfaces",
     "$WIFI_ROOT_DIR/frameworks/native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log/",
     "$WIFI_ROOT_DIR/test/wifi_standard/native/Mock",
-    "//third_party/googletest/googlemock/include",
-    "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/base/cRPC/include",
   ]

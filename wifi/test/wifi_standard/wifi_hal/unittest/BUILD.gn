@@ -17,10 +17,7 @@ module_output_path = "wifi/wifi_hal_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_hal/unittest",
-  ]
+  include_dirs = [ "$WIFI_ROOT_DIR/test/wifi_standard/wifi_hal/unittest" ]
 }
 
 ohos_unittest("wifi_hal_unittest") {
@@ -73,7 +70,6 @@ ohos_unittest("wifi_hal_unittest") {
   ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/relation_services/common",
     "$WIFI_ROOT_DIR/relation_services/wifi_hal_service",
@@ -81,9 +77,6 @@ ohos_unittest("wifi_hal_unittest") {
     "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_module/wpa_supplicant_hal",
     "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal",
     "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/common",
-    "//third_party/bounds_checking_function/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
   ]
 
@@ -100,6 +93,7 @@ ohos_unittest("wifi_hal_unittest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hilog:libhilog",
+    "wpa_supplicant:wpa_client",
   ]
 
   defines = [

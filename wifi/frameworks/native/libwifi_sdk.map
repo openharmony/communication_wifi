@@ -78,6 +78,7 @@
         GetVoWifiDetectMode;
         SetVoWifiDetectPeriod;
         GetVoWifiDetectPeriod;
+        GetMultiLinkedInfo;
         "*CompositeWifiFilter*";
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";

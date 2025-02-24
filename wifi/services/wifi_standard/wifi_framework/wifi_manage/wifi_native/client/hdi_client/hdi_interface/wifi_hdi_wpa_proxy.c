@@ -68,6 +68,8 @@ const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
+static struct HdfRemoteService* g_remote = NULL;
+static struct HdfDeathRecipient* g_recipient = NULL;
 static pthread_mutex_t g_ifaceNameMutex = PTHREAD_MUTEX_INITIALIZER;
 static char g_staIfaceName[STA_INSTANCE_MAX_NUM][IFACENAME_LEN] = {{0}, {0}};
 static char g_p2pIfaceName[IFACENAME_LEN] = {0};
@@ -233,6 +235,8 @@ static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRem
     OsalMemFree(recipient);
     recipient = NULL;
     HdiWpaResetGlobalObj();
+    g_remote = NULL;
+    g_recipient = NULL;
 }
 
 static WifiErrorNo RegistHdfDeathCallBack()
@@ -248,14 +252,38 @@ static WifiErrorNo RegistHdfDeathCallBack()
         LOGE("%{public}s: failed to get HdfRemoteService", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
+    g_remote = remote;
     LOGI("%{public}s: success to get HdfRemoteService", __func__);
     struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
     if (recipient == NULL) {
         LOGE("%{public}s: OsalMemCalloc is failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
+    if (g_recipient != NULL) {
+        OsalMemFree(g_recipient);
+    }
+    g_recipient = recipient;
     recipient->OnRemoteDied = ProxyOnRemoteDied;
     HdfRemoteServiceAddDeathRecipient(remote, recipient);
+    return WIFI_HAL_OPT_OK;
+}
+
+static WifiErrorNo UnRegistHdfDeathCallBack()
+{
+    if (g_remote == NULL || g_recipient == NULL) {
+        LOGE("%{public}s: Invalid remote or recipient", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    HdfRemoteServiceRemoveDeathRecipient(g_remote, g_recipient);
+    HdfRemoteServiceRecycle(g_remote);
+    g_remote = NULL;
+    if (g_recipient == NULL) {
+        LOGE("%{public}s: param recipient is null", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    OsalMemFree(g_recipient);
+    g_recipient = NULL;
+    LOGI("%{public}s: Death recipient unregistered", __func__);
     return WIFI_HAL_OPT_OK;
 }
 
@@ -361,6 +389,9 @@ WifiErrorNo HdiWpaStop()
     IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
     g_wpaObj = NULL;
     if (g_devMgr != NULL) {
+        if (UnRegistHdfDeathCallBack() != WIFI_HAL_OPT_OK) {
+            LOGE("%{public}s UnRegistHdfDeathCallBack failed", __func__);
+        }
         g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
         HDIDeviceManagerRelease(g_devMgr);
         g_devMgr = NULL;

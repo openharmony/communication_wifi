@@ -17,10 +17,8 @@ module_output_path = "wifi/crpc_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "$WIFI_ROOT_DIR/test/wifi_standard/ipc_framework/cRPC/unittest",
-  ]
+  include_dirs =
+      [ "$WIFI_ROOT_DIR/test/wifi_standard/ipc_framework/cRPC/unittest" ]
 }
 
 ohos_unittest("crpc_unittest") {
@@ -40,10 +38,7 @@ ohos_unittest("crpc_unittest") {
     "server_test.cpp",
   ]
 
-  include_dirs = [
-    "$WIFI_ROOT_DIR/base/cRPC/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  ]
+  include_dirs = [ "$WIFI_ROOT_DIR/base/cRPC/include" ]
 
   ldflags = [
     "-fPIC",

@@ -31,6 +31,16 @@ ApInterface::ApInterface(int id)
 ApInterface::~ApInterface()
 {}
 
+extern "C" IApService *CreateApInterface(int id)
+{
+    return new ApInterface(id);
+}
+
+extern "C" void DestroyApInterface(IApService *apInterface)
+{
+    delete apInterface;
+}
+
 ErrCode ApInterface::EnableHotspot()
 {
     return m_ApService.EnableHotspot();

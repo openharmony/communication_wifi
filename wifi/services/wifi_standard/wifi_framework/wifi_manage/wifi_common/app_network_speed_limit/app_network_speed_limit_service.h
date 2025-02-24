@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr const int UNKNOWN_UID = -1;
+constexpr const int UNKNOWN_MODE = -1;
 
 enum GameSceneId : int {
     MSG_GAME_STATE_START = 0,
@@ -85,17 +86,20 @@ private:
         const int uid = -1);
     void HighPriorityTransmit(int uid, int protocol, int enable);
     void GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
+    void LogSpeedLimitConfigs();
+    void UpdateGamePvpState(const WifiNetworkControlInfo &networkControlInfo);
 
 private:
     StaServiceCallback m_staCallback;
     std::atomic<bool> m_isWifiConnected = false;
+    std::atomic<bool> m_isGamePvp = false;
     int m_isHighPriorityTransmit = 0;
     std::map<int, int> m_bgLimitRecordMap;
     int m_limitSpeedMode{0};
     std::unordered_set<int> m_bgUidSet;
     std::unordered_set<int> m_bgPidSet;
     std::unordered_set<int> m_fgUidSet;
-    int m_lastLimitSpeedMode{0};
+    int m_lastLimitSpeedMode{UNKNOWN_MODE};
     std::unordered_set<int> m_lastBgUidSet;
     std::unordered_set<int> m_lastBgPidSet;
     std::unordered_set<int> m_lastFgUidSet;

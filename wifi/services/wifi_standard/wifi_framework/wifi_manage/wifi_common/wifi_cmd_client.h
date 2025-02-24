@@ -29,6 +29,7 @@ inline const int CMD_AX_BLA_LIST = 131;
 inline const int CMD_AX_SELFCURE = 132;
 inline const int CMD_BE_BLA_LIST = 221;
 inline const int CMD_EMLSR_MODE = 222;
+inline const int CMD_MLD_LINK_SWITCH = 223;
 
 struct WifiPrivCmd {
     uint8_t *buf;
@@ -51,6 +52,7 @@ private:
     int AxSelfcure(const std::string &ifName, const std::string &param) const;
     int SetBeBlaList(const std::string &ifName, const std::string &param) const;
     int SetEmlsrMode(const std::string &ifName, const std::string &param) const;
+    int StartMldLinkSwitch(const std::string &ifName, const std::string &param) const;
 };
 } // namespace Wifi
 } // namespace OHOS

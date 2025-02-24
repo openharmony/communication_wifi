@@ -24,7 +24,7 @@ namespace Wifi {
 constexpr int MAX_ALIAS_LEN = 128;
 constexpr int MAX_RETRY_COUNT = 5;
 constexpr int RETRY_INTERVAL = 100 * 1000;
-constexpr int IPC_ERROR_CODE = 29189;
+constexpr int IPC_ERROR_REMOTE_SA_DIE = 29189;
 
 static bool CheckParamters(const std::vector<uint8_t>& certEntry, const std::string& pwd,
     std::string& alias)
@@ -87,9 +87,9 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     int ret = CM_SUCCESS;
     for (int i = 0; i < MAX_RETRY_COUNT; i++) {
         ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
-        if (ret == IPC_ERROR_CODE) {
+        if (ret == IPC_ERROR_REMOTE_SA_DIE) {
             usleep(RETRY_INTERVAL);
-            LOGE("CmInstallAppCert ipc fail, retry %{public}d.", i + 1);
+            LOGE("CmInstallAppCert fail, remote sa die, code:%{public}d, retry %{public}d.", ret, i + 1);
             continue;
         }
         break;

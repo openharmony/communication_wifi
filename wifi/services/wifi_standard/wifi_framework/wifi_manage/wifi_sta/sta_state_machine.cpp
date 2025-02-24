@@ -689,7 +689,6 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
     WifiChrUtils::ClearSignalPollInfoArray();
-    WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1);
     WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);

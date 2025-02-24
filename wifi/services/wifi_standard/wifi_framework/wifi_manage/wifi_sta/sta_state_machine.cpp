@@ -1925,6 +1925,14 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
+// if wifipro is open, wifipro will notify selfcure no internet, if not, sta should notify
+#ifndef FEATURE_WIFI_PRO_SUPPORT
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        if (selfCureService_ != nullptr) {
+            selfCureService_->NotifyInternetFailureDetected(false);
+        }
+#endif
+#endif
     }
 #ifndef OHOS_ARCH_LITE
     SyncDeviceEverConnectedState(true);

@@ -21,6 +21,9 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_ALIAS_LEN = 128;
+constexpr int MAX_RETRY_COUNT = 5;
+constexpr int RETRY_INTERVAL = 100 * 1000;
+constexpr int IPC_ERROR_CODE = 29189;
 
 static bool CheckParamters(const std::vector<uint8_t>& certEntry, const std::string& pwd,
     std::string& alias)
@@ -80,11 +83,19 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     uint32_t store = 3;
     char retUriBuf[MAX_ALIAS_LEN] = { 0 };
     struct CmBlob keyUri = { sizeof(retUriBuf), reinterpret_cast<uint8_t*>(retUriBuf) };
-    int ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
-
+    int ret = CM_SUCCESS;
+    for (int i = 0; i < MAX_RETRY_COUNT; i++) {
+        ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
+        if (ret == IPC_ERROR_CODE) {
+            usleep(RETRY_INTERVAL);
+            LOGE("CmInstallAppCert ipc fail, retry %{public}d.", i + 1);
+            continue;
+        }
+        break;
+    }
     free(data);
     data = nullptr;
-    if (ret == 0) {
+    if (ret == CM_SUCCESS) {
         uri = reinterpret_cast<char*>(keyUri.data);
     }
 

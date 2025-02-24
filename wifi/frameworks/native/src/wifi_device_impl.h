@@ -655,6 +655,14 @@ public:
      */
     ErrCode GetVoWifiDetectPeriod(int &period) override;
 
+    /**
+     * @Description Obtains the MLO Wi-Fi connection information
+     *
+     * @param multiLinkedInfo - Wifi MLO Linked Info
+     * @return ErrCode - operation result
+     */
+    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) override;
+
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

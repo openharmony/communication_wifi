@@ -86,6 +86,8 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_VOWIFI_DETECT_MODE = 0x104C,       /* GetVoWifiDetectMode */
     WIFI_SVR_CMD_SET_VOWIFI_DETECT_PERIOD = 0x104D,     /* SetVoWifiDetectPeriod */
     WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD = 0x104E,     /* GetVoWifiDetectPeriod */
+    /* MLO connect */
+    WIFI_SVR_CMD_GET_MULTI_LINKED_INFO = 0x104F,
 
     WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY = 0x104F,           /* get signalpool info */
     

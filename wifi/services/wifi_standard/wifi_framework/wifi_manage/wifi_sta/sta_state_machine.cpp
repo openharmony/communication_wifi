@@ -121,12 +121,19 @@ const std::map<int, int> wpa3FailreasonMap {
     {MAC_ASSOC_RSP_TIMEOUT, WPA3_ASSOC_TIMEOUT}
 };
 
+const std::map<int, int> portalEventValues = {
+    {PortalState::NOT_PORTAL, HISYS_EVENT_PROTAL_STATE_NOT_PORTAL},
+    {PortalState::UNAUTHED, HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED},
+    {PortalState::AUTHED, HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED},
+    {PortalState::EXPERIED, HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED}
+};
+
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       targetNetworkId_(INVALID_NETWORK_ID),
       lastSignalLevel_(INVALID_SIGNAL_LEVEL), targetRoamBssid(WPA_BSSID_ANY), currentTpType(IPTYPE_IPV4),
       getIpSucNum(0), getIpFailNum(0), enableSignalPoll(true), isRoam(false),
-      lastTimestamp(0), portalFlag(true), portalState(PortalState::UNCHECKED), detectNum(0),
+      lastTimestamp(0), autoPullBrowserFlag(true), portalState(PortalState::UNCHECKED), detectNum(0),
       portalExpiredDetectCount(0), mIsWifiInternetCHRFlag(false), networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr), pInitState(nullptr),
       pLinkState(nullptr), pSeparatedState(nullptr), pApLinkingState(nullptr),
@@ -256,6 +263,8 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isMloConnected = false;
     linkedInfo.isWurEnable = false;
     linkedInfo.isHiLinkNetwork = false;
+    std::vector<WifiLinkedInfo> emptyMloLinkInfo;
+    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(emptyMloLinkInfo, m_instId);
 }
 
 /* --------------------------- state machine Init State ------------------------------ */
@@ -499,7 +508,7 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", networkId);
         return;
     }
-    
+
     if (networkId == pStaStateMachine->linkedInfo.networkId && config.isReassocSelfCureWithFactoryMacAddress == 0) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
@@ -517,7 +526,7 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
         return;
     }
-    
+
     if (pStaStateMachine->StartConnectToNetwork(networkId, bssid, connTriggerMode) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to network failed: %{public}d.\n", networkId);
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::FAILED);
@@ -669,7 +678,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     msg->GetStringFromMessage();
     WIFI_LOGI("Enter DealDisconnectEventInLinkState m_instId = %{public}d reason:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
-    
+
     pStaStateMachine->mIsWifiInternetCHRFlag = false;
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine->hasNoInternetDialog_) {
@@ -681,6 +690,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     }
     WifiChrUtils::ClearSignalPollInfoArray();
     WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1);
+    WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
         if (shouldStopTimer) {
@@ -697,6 +707,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
         pStaStateMachine->StopDhcp();
+        pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
         pStaStateMachine->InitWifiLinkedInfo();
@@ -708,6 +719,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
 void StaStateMachine::LinkState::StopWifiProcessInLinkState(InternalMessagePtr msg)
 {
     WIFI_LOGI("Enter StaStateMachine::StopWifiProcessInLinkState m_instId = %{public}d\n", pStaStateMachine->m_instId);
+    WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
     WifiStaHalInterface::GetInstance().Disconnect(
         WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId));
     pStaStateMachine->DelayMessage(msg);
@@ -786,7 +798,8 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
             WriteEmlsrExitReasonHiSysEvent(pStaStateMachine->linkedInfo.ssid, static_cast<int>(reasonCode));
         }
         pStaStateMachine->linkedInfo.wifiLinkType = static_cast<WifiLinkType>(state);
-        WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, pStaStateMachine->linkedInfo.wifiLinkType);
+        WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid,
+            pStaStateMachine->linkedInfo.wifiLinkType, "MLO_STATE_CHANGED");
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine->enhanceService_ != nullptr) {
             pStaStateMachine->enhanceService_->OnWifiLinkTypeChanged(pStaStateMachine->linkedInfo.wifiLinkType);
@@ -927,6 +940,7 @@ void StaStateMachine::SeparatedState::GoInState()
     pStaStateMachine->isRoam = false;
     pStaStateMachine->mPortalUrl = "";
     /* Callback result to InterfaceService. */
+    pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, pStaStateMachine->linkedInfo);
     /* clear connection information. */
     pStaStateMachine->InitWifiLinkedInfo();
@@ -1166,6 +1180,7 @@ void StaStateMachine::ApLinkedState::GoInState()
 void StaStateMachine::ApLinkedState::GoOutState()
 {
     WIFI_LOGI("ApLinkedState GoOutState function.");
+    pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
     return;
 }
 
@@ -1750,7 +1765,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
 
 void StaStateMachine::SetPortalBrowserFlag(bool flag)
 {
-    portalFlag = flag;
+    autoPullBrowserFlag = flag;
     mIsWifiInternetCHRFlag = false;
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
@@ -1776,7 +1791,7 @@ void StaStateMachine::ShowPortalNitification()
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_CONNECTED);
-            portalFlag = false;
+            autoPullBrowserFlag = false;
         } else {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
@@ -1843,6 +1858,8 @@ void StaStateMachine::UpdatePortalState(SystemNetWorkState netState, bool &updat
         }
         PortalExpiredDetect();
     }
+    WritePortalStateHiSysEvent(portalEventValues.count(portalState) > 0 ?
+        portalEventValues.at(portalState) : HISYS_EVENT_DEFAULT_VALUE);
 }
 
 void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std::string url)
@@ -1876,11 +1893,10 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         UpdatePortalState(netState, updatePortalAuthTime);
         /* Save connection information to WifiSettings. */
         WriteIsInternetHiSysEvent(NETWORK);
-        WritePortalStateHiSysEvent(portalFlag ? HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED
-                                              : HISYS_EVENT_PROTAL_STATE_NOT_PORTAL);
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
+        lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
         if (getCurrentWifiDeviceConfig().isPortal) {
             StartDetectTimer(DETECT_TYPE_PERIODIC);
@@ -1910,12 +1926,13 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         }
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
+        lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
 #ifndef OHOS_ARCH_LITE
     SyncDeviceEverConnectedState(true);
 #endif
-    portalFlag = true;
+    autoPullBrowserFlag = true;
     TryModifyPortalAttribute(netState);
 }
 
@@ -1925,16 +1942,15 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     UpdatePortalState(netState, updatePortalAuthTime);
 #ifndef OHOS_ARCH_LITE
-    if (linkedInfo.detailedState != DetailedState::CAPTIVE_PORTAL_CHECK
+    if (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL
         && WifiConfigCenter::GetInstance().IsAllowPopUp()) {
         ShowPortalNitification();
     }
 #endif
-    if (portalFlag == false) {
+    if (autoPullBrowserFlag == false) {
         WriteIsInternetHiSysEvent(NO_NETWORK);
-        WritePortalStateHiSysEvent(HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED);
         HandlePortalNetworkPorcess();
-        portalFlag = true;
+        autoPullBrowserFlag = true;
     }
     bool isHomeAp = false;
     bool isHomeRouter = false;
@@ -1944,6 +1960,7 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
 #endif
     WriteIsInternetHiSysEvent(NETWORK);
     SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
+    lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
     InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
@@ -2074,7 +2091,8 @@ void StaStateMachine::LinkedState::GoInState()
     WIFI_LOGI("LinkedState GoInState function. m_instId = %{public}d", pStaStateMachine->m_instId);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
-    WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, pStaStateMachine->linkedInfo.wifiLinkType);
+    WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid,
+        pStaStateMachine->linkedInfo.wifiLinkType, "CONNECT");
 #ifndef OHOS_ARCH_LITE
     CheckIfRestoreWifi();
 #endif
@@ -2227,8 +2245,6 @@ void StaStateMachine::LinkedState::UpdateExpandOffset()
         expandRssi_ = pStaStateMachine->linkedInfo.rssi;
         rssiOffset_ = expandRssi_ - halfFoldRssi_;
     }
-    WIFI_LOGI("LinkedState, UpdateExpandOffset rssiOffset_:%{public}d, foldStatus_:%{public}d\n",
-        rssiOffset_, pStaStateMachine->foldStatus_);
     if (rssiOffset_ < RSSI_OFFSET_MIN) {
         rssiOffset_ = RSSI_OFFSET_MIN;
     } else if (rssiOffset_ >= RSSI_OFFSET_MAX) {
@@ -3552,7 +3568,7 @@ void StaStateMachine::DealSignalPollResult()
     } else {
         UpdateLinkRssi(signalInfo);
     }
-    
+
     if (signalInfo.txrate > 0) {
         linkedInfo.txLinkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
         linkedInfo.linkSpeed = signalInfo.txrate / TRANSFORMATION_TO_MBPS;
@@ -3573,6 +3589,54 @@ void StaStateMachine::DealSignalPollResult()
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
     JudgeEnableSignalPoll(signalInfo);
+    DealMloLinkSignalPollResult();
+}
+
+void StaStateMachine::DealMloLinkSignalPollResult()
+{
+    if (linkedInfo.wifiLinkType != WifiLinkType::WIFI7_EMLSR) {
+        WIFI_LOGD("%{public}s current linkType is not EMLSR", __FUNCTION__);
+        return;
+    }
+    std::vector<WifiMloSignalInfo> mloSignalInfo;
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (WifiStaHalInterface::GetInstance().GetConnectionMloSignalInfo(ifName, mloSignalInfo) != WIFI_HAL_OPT_OK ||
+        mloSignalInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
+        return;
+    }
+    std::vector<WifiLinkedInfo> mloLinkedInfo;
+    if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkedInfo, m_instId) < 0) {
+        WIFI_LOGE("%{public}s get mlo linkInfo fail", __FUNCTION__);
+        return;
+    }
+    for (auto &linkInfo : mloLinkedInfo) {
+        bool isLinkedMatch = false;
+        for (auto signalInfo : mloSignalInfo) {
+            if (signalInfo.linkId != linkInfo.linkId) {
+                continue;
+            }
+            isLinkedMatch = true;
+            int rssi = UpdateLinkInfoRssi(signalInfo.rssi);
+            WIFI_LOGI("MloSignalPollResult ssid:%{public}s, bssid:%{public}s, linkId:%{public}d, rssi: %{public}d,"
+                "fre: %{public}d, txSpeed: %{public}d, rxSpeed: %{public}d, deltaTxPackets: %{public}d, deltaRxPackets:"
+                "%{public}d", SsidAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkInfo.bssid).c_str(),
+                linkInfo.linkId, rssi, signalInfo.frequency, signalInfo.txLinkSpeed, signalInfo.rxLinkSpeed,
+                signalInfo.txPackets - linkInfo.lastTxPackets, signalInfo.rxPackets - linkInfo.lastRxPackets);
+
+            linkInfo.rssi = rssi;
+            linkInfo.frequency = signalInfo.frequency;
+            linkInfo.linkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;
+            linkInfo.txLinkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;
+            linkInfo.rxLinkSpeed = signalInfo.rxLinkSpeed / TRANSFORMATION_TO_MBPS;
+            linkInfo.lastTxPackets = signalInfo.txPackets;
+            linkInfo.lastRxPackets = signalInfo.rxPackets;
+        }
+        if (!isLinkedMatch) {
+            WIFI_LOGE("%{public}s linkId:%{public}d not match", __FUNCTION__, linkInfo.linkId);
+            return;
+        }
+    }
+    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
 }
 
 void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
@@ -3640,7 +3704,7 @@ void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int f
             lastSignalLevel_ = currentSignalLevel;
         }
     }
-    
+
     linkedInfo.c0Rssi = UpdateLinkInfoRssi(signalInfo.c0Rssi);
     linkedInfo.c1Rssi = UpdateLinkInfoRssi(signalInfo.c1Rssi);
 }

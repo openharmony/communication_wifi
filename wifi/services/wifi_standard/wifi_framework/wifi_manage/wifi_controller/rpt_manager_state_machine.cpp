@@ -26,7 +26,6 @@
 #include "wifi_p2p_hal_interface.h"
 
 #define TIME_DELAY (1000)
-#define RPT_STARTING_TIMEOUT (6000)
 #define MAX_RETRY_COUNT (3)
 
 namespace OHOS::Wifi {
@@ -246,7 +245,7 @@ void RptManagerMachine::StartingState::StartRpt()
     }
     auto config = pRptManagerMachine->CreateRptConfig();
     pService->CreateRptGroup(config);
-    pRptManagerMachine->MessageExecutedLater(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED, RPT_STARTING_TIMEOUT);
+    pRptManagerMachine->MessageExecutedLater(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED, CREATE_GROUP_TIMEOUT + TIME_DELAY);
 #endif
 }
 

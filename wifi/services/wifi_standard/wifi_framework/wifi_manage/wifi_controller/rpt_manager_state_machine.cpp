@@ -195,7 +195,7 @@ void RptManagerMachine::StartingState::GoInState()
 void RptManagerMachine::StartingState::GoOutState()
 {
     WIFI_LOGE("StartingState GoOutState function.\n");
-    pRptManagerMachine->StopTimer(RPT_CMD_ON_CREATE_GROUP_FAILED);
+    pRptManagerMachine->StopTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED);
 }
 
 bool RptManagerMachine::StartingState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -214,7 +214,7 @@ bool RptManagerMachine::StartingState::ExecuteStateMsg(InternalMessagePtr msg)
         case RPT_CMD_STOP:
             pRptManagerMachine->MessageExecutedLater(RPT_CMD_STOP, TIME_DELAY);
             break;
-        case RPT_CMD_ON_CREATE_GROUP_FAILED:
+        case RPT_CMD_ON_CREATE_RPT_GROUP_FAILED:
             pRptManagerMachine->mcb.onStartFailure(mid);
             pRptManagerMachine->SwitchState(pRptManagerMachine->pStoppedState);
             break;
@@ -246,7 +246,7 @@ void RptManagerMachine::StartingState::StartRpt()
     }
     auto config = pRptManagerMachine->CreateRptConfig();
     pService->CreateRptGroup(config);
-    pRptManagerMachine->MessageExecutedLater(RPT_CMD_ON_CREATE_GROUP_FAILED, RPT_STARTING_TIMEOUT);
+    pRptManagerMachine->MessageExecutedLater(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED, RPT_STARTING_TIMEOUT);
 #endif
 }
 

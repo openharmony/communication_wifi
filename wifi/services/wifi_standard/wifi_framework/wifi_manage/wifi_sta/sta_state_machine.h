@@ -626,6 +626,8 @@ private:
      */
     void DealSignalPollResult();
 
+    void DealMloLinkSignalPollResult();
+
     /**
      * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
      *

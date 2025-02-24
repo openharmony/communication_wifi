@@ -365,6 +365,28 @@ NO_SANITIZE("cfi") WifiErrorCode GetLinkedInfo(WifiLinkedInfo *result)
     return GetCErrorCode(ret);
 }
 
+NO_SANITIZE("cfi") WifiErrorCode GetMultiLinkedInfo(WifiLinkedInfo *result, unsigned int *size)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
+    CHECK_PTR_RETURN(size, ERROR_WIFI_INVALID_ARGS);
+    std::vector<OHOS::Wifi::WifiLinkedInfo> wifiMultiLinkedInfo;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->GetMultiLinkedInfo(wifiMultiLinkedInfo);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get Multi LinkedInfo error!");
+        return GetCErrorCode(ret);
+    }
+    *size = static_cast<int>(wifiMultiLinkedInfo.size());
+    for (auto& each : wifiMultiLinkedInfo) {
+        OHOS::Wifi::ErrCode retValue = GetLinkedInfoFromCpp(each, result++);
+        if (retValue != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("GetMultiLinkedInfo Get linked info from cpp error!");
+            ret = retValue;
+        }
+    }
+    return GetCErrorCode(ret);
+}
+
 NO_SANITIZE("cfi") WifiErrorCode GetDisconnectedReason(DisconnectedReason *result)
 {
     CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);

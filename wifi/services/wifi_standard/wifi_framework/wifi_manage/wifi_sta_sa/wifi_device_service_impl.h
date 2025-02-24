@@ -110,6 +110,7 @@ public:
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
     ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
+
     ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mloLinkInfo) override;
 
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;

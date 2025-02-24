@@ -91,7 +91,7 @@ void RptManager::OnP2pActionResult(P2pActionCallback action, ErrCode code)
         pRptManagerMachine->SendMessage(msg);
     }
     if (action == P2pActionCallback::CreateGroup && code == ErrCode::WIFI_OPT_FAILED) {
-        auto msg = pRptManagerMachine->CreateMessage(RPT_CMD_ON_GROUP_CREATE_FAILED);
+        auto msg = pRptManagerMachine->CreateMessage(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED);
         pRptManagerMachine->SendMessage(msg);
     }
 }

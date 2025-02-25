@@ -98,7 +98,7 @@ void RptManager::OnP2pActionResult(P2pActionCallback action, ErrCode code)
     // After CreateGroup success, need to wait p2pConnState change to P2P_CONNECTED.
     if (action == P2pActionCallback::CreateGroup && code == ErrCode::WIFI_OPT_SUCCESS) {
         pRptManagerMachine->StopTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED);
-        pRptManagerMachine->StartTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED，CREATE_GROUP_TIMEOUT);
+        pRptManagerMachine->StartTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED, CREATE_GROUP_TIMEOUT);
     }
 }
 

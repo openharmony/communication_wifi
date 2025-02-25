@@ -22,9 +22,8 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_ALIAS_LEN = 128;
-constexpr int MAX_RETRY_COUNT = 5;
-constexpr int RETRY_INTERVAL = 100 * 1000;
-constexpr int IPC_ERROR_REMOTE_SA_DIE = 29189;
+constexpr int RETRY_INTERVAL = 5 * 100 * 1000; // wait for the remote sa to be ready
+constexpr int IPC_ERROR_REMOTE_SA_DIE = 29189; // means the remote sa is dead
 
 static bool CheckParamters(const std::vector<uint8_t>& certEntry, const std::string& pwd,
     std::string& alias)
@@ -84,15 +83,11 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     uint32_t store = 3;
     char retUriBuf[MAX_ALIAS_LEN] = { 0 };
     struct CmBlob keyUri = { sizeof(retUriBuf), reinterpret_cast<uint8_t*>(retUriBuf) };
-    int ret = CM_SUCCESS;
-    for (int i = 0; i < MAX_RETRY_COUNT; i++) {
+    int ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
+    if (ret == IPC_ERROR_REMOTE_SA_DIE) {
+        LOGE("CmInstallAppCert fail, remote sa die, code:%{public}d, retry after %{public}d.", ret, RETRY_INTERVAL);
+        usleep(RETRY_INTERVAL);
         ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
-        if (ret == IPC_ERROR_REMOTE_SA_DIE) {
-            usleep(RETRY_INTERVAL);
-            LOGE("CmInstallAppCert fail, remote sa die, code:%{public}d, retry %{public}d.", ret, i + 1);
-            continue;
-        }
-        break;
     }
     free(data);
     data = nullptr;

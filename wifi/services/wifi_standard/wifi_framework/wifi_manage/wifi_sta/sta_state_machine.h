@@ -316,7 +316,6 @@ public:
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
-        void UpdateWifi7WurInfo();
         void FoldStatusNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
@@ -965,6 +964,7 @@ private:
     void UpdateLinkedBssid(std::string &bssid);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
+    void ResetWifi7WurInfo();
     void UpdateWifiCategory();
     void SetSupportedWifiCategory();
 #endif

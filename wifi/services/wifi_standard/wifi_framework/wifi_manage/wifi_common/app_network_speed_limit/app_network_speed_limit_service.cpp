@@ -350,6 +350,7 @@ void AppNetworkSpeedLimitService::LogSpeedLimitConfigs()
 void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo)
 {
     if (!(AppParser::GetInstance().IsKeyBackgroundLimitApp(networkControlInfo.bundleName) ||
+        AppParser::GetInstance().IsGameBackgroundLimitApp(networkControlInfo.bundleName) ||
         networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME || m_isGamePvp)) {
         return;
     }

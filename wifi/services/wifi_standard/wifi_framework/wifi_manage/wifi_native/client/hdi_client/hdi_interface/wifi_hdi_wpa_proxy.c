@@ -440,7 +440,7 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
         }
         RemoveIfaceName(ifName);
     }
-    if (strncmp(ifName, "p2p0", strlen("p2p0")) == 0) {
+    if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
         ReleaseP2pCallback();
     }
     if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {

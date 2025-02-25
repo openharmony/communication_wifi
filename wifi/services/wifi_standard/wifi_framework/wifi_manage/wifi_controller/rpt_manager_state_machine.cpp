@@ -188,7 +188,7 @@ void RptManagerMachine::StartingState::GoInState()
 {
     WIFI_LOGE("StartingState GoInState function.\n");
     WriteWifiBridgeStateHiSysEvent(P2P_BRIDGE_ON);
-    pRptManagerMachine->StartTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED，SOFT_AP_TIME_OUT);
+    pRptManagerMachine->StartTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED, SOFT_AP_TIME_OUT);
     StartRpt();
 }
 

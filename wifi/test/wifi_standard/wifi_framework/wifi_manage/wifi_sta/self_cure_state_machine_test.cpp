@@ -986,6 +986,8 @@ public:
         pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
         currentCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
         pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
+        currentCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+        pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
         EXPECT_NE(pSelfCureStateMachine_->useWithRandMacAddress_, TEN);
     }
 

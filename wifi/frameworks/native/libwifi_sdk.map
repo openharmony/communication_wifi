@@ -54,6 +54,7 @@
         ConnectToDevice;
         Disconnect;
         GetLinkedInfo;
+        GetSignalPollInfoArray;
         GetDisconnectedReason;
         GetDeviceMacAddress;
         GetApIfaceName;
@@ -77,6 +78,7 @@
         GetVoWifiDetectMode;
         SetVoWifiDetectPeriod;
         GetVoWifiDetectPeriod;
+        GetMultiLinkedInfo;
         "*CompositeWifiFilter*";
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";

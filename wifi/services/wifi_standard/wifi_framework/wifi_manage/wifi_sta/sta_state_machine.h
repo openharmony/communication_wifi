@@ -31,6 +31,7 @@
 #include "sta_define.h"
 #include "network_status_history_manager.h"
 #include "wifi_native_struct.h"
+#include "wifi_chr_utils.h"
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"
@@ -315,7 +316,6 @@ public:
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
-        void UpdateWifi7WurInfo();
         void FoldStatusNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
@@ -625,6 +625,8 @@ private:
      * @Description : Deal SignalPoll Result.
      */
     void DealSignalPollResult();
+
+    void DealMloLinkSignalPollResult();
 
     /**
      * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
@@ -962,6 +964,7 @@ private:
     void UpdateLinkedBssid(std::string &bssid);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
+    void ResetWifi7WurInfo();
     void UpdateWifiCategory();
     void SetSupportedWifiCategory();
 #endif

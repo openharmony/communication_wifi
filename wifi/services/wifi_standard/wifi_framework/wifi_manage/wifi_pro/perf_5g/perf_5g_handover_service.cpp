@@ -467,14 +467,6 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
             MacAnonymize(relationAps_[relationApIndex].apInfo_.bssid).data());
         return;
     }
-    bool isAvoidanceMlo = DualBandUtils::IsSameSsidAp(connectedAp_->apInfo, relationAps_[relationApIndex].apInfo_.ssid,
-        relationAps_[relationApIndex].apInfo_.bssid, relationAps_[relationApIndex].apInfo_.keyMgmt)
-        && relationAps_[relationApIndex].relationInfo_.IsOnSameRouter()
-        && connectedAp_->isMloConnected;
-    if (isAvoidanceMlo) {
-        WIFI_LOGW("FoundMonitorAp, avoidance of mlo, can not monitor");
-        return;
-    }
     if (relationAps_[relationApIndex].apInfo_.networkStatus != NetworkStatus::HAS_INTERNET) {
         WIFI_LOGI("FoundMonitorAp, no internet(%{public}d), can not monitor",
             relationAps_[relationApIndex].apInfo_.networkStatus);

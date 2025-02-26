@@ -91,8 +91,8 @@ public:
     const WifiEventCallback &GetCallbackInst(const std::string &ifaceName) const;
     const std::function<void(int)> &GetDeathCallbackInst(void) const;
     WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
-    WifiErrorNo GetConnectionMloLinkedInfo(const std::string &ifName,
-    std::vector<WifiLinkedInfo> &mloLinkInfo);
+    WifiErrorNo GetConnectionMloLinkedInfo(const std::string &ifName, std::vector<WifiLinkedInfo> &mloLinkInfo);
+    WifiErrorNo GetConnectionMloSignalInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
 public:
     WifiSignalPollInfo mInfo;
 private:

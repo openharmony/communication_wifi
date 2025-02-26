@@ -124,6 +124,7 @@ ohos_unittest("manager_unittest") {
     "common/wifi_permission_utils_test.cpp",
     "common/wifi_protect_manager_test.cpp",
     "common/wifi_protect_test.cpp",
+    "common/wifi_rdb_manager_test.cpp",
     "common/wifi_system_timer_test.cpp",
     "mock_wifi_system_ability_listerner.cpp",
     "wifi_manager_test.cpp",

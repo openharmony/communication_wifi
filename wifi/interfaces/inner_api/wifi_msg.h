@@ -35,6 +35,7 @@ namespace Wifi {
 #define UNKNOWN_HILINK_NETWORK_ID (-2)
 #define WIFI_INVALID_UID (-1)
 #define INVALID_SIGNAL_LEVEL (-1)
+#define INVALID_LINK_ID (-1)
 #define IPV4_ADDRESS_TYPE 0
 #define IPV6_ADDRESS_TYPE 1
 #define WIFI_INVALID_SIM_ID (0)
@@ -212,6 +213,18 @@ enum class DisconnectDetailReason {
     DISASSOC_LOW_ACK = 34
 };
 
+struct WifiMloSignalInfo {
+    int32_t linkId {INVALID_LINK_ID};
+    int32_t frequency {0};
+    int32_t rssi {0};
+    int32_t linkSpeed {0};
+    int32_t rxLinkSpeed {0};
+    int32_t txLinkSpeed {0};
+    int32_t rxPackets {0};
+    int32_t txPackets {0};
+    WifiChannelWidth channelWidth {WifiChannelWidth::WIDTH_INVALID};
+};
+
 struct WifiLinkedInfo {
     int networkId;
     std::string ssid;
@@ -249,6 +262,7 @@ struct WifiLinkedInfo {
     bool isWurEnable;
     int c0Rssi;
     int c1Rssi;
+    int linkId;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -282,6 +296,7 @@ struct WifiLinkedInfo {
         isWurEnable = false;
         c0Rssi = 0;
         c1Rssi = 0;
+        linkId = INVALID_LINK_ID;
     }
 };
 
@@ -1037,10 +1052,11 @@ struct WifiSignalPollInfo {
     int c1Rssi;
     std::vector<uint8_t> ext;
     int extLen;
+    int64_t timeStamp;
 
     WifiSignalPollInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0),
         txPackets(0), rxPackets(0), snr(0), chload(0), ulDelay(0), txBytes(0), rxBytes(0),
-        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(), extLen(0)
+        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(), extLen(0), timeStamp(0)
     {}
 
     ~WifiSignalPollInfo()

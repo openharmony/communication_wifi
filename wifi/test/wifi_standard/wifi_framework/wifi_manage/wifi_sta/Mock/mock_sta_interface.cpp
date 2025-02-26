@@ -341,5 +341,11 @@ void StaInterface::ProcessVoWifiNetlinkReportEvent(const int type)
 {
     WIFI_LOGI("Enter ProcessVoWifiNetlinkReportEvent");
 }
+
+ErrCode StaInterface::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    WIFI_LOGI("Enter GetSignalPollInfoArray");
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

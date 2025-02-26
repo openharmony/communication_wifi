@@ -446,8 +446,7 @@ int WifiHistoryRecordManager::QueryApInfoRecordByBssid(const std::string &bssid,
     std::vector<std::string> queryAllColumn;
     auto resultSet = wifiDataBaseUtils_->Query(predicates, queryAllColumn);
     if (resultSet == nullptr) {
-        resultSet->Close();
-        WIFI_LOGI("%{public}s, query fail", __func__);
+        WIFI_LOGE("%{public}s, query fail", __func__);
         return QUERY_FAILED;
     }
     int32_t resultSetNum = resultSet->GoToFirstRow();
@@ -484,8 +483,7 @@ int WifiHistoryRecordManager::QueryAllApInfoRecord(std::vector<ConnectedApInfo> 
     std::vector<std::string> queryAllColumn;
     auto resultSet = wifiDataBaseUtils_->Query(predicates, queryAllColumn);
     if (resultSet == nullptr) {
-        resultSet->Close();
-        WIFI_LOGI("%{public}s, all query fail", __func__);
+        WIFI_LOGE("%{public}s, all query fail", __func__);
         return QUERY_FAILED;
     }
     int32_t resultSetNum = resultSet->GoToFirstRow();

@@ -1014,7 +1014,7 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     }
     // when wifiSwitchReason is APP_QOE_SLOW, skip IsReachWifiScanThreshold
     if (pWifiProStateMachine_->wifiSwitchReason_ != WIFI_SWITCH_REASON_APP_QOE_SLOW &&
-        !pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel)) {
+        signalLevel > SIG_LEVEL_2) {
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }

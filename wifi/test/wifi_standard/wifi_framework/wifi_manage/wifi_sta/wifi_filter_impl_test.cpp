@@ -39,7 +39,7 @@ public:
 
 HWTEST_F(WifiFilterImplTest, HiddenWifiFilterReturnFalse, TestSize.Level1) {
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.bssid = "11:11:11:11:11:55";
     scanInfo1.frequency = 2407;
     scanInfo1.rssi = -77;
     scanInfo1.ssid = "";
@@ -52,7 +52,7 @@ HWTEST_F(WifiFilterImplTest, HiddenWifiFilterReturnFalse, TestSize.Level1) {
 HWTEST_F(WifiFilterImplTest, HiddenWifiFilterReturnTrue, TestSize.Level1) {
 
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "11:22:11:11:22";
+    scanInfo2.bssid = "11:22:11:11:22:44";
     scanInfo2.frequency = 2407;
     scanInfo2.rssi = -77;
     scanInfo2.ssid = "sssx";
@@ -64,7 +64,7 @@ HWTEST_F(WifiFilterImplTest, HiddenWifiFilterReturnTrue, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, RssiWifiFilter24gReturnFalse, TestSize.Level1) {
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.bssid = "11:11:11:11:11:77";
     scanInfo1.ssid = "x";
     scanInfo1.frequency = 2407;
     scanInfo1.rssi = -82;
@@ -77,7 +77,7 @@ HWTEST_F(WifiFilterImplTest, RssiWifiFilter24gReturnFalse, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, RssiWifiFilter24gReturnTrue, TestSize.Level1) {
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "11:11:11:11:11";
+    scanInfo2.bssid = "11:11:11:11:11:66";
     scanInfo2.ssid = "x";
     scanInfo2.rssi = -70;
     scanInfo2.frequency = 2407;
@@ -90,7 +90,7 @@ HWTEST_F(WifiFilterImplTest, RssiWifiFilter24gReturnTrue, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, RssiWifiFilter5gReturnFalse, TestSize.Level1) {
     InterScanInfo scanInfo1;
-    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.bssid = "11:11:11:11:11:44";
     scanInfo1.ssid = "x";
     scanInfo1.frequency = 5820;
     scanInfo1.rssi = -82;
@@ -103,7 +103,7 @@ HWTEST_F(WifiFilterImplTest, RssiWifiFilter5gReturnFalse, TestSize.Level1) {
 
 HWTEST_F(WifiFilterImplTest, RssiWifiFilter5gReturnTrue, TestSize.Level1) {
     InterScanInfo scanInfo2;
-    scanInfo2.bssid = "11:11:11:11:11";
+    scanInfo2.bssid = "11:11:11:11:11:22";
     scanInfo2.ssid = "x";
     scanInfo2.rssi = -70;
     scanInfo2.frequency = 5820;
@@ -117,13 +117,13 @@ HWTEST_F(WifiFilterImplTest, RssiWifiFilter5gReturnTrue, TestSize.Level1) {
 HWTEST_F(WifiFilterImplTest, SavedWifiFilterReturnFalse, TestSize.Level1) {
     InterScanInfo scanInfo1;
     scanInfo1.ssid = "x";
-    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.bssid = "11:11:11:11:11:33";
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = -1;
 
     InterScanInfo scanInfo2;
     scanInfo2.ssid = "x";
-    scanInfo2.bssid = "11:11:11:11:11";
+    scanInfo2.bssid = "11:11:11:11:11:77";
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.networkStatusHistory = 255;
     networkCandidate2.wifiDeviceConfig.networkId = 1;
@@ -132,7 +132,7 @@ HWTEST_F(WifiFilterImplTest, SavedWifiFilterReturnFalse, TestSize.Level1) {
 
     InterScanInfo scanInfo3;
     scanInfo3.ssid = "x";
-    scanInfo3.bssid = "11:11:11:11:11";
+    scanInfo3.bssid = "11:11:11:11:11:44";
     NetworkSelection::NetworkCandidate networkCandidate3(scanInfo3);
     networkCandidate3.wifiDeviceConfig.networkId = 1;
 

@@ -360,6 +360,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getIpv6Info", GetIpv6Info),
         DECLARE_NAPI_FUNCTION("getLinkedInfo", GetLinkedInfo),
         DECLARE_NAPI_FUNCTION("getLinkedInfoSync", GetLinkedInfoSync),
+        DECLARE_NAPI_FUNCTION("getMultiLinkedInfo", GetMultiLinkedInfo),
         DECLARE_NAPI_FUNCTION("getDisconnectedReason", GetDisconnectedReason),
         DECLARE_NAPI_FUNCTION("isMeteredHotspot", IsMeteredHotspot),
         DECLARE_NAPI_FUNCTION("removeDevice", RemoveDevice),

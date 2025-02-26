@@ -28,6 +28,7 @@ namespace Wifi {
 
 constexpr int MAX_SIZE = 256;
 int g_bigDataRecvLen = 0;
+constexpr int SIGNALARR_LENGTH = 6;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
     sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());
@@ -704,6 +705,38 @@ void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiD
     return;
 }
 
+void WifiDeviceProxy::WifiDeviceProxy::ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> &result)
+{
+    std::vector<uint32_t> allSize;
+    reply.ReadUInt32Vector(&allSize);
+    uint32_t retSize = static_cast<uint32_t>(allSize.size());
+    if (retSize > WIFI_MAX_MLO_LINK_NUM || retSize == 0) {
+        WIFI_LOGE("Parse multi linked info size error: %{public}d", retSize);
+        return;
+    }
+    sptr<Ashmem> ashmem = reply.ReadAshmem();
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        WIFI_LOGE("ParseMultiLinkedInfo ReadAshmem error");
+        return;
+    }
+    int offset = 0;
+    for (uint32_t i = 0; i < retSize; i++) {
+        auto origin = ashmem->ReadFromAshmem(allSize[i], offset);
+        if (origin == nullptr) {
+            offset += static_cast<int>(allSize[i]);
+            continue;
+        }
+        MessageParcel inParcel;
+        inParcel.WriteBuffer(reinterpret_cast<const char*>(origin), allSize[i]);
+        WifiLinkedInfo info;
+        ReadLinkedInfo(inParcel, info);
+        offset += static_cast<int>(allSize[i]);
+        result.emplace_back(info);
+    }
+    ashmem->UnmapAshmem();
+    ashmem->CloseAshmem();
+}
+
 ErrCode WifiDeviceProxy::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     if (mRemoteDied) {
@@ -1283,6 +1316,33 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.lastRxPackets = reply.ReadInt32();
     info.lastTxPackets = reply.ReadInt32();
     info.wifiLinkType = static_cast<WifiLinkType>(reply.ReadInt32());
+    info.linkId = reply.ReadInt32();
+}
+
+void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply,
+                                             std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    if (length > SIGNALARR_LENGTH) {
+        length = SIGNALARR_LENGTH;
+    }
+    for (int index = 0; index < length; index++) {
+        WifiSignalPollInfo signInfo;
+        signInfo.signal = reply.ReadInt32();
+        signInfo.txrate = reply.ReadInt32();
+        signInfo.rxrate = reply.ReadInt32();
+        signInfo.noise = reply.ReadInt32();
+        signInfo.txPackets = reply.ReadInt32();
+        signInfo.rxPackets = reply.ReadInt32();
+        signInfo.snr = reply.ReadInt32();
+        signInfo.chload = reply.ReadInt32();
+        signInfo.ulDelay = reply.ReadInt32();
+        signInfo.txBytes = reply.ReadInt32();
+        signInfo.rxBytes = reply.ReadInt32();
+        signInfo.txFailed = reply.ReadInt32();
+        signInfo.chloadSelf = reply.ReadInt32();
+        signInfo.timeStamp = reply.ReadInt64();
+        wifiSignalPollInfos.push_back(signInfo);
+    }
 }
 
 ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
@@ -1387,6 +1447,42 @@ ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
     }
 
     ReadLinkedInfo(reply, info);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(length);
+    
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY), error);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    ReadWifiSignalPollInfo(reply, wifiSignalPollInfos, length);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -2730,6 +2826,41 @@ ErrCode WifiDeviceProxy::GetVoWifiDetectPeriod(int &period)
         return ErrCode(ret);
     }
     period = reply.ReadInt32();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_MULTI_LINKED_INFO), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO), error);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+
+    ParseMultiLinkedInfo(reply, multiLinkedInfo);
     return WIFI_OPT_SUCCESS;
 }
 

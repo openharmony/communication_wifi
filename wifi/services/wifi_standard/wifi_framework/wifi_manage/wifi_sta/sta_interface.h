@@ -445,6 +445,9 @@ public:
      * @param type - wifi netlink message type
      */
     void ProcessVoWifiNetlinkReportEvent(const int type) override;
+
+    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
+    
 private:
     bool InitStaServiceLocked();
     std::vector<StaServiceCallback> m_staCallback;

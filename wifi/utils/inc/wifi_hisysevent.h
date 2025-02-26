@@ -146,7 +146,7 @@ void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed)
 
 void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect = false);
 
-void WriteWifiLinkTypeHiSysEvent(const std::string &ssid, int32_t wifiLinkType);
+void WriteWifiLinkTypeHiSysEvent(const std::string &ssid, int32_t wifiLinkType, const std::string &triggerReason);
 
 void WriteEmlsrExitReasonHiSysEvent(const std::string &ssid, int32_t reason);
 

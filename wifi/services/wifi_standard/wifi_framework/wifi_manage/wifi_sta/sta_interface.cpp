@@ -625,5 +625,12 @@ void StaInterface::ProcessVoWifiNetlinkReportEvent(const int type)
         WifiCommonEventHelper::PublishVoWifiSignalDetectInterruptEvent(index, data);
     }
 }
+
+ErrCode StaInterface::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    WIFI_LOGI("Enter GetSignalPollInfoArray");
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->GetSignalPollInfoArray(wifiSignalPollInfos, length);
+}
 }  // namespace Wifi
 }  // namespace OHOS

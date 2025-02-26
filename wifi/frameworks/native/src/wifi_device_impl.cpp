@@ -338,6 +338,13 @@ ErrCode WifiDeviceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     return client_->GetLinkedInfo(info);
 }
 
+ErrCode WifiDeviceImpl::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetSignalPollInfoArray(wifiSignalPollInfos, length);
+}
+
 ErrCode WifiDeviceImpl::GetDisconnectedReason(DisconnectedReason &reason)
 {
     RETURN_IF_FAIL(GetWifiDeviceProxy());
@@ -681,6 +688,13 @@ ErrCode WifiDeviceImpl::GetVoWifiDetectPeriod(int &period)
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetVoWifiDetectPeriod(period);
+}
+
+ErrCode WifiDeviceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetMultiLinkedInfo(multiLinkedInfo);
 }
 
 }  // namespace Wifi

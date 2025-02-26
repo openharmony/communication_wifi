@@ -109,6 +109,10 @@ public:
 
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
+    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
+
+    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mloLinkInfo) override;
+
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
 
     ErrCode GetIpInfo(IpInfo &info) override;
@@ -226,6 +230,7 @@ private:
     void ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result);
     void updateStaDeviceMacAddress(WifiDeviceConfig &config);
     int ProcessPermissionVerify(const std::string &appId, const std::string &packageName);
+    void UpdateWifiLinkInfo(WifiLinkedInfo &info);
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;
     static constexpr int MAX_HEX_LEN = 64;

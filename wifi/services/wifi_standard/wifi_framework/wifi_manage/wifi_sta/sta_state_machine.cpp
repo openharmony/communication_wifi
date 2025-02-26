@@ -1256,7 +1256,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 {
     std::string reason = msg->GetStringFromMessage();
     std::string bssid = msg->GetStringFromMessage();
-    WIFI_LOGI("ApLinkedState reveived bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
+    WIFI_LOGI("ApLinkedState received bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
         reason.c_str(), MacAnonymize(bssid).c_str());
     if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
         WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
@@ -1267,6 +1267,8 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     pStaStateMachine->UpdateHiLinkAttribute();
     pStaStateMachine->UpdateLinkedBssid(bssid);
 #ifndef OHOS_ARCH_LITE
+    pStaStateMachine->ResetWifi7WurInfo();
+    pStaStateMachine->UpdateWifiCategory();
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
@@ -1275,6 +1277,13 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
         WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId)) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetBssid return fail.");
+    }
+    if (!pStaStateMachine->CanArpReachable()) {
+        WIFI_LOGI("Arp not reachable, start to dhcp.");
+        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));
+        pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+    } else {
+        WIFI_LOGI("Arp reachable, stay in linked state.");
     }
 }
 
@@ -2127,34 +2136,6 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
-        case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {
-            ret = EXECUTED;
-            std::string reason = msg->GetStringFromMessage();
-            std::string bssid = msg->GetStringFromMessage();
-            WIFI_LOGI("reveived bssid changed event, reason:%{public}s,bssid:%{public}s.\n",
-                reason.c_str(), MacAnonymize(bssid).c_str());
-            if (strcmp(reason.c_str(), "ASSOC_COMPLETE") != 0) {
-                WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
-                return false;
-            }
-            std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
-            if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName) !=
-                WIFI_HAL_OPT_OK) {
-                return false;
-            }
-            pStaStateMachine->linkedInfo.bssid = bssid;
-            pStaStateMachine->UpdateHiLinkAttribute();
-            pStaStateMachine->UpdateLinkedBssid(bssid);
-#ifndef OHOS_ARCH_LITE
-            UpdateWifi7WurInfo();
-            pStaStateMachine->UpdateWifiCategory();
-            pStaStateMachine->SetSupportedWifiCategory();
-#endif
-            pStaStateMachine->DealMloConnectionLinkInfo();
-            WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo,
-                pStaStateMachine->m_instId);
-            break;
-        }
         case WIFI_SVR_CMD_STA_DHCP_RESULT_NOTIFY_EVENT: {
             ret = EXECUTED;
             DhcpResultNotify(msg);
@@ -2279,11 +2260,6 @@ void StaStateMachine::LinkedState::DealNetworkCheck(InternalMessagePtr msg)
         pStaStateMachine->m_NetWorkState->StartWifiDetection();
     }
 #endif
-}
-
-void StaStateMachine::LinkedState::UpdateWifi7WurInfo()
-{
-    pStaStateMachine->linkedInfo.isWurEnable = false;
 }
 
 #ifndef OHOS_ARCH_LITE
@@ -2583,6 +2559,11 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
         }
     }
     return;
+}
+
+void StaStateMachine::ResetWifi7WurInfo()
+{
+    linkedInfo.isWurEnable = false;
 }
 
 void StaStateMachine::DhcpResultNotify::SaveDhcpResult(DhcpResult *dest, DhcpResult *source)

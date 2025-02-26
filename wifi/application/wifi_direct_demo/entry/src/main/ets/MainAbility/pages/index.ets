@@ -337,7 +337,7 @@ struct Index {
     });
   }
 
-  private checkDouble(macAddress: string): boolean{
+  private checkDouble(macAddress: string): boolean {
     for (var index = 0; index < this.p2pDeviceList.length; index++) {
       const element = this.p2pDeviceList[index];
       if (element.macAddress == macAddress) {

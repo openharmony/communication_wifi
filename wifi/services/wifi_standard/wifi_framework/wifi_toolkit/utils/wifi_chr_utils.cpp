@@ -43,8 +43,8 @@ void WifiChrUtils::ClearSignalPollInfoArray()
 void WifiChrUtils::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
 {
     LOGI("Eneter GetSignalPollInfoArray.");
-    if (length > SIGNALARR_LENGTH) {
-        length = SIGNALARR_LENGTH;
+    if (length > wifiSignalPollInfos.size()) {
+        length = wifiSignalPollInfos.size();
     }
     std::unique_lock<std::mutex> lock(signalInfoMutex);
     for (int index = 0; index < length; index++) {

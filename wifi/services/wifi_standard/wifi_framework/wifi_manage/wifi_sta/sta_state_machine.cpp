@@ -330,7 +330,7 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
         }
         case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
             ret = EXECUTED;
-            pStaStateMachine->DealScreenStateChangedEvent(msg);
+            DealScreenStateChangedEvent(msg);
             break;
         }
         default:
@@ -549,6 +549,22 @@ bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
     }
     return true;
 }
+
+bool StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");
+        return;
+    }
+
+    int screenState = msg->GetParam1();
+    WIFI_LOGI("InitState::DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
+    if (screenState == MODE_STATE_OPEN) {
+        pStaStateMachine->enableSignalPoll = true;
+    } else {
+        pStaStateMachine->enableSignalPoll = false;
+    }
+}
 /* --------------------------- state machine link State ------------------------------ */
 StaStateMachine::LinkState::LinkState(StaStateMachine *staStateMachine)
     : State("LinkState"), pStaStateMachine(staStateMachine)
@@ -595,6 +611,9 @@ int StaStateMachine::LinkState::InitStaSMHandleMap()
     };
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK] = [this](InternalMessagePtr msg) {
         return this->pStaStateMachine->DealReassociateCmd(msg);
+    };
+    staSmHandleFuncMap[WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT] = [this](InternalMessagePtr msg) {
+        return this->pStaStateMachine->DealScreenStateChangedEvent(msg);
     };
 #ifndef OHOS_ARCH_LITE
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_SIM_AUTH_EVENT] = [this](InternalMessagePtr msg) {
@@ -973,6 +992,11 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessagePtr msg)
         case WIFI_SVR_CMD_STA_RECONNECT_NETWORK: {
             ret = EXECUTED;
             DealReConnectCmdInSeparatedState(msg);
+            break;
+        }
+        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            pStaStateMachine->DealScreenStateChangedEvent(msg);
             break;
         }
         default:

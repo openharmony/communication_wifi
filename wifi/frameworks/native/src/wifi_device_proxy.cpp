@@ -1319,13 +1319,10 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.linkId = reply.ReadInt32();
 }
 
-void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply,
-                                             std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos)
 {
-    if (length > SIGNALARR_LENGTH) {
-        length = SIGNALARR_LENGTH;
-    }
-    for (int index = 0; index < length; index++) {
+    int arrayLength = reply.ReadInt32();
+    for (int index = 0; index < arrayLength; index++) {
         WifiSignalPollInfo signInfo;
         signInfo.signal = reply.ReadInt32();
         signInfo.txrate = reply.ReadInt32();
@@ -1482,7 +1479,7 @@ ErrCode WifiDeviceProxy::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> 
     if (ret != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-    ReadWifiSignalPollInfo(reply, wifiSignalPollInfos, length);
+    ReadWifiSignalPollInfo(reply, wifiSignalPollInfos);
     return WIFI_OPT_SUCCESS;
 }
 

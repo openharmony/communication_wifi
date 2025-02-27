@@ -944,6 +944,10 @@ void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data
     ErrCode ret = GetSignalPollInfoArray(wifiSignalPollInfos, length);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
+        if (length > wifiSignalPollInfos.size()) {
+            length = wifiSignalPollInfos.size();
+        }
+        reply.WriteInt32(length);
         for (int index  = 0 ; index < length ; index++) {
             reply.WriteInt32(wifiSignalPollInfos[index].signal);
             reply.WriteInt32(wifiSignalPollInfos[index].txrate);

@@ -67,7 +67,6 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-        int retryCount = 0;
     private:
         void StartRpt();
         RptManagerMachine *pRptManagerMachine;

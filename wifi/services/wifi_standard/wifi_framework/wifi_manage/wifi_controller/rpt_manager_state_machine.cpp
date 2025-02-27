@@ -163,7 +163,6 @@ bool RptManagerMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg)
     WIFI_LOGE("IdleState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case RPT_CMD_START:
-            pRptManagerMachine->pStartingState->retryCount = 0;
             pRptManagerMachine->pP2pConflictState->retryCount = 0;
             pRptManagerMachine->SwitchState(pRptManagerMachine->pStartingState);
             break;
@@ -189,12 +188,14 @@ void RptManagerMachine::StartingState::GoInState()
 {
     WIFI_LOGE("StartingState GoInState function.\n");
     WriteWifiBridgeStateHiSysEvent(P2P_BRIDGE_ON);
+    pRptManagerMachine->StartTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED, SOFT_AP_TIME_OUT);
     StartRpt();
 }
 
 void RptManagerMachine::StartingState::GoOutState()
 {
     WIFI_LOGE("StartingState GoOutState function.\n");
+    pRptManagerMachine->StopTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED);
 }
 
 bool RptManagerMachine::StartingState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -213,13 +214,9 @@ bool RptManagerMachine::StartingState::ExecuteStateMsg(InternalMessagePtr msg)
         case RPT_CMD_STOP:
             pRptManagerMachine->MessageExecutedLater(RPT_CMD_STOP, TIME_DELAY);
             break;
-        case RPT_CMD_ON_CREATE_RPT_GROUP_TIMEOUT:
-            if (retryCount < MAX_RETRY_COUNT) {
-                StartRpt();
-            } else {
-                pRptManagerMachine->mcb.onStartFailure(mid);
-                pRptManagerMachine->SwitchState(pRptManagerMachine->pStoppedState);
-            }
+        case RPT_CMD_ON_CREATE_RPT_GROUP_FAILED:
+            pRptManagerMachine->mcb.onStartFailure(mid);
+            pRptManagerMachine->SwitchState(pRptManagerMachine->pStoppedState);
             break;
         default:
             break;
@@ -247,10 +244,8 @@ void RptManagerMachine::StartingState::StartRpt()
         pRptManagerMachine->SwitchState(pRptManagerMachine->pP2pConflictState);
         return;
     }
-    retryCount++;
     auto config = pRptManagerMachine->CreateRptConfig();
     pService->CreateRptGroup(config);
-    pRptManagerMachine->MessageExecutedLater(RPT_CMD_ON_CREATE_RPT_GROUP_TIMEOUT, TIME_DELAY);
 #endif
 }
 

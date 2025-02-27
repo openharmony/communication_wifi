@@ -5,7 +5,7 @@
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -946,7 +946,7 @@ void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data
     if (ret == WIFI_OPT_SUCCESS) {
         int arrayLength = static_cast<int>(wifiSignalPollInfos.size());
         reply.WriteInt32(arrayLength);
-        for (int index  = 0 ; index < arrayLength ; index++) {
+        for (int index = 0; index < arrayLength; index++) {
             reply.WriteInt32(wifiSignalPollInfos[index].signal);
             reply.WriteInt32(wifiSignalPollInfos[index].txrate);
             reply.WriteInt32(wifiSignalPollInfos[index].rxrate);

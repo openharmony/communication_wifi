@@ -3112,8 +3112,6 @@ void StaStateMachine::AppendFastTransitionKeyMgmt(
         halDeviceConfig.keyMgmt.append(" FT-EAP ");
     } else if (scanInfo.capabilities.find("FT/PSK") != std::string::npos) {
         halDeviceConfig.keyMgmt.append(" FT-PSK ");
-    } else if (scanInfo.capabilities.find("FT/SAE") != std::string::npos) {
-        halDeviceConfig.keyMgmt.append(" FT-SAE ");
     } else {
         WIFI_LOGI("No need append ft keyMgmt!");
     }

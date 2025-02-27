@@ -550,7 +550,7 @@ bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
     return true;
 }
 
-bool StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr msg)
+void StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");

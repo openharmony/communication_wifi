@@ -594,7 +594,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
             }
             if (std::find_if(mloInfo.begin(), mloInfo.end(),
                 [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
-                pStaStateMachine->StartRoamToNetwork(bssid);
+                pStaStateMachine->StartConnectToBssid(bssid);
                 return WIFI_OPT_SUCCESS;
             }
             if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {

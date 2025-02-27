@@ -219,11 +219,12 @@ static void HdiWpaResetGlobalObj()
 static void RecycleServiceAndRecipient(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
 {
     LOGI("%{public}s enter", __func__);
-    if (recipient == NULL || service == NULL) {
+    pthread_mutex_lock(&g_wpaObjMutex);
+    if (recipient == NULL || service == NULL || g_remote == NULL || g_recipient == NULL) {
         LOGE("%{public}s input param is null", __func__);
+        pthread_mutex_unlock(&g_wpaObjMutex);
         return;
     }
-    pthread_mutex_lock(&g_wpaObjMutex);
     HdfRemoteServiceRemoveDeathRecipient(service, recipient);
     HdfRemoteServiceRecycle(service);
     OsalMemFree(recipient);

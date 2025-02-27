@@ -28,7 +28,6 @@ namespace Wifi {
 
 constexpr int MAX_SIZE = 256;
 int g_bigDataRecvLen = 0;
-constexpr int SIGNALARR_LENGTH = 6;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
     sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());

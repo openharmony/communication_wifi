@@ -606,6 +606,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
                 return WIFI_OPT_SUCCESS;
             }
         }
+        pStaStateMachine->StartConnectToBssid(bssid);
     } else {
         LOGI("%{public}s switch to target network", __FUNCTION__);
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);

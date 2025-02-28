@@ -14,6 +14,7 @@
  */
 #ifndef WIFI_MOCK_WPA_CTRL_H
 #define WIFI_MOCK_WPA_CTRL_H
+#include "wpa_ctrl.h"
 #include <string>
 #include <vector>
 #include <map>

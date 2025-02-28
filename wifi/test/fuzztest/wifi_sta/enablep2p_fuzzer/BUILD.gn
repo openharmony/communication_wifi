@@ -86,8 +86,20 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
+  defines = [
+    "AP_INTF=\"$wifi_feature_with_ap_intf\"",
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
+    "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
+    "FEATURE_AP_SUPPORT",
+    "FEATURE_STA_SUPPORT",
+    "FEATURE_P2P_SUPPORT",
+    "FEATURE_SELF_CURE_SUPPORT",
+    "FEATURE_WIFI_PRO_SUPPORT",
+    "SUPPORT_RANDOM_MAC_ADDR",
+  ]
+
   if (is_asan) {
-    defines = [ "DTFUZZ_TEST" ]
+    defines += [ "DTFUZZ_TEST" ]
   }
 
   sources = [

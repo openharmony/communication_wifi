@@ -674,8 +674,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         return;
     }
     int reason = msg->GetParam1();
-    std::string bssid;
-    msg->GetStringFromMessage();
+    std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("Enter DealDisconnectEventInLinkState m_instId = %{public}d reason:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
 

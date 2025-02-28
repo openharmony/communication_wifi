@@ -103,7 +103,6 @@ ohos_fuzztest("EnableP2pFuzzTest") {
   }
 
   sources = [
-  sources = [
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_callback_proxy.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_death_recipient.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_mgr_service_impl.cpp",

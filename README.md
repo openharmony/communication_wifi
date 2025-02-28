@@ -1,5 +1,6 @@
 # communication\_wifi<a name="EN-US_TOPIC_0000001162030287"></a>
 
+
 -   [Introduction](#section11660541593)
 -   [Architecture](#section342962219551)
 -   [Directory Structure](#section161941989596)

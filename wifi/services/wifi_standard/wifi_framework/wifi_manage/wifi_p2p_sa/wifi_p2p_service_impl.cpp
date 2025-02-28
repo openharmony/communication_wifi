@@ -279,8 +279,10 @@ ErrCode WifiP2pServiceImpl::StopDiscoverDevices(void)
 ErrCode WifiP2pServiceImpl::DiscoverServices(void)
 {
     WIFI_LOGI("DiscoverServices");
-    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DiscoverServices:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DiscoverServices:VerifyGetWifiLocalMacPermission or"
+            "VerifyGetWifiPeersPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -324,8 +326,10 @@ ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
 ErrCode WifiP2pServiceImpl::RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request)
 {
     WIFI_LOGI("RequestService");
-    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("RequestService:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RequestService:VerifyGetWifiLocalMacPermission or"
+            "VerifyGetWifiPeersMacPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -909,8 +913,10 @@ ErrCode WifiP2pServiceImpl::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups
     }
     if (apiVersion == API_VERSION_9) {
 #ifndef SUPPORT_RANDOM_MAC_ADDR
-        if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("QueryP2pGroups:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
+        if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
+            WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+            WIFI_LOGE("QueryP2pGroups:VerifyGetWifiLocalMacPermission or"
+                "VerifyGetWifiPeersMacPermission PERMISSION_DENIED!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
 #endif

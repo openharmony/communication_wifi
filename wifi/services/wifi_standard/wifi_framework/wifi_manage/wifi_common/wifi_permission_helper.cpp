@@ -121,7 +121,8 @@ int WifiPermissionHelper::VerifyWifiConnectionPermission(const int &pid, const i
 
 int WifiPermissionHelper::VerifyGetWifiDirectDevicePermission(const int &pid, const int &uid)
 {
-    if (VerifyPermission("ohos.permission.LOCATION", pid, uid, 0) == PERMISSION_DENIED) {
+    if (VerifyPermission("ohos.permission.GET_WIFI_LOCAL_MAC", pid, uid, 0) == PERMISSION_DENIED ||
+        VerifyPermission("ohos.permission.GET_WIFI_PEERS_MAC", pid, uid, 0) == PERMISSION_DENIED) {
         return PERMISSION_DENIED;
     }
     return PERMISSION_GRANTED;

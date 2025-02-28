@@ -103,12 +103,12 @@ int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid
     return PERMISSION_DENIED;
 }
 
-int VerifyEnterpriseWifiConnectionPermission(const int &pid, const int &uid)
+int WifiAuthCenter::VerifyEnterpriseWifiConnectionPermission(const int &pid, const int &uid)
 {
     return PERMISSION_DENIED;
 }
- 
-int VerifyGetWifiConfigPermission(const int &pid, const int &uid)
+
+int WifiAuthCenter::VerifySameProcessPermission(const int &pid, const int &uid)
 {
     return PERMISSION_DENIED;
 }

@@ -193,6 +193,7 @@ public:
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
+        void DealScreenStateChangedEvent(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
 

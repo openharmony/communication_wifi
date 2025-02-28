@@ -337,6 +337,11 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             SaveFoldStatus(msg);
             break;
         }
+        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            DealScreenStateChangedEvent(msg);
+            break;
+        }
         default:
             WIFI_LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
@@ -553,6 +558,22 @@ bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
         }
     }
     return true;
+}
+
+void StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");
+        return;
+    }
+
+    int screenState = msg->GetParam1();
+    WIFI_LOGI("InitState::DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
+    if (screenState == MODE_STATE_OPEN) {
+        pStaStateMachine->enableSignalPoll = true;
+    } else {
+        pStaStateMachine->enableSignalPoll = false;
+    }
 }
 /* --------------------------- state machine link State ------------------------------ */
 StaStateMachine::LinkState::LinkState(StaStateMachine *staStateMachine)

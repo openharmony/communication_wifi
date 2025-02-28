@@ -58,12 +58,12 @@ private:
     void GetCandidateRelationApInfo(std::vector<CandidateRelationApInfo> &candidateRelationApInfos,
         RelationAp &satisfySwitchRssiAp);
     void AddRelationAp(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &wifiScanInfos);
-    bool IsRelationFreq(int frequency);
+    bool IsRelationFreq(int32_t frequency);
     void Monitor5gAp(std::vector<InterScanInfo> &wifiScanInfos);
     void ClearDeletedRelationAp(std::vector<WifiDeviceConfig> &wifiDeviceConfigs);
     void StartMonitor();
     void StopMonitor();
-    void ActiveScan(int rssi);
+    void ActiveScan(int32_t rssi);
     void AddRelationApInfo(RelationAp &relationAp);
     void FoundMonitorAp(int32_t relationApIndex, std::vector<InterScanInfo> &wifiScanInfos);
     void UnloadScanController();
@@ -71,7 +71,7 @@ private:
     void LoadMonitorScanController();
     std::string HandleSwitchResult(WifiLinkedInfo &wifiLinkedInfo, std::string &bssidBeforePerf5g);
     void UpdateTriggerScanRssiThreshold();
-    void RssiUpdate(int rssi);
+    void RssiUpdate(int32_t rssi);
     void GetNoExistRelationInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
         std::vector<InterScanInfo> &wifiScanInfos, std::unordered_set<std::string> &noExistRelationBssidSet,
         std::vector<RelationAp> &sameSsidAps, std::unordered_set<std::string> &existRelationBssidSet);

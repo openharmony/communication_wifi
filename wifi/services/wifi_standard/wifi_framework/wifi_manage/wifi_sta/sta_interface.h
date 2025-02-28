@@ -74,9 +74,11 @@ public:
      *
      * @param networkId - target networkId
      * @param bssid - target bssid
+     * @param type - select network type: SelectedType
      * @return ErrCode - operation result
      */
-    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) override;
+    virtual ErrCode StartConnectToBssid(const int32_t networkId, const std::string bssid,
+        int32_t type = NETWORK_SELECTED_BY_USER) override;
 
     /**
      * @Description connect to user select ssid and bssid network

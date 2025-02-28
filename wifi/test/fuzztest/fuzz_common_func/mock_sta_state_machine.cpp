@@ -56,14 +56,14 @@ void MockStaStateMachine::SendMessage(int msgName, int param1, int param2, const
         msgName, param1, param2);
 }
 
-void MockStaStateMachine::StartRoamToNetwork(std::string bssid)
+void MockStaStateMachine::StartConnectToBssid(std::string bssid)
 {
-    WIFI_LOGD("MockStaStateMachine::StartRoamToNetwork, bssid is %{private}s.", bssid.c_str());
+    WIFI_LOGD("MockStaStateMachine::StartConnectToBssid, bssid is %{private}s.", bssid.c_str());
 }
-
+ 
 void MockStaStateMachine::StopTimer(int timerName)
 {
-    WIFI_LOGD("MockStaStateMachine::StartRoamToNetwork, bssid is %{private}d.", timerName);
+    WIFI_LOGD("MockStaStateMachine::StartConnectToBssid, bssid is %{private}d.", timerName);
 }
 
 void MessageExecutedLater(int msgName, int64_t delayTimeMs)

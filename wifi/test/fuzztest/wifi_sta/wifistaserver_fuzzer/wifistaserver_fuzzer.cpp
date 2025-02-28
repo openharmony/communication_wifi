@@ -158,7 +158,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->DeregisterAutoJoinCondition(conditionName);
     pStaInterface->DeliverStaIfaceData(conditionName);
     pStaInterface->DisableStaService();
-    pStaInterface->StartRoamToNetwork(uid, config.keyMgmt);
+    pStaInterface->StartConnectToBssid(networkId, config.bssid);
     pStaInterface->DisableAutoJoin(config.keyMgmt);
     pStaInterface->EnableAutoJoin(conditionName);
     pStaInterface->StartPortalCertification();
@@ -177,7 +177,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->RemoveAllDevice();
     pStaService->ConnectToDevice(config);
     pStaService->ConnectToNetwork(networkId);
-    pStaService->StartRoamToNetwork(networkId, conditionName);
+    pStaService->StartConnectToBssid(networkId, config.bssid);
     pStaService->ReAssociate();
     pStaService->EnableDeviceConfig(networkId, attemptEnable);
     pStaService->DisableDeviceConfig(networkId);
@@ -414,7 +414,7 @@ void StartRoamToNetworkTest(const uint8_t* data, size_t size)
     config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
     config.networkId = 0;
     WifiSettings::GetInstance().AddDeviceConfig(config);
-    pStaService->StartRoamToNetwork(networkId, staBssid);
+    pStaService->StartConnectToBssid(networkId, staBssid);
 }
 
 void StaServiceFuzzTest(const uint8_t* data, size_t size)

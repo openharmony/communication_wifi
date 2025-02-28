@@ -412,7 +412,7 @@ public:
      *
      * @param bssid - the mac address of network(in)
      */
-    void StartRoamToNetwork(std::string bssid);
+    void StartConnectToBssid(std::string bssid);
     /**
      * @Description Register sta callback function
      *

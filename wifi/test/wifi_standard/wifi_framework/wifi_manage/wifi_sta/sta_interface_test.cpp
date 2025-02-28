@@ -381,13 +381,13 @@ public:
         pStaInterface->DeliverStaIfaceData(mac);
     }
 
-    void StartRoamToNetwork()
+    void StartConnectToBssid()
     {
         std::string bssid = "01:23:45:67:89:ab";
         WifiDeviceConfig deviceConfig;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
             .WillOnce(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
-        pStaInterface->StartRoamToNetwork(0, bssid);
+        pStaInterface->StartConnectToBssid(0, bssid, NETWORK_SELECTED_BY_AUTO);
     }
 
     void StartConnectToUserSelectNetwork()
@@ -757,9 +757,9 @@ HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(StaInterfaceTest, StartRoamToNetwork, TestSize.Level1)
+HWTEST_F(StaInterfaceTest, StartConnectToBssid, TestSize.Level1)
 {
-    StartRoamToNetwork();
+    StartConnectToBssid();
 }
 
 HWTEST_F(StaInterfaceTest, StartConnectToUserSelectNetwork, TestSize.Level1)

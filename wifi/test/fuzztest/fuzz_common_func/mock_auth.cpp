@@ -102,5 +102,15 @@ int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid
 {
     return PERMISSION_DENIED;
 }
+
+int WifiAuthCenter::VerifyEnterpriseWifiConnectionPermission(const int &pid, const int &uid)
+{
+    return PERMISSION_DENIED;
+}
+
+int WifiAuthCenter::VerifySameProcessPermission(const int &pid, const int &uid)
+{
+    return PERMISSION_DENIED;
+}
 } // namespace Wifi
 } // namespace OHOS

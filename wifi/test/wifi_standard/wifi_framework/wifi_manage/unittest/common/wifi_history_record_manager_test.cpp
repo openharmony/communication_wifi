@@ -358,7 +358,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateStaticTimePointTest, TestSize.Level
     // test valid time
     int64_t validTime = 315559083;  // 1980-01-01
     WifiHistoryRecordManager::GetInstance().UpdateStaticTimePoint(validTime);
-    int64_t current1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentConnectedTime_;
+    int64_t current1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currenttStaticTimePoint_;
     int64_t dayIntWeek1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordDayInWeek_;
     int64_t hour1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordHour_;
     int64_t minute1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordMinute_;
@@ -379,7 +379,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateStaticTimePointTest, TestSize.Level
     // test invalid time
     int64_t invalidTime = -10;
     WifiHistoryRecordManager::GetInstance().UpdateStaticTimePoint(invalidTime);
-    int64_t current2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentConnectedTime_;
+    int64_t current2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.currenttStaticTimePoint_;
     EXPECT_TRUE(current2 > 0);
 }
 

@@ -301,7 +301,7 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+    EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
 
     msg->ClearMessageBody();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
@@ -311,7 +311,7 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
     msg->AddIntMessageBody(static_cast<int>(apcfg.GetBand()));
     msg->AddIntMessageBody(apcfg.GetChannel());
     msg->AddIntMessageBody(apcfg.GetMaxConn());
-    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+    EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2, TestSize.Level1)

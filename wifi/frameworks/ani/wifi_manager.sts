@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-loadLibrary("wifi_ani");
+loadLibrary("wifi_ani.z");
 
 namespace wifiManager {
     export native function isWifiActive(): boolean;

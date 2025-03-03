@@ -23,7 +23,10 @@ std::shared_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::
 static ani_boolean isWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     bool activeStatus = false;
-    wifiDevicePtr->IsWifiActive(activeStatus);
+    OHOS::ErrCode ret = wifiDevicePtr->IsWifiActive(activeStatus);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        std::cerr << "IsWifiActive failed." << std::endl;
+    }
     return static_cast<ani_boolean>(activeStatus);
 }
 

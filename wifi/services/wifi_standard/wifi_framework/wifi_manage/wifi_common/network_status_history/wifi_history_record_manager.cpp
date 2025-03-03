@@ -321,7 +321,7 @@ bool WifiHistoryRecordManager::IsAbnormalTimeRecords()
         connectedApInfo_.markedAsHomeApTime_ = INVALID_TIME_POINT;
         UpdateStaticTimePoint(currentTime);
         ret = true;
-    } else if (statisticalTimeInterval >= SECOND_OF_ONE_DAY || statisticalTimeInterval <= 0) {
+    } else if (statisticalTimeInterval >= SECOND_OF_ONE_DAY || statisticalTimeInterval < 0) {
         WIFI_LOGE("%{public}s, statisticalTimeInterval is greater than 1 day or less than 0, "
             "last=%{public}" PRId64"s, current=%{public}" PRId64"s",
             __func__, connectedApInfo_.currenttStaticTimePoint_, currentTime);

@@ -14,10 +14,6 @@
 import("//build/ohos.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
-group("ani_package") {
-  deps = [ ":wifi_ani" ]
-}
-
 ohos_shared_library("wifi_ani") {
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
@@ -25,10 +21,9 @@ ohos_shared_library("wifi_ani") {
     cfi_cross_dso = true  # Cross-SO CFI Checks
     debug = false
   }
-  sources = [ "wifi_ani_manager.cpp" ]
+  sources = [ "src/wifi_ani_manager.cpp" ]
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   external_deps = [ "runtime_core:ani" ]
   part_name = "wifi"
   subsystem_name = "communication"
-  output_extension = "so"
 }

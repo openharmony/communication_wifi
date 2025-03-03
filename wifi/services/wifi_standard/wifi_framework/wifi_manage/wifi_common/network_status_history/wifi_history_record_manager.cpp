@@ -341,7 +341,7 @@ void WifiHistoryRecordManager::UpdateStaticTimePoint(const int64_t &currentTimeI
         currentTime = static_cast<std::time_t>(currentTimeInt);
     }
     std::tm* localTime = std::localtime(&currentTime);
-    if (localTime == nullptr) {
+    if (localTime == nullptr || currentTime <= INVALID_TIME_POINT) {
         WIFI_LOGE("%{public}s fail", __func__);
         return;
     }

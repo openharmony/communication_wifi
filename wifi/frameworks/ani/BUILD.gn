@@ -32,4 +32,3 @@ ohos_shared_library("wifi_ani") {
   subsystem_name = "communication"
   output_extension = "so"
 }
-

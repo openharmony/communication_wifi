@@ -624,7 +624,6 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 {
     int id = msg->GetParam2();
     int isOpen = msg->GetParam1();
-
     if (HandleWifiToggleChangeForWlan1(id, isOpen)) {
         return;
     }

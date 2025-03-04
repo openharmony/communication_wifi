@@ -187,6 +187,8 @@ static napi_value WifiCategoryInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::DEFAULT), "DEFAULT");
     SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI6), "WIFI6");
     SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI6_PLUS), "WIFI6_PLUS");
+    SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI7), "WIFI7");
+    SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI7_PLUS), "WIFI7_PLUS");
     return wifiCategory;
 }
 static napi_value WifiStandardInit(napi_env env)

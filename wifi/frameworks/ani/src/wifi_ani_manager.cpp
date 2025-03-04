@@ -18,12 +18,12 @@
 #include <iostream>
 #include "wifi_device.h"
 
-std::shared_ptr<OHOS::Wifi::WifiDevice> wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+std::shared_ptr<OHOS::Wifi::WifiDevice> g_wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 
-static ani_boolean isWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+static ani_boolean IsWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     bool activeStatus = false;
-    OHOS::ErrCode ret = wifiDevicePtr->IsWifiActive(activeStatus);
+    OHOS::ErrCode ret = g_wifiDevicePtr->IsWifiActive(activeStatus);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
         std::cerr << "IsWifiActive failed." << std::endl;
     }
@@ -46,7 +46,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     std::array functions = {
-        ani_native_function {"isWifiActive", ":Z", reinterpret_cast<ani_boolean *>(isWifiActive)},
+        ani_native_function {"isWifiActive", ":Z", reinterpret_cast<ani_boolean *>(IsWifiActive)},
     };
 
     if (ANI_OK != env->Namespace_BindNativeFunctions(wifimanager, functions.data(), functions.size())) {

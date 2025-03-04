@@ -247,7 +247,6 @@ enum class WifiChannelWidthJs {
 enum class WifiCategoryJs {
     DEFAULT = 1,
     WIFI6 = 2,
-    WIFI6_PLUS = 3
     WIFI6_PLUS = 3,
     WIFI7 = 4,
     WIFI7_PLUS = 5

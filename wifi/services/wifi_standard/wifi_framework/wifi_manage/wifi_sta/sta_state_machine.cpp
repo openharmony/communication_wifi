@@ -32,6 +32,7 @@
 #include "block_connect_service.h"
 #include "wifi_randommac_helper.h"
 #include "define.h"
+#include "wifi_code_convert.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
 #include "securec.h"
@@ -783,7 +784,8 @@ void StaStateMachine::LinkState::DealWpaStateChange(InternalMessagePtr msg)
     int status = msg->GetParam1();
     WIFI_LOGI("DealWpaStateChange status: %{public}d", status);
     if (static_cast<SupplicantState>(status) == SupplicantState::ASSOCIATING) {
-        pStaStateMachine->linkedInfo.ssid = msg->GetStringFromMessage();
+        std::string ssid = msg->GetStringFromMessage();
+        pStaStateMachine->linkedInfo.ssid = WifiCodeConvertUtil::GbkToUtf8(ssid);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, pStaStateMachine->linkedInfo);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
             static_cast<int>(WifiOperateState::STA_ASSOCIATING));

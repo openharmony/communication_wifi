@@ -211,6 +211,7 @@
         "OHOS::Wifi::WifiSettings::GetAllCandidateConfig(int, std::__h::vector<OHOS::Wifi::WifiDeviceConfig, std::__h::allocator<OHOS::Wifi::WifiDeviceConfig>>&)";
         "OHOS::Wifi::WifiSettings::IncreaseDeviceConnFailedCount(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int const&, int)";
         "OHOS::Wifi::WifiSettings::SetDeviceConnFailedCount(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int const&, int)";
+        "OHOS::Wifi::WifiSettings::InKeyMgmtBitset(OHOS::Wifi::WifiDeviceConfig const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiSettings::SyncDeviceConfig()";
         "OHOS::Wifi::WifiSettings::ReloadDeviceConfig()";
         "OHOS::Wifi::WifiSettings::GetNextNetworkId()";

@@ -16,7 +16,6 @@
 #include "wifi_history_record_manager.h"
 #include <ctime>
 #include <mutex>
-#include <regex>
 #include "wifi_logger.h"
 #include "wifi_timer.h"
 #include "wifi_settings.h"
@@ -341,8 +340,8 @@ void WifiHistoryRecordManager::UpdateStaticTimePoint(const int64_t &currentTimeI
         currentTime = static_cast<std::time_t>(currentTimeInt);
     }
     std::tm* localTime = std::localtime(&currentTime);
-    if (localTime == nullptr || currentTime <= INVALID_TIME_POINT) {
-        WIFI_LOGE("%{public}s fail", __func__);
+    if (localTime == nullptr) {
+        WIFI_LOGE("%{public}s, localTime is nullptr", __func__);
         return;
     }
     connectedApInfo_.currenttStaticTimePoint_ = currentTime;
@@ -553,9 +552,8 @@ bool WifiHistoryRecordManager::IsHomeRouter(const std::string &portalUrl)
 
     // Obtain the portal redirection address from the XML file
     std::vector<PackageInfo> homeRouterList = packageInfoMap["HOME_ROUTER_REDIRECTED_URL"];
-    std::regex reg(portalUrl);
     for (const PackageInfo &info : homeRouterList) {
-        if (std::regex_search(info.name, reg)) {
+        if (portalUrl.find(info.name) != std::string_view::npos) {
             WIFI_LOGI("home router");
             return true;
         }

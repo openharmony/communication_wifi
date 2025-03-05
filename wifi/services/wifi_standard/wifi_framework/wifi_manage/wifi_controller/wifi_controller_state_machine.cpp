@@ -622,6 +622,17 @@ bool WifiControllerMachine::EnableState::HandleWifiToggleChangeForWlan1(int id, 
 
 void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg)
 {
+    if (pWifiControllerMachine == nullptr) {
+        WIFI_LOGE("pWifiControllerMachine is null.\n");
+        return;
+    }
+    if (pWifiControllerMachine->multiStaManagers.HasAnyManager()) {
+        ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopWifi2Service(INSTID_WLAN1);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("AutoStopWifi2Service fail.\n");
+        }
+        pWifiControllerMachine->SendMessage(CMD_MULTI_STA_STOPPED, INSTID_WLAN1);
+    }
     int id = msg->GetParam2();
     int isOpen = msg->GetParam1();
     if (HandleWifiToggleChangeForWlan1(id, isOpen)) {

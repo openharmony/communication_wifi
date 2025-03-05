@@ -71,6 +71,7 @@
         "OHOS::Wifi::WifiConfigCenter::SetWifiScanOnlyMidState(OHOS::Wifi::WifiOprMidState, OHOS::Wifi::WifiOprMidState, int)";
         "OHOS::Wifi::WifiConfigCenter::SetWifiScanOnlyMidState(OHOS::Wifi::WifiOprMidState, int)";
         "OHOS::Wifi::WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(OHOS::Wifi::WifiLinkedInfo&)";
+        "OHOS::Wifi::WifiConfigCenter::SetMloWifiLinkedMaxSpeed(int)";
         "OHOS::Wifi::WifiConfigCenter::CheckScanOnlyAvailable(int)";
         "OHOS::Wifi::WifiConfigCenter::GetConnectedBssid(int)";
         "OHOS::Wifi::WifiConfigCenter::SetSoftapToggledState(bool)";

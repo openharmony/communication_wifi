@@ -973,6 +973,7 @@ void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, Me
     reply.WriteInt32(0);
     if (ret != WIFI_OPT_SUCCESS) {
         reply.WriteInt32(ret);
+        return;
     }
     uint32_t size = static_cast<uint32_t>(multiLinkedInfo.size());
     if (size > WIFI_MAX_MLO_LINK_NUM) {

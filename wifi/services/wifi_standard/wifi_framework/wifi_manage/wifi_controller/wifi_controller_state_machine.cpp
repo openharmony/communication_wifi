@@ -22,9 +22,9 @@
 #include "wifi_hisysevent.h"
 #include "wifi_global_func.h"
 #include "wifi_battery_utils.h"
+#include "wifi_service_scheduler.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
-#include "wifi_service_scheduler.h"
 #endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher.h"
@@ -623,17 +623,6 @@ bool WifiControllerMachine::EnableState::HandleWifiToggleChangeForWlan1(int id, 
 
 void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg)
 {
-    if (pWifiControllerMachine == nullptr) {
-        WIFI_LOGE("pWifiControllerMachine is null.\n");
-        return;
-    }
-    if (pWifiControllerMachine->multiStaManagers.HasAnyManager()) {
-        ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopWifi2Service(INSTID_WLAN1);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("AutoStopWifi2Service fail.\n");
-        }
-        pWifiControllerMachine->SendMessage(CMD_MULTI_STA_STOPPED, INSTID_WLAN1);
-    }
     int id = msg->GetParam2();
     int isOpen = msg->GetParam1();
     if (HandleWifiToggleChangeForWlan1(id, isOpen)) {
@@ -683,6 +672,17 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(InternalMessagePtr msg)
 {
+    if (pWifiControllerMachine == nullptr) {
+        WIFI_LOGE("pWifiControllerMachine is null.\n");
+        return;
+    }
+    if (pWifiControllerMachine->multiStaManagers.HasAnyManager()) {
+        ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopWifi2Service(INSTID_WLAN1);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("AutoStopWifi2Service fail.\n");
+        }
+        pWifiControllerMachine->SendMessage(CMD_MULTI_STA_STOPPED, INSTID_WLAN1);
+    }
     int open = msg->GetParam1();
     int id = msg->GetParam2();
     WIFI_LOGE("handleSoftapToggleChangeInEnabledState");

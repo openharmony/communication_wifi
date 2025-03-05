@@ -24,6 +24,7 @@
 #include "wifi_battery_utils.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
+#include "wifi_service_scheduler.h"
 #endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher.h"

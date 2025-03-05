@@ -521,6 +521,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan:wifi_scan_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure:wifi_self_cure",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_service",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
@@ -548,6 +549,7 @@ if (defined(ohos_lite)) {
       "dhcp:dhcp_sdk",
       "hilog:libhilog",
       "ipc:ipc_single",
+      "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_native_manager_if",
@@ -659,6 +661,11 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_vap_manager) {
       defines += [ "FEATURE_VAP_MANAGER_SUPPORT" ]
     }
+
+    if (wifi_feature_with_data_report) {
+      defines += [ "WIFI_DATA_REPORT_ENABLE" ]
+    }
+
     version_script = "libwifi_manager.map"
     part_name = "wifi"
     subsystem_name = "communication"

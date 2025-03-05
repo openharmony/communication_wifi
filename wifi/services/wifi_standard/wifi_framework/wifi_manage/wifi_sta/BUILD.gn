@@ -50,6 +50,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
@@ -140,6 +141,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_service",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
@@ -169,6 +171,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
     }
 
+    if (wifi_feature_with_data_report) {
+      defines += [ "WIFI_DATA_REPORT_ENABLE" ]
+    }
+
     defines += [ "FEATURE_SELF_CURE_SUPPORT" ]
 
     external_deps = [
@@ -185,6 +191,7 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "ipc:ipc_single",
+      "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_stats_manager_if",

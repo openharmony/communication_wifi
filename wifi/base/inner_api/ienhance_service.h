@@ -264,6 +264,16 @@ public:
     /**
      * @Description notify wifi link type changed
      *
+     * @param apJsonData - ap Info
+     * @param gpsFlag - gps flag
+     * @param version - report version
+     * @return void
+     */
+    virtual void CrowdsourcedDataReportInterface(std::string &apJsonData, const int gpsFlag, const int version);
+
+    /**
+     * @Description notify wifi link type changed
+     *
      * @param wifiLinkType - wifiLinkType
      * @return void
      */

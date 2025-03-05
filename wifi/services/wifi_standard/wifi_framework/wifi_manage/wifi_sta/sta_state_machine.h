@@ -250,6 +250,9 @@ public:
 
     private:
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
+        void DealWpaLinkPasswdWrongFailEvent();
+        void DealWpaLinkFullConnectFailEvent();
+        void DealWpaLinkAssocRejectFailEvent();
         void DealWpaLinkFailEvent(InternalMessagePtr msg);
     private:
         StaStateMachine *pStaStateMachine;
@@ -564,6 +567,20 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
+
+    /**
+     * @Description User select connect to network.
+     *
+     * @param deviceConfig - Ap device config information
+     */
+    void UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName);
+
+    /**
+     * @Description Auto select connect to network.
+     *
+     * @param bssid - the bssid of network which is going to be connected.
+     */
+    void AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName);
 
     void SetAllowAutoConnectStatus(int32_t networkId, bool status);
 

@@ -100,6 +100,7 @@ public:
     virtual int GetRealMacAddress(std::string &macAddress, int instId = 0) = 0;
     virtual int GetScoretacticsNormalScore(int instId = 0) = 0;
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
+    virtual int SetMloWifiLinkedMaxSpeed(int instId = 0) = 0;
     virtual void SaveDisconnectedReason(DisconnectedReason discReason, int instId = 0) = 0;
     virtual void InsertWifiCategoryBlackListCache(int blacklistType, const std::string currentBssid,
         const WifiCategoryBlackListInfo wifi6BlackListInfo) = 0;
@@ -284,6 +285,7 @@ public:
     MOCK_METHOD2(GetRealMacAddress, int(std::string &macAddress, int));
     MOCK_METHOD1(GetScoretacticsNormalScore, int(int));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
+    MOCK_METHOD1(SetMloWifiLinkedMaxSpeed, int(int));
     MOCK_METHOD2(SaveDisconnectedReason, void(DisconnectedReason discReason, int));
     MOCK_METHOD3(InsertWifiCategoryBlackListCache, void(int blacklistType, const std::string currentBssid,
         const WifiCategoryBlackListInfo wifi6BlackListInfo));

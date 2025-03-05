@@ -110,6 +110,7 @@ public:
     virtual bool GetWifiFlagOnAirplaneMode(int instId) = 0;
     virtual int GetScanOnlySwitchState(int instId) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
+    virtual int SetMloWifiLinkedMaxSpeed(int instId = 0) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -201,6 +202,7 @@ public:
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
     MOCK_METHOD1(GetScanOnlySwitchState, int(int instId));
+    MOCK_METHOD1(SetMloWifiLinkedMaxSpeed, int(int));
 };
 }  // namespace OHOS
 }  // namespace Wifi

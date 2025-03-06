@@ -680,6 +680,7 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopWifi2Service(INSTID_WLAN1);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("AutoStopWifi2Service fail.\n");
+            return;
         }
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
         std::string staIface = WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN1);

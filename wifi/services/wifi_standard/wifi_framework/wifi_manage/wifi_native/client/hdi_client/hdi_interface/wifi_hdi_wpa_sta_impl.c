@@ -168,7 +168,7 @@ static WifiErrorNo SetNetwork(int networkId, SetNetworkConfig conf, const char *
     int pos = -1;
     for (unsigned i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
         if (g_wpaSsidFields[i].field == conf.cfgParam) {
-            pos = i;
+            pos = (int)i;
             break;
         }
     }

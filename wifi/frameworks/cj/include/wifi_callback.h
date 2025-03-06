@@ -20,9 +20,9 @@
 
 #include "ffi_structs.h"
 #include "wifi_errcode.h"
-#include "wifi_p2p.h"
 #include "wifi_hotspot.h"
 #include "wifi_logger.h"
+#include "wifi_p2p.h"
 #include "wifi_sa_event.h"
 
 namespace OHOS::Wifi {
@@ -50,21 +50,20 @@ public:
         samgrProxy->SubscribeSystemAbility((int32_t)WIFI_HOTSPOT_ABILITY_ID, mSaStatusListener);
         samgrProxy->SubscribeSystemAbility((int32_t)WIFI_P2P_ABILITY_ID, mSaStatusListener);
     }
-    ~CjEventRegister()
-    {}
+    ~CjEventRegister() {}
 
     static CjEventRegister& GetInstance();
 
-    int32_t Register(const std::string& type, void (* callback)());
+    int32_t Register(const std::string& type, void (*callback)());
     int32_t UnRegister(const std::string& type);
-    ErrCode RegisterDeviceEvents(const std::vector<std::string> &event);
-    ErrCode RegisterScanEvents(const std::vector<std::string> &event);
-    ErrCode RegisterHotspotEvents(const std::vector<std::string> &event);
-    ErrCode RegisterP2PEvents(const std::vector<std::string> &event);
+    ErrCode RegisterDeviceEvents(const std::vector<std::string>& event);
+    ErrCode RegisterScanEvents(const std::vector<std::string>& event);
+    ErrCode RegisterHotspotEvents(const std::vector<std::string>& event);
+    ErrCode RegisterP2PEvents(const std::vector<std::string>& event);
 
 private:
     OHOS::sptr<OHOS::ISystemAbilityStatusChange> mSaStatusListener = nullptr;
 };
-}
+} // namespace OHOS::Wifi
 
 #endif

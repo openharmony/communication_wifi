@@ -138,6 +138,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         std::string bssid = "";
         if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
             bssid = networkSelectionResult.interScanInfo.bssid;
+        } else {
             connTriggerMode = SelectedType::NETWORK_SELECTED_BY_USER;
         }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;

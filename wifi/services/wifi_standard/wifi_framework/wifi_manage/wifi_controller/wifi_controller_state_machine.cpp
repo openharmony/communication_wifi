@@ -686,7 +686,7 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
         std::string staIfName = WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN1);
         if (!staIfName.empty()) {
             HalDeviceManager::GetInstance().RemoveStaIface(staIfName);
-            WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(staIfName);
+            WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(INSTID_WLAN1);
         }
 #endif
         pWifiControllerMachine->SendMessage(CMD_MULTI_STA_STOPPED, INSTID_WLAN1);

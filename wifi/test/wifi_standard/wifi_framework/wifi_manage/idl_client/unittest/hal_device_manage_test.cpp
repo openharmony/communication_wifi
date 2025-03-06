@@ -79,7 +79,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest, TestSize.Level1)
         ifaceName,
         instId);
     std::vector<ScanResultsInfo> scanResultsInfo;
-    DelayedSingleton<HalDeviceManager>::GetInstance()->GetScanInfos(ifaceName, scanResultsInfo);
+    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetScanInfos(ifaceName, scanResultsInfo));
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetConnectSignalInfoTest, TestSize.Level1)
@@ -436,7 +436,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest_01, TestSize.Level1)
         std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName);
     std::vector<ScanResultsInfo> scanResultsInfo;
-    DelayedSingleton<HalDeviceManager>::GetInstance()->GetScanInfos(ifaceName, scanResultsInfo);
+    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetScanInfos(ifaceName, scanResultsInfo));
 }
 HWTEST_F(WifiHalDeviceManagerTest, SetTxPowerTest_01, TestSize.Level1)
 {

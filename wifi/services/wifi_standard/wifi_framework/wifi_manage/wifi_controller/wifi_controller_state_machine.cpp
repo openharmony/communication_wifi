@@ -681,6 +681,13 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("AutoStopWifi2Service fail.\n");
         }
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+        std::string staIface = WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN1);
+        if (!staIface.empty()) {
+            HalDeviceManager::GetInstance().RemoveStaIface(staIface);
+            WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(mid);
+        }
+#endif
         pWifiControllerMachine->SendMessage(CMD_MULTI_STA_STOPPED, INSTID_WLAN1);
     }
     int open = msg->GetParam1();

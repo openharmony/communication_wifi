@@ -640,6 +640,10 @@ HWTEST_F(WifiHistoryRecordManagerTest, IsHomeRouterTest, TestSize.Level1)
     portalUrl = "test";
     ret = WifiHistoryRecordManager::GetInstance().IsHomeRouter(portalUrl);
     EXPECT_FALSE(ret);
+
+    portalUrl = "test3546fsds<](!,={+";
+    ret = WifiHistoryRecordManager::GetInstance().IsHomeRouter(portalUrl);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(WifiHistoryRecordManagerTest, ClearConnectedApInfoTest, TestSize.Level1)

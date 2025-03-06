@@ -683,10 +683,10 @@ void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(
             return;
         }
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-        std::string staIface = WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN1);
-        if (!staIface.empty()) {
-            HalDeviceManager::GetInstance().RemoveStaIface(staIface);
-            WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(mid);
+        std::string staIfName = WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN1);
+        if (!staIfName.empty()) {
+            HalDeviceManager::GetInstance().RemoveStaIface(staIfName);
+            WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(staIfName);
         }
 #endif
         pWifiControllerMachine->SendMessage(CMD_MULTI_STA_STOPPED, INSTID_WLAN1);

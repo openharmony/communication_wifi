@@ -170,6 +170,8 @@ public:
 
     int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
 
+    void SetMloWifiLinkedMaxSpeed(int instId = 0);
+
     bool CheckScanOnlyAvailable(int instId = 0);
 
     std::string GetConnectedBssid(int instId = 0);

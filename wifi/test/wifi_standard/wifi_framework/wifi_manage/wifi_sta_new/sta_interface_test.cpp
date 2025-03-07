@@ -54,12 +54,12 @@ public:
     MockWifiStaService *pMockStaService = nullptr;
 };
 
-HWTEST_F(StaInterfaceTest, StartRoamToNetworkTest01, TestSize.Level1)
+HWTEST_F(StaInterfaceTest, StartConnectToBssidTest01, TestSize.Level1)
 {
     int networkId = 0;
     std::string bssid = "01:23:45:67:89:ab";
-    EXPECT_CALL(*pMockStaService, StartRoamToNetwork(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-    EXPECT_TRUE(pStaInterface->StartRoamToNetwork(networkId, bssid) == WIFI_OPT_SUCCESS);
+    EXPECT_CALL(*pMockStaService, StartConnectToBssid(_, _, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+    EXPECT_TRUE(pStaInterface->StartConnectToBssid(networkId, bssid, NETWORK_SELECTED_BY_USER) == WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(StaInterfaceTest, StartConnectToUserSelectNetworkTest01, TestSize.Level1)

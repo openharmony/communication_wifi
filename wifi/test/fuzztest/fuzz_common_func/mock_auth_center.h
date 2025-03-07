@@ -64,7 +64,7 @@ public:
     int VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid);
 
     int VerifyGetWifiConfigPermission(const int &pid, const int &uid);
-
+    
     int VerifyEnterpriseWifiConnectionPermission(const int &pid, const int &uid);
 
     int VerifySameProcessPermission(const int &pid, const int &uid);

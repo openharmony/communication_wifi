@@ -1092,7 +1092,7 @@ ErrCode WifiDeviceServiceImpl::StartRoamToNetwork(const int networkId, const std
         WIFI_LOGE("%{public}s: pService is nullptr!", __FUNCTION__);
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    return pService->StartRoamToNetwork(networkId, bssid);
+    return pService->StartConnectToBssid(networkId, bssid);
 }
 
 ErrCode WifiDeviceServiceImpl::StartConnectToUserSelectNetwork(int networkId, std::string bssid, bool isCandidate)

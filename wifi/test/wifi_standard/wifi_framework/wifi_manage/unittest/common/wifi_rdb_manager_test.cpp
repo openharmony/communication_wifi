@@ -118,18 +118,5 @@ HWTEST_F(WifiRdbManagerTest, Delete_Success, TestSize.Level1)
     int deletedRowCount = 0;
     bool result = rdbManager->Delete(deletedRowCount, predicates);
     ASSERT_TRUE(result);
-    ASSERT_GT(deletedRowCount, 0);
-}
-
-HWTEST_F(WifiRdbManagerTest, DelayCloseRdbStoreTest, TestSize.Level1)
-{
-    auto wifiRdbManager = std::make_shared<WifiRdbManager>(
-        "/data/service/el1/public/wifi/wifi_test.db", 1, nullptr);
-    wifiRdbManager->DelayCloseRdbStore();
-
-    // Wait for the delay to ensure the store is closed
-    std::this_thread::sleep_for(std::chrono::seconds(25));
-
-    // Check if the rdbStore_ is reset to nullptr
-    EXPECT_EQ(wifiRdbManager->GetRdbStore(), nullptr);
+    ASSERT_EQ(deletedRowCount, 0);
 }

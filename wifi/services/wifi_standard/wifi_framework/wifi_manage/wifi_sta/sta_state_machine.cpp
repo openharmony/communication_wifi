@@ -337,6 +337,11 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             SaveFoldStatus(msg);
             break;
         }
+        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            DealScreenStateChangedEvent(msg);
+            break;
+        }
         default:
             WIFI_LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
@@ -554,6 +559,22 @@ bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
     }
     return true;
 }
+
+void StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");
+        return;
+    }
+
+    int screenState = msg->GetParam1();
+    WIFI_LOGI("InitState::DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
+    if (screenState == MODE_STATE_OPEN) {
+        pStaStateMachine->enableSignalPoll = true;
+    } else {
+        pStaStateMachine->enableSignalPoll = false;
+    }
+}
 /* --------------------------- state machine link State ------------------------------ */
 StaStateMachine::LinkState::LinkState(StaStateMachine *staStateMachine)
     : State("LinkState"), pStaStateMachine(staStateMachine)
@@ -674,8 +695,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         return;
     }
     int reason = msg->GetParam1();
-    std::string bssid;
-    msg->GetStringFromMessage();
+    std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("Enter DealDisconnectEventInLinkState m_instId = %{public}d reason:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
 
@@ -1230,6 +1250,10 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             DealStartRoamCmdInApLinkedState(msg);
             break;
+        case WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT:
+            ret = EXECUTED;
+            DealCsaChannelChanged(msg);
+            break;
         default:
             break;
     }
@@ -1291,6 +1315,7 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
 {
     std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("%{public}s enter, bssid:%{public}s", __FUNCTION__, MacAnonymize(bssid).c_str());
+    pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->AfterApLinkedprocess(bssid);
 }
 
@@ -1321,6 +1346,20 @@ void StaStateMachine::ApLinkedState::DealStartRoamCmdInApLinkedState(InternalMes
     /* Start roaming */
     /* 只处理主动漫游*/
     pStaStateMachine->SwitchState(pStaStateMachine->pApRoamingState);
+}
+
+void StaStateMachine::ApLinkedState::DealCsaChannelChanged(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is null", __FUNCTION__);
+        return;
+    }
+    int newFrq = msg->GetParam1();
+    WIFI_LOGI("%{public}s update freq from %{public}d  to %{public}d", __FUNCTION__,
+        pStaStateMachine->linkedInfo.frequency, newFrq);
+    pStaStateMachine->linkedInfo.frequency = newFrq;
+    // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }
 
 void StaStateMachine::StartDisConnectToNetwork()
@@ -1936,6 +1975,14 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
+// if wifipro is open, wifipro will notify selfcure no internet, if not, sta should notify
+#ifndef FEATURE_WIFI_PRO_SUPPORT
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        if (selfCureService_ != nullptr) {
+            selfCureService_->NotifyInternetFailureDetected(false);
+        }
+#endif
+#endif
     }
 #ifndef OHOS_ARCH_LITE
     SyncDeviceEverConnectedState(true);
@@ -2351,18 +2398,6 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessagePtr msg)
     }
 }
 
-void StaStateMachine::DealCsaChannelChanged(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        LOGE("%{public}s InternalMessage msg is null", __FUNCTION__);
-        return;
-    }
-    int newFreq = msg->GetParam1();
-    WIFI_LOGI("%{public}s update freq from %{public}d to %{public}d", __FUNCTION__, linkedInfo.frequency, newFreq);
-    linkedInfo.frequency = newFreq;
-    // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
-    InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
-}
 void StaStateMachine::DealWpaStateChange(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
@@ -3112,8 +3147,6 @@ void StaStateMachine::AppendFastTransitionKeyMgmt(
         halDeviceConfig.keyMgmt.append(" FT-EAP ");
     } else if (scanInfo.capabilities.find("FT/PSK") != std::string::npos) {
         halDeviceConfig.keyMgmt.append(" FT-PSK ");
-    } else if (scanInfo.capabilities.find("FT/SAE") != std::string::npos) {
-        halDeviceConfig.keyMgmt.append(" FT-SAE ");
     } else {
         WIFI_LOGI("No need append ft keyMgmt!");
     }
@@ -3411,6 +3444,7 @@ void StaStateMachine::DealMloConnectionLinkInfo()
         return;
     }
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
+    WifiConfigCenter::GetInstance().SetMloWifiLinkedMaxSpeed(m_instId);
 }
 
 void StaStateMachine::UpdateLinkedBssid(std::string &bssid)
@@ -3530,7 +3564,7 @@ void StaStateMachine::DealSignalPollResult()
         WIFI_LOGE("GetConnectSignalInfo return fail: %{public}d.", ret);
         return;
     }
-
+    DealMloLinkSignalPollResult();
     if (signalInfo.frequency > 0) {
         linkedInfo.frequency = signalInfo.frequency;
     }
@@ -3569,7 +3603,6 @@ void StaStateMachine::DealSignalPollResult()
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
     JudgeEnableSignalPoll(signalInfo);
-    DealMloLinkSignalPollResult();
 }
 
 void StaStateMachine::DealMloLinkSignalPollResult()
@@ -3605,9 +3638,9 @@ void StaStateMachine::DealMloLinkSignalPollResult()
 
             linkInfo.rssi = rssi;
             linkInfo.frequency = signalInfo.frequency;
-            linkInfo.linkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;
-            linkInfo.txLinkSpeed = signalInfo.txLinkSpeed / TRANSFORMATION_TO_MBPS;
-            linkInfo.rxLinkSpeed = signalInfo.rxLinkSpeed / TRANSFORMATION_TO_MBPS;
+            linkInfo.linkSpeed = signalInfo.txLinkSpeed;
+            linkInfo.txLinkSpeed = signalInfo.txLinkSpeed;
+            linkInfo.rxLinkSpeed = signalInfo.rxLinkSpeed;
             linkInfo.lastTxPackets = signalInfo.txPackets;
             linkInfo.lastRxPackets = signalInfo.rxPackets;
         }
@@ -3663,14 +3696,27 @@ void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
 
 void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)
 {
+    int curRssi = signalInfo.signal;
+    std::vector<WifiLinkedInfo> mloLinkedInfo;
+    if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR &&
+        WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkedInfo, m_instId) == 0) {
+        for (auto& info : mloLinkedInfo) {
+            if (info.rssi > curRssi) {
+                curRssi = info.rssi;
+            }
+        }
+        WIFI_LOGD("%{public}s signalInfoRssi: %{public}d, maxRssi: %{public}d",
+            __FUNCTION__, signalInfo.signal, curRssi);
+    }
+
     int currentSignalLevel = 0;
     if (foldStateRssi != INVALID_RSSI_VALUE) {
         linkedInfo.rssi = setRssi(foldStateRssi);
-    } else if (signalInfo.signal > INVALID_RSSI_VALUE && signalInfo.signal < MAX_RSSI_VALUE) {
-        if (signalInfo.signal > 0) {
-            linkedInfo.rssi = setRssi((signalInfo.signal - SIGNAL_INFO));
+    } else if (curRssi > INVALID_RSSI_VALUE && curRssi < MAX_RSSI_VALUE) {
+        if (curRssi > 0) {
+            linkedInfo.rssi = setRssi((curRssi - SIGNAL_INFO));
         } else {
-            linkedInfo.rssi = setRssi(signalInfo.signal);
+            linkedInfo.rssi = setRssi(curRssi);
         }
     } else {
         linkedInfo.rssi = INVALID_RSSI_VALUE;
@@ -4152,7 +4198,7 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     }
 }
 
-void StaStateMachine::StartRoamToNetwork(std::string bssid)
+void StaStateMachine::StartConnectToBssid(std::string bssid)
 {
     InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {

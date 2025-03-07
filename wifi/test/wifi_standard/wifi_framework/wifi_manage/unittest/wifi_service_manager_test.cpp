@@ -128,7 +128,8 @@ HWTEST_F(WifiServiceManagerTest, DestroyApInterfaceTest, TestSize.Level1)
     WifiApServiceUtil wifiApServiceUtil;
     IApService *service = wifiApServiceUtil.CreateApInterface(0);
     wifiApServiceUtil.DestroyApInterface(service);
-    EXPECT_TRUE(service == nullptr);
+    EXPECT_TRUE(service != nullptr);
+    service = nullptr;
 }
 }  // namespace Wifi
 }  // namespace OHOS

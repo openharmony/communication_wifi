@@ -13,7 +13,8 @@
 @rem limitations under the License.
 @rem
 
-@if "%DEBUG%" == "" @echo off
+@echo off
+@if "%DEBUG%" == ""
 @rem ##########################################################################
 @rem
 @rem  Gradle startup script for Windows
@@ -100,3 +101,4 @@ exit /b 1
 if "%OS%"=="Windows_NT" endlocal
 
 :omega
+@echo on

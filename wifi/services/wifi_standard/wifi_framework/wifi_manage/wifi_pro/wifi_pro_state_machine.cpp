@@ -320,7 +320,8 @@ void WifiProStateMachine::FastScan(std::vector<WifiScanInfo> &scanInfoList)
     }
     params.scanStyle = 0;
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
-    if (pScanService == nullptr || pScanService->ScanWithParam(params, true) != WIFI_OPT_SUCCESS) {
+    if (pScanService == nullptr ||
+        pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_WIFIPRO) != WIFI_OPT_SUCCESS) {
         WIFI_LOGI("FastScan error, do full channel scan.");
         SendMessage(EVENT_REQUEST_SCAN_DELAY);
     }
@@ -1083,7 +1084,7 @@ void WifiProStateMachine::WifiHasNetState::HandleWifiQoeSlow()
             WIFI_LOGI("TryStartScan, pService is nullptr.");
             return;
         }
-        pScanService->Scan(true);
+        pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
         WIFI_LOGI("wifi to wifi, app qoe slow");
         pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_APP_QOE_SLOW);
         qoeSwitch_ = true;
@@ -1186,7 +1187,7 @@ void WifiProStateMachine::WifiNoNetState::HandleReuqestScanInNoNet(const Interna
         WIFI_LOGI("TryStartScan, pService is nullptr.");
         return;
     }
-    pScanService->Scan(true);
+    pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
     fullScan_ = true;
 }
 

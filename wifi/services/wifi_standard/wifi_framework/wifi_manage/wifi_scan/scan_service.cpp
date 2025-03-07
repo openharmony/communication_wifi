@@ -74,6 +74,7 @@ ScanService::~ScanService()
         pScanStateMachine = nullptr;
     }
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->ClearScanInfoList();
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->CleanWifiCategoryRecord();
 }
 
 bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks)

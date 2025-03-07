@@ -261,7 +261,6 @@ void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results
 void WifiScanManager::DealStaOpened(int instId)
 {
     WIFI_LOGI("wifi opened id=%{public}d", instId);
-    WifiConfigCenter::GetInstance().GetWifiScanConfig()->CleanWifiCategoryRecord();
     CheckAndStartScanService(instId);
 }
 }  // namespace Wifi

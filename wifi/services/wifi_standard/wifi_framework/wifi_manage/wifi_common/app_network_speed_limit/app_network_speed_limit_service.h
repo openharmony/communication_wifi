@@ -78,6 +78,7 @@ private:
     void UpdateSpeedLimitConfigs(const int enable);
     void UpdateNoSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     bool IsLimitSpeedBgApp(const int controlId, const std::string &bundleName, const int enable);
+    bool IsTopNLimitSpeedSceneInNow();
     void AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo);
     void WifiConnectStateChanged();
     void ForegroundAppChangedAction(const std::string &bundleName);
@@ -88,6 +89,7 @@ private:
     void GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     void LogSpeedLimitConfigs();
     void UpdateGamePvpState(const WifiNetworkControlInfo &networkControlInfo);
+    bool VerifyInputParameters(const WifiNetworkControlInfo &networkControlInfo);
 
 private:
     StaServiceCallback m_staCallback;

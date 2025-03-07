@@ -1041,6 +1041,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "channelWidth", static_cast<int>(linkedInfo.channelWidth), result);
     SetValueInt32(env, "supportedWifiCategory", static_cast<int>(linkedInfo.supportedWifiCategory), result);
     SetValueBool(env, "isHiLinkNetwork", linkedInfo.isHiLinkNetwork, result);
+    SetValueInt32(env, "wifiLinkType", static_cast<int>(linkedInfo.wifiLinkType), result);
 }
 
 /* This interface has not been fully implemented */

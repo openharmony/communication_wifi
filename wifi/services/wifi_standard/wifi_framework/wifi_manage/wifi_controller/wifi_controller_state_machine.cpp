@@ -605,16 +605,6 @@ void WifiControllerMachine::SwitchRole(ConcreteManagerRole role)
     }
 }
 
-void WifiControllerMachine::EnableState::HandleWifiToggleChangeForRpt(int id, int isOpen)
-{
-#ifdef FEATURE_RPT_SUPPORT
-    if (isOpen == 0 && pWifiControllerMachine->hotspotMode == HotspotMode::RPT) {
-        WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-        pWifiControllerMachine->SendMessage(CMD_SOFTAP_TOGGLED, 0, id);
-    }
-#endif
-}
-
 bool WifiControllerMachine::EnableState::HandleWifiToggleChangeForWlan1(int id, int isOpen)
 {
     if (id == INSTID_WLAN1 && isOpen == 0) {
@@ -634,9 +624,6 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 {
     int id = msg->GetParam2();
     int isOpen = msg->GetParam1();
-
-    HandleWifiToggleChangeForRpt(id, isOpen);
-
     if (HandleWifiToggleChangeForWlan1(id, isOpen)) {
         return;
     }

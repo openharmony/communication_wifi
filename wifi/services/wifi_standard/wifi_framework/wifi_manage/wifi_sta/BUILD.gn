@@ -165,6 +165,12 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
     }
 
+    if (wifi_feature_wifi_pro_ctrl) {
+      defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
+    }
+
+    defines += [ "FEATURE_SELF_CURE_SUPPORT" ]
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",

@@ -193,6 +193,7 @@ public:
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
+        void DealScreenStateChangedEvent(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
 
@@ -270,6 +271,7 @@ public:
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
         void HandleLinkSwitchEvent(InternalMessagePtr msg);
         void DealStartRoamCmdInApLinkedState(InternalMessagePtr msg);
+        void DealCsaChannelChanged(InternalMessagePtr msg);
 
     private:
         StaStateMachine *pStaStateMachine;
@@ -411,7 +413,7 @@ public:
      *
      * @param bssid - the mac address of network(in)
      */
-    void StartRoamToNetwork(std::string bssid);
+    void StartConnectToBssid(std::string bssid);
     /**
      * @Description Register sta callback function
      *
@@ -453,7 +455,6 @@ public:
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
-    void DealCsaChannelChanged(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);

@@ -84,6 +84,7 @@ public:
     virtual int ClearScanInfoList() = 0;
     virtual int GetScanInfoList(std::vector<WifiScanInfo> &results) = 0;
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
+    virtual void SetMloWifiLinkedMaxSpeed(int instId = 0) = 0;
     virtual std::string GetConnectedBssid(int instId = 0) = 0;
     virtual std::string GetApIfaceName() = 0;
     virtual int SetHotspotState(int state, int id = 0) = 0;
@@ -231,6 +232,7 @@ public:
     MOCK_METHOD0(ClearScanInfoList, int());
     MOCK_METHOD1(GetScanInfoList, int(std::vector<WifiScanInfo> &results));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
+    MOCK_METHOD1(SetMloWifiLinkedMaxSpeed, void(int instId));
     MOCK_METHOD1(GetConnectedBssid, std::string (int instId));
     MOCK_METHOD0(GetApIfaceName, std::string());
     MOCK_METHOD2(SetHotspotState, int(int state, int id));

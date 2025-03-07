@@ -134,6 +134,7 @@ ohos_unittest("wifi_controller_unittest") {
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
+    "audio_framework:audio_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",

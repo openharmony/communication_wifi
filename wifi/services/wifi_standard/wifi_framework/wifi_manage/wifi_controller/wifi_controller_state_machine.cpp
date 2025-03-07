@@ -22,6 +22,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_global_func.h"
 #include "wifi_battery_utils.h"
+#include "wifi_service_scheduler.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
@@ -671,6 +672,25 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::EnableState::HandleSoftapToggleChangeInEnabledState(InternalMessagePtr msg)
 {
+    if (pWifiControllerMachine == nullptr) {
+        WIFI_LOGE("pWifiControllerMachine is null.\n");
+        return;
+    }
+    if (pWifiControllerMachine->multiStaManagers.HasAnyManager()) {
+        ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopWifi2Service(INSTID_WLAN1);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("AutoStopWifi2Service fail.\n");
+            return;
+        }
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+        std::string staIfName = WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN1);
+        if (!staIfName.empty()) {
+            HalDeviceManager::GetInstance().RemoveStaIface(staIfName);
+            WifiServiceScheduler::GetInstance().ClearStaIfaceNameMap(INSTID_WLAN1);
+        }
+#endif
+        pWifiControllerMachine->SendMessage(CMD_MULTI_STA_STOPPED, INSTID_WLAN1);
+    }
     int open = msg->GetParam1();
     int id = msg->GetParam2();
     WIFI_LOGE("handleSoftapToggleChangeInEnabledState");

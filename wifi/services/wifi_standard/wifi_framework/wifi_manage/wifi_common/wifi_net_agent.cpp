@@ -62,12 +62,16 @@ bool WifiNetAgent::RegisterNetSupplier(int instId)
     WIFI_LOGI("Enter RegisterNetSupplier.");
     std::unique_lock<std::mutex> lock(netAgentMutex_);
 
-    std::string ident = "wifi";
     using NetManagerStandard::NetBearType;
     using NetManagerStandard::NetCap;
+    std::string ident = "wlan0";
     std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
+    if (instId == 1) {
+        ident = "wlan1";
+        // wlan1 is not used as a standalone channel.
+        netCaps.erase(NetCap::NET_CAPABILITY_INTERNET);
+    }
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
-    std::string supplierIdStr = (instId == 0) ? "supplierIdForWlan0" : "supplierIdForWlan1";
     if (supplierIdNow != INVALID_SUPPLIER_ID) {
         WIFI_LOGI("RegisterNetSupplier supplierId alread exist.");
         return true;
@@ -75,7 +79,7 @@ bool WifiNetAgent::RegisterNetSupplier(int instId)
     int32_t result = NetConnClient::GetInstance().RegisterNetSupplier(NetBearType::BEARER_WIFI,
                                                                       ident, netCaps, supplierIdNow);
     if (result == NETMANAGER_SUCCESS) {
-        WIFI_LOGI("Register %{public}s successful, supplierId is [%{public}d]", supplierIdStr.c_str(), supplierIdNow);
+        WIFI_LOGI("Register %{public}s successful, supplierId is [%{public}d]", ident.c_str(), supplierIdNow);
         return true;
     }
     WIFI_LOGI("Register NetSupplier failed");
@@ -542,7 +546,7 @@ void WifiNetAgent::NetConnCallback::LogNetCaps(
 void WifiNetAgent::RestoreWifiConnection()
 {
     using NetManagerStandard::NetBearType;
-    int32_t result = NetConnClient::GetInstance().UpdateSupplierScore(NetBearType::BEARER_WIFI,
+    int32_t result = NetConnClient::GetInstance().IncreaseSupplierScore(NetBearType::BEARER_WIFI,
         ACCEPT_UNVALIDATED, supplierId);
     WIFI_LOGI("Restore Wifi Connection, result:%{public}d", result);
 }

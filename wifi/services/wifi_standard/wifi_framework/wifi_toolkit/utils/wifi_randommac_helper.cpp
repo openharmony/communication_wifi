@@ -123,9 +123,8 @@ long int WifiRandomMacHelper::GetRandom()
     long random = 0;
     do {
         int fd = open("/dev/random", O_RDONLY);
-        ssize_t length = 0;
         if (fd >= 0) {
-            length = read(fd, &random, sizeof(random));
+            read(fd, &random, sizeof(random));
             close(fd);
         } else {
             WIFI_LOGW("%{public}s: failed to open, try again", __func__);
@@ -133,7 +132,7 @@ long int WifiRandomMacHelper::GetRandom()
         if (random == 0) {
             fd = open("/dev/random", O_RDONLY);
             if (fd >= 0) {
-                length = read(fd, &random, sizeof(random));
+                read(fd, &random, sizeof(random));
                 close(fd);
             } else {
                 WIFI_LOGE("%{public}s: retry failed", __func__);

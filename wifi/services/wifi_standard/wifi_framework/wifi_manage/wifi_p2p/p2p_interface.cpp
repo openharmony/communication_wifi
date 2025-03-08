@@ -273,5 +273,9 @@ ErrCode P2pInterface::SetEnhanceService(IEnhanceService* enhanceService)
     return p2pService.SetEnhanceService(enhanceService);
 }
 
+void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept)
+{
+    return p2pService.NotifyWscDialogConfirmResult(isAccept);
+}
 }  // namespace Wifi
 }  // namespace OHOS

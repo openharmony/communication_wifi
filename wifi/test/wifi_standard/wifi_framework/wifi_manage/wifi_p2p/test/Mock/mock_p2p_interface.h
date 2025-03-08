@@ -67,6 +67,7 @@ public:
     virtual ErrCode DisableRandomMac(int setmode);
     virtual ErrCode CreateRptGroup(const WifiP2pConfig &config);
     virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result);
+    virtual void NotifyWscDialogConfirmResult(bool isAccept);
 };
 }  // namespace Wifi
 }  // namespace OHOS

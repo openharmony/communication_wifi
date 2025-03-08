@@ -233,5 +233,10 @@ ErrCode P2pInterface::GetRptStationsList(std::vector<StationInfo> &result)
     return WIFI_OPT_SUCCESS;
 }
 
+void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept)
+{
+    return;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -37,6 +37,7 @@
 #include "mac_address.h"
 #include "wifi_settings.h"
 #include "p2p_chr_reporter.h"
+#include "wifi_notification_util.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -768,47 +769,8 @@ void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string 
 void P2pStateMachine::NotifyUserInvitationReceivedMessage()
 {
     WIFI_LOGI("P2pStateMachine::NotifyUserInvitationReceivedMessage  enter");
-    const std::string inputBoxPin("input pin:");
-    auto sendMessage = [this](int msgName, const std::any &messageObj) { this->SendMessage(msgName, messageObj); };
-
-    const WpsInfo &wps = savedP2pConfig.GetWpsInfo();
-    std::function<void(AlertDialog &, std::any)> acceptEvent = [=](AlertDialog &dlg, std::any msg) {
-        std::any msgBuf = msg;
-        std::any anyPin;
-        if (wps.GetWpsMethod() == WpsMethod::WPS_METHOD_KEYPAD) {
-            anyPin = dlg.GetInputBox(inputBoxPin);
-        }
-        sendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), anyPin);
-    };
-
-    std::function<void(AlertDialog &, std::any)> rejectEvent = [=](AlertDialog &dlg, std::any msg) {
-        AlertDialog dlgBuf = dlg;
-        std::any andMsg = msg;
-        /* PEER_CONNECTION_USER_REJECT -> INTERNAL_CONN_USER_ACCEPT @2022-11-24 */
-        SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), andMsg);
-    };
-
-    AlertDialog &dialog = AbstractUI::GetInstance().Build();
-    std::string message = "NotifyInvitationReceived: "
-        "Receiving device:" +
-        deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
-    dialog.SetButton("accepts", acceptEvent, nullptr);
-    dialog.SetButton("rejects", rejectEvent, nullptr);
-
-    switch (wps.GetWpsMethod()) {
-        case WpsMethod::WPS_METHOD_KEYPAD: {
-            dialog.SetInputBox(inputBoxPin);
-            break;
-        }
-        case WpsMethod::WPS_METHOD_DISPLAY: {
-            message += std::string("PIN:") + wps.GetPin();
-            break;
-        }
-        default:
-            break;
-    }
-    dialog.SetMessage(message);
-    AbstractUI::GetInstance().ShowAlerDialog(dialog);
+    std::string deviceName = deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
+    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_PBC_DIALOG, deviceName);
 }
 
 void P2pStateMachine::P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const
@@ -1375,6 +1337,7 @@ void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
     p2pGroupOperatingState.SetEnhanceService(enhanceService);
 }
+
 int P2pStateMachine::GetRandomSocialFreq(const std::vector<int> &freqList) const
 {
     std::vector<int> validFreqs;
@@ -1393,6 +1356,12 @@ int P2pStateMachine::GetRandomSocialFreq(const std::vector<int> &freqList) const
         return 0;
     }
     return validFreqs[randomIndex];
+}
+
+bool P2pStateMachine::P2pReject(const std::string mac) const
+{
+    WifiP2PHalInterface::GetInstance().P2pReject(mac);
+    return true;
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -91,6 +91,7 @@ public:
     virtual WifiErrorNo Hid2dConnect(const Hid2dConnectConfig &config) const = 0;
     virtual const P2pHalCallback &GetP2pCallbackInst(void) const = 0;
     virtual WifiErrorNo GroupClientRemove(const std::string &deviceMac) const = 0;
+    virtual WifiErrorNo P2pReject(const std::string &mac);
 };
 
 class WifiP2PHalInterface : public MockWifiP2PHalInterface {
@@ -160,6 +161,7 @@ public:
     MOCK_METHOD3(DisAssociateSta, WifiErrorNo(const std::string &ifaceName, const std::string &interfaceName,
         const std::string &mac));
     MOCK_CONST_METHOD1(GroupClientRemove, WifiErrorNo(const std::string &deviceMac));
+    MOCK_METHOD1(P2pReject, WifiErrorNo(const std::string &mac));
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -649,5 +649,15 @@ WifiErrorNo WifiP2PHalInterface::DisAssociateSta(const std::string &ifaceName, c
     return WIFI_HAL_OPT_FAILED;
 #endif
 }
+
+WifiErrorNo WifiP2PHalInterface::P2pReject(const std::string &mac)
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->P2pReject(mac);
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
 }  // namespace Wifi
 }  // namespace OHOS

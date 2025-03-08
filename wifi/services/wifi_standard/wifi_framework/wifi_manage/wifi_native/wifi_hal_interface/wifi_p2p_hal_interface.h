@@ -493,6 +493,7 @@ public:
     WifiErrorNo DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName,
         const std::string &mac);
 
+    WifiErrorNo P2pReject(const std::string &mac);
 private:
     P2pHalCallback mP2pCallback;
 };

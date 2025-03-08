@@ -31,11 +31,14 @@ void InvitationReceivedState::GoInState()
 {
     WIFI_LOGI("             GoInState");
     p2pStateMachine.NotifyUserInvitationReceivedMessage();
+    p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT),
+        WSC_DIALOG_SELECT_TIMEOUT);
 }
 
 void InvitationReceivedState::GoOutState()
 {
     WIFI_LOGI("             GoOutState");
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT));
 }
 
 bool InvitationReceivedState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -70,6 +73,7 @@ bool InvitationReceivedState::ExecuteStateMsg(InternalMessagePtr msg)
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupNegotiationState);
             break;
         }
+        case P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT:
         case P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT: {
             WIFI_LOGI("User rejected invitation");
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);

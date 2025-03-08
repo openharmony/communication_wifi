@@ -54,7 +54,7 @@ ErrCode StaMonitor::InitStaMonitor()
         [this](int status) { this->OnWpsTimeOutCallBack(status); },
         [this]() { this->OnWpaAuthTimeOutCallBack(); },
         [this](int status) { this->OnWpaConnectionFullCallBack(status); },
-        [this](int status) { this->OnWpaConnectionRejectCallBack(status); },
+        [this](const AssocRejectInfo &assocRejectInfo) { this->OnWpaConnectionRejectCallBack(assocRejectInfo); },
         [this](const std::string &notifyParam) { this->OnWpaStaNotifyCallBack(notifyParam); },
         [this](int reason, const std::string &bssid) {},
     };
@@ -239,16 +239,22 @@ void StaMonitor::OnWpaConnectionFullCallBack(int status)
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
 }
 
-void StaMonitor::OnWpaConnectionRejectCallBack(int status)
+void StaMonitor::OnWpaConnectionRejectCallBack(const AssocRejectInfo &assocRejectInfo)
 {
-    LOGI("onWpsConnectionRejectCallBack() status:%{public}d", status);
+    LOGI("onWpsConnectionRejectCallBack() bssid: %{public}s, status:%{public}d, timeOut:%{public}d",
+        MacAnonymize(assocRejectInfo.bssid).c_str(), assocRejectInfo.statusCode, assocRejectInfo.timeOut);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;
     }
 
     /* Notification state machine wpa password wrong event. */
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
+    msg->AddStringMessageBody(assocRejectInfo.bssid);
+    msg->SetParam1(assocRejectInfo.statusCode);
+    msg->SetParam2(assocRejectInfo.timeOut);
+    pStaStateMachine->SendMessage(msg);
 }
 
 void StaMonitor::OnWpsPbcOverlapCallBack(int status)

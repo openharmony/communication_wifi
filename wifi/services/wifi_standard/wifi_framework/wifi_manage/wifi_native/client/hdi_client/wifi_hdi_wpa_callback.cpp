@@ -268,7 +268,11 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
     }
     if (cbk.onWpaConnectionReject) {
         LOGI("onWpaConnectionRejectCallBack");
-        cbk.onWpaConnectionReject(statusCode);
+        AssocRejectInfo assocRejectInfo;
+        assocRejectInfo.bssid = std::string(bssid);
+        assocRejectInfo.statusCode = statusCode;
+        assocRejectInfo.timeOut = associateRejectParam->timeOut;
+        cbk.onWpaConnectionReject(assocRejectInfo);
         OHOS::Wifi::WriteAssocFailHiSysEvent("CONNECT_REJECT", statusCode);
     }
     return 0;

@@ -20,6 +20,11 @@
 
 namespace OHOS {
 namespace Wifi {
+struct AssocRejectInfo {
+    std::string bssid{""};
+    int statusCode{0};
+    int timeOut{0};
+};
 struct WifiEventCallback {
     std::function<void(int, int, const std::string &)> onConnectChanged;
     std::function<void(const std::string &, const std::string &)> onBssidChanged;
@@ -29,7 +34,7 @@ struct WifiEventCallback {
     std::function<void(int)> onWpsTimeOut;
     std::function<void(void)> onWpaAuthTimeout;
     std::function<void(int)> onWpaConnectionFull;
-    std::function<void(int)> onWpaConnectionReject;
+    std::function<void(const AssocRejectInfo &)> onWpaConnectionReject;
     std::function<void(const std::string &)> onEventStaNotify;
     std::function<void(int, const std::string &)> onReportDisConnectReason;
 };

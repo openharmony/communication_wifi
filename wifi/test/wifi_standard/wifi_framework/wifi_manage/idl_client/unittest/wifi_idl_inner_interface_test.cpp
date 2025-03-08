@@ -69,7 +69,7 @@ static void OnWpaConnectionFullMock(int status)
     LOGI("OnWpaConnectionFullMock");
 }
 
-static void OnWpaConnectionRejectMock(int status)
+static void OnWpaConnectionRejectMock(const AssocRejectInfo &assocRejectInfo)
 {
     LOGI("OnWpaConnectionRejectMock");
 }
@@ -416,6 +416,8 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnBssidChangedTest, TestSize.Level1)
 HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
 {
     LOGI("OnWpaStateChangedTest enter");
+    AssocRejectInfo assocRejectInfo;
+    assocRejectInfo.statusCode = 1;
     int status = 1;
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
@@ -425,7 +427,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
-    OnWpaConnectionReject(status);
+    OnWpaConnectionReject(assocRejectInfo);
     OnWpsOverlap(status);
     OnWpsTimeOut(status);
     UnRegisterStaCallbackMock(&callback);
@@ -434,7 +436,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
-    OnWpaConnectionReject(status);
+    OnWpaConnectionReject(assocRejectInfo);
     OnWpsOverlap(status);
     OnWpsTimeOut(status);
 }

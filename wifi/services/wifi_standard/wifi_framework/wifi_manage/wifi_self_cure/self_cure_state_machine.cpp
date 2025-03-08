@@ -2273,12 +2273,12 @@ int SelfCureStateMachine::GetWifi7SelfCureType(int connectFailTimes, WifiLinkedI
     std::vector<WifiScanInfo> scanResults;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     int scanRssi = GetScanRssi(info.bssid, scanResults);
-    WIFI_LOGI("GetWifi7SelfCureType scanRssi %{public}d", scanRssi);
-    if ((info.supportedWifiCategory == WifiCategory::WIFI7
-        || info.supportedWifiCategory == WifiCategory::WIFI7_PLUS)
-        && connectFailTimes >= SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT
-        && info.rssi >= MIN_VAL_LEVEL_3) {
-            return WIFI7_SELFCURE_DISCONNECTED;
+    WifiCategory wifiCategory = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetWifiCategoryRecord(info.bssid);
+    WIFI_LOGI("GetWifi7SelfCureType scanRssi %{public}d, wifiCategory: %{public}d, connectFailTimes: %{public}d",
+        scanRssi, static_cast<int>(wifiCategory), connectFailTimes);
+    if ((wifiCategory == WifiCategory::WIFI7 || wifiCategory == WifiCategory::WIFI7_PLUS)
+        && connectFailTimes >= SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT && scanRssi >= MIN_VAL_LEVEL_3) {
+        return WIFI7_SELFCURE_DISCONNECTED;
     }
     return WIFI7_NO_SELFCURE;
 }
@@ -2296,8 +2296,7 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
         WIFI_LOGE("no bssid in connectFailListCache");
         return;
     }
-    int wifi7SelfCureType = WIFI7_NO_SELFCURE;
-    wifi7SelfCureType = GetWifi7SelfCureType(iterConnectFail->second.connectFailTimes, info);
+    int wifi7SelfCureType = GetWifi7SelfCureType(iterConnectFail->second.connectFailTimes, info);
     if (wifi7SelfCureType == WIFI7_SELFCURE_DISCONNECTED) {
         std::map<std::string, WifiCategoryBlackListInfo> blackListCache;
         WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, blackListCache);

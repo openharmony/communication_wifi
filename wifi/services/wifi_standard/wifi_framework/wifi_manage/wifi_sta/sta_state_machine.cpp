@@ -1147,6 +1147,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr ms
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
                 DisabledReason::DISABLED_ASSOCIATION_REJECTION);
             pStaStateMachine->AddRandomMacCure();
+            pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
             pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_REJECT,
                 pStaStateMachine->linkedInfo);
             break;

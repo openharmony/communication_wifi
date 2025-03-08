@@ -16,6 +16,7 @@
 #define OHOS_STA_MONITOR_H
 
 #include "sta_state_machine.h"
+#include "wifi_event_callback.h"
 
 namespace OHOS {
 namespace Wifi {

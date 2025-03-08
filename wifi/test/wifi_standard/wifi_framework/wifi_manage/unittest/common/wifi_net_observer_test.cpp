@@ -85,7 +85,7 @@ HWTEST_F(WifiNetObserverTest, OnNetDetectionResultChangedTest, TestSize.Level1)
     int result = -1;
     // Create a mock callback function
     std::function<void(SystemNetWorkState, std::string)> mockCallback =
-        [this, &result](SystemNetWorkState netState, std::string urlRedirect) {
+        [&result](SystemNetWorkState netState, std::string urlRedirect) {
             switch (netState) {
                 case NETWORK_NOTWORKING:
                     result = 0;

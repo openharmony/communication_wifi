@@ -196,7 +196,7 @@ private:
 struct StationInfo {
     std::string deviceName; /* Device name */
     std::string bssid;      /* Device Mac */
-    int bssidType; /* bssid type */
+    int bssidType{0}; /* bssid type */
     std::string ipAddr;     /* Device IP address */
 };
 

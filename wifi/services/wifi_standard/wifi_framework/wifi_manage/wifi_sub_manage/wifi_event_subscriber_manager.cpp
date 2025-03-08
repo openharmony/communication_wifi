@@ -815,7 +815,7 @@ void NotificationEventSubscriber::OnReceiveNotificationEvent(int notificationId)
         }
     }
 }
- 
+
 void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
 {
     if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
@@ -834,8 +834,18 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
             pEnhanceService->OnDialogClick(true);
         }
     }
+#ifdef FEATURE_P2P_SUPPORT
+    if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
+        WIFI_LOGI("OnReceiveNotification P2P_WSC_PBC_DIALOG Accept");
+
+        IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+        if (p2pService != nullptr) {
+            p2pService->NotifyWscDialogConfirmResult(true);
+        }
+    }
+#endif
 }
- 
+
 void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
 {
     if (dialogType == static_cast<int>(WifiDialogType::AUTO_IDENTIFY_CONN)) {
@@ -844,6 +854,15 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
             pEnhanceService->OnDialogClick(false);
         }
     }
+#ifdef FEATURE_P2P_SUPPORT
+    if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
+        WIFI_LOGI("OnReceiveNotification P2P_WSC_PBC_DIALOG Reject");
+        IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+        if (p2pService != nullptr) {
+            p2pService->NotifyWscDialogConfirmResult(false);
+        }
+    }
+#endif
 }
  
 #ifdef HAS_POWERMGR_PART

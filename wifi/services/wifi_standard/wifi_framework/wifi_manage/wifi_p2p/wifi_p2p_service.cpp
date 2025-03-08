@@ -507,5 +507,15 @@ ErrCode WifiP2pService::SetGcIpAddress(const IpAddrInfo& ipInfo)
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_IP_ADDRESS), ipInfo);
     return WIFI_OPT_SUCCESS;
 }
+
+void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept)
+{
+    WIFI_LOGI("Notify user auth response:%{public}d", isAccept);
+    if (isAccept) {
+        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
+    } else {
+        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS

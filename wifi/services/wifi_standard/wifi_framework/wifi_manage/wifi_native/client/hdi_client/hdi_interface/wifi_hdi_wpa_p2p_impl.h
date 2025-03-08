@@ -22,7 +22,8 @@
 
 enum P2pRemoveGroupEvent {
     P2P_REMOVE_GROUP_CLIENT = 0,
-    EVENT_MAX
+    P2P_REJECT,
+    EVENT_MAX,
 };
 
 #ifdef __cplusplus
@@ -127,6 +128,7 @@ WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *car
 
 void ReleaseP2pCallback(void);
 
+WifiErrorNo HdiP2pReject(const char *bssid);
 #ifdef __cplusplus
 }
 #endif

@@ -53,6 +53,7 @@ public:
     ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks);
     ErrCode CreateRptGroup(const WifiP2pConfig &config);
     ErrCode GetRptStationsList(std::vector<StationInfo> &result);
+    void NotifyWscDialogConfirmResult(bool isAccept);
 
 public:
     IP2pServiceCallbacks mCallback;

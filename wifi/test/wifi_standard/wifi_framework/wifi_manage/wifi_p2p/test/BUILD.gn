@@ -148,6 +148,7 @@ ohos_unittest("wifi_p2p_test") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "googletest:gmock_main",

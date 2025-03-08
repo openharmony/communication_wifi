@@ -784,6 +784,7 @@ struct WifiDeviceConfig {
         level = 0;
         isPasspoint = false;
         isEphemeral = false;
+        keyMgmtBitset = 0u;
         wepTxKeyIndex = 0;
         priority = 0;
         hiddenSSID = false;

@@ -226,8 +226,7 @@ int WifiCmdClient::SetBeBlaList(const std::string &ifName, const std::string &pa
 int WifiCmdClient::SetEmlsrMode(const std::string &ifName, const std::string &param) const
 {
     WIFI_LOGD("%{public}s enter", __FUNCTION__);
-    if (param.size() > TINY_BUFF_SIZE ||
-        param.size() + strlen(CMD_SET_EMLSR_MODE) > TINY_BUFF_SIZE) {
+    if (param.size() + strlen(CMD_SET_EMLSR_MODE) > TINY_BUFF_SIZE) {
         WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
         return -1;
     }
@@ -240,8 +239,7 @@ int WifiCmdClient::SetEmlsrMode(const std::string &ifName, const std::string &pa
 int WifiCmdClient::StartMldLinkSwitch(const std::string &ifName, const std::string &param) const
 {
     WIFI_LOGD("%{public}s enter", __FUNCTION__);
-    if (param.size() > TINY_BUFF_SIZE ||
-        param.size() + strlen(CMD_SET_MLSR_LINK_SWITCH) > TINY_BUFF_SIZE) {
+    if (param.size() + strlen(CMD_SET_MLSR_LINK_SWITCH) > TINY_BUFF_SIZE) {
         WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
         return -1;
     }

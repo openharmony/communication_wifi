@@ -1443,6 +1443,15 @@ public:
         pSelfCureStateMachine_->ShouldTransToWifi7SelfCure(info);
     }
 
+    void HandleWifiBlackListUpdateMsgTest()
+    {
+        WifiCategoryBlackListInfo wifiBlackListInfo(1, TIME_MILLS);
+        wifiBlackListCache.emplace(std::make_pair(currentBssid_, wifiBlackListInfo));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiCategoryBlackListCache(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<1>(wifiBlackListCache), Return(0)));
+        pSelfCureStateMachine_->HandleWifiBlackListUpdateMsg();
+    }
+
     void GetCurrentBssidTest()
     {
         LOGI("Enter GetCurrentBssidTest");

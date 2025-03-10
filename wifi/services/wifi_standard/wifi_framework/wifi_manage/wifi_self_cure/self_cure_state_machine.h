@@ -149,6 +149,7 @@ public:
         void HandleWifi7WithoutMldBackoff(InternalMessagePtr msg);
         void HandleWifi7MldBackoff(InternalMessagePtr msg);
         void HandleNetworkConnectFailCount(InternalMessagePtr msg);
+        void HandleWifiBlackListUpdateMsg();
         SelfCureStateMachine *pSelfCureStateMachine_;
         bool isSetStaticIpConfig_ = false;
     };
@@ -338,7 +339,7 @@ private:
     void SendBlaListToDriver(int blaListType);
     std::string BlackListToString(std::map<std::string, WifiCategoryBlackListInfo> &map);
     std::string ParseWifiCategoryBlackListInfo(std::pair<std::string, WifiCategoryBlackListInfo> iter);
-    void AgeOutWifiCategoryBlack(int blaListType, std::map<std::string, WifiCategoryBlackListInfo> &blackListCache);
+    bool AgeOutWifiCategoryBlack(int blaListType);
     void AgeOutWifiConnectFailList();
     int GetCurSignalLevel();
     bool IsHttpReachable();

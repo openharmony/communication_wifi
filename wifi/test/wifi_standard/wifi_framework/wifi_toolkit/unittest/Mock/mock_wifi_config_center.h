@@ -84,6 +84,7 @@ public:
     virtual int ClearScanInfoList() = 0;
     virtual int GetScanInfoList(std::vector<WifiScanInfo> &results) = 0;
     virtual int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo) = 0;
+    virtual void SetMloWifiLinkedMaxSpeed(int instId = 0) = 0;
     virtual std::string GetConnectedBssid(int instId = 0) = 0;
     virtual std::string GetApIfaceName() = 0;
     virtual int SetHotspotState(int state, int id = 0) = 0;
@@ -158,8 +159,6 @@ public:
     virtual int GetScanGenieState() const = 0;
     virtual int Init() = 0;
     virtual void SetFreezeModeState(int state) = 0;
-    virtual int GetHotspotMacConfig(HotspotMacConfig &config, int id = 0) = 0;
-    virtual int SetHotspotMacConfig(const HotspotMacConfig &config, int id = 0) = 0;
     virtual void SetSystemMode(int systemMode) = 0;
     virtual int GetSystemMode() = 0;
     virtual bool GetWifiSelfcureResetEntered() const = 0;
@@ -168,6 +167,7 @@ public:
     virtual void SetDeviceType(int deviceType) = 0;
     virtual int64_t GetHid2dSceneLastSetTime() = 0;
     virtual int SetHid2dSceneLastSetTime(int64_t setTime) = 0;
+    virtual int GetP2pEnhanceFreq() = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -232,6 +232,7 @@ public:
     MOCK_METHOD0(ClearScanInfoList, int());
     MOCK_METHOD1(GetScanInfoList, int(std::vector<WifiScanInfo> &results));
     MOCK_METHOD1(SetWifiLinkedStandardAndMaxSpeed, int(WifiLinkedInfo &linkInfo));
+    MOCK_METHOD1(SetMloWifiLinkedMaxSpeed, void(int instId));
     MOCK_METHOD1(GetConnectedBssid, std::string (int instId));
     MOCK_METHOD0(GetApIfaceName, std::string());
     MOCK_METHOD2(SetHotspotState, int(int state, int id));
@@ -306,8 +307,6 @@ public:
     MOCK_CONST_METHOD0(GetScanGenieState, int());
     MOCK_METHOD0(Init, int());
     MOCK_METHOD1(SetFreezeModeState, void(int state));
-    MOCK_METHOD2(GetHotspotMacConfig, int(HotspotMacConfig &config, int id));
-    MOCK_METHOD2(SetHotspotMacConfig, int(const HotspotMacConfig &config, int id));
     MOCK_METHOD1(SetSystemMode, void(int));
     MOCK_METHOD0(GetSystemMode, int());
     MOCK_METHOD0(GetHid2dSceneLastSetTime, int64_t());
@@ -315,6 +314,7 @@ public:
     MOCK_METHOD0(IsAllowPopUp, bool());
     MOCK_METHOD1(SetDeviceType, void(int deviceType));
     MOCK_METHOD1(SetHotspotIdleTimeout, int(int time));
+    MOCK_METHOD0(GetP2pEnhanceFreq, int());
     MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());
 private:
     WifiConfigCenter();

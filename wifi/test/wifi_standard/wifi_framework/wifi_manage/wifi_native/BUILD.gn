@@ -47,10 +47,6 @@ ohos_unittest("wifi_native_test") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface",
-    "//third_party/googletest/googlemock/include",
-    "//third_party/googletest/googletest/include",
-    "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard/src/",
-    "//drivers/peripheral/wlan/interfaces/include/",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock",
   ]
 

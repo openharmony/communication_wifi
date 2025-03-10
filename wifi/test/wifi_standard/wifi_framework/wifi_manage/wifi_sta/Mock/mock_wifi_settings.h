@@ -37,6 +37,10 @@ public:
     virtual int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config) = 0;
     virtual int SyncDeviceConfig() = 0;
+    virtual bool InKeyMgmtBitset(const WifiDeviceConfig &config, const std::string &keyMgmt) = 0;
+    virtual void SetKeyMgmtBitset(WifiDeviceConfig &config) = 0;
+    virtual void GetAllSuitableEncryption(const WifiDeviceConfig &config,
+        const std::string &keyMgmt, std::vector<std::string> &candidateKeyMgmtList) = 0;
     virtual int ReloadDeviceConfig() = 0;
     virtual int SetCountryCode(const std::string &countryCode) = 0;
     virtual int GetCountryCode(std::string &countryCode) = 0;
@@ -106,6 +110,7 @@ public:
     virtual bool GetWifiFlagOnAirplaneMode(int instId) = 0;
     virtual int GetScanOnlySwitchState(int instId) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
+    virtual int SetMloWifiLinkedMaxSpeed(int instId = 0) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -125,6 +130,10 @@ public:
     MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config));
     MOCK_METHOD0(SyncDeviceConfig, int());
+    MOCK_METHOD2(InKeyMgmtBitset, bool(const WifiDeviceConfig &config, const std::string &keyMgmt));
+    MOCK_METHOD1(SetKeyMgmtBitset, void(WifiDeviceConfig &config));
+    MOCK_METHOD3(GetAllSuitableEncryption, void(const WifiDeviceConfig &config,
+        const std::string &keyMgmt, std::vector<std::string> &candidateKeyMgmtList));
     MOCK_METHOD0(ReloadDeviceConfig, int());
     MOCK_METHOD1(SetCountryCode, int(const std::string &countryCode));
     MOCK_METHOD1(GetCountryCode, int(std::string &countryCode));
@@ -193,6 +202,7 @@ public:
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
     MOCK_METHOD1(GetScanOnlySwitchState, int(int instId));
+    MOCK_METHOD1(SetMloWifiLinkedMaxSpeed, int(int));
 };
 }  // namespace OHOS
 }  // namespace Wifi

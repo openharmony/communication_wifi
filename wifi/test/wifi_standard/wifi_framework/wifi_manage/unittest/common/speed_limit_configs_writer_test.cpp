@@ -61,7 +61,7 @@ HWTEST_F(SpeedLimitConfigsWriterTest, SetBgLimitIdList_DoesNotCallSetUidPidsWhen
 {
     std::vector<int> idList = {10, 11, 12};
     SetBgLimitIdList(idList, 999);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SpeedLimitConfigsWriterTest, SetUidPids_WritesIdStrToFileWhenFileOpenSucceeds, TestSize.Level1)

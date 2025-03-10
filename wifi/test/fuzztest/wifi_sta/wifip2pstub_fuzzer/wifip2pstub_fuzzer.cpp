@@ -687,7 +687,7 @@ void WifiP2pServiceImplFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
     pWifiP2pServiceImpl->WriteWifiP2pServiceInfo(datas, srvInfo);
     pWifiP2pServiceImpl->WriteWifiP2pDeviceData(datas, device);
-    pWifiP2pServiceImpl->WriteWifiP2pGroupData(datas, group);
+    pWifiP2pServiceImpl->WriteWifiP2pGroupData(datas, group, false);
     pWifiP2pServiceImpl->WriteWifiP2pServiceInfo(datas, srvInfo);
 }
 

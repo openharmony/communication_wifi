@@ -49,6 +49,13 @@ static const HdiP2pWpaNetworkField g_hdiP2pWpaNetworkFields[] = {
 
 static struct IWpaCallback *g_hdiWpaP2pCallbackObj = NULL;
 
+void ReleaseP2pCallback(void)
+{
+    StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaP2pCallbackObj);
+    free(g_hdiWpaP2pCallbackObj);
+    g_hdiWpaP2pCallbackObj = NULL;
+}
+
 static WifiErrorNo RegisterP2pEventCallback()
 {
     LOGI("RegisterP2pEventCallback enter");
@@ -75,34 +82,6 @@ static WifiErrorNo RegisterP2pEventCallback()
 
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterP2pEventCallback success.");
-    return WIFI_HAL_OPT_OK;
-}
-
-static WifiErrorNo UnRegisterP2pEventCallback()
-{
-    LOGI("UnRegisterP2pEventCallback enter");
-    pthread_mutex_lock(GetWpaObjMutex());
-    if (g_hdiWpaP2pCallbackObj != NULL) {
-        struct IWpaInterface *wpaObj = GetWpaInterface();
-        if (wpaObj == NULL) {
-            pthread_mutex_unlock(GetWpaObjMutex());
-            LOGE("UnRegisterP2pEventCallback: wpaObj is NULL");
-            return WIFI_HAL_OPT_FAILED;
-        }
-
-        int32_t result = wpaObj->UnregisterWpaEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
-        if (result != HDF_SUCCESS) {
-            pthread_mutex_unlock(GetWpaObjMutex());
-            LOGE("UnRegisterP2pEventCallback: UnregisterEventCallback failed result:%{public}d", result);
-            return WIFI_HAL_OPT_FAILED;
-        }
-        StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaP2pCallbackObj);
-        free(g_hdiWpaP2pCallbackObj);
-        g_hdiWpaP2pCallbackObj = NULL;
-    }
-
-    pthread_mutex_unlock(GetWpaObjMutex());
-    LOGI("UnRegisterP2pEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
 
@@ -227,11 +206,6 @@ WifiErrorNo HdiWpaP2pStop()
     if (IsHdiWpaStopped() == WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStop: HdiWpa already stopped, HdiWpaP2pStop success");
         return WIFI_HAL_OPT_OK;
-    }
-
-    if (UnRegisterP2pEventCallback() != WIFI_HAL_OPT_OK) {
-        LOGE("HdiWpaP2pStop: UnRegisterP2pEventCallback failed!");
-        return WIFI_HAL_OPT_FAILED;
     }
 
     if (HdiRemoveWpaIface(GetHdiP2pIfaceName()) != WIFI_HAL_OPT_OK) {
@@ -1345,6 +1319,28 @@ WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *car
     }
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiDeliverP2pData success.");
+    return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo HdiP2pRemoveGroupClient(const char *deviceMac, const char *ifName)
+{
+    LOGI("HdiP2pRemoveGroupClient enter");
+    pthread_mutex_lock(GetWpaObjMutex());
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiP2pRemoveGroupClient: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, ifName, P2P_REMOVE_GROUP_CLIENT, 0, deviceMac);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiP2pRemoveGroupClient: send failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("HdiP2pRemoveGroupClient success.");
     return WIFI_HAL_OPT_OK;
 }
 #endif

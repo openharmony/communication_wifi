@@ -289,6 +289,7 @@ private:
     bool IsRptRunning();
     static void ConfigInfoDump(std::string& result);
     static void StationsInfoDump(std::string& result);
+    ErrCode VerifyConfigValidity(const HotspotConfig &config);
 
 private:
     bool mGetChannels = false;

@@ -22,18 +22,6 @@ namespace OHOS {
 namespace Wifi {
 /* self cure history info */
 struct WifiSelfCureHistoryInfo {
-    /* record dns failed count */
-    int dnsSelfCureFailedCnt;
-
-    /* record last dns failed milliseconds */
-    int64_t lastDnsSelfCureFailedTs;
-
-    /* record renew dhcp failed count */
-    int renewDhcpSelfCureFailedCnt;
-
-    /* record last renew dhcp failed milliseconds */
-    int64_t lastRenewDhcpSelfCureFailedTs;
-
     /* record static ip failed count */
     int staticIpSelfCureFailedCnt;
 
@@ -77,10 +65,6 @@ struct WifiSelfCureHistoryInfo {
     int64_t lastResetSelfCureConnectFailedTs;
     WifiSelfCureHistoryInfo()
     {
-        dnsSelfCureFailedCnt = 0;
-        lastDnsSelfCureFailedTs = 0;
-        renewDhcpSelfCureFailedCnt = 0;
-        lastRenewDhcpSelfCureFailedTs = 0;
         staticIpSelfCureFailedCnt = 0;
         lastStaticIpSelfCureFailedTs = 0;
         reassocSelfCureFailedCnt = 0;
@@ -99,10 +83,6 @@ struct WifiSelfCureHistoryInfo {
     std::string GetSelfCureHistory()
     {
         std::string internetSelfCureHistory;
-        internetSelfCureHistory.append(std::to_string(dnsSelfCureFailedCnt) + "|");
-        internetSelfCureHistory.append(std::to_string(lastDnsSelfCureFailedTs) + "|");
-        internetSelfCureHistory.append(std::to_string(renewDhcpSelfCureFailedCnt) + "|");
-        internetSelfCureHistory.append(std::to_string(lastRenewDhcpSelfCureFailedTs) + "|");
         internetSelfCureHistory.append(std::to_string(staticIpSelfCureFailedCnt) + "|");
         internetSelfCureHistory.append(std::to_string(lastStaticIpSelfCureFailedTs) + "|");
         internetSelfCureHistory.append(std::to_string(reassocSelfCureFailedCnt) + "|");
@@ -130,6 +110,7 @@ enum class SelfCureType {
     SCE_TYPE_MULTI_GW = 5,
     SCE_TYPE_RANDMAC = 6,
     SCE_TYPE_RESET = 7,
+    SCE_TYPE_RESET_WIFI_ON = 8,
 };
 
 enum SelfCureState {

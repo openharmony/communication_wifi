@@ -71,6 +71,7 @@
         "OHOS::Wifi::WifiConfigCenter::SetWifiScanOnlyMidState(OHOS::Wifi::WifiOprMidState, OHOS::Wifi::WifiOprMidState, int)";
         "OHOS::Wifi::WifiConfigCenter::SetWifiScanOnlyMidState(OHOS::Wifi::WifiOprMidState, int)";
         "OHOS::Wifi::WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(OHOS::Wifi::WifiLinkedInfo&)";
+        "OHOS::Wifi::WifiConfigCenter::SetMloWifiLinkedMaxSpeed(int)";
         "OHOS::Wifi::WifiConfigCenter::CheckScanOnlyAvailable(int)";
         "OHOS::Wifi::WifiConfigCenter::GetConnectedBssid(int)";
         "OHOS::Wifi::WifiConfigCenter::SetSoftapToggledState(bool)";
@@ -84,8 +85,6 @@
         "OHOS::Wifi::WifiConfigCenter::SetApMidState(OHOS::Wifi::WifiOprMidState, int)";
         "OHOS::Wifi::WifiConfigCenter::GetHotspotState(int)";
         "OHOS::Wifi::WifiConfigCenter::SetHotspotState(int, int)";
-        "OHOS::Wifi::WifiConfigCenter::SetHotspotMacConfig(OHOS::Wifi::HotspotMacConfig const&, int)";
-        "OHOS::Wifi::WifiConfigCenter::GetHotspotMacConfig(OHOS::Wifi::HotspotMacConfig&, int)";
         "OHOS::Wifi::WifiConfigCenter::SetPowerModel(OHOS::Wifi::PowerModel const&, int)";
         "OHOS::Wifi::WifiConfigCenter::GetPowerModel(OHOS::Wifi::PowerModel&, int)";
         "OHOS::Wifi::WifiConfigCenter::GetStationList(std::__h::vector<OHOS::Wifi::StationInfo, std::__h::allocator<OHOS::Wifi::StationInfo>>&, int)";
@@ -319,6 +318,7 @@
         "OHOS::Wifi::StrToUpper(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::SetParamValue(char const*, char const*)";
         "OHOS::Wifi::WifiConfigCenter::GetLinkedInfo(OHOS::Wifi::WifiLinkedInfo&, int)";
+        "OHOS::Wifi::WifiConfigCenter::GetMloLinkedInfo(std::__h::vector<OHOS::Wifi::WifiLinkedInfo, std::__h::allocator<OHOS::Wifi::WifiLinkedInfo>>&, int)";
         "OHOS::Wifi::ConvertMncToIso(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::WifiCommonEventHelper::PublishScanStateChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiCommonEventHelper::PublishWifiSemiStateChangedEvent(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
@@ -713,6 +713,24 @@
         "OHOS::Wifi::WifiScanController::WifiScanController(std::__h::vector<OHOS::Wifi::IDualBandScanStrategy*, std::__h::allocator<OHOS::Wifi::IDualBandScanStrategy*>>)";
         "OHOS::Wifi::IsValid5GHz(int)";
         "OHOS::Wifi::IsValid24GHz(int)";
+        "OHOS::Wifi::WifiApHalInterface::GetInstance()";
+        "OHOS::Wifi::WifiApHalInterface::GetFrequenciesByBand(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, std::__h::vector<int, std::__h::allocator<int>>&)";
+        "OHOS::Wifi::WifiApHalInterface::RegisterApEvent(OHOS::Wifi::IWifiApMonitorEventCallback, int)";
+        "OHOS::Wifi::WifiApHalInterface::SetPowerModel(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
+        "OHOS::Wifi::WifiApHalInterface::GetPowerModel(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int&)";
+        "OHOS::Wifi::WifiApHalInterface::SetWifiCountryCode(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+        "OHOS::Wifi::WifiApHalInterface::SetConnectMacAddr(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+        "OHOS::Wifi::WifiApHalInterface::SetSoftApConfig(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Wifi::HotspotConfig const&, int)";
+        "OHOS::Wifi::WifiApHalInterface::SetMaxConnectNum(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, int)";
+        "OHOS::Wifi::WifiApHalInterface::EnableAp(int)";
+        "OHOS::Wifi::WifiApHalInterface::AddBlockByMac(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
+        "OHOS::Wifi::WifiApHalInterface::DelBlockByMac(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
+        "OHOS::Wifi::WifiApHalInterface::DisAssociateSta(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+        "OHOS::Wifi::WifiApHalInterface::SetSoftApBlockList(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> const&)";
+        "OHOS::Wifi::WifiApHalInterface::DisconnectStaByMac(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
+        "OHOS::Wifi::WifiApHalInterface::GetStationList(std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&, int)";
+        "OHOS::Wifi::NetworkInterface::IsValidInterfaceName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+        "OHOS::Wifi::IfConfig::ExecCommand(std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> const&)";
     };
     local:
         *;

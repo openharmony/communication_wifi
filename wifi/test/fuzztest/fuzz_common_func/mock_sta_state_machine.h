@@ -29,7 +29,7 @@ public:
     void SendMessage(InternalMessagePtr msg);
     void SendMessage(int msgName, const std::any &messageObj);
     void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
-    void StartRoamToNetwork(std::string bssid);
+    void StartConnectToBssid(std::string bssid);
     void StopTimer(int timerName);
     void MessageExecutedLater(int msgName, int64_t delayTimeMs);
 };

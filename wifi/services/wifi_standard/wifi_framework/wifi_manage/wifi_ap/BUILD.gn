@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
-ohos_static_library("wifi_ap_service") {
+ohos_shared_library("wifi_ap_service") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
@@ -26,6 +26,7 @@ ohos_static_library("wifi_ap_service") {
     cfi_vcall_icall_only = true
     debug = false
   }
+  install_enable = true
   sources = [
     "ap_config_use.cpp",
     "ap_idle_state.cpp",
@@ -90,6 +91,8 @@ ohos_static_library("wifi_ap_service") {
 
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
 
@@ -114,7 +117,7 @@ ohos_static_library("wifi_ap_service") {
     defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
     external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
   }
-
+  version_script = "libwifi_ap_service.map"
   part_name = "wifi"
   subsystem_name = "communication"
 }

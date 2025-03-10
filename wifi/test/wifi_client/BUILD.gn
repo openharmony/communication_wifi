@@ -45,7 +45,6 @@ if (defined(ohos_lite)) {
     include_dirs = local_base_include_dirs
     include_dirs += [
       "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-      "//commonlibrary/c_utils/base/include",
     ]
     deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 

@@ -27,6 +27,7 @@ void ConvertBackupCfgToDeviceCfg(const WifiBackupConfig &backupCfg, WifiDeviceCo
     config.priority = backupCfg.priority;
     config.hiddenSSID = backupCfg.hiddenSSID;
     config.keyMgmt = backupCfg.keyMgmt;
+    config.keyMgmtBitset = backupCfg.keyMgmtBitset;
     config.networkStatusHistory = backupCfg.networkStatusHistory;
     config.isPortal = backupCfg.isPortal;
     config.lastHasInternetTime = backupCfg.lastHasInternetTime;
@@ -51,6 +52,7 @@ void ConvertDeviceCfgToBackupCfg(const WifiDeviceConfig &config, WifiBackupConfi
     backupCfg.priority = config.priority;
     backupCfg.hiddenSSID = config.hiddenSSID;
     backupCfg.keyMgmt = config.keyMgmt;
+    backupCfg.keyMgmtBitset = config.keyMgmtBitset;
     backupCfg.networkStatusHistory = config.networkStatusHistory;
     backupCfg.isPortal = config.isPortal;
     backupCfg.lastHasInternetTime = config.lastHasInternetTime;

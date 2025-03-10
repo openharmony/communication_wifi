@@ -17,6 +17,7 @@
 #include "wifi_log.h"
 #include "hal_device_manage.h"
 #include <mutex>
+#include "wifi_config_center.h"
 
 #undef LOG_TAG
 #define LOG_TAG "WifiP2PHalInterface"
@@ -341,7 +342,8 @@ WifiErrorNo WifiP2PHalInterface::GroupClientRemove(const std::string &deviceMac)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
-    return mHdiWpaClient->ReqP2pRemoveGroupClient(deviceMac);
+    std::string ifName = WifiConfigCenter::GetInstance().GetP2pIfaceName();
+    return mHdiWpaClient->ReqP2pRemoveGroupClient(deviceMac, ifName);
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
     return mIdlClient->ReqP2pRemoveGroupClient(deviceMac);

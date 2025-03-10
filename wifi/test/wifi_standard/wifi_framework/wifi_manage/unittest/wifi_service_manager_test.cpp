@@ -113,5 +113,23 @@ HWTEST_F(WifiServiceManagerTest, GetEnhanceServiceInstTest, TestSize.Level1)
     WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
+
+HWTEST_F(WifiServiceManagerTest, CreateApInterfaceTest, TestSize.Level1)
+{
+    WIFI_LOGE("CreateApInterfaceTest enter!");
+    WifiApServiceUtil wifiApServiceUtil;
+    IApService *service = wifiApServiceUtil.CreateApInterface(0);
+    EXPECT_TRUE(service != nullptr);
+}
+
+HWTEST_F(WifiServiceManagerTest, DestroyApInterfaceTest, TestSize.Level1)
+{
+    WIFI_LOGE("DestroyApInterfaceTest enter!");
+    WifiApServiceUtil wifiApServiceUtil;
+    IApService *service = wifiApServiceUtil.CreateApInterface(0);
+    wifiApServiceUtil.DestroyApInterface(service);
+    EXPECT_TRUE(service != nullptr);
+    service = nullptr;
+}
 }  // namespace Wifi
 }  // namespace OHOS

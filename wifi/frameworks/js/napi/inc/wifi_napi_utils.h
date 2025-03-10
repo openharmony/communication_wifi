@@ -252,6 +252,14 @@ enum class WifiCategoryJs {
     WIFI7_PLUS = 5
 };
 
+enum class WifiLinkTypeJs {
+    DEFAULT_LINK = 0,
+    WIFI7_SINGLE_LINK = 1,
+    WIFI7_MLSR = 2,
+    WIFI7_EMLSR = 3,
+    WIFI7_STR = 4
+};
+
 enum class WifiDetailStateJs {
     UNKNOWN = -1,
     INACTIVE = 0,

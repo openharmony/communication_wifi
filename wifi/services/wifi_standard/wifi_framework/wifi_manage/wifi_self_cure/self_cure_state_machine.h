@@ -189,7 +189,6 @@ public:
         std::string currentBssid_ = "";
         int selfCureFailedCounter_ = 0;
         int currentAbnormalType_ = -1;
-        int lastSelfCureLevel_ = -1;
         int currentSelfCureLevel_ = -1;
         int renewDhcpCount_ = -1;
         bool isHasInternetRecently_ = false;
@@ -210,7 +209,6 @@ public:
         WifiSelfCureHistoryInfo selfCureHistoryInfo_;
         int selfCureForInvalidIpCnt_ = 0;
         SelfCureIssHandleFuncMap selfCureIssHandleFuncMap_;
-        std::vector<std::string> assignedDnses_;
         int InitSelfCureIssHandleMap();
         void HandleInternetFailedSelfCure(InternalMessagePtr msg);
         void HandleSelfCureWifiLink(InternalMessagePtr msg);
@@ -238,9 +236,6 @@ public:
         void HandleSelfCureFailedForRandMacReassoc();
         void HandleRssiChanged();
         void HandleDelayedResetSelfCure();
-        void UpdateDnsServers(std::vector<std::string>& dnsServers);
-        void SelfCureForDns();
-        void resetDnses(std::vector<std::string>& dnses);
         void SelfCureForInvalidIp();
         void SelfCureForReassoc(int requestCureLevel);
         void SelfcureForMultiGateway(InternalMessagePtr msg);

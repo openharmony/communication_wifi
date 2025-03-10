@@ -224,6 +224,12 @@ bool P2pIdleState::ProcessCmdHid2dConnect(InternalMessagePtr msg) const
         WIFI_LOGE("Hid2d connect:Failed to obtain config info.");
         return EXECUTED;
     }
+    DHCPTYPE dhcpType = DHCPTYPE::DHCP_LEGACEGO;
+    if (config.GetDhcpMode() == DhcpMode::CONNECT_GO_NODHCP ||
+        config.GetDhcpMode() == DhcpMode::CONNECT_AP_NODHCP) {
+        dhcpType = DHCPTYPE::NO_DHCP;
+    }
+    p2pStateMachine.SetIsNeedDhcp(dhcpType);
 
     if (!p2pStateMachine.p2pDevIface.empty()) {
         WIFI_LOGE("Hid2d connect:exists dev iface %{public}s", p2pStateMachine.p2pDevIface.c_str());

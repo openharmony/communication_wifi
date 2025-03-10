@@ -71,6 +71,11 @@ void AppNetworkSpeedLimitService::Init()
     std::string delayTime = AppParser::GetInstance().GetAsyncLimitSpeedDelayTime();
     m_delayTime = CheckDataTolonglong(delayTime);
     m_asyncSendLimit = std::make_unique<WifiEventHandler>("StartSendLimitInfoThread");
+    if (IsTopNLimitSpeedSceneInNow()) {
+        WIFI_LOGI("%{public}s the current foreground application is TopN.", __FUNCTION__);
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+    }
+    WIFI_LOGD("AppNetworkSpeedLimitService initialization complete.");
 }
 
 void AppNetworkSpeedLimitService::InitWifiLimitRecord()
@@ -284,6 +289,7 @@ void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const in
     if (m_limitSpeedMode >= m_lastLimitSpeedMode) {
         delayTime = m_delayTime;
     }
+    WIFI_LOGD("Current maximum speed limit m_limitSpeedMode: %{public}d.", m_limitSpeedMode);
     m_asyncSendLimit->RemoveAsyncTask(ASYNC_WORK_NAME);
     m_asyncSendLimit->PostAsyncTask([uid, enable, this]() {
             this->UpdateSpeedLimitConfigs(enable);
@@ -349,9 +355,7 @@ void AppNetworkSpeedLimitService::LogSpeedLimitConfigs()
 
 void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo)
 {
-    if (!(AppParser::GetInstance().IsKeyBackgroundLimitApp(networkControlInfo.bundleName) ||
-        AppParser::GetInstance().IsGameBackgroundLimitApp(networkControlInfo.bundleName) ||
-        networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME || m_isGamePvp)) {
+    if (VerifyInputParameters(networkControlInfo)) {
         return;
     }
     UpdateGamePvpState(networkControlInfo);
@@ -359,6 +363,37 @@ void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkCon
     asyncParamInfo.funcName = __FUNCTION__;
     asyncParamInfo.networkControlInfo = networkControlInfo;
     AsyncLimitSpeed(asyncParamInfo);
+}
+
+bool AppNetworkSpeedLimitService::VerifyInputParameters(const WifiNetworkControlInfo &networkControlInfo)
+{
+    if (AppParser::GetInstance().IsKeyBackgroundLimitApp(networkControlInfo.bundleName)) {
+        WIFI_LOGD("Belongs to a blasklist corresponding to a TopN scenario, uid: %{public}d.", networkControlInfo.uid);
+        return false;
+    }
+
+    if (AppParser::GetInstance().IsGameBackgroundLimitApp(networkControlInfo.bundleName)) {
+        WIFI_LOGD("Belongs to a blasklist corresponding to a Game scenario, uid: %{public}d.", networkControlInfo.uid);
+        return false;
+    }
+
+    if (m_isGamePvp) {
+        WIFI_LOGD("Belongs to a blasklist corresponding to a PVP scenario, uid: %{public}d.", networkControlInfo.uid);
+        return false;
+    }
+
+    if (AppParser::GetInstance().IsHighTempLimitSpeedApp(networkControlInfo.bundleName)) {
+        WIFI_LOGD("Belongs to a blasklist corresponding to a High-Temp scenario, uid: %{public}d",
+            networkControlInfo.uid);
+        return false;
+    }
+
+    if (networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
+        WIFI_LOGD("Belong to the game scene");
+        return false;
+    }
+    WIFI_LOGD("Not a network speed limit app or game scene.");
+    return true;
 }
 
 void AppNetworkSpeedLimitService::UpdateGamePvpState(const WifiNetworkControlInfo &networkControlInfo)
@@ -431,6 +466,23 @@ void AppNetworkSpeedLimitService::WifiConnectStateChanged()
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP],
             m_isHighPriorityTransmit);
     }
+}
+
+bool AppNetworkSpeedLimitService::IsTopNLimitSpeedSceneInNow()
+{
+    std::vector<AppExecFwk::RunningProcessInfo> fgAppList;
+    if (GetAppList(fgAppList, true) < 0) {
+        WIFI_LOGE("Get foreground app list fail.");
+        return false;
+    }
+
+    for (auto& foregroundApp : fgAppList) {
+        if (AppParser::GetInstance().IsKeyForegroundApp(foregroundApp.processName_)) {
+            WIFI_LOGD("Current TopN scenario.");
+            return true;
+        }
+    }
+    return false;
 }
 
 void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &bundleName)

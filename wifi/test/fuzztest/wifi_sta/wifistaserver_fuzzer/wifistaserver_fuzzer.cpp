@@ -42,7 +42,6 @@ constexpr int STATE = 20;
 static std::unique_ptr<StaInterface> pStaInterface = nullptr;
 static std::unique_ptr<StaAutoConnectService> pStaAutoConnectService = nullptr;
 static std::unique_ptr<StaService> pStaService = nullptr;
-static std::unique_ptr<StaAppAcceleration> pStaAppAcceleration = nullptr;
 static std::unique_ptr<IWifiCountryCodeChangeListener> pStaObserver = nullptr;
 StaServiceCallback mStaCallback;
 
@@ -50,7 +49,6 @@ void MyExit()
 {
     pStaInterface.reset();
     pStaAutoConnectService.reset();
-    pStaAppAcceleration.reset();
     pStaObserver.reset();
     pStaService.reset();
     sleep(U32_AT_SIZE_ZERO);
@@ -160,7 +158,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->DeregisterAutoJoinCondition(conditionName);
     pStaInterface->DeliverStaIfaceData(conditionName);
     pStaInterface->DisableStaService();
-    pStaInterface->StartRoamToNetwork(uid, config.keyMgmt);
+    pStaInterface->StartConnectToBssid(networkId, config.bssid);
     pStaInterface->DisableAutoJoin(config.keyMgmt);
     pStaInterface->EnableAutoJoin(conditionName);
     pStaInterface->StartPortalCertification();
@@ -179,7 +177,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->RemoveAllDevice();
     pStaService->ConnectToDevice(config);
     pStaService->ConnectToNetwork(networkId);
-    pStaService->StartRoamToNetwork(networkId, conditionName);
+    pStaService->StartConnectToBssid(networkId, config.bssid);
     pStaService->ReAssociate();
     pStaService->EnableDeviceConfig(networkId, attemptEnable);
     pStaService->DisableDeviceConfig(networkId);
@@ -255,20 +253,8 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->AutoSelectDevice(config, scanInfo, blocklistBssids, info);
     pStaAutoConnectService->WhetherDevice5GAvailable(scanInfo);
     pStaAutoConnectService->GetAvailableScanInfos(scanInfo, scanInfo, blocklistBssids, info);
+    pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfo);
     pStaService->AutoConnectService(scanInfo);
-}
-
-void StaAppAccelerationFuzzTest(const uint8_t* data, size_t size)
-{
-    int index = 0;
-    int uid = static_cast<int>(data[index++]);
-    int enable = static_cast<int>(data[index++]);
-    int type = static_cast<int>(data[index++]);
-    int limitMode = static_cast<int>(data[index++]);
-    int protocol = static_cast<int>(data[index++]);
-    pStaAppAcceleration->SetGameBoostMode(enable, uid, type, limitMode);
-    pStaAppAcceleration->HighPriorityTransmit(uid, protocol, enable);
-    pStaAppAcceleration->StopAllAppAcceleration();
 }
 
 void RegisterDeviceAppraisalTest(const uint8_t* data, size_t size)
@@ -428,7 +414,7 @@ void StartRoamToNetworkTest(const uint8_t* data, size_t size)
     config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
     config.networkId = 0;
     WifiSettings::GetInstance().AddDeviceConfig(config);
-    pStaService->StartRoamToNetwork(networkId, staBssid);
+    pStaService->StartConnectToBssid(networkId, staBssid);
 }
 
 void StaServiceFuzzTest(const uint8_t* data, size_t size)
@@ -486,7 +472,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     OHOS::Wifi::StaServerFuzzTest(data, size);
     OHOS::Wifi::StaAutoServerFuzzTest(data, size);
-    OHOS::Wifi::StaAppAccelerationFuzzTest(data, size);
     OHOS::Wifi::RegisterDeviceAppraisalTest(data, size);
     OHOS::Wifi::AllowAutoSelectDeviceTest(data, size);
     OHOS::Wifi::StaAutoConnectServiceFuzzTest(data, size);

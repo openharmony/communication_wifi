@@ -30,9 +30,6 @@ std::vector<std::string> chinaPublicDnses(SELF_CURE_DNS_SIZE);
 std::vector<std::string> overseaPublicDnses(SELF_CURE_DNS_SIZE);
 using namespace NetManagerStandard;
 DEFINE_WIFILOG_LABEL("SelfCureUtils");
-const int PUBLIC_DNS_SERVERS_SIZE = 46;
-const int PUBLIC_IP_ADDR_NUM = 4;
-const std::string COUNTRY_CHINA_CAPITAL = "CN";
 SelfCureUtils::SelfCureUtils()
 {
     WIFI_LOGI("SelfCureUtils()");
@@ -66,11 +63,19 @@ void SelfCureUtils::UnRegisterDnsResultCallback()
 
 int32_t SelfCureUtils::GetCurrentDnsFailedCounter()
 {
+    if (dnsResultCallback_ == nullptr) {
+        WIFI_LOGE("dnsResultCallback_ is null");
+        return -1;
+    }
     return dnsResultCallback_->dnsFailedCounter_;
 }
 
 void SelfCureUtils::ClearDnsFailedCounter()
 {
+    if (dnsResultCallback_ == nullptr) {
+        WIFI_LOGE("dnsResultCallback_ is null");
+        return;
+    }
     dnsResultCallback_->dnsFailedCounter_ = 0;
 }
 
@@ -122,9 +127,6 @@ int32_t SelfCureUtils::GetSelfCureType(int32_t currentCureLevel)
 {
     SelfCureType ret = SelfCureType::SCE_TYPE_INVALID;
     switch (currentCureLevel) {
-        case WIFI_CURE_RESET_LEVEL_LOW_1_DNS:
-            ret = SelfCureType::SCE_TYPE_DNS;
-            break;
         case WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC:
             ret = SelfCureType::SCE_TYPE_REASSOC;
             break;
@@ -142,6 +144,9 @@ int32_t SelfCureUtils::GetSelfCureType(int32_t currentCureLevel)
             break;
         case WIFI_CURE_RESET_LEVEL_HIGH_RESET:
             ret = SelfCureType::SCE_TYPE_RESET;
+            break;
+        case WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON:
+            ret = SelfCureType::SCE_TYPE_RESET_WIFI_ON;
             break;
         default:
             break;
@@ -199,12 +204,21 @@ std::string SelfCureUtils::GetNextIpAddr(const std::string& gateway, const std::
     return "";
 }
 
-void SelfCureUtils::UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel,
-                                                     bool success)
+void SelfCureUtils::UpdateSelfCureHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel,
+                                              bool success)
 {
+    WIFI_LOGI("enter %{public}s", __FUNCTION__);
     auto now = std::chrono::system_clock::now();
     int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
+    if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP) {
+        if (success) {
+            historyInfo.staticIpSelfCureFailedCnt = 0;
+            historyInfo.lastStaticIpSelfCureFailedTs = 0;
+        } else {
+            historyInfo.staticIpSelfCureFailedCnt += 1;
+            historyInfo.lastStaticIpSelfCureFailedTs = currentMs;
+        }
+    } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
         if (success) {
             historyInfo.reassocSelfCureFailedCnt = 0;
             historyInfo.lastReassocSelfCureFailedTs = 0;
@@ -227,45 +241,6 @@ void SelfCureUtils::UpdateReassocAndResetHistoryInfo(WifiSelfCureHistoryInfo &hi
         } else {
             historyInfo.resetSelfCureFailedCnt += 1;
             historyInfo.lastResetSelfCureFailedTs = currentMs;
-        }
-    }
-}
-
-void SelfCureUtils::UpdateSelfCureHistoryInfo(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel,
-                                              bool success)
-{
-    WIFI_LOGI("enter %{public}s", __FUNCTION__);
-    auto now = std::chrono::system_clock::now();
-    int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_1_DNS) {
-        if (success) {
-            historyInfo.dnsSelfCureFailedCnt = 0;
-            historyInfo.lastDnsSelfCureFailedTs = 0;
-        } else {
-            historyInfo.dnsSelfCureFailedCnt += 1;
-            historyInfo.lastDnsSelfCureFailedTs = currentMs;
-        }
-    } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_DEAUTH_BSSID) {
-        if (success) {
-            historyInfo.renewDhcpSelfCureFailedCnt = 0;
-            historyInfo.lastRenewDhcpSelfCureFailedTs = 0;
-        } else {
-            historyInfo.renewDhcpSelfCureFailedCnt += 1;
-            historyInfo.lastRenewDhcpSelfCureFailedTs = currentMs;
-        }
-    } else if (requestCureLevel == WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP) {
-        if (success) {
-            historyInfo.staticIpSelfCureFailedCnt = 0;
-            historyInfo.lastStaticIpSelfCureFailedTs = 0;
-        } else {
-            historyInfo.staticIpSelfCureFailedCnt += 1;
-            historyInfo.lastStaticIpSelfCureFailedTs = currentMs;
-        }
-    } else {
-        if (requestCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC ||
-            requestCureLevel == WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC ||
-            requestCureLevel == WIFI_CURE_RESET_LEVEL_HIGH_RESET) {
-            UpdateReassocAndResetHistoryInfo(historyInfo, requestCureLevel, success);
         }
     }
 }
@@ -320,20 +295,6 @@ bool AllowSelfCure(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLe
                 return true;
             }
         }
-    }
-    return false;
-}
-
-static bool DealDns(const WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, int64_t currentMs)
-{
-    if (historyInfo.dnsSelfCureFailedCnt == 0 ||
-        (historyInfo.dnsSelfCureFailedCnt == SELF_CURE_FAILED_ONE_CNT &&
-         (currentMs - historyInfo.lastDnsSelfCureFailedTs > DELAYED_DAYS_LOW)) ||
-        (historyInfo.dnsSelfCureFailedCnt == SELF_CURE_FAILED_TWO_CNT &&
-         (currentMs - historyInfo.lastDnsSelfCureFailedTs > DELAYED_DAYS_MID)) ||
-        (historyInfo.dnsSelfCureFailedCnt >= SELF_CURE_FAILED_THREE_CNT &&
-         (currentMs - historyInfo.lastDnsSelfCureFailedTs > DELAYED_DAYS_HIGH))) {
-        return true;
     }
     return false;
 }
@@ -399,9 +360,6 @@ bool SelfCureUtils::SelfCureAcceptable(WifiSelfCureHistoryInfo &historyInfo, int
     }
     bool ifAcceptable = false;
     switch (requestCureLevel) {
-        case WIFI_CURE_RESET_LEVEL_LOW_1_DNS:
-            ifAcceptable = DealDns(historyInfo, WIFI_CURE_RESET_LEVEL_LOW_1_DNS, currentMs);
-            break;
         case WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP:
             ifAcceptable = DealStaticIp(historyInfo, WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP, currentMs);
             break;
@@ -499,15 +457,7 @@ int SelfCureUtils::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info,
     }
     // 0 to 12 is history subscript, which record the selfcure failed info, covert array to calss member
     for (int i = 0; i < cnt; i++) {
-        if (i == 0) {
-            info.dnsSelfCureFailedCnt = CheckDataLegal(histories[i]);
-        } else if (i == POS_DNS_FAILED_TS) {
-            info.lastDnsSelfCureFailedTs = CheckDataTolonglong(histories[i]);
-        } else if (i == POS_RENEW_DHCP_FAILED_CNT) {
-            info.renewDhcpSelfCureFailedCnt = CheckDataLegal(histories[i]);
-        } else if (i == POS_RENEW_DHCP_FAILED_TS) {
-            info.lastRenewDhcpSelfCureFailedTs = CheckDataTolonglong(histories[i]);
-        } else if (i == POS_STATIC_IP_FAILED_CNT) {
+        if (i == POS_STATIC_IP_FAILED_CNT) {
             info.staticIpSelfCureFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_STATIC_IP_FAILED_TS) {
             info.lastStaticIpSelfCureFailedTs = CheckDataTolonglong(histories[i]);
@@ -556,69 +506,6 @@ int SelfCureUtils::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info,
         }
     }
     return 0;
-}
-
-void SelfCureUtils::GetPublicDnsServers(std::vector<std::string>& publicDnsServers)
-{
-    std::string wifiCountryCode;
-    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(wifiCountryCode);
-    if (wifiCountryCode.compare(COUNTRY_CHINA_CAPITAL) == 0 && !chinaPublicDnses[0].empty()) {
-        publicDnsServers = chinaPublicDnses;
-    } else {
-        publicDnsServers = overseaPublicDnses;
-    }
-}
-
-void SelfCureUtils::GetReplacedDnsServers(
-    std::vector<std::string>& curDnses, std::vector<std::string>& replaceDnses)
-{
-    if (curDnses.empty()) {
-        return;
-    }
-    std::vector<std::string> publicServer;
-    replaceDnses = curDnses;
-    GetPublicDnsServers(publicServer);
-    replaceDnses[1] = publicServer[0];
-}
-
-void SelfCureUtils::InitDnsServer()
-{
-    WIFI_LOGI("InitDnsServer");
-    std::vector<std::string> strPublicIpAddr;
-    char dnsIpAddr[PUBLIC_DNS_SERVERS_SIZE] = {0};
-    int ret = GetParamValue(CONST_WIFI_DNSCURE_IPCFG, "", dnsIpAddr, PUBLIC_DNS_SERVERS_SIZE);
-    if (ret <= 0) {
-        WIFI_LOGE("get wifi const.wifi.dnscure_ipcfg code by cache fail, ret=%{public}d", ret);
-        return;
-    }
-    std::string temp = "";
-    int publicDnsSize = sizeof(dnsIpAddr);
-    for (int i = 0; i < publicDnsSize; i++) {
-        if (dnsIpAddr[i] == ';') {
-            strPublicIpAddr.push_back(temp);
-            temp = "";
-            continue;
-        } else if (i == publicDnsSize - 1) {
-            temp = temp + dnsIpAddr[i];
-            strPublicIpAddr.push_back(temp);
-            continue;
-        } else {
-            temp = temp + dnsIpAddr[i];
-        }
-    }
-    if (strPublicIpAddr.size() != PUBLIC_IP_ADDR_NUM) {
-        WIFI_LOGE("Get number of public ipaddr failed");
-        return;
-    }
-    for (uint32_t i = 0; i < overseaPublicDnses.size(); i++) {
-        overseaPublicDnses[i] = strPublicIpAddr[i];
-    }
-    uint32_t spaceSize = chinaPublicDnses.size();
-    strPublicIpAddr.erase(strPublicIpAddr.begin(), strPublicIpAddr.begin() + spaceSize);
-    for (uint32_t i = 0; i < chinaPublicDnses.size(); i++) {
-        chinaPublicDnses[i] = strPublicIpAddr[i];
-    }
-    WIFI_LOGI("InitDnsServer Success");
 }
 
 bool SelfCureUtils::IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& deviceKeymgmt)

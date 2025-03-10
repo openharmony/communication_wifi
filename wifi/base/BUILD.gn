@@ -151,7 +151,7 @@ if (defined(ohos_lite)) {
     ]
 
     public_configs = [ ":wifi_base_exported_header" ]
-
+    version_script = "libwifi_base.map"
     part_name = "wifi"
     subsystem_name = "communication"
     innerapi_tags = [ "platformsdk" ]

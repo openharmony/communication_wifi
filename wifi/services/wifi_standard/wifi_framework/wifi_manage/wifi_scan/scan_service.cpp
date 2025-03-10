@@ -74,6 +74,7 @@ ScanService::~ScanService()
         pScanStateMachine = nullptr;
     }
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->ClearScanInfoList();
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->CleanWifiCategoryRecord();
 }
 
 bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallbacks)
@@ -1814,6 +1815,13 @@ bool ScanService::AllowSystemSingleScan()
         return false;
     }
     if (staStatus != static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
+        return false;
+    }
+    Hid2dUpperScene shareScene;
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SHARE_SERVICE_UID, shareScene);
+    if ((shareScene.scene & 0x01) > 0) {
+        RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::HID2D_CLONE);
         return false;
     }
     // single scan requires controled by Hid2d or ActionListen

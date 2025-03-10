@@ -70,9 +70,6 @@ StaService::StaService(int instId)
     : pStaStateMachine(nullptr),
       pStaMonitor(nullptr),
       pStaAutoConnectService(nullptr),
-#ifndef OHOS_ARCH_LITE
-      pStaAppAcceleration(nullptr),
-#endif
       m_instId(instId)
 {}
 
@@ -94,13 +91,6 @@ StaService::~StaService()
         delete pStaStateMachine;
         pStaStateMachine = nullptr;
     }
-
-#ifndef OHOS_ARCH_LITE
-    if (pStaAppAcceleration != nullptr) {
-        delete pStaAppAcceleration;
-        pStaAppAcceleration = nullptr;
-    }
-#endif
 }
 
 ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callbacks)
@@ -144,17 +134,6 @@ ErrCode StaService::InitStaService(const std::vector<StaServiceCallback> &callba
         }
         pStaAutoConnectService->SetAutoConnectStateCallback(callbacks);
 #ifndef OHOS_ARCH_LITE
-        pStaAppAcceleration = new (std::nothrow) StaAppAcceleration(m_instId);
-        if (pStaAppAcceleration == nullptr) {
-            WIFI_LOGE("Alloc pStaAppAcceleration failed.\n");
-        }
-
-        if (pStaAppAcceleration->InitAppAcceleration() != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("InitAppAcceleration failed.\n");
-        }
-        std::vector<StaServiceCallback> appAccelerationStaCallBacks;
-        appAccelerationStaCallBacks.push_back(pStaAppAcceleration->GetStaCallback());
-        RegisterStaServiceCallback(appAccelerationStaCallBacks);
         GetStaControlInfo();
 #endif
     }
@@ -470,6 +449,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     }
 
     UpdateEapConfig(config, tempDeviceConfig.wifiEapConfig);
+    WifiSettings::GetInstance().SetKeyMgmtBitset(tempDeviceConfig);
 
     /* Add the new network to WifiSettings. */
     if (!WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
@@ -588,9 +568,9 @@ ErrCode StaService::ConnectToNetwork(int networkId, int type) const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bssid) const
+ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::string bssid, int32_t type) const
 {
-    LOGI("Enter StartRoamToNetwork, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
+    LOGI("Enter StartConnectToBssid, networkId: %{public}d, bssid: %{public}s", networkId, MacAnonymize(bssid).c_str());
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
         LOGE("%{public}s WifiDeviceConfig is null!", __FUNCTION__);
@@ -599,32 +579,39 @@ ErrCode StaService::StartRoamToNetwork(const int networkId, const std::string bs
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
 
     WifiLinkedInfo linkedInfo;
-    std::vector<WifiLinkedInfo> mloInfo;
-    bool isMloBssid = false;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId);
-    for (auto iter : mloInfo) {
-        if (iter.bssid == bssid) {
-            isMloBssid = true;
-            break;
-        }
-    }
     if (networkId == linkedInfo.networkId) {
+        LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
+            __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
-        } else if (linkedInfo.mloState == MloState::WIFI7_EMLSR && isMloBssid) {
-            LOGI("%{public}s current linkedBssid is emlsr, forbid link switch", __FUNCTION__);
-            return WIFI_OPT_NOT_SUPPORTED;
-        } else {
-            LOGI("%{public}s current linkedBssid: %{public}s, roam to targetBssid: %{public}s",
-                __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
-            pStaStateMachine->StartRoamToNetwork(bssid);
+            return WIFI_OPT_SUCCESS;
+        } else if (linkedInfo.isMloConnected) {
+            std::vector<WifiLinkedInfo> mloInfo;
+            if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloInfo, m_instId) < 0) {
+                LOGE("%{public}s get mlo connect info failed", __FUNCTION__);
+                return WIFI_OPT_FAILED;
+            }
+            if (std::find_if(mloInfo.begin(), mloInfo.end(),
+                [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
+                pStaStateMachine->StartConnectToBssid(bssid);
+                return WIFI_OPT_SUCCESS;
+            }
+            if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {
+                WifiCmdClient::GetInstance().SendCmdToDriver(
+                    WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), CMD_MLD_LINK_SWITCH, bssid);
+                return WIFI_OPT_SUCCESS;
+            } else if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR) {
+                LOGI("%{public}s emlsr not support linkSwitch", __FUNCTION__);
+                return WIFI_OPT_SUCCESS;
+            }
         }
+        pStaStateMachine->StartConnectToBssid(bssid);
     } else {
         LOGI("%{public}s switch to target network", __FUNCTION__);
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
         message->SetParam1(networkId);
-        message->SetParam2(NETWORK_SELECTED_BY_USER);
+        message->SetParam2(type);
         message->AddStringMessageBody(bssid);
         pStaStateMachine->SendMessage(message);
     }
@@ -902,9 +889,6 @@ void StaService::HandleScreenStatusChanged(int screenState)
             pStaStateMachine->StopTimer(static_cast<int>(CMD_START_NETCHECK));
         }
     }
-    if (pStaAppAcceleration != nullptr) {
-        pStaAppAcceleration->HandleScreenStatusChanged(screenState);
-    }
 #endif
     return;
 }
@@ -979,8 +963,8 @@ ErrCode StaService::StartPortalCertification()
 #ifndef OHOS_ARCH_LITE
 ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {
-    if (pStaAppAcceleration == nullptr) {
-        WIFI_LOGE("pStaAppAcceleration is null");
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null");
         return WIFI_OPT_FAILED;
     }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT, appStateData);
@@ -1142,6 +1126,13 @@ void StaService::ProcessSetVoWifiDetectPeriod(int period)
 {
     bool ret = VoWifiDetectSet("PERIOD " + std::to_string(period));
     WIFI_LOGI("Set VoWifi Detect Period result: %{public}d, period = %{public}d", ret, period);
+}
+
+ErrCode StaService::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    WifiChrUtils::GetSignalPollInfoArray(wifiSignalPollInfos, length);
+    return WIFI_OPT_SUCCESS;
 }
  
 bool StaService::VoWifiDetectSet(std::string cmd)

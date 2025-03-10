@@ -161,6 +161,9 @@ public:
     void EnableAutoJoinSuccess();
     void RegisterAutoJoinConditionSuccess();
     void DeregisterAutoJoinConditionSuccess();
+    void IsAutoConnectFailByP2PEnhanceFilterSucc1();
+    void IsAutoConnectFailByP2PEnhanceFilterSucc2();
+    void IsAutoConnectFailByP2PEnhanceFilterFail1();
 };
 
 void StaAutoConnectServiceTest::InitAutoConnectService()
@@ -340,6 +343,35 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail6()
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
+}
+
+void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterSucc1()
+{
+    std::vector<InterScanInfo> scanInfos;
+    scanInfos.emplace_back();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Return(0));
+    EXPECT_FALSE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));
+}
+
+void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterSucc2()
+{
+    std::vector<InterScanInfo> scanInfos;
+    scanInfos.emplace_back();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Return(FREQUENCY));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(1));
+    EXPECT_TRUE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));
+}
+
+void StaAutoConnectServiceTest::IsAutoConnectFailByP2PEnhanceFilterFail1()
+{
+    std::vector<InterScanInfo> scanInfos;
+    GetInterScanInfoVector(scanInfos);
+    scanInfos[0].frequency = FREQUENCY;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pEnhanceFreq()).WillOnce(Return(FREQUENCY));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(1));
+    EXPECT_FALSE(pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfos));
 }
 
 void StaAutoConnectServiceTest::EnableOrDisableBssidSuccess1()
@@ -1443,6 +1475,21 @@ HWTEST_F(StaAutoConnectServiceTest, DeregisterAutoJoinConditionSuccess, TestSize
 {
     DeregisterAutoJoinConditionSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterSucc1, TestSize.Level1)
+{
+    IsAutoConnectFailByP2PEnhanceFilterSucc1();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterSucc2, TestSize.Level1)
+{
+    IsAutoConnectFailByP2PEnhanceFilterSucc2();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterFail1, TestSize.Level1)
+{
+    IsAutoConnectFailByP2PEnhanceFilterFail1();
 }
 } // Wifi
 } // OHOS

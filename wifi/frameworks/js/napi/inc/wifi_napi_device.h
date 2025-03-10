@@ -49,6 +49,7 @@ napi_value GetIpInfo(napi_env env, napi_callback_info info);
 napi_value GetIpv6Info(napi_env env, napi_callback_info info);
 napi_value GetLinkedInfo(napi_env env, napi_callback_info info);
 napi_value GetLinkedInfoSync(napi_env env, napi_callback_info info);
+napi_value GetMultiLinkedInfo(napi_env env, napi_callback_info info);
 napi_value GetDisconnectedReason(napi_env env, napi_callback_info info);
 napi_value IsMeteredHotspot(napi_env env, napi_callback_info info);
 napi_value RemoveDevice(napi_env env, napi_callback_info info);

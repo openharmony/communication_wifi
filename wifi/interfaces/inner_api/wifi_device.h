@@ -217,6 +217,8 @@ public:
      */
     virtual ErrCode GetLinkedInfo(WifiLinkedInfo &info) = 0;
 
+    virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) = 0;
+
     /**
      * @Description Obtains the disconnected reason
      *
@@ -624,6 +626,14 @@ public:
      * @return vowifi detection period
      */
     virtual ErrCode GetVoWifiDetectPeriod(int &period) = 0;
+
+    /**
+     * @Description Obtains the MLO Wi-Fi connection information
+     *
+     * @param multiLinkedInfo - Wifi MLO Linked Info
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

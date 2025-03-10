@@ -137,10 +137,11 @@ public:
     void HandleForegroundAppChangedActionTest();
     void EnableHiLinkHandshakeTest();
     void DeliverStaIfaceDataTest();
-    void StartRoamToNetworkTest();
+    void StartConnectToBssidTest();
     int StartConnectToUserSelectNetworkSuccessTest();
     int StartConnectToUserSelectNetworkSuccessFail();
     void HandleFoldStatusChangedTest();
+    void GetSignalPollInfoArrayTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -796,7 +797,7 @@ void StaServiceTest::DeliverStaIfaceDataTest()
     pStaService->DeliverStaIfaceData(currentMac);
 }
 
-void StaServiceTest::StartRoamToNetworkTest()
+void StaServiceTest::StartConnectToBssidTest()
 {
     WifiDeviceConfig config;
     config.bssid = "01:23:45:67:89:AB";
@@ -808,7 +809,7 @@ void StaServiceTest::StartRoamToNetworkTest()
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
-    pStaService->StartRoamToNetwork(0, "11:22:33:44");
+    pStaService->StartConnectToBssid(0, "11:22:33:44");
 }
 
 int StaServiceTest::StartConnectToUserSelectNetworkSuccessTest()
@@ -845,9 +846,22 @@ void StaServiceTest::HandleFoldStatusChangedTest()
     pStaService->HandleFoldStatusChanged(foldStatus);
 }
 
+void StaServiceTest::GetSignalPollInfoArrayTest()
+{
+    std::vector<WifiSignalPollInfo> wifiSignalPollInfos;
+    int length = 6;
+    pStaService->GetSignalPollInfoArray(wifiSignalPollInfos, length);
+}
+
 HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level1)
 {
     HandleFoldStatusChangedTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
+}
+
+HWTEST_F(StaServiceTest, GetSignalPollInfoArrayTest, TestSize.Level1)
+{
+    GetSignalPollInfoArrayTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
@@ -1190,9 +1204,9 @@ HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StartRoamToNetworkTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, StartConnectToBssidTest, TestSize.Level1)
 {
-    StartRoamToNetworkTest();
+    StartConnectToBssidTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 

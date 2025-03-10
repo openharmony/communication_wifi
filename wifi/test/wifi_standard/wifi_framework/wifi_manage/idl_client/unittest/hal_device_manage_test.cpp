@@ -197,9 +197,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest, TestSize.Level1)
     int instId = 0;
     HalDeviceManager::g_chipHdiServiceDied = true;
     HalDeviceManager::GetInstance().CreateApIface(
-        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName,
-        instId);
+        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
     int32_t band = 0;
     std::vector<int> frequencies;
     EXPECT_EQ(false, HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies));
@@ -693,7 +691,7 @@ HWTEST_F(WifiHalDeviceManagerTest, CanIfaceComboSupportRequestTest_01, TestSize.
 
     wifiChipInfo.ifaces.insert(std::pair<IfaceType, std::vector<WifiIfaceInfo>>(createIfaceType, wifiIfaceInfo));
 
-    EXPECT_EQ(true, HalDeviceManager::GetInstance().CanIfaceComboSupportRequest(wifiChipInfo,
+    EXPECT_TRUE(HalDeviceManager::GetInstance().CanIfaceComboSupportRequest(wifiChipInfo,
         chipMode, chipIfaceCombo, createIfaceType, ifaceCreationData));
 }
 

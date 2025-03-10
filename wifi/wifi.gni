@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ability_runtime_path = "//foundation/ability/ability_runtime"
 fuzz_test_output_path = "wifi/wifi/wifi_sta"
 SUBSYSTEM_DIR = "//foundation/communication"
 WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
@@ -47,7 +46,7 @@ declare_args() {
   wifi_feature_with_random_mac_addr = true
   wifi_feature_with_hpf_supported = true
   wifi_feature_with_scan_control = true
-  wifi_feature_with_hdi_wpa_supported = false
+  wifi_feature_with_hdi_wpa_supported = true
   wifi_feature_network_selection = false
   wifi_feature_p2p_random_mac_addr = true
   wifi_feature_powermgr_support = false
@@ -58,6 +57,7 @@ declare_args() {
   }
   wifi_feature_with_vap_manager = true
   wifi_feature_with_wifi_oeminfo_mac = false
+  wifi_feature_audio_aware = true
 }
 
 memory_optimization_cflags = [

@@ -20,7 +20,6 @@
 #include "app_mgr_client.h"
 #include "wifi_protect_manager.h"
 #include "wifi_service_manager.h"
-#include "sta_app_acceleration.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_logger.h"
 

@@ -1,0 +1,10 @@
+1.0 {
+    global:
+        CreateApInterface;
+        DestroyApInterface;
+    extern "C++" {
+        "OHOS::Wifi::ApInterface::ApInterface(int)";
+    };
+    local:
+        *;
+};

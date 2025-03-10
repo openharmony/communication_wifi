@@ -29,6 +29,8 @@
 #include "hdf_remote_service.h"
 #include "osal_mem.h"
 #include "wifi_native_define.h"
+#include "wifi_hdi_wpa_sta_impl.h"
+#include "wifi_hdi_wpa_p2p_impl.h"
 #ifndef UT_TEST
 #include "wifi_log.h"
 #else
@@ -68,6 +70,8 @@ const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
+static struct HdfRemoteService* g_remote = NULL;
+static struct HdfDeathRecipient* g_recipient = NULL;
 static pthread_mutex_t g_ifaceNameMutex = PTHREAD_MUTEX_INITIALIZER;
 static char g_staIfaceName[STA_INSTANCE_MAX_NUM][IFACENAME_LEN] = {{0}, {0}};
 static char g_p2pIfaceName[IFACENAME_LEN] = {0};
@@ -214,24 +218,28 @@ static void HdiWpaResetGlobalObj()
         mNativeProcessCallback(WPA_DEATH);
     }
 }
-
-static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
+static void RecycleServiceAndRecipient(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
 {
     LOGI("%{public}s enter", __func__);
-    if (recipient == NULL || service == NULL) {
+    pthread_mutex_lock(&g_wpaObjMutex);
+    if (recipient == NULL || service == NULL || g_remote == NULL || g_recipient == NULL) {
         LOGE("%{public}s input param is null", __func__);
-        HdiWpaResetGlobalObj();
+        pthread_mutex_unlock(&g_wpaObjMutex);
         return;
     }
     HdfRemoteServiceRemoveDeathRecipient(service, recipient);
     HdfRemoteServiceRecycle(service);
-    if (recipient == NULL) {
-        LOGE("%{public}s param recipient is null", __func__);
-        HdiWpaResetGlobalObj();
-        return;
-    }
     OsalMemFree(recipient);
     recipient = NULL;
+    g_remote = NULL;
+    g_recipient = NULL;
+    pthread_mutex_unlock(&g_wpaObjMutex);
+}
+
+static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service)
+{
+    LOGI("%{public}s enter", __func__);
+    RecycleServiceAndRecipient(recipient, service);
     HdiWpaResetGlobalObj();
 }
 
@@ -248,14 +256,38 @@ static WifiErrorNo RegistHdfDeathCallBack()
         LOGE("%{public}s: failed to get HdfRemoteService", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
+    g_remote = remote;
     LOGI("%{public}s: success to get HdfRemoteService", __func__);
     struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
     if (recipient == NULL) {
         LOGE("%{public}s: OsalMemCalloc is failed", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
+    if (g_recipient != NULL) {
+        OsalMemFree(g_recipient);
+    }
+    g_recipient = recipient;
     recipient->OnRemoteDied = ProxyOnRemoteDied;
     HdfRemoteServiceAddDeathRecipient(remote, recipient);
+    return WIFI_HAL_OPT_OK;
+}
+
+static WifiErrorNo UnRegistHdfDeathCallBack()
+{
+    if (g_remote == NULL || g_recipient == NULL) {
+        LOGE("%{public}s: Invalid remote or recipient", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    HdfRemoteServiceRemoveDeathRecipient(g_remote, g_recipient);
+    HdfRemoteServiceRecycle(g_remote);
+    g_remote = NULL;
+    if (g_recipient == NULL) {
+        LOGE("%{public}s: param recipient is null", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    OsalMemFree(g_recipient);
+    g_recipient = NULL;
+    LOGI("%{public}s: Death recipient unregistered", __func__);
     return WIFI_HAL_OPT_OK;
 }
 
@@ -361,6 +393,9 @@ WifiErrorNo HdiWpaStop()
     IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
     g_wpaObj = NULL;
     if (g_devMgr != NULL) {
+        if (UnRegistHdfDeathCallBack() != WIFI_HAL_OPT_OK) {
+            LOGE("%{public}s UnRegistHdfDeathCallBack failed", __func__);
+        }
         g_devMgr->UnloadDevice(g_devMgr, HDI_WPA_SERVICE_NAME);
         HDIDeviceManagerRelease(g_devMgr);
         g_devMgr = NULL;
@@ -437,6 +472,12 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
             return WIFI_HAL_OPT_FAILED;
         }
         RemoveIfaceName(ifName);
+    }
+    if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
+        ReleaseP2pCallback();
+    }
+    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
+        ReleaseStaCallback(ifName);
     }
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("%{public}s RemoveWpaIface success!", __func__);

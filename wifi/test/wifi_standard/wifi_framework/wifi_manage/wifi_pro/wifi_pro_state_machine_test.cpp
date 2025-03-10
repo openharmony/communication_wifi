@@ -199,21 +199,12 @@ HWTEST_F(WifiProStateMachineTest, SetSwitchReasonTest01, TestSize.Level1)
 HWTEST_F(WifiProStateMachineTest, IsSwitchingOrSelfCuringTest01, TestSize.Level1)
 {
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
-    pWifiProStateMachine_->isWifiNoInternet_ = false;
     EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
 
 HWTEST_F(WifiProStateMachineTest, IsSwitchingOrSelfCuringTest02, TestSize.Level1)
 {
     pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
-    pWifiProStateMachine_->isWifiNoInternet_ = false;
-    EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
-}
-
-HWTEST_F(WifiProStateMachineTest, IsSwitchingOrSelfCuringTest03, TestSize.Level1)
-{
-    pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
-    pWifiProStateMachine_->isWifiNoInternet_ = true;
     EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
 
@@ -273,7 +264,6 @@ HWTEST_F(WifiProStateMachineTest, FastScanTest01, TestSize.Level1)
 HWTEST_F(WifiProStateMachineTest, IsSatisfiedWifi2WifiConditionTest01, TestSize.Level1)
 {
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
-    pWifiProStateMachine_->isWifiNoInternet_ = true;
     pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition();
     EXPECT_EQ(pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
@@ -282,15 +272,14 @@ HWTEST_F(WifiProStateMachineTest, TryNoNetSwitchTest, TestSize.Level1)
 {
     NetworkSelectionResult networkSelectionResult;
     networkSelectionResult.wifiDeviceConfig.networkId = 1;
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = false;
+    wifiNoNetState_->pWifiProStateMachine_->isFirstNetDectect_ = false;
     wifiNoNetState_->pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_NO_INTERNET;
     wifiNoNetState_->pWifiProStateMachine_->TryWifi2Wifi(networkSelectionResult);
 
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
+    wifiNoNetState_->pWifiProStateMachine_->isFirstNetDectect_ = true;
     wifiNoNetState_->pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_NO_INTERNET;
     wifiNoNetState_->pWifiProStateMachine_->TryWifi2Wifi(networkSelectionResult);
 
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = false;
     wifiNoNetState_->pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_POOR_RSSI;
     wifiNoNetState_->pWifiProStateMachine_->TryWifi2Wifi(networkSelectionResult);
     EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
@@ -365,12 +354,12 @@ HWTEST_F(WifiProStateMachineTest, WifiProEnableStateHandleWifiConnectStateChange
     linkedInfo.ssid = "test";
     msg->SetMessageObj(linkedInfo);
     wifiProEnableState_->HandleWifiConnectStateChangedInEnable(msg);
-
+ 
     msg->SetParam1(23);
     linkedInfo.ssid = "test1";
     msg->SetMessageObj(linkedInfo);
     wifiProEnableState_->HandleWifiConnectStateChangedInEnable(msg);
-
+ 
     msg->SetParam1(0);
     linkedInfo.ssid = "test2";
     msg->SetMessageObj(linkedInfo);
@@ -500,7 +489,8 @@ HWTEST_F(WifiProStateMachineTest, WifiHasNetStateExecuteStateMsgTest01, TestSize
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(EVENT_WIFI_RSSI_CHANGED);
-    wifiHasNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
+    msg->SetParam1(2);
+    wifiHasNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
     EXPECT_EQ(wifiHasNetState_->ExecuteStateMsg(msg), true);
 }
 
@@ -508,8 +498,8 @@ HWTEST_F(WifiProStateMachineTest, WifiHasNetStateExecuteStateMsgTest02, TestSize
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(EVENT_WIFI_RSSI_CHANGED);
+    msg->SetParam1(2);
     wifiHasNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
-    wifiHasNetState_->pWifiProStateMachine_->isWifiNoInternet_ = false;
     wifiHasNetState_->pWifiProStateMachine_->instId_ = 1;
     WifiLinkedInfo linkedInfo;
     linkedInfo.rssi = 1;
@@ -603,7 +593,6 @@ HWTEST_F(WifiProStateMachineTest, WifiNoNetStateExecuteStateMsgTest01, TestSize.
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     wifiNoNetState_->pWifiProStateMachine_ = new WifiProStateMachine();
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
     msg->SetMessageName(EVENT_CHECK_WIFI_INTERNET_RESULT);
     msg->SetParam1(19);
     EXPECT_EQ(wifiNoNetState_->ExecuteStateMsg(msg), false);
@@ -612,7 +601,6 @@ HWTEST_F(WifiProStateMachineTest, WifiNoNetStateExecuteStateMsgTest01, TestSize.
 HWTEST_F(WifiProStateMachineTest, WifiNoNetStateExecuteStateMsgTest04, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
     msg->SetMessageName(EVENT_REQUEST_SCAN_DELAY);
     EXPECT_EQ(wifiNoNetState_->ExecuteStateMsg(msg), true);
 }
@@ -620,7 +608,6 @@ HWTEST_F(WifiProStateMachineTest, WifiNoNetStateExecuteStateMsgTest04, TestSize.
 HWTEST_F(WifiProStateMachineTest, wifiNoNetStateExecuteStateMsgTest05, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
     msg->SetMessageName(EVENT_WIFI_CONNECT_STATE_CHANGED);
     msg->SetParam1(23);
     EXPECT_EQ(wifiNoNetState_->ExecuteStateMsg(msg), false);
@@ -636,7 +623,6 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateExecuteStateMsgTest06, TestSize.
 
 HWTEST_F(WifiProStateMachineTest, wifiNoNetStateIsSatisfiedWifi2WifiConditionMsgTest, TestSize.Level1)
 {
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
     wifiNoNetState_->pWifiProStateMachine_->isDisableWifiAutoSwitch_ = true;
     wifiNoNetState_->pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition();
 
@@ -648,7 +634,6 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateIsSatisfiedWifi2WifiConditionMsg
 HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest01, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
     wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
     wifiNoNetState_->pWifiProStateMachine_->TrySelfCure(false);
     EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, true);
@@ -657,7 +642,6 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest01, TestSize.Leve
 HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest02, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    wifiNoNetState_->pWifiProStateMachine_->isWifiNoInternet_ = true;
     wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
     wifiNoNetState_->pWifiProStateMachine_->TrySelfCure(true);
     EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
@@ -667,7 +651,7 @@ HWTEST_F(WifiProStateMachineTest, WifiPortalStateGoInStateTest01, TestSize.Level
 {
     wifiPortalState_->GoInState();
     wifiPortalState_->GoOutState();
-    EXPECT_EQ(wifiPortalState_->pWifiProStateMachine_->isWifiNoInternet_, false);
+    EXPECT_EQ(wifiPortalState_->pWifiProStateMachine_->isFirstNetDectect_, false);
 }
 
 HWTEST_F(WifiProStateMachineTest, WifiPortalStateExecuteStateMsgTest01, TestSize.Level1)

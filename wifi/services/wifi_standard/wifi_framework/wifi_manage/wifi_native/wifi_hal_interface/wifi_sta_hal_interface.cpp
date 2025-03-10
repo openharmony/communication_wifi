@@ -674,8 +674,8 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceNa
     info.chloadSelf = signalPollResult.chloadSelf;
     info.c0Rssi = signalPollResult.c0Rssi;
     info.c1Rssi = signalPollResult.c1Rssi;
-    info.ext = signalPollResult.ext.data();
-    info.extLen = signalPollResult.ext.size();
+    info.ext.assign(signalPollResult.ext.begin(), signalPollResult.ext.end());
+    info.extLen = static_cast<int>(info.ext.size());
     return WIFI_HAL_OPT_OK;
 #else
     CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
@@ -813,6 +813,19 @@ WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &i
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->GetMloLinkedInfo(ifName, mloLinkInfo);
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
+WifiErrorNo WifiStaHalInterface::GetConnectionMloSignalInfo(const std::string &ifName,
+    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+{
+    if (ifName.length() <= 0) {
+        return WIFI_HAL_OPT_INVALID_PARAM;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->GetMloSignalPollInfo(ifName, mloSignalInfo);
 #else
     return WIFI_HAL_OPT_FAILED;
 #endif

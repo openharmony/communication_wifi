@@ -135,7 +135,7 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
         }
         mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-        WifiAssetManager::GetInstance().WifiAssetAdd(config);
+        WifiAssetManager::GetInstance().WifiAssetAdd(config, USER_ID_DEFAULT, false);
 #endif
     }
     return config.networkId;
@@ -217,7 +217,7 @@ int WifiSettings::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.networkId == networkId && iter->second.instanceId == instId) {
             SyncAfterDecryped(iter->second);
-            config =  iter->second;
+            config = iter->second;
             return 0;
         }
     }
@@ -236,7 +236,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.ssid == index && iter->second.instanceId == instId) {
                 SyncAfterDecryped(iter->second);
-                config =  iter->second;
+                config = iter->second;
                 return 0;
             }
         }
@@ -244,7 +244,7 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
         for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
             if (iter->second.bssid == index && iter->second.instanceId == instId) {
                 SyncAfterDecryped(iter->second);
-                config =  iter->second;
+                config = iter->second;
                 return 0;
             }
         }
@@ -261,23 +261,12 @@ int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &ke
     }
 
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (keymgmt.compare("WPA-PSK+SAE") == 0) {
-        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-            if ((iter->second.ssid == ssid) && (keymgmt.find(iter->second.keyMgmt) != std::string::npos)
-                && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
-                SyncAfterDecryped(iter->second);
-                config =  iter->second;
-                return 0;
-            }
-        }
-    } else {
-        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-            if ((iter->second.ssid == ssid) && (iter->second.keyMgmt == keymgmt)
-                && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
-                SyncAfterDecryped(iter->second);
-                config =  iter->second;
-                return 0;
-            }
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if ((iter->second.ssid == ssid) && (InKeyMgmtBitset(iter->second, keymgmt))
+            && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
+            SyncAfterDecryped(iter->second);
+            config = iter->second;
+            return 0;
         }
     }
 
@@ -646,6 +635,64 @@ int WifiSettings::SyncDeviceConfig()
 #endif
 }
 
+static int FindKeyMgmtPosition(const std::string& keyMgmt)
+{
+    for (int index = 0; index < KEY_MGMT_TOTAL_NUM; ++index) {
+        if (KEY_MGMT_ARRAY[index] == keyMgmt) {
+            return index;
+        }
+    }
+    return -1;
+}
+
+bool WifiSettings::InKeyMgmtBitset(const WifiDeviceConfig& config, const std::string& keyMgmt)
+{
+    if (keyMgmt != "WPA-PSK+SAE") {
+        int index = FindKeyMgmtPosition(keyMgmt);
+        if (index < 0) {
+            return false;
+        }
+        return (config.keyMgmtBitset & (1 << index)) != 0;
+    } else {
+        return InKeyMgmtBitset(config, KEY_MGMT_WPA_PSK) || InKeyMgmtBitset(config, KEY_MGMT_SAE);
+    }
+}
+
+void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
+{
+    // Currently only set when keyMgmtBitset does not match keyMgmt
+    if (InKeyMgmtBitset(config, config.keyMgmt)) {
+        return;
+    }
+    int index = FindKeyMgmtPosition(config.keyMgmt);
+    // Invalid keyMgmt
+    if (index < 0) {
+        return;
+    }
+    config.keyMgmtBitset |= (1 << index);
+    if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
+        index = FindKeyMgmtPosition(KEY_MGMT_SAE);
+        config.keyMgmtBitset |= (1 << index);
+    }
+}
+
+void WifiSettings::GetAllSuitableEncryption(const WifiDeviceConfig &config,
+    const std::string &keyMgmt, std::vector<std::string> &candidateKeyMgmtList)
+{
+    if (keyMgmt == "WPA-PSK+SAE") {
+        if (InKeyMgmtBitset(config, KEY_MGMT_WPA_PSK)) {
+            candidateKeyMgmtList.emplace_back(KEY_MGMT_WPA_PSK);
+        }
+        if (InKeyMgmtBitset(config, KEY_MGMT_SAE)) {
+            candidateKeyMgmtList.emplace_back(KEY_MGMT_SAE);
+        }
+    } else {
+        if (InKeyMgmtBitset(config, keyMgmt)) {
+            candidateKeyMgmtList.emplace_back(keyMgmt);
+        }
+    }
+}
+
 int WifiSettings::ReloadDeviceConfig()
 {
 #ifndef CONFIG_NO_CONFIG_WRITE
@@ -663,6 +710,7 @@ int WifiSettings::ReloadDeviceConfig()
     mWifiDeviceConfig.clear();
     for (std::size_t i = 0; i < tmp.size(); ++i) {
         WifiDeviceConfig &item = tmp[i];
+        SetKeyMgmtBitset(item);
         item.networkId = mNetworkId++;
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
@@ -956,11 +1004,9 @@ int WifiSettings::SyncHotspotConfig()
 int WifiSettings::SetHotspotConfig(const HotspotConfig &config, int id)
 {
     std::unique_lock<std::mutex> lock(mApMutex);
-    if (config.GetPreSharedKey() != mHotspotConfig[id].GetPreSharedKey()) {
-        LOGI("Hotspot preSharedKey changed to %{public}s", PassWordAnonymize(config.GetPreSharedKey()).c_str());
-    }
-    if (config.GetSsid() != mHotspotConfig[id].GetSsid()) {
-        LOGI("Hotspot ssid changed to %{public}s", SsidAnonymize(config.GetSsid()).c_str());
+    if (id < 0 || id >= AP_INSTANCE_MAX_NUM) {
+        LOGE("SetHotspotConfig id is out of range");
+        return -1;
     }
     mHotspotConfig[id] = config;
     return 0;
@@ -972,10 +1018,10 @@ int WifiSettings::GetHotspotConfig(HotspotConfig &config, int id)
     auto iter = mHotspotConfig.find(id);
     if (iter != mHotspotConfig.end()) {
         config = iter->second;
+        return 0;
     }
-    return 0;
+    return -1;
 }
-
 
 void WifiSettings::ClearHotspotConfig()
 {
@@ -2231,11 +2277,9 @@ bool WifiSettings::EncryptionWapiConfig(const WifiEncryptionInfo &wifiEncryption
 
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
-    const std::set<int> &wifiLinkedNetworkIds)
+void WifiSettings::ApplyCloudWifiConfig(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+    const std::set<int> &wifiLinkedNetworkIds, std::map<int, WifiDeviceConfig> &tempConfigs)
 {
-    std::unique_lock<std::mutex> lock(mStaMutex);
-    std::map<int, WifiDeviceConfig> tempConfigs;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (wifiLinkedNetworkIds.count(iter->second.networkId) != 0) {
             tempConfigs.emplace(std::make_pair(iter->second.networkId, iter->second));
@@ -2259,6 +2303,14 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
 #endif
         LOGI("UpdateWifiConfigFromCloud remove from cloud %{public}s", SsidAnonymize(iter->second.ssid).c_str());
     }
+}
+
+void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
+    const std::set<int> &wifiLinkedNetworkIds)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    std::map<int, WifiDeviceConfig> tempConfigs;
+    ApplyCloudWifiConfig(newWifiDeviceConfigs, wifiLinkedNetworkIds, tempConfigs);
     for (auto iter : newWifiDeviceConfigs) {
         bool find = false;
         for (auto oriIter = mWifiDeviceConfig.begin(); oriIter != mWifiDeviceConfig.end(); oriIter++) {
@@ -2281,8 +2333,12 @@ void WifiSettings::UpdateWifiConfigFromCloud(const std::vector<WifiDeviceConfig>
         tempConfigs.emplace(std::make_pair(iter.networkId, iter));
         mNetworkId++;
     }
+    for (auto& iter : tempConfigs) {
+        SetKeyMgmtBitset(iter.second);
+    }
     mWifiDeviceConfig.swap(tempConfigs);
 }
+
 void WifiSettings::UpLoadLocalDeviceConfigToCloud()
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

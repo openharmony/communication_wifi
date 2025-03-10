@@ -14,6 +14,7 @@
  */
 
 #include "wifi_cert_utils.h"
+#include <unistd.h>
 #include "cert_manager_api.h"
 #include "securec.h"
 #include "wifi_log.h"
@@ -21,6 +22,8 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_ALIAS_LEN = 128;
+constexpr int RETRY_INTERVAL = 5 * 100 * 1000; // wait for the remote sa to be ready
+constexpr int IPC_ERROR_REMOTE_SA_DIE = 29189; // means the remote sa is dead
 
 static bool CheckParamters(const std::vector<uint8_t>& certEntry, const std::string& pwd,
     std::string& alias)
@@ -81,10 +84,14 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     char retUriBuf[MAX_ALIAS_LEN] = { 0 };
     struct CmBlob keyUri = { sizeof(retUriBuf), reinterpret_cast<uint8_t*>(retUriBuf) };
     int ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
-
+    if (ret == IPC_ERROR_REMOTE_SA_DIE) {
+        LOGE("CmInstallAppCert fail, remote sa die, code:%{public}d, retry after %{public}d.", ret, RETRY_INTERVAL);
+        usleep(RETRY_INTERVAL);
+        ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
+    }
     free(data);
     data = nullptr;
-    if (ret == 0) {
+    if (ret == CM_SUCCESS) {
         uri = reinterpret_cast<char*>(keyUri.data);
     }
 

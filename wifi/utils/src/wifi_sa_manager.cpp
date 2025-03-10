@@ -24,7 +24,7 @@ DEFINE_WIFILOG_LABEL("WifiSaLoadManager");
 
 namespace OHOS {
 namespace Wifi {
-static constexpr int32_t WIFI_LOADSA_TIMEOUT_MS = 1000;
+static constexpr int32_t WIFI_LOADSA_TIMEOUT_MS = 2500;
 
 WifiSaLoadManager& WifiSaLoadManager::GetInstance()
 {

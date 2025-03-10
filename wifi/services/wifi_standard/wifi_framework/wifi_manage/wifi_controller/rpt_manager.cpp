@@ -90,6 +90,16 @@ void RptManager::OnP2pActionResult(P2pActionCallback action, ErrCode code)
         auto msg = pRptManagerMachine->CreateMessage(RPT_CMD_ON_GROUP_REMOVED);
         pRptManagerMachine->SendMessage(msg);
     }
+    if (action == P2pActionCallback::CreateGroup && code == ErrCode::WIFI_OPT_FAILED) {
+        auto msg = pRptManagerMachine->CreateMessage(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED);
+        pRptManagerMachine->SendMessage(msg);
+    }
+
+    // After CreateGroup success, need to wait p2pConnState change to P2P_CONNECTED.
+    if (action == P2pActionCallback::CreateGroup && code == ErrCode::WIFI_OPT_SUCCESS) {
+        pRptManagerMachine->StopTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED);
+        pRptManagerMachine->StartTimer(RPT_CMD_ON_CREATE_RPT_GROUP_FAILED, CREATE_GROUP_TIMEOUT);
+    }
 }
 
 void RptManager::OnP2pClosed()

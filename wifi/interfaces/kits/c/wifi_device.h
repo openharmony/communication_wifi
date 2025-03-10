@@ -354,6 +354,14 @@ WifiErrorCode EnableSemiWifi(void);
  * @since 7
  */
 WifiErrorCode GetWifiDetailState(WifiDetailState *state);
+
+/**
+ * @Description Obtains the MLO Wi-Fi connection information
+ *
+ * @param multiLinkedInfo - Wifi MLO Linked Info
+ * @return ErrCode - operation result
+ */
+WifiErrorCode GetMultiLinkedInfo(WifiLinkedInfo *result, unsigned int *size);
 #ifdef __cplusplus
 }
 #endif

@@ -58,7 +58,7 @@ void DeviceMovementCallback::HandleMovementChange()
         WIFI_LOGE("%{public}s movementChangeEventHandler is null", __func__);
         return;
     }
-    movementChangeEventHandler->PostAsyncTask([this]() {
+    movementChangeEventHandler->PostAsyncTask([]() {
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
             IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
             if (pScanService == nullptr) {

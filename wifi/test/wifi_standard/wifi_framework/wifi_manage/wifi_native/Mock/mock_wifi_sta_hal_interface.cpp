@@ -353,5 +353,13 @@ WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &i
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
     WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
+
+WifiErrorNo WifiStaHalInterface::GetConnectionMloSignalInfo(const std::string &ifName,
+    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+{
+    return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
+        WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

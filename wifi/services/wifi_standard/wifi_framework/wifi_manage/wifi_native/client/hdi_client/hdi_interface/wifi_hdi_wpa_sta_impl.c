@@ -97,6 +97,14 @@ static int GetInstId(const char *ifaceName)
     return inst;
 }
 
+void ReleaseStaCallback(const char *ifName)
+{
+    int instId = GetInstId(ifName);
+    StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaStaCallbackObj[instId]);
+    free(g_hdiWpaStaCallbackObj[instId]);
+    g_hdiWpaStaCallbackObj[instId] = NULL;
+}
+
 static WifiErrorNo RegisterEventCallback(const char *ifaceName)
 {
     LOGI("RegisterEventCallback enter! ifaceName = %{public}s", ifaceName);
@@ -124,40 +132,6 @@ static WifiErrorNo RegisterEventCallback(const char *ifaceName)
 
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterEventCallback success.");
-    return WIFI_HAL_OPT_OK;
-}
-
-static WifiErrorNo UnRegisterEventCallback(const char *ifaceName)
-{
-    LOGI("UnRegisterEventCallback enter! ifaceName = %{public}s", ifaceName);
-    if (ifaceName == NULL) {
-        LOGE("UnRegisterEventCallback ifaceName is null");
-        return WIFI_HAL_OPT_FAILED;
-    }
-    pthread_mutex_lock(GetWpaObjMutex());
-    int instId = GetInstId(ifaceName);
-    LOGI("UnRegisterEventCallback enter! instId = %{public}d", instId);
-    if (g_hdiWpaStaCallbackObj[instId] != NULL) {
-        struct IWpaInterface *wpaObj = GetWpaInterface();
-        if (wpaObj == NULL) {
-            pthread_mutex_unlock(GetWpaObjMutex());
-            LOGE("UnRegisterEventCallback: wpaObj is NULL");
-            return WIFI_HAL_OPT_FAILED;
-        }
-
-        int32_t result = wpaObj->UnregisterWpaEventCallback(wpaObj, g_hdiWpaStaCallbackObj[instId], ifaceName);
-        if (result != HDF_SUCCESS) {
-            pthread_mutex_unlock(GetWpaObjMutex());
-            LOGE("UnRegisterEventCallback: UnregisterEventCallback failed result:%{public}d", result);
-            return WIFI_HAL_OPT_FAILED;
-        }
-        StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaStaCallbackObj[instId]);
-        free(g_hdiWpaStaCallbackObj[instId]);
-        g_hdiWpaStaCallbackObj[instId] = NULL;
-    }
-
-    pthread_mutex_unlock(GetWpaObjMutex());
-    LOGI("UnRegisterEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
 
@@ -194,7 +168,7 @@ static WifiErrorNo SetNetwork(int networkId, SetNetworkConfig conf, const char *
     int pos = -1;
     for (unsigned i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
         if (g_wpaSsidFields[i].field == conf.cfgParam) {
-            pos = i;
+            pos = (int)i;
             break;
         }
     }
@@ -281,10 +255,6 @@ static WifiErrorNo HdiWpaStaStopWifi(int instId)
             LOGE("HdiWpaStop: HdiRemoveWpaIface failed");
             return WIFI_HAL_OPT_FAILED;
         }
-        if (UnRegisterEventCallback(ifaceName) != WIFI_HAL_OPT_OK) {
-            LOGE("HdiWpaStop: UnRegisterEventCallback failed");
-            return WIFI_HAL_OPT_FAILED;
-        }
         ClearHdiStaIfaceName(instId);
         LOGI("HdiWpaStaStopWifi success, instId = %{public}d, ifaceName = %{public}s", instId, ifaceName);
     }
@@ -307,10 +277,6 @@ WifiErrorNo HdiWpaStaStop(int instId)
         }
         if (HdiRemoveWpaIface(ifaceName) != WIFI_HAL_OPT_OK) {
             LOGE("HdiWpaStaStop: HdiRemoveWpaStaIface failed!");
-            return WIFI_HAL_OPT_FAILED;
-        }
-        if (UnRegisterEventCallback(ifaceName) != WIFI_HAL_OPT_OK) {
-            LOGE("HdiWpaStaStop: UnRegisterEventCallback failed!");
             return WIFI_HAL_OPT_FAILED;
         }
         ClearHdiStaIfaceName(instId);
@@ -1198,7 +1164,7 @@ WifiErrorNo HdiWpaGetMloLinkedInfo(const char *ifName, const char *staParam, cha
     if (result != HDF_SUCCESS) {
         LOGE("%{public}s: failed to GetWpaStaData, result:%{public}d", __func__, result);
         pthread_mutex_unlock(GetWpaObjMutex());
-        return WIFI_HAL_OPT_FAILED;
+        return result;
     }
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("GetWpaStaData for mlo success.");

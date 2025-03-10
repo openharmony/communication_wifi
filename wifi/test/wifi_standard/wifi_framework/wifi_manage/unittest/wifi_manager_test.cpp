@@ -396,7 +396,7 @@ HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGI("GetLastStaStateByDatashareTest enter!");
     wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare();
-    EXPECT_EQ(wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare(), true);
+    EXPECT_EQ(wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare(), 0);
 }
 
 HWTEST_F(WifiManagerTest, RegisterCesEventTest, TestSize.Level1)
@@ -529,7 +529,7 @@ HWTEST_F(WifiManagerTest, CheckSoftApStartedTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, CheckEnhanceWifiConnectedTest, TestSize.Level1)
 {
     wifiManager.wifiMultiVapManager->CheckEnhanceWifiConnected();
-    EXPECT_EQ(wifiManager.wifiMultiVapManager->CheckEnhanceWifiConnected(), true);
+    EXPECT_FALSE(wifiManager.wifiMultiVapManager->CheckEnhanceWifiConnected());
 }
 
 HWTEST_F(WifiManagerTest, VapConflictReportTest, TestSize.Level1)
@@ -614,7 +614,7 @@ HWTEST_F(WifiManagerTest, IsInterfaceUpTest, TestSize.Level1)
     WIFI_LOGI("IsInterfaceUpTest enter!");
     std::string iface = "wlan0";
     wifiManager.wifiTogglerManager->IsInterfaceUp(iface);
-    EXPECT_EQ(wifiManager.wifiTogglerManager->IsInterfaceUp(iface), false);
+    EXPECT_FALSE(wifiManager.wifiTogglerManager->IsInterfaceUp(iface));
 }
 
 HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_WpaDeath, TestSize.Level1)

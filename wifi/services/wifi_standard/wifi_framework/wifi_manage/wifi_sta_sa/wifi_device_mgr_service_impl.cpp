@@ -150,6 +150,54 @@ int32_t WifiDeviceMgrServiceImpl::OnExtension(const std::string& extension, Mess
     }
     return 0;
 }
+
+int32_t WifiDeviceMgrServiceImpl::OnSvcCmd(int32_t fd, const std::vector<std::u16string>& args)
+{
+    int32_t instIdWlan0 = 0;
+    int32_t svcResult = -1;
+    std::string info = "svc wifi help:\n"
+                " svc wifi enable: enable wifi device\n"
+                " svc wifi disable: disable wifi device\n";
+
+    std::lock_guard<std::mutex> lock(g_initMutex);
+    sptr<WifiDeviceServiceImpl> impl = nullptr;
+    if (mWifiService.find(instIdWlan0) != mWifiService.end() && mWifiService[instIdWlan0] != nullptr) {
+        impl = iface_cast<WifiDeviceServiceImpl>(mWifiService[instIdWlan0]);
+    }
+    if (impl == nullptr) {
+        info = "wifi service in invalid state\n";
+        if (!SaveStringToFd(fd, info)) {
+            WIFI_LOGE("WiFi device save string to fd failed.");
+        }
+        return svcResult;
+    }
+
+    std::string cmd = args.size() > 0 ? Str16ToStr8(args[0]) : "";
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+    WIFI_LOGI("svc command is %{public}s.", cmd.c_str());
+    if (cmd == "help") {
+        svcResult = 0;
+    } else if (cmd == "enable") {
+        if (impl->EnableWifi() == WIFI_OPT_SUCCESS) {
+            info = "wifi enable success\n";
+            svcResult = 0;
+        } else {
+            info = "wifi enable fail\n";
+        }
+    } else if (cmd == "disable") {
+        if (impl->DisableWifi() == WIFI_OPT_SUCCESS) {
+            info = "wifi disable success\n";
+            svcResult = 0;
+        } else {
+            info = "wifi disable fail\n";
+        }
+    }
+
+    if (!SaveStringToFd(fd, info)) {
+        WIFI_LOGE("WiFi device save string to fd failed.");
+    }
+    return svcResult;
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

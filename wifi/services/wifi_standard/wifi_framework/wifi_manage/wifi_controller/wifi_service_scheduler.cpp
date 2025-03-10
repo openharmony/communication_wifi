@@ -584,7 +584,7 @@ ErrCode WifiServiceScheduler::StartWifiProService(int instId)
 {
     if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
         WIFI_LOGI("factory mode, not start wifipro service");
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_SUCCESS;
     }
     if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_WIFIPRO) < 0) {
         WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_WIFIPRO);

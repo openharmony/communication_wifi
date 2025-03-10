@@ -63,9 +63,9 @@ void StateMachine::SendMessage(int msgName, int param1, int param2, const std::a
         msgName, param1, param2);
 }
 
-void StateMachine::StartRoamToNetwork(std::string bssid)
+void StateMachine::StartConnectToBssid(std::string bssid)
 {
-    WIFI_LOGD("StateMachine::StartRoamToNetwork, bssid is %{private}s.", bssid.c_str());
+    WIFI_LOGD("StateMachine::StartConnectToBssid, bssid is %{private}s.", bssid.c_str());
 }
 
 void StateMachine::StopTimer(int timerName)

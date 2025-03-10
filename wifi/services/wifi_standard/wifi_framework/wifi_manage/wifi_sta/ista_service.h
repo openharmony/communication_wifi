@@ -79,7 +79,8 @@ public:
      * @param bssid - target bssid
      * @return ErrCode - operation result
      */
-    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) = 0;
+    virtual ErrCode StartConnectToBssid(const int32_t networkId, const std::string bssid,
+        int32_t type = NETWORK_SELECTED_BY_USER) = 0;
 
     /**
      * @Description connect to user select ssid and bssid network
@@ -442,6 +443,9 @@ public:
      * @param type - wifi netlink message type
      */
     virtual void ProcessVoWifiNetlinkReportEvent(const int type) = 0;
+
+    virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) = 0;
+
     /**
      * @Description fold status
      *

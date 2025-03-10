@@ -42,6 +42,7 @@ static const auto CMD_SET_AX_BLA_LIST = "SET_AX_BLACKLIST";
 static const auto CMD_SET_AX_CLOSE_HTC = "SET_AX_CLOSE_HTC";
 static const auto CMD_SET_BE_BLA_LIST = "SET_BE_BLACKLIST";
 static const auto CMD_SET_EMLSR_MODE = "SET_EMLSR_SWITCH";
+static const auto CMD_SET_MLSR_LINK_SWITCH = "SET_MLSR_LINK_SWITCH ";
 
 #define MSS_SOFTAP_MAX_IFNAMESIZE 5
 #define MSS_SOFTAP_CMDSIZE 30
@@ -70,6 +71,8 @@ int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, con
         ret = SetBeBlaList(ifName, param);
     } else if (commandId == CMD_EMLSR_MODE) {
         ret = SetEmlsrMode(ifName, param);
+    } else if (commandId == CMD_MLD_LINK_SWITCH) {
+        ret = StartMldLinkSwitch(ifName, param);
     } else {
         WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
     }
@@ -223,13 +226,24 @@ int WifiCmdClient::SetBeBlaList(const std::string &ifName, const std::string &pa
 int WifiCmdClient::SetEmlsrMode(const std::string &ifName, const std::string &param) const
 {
     WIFI_LOGD("%{public}s enter", __FUNCTION__);
-    if (param.size() > TINY_BUFF_SIZE ||
-        param.size() + strlen(CMD_SET_EMLSR_MODE) > TINY_BUFF_SIZE) {
+    if (param.size() + strlen(CMD_SET_EMLSR_MODE) > TINY_BUFF_SIZE) {
         WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
         return -1;
     }
     std::string cmdParm = CMD_SET_EMLSR_MODE;
     cmdParm.append(" ");
+    cmdParm.append(param);
+    return SendCommandToDriverByInterfaceName(ifName, cmdParm);
+}
+
+int WifiCmdClient::StartMldLinkSwitch(const std::string &ifName, const std::string &param) const
+{
+    WIFI_LOGD("%{public}s enter", __FUNCTION__);
+    if (param.size() + strlen(CMD_SET_MLSR_LINK_SWITCH) > TINY_BUFF_SIZE) {
+        WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
+        return -1;
+    }
+    std::string cmdParm = CMD_SET_MLSR_LINK_SWITCH;
     cmdParm.append(param);
     return SendCommandToDriverByInterfaceName(ifName, cmdParm);
 }

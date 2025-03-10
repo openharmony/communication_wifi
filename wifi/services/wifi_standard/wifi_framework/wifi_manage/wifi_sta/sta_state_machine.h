@@ -31,6 +31,8 @@
 #include "sta_define.h"
 #include "network_status_history_manager.h"
 #include "wifi_native_struct.h"
+#include "wifi_chr_utils.h"
+#include "audio_stream_manager.h"
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"
@@ -100,6 +102,10 @@ constexpr int MAC_ASSOC_RSP_TIMEOUT = 5203;
 constexpr int DHCP_RENEW_FAILED = 4;
 constexpr int DHCP_RENEW_TIMEOUT = 5;
 constexpr int DHCP_LEASE_EXPIRED = 6;
+/* FoldState Status*/
+constexpr int RSSI_OFFSET_MIN = 0;
+constexpr int RSSI_OFFSET_DEFAULT = 5;
+constexpr int RSSI_OFFSET_MAX = 10;
 
 constexpr unsigned int BIT_MLO_CONNECT = 0x80;
 
@@ -134,6 +140,12 @@ enum FoldStatus {
     HALF_FOLD,
 };
 
+enum AudioType:uint32_t {
+MUSIC_TYPE = 0,
+MOVIE_TYPE = 1,
+AUDIOBOOK_TYPE = 2,
+};
+
 inline const int DETECT_TYPE_DEFAULT = 0;
 inline const int DETECT_TYPE_PERIODIC = 1;
 inline const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
@@ -155,6 +167,7 @@ public:
     ~StaStateMachine();
     using staSmHandleFunc = std::function<void(InternalMessagePtr)>;
     using StaSmHandleFuncMap = std::map<int, staSmHandleFunc>;
+    int foldStatus_ = 0;
     /**
      * @Description  Definition of member function of State base class in StaStateMachine.
      *
@@ -178,7 +191,6 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
-
     private:
         void StartWifiProcess();
         void StopWifiProcess();
@@ -186,7 +198,9 @@ public:
         void UpdateCountryCode(InternalMessagePtr msg);
         bool AllowAutoConnect();
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
+        void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
+        void DealScreenStateChangedEvent(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
 
@@ -264,6 +278,7 @@ public:
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
         void HandleLinkSwitchEvent(InternalMessagePtr msg);
         void DealStartRoamCmdInApLinkedState(InternalMessagePtr msg);
+        void DealCsaChannelChanged(InternalMessagePtr msg);
 
     private:
         StaStateMachine *pStaStateMachine;
@@ -298,8 +313,11 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void UpdateExpandOffset();
-        int foldStatus_ = 0;
         int halfFoldUpdateRssi_ = 0;
+        int halfFoldRssi_ = 0;
+        int expandRssi_ = 0;
+        int rssiOffset_ = RSSI_OFFSET_DEFAULT;
+        bool isExpandUpdateRssi_ = true;
     private:
 #ifndef OHOS_ARCH_LITE
         void CheckIfRestoreWifi();
@@ -307,13 +325,8 @@ public:
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
-        void UpdateWifi7WurInfo();
         void FoldStatusNotify(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
-        int halfFoldRssi_ = 0;
-        int expandRssi_ = 0;
-        int rssiOffset_ = 6;
-        bool isExpandUpdateRssi_ = true;
     };
     /**
      * @Description  Definition of member function of ApRoamingState class in StaStateMachine.
@@ -394,7 +407,17 @@ public:
         DhcpResult DhcpIpv6Result;
         DhcpResult DhcpOfferInfo;
     };
-
+#ifdef FEATURE_AUDIO_AWARE
+    class WiFiAudioRendererStateListener : public AudioStandard::AudioRendererStateChangeCallback {
+    public:
+        explicit WiFiAudioRendererStateListener(StaStateMachine *staStateMachine);
+        ~WiFiAudioRendererStateListener() {};
+        void OnRendererStateChange(const std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>>
+            &audioRendererChangeInfos) override;
+    private:
+        StaStateMachine *pStaStateMachine;
+    };
+#endif
 public:
     /**
      * @Description  Initialize StaStateMachine
@@ -407,7 +430,7 @@ public:
      *
      * @param bssid - the mac address of network(in)
      */
-    void StartRoamToNetwork(std::string bssid);
+    void StartConnectToBssid(std::string bssid);
     /**
      * @Description Register sta callback function
      *
@@ -443,13 +466,12 @@ public:
      *
      */
     void HandlePortalNetworkPorcess();
-    
+
     void SetPortalBrowserFlag(bool flag);
     void DealApRoamingStateTimeout(InternalMessagePtr msg);
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
-    void DealCsaChannelChanged(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);
@@ -528,7 +550,7 @@ private:
      --=* @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConvertDeviceCfg(const WifiDeviceConfig &config, std::string bssid) const;
+    ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const;
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -561,7 +583,7 @@ private:
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
 
     void SetAllowAutoConnectStatus(int32_t networkId, bool status);
- 
+
     /**
      * @Description  Disconnect network
      *
@@ -621,6 +643,8 @@ private:
      * @Description : Deal SignalPoll Result.
      */
     void DealSignalPollResult();
+
+    void DealMloLinkSignalPollResult();
 
     /**
      * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
@@ -757,7 +781,7 @@ private:
      * @param networkId - networkId
      */
     void OnWifiWpa3SelfCure(int failreason, int networkId);
-	
+
     /**
      * @Description : Deal screen state change event.
      *
@@ -958,6 +982,7 @@ private:
     void UpdateLinkedBssid(std::string &bssid);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
+    void ResetWifi7WurInfo();
     void UpdateWifiCategory();
     void SetSupportedWifiCategory();
 #endif
@@ -970,10 +995,16 @@ private:
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
+    std::string GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfig &config, const std::string &bssid) const;
     void TryModifyPortalAttribute(SystemNetWorkState netState);
     void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
     void UpdateHiLinkAttribute();
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
+    void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
+#ifdef FEATURE_AUDIO_AWARE
+    void RegisterAudioRenderStateChangeListener();
+    void UnRegisterAudioRenderStateChangeListener();
+#endif
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
@@ -997,7 +1028,7 @@ private:
     bool isRoam;
     bool isCurrentRoaming_ = false;
     int64_t lastTimestamp;
-    bool portalFlag;
+    bool autoPullBrowserFlag;
     PortalState portalState;
     int detectNum;
     int portalExpiredDetectCount;
@@ -1023,6 +1054,11 @@ private:
     int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
     std::string curForegroundAppBundleName_ = "";
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
+    OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
+#ifdef FEATURE_AUDIO_AWARE
+    bool isAudioRunning_ = false;
+    std::shared_ptr<AudioStandard::AudioRendererStateChangeCallback> rendererStateCallback_ = nullptr;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -20,6 +20,11 @@
 #include "wifi_hdi_wpa_proxy.h"
 #include "i_wifi_struct.h"
 
+enum P2pRemoveGroupEvent {
+    P2P_REMOVE_GROUP_CLIENT = 0,
+    EVENT_MAX
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -98,6 +103,8 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin, int size);
 
 WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info);
 
+WifiErrorNo HdiP2pRemoveGroupClient(const char *deviceMac, const char *ifName);
+
 WifiErrorNo HdiP2pSetServDiscExternal(int mode);
 
 WifiErrorNo HdiP2pRemoveGroup(const char *groupName);
@@ -117,6 +124,8 @@ WifiErrorNo HdiP2pListNetworks(struct HdiP2pNetworkList *infoList);
 WifiErrorNo HdiP2pSaveConfig();
 
 WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *carryData);
+
+void ReleaseP2pCallback(void);
 
 #ifdef __cplusplus
 }

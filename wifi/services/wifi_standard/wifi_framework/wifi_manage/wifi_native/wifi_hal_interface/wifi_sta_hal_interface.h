@@ -422,6 +422,15 @@ public:
      */
     WifiErrorNo GetConnectionMloLinkedInfo(const std::string &ifName, std::vector<WifiLinkedInfo> &mloLinkInfo);
 
+    /**
+     * @Description get wifi7 mlo signal poll info
+     *
+     * @param ifName - interface name
+     * @param mloLinkInfo - MLO signal poll info
+     * @return WifiErrorNo
+     */
+    WifiErrorNo GetConnectionMloSignalInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
+
 private:
 #ifdef READ_MAC_FROM_OEM
     std::string GetWifiOeminfoMac();

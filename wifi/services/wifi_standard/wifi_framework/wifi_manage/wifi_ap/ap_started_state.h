@@ -93,13 +93,13 @@ public:
      * @return None
      */
     void StartMonitor() const;
- 
+
     bool SetConfig();
- 
+
     void SetRandomMac() const;
- 
+
     bool SetCountry();
- 
+
 private:
     /**
      * @Description  Called inside the state，processing function
@@ -158,14 +158,6 @@ private:
      * @return None
      */
     void ProcessCmdStationLeave(InternalMessagePtr msg);
-
-    /**
-     * @Description  Process the hotspot configuration message of the APP
-                     received by the state machine.
-     * @param msg - Message body sent by the state machine
-     * @return None
-     */
-    void ProcessCmdSetHotspotConfig(InternalMessagePtr msg);
 
     /**
      * @Description  Process the hotspot idle timeout message of the APP
@@ -235,14 +227,6 @@ private:
      * @return None
      */
     void Init();
-
-    /**
-     * @Description update MAC address.
-     * @param ssid - Network name
-     * @param securityType - Security type
-     * @return true: Set successfully    false: Set failed
-     */
-    bool UpdatMacAddress(const std::string ssid, KeyMgmt securityType);
 
     void ProcessCmdHotspotChannelChanged(InternalMessagePtr msg);
     void ProcessCmdAssociatedStaChanged(InternalMessagePtr msg);

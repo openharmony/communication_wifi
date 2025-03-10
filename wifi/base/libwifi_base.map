@@ -1,0 +1,18 @@
+1.0 {
+    global:
+   extern "C++" {
+    OHOS::Wifi::WifiOpensslUtils*;
+    OHOS::Wifi::StateMachine::*;
+    OHOS::Wifi::State:*;
+    OHOS::Wifi::InternalMessage::*;
+    OHOS::Wifi::AppParser::*;
+    OHOS::Wifi::WifiDataShareHelperUtils::*;
+    OHOS::Wifi::WifiNotificationUtil::*;
+    OHOS::Wifi::WifiWatchDogUtils::*;
+    OHOS::Wifi::MessageManage::*;
+    OHOS::Wifi::XmlParser::*;
+    OHOS::Wifi::BatteryUtils::*;
+    };
+    local:
+        *;
+};

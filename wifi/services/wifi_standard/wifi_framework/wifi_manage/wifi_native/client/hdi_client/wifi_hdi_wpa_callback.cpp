@@ -643,7 +643,7 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
-        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s len=%{public}lu",
+        LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s len=%{public}zu",
             cbInfo.groupName.c_str(), OHOS::Wifi::SsidAnonymize(cbInfo.ssid).c_str(), cbInfo.ssid.size());
 
         char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};

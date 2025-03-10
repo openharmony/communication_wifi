@@ -149,7 +149,6 @@ public:
         void HandleWifi7WithoutMldBackoff(InternalMessagePtr msg);
         void HandleWifi7MldBackoff(InternalMessagePtr msg);
         void HandleNetworkConnectFailCount(InternalMessagePtr msg);
-        void HandleWifiBlackListUpdateMsg();
         SelfCureStateMachine *pSelfCureStateMachine_;
         bool isSetStaticIpConfig_ = false;
     };
@@ -393,6 +392,7 @@ private:
     void SetSelfCureWifiTimeOut(SelfCureState wifiSelfCureState);
     void ResetSelfCureParam();
     void NotifySelfCureCompleted(int status);
+    void HandleWifiBlackListUpdateMsg();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;

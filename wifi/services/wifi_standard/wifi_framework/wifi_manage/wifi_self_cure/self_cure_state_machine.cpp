@@ -610,6 +610,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::GoInState()
     pSelfCureStateMachine_->isInternetFailureDetected_ = false;
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_IDLE, false);
     pSelfCureStateMachine_->ClearDhcpOffer();
+    pSelfCureStateMachine_->HandleWifiBlackListUpdateMsg();
 }
 
 void SelfCureStateMachine::DisconnectedMonitorState::GoOutState()
@@ -645,9 +646,6 @@ bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMes
         case WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER:
             ret = EXECUTED;
             HandleWifi7BlacklistRecover(msg);
-            break;
-        case WIFI_CURE_CMD_WIFI_BLACK_LIST_UPDATE:
-            HandleWifiBlackListUpdateMsg();
             break;
         default:
             WIFI_LOGD("DisconnectedMonitorState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
@@ -740,16 +738,6 @@ void SelfCureStateMachine::DisconnectedMonitorState::HandleNetworkConnectFailCou
     WifiCategoryConnectFailInfo wifi7ConnectFailInfo(actionType, 1, pSelfCureStateMachine_->GetNowMilliSeconds());
     WifiConfigCenter::GetInstance().UpdateWifiConnectFailListCache(EVENT_BE_BLA_LIST, info.bssid, wifi7ConnectFailInfo);
     pSelfCureStateMachine_->ShouldTransToWifi7SelfCure(info);
-}
-
-void SelfCureStateMachine::DisconnectedMonitorState::HandleWifiBlackListUpdateMsg()
-{
-    if (pSelfCureStateMachine_->AgeOutWifiCategoryBlack(EVENT_BE_BLA_LIST)) {
-        pSelfCureStateMachine_->SendBlaListToDriver(EVENT_BE_BLA_LIST);
-    }
-    if (pSelfCureStateMachine_->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST)) {
-        pSelfCureStateMachine_->SendBlaListToDriver(EVENT_AX_BLA_LIST);
-    }
 }
 
 /* --------------------------- state machine connection self cure state ------------------------------ */
@@ -2959,6 +2947,16 @@ void SelfCureStateMachine::ResetSelfCureParam()
     StopTimer(WIFI_CURE_RESET_ON_TIMEOUT);
     StopTimer(WIFI_CURE_REASSOC_TIMEOUT);
     StopTimer(WIFI_CURE_CONNECT_TIMEOUT);
+}
+
+void SelfCureStateMachine::HandleWifiBlackListUpdateMsg()
+{
+    if (AgeOutWifiCategoryBlack(EVENT_BE_BLA_LIST)) {
+        SendBlaListToDriver(EVENT_BE_BLA_LIST);
+    }
+    if (AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST)) {
+        SendBlaListToDriver(EVENT_AX_BLA_LIST);
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

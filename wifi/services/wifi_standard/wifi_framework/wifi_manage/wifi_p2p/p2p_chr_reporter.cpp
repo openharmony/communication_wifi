@@ -23,10 +23,9 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 
-DEFINE_WIFILOG_P2P_LABEL("P2pChrReporter");
-
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_P2P_LABEL("P2pChrReporter");
 
 void P2pChrReporter::ProcessChrEvent(const std::string &notifyParam)
 {
@@ -146,7 +145,8 @@ void P2pChrReporter::ResetState()
 
 void P2pChrReporter::ReportP2pConnectFailed(int state, int errCode, int minorCode)
 {
-    int standErrCode = GenerateStandardErrCode(P2P_SUB_SYSTEM_ID, GetP2pSpecificError(state, errCode));
+    int standErrCode = static_cast<int>(GenerateStandardErrCode(P2P_SUB_SYSTEM_ID,
+        GetP2pSpecificError(state, errCode)));
     WIFI_LOGI("P2pConnectFailed state:%{public}d, err:%{public}d, minorErr:%{public}d, "
         "DeviceRole:%{public}d, standErrCode:%{public}d", state, errCode, minorCode, role_, standErrCode);
     WriteP2pConnectFailedHiSysEvent(standErrCode, minorCode);
@@ -155,7 +155,8 @@ void P2pChrReporter::ReportP2pConnectFailed(int state, int errCode, int minorCod
 
 void P2pChrReporter::ReportP2pAbnormalDisconnect(int state, int errCode, int minorCode)
 {
-    int standErrCode = GenerateStandardErrCode(P2P_SUB_SYSTEM_ID, GetP2pSpecificError(state, errCode));
+    int standErrCode = static_cast<int>(GenerateStandardErrCode(P2P_SUB_SYSTEM_ID,
+        GetP2pSpecificError(state, errCode)));
     WIFI_LOGI("P2pAbnormalDisconnect state:%{public}d, err:%{public}d, minorErr:%{public}d, "
         "DeviceRole:%{public}d, standErrCode:%{public}d", state, errCode, minorCode, role_, standErrCode);
     WriteP2pAbDisConnectHiSysEvent(standErrCode, minorCode);
@@ -164,9 +165,9 @@ void P2pChrReporter::ReportP2pAbnormalDisconnect(int state, int errCode, int min
 
 uint16_t P2pChrReporter::GetP2pSpecificError(int state, int errCode)
 {
-    uint8_t standardState = static_cast<uint8_t>(state & 0x1F);
+    uint8_t standardState = static_cast<uint8_t>(state) & 0x1F;
     uint8_t standardRole = static_cast<uint8_t>(role_);
-    uint16_t standardErrCode = static_cast<uint16_t>(errCode & 0x1FF);
+    uint16_t standardErrCode = static_cast<uint16_t>(errCode) & 0x1FF;
     return (standardState << STATE_OFFSET) | (standardRole << DEVICE_ROLE_OFFSET) | standardErrCode;
 }
 

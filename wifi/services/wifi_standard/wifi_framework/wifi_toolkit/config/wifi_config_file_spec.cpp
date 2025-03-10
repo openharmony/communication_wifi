@@ -40,6 +40,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isEphemeral = false;
     item.preSharedKey.clear();
     item.keyMgmt.clear();
+    item.keyMgmtBitset = 0;
     std::string().swap(item.preSharedKey);
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         item.wepKeys[i].clear();
@@ -244,6 +245,8 @@ static int SetWifiDeviceConfigFirst(WifiDeviceConfig &item, const std::string &k
         item.preSharedKey = value;
     } else if (key == "keyMgmt") {
         item.keyMgmt = value;
+    } else if (key == "keyMgmtBitset") {
+        item.keyMgmtBitset = static_cast<uint32_t>(CheckDataLegal(tmpValue));
     } else if (key == "wepTxKeyIndex") {
         item.wepTxKeyIndex = CheckDataLegal(tmpValue);
     } else if (key == "priority") {
@@ -580,6 +583,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"priority=" << item.priority << std::endl;
     ss << "    " <<"hiddenSSID=" << (int)item.hiddenSSID << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
+    ss << "    " <<"keyMgmtBitset=" << item.keyMgmtBitset << std::endl;
     ss << "    " <<"lastConnectTime=" << item.lastConnectTime << std::endl;
     ss << "    " <<"numRebootsSinceLastUse=" << item.numRebootsSinceLastUse << std::endl;
     ss << "    " <<"numAssociation=" << item.numAssociation << std::endl;
@@ -766,6 +770,7 @@ void ClearTClass<HotspotConfig>(HotspotConfig &item)
     item.SetMaxConn(0);
     item.SetIpAddress("");
     item.SetLeaseTime((int)DHCP_LEASE_TIME);
+    item.SetRandomMac("");
     return;
 }
 
@@ -834,9 +839,10 @@ int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key
         item.SetIpAddress(value);
     } else if (key == "leaseTime") {
         item.SetLeaseTime(CheckDataLegal(tmpValue));
+    } else if (key == "randomMac") {
+        item.SetRandomMac(value);
     } else {
         LOGE("Invalid config key value");
-        errorKeyValue++;
     }
     return errorKeyValue;
 }
@@ -875,6 +881,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
     ss << "    " <<"maxConn=" << item.GetMaxConn() << std::endl;
     ss << "    " <<"ipAddress=" << item.GetIpAddress() << std::endl;
     ss << "    " <<"leaseTime=" << static_cast<int>(item.GetLeaseTime()) << std::endl;
+    ss << "    " <<"randomMac=" << item.GetRandomMac() << std::endl;
     ss << "    " <<"</HotspotConfig>" << std::endl;
     return ss.str();
 }
@@ -1736,6 +1743,7 @@ static void ClearWifiBackupConfig(WifiBackupConfig &item)
     item.priority = 0;
     item.hiddenSSID = false;
     item.keyMgmt.clear();
+    item.keyMgmtBitset = 0;
     item.networkStatusHistory = 0;
     item.isPortal = false;
     item.lastHasInternetTime = -1;
@@ -1783,6 +1791,8 @@ static int SetWifiBackupConfigFirst(WifiBackupConfig &item, const std::string &k
         item.hiddenSSID = CheckDataLegal(tmpValue);
     } else if (key == "keyMgmt") {
         item.keyMgmt = value;
+    } else if (key == "keyMgmtBitset") {
+        item.keyMgmtBitset = static_cast<uint32_t>(CheckDataLegal(tmpValue));
     } else {
         return -1;
     }
@@ -1843,6 +1853,7 @@ static std::string OutPutWifiBackupConfig(WifiBackupConfig &item)
     ss << "    " <<"priority=" << item.priority << std::endl;
     ss << "    " <<"hiddenSSID=" << (int)item.hiddenSSID << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
+    ss << "    " <<"keyMgmtBitset=" << item.keyMgmtBitset << std::endl;
     ss << "    " <<"networkStatusHistory=" << item.networkStatusHistory << std::endl;
     ss << "    " <<"isPortal=" << item.isPortal << std::endl;
     ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;

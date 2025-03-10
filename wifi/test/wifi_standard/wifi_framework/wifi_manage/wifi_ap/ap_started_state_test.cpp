@@ -301,7 +301,7 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 
     EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+    EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
 
     msg->ClearMessageBody();
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG));
@@ -311,7 +311,7 @@ HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
     msg->AddIntMessageBody(static_cast<int>(apcfg.GetBand()));
     msg->AddIntMessageBody(apcfg.GetChannel());
     msg->AddIntMessageBody(apcfg.GetMaxConn());
-    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+    EXPECT_FALSE(pApStartedState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS2, TestSize.Level1)
@@ -534,18 +534,6 @@ HWTEST_F(ApStartedState_test, ProcessCmdUpdateCountryCodeTest, TestSize.Level1)
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE));
     msg->AddStringMessageBody(countryCode);
     pApStartedState->ProcessCmdUpdateCountryCode(msg);
-}
-
-HWTEST_F(ApStartedState_test, UpdatMacAddressTest, TestSize.Level1)
-{
-    std::string ssid = "1234";
-    KeyMgmt securityType = KeyMgmt::WPA2_PSK;
-    HotspotConfig curApConfig;
-    curApConfig.SetSsid("1234");
-    curApConfig.SetSecurityType(KeyMgmt::WPA2_PSK);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetHotspotConfig(_, 0))
-        .WillOnce(DoAll(SetArgReferee<0>(curApConfig), Return(0)));
-    pApStartedState->UpdatMacAddress(ssid, securityType);
 }
 
 HWTEST_F(ApStartedState_test, ProcessCmdSetHotspotIdleTimeout, TestSize.Level1)

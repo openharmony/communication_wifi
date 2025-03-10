@@ -162,6 +162,15 @@ public:
      * @return int
      */
     static int VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid);
+
+    /**
+     * @Description : Verify Wifi Connection Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifyEnterpriseWifiConnectionPermission(const int &pid, const int &uid);
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -23,6 +23,17 @@ config("module_private_config") {
 
 ohos_unittest("wifi_sub_manage_unittest") {
   module_out_path = module_output_path
+
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = false  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
   sources = [
     "$WIFI_ROOT_DIR/base/utils/wifi_datashare_utils.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",
@@ -143,6 +154,7 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "ability_runtime:extension_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
+    "audio_framework:audio_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",

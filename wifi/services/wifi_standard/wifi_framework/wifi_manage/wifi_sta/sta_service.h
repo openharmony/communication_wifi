@@ -22,9 +22,9 @@
 #include "sta_monitor.h"
 #include "sta_state_machine.h"
 #include "network_selection.h"
+#include "wifi_chr_utils.h"
 #ifndef OHOS_ARCH_LITE
 #include "i_wifi_country_code_change_listener.h"
-#include "sta_app_acceleration.h"
 #endif
 
 namespace OHOS {
@@ -86,9 +86,11 @@ public:
      *
      * @param networkId - target networkId
      * @param bssid - target bssid
+     * @param type - select network type: SelectedType
      * @return ErrCode - operation result
      */
-    virtual ErrCode StartRoamToNetwork(const int networkId, const std::string bssid) const;
+    virtual ErrCode StartConnectToBssid(const int32_t networkId, const std::string bssid,
+        int32_t type = NETWORK_SELECTED_BY_USER) const;
 
     /**
      * @Description connect to user select ssid and bssid network
@@ -401,6 +403,8 @@ public:
      */
     virtual void HandleFoldStatusChanged(int foldstatus);
 
+    virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
+
     /* VOWIFI */
     virtual std::string VoWifiDetect(std::string cmd);
  
@@ -456,9 +460,7 @@ private:
     StaStateMachine *pStaStateMachine;
     StaMonitor *pStaMonitor;
     StaAutoConnectService *pStaAutoConnectService;
-#ifndef OHOS_ARCH_LITE
-    StaAppAcceleration *pStaAppAcceleration;
-#endif
+
     int m_instId;
     std::vector<PackageInfo> sta_candidate_trust_list;
     bool m_connMangerStatus = true;

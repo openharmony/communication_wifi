@@ -90,7 +90,7 @@ HWTEST_F(ApService_test, EnableHotspot_SUCCESS, TestSize.Level1)
 {
     EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, pApService->EnableHotspot());
+    EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->EnableHotspot());
 }
 /* DisableHotspot */
 HWTEST_F(ApService_test, DisableHotspotSUCCESS, TestSize.Level1)

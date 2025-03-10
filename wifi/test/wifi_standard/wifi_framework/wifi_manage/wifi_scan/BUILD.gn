@@ -18,7 +18,6 @@ module_output_path = "wifi/scan_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
   ]
 }
@@ -75,7 +74,6 @@ ohos_unittest("wifi_scan_unittest") {
   ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/base/shared_util",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
@@ -107,7 +105,6 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/hardware/libhardware/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/frameworks/native/include",
@@ -117,8 +114,6 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/depends/include/system/core/libnetutils/include/netutils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
-    "//third_party/googletest/googlemock/include",
-    "//third_party/googletest/googletest/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/utils/inc",
   ]
@@ -155,6 +150,7 @@ ohos_unittest("wifi_scan_unittest") {
     "ability_runtime:extension_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
+    "audio_framework:audio_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",

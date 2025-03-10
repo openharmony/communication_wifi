@@ -75,7 +75,6 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
 #ifdef OHOS_ARCH_LITE
     return (client_ != nullptr);
 #else
-    WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
     if (IsRemoteDied() == false) {
         return true;
     }
@@ -89,7 +88,12 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
     sptr<IRemoteObject> object = sa_mgr->GetSystemAbility(systemAbilityId_);
     if (object == nullptr) {
         WIFI_LOGE("failed to get DEVICE_SERVICE");
-        return false;
+        WifiSaLoadManager::GetInstance().LoadWifiSa(systemAbilityId_);
+        object = sa_mgr->GetSystemAbility(systemAbilityId_);
+        if (object == nullptr) {
+            WIFI_LOGE("failed to get DEVICE_SERVICE again!");
+            return false;
+        }
     }
 
     sptr<IWifiDeviceMgr> deviceMgr = iface_cast<IWifiDeviceMgr>(object);
@@ -332,6 +336,13 @@ ErrCode WifiDeviceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetLinkedInfo(info);
+}
+
+ErrCode WifiDeviceImpl::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetSignalPollInfoArray(wifiSignalPollInfos, length);
 }
 
 ErrCode WifiDeviceImpl::GetDisconnectedReason(DisconnectedReason &reason)
@@ -677,6 +688,13 @@ ErrCode WifiDeviceImpl::GetVoWifiDetectPeriod(int &period)
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetVoWifiDetectPeriod(period);
+}
+
+ErrCode WifiDeviceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetMultiLinkedInfo(multiLinkedInfo);
 }
 
 }  // namespace Wifi

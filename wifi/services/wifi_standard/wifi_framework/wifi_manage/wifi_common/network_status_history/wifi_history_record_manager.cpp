@@ -16,7 +16,6 @@
 #include "wifi_history_record_manager.h"
 #include <ctime>
 #include <mutex>
-#include <regex>
 #include "wifi_logger.h"
 #include "wifi_timer.h"
 #include "wifi_settings.h"
@@ -334,15 +333,17 @@ bool WifiHistoryRecordManager::IsAbnormalTimeRecords()
 void WifiHistoryRecordManager::UpdateStaticTimePoint(const int64_t &currentTimeInt)
 {
     std::time_t currentTime;
-    if (std::numeric_limits<std::time_t>::is_signed &&
-        currentTimeInt > static_cast<uint64_t>(std::numeric_limits<std::time_t>::max())) {
-        auto now = std::chrono::system_clock::now();
-        auto nowMs = std::chrono::time_point_cast<std::chrono::seconds>(now);
-        currentTime = nowMs.time_since_epoch().count();
+    if (currentTimeInt < INVALID_TIME_POINT ||
+        currentTimeInt > static_cast<int64_t>(std::numeric_limits<std::time_t>::max())) {
+        currentTime = GetCurrentTimeSeconds();
     } else {
         currentTime = static_cast<std::time_t>(currentTimeInt);
     }
     std::tm* localTime = std::localtime(&currentTime);
+    if (localTime == nullptr) {
+        WIFI_LOGE("%{public}s, localTime is nullptr", __func__);
+        return;
+    }
     connectedApInfo_.currenttStaticTimePoint_ = currentTime;
     connectedApInfo_.currentRecordDayInWeek_ = localTime->tm_wday;
     connectedApInfo_.currentRecordHour_ = localTime->tm_hour;
@@ -448,8 +449,7 @@ int WifiHistoryRecordManager::QueryApInfoRecordByBssid(const std::string &bssid,
     std::vector<std::string> queryAllColumn;
     auto resultSet = wifiDataBaseUtils_->Query(predicates, queryAllColumn);
     if (resultSet == nullptr) {
-        resultSet->Close();
-        WIFI_LOGI("%{public}s, query fail", __func__);
+        WIFI_LOGE("%{public}s, query fail", __func__);
         return QUERY_FAILED;
     }
     int32_t resultSetNum = resultSet->GoToFirstRow();
@@ -486,8 +486,7 @@ int WifiHistoryRecordManager::QueryAllApInfoRecord(std::vector<ConnectedApInfo> 
     std::vector<std::string> queryAllColumn;
     auto resultSet = wifiDataBaseUtils_->Query(predicates, queryAllColumn);
     if (resultSet == nullptr) {
-        resultSet->Close();
-        WIFI_LOGI("%{public}s, all query fail", __func__);
+        WIFI_LOGE("%{public}s, all query fail", __func__);
         return QUERY_FAILED;
     }
     int32_t resultSetNum = resultSet->GoToFirstRow();
@@ -553,9 +552,8 @@ bool WifiHistoryRecordManager::IsHomeRouter(const std::string &portalUrl)
 
     // Obtain the portal redirection address from the XML file
     std::vector<PackageInfo> homeRouterList = packageInfoMap["HOME_ROUTER_REDIRECTED_URL"];
-    std::regex reg(portalUrl);
     for (const PackageInfo &info : homeRouterList) {
-        if (std::regex_search(info.name, reg)) {
+        if (portalUrl.find(info.name) != std::string_view::npos) {
             WIFI_LOGI("home router");
             return true;
         }

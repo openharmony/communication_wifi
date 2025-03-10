@@ -113,6 +113,7 @@ if (defined(ohos_lite)) {
       "utils/package_parser.cpp",
       "utils/softap_parser.cpp",
       "utils/wifi_cert_utils.cpp",
+      "utils/wifi_chr_utils.cpp",
     ]
 
     include_dirs = local_base_include_dirs

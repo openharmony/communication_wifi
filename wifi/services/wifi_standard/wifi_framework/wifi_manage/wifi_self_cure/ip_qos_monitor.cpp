@@ -78,7 +78,6 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     WIFI_LOGI("%{public}s: mInternetFailedCounter = %{public}d", __FUNCTION__, mInternetFailedCounter);
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    int32_t currentRssi = linkedInfo.rssi;
     int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, mInstId);
     if ((mInternetFailedCounter >= 1) && (linkedInfo.connState == ConnState::CONNECTED)) {
         ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
@@ -94,10 +93,6 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
             mNetWorkDetect->StartWifiDetection();
             mHttpDetectedAllowed = false;
             return;
-        }
-        if (AllowSelfCureNetwork(currentRssi)) {
-            pSelfCureService->NotifyInternetFailureDetected(0);
-            mInternetSelfCureAllowed = false;
         }
     }
 }

@@ -27,6 +27,7 @@ namespace Wifi {
 constexpr int WIFI_STR_MAC_LENGTH = 17;
 constexpr int MAX_PASSPHRASE_LENGTH = 127;
 constexpr int DEVICE_NAME_LENGTH = 32;
+constexpr int CREATE_GROUP_TIMEOUT = 5000;
 
 enum class P2pGroupStatus { GS_CREATING, GS_CREATED, GS_STARTED, GS_REMOVING, GS_INVALID };
 enum class P2pServiceStatus : unsigned char {

@@ -93,8 +93,6 @@ void ApStartedState::Init()
         [this](InternalMessagePtr msg) { this->ProcessCmdStationJoin(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_STATION_LEAVE,
         [this](InternalMessagePtr msg) { this->ProcessCmdStationLeave(msg); }));
-    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_SET_HOTSPOT_CONFIG,
-        [this](InternalMessagePtr msg) { this->ProcessCmdSetHotspotConfig(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_UPDATE_HOTSPOTCONFIG_RESULT,
         [this](InternalMessagePtr msg) { this->ProcessCmdUpdateConfigResult(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_ADD_BLOCK_LIST,
@@ -134,31 +132,6 @@ bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
     (iter->second)(msg);
 
     return EXECUTED;
-}
-
-bool ApStartedState::UpdatMacAddress(const std::string ssid, KeyMgmt securityType)
-{
-    HotspotConfig curApConfig;
-    WifiSettings::GetInstance().GetHotspotConfig(curApConfig, m_id);
-
-    LOGD("%{public}s: [ssid:%{private}s, securityType:%{public}d] ==> [ssid:%{private}s, securityType:%{public}d]",
-        __func__, curApConfig.GetSsid().c_str(), curApConfig.GetSecurityType(),
-        ssid.c_str(), securityType);
-    if ((curApConfig.GetSsid() != ssid) ||
-        (curApConfig.GetSecurityType() != securityType)) {
-        std::string macAddress;
-        WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
-        if (MacAddress::IsValidMac(macAddress.c_str())) {
-            if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
-                WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {
-                LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
-                return false;
-            }
-        } else {
-            LOGW("%{public}s: macAddress is invalid", __func__);
-        }
-    }
-    return true;
 }
 
 bool ApStartedState::SetConfig(HotspotConfig &apConfig)
@@ -295,30 +268,6 @@ void ApStartedState::ProcessCmdStationLeave(InternalMessagePtr msg)
     }
 }
 
-void ApStartedState::ProcessCmdSetHotspotConfig(InternalMessagePtr msg)
-{
-    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
-    std::string ssid = msg->GetStringFromMessage();
-    KeyMgmt securityType = static_cast<KeyMgmt>(msg->GetIntFromMessage());
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-    UpdatMacAddress(ssid, securityType);
-#endif
-    m_hotspotConfig.SetSsid(ssid);
-    m_hotspotConfig.SetPreSharedKey(msg->GetStringFromMessage());
-    m_hotspotConfig.SetSecurityType(securityType);
-    m_hotspotConfig.SetBand(static_cast<BandType>(msg->GetIntFromMessage()));
-    m_hotspotConfig.SetChannel(msg->GetIntFromMessage());
-    m_hotspotConfig.SetBandWidth(msg->GetIntFromMessage());
-    m_hotspotConfig.SetMaxConn(msg->GetIntFromMessage());
-    m_hotspotConfig.SetIpAddress(msg->GetStringFromMessage());
-    m_hotspotConfig.SetLeaseTime(msg->GetIntFromMessage());
-    if (SetConfig(m_hotspotConfig)) {
-        WIFI_LOGI("SetSoftApConfig success.");
-    } else {
-        WIFI_LOGE("SetSoftApConfig failed.");
-    }
-}
-
 void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
@@ -429,36 +378,32 @@ void ApStartedState::ProcessCmdSetHotspotIdleTimeout(InternalMessagePtr msg)
 
 void ApStartedState::SetRandomMac() const
 {
-    HotspotMacConfig macConfig;
-    WifiConfigCenter::GetInstance().GetHotspotMacConfig(macConfig, m_id);
-    std::string macAddress;
+    HotspotConfig curConfig;
+    if (WifiSettings::GetInstance().GetHotspotConfig(curConfig, m_id) != 0) {
+        WIFI_LOGE("Get hotspot config error");
+        return;
+    }
 
-    bool isDataClone = macConfig.GetCallingBundleName() ==
-        WifiSettings::GetInstance().GetPackageName("DATA_CLONE").c_str();
-    if (isDataClone && !macConfig.GetRandomMac().empty()) {
-        macAddress = macConfig.GetRandomMac();
-    } else {
+    std::string macAddress = curConfig.GetRandomMac();
+    if (macAddress == "") {
         WifiRandomMacHelper::GenerateRandomMacAddress(macAddress);
     }
 
-    do {
-        if (!MacAddress::IsValidMac(macAddress.c_str())) {
-            WIFI_LOGE("%{public}s: macAddress is invalid", __func__);
-            break;
-        }
-
-        if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
-            WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {
-            WIFI_LOGE("%{public}s: failed to set ap MAC address:%{private}s", __func__, macAddress.c_str());
-            break;
-        }
-
-        if (isDataClone && macConfig.GetRandomMac().empty()) {
-            macConfig.SetRandomMac(macAddress);
-            WifiConfigCenter::GetInstance().SetHotspotMacConfig(macConfig, m_id);
-        }
+    if (!MacAddress::IsValidMac(macAddress.c_str())) {
+        WIFI_LOGE("Mac address is invalid");
+        macAddress = "";
+        curConfig.SetRandomMac(macAddress);
+        WifiSettings::GetInstance().SetHotspotConfig(curConfig, m_id);
         return;
-    } while (0);
+    }
+    curConfig.SetRandomMac(macAddress);
+    WifiSettings::GetInstance().SetHotspotConfig(curConfig, m_id);
+    WIFI_LOGI("Set randomMac: %{public}s", MacAnonymize(macAddress).c_str());
+    if (WifiApHalInterface::GetInstance().SetConnectMacAddr(
+        WifiConfigCenter::GetInstance().GetApIfaceName(), macAddress) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("%{public}s: failed to set ap MAC address", __func__);
+    }
+    return;
 }
 
 bool ApStartedState::SetCountry()

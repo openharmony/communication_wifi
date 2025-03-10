@@ -94,7 +94,7 @@ private:
     void ReadWifiP2pDeviceData(MessageParcel &data, WifiP2pDevice &device);
     void WriteWifiP2pDeviceData(MessageParcel &reply, const WifiP2pDevice &device);
     bool ReadWifiP2pGroupData(MessageParcel &data, WifiP2pGroupInfo &info);
-    void WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroupInfo &info);
+    void WriteWifiP2pGroupData(MessageParcel &reply, const WifiP2pGroupInfo &info, bool isPersistent);
     void ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &config);
     void OnQueryP2pLocalDevice(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDiscoverPeers(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

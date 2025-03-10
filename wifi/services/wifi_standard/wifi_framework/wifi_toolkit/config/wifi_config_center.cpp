@@ -358,6 +358,9 @@ int WifiConfigCenter::GetMloLinkedInfo(std::vector<WifiLinkedInfo> &mloInfo, int
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mWifiMloLinkedInfo.find(instId);
     if (iter != mWifiMloLinkedInfo.end()) {
+        if (iter->second.size() != WIFI_MAX_MLO_LINK_NUM) {
+            return -1;
+        }
         mloInfo = iter->second;
     }
     return 0;
@@ -366,11 +369,7 @@ int WifiConfigCenter::GetMloLinkedInfo(std::vector<WifiLinkedInfo> &mloInfo, int
 int WifiConfigCenter::SaveMloLinkedInfo(const std::vector<WifiLinkedInfo> &mloInfo, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    if (mloInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
-        return 0;
-    }
     mWifiMloLinkedInfo[instId] = mloInfo;
-
     return 0;
 }
 int WifiConfigCenter::SetMacAddress(const std::string &macAddress, int instId)
@@ -627,6 +626,28 @@ int WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
         }
     }
     return 0;
+}
+
+void WifiConfigCenter::SetMloWifiLinkedMaxSpeed(int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto mloIter = mWifiMloLinkedInfo.find(instId);
+    if (mloIter == mWifiMloLinkedInfo.end()) {
+        return;
+    }
+    if (mloIter->second.size() != WIFI_MAX_MLO_LINK_NUM) {
+        return;
+    }
+    std::vector<WifiScanInfo> wifiScanInfoList;
+    wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
+    for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
+        for (auto& mloInfoItem : mWifiMloLinkedInfo[instId]) {
+            if (iter->bssid == mloInfoItem.bssid) {
+                mloInfoItem.maxSupportedRxLinkSpeed = iter->maxSupportedRxLinkSpeed;
+                mloInfoItem.maxSupportedTxLinkSpeed = iter->maxSupportedTxLinkSpeed;
+            }
+        }
+    }
 }
 
 bool WifiConfigCenter::CheckScanOnlyAvailable(int instId)
@@ -1455,23 +1476,6 @@ std::set<int> WifiConfigCenter::GetAllWifiLinkedNetworkId()
         wifiLinkedNetworkId.insert(iter->second.networkId);
     }
     return wifiLinkedNetworkId;
-}
-
-int WifiConfigCenter::SetHotspotMacConfig(const HotspotMacConfig &config, int id)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    mHotspotMacConfig[id] = config;
-    return 0;
-}
-
-int WifiConfigCenter::GetHotspotMacConfig(HotspotMacConfig &config, int id)
-{
-    std::unique_lock<std::mutex> lock(mApMutex);
-    auto iter = mHotspotMacConfig.find(id);
-    if (iter != mHotspotMacConfig.end()) {
-        config = iter->second;
-    }
-    return 0;
 }
 
 void WifiConfigCenter::SetSystemMode(int systemMode)

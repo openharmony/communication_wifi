@@ -68,10 +68,7 @@ ohos_unittest("wifi_non_mock_unittest") {
     ".",
   ]
 
-  deps = [
-    "$WIFI_ROOT_DIR/utils:wifi_utils",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
 
   ldflags = [
     "-fPIC",

@@ -295,6 +295,8 @@ public:
      */
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
+    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
+
     /**
      * @Description Obtains the disconnected reason
      *
@@ -638,6 +640,14 @@ public:
      */
     ErrCode GetVoWifiDetectPeriod(int &period) override;
 
+    /**
+     * @Description Obtains the MLO Wi-Fi connection information
+     *
+     * @param multiLinkedInfo - MLO wifiLinkedInfo
+     * @return ErrCode - operation result
+     */
+    ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) override;
+
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.
@@ -677,8 +687,10 @@ private:
     void ReadEapConfig(MessageParcel &reply, WifiEapConfig &wifiEapConfig);
     void BigDataReadEapConfig(WifiEapConfig &wifiEapConfig, std::vector<std::string> &tokens);
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
+    void ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
+    void ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> &result);
     void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);
     void ReadSignalInfoForVoWiFi(MessageParcel &reply, VoWifiSignalInfo &signalInfo);
     void RemoveDeathRecipient(void);
@@ -688,6 +700,36 @@ private:
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
 #endif
+private:
+    void InitWifiState();
+    void OnWifiStateChanged(int state);
+};
+class WifiInternalCallback : public IWifiDeviceCallBack {
+public:
+    WifiInternalCallback() {
+    }
+    ~WifiInternalCallback() {
+    }
+    void OnWifiStateChanged(int state) override
+    {
+        if (wifiStateChangeCallback == nullptr) {
+            return;
+        }
+        wifiStateChangeCallback(state);
+        return;
+    }
+    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {}
+    void OnWifiRssiChanged(int rssi) override {}
+    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override {}
+    void OnStreamChanged(int direction) override {}
+    void OnDeviceConfigChanged(ConfigChange value) override {}
+#ifndef OHOS_ARCH_LITE
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
+    {
+        return nullptr;
+    }
+#endif
+    std::function<void(int state)> wifiStateChangeCallback;
 };
 }  // namespace Wifi
 }  // namespace OHOS

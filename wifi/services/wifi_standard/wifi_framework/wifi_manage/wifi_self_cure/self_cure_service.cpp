@@ -94,7 +94,6 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         lastWifiLinkedInfo = info;
     } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
         pSelfCureStateMachine->SetHttpMonitorStatus(false);
-        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_INTERNET_FAILURE_DETECTED, 0, 1, info);
     } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
         pSelfCureStateMachine->SetHttpMonitorStatus(true);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);

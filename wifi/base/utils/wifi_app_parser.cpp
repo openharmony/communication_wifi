@@ -424,11 +424,16 @@ GameBackgroundLimitListAppInfo AppParser::ParseGameBackgroundLimitListAppInfo(co
 void AppParser::ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode)
 {
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_DELAY_TIME));
+    if (value == NULL) {
+        WIFI_LOGE("%{public}s xml parser limit speed delay time info error.", __FUNCTION__);
+        return;
+    }
     m_delayTime = std::string(reinterpret_cast<char *>(value));
     if (m_delayTime.empty()) {
         WIFI_LOGE("%{public}s delay time is null, will set 0.", __FUNCTION__);
         m_delayTime = "0";
     }
+    xmlFree(value);
 }
 
 AppType AppParser::GetAppTypeAsInt(const xmlNodePtr &innode)

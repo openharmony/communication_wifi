@@ -189,6 +189,18 @@ static napi_value WifiCategoryInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiCategory, static_cast<int>(WifiCategoryJs::WIFI7_PLUS), "WIFI7_PLUS");
     return wifiCategory;
 }
+static napi_value WifiLinkTypeInit(napi_env env)
+{
+    napi_value wifiLinkType = nullptr;
+    napi_create_object(env, &wifiLinkType);
+    SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::DEFAULT_LINK), "DEFAULT_LINK");
+    SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_SINGLE_LINK),
+        "WIFI7_SINGLE_LINK");
+    SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_MLSR), "WIFI7_MLSR");
+    SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_EMLSR), "WIFI7_EMLSR");
+    SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_STR), "WIFI7_STR");
+    return wifiLinkType;
+}
 static napi_value WifiDetailStateInit(napi_env env)
 {
     napi_value wifiDetailState = nullptr;
@@ -296,6 +308,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value proxyMethodObj = ProxyMethodInit(env);
     napi_value wapiPskTypeObj = WapiPskTypeInit(env);
     napi_value wifiCategoryObj = WifiCategoryInit(env);
+    napi_value wifiLinkTypeObj = WifiLinkTypeInit(env);
     napi_value wifiDetailStateObj = WifiDetailStateInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
@@ -308,6 +321,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("ProxyMethod", proxyMethodObj),
         DECLARE_NAPI_PROPERTY("WapiPskType", wapiPskTypeObj),
         DECLARE_NAPI_PROPERTY("WifiCategory", wifiCategoryObj),
+        DECLARE_NAPI_PROPERTY("WifiLinkType", wifiLinkTypeObj),
         DECLARE_NAPI_PROPERTY("WifiDetailState", wifiDetailStateObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
@@ -360,6 +374,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getIpv6Info", GetIpv6Info),
         DECLARE_NAPI_FUNCTION("getLinkedInfo", GetLinkedInfo),
         DECLARE_NAPI_FUNCTION("getLinkedInfoSync", GetLinkedInfoSync),
+        DECLARE_NAPI_FUNCTION("getMultiLinkedInfo", GetMultiLinkedInfo),
         DECLARE_NAPI_FUNCTION("getDisconnectedReason", GetDisconnectedReason),
         DECLARE_NAPI_FUNCTION("isMeteredHotspot", IsMeteredHotspot),
         DECLARE_NAPI_FUNCTION("removeDevice", RemoveDevice),

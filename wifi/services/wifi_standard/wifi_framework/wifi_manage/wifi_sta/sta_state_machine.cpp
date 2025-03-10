@@ -775,7 +775,7 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
         }
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine->enhanceService_ != nullptr) {
-            pStaStateMachine->enhanceService_->NotifyWurState(state == WUR_ENABLE, reasonCode);
+            pStaStateMachine->enhanceService_->NotifyWurState(state, reasonCode);
         }
 #endif
     }

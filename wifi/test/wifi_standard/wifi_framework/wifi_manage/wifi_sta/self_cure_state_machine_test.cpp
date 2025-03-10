@@ -2156,6 +2156,11 @@ HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi7SelfCureTest, TestSize.Leve
     ShouldTransToWifi7SelfCureTest();
 }
 
+HWTEST_F(SelfCureStateMachineTest, HandleWifiBlackListUpdateMsgTest, TestSize.Level1)
+{
+    HandleWifiBlackListUpdateMsgTest();
+}
+
 HWTEST_F(SelfCureStateMachineTest, IsWifi6NetworkTest, TestSize.Level1)
 {
     IsWifi6NetworkTest();

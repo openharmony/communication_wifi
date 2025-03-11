@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@
 #include "xml_parser.h"
 #include <vector>
 #include <string>
+#include <shared_mutex>
 
 namespace OHOS {
 namespace Wifi {
@@ -53,25 +54,26 @@ struct KeyBackgroundLimitListAppInfo : CommonAppInfo {};
 struct GameBackgroundLimitListAppInfo : CommonAppInfo {};
 struct LiveStreamAppInfo : CommonAppInfo {};
 
-class AppParser : public XmlParser {
-public:
-    AppParser();
-    ~AppParser() override;
-    static AppParser &GetInstance();
-    bool IsLowLatencyApp(const std::string &bundleName) const;
-    bool IsWhiteListApp(const std::string &bundleName) const;
-    bool IsBlackListApp(const std::string &bundleName) const;
-    bool IsMultiLinkApp(const std::string &bundleName) const;
-    bool IsChariotApp(const std::string &bundleName) const;
-    bool IsHighTempLimitSpeedApp(const std::string &bundleName) const;
-    bool IsKeyForegroundApp(const std::string &bundleName) const;
-    bool IsKeyBackgroundLimitApp(const std::string &bundleName) const;
-    std::string GetAsyncLimitSpeedDelayTime() const;
-    bool IsLiveStreamApp(const std::string &bundleName) const;
-    bool IsGameBackgroundLimitApp(const std::string &bundleName) const;
-    bool IsOverGameRtt(const std::string &bundleName, const int gameRtt) const;
-    bool Init();
+struct AppParserResult {
+    std::vector<LowLatencyAppInfo> m_lowLatencyAppVec {};
+    std::vector<WhiteListAppInfo> m_whiteAppVec {};
+    std::vector<BlackListAppInfo> m_blackAppVec {};
+    std::vector<MultiLinkAppInfo> m_multilinkAppVec {};
+    std::vector<ChariotAppInfo> m_chariotAppVec {};
+    std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVec {};
+    std::vector<KeyForegroundListAppInfo> m_keyForegroundListAppVec {};
+    std::vector<KeyBackgroundLimitListAppInfo> m_keyBackgroundLimitListAppVec {};
+    std::vector<LiveStreamAppInfo> m_liveStreamAppVec {};
+    std::vector<GameBackgroundLimitListAppInfo> m_gameBackgroundLimitListAppVec {};
+    std::unordered_map<std::string, int> m_gameRtt {};
+    std::string m_delayTime = "";
+};
 
+class AppParserInner : public XmlParser {
+public:
+    AppParserInner();
+    ~AppParserInner() override;
+    bool Init(AppParserResult &result, std::vector<const char*> appFileList = {});
 private:
     bool InitAppParser(const char *appXmlFilePath);
     bool ParseInternal(xmlNodePtr node) override;
@@ -89,28 +91,36 @@ private:
     GameBackgroundLimitListAppInfo ParseGameBackgroundLimitListAppInfo(const xmlNodePtr &innode);
     void ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
-    bool ReadPackageCloudFilterConfig();
-    bool IsReadCloudConfig();
-    std::string GetLocalFileVersion(const char *appXmlVersionFilePath);
-    std::string GetCloudPushFileVersion(const char *appVersionFilePath);
-    std::string GetCloudPushVersionFilePath();
-    std::string GetCloudPushJsonFilePath();
+    std::string GetLocalFileVersion(const xmlNodePtr &innode);
 private:
-    std::vector<LowLatencyAppInfo> m_lowLatencyAppVec {};
-    std::vector<WhiteListAppInfo> m_whiteAppVec {};
-    std::vector<BlackListAppInfo> m_blackAppVec {};
-    std::vector<MultiLinkAppInfo> m_multilinkAppVec {};
-    std::vector<ChariotAppInfo> m_chariotAppVec {};
-    std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVec {};
-    std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVecCloudPush {};
-    std::vector<KeyForegroundListAppInfo> m_keyForegroundListAppVec {};
-    std::vector<KeyBackgroundLimitListAppInfo> m_keyBackgroundLimitListAppVec {};
-    std::vector<LiveStreamAppInfo> m_liveStreamAppVec {};
-    std::vector<GameBackgroundLimitListAppInfo> m_gameBackgroundLimitListAppVec {};
-    std::unordered_map<std::string, int> m_gameRtt {};
-    std::string m_delayTime = "";
-    bool mIshighTempLimitSpeedReadCloudPush = false;
-    bool initFlag_ = false;
+    AppParserResult result_;
+    std::atomic<bool> initFlag_ {false};
+};
+
+class AppParser {
+public:
+    static AppParser &GetInstance();
+    bool Init();
+    bool IsLowLatencyApp(const std::string &bundleName) const;
+    bool IsWhiteListApp(const std::string &bundleName) const;
+    bool IsBlackListApp(const std::string &bundleName) const;
+    bool IsMultiLinkApp(const std::string &bundleName) const;
+    bool IsChariotApp(const std::string &bundleName) const;
+    bool IsHighTempLimitSpeedApp(const std::string &bundleName) const;
+    bool IsKeyForegroundApp(const std::string &bundleName) const;
+    bool IsKeyBackgroundLimitApp(const std::string &bundleName) const;
+    std::string GetAsyncLimitSpeedDelayTime() const;
+    bool IsLiveStreamApp(const std::string &bundleName) const;
+    bool IsGameBackgroundLimitApp(const std::string &bundleName) const;
+    bool IsOverGameRtt(const std::string &bundleName, const int gameRtt) const;
+private:
+    AppParser();
+    ~AppParser();
+private:
+    mutable std::shared_mutex appParserMutex_;
+    std::unique_ptr<AppParserInner> appParserInner_;
+    AppParserResult result_;
+    std::atomic<bool> initFlag_ {false};
 };
 } // namespace Wifi
 } // namespace OHOS

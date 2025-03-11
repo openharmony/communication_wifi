@@ -28,7 +28,6 @@ declare_args() {
   wifi_feature_wifi_pro_ctrl = true
   wifi_feature_with_wifi_oeminfo_mac = false
   wifi_feature_voicewifi_enable = false
-  wifi_feature_audio_aware = false
 }
 
 memory_optimization_cflags = [

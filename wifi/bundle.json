@@ -69,8 +69,7 @@
             "wifi_feature_with_sta_asset",
             "wifi_feature_wifi_pro_ctrl",
             "wifi_feature_with_wifi_oeminfo_mac",
-            "wifi_feature_voicewifi_enable",
-            "wifi_feature_audio_aware"
+            "wifi_feature_voicewifi_enable"
         ],
         "adapted_system_type": [
             "small",
@@ -121,8 +120,7 @@
                 "libxml2",
                 "asset",
                 "icu",
-                "window_manager",
-                "audio_framework"
+                "window_manager"
             ],
             "third_party": [
                 "googletest",

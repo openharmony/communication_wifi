@@ -322,13 +322,36 @@ bool WifiDeviceServiceImpl::CheckConfigWapi(const WifiDeviceConfig &config)
     return true;
 }
 
+static bool CheckOriSsidLength(const WifiDeviceConfig &config)
+{
+    std::vector<WifiScanInfo> scanInfoList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
+    std::string deviceKeyMgmt = "";
+    for (auto &scanInfo : scanInfoList) {
+        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (config.ssid == scanInfo.ssid && WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
+            LOGI("CheckOriSsidLength: oriSsid length:%{public}u", scanInfo.oriSsid.length());
+            if ((scanInfo.oriSsid.length() <= 0) || (scanInfo.oriSsid.length() > DEVICE_NAME_LENGTH)) {
+                return false;
+            }
+            break;
+        }
+    }
+    return true;
+}
+
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
-    if ((config.ssid.length() <= 0) || (config.ssid.length() > DEVICE_NAME_LENGTH) || (config.keyMgmt.length()) <= 0) {
+    if (config.ssid.length() <= 0 || (config.keyMgmt.length()) <= 0) {
         WIFI_LOGE("CheckConfigPwd: invalid ssid or keyMgmt!");
         return false;
     }
-
+    if (config.ssid.length() > DEVICE_NAME_LENGTH) {
+        if (!CheckOriSsidLength(config)) {
+            LOGE("CheckConfigPwd: invalid ssid");
+            return false;
+        }
+    }
     WIFI_LOGI("CheckConfigPwd: keyMgmt = %{public}s!", config.keyMgmt.c_str());
     if (config.keyMgmt == KEY_MGMT_EAP || config.keyMgmt == KEY_MGMT_SUITE_B_192) {
         return CheckConfigEap(config);

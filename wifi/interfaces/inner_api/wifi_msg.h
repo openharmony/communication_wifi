@@ -146,6 +146,12 @@ enum ConnState {
     UNKNOWN
 };
 
+enum WurState {
+    WUR_DISABLE = 0,
+    WUR_ENABLE = 1,
+    WUR_ENABLE_FAIL = 2
+};
+
 enum WifiLinkType:int32_t {
     DISCONNECT = -1,
     DEFAULT_LINK = 0,

@@ -64,13 +64,9 @@ bool WifiNetAgent::RegisterNetSupplier(int instId)
 
     using NetManagerStandard::NetBearType;
     using NetManagerStandard::NetCap;
-    std::string ident = "wlan0";
-    std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
-    if (instId == 1) {
-        ident = "wlan1";
-        // wlan1 is not used as a standalone channel.
-        netCaps.erase(NetCap::NET_CAPABILITY_INTERNET);
-    }
+    std::string ident = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    // wlan1 is not used as a standalone channel.
+    std::set<NetCap> netCaps = (instId == 0) ? {NetCap::NET_CAPABILITY_INTERNET} : {};
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
     if (supplierIdNow != INVALID_SUPPLIER_ID) {
         WIFI_LOGI("RegisterNetSupplier supplierId alread exist.");

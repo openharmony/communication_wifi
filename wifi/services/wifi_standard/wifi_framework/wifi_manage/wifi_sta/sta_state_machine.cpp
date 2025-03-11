@@ -1416,7 +1416,7 @@ void StaStateMachine::GetIpState::GoInState()
     if (pStaStateMachine->NetSupplierInfo != nullptr) {
         pStaStateMachine->NetSupplierInfo->isAvailable_ = true;
         pStaStateMachine->NetSupplierInfo->isRoaming_ = pStaStateMachine->isRoam;
-        pStaStateMachine->NetSupplierInfo->ident_ = (pStaStateMachine->m_instId == 0) ? "wlan0" : "wlan1";
+        pStaStateMachine->NetSupplierInfo->ident_ = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
         WIFI_LOGI("On connect update net supplier info\n");
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(pStaStateMachine->NetSupplierInfo,
             pStaStateMachine->m_instId);

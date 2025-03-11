@@ -78,6 +78,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_supplicant_hal_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_service_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/select_network_data_report.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_common_service_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_event_subscriber_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_hotspot_manager.cpp",
@@ -154,6 +155,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
@@ -179,6 +181,7 @@ ohos_unittest("manager_unittest") {
 
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_service",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
 
@@ -218,6 +221,7 @@ ohos_unittest("manager_unittest") {
     "init:libbeget_proxy",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
     "netmanager_base:net_stats_manager_if",
@@ -286,6 +290,10 @@ ohos_unittest("manager_unittest") {
   if (wifi_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]
     defines += [ "WIFI_FFRT_ENABLE" ]
+  }
+
+  if (wifi_feature_with_data_report) {
+    defines += [ "WIFI_DATA_REPORT_ENABLE" ]
   }
 
   part_name = "wifi"

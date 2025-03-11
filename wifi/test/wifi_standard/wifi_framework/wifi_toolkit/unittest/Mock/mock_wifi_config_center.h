@@ -168,6 +168,8 @@ public:
     virtual int64_t GetHid2dSceneLastSetTime() = 0;
     virtual int SetHid2dSceneLastSetTime(int64_t setTime) = 0;
     virtual int GetP2pEnhanceFreq() = 0;
+    virtual bool IsNeedFastScan(void) = 0;
+    virtual void SetFastScan(bool fastScan) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -316,6 +318,8 @@ public:
     MOCK_METHOD1(SetHotspotIdleTimeout, int(int time));
     MOCK_METHOD0(GetP2pEnhanceFreq, int());
     MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());
+    MOCK_METHOD0(IsNeedFastScan, bool());
+    MOCK_METHOD1(SetFastScan, void(bool fastScan));
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

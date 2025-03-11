@@ -710,6 +710,9 @@ void WifiProStateMachine::WifiConnectedState::HandleWifiConnectStateChangedInCon
             WifiLinkedInfo linkedInfo;
             msg->GetMessageObj(linkedInfo);
             pWifiProStateMachine_->HandleConnectedPerf5g(linkedInfo);
+            if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
+                pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+            }
         }
         pWifiProStateMachine_->disconnectToConnectedState_ = false;
     }

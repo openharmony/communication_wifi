@@ -37,7 +37,10 @@ public:
     {
         m_appXmlParser = std::make_unique<AppParser>();
         InitAppParserTest();
-        m_appXmlParser->ParseAppList(root_node);
+        m_appXmlParser->appParserInner_ = std::make_unique<AppParserInner>();
+        m_appXmlParser->appParserInner_->Init(m_appXmlParser->appParserInner_->result_);
+        m_appXmlParser->appParserInner_->ParseAppList(root_node);
+        m_appXmlParser->result_ = m_appXmlParser->appParserInner_->result_;
     }
     virtual void TearDown() {}
 
@@ -67,40 +70,41 @@ private:
 HWTEST_F(AppParserTest, InitAppParser, TestSize.Level1)
 {
     WIFI_LOGI("InitAppParser enter");
-    EXPECT_FALSE(m_appXmlParser->InitAppParser("nothing.xml"));
+    EXPECT_FALSE(m_appXmlParser->appParserInner_->InitAppParser("nothing.xml"));
 }
 
 HWTEST_F(AppParserTest, ParseInternal_Fail, TestSize.Level1)
 {
     WIFI_LOGI("ParseInternal_Fail enter");
-    EXPECT_FALSE(m_appXmlParser->ParseInternal(nullptr));
+    EXPECT_FALSE(m_appXmlParser->appParserInner_->ParseInternal(nullptr));
 }
 
 HWTEST_F(AppParserTest, ParseInternal_Success, TestSize.Level1)
 {
     WIFI_LOGI("ParseInternal_Success enter");
-    EXPECT_TRUE(m_appXmlParser->ParseInternal(root_node));
+    EXPECT_TRUE(m_appXmlParser->appParserInner_->ParseInternal(root_node));
 }
 
 HWTEST_F(AppParserTest, ParseAppList_fail, TestSize.Level1)
 {
     WIFI_LOGI("ParseAppList_fail enter");
     xmlNodePtr otherNode = xmlNewNode(NULL, BAD_CAST "otherNode");
-    m_appXmlParser->ParseAppList(otherNode);
-    EXPECT_EQ(1, m_appXmlParser->m_lowLatencyAppVec.size());
-    EXPECT_EQ(1, m_appXmlParser->m_whiteAppVec.size());
-    EXPECT_EQ(1, m_appXmlParser->m_blackAppVec.size());
-    EXPECT_EQ(1, m_appXmlParser->m_chariotAppVec.size());
+    m_appXmlParser->appParserInner_->ParseAppList(otherNode);
+    EXPECT_EQ(1, m_appXmlParser->appParserInner_->result_.m_lowLatencyAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->appParserInner_->result_.m_whiteAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->appParserInner_->result_.m_blackAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->appParserInner_->result_.m_chariotAppVec.size());
 }
 
 HWTEST_F(AppParserTest, ParseAppList_Success, TestSize.Level1)
 {
     WIFI_LOGI("ParseAppList_Success enter");
-    m_appXmlParser->ParseAppList(root_node);
-    EXPECT_EQ(1, m_appXmlParser->m_lowLatencyAppVec.size());
-    EXPECT_EQ(1, m_appXmlParser->m_whiteAppVec.size());
-    EXPECT_EQ(1, m_appXmlParser->m_blackAppVec.size());
-    EXPECT_EQ(1, m_appXmlParser->m_chariotAppVec.size());
+    m_appXmlParser->appParserInner_->ParseAppList(root_node);
+    EXPECT_EQ(1, m_appXmlParser->appParserInner_->result_.m_lowLatencyAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->appParserInner_->result_.m_whiteAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->appParserInner_->result_.m_blackAppVec.size());
+    EXPECT_EQ(1, m_appXmlParser->appParserInner_->result_.m_chariotAppVec.size());
+    m_appXmlParser->result_ = m_appXmlParser->appParserInner_->result_;
 }
 
 HWTEST_F(AppParserTest, IsLowLatencyApp_True, TestSize.Level1)
@@ -157,46 +161,6 @@ HWTEST_F(AppParserTest, IsChariotApp_False, TestSize.Level1)
     WIFI_LOGI("IsChariotApp_False enter");
     std::string appName = "other";
     EXPECT_FALSE(m_appXmlParser->IsChariotApp(appName));
-}
-
-HWTEST_F(AppParserTest, ReadPackageCloudFilterConfig, TestSize.Level1)
-{
-    WIFI_LOGI("IsChariotApp_False enter");
-    std::string appName = "other";
-    EXPECT_FALSE(m_appXmlParser->ReadPackageCloudFilterConfig());
-}
- 
-HWTEST_F(AppParserTest, IsReadCloudConfig, TestSize.Level1)
-{
-    WIFI_LOGI("IsReadCloudConfig enter");
-    m_appXmlParser->IsReadCloudConfig();
-    EXPECT_FALSE(m_appXmlParser->IsReadCloudConfig());
-}
- 
-HWTEST_F(AppParserTest, GetCloudPushFileVersion, TestSize.Level1)
-{
-    WIFI_LOGI("GetLocalFileVersion enter");
-    std::string strCloud = m_appXmlParser->GetCloudPushVersionFilePath();
-    EXPECT_EQ(m_appXmlParser->GetCloudPushFileVersion(strCloud.c_str()), "");
-}
- 
-HWTEST_F(AppParserTest, GetLocalFileVersion, TestSize.Level1)
-{
-    WIFI_LOGI("GetLocalFileVersion enter");
-    std::string wifiMonitorAppFilePath = "/system/etc/wifi/wifi_monitor_apps.xml";
-    EXPECT_NE(m_appXmlParser->GetLocalFileVersion(wifiMonitorAppFilePath.c_str()), "");
-}
- 
-HWTEST_F(AppParserTest, GetCloudPushVersionFilePath, TestSize.Level1)
-{
-    WIFI_LOGI("GetCloudPushVersionFilePath enter");
-    EXPECT_NE(m_appXmlParser->GetCloudPushVersionFilePath(), "");
-}
- 
-HWTEST_F(AppParserTest, GetCloudPushJsonFilePath, TestSize.Level1)
-{
-    WIFI_LOGI("GetCloudPushJsonFilePath enter");
-    EXPECT_NE(m_appXmlParser->GetCloudPushJsonFilePath(), "");
 }
 
 } // namespace Wifi

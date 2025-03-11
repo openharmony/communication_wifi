@@ -190,10 +190,23 @@ HWTEST_F(WifiManagerTest, CheckAndStopScanServiceTest, TestSize.Level1)
     wifiManager.wifiScanManager->CheckAndStopScanService();
 }
 
-HWTEST_F(WifiManagerTest, DealScanInfoNotifyTest, TestSize.Level1)
+HWTEST_F(WifiManagerTest, DealScanInfoNotifyTest_001, TestSize.Level1)
 {
-    WIFI_LOGI("DealScanInfoNotifyTest enter!");
+    WIFI_LOGI("DealScanInfoNotifyTest_001 enter!");
     std::vector<InterScanInfo> results;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAutoConnect())
+        .WillOnce(DoAll(Return(true)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiMidState(_))
+        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
+    wifiManager.wifiScanManager->DealScanInfoNotify(results);
+}
+
+HWTEST_F(WifiManagerTest, DealScanInfoNotifyTest_002, TestSize.Level1)
+{
+    WIFI_LOGI("DealScanInfoNotifyTest_002 enter!");
+    std::vector<InterScanInfo> results;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAutoConnect())
+        .WillOnce(DoAll(Return(false)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiMidState(_))
         .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
     wifiManager.wifiScanManager->DealScanInfoNotify(results);

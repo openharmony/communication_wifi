@@ -32,7 +32,6 @@
 #include "network_status_history_manager.h"
 #include "wifi_native_struct.h"
 #include "wifi_chr_utils.h"
-#include "audio_stream_manager.h"
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"
@@ -138,12 +137,6 @@ enum FoldStatus {
     EXPAND,
     FOLDED,
     HALF_FOLD,
-};
-
-enum AudioType:uint32_t {
-MUSIC_TYPE = 0,
-MOVIE_TYPE = 1,
-AUDIOBOOK_TYPE = 2,
 };
 
 inline const int DETECT_TYPE_DEFAULT = 0;
@@ -410,17 +403,7 @@ public:
         DhcpResult DhcpIpv6Result;
         DhcpResult DhcpOfferInfo;
     };
-#ifdef FEATURE_AUDIO_AWARE
-    class WiFiAudioRendererStateListener : public AudioStandard::AudioRendererStateChangeCallback {
-    public:
-        explicit WiFiAudioRendererStateListener(StaStateMachine *staStateMachine);
-        ~WiFiAudioRendererStateListener() {};
-        void OnRendererStateChange(const std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>>
-            &audioRendererChangeInfos) override;
-    private:
-        StaStateMachine *pStaStateMachine;
-    };
-#endif
+
 public:
     /**
      * @Description  Initialize StaStateMachine
@@ -1018,10 +1001,6 @@ private:
     void UpdateHiLinkAttribute();
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
-#ifdef FEATURE_AUDIO_AWARE
-    void RegisterAudioRenderStateChangeListener();
-    void UnRegisterAudioRenderStateChangeListener();
-#endif
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
@@ -1072,10 +1051,6 @@ private:
     std::string curForegroundAppBundleName_ = "";
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
-#ifdef FEATURE_AUDIO_AWARE
-    bool isAudioRunning_ = false;
-    std::shared_ptr<AudioStandard::AudioRendererStateChangeCallback> rendererStateCallback_ = nullptr;
-#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

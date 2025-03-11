@@ -104,7 +104,6 @@ ohos_fuzztest("WifiHotspotImplFuzzTest") {
     "ability_runtime:dataobs_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
-    "audio_framework:audio_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",

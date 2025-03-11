@@ -1233,18 +1233,11 @@ StaStateMachine::ApLinkedState::~ApLinkedState()
 void StaStateMachine::ApLinkedState::GoInState()
 {
     WIFI_LOGI("ApLinkedState GoInState function.");
-#ifdef FEATURE_AUDIO_AWARE
-    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE && !(pStaStateMachine->isAudioRunning_)) {
-#else
     if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
-#endif
         pStaStateMachine->enableSignalPoll = false;
     } else {
         pStaStateMachine->enableSignalPoll = true;
     }
-#ifdef FEATURE_AUDIO_AWARE
-    pStaStateMachine->RegisterAudioRenderStateChangeListener();
-#endif
     return;
 }
 
@@ -1252,9 +1245,6 @@ void StaStateMachine::ApLinkedState::GoOutState()
 {
     WIFI_LOGI("ApLinkedState GoOutState function.");
     pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
-#ifdef FEATURE_AUDIO_AWARE
-    pStaStateMachine->UnRegisterAudioRenderStateChangeListener();
-#endif
     return;
 }
 
@@ -1373,6 +1363,7 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
     pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->AfterApLinkedprocess(bssid);
 }
+
 
 void StaStateMachine::ApLinkedState::DealStartRoamCmdInApLinkedState(InternalMessagePtr msg)
 {
@@ -2638,29 +2629,12 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
         StartDetectTimer(DETECT_TYPE_DEFAULT);
     }
-#ifdef FEATURE_AUDIO_AWARE
-    if (screenState == MODE_STATE_CLOSE) {
-        StopTimer(static_cast<int>(CMD_START_NETCHECK));
-    }
-    if (screenState == MODE_STATE_CLOSE) {
-        if (isAudioRunning_) {
-            enableSignalPoll = true;
-            lastSignalLevel_ = INVALID_SIGNAL_LEVEL; // Reset signal level when first start signal poll
-            staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY_WITH_TASK;
-            StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-            StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
-        } else {
-            enableSignalPoll = false;
-            StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-        }
-    }
-#else
+
     if (screenState == MODE_STATE_CLOSE) {
         enableSignalPoll = false;
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
         StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
-#endif
 #ifndef OHOS_ARCH_LITE
     WifiProtectManager::GetInstance().HandleScreenStateChanged(screenState == MODE_STATE_OPEN);
 #endif
@@ -4808,79 +4782,6 @@ void StaStateMachine::UnRegisterStaServiceCallback(const StaServiceCallback &cal
     std::unique_lock<std::shared_mutex> lock(m_staCallbackMutex);
     m_staCallback.erase(callback.callbackModuleName);
 }
-
-#ifdef FEATURE_AUDIO_AWARE
-void StaStateMachine::RegisterAudioRenderStateChangeListener()
-{
-    if (rendererStateCallback_ == nullptr) {
-        rendererStateCallback_ = std::make_shared<WiFiAudioRendererStateListener>(this);
-    }
-    const int32_t clientPid = IPCSkeleton::GetCallingPid();
-    auto ret = AudioStandard::AudioStreamManager::GetInstance()->RegisterAudioRendererEventListener(clientPid,
-        rendererStateCallback_);
-    if (ret != 0) {
-        WIFI_LOGE("WiFiAudioRendererStateListener register fail");
-        return;
-    }
-    WIFI_LOGI("WiFiAudioRendererStateListener register succ");
-}
-
-void StaStateMachine::UnRegisterAudioRenderStateChangeListener()
-{
-    isAudioRunning_ = false;
-    const int32_t clientPid = IPCSkeleton::GetCallingPid();
-    auto ret = AudioStandard::AudioStreamManager::GetInstance()->UnregisterAudioRendererEventListener(clientPid);
-    if (ret != 0) {
-        WIFI_LOGE("WiFiAudioRendererStateListener unregister fail");
-        return;
-    }
-    WIFI_LOGI("WiFiAudioRendererStateListener unregister succ");
-}
-
-StaStateMachine::WiFiAudioRendererStateListener::WiFiAudioRendererStateListener(StaStateMachine *staStateMachine)
-    : pStaStateMachine(staStateMachine) {}
-
-void StaStateMachine::WiFiAudioRendererStateListener::OnRendererStateChange(
-    const std::vector<std::shared_ptr<AudioStandard::AudioRendererChangeInfo>> &audioRendererChangeInfos)
-{
-    int32_t audioBit = 0;
-    for (const auto &audioRendererChangeInfo : audioRendererChangeInfos) {
-        WIFI_LOGI("OnRendererStateChange, streamUsage: %d, rendererState: %d",
-        static_cast<int32_t>(audioRendererChangeInfo->rendererInfo.streamUsage),
-        static_cast<int32_t>(audioRendererChangeInfo->rendererState));
-        if (audioRendererChangeInfo->rendererState == AudioStandard::RendererState::RENDERER_RUNNING) {
-            if (audioRendererChangeInfo->rendererInfo.streamUsage == OHOS::AudioStandard::STREAM_USAGE_MUSIC) {
-                audioBit |= (1 << static_cast<int32_t>(AudioType::MUSIC_TYPE));
-            } else if (audioRendererChangeInfo->rendererInfo.streamUsage == OHOS::AudioStandard::STREAM_USAGE_MOVIE) {
-                audioBit |= (1 << static_cast<int32_t>(AudioType::MOVIE_TYPE));
-            } else if (audioRendererChangeInfo->rendererInfo.streamUsage ==
-                OHOS::AudioStandard::STREAM_USAGE_AUDIOBOOK) {
-                audioBit |= (1 << static_cast<int32_t>(AudioType::AUDIOBOOK_TYPE));
-            }
-        } else {
-            if (audioRendererChangeInfo->rendererInfo.streamUsage == OHOS::AudioStandard::STREAM_USAGE_MUSIC) {
-                audioBit &=~ (1 << static_cast<int32_t>(AudioType::MUSIC_TYPE));
-            } else if (audioRendererChangeInfo->rendererInfo.streamUsage == OHOS::AudioStandard::STREAM_USAGE_MOVIE) {
-                audioBit &=~ (1 << static_cast<int32_t>(AudioType::MOVIE_TYPE));
-            } else if (audioRendererChangeInfo->rendererInfo.streamUsage ==
-                OHOS::AudioStandard::STREAM_USAGE_AUDIOBOOK) {
-                audioBit &=~ (1 << static_cast<int32_t>(AudioType::AUDIOBOOK_TYPE));
-            }
-        }
-    }
-    if (audioBit) {
-        pStaStateMachine->isAudioRunning_ = true;
-    } else {
-        pStaStateMachine->isAudioRunning_ = false;
-    }
-    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE && !(pStaStateMachine->isAudioRunning_)) {
-        WIFI_LOGI("OnRendererStateChange, audio stop when screen off");
-        pStaStateMachine->enableSignalPoll = false;
-        pStaStateMachine->staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
-    }
-    WIFI_LOGI("OnRendererStateChange isAudioRunning_=%{public}d", pStaStateMachine->isAudioRunning_);
-}
-#endif
 
 void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {

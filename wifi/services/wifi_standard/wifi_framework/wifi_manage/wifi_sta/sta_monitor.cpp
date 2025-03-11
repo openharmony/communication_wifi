@@ -56,7 +56,7 @@ ErrCode StaMonitor::InitStaMonitor()
         [this](int status) { this->OnWpaConnectionFullCallBack(status); },
         [this](int status) { this->OnWpaConnectionRejectCallBack(status); },
         [this](const std::string &notifyParam) { this->OnWpaStaNotifyCallBack(notifyParam); },
-        [](int reason, const std::string &bssid) {},
+        [this](int reason, const std::string &bssid) {},
     };
 
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);

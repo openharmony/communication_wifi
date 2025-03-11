@@ -111,8 +111,6 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
-#define WUR_DISABLE 0
-#define WUR_ENABLE 1
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -826,14 +824,14 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
 #endif
     }
     if (feature == CoFeatureType::COFEATURE_TYPE_WUR) {
-        if (state == WUR_ENABLE) {
+        if (state == WurState::WUR_ENABLE) {
             pStaStateMachine->linkedInfo.isWurEnable = true;
         } else {
             pStaStateMachine->linkedInfo.isWurEnable = false;
         }
 #ifndef OHOS_ARCH_LITE
         if (pStaStateMachine->enhanceService_ != nullptr) {
-            pStaStateMachine->enhanceService_->NotifyWurState(state == WUR_ENABLE, reasonCode);
+            pStaStateMachine->enhanceService_->NotifyWurState(state, reasonCode);
         }
 #endif
     }

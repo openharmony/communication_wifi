@@ -177,15 +177,10 @@ if (defined(ohos_lite)) {
 
     defines += [ "FEATURE_SELF_CURE_SUPPORT" ]
 
-    if (wifi_feature_audio_aware) {
-      defines += [ "FEATURE_AUDIO_AWARE" ]
-    }
-
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",
       "ability_runtime:wantagent_innerkits",
-      "audio_framework:audio_client",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "c_utils:utils",

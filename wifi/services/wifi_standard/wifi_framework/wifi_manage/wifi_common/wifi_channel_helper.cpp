@@ -88,15 +88,15 @@ void WifiChannelHelper::UpdateValidChannels(std::string ifaceName, int instId)
     ChannelsTable chanTbs;
     std::vector<int> freqs2G;
     std::vector<int> freqs5G;
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
     int band = static_cast<int>(BandType::BAND_2GHZ);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs2G)) {
         WIFI_LOGE("get 2g frequencies failed.");
         WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G, instId);
     }
 #endif
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
     band = static_cast<int>(BandType::BAND_5GHZ);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs5G)) {
         WIFI_LOGE("get 5g frequencies failed.");
     }
@@ -128,20 +128,20 @@ void WifiChannelHelper::UpdateValidFreqs()
     std::vector<int> freqs5G;
     std::vector<int> freqsDfs;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
     int band = static_cast<int>(ScanBandType::SCAN_BAND_24_GHZ);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs2G)) {
         WIFI_LOGE("get 2g frequencies failed.");
     }
 #endif
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
     band = static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs5G)) {
         WIFI_LOGE("get 5g frequencies failed.");
     }
 #endif
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
     band = static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ_DFS_ONLY);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqsDfs)) {
         WIFI_LOGE("get 5g frequencies failed.");
     }

@@ -732,6 +732,11 @@
         "OHOS::Wifi::WifiApHalInterface::GetStationList(std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&, int)";
         "OHOS::Wifi::NetworkInterface::IsValidInterfaceName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::IfConfig::ExecCommand(std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> const&)";
+	    "OHOS::Wifi::WifiDataReportService::GetInstance()";
+        "OHOS::Wifi::WifiDataReportService::InitReportApAllInfo()";
+        "OHOS::Wifi::WifiDataReportService::UpdateAppBundleNameInfo(const std::string&)";
+        "OHOS::Wifi::WifiDataReportService::ReportApConnEventInfo(ConnReportReason, const WifiLinkedInfo&, int, const int&, IEnhanceService*)";
+        "OHOS::Wifi::WifiDataReportService::ReportQoeInfo(const WifiSignalPollInfo&, const IEnhanceService*)";
     };
     local:
         *;

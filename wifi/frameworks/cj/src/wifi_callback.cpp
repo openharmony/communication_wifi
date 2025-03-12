@@ -15,13 +15,13 @@
 
 #include "wifi_callback.h"
 
-#include "ffi_structs.h"
 #include "accesstoken_kit.h"
+#include "cj_lambda.h"
+#include "ffi_structs.h"
 #include "ipc_skeleton.h"
 #include "wifi_device.h"
 #include "wifi_logger.h"
 #include "wifi_scan.h"
-#include "cj_lambda.h"
 
 DEFINE_WIFILOG_LABEL("CJ_Wifi_Callback");
 
@@ -40,17 +40,14 @@ CjEventRegister& CjEventRegister::GetInstance()
 
 class CjWifiDeviceEventCallback : public IWifiDeviceCallBack {
 public:
-    CjWifiDeviceEventCallback() {
-    }
+    CjWifiDeviceEventCallback() {}
 
-    virtual ~CjWifiDeviceEventCallback() {
-    }
+    virtual ~CjWifiDeviceEventCallback() {}
 
 public:
     void OnWifiStateChanged(int state) override
     {
-        WIFI_LOGI("OnWifiStateChanged event: %{public}d [0:DISABLING, 1:DISABLED, 2:ENABLING, 3:ENABLED]",
-            state);
+        WIFI_LOGI("OnWifiStateChanged event: %{public}d [0:DISABLING, 1:DISABLED, 2:ENABLING, 3:ENABLED]", state);
         if (wifiStateChange == nullptr) {
             WIFI_LOGI("OnWifiStateChanged not registered");
             return;
@@ -62,7 +59,7 @@ public:
         wifiStateChange(m_wifiStateConvertMap[state]);
     }
 
-    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override
+    void OnWifiConnectionChanged(int state, const WifiLinkedInfo& info) override
     {
         WIFI_LOGI("OnWifiConnectionChanged event: %{public}d [4:CONNECTED, 6:DISCONNECTED, 7:SPECIAL_CONNECT]", state);
         if (wifiConnectionChange == nullptr) {
@@ -86,24 +83,18 @@ public:
         wifiRssiChange(rssi);
     }
 
-    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override
-    {
-    }
+    void OnWifiWpsStateChanged(int state, const std::string& pinCode) override {}
 
-    void OnStreamChanged(int direction) override
-    {
-    }
+    void OnStreamChanged(int direction) override {}
 
-    void OnDeviceConfigChanged(ConfigChange value) override
-    {
-    }
+    void OnDeviceConfigChanged(ConfigChange value) override {}
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override
     {
         return nullptr;
     }
 
-    void SetCallback(const std::string &type, void (* callback)(int32_t))
+    void SetCallback(const std::string& type, void (*callback)(int32_t))
     {
         if (type == EVENT_STA_POWER_STATE_CHANGE) {
             wifiStateChange = CJLambda::Create(callback);
@@ -115,18 +106,13 @@ public:
             wifiRssiChange = CJLambda::Create(callback);
         }
     }
+
 private:
+    std::function<void(int32_t)> wifiStateChange { nullptr };
+    std::function<void(int32_t)> wifiConnectionChange { nullptr };
+    std::function<void(int32_t)> wifiRssiChange { nullptr };
 
-    std::function<void(int32_t)> wifiStateChange{nullptr};
-    std::function<void(int32_t)> wifiConnectionChange{nullptr};
-    std::function<void(int32_t)> wifiRssiChange{nullptr};
-
-    enum class JsLayerWifiState {
-        DISABLED = 0,
-        ENABLED = 1,
-        ENABLING = 2,
-        DISABLING = 3
-    };
+    enum class JsLayerWifiState { DISABLED = 0, ENABLED = 1, ENABLING = 2, DISABLING = 3 };
 
     enum class JsLayerConnectStatus {
         DISCONNECTED = 0,
@@ -168,11 +154,9 @@ private:
 
 class CjWifiScanEventCallback : public IWifiScanCallback {
 public:
-    CjWifiScanEventCallback() {
-    }
+    CjWifiScanEventCallback() {}
 
-    virtual ~CjWifiScanEventCallback() {
-    }
+    virtual ~CjWifiScanEventCallback() {}
 
 public:
     void OnWifiScanStateChanged(int state) override
@@ -190,21 +174,20 @@ public:
         return nullptr;
     }
 
-    void SetScanStateChange(void (* callback)(int32_t))
+    void SetScanStateChange(void (*callback)(int32_t))
     {
         wifiScanStateChange = CJLambda::Create(callback);
     }
+
 private:
-    std::function<void(int32_t)> wifiScanStateChange{nullptr};
+    std::function<void(int32_t)> wifiScanStateChange { nullptr };
 };
 
 class CjWifiHotspotEventCallback : public IWifiHotspotCallback {
 public:
-    CjWifiHotspotEventCallback() {
-    }
+    CjWifiHotspotEventCallback() {}
 
-    virtual ~CjWifiHotspotEventCallback() {
-    }
+    virtual ~CjWifiHotspotEventCallback() {}
 
 public:
     void OnHotspotStateChanged(int state) override
@@ -220,15 +203,11 @@ public:
         hotspotStateChange(m_apStateConvertMap[state]);
     }
 
-    void OnHotspotStaJoin(const StationInfo &info) override
-    {
-    }
+    void OnHotspotStaJoin(const StationInfo& info) override {}
 
-    void OnHotspotStaLeave(const StationInfo &info) override
-    {
-    }
+    void OnHotspotStaLeave(const StationInfo& info) override {}
 
-    void SetHotspotStateChanged(void (* callback)(int32_t))
+    void SetHotspotStateChanged(void (*callback)(int32_t))
     {
         hotspotStateChange = CJLambda::Create(callback);
     }
@@ -237,15 +216,11 @@ public:
     {
         return nullptr;
     }
-private:
-    std::function<void(int32_t)> hotspotStateChange{nullptr};
 
-    enum class JsLayerApState {
-        DISABLED = 0,
-        ENABLED = 1,
-        ENABLING = 2,
-        DISABLING = 3
-    };
+private:
+    std::function<void(int32_t)> hotspotStateChange { nullptr };
+
+    enum class JsLayerApState { DISABLED = 0, ENABLED = 1, ENABLING = 2, DISABLING = 3 };
 
     std::map<int, int> m_apStateConvertMap = {
         { static_cast<int>(ApState::AP_STATE_STARTING), static_cast<int>(JsLayerApState::ENABLING) },
@@ -257,11 +232,9 @@ private:
 
 class CjWifiP2pEventCallback : public IWifiP2pCallback {
 public:
-    CjWifiP2pEventCallback() {
-    }
+    CjWifiP2pEventCallback() {}
 
-    virtual ~CjWifiP2pEventCallback() {
-    }
+    virtual ~CjWifiP2pEventCallback() {}
 
 public:
     void OnP2pStateChanged(int state) override
@@ -313,7 +286,7 @@ public:
             return;
         }
         CWifiP2pDevice cdevices[size];
-        WifiP2pDeviceArr arr{.head = cdevices, .size = size};
+        WifiP2pDeviceArr arr { .head = cdevices, .size = size };
         uint32_t idx = 0;
         for (auto& each : devices) {
             cdevices[idx].deviceName = const_cast<char*>(each.GetDeviceName().c_str());
@@ -327,14 +300,11 @@ public:
         p2pPeerDeviceChange(arr);
     }
 
-    void OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo>& srvInfo) override
-    {
-    }
+    void OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo>& srvInfo) override {}
 
     void OnP2pConnectionChanged(const WifiP2pLinkedInfo& info) override
     {
-        WIFI_LOGI("received p2p connection changed event, state: %{public}d",
-            static_cast<int>(info.GetConnectState()));
+        WIFI_LOGI("received p2p connection changed event, state: %{public}d", static_cast<int>(info.GetConnectState()));
         if (p2pConnectionChange == nullptr) {
             WIFI_LOGI("OnP2pConnectionChanged not registered");
             return;
@@ -356,36 +326,24 @@ public:
         p2pDiscoveryChange(static_cast<int32_t>(isChange));
     }
 
-    void OnP2pActionResult(P2pActionCallback action, ErrCode code) override
-    {
-    }
+    void OnP2pActionResult(P2pActionCallback action, ErrCode code) override {}
 
-    void OnConfigChanged(CfgType type, char* data, int dataLen) override
-    {
-    }
+    void OnConfigChanged(CfgType type, char* data, int dataLen) override {}
 
-    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info) override
-    {
-    }
+    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo& info) override {}
 
-    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override
-    {
-    }
+    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo& info) override {}
 
-    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override
-    {
-    }
+    void OnP2pPrivatePeersChanged(const std::string& priWfdInfo) override {}
 
-    void OnP2pChrErrCodeReport(const int errCode) override
-    {
-    }
+    void OnP2pChrErrCodeReport(const int errCode) override {}
 
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override
     {
         return nullptr;
     }
 
-    void SetCallback(const std::string &type, void (* callback)())
+    void SetCallback(const std::string& type, void (*callback)())
     {
         if (type == EVENT_P2P_STATE_CHANGE) {
             p2pStateChange = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
@@ -406,13 +364,14 @@ public:
             p2pDiscoveryChange = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
         }
     }
+
 private:
-    std::function<void(int32_t)> p2pStateChange{nullptr};
-    std::function<void(CWifiP2PLinkedInfo)> p2pConnectionChange{nullptr};
-    std::function<void(CWifiP2pDevice)> p2pDeviceChange{nullptr};
-    std::function<void(WifiP2pDeviceArr)> p2pPeerDeviceChange{nullptr};
-    std::function<void()> p2pPersistentGroupChange{nullptr};
-    std::function<void(int32_t)> p2pDiscoveryChange{nullptr};
+    std::function<void(int32_t)> p2pStateChange { nullptr };
+    std::function<void(CWifiP2PLinkedInfo)> p2pConnectionChange { nullptr };
+    std::function<void(CWifiP2pDevice)> p2pDeviceChange { nullptr };
+    std::function<void(WifiP2pDeviceArr)> p2pPeerDeviceChange { nullptr };
+    std::function<void()> p2pPersistentGroupChange { nullptr };
+    std::function<void(int32_t)> p2pDiscoveryChange { nullptr };
 };
 
 sptr<CjWifiDeviceEventCallback> cjWifiDeviceCallback =
@@ -427,15 +386,15 @@ sptr<CjWifiHotspotEventCallback> cjWifiHotspotCallback =
 sptr<CjWifiP2pEventCallback> cjWifiP2pCallback =
     sptr<CjWifiP2pEventCallback>(new (std::nothrow) CjWifiP2pEventCallback());
 
-int32_t CjEventRegister::Register(const std::string& type, void (* callback)())
+int32_t CjEventRegister::Register(const std::string& type, void (*callback)())
 {
     WIFI_LOGI("Register event: %{public}s", type.c_str());
-    std::vector<std::string> event = {type};
+    std::vector<std::string> event = { type };
 
-    if (type == EVENT_STA_POWER_STATE_CHANGE || type == EVENT_STA_CONN_STATE_CHANGE
-        || type == EVENT_STA_RSSI_STATE_CHANGE) {
-            cjWifiDeviceCallback->SetCallback(type, reinterpret_cast<void (*)(int32_t)>(callback));
-            CjEventRegister::GetInstance().RegisterDeviceEvents(event);
+    if (type == EVENT_STA_POWER_STATE_CHANGE || type == EVENT_STA_CONN_STATE_CHANGE ||
+        type == EVENT_STA_RSSI_STATE_CHANGE) {
+        cjWifiDeviceCallback->SetCallback(type, reinterpret_cast<void (*)(int32_t)>(callback));
+        CjEventRegister::GetInstance().RegisterDeviceEvents(event);
     }
 
     if (type == EVENT_STA_SCAN_STATE_CHANGE) {
@@ -462,7 +421,7 @@ int32_t CjEventRegister::UnRegister(const std::string& type)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode CjEventRegister::RegisterDeviceEvents(const std::vector<std::string> &event)
+ErrCode CjEventRegister::RegisterDeviceEvents(const std::vector<std::string>& event)
 {
     if (g_cjWifiStaPtr == nullptr) {
         WIFI_LOGE("Register sta event get instance failed!");
@@ -471,7 +430,7 @@ ErrCode CjEventRegister::RegisterDeviceEvents(const std::vector<std::string> &ev
     return g_cjWifiStaPtr->RegisterCallBack(cjWifiDeviceCallback, event);
 }
 
-ErrCode CjEventRegister::RegisterScanEvents(const std::vector<std::string> &event)
+ErrCode CjEventRegister::RegisterScanEvents(const std::vector<std::string>& event)
 {
     if (g_cjWifiScanPtr == nullptr) {
         WIFI_LOGE("Register scan event get instance failed!");
@@ -480,7 +439,7 @@ ErrCode CjEventRegister::RegisterScanEvents(const std::vector<std::string> &even
     return g_cjWifiScanPtr->RegisterCallBack(cjWifiScanCallback, event);
 }
 
-ErrCode CjEventRegister::RegisterHotspotEvents(const std::vector<std::string> &event)
+ErrCode CjEventRegister::RegisterHotspotEvents(const std::vector<std::string>& event)
 {
     if (g_cjWifiHotspotPtr == nullptr) {
         WIFI_LOGE("Register hotspot event get instance failed!");
@@ -489,7 +448,7 @@ ErrCode CjEventRegister::RegisterHotspotEvents(const std::vector<std::string> &e
     return g_cjWifiHotspotPtr->RegisterCallBack(cjWifiHotspotCallback, event);
 }
 
-ErrCode CjEventRegister::RegisterP2PEvents(const std::vector<std::string> &event)
+ErrCode CjEventRegister::RegisterP2PEvents(const std::vector<std::string>& event)
 {
     if (g_cjWifiP2pPtr == nullptr) {
         WIFI_LOGE("Register p2p event get instance failed!");
@@ -535,4 +494,4 @@ void CjWifiAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, cons
             return;
     }
 }
-}
+} // namespace OHOS::Wifi

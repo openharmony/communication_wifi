@@ -1519,5 +1519,20 @@ void WifiConfigCenter::SetFastScan(bool fastScan)
     isNeedFastScan = fastScan;
 }
 
+void WifiConfigCenter::SetAutoConnect(bool autoConnectEnable)
+{
+    if (GetDeviceType() != ProductDeviceType::WEARABLE) {
+        LOGD("SetAutoConnect not wearable device");
+        return;
+    }
+
+    LOGI("SetAutoConnect autoConnectEnable:%{public}d", autoConnectEnable);
+    autoConnectEnable_.store(autoConnectEnable);
+}
+
+bool WifiConfigCenter::GetAutoConnect()
+{
+    return autoConnectEnable_.load();
+}
 }  // namespace Wifi
 }  // namespace OHOS

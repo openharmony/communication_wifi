@@ -56,6 +56,52 @@ WifiNetAgent::~WifiNetAgent()
     }
 }
 
+bool WifiNetAgent::RegisterNetConnObserver(int instId)
+{
+    if (instId != INSTID_WLAN0) {
+        WIFI_LOGI("RegisterNetConnObserver instId is not 0.");
+        return false;
+    }
+
+    bool isBtNet = IsDefaultBtNet();
+    WifiConfigCenter::GetInstance().SetAutoConnect(!isBtNet);
+
+    if (netConnCallback_ == nullptr) {
+        netConnCallback_ = new (std::nothrow)NetInfoObserver();
+        if (netConnCallback_ == nullptr) {
+            WIFI_LOGE("RegisterNetConnObserver netConnCallback is null.");
+            return false;
+        }
+    }
+
+    NetManagerStandard::NetSpecifier netSpecifier;
+    NetManagerStandard::NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET);
+    netSpecifier.ident_ = "";
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetManagerStandard::NetSpecifier> specifier = new NetManagerStandard::NetSpecifier(netSpecifier);
+    NetManagerStandard::NetConnClient::GetInstance().RegisterNetConnCallback(specifier, netConnCallback_, 0);
+    WIFI_LOGI("RegisterNetConnObserver success.");
+    return true;
+}
+
+int32_t WifiNetAgent::NetInfoObserver::NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle)
+{
+    bool isBtNet = IsDefaultBtNet();
+    WifiConfigCenter::GetInstance().SetAutoConnect(!isBtNet);
+    WIFI_LOGI("NetAvailable, isBtNet:%{public}d.", isBtNet);
+    return 0;
+}
+
+bool WifiNetAgent::IsDefaultBtNet()
+{
+    NetManagerStandard::NetHandle defaultNet;
+    NetManagerStandard::NetConnClient::GetInstance().GetDefaultNet(defaultNet);
+    NetManagerStandard::NetAllCapabilities netAllCap;
+    NetConnClient::GetInstance().GetNetCapabilities(defaultNet, netAllCap);
+    return netAllCap.bearerTypes_.find(NetManagerStandard::BEARER_BLUETOOTH) != netAllCap.bearerTypes_.end();
+}
+
 bool WifiNetAgent::RegisterNetSupplier(int instId)
 {
     TimeStats timeStats(__func__);
@@ -224,6 +270,7 @@ void WifiNetAgent::OnStaMachineWifiStart(int instId)
 #endif
             this->RegisterNetSupplier(m_instId);
             this->RegisterNetSupplierCallback(m_instId);
+            this->RegisterNetConnObserver(m_instId);
         });
     }
 }
@@ -242,6 +289,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
 #endif
         this->RegisterNetSupplier(m_instId);
         this->RegisterNetSupplierCallback(m_instId);
+        this->RegisterNetConnObserver(m_instId);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.connState == ConnState::CONNECTED) {

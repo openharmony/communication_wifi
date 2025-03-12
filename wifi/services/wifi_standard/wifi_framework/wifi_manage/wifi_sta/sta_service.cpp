@@ -35,6 +35,7 @@
 #include "external_wifi_filter_builder_manager.h"
 #include "external_wifi_common_builder_manager.h"
 #include "block_connect_service.h"
+#include "parameters.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -60,6 +61,7 @@ constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 #define EAP_AUTH_WLAN_MNC "@wlan.mnc"
 #define EAP_AUTH_WLAN_MCC ".mcc"
 #define EAP_AUTH_PERMANENT_SUFFIX ".3gppnetwork.org"
+#define ENABLE_BACK_AUDIO "persist.booster.enable_back_audio"
 
 const int WIFI_DETECT_MODE_LOW = 1;
 const int WIFI_DETECT_MODE_HIGH = 2;
@@ -1009,6 +1011,22 @@ ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
 
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaService::DeliverAudioState(int state)
+{
+    int isEnableBackAudio = 0;
+    std::string strValue = system::GetParameter(ENABLE_BACK_AUDIO, "");
+    if (!strValue.empty()) {
+        isEnableBackAudio = CheckDataLegal(strValue);
+    }
+    if (isEnableBackAudio) {
+        CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+        WIFI_LOGI("DealScreenOffPoll deliver audio state.");
+        pStaStateMachine->SendMessage(WIFI_AUDIO_STATE_CHANGED_NOTIFY_EVENT, state);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 void StaService::HandleFoldStatusChanged(int foldstatus)
 {
     if (pStaStateMachine == nullptr) {

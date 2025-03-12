@@ -396,6 +396,13 @@ public:
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac) = 0;
 
     /**
+     * @Description Deliver Audio State
+     *
+	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DeliverAudioState(int state) = 0;
+
+    /**
      * @Description  wifiPro service initialization function.
      *
      * @return VoWifiSignalInfo : wifi signal info

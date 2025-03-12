@@ -45,6 +45,7 @@
 #include "wifi_randommac_helper.h"
 #include "wifi_sta_hal_interface.h"
 #include "block_connect_service.h"
+#include "sta_define.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -2083,6 +2084,22 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiDeviceServiceImpl::DeliverAudioState(const WifiNetworkControlInfo& networkControlInfo)
+{
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return;
+    }
+    if (networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK) {
+        if (networkControlInfo.state == AUDIO_ON) {
+            pService->DeliverAudioState(AUDIO_ON);
+        } else {
+            pService->DeliverAudioState(AUDIO_OFF);
+        }
+    }
+}
+
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiDeviceServiceImpl::ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
 {
@@ -2102,6 +2119,7 @@ ErrCode WifiDeviceServiceImpl::ReceiveNetworkControlInfo(const WifiNetworkContro
         return WIFI_OPT_FAILED;
     }
     AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    DeliverAudioState(networkControlInfo);
     return WIFI_OPT_SUCCESS;
 }
 

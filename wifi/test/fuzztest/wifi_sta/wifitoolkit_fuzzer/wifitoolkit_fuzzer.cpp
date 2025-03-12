@@ -132,16 +132,11 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
     m_appXmlParser->IsBlackListApp(conditionName);
     m_appXmlParser->IsChariotApp(conditionName);
     m_appXmlParser->IsHighTempLimitSpeedApp(conditionName);
-    m_appXmlParser->InitAppParser(string);
+    m_appXmlParser->appParserInner_->InitAppParser(string);
 
-    m_appXmlParser->ParseInternal(root_node);
-    m_appXmlParser->GetAppTypeAsInt(root_node);
-    m_appXmlParser->ReadPackageCloudFilterConfig();
-    m_appXmlParser->IsReadCloudConfig();
-    m_appXmlParser->GetCloudPushFileVersion(string);
-    m_appXmlParser->GetLocalFileVersion(string);
-    m_appXmlParser->GetCloudPushVersionFilePath();
-    m_appXmlParser->GetCloudPushJsonFilePath();
+    m_appXmlParser->appParserInner_->ParseInternal(root_node);
+    m_appXmlParser->appParserInner_->GetAppTypeAsInt(root_node);
+    m_appXmlParser->appParserInner_->GetLocalFileVersion(root_node);
     m_xmlParser->LoadConfiguration(string);
     m_xmlParser->LoadConfigurationMemory(string);
 }

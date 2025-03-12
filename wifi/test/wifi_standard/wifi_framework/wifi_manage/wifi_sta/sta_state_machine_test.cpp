@@ -31,6 +31,7 @@
 #include "mock_wifi_sta_hal_interface.h"
 #include "mock_block_connect_service.h"
 #include "wifi_history_record_manager.h"
+#include "sta_define.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -1751,6 +1752,17 @@ public:
         std::string bssid = "11:22:33:44:55:66";
         pStaStateMachine->UpdateLinkedBssid(bssid);
     }
+
+    void AudioStateNotifyTest()
+    {
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetParam1(AUDIO_ON);
+        pStaStateMachine->DealAudioStateChangedEvent(msg);
+        EXPECT_EQ(pStaStateMachine->isAudioOn_, AUDIO_ON);
+        msg->SetParam1(AUDIO_OFF);
+        pStaStateMachine->DealAudioStateChangedEvent(msg);
+        EXPECT_EQ(pStaStateMachine->isAudioOn_, AUDIO_OFF);
+    }
 };
 
 HWTEST_F(StaStateMachineTest, UpdateExpandOffsetRange, TestSize.Level1)
@@ -2703,6 +2715,11 @@ HWTEST_F(StaStateMachineTest, UpdateLinkedBssidTest, TestSize.Level1)
 {
     UpdateLinkedBssidTest();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, AudioStateNotifyTest, TestSize.Level1)
+{
+    AudioStateNotifyTest();
 }
 } // namespace Wifi
 } // namespace OHOS

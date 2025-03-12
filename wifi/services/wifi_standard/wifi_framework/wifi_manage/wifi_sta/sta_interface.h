@@ -390,6 +390,13 @@ public:
     virtual ErrCode DeliverStaIfaceData(const std::string &bssid) override;
 
 	/**
+     * @Description DeliverAudioState.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DeliverAudioState(int state) override;
+
+	/**
      * @Description OnFoldStateChanged.
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED

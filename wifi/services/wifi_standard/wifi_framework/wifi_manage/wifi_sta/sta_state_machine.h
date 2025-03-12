@@ -790,6 +790,13 @@ private:
     void DealScreenStateChangedEvent(InternalMessagePtr msg);
 
     /**
+     * @Description : Deal audio state change event.
+     *
+     * @param msg - Message body received by the state machine[in]
+     */
+    void DealAudioStateChangedEvent(InternalMessagePtr msg);
+
+    /**
      * @Description set external sim
      *
      * @param ifName - port name(in)
@@ -1001,6 +1008,7 @@ private:
     void UpdateHiLinkAttribute();
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
+    void EnableScreenOffSignalPoll();
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
@@ -1051,6 +1059,7 @@ private:
     std::string curForegroundAppBundleName_ = "";
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
+    int isAudioOn_ = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

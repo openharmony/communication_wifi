@@ -516,6 +516,15 @@ ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::DeliverAudioState(int state)
+{
+    WIFI_LOGI("Enter DeliverAudioState");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->DeliverAudioState(state);
+    return WIFI_OPT_SUCCESS;
+}
+
 bool StaInterface::InitStaServiceLocked()
 {
     WIFI_LOGI("InitStaServiceLocked m_instId:%{public}d\n", m_instId);

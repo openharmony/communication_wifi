@@ -84,6 +84,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
     WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
     p2pInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
     WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
+    groupManager.SaveP2pInfo(p2pInfo);
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
     group.SetCreatorUid(WifiConfigCenter::GetInstance().GetP2pCreatorUid());
     WifiConfigCenter::GetInstance().SaveP2pCreatorUid(-1);

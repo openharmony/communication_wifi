@@ -329,15 +329,18 @@ static bool CheckOriSsidLength(const WifiDeviceConfig &config)
     std::string deviceKeyMgmt = "";
     for (auto &scanInfo : scanInfoList) {
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (config.ssid == scanInfo.ssid && WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
+        // Hybrid encryption currently only supports WPA-PSK+SAE, which is treated specially here
+        if (config.ssid == scanInfo.ssid
+            && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
+                || (config.keyMgmt == deviceKeyMgmt))) {
             LOGI("CheckOriSsidLength: oriSsid length:%{public}u", scanInfo.oriSsid.length());
-            if ((scanInfo.oriSsid.length() <= 0) || (scanInfo.oriSsid.length() > DEVICE_NAME_LENGTH)) {
-                return false;
+            if ((scanInfo.oriSsid.length() > 0) && (scanInfo.oriSsid.length() <= DEVICE_NAME_LENGTH)) {
+                return true;
             }
             break;
         }
     }
-    return true;
+    return false;
 }
 
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)

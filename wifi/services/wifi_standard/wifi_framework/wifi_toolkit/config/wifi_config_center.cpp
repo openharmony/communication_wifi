@@ -1506,5 +1506,18 @@ bool WifiConfigCenter::IsAllowPopUp()
             return true;
     }
 }
+
+bool WifiConfigCenter::IsNeedFastScan(void)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    return isNeedFastScan;
+}
+
+void WifiConfigCenter::SetFastScan(bool fastScan)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    isNeedFastScan = fastScan;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

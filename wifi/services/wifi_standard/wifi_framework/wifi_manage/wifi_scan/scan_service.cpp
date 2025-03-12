@@ -517,6 +517,11 @@ bool ScanService::SingleScan(ScanConfig &scanConfig)
         return false;
     }
 
+#ifndef OHOS_ARCH_LITE
+    /* Check whether to perform fast scan based on historical information after wifi is enable. */
+    CheckNeedFastScan(interConfig.scanFreqs);
+#endif
+
     if (!AddScanMessageBody(interMessage, interConfig)) {
         std::unique_lock<std::mutex> lock(scanConfigMapMutex);
         scanConfigMap.erase(requestIndex);
@@ -2116,6 +2121,44 @@ void ScanService::Delete5GhzFreqs(std::vector<int> &freqs)
     }
 
     return;
+}
+
+void ScanService::GetSavedNetworkFreq(std::vector<int> &scanFreqs)
+{
+    std::vector<WifiDeviceConfig> deviceConfigs;
+    std::vector<int32_t> availableFreqs;
+
+    if (WifiSettings::GetInstance().GetDeviceConfig(deviceConfigs) != 0) {
+        WIFI_LOGE("GetDeviceConfig failed");
+        return;
+    }
+    if (!WifiChannelHelper::GetInstance().GetAvailableScanFreqs(ScanBandType::SCAN_BAND_BOTH_WITH_DFS,
+        availableFreqs)) {
+        WIFI_LOGE("GetAvailableScanFreqs failed");
+        return;
+    }
+    for (auto dev : deviceConfigs) {
+        if (std::find(scanFreqs.begin(), scanFreqs.end(), dev.frequency) == scanFreqs.end() &&
+            std::find(availableFreqs.begin(), availableFreqs.end(), dev.frequency) != availableFreqs.end()) {
+            scanFreqs.push_back(dev.frequency);
+        }
+    }
+}
+
+void ScanService::CheckNeedFastScan(std::vector<int> &scanFreqs)
+{
+    if (GetDeviceType() != ProductDeviceType::WEARABLE) {
+        WIFI_LOGD("Not wearable device, do not fast scan");
+        return;
+    }
+    /* If scan freqs is empty, the freq for the first periodic scanning is selected based on
+     * the historical connection freq.
+    */
+    if (systemScanIntervalMode.scanIntervalMode.count == 1 && scanFreqs.empty() == 0 &&
+        WifiConfigCenter::GetInstance().IsNeedFastScan()) {
+        WifiConfigCenter::GetInstance().SetFastScan(false);
+        GetSavedNetworkFreq(scanFreqs);
+    }
 }
 
 bool ScanService::GetSavedNetworkSsidList(std::vector<std::string> &savedNetworkSsid)

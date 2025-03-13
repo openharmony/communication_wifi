@@ -136,7 +136,6 @@ void WifiProChr::RecordSwitchChrCnt(bool isSuccess)
         } else {
             return;
         }
-        UpdateWifiProLinkedInfo();
     } else {
         if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET) {
             g_WifiProResultCnt[WifiProEventResult::NONET_FAILED]++;
@@ -209,18 +208,6 @@ void WifiProChr::RecordWifiProSwitchSuccTime()
     } else {
         RecordSwitchTimeChrCnt(WifiProSwitchTimeCnt::SWITCH_TIME_LEVEL3);
     }
-}
-
-void WifiProChr::UpdateWifiProLinkedInfo()
-{
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    WifiDeviceConfig configs;
-    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, configs);
-    wifiProConnectSsid_ = configs.ssid;
-    wifiProConnectKeyMgmt_ = configs.keyMgmt;
-    WIFI_LOGI("UpdateWifiProLinkedInfo, wifiProSuccFlag_ : %{public}s, wifiProConnectSsid_ : %{public}s, ",
-        wifiProConnectSsid_.c_str(), wifiProConnectKeyMgmt_.c_str());
 }
 
 void WifiProChr::RecordCountWiFiPro(bool isValid)

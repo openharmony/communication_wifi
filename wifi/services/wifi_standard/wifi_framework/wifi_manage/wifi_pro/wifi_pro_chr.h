@@ -76,7 +76,6 @@ public:
     void RecordWifiProStartTime(WifiSwitchReason reason);
     void RecordWifiProConnectTime();
     void RecordWifiProSwitchSuccTime();
-    void UpdateWifiProLinkedInfo();
     void RecordCountWiFiPro(bool isValid);
     void WriteWifiProSysEvent();
 
@@ -84,8 +83,6 @@ private:
     int64_t wifiProStartTime_ = 0;
     int64_t wifiProSumTime_ = 0;
     int64_t lastLoadTime_ = 0;
-    std::string wifiProConnectSsid_ = "";
-    std::string wifiProConnectKeyMgmt_ = "";
     WifiSwitchReason switchReason_ = WifiSwitchReason::WIFI_SWITCH_REASON_DEFAULT;
 };
 }  // namespace Wifi

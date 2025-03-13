@@ -132,11 +132,13 @@ int CreateUnixServer(const char *path, int backlog)
     int keepAlive = 1;
     if (setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive)) < 0) {
         LOGE("setsockopt failed!");
+        close(sock);
         return -1;
     }
     int reuseaddr = 1;
     if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&reuseaddr, sizeof(reuseaddr)) < 0) {
         LOGE("setsockopt failed!");
+        close(sock);
         return -1;
     }
     int ret = bind(sock, (struct sockaddr *)&sockAddr, sizeof(sockAddr));

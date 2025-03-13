@@ -358,10 +358,10 @@ int WifiConfigCenter::GetMloLinkedInfo(std::vector<WifiLinkedInfo> &mloInfo, int
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mWifiMloLinkedInfo.find(instId);
     if (iter != mWifiMloLinkedInfo.end()) {
-        mloInfo = iter->second;
-        if (mloInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
+        if (iter->second.size() != WIFI_MAX_MLO_LINK_NUM) {
             return -1;
         }
+        mloInfo = iter->second;
     }
     return 0;
 }
@@ -626,6 +626,28 @@ int WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
         }
     }
     return 0;
+}
+
+void WifiConfigCenter::SetMloWifiLinkedMaxSpeed(int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto mloIter = mWifiMloLinkedInfo.find(instId);
+    if (mloIter == mWifiMloLinkedInfo.end()) {
+        return;
+    }
+    if (mloIter->second.size() != WIFI_MAX_MLO_LINK_NUM) {
+        return;
+    }
+    std::vector<WifiScanInfo> wifiScanInfoList;
+    wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
+    for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
+        for (auto& mloInfoItem : mWifiMloLinkedInfo[instId]) {
+            if (iter->bssid == mloInfoItem.bssid) {
+                mloInfoItem.maxSupportedRxLinkSpeed = iter->maxSupportedRxLinkSpeed;
+                mloInfoItem.maxSupportedTxLinkSpeed = iter->maxSupportedTxLinkSpeed;
+            }
+        }
+    }
 }
 
 bool WifiConfigCenter::CheckScanOnlyAvailable(int instId)
@@ -1483,6 +1505,34 @@ bool WifiConfigCenter::IsAllowPopUp()
             LOGI("Allow pop up dialog, device type:%{public}d", mDeviceType);
             return true;
     }
+}
+
+bool WifiConfigCenter::IsNeedFastScan(void)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    return isNeedFastScan;
+}
+
+void WifiConfigCenter::SetFastScan(bool fastScan)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    isNeedFastScan = fastScan;
+}
+
+void WifiConfigCenter::SetAutoConnect(bool autoConnectEnable)
+{
+    if (GetDeviceType() != ProductDeviceType::WEARABLE) {
+        LOGD("SetAutoConnect not wearable device");
+        return;
+    }
+
+    LOGI("SetAutoConnect autoConnectEnable:%{public}d", autoConnectEnable);
+    autoConnectEnable_.store(autoConnectEnable);
+}
+
+bool WifiConfigCenter::GetAutoConnect()
+{
+    return autoConnectEnable_.load();
 }
 }  // namespace Wifi
 }  // namespace OHOS

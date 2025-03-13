@@ -33,7 +33,7 @@ public:
     virtual void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
     void StopTimer(int timerName);
     void StartTimer(int timerName, int64_t interval);
-    void StartRoamToNetwork(std::string bssid);
+    void StartConnectToBssid(std::string bssid);
     void StopHandlerThread();
     bool InitialStateMachine(const std::string &name = "RunHandleThread");
     void StartStateMachine();

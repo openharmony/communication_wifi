@@ -42,6 +42,7 @@ declare_args() {
       defined(global_parts_info.resourceschedule_ffrt)) {
     wifi_ffrt_enable = true
   }
+  wifi_feature_with_data_report = true
   wifi_feature_sta_ap_exclusion = true
   wifi_feature_with_random_mac_addr = true
   wifi_feature_with_hpf_supported = true

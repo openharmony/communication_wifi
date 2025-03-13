@@ -193,6 +193,7 @@ public:
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
+        void DealScreenStateChangedEvent(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
 
@@ -249,6 +250,9 @@ public:
 
     private:
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
+        void DealWpaLinkPasswdWrongFailEvent();
+        void DealWpaLinkFullConnectFailEvent();
+        void DealWpaLinkAssocRejectFailEvent();
         void DealWpaLinkFailEvent(InternalMessagePtr msg);
     private:
         StaStateMachine *pStaStateMachine;
@@ -270,6 +274,7 @@ public:
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
         void HandleLinkSwitchEvent(InternalMessagePtr msg);
         void DealStartRoamCmdInApLinkedState(InternalMessagePtr msg);
+        void DealCsaChannelChanged(InternalMessagePtr msg);
 
     private:
         StaStateMachine *pStaStateMachine;
@@ -411,7 +416,7 @@ public:
      *
      * @param bssid - the mac address of network(in)
      */
-    void StartRoamToNetwork(std::string bssid);
+    void StartConnectToBssid(std::string bssid);
     /**
      * @Description Register sta callback function
      *
@@ -453,7 +458,6 @@ public:
     void DealHiLinkDataToWpa(InternalMessagePtr msg);
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
-    void DealCsaChannelChanged(InternalMessagePtr msg);
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);
@@ -563,6 +567,20 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
+
+    /**
+     * @Description User select connect to network.
+     *
+     * @param deviceConfig - Ap device config information
+     */
+    void UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName);
+
+    /**
+     * @Description Auto select connect to network.
+     *
+     * @param bssid - the bssid of network which is going to be connected.
+     */
+    void AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName);
 
     void SetAllowAutoConnectStatus(int32_t networkId, bool status);
 

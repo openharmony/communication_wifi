@@ -1,0 +1,92 @@
+# Copyright (C) 2024-2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/communication/wifi/wifi/wifi.gni")
+
+local_base_sources = [ "select_network_data_report.cpp" ]
+
+local_base_include_dirs = [
+  "$WIFI_ROOT_DIR/base/cRPC/include",
+  "$WIFI_ROOT_DIR/base/utils",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+  "$WIFI_ROOT_DIR/services/wifi_standard/sdk/include",
+  "$WIFI_ROOT_DIR/interfaces/inner_api",
+  "$WIFI_ROOT_DIR/frameworks/native/interfaces",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+  "$WIFI_ROOT_DIR/utils/inc",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+]
+
+ohos_static_library("wifi_sta_ext_service") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = false  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+  sources = local_base_sources
+
+  include_dirs = local_base_include_dirs
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
+  cflags_cc += [
+    "-std=c++17",
+    "-fno-rtti",
+  ]
+
+  ldflags += [
+    "-fPIC",
+    "-Wl,-E",
+  ]
+
+  deps = [
+    "$WIFI_ROOT_DIR/base:wifi_base",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:app_manager",
+    "ability_runtime:wantagent_innerkits",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "cellular_data:tel_cellular_data_api",
+    "core_service:tel_core_service_api",
+    "dhcp:dhcp_sdk",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_base:net_stats_manager_if",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "time_service:time_client",
+  ]
+
+  defines = []
+
+  if (wifi_feature_with_data_report) {
+    defines += [ "WIFI_DATA_REPORT_ENABLE" ]
+  }
+  part_name = "wifi"
+  subsystem_name = "communication"
+}

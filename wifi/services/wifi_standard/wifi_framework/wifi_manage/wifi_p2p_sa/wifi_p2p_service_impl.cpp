@@ -279,8 +279,10 @@ ErrCode WifiP2pServiceImpl::StopDiscoverDevices(void)
 ErrCode WifiP2pServiceImpl::DiscoverServices(void)
 {
     WIFI_LOGI("DiscoverServices");
-    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DiscoverServices:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DiscoverServices:VerifyGetWifiLocalMacPermission or"
+            "VerifyGetWifiPeersPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -324,8 +326,10 @@ ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
 ErrCode WifiP2pServiceImpl::RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request)
 {
     WIFI_LOGI("RequestService");
-    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("RequestService:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RequestService:VerifyGetWifiLocalMacPermission or"
+            "VerifyGetWifiPeersMacPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1217,8 +1221,10 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("Hid2dConnect:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("QueryP2pGroups:VerifyGetWifiLocalMacPermission or"
+            "VerifyGetWifiPeersMacPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);

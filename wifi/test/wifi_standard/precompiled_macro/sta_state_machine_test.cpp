@@ -1003,7 +1003,7 @@ HWTEST_F(StaStateMachineTest, ConvertDeviceCfgTest01, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealCsaChannelChangedTest01, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    pStaStateMachine->DealCsaChannelChanged(msg);
+    pStaStateMachine->pApLinkedState->DealCsaChannelChanged(msg);
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 

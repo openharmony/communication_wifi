@@ -287,7 +287,10 @@ bool NetworkInterface::FetchApOrP2pIpAddress(
     bool ret = false;
     int n = 0;
     constexpr int prefixInterfaceName = 3;
-    constexpr int prefixP2P = 4;
+    if (static_cast<int>(interfaceName.size()) <= prefixInterfaceName) {
+        WIFI_LOGE("ifaceName is invalid!");
+        return false;
+    }
 
     if (getifaddrs(&ifaddr) == -1) {
         WIFI_LOGE("getifaddrs failed, error is %{public}d", errno);
@@ -298,15 +301,11 @@ bool NetworkInterface::FetchApOrP2pIpAddress(
             continue;
         }
         std::string subInterfaceName = interfaceName.substr(0, prefixInterfaceName);
-        char ifaName[prefixP2P + 1];
-        if (strncpy_s(ifaName, sizeof(ifaName), ifa->ifa_name, prefixP2P) != EOK) {
-            return false;
-        }
         if ((subInterfaceName == "wla") && (strncmp(interfaceName.c_str(), ifa->ifa_name, IF_NAMESIZE) == 0)) {
             continue;
         }
         if ((subInterfaceName == "p2p") &&
-            (strncmp("p2p0", ifa->ifa_name, IF_NAMESIZE) == 0 || strncmp("p2p-", ifaName, IF_NAMESIZE) == 0)) {
+            (strncmp("p2p0", ifa->ifa_name, IF_NAMESIZE) == 0 || strncmp("p2p-", ifa->ifa_name, strlen("p2p-")) == 0)) {
             continue;
         }
         ret |= SaveIpAddress(*ifa, vecipv4, vecIPv6);

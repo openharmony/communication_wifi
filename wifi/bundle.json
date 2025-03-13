@@ -163,6 +163,13 @@
                         "header_files": []
                     },
                     "name": "//foundation/communication/wifi/wifi/utils:wifi_utils"
+                },
+                {
+                    "header": {
+                        "header_base": "//foundation/communication/wifi/wifi/frameworks/cj/include",
+                        "header_files": []
+                    },
+                    "name": "//foundation/communication/wifi/wifi/frameworks/cj:cj_wifi_ffi"
                 }
             ],
             "test": [

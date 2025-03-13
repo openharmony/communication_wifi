@@ -260,7 +260,7 @@ static int WpaCliCmdSetNetwork(WifiWpaStaInterface *this, const struct WpaSetNet
     int pos = -1;
     for (unsigned i = 0; i < sizeof(g_wpaSsidFields) / sizeof(g_wpaSsidFields[0]); ++i) {
         if (g_wpaSsidFields[i].field == argv->param) {
-            pos = i;
+            pos = (int)i;
             break;
         }
     }
@@ -1032,7 +1032,7 @@ static bool GetChanWidthCenterFreqHe(ScanInfo *pcmd, ScanInfoElem* infoElem)
 
 static bool GetChanWidthCenterFreqHt(ScanInfo *pcmd, ScanInfoElem* infoElem)
 {
-    const int offsetBit = 0x3;
+    const unsigned int offsetBit = 0x3;
     if ((pcmd == NULL) || (infoElem == NULL)) {
         LOGE("pcmd or infoElem is NULL.");
         return false;

@@ -56,18 +56,64 @@ WifiNetAgent::~WifiNetAgent()
     }
 }
 
+bool WifiNetAgent::RegisterNetConnObserver(int instId)
+{
+    if (instId != INSTID_WLAN0) {
+        WIFI_LOGI("RegisterNetConnObserver instId is not 0.");
+        return false;
+    }
+
+    bool isBtNet = IsDefaultBtNet();
+    WifiConfigCenter::GetInstance().SetAutoConnect(!isBtNet);
+
+    if (netConnCallback_ == nullptr) {
+        netConnCallback_ = new (std::nothrow)NetInfoObserver();
+        if (netConnCallback_ == nullptr) {
+            WIFI_LOGE("RegisterNetConnObserver netConnCallback is null.");
+            return false;
+        }
+    }
+
+    NetManagerStandard::NetSpecifier netSpecifier;
+    NetManagerStandard::NetAllCapabilities netAllCapabilities;
+    netAllCapabilities.netCaps_.insert(NetManagerStandard::NetCap::NET_CAPABILITY_INTERNET);
+    netSpecifier.ident_ = "";
+    netSpecifier.netCapabilities_ = netAllCapabilities;
+    sptr<NetManagerStandard::NetSpecifier> specifier = new NetManagerStandard::NetSpecifier(netSpecifier);
+    NetManagerStandard::NetConnClient::GetInstance().RegisterNetConnCallback(specifier, netConnCallback_, 0);
+    WIFI_LOGI("RegisterNetConnObserver success.");
+    return true;
+}
+
+int32_t WifiNetAgent::NetInfoObserver::NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle)
+{
+    bool isBtNet = IsDefaultBtNet();
+    WifiConfigCenter::GetInstance().SetAutoConnect(!isBtNet);
+    WIFI_LOGI("NetAvailable, isBtNet:%{public}d.", isBtNet);
+    return 0;
+}
+
+bool WifiNetAgent::IsDefaultBtNet()
+{
+    NetManagerStandard::NetHandle defaultNet;
+    NetManagerStandard::NetConnClient::GetInstance().GetDefaultNet(defaultNet);
+    NetManagerStandard::NetAllCapabilities netAllCap;
+    NetConnClient::GetInstance().GetNetCapabilities(defaultNet, netAllCap);
+    return netAllCap.bearerTypes_.find(NetManagerStandard::BEARER_BLUETOOTH) != netAllCap.bearerTypes_.end();
+}
+
 bool WifiNetAgent::RegisterNetSupplier(int instId)
 {
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplier.");
     std::unique_lock<std::mutex> lock(netAgentMutex_);
 
-    std::string ident = "wifi";
     using NetManagerStandard::NetBearType;
     using NetManagerStandard::NetCap;
-    std::set<NetCap> netCaps {NetCap::NET_CAPABILITY_INTERNET};
+    std::string ident = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
+    // wlan1 is not used as a standalone channel.
+    std::set<NetCap> netCaps = (instId == 0) ? std::set<NetCap>{NetCap::NET_CAPABILITY_INTERNET} : std::set<NetCap>{};
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
-    std::string supplierIdStr = (instId == 0) ? "supplierIdForWlan0" : "supplierIdForWlan1";
     if (supplierIdNow != INVALID_SUPPLIER_ID) {
         WIFI_LOGI("RegisterNetSupplier supplierId alread exist.");
         return true;
@@ -75,7 +121,7 @@ bool WifiNetAgent::RegisterNetSupplier(int instId)
     int32_t result = NetConnClient::GetInstance().RegisterNetSupplier(NetBearType::BEARER_WIFI,
                                                                       ident, netCaps, supplierIdNow);
     if (result == NETMANAGER_SUCCESS) {
-        WIFI_LOGI("Register %{public}s successful, supplierId is [%{public}d]", supplierIdStr.c_str(), supplierIdNow);
+        WIFI_LOGI("Register %{public}s successful, supplierId is [%{public}d]", ident.c_str(), supplierIdNow);
         return true;
     }
     WIFI_LOGI("Register NetSupplier failed");
@@ -224,6 +270,7 @@ void WifiNetAgent::OnStaMachineWifiStart(int instId)
 #endif
             this->RegisterNetSupplier(m_instId);
             this->RegisterNetSupplierCallback(m_instId);
+            this->RegisterNetConnObserver(m_instId);
         });
     }
 }
@@ -242,6 +289,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
 #endif
         this->RegisterNetSupplier(m_instId);
         this->RegisterNetSupplierCallback(m_instId);
+        this->RegisterNetConnObserver(m_instId);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.connState == ConnState::CONNECTED) {
@@ -542,8 +590,7 @@ void WifiNetAgent::NetConnCallback::LogNetCaps(
 void WifiNetAgent::RestoreWifiConnection()
 {
     using NetManagerStandard::NetBearType;
-    int32_t result = NetConnClient::GetInstance().UpdateSupplierScore(NetBearType::BEARER_WIFI,
-        ACCEPT_UNVALIDATED, supplierId);
+    int32_t result = NetConnClient::GetInstance().IncreaseSupplierScore(supplierId);
     WIFI_LOGI("Restore Wifi Connection, result:%{public}d", result);
 }
 }

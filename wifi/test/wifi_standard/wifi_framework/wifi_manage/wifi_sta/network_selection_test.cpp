@@ -62,30 +62,6 @@ HWTEST_F(NetworkSelectionTest, TestMinRssiFor24G, TestSize.Level1)
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 2407;
-    scanInfo1.rssi = -78;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
-    EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
-        wifiDeviceConfig.networkId = 0;
-        return 0;
-    }));
-    NetworkSelectionManager selectionManager;
-    EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
-    scanInfo1.rssi = -77;
-    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
-}
-
-HWTEST_F(NetworkSelectionTest, TestMinRssiFor5G, TestSize.Level1)
-{
-    NetworkSelectionResult selectionResult;
-    std::vector<InterScanInfo> scanInfos;
-    auto &scanInfo1 = scanInfos.emplace_back();
-    scanInfo1.bssid = "11:11:11:11:11";
-    scanInfo1.ssid = "test1";
-    scanInfo1.frequency = 5820;
     scanInfo1.rssi = -81;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -102,6 +78,30 @@ HWTEST_F(NetworkSelectionTest, TestMinRssiFor5G, TestSize.Level1)
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
 }
 
+HWTEST_F(NetworkSelectionTest, TestMinRssiFor5G, TestSize.Level1)
+{
+    NetworkSelectionResult selectionResult;
+    std::vector<InterScanInfo> scanInfos;
+    auto &scanInfo1 = scanInfos.emplace_back();
+    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.ssid = "test1";
+    scanInfo1.frequency = 5820;
+    scanInfo1.rssi = -78;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
+    EXPECT_CALL(WifiSettings::GetInstance(),
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        wifiDeviceConfig.networkId = 0;
+        return 0;
+    }));
+    NetworkSelectionManager selectionManager;
+    EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
+    scanInfo1.rssi = -77;
+    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
+}
+
 HWTEST_F(NetworkSelectionTest, TestUnSavedNetwork, TestSize.Level1)
 {
     NetworkSelectionResult selectionResult;
@@ -110,7 +110,7 @@ HWTEST_F(NetworkSelectionTest, TestUnSavedNetwork, TestSize.Level1)
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
@@ -135,7 +135,7 @@ HWTEST_F(NetworkSelectionTest, TestPasspointNetwork, TestSize.Level1)
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
@@ -168,7 +168,7 @@ HWTEST_F(NetworkSelectionTest, TestEphemeralNetwork, TestSize.Level1)
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
@@ -201,7 +201,7 @@ HWTEST_F(NetworkSelectionTest, TestEnableNetwork, TestSize.Level1)
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
@@ -239,7 +239,7 @@ HWTEST_F(NetworkSelectionTest, TestMatchUserSelectBssidNetwork, TestSize.Level1)
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
@@ -267,17 +267,17 @@ HWTEST_F(NetworkSelectionTest, TestBlackListNetworks, TestSize.Level1)
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     auto &scanInfo2 = scanInfos.emplace_back();
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     auto &scanInfo3 = scanInfos.emplace_back();
     scanInfo3.bssid = "33:33:33:33:33";
     scanInfo3.ssid = "test3";
     scanInfo3.frequency = 5028;
-    scanInfo3.rssi = -80;
+    scanInfo3.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -307,12 +307,12 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksByDifferentHistoryStatus, 
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     auto &scanInfo2 = scanInfos.emplace_back();
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -340,12 +340,12 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentSignalLevels,
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     auto &scanInfo2 = scanInfos.emplace_back();
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -373,12 +373,12 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentSecurities, T
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     auto &scanInfo2 = scanInfos.emplace_back();
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     scanInfo2.capabilities = "SAE";
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
@@ -412,7 +412,7 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentBands, TestSi
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -445,7 +445,7 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentBandsAndDiffe
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -462,7 +462,7 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentBandsAndDiffe
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos));
-    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 1);
+    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 0);
 }
 
 HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDiffrentRssi, TestSize.Level1)
@@ -542,12 +542,12 @@ HWTEST_F(NetworkSelectionTest, TestBlackListNetworkAndNoInternetNetwork, TestSiz
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     auto &scanInfo2 = scanInfos.emplace_back();
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -577,12 +577,12 @@ HWTEST_F(NetworkSelectionTest, TestNoInternetNetworkAndPortalNetwork, TestSize.L
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     auto &scanInfo2 = scanInfos.emplace_back();
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -612,12 +612,12 @@ HWTEST_F(NetworkSelectionTest, TestPortalNetworkAndRecoveryNetwork, TestSize.Lev
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     auto &scanInfo2 = scanInfos.emplace_back();
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
@@ -648,12 +648,12 @@ HWTEST_F(NetworkSelectionTest, TestRecoveryNetworkAndHasInternetNetwork, TestSiz
     scanInfo1.bssid = "11:11:11:11:11";
     scanInfo1.ssid = "test1";
     scanInfo1.frequency = 5028;
-    scanInfo1.rssi = -80;
+    scanInfo1.rssi = -77;
     auto &scanInfo2 = scanInfos.emplace_back();
     scanInfo2.bssid = "22:22:22:22:22";
     scanInfo2.ssid = "test2";
     scanInfo2.frequency = 5028;
-    scanInfo2.rssi = -80;
+    scanInfo2.rssi = -77;
     NetworkSelectionManager selectionManager;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));

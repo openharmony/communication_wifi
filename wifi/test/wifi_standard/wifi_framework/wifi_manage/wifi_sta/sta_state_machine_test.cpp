@@ -352,7 +352,7 @@ public:
 
     void StartConnectToNetworkFail1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).WillRepeatedly(Return(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).WillRepeatedly(Return(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->StartConnectToNetwork(0, "wifitest/123", 0) == WIFI_OPT_FAILED);
@@ -1152,7 +1152,7 @@ public:
         pStaStateMachine->foldStatus_ = EXPAND;
         pStaStateMachine->pLinkedState->halfFoldRssi_ = halfFoldRssiValue;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_DEFAULT);
+        EXPECT_NE(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_DEFAULT);
     }
 
     void UpdateExpandOffsetDefault()

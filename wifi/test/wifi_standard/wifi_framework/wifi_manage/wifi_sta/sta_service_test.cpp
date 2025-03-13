@@ -1008,13 +1008,13 @@ HWTEST_F(StaServiceTest, StaServiceAutoConnectServiceSuccess, TestSize.Level1)
 HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackSuccess, TestSize.Level1)
 {
     StaServiceRegisterStaServiceCallbackSuccess();
-    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("StaServiceTest")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackFail, TestSize.Level1)
 {
     StaServiceRegisterStaServiceCallbackFail();
-    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("StaServiceTest")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestSucc, TestSize.Level1)

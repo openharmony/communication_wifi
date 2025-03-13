@@ -10,15 +10,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
- 
+
 ohos_shared_library("wifimanager_ani") {
-  include_dirs = [
-    "./include"
-  ]
+  include_dirs = [ "./include" ]
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = true  # Enable boundary san detection
@@ -29,26 +27,24 @@ ohos_shared_library("wifimanager_ani") {
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   external_deps = [
     "runtime_core:ani",
-    "runtime_core:libarkruntime"
+    "runtime_core:libarkruntime",
   ]
   part_name = "wifi"
   subsystem_name = "communication"
   output_extension = "so"
 }
- 
+
 generate_static_abc("wifimanager_ani_abc") {
   base_url = "./ets"
-  files = [
-     "./ets/@ohos.wifiManager.ets",
-  ]
+  files = [ "./ets/@ohos.wifiManager.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/wifimanager_ani_abc.abc"
 }
- 
+
 ohos_prebuilt_etc("wifimanager_ani_abc_etc") {
   source = "$target_out_dir/wifimanager_ani_abc.abc"
   module_install_dir = "framework"
   part_name = "wifi"
   subsystem_name = "communication"
-  deps = [":wifimanager_ani_abc"]
+  deps = [ ":wifimanager_ani_abc" ]
 }

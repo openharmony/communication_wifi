@@ -1927,7 +1927,7 @@ bool SelfCureStateMachine::AgeOutWifiCategoryBlack(int blaListType)
         if (GetNowMilliSeconds() - iter->second.updateTime >= WIFI_BLA_LIST_TIME_EXPIRED) {
             WifiConfigCenter::GetInstance().RemoveWifiCategoryBlackListCache(blaListType, iter->first);
             isUpdate = true;
-            WIFI_LOGI("%{public}s blaListType:%{public}d remove bssid: %{public}s for ageOut",
+            WIFI_LOGI("%{public}s blaListType:%{public}d remove bssid: %{public}s for ageOut", __FUNCTION__
                 blaListType, MacAnonymize(iter->first).c_str());
         }
     }
@@ -1942,7 +1942,7 @@ bool SelfCureStateMachine::AgeOutWifiCategoryBlack(int blaListType)
         }
         WifiConfigCenter::GetInstance().RemoveWifiCategoryBlackListCache(blaListType, delBssid);
         isUpdate = true;
-        WIFI_LOGI("%{public}s blaListType:%{public}d remove bssid: %{public}s for reach max size",
+        WIFI_LOGI("%{public}s blaListType:%{public}d remove bssid: %{public}s for reach max size", __FUNCTION__
             blaListType, MacAnonymize(delBssid).c_str());
     }
     return isUpdate;

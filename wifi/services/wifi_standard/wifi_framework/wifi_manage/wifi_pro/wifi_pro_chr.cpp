@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiProChr");
-const int64_t ONE_DAY_TIME = 20;
+const int64_t ONE_DAY_TIME = 24 * 60 * 60 * 1000;
 const int32_t TIME_LEVEL1_CNT = 3000;
 const int32_t TIME_LEVEL2_CNT = 5000;
 const int32_t TIME_START_TO_CONNECT_LEVEL1_CNT = 1000;

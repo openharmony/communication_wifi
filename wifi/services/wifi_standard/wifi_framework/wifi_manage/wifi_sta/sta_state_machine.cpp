@@ -54,6 +54,7 @@
 #else
 #include "mock_dhcp_service.h"
 #endif
+#include "sta_define.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -343,6 +344,11 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             DealScreenStateChangedEvent(msg);
             break;
         }
+        case WIFI_AUDIO_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            pStaStateMachine->DealAudioStateChangedEvent(msg);
+            break;
+        }
         default:
             WIFI_LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
@@ -573,9 +579,14 @@ void StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr 
     if (screenState == MODE_STATE_OPEN) {
         pStaStateMachine->enableSignalPoll = true;
     } else {
-        pStaStateMachine->enableSignalPoll = false;
+        if (pStaStateMachine->isAudioOn_ == AUDIO_OFF) {
+            pStaStateMachine->enableSignalPoll = false;
+        } else {
+            pStaStateMachine->enableSignalPoll = true;
+        }
     }
 }
+
 /* --------------------------- state machine link State ------------------------------ */
 StaStateMachine::LinkState::LinkState(StaStateMachine *staStateMachine)
     : State("LinkState"), pStaStateMachine(staStateMachine)
@@ -1243,7 +1254,8 @@ StaStateMachine::ApLinkedState::~ApLinkedState()
 void StaStateMachine::ApLinkedState::GoInState()
 {
     WIFI_LOGI("ApLinkedState GoInState function.");
-    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
+    if ((WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) &&
+        (pStaStateMachine->isAudioOn_ == AUDIO_OFF)) {
         pStaStateMachine->enableSignalPoll = false;
     } else {
         pStaStateMachine->enableSignalPoll = true;
@@ -2626,6 +2638,15 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
     WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
 }
 
+void StaStateMachine::EnableScreenOffSignalPoll()
+{
+    enableSignalPoll = true;
+    lastSignalLevel_ = INVALID_SIGNAL_LEVEL; // Reset signal level when first start signal poll
+    staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY_WITH_TASK;
+    StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+    StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
+}
+
 void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
@@ -2638,13 +2659,19 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
     if (screenState == MODE_STATE_OPEN) {
         enableSignalPoll = true;
         lastSignalLevel_ = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
+        StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
         StartTimer(static_cast<int>(CMD_SIGNAL_POLL), 0);
         StartDetectTimer(DETECT_TYPE_DEFAULT);
     }
-
     if (screenState == MODE_STATE_CLOSE) {
-        enableSignalPoll = false;
-        StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+        if (isAudioOn_) {
+            EnableScreenOffSignalPoll();
+            WIFI_LOGI("DealScreenOffPoll, screen off poll start");
+        } else {
+            enableSignalPoll = false;
+            StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
+            WIFI_LOGI("DealScreenOffPoll, screen off poll stop");
+        }
         StopTimer(static_cast<int>(CMD_START_NETCHECK));
     }
 #ifndef OHOS_ARCH_LITE
@@ -2657,6 +2684,25 @@ void StaStateMachine::DealScreenStateChangedEvent(InternalMessagePtr msg)
         }
     }
     return;
+}
+
+void StaStateMachine::DealAudioStateChangedEvent(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealScreenOffPoll InternalMessage msg is null.");
+        return;
+    }
+    int isAudioOn = msg->GetParam1();
+    WIFI_LOGI("DealScreenOffPoll, Receive msg: isAudioOn=%{public}d", isAudioOn);
+    isAudioOn_ = isAudioOn;
+    if ((WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) && (isAudioOn_ == AUDIO_OFF)) {
+        WIFI_LOGI("DealScreenOffPoll, poll stop when screen off and audio off");
+        enableSignalPoll = false;
+        staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
+    } else if ((WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) && (isAudioOn_ == AUDIO_ON)) {
+        WIFI_LOGI("DealScreenOffPoll, poll start when screen off and audio on");
+        EnableScreenOffSignalPoll();
+    }
 }
 
 void StaStateMachine::ResetWifi7WurInfo()

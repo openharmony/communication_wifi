@@ -12,13 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-loadLibrary("wifimanager_ani");
- 
+
 export namespace wifiManager {
+    loadLibrary("wifimanager_ani.z");
     export native function isWifiActive(): boolean;
 }
- 
+
 function main(){
     console.println("wifi manager")
     let c = wifiManager.isWifiActive();

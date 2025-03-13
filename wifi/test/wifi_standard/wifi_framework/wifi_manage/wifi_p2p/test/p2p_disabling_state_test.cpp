@@ -74,7 +74,7 @@ HWTEST_F(P2pDisablingStateTest, ExecuteStateMsg, TestSize.Level1)
     EXPECT_TRUE(pP2pDisablingState->ExecuteStateMsg(msg));
 
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    EXPECT_TRUE(pP2pDisablingState->ExecuteStateMsg(msg));
+    EXPECT_FALSE(pP2pDisablingState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pDisablingStateTest, ExecuteStateMsg2, TestSize.Level1)

@@ -418,9 +418,9 @@ public:
         pStaStateMachine->SetRandomMac(deviceConfig, "");
     }
 
-    void StartRoamToNetworkSuccess()
+    void StartConnectToBssidSuccess()
     {
-        pStaStateMachine->StartRoamToNetwork("a2:b1:f5:c7:d1");
+        pStaStateMachine->StartConnectToBssid("a2:b1:f5:c7:d1");
     }
 
     void SeparatedStateGoInStateSuccess()
@@ -2018,9 +2018,9 @@ HWTEST_F(StaStateMachineTest, SetRandomMacFail2, TestSize.Level1)
     SetRandomMacFail2();
 }
 
-HWTEST_F(StaStateMachineTest, StartRoamToNetworkSuccess, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, StartConnectToBssidSuccess, TestSize.Level1)
 {
-    StartRoamToNetworkSuccess();
+    StartConnectToBssidSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 

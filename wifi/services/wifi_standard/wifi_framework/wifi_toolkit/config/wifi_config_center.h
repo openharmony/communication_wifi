@@ -170,6 +170,8 @@ public:
 
     int SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo);
 
+    void SetMloWifiLinkedMaxSpeed(int instId = 0);
+
     bool CheckScanOnlyAvailable(int instId = 0);
 
     std::string GetConnectedBssid(int instId = 0);
@@ -348,6 +350,13 @@ public:
     void SetDeviceType(int deviceType);
 
     bool IsAllowPopUp();
+
+    bool IsNeedFastScan(void);
+
+    void SetFastScan(bool fastScan);
+    void SetAutoConnect(bool autoConnectEnable);
+
+    bool GetAutoConnect();
 private:
     WifiConfigCenter();
     std::string GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
@@ -362,6 +371,7 @@ private:
 private:
     // STA
     std::mutex mStaMutex;
+    std::atomic<bool> autoConnectEnable_ {true};
     std::atomic<bool> mWifiSelfcureReset {false};
     std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
@@ -393,6 +403,7 @@ private:
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
+    bool isNeedFastScan = false;
 
     // AP
     std::mutex mApMutex;

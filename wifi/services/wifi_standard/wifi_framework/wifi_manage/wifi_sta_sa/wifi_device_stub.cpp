@@ -944,7 +944,9 @@ void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data
     ErrCode ret = GetSignalPollInfoArray(wifiSignalPollInfos, length);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        for (int index  = 0 ; index < length ; index++) {
+        int arrayLength = static_cast<int>(wifiSignalPollInfos.size());
+        reply.WriteInt32(arrayLength);
+        for (int index = 0; index < arrayLength; index++) {
             reply.WriteInt32(wifiSignalPollInfos[index].signal);
             reply.WriteInt32(wifiSignalPollInfos[index].txrate);
             reply.WriteInt32(wifiSignalPollInfos[index].rxrate);
@@ -971,6 +973,7 @@ void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, Me
     reply.WriteInt32(0);
     if (ret != WIFI_OPT_SUCCESS) {
         reply.WriteInt32(ret);
+        return;
     }
     uint32_t size = static_cast<uint32_t>(multiLinkedInfo.size());
     if (size > WIFI_MAX_MLO_LINK_NUM) {

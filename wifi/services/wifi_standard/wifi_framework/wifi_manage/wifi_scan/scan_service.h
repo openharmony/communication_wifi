@@ -956,6 +956,20 @@ private:
     };
     std::shared_ptr<IWifiCountryCodeChangeListener> m_scanObserver;
 #endif
+
+    /**
+     * @Description Check whether a quick scan is required
+     *
+     * @param scan freq
+     */
+     void CheckNeedFastScan(std::vector<int> &scanFreqs);
+     
+     /**
+     * @Description get freq from historical connection freq
+     *
+     * @param scan freq
+     */
+    void GetSavedNetworkFreq(std::vector<int> &scanFreqs);
 };
 }  // namespace Wifi
 }  // namespace OHOS

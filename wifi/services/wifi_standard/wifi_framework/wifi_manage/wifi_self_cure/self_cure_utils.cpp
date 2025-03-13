@@ -63,11 +63,19 @@ void SelfCureUtils::UnRegisterDnsResultCallback()
 
 int32_t SelfCureUtils::GetCurrentDnsFailedCounter()
 {
+    if (dnsResultCallback_ == nullptr) {
+        WIFI_LOGE("dnsResultCallback_ is null");
+        return -1;
+    }
     return dnsResultCallback_->dnsFailedCounter_;
 }
 
 void SelfCureUtils::ClearDnsFailedCounter()
 {
+    if (dnsResultCallback_ == nullptr) {
+        WIFI_LOGE("dnsResultCallback_ is null");
+        return;
+    }
     dnsResultCallback_->dnsFailedCounter_ = 0;
 }
 

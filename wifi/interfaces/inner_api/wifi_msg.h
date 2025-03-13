@@ -146,6 +146,12 @@ enum ConnState {
     UNKNOWN
 };
 
+enum WurState {
+    WUR_DISABLE = 0,
+    WUR_ENABLE = 1,
+    WUR_ENABLE_FAIL = 2
+};
+
 enum WifiLinkType:int32_t {
     DISCONNECT = -1,
     DEFAULT_LINK = 0,
@@ -784,6 +790,7 @@ struct WifiDeviceConfig {
         level = 0;
         isPasspoint = false;
         isEphemeral = false;
+        keyMgmtBitset = 0u;
         wepTxKeyIndex = 0;
         priority = 0;
         hiddenSSID = false;

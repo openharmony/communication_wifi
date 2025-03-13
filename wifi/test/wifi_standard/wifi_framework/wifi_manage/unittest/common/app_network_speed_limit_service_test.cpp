@@ -62,7 +62,8 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, LimitSpeed_HighTemp, TestSize.Level1)
 {
     WIFI_LOGI("LimitSpeed_HighTemp enter");
     AppNetworkSpeedLimitService::GetInstance().LimitSpeed(BG_LIMIT_CONTROL_ID_TEMP, BG_LIMIT_LEVEL_3);
-    EXPECT_EQ(BG_LIMIT_OFF,
+    sleep(1);
+    EXPECT_EQ(BG_LIMIT_LEVEL_3,
         AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP]);
 }
 
@@ -146,6 +147,155 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, IsLimitSpeedBgApp, TestSize.Level1)
 
     // Verify
     EXPECT_TRUE(result);
+
+    enable = 0;
+    result = AppNetworkSpeedLimitService::GetInstance().IsLimitSpeedBgApp(controlId, "com.ohos.wifi", enable);
+    EXPECT_FALSE(result);
+
+    controlId = BG_LIMIT_CONTROL_ID_STREAM;
+    result = AppNetworkSpeedLimitService::GetInstance().IsLimitSpeedBgApp(controlId, "com.ohos.wifi", enable);
+    EXPECT_FALSE(result);
+
+    controlId = BG_LIMIT_CONTROL_ID_KEY_FG_APP;
+    result = AppNetworkSpeedLimitService::GetInstance().IsLimitSpeedBgApp(controlId, "com.ohos.wifi", enable);
+    EXPECT_FALSE(result);
+
+    controlId = BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT;
+    result = AppNetworkSpeedLimitService::GetInstance().IsLimitSpeedBgApp(controlId, "com.ohos.wifi", enable);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, DealStaConnChanged, TestSize.Level1)
+{
+    WIFI_LOGI("DealStaConnChanged enter");
+    WifiLinkedInfo info;
+    int instId = 1;
+    AppNetworkSpeedLimitService::GetInstance().DealStaConnChanged(
+            OperateResState::DISCONNECT_DISCONNECTED, info, instId);
+    AppNetworkSpeedLimitService::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, instId);
+    EXPECT_EQ(1, instId);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, HandleForegroundAppChangedAction, TestSize.Level1)
+{
+    WIFI_LOGI("HandleForegroundAppChangedAction enter");
+    AppExecFwk::AppStateData appStateData;
+    appStateData.state = static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND);
+    appStateData.isFocused = true;
+    AppNetworkSpeedLimitService::GetInstance().HandleForegroundAppChangedAction(appStateData);
+    EXPECT_TRUE(appStateData.isFocused);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GetAppList, TestSize.Level1)
+{
+    WIFI_LOGI("GetAppList enter");
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    bool getFgAppFlag = false;
+    AppNetworkSpeedLimitService::GetInstance().GetAppList(infos, getFgAppFlag);
+    getFgAppFlag = true;
+    AppNetworkSpeedLimitService::GetInstance().GetAppList(infos, getFgAppFlag);
+    EXPECT_TRUE(getFgAppFlag);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateSpeedLimitConfigs, TestSize.Level1)
+{
+    WIFI_LOGI("UpdateSpeedLimitConfigs enter");
+    AppNetworkSpeedLimitService::GetInstance().m_limitSpeedMode = BG_LIMIT_LEVEL_3;
+    int enable = 1;
+    AppNetworkSpeedLimitService::GetInstance().UpdateSpeedLimitConfigs(enable);
+    EXPECT_EQ(1, enable);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, HandleRequest, TestSize.Level1)
+{
+    WIFI_LOGI("HandleRequest enter");
+    AsyncParamInfo asyncParamInfo;
+    asyncParamInfo.funcName = "HandleWifiConnectStateChanged";
+    AppNetworkSpeedLimitService::GetInstance().HandleRequest(asyncParamInfo);
+    asyncParamInfo.funcName = "HandleForegroundAppChangedAction";
+    AppNetworkSpeedLimitService::GetInstance().HandleRequest(asyncParamInfo);
+    asyncParamInfo.funcName = "LimitSpeed";
+    AppNetworkSpeedLimitService::GetInstance().HandleRequest(asyncParamInfo);
+    asyncParamInfo.funcName = "ReceiveNetworkControlInfo";
+    asyncParamInfo.networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    AppNetworkSpeedLimitService::GetInstance().HandleRequest(asyncParamInfo);
+    asyncParamInfo.networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK;
+    asyncParamInfo.networkControlInfo.state = 1;
+    asyncParamInfo.networkControlInfo.uid = 20020022;
+    AppNetworkSpeedLimitService::GetInstance().HandleRequest(asyncParamInfo);
+    int audioUidSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
+    EXPECT_EQ(audioUidSize, 1);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitInfo, TestSize.Level1)
+{
+    WIFI_LOGI("SendLimitInfo enter");
+    AppNetworkSpeedLimitService::GetInstance().m_limitSpeedMode = BG_LIMIT_LEVEL_3;
+    AppNetworkSpeedLimitService::GetInstance().m_lastLimitSpeedMode = BG_LIMIT_OFF;
+    AppNetworkSpeedLimitService::GetInstance().m_lastBgUidSet = {};
+    AppNetworkSpeedLimitService::GetInstance().m_bgUidSet = {-1};
+    AppNetworkSpeedLimitService::GetInstance().m_lastFgUidSet = {};
+    AppNetworkSpeedLimitService::GetInstance().m_fgUidSet = {-1};
+    AppNetworkSpeedLimitService::GetInstance().SendLimitInfo();
+    EXPECT_EQ(BG_LIMIT_LEVEL_3, AppNetworkSpeedLimitService::GetInstance().m_limitSpeedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControlInfo, TestSize.Level1)
+{
+    WIFI_LOGI("ReceiveNetworkControlInfo enter");
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.youku.next";
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE;
+    networkControlInfo.state = 1;
+    networkControlInfo.uid = 20020044;
+    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    AppNetworkSpeedLimitService::GetInstance().m_additionalWindowUidSet.clear();
+    int windowUidSize = AppNetworkSpeedLimitService::GetInstance().m_additionalWindowUidSet.size();
+    EXPECT_EQ(windowUidSize, 0);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateNoSpeedLimitConfigs, TestSize.Level1)
+{
+    WIFI_LOGI("UpdateNoSpeedLimitConfigs enter");
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.uid = 20020022;
+    networkControlInfo.state = 1;
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK;
+    AppNetworkSpeedLimitService::GetInstance().UpdateNoSpeedLimitConfigs(networkControlInfo);
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE;
+    AppNetworkSpeedLimitService::GetInstance().UpdateNoSpeedLimitConfigs(networkControlInfo);
+
+    networkControlInfo.state = 0;
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK;
+    AppNetworkSpeedLimitService::GetInstance().UpdateNoSpeedLimitConfigs(networkControlInfo);
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE;
+    AppNetworkSpeedLimitService::GetInstance().UpdateNoSpeedLimitConfigs(networkControlInfo);
+    int windowUidSize = AppNetworkSpeedLimitService::GetInstance().m_additionalWindowUidSet.size();
+    EXPECT_EQ(windowUidSize, 0);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ForegroundAppChangedAction_Test, TestSize.Level1)
+{
+    WIFI_LOGI("ForegroundAppChangedAction enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] = BG_LIMIT_LEVEL_3;
+    std::string bundleName = "com.xingin.xhs_hos";
+    AppNetworkSpeedLimitService::GetInstance().ForegroundAppChangedAction(bundleName);
+
+    bundleName = "com.ohos.wifi";
+    AppNetworkSpeedLimitService::GetInstance().ForegroundAppChangedAction(bundleName);
+    EXPECT_TRUE(AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, HighPriorityTransmit, TestSize.Level1)
+{
+    WIFI_LOGI("HighPriorityTransmit enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isHighPriorityTransmit = 1;
+    int uid = 1;
+    int protocol = 17;
+    int enable = 0;
+    AppNetworkSpeedLimitService::GetInstance().HighPriorityTransmit(uid, protocol, enable);
+    EXPECT_EQ(enable, 0);
 }
 } // namespace Wifi
 } // namespace OHOS

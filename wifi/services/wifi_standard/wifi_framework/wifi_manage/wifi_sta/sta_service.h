@@ -396,6 +396,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac);
+
+    /**
+     * @Description deliver audio state
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode DeliverAudioState(int state);
+
 /**
      * @Description fold status
      *

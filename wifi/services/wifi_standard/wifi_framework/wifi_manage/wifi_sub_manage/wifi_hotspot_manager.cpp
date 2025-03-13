@@ -139,7 +139,6 @@ void WifiHotspotManager::DealApStateChanged(ApState state, int id)
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(state);
     cbMsg.id = id;
-    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     if (state == ApState::AP_STATE_IDLE) {
         WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSING, id);
         WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
@@ -149,6 +148,7 @@ void WifiHotspotManager::DealApStateChanged(ApState state, int id)
         auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
         ins->SendMessage(CMD_AP_START, id);
     }
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 
     std::string msg = std::string("OnHotspotStateChanged") + std::string("id = ") + std::to_string(id);
     WifiCommonEventHelper::PublishHotspotStateChangedEvent((int)state, msg);

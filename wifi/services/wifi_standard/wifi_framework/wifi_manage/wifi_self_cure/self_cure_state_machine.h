@@ -352,7 +352,6 @@ private:
     bool IfP2pConnected();
     bool ShouldTransToWifi6SelfCure(InternalMessagePtr msg, std::string currConnectedBssid);
     int GetWifi7SelfCureType(int connectFailTimes, WifiLinkedInfo &info);
-    void (WifiLinkedInfo &info);
     void HandleWifiBlackListUpdateMsg();
     int GetScanRssi(std::string currentBssid, const std::vector<WifiScanInfo> scanResults);
     int GetCurrentRssi();

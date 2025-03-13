@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- 
+
+
 #ifndef WIFI_MANAGER_ANI_H_
 #define WIFI_MANAGER_ANI_H_
- 
+
 #include <ani.h>
- 
+
 static ani_boolean IsWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
- 
+
 #endif

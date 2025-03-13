@@ -238,6 +238,12 @@ void WifiScanManager::DealScanFinished(int state, int instId)
 
 void WifiScanManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, int instId)
 {
+    bool autoConnectEnable = WifiConfigCenter::GetInstance().GetAutoConnect();
+    if (!autoConnectEnable) {
+        WIFI_LOGI("DealScanInfoNotify: not auto connect");
+        return;
+    }
+
     if (WifiConfigCenter::GetInstance().GetWifiMidState(instId) == WifiOprMidState::RUNNING) {
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
         if (pService != nullptr) {
@@ -261,6 +267,7 @@ void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results
 void WifiScanManager::DealStaOpened(int instId)
 {
     WIFI_LOGI("wifi opened id=%{public}d", instId);
+    WifiConfigCenter::GetInstance().SetFastScan(true);
     CheckAndStartScanService(instId);
 }
 }  // namespace Wifi

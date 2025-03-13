@@ -37,6 +37,7 @@ void XmlParser::Destroy()
 
 bool XmlParser::LoadConfiguration(const char *xmlPath)
 {
+    Destroy(); // clear old doc before load new doc
     mDoc_ = xmlReadFile(xmlPath, nullptr, XML_PARSE_NOBLANKS);
     if (mDoc_ == nullptr) {
         WIFI_LOGE("LoadConfiguration fail");
@@ -51,6 +52,7 @@ bool XmlParser::LoadConfigurationMemory(const char *xml)
         WIFI_LOGE("LoadConfigurationMemory xml is nullptr");
         return false;
     }
+    Destroy(); // clear old doc before load new doc
     mDoc_ = xmlReadMemory(xml, strlen(xml), nullptr, nullptr, 0);
     if (mDoc_ == nullptr) {
         WIFI_LOGE("LoadConfigurationMemory fail");

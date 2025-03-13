@@ -1858,9 +1858,6 @@ void SelfCureStateMachine::SendBlaListToDriver(int blaListType)
     AgeOutWifiCategoryBlack(blaListType);
     std::map<std::string, WifiCategoryBlackListInfo> wifiBlackListCache;
     WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(blaListType, wifiBlackListCache);
-    if (wifiBlackListCache.empty()) {
-        return;
-    }
     std::string param = BlackListToString(wifiBlackListCache);
     std::string ifName = "wlan0";
     if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, blaListType, param) != 0) {
@@ -1872,11 +1869,11 @@ void SelfCureStateMachine::SendBlaListToDriver(int blaListType)
 std::string SelfCureStateMachine::BlackListToString(std::map<std::string, WifiCategoryBlackListInfo> &map)
 {
     std::string param;
-    if (map.empty()) {
-        return param;
-    }
     uint32_t idx = map.size() >= WIFI_MAX_BLA_LIST_NUM ? WIFI_MAX_BLA_LIST_NUM : map.size();
     param.push_back(idx);
+    if (idx == 0u) {
+        return param;
+    }
     for (auto iter : map) {
         std::string singleParam = ParseWifiCategoryBlackListInfo(iter);
         if (singleParam.size() != WIFI_SINGLE_ITEM_BYTE_LEN) {
@@ -2323,6 +2320,16 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
         }
     } else {
         WIFI_LOGD("don't need to do wifi7 selfcure");
+    }
+}
+
+void SelfCureStateMachine::HandleWifiBlackListUpdateMsg()
+{
+    if (AgeOutWifiCategoryBlack(EVENT_BE_BLA_LIST)) {
+        SendBlaListToDriver(EVENT_BE_BLA_LIST);
+    }
+    if (AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST)) {
+        SendBlaListToDriver(EVENT_AX_BLA_LIST);
     }
 }
 
@@ -2947,16 +2954,6 @@ void SelfCureStateMachine::ResetSelfCureParam()
     StopTimer(WIFI_CURE_RESET_ON_TIMEOUT);
     StopTimer(WIFI_CURE_REASSOC_TIMEOUT);
     StopTimer(WIFI_CURE_CONNECT_TIMEOUT);
-}
-
-void SelfCureStateMachine::HandleWifiBlackListUpdateMsg()
-{
-    if (AgeOutWifiCategoryBlack(EVENT_BE_BLA_LIST)) {
-        SendBlaListToDriver(EVENT_BE_BLA_LIST);
-    }
-    if (AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST)) {
-        SendBlaListToDriver(EVENT_AX_BLA_LIST);
-    }
 }
 } // namespace Wifi
 } // namespace OHOS

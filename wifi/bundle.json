@@ -59,6 +59,7 @@
             "wifi_feature_p2p_random_mac_addr",
             "wifi_feature_non_hdf_driver",
             "wifi_feature_with_local_random_mac",
+            "wifi_feature_with_data_report",
             "wifi_feature_sta_ap_exclusion",
             "wifi_feature_with_random_mac_addr",
             "wifi_feature_with_scan_control",

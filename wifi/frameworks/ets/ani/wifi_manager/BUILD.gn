@@ -31,7 +31,6 @@ ohos_shared_library("wifimanager_ani") {
   ]
   part_name = "wifi"
   subsystem_name = "communication"
-  output_extension = "so"
 }
 
 generate_static_abc("wifimanager_ani_abc") {

@@ -18,7 +18,6 @@
 
 #include "client.h"
 #include "i_wifi_struct.h"
-#include "wifi_event_callback.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +54,7 @@ void OnWpaSsidWrongKey();
 void OnWpsOverlap(int status);
 void OnWpsTimeOut(int status);
 void OnWpaConnectionFull(int status);
-void OnWpaConnectionReject(const OHOS::Wifi::AssocRejectInfo &assocRejectInfo);
+void OnWpaConnectionReject(int status);
 void OnWpaStaNotifyCallBack(const char *notifyParam);
 void OnDisConnectReasonCallback(int reason, const char *bssid);
 

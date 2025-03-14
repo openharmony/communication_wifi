@@ -21,7 +21,7 @@ namespace Wifi {
 #define FRIEND_GTEST(test_typename) friend class test_typename##Test
 
 
-#define INTERNET_STATUS_DETECT_INTERVAL_MS (8 * 1000)
+#define INTERNET_STATUS_DETECT_INTERVAL_MS (4 * 1000)
 #define NO_INTERNET_DETECT_INTERVAL_MS (5 * 1000)
 
 #define WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD 104

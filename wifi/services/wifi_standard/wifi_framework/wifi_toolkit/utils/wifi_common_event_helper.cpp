@@ -229,5 +229,13 @@ bool WifiCommonEventHelper::PublishVoWifiSignalDetectInterruptEvent(const int &c
     permissions.push_back(COMMON_EVENT_GET_WIFI_CONFIG_PERMISSION);
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_VOWIFI_SIGNAL_DETECT_INTERRUPT, code, data, permissions);
 }
+
+bool WifiCommonEventHelper::PublishInternetAccessChangedEvent(const int &code, const std::string &data)
+{
+    WIFI_LOGI("PublishInternetAccessChangedEvent code:%{public}d", code);
+    std::vector<std::string> permissions;
+    permissions.push_back(COMMON_EVENT_GET_WIFI_INFO_PERMISSION);
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_INTERNET_ACCESS_CHANGE, code, data, permissions);
+}
 }  // namespace Wifi
 }  // namespace OHOS

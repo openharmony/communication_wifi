@@ -89,6 +89,7 @@ namespace Wifi {
 #define VALUE_LIMIT_MAX_RSSI (-55)
 #define AUDIO_ON (1)
 #define AUDIO_OFF (0)
+#define SIGNAL_LEVEL_2 (2)
 
 enum SelectedType {
     NETWORK_SELECTED_BY_UNKNOWN = -1,
@@ -127,6 +128,7 @@ typedef enum EnumNetWorkState {
     NETWORK_NOTWORKING,
     NETWORK_IS_WORKING,
     NETWORK_IS_PORTAL,
+    NETWORK_DEFAULT_STATE,
 }SystemNetWorkState;
 
 typedef enum EnumStaNetState {

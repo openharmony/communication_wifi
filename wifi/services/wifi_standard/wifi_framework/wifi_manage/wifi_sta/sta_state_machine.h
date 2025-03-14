@@ -987,6 +987,7 @@ private:
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
     void UpdateLinkedBssid(std::string &bssid);
+    void InvokeOnInternetAccessChanged(SystemNetWorkState internetAccessStatus);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void ResetWifi7WurInfo();
@@ -1060,6 +1061,7 @@ private:
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
     int isAudioOn_ = 0;
+    SystemNetWorkState lastInternetAccessStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
 };
 }  // namespace Wifi
 }  // namespace OHOS

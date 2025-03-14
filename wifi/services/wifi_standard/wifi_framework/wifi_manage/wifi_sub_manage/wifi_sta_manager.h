@@ -48,6 +48,7 @@ private:
     void DealAutoSelectNetworkChanged(int networkId, int instId);
     void PublishWifiOperateStateHiSysEvent(OperateResState state);
     void NotifyScanForStaConnChanged(OperateResState state, int instId = 0);
+    void DealInternetAccessChanged(int internetAccessStatus, int instId);
 private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};

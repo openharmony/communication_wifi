@@ -16,6 +16,7 @@
 #include "ip_qos_monitor.h"
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
+#include "wifi_global_func.h"
 
 static const int32_t MIN_DELTA_TCP_TX = 3;
 static const int32_t QOS_TCP_TX_PKTS = 6;
@@ -69,16 +70,27 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
     bool internetGood = ParseNetworkInternetGood(elems);
     if (internetGood) {
+        if (!lastTxRxGood_) {
+            WIFI_LOGI("%{public}s: set tx_rx_good property true", __FUNCTION__);
+            SetParamValue(WIFI_IS_TX_RX_GOOD, "1");
+            lastTxRxGood_ = true;
+        }
         mInternetFailedCounter = 0;
         mInternetSelfCureAllowed = true;
         mHttpDetectedAllowed = true;
         return;
     }
-    mInternetFailedCounter++;
-    WIFI_LOGI("%{public}s: mInternetFailedCounter = %{public}d", __FUNCTION__, mInternetFailedCounter);
+
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, mInstId);
+    if (lastTxRxGood_) {
+        WIFI_LOGI("%{public}s: set tx_rx_good property false", __FUNCTION__);
+        SetParamValue(WIFI_IS_TX_RX_GOOD, "0");
+        lastTxRxGood_ = false;
+    }
+    mInternetFailedCounter++;
+    WIFI_LOGI("%{public}s: mInternetFailedCounter = %{public}d", __FUNCTION__, mInternetFailedCounter);
     if ((mInternetFailedCounter >= 1) && (linkedInfo.connState == ConnState::CONNECTED)) {
         ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
         if (pSelfCureService == nullptr) {
@@ -120,12 +132,12 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
         int64_t tcpTxPkts = elems[QOS_TCP_TX_PKTS];
         int64_t tcpRxPkts = elems[QOS_TCP_RX_PKTS];
         WIFI_LOGD("tcpTxPkts = %{public}" PRId64 ", tcpRxPkts = %{public}" PRId64, tcpTxPkts, tcpRxPkts);
-        if ((mLastTcpTxCounter == 0) || (mLastTcpRxCounter == 0)) {
+        if ((mLastTcpTxCounter == 0) && (mLastTcpRxCounter == 0)) {
             mLastTcpTxCounter = tcpTxPkts;
             mLastTcpRxCounter = tcpRxPkts;
             WIFI_LOGI("mLastTcpTxCounter = %{public}" PRId64 ", mLastTcpRxCounter = %{public}" PRId64,
                 mLastTcpTxCounter, mLastTcpRxCounter);
-            return true;
+            return lastTxRxGood_;
         }
         int64_t deltaTcpTxPkts = tcpTxPkts - mLastTcpTxCounter;
         int64_t deltaTcpRxPkts = tcpRxPkts - mLastTcpRxCounter;
@@ -134,6 +146,11 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
         mLastTcpTxCounter = tcpTxPkts;
         mLastTcpRxCounter = tcpRxPkts;
         if (deltaTcpRxPkts == 0) {
+            if (deltaTcpTxPkts < MIN_DELTA_TCP_TX) {
+                WIFI_LOGI("%{public}s deltaTcpRxPkts 0, deltaTcpTxPkts less 3, return last tx rx status %{public}d",
+                    __FUNCTION__, lastTxRxGood_);
+                return lastTxRxGood_;
+            }
             if (deltaTcpTxPkts >= MIN_DELTA_TCP_TX) {
                 WIFI_LOGI("%{public}s internetGood: false", __FUNCTION__);
                 return false;
@@ -147,10 +164,20 @@ int64_t IpQosMonitor::GetCurrentTcpTxCounter()
 {
     return mLastTcpTxCounter;
 }
- 
+
 int64_t IpQosMonitor::GetCurrentTcpRxCounter()
 {
     return mLastTcpRxCounter;
 }
+
+void IpQosMonitor::ResetTxRxProperty()
+{
+    WIFI_LOGI("%{public}s: reset tx rx property, set tx_rx_good property false", __FUNCTION__);
+    SetParamValue(WIFI_IS_TX_RX_GOOD, "0");
+    lastTxRxGood_ = false;
+    mLastTcpTxCounter = 0;
+    mLastTcpRxCounter = 0;
+}
+
 } // namespace Wifi
 } // namespace OHOS

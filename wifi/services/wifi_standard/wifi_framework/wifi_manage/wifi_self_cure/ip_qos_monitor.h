@@ -33,6 +33,7 @@ public:
     bool ParseNetworkInternetGood(const std::vector<int64_t> &elems);
     int64_t GetCurrentTcpTxCounter();
     int64_t GetCurrentTcpRxCounter();
+    void ResetTxRxProperty();
 private:
     bool AllowSelfCureNetwork(int32_t currentRssi);
     int32_t mInstId = 0;
@@ -42,6 +43,7 @@ private:
     int64_t mLastTcpRxCounter = 0;
     int32_t mInternetFailedCounter = 0;
     sptr<NetStateObserver> mNetWorkDetect;
+    bool lastTxRxGood_ = false;
 };
 
 } // namespace Wifi

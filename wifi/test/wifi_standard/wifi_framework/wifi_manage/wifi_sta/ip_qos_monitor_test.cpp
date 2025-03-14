@@ -106,6 +106,14 @@ HWTEST_F(IpQosMonitorTest, TestHandleTcpPktsResp, TestSize.Level1)
     IpQosMonitor::GetInstance().HandleTcpPktsResp(elems);
 }
 
+HWTEST_F(IpQosMonitorTest, TestHandleTcpPktsResp002, TestSize.Level1)
+{
+    IpQosMonitor::GetInstance().lastTxRxGood_ = false;
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 1};
+    IpQosMonitor::GetInstance().HandleTcpPktsResp(elems);
+    EXPECT_TRUE(IpQosMonitor::GetInstance().lastTxRxGood_);
+}
+
 HWTEST_F(IpQosMonitorTest, TestAllowSelfCureNetwork, TestSize.Level1)
 {
     int32_t currentRssi = 123;

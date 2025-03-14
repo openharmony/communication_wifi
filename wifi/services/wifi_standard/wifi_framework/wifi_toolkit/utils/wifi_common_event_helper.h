@@ -27,6 +27,7 @@ inline const std::string COMMON_EVENT_WIFI_SCAN_STATE = "usual.event.wifi.SCAN_S
 inline const std::string COMMON_EVENT_WIFI_SEMI_STATE = "usual.event.wifi.SEMI_STATE";
 inline const std::string COMMON_EVENT_WIFI_RSSI_VALUE = "usual.event.wifi.RSSI_VALUE";
 inline const std::string COMMON_EVENT_WITAS_RSSI_VALUE = "usual.event.wifi.WITAS_RSSI_VALUE";
+inline const std::string COMMON_EVENT_WIFI_INTERNET_ACCESS_CHANGE = "usual.event.wifi.INTERNET_ACCESS_CHANGE";
 inline const std::string COMMON_EVENT_WIFI_CONN_STATE = "usual.event.wifi.CONN_STATE";
 inline const std::string COMMON_EVENT_WIFI2_CONN_STATE = "usual.event.wifi.WIFI2_CONN_STATE";
 inline const std::string COMMON_EVENT_WIFI_HOTSPOT_STATE = "usual.event.wifi.HOTSPOT_STATE";
@@ -85,6 +86,7 @@ public:
     static bool PublishSelfcureStateChangedEvent(const int &pid, const int &code, bool isSelfCureOnGoing);
     static bool PublishVoWifiSignalDetectInterruptEvent(const int &code, const std::string &data);
     static bool PublishNotAvailableDialog();
+    static bool PublishInternetAccessChangedEvent(const int &code, const std::string &data);
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -18,6 +18,7 @@
 
 #include "client.h"
 #include "i_wifi_struct.h"
+#include "wifi_event_callback.h"
 
 #ifdef __cplusplus
 extern "C" {

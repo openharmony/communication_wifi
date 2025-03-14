@@ -1234,6 +1234,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr ms
             DealWpaLinkFullConnectFailEvent();
             break;
         case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
+            pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
             DealWpaLinkAssocRejectFailEvent();
             break;
         default:

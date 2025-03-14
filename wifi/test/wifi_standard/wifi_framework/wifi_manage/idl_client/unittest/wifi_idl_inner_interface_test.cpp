@@ -69,7 +69,7 @@ static void OnWpaConnectionFullMock(int status)
     LOGI("OnWpaConnectionFullMock");
 }
 
-static void OnWpaConnectionRejectMock(const AssocRejectInfo &assocRejectInfo)
+static void OnWpaConnectionRejectMock(const OHOS::Wifi::AssocRejectInfo &assocRejectInfo)
 {
     LOGI("OnWpaConnectionRejectMock");
 }
@@ -416,7 +416,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnBssidChangedTest, TestSize.Level1)
 HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
 {
     LOGI("OnWpaStateChangedTest enter");
-    AssocRejectInfo assocRejectInfo;
+    OHOS::Wifi::AssocRejectInfo assocRejectInfo;
     assocRejectInfo.statusCode = 1;
     int status = 1;
     WifiEventCallback callback;

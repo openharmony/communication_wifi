@@ -12,18 +12,9 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/communication/wifi/wifi/wifi.gni")
-
-ohos_shared_library("wifi_ani") {
-  sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    debug = false
-  }
-  sources = [ "src/wifi_ani_manager.cpp" ]
-  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
-  external_deps = [ "runtime_core:ani" ]
-  part_name = "wifi"
-  subsystem_name = "communication"
+group("wifi_ani") {
+  deps = [
+    "./wifi_manager:wifimanager_ani",
+    "./wifi_manager:wifimanager_ani_abc_etc",
+  ]
 }

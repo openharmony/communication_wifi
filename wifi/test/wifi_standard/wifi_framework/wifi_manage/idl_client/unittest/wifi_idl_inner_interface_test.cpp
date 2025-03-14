@@ -416,8 +416,6 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnBssidChangedTest, TestSize.Level1)
 HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
 {
     LOGI("OnWpaStateChangedTest enter");
-    OHOS::Wifi::AssocRejectInfo assocRejectInfo;
-    assocRejectInfo.statusCode = 1;
     int status = 1;
     WifiEventCallback callback;
     RegisterStaCallbackMock(&callback);
@@ -427,7 +425,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
-    OnWpaConnectionReject(assocRejectInfo);
+    OnWpaConnectionReject(status);
     OnWpsOverlap(status);
     OnWpsTimeOut(status);
     UnRegisterStaCallbackMock(&callback);
@@ -436,7 +434,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     OnWpaStateChanged(status, "test");
     OnWpaSsidWrongKey();
     OnWpaConnectionFull(status);
-    OnWpaConnectionReject(assocRejectInfo);
+    OnWpaConnectionReject(status);
     OnWpsOverlap(status);
     OnWpsTimeOut(status);
 }

@@ -123,11 +123,13 @@ void OnWpaConnectionFull(int status)
     }
 }
 
-void OnWpaConnectionReject(const OHOS::Wifi::AssocRejectInfo &assocRejectInfo)
+void OnWpaConnectionReject(int status)
 {
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
         OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpaConnectionReject) {
+        OHOS::Wifi::AssocRejectInfo assocRejectInfo;
+        assocRejectInfo.statusCode = status;
         cbk.onWpaConnectionReject(assocRejectInfo);
     }
 }

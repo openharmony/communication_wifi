@@ -55,7 +55,7 @@ void OnWpaSsidWrongKey();
 void OnWpsOverlap(int status);
 void OnWpsTimeOut(int status);
 void OnWpaConnectionFull(int status);
-void OnWpaConnectionReject(const AssocRejectInfo &assocRejectInfo);
+void OnWpaConnectionReject(const OHOS::Wifi::AssocRejectInfo &assocRejectInfo);
 void OnWpaStaNotifyCallBack(const char *notifyParam);
 void OnDisConnectReasonCallback(int reason, const char *bssid);
 

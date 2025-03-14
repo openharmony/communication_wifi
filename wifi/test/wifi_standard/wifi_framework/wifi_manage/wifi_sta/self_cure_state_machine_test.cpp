@@ -1306,30 +1306,9 @@ public:
     void AgeOutWifi6BlackTest()
     {
         LOGI("Enter AgeOutWifi6BlackTest");
-        std::map<std::string, WifiCategoryBlackListInfo> wifi6BlackListCache;
-        std::string currentBssid_ = CURR_BSSID;
-        WifiCategoryBlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
-        wifi6BlackListCache.emplace(std::make_pair(currentBssid_, wifi6BlackListInfo));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiCategoryBlackListCache(_, _)).Times(AtLeast(0));
-        pSelfCureStateMachine_->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST, wifi6BlackListCache);
-
-        wifi6BlackListCache.emplace(std::make_pair("1", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("2", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("3", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("4", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("5", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("6", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("7", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("8", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("9", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("10", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("11", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("12", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("13", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("14", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("15", wifi6BlackListInfo));
-        wifi6BlackListCache.emplace(std::make_pair("16", wifi6BlackListInfo));
-        pSelfCureStateMachine_->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST, wifi6BlackListCache);
+        pSelfCureStateMachine_->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST);
+        pSelfCureStateMachine_->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST);
     }
 
     void AgeOutWifiConnectFailTest()
@@ -1446,7 +1425,8 @@ public:
     void HandleWifiBlackListUpdateMsgTest()
     {
         WifiCategoryBlackListInfo wifiBlackListInfo(1, TIME_MILLS);
-        wifiBlackListCache.emplace(std::make_pair(currentBssid_, wifiBlackListInfo));
+        std::map<std::string, WifiCategoryBlackListInfo> wifiBlackListCache;
+        wifiBlackListCache.emplace(std::make_pair(CURR_BSSID, wifiBlackListInfo));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiCategoryBlackListCache(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<1>(wifiBlackListCache), Return(0)));
         pSelfCureStateMachine_->HandleWifiBlackListUpdateMsg();

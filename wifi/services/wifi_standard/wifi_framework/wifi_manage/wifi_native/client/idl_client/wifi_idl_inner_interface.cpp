@@ -128,7 +128,9 @@ void OnWpaConnectionReject(int status)
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(
         OHOS::Wifi::WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0));
     if (cbk.onWpaConnectionReject) {
-        cbk.onWpaConnectionReject(status);
+        OHOS::Wifi::AssocRejectInfo assocRejectInfo;
+        assocRejectInfo.statusCode = status;
+        cbk.onWpaConnectionReject(assocRejectInfo);
     }
 }
 

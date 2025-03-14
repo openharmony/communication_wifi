@@ -282,15 +282,17 @@ void StaMonitorTest::OnWpaConnectionFullCallBackFail()
 
 void StaMonitorTest::OnWpaConnectionRejectCallBackSuccess()
 {
-    int status = 1;
-    pStaMonitor->OnWpaConnectionRejectCallBack(status);
+    AssocRejectInfo assocRejectInfo;
+    assocRejectInfo.statusCode = 1;
+    pStaMonitor->OnWpaConnectionRejectCallBack(assocRejectInfo);
 }
 
 void StaMonitorTest::OnWpaConnectionRejectCallBackFail()
 {
-    int status = 1;
+    AssocRejectInfo assocRejectInfo;
+    assocRejectInfo.statusCode = 1;
     pStaMonitor->pStaStateMachine = nullptr;
-    pStaMonitor->OnWpaConnectionRejectCallBack(status);
+    pStaMonitor->OnWpaConnectionRejectCallBack(assocRejectInfo);
 }
 
 void StaMonitorTest::OnWpaHilinkCallBackSuccess()

@@ -57,6 +57,7 @@ public:
     virtual WifiErrorNo GetFrequenciesByBand(const std::string &ifaceName,
     int band, std::vector<int> &frequencies) = 0;
     virtual WifiErrorNo EnableAp(int id = 0) = 0;
+    virtual WifiErrorNo SetApPasswd(const char *pass, int id = 0) = 0;
     virtual WifiErrorNo SetMaxConnectNum(const std::string &ifName, int32_t channel, int32_t maxConn);
 };
 
@@ -83,6 +84,7 @@ public:
     MOCK_METHOD3(SetSoftApConfig, WifiErrorNo(const std::string &ifName,
         const HotspotConfig &config, int id));
     MOCK_METHOD1(EnableAp, WifiErrorNo(int id));
+    MOCK_METHOD2(SetApPasswd, WifiErrorNo(const char *pass, int id));
     MOCK_METHOD3(SetMaxConnectNum, WifiErrorNo (const std::string &ifName, int32_t channel, int32_t maxConn));
 };
 } // namespace Wifi

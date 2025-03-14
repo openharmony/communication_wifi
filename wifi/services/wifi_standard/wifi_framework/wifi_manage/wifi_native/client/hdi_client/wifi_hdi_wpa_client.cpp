@@ -712,16 +712,12 @@ bool WifiHdiWpaClient::GetEncryptionString(const HotspotConfig &config, std::str
         case KeyMgmt::WPA_PSK:
             encryptionString = StringCombination(
                 "wpa=3\n"
-                "wpa_pairwise=TKIP CCMP\n"
-                "wpa_passphrase=%s",
-                config.GetPreSharedKey().c_str());
+                "wpa_pairwise=TKIP CCMP\n");
             break;
         case KeyMgmt::WPA2_PSK:
             encryptionString = StringCombination(
                 "wpa=2\n"
-                "rsn_pairwise=CCMP\n"
-                "wpa_passphrase=%s",
-                config.GetPreSharedKey().c_str());
+                "rsn_pairwise=CCMP\n");
             break;
         default:
             LOGE("unsupport security type");
@@ -809,6 +805,14 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
 WifiErrorNo WifiHdiWpaClient::EnableAp(int id)
 {
     if (HdiEnableAp(id) != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::SetApPasswd(const char *pass, int id)
+{
+    if (HdiSetApPasswd(pass, id) != WIFI_HAL_OPT_OK) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;

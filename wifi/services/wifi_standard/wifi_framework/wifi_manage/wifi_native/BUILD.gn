@@ -196,7 +196,7 @@ if (defined(ohos_lite)) {
     ]
 
     if (wifi_feature_non_seperate_p2p) {
-      defines = [ "NON_SEPERATE_P2P" ]
+      defines += [ "NON_SEPERATE_P2P" ]
     }
 
     configs = [ ":wifi_fw_common_header" ]

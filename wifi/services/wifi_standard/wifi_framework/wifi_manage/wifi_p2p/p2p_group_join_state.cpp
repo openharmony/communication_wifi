@@ -29,9 +29,8 @@ void P2pGroupJoinState::GoInState()
 {
     WIFI_LOGI("GoInState");
     p2pStateMachine.NotifyUserInvitationReceivedMessage();
-    const int exceptionTimeOut = 120000;
-    p2pStateMachine.MessageExecutedLater(
-        static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT), exceptionTimeOut);
+    p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT),
+        WSC_DIALOG_SELECT_TIMEOUT);
 }
 
 void P2pGroupJoinState::GoOutState()

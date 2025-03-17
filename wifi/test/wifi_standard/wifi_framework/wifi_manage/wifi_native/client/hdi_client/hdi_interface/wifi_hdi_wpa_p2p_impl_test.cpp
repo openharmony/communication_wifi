@@ -373,5 +373,12 @@ HWTEST_F(WifiHdiWpaP2pImplTest, RegisterHdiWpaP2pEventCallbackTest, TestSize.Lev
     EXPECT_EQ(RegisterHdiWpaP2pEventCallback(nullptr), WIFI_HAL_OPT_INVALID_PARAM);
     EXPECT_EQ(RegisterHdiWpaP2pEventCallback(&callback), WIFI_HAL_OPT_INVALID_PARAM);
 }
+
+HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pRejectTest, TestSize.Level1)
+{
+    const char *bssid = nullptr;
+    WifiErrorNo result = HdiP2pReject(bssid);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+}
 }
 }

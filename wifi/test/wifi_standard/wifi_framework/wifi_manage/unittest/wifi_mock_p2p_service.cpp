@@ -431,6 +431,11 @@ ErrCode WifiMockP2pService::GetRptStationsList(std::vector<StationInfo> &result)
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiMockP2pService::NotifyWscDialogConfirmResult(bool isAccept)
+{
+    return;
+}
+
 extern "C" IP2pService *Create(void)
 {
     return new (std::nothrow) WifiMockP2pService();

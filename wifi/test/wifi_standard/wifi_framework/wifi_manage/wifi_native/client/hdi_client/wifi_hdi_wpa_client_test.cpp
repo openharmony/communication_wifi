@@ -1496,5 +1496,12 @@ HWTEST_F(WifiHdiWpaClientTest, GetMloLinkedInfoTest, TestSize.Level1)
     WifiErrorNo result = wifiHdiWpaClient->GetMloLinkedInfo(ifaceName, mloLinkInfo);
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
+
+HWTEST_F(WifiHdiWpaClientTest, P2pRejectTest, TestSize.Level1)
+{
+    std::string bssid = "00:11:22:33:44:55";
+    WifiErrorNo result = wifiHdiWpaClient->P2pReject(bssid);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+}
 } // namespace Wifi
 } // namespace OHOS

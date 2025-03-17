@@ -64,6 +64,9 @@ public:
     virtual bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
 private:
+    void HandleInternalConnUserAccept(InternalMessagePtr msg);
+    void HandleInternalConnUserConfirm();
+    void HandleUserRejectOrTimeOut();
     P2pStateMachine &p2pStateMachine;
     WifiP2pGroupManager &groupManager;
     WifiP2pDeviceManager &deviceManager;

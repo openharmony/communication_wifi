@@ -1343,4 +1343,26 @@ WifiErrorNo HdiP2pRemoveGroupClient(const char *deviceMac, const char *ifName)
     LOGI("HdiP2pRemoveGroupClient success.");
     return WIFI_HAL_OPT_OK;
 }
+
+WifiErrorNo HdiP2pReject(const char *bssid)
+{
+    LOGI("HdiP2pReject enter");
+    pthread_mutex_lock(GetWpaObjMutex());
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiP2pReject: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, GetHdiP2pIfaceName(), P2P_REJECT, 0, bssid);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiP2pReject: send failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("HdiP2pReject success.");
+    return WIFI_HAL_OPT_OK;
+}
 #endif

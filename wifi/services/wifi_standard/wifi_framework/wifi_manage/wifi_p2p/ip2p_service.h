@@ -349,6 +349,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) = 0;
+
+    /**
+     * @Description Notify user accept result to p2p service
+     *
+     * @param isAccept if user accept to projection screen
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual void NotifyWscDialogConfirmResult(bool isAccept) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

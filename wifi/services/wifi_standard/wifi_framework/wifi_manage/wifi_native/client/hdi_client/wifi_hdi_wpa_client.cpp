@@ -1585,6 +1585,11 @@ WifiErrorNo WifiHdiWpaClient::HandleMloSignalPollData(char *staData, uint32_t st
     }
     return WIFI_HAL_OPT_OK;
 }
+
+WifiErrorNo WifiHdiWpaClient::P2pReject(const std::string &mac)
+{
+    return HdiP2pReject(mac.c_str());
+}
 } // namespace Wifi
 }  // namespace OHOS
 #endif

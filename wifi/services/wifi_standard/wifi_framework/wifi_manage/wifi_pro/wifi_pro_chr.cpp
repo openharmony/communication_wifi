@@ -36,10 +36,10 @@ int32_t g_fullScanCnt = 0;
 int32_t g_poorLinkCnt = 0;
 int32_t g_noNetCnt = 0;
 int32_t g_qoeSlowCnt = 0;
-std::map<ReasonNotSwitch, int32_t> g_ReasonNotSwitchCnt = {};
-std::map<WifiProEventResult, int32_t> g_SelectNetResultCnt = {};
-std::map<WifiProEventResult, int32_t> g_WifiProResultCnt = {};
-std::map<WifiProSwitchTimeCnt, int32_t> g_WifiProSwitchTimeCnt = {};
+std::map<ReasonNotSwitch, int32_t> g_reasonNotSwitchCnt = {};
+std::map<WifiProEventResult, int32_t> g_selectNetResultCnt = {};
+std::map<WifiProEventResult, int32_t> g_wifiProResultCnt = {};
+std::map<WifiProSwitchTimeCnt, int32_t> g_wifiProSwitchTimeCnt = {};
 
 template<typename... Types>
 static void WriteEvent(const std::string& eventType, Types... args)
@@ -78,16 +78,16 @@ void WifiProChr::ResetChrRecord()
     g_noNetCnt = 0;
     g_qoeSlowCnt = 0;
     std::map<ReasonNotSwitch, int32_t> reasonNotSwitchEmptyMap = {};
-    g_ReasonNotSwitchCnt.swap(reasonNotSwitchEmptyMap);
+    g_reasonNotSwitchCnt.swap(reasonNotSwitchEmptyMap);
 
     std::map<WifiProEventResult, int32_t> selectNetResultEmptyMap = {};
-    g_SelectNetResultCnt.swap(selectNetResultEmptyMap);
+    g_selectNetResultCnt.swap(selectNetResultEmptyMap);
 
     std::map<WifiProEventResult, int32_t> wifiProResultEmptyMap = {};
-    g_WifiProResultCnt.swap(wifiProResultEmptyMap);
+    g_wifiProResultCnt.swap(wifiProResultEmptyMap);
 
     std::map<WifiProSwitchTimeCnt, int32_t> wifiProSwitchTimeEmptyMap = {};
-    g_WifiProSwitchTimeCnt.swap(wifiProSwitchTimeEmptyMap);
+    g_wifiProSwitchTimeCnt.swap(wifiProSwitchTimeEmptyMap);
 }
 
 void WifiProChr::RecordScanChrCnt(std::string eventName)
@@ -105,19 +105,19 @@ void WifiProChr::RecordSelectNetChrCnt(bool isSuccess)
         isSuccess, static_cast<int>(switchReason_));
     if (isSuccess) {
         if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET) {
-            g_SelectNetResultCnt[WifiProEventResult::NONET_SUCC]++;
+            g_selectNetResultCnt[WifiProEventResult::NONET_SUCC]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_APP_QOE_SLOW) {
-            g_SelectNetResultCnt[WifiProEventResult::QOE_SUCCC]++;
+            g_selectNetResultCnt[WifiProEventResult::QOE_SUCCC]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_POOR_RSSI) {
-            g_SelectNetResultCnt[WifiProEventResult::POORLINK_SUCC]++;
+            g_selectNetResultCnt[WifiProEventResult::POORLINK_SUCC]++;
         }
     } else {
         if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET) {
-            g_SelectNetResultCnt[WifiProEventResult::NONET_FAILED]++;
+            g_selectNetResultCnt[WifiProEventResult::NONET_FAILED]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_APP_QOE_SLOW) {
-            g_SelectNetResultCnt[WifiProEventResult::QOESLOW_FAILED]++;
+            g_selectNetResultCnt[WifiProEventResult::QOESLOW_FAILED]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_POOR_RSSI) {
-            g_SelectNetResultCnt[WifiProEventResult::POORLINK_FAILED]++;
+            g_selectNetResultCnt[WifiProEventResult::POORLINK_FAILED]++;
         }
     }
 }
@@ -128,21 +128,21 @@ void WifiProChr::RecordSwitchChrCnt(bool isSuccess)
         isSuccess, static_cast<int>(switchReason_));
     if (isSuccess) {
         if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET) {
-            g_WifiProResultCnt[WifiProEventResult::NONET_SUCC]++;
+            g_wifiProResultCnt[WifiProEventResult::NONET_SUCC]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_APP_QOE_SLOW) {
-            g_WifiProResultCnt[WifiProEventResult::QOE_SUCCC]++;
+            g_wifiProResultCnt[WifiProEventResult::QOE_SUCCC]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_POOR_RSSI) {
-            g_WifiProResultCnt[WifiProEventResult::POORLINK_SUCC]++;
+            g_wifiProResultCnt[WifiProEventResult::POORLINK_SUCC]++;
         } else {
             return;
         }
     } else {
         if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET) {
-            g_WifiProResultCnt[WifiProEventResult::NONET_FAILED]++;
+            g_wifiProResultCnt[WifiProEventResult::NONET_FAILED]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_APP_QOE_SLOW) {
-            g_WifiProResultCnt[WifiProEventResult::QOESLOW_FAILED]++;
+            g_wifiProResultCnt[WifiProEventResult::QOESLOW_FAILED]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_POOR_RSSI) {
-            g_WifiProResultCnt[WifiProEventResult::POORLINK_FAILED]++;
+            g_wifiProResultCnt[WifiProEventResult::POORLINK_FAILED]++;
         }
     }
     switchReason_ = WifiSwitchReason::WIFI_SWITCH_REASON_DEFAULT;
@@ -151,20 +151,20 @@ void WifiProChr::RecordSwitchChrCnt(bool isSuccess)
 void WifiProChr::RecordSwitchTimeChrCnt(WifiProSwitchTimeCnt time)
 {
     WIFI_LOGI("RecordSwitchTimeChrCnt");
-    if (g_WifiProSwitchTimeCnt.count(time) == 0) {
-        g_WifiProSwitchTimeCnt.insert(std::make_pair(time, 0));
+    if (g_wifiProSwitchTimeCnt.count(time) == 0) {
+        g_wifiProSwitchTimeCnt.insert(std::make_pair(time, 0));
     } else {
-        g_WifiProSwitchTimeCnt[time]++;
+        g_wifiProSwitchTimeCnt[time]++;
     }
 }
 
 void WifiProChr::RecordReasonNotSwitchChrCnt(ReasonNotSwitch reason)
 {
     WIFI_LOGI("RecordReasonNotSwitchChrCnt");
-    if (g_ReasonNotSwitchCnt.count(reason) == 0) {
-        g_ReasonNotSwitchCnt.insert(std::make_pair(reason, 0));
+    if (g_reasonNotSwitchCnt.count(reason) == 0) {
+        g_reasonNotSwitchCnt.insert(std::make_pair(reason, 0));
     } else {
-        g_ReasonNotSwitchCnt[reason]++;
+        g_reasonNotSwitchCnt[reason]++;
     }
 }
 
@@ -249,36 +249,36 @@ void WifiProChr::WriteWifiProSysEvent()
     root["WIFIPRO_POOR_LINK_CNT"] = g_poorLinkCnt;
     root["WIFIPRO_NONET_CNT"] = g_noNetCnt;
     root["WIFIPRO_QOE_SLOW_CNT"] = g_qoeSlowCnt;
-    root["POOR_LINK_SELECT_NET_SUCC_CNT"] = g_SelectNetResultCnt[WifiProEventResult::POORLINK_SUCC];
-    root["NONET_SELECT_NET_SUCC_CNT"] = g_SelectNetResultCnt[WifiProEventResult::NONET_SUCC];
-    root["QOE_SLOW_SELECT_NET_SUCC_CNT"] = g_SelectNetResultCnt[WifiProEventResult::QOE_SUCCC];
-    root["POOR_LINK_SELECT_NET_FAILED_CNT"] = g_SelectNetResultCnt[WifiProEventResult::POORLINK_FAILED];
-    root["NONET_SELECT_NET_FAILED_CNT"] = g_SelectNetResultCnt[WifiProEventResult::NONET_FAILED];
-    root["QOE_SLOW_SELECT_NET_FAILED_CNT"] = g_SelectNetResultCnt[WifiProEventResult::QOESLOW_FAILED];
-    root["POOR_LINK_SWITCH_SUCC_CNT"] = g_WifiProResultCnt[WifiProEventResult::POORLINK_SUCC];
-    root["NONET_SWITCH_SUCC_CNT"] = g_WifiProResultCnt[WifiProEventResult::NONET_SUCC];
-    root["QOE_SLOW_SWITCH_SUCC_CNT"] = g_WifiProResultCnt[WifiProEventResult::QOE_SUCCC];
-    root["POOR_LINK_SWITCH_FAILED_CNT"] = g_WifiProResultCnt[WifiProEventResult::POORLINK_FAILED];
-    root["NONET_SWITCH_FAILED_CNT"] = g_WifiProResultCnt[WifiProEventResult::NONET_FAILED];
-    root["QOE_SLOW_SWITCH_FAILED_CNT"] = g_WifiProResultCnt[WifiProEventResult::QOESLOW_FAILED];
-    root["TIME_LEVEL1_CNT"] = g_WifiProSwitchTimeCnt[SWITCH_TIME_LEVEL1];
-    root["TIME_LEVEL2_CNT"] = g_WifiProSwitchTimeCnt[SWITCH_TIME_LEVEL2];
-    root["TIME_LEVEL3_CNT"] = g_WifiProSwitchTimeCnt[SWITCH_TIME_LEVEL3];
-    root["TIME_START_TO_CONNECT_LEVEL1_CNT"] = g_WifiProSwitchTimeCnt[START_TO_CONNECT_LEVEL1];
-    root["TIME_START_TO_CONNECT_LEVEL2_CNT"] = g_WifiProSwitchTimeCnt[START_TO_CONNECT_LEVEL2];
-    root["TIME_START_TO_CONNECT_LEVEL3_CNT"] = g_WifiProSwitchTimeCnt[START_TO_CONNECT_LEVEL3];
-    root["TIME_CONNECT_TO_SUCC_LEVEL1_CNT"] = g_WifiProSwitchTimeCnt[CONNECT_TO_SUCC_LEVEL1];
-    root["TIME_CONNECT_TO_SUCC_LEVEL2_CNT"] = g_WifiProSwitchTimeCnt[CONNECT_TO_SUCC_LEVEL2];
-    root["TIME_CONNECT_TO_SUCC_LEVEL3_CNT"] = g_WifiProSwitchTimeCnt[CONNECT_TO_SUCC_LEVEL3];
-    root["REASON_NOT_SWTICH_SWITCHING"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_SWITCHING];
-    root["REASON_NOT_SWTICH_SELFCURING"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_SELFCURING];
-    root["REASON_NOT_SWTICH_NONET_BEFORE"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_NONET_BEFORE_CONNECT];
-    root["REASON_NOT_SWTICH_SIGNAL_BRIDGE"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_SIGNAL_BRIDGE_ON];
-    root["REASON_NOT_SWTICH_AP_STA_ON"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_AP_STA_ON];
-    root["REASON_NOT_SWTICH_APP_WLISTS"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_APP_WHITE_LISTS];
-    root["REASON_NOT_SWTICH_ISCALLING"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_ISCALLING];
-    root["REASON_NOT_SWTICH_NOT_AUTOSWITCH"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_NOT_ALLOW_AUTOSWITCH];
-    root["REASON_NOT_SWTICH_DISABLED"] = g_ReasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_DISABLED];
+    root["POOR_LINK_SELECT_NET_SUCC_CNT"] = g_selectNetResultCnt[WifiProEventResult::POORLINK_SUCC];
+    root["NONET_SELECT_NET_SUCC_CNT"] = g_selectNetResultCnt[WifiProEventResult::NONET_SUCC];
+    root["QOE_SLOW_SELECT_NET_SUCC_CNT"] = g_selectNetResultCnt[WifiProEventResult::QOE_SUCCC];
+    root["POOR_LINK_SELECT_NET_FAILED_CNT"] = g_selectNetResultCnt[WifiProEventResult::POORLINK_FAILED];
+    root["NONET_SELECT_NET_FAILED_CNT"] = g_selectNetResultCnt[WifiProEventResult::NONET_FAILED];
+    root["QOE_SLOW_SELECT_NET_FAILED_CNT"] = g_selectNetResultCnt[WifiProEventResult::QOESLOW_FAILED];
+    root["POOR_LINK_SWITCH_SUCC_CNT"] = g_wifiProResultCnt[WifiProEventResult::POORLINK_SUCC];
+    root["NONET_SWITCH_SUCC_CNT"] = g_wifiProResultCnt[WifiProEventResult::NONET_SUCC];
+    root["QOE_SLOW_SWITCH_SUCC_CNT"] = g_wifiProResultCnt[WifiProEventResult::QOE_SUCCC];
+    root["POOR_LINK_SWITCH_FAILED_CNT"] = g_wifiProResultCnt[WifiProEventResult::POORLINK_FAILED];
+    root["NONET_SWITCH_FAILED_CNT"] = g_wifiProResultCnt[WifiProEventResult::NONET_FAILED];
+    root["QOE_SLOW_SWITCH_FAILED_CNT"] = g_wifiProResultCnt[WifiProEventResult::QOESLOW_FAILED];
+    root["TIME_LEVEL1_CNT"] = g_wifiProSwitchTimeCnt[SWITCH_TIME_LEVEL1];
+    root["TIME_LEVEL2_CNT"] = g_wifiProSwitchTimeCnt[SWITCH_TIME_LEVEL2];
+    root["TIME_LEVEL3_CNT"] = g_wifiProSwitchTimeCnt[SWITCH_TIME_LEVEL3];
+    root["TIME_START_TO_CONNECT_LEVEL1_CNT"] = g_wifiProSwitchTimeCnt[START_TO_CONNECT_LEVEL1];
+    root["TIME_START_TO_CONNECT_LEVEL2_CNT"] = g_wifiProSwitchTimeCnt[START_TO_CONNECT_LEVEL2];
+    root["TIME_START_TO_CONNECT_LEVEL3_CNT"] = g_wifiProSwitchTimeCnt[START_TO_CONNECT_LEVEL3];
+    root["TIME_CONNECT_TO_SUCC_LEVEL1_CNT"] = g_wifiProSwitchTimeCnt[CONNECT_TO_SUCC_LEVEL1];
+    root["TIME_CONNECT_TO_SUCC_LEVEL2_CNT"] = g_wifiProSwitchTimeCnt[CONNECT_TO_SUCC_LEVEL2];
+    root["TIME_CONNECT_TO_SUCC_LEVEL3_CNT"] = g_wifiProSwitchTimeCnt[CONNECT_TO_SUCC_LEVEL3];
+    root["REASON_NOT_SWTICH_SWITCHING"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_SWITCHING];
+    root["REASON_NOT_SWTICH_SELFCURING"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_SELFCURING];
+    root["REASON_NOT_SWTICH_NONET_BEFORE"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_NONET_BEFORE_CONNECT];
+    root["REASON_NOT_SWTICH_SIGNAL_BRIDGE"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_SIGNAL_BRIDGE_ON];
+    root["REASON_NOT_SWTICH_AP_STA_ON"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_AP_STA_ON];
+    root["REASON_NOT_SWTICH_APP_WLISTS"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_APP_WHITE_LISTS];
+    root["REASON_NOT_SWTICH_ISCALLING"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_ISCALLING];
+    root["REASON_NOT_SWTICH_NOT_AUTOSWITCH"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_NOT_ALLOW_AUTOSWITCH];
+    root["REASON_NOT_SWTICH_DISABLED"] = g_reasonNotSwitchCnt[ReasonNotSwitch::WIFIPRO_DISABLED];
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PRO_STATISTICS", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi

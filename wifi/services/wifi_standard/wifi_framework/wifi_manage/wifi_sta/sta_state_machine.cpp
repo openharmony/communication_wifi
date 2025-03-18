@@ -796,7 +796,11 @@ void StaStateMachine::LinkState::DealWpaStateChange(InternalMessagePtr msg)
     WIFI_LOGI("DealWpaStateChange status: %{public}d", status);
     if (static_cast<SupplicantState>(status) == SupplicantState::ASSOCIATING) {
         std::string ssid = msg->GetStringFromMessage();
-        pStaStateMachine->linkedInfo.ssid = WifiCodeConvertUtil::GbkToUtf8(ssid);
+        if (ssid.length() != 0 && !WifiCodeConvertUtil::IsUtf8(ssid)) {
+            pStaStateMachine->linkedInfo.ssid = WifiCodeConvertUtil::GbkToUtf8(ssid);
+        } else {
+            pStaStateMachine->linkedInfo.ssid = ssid;
+        }
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, pStaStateMachine->linkedInfo);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
             static_cast<int>(WifiOperateState::STA_ASSOCIATING));

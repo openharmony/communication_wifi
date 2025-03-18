@@ -67,6 +67,7 @@ constexpr int MICROSECOND_TO_NANOSECOND = 1000;
 constexpr char HIDDEN_CHAR_SHOW_AS = '*';
 constexpr int PASSWORD_MIN_LEN = 8;
 constexpr int PASSWORD_NO_HIDDEN_LEN = 2;
+constexpr int STRING_MAC_LEN = 18;
 
 constexpr uint32_t BASE_BIN = 2;
 constexpr uint32_t BASE_HEX = 16;
@@ -194,9 +195,8 @@ static unsigned char ConvertStrChar(char ch)
 
 errno_t MacStrToArray(const std::string& strMac, unsigned char mac[WIFI_MAC_LEN])
 {
-    constexpr int strMacLen = 18;
-    char tempArray[strMacLen] = { 0 };
-    errno_t ret = memcpy_s(tempArray, strMacLen, strMac.c_str(), strMac.size() + 1);
+    char tempArray[STRING_MAC_LEN] = { 0 };
+    errno_t ret = memcpy_s(tempArray, STRING_MAC_LEN, strMac.c_str(), strMac.size() + 1);
     if (ret != EOK) {
         return ret;
     }
@@ -585,11 +585,21 @@ bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output)
     output.resize(decodedLen);
 
     BIO *b64 = BIO_new(BIO_f_base64());
+    if (b64 == nullptr) {
+        WIFI_LOGE("%{public}s: failed to create b64", __func__);
+        return false;
+    }
     BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
     BIO *bio = BIO_new_mem_buf(input.c_str(), input.length());
+    if (bio == nullptr) {
+        WIFI_LOGE("%{public}s: failed to create bio", __func__);
+        BIO_free(b64);
+        return false;
+    }
     bio = BIO_push(b64, bio);
     if (BIO_read(bio, &output[0], input.length()) != static_cast<int32_t>(decodedLen)) {
         WIFI_LOGE("%{public}s: wrong data length for decoded buffer", __func__);
+        BIO_free_all(bio);
         return false;
     }
     BIO_free_all(bio);
@@ -606,8 +616,17 @@ std::string EncodeBase64(const std::vector<uint8_t> &input)
         return "";
     }
     BIO *b64 = BIO_new(BIO_f_base64());
+    if (b64 == nullptr) {
+        WIFI_LOGE("%{public}s: failed to create b64", __func__);
+        return "";
+    }
     BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
     BIO *bio = BIO_new(BIO_s_mem());
+    if (bio == nullptr) {
+        WIFI_LOGE("%{public}s: failed to create bio", __func__);
+        BIO_free(b64);
+        return "";
+    }
     bio = BIO_push(b64, bio);
     BIO_write(bio, &input[0], input.size());
     BIO_flush(bio);

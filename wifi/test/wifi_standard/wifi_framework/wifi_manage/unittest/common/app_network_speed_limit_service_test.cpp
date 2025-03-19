@@ -20,7 +20,6 @@
 #include "wifi_logger.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_app_state_aware.h"
-#include "mock_wifi_app_parser.h"
 
 using ::testing::_;
 using ::testing::DoAll;

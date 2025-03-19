@@ -130,10 +130,6 @@ if (defined(ohos_lite)) {
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
 
-    if (wifi_feature_non_seperate_p2p) {
-      defines += [ "NON_SEPERATE_P2P" ]
-    }
-
     if (wifi_feature_with_wifi_oeminfo_mac) {
       sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_oem_mac/wifi_oeminfo_mac.cpp" ]
       defines += [ "READ_MAC_FROM_OEM" ]
@@ -198,6 +194,10 @@ if (defined(ohos_lite)) {
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
+
+    if (wifi_feature_non_seperate_p2p) {
+      defines += [ "NON_SEPERATE_P2P" ]
+    }
 
     configs = [ ":wifi_fw_common_header" ]
 

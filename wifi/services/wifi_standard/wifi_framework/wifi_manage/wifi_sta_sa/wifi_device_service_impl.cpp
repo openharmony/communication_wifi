@@ -127,6 +127,9 @@ ErrCode WifiDeviceServiceImpl::EnableWifi()
     }
 
     if (m_instId == INSTID_WLAN0) {
+#ifdef DYNAMIC_UNLOAD_SA
+        WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaTimer();
+#endif
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
 #ifndef OHOS_ARCH_LITE
         WifiSettings::GetInstance().SetWifiToggleCaller(GetCallingPid(), m_instId);

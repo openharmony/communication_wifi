@@ -195,10 +195,6 @@ if (defined(ohos_lite)) {
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
 
-    if (wifi_feature_non_seperate_p2p) {
-      defines += [ "NON_SEPERATE_P2P" ]
-    }
-
     configs = [ ":wifi_fw_common_header" ]
 
     deps = [

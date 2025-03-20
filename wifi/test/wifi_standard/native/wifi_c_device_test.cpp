@@ -69,7 +69,9 @@ public:
 
     void IsWifiActiveEnable()
     {
-        EXPECT_FALSE(IsWifiActive() == true);
+        IsWifiActive();
+        WifiDetailState state;
+        EXPECT_TRUE(GetWifiDetailState(&state) != WIFI_SUCCESS);
     }
 
     void ScanSuccess()

@@ -1011,7 +1011,7 @@ static int hex2byte(const char *hex)
     if (b < 0) {
         return -1;
     }
-    return (a << HDI_POS_FOURTH) | b;
+    return (int)(((unsigned int)a << HDI_POS_FOURTH) | (unsigned int)b);
 }
 
 static char* hwaddr_parse(char *txt, uint8_t *addr)
@@ -1026,7 +1026,7 @@ static char* hwaddr_parse(char *txt, uint8_t *addr)
             return NULL;
         txt += HDI_MAC_SUB_LEN;
         addr[i] = a;
-        if (i < ETH_ALEN - 1 && *txt++ != ':')
+        if (i < ETH_ALEN - 1 && (*txt++ != ':'))
             return NULL;
     }
     return txt;
@@ -1089,7 +1089,7 @@ WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
     wpsParam.bssidLen = ETH_ALEN;
     wpsParam.passphrase = (uint8_t *)info->passphrase;
     wpsParam.passphraseLen = strlen(info->passphrase) + 1;
-    wpsParam.frequency = (info->frequency << 16) | (info->isLegacyGo);
+    wpsParam.frequency = (int)(((unsigned int)(info->frequency) << HDI_POS_OT) | (unsigned int)(info->isLegacyGo));
     int32_t result = wpaObj->P2pHid2dConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pHid2dConnect: P2pHid2dConnect failed result:%{public}d", result);

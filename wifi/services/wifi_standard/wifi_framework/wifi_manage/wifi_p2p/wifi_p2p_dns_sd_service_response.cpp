@@ -83,7 +83,7 @@ bool WifiP2pDnsSdServiceResponse::FetchDnsName(std::istringstream &istream, std:
             dnsName.append(it->second);
             return true;
         } else {
-            if (t > (istream.str().size() - static_cast<unsigned char>(istream.tellg()))) {
+            if (t > (static_cast<unsigned char>(istream.str().size()) - static_cast<unsigned char>(istream.tellg()))) {
                 return false;
             }
             std::unique_ptr<char[]> ptr = std::make_unique<char[]>(t);

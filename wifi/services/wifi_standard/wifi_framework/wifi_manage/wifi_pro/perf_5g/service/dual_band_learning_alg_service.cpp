@@ -225,12 +225,10 @@ long DualBandLearningAlgService::GetDetailStep(long flowRate)
 }
 long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
 {
-    if (rateList.empty()) {
-        return 0;
-    }
     long flowSum = 0;
-    flowSum += (rateList.back().txBytes - rateList.front().txBytes);
-    flowSum += (rateList.back().rxBytes - rateList.front().rxBytes);
+    for (auto it = rateList.begin(); it != rateList.end(); it++) {
+        flowSum += it->txBytes + it->rxBytes;
+    }
     int conversionStep = 1000;
     return flowSum / conversionStep / FLOW_RATE_TIME_RANGE_SECOND;
 }

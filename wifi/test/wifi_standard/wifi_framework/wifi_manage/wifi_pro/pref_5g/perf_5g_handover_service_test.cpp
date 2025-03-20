@@ -37,7 +37,7 @@ public:
         wifiLinkedInfo.frequency = FRE_2G;
         wifiLinkedInfo.isMloConnected = false;
         std::string beforeBssid = "";
-        perf5gHandoverService_->OnConnected(wifiLinkedInfo, beforeBssid);
+        perf5gHandoverService_->OnConnected(wifiLinkedInfo);
     }
 
     virtual void TearDown()

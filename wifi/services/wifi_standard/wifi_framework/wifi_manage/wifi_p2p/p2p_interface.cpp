@@ -47,6 +47,16 @@ P2pInterface::P2pInterface()
       p2pService(p2pStateMachine, deviceMgr, groupManager, svrMgr)
 {}
 
+extern "C" IP2pService *CreateP2pInterface()
+{
+    return new P2pInterface();
+}
+
+extern "C" void DestroyP2pInterface(IP2pService *p2pInterface)
+{
+    delete p2pInterface;
+    p2pInterface = nullptr;
+}
 
 ErrCode P2pInterface::EnableP2p()
 {

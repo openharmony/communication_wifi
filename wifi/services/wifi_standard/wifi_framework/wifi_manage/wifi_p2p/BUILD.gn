@@ -14,9 +14,9 @@
 import("//build/ohos.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
-ohos_static_library("wifi_p2p_service") {
+ohos_shared_library("wifi_p2p_service") {
   branch_protector_ret = "pac_ret"
-
+  install_enable = true
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = false  # Enable boundary san detection
@@ -136,9 +136,11 @@ ohos_static_library("wifi_p2p_service") {
 
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
-
+  version_script = "libwifi_p2p_service.map"
   part_name = "wifi"
   subsystem_name = "communication"
 }

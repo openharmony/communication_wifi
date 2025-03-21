@@ -106,7 +106,6 @@ void WifiScanManager::CheckAndStartScanService(int instId)
     ErrCode errCode = TryToStartScanService(instId);
     if (errCode != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetScanMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED, instId);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_SCAN, instId);
     }
 #ifndef OHOS_ARCH_LITE
     WifiCountryCodeManager::GetInstance().SetWifiCountryCodeFromExternal();

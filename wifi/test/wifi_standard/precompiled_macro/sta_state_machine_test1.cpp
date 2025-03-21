@@ -13,6 +13,7 @@
 * limitations under the License.
 */
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "internal_message.h"
 #include "sta_define.h"
 #include "define.h"
@@ -21,14 +22,10 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
-#include "mock_wifi_config_center.h"
-#include "mock_wifi_settings.h"
-#include "mock_if_config.h"
-#include "mock_wifi_manager.h"
 #include "mock_wifi_sta_hal_interface.h"
 #include "wifi_error_no.h"
 #include "log.h"
-
+#include "wifi_config_center.h"
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;
@@ -64,8 +61,6 @@ static void TearDownTestCase()
 }
 virtual void SetUp()
 {
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(testing::AtLeast(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveDisconnectedReason(_, _)).Times(testing::AtLeast(0));
     pStaStateMachine.reset(new StaStateMachine());
     pStaStateMachine->InitStaStateMachine();
     pStaStateMachine->InitWifiLinkedInfo();
@@ -79,10 +74,6 @@ std::unique_ptr<StaStateMachine> pStaStateMachine;
 
 void StartConnectToNetworkSuccess()
 {
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
-    EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
     MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
     pStaStateMachine->StartConnectToNetwork(0, "wifitest/123", 0);
 }
@@ -93,15 +84,11 @@ void OnWifiWpa3SelfCureSuccessTest()
     WifiDeviceConfig config;
     config.lastConnectTime = 1;
     config.ssid = "1234";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-    .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
     std::vector<WifiScanInfo> scanResults;
     WifiScanInfo scanInfo;
     scanInfo.ssid = "1234";
     scanInfo.capabilities = "PSK+SAE";
     scanResults.push_back(scanInfo);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).
-        WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
     int networkId = 0;
     pStaStateMachine->OnWifiWpa3SelfCure(failreason, networkId);
 }
@@ -116,8 +103,6 @@ void InitRandomMacInfoTest()
     scanInfo.ssid = "1234";
     scanInfo.securityType = WifiSecurity::OPEN;
     scanResults.push_back(scanInfo);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).
-        WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
     WifiStoreRandomMac randomMacInfo;
     pStaStateMachine->InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
 }
@@ -135,10 +120,6 @@ void SetRandomMacSuccess1()
     WifiDeviceConfig deviceConfig;
     deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
     deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
     pStaStateMachine->SetRandomMac(deviceConfig, "");
 }
 
@@ -153,9 +134,6 @@ void SetRandomMacFail1()
     randomMacInfo.preSharedKey = RANDOMMAC_PASSWORD;
     randomMacInfo.peerBssid = RANDOMMAC_BSSID;
     pStaStateMachine->MacAddressGenerate(randomMacInfo);
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(-1)));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
     pStaStateMachine->SetRandomMac(deviceConfig, "");
 }
 
@@ -170,13 +148,7 @@ void SetRandomMacFail2()
     pStaStateMachine->MacAddressGenerate(randomMacInfo);
     deviceConfig.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
     deviceConfig.keyMgmt = KEY_MGMT_WPA_PSK;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(deviceConfig), Return(0)));
     std::string MacAddress = "11:22:33:44:55:66";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).
-        WillRepeatedly(DoAll(SetArgReferee<0>(MacAddress), Return(0)));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
     pStaStateMachine->SetRandomMac(deviceConfig, "");
 }
 
@@ -207,10 +179,6 @@ void HandleStaBssidChangedEventTest1()
 
 void DealStartRoamCmdInApLinkedStateSuccess()
 {
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(testing::AtLeast(0));
-    EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
-    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
     pStaStateMachine->pApLinkedState->DealStartRoamCmdInApLinkedState(msg);
@@ -219,9 +187,6 @@ void DealStartRoamCmdInApLinkedStateSuccess()
 
 void ApRoamingStateExeMsgSuccess()
 {
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::string bssid = "wifitest";
     msg->SetMessageObj(bssid);
@@ -236,12 +201,8 @@ void GetIpStateStateIsPublicESSTest()
     scanInfo.ssid = "1234";
     scanInfo.capabilities = "123";
     scanResults.push_back(scanInfo);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).
-        WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
     WifiLinkedInfo linkedInfo;
     linkedInfo.ssid = "1234";
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).
-        WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     pStaStateMachine->pGetIpState->IsPublicESS();
 }
 
@@ -253,9 +214,6 @@ void DealApRoamingStateTimeoutTest1()
 
 void ApRoamingStateExeMsgSuccess1()
 {
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).WillRepeatedly(Return(0));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetMacAddress(_, _)).Times(AtLeast(0)).WillOnce(Return(0));
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::string bssid = "wifitest";
     msg->SetMessageObj(bssid);
@@ -321,15 +279,12 @@ void TransHalDeviceConfigTest()
     WifiScanInfo scanInfo;
     scanInfo.ssid = "1234";
     scanResults.push_back(scanInfo);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).
-        WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
     WifiHalDeviceConfig halDeviceConfig;
     pStaStateMachine->TransHalDeviceConfig(halDeviceConfig, config);
 }
 
 void DealReassociateCmdSuccess()
 {
-    EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::string bssid = "wifitest";
     msg->SetMessageObj(bssid);
@@ -362,16 +317,19 @@ void StartDisConnectToNetworkSuccess()
 HWTEST_F(StaStateMachineTest, StartConnectToNetworkSuccess, TestSize.Level1)
 {
     StartConnectToNetworkSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, OnWifiWpa3SelfCureSuccessTest, TestSize.Level1)
 {
     OnWifiWpa3SelfCureSuccessTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, InitRandomMacInfoTest, TestSize.Level1)
 {
     InitRandomMacInfoTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SetRandomMacConfigTest, TestSize.Level1)
@@ -424,26 +382,31 @@ HWTEST_F(StaStateMachineTest, DealScreenStateChangedEventTest1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, OnDhcpOfferResultTest, TestSize.Level1)
 {
     OnDhcpOfferResultTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealDhcpResultTest, TestSize.Level1)
 {
     DealDhcpResultTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, TryToCloseDhcpClientTest, TestSize.Level1)
 {
     TryToCloseDhcpClientTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, TryToCloseDhcpClientTest1, TestSize.Level1)
 {
     TryToCloseDhcpClientTest1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealDhcpResultFailedTest, TestSize.Level1)
 {
     DealDhcpResultFailedTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealDhcpOfferResultTest, TestSize.Level1)
@@ -455,21 +418,25 @@ HWTEST_F(StaStateMachineTest, DealDhcpOfferResultTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, SetRandomMacSuccess1, TestSize.Level1)
 {
     SetRandomMacSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SetRandomMacFail1, TestSize.Level1)
 {
     SetRandomMacFail1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SetRandomMacFail2, TestSize.Level1)
 {
     SetRandomMacFail2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, TransHalDeviceConfigTest, TestSize.Level1)
 {
     TransHalDeviceConfigTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealReConnectCmdInSeparatedStateSuccess, TestSize.Level1)
@@ -481,6 +448,7 @@ HWTEST_F(StaStateMachineTest, DealReConnectCmdInSeparatedStateSuccess, TestSize.
 HWTEST_F(StaStateMachineTest, DealReassociateCmdSuccess, TestSize.Level1)
 {
     DealReassociateCmdSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, DealReConnectCmdSuccess, TestSize.Level1)

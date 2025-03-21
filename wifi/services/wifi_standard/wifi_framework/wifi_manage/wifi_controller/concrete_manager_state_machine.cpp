@@ -247,6 +247,8 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr
 {
     mid = msg->GetParam1();
     int targetRole = msg->GetParam2();
+    ConcreteManagerRole role = static_cast<ConcreteManagerRole>(targetRole);
+    pConcreteMangerMachine->SetTargetRole(role);
     WIFI_LOGI("HandleStartInIdleState targetRole:%{public}d mid:%{public}d", targetRole, mid);
     ErrCode res = WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
     if (res != WIFI_OPT_SUCCESS) {

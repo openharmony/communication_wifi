@@ -246,14 +246,17 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMess
 void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr msg)
 {
     mid = msg->GetParam1();
-    WIFI_LOGI("HandleStartInIdleState targetRole:%{public}d mid:%{public}d", mTargetRole, mid);
+    int targetRole = msg->GetParam2();
+    ConcreteManagerRole role = static_cast<ConcreteManagerRole>(targetRole);
+    pConcreteMangerMachine->SetTargetRole(role);
+    WIFI_LOGI("HandleStartInIdleState targetRole:%{public}d mid:%{public}d", targetRole, mid);
     ErrCode res = WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
     if (res != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
+    if (targetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartStaService(mid, ifaceName);
         if (ret != WIFI_OPT_SUCCESS) {
             WifiConfigCenter::GetInstance().SetWifiStopState(true);
@@ -261,11 +264,11 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr
             return;
         }
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
-    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
-        WIFI_LOGI("HandleStartInIdleState, current role is %{public}d, start scan only success.", mTargetRole);
+    } else if (targetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
+        WIFI_LOGI("HandleStartInIdleState, current role is %{public}d, start scan only success.", targetRole);
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
-    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
-        mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
+    } else if (targetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
+        targetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartSemiStaService(mid, ifaceName);
         if (ret != WIFI_OPT_SUCCESS) {
             WifiConfigCenter::GetInstance().SetWifiStopState(true);

@@ -438,7 +438,7 @@ void WifiManager::InstallPacketFilterProgram(int event, int instId)
         WIFI_LOGW("%{public}s cannot get device ip address", __FUNCTION__);
     }
     std::string ipAddrStr = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
-    std::string ipMaskStr = IpTools::ConvertIpv4Mask(ipInfo.netmask);
+    std::string ipMaskStr = IpTools::ConvertIpv4Address(ipInfo.netmask);
     int netMaskLen = IpTools::GetMaskLength(ipMaskStr);
     WIFI_LOGD("%{public}s get ip info ipaddrStr: %{public}s, ipMaskStr: %{public}s, netMaskLen: %{public}d",
         __FUNCTION__,

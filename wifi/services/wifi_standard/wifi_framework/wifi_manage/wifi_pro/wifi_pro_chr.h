@@ -84,6 +84,15 @@ private:
     int64_t wifiProSumTime_ = 0;
     int64_t lastLoadTime_ = 0;
     WifiSwitchReason switchReason_ = WifiSwitchReason::WIFI_SWITCH_REASON_DEFAULT;
+    int32_t fastScanCnt_ = 0;
+    int32_t fullScanCnt_ = 0;
+    int32_t poorLinkCnt_ = 0;
+    int32_t noNetCnt_ = 0;
+    int32_t qoeSlowCnt_ = 0;
+    std::map<ReasonNotSwitch, int32_t> reasonNotSwitchCnt_ = {};
+    std::map<WifiProEventResult, int32_t> selectNetResultCnt_ = {};
+    std::map<WifiProEventResult, int32_t> wifiProResultCnt_ = {};
+    std::map<WifiProSwitchTimeCnt, int32_t> wifiProSwitchTimeCnt_ = {};
 };
 }  // namespace Wifi
 }  // namespace OHOS

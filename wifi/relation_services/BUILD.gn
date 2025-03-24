@@ -128,7 +128,7 @@ if (defined(ohos_lite)) {
         "hilog:libhilog",
       ]
 
-      public_external_deps = [ "wpa_supplicant:wpa_client" ]
+      external_deps += [ "wpa_supplicant:wpa_client" ]
     }
 
     defines = [

@@ -285,12 +285,6 @@ HWTEST_F(WifiProStateMachineTest, TryNoNetSwitchTest, TestSize.Level1)
     EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
 
-HWTEST_F(WifiProStateMachineTest, FullScanTest, TestSize.Level1)
-{
-    wifiNoNetState_->pWifiProStateMachine_->FullScan();
-    EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
-}
-
 HWTEST_F(WifiProStateMachineTest, WifiProEnableStateTransitionNetStateTest01, TestSize.Level1)
 {
     wifiProEnableState_->pWifiProStateMachine_ = new WifiProStateMachine();

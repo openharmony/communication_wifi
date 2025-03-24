@@ -691,10 +691,13 @@ void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMes
         return;
     }
     int32_t state = msg->GetParam1();
-    if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED) &&
-        (pWifiProStateMachine_->currentState_ != WifiProState::WIFI_NONET)) {
-        WIFI_LOGI("state transition: WifiConnectedState -> WifiNoNetState.");
-        pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
+    if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
+        if (pWifiProStateMachine_->currentState_ == WifiProState::WIFI_NONET) {
+            pWifiProStateMachine_->FullScan();
+        } else {
+            WIFI_LOGI("state transition: WifiConnectedState -> WifiNoNetState.");
+            pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiNoNetState_);
+        }
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL) &&
         (pWifiProStateMachine_->currentState_ != WifiProState::WIFI_PORTAL)) {
         WIFI_LOGI("state transition: WifiConnectedState -> WifiPortalState.");

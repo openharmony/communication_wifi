@@ -751,6 +751,8 @@ struct WifiDeviceConfig {
     std::string macAddress;
     int uid;
     time_t lastConnectTime;
+    /* last update time */
+    time_t lastUpdateTime;
     int numRebootsSinceLastUse;
     int numAssociation;
     int connFailedCount;
@@ -798,6 +800,7 @@ struct WifiDeviceConfig {
         rssi = -100;
         uid = WIFI_INVALID_UID;
         lastConnectTime = -1;
+        lastUpdateTime = -1;
         numRebootsSinceLastUse = 0;
         numAssociation = 0;
         connFailedCount = 0;

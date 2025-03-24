@@ -255,6 +255,7 @@ private:
         std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
+    bool FullScan();
 };
 } // namespace Wifi
 } // namespace OHOS

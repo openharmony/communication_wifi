@@ -160,6 +160,7 @@ public:
         void HandleWifiNoInternet(const InternalMessagePtr msg);
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();
+        bool HandleHttpResultInNoNet(InternalMessagePtr msg);
     };
 
     class WifiPortalState : public State {

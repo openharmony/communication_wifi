@@ -402,7 +402,7 @@ HWTEST_F(WifiManagerTest, GetLocationModeByDatashareTest, TestSize.Level1)
     WIFI_LOGI("GetLocationModeByDatashareTest enter!");
     bool result = wifiManager.wifiEventSubscriberManager->GetLocationModeByDatashare();
     WIFI_LOGI("GetLocationModeByDatashareTest result(%{public}d)", result);
-    EXPECT_FALSE(result, true);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)

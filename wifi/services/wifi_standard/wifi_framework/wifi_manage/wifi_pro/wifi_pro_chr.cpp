@@ -30,6 +30,7 @@ const int32_t TIME_START_TO_CONNECT_LEVEL1_CNT = 1000;
 const int32_t TIME_START_TO_CONNECT_LEVEL2_CNT = 1500;
 const int32_t TIME_CONNECT_TO_SUCC_LEVEL1_CNT = 2000;
 const int32_t TIME_CONNECT_TO_SUCC_LEVEL2_CNT = 3500;
+const int32_t USE_1000 = 1000;
 
 template<typename... Types>
 static void WriteEvent(const std::string& eventType, Types... args)
@@ -164,14 +165,14 @@ void WifiProChr::RecordReasonNotSwitchChrCnt(ReasonNotSwitch reason)
 void WifiProChr::RecordWifiProStartTime(WifiSwitchReason reason)
 {
     WIFI_LOGD("RecordWifiProStartTime");
-    wifiProStartTime_ = GetCurrentTimeSeconds();
+    wifiProStartTime_ = GetElapsedMicrosecondsSinceBoot() / USE_1000;
     switchReason_ = reason;
 }
 
 void WifiProChr::RecordWifiProConnectTime()
 {
     WIFI_LOGD("RecordWifiProConnectTime");
-    wifiProSumTime_ = GetCurrentTimeSeconds() - wifiProStartTime_;
+    wifiProSumTime_ = GetElapsedMicrosecondsSinceBoot() / USE_1000 - wifiProStartTime_;
     if (wifiProSumTime_ < TIME_START_TO_CONNECT_LEVEL1_CNT) {
         RecordSwitchTimeChrCnt(WifiProSwitchTimeCnt::START_TO_CONNECT_LEVEL1);
     } else if (wifiProSumTime_ < TIME_START_TO_CONNECT_LEVEL2_CNT) {
@@ -184,7 +185,7 @@ void WifiProChr::RecordWifiProConnectTime()
 void WifiProChr::RecordWifiProSwitchSuccTime()
 {
     WIFI_LOGD("RecordWifiProSwitchSuccTime");
-    int64_t wifiProConnectToSucc = GetCurrentTimeSeconds() - wifiProStartTime_ - wifiProSumTime_;
+    int64_t wifiProConnectToSucc = GetElapsedMicrosecondsSinceBoot() / USE_1000 - wifiProStartTime_ - wifiProSumTime_;
     if (wifiProConnectToSucc < TIME_CONNECT_TO_SUCC_LEVEL1_CNT) {
         RecordSwitchTimeChrCnt(WifiProSwitchTimeCnt::CONNECT_TO_SUCC_LEVEL1);
     } else if (wifiProConnectToSucc < TIME_CONNECT_TO_SUCC_LEVEL2_CNT) {
@@ -193,7 +194,7 @@ void WifiProChr::RecordWifiProSwitchSuccTime()
         RecordSwitchTimeChrCnt(WifiProSwitchTimeCnt::CONNECT_TO_SUCC_LEVEL3);
     }
 
-    wifiProSumTime_ = GetCurrentTimeSeconds() - wifiProStartTime_;
+    wifiProSumTime_ = GetElapsedMicrosecondsSinceBoot() / USE_1000 - wifiProStartTime_;
     if (wifiProSumTime_ < TIME_LEVEL1_CNT) {
         RecordSwitchTimeChrCnt(WifiProSwitchTimeCnt::SWITCH_TIME_LEVEL1);
     } else if (wifiProSumTime_ < TIME_LEVEL2_CNT) {
@@ -236,8 +237,8 @@ void WifiProChr::RecordCountWiFiPro(bool isValid)
                 break;
         }
     }
-    if (lastLoadTime_ == 0 || GetCurrentTimeSeconds() - lastLoadTime_ > ONE_DAY_TIME) {
-        lastLoadTime_ = GetCurrentTimeSeconds();
+    if (lastLoadTime_ == 0 || GetElapsedMicrosecondsSinceBoot() / USE_1000 - lastLoadTime_ > ONE_DAY_TIME) {
+        lastLoadTime_ = GetElapsedMicrosecondsSinceBoot() / USE_1000;
         WriteWifiProSysEvent();
         ResetChrRecord();
         WIFI_LOGI("WifiProChr::WriteWifiProSysEvent success");

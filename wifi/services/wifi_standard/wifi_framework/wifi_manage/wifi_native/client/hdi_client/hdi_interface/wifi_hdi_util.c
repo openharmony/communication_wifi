@@ -1222,6 +1222,7 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
     }
 
     infoEle = HdiBssGetIeExt(scanResult->ie, scanResult->ieLen, HDI_EID_EXT_HE_OPERATION);
+    // infoEle format: First position: Tag number, second postion: Tag length, third postion: ext tag number.
     if (infoEle) {
         unsigned int len = infoEle[1];
         if (len > 1) {
@@ -1231,7 +1232,7 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
                 return -1;
             }
             pos += ret;
-            for (size_t i = 0; i < len; i++) {
+            for (size_t i = 0; i < len - 1; i++) { // because ext tag number used one postion, len need substract 1.
                 ret = HdiTxtPrintf(pos, end - pos, "%02x", infoEle[i + HDI_POS_THIRD]);
                 if (HdiCheckError(end - pos, ret)) {
                     return -1;

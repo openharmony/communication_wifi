@@ -439,7 +439,8 @@ public:
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);
-    bool IsP2pServiceRunning();
+    // forceEnable: true - force enable P2pService if p2pservice is not running, false - check the service status
+    bool IsP2pServiceRunning(bool forceEnable = true);
     bool IsCallingAllowed();
     static void SaBasicDump(std::string& result);
 

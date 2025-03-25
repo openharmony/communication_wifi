@@ -138,49 +138,12 @@ ErrCode WifiP2pServiceImpl::EnableP2p(void)
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
-
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    if (curState != WifiOprMidState::CLOSED) {
-        WIFI_LOGW("current p2p state is %{public}d", static_cast<int>(curState));
-        if (curState == WifiOprMidState::CLOSING) {
-            return WIFI_OPT_OPEN_FAIL_WHEN_CLOSING;
-        } else {
-            return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
-        }
+    auto &wifiP2pManager = WifiManager::GetInstance().GetWifiP2pManager();
+    if (wifiP2pManager == nullptr) {
+        WIFI_LOGE("GetWifiP2pManager failed!");
+        return WIFI_OPT_FAILED;
     }
-    if (!WifiConfigCenter::GetInstance().SetP2pMidState(curState, WifiOprMidState::OPENING)) {
-        WIFI_LOGD("set p2p mid state opening failed!");
-        return WIFI_OPT_OPEN_SUCC_WHEN_OPENED;
-    }
-    ErrCode ret = WIFI_OPT_FAILED;
-    do {
-        if (WifiServiceManager::GetInstance().CheckAndEnforceService(WIFI_SERVICE_P2P) < 0) {
-            WIFI_LOGE("Load %{public}s service failed!", WIFI_SERVICE_P2P);
-            break;
-        }
-        IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-        if (pService == nullptr) {
-            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_P2P);
-            break;
-        }
-        ret = pService->RegisterP2pServiceCallbacks(WifiManager::GetInstance().GetWifiP2pManager()->GetP2pCallback());
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Register p2p service callback failed!");
-            break;
-        }
-        ret = pService->EnableP2p();
-        if (ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("service EnableP2p failed, ret %{public}d!", static_cast<int>(ret));
-            break;
-        }
-    } while (false);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
-    } else {
-        WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
-    }
-    return ret;
+    return wifiP2pManager->AutoStartP2pService();
 }
 
 ErrCode WifiP2pServiceImpl::DisableP2p(void)
@@ -211,7 +174,6 @@ ErrCode WifiP2pServiceImpl::DisableP2p(void)
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
         return WIFI_OPT_SUCCESS;
     }
     ErrCode ret = pService->DisableP2p();
@@ -696,7 +658,7 @@ ErrCode WifiP2pServiceImpl::GetCurrentGroup(WifiP2pGroupInfo &group)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (!IsP2pServiceRunning()) {
+    if (!IsP2pServiceRunning(false)) {
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
@@ -767,8 +729,9 @@ ErrCode WifiP2pServiceImpl::GetP2pDiscoverStatus(int &status)
         WIFI_LOGE("GetP2pDiscoverStatus:VerifyGetWifiInfoInternalPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (!IsP2pServiceRunning()) {
+    if (!IsP2pServiceRunning(false)) {
         WIFI_LOGE("P2pService is not running!");
+        status = 0;
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -791,8 +754,9 @@ ErrCode WifiP2pServiceImpl::GetP2pConnectedStatus(int &status)
         WIFI_LOGE("GetP2pConnectedStatus:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (!IsP2pServiceRunning()) {
+    if (!IsP2pServiceRunning(false)) {
         WIFI_LOGE("P2pService is not running!");
+        status = static_cast<int>(P2pConnectedState::P2P_DISCONNECTED);
         return WIFI_OPT_P2P_NOT_OPENED;
     }
 
@@ -1027,17 +991,39 @@ bool WifiP2pServiceImpl::IsCallingAllowed()
     return true;
 }
 
-bool WifiP2pServiceImpl::IsP2pServiceRunning()
+bool WifiP2pServiceImpl::IsP2pServiceRunning(bool forceEnable)
 {
     if (!IsCallingAllowed()) {
         return false;
     }
-    WifiOprMidState curState = WifiConfigCenter::GetInstance().GetP2pMidState();
-    if (curState != WifiOprMidState::RUNNING) {
-        WIFI_LOGW("p2p service does not started!");
+    // check wifi service status first
+    WifiOprMidState curStateWifi = WifiConfigCenter::GetInstance().GetWifiMidState();
+    if (curStateWifi != WifiOprMidState::RUNNING && curStateWifi != WifiOprMidState::SEMI_ACTIVE) {
+        // if wifi service is not running, do not call p2p service
+        WIFI_LOGW("wifi service does not started!");
         return false;
     }
-    return true;
+    // check p2p service status
+    WifiOprMidState curStateP2p = WifiConfigCenter::GetInstance().GetP2pMidState();
+    if (curStateP2p == WifiOprMidState::RUNNING) {
+        return true;
+    }
+    auto &wifiP2pManager = WifiManager::GetInstance().GetWifiP2pManager();
+    if (wifiP2pManager == nullptr) {
+        WIFI_LOGE("Get WifiP2pManager failed!");
+        return false;
+    }
+    // if forceEnable is true and first time use P2P, try to start p2p service
+    if (forceEnable && !wifiP2pManager->HasP2pActivatedBefore()) {
+        WIFI_LOGI("P2p service is not running, try to start it! %{public}d", static_cast<int>(curStateP2p));
+        ErrCode errCode = wifiP2pManager->AutoStartP2pService();
+        if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
+            WIFI_LOGE("Failed to start p2p service!");
+            return false;
+        }
+        return true;
+    }
+    return false;
 }
 
 ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)
@@ -1435,18 +1421,11 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         WIFI_LOGE("Hid2dSetUpperScene:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (!IsP2pServiceRunning()) {
-        WIFI_LOGE("P2pService is not runing!");
-        return WIFI_OPT_P2P_NOT_OPENED;
-    }
-
-    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-    if (pService == nullptr) {
-        WIFI_LOGE("Get P2P service failed!");
-        return WIFI_OPT_P2P_NOT_OPENED;
-    }
     WifiConfigCenter::GetInstance().SetHid2dUpperScene(callingUid, scene);
-    return pService->Hid2dSetUpperScene(ifName, scene);
+    /* Not support currently */
+    WIFI_LOGI("Set upper scene, ifName=%{public}s, scene=%{public}u, fps=%{public}d, bw=%{public}u",
+        ifName.c_str(), scene.scene, scene.fps, scene.bw);
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pServiceImpl::MonitorCfgChange(void)

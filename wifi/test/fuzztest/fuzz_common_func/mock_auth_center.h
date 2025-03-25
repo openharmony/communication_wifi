@@ -70,17 +70,6 @@ public:
     int VerifySameProcessPermission(const int &pid, const int &uid);
 };
 
-
-class WifiAppStateAware {
-public:
-    static WifiAppStateAware &GetInstance();
-
-    explicit WifiAppStateAware();
-    ~WifiAppStateAware();
-    bool IsForegroundApp(int32_t uid);
-    bool IsForegroundApp(const std::string &bundleName);
-};
-
 class WifiNetAgent {
 public:
     static WifiNetAgent &GetInstance();

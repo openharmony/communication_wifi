@@ -13,28 +13,12 @@
  * limitations under the License.
  */
 #include "scan_service.h"
+#include "wifi_config_center.h"
 #include <gtest/gtest.h>
-#include "Mock/mock_wifi_manager.h"
-#include "mock_wifi_config_center.h"
-#include "Mock/mock_wifi_settings.h"
-#include "Mock/mock_scan_state_machine.h"
-
-using ::testing::_;
-using ::testing::AtLeast;
-using ::testing::DoAll;
-using ::testing::Eq;
-using ::testing::Return;
-using ::testing::SetArgReferee;
-using ::testing::StrEq;
-using ::testing::TypedEq;
-using ::testing::ext::TestSize;
-
-constexpr int TWO = 2;
-constexpr int FOUR = 4;
 constexpr int STATUS = 17;
-
 namespace OHOS {
 namespace Wifi {
+using namespace testing::ext;
 const std::string g_errLog = "wifitest";
 
 class ScanServiceTest : public testing::Test {
@@ -44,8 +28,15 @@ public:
     virtual void SetUp()
     {
         pScanService = std::make_unique<ScanService>();
-        pScanService->pScanStateMachine = new MockScanStateMachine();
-        pScanService->RegisterScanCallbacks(WifiManager::GetInstance().GetScanCallback());
+        pScanService->pScanStateMachine = new ScanStateMachine();
+        pScanService->pScanStateMachine->InitScanStateMachine();
+        IScanSerivceCallbacks callback;
+        callback.OnScanStartEvent = nullptr;
+        callback.OnScanStopEvent = nullptr;
+        callback.OnScanFinishEvent = nullptr;
+        callback.OnScanInfoEvent = nullptr;
+        callback.OnStoreScanInfoEvent = nullptr;
+        pScanService->RegisterScanCallbacks(callback);
     }
     virtual void TearDown()
     {
@@ -106,9 +97,6 @@ public:
 
     void AllowExternScanFail2()
     {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
-            .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
     }
 
@@ -122,16 +110,12 @@ public:
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         pScanService->staStatus = STATUS;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
-            .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail4()
     {
         pScanService->disableScanFlag = true;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
         EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
     }
 };

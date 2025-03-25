@@ -1126,18 +1126,24 @@ bool WifiProStateMachine::WifiNoNetState::ExecuteStateMsg(InternalMessagePtr msg
     if (msg == nullptr) {
         return false;
     }
+    bool ret = NOT_EXECUTED;
     WIFI_LOGD("WifiNoNetState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_HANDLE_SCAN_RESULT:
             HandleWifiNoInternet(msg);
+            ret = EXECUTED;
             break;
         case EVENT_REQUEST_SCAN_DELAY:
             HandleReuqestScanInNoNet(msg);
+            ret = EXECUTED;
+            break;
+        case EVENT_CHECK_WIFI_INTERNET_RESULT:
+            ret = HandleHttpResultInNoNet(msg);
             break;
         default:
-            return false;
+            return ret;
     }
-    return true;
+    return ret;
 }
 
 void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMessagePtr msg)
@@ -1225,6 +1231,19 @@ void WifiProStateMachine::WifiNoNetState::HandleNoNetChanged()
     return;
 }
 
+bool WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGI("ReuqestScanInNoNet, msg is nullptr.");
+        return NOT_EXECUTED;
+    }
+    int32_t state = msg->GetParam1();
+    if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
+        pWifiProStateMachine_->FullScan();
+        return EXECUTED;
+    }
+    return NOT_EXECUTED;
+}
 /* --------------------------- state machine portal state ------------------------------ */
 WifiProStateMachine::WifiPortalState::WifiPortalState(WifiProStateMachine *pWifiProStateMachine)
     : State("WifiPortalState"),

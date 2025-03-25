@@ -301,6 +301,19 @@ private:
     static void* libApServiceHandle_;
 };
 #endif
+
+#ifdef FEATURE_P2P_SUPPORT
+class WifiP2PServiceUtil {
+    public:
+    WifiP2PServiceUtil() : wifiLibraryUtils_ ("libwifi_p2p_service.z.so", libP2pServiceHandle_, false) {}
+    ~WifiP2PServiceUtil() {}
+    IP2pService *CreateP2pInterface();
+    void DestroyP2pInterface(IP2pService *p2pService);
+    private:
+    WifiLibraryUtils wifiLibraryUtils_;
+    static void* libP2pServiceHandle_;
+};
+#endif
 } // namespace Wifi
 } // namespace OHOS
 #endif

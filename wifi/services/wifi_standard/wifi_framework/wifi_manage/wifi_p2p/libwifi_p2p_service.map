@@ -1,0 +1,8 @@
+1.0 {
+    global:
+        CreateP2pInterface;
+        DestroyP2pInterface;
+
+    local:
+        *;
+};

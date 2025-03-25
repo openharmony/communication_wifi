@@ -51,6 +51,8 @@ IP2pServiceCallbacks& WifiP2pManager::GetP2pCallback(void)
 
 ErrCode WifiP2pManager::AutoStartP2pService()
 {
+    std::unique_lock<std::mutex> locker(p2pEnableMutex);
+    hasP2pActivatedOnce_ = true;
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     WIFI_LOGI("AutoStartP2pService, current p2p state:%{public}d", p2pState);
     if (p2pState != WifiOprMidState::CLOSED) {
@@ -112,10 +114,8 @@ ErrCode WifiP2pManager::AutoStartP2pService()
     } while (false);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
         return ret;
     }
-    std::unique_lock<std::mutex> locker(p2pEnableMutex);
     p2pEnableCond.wait_for(locker, std::chrono::milliseconds(P2P_ENABLE_WAIT_MS));
 #ifndef OHOS_ARCH_LITE
     StopUnloadP2PSaTimer();
@@ -125,6 +125,7 @@ ErrCode WifiP2pManager::AutoStartP2pService()
 
 ErrCode WifiP2pManager::AutoStopP2pService()
 {
+    std::unique_lock<std::mutex> locker(p2pEnableMutex);
     WifiOprMidState p2pState = WifiConfigCenter::GetInstance().GetP2pMidState();
     WIFI_LOGI("AutoStopP2pService, current p2p state:%{public}d", p2pState);
     if (p2pState != WifiOprMidState::RUNNING) {
@@ -144,7 +145,6 @@ ErrCode WifiP2pManager::AutoStopP2pService()
     if (pService == nullptr) {
         WIFI_LOGE("AutoStopP2pService, Instance get p2p service is null!");
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSED);
-        WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_P2P);
         return WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED;
     }
 
@@ -154,9 +154,13 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
         return ret;
     }
-    std::unique_lock<std::mutex> locker(p2pEnableMutex);
     p2pEnableCond.wait_for(locker, std::chrono::milliseconds(P2P_ENABLE_WAIT_MS));
     return WIFI_OPT_SUCCESS;
+}
+
+bool WifiP2pManager::HasP2pActivatedBefore(void)
+{
+    return hasP2pActivatedOnce_;
 }
 
 #ifndef OHOS_ARCH_LITE
@@ -277,6 +281,7 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
     cbMsg.msgData = static_cast<int>(state);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     if (state == P2pState::P2P_STATE_IDLE) {
+        // close p2p service sync here to avoid p2p service not closed when p2p service opened Again
         CloseP2pService();
         p2pEnableCond.notify_all();
     }

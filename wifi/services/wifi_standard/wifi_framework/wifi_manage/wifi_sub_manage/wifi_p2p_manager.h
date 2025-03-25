@@ -35,7 +35,7 @@ public:
     ErrCode AutoStopP2pService();
     void StopUnloadP2PSaTimer(void);
     void StartUnloadP2PSaTimer(void);
-    void CloseP2pService(void);
+    bool HasP2pActivatedBefore(void);
 
 private:
     void InitP2pCallback(void);
@@ -53,14 +53,18 @@ private:
     void DealP2pGcLeaveGroup(const GcInfo &info);
     void IfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void DealP2pPrivatePeersChanged(const std::string &privateInfo);
-
+    // do not call this function directly, use AutoStartP2pService instead
+    void CloseP2pService(void);
 private:
     IP2pServiceCallbacks mP2pCallback;
     uint32_t unloadP2PSaTimerId{0};
     std::mutex unloadP2PSaTimerMutex;
     std::string ifaceName{""};
+    // mutex to avoid EnableP2p and DisableP2p at the same time
     std::mutex p2pEnableMutex;
     std::condition_variable p2pEnableCond;
+    // has p2p been activated once, flag to dlopen p2p service
+    std::atomic<bool> hasP2pActivatedOnce_{false};
 };
 
 }  // namespace Wifi

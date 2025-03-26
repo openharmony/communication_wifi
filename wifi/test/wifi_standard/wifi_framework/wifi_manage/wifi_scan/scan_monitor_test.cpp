@@ -120,6 +120,7 @@ HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest1, TestSize.Level1)
 HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest2, TestSize.Level1)
 {
     ProcessReceiveScanEventTest2();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(ScanMonitorTest, ProcessReceiveScanEventTest3, TestSize.Level1)

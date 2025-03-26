@@ -251,8 +251,7 @@ private:
     void HandleWifi2WifiFailed();
     void FastScan(std::vector<WifiScanInfo> &scanInfoList);
     bool TrySelfCure(bool forceNoHttpCheck);
-    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, NetworkSelectType networkSelectType,
-        std::vector<InterScanInfo> &scanInfos);
+    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
 };

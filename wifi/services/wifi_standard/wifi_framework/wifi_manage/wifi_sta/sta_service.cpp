@@ -457,6 +457,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     if (!WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
         LOGI("AddDeviceConfig EncryptionDeviceConfig failed");
     }
+    tempDeviceConfig.lastUpdateTime = time(0);
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* update net link proxy info */

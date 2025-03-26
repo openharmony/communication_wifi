@@ -129,14 +129,18 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 #endif
         iter->second = config;
     } else {
-        if (mWifiDeviceConfig.size() > WIFI_DEVICE_CONFIG_MAX_MUN) {
-            LOGE("AddDeviceConfig Exceeding the maximum value!");
-            return -1;
-        }
         mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
         WifiAssetManager::GetInstance().WifiAssetAdd(config, USER_ID_DEFAULT, false);
 #endif
+        std::vector<WifiDeviceConfig> tempConfigs;
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            tempConfigs.push_back(iter->second);
+        }
+        std::vector<WifiDeviceConfig> removedConfigs = RemoveExcessDeviceConfigs(tempConfigs);
+        for (auto iter = removedConfigs.begin(); iter != removedConfigs.end(); iter++) {
+            mWifiDeviceConfig.erase(iter->networkId);
+        }
     }
     return config.networkId;
 }
@@ -1861,19 +1865,20 @@ int WifiSettings::SyncWifiConfig()
     return mSavedWifiConfig.SaveConfig();
 }
 
-int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const
+std::vector<WifiDeviceConfig> WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const
 {
+    std::vector<WifiDeviceConfig> removeVec;
     int maxNumConfigs = mMaxNumConfigs;
     if (maxNumConfigs < 0) {
-        return 1;
+        return removeVec;
     }
     int numExcessNetworks = static_cast<int>(configs.size()) - maxNumConfigs;
     if (numExcessNetworks <= 0) {
-        return 1;
+        return removeVec;
     }
     sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
-        if (a.lastConnectTime != b.lastConnectTime) {
-            return a.lastConnectTime < b.lastConnectTime;
+        if (std::max(a.lastConnectTime, a.lastUpdateTime) != std::max(b.lastConnectTime, b.lastUpdateTime)) {
+            return std::max(a.lastConnectTime, a.lastUpdateTime) < std::max(b.lastConnectTime, b.lastUpdateTime);
         } else if (a.numRebootsSinceLastUse != b.numRebootsSinceLastUse) {
             return a.numRebootsSinceLastUse > b.numRebootsSinceLastUse;
         } else if (a.numAssociation != b.numAssociation) {
@@ -1890,11 +1895,12 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     LOGI("saved config size greater than %{public}d, remove ssid(print up to 1000)=%{public}s",
         maxNumConfigs, removeConfig.str().c_str());
     std::vector<WifiDeviceConfig> newVec(configs.begin(), configs.begin() + numExcessNetworks);
+    removeVec.swap(newVec);
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-    WifiAssetManager::GetInstance().WifiAssetRemovePack(newVec);
+    WifiAssetManager::GetInstance().WifiAssetRemovePack(removeVec);
 #endif
     configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
-    return 0;
+    return removeVec;
 }
 
 std::string WifiSettings::FuzzyBssid(const std::string bssid)

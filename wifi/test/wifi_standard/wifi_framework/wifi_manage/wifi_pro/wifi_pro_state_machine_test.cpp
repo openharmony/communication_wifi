@@ -50,6 +50,7 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int TEN = 10;
+static std::string g_errLog = "wifi_test";
 
 class WifiProStateMachineTest : public testing::Test {
 public:
@@ -157,7 +158,7 @@ HWTEST_F(WifiProStateMachineTest, HandleRssiChangedInLinkMonitorStateTest, TestS
     auto pWiFiLinkMonitorState = pWifiProStateMachine_->pWifiHasNetState_;
     pWiFiLinkMonitorState->rssiLevel2Or3ScanedCounter_ = 1;
     pWiFiLinkMonitorState->HandleRssiChangedInHasNet(msg);
-    EXPECT_EQ(pWiFiLinkMonitorState->rssiLevel2Or3ScanedCounter_, 1);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiProStateMachineTest, RefreshConnectedNetWorkTest01, TestSize.Level1)

@@ -22,26 +22,9 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr int SELF_CURE_DNS_SIZE = 2;
 constexpr int VEC_POS_3 = 3;
 constexpr int GET_NEXT_IP_MAC_CNT = 10;
-constexpr int POS_DNS_FAILED_TS = 1;
-constexpr int POS_RENEW_DHCP_FAILED_CNT = 2;
-constexpr int POS_RENEW_DHCP_FAILED_TS = 3;
-constexpr int POS_STATIC_IP_FAILED_CNT = 4;
-constexpr int POS_STATIC_IP_FAILED_TS = 5;
-constexpr int POS_REASSOC_FAILED_CNT = 6;
-constexpr int POS_REASSOC_FAILED_TS = 7;
-constexpr int POS_RANDMAC_FAILED_CNT = 8;
-constexpr int POS_RANDMAC_FAILED_TS = 9;
-constexpr int POS_RESET_FAILED_CNT = 10;
-constexpr int POS_RESET_FAILED_TS = 11;
-constexpr int POS_REASSOC_CONNECT_FAILED_CNT = 12;
-constexpr int POS_REASSOC_CONNECT_FAILED_TS = 13;
-constexpr int POS_RANDMAC_CONNECT_FAILED_CNT = 14;
-constexpr int POS_RANDMAC_CONNECT_FAILED_TS = 15;
-constexpr int POS_RESET_CONNECT_FAILED_CNT = 16;
-constexpr int POS_RESET_CONNECT_FAILED_TS = 17;
+
 inline constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
 class SelfCureUtils {
 public:

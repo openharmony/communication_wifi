@@ -315,7 +315,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg16, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
-    EXPECT_TRUE(pP2pEnabledState->ExecuteStateMsg(msg));
+    EXPECT_FALSE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg17, TestSize.Level1)

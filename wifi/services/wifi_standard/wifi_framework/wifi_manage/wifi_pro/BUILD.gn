@@ -28,7 +28,6 @@ ohos_static_library("wifi_pro") {
   include_dirs = [
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/base/utils",
-
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
@@ -85,6 +84,7 @@ ohos_static_library("wifi_pro") {
     "perf_5g/service/dual_band_selector.cpp",
     "perf_5g/service/score_service.cpp",
     "perf_5g/service/wifi_scan_controller.cpp",
+    "wifi_pro_chr.cpp",
     "wifi_pro_interface.cpp",
     "wifi_pro_service.cpp",
     "wifi_pro_state_machine.cpp",
@@ -101,7 +101,9 @@ ohos_static_library("wifi_pro") {
     "c_utils:utils",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "init:libbegetutil",
+    "jsoncpp:jsoncpp",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_stats_manager_if",
     "netmanager_base:netsys_controller",

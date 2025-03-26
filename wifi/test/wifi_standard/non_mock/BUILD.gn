@@ -78,10 +78,12 @@ ohos_unittest("wifi_non_mock_unittest") {
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
     "hilog:libhilog",
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",
+    "time_service:time_client",
   ]
 
   defines = [

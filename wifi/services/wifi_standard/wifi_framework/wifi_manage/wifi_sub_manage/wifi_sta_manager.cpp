@@ -23,6 +23,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_protect_manager.h"
 #include "wifi_system_timer.h"
+#include "block_connect_service.h"
 #ifdef FEATURE_STA_SUPPORT
 #include "wifi_country_code_manager.h"
 #endif
@@ -166,6 +167,7 @@ void WifiStaManager::DealStaStopped(int instId)
 #ifdef DYNAMIC_UNLOAD_SA
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE, instId);
 #endif
+    BlockConnectService::GetInstance().DealStaStopped(instId);
 }
 
 void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)

@@ -19,6 +19,7 @@
 #include "wifi_config_center.h"
 #include "wifi_p2p_msg.h"
 #include "wifi_logger.h"
+#include "block_connect_service.h"
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
 #include "parameter.h"
 #endif
@@ -61,8 +62,7 @@ bool NetworkSelectionUtils::IsScanResultForOweNetwork(const NetworkCandidate &ne
 
 bool NetworkSelectionUtils::IsBlackListNetwork(const NetworkCandidate &networkCandidate)
 {
-    constexpr int maxRetryCount = 3;
-    return networkCandidate.wifiDeviceConfig.connFailedCount >= maxRetryCount;
+    return BlockConnectService::GetInstance().IsBssidMatchUnusableSet(networkCandidate.interScanInfo.bssid);
 }
 
 std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates,

@@ -73,13 +73,34 @@ public:
     // Enable all networks by entering settings
     void OnReceiveSettingsEnterEvent(bool isEnter);
 
+    // handle wifi stopped msg
+    void DealStaStopped(int instId);
+
+    // handle wifi connected failed msg
+    void NotifyWifiConnFailedInfo(int targetNetworkId, std::string bssid, DisabledReason disableReason);
+
+    // release all blacklist bssid
+    void ReleaseUnusableBssidSet();
+
+    // check if the given bssid match the unusable bssid set
+    bool IsBssidMatchUnusableSet(std::string bssid);
+
 private:
     DisablePolicy CalculateDisablePolicy(DisabledReason disableReason);
     void EnableAllNetworksByEnteringSettings(std::vector<DisabledReason> enableReasons);
     void LogDisabledConfig(const WifiDeviceConfig& config);
+    void StartClearSetTimer();
+    void StopClearSetTimer();
+    void ClearSetTimerCallback();
     LastConnectedApInfo mLastConnectedApInfo;
     std::map<DisabledReason, DisablePolicy> blockConnectPolicies;
     std::vector<int> validReasons;
+    std::set<std::string> autoJoinUnusableBssidSet_;
+    std::string curUnusableSsid_;
+    std::string curUnusableKeyMgmt_;
+    std::mutex bssidMutex_;
+    std::mutex clearSetTimerMutex_;
+    uint32_t clearSetTimerId_ {0};
 };
 }
 }

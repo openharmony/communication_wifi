@@ -23,7 +23,6 @@
 #include "wifi_hisysevent.h"
 #include "wifi_protect_manager.h"
 #include "wifi_system_timer.h"
-#include "block_connect_service.h"
 #ifdef FEATURE_STA_SUPPORT
 #include "wifi_country_code_manager.h"
 #endif
@@ -31,6 +30,7 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "dhcp_c_api.h"
+#include "block_connect_service.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #include "wifi_notification_util.h"

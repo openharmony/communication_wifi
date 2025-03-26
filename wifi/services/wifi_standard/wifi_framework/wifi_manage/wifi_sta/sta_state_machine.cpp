@@ -1174,8 +1174,10 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent()
 #endif
 #endif
     }
+#ifndef OHOS_ARCH_LITE
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
+#endif
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG,
         pStaStateMachine->linkedInfo);
     return;
@@ -1206,9 +1208,9 @@ void StaStateMachine::ApLinkingState::DealWpaLinkAssocRejectFailEvent()
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
         DisabledReason::DISABLED_ASSOCIATION_REJECTION);
+#ifndef OHOS_ARCH_LITE
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_ASSOCIATION_REJECTION);
-#ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
     WifiDataReportService::GetInstance().ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_REJECTION,
         pStaStateMachine->linkedInfo, pStaStateMachine->m_instId,
@@ -2251,7 +2253,9 @@ void StaStateMachine::LinkedState::GoInState()
     WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
     WifiSettings::GetInstance().ClearAllNetworkConnectChoice();
     BlockConnectService::GetInstance().EnableNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId);
+#ifndef OHOS_ARCH_LITE
     BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
+#endif
     WifiSettings::GetInstance().SyncDeviceConfig();
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
@@ -4039,7 +4043,9 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
         SetAllowAutoConnectStatus(networkId, true);
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
+#ifndef OHOS_ARCH_LITE
         BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
+#endif
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     }
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);

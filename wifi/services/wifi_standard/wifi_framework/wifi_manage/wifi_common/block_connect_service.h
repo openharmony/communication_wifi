@@ -72,7 +72,7 @@ public:
 
     // Enable all networks by entering settings
     void OnReceiveSettingsEnterEvent(bool isEnter);
-
+#ifndef OHOS_ARCH_LITE
     // handle wifi stopped msg
     void DealStaStopped(int instId);
 
@@ -84,23 +84,27 @@ public:
 
     // check if the given bssid match the unusable bssid set
     bool IsBssidMatchUnusableSet(std::string bssid);
-
+#endif
 private:
     DisablePolicy CalculateDisablePolicy(DisabledReason disableReason);
     void EnableAllNetworksByEnteringSettings(std::vector<DisabledReason> enableReasons);
     void LogDisabledConfig(const WifiDeviceConfig& config);
+#ifndef OHOS_ARCH_LITE
     void StartClearSetTimer();
     void StopClearSetTimer();
     void ClearSetTimerCallback();
+#endif
     LastConnectedApInfo mLastConnectedApInfo;
     std::map<DisabledReason, DisablePolicy> blockConnectPolicies;
     std::vector<int> validReasons;
+#ifndef OHOS_ARCH_LITE
     std::set<std::string> autoJoinUnusableBssidSet_;
     std::string curUnusableSsid_;
     std::string curUnusableKeyMgmt_;
     std::mutex bssidMutex_;
     std::mutex clearSetTimerMutex_;
     uint32_t clearSetTimerId_ {0};
+#endif
 };
 }
 }

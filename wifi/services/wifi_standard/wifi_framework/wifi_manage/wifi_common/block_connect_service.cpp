@@ -104,7 +104,7 @@ bool BlockConnectService::ShouldAutoConnect(const WifiDeviceConfig &config)
 {
     // Return true if auto connect is enabled, false otherwise
     WIFI_LOGD("ENTER shouldAutoConnect %{public}d",
-            config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED);
+                config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED);
     return config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
 }
 

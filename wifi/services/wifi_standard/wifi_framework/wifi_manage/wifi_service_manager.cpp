@@ -205,7 +205,8 @@ int WifiServiceManager::LoadP2pService(const std::string &dlname, bool bCreate)
     if (mP2pServiceHandle.pService) {
         return 0;
     }
-    mP2pServiceHandle.pService = new P2pInterface();
+    WifiP2PServiceUtil p2pServiceUtil;
+    mP2pServiceHandle.pService = p2pServiceUtil.CreateP2pInterface();
     WifiManager::GetInstance().GetWifiP2pManager()->StopUnloadP2PSaTimer();
     return 0;
 }
@@ -503,7 +504,8 @@ NO_SANITIZE("cfi") int WifiServiceManager::UnloadP2pService(bool bPreLoad)
     WIFI_LOGI("WifiServiceManager::UnloadP2pService");
     std::unique_lock<std::mutex> lock(mP2pMutex);
     if (mP2pServiceHandle.pService != nullptr) {
-        delete mP2pServiceHandle.pService;
+        WifiP2PServiceUtil p2pServiceUtil;
+        p2pServiceUtil.DestroyP2pInterface(mP2pServiceHandle.pService);
         mP2pServiceHandle.pService = nullptr;
     }
     if (!bPreLoad) {
@@ -619,6 +621,37 @@ void WifiApServiceUtil::DestroyApInterface(IApService *service)
         return;
     }
     destroyApInterface(service);
+}
+#endif
+
+#ifdef FEATURE_P2P_SUPPORT
+void* WifiP2PServiceUtil::libP2pServiceHandle_ = nullptr;
+IP2pService *WifiP2PServiceUtil::CreateP2pInterface()
+{
+    if (libP2pServiceHandle_ == nullptr) {
+        return nullptr;
+    }
+    using CreateP2pInterfaceFunc = IP2pService *(*)();
+    CreateP2pInterfaceFunc createP2pInterface =
+        reinterpret_cast<CreateP2pInterfaceFunc>(wifiLibraryUtils_.GetFunction("CreateP2pInterface"));
+    if (createP2pInterface == nullptr) {
+        return nullptr;
+    }
+    return createP2pInterface();
+}
+ 
+void WifiP2PServiceUtil::DestroyP2pInterface(IP2pService *service)
+{
+    if (libP2pServiceHandle_ == nullptr) {
+        return;
+    }
+    using DestroyP2pInterfaceFunc = void (*)(IP2pService *);
+    DestroyP2pInterfaceFunc destroyP2pInterface =
+        reinterpret_cast<DestroyP2pInterfaceFunc>(wifiLibraryUtils_.GetFunction("DestroyP2pInterface"));
+    if (destroyP2pInterface == nullptr) {
+        return;
+    }
+    destroyP2pInterface(service);
 }
 #endif
 } // namespace Wifi

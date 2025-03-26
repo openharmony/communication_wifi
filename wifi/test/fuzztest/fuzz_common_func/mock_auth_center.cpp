@@ -119,26 +119,6 @@ void NetworkSelectionManager::TryNominate(std::vector<NetworkSelection::NetworkC
     return;
 }
 
-WifiAppStateAware &WifiAppStateAware::GetInstance()
-{
-    static WifiAppStateAware gWifiAppStateAware;
-    return gWifiAppStateAware;
-}
-
-WifiAppStateAware::WifiAppStateAware()
-{}
-WifiAppStateAware::~WifiAppStateAware()
-{}
-
-bool WifiAppStateAware::IsForegroundApp(int32_t uid)
-{
-    return true;
-}
-
-bool WifiAppStateAware::IsForegroundApp(const std::string &bundleName)
-{
-    return true;
-}
 
 WifiNetAgent &WifiNetAgent::GetInstance()
 {
@@ -148,6 +128,7 @@ WifiNetAgent &WifiNetAgent::GetInstance()
 
 WifiNetAgent::WifiNetAgent()
 {}
+
 WifiNetAgent::~WifiNetAgent()
 {}
 

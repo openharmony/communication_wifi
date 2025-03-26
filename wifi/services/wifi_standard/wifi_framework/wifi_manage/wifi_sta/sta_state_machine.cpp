@@ -2087,15 +2087,20 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
 #endif
     WriteIsInternetHiSysEvent(NETWORK);
-    SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
-    lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
-    InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
+    WIFI_LOGD("%{public}s, isHiLinkNetwork : %{public}d isHomeAp : %{public}d isHomeRouter : %{public}d keyMgmt : "
+              "%{public}s", __func__, linkedInfo.isHiLinkNetwork, isHomeAp, isHomeRouter, config.keyMgmt.c_str());
     if ((linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) && config.keyMgmt != KEY_MGMT_NONE) {
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
+        SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
+        lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
+        InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
     } else {
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
+        SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
+        lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+        InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
     }
 }
 

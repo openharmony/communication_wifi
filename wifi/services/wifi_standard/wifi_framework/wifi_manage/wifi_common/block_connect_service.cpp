@@ -13,8 +13,10 @@
 * limitations under the License.
 */
 #include "block_connect_service.h"
+#ifndef OHOS_ARCH_LITE
 #include "wifi_config_center.h"
 #include "wifi_system_timer.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -23,7 +25,9 @@ constexpr int FREQUENT_DISCONNECT_COUNT = 5;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MAX = 10 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 1 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 0.5 * 60 * 1000 * 1000;
+#ifndef OHOS_ARCH_LITE
 constexpr int64_t TIMEOUT_CLEAR_SET = 4 * 60 * 1000;
+#endif
 
 BlockConnectService &BlockConnectService::GetInstance()
 {
@@ -99,7 +103,7 @@ void BlockConnectService::Exit()
 bool BlockConnectService::ShouldAutoConnect(const WifiDeviceConfig &config)
 {
     // Return true if auto connect is enabled, false otherwise
-    WIFI_LOGD("ENTER shouldAutoConnect %d",
+    WIFI_LOGD("ENTER shouldAutoConnect %{public}d",
         config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED);
     return config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
 }
@@ -319,7 +323,9 @@ void BlockConnectService::OnReceiveSettingsEnterEvent(bool isEnter)
             DisabledReason::DISABLED_CONSECUTIVE_FAILURES,
         };
         EnableAllNetworksByEnteringSettings(enableReasons);
+#ifndef OHOS_ARCH_LITE
         ReleaseUnusableBssidSet();
+#endif
     }
 }
 
@@ -342,6 +348,7 @@ void BlockConnectService::LogDisabledConfig(const WifiDeviceConfig &config)
     }
 }
 
+#ifndef OHOS_ARCH_LITE
 void BlockConnectService::DealStaStopped(int instId)
 {
     if (instId != 0) {
@@ -436,5 +443,6 @@ void BlockConnectService::ClearSetTimerCallback()
     curUnusableSsid_ = "";
     curUnusableKeyMgmt_ = "";
 }
+#endif
 }
 }

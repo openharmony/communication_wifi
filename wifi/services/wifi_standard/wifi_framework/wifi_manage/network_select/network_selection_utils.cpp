@@ -19,7 +19,9 @@
 #include "wifi_config_center.h"
 #include "wifi_p2p_msg.h"
 #include "wifi_logger.h"
+#ifndef OHOS_ARCH_LITE
 #include "block_connect_service.h"
+#endif
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
 #include "parameter.h"
 #endif
@@ -62,7 +64,11 @@ bool NetworkSelectionUtils::IsScanResultForOweNetwork(const NetworkCandidate &ne
 
 bool NetworkSelectionUtils::IsBlackListNetwork(const NetworkCandidate &networkCandidate)
 {
+#ifndef OHOS_ARCH_LITE
     return BlockConnectService::GetInstance().IsBssidMatchUnusableSet(networkCandidate.interScanInfo.bssid);
+#else
+    return false;
+#endif
 }
 
 std::string NetworkSelectionUtils::GetNetworkCandidatesInfo(const std::vector<NetworkCandidate*> &networkCandidates,

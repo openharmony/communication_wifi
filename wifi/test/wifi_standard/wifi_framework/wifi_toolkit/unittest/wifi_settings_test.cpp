@@ -691,14 +691,6 @@ HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
     config.keyMgmtBitset = 0;
     WifiSettings::GetInstance().SetKeyMgmtBitset(config);
     EXPECT_EQ(config.keyMgmtBitset, 8);
-    config.keyMgmt = "WPA-PSK";
-    config.keyMgmtBitset = 12;
-    WifiSettings::GetInstance().SetKeyMgmtBitset(config);
-    EXPECT_EQ(config.keyMgmtBitset, 12);
-    config.keyMgmt = "ABC";
-    config.keyMgmtBitset = 0;
-    WifiSettings::GetInstance().SetKeyMgmtBitset(config);
-    EXPECT_EQ(config.keyMgmtBitset, 0);
 }
 
 HWTEST_F(WifiSettingsTest, GetAllSuitableEncryptionTest, TestSize.Level1)

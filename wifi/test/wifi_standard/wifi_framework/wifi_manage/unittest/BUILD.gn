@@ -16,7 +16,7 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ################################################################################
 
-module_output_path = "wifi/manager_test"
+module_output_path = "wifi/wifi/manager_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]

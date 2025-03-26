@@ -279,9 +279,8 @@ void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)
 #endif
 #ifdef FEATURE_P2P_SUPPORT
         case WifiCloseServiceCode::P2P_SERVICE_CLOSE:
-            mCloseServiceThread->PostAsyncTask([this]() {
-                wifiP2pManager->CloseP2pService();
-            });
+            // due to time order problem, p2p service close should be done in sync task
+            // do nothing here
             break;
 #endif
         case WifiCloseServiceCode::STA_MSG_OPENED:

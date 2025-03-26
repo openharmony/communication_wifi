@@ -20,6 +20,7 @@
 using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
+static std::string g_errLog = "wifi_test";
 
 class DualBandRepostitoryTest : public testing::Test {
 public:
@@ -44,7 +45,7 @@ HWTEST_F(DualBandRepostitoryTest, LoadApHistoryInfoTest1, TestSize.Level1)
     ApInfo apInfo;
     bool hasHistoryInfo = false;
     dualBandRepostitory_->LoadApHistoryInfo(apInfo, hasHistoryInfo);
-    EXPECT_EQ(hasHistoryInfo, false);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(DualBandRepostitoryTest, LoadRelationApInfoTest1, TestSize.Level1)

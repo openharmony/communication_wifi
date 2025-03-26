@@ -285,6 +285,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        void HandleArpFailedDetected(InternalMessagePtr msg);
         SelfCureStateMachine *pSelfCureStateMachine_;
     };
 

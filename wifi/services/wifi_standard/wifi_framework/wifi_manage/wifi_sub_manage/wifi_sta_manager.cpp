@@ -167,7 +167,9 @@ void WifiStaManager::DealStaStopped(int instId)
 #ifdef DYNAMIC_UNLOAD_SA
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE, instId);
 #endif
+#ifdef OHOS_ARCH_LITE
     BlockConnectService::GetInstance().DealStaStopped(instId);
+#endif
 }
 
 void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)

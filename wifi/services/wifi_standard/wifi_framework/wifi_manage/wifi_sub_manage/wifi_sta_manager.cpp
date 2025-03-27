@@ -30,6 +30,7 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "dhcp_c_api.h"
+#include "block_connect_service.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #include "wifi_notification_util.h"
@@ -165,6 +166,9 @@ void WifiStaManager::DealStaStopped(int instId)
 #endif
 #ifdef DYNAMIC_UNLOAD_SA
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::STA_SERVICE_CLOSE, instId);
+#endif
+#ifndef OHOS_ARCH_LITE
+    BlockConnectService::GetInstance().DealStaStopped(instId);
 #endif
 }
 

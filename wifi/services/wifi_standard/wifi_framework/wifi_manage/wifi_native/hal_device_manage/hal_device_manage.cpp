@@ -64,7 +64,9 @@ HalDeviceManager::HalDeviceManager()
 HalDeviceManager::~HalDeviceManager()
 {
     LOGI("HalDeviceManager::~HalDeviceManager");
+#ifndef __UT__
     StopChipHdi();
+#endif
     ResetHalDeviceManagerInfo(false);
 }
 

@@ -32,9 +32,7 @@ public:
         HalDeviceManager::GetInstance().StartChipHdi();
     }
     virtual void TearDown()
-    {
-        HalDeviceManager::GetInstance().StopChipHdi();
-    }
+    {}
 
     static void DestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     static void OnRssiReportCallback(int index, int antRssi);

@@ -1839,11 +1839,41 @@ bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessagePtr m
             ret = EXECUTED;
             pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pDisconnectedMonitorState_);
             break;
+        case WIFI_CURE_CMD_PERIODIC_ARP_DETECTED:
+            ret = EXECUTED;
+            pSelfCureStateMachine_->PeriodicArpDetection();
+            break;
+        case WIFI_CURE_CMD_ARP_FAILED_DETECTED:
+            ret = EXECUTED;
+            HandleArpFailedDetected(msg);
+            break;
         default:
             WIFI_LOGD("NoInternetState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;
+}
+
+void SelfCureStateMachine::NoInternetState::HandleArpFailedDetected(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGW("HandleArpFailedDetected, msg is nullptr");
+        return;
+    }
+    std::string currentBssid = pSelfCureStateMachine_->GetCurrentBssid();
+    if (pSelfCureStateMachine_->ShouldTransToWifi6SelfCure(msg, currentBssid)) {
+        return;
+    }
+
+    std::string selfCureHistory = pSelfCureStateMachine_->GetSelfCureHistoryInfo();
+    WifiSelfCureHistoryInfo selfCureInfo;
+    SelfCureUtils::GetInstance().String2InternetSelfCureHistoryInfo(selfCureHistory, selfCureInfo);
+    if (SelfCureUtils::GetInstance().SelfCureAcceptable(selfCureInfo, WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC)) {
+        WIFI_LOGI("arp failed, try to reassoc");
+        pSelfCureStateMachine_->MessageExecutedLater(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK,
+            WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC, 0, SELF_CURE_DELAYED_MS);
+        pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pInternetSelfCureState_);
+    }
 }
 
 int64_t SelfCureStateMachine::GetNowMilliSeconds()
@@ -1995,7 +2025,7 @@ bool SelfCureStateMachine::IsHttpReachable()
     mNetWorkDetect_->StartWifiDetection();
     std::unique_lock<std::mutex> locker(detectionMtx_);
     detectionCond_.wait_for(locker, std::chrono::milliseconds(HTTP_DETECT_TIMEOUT));
-    WIFI_LOGI("IsHttpReachable network detect end, resuil is %{public}d", isHttpReachable_);
+    WIFI_LOGI("IsHttpReachable network detect end, result is %{public}d", isHttpReachable_);
     return isHttpReachable_;
 }
 

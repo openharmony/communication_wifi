@@ -26,8 +26,6 @@
 
 namespace OHOS {
 namespace Wifi {
-std::vector<std::string> chinaPublicDnses(SELF_CURE_DNS_SIZE);
-std::vector<std::string> overseaPublicDnses(SELF_CURE_DNS_SIZE);
 using namespace NetManagerStandard;
 DEFINE_WIFILOG_LABEL("SelfCureUtils");
 SelfCureUtils::SelfCureUtils()
@@ -457,24 +455,24 @@ int SelfCureUtils::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info,
     }
     // 0 to 12 is history subscript, which record the selfcure failed info, covert array to calss member
     for (int i = 0; i < cnt; i++) {
-        if (i == POS_STATIC_IP_FAILED_CNT) {
+        if (i == SelfCureHistoryOrder::POS_STATIC_IP_FAILED_CNT) {
             info.staticIpSelfCureFailedCnt = CheckDataLegal(histories[i]);
-        } else if (i == POS_STATIC_IP_FAILED_TS) {
+        } else if (i == SelfCureHistoryOrder::POS_STATIC_IP_FAILED_TS) {
             info.lastStaticIpSelfCureFailedTs = CheckDataTolonglong(histories[i]);
-        } else if (i == POS_REASSOC_FAILED_CNT) {
+        } else if (i == SelfCureHistoryOrder::POS_REASSOC_FAILED_CNT) {
             info.reassocSelfCureFailedCnt = CheckDataLegal(histories[i]);
-        } else if (i == POS_REASSOC_FAILED_TS) {
+        } else if (i == SelfCureHistoryOrder::POS_REASSOC_FAILED_TS) {
             info.lastReassocSelfCureFailedTs = CheckDataTolonglong(histories[i]);
-        } else if (i == POS_RANDMAC_FAILED_CNT) {
+        } else if (i == SelfCureHistoryOrder::POS_RANDMAC_FAILED_CNT) {
             info.randMacSelfCureFailedCnt = CheckDataLegal(histories[i]);
-        } else if (i == POS_RANDMAC_FAILED_TS) {
+        } else if (i == SelfCureHistoryOrder::POS_RANDMAC_FAILED_TS) {
             info.lastRandMacSelfCureFailedCntTs = CheckDataTolonglong(histories[i]);
-        } else if (i == POS_RESET_FAILED_CNT) {
+        } else if (i == SelfCureHistoryOrder::POS_RESET_FAILED_CNT) {
             info.resetSelfCureFailedCnt = CheckDataLegal(histories[i]);
-        } else if (i == POS_RESET_FAILED_TS) {
+        } else if (i == SelfCureHistoryOrder::POS_RESET_FAILED_TS) {
             info.lastResetSelfCureFailedTs = CheckDataTolonglong(histories[i]);
         } else {
-            WIFI_LOGI("exception happen.");
+            WIFI_LOGE("SetSelfCureFailInfo, exception happen.");
         }
     }
     return 0;
@@ -502,7 +500,7 @@ int SelfCureUtils::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info,
         } else if (i == POS_RESET_CONNECT_FAILED_TS) {
             info.lastResetSelfCureConnectFailedTs = CheckDataTolonglong(histories[i]);
         } else {
-            WIFI_LOGI("exception happen.");
+            WIFI_LOGE("SetSelfCureConnectFailInfo, exception happen.");
         }
     }
     return 0;

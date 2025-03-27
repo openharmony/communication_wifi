@@ -160,6 +160,7 @@ public:
         void HandleWifiNoInternet(const InternalMessagePtr msg);
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();
+        bool HandleHttpResultInNoNet(InternalMessagePtr msg);
     };
 
     class WifiPortalState : public State {
@@ -254,6 +255,7 @@ private:
     bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
+    bool FullScan();
 };
 } // namespace Wifi
 } // namespace OHOS

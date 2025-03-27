@@ -245,6 +245,11 @@ public:
     virtual void OnDialogClick(bool click) = 0;
 
     /**
+     * @Description user reset network settings notify
+     */
+    virtual void ResetNetworkSettingsNotify() = 0;
+ 
+    /**
      * @Description obtain supported frequency
      *
      * @param freq - current use freq

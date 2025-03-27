@@ -841,7 +841,7 @@ public:
      * @param pass
      * @return WifiErrorNo
      */
-     WifiErrorNo SetApPasswd(const char *pass, int id = 0);
+    WifiErrorNo SetApPasswd(const char *pass, int id = 0);
 
     /**
      * @Description register callback for death recipient of native process

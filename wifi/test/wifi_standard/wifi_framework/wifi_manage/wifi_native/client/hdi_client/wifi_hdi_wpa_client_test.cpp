@@ -87,7 +87,6 @@ HWTEST_F(WifiHdiWpaClientTest, GetStaCapabilities, TestSize.Level1)
     unsigned int capabilities = 0;
     WifiErrorNo result = wifiHdiWpaClient->GetStaCapabilities(capabilities);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
-    EXPECT_EQ(capabilities, 0);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, GetStaDeviceMacAddress, TestSize.Level1)

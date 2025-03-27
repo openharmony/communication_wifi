@@ -1829,7 +1829,6 @@ HWTEST_F(StaStateMachineTest, InitStateGoInStateSuccess, TestSize.Level1)
 {
     InitStateGoInStateSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, InitStateGoOutStateSuccess, TestSize.Level1)
@@ -2289,6 +2288,7 @@ HWTEST_F(StaStateMachineTest, DhcpResultNotifyOnFailedTest3, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DhcpResultNotifyEventTest, TestSize.Level1)
 {
     DhcpResultNotifyEventTest();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(StaStateMachineTest, SaveLinkstateSuccess, TestSize.Level1)

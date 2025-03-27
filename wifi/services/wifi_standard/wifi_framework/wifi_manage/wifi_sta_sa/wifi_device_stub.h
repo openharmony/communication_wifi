@@ -120,6 +120,9 @@ private:
     void SendDeviceConfig(int32_t ashmemSize, std::vector<WifiDeviceConfig> &result, MessageParcel &reply);
     void WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedInfo &wifiInfo);
     void SendMultiLinkedInfo(uint32_t contentSize, std::vector<WifiLinkedInfo> &result, MessageParcel &reply);
+#ifdef DYNAMIC_UNLOAD_SA
+    virtual void StopUnloadStaTimer(void) = 0;
+#endif
 
 private:
     HandleFuncMap handleFuncMap;

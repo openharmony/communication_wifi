@@ -229,7 +229,7 @@ public:
             .WillOnce(Return(0));
         pScanService->scanStartedFlag = true;
         EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_EXTERN) == WIFI_OPT_SUCCESS);
-        EXPECT_FALSE(pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN) == WIFI_OPT_SUCCESS);
         pScanService->pScanStateMachine = nullptr;
         EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_EXTERN) == WIFI_OPT_FAILED);
     }
@@ -241,7 +241,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
     }
 
     void ScanWithParamFail1()

@@ -458,6 +458,17 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     return true;
 }
 
+bool WifiProStateMachine::FullScan()
+{
+    WIFI_LOGD("start Fullscan");
+    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
+    if (pScanService == nullptr) {
+        WIFI_LOGI("TryStartScan, pService is nullptr.");
+        return WIFI_OPT_FAILED;
+    }
+    WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
+    return pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
+}
 /* --------------------------- state machine default state ------------------------------ */
 WifiProStateMachine::DefaultState::DefaultState(WifiProStateMachine *pWifiProStateMachine)
     : State("DefaultState"),
@@ -971,20 +982,13 @@ void WifiProStateMachine::WifiHasNetState::HandleReuqestScanInHasNet(const Inter
 void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, int32_t signalLevel)
 {
     // calculate the interval and the max scan counter.
-    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(pWifiProStateMachine_->instId_);
-    if (pScanService == nullptr) {
-        WIFI_LOGI("TryStartScan, pService is nullptr.");
-        return;
-    }
-
     int32_t scanInterval = WifiProUtils::GetScanInterval(hasSwitchRecord, signalLevel);
     int32_t scanMaxCounter = WifiProUtils::GetMaxCounter(hasSwitchRecord, signalLevel);
     if ((signalLevel == SIG_LEVEL_2 || signalLevel == SIG_LEVEL_3) &&
         rssiLevel2Or3ScanedCounter_ < scanMaxCounter) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel2Or3ScanedCounter:%{public}d.", signalLevel, rssiLevel2Or3ScanedCounter_);
-        auto ret = pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
-        WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
+        auto ret = pWifiProStateMachine_->FullScan();
         if (ret == WIFI_OPT_SUCCESS) {
             rssiLevel2Or3ScanedCounter_++;
         }
@@ -992,8 +996,7 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
     } else if ((signalLevel < SIG_LEVEL_2) && (rssiLevel0Or1ScanedCounter_ < scanMaxCounter)) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel0Or1ScanedCounter:%{public}d.", signalLevel, rssiLevel0Or1ScanedCounter_);
-        auto ret = pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
-        WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
+        auto ret = pWifiProStateMachine_->FullScan();
         if (ret == WIFI_OPT_SUCCESS) {
             rssiLevel0Or1ScanedCounter_++;
         }
@@ -1112,15 +1115,8 @@ void WifiProStateMachine::WifiHasNetState::HandleWifiQoeSlow()
 {
     int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
     if (signalLevel >= SIG_LEVEL_3) {
-        IScanService *pScanService =
-            WifiServiceManager::GetInstance().GetScanServiceInst(pWifiProStateMachine_->instId_);
-        if (pScanService == nullptr) {
-            WIFI_LOGI("TryStartScan, pService is nullptr.");
-            return;
-        }
-        pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
-        WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
         WIFI_LOGI("wifi to wifi, app qoe slow");
+        pWifiProStateMachine_->FullScan();
         pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_APP_QOE_SLOW);
         WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_APP_QOE_SLOW);
         qoeSwitch_ = true;
@@ -1153,18 +1149,24 @@ bool WifiProStateMachine::WifiNoNetState::ExecuteStateMsg(InternalMessagePtr msg
     if (msg == nullptr) {
         return false;
     }
+    bool ret = NOT_EXECUTED;
     WIFI_LOGD("WifiNoNetState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_HANDLE_SCAN_RESULT:
             HandleWifiNoInternet(msg);
+            ret = EXECUTED;
             break;
         case EVENT_REQUEST_SCAN_DELAY:
             HandleReuqestScanInNoNet(msg);
+            ret = EXECUTED;
+            break;
+        case EVENT_CHECK_WIFI_INTERNET_RESULT:
+            ret = HandleHttpResultInNoNet(msg);
             break;
         default:
-            return false;
+            return ret;
     }
-    return true;
+    return ret;
 }
 
 void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMessagePtr msg)
@@ -1217,13 +1219,7 @@ void WifiProStateMachine::WifiNoNetState::HandleReuqestScanInNoNet(const Interna
         WIFI_LOGI("ReuqestScanInNoNet, msg is nullptr.");
         return;
     }
-    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(pWifiProStateMachine_->instId_);
-    if (pScanService == nullptr) {
-        WIFI_LOGI("TryStartScan, pService is nullptr.");
-        return;
-    }
-    pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
-    WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
+    pWifiProStateMachine_->FullScan();
     fullScan_ = true;
 }
 
@@ -1258,6 +1254,19 @@ void WifiProStateMachine::WifiNoNetState::HandleNoNetChanged()
     return;
 }
 
+bool WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGI("ReuqestScanInNoNet, msg is nullptr.");
+        return NOT_EXECUTED;
+    }
+    int32_t state = msg->GetParam1();
+    if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
+        pWifiProStateMachine_->FullScan();
+        return EXECUTED;
+    }
+    return NOT_EXECUTED;
+}
 /* --------------------------- state machine portal state ------------------------------ */
 WifiProStateMachine::WifiPortalState::WifiPortalState(WifiProStateMachine *pWifiProStateMachine)
     : State("WifiPortalState"),

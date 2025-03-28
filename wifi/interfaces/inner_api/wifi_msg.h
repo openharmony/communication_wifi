@@ -1057,8 +1057,8 @@ struct WifiSignalPollInfo {
     int snr;
     int chload;
     int ulDelay;
-    int txBytes;
-    int rxBytes;
+    unsigned int txBytes;
+    unsigned int rxBytes;
     int txFailed;
     int chloadSelf;
     int c0Rssi;

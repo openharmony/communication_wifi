@@ -1039,8 +1039,8 @@ void WifiSettings::ClearHotspotConfig()
     if (!ret.second) {
         mHotspotConfig[0] = config;
     }
-    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey is %{public}s", __FUNCTION__,
-        SsidAnonymize(config.GetSsid()).c_str(), PassWordAnonymize(config.GetPreSharedKey()).c_str());
+    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}d", __FUNCTION__,
+        SsidAnonymize(config.GetSsid()).c_str(), config.GetPreSharedKey().length());
 }
 
 int WifiSettings::GetBlockList(std::vector<StationInfo> &results, int id)

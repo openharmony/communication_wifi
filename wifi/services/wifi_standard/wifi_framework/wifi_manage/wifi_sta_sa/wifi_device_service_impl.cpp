@@ -1944,6 +1944,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
     WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
+    FactoryResetNotify();
 #endif
     /* p2p */
     WifiSettings::GetInstance().RemoveWifiP2pGroupInfo();
@@ -1955,6 +1956,20 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset ok!");
     return WIFI_OPT_SUCCESS;
 }
+
+#ifndef OHOS_ARCH_LITE
+ErrCode WifiDeviceServiceImpl::FactoryResetNotify()
+{
+    WIFI_LOGI("Enter FactoryResetNotify.");
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    pEnhanceService->ResetNetworkSettingsNotify();
+    return WIFI_OPT_SUCCESS;
+}
+#endif
 
 bool ComparedHinlinkKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt)
 {

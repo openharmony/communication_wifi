@@ -226,6 +226,7 @@ private:
     ErrCode HilinkGetMacAddress(WifiDeviceConfig &deviceConfig, std::string &currentMac);
 #ifndef OHOS_ARCH_LITE
     bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
+    ErrCode FactoryResetNotify();
 #endif
     void ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result);
     void updateStaDeviceMacAddress(WifiDeviceConfig &config);

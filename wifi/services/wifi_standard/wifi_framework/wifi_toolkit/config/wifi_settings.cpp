@@ -2355,7 +2355,7 @@ std::string WifiSettings::GetDefaultApSsid()
 #ifdef INIT_LIB_ENABLE
     std::string marketName = GetMarketName();
     std::string brandName = GetBrand();
-    if (marketName.empty() || brandName.empty() ) {
+    if (marketName.empty() || brandName.empty()) {
         LOGE("Get market name or brand name is empty");
         ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
         return ssid;

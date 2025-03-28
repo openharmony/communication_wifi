@@ -704,6 +704,7 @@ void WifiProStateMachine::WifiConnectedState::InitConnectedState()
 void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMessagePtr msg)
 {
     WIFI_LOGI("Enter HandleHttpResult.");
+    pWifiProStateMachine_->mHttpDetectedAllowed = true;
     if (msg == nullptr) {
         WIFI_LOGI("HttpResultInConnected, msg is nullptr.");
         return;
@@ -870,6 +871,7 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
     pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
     pWifiProStateMachine_->perf5gHandoverService_.NetworkStatusChanged(NetworkStatus::HAS_INTERNET);
+    pWifiProStateMachine_->mHttpDetectedAllowed = true;
 }
 
 void WifiProStateMachine::WifiHasNetState::GoOutState()
@@ -1066,10 +1068,14 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
 
 void WifiProStateMachine::WifiHasNetState::RequestHttpDetect()
 {
-    WIFI_LOGI("Enter RequestHttpDetect.");
+    if (!pWifiProStateMachine_->mHttpDetectedAllowed) {
+        WIFI_LOGI("Has RequestHttpDetect.");
+        return;
+    }
     sptr<NetStateObserver> mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
     mNetWorkDetect->StartWifiDetection();
     netDiasableDetectCount_ = 0;
+    pWifiProStateMachine_->mHttpDetectedAllowed = false;
 }
 
 void WifiProStateMachine::WifiHasNetState::ParseQoeInfoAndRequestDetect()

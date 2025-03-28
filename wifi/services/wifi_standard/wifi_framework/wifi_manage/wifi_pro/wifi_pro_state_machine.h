@@ -235,8 +235,9 @@ private:
     bool isDisableWifiAutoSwitch_ { false };
     std::string targetBssid_ { "" };
     NetworkSelectionResult networkSelectionResult_;
-    WifiProState currentState_;
+    WifiProState currentState_ {WIFI_DEFAULT};
     Perf5gHandoverService perf5gHandoverService_;
+    bool mHttpDetectedAllowed { false } ;
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
     bool HasWifiSwitchRecord();

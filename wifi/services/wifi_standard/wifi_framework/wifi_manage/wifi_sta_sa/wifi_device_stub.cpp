@@ -959,8 +959,8 @@ void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data
             reply.WriteInt32(wifiSignalPollInfos[index].snr);
             reply.WriteInt32(wifiSignalPollInfos[index].chload);
             reply.WriteInt32(wifiSignalPollInfos[index].ulDelay);
-            reply.WriteInt32(wifiSignalPollInfos[index].txBytes);
-            reply.WriteInt32(wifiSignalPollInfos[index].rxBytes);
+            reply.WriteUint32(wifiSignalPollInfos[index].txBytes);
+            reply.WriteUint32(wifiSignalPollInfos[index].rxBytes);
             reply.WriteInt32(wifiSignalPollInfos[index].txFailed);
             reply.WriteInt32(wifiSignalPollInfos[index].chloadSelf);
             reply.WriteInt64(wifiSignalPollInfos[index].timeStamp);

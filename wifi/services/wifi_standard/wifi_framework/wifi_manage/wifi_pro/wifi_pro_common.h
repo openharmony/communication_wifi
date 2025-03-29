@@ -94,8 +94,8 @@ struct LinkQuality {
     int signal;
     int txrate;
     int rxrate;
-    int txBytes;
-    int rxBytes;
+    unsigned int txBytes;
+    unsigned int rxBytes;
     LinkQuality() : signal(0), txrate(0), rxrate(0), txBytes(0), rxBytes(0)
     {}
     ~LinkQuality()

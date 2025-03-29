@@ -223,7 +223,7 @@ long DualBandLearningAlgService::GetDetailStep(unsigned long flowRate)
     }
     return DETAIL_STEPS[detailStepIndex];
 }
-long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
+unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
 {
     if (rateList.empty()) {
         return 0;
@@ -236,7 +236,8 @@ long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
     } else {
         flowTx += flowRx;
     }
-    return static_cast<long>(flowTx / conversionStep / FLOW_RATE_TIME_RANGE_SECOND);
+    int32_t conversionStep = 1000;
+    return static_cast<unsigned long>(flowTx / conversionStep / FLOW_RATE_TIME_RANGE_SECOND);
 }
 bool DualBandLearningAlgService::IsMoveRight(long averageRate24g, long averageRate5g)
 {

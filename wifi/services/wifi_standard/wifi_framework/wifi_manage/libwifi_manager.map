@@ -724,6 +724,7 @@
         "OHOS::Wifi::WifiApHalInterface::SetSoftApConfig(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Wifi::HotspotConfig const&, int)";
         "OHOS::Wifi::WifiApHalInterface::SetMaxConnectNum(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, int)";
         "OHOS::Wifi::WifiApHalInterface::EnableAp(int)";
+        "OHOS::Wifi::WifiApHalInterface::SetApPasswd(char const*, int)";
         "OHOS::Wifi::WifiApHalInterface::AddBlockByMac(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::WifiApHalInterface::DelBlockByMac(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::WifiApHalInterface::DisAssociateSta(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";

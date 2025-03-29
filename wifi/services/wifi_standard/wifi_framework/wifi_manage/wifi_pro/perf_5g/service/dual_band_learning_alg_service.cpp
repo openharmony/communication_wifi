@@ -223,14 +223,20 @@ long DualBandLearningAlgService::GetDetailStep(unsigned long flowRate)
     }
     return DETAIL_STEPS[detailStepIndex];
 }
-unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
+long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
 {
-    unsigned long flowSum = 0;
-    for (auto it = rateList.begin(); it != rateList.end(); it++) {
-        flowSum += it->txBytes + it->rxBytes;
+    if (rateList.empty()) {
+        return 0;
     }
-    unsigned int conversionStep = 1000;
-    return flowSum / conversionStep / FLOW_RATE_TIME_RANGE_SECOND;
+    int64_t flowTx = (rateList.back().txBytes - rateList.front().txBytes);
+    int64_t flowRx = (rateList.back().txBytes - rateList.front().txBytes);
+    // avoid add flow
+    if (((flowTx > 0) && (flowRx > (INT64_MAX - flowTx ))) || ((flowTx < 0) && (flowRx < (INT64_MIN - flowTx)))) {
+        flowTx = INT64_MAX;
+    } else {
+        flowTx += flowRx;
+    }
+    return static_cast<long>(flowTx / conversionStep / FLOW_RATE_TIME_RANGE_SECOND);
 }
 bool DualBandLearningAlgService::IsMoveRight(long averageRate24g, long averageRate5g)
 {

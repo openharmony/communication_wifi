@@ -143,16 +143,13 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     WIFI_LOGI("DisableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("DisableWifi: NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED &&
+        WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }

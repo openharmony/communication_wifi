@@ -145,6 +145,7 @@ public:
         void RequestHttpDetect();
         void ParseQoeInfoAndRequestDetect();
         void HandleWifiQoeSlow();
+        void StartWifiDetection();
     };
 
     class WifiNoNetState : public State {
@@ -236,8 +237,8 @@ private:
     std::string targetBssid_ { "" };
     NetworkSelectionResult networkSelectionResult_;
     WifiProState currentState_ {WIFI_DEFAULT};
+    bool mHttpDetectedAllowed_ { false } ;
     Perf5gHandoverService perf5gHandoverService_;
-    bool mHttpDetectedAllowed { false } ;
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
     bool HasWifiSwitchRecord();

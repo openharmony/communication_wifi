@@ -705,7 +705,6 @@ void WifiProStateMachine::WifiConnectedState::InitConnectedState()
 void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMessagePtr msg)
 {
     WIFI_LOGI("Enter HandleHttpResult.");
-    pWifiProStateMachine_->mHttpDetectedAllowed = true;
     if (msg == nullptr) {
         WIFI_LOGI("HttpResultInConnected, msg is nullptr.");
         return;

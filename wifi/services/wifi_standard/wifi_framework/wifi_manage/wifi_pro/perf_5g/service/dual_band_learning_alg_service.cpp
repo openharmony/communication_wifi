@@ -228,15 +228,14 @@ unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &ra
     if (rateList.empty()) {
         return 0;
     }
-    int64_t flowTx = (rateList.back().txBytes - rateList.front().txBytes);
-    int64_t flowRx = (rateList.back().txBytes - rateList.front().txBytes);
+    uint32_t flowTx = (rateList.back().txBytes - rateList.front().txBytes);
+    uint32_t flowRx = (rateList.back().txBytes - rateList.front().txBytes);
     // avoid add flow
-    if (((flowTx > 0) && (flowRx > (INT64_MAX - flowTx ))) || ((flowTx < 0) && (flowRx < (INT64_MIN - flowTx)))) {
-        flowTx = INT64_MAX;
+    if ((flowTx > 0) && (flowRx > (UINT32_MAX - flowTx))) {
+        flowTx = UINT32_MAX;
     } else {
         flowTx += flowRx;
     }
-    int32_t conversionStep = 1000;
     return static_cast<unsigned long>(flowTx / conversionStep / FLOW_RATE_TIME_RANGE_SECOND);
 }
 bool DualBandLearningAlgService::IsMoveRight(long averageRate24g, long averageRate5g)

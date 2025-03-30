@@ -159,7 +159,7 @@ bool WifiProtectManager::GetWifiProtect(
             static_cast<int>(protectMode), name.c_str());
         return false;
     }
-    WifiProtectMode curProtectMode = WIFI_PROTECT_DEFAULT;
+    WifiProtectMode curProtectMode;
 #endif
     bool isAlreadyExist = false;
     std::unique_lock<std::mutex> lock(mMutex);

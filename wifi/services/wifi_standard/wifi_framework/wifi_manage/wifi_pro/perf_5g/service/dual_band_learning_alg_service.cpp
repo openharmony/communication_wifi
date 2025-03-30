@@ -35,6 +35,7 @@ constexpr double BASE_VALUE = 500.0;
 constexpr double VALID_SIZE_RATE_LIST = 5;
 const double PI = acos(-1.0);
 const double E = exp(1);
+constexpr uint32_t  USE_1000 = 1000;
 
 DualBandLearningAlgService::DualBandLearningAlgService()
 {}
@@ -232,11 +233,12 @@ unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &ra
     uint32_t flowRx = (rateList.back().txBytes - rateList.front().txBytes);
     // avoid add flow
     if ((flowTx > 0) && (flowRx > (UINT32_MAX - flowTx))) {
+        WIFI_LOGW("%{public}s, GetFlowRate add overflow", __FUNCTION__);
         flowTx = UINT32_MAX;
     } else {
         flowTx += flowRx;
     }
-    return static_cast<unsigned long>(flowTx / conversionStep / FLOW_RATE_TIME_RANGE_SECOND);
+    return static_cast<unsigned long>(flowTx / USE_1000 / FLOW_RATE_TIME_RANGE_SECOND);
 }
 bool DualBandLearningAlgService::IsMoveRight(long averageRate24g, long averageRate5g)
 {

@@ -19,9 +19,9 @@
 #include "securec.h"
 #include "v1_0/ihostapd_interface.h"
 #include "v1_0/ihostapd_callback.h"
-#include "v1_2/iwpa_interface.h"
-#include "v1_2/iwpa_callback.h"
-#include "v1_2/wpa_types.h"
+#include "v2_0/iwpa_interface.h"
+#include "v2_0/iwpa_callback.h"
+#include "v2_0/wpa_types.h"
 
 static const int ETH_ADDR_LEN = 6;
 #define WIFI_P2P_DEVICE_TYPE_LENGTH 64

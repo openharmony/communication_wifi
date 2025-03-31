@@ -187,6 +187,8 @@ struct HdiP2pNetworkInfo {
     uint32_t bssidLen;
     uint8_t* flags;
     uint32_t flagsLen;
+    uint8_t* clientList;
+    uint32_t clientListLen;
 };
 
 struct HdiP2pNetworkList {

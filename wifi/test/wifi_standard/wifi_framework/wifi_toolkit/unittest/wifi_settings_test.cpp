@@ -20,6 +20,7 @@
 #include "securec.h"
 #include "wifi_settings.h"
 #include "wifi_logger.h"
+#include "wifi_global_func.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -716,6 +717,13 @@ HWTEST_F(WifiSettingsTest, GetAllSuitableEncryptionTest, TestSize.Level1)
     config.keyMgmtBitset = 4;
     WifiSettings::GetInstance().GetAllSuitableEncryption(config, keyMgmt, result);
     EXPECT_EQ(result.front(), "WPA-PSK");
+}
+
+HWTEST_F(WifiSettingsTest, GetDefaultApSsidTest, TestSize.Level1)
+{
+    std::string testSsid = WifiSettings::GetInstance().GetDefaultApSsid();
+    bool ifValidSsid = testSsid.length() >= MIN_SSID_LEN && testSsid.length() <= MAX_SSID_LEN;
+    EXPECT_EQ(ifValidSsid, true);
 }
 }  // namespace Wifi
 }  // namespace OHO

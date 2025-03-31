@@ -182,8 +182,11 @@ ErrCode WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfig &result)
 
 ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
 {
-    WIFI_LOGI("Instance %{public}d %{public}s band:%{public}d, channel:%{public}d", m_id, __func__,
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d, band:%{public}d, "
+        "channel:%{public}d", m_id, __func__, GetCallingPid(), GetCallingUid(),
         static_cast<int>(config.GetBand()), config.GetChannel());
+#endif
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetHotspotConfig:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -192,12 +195,10 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
         WIFI_LOGE("SetHotspotConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
     ErrCode validRetval = VerifyConfigValidity(config);
     if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {
         WIFI_LOGE("SetHotspotConfig:VerifyConfigValidity failed!");
@@ -467,7 +468,10 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
 
 ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
 {
-    WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d", m_id, __func__,
+        GetCallingPid(), GetCallingUid());
+#endif
     ErrCode errCode = CheckCanEnableHotspot(type);
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
@@ -479,7 +483,10 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
 
 ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
 {
-    WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d", m_id, __func__,
+        GetCallingPid(), GetCallingUid());
+#endif
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DisableHotspot:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;

@@ -135,7 +135,7 @@ public:
         int64_t mLastTcpTxCounter_ { 0 };
         int64_t mLastTcpRxCounter_ { 0 };
         int32_t mLastDnsFailedCnt_ { 0 };
-        int netDiasableDetectCount_ { 0 };
+        int netDisableDetectCount_ { 0 };
         bool qoeSwitch_  { false } ;
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);

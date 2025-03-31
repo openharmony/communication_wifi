@@ -17,6 +17,7 @@ WIFI_ROOT_DIR = "$SUBSYSTEM_DIR/wifi/wifi"
 DHCP_ROOT_DIR = "$SUBSYSTEM_DIR/dhcp"
 CONFIG_CTRL_IFACE = "unix"
 
+
 declare_args() {
   wifi_feature_dynamic_unload_sa = false
   wifi_feature_with_p2p = true

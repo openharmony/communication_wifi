@@ -1737,9 +1737,9 @@ void WifiSettings::InitHotspotConfig()
         LOGI("load hotspot config fail, use default config");
         InitDefaultHotspotConfig();
     }
-    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey is %{public}s", __FUNCTION__,
+    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}d", __FUNCTION__,
         SsidAnonymize(mHotspotConfig[0].GetSsid()).c_str(),
-        PassWordAnonymize(mHotspotConfig[0].GetPreSharedKey()).c_str());
+        PassWordAnonymize(mHotspotConfig[0].GetPreSharedKey()).length());
 
     /* init block list info */
     if (mSavedBlockInfo.LoadConfig() >= 0) {

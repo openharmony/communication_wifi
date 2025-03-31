@@ -234,7 +234,7 @@ unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &ra
     // avoid add flow
     if ((flowTx > 0) && (flowRx > (UINT32_MAX - flowTx))) {
         WIFI_LOGW("%{public}s, add overflow", __FUNCTION__);
-        flowTx = 0;
+        flowTx = UINT32_MAX;
     } else {
         flowTx += flowRx;
     }

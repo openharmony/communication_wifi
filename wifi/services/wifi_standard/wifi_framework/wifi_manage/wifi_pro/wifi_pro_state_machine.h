@@ -142,10 +142,9 @@ public:
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
         void WifiHasNetStateInit();
-        void RequestHttpDetect();
+        void RequestHttpDetect(bool forceHttpDetect);
         void ParseQoeInfoAndRequestDetect();
         void HandleWifiQoeSlow();
-        void StartWifiDetection();
     };
 
     class WifiNoNetState : public State {

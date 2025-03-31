@@ -901,7 +901,7 @@ bool WifiProStateMachine::WifiHasNetState::ExecuteStateMsg(InternalMessagePtr ms
             HandleScanResultInHasNet(msg);
             break;
         case EVENT_REQUEST_NETWORK_DETECT:
-            RequestHttpDetect();
+            RequestHttpDetect(false);
             break;
         case EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL:
             ParseQoeInfoAndRequestDetect();
@@ -913,7 +913,7 @@ bool WifiProStateMachine::WifiHasNetState::ExecuteStateMsg(InternalMessagePtr ms
             pWifiProStateMachine_->perf5gHandoverService_.HandleSignalInfoChange(msg);
             break;
         case EVENT_DETECT_TIMEOUT:
-            StartWifiDetection();
+            RequestHttpDetect(true);
             break;
         default:
             return false;
@@ -1071,13 +1071,17 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     }
 }
 
-void WifiProStateMachine::WifiHasNetState::RequestHttpDetect()
+void WifiProStateMachine::WifiHasNetState::RequestHttpDetect(bool forceHttpDetect)
 {
-    if (!pWifiProStateMachine_->mHttpDetectedAllowed_ || netDiasableDetectCount_ > DEFAULT_NET_DISABLE_DETECT_COUNT) {
+    sptr<NetStateObserver> mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
+    if (forceHttpDetect) {
+        mNetWorkDetect->StartWifiDetection();
+    } else if (!pWifiProStateMachine_->mHttpDetectedAllowed_ || netDiasableDetectCount_ > DEFAULT_NET_DISABLE_DETECT_COUNT) {
         WIFI_LOGI("Has RequestHttpDetect or Detect over twice");
         return;
     }
-    StartWifiDetection();
+    WIFI_LOGI("HttpDetect.");
+    mNetWorkDetect->StartWifiDetection();
     pWifiProStateMachine_->mHttpDetectedAllowed_ = false;
     pWifiProStateMachine_->StartTimer(EVENT_DETECT_TIMEOUT, WIFI_PRO_DETECT_TIMEOUT);
     netDiasableDetectCount_++;
@@ -1120,13 +1124,6 @@ void WifiProStateMachine::WifiHasNetState::HandleWifiQoeSlow()
         WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_APP_QOE_SLOW);
         qoeSwitch_ = true;
     }
-}
-
-void WifiProStateMachine::WifiHasNetState::StartWifiDetection()
-{
-    WIFI_LOGI("HttpDetect.");
-    sptr<NetStateObserver> mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
-    mNetWorkDetect->StartWifiDetection();
 }
 /* --------------------------- state machine no net state ------------------------------ */
 WifiProStateMachine::WifiNoNetState::WifiNoNetState(WifiProStateMachine *pWifiProStateMachine)

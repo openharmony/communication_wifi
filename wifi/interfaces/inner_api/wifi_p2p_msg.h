@@ -305,8 +305,6 @@ public:
     void SetExplicitGroup(bool isExplicit);
     void SetCreatorUid(int uid);
     int GetCreatorUid();
-    void SetPersistentFlag(bool falg);
-    bool GetPersistentFlag(void);
 
 private:
     WifiP2pDevice owner;
@@ -324,7 +322,6 @@ private:
     std::string gcIpAddress;
     bool explicitGroup;
     int creatorUid = -1;
-    bool isOldPersistenGroup = false;
 };
 
 class WpsInfo {

@@ -278,6 +278,9 @@ private:
      */
     virtual bool ProcessChrReport(InternalMessagePtr msg) const;
 private:
+    void P2pConfigInitExt(bool &result);
+
+private:
     using ProcessFun = std::function<bool(const InternalMessagePtr)> const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;
     P2pStateMachine &p2pStateMachine;

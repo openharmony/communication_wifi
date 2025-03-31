@@ -89,9 +89,6 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
     group.SetCreatorUid(WifiConfigCenter::GetInstance().GetP2pCreatorUid());
     WifiConfigCenter::GetInstance().SaveP2pCreatorUid(-1);
     groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
-    if (p2pStateMachine.CheckIsDisplayDevice(group.GetOwner().GetDeviceAddress())) {
-        group.SetPersistentFlag(true);
-    }
 
     if (groupManager.GetCurrentGroup().IsGroupOwner() &&
         MacAddress::IsValidMac(groupManager.GetCurrentGroup().GetOwner().GetDeviceAddress().c_str())) {

@@ -229,8 +229,8 @@ unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &ra
     if (rateList.empty()) {
         return 0;
     }
-    uint32_t flowTx = (rateList.back().txBytes - rateList.front().txBytes) / USE_1000 / FLOW_RATE_TIME_RANGE_SECOND;
-    uint32_t flowRx = (rateList.back().txBytes - rateList.front().txBytes) / USE_1000 / FLOW_RATE_TIME_RANGE_SECOND;
+    uint32_t flowTx = rateList.back().txBytes - rateList.front().txBytes;
+    uint32_t flowRx = rateList.back().txBytes - rateList.front().txBytes;
     // avoid add flow
     if ((flowTx > 0) && (flowRx > (UINT32_MAX - flowTx))) {
         WIFI_LOGW("%{public}s, add overflow", __FUNCTION__);
@@ -238,7 +238,7 @@ unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &ra
     } else {
         flowTx += flowRx;
     }
-    return static_cast<unsigned long>(flowTx);
+    return static_cast<unsigned long>(flowTx / USE_1000 / FLOW_RATE_TIME_RANGE_SECOND);
 }
 bool DualBandLearningAlgService::IsMoveRight(long averageRate24g, long averageRate5g)
 {

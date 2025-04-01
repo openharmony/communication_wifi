@@ -19,7 +19,7 @@ config("module_private_config") {
 }
 
 ohos_unittest("wifi_p2p_test") {
-  module_out_path = "wifi/p2p_test"
+  module_out_path = "wifi/wifi/p2p_test"
 
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection

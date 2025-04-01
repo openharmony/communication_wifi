@@ -16,7 +16,7 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ################################################################################
 
-module_output_path = "wifi/wifi_non_mock_unittest"
+module_output_path = "wifi/wifi/wifi_non_mock_unittest"
 
 config("module_private_config") {
   visibility = [ ":*" ]

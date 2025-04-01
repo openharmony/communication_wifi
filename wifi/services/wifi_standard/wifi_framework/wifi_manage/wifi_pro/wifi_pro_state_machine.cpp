@@ -227,16 +227,16 @@ bool WifiProStateMachine::IsReachWifiScanThreshold(int32_t signalLevel)
     }
 
     if (HasWifiSwitchRecord()) {
-        WIFI_LOGI("IsReachWifiScanThreshold, ap is not strong enough, and has switch record.");
+        WIFI_LOGD("IsReachWifiScanThreshold, ap is not strong enough, and has switch record.");
         return true;
     }
 
     if (HasAvailableSsidToSwitch()) {
-        WIFI_LOGI("IsReachWifiScanThreshold, ap is not strong enough, and has available ap.");
+        WIFI_LOGD("IsReachWifiScanThreshold, ap is not strong enough, and has available ap.");
         return true;
     }
 
-    WIFI_LOGI("IsReachWifiScanThreshold, ap is not strong enough, no need to switch.");
+    WIFI_LOGD("IsReachWifiScanThreshold, ap is not strong enough, no need to switch.");
     return false;
 }
 
@@ -703,7 +703,7 @@ void WifiProStateMachine::WifiConnectedState::InitConnectedState()
 
 void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMessagePtr msg)
 {
-    WIFI_LOGI("Enter HandleHttpResult.");
+    WIFI_LOGD("Enter HandleHttpResult.");
     if (msg == nullptr) {
         WIFI_LOGI("HttpResultInConnected, msg is nullptr.");
         return;
@@ -1088,7 +1088,7 @@ void WifiProStateMachine::WifiHasNetState::ParseQoeInfoAndRequestDetect()
     mLastTcpTxCounter_ = mCurrentTcpTxCounter;
     mLastTcpRxCounter_ = mCurrentTcpRxCounter;
     mLastDnsFailedCnt_ = mCurrentDnsFailedCnt;
-    WIFI_LOGI("deltaTcpTxPkts = %{public}" PRId64 ", deltaTcpRxPkts = %{public}" PRId64 ", deltaFailedDns = %{public}d"
+    WIFI_LOGD("deltaTcpTxPkts = %{public}" PRId64 ", deltaTcpRxPkts = %{public}" PRId64 ", deltaFailedDns = %{public}d"
               ", nedisable = %{public}d",
         deltaTcpTxPkts, deltaTcpRxPkts, deltaFailedDns, netDiasableDetectCount_);
 

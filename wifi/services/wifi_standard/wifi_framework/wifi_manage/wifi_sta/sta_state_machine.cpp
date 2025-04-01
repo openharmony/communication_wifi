@@ -1965,6 +1965,11 @@ void StaStateMachine::PortalExpiredDetect()
     }
 }
 
+void StaStateMachine::GetDetectNetState(OperateResState &state)
+{
+    state = lastCheckNetState_;
+}
+
 void StaStateMachine::UpdatePortalState(SystemNetWorkState netState, bool &updatePortalAuthTime)
 {
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {

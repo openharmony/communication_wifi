@@ -1160,5 +1160,10 @@ bool StaService::VoWifiDetectSet(std::string cmd)
     WIFI_LOGI("VoWifiDetectSet ret : %{public}s", ret.c_str());
     return (!ret.empty() && (ret == "true" || ret == "OK"));
 }
+
+void StaService::GetDetectNetState(OperateResState &state)
+{
+    pStaStateMachine->GetDetectNetState(state);
+}
 }  // namespace Wifi
 }  // namespace OHOS

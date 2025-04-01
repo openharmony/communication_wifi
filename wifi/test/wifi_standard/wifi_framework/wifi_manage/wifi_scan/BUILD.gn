@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_output_path = "wifi/scan_test"
+module_output_path = "wifi/wifi/scan_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]

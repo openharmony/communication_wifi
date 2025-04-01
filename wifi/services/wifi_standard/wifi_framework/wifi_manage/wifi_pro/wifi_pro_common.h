@@ -41,6 +41,7 @@ enum WifiProCommond {
     EVENT_QOE_APP_SLOW = 13,
     EVENT_SIGNAL_INFO_CHANGE = 14,
     EVENT_QOE_REPORT = 15,
+    EVENT_DETECT_TIMEOUT = 16,
 };
 
 enum SigLevel {

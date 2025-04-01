@@ -580,7 +580,8 @@ HWTEST_F(WifiProStateMachineTest, WifiHasNetStateTryStartScanTest02, TestSize.Le
 
 HWTEST_F(WifiProStateMachineTest, WifiHasNetStateRequestHttpDetectTest01, TestSize.Level1)
 {
-    wifiHasNetState_->RequestHttpDetect();
+    wifiHasNetState_->RequestHttpDetect(false);
+    wifiHasNetState_->RequestHttpDetect(true);
     EXPECT_NE(wifiHasNetState_->pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
 

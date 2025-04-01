@@ -229,6 +229,9 @@ unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &ra
     if (rateList.empty()) {
         return 0;
     }
+    if (rateList.back().txBytes < rateList.front().txBytes || rateList.back().txBytes < rateList.front().txBytes) {
+        return 0;
+    }
     uint32_t flowTx = rateList.back().txBytes - rateList.front().txBytes;
     uint32_t flowRx = rateList.back().txBytes - rateList.front().txBytes;
     // avoid add flow

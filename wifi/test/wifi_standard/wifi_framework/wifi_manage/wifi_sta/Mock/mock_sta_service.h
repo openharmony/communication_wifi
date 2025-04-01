@@ -59,6 +59,7 @@ public:
     MOCK_CONST_METHOD1(SetPowerMode, ErrCode(bool mode));
     MOCK_CONST_METHOD1(SetTxPower, ErrCode(int power));
     MOCK_METHOD2(OnSystemAbilityChanged, ErrCode(int systemAbilityid, bool add));
+    MOCK_METHOD1(GetDetectNetState, void(OperateResState &state));
 };
 }  // namespace OHOS
 }  // namespace OHOS

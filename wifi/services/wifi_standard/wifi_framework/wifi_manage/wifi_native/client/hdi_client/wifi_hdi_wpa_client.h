@@ -855,6 +855,8 @@ public:
     WifiErrorNo GetMloSignalPollInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
 
     WifiErrorNo P2pReject(const std::string &mac);
+
+    WifiErrorNo SetMiracastSinkConfig(const std::string& config);
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

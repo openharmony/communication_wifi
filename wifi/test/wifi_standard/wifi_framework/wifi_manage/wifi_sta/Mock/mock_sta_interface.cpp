@@ -353,5 +353,10 @@ ErrCode StaInterface::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wi
     WIFI_LOGI("Enter GetSignalPollInfoArray");
     return WIFI_OPT_SUCCESS;
 }
+
+void StaInterface::GetDetectNetState(OperateResState &state)
+{
+    WIFI_LOGI("Enter GetDetectNetState");
+}
 }  // namespace Wifi
 }  // namespace OHOS

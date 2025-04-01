@@ -142,6 +142,7 @@ public:
     int StartConnectToUserSelectNetworkSuccessFail();
     void HandleFoldStatusChangedTest();
     void GetSignalPollInfoArrayTest();
+    void GetDetectNetStateTest();
 public:
     std::unique_ptr<StaService> pStaService;
 };
@@ -853,10 +854,21 @@ void StaServiceTest::GetSignalPollInfoArrayTest()
     pStaService->GetSignalPollInfoArray(wifiSignalPollInfos, length);
 }
 
+void StaServiceTest::GetDetectNetStateTest()
+{
+    OperateResState state;
+    pStaService->GetDetectNetState(state);
+}
+
 HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level1)
 {
     HandleFoldStatusChangedTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
+}
+
+HWTEST_F(StaServiceTest, GetDetectNetStateTest, TestSize.Level1)
+{
+    GetDetectNetStateTest();
 }
 
 HWTEST_F(StaServiceTest, GetSignalPollInfoArrayTest, TestSize.Level1)

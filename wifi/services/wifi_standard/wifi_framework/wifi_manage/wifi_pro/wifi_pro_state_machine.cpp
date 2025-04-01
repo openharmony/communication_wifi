@@ -352,10 +352,16 @@ bool WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
     WIFI_LOGI("TrySelfCure.");
 
     ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId_);
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(instId_);
     do {
         if (pSelfCureService == nullptr) {
             WIFI_LOGE("pSelfCureService nullptr.");
             break;
+        }
+
+        if (pStaService == nullptr) {
+            WIFI_LOGE("pStaService is invalid");
+            return false;
         }
 
         if (pSelfCureService->IsSelfCureOnGoing()) {
@@ -370,12 +376,13 @@ bool WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
 
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-
+        OperateResState lastCheckNetState = OperateResState::CONNECT_NETWORK_NORELATED;
+        pStaService->GetDetectNetState(lastCheckNetState);
         // issatisfy min rssi
-        if (linkedInfo.rssi > SELF_CURE_RSSI_THRESHOLD) {
+        if (linkedInfo.rssi > SELF_CURE_RSSI_THRESHOLD && lastCheckNetState != OperateResState::CONNECT_CHECK_PORTAL) {
             pSelfCureService->NotifyInternetFailureDetected(forceNoHttpCheck);
         } else {
-            WIFI_LOGI("not reach rssi threshold.");
+            WIFI_LOGI("Failure to meet the conditions for selfcure.");
         }
     } while (0);
     return true;

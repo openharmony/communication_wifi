@@ -462,7 +462,8 @@ void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
 }
 void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<InterScanInfo> &wifiScanInfos)
 {
-    if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
+    if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid) ||
+        NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
         WIFI_LOGI("FoundMonitorAp, relation ap(%{public}s) in block list, can not monitor",
             MacAnonymize(relationAps_[relationApIndex].apInfo_.bssid).data());
         return;

@@ -2446,7 +2446,7 @@ ErrCode WifiDeviceServiceImpl::UpdateNetworkLagInfo(const NetworkLagType network
 {
     // permission check
 #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("UpdateNetworkLagInfo, uid:%{public}d.", GetCallingUid());
+    WIFI_LOGD("UpdateNetworkLagInfo, uid:%{public}d.", GetCallingUid());
 #endif
  
     if (!WifiAuthCenter::IsNativeProcess()) {

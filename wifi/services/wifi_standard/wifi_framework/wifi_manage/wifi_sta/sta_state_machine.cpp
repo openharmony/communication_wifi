@@ -3509,7 +3509,7 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
         wifiDeviceConfig.noInternetAccess = false;
         WifiConfigCenter::GetInstance().GetIpInfo(wifiDeviceConfig.lastDhcpResult, m_instId);
     }
-    if (networkStatus == NetworkStatus::NO_INTERNET) {
+    if (networkStatus == NetworkStatus::NO_INTERNET && IsGoodSignalQuality()) {
         wifiDeviceConfig.noInternetAccess = true;
     }
     WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);

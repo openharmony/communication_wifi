@@ -451,6 +451,13 @@ public:
      */
     virtual void ProcessVoWifiNetlinkReportEvent(const int type) = 0;
 
+    /**
+     * @Description  get Detect result.
+     *
+     * @param state net state
+     */
+    virtual void GetDetectNetState(OperateResState &state) = 0;
+
     virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) = 0;
 
     /**

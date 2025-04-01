@@ -23,7 +23,7 @@ config("module_private_config") {
 }
 
 ohos_unittest("wifi_native_test") {
-  module_out_path = "wifi/native_hdi_test"
+  module_out_path = "wifi/wifi/native_hdi_test"
 
   include_dirs = [
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",

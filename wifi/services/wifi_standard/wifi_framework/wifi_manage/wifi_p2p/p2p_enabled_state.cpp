@@ -127,6 +127,8 @@ void P2pEnabledState::InitProcessMsg()
         [this](InternalMessagePtr msg) { return this->ProcessCmdDecreaseSharedLink(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_EVENT_CHR_REPORT,
         [this](InternalMessagePtr msg) { return this->ProcessChrReport(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_MIRACAST_SINK_CONFIG,
+        [this](InternalMessagePtr msg) { return this->ProcessSetMiracastSinkConfig(msg); }));
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
@@ -686,6 +688,18 @@ bool P2pEnabledState::ProcessChrReport(InternalMessagePtr msg) const
     WifiP2pDevice device = deviceManager.GetThisDevice();
     device.SetChrErrCode(static_cast<P2pChrEvent>(errCode));
     p2pStateMachine.BroadcastThisDeviceChanaged(device);
+    return EXECUTED;
+}
+
+bool P2pEnabledState::ProcessSetMiracastSinkConfig(InternalMessagePtr msg) const
+{
+    WIFI_LOGI("P2pEnabledState receive set sink config");
+    std::string config;
+    if (!msg->GetMessageObj(config)) {
+        WIFI_LOGE("Failed to obtain string information");
+        return EXECUTED;
+    }
+    WifiP2PHalInterface::GetInstance().SetMiracastSinkConfig(config);
     return EXECUTED;
 }
 } // namespace Wifi

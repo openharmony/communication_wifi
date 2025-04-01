@@ -542,7 +542,7 @@ ErrCode WifiScanProxy::StartWifiPnoScan(bool isStartAction, int periodMs, int su
     int error = Remote()->SendRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), data,
         reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+        WIFI_LOGE("Set Attr(%{public}d) failed, error code is %{public}d",
             static_cast<int32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), error);
         return WIFI_OPT_FAILED;
     }

@@ -517,5 +517,13 @@ void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept)
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
     }
 }
+
+ErrCode WifiP2pService::SetMiracastSinkConfig(const std::string& config)
+{
+    WIFI_LOGI("SetMiracastSinkConfig");
+    const std::any info = config;
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_MIRACAST_SINK_CONFIG), info);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

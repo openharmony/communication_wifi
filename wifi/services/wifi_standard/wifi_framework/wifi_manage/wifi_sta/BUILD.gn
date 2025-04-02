@@ -147,7 +147,7 @@ if (defined(ohos_lite)) {
 
     defines = [
       "FEATURE_STA_SUPPORT",
-      "WIFI_CONFIG_UPDATE" ,
+      "WIFI_CONFIG_UPDATE",
     ]
 
     if (wifi_feature_with_local_random_mac) {

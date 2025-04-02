@@ -527,7 +527,7 @@ void P2pMonitor::WpaEventGroupStarted(const HalP2pGroupInfo &groupInfo) const
     } else {
         group.SetPassphrase(std::string(groupInfo.psk));
     }
-    if (groupInfo.isPersistent && groupInfo.psk.empty()) {
+    if (groupInfo.isPersistent && !groupInfo.isGo && groupInfo.psk.empty()) {
         WIFI_LOGE("groupinfo isPersistent and psk is null");
         group.SetIsPersistent(0);
     } else {
@@ -649,9 +649,10 @@ void P2pMonitor::WpaEventApStaDisconnected(const std::string &p2pDeviceAddress) 
     Broadcast2SmApStaDisconnected(selectIfacName, device);
 }
 
-void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress, const std::string &p2pGroupAddress) const
+void P2pMonitor::WpaEventApStaConnected(const std::string &p2pDeviceAddress,
+    const std::string &p2pGroupAddress) const
 {
-    WIFI_LOGD("onStaAuthorized callback, p2pDeviceAddress: %{private}s, p2pGroupAddress: %{private}s",
+    WIFI_LOGD("onStaAuthorized callback, p2pDeviceAddress:%{private}s p2pGroupAddress %{private}s",
         p2pDeviceAddress.c_str(), p2pGroupAddress.c_str());
     WifiP2pDevice device;
     device.SetDeviceAddress(p2pDeviceAddress);

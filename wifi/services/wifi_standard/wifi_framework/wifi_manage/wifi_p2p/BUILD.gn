@@ -130,7 +130,6 @@ ohos_static_library("wifi_p2p_service") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "netmanager_base:net_conn_manager_if",
-    "samgr:samgr_proxy",
   ]
 
   deps = [

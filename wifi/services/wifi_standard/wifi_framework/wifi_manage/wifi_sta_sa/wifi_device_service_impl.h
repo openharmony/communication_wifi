@@ -68,7 +68,7 @@ public:
     ErrCode RemoveDevice(int networkId) override;
 
     ErrCode RemoveAllDevice() override;
-
+    
     ErrCode SetTxPower(int power) override;
 
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
@@ -109,9 +109,9 @@ public:
 
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
-    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
-
     ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mloLinkInfo) override;
+
+    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
 
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
 
@@ -156,7 +156,7 @@ public:
     ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) override;
 
     ErrCode GetSupportedFeatures(long &features) override;
-
+    
     ErrCode IsFeatureSupported(long feature, bool &isSupported) override;
 
     ErrCode GetDeviceMacAddress(std::string &result) override;
@@ -232,6 +232,10 @@ private:
     int ProcessPermissionVerify(const std::string &appId, const std::string &packageName);
     void UpdateWifiLinkInfo(WifiLinkedInfo &info);
     void DeliverAudioState(const WifiNetworkControlInfo& networkControlInfo);
+#ifdef DYNAMIC_UNLOAD_SA
+        void StopUnloadStaTimer(void) override;
+#endif
+
 private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;
     static constexpr int MAX_HEX_LEN = 64;

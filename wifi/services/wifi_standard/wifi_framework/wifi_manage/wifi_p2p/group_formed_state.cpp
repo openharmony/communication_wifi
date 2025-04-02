@@ -267,6 +267,7 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessagePtr msg) const
     if (groupManager.IsCurrGroupClientEmpty() && !groupManager.GetCurrentGroup().IsExplicitGroup()) {
         WIFI_LOGE("Clients empty, remove p2p group.");
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupOperatingState);
+        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
     } else {
         p2pStateMachine.BroadcastP2pConnectionChanged();
     }

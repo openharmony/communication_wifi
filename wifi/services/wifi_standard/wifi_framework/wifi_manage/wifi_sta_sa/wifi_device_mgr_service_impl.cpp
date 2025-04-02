@@ -78,6 +78,7 @@ void WifiDeviceMgrServiceImpl::OnStart()
 
 void WifiDeviceMgrServiceImpl::OnStop()
 {
+    std::lock_guard<std::mutex> lock(g_initMutex);
     mState = ServiceRunningState::STATE_NOT_START;
     mPublishFlag = false;
     WIFI_LOGI("Stop sta service!");

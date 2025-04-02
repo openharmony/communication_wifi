@@ -530,6 +530,7 @@ void P2pHalCbclientRemoved(const char *deviceMac)
     if (strncpy_s(pCbkMsg->msg.deviceInfo.p2pDeviceAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pDeviceAddress),
         deviceMac, sizeof(pCbkMsg->msg.deviceInfo.p2pDeviceAddress) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, P2P_CLIENT_REMOVED_EVENT);
@@ -708,6 +709,7 @@ void P2pHalCbStaConnectState(const char *p2pDeviceAddress, const char *p2pGroupA
     if (strncpy_s(pCbkMsg->msg.deviceInfo.p2pGroupAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pGroupAddress),
         p2pGroupAddress, sizeof(pCbkMsg->msg.deviceInfo.p2pGroupAddress) - 1) != EOK) {
         free(pCbkMsg);
+        pCbkMsg = NULL;
         return;
     }
     EmitEventCallbackMsg(pCbkMsg, ((state == 0) ? AP_STA_DISCONNECTED_EVENT : AP_STA_CONNECTED_EVENT));

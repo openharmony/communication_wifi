@@ -76,6 +76,7 @@ void WifiHotspotMgrServiceImpl::OnStart()
 
 void WifiHotspotMgrServiceImpl::OnStop()
 {
+    std::lock_guard<std::mutex> lock(g_hotspotMutex);
     mState = ServiceRunningState::STATE_NOT_START;
     mPublishFlag = false;
     WIFI_LOGI("Stop ap service!");

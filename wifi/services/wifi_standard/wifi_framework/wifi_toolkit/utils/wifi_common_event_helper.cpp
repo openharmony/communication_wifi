@@ -212,7 +212,7 @@ bool WifiCommonEventHelper::PublishSelfcureStateChangedEvent(const int &pid, con
     CommonEventData commonData;
     commonData.SetWant(want);
     std::vector<std::string> permissions;
-    permissions.push_back(COMMON_EVENT_GET_WIFI_INFO_PERMISSION);
+    permissions.push_back(COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION);
     CommonEventPublishInfo publishInfo;
     publishInfo.SetSubscriberPermissions(permissions);
     if (!CommonEventManager::PublishCommonEvent(commonData, publishInfo)) {

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "handler.h"
+#include <cinttypes>
 #include <iostream>
 #include <sys/time.h>
 #include "wifi_log.h"
@@ -58,7 +59,6 @@ bool Handler::InitialHandler(const std::string &name)
     if (pMyTaskQueue == nullptr) {
         pMyTaskQueue = std::make_unique<WifiEventHandler>(name);
     }
-    WifiWatchDogUtils::GetInstance();
 #endif
     LOGI("InitialHandler success: %{public}s", mThreadName.c_str());
     mThreadName = name;
@@ -133,7 +133,18 @@ void Handler::SendMessage(InternalMessagePtr msg)
         return;
     }
     LOGD("%{public}s SendMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
+#ifdef OHOS_ARCH_LITE
     MessageExecutedLater(msg, 0);
+#else
+    std::function<void()> func = std::bind([this, msg]() {
+        LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
+        ExecuteMessage(msg);
+        MessageManage::GetInstance().ReclaimMsg(msg);
+        });
+    if (pMyTaskQueue != nullptr) {
+        pMyTaskQueue->PostAsyncTask(func, std::to_string(msg->GetMessageName()), 0);
+    }
+#endif
     return;
 }
 
@@ -153,7 +164,7 @@ void Handler::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
 #ifdef OHOS_ARCH_LITE
     /* Obtains the current time, accurate to milliseconds. */
     struct timespec curTime = {0, 0};
-    if (clock_gettime(CLOCK_BOOTTIME, &curTime) != 0) {
+    if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
         LOGE("clock_gettime failed.");
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;
@@ -172,7 +183,7 @@ void Handler::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
         LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
         ExecuteMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);
-    });
+        });
     pMyTaskQueue->PostAsyncTask(func, std::to_string(msg->GetMessageName()), delayTime);
 #endif
     return;
@@ -200,7 +211,7 @@ void Handler::MessageExecutedAtTime(InternalMessagePtr msg, int64_t execTime)
 #else
     /* Obtains the current time, accurate to milliseconds. */
     struct timespec curTime = {0, 0};
-    if (clock_gettime(CLOCK_BOOTTIME, &curTime) != 0) {
+    if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
         LOGE("clock_gettime failed.");
         MessageManage::GetInstance().ReclaimMsg(msg);
         return;

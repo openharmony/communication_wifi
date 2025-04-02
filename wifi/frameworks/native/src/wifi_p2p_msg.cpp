@@ -420,7 +420,7 @@ void WifiP2pGroupInfo::SetGcIpAddress(const std::string &ipAddr)
 {
     gcIpAddress = ipAddr;
 }
-
+ 
 const std::string &WifiP2pGroupInfo::GetGcIpAddress() const
 {
     return gcIpAddress;
@@ -546,9 +546,9 @@ int WifiP2pGroupInfo::GetCreatorUid()
     return creatorUid;
 }
 
-void WifiP2pGroupInfo::SetPersistentFlag(bool falg)
+void WifiP2pGroupInfo::SetPersistentFlag(bool flag)
 {
-    isOldPersistenGroup = falg;
+    isOldPersistenGroup = flag;
 }
 
 bool WifiP2pGroupInfo::GetPersistentFlag(void)

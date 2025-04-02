@@ -1445,13 +1445,13 @@ bool WifiSettings::IsModulePreLoad(const std::string &name)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     if (name == WIFI_SERVICE_STA) {
-        return mWifiConfig[0].preLoadSta;
+        return true;
     } else if (name == WIFI_SERVICE_SCAN) {
-        return mWifiConfig[0].preLoadScan;
+        return true;
     } else if (name == WIFI_SERVICE_AP) {
         return mWifiConfig[0].preLoadAp;
     } else if (name == WIFI_SERVICE_P2P) {
-        return mWifiConfig[0].preLoadP2p;
+        return true;
     } else if (name == WIFI_SERVICE_AWARE) {
         return mWifiConfig[0].preLoadAware;
     } else if (name == WIFI_SERVICE_ENHANCE) {
@@ -1852,7 +1852,6 @@ void WifiSettings::InitWifiConfig()
 
 int WifiSettings::SyncWifiConfig()
 {
-    std::unique_lock<std::mutex> lock(mSyncWifiConfigMutex);
     std::vector<WifiConfig> tmp;
     for (auto &item : mWifiConfig) {
         tmp.push_back(item.second);

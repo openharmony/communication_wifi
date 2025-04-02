@@ -44,7 +44,6 @@ enum ErrCode {
     WIFI_OPT_NON_SYSTEMAPP,           /* not system app denied */
     WIFI_OPT_SCAN_NEXT_PERIOD,
     WIFI_OPT_GET_ENHANCE_SVC_FAILED,  /* get enhance service failed */
-    WIFI_OPT_STA_AND_P2P_MAC_SAME,    /* sta and p2p mac is same */
     WIFI_OPT_ENTERPRISE_DENIED = 203, /* mdm forbidden */
 };
 }  // namespace Wifi

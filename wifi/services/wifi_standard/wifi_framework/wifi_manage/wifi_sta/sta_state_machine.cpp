@@ -32,7 +32,6 @@
 #include "block_connect_service.h"
 #include "wifi_randommac_helper.h"
 #include "define.h"
-#include "wifi_code_convert.h"
 #ifndef OHOS_ARCH_LITE
 #include <dlfcn.h>
 #include "securec.h"
@@ -49,6 +48,7 @@
 #include "wifi_net_stats_manager.h"
 #include "wifi_history_record_manager.h"
 #endif // OHOS_ARCH_LITE
+
 #include "wifi_channel_helper.h"
 #ifndef OHOS_WIFI_STA_TEST
 #else
@@ -795,8 +795,7 @@ void StaStateMachine::LinkState::DealWpaStateChange(InternalMessagePtr msg)
     int status = msg->GetParam1();
     WIFI_LOGI("DealWpaStateChange status: %{public}d", status);
     if (static_cast<SupplicantState>(status) == SupplicantState::ASSOCIATING) {
-        std::string ssid = msg->GetStringFromMessage();
-        pStaStateMachine->linkedInfo.ssid = WifiCodeConvertUtil::GbkToUtf8(ssid);
+        pStaStateMachine->linkedInfo.ssid = msg->GetStringFromMessage();
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, pStaStateMachine->linkedInfo);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
             static_cast<int>(WifiOperateState::STA_ASSOCIATING));
@@ -1423,7 +1422,7 @@ void StaStateMachine::ApLinkedState::DealCsaChannelChanged(InternalMessagePtr ms
         return;
     }
     int newFrq = msg->GetParam1();
-    WIFI_LOGI("%{public}s update freq from %{public}d  to %{public}d", __FUNCTION__,
+    WIFI_LOGI("%{public}s update freq from %{public}d to %{public}d", __FUNCTION__,
         pStaStateMachine->linkedInfo.frequency, newFrq);
     pStaStateMachine->linkedInfo.frequency = newFrq;
     // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
@@ -3111,8 +3110,8 @@ void StaStateMachine::DhcpResultNotify::OnFailedDhcpResult(int status, const cha
     }
     WIFI_LOGI("Enter DhcpResultNotify::OnFailed. ifname=%{public}s, status=%{public}d, reason=%{public}s",
         ifname, status, reason);
-    WriteDhcpFailHiSysEvent("DHCP_FAIL", status);
     DhcpResultNotifyEvent(DhcpReturnCode::DHCP_FAIL);
+    WriteDhcpFailHiSysEvent("DHCP_FAIL", status);
 }
 
 void StaStateMachine::DhcpResultNotify::DealDhcpResultFailed()
@@ -4023,7 +4022,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(bssid).c_str());
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
-        SetAllowAutoConnectStatus(networkId, true);
+        SetAllowAutoConnectStatus(deviceConfig, true);
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     }
@@ -4061,13 +4060,8 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     return WIFI_OPT_SUCCESS;
 }
 
-void StaStateMachine::SetAllowAutoConnectStatus(int32_t networkId, bool status)
+void StaStateMachine::SetAllowAutoConnectStatus(WifiDeviceConfig &deviceConfig, bool status)
 {
-    WifiDeviceConfig deviceConfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
-        WIFI_LOGE("SetAllowAutoConnectStatus get GetDeviceConfig failed!");
-        return;
-    }
     if (deviceConfig.isAllowAutoConnect == status) {
         return;
     }

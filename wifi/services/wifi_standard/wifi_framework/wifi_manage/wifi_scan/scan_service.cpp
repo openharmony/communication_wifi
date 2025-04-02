@@ -637,7 +637,7 @@ int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const Inte
     storeScanConfig.scanFreqs.assign(interConfig.scanFreqs.begin(), interConfig.scanFreqs.end());
 
     struct timespec times = {0, 0};
-    clock_gettime(CLOCK_BOOTTIME, &times);
+    clock_gettime(CLOCK_MONOTONIC, &times);
     storeScanConfig.scanTime =
         static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND + times.tv_nsec / SECOND_TO_MILLI_SECOND;
     storeScanConfig.fullScanFlag = scanConfig.fullScanFlag;
@@ -703,7 +703,7 @@ void ScanService::HandleCommonScanInfo(
         TryToRestoreSavedNetwork();
     }
     struct timespec times = {0, 0};
-    clock_gettime(CLOCK_BOOTTIME, &times);
+    clock_gettime(CLOCK_MONOTONIC, &times);
     int64_t availableTime = static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND +
         times.tv_nsec / SECOND_TO_MILLI_SECOND;
     if (mEnhanceService != nullptr) {
@@ -1070,7 +1070,7 @@ bool ScanService::PnoScan(const PnoScanConfig &pnoScanConfig, const InterScanCon
     WIFI_LOGI("End: send message.");
 
     struct timespec times = {0, 0};
-    clock_gettime(CLOCK_BOOTTIME, &times);
+    clock_gettime(CLOCK_MONOTONIC, &times);
     pnoScanStartTime =
         static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
 
@@ -1460,7 +1460,7 @@ void ScanService::StartSystemTimerScan(bool scanAtOnce)
     }
     if (rlt == WIFI_OPT_SUCCESS) {
         struct timespec times = { 0, 0 };
-        clock_gettime(CLOCK_BOOTTIME, &times);
+        clock_gettime(CLOCK_MONOTONIC, &times);
         int64_t nowTime =
             static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
         int sinceLastScan = 0;
@@ -1790,13 +1790,11 @@ ErrCode ScanService::AllowWifiProScan()
     int state = WifiConfigCenter::GetInstance().GetScreenState();
     if (state == MODE_STATE_CLOSE) {
         WIFI_LOGW("internal scan not allow by Screen Off");
-        WriteScanLimitHiSysEvent("WIFIPRO_SCAN", static_cast<int>(ScanLimitType::SCREEN_OFF));
         return WIFI_OPT_FAILED;
     }
  
     if (staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
         WIFI_LOGW("NOT allow scan for staStatus: %{public}d", staStatus);
-        WriteScanLimitHiSysEvent("WIFIPRO_SCAN", static_cast<int>(ScanLimitType::STA_STATE));
         return WIFI_OPT_FAILED;
     }
  
@@ -2154,7 +2152,7 @@ void ScanService::CheckNeedFastScan(std::vector<int> &scanFreqs)
     /* If scan freqs is empty, the freq for the first periodic scanning is selected based on
      * the historical connection freq.
     */
-    if (systemScanIntervalMode.scanIntervalMode.count == 1 && scanFreqs.empty() == 0 &&
+    if (systemScanIntervalMode.scanIntervalMode.count == 1 && scanFreqs.empty() &&
         WifiConfigCenter::GetInstance().IsNeedFastScan()) {
         WifiConfigCenter::GetInstance().SetFastScan(false);
         GetSavedNetworkFreq(scanFreqs);
@@ -3041,8 +3039,8 @@ int WifiMaxThroughput(int wifiStandard, bool is11bMode, WifiChannelWidth channel
     int bitPerTone = CalculateBitPerTone(snrDb);
     bitPerTone = MIN(bitPerTone, maxBitsPerTone);
 
-    long long bitPerToneTotal = static_cast<long long>(bitPerTone) * maxNumSpatialStream;
-    long long numBitPerSym = bitPerToneTotal * numTonePerSym;
+    long bitPerToneTotal = static_cast<long>(bitPerTone) * maxNumSpatialStream;
+    long numBitPerSym = bitPerToneTotal * numTonePerSym;
     long phyRateMbps = (int)((numBitPerSym * MICRO_TO_NANO_RATIO) / (symDurationNs * BIT_PER_TONE_SCALE));
     int airTimeFraction = CalculateAirTimeFraction(channelUtilization, channelWidthFactor);
     int throughputMbps = (phyRateMbps * airTimeFraction) / MAX_CHANNEL_UTILIZATION;

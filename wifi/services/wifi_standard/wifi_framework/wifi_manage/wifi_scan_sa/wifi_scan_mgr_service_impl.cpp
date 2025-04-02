@@ -79,6 +79,7 @@ void WifiScanMgrServiceImpl::OnStart()
 
 void WifiScanMgrServiceImpl::OnStop()
 {
+    std::lock_guard<std::mutex> lock(g_scanMutex);
     mState = ServiceRunningState::STATE_NOT_START;
     mPublishFlag = false;
     WIFI_LOGI("Stop scan service!");

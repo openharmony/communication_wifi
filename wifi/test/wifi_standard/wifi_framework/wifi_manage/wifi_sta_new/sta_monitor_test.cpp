@@ -66,11 +66,12 @@ HWTEST_F(StaMonitorTest, OnConnectChangedCallBackTest01, TestSize.Level1)
     int status = HAL_WPA_CB_ASSOCIATING;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    int locallyGenerated = 0;
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
     status = HAL_WPA_CB_ASSOCIATED;
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
     status = HAL_WPA_CB_ASSOCIATING;
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
     EXPECT_NE(pStaMonitor->m_instId, TEN);
 }
 

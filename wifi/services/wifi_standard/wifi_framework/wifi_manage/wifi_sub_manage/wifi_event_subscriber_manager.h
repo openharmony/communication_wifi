@@ -37,6 +37,9 @@ const int MOUSE_CROSS_SERVICE_ID = 65569;
 inline const std::string COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED = "usual.event.ASSET_SYNC_DATA_CHANGED_SA";
 const int ASSETID = 6226;
 #endif
+#ifdef HAS_NETMANAGER_EVENT_PART
+inline const std::string WIFI_EVENT_BG_CONTINUOUS_TASK_STATE = "ohos.event.notification.wifi.BGCTTASK_STATE";
+#endif
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -82,7 +85,14 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
 };
 #endif
-
+#ifdef HAS_NETMANAGER_EVENT_PART
+class NetmgrEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
+public:
+    explicit NetmgrEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+    virtual ~NetmgrEventSubscriber();
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+};
+#endif
 class NetworkStateChangeSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
     explicit NetworkStateChangeSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -157,6 +167,13 @@ private:
     void UnRegisterLocationEvent();
     void RegisterNotificationEvent();
     void UnRegisterNotificationEvent();
+#ifdef HAS_NETMANAGER_EVENT_PART
+    void RegisterNetmgrEvent();
+    void UnRegisterNetmgrEvent();
+    std::shared_ptr<NetmgrEventSubscriber> wifiNetmgrEventSubsciber_ = nullptr;
+    std::mutex netmgrEventMutex;
+    uint32_t netMgrId{0};
+#endif
     void GetMdmProp();
     void RegisterMdmPropListener();
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);

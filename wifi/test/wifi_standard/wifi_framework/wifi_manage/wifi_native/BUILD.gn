@@ -115,6 +115,8 @@ ohos_unittest("wifi_native_test") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_wlan:libchip_proxy_2.0",
+    "drivers_interface_wlan:libwpa_proxy_2.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdf_ipc_adapter",

@@ -26,6 +26,7 @@
 #include "hdi_struct_toolkit.h"
 #include <securec.h>
 #include <unistd.h>
+#include <osal_mem.h>
 
 static void FreeHdiWifiWpaNetworkInfo(HdiWifiWpaNetworkInfo *hdiWifiWpaNetworkInfo)
 {
@@ -40,12 +41,25 @@ static void FreeHdiWifiWpaNetworkInfo(HdiWifiWpaNetworkInfo *hdiWifiWpaNetworkIn
 
 static void FreeHdiP2pNetworkInfo(HdiP2pNetworkInfo *hdiP2pNetworkInfo)
 {
-    free(hdiP2pNetworkInfo->ssid);
-    free(hdiP2pNetworkInfo->bssid);
-    free(hdiP2pNetworkInfo->flags);
+    if (hdiP2pNetworkInfo == nullptr) {
+        return;
+    }
+    if (hdiP2pNetworkInfo->ssid) {
+        OsalMemFree(hdiP2pNetworkInfo->ssid);
+    }
+    if (hdiP2pNetworkInfo->bssid) {
+        OsalMemFree(hdiP2pNetworkInfo->bssid);
+    }
+    if (hdiP2pNetworkInfo->flags) {
+        OsalMemFree(hdiP2pNetworkInfo->flags);
+    }
+    if (hdiP2pNetworkInfo->clientList) {
+        OsalMemFree(hdiP2pNetworkInfo->clientList);
+    }
     hdiP2pNetworkInfo->ssid = nullptr;
     hdiP2pNetworkInfo->bssid = nullptr;
     hdiP2pNetworkInfo->flags = nullptr;
+    hdiP2pNetworkInfo->clientList = nullptr;
 }
 
 static void FreeHdiP2pNetworkList(HdiP2pNetworkList *hdiP2pNetworkList)
@@ -53,7 +67,9 @@ static void FreeHdiP2pNetworkList(HdiP2pNetworkList *hdiP2pNetworkList)
     for (int i = 0; i < hdiP2pNetworkList->infoNum; i++) {
         FreeHdiP2pNetworkInfo(&hdiP2pNetworkList->infos[i]);
     }
-    free(hdiP2pNetworkList->infos);
+    if (hdiP2pNetworkList->infos) {
+        OsalMemFree(hdiP2pNetworkList->infos);
+    }
     hdiP2pNetworkList->infos = nullptr;
     hdiP2pNetworkList = nullptr;
 }

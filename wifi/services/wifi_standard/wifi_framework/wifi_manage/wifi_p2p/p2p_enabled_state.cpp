@@ -321,7 +321,20 @@ bool P2pEnabledState::P2pConfigInitialization()
         }
     }
 
-    retCode = WifiP2PHalInterface::GetInstance().SetP2pConfigMethods(
+    P2pConfigInitExt(result);
+
+    if (!p2pStateMachine.groupManager.GetGroups().empty()) {
+        p2pStateMachine.UpdateGroupInfoToWpa();
+        std::vector<WifiP2pGroupInfo> groups;
+        WifiSettings::GetInstance().SetWifiP2pGroupInfo(groups);
+        WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();
+    }
+    return result;
+}
+
+void P2pEnabledState::P2pConfigInitExt(bool &result)
+{
+    WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().SetP2pConfigMethods(
         std::string("virtual_push_button physical_display keypad"));
     if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set the wps config methods.");
@@ -340,10 +353,7 @@ bool P2pEnabledState::P2pConfigInitialization()
         WIFI_LOGE("Failed to obtain the device address.");
         result = false;
     }
-
     deviceManager.GetThisDevice().SetDeviceAddress(deviceAddr);
-    p2pStateMachine.UpdateGroupInfoToWpa();
-    return result;
 }
 
 bool P2pEnabledState::P2pSettingsInitialization()

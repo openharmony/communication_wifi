@@ -44,7 +44,8 @@ static const HdiP2pWpaNetworkField g_hdiP2pWpaNetworkFields[] = {
     {GROUP_CONFIG_PAIRWISE, "pairwise", 1},
     {GROUP_CONFIG_AUTH_ALG, "auth_alg", 1},
     {GROUP_CONFIG_MODE, "mode", 1},
-    {GROUP_CONFIG_DISABLED, "disabled", 1}
+    {GROUP_CONFIG_DISABLED, "disabled", 1},
+    {GROUP_CONFIG_CLIENTLIST, "p2p_client_list", 1}
 };
 
 static struct IWpaCallback *g_hdiWpaP2pCallbackObj = NULL;
@@ -119,67 +120,18 @@ static WifiErrorNo AddP2pRandomMacFlag()
     return WIFI_HAL_OPT_OK;
 }
 
-bool GetOldMac(char *mac, int len)
-{
-    char line[BUFF_SIZE];
- 
-    FILE *fp = fopen(P2P_SUPPLICANT_PATH, "r");
-    if (fp == NULL) {
-        return false;
-    }
-    while (fgets(line, sizeof(line), fp) != NULL) {
-        if (strstr(line, PERSISENT_MAC_STRING) != NULL) {
-            if (memcpy_s(mac, len, line, strlen(line)) != EOK) {
-                fclose(fp);
-                return false;
-            }
-            fclose(fp);
-            return true;
-        }
-    }
-    if (fclose(fp) != 0) {
-        LOGE("close fp failed");
-    }
-    return false;
-}
- 
-void AppendMac(char *mac, int len)
-{
-    FILE *fp = fopen(P2P_SUPPLICANT_PATH, "a");
-    if (fp == NULL) {
-        LOGE("Error! Could not open file\n");
-        return;
-    }
-    if (fwrite("\n", sizeof(char), strlen("\n"), fp) == 0) {
-        LOGE("write \n faild");
-    }
-    if (fwrite(mac, sizeof(char), len, fp) == 0) {
-        LOGE("write mac faild");
-    }
-    if (fclose(fp) != 0) {
-        LOGE("close fp failed");
-    }
-}
-
 WifiErrorNo HdiWpaP2pStart(const char *ifaceName, const bool hasPersisentGroup)
 {
-    char persisentMac[PERSISENT_MAC_LEN] = {0};
-    bool hasPersisentMac = false;
-
     LOGI("HdiWpaP2pStart enter");
     if (SetHdiP2pIfaceName(ifaceName) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: set p2p iface name failed!");
         return WIFI_HAL_OPT_FAILED;
     }
-    if (hasPersisentGroup) {
-        hasPersisentMac = GetOldMac(persisentMac, PERSISENT_MAC_LEN);
-    }
-    if (CopyConfigFile("p2p_supplicant.conf") != WIFI_HAL_OPT_OK) {
-        LOGE("HdiWpaP2pStart: CopyConfigFile failed!");
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (hasPersisentMac) {
-        AppendMac(persisentMac, PERSISENT_MAC_LEN);
+    if (access(CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf", F_OK) == -1) {
+        if (CopyConfigFile("p2p_supplicant.conf") != WIFI_HAL_OPT_OK) {
+            LOGE("HdiWpaP2pStart: CopyConfigFile failed!");
+            return WIFI_HAL_OPT_FAILED;
+        }
     }
     if (HdiWpaStart() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: HdiWpaStart failed!");

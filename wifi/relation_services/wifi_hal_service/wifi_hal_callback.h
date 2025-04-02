@@ -269,7 +269,7 @@ void P2pHalCbServiceDiscoveryResponse(const P2pServDiscRespInfo *info);
  * @param p2pGroupAddress
  * @param type - 0 disconnect, 1 connected
  */
-void P2pHalCbStaConnectState(const char *p2pDeviceAddress, const char *p2pGroupAddress, int type);
+void P2pHalCbStaConnectState(const char *p2pDeviceAddress, const char *p2pGroupAddress, int state);
 
 /**
  * @Description Reporting Link Failure Events

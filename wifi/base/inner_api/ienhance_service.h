@@ -190,18 +190,19 @@ public:
         const std::string &name, P2pEnhanceActionListenCallback callback) = 0;
 
     /**
-     * @Description Check Enhance Vap Available
-     *
-     * @return true: available, false: not available
-     */
-    virtual bool CheckEnhanceVapAvailable() = 0;
-
-    /**
      * @Description Check if custom network
      *
      * @return true or false
      */
     virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description Check Enhance Vap Available
+     *
+     * @return true: available, false: not available
+     */
+
+    virtual bool CheckEnhanceVapAvailable() = 0;
 
     /**
      * @Description Check if specific network
@@ -236,7 +237,7 @@ public:
      * @Description on notification receive
      */
     virtual void OnNotificationReceive() = 0;
- 
+
     /**
      * @Description on dialog receive
      *

@@ -122,7 +122,6 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "hilog:libhilog",
-      "samgr:samgr_proxy",
     ]
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc

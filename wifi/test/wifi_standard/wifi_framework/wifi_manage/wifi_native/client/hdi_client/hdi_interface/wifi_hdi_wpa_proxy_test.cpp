@@ -117,6 +117,13 @@ HWTEST_F(WifiHdiWpaProxyTest, RegistHdfApDeathCallBackTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
+extern "C" WifiErrorNo UnRegistHdfDeathCallBack();
+HWTEST_F(WifiHdiWpaProxyTest, RegistHdfDeathCallBackTest, TestSize.Level1)
+{
+    WifiErrorNo result = UnRegistHdfDeathCallBack();
+    EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
+}
+
 extern "C" void RemoveIfaceName(const char* ifName);
 HWTEST_F(WifiHdiWpaProxyTest, RemoveIfaceNameTest, TestSize.Level1)
 {

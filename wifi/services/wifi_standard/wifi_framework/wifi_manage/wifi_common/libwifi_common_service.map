@@ -118,7 +118,6 @@
         "OHOS::Wifi::WifiNetAgent::GetInstance()";
         "OHOS::Wifi::WifiNetAgent::RegisterNetSupplier(int)";
         "OHOS::Wifi::WifiNetAgent::RegisterNetSupplierCallback(int)";
-        "OHOS::Wifi::WifiNetAgent::RegisterNetConnObserver(int)";
         "OHOS::Wifi::WifiNetAgent::UnregisterNetSupplier(int)";
         "OHOS::Wifi::WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSupplierInfo> &, int)";
         "OHOS::Wifi::WifiNetAgent::AddRoute(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, int)";

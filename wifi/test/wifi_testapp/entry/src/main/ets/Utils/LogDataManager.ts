@@ -112,10 +112,6 @@ export class LogDataManager {
   testOnStreamChangeManager_EndLog = "testOnStreamChange End----------"
   testOnDeviceConfigChangeManager_StartLog = "testOnDeviceConfigChangeManager Start----------"
   testOnDeviceConfigChangeManager_EndLog = "testOnDeviceConfigChangeManager End----------"
-  testEnableSemiWifi_StartLog = "testEnableSemiWifi Start----------"
-  testEnableSemiWifi_EndLog = "testEnableSemiWifi End----------"
-  testStartScanManager_StartLog = "testStartScan Start----------"
-  testStartScanManager_EndLog = "testStartScan End----------"
   //hotspot
   testEnableHotspotManager_StartLog = "testEnableHotspot start--------------"
   testEnableHotspotManager_EndLog = "testEnableHotspot End--------------"

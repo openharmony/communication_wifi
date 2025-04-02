@@ -137,7 +137,7 @@ InternalMessagePtr MessageQueue::GetNextMessage()
     while (!mNeedQuit) {
         /* Obtains the current time, accurate to milliseconds. */
         struct timespec curTime = {0, 0};
-        if (clock_gettime(CLOCK_BOOTTIME, &curTime) != 0) {
+        if (clock_gettime(CLOCK_MONOTONIC, &curTime) != 0) {
             LOGE("clock_gettime failed.");
             return nullptr;
         }

@@ -39,13 +39,13 @@ inline const std::string COMMON_EVENT_WIFI_P2P_PEERS_STATE_CHANGED =
     "usual.event.wifi.p2p.DEVICES_CHANGE";
 inline const std::string COMMON_EVENT_WIFI_P2P_PEERS_DISCOVERY_STATE_CHANGED =
     "usual.event.wifi.p2p.PEER_DISCOVERY_STATE_CHANGE";
-inline const std::string COMMON_EVENT_WIFI_P2P_CURRENT_DEVICE_STATE_CHANGED =
-    "usual.event.wifi.p2p.CURRENT_DEVICE_CHANGE";
-inline const std::string COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED = "usual.event.wifi.p2p.GROUP_STATE_CHANGED";
+const std::string COMMON_EVENT_WIFI_P2P_CURRENT_DEVICE_STATE_CHANGED = "usual.event.wifi.p2p.CURRENT_DEVICE_CHANGE";
+const std::string COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED = "usual.event.wifi.p2p.GROUP_STATE_CHANGED";
 inline const std::string COMMON_EVENT_WIFI_SELF_CURE_STATE_CHANGED = "usual.event.wifi.selfcure.STATE_CHANGED";
 inline const std::string COMMON_EVENT_VOWIFI_SIGNAL_DETECT_INTERRUPT =
     "usual.event.wifi.VOWIFI_SIGNAL_DETECT_INTERRUPT";
 inline const std::string COMMON_EVENT_GET_WIFI_CONFIG_PERMISSION = "ohos.permission.GET_WIFI_CONFIG";
+inline const std::string COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION = "ohos.permission.SET_WIFI_CONFIG";
 inline const std::string COMMON_EVENT_GET_WIFI_INFO_PERMISSION = "ohos.permission.GET_WIFI_INFO";
 inline const std::string COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION = "ohos.permission.MANAGE_WIFI_CONNECTION";
 inline const std::string COMMON_EVENT_NOT_AVAILABLE_DIALOG = "event.settings.wlan.close_not_available_dialog";

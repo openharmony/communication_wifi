@@ -335,6 +335,10 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
+    if (wifi_feature_dynamic_unload_sa) {
+      defines += [ "DYNAMIC_UNLOAD_SA" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",
@@ -529,7 +533,6 @@ if (defined(ohos_lite)) {
     configs = [ ":wifi_manager_service_header" ]
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
-    ldflags = memory_optimization_ldflags
     external_deps = [
       "ability_base:want",
       "ability_base:zuri",
@@ -550,7 +553,6 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
-      "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_native_manager_if",
       "power_manager:powermgr_client",
@@ -606,9 +608,7 @@ if (defined(ohos_lite)) {
 
     if (defined(global_parts_info) &&
         defined(global_parts_info.powermgr_power_manager)) {
-      if (wifi_feature_powermgr_support) {
-        defines += [ "HAS_POWERMGR_PART" ]
-      }
+      defines += [ "HAS_POWERMGR_PART" ]
     }
 
     if (defined(global_parts_info) &&

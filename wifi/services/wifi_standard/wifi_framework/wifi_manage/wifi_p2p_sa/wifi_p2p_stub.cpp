@@ -201,8 +201,6 @@ int WifiP2pStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParc
     HandleFuncMap::iterator iter = handleFuncMap.find(code);
     if (iter == handleFuncMap.end()) {
         WIFI_LOGD("not find function to deal, code %{public}u", code);
-        reply.WriteInt32(0);
-        reply.WriteInt32(WIFI_OPT_NOT_SUPPORTED);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     } else {
         int exception = data.ReadInt32();
@@ -419,6 +417,10 @@ void WifiP2pStub::OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, Messa
         reply.WriteString(config.GetGroupOwnerAddress());
         std::vector<GcInfo> gcInfos = config.GetClientInfoList();
         int size = gcInfos.size();
+        if (size <= 0) {
+            WIFI_LOGE("gcInfos.size is %{public}d", size);
+            return;
+        }
         reply.WriteInt32(size);
         for (int i = 0; i < size; i++) {
             reply.WriteString(gcInfos[i].mac);
@@ -780,8 +782,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
 
             if (callback_ != nullptr) {
                 for (const auto &eventName : event) {
-                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, pid,
-                        eventName, tokenId);
+                    ret = WifiInternalEventDispatcher::GetInstance().AddP2pCallback(remote, callback_, pid, eventName, tokenId);
                 }
             }
         }

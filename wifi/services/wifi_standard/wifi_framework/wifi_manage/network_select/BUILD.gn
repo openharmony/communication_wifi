@@ -129,7 +129,6 @@ if (defined(ohos_lite)) {
       "ability_runtime:app_manager",
       "hilog:libhilog",
       "init:libbegetutil",
-      "samgr:samgr_proxy",
     ]
     part_name = "wifi"
     subsystem_name = "communication"

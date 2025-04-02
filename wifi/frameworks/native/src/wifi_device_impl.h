@@ -125,7 +125,7 @@ public:
     ErrCode AddDeviceConfig(const WifiDeviceConfig &config, int &result, bool isCandidate) override;
 
     /**
-     * @Description set tx power for sar.
+     * @Description set tx power for sar
      * @param power - 1001 1002 1003······
      * @return ErrCode - operation result
      */
@@ -600,7 +600,7 @@ public:
      *
      * @param uid - target app uid
      * @param protocol - target protocol type
-     * @return enable - enable/disable dpi mark
+     * @param enable - enable/disable dpi mark
      */
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
 

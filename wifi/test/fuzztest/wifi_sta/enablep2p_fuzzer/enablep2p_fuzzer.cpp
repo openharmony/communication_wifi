@@ -114,21 +114,6 @@ bool DoSomethingDeviceStubTest(const uint8_t* data, size_t size)
     return true;
 }
 
-bool IsFeatureSupportedTest(const uint8_t* data, size_t size)
-{
-    LOGI("IsFeatureSupportedTest");
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_FEATURE_SUPPORTED),
-        datas, reply, option);
-    return true;
-}
-
 bool OnEnableSemiWifiTest(const uint8_t* data, size_t size)
 {
     LOGI("OnEnableSemiWifiTest"); // code[0x1001,0x1031]
@@ -204,7 +189,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnStartRoamToNetworkTest(data, size);
     OHOS::Wifi::OnStartConnectToUserSelectNetworkTest(data, size);
     OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
-    OHOS::Wifi::IsFeatureSupportedTest(data, size);
     return 0;
 }
 }

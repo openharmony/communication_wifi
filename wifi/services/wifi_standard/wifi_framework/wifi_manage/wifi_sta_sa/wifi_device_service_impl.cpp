@@ -323,36 +323,13 @@ bool WifiDeviceServiceImpl::CheckConfigWapi(const WifiDeviceConfig &config)
     return true;
 }
 
-static bool CheckOriSsidLength(const WifiDeviceConfig &config)
-{
-    std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
-    std::string deviceKeyMgmt = "";
-    for (auto &scanInfo : scanInfoList) {
-        scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (config.ssid == scanInfo.ssid && WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
-            LOGI("CheckOriSsidLength: oriSsid length:%{public}u", scanInfo.oriSsid.length());
-            if ((scanInfo.oriSsid.length() <= 0) || (scanInfo.oriSsid.length() > DEVICE_NAME_LENGTH)) {
-                return false;
-            }
-            break;
-        }
-    }
-    return true;
-}
-
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
-    if (config.ssid.length() <= 0 || (config.keyMgmt.length()) <= 0) {
+    if ((config.ssid.length() <= 0) || (config.ssid.length() > DEVICE_NAME_LENGTH) || (config.keyMgmt.length()) <= 0) {
         WIFI_LOGE("CheckConfigPwd: invalid ssid or keyMgmt!");
         return false;
     }
-    if (config.ssid.length() > DEVICE_NAME_LENGTH) {
-        if (!CheckOriSsidLength(config)) {
-            LOGE("CheckConfigPwd: invalid ssid");
-            return false;
-        }
-    }
+
     WIFI_LOGI("CheckConfigPwd: keyMgmt = %{public}s!", config.keyMgmt.c_str());
     if (config.keyMgmt == KEY_MGMT_EAP || config.keyMgmt == KEY_MGMT_SUITE_B_192) {
         return CheckConfigEap(config);
@@ -414,7 +391,7 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
         return false;
     }
     auto ancoWifiValue = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
-    if (!ancoWifiValue.empty() && config.callProcessName == ancoWifiValue) {
+    if (config.callProcessName == ancoWifiValue) {
         SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);
         return true;
     }
@@ -441,7 +418,7 @@ bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
     int pid = GetCallingPid();
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(uid, pid);
-    if (wifiBrokerFrameProcessName.empty() || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
         return false;
     }
     return true;
@@ -1363,9 +1340,11 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     if (VerifyGetLinkedInfofoPermission() != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_PERMISSION_DENIED;
     }
+
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
+
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
     UpdateWifiLinkInfo(info);
     return WIFI_OPT_SUCCESS;
@@ -1382,6 +1361,12 @@ ErrCode WifiDeviceServiceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &m
     }
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
+    }
+    WifiLinkedInfo info;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
+    if (info.wifiLinkType != WifiLinkType::WIFI7_EMLSR) {
+        WIFI_LOGI("GetMultiLinkedInfo failed, not emlsr connected");
+        return WIFI_OPT_FAILED;
     }
     if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkInfo, m_instId) < 0) {
         WIFI_LOGE("GetMultiLinkedInfo failed, not find valid mloLinkInfo");
@@ -2604,6 +2589,13 @@ ErrCode WifiDeviceServiceImpl::GetVoWifiDetectPeriod(int &period)
     return pService->GetVoWifiDetectPeriod(period);
 #else
     return WIFI_OPT_SUCCESS;
+#endif
+
+#ifdef DYNAMIC_UNLOAD_SA
+void WifiDeviceServiceImpl::StopUnloadStaTimer(void)
+{
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
+}
 #endif
 }
 }  // namespace Wifi

@@ -89,8 +89,6 @@ WifiErrorNo HdiSetNativeProcessCallback(void (*callback)(int));
 
 WifiErrorNo HdiWpaGetMloLinkedInfo(const char *ifName, const char *staParam, char *staData,
     uint32_t staDataLen);
-
-void ReleaseStaCallback(const char *ifName);
 #ifdef __cplusplus
 }
 #endif

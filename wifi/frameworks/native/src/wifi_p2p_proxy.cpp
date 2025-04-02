@@ -77,8 +77,7 @@ ErrCode WifiP2pProxy::EnableP2p(void)
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -1483,8 +1482,7 @@ ErrCode WifiP2pProxy::Hid2dGetRecommendChannel(const RecommendChannelRequest& re
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data;
-    MessageParcel reply;
+    MessageParcel data, reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;

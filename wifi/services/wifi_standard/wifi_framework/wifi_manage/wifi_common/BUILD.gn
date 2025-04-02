@@ -132,7 +132,6 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
@@ -178,7 +177,6 @@ if (defined(ohos_lite)) {
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_service",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
@@ -285,10 +283,6 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_network_selection) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
-    }
-
-    if (wifi_feature_with_data_report) {
-      defines += [ "WIFI_DATA_REPORT_ENABLE" ]
     }
 
     cflags = memory_optimization_cflags

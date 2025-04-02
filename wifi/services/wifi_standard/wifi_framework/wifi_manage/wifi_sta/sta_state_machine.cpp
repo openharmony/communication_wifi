@@ -77,6 +77,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_ARP_CHECK_TIME 300
 #define NETWORK 1
 #define NO_NETWORK 0
+#define DISCONNECTED_NETWORK 2
 #define WPA_DEFAULT_NETWORKID 0
 #define SELF_CURE_FAC_MAC_REASSOC 2
 #define SELF_CURE_RAND_MAC_REASSOC 3
@@ -990,6 +991,7 @@ void StaStateMachine::SeparatedState::GoInState()
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     WifiConfigCenter::GetInstance().SetMacAddress("", pStaStateMachine->m_instId);
+    WriteIsInternetHiSysEvent(DISCONNECTED_NETWORK);
     WIFI_LOGI("SeparatedState GoInState function.");
     return;
 }
@@ -2087,7 +2089,6 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     }
 #endif
     if (autoPullBrowserFlag == false) {
-        WriteIsInternetHiSysEvent(NO_NETWORK);
         HandlePortalNetworkPorcess();
         autoPullBrowserFlag = true;
     }
@@ -2097,7 +2098,7 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
     isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
 #endif
-    WriteIsInternetHiSysEvent(NETWORK);
+    WriteIsInternetHiSysEvent(NO_NETWORK);
     lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);

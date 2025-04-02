@@ -50,6 +50,8 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/net_conf",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/rdb",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
@@ -149,6 +151,7 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_saved_device_appraisal.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_service.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_state_machine.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/sta_sm_ext.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_callback_proxy.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_death_recipient.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_service_impl.cpp",
@@ -215,6 +218,11 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "time_service:time_client",
     "window_manager:libdm_lite",
   ]
+
+  if (wifi_feature_with_data_report) {
+    defines += [ "WIFI_DATA_REPORT_ENABLE" ]
+    sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report/select_network_data_report.cpp" ]
+  }
 
   part_name = "wifi"
   subsystem_name = "communication"

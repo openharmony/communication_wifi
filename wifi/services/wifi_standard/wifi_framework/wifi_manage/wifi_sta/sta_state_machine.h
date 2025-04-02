@@ -46,6 +46,10 @@
 #include "iself_cure_service.h"
 #include "wifi_common_event_helper.h"
 #include "appmgr/app_mgr_interface.h"
+#include "sta_sm_ext.h"
+#ifdef WIFI_DATA_REPORT_ENABLE
+#include "select_network_data_report.h"
+#endif
 #endif
 
 namespace OHOS {
@@ -154,6 +158,12 @@ enum PortalState {
 const std::string WPA_BSSID_ANY = "any";
 
 class StaStateMachine : public StateMachine {
+#ifndef OHOS_ARCH_LITE
+    friend class StaSMExt;
+#ifdef WIFI_DATA_REPORT_ENABLE
+    friend class WifiDataReportService;
+#endif
+#endif
     FRIEND_GTEST(StaStateMachine);
 public:
     explicit StaStateMachine(int instId = 0);
@@ -250,9 +260,9 @@ public:
 
     private:
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
-        void DealWpaLinkPasswdWrongFailEvent();
-        void DealWpaLinkFullConnectFailEvent();
-        void DealWpaLinkAssocRejectFailEvent();
+        void DealWpaLinkPasswdWrongFailEvent(InternalMessagePtr msg);
+        void DealWpaLinkFullConnectFailEvent(InternalMessagePtr msg);
+        void DealWpaLinkAssocRejectFailEvent(InternalMessagePtr msg);
         void DealWpaLinkFailEvent(InternalMessagePtr msg);
     private:
         StaStateMachine *pStaStateMachine;
@@ -1021,6 +1031,9 @@ private:
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
     ISelfCureService *selfCureService_ = nullptr;
+#ifdef WIFI_DATA_REPORT_ENABLE
+    WifiDataReportService wifiDataReportService_;
+#endif
 #endif
 
     int targetNetworkId_;

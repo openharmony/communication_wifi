@@ -232,7 +232,6 @@ private:
     void updateStaDeviceMacAddress(WifiDeviceConfig &config);
     int ProcessPermissionVerify(const std::string &appId, const std::string &packageName);
     void UpdateWifiLinkInfo(WifiLinkedInfo &info);
-    void DeliverAudioState(const WifiNetworkControlInfo& networkControlInfo);
 #ifdef DYNAMIC_UNLOAD_SA
     void StopUnloadStaTimer(void) override;
 #endif

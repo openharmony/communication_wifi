@@ -413,5 +413,41 @@ HWTEST_F(WifiConfigCenterTest, AddMacAddrPairsTest01, TestSize.Level1)
     type = WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO;
     EXPECT_EQ(WifiConfigCenter::GetInstance().AddMacAddrPairs(type, macAddrInfo, randomMacAddr), 0);
 }
+
+HWTEST_F(WifiConfigCenterTest, GetHotspotModeTest, TestSize.Level1)
+{
+    HotspotMode mode = HotspotMode::LOCAL_ONLY_SOFTAP;
+    WifiConfigCenter::GetInstance().SetHotspotMode(mode);
+    HotspotMode outMode = WifiConfigCenter::GetInstance().GetHotspotMode();
+    EXPECT_EQ(outMode, HotspotMode::LOCAL_ONLY_SOFTAP);
+}
+ 
+HWTEST_F(WifiConfigCenterTest, SetHotspotModeTest, TestSize.Level1)
+{
+    HotspotMode mode = HotspotMode::SOFTAP;
+    WifiConfigCenter::GetInstance().SetHotspotMode(mode);
+    HotspotMode outMode = WifiConfigCenter::GetInstance().GetHotspotMode();
+    EXPECT_EQ(outMode, HotspotMode::SOFTAP);
+}
+ 
+HWTEST_F(WifiConfigCenterTest, GetLocalOnlyHotspotConfigTest, TestSize.Level1)
+{
+    HotspotConfig config;
+    config.ssid = "GetLocalOnlyHotspotConfigTest";
+    WifiConfigCenter::GetInstance().SetLocalOnlyHotspotConfig(config);
+    HotspotConfig outConfig;
+    WifiConfigCenter::GetInstance().GetLocalOnlyHotspotConfig(outConfig);
+    EXPECT_EQ(outConfig.ssid, "GetLocalOnlyHotspotConfigTest");
+}
+ 
+HWTEST_F(WifiConfigCenterTest, SetLocalOnlyHotspotConfigTest, TestSize.Level1)
+{
+    HotspotConfig config;
+    config.ssid = "SetLocalOnlyHotspotConfigTest";
+    WifiConfigCenter::GetInstance().SetLocalOnlyHotspotConfig(config);
+    HotspotConfig outConfig;
+    WifiConfigCenter::GetInstance().GetLocalOnlyHotspotConfig(outConfig);
+    EXPECT_EQ(outConfig.ssid, "SetLocalOnlyHotspotConfigTest");
+}
 }  // namespace Wifi
 }  // namespace OHOS

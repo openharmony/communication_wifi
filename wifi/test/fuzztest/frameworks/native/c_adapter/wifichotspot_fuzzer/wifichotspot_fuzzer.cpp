@@ -89,6 +89,32 @@ static void DisassociateStaTest(const uint8_t* data, size_t size)
     (void)DisassociateSta(&mac, macLen);
 }
 
+static void GetHotspotModeTest(const uint8_t* data, size_t size)
+{
+    int mode = 3;  // 3: HotspotMode::LOCAL_ONLY_SOFTAP
+    (void)GetHotspotMode(mode);
+}
+ 
+static void GetLocalOnlyHotspotConfigTest(const uint8_t* data, size_t size)
+{
+    HotspotConfig localOnlyResult;
+ 
+    if (size >= sizeof(HotspotConfig)) {
+        if (memcpy_s(localOnlyResult.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
+            return;
+        }
+ 
+        if (memcpy_s(localOnlyResult.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK) {
+            return;
+        }
+        int index = 0;
+        localOnlyResult.securityType = static_cast<int>(data[index++]);
+        localOnlyResult.band = static_cast<int>(data[index++]);
+        localOnlyResult.channelNum = static_cast<int>(data[index++]);
+    }
+    (void)GetLocalOnlyHotspotConfig(&localOnlyResult);
+}
+
 namespace OHOS {
 namespace Wifi {
     bool WifiCHotSpotFuzzerTest(const uint8_t* data, size_t size)
@@ -101,6 +127,10 @@ namespace Wifi {
         GetHotspotConfigTest(data, size);
         GetStationListTest(data, size);
         DisassociateStaTest(data, size);
+        (void)EnableLocalOnlyHotspot();
+        (void)DisableLocalOnlyHotspot();
+        GetHotspotModeTest(data, size);
+        GetLocalOnlyHotspotConfigTest(data, size);
         return true;
     }
 }  // namespace Wifi

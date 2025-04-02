@@ -200,6 +200,12 @@ struct StationInfo {
     std::string ipAddr;     /* Device IP address */
 };
 
+enum class HotspotMode {
+    NONE = 0,
+    SOFTAP,
+    RPT,
+    LOCAL_ONLY_SOFTAP,
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

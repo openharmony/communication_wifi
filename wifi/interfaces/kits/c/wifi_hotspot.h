@@ -164,6 +164,43 @@ WifiErrorCode AddTxPowerInfo(int power);
  * @since 7
  */
 WifiErrorCode GetApIfaceName(char *ifaceName, int nameLen);
+
+/**
+ * @Description Enable local only Hotspot
+  *
+ * @param type - service type
+ * @return ErrCode - operation result
+ */
+WifiErrorCode EnableLocalOnlyHotspot(void);
+ 
+/**
+ * @Description Disable local only Hotspot
+ *
+ * @param type - service type
+ * @return ErrCode - operation result
+ */
+WifiErrorCode DisableLocalOnlyHotspot(void);
+ 
+/**
+ * @Description Get local only Hotspot mode
+ *
+ * @param mode - hotspot mode
+ * @return ErrCode - operation result
+ */
+WifiErrorCode GetHotspotMode(int &hotspotMode);
+ 
+/**
+ * @brief Obtains a specified local only hotspot configuration.
+ *
+ * The hotspot configuration includes the SSID, security type, and key.
+ *
+ * @param result Indicates the obtained local only hotspot configuration.
+ * @return Returns {@link WIFI_SUCCESS} if the local only hotspot configuration is obtained;
+ * returns an error code defined in
+ * {@link WifiErrorCode} otherwise.
+ * @since 7
+ */
+WifiErrorCode GetLocalOnlyHotspotConfig(HotspotConfig *result);
 #ifdef __cplusplus
 }
 #endif

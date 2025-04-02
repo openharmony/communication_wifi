@@ -344,6 +344,7 @@ typedef enum P2pGroupConfigType {
     GROUP_CONFIG_AUTH_ALG,
     GROUP_CONFIG_MODE,
     GROUP_CONFIG_DISABLED,
+    GROUP_CONFIG_CLIENTLIST,
     GROUP_CONFIG_END_POS,
 } P2pGroupConfigType;
 

@@ -471,17 +471,18 @@ bool WifiControllerMachine::ShouldUseRpt(int id)
 }
 #endif
 
-WifiControllerMachine::HotspotMode WifiControllerMachine::CalculateHotspotMode(int id)
+HotspotMode WifiControllerMachine::CalculateHotspotMode(int id)
 {
     if (hotspotMode != HotspotMode::NONE) {
         return hotspotMode;
     }
 #ifdef FEATURE_RPT_SUPPORT
+    HotspotMode mode = WifiConfigCenter::GetInstance().GetHotspotMode();
     if (softApManagers.HasAnyManager()) {
         return HotspotMode::SOFTAP;
     } else if (rptManagers.HasAnyManager()) {
         return HotspotMode::RPT;
-    } else if (ShouldUseRpt(id)) {
+    } else if (ShouldUseRpt(id) && mode != HotspotMode::LOCAL_ONLY_SOFTAP) {  // The localOnlyHotspot does not use rpt
         return HotspotMode::RPT;
     }
 #endif
@@ -500,6 +501,7 @@ void WifiControllerMachine::MakeHotspotManager(int id, bool startTimer)
     }
 #ifdef FEATURE_RPT_SUPPORT
     if (hotspotMode == HotspotMode::RPT && !rptManagers.IdExist(id)) {
+        WifiConfigCenter::GetInstance().SetHotspotMode(HotspotMode::RPT);
         MakeRptManager(RptManager::Role::ROLE_RPT, id);
         return;
     }

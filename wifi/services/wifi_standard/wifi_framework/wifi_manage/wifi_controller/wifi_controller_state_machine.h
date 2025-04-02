@@ -27,6 +27,7 @@
 #include "multi_sta_manager.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "softap_manager.h"
+#include "wifi_ap_msg.h"
 #ifdef FEATURE_RPT_SUPPORT
 #include "rpt_manager.h"
 #endif
@@ -94,14 +95,6 @@ public:
     private:
         WifiControllerMachine *pWifiControllerMachine;
     };
-
-#ifdef FEATURE_AP_SUPPORT
-    enum class HotspotMode {
-        NONE = 0,
-        SOFTAP,
-        RPT
-    };
-#endif
 public:
     ErrCode InitWifiControllerMachine();
 

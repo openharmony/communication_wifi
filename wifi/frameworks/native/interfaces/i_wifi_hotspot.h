@@ -219,6 +219,37 @@ public:
      */
     virtual ErrCode GetApIfaceName(std::string& ifaceName) = 0;
 
+    /**
+     * @Description Enable local only Hotspot
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableLocalOnlyHotspot(const ServiceType type = ServiceType::DEFAULT) = 0;
+ 
+    /**
+     * @Description Disable local only Hotspot
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DisableLocalOnlyHotspot(const ServiceType type = ServiceType::DEFAULT) = 0;
+ 
+    /**
+     * @Description Get local only Hotspot mode
+     *
+     * @param mode - hotspot mode
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetHotspotMode(HotspotMode &mode) = 0;
+ 
+    /**
+     * @Description Get the LocalOnly Hotspot Config object
+     *
+     * @param config - LocalOnly HotapotConfig object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetLocalOnlyHotspotConfig(HotspotConfig &config) = 0;
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiHotspotService");
 };

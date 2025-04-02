@@ -27,6 +27,10 @@ inline const int MAX_PSK_LENGTH = 63;
 inline const int MAC_LENGTH = 17;
 inline const int MAX_IP_LENGTH = 39;
 inline const std::string GETTING_INFO = "Unknown";
+inline const std::string LOCAL_ONLY_SOFTAP_SSID_PREFIX = "OHOS_Share_";
+inline const int LOCAL_ONLY_SOFTAP_SSID_INIT_SUFFIX = 1000;
+inline const int LOCAL_ONLY_SOFTAP_SSID_END_SUFFIX = 9999;
+inline const int LOCAL_ONLY_SOFTAP_PWD_LEN = 15;
 
 /* *****************************ApService********************************** */
 

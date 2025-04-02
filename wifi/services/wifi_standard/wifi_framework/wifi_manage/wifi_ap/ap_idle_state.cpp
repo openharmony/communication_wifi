@@ -17,6 +17,7 @@
 #include "ap_macro.h"
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApIdleState");
 namespace OHOS {
@@ -31,6 +32,7 @@ ApIdleState::~ApIdleState()
 void ApIdleState::GoInState()
 {
     WIFI_LOGI("Instance %{public}d %{public}s  GoInState.", m_id, GetStateName().c_str());
+    WifiConfigCenter::GetInstance().SetHotspotMode(HotspotMode::NONE);
 }
 
 void ApIdleState::GoOutState()

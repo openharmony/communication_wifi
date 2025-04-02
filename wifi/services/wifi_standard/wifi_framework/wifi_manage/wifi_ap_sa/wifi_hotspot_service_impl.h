@@ -81,6 +81,14 @@ public:
     ErrCode SetHotspotConfig(const HotspotConfig &config) override;
 
     /**
+     * @Description Get the LocalOnly Hotspot State object
+     *
+     * @param config - Current LocalOnly hotspot configuration
+     * @return ErrCode - operation result
+     */
+    ErrCode GetLocalOnlyHotspotConfig(HotspotConfig &config) override;
+
+    /**
      * @Description Set the idel timeout of Hotspot
      *
      * @param time -input time,
@@ -117,6 +125,30 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+
+    /**
+     * @Description Enable local only Hotspot
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableLocalOnlyHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+ 
+    /**
+     * @Description Disable local only Hotspot
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    ErrCode DisableLocalOnlyHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+ 
+    /**
+     * @Description Get local only Hotspot mode
+     *
+     * @param mode - hotspot mode
+     * @return ErrCode - operation result
+     */
+    ErrCode GetHotspotMode(HotspotMode &mode) override;
 
     /**
      * @Description Get the Block Lists object

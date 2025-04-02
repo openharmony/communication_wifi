@@ -22,6 +22,7 @@
 #include "wifi_logger.h"
 #include "wifi_manager.h"
 #include "wifi_settings.h"
+#include "wifi_ap_msg.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -380,7 +381,6 @@ public:
 
     void CalculateHotspotModeTest()
     {
-        using HotspotMode = WifiControllerMachine::HotspotMode;
         pWifiControllerMachine->hotspotMode = HotspotMode::NONE;
         pWifiControllerMachine->CalculateHotspotMode(0);
 

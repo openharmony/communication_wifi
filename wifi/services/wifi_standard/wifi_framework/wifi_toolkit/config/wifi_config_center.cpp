@@ -1534,5 +1534,26 @@ bool WifiConfigCenter::GetAutoConnect()
 {
     return autoConnectEnable_.load();
 }
+
+HotspotMode WifiConfigCenter::GetHotspotMode()
+{
+    return hotspotMode_;
+}
+ 
+void WifiConfigCenter::SetHotspotMode(const HotspotMode &mode)
+{
+    hotspotMode_ = mode;
+}
+ 
+int WifiConfigCenter::GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig)
+{
+    hotspotConfig = localOnlyHotspotConfig_;
+    return 0;
+}
+ 
+void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotConfig)
+{
+    localOnlyHotspotConfig_ = hotspotConfig;
+}
 }  // namespace Wifi
 }  // namespace OHOS

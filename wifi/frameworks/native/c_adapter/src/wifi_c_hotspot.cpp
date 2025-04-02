@@ -252,3 +252,42 @@ WifiErrorCode GetApIfaceName(char *ifaceName, int nameLen)
     }
     return GetCErrorCode(ret);
 }
+
+NO_SANITIZE("cfi") WifiErrorCode EnableLocalOnlyHotspot()
+{
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(hotspotPtr->EnableLocalOnlyHotspot());
+}
+ 
+NO_SANITIZE("cfi") WifiErrorCode DisableLocalOnlyHotspot()
+{
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(hotspotPtr->DisableLocalOnlyHotspot());
+}
+ 
+NO_SANITIZE("cfi") WifiErrorCode GetHotspotMode(int &hotspotMode)
+{
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    OHOS::Wifi::HotspotMode mode;
+    OHOS::Wifi::ErrCode ret = hotspotPtr->GetHotspotMode(mode);
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        hotspotMode = static_cast<int>(mode);
+    }
+    return GetCErrorCode(ret);
+}
+ 
+NO_SANITIZE("cfi") WifiErrorCode GetLocalOnlyHotspotConfig(HotspotConfig *result)
+{
+    CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(result, ERROR_WIFI_INVALID_ARGS);
+    OHOS::Wifi::HotspotConfig localOnlyHotspotConfig;
+    OHOS::Wifi::ErrCode ret = hotspotPtr->GetLocalOnlyHotspotConfig(localOnlyHotspotConfig);
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        WifiErrorCode retValue = GetHotspotConfigFromCpp(localOnlyHotspotConfig, result);
+        if (retValue != WIFI_SUCCESS) {
+            WIFI_LOGE("Get localOnly hotspot config from cpp error!");
+            return retValue;
+        }
+    }
+    return GetCErrorCode(ret);
+}

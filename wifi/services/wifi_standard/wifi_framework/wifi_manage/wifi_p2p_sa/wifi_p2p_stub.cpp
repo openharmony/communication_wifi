@@ -418,7 +418,7 @@ void WifiP2pStub::OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, Messa
         reply.WriteBool(config.IsGroupOwner());
         reply.WriteString(config.GetGroupOwnerAddress());
         std::vector<GcInfo> gcInfos = config.GetClientInfoList();
-        int size = gcInfos.size();
+        int size = static_cast<int>(gcInfos.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; i++) {
             reply.WriteString(gcInfos[i].mac);

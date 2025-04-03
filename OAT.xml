@@ -44,6 +44,8 @@
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
                 <filteritem type="filename" name="*.png" desc="Image for markdown doc"/>
+                <filteritem type="filename" name="*.jpg" desc="Image for markdown doc"/>
+                <filteritem type="filename" name="*.ico" desc="Image for markdown doc"/>
             </filefilter>
         </filefilterlist>
         <licensematcherlist>

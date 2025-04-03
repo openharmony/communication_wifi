@@ -84,7 +84,7 @@ void WifiP2pStub::InitHandleMapEx()
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNEL_LIST)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply,
         MessageOption &option) { OnHid2dGetChannelListFor5G(code, data, reply, option); };
-    return;
+    InitHandleMapExPart3();
 }
 
 void WifiP2pStub::InitHandleMapExPart3()

@@ -1607,6 +1607,16 @@ WifiErrorNo WifiHdiWpaClient::P2pReject(const std::string &mac)
 {
     return HdiP2pReject(mac.c_str());
 }
+
+WifiErrorNo WifiHdiWpaClient::SetMiracastSinkConfig(const std::string& config)
+{
+    char configBuf[MAX_CMD_BUFFER_SIZE];
+    if (strncpy_s(configBuf, sizeof(configBuf), config.c_str(), config.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return HdiSetMiracastSinkConfig(configBuf);
+}
 } // namespace Wifi
 }  // namespace OHOS
 #endif

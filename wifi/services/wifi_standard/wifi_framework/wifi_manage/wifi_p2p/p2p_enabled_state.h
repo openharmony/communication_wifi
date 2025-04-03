@@ -277,6 +277,14 @@ private:
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessChrReport(InternalMessagePtr msg) const;
+
+    /**
+     * @Description Set miracast sink config
+     *
+     * @param config - miracast config
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessSetMiracastSinkConfig(InternalMessagePtr msg) const;
 private:
     void P2pConfigInitExt(bool &result);
 

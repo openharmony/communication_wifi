@@ -1317,4 +1317,26 @@ WifiErrorNo HdiP2pReject(const char *bssid)
     LOGI("HdiP2pReject success.");
     return WIFI_HAL_OPT_OK;
 }
+
+WifiErrorNo HdiSetMiracastSinkConfig(const char *config)
+{
+    LOGI("HdiSetMiracastSinkConfig enter");
+    pthread_mutex_lock(GetWpaObjMutex());
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiSetMiracastSinkConfig: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, GetHdiP2pIfaceName(), P2P_SET_MIRACAST_SINK_CONFIG, 0, config);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiSetMiracastSinkConfig: send failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("HdiSetMiracastSinkConfig success.");
+    return WIFI_HAL_OPT_OK;
+}
 #endif

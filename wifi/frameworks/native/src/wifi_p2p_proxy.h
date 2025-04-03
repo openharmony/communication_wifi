@@ -407,6 +407,14 @@ public:
      */
     ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) override;
 
+    /**
+     * @Description Set miracast sink config
+     *
+     * @param config - miracast config
+     * @return ErrCode - operation result
+     */
+    ErrCode SetMiracastSinkConfig(const std::string& config) override;
+
 private:
     class WifiDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

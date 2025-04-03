@@ -357,6 +357,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual void NotifyWscDialogConfirmResult(bool isAccept) = 0;
+
+    /**
+     * @Description Set miracast sink config
+     *
+     * @param config - miracast config
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetMiracastSinkConfig(const std::string& config) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

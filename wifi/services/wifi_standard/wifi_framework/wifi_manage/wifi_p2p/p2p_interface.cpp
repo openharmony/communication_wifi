@@ -287,5 +287,10 @@ void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept)
 {
     return p2pService.NotifyWscDialogConfirmResult(isAccept);
 }
+
+ErrCode P2pInterface::SetMiracastSinkConfig(const std::string& config)
+{
+    return p2pService.SetMiracastSinkConfig(config);
+}
 }  // namespace Wifi
 }  // namespace OHOS

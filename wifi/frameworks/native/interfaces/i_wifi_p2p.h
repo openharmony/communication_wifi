@@ -412,6 +412,14 @@ public:
      */
     virtual ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) = 0;
 
+    /**
+     * @Description Set miracast sink config
+     *
+     * @param config - miracast config
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetMiracastSinkConfig(const std::string& config) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiP2pService");
 };

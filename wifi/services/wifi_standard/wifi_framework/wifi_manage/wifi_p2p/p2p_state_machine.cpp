@@ -927,6 +927,10 @@ void P2pStateMachine::DhcpResultNotify::OnDhcpServerSuccess(const char *ifname,
 {
     WIFI_LOGI("Dhcp notify ServerSuccess. ifname:%s", ifname);
     std::vector<GcInfo> gcInfos;
+    if (size < 0 || size > MAX_CLIENT_SIZE) {
+        WIFI_LOGE("size is invaild");
+        return;
+    }
     for (size_t i = 0; i < size; i++) {
         GcInfo gcInfo;
         gcInfo.mac = stationInfos[i].macAddr;

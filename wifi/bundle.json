@@ -120,6 +120,7 @@
                 "jsoncpp",
                 "libxml2",
                 "asset",
+                "runtime_core",
                 "icu",
                 "window_manager"
             ],

@@ -122,7 +122,7 @@ bool DualBandRdbHelper::QueryRelationInfo(std::string &bssid, std::vector<Relati
         }
     }
     resultSet->Close();
-    WIFI_LOGE("QueryRelationInfo, relationInfos size(%{public}u)", relationInfos.size());
+    WIFI_LOGE("QueryRelationInfo, relationInfos size(%{public}zu)", relationInfos.size());
     return true;
 }
 bool DualBandRdbHelper::DeleteAll(std::unordered_set<std::string> &bssids)

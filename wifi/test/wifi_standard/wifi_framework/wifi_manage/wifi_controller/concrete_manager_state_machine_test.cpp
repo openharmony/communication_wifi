@@ -52,7 +52,6 @@ public:
     virtual void SetUp()
     {
         pConcreteManagerMachine = std::make_unique<ConcreteMangerMachine>();
-        pWifiTogglerManager = std::make_unique<WifiTogglerManager>();
         pConcreteManagerMachine->InitConcreteMangerMachine();
         mCb.onStartFailure = DealConcreteStartFailure;
         mCb.onStopped = DealConcreteStop;
@@ -82,7 +81,6 @@ public:
     }
 
     std::unique_ptr<ConcreteMangerMachine> pConcreteManagerMachine;
-    std::unique_ptr<WifiTogglerManager> pWifiTogglerManager;
     ConcreteModeCallback mCb;
 
     void DefaultStateGoInStateSuccess()

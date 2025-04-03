@@ -54,17 +54,7 @@ HWTEST_F(WifiNetAgentTest, RegisterNetSupplier_ReturnsFalseWhenRegistrationFails
     EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplier(instId));
 }
 
-HWTEST_F(WifiNetAgentTest, RegisterNetConnObserverTest_ReturnsFalseWhenRegistrationFails, TestSize.Level1)
-{
-    EXPECT_TRUE(WifiNetAgent::GetInstance().RegisterNetConnObserver(INSTID_WLAN0));
-}
-
-HWTEST_F(WifiNetAgentTest, RegisterNetConnObserverTest_ReturnTrueWhenRegistrationSuccess, TestSize.Level1)
-{
-    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetConnObserver(INSTID_WLAN1));
-}
-
-HWTEST_F(WifiNetAgentTest, RegisterNetSupplierCallback_ReturnFalseWhenRegistrationFails, TestSize.Level1)
+HWTEST_F(WifiNetAgentTest, RegisterNetSupplierCallback_ReturnsFalseWhenRegistrationFails, TestSize.Level1)
 {
     int instId = 0;
     EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplierCallback(instId));
@@ -284,13 +274,6 @@ HWTEST_F(WifiNetAgentTest, ReleaseNetworkTest001, TestSize.Level1)
     std::string ident = "";
     std::set<NetManagerStandard::NetCap> netCaps;
     EXPECT_EQ(netConnCallback.ReleaseNetwork(ident, netCaps), 0);
-}
-
-HWTEST_F(WifiNetAgentTest, NetAvailableTest001, TestSize.Level1)
-{
-    WifiNetAgent::NetInfoObserver netConnCallback;
-    sptr<NetManagerStandard::NetHandle> netHandle = new NetManagerStandard::NetHandle();
-    EXPECT_EQ(netConnCallback.NetAvailable(netHandle), 0);
 }
 
 HWTEST_F(WifiNetAgentTest, LogNetCapsTest001, TestSize.Level1)

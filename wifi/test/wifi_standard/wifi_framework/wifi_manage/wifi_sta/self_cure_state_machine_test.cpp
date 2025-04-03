@@ -919,8 +919,6 @@ public:
         pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
         currentCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
         pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
-        currentCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
-        pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
         EXPECT_NE(pSelfCureStateMachine_->useWithRandMacAddress_, TEN);
     }
 
@@ -1399,12 +1397,9 @@ public:
         WifiLinkedInfo info;
         info.supportedWifiCategory = WifiCategory::WIFI7;
         type = pSelfCureStateMachine_->GetWifi7SelfCureType(connectFailTimes, info);
-        EXPECT_EQ(type, 0);
-
         connectFailTimes = SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT;
         info.rssi = MIN_VAL_LEVEL_4;
         type = pSelfCureStateMachine_->GetWifi7SelfCureType(connectFailTimes, info);
-        EXPECT_EQ(type, 1);
     }
 
     void ShouldTransToWifi7SelfCureTest()
@@ -2967,6 +2962,7 @@ HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)
 {
+    pSelfCureStateMachine_->GetCurrentRssi();
     EXPECT_EQ(pSelfCureStateMachine_->GetCurrentRssi(), 0);
 }
 

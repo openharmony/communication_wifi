@@ -213,7 +213,6 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
-      "samgr:samgr_proxy",
     ]
 
     if (wifi_feature_with_local_random_mac) {

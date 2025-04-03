@@ -40,7 +40,6 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiP2pServiceImpl::instanceLock;
-std::mutex WifiP2pServiceImpl::g_p2pMutex;
 sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiP2pServiceImpl::GetInstance().GetRefPtr());
 
@@ -97,7 +96,6 @@ void WifiP2pServiceImpl::OnStop()
 
 bool WifiP2pServiceImpl::Init()
 {
-    std::lock_guard<std::mutex> lock(g_p2pMutex);
     if (!mPublishFlag) {
         bool ret = Publish(WifiP2pServiceImpl::GetInstance());
         if (!ret) {
@@ -279,10 +277,8 @@ ErrCode WifiP2pServiceImpl::StopDiscoverDevices(void)
 ErrCode WifiP2pServiceImpl::DiscoverServices(void)
 {
     WIFI_LOGI("DiscoverServices");
-    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
-        WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DiscoverServices:VerifyGetWifiLocalMacPermission or"
-            "VerifyGetWifiPeersPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("DiscoverServices:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -326,10 +322,8 @@ ErrCode WifiP2pServiceImpl::StopDiscoverServices(void)
 ErrCode WifiP2pServiceImpl::RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request)
 {
     WIFI_LOGI("RequestService");
-    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
-        WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("RequestService:VerifyGetWifiLocalMacPermission or"
-            "VerifyGetWifiPeersMacPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("RequestService:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
@@ -1204,12 +1198,12 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
 ErrCode WifiP2pServiceImpl::Hid2dRemoveGcGroup(const std::string& gcIfName)
 {
     WIFI_LOGI("Hid2dRemoveGcGroup:, gcIfName: %{public}s", gcIfName.c_str());
-    // TO Imple: delete by interface
     int callingUid = GetCallingUid();
     if (callingUid != SOFT_BUS_SERVICE_UID) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    // TO Imple: delete by interface
     return RemoveGroup();
 }
 
@@ -1221,10 +1215,8 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermission() == PERMISSION_DENIED ||
-        WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("QueryP2pGroups:VerifyGetWifiLocalMacPermission or"
-            "VerifyGetWifiPeersMacPermission PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyGetWifiDirectDevicePermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("Hid2dConnect:VerifyGetWifiDirectDevicePermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);
@@ -1238,12 +1230,6 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
-    }
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.bssid == config.GetBssid()) {
-        WIFI_LOGI("Connect mac sta has connected");
-        return WIFI_OPT_STA_AND_P2P_MAC_SAME;
     }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));

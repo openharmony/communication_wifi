@@ -353,7 +353,7 @@ public:
 
     void StartConnectToNetworkFail1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).WillRepeatedly(Return(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).WillRepeatedly(Return(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         EXPECT_TRUE(pStaStateMachine->StartConnectToNetwork(0, "wifitest/123", 0) == WIFI_OPT_FAILED);
@@ -654,9 +654,7 @@ public:
 
     void GetIpStateStateExeMsgFail()
     {
-        EXPECT_CALL(BlockConnectService::GetInstance(),
-        UpdateNetworkSelectStatus(_, _))
-        .WillRepeatedly(Return(-1));
+        EXPECT_CALL(BlockConnectService::GetInstance(),UpdateNetworkSelectStatus(_, _)).WillRepeatedly(Return(-1));
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         StaStateMachine staStateMachine;
         pStaStateMachine->pGetIpState->pStaStateMachine = &staStateMachine;
@@ -771,6 +769,15 @@ public:
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
     }
 
+    void HandleNetCheckResultSuccess5()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
+    }
+
     void HandleNetCheckResultFail()
     {
         pStaStateMachine->linkedInfo.connState = ConnState::DISCONNECTED;
@@ -883,12 +890,12 @@ public:
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig8), Return(0)));
         pStaStateMachine->TryModifyPortalAttribute(SystemNetWorkState::NETWORK_IS_PORTAL);
     }
- 
+
     void TestChangePortalAttribute()
     {
         WifiDeviceConfig config1;
         pStaStateMachine->ChangePortalAttribute(false, config1);
- 
+
         WifiDeviceConfig config2;
         pStaStateMachine->ChangePortalAttribute(true, config2);
     }
@@ -964,7 +971,7 @@ public:
         pStaStateMachine->pLinkedState->CheckIfRestoreWifi();
         EXPECT_NE(pStaStateMachine->linkedInfo.networkId, TEN);
     }
- 
+
     void ApRoamingStateGoInStateSuccess()
     {
         pStaStateMachine->pApRoamingState->GoInState();
@@ -1153,7 +1160,7 @@ public:
         pStaStateMachine->foldStatus_ = EXPAND;
         pStaStateMachine->pLinkedState->halfFoldRssi_ = halfFoldRssiValue;
         pStaStateMachine->pLinkedState->UpdateExpandOffset();
-        EXPECT_NE(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_DEFAULT);
+        EXPECT_EQ(pStaStateMachine->pLinkedState->rssiOffset_, RSSI_OFFSET_DEFAULT);
     }
 
     void UpdateExpandOffsetDefault()
@@ -1235,9 +1242,8 @@ public:
         pStaStateMachine->OnNetManagerRestart();
     }
 
-    void ReUpdateNetLinkInfoTest()
+    void OnBssidChangedEventSuccess()
     {
-        pStaStateMachine->linkedInfo.detailedState = DetailedState::NOTWORKING;
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->linkedInfo.bssid = RANDOMMAC_BSSID;
         pStaStateMachine->linkedInfo.ssid = RANDOMMAC_SSID;
@@ -1416,7 +1422,6 @@ public:
         pStaStateMachine->InvokeOnStaRssiLevelChanged(level);
         EXPECT_NE(pStaStateMachine->linkedInfo.networkId, TEN);
     }
-
     void DealHiLinkDataToWpaFailTest()
     {
         pStaStateMachine->DealHiLinkDataToWpa(nullptr);
@@ -1742,15 +1747,15 @@ public:
             .WillRepeatedly(Return(0));
     }
 
-    void CloseNoInternetDialogTest()
-    {
-        pStaStateMachine-> CloseNoInternetDialog();
-    }
-
     void UpdateLinkedBssidTest()
     {
         std::string bssid = "11:22:33:44:55:66";
         pStaStateMachine->UpdateLinkedBssid(bssid);
+    }
+
+    void CloseNoInternetDialogTest()
+    {
+        pStaStateMachine-> CloseNoInternetDialog();
     }
 
     void AudioStateNotifyTest()
@@ -1828,7 +1833,6 @@ HWTEST_F(StaStateMachineTest, DealConnectTimeOutCmd, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, InitStateGoInStateSuccess, TestSize.Level1)
 {
     InitStateGoInStateSuccess();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
@@ -2179,6 +2183,11 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess4, TestSize.Level1)
     HandleNetCheckResultSuccess4();
 }
 
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess5, TestSize.Level1)
+{
+    HandleNetCheckResultSuccess5();
+}
+
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
 {
     HandleNetCheckResultFail();
@@ -2197,7 +2206,7 @@ HWTEST_F(StaStateMachineTest, TestTryModifyPortalAttribute, TestSize.Level1)
     TestTryModifyPortalAttribute3();
     TestTryModifyPortalAttribute4();
 }
- 
+
 HWTEST_F(StaStateMachineTest, TestChangePortalAttribute, TestSize.Level1)
 {
     TestChangePortalAttribute();
@@ -2343,11 +2352,6 @@ HWTEST_F(StaStateMachineTest, DealReConnectCmdFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealReConnectCmdSuccess, TestSize.Level1)
 {
     DealReConnectCmdSuccess();
-}
-
-HWTEST_F(StaStateMachineTest, ReUpdateNetLinkInfoTest, TestSize.Level1)
-{
-    ReUpdateNetLinkInfoTest();
 }
 
 /**
@@ -2638,7 +2642,6 @@ HWTEST_F(StaStateMachineTest, ReplaceEmptyDnsTest, TestSize.Level1)
     ReplaceEmptyDnsTest();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
-
 
 HWTEST_F(StaStateMachineTest, ApLinkedStateExeMsgSuccess3, TestSize.Level1)
 {

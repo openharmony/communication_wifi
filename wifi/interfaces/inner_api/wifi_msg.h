@@ -984,6 +984,7 @@ enum class WapiPskType {
     WAPI_PSK_HEX = 1,
 };
 
+
 typedef struct {
     std::string ifName;
     int scene;
@@ -1005,14 +1006,11 @@ enum class WifiSelfcureType {
     TCP_RX_ABNORMAL,
     ROAMING_ABNORMAL,
     GATEWAY_ABNORMAL,
-    RAND_MAC_REASSOC_SELFCURE,
-    MULTI_GATEWAY_SELFCURE,
     DNS_SELFCURE_SUCC,
     STATIC_IP_SELFCURE_SUCC,
     REASSOC_SELFCURE_SUCC,
     RESET_SELFCURE_SUCC,
-    RAND_MAC_REASSOC_SELFCURE_SUCC,
-    MULTI_GATEWAY_SELFCURE_SUCC,
+    REDHCP_SELFCURE_SUCC,
 };
 
 enum class Wifi3VapConflictType {
@@ -1072,6 +1070,7 @@ struct WifiSignalPollInfo {
     ~WifiSignalPollInfo()
     {}
 };
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -35,7 +35,7 @@ public:
         const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0) = 0;
     virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
     virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
-    virtual int GetPackageInfoMap(std::map<std::string, std::vector<PackageInfo>> &filterMap) = 0;
+    virtual int GetPackageFilterMap(std::map<std::string, std::vector<std::string>> &filterMap) = 0;
     virtual int GetSignalLevel(const int &rssi, const int &band, int instId = 0) = 0;
     virtual int SyncDeviceConfig() = 0;
     virtual int RemoveDevice(int networkId) = 0;
@@ -61,7 +61,7 @@ public:
         WifiDeviceConfig &config, int));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
-    MOCK_METHOD1(GetPackageInfoMap,  int(std::map<std::string, std::vector<PackageInfo>> &filterMap));
+    MOCK_METHOD1(GetPackageFilterMap,  int(std::map<std::string, std::vector<std::string>> &filterMap));
     MOCK_METHOD3(GetSignalLevel, int(const int &rssi, const int &band, int));
     MOCK_METHOD0(SyncDeviceConfig, int());
     MOCK_METHOD1(RemoveDevice, int(int networkId));

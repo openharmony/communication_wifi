@@ -27,7 +27,6 @@
         </policylist>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
-                <filteritem type="filename" name="hvigorfile.ts" desc="Build Files"/>
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility, license header policies">
                 <filteritem type="filename" name="*.cfg" desc="The JSON format does not support comments."/>
@@ -45,6 +44,8 @@
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
                 <filteritem type="filename" name="*.png" desc="Image for markdown doc"/>
+                <filteritem type="filename" name="*.jpg" desc="Image for markdown doc"/>
+                <filteritem type="filename" name="*.ico" desc="Image for markdown doc"/>
             </filefilter>
         </filefilterlist>
         <licensematcherlist>

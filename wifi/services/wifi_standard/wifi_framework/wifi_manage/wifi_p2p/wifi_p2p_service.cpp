@@ -30,9 +30,10 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 
 namespace OHOS {
 namespace Wifi {
-#define COUNTRY_CODE_JAPAN_L "jp"
-#define COUNTRY_CODE_JAPAN_C "JP"
+#define COUNTRY_CODE_JAPAN_L      "jp"
+#define COUNTRY_CODE_JAPAN_C      "JP"
 #define SOFT_BUS_UID 1024
+
 WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pGroupManager &setGroupMgr, WifiP2pServiceManager &setSvrMgr)
     : p2pStateMachine(p2pStateMachine),
@@ -431,9 +432,18 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     const int COMMON_USING_2G_CHANNEL = 6;
     std::string countryCode;
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
-    if (countryCode == COUNTRY_CODE_JAPAN_C || countryCode == COUNTRY_CODE_JAPAN_L) {
+    if (countryCode == COUNTRY_CODE_JAPAN_L || countryCode == COUNTRY_CODE_JAPAN_C) {
         return COMMON_USING_2G_CHANNEL;
     }
+    int frequency;
+    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().GetChba0Freq(frequency);
+    if (ret == WIFI_HAL_OPT_OK && frequency != 0) {
+        WIFI_LOGI("P2pGetChba0Freq success, frequency = %{public}d", frequency);
+        int channel = FrequencyToChannel(frequency);
+        WIFI_LOGI("Recommend hml channel: %{public}d", channel);
+        return channel;
+    }
+
     int channel = 0; // 0 is invalid channel
     int COMMON_USING_5G_CHANNEL = 149;
     WifiLinkedInfo linkedInfo;

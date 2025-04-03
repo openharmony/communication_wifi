@@ -145,7 +145,10 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
-    defines = [ "FEATURE_STA_SUPPORT" ]
+    defines = [
+      "FEATURE_STA_SUPPORT",
+      "WIFI_CONFIG_UPDATE",
+    ]
 
     if (wifi_feature_with_local_random_mac) {
       defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
@@ -192,7 +195,6 @@ if (defined(ohos_lite)) {
       "ipc:ipc_core",
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
-      "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_stats_manager_if",
       "safwk:system_ability_fwk",

@@ -97,14 +97,6 @@ static int GetInstId(const char *ifaceName)
     return inst;
 }
 
-void ReleaseStaCallback(const char *ifName)
-{
-    int instId = GetInstId(ifName);
-    StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaStaCallbackObj[instId]);
-    free(g_hdiWpaStaCallbackObj[instId]);
-    g_hdiWpaStaCallbackObj[instId] = NULL;
-}
-
 static WifiErrorNo RegisterEventCallback(const char *ifaceName)
 {
     LOGI("RegisterEventCallback enter! ifaceName = %{public}s", ifaceName);
@@ -132,6 +124,40 @@ static WifiErrorNo RegisterEventCallback(const char *ifaceName)
 
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterEventCallback success.");
+    return WIFI_HAL_OPT_OK;
+}
+
+static WifiErrorNo UnRegisterEventCallback(const char *ifaceName)
+{
+    LOGI("UnRegisterEventCallback enter! ifaceName = %{public}s", ifaceName);
+    if (ifaceName == NULL) {
+        LOGE("UnRegisterEventCallback ifaceName is null");
+        return WIFI_HAL_OPT_FAILED;
+    }
+    pthread_mutex_lock(GetWpaObjMutex());
+    int instId = GetInstId(ifaceName);
+    LOGI("UnRegisterEventCallback enter! instId = %{public}d", instId);
+    if (g_hdiWpaStaCallbackObj[instId] != NULL) {
+        struct IWpaInterface *wpaObj = GetWpaInterface();
+        if (wpaObj == NULL) {
+            pthread_mutex_unlock(GetWpaObjMutex());
+            LOGE("UnRegisterEventCallback: wpaObj is NULL");
+            return WIFI_HAL_OPT_FAILED;
+        }
+
+        int32_t result = wpaObj->UnregisterWpaEventCallback(wpaObj, g_hdiWpaStaCallbackObj[instId], ifaceName);
+        if (result != HDF_SUCCESS) {
+            pthread_mutex_unlock(GetWpaObjMutex());
+            LOGE("UnRegisterEventCallback: UnregisterEventCallback failed result:%{public}d", result);
+            return WIFI_HAL_OPT_FAILED;
+        }
+        StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaStaCallbackObj[instId]);
+        free(g_hdiWpaStaCallbackObj[instId]);
+        g_hdiWpaStaCallbackObj[instId] = NULL;
+    }
+
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("UnRegisterEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
 
@@ -255,6 +281,10 @@ static WifiErrorNo HdiWpaStaStopWifi(int instId)
             LOGE("HdiWpaStop: HdiRemoveWpaIface failed");
             return WIFI_HAL_OPT_FAILED;
         }
+        if (UnRegisterEventCallback(ifaceName) != WIFI_HAL_OPT_OK) {
+            LOGE("HdiWpaStop: UnRegisterEventCallback failed");
+            return WIFI_HAL_OPT_FAILED;
+        }
         ClearHdiStaIfaceName(instId);
         LOGI("HdiWpaStaStopWifi success, instId = %{public}d, ifaceName = %{public}s", instId, ifaceName);
     }
@@ -277,6 +307,10 @@ WifiErrorNo HdiWpaStaStop(int instId)
         }
         if (HdiRemoveWpaIface(ifaceName) != WIFI_HAL_OPT_OK) {
             LOGE("HdiWpaStaStop: HdiRemoveWpaStaIface failed!");
+            return WIFI_HAL_OPT_FAILED;
+        }
+        if (UnRegisterEventCallback(ifaceName) != WIFI_HAL_OPT_OK) {
+            LOGE("HdiWpaStaStop: UnRegisterEventCallback failed!");
             return WIFI_HAL_OPT_FAILED;
         }
         ClearHdiStaIfaceName(instId);
@@ -506,18 +540,45 @@ WifiErrorNo HdiWpaStaScan()
     return WIFI_HAL_OPT_OK;
 }
 
+static bool GetScanData(unsigned char *resultBuff, ScanInfo *results, int *size)
+{
+    char *savedPtr = NULL;
+    strtok_r((char *)resultBuff, "\n", &savedPtr);
+    char *token = strtok_r(NULL, "\n", &savedPtr);
+    int j = 0;
+    while (token != NULL) {
+        if (j >= *size) {
+            *size = j;
+            LOGE("GetScanData: get scan info full!");
+            return false;
+        }
+        int length = strlen(token);
+        if (length <= 0 || DelScanInfoLine(&results[j], token, length)) {
+            LOGE("GetScanData: parse scan results line failed!");
+            break;
+        }
+        LOGI("-->>%{public}2d %{private}s %{private}s %{public}d %{public}d %{public}d %{public}d \
+         %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d",
+             j, results[j].ssid, results[j].bssid, results[j].freq, results[j].siglv,
+             results[j].centerFrequency0, results[j].centerFrequency1, results[j].channelWidth,
+             results[j].isVhtInfoExist, results[j].isHtInfoExist, results[j].isHeInfoExist, results[j].isErpExist,
+             results[j].maxRates, results[j].extMaxRates);
+        token = strtok_r(NULL, "\n", &savedPtr);
+        j++;
+    }
+	*size = j;
+	return true;
+}
+
 ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
 {
     LOGI("HdiWpaStaGetScanInfos enter");
-    if (ifaceName == NULL || size == NULL) {
-        LOGE("HdiWpaStaGetScanInfos ifaceName is null");
+    if (ifaceName == NULL || size == NULL || *size <= 0) {
+        LOGE("HdiWpaStaGetScanInfos: invalid parameter!");
         return NULL;
     }
 
-    ScanInfo *results = NULL;
-    if (*size > 0) {
-        results = (ScanInfo *)calloc(*size, sizeof(ScanInfo));
-    }
+    ScanInfo *results = (ScanInfo *)calloc(*size, sizeof(ScanInfo));
     if (results == NULL) {
         LOGE("HdiWpaStaGetScanInfos: calloc scanInfo failed!");
         return NULL;
@@ -534,62 +595,31 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
     pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {
-        free(results);
-        results = NULL;
-        free(resultBuff);
-        resultBuff = NULL;
         LOGE("HdiWpaStaGetScanInfos: wpaObj is NULL");
-        pthread_mutex_unlock(GetWpaObjMutex());
-        return NULL;
+        goto EXIT;
     }
 
-    int32_t result = wpaObj->ScanResult(wpaObj, ifaceName, resultBuff, &resultBuffLen);
-    if (result != HDF_SUCCESS) {
-        free(results);
-        results = NULL;
-        free(resultBuff);
-        resultBuff = NULL;
-        LOGE("HdiWpaStaGetScanInfos: ScanResult failed result:%{public}d", result);
-        pthread_mutex_unlock(GetWpaObjMutex());
-        return NULL;
+    if (wpaObj->ScanResult(wpaObj, ifaceName, resultBuff, &resultBuffLen) != HDF_SUCCESS) {
+        LOGE("HdiWpaStaGetScanInfos: ScanResult failed");
+        goto EXIT;
     }
 
-    char *savedPtr = NULL;
-    strtok_r((char *)resultBuff, "\n", &savedPtr);
-    char *token = strtok_r(NULL, "\n", &savedPtr);
-    int j = 0;
-    while (token != NULL) {
-        if (j >= *size) {
-            *size = j;
-            LOGE("HdiWpaStaGetScanInfos: get scan info full!");
-            free(results);
-            free(resultBuff);
-            pthread_mutex_unlock(GetWpaObjMutex());
-            return NULL;
-        }
-        int length = strlen(token);
-        if (length <= 0) {
-            break;
-        }
-        if (DelScanInfoLine(&results[j], token, length)) {
-            LOGE("HdiWpaStaGetScanInfos: parse scan results line failed!");
-            break;
-        }
-        LOGI("-->>%{public}2d %{private}s %{private}s %{public}d %{public}d %{public}d %{public}d \
-         %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d",
-             j, results[j].ssid, results[j].bssid, results[j].freq, results[j].siglv,
-             results[j].centerFrequency0, results[j].centerFrequency1, results[j].channelWidth,
-             results[j].isVhtInfoExist, results[j].isHtInfoExist, results[j].isHeInfoExist, results[j].isErpExist,
-             results[j].maxRates, results[j].extMaxRates);
-        token = strtok_r(NULL, "\n", &savedPtr);
-        j++;
-    }
+    if (GetScanData(resultBuff, results, size) == false) {
+        goto EXIT;
+	}
 
-    *size = j;
     free(resultBuff);
+    resultBuff = NULL;
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiWpaStaGetScanInfos success.");
     return results;
+EXIT:
+    free(results);
+    results = NULL;
+    free(resultBuff);
+    resultBuff = NULL;
+    pthread_mutex_unlock(GetWpaObjMutex());
+    return NULL;
 }
 
 WifiErrorNo HdiWpaStaRemoveNetwork(int networkId, const char *ifaceName)

@@ -44,8 +44,8 @@
 #include "telephony_errors.h"
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
-#include "wifi_common_event_helper.h"
 #include "appmgr/app_mgr_interface.h"
+#include "wifi_common_event_helper.h"
 #endif
 
 namespace OHOS {
@@ -568,6 +568,8 @@ private:
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
 
+    void SetAllowAutoConnectStatus(WifiDeviceConfig &deviceConfig, bool status);
+
     /**
      * @Description User select connect to network.
      *
@@ -581,8 +583,6 @@ private:
      * @param bssid - the bssid of network which is going to be connected.
      */
     void AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName);
-
-    void SetAllowAutoConnectStatus(int32_t networkId, bool status);
 
     /**
      * @Description  Disconnect network

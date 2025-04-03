@@ -782,7 +782,7 @@ static int WpaCliCmdScan(WifiWpaStaInterface *this, const ScanSettings *settings
         }
     }
     if (res < 0) {
-        LOGE("snprintf error!");
+        LOGE("snprintf error");
         free(pcmd);
         pcmd = NULL;
         return -1;

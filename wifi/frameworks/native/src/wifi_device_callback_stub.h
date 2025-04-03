@@ -19,7 +19,6 @@
 #include "iremote_object.h"
 #include "i_wifi_device_callback.h"
 
-#define DEFAULT_VALUES (-1024)
 
 namespace OHOS {
 namespace Wifi {
@@ -40,8 +39,6 @@ public:
     void RegisterUserCallBack(const sptr<IWifiDeviceCallBack> &callBack);
     bool IsRemoteDied() const;
     void SetRemoteDied(bool val);
-    void SetWifiState(int val);
-    int GetWifiState();
 
 private:
     int RemoteOnWifiStateChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -54,7 +51,6 @@ private:
     sptr<IWifiDeviceCallBack> callback_;
 
     bool mRemoteDied;
-    std::atomic<int> mState_ = DEFAULT_VALUES;
 };
 }  // namespace Wifi
 }  // namespace OHOS

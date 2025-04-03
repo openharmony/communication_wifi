@@ -719,6 +719,11 @@ ErrCode WifiP2pServiceImpl::GetP2pEnableStatus(int &status)
         WIFI_LOGE("GetP2pEnableStatus:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        status = static_cast<int>(P2pState::P2P_STATE_CLOSED);
+        return WIFI_OPT_SUCCESS;
+    }
     status = WifiConfigCenter::GetInstance().GetP2pState();
     return WIFI_OPT_SUCCESS;
 }

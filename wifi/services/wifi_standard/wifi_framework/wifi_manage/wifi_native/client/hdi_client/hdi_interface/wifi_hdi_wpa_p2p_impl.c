@@ -49,13 +49,6 @@ static const HdiP2pWpaNetworkField g_hdiP2pWpaNetworkFields[] = {
 
 static struct IWpaCallback *g_hdiWpaP2pCallbackObj = NULL;
 
-void ReleaseP2pCallback(void)
-{
-    StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaP2pCallbackObj);
-    free(g_hdiWpaP2pCallbackObj);
-    g_hdiWpaP2pCallbackObj = NULL;
-}
-
 static WifiErrorNo RegisterP2pEventCallback()
 {
     LOGI("RegisterP2pEventCallback enter");
@@ -82,6 +75,34 @@ static WifiErrorNo RegisterP2pEventCallback()
 
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterP2pEventCallback success.");
+    return WIFI_HAL_OPT_OK;
+}
+
+static WifiErrorNo UnRegisterP2pEventCallback()
+{
+    LOGI("UnRegisterP2pEventCallback enter");
+    pthread_mutex_lock(GetWpaObjMutex());
+    if (g_hdiWpaP2pCallbackObj != NULL) {
+        struct IWpaInterface *wpaObj = GetWpaInterface();
+        if (wpaObj == NULL) {
+            pthread_mutex_unlock(GetWpaObjMutex());
+            LOGE("UnRegisterP2pEventCallback: wpaObj is NULL");
+            return WIFI_HAL_OPT_FAILED;
+        }
+
+        int32_t result = wpaObj->UnregisterWpaEventCallback(wpaObj, g_hdiWpaP2pCallbackObj, GetHdiP2pIfaceName());
+        if (result != HDF_SUCCESS) {
+            pthread_mutex_unlock(GetWpaObjMutex());
+            LOGE("UnRegisterP2pEventCallback: UnregisterEventCallback failed result:%{public}d", result);
+            return WIFI_HAL_OPT_FAILED;
+        }
+        StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaP2pCallbackObj);
+        free(g_hdiWpaP2pCallbackObj);
+        g_hdiWpaP2pCallbackObj = NULL;
+    }
+
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("UnRegisterP2pEventCallback success.");
     return WIFI_HAL_OPT_OK;
 }
 
@@ -206,6 +227,11 @@ WifiErrorNo HdiWpaP2pStop()
     if (IsHdiWpaStopped() == WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStop: HdiWpa already stopped, HdiWpaP2pStop success");
         return WIFI_HAL_OPT_OK;
+    }
+
+    if (UnRegisterP2pEventCallback() != WIFI_HAL_OPT_OK) {
+        LOGE("HdiWpaP2pStop: UnRegisterP2pEventCallback failed!");
+        return WIFI_HAL_OPT_FAILED;
     }
 
     if (HdiRemoveWpaIface(GetHdiP2pIfaceName()) != WIFI_HAL_OPT_OK) {

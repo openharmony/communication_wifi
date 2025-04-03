@@ -22,6 +22,7 @@
 #include <locale>
 #include <securec.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "wifi_hdi_wpa_sta_impl.h"
 #include "wifi_hdi_wpa_callback.h"
@@ -495,7 +496,7 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const st
         LOGE("%{public}s: failed to copy", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
- 
+
     char cmdBuf[MAX_CMD_BUFFER_SIZE];
     if (strncpy_s(cmdBuf, sizeof(cmdBuf), cmd.c_str(), cmd.length()) != EOK) {
         LOGE("%{public}s: failed to copy", __func__);
@@ -766,6 +767,10 @@ bool WifiHdiWpaClient::WriteConfigToFile(const std::string &fileContext)
     }
     file << fileContext << std::endl;
     file.close();
+    if (chmod(destPath.c_str(), S_IRUSR | S_IWUSR | S_IRGRP) != 0) {
+        LOGE("Set file permissions failed: %s", strerror(errno));
+        return false;
+    }
     return true;
 }
 

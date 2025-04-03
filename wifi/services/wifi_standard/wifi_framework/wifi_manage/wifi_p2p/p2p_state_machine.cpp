@@ -435,12 +435,12 @@ ErrCode P2pStateMachine::AddClientInfo(std::vector<GcInfo> &gcInfos)
 GcInfo P2pStateMachine::MatchDevInGcInfos(const std::string &deviceAddr,
     const std::string &groupAddr, std::vector<GcInfo> &gcInfos)
 {
-    WIFI_LOGD("P2pStateMachine::MatchDevInGcInfos: devAddr = %s, groupAddr = %s",
+    WIFI_LOGD("P2pStateMachine::MatchDevInGcInfos: devAddr = %{public}s, groupAddr = %{public}s",
         MacAnonymize(deviceAddr).c_str(), MacAnonymize(groupAddr).c_str());
     GcInfo info;
     for (auto gcInfo : gcInfos) {
         if ((gcInfo.mac == deviceAddr) || (gcInfo.mac == groupAddr)) {
-            WIFI_LOGD("find curDev Ip:%s", gcInfo.ip.c_str());
+            WIFI_LOGD("find curDev Ip:%{private}s", gcInfo.ip.c_str());
             info = gcInfo;
             break;
         }
@@ -450,7 +450,7 @@ GcInfo P2pStateMachine::MatchDevInGcInfos(const std::string &deviceAddr,
 
 ErrCode P2pStateMachine::RemoveClientInfo(std::string mac)
 {
-    WIFI_LOGD("P2pStateMachine::RemoveClientInfo: mac = %s",
+    WIFI_LOGD("P2pStateMachine::RemoveClientInfo: mac = %{private}s",
         MacAnonymize(mac).c_str());
     WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
@@ -984,7 +984,7 @@ void P2pStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname,
 void P2pStateMachine::DhcpResultNotify::OnDhcpServerSuccess(const char *ifname,
     DhcpStationInfo *stationInfos, size_t size)
 {
-    WIFI_LOGI("Dhcp notify ServerSuccess. ifname:%s", ifname);
+    WIFI_LOGI("Dhcp notify ServerSuccess. ifname:%{private}s", ifname);
     std::vector<GcInfo> gcInfos;
     for (size_t i = 0; i < size; i++) {
         GcInfo gcInfo;
@@ -1023,7 +1023,7 @@ void P2pStateMachine::StartDhcpClientInterface()
     if (strncpy_s(config.ifname, sizeof(config.ifname), groupManager.GetCurrentGroup().GetInterface().c_str(),
         groupManager.GetCurrentGroup().GetInterface().length()) != EOK) {
             WIFI_LOGE("strncpy_s config.ifname failed!");
-            return;  
+            return;
         }
     result = StartDhcpClient(config);
     if (result != 0) {
@@ -1120,7 +1120,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     }
     int randomFreq = GetRandomSocialFreq(freqList);
     if (randomFreq == 0) {
-        WIFI_LOGE("Cannot get 1 6 11 channel frequency");
+        WIFI_LOGE("Can not get 1 6 11 channel frequency");
         return retFreq;
     }
     return randomFreq;
@@ -1244,9 +1244,6 @@ bool P2pStateMachine::HasPersisentGroup(void)
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
-    /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
-     * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
-     */
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     if (grpInfo.size() > 0) {
         if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_HAL_OPT_OK) {
@@ -1277,7 +1274,7 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
             WifiP2PHalInterface::GetInstance().P2pSetGroupConfig(createdNetId, wpaConfig);
             grpInfo.at(i) = grpBuf;
         } else {
-            WIFI_LOGW("AddNetwork failed when add %{public}s group!", grpBuf.GetGroupName().c_str());
+            WIFI_LOGE("AddNetwork failed when add %{private}s group!", grpBuf.GetGroupName().c_str());
         }
     }
     return;

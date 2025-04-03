@@ -613,7 +613,8 @@ public:
     WifiErrorNo ReqP2pRemoveGroup(const std::string &groupInterface) const;
 
     /**
-     * @Description Send a request for remove group to the P2P
+     * @Description remove gc client from the go
+     *
      * @param deviceMac
      * @param ifName
      * @return WifiErrorNo
@@ -826,7 +827,7 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const;
-    
+
     /**
      * @Description Enable Softap.
      *

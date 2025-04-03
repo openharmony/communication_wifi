@@ -84,6 +84,7 @@
                 "ability_runtime",
                 "access_token",
                 "battery_manager",
+                "bounds_checking_function",
                 "bundle_framework",
                 "c_utils",
                 "cellular_data",
@@ -92,7 +93,6 @@
                 "core_service",
                 "data_share",
                 "dhcp",
-                "distributed_notification_service",
                 "drivers_interface_wlan",
                 "eventhandler",
                 "ffrt",
@@ -102,9 +102,10 @@
                 "hisysevent",
                 "huks",
                 "i18n",
-                "image_framework",
                 "init",
                 "ipc",
+                "jsoncpp",
+                "libxml2",
                 "movement",
                 "napi",
                 "netmanager_base",
@@ -116,15 +117,11 @@
                 "samgr",
                 "power_manager",
                 "time_service",
-                "bounds_checking_function",
-                "jsoncpp",
-                "libxml2",
                 "asset",
                 "icu",
                 "window_manager"
             ],
             "third_party": [
-                "googletest",
                 "wpa_supplicant"
             ]
         },

@@ -207,7 +207,7 @@ static int StopModuleInternalSendTerminate(void)
     return (ret == 0 ? HAL_SUCCESS : HAL_FAILURE);
 }
 
-static int StopModuleInternalSoftAp(void) __attribute__((no_sanitize("cfi")))
+static int StopModuleInternalSoftAp(void)
 {
     int id = 0;
     WifiHostapdHalDevice *hostapdHalDevice = GetWifiHostapdDev(id);

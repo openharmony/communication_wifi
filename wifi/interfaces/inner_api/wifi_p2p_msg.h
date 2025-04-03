@@ -228,10 +228,10 @@ public:
     bool WpsPbcSupported() const;
     bool WpsDisplaySupported() const;
     bool WpKeypadSupported() const;
-    void SetGroupAddress(const std::string &groupAddress);
-    const std::string &GetGroupAddress() const;
     void SetChrErrCode(P2pChrEvent errCode);
     P2pChrEvent GetChrErrCode() const;
+    void SetGroupAddress(const std::string &groupAddress);
+    const std::string &GetGroupAddress() const;
 
 private:
     std::string deviceName; /* the value range is 0 to 32 characters. */
@@ -305,7 +305,7 @@ public:
     void SetExplicitGroup(bool isExplicit);
     void SetCreatorUid(int uid);
     int GetCreatorUid();
-    void SetPersistentFlag(bool falg);
+    void SetPersistentFlag(bool flag);
     bool GetPersistentFlag(void);
 
 private:

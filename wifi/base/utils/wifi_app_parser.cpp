@@ -385,6 +385,7 @@ void AppParserInner::ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode)
         WIFI_LOGE("%{public}s delay time is null, will set 0.", __FUNCTION__);
         result_.m_delayTime = "0";
     }
+    xmlFree(value);
 }
 
 AppType AppParserInner::GetAppTypeAsInt(const xmlNodePtr &innode)

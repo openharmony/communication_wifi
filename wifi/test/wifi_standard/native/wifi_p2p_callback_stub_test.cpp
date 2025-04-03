@@ -129,8 +129,7 @@ public:
         WIFI_LOGI("OnP2pChrErrCodeReport Mock");
     }
 
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
-    {
+    OHOS::sptr<OHOS::IRemoteObject> AsObject() override{
         return nullptr;
     }
 };

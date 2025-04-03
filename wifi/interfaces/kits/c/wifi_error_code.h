@@ -69,8 +69,6 @@ typedef enum {
     /** P2P error num */
     /** P2P is running but has no group */
     ERROR_P2P_GROUP_NOT_AVAILABLE = -200,
-    /* sta and p2p mac is same */
-    ERROR_P2P_AND_STA_MAC_SAME = -201,
 } WifiErrorCode;
 
 #endif // WIFI_ERROR_CODE_C_H

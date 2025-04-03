@@ -152,6 +152,7 @@ private:
     void UnRegisterPowermgrEvent();
     std::shared_ptr<PowermgrEventSubscriber> wifiPowermgrEventSubsciber_ = nullptr;
     std::mutex powermgrEventMutex;
+    uint32_t powerMgrId{0};
 #endif
     void UnRegisterCesEvent();
     void UnRegisterLocationEvent();

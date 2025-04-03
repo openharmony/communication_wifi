@@ -33,7 +33,7 @@ export struct PswDialog {
       Text(this.scanInfo.ssid)
         .fontSize(20)
         .width(ConfigData.WH_95_100)
-      TextInput({ placeholder : '请输入密码' })
+      TextInput({ placeholder : '?????' })
         .type(InputType.Password)
         .placeholderColor(Color.Gray)
         .fontSize(19)

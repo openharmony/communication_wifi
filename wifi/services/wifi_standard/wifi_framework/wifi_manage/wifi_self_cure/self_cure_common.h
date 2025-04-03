@@ -138,9 +138,9 @@ namespace Wifi {
 #define HTTP_DETECT_USLEEP_TIME (50 * 1000)
 #define WIFI_CONNECT_FAIL_LIST_TIME_EXPIRED (30 * 1000)
 
-constexpr int32_t WIFI_CURE_OFF_TIMEOUT_MS = 12 * 1000;
-constexpr int32_t WIFI_CURE_ON_TIMEOUT_MS = 8 * 1000;
-constexpr int32_t WIFI_CURE_REASSOC_TIMEOUT_MS = 12 * 1000;
+constexpr int32_t WIFI_CURE_OFF_TIMEOUT_MS = 2 * 1000;
+constexpr int32_t WIFI_CURE_ON_TIMEOUT_MS = 5 * 1000;
+constexpr int32_t WIFI_CURE_REASSOC_TIMEOUT_MS = 6 * 1000;
 constexpr int32_t WIFI_CURE_CONNECT_TIMEOUT_MS = 8 * 1000;
 constexpr int32_t WIFI_CURE_CONN_SUCCESS_MS = 500;
 

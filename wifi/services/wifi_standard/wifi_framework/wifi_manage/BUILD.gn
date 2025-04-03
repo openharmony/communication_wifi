@@ -560,6 +560,7 @@ if (defined(ohos_lite)) {
       "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
       "FEATURE_SELF_CURE_SUPPORT",
+      "HAS_NETMANAGER_EVENT_PART",
     ]
 
     if (wifi_feature_dynamic_unload_sa) {

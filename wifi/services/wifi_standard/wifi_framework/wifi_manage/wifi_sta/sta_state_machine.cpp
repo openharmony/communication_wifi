@@ -2051,10 +2051,10 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         SyncDeviceEverConnectedState(false);
 #endif
         if (!mIsWifiInternetCHRFlag &&
-            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL) &&
-            WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered()) {
+            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL)) {
             const int httpOpt = 1;
-            WriteWifiAccessIntFailedHiSysEvent(httpOpt, StaDnsState::DNS_STATE_UNREACHABLE);
+            int selfCureResetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
+            WriteWifiAccessIntFailedHiSysEvent(httpOpt, StaDnsState::DNS_STATE_UNREACHABLE, selfCureResetState);
             mIsWifiInternetCHRFlag = true;
         }
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
@@ -3727,6 +3727,7 @@ void StaStateMachine::DealSignalPollResult()
 
     linkedInfo.snr = signalInfo.snr;
     linkedInfo.chload = signalInfo.chload;
+    signalInfo.timeStamp = GetCurrentTimeSeconds();
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }

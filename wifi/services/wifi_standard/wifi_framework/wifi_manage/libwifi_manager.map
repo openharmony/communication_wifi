@@ -417,6 +417,7 @@
         "OHOS::Wifi::WifiCmdClient::SendCmdToDriver(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&) const";
         "OHOS::Wifi::ArpChecker::ArpChecker()";
         "OHOS::Wifi::ArpChecker::~ArpChecker()";
+        "OHOS::Wifi::WifiControllerMachine::IsLocalOnlyHotspot(bool)";
         "OHOS::Wifi::WifiControllerMachine::ShouldUseRpt(int)";
         "OHOS::Wifi::WifiSettings::SyncP2pVendorConfig()";
         "OHOS::Wifi::WifiSettings::AddRandomMac(OHOS::Wifi::WifiStoreRandomMac&)";
@@ -446,6 +447,7 @@
         "OHOS::Wifi::WifiChannelHelper::UpdateValidChannels(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, int)";
         "OHOS::Wifi::WifiP2pManager::HasP2pActivatedBefore()";
         "OHOS::Wifi::WifiCommonEventHelper::PublishHotspotStateChangedEvent(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+        "OHOS::Wifi::SoftApManager::InitSoftapManager(int hotspotMode)";
     };
     local:
         *;

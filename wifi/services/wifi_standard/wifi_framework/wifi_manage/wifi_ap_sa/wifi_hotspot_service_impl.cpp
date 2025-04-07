@@ -496,10 +496,9 @@ ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
     if (errCode != WIFI_OPT_SUCCESS) {
         return errCode;
     }
-    WifiConfigCenter::GetInstance().SetHotspotMode(HotspotMode::SOFTAP);
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_AP_REQUEST);
 
-    return  WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
+    return WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
 }
 
 ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
@@ -531,7 +530,10 @@ ErrCode WifiHotspotServiceImpl::EnableLocalOnlyHotspot(const ServiceType type)
         WIFI_LOGI("%{public}s, softap/rpt is running, can not use localOnlyHotspot", __func__);
         return WIFI_OPT_FAILED;
     }
-    WifiConfigCenter::GetInstance().SetHotspotMode(HotspotMode::LOCAL_ONLY_SOFTAP);
+    auto &wifiControllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    if (wifiControllerMachine != nullptr) {
+        wifiControllerMachine->IsLocalOnlyHotspot(true);
+    }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_AP_REQUEST);
     return WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
 }
@@ -561,8 +563,13 @@ ErrCode WifiHotspotServiceImpl::GetHotspotMode(HotspotMode &mode)
         WIFI_LOGE("GetBlockLists:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    mode = WifiConfigCenter::GetInstance().GetHotspotMode();
-    return WIFI_OPT_SUCCESS;
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
+    if (pService == nullptr) {
+        WIFI_LOGE("%{public}s, get hotspot service is null!", __func__);
+        mode = HotspotMode::NONE;
+        return WIFI_OPT_AP_NOT_OPENED;
+    }
+    return pService->GetHotspotMode(mode);
 }
 
 static ErrCode AddApBlockList(int m_id, StationInfo& updateInfo)

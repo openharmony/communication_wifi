@@ -450,7 +450,7 @@ bool NotCurrentNetworkFilter::Filter(NetworkCandidate &networkCandidate)
         NetworkSelectionUtils::IsConfigOpenOrEapType(networkCandidate)) {
         WIFI_LOGI("NotCurrentNetworkFilter, same ssid and open or eap type:%{public}s",
             networkCandidate.ToString().c_str());
-        networkCandidate.filtedReason[filterName].insert(FiltedReason::SAME_SSID);
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::SAME_SSID_OPENOREAP);
         return false;
     }
     return true;
@@ -670,6 +670,7 @@ bool WifiSwitchThresholdFilter::Filter(NetworkCandidate &networkCandidate)
     if (interScanInfo.rssi - linkedInfo.rssi < MIN_RSSI_INTERVAL) {
         WIFI_LOGI("WifiSwitchThresholdFilter, scan rssi:%{public}d, cur rssi:%{public}d, skip candidate:%{public}s",
             interScanInfo.rssi, linkedInfo.rssi, networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::LESS_THAN_8RSSI);
         return false;
     }
 

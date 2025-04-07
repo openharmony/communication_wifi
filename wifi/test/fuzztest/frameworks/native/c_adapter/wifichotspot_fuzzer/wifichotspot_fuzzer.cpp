@@ -92,7 +92,7 @@ static void DisassociateStaTest(const uint8_t* data, size_t size)
 static void GetHotspotModeTest(const uint8_t* data, size_t size)
 {
     int mode = 3;  // 3: HotspotMode::LOCAL_ONLY_SOFTAP
-    (void)GetHotspotMode(mode);
+    (void)GetHotspotMode(&mode);
 }
  
 static void GetLocalOnlyHotspotConfigTest(const uint8_t* data, size_t size)

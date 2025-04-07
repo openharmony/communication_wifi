@@ -265,13 +265,13 @@ NO_SANITIZE("cfi") WifiErrorCode DisableLocalOnlyHotspot()
     return GetCErrorCode(hotspotPtr->DisableLocalOnlyHotspot());
 }
  
-NO_SANITIZE("cfi") WifiErrorCode GetHotspotMode(int &hotspotMode)
+NO_SANITIZE("cfi") WifiErrorCode GetHotspotMode(int *hotspotMode)
 {
     CHECK_PTR_RETURN(hotspotPtr, ERROR_WIFI_NOT_AVAILABLE);
     OHOS::Wifi::HotspotMode mode;
     OHOS::Wifi::ErrCode ret = hotspotPtr->GetHotspotMode(mode);
     if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
-        hotspotMode = static_cast<int>(mode);
+        *hotspotMode = static_cast<int>(mode);
     }
     return GetCErrorCode(ret);
 }

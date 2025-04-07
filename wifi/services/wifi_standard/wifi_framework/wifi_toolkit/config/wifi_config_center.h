@@ -357,20 +357,6 @@ public:
     void SetAutoConnect(bool autoConnectEnable);
 
     bool GetAutoConnect();
-
-    /**
-     * @Description get hotspot mode, include softap/rpt/localOnlyHotspot
-     *
-     * @return hotspot mode
-     */
-    HotspotMode GetHotspotMode();
- 
-    /**
-     * @Description set hotspot mode, include softap/rpt/localOnlyHotspot
-     *
-     * @param mode  hotspot mode
-     */
-    void SetHotspotMode(const HotspotMode &mode);
  
     /**
      * @Description get local only hotspot Config
@@ -443,7 +429,6 @@ private:
     std::map <int, std::atomic<int>> mHotspotState;
     std::map<int, PowerModel> powerModel;
     std::map<std::string, StationInfo> mConnectStationInfo;
-    HotspotMode hotspotMode_ = HotspotMode::NONE;
     HotspotConfig localOnlyHotspotConfig_;
 
     // P2P

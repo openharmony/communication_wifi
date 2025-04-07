@@ -413,22 +413,6 @@ HWTEST_F(WifiConfigCenterTest, AddMacAddrPairsTest01, TestSize.Level1)
     type = WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO;
     EXPECT_EQ(WifiConfigCenter::GetInstance().AddMacAddrPairs(type, macAddrInfo, randomMacAddr), 0);
 }
-
-HWTEST_F(WifiConfigCenterTest, GetHotspotModeTest, TestSize.Level1)
-{
-    HotspotMode mode = HotspotMode::LOCAL_ONLY_SOFTAP;
-    WifiConfigCenter::GetInstance().SetHotspotMode(mode);
-    HotspotMode outMode = WifiConfigCenter::GetInstance().GetHotspotMode();
-    EXPECT_EQ(outMode, HotspotMode::LOCAL_ONLY_SOFTAP);
-}
- 
-HWTEST_F(WifiConfigCenterTest, SetHotspotModeTest, TestSize.Level1)
-{
-    HotspotMode mode = HotspotMode::SOFTAP;
-    WifiConfigCenter::GetInstance().SetHotspotMode(mode);
-    HotspotMode outMode = WifiConfigCenter::GetInstance().GetHotspotMode();
-    EXPECT_EQ(outMode, HotspotMode::SOFTAP);
-}
  
 HWTEST_F(WifiConfigCenterTest, GetLocalOnlyHotspotConfigTest, TestSize.Level1)
 {

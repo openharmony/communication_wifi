@@ -144,6 +144,21 @@ public:
      */
     virtual ErrCode SetPowerModel(const PowerModel& model) override;
 
+    /**
+     * @Description get hotspot mode
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetHotspotMode(HotspotMode &mode) override;
+
+    /**
+     * @Description set hotspot mode
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetHotspotMode(const HotspotMode &mode) override;
 private:
     ApRootState m_ApRootState;
     ApStartedState m_ApStartedState;

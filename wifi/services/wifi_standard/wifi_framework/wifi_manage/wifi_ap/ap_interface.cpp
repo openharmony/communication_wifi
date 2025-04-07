@@ -114,5 +114,15 @@ ErrCode ApInterface::SetPowerModel(const PowerModel& model)
 {
     return m_ApService.SetPowerModel(model);
 }
+
+ErrCode ApInterface::GetHotspotMode(HotspotMode &mode)
+{
+    return m_ApService.GetHotspotMode(mode);
+}
+
+ErrCode ApInterface::SetHotspotMode(const HotspotMode &mode)
+{
+    return m_ApService.SetHotspotMode(mode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

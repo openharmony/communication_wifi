@@ -32,7 +32,7 @@ ApIdleState::~ApIdleState()
 void ApIdleState::GoInState()
 {
     WIFI_LOGI("Instance %{public}d %{public}s  GoInState.", m_id, GetStateName().c_str());
-    WifiConfigCenter::GetInstance().SetHotspotMode(HotspotMode::NONE);
+    m_ApStateMachine.hotspotMode_ = HotspotMode::NONE;
 }
 
 void ApIdleState::GoOutState()

@@ -47,6 +47,13 @@ enum FiltedReason {
     POOR_SIGNAL,
     TIMEOUT_AND_NEED_RECHECK,
     NOT_ALLOW_AUTO_CONNECT,
+    SAME_BSSID,
+    SAME_SSID,
+    BLOCKLIST_AP,
+    NOT_P2P_FREQ_AT_5G,
+    EMPTY_HISTORY,
+    MAYBE_PORTAL_NETWORK,
+    LESS_THAN_8RSSI,
 };
 
 struct FiltedReasonComparator {

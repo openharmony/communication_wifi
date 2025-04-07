@@ -167,7 +167,6 @@ void P2pStateMachine::UpdateOwnDevice(P2pDeviceStatus status)
 void P2pStateMachine::InitializeThisDevice()
 {
     std::string deviceName;
-    constexpr size_t randomLen = 4;
     P2pVendorConfig p2pVendorCfg;
     int ret = WifiSettings::GetInstance().GetP2pVendorConfig(p2pVendorCfg);
     if (ret < 0) {
@@ -175,7 +174,7 @@ void P2pStateMachine::InitializeThisDevice()
     }
     WIFI_LOGI("%{public}s: random mac is %{public}s", __func__, p2pVendorCfg.GetRandomMacSupport() ? "true" : "false");
     if (p2pVendorCfg.GetDeviceName().empty()) {
-        deviceName = std::string("OHOS_") + GetRandomStr(randomLen);
+        deviceName = WifiSettings::GetInstance().GetDefaultApSsid();
         p2pVendorCfg.SetDeviceName(deviceName);
         ret = WifiSettings::GetInstance().SetP2pVendorConfig(p2pVendorCfg);
         if (ret < 0) {

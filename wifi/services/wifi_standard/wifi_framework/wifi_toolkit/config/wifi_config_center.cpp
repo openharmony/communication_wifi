@@ -1532,17 +1532,8 @@ void WifiConfigCenter::SetAutoConnect(bool autoConnectEnable)
 
 bool WifiConfigCenter::GetAutoConnect()
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     return autoConnectEnable_.load();
-}
-
-HotspotMode WifiConfigCenter::GetHotspotMode()
-{
-    return hotspotMode_;
-}
- 
-void WifiConfigCenter::SetHotspotMode(const HotspotMode &mode)
-{
-    hotspotMode_ = mode;
 }
  
 int WifiConfigCenter::GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig)
@@ -1553,6 +1544,7 @@ int WifiConfigCenter::GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig)
  
 void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotConfig)
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     localOnlyHotspotConfig_ = hotspotConfig;
 }
 }  // namespace Wifi

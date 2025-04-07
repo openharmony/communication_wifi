@@ -109,6 +109,9 @@ WifiControllerMachine::DisableState::~DisableState()
 void WifiControllerMachine::DisableState::GoInState()
 {
     WIFI_LOGE("DisableState GoInState function.");
+    if (pWifiControllerMachine != nullptr) {
+        pWifiControllerMachine->isLocalOnlyHotspot_ = false;
+    }
 }
 
 void WifiControllerMachine::DisableState::GoOutState()
@@ -399,10 +402,12 @@ void WifiControllerMachine::MakeMultiStaManager(MultiStaManager::Role role, int 
 #ifdef FEATURE_AP_SUPPORT
 void WifiControllerMachine::MakeSoftapManager(SoftApManager::Role role, int id)
 {
-    WIFI_LOGE("Enter MakeSoftapManager");
+    WIFI_LOGE("Enter MakeSoftapManager, isLocalOnlyHotspot=%{public}d", static_cast<int>(isLocalOnlyHotspot_));
     auto softapmode = std::make_shared<SoftApManager>(role, id);
     softapmode->RegisterCallback(WifiManager::GetInstance().GetWifiTogglerManager()->GetSoftApCallback());
-    softapmode->InitSoftapManager();
+    HotspotMode mode = isLocalOnlyHotspot_ ? HotspotMode::LOCAL_ONLY_SOFTAP : HotspotMode::SOFTAP;
+    isLocalOnlyHotspot_ = false;
+    softapmode->InitSoftapManager(mode);
     softApManagers.AddManager(softapmode);
 }
 
@@ -473,16 +478,18 @@ bool WifiControllerMachine::ShouldUseRpt(int id)
 
 HotspotMode WifiControllerMachine::CalculateHotspotMode(int id)
 {
+    WIFI_LOGI("%{public}s, isLocalOnlyHotspot=%{public}d, hotspotMode=%{public}d",
+        __func__, static_cast<int>(isLocalOnlyHotspot_), static_cast<int>(hotspotMode));
     if (hotspotMode != HotspotMode::NONE) {
         return hotspotMode;
     }
 #ifdef FEATURE_RPT_SUPPORT
-    HotspotMode mode = WifiConfigCenter::GetInstance().GetHotspotMode();
     if (softApManagers.HasAnyManager()) {
         return HotspotMode::SOFTAP;
     } else if (rptManagers.HasAnyManager()) {
         return HotspotMode::RPT;
-    } else if (ShouldUseRpt(id) && mode != HotspotMode::LOCAL_ONLY_SOFTAP) {  // The localOnlyHotspot does not use rpt
+    } else if (ShouldUseRpt(id) && !isLocalOnlyHotspot_) {
+        // Non-LocalOnlyHotspot can use rpt
         return HotspotMode::RPT;
     }
 #endif
@@ -497,15 +504,15 @@ void WifiControllerMachine::MakeHotspotManager(int id, bool startTimer)
         if (startTimer) {
             StartTimer(CMD_AP_START_TIME, SOFT_AP_TIME_OUT);
         }
-        return;
-    }
 #ifdef FEATURE_RPT_SUPPORT
-    if (hotspotMode == HotspotMode::RPT && !rptManagers.IdExist(id)) {
+    } else if (hotspotMode == HotspotMode::RPT && !rptManagers.IdExist(id)) {
         WifiConfigCenter::GetInstance().SetHotspotMode(HotspotMode::RPT);
         MakeRptManager(RptManager::Role::ROLE_RPT, id);
-        return;
+    }
+#else
     }
 #endif
+    isLocalOnlyHotspot_ = false;
 }
 #endif
 
@@ -711,6 +718,7 @@ void WifiControllerMachine::EnableState::HandleSoftapOpen(int id)
             pWifiControllerMachine->multiStaManagers.StopAllManagers();
             pWifiControllerMachine->concreteManagers.StopAllManagers();
             pWifiControllerMachine->mApidStopWifi = id;
+            WIFI_LOGI("%{public}s, has any manager", __func__);
             return;
         }
 #endif
@@ -897,10 +905,12 @@ void WifiControllerMachine::HandleConcreteStop(int id)
 template <class T>
 void WifiControllerMachine::HandleHotspotStop(int id, HotspotMode THotspotMode, ManagerControl<T> &TManagers)
 {
+    WIFI_LOGI("%{public}s, isLocalOnlyHotspot_=%{public}d", __func__, static_cast<int>(isLocalOnlyHotspot_));
     auto softap = TManagers.GetManager(id);
     bool roleIsRemoved = softap != nullptr && softap->GetRole() == T::Role::ROLE_HAS_REMOVED;
     softap = nullptr;
     TManagers.RemoveManager(id);
+    isLocalOnlyHotspot_ = false;
     if (hotspotMode == THotspotMode && !TManagers.HasAnyManager()) {
         hotspotMode = HotspotMode::NONE;
     }
@@ -963,6 +973,11 @@ void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
 void WifiControllerMachine::SelfcureResetWifi(int id)
 {
     concreteManagers.SendMessage(CONCRETE_CMD_RESET_STA, id);
+}
+
+void WifiControllerMachine::IsLocalOnlyHotspot(bool isLohs)
+{
+    isLocalOnlyHotspot_ = isLohs;
 }
 } // namespace Wifi
 } // namespace OHOS

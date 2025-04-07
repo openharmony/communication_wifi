@@ -41,7 +41,7 @@ public:
             pSoftApManager->pSoftapManagerMachine = new MockSoftapManagerStateMachine();
         }
         pSoftApManager->GetMachine()->SendMessage(SOFTAP_CMD_START,
-            static_cast<int>(SoftApManager::Role::ROLE_UNKNOW), 0);
+            static_cast<int>(HotspotMode::SOFTAP), 0);
     }
 
     virtual void TearDown()

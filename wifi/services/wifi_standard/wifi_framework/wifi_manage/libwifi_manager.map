@@ -156,8 +156,6 @@
         "OHOS::Wifi::WifiConfigCenter::GetWifiConnectFailListCache(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryConnectFailInfo, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, OHOS::Wifi::WifiCategoryConnectFailInfo>>>&)";
         "OHOS::Wifi::WifiConfigCenter::UpdateWifiConnectFailListCache(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryConnectFailInfo)";
         "OHOS::Wifi::WifiConfigCenter::RemoveWifiConnectFailListCache(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
-        "OHOS::Wifi::WifiConfigCenter::GetHotspotMode()";
-        "OHOS::Wifi::WifiConfigCenter::SetHotspotMode(OHOS::Wifi::HotspotMode const&)";
         "OHOS::Wifi::WifiConfigCenter::GetLocalOnlyHotspotConfig(OHOS::Wifi::HotspotConfig&)";
         "OHOS::Wifi::WifiConfigCenter::SetLocalOnlyHotspotConfig(OHOS::Wifi::HotspotConfig const&)";
         "OHOS::Wifi::WifiScanConfig::GetScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
@@ -446,8 +444,6 @@
         "OHOS::Wifi::WifiTogglerManager::SatelliteToggled(int)";
         "OHOS::Wifi::WifiChannelHelper::UpdateValidChannels(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, int)";
         "OHOS::Wifi::WifiP2pManager::HasP2pActivatedBefore()";
-        "OHOS::Wifi::WifiCommonEventHelper::PublishHotspotStateChangedEvent(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
-        "OHOS::Wifi::SoftApManager::InitSoftapManager(int hotspotMode)";
     };
     local:
         *;

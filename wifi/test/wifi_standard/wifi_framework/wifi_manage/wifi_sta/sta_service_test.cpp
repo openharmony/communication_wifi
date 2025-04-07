@@ -869,6 +869,7 @@ HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level0)
 HWTEST_F(StaServiceTest, GetDetectNetStateTest, TestSize.Level0)
 {
     GetDetectNetStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
 HWTEST_F(StaServiceTest, GetSignalPollInfoArrayTest, TestSize.Level0)

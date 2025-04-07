@@ -143,7 +143,9 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
     
     WifiErrorNo setSoftApConfigResult = WifiErrorNo::WIFI_HAL_OPT_OK;
-    if (WifiConfigCenter::GetInstance().GetHotspotMode() == HotspotMode::LOCAL_ONLY_SOFTAP) {
+    HotspotMode currentMode = HotspotMode::SOFTAP;
+    m_ApStateMachine.GetHotspotMode(currentMode);
+    if (currentMode == HotspotMode::LOCAL_ONLY_SOFTAP) {
         // The localOnlyHotspot uses the temporary configuration and does not flush to disks,
         // The SSID and password are random values.
         HotspotConfig hotspotConfigTemp = apConfig;
@@ -153,6 +155,7 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         hotspotConfigTemp.SetPreSharedKey(GetRandomStr(LOCAL_ONLY_SOFTAP_PWD_LEN));
         WifiConfigCenter::GetInstance().SetLocalOnlyHotspotConfig(hotspotConfigTemp);
         setSoftApConfigResult = WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, hotspotConfigTemp, m_id);
+        WIFI_LOGI("set local only hotspot config, ssid=%{public}s", SsidAnonymize(randomSsid).c_str());
     } else {
         setSoftApConfigResult = WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, apConfig, m_id);
     }

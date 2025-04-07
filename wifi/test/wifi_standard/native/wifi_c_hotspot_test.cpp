@@ -126,7 +126,7 @@ HWTEST_F(WifiHotspotTest, GetLocalOnlyHotspotConfigTests, TestSize.Level1)
 HWTEST_F(WifiHotspotTest, GetHotspotModeTest, TestSize.Level1)
 {
     int mode = 0;  // 0: HotspotMode::NONE
-    GetHotspotMode(mode);
+    GetHotspotMode(&mode);
     EXPECT_TRUE(mode == 0);  // 0: HotspotMode::NONE
 }
 

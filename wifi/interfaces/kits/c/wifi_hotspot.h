@@ -187,18 +187,14 @@ WifiErrorCode DisableLocalOnlyHotspot(void);
  * @param mode - hotspot mode
  * @return ErrCode - operation result
  */
-WifiErrorCode GetHotspotMode(int &hotspotMode);
+WifiErrorCode GetHotspotMode(int *hotspotMode);
  
 /**
- * @brief Obtains a specified local only hotspot configuration.
- *
+ * @Description Obtains a specified local only hotspot configuration.
  * The hotspot configuration includes the SSID, security type, and key.
  *
  * @param result Indicates the obtained local only hotspot configuration.
- * @return Returns {@link WIFI_SUCCESS} if the local only hotspot configuration is obtained;
- * returns an error code defined in
- * {@link WifiErrorCode} otherwise.
- * @since 7
+ * @return Returns {@link WIFI_SUCCESS} if the local only hotspot configuration is obtained
  */
 WifiErrorCode GetLocalOnlyHotspotConfig(HotspotConfig *result);
 #ifdef __cplusplus

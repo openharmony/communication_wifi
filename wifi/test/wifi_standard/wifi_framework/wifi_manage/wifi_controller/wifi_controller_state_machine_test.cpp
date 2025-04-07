@@ -675,5 +675,14 @@ HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForWlan1Test02, TestSi
         .WillRepeatedly(Return(WIFI_STATE_ENABLED));
     EXPECT_EQ(pWifiControllerMachine->pEnableState->HandleWifiToggleChangeForWlan1(id, isOpen), true);
 }
+
+HWTEST_F(WifiControllerMachineTest, IsLocalOnlyHotspotTest, TestSize.Level1)
+{
+    if (pWifiControllerMachine == nullptr) {
+        return;
+    }
+    pWifiControllerMachine->IsLocalOnlyHotspot(true);
+    EXPECT_TRUE(pWifiControllerMachine->isLocalOnlyHotspot_);
+}
 }
 }

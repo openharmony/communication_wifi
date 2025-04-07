@@ -116,6 +116,7 @@ public:
 #endif
     void ShutdownWifi(bool shutDownAp = true);
     void SelfcureResetWifi(int id);
+    void IsLocalOnlyHotspot(bool isLohs);
 private:
     template <typename T>
     inline void ParsePointer(T *&pointer)
@@ -175,6 +176,7 @@ private:
     HotspotMode hotspotMode {HotspotMode::NONE};
 #endif
     ManagerControl<MultiStaManager> multiStaManagers{MULTI_STA_CMD_STOP};
+    bool isLocalOnlyHotspot_ = false;
 };
 }  // namespace Wifi
 }  // namespace OHOS

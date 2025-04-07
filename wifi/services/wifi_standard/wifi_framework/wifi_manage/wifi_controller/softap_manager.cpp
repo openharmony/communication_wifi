@@ -32,7 +32,7 @@ SoftApManager::~SoftApManager()
     }
 }
 
-ErrCode SoftApManager::InitSoftapManager()
+ErrCode SoftApManager::InitSoftapManager(HotspotMode hotspotMode)
 {
     pSoftapManagerMachine = new (std::nothrow) SoftapManagerMachine();
     if (pSoftapManagerMachine == nullptr) {
@@ -44,7 +44,7 @@ ErrCode SoftApManager::InitSoftapManager()
         return WIFI_OPT_FAILED;
     }
     pSoftapManagerMachine->RegisterCallback(mcb);
-    pSoftapManagerMachine->SendMessage(SOFTAP_CMD_START, static_cast<int>(curRole), mid);
+    pSoftapManagerMachine->SendMessage(SOFTAP_CMD_START, static_cast<int>(hotspotMode), mid);
     return WIFI_OPT_SUCCESS;
 }
 

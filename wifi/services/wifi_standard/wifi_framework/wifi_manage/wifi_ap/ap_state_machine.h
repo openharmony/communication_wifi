@@ -112,6 +112,21 @@ public:
      */
     virtual void RegisterEventHandler();
 
+    /**
+     * @Description get hotspot mode
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode GetHotspotMode(HotspotMode &mode);
+
+    /**
+     * @Description set hotspot mode
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode SetHotspotMode(const HotspotMode &mode);
 private:
     DISALLOW_COPY_AND_ASSIGN(ApStateMachine);
 
@@ -131,6 +146,7 @@ private:
 
     DhcpdInterface m_DhcpdInterface;
     int m_id;
+    HotspotMode hotspotMode_ = HotspotMode::NONE;
 }; /* ApStateMachine */
 }  // namespace Wifi
 }  // namespace OHOS

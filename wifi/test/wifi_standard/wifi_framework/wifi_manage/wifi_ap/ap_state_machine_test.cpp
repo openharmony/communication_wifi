@@ -168,5 +168,27 @@ TEST_F(ApStateMachine_test, RegisterEventHandler)
     WarpRegisterEventHandler();
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
+
+TEST_F(ApStateMachine_test, GetPowerModelTest)
+{
+    if (pApStateMachine == nullptr) {
+        return;
+    }
+    HotspotMode mode = HotspotMode::NONE;
+    pApStateMachine->SetHotspotMode(HotspotMode::SOFTAP);
+    pApStateMachine->GetHotspotMode(mode);
+    EXPECT_EQ(mode, HotspotMode::SOFTAP);
+}
+
+TEST_F(ApStateMachine_test, SetHotspotModeTest)
+{
+    if (pApStateMachine == nullptr) {
+        return;
+    }
+    HotspotMode mode = HotspotMode::NONE;
+    pApStateMachine->SetHotspotMode(HotspotMode::RPT);
+    pApStateMachine->GetHotspotMode(mode);
+    EXPECT_EQ(mode, HotspotMode::RPT);
+}
 } // namespace Wifi
 } // namespace OHOS

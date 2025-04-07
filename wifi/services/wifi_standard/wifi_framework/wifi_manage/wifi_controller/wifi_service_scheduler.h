@@ -46,7 +46,7 @@ public:
     ErrCode AutoStartScanOnly(int instId, std::string &staIfName);
     ErrCode AutoStopScanOnly(int instId, bool setIfaceDown);
     ErrCode AutoStartSemiStaService(int instId, std::string &staIfName);
-    ErrCode AutoStartApService(int instId, std::string &softApIfName);
+    ErrCode AutoStartApService(int instId, std::string &softApIfName, int hotspotMode);
     ErrCode AutoStopApService(int instId);
     void DispatchWifiOpenRes(OperateResState state, int instId);
     void DispatchWifi2OpenRes(OperateResState state, int instId);
@@ -73,7 +73,7 @@ private:
 #ifdef FEATURE_SELF_CURE_SUPPORT
     ErrCode StartSelfCureService(int instId);
 #endif
-    ErrCode TryToStartApService(int instId);
+    ErrCode TryToStartApService(int instId, int hotspotMode);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     void StaIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);
     void P2pIfaceDestoryCallback(std::string &destoryIfaceName, int createIfaceType);

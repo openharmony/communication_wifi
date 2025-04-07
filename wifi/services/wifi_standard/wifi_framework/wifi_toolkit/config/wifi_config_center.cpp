@@ -1532,12 +1532,12 @@ void WifiConfigCenter::SetAutoConnect(bool autoConnectEnable)
 
 bool WifiConfigCenter::GetAutoConnect()
 {
-    std::unique_lock<std::mutex> lock(mApMutex);
     return autoConnectEnable_.load();
 }
  
 int WifiConfigCenter::GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig)
 {
+    std::unique_lock<std::mutex> lock(mApMutex);
     hotspotConfig = localOnlyHotspotConfig_;
     return 0;
 }

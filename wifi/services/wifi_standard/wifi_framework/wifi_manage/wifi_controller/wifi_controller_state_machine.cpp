@@ -506,7 +506,6 @@ void WifiControllerMachine::MakeHotspotManager(int id, bool startTimer)
         }
 #ifdef FEATURE_RPT_SUPPORT
     } else if (hotspotMode == HotspotMode::RPT && !rptManagers.IdExist(id)) {
-        WifiConfigCenter::GetInstance().SetHotspotMode(HotspotMode::RPT);
         MakeRptManager(RptManager::Role::ROLE_RPT, id);
     }
 #else

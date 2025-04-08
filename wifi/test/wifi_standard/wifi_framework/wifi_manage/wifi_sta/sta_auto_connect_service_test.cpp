@@ -1160,334 +1160,334 @@ void StaAutoConnectServiceTest::DeregisterAutoJoinConditionSuccess()
 /* ************************ HWTEST_F  ************************************ */
 
 
-HWTEST_F(StaAutoConnectServiceTest, InitAutoConnectServiceSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, InitAutoConnectServiceSuccess, TestSize.Level0)
 {
     InitAutoConnectServiceSuccess();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerSuccess1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerSuccess1, TestSize.Level0)
 {
     OnScanResultsReadyHandlerSuccess1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerSuccess2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerSuccess2, TestSize.Level0)
 {
     OnScanResultsReadyHandlerSuccess2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail1, TestSize.Level0)
 {
     OnScanResultsReadyHandlerFail1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail2, TestSize.Level0)
 {
     OnScanResultsReadyHandlerFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail3, TestSize.Level0)
 {
     OnScanResultsReadyHandlerFail3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail4, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail4, TestSize.Level0)
 {
     OnScanResultsReadyHandlerFail4();
 }
 
 
-HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail5, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail5, TestSize.Level0)
 {
     OnScanResultsReadyHandlerFail5();
 }
 
 
-HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail6, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, OnScanResultsReadyHandlerFail6, TestSize.Level0)
 {
     OnScanResultsReadyHandlerFail6();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidSuccess1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidSuccess1, TestSize.Level0)
 {
     EnableOrDisableBssidSuccess1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidSuccess2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidSuccess2, TestSize.Level0)
 {
     EnableOrDisableBssidSuccess2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidFail1, TestSize.Level0)
 {
     EnableOrDisableBssidFail1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidFail2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidFail2, TestSize.Level0)
 {
     EnableOrDisableBssidFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidFail3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidFail3, TestSize.Level0)
 {
     EnableOrDisableBssidFail3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidFail4, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, EnableOrDisableBssidFail4, TestSize.Level0)
 {
     EnableOrDisableBssidFail4();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceSuccess1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceSuccess1, TestSize.Level0)
 {
     AutoSelectDeviceSuccess1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceSuccess2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceSuccess2, TestSize.Level0)
 {
     AutoSelectDeviceSuccess2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceSuccess3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceSuccess3, TestSize.Level0)
 {
     AutoSelectDeviceSuccess3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail1, TestSize.Level0)
 {
     AutoSelectDeviceFail1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail2, TestSize.Level0)
 {
     AutoSelectDeviceFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail3, TestSize.Level0)
 {
     AutoSelectDeviceFail3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail4, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail4, TestSize.Level0)
 {
     AutoSelectDeviceFail4();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail5, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail5, TestSize.Level0)
 {
     AutoSelectDeviceFail5();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail6, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AutoSelectDeviceFail6, TestSize.Level0)
 {
     AutoSelectDeviceFail6();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RegisterDeviceAppraisalSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RegisterDeviceAppraisalSuccess, TestSize.Level0)
 {
     RegisterDeviceAppraisalSuccess();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RegisterDeviceAppraisalFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RegisterDeviceAppraisalFail1, TestSize.Level0)
 {
     RegisterDeviceAppraisalFail1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RegisterDeviceAppraisalFail2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RegisterDeviceAppraisalFail2, TestSize.Level0)
 {
     RegisterDeviceAppraisalFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess, TestSize.Level0)
 {
     GetAvailableScanInfosSuccess();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess1, TestSize.Level0)
 {
     GetAvailableScanInfosSuccess1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess2, TestSize.Level0)
 {
     GetAvailableScanInfosSuccess2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, GetAvailableScanInfosSuccess3, TestSize.Level0)
 {
     GetAvailableScanInfosSuccess3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess1, TestSize.Level0)
 {
     AllowAutoSelectDeviceSuccess1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess2, TestSize.Level0)
 {
     AllowAutoSelectDeviceSuccess2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess3, TestSize.Level0)
 {
     AllowAutoSelectDeviceSuccess3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess4, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceSuccess4, TestSize.Level0)
 {
     AllowAutoSelectDeviceSuccess4();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail1, TestSize.Level0)
 {
     AllowAutoSelectDeviceFail1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail2, TestSize.Level0)
 {
     AllowAutoSelectDeviceFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail3, TestSize.Level0)
 {
     AllowAutoSelectDeviceFail3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail4, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail4, TestSize.Level0)
 {
     AllowAutoSelectDeviceFail4();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail5, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, AllowAutoSelectDeviceFail5, TestSize.Level0)
 {
     AllowAutoSelectDeviceFail5();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughSuccess, TestSize.Level0)
 {
     CurrentDeviceGoodEnoughSuccess();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail1, TestSize.Level0)
 {
     CurrentDeviceGoodEnoughFail1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail2, TestSize.Level0)
 {
     CurrentDeviceGoodEnoughFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail3, TestSize.Level0)
 {
     CurrentDeviceGoodEnoughFail3();
 }
 
 
-HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail4, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail4, TestSize.Level0)
 {
     CurrentDeviceGoodEnoughFail4();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail5, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, CurrentDeviceGoodEnoughFail5, TestSize.Level0)
 {
     CurrentDeviceGoodEnoughFail5();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, WhetherDevice5GAvailableSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, WhetherDevice5GAvailableSuccess, TestSize.Level0)
 {
     WhetherDevice5GAvailableSuccess();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, WhetherDevice5GAvailableFail, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, WhetherDevice5GAvailableFail, TestSize.Level0)
 {
     WhetherDevice5GAvailableFail();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckSuccess, TestSize.Level0)
 {
     RoamingEncryptionModeCheckSuccess();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail1, TestSize.Level0)
 {
     RoamingEncryptionModeCheckFail1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail2, TestSize.Level0)
 {
     RoamingEncryptionModeCheckFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail3, TestSize.Level0)
 {
     RoamingEncryptionModeCheckFail3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail4, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingEncryptionModeCheckFail4, TestSize.Level0)
 {
     RoamingEncryptionModeCheckFail4();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionSuccess1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionSuccess1, TestSize.Level0)
 {
     RoamingSelectionSuccess1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail1, TestSize.Level0)
 {
     RoamingSelectionFail1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail2, TestSize.Level0)
 {
     RoamingSelectionFail2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail3, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail3, TestSize.Level0)
 {
     RoamingSelectionFail3();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail4, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RoamingSelectionFail4, TestSize.Level0)
 {
     RoamingSelectionFail4();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, DisableAutoJoinSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, DisableAutoJoinSuccess, TestSize.Level0)
 {
     DisableAutoJoinSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(StaAutoConnectServiceTest, EnableAutoJoinSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, EnableAutoJoinSuccess, TestSize.Level0)
 {
     EnableAutoJoinSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(StaAutoConnectServiceTest, RegisterAutoJoinConditionSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, RegisterAutoJoinConditionSuccess, TestSize.Level0)
 {
     RegisterAutoJoinConditionSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(StaAutoConnectServiceTest, DeregisterAutoJoinConditionSuccess, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, DeregisterAutoJoinConditionSuccess, TestSize.Level0)
 {
     DeregisterAutoJoinConditionSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterSucc1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterSucc1, TestSize.Level0)
 {
     IsAutoConnectFailByP2PEnhanceFilterSucc1();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterSucc2, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterSucc2, TestSize.Level0)
 {
     IsAutoConnectFailByP2PEnhanceFilterSucc2();
 }
 
-HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterFail1, TestSize.Level1)
+HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterFail1, TestSize.Level0)
 {
     IsAutoConnectFailByP2PEnhanceFilterFail1();
 }

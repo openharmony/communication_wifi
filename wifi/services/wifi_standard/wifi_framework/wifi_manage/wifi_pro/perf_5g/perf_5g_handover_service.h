@@ -27,6 +27,7 @@
 #include "candidate_relation_ap_info.h"
 #include "dual_band_repostitory.h"
 #include "internal_message.h"
+#include "wifi_hisysevent.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -52,6 +53,11 @@ private:
     std::string bssidLastConnected_;
     std::list<LinkQuality> linkQualityLastConnected_;
     bool inMonitor_ = false;
+    Pref5gStatisticsInfo perf5gInfo_;
+    int32_t inBlackListNum_;
+    std::chrono::steady_clock::time_point noInternetTime_ = std::chrono::steady_clock::time_point::min();
+    bool isIn5gPref_ = false;
+    bool has5gPrefSwitch_ = false;
 
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);

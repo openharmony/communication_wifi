@@ -416,5 +416,25 @@ void Write3VapConflictHisysevent(int type)
     root["WIFI_3VAP_CONFLICT_TYPE"] = type;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_3VAP_CONFLICT", "EVENT_VALUE", writer.write(root));
 }
+
+void Write5gPrefFailedHisysevent(const Pref5gStatisticsInfo &info)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["BSSID"] = info.bssid;
+    root["SSID"] = info.ssid;
+    root["FREQ"] = info.freq;
+    root["CON_DURATION"] = info.conDuration;
+    root["DURATION_NO_INTERNET"] = info.durationNoInternet;
+    root["ENTER_MONITOR_NUM"] = info.enterMonitorNum;
+    root["MONITOR_ACTIVE_SCAN_NUM"] = info.monitorActiveScanNum;
+    root["RELA_5G_NUM"] = info.rela5gNum;
+    root["NOT_ADJ_5g_NUM"] = info.notAdj5gNum;
+    root["NOT_INTERNET_5G_NUM"] = info.notInternetRela5gNum;
+    root["ALL_RELA_5G_IN_BLOCK_LIST_NUM"] = info.allRela5gInBlockListNum;
+    root["SATISFY_SWITCH_RSSI_NO_SELECTED_NUM"] = info.satisfySwitchRssiNoSelectedNum;
+    root["IS_USER_CONNECTED"] = info.isUserConnected;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_5G_PREF_FAILED", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

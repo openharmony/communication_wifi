@@ -705,6 +705,7 @@ HWTEST_F(StaInterfaceTest, DisableAutoJoin, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, GetDetectNetStateTest, TestSize.Level1)
 {
     GetDetectNetStateTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(StaInterfaceTest, EnableAutoJoin, TestSize.Level1)

@@ -90,6 +90,9 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     WIFI_LOGI("OnConnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d),relationAps size(%{public}u)",
         SsidAnonymize(connectedAp_->apInfo.ssid).data(), MacAnonymize(connectedAp_->apInfo.bssid).data(),
         connectedAp_->apInfo.frequency, relationAps_.size());
+    // 初始化 无网时长，进入监听次数，进入监听主动触发扫描次数
+    perf5gInfo_.Reset();
+    noInternetTime_ = std::chrono::steady_clock::time_point::min();
 }
 void Perf5gHandoverService::OnDisconnected()
 {
@@ -102,6 +105,27 @@ void Perf5gHandoverService::OnDisconnected()
         relationAps_.clear();
         return;
     }
+    // 进入过5G优选的流程，但是没有发生过5G优选切换。说明挂死在2.4G
+    if (isIn5gPref_ && !has5gPrefSwitch_) {
+        if (noInternetTime_ != std::chrono::steady_clock::time_point::min()) {
+            perf5gInfo_.durationNoInternet +=
+                duration_cast<seconds>(std::chrono::steady_clock::now() - noInternetTime_).count();
+            noInternetTime_ = std::chrono::steady_clock::time_point::min();
+        }
+        perf5gInfo_.conDuration = connectedAp_->apInfo.apConnectionInfo.GetTotalUseTime();
+        perf5gInfo_.bssid = MacAnonymize(connectedAp_->apInfo.bssid).data();
+        perf5gInfo_.ssid = SsidAnonymize(connectedAp_->apInfo.ssid).data();
+        perf5gInfo_.freq = connectedAp_->apInfo.frequency;
+        for (auto &relationAp : relationAps_) {
+            if (!relationAp.relationInfo_.IsAdjacent()) {
+                perf5gInfo_.notAdj5gNum++;
+            }
+        }
+        Write5gPrefFailedHisysevent(perf5gInfo_);
+        isIn5gPref_ = false;
+        has5gPrefSwitch_ = false;
+    }
+
     bssidLastConnected_ = connectedAp_->apInfo.bssid;
     linkQualityLastConnected_ = connectedAp_->apInfo.apConnectionInfo.GetLinkQualitys();
     pDualBandRepostitory_->SaveApInfo(connectedAp_->apInfo);
@@ -127,10 +151,16 @@ void Perf5gHandoverService::NetworkStatusChanged(NetworkStatus networkStatus)
     if (networkStatus == NetworkStatus::HAS_INTERNET) {
         if (pWifiScanController_ == nullptr) {
             WIFI_LOGI("%{public}s, has internet, do load scan controller", __FUNCTION__);
+            if (noInternetTime_ != std::chrono::steady_clock::time_point::min()) {
+                perf5gInfo_.durationNoInternet +=
+                    duration_cast<seconds>(std::chrono::steady_clock::now() - noInternetTime_).count();
+                noInternetTime_ = std::chrono::steady_clock::time_point::min();
+            }
             LoadHasInternetScanController();
         }
     } else {
         WIFI_LOGI("%{public}s, not has internet, do unload scan controller", __FUNCTION__);
+        noInternetTime_ = std::chrono::steady_clock::now();
         UnloadScanController();
     }
 }
@@ -342,13 +372,23 @@ bool Perf5gHandoverService::IsRelationFreq(int32_t frequency)
 }
 void Perf5gHandoverService::Monitor5gAp(std::vector<InterScanInfo> &wifiScanInfos)
 {
+    // 开始检测5G的AP，此处增加标志位，说明进入过5G优选流程
+    isIn5gPref_ = true;
     if (WifiProUtils::IsUserSelectNetwork()) {
         WIFI_LOGD("Monitor5gAp, IsUserSelectNetwork, can not monitor");
+        perf5gInfo_.isUserConnected = true;
         return;
     }
     int32_t relationApSize = static_cast<int32_t>(relationAps_.size());
+    perf5gInfo_.rela5gNum = relationApSize;
+    inBlackListNum_ = 0;
+    perf5gInfo_.notInternetRela5gNum = 0;
     for (int32_t index = 0; index < relationApSize; index++) {
         FoundMonitorAp(index, wifiScanInfos);
+    }
+    // 如果所有的关联AP都在黑名单中，计数
+    if (relationApSize == inBlackListNum_) {
+        perf5gInfo_.allRela5gInBlockListNum++;
     }
     if (monitorApIndexs_.empty()) {
         return;
@@ -362,6 +402,10 @@ void Perf5gHandoverService::Monitor5gAp(std::vector<InterScanInfo> &wifiScanInfo
     }
     if (!candidateRelationApInfos.empty()) {
         selectRelationAp_ = DualBandSelector::Select(connectedAp_->apInfo, candidateRelationApInfos);
+        if (selectRelationAp_ == nullptr) {
+            // 记录满足切换rssi但是选网失败
+            perf5gInfo_.satisfySwitchRssiNoSelectedNum++;
+        }
     }
     UpdateTriggerScanRssiThreshold();
     if (selectRelationAp_ != nullptr) {
@@ -416,6 +460,7 @@ void Perf5gHandoverService::StartMonitor()
 {
     if (!inMonitor_) {
         WIFI_LOGI("StartMonitor, load scan controller");
+        perf5gInfo_.enterMonitorNum++;
         inMonitor_ = true;
         LoadMonitorScanController();
     }
@@ -442,7 +487,9 @@ void Perf5gHandoverService::ActiveScan(int32_t rssi)
             needScanInMonitor = true;
         }
     }
-    pWifiScanController_->TryToScan(rssi, needScanInMonitor, connectedAp_->apInfo.frequency, monitorFreqs);
+    if (pWifiScanController_->TryToScan(rssi, needScanInMonitor, connectedAp_->apInfo.frequency, monitorFreqs)) {
+        perf5gInfo_.monitorActiveScanNum++;
+    }
 }
 void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
 {
@@ -466,11 +513,13 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
         NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
         WIFI_LOGI("FoundMonitorAp, relation ap(%{public}s) in block list, can not monitor",
             MacAnonymize(relationAps_[relationApIndex].apInfo_.bssid).data());
+        inBlackListNum_++;
         return;
     }
     if (relationAps_[relationApIndex].apInfo_.networkStatus != NetworkStatus::HAS_INTERNET) {
         WIFI_LOGI("FoundMonitorAp, no internet(%{public}d), can not monitor",
             relationAps_[relationApIndex].apInfo_.networkStatus);
+        perf5gInfo_.notInternetRela5gNum++;
         return;
     }
     for (const auto &wifiScanInfo : wifiScanInfos) {
@@ -527,6 +576,8 @@ std::string Perf5gHandoverService::HandleSwitchResult(WifiLinkedInfo &wifiLinked
         WIFI_LOGI("HandleSwitchResult, selectRelationAp_ is nullptr, clear ap info before switched");
         return "";
     }
+    // 存在selectRelationAp_ 说明有成功的筛选出5G的AP进行切换。
+    has5gPrefSwitch_ = true;
     std::string selectStrategyName = "";
     if (wifiLinkedInfo.bssid == selectRelationAp_->apInfo.bssid) {
         WIFI_LOGI("HandleSwitchResult, perf 5g successful");

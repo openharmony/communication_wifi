@@ -860,238 +860,239 @@ void StaServiceTest::GetDetectNetStateTest()
     pStaService->GetDetectNetState(state);
 }
 
-HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, HandleFoldStatusChangedTest, TestSize.Level0)
 {
     HandleFoldStatusChangedTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, GetDetectNetStateTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, GetDetectNetStateTest, TestSize.Level0)
 {
     GetDetectNetStateTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, GetSignalPollInfoArrayTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, GetSignalPollInfoArrayTest, TestSize.Level0)
 {
     GetSignalPollInfoArrayTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level0)
 {
     StaServiceStartPortalCertificationTest();
 }
 
-HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level0)
 {
     StaServiceOnSystemAbilityChangedTest();
 }
 
-HWTEST_F(StaServiceTest, StaServiceSetPowerModeTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceSetPowerModeTest, TestSize.Level0)
 {
     StaServiceSetPowerModeTest();
 }
 
-HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceEnableWifiSuccess, TestSize.Level0)
 {
     StaServiceEnableWifiSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigSuccess, TestSize.Level0)
 {
     StaServiceConnectToWifiDeviceConfigSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigFail1, TestSize.Level0)
 {
     StaServiceConnectToWifiDeviceConfigFail1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigFail2, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigFail2, TestSize.Level0)
 {
     StaServiceConnectToWifiDeviceConfigFail2();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigFail3, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToWifiDeviceConfigFail3, TestSize.Level0)
 {
     StaServiceConnectToWifiDeviceConfigFail3();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToNetworkIdSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToNetworkIdSuccess, TestSize.Level0)
 {
     StaServiceConnectToNetworkIdSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToNetworkIdFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToNetworkIdFail1, TestSize.Level0)
 {
     StaServiceConnectToNetworkIdFail1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceReAssociateSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceReAssociateSuccess, TestSize.Level0)
 {
     StaServiceReAssociateSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceAddDeviceConfigSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceAddDeviceConfigSuccess, TestSize.Level0)
 {
     StaServiceAddDeviceConfigSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceAddDeviceConfigFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceAddDeviceConfigFail1, TestSize.Level0)
 {
     StaServiceAddDeviceConfigFail1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceAddDeviceConfigFail2, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceAddDeviceConfigFail2, TestSize.Level0)
 {
     StaServiceAddDeviceConfigFail2();
 }
 
-HWTEST_F(StaServiceTest, StaServiceAddDeviceConfigFail3, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceAddDeviceConfigFail3, TestSize.Level0)
 {
     StaServiceAddDeviceConfigFail3();
 }
 
-HWTEST_F(StaServiceTest, StaServiceUpdateDeviceConfigSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceUpdateDeviceConfigSuccess, TestSize.Level0)
 {
     StaServiceUpdateDeviceConfigSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigSuccess, TestSize.Level0)
 {
     StaServiceRemoveDeviceConfigSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigFail1, TestSize.Level0)
 {
     StaServiceRemoveDeviceConfigFail1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigFail2, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveDeviceConfigFail2, TestSize.Level0)
 {
     StaServiceRemoveDeviceConfigFail2();
 }
 
-HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigSuccess, TestSize.Level0)
 {
     StaServiceEnableDeviceConfigSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigFail1, TestSize.Level0)
 {
     StaServiceEnableDeviceConfigFail1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigFail2, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigFail2, TestSize.Level0)
 {
     StaServiceEnableDeviceConfigFail2();
 }
 
-HWTEST_F(StaServiceTest, StaServiceDisableDeviceConfigSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceDisableDeviceConfigSuccess, TestSize.Level0)
 {
     StaServiceDisableDeviceConfigSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceDisableDeviceConfigFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceDisableDeviceConfigFail1, TestSize.Level0)
 {
     StaServiceDisableDeviceConfigFail1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceDisconnectSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceDisconnectSuccess, TestSize.Level0)
 {
     StaServiceDisconnectSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceStartWpsSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceStartWpsSuccess, TestSize.Level0)
 {
     StaServiceStartWpsSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceCancelWpsSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceCancelWpsSuccess, TestSize.Level0)
 {
     StaServiceCancelWpsSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceAutoConnectServiceSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceAutoConnectServiceSuccess, TestSize.Level0)
 {
     StaServiceAutoConnectServiceSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackSuccess, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackSuccess, TestSize.Level0)
 {
     StaServiceRegisterStaServiceCallbackSuccess();
     EXPECT_FALSE(g_errLog.find("StaServiceTest")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackFail, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRegisterStaServiceCallbackFail, TestSize.Level0)
 {
     StaServiceRegisterStaServiceCallbackFail();
     EXPECT_FALSE(g_errLog.find("StaServiceTest")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestSucc, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestSucc, TestSize.Level0)
 {
     StaServiceAddCandidateConfigTestSucc();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail0, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail0, TestSize.Level0)
 {
     StaServiceAddCandidateConfigTestFail0();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceAddCandidateConfigTestFail1, TestSize.Level0)
 {
     StaServiceAddCandidateConfigTestFail1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveCandidateConfigTestSucc, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveCandidateConfigTestSucc, TestSize.Level0)
 {
     StaServiceRemoveCandidateConfigTestSucc();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveCandidateConfigTestFail, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveCandidateConfigTestFail, TestSize.Level0)
 {
     StaServiceRemoveCandidateConfigTestFail();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveAllCandidateConfigTestSucc, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveAllCandidateConfigTestSucc, TestSize.Level0)
 {
     StaServiceRemoveAllCandidateConfigTestSucc();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc0, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc0, TestSize.Level0)
 {
     StaServiceConnectToCandidateConfigTestSucc0();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc1, TestSize.Level0)
 {
     StaServiceConnectToCandidateConfigTestSucc1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail, TestSize.Level0)
 {
     StaServiceConnectToCandidateConfigTestFail();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestSucc, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestSucc, TestSize.Level0)
 {
     StaServiceRemoveAllDeviceTestSucc();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestFail0, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestFail0, TestSize.Level0)
 {
     StaServiceRemoveAllDeviceTestFail0();
 }
 
-HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestFail1, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceRemoveAllDeviceTestFail1, TestSize.Level0)
 {
     StaServiceRemoveAllDeviceTestFail1();
 }
 
-HWTEST_F(StaServiceTest, StaServiceReConnectTestSucc, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceReConnectTestSucc, TestSize.Level0)
 {
     StaServiceReConnectTestSucc();
 }
@@ -1101,133 +1102,133 @@ HWTEST_F(StaServiceTest, StaServiceReConnectTestSucc, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: issueI5JRBB
  */
-HWTEST_F(StaServiceTest, StaServiceSetSuspendMode, TestSize.Level1)
+HWTEST_F(StaServiceTest, StaServiceSetSuspendMode, TestSize.Level0)
 {
     StaServiceSetSuspendModeTest();
 }
 
-HWTEST_F(StaServiceTest, DisableAutoJoin, TestSize.Level1)
+HWTEST_F(StaServiceTest, DisableAutoJoin, TestSize.Level0)
 {
     DisableAutoJoin();
 }
 
-HWTEST_F(StaServiceTest, EnableAutoJoin, TestSize.Level1)
+HWTEST_F(StaServiceTest, EnableAutoJoin, TestSize.Level0)
 {
     EnableAutoJoin();
 }
 
-HWTEST_F(StaServiceTest, RegisterAutoJoinCondition, TestSize.Level1)
+HWTEST_F(StaServiceTest, RegisterAutoJoinCondition, TestSize.Level0)
 {
     RegisterAutoJoinCondition();
 }
 
-HWTEST_F(StaServiceTest, DeregisterAutoJoinCondition, TestSize.Level1)
+HWTEST_F(StaServiceTest, DeregisterAutoJoinCondition, TestSize.Level0)
 {
     DeregisterAutoJoinCondition();
 }
 
-HWTEST_F(StaServiceTest, RegisterFilterBuilder, TestSize.Level1)
+HWTEST_F(StaServiceTest, RegisterFilterBuilder, TestSize.Level0)
 {
     RegisterFilterBuilder();
 }
 
-HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level1)
+HWTEST_F(StaServiceTest, DeregisterFilterBuilder, TestSize.Level0)
 {
     DeregisterFilterBuilder();
 }
 
-HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeSuceessTest, TestSize.Level0)
 {
     EnableHiLinkHandshakeSuceessTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeFailTest, TestSize.Level0)
 {
     EnableHiLinkHandshakeFailTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, DeliverStaIfaceDataSuccessTest, TestSize.Level0)
 {
     DeliverStaIfaceDataSuccessTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, GetDataSlotIdTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, GetDataSlotIdTest, TestSize.Level0)
 {
     GetDataSlotIdTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, GetImsiTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, GetImsiTest, TestSize.Level0)
 {
     GetImsiTest();
 }
 
-HWTEST_F(StaServiceTest, GetPlmnTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, GetPlmnTest, TestSize.Level0)
 {
     GetPlmnTest();
 }
 
-HWTEST_F(StaServiceTest, GetMccTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, GetMccTest, TestSize.Level0)
 {
     GetMccTest();
 }
 
-HWTEST_F(StaServiceTest, GetMncTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, GetMncTest, TestSize.Level0)
 {
     GetMncTest();
 }
 
-HWTEST_F(StaServiceTest, UpdateEapConfigTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, UpdateEapConfigTest, TestSize.Level0)
 {
     UpdateEapConfigTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level0)
 {
     OnWifiCountryCodeChangedTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StartPortalCertificationTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, StartPortalCertificationTest, TestSize.Level0)
 {
     StartPortalCertificationTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, HandleForegroundAppChangedActionTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, HandleForegroundAppChangedActionTest, TestSize.Level0)
 {
     HandleForegroundAppChangedActionTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, EnableHiLinkHandshakeTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, EnableHiLinkHandshakeTest, TestSize.Level0)
 {
     EnableHiLinkHandshakeTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, DeliverStaIfaceDataTest, TestSize.Level0)
 {
     DeliverStaIfaceDataTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StartConnectToBssidTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, StartConnectToBssidTest, TestSize.Level0)
 {
     StartConnectToBssidTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 
-HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessTest, TestSize.Level1)
+HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessTest, TestSize.Level0)
 {
     EXPECT_EQ(0, StartConnectToUserSelectNetworkSuccessTest());
 }
 
-HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessFail, TestSize.Level1)
+HWTEST_F(StaServiceTest, StartConnectToUserSelectNetworkSuccessFail, TestSize.Level0)
 {
     EXPECT_EQ(1, StartConnectToUserSelectNetworkSuccessFail());
 }

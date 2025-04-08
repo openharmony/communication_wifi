@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_self_cure_output_path = "wifi/wifi_selfcure_unittest"
+module_self_cure_output_path = "wifi/wifi/wifi_selfcure_unittest"
 module_output_path = "wifi/wifi/sta_test"
 defines = []
 defines += [ "OHOS_WIFI_STA_TEST" ]

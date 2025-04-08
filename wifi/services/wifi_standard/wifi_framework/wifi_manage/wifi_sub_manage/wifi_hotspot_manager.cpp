@@ -14,6 +14,7 @@
  */
 
 #ifdef FEATURE_AP_SUPPORT
+#include "wifi_ap_msg.h"
 #include "wifi_hotspot_manager.h"
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
@@ -108,7 +109,13 @@ void WifiHotspotManager::CloseApService(int id)
     cbMsg.id = id;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("OnHotspotStateChanged") + std::string("id = ") + std::to_string(id);
-    WifiCommonEventHelper::PublishHotspotStateChangedEvent(static_cast<int>(ApState::AP_STATE_CLOSED), msg);
+    HotspotMode hotspotMode = HotspotMode::SOFTAP;
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService != nullptr) {
+        pService->GetHotspotMode(hotspotMode);
+    }
+    WifiCommonEventHelper::PublishHotspotStateChangedEvent("HotspotMode",
+        static_cast<int>(hotspotMode), static_cast<int>(ApState::AP_STATE_CLOSED), msg);
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN) {
         WIFI_LOGI("airplaneMode not close ap SA!");
@@ -151,7 +158,13 @@ void WifiHotspotManager::DealApStateChanged(ApState state, int id)
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 
     std::string msg = std::string("OnHotspotStateChanged") + std::string("id = ") + std::to_string(id);
-    WifiCommonEventHelper::PublishHotspotStateChangedEvent((int)state, msg);
+    HotspotMode hotspotMode = HotspotMode::SOFTAP;
+    IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
+    if (pService != nullptr) {
+        pService->GetHotspotMode(hotspotMode);
+    }
+    WifiCommonEventHelper::PublishHotspotStateChangedEvent("HotspotMode",
+        static_cast<int>(hotspotMode), (int)state, msg);
     return;
 }
 

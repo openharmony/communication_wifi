@@ -906,5 +906,146 @@ ErrCode WifiHotspotProxy::GetApIfaceName(std::string& ifaceName)
     ifaceName = reply.ReadString();
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiHotspotProxy::EnableLocalOnlyHotspot(const ServiceType type)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageParcel reply;
+    MessageParcel data;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token fail: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(type));
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT), data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT));
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+ 
+ErrCode WifiHotspotProxy::DisableLocalOnlyHotspot(const ServiceType type)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token fail: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(type));
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT), data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT));
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+ 
+ErrCode WifiHotspotProxy::GetHotspotMode(HotspotMode &mode)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageParcel data;
+    MessageOption option;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token fail: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_MODE),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_MODE), error);
+        return ErrCode(error);
+    }
+ 
+    int err = reply.ReadInt32();
+    if (err) {
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int result = reply.ReadInt32();
+    if (result != WIFI_OPT_SUCCESS) {
+        return ErrCode(result);
+    }
+    mode = HotspotMode(reply.ReadInt32());
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode WifiHotspotProxy::GetLocalOnlyHotspotConfig(HotspotConfig &result)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    const char *readRetStr = nullptr;
+    MessageParcel reply;
+    MessageParcel data;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(
+        HotspotInterfaceCode::WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG), data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed",
+            static_cast<int32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG));
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int except = reply.ReadInt32();
+    if (except) {
+        return WIFI_OPT_FAILED;
+    }
+    int remoteRet = reply.ReadInt32();
+    if (ErrCode(remoteRet) != WIFI_OPT_SUCCESS) {
+        return ErrCode(remoteRet);
+    }
+ 
+    readRetStr = reply.ReadCString();
+    result.SetSsid((readRetStr != nullptr) ? readRetStr : "");
+    result.SetSecurityType(static_cast<KeyMgmt>(reply.ReadInt32()));
+    result.SetBand(static_cast<BandType>(reply.ReadInt32()));
+    result.SetChannel(reply.ReadInt32());
+    readRetStr = reply.ReadCString();
+    result.SetPreSharedKey((readRetStr != nullptr) ? readRetStr : "");
+    result.SetMaxConn(reply.ReadInt32());
+    result.SetIpAddress(reply.ReadString());
+    result.SetLeaseTime(reply.ReadInt32());
+ 
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

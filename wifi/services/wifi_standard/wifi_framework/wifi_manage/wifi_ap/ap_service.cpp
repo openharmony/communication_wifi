@@ -336,5 +336,15 @@ std::string ApService::WifiCountryCodeChangeObserver::GetListenerModuleName()
 {
     return m_listenerModuleName;
 }
+
+ErrCode ApService::GetHotspotMode(HotspotMode &mode)
+{
+    return m_ApStateMachine.GetHotspotMode(mode);
+}
+
+ErrCode ApService::SetHotspotMode(const HotspotMode &mode)
+{
+    return m_ApStateMachine.SetHotspotMode(mode);
+}
 }  // namespace Wifi
 }  // namespace OHOS

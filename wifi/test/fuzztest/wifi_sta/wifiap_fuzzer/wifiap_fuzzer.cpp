@@ -304,6 +304,20 @@ void WifiApIdleStateFuzzTest(const uint8_t* data, size_t size)
     pApIdleState->ExecuteStateMsg(msg);
 }
 
+void GetHotspotModeFuzzTest(const uint8_t* data, size_t size)
+{
+    HotspotMode model = static_cast<HotspotMode>(static_cast<int>(data[0]) % THREE);
+    pApInterface->GetHotspotMode(model);
+    pApService->GetHotspotMode(model);
+}
+
+void SetHotspotModeFuzzTest(const uint8_t* data, size_t size)
+{
+    HotspotMode model = static_cast<HotspotMode>(static_cast<int>(data[0]) % THREE);
+    pApInterface->SetHotspotMode(model);
+    pApService->SetHotspotMode(model);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -341,6 +355,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::GetPowerModelFuzzTest(data, size);
     OHOS::Wifi::SetPowerModelFuzzTest(data, size);
     OHOS::Wifi::WifiApIdleStateFuzzTest(data, size);
+    OHOS::Wifi::GetHotspotModeFuzzTest(data, size);
+    OHOS::Wifi::SetHotspotModeFuzzTest(data, size);
     return 0;
 }
 }

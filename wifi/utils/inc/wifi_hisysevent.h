@@ -77,6 +77,14 @@ enum class WifiScanFailReason {
     HDI_GET_SCAN_INFOS_FAIL
 };
 
+struct Pref5gStatisticsInfo {
+    std::string bssid;
+    std::string ssid;
+    int32_t freq;
+    int64_t conDuration;
+};
+
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
 void WriteWifiApStateHiSysEvent(int32_t state);

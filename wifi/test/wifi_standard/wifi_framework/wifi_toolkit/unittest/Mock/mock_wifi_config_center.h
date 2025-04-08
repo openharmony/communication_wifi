@@ -172,6 +172,10 @@ public:
     virtual void SetFastScan(bool fastScan) = 0;
     virtual void SetAutoConnect(bool autoConnectEnable) = 0;
     virtual bool GetAutoConnect() = 0;
+    virtual HotspotMode GetHotspotMode() = 0;
+    virtual void SetHotspotMode(const HotspotMode &mode) = 0;
+    virtual int GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig) = 0;
+    virtual void SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotConfig) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -324,6 +328,10 @@ public:
     MOCK_METHOD1(SetFastScan, void(bool fastScan));
     MOCK_METHOD1(SetAutoConnect, void(bool));
     MOCK_METHOD0(GetAutoConnect, bool());
+    MOCK_METHOD0(GetHotspotMode, HotspotMode());
+    MOCK_METHOD1(SetHotspotMode, void(const HotspotMode &mode));
+    MOCK_METHOD1(GetLocalOnlyHotspotConfig, int(HotspotConfig &hotspotConfig));
+    MOCK_METHOD1(SetLocalOnlyHotspotConfig, void(const HotspotConfig &hotspotConfig));
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

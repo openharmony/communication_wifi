@@ -22,6 +22,7 @@
 #include "wifi_logger.h"
 #include "wifi_manager.h"
 #include "wifi_settings.h"
+#include "wifi_ap_msg.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -380,7 +381,6 @@ public:
 
     void CalculateHotspotModeTest()
     {
-        using HotspotMode = WifiControllerMachine::HotspotMode;
         pWifiControllerMachine->hotspotMode = HotspotMode::NONE;
         pWifiControllerMachine->CalculateHotspotMode(0);
 
@@ -674,6 +674,15 @@ HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForWlan1Test02, TestSi
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetPersistWifiState(_))
         .WillRepeatedly(Return(WIFI_STATE_ENABLED));
     EXPECT_EQ(pWifiControllerMachine->pEnableState->HandleWifiToggleChangeForWlan1(id, isOpen), true);
+}
+
+HWTEST_F(WifiControllerMachineTest, IsLocalOnlyHotspotTest, TestSize.Level1)
+{
+    if (pWifiControllerMachine == nullptr) {
+        return;
+    }
+    pWifiControllerMachine->IsLocalOnlyHotspot(true);
+    EXPECT_TRUE(pWifiControllerMachine->isLocalOnlyHotspot_);
 }
 }
 }

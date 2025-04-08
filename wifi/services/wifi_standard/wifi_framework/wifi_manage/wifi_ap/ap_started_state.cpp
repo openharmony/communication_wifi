@@ -39,6 +39,8 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_randommac_helper.h"
 #include "wifi_battery_utils.h"
+#include "ap_define.h"
+
 #define SET_DUAL_ANTENNAS 45
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 
@@ -139,10 +141,29 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
     m_ApConfigUse.UpdateApChannelConfig(apConfig);
     std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
-    if (WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, apConfig, m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
+    
+    WifiErrorNo setSoftApConfigResult = WifiErrorNo::WIFI_HAL_OPT_OK;
+    HotspotMode currentMode = HotspotMode::SOFTAP;
+    m_ApStateMachine.GetHotspotMode(currentMode);
+    if (currentMode == HotspotMode::LOCAL_ONLY_SOFTAP) {
+        // The localOnlyHotspot uses the temporary configuration and does not flush to disks,
+        // The SSID and password are random values.
+        HotspotConfig hotspotConfigTemp = apConfig;
+        std::string randomSsid = LOCAL_ONLY_SOFTAP_SSID_PREFIX +
+            std::to_string(GetRandomInt(LOCAL_ONLY_SOFTAP_SSID_INIT_SUFFIX, LOCAL_ONLY_SOFTAP_SSID_END_SUFFIX));
+        hotspotConfigTemp.SetSsid(randomSsid);
+        hotspotConfigTemp.SetPreSharedKey(GetRandomStr(LOCAL_ONLY_SOFTAP_PWD_LEN));
+        WifiConfigCenter::GetInstance().SetLocalOnlyHotspotConfig(hotspotConfigTemp);
+        setSoftApConfigResult = WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, hotspotConfigTemp, m_id);
+        WIFI_LOGI("set local only hotspot config, ssid=%{public}s", SsidAnonymize(randomSsid).c_str());
+    } else {
+        setSoftApConfigResult = WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, apConfig, m_id);
+    }
+    if (setSoftApConfigResult != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("set hostapd config failed.");
         return false;
     }
+
     if (BatteryUtils::GetInstance().GetBatteryCapacity() > SET_DUAL_ANTENNAS) {
         HotspotConfig hotspotConfig;
         WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);

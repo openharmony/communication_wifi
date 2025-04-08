@@ -72,6 +72,8 @@ public:
     static bool PublishConnStateChangedEvent(const int &code, const std::string &data);
     static bool PublishWifi2ConnStateChangedEvent(const int &code, const std::string &data);
     static bool PublishHotspotStateChangedEvent(const int &code, const std::string &data);
+    static bool PublishHotspotStateChangedEvent(const std::string &apModeKey, int apModeValue, const int &code,
+        const std::string &data);
     static bool PublishApStaJoinEvent(const int &code, const std::string &data);
     static bool PublishApStaLeaveEvent(const int &code, const std::string &data);
     static bool PublishMPlinkEvent(const int &code, const std::string &data);

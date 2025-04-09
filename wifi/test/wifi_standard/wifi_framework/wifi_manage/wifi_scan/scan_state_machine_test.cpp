@@ -39,7 +39,6 @@ constexpr int FREQ_5_GHZ_VALUE = 5010;
 constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int TWO = 2;
-constexpr int ONE = 1;
 static std::string g_errLog;
 void ScanStateMachineCallback(const LogType type, const LogLevel level,
                               const unsigned int domain, const char *tag,

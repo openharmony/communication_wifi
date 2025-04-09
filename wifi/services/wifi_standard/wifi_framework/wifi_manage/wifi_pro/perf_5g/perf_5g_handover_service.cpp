@@ -47,9 +47,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     std::string strategyName = HandleSwitchResult(wifiLinkedInfo);
     bool is5gAfterPerf = (strategyName != "");
     if (connectedAp_ != nullptr) {
-        if (connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {
-            return;
-        }
+        if (connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {return;}
         WIFI_LOGI("OnConnected, connected ap is switched");
         OnDisconnected();
     }
@@ -75,7 +73,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         wifiLinkedInfo.isDataRestricted, wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, isHwItCustNetwork);
     ApConnectionInfo apConnectionInfo(wifiLinkedInfo.bssid);
     apConnectionInfo.SetConnectedTime(std::chrono::steady_clock::now());
-    onnectTime_ = std::chrono::steady_clock::now();
+    connectTime_ = std::chrono::steady_clock::now();
     connectedAp_->apInfo.apConnectionInfo = apConnectionInfo;
     if (connectedAp_->canNotPerf) {
         WIFI_LOGI("OnConnected, ap is not allow perf 5g");

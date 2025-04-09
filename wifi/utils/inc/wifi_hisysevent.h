@@ -160,6 +160,9 @@ void WritePortalAuthExpiredHisysevent(int respCode, int detectNum, time_t connTi
 void WriteWifiSelfcureHisysevent(int type);
 
 void Write3VapConflictHisysevent(int type);
+
+void WriteAutoSelectHiSysEvent(int selectType, const std::string &selectedInfo,
+    const std::string &filteredReason, const std::string &savedResult);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

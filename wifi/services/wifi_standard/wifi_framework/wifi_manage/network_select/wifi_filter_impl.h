@@ -212,4 +212,12 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 }
+
+class NotAllowAutoConnectFilter final : public SimpleWifiFilter {
+public:
+    NotAllowAutoConnectFilter();
+    ~NotAllowAutoConnectFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
 #endif //OHOS_WIFI_WIFI_FILTER_H

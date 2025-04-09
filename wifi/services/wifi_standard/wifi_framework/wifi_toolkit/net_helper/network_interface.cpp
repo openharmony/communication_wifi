@@ -272,7 +272,7 @@ bool NetworkInterface::FetchIpAddress(
         if (strncmp(interfaceName.c_str(), ifa->ifa_name, IF_NAMESIZE) != 0 && !interfaceName.empty()) {
             continue;
         }
-        ret |= SaveIpAddress(*ifa, vecipv4, vecIPv6);
+        ret = static_cast<uint32_t>(ret) | static_cast<uint32_t>(SaveIpAddress(*ifa, vecipv4, vecIPv6));
     }
 
     freeifaddrs(ifaddr);
@@ -308,7 +308,7 @@ bool NetworkInterface::FetchApOrP2pIpAddress(
             (strncmp("p2p0", ifa->ifa_name, IF_NAMESIZE) == 0 || strncmp("p2p-", ifa->ifa_name, strlen("p2p-")) == 0)) {
             continue;
         }
-        ret |= SaveIpAddress(*ifa, vecipv4, vecIPv6);
+        ret = static_cast<uint32_t>(ret) | static_cast<uint32_t>(SaveIpAddress(*ifa, vecipv4, vecIPv6));
     }
 
     freeifaddrs(ifaddr);

@@ -37,6 +37,7 @@
 #include "mac_address.h"
 #include "wifi_settings.h"
 #include "p2p_chr_reporter.h"
+#include "wifi_notification_util.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -49,8 +50,6 @@ const int CMD_TYPE_SET = 2;
 const int DATA_TYPE_P2P_BUSINESS = 1;
 const int ARP_TIMEOUT = 100;
 const std::string CARRY_DATA_MIRACAST = "1";
-const std::string PRIMARY_PC_TYPE = "1";
-const std::string PRIMARY_DISPLAY_TYPE = "7";
 const std::vector<int> FILTERED_FREQS = {2412, 2437, 2462};
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
@@ -198,6 +197,7 @@ void P2pStateMachine::UpdateGroupManager() const
         WIFI_LOGE("Failed to get listNetworks");
         return;
     }
+    groupManager.ClearAll();
     for (auto wpaGroup = wpaGroups.begin(); wpaGroup != wpaGroups.end(); ++wpaGroup) {
         groupManager.UpdateWpaGroup(wpaGroup->second);
     }
@@ -207,23 +207,7 @@ void P2pStateMachine::UpdateGroupManager() const
 void P2pStateMachine::UpdatePersistentGroups() const
 {
     WIFI_LOGI("UpdatePersistentGroups");
-    std::vector<WifiP2pGroupInfo> groups;
-    groups = groupManager.GetGroups();
-    WifiSettings::GetInstance().SetWifiP2pGroupInfo(groups);
-    WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();
     BroadcastPersistentGroupsChanged();
-}
-
-bool P2pStateMachine::CheckIsDisplayDevice(const std::string &mac) const
-{
-    WifiP2pDevice dev = deviceManager.GetDevices(mac);
-    std::string primaryType = dev.GetPrimaryDeviceType();
-    std::vector<std::string> type = StrSplit(primaryType, "-");
-    if (!type.empty() && (type[0] == PRIMARY_PC_TYPE || type[0] == PRIMARY_DISPLAY_TYPE)) {
-        WIFI_LOGI("peer is a dispaly type");
-        return true;
-    }
-    return false;
 }
 
 bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) const
@@ -248,10 +232,6 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
              * If GO is running on the peer device and the GO has been connected,
              * you can directly connect to the peer device through p2p_group_add.
              */
-            if (CheckIsDisplayDevice(config.GetDeviceAddress()) && !groupManager.IsOldPersistentGroup(networkId)) {
-                WifiP2PHalInterface::GetInstance().RemoveNetwork(networkId);
-                return false;
-            }
             if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().GroupAdd(true, networkId, 0)) {
                 return false;
             }
@@ -768,47 +748,8 @@ void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string 
 void P2pStateMachine::NotifyUserInvitationReceivedMessage()
 {
     WIFI_LOGI("P2pStateMachine::NotifyUserInvitationReceivedMessage  enter");
-    const std::string inputBoxPin("input pin:");
-    auto sendMessage = [this](int msgName, const std::any &messageObj) { this->SendMessage(msgName, messageObj); };
-
-    const WpsInfo &wps = savedP2pConfig.GetWpsInfo();
-    std::function<void(AlertDialog &, std::any)> acceptEvent = [=](AlertDialog &dlg, std::any msg) {
-        std::any msgBuf = msg;
-        std::any anyPin;
-        if (wps.GetWpsMethod() == WpsMethod::WPS_METHOD_KEYPAD) {
-            anyPin = dlg.GetInputBox(inputBoxPin);
-        }
-        sendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), anyPin);
-    };
-
-    std::function<void(AlertDialog &, std::any)> rejectEvent = [=](AlertDialog &dlg, std::any msg) {
-        AlertDialog dlgBuf = dlg;
-        std::any andMsg = msg;
-        /* PEER_CONNECTION_USER_REJECT -> INTERNAL_CONN_USER_ACCEPT @2022-11-24 */
-        SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), andMsg);
-    };
-
-    AlertDialog &dialog = AbstractUI::GetInstance().Build();
-    std::string message = "NotifyInvitationReceived: "
-        "Receiving device:" +
-        deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
-    dialog.SetButton("accepts", acceptEvent, nullptr);
-    dialog.SetButton("rejects", rejectEvent, nullptr);
-
-    switch (wps.GetWpsMethod()) {
-        case WpsMethod::WPS_METHOD_KEYPAD: {
-            dialog.SetInputBox(inputBoxPin);
-            break;
-        }
-        case WpsMethod::WPS_METHOD_DISPLAY: {
-            message += std::string("PIN:") + wps.GetPin();
-            break;
-        }
-        default:
-            break;
-    }
-    dialog.SetMessage(message);
-    AbstractUI::GetInstance().ShowAlerDialog(dialog);
+    std::string deviceName = deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
+    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_PBC_DIALOG, deviceName);
 }
 
 void P2pStateMachine::P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const
@@ -1241,6 +1182,17 @@ bool P2pStateMachine::HasPersisentGroup(void)
     return !grpInfo.empty();
 }
 
+void P2pStateMachine::SetClientInfo(HalP2pGroupConfig &wpaConfig, WifiP2pGroupInfo &grpBuf) const
+{
+    std::vector<WifiP2pDevice> devices = grpBuf.GetPersistentDevices();
+    for (size_t i = 0; i < devices.size(); i++) {
+        wpaConfig.clientList += devices[i].GetDeviceAddress();
+        if (i < devices.size() - 1) {
+            wpaConfig.clientList += " ";
+        }
+    }
+}
+
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
@@ -1257,23 +1209,24 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
 
     int createdNetId = -1;
     WifiP2pGroupInfo grpBuf;
-    HalP2pGroupConfig wpaConfig;
     for (unsigned int i = 0; i < grpInfo.size(); ++i) {
         grpBuf = grpInfo.at(i);
         WifiErrorNo ret = WifiP2PHalInterface::GetInstance().P2pAddNetwork(createdNetId);
         if (ret == WIFI_HAL_OPT_OK) {
+            HalP2pGroupConfig wpaConfig;
             grpBuf.SetNetworkId(createdNetId);
             wpaConfig.ssid = grpBuf.GetGroupName();
             wpaConfig.psk = grpBuf.GetPassphrase();
             wpaConfig.bssid = grpBuf.GetOwner().GetDeviceAddress();
             const int p2pDisabled = 2;
             wpaConfig.disabled = p2pDisabled;
-            if (grpBuf.GetOwner().GetDeviceAddress() == deviceManager.GetThisDevice().GetDeviceAddress()) {
+            if (!grpBuf.GetPersistentDevices().empty()) {
                 const int p2pMode = 3;
                 wpaConfig.mode = p2pMode;
             } else {
                 wpaConfig.mode = 0;
             }
+            SetClientInfo(wpaConfig, grpBuf);
             WifiP2PHalInterface::GetInstance().P2pSetGroupConfig(createdNetId, wpaConfig);
             grpInfo.at(i) = grpBuf;
         } else {
@@ -1375,6 +1328,7 @@ void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
     p2pGroupOperatingState.SetEnhanceService(enhanceService);
 }
+
 int P2pStateMachine::GetRandomSocialFreq(const std::vector<int> &freqList) const
 {
     std::vector<int> validFreqs;
@@ -1393,6 +1347,12 @@ int P2pStateMachine::GetRandomSocialFreq(const std::vector<int> &freqList) const
         return 0;
     }
     return validFreqs[randomIndex];
+}
+
+bool P2pStateMachine::P2pReject(const std::string mac) const
+{
+    WifiP2PHalInterface::GetInstance().P2pReject(mac);
+    return true;
 }
 } // namespace Wifi
 } // namespace OHOS

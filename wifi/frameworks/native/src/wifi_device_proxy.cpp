@@ -1332,8 +1332,8 @@ void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<W
         signInfo.snr = reply.ReadInt32();
         signInfo.chload = reply.ReadInt32();
         signInfo.ulDelay = reply.ReadInt32();
-        signInfo.txBytes = reply.ReadInt32();
-        signInfo.rxBytes = reply.ReadInt32();
+        signInfo.txBytes = reply.ReadUint32();
+        signInfo.rxBytes = reply.ReadUint32();
         signInfo.txFailed = reply.ReadInt32();
         signInfo.chloadSelf = reply.ReadInt32();
         signInfo.timeStamp = reply.ReadInt64();

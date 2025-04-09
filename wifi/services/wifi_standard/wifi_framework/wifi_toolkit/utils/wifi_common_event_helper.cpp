@@ -151,6 +151,12 @@ bool WifiCommonEventHelper::PublishHotspotStateChangedEvent(const int &code, con
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_HOTSPOT_STATE, code, data);
 }
 
+bool WifiCommonEventHelper::PublishHotspotStateChangedEvent(const std::string &apModeKey, int apModeValue,
+    const int &code, const std::string &data)
+{
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_HOTSPOT_STATE, apModeKey, apModeValue, code, data);
+}
+
 bool WifiCommonEventHelper::PublishApStaJoinEvent(const int &code, const std::string &data)
 {
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_AP_STA_JOIN, code, data);
@@ -212,7 +218,7 @@ bool WifiCommonEventHelper::PublishSelfcureStateChangedEvent(const int &pid, con
     CommonEventData commonData;
     commonData.SetWant(want);
     std::vector<std::string> permissions;
-    permissions.push_back(COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION);
+    permissions.push_back(COMMON_EVENT_GET_WIFI_INFO_PERMISSION);
     CommonEventPublishInfo publishInfo;
     publishInfo.SetSubscriberPermissions(permissions);
     if (!CommonEventManager::PublishCommonEvent(commonData, publishInfo)) {

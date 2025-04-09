@@ -26,24 +26,24 @@
 #include <chrono>
 #include <atomic>
 #include "singleton.h"
-#include "v1_0/ichip_controller.h"
+#include "v2_0/ichip_controller.h"
 
 namespace OHOS {
 namespace Wifi {
-using OHOS::HDI::Wlan::Chip::V1_0::IChipController;
-using OHOS::HDI::Wlan::Chip::V1_0::IChipControllerCallback;
-using OHOS::HDI::Wlan::Chip::V1_0::IConcreteChip;
-using OHOS::HDI::Wlan::Chip::V1_0::IConcreteChipCallback;
-using OHOS::HDI::Wlan::Chip::V1_0::IChipIface;
-using OHOS::HDI::Wlan::Chip::V1_0::IChipIfaceCallback;
-using OHOS::HDI::Wlan::Chip::V1_0::ErrorCode;
-using OHOS::HDI::Wlan::Chip::V1_0::IfaceType;
-using OHOS::HDI::Wlan::Chip::V1_0::ComboIface;
-using OHOS::HDI::Wlan::Chip::V1_0::UsableMode;
-using OHOS::HDI::Wlan::Chip::V1_0::ScanParams;
-using OHOS::HDI::Wlan::Chip::V1_0::ScanResultsInfo;
-using OHOS::HDI::Wlan::Chip::V1_0::PnoScanParams;
-using OHOS::HDI::Wlan::Chip::V1_0::SignalPollResult;
+using OHOS::HDI::Wlan::Chip::V2_0::IChipController;
+using OHOS::HDI::Wlan::Chip::V2_0::IChipControllerCallback;
+using OHOS::HDI::Wlan::Chip::V2_0::IConcreteChip;
+using OHOS::HDI::Wlan::Chip::V2_0::IConcreteChipCallback;
+using OHOS::HDI::Wlan::Chip::V2_0::IChipIface;
+using OHOS::HDI::Wlan::Chip::V2_0::IChipIfaceCallback;
+using OHOS::HDI::Wlan::Chip::V2_0::ErrorCode;
+using OHOS::HDI::Wlan::Chip::V2_0::IfaceType;
+using OHOS::HDI::Wlan::Chip::V2_0::ComboIface;
+using OHOS::HDI::Wlan::Chip::V2_0::UsableMode;
+using OHOS::HDI::Wlan::Chip::V2_0::ScanParams;
+using OHOS::HDI::Wlan::Chip::V2_0::ScanResultsInfo;
+using OHOS::HDI::Wlan::Chip::V2_0::PnoScanParams;
+using OHOS::HDI::Wlan::Chip::V2_0::SignalPollResult;
 using IfaceDestoryCallback = std::function<void(std::string&, int)>;
 using RssiReportCallback = std::function<void(int, int)>;
 using NetlinkReportCallback = std::function<void(int, const std::vector<uint8_t>&)>;
@@ -467,7 +467,7 @@ private:
     bool GetChip(const std::string &removeIfaceName, IfaceType removeIfaceType, sptr<IConcreteChip> &chip);
     bool RemoveIface(sptr<IChipIface> &iface, bool isCallback, IfaceType createIfaceType);
     bool SendCmdToDriver(const std::string &ifaceName, const std::string &interfaceName,
-        int cmd, const std::string &param);
+        int cmd, const std::string &param, std::string &result);
     std::string MakeMacFilterString(const std::vector<std::string> &blockList);
     static void ResetHalDeviceManagerInfo(bool isRemoteDied);
 

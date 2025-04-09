@@ -285,6 +285,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        void HandleArpFailedDetected(InternalMessagePtr msg);
         SelfCureStateMachine *pSelfCureStateMachine_;
     };
 
@@ -338,7 +339,7 @@ private:
     void SendBlaListToDriver(int blaListType);
     std::string BlackListToString(std::map<std::string, WifiCategoryBlackListInfo> &map);
     std::string ParseWifiCategoryBlackListInfo(std::pair<std::string, WifiCategoryBlackListInfo> iter);
-    void AgeOutWifiCategoryBlack(int blaListType, std::map<std::string, WifiCategoryBlackListInfo> &blackListCache);
+    bool AgeOutWifiCategoryBlack(int blaListType);
     void AgeOutWifiConnectFailList();
     int GetCurSignalLevel();
     bool IsHttpReachable();
@@ -353,6 +354,7 @@ private:
     bool ShouldTransToWifi6SelfCure(InternalMessagePtr msg, std::string currConnectedBssid);
     int GetWifi7SelfCureType(int connectFailTimes, WifiLinkedInfo &info);
     void ShouldTransToWifi7SelfCure(WifiLinkedInfo &info);
+    void HandleWifiBlackListUpdateMsg();
     int GetScanRssi(std::string currentBssid, const std::vector<WifiScanInfo> scanResults);
     int GetCurrentRssi();
     std::string GetCurrentBssid();

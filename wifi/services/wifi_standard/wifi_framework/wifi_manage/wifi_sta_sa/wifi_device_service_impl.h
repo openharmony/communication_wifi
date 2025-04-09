@@ -226,13 +226,17 @@ private:
     ErrCode HilinkGetMacAddress(WifiDeviceConfig &deviceConfig, std::string &currentMac);
 #ifndef OHOS_ARCH_LITE
     bool InitWifiBrokerProcessInfo(const WifiDeviceConfig &config);
+    ErrCode FactoryResetNotify();
 #endif
     void ReplaceConfigWhenCandidateConnected(std::vector<WifiDeviceConfig> &result);
     void updateStaDeviceMacAddress(WifiDeviceConfig &config);
     int ProcessPermissionVerify(const std::string &appId, const std::string &packageName);
     void UpdateWifiLinkInfo(WifiLinkedInfo &info);
-    void DeliverAudioState(const WifiNetworkControlInfo& networkControlInfo);
-private:
+#ifdef DYNAMIC_UNLOAD_SA
+    void StopUnloadStaTimer(void) override;
+#endif
+
+    private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;
     static constexpr int MAX_HEX_LEN = 64;
     static constexpr int MIN_PSK_LEN = 8;

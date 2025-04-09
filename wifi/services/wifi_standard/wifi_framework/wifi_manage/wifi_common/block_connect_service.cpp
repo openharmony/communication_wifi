@@ -13,6 +13,10 @@
 * limitations under the License.
 */
 #include "block_connect_service.h"
+#ifndef OHOS_ARCH_LITE
+#include "wifi_config_center.h"
+#include "wifi_system_timer.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -21,6 +25,9 @@ constexpr int FREQUENT_DISCONNECT_COUNT = 5;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MAX = 10 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 1 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 0.5 * 60 * 1000 * 1000;
+#ifndef OHOS_ARCH_LITE
+constexpr int64_t TIMEOUT_CLEAR_SET = 4 * 60 * 1000;
+#endif
 
 BlockConnectService &BlockConnectService::GetInstance()
 {
@@ -97,7 +104,7 @@ bool BlockConnectService::ShouldAutoConnect(const WifiDeviceConfig &config)
 {
     // Return true if auto connect is enabled, false otherwise
     WIFI_LOGD("ENTER shouldAutoConnect %{public}d",
-              config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED);
+        config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED);
     return config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
 }
 
@@ -316,6 +323,9 @@ void BlockConnectService::OnReceiveSettingsEnterEvent(bool isEnter)
             DisabledReason::DISABLED_CONSECUTIVE_FAILURES,
         };
         EnableAllNetworksByEnteringSettings(enableReasons);
+#ifndef OHOS_ARCH_LITE
+        ReleaseUnusableBssidSet();
+#endif
     }
 }
 
@@ -337,5 +347,102 @@ void BlockConnectService::LogDisabledConfig(const WifiDeviceConfig &config)
         return;
     }
 }
+
+#ifndef OHOS_ARCH_LITE
+void BlockConnectService::DealStaStopped(int instId)
+{
+    if (instId != 0) {
+        WIFI_LOGD("sta stopped, but instId is %{public}d", instId);
+        return;
+    }
+    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
+        ReleaseUnusableBssidSet();
+    }
+}
+
+void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::string bssid, DisabledReason disableReason)
+{
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, targetNetwork)) {
+        WIFI_LOGE("Failed to get device config %{public}d", targetNetworkId);
+        return;
+    }
+    std::lock_guard<std::mutex> lock(bssidMutex_);
+    if (disableReason == DisabledReason::DISABLED_ASSOCIATION_REJECTION
+        || disableReason == DisabledReason::DISABLED_AUTHENTICATION_FAILURE) {
+        if (targetNetwork.ssid != curUnusableSsid_ ||
+            !WifiSettings::GetInstance().InKeyMgmtBitset(targetNetwork, curUnusableKeyMgmt_)) {
+            autoJoinUnusableBssidSet_.clear();
+        }
+        if (!bssid.empty()) {
+            autoJoinUnusableBssidSet_.insert(bssid);
+            curUnusableSsid_ = targetNetwork.ssid;
+            curUnusableKeyMgmt_ = targetNetwork.keyMgmt;
+        }
+    }
+}
+
+void BlockConnectService::ReleaseUnusableBssidSet()
+{
+    StopClearSetTimer();
+    std::lock_guard<std::mutex> lock(bssidMutex_);
+    autoJoinUnusableBssidSet_.clear();
+    curUnusableSsid_ = "";
+    curUnusableKeyMgmt_ = "";
+}
+
+bool BlockConnectService::IsBssidMatchUnusableSet(std::string bssid)
+{
+    std::lock_guard<std::mutex> lock(bssidMutex_);
+    for (auto curBssid : autoJoinUnusableBssidSet_) {
+        if (bssid == curBssid) {
+            WIFI_LOGI("current bssid %{public}s match unusable bssid set.", MacAnonymize(bssid).c_str());
+            return true;
+        }
+    }
+    return false;
+}
+
+void BlockConnectService::StartClearSetTimer()
+{
+    WIFI_LOGD("%{public}s, enter", __FUNCTION__);
+    std::lock_guard<std::mutex> lock(clearSetTimerMutex_);
+    if (clearSetTimerId_ != 0) {
+        WIFI_LOGI("%{public}s, clearSetTimerId_ is not zero", __FUNCTION__);
+        return;
+    }
+    std::shared_ptr<WifiSysTimer> clearSetTimer =
+        std::make_shared<WifiSysTimer>(false, 0, true, false);
+    std::function<void()> callback = [this]() { this->ClearSetTimerCallback(); };
+    clearSetTimer->SetCallbackInfo(callback);
+    clearSetTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(clearSetTimer);
+    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
+    MiscServices::TimeServiceClient::GetInstance()->StartTimer(clearSetTimerId_, currentTime + TIMEOUT_CLEAR_SET);
+    WIFI_LOGI("%{public}s, succuss", __FUNCTION__);
+}
+
+void BlockConnectService::StopClearSetTimer()
+{
+    WIFI_LOGI("enter %{public}s, ", __FUNCTION__);
+    std::lock_guard<std::mutex> lock(clearSetTimerMutex_);
+    if (clearSetTimerId_ == 0) {
+        WIFI_LOGE("%{public}s, clearSetTimerId_ is zero", __FUNCTION__);
+        return;
+    } else {
+        MiscServices::TimeServiceClient::GetInstance()->StopTimer(clearSetTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(clearSetTimerId_);
+        clearSetTimerId_ = 0;
+        return;
+    }
+}
+
+void BlockConnectService::ClearSetTimerCallback()
+{
+    std::lock_guard<std::mutex> lock(bssidMutex_);
+    autoJoinUnusableBssidSet_.clear();
+    curUnusableSsid_ = "";
+    curUnusableKeyMgmt_ = "";
+}
+#endif
 }
 }

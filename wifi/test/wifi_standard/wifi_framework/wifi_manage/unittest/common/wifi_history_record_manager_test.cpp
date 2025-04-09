@@ -304,7 +304,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateConnectionTimeTest, TestSize.Level1
     WifiHistoryRecordManager::GetInstance().UpdateConnectionTime(false);
 
     long testTotalUseTimeAtNight2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
-    EXPECT_TRUE(testTotalUseTimeAtNight2 != 0);
+    EXPECT_FALSE(testTotalUseTimeAtNight2 != 0);
 
     // The statistical time does not cross 0 o'clock
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();

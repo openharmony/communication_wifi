@@ -26,8 +26,8 @@ DEFINE_WIFILOG_LABEL("DualBandLearningAlgService");
 constexpr int MEAN_P_MIN_RSSI = -72;
 constexpr int MEAN_P_MAX_RSSI = -42;
 const int DETAIL_STEPS[] = {0, 1, 3, 5};
-const int FLOW_THRESHOLDS[] = {0, 20, 100, 500};
-constexpr int FLOW_RATE_TIME_RANGE_SECOND = 15;
+const unsigned int FLOW_THRESHOLDS[] = {0, 20, 100, 500};
+constexpr unsigned int FLOW_RATE_TIME_RANGE_SECOND = 15;
 constexpr double MEAN_P_MIN = 0.05;
 constexpr double MEAN_P_MAX = 0.95;
 constexpr int LOOP_MAX = 20;
@@ -35,6 +35,7 @@ constexpr double BASE_VALUE = 500.0;
 constexpr double VALID_SIZE_RATE_LIST = 5;
 const double PI = acos(-1.0);
 const double E = exp(1);
+constexpr uint32_t  USE_1000 = 1000;
 
 DualBandLearningAlgService::DualBandLearningAlgService()
 {}
@@ -100,7 +101,7 @@ void DualBandLearningAlgService::UpdateMeanPValue(std::list<LinkQuality> &rate2g
     long averageRate24g = Get2gAverageRate(rate2gList);
     long averageRate5g = Get5gAverageRate(rate5gList);
     bool isMoveToRight = IsMoveRight(averageRate24g, averageRate5g);
-    long flowRate5g = GetFlowRate(rate5gList);
+    unsigned long flowRate5g = GetFlowRate(rate5gList);
     long detailStep = GetDetailStep(flowRate5g);
     MoveMeanPs(meanPvalues, detailStep, rssi5g, isMoveToRight);
     meanPString = DualBandUtils::DoubleArrToString(meanPvalues, DualBandUtils::comma);
@@ -210,7 +211,7 @@ long DualBandLearningAlgService::Get5gAverageRate(std::list<LinkQuality> &rate5g
     }
     return rateSum / rateNum;
 }
-long DualBandLearningAlgService::GetDetailStep(long flowRate)
+long DualBandLearningAlgService::GetDetailStep(unsigned long flowRate)
 {
     int detailStepIndex = 0;
     int flowThresholdSize = std::size(FLOW_THRESHOLDS);
@@ -223,14 +224,25 @@ long DualBandLearningAlgService::GetDetailStep(long flowRate)
     }
     return DETAIL_STEPS[detailStepIndex];
 }
-long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
+unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
 {
-    long flowSum = 0;
-    for (auto it = rateList.begin(); it != rateList.end(); it++) {
-        flowSum += it->txBytes + it->rxBytes;
+    if (rateList.empty()) {
+        return 0;
     }
-    int conversionStep = 1000;
-    return flowSum / conversionStep / FLOW_RATE_TIME_RANGE_SECOND;
+    if (rateList.back().txBytes < rateList.front().txBytes || rateList.back().txBytes < rateList.front().txBytes) {
+        WIFI_LOGW("%{public}s, signalpoll overflow", __FUNCTION__);
+        return 0;
+    }
+    uint32_t flowTx = rateList.back().txBytes - rateList.front().txBytes;
+    uint32_t flowRx = rateList.back().txBytes - rateList.front().txBytes;
+    // avoid add flow
+    if ((flowTx > 0) && (flowRx > (UINT32_MAX - flowTx))) {
+        WIFI_LOGW("%{public}s, add overflow", __FUNCTION__);
+        flowTx = UINT32_MAX;
+    } else {
+        flowTx += flowRx;
+    }
+    return static_cast<unsigned long>(flowTx / USE_1000 / FLOW_RATE_TIME_RANGE_SECOND);
 }
 bool DualBandLearningAlgService::IsMoveRight(long averageRate24g, long averageRate5g)
 {
@@ -243,7 +255,7 @@ bool DualBandLearningAlgService::IsValidRssi(int rssi)
 }
 bool DualBandLearningAlgService::IsReachTrafficThreshold(std::list<LinkQuality> &rateList)
 {
-    long flowRate = GetFlowRate(rateList);
+    unsigned long flowRate = GetFlowRate(rateList);
     return GetDetailStep(flowRate) != 0;
 }
 void DualBandLearningAlgService::MoveMeanPs(std::vector<double> &meanPVs, int detailStep,

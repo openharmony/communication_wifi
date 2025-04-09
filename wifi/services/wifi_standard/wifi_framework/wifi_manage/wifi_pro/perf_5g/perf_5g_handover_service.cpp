@@ -42,9 +42,9 @@ Perf5gHandoverService::Perf5gHandoverService()
 }
 Perf5gHandoverService::~Perf5gHandoverService()
 {}
-void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo, std::string &bssidBeforePerf5g)
+void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
 {
-    std::string strategyName = HandleSwitchResult(wifiLinkedInfo, bssidBeforePerf5g);
+    std::string strategyName = HandleSwitchResult(wifiLinkedInfo);
     bool is5gAfterPerf = (strategyName != "");
     if (connectedAp_ != nullptr) {
         if (connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {
@@ -134,15 +134,15 @@ void Perf5gHandoverService::NetworkStatusChanged(NetworkStatus networkStatus)
         UnloadScanController();
     }
 }
-bool Perf5gHandoverService::Switch5g()
+std::string Perf5gHandoverService::Switch5g()
 {
     if (selectRelationAp_ == nullptr || connectedAp_ == nullptr) {
-        return false;
+        return "";
     }
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pStaService == nullptr) {
         WIFI_LOGE("Switch5g: pStaService is invalid");
-        return false;
+        return "";
     }
     int32_t ret;
  
@@ -150,11 +150,11 @@ bool Perf5gHandoverService::Switch5g()
     ret = pStaService->StartConnectToBssid(
         selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, NETWORK_SELECTED_BY_AUTO);
     if (ret == WIFI_OPT_SUCCESS) {
-        return true;
+        return selectRelationAp_->apInfo.bssid;
     }
     WIFI_LOGW("Switch5g, StartConnectToBssid fail, ret = %{public}d", ret);
     selectRelationAp_.reset();
-    return false;
+    return "";
 }
 void Perf5gHandoverService::ScanResultUpdated(std::vector<InterScanInfo> &scanInfos)
 {
@@ -462,7 +462,8 @@ void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
 }
 void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<InterScanInfo> &wifiScanInfos)
 {
-    if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
+    if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid) ||
+        NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
         WIFI_LOGI("FoundMonitorAp, relation ap(%{public}s) in block list, can not monitor",
             MacAnonymize(relationAps_[relationApIndex].apInfo_.bssid).data());
         return;
@@ -514,7 +515,7 @@ void Perf5gHandoverService::LoadMonitorScanController()
         std::dynamic_pointer_cast<IDualBandScanStrategy>(std::make_shared<PeriodicScanStrategy>()));
     pWifiScanController_ = std::make_shared<WifiScanController>(dualBandScanStrategys);
 }
-std::string Perf5gHandoverService::HandleSwitchResult(WifiLinkedInfo &wifiLinkedInfo, std::string &bssidBeforePerf5g)
+std::string Perf5gHandoverService::HandleSwitchResult(WifiLinkedInfo &wifiLinkedInfo)
 {
     if (selectRelationAp_ == nullptr) {
         if (connectedAp_ != nullptr && connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {
@@ -530,7 +531,6 @@ std::string Perf5gHandoverService::HandleSwitchResult(WifiLinkedInfo &wifiLinked
     if (wifiLinkedInfo.bssid == selectRelationAp_->apInfo.bssid) {
         WIFI_LOGI("HandleSwitchResult, perf 5g successful");
         selectStrategyName = selectRelationAp_->selectStrategyName;
-        bssidBeforePerf5g = bssidLastConnected_;
     } else {
         WIFI_LOGW("HandleSwitchResult, perf 5g failed");
         HandleSwitchFailed(Perf5gSwitchResult::NO_PERF_5G_AP);
@@ -574,8 +574,10 @@ void Perf5gHandoverService::GetNoExistRelationInfo(std::vector<WifiDeviceConfig>
             }
             bool isSameSsidConnectedAp = (connectedAp_->apInfo.ssid == wifiDeviceConfig.ssid &&
                 connectedAp_->apInfo.keyMgmt == wifiDeviceConfig.keyMgmt);
-            isSameSsidConnectedAp = isSameSsidConnectedAp &&
-                (wifiScanInfo.ssid == wifiDeviceConfig.ssid && scanResultKmgmt == wifiDeviceConfig.keyMgmt);
+            isSameSsidConnectedAp =
+                isSameSsidConnectedAp && (wifiScanInfo.ssid == wifiDeviceConfig.ssid &&
+                (scanResultKmgmt == wifiDeviceConfig.keyMgmt || (scanResultKmgmt.compare("WPA-PSK+SAE") == 0 &&
+                scanResultKmgmt.find(wifiDeviceConfig.keyMgmt) != std::string::npos)));
             if (isSameSsidConnectedAp) {
                 noExistRelationBssidSet.insert(wifiScanInfo.bssid);
                 RelationAp relationAp;

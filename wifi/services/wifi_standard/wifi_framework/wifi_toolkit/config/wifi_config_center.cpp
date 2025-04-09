@@ -1534,5 +1534,18 @@ bool WifiConfigCenter::GetAutoConnect()
 {
     return autoConnectEnable_.load();
 }
+ 
+int WifiConfigCenter::GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig)
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    hotspotConfig = localOnlyHotspotConfig_;
+    return 0;
+}
+ 
+void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotConfig)
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    localOnlyHotspotConfig_ = hotspotConfig;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -610,6 +610,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::GoInState()
     pSelfCureStateMachine_->isInternetFailureDetected_ = false;
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_IDLE, false);
     pSelfCureStateMachine_->ClearDhcpOffer();
+    pSelfCureStateMachine_->HandleWifiBlackListUpdateMsg();
 }
 
 void SelfCureStateMachine::DisconnectedMonitorState::GoOutState()
@@ -1838,11 +1839,41 @@ bool SelfCureStateMachine::NoInternetState::ExecuteStateMsg(InternalMessagePtr m
             ret = EXECUTED;
             pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pDisconnectedMonitorState_);
             break;
+        case WIFI_CURE_CMD_PERIODIC_ARP_DETECTED:
+            ret = EXECUTED;
+            pSelfCureStateMachine_->PeriodicArpDetection();
+            break;
+        case WIFI_CURE_CMD_ARP_FAILED_DETECTED:
+            ret = EXECUTED;
+            HandleArpFailedDetected(msg);
+            break;
         default:
             WIFI_LOGD("NoInternetState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;
+}
+
+void SelfCureStateMachine::NoInternetState::HandleArpFailedDetected(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGW("HandleArpFailedDetected, msg is nullptr");
+        return;
+    }
+    std::string currentBssid = pSelfCureStateMachine_->GetCurrentBssid();
+    if (pSelfCureStateMachine_->ShouldTransToWifi6SelfCure(msg, currentBssid)) {
+        return;
+    }
+
+    std::string selfCureHistory = pSelfCureStateMachine_->GetSelfCureHistoryInfo();
+    WifiSelfCureHistoryInfo selfCureInfo;
+    SelfCureUtils::GetInstance().String2InternetSelfCureHistoryInfo(selfCureHistory, selfCureInfo);
+    if (SelfCureUtils::GetInstance().SelfCureAcceptable(selfCureInfo, WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC)) {
+        WIFI_LOGI("arp failed, try to reassoc");
+        pSelfCureStateMachine_->MessageExecutedLater(WIFI_CURE_CMD_SELF_CURE_WIFI_LINK,
+            WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC, 0, SELF_CURE_DELAYED_MS);
+        pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pInternetSelfCureState_);
+    }
 }
 
 int64_t SelfCureStateMachine::GetNowMilliSeconds()
@@ -1854,12 +1885,9 @@ int64_t SelfCureStateMachine::GetNowMilliSeconds()
 
 void SelfCureStateMachine::SendBlaListToDriver(int blaListType)
 {
+    AgeOutWifiCategoryBlack(blaListType);
     std::map<std::string, WifiCategoryBlackListInfo> wifiBlackListCache;
     WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(blaListType, wifiBlackListCache);
-    if (wifiBlackListCache.empty()) {
-        return;
-    }
-    AgeOutWifiCategoryBlack(blaListType, wifiBlackListCache);
     std::string param = BlackListToString(wifiBlackListCache);
     std::string ifName = "wlan0";
     if (WifiCmdClient::GetInstance().SendCmdToDriver(ifName, blaListType, param) != 0) {
@@ -1871,11 +1899,11 @@ void SelfCureStateMachine::SendBlaListToDriver(int blaListType)
 std::string SelfCureStateMachine::BlackListToString(std::map<std::string, WifiCategoryBlackListInfo> &map)
 {
     std::string param;
-    if (map.empty()) {
-        return param;
-    }
     uint32_t idx = map.size() >= WIFI_MAX_BLA_LIST_NUM ? WIFI_MAX_BLA_LIST_NUM : map.size();
     param.push_back(idx);
+    if (idx == 0u) {
+        return param;
+    }
     for (auto iter : map) {
         std::string singleParam = ParseWifiCategoryBlackListInfo(iter);
         if (singleParam.size() != WIFI_SINGLE_ITEM_BYTE_LEN) {
@@ -1913,16 +1941,24 @@ std::string SelfCureStateMachine::ParseWifiCategoryBlackListInfo(std::pair<std::
     return singleParam;
 }
 
-void SelfCureStateMachine::AgeOutWifiCategoryBlack(int blaListType, std::map<std::string,
-    WifiCategoryBlackListInfo> &blackListCache)
+bool SelfCureStateMachine::AgeOutWifiCategoryBlack(int blaListType)
 {
+    bool isUpdate = false;
+    std::map<std::string, WifiCategoryBlackListInfo> blackListCache;
+    WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(blaListType, blackListCache);
+    if (blackListCache.empty()) {
+        return false;
+    }
     if (blaListType != EVENT_AX_BLA_LIST && blaListType != EVENT_BE_BLA_LIST) {
         WIFI_LOGE("AgeOutWifiCategoryBlack wrong type.");
-        return;
+        return false;
     }
     for (auto iter = blackListCache.begin(); iter != blackListCache.end(); ++iter) {
         if (GetNowMilliSeconds() - iter->second.updateTime >= WIFI_BLA_LIST_TIME_EXPIRED) {
             WifiConfigCenter::GetInstance().RemoveWifiCategoryBlackListCache(blaListType, iter->first);
+            isUpdate = true;
+            WIFI_LOGI("%{public}s blaListType:%{public}d remove bssid: %{public}s for ageOut", __FUNCTION__,
+                blaListType, MacAnonymize(iter->first).c_str());
         }
     }
     if (blackListCache.size() >= WIFI_MAX_BLA_LIST_NUM) {
@@ -1935,7 +1971,11 @@ void SelfCureStateMachine::AgeOutWifiCategoryBlack(int blaListType, std::map<std
             }
         }
         WifiConfigCenter::GetInstance().RemoveWifiCategoryBlackListCache(blaListType, delBssid);
+        isUpdate = true;
+        WIFI_LOGI("%{public}s blaListType:%{public}d remove bssid: %{public}s for reach max size", __FUNCTION__,
+            blaListType, MacAnonymize(delBssid).c_str());
     }
+    return isUpdate;
 }
 
 void SelfCureStateMachine::AgeOutWifiConnectFailList()
@@ -1985,7 +2025,7 @@ bool SelfCureStateMachine::IsHttpReachable()
     mNetWorkDetect_->StartWifiDetection();
     std::unique_lock<std::mutex> locker(detectionMtx_);
     detectionCond_.wait_for(locker, std::chrono::milliseconds(HTTP_DETECT_TIMEOUT));
-    WIFI_LOGI("IsHttpReachable network detect end, resuil is %{public}d", isHttpReachable_);
+    WIFI_LOGI("IsHttpReachable network detect end, result is %{public}d", isHttpReachable_);
     return isHttpReachable_;
 }
 
@@ -2273,12 +2313,12 @@ int SelfCureStateMachine::GetWifi7SelfCureType(int connectFailTimes, WifiLinkedI
     std::vector<WifiScanInfo> scanResults;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     int scanRssi = GetScanRssi(info.bssid, scanResults);
-    WIFI_LOGI("GetWifi7SelfCureType scanRssi %{public}d", scanRssi);
-    if ((info.supportedWifiCategory == WifiCategory::WIFI7
-        || info.supportedWifiCategory == WifiCategory::WIFI7_PLUS)
-        && connectFailTimes >= SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT
-        && info.rssi >= MIN_VAL_LEVEL_3) {
-            return WIFI7_SELFCURE_DISCONNECTED;
+    WifiCategory wifiCategory = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetWifiCategoryRecord(info.bssid);
+    WIFI_LOGI("GetWifi7SelfCureType scanRssi %{public}d, wifiCategory: %{public}d, connectFailTimes: %{public}d",
+        scanRssi, static_cast<int>(wifiCategory), connectFailTimes);
+    if ((wifiCategory == WifiCategory::WIFI7 || wifiCategory == WifiCategory::WIFI7_PLUS)
+        && connectFailTimes >= SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT && scanRssi >= MIN_VAL_LEVEL_3) {
+        return WIFI7_SELFCURE_DISCONNECTED;
     }
     return WIFI7_NO_SELFCURE;
 }
@@ -2296,8 +2336,7 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
         WIFI_LOGE("no bssid in connectFailListCache");
         return;
     }
-    int wifi7SelfCureType = WIFI7_NO_SELFCURE;
-    wifi7SelfCureType = GetWifi7SelfCureType(iterConnectFail->second.connectFailTimes, info);
+    int wifi7SelfCureType = GetWifi7SelfCureType(iterConnectFail->second.connectFailTimes, info);
     if (wifi7SelfCureType == WIFI7_SELFCURE_DISCONNECTED) {
         std::map<std::string, WifiCategoryBlackListInfo> blackListCache;
         WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, blackListCache);
@@ -2315,6 +2354,16 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
         }
     } else {
         WIFI_LOGD("don't need to do wifi7 selfcure");
+    }
+}
+
+void SelfCureStateMachine::HandleWifiBlackListUpdateMsg()
+{
+    if (AgeOutWifiCategoryBlack(EVENT_BE_BLA_LIST)) {
+        SendBlaListToDriver(EVENT_BE_BLA_LIST);
+    }
+    if (AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST)) {
+        SendBlaListToDriver(EVENT_AX_BLA_LIST);
     }
 }
 

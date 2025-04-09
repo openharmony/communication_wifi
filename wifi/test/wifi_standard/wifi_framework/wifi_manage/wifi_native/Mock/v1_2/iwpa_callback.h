@@ -19,7 +19,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <hdf_base.h>
-#include "wlan/wpa/v1_2/wpa_types.h"
+#include "wlan/wpa/v2_0/wpa_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,7 +27,7 @@ extern "C" {
 
 struct HdfRemoteService;
 
-#define IWPACALLBACK_INTERFACE_DESC "ohos.hdi.wlan.wpa.v1_2.IWpaCallback"
+#define IWPACALLBACK_INTERFACE_DESC "ohos.hdi.wlan.wpa.v2_0.IWpaCallback"
 
 #define IWPA_CALLBACK_MAJOR_VERSION 1
 #define IWPA_CALLBACK_MINOR_VERSION 2

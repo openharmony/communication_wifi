@@ -88,13 +88,10 @@ private:
     void HighPriorityTransmit(int uid, int protocol, int enable);
     void GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     void LogSpeedLimitConfigs();
-    void UpdateGamePvpState(const WifiNetworkControlInfo &networkControlInfo);
-    bool VerifyInputParameters(const WifiNetworkControlInfo &networkControlInfo);
 
 private:
     StaServiceCallback m_staCallback;
     std::atomic<bool> m_isWifiConnected = false;
-    std::atomic<bool> m_isGamePvp = false;
     int m_isHighPriorityTransmit = 0;
     std::map<int, int> m_bgLimitRecordMap;
     int m_limitSpeedMode{0};

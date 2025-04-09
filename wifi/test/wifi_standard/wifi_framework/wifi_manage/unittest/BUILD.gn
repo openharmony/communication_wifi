@@ -16,7 +16,7 @@ import("//foundation/communication/wifi/wifi/wifi.gni")
 
 ################################################################################
 
-module_output_path = "wifi/manager_test"
+module_output_path = "wifi/wifi/manager_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -103,7 +103,6 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_sta_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_state_machine.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
-    "Mock/mock_wifi_app_parser.cpp",
     "Mock/mock_wifi_settings.cpp",
     "common/app_network_speed_limit_service_test.cpp",
     "common/block_connect_service_test.cpp",
@@ -230,8 +229,8 @@ ohos_unittest("manager_unittest") {
     "time_service:time_client",
     "window_manager:libdm_lite",
   ]
-  external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
-  external_deps += [ "drivers_interface_wlan:libwpa_proxy_1.2" ]
+  external_deps += [ "drivers_interface_wlan:libchip_proxy_2.0" ]
+  external_deps += [ "drivers_interface_wlan:libwpa_proxy_2.0" ]
   external_deps += [ "drivers_interface_wlan:libhostapd_proxy_1.0" ]
   defines = [
     "HDI_WPA_INTERFACE_SUPPORT",

@@ -419,5 +419,12 @@ ErrCode WifiP2pImpl::Hid2dIsWideBandwidthSupported(bool &isSupport)
     RETURN_IF_FAIL(GetWifiP2pProxy());
     return client_->Hid2dIsWideBandwidthSupported(isSupport);
 }
+
+ErrCode WifiP2pImpl::SetMiracastSinkConfig(const std::string& config)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->SetMiracastSinkConfig(config);
+}
 }  // namespace Wifi
 }  // namespace OHOS

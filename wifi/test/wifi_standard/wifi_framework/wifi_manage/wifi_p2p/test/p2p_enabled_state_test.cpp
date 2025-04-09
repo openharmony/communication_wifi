@@ -29,7 +29,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-const std::string g_errLog = "wifitest";
+const std::string g_errLog = "wifi_test";
 class P2pEnabledStateTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -105,7 +105,7 @@ HWTEST_F(P2pEnabledStateTest, GoInState, TestSize.Level1)
 HWTEST_F(P2pEnabledStateTest, GoOutState, TestSize.Level1)
 {
     pP2pEnabledState->GoOutState();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("P2pEnabledState")!=std::string::npos);
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg, TestSize.Level1)
@@ -315,7 +315,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg16, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_FALSE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg17, TestSize.Level1)
@@ -395,7 +395,7 @@ HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg22, TestSize.Level1)
     pP2pEnabledState->ExecuteStateMsg(msg);
 
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_FAILURE));
-    pP2pEnabledState->ExecuteStateMsg(msg);
+    EXPECT_FALSE(pP2pEnabledState->ExecuteStateMsg(msg));
 }
 
 HWTEST_F(P2pEnabledStateTest, ExecuteStateMsg23, TestSize.Level1)

@@ -335,7 +335,6 @@ void RptManagerMachine::StartedState::GoInState()
 void RptManagerMachine::StartedState::GoOutState()
 {
     WIFI_LOGE("StartedState GoOutState function.\n");
-    pRptManagerMachine->BroadcastApState(static_cast<int>(ApState::AP_STATE_CLOSED));
 }
 
 bool RptManagerMachine::StartedState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -453,6 +452,7 @@ void RptManagerMachine::StoppedState::GoInState()
     WIFI_LOGE("StoppedState GoInState function.\n");
     WriteWifiBridgeStateHiSysEvent(P2P_BRIDGE_OFF);
     pRptManagerMachine->mcb.onStopped(mid);
+    pRptManagerMachine->BroadcastApState(static_cast<int>(ApState::AP_STATE_CLOSED));
 }
 
 void RptManagerMachine::StoppedState::GoOutState()
@@ -492,7 +492,8 @@ void RptManagerMachine::BroadcastApState(int apState)
     cbMsg.id = mid;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("OnHotspotStateChanged") + std::string("id = ") + std::to_string(mid);
-    WifiCommonEventHelper::PublishHotspotStateChangedEvent(apState, msg);
+    WifiCommonEventHelper::PublishHotspotStateChangedEvent("HotspotMode",
+        static_cast<int>(HotspotMode::RPT), apState, msg);
 }
 
 void RptManagerMachine::BroadcastStationJoin(std::string mac)

@@ -641,5 +641,10 @@ ErrCode StaInterface::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wi
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->GetSignalPollInfoArray(wifiSignalPollInfos, length);
 }
+
+void StaInterface::GetDetectNetState(OperateResState &state)
+{
+    pStaService->GetDetectNetState(state);
+}
 }  // namespace Wifi
 }  // namespace OHOS

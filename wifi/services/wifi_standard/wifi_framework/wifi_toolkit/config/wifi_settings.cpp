@@ -129,14 +129,18 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 #endif
         iter->second = config;
     } else {
-        if (mWifiDeviceConfig.size() > WIFI_DEVICE_CONFIG_MAX_MUN) {
-            LOGE("AddDeviceConfig Exceeding the maximum value!");
-            return -1;
-        }
         mWifiDeviceConfig.emplace(std::make_pair(config.networkId, config));
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
         WifiAssetManager::GetInstance().WifiAssetAdd(config, USER_ID_DEFAULT, false);
 #endif
+        std::vector<WifiDeviceConfig> tempConfigs;
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            tempConfigs.push_back(iter->second);
+        }
+        std::vector<WifiDeviceConfig> removedConfigs = RemoveExcessDeviceConfigs(tempConfigs);
+        for (auto iter = removedConfigs.begin(); iter != removedConfigs.end(); iter++) {
+            mWifiDeviceConfig.erase(iter->networkId);
+        }
     }
     return config.networkId;
 }
@@ -1028,24 +1032,19 @@ void WifiSettings::ClearHotspotConfig()
     std::unique_lock<std::mutex> lock(mApMutex);
     mHotspotConfig.clear();
     HotspotConfig config;
-#ifdef INIT_LIB_ENABLE
-    std::string ssid = GetMarketName();
-#endif
     config.SetSecurityType(KeyMgmt::WPA2_PSK);
     config.SetBand(BandType::BAND_2GHZ);
     config.SetChannel(AP_CHANNEL_DEFAULT);
     config.SetMaxConn(GetApMaxConnNum());
     config.SetBandWidth(AP_BANDWIDTH_DEFAULT);
-#ifdef INIT_LIB_ENABLE
-    config.SetSsid(ssid);
-#else
-    config.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
-#endif
+    config.SetSsid(GetDefaultApSsid());
     config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, config);
     if (!ret.second) {
         mHotspotConfig[0] = config;
     }
+    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}d", __FUNCTION__,
+        SsidAnonymize(config.GetSsid()).c_str(), config.GetPreSharedKey().length());
 }
 
 int WifiSettings::GetBlockList(std::vector<StationInfo> &results, int id)
@@ -1711,19 +1710,12 @@ std::string WifiSettings::GetPackageName(std::string tag)
 void WifiSettings::InitDefaultHotspotConfig()
 {
     HotspotConfig cfg;
-#ifdef INIT_LIB_ENABLE
-    std::string ssid = GetMarketName();
-#endif
     cfg.SetSecurityType(KeyMgmt::WPA2_PSK);
     cfg.SetBand(BandType::BAND_2GHZ);
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
     cfg.SetBandWidth(AP_BANDWIDTH_DEFAULT);
-#ifdef INIT_LIB_ENABLE
-    cfg.SetSsid(ssid);
-#else
-    cfg.SetSsid("OHOS_" + GetRandomStr(RANDOM_STR_LEN));
-#endif
+    cfg.SetSsid(GetDefaultApSsid());
     cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {
@@ -1749,6 +1741,10 @@ void WifiSettings::InitHotspotConfig()
         LOGI("load hotspot config fail, use default config");
         InitDefaultHotspotConfig();
     }
+    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}d", __FUNCTION__,
+        SsidAnonymize(mHotspotConfig[0].GetSsid()).c_str(),
+        PassWordAnonymize(mHotspotConfig[0].GetPreSharedKey()).length());
+
     /* init block list info */
     if (mSavedBlockInfo.LoadConfig() >= 0) {
         std::vector<StationInfo> tmp;
@@ -1861,19 +1857,20 @@ int WifiSettings::SyncWifiConfig()
     return mSavedWifiConfig.SaveConfig();
 }
 
-int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const
+std::vector<WifiDeviceConfig> WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const
 {
+    std::vector<WifiDeviceConfig> removeVec;
     int maxNumConfigs = mMaxNumConfigs;
     if (maxNumConfigs < 0) {
-        return 1;
+        return removeVec;
     }
     int numExcessNetworks = static_cast<int>(configs.size()) - maxNumConfigs;
     if (numExcessNetworks <= 0) {
-        return 1;
+        return removeVec;
     }
     sort(configs.begin(), configs.end(), [](WifiDeviceConfig a, WifiDeviceConfig b) {
-        if (a.lastConnectTime != b.lastConnectTime) {
-            return a.lastConnectTime < b.lastConnectTime;
+        if (std::max(a.lastConnectTime, a.lastUpdateTime) != std::max(b.lastConnectTime, b.lastUpdateTime)) {
+            return std::max(a.lastConnectTime, a.lastUpdateTime) < std::max(b.lastConnectTime, b.lastUpdateTime);
         } else if (a.numRebootsSinceLastUse != b.numRebootsSinceLastUse) {
             return a.numRebootsSinceLastUse > b.numRebootsSinceLastUse;
         } else if (a.numAssociation != b.numAssociation) {
@@ -1890,11 +1887,12 @@ int WifiSettings::RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &confi
     LOGI("saved config size greater than %{public}d, remove ssid(print up to 1000)=%{public}s",
         maxNumConfigs, removeConfig.str().c_str());
     std::vector<WifiDeviceConfig> newVec(configs.begin(), configs.begin() + numExcessNetworks);
+    removeVec.swap(newVec);
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
-    WifiAssetManager::GetInstance().WifiAssetRemovePack(newVec);
+    WifiAssetManager::GetInstance().WifiAssetRemovePack(removeVec);
 #endif
     configs.erase(configs.begin(), configs.begin() + numExcessNetworks);
-    return 0;
+    return removeVec;
 }
 
 std::string WifiSettings::FuzzyBssid(const std::string bssid)
@@ -2356,5 +2354,41 @@ void WifiSettings::UpLoadLocalDeviceConfigToCloud()
     WifiAssetManager::GetInstance().WifiAssetAddPack(tmp, USER_ID_DEFAULT, true, true);
 }
 #endif
+
+std::string WifiSettings::GetDefaultApSsid()
+{
+    std::string ssid;
+#ifdef INIT_LIB_ENABLE
+    std::string marketName = GetMarketName();
+    std::string brandName = GetBrand();
+    if (marketName.empty() || brandName.empty()) {
+        LOGE("Get market name or brand name is empty");
+        ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
+        return ssid;
+    }
+    brandName += " ";
+    size_t pos = marketName.find(brandName);
+    if (pos != std::string::npos) {
+        ssid = marketName.substr(pos + brandName.length());
+    } else {
+        ssid = marketName;
+    }
+
+    if (ssid.empty()) {
+        LOGE("ssid is empty and use random generation");
+        ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
+        return ssid;
+    }
+
+    const std::string ellipsis = "...";
+    if (ssid.length() > MAX_SSID_LEN) {
+        LOGE("ssid is larger than 32, use ellipsis");
+        ssid = ssid.substr(0, MAX_SSID_LEN - ellipsis.length()) + ellipsis;
+    }
+#else
+    ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
+#endif
+    return ssid;
+}
 }  // namespace Wifi
 }  // namespace OHOS

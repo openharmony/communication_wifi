@@ -493,6 +493,15 @@ public:
     WifiErrorNo DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName,
         const std::string &mac);
 
+    WifiErrorNo P2pReject(const std::string &mac);
+
+    /**
+     * @Description Set miracast sink config
+     *
+     * @param config - miracast config
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetMiracastSinkConfig(const std::string& config);
 private:
     P2pHalCallback mP2pCallback;
 };

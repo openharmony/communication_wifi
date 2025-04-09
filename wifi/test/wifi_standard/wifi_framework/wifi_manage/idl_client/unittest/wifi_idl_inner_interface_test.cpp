@@ -69,7 +69,7 @@ static void OnWpaConnectionFullMock(int status)
     LOGI("OnWpaConnectionFullMock");
 }
 
-static void OnWpaConnectionRejectMock(int status)
+static void OnWpaConnectionRejectMock(const OHOS::Wifi::AssocRejectInfo &assocRejectInfo)
 {
     LOGI("OnWpaConnectionRejectMock");
 }

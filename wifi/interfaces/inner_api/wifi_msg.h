@@ -751,6 +751,8 @@ struct WifiDeviceConfig {
     std::string macAddress;
     int uid;
     time_t lastConnectTime;
+    /* last update time */
+    time_t lastUpdateTime;
     int numRebootsSinceLastUse;
     int numAssociation;
     int connFailedCount;
@@ -798,6 +800,7 @@ struct WifiDeviceConfig {
         rssi = -100;
         uid = WIFI_INVALID_UID;
         lastConnectTime = -1;
+        lastUpdateTime = -1;
         numRebootsSinceLastUse = 0;
         numAssociation = 0;
         connFailedCount = 0;
@@ -1054,8 +1057,8 @@ struct WifiSignalPollInfo {
     int snr;
     int chload;
     int ulDelay;
-    int txBytes;
-    int rxBytes;
+    unsigned int txBytes;
+    unsigned int rxBytes;
     int txFailed;
     int chloadSelf;
     int c0Rssi;

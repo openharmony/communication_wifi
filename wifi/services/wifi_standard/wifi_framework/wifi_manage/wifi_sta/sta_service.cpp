@@ -457,6 +457,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     if (!WifiSettings::GetInstance().EncryptionDeviceConfig(tempDeviceConfig)) {
         LOGI("AddDeviceConfig EncryptionDeviceConfig failed");
     }
+    tempDeviceConfig.lastUpdateTime = time(0);
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* update net link proxy info */
@@ -1158,6 +1159,11 @@ bool StaService::VoWifiDetectSet(std::string cmd)
     std::string ret = VoWifiDetect(VOWIFI_DETECT_SET_PREFIX + cmd);
     WIFI_LOGI("VoWifiDetectSet ret : %{public}s", ret.c_str());
     return (!ret.empty() && (ret == "true" || ret == "OK"));
+}
+
+void StaService::GetDetectNetState(OperateResState &state)
+{
+    pStaStateMachine->GetDetectNetState(state);
 }
 }  // namespace Wifi
 }  // namespace OHOS

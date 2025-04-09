@@ -195,6 +195,10 @@ if (defined(ohos_lite)) {
       "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     ]
 
+    if (wifi_feature_non_seperate_p2p) {
+      defines += [ "NON_SEPERATE_P2P" ]
+    }
+
     configs = [ ":wifi_fw_common_header" ]
 
     deps = [
@@ -222,13 +226,13 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_hdi_wpa_supported) {
       defines += [ "HDI_WPA_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libwpa_proxy_1.2" ]
+      external_deps += [ "drivers_interface_wlan:libwpa_proxy_2.0" ]
       external_deps += [ "drivers_interface_wlan:libhostapd_proxy_1.0" ]
     }
 
     if (wifi_feature_with_hdi_chip_supported) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
-      external_deps += [ "drivers_interface_wlan:libchip_proxy_1.0" ]
+      external_deps += [ "drivers_interface_wlan:libchip_proxy_2.0" ]
     }
 
     if (wifi_feature_with_wifi_oeminfo_mac) {

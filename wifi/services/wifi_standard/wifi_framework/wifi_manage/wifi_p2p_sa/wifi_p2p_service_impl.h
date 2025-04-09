@@ -436,10 +436,19 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) override;
+
+    /**
+     * @Description Set miracast sink config
+     *
+     * @param config - miracast config
+     * @return ErrCode - operation result
+     */
+    ErrCode SetMiracastSinkConfig(const std::string& config) override;
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);
-    bool IsP2pServiceRunning();
+    // forceEnable: true - force enable P2pService if p2pservice is not running, false - check the service status
+    bool IsP2pServiceRunning(bool forceEnable = true);
     bool IsCallingAllowed();
     static void SaBasicDump(std::string& result);
 

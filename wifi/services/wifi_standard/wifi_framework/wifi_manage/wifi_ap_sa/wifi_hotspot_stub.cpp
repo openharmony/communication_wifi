@@ -121,6 +121,18 @@ void WifiHotspotStub::InitHandleMap()
     handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_IFACE_NAME)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply,
         MessageOption &option) { OnGetApIfaceName(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnEnableLocalOnlyHotspot(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnDisableLocalOnlyHotspot(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_MODE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetHotspotMode(code, data, reply, option); };
+    handleFuncMap[static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) { OnGetLocalOnlyHotspotConfig(code, data, reply, option); };
     return;
 }
 
@@ -599,6 +611,68 @@ void WifiHotspotStub::OnGetApIfaceName(uint32_t code, MessageParcel &data,
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteString(ifaceName);
     }
+    return;
+}
+
+void WifiHotspotStub::OnEnableLocalOnlyHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int32_t serviceType = data.ReadInt32();
+    ErrCode ret = EnableLocalOnlyHotspot(ServiceType(serviceType));
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+ 
+    return;
+}
+ 
+void WifiHotspotStub::OnDisableLocalOnlyHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int32_t serviceType = data.ReadInt32();
+    ErrCode ret = DisableLocalOnlyHotspot(ServiceType(serviceType));
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+ 
+    return;
+}
+ 
+void WifiHotspotStub::OnGetHotspotMode(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    Wifi::HotspotMode mode = Wifi::HotspotMode::NONE;
+    ErrCode ret = GetHotspotMode(mode);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    reply.WriteInt32(static_cast<int>(mode));
+    return;
+}
+ 
+void WifiHotspotStub::OnGetLocalOnlyHotspotConfig(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    HotspotConfig localOnlyHotspotConfig;
+ 
+    ErrCode ret = GetLocalOnlyHotspotConfig(localOnlyHotspotConfig);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteCString(localOnlyHotspotConfig.GetSsid().c_str());
+        reply.WriteInt32(static_cast<int>(localOnlyHotspotConfig.GetSecurityType()));
+        reply.WriteInt32(static_cast<int>(localOnlyHotspotConfig.GetBand()));
+        reply.WriteInt32(localOnlyHotspotConfig.GetChannel());
+        reply.WriteCString(localOnlyHotspotConfig.GetPreSharedKey().c_str());
+        reply.WriteInt32(localOnlyHotspotConfig.GetMaxConn());
+        if (localOnlyHotspotConfig.GetIpAddress().empty()) {
+            reply.WriteString(DHCP_IP_V4_DEFAULT);
+        } else {
+            reply.WriteString(localOnlyHotspotConfig.GetIpAddress());
+        }
+        reply.WriteInt32(localOnlyHotspotConfig.GetLeaseTime());
+    }
+ 
     return;
 }
 }  // namespace Wifi

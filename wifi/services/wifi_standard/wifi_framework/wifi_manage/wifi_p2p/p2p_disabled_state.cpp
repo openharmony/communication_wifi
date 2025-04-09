@@ -36,6 +36,7 @@ void P2pDisabledState::GoInState()
     WIFI_LOGI("             GoInState");
     if (p2pSmInitFlag) {
         p2pStateMachine.ClearAllP2pServiceCallbacks();
+        p2pStateMachine.groupManager.ClearAll();
         p2pStateMachine.groupManager.StashGroups();
         p2pStateMachine.StopP2pDhcpClient();
         p2pStateMachine.StopDhcpServer();

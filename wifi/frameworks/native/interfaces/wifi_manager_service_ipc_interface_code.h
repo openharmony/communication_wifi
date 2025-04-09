@@ -126,6 +126,10 @@ enum class  HotspotInterfaceCode {
     WIFI_SVR_CMD_SETTIMEOUT_AP = 0x1115,             /* set hotspot idle timeout */
     WIFI_SVR_CMD_GET_IFACE_NAME = 0x1116,            /* get hotspot iface name */
     WIFI_SVR_CMD_IS_HOTSPOT_SUPPORTED = 0x1117, /* whether hotspot is supported */
+    WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT = 0x1118,  /* enable local only hotspot */
+    WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT = 0x1119,  /* disable local only hotspot */
+    WIFI_SVR_CMD_GET_HOTSPOT_MODE = 0x1120,  /* get hotspot mode, include softap/rpt/localOnlySoftap */
+    WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG = 0x1121,  /* get local only hotspot config */
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
@@ -181,6 +185,7 @@ enum class  P2PInterfaceCode {
     WIFI_SVR_CMD_P2P_DISABLE_RANDOM_MAC = 0x202A,
     WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P = 0x202B,    /* check can use p2p */
     WIFI_SVR_CMD_P2P_HID2D_WIDE_SUPPORTED = 0x202C,    /* Hid2d Is Wide Bandwidth Supported */
+    WIFI_SVR_CMD_P2P_SET_MIRACAST_SINK_CONFIG = 0x202D,    /* Set miracast sink config */
 
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
     WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT = 0x3000,

@@ -79,7 +79,7 @@ public:
     virtual void SetDefaultFrequenciesByCountryBand(const BandType band, std::vector<int> &frequencies,
         int instId = 0) = 0;
     virtual int GetNextNetworkId() = 0;
-    virtual int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const = 0;
+    virtual std::vector<WifiDeviceConfig> RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const = 0;
     virtual void EncryptionWifiDeviceConfigOnBoot()= 0;
     virtual int GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups) = 0;
     virtual std::string FuzzyBssid(const std::string bssid) = 0;
@@ -170,7 +170,8 @@ public:
     MOCK_METHOD1(AddWpsDeviceConfig, int(const WifiDeviceConfig &config));
     MOCK_METHOD3(SetDefaultFrequenciesByCountryBand, void(const BandType band, std::vector<int> &frequencies, int));
     MOCK_METHOD0(GetNextNetworkId, int());
-    MOCK_CONST_METHOD1(RemoveExcessDeviceConfigs, int(std::vector<WifiDeviceConfig> &configs));
+    MOCK_CONST_METHOD1(RemoveExcessDeviceConfigs,
+        std::vector<WifiDeviceConfig>(std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD0(EncryptionWifiDeviceConfigOnBoot, void());
     MOCK_METHOD1(GetWifiP2pGroupInfo, int(std::vector<WifiP2pGroupInfo> &groups));
     MOCK_METHOD1(FuzzyBssid, std::string(const std::string bssid));

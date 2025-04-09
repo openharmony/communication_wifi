@@ -436,6 +436,13 @@ public:
      * @param period period of vowifi detect
      */
     virtual void ProcessSetVoWifiDetectPeriod(int period);
+
+    /**
+     * @Description  get Detect result.
+     *
+     * @param state net state
+     */
+    virtual void GetDetectNetState(OperateResState &state);
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;

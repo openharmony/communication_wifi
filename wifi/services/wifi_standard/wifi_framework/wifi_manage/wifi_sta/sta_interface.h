@@ -453,6 +453,13 @@ public:
      */
     void ProcessVoWifiNetlinkReportEvent(const int type) override;
 
+    /**
+     * @Description  get Detect result.
+     *
+     * @param state net state
+     */
+    void GetDetectNetState(OperateResState &state) override;
+
     ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
     
 private:

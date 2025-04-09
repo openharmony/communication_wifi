@@ -106,13 +106,6 @@ int WifiP2pGroupManager::ClearAll()
 void WifiP2pGroupManager::UpdateWpaGroup(const WifiP2pGroupInfo &group)
 {
     std::unique_lock<std::mutex> lock(groupMutex);
-    for (auto it = groupsInfo.begin(); it != groupsInfo.end(); ++it) {
-        if (it->GetGroupName() == group.GetGroupName() &&
-            it->GetOwner().GetDeviceAddress() == group.GetOwner().GetDeviceAddress()) {
-            WIFI_LOGD("UpdateWpaGroup: ssid equal, return");
-            return;
-        }
-    }
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     WIFI_LOGD("%{public}s: update wpa group, Name:%{private}s", __func__, group.GetGroupName().c_str());
     AddMacAddrPairInfo(WifiMacAddrInfoType::P2P_GROUPSINFO_MACADDR_INFO, group);
@@ -240,16 +233,6 @@ void WifiP2pGroupManager::SaveP2pInfo(const WifiP2pLinkedInfo &linkedInfo)
 {
     std::unique_lock<std::mutex> lock(groupMutex);
     p2pConnInfo = linkedInfo;
-}
-
-bool WifiP2pGroupManager::IsOldPersistentGroup(int id)
-{
-    for (auto it = groupsInfo.begin(); it != groupsInfo.end(); ++it) {
-        if (it->GetNetworkId() == id) {
-            return it->GetPersistentFlag();
-        }
-    }
-    return false;
 }
 
 const WifiP2pLinkedInfo &WifiP2pGroupManager::GetP2pInfo() const

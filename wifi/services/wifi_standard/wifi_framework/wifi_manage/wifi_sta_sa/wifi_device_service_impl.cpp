@@ -45,7 +45,6 @@
 #include "wifi_randommac_helper.h"
 #include "wifi_sta_hal_interface.h"
 #include "block_connect_service.h"
-#include "sta_define.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -143,16 +142,13 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     WIFI_LOGI("DisableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("DisableWifi: NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED &&
+        WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -330,15 +326,18 @@ static bool CheckOriSsidLength(const WifiDeviceConfig &config)
     std::string deviceKeyMgmt = "";
     for (auto &scanInfo : scanInfoList) {
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (config.ssid == scanInfo.ssid && WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
+        // Hybrid encryption currently only supports WPA-PSK+SAE, which is treated specially here
+        if (config.ssid == scanInfo.ssid
+            && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
+                || (config.keyMgmt == deviceKeyMgmt))) {
             LOGI("CheckOriSsidLength: oriSsid length:%{public}u", scanInfo.oriSsid.length());
-            if ((scanInfo.oriSsid.length() <= 0) || (scanInfo.oriSsid.length() > DEVICE_NAME_LENGTH)) {
-                return false;
+            if ((scanInfo.oriSsid.length() > 0) && (scanInfo.oriSsid.length() <= DEVICE_NAME_LENGTH)) {
+                return true;
             }
             break;
         }
     }
-    return true;
+    return false;
 }
 
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
@@ -1941,6 +1940,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     WifiSettings::GetInstance().SyncDeviceConfig();
 #ifndef OHOS_ARCH_LITE
     WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
+    FactoryResetNotify();
 #endif
     /* p2p */
     WifiSettings::GetInstance().RemoveWifiP2pGroupInfo();
@@ -1952,6 +1952,20 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset ok!");
     return WIFI_OPT_SUCCESS;
 }
+
+#ifndef OHOS_ARCH_LITE
+ErrCode WifiDeviceServiceImpl::FactoryResetNotify()
+{
+    WIFI_LOGI("Enter FactoryResetNotify.");
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    pEnhanceService->ResetNetworkSettingsNotify();
+    return WIFI_OPT_SUCCESS;
+}
+#endif
 
 bool ComparedHinlinkKeymgmt(const std::string scanInfoKeymgmt, const std::string deviceKeymgmt)
 {
@@ -2084,22 +2098,6 @@ ErrCode WifiDeviceServiceImpl::EnableHiLinkHandshake(bool uiFlag, std::string &b
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiDeviceServiceImpl::DeliverAudioState(const WifiNetworkControlInfo& networkControlInfo)
-{
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
-    if (pService == nullptr) {
-        WIFI_LOGE("pService is nullptr!");
-        return;
-    }
-    if (networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK) {
-        if (networkControlInfo.state == AUDIO_ON) {
-            pService->DeliverAudioState(AUDIO_ON);
-        } else {
-            pService->DeliverAudioState(AUDIO_OFF);
-        }
-    }
-}
-
 #ifndef OHOS_ARCH_LITE
 ErrCode WifiDeviceServiceImpl::ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
 {
@@ -2119,7 +2117,6 @@ ErrCode WifiDeviceServiceImpl::ReceiveNetworkControlInfo(const WifiNetworkContro
         return WIFI_OPT_FAILED;
     }
     AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
-    DeliverAudioState(networkControlInfo);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -2606,5 +2603,12 @@ ErrCode WifiDeviceServiceImpl::GetVoWifiDetectPeriod(int &period)
     return WIFI_OPT_SUCCESS;
 #endif
 }
+
+#ifdef DYNAMIC_UNLOAD_SA
+void WifiDeviceServiceImpl::StopUnloadStaTimer(void)
+{
+    WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

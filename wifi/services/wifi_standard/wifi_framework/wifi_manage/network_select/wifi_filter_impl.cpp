@@ -722,4 +722,23 @@ bool WifiSwitch5GNot2GFilter::Filter(NetworkCandidate &networkCandidate)
  
     return true;
 }
+
+NotAllowAutoConnectFilter::NotAllowAutoConnectFilter() : SimpleWifiFilter("NotAllowAutoConnectFilter") {}
+ 
+NotAllowAutoConnectFilter::~NotAllowAutoConnectFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+ 
+bool NotAllowAutoConnectFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    if (!networkCandidate.wifiDeviceConfig.isAllowAutoConnect) {
+        return false;
+    }
+    return true;
+}
 }

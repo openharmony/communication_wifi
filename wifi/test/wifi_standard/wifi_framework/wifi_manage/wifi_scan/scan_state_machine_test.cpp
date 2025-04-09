@@ -14,7 +14,6 @@
  */
 #include "mock_wifi_manager.h"
 #include "mock_wifi_config_center.h"
-#include "mock_wifi_settings.h"
 #include "mock_scan_service.h"
 #include "scan_state_machine.h"
 
@@ -56,7 +55,6 @@ public:
     void SetUp() override
     {
         LOG_SetCallback(ScanStateMachineCallback);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(0));
         pScanStateMachine = std::make_unique<ScanStateMachine>();
         pScanStateMachine->InitScanStateMachine();
         pScanStateMachine->EnrollScanStatusListener(
@@ -1035,8 +1033,6 @@ public:
         config.networkId = NETWORK_ID;
         config.ssid = "";
         config.keyMgmt = "WEP";
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _, _))
-            .Times(ONE).WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
         ScanStateMachine::FilterScanResultRecord records;
         InterScanInfo interScanInfo;
         interScanInfo.securityType = WifiSecurity::WEP;

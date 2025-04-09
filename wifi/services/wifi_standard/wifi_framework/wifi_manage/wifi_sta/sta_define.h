@@ -89,7 +89,6 @@ namespace Wifi {
 #define VALUE_LIMIT_MAX_RSSI (-55)
 #define AUDIO_ON (1)
 #define AUDIO_OFF (0)
-#define SIGNAL_LEVEL_2 (2)
 
 enum SelectedType {
     NETWORK_SELECTED_BY_UNKNOWN = -1,

@@ -16,15 +16,19 @@
 #include <ani.h>
 #include <array>
 #include <iostream>
+#include "wifi_manager_ani.h"
+#include "wifi_logger.h"
 #include "wifi_device.h"
 
-std::shared_ptr<OHOS::Wifi::WifiDevice> g_wifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+using namespace OHOS::Wifi;
 
-static ani_boolean IsWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+std::shared_ptr<WifiDevice> g_wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+
+ani_boolean IsWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     bool activeStatus = false;
-    OHOS::ErrCode ret = g_wifiDevicePtr->IsWifiActive(activeStatus);
-    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+    ErrCode ret = g_wifiDevicePtr->IsWifiActive(activeStatus);
+    if (ret != WIFI_OPT_SUCCESS) {
         std::cerr << "IsWifiActive failed." << std::endl;
     }
     return static_cast<ani_boolean>(activeStatus);
@@ -38,7 +42,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_OUT_OF_REF;
     }
 
-    static const char *NameSpaceName = "Lwifi_manager/wifiManager;";
+    static const char *NameSpaceName = "L@ohos/wifiManager/wifiManager;";
     ani_namespace wifimanager {};
     if (ANI_OK != env->FindNamespace(NameSpaceName, &wifimanager)) {
         std::cerr << "Not found '" << NameSpaceName << "'" << std::endl;

@@ -60,6 +60,21 @@ private:
      */
     static void TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
                             const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector);
+    
+    /**
+     * get saved configs for chr
+     *
+     * @param networkCandidates candidate networks
+     */
+    std::stringstream GetSavedNetInfoForChr(
+        std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
+    /**
+     * get filtered reason for chr
+     *
+     * @param networkCandidates candidate networks
+     */
+    std::stringstream GetFilteredReasonForChr(
+        std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
 };
 }
 #endif

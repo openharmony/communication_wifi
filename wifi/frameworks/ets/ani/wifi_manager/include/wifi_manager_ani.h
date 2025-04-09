@@ -13,14 +13,12 @@
  * limitations under the License.
  */
 
-loadLibrary("wifi_ani.z");
 
-namespace wifiManager {
-    export native function isWifiActive(): boolean;
-}
+#ifndef WIFI_MANAGER_ANI_H_
+#define WIFI_MANAGER_ANI_H_
 
-function main(){
-    console.println("wifi manager")
-    let c = wifiManager.isWifiActive();
-    console.println("isWifiActive: " +  c);
-}
+#include <ani.h>
+
+static ani_boolean IsWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object);
+
+#endif

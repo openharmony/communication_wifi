@@ -107,7 +107,7 @@ void WriteWifiSignalHiSysEvent(int direction, int txPackets, int rxPackets);
 
 void WriteWifiOperateStateHiSysEvent(int operateType, int operateState);
 
-void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode);
+void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode, int locallyGenerated);
 
 void WriteWifiConnectionInfoHiSysEvent(int networkId);
 

@@ -34,7 +34,7 @@ namespace Wifi {
 constexpr int LENTH = 16;
 constexpr int LENTH1 = 11;
 
-static void OnConnectChangedMock(int status, int networkId, const std::string &bssid)
+static void OnConnectChangedMock(int status, int networkId, const std::string &bssid, int locallyGenerated)
 {
     LOGI("OnConnectChangedMock");
 }

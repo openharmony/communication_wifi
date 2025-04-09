@@ -17,7 +17,6 @@
 #include "mock_wifi_manager.h"
 #include "mock_scan_service.h"
 #include "mock_wifi_config_center.h"
-#include "mock_wifi_settings.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -39,7 +38,6 @@ public:
     {}
     void SetUp() override
     {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), ClearScanInfoList()).Times(AtLeast(0));
         pScanInterface = std::make_unique<ScanInterface>();
         pScanInterface->pScanService = new MockScanService();
         pScanInterface->mScanSerivceCallbacks = WifiManager::GetInstance().GetScanCallback();

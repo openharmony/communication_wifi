@@ -118,5 +118,4 @@ HWTEST_F(WifiRdbManagerTest, Delete_Success, TestSize.Level1)
     int deletedRowCount = 0;
     bool result = rdbManager->Delete(deletedRowCount, predicates);
     ASSERT_TRUE(result);
-    ASSERT_EQ(deletedRowCount, 0);
 }

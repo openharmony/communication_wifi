@@ -107,13 +107,14 @@ public:
     void AutoStartApServiceTest()
     {
         std::string ifName;
+        int hotspotMode = static_cast<int>(HotspotMode::SOFTAP);
         WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::CLOSING, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0, ifName), WIFI_OPT_FAILED);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0, ifName, hotspotMode), WIFI_OPT_FAILED);
 
         apState = WifiConfigCenter::GetInstance().GetApMidState(0);
         WifiConfigCenter::GetInstance().SetApMidState(apState, WifiOprMidState::RUNNING, 0);
-        EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0, ifName), WIFI_OPT_FAILED);
+        EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(0, ifName, hotspotMode), WIFI_OPT_FAILED);
     }
     
     void AutoStopApServiceTest()
@@ -461,32 +462,35 @@ HWTEST_F(WifiServiceSchedulerTest, AutoStartApServiceTest01, TestSize.Level1)
 {
     int instId = 1;
     std::string softApIfName = "TEST";
+    int hotspotMode = static_cast<int>(HotspotMode::SOFTAP);
     
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApMidState(_))
         .WillRepeatedly(Return(WifiOprMidState::CLOSING));
-    EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(instId, softApIfName), WIFI_OPT_FAILED);
+    EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(instId, softApIfName, hotspotMode), WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, AutoStartApServiceTest02, TestSize.Level1)
 {
     int instId = 1;
     std::string softApIfName = "TEST";
+    int hotspotMode = static_cast<int>(HotspotMode::SOFTAP);
     
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApMidState(_))
         .WillRepeatedly(Return(WifiOprMidState::OPENING));
-    EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(instId, softApIfName), WIFI_OPT_SUCCESS);
+    EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(instId, softApIfName, hotspotMode), WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, AutoStartApServiceTest03, TestSize.Level1)
 {
     int instId = 1;
     std::string softApIfName = "TEST";
+    int hotspotMode = static_cast<int>(HotspotMode::SOFTAP);
     
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetApMidState(_))
         .WillRepeatedly(Return(WifiOprMidState::CLOSED));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), SetApMidState(_, _, _))
         .WillRepeatedly(Return(true));
-    EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(instId, softApIfName), WIFI_OPT_FAILED);
+    EXPECT_EQ(pWifiServiceScheduler->AutoStartApService(instId, softApIfName, hotspotMode), WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiServiceSchedulerTest, AutoStopApServiceTest01, TestSize.Level1)

@@ -64,7 +64,9 @@ HalDeviceManager::HalDeviceManager()
 HalDeviceManager::~HalDeviceManager()
 {
     LOGI("HalDeviceManager::~HalDeviceManager");
+#ifndef __UT__
     StopChipHdi();
+#endif
     ResetHalDeviceManagerInfo(false);
 }
 
@@ -462,6 +464,11 @@ bool HalDeviceManager::SetDpiMarkRule(const std::string &ifaceName, int uid, int
 
 bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std::string &mac)
 {
+#ifdef NON_SEPERATE_P2P
+    /* non seperate p2p device do nothing, changing the mac will cause the p2p network uninstalled */
+    LOGI("non seperate p2p device do nothing");
+    return false;
+#else
     if (!CheckReloadChipHdiService()) {
         return false;
     }
@@ -491,6 +498,7 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
 
     LOGI("SetStaMacAddress success");
     return true;
+#endif
 }
 
 IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)
@@ -767,7 +775,7 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
 }
 
 bool HalDeviceManager::SendCmdToDriver(const std::string &ifaceName, const std::string &interfaceName,
-    int cmd, const std::string &param)
+    int cmd, const std::string &param, std::string &result)
 {
     if (!CheckReloadChipHdiService()) {
         return false;
@@ -790,9 +798,13 @@ bool HalDeviceManager::SendCmdToDriver(const std::string &ifaceName, const std::
         int8_t cc = c;
         paramBuf.push_back(cc);
     }
-    int32_t ret = iface->SendCmdToDriver(interfaceName, cmd, paramBuf);
+    std::vector<int8_t> resultBuf;
+    int32_t ret = iface->SendCmdToDriver(interfaceName, cmd, paramBuf, resultBuf);
     if (ret != HDF_SUCCESS) {
         LOGE("SendCmdToDriver, call SendCmdToDriver failed! ret:%{public}d", ret);
+    }
+    if (!resultBuf.empty()) {
+        result.assign(resultBuf.begin(), resultBuf.end());
     }
     LOGI("SendCmdToDriver success");
     return true;
@@ -817,7 +829,8 @@ bool HalDeviceManager::SetBlockList(const std::string &ifaceName, const std::str
 {
     const int setMacFilterCmd = 100;
     std::string macFilterStr = MakeMacFilterString(blockList);
-    return SendCmdToDriver(ifaceName, interfaceName, setMacFilterCmd, macFilterStr);
+    std::string result;
+    return SendCmdToDriver(ifaceName, interfaceName, setMacFilterCmd, macFilterStr, result);
 }
 
 bool HalDeviceManager::DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName,
@@ -825,7 +838,8 @@ bool HalDeviceManager::DisAssociateSta(const std::string &ifaceName, const std::
 {
     const int disAssociateStaCmd = 101;
     mac.erase(std::remove(mac.begin(), mac.end(), ':'), mac.end());
-    return SendCmdToDriver(ifaceName, interfaceName, disAssociateStaCmd, mac);
+    std::string result;
+    return SendCmdToDriver(ifaceName, interfaceName, disAssociateStaCmd, mac, result);
 }
 
 bool HalDeviceManager::SetMaxConnectNum(const std::string &ifaceName, int32_t channel, int32_t maxConn)
@@ -836,7 +850,8 @@ bool HalDeviceManager::SetMaxConnectNum(const std::string &ifaceName, int32_t ch
     }
     std::string param = std::to_string(channel) + '.' + std::to_string(maxConn);
     LOGI("SetMaxConnectNum param is %{public}s", param.c_str());
-    return SendCmdToDriver(ifaceName, ifaceName, CMD_SET_MAX_CONNECT, param);
+    std::string result;
+    return SendCmdToDriver(ifaceName, ifaceName, CMD_SET_MAX_CONNECT, param, result);
 }
 
 void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)

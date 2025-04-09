@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_output_path = "wifi/wifi_sub_manage_unittest"
+module_output_path = "wifi/wifi/wifi_sub_manage_unittest"
 defines = []
 
 config("module_private_config") {

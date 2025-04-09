@@ -33,6 +33,10 @@ public:
     virtual bool IsFrequentDisconnect(std::string bssid, int wpaReason) = 0;
     virtual bool IsWrongPassword(int targetNetworkId) = 0;
     virtual void OnReceiveSettingsEnterEvent(bool isEnter) = 0;
+    virtual void DealStaStopped(int instId) = 0;
+    virtual void NotifyWifiConnFailedInfo(int targetNetworkId, std::string bssid, DisabledReason disableReason) = 0;
+    virtual void ReleaseUnusableBssidSet() = 0;
+    virtual bool IsBssidMatchUnusableSet(std::string bssid) = 0;
 };
  
 class BlockConnectService : public MockBlockConnectService {
@@ -48,6 +52,10 @@ public:
     MOCK_METHOD2(IsFrequentDisconnect, bool(std::string bssid, int wpaReason));
     MOCK_METHOD1(IsWrongPassword, bool(int targetNetworkId));
     MOCK_METHOD1(OnReceiveSettingsEnterEvent, void(bool isEnter));
+    MOCK_METHOD1(DealStaStopped, void(int instId));
+    MOCK_METHOD3(NotifyWifiConnFailedInfo, void(int targetNetworkId, std::string bssid, DisabledReason disableReason));
+    MOCK_METHOD0(ReleaseUnusableBssidSet, void());
+    MOCK_METHOD1(IsBssidMatchUnusableSet, bool(std::string bssid));
 };
 }  // namespace OHOS
 }  // namespace Wifi

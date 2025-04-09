@@ -100,6 +100,9 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     if (IsSignalSmoothingEnable()) {
         RegisterFoldStatusListener();
     }
+#ifdef HAS_NETMANAGER_EVENT_PART
+    RegisterNetmgrEvent();
+#endif
 }
 
 WifiEventSubscriberManager::~WifiEventSubscriberManager()
@@ -118,6 +121,9 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     if (IsSignalSmoothingEnable()) {
         UnRegisterFoldStatusListener();
     }
+#ifdef HAS_NETMANAGER_EVENT_PART
+    UnRegisterNetmgrEvent();
+#endif
 }
 
 void WifiEventSubscriberManager::Init()
@@ -834,6 +840,16 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
             pEnhanceService->OnDialogClick(true);
         }
     }
+#ifdef FEATURE_P2P_SUPPORT
+    if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
+        WIFI_LOGI("OnReceiveNotification P2P_WSC_PBC_DIALOG Accept");
+
+        IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+        if (p2pService != nullptr) {
+            p2pService->NotifyWscDialogConfirmResult(true);
+        }
+    }
+#endif
 }
 
 void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
@@ -844,6 +860,15 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
             pEnhanceService->OnDialogClick(false);
         }
     }
+#ifdef FEATURE_P2P_SUPPORT
+    if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
+        WIFI_LOGI("OnReceiveNotification P2P_WSC_PBC_DIALOG Reject");
+        IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+        if (p2pService != nullptr) {
+            p2pService->NotifyWscDialogConfirmResult(false);
+        }
+    }
+#endif
 }
 
 #ifdef HAS_POWERMGR_PART
@@ -905,6 +930,73 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
 #endif
 }
 
+#endif
+#ifdef HAS_NETMANAGER_EVENT_PART
+void WifiEventSubscriberManager::RegisterNetmgrEvent()
+{
+    std::unique_lock<std::mutex> lock(netmgrEventMutex);
+    if (netMgrId != 0) {
+        WifiTimer::GetInstance()->UnRegister(netMgrId);
+    }
+    if (wifiNetmgrEventSubsciber_) {
+        return;
+    }
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(WIFI_EVENT_BG_CONTINUOUS_TASK_STATE);
+    WIFI_LOGI("RegisterNetmgrEvent start");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfo.SetPermission("ohos.permission.ACCESS_BOOSTER_SERVICE");
+    wifiNetmgrEventSubsciber_ = std::make_shared<NetmgrEventSubscriber>(subscriberInfo);
+    if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiNetmgrEventSubsciber_)) {
+        WIFI_LOGE("RegisterNetmgrEvent SubscribeCommonEvent failed");
+        wifiNetmgrEventSubsciber_ = nullptr;
+        WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterNetmgrEvent, this);
+        WifiTimer::GetInstance()->Register(timeoutCallBack, netMgrId, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WIFI_LOGI("RegisterNetmgrEvent retry, netMgrId = %{public}u", netMgrId);
+    } else {
+        WIFI_LOGI("RegisterNetmgrEvent success");
+    }
+}
+
+void WifiEventSubscriberManager::UnRegisterNetmgrEvent()
+{
+    std::unique_lock<std::mutex> lock(netmgrEventMutex);
+    if (netMgrId != 0) {
+        WifiTimer::GetInstance()->UnRegister(netMgrId);
+    }
+    if (!wifiNetmgrEventSubsciber_) {
+        return;
+    }
+    if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(wifiNetmgrEventSubsciber_)) {
+        WIFI_LOGE("UnRegisterNetmgrEvent failed");
+    }
+    wifiNetmgrEventSubsciber_ = nullptr;
+    WIFI_LOGI("UnRegisterNetmgrEvent finished");
+}
+
+NetmgrEventSubscriber::NetmgrEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+    : CommonEventSubscriber(subscriberInfo)
+{
+    WIFI_LOGI("NetmgrEventSubscriber enter");
+}
+
+NetmgrEventSubscriber::~NetmgrEventSubscriber()
+{
+    WIFI_LOGI("~NetmgrEventSubscriber enter");
+}
+
+void NetmgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    uint32_t bgContinuousTaskState = eventData.GetCode();
+    WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by BgTaskAware %{public}d", bgContinuousTaskState);
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return;
+    }
+    pService->DeliverAudioState(bgContinuousTaskState);
+}
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 void WifiEventSubscriberManager::RegisterAssetEvent()

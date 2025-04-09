@@ -233,5 +233,14 @@ ErrCode P2pInterface::GetRptStationsList(std::vector<StationInfo> &result)
     return WIFI_OPT_SUCCESS;
 }
 
+void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept)
+{
+    return;
+}
+
+ErrCode P2pInterface::SetMiracastSinkConfig(const std::string& config)
+{
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

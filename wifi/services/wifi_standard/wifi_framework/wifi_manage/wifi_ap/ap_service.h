@@ -151,6 +151,21 @@ public:
      */
     ErrCode SetPowerModel(const PowerModel& model);
 
+    /**
+     * @Description get hotspot mode
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode GetHotspotMode(HotspotMode &mode);
+
+    /**
+     * @Description set hotspot mode
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    ErrCode SetHotspotMode(const HotspotMode &mode);
 private:
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
     public:

@@ -135,14 +135,14 @@ public:
         int64_t mLastTcpTxCounter_ { 0 };
         int64_t mLastTcpRxCounter_ { 0 };
         int32_t mLastDnsFailedCnt_ { 0 };
-        int netDiasableDetectCount_ { 0 };
+        int netDisableDetectCount_ { 0 };
         bool qoeSwitch_  { false } ;
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
         void WifiHasNetStateInit();
-        void RequestHttpDetect();
+        void RequestHttpDetect(bool forceHttpDetect);
         void ParseQoeInfoAndRequestDetect();
         void HandleWifiQoeSlow();
     };
@@ -160,6 +160,7 @@ public:
         void HandleWifiNoInternet(const InternalMessagePtr msg);
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();
+        bool HandleHttpResultInNoNet(InternalMessagePtr msg);
     };
 
     class WifiPortalState : public State {
@@ -234,7 +235,8 @@ private:
     bool isDisableWifiAutoSwitch_ { false };
     std::string targetBssid_ { "" };
     NetworkSelectionResult networkSelectionResult_;
-    WifiProState currentState_;
+    WifiProState currentState_ {WIFI_DEFAULT};
+    bool mHttpDetectedAllowed_ { false } ;
     Perf5gHandoverService perf5gHandoverService_;
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
@@ -251,11 +253,10 @@ private:
     void HandleWifi2WifiFailed();
     void FastScan(std::vector<WifiScanInfo> &scanInfoList);
     bool TrySelfCure(bool forceNoHttpCheck);
-    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, NetworkSelectType networkSelectType,
-        std::vector<InterScanInfo> &scanInfos);
+    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
-    void HandleConnectedPerf5g(WifiLinkedInfo &wifiLinkedInfo);
+    bool FullScan();
 };
 } // namespace Wifi
 } // namespace OHOS

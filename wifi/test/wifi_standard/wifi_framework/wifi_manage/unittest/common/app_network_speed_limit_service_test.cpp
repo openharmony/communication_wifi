@@ -20,7 +20,6 @@
 #include "wifi_logger.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_app_state_aware.h"
-#include "mock_wifi_app_parser.h"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -34,6 +33,12 @@ using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("AppNetworkSpeedLimitServiceTest");
+static std::string g_errLog;
+void AppNetworkSpeedLimitServiceCallback(const LogType type, const LogLevel level, const unsigned int domain,
+                                         const char *tag, const char *msg)
+{
+    g_errLog = msg;
+}
 
 class AppNetworkSpeedLimitServiceTest : public testing::Test {
 public:
@@ -44,7 +49,10 @@ public:
         wifiAppStateAware.appChangeEventHandler.reset();
         wifiAppStateAware.mAppStateObserver = nullptr;
     }
-    virtual void SetUp() {}
+    virtual void SetUp()
+    {
+        LOG_SetCallback(AppNetworkSpeedLimitServiceCallback);
+    }
     virtual void TearDown() {}
 };
 
@@ -173,7 +181,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, DealStaConnChanged, TestSize.Level1)
     AppNetworkSpeedLimitService::GetInstance().DealStaConnChanged(
             OperateResState::DISCONNECT_DISCONNECTED, info, instId);
     AppNetworkSpeedLimitService::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, instId);
-    EXPECT_EQ(1, instId);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(AppNetworkSpeedLimitServiceTest, HandleForegroundAppChangedAction, TestSize.Level1)
@@ -203,7 +211,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateSpeedLimitConfigs, TestSize.Leve
     AppNetworkSpeedLimitService::GetInstance().m_limitSpeedMode = BG_LIMIT_LEVEL_3;
     int enable = 1;
     AppNetworkSpeedLimitService::GetInstance().UpdateSpeedLimitConfigs(enable);
-    EXPECT_EQ(1, enable);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(AppNetworkSpeedLimitServiceTest, HandleRequest, TestSize.Level1)
@@ -295,7 +303,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, HighPriorityTransmit, TestSize.Level1)
     int protocol = 17;
     int enable = 0;
     AppNetworkSpeedLimitService::GetInstance().HighPriorityTransmit(uid, protocol, enable);
-    EXPECT_EQ(enable, 0);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

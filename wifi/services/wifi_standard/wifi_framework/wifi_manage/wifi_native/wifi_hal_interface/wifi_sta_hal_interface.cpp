@@ -668,8 +668,8 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceNa
     info.snr = signalPollResult.currentSnr;
     info.chload = signalPollResult.currentChload;
     info.ulDelay = signalPollResult.currentUlDelay;
-    info.txBytes = signalPollResult.currentTxBytes;
-    info.rxBytes = signalPollResult.currentRxBytes;
+    info.txBytes = static_cast<unsigned int>(signalPollResult.currentTxBytes);
+    info.rxBytes = static_cast<unsigned int>(signalPollResult.currentRxBytes);
     info.txFailed = signalPollResult.currentTxFailed;
     info.chloadSelf = signalPollResult.chloadSelf;
     info.c0Rssi = signalPollResult.c0Rssi;

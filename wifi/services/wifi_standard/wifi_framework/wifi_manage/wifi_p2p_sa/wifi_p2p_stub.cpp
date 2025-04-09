@@ -84,6 +84,11 @@ void WifiP2pStub::InitHandleMapEx()
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNEL_LIST)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply,
         MessageOption &option) { OnHid2dGetChannelListFor5G(code, data, reply, option); };
+    InitHandleMapExPart3();
+}
+
+void WifiP2pStub::InitHandleMapExPart3()
+{
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_SELF_WIFI_CFG)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply,
         MessageOption &option) { OnHid2dGetSelfWifiCfgInfo(code, data, reply, option); };
@@ -109,7 +114,10 @@ void WifiP2pStub::InitHandleMapEx()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
             OnHid2dIsWideBandwidthSupported(code, data, reply, option);
         };
-    return;
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_MIRACAST_SINK_CONFIG)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnSetMiracastSinkConfig(code, data, reply, option);
+        };
 }
 
 void WifiP2pStub::InitHandleMap()
@@ -418,7 +426,7 @@ void WifiP2pStub::OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, Messa
         reply.WriteBool(config.IsGroupOwner());
         reply.WriteString(config.GetGroupOwnerAddress());
         std::vector<GcInfo> gcInfos = config.GetClientInfoList();
-        int size = gcInfos.size();
+        int size = static_cast<int>(gcInfos.size());
         reply.WriteInt32(size);
         for (int i = 0; i < size; i++) {
             reply.WriteString(gcInfos[i].mac);
@@ -1112,6 +1120,16 @@ void WifiP2pStub::OnHid2dIsWideBandwidthSupported(
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(isSupport ? 1 : 0);
     }
+}
+
+void WifiP2pStub::OnSetMiracastSinkConfig(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::string config = data.ReadString();
+    ErrCode ret = SetMiracastSinkConfig(config);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
 }
 }  // namespace Wifi
 }  // namespace OHOS

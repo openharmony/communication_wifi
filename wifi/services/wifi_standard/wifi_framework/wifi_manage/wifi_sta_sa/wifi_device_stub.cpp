@@ -252,6 +252,9 @@ int WifiDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
 void WifiDeviceStub::OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+#ifdef DYNAMIC_UNLOAD_SA
+    StopUnloadStaTimer();
+#endif
     ErrCode ret = EnableWifi();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
@@ -956,8 +959,8 @@ void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data
             reply.WriteInt32(wifiSignalPollInfos[index].snr);
             reply.WriteInt32(wifiSignalPollInfos[index].chload);
             reply.WriteInt32(wifiSignalPollInfos[index].ulDelay);
-            reply.WriteInt32(wifiSignalPollInfos[index].txBytes);
-            reply.WriteInt32(wifiSignalPollInfos[index].rxBytes);
+            reply.WriteUint32(wifiSignalPollInfos[index].txBytes);
+            reply.WriteUint32(wifiSignalPollInfos[index].rxBytes);
             reply.WriteInt32(wifiSignalPollInfos[index].txFailed);
             reply.WriteInt32(wifiSignalPollInfos[index].chloadSelf);
             reply.WriteInt64(wifiSignalPollInfos[index].timeStamp);

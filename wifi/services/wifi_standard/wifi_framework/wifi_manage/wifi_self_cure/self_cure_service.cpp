@@ -99,6 +99,8 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
     } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
         pSelfCureStateMachine->SetHttpMonitorStatus(true);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);
+    } else if (state == OperateResState::CONNECT_CONNECTION_REJECT) {
+        pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, info);
     }
     lastState = state;
 }

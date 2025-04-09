@@ -435,7 +435,6 @@ bool P2pIdleState::ProcessInvitationReceivedEvt(InternalMessagePtr msg) const
     config.SetNetId(group.GetNetworkId());
     groupManager.AddOrUpdateGroup(group);
     p2pStateMachine.savedP2pConfig = config;
-
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pInvitationReceivedState);
     return EXECUTED;
 }

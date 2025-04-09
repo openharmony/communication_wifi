@@ -171,7 +171,7 @@ public:
     virtual void SetStaIfaceName(const std::string &ifaceName) = 0;
     virtual int GetHiddenDeviceConfig(std::vector<WifiDeviceConfig> &results) = 0;
     virtual int IncreaseNumRebootsSinceLastUse()= 0;
-    virtual int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const = 0;
+    virtual std::vector<WifiDeviceConfig> RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const = 0;
     virtual void EncryptionWifiDeviceConfigOnBoot()= 0;
     virtual int GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups) = 0;
     virtual std::map<int, WifiLinkedInfo> GetAllWifiLinkedInfo() = 0;
@@ -353,7 +353,8 @@ public:
     MOCK_METHOD1(SetStaIfaceName, void(const std::string &ifaceName));
     MOCK_METHOD1(GetHiddenDeviceConfig, int(std::vector<WifiDeviceConfig> &results));
     MOCK_METHOD0(IncreaseNumRebootsSinceLastUse, int());
-    MOCK_CONST_METHOD1(RemoveExcessDeviceConfigs, int(std::vector<WifiDeviceConfig> &configs));
+    MOCK_CONST_METHOD1(RemoveExcessDeviceConfigs,
+        std::vector<WifiDeviceConfig>(std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD0(EncryptionWifiDeviceConfigOnBoot, void());
     MOCK_METHOD1(GetWifiP2pGroupInfo, int(std::vector<WifiP2pGroupInfo> &groups));
     MOCK_METHOD0(GetAllWifiLinkedInfo, std::map<int, WifiLinkedInfo> ());

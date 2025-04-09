@@ -115,7 +115,7 @@ void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReas
 
 void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason);
 
-void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt);
+void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt, int selfCureResetState);
 
 void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason);
 

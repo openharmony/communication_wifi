@@ -16,6 +16,7 @@
 #define OHOS_STA_MONITOR_H
 
 #include "sta_state_machine.h"
+#include "wifi_event_callback.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -100,9 +101,9 @@ public:
     /**
      * @Description : Callback of the Connection Refused event.
      *
-     * @param status - status codes [in]
+     * @param assocRejectInfo - assoc reject info [in]
      */
-    void OnWpaConnectionRejectCallBack(int status);
+    void OnWpaConnectionRejectCallBack(const AssocRejectInfo &assocRejectInfo);
 
     /**
      * @Description : Callback of the WPS_OVERLAP event.

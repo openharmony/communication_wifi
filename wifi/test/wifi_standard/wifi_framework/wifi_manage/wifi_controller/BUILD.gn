@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_output_path = "wifi/wifi_controller_test"
+module_output_path = "wifi/wifi/wifi_controller_test"
 
 defines = []
 

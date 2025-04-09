@@ -41,6 +41,7 @@ enum WifiProCommond {
     EVENT_QOE_APP_SLOW = 13,
     EVENT_SIGNAL_INFO_CHANGE = 14,
     EVENT_QOE_REPORT = 15,
+    EVENT_DETECT_TIMEOUT = 16,
 };
 
 enum SigLevel {
@@ -94,8 +95,8 @@ struct LinkQuality {
     int signal;
     int txrate;
     int rxrate;
-    int txBytes;
-    int rxBytes;
+    unsigned int txBytes;
+    unsigned int rxBytes;
     LinkQuality() : signal(0), txrate(0), rxrate(0), txBytes(0), rxBytes(0)
     {}
     ~LinkQuality()

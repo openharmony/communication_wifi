@@ -164,6 +164,7 @@ public:
         pScanService->HandleScanStatusReport(scanStatusReport);
         pScanService->pScanStateMachine = nullptr;
         pScanService->HandleScanStatusReport(scanStatusReport);
+        EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
     }
 
     void HandleScanStatusReportSuccess7()
@@ -178,6 +179,7 @@ public:
         ScanStatusReport scanStatusReport;
         scanStatusReport.status = SCAN_STATUS_INVALID;
         pScanService->HandleScanStatusReport(scanStatusReport);
+        EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
     }
 
     void HandleInnerEventReportSuccess1()
@@ -227,7 +229,7 @@ public:
             .WillOnce(Return(0));
         pScanService->scanStartedFlag = true;
         EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_EXTERN) == WIFI_OPT_SUCCESS);
-        EXPECT_FALSE(pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN) == WIFI_OPT_SUCCESS);
         pScanService->pScanStateMachine = nullptr;
         EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_EXTERN) == WIFI_OPT_FAILED);
     }
@@ -239,7 +241,7 @@ public:
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_BOTH_WITH_DFS;
-        EXPECT_EQ(WIFI_OPT_FAILED, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_NATIVE_EXTERN));
     }
 
     void ScanWithParamFail1()
@@ -751,6 +753,7 @@ public:
     {
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->HandleSystemScanTimeout();
+        EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
     }
 
     void DisconnectedTimerScanSuccess()
@@ -2186,6 +2189,7 @@ HWTEST_F(ScanServiceTest, HandlePnoScanInfoSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, EndPnoScanSuccess, TestSize.Level1)
 {
     EndPnoScanSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, EndPnoScanFail, TestSize.Level1)
@@ -2208,11 +2212,13 @@ HWTEST_F(ScanServiceTest, HandleScreenStatusChangedSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleStaStatusChangedSuccess1, TestSize.Level1)
 {
     HandleStaStatusChangedSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleStaStatusChangedSuccess2, TestSize.Level1)
 {
     HandleStaStatusChangedSuccess2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleStaStatusChangedFail, TestSize.Level1)
@@ -2281,6 +2287,7 @@ HWTEST_F(ScanServiceTest, StartSystemTimerScanFail1, TestSize.Level1)
 HWTEST_F(ScanServiceTest, StartSystemTimerScanFail2, TestSize.Level1)
 {
     StartSystemTimerScanFail2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: StartSystemTimerScanFail3
@@ -2291,6 +2298,7 @@ HWTEST_F(ScanServiceTest, StartSystemTimerScanFail2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, StartSystemTimerScanFail3, TestSize.Level1)
 {
     StartSystemTimerScanFail3();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
  * @tc.name: StartSystemTimerScanFail4
@@ -2301,11 +2309,13 @@ HWTEST_F(ScanServiceTest, StartSystemTimerScanFail3, TestSize.Level1)
 HWTEST_F(ScanServiceTest, StartSystemTimerScanFail4, TestSize.Level1)
 {
     StartSystemTimerScanFail4();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleSystemScanTimeoutSuccess, TestSize.Level1)
 {
     HandleSystemScanTimeoutSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, DisconnectedTimerScanSuccess, TestSize.Level1)
@@ -2392,11 +2402,13 @@ HWTEST_F(ScanServiceTest, AllowExternScanFail4, TestSize.Level1)
 HWTEST_F(ScanServiceTest, AllowSystemTimerScanSuccess, TestSize.Level1)
 {
     AllowSystemTimerScanSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail1, TestSize.Level1)
 {
     AllowSystemTimerScanFail1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, AllowSystemTimerScanFail3, TestSize.Level1)

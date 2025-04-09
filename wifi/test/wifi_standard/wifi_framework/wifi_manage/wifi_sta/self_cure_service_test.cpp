@@ -142,6 +142,7 @@ HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest4, TestSize.Level1)
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest5, TestSize.Level1)
 {
     HandleStaConnChangedTest5();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)

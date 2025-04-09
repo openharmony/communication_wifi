@@ -34,10 +34,10 @@ class Perf5gHandoverService {
 public:
     Perf5gHandoverService();
     ~Perf5gHandoverService();
-    void OnConnected(WifiLinkedInfo &wifiLinkedInfo, std::string &bssidBeforePerf5g);
+    void OnConnected(WifiLinkedInfo &wifiLinkedInfo);
     void OnDisconnected();
     void NetworkStatusChanged(NetworkStatus networkStatus);
-    bool Switch5g();
+    std::string Switch5g();
     void ScanResultUpdated(std::vector<InterScanInfo> &scanInfos);
     void HandleSignalInfoChange(InternalMessagePtr msg);
     void QoeUpdate(InternalMessagePtr msg);
@@ -69,7 +69,7 @@ private:
     void UnloadScanController();
     void LoadHasInternetScanController();
     void LoadMonitorScanController();
-    std::string HandleSwitchResult(WifiLinkedInfo &wifiLinkedInfo, std::string &bssidBeforePerf5g);
+    std::string HandleSwitchResult(WifiLinkedInfo &wifiLinkedInfo);
     void UpdateTriggerScanRssiThreshold();
     void RssiUpdate(int32_t rssi);
     void GetNoExistRelationInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs,

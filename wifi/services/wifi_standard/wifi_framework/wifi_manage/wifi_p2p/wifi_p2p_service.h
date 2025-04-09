@@ -332,6 +332,22 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetEnhanceService(IEnhanceService* enhanceService) override;
+
+    /**
+     * @Description Notify user accept result to p2p service
+     *
+     * @param isAccept if user accept to projection screen
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    void NotifyWscDialogConfirmResult(bool isAccept) override;
+
+    /**
+     * @Description Set miracast sink config
+     *
+     * @param config - miracast config
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetMiracastSinkConfig(const std::string& config) override;
 private:
     /**
      * @Description - P2P state machine deregistration event callback.

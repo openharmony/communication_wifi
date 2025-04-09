@@ -355,56 +355,10 @@ void AppNetworkSpeedLimitService::LogSpeedLimitConfigs()
 
 void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo)
 {
-    if (VerifyInputParameters(networkControlInfo)) {
-        return;
-    }
-    UpdateGamePvpState(networkControlInfo);
     AsyncParamInfo asyncParamInfo;
     asyncParamInfo.funcName = __FUNCTION__;
     asyncParamInfo.networkControlInfo = networkControlInfo;
     AsyncLimitSpeed(asyncParamInfo);
-}
-
-bool AppNetworkSpeedLimitService::VerifyInputParameters(const WifiNetworkControlInfo &networkControlInfo)
-{
-    if (AppParser::GetInstance().IsKeyBackgroundLimitApp(networkControlInfo.bundleName)) {
-        WIFI_LOGD("Belongs to a blasklist corresponding to a TopN scenario, uid: %{public}d.", networkControlInfo.uid);
-        return false;
-    }
-
-    if (AppParser::GetInstance().IsGameBackgroundLimitApp(networkControlInfo.bundleName)) {
-        WIFI_LOGD("Belongs to a blasklist corresponding to a Game scenario, uid: %{public}d.", networkControlInfo.uid);
-        return false;
-    }
-
-    if (m_isGamePvp) {
-        WIFI_LOGD("Belongs to a blasklist corresponding to a PVP scenario, uid: %{public}d.", networkControlInfo.uid);
-        return false;
-    }
-
-    if (AppParser::GetInstance().IsHighTempLimitSpeedApp(networkControlInfo.bundleName)) {
-        WIFI_LOGD("Belongs to a blasklist corresponding to a High-Temp scenario, uid: %{public}d",
-            networkControlInfo.uid);
-        return false;
-    }
-
-    if (networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
-        WIFI_LOGD("Belong to the game scene");
-        return false;
-    }
-    WIFI_LOGD("Not a network speed limit app or game scene.");
-    return true;
-}
-
-void AppNetworkSpeedLimitService::UpdateGamePvpState(const WifiNetworkControlInfo &networkControlInfo)
-{
-    if (networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
-        if (networkControlInfo.state == GameSceneId::MSG_GAME_ENTER_PVP_BATTLE) {
-            m_isGamePvp = true;
-        } else if (networkControlInfo.state == GameSceneId::MSG_GAME_EXIT_PVP_BATTLE) {
-            m_isGamePvp = false;
-        }
-    }
 }
 
 void AppNetworkSpeedLimitService::UpdateNoSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)

@@ -291,6 +291,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode CheckCanUseP2p() = 0;
+
+    /**
+     * @Description Set miracast sink config
+     *
+     * @param config - miracast config
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetMiracastSinkConfig(const std::string& config) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

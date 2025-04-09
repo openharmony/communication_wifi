@@ -162,6 +162,9 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
         case AUTO_IDENTIFY_CONN:
             param["wifi5gSsid"] = comInfo;
             break;
+        case P2P_WSC_PBC_DIALOG:
+            param["p2pDeviceName"] = comInfo;
+            break;
         default: {
             break;
         }

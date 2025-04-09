@@ -59,7 +59,7 @@ int hex2byte(const char *hex)
     if (b < 0) {
         return -1;
     }
-    return (a << HDI_POS_FOURTH) | b;
+    return (int)(((unsigned int)a << HDI_POS_FOURTH) | (unsigned int)b);
 }
 
 static void DealDigital(u8 *buf, const char **pos, size_t *len)
@@ -181,34 +181,34 @@ int HdiGetCipherInfo(char *start, char *end, int ciphers, const char *delim)
     char *pos = start;
     int ret;
 
-    if (ciphers & HDI_CIPHER_CCMP_256) {
+    if ((unsigned int)ciphers & HDI_CIPHER_CCMP_256) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sCCMP-256");
     }
-    if (ciphers & HDI_CIPHER_GCMP_256) {
+    if ((unsigned int)ciphers & HDI_CIPHER_GCMP_256) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sGCMP-256");
     }
-    if (ciphers & HDI_CIPHER_CCMP) {
+    if ((unsigned int)ciphers & HDI_CIPHER_CCMP) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sCCMP");
     }
-    if (ciphers & HDI_CIPHER_GCMP) {
+    if ((unsigned int)ciphers & HDI_CIPHER_GCMP) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sGCMP");
     }
-    if (ciphers & HDI_CIPHER_TKIP) {
+    if ((unsigned int)ciphers & HDI_CIPHER_TKIP) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sTKIP");
     }
-    if (ciphers & HDI_CIPHER_AES_128_CMAC) {
+    if ((unsigned int)ciphers & HDI_CIPHER_AES_128_CMAC) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sAES-128-CMAC");
     }
-    if (ciphers & HDI_CIPHER_BIP_GMAC_128) {
+    if ((unsigned int)ciphers & HDI_CIPHER_BIP_GMAC_128) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sBIP-GMAC-128");
     }
-    if (ciphers & HDI_CIPHER_BIP_GMAC_256) {
+    if ((unsigned int)ciphers & HDI_CIPHER_BIP_GMAC_256) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sBIP-GMAC-256");
     }
-    if (ciphers & HDI_CIPHER_BIP_CMAC_256) {
+    if ((unsigned int)ciphers & HDI_CIPHER_BIP_CMAC_256) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sBIP-CMAC-256");
     }
-    if (ciphers & HDI_CIPHER_NONE) {
+    if ((unsigned int)ciphers & HDI_CIPHER_NONE) {
         HDI_HANDLE_CIPHER_INFO(ret, start, end, delim, "%sNONE");
     }
 
@@ -470,7 +470,7 @@ int HdiConvertIe(const uint8_t *hdiIe, size_t wpaIeLen,
             return -1;
         }
         for (i = 0; i < count; i++) {
-            data->pairwiseCipher |= HdiRsnIdToCipher(pos);
+            data->pairwiseCipher = (int)((unsigned int)(data->pairwiseCipher) | (unsigned int)HdiRsnIdToCipher(pos));
             pos += HDI_SELECTOR_LEN;
             left -= HDI_SELECTOR_LEN;
         }
@@ -489,7 +489,7 @@ int HdiConvertIe(const uint8_t *hdiIe, size_t wpaIeLen,
             return -1;
         }
         for (i = 0; i < count; i++) {
-            data->keyMgmt |= HdiKeyMgmtToAuthMgmt(pos);
+            data->keyMgmt = (int)((unsigned int)(data->keyMgmt) | (unsigned int)HdiKeyMgmtToAuthMgmt(pos));
             pos += HDI_SELECTOR_LEN;
             left -= HDI_SELECTOR_LEN;
         }
@@ -537,7 +537,7 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
         rsnIe[1] == rsnIeLen - HDI_POS_SECOND &&
         HdiGetBe32(&rsnIe[HDI_POS_SECOND]) == HDI_OSEN_IE_VENDOR_TYPE) {
         pos = rsnIe + HDI_POS_SIX;
-        left = rsnIeLen - HDI_POS_SIX;
+        left = (int)(rsnIeLen - HDI_POS_SIX);
 
         data->groupCipher = HDI_CIPHER_GTK_NOT_USED;
         data->hasGroup = 1;
@@ -556,7 +556,7 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
         }
 
         pos = (const uint8_t *) (hdr + 1);
-        left = rsnIeLen - sizeof(*hdr);
+        left = (int)(rsnIeLen - sizeof(*hdr));
     }
 
     if (left >= HDI_SELECTOR_LEN) {
@@ -585,7 +585,8 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
         }
         data->hasPairwise = 1;
         for (i = 0; i < count; i++) {
-            data->pairwiseCipher |= HdiRsnIdToCipherSuite(pos);
+            data->pairwiseCipher = (int)((unsigned int)(data->pairwiseCipher) |
+                (unsigned int)HdiRsnIdToCipherSuite(pos));
             pos += HDI_SELECTOR_LEN;
             left -= HDI_SELECTOR_LEN;
         }
@@ -604,7 +605,7 @@ int HdiConvertIeRsn(const uint8_t *rsnIe, size_t rsnIeLen,
             return -1;
         }
         for (i = 0; i < count; i++) {
-            data->keyMgmt |= HdiRsnKeyMgmtToAuthMgmt(pos);
+            data->keyMgmt = (int)((unsigned int)(data->keyMgmt) | (unsigned int)HdiRsnKeyMgmtToAuthMgmt(pos));
             pos += HDI_SELECTOR_LEN;
             left -= HDI_SELECTOR_LEN;
         }
@@ -675,18 +676,21 @@ char* HdiGetIeTxt(char *pos, char *end, const char *proto,
 
     start = pos;
 
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT, ret, pos, end, "+", "%sEAP");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_PSK, ret, pos, end, "+", "%sPSK");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_HDI_NONE, ret, pos, end, "+", "%sNone");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_SAE, ret, pos, end, "+", "%sSAE");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_SUITE_B_192, ret, pos, end, "+", "%sEAP-SUITE-B-192");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_OSEN, ret, pos, end, "+", "%sOSEN");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_OWE, ret, pos, end, "+", "%sOWE");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_PSK_SHA256, ret, pos, end, "+", "%sPSK");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_FT_IEEE8021X, ret, pos, end, "+", "%sFT/EAP");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_FT_PSK, ret, pos, end, "+", "%sFT/PSK");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_FT_SAE, ret, pos, end, "+", "%sFT/SAE");
-    HDI_HANDLE_CIPHER_POS_INFO(data.keyMgmt & HDI_KEY_MGMT_IEEE8021X_SHA256, ret, pos, end, "+", "%sEAP");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT, ret, pos, end, "+", "%sEAP");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_PSK, ret, pos, end, "+", "%sPSK");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_HDI_NONE, ret, pos, end, "+", "%sNone");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_SAE, ret, pos, end, "+", "%sSAE");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_SUITE_B_192,
+        ret, pos, end, "+", "%sEAP-SUITE-B-192");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_OSEN, ret, pos, end, "+", "%sOSEN");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_OWE, ret, pos, end, "+", "%sOWE");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_PSK_SHA256, ret, pos, end, "+", "%sPSK");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_FT_IEEE8021X,
+        ret, pos, end, "+", "%sFT/EAP");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_FT_PSK, ret, pos, end, "+", "%sFT/PSK");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_FT_SAE, ret, pos, end, "+", "%sFT/SAE");
+    HDI_HANDLE_CIPHER_POS_INFO((unsigned int)(data.keyMgmt) & HDI_KEY_MGMT_IEEE8021X_SHA256,
+        ret, pos, end, "+", "%sEAP");
 
     pos = HdiGetCipherTxt(pos, end, data.pairwiseCipher);
 

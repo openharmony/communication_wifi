@@ -19,12 +19,8 @@
 DEFINE_WIFILOG_LABEL("WifiPermissionHelperTest");
 using ::testing::ext::TestSize;
 
-
 namespace OHOS {
 namespace Wifi {
-constexpr int PID_NUM_1001 = 1001;
-constexpr int UID_NUM_1001 = 1001;
-
 class WifiPermissionHelperTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -33,19 +29,16 @@ public:
     {}
     virtual void SetUp()
     {
-        pid = PID_NUM_1001;
-        uid = UID_NUM_1001;
-        pWifiPermissionHelper = std::make_unique<WifiPermissionHelper>();
+        pid = static_cast<int>(getpid());
+        uid = static_cast<int>(getuid());
     }
 
     virtual void TearDown()
     {
-        pWifiPermissionHelper.reset();
     }
 public:
     int pid;
     int uid;
-    std::unique_ptr<WifiPermissionHelper> pWifiPermissionHelper;
 };
 
 /**
@@ -58,7 +51,7 @@ HWTEST_F(WifiPermissionHelperTest, VerifyPermission001, TestSize.Level1)
 {
     WIFI_LOGI("VerifyPermission001 enter");
     std::string permissionName = "ohos.permission.GET_WIFI_INFO";
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyPermission(permissionName, pid, uid, 0) == PERMISSION_DENIED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyPermission(permissionName, pid, uid, 0) == PERMISSION_GRANTED);
 }
 /**
  * @tc.name: VerifyAllPermission001
@@ -69,18 +62,18 @@ HWTEST_F(WifiPermissionHelperTest, VerifyPermission001, TestSize.Level1)
 HWTEST_F(WifiPermissionHelperTest, VerifyAllPermission001, TestSize.Level1)
 {
     WIFI_LOGI("VerifyAllPermission001 enter");
-    EXPECT_TRUE(pWifiPermissionHelper->VerifySetWifiInfoPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyGetWifiInfoPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifySetWifiConfigPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyGetWifiConfigPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyGetScanInfosPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyGetWifiLocalMacPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyWifiConnectionPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyGetWifiDirectDevicePermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyManageWifiHotspotPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyGetWifiPeersMacPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyGetWifiInfoInternalPermission(pid, uid) == PERMISSION_DENIED);
-    EXPECT_TRUE(pWifiPermissionHelper->VerifyManageWifiHotspotExtPermission(pid, uid) == PERMISSION_DENIED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifySetWifiInfoPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyGetWifiInfoPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifySetWifiConfigPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyGetWifiConfigPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyGetScanInfosPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyGetWifiLocalMacPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyWifiConnectionPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyGetWifiDirectDevicePermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyManageWifiHotspotPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyGetWifiPeersMacPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyGetWifiInfoInternalPermission(pid, uid) == PERMISSION_GRANTED);
+    EXPECT_TRUE(WifiPermissionHelper::VerifyManageWifiHotspotExtPermission(pid, uid) == PERMISSION_GRANTED);
 }
 }  // namespace Wifi
 }  // namespace OHOS

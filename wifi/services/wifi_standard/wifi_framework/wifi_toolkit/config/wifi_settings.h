@@ -64,7 +64,6 @@ constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
-constexpr int WIFI_DEVICE_CONFIG_MAX_MUN = 1000;
 constexpr uint32_t COMPARE_MAC_OFFSET = 2;
 /* Plaintext string length */
 constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
@@ -332,6 +331,7 @@ public:
 
     void UpLoadLocalDeviceConfigToCloud();
 #endif
+    std::string GetDefaultApSsid();
 
 private:
     WifiSettings();
@@ -349,7 +349,7 @@ private:
     void InitDefaultWifiConfig();
     void InitWifiConfig();
     int SyncWifiConfig();
-    int RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const;
+    std::vector<WifiDeviceConfig> RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const;
     std::string FuzzyBssid(const std::string bssid);
 #ifndef OHOS_ARCH_LITE
     void MergeWifiConfig();

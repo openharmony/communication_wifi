@@ -75,6 +75,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         wifiLinkedInfo.isDataRestricted, wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, isHwItCustNetwork);
     ApConnectionInfo apConnectionInfo(wifiLinkedInfo.bssid);
     apConnectionInfo.SetConnectedTime(std::chrono::steady_clock::now());
+    onnectTime_ = std::chrono::steady_clock::now();
     connectedAp_->apInfo.apConnectionInfo = apConnectionInfo;
     if (connectedAp_->canNotPerf) {
         WIFI_LOGI("OnConnected, ap is not allow perf 5g");
@@ -106,13 +107,16 @@ void Perf5gHandoverService::OnDisconnected()
         return;
     }
     // 进入过5G优选的流程，但是没有发生过5G优选切换。说明挂死在2.4G
-    if (isIn5gPref_ && !has5gPrefSwitch_) {
+    if (isIn5gPref_ && !(has5gPrefSwitch_ || selectRelationAp_ != nullptr)) {
         if (noInternetTime_ != std::chrono::steady_clock::time_point::min()) {
             perf5gInfo_.durationNoInternet +=
                 duration_cast<seconds>(std::chrono::steady_clock::now() - noInternetTime_).count();
             noInternetTime_ = std::chrono::steady_clock::time_point::min();
         }
-        perf5gInfo_.conDuration = connectedAp_->apInfo.apConnectionInfo.GetTotalUseTime();
+        if (connectTime_ != std::chrono::steady_clock::time_point::min()) {
+            perf5gInfo_.conDuration = duration_cast<seconds>(std::chrono::steady_clock::now() - connectTime_).count();
+            connectTime_ = std::chrono::steady_clock::time_point::min();
+        }
         perf5gInfo_.bssid = MacAnonymize(connectedAp_->apInfo.bssid).data();
         perf5gInfo_.ssid = SsidAnonymize(connectedAp_->apInfo.ssid).data();
         perf5gInfo_.freq = connectedAp_->apInfo.frequency;
@@ -386,8 +390,8 @@ void Perf5gHandoverService::Monitor5gAp(std::vector<InterScanInfo> &wifiScanInfo
     for (int32_t index = 0; index < relationApSize; index++) {
         FoundMonitorAp(index, wifiScanInfos);
     }
-    // 如果所有的关联AP都在黑名单中，计数
-    if (relationApSize == inBlackListNum_) {
+    // 除去无网AP如果所有的关联AP都在黑名单中，计数
+    if (relationApSize == inBlackListNum_ + perf5gInfo_.notInternetRela5gNum) {
         perf5gInfo_.allRela5gInBlockListNum++;
     }
     if (monitorApIndexs_.empty()) {
@@ -487,7 +491,8 @@ void Perf5gHandoverService::ActiveScan(int32_t rssi)
             needScanInMonitor = true;
         }
     }
-    if (pWifiScanController_->TryToScan(rssi, needScanInMonitor, connectedAp_->apInfo.frequency, monitorFreqs)) {
+    if (inMonitor_
+        && pWifiScanController_->TryToScan(rssi, needScanInMonitor, connectedAp_->apInfo.frequency, monitorFreqs)) {
         perf5gInfo_.monitorActiveScanNum++;
     }
 }

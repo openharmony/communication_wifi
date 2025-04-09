@@ -708,6 +708,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         return;
     }
     int reason = msg->GetParam1();
+    int locallyGenerated = msg->GetParam2();
     std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("Enter DealDisconnectEventInLinkState m_instId = %{public}d reason:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
@@ -734,7 +735,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
                 DisabledReason::DISABLED_CONSECUTIVE_FAILURES);
         }
-        WriteWifiAbnormalDisconnectHiSysEvent(reason);
+        WriteWifiAbnormalDisconnectHiSysEvent(reason, locallyGenerated);
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";

@@ -115,11 +115,12 @@ void WriteWifiOperateStateHiSysEvent(int operateType, int operateState)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_OPERATE_STATE", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode)
+void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode, int locallyGenerated)
 {
     Json::Value root;
     Json::FastWriter writer;
     root["ERROR_CODE"] = errorCode;
+    root["IS_ACTIVE_DISCONNECT"] = locallyGenerated;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
 

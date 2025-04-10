@@ -72,7 +72,8 @@ public:
         std::function<void(const StationInfo &, int)> OnStationEvent =
             [&](const StationInfo &sta, int id) { m_sta = sta; };
         IApServiceCallbacks callbacks = {"", [&](ApState state, int id, int hotspotMode) {
-            mBState = state; hotspotMode = static_cast<int>(HotspotMode::SOFTAP);},
+            mBState = state;
+            hotspotMode = static_cast<int>(HotspotMode::SOFTAP);},
             OnStationEvent, OnStationEvent};
         return pApStateMachine->RegisterApServiceCallbacks(callbacks);
     }

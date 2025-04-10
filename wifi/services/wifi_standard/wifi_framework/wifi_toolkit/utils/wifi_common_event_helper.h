@@ -48,7 +48,7 @@ inline const std::string COMMON_EVENT_VOWIFI_SIGNAL_DETECT_INTERRUPT =
     "usual.event.wifi.VOWIFI_SIGNAL_DETECT_INTERRUPT";
 inline const std::string COMMON_EVENT_GET_WIFI_CONFIG_PERMISSION = "ohos.permission.GET_WIFI_CONFIG";
 inline const std::string COMMON_EVENT_GET_WIFI_INFO_PERMISSION = "ohos.permission.GET_WIFI_INFO";
-inline const std::string COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION = "ohos.permission.SET_WIFI_CONFIG";
+inline const std::string COMMON_EVENT_SET_WIFI_INFO_PERMISSION = "ohos.permission.SET_WIFI_INFO";
 inline const std::string COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION = "ohos.permission.MANAGE_WIFI_CONNECTION";
 inline const std::string COMMON_EVENT_NOT_AVAILABLE_DIALOG = "event.settings.wlan.close_not_available_dialog";
 inline const int CANCEL_DIAG = 0;

@@ -81,7 +81,6 @@ struct Pref5gStatisticsInfo {
     std::string bssid;
     std::string ssid;
     int32_t freq;
-    int64_t conDuration;
     int64_t durationNoInternet;
     int32_t enterMonitorNum;
     int32_t monitorActiveScanNum;

@@ -54,11 +54,6 @@ private:
     std::list<LinkQuality> linkQualityLastConnected_;
     bool inMonitor_ = false;
     Pref5gStatisticsInfo perf5gInfo_;
-    int32_t inBlackListNum_ = 0;
-    std::chrono::steady_clock::time_point noInternetTime_ = std::chrono::steady_clock::time_point::min();
-    std::chrono::steady_clock::time_point connectTime_ = std::chrono::steady_clock::time_point::min();
-    bool isIn5gPref_ = false;
-    bool has5gPrefSwitch_ = false;
 
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);

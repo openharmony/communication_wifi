@@ -57,7 +57,7 @@ public:
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
-
+ 
 class NotP2pFreqAt5gFilter final : public SimpleWifiFilter {
 public:
     NotP2pFreqAt5gFilter();

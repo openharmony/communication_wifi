@@ -73,8 +73,7 @@ public:
             [&](const StationInfo &sta, int id) { m_sta = sta; };
         IApServiceCallbacks callbacks = {"", [&](ApState state, int id, int hotspotMode) {
             mBState = state;
-            hotspotMode = static_cast<int>(HotspotMode::SOFTAP);},
-            OnStationEvent, OnStationEvent};
+            hotspotMode_ = hotspotMode;}, OnStationEvent, OnStationEvent};
         return pApStateMachine->RegisterApServiceCallbacks(callbacks);
     }
     ErrCode UnRegisterApServiceCallbacks()
@@ -116,6 +115,7 @@ public:
     MockApMonitor *pMockApMonitor;
     ApStateMachine *pApStateMachine;
     ApState mBState;
+    int hotspotMode_;
     StationInfo m_sta;
 };
 TEST_F(ApStateMachineTest, OnApStateChange)

@@ -45,10 +45,8 @@ public:
         pMockApIdleState = &(pMockPendant->GetMockApIdleState());
         pMockApStartedState = &(pMockPendant->GetMockApStartedState());
         pMockApMonitor = &(pMockPendant->GetMockApMonitor());
-
         pApStateMachine = new ApStateMachine(*pMockApStationsManager, *pMockApRootState, *pMockApIdleState,
             *pMockApStartedState, *pMockApMonitor);
-
         RegisterApServiceCallbacks();
         EXPECT_CALL(WifiApHalInterface::GetInstance(), RegisterApEvent(_, 0))
             .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
@@ -73,7 +71,8 @@ public:
             [&](const StationInfo &sta, int id) { m_sta = sta; };
         IApServiceCallbacks callbacks = {"", [&](ApState state, int id, int hotspotMode) {
             mBState = state;
-            hotspotMode_ = hotspotMode;}, OnStationEvent, OnStationEvent};
+            hotspotMode_ = hotspotMode;},
+            OnStationEvent, OnStationEvent};
         return pApStateMachine->RegisterApServiceCallbacks(callbacks);
     }
     ErrCode UnRegisterApServiceCallbacks()

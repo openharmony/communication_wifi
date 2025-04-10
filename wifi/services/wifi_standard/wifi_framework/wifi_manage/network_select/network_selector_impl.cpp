@@ -72,7 +72,6 @@ void Wifi2WifiIntegrator::GetCandidatesFromSubNetworkSelector()
 Wifi2WifiIntegrator::Wifi2WifiIntegrator() : CompositeNetworkSelector("Wifi2WifiIntegrator")
 {
     auto andFilters = make_shared<AndWifiFilter>();
-    andFilters->AddFilter(make_shared<NotAllowAutoConnectFilter>());
     andFilters->AddFilter(make_shared<ValidNetworkIdFilter>());
     andFilters->AddFilter(make_shared<NotCurrentNetworkFilter>());
     andFilters->AddFilter(make_shared<NotNetworkBlackListFilter>());
@@ -113,7 +112,6 @@ void Wifi2WifiNoNetIntegrator::GetCandidatesFromSubNetworkSelector()
 Wifi2WifiNoNetIntegrator::Wifi2WifiNoNetIntegrator() : CompositeNetworkSelector("Wifi2WifiNoNetIntegrator")
 {
     auto andFilters = make_shared<AndWifiFilter>();
-    andFilters->AddFilter(make_shared<NotAllowAutoConnectFilter>());
     andFilters->AddFilter(make_shared<ValidNetworkIdFilter>());
     andFilters->AddFilter(make_shared<NotCurrentNetworkFilter>());
     andFilters->AddFilter(make_shared<NotNetworkBlackListFilter>());
@@ -145,7 +143,6 @@ void Wifi2WifiQoeSlowIntegrator::GetCandidatesFromSubNetworkSelector()
 Wifi2WifiQoeSlowIntegrator::Wifi2WifiQoeSlowIntegrator() : CompositeNetworkSelector("Wifi2WifiQoeSlowIntegrator")
 {
     auto andFilters = make_shared<AndWifiFilter>();
-    andFilters->AddFilter(make_shared<NotAllowAutoConnectFilter>());
     andFilters->AddFilter(make_shared<ValidNetworkIdFilter>());
     andFilters->AddFilter(make_shared<NotCurrentNetworkFilter>());
     andFilters->AddFilter(make_shared<NotNetworkBlackListFilter>());

@@ -31,7 +31,7 @@ using ::testing::Return;
 namespace OHOS {
 namespace Wifi {
 static std::string g_errLog = "wifitest";
-class ApStateMachine_test : public testing::Test {
+class ApStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
@@ -66,15 +66,14 @@ public:
         pMockApStartedState = nullptr;
         pMockApMonitor = nullptr;
     }
-
 public:
     ErrCode RegisterApServiceCallbacks()
     {
         std::function<void(const StationInfo &, int)> OnStationEvent =
             [&](const StationInfo &sta, int id) { m_sta = sta; };
-
         IApServiceCallbacks callbacks = {"", [&](ApState state, int id, int hotspotMode) {
             mBState = state; hotspotMode = static_cast<int>(HotspotMode::SOFTAP);},
+            OnStationEvent, OnStationEvent};
         return pApStateMachine->RegisterApServiceCallbacks(callbacks);
     }
     ErrCode UnRegisterApServiceCallbacks()
@@ -82,18 +81,11 @@ public:
         IApServiceCallbacks callbacks;
         return pApStateMachine->RegisterApServiceCallbacks(callbacks);
     }
-
 public:
     void WrapOnApStateChange(ApState state)
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)), 0)).WillOnce(
             Return(0));
-        pApStateMachine->OnApStateChange(state);
-    }
-    void WrapOnApStateChangeFail(ApState state)
-    {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetHotspotState(Eq(static_cast<int>(state)), 0)).WillOnce(
-            Return(1));
         pApStateMachine->OnApStateChange(state);
     }
 
@@ -114,7 +106,6 @@ public:
     {
         pApStateMachine->RegisterEventHandler();
     }
-
 public:
     MockPendant *pMockPendant;
     MockApStationsManager *pMockApStationsManager;
@@ -122,12 +113,11 @@ public:
     MockApIdleState *pMockApIdleState;
     MockApStartedState *pMockApStartedState;
     MockApMonitor *pMockApMonitor;
-
     ApStateMachine *pApStateMachine;
     ApState mBState;
     StationInfo m_sta;
 };
-TEST_F(ApStateMachine_test, OnApStateChange)
+TEST_F(ApStateMachineTest, OnApStateChange)
 {
     ApState BroadState = ApState::AP_STATE_IDLE;
     WrapOnApStateChange(BroadState);
@@ -145,17 +135,19 @@ TEST_F(ApStateMachine_test, OnApStateChange)
     WrapOnApStateChange(BroadState);
 
     BroadState = ApState::AP_STATE_CLOSED;
-    WrapOnApStateChangeFail(BroadState);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetHotspotState(Eq(static_cast<int>(BroadState)), 0)).WillOnce(
+        Return(1));
+    pApStateMachine->OnApStateChange(BroadState);
 }
 
-TEST_F(ApStateMachine_test, BroadCastStationJoin)
+TEST_F(ApStateMachineTest, BroadCastStationJoin)
 {
     const StationInfo BroadCastStation = {"test1", "aa:bb:cc:dd:ee:ff", 1, "127.0.0.1"};
     WrapBroadCastStationJoin(BroadCastStation);
     EXPECT_EQ(BroadCastStation, m_sta);
 }
 
-TEST_F(ApStateMachine_test, BroadCastStationLeave)
+TEST_F(ApStateMachineTest, BroadCastStationLeave)
 {
     const StationInfo BroadCastStation = {"test1", "aa:bb:cc:dd:ee:ff", 1, "127.0.0.1"};
     WrapBroadCastStationChangeDefult(BroadCastStation);
@@ -163,13 +155,13 @@ TEST_F(ApStateMachine_test, BroadCastStationLeave)
     EXPECT_EQ(BroadCastStation, m_sta);
 }
 
-TEST_F(ApStateMachine_test, RegisterEventHandler)
+TEST_F(ApStateMachineTest, RegisterEventHandler)
 {
     WarpRegisterEventHandler();
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage") != std::string::npos);
 }
 
-TEST_F(ApStateMachine_test, GetPowerModelTest)
+TEST_F(ApStateMachineTest, GetPowerModelTest)
 {
     if (pApStateMachine == nullptr) {
         return;
@@ -180,7 +172,7 @@ TEST_F(ApStateMachine_test, GetPowerModelTest)
     EXPECT_EQ(mode, HotspotMode::SOFTAP);
 }
 
-TEST_F(ApStateMachine_test, SetHotspotModeTest)
+TEST_F(ApStateMachineTest, SetHotspotModeTest)
 {
     if (pApStateMachine == nullptr) {
         return;

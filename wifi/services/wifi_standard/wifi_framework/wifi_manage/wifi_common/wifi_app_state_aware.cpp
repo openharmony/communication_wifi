@@ -22,11 +22,6 @@
 #include "wifi_service_manager.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_logger.h"
-#ifndef OHOS_ARCH_LITE
-#ifdef WIFI_DATA_REPORT_ENABLE
-#include "select_network_data_report.h"
-#endif
-#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -141,11 +136,6 @@ void WifiAppStateAware::OnForegroundAppChanged(const AppExecFwk::AppStateData &a
     if (mWifiAppStateAwareCallbacks.OnForegroundAppChanged != nullptr) {
         mWifiAppStateAwareCallbacks.OnForegroundAppChanged(appStateData, mInstId);
     }
-#endif
-#ifndef OHOS_ARCH_LITE
-#ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService::GetInstance().UpdateAppBundleNameInfo(appStateData.bundleName);
-#endif
 #endif
 }
 

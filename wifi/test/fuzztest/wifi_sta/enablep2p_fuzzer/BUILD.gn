@@ -204,7 +204,6 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
-    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

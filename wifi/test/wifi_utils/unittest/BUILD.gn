@@ -45,6 +45,7 @@ ohos_unittest("utils_unittest") {
   ]
 
   deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
+  defines = []
 
   external_deps = [
     "ability_base:want",
@@ -52,7 +53,6 @@ ohos_unittest("utils_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hilog:libhilog",
@@ -63,6 +63,13 @@ ohos_unittest("utils_unittest") {
     "openssl:libssl_shared",
     "samgr:samgr_proxy",
   ]
+
+  if (wifi_ffrt_enable) {
+    external_deps += [ "ffrt:libffrt" ]
+    defines += [ "WIFI_FFRT_ENABLE" ]
+  } else {
+    external_deps += [ "eventhandler:libeventhandler" ]
+  }
 
   configs = [ ":module_private_config" ]
 

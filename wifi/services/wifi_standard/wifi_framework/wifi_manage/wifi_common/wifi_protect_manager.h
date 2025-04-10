@@ -22,8 +22,6 @@
 #include "appmgr/application_state_observer_stub.h"
 #include "appmgr/app_state_data.h"
 #include "ipc_skeleton.h"
-#include "event_handler.h"
-#include "event_runner.h"
 #include "appmgr/app_mgr_interface.h"
 #include "wifi_event_handler.h"
 #endif

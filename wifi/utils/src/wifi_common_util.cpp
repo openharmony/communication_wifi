@@ -303,6 +303,14 @@ int64_t GetCurrentTimeSeconds()
     return value.count();
 }
 
+int64_t GetCurrentTimeMilliSeconds()
+{
+    auto now = std::chrono::system_clock::now();
+    auto nowMs = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+    auto value = nowMs.time_since_epoch();
+    return value.count();
+}
+
 int64_t GetElapsedMicrosecondsSinceBoot()
 {
     struct timespec times = {0, 0};

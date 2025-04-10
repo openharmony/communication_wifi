@@ -55,6 +55,7 @@
 #include "mock_dhcp_service.h"
 #endif
 #include "sta_define.h"
+#include "ip_qos_monitor.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -2024,7 +2025,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     }
     /*when detect result is NETWORK_NOTWORKING but tx rx is good, considered as NETWORK_IS_WORKING*/
     if (netState == SystemNetWorkState::NETWORK_NOTWORKING &&
-        OHOS::system::GetParameter(WIFI_IS_TX_RX_GOOD, "0") == "1" &&
+        IpQosMonitor::GetInstance().GetTxRxStatus() &&
         WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
         WIFI_LOGI("net detection result is NETWORK_NOTWORKING but tx rx is good, considered as NETWORK_IS_WORKING");
         netState = SystemNetWorkState::NETWORK_IS_WORKING;

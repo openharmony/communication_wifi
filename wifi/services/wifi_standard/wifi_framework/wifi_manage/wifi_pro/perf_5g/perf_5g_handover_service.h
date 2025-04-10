@@ -53,7 +53,7 @@ private:
     std::string bssidLastConnected_;
     std::list<LinkQuality> linkQualityLastConnected_;
     bool inMonitor_ = false;
-    Pref5gStatisticsInfo perf5gInfo_;
+    Pref5gStatisticsInfo perf5gChrInfo_;
 
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);

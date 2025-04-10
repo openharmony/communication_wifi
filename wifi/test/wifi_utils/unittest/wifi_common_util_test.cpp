@@ -236,6 +236,15 @@ HWTEST_F(WifiCommonUtilTest, GetSplitInfoTest_1, TestSize.Level1)
     EXPECT_EQ(result.size(), 1);
 }
 
+HWTEST_F(WifiCommonUtilTest, GetSplitInfoTest_2, TestSize.Level1)
+{
+    WIFI_LOGI("GetSplitInfoTest_1 enter");
+    std::string input = "0000010000";
+    std::string delimiter = "0";
+    std::vector<std::string> result = GetSplitInfo(input, delimiter);
+    EXPECT_EQ(result.size(), 1);
+}
+
 HWTEST_F(WifiCommonUtilTest, GetCurrentTimeSecondsTest, TestSize.Level1)
 {
     WIFI_LOGI("GetCurrentTimeSecondsTest enter");

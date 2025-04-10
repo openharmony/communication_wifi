@@ -240,7 +240,7 @@ bool WifiCommonEventHelper::PublishInternetAccessChangedEvent(const int &code, c
 {
     WIFI_LOGI("PublishInternetAccessChangedEvent code:%{public}d", code);
     std::vector<std::string> permissions;
-    permissions.push_back(COMMON_EVENT_GET_WIFI_INFO_PERMISSION);
+    permissions.push_back(COMMON_EVENT_SET_WIFI_CONFIG_PERMISSION);
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_INTERNET_ACCESS_CHANGE, code, data, permissions);
 }
 }  // namespace Wifi

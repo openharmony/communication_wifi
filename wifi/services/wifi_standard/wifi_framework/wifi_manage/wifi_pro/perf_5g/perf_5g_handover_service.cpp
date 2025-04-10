@@ -124,9 +124,9 @@ void Perf5gHandoverService::OnDisconnected()
             }
         }
         Write5gPrefFailedHisysevent(perf5gInfo_);
-        isIn5gPref_ = false;
-        has5gPrefSwitch_ = false;
     }
+    isIn5gPref_ = false;
+    has5gPrefSwitch_ = false;
 
     bssidLastConnected_ = connectedAp_->apInfo.bssid;
     linkQualityLastConnected_ = connectedAp_->apInfo.apConnectionInfo.GetLinkQualitys();

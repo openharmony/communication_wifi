@@ -34,6 +34,7 @@ public:
     int64_t GetCurrentTcpTxCounter();
     int64_t GetCurrentTcpRxCounter();
     void ResetTxRxProperty();
+    bool GetTxRxStatus();
 private:
     bool AllowSelfCureNetwork(int32_t currentRssi);
     int32_t mInstId = 0;

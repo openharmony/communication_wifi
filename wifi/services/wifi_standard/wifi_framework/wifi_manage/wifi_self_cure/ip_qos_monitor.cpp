@@ -71,8 +71,7 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     bool internetGood = ParseNetworkInternetGood(elems);
     if (internetGood) {
         if (!lastTxRxGood_) {
-            WIFI_LOGI("%{public}s: set tx_rx_good property true", __FUNCTION__);
-            SetParamValue(WIFI_IS_TX_RX_GOOD, "1");
+            WIFI_LOGI("%{public}s: set tx_rx_good true", __FUNCTION__);
             lastTxRxGood_ = true;
         }
         mInternetFailedCounter = 0;
@@ -85,8 +84,7 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, mInstId);
     if (lastTxRxGood_) {
-        WIFI_LOGI("%{public}s: set tx_rx_good property false", __FUNCTION__);
-        SetParamValue(WIFI_IS_TX_RX_GOOD, "0");
+        WIFI_LOGI("%{public}s: set tx_rx_good false", __FUNCTION__);
         lastTxRxGood_ = false;
     }
     mInternetFailedCounter++;
@@ -172,11 +170,15 @@ int64_t IpQosMonitor::GetCurrentTcpRxCounter()
 
 void IpQosMonitor::ResetTxRxProperty()
 {
-    WIFI_LOGI("%{public}s: reset tx rx property, set tx_rx_good property false", __FUNCTION__);
-    SetParamValue(WIFI_IS_TX_RX_GOOD, "0");
+    WIFI_LOGI("%{public}s: reset tx rx status", __FUNCTION__);
     lastTxRxGood_ = false;
     mLastTcpTxCounter = 0;
     mLastTcpRxCounter = 0;
+}
+
+bool IpQosMonitor::GetTxRxStatus()
+{
+    return lastTxRxGood_;
 }
 
 } // namespace Wifi

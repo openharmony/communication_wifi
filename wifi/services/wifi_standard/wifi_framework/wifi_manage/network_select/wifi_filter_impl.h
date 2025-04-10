@@ -57,7 +57,15 @@ public:
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
- 
+
+class NotAllowAutoConnectFilter final : public SimpleWifiFilter {
+public:
+    NotAllowAutoConnectFilter();
+    ~NotAllowAutoConnectFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
 class NotP2pFreqAt5gFilter final : public SimpleWifiFilter {
 public:
     NotP2pFreqAt5gFilter();
@@ -212,12 +220,4 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 }
-
-class NotAllowAutoConnectFilter final : public SimpleWifiFilter {
-public:
-    NotAllowAutoConnectFilter();
-    ~NotAllowAutoConnectFilter() override;
-protected:
-    bool Filter(NetworkCandidate &networkCandidate) override;
-};
 #endif //OHOS_WIFI_WIFI_FILTER_H

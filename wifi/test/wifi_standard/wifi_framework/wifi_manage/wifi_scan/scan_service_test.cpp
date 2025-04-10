@@ -1875,6 +1875,7 @@ HWTEST_F(ScanServiceTest, UnInitScanServiceSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleScanStatusReportSuccess1, TestSize.Level1)
 {
     HandleScanStatusReportSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleScanStatusReportSuccess2, TestSize.Level1)
@@ -1917,6 +1918,7 @@ HWTEST_F(ScanServiceTest, HandleScanStatusReportFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess1, TestSize.Level1)
 {
     HandleInnerEventReportSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess2, TestSize.Level1)
@@ -2188,16 +2190,19 @@ HWTEST_F(ScanServiceTest, HandleStaStatusChangedSuccess2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleStaStatusChangedFail, TestSize.Level1)
 {
     HandleStaStatusChangedFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleCustomStatusChangedSuccess1, TestSize.Level1)
 {
     HandleCustomStatusChangedSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleCustomStatusChangedSuccess2, TestSize.Level1)
 {
     HandleCustomStatusChangedSuccess2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, SystemScanProcessSuccess1, TestSize.Level1)
@@ -2319,11 +2324,13 @@ HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutFail2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutSuccess, TestSize.Level1)
 {
     RestartPnoScanTimeOutSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutFail, TestSize.Level1)
 {
     RestartPnoScanTimeOutFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoSuccess, TestSize.Level1)

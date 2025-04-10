@@ -90,32 +90,22 @@ struct Pref5gStatisticsInfo {
     int32_t notInternetRela5gNum;
     int32_t allRela5gInBlockListNum;
     int32_t satisfySwitchRssiNoSelectedNum;
-    int32_t isUserConnected;
+    int32_t inBlackListNum = 0;
+    bool isUserConnected;
+    bool isIn5gPref = false;
+    bool has5gPrefSwitch = false;
+    std::chrono::steady_clock::time_point noInternetTime = std::chrono::steady_clock::time_point::min();
+    std::chrono::steady_clock::time_point connectTime = std::chrono::steady_clock::time_point::min();
  
-    Pref5gStatisticsInfo() : bssid(""), ssid(""), freq(0), conDuration(0), durationNoInternet(0), enterMonitorNum(0),
+    Pref5gStatisticsInfo() : bssid(""), ssid(""), freq(0), durationNoInternet(0), enterMonitorNum(0),
         monitorActiveScanNum(0), rela5gNum(0), notAdj5gNum(0), notInternetRela5gNum(0), allRela5gInBlockListNum(0),
-        satisfySwitchRssiNoSelectedNum(0), isUserConnected(0)
+        satisfySwitchRssiNoSelectedNum(0), inBlackListNum(0), isUserConnected(false), isIn5gPref(false),
+        has5gPrefSwitch(false), noInternetTime(std::chrono::steady_clock::time_point::min()),
+        connectTime(std::chrono::steady_clock::time_point::min())
     {}
  
     ~Pref5gStatisticsInfo()
     {}
-
-    void Reset()
-    {
-        bssid = "";
-        ssid = "";
-        freq = 0;
-        conDuration = 0;
-        durationNoInternet = 0;
-        enterMonitorNum = 0;
-        monitorActiveScanNum = 0;
-        rela5gNum = 0;
-        notAdj5gNum = 0;
-        notInternetRela5gNum = 0;
-        allRela5gInBlockListNum = 0;
-        satisfySwitchRssiNoSelectedNum = 0;
-        isUserConnected = 0;
-    }
 };
 
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
@@ -202,7 +192,7 @@ void WriteWifiSelfcureHisysevent(int type);
 
 void Write3VapConflictHisysevent(int type);
 
-void Write5gPrefFailedHisysevent(const Pref5gStatisticsInfo &info);
+void Write5gPrefFailedHisysevent(Pref5gStatisticsInfo &info);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

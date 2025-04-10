@@ -38,7 +38,8 @@ public:
 
 private:
     void InitApCallback(void);
-    void DealApStateChanged(ApState bState, int id = 0);
+    void DealApStateChanged(ApState bState, int id = 0,
+        int hotspotMode = static_cast<int>(HotspotMode::SOFTAP));
     void DealApGetStaJoin(const StationInfo &info, int id = 0);
     void DealApGetStaLeave(const StationInfo &info, int id = 0);
 

@@ -21,7 +21,6 @@
 #ifdef WIFI_FFRT_ENABLE
 #include "c/ffrt_dump.h"
 #endif
-#include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #endif

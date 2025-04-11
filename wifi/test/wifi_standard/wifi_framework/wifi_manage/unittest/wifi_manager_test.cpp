@@ -124,6 +124,13 @@ HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)
     wifiManager.wifiStaManager->DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info);
 }
 
+HWTEST_F(WifiManagerTest, DealSignalPollReportTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealSignalPollReportTest enter!");
+    wifiManager.wifiStaManager->DealSignalPollReport("11:22:33:44:55:66", 2, 0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 HWTEST_F(WifiManagerTest, DealWpsChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealWpsChangedTest enter!");

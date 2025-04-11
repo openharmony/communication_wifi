@@ -56,6 +56,7 @@ private:
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
     int64_t startTime_ = 0;
+    std::mutex bssidMutex_;
     std::set<std::string> bssidSet_;
     std::vector<std::string> bssidArray_;
     const size_t signalArrLength = 6;

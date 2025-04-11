@@ -43,6 +43,7 @@ public:
     MOCK_METHOD2(DealStaOpenRes, void(OperateResState state, int));
     MOCK_METHOD2(DealStaCloseRes, void(OperateResState state, int));
     MOCK_METHOD3(DealStaConnChanged, void(OperateResState type, const WifiLinkedInfo &info, int));
+    MOCK_METHOD3(DealSignalPollReport, void(const std::string &bssid, const int32_t signalLevel, int));
     MOCK_METHOD3(DealWpsChanged, void(WpsStartState state, const int pinCode, int));
     MOCK_METHOD2(DealStreamChanged, void(StreamDirection state, int));
     MOCK_METHOD2(DealRssiChanged, void(int rssi, int));

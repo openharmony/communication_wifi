@@ -55,22 +55,27 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     /* Traverse networkCandidates and reserve qualified networkCandidate */
     TryNominate(networkCandidates, networkSelector);
 
-    std::stringstream savedResult = GetSavedNetInfoForChr(networkCandidates);
-    std::stringstream filteredReason = GetFilteredReasonForChr(networkCandidates);
-    std::stringstream selectedInfo;
+    std::string savedResult = GetSavedNetInfoForChr(networkCandidates);
+    std::string filteredReason = GetFilteredReasonForChr(networkCandidates);
 
     /* Get best networkCandidate from the reserved networkCandidates */
     std::vector<NetworkSelection::NetworkCandidate *> bestNetworkCandidates;
     networkSelector->GetBestCandidates(bestNetworkCandidates);
+    std::string selectedInfo;
     if (bestNetworkCandidates.empty()) {
-        WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo.str(), filteredReason.str(), savedResult.str());
+        WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
         return false;
     } else {
         WifiDeviceConfig selectedConfig;
         selectedConfig = bestNetworkCandidates.at(0)->wifiDeviceConfig;
-        selectedInfo << selectedConfig.networkId << "_" << SsidAnonymize(selectedConfig.ssid) << "_"
-            << MacAnonymize(selectedConfig.bssid) << selectedConfig.keyMgmt;
-        WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo.str(), filteredReason.str(), savedResult.str());
+        selectedInfo += selectedConfig.networkId;
+        selectedInfo += "_";
+        selectedInfo += SsidAnonymize(selectedConfig.ssid);
+        selectedInfo += "_";
+        selectedInfo += MacAnonymize(selectedConfig.bssid);
+        selectedInfo += "_";
+        selectedInfo += selectedConfig.keyMgmt;
+        WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
     }
 
     /* if bestNetworkCandidates is not empty, assign the value of first bestNetworkCandidate
@@ -138,7 +143,7 @@ void NetworkSelectionManager::TryNominate(std::vector<NetworkSelection::NetworkC
     });
 }
 
-std::stringstream NetworkSelectionManager::GetSavedNetInfoForChr(
+std::string NetworkSelectionManager::GetSavedNetInfoForChr(
     std::vector<NetworkSelection::NetworkCandidate> &networkCandidates)
 {
     std::map<int, WifiDeviceConfig> wifiDeviceConfigs;
@@ -149,22 +154,26 @@ std::stringstream NetworkSelectionManager::GetSavedNetInfoForChr(
         wifiDeviceConfigs.insert({networkCandidates.at(i).wifiDeviceConfig.networkId,
             networkCandidates.at(i).wifiDeviceConfig});
     }
-    std::stringstream savedResult;
-    savedResult << "[";
+    std::string savedResult;
+    savedResult += "[";
     for (auto pair : wifiDeviceConfigs) {
-        savedResult << "[";
-        savedResult << pair.first << "_" << SsidAnonymize(pair.second.ssid) << pair.second.keyMgmt;
-        savedResult << "]";
+        savedResult += "[";
+        savedResult += pair.first;
+        savedResult += "_";
+        savedResult += SsidAnonymize(pair.second.ssid);
+        savedResult += "_";
+        savedResult += pair.second.keyMgmt;
+        savedResult += "]";
     }
-    savedResult << "]";
+    savedResult += "]";
     return savedResult;
 }
 
-std::stringstream NetworkSelectionManager::GetFilteredReasonForChr(
+std::string NetworkSelectionManager::GetFilteredReasonForChr(
     std::vector<NetworkSelection::NetworkCandidate> &networkCandidates)\
 {
-    std::stringstream filteredReason;
-    filteredReason << "[";
+    std::string filteredReasons;
+    filteredReasons += "[";
     for (size_t i = 0; i < networkCandidates.size(); i++) {
         if (networkCandidates.at(i).wifiDeviceConfig.networkId == INVALID_NETWORK_ID) {
             continue;
@@ -175,17 +184,18 @@ std::stringstream NetworkSelectionManager::GetFilteredReasonForChr(
         if (filtedReason.size() == 0) {
             continue;
         }
-        filteredReason << "[";
-        for (const auto& pair : filteredReason) {
-            std::string filterName = pair.first;
-            filteredReason << filterName << "_" << networkCandidates.at(i).ToString(filterName);
+        filteredReasons += "[";
+        for (const auto& pair : filtedReason) {
+            filteredReasons += pair.first;
+            filteredReasons += "_";
+            filteredReasons += networkCandidates.at(i).ToString(filterName);
         }
-        filteredReason << "]";
+        filteredReasons += "]";
         if (i < networkCandidates.size() - 1) {
-            filteredReason << ", ";
+            filteredReasons += ", ";
         }
     }
-    filteredReason << "]";
-    return filteredReason;
+    filteredReasons += "]";
+    return filteredReasons;
 }
 }

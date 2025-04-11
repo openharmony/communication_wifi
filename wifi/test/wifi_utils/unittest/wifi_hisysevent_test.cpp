@@ -36,6 +36,12 @@ HWTEST_F(WifiHisyseventTest, WritePortalStateHiSysEventTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(WifiHisyseventTest, WriteWifiBeaconLostHiSysEventTest, TestSize.Level1)
+{
+    WriteWifiBeaconLostHiSysEvent(0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 HWTEST_F(WifiHisyseventTest, WriteArpInfoHiSysEventTest, TestSize.Level1)
 {
     WriteArpInfoHiSysEvent(0, 0);

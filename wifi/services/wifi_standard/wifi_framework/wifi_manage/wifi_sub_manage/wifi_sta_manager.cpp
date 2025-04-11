@@ -247,14 +247,14 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
         WIFI_LOGE("OnSignalPollReport: pService is nullptr!");
         return;
     }
-    if (bssidArray_.size() >= SIGNALARR_LENGTH) {
+    if (bssidArray_.size() >= signalArrLength) {
         bssidArray_.pop_back();
         bssidArray_.insert(bssidArray_.begin(), bssid);
     } else {
         bssidArray_.insert(bssidArray_.begin(), bssid);
     }
     std::vector<WifiSignalPollInfo> wifiCheckInfoArray;
-    if (pService->GetSignalPollInfoArray(wifiCheckInfoArray, SIGNALARR_LENGTH) != WIFI_OPT_SUCCESS) {
+    if (pService->GetSignalPollInfoArray(wifiCheckInfoArray, signalArrLength) != WIFI_OPT_SUCCESS) {
         return;
     }
     std::sort(wifiCheckInfoArray.begin(), wifiCheckInfoArray.end(),

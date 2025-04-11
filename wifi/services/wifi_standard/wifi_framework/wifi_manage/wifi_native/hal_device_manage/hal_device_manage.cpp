@@ -464,11 +464,6 @@ bool HalDeviceManager::SetDpiMarkRule(const std::string &ifaceName, int uid, int
 
 bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std::string &mac)
 {
-#ifdef NON_SEPERATE_P2P
-    /* non seperate p2p device do nothing, changing the mac will cause the p2p network uninstalled */
-    LOGI("non seperate p2p device do nothing");
-    return false;
-#else
     if (!CheckReloadChipHdiService()) {
         return false;
     }
@@ -498,7 +493,6 @@ bool HalDeviceManager::SetStaMacAddress(const std::string &ifaceName, const std:
 
     LOGI("SetStaMacAddress success");
     return true;
-#endif
 }
 
 IChipIface *HalDeviceManager::FindIface(const std::string &ifaceName)

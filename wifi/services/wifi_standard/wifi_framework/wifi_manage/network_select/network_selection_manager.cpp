@@ -186,7 +186,8 @@ std::string NetworkSelectionManager::GetFilteredReasonForChr(
         }
         filteredReasons += "[";
         for (const auto& pair : filtedReason) {
-            filteredReasons += pair.first;
+            std::string filterName = pair.first;
+            filteredReasons += filterName;
             filteredReasons += "_";
             filteredReasons += networkCandidates.at(i).ToString(filterName);
         }

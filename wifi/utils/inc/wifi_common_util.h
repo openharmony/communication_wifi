@@ -201,6 +201,12 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
 int64_t GetCurrentTimeSeconds();
 
 /**
+ * @Description GetCurrentTimeSeconds since 1970-01-01 00:00:00 GMT
+ *
+ * @return Returns the time, in milliseconds
+ */
+int64_t GetCurrentTimeMilliSeconds();
+/**
  * @Description GetElapsedMicrosecondsSinceBoot
  *
  * @return microseconds;

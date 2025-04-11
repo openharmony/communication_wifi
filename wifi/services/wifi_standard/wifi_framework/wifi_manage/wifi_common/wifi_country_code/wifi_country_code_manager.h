@@ -159,7 +159,8 @@ private:
     static void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
 #endif
 #ifdef FEATURE_AP_SUPPORT
-    static void DealApStateChanged(ApState state, int id = 0);
+    static void DealApStateChanged(ApState state, int id = 0,
+        int hotspotMode = static_cast<int>(HotspotMode::SOFTAP));
 #endif
     bool IsAllowUpdateWifiCountryCode();
     ErrCode UpdateWifiCountryCodeCache(const std::string &wifiCountryCode);

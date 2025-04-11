@@ -335,7 +335,6 @@ private:
      *
      */
     ErrCode InitSelfCureStates();
-    int64_t GetNowMilliSeconds();
     void SendBlaListToDriver(int blaListType);
     std::string BlackListToString(std::map<std::string, WifiCategoryBlackListInfo> &map);
     std::string ParseWifiCategoryBlackListInfo(std::pair<std::string, WifiCategoryBlackListInfo> iter);

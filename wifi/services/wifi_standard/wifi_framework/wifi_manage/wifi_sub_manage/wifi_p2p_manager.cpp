@@ -470,6 +470,8 @@ void WifiP2pManager::DealConfigChanged(CfgType type, char* data, int dataLen)
     cfgInfoPtr->dataLen = dataLen;
     cbMsg.cfgInfo = cfgInfoPtr;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    delete[] cfgData;
+    cfgData = nullptr;
     return;
 }
 

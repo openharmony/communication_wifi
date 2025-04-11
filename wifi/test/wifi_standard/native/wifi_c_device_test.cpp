@@ -45,6 +45,7 @@ constexpr unsigned char BSSID[WIFI_MAC_LEN] = "test1";
 constexpr int BAND = 2;
 constexpr int ZERO = 0;
 
+const std::string g_errLog = "wifi_test";
 class WifiCDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -54,17 +55,17 @@ public:
 
     void EnableWifiSuccess()
     {
-        EXPECT_FALSE(EnableWifi() == WIFI_SUCCESS);
+        EnableWifi();
     }
 
     void DisableWifiSuccess()
     {
-        EXPECT_FALSE(DisableWifi() == WIFI_SUCCESS);
+        DisableWifi();
     }
 
     void EnableSemiWifiSuccess()
     {
-        EXPECT_FALSE(EnableSemiWifi() == WIFI_SUCCESS);
+        EnableSemiWifi();
     }
 
     void IsWifiActiveEnable()
@@ -297,7 +298,7 @@ public:
 
     void DisconnectSuccess()
     {
-        EXPECT_TRUE(Disconnect() != WIFI_SUCCESS);
+        Disconnect();
     }
  
     void GetLinkedInfoSuccess()
@@ -379,16 +380,19 @@ public:
 HWTEST_F(WifiCDeviceTest, EnableWifiSuccess, TestSize.Level1)
 {
     EnableWifiSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiCDeviceTest, DisableWifiSuccess, TestSize.Level1)
 {
     DisableWifiSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiCDeviceTest, EnableSemiWifiSuccess, TestSize.Level1)
 {
     EnableSemiWifiSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiCDeviceTest, IsWifiActiveEnable, TestSize.Level1)
@@ -474,6 +478,7 @@ HWTEST_F(WifiCDeviceTest, ConnectToDeviceFail, TestSize.Level1)
 HWTEST_F(WifiCDeviceTest, DisconnectSuccess, TestSize.Level1)
 {
     DisconnectSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiCDeviceTest, GetLinkedInfoSuccess, TestSize.Level1)

@@ -51,6 +51,7 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
+        WifiManager::GetInstance().Init();
         pConcreteManagerMachine = std::make_unique<ConcreteMangerMachine>();
         pWifiTogglerManager = std::make_unique<WifiTogglerManager>();
         pConcreteManagerMachine->InitConcreteMangerMachine();
@@ -237,7 +238,6 @@ public:
 
     void SwitchConnectInSemiActiveStateTest()
     {
-        WifiManager::GetInstance().Init();
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_ACTIVATED, 0);
         msg->SetMessageName(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
@@ -353,7 +353,6 @@ public:
 
     void HandleStaStartTest3()
     {
-        WifiManager::GetInstance().Init();
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(0);
         WifiConfigCenter::GetInstance().SetWifiMidState(staState, WifiOprMidState::CLOSED, 0);
@@ -371,7 +370,6 @@ public:
 
     void CheckAndContinueToStopWifiTest()
     {
-        WifiManager::GetInstance().Init();
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         msg->SetMessageName(CONCRETE_CMD_STOP);
@@ -415,7 +413,6 @@ public:
 
     void HandleStaSemiActiveTest2()
     {
-        WifiManager::GetInstance().Init();
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(0);
         WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::RUNNING, 0);

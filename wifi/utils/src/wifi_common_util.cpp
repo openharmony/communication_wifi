@@ -503,6 +503,41 @@ bool IsOtherVapConnect()
     return p2pOrHmlConnected && hotspotEnable;
 }
 
+bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray,
+    int signalLevel)
+{
+    if (wifiBeaconCheckInfoArray.empty() || bssidArray.empty()) {
+        WIFI_LOGE("Empty array");
+        return false;
+    }
+    if (wifiBeaconCheckInfoArray.size() != bssidArray.size()) {
+        WIFI_LOGE("Array sizes are inconsistent");
+        return false;
+    }
+    int interval = SIGNAL_RECORD_5S;
+    signalLevel <= SIGNAL_LEVEL_TWO ? interval = SIGNAL_RECORD_5S : interval = SIGNAL_RECORD_10S;
+    const int64_t initTime = wifiBeaconCheckInfoArray[0].timeStamp;
+    const int initRssi = wifiBeaconCheckInfoArray[0].signal;
+    const std::string initBssid = bssidArray[0];
+    int count = 1;
+    int accumulateTime = 0;
+    // Check if RSSI and BSSID remain unchanged over the specified interval
+    for (size_t i = 1; i < wifiBeaconCheckInfoArray.size(); i++) {
+        const auto &signalInfo = wifiBeaconCheckInfoArray[i];
+        const std::string &bssid = bssidArray[i];
+        if (initRssi == signalInfo.signal && initBssid == bssid) {
+            accumulateTime = initTime - signalInfo.timeStamp;
+            count++;
+        } else {
+            return false;
+        }
+        if (accumulateTime >= interval && count >= CHECK_THREE_TIME) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static int Hex2num(char c)
 {
     if (c >= '0' && c <= '9') {

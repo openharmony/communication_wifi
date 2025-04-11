@@ -222,7 +222,8 @@ HWTEST_F(WifiManagerTest, StartUnloadApSaTimerTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, DealApStateChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealApStateChangedTest enter!");
-    wifiManager.wifiHotspotManager->DealApStateChanged(ApState::AP_STATE_NONE);
+    wifiManager.wifiHotspotManager->DealApStateChanged(ApState::AP_STATE_NONE,
+        0, static_cast<int>(HotspotMode::SOFTAP));
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

@@ -77,6 +77,36 @@ enum class WifiScanFailReason {
     HDI_GET_SCAN_INFOS_FAIL
 };
 
+struct Pref5gStatisticsInfo {
+    std::string bssid;
+    std::string ssid;
+    int32_t freq;
+    int64_t durationNoInternet;
+    int32_t enterMonitorNum;
+    int32_t monitorActiveScanNum;
+    int32_t rela5gNum;
+    int32_t notAdj5gNum;
+    int32_t notInternetRela5gNum;
+    int32_t allRela5gInBlockListNum;
+    int32_t satisfySwitchRssiNoSelectedNum;
+    int32_t inBlackListNum = 0;
+    bool isUserConnected;
+    bool isIn5gPref = false;
+    bool has5gPrefSwitch = false;
+    std::chrono::steady_clock::time_point noInternetTime = std::chrono::steady_clock::time_point::min();
+    std::chrono::steady_clock::time_point connectTime = std::chrono::steady_clock::time_point::min();
+ 
+    Pref5gStatisticsInfo() : bssid(""), ssid(""), freq(0), durationNoInternet(0), enterMonitorNum(0),
+        monitorActiveScanNum(0), rela5gNum(0), notAdj5gNum(0), notInternetRela5gNum(0), allRela5gInBlockListNum(0),
+        satisfySwitchRssiNoSelectedNum(0), inBlackListNum(0), isUserConnected(false), isIn5gPref(false),
+        has5gPrefSwitch(false), noInternetTime(std::chrono::steady_clock::time_point::min()),
+        connectTime(std::chrono::steady_clock::time_point::min())
+    {}
+ 
+    ~Pref5gStatisticsInfo()
+    {}
+};
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
 void WriteWifiApStateHiSysEvent(int32_t state);

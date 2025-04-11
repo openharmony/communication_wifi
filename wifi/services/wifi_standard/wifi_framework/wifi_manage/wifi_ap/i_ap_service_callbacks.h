@@ -25,7 +25,7 @@ namespace Wifi {
 /* All callbacks provided by the AP service */
 struct IApServiceCallbacks {
     std::string callbackModuleName;
-    std::function<void(ApState, int)> OnApStateChangedEvent;
+    std::function<void(ApState, int, int)> OnApStateChangedEvent;
     std::function<void(const StationInfo &, int)> OnHotspotStaJoinEvent;   // STA device join event.
     std::function<void(const StationInfo &, int)> OnHotspotStaLeaveEvent;  // STA device leaving event.
 };

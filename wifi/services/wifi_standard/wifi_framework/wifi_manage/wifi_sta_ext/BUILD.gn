@@ -1,4 +1,4 @@
-# Copyright (C) 2024-2025 Huawei Device Co., Ltd.
+# Copyright (C) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
 
-local_base_sources = [ "select_network_data_report.cpp" ]
+local_base_sources = [ "sta_sm_ext.cpp" ]
 
 local_base_include_dirs = [
   "$WIFI_ROOT_DIR/base/cRPC/include",
@@ -24,18 +24,27 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report",
 ]
 
 ohos_static_library("wifi_sta_ext_service") {
   branch_protector_ret = "pac_ret"
   sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = false  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = false  # Enable integer overflow detection
-    ubsan = false  # Enable some Ubsan options
+    cfi = true
+    boundary_sanitize = false
+    cfi_cross_dso = true
+    integer_overflow = false
+    ubsan = false
     cfi_vcall_icall_only = true
     debug = false
   }
@@ -72,9 +81,6 @@ ohos_static_library("wifi_sta_ext_service") {
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_core",
-    "ipc:ipc_single",
-    "jsoncpp:jsoncpp",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_stats_manager_if",
     "safwk:system_ability_fwk",
@@ -86,6 +92,7 @@ ohos_static_library("wifi_sta_ext_service") {
 
   if (wifi_feature_with_data_report) {
     defines += [ "WIFI_DATA_REPORT_ENABLE" ]
+    sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report/select_network_data_report.cpp" ]
   }
   part_name = "wifi"
   subsystem_name = "communication"

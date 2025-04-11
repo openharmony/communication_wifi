@@ -247,32 +247,34 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
         WIFI_LOGE("OnSignalPollReport: pService is nullptr!");
         return;
     }
-    if (bssidArray_.size() >= signalArrLength) {
-        bssidArray_.pop_back();
-        bssidArray_.insert(bssidArray_.begin(), bssid);
-    } else {
-        bssidArray_.insert(bssidArray_.begin(), bssid);
-    }
     std::vector<WifiSignalPollInfo> wifiCheckInfoArray;
     if (pService->GetSignalPollInfoArray(wifiCheckInfoArray, signalArrLength) != WIFI_OPT_SUCCESS) {
         return;
     }
     std::sort(wifiCheckInfoArray.begin(), wifiCheckInfoArray.end(),
         [](const WifiSignalPollInfo& a, const WifiSignalPollInfo& b) {return a.timeStamp > b.timeStamp;});
-    if (isBeaconLost(bssidArray_, wifiCheckInfoArray, signalLevel)) {
-        WIFI_LOGW("Beacon Lost.");
-        int64_t currentTime =
-            static_cast<int64_t>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-        if (currentTime - startTime_ > ONE_DAY_TIME_SECONDS) {
-            bssidSet_.clear();
-            startTime_ = currentTime;
+    {
+        std::lock_guard<std::mutex> lock(bssidMutex_);
+        if (bssidArray_.size() >= signalArrLength) {
+            bssidArray_.pop_back();
+            bssidArray_.insert(bssidArray_.begin(), bssid);
+        } else {
+            bssidArray_.insert(bssidArray_.begin(), bssid);
         }
-        if (bssidSet_.find(bssid) == bssidSet_.end()) {
-            bssidSet_.insert(bssid);
-            int32_t errorCode = BeaconLostType::SIGNAL_LEVEL_LOW;
-            signalLevel <= SIGNAL_LEVEL_TWO ?
-                errorCode = BeaconLostType::SIGNAL_LEVEL_LOW : errorCode = BeaconLostType::SIGNAL_LEVEL_HIGH;
-            WriteWifiBeaconLostHiSysEvent(errorCode);
+        if (isBeaconLost(bssidArray_, wifiCheckInfoArray, signalLevel)) {
+            WIFI_LOGW("Beacon Lost.");
+            int64_t currentTime = GetCurrentTimeSeconds();
+            if (currentTime - startTime_ > ONE_DAY_TIME_SECONDS) {
+                bssidSet_.clear();
+                startTime_ = currentTime;
+            }
+            if (bssidSet_.find(bssid) == bssidSet_.end()) {
+                bssidSet_.insert(bssid);
+                int32_t errorCode = BeaconLostType::SIGNAL_LEVEL_LOW;
+                signalLevel <= SIGNAL_LEVEL_TWO ?
+                    errorCode = BeaconLostType::SIGNAL_LEVEL_LOW : errorCode = BeaconLostType::SIGNAL_LEVEL_HIGH;
+                WriteWifiBeaconLostHiSysEvent(errorCode);
+            }
         }
     }
 }

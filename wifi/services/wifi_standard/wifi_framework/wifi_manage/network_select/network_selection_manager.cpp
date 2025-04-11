@@ -169,8 +169,8 @@ std::stringstream NetworkSelectionManager::GetFilteredReasonForChr(
         if (networkCandidates.at(i).wifiDeviceConfig.networkId == INVALID_NETWORK_ID) {
             continue;
         }
-        std::map<std::string, std::set<FiltedReason,
-            FiltedReasonComparator, std::allocator<FiltedReason>>> filtedReason;
+        std::map<std::string, std::set<NetworkSelection::FiltedReason,
+            NetworkSelection::FiltedReasonComparator, std::allocator<NetworkSelection::FiltedReason>>> filtedReason;
         filtedReason = networkCandidates.at(i).filtedReason;
         if (filtedReason.size() == 0) {
             continue;

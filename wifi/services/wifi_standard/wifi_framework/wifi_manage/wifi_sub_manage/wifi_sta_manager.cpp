@@ -263,7 +263,7 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
         WIFI_LOGW("Beacon Lost.");
         int64_t currentTime =
             static_cast<int64_t>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-        if (currentTime - startTime_ > ONE_DAY_TIME) {
+        if (currentTime - startTime_ > ONE_DAY_TIME_SECONDS) {
             bssidSet_.clear();
             startTime_ = currentTime;
         }

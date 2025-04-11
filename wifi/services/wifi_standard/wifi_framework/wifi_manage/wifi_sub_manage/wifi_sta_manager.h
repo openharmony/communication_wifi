@@ -58,8 +58,7 @@ private:
     int64_t startTime_ = 0;
     std::set<std::string> bssidSet_;
     std::vector<std::string> bssidArray_;
-    const int64_t ONE_DAY_TIME = 24 * 60 * 60;
-    size_t SIGNALARR_LENGTH = 6;
+    const size_t SIGNALARR_LENGTH = 6;
 };
 
 }  // namespace Wifi

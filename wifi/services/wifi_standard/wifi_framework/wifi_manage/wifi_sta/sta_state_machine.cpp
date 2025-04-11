@@ -3795,15 +3795,14 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
         enhanceService_->SetEnhanceSignalPollInfo(signalInfo);
     }
 #endif
-
     WriteLinkInfoHiSysEvent(lastSignalLevel_, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
     std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
     for (const auto &callBackItem : m_staCallback) {
-        if (callBackItem.second.OnSignalPollReport != nullptr) {
-            callBackItem.second.OnSignalPollReport(signalInfo);
-        }
         if (callBackItem.second.OnWifiHalSignalInfoChange != nullptr) {
-            callBackItem.second.OnWifiHalSignalInfoChange(linkedInfo.bssid, lastSignalLevel_, m_instId);
+            callBackItem.second.OnWifiHalSignalInfoChange(signalInfo);
+        }
+        if (callBackItem.second.OnSignalPollReport != nullptr) {
+            callBackItem.second.OnSignalPollReport(linkedInfo.bssid, lastSignalLevel_, m_instId);
         }
     }
     if (enableSignalPoll) {

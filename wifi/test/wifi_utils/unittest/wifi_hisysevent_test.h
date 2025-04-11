@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "wifi_hisysevent.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {

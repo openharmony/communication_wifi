@@ -76,7 +76,7 @@ void ApStateMachine::OnApStateChange(ApState state)
         std::shared_lock<std::shared_mutex> lock(m_callbackMutex);
         for (const auto &callBackItem : m_callbacks) {
             if (callBackItem.second.OnApStateChangedEvent != nullptr) {
-                callBackItem.second.OnApStateChangedEvent(state, m_id);
+                callBackItem.second.OnApStateChangedEvent(state, m_id, static_cast<int>(hotspotMode_));
             }
         }
     }

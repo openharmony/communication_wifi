@@ -275,12 +275,18 @@ HWTEST_F(WifiCountryCodeManagerTest, DealApStateChangedTest, TestSize.Level1)
     tempInfos.emplace(1, info1);
     WifiCountryCodeManager::GetInstance().m_isFirstConnected = false;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAllWifiLinkedInfo()).WillRepeatedly(Return(tempInfos));
-    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_STARTING, 0);
-    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_STARTED, 0);
-    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_CLOSING, 0);
-    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_CLOSED, 0);
-    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_IDLE, 0);
-    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_NONE, 0);
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_STARTING,
+        0, static_cast<int>(HotspotMode::SOFTAP));
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_STARTED,
+        0, static_cast<int>(HotspotMode::SOFTAP));
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_CLOSING,
+        0, static_cast<int>(HotspotMode::SOFTAP));
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_CLOSED,
+        0, static_cast<int>(HotspotMode::SOFTAP));
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_IDLE,
+        0, static_cast<int>(HotspotMode::SOFTAP));
+    WifiCountryCodeManager::GetInstance().DealApStateChanged(ApState::AP_STATE_NONE,
+        0, static_cast<int>(HotspotMode::SOFTAP));
 }
 
 HWTEST_F(WifiCountryCodeManagerTest, UpdateWifiCountryCodeCacheSuccessTest, TestSize.Level1)

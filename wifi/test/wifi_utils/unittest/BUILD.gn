@@ -36,6 +36,7 @@ ohos_unittest("utils_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/base/cRPC/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
   ]
 
   ldflags = [

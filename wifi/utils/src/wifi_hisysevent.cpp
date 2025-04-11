@@ -124,6 +124,14 @@ void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode, int locallyGenerated)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
 
+void WriteWifiBeaconLostHiSysEvent(int32_t errorCode)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ERROR_CODE"] = errorCode;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_BEACON_LOST", "EVENT_VALUE", writer.write(root));
+}
+
 void WriteWifiConnectionInfoHiSysEvent(int networkId)
 {
     Json::Value root;

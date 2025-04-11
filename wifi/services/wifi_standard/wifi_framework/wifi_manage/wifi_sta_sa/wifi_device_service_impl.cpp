@@ -330,7 +330,7 @@ static bool CheckOriSsidLength(const WifiDeviceConfig &config)
         if (config.ssid == scanInfo.ssid
             && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
                 || (config.keyMgmt == deviceKeyMgmt))) {
-            LOGI("CheckOriSsidLength: oriSsid length:%{public}u", scanInfo.oriSsid.length());
+            LOGI("CheckOriSsidLength: oriSsid length:%{public}zu", scanInfo.oriSsid.length());
             if ((scanInfo.oriSsid.length() > 0) && (scanInfo.oriSsid.length() <= DEVICE_NAME_LENGTH)) {
                 return true;
             }

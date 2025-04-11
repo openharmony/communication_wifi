@@ -524,7 +524,7 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         return;
     }
 
-    if (networkId == pStaStateMachine->linkedInfo.networkId && config.isReassocSelfCureWithFactoryMacAddress == 0) {
+    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
         return;

@@ -48,12 +48,18 @@ private:
     void DealAutoSelectNetworkChanged(int networkId, int instId);
     void PublishWifiOperateStateHiSysEvent(OperateResState state);
     void NotifyScanForStaConnChanged(OperateResState state, int instId = 0);
+    void DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId = 0);
 private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
+    int64_t startTime_ = 0;
+    std::set<std::string> bssidSet_;
+    std::vector<std::string> bssidArray_;
+    const int64_t ONE_DAY_TIME = 24 * 60 * 60;
+    size_t SIGNALARR_LENGTH = 6;
 };
 
 }  // namespace Wifi

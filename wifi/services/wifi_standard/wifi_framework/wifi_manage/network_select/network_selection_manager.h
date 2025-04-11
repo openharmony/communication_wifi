@@ -66,14 +66,14 @@ private:
      *
      * @param networkCandidates candidate networks
      */
-    std::stringstream GetSavedNetInfoForChr(
+    std::string GetSavedNetInfoForChr(
         std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
     /**
      * get filtered reason for chr
      *
      * @param networkCandidates candidate networks
      */
-    std::stringstream GetFilteredReasonForChr(
+    std::string GetFilteredReasonForChr(
         std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
 };
 }

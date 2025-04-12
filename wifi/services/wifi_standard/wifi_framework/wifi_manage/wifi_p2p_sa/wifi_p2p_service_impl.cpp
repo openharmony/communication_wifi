@@ -1586,5 +1586,36 @@ ErrCode WifiP2pServiceImpl::SetMiracastSinkConfig(const std::string& config)
     }
     return pService->SetMiracastSinkConfig(config);
 }
+
+ErrCode WifiP2pServiceImpl::GetSupportedChanForBand(std::vector<int> &channels, int band)
+{
+    WIFI_LOGI("GetSupportedChanForBand");
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetSupportedChanForBand:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    ChannelsTable channelList;
+    WifiChannelHelper::GetInstance().GetValidChannels(channelList);
+    if (band == static_cast<int>(BandType::BAND_5GHZ)) {
+        if (channelList.find(BandType::BAND_5GHZ) != channelList.end()) {
+            channels = channelList[BandType::BAND_5GHZ];
+        }
+    } else if (band == static_cast<int>(BandType::BAND_2GHZ)) {
+        if (channelList.find(BandType::BAND_2GHZ) != channelList.end()) {
+            channels = channelList[BandType::BAND_2GHZ];
+        }
+    } else if (band == static_cast<int>(BandType::BAND_ANY)) {
+        for (auto channel : channelList) {
+            channels.insert(channels.end(), channel.second.begin(), channel.second.end());
+        }
+    } else {
+        WIFI_LOGE("invaild band %{public}d", band);
+    }
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

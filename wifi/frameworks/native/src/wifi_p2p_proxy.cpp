@@ -1852,5 +1852,47 @@ ErrCode WifiP2pProxy::SetMiracastSinkConfig(const std::string& config)
     }
     return ErrCode(reply.ReadInt32());
 }
+
+ErrCode WifiP2pProxy::GetSupportedChanForBand(std::vector<int> &channels, int band)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(band);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_SUPPORT_CHANN_FOR_BAND), data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_SUPPORT_CHANN_FOR_BAND), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    constexpr int MAX_SIZE = 40;
+    int listSize = reply.ReadInt32();
+    if (listSize > MAX_SIZE) {
+        WIFI_LOGE("Get channel list size error: %{public}d", listSize);
+        return WIFI_OPT_FAILED;
+    }
+    for (int i = 0; i < listSize; i++) {
+        channels.emplace_back(reply.ReadInt32());
+    }
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -22,9 +22,9 @@
 
 using namespace OHOS::Wifi;
 
-std::shared_ptr<WifiDevice> g_wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
+static std::shared_ptr<WifiDevice> g_wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 
-ani_boolean IsWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+static ani_boolean IsWifiActive([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
 {
     bool activeStatus = false;
     ErrCode ret = g_wifiDevicePtr->IsWifiActive(activeStatus);

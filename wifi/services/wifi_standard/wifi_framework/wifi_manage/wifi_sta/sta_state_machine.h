@@ -657,14 +657,6 @@ private:
     void UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi = INVALID_RSSI_VALUE);
 
     /**
-     * @Description : adjust signal level
-     *
-     * @param  originSignalLevel - origin signal level
-     * @return adjusted signal level
-     */
-    int AdjustSignalLevel(int originSignalLevel);
-
-    /**
      * @Description : JudgeEnableSignalPoll.
      *
      * @param  signalInfo -JudgeEnableSignalPoll

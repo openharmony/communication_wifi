@@ -118,12 +118,13 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess1()
     int status = HAL_WPA_CB_CONNECTED;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
+    int locallyGenerated = 0;
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::DISCONNECTED;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .Times(AtLeast(0))
         .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
 }
 
 void StaMonitorTest::OnConnectChangedCallBackSuccess2()
@@ -131,12 +132,13 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess2()
     int status = HAL_WPA_CB_DISCONNECTED;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
+    int locallyGenerated = 0;
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::DISCONNECTED;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .Times(AtLeast(0))
         .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
 }
 
 void StaMonitorTest::OnConnectChangedCallBackSuccess3()
@@ -144,12 +146,13 @@ void StaMonitorTest::OnConnectChangedCallBackSuccess3()
     int status = 0;
     int networkId = 1;
     std::string bssid = "01:23:45:67:89:AB";
+    int locallyGenerated = 0;
     WifiLinkedInfo linkedInfo;
     linkedInfo.connState = ConnState::DISCONNECTED;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .Times(AtLeast(0))
         .WillOnce(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
 }
 
 void StaMonitorTest::OnConnectChangedCallBackFail1()
@@ -157,8 +160,9 @@ void StaMonitorTest::OnConnectChangedCallBackFail1()
     int status = HAL_WPA_CB_CONNECTED;
     int networkId = 0;
     std::string bssid = "00:00:00:00:00:00";
+    int locallyGenerated = 0;
     pStaMonitor->pStaStateMachine = nullptr;
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
 }
 
 void StaMonitorTest::OnConnectChangedCallBackFail2()
@@ -166,7 +170,8 @@ void StaMonitorTest::OnConnectChangedCallBackFail2()
     int status = HAL_WPA_CB_CONNECTED;
     int networkId = 0;
     std::string bssid = "00:00:00:00:00:00";
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    int locallyGenerated = 0;
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
 }
 
 void StaMonitorTest::OnConnectChangedCallBackFail3()
@@ -174,7 +179,8 @@ void StaMonitorTest::OnConnectChangedCallBackFail3()
     int status = -1;
     int networkId = 0;
     std::string bssid = "00:00:00:00:00:00";
-    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid);
+    int locallyGenerated = 0;
+    pStaMonitor->OnConnectChangedCallBack(status, networkId, bssid, locallyGenerated);
 }
 
 void StaMonitorTest::OnWpaStateChangedCallBackSuccess()

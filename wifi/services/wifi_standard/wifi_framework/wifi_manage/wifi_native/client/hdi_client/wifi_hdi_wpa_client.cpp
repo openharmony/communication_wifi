@@ -67,7 +67,7 @@ constexpr int BAND_WIDTH_OFFSET = 16;
 WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName, int instId)
 {
     WifiEventCallback callback;
-    callback.onConnectChanged = [](int param1, int param2, const std::string &param3) {};
+    callback.onConnectChanged = [](int param1, int param2, const std::string &param3, int param4) {};
     ReqRegisterStaEventCallback(callback, ifaceName.c_str(), instId);
     LOGI("WifiHdiWpaClient StartWifi ifaceName:%{public}s instId:%{public}d", ifaceName.c_str(), instId);
     return HdiWpaStaStart(ifaceName.c_str(), instId);

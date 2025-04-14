@@ -56,7 +56,7 @@ ErrCode WifiProService::InitWifiProService()
 
 void WifiProService::HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo)
 {
-    WIFI_LOGI("WifiProService wifi connection state change, state:%{public}d,connState:%{public}d,"
+    WIFI_LOGD("WifiProService wifi connection state change, state:%{public}d,connState:%{public}d,"
         "supplicantState:%{public}d.", state, linkedInfo.connState, static_cast<int32_t>(linkedInfo.supplicantState));
     if (pWifiProStateMachine_ == nullptr) {
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
@@ -114,7 +114,7 @@ void WifiProService::NotifyCheckWifiInternetResult(OperateResState state)
 
 void WifiProService::HandleRssiLevelChanged(int32_t rssi)
 {
-    WIFI_LOGI("WifiProService::HandleRssiLevelChanged, %{public}d.", rssi);
+    WIFI_LOGI("HandleRssiLevelChanged, %{public}d.", rssi);
     if (pWifiProStateMachine_ == nullptr) {
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
         return;
@@ -125,7 +125,7 @@ void WifiProService::HandleRssiLevelChanged(int32_t rssi)
 
 void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter WifiProService::HandleScanResult.");
+    WIFI_LOGI("Enter HandleScanResult.");
     if (pWifiProStateMachine_ == nullptr) {
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
         return;

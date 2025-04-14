@@ -27,6 +27,7 @@
 #include "multi_sta_manager.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "softap_manager.h"
+#include "wifi_ap_msg.h"
 #ifdef FEATURE_RPT_SUPPORT
 #include "rpt_manager.h"
 #endif
@@ -94,14 +95,6 @@ public:
     private:
         WifiControllerMachine *pWifiControllerMachine;
     };
-
-#ifdef FEATURE_AP_SUPPORT
-    enum class HotspotMode {
-        NONE = 0,
-        SOFTAP,
-        RPT
-    };
-#endif
 public:
     ErrCode InitWifiControllerMachine();
 
@@ -123,6 +116,7 @@ public:
 #endif
     void ShutdownWifi(bool shutDownAp = true);
     void SelfcureResetWifi(int id);
+    void IsLocalOnlyHotspot(bool isLohs);
 private:
     template <typename T>
     inline void ParsePointer(T *&pointer)
@@ -182,6 +176,7 @@ private:
     HotspotMode hotspotMode {HotspotMode::NONE};
 #endif
     ManagerControl<MultiStaManager> multiStaManagers{MULTI_STA_CMD_STOP};
+    bool isLocalOnlyHotspot_ = false;
 };
 }  // namespace Wifi
 }  // namespace OHOS

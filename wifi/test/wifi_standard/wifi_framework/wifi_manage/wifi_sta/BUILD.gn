@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//foundation/communication/wifi/wifi/wifi.gni")
-module_self_cure_output_path = "wifi/wifi_selfcure_unittest"
+module_self_cure_output_path = "wifi/wifi/wifi_selfcure_unittest"
 module_output_path = "wifi/wifi/sta_test"
 defines = []
 defines += [ "OHOS_WIFI_STA_TEST" ]
@@ -69,7 +69,7 @@ local_base_sources = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_saved_device_appraisal.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_service.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_state_machine.cpp",
-  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/select_network_data_report.cpp",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/sta_sm_ext.cpp",
   "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
   "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_supplicant_hal_interface.cpp",
   "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/net_conn_client.cpp",
@@ -122,6 +122,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
   "$WIFI_ROOT_DIR/utils/inc",
@@ -218,10 +219,7 @@ ohos_unittest("wifi_sta_unittest") {
 
   include_dirs = local_base_include_dirs
   ldflags = local_base_ldflags
-  deps = [
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_service",
-    "$WIFI_ROOT_DIR/utils:wifi_utils",
-  ]
+  deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
   external_deps = local_base_external_deps
 
   if (wifi_ffrt_enable) {
@@ -231,6 +229,7 @@ ohos_unittest("wifi_sta_unittest") {
 
   if (wifi_feature_with_data_report) {
     defines += [ "WIFI_DATA_REPORT_ENABLE" ]
+    sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report/select_network_data_report.cpp" ]
   }
 
   defines += [
@@ -307,7 +306,6 @@ ohos_unittest("wifi_selfcure_unittest") {
   ldflags = local_base_ldflags
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_service",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
   external_deps = local_base_external_deps
@@ -332,6 +330,7 @@ ohos_unittest("wifi_selfcure_unittest") {
 
   if (wifi_feature_with_data_report) {
     defines += [ "WIFI_DATA_REPORT_ENABLE" ]
+    sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report/select_network_data_report.cpp" ]
   }
 
   part_name = "wifi"

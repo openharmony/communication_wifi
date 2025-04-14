@@ -105,6 +105,31 @@ HWTEST_F(WifiHotspotTest, DisableHotspotTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(WifiHotspotTest, EnableLocalOnlyHotspotTest, TestSize.Level1)
+{
+    EnableLocalOnlyHotspot();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+ 
+HWTEST_F(WifiHotspotTest, DisableLocalOnlyHotspotTest, TestSize.Level1)
+{
+    DisableLocalOnlyHotspot();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+ 
+HWTEST_F(WifiHotspotTest, GetLocalOnlyHotspotConfigTests, TestSize.Level1)
+{
+    GetHotspotConfigTests();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+ 
+HWTEST_F(WifiHotspotTest, GetHotspotModeTest, TestSize.Level1)
+{
+    int mode = 0;  // 0: HotspotMode::NONE
+    GetHotspotMode(&mode);
+    EXPECT_TRUE(mode == 0);  // 0: HotspotMode::NONE
+}
+
 HWTEST_F(WifiHotspotTest, IsHotspotActiveTest, TestSize.Level1)
 {
     IsHotspotActiveTest();
@@ -196,7 +221,9 @@ HWTEST_F(WifiHotspotTest, SetHotspotConfigTestsException04, TestSize.Level1)
 
 HWTEST_F(WifiHotspotTest, GetHotspotConfigTests, TestSize.Level1)
 {
-    GetHotspotConfigTests();
+    HotspotConfig ret;
+    ret.band = g_mode;
+    GetHotspotConfig(&ret);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

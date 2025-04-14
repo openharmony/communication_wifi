@@ -89,7 +89,6 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "c_utils:utils",
-      "eventhandler:libeventhandler",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
       "ipc:ipc_single",
@@ -104,6 +103,8 @@ if (defined(ohos_lite)) {
     if (wifi_ffrt_enable) {
       external_deps += [ "ffrt:libffrt" ]
       defines += [ "WIFI_FFRT_ENABLE" ]
+    } else {
+      external_deps += [ "eventhandler:libeventhandler" ]
     }
 
     cflags = memory_optimization_cflags

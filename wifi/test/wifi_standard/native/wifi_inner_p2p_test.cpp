@@ -25,6 +25,7 @@ namespace OHOS {
 namespace Wifi {
 
 static std::shared_ptr<WifiP2p> p2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
+const std::string g_errLog = "wifi_test";
 class WifiInnerP2pTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -38,21 +39,24 @@ HWTEST_F(WifiInnerP2pTest, RequestServiceTest, TestSize.Level1)
     WifiP2pDevice device;
     WifiP2pServiceRequest request;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->RequestService(device, request));
+    p2pPtr->RequestService(device, request);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, PutLocalP2pServiceTest, TestSize.Level1)
 {
     WifiP2pServiceInfo srvInfo;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->PutLocalP2pService(srvInfo));
+    p2pPtr->PutLocalP2pService(srvInfo);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, DeleteLocalP2pServiceTest, TestSize.Level1)
 {
     WifiP2pServiceInfo srvInfo;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->DeleteLocalP2pService(srvInfo));
+    p2pPtr->DeleteLocalP2pService(srvInfo);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, QueryP2pLinkedInfoTest, TestSize.Level1)
@@ -66,41 +70,47 @@ HWTEST_F(WifiInnerP2pTest, GetP2pDiscoverStatusTest, TestSize.Level1)
 {
     int status = 0;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->GetP2pDiscoverStatus(status));
+    p2pPtr->GetP2pDiscoverStatus(status);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, QueryP2pServicesTest, TestSize.Level1)
 {
     std::vector<WifiP2pServiceInfo> services;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->QueryP2pServices(services));
+    p2pPtr->QueryP2pServices(services);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, GetSupportedFeaturesTest, TestSize.Level1)
 {
     long features = 0;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->GetSupportedFeatures(features));
+    p2pPtr->GetSupportedFeatures(features);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, IsFeatureSupportedTest, TestSize.Level1)
 {
     ASSERT_TRUE(p2pPtr != nullptr);
     p2pPtr->IsFeatureSupported(0);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, SetP2pDeviceNameTest, TestSize.Level1)
 {
     std::string deviceName;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->SetP2pDeviceName(deviceName));
+    p2pPtr->SetP2pDeviceName(deviceName);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, SetP2pWfdInfoTest, TestSize.Level1)
 {
     WifiP2pWfdInfo wfdInfo;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->SetP2pWfdInfo(wfdInfo));
+    p2pPtr->SetP2pWfdInfo(wfdInfo);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 }
 }

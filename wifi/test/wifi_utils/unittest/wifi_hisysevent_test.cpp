@@ -89,5 +89,11 @@ HWTEST_F(WifiHisyseventTest, Write3VapConflictHisyseventTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(WifiHisyseventTest, Write5gPrefFailedHisyseventTest, TestSize.Level1)
+{
+    Pref5gStatisticsInfo info;
+    Write5gPrefFailedHisysevent(info);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 }  // namespace Wifi
 }  // namespace OHOS

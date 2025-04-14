@@ -81,6 +81,10 @@
         GetVoWifiDetectPeriod;
         GetMultiLinkedInfo;
         "*CompositeWifiFilter*";
+        EnableLocalOnlyHotspot;
+        DisableLocalOnlyHotspot;
+        GetHotspotMode;
+        GetLocalOnlyHotspotConfig;
         extern "C++" {
             "OHOS::Wifi::WifiDevice::GetInstance(int, int)";
             "OHOS::Wifi::WifiScan::GetInstance(int, int)";

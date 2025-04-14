@@ -18,6 +18,7 @@
 #include "wifi_errcode.h"
 #include "wifi_scan_control_msg.h"
 #include "wifi_msg.h"
+#include "wifi_crowdsourced_data.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -267,14 +268,12 @@ public:
     virtual void SetEnhanceSignalPollInfo(WifiSignalPollInfo &info) = 0;
 
     /**
-     * @Description notify wifi link type changed
+     * @Description Crowdsourced Data Report Interface
      *
-     * @param apJsonData - ap Info
-     * @param gpsFlag - gps flag
-     * @param version - report version
+     * @param wifiCrowdsourcedInfo - wifi crowdsourced info
      * @return void
      */
-    virtual void CrowdsourcedDataReportInterface(std::string &apJsonData, const int gpsFlag, const int version);
+    virtual void CrowdsourcedDataReportInterface(const WifiCrowdsourcedInfo& wifiCrowdsourcedInfo) = 0;
 
     /**
      * @Description notify wifi link type changed
@@ -282,7 +281,7 @@ public:
      * @param wifiLinkType - wifiLinkType
      * @return void
      */
-    virtual void OnWifiLinkTypeChanged(const WifiLinkType &wifiLinkType);
+    virtual void OnWifiLinkTypeChanged(const WifiLinkType &wifiLinkType) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

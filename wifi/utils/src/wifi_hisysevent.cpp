@@ -115,11 +115,12 @@ void WriteWifiOperateStateHiSysEvent(int operateType, int operateState)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_OPERATE_STATE", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode)
+void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode, int locallyGenerated)
 {
     Json::Value root;
     Json::FastWriter writer;
     root["ERROR_CODE"] = errorCode;
+    root["IS_ACTIVE_DISCONNECT"] = locallyGenerated;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ABNORMAL_DISCONNECT", "EVENT_VALUE", writer.write(root));
 }
 
@@ -415,6 +416,49 @@ void Write3VapConflictHisysevent(int type)
     Json::FastWriter writer;
     root["WIFI_3VAP_CONFLICT_TYPE"] = type;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_3VAP_CONFLICT", "EVENT_VALUE", writer.write(root));
+}
+
+void Write5gPrefFailedHisysevent(Pref5gStatisticsInfo &info)
+{
+    int64_t conDuration = 0;
+    if (info.isIn5gPref && !info.has5gPrefSwitch) {
+        if (info.noInternetTime != std::chrono::steady_clock::time_point::min()) {
+            info.durationNoInternet += std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now()
+                - info.noInternetTime).count();
+        }
+        if (info.connectTime != std::chrono::steady_clock::time_point::min()) {
+            conDuration = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now()
+                - info.connectTime).count();
+        }
+        Json::Value root;
+        Json::FastWriter writer;
+        root["BSSID"] = info.bssid;
+        root["SSID"] = info.ssid;
+        root["FREQ"] = info.freq;
+        root["CON_DURATION"] = conDuration;
+        root["DURATION_NO_INTERNET"] = info.durationNoInternet;
+        root["ENTER_MONITOR_NUM"] = info.enterMonitorNum;
+        root["MONITOR_ACTIVE_SCAN_NUM"] = info.monitorActiveScanNum;
+        root["RELA_5G_NUM"] = info.rela5gNum;
+        root["NOT_ADJ_5g_NUM"] = info.notAdj5gNum;
+        root["NOT_INTERNET_5G_NUM"] = info.notInternetRela5gNum;
+        root["ALL_RELA_5G_IN_BLOCK_LIST_NUM"] = info.allRela5gInBlockListNum;
+        root["SATISFY_SWITCH_RSSI_NO_SELECTED_NUM"] = info.satisfySwitchRssiNoSelectedNum;
+        root["IS_USER_CONNECTED"] = info.isUserConnected;
+        WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_5G_PREF_FAILED", "EVENT_VALUE", writer.write(root));
+    }
+}
+
+void WriteAutoSelectHiSysEvent(int selectType, const std::string &selectedInfo,
+    const std::string &filteredReason, const std::string &savedResult)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["AUTO_SELECT_TYPE"] = selectType;
+    root["AUTO_SELECT_RESULT"] = selectedInfo;
+    root["AUTO_SELECT_FILTER"] = filteredReason;
+    root["SAVED_NETWORK_IN_SCAN"] = savedResult;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_AUTO_SELECT_STATISTIC", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi
 }  // namespace OHOS

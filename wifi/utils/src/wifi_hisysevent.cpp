@@ -448,5 +448,17 @@ void Write5gPrefFailedHisysevent(Pref5gStatisticsInfo &info)
         WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_5G_PREF_FAILED", "EVENT_VALUE", writer.write(root));
     }
 }
+
+void WriteAutoSelectHiSysEvent(int selectType, const std::string &selectedInfo,
+    const std::string &filteredReason, const std::string &savedResult)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["AUTO_SELECT_TYPE"] = selectType;
+    root["AUTO_SELECT_RESULT"] = selectedInfo;
+    root["AUTO_SELECT_FILTER"] = filteredReason;
+    root["SAVED_NETWORK_IN_SCAN"] = savedResult;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_AUTO_SELECT_STATISTIC", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

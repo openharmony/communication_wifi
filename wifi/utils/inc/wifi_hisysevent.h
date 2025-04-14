@@ -192,6 +192,9 @@ void WriteWifiSelfcureHisysevent(int type);
 void Write3VapConflictHisysevent(int type);
 
 void Write5gPrefFailedHisysevent(Pref5gStatisticsInfo &info);
+
+void WriteAutoSelectHiSysEvent(int selectType, const std::string &selectedInfo,
+    const std::string &filteredReason, const std::string &savedResult);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -113,6 +113,44 @@ HWTEST_F(XmlParserTest, GetStringValueTest, TestSize.Level1)
     EXPECT_EQ("", m_xmlParser->GetStringValue(nullptr));
 }
 
+HWTEST_F(XmlParserTest, GetStringArrValue_ValidChildNodesTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetStringArrValue_ValidChildNodesTest enter");
+    xmlNodePtr node = xmlNewNode(nullptr, BAD_CAST "TestNode");
+    xmlNewProp(node, BAD_CAST "num", BAD_CAST "2");
+
+    xmlNodePtr child1 = xmlNewChild(node, nullptr, BAD_CAST "item", nullptr);
+    xmlNewProp(child1, BAD_CAST "value", BAD_CAST "value1");
+
+    xmlNodePtr child2 = xmlNewChild(node, nullptr, BAD_CAST "item", nullptr);
+    xmlNewProp(child2, BAD_CAST "value", BAD_CAST "value2");
+
+    std::vector<std::string> result = m_xmlParser->GetStringArrValue(node);
+    ASSERT_EQ(result.size(), 2);
+    EXPECT_EQ(result[0], "value1");
+    EXPECT_EQ(result[1], "value2");
+
+    xmlFreeNode(node);
+}
+
+HWTEST_F(XmlParserTest, GetStringArrValue_MissingValuePropertyTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetStringArrValue_MissingValuePropertyTest enter");
+    xmlNodePtr node = xmlNewNode(nullptr, BAD_CAST "TestNode");
+    xmlNewProp(node, BAD_CAST "num", BAD_CAST "2");
+
+    xmlNodePtr child1 = xmlNewChild(node, nullptr, BAD_CAST "item", nullptr);
+    xmlNewProp(child1, BAD_CAST "value", BAD_CAST "value1");
+
+    xmlNodePtr child2;
+    child2 = xmlNewChild(node, nullptr, BAD_CAST "item", nullptr);
+    // Missing "value" property for child2
+
+    EXPECT_EQ(m_xmlParser->GetStringArrValue(node).size(), 1);
+
+    xmlFreeNode(node);
+}
+
 HWTEST_F(XmlParserTest, GetStringArrValueTest, TestSize.Level1)
 {
     WIFI_LOGI("GetStringArrValueTest enter");
@@ -123,6 +161,19 @@ HWTEST_F(XmlParserTest, GetByteArrValueTest, TestSize.Level1)
 {
     WIFI_LOGI("GetByteArrValueTest enter");
     EXPECT_EQ(m_xmlParser->GetByteArrValue(nullptr).size(), 0);
+}
+
+HWTEST_F(XmlParserTest, GetByteArrValue_ValidContentTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetByteArrValue_ValidContentTest enter");
+    xmlNodePtr node = xmlNewNode(nullptr, BAD_CAST "TestNode");
+    xmlNewProp(node, BAD_CAST "num", BAD_CAST "2");
+    xmlNodeSetContent(node, BAD_CAST "1A2B"); // Valid hex content
+    std::vector<unsigned char> result = m_xmlParser->GetByteArrValue(node);
+    ASSERT_EQ(result.size(), 2);
+    EXPECT_EQ(result[0], 0x1A);
+    EXPECT_EQ(result[1], 0x2B);
+    xmlFreeNode(node);
 }
 
 HWTEST_F(XmlParserTest, GetStringMapValueTest, TestSize.Level1)

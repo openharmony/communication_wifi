@@ -120,7 +120,8 @@ std::vector<std::string> XmlParser::GetStringArrValue(xmlNodePtr innode)
         WIFI_LOGE("GetStringArrValue numChar failed");
         return stringArr;
     }
-    int num = std::stoi(std::string(reinterpret_cast<char *>(numChar)));
+    std::string temp = std::string(reinterpret_cast<char *>(numChar));
+    int num = CheckDataLegal(temp);
     xmlFree(numChar);
     if (num == 0) {
         return stringArr;
@@ -130,7 +131,6 @@ std::vector<std::string> XmlParser::GetStringArrValue(xmlNodePtr innode)
             xmlChar* value = xmlGetProp(node, BAD_CAST"value");
             if (value == nullptr) {
                 WIFI_LOGE("GetStringArrValue value failed");
-                xmlFree(numChar);
                 return stringArr;
             }
             stringArr.push_back(std::string(reinterpret_cast<char *>(value)));
@@ -151,7 +151,8 @@ std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
         WIFI_LOGE("GetByteArrValue numChar failed");
         return byteArr;
     }
-    int num = std::stoi(std::string(reinterpret_cast<char *>(numChar)));
+    std::string temp = std::string(reinterpret_cast<char *>(numChar));
+    int num = CheckDataLegal(temp);
     xmlChar *value = xmlNodeGetContent(node);
     std::string valueStr = std::string(reinterpret_cast<char *>(value));
     xmlFree(numChar);
@@ -161,7 +162,7 @@ std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
     }
     for (size_t i = 0; i < valueStr.length(); i += 2) { // trans string to byte
         std::string byteString = valueStr.substr(i, 2);
-        unsigned char byte = static_cast<unsigned char>(std::stoi(byteString, nullptr, 16)); // hex
+        unsigned char byte = static_cast<unsigned char>(CheckDataLegalHex(byteString)); // hex
         byteArr.push_back(byte);
     }
     return byteArr;

@@ -991,6 +991,7 @@ void StaStateMachine::SeparatedState::GoInState()
     /* clear connection information. */
     pStaStateMachine->InitWifiLinkedInfo();
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
+    pStaStateMachine->linkSwitchDetectingFlag_ = false;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     WifiConfigCenter::GetInstance().SetMacAddress("", pStaStateMachine->m_instId);
     WriteIsInternetHiSysEvent(DISCONNECTED_NETWORK);
@@ -1318,6 +1319,10 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             pStaStateMachine->DealSignalPollResult();
             break;
+        case CMD_LINK_SWITCH_DETECT_TIMEOUT:
+            ret = EXECUTED;
+            pStaStateMachine->linkSwitchDetectingFlag_ = false;
+            break;
 #ifndef OHOS_ARCH_LITE
         case WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT:
             ret = EXECUTED;
@@ -1393,8 +1398,12 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
 {
     std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("%{public}s enter, bssid:%{public}s", __FUNCTION__, MacAnonymize(bssid).c_str());
-    pStaStateMachine->DealSignalPollResult();
+    pStaStateMachine->linkSwitchDetectingFlag_ = true;
+    pStaStateMachine->StopTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT);
+    pStaStateMachine->StartTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT, STA_LINK_SWITCH_DETECT_DURATION);
     pStaStateMachine->AfterApLinkedprocess(bssid);
+    pStaStateMachine->DealSignalPollResult();
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }
 
 
@@ -1407,6 +1416,7 @@ void StaStateMachine::ApLinkedState::DealStartRoamCmdInApLinkedState(InternalMes
     WriteConnectTypeHiSysEvent(NETWORK_SELECTED_BY_ROAM);
     std::string bssid = msg->GetStringFromMessage();
     pStaStateMachine->targetRoamBssid = bssid;
+    pStaStateMachine->linkSwitchDetectingFlag_ = false;
     WIFI_LOGI("%{public}s current bssid:%{public}s, target bssid:%{public}s,", __FUNCTION__,
         MacAnonymize(pStaStateMachine->linkedInfo.bssid).c_str(),
         MacAnonymize(pStaStateMachine->targetRoamBssid).c_str());
@@ -3832,6 +3842,10 @@ void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
 
 void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)
 {
+    if (linkSwitchDetectingFlag_) {
+        WIFI_LOGI("%{public}s link switch detecting, not update rssi", __FUNCTION__);
+        return;
+    }
     int curRssi = signalInfo.signal;
     std::vector<WifiLinkedInfo> mloLinkedInfo;
     if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR &&
@@ -4040,6 +4054,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         return WIFI_OPT_FAILED;
     }
     targetNetworkId_ = networkId;
+    linkSwitchDetectingFlag_ = false;
     SetRandomMac(deviceConfig, bssid);
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(bssid).c_str());

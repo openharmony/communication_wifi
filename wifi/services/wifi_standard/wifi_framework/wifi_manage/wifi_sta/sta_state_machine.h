@@ -67,11 +67,13 @@ constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
 constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
+constexpr int CMD_LINK_SWITCH_DETECT_TIMEOUT = 0x07;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY_WITH_TASK = 1 * 1000;
 constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
+constexpr int STA_LINK_SWITCH_DETECT_DURATION = 2000; // ms
 
 /* pincode length */
 constexpr int PIN_CODE_LEN = 8;
@@ -1074,6 +1076,11 @@ private:
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
     int isAudioOn_ = 0;
+    /*
+     linkswitch detect flag to avoid freq linkswitch cause signal level jump,
+     set to true when linkswitch start, to false when linkswitch duration 2s later
+    */
+    bool linkSwitchDetectingFlag_{false};
 };
 }  // namespace Wifi
 }  // namespace OHOS

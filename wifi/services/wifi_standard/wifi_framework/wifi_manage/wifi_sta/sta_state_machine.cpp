@@ -3847,7 +3847,7 @@ void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
 void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)
 {
     if (linkSwitchDetectingFlag_) {
-        WIFI_LOGI("%{public}s link switch detecting, not update rssi");
+        WIFI_LOGI("%{public}s link switch detecting, not update rssi", __FUNCTION__);
         return;
     }
     int curRssi = signalInfo.signal;

@@ -35,6 +35,7 @@
 #include "wifi_sa_manager.h"
 #include "wifi_notification_util.h"
 #endif
+#include "wifi_chr_utils.h"
 
 DEFINE_WIFILOG_LABEL("WifiStaManager");
 
@@ -239,44 +240,7 @@ static void HandleStaDisconnected(int instId)
 
 void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
 {
-    if (signalLevel < 0) {
-        return;
-    }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(instId);
-    if (pService == nullptr) {
-        WIFI_LOGE("OnSignalPollReport: pService is nullptr!");
-        return;
-    }
-    std::vector<WifiSignalPollInfo> wifiCheckInfoArray;
-    if (pService->GetSignalPollInfoArray(wifiCheckInfoArray, signalArrLength) != WIFI_OPT_SUCCESS) {
-        return;
-    }
-    std::sort(wifiCheckInfoArray.begin(), wifiCheckInfoArray.end(),
-        [](const WifiSignalPollInfo& a, const WifiSignalPollInfo& b) {return a.timeStamp > b.timeStamp;});
-    {
-        std::lock_guard<std::mutex> lock(bssidMutex_);
-        if (bssidArray_.size() >= signalArrLength) {
-            bssidArray_.pop_back();
-            bssidArray_.insert(bssidArray_.begin(), bssid);
-        } else {
-            bssidArray_.insert(bssidArray_.begin(), bssid);
-        }
-        if (isBeaconLost(bssidArray_, wifiCheckInfoArray, signalLevel)) {
-            WIFI_LOGW("Beacon Lost.");
-            int64_t currentTime = GetCurrentTimeSeconds();
-            if (currentTime - startTime_ > ONE_DAY_TIME_SECONDS) {
-                bssidSet_.clear();
-                startTime_ = currentTime;
-            }
-            if (bssidSet_.find(bssid) == bssidSet_.end()) {
-                bssidSet_.insert(bssid);
-                int32_t errorCode = BeaconLostType::SIGNAL_LEVEL_LOW;
-                signalLevel <= SIGNAL_LEVEL_TWO ?
-                    errorCode = BeaconLostType::SIGNAL_LEVEL_LOW : errorCode = BeaconLostType::SIGNAL_LEVEL_HIGH;
-                WriteWifiBeaconLostHiSysEvent(errorCode);
-            }
-        }
-    }
+    WifiChrUtils::GetInstance().BeaconLostReport(bssid, signalLevel, instId);
 }
 
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)

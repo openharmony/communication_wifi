@@ -3846,6 +3846,10 @@ void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
 
 void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)
 {
+    if (linkSwitchDetectingFlag_) {
+        WIFI_LOGI("%{public}s link switch detecting, not update rssi");
+        return;
+    }
     int curRssi = signalInfo.signal;
     std::vector<WifiLinkedInfo> mloLinkedInfo;
     if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR &&
@@ -3874,7 +3878,7 @@ void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int f
 
     if (linkedInfo.rssi != INVALID_RSSI_VALUE) {
         currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
-        if ((currentSignalLevel != lastSignalLevel_) && !linkSwitchDetectingFlag_) {
+        if (currentSignalLevel != lastSignalLevel_) {
             WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
             InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
             lastSignalLevel_ = currentSignalLevel;

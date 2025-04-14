@@ -17,15 +17,29 @@
 #define OHOS_WIFI_CHR_UTILS_H
 
 #include "wifi_msg.h"
+#include <set>
 
 namespace OHOS {
 namespace Wifi {
 class WifiChrUtils {
 
 public:
+    static WifiChrUtils &GetInstance();
+    ~WifiChrUtils() = default;
     static void AddSignalPollInfoArray(WifiSignalPollInfo signalInfo);
     static void GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
     static void ClearSignalPollInfoArray();
+    void BeaconLostReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId);
+
+private:
+    WifiChrUtils();
+ 
+private:
+    int64_t startTime_ = 0;
+    std::mutex bssidMutex_;
+    std::mutex setMutex_;
+    std::set<std::string> uploadedBssidSet_;
+    std::vector<std::string> bssidArray_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

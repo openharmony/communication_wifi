@@ -514,8 +514,7 @@ bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPo
         WIFI_LOGE("Array sizes are inconsistent");
         return false;
     }
-    int interval = SIGNAL_RECORD_5S;
-    signalLevel <= SIGNAL_LEVEL_TWO ? interval = SIGNAL_RECORD_5S : interval = SIGNAL_RECORD_10S;
+    int interval = (signalLevel <= SIGNAL_LEVEL_TWO) ? SIGNAL_RECORD_5S : SIGNAL_RECORD_10S;
     const int64_t initTime = wifiBeaconCheckInfoArray[0].timeStamp;
     const int initRssi = wifiBeaconCheckInfoArray[0].signal;
     const std::string initBssid = bssidArray[0];

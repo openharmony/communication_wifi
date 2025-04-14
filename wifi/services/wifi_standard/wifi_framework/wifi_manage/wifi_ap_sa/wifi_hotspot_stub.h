@@ -64,7 +64,10 @@ private:
     void OnGetApIfaceName(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     bool CheckHotspot160MParam(BandType band, int bandwidth, int channel);
     bool CheckHostspot160MCountryCode();
-
+    void OnEnableLocalOnlyHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnDisableLocalOnlyHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnGetHotspotMode(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnGetLocalOnlyHotspotConfig(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 private:
     HandleFuncMap handleFuncMap;
     std::mutex deathRecipientMutex;

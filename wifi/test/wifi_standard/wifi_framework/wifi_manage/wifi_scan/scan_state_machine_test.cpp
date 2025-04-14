@@ -14,7 +14,6 @@
  */
 #include "mock_wifi_manager.h"
 #include "mock_wifi_config_center.h"
-#include "mock_wifi_settings.h"
 #include "mock_scan_service.h"
 #include "scan_state_machine.h"
 
@@ -40,7 +39,6 @@ constexpr int FREQ_5_GHZ_VALUE = 5010;
 constexpr int NETWORK_ID = 15;
 constexpr int BAND = 2;
 constexpr int TWO = 2;
-constexpr int ONE = 1;
 static std::string g_errLog;
 void ScanStateMachineCallback(const LogType type, const LogLevel level,
                               const unsigned int domain, const char *tag,
@@ -56,7 +54,6 @@ public:
     void SetUp() override
     {
         LOG_SetCallback(ScanStateMachineCallback);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(0));
         pScanStateMachine = std::make_unique<ScanStateMachine>();
         pScanStateMachine->InitScanStateMachine();
         pScanStateMachine->EnrollScanStatusListener(
@@ -1035,8 +1032,6 @@ public:
         config.networkId = NETWORK_ID;
         config.ssid = "";
         config.keyMgmt = "WEP";
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(config.ssid, config.keyMgmt, _, _))
-            .Times(ONE).WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
         ScanStateMachine::FilterScanResultRecord records;
         InterScanInfo interScanInfo;
         interScanInfo.securityType = WifiSecurity::WEP;

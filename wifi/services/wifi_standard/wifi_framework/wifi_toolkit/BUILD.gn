@@ -162,7 +162,6 @@ if (defined(ohos_lite)) {
       "common_event_service:cesfwk_innerkits",
       "dhcp:dhcp_sdk",
       "dhcp:dhcp_utils",
-      "eventhandler:libeventhandler",
       "hilog:libhilog",
       "icu:shared_icuuc",
       "ipc:ipc_single",

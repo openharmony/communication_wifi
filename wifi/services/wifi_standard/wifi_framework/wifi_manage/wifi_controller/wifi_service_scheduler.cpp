@@ -827,10 +827,10 @@ void WifiServiceScheduler::DispatchWifi2CloseRes(OperateResState state, int inst
 /*--------------------------------------------------softAp------------------------------------------------------------*/
 
 #ifdef FEATURE_AP_SUPPORT
-ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softApIfName)
+ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softApIfName, int hotspotMode)
 {
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState(instId);
-    WIFI_LOGE("AutoStartApService, current ap state:%{public}d", apState);
+    WIFI_LOGE("AutoStartApService, current ap state:%{public}d, hotspotMode=%{public}d", apState, hotspotMode);
     std::lock_guard<std::mutex> lock(mutex);
     if (apState != WifiOprMidState::CLOSED) {
         if (apState == WifiOprMidState::CLOSING) {
@@ -860,7 +860,7 @@ ErrCode WifiServiceScheduler::AutoStartApService(int instId, std::string &softAp
         WIFI_LOGE("AutoStartApService, set ap mid state opening failed!");
         return WIFI_OPT_FAILED;
     }
-    ErrCode errCode = TryToStartApService(instId);
+    ErrCode errCode = TryToStartApService(instId, hotspotMode);
     if (errCode != WIFI_OPT_SUCCESS) {
         WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, instId);
         return errCode;
@@ -903,7 +903,7 @@ ErrCode WifiServiceScheduler::AutoStopApService(int instId)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiServiceScheduler::TryToStartApService(int instId)
+ErrCode WifiServiceScheduler::TryToStartApService(int instId, int hotspotMode)
 {
     ErrCode errCode = WIFI_OPT_FAILED;
     do {
@@ -928,9 +928,11 @@ ErrCode WifiServiceScheduler::TryToStartApService(int instId)
                 static_cast<int>(errCode));
             break;
         }
+        pService->SetHotspotMode(HotspotMode(hotspotMode));
         errCode = pService->EnableHotspot();
         if (errCode != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("service enable ap failed, ret %{public}d!", static_cast<int>(errCode));
+            pService->SetHotspotMode(HotspotMode::NONE);
             break;
         }
     } while (false);

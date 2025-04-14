@@ -48,6 +48,22 @@ public:
      * @return ErrCode
      */
     virtual ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks) = 0;
+
+    /**
+     * @Description get hotspot mode
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetHotspotMode(HotspotMode &mode);
+
+    /**
+     * @Description set hotspot mode
+     *
+     * @param model - the model to be set
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetHotspotMode(const HotspotMode &mode);
 };
 }  // namespace Wifi
 }  // namespace OHOS

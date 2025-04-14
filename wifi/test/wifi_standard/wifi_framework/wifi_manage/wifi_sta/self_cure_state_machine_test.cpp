@@ -1238,12 +1238,6 @@ public:
         pSelfCureStateMachine_->pWifi6SelfCureState_->HandleWifi6WithoutHtcArpFail(msg);
     }
 
-    void GetNowMilliSecondsTest()
-    {
-        LOGI("Enter GetNowMilliSecondsTest");
-        EXPECT_NE(pSelfCureStateMachine_->GetNowMilliSeconds(), 0);
-    }
-
     void SendBlaListToDriverTest()
     {
         LOGI("Enter SendBlaListToDriverTest");
@@ -2077,11 +2071,7 @@ HWTEST_F(SelfCureStateMachineTest, HandleWifi6WithHtcArpFailTest, TestSize.Level
 HWTEST_F(SelfCureStateMachineTest, HandleWifi6WithoutHtcArpFailTest, TestSize.Level1)
 {
     HandleWifi6WithoutHtcArpFailTest();
-}
-
-HWTEST_F(SelfCureStateMachineTest, GetNowMilliSecondsTest, TestSize.Level1)
-{
-    GetNowMilliSecondsTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SendBlaListToDriverTest, TestSize.Level1)

@@ -180,5 +180,16 @@ int SharedLinkManager::GetSharedLinkCount()
     WIFI_LOGI("Get sharedLinkCount: %{public}d", sharedLinkCount);
     return sharedLinkCount;
 }
+
+void SharedLinkManager::ClearUidCount(int uid)
+{
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    if (sharedLinkCountMap.find(uid) == sharedLinkCountMap.end()) {
+        WIFI_LOGI("ClearUidCount %{public}d not found", uid);
+        return;
+    }
+    WIFI_LOGI("ClearUidCount set %{public}d count to 0", uid);
+    sharedLinkCountMap[uid] = 0;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -262,5 +262,33 @@ ErrCode WifiHotspotImpl::GetApIfaceName(std::string& ifaceName)
     RETURN_IF_FAIL(GetWifiHotspotProxy());
     return client_->GetApIfaceName(ifaceName);
 }
+
+ErrCode WifiHotspotImpl::EnableLocalOnlyHotspot(const ServiceType type)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    return client_->EnableLocalOnlyHotspot();
+}
+ 
+ErrCode WifiHotspotImpl::DisableLocalOnlyHotspot(const ServiceType type)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    return client_->DisableLocalOnlyHotspot();
+}
+ 
+ErrCode WifiHotspotImpl::GetHotspotMode(HotspotMode &mode)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    return client_->GetHotspotMode(mode);
+}
+ 
+ErrCode WifiHotspotImpl::GetLocalOnlyHotspotConfig(HotspotConfig &config)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    return client_->GetLocalOnlyHotspotConfig(config);
+}
 }  // namespace Wifi
 }  // namespace OHOS

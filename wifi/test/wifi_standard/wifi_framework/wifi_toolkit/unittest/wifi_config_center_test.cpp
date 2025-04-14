@@ -413,5 +413,25 @@ HWTEST_F(WifiConfigCenterTest, AddMacAddrPairsTest01, TestSize.Level1)
     type = WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO;
     EXPECT_EQ(WifiConfigCenter::GetInstance().AddMacAddrPairs(type, macAddrInfo, randomMacAddr), 0);
 }
+ 
+HWTEST_F(WifiConfigCenterTest, GetLocalOnlyHotspotConfigTest, TestSize.Level1)
+{
+    HotspotConfig config;
+    config.ssid = "GetLocalOnlyHotspotConfigTest";
+    WifiConfigCenter::GetInstance().SetLocalOnlyHotspotConfig(config);
+    HotspotConfig outConfig;
+    WifiConfigCenter::GetInstance().GetLocalOnlyHotspotConfig(outConfig);
+    EXPECT_EQ(outConfig.ssid, "GetLocalOnlyHotspotConfigTest");
+}
+ 
+HWTEST_F(WifiConfigCenterTest, SetLocalOnlyHotspotConfigTest, TestSize.Level1)
+{
+    HotspotConfig config;
+    config.ssid = "SetLocalOnlyHotspotConfigTest";
+    WifiConfigCenter::GetInstance().SetLocalOnlyHotspotConfig(config);
+    HotspotConfig outConfig;
+    WifiConfigCenter::GetInstance().GetLocalOnlyHotspotConfig(outConfig);
+    EXPECT_EQ(outConfig.ssid, "SetLocalOnlyHotspotConfigTest");
+}
 }  // namespace Wifi
 }  // namespace OHOS

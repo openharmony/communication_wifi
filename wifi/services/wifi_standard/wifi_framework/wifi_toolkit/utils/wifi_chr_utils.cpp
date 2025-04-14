@@ -16,12 +16,23 @@
 #include "wifi_chr_utils.h"
 #include "wifi_log.h"
 #include "wifi_common_util.h"
+#include "wifi_internal_msg.h"
+#include "wifi_hisysevent.h"
 
 namespace OHOS {
 namespace Wifi {
 static const int SIGNALARR_LENGTH = 6;
 static std::vector<WifiSignalPollInfo> signalPollInfoArray;
 std::mutex signalInfoMutex;
+
+WifiChrUtils &WifiChrUtils::GetInstance()
+{
+    static WifiChrUtils gWifiChrUtils;
+    return gWifiChrUtils;
+}
+ 
+WifiChrUtils::WifiChrUtils()
+{}
 
 void WifiChrUtils::AddSignalPollInfoArray(WifiSignalPollInfo signalInfo)
 {
@@ -50,6 +61,44 @@ void WifiChrUtils::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiS
     }
     for (int index = 0; index < length; index++) {
         wifiSignalPollInfos.push_back(signalPollInfoArray[index]);
+    }
+}
+
+void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
+{
+    if (signalLevel < 0) return;
+    std::vector<WifiSignalPollInfo> wifiCheckInfoArray = signalPollInfoArray;
+    std::sort(wifiCheckInfoArray.begin(), wifiCheckInfoArray.end(),
+        [](const WifiSignalPollInfo& a, const WifiSignalPollInfo& b) {return a.timeStamp > b.timeStamp;});
+ 
+    bool beaconLost = false;
+    {
+        std::lock_guard<std::mutex> arrayLock(bssidMutex_);
+        if (bssidArray_.size() >= SIGNALARR_LENGTH) bssidArray_.pop_back();
+        bssidArray_.insert(bssidArray_.begin(), bssid);
+        beaconLost = isBeaconLost(bssidArray_, wifiCheckInfoArray, signalLevel);
+    }
+ 
+    if (beaconLost) {
+        LOGW("Beacon Lost.");
+        int32_t errorCode = (signalLevel <= SIGNAL_LEVEL_TWO) ?
+            BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH;
+        bool shouldReport = false;
+        {
+            std::lock_guard<std::mutex> setLock(setMutex_);
+            int64_t currentTime = GetCurrentTimeSeconds();
+            if (currentTime - startTime_ > ONE_DAY_TIME_SECONDS) {
+                uploadedBssidSet_.clear();
+                startTime_ = currentTime;
+            }
+            if (!uploadedBssidSet_.count(bssid)) {
+                uploadedBssidSet_.insert(bssid);
+                shouldReport = true;
+            }
+        }
+        if (shouldReport) {
+            WriteWifiBeaconLostHiSysEvent(errorCode);
+        }
     }
 }
 }  // namespace Wifi

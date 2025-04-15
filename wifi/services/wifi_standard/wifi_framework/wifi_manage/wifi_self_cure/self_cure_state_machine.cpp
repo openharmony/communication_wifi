@@ -549,7 +549,11 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
         pSelfCureStateMachine_->noTcpRxCounter_ = 0;
         return;
     } else {
-        pSelfCureStateMachine_->selfCureReason_ = WIFI_CURE_INTERNET_FAILED_TYPE_TCP;
+        int32_t currentDnsFailedCnt = SelfCureUtils::GetInstance().GetCurrentDnsFailedCounter();
+        int32_t deltaFailedDns = (currentDnsFailedCnt - lastDnsFailedCnt_);
+        lastDnsFailedCnt_ = currentDnsFailedCnt;
+        pSelfCureStateMachine_->selfCureReason_ = deltaFailedDns >= DNS_FAILED_CNT ?
+            WIFI_CURE_INTERNET_FAILED_TYPE_DNS : WIFI_CURE_INTERNET_FAILED_TYPE_TCP;
     }
     WIFI_LOGI("HandleInternetFailedDetected, http unreachable, transition to SelfCureState,"
         "selfCureReason_: %{public}d", pSelfCureStateMachine_->selfCureReason_);

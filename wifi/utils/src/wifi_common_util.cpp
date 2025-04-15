@@ -303,6 +303,14 @@ int64_t GetCurrentTimeSeconds()
     return value.count();
 }
 
+int64_t GetCurrentTimeMilliSeconds()
+{
+    auto now = std::chrono::system_clock::now();
+    auto nowMs = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+    auto value = nowMs.time_since_epoch();
+    return value.count();
+}
+
 int64_t GetElapsedMicrosecondsSinceBoot()
 {
     struct timespec times = {0, 0};
@@ -650,21 +658,29 @@ std::string EncodeBase64(const std::vector<uint8_t> &input)
 
 std::vector<std::string> GetSplitInfo(const std::string &input, const std::string &delimiter)
 {
+    size_t start = 0;
     size_t pos = 0;
-    std::string token;
     std::vector<std::string> results;
-
-    std::string splitStr = input;
-    WIFI_LOGD("%{public}s input:%{private}s, delimiter:%{public}s", __func__, input.c_str(), delimiter.c_str());
-    while ((pos = splitStr.find(delimiter)) != std::string::npos) {
-        token = splitStr.substr(0, pos);
-        if (token.length() > 0) {
-            results.push_back(token);
-            splitStr.erase(0, pos + delimiter.length());
-            WIFI_LOGD("%{public}s token:%{private}s, splitStr:%{public}s", __func__, token.c_str(), splitStr.c_str());
-        }
+    if (input.empty() || delimiter.empty()) {
+        WIFI_LOGE("%{public}s: invalid input or delimiter", __func__);
+        return results;
     }
-    results.push_back(splitStr);
+
+    if (input.length() < delimiter.length()) {
+        WIFI_LOGE("%{public}s: invalid input length", __func__);
+        return results;
+    }
+
+    WIFI_LOGD("%{public}s input:%{private}s, delimiter:%{public}s", __func__, input.c_str(), delimiter.c_str());
+    while ((pos = input.find(delimiter, start)) != std::string::npos) {
+        if (pos > start) {
+            results.push_back(input.substr(start, pos - start));
+        }
+        start = pos + delimiter.length();
+    }
+    if (start < input.length()) {
+        results.push_back(input.substr(start));
+    }
     WIFI_LOGD("%{public}s size:%{public}zu", __func__, results.size());
     return results;
 }

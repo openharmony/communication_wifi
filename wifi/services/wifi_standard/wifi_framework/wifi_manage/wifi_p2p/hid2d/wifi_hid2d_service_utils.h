@@ -48,7 +48,7 @@ public:
     static void DecreaseSharedLink(int callingUid);
     static void ClearSharedLinkCount();
     static int GetSharedLinkCount();
-
+    static void ClearUidCount(int uid);
 private:
     static std::map<int, int> sharedLinkCountMap;
     static int firstGroupUid;

@@ -26,7 +26,7 @@ struct AssocRejectInfo {
     int timeOut{0};
 };
 struct WifiEventCallback {
-    std::function<void(int, int, const std::string &)> onConnectChanged;
+    std::function<void(int, int, const std::string &, int)> onConnectChanged;
     std::function<void(const std::string &, const std::string &)> onBssidChanged;
     std::function<void(int, const std::string &)> onWpaStateChanged;
     std::function<void(void)> onWpaSsidWrongKey;

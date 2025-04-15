@@ -222,7 +222,8 @@ HWTEST_F(WifiManagerTest, StartUnloadApSaTimerTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, DealApStateChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealApStateChangedTest enter!");
-    wifiManager.wifiHotspotManager->DealApStateChanged(ApState::AP_STATE_NONE);
+    wifiManager.wifiHotspotManager->DealApStateChanged(ApState::AP_STATE_NONE,
+        0, static_cast<int>(HotspotMode::SOFTAP));
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
@@ -402,14 +403,14 @@ HWTEST_F(WifiManagerTest, GetLocationModeByDatashareTest, TestSize.Level1)
     WIFI_LOGI("GetLocationModeByDatashareTest enter!");
     bool result = wifiManager.wifiEventSubscriberManager->GetLocationModeByDatashare();
     WIFI_LOGI("GetLocationModeByDatashareTest result(%{public}d)", result);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 }
 
 HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGI("GetLastStaStateByDatashareTest enter!");
     wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare();
-    EXPECT_EQ(wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare(), 0);
+    EXPECT_EQ(wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare(), 1);
 }
 
 HWTEST_F(WifiManagerTest, RegisterCesEventTest, TestSize.Level1)

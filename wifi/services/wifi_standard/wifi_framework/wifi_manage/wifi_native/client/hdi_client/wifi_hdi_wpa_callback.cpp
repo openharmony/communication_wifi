@@ -86,7 +86,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         OHOS::Wifi::WriteAuthFailHiSysEvent("WRONG_PSWD", reasonCode);
     }
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, reasonCode, std::string(szBssid));
+        cbk.onConnectChanged(HAL_WPA_CB_DISCONNECTED, reasonCode, std::string(szBssid), locallyGenerated);
     }
     LOGI("%{public}s callback out, bssid:%{public}s ifName = %{public}s",
         __func__,
@@ -115,7 +115,7 @@ int32_t OnEventConnected(struct IWpaCallback *self,
     }
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (cbk.onConnectChanged) {
-        cbk.onConnectChanged(HAL_WPA_CB_CONNECTED, connectParam->networkId, szBssid);
+        cbk.onConnectChanged(HAL_WPA_CB_CONNECTED, connectParam->networkId, szBssid, 0);
     }
     LOGI("%{public}s callback out ,bssid = %{public}s", __func__, OHOS::Wifi::MacAnonymize(szBssid).c_str());
     return 0;

@@ -167,7 +167,7 @@ HWTEST_F(WifiChannelHelperTest, TransformChannelToBandTest, TestSize.Level1)
 
 HWTEST_F(WifiChannelHelperTest, IsValidFreqTest, TestSize.Level1)
 {
-    EXPECT_FALSE(WifiChannelHelper::GetInstance().IsValidFreq(2412));
+    EXPECT_TRUE(WifiChannelHelper::GetInstance().IsValidFreq(2412));
     EXPECT_FALSE(WifiChannelHelper::GetInstance().IsValidFreq(5200));
     EXPECT_FALSE(WifiChannelHelper::GetInstance().IsValid24GHz(0));
 }

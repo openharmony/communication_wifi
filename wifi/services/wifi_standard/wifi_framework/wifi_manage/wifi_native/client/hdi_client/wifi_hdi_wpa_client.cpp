@@ -67,7 +67,7 @@ constexpr int BAND_WIDTH_OFFSET = 16;
 WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName, int instId)
 {
     WifiEventCallback callback;
-    callback.onConnectChanged = [](int param1, int param2, const std::string &param3) {};
+    callback.onConnectChanged = [](int param1, int param2, const std::string &param3, int param4) {};
     ReqRegisterStaEventCallback(callback, ifaceName.c_str(), instId);
     LOGI("WifiHdiWpaClient StartWifi ifaceName:%{public}s instId:%{public}d", ifaceName.c_str(), instId);
     return HdiWpaStaStart(ifaceName.c_str(), instId);
@@ -713,16 +713,12 @@ bool WifiHdiWpaClient::GetEncryptionString(const HotspotConfig &config, std::str
         case KeyMgmt::WPA_PSK:
             encryptionString = StringCombination(
                 "wpa=3\n"
-                "wpa_pairwise=TKIP CCMP\n"
-                "wpa_passphrase=%s",
-                config.GetPreSharedKey().c_str());
+                "wpa_pairwise=TKIP CCMP\n");
             break;
         case KeyMgmt::WPA2_PSK:
             encryptionString = StringCombination(
                 "wpa=2\n"
-                "rsn_pairwise=CCMP\n"
-                "wpa_passphrase=%s",
-                config.GetPreSharedKey().c_str());
+                "rsn_pairwise=CCMP\n");
             break;
         default:
             LOGE("unsupport security type");
@@ -814,6 +810,14 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
 WifiErrorNo WifiHdiWpaClient::EnableAp(int id)
 {
     if (HdiEnableAp(id) != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::SetApPasswd(const char *pass, int id)
+{
+    if (HdiSetApPasswd(pass, id) != WIFI_HAL_OPT_OK) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;

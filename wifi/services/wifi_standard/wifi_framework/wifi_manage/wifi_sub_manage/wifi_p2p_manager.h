@@ -62,6 +62,9 @@ private:
     std::string ifaceName{""};
     // mutex to avoid EnableP2p and DisableP2p at the same time
     std::mutex p2pEnableMutex;
+    // condition variable to wait for p2p service to be enabled
+    // when p2p service is enabled, notify all waiting threads
+    std::mutex p2pEnableCondMutex;
     std::condition_variable p2pEnableCond;
     // has p2p been activated once, flag to dlopen p2p service
     std::atomic<bool> hasP2pActivatedOnce_{false};

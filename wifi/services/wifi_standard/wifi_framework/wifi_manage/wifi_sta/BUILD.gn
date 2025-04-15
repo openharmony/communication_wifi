@@ -91,6 +91,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "init:libbegetutil",
+      "samgr:samgr_proxy",
     ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
@@ -197,6 +198,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",
+      "samgr:samgr_proxy",
     ]
 
     part_name = "wifi"

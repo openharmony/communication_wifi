@@ -78,6 +78,7 @@ ohos_shared_library("wifi_ap_service") {
   ]
 
   external_deps = [
+    "samgr:samgr_proxy",
     "ability_base:base",
     "ability_base:want",
     "c_utils:utils",
@@ -86,7 +87,6 @@ ohos_shared_library("wifi_ap_service") {
     "hilog:libhilog",
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
-    "samgr:samgr_proxy",
   ]
 
   deps = [

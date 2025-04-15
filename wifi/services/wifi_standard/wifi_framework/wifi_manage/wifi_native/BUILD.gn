@@ -123,7 +123,10 @@ if (defined(ohos_lite)) {
       deps += [ "$WIFI_ROOT_DIR/base/cRPC:crpc_client" ]
     }
 
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "samgr:samgr_proxy",
+    ]
 
     defines = [
       "OHOS_ARCH_LITE",
@@ -208,12 +211,12 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "samgr:samgr_proxy",
       "c_utils:utils",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
-      "samgr:samgr_proxy",
     ]
 
     if (wifi_feature_with_local_random_mac) {

@@ -156,6 +156,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps = [
+      "samgr:samgr_proxy",
       "ability_base:want",
       "c_utils:utils",
       "certificate_manager:cert_manager_sdk",
@@ -167,7 +168,6 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "jsoncpp:jsoncpp",
       "libxml2:libxml2",
-      "samgr:samgr_proxy",
     ]
     if (wifi_feature_with_sta_asset) {
       defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]

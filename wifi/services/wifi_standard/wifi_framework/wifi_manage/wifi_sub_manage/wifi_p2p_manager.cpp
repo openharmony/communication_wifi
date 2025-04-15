@@ -116,7 +116,11 @@ ErrCode WifiP2pManager::AutoStartP2pService()
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         return ret;
     }
-    p2pEnableCond.wait_for(locker, std::chrono::milliseconds(P2P_ENABLE_WAIT_MS));
+    {
+        // wait for p2p service to be enabled
+        std::unique_lock<std::mutex> lockerCond(p2pEnableCondMutex);
+        p2pEnableCond.wait_for(lockerCond, std::chrono::milliseconds(P2P_ENABLE_WAIT_MS));
+    }
 #ifndef OHOS_ARCH_LITE
     StopUnloadP2PSaTimer();
 #endif
@@ -154,12 +158,21 @@ ErrCode WifiP2pManager::AutoStopP2pService()
         WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::CLOSING, WifiOprMidState::RUNNING);
         return ret;
     }
-    p2pEnableCond.wait_for(locker, std::chrono::milliseconds(P2P_ENABLE_WAIT_MS));
+    {
+        // wait for p2p service to be disabled
+        std::unique_lock<std::mutex> lockerCond(p2pEnableCondMutex);
+        p2pEnableCond.wait_for(lockerCond, std::chrono::milliseconds(P2P_ENABLE_WAIT_MS));
+    }
     return WIFI_OPT_SUCCESS;
 }
 
 bool WifiP2pManager::HasP2pActivatedBefore(void)
 {
+    // Check if the P2P service has been activated at least once.
+    // This is used to determine whether to load the P2P service dynamically.
+    // If it has been activated, we can assume that the service is needed.
+    // use unique_lock to avoid enableP2p and disableP2p at the same time
+    std::unique_lock<std::mutex> locker(p2pEnableMutex);
     return hasP2pActivatedOnce_;
 }
 

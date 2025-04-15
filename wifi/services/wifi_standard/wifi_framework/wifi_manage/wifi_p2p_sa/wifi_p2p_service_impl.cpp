@@ -1002,6 +1002,24 @@ bool WifiP2pServiceImpl::IsP2pServiceRunning(bool forceEnable)
     if (!IsCallingAllowed()) {
         return false;
     }
+
+    auto &wifiP2pManager = WifiManager::GetInstance().GetWifiP2pManager();
+    if (wifiP2pManager == nullptr) {
+        WIFI_LOGE("Get WifiP2pManager failed!");
+        return false;
+    }
+
+    // if forceEnable is true and first time use P2P, try to start p2p service
+    if ((!forceEnable) || wifiP2pManager->HasP2pActivatedBefore()) {
+        // check p2p service status
+        WifiOprMidState curStateP2p = WifiConfigCenter::GetInstance().GetP2pMidState();
+        if (curStateP2p == WifiOprMidState::RUNNING) {
+            return true;
+        }
+        WIFI_LOGI("P2p service is not running： %{public}d", static_cast<int>(curStateP2p));
+        return false;
+    }
+
     // check wifi service status first
     WifiOprMidState curStateWifi = WifiConfigCenter::GetInstance().GetWifiMidState();
     if (curStateWifi != WifiOprMidState::RUNNING && curStateWifi != WifiOprMidState::SEMI_ACTIVE) {
@@ -1009,27 +1027,14 @@ bool WifiP2pServiceImpl::IsP2pServiceRunning(bool forceEnable)
         WIFI_LOGW("wifi service does not started!");
         return false;
     }
-    // check p2p service status
-    WifiOprMidState curStateP2p = WifiConfigCenter::GetInstance().GetP2pMidState();
-    if (curStateP2p == WifiOprMidState::RUNNING) {
-        return true;
-    }
-    auto &wifiP2pManager = WifiManager::GetInstance().GetWifiP2pManager();
-    if (wifiP2pManager == nullptr) {
-        WIFI_LOGE("Get WifiP2pManager failed!");
+
+    WIFI_LOGI("P2p service is not running, try to start it!");
+    ErrCode errCode = wifiP2pManager->AutoStartP2pService();
+    if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
+        WIFI_LOGE("Failed to start p2p service!");
         return false;
     }
-    // if forceEnable is true and first time use P2P, try to start p2p service
-    if (forceEnable && !wifiP2pManager->HasP2pActivatedBefore()) {
-        WIFI_LOGI("P2p service is not running, try to start it! %{public}d", static_cast<int>(curStateP2p));
-        ErrCode errCode = wifiP2pManager->AutoStartP2pService();
-        if (errCode != WIFI_OPT_SUCCESS && errCode != WIFI_OPT_OPEN_SUCC_WHEN_OPENED) {
-            WIFI_LOGE("Failed to start p2p service!");
-            return false;
-        }
-        return true;
-    }
-    return false;
+    return true;
 }
 
 ErrCode WifiP2pServiceImpl::SetP2pDeviceName(const std::string &deviceName)

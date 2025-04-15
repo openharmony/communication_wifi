@@ -839,6 +839,11 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
         if (pEnhanceService != nullptr) {
             pEnhanceService->OnDialogClick(true);
         }
+    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_CONN)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsDialogClick(true, SETTINGS_5G_AUTO_IDENTIFY_CONN);
+        }
     }
 #ifdef FEATURE_P2P_SUPPORT
     if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
@@ -858,6 +863,11 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
             pEnhanceService->OnDialogClick(false);
+        }
+    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_CONN)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingDialogClick(false, SETTINGS_5G_AUTO_IDENTIFY_CONN);
         }
     }
 #ifdef FEATURE_P2P_SUPPORT
@@ -1248,6 +1258,10 @@ void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &ev
     if (action == ENTER_SETTINGS) {
         bool isSettingsEnter = eventData.GetWant().GetBoolParam(WLAN_PAGE_ENTER, false);
         BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsWlanEnterReceive();
+        }
     }
 }
 

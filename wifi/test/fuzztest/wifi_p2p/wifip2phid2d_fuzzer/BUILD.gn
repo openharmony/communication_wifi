@@ -54,6 +54,7 @@ ohos_fuzztest("WifiP2pHid2dFuzzTest") {
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "wifi"

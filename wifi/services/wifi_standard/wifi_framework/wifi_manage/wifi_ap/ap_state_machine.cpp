@@ -76,7 +76,7 @@ void ApStateMachine::OnApStateChange(ApState state)
         std::shared_lock<std::shared_mutex> lock(m_callbackMutex);
         for (const auto &callBackItem : m_callbacks) {
             if (callBackItem.second.OnApStateChangedEvent != nullptr) {
-                callBackItem.second.OnApStateChangedEvent(state, m_id);
+                callBackItem.second.OnApStateChangedEvent(state, m_id, static_cast<int>(hotspotMode_));
             }
         }
     }
@@ -176,6 +176,19 @@ void ApStateMachine::RegisterEventHandler()
 
     m_ApStationsManager.RegisterEventHandler(
         [this](const StationInfo &staInfo, ApStatemachineEvent act) { this->BroadCastStationChange(staInfo, act); });
+}
+
+ErrCode ApStateMachine::GetHotspotMode(HotspotMode &mode)
+{
+    mode = hotspotMode_;
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode ApStateMachine::SetHotspotMode(const HotspotMode &mode)
+{
+    hotspotMode_ = mode;
+    WIFI_LOGI("%{public}s, mode=%{public}d", __func__, static_cast<int>(mode));
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

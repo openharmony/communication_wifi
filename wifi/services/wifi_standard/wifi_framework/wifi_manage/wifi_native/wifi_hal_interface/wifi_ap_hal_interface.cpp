@@ -104,6 +104,16 @@ WifiErrorNo WifiApHalInterface::EnableAp(int id)
 #endif
 }
 
+WifiErrorNo WifiApHalInterface::SetApPasswd(const char *pass, int id)
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->SetApPasswd(pass, id);
+#else
+    return WIFI_HAL_OPT_OK;
+#endif
+}
+
 WifiErrorNo WifiApHalInterface::GetStationList(std::vector<std::string> &result, int id)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT

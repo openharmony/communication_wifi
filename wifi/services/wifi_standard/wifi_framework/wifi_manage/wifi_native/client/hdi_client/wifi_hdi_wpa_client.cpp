@@ -67,7 +67,7 @@ constexpr int BAND_WIDTH_OFFSET = 16;
 WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName, int instId)
 {
     WifiEventCallback callback;
-    callback.onConnectChanged = [](int param1, int param2, const std::string &param3) {};
+    callback.onConnectChanged = [](int param1, int param2, const std::string &param3, int param4) {};
     ReqRegisterStaEventCallback(callback, ifaceName.c_str(), instId);
     LOGI("WifiHdiWpaClient StartWifi ifaceName:%{public}s instId:%{public}d", ifaceName.c_str(), instId);
     return HdiWpaStaStart(ifaceName.c_str(), instId);
@@ -713,16 +713,12 @@ bool WifiHdiWpaClient::GetEncryptionString(const HotspotConfig &config, std::str
         case KeyMgmt::WPA_PSK:
             encryptionString = StringCombination(
                 "wpa=3\n"
-                "wpa_pairwise=TKIP CCMP\n"
-                "wpa_passphrase=%s",
-                config.GetPreSharedKey().c_str());
+                "wpa_pairwise=TKIP CCMP\n");
             break;
         case KeyMgmt::WPA2_PSK:
             encryptionString = StringCombination(
                 "wpa=2\n"
-                "rsn_pairwise=CCMP\n"
-                "wpa_passphrase=%s",
-                config.GetPreSharedKey().c_str());
+                "rsn_pairwise=CCMP\n");
             break;
         default:
             LOGE("unsupport security type");
@@ -814,6 +810,14 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
 WifiErrorNo WifiHdiWpaClient::EnableAp(int id)
 {
     if (HdiEnableAp(id) != WIFI_HAL_OPT_OK) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo WifiHdiWpaClient::SetApPasswd(const char *pass, int id)
+{
+    if (HdiSetApPasswd(pass, id) != WIFI_HAL_OPT_OK) {
         return WIFI_HAL_OPT_FAILED;
     }
     return WIFI_HAL_OPT_OK;
@@ -1007,20 +1011,31 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pListNetworks(std::map<int, WifiP2pGroupInfo>
     for (int i = 0; i < infoList.infoNum; ++i) {
         WifiP2pGroupInfo groupInfo;
         groupInfo.SetNetworkId(infoList.infos[i].id);
-        groupInfo.SetGroupName((char *)infoList.infos[i].ssid);
-
+        if (infoList.infos[i].ssid != nullptr) {
+            groupInfo.SetGroupName((char *)infoList.infos[i].ssid);
+        }
         char address[18] = {0};
-        ConvertMacArr2String(infoList.infos[i].bssid, ETH_ALEN, address, sizeof(address));
+        if (infoList.infos[i].bssid != nullptr) {
+            ConvertMacArr2String(infoList.infos[i].bssid, ETH_ALEN, address, sizeof(address));
+        }
         WifiP2pDevice device;
         device.SetDeviceAddress(address);
         groupInfo.SetOwner(device);
-        if (strstr((char *)infoList.infos[i].flags, "P2P-PERSISTENT") != nullptr) {
+        if (infoList.infos[i].flags != nullptr &&
+            strstr((char *)infoList.infos[i].flags, "P2P-PERSISTENT") != nullptr) {
             groupInfo.SetIsPersistent(true);
         }
+        if (infoList.infos[i].clientList != nullptr) {
+            const std::string str(reinterpret_cast<const char*>(infoList.infos[i].clientList));
+            std::vector<std::string> result = StrSplit(str, "-");
+            for (size_t i = 0; i < result.size(); i++) {
+                WifiP2pDevice device;
+                device.SetDeviceAddress(result[i]);
+                groupInfo.AddPersistentDevice(device);
+            }
+        }
         mapGroups.insert(std::pair<int, WifiP2pGroupInfo>(infoList.infos[i].id, groupInfo));
-        std::string ssid(reinterpret_cast<const char*>(infoList.infos[i].ssid));
-        LOGI("ReqP2pListNetworks id=%{public}d ssid=%{public}s address=%{private}s",
-            infoList.infos[i].id, SsidAnonymize(ssid).c_str(), address);
+        LOGI("ReqP2pListNetworks id=%{public}d, address=%{private}s", infoList.infos[i].id, address);
     }
     FreeHdiP2pNetworkList(&infoList);
     return ret;
@@ -1382,6 +1397,7 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pSetGroupConfig(int networkId, const HalP2pGr
     num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_KEY_MGMT, config.keyMgmt);
     num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_PAIRWISE, config.pairwise);
     num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_AUTH_ALG, config.authAlg);
+    num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_CLIENTLIST, config.clientList);
 
     num += PushP2pGroupConfigInt(conf + num, GROUP_CONFIG_MODE, config.mode);
     num += PushP2pGroupConfigInt(conf + num, GROUP_CONFIG_DISABLED, config.disabled);
@@ -1594,6 +1610,16 @@ WifiErrorNo WifiHdiWpaClient::HandleMloSignalPollData(char *staData, uint32_t st
 WifiErrorNo WifiHdiWpaClient::P2pReject(const std::string &mac)
 {
     return HdiP2pReject(mac.c_str());
+}
+
+WifiErrorNo WifiHdiWpaClient::SetMiracastSinkConfig(const std::string& config)
+{
+    char configBuf[MAX_CMD_BUFFER_SIZE];
+    if (strncpy_s(configBuf, sizeof(configBuf), config.c_str(), config.length()) != EOK) {
+        LOGE("%{public}s: failed to copy", __func__);
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return HdiSetMiracastSinkConfig(configBuf);
 }
 } // namespace Wifi
 }  // namespace OHOS

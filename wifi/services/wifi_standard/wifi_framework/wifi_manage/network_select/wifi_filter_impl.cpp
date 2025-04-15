@@ -442,6 +442,7 @@ bool NotCurrentNetworkFilter::Filter(NetworkCandidate &networkCandidate)
     if (networkCandidate.interScanInfo.bssid == linkedInfo.bssid) {
         WIFI_LOGI("NotCurrentNetworkFilter, same bssid:%{public}s",
             networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::SAME_BSSID);
         return false;
     }
 
@@ -449,6 +450,7 @@ bool NotCurrentNetworkFilter::Filter(NetworkCandidate &networkCandidate)
         NetworkSelectionUtils::IsConfigOpenOrEapType(networkCandidate)) {
         WIFI_LOGI("NotCurrentNetworkFilter, same ssid and open or eap type:%{public}s",
             networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::SAME_SSID_OPENOREAP);
         return false;
     }
     return true;
@@ -469,7 +471,11 @@ bool SignalLevelFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &interScanInfo = networkCandidate.interScanInfo;
     int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(interScanInfo.rssi, interScanInfo.band);
-    return signalLevel > SIGNAL_LEVEL_TWO;
+    if (signalLevel > SIGNAL_LEVEL_TWO) {
+        return true;
+    }
+    networkCandidate.filtedReason[filterName].insert(FiltedReason::POOR_SIGNAL);
+    return false;
 }
 
 ValidNetworkIdFilter::ValidNetworkIdFilter() : SimpleWifiFilter("ValidNetworkId") {}
@@ -485,7 +491,12 @@ ValidNetworkIdFilter::~ValidNetworkIdFilter()
  
 bool ValidNetworkIdFilter::Filter(NetworkCandidate &networkCandidate)
 {
-    return networkCandidate.wifiDeviceConfig.networkId != INVALID_NETWORK_ID;
+    if (networkCandidate.wifiDeviceConfig.networkId != INVALID_NETWORK_ID) {
+        return true;
+    } else {
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NETWORK_ID_INVALID);
+        return false;
+    }
 }
 
 NotNetworkBlackListFilter::NotNetworkBlackListFilter() : SimpleWifiFilter("NotNetworkBlackList") {}
@@ -504,6 +515,7 @@ bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
     if (NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(networkCandidate.interScanInfo.bssid)) {
         WIFI_LOGI("NotNetworkBlockListFilter, in abnormal wifi blocklist, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NETWORK_STATUS_DISABLE);
         return false;
     }
 
@@ -520,6 +532,7 @@ bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
         if (linkedInfo.detailedState == DetailedState::NOTWORKING && targetSignalLevel >= SIGNAL_LEVEL_THREE) {
             WIFI_LOGI("NotNetworkBlockListFilter, ignore blocklist, targetSignalLevel >= 3");
         }
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::BLOCKLIST_AP);
         return false;
     }
     return true;
@@ -570,7 +583,11 @@ bool NotP2pFreqAt5gFilter::Filter(NetworkCandidate &networkCandidate)
         return true;
     }
 
-    return NetworkSelectionUtils::IsSameFreqAsP2p(networkCandidate);
+    if (NetworkSelectionUtils::IsSameFreqAsP2p(networkCandidate)) {
+        return true;
+    }
+    networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_P2P_FREQ_AT_5G);
+    return false;
 }
 
 ValidConfigNetworkFilter::ValidConfigNetworkFilter() : SimpleWifiFilter("ValidConfigNetwork") {}
@@ -591,6 +608,7 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
     if (wifiDeviceConfig.noInternetAccess) {
         WIFI_LOGI("ValidConfigNetworkFilter, no internet access, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NO_INTERNET);
         return false;
     }
 
@@ -598,6 +616,7 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
     if (networkCandidate.wifiDeviceConfig.isPortal) {
         WIFI_LOGI("ValidConfigNetworkFilter, portal network, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::PORTAL_NETWORK);
         return false;
     }
 
@@ -607,6 +626,7 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
         !networkCandidate.wifiDeviceConfig.isAllowAutoConnect) {
         WIFI_LOGI("ValidConfigNetworkFilter, disable network, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NETWORK_STATUS_DISABLE);
         return false;
     }
 
@@ -614,6 +634,7 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
     if (NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(wifiDeviceConfig.networkStatusHistory)) {
         WIFI_LOGI("ValidConfigNetworkFilter, no network status history, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::EMPTY_HISTORY);
         return false;
     }
 
@@ -622,6 +643,7 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
         NetworkSelectionUtils::IsOpenAndMaybePortal(networkCandidate)) {
         WIFI_LOGI("ValidConfigNetworkFilter, maybe portal network, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::MAYBE_PORTAL_NETWORK);
         return false;
     }
 
@@ -648,6 +670,7 @@ bool WifiSwitchThresholdFilter::Filter(NetworkCandidate &networkCandidate)
     if (interScanInfo.rssi - linkedInfo.rssi < MIN_RSSI_INTERVAL) {
         WIFI_LOGI("WifiSwitchThresholdFilter, scan rssi:%{public}d, cur rssi:%{public}d, skip candidate:%{public}s",
             interScanInfo.rssi, linkedInfo.rssi, networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::LESS_THAN_8RSSI);
         return false;
     }
 

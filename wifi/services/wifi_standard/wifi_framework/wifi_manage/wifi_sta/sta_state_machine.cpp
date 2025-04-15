@@ -39,9 +39,6 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_net_observer.h"
 #include "wifi_system_timer.h"
-#ifdef WIFI_DATA_REPORT_ENABLE
-#include "select_network_data_report.h"
-#endif
 #ifdef WIFI_CONFIG_UPDATE
 #include "wifi_config_update.h"
 #endif
@@ -77,6 +74,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_ARP_CHECK_TIME 300
 #define NETWORK 1
 #define NO_NETWORK 0
+#define DISCONNECTED_NETWORK 2
 #define WPA_DEFAULT_NETWORKID 0
 #define SELF_CURE_FAC_MAC_REASSOC 2
 #define SELF_CURE_RAND_MAC_REASSOC 3
@@ -132,6 +130,11 @@ const std::map<int, int> portalEventValues = {
 
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
+#ifndef OHOS_ARCH_LITE
+#ifdef WIFI_DATA_REPORT_ENABLE
+      wifiDataReportService_(*this, instId),
+#endif
+#endif
       targetNetworkId_(INVALID_NETWORK_ID),
       lastSignalLevel_(INVALID_SIGNAL_LEVEL), targetRoamBssid(WPA_BSSID_ANY), currentTpType(IPTYPE_IPV4),
       getIpSucNum(0), getIpFailNum(0), enableSignalPoll(true), isRoam(false),
@@ -447,7 +450,7 @@ void StaStateMachine::InitState::StartWifiProcess()
         WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
         std::string realMacAddress;
         WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, pStaStateMachine->m_instId);
-        if (realMacAddress.empty()) {
+        if (realMacAddress.empty() || realMacAddress != mac) {
             WifiSettings::GetInstance().SetRealMacAddress(mac, pStaStateMachine->m_instId);
         }
     } else {
@@ -736,6 +739,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         return;
     }
     int reason = msg->GetParam1();
+    int locallyGenerated = msg->GetParam2();
     std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("Enter DealDisconnectEventInLinkState m_instId = %{public}d reason:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
@@ -762,7 +766,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
                 DisabledReason::DISABLED_CONSECUTIVE_FAILURES);
         }
-        WriteWifiAbnormalDisconnectHiSysEvent(reason);
+        WriteWifiAbnormalDisconnectHiSysEvent(reason, locallyGenerated);
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
@@ -1003,9 +1007,8 @@ void StaStateMachine::SeparatedState::GoInState()
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService::GetInstance().ReportApConnEventInfo(ConnReportReason::CONN_DISCONNECTED,
-        pStaStateMachine->linkedInfo, pStaStateMachine->m_instId,
-        pStaStateMachine->targetNetworkId_, pStaStateMachine->enhanceService_);
+    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_DISCONNECTED,
+        pStaStateMachine->linkedInfo.networkId);
 #endif
 #endif
     pStaStateMachine->StopDhcp();
@@ -1017,8 +1020,10 @@ void StaStateMachine::SeparatedState::GoInState()
     /* clear connection information. */
     pStaStateMachine->InitWifiLinkedInfo();
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
+    pStaStateMachine->linkSwitchDetectingFlag_ = false;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     WifiConfigCenter::GetInstance().SetMacAddress("", pStaStateMachine->m_instId);
+    WriteIsInternetHiSysEvent(DISCONNECTED_NETWORK);
     WIFI_LOGI("SeparatedState GoInState function.");
     return;
 }
@@ -1178,7 +1183,7 @@ void StaStateMachine::ApLinkingState::HandleStaBssidChangedEvent(InternalMessage
     }
 }
 
-void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent()
+void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMessagePtr msg)
 {
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
@@ -1187,9 +1192,8 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent()
             DisabledReason::DISABLED_BY_WRONG_PASSWORD);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-        WifiDataReportService::GetInstance().ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
-            pStaStateMachine->linkedInfo, pStaStateMachine->m_instId,
-            pStaStateMachine->targetNetworkId_, pStaStateMachine->enhanceService_);
+        pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
+            pStaStateMachine->targetNetworkId_);
 #endif
 #endif
     } else {
@@ -1197,9 +1201,8 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent()
             DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-        WifiDataReportService::GetInstance().ReportApConnEventInfo(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
-            pStaStateMachine->linkedInfo, pStaStateMachine->m_instId,
-            pStaStateMachine->targetNetworkId_, pStaStateMachine->enhanceService_);
+        pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
+            pStaStateMachine->targetNetworkId_);
 #endif
 #endif
     }
@@ -1212,7 +1215,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent()
     return;
 }
 
-void StaStateMachine::ApLinkingState::DealWpaLinkFullConnectFailEvent()
+void StaStateMachine::ApLinkingState::DealWpaLinkFullConnectFailEvent(InternalMessagePtr msg)
 {
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_FULL);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_FULL);
@@ -1220,9 +1223,8 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFullConnectFailEvent()
         DisabledReason::DISABLED_ASSOCIATION_REJECTION);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService::GetInstance().ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_FULL,
-        pStaStateMachine->linkedInfo, pStaStateMachine->m_instId,
-        pStaStateMachine->targetNetworkId_, pStaStateMachine->enhanceService_);
+    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_FULL,
+        pStaStateMachine->targetNetworkId_);
 #endif
 #endif
     pStaStateMachine->AddRandomMacCure();
@@ -1231,8 +1233,9 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFullConnectFailEvent()
     return;
 }
 
-void StaStateMachine::ApLinkingState::DealWpaLinkAssocRejectFailEvent()
+void StaStateMachine::ApLinkingState::DealWpaLinkAssocRejectFailEvent(InternalMessagePtr msg)
 {
+    pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_REJECTED);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_REJECT);
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
@@ -1241,9 +1244,8 @@ void StaStateMachine::ApLinkingState::DealWpaLinkAssocRejectFailEvent()
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_ASSOCIATION_REJECTION);
 #ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService::GetInstance().ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_REJECTION,
-        pStaStateMachine->linkedInfo, pStaStateMachine->m_instId,
-        pStaStateMachine->targetNetworkId_, pStaStateMachine->enhanceService_);
+    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_REJECTION,
+        pStaStateMachine->targetNetworkId_);
 #endif
 #endif
     pStaStateMachine->AddRandomMacCure();
@@ -1267,14 +1269,13 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr ms
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
     switch (eventName) {
         case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
-            DealWpaLinkPasswdWrongFailEvent();
+            DealWpaLinkPasswdWrongFailEvent(msg);
             break;
         case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
-            DealWpaLinkFullConnectFailEvent();
+            DealWpaLinkFullConnectFailEvent(msg);
             break;
         case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
-            pStaStateMachine->linkedInfo.bssid = msg->GetStringFromMessage();
-            DealWpaLinkAssocRejectFailEvent();
+            DealWpaLinkAssocRejectFailEvent(msg);
             break;
         default:
             WIFI_LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);
@@ -1346,6 +1347,10 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
         case CMD_SIGNAL_POLL:
             ret = EXECUTED;
             pStaStateMachine->DealSignalPollResult();
+            break;
+        case CMD_LINK_SWITCH_DETECT_TIMEOUT:
+            ret = EXECUTED;
+            pStaStateMachine->linkSwitchDetectingFlag_ = false;
             break;
 #ifndef OHOS_ARCH_LITE
         case WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT:
@@ -1437,8 +1442,12 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
 {
     std::string bssid = msg->GetStringFromMessage();
     WIFI_LOGI("%{public}s enter, bssid:%{public}s", __FUNCTION__, MacAnonymize(bssid).c_str());
-    pStaStateMachine->DealSignalPollResult();
+    pStaStateMachine->linkSwitchDetectingFlag_ = true;
+    pStaStateMachine->StopTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT);
+    pStaStateMachine->StartTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT, STA_LINK_SWITCH_DETECT_DURATION);
     pStaStateMachine->AfterApLinkedprocess(bssid);
+    pStaStateMachine->DealSignalPollResult();
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }
 
 
@@ -1451,6 +1460,7 @@ void StaStateMachine::ApLinkedState::DealStartRoamCmdInApLinkedState(InternalMes
     WriteConnectTypeHiSysEvent(NETWORK_SELECTED_BY_ROAM);
     std::string bssid = msg->GetStringFromMessage();
     pStaStateMachine->targetRoamBssid = bssid;
+    pStaStateMachine->linkSwitchDetectingFlag_ = false;
     WIFI_LOGI("%{public}s current bssid:%{public}s, target bssid:%{public}s,", __FUNCTION__,
         MacAnonymize(pStaStateMachine->linkedInfo.bssid).c_str(),
         MacAnonymize(pStaStateMachine->targetRoamBssid).c_str());
@@ -2093,10 +2103,10 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         SyncDeviceEverConnectedState(false);
 #endif
         if (!mIsWifiInternetCHRFlag &&
-            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL) &&
-            WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered()) {
+            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL)) {
             const int httpOpt = 1;
-            WriteWifiAccessIntFailedHiSysEvent(httpOpt, StaDnsState::DNS_STATE_UNREACHABLE);
+            int selfCureResetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
+            WriteWifiAccessIntFailedHiSysEvent(httpOpt, StaDnsState::DNS_STATE_UNREACHABLE, selfCureResetState);
             mIsWifiInternetCHRFlag = true;
         }
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
@@ -2131,7 +2141,6 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     }
 #endif
     if (autoPullBrowserFlag == false) {
-        WriteIsInternetHiSysEvent(NO_NETWORK);
         HandlePortalNetworkPorcess();
         autoPullBrowserFlag = true;
     }
@@ -2141,7 +2150,7 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
     isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
 #endif
-    WriteIsInternetHiSysEvent(NETWORK);
+    WriteIsInternetHiSysEvent(NO_NETWORK);
     lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
@@ -2292,9 +2301,8 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService::GetInstance().ReportApConnEventInfo(ConnReportReason::CONN_SUC_START,
-        pStaStateMachine->linkedInfo, pStaStateMachine->m_instId,
-        pStaStateMachine->targetNetworkId_, pStaStateMachine->enhanceService_);
+    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_SUC_START,
+        pStaStateMachine->targetNetworkId_);
 #endif
 #endif
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
@@ -3780,6 +3788,7 @@ void StaStateMachine::DealSignalPollResult()
 
     linkedInfo.snr = signalInfo.snr;
     linkedInfo.chload = signalInfo.chload;
+    signalInfo.timeStamp = GetCurrentTimeSeconds();
     if (linkedInfo.wifiStandard == WIFI_MODE_UNDEFINED) {
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
@@ -3788,7 +3797,7 @@ void StaStateMachine::DealSignalPollResult()
     LogSignalInfo(signalInfo);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService::GetInstance().ReportQoeInfo(signalInfo, enhanceService_);
+    wifiDataReportService_.ReportQoeInfo(signalInfo, ConnReportReason::CONN_SUC_KEEP, linkedInfo.networkId);
 #endif
 #endif
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
@@ -3887,6 +3896,10 @@ void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
 
 void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int foldStateRssi)
 {
+    if (linkSwitchDetectingFlag_) {
+        WIFI_LOGI("%{public}s link switch detecting, not update rssi", __FUNCTION__);
+        return;
+    }
     int curRssi = signalInfo.signal;
     std::vector<WifiLinkedInfo> mloLinkedInfo;
     if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR &&
@@ -4095,6 +4108,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         return WIFI_OPT_FAILED;
     }
     targetNetworkId_ = networkId;
+    linkSwitchDetectingFlag_ = false;
     SetRandomMac(deviceConfig, bssid);
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(bssid).c_str());
@@ -4119,7 +4133,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     ConvertDeviceCfg(deviceConfig, bssid);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService::GetInstance().InitReportApAllInfo();
+    wifiDataReportService_.InitReportApAllInfo();
 #endif
 #endif
     if (bssid.empty()) {

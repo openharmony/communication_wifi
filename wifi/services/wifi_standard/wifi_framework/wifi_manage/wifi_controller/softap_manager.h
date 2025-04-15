@@ -34,7 +34,7 @@ public:
     ErrCode RegisterCallback(const SoftApModeCallback &callbacks);
     explicit SoftApManager(SoftApManager::Role role, int id);
     ~SoftApManager();
-    ErrCode InitSoftapManager();
+    ErrCode InitSoftapManager(HotspotMode hotspotMode);
     void SetRole(Role role);
     Role GetRole();
     SoftapManagerMachine *GetMachine();

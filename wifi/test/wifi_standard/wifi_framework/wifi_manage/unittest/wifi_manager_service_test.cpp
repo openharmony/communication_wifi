@@ -146,12 +146,12 @@ HWTEST_F(WifiManagerServiceTest, ApStateResTest, TestSize.Level1)
     sleep(1);
     ASSERT_TRUE(cbk.OnApStateChangedEvent != nullptr);
 
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTING, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTED, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSING, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSED, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_IDLE, 0);
-    cbk.OnApStateChangedEvent(ApState::AP_STATE_NONE, 0);
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTING, 0, static_cast<int>(HotspotMode::SOFTAP));
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_STARTED, 0, static_cast<int>(HotspotMode::SOFTAP));
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSING, 0, static_cast<int>(HotspotMode::SOFTAP));
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_CLOSED, 0, static_cast<int>(HotspotMode::SOFTAP));
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_IDLE, 0, static_cast<int>(HotspotMode::SOFTAP));
+    cbk.OnApStateChangedEvent(ApState::AP_STATE_NONE, 0, static_cast<int>(HotspotMode::SOFTAP));
     sleep(2);
 }
 

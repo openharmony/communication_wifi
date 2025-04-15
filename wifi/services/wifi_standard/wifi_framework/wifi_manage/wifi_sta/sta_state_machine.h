@@ -46,6 +46,10 @@
 #include "iself_cure_service.h"
 #include "wifi_common_event_helper.h"
 #include "appmgr/app_mgr_interface.h"
+#include "sta_sm_ext.h"
+#ifdef WIFI_DATA_REPORT_ENABLE
+#include "select_network_data_report.h"
+#endif
 #endif
 
 namespace OHOS {
@@ -63,11 +67,13 @@ constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
 constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
+constexpr int CMD_LINK_SWITCH_DETECT_TIMEOUT = 0x07;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY_WITH_TASK = 1 * 1000;
 constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
+constexpr int STA_LINK_SWITCH_DETECT_DURATION = 2000; // ms
 
 /* pincode length */
 constexpr int PIN_CODE_LEN = 8;
@@ -154,6 +160,12 @@ enum PortalState {
 const std::string WPA_BSSID_ANY = "any";
 
 class StaStateMachine : public StateMachine {
+#ifndef OHOS_ARCH_LITE
+    friend class StaSMExt;
+#ifdef WIFI_DATA_REPORT_ENABLE
+    friend class WifiDataReportService;
+#endif
+#endif
     FRIEND_GTEST(StaStateMachine);
 public:
     explicit StaStateMachine(int instId = 0);
@@ -254,9 +266,9 @@ public:
 
     private:
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
-        void DealWpaLinkPasswdWrongFailEvent();
-        void DealWpaLinkFullConnectFailEvent();
-        void DealWpaLinkAssocRejectFailEvent();
+        void DealWpaLinkPasswdWrongFailEvent(InternalMessagePtr msg);
+        void DealWpaLinkFullConnectFailEvent(InternalMessagePtr msg);
+        void DealWpaLinkAssocRejectFailEvent(InternalMessagePtr msg);
         void DealWpaLinkFailEvent(InternalMessagePtr msg);
     private:
         StaStateMachine *pStaStateMachine;
@@ -1029,6 +1041,9 @@ private:
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
     ISelfCureService *selfCureService_ = nullptr;
+#ifdef WIFI_DATA_REPORT_ENABLE
+    WifiDataReportService wifiDataReportService_;
+#endif
 #endif
 
     int targetNetworkId_;
@@ -1069,6 +1084,11 @@ private:
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
     int isAudioOn_ = 0;
+    /*
+     linkswitch detect flag to avoid freq linkswitch cause signal level jump,
+     set to true when linkswitch start, to false when linkswitch duration 2s later
+    */
+    bool linkSwitchDetectingFlag_{false};
 };
 }  // namespace Wifi
 }  // namespace OHOS

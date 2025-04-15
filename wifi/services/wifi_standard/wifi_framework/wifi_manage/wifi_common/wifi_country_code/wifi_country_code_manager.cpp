@@ -216,7 +216,7 @@ void WifiCountryCodeManager::DealStaConnChanged(OperateResState state, const Wif
 #endif
 
 #ifdef FEATURE_AP_SUPPORT
-void WifiCountryCodeManager::DealApStateChanged(ApState state, int id)
+void WifiCountryCodeManager::DealApStateChanged(ApState state, int id, int hotspotMode)
 {
     WIFI_LOGI("ap state change, state=%{public}d, id=%{public}d", state, id);
     if (state == ApState::AP_STATE_STARTED) {

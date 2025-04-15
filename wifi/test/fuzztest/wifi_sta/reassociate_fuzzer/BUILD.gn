@@ -42,6 +42,7 @@ ohos_fuzztest("ReAssociateFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "wifi"

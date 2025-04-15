@@ -26,15 +26,18 @@ class WifiChrUtils {
 public:
     static WifiChrUtils &GetInstance();
     ~WifiChrUtils() = default;
-    static void AddSignalPollInfoArray(WifiSignalPollInfo signalInfo);
-    static void GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
-    static void ClearSignalPollInfoArray();
+    void AddSignalPollInfoArray(WifiSignalPollInfo signalInfo);
+    void GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
+    void ClearSignalPollInfoArray();
     void BeaconLostReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId);
 
 private:
     WifiChrUtils();
  
 private:
+    const int SIGNALARR_LENGTH = 6;
+    std::vector<WifiSignalPollInfo> signalPollInfoArray;
+    std::mutex signalInfoMutex;
     int64_t startTime_ = 0;
     std::mutex bssidMutex_;
     std::mutex setMutex_;

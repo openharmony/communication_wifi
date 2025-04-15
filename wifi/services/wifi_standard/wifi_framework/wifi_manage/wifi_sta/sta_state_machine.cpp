@@ -479,7 +479,7 @@ void StaStateMachine::InitState::StopWifiProcess()
         pStaStateMachine->CloseNoInternetDialog();
     }
 #endif
-    WifiChrUtils::ClearSignalPollInfoArray();
+    WifiChrUtils::GetInstance().ClearSignalPollInfoArray();
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
 }
 
@@ -526,7 +526,7 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         return;
     }
 
-    if (networkId == pStaStateMachine->linkedInfo.networkId && config.isReassocSelfCureWithFactoryMacAddress == 0) {
+    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
         return;
@@ -726,7 +726,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
-    WifiChrUtils::ClearSignalPollInfoArray();
+    WifiChrUtils::GetInstance().ClearSignalPollInfoArray();
     WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
@@ -3750,7 +3750,7 @@ void StaStateMachine::DealSignalPollResult()
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
     pLinkedState->UpdateExpandOffset();
-    WifiChrUtils::AddSignalPollInfoArray(signalInfo);
+    WifiChrUtils::GetInstance().AddSignalPollInfoArray(signalInfo);
     LogSignalInfo(signalInfo);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
@@ -3817,9 +3817,13 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
     }
 #endif
     WriteLinkInfoHiSysEvent(lastSignalLevel_, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
+    std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
     for (const auto &callBackItem : m_staCallback) {
         if (callBackItem.second.OnWifiHalSignalInfoChange != nullptr) {
             callBackItem.second.OnWifiHalSignalInfoChange(signalInfo);
+        }
+        if (callBackItem.second.OnSignalPollReport != nullptr) {
+            callBackItem.second.OnSignalPollReport(linkedInfo.bssid, lastSignalLevel_, m_instId);
         }
     }
     if (enableSignalPoll) {

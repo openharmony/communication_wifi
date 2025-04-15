@@ -22,6 +22,9 @@
 
 namespace OHOS {
 namespace Wifi {
+enum SettingsDialogClickType {
+    SETTINGS_5G_AUTO_IDENTIFY_CONN = 0
+}
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;
 using P2pEnhanceActionListenCallback = std::function<void(int)>;
 class IEnhanceService {
@@ -232,6 +235,19 @@ public:
      */
     virtual ErrCode Hid2dSetPeerWifiCfgInfo(PeerCfgType cfgType, char cfgData[CFG_DATA_MAX_BYTES],
         int setDataValidLen) = 0;
+
+    /**
+     * @Description on settings wlan enter receive
+     */
+    virtual void OnSettingsWlanEnterReceive() = 0;
+
+    /**
+     * @Description on settings dialog receive
+     *
+     * @param click - user click accept or reject
+     * @param type - settings dialog click type
+     */
+    virtual void OnSettingsDialogClick(bool click, int type) = 0;
 
     /**
      * @Description on notification receive

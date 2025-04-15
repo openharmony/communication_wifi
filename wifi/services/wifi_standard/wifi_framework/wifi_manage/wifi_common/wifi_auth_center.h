@@ -65,6 +65,15 @@ public:
     int VerifySetWifiInfoPermission(const int &pid, const int &uid);
 
     /**
+     * @Description Verify whether the app has the edm permission to visit wifi
+     *
+     * @param pid - the app's process id
+     * @param uid - the app id
+     * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    int VerifyManageEdmPolicyPermission(const int &pid, const int &uid);
+
+    /**
      * @Description Verify whether the app has the permission to visit wifi
      *
      * @param pid - the app's process id

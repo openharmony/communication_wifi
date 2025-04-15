@@ -163,6 +163,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_VOWIFI_SUPPORT" ]
     }
 
+    if (wifi_feature_wifiblocklist_wifiwhitelist_enable) {
+      defines += [ "FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT" ]
+    }
+
     if (wifi_feature_network_selection) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
     }

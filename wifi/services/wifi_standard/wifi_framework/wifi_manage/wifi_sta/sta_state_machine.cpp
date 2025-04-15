@@ -498,6 +498,29 @@ bool StaStateMachine::InitState::AllowAutoConnect()
     return true;
 }
 
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+bool StaStateMachine::InitState::StopByBlockList(WifiDeviceConfig &config)
+{
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, 0)) {
+        pStaStateMachine->DealMDMBlockWhiteListConnect(config);
+        return true;
+    }
+    return false;
+}
+
+bool StaStateMachine::InitState::StopByWhiteList(WifiDeviceConfig &config)
+{
+    if (!WifiSettings::GetInstance().WhetherSetWhiteListConfig() || config.bssid.empty()) {
+        return false;
+    }
+    if (!WifiSettings::GetInstance().FindWifiWhiteListConfig(config.ssid, config.bssid, 0)) {
+        pStaStateMachine->DealMDMBlockWhiteListConnect(config);
+        return true;
+    }
+    return false;
+}
+#endif
+
 void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
 {
     WIFI_LOGI("enter StartConnectEvent m_instId = %{public}d\n", pStaStateMachine->m_instId);
@@ -538,6 +561,12 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
         return;
     }
+
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    if (StopByBlockList(config) || StopByWhiteList(config)) {
+        return;
+    }
+#endif
 
     if (pStaStateMachine->StartConnectToNetwork(networkId, bssid, connTriggerMode) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to network failed: %{public}d.\n", networkId);
@@ -1375,6 +1404,21 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
+        pStaStateMachine->m_instId) != 0) {
+        WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", pStaStateMachine->linkedInfo.networkId);
+        return;
+    }
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, config.bssid) ||
+        (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
+        !WifiSettings::GetInstance().FindWifiWhiteListConfig(config.ssid, config.bssid))) {
+            pStaStateMachine->DealMDMBlockWhiteListConnect(config);
+            pStaStateMachine->StartDisConnectToNetwork();
+            return;
+    }
+#endif
     /* BSSID change is not received during roaming, only set BSSID */
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
         WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId)) != WIFI_HAL_OPT_OK) {
@@ -2651,6 +2695,16 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
     std::string realMacAddr;
     WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
+
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(deviceConfig.ssid, deviceConfig.bssid) ||
+        (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
+        !WifiSettings::GetInstance().FindWifiWhiteListConfig(deviceConfig.ssid, deviceConfig.bssid))) {
+            DealMDMBlockWhiteListConnect(deviceConfig);
+            StartDisConnectToNetwork();
+            return;
+    }
+#endif
 
     linkedInfo.ssid = deviceConfig.ssid;
     linkedInfo.bssid = bssid;
@@ -4355,13 +4409,39 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     }
 }
 
-void StaStateMachine::StartConnectToBssid(std::string bssid)
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+void StaStateMachine::DealMDMBlockWhiteListConnect(WifiDeviceConfig &config)
+{
+    SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
+        DisabledReason::DISABLED_BY_WIFI_MANAGER);
+    AddRandomMacCure();
+    InvokeOnStaConnChanged(OperateResState::CONNECT_ENABLE_NETWORK_FAILED,
+        linkedInfo);
+    SwitchState(pSeparatedState);
+}
+#endif
+
+void StaStateMachine::StartConnectToBssid(const int32_t networkId, std::string bssid)
 {
     InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {
         return;
     }
-
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
+        WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", networkId);
+        return;
+    }
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, 0)) {
+        return;
+    }
+    if (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
+        !WifiSettings::GetInstance().FindWifiWhiteListConfig(config.ssid, config.bssid, 0)) {
+        return;
+    }
+#endif
     msg->SetMessageName(WIFI_SVR_COM_STA_START_ROAM);
     msg->AddStringMessageBody(bssid);
     SendMessage(msg);

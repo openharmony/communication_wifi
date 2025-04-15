@@ -47,6 +47,11 @@ int WifiPermissionUtils::VerifyGetScanInfosPermission()
     return PERMISSION_GRANTED;
 }
 
+int WifiPermissionUtils::VerifyManageEdmPolicyPermission()
+{
+    return PERMISSION_GRANTED;
+}
+
 int WifiPermissionUtils::VerifyGetWifiLocalMacPermission()
 {
     return PERMISSION_GRANTED;
@@ -144,6 +149,12 @@ int WifiPermissionUtils::VerifyGetWifiLocalMacPermission()
 int WifiPermissionUtils::VerifySetWifiConfigPermission()
 {
     return WifiAuthCenter::GetInstance().VerifySetWifiConfigPermission(
+        IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::VerifyManageEdmPolicyPermission()
+{
+    return WifiAuthCenter::GetInstance().VerifyManageEdmPolicyPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
 }
 

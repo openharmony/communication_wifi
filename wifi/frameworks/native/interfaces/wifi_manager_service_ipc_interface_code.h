@@ -90,6 +90,8 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_MULTI_LINKED_INFO = 0x104F,
 
     WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY = 0x1050,           /* get signalpool info */
+
+    WIFI_SVR_CMD_SET_WIFI_ACCESS_LIST = 0x1051, /* set wifi block white list */
     
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

@@ -46,6 +46,15 @@ public:
     static int VerifySameProcessPermission(const int &pid, const int &uid);
 
     /**
+     * @Description : Verify Edm Prolicy Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @return int
+     */
+    static int VerifyManageEdmPolicyPermission(const int &pid, const int &uid);
+
+    /**
      * @Description : Verify Set Wifi Information Permission.
      *
      * @param pid - Process ID.[in]

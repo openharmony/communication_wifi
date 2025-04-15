@@ -44,6 +44,11 @@ int WifiAuthCenter::VerifySetWifiInfoPermission(const int &pid, const int &uid)
     return PERMISSION_GRANTED;
 }
 
+int WifiAuthCenter::VerifyManageEdmPolicyPermission(const int &pid, const int &uid)
+{
+    return PERMISSION_GRANTED;
+}
+
 int WifiAuthCenter::VerifyGetWifiInfoPermission(const int &pid, const int &uid)
 {
     return PERMISSION_GRANTED;

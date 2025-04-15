@@ -167,6 +167,8 @@ void WifiDeviceStub::InitHandleMap()
         MessageParcel &data, MessageParcel &reply) { OnIsHeldWifiProtectRef(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ADD_DEVICE_CONFIG)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnAddDeviceConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_WIFI_ACCESS_LIST)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetWifiAccessList(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnUpdateDeviceConfig(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG)] = [this](uint32_t code,
@@ -357,6 +359,35 @@ void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, MessageParcel &data, Messa
         reply.WriteInt32(result);
     }
 
+    return;
+}
+
+void WifiDeviceStub::OnSetWifiAccessList(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    WifiDeviceConfig config;
+    ReadWifiDeviceConfig(data, config);
+ 
+    int size = data.ReadInt32();
+    std::vector<WifiAccessInfo> wifiList;
+    for (int i = 0; i < size; i++) {
+        WifiAccessInfo info;
+        info.ssid = data.ReadString();
+        info.bssid = data.ReadString();
+        info.uid = data.ReadInt32();
+        info.WifiType = static_cast<WifiAccessType>(data.ReadInt32());
+        wifiList.push_back(info);
+    }
+ 
+    int result = INVALID_NETWORK_ID;
+    ErrCode ret = SetWifiAccessList(wifiList);
+ 
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(result);
+    }
+ 
     return;
 }
 

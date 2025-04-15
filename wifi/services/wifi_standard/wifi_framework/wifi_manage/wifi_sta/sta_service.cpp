@@ -396,6 +396,44 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
     wifiEapConfig.identity = identity;
 }
 
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+ErrCode StaService::SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList) const
+{
+    std::vector<WifiAccessInfo> tmp;
+    tmp.assign(wifiAccessList.begin(), wifiAccessList.end());
+    
+    WifiSettings::GetInstance().ClearWifiBlockListConfig(m_instId);
+    WifiSettings::GetInstance().ClearWifiWhiteListConfig(m_instId);
+    for (size_t i = 0; i < tmp.size(); i++) {
+        if (tmp[i].WifiType == MDM_BLOCKLIST) {
+            WifiSettings::GetInstance().AddWifiBlockListConfig(m_instId, tmp[i]);
+        }
+        if (tmp[i].WifiType == MDM_WHITELIST) {
+            WifiSettings::GetInstance().AddWifiWhiteListConfig(m_instId, tmp[i]);
+        }
+    }
+    WifiSettings::GetInstance().SyncWifiBlockListConfig();
+    WifiSettings::GetInstance().SyncWifiWhiteListConfig();
+ 
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if ((linkedInfo.connState == CONNECTING || linkedInfo.connState == CONNECTED) &&
+        WifiSettings::GetInstance().FindWifiBlockListConfig(linkedInfo.ssid, linkedInfo.bssid, 0)) {
+        WifiDeviceConfig targetNetwork;
+        if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, targetNetwork)) {
+            WIFI_LOGE("AllowAutoConnect, failed tot get device config");
+            return WIFI_OPT_FAILED;
+        }
+        targetNetwork.isAllowAutoConnect = false;
+        WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+        CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+        pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISCONNECT);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+#endif
+
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
     LOGI("Enter AddDeviceConfig, ssid:%{public}s, bssid=%{public}s, keyMgmt: %{public}s\n",
@@ -597,7 +635,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
             }
             if (std::find_if(mloInfo.begin(), mloInfo.end(),
                 [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
-                pStaStateMachine->StartConnectToBssid(bssid);
+                    pStaStateMachine->StartConnectToBssid(networkId, bssid);
                 return WIFI_OPT_SUCCESS;
             }
             if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {
@@ -609,7 +647,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
                 return WIFI_OPT_SUCCESS;
             }
         }
-        pStaStateMachine->StartConnectToBssid(bssid);
+        pStaStateMachine->StartConnectToBssid(networkId, bssid);
     } else {
         LOGI("%{public}s switch to target network", __FUNCTION__);
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);

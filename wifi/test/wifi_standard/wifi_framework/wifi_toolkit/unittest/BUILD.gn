@@ -150,6 +150,9 @@ ohos_unittest("toolkit_unittest") {
   if (wifi_feature_with_local_random_mac) {
     defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
   }
+  if (wifi_feature_wifiblocklist_wifiwhitelist_enable) {
+    defines += [ "FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT" ]
+  }
   defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   configs = [ ":module_private_config" ]
 

@@ -205,6 +205,13 @@ ErrCode WifiDeviceImpl::AddDeviceConfig(const WifiDeviceConfig &config, int &res
     return client_->AddDeviceConfig(config, result, isCandidate);
 }
 
+ErrCode WifiDeviceImpl::SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetWifiAccessList(wifiAccessList);
+}
+
 ErrCode WifiDeviceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config, int &result)
 {
     std::lock_guard<std::mutex> lock(mutex_);

@@ -92,6 +92,10 @@ int WifiSettings::Init()
     mTrustListPolicies.SetConfigFilePath(WIFI_TRUST_LIST_POLICY_FILE_PATH);
     mMovingFreezePolicy.SetConfigFilePath(WIFI_MOVING_FREEZE_POLICY_FILE_PATH);
     mSavedWifiStoreRandomMac.SetConfigFilePath(WIFI_STA_RANDOM_MAC_FILE_PATH);
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    wifiBlockListConfig_.SetConfigFilePath(WIFI_ACCESS_BLOCK_LIST);
+    wifiWhiteListConfig_.SetConfigFilePath(WIFI_ACCESS_WHITE_LIST);
+#endif
 #ifndef OHOS_ARCH_LITE
     MergeWifiConfig();
     MergeSoftapConfig();
@@ -100,6 +104,10 @@ int WifiSettings::Init()
     SetUpHks();
 #endif
     InitWifiConfig();
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    InitWifiBlockListConfig();
+    InitWifiWhiteListConfig();
+#endif
     ReloadDeviceConfig();
     InitHotspotConfig();
     InitP2pVendorConfig();
@@ -144,6 +152,88 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
     }
     return config.networkId;
 }
+
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+ErrCode WifiSettings::AddWifiBlockListConfig(int uid, const WifiAccessInfo& WifiListInfo)
+{
+    if (WifiListInfo.ssid.empty()) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+ 
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    if (wifiBlockList_.size() > WIFI_ACCESS_LIST_MAX_NUM) {
+        LOGE("Add WifiAccessInfo exceeding the maximum value!");
+        return WIFI_OPT_MDM_BLOCKLIST_OUT_MAX_NUM;
+    }
+    wifiBlockList_.push_back(WifiListInfo);
+    LOGI("current mWifiBlockSize is %{public}d", static_cast<int>(wifiBlockList_.size()));
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode WifiSettings::AddWifiWhiteListConfig(int uid, const WifiAccessInfo& WifiListInfo)
+{
+    if (WifiListInfo.ssid.empty() || WifiListInfo.bssid.empty()) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+ 
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    if (wifiWhiteList_.size() > WIFI_ACCESS_LIST_MAX_NUM) {
+        LOGE("Add WifiAccessInfo exceeding the maximum value!");
+        return WIFI_OPT_MDM_WHITELIST_OUT_MAX_NUM;
+    }
+    wifiWhiteList_.push_back(WifiListInfo);
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiSettings::ClearWifiBlockListConfig(int uid)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    LOGI("Clear wifi block List ");
+    wifiBlockList_.clear();
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode WifiSettings::ClearWifiWhiteListConfig(int uid)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    LOGI("Clear wifi White List ");
+    wifiWhiteList_.clear();
+    return WIFI_OPT_SUCCESS;
+}
+ 
+bool WifiSettings::FindWifiBlockListConfig(const std::string &ssid,
+    const std::string &bssid, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    for (int i = 0; i < wifiBlockList_.size(); i++) {
+        if (wifiBlockList_[i].ssid == ssid || wifiBlockList_[i].bssid == bssid) {
+            LOGI("find wifi block list info successful!");
+            return true;
+        }
+    }
+    LOGD("find wifi block list info failed!");
+    return false;
+}
+ 
+bool WifiSettings::WhetherSetWhiteListConfig()
+{
+    return wifiWhiteList_.size() > 0;
+}
+ 
+bool WifiSettings::FindWifiWhiteListConfig(const std::string &ssid,
+    const std::string &bssid, int instId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    for (int i = 0; i < wifiWhiteList_.size(); i++) {
+        if (wifiWhiteList_[i].ssid == ssid && wifiWhiteList_[i].bssid == bssid) {
+            LOGI("find wifi white list info successful!");
+            return true;
+        }
+    }
+    LOGD("find wifi white list info failed!");
+    return false;
+}
+#endif
 
 void WifiSettings::SyncAfterDecryped(WifiDeviceConfig &config)
 {
@@ -1845,6 +1935,64 @@ void WifiSettings::InitWifiConfig()
     }
     return;
 }
+
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+void WifiSettings::InitWifiBlockListConfig()
+{
+    if (wifiBlockListConfig_.LoadConfig() < 0) {
+        LOGI("the block loadConfig() return value < 0");
+        return;
+    }
+    std::vector<WifiAccessInfo> tmp;
+    wifiBlockListConfig_.GetValue(tmp);
+    if (tmp.size() > 0) {
+        for (size_t i = 0; i < tmp.size(); i++) {
+            wifiBlockList_.push_back(tmp[i]);
+        }
+    }
+}
+ 
+void WifiSettings::InitWifiWhiteListConfig()
+{
+    if (wifiWhiteListConfig_.LoadConfig() < 0) {
+        LOGI("the white loadConfig() return value < 0");
+        return;
+    }
+    std::vector<WifiAccessInfo> tmp;
+    wifiWhiteListConfig_.GetValue(tmp);
+    if (tmp.size() > 0) {
+        for (size_t i = 0; i < tmp.size(); i++) {
+            wifiWhiteList_.push_back(tmp[i]);
+        }
+    }
+}
+ 
+int WifiSettings::SyncWifiBlockListConfig()
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    std::vector<WifiAccessInfo> tmp;
+
+    for (int i = 0; i < wifiBlockList_.size(); i++) {
+        tmp.push_back(wifiBlockList_[i]);
+    }
+    wifiBlockListConfig_.SetValue(tmp);
+    wifiBlockListConfig_.SaveConfig();
+    return 0;
+}
+ 
+int WifiSettings::SyncWifiWhiteListConfig()
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    std::vector<WifiAccessInfo> tmp;
+
+    for (int i = 0; i < wifiWhiteList_.size(); i++) {
+        tmp.push_back(wifiWhiteList_[i]);
+    }
+    wifiWhiteListConfig_.SetValue(tmp);
+    wifiWhiteListConfig_.SaveConfig();
+    return 0;
+}
+#endif
 
 int WifiSettings::SyncWifiConfig()
 {

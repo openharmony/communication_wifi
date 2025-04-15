@@ -118,6 +118,14 @@ int StaInterface::AddDeviceConfig(const WifiDeviceConfig &config)
     return pStaService->AddDeviceConfig(config);
 }
 
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+ErrCode StaInterface::SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList)
+{
+    LOGI("Enter SetWifiAccessList.\n");
+    return pStaService->SetWifiAccessList(wifiAccessList);
+}
+#endif
+
 int StaInterface::UpdateDeviceConfig(const WifiDeviceConfig &config)
 {
     LOGI("Enter UpdateDeviceConfig.\n");

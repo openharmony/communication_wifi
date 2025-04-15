@@ -190,6 +190,10 @@ public:
         void StartConnectEvent(InternalMessagePtr msg);
         void UpdateCountryCode(InternalMessagePtr msg);
         bool AllowAutoConnect();
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+        bool StopByBlockList(WifiDeviceConfig &config);
+        bool StopByWhiteList(WifiDeviceConfig &config);
+#endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
@@ -414,9 +418,10 @@ public:
     /**
      * @Description  Start roaming connection.
      *
+     * @param networkId - the networkId
      * @param bssid - the mac address of network(in)
      */
-    void StartConnectToBssid(std::string bssid);
+    void StartConnectToBssid(const int32_t networkId, std::string bssid);
     /**
      * @Description Register sta callback function
      *
@@ -459,6 +464,9 @@ public:
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
     void GetDetectNetState(OperateResState &state);
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    void DealMDMBlockWhiteListConnect(WifiDeviceConfig &config);
+#endif
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);

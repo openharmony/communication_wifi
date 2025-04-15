@@ -77,6 +77,12 @@ inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
 inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 
+enum WifiAccessType {
+    MDM_BLOCKLIST = 0,
+    MDM_WHITELIST = 1,
+    MDM_INVALIDLIST = 2
+};
+
 enum class SupplicantState {
     DISCONNECTED = 0,
     INTERFACE_DISABLED = 1,
@@ -172,7 +178,13 @@ enum class DisconnectedReason {
     DISC_REASON_CONNECTION_FULL = 2,
 
     /* Connection Rejected */
-    DISC_REASON_CONNECTION_REJECTED = 3
+    DISC_REASON_CONNECTION_REJECTED = 3,
+ 
+    /* Connection No Reason */
+    DISC_REASON_NO_REASON = 4,
+ 
+    /* Connect mdm blocklist or  wifi is fail*/
+    DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL = 5,
 };
 
 enum class WifiOperateType {
@@ -303,6 +315,22 @@ struct WifiLinkedInfo {
         c0Rssi = 0;
         c1Rssi = 0;
         linkId = INVALID_LINK_ID;
+    }
+};
+
+/* Wifi access list info */
+struct WifiAccessInfo {
+    std::string ssid;
+    std::string bssid;
+    WifiAccessType WifiType;
+    int uid;
+ 
+    WifiAccessInfo()
+    {
+        ssid = "";
+        bssid = "";
+        WifiType = MDM_INVALIDLIST;
+        uid = 0;
     }
 };
 

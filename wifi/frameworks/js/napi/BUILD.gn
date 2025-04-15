@@ -101,12 +101,12 @@ ohos_shared_library("wifiext") {
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
 
   external_deps = [
-    "samgr:samgr_proxy",
     "ability_runtime:app_context",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 
   defines = []

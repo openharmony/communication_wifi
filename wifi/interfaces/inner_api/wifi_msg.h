@@ -45,6 +45,8 @@ namespace Wifi {
 #define MAX_PID_LIST_SIZE 128
 #define REGISTERINFO_MAX_NUM 1000
 #define WIFI_MAX_MLO_LINK_NUM 2
+#define EXTERNAL_HILINK_MAX_VALUE 3
+#define INTERNAL_HILINK_MAX_VALUE 10
 
 inline const std::string KEY_MGMT_NONE = "NONE";
 inline const std::string KEY_MGMT_WEP = "WEP";
@@ -264,7 +266,7 @@ struct WifiLinkedInfo {
     bool isAncoConnected;
     WifiCategory supportedWifiCategory;
     bool isMloConnected;
-    bool isHiLinkNetwork;
+    int isHiLinkNetwork;
     bool isWurEnable;
     int c0Rssi;
     int c1Rssi;
@@ -296,7 +298,7 @@ struct WifiLinkedInfo {
         lastRxPackets = 0;
         lastTxPackets = 0;
         isAncoConnected = false;
-        isHiLinkNetwork = false;
+        isHiLinkNetwork = 0;
         supportedWifiCategory = WifiCategory::DEFAULT;
         isMloConnected = false;
         isWurEnable = false;

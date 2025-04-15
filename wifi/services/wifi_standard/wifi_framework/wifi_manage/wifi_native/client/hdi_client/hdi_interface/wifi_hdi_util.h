@@ -52,7 +52,7 @@ int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *dest
  */
 void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len);
 
-bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len);
+int RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len);
 
 #ifdef __cplusplus
 }

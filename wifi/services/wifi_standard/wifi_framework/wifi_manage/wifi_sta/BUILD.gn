@@ -198,7 +198,6 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",
-      "samgr:samgr_proxy",
     ]
 
     part_name = "wifi"

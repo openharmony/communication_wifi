@@ -21,10 +21,6 @@
 
 namespace OHOS {
 namespace Wifi {
-static const int SIGNALARR_LENGTH = 6;
-static std::vector<WifiSignalPollInfo> signalPollInfoArray;
-std::mutex signalInfoMutex;
-
 WifiChrUtils &WifiChrUtils::GetInstance()
 {
     static WifiChrUtils gWifiChrUtils;

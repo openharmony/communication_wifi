@@ -477,7 +477,7 @@ void StaStateMachine::InitState::StopWifiProcess()
         pStaStateMachine->CloseNoInternetDialog();
     }
 #endif
-    WifiChrUtils::ClearSignalPollInfoArray();
+    WifiChrUtils::GetInstance().ClearSignalPollInfoArray();
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
 }
 
@@ -724,7 +724,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
-    WifiChrUtils::ClearSignalPollInfoArray();
+    WifiChrUtils::GetInstance().ClearSignalPollInfoArray();
     WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
@@ -3729,7 +3729,7 @@ void StaStateMachine::DealSignalPollResult()
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
     pLinkedState->UpdateExpandOffset();
-    WifiChrUtils::AddSignalPollInfoArray(signalInfo);
+    WifiChrUtils::GetInstance().AddSignalPollInfoArray(signalInfo);
     LogSignalInfo(signalInfo);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE

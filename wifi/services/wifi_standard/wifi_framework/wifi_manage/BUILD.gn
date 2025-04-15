@@ -89,10 +89,7 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
     ]
 
-    external_deps = [
-      "bounds_checking_function:libsec_shared",
-      "samgr:samgr_proxy",
-    ]
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [
       "OHOS_ARCH_LITE",
@@ -160,7 +157,10 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
     ]
 
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "samgr:samgr_proxy",
+    ]
 
     defines = [ "OHOS_ARCH_LITE" ]
     cflags_cc = [

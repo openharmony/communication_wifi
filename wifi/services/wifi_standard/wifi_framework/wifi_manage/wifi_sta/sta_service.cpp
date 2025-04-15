@@ -1150,7 +1150,7 @@ void StaService::ProcessSetVoWifiDetectPeriod(int period)
 ErrCode StaService::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
 {
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-    WifiChrUtils::GetSignalPollInfoArray(wifiSignalPollInfos, length);
+    WifiChrUtils::GetInstance().GetSignalPollInfoArray(wifiSignalPollInfos, length);
     return WIFI_OPT_SUCCESS;
 }
  

@@ -26,6 +26,8 @@ public:
     virtual void DealStaOpenRes(OperateResState state, int instId = 0) = 0;
     virtual void DealStaCloseRes(OperateResState state, int instId = 0) = 0;
     virtual void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0) = 0;
+    virtual void DealSignalPollReport(const std::string &bssid, const int32_t signalLevel,
+        const int32_t instId = 0) = 0;
     virtual void DealWpsChanged(WpsStartState state, const int pinCode, int instId = 0) = 0;
     virtual void DealStreamChanged(StreamDirection state, int instId = 0) = 0;
     virtual void DealRssiChanged(int rssi, int instId = 0) = 0;
@@ -41,6 +43,7 @@ public:
     MOCK_METHOD2(DealStaOpenRes, void(OperateResState state, int));
     MOCK_METHOD2(DealStaCloseRes, void(OperateResState state, int));
     MOCK_METHOD3(DealStaConnChanged, void(OperateResState type, const WifiLinkedInfo &info, int));
+    MOCK_METHOD3(DealSignalPollReport, void(const std::string &bssid, const int32_t signalLevel, int));
     MOCK_METHOD3(DealWpsChanged, void(WpsStartState state, const int pinCode, int));
     MOCK_METHOD2(DealStreamChanged, void(StreamDirection state, int));
     MOCK_METHOD2(DealRssiChanged, void(int rssi, int));

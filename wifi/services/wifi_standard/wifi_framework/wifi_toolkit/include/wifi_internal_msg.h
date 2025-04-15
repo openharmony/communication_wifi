@@ -52,6 +52,8 @@ constexpr int RSSI_LEVEL_3_5G = -72;
 constexpr int RSSI_LEVEL_4_5G = -65;
 constexpr int AIRPLANE_MODE_OPEN = 1;
 constexpr int AIRPLANE_MODE_CLOSE = 2;
+const int64_t ONE_DAY_TIME_SECONDS = 24 * 60 * 60;
+
 #define DNS_IP_ADDR_LEN 15
 #define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
 

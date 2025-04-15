@@ -653,6 +653,7 @@ WifiErrorNo WifiStaHalInterface::GetConnectSignalInfo(const std::string &ifaceNa
     if (endBssid.length() != HAL_BSSID_LENGTH) {
         return WIFI_HAL_OPT_INPUT_MAC_INVALID;
     }
+    info.timeStamp = GetCurrentTimeSeconds();
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     SignalPollResult signalPollResult;
     if (!HalDeviceManager::GetInstance().GetConnectSignalInfo(ifaceName, signalPollResult)) {

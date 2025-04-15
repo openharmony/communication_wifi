@@ -172,9 +172,7 @@ enum class DisconnectedReason {
     DISC_REASON_CONNECTION_FULL = 2,
 
     /* Connection Rejected */
-    DISC_REASON_CONNECTION_REJECTED = 3,
-
-    DISC_REASON_BEACON_LOST = 4
+    DISC_REASON_CONNECTION_REJECTED = 3
 };
 
 enum class WifiOperateType {

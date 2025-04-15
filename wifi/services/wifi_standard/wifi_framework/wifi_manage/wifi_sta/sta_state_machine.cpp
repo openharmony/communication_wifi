@@ -267,7 +267,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
     linkedInfo.isMloConnected = false;
     linkedInfo.isWurEnable = false;
-    linkedInfo.isHiLinkNetwork = false;
+    linkedInfo.isHiLinkNetwork = 0;
     std::vector<WifiLinkedInfo> emptyMloLinkInfo;
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(emptyMloLinkInfo, m_instId);
 }
@@ -2112,7 +2112,8 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
     WIFI_LOGD("%{public}s, isHiLinkNetwork : %{public}d isHomeAp : %{public}d isHomeRouter : %{public}d keyMgmt : "
               "%{public}s", __func__, linkedInfo.isHiLinkNetwork, isHomeAp, isHomeRouter, config.keyMgmt.c_str());
-    if ((linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) && config.keyMgmt != KEY_MGMT_NONE) {
+    if ((InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) || isHomeAp || isHomeRouter)
+        && config.keyMgmt != KEY_MGMT_NONE) {
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
@@ -2148,7 +2149,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
             needChangePortalFlag = true;
             break;
         case SystemNetWorkState::NETWORK_IS_WORKING:
-            if (!linkedInfo.isHiLinkNetwork && !isHomeAp && !isHomeRouter) {
+            if (!InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) && !isHomeAp && !isHomeRouter) {
                 WIFI_LOGI("%{public}s, has internet and not hilink/homeAp/homeRouter network, not modify", __func__);
                 break;
             }
@@ -2159,7 +2160,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
             needChangePortalFlag = true;
             break;
         case SystemNetWorkState::NETWORK_IS_PORTAL:
-            if (!linkedInfo.isHiLinkNetwork && !isHomeAp && !isHomeRouter) {
+            if (!InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) && !isHomeAp && !isHomeRouter) {
                 WIFI_LOGI("%{public}s, portal and not hilink/homeAp/homeRouter network, not modify", __func__);
                 break;
             }

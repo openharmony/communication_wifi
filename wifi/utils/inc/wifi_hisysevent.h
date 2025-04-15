@@ -139,6 +139,8 @@ void WriteWifiOperateStateHiSysEvent(int operateType, int operateState);
 
 void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode, int locallyGenerated);
 
+void WriteWifiBeaconLostHiSysEvent(int errorCode);
+
 void WriteWifiConnectionInfoHiSysEvent(int networkId);
 
 void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReason, int apState);

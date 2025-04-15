@@ -35,6 +35,7 @@
 #include "wifi_sa_manager.h"
 #include "wifi_notification_util.h"
 #endif
+#include "wifi_chr_utils.h"
 
 DEFINE_WIFILOG_LABEL("WifiStaManager");
 
@@ -139,6 +140,10 @@ void WifiStaManager::InitStaCallback(void)
     mStaCallback.OnAutoSelectNetworkRes = [this](int networkId, int instId) {
         this->DealAutoSelectNetworkChanged(networkId, instId);
     };
+    mStaCallback.OnSignalPollReport =
+        [this](const std::string &bssid, const int32_t signalLevel, const int32_t instId) {
+            this->DealSignalPollReport(bssid, signalLevel, instId);
+        };
     return;
 }
 
@@ -231,6 +236,11 @@ static void HandleStaDisconnected(int instId)
         }
 #endif
     }
+}
+
+void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
+{
+    WifiChrUtils::GetInstance().BeaconLostReport(bssid, signalLevel, instId);
 }
 
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)

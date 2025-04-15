@@ -127,7 +127,10 @@ HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, DealSignalPollReportTest, TestSize.Level1)
 {
     WIFI_LOGI("DealSignalPollReportTest enter!");
-    wifiManager.wifiStaManager->DealSignalPollReport("11:22:33:44:55:66", 2, 0);
+    std::string bssid = "11:22:33:44:55:66";
+    int32_t signalLevel = 2;
+    int32_t instId = 0;
+    wifiManager.wifiStaManager->DealSignalPollReport(bssid, signalLevel, instId);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

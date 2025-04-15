@@ -19,6 +19,7 @@
 #include <libxml/tree.h>
 #include <iostream>
 #include <map>
+#include "wifi_common_util.h"
 
 inline constexpr auto XML_TAG_DOCUMENT_HEADER = "WifiConfigStoreData";
 inline bool ConvertStringToBool(const std::string str)
@@ -102,10 +103,10 @@ public:
         xmlFree(value);
         switch (type) {
             case PrimType::INT:
-                primValue = std::stoi(valueString);
+                primValue = CheckDataLegal(valueString);
                 break;
             case PrimType::LONG:
-                primValue = std::stol(valueString);
+                primValue = CheckDataTolonglong(valueString);
                 break;
             case PrimType::BOOLEAN:
                 primValue = ConvertStringToBool(valueString);

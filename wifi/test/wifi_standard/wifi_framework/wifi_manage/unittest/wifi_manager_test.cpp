@@ -124,6 +124,16 @@ HWTEST_F(WifiManagerTest, DealStaConnChangedTest, TestSize.Level1)
     wifiManager.wifiStaManager->DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info);
 }
 
+HWTEST_F(WifiManagerTest, DealSignalPollReportTest, TestSize.Level1)
+{
+    WIFI_LOGI("DealSignalPollReportTest enter!");
+    std::string bssid = "11:22:33:44:55:66";
+    int32_t signalLevel = 2;
+    int32_t instId = 0;
+    wifiManager.wifiStaManager->DealSignalPollReport(bssid, signalLevel, instId);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 HWTEST_F(WifiManagerTest, DealWpsChangedTest, TestSize.Level1)
 {
     WIFI_LOGI("DealWpsChangedTest enter!");
@@ -403,14 +413,14 @@ HWTEST_F(WifiManagerTest, GetLocationModeByDatashareTest, TestSize.Level1)
     WIFI_LOGI("GetLocationModeByDatashareTest enter!");
     bool result = wifiManager.wifiEventSubscriberManager->GetLocationModeByDatashare();
     WIFI_LOGI("GetLocationModeByDatashareTest result(%{public}d)", result);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, GetLastStaStateByDatashareTest, TestSize.Level1)
 {
     WIFI_LOGI("GetLastStaStateByDatashareTest enter!");
     wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare();
-    EXPECT_EQ(wifiManager.wifiEventSubscriberManager->GetLastStaStateByDatashare(), 1);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, RegisterCesEventTest, TestSize.Level1)

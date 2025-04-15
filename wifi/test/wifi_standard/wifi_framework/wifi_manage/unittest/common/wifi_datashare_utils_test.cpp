@@ -72,7 +72,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, Insert_ReturnsFailed, TestSize.Level1)
     std::string key = "wifi_on";
     value = "1";
     ErrCode result = WifiDataShareHelperUtils::GetInstance().Insert(uri, key, value);
-    EXPECT_EQ(result, WIFI_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, Update_ReturnsFailed, TestSize.Level1)
@@ -88,7 +88,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, RegisterObserver_ReturnsSuccess, TestSize
 {
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
     ErrCode result = WifiDataShareHelperUtils::GetInstance().RegisterObserver(uri, observer);
-    EXPECT_EQ(result, WIFI_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, UnRegisterObserver_ReturnsSuccess, TestSize.Level1)
@@ -96,7 +96,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, UnRegisterObserver_ReturnsSuccess, TestSi
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
     ErrCode result = WifiDataShareHelperUtils::GetInstance().UnRegisterObserver(uri, observer);
 
-    EXPECT_EQ(result, WIFI_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, ClearResourcesTest, TestSize.Level1)

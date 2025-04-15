@@ -229,12 +229,12 @@ unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &ra
     if (rateList.empty()) {
         return 0;
     }
-    if (rateList.back().txBytes < rateList.front().txBytes || rateList.back().txBytes < rateList.front().txBytes) {
+    if (rateList.back().txBytes < rateList.front().txBytes || rateList.back().rxBytes < rateList.front().rxBytes) {
         WIFI_LOGW("%{public}s, signalpoll overflow", __FUNCTION__);
         return 0;
     }
     uint32_t flowTx = rateList.back().txBytes - rateList.front().txBytes;
-    uint32_t flowRx = rateList.back().txBytes - rateList.front().txBytes;
+    uint32_t flowRx = rateList.back().rxBytes - rateList.front().rxBytes;
     // avoid add flow
     if ((flowTx > 0) && (flowRx > (UINT32_MAX - flowTx))) {
         WIFI_LOGW("%{public}s, add overflow", __FUNCTION__);

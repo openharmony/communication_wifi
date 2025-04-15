@@ -124,9 +124,9 @@ ohos_unittest("wifi_sta_ext_unittest") {
     "netmanager_base:netsys_controller",
     "netstack:http_client",
     "power_manager:powermgr_client",
+    "samgr:samgr_proxy",
     "time_service:time_client",
     "window_manager:libdm_lite",
-    "samgr:samgr_proxy",
   ]
 
   defines = [

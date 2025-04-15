@@ -21,8 +21,9 @@
 
 namespace OHOS {
 namespace Wifi {
-class WifiChrUtils {
+const int SIGNALARR_LENGTH = 6;
 
+class WifiChrUtils {
 public:
     static WifiChrUtils &GetInstance();
     ~WifiChrUtils() = default;
@@ -35,7 +36,6 @@ private:
     WifiChrUtils();
  
 private:
-    const int SIGNALARR_LENGTH = 6;
     std::vector<WifiSignalPollInfo> signalPollInfoArray;
     std::mutex signalInfoMutex;
     int64_t startTime_ = 0;

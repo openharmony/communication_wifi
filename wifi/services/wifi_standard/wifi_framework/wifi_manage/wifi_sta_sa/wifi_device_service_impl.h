@@ -65,6 +65,8 @@ public:
 
     ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
+    ErrCode SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList) override;
+
     ErrCode RemoveDevice(int networkId) override;
 
     ErrCode RemoveAllDevice() override;

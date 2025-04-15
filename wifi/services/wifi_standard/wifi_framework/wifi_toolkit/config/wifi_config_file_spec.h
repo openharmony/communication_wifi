@@ -138,6 +138,18 @@ std::string GetTClassName<WifiDeviceConfig>();
 template <>
 std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item);
 
+template <>
+std::string OutTClassString<WifiAccessInfo>(WifiAccessInfo &item);
+ 
+template <>
+std::string GetTClassName<WifiAccessInfo>();
+ 
+template <>
+void ClearTClass<WifiAccessInfo>(WifiAccessInfo &item);
+ 
+template <>
+int SetTClassKeyValue<WifiAccessInfo>(WifiAccessInfo &item, const std::string &key, const std::string &value);
+
 #ifndef OHOS_ARCH_LITE
 /**
  * @Description Clear and init WifiBackupConfig

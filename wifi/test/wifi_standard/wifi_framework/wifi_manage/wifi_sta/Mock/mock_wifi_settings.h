@@ -17,6 +17,7 @@
 
 #include "wifi_ap_msg.h"
 #include "wifi_msg.h"
+#include "wifi_errcode.h"
 #include <gmock/gmock.h>
 #include "wifi_internal_msg.h"
 
@@ -111,6 +112,19 @@ public:
     virtual int GetScanOnlySwitchState(int instId) = 0;
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual int SetMloWifiLinkedMaxSpeed(int instId = 0) = 0;
+    virtual ErrCode AddWifiWhiteListConfig(int uid, const WifiAccessInfo &WifiListInfo) = 0;
+    virtual ErrCode AddWifiBlockListConfig(int uid, const WifiAccessInfo &WifiListInfo) = 0;
+    virtual ErrCode ClearWifiBlockListConfig(int uid) = 0;
+    virtual ErrCode ClearWifiWhiteListConfig(int uid) = 0;
+    virtual bool FindWifiBlockListConfig(const std::string &ssid, const std::string &bssid, int instId = 0) = 0;
+    virtual bool FindWifiWhiteListConfig(const std::string &ssid, const std::string &bssid, int instId = 0) = 0;
+    virtual void InitWifiBlockListConfig() = 0;
+    virtual void InitWifiWhiteListConfig() = 0;
+    virtual void InitDefaultWifiBlockListConfig() = 0;
+    virtual void InitDefaultWifiWhiteListConfig() = 0;
+    virtual int SyncWifiBlockListConfig() = 0;
+    virtual int SyncWifiWhiteListConfig() = 0;
+    virtual bool WhetherSetWhiteListConfig() = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -122,6 +136,19 @@ public:
     MOCK_METHOD1(AddDeviceConfig, int(const WifiDeviceConfig &config));
     MOCK_METHOD1(RemoveDevice, int(int networkId));
     MOCK_METHOD0(ClearDeviceConfig, void());
+    MOCK_METHOD2(AddWifiBlockListConfig, ErrCode(int uid, const WifiAccessInfo &WifiListInfo));
+    MOCK_METHOD2(AddWifiWhiteListConfig, ErrCode(int uid, const WifiAccessInfo &WifiListInfo));
+    MOCK_METHOD1(ClearWifiBlockListConfig, ErrCode(int uid));
+    MOCK_METHOD1(ClearWifiWhiteListConfig, ErrCode(int uid));
+    MOCK_METHOD3(FindWifiBlockListConfig, bool(const std::string &ssid, const std::string &bssid, int instId));
+    MOCK_METHOD3(FindWifiWhiteListConfig, bool(const std::string &ssid, const std::string &bssid, int instId));
+    MOCK_METHOD0(InitWifiBlockListConfig, void());
+    MOCK_METHOD0(InitWifiWhiteListConfig, void());
+    MOCK_METHOD0(InitDefaultWifiBlockListConfig, void());
+    MOCK_METHOD0(InitDefaultWifiWhiteListConfig, void());
+    MOCK_METHOD0(SyncWifiBlockListConfig, int());
+    MOCK_METHOD0(SyncWifiWhiteListConfig, int());
+    MOCK_METHOD0(WhetherSetWhiteListConfig, bool());
     MOCK_METHOD2(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int));
     MOCK_METHOD3(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));
     MOCK_METHOD4(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt,

@@ -124,6 +124,17 @@ public:
     virtual ErrCode AddCandidateConfig(const int uid, const WifiDeviceConfig &config, int& netWorkId) = 0;
 
     /**
+     * @Description Add wifi block list and wifi white list
+     *
+     * @param config - WifiAccessInfo object
+     * @param result - the result of wifi access list
+     * @return ErrCode - operation result
+     */
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    virtual ErrCode SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList) = 0;
+#endif
+
+    /**
      * @Description Connect to a candidate specified network.
      *
      * @param uid - call app uid

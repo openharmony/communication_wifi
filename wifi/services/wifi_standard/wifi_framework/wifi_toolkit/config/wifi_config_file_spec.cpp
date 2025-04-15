@@ -547,6 +547,33 @@ std::string GetTClassName<WifiDeviceConfig>()
     return "WifiDeviceConfig";
 }
 
+template <>
+std::string GetTClassName<WifiAccessInfo>()
+{
+    return "WifiAccessInfo";
+}
+ 
+template <>
+int SetTClassKeyValue<WifiAccessInfo>(WifiAccessInfo &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "ssid") {
+        item.ssid = value;
+    } else if (key == "bssid") {
+        item.bssid = value;
+    } else if (key == "uid") {
+        std::string tmpValue = value;
+        item.uid = static_cast<int>(CheckDataLegal(tmpValue));
+    } else if (key == "WifiType") {
+        std::string tmpValue = value;
+        item.WifiType = static_cast<WifiAccessType>(CheckDataLegal(tmpValue));
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 static std::string OutPutEncryptionDeviceConfig(WifiDeviceConfig &item)
 {
@@ -569,6 +596,18 @@ static std::string OutPutEncryptionDeviceConfig(WifiDeviceConfig &item)
     return ss.str();
 }
 #endif
+
+static std::string OutPutWifiAccessListInfo(WifiAccessInfo &item)
+{
+    std::ostringstream ss;
+    ss << "    " << "<WifiAccessInfo>" << std::endl;
+    ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
+    ss << "    " << "bssid=" << item.bssid << std::endl;
+    ss << "    " << "WifiType=" << item.WifiType << std::endl;
+    ss << "    " << "uid=" << item.uid << std::endl;
+    ss << "    " << "</WifiAccessInfo>" << std::endl;
+    return ss.str();
+}
 
 static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 {
@@ -761,6 +800,24 @@ std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item)
        << OutPutWifiDeviceConfigPrivacy(item) << OutPutWifiWapiConfig(item)
        << OutPutLastDhcpResultsConfig(item);
     return ss.str();
+}
+
+template<>
+std::string OutTClassString<WifiAccessInfo> (WifiAccessInfo &item)
+{
+    std::ostringstream ss;
+    ss << OutPutWifiAccessListInfo(item);
+    return ss.str();
+}
+ 
+template <>
+void ClearTClass<WifiAccessInfo>(WifiAccessInfo &item)
+{
+    item.ssid.clear();
+    item.bssid.clear();
+    item.uid = 0;
+    item.WifiType = MDM_INVALIDLIST;
+    return;
 }
 
 template<>

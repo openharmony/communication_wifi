@@ -233,6 +233,10 @@ ohos_unittest("wifi_sta_unittest") {
     defines += [ "WIFI_DATA_REPORT_ENABLE" ]
   }
 
+  if (wifi_feature_wifiblocklist_wifiwhitelist_enable) {
+    defines += [ "FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT" ]
+  }
+
   defines += [
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     "private=public",

@@ -335,6 +335,10 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
+    if (wifi_feature_wifiblocklist_wifiwhitelist_enable) {
+      defines += [ "FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT" ]
+    }
+
     if (wifi_feature_dynamic_unload_sa) {
       defines += [ "DYNAMIC_UNLOAD_SA" ]
     }
@@ -581,6 +585,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_voicewifi_enable) {
       defines += [ "FEATURE_VOWIFI_SUPPORT" ]
+    }
+
+    if (wifi_feature_wifiblocklist_wifiwhitelist_enable) {
+      defines += [ "FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT" ]
     }
 
     if (defined(global_parts_info) &&

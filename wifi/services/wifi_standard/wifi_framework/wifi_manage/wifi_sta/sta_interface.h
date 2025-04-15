@@ -150,6 +150,16 @@ public:
      */
     virtual int AddDeviceConfig(const WifiDeviceConfig &config) override;
     /**
+     * @Description Add wifi block list and wifi white list
+     *
+     * @param config - WifiAccessInfo object
+     * @param result - the result of wifi access list
+     * @return ErrCode - operation result
+     */
+#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+    virtual ErrCode SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList) override;
+#endif
+    /**
      * @Description  Update a network to config
      *
      * @param config -The Network info(in)

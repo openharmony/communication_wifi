@@ -61,7 +61,7 @@ public:
      * @param code - network id  or disconnect reason[in]
      * @param bssid - bssid of the network [in]
      */
-    void OnConnectChangedCallBack(int status, int code, const std::string &bssid);
+    void OnConnectChangedCallBack(int status, int code, const std::string &bssid, int locallyGenerated);
 
     /**
      * @Description : Callback of the hilink trigger boardcast and wps.

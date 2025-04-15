@@ -44,8 +44,8 @@ ErrCode StaMonitor::InitStaMonitor()
     WIFI_LOGI("Enter InitStaMonitor.\n");
     using namespace std::placeholders;
     WifiEventCallback callBack = {
-        [this](int status, int code, const std::string &bssid) {
-            this->OnConnectChangedCallBack(status, code, bssid);
+        [this](int status, int code, const std::string &bssid, int locallyGenerated) {
+            this->OnConnectChangedCallBack(status, code, bssid, locallyGenerated);
         },
         [this](const std::string &reason, const std::string &bssid) { this->OnBssidChangedCallBack(reason, bssid); },
         [this](int status, const std::string &ssid) { this->OnWpaStateChangedCallBack(status, ssid); },
@@ -89,7 +89,7 @@ void StaMonitor::SetStateMachine(StaStateMachine *paraStaStateMachine)
     return;
 }
 
-void StaMonitor::OnConnectChangedCallBack(int status, int code, const std::string &bssid)
+void StaMonitor::OnConnectChangedCallBack(int status, int code, const std::string &bssid, int locallyGenerated)
 {
     WIFI_LOGI("OnConnectChangedCallBack status:%{public}d, code=%{public}d, bssid=%{public}s, instId=%{public}d",
         status, code, MacAnonymize(bssid).c_str(), m_instId);
@@ -116,6 +116,7 @@ void StaMonitor::OnConnectChangedCallBack(int status, int code, const std::strin
                 return;
             }
             msg->SetParam1(code);
+            msg->SetParam2(locallyGenerated);
             msg->AddStringMessageBody(bssid);
             pStaStateMachine->SendMessage(msg);
             break;

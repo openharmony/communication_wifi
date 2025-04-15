@@ -418,6 +418,8 @@ HWTEST_F(ApStartedState_test, SetConfig_004, TestSize.Level1)
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_CALL(WifiApHalInterface::GetInstance(), EnableAp(_))
         .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    EXPECT_CALL(WifiApHalInterface::GetInstance(), SetApPasswd(_, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
     EXPECT_FALSE(pApStartedState->SetConfig(apcfg));
 }
 

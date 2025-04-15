@@ -80,7 +80,7 @@ void WifiProInterface::DealStaConnChanged(OperateResState state, const WifiLinke
 
 void WifiProInterface::DealRssiLevelChanged(int32_t rssi, int32_t instId)
 {
-    WIFI_LOGI("Enter DealRssiLevelChanged");
+    WIFI_LOGD("Enter DealRssiLevelChanged");
     std::lock_guard<std::mutex> lock(mutex_);
     if (pWifiProService_ == nullptr) {
         WIFI_LOGI("pWifiProService is null");

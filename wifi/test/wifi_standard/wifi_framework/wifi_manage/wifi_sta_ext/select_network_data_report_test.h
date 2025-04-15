@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,33 +17,42 @@
 #define OHOS_SELECT_NETWORK_DATA_REPORT_TEST_H
 #include <gtest/gtest.h>
 #include "select_network_data_report.h"
+#include "wifi_crowdsourced_data.h"
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
 #include "wifi_settings.h"
 #include <gmock/gmock.h>
+#include "sta_state_machine.h"
 
 namespace OHOS {
 namespace Wifi {
 
+class MockStaStateMachine : public StaStateMachine {
+public:
+    explicit MockStaStateMachine(int instId = 0) : StaStateMachine(instId) {}
+};
+
 class WifiDataReportServiceTest : public testing::Test {
 public:
-    WifiDataReportServiceTest();
-    ~WifiDataReportServiceTest();
+    WifiDataReportServiceTest()
+        : mStaStateMachine(0), mWifiDataReportService_(mStaStateMachine, 0)
+    {}
+
+    ~WifiDataReportServiceTest() {}
 
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
+
     void SetUp() override
     {
-        mWifiDataReportService = &WifiDataReportService::GetInstance();
+        mWifiDataReportService_.InitReportApAllInfo();
     }
     void TearDown() override {}
 
-    WifiDataReportService* mWifiDataReportService;
+    MockStaStateMachine mStaStateMachine;
+    WifiDataReportService mWifiDataReportService_;
 };
-
-WifiDataReportServiceTest::WifiDataReportServiceTest() : mWifiDataReportService() {}
-WifiDataReportServiceTest::~WifiDataReportServiceTest() {}
 
 } // namespace Wifi
 } // namespace OHOS

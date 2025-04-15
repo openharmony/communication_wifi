@@ -44,7 +44,8 @@ static const HdiP2pWpaNetworkField g_hdiP2pWpaNetworkFields[] = {
     {GROUP_CONFIG_PAIRWISE, "pairwise", 1},
     {GROUP_CONFIG_AUTH_ALG, "auth_alg", 1},
     {GROUP_CONFIG_MODE, "mode", 1},
-    {GROUP_CONFIG_DISABLED, "disabled", 1}
+    {GROUP_CONFIG_DISABLED, "disabled", 1},
+    {GROUP_CONFIG_CLIENTLIST, "p2p_client_list", 1}
 };
 
 static struct IWpaCallback *g_hdiWpaP2pCallbackObj = NULL;
@@ -119,67 +120,18 @@ static WifiErrorNo AddP2pRandomMacFlag()
     return WIFI_HAL_OPT_OK;
 }
 
-bool GetOldMac(char *mac, int len)
-{
-    char line[BUFF_SIZE];
- 
-    FILE *fp = fopen(P2P_SUPPLICANT_PATH, "r");
-    if (fp == NULL) {
-        return false;
-    }
-    while (fgets(line, sizeof(line), fp) != NULL) {
-        if (strstr(line, PERSISENT_MAC_STRING) != NULL) {
-            if (memcpy_s(mac, len, line, strlen(line)) != EOK) {
-                fclose(fp);
-                return false;
-            }
-            fclose(fp);
-            return true;
-        }
-    }
-    if (fclose(fp) != 0) {
-        LOGE("close fp failed");
-    }
-    return false;
-}
- 
-void AppendMac(char *mac, int len)
-{
-    FILE *fp = fopen(P2P_SUPPLICANT_PATH, "a");
-    if (fp == NULL) {
-        LOGE("Error! Could not open file\n");
-        return;
-    }
-    if (fwrite("\n", sizeof(char), strlen("\n"), fp) == 0) {
-        LOGE("write \n faild");
-    }
-    if (fwrite(mac, sizeof(char), len, fp) == 0) {
-        LOGE("write mac faild");
-    }
-    if (fclose(fp) != 0) {
-        LOGE("close fp failed");
-    }
-}
-
 WifiErrorNo HdiWpaP2pStart(const char *ifaceName, const bool hasPersisentGroup)
 {
-    char persisentMac[PERSISENT_MAC_LEN] = {0};
-    bool hasPersisentMac = false;
-
     LOGI("HdiWpaP2pStart enter");
     if (SetHdiP2pIfaceName(ifaceName) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: set p2p iface name failed!");
         return WIFI_HAL_OPT_FAILED;
     }
-    if (hasPersisentGroup) {
-        hasPersisentMac = GetOldMac(persisentMac, PERSISENT_MAC_LEN);
-    }
-    if (CopyConfigFile("p2p_supplicant.conf") != WIFI_HAL_OPT_OK) {
-        LOGE("HdiWpaP2pStart: CopyConfigFile failed!");
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (hasPersisentMac) {
-        AppendMac(persisentMac, PERSISENT_MAC_LEN);
+    if (access(CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf", F_OK) == -1) {
+        if (CopyConfigFile("p2p_supplicant.conf") != WIFI_HAL_OPT_OK) {
+            LOGE("HdiWpaP2pStart: CopyConfigFile failed!");
+            return WIFI_HAL_OPT_FAILED;
+        }
     }
     if (HdiWpaStart() != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: HdiWpaStart failed!");
@@ -1011,7 +963,7 @@ static int hex2byte(const char *hex)
     if (b < 0) {
         return -1;
     }
-    return (a << HDI_POS_FOURTH) | b;
+    return (int)(((unsigned int)a << HDI_POS_FOURTH) | (unsigned int)b);
 }
 
 static char* hwaddr_parse(char *txt, uint8_t *addr)
@@ -1026,7 +978,7 @@ static char* hwaddr_parse(char *txt, uint8_t *addr)
             return NULL;
         txt += HDI_MAC_SUB_LEN;
         addr[i] = a;
-        if (i < ETH_ALEN - 1 && *txt++ != ':')
+        if (i < ETH_ALEN - 1 && (*txt++ != ':'))
             return NULL;
     }
     return txt;
@@ -1089,7 +1041,7 @@ WifiErrorNo HdiP2pHid2dConnect(struct Hid2dConnectInfo *info)
     wpsParam.bssidLen = ETH_ALEN;
     wpsParam.passphrase = (uint8_t *)info->passphrase;
     wpsParam.passphraseLen = strlen(info->passphrase) + 1;
-    wpsParam.frequency = (info->frequency << 16) | (info->isLegacyGo);
+    wpsParam.frequency = (int)(((unsigned int)(info->frequency) << HDI_POS_OT) | (unsigned int)(info->isLegacyGo));
     int32_t result = wpaObj->P2pHid2dConnect(wpaObj, GetHdiP2pIfaceName(), &wpsParam);
     if (result != HDF_SUCCESS) {
         LOGE("HdiP2pHid2dConnect: P2pHid2dConnect failed result:%{public}d", result);
@@ -1363,6 +1315,28 @@ WifiErrorNo HdiP2pReject(const char *bssid)
     }
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("HdiP2pReject success.");
+    return WIFI_HAL_OPT_OK;
+}
+
+WifiErrorNo HdiSetMiracastSinkConfig(const char *config)
+{
+    LOGI("HdiSetMiracastSinkConfig enter");
+    pthread_mutex_lock(GetWpaObjMutex());
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiSetMiracastSinkConfig: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, GetHdiP2pIfaceName(), P2P_SET_MIRACAST_SINK_CONFIG, 0, config);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiSetMiracastSinkConfig: send failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("HdiSetMiracastSinkConfig success.");
     return WIFI_HAL_OPT_OK;
 }
 #endif

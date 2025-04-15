@@ -156,6 +156,8 @@
         "OHOS::Wifi::WifiConfigCenter::GetWifiConnectFailListCache(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryConnectFailInfo, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, OHOS::Wifi::WifiCategoryConnectFailInfo>>>&)";
         "OHOS::Wifi::WifiConfigCenter::UpdateWifiConnectFailListCache(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryConnectFailInfo)";
         "OHOS::Wifi::WifiConfigCenter::RemoveWifiConnectFailListCache(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
+        "OHOS::Wifi::WifiConfigCenter::GetLocalOnlyHotspotConfig(OHOS::Wifi::HotspotConfig&)";
+        "OHOS::Wifi::WifiConfigCenter::SetLocalOnlyHotspotConfig(OHOS::Wifi::HotspotConfig const&)";
         "OHOS::Wifi::WifiScanConfig::GetScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
         "OHOS::Wifi::WifiScanConfig::SaveScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
         "OHOS::Wifi::WifiScanConfig::SetAppRunningState(OHOS::Wifi::ScanMode)";
@@ -400,6 +402,7 @@
         "OHOS::Wifi::WifiApHalInterface::SetSoftApConfig(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Wifi::HotspotConfig const&, int)";
         "OHOS::Wifi::WifiApHalInterface::SetMaxConnectNum(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, int)";
         "OHOS::Wifi::WifiApHalInterface::EnableAp(int)";
+        "OHOS::Wifi::WifiApHalInterface::SetApPasswd(char const*, int)";
         "OHOS::Wifi::WifiApHalInterface::AddBlockByMac(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::WifiApHalInterface::DelBlockByMac(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::WifiApHalInterface::DisAssociateSta(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
@@ -413,6 +416,7 @@
         "OHOS::Wifi::WifiCmdClient::SendCmdToDriver(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&) const";
         "OHOS::Wifi::ArpChecker::ArpChecker()";
         "OHOS::Wifi::ArpChecker::~ArpChecker()";
+        "OHOS::Wifi::WifiControllerMachine::IsLocalOnlyHotspot(bool)";
         "OHOS::Wifi::WifiControllerMachine::ShouldUseRpt(int)";
         "OHOS::Wifi::WifiSettings::SyncP2pVendorConfig()";
         "OHOS::Wifi::WifiSettings::AddRandomMac(OHOS::Wifi::WifiStoreRandomMac&)";

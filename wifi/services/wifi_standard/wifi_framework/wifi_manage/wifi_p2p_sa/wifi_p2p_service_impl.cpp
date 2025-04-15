@@ -43,6 +43,7 @@ std::mutex WifiP2pServiceImpl::instanceLock;
 std::mutex WifiP2pServiceImpl::g_p2pMutex;
 sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiP2pServiceImpl::GetInstance().GetRefPtr());
+static constexpr int MIRACAST_CONFIG_MAX_LEN = 512;
 
 sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::GetInstance()
 {
@@ -717,6 +718,11 @@ ErrCode WifiP2pServiceImpl::GetP2pEnableStatus(int &status)
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetP2pEnableStatus:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        status = static_cast<int>(P2pState::P2P_STATE_CLOSED);
+        return WIFI_OPT_SUCCESS;
     }
     status = WifiConfigCenter::GetInstance().GetP2pState();
     return WIFI_OPT_SUCCESS;
@@ -1552,6 +1558,33 @@ ErrCode WifiP2pServiceImpl::Hid2dIsWideBandwidthSupported(bool &isSupport)
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pServiceImpl::SetMiracastSinkConfig(const std::string& config)
+{
+    WIFI_LOGI("SetMiracastSinkConfig");
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("SetMiracastSinkConfig:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetMiracastSinkConfig:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (config.length() > MIRACAST_CONFIG_MAX_LEN) {
+        WIFI_LOGE("%{public}s config length %{public}zu illeage", __func__, config.length());
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->SetMiracastSinkConfig(config);
 }
 }  // namespace Wifi
 }  // namespace OHOS

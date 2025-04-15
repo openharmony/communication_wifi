@@ -33,6 +33,10 @@ namespace Wifi {
 #define COUNTRY_CODE_JAPAN_L "jp"
 #define COUNTRY_CODE_JAPAN_C "JP"
 #define SOFT_BUS_UID 1024
+
+std::map<int, int> g_listenSa = {{SOFTBUS_SERVER_SA_ID, SOFT_BUS_UID},
+    {MIRACAST_SERVICE_SA_ID, MIRACAST_SERVICE_UID}};
+
 WifiP2pService::WifiP2pService(P2pStateMachine &p2pStateMachine, WifiP2pDeviceManager &setDeviceMgr,
     WifiP2pGroupManager &setGroupMgr, WifiP2pServiceManager &setSvrMgr)
     : p2pStateMachine(p2pStateMachine),
@@ -409,16 +413,17 @@ ErrCode WifiP2pService::HandleBusinessSAException(int systemAbilityId)
         return WIFI_OPT_SUCCESS;
     }
     int callingUid = -1;
-    if (systemAbilityId != SOFTBUS_SERVER_SA_ID) {
+    if (g_listenSa.find(systemAbilityId) == g_listenSa.end()) {
         return WIFI_OPT_INVALID_PARAM;
     }
     SharedLinkManager::GetGroupUid(callingUid);
-    if (callingUid == SOFT_BUS_UID) {
+    if (callingUid == g_listenSa[systemAbilityId]) {
         SharedLinkManager::DecreaseSharedLink(callingUid);
         RemoveGroup();
         return WIFI_OPT_SUCCESS;
+    } else {
+        SharedLinkManager::ClearUidCount(g_listenSa[systemAbilityId]);
     }
-    SharedLinkManager::DecreaseSharedLink(callingUid);
     if (SharedLinkManager::GetSharedLinkCount() == 0) {
         RemoveGroup();
     }
@@ -516,6 +521,14 @@ void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept)
     } else {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
     }
+}
+
+ErrCode WifiP2pService::SetMiracastSinkConfig(const std::string& config)
+{
+    WIFI_LOGI("SetMiracastSinkConfig");
+    const std::any info = config;
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_MIRACAST_SINK_CONFIG), info);
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

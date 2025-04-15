@@ -836,6 +836,14 @@ public:
     WifiErrorNo EnableAp(int id = 0);
 
     /**
+     * @Description SetApPasswd Softap.
+     *
+     * @param pass
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetApPasswd(const char *pass, int id = 0);
+
+    /**
      * @Description register callback for death recipient of native process
      *
      * @param id
@@ -855,6 +863,8 @@ public:
     WifiErrorNo GetMloSignalPollInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
 
     WifiErrorNo P2pReject(const std::string &mac);
+
+    WifiErrorNo SetMiracastSinkConfig(const std::string& config);
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

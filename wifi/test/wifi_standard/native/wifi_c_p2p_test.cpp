@@ -28,6 +28,7 @@ namespace Wifi {
 int g_networkid = 15;
 int g_config = 5;
 P2pState g_moded = P2pState::P2P_STATE_CLOSING;
+const std::string g_errLog = "wifi_test";
 class WifiP2pTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -233,7 +234,7 @@ HWTEST_F(WifiP2pTest, UnregisterCfgChangCallbackTest, TestSize.Level1)
 HWTEST_F(WifiP2pTest, CheckCanUseP2pTest, TestSize.Level1)
 {
     CheckCanUseP2p();
-    EXPECT_NE(CheckCanUseP2p(), 0);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 }
 }

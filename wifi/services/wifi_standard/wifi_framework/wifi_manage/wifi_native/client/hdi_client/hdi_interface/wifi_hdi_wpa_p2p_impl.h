@@ -23,6 +23,7 @@
 enum P2pRemoveGroupEvent {
     P2P_REMOVE_GROUP_CLIENT = 0,
     P2P_REJECT,
+    P2P_SET_MIRACAST_SINK_CONFIG,
     EVENT_MAX,
 };
 
@@ -129,6 +130,8 @@ WifiErrorNo HdiDeliverP2pData(int32_t cmdType, int32_t dataType, const char *car
 void ReleaseP2pCallback(void);
 
 WifiErrorNo HdiP2pReject(const char *bssid);
+
+WifiErrorNo HdiSetMiracastSinkConfig(const char *config);
 #ifdef __cplusplus
 }
 #endif

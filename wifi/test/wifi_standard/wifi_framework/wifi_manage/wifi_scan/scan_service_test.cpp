@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 #include "mock_wifi_manager.h"
 #include "mock_wifi_config_center.h"
-#include "mock_wifi_settings.h"
 #include "mock_scan_state_machine.h"
 #include <log.h>
 
@@ -35,7 +34,6 @@ namespace Wifi {
 constexpr int FREQ_2_DOT_4_GHZ = 2450;
 constexpr int FREQ_5_GHZ = 5200;
 constexpr int TWO = 2;
-constexpr int THREE = 3;
 constexpr int FOUR = 4;
 constexpr int FAILEDNUM = 6;
 constexpr int STANDER = 5;
@@ -80,12 +78,8 @@ public:
         std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
         std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
-        EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadMovingFreezePolicy())
-            .WillRepeatedly(Return(defaultValue));
         pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback());
     }
 
@@ -94,13 +88,9 @@ public:
         std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
         std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
         ChannelsTable temp = { { BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel } };
-        EXPECT_CALL(WifiSettings::GetInstance(), GetSupportHwPnoFlag(_)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanControlInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).Times(AtLeast(1));
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), ReloadTrustListPolicies())
-            .WillRepeatedly(Return(refVecTrustList));
         pScanService->InitScanService(WifiManager::GetInstance().GetScanCallback());
     }
 
@@ -114,7 +104,6 @@ public:
     void HandleScanStatusReportSuccess1()
     {
         EXPECT_CALL(WifiManager::GetInstance(), DealScanOpenRes(_)).Times(AtLeast(1));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         ScanStatusReport scanStatusReport;
         scanStatusReport.status = SCAN_STARTED_STATUS;
@@ -199,9 +188,6 @@ public:
 
     void HandleInnerEventReportSuccess3()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_)).Times(AtLeast(0));
         ScanInnerEventType innerEvent;
         innerEvent = RESTART_PNO_SCAN_TIMER;
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
@@ -224,9 +210,6 @@ public:
     void ScanFail()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(THREE)
-            .WillOnce(Return(1))
-            .WillOnce(Return(0));
         pScanService->scanStartedFlag = true;
         EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_EXTERN) == WIFI_OPT_SUCCESS);
         EXPECT_TRUE(pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN) == WIFI_OPT_SUCCESS);
@@ -236,7 +219,6 @@ public:
 
     void ScanWithParamSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(true));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(1));
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
@@ -270,7 +252,6 @@ public:
 
     void ScanWithParamFail4()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(false));
         pScanService->scanStartedFlag = true;
         WifiScanParams params;
         params.band = SCAN_BAND_UNSPECIFIED;
@@ -526,18 +507,13 @@ public:
         cfg.isPasspoint = false;
         cfg.isEphemeral = false;
         results.push_back(cfg);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(results), Return(0)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_));
         pScanService->BeginPnoScan();
     }
 
     void BeginPnoScanFail1()
     {
         pScanService->isPnoScanBegined = false;
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveScanInfoList(_)).WillRepeatedly(Return(0));
         EXPECT_EQ(false, pScanService->BeginPnoScan());
     }
@@ -670,8 +646,6 @@ public:
 
     void SystemScanProcessSuccess2()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_)).Times(AtLeast(0));
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->SystemScanProcess(true);
     }
@@ -784,15 +758,11 @@ public:
 
     void RestartPnoScanTimeOutSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_)).Times(AtLeast(0));
         pScanService->RestartPnoScanTimeOut();
     }
 
     void RestartPnoScanTimeOutFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi2Dot4Ghz(_)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), GetMinRssi5Ghz(_)).Times(AtLeast(0));
         pScanService->pnoScanFailedNum = FAILEDNUM;
         pScanService->RestartPnoScanTimeOut();
     }
@@ -1089,21 +1059,18 @@ public:
 
     void GetSavedNetworkSsidListSuccess()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(0));
         std::vector<std::string> savedNetworkSsid;
         EXPECT_EQ(true, pScanService->GetSavedNetworkSsidList(savedNetworkSsid));
     }
 
     void GetSavedNetworkSsidListFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
         std::vector<std::string> savedNetworkSsid;
         EXPECT_EQ(true, pScanService->GetSavedNetworkSsidList(savedNetworkSsid));
     }
 
     void GetHiddenNetworkSsidListSuccess1()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(0));
         std::vector<std::string> hiddenNetworkSsid;
         EXPECT_EQ(true, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
     }
@@ -1114,15 +1081,12 @@ public:
         WifiDeviceConfig cfg;
         cfg.hiddenSSID = true;
         deviceConfigs.push_back(cfg);
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _))
-            .WillRepeatedly(DoAll(SetArgReferee<0>(deviceConfigs), Return(0)));
         std::vector<std::string> hiddenNetworkSsid;
         EXPECT_EQ(true, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
     }
 
     void GetHiddenNetworkSsidListFail()
     {
-        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).WillRepeatedly(Return(-1));
         std::vector<std::string> hiddenNetworkSsid;
         EXPECT_EQ(true, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
     }
@@ -1911,6 +1875,7 @@ HWTEST_F(ScanServiceTest, UnInitScanServiceSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleScanStatusReportSuccess1, TestSize.Level1)
 {
     HandleScanStatusReportSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleScanStatusReportSuccess2, TestSize.Level1)
@@ -1953,6 +1918,7 @@ HWTEST_F(ScanServiceTest, HandleScanStatusReportFail, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess1, TestSize.Level1)
 {
     HandleInnerEventReportSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleInnerEventReportSuccess2, TestSize.Level1)
@@ -2224,16 +2190,19 @@ HWTEST_F(ScanServiceTest, HandleStaStatusChangedSuccess2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleStaStatusChangedFail, TestSize.Level1)
 {
     HandleStaStatusChangedFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleCustomStatusChangedSuccess1, TestSize.Level1)
 {
     HandleCustomStatusChangedSuccess1();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, HandleCustomStatusChangedSuccess2, TestSize.Level1)
 {
     HandleCustomStatusChangedSuccess2();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, SystemScanProcessSuccess1, TestSize.Level1)
@@ -2355,11 +2324,13 @@ HWTEST_F(ScanServiceTest, HandleDisconnectedScanTimeoutFail2, TestSize.Level1)
 HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutSuccess, TestSize.Level1)
 {
     RestartPnoScanTimeOutSuccess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, RestartPnoScanTimeOutFail, TestSize.Level1)
 {
     RestartPnoScanTimeOutFail();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(ScanServiceTest, GetScanControlInfoSuccess, TestSize.Level1)

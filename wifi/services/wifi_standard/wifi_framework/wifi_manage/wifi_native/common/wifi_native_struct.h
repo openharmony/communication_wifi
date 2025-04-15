@@ -204,6 +204,7 @@ struct HalP2pGroupConfig {
     std::string keyMgmt;
     std::string pairwise;
     std::string authAlg;
+    std::string clientList;
     int mode;
     int disabled;
 
@@ -213,6 +214,7 @@ struct HalP2pGroupConfig {
           keyMgmt("WPA-PSK"),
           pairwise("CCMP"),
           authAlg("OPEN"),
+          clientList(""),
           mode(0),
           disabled(0)
     {}

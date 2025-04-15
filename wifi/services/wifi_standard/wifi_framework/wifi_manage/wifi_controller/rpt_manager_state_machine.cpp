@@ -492,7 +492,8 @@ void RptManagerMachine::BroadcastApState(int apState)
     cbMsg.id = mid;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::string msg = std::string("OnHotspotStateChanged") + std::string("id = ") + std::to_string(mid);
-    WifiCommonEventHelper::PublishHotspotStateChangedEvent(apState, msg);
+    WifiCommonEventHelper::PublishHotspotStateChangedEvent("HotspotMode",
+        static_cast<int>(HotspotMode::RPT), apState, msg);
 }
 
 void RptManagerMachine::BroadcastStationJoin(std::string mac)

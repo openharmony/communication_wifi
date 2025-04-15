@@ -236,6 +236,37 @@ public:
      */
     ErrCode GetApIfaceName(std::string& ifaceName) override;
 
+    /**
+     * @Description Enable local only Hotspot
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableLocalOnlyHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+ 
+    /**
+     * @Description Disable local only Hotspot
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    ErrCode DisableLocalOnlyHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+ 
+    /**
+     * @Description Get local only Hotspot mode
+     *
+     * @param mode - hotspot mode
+     * @return ErrCode - operation result
+     */
+    ErrCode GetHotspotMode(HotspotMode &mode) override;
+ 
+    /**
+     * @Description Get the LocalOnly Hotspot State object
+     *
+     * @param config - Current hotspot configuration
+     * @return ErrCode - operation result
+     */
+    ErrCode GetLocalOnlyHotspotConfig(HotspotConfig &config) override;
 private:
     bool GetWifiHotspotProxy();
     std::atomic<int> systemAbilityId_;

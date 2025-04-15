@@ -54,6 +54,7 @@ public:
     ErrCode CreateRptGroup(const WifiP2pConfig &config);
     ErrCode GetRptStationsList(std::vector<StationInfo> &result);
     void NotifyWscDialogConfirmResult(bool isAccept);
+    ErrCode SetMiracastSinkConfig(const std::string& config);
 
 public:
     IP2pServiceCallbacks mCallback;

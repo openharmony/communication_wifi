@@ -48,6 +48,7 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
@@ -105,6 +106,7 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_service",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
@@ -124,7 +126,6 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "ipc:ipc_single",
-    "jsoncpp:jsoncpp",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
     "netmanager_base:net_stats_manager_if",
@@ -134,10 +135,6 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "time_service:time_client",
     "window_manager:libdm_lite",
   ]
-
-  if (wifi_feature_with_data_report) {
-    defines += [ "WIFI_DATA_REPORT_ENABLE" ]
-  }
 
   part_name = "wifi"
   subsystem_name = "communication"

@@ -247,6 +247,14 @@ WifiErrorCode DisableRandomMac(int setmode);
  */
 WifiErrorCode CheckCanUseP2p();
 
+/**
+ * @Description Set miracast sink config
+ *
+ * @param config - miracast config
+ * @return WifiErrorCode - operation result
+ */
+WifiErrorCode SetMiracastSinkConfig(const char* config);
+
 #ifdef __cplusplus
 }
 #endif

@@ -151,7 +151,6 @@ Wifi2WifiQoeSlowIntegrator::Wifi2WifiQoeSlowIntegrator() : CompositeNetworkSelec
     andFilters->AddFilter(make_shared<NotP2pFreqAt5gFilter>());
     andFilters->AddFilter(make_shared<SignalLevelFilter>());
     andFilters->AddFilter(make_shared<WifiSwitchThresholdQoeFilter>());
-    andFilters->AddFilter(make_shared<WifiSwitch5GNot2GFilter>());
     andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
     SetWifiFilter(andFilters);
  

@@ -56,7 +56,6 @@ const int64_t ONE_DAY_TIME_SECONDS = 24 * 60 * 60;
 
 #define DNS_IP_ADDR_LEN 15
 #define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
-constexpr const char* WIFI_IS_TX_RX_GOOD = "persist.wifi.is_tx_rx_good";
 
 constexpr int FUZZY_BSSID_MAX_MATCH_CNT = 30;
 

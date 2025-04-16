@@ -59,7 +59,6 @@ if (defined(ohos_lite)) {
       "hilog_lite:hilog_shared",
       "openssl:libcrypto_shared",
       "openssl:libssl_shared",
-      "samgr:samgr_proxy",
     ]
 
     configs -= [ "//build/lite/config:language_cpp" ]

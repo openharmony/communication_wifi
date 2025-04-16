@@ -152,12 +152,12 @@ public:
     /**
      * @Description Add wifi block list and wifi white list
      *
-     * @param config - WifiAccessInfo object
+     * @param config - WifiRestrictedInfo object
      * @param result - the result of wifi access list
      * @return ErrCode - operation result
      */
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-    virtual ErrCode SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList) override;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
 #endif
     /**
      * @Description  Update a network to config

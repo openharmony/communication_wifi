@@ -48,7 +48,7 @@
         GetDeviceConfigs;
         GetDeviceConfig;
         RemoveDevice;
-        SetWifiAccessList;
+        SetWifiRestrictedList;
         AllowAutoConnect;
         DisableDeviceConfig;
         EnableDeviceConfig;

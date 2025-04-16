@@ -726,66 +726,66 @@ HWTEST_F(WifiSettingsTest, GetDefaultApSsidTest, TestSize.Level1)
     EXPECT_EQ(ifValidSsid, true);
 }
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
 HWTEST_F(WifiSettingsTest, AddWifiBlockListConfigTest, TestSize.Level1)
 {
     WIFI_LOGE("AddWifiBlockListConfigTest enter!");
-    WifiAccessInfo info;
+    WifiRestrictedInfo info;
     info.ssid = "blockTest1";
     info.bssid = "blockTest_bssid_1";
-    info.WifiType = MDM_BLOCKLIST;
+    info.wifiRestrictedType = MDM_BLOCKLIST;
     info.uid = 0;
  
-    ErrCode result = WifiSettings::GetInstance().AddWifiBlockListConfig(info.uid, info);
+    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
  
 HWTEST_F(WifiSettingsTest, AddWifiBlockListConfigFailTest, TestSize.Level1)
 {
     WIFI_LOGE("AddWifiBlockListConfigFailTest enter!");
-    WifiAccessInfo info;
+    WifiRestrictedInfo info;
     info.ssid = "";
     info.bssid = "111";
-    info.WifiType = MDM_BLOCKLIST;
+    info.wifiRestrictedType = MDM_BLOCKLIST;
     info.uid = 0;
  
-    ErrCode result = WifiSettings::GetInstance().AddWifiBlockListConfig(info.uid, info);
+    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
     EXPECT_EQ(result, WIFI_OPT_INVALID_PARAM);
 }
  
 HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigTest, TestSize.Level1)
 {
-    WIFI_LOGE("AddWifiBlockListConfigTest enter!");
-    WifiAccessInfo info;
+    WIFI_LOGE("AddWifiWhiteListConfigTest enter!");
+    WifiRestrictedInfo info;
     info.ssid = "whiteTest1";
     info.bssid = "whiteTest_bssid_1";
-    info.WifiType = MDM_WHITELIST;
+    info.wifiRestrictedType = MDM_WHITELIST;
     info.uid = 0;
  
-    ErrCode result = WifiSettings::GetInstance().AddWifiWhiteListConfig(info.uid, info);
+    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
  
 HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigFailTest, TestSize.Level1)
 {
-    WIFI_LOGE("AddWifiBlockListConfigFailTest enter!");
-    WifiAccessInfo info;
+    WIFI_LOGE("AddWifiWhiteListConfigFailTest enter!");
+    WifiRestrictedInfo info;
     info.ssid = "whiteTest2";
     info.bssid = "";
-    info.WifiType = MDM_WHITELIST;
+    info.wifiRestrictedType = MDM_WHITELIST;
     info.uid = 0;
  
-    ErrCode result = WifiSettings::GetInstance().AddWifiWhiteListConfig(info.uid, info);
+    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
     EXPECT_EQ(result, WIFI_OPT_INVALID_PARAM);
 }
  
 HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
 {
     WIFI_LOGE("FindWifiBlockListConfigTest enter!");
-    WifiAccessInfo info;
+    WifiRestrictedInfo info;
     info.ssid = "blockTest1";
     info.bssid = "blockTest_bssid_1";
-    info.WifiType = MDM_BLOCKLIST;
+    info.wifiRestrictedType = MDM_BLOCKLIST;
     info.uid = 0;
  
     bool result = WifiSettings::GetInstance().FindWifiBlockListConfig(info.ssid, info.bssid, info.uid);
@@ -801,10 +801,10 @@ HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
 HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
 {
     WIFI_LOGE("FindWifiWhiteListConfigTest enter!");
-    WifiAccessInfo info;
+    WifiRestrictedInfo info;
     info.ssid = "whiteTest1";
     info.bssid = "whiteTest_bssid_1";
-    info.WifiType = MDM_WHITELIST;
+    info.wifiRestrictedType = MDM_WHITELIST;
     info.uid = 0;
  
     bool result = WifiSettings::GetInstance().FindWifiWhiteListConfig(info.ssid, info.bssid, info.uid);
@@ -824,7 +824,7 @@ HWTEST_F(WifiSettingsTest, whetherSetWhiteListConfigTest, TestSize.Level1)
     bool result = WifiSettings::GetInstance().WhetherSetWhiteListConfig();
     EXPECT_EQ(result, true);
  
-    WifiSettings::GetInstance().ClearWifiWhiteListConfig(0);
+    WifiSettings::GetInstance().ClearWifiRestrictedListConfig(0);
  
     result = WifiSettings::GetInstance().WhetherSetWhiteListConfig();
     EXPECT_EQ(result, false);

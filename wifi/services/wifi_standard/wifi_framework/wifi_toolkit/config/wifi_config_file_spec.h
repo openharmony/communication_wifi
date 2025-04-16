@@ -139,16 +139,16 @@ template <>
 std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item);
 
 template <>
-std::string OutTClassString<WifiAccessInfo>(WifiAccessInfo &item);
+std::string OutTClassString<WifiRestrictedInfo>(WifiRestrictedInfo &item);
  
 template <>
-std::string GetTClassName<WifiAccessInfo>();
+std::string GetTClassName<WifiRestrictedInfo>();
  
 template <>
-void ClearTClass<WifiAccessInfo>(WifiAccessInfo &item);
+void ClearTClass<WifiRestrictedInfo>(WifiRestrictedInfo &item);
  
 template <>
-int SetTClassKeyValue<WifiAccessInfo>(WifiAccessInfo &item, const std::string &key, const std::string &value);
+int SetTClassKeyValue<WifiRestrictedInfo>(WifiRestrictedInfo &item, const std::string &key, const std::string &value);
 
 #ifndef OHOS_ARCH_LITE
 /**

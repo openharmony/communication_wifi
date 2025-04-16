@@ -127,11 +127,11 @@ public:
     /**
      * @Description Add wifi block list and wifi white list
      *
-     * @param config - WifiAccessInfo object
+     * @param config - WifiRestrictedInfo object
      * @param result - the result of wifi access list
      * @return ErrCode - operation result
      */
-    ErrCode SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList) override;
+    ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
 
     /**
      * @Description Remove the wifi device config equals to input network id
@@ -697,7 +697,7 @@ private:
     void ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info);
     void ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos);
     void WriteDeviceConfig(const WifiDeviceConfig &config, MessageParcel &data);
-    void WriteWifiAccessInfo(const WifiAccessInfo &info, MessageParcel &data);
+    void WriteWifiRestrictedInfo(const WifiRestrictedInfo &info, MessageParcel &data);
     void ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result);
     void ParseMultiLinkedInfo(MessageParcel &reply, std::vector<WifiLinkedInfo> &result);
     void ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config);

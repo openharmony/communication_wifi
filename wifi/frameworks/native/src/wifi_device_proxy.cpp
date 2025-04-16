@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int MAX_SIZE = 256;
-constexpr int MAX_MDM_BLOCKWHITELIST_SIZE = 200;
+constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
 int g_bigDataRecvLen = 0;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
@@ -314,12 +314,12 @@ ErrCode WifiDeviceProxy::IsHeldWifiProtectRef(
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiDeviceProxy::WriteWifiAccessInfo(const WifiAccessInfo &info, MessageParcel &data)
+void WifiDeviceProxy::WriteWifiRestrictedInfo(const WifiRestrictedInfo &info, MessageParcel &data)
 {
     data.WriteString(info.ssid);
     data.WriteString(info.bssid);
     data.WriteInt32(info.uid);
-    data.WriteInt32(static_cast<int32_t>(info.WifiType));
+    data.WriteInt32(static_cast<int32_t>(info.wifiRestrictedType));
 }
 
 void WifiDeviceProxy::WriteIpAddress(MessageParcel &data, const WifiIpAddress &address)
@@ -564,9 +564,9 @@ ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiDeviceProxy::SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList)
+ErrCode WifiDeviceProxy::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
 {
-    WIFI_LOGI("wifi_device_proxy:: SetWifiAccessList");
+    WIFI_LOGI("wifi_device_proxy:: SetWifiRestrictedList");
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -579,14 +579,14 @@ ErrCode WifiDeviceProxy::SetWifiAccessList(const std::vector<WifiAccessInfo> &wi
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    int size = static_cast<int>(wifiAccessList.size());
-    if (size > MAX_MDM_BLOCKWHITELIST_SIZE) {
-        WIFI_LOGE("SetWifiAccessList size error: %{public}d", size);
+    int size = static_cast<int>(wifiRestrictedInfoList.size());
+    if (size > MAX_MDM_RESTRICTED_SIZE) {
+        WIFI_LOGE("SetWifiRestrictedList size error: %{public}d", size);
         return WIFI_OPT_MDM_OUT_MAX_NUM;
     }
     data.WriteInt32(size);
     for (int i = 0; i < size; i++) {
-        WriteWifiAccessInfo(wifiAccessList[i], data);
+        WriteWifiRestrictedInfo(wifiRestrictedInfoList[i], data);
     }
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_WIFI_ACCESS_LIST),
         data, reply, option);
@@ -1422,7 +1422,7 @@ ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
         return ErrCode(ret);
     }
     int tempReason = reply.ReadInt32();
-    if (tempReason >= 0 && tempReason <= (int)DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL) {
+    if (tempReason >= 0 && tempReason < static_cast<int>(DisconnectedReason::DISC_REASON_MAX_VALUE)) {
         reason = (DisconnectedReason)tempReason;
     } else {
         reason = DisconnectedReason::DISC_REASON_DEFAULT;

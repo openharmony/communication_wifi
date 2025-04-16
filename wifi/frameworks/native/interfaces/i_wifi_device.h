@@ -649,11 +649,11 @@ public:
     /**
      * @Description Add wifi block list and wifi white list
      *
-     * @param config - WifiAccessInfo object
+     * @param config - WifiRestrictedInfo object
      * @param result - the result of wifi access list
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList) = 0;
+    virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

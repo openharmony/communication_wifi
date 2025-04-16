@@ -501,23 +501,19 @@ bool StaStateMachine::InitState::AllowAutoConnect()
     return true;
 }
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-bool StaStateMachine::InitState::StopByBlockList(WifiDeviceConfig &config)
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+bool StaStateMachine::InitState::RestrictedByMdm(WifiDeviceConfig &config)
 {
-    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, 0)) {
-        pStaStateMachine->DealMDMBlockWhiteListConnect(config);
+    WIFI_LOGI("Enter RestrictedByMdm");
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, config.bssid, 0)) {
+        pStaStateMachine->DealMdmRestrictedConnect(config);
         return true;
     }
-    return false;
-}
-
-bool StaStateMachine::InitState::StopByWhiteList(WifiDeviceConfig &config)
-{
     if (!WifiSettings::GetInstance().WhetherSetWhiteListConfig() || config.bssid.empty()) {
         return false;
     }
     if (!WifiSettings::GetInstance().FindWifiWhiteListConfig(config.ssid, config.bssid, 0)) {
-        pStaStateMachine->DealMDMBlockWhiteListConnect(config);
+        pStaStateMachine->DealMdmRestrictedConnect(config);
         return true;
     }
     return false;
@@ -565,8 +561,8 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         return;
     }
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-    if (StopByBlockList(config) || StopByWhiteList(config)) {
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (RestrictedByMdm(config)) {
         return;
     }
 #endif
@@ -1409,19 +1405,16 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
         pStaStateMachine->m_instId) != 0) {
         WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", pStaStateMachine->linkedInfo.networkId);
         return;
     }
-    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, config.bssid) ||
-        (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
-        !WifiSettings::GetInstance().FindWifiWhiteListConfig(config.ssid, config.bssid))) {
-            pStaStateMachine->DealMDMBlockWhiteListConnect(config);
-            pStaStateMachine->StartDisConnectToNetwork();
-            return;
+    if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, true)) {
+        pStaStateMachine->DealMdmRestrictedConnect(config);
+        return;
     }
 #endif
     /* BSSID change is not received during roaming, only set BSSID */
@@ -2704,13 +2697,10 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
     WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-    if (WifiSettings::GetInstance().FindWifiBlockListConfig(deviceConfig.ssid, deviceConfig.bssid) ||
-        (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
-        !WifiSettings::GetInstance().FindWifiWhiteListConfig(deviceConfig.ssid, deviceConfig.bssid))) {
-            DealMDMBlockWhiteListConnect(deviceConfig);
-            StartDisConnectToNetwork();
-            return;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (WhetherRestrictedByMdm(deviceConfig.ssid, deviceConfig.bssid, true)) {
+        DealMdmRestrictedConnect(deviceConfig);
+        return;
     }
 #endif
 
@@ -4423,16 +4413,37 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     }
 }
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-void StaStateMachine::DealMDMBlockWhiteListConnect(WifiDeviceConfig &config)
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+void StaStateMachine::DealMdmRestrictedConnect(WifiDeviceConfig &config)
 {
+    WIFI_LOGI("WIFI Disconnect by MdmRestricted");
     SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
         DisabledReason::DISABLED_BY_WIFI_MANAGER);
     AddRandomMacCure();
     InvokeOnStaConnChanged(OperateResState::CONNECT_ENABLE_NETWORK_FAILED,
         linkedInfo);
-    SwitchState(pSeparatedState);
+    StartDisConnectToNetwork();
+}
+
+bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBsssid)
+{
+    if (checkBssid) {
+        return WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0) ||
+        (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
+        !WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid, 0));
+    } else {
+        if (WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0)) {
+            return true;
+        }
+        if (!WifiSettings::GetInstance().WhetherSetWhiteListConfig() || bssid.empty()) {
+            return false;
+        }
+        if (!WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid)) {
+            return true;
+        }
+        return false;
+    }
 }
 #endif
 
@@ -4442,13 +4453,13 @@ void StaStateMachine::StartConnectToBssid(const int32_t networkId, std::string b
     if (msg == nullptr) {
         return;
     }
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
         WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", networkId);
         return;
     }
-    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, 0)) {
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, config.bssid, 0)) {
         return;
     }
     if (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&

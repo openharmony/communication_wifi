@@ -216,13 +216,13 @@ int StaInterface::AddDeviceConfig(const WifiDeviceConfig &config)
     return pStaService->AddDeviceConfig(config);
 }
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-ErrCode StaInterface::SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList)
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+ErrCode StaInterface::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
 {
-    LOGI("Enter SetWifiAccessList.\n");
+    LOGI("Enter SetWifiRestrictedList.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->SetWifiAccessList(wifiAccessList) != WIFI_OPT_SUCCESS) {
+    if (pStaService->SetWifiRestrictedList(wifiRestrictedInfoList) != WIFI_OPT_SUCCESS) {
         LOGE("RemoveDeviceConfig failed.\n");
         return WIFI_OPT_FAILED;
     }

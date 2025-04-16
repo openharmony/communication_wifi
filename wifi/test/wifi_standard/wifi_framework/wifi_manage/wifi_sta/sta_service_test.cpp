@@ -116,8 +116,8 @@ public:
     void StaServiceSetPowerModeTest();
     void StaServiceOnSystemAbilityChangedTest();
     void StaServiceStartPortalCertificationTest();
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-    void StaServiceSetWifiAccessListSuccess();
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    void StaServiceSetWifiRestrictedListSuccess();
 #endif
     void DisableAutoJoin();
     void EnableAutoJoin();
@@ -409,25 +409,25 @@ void StaServiceTest::StaServiceRemoveDeviceConfigFail2()
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
 }
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-void StaServiceTest::StaServiceSetWifiAccessListSuccess()
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+void StaServiceTest::StaServiceSetWifiRestrictedListSuccess()
 {
-    std::vector<WifiAccessInfo> wifiAccessList;
-    WifiAccessInfo blackInfo;
+    std::vector<WifiRestrictedInfo> wifiRestrictedInfoList;
+    WifiRestrictedInfo blackInfo;
     blackInfo.ssid = "testBlock1";
     blackInfo.bssid = "testBlock_bssid";
     blackInfo.uid = 0;
-    blackInfo.WifiType = MDM_BLOCKLIST;
-    wifiAccessList.push_back(blackInfo);
+    blackInfo.wifiRestrictedType = MDM_BLOCKLIST;
+    wifiRestrictedInfoList.push_back(blackInfo);
  
-    WifiAccessInfo whiteInfo;
+    WifiRestrictedInfo whiteInfo;
     whiteInfo.ssid = "testWhite";
     whiteInfo.bssid = "testWhite_bssid";
     whiteInfo.uid = 0;
-    whiteInfo.WifiType = MDM_WHITELIST;
-    wifiAccessList.push_back(whiteInfo);
+    whiteInfo.wifiRestrictedType = MDM_WHITELIST;
+    wifiRestrictedInfoList.push_back(whiteInfo);
  
-    EXPECT_TRUE(pStaService->SetWifiAccessList(wifiAccessList) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->SetWifiRestrictedList(wifiRestrictedInfoList) == WIFI_OPT_SUCCESS);
 }
 #endif
 
@@ -1003,10 +1003,10 @@ HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigSuccess, TestSize.Level0)
     StaServiceEnableDeviceConfigSuccess();
 }
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-HWTEST_F(StaServiceTest, StaServiceSetWifiAccessListSuccess, TestSize.Level0)
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+HWTEST_F(StaServiceTest, StaServiceSetWifiRestrictedListSuccess, TestSize.Level0)
 {
-    StaServiceSetWifiAccessListSuccess();
+    StaServiceSetWifiRestrictedListSuccess();
 }
 #endif
 

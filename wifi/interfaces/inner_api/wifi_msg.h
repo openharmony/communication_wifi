@@ -77,7 +77,7 @@ inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
 inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 
-enum WifiAccessType {
+enum WifiRestrictedType {
     MDM_BLOCKLIST = 0,
     MDM_WHITELIST = 1,
     MDM_INVALID_LIST = 2
@@ -322,7 +322,7 @@ struct WifiLinkedInfo {
 struct WifiRestrictedInfo {
     std::string ssid;
     std::string bssid;
-    WifiAccessType wifiRestrictedType;
+    WifiRestrictedType wifiRestrictedType;
     int uid;
  
     WifiRestrictedInfo()

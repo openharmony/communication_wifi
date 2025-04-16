@@ -372,7 +372,7 @@ void WifiDeviceStub::OnSetWifiRestrictedList(uint32_t code, MessageParcel &data,
         info.ssid = data.ReadString();
         info.bssid = data.ReadString();
         info.uid = data.ReadInt32();
-        info.wifiRestrictedType = static_cast<WifiAccessType>(data.ReadInt32());
+        info.wifiRestrictedType = static_cast<WifiRestrictedType>(data.ReadInt32());
         wifiList.push_back(info);
     }
     int result = INVALID_NETWORK_ID;

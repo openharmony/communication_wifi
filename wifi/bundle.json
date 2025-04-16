@@ -71,7 +71,7 @@
             "wifi_feature_wifi_pro_ctrl",
             "wifi_feature_with_wifi_oeminfo_mac",
             "wifi_feature_voicewifi_enable",
-            "wifi_feature_wifiblocklist_wifiwhitelist_enable"
+            "wifi_feature_mdm_restricted_enable"
         ],
         "adapted_system_type": [
             "small",

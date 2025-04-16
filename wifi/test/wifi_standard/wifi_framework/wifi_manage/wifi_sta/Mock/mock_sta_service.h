@@ -34,7 +34,7 @@ public:
     MOCK_CONST_METHOD0(ReAssociate, ErrCode());
     MOCK_CONST_METHOD1(AddDeviceConfig, int(const WifiDeviceConfig &config));
     MOCK_CONST_METHOD1(UpdateDeviceConfig, int(const WifiDeviceConfig &config));
-    MOCK_CONST_METHOD1(SetWifiAccessList, ErrCode(const std::vector<WifiAccessInfo> &wifiAccessList));
+    MOCK_CONST_METHOD1(SetWifiRestrictedList, ErrCode(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList));
     MOCK_CONST_METHOD1(RemoveDevice, ErrCode(int networkId));
     MOCK_CONST_METHOD2(EnableDeviceConfig, ErrCode(int networkId, bool attemptEnable));
     MOCK_CONST_METHOD1(DisableDeviceConfig, ErrCode(int networkId));

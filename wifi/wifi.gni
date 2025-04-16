@@ -58,7 +58,7 @@ declare_args() {
   }
   wifi_feature_with_vap_manager = true
   wifi_feature_with_wifi_oeminfo_mac = false
-  wifi_feature_wifiblocklist_wifiwhitelist_enable = true
+  wifi_feature_mdm_restricted_enable = true
 }
 
 memory_optimization_cflags = [

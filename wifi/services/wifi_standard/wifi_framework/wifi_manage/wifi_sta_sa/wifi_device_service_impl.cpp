@@ -628,18 +628,18 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceServiceImpl::SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList)
+ErrCode WifiDeviceServiceImpl::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
 {
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
     if (WifiPermissionUtils::VerifyManageEdmPolicyPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetWifiAccessList:VerifyManageEdmPolicyPermission PERMISSION_DENIED!");
+        WIFI_LOGE("SetWifiRestrictedList:VerifyManageEdmPolicyPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    return pService->SetWifiAccessList(wifiAccessList);
+    return pService->SetWifiRestrictedList(wifiRestrictedInfoList);
 #else
     return WIFI_OPT_FAILED;
 #endif

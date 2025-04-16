@@ -174,8 +174,8 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]
       external_deps += [ "asset:asset_sdk" ]
     }
-    if (wifi_feature_wifiblocklist_wifiwhitelist_enable) {
-      defines += [ "FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT" ]
+    if (wifi_feature_mdm_restricted_enable) {
+      defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
     }
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {
       external_deps += [

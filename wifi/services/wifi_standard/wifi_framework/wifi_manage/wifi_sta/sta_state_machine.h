@@ -202,9 +202,8 @@ public:
         void StartConnectEvent(InternalMessagePtr msg);
         void UpdateCountryCode(InternalMessagePtr msg);
         bool AllowAutoConnect();
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-        bool StopByBlockList(WifiDeviceConfig &config);
-        bool StopByWhiteList(WifiDeviceConfig &config);
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+        bool RestrictedByMdm(WifiDeviceConfig &config);
 #endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void SaveFoldStatus(InternalMessagePtr msg);
@@ -476,8 +475,15 @@ public:
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
     void GetDetectNetState(OperateResState &state);
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-    void DealMDMBlockWhiteListConnect(WifiDeviceConfig &config);
+    /**
+     * @Description  Save the disconnected reason.
+     *
+     * @param discReason - disconnected reason(in)
+     */
+    void SaveDiscReason(DisconnectedReason discReason);
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    void DealMdmRestrictedConnect(WifiDeviceConfig &config);
+    bool WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid);
 #endif
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
@@ -567,12 +573,6 @@ private:
      */
     void SaveLinkstate(ConnState state, DetailedState detailState);
 
-    /**
-     * @Description  Save the disconnected reason.
-     *
-     * @param discReason - disconnected reason(in)
-     */
-    void SaveDiscReason(DisconnectedReason discReason);
     /**
      * @Description  Update wifi status and save connection information.
      *

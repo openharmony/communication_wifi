@@ -118,11 +118,11 @@ int StaInterface::AddDeviceConfig(const WifiDeviceConfig &config)
     return pStaService->AddDeviceConfig(config);
 }
 
-#ifdef FEATURE_WIFI_BLOCKLIST_WHITELIST_SUPPORT
-ErrCode StaInterface::SetWifiAccessList(const std::vector<WifiAccessInfo> &wifiAccessList)
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+ErrCode StaInterface::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
 {
-    LOGI("Enter SetWifiAccessList.\n");
-    return pStaService->SetWifiAccessList(wifiAccessList);
+    LOGI("Enter SetWifiRestrictedList.\n");
+    return pStaService->SetWifiRestrictedList(wifiRestrictedInfoList);
 }
 #endif
 

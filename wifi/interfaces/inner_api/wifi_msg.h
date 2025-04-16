@@ -80,7 +80,7 @@ inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 enum WifiAccessType {
     MDM_BLOCKLIST = 0,
     MDM_WHITELIST = 1,
-    MDM_INVALIDLIST = 2
+    MDM_INVALID_LIST = 2
 };
 
 enum class SupplicantState {
@@ -180,11 +180,11 @@ enum class DisconnectedReason {
     /* Connection Rejected */
     DISC_REASON_CONNECTION_REJECTED = 3,
  
-    /* Connection No Reason */
-    DISC_REASON_NO_REASON = 4,
- 
     /* Connect mdm blocklist or  wifi is fail*/
     DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL = 5,
+
+    /* Connect fail reason max value, add new reason before this*/
+    DISC_REASON_MAX_VALUE
 };
 
 enum class WifiOperateType {
@@ -319,17 +319,17 @@ struct WifiLinkedInfo {
 };
 
 /* Wifi access list info */
-struct WifiAccessInfo {
+struct WifiRestrictedInfo {
     std::string ssid;
     std::string bssid;
-    WifiAccessType WifiType;
+    WifiAccessType wifiRestrictedType;
     int uid;
  
-    WifiAccessInfo()
+    WifiRestrictedInfo()
     {
         ssid = "";
         bssid = "";
-        WifiType = MDM_INVALIDLIST;
+        wifiRestrictedType = MDM_INVALID_LIST;
         uid = 0;
     }
 };

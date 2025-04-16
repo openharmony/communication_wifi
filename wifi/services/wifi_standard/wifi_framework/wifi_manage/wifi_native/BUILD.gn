@@ -123,10 +123,7 @@ if (defined(ohos_lite)) {
       deps += [ "$WIFI_ROOT_DIR/base/cRPC:crpc_client" ]
     }
 
-    external_deps = [
-      "bounds_checking_function:libsec_shared",
-      "samgr:samgr_proxy",
-    ]
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [
       "OHOS_ARCH_LITE",

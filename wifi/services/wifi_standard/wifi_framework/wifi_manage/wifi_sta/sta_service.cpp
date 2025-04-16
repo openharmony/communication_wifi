@@ -418,7 +418,7 @@ ErrCode StaService::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> 
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (WifiSettings::GetInstance().FindWifiBlockListConfig(linkedInfo.ssid, linkedInfo.bssid, 0)) {
         CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-        PStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_NETWORK_REMOVED, linkedInfo.networkId);
+        pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_NETWORK_REMOVED, linkedInfo.networkId);
         WifiSettings::GetInstance().RemoveConnectChoiceFromAllNetwork(linkedInfo.networkId);
     }
     return WIFI_OPT_SUCCESS;

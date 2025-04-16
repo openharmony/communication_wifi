@@ -140,6 +140,9 @@ void WifiStaManager::InitStaCallback(void)
     mStaCallback.OnAutoSelectNetworkRes = [this](int networkId, int instId) {
         this->DealAutoSelectNetworkChanged(networkId, instId);
     };
+    mStaCallback.OnInternetAccessChange = [this](int internetAccessStatus, int instId) {
+        this->DealInternetAccessChanged(internetAccessStatus, instId);
+    };
     mStaCallback.OnSignalPollReport =
         [this](const std::string &bssid, const int32_t signalLevel, const int32_t instId) {
             this->DealSignalPollReport(bssid, signalLevel, instId);
@@ -329,6 +332,15 @@ void WifiStaManager::DealAutoSelectNetworkChanged(int networkId, int instId)
         pService->OnAutoConnectStateChanged(networkId != -1);
     }
     return;
+}
+
+void WifiStaManager::DealInternetAccessChanged(int internetAccessStatus, int instId)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_INTERNET_ACCESS_CHANGE;
+    cbMsg.msgData = internetAccessStatus;
+    cbMsg.id = instId;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 }
 
 #ifndef OHOS_ARCH_LITE

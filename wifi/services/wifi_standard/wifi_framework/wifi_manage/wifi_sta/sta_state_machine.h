@@ -1000,6 +1000,7 @@ private:
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
     void UpdateLinkedBssid(std::string &bssid);
+    void InvokeOnInternetAccessChanged(SystemNetWorkState internetAccessStatus);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void ResetWifi7WurInfo();
@@ -1076,6 +1077,7 @@ private:
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
     int isAudioOn_ = 0;
+    SystemNetWorkState lastInternetAccessStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
     /*
      linkswitch detect flag to avoid freq linkswitch cause signal level jump,
      set to true when linkswitch start, to false when linkswitch duration 2s later

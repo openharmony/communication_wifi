@@ -127,6 +127,7 @@ typedef enum EnumNetWorkState {
     NETWORK_NOTWORKING,
     NETWORK_IS_WORKING,
     NETWORK_IS_PORTAL,
+    NETWORK_DEFAULT_STATE,
 }SystemNetWorkState;
 
 typedef enum EnumStaNetState {

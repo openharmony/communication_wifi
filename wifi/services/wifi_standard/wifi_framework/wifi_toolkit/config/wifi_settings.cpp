@@ -178,7 +178,7 @@ ErrCode WifiSettings::ClearWifiRestrictedListConfig(int uid)
 bool WifiSettings::FindWifiBlockListConfig(const std::string &ssid, const std::string &bssid, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    for (int i = 0; i < wifiRestrictedList_.size(); i++) {
+    for (size_t i = 0; i < wifiRestrictedList_.size(); i++) {
         if (wifiRestrictedList_[i].wifiRestrictedType == MDM_BLOCKLIST &&
             (wifiRestrictedList_[i].ssid == ssid || wifiRestrictedList_[i].bssid == bssid)) {
             LOGI("find wifi block list info successful!");
@@ -192,7 +192,7 @@ bool WifiSettings::WhetherSetWhiteListConfig()
 {
     bool setWhiteList = false;
     std::unique_lock<std::mutex> lock(mStaMutex);
-    for (int i = 0; i < wifiRestrictedList_.size(); i++) {
+    for (size_t i = 0; i < wifiRestrictedList_.size(); i++) {
         if (wifiRestrictedList_[i].wifiRestrictedType == MDM_WHITELIST) {
             setWhiteList = true;
             break;
@@ -205,7 +205,7 @@ bool WifiSettings::FindWifiWhiteListConfig(const std::string &ssid,
     const std::string &bssid, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
-    for (int i = 0; i < wifiRestrictedList_.size(); i++) {
+    for (size_t i = 0; i < wifiRestrictedList_.size(); i++) {
         if (wifiRestrictedList_[i].wifiRestrictedType == MDM_WHITELIST && wifiRestrictedList_[i].ssid == ssid &&
             wifiRestrictedList_[i].bssid == bssid) {
             LOGI("find wifi white list info successful!");
@@ -1938,11 +1938,11 @@ int WifiSettings::SyncWifiRestrictedListConfig()
     std::unique_lock<std::mutex> lock(mStaMutex);
     std::vector<WifiRestrictedInfo> tmp;
 
-    for (int i = 0; i < wifiRestrictedList_.size(); i++) {
+    for (size_t i = 0; i < wifiRestrictedList_.size(); i++) {
         tmp.push_back(wifiRestrictedList_[i]);
     }
-    wifiRestrictedList_.SetValue(tmp);
-    wifiRestrictedList_.SaveConfig();
+    wifiMdmRestrictedListConfig_.SetValue(tmp);
+    wifiMdmRestrictedListConfig_.SaveConfig();
     return 0;
 }
 #endif

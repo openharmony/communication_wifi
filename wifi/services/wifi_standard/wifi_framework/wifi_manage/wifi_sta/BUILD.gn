@@ -91,6 +91,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "init:libbegetutil",
+      "libxml2:libxml2",
       "samgr:samgr_proxy",
     ]
 

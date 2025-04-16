@@ -65,6 +65,7 @@ private:
     bool Init();
     bool IsScanServiceRunning();
     bool IsWifiScanAllowed(bool externFlag = true);
+    bool IsInWhiteList();
 #ifndef OHOS_ARCH_LITE
     void UpdateScanMode();
 #endif
@@ -75,6 +76,8 @@ private:
     static std::shared_ptr<WifiScanServiceImpl> g_instance;
     ServiceRunningState mState;
 #endif
+    int64_t queryScanWhiteListTimeStamp_ = 0;
+    std::string scanWhiteListStr_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

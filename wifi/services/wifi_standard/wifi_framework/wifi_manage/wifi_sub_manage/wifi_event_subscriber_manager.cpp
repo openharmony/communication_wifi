@@ -359,6 +359,18 @@ bool WifiEventSubscriberManager::GetLocationModeByDatashare()
     return (locationMode.compare("1") == 0);
 }
 
+std::string WifiEventSubscriberManager::GetScanWhiteListByDatashare()
+{
+    std::string whiteList;
+    Uri uri(WifiDataShareHelperUtils::GetInstance().GetScanWhiteListDataShareUri());
+    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri, "location_kit_api_control_white_list", whiteList);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetScanWhiteListDataShareUri, Query ScanWhiteList fail!");
+        return "";
+    }
+    return whiteList;
+}
+
 void WifiEventSubscriberManager::DealLocationModeChangeEvent()
 {
     if (GetLocationModeByDatashare()) {

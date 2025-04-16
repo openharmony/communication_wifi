@@ -242,5 +242,21 @@ void WifiDataShareHelperUtils::ClearResources(std::shared_ptr<DataShare::DataSha
         operatrPtr = nullptr;
     }
 }
+
+std::string WifiDataShareHelperUtils::GetScanWhiteListDataShareUri()
+{
+    std::vector<int> accountIds;
+#ifdef HAS_ACCOUNT_PART
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(accountIds);
+#endif
+    std::string userId = "100";
+    if (!accountIds.empty()) {
+        userId = std::to_string(accountIds[0]);
+    }
+
+    std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_" + userId +
+        "?Proxy=true&key=location_kit_api_control_white_list";
+    return uri;
+}
 }   // namespace Wifi
 }   // namespace OHOS

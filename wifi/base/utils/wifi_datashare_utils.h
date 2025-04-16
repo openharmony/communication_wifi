@@ -125,6 +125,7 @@ public:
     ErrCode UnRegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
 
     std::string GetLoactionDataShareUri();
+    std::string GetScanWhiteListDataShareUri();
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(bool onlySettingsData = false);

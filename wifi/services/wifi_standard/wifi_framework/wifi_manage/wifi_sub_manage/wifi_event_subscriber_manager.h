@@ -138,6 +138,7 @@ public:
     void GetAirplaneModeByDatashare();
     void GetWifiAllowSemiActiveByDatashare();
     bool GetLocationModeByDatashare();
+    std::string GetScanWhiteListByDatashare();
     void DealLocationModeChangeEvent();
     void CheckAndStartStaByDatashare();
     bool IsMdmForbidden(void);

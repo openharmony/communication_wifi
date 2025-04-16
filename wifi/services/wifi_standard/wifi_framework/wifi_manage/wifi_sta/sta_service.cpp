@@ -410,7 +410,7 @@ ErrCode StaService::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> 
     std::vector<WifiRestrictedInfo> tmp;
     tmp.assign(wifiRestrictedInfoList.begin(), wifiRestrictedInfoList.end());
     WifiSettings::GetInstance().ClearWifiRestrictedListConfig(m_instId);
-    for (size_t i = 0; i < tmp.size(); i++) {
+    for (size_t i = 0; i < tmp.size() && i <= MAX_MDM_RESTRICTED_SIZE; i++) {
         WifiSettings::GetInstance().AddWifiRestrictedListConfig(m_instId, tmp[i]);
     }
     WifiSettings::GetInstance().SyncWifiRestrictedListConfig();

@@ -590,7 +590,7 @@ void WifiNetAgent::NetConnCallback::LogNetCaps(
 void WifiNetAgent::RestoreWifiConnection()
 {
     using NetManagerStandard::NetBearType;
-    int32_t result = NetConnClient::GetInstance().IncreaseSupplierScore(supplierId);
+    int32_t result = NetConnClient::GetInstance().UpdateSupplierScore(supplierId, ACCEPT_UNVALIDATED);
     WIFI_LOGI("Restore Wifi Connection, result:%{public}d", result);
 }
 }

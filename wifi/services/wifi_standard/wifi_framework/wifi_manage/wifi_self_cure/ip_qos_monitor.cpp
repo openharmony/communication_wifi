@@ -68,6 +68,7 @@ void IpQosMonitor::ParseTcpReportMsg(const std::vector<int64_t> &elems, int32_t 
 void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
 {
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
+    std::unique_lock<std::mutex> locker(txRxStatusMtx_);
     bool internetGood = ParseNetworkInternetGood(elems);
     if (internetGood) {
         if (!lastTxRxGood_) {
@@ -171,6 +172,7 @@ int64_t IpQosMonitor::GetCurrentTcpRxCounter()
 void IpQosMonitor::ResetTxRxProperty()
 {
     WIFI_LOGI("%{public}s: reset tx rx status", __FUNCTION__);
+    std::unique_lock<std::mutex> locker(txRxStatusMtx_);
     lastTxRxGood_ = false;
     mLastTcpTxCounter = 0;
     mLastTcpRxCounter = 0;
@@ -178,6 +180,7 @@ void IpQosMonitor::ResetTxRxProperty()
 
 bool IpQosMonitor::GetTxRxStatus()
 {
+    std::unique_lock<std::mutex> locker(txRxStatusMtx_);
     return lastTxRxGood_;
 }
 

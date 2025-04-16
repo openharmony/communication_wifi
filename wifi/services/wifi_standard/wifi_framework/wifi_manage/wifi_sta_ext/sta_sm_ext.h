@@ -23,14 +23,14 @@ class StaStateMachine; // 前向声明
 
 class StaSMExt {
 private:
-    StaStateMachine& staStateMachine_;
+    StaStateMachine* staStateMachine_;
 public:
 
-    explicit StaSMExt(StaStateMachine& staStateMachine, int instId);
+    explicit StaSMExt(StaStateMachine* staStateMachinePtr, int instId);
     virtual ~StaSMExt();
 
     /**
-     * @Description : get pStaStateMachine
+     * @Description : get staStateMachinePtr
      *
      */
     StaStateMachine* GetStaStateMachine() const;

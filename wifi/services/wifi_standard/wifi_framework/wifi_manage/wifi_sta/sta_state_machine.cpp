@@ -4426,7 +4426,7 @@ void StaStateMachine::DealMdmRestrictedConnect(WifiDeviceConfig &config)
     StartDisConnectToNetwork();
 }
 
-bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBsssid)
+bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid)
 {
     if (checkBssid) {
         return WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0) ||

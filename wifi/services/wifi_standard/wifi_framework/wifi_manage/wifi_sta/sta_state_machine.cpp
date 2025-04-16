@@ -1380,11 +1380,6 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
-    /* BSSID change is not received during roaming, only set BSSID */
-    if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
-        WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId)) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("SetBssid return fail.");
-    }
     if (!pStaStateMachine->CanArpReachable()) {
         WIFI_LOGI("Arp not reachable, start to dhcp.");
         WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));

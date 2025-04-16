@@ -223,7 +223,7 @@ ErrCode StaInterface::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->SetWifiRestrictedList(wifiRestrictedInfoList) != WIFI_OPT_SUCCESS) {
-        LOGE("RemoveDeviceConfig failed.\n");
+        LOGE("SetWifiRestrictedList failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

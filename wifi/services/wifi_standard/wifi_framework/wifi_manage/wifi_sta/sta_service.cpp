@@ -43,7 +43,9 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
 constexpr const int MAX_MDM_RESTRICTED_SIZE = 200;
+#endif
 
 #define EAP_AUTH_IMSI_MCC_POS 0
 #define EAP_AUTH_MAX_MCC_LEN  3

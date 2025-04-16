@@ -571,6 +571,9 @@ void WifiInternalEventDispatcher::PublishStaEvent(const WifiEventCallbackMsg &ms
         case WIFI_CBK_MSG_SEMI_STATE_CHANGE:
             WifiCommonEventHelper::PublishWifiSemiStateChangedEvent(msg.msgData, "OnWifiSemiStateChanged");
             break;
+        case WIFI_CBK_MSG_INTERNET_ACCESS_CHANGE:
+            WifiCommonEventHelper::PublishInternetAccessChangedEvent(msg.msgData, "OnWifiInternetAccessChanged");
+            break;
         default:
             break;
     }

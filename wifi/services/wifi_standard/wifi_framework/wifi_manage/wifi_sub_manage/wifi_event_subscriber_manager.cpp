@@ -870,7 +870,7 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
     }
 #endif
 }
- 
+
 #ifdef HAS_POWERMGR_PART
 void WifiEventSubscriberManager::RegisterPowermgrEvent()
 {
@@ -1024,7 +1024,7 @@ void WifiEventSubscriberManager::RegisterAssetEvent()
         WIFI_LOGI("RegisterAssetEvent success");
     }
 }
- 
+
 void WifiEventSubscriberManager::UnRegisterAssetEvent()
 {
     std::unique_lock<std::mutex> lock(AssetEventMutex);
@@ -1040,18 +1040,18 @@ void WifiEventSubscriberManager::UnRegisterAssetEvent()
     wifiAssetrEventSubsciber_ = nullptr;
     WIFI_LOGI("UnRegisterAssetEvent finished");
 }
- 
+
 AssetEventSubscriber::AssetEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {
     WIFI_LOGI("AssetEventSubscriber enter");
 }
- 
+
 AssetEventSubscriber::~AssetEventSubscriber()
 {
     WIFI_LOGI("~AssetEventSubscriber enter");
 }
- 
+
 void AssetEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();

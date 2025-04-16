@@ -16,6 +16,7 @@
 #ifndef OHOS_IP_QOS_MONITOR_H
 #define OHOS_IP_QOS_MONITOR_H
 
+#include <mutex>
 #include "self_cure_service.h"
 #include "wifi_netlink.h"
 #include "wifi_net_observer.h"
@@ -45,6 +46,7 @@ private:
     int32_t mInternetFailedCounter = 0;
     sptr<NetStateObserver> mNetWorkDetect;
     bool lastTxRxGood_ = false;
+    std::mutex txRxStatusMtx_;
 };
 
 } // namespace Wifi

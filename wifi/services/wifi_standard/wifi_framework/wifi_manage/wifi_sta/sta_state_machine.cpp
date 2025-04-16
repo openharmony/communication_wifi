@@ -1531,7 +1531,6 @@ void StaStateMachine::GetIpState::GoInState()
             pStaStateMachine->StartDisConnectToNetwork();
             WIFI_LOGE("ConfigstaticIpAddress failed!\n");
         }
-        return;
     }
     pStaStateMachine->HandlePreDhcpSetup();
     do {
@@ -1550,6 +1549,7 @@ void StaStateMachine::GetIpState::GoInState()
             pStaStateMachine->linkedInfo.bssid.c_str(), pStaStateMachine->linkedInfo.bssid.size()) == EOK) {
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
         }
+        config.isStaticIpv4 = assignMethod == AssignIpMethod::STATIC;
         config.bIpv6 = pStaStateMachine->currentTpType == IPTYPE_IPV4 ? false : true;
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
@@ -1560,9 +1560,11 @@ void StaStateMachine::GetIpState::GoInState()
             "IsSpecificNetwork %{public}d", pStaStateMachine->currentTpType, dhcpRet, pStaStateMachine->isRoam,
             pStaStateMachine->m_instId, config.bSpecificNetwork);
         if (dhcpRet == 0) {
-            WIFI_LOGI("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
-            pStaStateMachine->StartTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT),
-                STA_SIGNAL_START_GET_DHCP_IP_DELAY);
+            if (!config.isStaticIpv4) {
+                WIFI_LOGI("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
+                pStaStateMachine->StartTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT),
+                    STA_SIGNAL_START_GET_DHCP_IP_DELAY);
+            }
             return;
         }
     } while (0);

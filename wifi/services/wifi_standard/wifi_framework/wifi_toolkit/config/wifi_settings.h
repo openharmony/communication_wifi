@@ -114,7 +114,7 @@ public:
     int AddDeviceConfig(const WifiDeviceConfig &config);
 
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
-    ErrCode AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo& WifiListInfo);
+    ErrCode AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo& wifiListInfo);
  
     ErrCode ClearWifiRestrictedListConfig(int uid);
  

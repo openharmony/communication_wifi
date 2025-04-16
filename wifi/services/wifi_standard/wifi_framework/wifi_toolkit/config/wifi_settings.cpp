@@ -152,10 +152,10 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 }
 
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
-ErrCode WifiSettings::AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo& WifiListInfo)
+ErrCode WifiSettings::AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo& wifiListInfo)
 {
-    if (WifiListInfo.ssid.empty() && wifiListInfo.wifiRestrictedType == MDM_BLOCKLIST) ||
-    (wifiListInfo.wifiRestrictedType == MDM_WHITELIST && (WifiListInfo.bssid.empty() || wifiListInfo.ssid.empty())) {
+    if (wifiListInfo.ssid.empty() && wifiListInfo.wifiRestrictedType == MDM_BLOCKLIST) ||
+    (wifiListInfo.wifiRestrictedType == MDM_WHITELIST && (wifiListInfo.bssid.empty() || wifiListInfo.ssid.empty())) {
         return WIFI_OPT_INVALID_PARAM;
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -163,7 +163,7 @@ ErrCode WifiSettings::AddWifiRestrictedListConfig(int uid, const WifiRestrictedI
         LOGE("Add WifiRestrictedInfo exceeding the maximum value!");
         return WIFI_OPT_MDM_WHITELIST_OUT_MAX_NUM;
     }
-    wifiRestrictedList_.push_back(WifiListInfo);
+    wifiRestrictedList_.push_back(wifiListInfo);
     return WIFI_OPT_SUCCESS;
 }
  

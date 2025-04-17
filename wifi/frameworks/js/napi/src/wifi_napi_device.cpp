@@ -1263,7 +1263,7 @@ static void IpConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, 
 {
     SetValueInt32(env, "ipAddress", wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4, ipCfgObj);
     SetValueInt32(env, "gateway", wifiIpConfig.staticIpAddress.gateway.addressIpv4, ipCfgObj);
-
+    SetValueInt32(env, "prefixLength", wifiIpConfig.staticIpAddress.ipAddress.prefixLength, ipCfgObj);
     const int DNS_NUM = 2;
     napi_value dnsArray;
     napi_create_array_with_length(env, DNS_NUM, &dnsArray);

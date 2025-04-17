@@ -123,6 +123,7 @@ ohos_unittest("wifi_native_test") {
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
+    "samgr:samgr_proxy",
   ]
 
   configs = [ ":module_private_config" ]

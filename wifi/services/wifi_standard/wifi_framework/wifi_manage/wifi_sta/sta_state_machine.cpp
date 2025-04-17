@@ -52,6 +52,7 @@
 #include "mock_dhcp_service.h"
 #endif
 #include "sta_define.h"
+#include "ip_qos_monitor.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -80,6 +81,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define SELF_CURE_RAND_MAC_REASSOC 3
 #define USER_CONNECT "1"
 #define AUTO_CONNECT "0"
+#define SIGNAL_LEVEL_2 2
 
 #define CMD_BUFFER_SIZE 1024
 #define GSM_AUTH_RAND_LEN 16
@@ -477,7 +479,7 @@ void StaStateMachine::InitState::StopWifiProcess()
         pStaStateMachine->CloseNoInternetDialog();
     }
 #endif
-    WifiChrUtils::ClearSignalPollInfoArray();
+    WifiChrUtils::GetInstance().ClearSignalPollInfoArray();
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
 }
 
@@ -543,7 +545,7 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         return;
     }
 
-    if (networkId == pStaStateMachine->linkedInfo.networkId && config.isReassocSelfCureWithFactoryMacAddress == 0) {
+    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
         return;
@@ -749,7 +751,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
         WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
     }
-    WifiChrUtils::ClearSignalPollInfoArray();
+    WifiChrUtils::GetInstance().ClearSignalPollInfoArray();
     WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
@@ -1304,6 +1306,7 @@ void StaStateMachine::ApLinkedState::GoOutState()
 {
     WIFI_LOGI("ApLinkedState GoOutState function.");
     pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
+    pStaStateMachine->lastInternetAccessStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
     return;
 }
 
@@ -1568,7 +1571,6 @@ void StaStateMachine::GetIpState::GoInState()
             pStaStateMachine->StartDisConnectToNetwork();
             WIFI_LOGE("ConfigstaticIpAddress failed!\n");
         }
-        return;
     }
     pStaStateMachine->HandlePreDhcpSetup();
     do {
@@ -1587,6 +1589,7 @@ void StaStateMachine::GetIpState::GoInState()
             pStaStateMachine->linkedInfo.bssid.c_str(), pStaStateMachine->linkedInfo.bssid.size()) == EOK) {
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
         }
+        config.isStaticIpv4 = assignMethod == AssignIpMethod::STATIC;
         config.bIpv6 = pStaStateMachine->currentTpType == IPTYPE_IPV4 ? false : true;
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
@@ -1597,9 +1600,11 @@ void StaStateMachine::GetIpState::GoInState()
             "IsSpecificNetwork %{public}d", pStaStateMachine->currentTpType, dhcpRet, pStaStateMachine->isRoam,
             pStaStateMachine->m_instId, config.bSpecificNetwork);
         if (dhcpRet == 0) {
-            WIFI_LOGI("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
-            pStaStateMachine->StartTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT),
-                STA_SIGNAL_START_GET_DHCP_IP_DELAY);
+            if (!config.isStaticIpv4) {
+                WIFI_LOGI("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
+                pStaStateMachine->StartTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT),
+                    STA_SIGNAL_START_GET_DHCP_IP_DELAY);
+            }
             return;
         }
     } while (0);
@@ -2065,6 +2070,13 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     if (!portalUrl.empty()) {
         mPortalUrl = portalUrl;
     }
+    /*when detect result is NETWORK_NOTWORKING but tx rx is good, considered as NETWORK_IS_WORKING*/
+    if (netState == SystemNetWorkState::NETWORK_NOTWORKING &&
+        IpQosMonitor::GetInstance().GetTxRxStatus() &&
+        WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
+        WIFI_LOGI("net detection result is NETWORK_NOTWORKING but tx rx is good, considered as NETWORK_IS_WORKING");
+        netState = SystemNetWorkState::NETWORK_IS_WORKING;
+    }
     bool updatePortalAuthTime = false;
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
         mIsWifiInternetCHRFlag = false;
@@ -2120,6 +2132,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
     autoPullBrowserFlag = true;
     TryModifyPortalAttribute(netState);
+    InvokeOnInternetAccessChanged(netState);
 }
 
 void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime)
@@ -3783,7 +3796,7 @@ void StaStateMachine::DealSignalPollResult()
         WifiConfigCenter::GetInstance().SetWifiLinkedStandardAndMaxSpeed(linkedInfo);
     }
     pLinkedState->UpdateExpandOffset();
-    WifiChrUtils::AddSignalPollInfoArray(signalInfo);
+    WifiChrUtils::GetInstance().AddSignalPollInfoArray(signalInfo);
     LogSignalInfo(signalInfo);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
@@ -3850,9 +3863,13 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
     }
 #endif
     WriteLinkInfoHiSysEvent(lastSignalLevel_, linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed);
+    std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
     for (const auto &callBackItem : m_staCallback) {
         if (callBackItem.second.OnWifiHalSignalInfoChange != nullptr) {
             callBackItem.second.OnWifiHalSignalInfoChange(signalInfo);
+        }
+        if (callBackItem.second.OnSignalPollReport != nullptr) {
+            callBackItem.second.OnSignalPollReport(linkedInfo.bssid, lastSignalLevel_, m_instId);
         }
     }
     if (enableSignalPoll) {
@@ -5054,6 +5071,28 @@ void StaStateMachine::InvokeOnDhcpOfferReport(IpInfo ipInfo)
     for (const auto &callBackItem : m_staCallback) {
         if (callBackItem.second.OnDhcpOfferReport != nullptr) {
             callBackItem.second.OnDhcpOfferReport(ipInfo, m_instId);
+        }
+    }
+}
+
+void StaStateMachine::InvokeOnInternetAccessChanged(SystemNetWorkState internetAccessStatus)
+{
+    WIFI_LOGI("InvokeOnInternetAccessChanged, internetAccessStatus: %{public}d, lastInternetAccessStatus: %{public}d",
+        internetAccessStatus, lastInternetAccessStatus_);
+    if (lastInternetAccessStatus_ == internetAccessStatus) {
+        return;
+    }
+    if (internetAccessStatus == SystemNetWorkState::NETWORK_NOTWORKING &&
+        lastInternetAccessStatus_ == SystemNetWorkState::NETWORK_IS_WORKING &&
+        lastSignalLevel_ < SIGNAL_LEVEL_2) {
+        WIFI_LOGI("net detection result is NETWORK_NOTWORKING, last status is NETWORK_IS_WORKING, signal level less 2");
+        return;
+    }
+    lastInternetAccessStatus_ = internetAccessStatus;
+    std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnInternetAccessChange != nullptr) {
+            callBackItem.second.OnInternetAccessChange(static_cast<int32_t>(internetAccessStatus), m_instId);
         }
     }
 }

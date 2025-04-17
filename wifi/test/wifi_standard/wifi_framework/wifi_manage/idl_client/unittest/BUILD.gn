@@ -112,6 +112,7 @@ ohos_unittest("idl_client_unittest") {
     "hdf_core:libpub_utils",
     "hilog:libhilog",
     "jsoncpp:jsoncpp",
+    "samgr:samgr_proxy",
   ]
 
   if (wifi_feature_with_hdi_chip_supported) {

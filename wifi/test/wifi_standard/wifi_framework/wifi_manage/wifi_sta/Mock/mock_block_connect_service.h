@@ -37,6 +37,8 @@ public:
     virtual void NotifyWifiConnFailedInfo(int targetNetworkId, std::string bssid, DisabledReason disableReason) = 0;
     virtual void ReleaseUnusableBssidSet() = 0;
     virtual bool IsBssidMatchUnusableSet(std::string bssid) = 0;
+    virtual bool UpdateNetworkSelectStatusForMdmRestrictedList() = 0;
+    virtual bool ClearBlockConnectForMdmRestrictedList() = 0;
 };
  
 class BlockConnectService : public MockBlockConnectService {
@@ -56,6 +58,8 @@ public:
     MOCK_METHOD3(NotifyWifiConnFailedInfo, void(int targetNetworkId, std::string bssid, DisabledReason disableReason));
     MOCK_METHOD0(ReleaseUnusableBssidSet, void());
     MOCK_METHOD1(IsBssidMatchUnusableSet, bool(std::string bssid));
+    MOCK_METHOD0(ClearBlockConnectForMdmRestrictedList, bool());
+    MOCK_METHOD0(UpdateNetworkSelectStatusForMdmRestrictedList, bool());
 };
 }  // namespace OHOS
 }  // namespace Wifi

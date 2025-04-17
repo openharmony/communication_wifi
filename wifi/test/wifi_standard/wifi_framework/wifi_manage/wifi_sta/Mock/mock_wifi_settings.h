@@ -114,6 +114,8 @@ public:
     virtual int SetMloWifiLinkedMaxSpeed(int instId = 0) = 0;
     virtual ErrCode AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo &WifiListInfo) = 0;
     virtual ErrCode ClearWifiRestrictedListConfig(int uid) = 0;
+    virtual int GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0) = 0;
+    virtual ErrCode CheckWifiMdmRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
     virtual bool FindWifiBlockListConfig(const std::string &ssid, const std::string &bssid, int instId = 0) = 0;
     virtual bool FindWifiWhiteListConfig(const std::string &ssid, const std::string &bssid, int instId = 0) = 0;
     virtual void InitWifiMdmRestrictedListConfig() = 0;
@@ -132,6 +134,8 @@ public:
     MOCK_METHOD0(ClearDeviceConfig, void());
     MOCK_METHOD2(AddWifiRestrictedListConfig, ErrCode(int uid, const WifiRestrictedInfo &WifiListInfo));
     MOCK_METHOD1(ClearWifiRestrictedListConfig, ErrCode(int uid));
+    MOCK_METHOD1(CheckWifiMdmRestrictedList, ErrCode(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList));
+    MOCK_METHOD2(GetMdmRestrictedBlockDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int instId));
     MOCK_METHOD3(FindWifiBlockListConfig, bool(const std::string &ssid, const std::string &bssid, int instId));
     MOCK_METHOD3(FindWifiWhiteListConfig, bool(const std::string &ssid, const std::string &bssid, int instId));
     MOCK_METHOD0(InitWifiMdmRestrictedListConfig, void());

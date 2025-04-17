@@ -136,6 +136,7 @@ ohos_unittest("toolkit_unittest") {
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "netstack:http_client",
+    "samgr:samgr_proxy",
   ]
   if (wifi_feature_with_sta_asset) {
     defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]

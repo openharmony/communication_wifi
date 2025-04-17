@@ -49,6 +49,7 @@ ohos_fuzztest("WifiP2pCbkStubFuzzTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "wifi"

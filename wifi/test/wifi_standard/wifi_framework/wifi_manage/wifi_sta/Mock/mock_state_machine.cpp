@@ -63,9 +63,10 @@ void StateMachine::SendMessage(int msgName, int param1, int param2, const std::a
         msgName, param1, param2);
 }
 
-void StateMachine::StartConnectToBssid(std::string bssid)
+void StateMachine::StartConnectToBssid(const int32_t networkId, std::string bssid)
 {
-    WIFI_LOGD("StateMachine::StartConnectToBssid, bssid is %{private}s.", bssid.c_str());
+    WIFI_LOGD("StateMachine::StartConnectToBssid, bssid is %{private}s networkId is %{private}d.",
+        bssid.c_str(), networkId);
 }
 
 void StateMachine::StopTimer(int timerName)

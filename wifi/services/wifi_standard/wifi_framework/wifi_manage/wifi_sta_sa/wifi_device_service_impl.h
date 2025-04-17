@@ -65,6 +65,8 @@ public:
 
     ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
+    ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
+
     ErrCode RemoveDevice(int networkId) override;
 
     ErrCode RemoveAllDevice() override;

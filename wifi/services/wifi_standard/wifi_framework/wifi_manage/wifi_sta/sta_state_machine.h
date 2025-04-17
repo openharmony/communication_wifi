@@ -202,6 +202,9 @@ public:
         void StartConnectEvent(InternalMessagePtr msg);
         void UpdateCountryCode(InternalMessagePtr msg);
         bool AllowAutoConnect();
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+        bool RestrictedByMdm(WifiDeviceConfig &config);
+#endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
@@ -426,9 +429,10 @@ public:
     /**
      * @Description  Start roaming connection.
      *
+     * @param networkId - the networkId
      * @param bssid - the mac address of network(in)
      */
-    void StartConnectToBssid(std::string bssid);
+    void StartConnectToBssid(const int32_t networkId, std::string bssid);
     /**
      * @Description Register sta callback function
      *
@@ -471,6 +475,16 @@ public:
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
     void GetDetectNetState(OperateResState &state);
+    /**
+     * @Description  Save the disconnected reason.
+     *
+     * @param discReason - disconnected reason(in)
+     */
+    void SaveDiscReason(DisconnectedReason discReason);
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    void DealMdmRestrictedConnect(WifiDeviceConfig &config);
+    bool WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid);
+#endif
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);
@@ -559,12 +573,6 @@ private:
      */
     void SaveLinkstate(ConnState state, DetailedState detailState);
 
-    /**
-     * @Description  Save the disconnected reason.
-     *
-     * @param discReason - disconnected reason(in)
-     */
-    void SaveDiscReason(DisconnectedReason discReason);
     /**
      * @Description  Update wifi status and save connection information.
      *

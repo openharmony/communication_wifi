@@ -645,6 +645,15 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) = 0;
+
+    /**
+     * @Description Add wifi block list and wifi white list
+     *
+     * @param config - WifiRestrictedInfo object
+     * @param result - the result of wifi access list
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

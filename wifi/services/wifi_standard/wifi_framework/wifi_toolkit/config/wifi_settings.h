@@ -64,6 +64,7 @@ constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 /* Hotspot idle status auto close timeout 10min. */
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
+constexpr int WIFI_MDM_RESTRICTED_MAX_NUM = 200;
 constexpr uint32_t COMPARE_MAC_OFFSET = 2;
 /* Plaintext string length */
 constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
@@ -82,6 +83,7 @@ inline constexpr char DUAL_WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfig
 inline constexpr char DUAL_SOFTAP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/WifiConfigStoreSoftAp.xml";
 inline constexpr char PACKAGE_FILTER_CONFIG_FILE_PATH[] = "/system/etc/wifi/wifi_package_filter.xml";
 inline constexpr char P2P_SUPPLICANT_CONFIG_FILE[] = CONFIG_ROOR_DIR"/wpa_supplicant/p2p_supplicant.conf";
+inline constexpr char WIFI_MDM_RESTRICTED_LIST[] = CONFIG_ROOR_DIR"/WifiMdmRestrictedList.conf";
 
 namespace OHOS {
 namespace Wifi {
@@ -110,6 +112,24 @@ public:
     int Init();
 
     int AddDeviceConfig(const WifiDeviceConfig &config);
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    ErrCode AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo& wifiListInfo);
+
+    ErrCode CheckWifiMdmRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList);
+    
+    ErrCode ClearWifiRestrictedListConfig(int uid);
+
+    int GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0);
+ 
+    int SyncWifiRestrictedListConfig();
+
+    bool FindWifiBlockListConfig(const std::string &ssid, const std::string &bssid, int instId = 0);
+ 
+    bool FindWifiWhiteListConfig(const std::string &ssid, const std::string &bssid, int instId = 0);
+ 
+    bool WhetherSetWhiteListConfig();
+#endif
 
     int RemoveDevice(int networkId);
 
@@ -347,6 +367,9 @@ private:
     void InitP2pVendorConfig();
     int GetApMaxConnNum();
     void InitDefaultWifiConfig();
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    void InitWifiMdmRestrictedListConfig();
+#endif
     void InitWifiConfig();
     int SyncWifiConfig();
     std::vector<WifiDeviceConfig> RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const;
@@ -368,6 +391,10 @@ private:
 #endif
     void SyncAfterDecryped(WifiDeviceConfig &config);
     int GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> &configs);
+public:
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    std::vector<WifiRestrictedInfo> wifiRestrictedList_;
+#endif
 private:
     // STA
     std::mutex mStaMutex;
@@ -378,6 +405,9 @@ private:
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    WifiConfigFileImpl<WifiRestrictedInfo> wifiMdmRestrictedListConfig_;
+#endif
     WifiConfigFileImpl<WifiStoreRandomMac> mSavedWifiStoreRandomMac;
     std::unique_ptr<WifiEventHandler> mWifiEncryptionThread = nullptr;
 

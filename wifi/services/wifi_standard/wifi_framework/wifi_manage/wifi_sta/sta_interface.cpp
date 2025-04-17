@@ -216,6 +216,20 @@ int StaInterface::AddDeviceConfig(const WifiDeviceConfig &config)
     return pStaService->AddDeviceConfig(config);
 }
 
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+ErrCode StaInterface::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
+{
+    LOGI("Enter SetWifiRestrictedList.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    if (pStaService->SetWifiRestrictedList(wifiRestrictedInfoList) != WIFI_OPT_SUCCESS) {
+        LOGE("SetWifiRestrictedList failed.\n");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+#endif
+
 int StaInterface::UpdateDeviceConfig(const WifiDeviceConfig &config)
 {
     LOGI("Enter UpdateDeviceConfig.\n");

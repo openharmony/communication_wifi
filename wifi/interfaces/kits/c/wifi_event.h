@@ -119,7 +119,13 @@ typedef enum {
     DISC_REASON_CONNECTION_FULL = 2,
 
     /* Connection Rejected */
-    DISC_REASON_CONNECTION_REJECTED = 3
+    DISC_REASON_CONNECTION_REJECTED = 3,
+
+    /* Connect mdm blocklist wifi is fail*/
+    DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL = 5,
+
+    /* Connect fail reason max value, add new reason before this*/
+    DISC_REASON_MAX_VALUE
 } DisconnectedReason;
 
 #ifdef __cplusplus

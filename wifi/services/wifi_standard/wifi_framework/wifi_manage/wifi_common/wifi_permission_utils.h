@@ -27,6 +27,7 @@ const int API_VERSION_INVALID = -1;
 
 class WifiPermissionUtils {
 public:
+    static int VerifyManageEdmPolicyPermission();
     static int VerifySetWifiInfoPermission();
     static int VerifyGetWifiInfoPermission();
     static int VerifySameProcessPermission();

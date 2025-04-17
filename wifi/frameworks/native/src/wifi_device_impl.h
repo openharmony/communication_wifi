@@ -663,6 +663,14 @@ public:
      */
     ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) override;
 
+    /**
+     * @Description Add wifi block list and wifi white list
+     *
+     * @param config - WifiRestrictedInfo object
+     * @param result - the result of wifi access list
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

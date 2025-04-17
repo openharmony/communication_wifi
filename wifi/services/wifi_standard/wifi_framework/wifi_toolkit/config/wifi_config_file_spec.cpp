@@ -547,6 +547,40 @@ std::string GetTClassName<WifiDeviceConfig>()
     return "WifiDeviceConfig";
 }
 
+template <>
+std::string GetTClassName<WifiRestrictedInfo>()
+{
+    return "WifiRestrictedInfo";
+}
+ 
+template <>
+int SetTClassKeyValue<WifiRestrictedInfo>(WifiRestrictedInfo &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    if (key == "ssid") {
+        item.ssid = value;
+    } else if (key == "HexSsid") {
+        std::vector<char> vec;
+        vec.clear();
+        if (HexStringToVec(value, vec) == 0) {
+            std::string strSsid(vec.begin(), vec.end());
+            item.ssid = strSsid;
+        }
+    } else if (key == "bssid") {
+        item.bssid = value;
+    } else if (key == "uid") {
+        std::string tmpValue = value;
+        item.uid = static_cast<int>(CheckDataLegal(tmpValue));
+    } else if (key == "wifiRestrictedType") {
+        std::string tmpValue = value;
+        item.wifiRestrictedType = static_cast<WifiRestrictedType>(CheckDataLegal(tmpValue));
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 static std::string OutPutEncryptionDeviceConfig(WifiDeviceConfig &item)
 {
@@ -569,6 +603,19 @@ static std::string OutPutEncryptionDeviceConfig(WifiDeviceConfig &item)
     return ss.str();
 }
 #endif
+
+static std::string OutPutWifiRestrictedInfoListInfo(WifiRestrictedInfo &item)
+{
+    std::ostringstream ss;
+    ss << "    " << "<WifiRestrictedInfo>" << std::endl;
+    ss << "    " << "ssid=" << ValidateString(item.ssid) << std::endl;
+    ss << "    " << "HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
+    ss << "    " << "bssid=" << item.bssid << std::endl;
+    ss << "    " << "wifiRestrictedType=" << item.wifiRestrictedType << std::endl;
+    ss << "    " << "uid=" << item.uid << std::endl;
+    ss << "    " << "</WifiRestrictedInfo>" << std::endl;
+    return ss.str();
+}
 
 static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 {
@@ -761,6 +808,24 @@ std::string OutTClassString<WifiDeviceConfig>(WifiDeviceConfig &item)
        << OutPutWifiDeviceConfigPrivacy(item) << OutPutWifiWapiConfig(item)
        << OutPutLastDhcpResultsConfig(item);
     return ss.str();
+}
+
+template<>
+std::string OutTClassString<WifiRestrictedInfo> (WifiRestrictedInfo &item)
+{
+    std::ostringstream ss;
+    ss << OutPutWifiRestrictedInfoListInfo(item);
+    return ss.str();
+}
+ 
+template <>
+void ClearTClass<WifiRestrictedInfo>(WifiRestrictedInfo &item)
+{
+    item.ssid.clear();
+    item.bssid.clear();
+    item.uid = 0;
+    item.wifiRestrictedType = MDM_INVALID_LIST;
+    return;
 }
 
 template<>

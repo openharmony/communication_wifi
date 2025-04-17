@@ -867,7 +867,7 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
     } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_CONN)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
-            pEnhanceService->OnSettingDialogClick(false, SETTINGS_5G_AUTO_IDENTIFY_CONN);
+            pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_AUTO_IDENTIFY_CONN);
         }
     }
 #ifdef FEATURE_P2P_SUPPORT

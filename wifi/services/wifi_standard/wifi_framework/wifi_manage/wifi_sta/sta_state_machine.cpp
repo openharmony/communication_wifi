@@ -4921,7 +4921,7 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
     }
     switch (state) {
         case OperateResState::CONNECT_AP_CONNECTED:
-            WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
+            WriteWifiConnectionHiSysEvent(static_cast<int>(WifiConnectionType::CONNECT), "");
             if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
                 WifiNetStatsManager::GetInstance().StartNetStats();
@@ -4929,7 +4929,7 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
             }
             break;
         case OperateResState::DISCONNECT_DISCONNECTED:
-            WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
+            WriteWifiConnectionHiSysEvent(static_cast<int>(WifiConnectionType::DISCONNECT), "");
             if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
                 WifiNetStatsManager::GetInstance().StopNetStats();

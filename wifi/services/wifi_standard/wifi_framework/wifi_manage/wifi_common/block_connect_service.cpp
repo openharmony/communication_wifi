@@ -59,6 +59,8 @@ BlockConnectService::BlockConnectService()
          DisablePolicy(-1, 1, WifiDeviceConfigStatus::PERMEMANTLY_DISABLED)},
         {DisabledReason::DISABLED_AUTHENTICATION_PRIVATE_EAP_ERROR,
          DisablePolicy(-1, 1, WifiDeviceConfigStatus::PERMEMANTLY_DISABLED)},
+        {DisabledReason::DISABLED_MDM_RESTRICTED,
+         DisablePolicy(-1, 1, WifiDeviceConfigStatus::PERMEMANTLY_DISABLED)},
         {DisabledReason::DISABLED_NETWORK_NOT_FOUND,
          DisablePolicy(5 * 60 * 1000 * 1000, 2, WifiDeviceConfigStatus::DISABLED)},
         {DisabledReason::DISABLED_CONSECUTIVE_FAILURES,
@@ -191,6 +193,62 @@ bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, Disable
     }
     return UpdateNetworkSelectStatus(targetNetworkId, disableReason);
 }
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+// set thie blocklist information for mdm restrictedlist
+bool BlockConnectService::UpdateNetworkSelectStatusForMdmRestrictedList()
+{
+    WIFI_LOGD("ENTER UpdateNetworkSelectStatusForMdmRestrictedList");
+    std::vector<WifiDeviceConfig> results;
+    int64_t timestamp = GetElapsedMicrosecondsSinceBoot();
+    if (WifiSettings::GetInstance().GetMdmRestrictedBlockDeviceConfig(results) != 0) {
+        WIFI_LOGE("Failed to get device config");
+        return false;
+    }
+    for (auto &config : results) {
+        DisablePolicy disablePolicy = CalculateDisablePolicy(DisabledReason::DISABLED_MDM_RESTRICTED);
+        if (disablePolicy.disableStatus == WifiDeviceConfigStatus::ENABLED) {
+            config.networkSelectionStatus.status = WifiDeviceConfigStatus::DISABLED;
+            config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_MDM_RESTRICTED;
+            config.networkSelectionStatus.networkDisableTimeStamp = timestamp;
+            config.networkSelectionStatus.networkDisableCount = 1;
+            WifiSettings::GetInstance().AddDeviceConfig(config);
+            continue;
+        }
+        if (config.networkSelectionStatus.networkSelectionDisableReason != DisabledReason::DISABLED_MDM_RESTRICTED) {
+            config.networkSelectionStatus.networkDisableCount = 1;
+            config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_MDM_RESTRICTED;
+        }
+        config.networkSelectionStatus.networkDisableTimeStamp = timestamp;
+        WifiSettings::GetInstance().AddDeviceConfig(config);
+    }
+    return true;
+}
+
+// Clear mdmRestrictedList from block connect
+bool BlockConnectService::ClearBlockConnectForMdmRestrictedList()
+{
+    WIFI_LOGD("ENTER ClearBlockConnectForMdmRestrictedList");
+    std::vector<WifiDeviceConfig> results;
+    if (WifiSettings::GetInstance().GetMdmRestrictedBlockDeviceConfig(results) != 0) {
+        WIFI_LOGE("Failed to get device config");
+        return false;
+    }
+    for (auto &config : results) {
+        if (config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) {
+            continue;
+        }
+        if (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_MDM_RESTRICTED) {
+            config.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
+            config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
+            config.networkSelectionStatus.networkDisableTimeStamp = -1;
+            config.networkSelectionStatus.networkDisableCount = 0;
+            WifiSettings::GetInstance().AddDeviceConfig(config);
+        }
+    }
+    return true;
+}
+#endif
 
 // Clear the blocklist information of a target network
 bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason)

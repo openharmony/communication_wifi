@@ -115,8 +115,12 @@ public:
 
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     ErrCode AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo& wifiListInfo);
- 
+
+    ErrCode CheckWifiMdmRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList);
+    
     ErrCode ClearWifiRestrictedListConfig(int uid);
+
+    int GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0);
  
     int SyncWifiRestrictedListConfig();
 
@@ -388,7 +392,9 @@ private:
     void SyncAfterDecryped(WifiDeviceConfig &config);
     int GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> &configs);
 public:
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     std::vector<WifiRestrictedInfo> wifiRestrictedList_;
+#endif
 private:
     // STA
     std::mutex mStaMutex;

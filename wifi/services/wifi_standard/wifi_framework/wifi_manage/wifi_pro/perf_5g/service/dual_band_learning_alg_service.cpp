@@ -35,6 +35,7 @@ constexpr double BASE_VALUE = 500.0;
 constexpr double VALID_SIZE_RATE_LIST = 5;
 const double PI = acos(-1.0);
 const double E = exp(1);
+constexpr uint32_t  USE_1000 = 1000;
 
 DualBandLearningAlgService::DualBandLearningAlgService()
 {}

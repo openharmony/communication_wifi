@@ -285,6 +285,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
     }
 
+    if (wifi_feature_mdm_restricted_enable) {
+      defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
+    }
+
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
     ldflags = memory_optimization_ldflags

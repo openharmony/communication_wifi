@@ -43,6 +43,8 @@ public:
 
     int VerifyGetWifiInfoPermission(const int &pid, const int &uid);
 
+    int VerifyManageEdmPolicyPermission(const int &pid, const int &uid);
+
     int VerifyGetScanInfosPermission(const int &pid, const int &uid);
 
     int VerifyGetWifiLocalMacPermission(const int &pid, const int &uid);

@@ -72,6 +72,12 @@ public:
 
     // Enable all networks by entering settings
     void OnReceiveSettingsEnterEvent(bool isEnter);
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    // set thie blocklist information for mdm restrictedlist
+    bool UpdateNetworkSelectStatusForMdmRestrictedList();
+    // Clear mdmRestrictedList from block connect
+    bool ClearBlockConnectForMdmRestrictedList();
+#endif
 #ifndef OHOS_ARCH_LITE
     // handle wifi stopped msg
     void DealStaStopped(int instId);

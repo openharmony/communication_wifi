@@ -77,6 +77,12 @@ inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
 inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 
+enum WifiRestrictedType {
+    MDM_BLOCKLIST = 0,
+    MDM_WHITELIST = 1,
+    MDM_INVALID_LIST = 2
+};
+
 enum class SupplicantState {
     DISCONNECTED = 0,
     INTERFACE_DISABLED = 1,
@@ -172,7 +178,13 @@ enum class DisconnectedReason {
     DISC_REASON_CONNECTION_FULL = 2,
 
     /* Connection Rejected */
-    DISC_REASON_CONNECTION_REJECTED = 3
+    DISC_REASON_CONNECTION_REJECTED = 3,
+ 
+    /* Connect mdm blocklist or  wifi is fail*/
+    DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL = 5,
+
+    /* Connect fail reason max value, add new reason before this*/
+    DISC_REASON_MAX_VALUE
 };
 
 enum class WifiOperateType {
@@ -303,6 +315,22 @@ struct WifiLinkedInfo {
         c0Rssi = 0;
         c1Rssi = 0;
         linkId = INVALID_LINK_ID;
+    }
+};
+
+/* Wifi access list info */
+struct WifiRestrictedInfo {
+    std::string ssid;
+    std::string bssid;
+    WifiRestrictedType wifiRestrictedType;
+    int uid;
+ 
+    WifiRestrictedInfo()
+    {
+        ssid = "";
+        bssid = "";
+        wifiRestrictedType = MDM_INVALID_LIST;
+        uid = 0;
     }
 };
 
@@ -596,7 +624,8 @@ enum class DisabledReason {
     DISABLED_BY_SYSTEM = 13,
     DISABLED_EAP_AKA_FAILURE = 14,
     DISABLED_DISASSOC_REASON = 15,
-    NETWORK_SELECTION_DISABLED_MAX = 16
+    DISABLED_MDM_RESTRICTED = 16,
+    NETWORK_SELECTION_DISABLED_MAX = 17
 };
 
 struct NetworkSelectionStatus {

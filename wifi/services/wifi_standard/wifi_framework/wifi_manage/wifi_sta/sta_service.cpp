@@ -43,6 +43,9 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+constexpr const int MAX_MDM_RESTRICTED_SIZE = 200;
+#endif
 
 #define EAP_AUTH_IMSI_MCC_POS 0
 #define EAP_AUTH_MAX_MCC_LEN  3
@@ -278,7 +281,14 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
         LOGE("ConnectToCandidateConfig:GetCandidateConfig is null!");
         return WIFI_OPT_FAILED;
     }
-
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, false)) {
+        LOGD("ConnectToCandiateConfig RestrictedByMdm");
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
+        return WIFI_OPT_FAILED;
+    }
+#endif
 #ifndef OHOS_ARCH_LITE
     if (config.lastConnectTime <= 0) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
@@ -395,6 +405,33 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
     LOGI("StaService::UpdateEapConfig, identity: %{public}s", identity.c_str());
     wifiEapConfig.identity = identity;
 }
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+ErrCode StaService::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) const
+{
+    std::vector<WifiRestrictedInfo> tmp;
+    tmp.assign(wifiRestrictedInfoList.begin(), wifiRestrictedInfoList.end());
+    ErrCode checkResult = WifiSettings::GetInstance().CheckWifiMdmRestrictedList(tmp);
+    if (checkResult != WIFI_OPT_SUCCESS) {
+        return checkResult;
+    }
+    BlockConnectService::GetInstance().ClearBlockConnectForMdmRestrictedList();
+    WifiSettings::GetInstance().ClearWifiRestrictedListConfig(m_instId);
+    for (size_t i = 0; i < tmp.size() && i <= MAX_MDM_RESTRICTED_SIZE; i++) {
+        WifiSettings::GetInstance().AddWifiRestrictedListConfig(m_instId, tmp[i]);
+    }
+    WifiSettings::GetInstance().SyncWifiRestrictedListConfig();
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatusForMdmRestrictedList();
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(linkedInfo.ssid, linkedInfo.bssid, 0)) {
+        CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+        pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_NETWORK_REMOVED, linkedInfo.networkId);
+        WifiSettings::GetInstance().RemoveConnectChoiceFromAllNetwork(linkedInfo.networkId);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+#endif
 
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
 {
@@ -544,6 +581,13 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
     LOGI(
         "Enter ConnectToDevice, ssid = %{public}s instId:%{public}d. \n", SsidAnonymize(config.ssid).c_str(), m_instId);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, false)) {
+        LOGD("ConnectToDevice RestrictedByMdm");
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
+        return WIFI_OPT_FAILED;
+    }
+#endif
     int netWorkId = AddDeviceConfig(config);
     if (netWorkId == INVALID_NETWORK_ID) {
         LOGD("ConnectToDevice, AddDeviceConfig failed!");
@@ -564,6 +608,13 @@ ErrCode StaService::ConnectToNetwork(int networkId, int type) const
     }
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, false)) {
+        LOGD("ConnectToNetwork RestrictedByMdm");
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
+        return WIFI_OPT_FAILED;
+    }
+#endif
     LOGI("ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
@@ -597,7 +648,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
             }
             if (std::find_if(mloInfo.begin(), mloInfo.end(),
                 [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
-                pStaStateMachine->StartConnectToBssid(bssid);
+                    pStaStateMachine->StartConnectToBssid(networkId, bssid);
                 return WIFI_OPT_SUCCESS;
             }
             if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {
@@ -609,7 +660,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
                 return WIFI_OPT_SUCCESS;
             }
         }
-        pStaStateMachine->StartConnectToBssid(bssid);
+        pStaStateMachine->StartConnectToBssid(networkId, bssid);
     } else {
         LOGI("%{public}s switch to target network", __FUNCTION__);
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);

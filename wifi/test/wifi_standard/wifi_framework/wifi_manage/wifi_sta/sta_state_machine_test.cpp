@@ -421,7 +421,7 @@ public:
 
     void StartConnectToBssidSuccess()
     {
-        pStaStateMachine->StartConnectToBssid("a2:b1:f5:c7:d1");
+        pStaStateMachine->StartConnectToBssid(0, "a2:b1:f5:c7:d1");
     }
 
     void SeparatedStateGoInStateSuccess()

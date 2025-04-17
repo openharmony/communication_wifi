@@ -4419,7 +4419,7 @@ void StaStateMachine::DealMdmRestrictedConnect(WifiDeviceConfig &config)
     WIFI_LOGI("WIFI Disconnect by MdmRestricted");
     SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
-        DisabledReason::DISABLED_BY_WIFI_MANAGER);
+        DisabledReason::DISABLED_MDM_RESTRICTED);
     AddRandomMacCure();
     InvokeOnStaConnChanged(OperateResState::CONNECT_ENABLE_NETWORK_FAILED,
         linkedInfo);

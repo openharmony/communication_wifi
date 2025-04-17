@@ -391,7 +391,7 @@ bool WifiDeviceServiceImpl::InitWifiBrokerProcessInfo(const WifiDeviceConfig &co
         return false;
     }
     auto ancoWifiValue = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
-    if (config.callProcessName == ancoWifiValue) {
+    if (!ancoWifiValue.empty() && config.callProcessName == ancoWifiValue) {
         SetWifiBrokerProcess(GetCallingPid(), config.callProcessName);
         return true;
     }
@@ -418,7 +418,7 @@ bool WifiDeviceServiceImpl::IsWifiBrokerProcess(int uid)
     int pid = GetCallingPid();
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(uid, pid);
-    if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+    if (wifiBrokerFrameProcessName.empty() || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
         return false;
     }
     return true;

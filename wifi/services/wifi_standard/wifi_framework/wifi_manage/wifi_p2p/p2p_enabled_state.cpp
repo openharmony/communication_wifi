@@ -149,7 +149,7 @@ bool P2pEnabledState::ProcessCmdStartListen(InternalMessagePtr msg) const
     }
 
     constexpr int defaultOpClass = 81;
-    constexpr int defaultChannel = 6;
+    constexpr int defaultChannel = 1;
     if (WifiP2PHalInterface::GetInstance().SetListenChannel(defaultChannel, defaultOpClass)) {
         WIFI_LOGI("p2p set listen channel failed. channel:%{public}d, opclass:%{public}d", defaultChannel,
             defaultOpClass);

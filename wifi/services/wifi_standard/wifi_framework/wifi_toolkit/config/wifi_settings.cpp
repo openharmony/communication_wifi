@@ -166,6 +166,60 @@ ErrCode WifiSettings::AddWifiRestrictedListConfig(int uid, const WifiRestrictedI
     wifiRestrictedList_.push_back(wifiListInfo);
     return WIFI_OPT_SUCCESS;
 }
+
+int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId) {
+    LOGI("Enter GetMdmRestrictedBlockDeviceConfig");
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGD("Reload wifi config");
+        ReloadDeviceConfig();
+    }
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    std::map<std::string, std::string> blockSsids;
+    std::map<std::string, std::string> blockBssids;
+    std::map<std::string, WifiRestrictedInfo> whiteBlocks;
+    for (size_t i = 0; i < wifiRestrictedList_.size(); i++) {
+        if (wifiRestrictedList_[i].wifiRestrictedType == MDM_BLOCKLIST) {
+            if (!wifiRestrictedList_[i].ssid.empty()) {
+                blockSsids.emplace(wifiRestrictedList_[i].ssid, wifiRestrictedList_[i].ssid);
+            }
+            if (!wifiRestrictedList_[i].bssid.empty()) {
+                blockBssids.emplace(wifiRestrictedList_[i].bssid, wifiRestrictedList_[i].bssid);
+            }
+        }
+        if (wifiRestrictedList_[i].wifiRestrictedType == MDM_WHITELIST) {
+            whiteBlocks.emplace(wifiRestrictedList_[i].ssid + wifiRestrictedList_[i].bssid, wifiRestrictedList_[i]);
+        }
+    }
+    if (blockSsids.size() <= 0 && blockBssids.size() <= 0 && whiteBlocks.size() <= 0) {
+        return 0;
+    }
+    
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if (iter->second.instanceId == instId && ((blockSsids.find(iter->second.ssid) != blockSsids.end() ||
+            blockBssids.find(iter->second.bssid) != blockBssids.end()) ||
+            whiteBlocks.find(iter->second.ssid + iter->second.bssid) != whiteBlocks.end())) {
+            results.push_back(iter->second);
+        }
+    }
+    return 0;
+}
+
+ErrCode WifiSettings::CheckWifiMdmRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) {
+    if (wifiRestrictedInfoList.size() > WIFI_MDM_RESTRICTED_MAX_NUM) {
+        LOGE("Add WifiRestrictedInfo exceeding the maximum value!");
+        return WIFI_OPT_MDM_BLOCKLIST_OUT_MAX_NUM;
+    }
+    ErrCode code = WIFI_OPT_SUCCESS;
+    for (size_t i = 0; i < wifiRestrictedInfoList.size(); i++) {
+        if ((wifiRestrictedInfoList[i].ssid.empty() && wifiRestrictedInfoList[i].wifiRestrictedType == MDM_BLOCKLIST) ||
+        (wifiRestrictedInfoList[i].wifiRestrictedType == MDM_WHITELIST &&
+        (wifiRestrictedInfoList[i].ssid.empty() || wifiRestrictedInfoList[i].bssid.empty()))) {
+            code = WIFI_OPT_INVALID_PARAM;
+            break;
+        }
+    }
+    return code;
+}
  
 ErrCode WifiSettings::ClearWifiRestrictedListConfig(int uid)
 {

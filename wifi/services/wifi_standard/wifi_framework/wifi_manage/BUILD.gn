@@ -704,6 +704,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hilog:libhilog",
       "ipc:ipc_single",
+      "libxml2:libxml2",
     ]
 
     version_script = "libwifi_manager.map"

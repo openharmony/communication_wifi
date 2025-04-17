@@ -167,7 +167,8 @@ ErrCode WifiSettings::AddWifiRestrictedListConfig(int uid, const WifiRestrictedI
     return WIFI_OPT_SUCCESS;
 }
 
-int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId) {
+int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId)
+{
     LOGI("Enter GetMdmRestrictedBlockDeviceConfig");
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -204,7 +205,8 @@ int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig
     return 0;
 }
 
-ErrCode WifiSettings::CheckWifiMdmRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) {
+ErrCode WifiSettings::CheckWifiMdmRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
+{
     if (wifiRestrictedInfoList.size() > WIFI_MDM_RESTRICTED_MAX_NUM) {
         LOGE("Add WifiRestrictedInfo exceeding the maximum value!");
         return WIFI_OPT_MDM_BLOCKLIST_OUT_MAX_NUM;

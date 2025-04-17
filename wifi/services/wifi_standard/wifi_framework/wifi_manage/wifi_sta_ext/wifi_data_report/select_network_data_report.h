@@ -38,7 +38,7 @@ private:
     std::mutex historyMutex_; // 用于保护历史记录
 public:
 
-    explicit WifiDataReportService(StaStateMachine& staStateMachine, int instId);
+    explicit WifiDataReportService(StaStateMachine* staStateMachinePtr, int instId);
     ~ WifiDataReportService() override;
 
     /**

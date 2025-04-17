@@ -48,8 +48,8 @@ constexpr int MAX_PUSH_COUNT = 10; // 10条数据融合为一条上报
 
 } // namespace WifiDataConstants
 
-WifiDataReportService::WifiDataReportService(StaStateMachine& staStateMachine, int instId)
-    : StaSMExt(staStateMachine, instId) {}
+WifiDataReportService::WifiDataReportService(StaStateMachine* staStateMachinePtr, int instId)
+    : StaSMExt(staStateMachinePtr, instId) {}
 
 WifiDataReportService::~WifiDataReportService() {}
 

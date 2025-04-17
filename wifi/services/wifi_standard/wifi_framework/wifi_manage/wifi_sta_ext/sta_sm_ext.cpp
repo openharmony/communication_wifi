@@ -21,13 +21,13 @@
 namespace OHOS {
 namespace Wifi {
 
-StaSMExt::StaSMExt(StaStateMachine& staStateMachine, int instId) : staStateMachine_(staStateMachine) {}
+StaSMExt::StaSMExt(StaStateMachine* staStateMachinePtr, int instId) : staStateMachine_(staStateMachinePtr) {}
 
 StaSMExt::~StaSMExt() {}
 
 StaStateMachine* StaSMExt::GetStaStateMachine() const
 {
-    return &staStateMachine_;
+    return staStateMachine_;
 }
 
 } // namespace Wifi

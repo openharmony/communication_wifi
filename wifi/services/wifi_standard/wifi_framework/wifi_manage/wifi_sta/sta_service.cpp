@@ -411,11 +411,17 @@ ErrCode StaService::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> 
 {
     std::vector<WifiRestrictedInfo> tmp;
     tmp.assign(wifiRestrictedInfoList.begin(), wifiRestrictedInfoList.end());
+    ErrCode checkResult = WifiSettings::GetInstance().CheckWifiMdmRestrictedList(tmp);
+    if (checkResult != WIFI_OPT_SUCCESS) {
+        return checkResult;
+    }
+    BlockConnectService::GetInstance().ClearBlockConnectForMdmRestrictedList();
     WifiSettings::GetInstance().ClearWifiRestrictedListConfig(m_instId);
     for (size_t i = 0; i < tmp.size() && i <= MAX_MDM_RESTRICTED_SIZE; i++) {
         WifiSettings::GetInstance().AddWifiRestrictedListConfig(m_instId, tmp[i]);
     }
     WifiSettings::GetInstance().SyncWifiRestrictedListConfig();
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatusForMdmRestrictedList();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (WifiSettings::GetInstance().FindWifiBlockListConfig(linkedInfo.ssid, linkedInfo.bssid, 0)) {

@@ -1042,9 +1042,6 @@ private:
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
     ISelfCureService *selfCureService_ = nullptr;
-#ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService wifiDataReportService_;
-#endif
 #endif
 
     int targetNetworkId_;
@@ -1091,6 +1088,11 @@ private:
      set to true when linkswitch start, to false when linkswitch duration 2s later
     */
     bool linkSwitchDetectingFlag_{false};
+#ifndef OHOS_ARCH_LITE
+#ifdef WIFI_DATA_REPORT_ENABLE
+    WifiDataReportService *wifiDataReportService_ = nullptr;
+#endif
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

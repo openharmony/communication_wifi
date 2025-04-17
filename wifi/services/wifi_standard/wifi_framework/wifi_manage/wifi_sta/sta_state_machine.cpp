@@ -132,11 +132,6 @@ const std::map<int, int> portalEventValues = {
 
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
-#ifndef OHOS_ARCH_LITE
-#ifdef WIFI_DATA_REPORT_ENABLE
-      wifiDataReportService_(*this, instId),
-#endif
-#endif
       targetNetworkId_(INVALID_NETWORK_ID),
       lastSignalLevel_(INVALID_SIGNAL_LEVEL), targetRoamBssid(WPA_BSSID_ANY), currentTpType(IPTYPE_IPV4),
       getIpSucNum(0), getIpFailNum(0), enableSignalPoll(true), isRoam(false),
@@ -164,6 +159,11 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
     ParsePointer(pDhcpResultNotify);
+#ifndef OHOS_ARCH_LITE
+#ifdef WIFI_DATA_REPORT_ENABLE
+    ParsePointer(wifiDataReportService_);
+#endif
+#endif
     {
         std::unique_lock<std::shared_mutex> lock(m_staCallbackMutex);
         m_staCallback.clear();
@@ -200,6 +200,15 @@ ErrCode StaStateMachine::InitStaStates()
 {
     WIFI_LOGE("Enter InitStaStates\n");
     int tmpErrNumber;
+#ifndef OHOS_ARCH_LITE
+#ifdef WIFI_DATA_REPORT_ENABLE
+    wifiDataReportService_ = new (std::nothrow) WifiDataReportService(this, this->m_instId);
+    if (wifiDataReportService_ == nullptr) {
+        WIFI_LOGE("wifiDataReportService_ new failed");
+        return WIFI_OPT_FAILED;
+    }
+#endif
+#endif
     pInitState = new (std::nothrow) InitState(this);
     tmpErrNumber = JudgmentEmpty(pInitState);
     pLinkState = new (std::nothrow) LinkState(this);
@@ -1005,7 +1014,7 @@ void StaStateMachine::SeparatedState::GoInState()
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_DISCONNECTED,
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_DISCONNECTED,
         pStaStateMachine->linkedInfo.networkId);
 #endif
 #endif
@@ -1190,7 +1199,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
             DisabledReason::DISABLED_BY_WRONG_PASSWORD);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-        pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
+        pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
             pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -1199,7 +1208,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
             DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-        pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
+        pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
             pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -1221,7 +1230,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFullConnectFailEvent(InternalMe
         DisabledReason::DISABLED_ASSOCIATION_REJECTION);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_FULL,
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_FULL,
         pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -1242,7 +1251,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkAssocRejectFailEvent(InternalMe
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_ASSOCIATION_REJECTION);
 #ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_REJECTION,
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_REJECTION,
         pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -2307,7 +2316,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_SUC_START,
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_SUC_START,
         pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -3800,7 +3809,7 @@ void StaStateMachine::DealSignalPollResult()
     LogSignalInfo(signalInfo);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    wifiDataReportService_.ReportQoeInfo(signalInfo, ConnReportReason::CONN_SUC_KEEP, linkedInfo.networkId);
+    wifiDataReportService_->ReportQoeInfo(signalInfo, ConnReportReason::CONN_SUC_KEEP, linkedInfo.networkId);
 #endif
 #endif
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
@@ -4140,7 +4149,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     ConvertDeviceCfg(deviceConfig, bssid);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    wifiDataReportService_.InitReportApAllInfo();
+    wifiDataReportService_->InitReportApAllInfo();
 #endif
 #endif
     if (bssid.empty()) {

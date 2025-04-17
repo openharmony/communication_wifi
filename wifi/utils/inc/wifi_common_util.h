@@ -26,6 +26,7 @@
 #include "wifi_timer.h"
 #endif
 #include "wifi_errcode.h"
+#include "wifi_msg.h"
 
 #ifndef WIFI_MAC_LEN
 #define WIFI_MAC_LEN 6
@@ -52,6 +53,15 @@ inline const uint8_t WIFI_SYSTEM_ID = 202;
 inline const uint8_t P2P_SUB_SYSTEM_ID = 2;
 inline const int SYSTEM_OFFSET = 21;
 inline const int SUB_SYSTEM_OFFSET = 16;
+inline const int SIGNAL_RECORD_5S = 5;
+inline const int SIGNAL_RECORD_10S = 10;
+inline const int SIGNAL_LEVEL_TWO = 2;
+inline const int CHECK_THREE_TIME = 3;
+
+enum BeaconLostType : int32_t {
+    SIGNAL_LEVEL_LOW = 0,
+    SIGNAL_LEVEL_HIGH = 1
+};
 
 /* StaCallBackNameEventIdMap */
 static std::map<std::string, int> g_staCallBackNameEventIdMap = {
@@ -308,6 +318,8 @@ int FrequencyToChannel(int freq);
  */
 int ChannelToFrequency(int channel);
 bool IsOtherVapConnect();
+bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray,
+    int signalLevel);
 int HexString2Byte(const char *hex, uint8_t *buf, size_t len);
 void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t hexstrLen);
 bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);

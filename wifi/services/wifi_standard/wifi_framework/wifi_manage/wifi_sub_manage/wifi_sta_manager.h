@@ -48,6 +48,8 @@ private:
     void DealAutoSelectNetworkChanged(int networkId, int instId);
     void PublishWifiOperateStateHiSysEvent(OperateResState state);
     void NotifyScanForStaConnChanged(OperateResState state, int instId = 0);
+    void DealInternetAccessChanged(int internetAccessStatus, int instId);
+    void DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId = 0);
 private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};
@@ -55,7 +57,6 @@ private:
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
 };
-
 }  // namespace Wifi
 }  // namespace OHOS
 #endif // OHOS_WIFI_STA_MANAGER_H

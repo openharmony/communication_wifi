@@ -191,6 +191,7 @@ ohos_unittest("wifi_sta_unittest") {
 
   sources = local_base_sources
   sources += [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure/ip_qos_monitor.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta/sta_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/arp_checker.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/base_address.cpp",
@@ -203,6 +204,7 @@ ohos_unittest("wifi_sta_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_common_event_helper.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_randommac_helper.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/mock/mock_wifi_service_manager.cpp",
     "Mock/mock_mac_address.cpp",
     "Mock/mock_sta_auto_connect_service.cpp",
     "Mock/mock_wifi_manager.cpp",
@@ -218,6 +220,9 @@ ohos_unittest("wifi_sta_unittest") {
   ]
 
   include_dirs = local_base_include_dirs
+  include_dirs +=
+      [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage" ]
+
   ldflags = local_base_ldflags
   deps = [ "$WIFI_ROOT_DIR/utils:wifi_utils" ]
   external_deps = local_base_external_deps
@@ -240,6 +245,7 @@ ohos_unittest("wifi_sta_unittest") {
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     "private=public",
     "SUPPORT_RANDOM_MAC_ADDR",
+    "FEATURE_SELF_CURE_SUPPORT",
   ]
   part_name = "wifi"
   subsystem_name = "communication"

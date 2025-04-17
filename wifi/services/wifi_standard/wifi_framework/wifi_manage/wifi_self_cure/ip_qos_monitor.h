@@ -16,6 +16,7 @@
 #ifndef OHOS_IP_QOS_MONITOR_H
 #define OHOS_IP_QOS_MONITOR_H
 
+#include <mutex>
 #include "self_cure_service.h"
 #include "wifi_netlink.h"
 #include "wifi_net_observer.h"
@@ -33,6 +34,8 @@ public:
     bool ParseNetworkInternetGood(const std::vector<int64_t> &elems);
     int64_t GetCurrentTcpTxCounter();
     int64_t GetCurrentTcpRxCounter();
+    void ResetTxRxProperty();
+    bool GetTxRxStatus();
 private:
     bool AllowSelfCureNetwork(int32_t currentRssi);
     int32_t mInstId = 0;
@@ -42,6 +45,8 @@ private:
     int64_t mLastTcpRxCounter = 0;
     int32_t mInternetFailedCounter = 0;
     sptr<NetStateObserver> mNetWorkDetect;
+    bool lastTxRxGood_ = false;
+    std::mutex txRxStatusMtx_;
 };
 
 } // namespace Wifi

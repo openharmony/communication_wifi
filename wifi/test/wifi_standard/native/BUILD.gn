@@ -70,6 +70,7 @@ ohos_unittest("native_unittest") {
     "googletest:gtest_main",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "wifi"

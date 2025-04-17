@@ -44,6 +44,7 @@ constexpr int64_t SELF_CURE_RSSI_THRESHOLD = -70;
 constexpr int64_t DEFAULT_NET_DISABLE_DETECT_COUNT = 2;
 constexpr int64_t MIN_TCP_TX = 2;
 constexpr int64_t MIN_DNS_FAILED_CNT = 2;
+constexpr int32_t WIFI_PRO_DETECT_TIMEOUT = 16 * 1000;  // ms
 // show reason
 std::map<WifiSwitchReason, std::string> g_switchReason = {
     {WIFI_SWITCH_REASON_NO_INTERNET, "NO_INTERNET"},
@@ -678,6 +679,8 @@ void WifiProStateMachine::WifiConnectedState::HandleHttpResult(const InternalMes
         WIFI_LOGI("HttpResultInConnected, msg is nullptr.");
         return;
     }
+    pWifiProStateMachine_->StopTimer(EVENT_DETECT_TIMEOUT);
+    pWifiProStateMachine_->mHttpDetectedAllowed_ = true;
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED) &&
         (pWifiProStateMachine_->currentState_ != WifiProState::WIFI_NONET)) {
@@ -829,6 +832,7 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     mLastTcpTxCounter_ = 0;
     mLastTcpRxCounter_ = 0;
     mLastDnsFailedCnt_ = 0;
+    netDisableDetectCount_ = 0;
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
     pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
@@ -860,7 +864,7 @@ bool WifiProStateMachine::WifiHasNetState::ExecuteStateMsg(InternalMessagePtr ms
             HandleScanResultInHasNet(msg);
             break;
         case EVENT_REQUEST_NETWORK_DETECT:
-            RequestHttpDetect();
+            RequestHttpDetect(false);
             break;
         case EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL:
             ParseQoeInfoAndRequestDetect();
@@ -870,6 +874,9 @@ bool WifiProStateMachine::WifiHasNetState::ExecuteStateMsg(InternalMessagePtr ms
             break;
         case EVENT_SIGNAL_INFO_CHANGE:
             pWifiProStateMachine_->perf5gHandoverService_.HandleSignalInfoChange(msg);
+            break;
+        case EVENT_DETECT_TIMEOUT:
+            RequestHttpDetect(true);
             break;
         default:
             return false;
@@ -1030,12 +1037,24 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     }
 }
 
-void WifiProStateMachine::WifiHasNetState::RequestHttpDetect()
+void WifiProStateMachine::WifiHasNetState::RequestHttpDetect(bool forceHttpDetect)
 {
-    WIFI_LOGI("Enter RequestHttpDetect.");
+    const bool shouldDetect = forceHttpDetect || (pWifiProStateMachine_->mHttpDetectedAllowed_ &&
+                                                     netDisableDetectCount_ < DEFAULT_NET_DISABLE_DETECT_COUNT);
+    WIFI_LOGI("forceHttpDetect %{public}d, mHttpDetectedAllowed_ %{public}d, netDisableDetectCount_ %{public}d",
+        forceHttpDetect, pWifiProStateMachine_->mHttpDetectedAllowed_, netDisableDetectCount_);
+    if (!shouldDetect) {
+        WIFI_LOGI("Has RequestHttpDetect.");
+        return;
+    }
     sptr<NetStateObserver> mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
     mNetWorkDetect->StartWifiDetection();
-    netDiasableDetectCount_ = 0;
+    pWifiProStateMachine_->mHttpDetectedAllowed_ = false;
+    netDisableDetectCount_++;
+    // Start the timeout timer when the probe is not forced
+    if (!forceHttpDetect) {
+        pWifiProStateMachine_->StartTimer(EVENT_DETECT_TIMEOUT, WIFI_PRO_DETECT_TIMEOUT);
+    }
 }
 
 void WifiProStateMachine::WifiHasNetState::ParseQoeInfoAndRequestDetect()
@@ -1046,7 +1065,7 @@ void WifiProStateMachine::WifiHasNetState::ParseQoeInfoAndRequestDetect()
     int64_t mCurrentTcpTxCounter = IpQosMonitor::GetInstance().GetCurrentTcpTxCounter();
     int64_t mCurrentTcpRxCounter = IpQosMonitor::GetInstance().GetCurrentTcpRxCounter();
     int32_t mCurrentDnsFailedCnt = SelfCureUtils::GetInstance().GetCurrentDnsFailedCounter();
-
+ 
     // caculate delta of TX RX DNSFailedCount
     int64_t deltaTcpTxPkts = mCurrentTcpTxCounter - mLastTcpTxCounter_;
     int64_t deltaTcpRxPkts = mCurrentTcpRxCounter - mLastTcpRxCounter_;
@@ -1056,25 +1075,13 @@ void WifiProStateMachine::WifiHasNetState::ParseQoeInfoAndRequestDetect()
     mLastDnsFailedCnt_ = mCurrentDnsFailedCnt;
     WIFI_LOGI("deltaTcpTxPkts = %{public}" PRId64 ", deltaTcpRxPkts = %{public}" PRId64 ", deltaFailedDns = %{public}d"
               ", nedisable = %{public}d",
-        deltaTcpTxPkts, deltaTcpRxPkts, deltaFailedDns, netDiasableDetectCount_);
-
-    // if Rx = 0 DNSFailedCount >=2  detect network
-    if (deltaTcpRxPkts == 0 && deltaFailedDns >= MIN_DNS_FAILED_CNT) {
-        WIFI_LOGI("Rx = 0 && DNSFailed > 2 detect");
+        deltaTcpTxPkts, deltaTcpRxPkts, deltaFailedDns, netDisableDetectCount_);
+    // if Rx = 0 DNSFailedCount >=2 or  Rx = 0 Tx >=2
+    if (deltaTcpRxPkts == 0 && (deltaFailedDns >= MIN_DNS_FAILED_CNT || deltaTcpTxPkts >= MIN_TCP_TX)) {
         pWifiProStateMachine_->SendMessage(EVENT_REQUEST_NETWORK_DETECT);
-        return;
+    } else {
+        netDisableDetectCount_ = 0;
     }
-
-    // if Rx = 0 Tx >=2  Count++, if Count >= 2 detect network
-    if (deltaTcpRxPkts == 0 && deltaTcpTxPkts >= MIN_TCP_TX) {
-        netDiasableDetectCount_++;
-        if (netDiasableDetectCount_ >= DEFAULT_NET_DISABLE_DETECT_COUNT) {
-            WIFI_LOGI("Rx = 0 Tx >=2 Count >= 2 detect");
-            pWifiProStateMachine_->SendMessage(EVENT_REQUEST_NETWORK_DETECT);
-        }
-        return;
-    }
-    netDiasableDetectCount_ = 0;
 }
 
 void WifiProStateMachine::WifiHasNetState::HandleWifiQoeSlow()

@@ -1,4 +1,3 @@
-
 # communication\_wifi<a name="EN-US_TOPIC_0000001162030287"></a>
 
 -   [Introduction](#section11660541593)

@@ -53,7 +53,8 @@ enum WifiDialogType {
     THREE_VAP = 1,
     CANDIDATE_CONNECT = 2,
     AUTO_IDENTIFY_CONN = 3,
-    P2P_WSC_PBC_DIALOG = 4
+    P2P_WSC_PBC_DIALOG = 4,
+    SETTINGS_AUTO_IDENTIFY_CONN = 5
 };
 
 class WifiNotificationUtil {

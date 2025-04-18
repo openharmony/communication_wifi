@@ -198,7 +198,7 @@ int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.instanceId == instId && ((blockSsids.find(iter->second.ssid) != blockSsids.end() ||
             blockBssids.find(iter->second.bssid) != blockBssids.end()) ||
-            whiteBlocks.find(iter->second.ssid + iter->second.bssid) != whiteBlocks.end())) {
+            whiteBlocks.find(iter->second.ssid + iter->second.bssid) == whiteBlocks.end())) {
             results.push_back(iter->second);
         }
     }

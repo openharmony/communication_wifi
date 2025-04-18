@@ -156,16 +156,6 @@ public:
      */
     virtual int AddDeviceConfig(const WifiDeviceConfig &config) const;
     /**
-     * @Description Add wifi block list and wifi white list
-     *
-     * @param config - WifiRestrictedInfo object
-     * @param result - the result of wifi access list
-     * @return ErrCode - operation result
-     */
-#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
-    virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) const;
-#endif
-    /**
      * @Description Update a network to config.
      *
      * @param config -The Network info(in)
@@ -453,6 +443,17 @@ public:
      * @param state net state
      */
     virtual void GetDetectNetState(OperateResState &state);
+
+        /**
+     * @Description Add wifi block list and wifi white list
+     *
+     * @param config - WifiRestrictedInfo object
+     * @param result - the result of wifi access list
+     * @return ErrCode - operation result
+     */
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) const;
+#endif
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;

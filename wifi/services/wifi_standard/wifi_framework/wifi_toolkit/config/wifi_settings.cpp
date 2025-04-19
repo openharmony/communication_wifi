@@ -236,7 +236,8 @@ bool WifiSettings::FindWifiBlockListConfig(const std::string &ssid, const std::s
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (size_t i = 0; i < wifiRestrictedList_.size(); i++) {
         if (wifiRestrictedList_[i].wifiRestrictedType == MDM_BLOCKLIST &&
-            (wifiRestrictedList_[i].ssid == ssid || wifiRestrictedList_[i].bssid == bssid)) {
+            (wifiRestrictedList_[i].ssid == ssid ||
+            (!wifiRestrictedList_[i].bssid.empty() && wifiRestrictedList_[i].bssid == bssid))) {
             LOGI("find wifi block list info successful!");
             return true;
         }

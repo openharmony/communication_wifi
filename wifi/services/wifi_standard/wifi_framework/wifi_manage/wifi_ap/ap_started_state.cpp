@@ -143,6 +143,7 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
     
     WifiErrorNo setSoftApConfigResult = WifiErrorNo::WIFI_HAL_OPT_OK;
+    WifiErrorNo setApPasswdResult = WifiErrorNo::WIFI_HAL_OPT_OK;
     HotspotMode currentMode = HotspotMode::SOFTAP;
     m_ApStateMachine.GetHotspotMode(currentMode);
     if (currentMode == HotspotMode::LOCAL_ONLY_SOFTAP) {
@@ -155,11 +156,14 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         hotspotConfigTemp.SetPreSharedKey(GetRandomStr(LOCAL_ONLY_SOFTAP_PWD_LEN));
         WifiConfigCenter::GetInstance().SetLocalOnlyHotspotConfig(hotspotConfigTemp);
         setSoftApConfigResult = WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, hotspotConfigTemp, m_id);
+        setApPasswdResult = WifiApHalInterface::GetInstance().SetApPasswd(
+            hotspotConfigTemp.GetPreSharedKey().c_str(), m_id);
         WIFI_LOGI("set local only hotspot config, ssid=%{public}s", SsidAnonymize(randomSsid).c_str());
     } else {
         setSoftApConfigResult = WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, apConfig, m_id);
+        setApPasswdResult = WifiApHalInterface::GetInstance().SetApPasswd(apConfig.GetPreSharedKey().c_str(), m_id);
     }
-    if (setSoftApConfigResult != WifiErrorNo::WIFI_HAL_OPT_OK) {
+    if (setSoftApConfigResult != WifiErrorNo::WIFI_HAL_OPT_OK || setApPasswdResult != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("set hostapd config failed.");
         return false;
     }
@@ -172,11 +176,6 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         }
     }
     WifiApHalInterface::GetInstance().SetMaxConnectNum(ifName, apConfig.GetChannel(), apConfig.GetMaxConn());
-    if (WifiApHalInterface::GetInstance().SetApPasswd(apConfig.GetPreSharedKey().c_str(), m_id)
-            != WifiErrorNo::WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("SetApPasswd failed.");
-        return false;
-    }
     if (WifiApHalInterface::GetInstance().EnableAp(m_id) != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Enableap failed.");
         return false;

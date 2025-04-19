@@ -2754,12 +2754,14 @@ bool ScanService::AllowScanByHid2dState()
 
 bool ScanService::AllowScanByActionListen()
 {
+#ifdef SUPPORT_SCAN_CONTROL_ACTION_LISTEN
     if (WifiConfigCenter::GetInstance().GetP2pEnhanceActionListenChannel() != 0) {
         RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
             ScanLimitType::ACTION_LISTEN);
         WIFI_LOGW("Scan is not allowed in ActionListen condition.");
         return false;
     }
+#endif
     return true;
 }
 

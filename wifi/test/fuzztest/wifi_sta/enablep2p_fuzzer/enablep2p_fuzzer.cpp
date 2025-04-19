@@ -190,6 +190,54 @@ bool OnSetScanOnlyAvailableTest(const uint8_t* data, size_t size)
     return true;
 }
 
+void OnEnableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT), datas);
+}
+ 
+void OnDisableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT), datas);
+}
+ 
+void OnGetHotspotModeFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_MODE), datas);
+}
+ 
+void OnGetLocaoOnlyHotspotConfigFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG), datas);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -205,6 +253,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnStartConnectToUserSelectNetworkTest(data, size);
     OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
     OHOS::Wifi::IsFeatureSupportedTest(data, size);
+    OHOS::Wifi::OnEnableLocalOnlyHotspotFuzzTest(data, size);
+    OHOS::Wifi::OnDisableLocalOnlyHotspotFuzzTest(data, size);
+    OHOS::Wifi::OnGetHotspotModeFuzzTest(data, size);
+    OHOS::Wifi::OnGetLocaoOnlyHotspotConfigFuzzTest(data, size);
     return 0;
 }
 }

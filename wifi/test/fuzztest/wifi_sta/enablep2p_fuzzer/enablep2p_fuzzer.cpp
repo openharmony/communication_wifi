@@ -40,7 +40,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr size_t MAP_SCAN_NUMS = 20;
 constexpr size_t MAP_P2P_NUMS = 50;
-constexpr size_t MAP_HOTSPOT_NUMS = 30;
+constexpr size_t MAP_HOTSPOT_NUMS = 40;
 constexpr size_t MAP_DEVICE_NUMS = 60;
 constexpr size_t U32_AT_SIZE_ZERO = 4;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
@@ -190,70 +190,6 @@ bool OnSetScanOnlyAvailableTest(const uint8_t* data, size_t size)
     return true;
 }
 
-void OnEnableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(
-        HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT), datas, reply, option);
-}
- 
-void OnDisableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(
-        HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT), datas, reply, option);
-}
- 
-void OnGetHotspotModeFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_MODE),
-        datas, reply, option);
-}
- 
-void OnGetLocaoOnlyHotspotConfigFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(
-        HotspotInterfaceCode::WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG), datas, reply, option);
-}
-
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -269,10 +205,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnStartConnectToUserSelectNetworkTest(data, size);
     OHOS::Wifi::OnSetScanOnlyAvailableTest(data, size);
     OHOS::Wifi::IsFeatureSupportedTest(data, size);
-    OHOS::Wifi::OnEnableLocalOnlyHotspotFuzzTest(data, size);
-    OHOS::Wifi::OnDisableLocalOnlyHotspotFuzzTest(data, size);
-    OHOS::Wifi::OnGetHotspotModeFuzzTest(data, size);
-    OHOS::Wifi::OnGetLocaoOnlyHotspotConfigFuzzTest(data, size);
     return 0;
 }
 }

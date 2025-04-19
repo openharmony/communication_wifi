@@ -199,7 +199,11 @@ void OnEnableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT), datas);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(
+        HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT), datas, reply, option);
 }
  
 void OnDisableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
@@ -211,7 +215,11 @@ void OnDisableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT), datas);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(
+        HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT), datas, reply, option);
 }
  
 void OnGetHotspotModeFuzzTest(const uint8_t* data, size_t size)
@@ -223,7 +231,11 @@ void OnGetHotspotModeFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_MODE), datas);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_MODE),
+        datas, reply, option);
 }
  
 void OnGetLocaoOnlyHotspotConfigFuzzTest(const uint8_t* data, size_t size)
@@ -235,7 +247,11 @@ void OnGetLocaoOnlyHotspotConfigFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG), datas);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiScanStub->OnRemoteRequest(static_cast<uint32_t>(
+        HotspotInterfaceCode::WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG), datas, reply, option);
 }
 
 /* Fuzzer entry point */

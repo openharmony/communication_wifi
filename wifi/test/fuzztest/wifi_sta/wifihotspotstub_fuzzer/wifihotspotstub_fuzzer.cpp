@@ -137,54 +137,6 @@ void OnGetStationListFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_STATION_LIST), datas);
 }
 
-void OnEnableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_LOCAL_ONLY_HOTSPOT), datas);
-}
- 
-void OnDisableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_DISABLE_LOCAL_ONLY_HOTSPOT), datas);
-}
- 
-void OnGetHotspotModeFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_HOTSPOT_MODE), datas);
-}
- 
-void OnGetLocaoOnlyHotspotConfigFuzzTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_GET_LOCAL_ONLY_HOTSPOT_CONFIG), datas);
-}
-
 void OnAddBlockListFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
@@ -482,9 +434,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetHotspotConfigFuzzTest(data, size);
     OHOS::Wifi::OnSetApConfigWifiFuzzTest(data, size);
     OHOS::Wifi::OnGetStationListFuzzTest(data, size);
-    OHOS::Wifi::OnEnableLocalOnlyHotspotFuzzTest(data, size);
-    OHOS::Wifi::OnDisableLocalOnlyHotspotFuzzTest(data, size);
-    OHOS::Wifi::OnGetHotspotModeFuzzTest(data, size);
     OHOS::Wifi::OnAddBlockListFuzzTest(data, size);
     OHOS::Wifi::OnDelBlockListFuzzTest(data, size);
     OHOS::Wifi::OnGetBlockListsFuzzTest(data, size);

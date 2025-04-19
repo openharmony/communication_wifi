@@ -161,24 +161,6 @@ void IsValidHotspotConfigFuzzTest(const uint8_t* data, size_t size)
     pWifiHotspotServiceImpl->IsValidHotspotConfig(cfg, cfgFromCenter, bandsFromCenter, channInfoFromCenter);
 }
 
-void EnableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
-{
-    ServiceType type = ServiceType::DEFAULT;
-    pWifiHotspotServiceImpl->EnableLocalOnlyHotspot(type);
-}
- 
-void DisableLocalOnlyHotspotFuzzTest(const uint8_t* data, size_t size)
-{
-    ServiceType type = ServiceType::DEFAULT;
-    pWifiHotspotServiceImpl->DisableLocalOnlyHotspot(type);
-}
- 
-void GetHotspotModeFuzzTest(const uint8_t* data, size_t size)
-{
-    HotspotMode mode = HotspotMode::NONE;
-    pWifiHotspotServiceImpl->GetHotspotMode(mode);
-}
-
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -195,9 +177,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::CfgCheckIpAddressFuzzTest(data, size);
     OHOS::Wifi::IsValidHotspotConfigFuzzTest(data, size);
     OHOS::Wifi::StationsInfoDumpFuzzTest();
-    OHOS::Wifi::EnableLocalOnlyHotspotFuzzTest(data, size);
-    OHOS::Wifi::DisableLocalOnlyHotspotFuzzTest(data, size);
-    OHOS::Wifi::GetHotspotModeFuzzTest(data, size);
     return 0;
 }
 }

@@ -116,6 +116,9 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_scan_control) {
       defines += [ "SUPPORT_SCAN_CONTROL" ]
     }
+    if (wifi_feature_with_scan_control_action_listen) {
+      defines += [ "SUPPORT_SCAN_CONTROL_ACTION_LISTEN" ]
+    }
 
     external_deps = [
       "ability_base:want",

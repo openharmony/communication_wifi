@@ -78,6 +78,7 @@ private:
 #endif
     int64_t queryScanWhiteListTimeStamp_ = 0;
     std::string scanWhiteListStr_;
+    std::mutex wifiWhiteListMutex_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

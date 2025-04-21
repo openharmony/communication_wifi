@@ -361,6 +361,10 @@ bool WifiEventSubscriberManager::GetLocationModeByDatashare()
 
 std::string WifiEventSubscriberManager::GetScanWhiteListByDatashare()
 {
+    if (!WifiDataShareHelperUtils::GetInstance().CheckIfSettingsDataReady()) {
+        WIFI_LOGE("GetScanWhiteListDataShareUri, SettingsDataIsNotReady!");
+        return "";
+    }
     std::string whiteList;
     Uri uri(WifiDataShareHelperUtils::GetInstance().GetScanWhiteListDataShareUri());
     int ret = WifiDataShareHelperUtils::GetInstance().Query(uri, "location_kit_api_control_white_list", whiteList);

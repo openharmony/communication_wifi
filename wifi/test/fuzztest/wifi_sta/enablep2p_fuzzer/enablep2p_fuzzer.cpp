@@ -40,7 +40,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr size_t MAP_SCAN_NUMS = 20;
 constexpr size_t MAP_P2P_NUMS = 50;
-constexpr size_t MAP_HOTSPOT_NUMS = 30;
+constexpr size_t MAP_HOTSPOT_NUMS = 40;
 constexpr size_t MAP_DEVICE_NUMS = 60;
 constexpr size_t U32_AT_SIZE_ZERO = 4;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";

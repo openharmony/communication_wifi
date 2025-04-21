@@ -1014,6 +1014,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelectSelfCureByFailedReason(i
         WIFI_LOGI("start multi gateway selfcure");
         lastMultiGwSelfFailedType_ = internetFailedType;
         pSelfCureStateMachine_->SendMessage(WIFI_CURE_CMD_MULTI_GATEWAY);
+        return;
     }
 
     if (isUserSetStaticIpConfig_ && ((internetFailedType == WIFI_CURE_INTERNET_FAILED_TYPE_DNS) ||
@@ -1281,6 +1282,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
     MultiGateway::GetInstance().GetNextGatewayMac(macString);
     if (macString.empty() || ipAddr.empty()) {
         WIFI_LOGE("macString or ipAddr is nullptr");
+        pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MULTI_GATEWAY, false);
         if (lastMultiGwSelfFailedType_ != -1) {
             SelectSelfCureByFailedReason(lastMultiGwSelfFailedType_);
         }

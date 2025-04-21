@@ -38,8 +38,9 @@
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
 namespace Wifi {
-const int64_t DEFAULT_INVALID_24_HOURS = 24 * 60 * 60;
-constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
+constexpr int64_t DEFAULT_INVALID_24_HOURS = 24 * 60 * 60;
+constexpr int64_t SECOND_TO_MICROSECOND = 1000 * 1000;
+constexpr int32_t MAX_WHITELIST_LEN = 100;
 #ifdef OHOS_ARCH_LITE
 std::mutex WifiScanServiceImpl::g_instanceLock;
 std::shared_ptr<WifiScanServiceImpl> WifiScanServiceImpl::g_instance = nullptr;
@@ -454,6 +455,7 @@ void WifiScanServiceImpl::UpdateScanMode()
 
 bool WifiScanServiceImpl::IsInWhiteList()
 {
+    std::unique_lock<std::mutex> lock(wifiWhiteListMutex_);
     std::string bundleName;
     GetBundleNameByUid(GetCallingUid(), bundleName);
     int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
@@ -468,21 +470,21 @@ bool WifiScanServiceImpl::IsInWhiteList()
     if (scanWhiteListStr_.empty()) {
         return false;
     }
-    auto *cjson = cJSON_Parse(scanWhiteListStr_.c_str());
+    auto *whileListRoot = cJSON_Parse(scanWhiteListStr_.c_str());
     std::string type = "wifi";
-    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(cjson, type.c_str());
-    if (cJSON_IsArray(whiteList)) {
-        int size = cJSON_GetArraySize(whiteList);
-        for (int i = 0; i < size; i++) {
-            cJSON* item = cJSON_GetArrayItem(whiteList, i);
+    cJSON* wifiWhiteList = cJSON_GetObjectItemCaseSensitive(whileListRoot, type.c_str());
+    if (cJSON_IsArray(wifiWhiteList)) {
+        int size = cJSON_GetArraySize(wifiWhiteList);
+        for (int i = 0; i < size && i < MAX_WHITELIST_LEN; i++) {
+            cJSON* item = cJSON_GetArrayItem(wifiWhiteList, i);
             size_t pos = bundleName.find(item->valuestring);
             if (pos != std::string::npos) {
-                cJSON_Delete(cjson);
+                cJSON_Delete(whileListRoot);
                 return true;
             }
         }
     }
-    cJSON_Delete(cjson);
+    cJSON_Delete(whileListRoot);
     return false;
 }
 }  // namespace Wifi

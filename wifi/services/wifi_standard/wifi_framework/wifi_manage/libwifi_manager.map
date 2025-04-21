@@ -257,6 +257,7 @@
         "OHOS::Wifi::BaseAddress::~BaseAddress()";
         "OHOS::Wifi::WifiSettings::GetP2pVendorConfig(OHOS::Wifi::P2pVendorConfig&)";
         "OHOS::Wifi::WifiSettings::SetP2pVendorConfig(OHOS::Wifi::P2pVendorConfig const&)";
+        "OHOS::Wifi::WifiSettings::GetDefaultApSsid()";
         "OHOS::Wifi::WifiSettings::SetWifiP2pGroupInfo(std::__h::vector<OHOS::Wifi::WifiP2pGroupInfo, std::__h::allocator<OHOS::Wifi::WifiP2pGroupInfo>> const&)";
         "OHOS::Wifi::GetRandomStr(int)";
         "OHOS::Wifi::Ipv4Address::defaultInetAddress";

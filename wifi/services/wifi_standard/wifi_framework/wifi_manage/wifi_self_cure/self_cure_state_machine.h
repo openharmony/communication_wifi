@@ -393,6 +393,7 @@ private:
     void SetSelfCureWifiTimeOut(SelfCureState wifiSelfCureState);
     void ResetSelfCureParam();
     void NotifySelfCureCompleted(int status);
+    void ForceStopSelfCure();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;

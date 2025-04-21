@@ -308,8 +308,6 @@ HWTEST_F(WifiConfigFileTest, SaveLoadWifiP2pGroupInfo_SUCCESS, TestSize.Level1)
     mWifiP2pGroupInfo.SetValue(vec);
     mWifiP2pGroupInfo.SaveConfig();
     mWifiP2pGroupInfo.LoadConfig();
-    unsigned orgSize = vec.size();
-    EXPECT_TRUE(vec.size() == orgSize);
     EXPECT_EQ(true, (strcmp(vec.at(1).GetClientDevices().at(1).GetDeviceName().c_str(), "device_6") == 0));
     EXPECT_EQ(P2pGroupCapability::PGC_GROUP_OWNER,
         static_cast<P2pGroupCapability>(vec.at(1).GetClientDevices().at(1).GetGroupCapabilitys()));

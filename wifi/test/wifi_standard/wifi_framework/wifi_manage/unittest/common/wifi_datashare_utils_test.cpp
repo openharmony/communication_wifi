@@ -104,9 +104,6 @@ HWTEST_F(WifiDataShareHelperUtilsTest, ClearResourcesTest, TestSize.Level1)
     bool onlySettingsData = true;
     auto operatePtr = WifiDataShareHelperUtils::GetInstance().WifiCreateDataShareHelper(onlySettingsData);
 
-    if (operatePtr == nullptr) {
-        return;
-    }
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> columns;

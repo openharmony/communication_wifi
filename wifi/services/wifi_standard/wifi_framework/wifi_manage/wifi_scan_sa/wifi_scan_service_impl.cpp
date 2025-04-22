@@ -317,7 +317,6 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
 
 ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
 {
-    std::unique_lock<std::mutex> lock(mThirdPartyScanLimitMutex_);
     std::string appId = "";
     std::string packageName = "";
 #ifndef OHOS_ARCH_LITE
@@ -326,27 +325,26 @@ ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
 #endif
     if (appId.empty() || packageName.empty()) {
         WIFI_LOGE("ProcessPermissionVerify(), Empty id or packageName");
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_SUCCESS;
     }
  
     std::vector<PackageInfo> specialList;
     if (WifiSettings::GetInstance().GetPackageInfoByName("ScanLimitPackages", specialList) != 0) {
-        WIFI_LOGE("ProcessHmRequest GetPackageInfoByName failed");
+        WIFI_LOGE("ProcessScanInfoRequest GetPackageInfoByName failed");
         return WIFI_OPT_FAILED;
     }
  
     bool isFind = false;
-    auto iter = specialList.begin();
     // USE_SIZE_50 avoid endless loops
-    while (iter != specialList.end() && specialList.size() < USE_SIZE_50) {
-        WIFI_LOGD("ProcessHmRequest,list : %{public}s,frontapp %{public}s,list_appid :  %{public}s,appid :  %{public}s",
+    for (auto iter = specialList.begin(); iter != specialList.end() && specialList.size() < USE_SIZE_50; ++iter) {
+        WIFI_LOGD("speciallist : %{public}s,frontapp %{public}s,list_appid :  %{public}s,appid :  %{public}s",
             (iter->name).c_str(), (packageName).c_str(), (iter->appid).c_str(), appId.c_str());
         if (iter->name == packageName && iter->appid == appId) {
             isFind = true;
             break;
         }
-        iter++;
     }
+
     if (!isFind) {
         return WIFI_OPT_SUCCESS;
     }
@@ -355,20 +353,20 @@ ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
  
 ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(int uid, std::string appId)
 {
-    // Check if the Hm is in front
+    // Check if the App is in front
     if (!WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
         WIFI_LOGE("IsAllowedThirdPartyRequest App not in front.");
         return WIFI_OPT_PERMISSION_DENIED;
     }
  
     int64_t nowTime = GetCurrentTimeSeconds();
- 
+    std::unique_lock<std::mutex> lock(mThirdPartyScanLimitMutex_);
     if (callTimestampsMap_.count(appId) == 0) {
         callTimestampsMap_[appId] = std::vector<int64_t>();
     } else {
         // Check if the last call is within 30 seconds
         if (!callTimestampsMap_[appId].empty() && nowTime - callTimestampsMap_[appId].back() < USES_30) {
-            WIFI_LOGE("IsAllowedHmRequest, last call is within 30 seconds!");
+            WIFI_LOGE("IsAllowedThirdPartyRequest, last call is within 30 seconds!");
             return WIFI_OPT_PERMISSION_DENIED;
         }
     }
@@ -376,10 +374,12 @@ ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(int uid, std::string app
     // Clear call records that have been recorded for more than 10 minutes
     // USE_SIZE_50 avoid endless loops
     auto it = callTimestampsMap_[appId].begin();
-    while (it != callTimestampsMap_[appId].end() && nowTime - *it > USEM_10 &&
-           callTimestampsMap_[appId].size() < USE_SIZE_50) {
-        it++;
+    for (; it != callTimestampsMap_[appId].end(); ++it) {
+        if (nowTime - *it > USEM_10 && callTimestampsMap_[appId].size() < USE_SIZE_50) {
+            break;
+        }
     }
+    
     callTimestampsMap_[appId].erase(callTimestampsMap_[appId].begin(), it);
  
     // Check whether the number of calls exceeds 20 within 10 minutes

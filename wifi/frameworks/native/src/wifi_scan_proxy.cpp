@@ -279,7 +279,7 @@ static void GetScanInfo(WifiScanInfo &info, MessageParcel &inParcel)
     info.maxSupportedRxLinkSpeed = inParcel.ReadInt32();
     info.maxSupportedTxLinkSpeed = inParcel.ReadInt32();
     info.disappearCount = inParcel.ReadInt32();
-    info.isHiLinkNetwork = inParcel.ReadBool();
+    info.isHiLinkNetwork = inParcel.ReadInt32();
     info.supportedWifiCategory = static_cast<WifiCategory>(inParcel.ReadInt32());
 }
 

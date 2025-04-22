@@ -862,5 +862,10 @@ uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode)
     uint8_t standardSubSystem = subSystem & 0x1F;
     return (WIFI_SYSTEM_ID << SYSTEM_OFFSET | standardSubSystem << SUB_SYSTEM_OFFSET | errCode);
 }
+
+bool InternalHiLinkNetworkToBool(int isHiLinkNetwork)
+{
+    return (isHiLinkNetwork > 0 && isHiLinkNetwork <= INTERNAL_HILINK_MAX_VALUE) ? true : false;
+}
 }  // namespace Wifi
 }  // namespace OHOS

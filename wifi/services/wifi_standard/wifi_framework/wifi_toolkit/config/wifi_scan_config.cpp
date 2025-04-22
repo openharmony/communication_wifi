@@ -381,7 +381,7 @@ void WifiScanConfig::GetScanInfoListInner(std::vector<WifiScanInfo> &results)
     results = mWifiScanInfoList;
 }
 
-void WifiScanConfig::RecordHilinkAbility(const std::string &bssid, bool isSupportHilink)
+void WifiScanConfig::RecordHilinkAbility(const std::string &bssid, int isSupportHilink)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     if (bssid.empty()) {
@@ -391,7 +391,7 @@ void WifiScanConfig::RecordHilinkAbility(const std::string &bssid, bool isSuppor
     hilinkAbilityRecord.insert_or_assign(bssid, isSupportHilink);
 }
 
-bool WifiScanConfig::GetHilinkAbility(const std::string &bssid)
+int WifiScanConfig::GetHilinkAbility(const std::string &bssid)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     auto iter = hilinkAbilityRecord.find(bssid);

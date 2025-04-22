@@ -374,8 +374,8 @@ ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(int uid, std::string app
     // Clear call records that have been recorded for more than 10 minutes
     // USE_SIZE_50 avoid endless loops
     auto it = callTimestampsMap_[appId].begin();
-    for (; it != callTimestampsMap_[appId].end(); ++it) {
-        if (nowTime - *it > USEM_10 && callTimestampsMap_[appId].size() < USE_SIZE_50) {
+    for (; it != callTimestampsMap_[appId].end() && callTimestampsMap_[appId].size() < USE_SIZE_50; ++it) {
+        if (nowTime - *it <= USEM_10) {
             break;
         }
     }

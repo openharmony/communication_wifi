@@ -339,7 +339,7 @@ ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
     auto iter = specialList.begin();
     // USE_SIZE_50 avoid endless loops
     while (iter != specialList.end() && specialList.size() < USE_SIZE_50) {
-        WIFI_LOGI("ProcessHmRequest,list : %{public}s,frontapp %{public}s,list_appid :  %{public}s,appid :  %{public}s",
+        WIFI_LOGD("ProcessHmRequest,list : %{public}s,frontapp %{public}s,list_appid :  %{public}s,appid :  %{public}s",
             (iter->name).c_str(), (packageName).c_str(), (iter->appid).c_str(), appId.c_str());
         if (iter->name == packageName && iter->appid == appId) {
             isFind = true;
@@ -362,7 +362,6 @@ ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(int uid, std::string app
     }
  
     int64_t nowTime = GetCurrentTimeSeconds();
-    WIFI_LOGI("IsAllowedThirdPartyRequest nowTime : %{public}" PRId64, nowTime);
  
     if (callTimestampsMap_.count(appId) == 0) {
         callTimestampsMap_[appId] = std::vector<int64_t>();

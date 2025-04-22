@@ -120,7 +120,7 @@ HWTEST_F(WifiHdiWpaClientTest, QueryScanInfos, TestSize.Level1)
         results[i].extMaxRates = 0;
         results[i].ieSize = 0;
         results[i].infoElems = NULL;
-        results[i].isHiLinkNetwork = false;
+        results[i].isHiLinkNetwork = 0;
     }
     std::vector<InterScanInfo> scanInfos;
     WifiErrorNo result = wifiHdiWpaClient->QueryScanInfos(scanInfos);

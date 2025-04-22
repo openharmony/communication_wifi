@@ -939,7 +939,7 @@ void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedI
     reply.WriteInt32(static_cast<int>(wifiInfo.channelWidth));
     reply.WriteBool(wifiInfo.isAncoConnected);
     reply.WriteInt32(static_cast<int>(wifiInfo.supportedWifiCategory));
-    reply.WriteBool(wifiInfo.isHiLinkNetwork);
+    reply.WriteInt32(wifiInfo.isHiLinkNetwork);
     reply.WriteInt32(wifiInfo.lastRxPackets);
     reply.WriteInt32(wifiInfo.lastTxPackets);
     reply.WriteInt32(static_cast<int>(wifiInfo.wifiLinkType));

@@ -169,7 +169,7 @@ struct WifiScanInfo {
     int maxSupportedRxLinkSpeed;
     int maxSupportedTxLinkSpeed;
     int disappearCount;
-    bool isHiLinkNetwork;
+    int isHiLinkNetwork;
     WifiCategory supportedWifiCategory;
     WifiScanInfo()
     {
@@ -186,7 +186,7 @@ struct WifiScanInfo {
         wifiStandard = 0;
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
-        isHiLinkNetwork = false;
+        isHiLinkNetwork = 0;
         supportedWifiCategory = WifiCategory::DEFAULT;
     }
 

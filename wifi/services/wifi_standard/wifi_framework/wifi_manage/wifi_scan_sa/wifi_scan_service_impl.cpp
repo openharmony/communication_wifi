@@ -337,7 +337,7 @@ ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
     bool isFind = false;
     // USE_SIZE_50 avoid endless loops
     for (auto iter = specialList.begin(); iter != specialList.end() && specialList.size() < USE_SIZE_50; ++iter) {
-        WIFI_LOGD("speciallist : %{public}s,frontapp %{public}s,list_appid :  %{public}s,appid :  %{public}s",
+        WIFI_LOGD("speciallist: %{public}s,frontapp %{public}s,list_appid :  %{public}s,appid :  %{public}s",
             (iter->name).c_str(), (packageName).c_str(), (iter->appid).c_str(), appId.c_str());
         if (iter->name == packageName && iter->appid == appId) {
             isFind = true;

@@ -413,6 +413,7 @@ void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr
 
     #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SaveWifiConfigForUpdate(pStaStateMachine->targetNetworkId_);
+    pStaStateMachine->UpdateWifiCategory();
     pStaStateMachine->SetSupportedWifiCategory();
     #endif
     pStaStateMachine->DealMloConnectionLinkInfo();

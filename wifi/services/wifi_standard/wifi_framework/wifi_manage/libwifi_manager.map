@@ -446,6 +446,7 @@
         "OHOS::Wifi::WifiTogglerManager::SatelliteToggled(int)";
         "OHOS::Wifi::WifiChannelHelper::UpdateValidChannels(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, int)";
         "OHOS::Wifi::WifiP2pManager::HasP2pActivatedBefore()";
+        "OHOS::Wifi::WifiSettings::GetPackageInfoByName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::vector<OHOS::Wifi::PackageInfo, std::__h::allocator<OHOS::Wifi::PackageInfo>>&)";
     };
     local:
         *;

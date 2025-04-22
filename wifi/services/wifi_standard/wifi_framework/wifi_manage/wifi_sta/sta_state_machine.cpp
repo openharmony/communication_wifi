@@ -875,7 +875,7 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
             WriteEmlsrExitReasonHiSysEvent(pStaStateMachine->linkedInfo.ssid, static_cast<int>(reasonCode));
         }
         if (static_cast<int32_t>(state) == WifiLinkType::WIFI7_EMLSR) {
-            DealMloLinkSignalPollResult();
+            pStaStateMachine->DealMloLinkSignalPollResult();
         }
         pStaStateMachine->linkedInfo.wifiLinkType = static_cast<WifiLinkType>(state);
         WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid,

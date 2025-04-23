@@ -58,6 +58,7 @@ constexpr int RSS_UID = 1096;
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
+constexpr const int MAX_MDM_RESTRICTED_SIZE = 200;
 
 #ifdef OHOS_ARCH_LITE
 std::mutex WifiDeviceServiceImpl::g_instanceLock;
@@ -631,13 +632,26 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
 ErrCode WifiDeviceServiceImpl::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
 {
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if (pService == nullptr) {
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
     if (WifiPermissionUtils::VerifyManageEdmPolicyPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetWifiRestrictedList:VerifyManageEdmPolicyPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+    std::vector<WifiRestrictedInfo> tmp;
+    tmp.assign(wifiRestrictedInfoList.begin(), wifiRestrictedInfoList.end());
+    ErrCode checkResult = WifiSettings::GetInstance().CheckWifiMdmRestrictedList(tmp);
+    if (checkResult != WIFI_OPT_SUCCESS) {
+        return checkResult;
+    }
+    BlockConnectService::GetInstance().ClearBlockConnectForMdmRestrictedList();
+    WifiSettings::GetInstance().ClearWifiRestrictedListConfig(m_instId);
+    for (size_t i = 0; i < tmp.size() && i <= MAX_MDM_RESTRICTED_SIZE; i++) {
+        WifiSettings::GetInstance().AddWifiRestrictedListConfig(m_instId, tmp[i]);
+    }
+    WifiSettings::GetInstance().SyncWifiRestrictedListConfig();
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatusForMdmRestrictedList();
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_SUCCESS;
     }
     return pService->SetWifiRestrictedList(wifiRestrictedInfoList);
 #else

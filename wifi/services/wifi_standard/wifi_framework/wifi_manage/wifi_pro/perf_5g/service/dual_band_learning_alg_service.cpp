@@ -35,6 +35,7 @@ constexpr double BASE_VALUE = 500.0;
 constexpr double VALID_SIZE_RATE_LIST = 5;
 const double PI = acos(-1.0);
 const double E = exp(1);
+constexpr uint32_t  USE_1000 = 1000;
 
 DualBandLearningAlgService::DualBandLearningAlgService()
 {}
@@ -223,14 +224,25 @@ long DualBandLearningAlgService::GetDetailStep(long flowRate)
     }
     return DETAIL_STEPS[detailStepIndex];
 }
-long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
+unsigned long DualBandLearningAlgService::GetFlowRate(std::list<LinkQuality> &rateList)
 {
-    long flowSum = 0;
-    for (auto it = rateList.begin(); it != rateList.end(); it++) {
-        flowSum += it->txBytes + it->rxBytes;
+    if (rateList.empty()) {
+        return 0;
     }
-    int conversionStep = 1000;
-    return flowSum / conversionStep / FLOW_RATE_TIME_RANGE_SECOND;
+    if (rateList.back().txBytes < rateList.front().txBytes || rateList.back().rxBytes < rateList.front().rxBytes) {
+        WIFI_LOGW("%{public}s, signalpoll overflow", __FUNCTION__);
+        return 0;
+    }
+    uint32_t flowTx = rateList.back().txBytes - rateList.front().txBytes;
+    uint32_t flowRx = rateList.back().rxBytes - rateList.front().rxBytes;
+    // avoid add flow
+    if ((flowTx > 0) && (flowRx > (UINT32_MAX - flowTx))) {
+        WIFI_LOGW("%{public}s, add overflow", __FUNCTION__);
+        flowTx = UINT32_MAX;
+    } else {
+        flowTx += flowRx;
+    }
+    return static_cast<unsigned long>(flowTx / USE_1000 / FLOW_RATE_TIME_RANGE_SECOND);
 }
 bool DualBandLearningAlgService::IsMoveRight(long averageRate24g, long averageRate5g)
 {

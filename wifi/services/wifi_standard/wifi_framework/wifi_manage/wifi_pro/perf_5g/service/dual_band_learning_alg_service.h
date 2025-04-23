@@ -36,7 +36,7 @@ private:
     static long Get2gAverageRate(std::list<LinkQuality> &rate2gList);
     static long Get5gAverageRate(std::list<LinkQuality> &rate5gList);
     static long GetDetailStep(long flowRate);
-    static long GetFlowRate(std::list<LinkQuality> &rateList);
+    static unsigned long GetFlowRate(std::list<LinkQuality> &rateList);
     static bool IsMoveRight(long averageRate24g, long averageRate5g);
     static bool IsValidRssi(int rssi);
     static bool IsReachTrafficThreshold(std::list<LinkQuality> &rateList);

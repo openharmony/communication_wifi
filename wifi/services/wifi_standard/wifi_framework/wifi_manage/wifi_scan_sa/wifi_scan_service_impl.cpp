@@ -287,7 +287,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
 
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(result);
     if (!compatible) {
-#ifdef SUPPORT_RANDOM_MAC_ADDR
+    #ifdef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
             WIFI_LOGI("GetScanInfoList: GET_WIFI_PEERS_MAC PERMISSION_DENIED");
             if (ProcessScanInfoRequest() == WIFI_OPT_PERMISSION_DENIED) {
@@ -310,7 +310,7 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
                 }
             }
         }
-#endif
+    #endif
     }
     return WIFI_OPT_SUCCESS;
 }

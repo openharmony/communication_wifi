@@ -151,18 +151,29 @@ bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
     if (msg == nullptr || pConcreteMangerMachine == nullptr) {
         return false;
     }
+    bool ret = NOT_EXECUTED;
     WIFI_LOGE("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_STOP:
+            ret = EXECUTED;
             pConcreteMangerMachine->CheckAndContinueToStopWifi(msg);
             break;
         case CONCRETE_CMD_STA_STOP:
+            ret = EXECUTED;
             pConcreteMangerMachine->HandleStaStop();
             break;
+        case CONCRETE_CMD_SET_TARGET_ROLE: {
+            ret = EXECUTED;
+            int role = msg->GetParam1();
+            ConcreteManagerRole targetRole = static_cast<ConcreteManagerRole>(role);
+            pConcreteMangerMachine->SetTargetRole(targetRole);
+            break;
+        }
         default:
+            WIFI_LOGI("DefaultState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
     }
-    return true;
+    return ret;
 }
 
 ConcreteMangerMachine::IdleState::IdleState(ConcreteMangerMachine *concreteMangerMachine)
@@ -187,27 +198,32 @@ bool ConcreteMangerMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg) _
     if (msg == nullptr) {
         return false;
     }
+    bool ret = NOT_EXECUTED;
     WIFI_LOGE("IdleState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     if (pConcreteMangerMachine->HandleCommonMessage(msg)) {
         return true;
     }
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_START:
+            ret = EXECUTED;
             HandleStartInIdleState(msg);
             break;
         case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
+            ret = EXECUTED;
             HandleSwitchToConnectMode(msg);
             break;
         case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
+            ret = EXECUTED;
             HandleSwitchToScanOnlyMode(msg);
             break;
         case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
+            ret = EXECUTED;
             HandleSwitchToSemiActiveMode(msg);
             break;
         default:
             break;
     }
-    return true;
+    return ret;
 }
 
 void ConcreteMangerMachine::IdleState::HandleSwitchToConnectMode(InternalMessagePtr msg)
@@ -246,17 +262,14 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMess
 void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr msg)
 {
     mid = msg->GetParam1();
-    int targetRole = msg->GetParam2();
-    ConcreteManagerRole role = static_cast<ConcreteManagerRole>(targetRole);
-    pConcreteMangerMachine->SetTargetRole(role);
-    WIFI_LOGI("HandleStartInIdleState targetRole:%{public}d mid:%{public}d", targetRole, mid);
+    WIFI_LOGI("HandleStartInIdleState mTargetRole:%{public}d mid:%{public}d", mTargetRole, mid);
     ErrCode res = WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
     if (res != WIFI_OPT_SUCCESS) {
         WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
-    if (targetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
+    if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartStaService(mid, ifaceName);
         if (ret != WIFI_OPT_SUCCESS) {
             WifiConfigCenter::GetInstance().SetWifiStopState(true);
@@ -264,11 +277,11 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr
             return;
         }
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pConnectState);
-    } else if (targetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
-        WIFI_LOGI("HandleStartInIdleState, current role is %{public}d, start scan only success.", targetRole);
+    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {
+        WIFI_LOGI("HandleStartInIdleState, current role is %{public}d, start scan only success.", mTargetRole);
         pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pScanonlyState);
-    } else if (targetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
-        targetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
+    } else if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_MIX_SEMI_ACTIVE) ||
+        mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartSemiStaService(mid, ifaceName);
         if (ret != WIFI_OPT_SUCCESS) {
             WifiConfigCenter::GetInstance().SetWifiStopState(true);
@@ -304,20 +317,23 @@ bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessagePtr msg
         return false;
     }
     WIFI_LOGE("ConnectState-msgCode=%{public}d is received.\n", msg->GetMessageName());
+    bool ret = NOT_EXECUTED;
     if (pConcreteMangerMachine->HandleCommonMessage(msg)) {
         return true;
     }
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
+            ret = EXECUTED;
             SwitchScanOnlyInConnectState();
             break;
         case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
+            ret = EXECUTED;
             SwitchSemiActiveInConnectState();
             break;
         default:
             break;
     }
-    return true;
+    return ret;
 }
 
 void ConcreteMangerMachine::ConnectState::SwitchScanOnlyInConnectState()
@@ -360,21 +376,24 @@ bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessagePtr ms
     if (msg == nullptr) {
         return false;
     }
+    bool ret = NOT_EXECUTED;
     WIFI_LOGE("ScanonlyState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     if (pConcreteMangerMachine->HandleCommonMessage(msg)) {
         return true;
     }
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
+            ret = EXECUTED;
             SwitchConnectInScanOnlyState();
             break;
         case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
+            ret = EXECUTED;
             SwitchSemiActiveInScanOnlyState();
             break;
         default:
             break;
     }
-    return true;
+    return ret;
 }
 
 void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
@@ -419,18 +438,22 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessagePtr 
     if (msg == nullptr) {
         return false;
     }
+    bool ret = NOT_EXECUTED;
     WIFI_LOGI("SemiActiveState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     if (pConcreteMangerMachine->HandleCommonMessage(msg)) {
         return true;
     }
     switch (msg->GetMessageName()) {
         case CONCRETE_CMD_SWITCH_TO_CONNECT_MODE:
+            ret = EXECUTED;
             SwitchConnectInSemiActiveState();
             break;
         case CONCRETE_CMD_SWITCH_TO_SCAN_ONLY_MODE:
+            ret = EXECUTED;
             SwitchScanOnlyInSemiActiveState();
             break;
         case CONCRETE_CMD_SWITCH_TO_SEMI_ACTIVE_MODE:
+            ret = EXECUTED;
             if (pConcreteMangerMachine->mTargetRole ==
                 static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
                 WIFI_LOGI("switch ROLE_CLIENT_STA_SEMI_ACTIVE");
@@ -444,7 +467,7 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessagePtr 
         default:
             break;
     }
-    return true;
+    return ret;
 }
 
 void ConcreteMangerMachine::SemiActiveState::SwitchConnectInSemiActiveState()

@@ -294,9 +294,11 @@ void WifiProStateMachine::HandleWifi2WifiSucsess(int64_t blackListTime)
 {
     WIFI_LOGI("Enter HandleWifi2WifiSucsess");
     auto &networkBlackListManager = NetworkBlockListManager::GetInstance();
-    networkBlackListManager.AddWifiBlocklist(badBssid_);
-    MessageExecutedLater(EVENT_REMOVE_BLOCK_LIST, badBssid_, blackListTime);
-    networkBlackListManager.CleanTempWifiBlockList();
+    if (!badBssid_.empty()) {
+        networkBlackListManager.AddWifiBlocklist(badBssid_);
+        MessageExecutedLater(EVENT_REMOVE_BLOCK_LIST, badBssid_, blackListTime);
+        networkBlackListManager.CleanTempWifiBlockList();
+    }
     RefreshConnectedNetWork();
 }
 
@@ -573,7 +575,7 @@ void WifiProStateMachine::WifiProEnableState::HandleWifiConnectStateChangedInEna
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiConnectedState_);
         WifiLinkedInfo linkedInfo;
         msg->GetMessageObj(linkedInfo);
-        pWifiProStateMachine_->HandleConnectedPerf5g(linkedInfo);
+        pWifiProStateMachine_->perf5gHandoverService_.OnConnected(linkedInfo);
     } else if (state == static_cast<int32_t>(OperateResState::DISCONNECT_DISCONNECTED)) {
         WIFI_LOGI("state transition: WifiProEnableState -> WifiDisConnectedStat.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiDisConnectedState_);
@@ -709,9 +711,10 @@ void WifiProStateMachine::WifiConnectedState::HandleWifiConnectStateChangedInCon
         if (state == static_cast<int32_t>(OperateResState::CONNECT_AP_CONNECTED)) {
             WifiLinkedInfo linkedInfo;
             msg->GetMessageObj(linkedInfo);
-            pWifiProStateMachine_->HandleConnectedPerf5g(linkedInfo);
+            pWifiProStateMachine_->perf5gHandoverService_.OnConnected(linkedInfo);
             if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
                 pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+                pWifiProStateMachine_->HandleWifi2WifiSucsess(BLOCKLIST_VALID_TIME);
             }
         }
         pWifiProStateMachine_->disconnectToConnectedState_ = false;
@@ -773,7 +776,7 @@ void WifiProStateMachine::WifiDisconnectedState::HandleWifiConnectStateChangedIn
     if (state == static_cast<int32_t>(OperateResState::CONNECT_AP_CONNECTED)) {
         WifiLinkedInfo linkedInfo;
         msg->GetMessageObj(linkedInfo);
-        pWifiProStateMachine_->HandleConnectedPerf5g(linkedInfo);
+        pWifiProStateMachine_->perf5gHandoverService_.OnConnected(linkedInfo);
         if (pWifiProStateMachine_->isWifi2WifiSwitching_ && pWifiProStateMachine_->targetBssid_ != linkedInfo.bssid) {
             WIFI_LOGI("selected bssid and switched bssid are not same:selected bssid:%{public}s,"
                       "switched bssid:%{public}s,",
@@ -990,8 +993,10 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     }
 
     pWifiProStateMachine_->perf5gHandoverService_.ScanResultUpdated(scanInfos);
-    if (pWifiProStateMachine_->perf5gHandoverService_.Switch5g()) {
+    pWifiProStateMachine_->targetBssid_ = pWifiProStateMachine_->perf5gHandoverService_.Switch5g();
+    if (pWifiProStateMachine_->targetBssid_ != "") {
         WIFI_LOGI("HandleScanResultInHasNet, perf 5g tried to switch.");
+        pWifiProStateMachine_->badBssid_ = pWifiProStateMachine_->currentBssid_;
         pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
         return;
     }
@@ -1260,15 +1265,6 @@ bool WifiProStateMachine::WifiPortalState::ExecuteStateMsg(InternalMessagePtr ms
             return false;
     }
     return true;
-}
-void WifiProStateMachine::HandleConnectedPerf5g(WifiLinkedInfo &wifiLinkedInfo)
-{
-    std::string bssidBeforePerf5g;
-    perf5gHandoverService_.OnConnected(wifiLinkedInfo, bssidBeforePerf5g);
-    if (!bssidBeforePerf5g.empty()) {
-        NetworkBlockListManager::GetInstance().AddWifiBlocklist(bssidBeforePerf5g);
-        MessageExecutedLater(EVENT_REMOVE_BLOCK_LIST, bssidBeforePerf5g, BLOCKLIST_VALID_TIME);
-    }
 }
 
 } // namespace Wifi

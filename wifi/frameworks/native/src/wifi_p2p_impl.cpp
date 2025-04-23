@@ -426,5 +426,12 @@ ErrCode WifiP2pImpl::SetMiracastSinkConfig(const std::string& config)
     RETURN_IF_FAIL(GetWifiP2pProxy());
     return client_->SetMiracastSinkConfig(config);
 }
+
+ErrCode WifiP2pImpl::GetSupportedChanForBand(std::vector<int> &channels, int band)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->GetSupportedChanForBand(channels, band);
+}
 }  // namespace Wifi
 }  // namespace OHOS

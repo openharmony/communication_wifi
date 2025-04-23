@@ -58,7 +58,9 @@ constexpr int RSS_UID = 1096;
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
 constexpr const int MAX_MDM_RESTRICTED_SIZE = 200;
+#endif
 
 #ifdef OHOS_ARCH_LITE
 std::mutex WifiDeviceServiceImpl::g_instanceLock;

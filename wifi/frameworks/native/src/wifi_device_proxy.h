@@ -125,15 +125,6 @@ public:
     ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
     /**
-     * @Description Add wifi block list and wifi white list
-     *
-     * @param config - WifiRestrictedInfo object
-     * @param result - the result of wifi access list
-     * @return ErrCode - operation result
-     */
-    ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
-
-    /**
      * @Description Remove the wifi device config equals to input network id
      *
      * @param networkId - want to remove device config's network id
@@ -656,6 +647,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLinkedInfo) override;
+
+    /**
+     * @Description Add wifi block list and wifi white list
+     *
+     * @param config - WifiRestrictedInfo object
+     * @param result - the result of wifi access list
+     * @return ErrCode - operation result
+     */
+    ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

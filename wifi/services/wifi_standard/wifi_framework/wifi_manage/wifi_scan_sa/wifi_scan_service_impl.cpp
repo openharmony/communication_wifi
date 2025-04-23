@@ -348,17 +348,18 @@ ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
     if (!isFind) {
         return WIFI_OPT_SUCCESS;
     }
-    return IsAllowedThirdPartyRequest(GetCallingUid(), appId);
+    return IsAllowedThirdPartyRequest(appId);
 }
  
-ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(int uid, std::string appId)
+ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(std::string appId)
 {
     // Check if the App is in front
-    if (!WifiAppStateAware::GetInstance().IsForegroundApp(uid)) {
+#ifndef OHOS_ARCH_LITE
+    if (!WifiAppStateAware::GetInstance().IsForegroundApp(GetCallingUid())) {
         WIFI_LOGE("IsAllowedThirdPartyRequest App not in front.");
         return WIFI_OPT_PERMISSION_DENIED;
     }
- 
+#endif
     int64_t nowTime = GetCurrentTimeSeconds();
     std::unique_lock<std::mutex> lock(mThirdPartyScanLimitMutex_);
     if (callTimestampsMap_.count(appId) == 0) {

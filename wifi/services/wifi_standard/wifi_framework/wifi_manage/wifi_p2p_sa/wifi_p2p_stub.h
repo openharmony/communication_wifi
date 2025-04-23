@@ -105,6 +105,7 @@ private:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnSetMiracastSinkConfig(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnGetSupportChanForBand(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
 private:
     HandleFuncMap handleFuncMap;

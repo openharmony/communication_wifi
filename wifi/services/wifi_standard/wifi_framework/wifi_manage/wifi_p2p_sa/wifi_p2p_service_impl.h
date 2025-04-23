@@ -444,6 +444,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetMiracastSinkConfig(const std::string& config) override;
+
+    /**
+     * @Description Get support channels for band
+     *
+     * @param channels - support channels
+     * @param band - channel band
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSupportedChanForBand(std::vector<int> &channels, int band) override;
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);

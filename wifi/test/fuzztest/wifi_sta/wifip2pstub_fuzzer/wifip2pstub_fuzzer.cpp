@@ -691,6 +691,19 @@ void WifiP2pServiceImplFuzzTest(const uint8_t* data, size_t size)
     pWifiP2pServiceImpl->WriteWifiP2pServiceInfo(datas, srvInfo);
 }
 
+void OnGetSupportChanForBandTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_SUPPORT_CHANN_FOR_BAND),
+        datas, reply, option);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

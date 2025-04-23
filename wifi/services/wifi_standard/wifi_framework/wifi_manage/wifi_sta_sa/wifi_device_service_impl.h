@@ -65,8 +65,6 @@ public:
 
     ErrCode UpdateDeviceConfig(const WifiDeviceConfig &config, int &result) override;
 
-    ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
-
     ErrCode RemoveDevice(int networkId) override;
 
     ErrCode RemoveAllDevice() override;
@@ -212,6 +210,8 @@ public:
     ErrCode SetVoWifiDetectPeriod(int period) override;
  
     ErrCode GetVoWifiDetectPeriod(int &period) override;
+
+    ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

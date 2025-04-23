@@ -52,7 +52,7 @@ public:
     ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
     ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) override;
     ErrCode ProcessScanInfoRequest();
-    ErrCode IsAllowedThirdPartyRequest(int uid, std::string appId);
+    ErrCode IsAllowedThirdPartyRequest(std::string appId);
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
         const std::vector<std::string> &event) override;

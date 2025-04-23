@@ -135,14 +135,14 @@ public:
         int64_t mLastTcpTxCounter_ { 0 };
         int64_t mLastTcpRxCounter_ { 0 };
         int32_t mLastDnsFailedCnt_ { 0 };
-        int netDiasableDetectCount_ { 0 };
+        int netDisableDetectCount_  { 0 };
         bool qoeSwitch_  { false } ;
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
         void WifiHasNetStateInit();
-        void RequestHttpDetect();
+        void RequestHttpDetect(bool forceHttpDetect);
         void ParseQoeInfoAndRequestDetect();
         void HandleWifiQoeSlow();
     };
@@ -234,7 +234,8 @@ private:
     bool isDisableWifiAutoSwitch_ { false };
     std::string targetBssid_ { "" };
     NetworkSelectionResult networkSelectionResult_;
-    WifiProState currentState_;
+    WifiProState currentState_ {WIFI_DEFAULT};
+    bool mHttpDetectedAllowed_ { false } ;
     Perf5gHandoverService perf5gHandoverService_;
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);

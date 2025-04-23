@@ -199,6 +199,12 @@
         "OHOS::Wifi::WifiSettings::SetDefaultFrequenciesByCountryBand(OHOS::Wifi::BandType, std::__h::vector<int, std::__h::allocator<int>>&, int)";
         "OHOS::Wifi::WifiSettings::SetScanOnlySwitchState(int const&, int)";
         "OHOS::Wifi::WifiSettings::GetScanOnlySwitchState(int)";
+        "OHOS::Wifi::WifiSettings::AddWifiRestrictedListConfig(int, OHOS::Wifi::WifiRestrictedInfo const&)";
+        "OHOS::Wifi::WifiSettings::CheckWifiMdmRestrictedList(std::__h::vector<OHOS::Wifi::WifiRestrictedInfo, std::__h::allocator<OHOS::Wifi::WifiRestrictedInfo>> const&)";
+        "OHOS::Wifi::WifiSettings::ClearWifiRestrictedListConfig(int)";
+        "OHOS::Wifi::WifiSettings::SyncWifiRestrictedListConfig()";
+        "OHOS::Wifi::BlockConnectService::ClearBlockConnectForMdmRestrictedList()";
+        "OHOS::Wifi::BlockConnectService::UpdateNetworkSelectStatusForMdmRestrictedList()";
         "OHOS::Wifi::DhcpdInterface::DhcpdInterface()";
         "OHOS::Wifi::DhcpdInterface::~DhcpdInterface()";
         "OHOS::Wifi::DhcpdInterface::RegisterDhcpCallBack(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, ServerCallBack&)";

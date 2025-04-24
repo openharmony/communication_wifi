@@ -37,6 +37,7 @@ bool PackageXmlParser::ParseInternal(xmlNodePtr node)
     mCandidateFilterList.clear();
     mCorePackageMap.clear();
     mAclAuthList.clear();
+    mScanLimitPackage_.clear();
     for (xmlNodePtr subNode = node->children; subNode != nullptr; subNode = subNode->next) {
         std::string tagName = GetNodeValue(subNode);
         if (tagName == TAG_SCAN_CONTROL) {
@@ -47,6 +48,8 @@ bool PackageXmlParser::ParseInternal(xmlNodePtr node)
             GetPackageMap(subNode, mCorePackageMap);
         } else if (tagName == TAG_ACL_AUTH) {
             GetPackageList(subNode, mAclAuthList);
+        } else if (tagName == TAG_SCAN_LIMIT) {
+            GetPackageList(subNode, mScanLimitPackage_);
         } else {
             WIFI_LOGI("unknow package tag.");
         }
@@ -108,6 +111,11 @@ void PackageXmlParser::GetCorePackages(std::map<std::string, std::vector<Package
 void PackageXmlParser::GetAclAuthPackages(std::vector<PackageInfo> &packageList)
 {
     packageList = mAclAuthList;
+}
+
+void PackageXmlParser::GetScanLimitPackages(std::vector<PackageInfo> &packageList)
+{
+    packageList = mScanLimitPackage_;
 }
 }
 }

@@ -874,6 +874,9 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
             static_cast<int32_t>(state) != WifiLinkType::WIFI7_EMLSR) {
             WriteEmlsrExitReasonHiSysEvent(pStaStateMachine->linkedInfo.ssid, static_cast<int>(reasonCode));
         }
+        if (static_cast<int32_t>(state) == WifiLinkType::WIFI7_EMLSR) {
+            pStaStateMachine->DealMloLinkSignalPollResult();
+        }
         pStaStateMachine->linkedInfo.wifiLinkType = static_cast<WifiLinkType>(state);
         WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid,
             pStaStateMachine->linkedInfo.wifiLinkType, "MLO_STATE_CHANGED");
@@ -1447,7 +1450,11 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr msg)
 {
     std::string bssid = msg->GetStringFromMessage();
-    WIFI_LOGI("%{public}s enter, bssid:%{public}s", __FUNCTION__, MacAnonymize(bssid).c_str());
+    WIFI_LOGI("%{public}s enter, bssid:%{public}s, current linkedBssid: %{public}s",
+        __FUNCTION__, MacAnonymize(bssid).c_str(), MacAnonymize(pStaStateMachine->linkedInfo.bssid).c_str());
+    if (bssid == pStaStateMachine->linkedInfo.bssid) {
+        return;
+    }
     pStaStateMachine->linkSwitchDetectingFlag_ = true;
     pStaStateMachine->StopTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT);
     pStaStateMachine->StartTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT, STA_LINK_SWITCH_DETECT_DURATION);
@@ -1495,6 +1502,9 @@ void StaStateMachine::ApLinkedState::DealCsaChannelChanged(InternalMessagePtr ms
     int newFrq = msg->GetParam1();
     WIFI_LOGI("%{public}s update freq from %{public}d  to %{public}d", __FUNCTION__,
         pStaStateMachine->linkedInfo.frequency, newFrq);
+    if (newFrq == pStaStateMachine->linkedInfo.frequency) {
+        return;
+    }
     pStaStateMachine->linkedInfo.frequency = newFrq;
     // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);

@@ -164,7 +164,6 @@ SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetw
     andFilter->AddFilter(make_shared<PassPointWifiFilter>());
     andFilter->AddFilter(make_shared<EphemeralWifiFilter>());
     andFilter->AddFilter(make_shared<DisableWifiFilter>());
-    andFilter->AddFilter(make_shared<MatchedUserSelectBssidWifiFilter>());
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG, *andFilter);
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
     shared_ptr<CustNetPreferredNetworkSelector> custNetPreferredNetworkSelector = nullptr;

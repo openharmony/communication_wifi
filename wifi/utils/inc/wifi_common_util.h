@@ -231,7 +231,7 @@ int64_t GetElapsedMicrosecondsSinceBoot();
  */
 std::string GetBundleName();
 
-std::string GetBundleAppIdByBundleName(const int userId, const std::string &bundleName);
+std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &bundleName);
 /**
  * @Description get bundle name by uid
  *

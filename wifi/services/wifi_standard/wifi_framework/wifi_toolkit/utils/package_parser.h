@@ -23,6 +23,7 @@ constexpr auto TAG_SCAN_CONTROL = "ScanControlPackages";
 constexpr auto TAG_CANDIDATE_FILTER = "CandidateFilterPackages";
 constexpr auto TAG_CORE_PACKAGEINFO = "CorePackages";
 constexpr auto TAG_ACL_AUTH = "AclAuthPackages";
+constexpr auto TAG_SCAN_LIMIT = "ScanLimitPackages";
 constexpr auto PARAM_NAME = "name";
 constexpr auto PARAM_APPID = "appid";
 
@@ -37,6 +38,7 @@ public:
     void GetCandidateFilterPackages(std::vector<PackageInfo> &packageList);
     void GetCorePackages(std::map<std::string, std::vector<PackageInfo>> &packageMap);
     void GetAclAuthPackages(std::vector<PackageInfo> &packageList);
+    void GetScanLimitPackages(std::vector<PackageInfo> &packageList);
 
 private:
     bool ParseInternal(xmlNodePtr node) override;
@@ -48,6 +50,7 @@ private:
     std::vector<PackageInfo> mCandidateFilterList;
     std::map<std::string, std::vector<PackageInfo>> mCorePackageMap;
     std::vector<PackageInfo> mAclAuthList;
+    std::vector<PackageInfo> mScanLimitPackage_;
 };
 }
 }

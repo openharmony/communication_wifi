@@ -1116,6 +1116,17 @@ int WifiSettings::GetPackageInfoMap(std::map<std::string, std::vector<PackageInf
     return 0;
 }
 
+int WifiSettings::GetPackageInfoByName(std::string name, std::vector<PackageInfo> &packageInfo)
+{
+    std::unique_lock<std::mutex> lock(mPackageConfMutex);
+    auto iter = mPackageInfoMap.find(name);
+    if (iter != mPackageInfoMap.end()) {
+        packageInfo = iter->second;
+        return 0;
+    }
+    return -1;
+}
+
 int WifiSettings::SyncHotspotConfig()
 {
     std::unique_lock<std::mutex> lock(mApMutex);
@@ -1811,16 +1822,19 @@ void WifiSettings::InitPackageInfoConfig()
     std::vector<PackageInfo> candidateList;
     std::map<std::string, std::vector<PackageInfo>> variableMap;
     std::vector<PackageInfo> permissionTrustList;
+    std::vector<PackageInfo> scanLimitPackage;
     xmlParser->GetScanControlPackages(scanControlPackageMap);
     xmlParser->GetCandidateFilterPackages(candidateList);
     xmlParser->GetCorePackages(variableMap);
     xmlParser->GetAclAuthPackages(permissionTrustList);
+    xmlParser->GetScanLimitPackages(scanLimitPackage);
     
     std::unique_lock<std::mutex> lock(mPackageConfMutex);
     mPackageInfoMap.insert(scanControlPackageMap.begin(), scanControlPackageMap.end());
     mPackageInfoMap.insert_or_assign("CandidateFilterPackages", candidateList);
     mPackageInfoMap.insert(variableMap.begin(), variableMap.end());
     mPackageInfoMap.insert_or_assign("AclAuthPackages", permissionTrustList);
+    mPackageInfoMap.insert_or_assign("ScanLimitPackages", scanLimitPackage);
 #endif
 }
 

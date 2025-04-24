@@ -95,6 +95,7 @@ constexpr int IP_ADDRESS_FIRST_BYTE_INDEX = 0;
 constexpr int IP_ADDRESS_SECOND_BYTE_INDEX = 1;
 constexpr int IP_ADDRESS_THIRD_BYTE_INDEX = 2;
 constexpr int IP_ADDRESS_FOURTH_BYTE_INDEX = 3;
+constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 
 static std::string DataAnonymize(const std::string str, const char delim,
     const char hiddenCh, const int startIdx = 0)
@@ -347,8 +348,9 @@ std::string GetBundleName()
     return bundleInfo.name;
 }
 
-std::string GetBundleAppIdByBundleName(const int userId, const std::string &bundleName)
+std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &bundleName)
 {
+    int userId = static_cast<int32_t>(GetCallingUid() / UID_CALLINGUID_TRANSFORM_DIVISOR);
     sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
     if (bundleInstance == nullptr) {
         WIFI_LOGE("bundle instance is null!");

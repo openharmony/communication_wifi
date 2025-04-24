@@ -51,6 +51,8 @@ public:
     ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override;
     ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
     ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) override;
+    ErrCode ProcessScanInfoRequest();
+    ErrCode IsAllowedThirdPartyRequest(std::string appId);
 #ifdef OHOS_ARCH_LITE
     ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
         const std::vector<std::string> &event) override;
@@ -75,6 +77,8 @@ private:
     static std::shared_ptr<WifiScanServiceImpl> g_instance;
     ServiceRunningState mState;
 #endif
+    std::mutex mThirdPartyScanLimitMutex_;
+    std::map<std::string, std::vector<int64_t>> callTimestampsMap_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

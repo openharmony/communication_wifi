@@ -1472,7 +1472,7 @@ void WifiDeviceStub::OnSetTxPower(uint32_t code, MessageParcel &data, MessagePar
 void WifiDeviceStub::OnGetDeviceConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    bool networkId = data.ReadInt32();
+    int networkId = data.ReadInt32();
     WifiDeviceConfig config;
     ErrCode ret = GetDeviceConfig(networkId, config);
     reply.WriteInt32(0);

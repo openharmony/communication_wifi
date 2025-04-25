@@ -56,6 +56,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
+  "$WIFI_ROOT_DIR/services/wifi_standard/include",
   "$WIFI_ROOT_DIR/utils/inc",
 ]
 
@@ -172,6 +173,9 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_sta_asset) {
       defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]
       external_deps += [ "asset:asset_sdk" ]
+    }
+    if (wifi_feature_mdm_restricted_enable) {
+      defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
     }
     if (defined(global_parts_info) && defined(global_parts_info.startup_init)) {
       external_deps += [

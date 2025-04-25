@@ -46,6 +46,9 @@ enum ErrCode {
     WIFI_OPT_GET_ENHANCE_SVC_FAILED,  /* get enhance service failed */
     WIFI_OPT_STA_AND_P2P_MAC_SAME,    /* sta and p2p mac is same */
     WIFI_OPT_ENTERPRISE_DENIED = 203, /* mdm forbidden */
+    WIFI_OPT_MDM_BLOCKLIST_OUT_MAX_NUM,  /* mdm blocklist over max num fail */
+    WIFI_OPT_MDM_WHITELIST_OUT_MAX_NUM,  /* mdm whitelist over max num fail */
+    WIFI_OPT_MDM_OUT_MAX_NUM,  /* mdm block and white list totail size over max num fail */
 };
 }  // namespace Wifi
 }  // namespace OHOS

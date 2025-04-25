@@ -56,9 +56,10 @@ void MockStaStateMachine::SendMessage(int msgName, int param1, int param2, const
         msgName, param1, param2);
 }
 
-void MockStaStateMachine::StartConnectToBssid(std::string bssid)
+void MockStaStateMachine::StartConnectToBssid(const int32_t networkId, std::string bssid)
 {
-    WIFI_LOGD("MockStaStateMachine::StartConnectToBssid, bssid is %{private}s.", bssid.c_str());
+    WIFI_LOGD("MockStaStateMachine::StartConnectToBssid, bssid is %{private}s networkId is %{private}d.",
+        bssid.c_str(), networkId);
 }
  
 void MockStaStateMachine::StopTimer(int timerName)

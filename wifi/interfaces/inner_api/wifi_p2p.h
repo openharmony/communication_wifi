@@ -299,6 +299,15 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetMiracastSinkConfig(const std::string& config) = 0;
+
+    /**
+     * @Description Get support channels for band
+     *
+     * @param channels - support channels
+     * @param band - channel band
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetSupportedChanForBand(std::vector<int> &channels, int band) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

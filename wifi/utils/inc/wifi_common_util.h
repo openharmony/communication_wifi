@@ -48,6 +48,7 @@ namespace Wifi {
 #endif
 
 constexpr int INVALID_FREQ_OR_CHANNEL = -1;
+constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
 const uint32_t DECIMAL_NOTATION = 10;
 inline const uint8_t WIFI_SYSTEM_ID = 202;
 inline const uint8_t P2P_SUB_SYSTEM_ID = 2;
@@ -231,7 +232,7 @@ int64_t GetElapsedMicrosecondsSinceBoot();
  */
 std::string GetBundleName();
 
-std::string GetBundleAppIdByBundleName(const int userId, const std::string &bundleName);
+std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &bundleName);
 /**
  * @Description get bundle name by uid
  *
@@ -333,6 +334,13 @@ int CheckDataLegalHex(const std::string &data);
 unsigned int CheckDataToUint(std::string &data, int base = DECIMAL_NOTATION);
 long long CheckDataTolonglong(std::string &data, int base = DECIMAL_NOTATION);
 uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode);
+
+/**
+ * @Description Internal HiLinkNetwork Type To Bool
+ *
+ * @return bool - isHiLinkNetwork
+ */
+bool InternalHiLinkNetworkToBool(int isHiLinkNetwork);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

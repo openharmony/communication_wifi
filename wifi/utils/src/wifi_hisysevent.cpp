@@ -81,9 +81,9 @@ void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t
     WriteEventBehavior("WIFI_P2P_STATE", "INTERFACE", inter, "P2PTYPE", type, "STATE", state);
 }
 
-void WriteWifiConnectionHiSysEvent(const WifiConnectionType& type, const std::string& pkgName)
+void WriteWifiConnectionHiSysEvent(int type, const std::string& pkgName)
 {
-    WriteEvent("WIFI_CONNECTION", "TYPE", static_cast<int>(type), "PACKAGE_NAME", pkgName);
+    WriteEvent("WIFI_CONNECTION", "TYPE", type, "PACKAGE_NAME", pkgName);
 }
 
 void WriteWifiScanHiSysEvent(const int result, const std::string& pkgName)

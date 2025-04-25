@@ -52,6 +52,7 @@
 #include "mock_dhcp_service.h"
 #endif
 #include "sta_define.h"
+#include "ip_qos_monitor.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -80,6 +81,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define SELF_CURE_RAND_MAC_REASSOC 3
 #define USER_CONNECT "1"
 #define AUTO_CONNECT "0"
+#define SIGNAL_LEVEL_2 2
 
 #define CMD_BUFFER_SIZE 1024
 #define GSM_AUTH_RAND_LEN 16
@@ -130,11 +132,6 @@ const std::map<int, int> portalEventValues = {
 
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
-#ifndef OHOS_ARCH_LITE
-#ifdef WIFI_DATA_REPORT_ENABLE
-      wifiDataReportService_(*this, instId),
-#endif
-#endif
       targetNetworkId_(INVALID_NETWORK_ID),
       lastSignalLevel_(INVALID_SIGNAL_LEVEL), targetRoamBssid(WPA_BSSID_ANY), currentTpType(IPTYPE_IPV4),
       getIpSucNum(0), getIpFailNum(0), enableSignalPoll(true), isRoam(false),
@@ -162,6 +159,11 @@ StaStateMachine::~StaStateMachine()
     ParsePointer(pLinkedState);
     ParsePointer(pApRoamingState);
     ParsePointer(pDhcpResultNotify);
+#ifndef OHOS_ARCH_LITE
+#ifdef WIFI_DATA_REPORT_ENABLE
+    ParsePointer(wifiDataReportService_);
+#endif
+#endif
     {
         std::unique_lock<std::shared_mutex> lock(m_staCallbackMutex);
         m_staCallback.clear();
@@ -198,6 +200,15 @@ ErrCode StaStateMachine::InitStaStates()
 {
     WIFI_LOGE("Enter InitStaStates\n");
     int tmpErrNumber;
+#ifndef OHOS_ARCH_LITE
+#ifdef WIFI_DATA_REPORT_ENABLE
+    wifiDataReportService_ = new (std::nothrow) WifiDataReportService(this, this->m_instId);
+    if (wifiDataReportService_ == nullptr) {
+        WIFI_LOGE("wifiDataReportService_ new failed");
+        return WIFI_OPT_FAILED;
+    }
+#endif
+#endif
     pInitState = new (std::nothrow) InitState(this);
     tmpErrNumber = JudgmentEmpty(pInitState);
     pLinkState = new (std::nothrow) LinkState(this);
@@ -267,7 +278,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.supportedWifiCategory = WifiCategory::DEFAULT;
     linkedInfo.isMloConnected = false;
     linkedInfo.isWurEnable = false;
-    linkedInfo.isHiLinkNetwork = false;
+    linkedInfo.isHiLinkNetwork = 0;
     std::vector<WifiLinkedInfo> emptyMloLinkInfo;
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(emptyMloLinkInfo, m_instId);
 }
@@ -402,6 +413,7 @@ void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr
 
     #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SaveWifiConfigForUpdate(pStaStateMachine->targetNetworkId_);
+    pStaStateMachine->UpdateWifiCategory();
     pStaStateMachine->SetSupportedWifiCategory();
     #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
@@ -501,6 +513,25 @@ bool StaStateMachine::InitState::AllowAutoConnect()
     return true;
 }
 
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+bool StaStateMachine::InitState::RestrictedByMdm(WifiDeviceConfig &config)
+{
+    WIFI_LOGI("Enter RestrictedByMdm");
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, config.bssid, 0)) {
+        pStaStateMachine->DealMdmRestrictedConnect(config);
+        return true;
+    }
+    if (!WifiSettings::GetInstance().WhetherSetWhiteListConfig() || config.bssid.empty()) {
+        return false;
+    }
+    if (!WifiSettings::GetInstance().FindWifiWhiteListConfig(config.ssid, config.bssid, 0)) {
+        pStaStateMachine->DealMdmRestrictedConnect(config);
+        return true;
+    }
+    return false;
+}
+#endif
+
 void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
 {
     WIFI_LOGI("enter StartConnectEvent m_instId = %{public}d\n", pStaStateMachine->m_instId);
@@ -541,6 +572,12 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
         return;
     }
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (RestrictedByMdm(config)) {
+        return;
+    }
+#endif
 
     if (pStaStateMachine->StartConnectToNetwork(networkId, bssid, connTriggerMode) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to network failed: %{public}d.\n", networkId);
@@ -837,6 +874,9 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
             static_cast<int32_t>(state) != WifiLinkType::WIFI7_EMLSR) {
             WriteEmlsrExitReasonHiSysEvent(pStaStateMachine->linkedInfo.ssid, static_cast<int>(reasonCode));
         }
+        if (static_cast<int32_t>(state) == WifiLinkType::WIFI7_EMLSR) {
+            pStaStateMachine->DealMloLinkSignalPollResult();
+        }
         pStaStateMachine->linkedInfo.wifiLinkType = static_cast<WifiLinkType>(state);
         WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid,
             pStaStateMachine->linkedInfo.wifiLinkType, "MLO_STATE_CHANGED");
@@ -978,7 +1018,7 @@ void StaStateMachine::SeparatedState::GoInState()
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_DISCONNECTED,
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_DISCONNECTED,
         pStaStateMachine->linkedInfo.networkId);
 #endif
 #endif
@@ -1163,7 +1203,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
             DisabledReason::DISABLED_BY_WRONG_PASSWORD);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-        pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
+        pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
             pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -1172,7 +1212,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
             DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-        pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
+        pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
             pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -1194,7 +1234,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFullConnectFailEvent(InternalMe
         DisabledReason::DISABLED_ASSOCIATION_REJECTION);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_FULL,
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_FULL,
         pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -1215,7 +1255,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkAssocRejectFailEvent(InternalMe
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_ASSOCIATION_REJECTION);
 #ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_REJECTION,
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_REJECTION,
         pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -1279,6 +1319,7 @@ void StaStateMachine::ApLinkedState::GoOutState()
 {
     WIFI_LOGI("ApLinkedState GoOutState function.");
     pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
+    pStaStateMachine->lastInternetAccessStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
     return;
 }
 
@@ -1380,6 +1421,18 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
+        pStaStateMachine->m_instId) != 0) {
+        WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", pStaStateMachine->linkedInfo.networkId);
+        return;
+    }
+    if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, true)) {
+        pStaStateMachine->DealMdmRestrictedConnect(config);
+        return;
+    }
+#endif
     /* BSSID change is not received during roaming, only set BSSID */
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
         WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId)) != WIFI_HAL_OPT_OK) {
@@ -1397,7 +1450,11 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr msg)
 {
     std::string bssid = msg->GetStringFromMessage();
-    WIFI_LOGI("%{public}s enter, bssid:%{public}s", __FUNCTION__, MacAnonymize(bssid).c_str());
+    WIFI_LOGI("%{public}s enter, bssid:%{public}s, current linkedBssid: %{public}s",
+        __FUNCTION__, MacAnonymize(bssid).c_str(), MacAnonymize(pStaStateMachine->linkedInfo.bssid).c_str());
+    if (bssid == pStaStateMachine->linkedInfo.bssid) {
+        return;
+    }
     pStaStateMachine->linkSwitchDetectingFlag_ = true;
     pStaStateMachine->StopTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT);
     pStaStateMachine->StartTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT, STA_LINK_SWITCH_DETECT_DURATION);
@@ -1445,6 +1502,9 @@ void StaStateMachine::ApLinkedState::DealCsaChannelChanged(InternalMessagePtr ms
     int newFrq = msg->GetParam1();
     WIFI_LOGI("%{public}s update freq from %{public}d  to %{public}d", __FUNCTION__,
         pStaStateMachine->linkedInfo.frequency, newFrq);
+    if (newFrq == pStaStateMachine->linkedInfo.frequency) {
+        return;
+    }
     pStaStateMachine->linkedInfo.frequency = newFrq;
     // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
@@ -2030,6 +2090,13 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     if (!portalUrl.empty()) {
         mPortalUrl = portalUrl;
     }
+    /*when detect result is NETWORK_NOTWORKING but tx rx is good, considered as NETWORK_IS_WORKING*/
+    if (netState == SystemNetWorkState::NETWORK_NOTWORKING &&
+        IpQosMonitor::GetInstance().GetTxRxStatus() &&
+        WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
+        WIFI_LOGI("net detection result is NETWORK_NOTWORKING but tx rx is good, considered as NETWORK_IS_WORKING");
+        netState = SystemNetWorkState::NETWORK_IS_WORKING;
+    }
     bool updatePortalAuthTime = false;
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
         mIsWifiInternetCHRFlag = false;
@@ -2085,6 +2152,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
     autoPullBrowserFlag = true;
     TryModifyPortalAttribute(netState);
+    InvokeOnInternetAccessChanged(netState);
 }
 
 void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime)
@@ -2114,7 +2182,8 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
     WIFI_LOGD("%{public}s, isHiLinkNetwork : %{public}d isHomeAp : %{public}d isHomeRouter : %{public}d keyMgmt : "
               "%{public}s", __func__, linkedInfo.isHiLinkNetwork, isHomeAp, isHomeRouter, config.keyMgmt.c_str());
-    if ((linkedInfo.isHiLinkNetwork || isHomeAp || isHomeRouter) && config.keyMgmt != KEY_MGMT_NONE) {
+    if ((InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) || isHomeAp || isHomeRouter)
+        && config.keyMgmt != KEY_MGMT_NONE) {
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
@@ -2150,7 +2219,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
             needChangePortalFlag = true;
             break;
         case SystemNetWorkState::NETWORK_IS_WORKING:
-            if (!linkedInfo.isHiLinkNetwork && !isHomeAp && !isHomeRouter) {
+            if (!InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) && !isHomeAp && !isHomeRouter) {
                 WIFI_LOGI("%{public}s, has internet and not hilink/homeAp/homeRouter network, not modify", __func__);
                 break;
             }
@@ -2161,7 +2230,7 @@ void StaStateMachine::TryModifyPortalAttribute(SystemNetWorkState netState)
             needChangePortalFlag = true;
             break;
         case SystemNetWorkState::NETWORK_IS_PORTAL:
-            if (!linkedInfo.isHiLinkNetwork && !isHomeAp && !isHomeRouter) {
+            if (!InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) && !isHomeAp && !isHomeRouter) {
                 WIFI_LOGI("%{public}s, portal and not hilink/homeAp/homeRouter network, not modify", __func__);
                 break;
             }
@@ -2259,7 +2328,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_.ReportApConnEventInfo(ConnReportReason::CONN_SUC_START,
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_SUC_START,
         pStaStateMachine->targetNetworkId_);
 #endif
 #endif
@@ -2661,6 +2730,13 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
     std::string realMacAddr;
     WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (WhetherRestrictedByMdm(deviceConfig.ssid, deviceConfig.bssid, true)) {
+        DealMdmRestrictedConnect(deviceConfig);
+        return;
+    }
+#endif
 
     linkedInfo.ssid = deviceConfig.ssid;
     linkedInfo.bssid = bssid;
@@ -3557,14 +3633,9 @@ bool StaStateMachine::IsGoodSignalQuality()
 {
     const WifiLinkedInfo singalInfo = linkedInfo;
     bool isGoodSignal = true;
-    if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency)) {
-        if (singalInfo.rssi <= RSSI_LEVEL_1_5G) {
-            isGoodSignal = false;
-        }
-    } else {
-        if (singalInfo.rssi <= RSSI_LEVEL_1_2G) {
-            isGoodSignal = false;
-        }
+    int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(singalInfo.rssi, singalInfo.band, m_instId);
+    if (currentSignalLevel <= RSSI_LEVEL_2) {
+        isGoodSignal = false;
     }
     if (singalInfo.chload >= MAX_CHLOAD) {
         isGoodSignal = false;
@@ -3745,7 +3816,7 @@ void StaStateMachine::DealSignalPollResult()
     LogSignalInfo(signalInfo);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    wifiDataReportService_.ReportQoeInfo(signalInfo, ConnReportReason::CONN_SUC_KEEP, linkedInfo.networkId);
+    wifiDataReportService_->ReportQoeInfo(signalInfo, ConnReportReason::CONN_SUC_KEEP, linkedInfo.networkId);
 #endif
 #endif
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
@@ -4085,7 +4156,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     ConvertDeviceCfg(deviceConfig, bssid);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-    wifiDataReportService_.InitReportApAllInfo();
+    wifiDataReportService_->InitReportApAllInfo();
 #endif
 #endif
     if (bssid.empty()) {
@@ -4375,13 +4446,60 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
     }
 }
 
-void StaStateMachine::StartConnectToBssid(std::string bssid)
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+void StaStateMachine::DealMdmRestrictedConnect(WifiDeviceConfig &config)
+{
+    WIFI_LOGI("WIFI Disconnect by MdmRestricted");
+    SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
+        DisabledReason::DISABLED_MDM_RESTRICTED);
+    AddRandomMacCure();
+    InvokeOnStaConnChanged(OperateResState::CONNECT_ENABLE_NETWORK_FAILED,
+        linkedInfo);
+    StartDisConnectToNetwork();
+}
+
+bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid)
+{
+    if (checkBssid) {
+        return WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0) ||
+        (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
+        !WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid, 0));
+    } else {
+        if (WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0)) {
+            return true;
+        }
+        if (!WifiSettings::GetInstance().WhetherSetWhiteListConfig() || bssid.empty()) {
+            return false;
+        }
+        if (!WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid)) {
+            return true;
+        }
+        return false;
+    }
+}
+#endif
+
+void StaStateMachine::StartConnectToBssid(const int32_t networkId, std::string bssid)
 {
     InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {
         return;
     }
-
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, m_instId) != 0) {
+        WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", networkId);
+        return;
+    }
+    if (WifiSettings::GetInstance().FindWifiBlockListConfig(config.ssid, config.bssid, 0)) {
+        return;
+    }
+    if (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
+        !WifiSettings::GetInstance().FindWifiWhiteListConfig(config.ssid, config.bssid, 0)) {
+        return;
+    }
+#endif
     msg->SetMessageName(WIFI_SVR_COM_STA_START_ROAM);
     msg->AddStringMessageBody(bssid);
     SendMessage(msg);
@@ -4915,7 +5033,7 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
     }
     switch (state) {
         case OperateResState::CONNECT_AP_CONNECTED:
-            WriteWifiConnectionHiSysEvent(WifiConnectionType::CONNECT, "");
+            WriteWifiConnectionHiSysEvent(static_cast<int>(WifiConnectionType::CONNECT), "");
             if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
                 WifiNetStatsManager::GetInstance().StartNetStats();
@@ -4923,7 +5041,7 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
             }
             break;
         case OperateResState::DISCONNECT_DISCONNECTED:
-            WriteWifiConnectionHiSysEvent(WifiConnectionType::DISCONNECT, "");
+            WriteWifiConnectionHiSysEvent(static_cast<int>(WifiConnectionType::DISCONNECT), "");
             if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
                 WifiNetStatsManager::GetInstance().StopNetStats();
@@ -4969,6 +5087,28 @@ void StaStateMachine::InvokeOnDhcpOfferReport(IpInfo ipInfo)
     for (const auto &callBackItem : m_staCallback) {
         if (callBackItem.second.OnDhcpOfferReport != nullptr) {
             callBackItem.second.OnDhcpOfferReport(ipInfo, m_instId);
+        }
+    }
+}
+
+void StaStateMachine::InvokeOnInternetAccessChanged(SystemNetWorkState internetAccessStatus)
+{
+    WIFI_LOGI("InvokeOnInternetAccessChanged, internetAccessStatus: %{public}d, lastInternetAccessStatus: %{public}d",
+        internetAccessStatus, lastInternetAccessStatus_);
+    if (lastInternetAccessStatus_ == internetAccessStatus) {
+        return;
+    }
+    if (internetAccessStatus == SystemNetWorkState::NETWORK_NOTWORKING &&
+        lastInternetAccessStatus_ == SystemNetWorkState::NETWORK_IS_WORKING &&
+        lastSignalLevel_ < SIGNAL_LEVEL_2) {
+        WIFI_LOGI("net detection result is NETWORK_NOTWORKING, last status is NETWORK_IS_WORKING, signal level less 2");
+        return;
+    }
+    lastInternetAccessStatus_ = internetAccessStatus;
+    std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
+    for (const auto &callBackItem : m_staCallback) {
+        if (callBackItem.second.OnInternetAccessChange != nullptr) {
+            callBackItem.second.OnInternetAccessChange(static_cast<int32_t>(internetAccessStatus), m_instId);
         }
     }
 }

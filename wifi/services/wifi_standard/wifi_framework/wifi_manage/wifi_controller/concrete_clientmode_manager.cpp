@@ -38,7 +38,7 @@ ErrCode ConcreteClientModeManager::RegisterCallback(const ConcreteModeCallback &
 
 void ConcreteClientModeManager::SetRole(ConcreteManagerRole role)
 {
-    pConcreteMangerMachine->SetTargetRole(role);
+    pConcreteMangerMachine->SendMessage(CONCRETE_CMD_SET_TARGET_ROLE, static_cast<int>(role));
     curRole = role;
     if (role == ConcreteManagerRole::ROLE_CLIENT_STA) {
         pConcreteMangerMachine->SendMessage(CONCRETE_CMD_SWITCH_TO_CONNECT_MODE);
@@ -64,8 +64,8 @@ ErrCode ConcreteClientModeManager::InitConcreteManager()
         return WIFI_OPT_FAILED;
     }
     pConcreteMangerMachine->RegisterCallback(mcb);
-    pConcreteMangerMachine->SetTargetRole(curRole);
-    pConcreteMangerMachine->SendMessage(CONCRETE_CMD_START, mid, static_cast<int>(curRole));
+    pConcreteMangerMachine->SendMessage(CONCRETE_CMD_SET_TARGET_ROLE, static_cast<int>(curRole));
+    pConcreteMangerMachine->SendMessage(CONCRETE_CMD_START, mid);
     return WIFI_OPT_SUCCESS;
 }
 

@@ -338,6 +338,10 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
+    if (wifi_feature_mdm_restricted_enable) {
+      defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
+    }
+
     if (wifi_feature_dynamic_unload_sa) {
       defines += [ "DYNAMIC_UNLOAD_SA" ]
     }
@@ -586,6 +590,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_VOWIFI_SUPPORT" ]
     }
 
+    if (wifi_feature_mdm_restricted_enable) {
+      defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
+    }
+
     if (defined(global_parts_info) &&
         defined(global_parts_info.telephony_core_service)) {
       external_deps += [ "core_service:tel_core_service_api" ]
@@ -705,6 +713,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hilog:libhilog",
       "ipc:ipc_single",
+      "libxml2:libxml2",
     ]
 
     version_script = "libwifi_manager.map"

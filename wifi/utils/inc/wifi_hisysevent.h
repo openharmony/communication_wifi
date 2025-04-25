@@ -115,7 +115,7 @@ void WriteWifiBridgeStateHiSysEvent(int32_t state);
 
 void WriteWifiP2pStateHiSysEvent(const std::string& inter, int32_t type, int32_t state);
 
-void WriteWifiConnectionHiSysEvent(const WifiConnectionType& type, const std::string& pkgName);
+void WriteWifiConnectionHiSysEvent(int type, const std::string& pkgName);
 
 void WriteAuthFailHiSysEvent(const std::string &authFailReason, int subErrCode = 0);
 

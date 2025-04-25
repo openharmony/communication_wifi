@@ -466,6 +466,17 @@ public:
      * @param success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode OnFoldStateChanged(const int foldStatus) = 0;
+
+    /**
+     * @Description Add wifi block list and wifi white list
+     *
+     * @param config - WifiRestrictedInfo object
+     * @param result - the result of wifi access list
+     * @return ErrCode - operation result
+     */
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

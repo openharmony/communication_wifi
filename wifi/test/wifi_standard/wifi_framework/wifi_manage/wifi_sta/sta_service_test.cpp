@@ -116,6 +116,9 @@ public:
     void StaServiceSetPowerModeTest();
     void StaServiceOnSystemAbilityChangedTest();
     void StaServiceStartPortalCertificationTest();
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    void StaServiceSetWifiRestrictedListSuccess();
+#endif
     void DisableAutoJoin();
     void EnableAutoJoin();
     void RegisterAutoJoinCondition();
@@ -405,6 +408,28 @@ void StaServiceTest::StaServiceRemoveDeviceConfigFail2()
     int networkId = NETWORK_ID;
     EXPECT_TRUE(pStaService->RemoveDevice(networkId) == WIFI_OPT_FAILED);
 }
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+void StaServiceTest::StaServiceSetWifiRestrictedListSuccess()
+{
+    std::vector<WifiRestrictedInfo> wifiRestrictedInfoList;
+    WifiRestrictedInfo blackInfo;
+    blackInfo.ssid = "testBlock1";
+    blackInfo.bssid = "testBlock_bssid";
+    blackInfo.uid = 0;
+    blackInfo.wifiRestrictedType = MDM_BLOCKLIST;
+    wifiRestrictedInfoList.push_back(blackInfo);
+ 
+    WifiRestrictedInfo whiteInfo;
+    whiteInfo.ssid = "testWhite";
+    whiteInfo.bssid = "testWhite_bssid";
+    whiteInfo.uid = 0;
+    whiteInfo.wifiRestrictedType = MDM_WHITELIST;
+    wifiRestrictedInfoList.push_back(whiteInfo);
+ 
+    EXPECT_TRUE(pStaService->SetWifiRestrictedList(wifiRestrictedInfoList) == WIFI_OPT_SUCCESS);
+}
+#endif
 
 void StaServiceTest::StaServiceEnableDeviceConfigSuccess()
 {
@@ -978,7 +1003,14 @@ HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigSuccess, TestSize.Level0)
     StaServiceEnableDeviceConfigSuccess();
 }
 
-HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigFail1, TestSize.Level0)
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+HWTEST_F(StaServiceTest, StaServiceSetWifiRestrictedListSuccess, TestSize.Level0)
+{
+    StaServiceSetWifiRestrictedListSuccess();
+}
+#endif
+
+HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigFail1, TestSize.Level1)
 {
     StaServiceEnableDeviceConfigFail1();
 }

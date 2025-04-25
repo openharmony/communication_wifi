@@ -147,6 +147,7 @@ ohos_unittest("WifiApServiceTest") {
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
+    "samgr:samgr_proxy",
   ]
 
   if (defined(global_parts_info.powermgr_battery_manager)) {

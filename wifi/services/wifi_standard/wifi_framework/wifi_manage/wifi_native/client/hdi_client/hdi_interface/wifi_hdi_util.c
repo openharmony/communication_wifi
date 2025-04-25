@@ -47,9 +47,6 @@
 #define HILINK_OUI_HEAD_LEN 7
 #define HILINK_HEAD_LEN 9
 #define HILINK_OFFSET_LEN 2
-#define HILINK_LOGO_IS_HI 1
-#define HILINK_LOGO_IS_WPS 2
-#define HILINK_LOGO_IS_ENTERPRISE_HI 3
 
 const unsigned int HT_OPER_EID = 61;
 const unsigned int VHT_OPER_EID = 192;
@@ -1450,18 +1447,18 @@ static uint8_t CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len)
     return 0;
 }
 
-bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
+int RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
 {
     const struct HdiElem *elem;
     uint8_t num = 0;
 
     if (!start) {
-        return false;
+        return num;
     }
 
     HDI_CHECK_ELEMENT(elem, start, len) {
         if (elem == NULL) {
-            return false;
+            return num;
         }
         uint8_t id = elem->id, elen = elem->datalen;
         const uint8_t *pos = elem->data;
@@ -1470,9 +1467,6 @@ bool RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
             num |= CheckHiLinkOUISection(pos, elen);
         }
     }
-    if (num == HILINK_LOGO_IS_HI || num == HILINK_LOGO_IS_WPS || num == HILINK_LOGO_IS_ENTERPRISE_HI) {
-        return true;
-    }
 
-    return false;
+    return num;
 }

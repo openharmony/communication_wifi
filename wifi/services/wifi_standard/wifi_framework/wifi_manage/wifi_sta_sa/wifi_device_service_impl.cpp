@@ -891,7 +891,11 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfig(const int &networkId, WifiDeviceC
     #endif
     }
 
-    WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
+    int ret = WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
+    if (ret != 0) {
+        WIFI_LOGE("GetDeviceConfig: GetDeviceConfig failed! not found networkId = %{public}d", networkId);
+        return WIFI_OPT_INVALID_CONFIG;
+    }
     return WIFI_OPT_SUCCESS;
 }
 

@@ -900,6 +900,7 @@ enum class WifiProtectType  {
 
 /* WifiProtectMode  */
 enum class WifiProtectMode {
+    WIFI_PROTECT_DEFAULT = -1,
     WIFI_PROTECT_FULL = 0,
     WIFI_PROTECT_SCAN_ONLY = 1,
     WIFI_PROTECT_FULL_HIGH_PERF = 2,

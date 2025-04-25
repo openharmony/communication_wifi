@@ -156,6 +156,9 @@ bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
     WIFI_LOGD("DefaultState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
+        case WIFI_CURE_CMD_FORCE_STOP_SELF_CURE:
+            pSelfCureStateMachine_->ForceStopSelfCure();
+            break;
         case WIFI_CURE_DHCP_OFFER_PKT_RCV: {
             IpInfo info;
             msg->GetMessageObj(info);
@@ -2691,12 +2694,17 @@ bool SelfCureStateMachine::IsSelfCureL2Connecting()
     return selfCureL2State_ != SelfCureState::SCE_WIFI_INVALID_STATE;
 }
 
-void SelfCureStateMachine::StopSelfCureWifi(int32_t status)
+void SelfCureStateMachine::ForceStopSelfCure()
 {
     if (GetCurStateName() != pDisconnectedMonitorState_->GetStateName()) {
         WIFI_LOGI("stop selfcure");
         SwitchState(pDisconnectedMonitorState_);
     }
+}
+
+void SelfCureStateMachine::StopSelfCureWifi(int32_t status)
+{
+    SendMessage(WIFI_CURE_CMD_FORCE_STOP_SELF_CURE);
     if (selfCureL2State_ == SelfCureState::SCE_WIFI_INVALID_STATE) {
         return;
     }

@@ -63,6 +63,14 @@ int WifiPermissionHelper::VerifySameProcessPermission(const int &pid, const int 
 #endif
 }
 
+int WifiPermissionHelper::VerifyManageEdmPolicyPermission(const int &pid, const int &uid)
+{
+    if (VerifyPermission("ohos.permission.MANAGE_EDM_POLICY", pid, uid, 0) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
 int WifiPermissionHelper::VerifySetWifiInfoPermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.SET_WIFI_INFO", pid, uid, 0) == PERMISSION_DENIED) {

@@ -90,6 +90,8 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_MULTI_LINKED_INFO = 0x104F,
 
     WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY = 0x1050,           /* get signalpool info */
+
+    WIFI_SVR_CMD_SET_WIFI_ACCESS_LIST = 0x1051, /* set wifi block white list */
     
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */
@@ -186,6 +188,7 @@ enum class  P2PInterfaceCode {
     WIFI_SVR_CMD_P2P_CHECK_CAN_USE_P2P = 0x202B,    /* check can use p2p */
     WIFI_SVR_CMD_P2P_HID2D_WIDE_SUPPORTED = 0x202C,    /* Hid2d Is Wide Bandwidth Supported */
     WIFI_SVR_CMD_P2P_SET_MIRACAST_SINK_CONFIG = 0x202D,    /* Set miracast sink config */
+    WIFI_SVR_CMD_P2P_GET_SUPPORT_CHANN_FOR_BAND = 0x202E,  /* Get support channels for band*/
 
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
     WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT = 0x3000,

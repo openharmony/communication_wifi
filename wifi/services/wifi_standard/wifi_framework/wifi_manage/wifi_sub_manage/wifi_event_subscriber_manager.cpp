@@ -359,17 +359,18 @@ bool WifiEventSubscriberManager::GetLocationModeByDatashare()
     return (locationMode.compare("1") == 0);
 }
 
-std::string WifiEventSubscriberManager::GetScanWhiteListByDatashare()
+std::string WifiEventSubscriberManager::GetScanMacInfoWhiteListByDatashare()
 {
     if (!WifiDataShareHelperUtils::GetInstance().CheckIfSettingsDataReady()) {
-        WIFI_LOGE("GetScanWhiteListDataShareUri, SettingsDataIsNotReady!");
+        WIFI_LOGE("GetScanMacInfoWhiteListDataShareUri, SettingsDataIsNotReady!");
         return "";
     }
     std::string whiteList;
-    Uri uri(WifiDataShareHelperUtils::GetInstance().GetScanWhiteListDataShareUri());
-    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri, "location_kit_api_control_white_list", whiteList);
+    Uri uri(WifiDataShareHelperUtils::GetInstance().GetScanMacInfoWhiteListDataShareUri());
+    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri,
+        SETTINGS_DATASHARE_KEY_SCANMACINFO_WHITELIST, whiteList);
     if (ret != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("GetScanWhiteListDataShareUri, Query ScanWhiteList fail!");
+        WIFI_LOGE("GetScanMacInfoWhiteListDataShareUri, Query ScanWhiteList fail!");
         return "";
     }
     return whiteList;
@@ -855,6 +856,11 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
         if (pEnhanceService != nullptr) {
             pEnhanceService->OnDialogClick(true);
         }
+    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_CONN)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsDialogClick(true, SETTINGS_5G_AUTO_IDENTIFY_CONN);
+        }
     }
 #ifdef FEATURE_P2P_SUPPORT
     if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
@@ -875,6 +881,11 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
         if (pEnhanceService != nullptr) {
             pEnhanceService->OnDialogClick(false);
         }
+    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_CONN)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_AUTO_IDENTIFY_CONN);
+        }
     }
 #ifdef FEATURE_P2P_SUPPORT
     if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
@@ -886,7 +897,7 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
     }
 #endif
 }
- 
+
 #ifdef HAS_POWERMGR_PART
 void WifiEventSubscriberManager::RegisterPowermgrEvent()
 {
@@ -1040,7 +1051,7 @@ void WifiEventSubscriberManager::RegisterAssetEvent()
         WIFI_LOGI("RegisterAssetEvent success");
     }
 }
- 
+
 void WifiEventSubscriberManager::UnRegisterAssetEvent()
 {
     std::unique_lock<std::mutex> lock(AssetEventMutex);
@@ -1056,18 +1067,18 @@ void WifiEventSubscriberManager::UnRegisterAssetEvent()
     wifiAssetrEventSubsciber_ = nullptr;
     WIFI_LOGI("UnRegisterAssetEvent finished");
 }
- 
+
 AssetEventSubscriber::AssetEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {
     WIFI_LOGI("AssetEventSubscriber enter");
 }
- 
+
 AssetEventSubscriber::~AssetEventSubscriber()
 {
     WIFI_LOGI("~AssetEventSubscriber enter");
 }
- 
+
 void AssetEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
@@ -1264,6 +1275,10 @@ void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &ev
     if (action == ENTER_SETTINGS) {
         bool isSettingsEnter = eventData.GetWant().GetBoolParam(WLAN_PAGE_ENTER, false);
         BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsWlanEnterReceive();
+        }
     }
 }
 

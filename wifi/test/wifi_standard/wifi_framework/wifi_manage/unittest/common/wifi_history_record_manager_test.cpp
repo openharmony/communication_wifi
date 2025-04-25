@@ -207,7 +207,6 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged3Test, TestSize.Level1)
     EXPECT_TRUE(recordSsid == testSsid);
     EXPECT_TRUE(recordBssid == testBssid);
     EXPECT_TRUE(recordFirstConnectedTime == testFirstConnectedTime);
-    EXPECT_TRUE(recordTotalUseTime == recordTotalUseTime);
     EXPECT_TRUE(recordTotalUseTimeAtNight == testTotalUseTimeAtNight);
     EXPECT_TRUE(recordTotalUseTimeAtWeekend == testTotalUseTimeAtWeekend);
 }

@@ -210,6 +210,8 @@ public:
     ErrCode SetVoWifiDetectPeriod(int period) override;
  
     ErrCode GetVoWifiDetectPeriod(int &period) override;
+
+    ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

@@ -18,6 +18,7 @@
 #include "self_cure_utils.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
+#include "ip_qos_monitor.h"
 
 DEFINE_WIFILOG_LABEL("SelfCureService");
 
@@ -90,6 +91,7 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         if (lastState == OperateResState::CONNECT_OBTAINING_IP) {
             pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, lastWifiLinkedInfo);
         }
+        IpQosMonitor::GetInstance().ResetTxRxProperty();
     } else if (state == OperateResState::CONNECT_OBTAINING_IP) {
         lastWifiLinkedInfo = info;
     } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {

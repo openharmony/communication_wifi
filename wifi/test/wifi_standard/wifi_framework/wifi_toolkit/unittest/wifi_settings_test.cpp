@@ -725,5 +725,110 @@ HWTEST_F(WifiSettingsTest, GetDefaultApSsidTest, TestSize.Level1)
     bool ifValidSsid = testSsid.length() >= MIN_SSID_LEN && testSsid.length() <= MAX_SSID_LEN;
     EXPECT_EQ(ifValidSsid, true);
 }
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+HWTEST_F(WifiSettingsTest, AddWifiBlockListConfigTest, TestSize.Level1)
+{
+    WIFI_LOGE("AddWifiBlockListConfigTest enter!");
+    WifiRestrictedInfo info;
+    info.ssid = "blockTest1";
+    info.bssid = "blockTest_bssid_1";
+    info.wifiRestrictedType = MDM_BLOCKLIST;
+    info.uid = 0;
+ 
+    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+ 
+HWTEST_F(WifiSettingsTest, AddWifiBlockListConfigFailTest, TestSize.Level1)
+{
+    WIFI_LOGE("AddWifiBlockListConfigFailTest enter!");
+    WifiRestrictedInfo info;
+    info.ssid = "";
+    info.bssid = "111";
+    info.wifiRestrictedType = MDM_BLOCKLIST;
+    info.uid = 0;
+ 
+    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
+    EXPECT_EQ(result, WIFI_OPT_INVALID_PARAM);
+}
+ 
+HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigTest, TestSize.Level1)
+{
+    WIFI_LOGE("AddWifiWhiteListConfigTest enter!");
+    WifiRestrictedInfo info;
+    info.ssid = "whiteTest1";
+    info.bssid = "whiteTest_bssid_1";
+    info.wifiRestrictedType = MDM_WHITELIST;
+    info.uid = 0;
+ 
+    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+}
+ 
+HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigFailTest, TestSize.Level1)
+{
+    WIFI_LOGE("AddWifiWhiteListConfigFailTest enter!");
+    WifiRestrictedInfo info;
+    info.ssid = "whiteTest2";
+    info.bssid = "";
+    info.wifiRestrictedType = MDM_WHITELIST;
+    info.uid = 0;
+ 
+    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
+    EXPECT_EQ(result, WIFI_OPT_INVALID_PARAM);
+}
+ 
+HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
+{
+    WIFI_LOGE("FindWifiBlockListConfigTest enter!");
+    WifiRestrictedInfo info;
+    info.ssid = "blockTest1";
+    info.bssid = "blockTest_bssid_1";
+    info.wifiRestrictedType = MDM_BLOCKLIST;
+    info.uid = 0;
+ 
+    bool result = WifiSettings::GetInstance().FindWifiBlockListConfig(info.ssid, info.bssid, info.uid);
+    EXPECT_EQ(result, true);
+ 
+    info.ssid = "blockTest2";
+    info.bssid = "";
+ 
+    result = WifiSettings::GetInstance().FindWifiBlockListConfig(info.ssid, info.bssid, info.uid);
+    EXPECT_EQ(result, false);
+}
+ 
+HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
+{
+    WIFI_LOGE("FindWifiWhiteListConfigTest enter!");
+    WifiRestrictedInfo info;
+    info.ssid = "whiteTest1";
+    info.bssid = "whiteTest_bssid_1";
+    info.wifiRestrictedType = MDM_WHITELIST;
+    info.uid = 0;
+ 
+    bool result = WifiSettings::GetInstance().FindWifiWhiteListConfig(info.ssid, info.bssid, info.uid);
+    EXPECT_EQ(result, true);
+ 
+    info.ssid = "whiteTest2";
+    info.bssid = "";
+ 
+    result = WifiSettings::GetInstance().FindWifiWhiteListConfig(info.ssid, info.bssid, info.uid);
+    EXPECT_EQ(result, false);
+}
+ 
+HWTEST_F(WifiSettingsTest, whetherSetWhiteListConfigTest, TestSize.Level1)
+{
+    WIFI_LOGE("whetherSetWhiteListConfigTest enter!");
+    
+    bool result = WifiSettings::GetInstance().WhetherSetWhiteListConfig();
+    EXPECT_EQ(result, true);
+ 
+    WifiSettings::GetInstance().ClearWifiRestrictedListConfig(0);
+ 
+    result = WifiSettings::GetInstance().WhetherSetWhiteListConfig();
+    EXPECT_EQ(result, false);
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHO

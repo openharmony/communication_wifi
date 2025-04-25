@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int MAX_SIZE = 256;
+constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
 int g_bigDataRecvLen = 0;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
@@ -313,6 +314,14 @@ ErrCode WifiDeviceProxy::IsHeldWifiProtectRef(
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiDeviceProxy::WriteWifiRestrictedInfo(const WifiRestrictedInfo &info, MessageParcel &data)
+{
+    data.WriteString(info.ssid);
+    data.WriteString(info.bssid);
+    data.WriteInt32(info.uid);
+    data.WriteInt32(static_cast<int32_t>(info.wifiRestrictedType));
+}
+
 void WifiDeviceProxy::WriteIpAddress(MessageParcel &data, const WifiIpAddress &address)
 {
     data.WriteInt32(address.family);
@@ -553,6 +562,48 @@ ErrCode WifiDeviceProxy::RemoveDevice(int networkId)
         return WIFI_OPT_FAILED;
     }
     return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiDeviceProxy::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
+{
+    WIFI_LOGI("wifi_device_proxy:: SetWifiRestrictedList");
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int size = static_cast<int>(wifiRestrictedInfoList.size());
+    if (size > MAX_MDM_RESTRICTED_SIZE) {
+        WIFI_LOGE("SetWifiRestrictedList size error: %{public}d", size);
+        return WIFI_OPT_MDM_OUT_MAX_NUM;
+    }
+    data.WriteInt32(size);
+    for (int i = 0; i < size; i++) {
+        WriteWifiRestrictedInfo(wifiRestrictedInfoList[i], data);
+    }
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_WIFI_ACCESS_LIST),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_WIFI_ACCESS_LIST), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiDeviceProxy::RemoveAllDevice()
@@ -1311,7 +1362,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     }
     info.isAncoConnected = reply.ReadBool();
     info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
-    info.isHiLinkNetwork = reply.ReadBool();
+    info.isHiLinkNetwork = reply.ReadInt32();
     info.lastRxPackets = reply.ReadInt32();
     info.lastTxPackets = reply.ReadInt32();
     info.wifiLinkType = static_cast<WifiLinkType>(reply.ReadInt32());
@@ -1371,7 +1422,7 @@ ErrCode WifiDeviceProxy::GetDisconnectedReason(DisconnectedReason &reason)
         return ErrCode(ret);
     }
     int tempReason = reply.ReadInt32();
-    if (tempReason >= 0 && tempReason <= (int)DisconnectedReason::DISC_REASON_CONNECTION_REJECTED) {
+    if (tempReason >= 0 && tempReason < static_cast<int>(DisconnectedReason::DISC_REASON_MAX_VALUE)) {
         reason = (DisconnectedReason)tempReason;
     } else {
         reason = DisconnectedReason::DISC_REASON_DEFAULT;

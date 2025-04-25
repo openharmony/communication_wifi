@@ -36,7 +36,7 @@ public:
 class WifiDataReportServiceTest : public testing::Test {
 public:
     WifiDataReportServiceTest()
-        : mStaStateMachine(0), mWifiDataReportService_(mStaStateMachine, 0)
+        : mStaStateMachine(0), mWifiDataReportService_(&mStaStateMachine, 0)
     {}
 
     ~WifiDataReportServiceTest() {}

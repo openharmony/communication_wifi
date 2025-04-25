@@ -107,7 +107,6 @@ public:
 public:
     ErrCode InitConcreteMangerMachine();
     void RegisterCallback(ConcreteModeCallback &callback);
-    void SetTargetRole(ConcreteManagerRole role);
 
 private:
     template <typename T>
@@ -130,7 +129,7 @@ private:
 
     void BuildStateTree();
     ErrCode InitConcreteMangerStates();
-
+    void SetTargetRole(ConcreteManagerRole role);
     bool HandleCommonMessage(InternalMessagePtr msg);
     void CheckAndContinueToStopWifi(InternalMessagePtr msg);
     void HandleStaStop();

@@ -160,6 +160,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
     param["wifiDialogType"] = static_cast<int32_t>(type);
     switch (type) {
         case AUTO_IDENTIFY_CONN:
+        case SETTINGS_AUTO_IDENTIFY_CONN:
             param["wifi5gSsid"] = comInfo;
             break;
         case P2P_WSC_PBC_DIALOG:

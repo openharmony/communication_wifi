@@ -163,6 +163,7 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
     const std::vector<WifiScanInfo>& vecScnIanfos, napi_value& arrayResult)
 {
     uint32_t idx = 0;
+    bool isHiLinkNetwork = false;
     for (auto& each : vecScnIanfos) {
         napi_value eachObj;
         napi_create_object(env, &eachObj);
@@ -180,7 +181,9 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
         NativeInfoElemsToJsObj(env, each.infoElems, eachObj);
         SetValueInt64(env, "timestamp", each.timestamp, eachObj);
         SetValueInt32(env, "supportedWifiCategory", static_cast<int>(each.supportedWifiCategory), eachObj);
-        SetValueBool(env, "isHiLinkNetwork", each.isHiLinkNetwork, eachObj);
+        isHiLinkNetwork = static_cast<bool>((each.isHiLinkNetwork > 0
+            && each.isHiLinkNetwork <= EXTERNAL_HILINK_MAX_VALUE) ? true : false);
+        SetValueBool(env, "isHiLinkNetwork", isHiLinkNetwork, eachObj);
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
@@ -1040,7 +1043,8 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "linkSpeed", static_cast<int>(linkedInfo.txLinkSpeed), result);
     SetValueInt32(env, "channelWidth", static_cast<int>(linkedInfo.channelWidth), result);
     SetValueInt32(env, "supportedWifiCategory", static_cast<int>(linkedInfo.supportedWifiCategory), result);
-    SetValueBool(env, "isHiLinkNetwork", linkedInfo.isHiLinkNetwork, result);
+    SetValueBool(env, "isHiLinkNetwork", static_cast<bool>((linkedInfo.isHiLinkNetwork > 0
+        && linkedInfo.isHiLinkNetwork <= EXTERNAL_HILINK_MAX_VALUE) ? true : false), result);
     SetValueInt32(env, "wifiLinkType", static_cast<int>(linkedInfo.wifiLinkType), result);
 }
 
@@ -1263,7 +1267,7 @@ static void IpConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, 
 {
     SetValueInt32(env, "ipAddress", wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4, ipCfgObj);
     SetValueInt32(env, "gateway", wifiIpConfig.staticIpAddress.gateway.addressIpv4, ipCfgObj);
-
+    SetValueInt32(env, "prefixLength", wifiIpConfig.staticIpAddress.ipAddress.prefixLength, ipCfgObj);
     const int DNS_NUM = 2;
     napi_value dnsArray;
     napi_create_array_with_length(env, DNS_NUM, &dnsArray);

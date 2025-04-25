@@ -84,6 +84,7 @@ constexpr int DHCP_TIME = 15;
 constexpr int INVALID_RSSI_VALUE = -127;
 constexpr int MAX_RSSI_VALUE = 200;
 constexpr int SIGNAL_INFO = 256;
+constexpr int RSSI_LEVEL_2 = 2;
 constexpr int RSSI_LEVEL_3 = 3;
 
 /* 2.4g and 5g frequency thresholds */
@@ -202,6 +203,9 @@ public:
         void StartConnectEvent(InternalMessagePtr msg);
         void UpdateCountryCode(InternalMessagePtr msg);
         bool AllowAutoConnect();
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+        bool RestrictedByMdm(WifiDeviceConfig &config);
+#endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
@@ -426,9 +430,10 @@ public:
     /**
      * @Description  Start roaming connection.
      *
+     * @param networkId - the networkId
      * @param bssid - the mac address of network(in)
      */
-    void StartConnectToBssid(std::string bssid);
+    void StartConnectToBssid(const int32_t networkId, std::string bssid);
     /**
      * @Description Register sta callback function
      *
@@ -471,6 +476,16 @@ public:
     void HilinkSetMacAddress(std::string &cmd);
     void DealWpaStateChange(InternalMessagePtr msg);
     void GetDetectNetState(OperateResState &state);
+    /**
+     * @Description  Save the disconnected reason.
+     *
+     * @param discReason - disconnected reason(in)
+     */
+    void SaveDiscReason(DisconnectedReason discReason);
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    void DealMdmRestrictedConnect(WifiDeviceConfig &config);
+    bool WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid);
+#endif
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
     void SetSelfCureService(ISelfCureService *selfCureService);
@@ -559,12 +574,6 @@ private:
      */
     void SaveLinkstate(ConnState state, DetailedState detailState);
 
-    /**
-     * @Description  Save the disconnected reason.
-     *
-     * @param discReason - disconnected reason(in)
-     */
-    void SaveDiscReason(DisconnectedReason discReason);
     /**
      * @Description  Update wifi status and save connection information.
      *
@@ -1000,6 +1009,7 @@ private:
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
     void UpdateLinkedBssid(std::string &bssid);
+    void InvokeOnInternetAccessChanged(SystemNetWorkState internetAccessStatus);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void ResetWifi7WurInfo();
@@ -1033,9 +1043,6 @@ private:
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
     ISelfCureService *selfCureService_ = nullptr;
-#ifdef WIFI_DATA_REPORT_ENABLE
-    WifiDataReportService wifiDataReportService_;
-#endif
 #endif
 
     int targetNetworkId_;
@@ -1076,11 +1083,17 @@ private:
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
     int isAudioOn_ = 0;
+    SystemNetWorkState lastInternetAccessStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
     /*
      linkswitch detect flag to avoid freq linkswitch cause signal level jump,
      set to true when linkswitch start, to false when linkswitch duration 2s later
     */
     bool linkSwitchDetectingFlag_{false};
+#ifndef OHOS_ARCH_LITE
+#ifdef WIFI_DATA_REPORT_ENABLE
+    WifiDataReportService *wifiDataReportService_ = nullptr;
+#endif
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -53,7 +53,6 @@ namespace Wifi {
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 constexpr int EXTENSION_ERROR_CODE = 13500099;
-constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 constexpr int RSS_UID = 1096;
 
 bool g_hiLinkActive = false;
@@ -626,6 +625,23 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
     }
     result = retNetworkId;
     return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
+{
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    if (WifiPermissionUtils::VerifyManageEdmPolicyPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetWifiRestrictedList:VerifyManageEdmPolicyPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    return pService->SetWifiRestrictedList(wifiRestrictedInfoList);
+#else
+    return WIFI_OPT_FAILED;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::CheckCanAddDeviceConfig(const bool isCandidate)
@@ -1406,8 +1422,7 @@ void WifiDeviceServiceImpl::UpdateWifiLinkInfo(WifiLinkedInfo &info)
     std::string packageName = "";
 #ifndef OHOS_ARCH_LITE
     GetBundleNameByUid(GetCallingUid(), packageName);
-    int32_t userId = static_cast<int32_t>(GetCallingUid() / UID_CALLINGUID_TRANSFORM_DIVISOR);
-    appId = GetBundleAppIdByBundleName(userId, packageName);
+    appId = GetBundleAppIdByBundleName(GetCallingUid(), packageName);
 #endif
     if (ProcessPermissionVerify(appId, packageName) == PERMISSION_DENIED) {
         if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {

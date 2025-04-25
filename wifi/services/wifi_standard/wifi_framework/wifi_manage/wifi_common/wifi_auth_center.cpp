@@ -91,6 +91,14 @@ int WifiAuthCenter::VerifySetWifiInfoPermission(const int &pid, const int &uid)
     return WifiPermissionHelper::VerifySetWifiInfoPermission(pid, uid);
 }
 
+int WifiAuthCenter::VerifyManageEdmPolicyPermission(const int &pid, const int &uid)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifyManageEdmPolicyPermission(pid, uid);
+}
+
 int WifiAuthCenter::VerifyGetWifiInfoPermission(const int &pid, const int &uid)
 {
     if (g_permissinAlwaysGrant) {

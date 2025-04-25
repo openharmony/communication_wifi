@@ -358,5 +358,13 @@ void StaInterface::GetDetectNetState(OperateResState &state)
 {
     WIFI_LOGI("Enter GetDetectNetState");
 }
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+ErrCode StaInterface::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList)
+{
+    LOGI("Enter SetWifiRestrictedList.\n");
+    return pStaService->SetWifiRestrictedList(wifiRestrictedInfoList);
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

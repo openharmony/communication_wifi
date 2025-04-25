@@ -62,7 +62,6 @@ constexpr int MIN_5G_CHANNEL = 36;
 constexpr int MAX_5G_CHANNEL = 165;
 constexpr int FREQ_CHANNEL_1 = 2412;
 constexpr int FREQ_CHANNEL_36 = 5180;
-constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
 constexpr int MICROSECOND_TO_NANOSECOND = 1000;
 constexpr char HIDDEN_CHAR_SHOW_AS = '*';
 constexpr int PASSWORD_MIN_LEN = 8;
@@ -95,6 +94,7 @@ constexpr int IP_ADDRESS_FIRST_BYTE_INDEX = 0;
 constexpr int IP_ADDRESS_SECOND_BYTE_INDEX = 1;
 constexpr int IP_ADDRESS_THIRD_BYTE_INDEX = 2;
 constexpr int IP_ADDRESS_FOURTH_BYTE_INDEX = 3;
+constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 
 static std::string DataAnonymize(const std::string str, const char delim,
     const char hiddenCh, const int startIdx = 0)
@@ -347,8 +347,9 @@ std::string GetBundleName()
     return bundleInfo.name;
 }
 
-std::string GetBundleAppIdByBundleName(const int userId, const std::string &bundleName)
+std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &bundleName)
 {
+    int userId = static_cast<int32_t>(GetCallingUid() / UID_CALLINGUID_TRANSFORM_DIVISOR);
     sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
     if (bundleInstance == nullptr) {
         WIFI_LOGE("bundle instance is null!");
@@ -861,6 +862,11 @@ uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode)
 {
     uint8_t standardSubSystem = subSystem & 0x1F;
     return (WIFI_SYSTEM_ID << SYSTEM_OFFSET | standardSubSystem << SUB_SYSTEM_OFFSET | errCode);
+}
+
+bool InternalHiLinkNetworkToBool(int isHiLinkNetwork)
+{
+    return (isHiLinkNetwork > 0 && isHiLinkNetwork <= INTERNAL_HILINK_MAX_VALUE) ? true : false;
 }
 }  // namespace Wifi
 }  // namespace OHOS

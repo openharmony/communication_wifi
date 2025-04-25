@@ -33,6 +33,7 @@ constexpr const char *SETTINGS_DATASHARE_URI =
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
+constexpr const char *DEFAULT_USERID = "100";
 
 // E_OK and E_DATA_SHARE_NOT_READY used to check datashare ready
 constexpr const int32_t E_OK = 0;
@@ -243,19 +244,19 @@ void WifiDataShareHelperUtils::ClearResources(std::shared_ptr<DataShare::DataSha
     }
 }
 
-std::string WifiDataShareHelperUtils::GetScanWhiteListDataShareUri()
+std::string WifiDataShareHelperUtils::GetScanMacInfoWhiteListDataShareUri()
 {
     std::vector<int> accountIds;
 #ifdef HAS_ACCOUNT_PART
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(accountIds);
 #endif
-    std::string userId = "100";
+    std::string userId = DEFAULT_USERID;
     if (!accountIds.empty()) {
         userId = std::to_string(accountIds[0]);
     }
 
     std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_" + userId +
-        "?Proxy=true&key=location_kit_api_control_white_list";
+        "?Proxy=true&key=" + SETTINGS_DATASHARE_KEY_SCANMACINFO_WHITELIST;
     return uri;
 }
 }   // namespace Wifi

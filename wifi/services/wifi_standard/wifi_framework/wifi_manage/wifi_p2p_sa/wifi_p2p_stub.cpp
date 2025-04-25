@@ -118,6 +118,10 @@ void WifiP2pStub::InitHandleMapExPart3()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
             OnSetMiracastSinkConfig(code, data, reply, option);
         };
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_SUPPORT_CHANN_FOR_BAND)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnGetSupportChanForBand(code, data, reply, option);
+        };
 }
 
 void WifiP2pStub::InitHandleMap()
@@ -1130,6 +1134,23 @@ void WifiP2pStub::OnSetMiracastSinkConfig(
     ErrCode ret = SetMiracastSinkConfig(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnGetSupportChanForBand(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<int> channels;
+    int band = data.ReadInt32();
+    ErrCode ret = GetSupportedChanForBand(channels, band);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(static_cast<int>(channels.size()));
+        for (auto& channel : channels) {
+            reply.WriteInt32(channel);
+        }
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

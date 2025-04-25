@@ -271,7 +271,7 @@ void WifiScanStub::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &
         outParcel.WriteInt32(result[i].maxSupportedRxLinkSpeed);
         outParcel.WriteInt32(result[i].maxSupportedTxLinkSpeed);
         outParcel.WriteInt32(result[i].disappearCount);
-        outParcel.WriteBool(result[i].isHiLinkNetwork);
+        outParcel.WriteInt32(result[i].isHiLinkNetwork);
         outParcel.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
 
         int dataSize = static_cast<int>(outParcel.GetDataSize());

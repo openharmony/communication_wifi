@@ -44,7 +44,7 @@ namespace Wifi {
 
 constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
-constexpr const int MAX_MDM_RESTRICTED_SIZE = 200;
+
 #endif
 
 #define EAP_AUTH_IMSI_MCC_POS 0
@@ -411,19 +411,6 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
 ErrCode StaService::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) const
 {
-    std::vector<WifiRestrictedInfo> tmp;
-    tmp.assign(wifiRestrictedInfoList.begin(), wifiRestrictedInfoList.end());
-    ErrCode checkResult = WifiSettings::GetInstance().CheckWifiMdmRestrictedList(tmp);
-    if (checkResult != WIFI_OPT_SUCCESS) {
-        return checkResult;
-    }
-    BlockConnectService::GetInstance().ClearBlockConnectForMdmRestrictedList();
-    WifiSettings::GetInstance().ClearWifiRestrictedListConfig(m_instId);
-    for (size_t i = 0; i < tmp.size() && i <= MAX_MDM_RESTRICTED_SIZE; i++) {
-        WifiSettings::GetInstance().AddWifiRestrictedListConfig(m_instId, tmp[i]);
-    }
-    WifiSettings::GetInstance().SyncWifiRestrictedListConfig();
-    BlockConnectService::GetInstance().UpdateNetworkSelectStatusForMdmRestrictedList();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     if (WifiSettings::GetInstance().FindWifiBlockListConfig(linkedInfo.ssid, linkedInfo.bssid, 0)) {

@@ -55,7 +55,7 @@ public:
     int32_t RegisterNetSupplier(NetBearType bearerType, const std::string &ident,
                                            const std::set<NetCap> &netCaps, uint32_t &supplierId);
     int32_t DelInterfaceAddress(const std::string &ifName, const std::string &ipAddr, int32_t prefixLength);
-    int32_t IncreaseSupplierScore(uint32_t supplierId);
+    int32_t UpdateSupplierScore(uint32_t supplierId, uint32_t detectionStatus);
 };
 } // namespace NetManagerStandard
 } // namespace OHOS

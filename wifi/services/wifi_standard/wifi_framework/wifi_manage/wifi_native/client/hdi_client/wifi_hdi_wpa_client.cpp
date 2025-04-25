@@ -53,7 +53,7 @@ namespace OHOS {
 namespace Wifi {
 #define MAX_IFACENAME_LEN 6
 #define MAX_CMD_BUFFER_SIZE 1024
-#define MAX_PASSWORD_LEN 32
+#define MAX_PASSWORD_LEN 64
 constexpr int PMF_OPTIONAL = 1;
 constexpr int PMF_REQUIRED = 2;
 const int BUFFER_SIZE = 4096;

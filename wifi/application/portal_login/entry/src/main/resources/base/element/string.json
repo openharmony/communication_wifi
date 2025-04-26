@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "actions_menu_user_agent",
+      "value": "Browser UA"
+    },
+    {
+      "name": "contextmenu_open_in_browser",
+      "value": "Open in Browser"
+    },
+    {
+      "name": "site_setting_single_website_title",
+      "value": "%s settings"
+    },
+    {
+      "name": "user_agent_harmony",
+      "value": "HarmonyOS"
+    },
+    {
+      "name": "compatibility_mode_of_the_mobile_version",
+      "value": "Mobile site (Compatibility mode)"
+    },
+    {
+      "name": "compatibility_mode_of_the_PC_version",
+      "value": "Desktop site (Compatibility mode)"
+    }
+  ]
+}

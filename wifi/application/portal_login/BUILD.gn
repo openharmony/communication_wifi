@@ -12,11 +12,9 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/communication/wifi/wifi/wifi.gni")
 import("./signature/portallogin.gni")
 
-ohos_app("portal_login_hap") {
-  hvigor_home="./"    
+ohos_app("portal_login_hap") {  
   sdk_home = "//prebuilts/ohos-sdk/linux"
   sdk_type_name = [ "sdk.dir" ]
   deps = [

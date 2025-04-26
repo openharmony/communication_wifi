@@ -14,7 +14,8 @@
 import("//build/ohos.gni")
 import("./signature/portallogin.gni")
 
-ohos_app("portal_login_hap") {  
+ohos_app("portal_login_hap") {
+  hvigor_home="./"
   sdk_home = "//prebuilts/ohos-sdk/linux"
   sdk_type_name = [ "sdk.dir" ]
   deps = [

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 {
+  "hvigorVersion": "3.0.2",
   "modelVersion": "5.0.2",
   "dependencies": {
     "@ohos/hvigor-ohos-online-sign-plugin": "4.0.2"

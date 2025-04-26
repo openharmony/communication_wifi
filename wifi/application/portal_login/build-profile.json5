@@ -41,7 +41,7 @@
   },
   "modules": [
     {
-      "name": "portal_login_entry",
+      "name": "entry",
       "srcPath": "./entry",
       "targets": [
         {

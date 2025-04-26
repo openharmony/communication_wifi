@@ -14,7 +14,7 @@
  */
 {
   "module": {
-    "name": "portal_login_entry",
+    "name": "entry",
     "type": "entry",
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",

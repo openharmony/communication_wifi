@@ -15,9 +15,6 @@ import("//build/ohos.gni")
 import("./signature/portallogin.gni")
 
 ohos_app("portal_login_hap") {
-  hvigor_home="./"
-  sdk_home = "//prebuilts/ohos-sdk/linux"
-  sdk_type_name = [ "sdk.dir" ]
   deps = [
     ":portal_login_js_assets",
     ":portal_login_resources",
@@ -28,6 +25,9 @@ ohos_app("portal_login_hap") {
   part_name = "wifi"
   subsystem_name = "communication"
   module_install_dir = "app/PortalLogin"
+  hvigor_home="./"
+  sdk_home = "//prebuilts/ohos-sdk/linux"
+  sdk_type_name = [ "sdk.dir" ]
   if (defined(sign_hap_py_path)) {
     certificate_profile = "${certificate_profile_path}"
     key_alias = "CaptivePortalLoginHm Release"

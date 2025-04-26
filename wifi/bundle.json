@@ -142,8 +142,7 @@
                 "service_group": [
                     "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_manage",
                     "//foundation/communication/wifi/wifi/services/wifi_standard/wifi_framework:wifi_system_ability",
-                    "//foundation/communication/wifi/wifi/relation_services:relation_services",
-					"//foundation/communication/wifi/wifi/application/portal_login:portal_login_hap"
+                    "//foundation/communication/wifi/wifi/relation_services:relation_services"
                 ]
             },
             "inner_api": [

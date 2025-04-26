@@ -1945,14 +1945,12 @@ void StaStateMachine::HandlePortalNetworkPorcess()
         return;
     }
     int netId = m_NetWorkState->GetWifiNetId();
-    std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
-    AAFwk::Want want;
-    want.SetAction(PORTAL_ACTION);
-    want.SetUri(mPortalUrl);
-    want.AddEntity(PORTAL_ENTITY);
-    want.SetBundle(bundle);
-    want.SetParam("netId", netId);
-    WIFI_LOGI("wifi netId is %{public}d", netId);
+	want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
+    want.SetParam('url', mPortalUrl);
+    want.SetParam('netId', netId);
+    int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
+    want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
+    WIFI_LOGI("wifi netId is %{public}d, DeviceType is %{public}d", netId, deviceType);
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
     if (err != ERR_OK) {
         WIFI_LOGI("StartAbility is failed %{public}d", err);

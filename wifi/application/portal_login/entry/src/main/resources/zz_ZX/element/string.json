@@ -1,0 +1,28 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"[TS_855844]_Browser UA"
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"[TS_922302]_Open in Browser"
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"[TS_881176]_%s settings"
+        },
+        {
+            "name":"user_agent_harmony",
+            "value":"[TS_869551]_HarmonyOS"
+        },
+        {
+            "name":"compatibility_mode_of_the_mobile_version",
+            "value":"[TS_1035323]_Mobile site (Compatibility mode)"
+        },
+        {
+            "name":"compatibility_mode_of_the_PC_version",
+            "value":"[TS_1035326]_Desktop site (Compatibility mode)"
+        }
+    ]
+}

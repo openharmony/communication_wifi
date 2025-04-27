@@ -1,0 +1,28 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"تور كۆرگۈچ UA"
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"تور كۆرگۈچتە ئېچىش"
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"\u200f%s تەڭشەكلىرى"
+        },
+        {
+            "name":"user_agent_harmony",
+            "value":"\u200fHarmonyOS"
+        },
+        {
+            "name":"compatibility_mode_of_the_mobile_version",
+            "value":"ماسلاشما يانفون ھالەت"
+        },
+        {
+            "name":"compatibility_mode_of_the_PC_version",
+            "value":"ماسلاشما كومپيۇتېر ھالەت"
+        }
+    ]
+}

@@ -1,0 +1,28 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"བཤར་ཆས་ UA གསལ་འབྱེད།"
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"བཤར་ཆས་ཀྱི་ཁྲོད་ནས་ཁ་ཕྱེ་བ།"
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"%s ཡི་སྒྲིག་འགོད།"
+        },
+        {
+            "name":"user_agent_harmony",
+            "value":"HarmonyOS"
+        },
+        {
+            "name":"compatibility_mode_of_the_mobile_version",
+            "value":"ཁ་པར་པར་གཞིའི་འདྲེས་ཤོང་རྣམ་པ།"
+        },
+        {
+            "name":"compatibility_mode_of_the_PC_version",
+            "value":"གློག་ཀླད་པར་གཞིའི་འདྲེས་ཤོང་རྣམ་པ།"
+        }
+    ]
+}

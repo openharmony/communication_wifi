@@ -1495,6 +1495,11 @@ void WifiConfigCenter::SetDeviceType(int deviceType)
     mDeviceType = deviceType;
 }
 
+int WifiConfigCenter::GetDeviceType()
+{
+    return mDeviceType;
+}
+
 bool WifiConfigCenter::IsAllowPopUp()
 {
     switch (mDeviceType) {

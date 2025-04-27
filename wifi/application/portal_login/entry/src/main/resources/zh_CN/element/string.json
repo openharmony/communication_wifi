@@ -1,0 +1,28 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"浏览器 UA 标识"
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"在浏览器中打开"
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"%s 的设置"
+        },
+        {
+            "name":"user_agent_harmony",
+            "value":"HarmonyOS"
+        },
+        {
+            "name":"compatibility_mode_of_the_mobile_version",
+            "value":"手机版"
+        },
+        {
+            "name":"compatibility_mode_of_the_PC_version",
+            "value":"电脑版"
+        }
+    ]
+}

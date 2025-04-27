@@ -588,7 +588,7 @@ int GetDeviceType()
         if (strncmp(preValue, TABLET_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
             return ProductDeviceType::TABLET;
         }
-		 if (strncmp(preValue, TV_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
+        if (strncmp(preValue, TV_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
             return ProductDeviceType::TV;
         }
     }

@@ -349,7 +349,7 @@ public:
 
     void SetDeviceType(int deviceType);
 	
-	int GetDeviceType();
+    int GetDeviceType();
 
     bool IsAllowPopUp();
 

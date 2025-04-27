@@ -1944,7 +1944,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
         WIFI_LOGE("m_NetWorkState is nullptr\n");
         return;
     }
-    int netId = m_NetWorkState->GetWifiNetId();.
+    int netId = m_NetWorkState->GetWifiNetId();
     AAFwk::Want want;
     want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
     want.SetParam('url', mPortalUrl);

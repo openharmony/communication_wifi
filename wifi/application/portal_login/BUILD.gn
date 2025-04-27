@@ -25,16 +25,11 @@ ohos_app("portal_login_hap") {
   part_name = "wifi"
   subsystem_name = "communication"
   module_install_dir = "app/PortalLogin"
-  
-  js_build_mode = "release"
   sdk_home = "//prebuilts/ohos-sdk/linux"
   sdk_type_name = [ "sdk.dir" ]
   assemble_type = "assembleHap"
   build_level = "module"
-  build_modules = [ "entry" ]
-  
-  hvigor_home="./"
-  
+  build_modules = [ "entry" ]  
   if (defined(sign_hap_py_path)) {
     certificate_profile = "${certificate_profile_path}"
     key_alias = "CaptivePortalLoginHm Release"

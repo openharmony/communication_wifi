@@ -39,14 +39,14 @@ function validateURL(urlString: string): boolean {
 export function setUrl(want: Want): void {
   if (want.parameters && want.parameters.url && validateURL(want.parameters.url as string)) {
     url_ = want.parameters.url as string;
-    hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded set url:' + url_);
+    hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded set url:' + extractDomain(url_));
   } else {
-    hilog.error(DOMAIN, TAG, '%{public}s', 'Failed set url:' + url_);
+    hilog.error(DOMAIN, TAG, '%{public}s', 'Failed set url:' + extractDomain(url_));
   }
 }
 
 export function getUrl(): string {
-  hilog.info(DOMAIN, TAG, '%{public}s', 'get url:' + url_);
+  hilog.info(DOMAIN, TAG, '%{public}s', 'get url:' + extractDomain(url_));
   return url_;
 }
 

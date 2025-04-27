@@ -1476,9 +1476,8 @@ void WifiDeviceStub::OnGetDeviceConfig(uint32_t code, MessageParcel &data, Messa
     WifiDeviceConfig config;
     ErrCode ret = GetDeviceConfig(networkId, config);
     reply.WriteInt32(0);
-
+    reply.WriteInt32(ret);
     if (ret != WIFI_OPT_SUCCESS) {
-        reply.WriteInt32(ret);
         return;
     }
     WriteWifiDeviceConfig(reply, config);

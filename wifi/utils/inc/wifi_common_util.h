@@ -333,7 +333,8 @@ int CheckDataLegalHex(const std::string &data);
 unsigned int CheckDataToUint(std::string &data, int base = DECIMAL_NOTATION);
 long long CheckDataTolonglong(std::string &data, int base = DECIMAL_NOTATION);
 uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode);
-
+unsigned long StringToUlong(const std::string &word);
+double StringToDouble(const std::string &word);
 /**
  * @Description Internal HiLinkNetwork Type To Bool
  *

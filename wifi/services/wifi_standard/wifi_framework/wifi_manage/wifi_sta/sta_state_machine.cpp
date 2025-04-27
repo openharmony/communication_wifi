@@ -1947,8 +1947,8 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     int netId = m_NetWorkState->GetWifiNetId();
     AAFwk::Want want;
     want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
-    want.SetParam('url', mPortalUrl);
-    want.SetParam('netId', netId);
+    want.SetParam("url", mPortalUrl);
+    want.SetParam("netId", netId);
     int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
     want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
     WIFI_LOGI("wifi netId is %{public}d, DeviceType is %{public}d", netId, deviceType);

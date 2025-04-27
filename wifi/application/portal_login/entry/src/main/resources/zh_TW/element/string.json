@@ -1,0 +1,28 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"瀏覽器 UA 識別碼"
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"在瀏覽器中開啟"
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"%s 的設定"
+        },
+        {
+            "name":"user_agent_harmony",
+            "value":"HarmonyOS"
+        },
+        {
+            "name":"compatibility_mode_of_the_mobile_version",
+            "value":"手機版"
+        },
+        {
+            "name":"compatibility_mode_of_the_PC_version",
+            "value":"電腦版"
+        }
+    ]
+}

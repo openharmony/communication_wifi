@@ -130,6 +130,7 @@ enum ProductDeviceType : int {
     PHONE = 0,
     TABLET = 1,
     WEARABLE = 2,
+	TV = 3
 };
 
 struct WifiCallingInfo {

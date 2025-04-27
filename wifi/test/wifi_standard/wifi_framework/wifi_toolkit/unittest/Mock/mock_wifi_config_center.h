@@ -165,6 +165,7 @@ public:
     virtual int SetHotspotIdleTimeout(int time) = 0;
     virtual bool IsAllowPopUp() = 0;
     virtual void SetDeviceType(int deviceType) = 0;
+    virtual int GetDeviceType() = 0;
     virtual int64_t GetHid2dSceneLastSetTime() = 0;
     virtual int SetHid2dSceneLastSetTime(int64_t setTime) = 0;
     virtual int GetP2pEnhanceFreq() = 0;
@@ -321,6 +322,7 @@ public:
     MOCK_METHOD1(SetHid2dSceneLastSetTime, int(int64_t setTime));
     MOCK_METHOD0(IsAllowPopUp, bool());
     MOCK_METHOD1(SetDeviceType, void(int deviceType));
+    MOCK_METHOD0(GetDeviceType, int());
     MOCK_METHOD1(SetHotspotIdleTimeout, int(int time));
     MOCK_METHOD0(GetP2pEnhanceFreq, int());
     MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());

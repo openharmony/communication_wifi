@@ -58,7 +58,7 @@ void DualBandUtils::StringToVectorDouble(std::string &str, const char splitCh, s
     std::istringstream strStream(str);
     std::string subString;
     while (std::getline(strStream, subString, splitCh)) {
-        vectorValue.push_back(StringToUlong(subString));
+        vectorValue.push_back(StringToDouble(subString));
     }
 }
 std::string DualBandUtils::LongArrToString(std::vector<unsigned long> &arr, const char &splitCh)

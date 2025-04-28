@@ -50,6 +50,9 @@ public:
     static int GetSharedLinkCount();
     static void ClearUidCount(int uid);
 private:
+    static void PrintMapInfo(void);
+
+private:
     static std::map<int, int> sharedLinkCountMap;
     static int firstGroupUid;
 };

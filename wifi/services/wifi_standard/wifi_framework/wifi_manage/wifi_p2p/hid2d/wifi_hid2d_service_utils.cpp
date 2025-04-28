@@ -136,6 +136,7 @@ void SharedLinkManager::IncreaseSharedLink()
         firstGroupUid = DEFAULT_UID;
     }
     sharedLinkCountMap[firstGroupUid]++;
+    PrintMapInfo();
 }
 
 void SharedLinkManager::IncreaseSharedLink(int callingUid)
@@ -144,6 +145,7 @@ void SharedLinkManager::IncreaseSharedLink(int callingUid)
     sharedLinkCountMap[callingUid]++;
     WIFI_LOGI("CallingUid %{public}d increase shared link to %{public}d", callingUid,
         sharedLinkCountMap[callingUid]);
+    PrintMapInfo();
 }
 
 void SharedLinkManager::DecreaseSharedLink(int callingUid)
@@ -160,12 +162,14 @@ void SharedLinkManager::DecreaseSharedLink(int callingUid)
     sharedLinkCountMap[callingUid]--;
     WIFI_LOGI("CallingUid %{public}d decrease shared link to %{public}d", callingUid,
         sharedLinkCountMap[callingUid]);
+    PrintMapInfo();
 }
 
 void SharedLinkManager::ClearSharedLinkCount()
 {
     WIFI_LOGI("ClearSharedLinkCount");
     std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    PrintMapInfo();
     firstGroupUid = -1;
     sharedLinkCountMap.clear();
 }
@@ -190,6 +194,20 @@ void SharedLinkManager::ClearUidCount(int uid)
     }
     WIFI_LOGI("ClearUidCount set %{public}d count to 0", uid);
     sharedLinkCountMap[uid] = 0;
+}
+
+void SharedLinkManager::PrintMapInfo(void)
+{
+    if (sharedLinkCountMap.empty()) {
+        WIFI_LOGI("sharelink map is empty");
+        return;
+    }
+    std::string mapInfo;
+    for (auto iter : sharedLinkCountMap) {
+        mapInfo += std::to_string(iter.first);
+        mapInfo += " ";
+    }
+    WIFI_LOGI("sharelink map is %{public}s", mapInfo.c_str());
 }
 }  // namespace Wifi
 }  // namespace OHOS

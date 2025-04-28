@@ -48,6 +48,7 @@ namespace Wifi {
 #endif
 
 constexpr int INVALID_FREQ_OR_CHANNEL = -1;
+constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
 const uint32_t DECIMAL_NOTATION = 10;
 inline const uint8_t WIFI_SYSTEM_ID = 202;
 inline const uint8_t P2P_SUB_SYSTEM_ID = 2;

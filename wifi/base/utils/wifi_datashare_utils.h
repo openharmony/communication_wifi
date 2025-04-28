@@ -35,6 +35,7 @@ constexpr const char *SETTINGS_DATASHARE_URL_AIRPLANE_MODE =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 constexpr const char *SETTINGS_DATASHARE_KEY_AIRPLANE_MODE = "settings.telephony.airplanemode";
 constexpr const char *SETTINGS_DATASHARE_KEY_LOCATION_MODE = "location_switch_enable";
+constexpr const char *SETTINGS_DATASHARE_KEY_SCANMACINFO_WHITELIST = "location_kit_api_control_white_list";
 
 #ifndef OHOS_ARCH_LITE
 constexpr const char *SETTINGS_DATASHARE_URI_WIFI_ON =
@@ -125,6 +126,7 @@ public:
     ErrCode UnRegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
 
     std::string GetLoactionDataShareUri();
+    std::string GetScanMacInfoWhiteListDataShareUri();
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(bool onlySettingsData = false);

@@ -32,6 +32,8 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
+#include "wifi_event_subscriber_manager.h"
+#include "cJSON.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanServiceImpl");
 namespace OHOS {
@@ -41,6 +43,8 @@ const int USE_SIZE_50 = 50;
 const int USES_30 = 30; // 30 s
 const int USEM_10 = 10 * 60; // 10 min
 const int TIMES_20 = 20;
+constexpr int32_t MAX_SCANMACINFO_WHITELIST_LEN = 200;
+constexpr const char *FIXED_MAC = "02:00:00:00:00:00";
 #ifdef OHOS_ARCH_LITE
 std::mutex WifiScanServiceImpl::g_instanceLock;
 std::shared_ptr<WifiScanServiceImpl> WifiScanServiceImpl::g_instance = nullptr;
@@ -311,8 +315,19 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
             }
         }
     #endif
+    } else {
+        UpdateScanInfoListNotInWhiteList(result);
     }
     return WIFI_OPT_SUCCESS;
+}
+
+void WifiScanServiceImpl::UpdateScanInfoListNotInWhiteList(std::vector<WifiScanInfo> &result)
+{
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED && !IsInScanMacInfoWhiteList()) {
+        for (auto iter = result.begin(); iter != result.end(); ++iter) {
+            iter->bssid = FIXED_MAC;
+        }
+    }
 }
 
 ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
@@ -527,5 +542,46 @@ void WifiScanServiceImpl::UpdateScanMode()
     }
 }
 #endif
+
+bool WifiScanServiceImpl::IsInScanMacInfoWhiteList()
+{
+#ifndef OHOS_ARCH_LITE
+    std::unique_lock<std::mutex> lock(wifiWhiteListMutex_);
+    std::string bundleName;
+    GetBundleNameByUid(GetCallingUid(), bundleName);
+    int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
+    if (queryScanMacInfoWhiteListTimeStamp_ == 0 ||
+        (currentTime - queryScanMacInfoWhiteListTimeStamp_) / SECOND_TO_MICROSECOND >=
+        ONE_DAY_TIME_SECONDS) {
+        std::string queryScanMacInfoWhiteList =
+            WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetScanMacInfoWhiteListByDatashare();
+        queryScanMacInfoWhiteListTimeStamp_ = currentTime;
+        scanMacInfoWhiteListStr_ = queryScanMacInfoWhiteList;
+    }
+    if (scanMacInfoWhiteListStr_.empty()) {
+        return false;
+    }
+    auto *scanMacInfoWhileListRoot = cJSON_Parse(scanMacInfoWhiteListStr_.c_str());
+    if (scanMacInfoWhileListRoot == nullptr) {
+        return false;
+    }
+    cJSON* scanMacInfoWifiWhiteList = cJSON_GetObjectItemCaseSensitive(scanMacInfoWhileListRoot, "wifi");
+    if (scanMacInfoWifiWhiteList == nullptr) {
+        return false;
+    }
+    if (cJSON_IsArray(scanMacInfoWifiWhiteList)) {
+        int size = cJSON_GetArraySize(scanMacInfoWifiWhiteList);
+        for (int i = 0; i < size && i < MAX_SCANMACINFO_WHITELIST_LEN; i++) {
+            cJSON* item = cJSON_GetArrayItem(scanMacInfoWifiWhiteList, i);
+            if (item != nullptr && bundleName.find(item->valuestring) != std::string::npos) {
+                cJSON_Delete(scanMacInfoWhileListRoot);
+                return true;
+            }
+        }
+    }
+    cJSON_Delete(scanMacInfoWhileListRoot);
+#endif
+    return false;
+}
 }  // namespace Wifi
 }  // namespace OHOS

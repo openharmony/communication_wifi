@@ -325,6 +325,7 @@
         "OHOS::Wifi::WifiEventSubscriberManager::GetAirplaneModeByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::GetLocationModeByDatashare()";
+        "OHOS::Wifi::WifiEventSubscriberManager::GetScanMacInfoWhiteListByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::DealLocationModeChangeEvent()";
         "OHOS::Wifi::WifiEventSubscriberManager::CheckAndStartStaByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::IsMdmForbidden()";

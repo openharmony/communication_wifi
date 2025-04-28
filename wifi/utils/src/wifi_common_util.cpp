@@ -18,6 +18,7 @@
 #include <sstream>
 #include <iterator>
 #include <regex>
+#include <sstream>
 
 #ifndef OHOS_ARCH_LITE
 #include <vector>
@@ -857,6 +858,20 @@ long long CheckDataTolonglong(std::string &data, int base)
         return 0;
     }
     return num;
+}
+
+unsigned long StringToUlong(const std::string &word)
+{
+    unsigned long result;
+    std::istringstream(word) >> result;
+    return result;
+}
+ 
+double StringToDouble(const std::string &word)
+{
+    double result;
+    std::istringstream(word) >> result;
+    return result;
 }
 
 uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode)

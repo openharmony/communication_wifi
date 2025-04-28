@@ -93,7 +93,7 @@ void ApMonitor::WpaEventApNotifyCallBack(const std::string &notifyParam) const
         WIFI_LOGE("%{public}s notifyParam is error", __func__);
         return;
     }
-    int freq = stoi(data);
+    int freq = CheckDataLegal(data);
     WpaEventApChannelSwitch(freq);
     return;
 }

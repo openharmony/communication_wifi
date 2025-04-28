@@ -101,60 +101,113 @@ public:
         WifiLinkedInfo info;
         pSelfCureService->HandleStaConnChanged(state, info);
     }
+
+    void HandleDhcpOfferReportTest()
+    {
+        IpInfo ipInfo;
+        pSelfCureService->HandleDhcpOfferReport(ipInfo);
+    }
+
+    void NotifyP2pConnectStateChangedTest()
+    {
+        WifiP2pLinkedInfo info;
+        pSelfCureService->NotifyP2pConnectStateChanged(info);
+    }
+
+    void StopSelfCureWifiTest()
+    {
+        int32_t status = 0;
+        pSelfCureService->StopSelfCureWifi(status);
+    }
+
+    void CheckSelfCureWifiResultTest()
+    {
+        int event = 0;
+        pSelfCureService->CheckSelfCureWifiResult(event);
+    }
 };
 
 HWTEST_F(SelfCureServiceTest, InitSelfCureServiceTest, TestSize.Level1)
 {
     InitSelfCureServiceTest();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleRssiLevelChangedTest, TestSize.Level1)
 {
     HandleRssiLevelChangedTest();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest, TestSize.Level1)
 {
     HandleStaConnChangedTest();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest2, TestSize.Level1)
 {
     HandleStaConnChangedTest2();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest3, TestSize.Level1)
 {
     HandleStaConnChangedTest3();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest4, TestSize.Level1)
 {
     HandleStaConnChangedTest4();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, HandleStaConnChangedTest5, TestSize.Level1)
 {
     HandleStaConnChangedTest5();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureServiceTest, HandleDhcpOfferReportTest, TestSize.Level1)
+{
+    HandleDhcpOfferReportTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyP2pConnectStateChangedTest, TestSize.Level1)
+{
+    NotifyP2pConnectStateChangedTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, NotifyInternetFailureDetectedTest, TestSize.Level1)
 {
     int forceNoHttpCheck = 0;
     pSelfCureService->NotifyInternetFailureDetected(forceNoHttpCheck);
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, IsSelfCureOnGoingTest, TestSize.Level1)
 {
     EXPECT_EQ(pSelfCureService->IsSelfCureOnGoing(), false);
+}
+
+HWTEST_F(SelfCureServiceTest, IsSelfCureL2ConnectingTest, TestSize.Level1)
+{
+    EXPECT_EQ(pSelfCureService->IsSelfCureL2Connecting(), false);
+}
+
+HWTEST_F(SelfCureServiceTest, StopSelfCureWifiTest, TestSize.Level1)
+{
+    StopSelfCureWifiTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureServiceTest, CheckSelfCureWifiResultTest, TestSize.Level1)
+{
+    CheckSelfCureWifiResultTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 } // namespace Wifi

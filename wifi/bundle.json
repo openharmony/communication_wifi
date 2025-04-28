@@ -90,6 +90,7 @@
                 "c_utils",
                 "cellular_data",
                 "certificate_manager",
+                "cJSON",
                 "common_event_service",
                 "core_service",
                 "data_share",

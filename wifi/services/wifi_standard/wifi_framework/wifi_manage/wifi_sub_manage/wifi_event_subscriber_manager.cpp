@@ -359,6 +359,23 @@ bool WifiEventSubscriberManager::GetLocationModeByDatashare()
     return (locationMode.compare("1") == 0);
 }
 
+std::string WifiEventSubscriberManager::GetScanMacInfoWhiteListByDatashare()
+{
+    if (!WifiDataShareHelperUtils::GetInstance().CheckIfSettingsDataReady()) {
+        WIFI_LOGE("GetScanMacInfoWhiteListDataShareUri, SettingsDataIsNotReady!");
+        return "";
+    }
+    std::string whiteList;
+    Uri uri(WifiDataShareHelperUtils::GetInstance().GetScanMacInfoWhiteListDataShareUri());
+    int ret = WifiDataShareHelperUtils::GetInstance().Query(uri,
+        SETTINGS_DATASHARE_KEY_SCANMACINFO_WHITELIST, whiteList);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetScanMacInfoWhiteListDataShareUri, Query ScanWhiteList fail!");
+        return "";
+    }
+    return whiteList;
+}
+
 void WifiEventSubscriberManager::DealLocationModeChangeEvent()
 {
     if (GetLocationModeByDatashare()) {

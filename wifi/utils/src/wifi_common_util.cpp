@@ -63,7 +63,6 @@ constexpr int MIN_5G_CHANNEL = 36;
 constexpr int MAX_5G_CHANNEL = 165;
 constexpr int FREQ_CHANNEL_1 = 2412;
 constexpr int FREQ_CHANNEL_36 = 5180;
-constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
 constexpr int MICROSECOND_TO_NANOSECOND = 1000;
 constexpr char HIDDEN_CHAR_SHOW_AS = '*';
 constexpr int PASSWORD_MIN_LEN = 8;

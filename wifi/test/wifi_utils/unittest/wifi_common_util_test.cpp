@@ -291,39 +291,24 @@ HWTEST_F(WifiCommonUtilTest, GetCurrentTimeMilliSecondsTest, TestSize.Level1)
 HWTEST_F(WifiCommonUtilTest, StringToDoubleTest01, TestSize.Level1)
 {
     WIFI_LOGI("StringToDoubleTest01 enter");
-    std::string input = "55.22";
-    double output = 55.52;
+    std::string input = "12.34";
+    double output = 12.34;
     EXPECT_TRUE(StringToDouble(input) == output);
 }
 
+
 HWTEST_F(WifiCommonUtilTest, StringToDoubleTest02, TestSize.Level1)
 {
-    WIFI_LOGI("StringToDoubleTest02 enter");
-    std::string input = "55.22b";
-    double output = 55.22;
+    WIFI_LOGI("StringToDoubleTest03 enter");
+    std::string input = "12.34.56";
+    double output = 12.34;
     EXPECT_TRUE(StringToDouble(input) == output);
 }
 
 HWTEST_F(WifiCommonUtilTest, StringToDoubleTest03, TestSize.Level1)
 {
-    WIFI_LOGI("StringToDoubleTest03 enter");
-    std::string input = "55.35.33";
-    double output = 55.35;
-    EXPECT_TRUE(StringToDouble(input) == output);
-}
-
-HWTEST_F(WifiCommonUtilTest, StringToDoubleTest04, TestSize.Level1)
-{
-    WIFI_LOGI("StringToDoubleTest04 enter");
-    std::string input = "55bb";
-    double output = 55;
-    EXPECT_TRUE(StringToDouble(input) == output);
-}
-
-HWTEST_F(WifiCommonUtilTest, StringToDoubleTest05, TestSize.Level1)
-{
     WIFI_LOGI("StringToDoubleTest05 enter");
-    std::string input = "a55.22";
+    std::string input = "a12.34";
     double output = 0;
     EXPECT_TRUE(StringToDouble(input) == output);
 }
@@ -331,17 +316,17 @@ HWTEST_F(WifiCommonUtilTest, StringToDoubleTest05, TestSize.Level1)
 HWTEST_F(WifiCommonUtilTest, StringToUlongTest01, TestSize.Level1)
 {
     WIFI_LOGI("StringToUlongTest01 enter");
-    std::string input = "55.22";
-    unsigned long output = 55;
-    EXPECT_TRUE(StringToDouble(input) == output);
+    std::string input = "12.34";
+    unsigned long output = 12;
+    EXPECT_TRUE(StringToUlong(input) == output);
 }
 
 HWTEST_F(WifiCommonUtilTest, StringToUlongTest02, TestSize.Level1)
 {
     WIFI_LOGI("StringToUlongTest02 enter");
-    std::string input = "55b";
-    unsigned long output = 55;
-    EXPECT_TRUE(StringToDouble(input) == output);
+    std::string input = "12b";
+    unsigned long output = 12;
+    EXPECT_TRUE(StringToUlong(input) == output);
 }
 
 HWTEST_F(WifiCommonUtilTest, StringToUlongTest03, TestSize.Level1)
@@ -349,7 +334,7 @@ HWTEST_F(WifiCommonUtilTest, StringToUlongTest03, TestSize.Level1)
     WIFI_LOGI("StringToUlongTest03 enter");
     std::string input = "a55";
     unsigned long output = 0;
-    EXPECT_TRUE(StringToDouble(input) == output);
+    EXPECT_TRUE(StringToUlong(input) == output);
 }
 }  // namespace Wifi
 }  // namespace OHOS

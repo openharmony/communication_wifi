@@ -3491,7 +3491,7 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
         wifiDeviceConfig.noInternetAccess = false;
         WifiConfigCenter::GetInstance().GetIpInfo(wifiDeviceConfig.lastDhcpResult, m_instId);
     }
-    if (networkStatus == NetworkStatus::NO_INTERNET) {
+    if (networkStatus == NetworkStatus::NO_INTERNET && IsGoodSignalQuality()) {
         wifiDeviceConfig.noInternetAccess = true;
     }
     WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
@@ -3524,14 +3524,9 @@ bool StaStateMachine::IsGoodSignalQuality()
 {
     const WifiLinkedInfo singalInfo = linkedInfo;
     bool isGoodSignal = true;
-    if (WifiChannelHelper::GetInstance().IsValid5GHz(singalInfo.frequency)) {
-        if (singalInfo.rssi <= RSSI_LEVEL_1_5G) {
-            isGoodSignal = false;
-        }
-    } else {
-        if (singalInfo.rssi <= RSSI_LEVEL_1_2G) {
-            isGoodSignal = false;
-        }
+    int currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(singalInfo.rssi, singalInfo.band, m_instId);
+    if (currentSignalLevel <= RSSI_LEVEL_2) {
+        isGoodSignal = false;
     }
     if (singalInfo.chload >= MAX_CHLOAD) {
         isGoodSignal = false;

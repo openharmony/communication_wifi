@@ -18,6 +18,7 @@
 #include "sta_define.h"
 #include "wifi_logger.h"
 #include "json/json.h"
+#include <json/writer.h>
 #include <map>
 
 namespace OHOS {
@@ -286,6 +287,15 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt)
     Json::FastWriter writer;
     root["ERROR_CODE"] = errorCnt;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CONNECT_FAILED", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteSoftApConnectAccessNetErrorHiSysEvent(int errorCnt)
+{
+    WIFI_LOGE("WriteSoftApConnectAccessNetErrorHiSysEvent errorCnt=%{public}d", errorCnt);
+    Json:Value root;
+    Json::FastWriter writer;
+    root["ERROR_COOE"] = errorCnt;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CLIENT_ACCESS_NET_ERROR", "EVENT_VALUE", writer.write(root));
 }
 
 void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, const WifiScanFailReason failReason)

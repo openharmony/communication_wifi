@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include <condition_variable>
+#include <cstdint>
+#include <mutex>
 #ifndef OHOS_ARCH_LITE
 #include "wifi_event_subscriber_manager.h"
 #include "wifi_manager.h"
@@ -38,6 +41,7 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
+#include "ap_network_monitor.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -100,6 +104,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     if (IsSignalSmoothingEnable()) {
         RegisterFoldStatusListener();
     }
+    RegisterNetworkConnSubscriber();
 #ifdef HAS_NETMANAGER_EVENT_PART
     RegisterNetmgrEvent();
 #endif
@@ -121,6 +126,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     if (IsSignalSmoothingEnable()) {
         UnRegisterFoldStatusListener();
     }
+    UnRegisterNetworkConnSubscriber();
 #ifdef HAS_NETMANAGER_EVENT_PART
     UnRegisterNetmgrEvent();
 #endif
@@ -1389,6 +1395,46 @@ void WifiEventSubscriberManager::UnRegisterFoldStatusListener()
     }
     foldStatusListener_ = nullptr;
     WIFI_LOGI("UnRegisterDisplayMode finished");
+}
+
+void WifiEventSubscriberManager::RegisterNetworkConnSubscriber()
+{
+    std::lock_guard<std::mutex> lock(networkConnSubscriberLock_);
+    if (networkConnSubscriber_ == nullptr) {
+        networkConnSubscriber_ = sptr<NetworkConnSubscriber>::MakeSptr();
+    }
+    if (networkConnSubscriber_ != nullptr) {
+        int32_t  registerResult = NetManagerStandard::NetConnClient::GetInstance().RegisterNetConnCallback(
+            networkConnSubscriber_);
+        WIFI_LOGE("RegisterNetConnCallback end, registerResult=%{public}d.", registerResult);
+    } else {
+        WIFI_LOGE("Init, NetworkConnSubscriber make sptr error.");
+    }
+}
+
+void WifiEventSubscriberManager::UnRegisterNetworkConnSubscriber()
+{
+    std::lock_guard<class Mutex> lock(networkConnSubscriberLock_);
+    if (networkConnSubscriber_ == nullptr) {
+        int32_t unregisterResult = NetManagerStandard::NetConnClient::GetInstance().UnRegisterNetConnCallback(
+            networkConnSubscriber_);
+        WIFI_LOGI("UnRegisterNetConnCallback end, result=%{public}d.", unregisterResult);
+        networkConnSubscriber_ = nullptr;
+    }
+}
+
+int NetworkConnSubscriber::NetCapabilitiesChange(sptr<NetManangerStandard::NetHandle> &netHandle,
+    const sptr<NetManangerStandard::NetAllCapabilites> &netAllCap)
+{
+    const int NO_VALIDATED_NET = 1;
+    if (netAllCap->netCaps_.find(NetManagerStandard::NET_CAPABILTY_VAIDATED) == netAllCaps_.end()) {
+        //ApNetworkMonitor::GetInstance().DealApNetworkCapabilitiesChanged();
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceinst(0);
+        if (pService != nullptr) {
+            pService->OnNetCapabilitesChanged(NO_VALIDATED_NET);
+        }
+    }
+    return 0;
 }
 
 }  // namespace Wifi

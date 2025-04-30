@@ -276,6 +276,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",
+      "netmanager_base:net_conn_manager_if",
     ]
   }
   ohos_source_set("wifi_device_service_impl") {
@@ -358,6 +359,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",
+      "netmanager_base:net_conn_manager_if"
     ]
   }
   ohos_source_set("wifi_hotspot_service_impl") {
@@ -402,6 +404,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",
+      "netmanager_base:net_conn_manager_if",
     ]
 
     defines = [
@@ -713,7 +716,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hilog:libhilog",
       "ipc:ipc_single",
-      "libxml2:libxml2",
+      "netmanager_base:net_conn_manager_if",
     ]
 
     version_script = "libwifi_manager.map"
@@ -738,7 +741,10 @@ if (defined(ohos_lite)) {
       ":wifi_device_service_impl",
       ":wifi_manager_service",
     ]
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "netmanager_base:net_conn_manager_if",
+    ]
     shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"

@@ -159,6 +159,8 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetHotspotMode(const HotspotMode &mode) override;
+
+    virtual void OnNetCapabiltiesChanged(const int apStatus) override;
 private:
     ApRootState m_ApRootState;
     ApStartedState m_ApStartedState;

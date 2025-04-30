@@ -4431,6 +4431,9 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
             MacAnonymize(actualConfiguredMac).c_str());
     }
     if (MacAddress::IsValidMac(actualConfiguredMac.c_str())) {
+        // always set mac to hal to update drivers mac
+        // In the subsequent evolution, will set a pure random mac in disconneting process. and don't duplicate set mac
+        // when start connect
         if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
             WifiConfigCenter::GetInstance().GetStaIfaceName(instId), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
                 WIFI_LOGE("set Mac [%{public}s] failed", MacAnonymize(actualConfiguredMac).c_str());

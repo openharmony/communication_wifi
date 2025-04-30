@@ -394,6 +394,7 @@ private:
     void ResetSelfCureParam();
     void NotifySelfCureCompleted(int status);
     void ForceStopSelfCure();
+    void HandleConnectFailed();
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;

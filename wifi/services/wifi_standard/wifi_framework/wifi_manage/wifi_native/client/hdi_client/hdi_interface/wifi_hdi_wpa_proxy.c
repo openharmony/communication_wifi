@@ -67,11 +67,12 @@
 #endif
 
 const char *HDI_WPA_SERVICE_NAME = "wpa_interface_service";
+static void ProxyOnRemoteDied(struct HdfDeathRecipient* recipient, struct HdfRemoteService* service);
 static pthread_mutex_t g_wpaObjMutex = PTHREAD_MUTEX_INITIALIZER;
 static struct IWpaInterface *g_wpaObj = NULL;
 static struct HDIDeviceManager *g_devMgr = NULL;
 static struct HdfRemoteService* g_remote = NULL;
-static struct HdfDeathRecipient* g_recipient = NULL;
+static struct HdfDeathRecipient g_recipient = { ProxyOnRemoteDied };
 static pthread_mutex_t g_ifaceNameMutex = PTHREAD_MUTEX_INITIALIZER;
 static char g_staIfaceName[STA_INSTANCE_MAX_NUM][IFACENAME_LEN] = {{0}, {0}};
 static char g_p2pIfaceName[IFACENAME_LEN] = {0};
@@ -222,17 +223,14 @@ static void RecycleServiceAndRecipient(struct HdfDeathRecipient* recipient, stru
 {
     LOGI("%{public}s enter", __func__);
     pthread_mutex_lock(&g_wpaObjMutex);
-    if (recipient == NULL || service == NULL || g_remote == NULL || g_recipient == NULL) {
+    if (recipient == NULL || service == NULL || g_remote == NULL) {
         LOGE("%{public}s input param is null", __func__);
         pthread_mutex_unlock(&g_wpaObjMutex);
         return;
     }
     HdfRemoteServiceRemoveDeathRecipient(service, recipient);
     HdfRemoteServiceRecycle(service);
-    OsalMemFree(recipient);
-    recipient = NULL;
     g_remote = NULL;
-    g_recipient = NULL;
     pthread_mutex_unlock(&g_wpaObjMutex);
 }
 
@@ -258,35 +256,19 @@ static WifiErrorNo RegistHdfDeathCallBack()
     }
     g_remote = remote;
     LOGI("%{public}s: success to get HdfRemoteService", __func__);
-    struct HdfDeathRecipient* recipient = (struct HdfDeathRecipient*)OsalMemCalloc(sizeof(struct HdfDeathRecipient));
-    if (recipient == NULL) {
-        LOGE("%{public}s: OsalMemCalloc is failed", __func__);
-        return WIFI_HAL_OPT_FAILED;
-    }
-    if (g_recipient != NULL) {
-        OsalMemFree(g_recipient);
-    }
-    g_recipient = recipient;
-    recipient->OnRemoteDied = ProxyOnRemoteDied;
-    HdfRemoteServiceAddDeathRecipient(remote, recipient);
+    HdfRemoteServiceAddDeathRecipient(remote, &g_recipient);
     return WIFI_HAL_OPT_OK;
 }
 
 static WifiErrorNo UnRegistHdfDeathCallBack()
 {
-    if (g_remote == NULL || g_recipient == NULL) {
+    if (g_remote == NULL) {
         LOGE("%{public}s: Invalid remote or recipient", __func__);
         return WIFI_HAL_OPT_FAILED;
     }
-    HdfRemoteServiceRemoveDeathRecipient(g_remote, g_recipient);
+    HdfRemoteServiceRemoveDeathRecipient(g_remote, &g_recipient);
     HdfRemoteServiceRecycle(g_remote);
     g_remote = NULL;
-    if (g_recipient == NULL) {
-        LOGE("%{public}s: param recipient is null", __func__);
-        return WIFI_HAL_OPT_FAILED;
-    }
-    OsalMemFree(g_recipient);
-    g_recipient = NULL;
     LOGI("%{public}s: Death recipient unregistered", __func__);
     return WIFI_HAL_OPT_OK;
 }

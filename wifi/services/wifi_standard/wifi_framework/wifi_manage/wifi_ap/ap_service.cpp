@@ -15,6 +15,7 @@
 
 #include "ap_service.h"
 #include <unistd.h>
+#include "ap_network_monitor.h"
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
 #include "wifi_channel_helper.h"
@@ -330,6 +331,11 @@ ErrCode ApService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const
     m_stateMachineObj.SendMessage(msg);
     m_lastWifiCountryCode = wifiCountryCode;
     return WIFI_OPT_SUCCESS;
+}
+
+void ApService::handleNetCapbiliiesChanged(const int apStatus)
+{
+    ApNetworkMonitor::GetInstance().DealApNetworkCapabilitiesChanged();
 }
  
 std::string ApService::WifiCountryCodeChangeObserver::GetListenerModuleName()

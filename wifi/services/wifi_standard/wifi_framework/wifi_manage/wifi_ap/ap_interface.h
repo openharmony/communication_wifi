@@ -160,7 +160,7 @@ public:
      */
     virtual ErrCode SetHotspotMode(const HotspotMode &mode) override;
 
-    virtual void OnNetCapabiltiesChanged(const int apStatus) override;
+    void OnNetCapabiltiesChanged(const int apStatus) override;
 private:
     ApRootState m_ApRootState;
     ApStartedState m_ApStartedState;

@@ -3693,6 +3693,9 @@ void StaStateMachine::UpdateWifiCategory()
             WifiCategory category = enhanceService_->GetWifiCategory(iter->infoElems,
                 chipsetCategory, chipsetFeatrureCapability);
             WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordWifiCategory(iter->bssid, category);
+            if (iter->bssid == linkedInfo.bssid) {
+                linkedInfo.channelWidth = iter->channelWidth;
+            }
         }
     }
 }

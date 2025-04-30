@@ -1405,7 +1405,6 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     napi_value result;
     napi_create_object(env, &result);
     SetValueUtf8String(env, "ssid", vecDeviceConfigs[idx].ssid.c_str(), result);
-    SetValueUtf8String(env, "bssid", vecDeviceConfigs[idx].bssid.c_str(), result);
     SetValueInt32(env, "bssidType", static_cast<int>(vecDeviceConfigs[idx].bssidType), result);
     SetValueUtf8String(env, "preSharedKey", vecDeviceConfigs[idx].preSharedKey.c_str(), result);
     SetValueBool(env, "isHiddenSsid", vecDeviceConfigs[idx].hiddenSSID, result);

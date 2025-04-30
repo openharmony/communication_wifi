@@ -4431,13 +4431,11 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
             MacAnonymize(actualConfiguredMac).c_str());
     }
     if (MacAddress::IsValidMac(actualConfiguredMac.c_str())) {
-        if (lastMac != actualConfiguredMac) {
-            if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
-                WifiConfigCenter::GetInstance().GetStaIfaceName(instId), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
-                    WIFI_LOGE("set Mac [%{public}s] failed", MacAnonymize(actualConfiguredMac).c_str());
-                    return false;
-                }
-        }
+        if (WifiStaHalInterface::GetInstance().SetConnectMacAddr(
+            WifiConfigCenter::GetInstance().GetStaIfaceName(instId), actualConfiguredMac) != WIFI_HAL_OPT_OK) {
+                WIFI_LOGE("set Mac [%{public}s] failed", MacAnonymize(actualConfiguredMac).c_str());
+                return false;
+            }
         WifiConfigCenter::GetInstance().SetMacAddress(actualConfiguredMac, instId);
         return true;
     } else {

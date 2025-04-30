@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-#include <condition_variable>
-#include <cstdint>
-#include <mutex>
 #ifndef OHOS_ARCH_LITE
 #include "wifi_event_subscriber_manager.h"
 #include "wifi_manager.h"

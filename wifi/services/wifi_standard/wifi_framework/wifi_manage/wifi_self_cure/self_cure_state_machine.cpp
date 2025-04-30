@@ -2893,6 +2893,7 @@ void SelfCureStateMachine::HandleSelfCureException(int reasonCode)
             WIFI_LOGI("HandleSelfCureException, wifi connect/reassoc/reconnect fail! retry = %{public}d",
                 connectNetworkRetryCnt_);
             if (connectNetworkRetryCnt_ >= CONNECT_NETWORK_RETRY) {
+                HandleConnectFailed();
                 StopSelfCureDelay(SCE_WIFI_STATUS_FAIL, 0);
                 break;
             }
@@ -2994,6 +2995,39 @@ void SelfCureStateMachine::ResetSelfCureParam()
     StopTimer(WIFI_CURE_RESET_ON_TIMEOUT);
     StopTimer(WIFI_CURE_REASSOC_TIMEOUT);
     StopTimer(WIFI_CURE_CONNECT_TIMEOUT);
+}
+
+void SelfCureStateMachine::HandleConnectFailed()
+{
+    WIFI_LOGI("enter HandleConnectFailed");
+    if (useWithRandMacAddress_ != 0 && isSelfCureOnGoing_) {
+        useWithRandMacAddress_ = 0;
+        WifiDeviceConfig config;
+        int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
+        if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+            WIFI_LOGE("%{public}s: GetDeviceConfig failed", __FUNCTION__);
+            return;
+        }
+        //Connect failed, updateSlefCureConnedtHistoryInfo
+        WifiSelfCureHistoryInfo selfCureHistoryInfo;
+        std::string internetSelfCureHistory = config.internetSelfCureHistory;
+        SelfCureUtils::GetInstance().String2InternetSelfCureHistoryInfo(internetSelfCureHistory, selfCureHistoryInfo);
+        int requestCureLevel = WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC;
+        SelfCureUtils::GetInstance().UpdateSelfCureConnectHistoryInfo(selfCureHistoryInfo, requestCureLevel, false);
+        config.internetSelfCureHistory = selfCureHistoryInfo.GetSelfCureHistory();
+        config.isReassocSelfCureWithFactoryMacAddress = 0;
+        config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+        WifiSettings::GetInstance().AddDeviceConfig(config);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
+    cbMsg.msgData = ConnState::DISCONNECTED;
+    cbMsg.linkInfo = linkedInfo;
+    cbMsg.id = instId_;
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 }
 } // namespace Wifi
 } // namespace OHOS

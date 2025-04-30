@@ -72,7 +72,7 @@ struct WifiCrowdsourcedDetailInfo {
     int8_t apMobile;
     uint16_t frequency;
     uint8_t band; // 2.4G / 5G
-    int channelWidth; // curr ap channel width
+    WifiChannelWidth channelWidth; // curr ap channel width
     int8_t isPortal;
     int8_t isMloConnected;
     int8_t isApHome;
@@ -100,7 +100,7 @@ struct WifiCrowdsourcedDetailInfo {
         apMobile = -1;
         frequency = 0;
         band = 0;
-        channelWidth = -1;
+        channelWidth = WifiChannelWidth::WIDTH_INVALID;
         isPortal = -1;
         isMloConnected = -1;
         isApHome = -1;

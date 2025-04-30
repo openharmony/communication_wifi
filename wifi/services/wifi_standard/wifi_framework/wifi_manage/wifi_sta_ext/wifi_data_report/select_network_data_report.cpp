@@ -219,12 +219,12 @@ void WifiDataReportService::UpdateCrowdsourcedDetailInfo(WifiCrowdsourcedDetailI
     apDetailInfo.connFailedCount = apDeviceInfo.connFailedCount;
     apDetailInfo.isPortal = apDeviceInfo.isPortal;
     apDetailInfo.apKeyMgmt = apDeviceInfo.keyMgmt;
-    apDetailInfo.channelWidth = apDeviceInfo.channel;
     apDetailInfo.band = apDeviceInfo.band;
     apDetailInfo.frequency = apDeviceInfo.frequency;
     apDetailInfo.rssi = linkedInfo.rssi;
     apDetailInfo.ssid = linkedInfo.ssid;
     apDetailInfo.bssid = linkedInfo.bssid;
+    apDetailInfo.channelWidth = linkedInfo.channelWidth;
     apDetailInfo.isHiddenSSID = linkedInfo.ifHiddenSSID;
     apDetailInfo.wifiStandard = linkedInfo.wifiStandard;
     apDetailInfo.maxSupportedRxLinkSpeed = linkedInfo.maxSupportedRxLinkSpeed;
@@ -401,7 +401,7 @@ void WifiDataReportService::ReportApConnEventInfo(ConnReportReason reportReason,
     WifiCrowdsourcedInfo wifiCrowdsourcedInfo;
     wifiCrowdsourcedInfo.apDetailInfo.reason = reportReason;
     UpdateCrowdsourcedDetailInfo(wifiCrowdsourcedInfo.apDetailInfo, staStateMachinePtr->linkedInfo, apDeviceInfo);
-    if (staStateMachinePtr->enhanceService_ == nullptr) {
+    if (staStateMachinePtr->enhanceService_ == nullptr || wifiCrowdsourcedInfo.apDetailInfo.ssid.empty()) {
         return;
     }
     staStateMachinePtr->enhanceService_->CrowdsourcedDataReportInterface(wifiCrowdsourcedInfo);

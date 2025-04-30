@@ -70,7 +70,7 @@ HWTEST_F(WifiDataReportServiceTest, UpdateCrowdsourcedDetailInfo, TestSize.Level
     info.wifiStandard = 1;
     info.maxSupportedRxLinkSpeed = 1;
     info.maxSupportedTxLinkSpeed = 1;
-    apDeviceInfo.channel = 0;
+    info.channelWidth = WifiChannelWidth::WIDTH_20MHZ;
     info.supportedWifiCategory = WifiCategory::WIFI6;
     info.isMloConnected = 1;
     info.isDataRestricted = 1;
@@ -81,7 +81,7 @@ HWTEST_F(WifiDataReportServiceTest, UpdateCrowdsourcedDetailInfo, TestSize.Level
     EXPECT_TRUE(apDetailInfo.wifiStandard == info.wifiStandard);
     EXPECT_TRUE(apDetailInfo.maxSupportedRxLinkSpeed == info.maxSupportedRxLinkSpeed);
     EXPECT_TRUE(apDetailInfo.maxSupportedTxLinkSpeed == info.maxSupportedTxLinkSpeed);
-    EXPECT_TRUE(apDetailInfo.channelWidth == apDeviceInfo.channel);
+    EXPECT_TRUE(apDetailInfo.channelWidth == info.channelWidth);
     EXPECT_TRUE(apDetailInfo.supportedWifiCategory == info.supportedWifiCategory);
     EXPECT_TRUE(apDetailInfo.isMloConnected == info.isMloConnected);
     EXPECT_TRUE(apDetailInfo.apMobile == info.isDataRestricted);

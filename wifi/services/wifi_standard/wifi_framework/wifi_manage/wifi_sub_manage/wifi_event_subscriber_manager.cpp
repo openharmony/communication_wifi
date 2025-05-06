@@ -1015,7 +1015,7 @@ NetmgrEventSubscriber::~NetmgrEventSubscriber()
 
 void NetmgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    uint32_t bgContinuousTaskState = eventData.GetCode();
+    int bgContinuousTaskState = eventData.GetCode();
     WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by BgTaskAware %{public}d", bgContinuousTaskState);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {

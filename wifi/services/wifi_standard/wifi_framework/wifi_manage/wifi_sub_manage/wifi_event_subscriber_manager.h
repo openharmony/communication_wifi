@@ -128,6 +128,15 @@ public:
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
 };
 
+class WifiDisplayStateListener : public Rosen::DisplayManagerLite::IDisplayListener {
+public:
+    WifiDisplayStateListener();
+    ~WifiDisplayStateListener() = default;
+    void OnCreate(uint64_t DisplayId) override;
+    void OnDestroy(uint64_t DisplayId) override;
+    void OnChange(uint64_t DisplayId) override;
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
@@ -199,6 +208,8 @@ private:
     void UnRegisterDataShareReadyEvent();
     void RegisterFoldStatusListener();
     void UnRegisterFoldStatusListener();
+    void RegisterDisplayListener();
+    void UnregisterDisplayListener();
 
 private:
     uint32_t cesTimerId{0};
@@ -237,6 +248,8 @@ private:
     std::mutex accessDataShareMutex_;
     sptr<Rosen::DisplayManagerLite::IFoldStatusListener> foldStatusListener_ = nullptr;
     std::mutex foldStatusListenerMutex_;
+    sptr<Rosen::DisplayManagerLite::IDisplayListener> displayStatusListener_ = nullptr;
+    std::mutex displayStatusListenerMutex_;
 };
 
 }  // namespace Wifi

@@ -359,7 +359,13 @@ public:
     void SetAutoConnect(bool autoConnectEnable);
 
     bool GetAutoConnect();
- 
+    /**
+     * @Description set screen state
+     *
+     * @param isScreenLandscape  screenState true or false
+     */
+    void SetScreenDispalyState(bool isScreenLandscape);
+    bool IsScreenLandscape();
     /**
      * @Description get local only hotspot Config
      *
@@ -468,6 +474,7 @@ private:
     std::atomic<int> mNoChargerPlugModeState {MODE_STATE_CLOSE};
     std::atomic<bool> mThreadStatusFlag_ {false};
     std::atomic<uint64_t> mThreadStartTime {0};
+    std::atomic<bool> mIsScreenLandscape_ {false};
     std::mutex mMacAddrPairMutex;
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mHotspotMacAddrPair;

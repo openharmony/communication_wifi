@@ -433,5 +433,11 @@ HWTEST_F(WifiConfigCenterTest, SetLocalOnlyHotspotConfigTest, TestSize.Level1)
     WifiConfigCenter::GetInstance().GetLocalOnlyHotspotConfig(outConfig);
     EXPECT_EQ(outConfig.ssid, "SetLocalOnlyHotspotConfigTest");
 }
+
+HWTEST_F(WifiConfigCenterTest, SetScreenDispalyStateTest, TestSize.Level1)
+{
+    WifiConfigCenter::GetInstance().SetScreenDispalyState(true);
+    EXPECT_EQ(WifiConfigCenter::GetInstance().IsScreenLandscape(), true);
+}
 }  // namespace Wifi
 }  // namespace OHOS

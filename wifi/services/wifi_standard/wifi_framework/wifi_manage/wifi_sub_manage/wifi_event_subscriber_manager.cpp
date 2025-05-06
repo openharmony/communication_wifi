@@ -1357,10 +1357,14 @@ void WifiDisplayStateListener::OnChange(uint64_t DisplayId)
 {
     sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(DisplayId);
     if (displayLite == nullptr) {
-        WIFI_LOGE("OnChange fail");
+        WIFI_LOGE("OnChange displayLite is nullptr");
         return;
     }
     auto displayInfo =  displayLite->GetDisplayInfo();
+    if (displayInfo == nullptr) {
+        WIFI_LOGE("OnChange displayInfo is nullptr");
+        return;
+    }
     auto orientation = displayInfo->GetDisplayOrientation();
     // Landscape screen
     if ((orientation == Rosen::DisplayOrientation::LANDSCAPE ||

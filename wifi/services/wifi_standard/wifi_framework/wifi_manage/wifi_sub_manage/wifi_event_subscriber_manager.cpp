@@ -38,6 +38,8 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
+#include "display_manager_lite.h"
+#include "display_info.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -100,6 +102,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     if (IsSignalSmoothingEnable()) {
         RegisterFoldStatusListener();
     }
+    RegisterDisplayListener();
 #ifdef HAS_NETMANAGER_EVENT_PART
     RegisterNetmgrEvent();
 #endif
@@ -121,6 +124,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     if (IsSignalSmoothingEnable()) {
         UnRegisterFoldStatusListener();
     }
+    UnregisterDisplayListener();
 #ifdef HAS_NETMANAGER_EVENT_PART
     UnRegisterNetmgrEvent();
 #endif
@@ -1339,6 +1343,37 @@ void DataShareReadySubscriber::OnReceiveEvent(const EventFwk::CommonEventData &e
     }
 }
 
+WifiDisplayStateListener::WifiDisplayStateListener()
+{
+    WIFI_LOGI("WifiDisplayStateListener Enter");
+}
+void WifiDisplayStateListener::OnCreate(uint64_t DisplayId)
+{}
+ 
+void WifiDisplayStateListener::OnDestroy(uint64_t DisplayId)
+{}
+ 
+void WifiDisplayStateListener::OnChange(uint64_t DisplayId)
+{
+    sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(DisplayId);
+    if (displayLite == nullptr) {
+        WIFI_LOGE("OnChange fail");
+        return;
+    }
+    auto displayInfo =  displayLite->GetDisplayInfo();
+    auto orientation = displayInfo->GetDisplayOrientation();
+    // Landscape screen
+    if ((orientation == Rosen::DisplayOrientation::LANDSCAPE ||
+        orientation == Rosen::DisplayOrientation::LANDSCAPE_INVERTED)) {
+        WifiConfigCenter::GetInstance().SetScreenDispalyState(true);
+    } else if (orientation == Rosen::DisplayOrientation::PORTRAIT ||
+               orientation == Rosen::DisplayOrientation::PORTRAIT_INVERTED) {
+        WifiConfigCenter::GetInstance().SetScreenDispalyState(false);
+    } else {
+        WIFI_LOGI("WifiDisplayStateListener Unknow!");
+    }
+}
+
 WifiFoldStateListener::WifiFoldStateListener()
 {
     WIFI_LOGI("WifiFoldStateListener Enter");
@@ -1352,6 +1387,43 @@ void WifiFoldStateListener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
             pService->OnFoldStateChanged(static_cast<int>(foldStatus));
         }
     }
+}
+
+void WifiEventSubscriberManager::RegisterDisplayListener()
+{
+    std::unique_lock<std::mutex> lock(displayStatusListenerMutex_);
+    if (displayStatusListener_ != nullptr) {
+        return;
+    }
+    displayStatusListener_ = new(std::nothrow) WifiDisplayStateListener();
+    if (displayStatusListener_ == nullptr) {
+        WIFI_LOGE("RegisterDisplayListener fail");
+        return;
+    }
+ 
+    auto ret = Rosen::DisplayManagerLite::GetInstance().RegisterDisplayListener(displayStatusListener_);
+    if (ret != Rosen::DMError::DM_OK) {
+        WIFI_LOGE("RegisterDisplayListener fail");
+        displayStatusListener_ = nullptr;
+    } else {
+        WIFI_LOGI("RegisterDisplayListener success");
+    }
+}
+ 
+void WifiEventSubscriberManager::UnregisterDisplayListener()
+{
+    std::unique_lock<std::mutex> lock(displayStatusListenerMutex_);
+    if (displayStatusListener_ == nullptr) {
+        WIFI_LOGE("UnregisterDisplayListener fail");
+        return;
+    }
+ 
+    auto ret = Rosen::DisplayManagerLite::GetInstance().UnregisterDisplayListener(displayStatusListener_);
+    if (ret != Rosen::DMError::DM_OK) {
+        WIFI_LOGE("UnregisterDisplayListener fail");
+    }
+    displayStatusListener_ = nullptr;
+    WIFI_LOGI("UnregisterDisplayListener finished");
 }
 
 void WifiEventSubscriberManager::RegisterFoldStatusListener()

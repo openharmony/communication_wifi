@@ -1552,5 +1552,15 @@ void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotCon
     std::unique_lock<std::mutex> lock(mApMutex);
     localOnlyHotspotConfig_ = hotspotConfig;
 }
+
+void WifiConfigCenter::SetScreenDispalyState(bool isScreenLandscape)
+{
+    mIsScreenLandscape_.store(isScreenLandscape);
+}
+ 
+bool WifiConfigCenter::IsScreenLandscape()
+{
+    return mIsScreenLandscape_.load();
+}
 }  // namespace Wifi
 }  // namespace OHOS

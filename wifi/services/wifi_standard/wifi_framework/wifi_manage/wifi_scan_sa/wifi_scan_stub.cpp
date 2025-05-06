@@ -301,6 +301,10 @@ int WifiScanStub::OnGetScanInfoList(uint32_t code, MessageParcel &data, MessageP
         reply.WriteInt32(ret);
         return ret;
     }
+    //Sort scan results by RSSI in descending order
+    std::sort(result.begin(), result.end(), [](const WifiScanInfo& a, const WifiScanInfo& b){
+        return a.rssi > b.rssi;
+    })
     int32_t size = static_cast<int>(result.size());
     constexpr int maxSize = 200;
     if (size > maxSize) {

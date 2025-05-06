@@ -58,7 +58,9 @@ public:
         LOG_SetCallback(WifiHistoryRecordManagerCallback);
     }
     virtual void TearDown()
-    {}
+    {
+        WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    }
     std::time_t GetCurrentTimeStampSeconds()
     {
         auto now = std::chrono::system_clock::now();

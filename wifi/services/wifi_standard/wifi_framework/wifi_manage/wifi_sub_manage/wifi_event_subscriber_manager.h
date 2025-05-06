@@ -132,9 +132,9 @@ class WifiDisplayStateListener : public Rosen::DisplayManagerLite::IDisplayListe
 public:
     WifiDisplayStateListener();
     ~WifiDisplayStateListener() = default;
-    void OnCreate(uint64_t DisplayId) override;
-    void OnDestroy(uint64_t DisplayId) override;
-    void OnChange(uint64_t DisplayId) override;
+    void OnCreate(uint64_t displayId) override;
+    void OnDestroy(uint64_t displayId) override;
+    void OnChange(uint64_t displayId) override;
 };
 
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {

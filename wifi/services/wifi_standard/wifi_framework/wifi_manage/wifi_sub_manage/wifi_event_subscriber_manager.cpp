@@ -1347,15 +1347,15 @@ WifiDisplayStateListener::WifiDisplayStateListener()
 {
     WIFI_LOGI("WifiDisplayStateListener Enter");
 }
-void WifiDisplayStateListener::OnCreate(uint64_t DisplayId)
+void WifiDisplayStateListener::OnCreate(uint64_t displayId)
 {}
  
-void WifiDisplayStateListener::OnDestroy(uint64_t DisplayId)
+void WifiDisplayStateListener::OnDestroy(uint64_t displayId)
 {}
  
-void WifiDisplayStateListener::OnChange(uint64_t DisplayId)
+void WifiDisplayStateListener::OnChange(uint64_t displayId)
 {
-    sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(DisplayId);
+    sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(displayId);
     if (displayLite == nullptr) {
         WIFI_LOGE("OnChange displayLite is nullptr");
         return;

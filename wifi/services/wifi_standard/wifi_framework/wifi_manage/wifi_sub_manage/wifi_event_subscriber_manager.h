@@ -29,7 +29,6 @@
 #include "net_conn_callback_stub.h"
 #include "net_handle.h"
 #include "net_all_capabilities.h"
-#include "net_link_info.h"
 namespace OHOS {
 namespace Wifi {
 #ifdef HAS_POWERMGR_PART

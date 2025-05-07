@@ -1553,14 +1553,15 @@ void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotCon
     localOnlyHotspotConfig_ = hotspotConfig;
 }
 
-void WifiConfigCenter::SetScreenDispalyState(bool isScreenLandscape)
+void WifiConfigCenter::SetScreenDispalyState(DisplayOrientation orientation)
 {
-    mIsScreenLandscape_.store(isScreenLandscape);
+    screenDisplayOrientation.store(orientation);
 }
  
 bool WifiConfigCenter::IsScreenLandscape()
 {
-    return mIsScreenLandscape_.load();
+    return screenDisplayOrientation.load() == DisplayOrientation::LANDSCAPE ||
+           screenDisplayOrientation.load() == DisplayOrientation::LANDSCAPE_INVERTED;
 }
 }  // namespace Wifi
 }  // namespace OHOS

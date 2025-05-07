@@ -18,6 +18,7 @@
 #include "rpt_manager_state_machine.h"
 #include "wifi_logger.h"
 #include "wifi_log.h"
+#include "mock_wifi_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;

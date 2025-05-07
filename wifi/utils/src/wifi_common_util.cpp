@@ -532,7 +532,7 @@ bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPo
             return false;
         }
         accumulateTime = initTime - signalInfo.timeStamp;
-        if (accumulateTime > SIGNAL_RECORD_5S) {
+        if (accumulateTime >= SIGNAL_RECORD_5S) {
             return true;
         }
     }

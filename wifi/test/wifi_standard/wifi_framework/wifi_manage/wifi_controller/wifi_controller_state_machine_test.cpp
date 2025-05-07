@@ -33,6 +33,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+constexpr int TEN = 10;
 
 #define INVILAD_MSG 0x1111
 
@@ -58,7 +59,7 @@ public:
     static void TearDownTestCase()
     {
         pWifiControllerMachine.reset();
-        sleep(10);
+        sleep(TEN);
         WifiManager::GetInstance().Exit();
     }
 
@@ -73,7 +74,6 @@ public:
     {
         WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
-
 
     void DefaultStateGoInStateSuccess()
     {

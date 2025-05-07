@@ -29,6 +29,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+constexpr int TEN = 10;
 
 #define INVILAD_MSG 0x1111
 
@@ -47,7 +48,7 @@ public:
     static void SetUpTestCase() {}
     static void TearDownTestCase()
     {
-        sleep(10);
+        sleep(TEN);
         pSoftapManagerMachine.reset();
         WifiManager::GetInstance().Exit();
     }

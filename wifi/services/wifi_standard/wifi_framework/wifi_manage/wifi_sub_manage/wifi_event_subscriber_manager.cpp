@@ -38,7 +38,6 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
-#include "ap_network_monitor.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -1399,6 +1398,8 @@ void WifiEventSubscriberManager::RegisterNetworkConnSubscriber()
     std::lock_guard<std::mutex> lock(networkConnSubscriberLock_);
     if (networkConnSubscriber_ == nullptr) {
         networkConnSubscriber_ = sptr<NetworkConnSubscriber>::MakeSptr();
+    } else {
+        return;
     }
     if (networkConnSubscriber_ != nullptr) {
         int32_t  registerResult = NetManagerStandard::NetConnClient::GetInstance().RegisterNetConnCallback(
@@ -1425,7 +1426,6 @@ int NetworkConnSubscriber::NetCapabilitiesChange(sptr<NetManagerStandard::NetHan
 {
     const int NO_VALIDATED_NET = 1;
     if (netAllCap->netCaps_.find(NetManagerStandard::NET_CAPABILITY_VALIDATED) == netAllCap->netCaps_.end()) {
-        //ApNetworkMonitor::GetInstance().DealApNetworkCapabilitiesChanged();
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(0);
         if (pService != nullptr) {
             pService->OnNetCapabilitiesChanged(NO_VALIDATED_NET);

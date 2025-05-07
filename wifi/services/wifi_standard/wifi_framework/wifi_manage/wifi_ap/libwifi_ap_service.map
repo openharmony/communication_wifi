@@ -4,8 +4,6 @@
         DestroyApInterface;
     extern "C++" {
         "OHOS::Wifi::ApInterface::ApInterface(int)";
-        "OHOS::Wifi::ApNetworkMonitor::GetInstance()";
-        "OHOS::Wifi::ApNetworkMonitor::DealApNetworkCapabilitiesChanged()";
     };
     local:
         *;

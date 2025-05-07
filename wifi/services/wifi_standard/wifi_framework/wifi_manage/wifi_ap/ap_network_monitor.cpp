@@ -7,7 +7,7 @@
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
 
-DEFINE_WIFILOG_HOTSPOT_LABEL("wifiApNetworkMonitor");
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApNetworkMonitor");
 namespace OHOS {
 namespace Wifi {
 
@@ -22,18 +22,18 @@ ApNetworkMonitor &ApNetworkMonitor::GetInstance()
 
 void ApNetworkMonitor::DealApNetworkCapabilitiesChanged()
 {
-    WifiOprMidState apMidSate = WifiConfigCenter::GetInstance().GetApMidState(AP_SERVICE_ID);
+    WifiOprMidState apMidState = WifiConfigCenter::GetInstance().GetApMidState(AP_SERVICE_ID);
     if (apMidState != WifiOprMidState::RUNNING) {
         WIFI_LOGI("DealApNetworkCapabilitiesChanged: apMidState is not RUNNING.");
         return;
     }
-    std:vector<StationInfo> result;
+    std::vector<StationInfo> result;
     WifiConfigCenter::GetInstance().GetStationList(result);
     if (result.empty()) {
         WIFI_LOGI("DealApNetworkCapabilitiesChanged: GetStationList is empty.");
         return;
     }
-    WifiSoftApClientAccessNetErrorHiSysEvent(AP_NET_ERROR);
+    WriteSoftApClientAccessNetErrorHiSysEvent(AP_NET_ERROR);
     return;
 }
 

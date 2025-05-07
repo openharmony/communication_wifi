@@ -288,12 +288,12 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CONNECT_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteSoftApConnectAccessNetErrorHiSysEvent(int errorCnt)
+void WriteSoftApClientAccessNetErrorHiSysEvent(int errorCnt)
 {
-    WIFI_LOGE("WriteSoftApConnectAccessNetErrorHiSysEvent errorCnt=%{public}d", errorCnt);
+    WIFI_LOGE("WriteSoftApClientAccessNetErrorHiSysEvent errorCnt=%{public}d", errorCnt);
     Json:Value root;
     Json::FastWriter writer;
-    root["ERROR_COOE"] = errorCnt;
+    root["ERROR_CODE"] = errorCnt;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CLIENT_ACCESS_NET_ERROR", "EVENT_VALUE", writer.write(root));
 }
 

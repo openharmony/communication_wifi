@@ -15,7 +15,6 @@
 
 #include "ap_service.h"
 #include <unistd.h>
-#include "ap_network_monitor.h"
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
 #include "wifi_channel_helper.h"

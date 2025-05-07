@@ -254,7 +254,7 @@ private:
     sptr<Rosen::DisplayManagerLite::IFoldStatusListener> foldStatusListener_ = nullptr;
     std::mutex foldStatusListenerMutex_;
     std::mutex networkConnSubscriberLock_;
-    sptr<NetworkStateChangeSubscriber> networkConnSubscriber_ = nullptr;
+    sptr<NetworkConnSubscriber> networkConnSubscriber_ = nullptr;
 };
 
 }  // namespace Wifi

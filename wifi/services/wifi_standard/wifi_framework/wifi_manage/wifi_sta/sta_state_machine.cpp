@@ -3650,6 +3650,10 @@ void StaStateMachine::DealMloConnectionLinkInfo()
         WIFI_LOGI("%{public}s not support wifi7", __FUNCTION__);
         return;
     }
+    if (!linkedInfo.isMloConnected) {
+        WIFI_LOGI("%{public}s not support mlo connect", __FUNCTION__);
+        return;
+    }
     std::vector<WifiLinkedInfo> mloLinkedInfo;
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (WifiStaHalInterface::GetInstance().GetConnectionMloLinkedInfo(ifname, mloLinkedInfo) != 0) {

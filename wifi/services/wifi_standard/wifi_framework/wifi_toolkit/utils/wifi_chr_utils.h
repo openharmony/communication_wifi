@@ -40,6 +40,7 @@ private:
     std::mutex signalInfoMutex;
     std::mutex bssidMutex_;
     std::vector<std::string> bssidArray_;
+    int64_t startTime_ = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

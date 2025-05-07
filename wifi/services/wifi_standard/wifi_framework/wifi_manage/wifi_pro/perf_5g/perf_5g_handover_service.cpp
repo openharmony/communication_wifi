@@ -159,6 +159,12 @@ std::string Perf5gHandoverService::Switch5g()
     if (selectRelationAp_ == nullptr || connectedAp_ == nullptr) {
         return "";
     }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr && pEnhanceService->GetLimitSwitchScenes() == LimitSwitchScenes::DUAL_BAND_ROAM) {
+        WIFI_LOGE("Switch5g: fail, dual band roam is enable");
+        selectRelationAp_.reset();
+        return "";
+    }
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pStaService == nullptr) {
         WIFI_LOGE("Switch5g: pStaService is invalid");

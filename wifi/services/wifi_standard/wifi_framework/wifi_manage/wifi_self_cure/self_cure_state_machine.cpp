@@ -535,13 +535,17 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
         RequestReassocWithFactoryMac();
         return;
     }
-    if (!pSelfCureStateMachine_->isStaticIpCureSuccess_ && msg->GetParam2() == 1) {
+    // has no internet in history but not first connect, no need self cure
+    bool forceNoHttpCheck = static_cast<bool>(msg->GetParam2());
+    int64_t lastHasInetTime = static_cast<int64_t>(pSelfCureStateMachine_->GetLastHasInternetTime());
+    if (lastHasInetTime <= 0 || lastHasInetTime < pSelfCureStateMachine_->connectedTime_) {
+        forceNoHttpCheck = true;
+    }
+
+    if (!pSelfCureStateMachine_->isStaticIpCureSuccess_ && forceNoHttpCheck) {
         if (isHasInternetRecently_ || isPortalUnthenEver_ || pSelfCureStateMachine_->isInternetUnknown_) {
             pSelfCureStateMachine_->selfCureReason_ = WIFI_CURE_INTERNET_FAILED_TYPE_DNS;
             TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
-        } else if (pSelfCureStateMachine_->isInternetUnknown_ && pSelfCureStateMachine_->IfMultiGateway()) {
-            pSelfCureStateMachine_->selfCureReason_ = WIFI_CURE_INTERNET_FAILED_TYPE_TCP;
-            TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_TCP);
         } else {
             WIFI_LOGI("Handle network disable, there is not a expectant condition!.");
         }
@@ -2946,7 +2950,7 @@ void SelfCureStateMachine::SetSelfCureWifiTimeOut(SelfCureState wifiSelfCureStat
         case SelfCureState::SCE_WIFI_CONNECT_STATE: {
             WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_CONNECT_TIMEOUT");
             int32_t delayMs = WIFI_CURE_CONNECT_TIMEOUT_MS;
-            if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
+            if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_OPEN) {
                 delayMs += WIFI_CURE_CONNECT_TIMEOUT_MS;
             }
             MessageExecutedLater(WIFI_CURE_CONNECT_TIMEOUT, delayMs);
@@ -3020,14 +3024,12 @@ void SelfCureStateMachine::HandleConnectFailed()
         WifiSettings::GetInstance().AddDeviceConfig(config);
         WifiSettings::GetInstance().SyncDeviceConfig();
     }
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    WifiEventCallbackMsg cbMsg;
-    cbMsg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
-    cbMsg.msgData = ConnState::DISCONNECTED;
-    cbMsg.linkInfo = linkedInfo;
-    cbMsg.id = instId_;
-    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pStaService == nullptr) {
+        WIFI_LOGE("Get pStaService failed");
+        return;
+    }
+    pStaService->Disconnect();
 }
 } // namespace Wifi
 } // namespace OHOS

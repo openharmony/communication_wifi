@@ -567,6 +567,7 @@ bool WifiScanServiceImpl::IsInScanMacInfoWhiteList()
     }
     cJSON* scanMacInfoWifiWhiteList = cJSON_GetObjectItemCaseSensitive(scanMacInfoWhileListRoot, "wifi");
     if (scanMacInfoWifiWhiteList == nullptr) {
+        cJSON_Delete(scanMacInfoWhileListRoot);
         return false;
     }
     if (cJSON_IsArray(scanMacInfoWifiWhiteList)) {

@@ -436,7 +436,7 @@ HWTEST_F(WifiConfigCenterTest, SetLocalOnlyHotspotConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiConfigCenterTest, SetScreenDispalyStateTest, TestSize.Level1)
 {
-    WifiConfigCenter::GetInstance().SetScreenDispalyState(true);
+    WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::LANDSCAPE);
     EXPECT_EQ(WifiConfigCenter::GetInstance().IsScreenLandscape(), true);
 }
 }  // namespace Wifi

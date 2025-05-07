@@ -35,7 +35,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-
+static std::unique_ptr<MultiStaStateMachine> multiStaStateMachine_;
 class MultiStaStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -45,7 +45,8 @@ public:
 
     static void TearDownTestCase()
     {
-        sleep(1);
+        sleep(10);
+        multiStaStateMachine_.reset();
         WifiManager::GetInstance().Exit();
     }
 
@@ -57,10 +58,9 @@ public:
 
     virtual void TearDown()
     {
-        multiStaStateMachine_.reset();
+      WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
 
-    std::unique_ptr<MultiStaStateMachine> multiStaStateMachine_;
 
     static void OnStartFailureTest(int test)
     {

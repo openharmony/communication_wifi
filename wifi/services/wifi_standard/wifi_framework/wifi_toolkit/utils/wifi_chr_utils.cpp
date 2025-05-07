@@ -74,12 +74,16 @@ void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t sign
         bssidArray_.insert(bssidArray_.begin(), bssid);
         beaconLost = isBeaconLost(bssidArray_, wifiCheckInfoArray);
     }
- 
+
     if (beaconLost) {
-        LOGW("Beacon Lost.");
+        LOGW("Beacon Lost, signalLevel: %{public}d", signalLevel);
         int32_t errorCode = (signalLevel <= SIGNAL_LEVEL_TWO) ?
             BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH;
-        WriteWifiBeaconLostHiSysEvent(errorCode);
+        int64_t currentTime = GetCurrentTimeSeconds();
+        if (currentTime - startTime_ > SIGNAL_RECORD_5S) {
+            startTime_ = currentTime;
+            WriteWifiBeaconLostHiSysEvent(errorCode);
+        }
     }
 }
 }  // namespace Wifi

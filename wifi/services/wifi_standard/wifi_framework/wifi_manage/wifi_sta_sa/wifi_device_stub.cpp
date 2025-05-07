@@ -32,6 +32,8 @@ namespace Wifi {
 
 constexpr int SIGNALARR_LENGTH = 6;
 
+constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
+
 static std::map<int, std::string> g_HicollieStaMap = {
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), "WIFI_SVR_CMD_IS_WIFI_CONNECTED"},
     {static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), "WIFI_SVR_CMD_IS_WIFI_ACTIVE"},
@@ -366,17 +368,22 @@ void WifiDeviceStub::OnSetWifiRestrictedList(uint32_t code, MessageParcel &data,
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int size = data.ReadInt32();
-    std::vector<WifiRestrictedInfo> wifiList;
-    for (int i = 0; i < size; i++) {
-        WifiRestrictedInfo info;
-        info.ssid = data.ReadString();
-        info.bssid = data.ReadString();
-        info.uid = data.ReadInt32();
-        info.wifiRestrictedType = static_cast<WifiRestrictedType>(data.ReadInt32());
-        wifiList.push_back(info);
-    }
+    ErrCode ret = WIFI_OPT_FAILED;
     int result = INVALID_NETWORK_ID;
-    ErrCode ret = SetWifiRestrictedList(wifiList);
+    if (size > MAX_MDM_RESTRICTED_SIZE) {
+        ret = WIFI_OPT_MDM_OUT_MAX_NUM;
+    } else {
+        std::vector<WifiRestrictedInfo> wifiList;
+        for (int i = 0; i < size; i++) {
+            WifiRestrictedInfo info;
+            info.ssid = data.ReadString();
+            info.bssid = data.ReadString();
+            info.uid = data.ReadInt32();
+            info.wifiRestrictedType = static_cast<WifiRestrictedType>(data.ReadInt32());
+            wifiList.push_back(info);
+        }
+        ErrCode ret = SetWifiRestrictedList(wifiList);
+    }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {

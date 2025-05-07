@@ -29,6 +29,7 @@
 #include "mock_sta_service.h"
 #include "wifi_country_code_manager.h"
 #include "self_cure_utils.h"
+#include "wifi_app_state_aware.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -59,10 +60,15 @@ void SelfCureStateMachineCallBack(const LogType type, const LogLevel level,
 {
     g_errLog = msg;
 }
+static std::unique_ptr<SelfCureStateMachine> pSelfCureStateMachine_;
 class SelfCureStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void TearDownTestCase()
+    {
+        sleep(TEN);
+        pSelfCureStateMachine_.reset();
+    }
     virtual void SetUp()
     {
         LOG_SetCallback(SelfCureStateMachineCallBack);
@@ -77,10 +83,9 @@ public:
 
     virtual void TearDown()
     {
-        pSelfCureStateMachine_.reset();
+        WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
 
-    std::unique_ptr<SelfCureStateMachine> pSelfCureStateMachine_;
     std::unique_ptr<MockWifiStaService> pMockStaService;
 
     void DefaultStateGoInStateSuccess()

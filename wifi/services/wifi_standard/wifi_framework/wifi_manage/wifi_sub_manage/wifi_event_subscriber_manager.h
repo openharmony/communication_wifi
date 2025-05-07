@@ -133,12 +133,12 @@ public:
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
 };
 
-class NetworkStateChangeSubscriber : public NetManagerStandard::NetConnCallbackStub {
+class NetworkConnSubscriber : public NetManagerStandard::NetConnCallbackStub {
 public:
     NetworkConnSubscriber() = default;
-    ~NetworkConnSubscriber() default;
-    int32_t NetCapabilitiedChange(sptr<NetMannagerStandard::NetHandl> &netHandle,
-        cosnt sptr<NetManagerStandard::NetAllCapabiliites> &netAllCap) override;
+    ~NetworkConnSubscriber() = default;
+    int32_t NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
+        const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override;
 
 };
 

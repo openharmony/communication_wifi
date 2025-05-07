@@ -167,7 +167,7 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetHotspotMode(const HotspotMode &mode);
-    void handleNetCapabiliiesChanged(const int apStatus);
+    void handleNetCapabilitiesChanged(const int apStatus);
 private:
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
     public:

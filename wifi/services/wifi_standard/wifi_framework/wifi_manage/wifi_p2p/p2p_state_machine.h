@@ -426,6 +426,9 @@ private:
     virtual ErrCode AddClientInfo(std::vector<GcInfo> &gcInfos);
     virtual ErrCode RemoveClientInfo(std::string mac);
     virtual bool IsMatchClientDevice(std::vector<GcInfo> &gcInfos, WifiP2pDevice &device, GcInfo &gcInfo);
+#ifndef OHOS_ARCH_LITE
+    void WakeUpScreenSaver();
+#endif
 
 private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;

@@ -47,7 +47,7 @@ void WifiControllerMachineCallback(const LogType type, const LogLevel level,
 {
     g_errLog = msg;
 }
-
+static std::unique_ptr<WifiControllerMachine> pWifiControllerMachine;
 class WifiControllerMachineTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -57,6 +57,8 @@ public:
 
     static void TearDownTestCase()
     {
+        pWifiControllerMachine.reset();
+        sleep(10);
         WifiManager::GetInstance().Exit();
     }
 
@@ -69,10 +71,9 @@ public:
 
     virtual void TearDown()
     {
-        pWifiControllerMachine.reset();
+        WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
 
-    std::unique_ptr<WifiControllerMachine> pWifiControllerMachine;
 
     void DefaultStateGoInStateSuccess()
     {

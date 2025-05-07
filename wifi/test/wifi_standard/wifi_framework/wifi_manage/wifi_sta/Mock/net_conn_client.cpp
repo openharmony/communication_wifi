@@ -97,7 +97,7 @@ int32_t NetConnClient::DelInterfaceAddress(const std::string &ifName, const std:
     return NETMANAGER;
 }
 
-int32_t NetConnClient::RegisterNetConnCallback(const sptr<INetConnCallback> &callback)
+int32_t NetConnClient::RegisterNetConnCallback(const sptr<INetConnCallback> callback)
 {
     return NETMANAGER;
 }

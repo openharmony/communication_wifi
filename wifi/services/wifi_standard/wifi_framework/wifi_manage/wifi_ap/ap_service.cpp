@@ -332,7 +332,7 @@ ErrCode ApService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const
     return WIFI_OPT_SUCCESS;
 }
 
-void ApService::handleNetCapbiliiesChanged(const int apStatus)
+void ApService::handleNetCapabilitiesChanged(const int apStatus)
 {
     ApNetworkMonitor::GetInstance().DealApNetworkCapabilitiesChanged();
 }

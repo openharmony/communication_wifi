@@ -382,7 +382,7 @@ void WifiDeviceStub::OnSetWifiRestrictedList(uint32_t code, MessageParcel &data,
             info.wifiRestrictedType = static_cast<WifiRestrictedType>(data.ReadInt32());
             wifiList.push_back(info);
         }
-        ErrCode ret = SetWifiRestrictedList(wifiList);
+        ret = SetWifiRestrictedList(wifiList);
     }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);

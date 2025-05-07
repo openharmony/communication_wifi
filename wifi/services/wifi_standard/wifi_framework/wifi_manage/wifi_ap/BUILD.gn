@@ -45,7 +45,7 @@ ohos_shared_library("wifi_ap_service") {
     "$WIFI_ROOT_DIR/base/state_machine/include",
     "$WIFI_ROOT_DIR/base/cRPC/include",
     "$WIFI_ROOT_DIR/base/utils",
-    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/ipc_framework/interfaces",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",

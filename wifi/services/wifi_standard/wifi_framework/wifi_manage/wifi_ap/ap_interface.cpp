@@ -127,9 +127,7 @@ ErrCode ApInterface::SetHotspotMode(const HotspotMode &mode)
 
 void ApInterface::OnNetCapabilitiesChanged(const int apStatus)
 {
-    if (apStatus == 1) {
-        m_ApService.handleNetCapabilitiesChanged(apStatus);
-    }
+    m_ApService.handleNetCapabilitiesChanged(apStatus);
     return;
         
 }

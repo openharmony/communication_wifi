@@ -334,7 +334,7 @@ ErrCode ApService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const
 
 void ApService::handleNetCapabilitiesChanged(const int apStatus)
 {
-    ApNetworkMonitor::GetInstance().DealApNetworkCapabilitiesChanged();
+    ApNetworkMonitor::GetInstance().DealApNetworkCapabilitiesChanged(apStatus);
 }
  
 std::string ApService::WifiCountryCodeChangeObserver::GetListenerModuleName()

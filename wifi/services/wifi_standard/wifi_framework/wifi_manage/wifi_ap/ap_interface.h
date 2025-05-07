@@ -155,12 +155,17 @@ public:
     /**
      * @Description set hotspot mode
      *
-     * @param mode - the mode to be set
+     * @param model - the model to be set
      * @return ErrCode - operation result
      */
     virtual ErrCode SetHotspotMode(const HotspotMode &mode) override;
 
-    void OnNetCapabilitiesChanged(const int apStatus) override;
+    /**
+     * @Description Deal On Net Capabilities Changed
+     *
+     * @param apStatus
+     */
+    virtual void OnNetCapabilitiesChanged(const int apStatus) override;
 private:
     ApRootState m_ApRootState;
     ApStartedState m_ApStartedState;

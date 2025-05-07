@@ -359,7 +359,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",
-      "netmanager_base:net_conn_manager_if"
+      "netmanager_base:net_conn_manager_if",
     ]
   }
   ohos_source_set("wifi_hotspot_service_impl") {

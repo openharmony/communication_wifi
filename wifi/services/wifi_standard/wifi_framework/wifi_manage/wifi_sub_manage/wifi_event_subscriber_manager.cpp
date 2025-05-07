@@ -1347,34 +1347,38 @@ WifiDisplayStateListener::WifiDisplayStateListener()
 {
     WIFI_LOGI("WifiDisplayStateListener Enter");
 }
-void WifiDisplayStateListener::OnCreate(uint64_t displayId)
+void WifiDisplayStateListener::OnCreate(uint64_t DisplayId)
 {}
  
-void WifiDisplayStateListener::OnDestroy(uint64_t displayId)
+void WifiDisplayStateListener::OnDestroy(uint64_t DisplayId)
 {}
  
-void WifiDisplayStateListener::OnChange(uint64_t displayId)
+void WifiDisplayStateListener::OnChange(uint64_t DisplayId)
 {
-    sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(displayId);
+    sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(DisplayId);
     if (displayLite == nullptr) {
-        WIFI_LOGE("OnChange displayLite is nullptr");
+        WIFI_LOGE("OnChange fail");
         return;
     }
     auto displayInfo =  displayLite->GetDisplayInfo();
-    if (displayInfo == nullptr) {
-        WIFI_LOGE("OnChange displayInfo is nullptr");
-        return;
-    }
     auto orientation = displayInfo->GetDisplayOrientation();
     // Landscape screen
-    if ((orientation == Rosen::DisplayOrientation::LANDSCAPE ||
-        orientation == Rosen::DisplayOrientation::LANDSCAPE_INVERTED)) {
-        WifiConfigCenter::GetInstance().SetScreenDispalyState(true);
-    } else if (orientation == Rosen::DisplayOrientation::PORTRAIT ||
-               orientation == Rosen::DisplayOrientation::PORTRAIT_INVERTED) {
-        WifiConfigCenter::GetInstance().SetScreenDispalyState(false);
-    } else {
-        WIFI_LOGI("WifiDisplayStateListener Unknow!");
+    switch (orientation) {
+        case Rosen::DisplayOrientation::LANDSCAPE:
+            WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::LANDSCAPE);
+            break;
+        case Rosen::DisplayOrientation::PORTRAIT:
+            WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::PORTRAIT);
+            break;
+        case Rosen::DisplayOrientation::LANDSCAPE_INVERTED:
+            WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::LANDSCAPE_INVERTED);
+            break;
+        case Rosen::DisplayOrientation::PORTRAIT_INVERTED:
+            WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::PORTRAIT_INVERTED);
+            break;
+        default:
+            WIFI_LOGE("Unexpected orientation");
+            break;
     }
 }
 

@@ -1107,6 +1107,14 @@ struct WifiSignalPollInfo {
     ~WifiSignalPollInfo()
     {}
 };
+
+enum class DisplayOrientation {
+    DEFAULT,
+    PORTRAIT,
+    LANDSCAPE,
+    PORTRAIT_INVERTED,
+    LANDSCAPE_INVERTED,
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

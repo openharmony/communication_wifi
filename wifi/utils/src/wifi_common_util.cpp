@@ -505,8 +505,7 @@ bool IsOtherVapConnect()
     return p2pOrHmlConnected && hotspotEnable;
 }
 
-bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray,
-    int signalLevel)
+bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray)
 {
     if (wifiBeaconCheckInfoArray.empty() || bssidArray.empty()) {
         WIFI_LOGE("Empty array");
@@ -516,23 +515,24 @@ bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPo
         WIFI_LOGE("Array sizes are inconsistent");
         return false;
     }
-    int interval = (signalLevel <= SIGNAL_LEVEL_TWO) ? SIGNAL_RECORD_5S : SIGNAL_RECORD_10S;
     const int64_t initTime = wifiBeaconCheckInfoArray[0].timeStamp;
-    const int initRssi = wifiBeaconCheckInfoArray[0].signal;
     const std::string initBssid = bssidArray[0];
-    int count = 1;
     int accumulateTime = 0;
-    // Check if RSSI and BSSID remain unchanged over the specified interval
-    for (size_t i = 1; i < wifiBeaconCheckInfoArray.size(); i++) {
+    for (size_t i = 0; i < wifiBeaconCheckInfoArray.size(); i++) {
         const auto &signalInfo = wifiBeaconCheckInfoArray[i];
         const std::string &bssid = bssidArray[i];
-        if (initRssi == signalInfo.signal && initBssid == bssid) {
-            accumulateTime = initTime - signalInfo.timeStamp;
-            count++;
-        } else {
+        // 检查 ext 长度和 BSSID 是否一致
+        if (signalInfo.ext.size() < BEACON_RSSI_LENGTH || bssid != initBssid) {
             return false;
         }
-        if (accumulateTime >= interval && count >= CHECK_THREE_TIME) {
+        // 检查 RSSI 是否无效
+        bool isInvalid = std::all_of(signalInfo.ext.begin(), signalInfo.ext.begin() + BEACON_RSSI_LENGTH,
+            [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI; });
+        if (!isInvalid) {
+            return false;
+        }
+        accumulateTime = initTime - signalInfo.timeStamp;
+        if (accumulateTime > SIGNAL_RECORD_5S) {
             return true;
         }
     }

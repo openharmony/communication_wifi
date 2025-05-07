@@ -72,29 +72,14 @@ void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t sign
         std::lock_guard<std::mutex> arrayLock(bssidMutex_);
         if (bssidArray_.size() >= SIGNALARR_LENGTH) bssidArray_.pop_back();
         bssidArray_.insert(bssidArray_.begin(), bssid);
-        beaconLost = isBeaconLost(bssidArray_, wifiCheckInfoArray, signalLevel);
+        beaconLost = isBeaconLost(bssidArray_, wifiCheckInfoArray);
     }
  
     if (beaconLost) {
         LOGW("Beacon Lost.");
         int32_t errorCode = (signalLevel <= SIGNAL_LEVEL_TWO) ?
             BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH;
-        bool shouldReport = false;
-        {
-            std::lock_guard<std::mutex> setLock(setMutex_);
-            int64_t currentTime = GetCurrentTimeSeconds();
-            if (currentTime - startTime_ > ONE_DAY_TIME_SECONDS) {
-                uploadedBssidSet_.clear();
-                startTime_ = currentTime;
-            }
-            if (!uploadedBssidSet_.count(bssid)) {
-                uploadedBssidSet_.insert(bssid);
-                shouldReport = true;
-            }
-        }
-        if (shouldReport) {
-            WriteWifiBeaconLostHiSysEvent(errorCode);
-        }
+        WriteWifiBeaconLostHiSysEvent(errorCode);
     }
 }
 }  // namespace Wifi

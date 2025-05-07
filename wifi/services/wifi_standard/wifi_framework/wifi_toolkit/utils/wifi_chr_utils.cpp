@@ -80,7 +80,7 @@ void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t sign
         int32_t errorCode = (signalLevel <= SIGNAL_LEVEL_TWO) ?
             BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH;
         int64_t currentTime = GetCurrentTimeSeconds();
-        if (currentTime - startTime_ > SIGNAL_RECORD_5S) {
+        if (currentTime - startTime_ >= SIGNAL_RECORD_5S) {
             startTime_ = currentTime;
             WriteWifiBeaconLostHiSysEvent(errorCode);
         }

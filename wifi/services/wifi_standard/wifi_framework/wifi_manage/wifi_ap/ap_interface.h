@@ -165,7 +165,7 @@ public:
      *
      * @param apStatus
      */
-    virtual void OnNetCapabilitiesChanged(const int apStatus) override;
+    void OnNetCapabilitiesChanged(const int apStatus) override;
 private:
     ApRootState m_ApRootState;
     ApStartedState m_ApStartedState;

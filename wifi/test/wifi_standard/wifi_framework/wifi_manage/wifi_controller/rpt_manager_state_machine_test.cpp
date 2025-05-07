@@ -28,7 +28,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
-static std::unique_ptr<RptManagerMachine> pRptManagerMachine;
+const int TEN = 10;
 namespace OHOS::Wifi {
     static std::string g_errLog;
     void RptManagerMachineCallback(const LogType type, const LogLevel level,
@@ -46,7 +46,7 @@ public:
     static void SetUpTestCase() {}
     static void TearDownTestCase()
     {
-        sleep(10);
+        sleep(TEN);
         pRptManagerMachine.reset();
         WifiManager::GetInstance().Exit();
     }

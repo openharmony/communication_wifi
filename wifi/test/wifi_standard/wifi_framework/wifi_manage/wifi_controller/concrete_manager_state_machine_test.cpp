@@ -51,7 +51,7 @@ public:
     static void SetUpTestCase() {}
     static void TearDownTestCase()
     {
-        sleep(10);
+        sleep(TEN);
         pConcreteManagerMachine.reset();
         WifiManager::GetInstance().Exit();
     }

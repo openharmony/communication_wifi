@@ -138,7 +138,6 @@ public:
     ~NetworkConnSubscriber() = default;
     int32_t NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
         const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override;
-
 };
 
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {

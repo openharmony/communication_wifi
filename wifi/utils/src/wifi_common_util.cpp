@@ -522,11 +522,11 @@ bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPo
         const auto &signalInfo = wifiBeaconCheckInfoArray[i];
         const std::string &bssid = bssidArray[i];
         // 检查 ext 长度和 BSSID 是否一致
-        if (signalInfo.ext.size() < BEACON_RSSI_LENGTH || bssid != initBssid) {
+        if (signalInfo.ext.size() < BEACON_LENGTH_RSSI || bssid != initBssid) {
             return false;
         }
         // 检查 RSSI 是否无效
-        bool isInvalid = std::all_of(signalInfo.ext.begin(), signalInfo.ext.begin() + BEACON_RSSI_LENGTH,
+        bool isInvalid = std::all_of(signalInfo.ext.begin(), signalInfo.ext.begin() + BEACON_LENGTH_RSSI,
             [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI; });
         if (!isInvalid) {
             return false;

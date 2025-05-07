@@ -1424,11 +1424,11 @@ void WifiEventSubscriberManager::UnRegisterNetworkConnSubscriber()
 int NetworkConnSubscriber::NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
     const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap)
 {
-    const int NO_VALIDATED_NET = 1;
+    const int noValidatedNet = 1;
     if (netAllCap->netCaps_.find(NetManagerStandard::NET_CAPABILITY_VALIDATED) == netAllCap->netCaps_.end()) {
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(0);
         if (pService != nullptr) {
-            pService->OnNetCapabilitiesChanged(NO_VALIDATED_NET);
+            pService->OnNetCapabilitiesChanged(noValidatedNet);
         }
     }
     return 0;

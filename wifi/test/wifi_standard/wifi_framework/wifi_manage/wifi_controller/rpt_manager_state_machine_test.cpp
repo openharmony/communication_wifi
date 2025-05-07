@@ -40,7 +40,6 @@ namespace OHOS::Wifi {
 static std::unique_ptr<RptManagerMachine> pRptManagerMachine;
 class RptManagerMachineTest : public testing::Test {
 public:
-    std::unique_ptr<RptManagerMachine> pRptManagerMachine;
     RptModeCallback mCb;
 
     static void SetUpTestCase() {}

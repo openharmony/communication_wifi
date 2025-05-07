@@ -28,7 +28,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
-
+static std::unique_ptr<RptManagerMachine> pRptManagerMachine;
 namespace OHOS::Wifi {
     static std::string g_errLog;
     void RptManagerMachineCallback(const LogType type, const LogLevel level,
@@ -37,13 +37,19 @@ namespace OHOS::Wifi {
     {
         g_errLog = msg;
     }
+static std::unique_ptr<RptManagerMachine> pRptManagerMachine;
 class RptManagerMachineTest : public testing::Test {
 public:
     std::unique_ptr<RptManagerMachine> pRptManagerMachine;
     RptModeCallback mCb;
 
     static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void TearDownTestCase()
+    {
+        sleep(10);
+        pRptManagerMachine.reset();
+        WifiManager::GetInstance().Exit();
+    }
     virtual void SetUp()
     {
         pRptManagerMachine = std::make_unique<RptManagerMachine>();
@@ -56,7 +62,7 @@ public:
 
     virtual void TearDown()
     {
-        pRptManagerMachine.reset();
+        WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
 
     static void DealRptStartFailure(int id = 0)

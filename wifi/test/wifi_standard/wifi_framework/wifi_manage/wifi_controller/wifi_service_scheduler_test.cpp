@@ -41,6 +41,7 @@ static std::string g_errLog;
     {
         g_errLog = msg;
     }
+static std::unique_ptr<WifiServiceScheduler> pWifiServiceScheduler;
 class WifiServiceSchedulerTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -50,6 +51,8 @@ public:
 
     static void TearDownTestCase()
     {
+        sleep(10);
+        pWifiServiceScheduler.reset();
         WifiManager::GetInstance().Exit();
     }
 
@@ -61,10 +64,9 @@ public:
 
     virtual void TearDown()
     {
-        pWifiServiceScheduler.reset();
+        WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
 
-    std::unique_ptr<WifiServiceScheduler> pWifiServiceScheduler;
 
     void AutoStartStaServiceTest()
     {

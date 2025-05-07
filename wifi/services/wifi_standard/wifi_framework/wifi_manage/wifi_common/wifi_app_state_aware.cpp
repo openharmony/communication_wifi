@@ -30,6 +30,7 @@ DEFINE_WIFILOG_LABEL("WifiAppStateAware");
 constexpr const char *WIFI_APP_STATE_AWARE_THREAD = "WIFI_APP_STATE_AWARE_THREAD";
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 constexpr int64_t WIFI_APP_STATE_SUBSCRIBE_TIME_DELAY = 3 * 1000;
+const std::string APP_STATE_EVENT = "WIFI_APP_STATE_EVENT";
 WifiAppStateAware::WifiAppStateAware(int instId)
 {
     appChangeEventHandler = std::make_unique<WifiEventHandler>(WIFI_APP_STATE_AWARE_THREAD);
@@ -80,7 +81,7 @@ void WifiAppStateAware::RegisterAppStateChangedCallback(const int64_t delayTime)
     WIFI_LOGI("%{public}s enter", __func__);
     if (appChangeEventHandler) {
         std::function<void()> RegisterAppStateObserverFunc = [this]() { this->RegisterAppStateObserver(); };
-        appChangeEventHandler->PostAsyncTask(RegisterAppStateObserverFunc, delayTime);
+        appChangeEventHandler->PostAsyncTask(RegisterAppStateObserverFunc, APP_STATE_EVENT, delayTime);
     } else {
         WIFI_LOGE("%{public}s appChangeEventHandler is null", __func__);
     }

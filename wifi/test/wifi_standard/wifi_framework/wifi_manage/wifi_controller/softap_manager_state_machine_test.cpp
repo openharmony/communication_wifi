@@ -18,6 +18,7 @@
 #include "softap_manager_state_machine.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
+#include "mock_wifi_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -40,10 +41,16 @@ void SoftapManagerMachineCallback(const LogType type, const LogLevel level,
     g_errLog = msg;
 }
 
+static std::unique_ptr<SoftapManagerMachine> pSoftapManagerMachine;
 class SoftapManagerMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void TearDownTestCase()
+    {
+        sleep(10);
+        pSoftapManagerMachine.reset();
+        WifiManager::GetInstance().Exit();
+    }
     virtual void SetUp()
     {
         pSoftapManagerMachine = std::make_unique<SoftapManagerMachine>();
@@ -56,7 +63,7 @@ public:
 
     virtual void TearDown()
     {
-        pSoftapManagerMachine.reset();
+        WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
 
     static void DealSoftapStartFailure(int id = 0)
@@ -69,7 +76,6 @@ public:
         LOGI("softap stop");
     }
 
-    std::unique_ptr<SoftapManagerMachine> pSoftapManagerMachine;
     SoftApModeCallback mCb;
 
     void DefaultStateGoInStateSuccess()

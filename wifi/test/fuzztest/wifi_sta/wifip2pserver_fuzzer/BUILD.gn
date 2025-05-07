@@ -155,6 +155,7 @@ ohos_fuzztest("WifiP2pServerFuzzTest") {
     "samgr:samgr_proxy",
     "time_service:time_client",
     "window_manager:libdm_lite",
+    "power_manager:powermgr_client",
   ]
 
   part_name = "wifi"

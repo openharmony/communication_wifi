@@ -45,10 +45,16 @@ void ConcreteManagerMachineCallback(const LogType type, const LogLevel level,
     g_errLog = msg;
 }
 
+static std::unique_ptr<ConcreteMangerMachine> pConcreteManagerMachine;
 class ConcreteManagerMachineTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void TearDownTestCase()
+    {
+        sleep(10);
+        pConcreteManagerMachine.reset();
+        WifiManager::GetInstance().Exit();
+    }
     virtual void SetUp()
     {
         WifiManager::GetInstance().Init();
@@ -64,7 +70,7 @@ public:
 
     virtual void TearDown()
     {
-        pConcreteManagerMachine.reset();
+        WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
 
     static void DealConcreteStartFailure(int id = 0)
@@ -82,7 +88,6 @@ public:
         LOGI("client remove");
     }
 
-    std::unique_ptr<ConcreteMangerMachine> pConcreteManagerMachine;
     std::unique_ptr<WifiTogglerManager> pWifiTogglerManager;
     ConcreteModeCallback mCb;
 

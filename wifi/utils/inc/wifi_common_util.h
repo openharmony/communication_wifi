@@ -55,7 +55,7 @@ inline const uint8_t P2P_SUB_SYSTEM_ID = 2;
 inline const int SYSTEM_OFFSET = 21;
 inline const int SUB_SYSTEM_OFFSET = 16;
 inline const int SIGNAL_RECORD_5S = 5;
-inline const int BEACON_RSSI_LENGTH = 10;
+inline const int BEACON_LENGTH_RSSI = 10;
 inline const int8_t BEACON_LOST_RSSI = -128;
 inline const int SIGNAL_LEVEL_TWO = 2;
 

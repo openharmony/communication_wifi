@@ -614,9 +614,9 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
         return false;
     }
 
-    // status history > 80%
+    // status history < 80%
     if (!NetworkStatusHistoryManager::IsInternetAccessByHistory(wifiDeviceConfig.networkStatusHistory)) {
-        WIFI_LOGI("ValidConfigNetworkFilter, status history > 80 percent, skip candidate:%{public}s",
+        WIFI_LOGI("ValidConfigNetworkFilter, status history < 80 percent, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());
         return false;
     }

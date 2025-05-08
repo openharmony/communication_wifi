@@ -178,7 +178,7 @@ public:
     virtual int GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig) = 0;
     virtual void SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotConfig) = 0;
     virtual bool IsScreenLandscape() = 0;
-    virtual void SetScreenDispalyState(OHOS::Wifi::DisplayOrientation orientation) = 0;
+    virtual void SetScreenDispalyState(int32_t orientation) = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -337,7 +337,7 @@ public:
     MOCK_METHOD1(GetLocalOnlyHotspotConfig, int(HotspotConfig &hotspotConfig));
     MOCK_METHOD1(SetLocalOnlyHotspotConfig, void(const HotspotConfig &hotspotConfig));
     MOCK_METHOD0(IsScreenLandscape, bool());
-    MOCK_METHOD1(SetScreenDispalyState, void(OHOS::Wifi::DisplayOrientation orientation));
+    MOCK_METHOD1(SetScreenDispalyState, void(int32_t orientation));
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

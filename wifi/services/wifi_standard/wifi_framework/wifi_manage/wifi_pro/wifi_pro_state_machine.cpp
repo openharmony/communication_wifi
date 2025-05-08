@@ -164,11 +164,6 @@ bool WifiProStateMachine::IsKeepCurrWifiConnected()
         WIFI_LOGI("IsKeepCurrWifiConnected, rpt is running, do not switch");
         return true;
     }
-    // screen landscape
-    if (WifiConfigCenter::GetInstance().IsScreenLandscape()) {
-        WIFI_LOGI("IsKeepCurrWifiConnected, screen is landscape");
-        return true;
-    }
     return false;
 }
 

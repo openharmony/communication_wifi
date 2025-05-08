@@ -1500,7 +1500,12 @@ WifiErrorNo WifiHdiWpaClient::HandleMloLinkData(char *staData, uint32_t staDataL
     char *token = strtok_r(staData, "=", &savedPtr);
     WifiLinkedInfo linkInfo;
     while (token != NULL) {
-        value = strtok_r(NULL, "\n", &savedPtr);
+        char* tmpValue = strtok_r(NULL, "\n", &savedPtr);
+        if (!tmpValue) {
+            LOGE("%{public}s: tmpValue is null", __func__);
+            return WIFI_HAL_OPT_FAILED;
+        }
+        value = tmpValue;
         if (strcmp(token, "freq") == 0) {
             linkInfo.frequency = CheckDataLegal(value);
         } else if (strcmp(token, "link_id") == 0) {
@@ -1580,7 +1585,12 @@ WifiErrorNo WifiHdiWpaClient::HandleMloSignalPollData(char *staData, uint32_t st
     char *token = strtok_r(staData, "=", &savedPtr);
     WifiMloSignalInfo signalInfo;
     while (token != NULL) {
-        value = strtok_r(NULL, "\n", &savedPtr);
+        char* tmpValue = strtok_r(NULL, "\n", &savedPtr);
+        if (!tmpValue) {
+            LOGE("%{public}s: tmpValue is null", __func__);
+            return WIFI_HAL_OPT_FAILED;
+        }
+        value = tmpValue;
         if (strcmp(token, "LINK_ID") == 0) {
             signalInfo.linkId = CheckDataLegal(value);
         } else if (strcmp(token, "RSSI") == 0) {

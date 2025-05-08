@@ -19,6 +19,7 @@
 #include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_randommac_helper.h"
+#include "display_info.h"
 
 DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 
@@ -1553,15 +1554,15 @@ void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotCon
     localOnlyHotspotConfig_ = hotspotConfig;
 }
 
-void WifiConfigCenter::SetScreenDispalyState(DisplayOrientation orientation)
+void WifiConfigCenter::SetScreenDispalyState(int32_t orientation)
 {
     screenDisplayOrientation.store(orientation);
 }
  
 bool WifiConfigCenter::IsScreenLandscape()
 {
-    return screenDisplayOrientation.load() == DisplayOrientation::LANDSCAPE ||
-           screenDisplayOrientation.load() == DisplayOrientation::LANDSCAPE_INVERTED;
+    return screenDisplayOrientation.load() == static_cast<int32_t>(Rosen::DisplayOrientation::LANDSCAPE) ||
+           screenDisplayOrientation.load() == static_cast<int32_t>(Rosen::DisplayOrientation::LANDSCAPE_INVERTED);
 }
 }  // namespace Wifi
 }  // namespace OHOS

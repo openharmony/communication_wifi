@@ -362,9 +362,9 @@ public:
     /**
      * @Description set screen state
      *
-     * @param isScreenLandscape  screenState true or false
+     * @param isScreenLandscape  screenState
      */
-    void SetScreenDispalyState(DisplayOrientation orientation);
+    void SetScreenDispalyState(int32_t orientation);
     bool IsScreenLandscape();
     /**
      * @Description get local only hotspot Config
@@ -474,7 +474,7 @@ private:
     std::atomic<int> mNoChargerPlugModeState {MODE_STATE_CLOSE};
     std::atomic<bool> mThreadStatusFlag_ {false};
     std::atomic<uint64_t> mThreadStartTime {0};
-    std::atomic<DisplayOrientation> screenDisplayOrientation {DisplayOrientation::DEFAULT};
+    std::atomic<int32_t> screenDisplayOrientation {0};
     std::mutex mMacAddrPairMutex;
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mHotspotMacAddrPair;

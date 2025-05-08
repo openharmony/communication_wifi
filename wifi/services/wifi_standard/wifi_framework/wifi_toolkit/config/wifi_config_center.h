@@ -479,6 +479,7 @@ private:
     std::atomic<int> mNoChargerPlugModeState {MODE_STATE_CLOSE};
     std::atomic<bool> mThreadStatusFlag_ {false};
     std::atomic<uint64_t> mThreadStartTime {0};
+    // 0 PORTRAIT 1 LANDSCAPE 2 PORTRAIT_INVERTED 3 LANDSCAPE_INVERTED 4 UNKNOWN
     std::atomic<int32_t> screenDisplayOrientation {0};
     std::mutex mMacAddrPairMutex;
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;

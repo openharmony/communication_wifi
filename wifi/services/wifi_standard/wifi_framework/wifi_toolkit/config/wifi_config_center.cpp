@@ -19,6 +19,7 @@
 #include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_randommac_helper.h"
+#include "display_manager_lite.h"
 #include "display_info.h"
 
 DEFINE_WIFILOG_LABEL("WifiConfigCenter");

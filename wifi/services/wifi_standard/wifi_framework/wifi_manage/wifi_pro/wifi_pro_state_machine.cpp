@@ -1064,7 +1064,8 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     }
 
     WIFI_LOGI("wifi to wifi step 2: receive good ap.");
-    if (!pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition()) {
+    if (!pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition() ||
+        WifiConfigCenter::GetInstance().IsScreenLandscape()) {
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }

@@ -165,6 +165,8 @@ void WriteIsInternetHiSysEvent(int isInternet);
 
 void WriteSoftApConnectFailHiSysEvent(int errorCnt);
 
+void WriteSoftApClientAccessNetErrorHiSysEvent(int errorCode);
+
 void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, const WifiScanFailReason failReason);
 
 void WriteWifiEncryptionFailHiSysEvent(int event, const std::string &maskSsid,

@@ -288,6 +288,15 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CONNECT_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
+void WriteSoftApClientAccessNetErrorHiSysEvent(int errorCode)
+{
+    WIFI_LOGE("WriteSoftApClientAccessNetErrorHiSysEvent errorCode=%{public}d", errorCode);
+    Json::Value root;
+    Json::FastWriter writer;
+    root["ERROR_CODE"] = errorCode;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CLIENT_ACCESS_NET_ERROR", "EVENT_VALUE", writer.write(root));
+}
+
 void WriteWifiScanApiFailHiSysEvent(const std::string& pkgName, const WifiScanFailReason failReason)
 {
 #ifndef OHOS_ARCH_LITE

@@ -38,11 +38,9 @@ private:
 private:
     std::vector<WifiSignalPollInfo> signalPollInfoArray;
     std::mutex signalInfoMutex;
-    int64_t startTime_ = 0;
     std::mutex bssidMutex_;
-    std::mutex setMutex_;
-    std::set<std::string> uploadedBssidSet_;
     std::vector<std::string> bssidArray_;
+    int64_t startTime_ = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

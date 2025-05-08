@@ -89,7 +89,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     LoadRelationApInfo();
     Pref5gStatisticsInfo perf5gChrInfo_{};
     perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
-    WIFI_LOGI("OnConnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d),relationAps size(%{public}u)",
+    WIFI_LOGI("OnConnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d),relationAps size(%{public}zu)",
         SsidAnonymize(connectedAp_->apInfo.ssid).data(), MacAnonymize(connectedAp_->apInfo.bssid).data(),
         connectedAp_->apInfo.frequency, relationAps_.size());
 }
@@ -157,6 +157,12 @@ void Perf5gHandoverService::NetworkStatusChanged(NetworkStatus networkStatus)
 std::string Perf5gHandoverService::Switch5g()
 {
     if (selectRelationAp_ == nullptr || connectedAp_ == nullptr) {
+        return "";
+    }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr && pEnhanceService->GetLimitSwitchScenes() == LimitSwitchScenes::DUAL_BAND_ROAM) {
+        WIFI_LOGE("Switch5g: fail, dual band roam is enable");
+        selectRelationAp_.reset();
         return "";
     }
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();

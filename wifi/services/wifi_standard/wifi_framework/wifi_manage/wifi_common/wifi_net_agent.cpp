@@ -165,7 +165,7 @@ void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSuppl
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetSupplierInfo.");
     std::unique_lock<std::mutex> lock(netAgentMutex_);
-    isWifiAvaliable_ = netSupplierInfo->isAvailable_;
+    isWifiAvailable_[instId] = netSupplierInfo->isAvailable_;
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
     int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierIdNow, netSupplierInfo);
     WIFI_LOGI("Update network result:%{public}d", result);
@@ -177,7 +177,7 @@ void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter UpdateNetLinkInfo.");
     std::unique_lock<std::mutex> lock(netAgentMutex_);
-    if (!isWifiAvaliable_) {
+    if (!isWifiAvaliable_[instId]) {
         WIFI_LOGE("wifi is not avaliable, no need UpdateNetLinkInfo");
         return;
     }

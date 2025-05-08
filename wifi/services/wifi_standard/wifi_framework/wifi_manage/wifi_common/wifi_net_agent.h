@@ -226,7 +226,7 @@ private:
 private:
     uint32_t supplierId{0};
     uint32_t supplierIdForWlan1{0};
-    bool isWifiAvaliable_ = false;
+    bool isWifiAvailable_[2] = {false, false};
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
     std::unique_ptr<WifiEventHandler> netAgentEventHandler_ = nullptr;
     std::mutex netAgentMutex_;

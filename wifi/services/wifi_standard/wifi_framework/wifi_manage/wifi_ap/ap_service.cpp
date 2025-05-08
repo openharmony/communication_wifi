@@ -331,6 +331,11 @@ ErrCode ApService::WifiCountryCodeChangeObserver::OnWifiCountryCodeChanged(const
     m_lastWifiCountryCode = wifiCountryCode;
     return WIFI_OPT_SUCCESS;
 }
+
+void ApService::HandleNetCapabilitiesChanged(const int apStatus)
+{
+    ApNetworkMonitor::GetInstance().DealApNetworkCapabilitiesChanged(apStatus);
+}
  
 std::string ApService::WifiCountryCodeChangeObserver::GetListenerModuleName()
 {

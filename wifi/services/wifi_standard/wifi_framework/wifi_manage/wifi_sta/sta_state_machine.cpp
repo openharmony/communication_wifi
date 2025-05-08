@@ -2159,15 +2159,9 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     UpdatePortalState(netState, updatePortalAuthTime);
-#ifndef OHOS_ARCH_LITE
-    if (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL
-        && WifiConfigCenter::GetInstance().IsAllowPopUp()) {
-        ShowPortalNitification();
-    }
-#endif
-    if (autoPullBrowserFlag == false) {
-        HandlePortalNetworkPorcess();
-        autoPullBrowserFlag = true;
+    /* The tv doesn't need to publish the portal login page when connecting to a Hilink router without internet. */
+    if (GetDeviceType() != ProductDeviceType::TV) {
+        PublishPortalNitificationAndLogin();
     }
     bool isHomeAp = false;
     bool isHomeRouter = false;
@@ -2187,9 +2181,26 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
     } else {
+        if (GetDeviceType() == ProductDeviceType::TV) {
+            PublishPortalNitificationAndLogin();
+        }        
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
+    }
+}
+
+void StaStateMachine::PublishPortalNitificationAndLogin()
+{
+#ifndef OHOS_ARCH_LITE
+    if (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL
+        && WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+        ShowPortalNitification();
+    }
+#endif
+    if (autoPullBrowserFlag == false) {
+        HandlePortalNetworkPorcess();
+        autoPullBrowserFlag = true;
     }
 }
 

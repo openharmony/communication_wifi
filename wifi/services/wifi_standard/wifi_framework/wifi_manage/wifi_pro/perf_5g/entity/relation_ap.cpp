@@ -30,6 +30,7 @@ constexpr int WIFI_SCAN_LARGER_INTERVAL = 10;
 constexpr int WIFI_SCAN_INTERVAL = 5;
 constexpr int WIFI_MAX_SCAN_THRESHOLD = -30;
 constexpr int WIFI_MIN_SCAN_THRESHOLD = -90;
+constexpr int WIFI_MIN_SWITCH5G_THRESHOLD = -70;
 
 
 RelationAp::RelationAp()
@@ -64,6 +65,10 @@ void RelationAp::InitMonitorInfo()
 {
     switch5gRssiThreshold_ = apInfo_.apConnectionInfo.GetRssiSatisfyRttThreshold(GOOD_RTT_THRESHOLD,
         DEFAULT_TARGET_RSSI);
+    if (switch5gRssiThreshold_ < WIFI_MIN_SWITCH5G_THRESHOLD) {
+        WIFI_LOGD("Update switch5gRssiThreshold");
+        switch5gRssiThreshold_ = WIFI_MIN_SWITCH5G_THRESHOLD;
+    }
     triggerScanRssiThreshold_ = relationInfo_.GetTriggerScanRssiThreshold(switch5gRssiThreshold_);
     initalTriggerScanRssiTh_ = triggerScanRssiThreshold_;
     WIFI_LOGI("%{public}s, switch5gRssiThreshold_(%{public}d), triggerScanRssiThreshold_(%{public}d)",

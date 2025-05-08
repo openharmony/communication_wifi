@@ -298,6 +298,13 @@ public:
      * @return void
      */
     virtual void OnWifiLinkTypeChanged(const WifiLinkType &wifiLinkType) = 0;
+
+    /**
+     * @Description get limit switching network scenes
+     *
+     * @return 0: not limit, 1:dual band roam
+     */
+    virtual LimitSwitchScenes GetLimitSwitchScenes() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

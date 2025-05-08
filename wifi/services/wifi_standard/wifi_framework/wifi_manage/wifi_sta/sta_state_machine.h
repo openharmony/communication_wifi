@@ -1032,6 +1032,7 @@ private:
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
     void EnableScreenOffSignalPoll();
+    void PublishPortalNitificationAndLogin();
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;

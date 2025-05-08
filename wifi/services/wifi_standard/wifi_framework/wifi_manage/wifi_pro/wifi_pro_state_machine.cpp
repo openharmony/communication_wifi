@@ -317,6 +317,8 @@ void WifiProStateMachine::HandleWifi2WifiSucsess(int64_t blackListTime)
 void WifiProStateMachine::HandleWifi2WifiFailed()
 {
     WIFI_LOGI("wifitowifi step X: wifi to Wifi Failed Finally.");
+    NetworkBlockListManager::GetInstance().AddWifiBlocklist(targetBssid_);
+    MessageExecutedLater(EVENT_REMOVE_BLOCK_LIST, targetBssid_, BLOCKLIST_VALID_TIME);
     auto &networkBlackListManager = NetworkBlockListManager::GetInstance();
     if (networkBlackListManager.IsFailedMultiTimes(targetBssid_)) {
         WIFI_LOGI("HandleWifi2WifiFailed, add to abnormal black list:%{public}s.", MacAnonymize(targetBssid_).c_str());
@@ -452,6 +454,13 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
         return false;
     }
 
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.networkId == INVALID_NETWORK_ID) {
+        WIFI_LOGE("TryWifi2Wifi: current state : disconnected.");
+        return false;
+    }
+
     int32_t networkId = networkSelectionResult.wifiDeviceConfig.networkId;
     badBssid_ = currentBssid_;
     badSsid_ = currentSsid_;
@@ -476,6 +485,26 @@ bool WifiProStateMachine::FullScan()
     }
     WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
     return pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
+}
+
+void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
+{
+    WifiLinkedInfo linkedInfo;
+    msg->GetMessageObj(linkedInfo);
+    perf5gHandoverService_.OnConnected(linkedInfo);
+    if (isWifi2WifiSwitching_ && targetBssid_ != linkedInfo.bssid) {
+        WIFI_LOGI("selected bssid and switched bssid are not same:selected bssid:%{public}s,"
+                  "switched bssid:%{public}s,",
+            MacAnonymize(targetBssid_).c_str(),
+            MacAnonymize(linkedInfo.bssid).c_str());
+        WifiProChr::GetInstance().RecordSwitchChrCnt(false);
+        HandleWifi2WifiFailed();
+    } else if (isWifi2WifiSwitching_ && targetBssid_ == linkedInfo.bssid) {
+        WifiProChr::GetInstance().RecordSwitchChrCnt(true);
+        WifiProChr::GetInstance().RecordWifiProSwitchSuccTime();
+        HandleWifi2WifiSucsess(BLOCKLIST_VALID_TIME);
+    }
+    Wifi2WifiFinish();
 }
 /* --------------------------- state machine default state ------------------------------ */
 WifiProStateMachine::DefaultState::DefaultState(WifiProStateMachine *pWifiProStateMachine)
@@ -747,13 +776,7 @@ void WifiProStateMachine::WifiConnectedState::HandleWifiConnectStateChangedInCon
         pWifiProStateMachine_->perf5gHandoverService_.OnDisconnected();
     } else {
         if (state == static_cast<int32_t>(OperateResState::CONNECT_AP_CONNECTED)) {
-            WifiLinkedInfo linkedInfo;
-            msg->GetMessageObj(linkedInfo);
-            pWifiProStateMachine_->perf5gHandoverService_.OnConnected(linkedInfo);
-            if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
-                pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
-                pWifiProStateMachine_->HandleWifi2WifiSucsess(BLOCKLIST_VALID_TIME);
-            }
+            pWifiProStateMachine_->ProcessSwitchResult(msg);
         }
         pWifiProStateMachine_->disconnectToConnectedState_ = false;
     }
@@ -812,29 +835,10 @@ void WifiProStateMachine::WifiDisconnectedState::HandleWifiConnectStateChangedIn
     }
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_AP_CONNECTED)) {
-        WifiLinkedInfo linkedInfo;
-        msg->GetMessageObj(linkedInfo);
-        pWifiProStateMachine_->perf5gHandoverService_.OnConnected(linkedInfo);
-        if (pWifiProStateMachine_->isWifi2WifiSwitching_ && pWifiProStateMachine_->targetBssid_ != linkedInfo.bssid) {
-            WIFI_LOGI("selected bssid and switched bssid are not same:selected bssid:%{public}s,"
-                      "switched bssid:%{public}s,",
-                MacAnonymize(pWifiProStateMachine_->targetBssid_).c_str(),
-                MacAnonymize(linkedInfo.bssid).c_str());
-            NetworkBlockListManager::GetInstance().AddWifiBlocklist(linkedInfo.bssid);
-            pWifiProStateMachine_->MessageExecutedLater(EVENT_REMOVE_BLOCK_LIST,
-                linkedInfo.bssid, BLOCKLIST_VALID_TIME);
-            WifiProChr::GetInstance().RecordSwitchChrCnt(false);
-            pWifiProStateMachine_->HandleWifi2WifiFailed();
-        } else if (pWifiProStateMachine_->isWifi2WifiSwitching_
-            && pWifiProStateMachine_->targetBssid_ == linkedInfo.bssid) {
-            WifiProChr::GetInstance().RecordSwitchChrCnt(true);
-            WifiProChr::GetInstance().RecordWifiProSwitchSuccTime();
-            pWifiProStateMachine_->HandleWifi2WifiSucsess(BLOCKLIST_VALID_TIME);
-        }
+        pWifiProStateMachine_->ProcessSwitchResult(msg);
 
         WIFI_LOGI("state transition: WifiDisconnectedState -> WifiConnectedState.");
         pWifiProStateMachine_->disconnectToConnectedState_ = true;
-        pWifiProStateMachine_->Wifi2WifiFinish();
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiConnectedState_);
     }
 }

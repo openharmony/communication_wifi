@@ -1357,29 +1357,17 @@ void WifiDisplayStateListener::OnChange(uint64_t displayId)
 {
     sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(displayId);
     if (displayLite == nullptr) {
-        WIFI_LOGE("OnChange fail");
+        WIFI_LOGE("OnChange displayLite fail");
         return;
     }
     auto displayInfo =  displayLite->GetDisplayInfo();
-    auto orientation = displayInfo->GetDisplayOrientation();
-    // Landscape screen
-    switch (orientation) {
-        case Rosen::DisplayOrientation::LANDSCAPE:
-            WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::LANDSCAPE);
-            break;
-        case Rosen::DisplayOrientation::PORTRAIT:
-            WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::PORTRAIT);
-            break;
-        case Rosen::DisplayOrientation::LANDSCAPE_INVERTED:
-            WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::LANDSCAPE_INVERTED);
-            break;
-        case Rosen::DisplayOrientation::PORTRAIT_INVERTED:
-            WifiConfigCenter::GetInstance().SetScreenDispalyState(DisplayOrientation::PORTRAIT_INVERTED);
-            break;
-        default:
-            WIFI_LOGE("Unexpected orientation");
-            break;
+    if (displayInfo == nullptr) {
+        WIFI_LOGE("OnChange displayInfo fail");
+        return;
     }
+    // screen state
+    auto orientation = displayInfo->GetDisplayOrientation();
+    WifiConfigCenter::GetInstance().SetScreenDispalyState(static_cast<int32_t>(orientation));
 }
 
 WifiFoldStateListener::WifiFoldStateListener()

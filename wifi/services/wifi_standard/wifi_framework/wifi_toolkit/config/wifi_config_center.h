@@ -365,6 +365,11 @@ public:
      * @param isScreenLandscape  screenState
      */
     void SetScreenDispalyState(int32_t orientation);
+    /**
+     * @Description screen state is Landscape
+     *
+     * @return success or not
+     */
     bool IsScreenLandscape();
     /**
      * @Description get local only hotspot Config

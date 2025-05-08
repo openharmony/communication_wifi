@@ -1108,6 +1108,10 @@ struct WifiSignalPollInfo {
     {}
 };
 
+enum class LimitSwitchScenes {
+    NOT_LIMIT = 0,
+    DUAL_BAND_ROAM = 1,
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

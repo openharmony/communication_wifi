@@ -38,6 +38,9 @@
 #include "wifi_settings.h"
 #include "p2p_chr_reporter.h"
 #include "wifi_notification_util.h"
+#ifndef OHOS_ARCH_LITE
+#include "power_mgr_client.h"
+#endif
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -747,6 +750,11 @@ void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string 
 void P2pStateMachine::NotifyUserInvitationReceivedMessage()
 {
     WIFI_LOGI("P2pStateMachine::NotifyUserInvitationReceivedMessage  enter");
+    if (GetDeviceType() == ProductDeviceType::TV) {
+#ifndef OHOS_ARCH_LITE
+        WakeUpScreenSaver();
+#endif
+    }
     std::string deviceName = deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
     WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_PBC_DIALOG, deviceName);
 }
@@ -1357,5 +1365,22 @@ bool P2pStateMachine::P2pReject(const std::string mac) const
     WifiP2PHalInterface::GetInstance().P2pReject(mac);
     return true;
 }
+
+#ifndef OHOS_ARCH_LITE
+void P2pStateMachine::WakeUpScreenSaver()
+{
+    auto &powerMgr = PowerMgr::PowerMgrClient::GetInstance();
+    if (!powerMgr.IsScreenOn()) {
+        WIFI_LOGD("screen not on");
+        return;
+    }
+    if (powerMgr.WakeupDevice(PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_END_DREAM, "end_dream") !=
+        PowerMgr::PowerErrors::ERR_OK) {
+        WIFI_LOGE("fail to end dream");
+        return;
+    }
+    WIFI_LOGI("Wake up screen saver success");
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

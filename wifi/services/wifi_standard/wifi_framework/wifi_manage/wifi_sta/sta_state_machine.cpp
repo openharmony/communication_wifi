@@ -5103,7 +5103,7 @@ void StaStateMachine::InvokeOnInternetAccessChanged(SystemNetWorkState internetA
     }
     if (internetAccessStatus == SystemNetWorkState::NETWORK_NOTWORKING &&
         lastInternetAccessStatus_ == SystemNetWorkState::NETWORK_IS_WORKING &&
-        lastSignalLevel_ < SIGNAL_LEVEL_2) {
+        lastSignalLevel_ <= SIGNAL_LEVEL_2) {
         WIFI_LOGI("net detection result is NETWORK_NOTWORKING, last status is NETWORK_IS_WORKING, signal level less 2");
         return;
     }

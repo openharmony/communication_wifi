@@ -391,6 +391,10 @@ public:
         pP2pStateMachine->pDhcpResultNotify->OnSuccess(1, nullptr, &result);
         pP2pStateMachine->pDhcpResultNotify->OnSuccess(1, ifname, nullptr);
     }
+    void WarpWakeUpScreenSaver()
+    {
+        pP2pStateMachine->WakeUpScreenSaver();
+    }
 };
 
 void ButtonTest(AlertDialog &dialog, std::any ctx)
@@ -923,6 +927,12 @@ HWTEST_F(P2pStateMachineTest, HandleP2pServiceResp4, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, OnSuccessTest, TestSize.Level1)
 {
     OnSuccessTest();
+    EXPECT_FALSE(g_errLog.find("P2pStateMachine") != std::string::npos);
+}
+
+HWTEST_F(P2pStateMachineTest, WakeUpScreenSaverTest, TestSize.Level1)
+{
+    WarpWakeUpScreenSaver();
     EXPECT_FALSE(g_errLog.find("P2pStateMachine") != std::string::npos);
 }
 }  // namespace Wifi

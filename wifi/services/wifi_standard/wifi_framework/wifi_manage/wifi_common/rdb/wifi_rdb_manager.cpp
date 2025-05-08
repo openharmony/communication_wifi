@@ -73,7 +73,7 @@ bool WifiRdbManager::Insert(const std::string &tableName, const NativeRdb::Value
     int64_t rowId = -1;
     auto ret = rdbStore->InsertWithConflictResolution(rowId, tableName, valuesBucket,
         NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
-    WIFI_LOGD("Insert after rowId = %{public}lld", rowId);
+    WIFI_LOGD("Insert after rowId = %{public}" PRId64, rowId);
     return ret == NativeRdb::E_OK;
 }
 bool WifiRdbManager::Update(const NativeRdb::ValuesBucket &valuesBucket, const NativeRdb::AbsRdbPredicates &predicates)

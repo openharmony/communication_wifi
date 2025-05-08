@@ -38,6 +38,7 @@ ohos_shared_library("wifi_ap_service") {
     "ap_state_machine.cpp",
     "ap_stations_manager.cpp",
     "wifi_ap_nat_manager.cpp",
+    "ap_network_monitor.cpp",
   ]
 
   include_dirs = [
@@ -85,8 +86,9 @@ ohos_shared_library("wifi_ap_service") {
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "libxml2:libxml2",
-    "netmanager_base:net_conn_manager_if",
     "samgr:samgr_proxy",
+    "netmanager_base:net_conn_manager_if",
+    "ipc:ipc_single",
   ]
 
   deps = [

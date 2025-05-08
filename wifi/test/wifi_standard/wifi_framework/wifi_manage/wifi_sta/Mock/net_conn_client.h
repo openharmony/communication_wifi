@@ -56,6 +56,10 @@ public:
                                            const std::set<NetCap> &netCaps, uint32_t &supplierId);
     int32_t DelInterfaceAddress(const std::string &ifName, const std::string &ipAddr, int32_t prefixLength);
     int32_t UpdateSupplierScore(uint32_t supplierId, uint32_t detectionStatus);
+
+    int32_t RegisterNetConnCallback(const sptr<INetConnCallback> callback);
+
+    int32_t UnregisterNetConnCallback(const sptr<INetConnCallback> &callback);
 };
 } // namespace NetManagerStandard
 } // namespace OHOS

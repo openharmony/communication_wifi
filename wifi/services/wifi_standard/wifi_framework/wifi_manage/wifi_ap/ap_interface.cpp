@@ -124,5 +124,11 @@ ErrCode ApInterface::SetHotspotMode(const HotspotMode &mode)
 {
     return m_ApService.SetHotspotMode(mode);
 }
+
+void ApInterface::OnNetCapabilitiesChanged(const int apStatus)
+{
+    m_ApService.HandleNetCapabilitiesChanged(apStatus);
+    return;
+}
 }  // namespace Wifi
 }  // namespace OHOS

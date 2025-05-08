@@ -175,20 +175,12 @@ HWTEST_F(WifiP2pTest, QueryP2pLocalDeviceTests, TestSize.Level1)
     deviceInfo.supportWpsConfigMethods = 1;
     deviceInfo.deviceCapabilitys = 1;
     deviceInfo.groupCapabilitys = 1;
-    if (strcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), "device") != EOK) {
-        WIFI_LOGE("QueryP2pLocalDeviceTests strcpy_s deviceName Fail!");
-        return;
-    }
+    strcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), "device");
 
-    if (strcpy_s(deviceInfo.primaryDeviceType, sizeof(deviceInfo.primaryDeviceType), "10-0050F204-1") != EOK) {
-        WIFI_LOGE("QueryP2pLocalDeviceTests strcpy_s primaryDeviceType Fail!");
-        return;
-    }
+    strcpy_s(deviceInfo.primaryDeviceType, sizeof(deviceInfo.primaryDeviceType), "10-0050F204-1");
 
-    if (strcpy_s(deviceInfo.secondaryDeviceType, sizeof(deviceInfo.secondaryDeviceType), "10-0050F204-2") != EOK) {
-        WIFI_LOGE("QueryP2pLocalDeviceTests strcpy_s secondaryDeviceType Fail!");
-        return;
-    }
+    strcpy_s(deviceInfo.secondaryDeviceType, sizeof(deviceInfo.secondaryDeviceType), "10-0050F204-2");
+
     QueryP2pLocalDevice(&deviceInfo);
     EXPECT_NE(QueryP2pLocalDevice(&deviceInfo), 1);
 }

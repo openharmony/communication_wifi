@@ -103,6 +103,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
         RegisterFoldStatusListener();
     }
     RegisterDisplayListener();
+    RegisterNetworkConnSubscriber();
 #ifdef HAS_NETMANAGER_EVENT_PART
     RegisterNetmgrEvent();
 #endif
@@ -125,6 +126,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
         UnRegisterFoldStatusListener();
     }
     UnregisterDisplayListener();
+    UnRegisterNetworkConnSubscriber();
 #ifdef HAS_NETMANAGER_EVENT_PART
     UnRegisterNetmgrEvent();
 #endif
@@ -1457,6 +1459,47 @@ void WifiEventSubscriberManager::UnRegisterFoldStatusListener()
     }
     foldStatusListener_ = nullptr;
     WIFI_LOGI("UnRegisterDisplayMode finished");
+}
+
+void WifiEventSubscriberManager::RegisterNetworkConnSubscriber()
+{
+    std::lock_guard<std::mutex> lock(networkConnSubscriberLock_);
+    if (networkConnSubscriber_ == nullptr) {
+        networkConnSubscriber_ = sptr<NetworkConnSubscriber>::MakeSptr();
+    } else {
+        return;
+    }
+    if (networkConnSubscriber_ != nullptr) {
+        int32_t  registerResult = NetManagerStandard::NetConnClient::GetInstance().RegisterNetConnCallback(
+            networkConnSubscriber_);
+        WIFI_LOGI("RegisterNetConnCallback end, registerResult=%{public}d.", registerResult);
+    } else {
+        WIFI_LOGE("Init, NetworkConnSubscriber make sptr error.");
+    }
+}
+
+void WifiEventSubscriberManager::UnRegisterNetworkConnSubscriber()
+{
+    std::lock_guard<std::mutex> lock(networkConnSubscriberLock_);
+    if (networkConnSubscriber_ != nullptr) {
+        int32_t unregisterResult = NetManagerStandard::NetConnClient::GetInstance().UnregisterNetConnCallback(
+            networkConnSubscriber_);
+        WIFI_LOGI("UnregisterNetConnCallback end, result=%{public}d.", unregisterResult);
+        networkConnSubscriber_ = nullptr;
+    }
+}
+
+int NetworkConnSubscriber::NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
+    const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap)
+{
+    const int noValidatedNet = 1;
+    if (netAllCap->netCaps_.find(NetManagerStandard::NET_CAPABILITY_VALIDATED) == netAllCap->netCaps_.end()) {
+        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(0);
+        if (pService != nullptr) {
+            pService->OnNetCapabilitiesChanged(noValidatedNet);
+        }
+    }
+    return 0;
 }
 
 }  // namespace Wifi

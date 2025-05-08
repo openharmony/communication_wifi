@@ -21,6 +21,7 @@
 #include "i_ap_service_callbacks.h"
 #include "i_wifi_country_code_change_listener.h"
 #include "ap_started_state.h"
+#include "ap_network_monitor.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -166,6 +167,7 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetHotspotMode(const HotspotMode &mode);
+    void HandleNetCapabilitiesChanged(const int apStatus);
 private:
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
     public:

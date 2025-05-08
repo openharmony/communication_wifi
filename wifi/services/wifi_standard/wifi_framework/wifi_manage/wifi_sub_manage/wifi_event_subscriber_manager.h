@@ -25,6 +25,10 @@
 #include "common_event_manager.h"
 #include "wifi_event_handler.h"
 #include "display_manager_lite.h"
+#include "net_conn_client.h"
+#include "net_conn_callback_stub.h"
+#include "net_handle.h"
+#include "net_all_capabilities.h"
 namespace OHOS {
 namespace Wifi {
 #ifdef HAS_POWERMGR_PART
@@ -137,6 +141,14 @@ public:
     void OnChange(uint64_t displayId) override;
 };
 
+class NetworkConnSubscriber : public NetManagerStandard::NetConnCallbackStub {
+public:
+    NetworkConnSubscriber() = default;
+    ~NetworkConnSubscriber() = default;
+    int32_t NetCapabilitiesChange(sptr<NetManagerStandard::NetHandle> &netHandle,
+        const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override;
+};
+
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
@@ -210,6 +222,8 @@ private:
     void UnRegisterFoldStatusListener();
     void RegisterDisplayListener();
     void UnregisterDisplayListener();
+    void RegisterNetworkConnSubscriber();
+    void UnRegisterNetworkConnSubscriber();
 
 private:
     uint32_t cesTimerId{0};
@@ -250,6 +264,8 @@ private:
     std::mutex foldStatusListenerMutex_;
     sptr<Rosen::DisplayManagerLite::IDisplayListener> displayStatusListener_ = nullptr;
     std::mutex displayStatusListenerMutex_;
+    std::mutex networkConnSubscriberLock_;
+    sptr<NetworkConnSubscriber> networkConnSubscriber_ = nullptr;
 };
 
 }  // namespace Wifi

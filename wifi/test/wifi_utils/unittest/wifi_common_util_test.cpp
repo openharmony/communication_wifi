@@ -232,8 +232,7 @@ HWTEST_F(WifiCommonUtilTest, isBeaconLostTest, TestSize.Level1)
     WIFI_LOGI("isBeaconLostTest enter");
     std::vector<std::string> bssidArray = {};
     std::vector<WifiSignalPollInfo> wifiBeaconCheckInfoArray ={};
-    int signalLevel = SIGNAL_LEVEL_TWO;
-    bool result = isBeaconLost(bssidArray, wifiBeaconCheckInfoArray, signalLevel);
+    bool result = isBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_FALSE(result);
     WIFI_LOGI("isBeaconLostTest enter");
     bssidArray = {
@@ -251,8 +250,15 @@ HWTEST_F(WifiCommonUtilTest, isBeaconLostTest, TestSize.Level1)
     signalPoll2.timeStamp = 9;
     signalPoll3.timeStamp = 6;
     signalPoll4.timeStamp = 3;
+    signalPoll5.timeStamp = 0;
+    signalPoll0.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll1.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll2.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll3.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll4.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll5.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     wifiBeaconCheckInfoArray ={signalPoll0, signalPoll1, signalPoll2, signalPoll3, signalPoll4, signalPoll5};
-    result = isBeaconLost(bssidArray, wifiBeaconCheckInfoArray, signalLevel);
+    result = isBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_TRUE(result);
 }
 

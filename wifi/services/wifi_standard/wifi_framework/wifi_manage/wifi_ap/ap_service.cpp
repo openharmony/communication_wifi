@@ -69,7 +69,7 @@ ErrCode ApService::EnableHotspot()
     if (!(apStartedState_.StopAp())) {
         WIFI_LOGE("StopAp not going well.");
     }
-    m_ApStateMachine.OnApStateChange(ApState::AP_STATE_IDLE);
+    m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
     return WIFI_OPT_FAILED;
 }
 

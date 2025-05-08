@@ -73,7 +73,7 @@ void ApStateMachine::OnApStateChange(ApState state)
 
     if (state == ApState::AP_STATE_IDLE || state == ApState::AP_STATE_STARTED || state == ApState::AP_STATE_STARTING ||
             state == ApState::AP_STATE_CLOSING) {
-        std::shared_lock<std::shared_mutex> lock(m_callbackMutex);
+        std::unique_lock<std::shared_mutex> lock(m_callbackMutex);
         for (const auto &callBackItem : m_callbacks) {
             if (callBackItem.second.OnApStateChangedEvent != nullptr) {
                 callBackItem.second.OnApStateChangedEvent(state, m_id, static_cast<int>(hotspotMode_));

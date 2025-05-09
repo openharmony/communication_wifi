@@ -19,8 +19,9 @@
 #include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_randommac_helper.h"
+#ifndef OHOS_ARCH_LITE
 #include "display_info.h"
-
+#endif
 DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 
 namespace OHOS {

@@ -23,6 +23,7 @@
 #include <vector>
 #include <mutex>
 
+#include "define.h"
 #include "i_net_conn_service.h"
 #include "net_all_capabilities.h"
 #include "net_supplier_callback_base.h"
@@ -226,7 +227,7 @@ private:
 private:
     uint32_t supplierId{0};
     uint32_t supplierIdForWlan1{0};
-    bool isWifiAvaliable_ = false;
+    bool isWifiAvailable_[STA_INSTANCE_MAX_NUM] = {false};
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
     std::unique_ptr<WifiEventHandler> netAgentEventHandler_ = nullptr;
     std::mutex netAgentMutex_;

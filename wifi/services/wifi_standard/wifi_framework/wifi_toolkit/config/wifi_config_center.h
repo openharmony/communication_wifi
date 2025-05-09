@@ -359,6 +359,7 @@ public:
     void SetAutoConnect(bool autoConnectEnable);
 
     bool GetAutoConnect();
+#ifndef OHOS_ARCH_LITE
     /**
      * @Description set screen state
      *
@@ -371,6 +372,7 @@ public:
      * @return success or not
      */
     bool IsScreenLandscape();
+#endif
     /**
      * @Description get local only hotspot Config
      *

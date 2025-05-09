@@ -163,9 +163,6 @@ TEST_F(ApStateMachineTest, RegisterEventHandler)
 
 TEST_F(ApStateMachineTest, GetPowerModelTest)
 {
-    if (pApStateMachine == nullptr) {
-        return;
-    }
     HotspotMode mode = HotspotMode::NONE;
     pApStateMachine->SetHotspotMode(HotspotMode::SOFTAP);
     pApStateMachine->GetHotspotMode(mode);
@@ -174,9 +171,6 @@ TEST_F(ApStateMachineTest, GetPowerModelTest)
 
 TEST_F(ApStateMachineTest, SetHotspotModeTest)
 {
-    if (pApStateMachine == nullptr) {
-        return;
-    }
     HotspotMode mode = HotspotMode::NONE;
     pApStateMachine->SetHotspotMode(HotspotMode::RPT);
     pApStateMachine->GetHotspotMode(mode);

@@ -97,9 +97,7 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor()));
     pWifiScan->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(pWifiScan->OnRemoteRequest(code, data, reply, option), 1);
 }
@@ -111,15 +109,11 @@ HWTEST_F(WifiScanCallbackStubTest, OnRemoteRequestTest1, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    if (!data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor()));
     pWifiScan->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiScanCallback> userCallback =  new (std::nothrow) IWifiScanCallbackMock();
     pWifiScan->RegisterCallBack(userCallback);
-    if (!data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiScanCallback::GetDescriptor()));
     pWifiScan->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(pWifiScan->OnRemoteRequest(code, data, reply, option), 1);
 }

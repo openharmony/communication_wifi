@@ -83,13 +83,10 @@ public:
     void GetScanInfoListSucess()
     {
         WifiScanInfo result;
-        if (strcpy_s(result.ssid, sizeof(result.ssid), "networkId") != EOK) {
-            return;
-        }
 
-        if (memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            return;
-        }
+        strcpy_s(result.ssid, sizeof(result.ssid), "networkId");
+
+        memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
         result.securityType = TYPE_OPEN;
         result.rssi = RSSI;
         result.frequency = FREQUENCY;
@@ -115,17 +112,12 @@ public:
     {
         int result = 0;
         WifiDeviceConfig config;
-        if (strcpy_s(config.ssid, sizeof(config.ssid), "networkId") != EOK) {
-            return;
-        }
 
-        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            return;
-        }
+        strcpy_s(config.ssid, sizeof(config.ssid), "networkId");
 
-        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
-            return;
-        }
+        memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
+
+        strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678");
         config.securityType = TYPE_OPEN;
         config.netId = NETWORK_ID;
         config.freq = FREQUENCY;
@@ -137,20 +129,11 @@ public:
         WIFI_LOGI("AddDeviceConfigFail2 enter");
         int result = 0;
         WifiDeviceConfig config;
-        if (strcpy_s(config.ssid, sizeof(config.ssid), "1networkId1networkId1networkId12") != EOK) {
-            WIFI_LOGE("AddDeviceConfigFail2 strcpy_s ssid Fail!");
-            return;
-        }
 
-        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            WIFI_LOGE("AddDeviceConfigFail2 memcpy_s bssid Fail!");
-            return;
-        }
+        strcpy_s(config.ssid, sizeof(config.ssid), "1networkId1networkId1networkId12");
+        memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
 
-        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
-            WIFI_LOGE("AddDeviceConfigFail2 strcpy_s preSharedKey Fail!");
-            return;
-        }
+        strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678");
         config.securityType = TYPE_OPEN;
         config.netId = NETWORK_ID;
         config.freq = FREQUENCY;
@@ -162,21 +145,11 @@ public:
         WIFI_LOGI("AddDeviceConfigFail3 enter");
         int result = 0;
         WifiDeviceConfig config;
-        if (strcpy_s(config.ssid, sizeof(config.ssid), "networkId") != EOK) {
-            WIFI_LOGE("AddDeviceConfigFail3 strcpy_s ssid Fail!");
-            return;
-        }
 
-        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            WIFI_LOGE("AddDeviceConfigFail3 memcpy_s bssid Fail!");
-            return;
-        }
-
-        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey),
-            "1234567892123456789212345678921234567892123456789212345678921234") != EOK) {
-            WIFI_LOGE("AddDeviceConfigFail3 strcpy_s preSharedKey Fail!");
-            return;
-        }
+        strcpy_s(config.ssid, sizeof(config.ssid), "networkId");
+        memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
+        strcpy_s(config.preSharedKey, sizeof(config.preSharedKey),
+             "1234567892123456789212345678921234567892123456789212345678921234");
         config.securityType = TYPE_OPEN;
         config.netId = NETWORK_ID;
         config.freq = FREQUENCY;
@@ -187,17 +160,9 @@ public:
     {
         unsigned int mSize = 0;
         WifiDeviceConfig result;
-        if (strcpy_s(result.ssid, sizeof(result.ssid), "networkId") != EOK) {
-            return;
-        }
-
-        if (memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            return;
-        }
-
-        if (strcpy_s(result.preSharedKey, sizeof(result.preSharedKey), "12345678") != EOK) {
-            return;
-        }
+        strcpy_s(result.ssid, sizeof(result.ssid), "networkId");
+        memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
+        strcpy_s(result.preSharedKey, sizeof(result.preSharedKey), "12345678");
         result.securityType = TYPE_OPEN;
         result.netId = NETWORK_ID;
         result.freq = FREQUENCY;
@@ -209,20 +174,9 @@ public:
         WIFI_LOGI("GetDeviceConfigsFail enter");
         unsigned int mSize = 0;
         WifiDeviceConfig result;
-        if (strcpy_s(result.ssid, sizeof(result.ssid), "networkId") != EOK) {
-            WIFI_LOGE("GetDeviceConfigsFail strcpy_s ssid Fail!");
-            return;
-        }
-
-        if (memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            WIFI_LOGE("GetDeviceConfigsFail memcpy_s bssid Fail!");
-            return;
-        }
-
-        if (strcpy_s(result.preSharedKey, sizeof(result.preSharedKey), "12345678") != EOK) {
-            WIFI_LOGE("GetDeviceConfigsFail strcpy_s preSharedKey Fail!");
-            return;
-        }
+        strcpy_s(result.ssid, sizeof(result.ssid), "networkId");
+        memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
+        strcpy_s(result.preSharedKey, sizeof(result.preSharedKey), "12345678");
         result.securityType = TYPE_OPEN;
         result.netId = NETWORK_ID;
         result.freq = FREQUENCY;
@@ -257,17 +211,11 @@ public:
     void ConnectToDeviceSuccess()
     {
         WifiDeviceConfig config;
-        if (strcpy_s(config.ssid, sizeof(config.ssid), "networkId") != EOK) {
-            return;
-        }
+        strcpy_s(config.ssid, sizeof(config.ssid), "networkId");
 
-        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            return;
-        }
+        memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
 
-        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
-            return;
-        }
+        strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678");
         config.netId = NETWORK_ID;
         config.freq = FREQUENCY;
         EXPECT_TRUE(ConnectToDevice(&config) != WIFI_SUCCESS);
@@ -277,20 +225,12 @@ public:
     {
         WIFI_LOGI("ConnectToDeviceFail enter");
         WifiDeviceConfig config;
-        if (strcpy_s(config.ssid, sizeof(config.ssid), "1networkId1networkId1networkId12") != EOK) {
-            WIFI_LOGE("ConnectToDeviceFail strcpy_s ssid Fail!");
-            return;
-        }
 
-        if (memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            WIFI_LOGE("ConnectToDeviceFail memcpy_s bssid Fail!");
-            return;
-        }
+        strcpy_s(config.ssid, sizeof(config.ssid), "1networkId1networkId1networkId12");
 
-        if (strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678") != EOK) {
-            WIFI_LOGE("ConnectToDeviceFail strcpy_s preSharedKey Fail!");
-            return;
-        }
+        memcpy_s(config.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
+
+        strcpy_s(config.preSharedKey, sizeof(config.preSharedKey), "12345678");
         config.netId = NETWORK_ID;
         config.freq = FREQUENCY;
         EXPECT_TRUE(ConnectToDevice(&config) != WIFI_SUCCESS);
@@ -304,13 +244,9 @@ public:
     void GetLinkedInfoSuccess()
     {
         WifiLinkedInfo result;
-        if (strcpy_s(result.ssid, sizeof(result.ssid), "networkId") != EOK) {
-            return;
-        }
+        strcpy_s(result.ssid, sizeof(result.ssid), "networkId");
 
-        if (memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            return;
-        }
+        memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
         result.frequency = FREQUENCY;
         result.connState = WIFI_CONNECTED;
         EXPECT_TRUE(GetLinkedInfo(&result) != WIFI_SUCCESS);
@@ -325,13 +261,8 @@ public:
     void AdvanceScanSuccess()
     {
         WifiScanParams params;
-        if (strcpy_s(params.ssid, sizeof(params.ssid), "networkId") != EOK) {
-            return;
-        }
-
-        if (memcpy_s(params.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1) != EOK) {
-            return;
-        }
+        strcpy_s(params.ssid, sizeof(params.ssid), "networkId");
+        memcpy_s(params.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
         params.scanType = WIFI_FREQ_SCAN;
         params.freqs = FREQUENCY;
         params.band = BAND;

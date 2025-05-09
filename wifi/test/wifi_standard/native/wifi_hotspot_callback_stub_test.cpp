@@ -156,9 +156,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_003, TestSize.Level1)
     MessageParcel reply;
     MessageOption option;
     uint32_t code = 0;
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor()));
     data.WriteInt32(1);
     EXPECT_TRUE(pWifiHotspot->OnRemoteRequest(code, data, reply, option) == -1);
 }
@@ -175,9 +173,7 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnRemoteRequest_004, TestSize.Level1)
     MessageParcel reply;
     MessageOption option;
     uint32_t code = 1;
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor()));
     data.WriteInt32(0);
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
@@ -195,15 +191,11 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStateChanged_001, TestSize.Level1
     MessageParcel reply;
     MessageOption option;
     uint32_t code = static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_CHANGE);
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor()));
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
     pWifiHotspot->RegisterCallBack(userCallback);
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor()));
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
@@ -220,15 +212,11 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaJoin_001, TestSize.Level1)
     MessageParcel reply;
     MessageOption option;
     uint32_t code = static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_JOIN);
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor()));
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
     pWifiHotspot->RegisterCallBack(userCallback);
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor()));
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }
@@ -245,15 +233,11 @@ HWTEST_F(WifiHotspotCallbackStubTest, OnHotspotStaLeave_001, TestSize.Level1)
     MessageParcel reply;
     MessageOption option;
     uint32_t code = static_cast<uint32_t>(HotspotInterfaceCode::WIFI_CBK_CMD_HOTSPOT_STATE_LEAVE);
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor()));
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     sptr<IWifiHotspotCallback> userCallback =  new (std::nothrow) IWifiHotspotCallbackMock();
     pWifiHotspot->RegisterCallBack(userCallback);
-    if (!data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor())) {
-        return;
-    }
+    EXPECT_TRUE(data.WriteInterfaceToken(IWifiHotspotCallback::GetDescriptor()));
     pWifiHotspot->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(pWifiHotspot->OnRemoteRequest(code, data, reply, option), 1);
 }

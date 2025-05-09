@@ -38,7 +38,6 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
-#include "display_manager_lite.h"
 #include "display_info.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 

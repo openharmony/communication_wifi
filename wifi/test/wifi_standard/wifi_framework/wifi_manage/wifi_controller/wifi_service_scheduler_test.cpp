@@ -30,6 +30,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+constexpr int TEN = 10;
 
 namespace OHOS {
 namespace Wifi {
@@ -41,6 +42,7 @@ static std::string g_errLog;
     {
         g_errLog = msg;
     }
+static std::unique_ptr<WifiServiceScheduler> pWifiServiceScheduler;
 class WifiServiceSchedulerTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -50,6 +52,8 @@ public:
 
     static void TearDownTestCase()
     {
+        sleep(TEN);
+        pWifiServiceScheduler.reset();
         WifiManager::GetInstance().Exit();
     }
 
@@ -61,10 +65,8 @@ public:
 
     virtual void TearDown()
     {
-        pWifiServiceScheduler.reset();
+        WifiAppStateAware::GetInstance().appChangeEventHandler->RemoveAsyncTask("WIFI_APP_STATE_EVENT");
     }
-
-    std::unique_ptr<WifiServiceScheduler> pWifiServiceScheduler;
 
     void AutoStartStaServiceTest()
     {

@@ -1555,6 +1555,7 @@ void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotCon
     localOnlyHotspotConfig_ = hotspotConfig;
 }
 
+#ifndef OHOS_ARCH_LITE
 void WifiConfigCenter::SetScreenDispalyState(int32_t orientation)
 {
     screenDisplayOrientation.store(orientation);
@@ -1565,5 +1566,6 @@ bool WifiConfigCenter::IsScreenLandscape()
     return screenDisplayOrientation.load() == static_cast<int32_t>(Rosen::DisplayOrientation::LANDSCAPE) ||
            screenDisplayOrientation.load() == static_cast<int32_t>(Rosen::DisplayOrientation::LANDSCAPE_INVERTED);
 }
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

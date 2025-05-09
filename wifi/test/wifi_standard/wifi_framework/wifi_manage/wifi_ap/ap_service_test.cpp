@@ -280,9 +280,6 @@ HWTEST_F(ApService_test, OnWifiCountryCodeChangedSuccess, TestSize.Level1)
 HWTEST_F(ApService_test, GetPowerModelTest, TestSize.Level1)
 {
     WIFI_LOGI("GetPowerModelTest enter");
-    if (pApService == nullptr) {
-        return;
-    }
     HotspotMode mode = HotspotMode::NONE;
     pApService->SetHotspotMode(HotspotMode::SOFTAP);
     pApService->GetHotspotMode(mode);
@@ -292,9 +289,6 @@ HWTEST_F(ApService_test, GetPowerModelTest, TestSize.Level1)
 HWTEST_F(ApService_test, SetHotspotModeTest, TestSize.Level1)
 {
     WIFI_LOGI("SetHotspotModeTest enter");
-    if (pApService == nullptr) {
-        return;
-    }
     HotspotMode mode = HotspotMode::NONE;
     pApService->SetHotspotMode(HotspotMode::RPT);
     pApService->GetHotspotMode(mode);

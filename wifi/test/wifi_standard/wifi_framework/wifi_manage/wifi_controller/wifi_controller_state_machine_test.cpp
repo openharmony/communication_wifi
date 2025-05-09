@@ -679,9 +679,6 @@ HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeForWlan1Test02, TestSi
 
 HWTEST_F(WifiControllerMachineTest, IsLocalOnlyHotspotTest, TestSize.Level1)
 {
-    if (pWifiControllerMachine == nullptr) {
-        return;
-    }
     pWifiControllerMachine->IsLocalOnlyHotspot(true);
     EXPECT_TRUE(pWifiControllerMachine->isLocalOnlyHotspot_);
 }

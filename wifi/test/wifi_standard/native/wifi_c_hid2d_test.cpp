@@ -87,9 +87,7 @@ HWTEST_F(WifiHid2dTest, Hid2dConfigIPAddrTests, TestSize.Level1)
 {
     char ifName[IF_NAME_LEN];
     IpAddrInfo ipInfo;
-    if (memcpy_s(ipInfo.ip, sizeof(IP), IP, sizeof(IP)) != EOK) {
-        return;
-    }
+    memcpy_s(ipInfo.ip, sizeof(IP), IP, sizeof(IP));
     Hid2dConfigIPAddr(ifName, &ipInfo);
     EXPECT_EQ(Hid2dConfigIPAddr(ifName, &ipInfo), -128);
 }

@@ -185,6 +185,10 @@ if (defined(ohos_lite)) {
 
     defines += [ "FEATURE_SELF_CURE_SUPPORT" ]
 
+    if (wifi_feature_with_wifi_oeminfo_mac) {
+      defines += [ "READ_MAC_FROM_OEM" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",

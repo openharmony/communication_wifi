@@ -526,12 +526,14 @@ bool NotNetworkBlackListFilter::Filter(NetworkCandidate &networkCandidate)
     int32_t targetSignalLevel = WifiSettings::GetInstance().GetSignalLevel(scanInfo.rssi, scanInfo.band);
     if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(networkCandidate.interScanInfo.bssid) &&
         (targetSignalLevel <= SIGNAL_LEVEL_THREE || targetSignalLevel - curSignalLevel < MIN_SIGNAL_LEVEL_INTERVAL)) {
+        if (linkedInfo.detailedState == DetailedState::NOTWORKING && targetSignalLevel >= SIGNAL_LEVEL_THREE) {
+            WIFI_LOGI("NotNetworkBlockListFilter, ignore blocklist, targetSignalLevel >= 3, candidate:%{public}s",
+                networkCandidate.ToString().c_str());
+            return true;
+        }
         WIFI_LOGI("NotNetworkBlackListFilter, in wifi blocklist, targetSignalLevel:%{public}d, "
             "curSignalLevel:%{public}d, skip candidate:%{public}s",
             targetSignalLevel, curSignalLevel, networkCandidate.ToString().c_str());
-        if (linkedInfo.detailedState == DetailedState::NOTWORKING && targetSignalLevel >= SIGNAL_LEVEL_THREE) {
-            WIFI_LOGI("NotNetworkBlockListFilter, ignore blocklist, targetSignalLevel >= 3");
-        }
         networkCandidate.filtedReason[filterName].insert(FiltedReason::BLOCKLIST_AP);
         return false;
     }
@@ -609,6 +611,14 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
         WIFI_LOGI("ValidConfigNetworkFilter, no internet access, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());
         networkCandidate.filtedReason[filterName].insert(FiltedReason::NO_INTERNET);
+        return false;
+    }
+
+    // status history < 80%
+    if (!NetworkStatusHistoryManager::IsInternetAccessByHistory(wifiDeviceConfig.networkStatusHistory)) {
+        WIFI_LOGI("ValidConfigNetworkFilter, current network status history is %{public}s., skip : %{public}s",
+            NetworkStatusHistoryManager::ToString(wifiDeviceConfig.networkStatusHistory).c_str(),
+            networkCandidate.ToString().c_str());
         return false;
     }
 

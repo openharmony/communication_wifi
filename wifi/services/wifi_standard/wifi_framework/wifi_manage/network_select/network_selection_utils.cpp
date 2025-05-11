@@ -105,7 +105,7 @@ std::string NetworkSelectionUtils::GetScoreResultsInfo(const std::vector<ScoreRe
 
 bool NetworkSelectionUtils::IsConfigOpenType(const NetworkCandidate &networkCandidate)
 {
-    return !(IsOpenNetwork(networkCandidate) || NetworkSelectionUtils::IsScanResultForOweNetwork(networkCandidate)) &&
+    return (IsOpenNetwork(networkCandidate) || NetworkSelectionUtils::IsScanResultForOweNetwork(networkCandidate)) &&
         !HasWepKeys(networkCandidate.wifiDeviceConfig);
 }
 

@@ -269,6 +269,30 @@ HWTEST_F(WifiProStateMachineTest, IsSatisfiedWifi2WifiConditionTest01, TestSize.
     EXPECT_EQ(pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
 
+HWTEST_F(WifiProStateMachineTest, ProcessSwitchResultTest01, TestSize.Level1)
+{
+    pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
+    pWifiProStateMachine_->targetBssid_ = "111";
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.bssid = "111";
+    msg->SetMessageObj(linkedInfo);
+    pWifiProStateMachine_->ProcessSwitchResult(msg);
+    EXPECT_EQ(pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+}
+
+HWTEST_F(WifiProStateMachineTest, ProcessSwitchResultTest02, TestSize.Level1)
+{
+    pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
+    pWifiProStateMachine_->targetBssid_ = "111";
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.bssid = "222";
+    msg->SetMessageObj(linkedInfo);
+    pWifiProStateMachine_->ProcessSwitchResult(msg);
+    EXPECT_EQ(pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+}
+
 HWTEST_F(WifiProStateMachineTest, TryNoNetSwitchTest, TestSize.Level1)
 {
     NetworkSelectionResult networkSelectionResult;

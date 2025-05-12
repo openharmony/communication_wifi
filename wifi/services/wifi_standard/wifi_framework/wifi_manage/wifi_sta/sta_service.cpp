@@ -519,7 +519,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     WifiSettings::GetInstance().SyncDeviceConfig();
     NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
 #ifndef OHOS_ARCH_LITE
-    WifiHistoryRecordManager::GetInstance().DeleteApInfo(config.ssid, config.bssid);
+    WifiHistoryRecordManager::GetInstance().DeleteApInfo(config.ssid, config.keyMgmt);
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
     if (!wifiBrokerFrameProcessName.empty() && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {

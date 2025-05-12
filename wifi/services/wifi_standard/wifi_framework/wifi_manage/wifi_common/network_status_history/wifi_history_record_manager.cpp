@@ -31,7 +31,6 @@ DEFINE_WIFILOG_LABEL("WifiHistoryRecordManager");
 const std::string WIFI_HISTORY_RECORD_MANAGER_CLASS_NAME = "WifiHistoryRecordManager";
 const std::string PERIODIC_UPDATE_AP_INFO_THREAD = "PeriodicUpdateApInfoThread";
 const std::string UPDATE_AP_INFO_TASK = "UpdateApInfoTask";
-const std::string AP_CONNECTION_DURATION_INFO_TABLE_NAME = "ap_connection_duration_info";
 const std::string NETWORK_ID = "networkId";
 const std::string SSID = "ssid";
 const std::string BSSID = "bssid";
@@ -47,6 +46,7 @@ constexpr const char* UPDATE_CONNECT_TIME_RECORD_INTERVAL_DEFAULT = "1800000";  
 constexpr int64_t SECOND_OF_ONE_DAY = 60 * 60 * 24;
 constexpr int64_t SECOND_OF_HALF_HOUR = 30 * 60;
 constexpr int64_t SECOND_OF_ONE_HOUR = 60 * 60;
+constexpr int64_t SECOND_OF_TEN_HOUR = 60 * 60 * 10;
 constexpr int64_t SECOND_OF_ONE_MINUTE = 60;
 constexpr int64_t START_SECOND_OF_DAY = 0;
 constexpr int64_t END_SECONDS_OF_DAY = (23 * SECOND_OF_ONE_HOUR + 59 * SECOND_OF_ONE_MINUTE + 59);
@@ -63,7 +63,9 @@ constexpr int UPDATE_CONNECT_TIME_RECORD_INTERVAL_SIZE = 16;
 constexpr int GET_DEVICE_CONFIG_SUCCESS = 0;
 constexpr int TO_KEEP_TWO_DECIMAL = 100;
 constexpr int INVALID_TIME_RECORD_INTERVAL = 0;
-constexpr int TEN_DAY = 10;
+constexpr int ENTERPRISE_AP_NUM = 20;
+constexpr int DELETE_AP_NUM = 5;
+constexpr int MAX_NUM_OF_SAVED_AP = 500;
 
 WifiHistoryRecordManager &WifiHistoryRecordManager::GetInstance()
 {
@@ -114,23 +116,28 @@ StaServiceCallback WifiHistoryRecordManager::GetStaCallback() const
 
 void WifiHistoryRecordManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    if (instId != INSTID_WLAN0) {
+if (instId != INSTID_WLAN0 || info.networkId == INVALID_NETWORK_ID || info.bssid.empty() ||
+        (state != OperateResState::DISCONNECT_DISCONNECTED && state != OperateResState::CONNECT_AP_CONNECTED)) {
         return;
     }
+    WIFI_LOGI("HandleConnectionChange, state=%{public}d(24:disconn, 17:conn), networkId=%{public}d, "
+        "ssid=%{public}s, bssid=%{public}s", static_cast<int>(state), info.networkId,
+        SsidAnonymize(info.ssid).c_str(), MacAnonymize(info.bssid).c_str());
     WifiDeviceConfig config;
     int ret = WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config, instId);
-    if (IsEnterprise(config)) {
+    if (CheckIsEnterpriseAp(config)) {
+        RecordToEapApTable(config);
         WIFI_LOGI("enterprise AP, not record, ssid=%{public}s, keyMgmt=%{public}s, state=%{public}d",
             SsidAnonymize(info.ssid).c_str(), config.keyMgmt.c_str(), static_cast<int>(state));
         return;
     }
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
-        WIFI_LOGI("deal disconnected, networkId=%{public}d, ssid=%{public}s, bssid=%{public}s",
-            info.networkId, SsidAnonymize(info.ssid).c_str(), MacAnonymize(info.bssid).c_str());
         StopUpdateApInfoTimer();
 
-        // If the saved network does not exist, maybe disconnect caused by deletion, do not update and save
-        if (ret == GET_DEVICE_CONFIG_SUCCESS) {
+        // 1.If the saved network does not exist, maybe disconnect caused by deletion, do not update and save.
+        // 2.The system checks whether networkId_ is a valid value to ensure that the current state is connected
+        // and the connection time can be updated.
+        if (ret == GET_DEVICE_CONFIG_SUCCESS && connectedApInfo_.networkId_ != INVALID_NETWORK_ID) {
             UpdateConnectionTime(false);
         }
         ClearConnectedApInfo();
@@ -141,11 +148,10 @@ void WifiHistoryRecordManager::DealStaConnChanged(OperateResState state, const W
 
 void WifiHistoryRecordManager::HandleWifiConnectedMsg(const WifiLinkedInfo &info, const WifiDeviceConfig &config)
 {
-    if (info.bssid.empty() || info.bssid == connectedApInfo_.bssid_) {
+    if (info.bssid == connectedApInfo_.bssid_) {
+        WIFI_LOGI("already connected, bssid=%{public}s", MacAnonymize(connectedApInfo_.bssid_).c_str());
         return;
     }
-    WIFI_LOGI("deal connected, ssid=%{public}s, bssid=%{public}s", SsidAnonymize(info.ssid).c_str(),
-        MacAnonymize(info.bssid).c_str());
     if (info.networkId == connectedApInfo_.networkId_) {
         WIFI_LOGI("roam, networkId=%{public}d, last bssid=%{public}s", info.networkId,
             MacAnonymize(connectedApInfo_.bssid_).c_str());
@@ -158,27 +164,25 @@ void WifiHistoryRecordManager::HandleWifiConnectedMsg(const WifiLinkedInfo &info
     connectedApInfo_.ssid_ = info.ssid;
     connectedApInfo_.bssid_ = info.bssid;
     connectedApInfo_.currentConnectedTime_ = currentTime;
-    ConnectedApInfo dbApInfo;
-    int queryRet = QueryApInfoRecordByBssid(connectedApInfo_.bssid_, dbApInfo);
+    connectedApInfo_.keyMgmt_ = config.keyMgmt;
+    std::vector<ConnectedApInfo> dbApInfoVector;
+    int queryRet = QueryApInfoRecordByParam({{BSSID, config.bssid}}, dbApInfoVector);
     if (queryRet == QUERY_NO_RECORD) {  // First connect
-        connectedApInfo_.keyMgmt_ = config.keyMgmt;
         connectedApInfo_.firstConnectedTime_ = currentTime;
-    } else {
+    } else if (queryRet == QUERY_HAS_RECORD) {
+        ConnectedApInfo dbApInfo = dbApInfoVector.front();
         connectedApInfo_.keyMgmt_ = dbApInfo.keyMgmt_;
         connectedApInfo_.firstConnectedTime_ = dbApInfo.firstConnectedTime_;
         connectedApInfo_.totalUseTime_ = dbApInfo.totalUseTime_;
         connectedApInfo_.totalUseTimeAtNight_ = dbApInfo.totalUseTimeAtNight_;
         connectedApInfo_.totalUseTimeAtWeekend_ = dbApInfo.totalUseTimeAtWeekend_;
         connectedApInfo_.markedAsHomeApTime_ = dbApInfo.markedAsHomeApTime_;
+    } else {
+        WIFI_LOGE("ssid=%{public}s connected, but query failed, not counted", SsidAnonymize(info.ssid).c_str());
+        ClearConnectedApInfo();
+        return;
     }
     UpdateConnectionTime(true);
-}
-
-bool WifiHistoryRecordManager::IsEnterprise(const WifiDeviceConfig &config)
-{
-    bool isEnterpriseSecurityType = (config.keyMgmt == KEY_MGMT_EAP) ||
-        (config.keyMgmt == KEY_MGMT_SUITE_B_192) || (config.keyMgmt == KEY_MGMT_WAPI_CERT);
-    return isEnterpriseSecurityType && (config.wifiEapConfig.eap != EAP_METHOD_NONE);
 }
 
 void WifiHistoryRecordManager::NextUpdateApInfoTimer()
@@ -234,7 +238,7 @@ bool WifiHistoryRecordManager::CheckIsHomeAp()
     // 2.The duration of night and weekend use should account for more than 50% of the total usage time
     // 3.On average, it takes 30 minutes to use at night and 30 minutes on weekends
     bool ret = false;
-    if ((connectedApInfo_.totalUseTime_ > SECOND_OF_ONE_HOUR * TEN_DAY) && (restTimeRate > HOME_AP_MIN_TIME_RATE) &&
+    if ((connectedApInfo_.totalUseTime_ > SECOND_OF_TEN_HOUR) && (restTimeRate > HOME_AP_MIN_TIME_RATE) &&
         (dayAvgRestTime >= SECOND_OF_HALF_HOUR)) {
         ret = true;
     }
@@ -403,16 +407,16 @@ void WifiHistoryRecordManager::AddOrUpdateApInfoRecord()
             SsidAnonymize(connectedApInfo_.ssid_).c_str());
         return;
     }
-    ConnectedApInfo dbApInfo;
-    int queryRet = QueryApInfoRecordByBssid(connectedApInfo_.bssid_, dbApInfo);
+    std::vector<ConnectedApInfo> dbConnectedApInfo;
+    int queryRet = QueryApInfoRecordByParam({{BSSID, connectedApInfo_.bssid_}}, dbConnectedApInfo)
     if (queryRet == QUERY_NO_RECORD) {
+        HandleOldHistoryRecord();
         bool executeRet = wifiDataBaseUtils_->Insert(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
             CreateApInfoBucket(connectedApInfo_));
         WIFI_LOGI("insert ap info, ret=%{public}d", executeRet);
         return;
     } else if (queryRet == QUERY_HAS_RECORD) {
         NativeRdb::AbsRdbPredicates predicates(AP_CONNECTION_DURATION_INFO_TABLE_NAME);
-        predicates.EqualTo(SSID, connectedApInfo_.ssid_);
         predicates.EqualTo(BSSID, connectedApInfo_.bssid_);
         NativeRdb::ValuesBucket values = CreateApInfoBucket(connectedApInfo_);
         bool executeRet = wifiDataBaseUtils_->Update(values, predicates);
@@ -422,22 +426,35 @@ void WifiHistoryRecordManager::AddOrUpdateApInfoRecord()
     WIFI_LOGE("%{public}s fail", __func__);
 }
 
-void WifiHistoryRecordManager::RemoveApInfoRecord(const std::string &bssid)
+nt WifiHistoryRecordManager::RemoveApInfoRecordByParam(const std::string tableName,
+    const std::map<std::string, std::string> &deleteParms)
 {
     std::lock_guard<std::recursive_mutex> lock(updateApInfoMutex_);
     if (wifiDataBaseUtils_ == nullptr) {
-        WIFI_LOGE("RemoveApInfoRecord fail, wifiDataBaseUtils_ is nullptr");
-        return;
+        WIFI_LOGE("RemoveApInfoRecord(%{public}s) fail, wifiDataBaseUtils_ is nullptr", tableName.c_str());
+        return 0;
     }
-    NativeRdb::AbsRdbPredicates predicates(AP_CONNECTION_DURATION_INFO_TABLE_NAME);
-    predicates.EqualTo(BSSID, bssid);
+    NativeRdb::AbsRdbPredicates predicates(tableName);
+    if (!deleteParms.empty()) {
+
+        auto it = deleteParms.begin();
+        auto end = deleteParms.end();
+        while (it != end) {
+            auto nextIt = std::next(it);
+            predicates.EqualTo(it->first, it->second);
+            if (nextIt != end) {
+                predicates.And();
+            }
+            ++it;
+        }
+    } 
     int deleteRowCount = 0;
-    bool executeRet = wifiDataBaseUtils_->Delete(deleteRowCount, predicates);
-    WIFI_LOGI("remove ap info, executeRet=%{public}d, deleteRowCount=%{public}d, bssid=%{public}s",
-        executeRet, deleteRowCount, MacAnonymize(bssid).c_str());
+    wifiDataBaseUtils_->Delete(deleteRowCount, predicates);
+    return deleteRowCount;
 }
 
-int WifiHistoryRecordManager::QueryApInfoRecordByBssid(const std::string &bssid, ConnectedApInfo &dbApInfo)
+int WifiHistoryRecordManager::QueryApInfoRecordByParam(const std::map<std::string, std::string> &queryParms,
+    std::vector<ConnectedApInfo> &dbApInfoVector)
 {
     std::lock_guard<std::recursive_mutex> lock(updateApInfoMutex_);
     if (wifiDataBaseUtils_ == nullptr) {
@@ -445,44 +462,18 @@ int WifiHistoryRecordManager::QueryApInfoRecordByBssid(const std::string &bssid,
         return QUERY_FAILED;
     }
     NativeRdb::AbsRdbPredicates predicates(AP_CONNECTION_DURATION_INFO_TABLE_NAME);
-    predicates.EqualTo(BSSID, bssid);
-    std::vector<std::string> queryAllColumn;
-    auto resultSet = wifiDataBaseUtils_->Query(predicates, queryAllColumn);
-    if (resultSet == nullptr) {
-        WIFI_LOGE("%{public}s, query fail", __func__);
-        return QUERY_FAILED;
+    if (!queryParms.empty()) {
+        auto it = queryParms.begin();
+        auto end = queryParms.end();
+        while (it != end) {
+            auto nextIt = std::next(it);
+            predicates.EqualTo(it->first, it->second);
+            if (nextIt != end) {
+                predicates.And();
+            }
+            ++it;
+        }
     }
-    int32_t resultSetNum = resultSet->GoToFirstRow();
-    if (resultSetNum != NativeRdb::E_OK) {
-        resultSet->Close();
-        WIFI_LOGI("%{public}s, query empty", __func__);
-        return QUERY_NO_RECORD;
-    }
-    int32_t columnCnt = 0;
-    resultSet->GetInt(columnCnt++, dbApInfo.networkId_);
-    resultSet->GetString(columnCnt++, dbApInfo.ssid_);
-    resultSet->GetString(columnCnt++, dbApInfo.bssid_);
-    resultSet->GetString(columnCnt++, dbApInfo.keyMgmt_);
-    resultSet->GetLong(columnCnt++, dbApInfo.firstConnectedTime_);
-    resultSet->GetLong(columnCnt++, dbApInfo.currentConnectedTime_);
-    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTime_);
-    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtNight_);
-    resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtWeekend_);
-    resultSet->GetLong(columnCnt++, dbApInfo.markedAsHomeApTime_);
-    resultSet->Close();
-    WIFI_LOGI("%{public}s success, ssid=%{public}s, bssid=%{public}s",
-        __func__, SsidAnonymize(dbApInfo.ssid_).c_str(), MacAnonymize(dbApInfo.bssid_).c_str());
-    return QUERY_HAS_RECORD;
-}
-
-int WifiHistoryRecordManager::QueryAllApInfoRecord(std::vector<ConnectedApInfo> &dbApInfoVector)
-{
-    std::lock_guard<std::recursive_mutex> lock(updateApInfoMutex_);
-    if (wifiDataBaseUtils_ == nullptr) {
-        WIFI_LOGE("QueryAllApInfoRecord fail, wifiDataBaseUtils_ is nullptr");
-        return QUERY_FAILED;
-    }
-    NativeRdb::AbsRdbPredicates predicates(AP_CONNECTION_DURATION_INFO_TABLE_NAME);
     std::vector<std::string> queryAllColumn;
     auto resultSet = wifiDataBaseUtils_->Query(predicates, queryAllColumn);
     if (resultSet == nullptr) {
@@ -508,7 +499,7 @@ int WifiHistoryRecordManager::QueryAllApInfoRecord(std::vector<ConnectedApInfo> 
         resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtNight_);
         resultSet->GetLong(columnCnt++, dbApInfo.totalUseTimeAtWeekend_);
         resultSet->GetLong(columnCnt++, dbApInfo.markedAsHomeApTime_);
-        dbApInfoVector.push_back(dbApInfo);
+        dbApInfoVector.emplace_back(dbApInfo);
     } while (resultSet->GoToNextRow() == NativeRdb::E_OK);
     resultSet->Close();
     return QUERY_HAS_RECORD;
@@ -528,6 +519,131 @@ NativeRdb::ValuesBucket WifiHistoryRecordManager::CreateApInfoBucket(const Conne
     apInfoBucket.PutLong(TOTAL_USE_TIME_AT_WEEKEND, apInfo.totalUseTimeAtWeekend_);
     apInfoBucket.PutLong(MARKED_AS_HOME_AP_TIME, apInfo.markedAsHomeApTime_);
     return apInfoBucket;
+}
+
+bool WifiHistoryRecordManager::AddEnterpriseApRecord(const EnterpriseApInfo &enterpriseApInfo)
+{
+    std::lock_guard<std::recursive_mutex> lock(updateApInfoMutex_);
+    if (wifiDataBaseUtils_ == nullptr) {
+        WIFI_LOGE("%{public}s fail, wifiDataBaseUtils_ is nullptr", __func__);
+        return false;
+    }
+ 
+    std::vector<EnterpriseApInfo> dbEnterpriseApInfo;
+    int queryRet = QueryEnterpriseApRecordByParam(
+        {{SSID, enterpriseApInfo.ssid_}, {KEY_MGMT, enterpriseApInfo.keyMgmt_}}, dbEnterpriseApInfo);
+    if (queryRet == QUERY_NO_RECORD) {
+        bool executeRet = wifiDataBaseUtils_->Insert(ENTERPRISE_AP_INFO_TABLE_NAME,
+            CreateEnterpriseApInfoBucket(enterpriseApInfo));
+        WIFI_LOGI("%{public}s, ret=%{public}d", __func__, executeRet);
+        return executeRet;
+    } else if (queryRet == QUERY_HAS_RECORD) {
+        WIFI_LOGI("%{public}s, already exists", __func__);
+        return true;
+    }
+    WIFI_LOGE("%{public}s fail", __func__);
+    return false;
+}
+ 
+int WifiHistoryRecordManager::QueryEnterpriseApRecordByParam(const std::map<std::string, std::string> &queryParms,
+    std::vector<EnterpriseApInfo> &dbEnterpriseApInfoVector)
+{
+    std::lock_guard<std::recursive_mutex> lock(updateApInfoMutex_);
+    if (wifiDataBaseUtils_ == nullptr) {
+        WIFI_LOGE("%{public}s fail, wifiDataBaseUtils_ is nullptr", __func__);
+        return QUERY_FAILED;
+    }
+    NativeRdb::AbsRdbPredicates predicates(ENTERPRISE_AP_INFO_TABLE_NAME);
+    if (!queryParms.empty()) {
+        auto it = queryParms.begin();
+        auto end = queryParms.end();
+        while (it != end) {
+            auto nextIt = std::next(it);
+            predicates.EqualTo(it->first, it->second);
+            if (nextIt != end) {
+                predicates.And();
+            }
+            ++it;
+        }
+    }
+    std::vector<std::string> queryAllColumn;
+    auto resultSet = wifiDataBaseUtils_->Query(predicates, queryAllColumn);
+    if (resultSet == nullptr) {
+        WIFI_LOGI("%{public}s, all query fail", __func__);
+        return QUERY_FAILED;
+    }
+    int32_t resultSetNum = resultSet->GoToFirstRow();
+    if (resultSetNum != NativeRdb::E_OK) {
+        resultSet->Close();
+        WIFI_LOGI("%{public}s, query empty", __func__);
+        return QUERY_NO_RECORD;
+    }
+    do {
+        int32_t columnCnt = 0;
+        EnterpriseApInfo dbEnterpriseApInfo;
+        resultSet->GetString(columnCnt++, dbEnterpriseApInfo.ssid_);
+        resultSet->GetString(columnCnt++, dbEnterpriseApInfo.keyMgmt_);
+        dbEnterpriseApInfoVector.emplace_back(dbEnterpriseApInfo);
+    } while (resultSet->GoToNextRow() == NativeRdb::E_OK);
+    resultSet->Close();
+    return QUERY_HAS_RECORD;
+}
+ 
+NativeRdb::ValuesBucket WifiHistoryRecordManager::CreateEnterpriseApInfoBucket(
+    const EnterpriseApInfo &enterpriseApInfo)
+{
+    NativeRdb::ValuesBucket enterpriseApInfoBucket;
+    enterpriseApInfoBucket.PutString(SSID, enterpriseApInfo.ssid_);
+    enterpriseApInfoBucket.PutString(KEY_MGMT, enterpriseApInfo.keyMgmt_);
+    return enterpriseApInfoBucket;
+}
+ 
+bool WifiHistoryRecordManager::CheckIsEnterpriseAp(const WifiDeviceConfig &config)
+{
+    bool isEnterpriseSecurityType = (config.keyMgmt == KEY_MGMT_EAP) ||
+
+        (config.keyMgmt == KEY_MGMT_SUITE_B_192) || (config.keyMgmt == KEY_MGMT_WAPI_CERT);
+    if (isEnterpriseSecurityType && (config.wifiEapConfig.eap != EAP_METHOD_NONE)) {
+        WIFI_LOGI("%{public}s, EAP ap", __func__);
+        return true;
+    }
+ 
+    std::vector<EnterpriseApInfo> dbEnterpriseApInfo;
+    int queryEnterpriseApRet = QueryEnterpriseApRecordByParam({{SSID, config.ssid}, {KEY_MGMT, config.keyMgmt}},
+        dbEnterpriseApInfo);
+    if (queryEnterpriseApRet == QUERY_HAS_RECORD || queryEnterpriseApRet == QUERY_FAILED) {
+        WIFI_LOGE("%{public}s, query enterprise ap has_record/fail, ret=%{public}d", __func__, queryEnterpriseApRet);
+        return true;
+    }
+ 
+    std::vector<ConnectedApInfo> dbApInfoVector;
+    int queryApRet = QueryApInfoRecordByParam({{SSID, config.ssid}, {KEY_MGMT, config.keyMgmt}}, dbApInfoVector);
+    if (queryApRet == QUERY_NO_RECORD) {
+        return false;
+    } else if (queryApRet == QUERY_FAILED) {
+        WIFI_LOGE("%{public}s, query ap info fail", __func__);
+        return true;
+    } else if (queryApRet == QUERY_HAS_RECORD && dbApInfoVector.size() < ENTERPRISE_AP_NUM) {
+        WIFI_LOGI("%{public}s, size=%{public}zu, quantity less than 20", __func__, dbApInfoVector.size());
+        return false;
+    }
+ 
+    // If more than 20 hotspots with the same SSID and encryption mode exist,
+    // the hotspots are considered as enterprise networks. The encryption mode is not limited to EAP.
+    return true;
+}
+ 
+void WifiHistoryRecordManager::RecordToEapApTable(const WifiDeviceConfig &config)
+{
+    bool addRet = AddEnterpriseApRecord(EnterpriseApInfo(config.ssid, config.keyMgmt));
+
+    if (!addRet) {
+        return;
+    }
+    int count = RemoveApInfoRecordByParam(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
+            {{SSID, config.ssid}, {KEY_MGMT, config.keyMgmt}});
+    WIFI_LOGI("%{public}s, quantity more than 20, record ssid=%{public}s as EAP AP, delete count=%{public}d",
+        __func__, SsidAnonymize(config.ssid).c_str(), count);
 }
 
 bool WifiHistoryRecordManager::IsHomeAp(const std::string &bssid)
@@ -553,7 +669,7 @@ bool WifiHistoryRecordManager::IsHomeRouter(const std::string &portalUrl)
     // Obtain the portal redirection address from the XML file
     std::vector<PackageInfo> homeRouterList = packageInfoMap["HOME_ROUTER_REDIRECTED_URL"];
     for (const PackageInfo &info : homeRouterList) {
-        if (portalUrl.find(info.name) != std::string_view::npos) {
+        if (portalUrl.find(info.name) != std::string::npos) {
             WIFI_LOGI("home router");
             return true;
         }
@@ -584,23 +700,58 @@ void WifiHistoryRecordManager::ClearConnectedApInfo()
 
 void WifiHistoryRecordManager::DeleteAllApInfo()
 {
-    std::vector<ConnectedApInfo> dbApInfoVector;
-    int ret = QueryAllApInfoRecord(dbApInfoVector);
-    if (ret != QUERY_HAS_RECORD) {
-        WIFI_LOGE("%{public}s, no ap record", __func__);
+    std::lock_guard<std::recursive_mutex> lock(updateApInfoMutex_);
+    if (wifiDataBaseUtils_ == nullptr) {
+        WIFI_LOGE("%{public}s fail, wifiDataBaseUtils_ is nullptr", __func__);
+ 
         return;
     }
-    WIFI_LOGE("%{public}s", __func__);
-    for (const ConnectedApInfo &item : dbApInfoVector) {
-        RemoveApInfoRecord(item.bssid_);
-    }
+    std::string deleteAllApSql = "delete from ";
+    deleteAllApSql.append(AP_CONNECTION_DURATION_INFO_TABLE_NAME);
+    bool deleteApRet = wifiDataBaseUtils_->ExecuteSql(deleteAllApSql);
+ 
+    std::string deleteAllEapApSql = "delete from ";
+    deleteAllEapApSql.append(ENTERPRISE_AP_INFO_TABLE_NAME);
+    bool deleteEnterpriseApRet = wifiDataBaseUtils_->ExecuteSql(deleteAllEapApSql);
+ 
+    WIFI_LOGI("%{public}s, deleteApRet=%{public}d, deleteEnterpriseApRet=%{public}d",
+        __func__, deleteApRet, deleteEnterpriseApRet);
 }
 
-void WifiHistoryRecordManager::DeleteApInfo(const std::string &ssid, const std::string &bssid)
+void WifiHistoryRecordManager::DeleteApInfo(const std::string &ssid, const std::string &keyMgmt)
 {
-    WIFI_LOGI("%{public}s, ssid=%{public}s, bssid=%{public}s",
-        __func__, SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
-    RemoveApInfoRecord(bssid);
+    int count = RemoveApInfoRecordByParam(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
+        {{SSID, ssid}, {KEY_MGMT, keyMgmt}});
+    int eapCount = RemoveApInfoRecordByParam(ENTERPRISE_AP_INFO_TABLE_NAME,
+        {{SSID, ssid}, {KEY_MGMT, keyMgmt}});
+    WIFI_LOGI("%{public}s, ssid=%{public}s, keyMgmt=%{public}s, count=%{public}d, eapCount=%{public}d",
+        __func__, SsidAnonymize(ssid).c_str(), keyMgmt.c_str(), count, eapCount);
+}
+ 
+void WifiHistoryRecordManager::HandleOldHistoryRecord()
+{
+    std::map<std::string, std::string> queryParms;
+    std::vector<ConnectedApInfo> dbApInfoVector;
+    int ret = QueryApInfoRecordByParam(queryParms, dbApInfoVector);
+    if (ret != QUERY_HAS_RECORD || dbApInfoVector.empty() || dbApInfoVector.size() < MAX_NUM_OF_SAVED_AP) {
+        return;
+    }
+    std::sort(dbApInfoVector.begin(), dbApInfoVector.end(), [](ConnectedApInfo ap1, ConnectedApInfo ap2) {
+        return ap1.currentConnectedTime_ < ap2.currentConnectedTime_;  // asc
+    });
+    std::vector<ConnectedApInfo> deleteApInfoVector(dbApInfoVector.begin(), dbApInfoVector.begin() + DELETE_AP_NUM);
+ 
+    std::string ssidList = "";
+    std::for_each(deleteApInfoVector.begin(), deleteApInfoVector.end(), [&](const ConnectedApInfo &info) {
+        ssidList += SsidAnonymize(info.ssid_) + "  ";
+    });
+ 
+    for (const ConnectedApInfo &apInfo : deleteApInfoVector) {
+        RemoveApInfoRecordByParam(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
+            {{SSID, apInfo.ssid_}, {KEY_MGMT, apInfo.keyMgmt_}});
+    }
+    WIFI_LOGI("delete old ap record, ssid=%{public}s", ssidList.c_str());
+}
 }
 }
 }

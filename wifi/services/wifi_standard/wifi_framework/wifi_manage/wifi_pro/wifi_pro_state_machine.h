@@ -140,7 +140,7 @@ public:
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
-        void HandleScanResultInHasNetInner(std::vector<InterScanInfo> &scanInfos);
+        void HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
         void WifiHasNetStateInit();
         void RequestHttpDetect(bool forceHttpDetect);

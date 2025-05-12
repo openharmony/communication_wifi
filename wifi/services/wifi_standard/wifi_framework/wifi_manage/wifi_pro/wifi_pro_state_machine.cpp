@@ -1057,7 +1057,7 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     HandleScanResultInHasNetInner(scanInfos);
 }
 
-void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(std::vector<InterScanInfo> &scanInfos)
+void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("wifi to wifi step 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_, scanInfos)) {

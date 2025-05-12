@@ -56,5 +56,36 @@ HWTEST_F(NetworkStatusHistoryManagerTest, IsInternetAccessByHistory01, TestSize.
     EXPECT_TRUE(NetworkStatusHistoryManager::IsInternetAccessByHistory(networkStatusHistory) == false);
 }
 
+HWTEST_F(NetworkStatusHistoryManagerTest, ModifyAllHistoryRecordTest, TestSize.Level1)
+{
+ 
+    // portal 10 -> no internet 11
+    unsigned int oldNetworkStatusHistory1 = 663;  // 663: historyRecord 00000000001010010111
+    unsigned int newNetworkStatusHistory1 = 983;  // 983: historyRecord 00000000001111010111
+    NetworkStatusHistoryManager::ModifyAllHistoryRecord(oldNetworkStatusHistory1,
+        NetworkStatus::PORTAL, NetworkStatus::NO_INTERNET);
+    EXPECT_TRUE(oldNetworkStatusHistory1 == newNetworkStatusHistory1);
+ 
+    // portal 10 -> has internet 01
+    unsigned int oldNetworkStatusHistory2 = 663;  // 663: historyRecord 00000000001010010111
+    unsigned int newNetworkStatusHistory2 = 343;  // 983: historyRecord 00000000000101010111
+    NetworkStatusHistoryManager::ModifyAllHistoryRecord(oldNetworkStatusHistory2,
+        NetworkStatus::PORTAL, NetworkStatus::HAS_INTERNET);
+    EXPECT_TRUE(oldNetworkStatusHistory2 == newNetworkStatusHistory2);
+ 
+    // has internet 01 -> portal 10
+    unsigned int oldNetworkStatusHistory3 = 663;  // 663: historyRecord 00000000001010010111
+    unsigned int newNetworkStatusHistory3 = 683;  // 983: historyRecord 00000000001010101011
+    NetworkStatusHistoryManager::ModifyAllHistoryRecord(oldNetworkStatusHistory3,
+        NetworkStatus::HAS_INTERNET, NetworkStatus::PORTAL);
+    EXPECT_TRUE(oldNetworkStatusHistory3 == newNetworkStatusHistory3);
+ 
+    // has internet 01 -> no internet 11
+    unsigned int oldNetworkStatusHistory4 = 663;  // 663: historyRecord 00000000001010010111
+    unsigned int newNetworkStatusHistory4 = 703;  // 983: historyRecord 00000000001010111111
+    NetworkStatusHistoryManager::ModifyAllHistoryRecord(oldNetworkStatusHistory4,
+        NetworkStatus::HAS_INTERNET, NetworkStatus::NO_INTERNET);
+    EXPECT_TRUE(oldNetworkStatusHistory4 == newNetworkStatusHistory4);
+}
 } // WIFI
 } // OHOS

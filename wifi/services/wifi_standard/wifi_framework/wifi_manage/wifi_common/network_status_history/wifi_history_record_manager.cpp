@@ -116,7 +116,7 @@ StaServiceCallback WifiHistoryRecordManager::GetStaCallback() const
 
 void WifiHistoryRecordManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-if (instId != INSTID_WLAN0 || info.networkId == INVALID_NETWORK_ID || info.bssid.empty() ||
+    if (instId != INSTID_WLAN0 || info.networkId == INVALID_NETWORK_ID || info.bssid.empty() ||
         (state != OperateResState::DISCONNECT_DISCONNECTED && state != OperateResState::CONNECT_AP_CONNECTED)) {
         return;
     }
@@ -751,7 +751,6 @@ void WifiHistoryRecordManager::HandleOldHistoryRecord()
             {{SSID, apInfo.ssid_}, {KEY_MGMT, apInfo.keyMgmt_}});
     }
     WIFI_LOGI("delete old ap record, ssid=%{public}s", ssidList.c_str());
-}
 }
 }
 }

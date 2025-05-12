@@ -61,7 +61,10 @@ public:
         LOG_SetCallback(WifiHistoryRecordManagerCallback);
         wifiDataBaseUtils_ = WifiRdbManager::GetRdbManger(RdbType::WIFI_HISTORY_RECORD);
     }
-    virtual void TearDown() {}
+    virtual void TearDown()
+    {
+        WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    }
     std::time_t GetCurrentTimeStampSeconds()
     {
         auto now = std::chrono::system_clock::now();

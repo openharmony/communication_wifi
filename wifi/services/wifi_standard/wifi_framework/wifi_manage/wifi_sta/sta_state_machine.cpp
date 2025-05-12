@@ -462,7 +462,11 @@ void StaStateMachine::InitState::StartWifiProcess()
         WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
         std::string realMacAddress;
         WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, pStaStateMachine->m_instId);
+#ifdef READ_MAC_FROM_OEM
         if (realMacAddress.empty() || realMacAddress != mac) {
+#else
+        if (realMacAddress.empty()) {
+#endif
             WifiSettings::GetInstance().SetRealMacAddress(mac, pStaStateMachine->m_instId);
         }
     } else {

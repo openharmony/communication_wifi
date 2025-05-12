@@ -187,7 +187,6 @@ public:
         SelfCureStateMachine *pSelfCureStateMachine_;
         int currentRssi_ = -1;
         std::string currentBssid_ = "";
-        int selfCureFailedCounter_ = 0;
         int currentAbnormalType_ = -1;
         int currentSelfCureLevel_ = -1;
         int renewDhcpCount_ = -1;
@@ -383,7 +382,7 @@ private:
     bool IsSettingsPage();
     bool IsMultiDhcpOffer();
     void ClearDhcpOffer();
-    void CheckSelfCureConnectState();
+    bool CheckSelfCureConnectState();
     void CheckSelfCureReassocState();
     void UpdateSelfcureState(int currentCureLevel, bool isSelfCureOnGoing);
     void HandleSelfCureNormal();

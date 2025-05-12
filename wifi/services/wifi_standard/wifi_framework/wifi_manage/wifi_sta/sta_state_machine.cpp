@@ -714,10 +714,6 @@ bool StaStateMachine::IsNewConnectionInProgress()
     if (targetId == INVALID_NETWORK_ID) {
         return false;
     }
-    if (selfCureService_ != nullptr && selfCureService_->IsSelfCureL2Connecting()) {
-        WIFI_LOGI("IsNewConnectionInProgress, selfcure is ongoing");
-        return true;
-    }
     std::string targetSsid = "";
     // Get the target network's SSID, can get empty result if it is hillink network
     if (!m_hilinkFlag) {
@@ -819,12 +815,6 @@ void StaStateMachine::LinkState::DealNetworkRemoved(InternalMessagePtr msg)
         DealWifiDhcpCache(WIFI_DHCP_CACHE_REMOVE, ipCacheInfo);
     }
     if (pStaStateMachine->linkedInfo.networkId == networkId || pStaStateMachine->targetNetworkId_ == networkId) {
-#ifndef OHOS_ARCH_LITE
-        if ((pStaStateMachine->selfCureService_ != nullptr) &&
-            (pStaStateMachine->selfCureService_->IsSelfCureL2Connecting())) {
-            pStaStateMachine->selfCureService_->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
-        }
-#endif
         std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
         WIFI_LOGI("Enter StartDisConnectToNetwork ifaceName:%{public}s!", ifaceName.c_str());
         WifiStaHalInterface::GetInstance().Disconnect(ifaceName);
@@ -1149,10 +1139,6 @@ bool StaStateMachine::ApLinkingState::ExecuteStateMsg(InternalMessagePtr msg)
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_DISCONNECT: {
             ret = EXECUTED;
-            if (pStaStateMachine->selfCureService_ != nullptr &&
-                pStaStateMachine->selfCureService_->IsSelfCureL2Connecting()) {
-                pStaStateMachine->selfCureService_->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
-            }
             pStaStateMachine->StartDisConnectToNetwork();
             break;
         }
@@ -1339,10 +1325,6 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_DISCONNECT: {
             ret = EXECUTED;
-            if (pStaStateMachine->selfCureService_ != nullptr &&
-                pStaStateMachine->selfCureService_->IsSelfCureL2Connecting()) {
-                pStaStateMachine->selfCureService_->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
-            }
             pStaStateMachine->StartDisConnectToNetwork();
             break;
         }

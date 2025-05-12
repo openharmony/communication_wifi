@@ -614,7 +614,7 @@ int WifiSettings::GetCandidateConfigWithoutUid(const std::string &ssid, const st
     }
     for (const auto &it : configs) {
         // -1: Connect by system, use default uid.
-        if (it.uid != -1 && !(it.isShared) && it.ssid == ssid && it.keyMgmt == keymgmt) {
+        if (it.uid != -1 && !(it.isShared) && it.ssid == ssid && && InKeyMgmtBitset(it, keymgmt)) {
             config = it;
             return it.networkId;
         }

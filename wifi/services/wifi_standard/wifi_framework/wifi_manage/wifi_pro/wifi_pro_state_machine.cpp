@@ -1054,7 +1054,11 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         return;
     }
     qoeSwitch_ = false;
+    HandleScanResultInHasNetInner(scanInfos);
+}
 
+void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(std::vector<InterScanInfo> &scanInfos)
+{
     WIFI_LOGI("wifi to wifi step 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_, scanInfos)) {
         WIFI_LOGI("wifi to wifi step X: Wifi2Wifi select network fail.");

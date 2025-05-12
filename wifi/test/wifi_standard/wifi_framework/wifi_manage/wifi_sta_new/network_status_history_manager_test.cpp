@@ -58,7 +58,6 @@ HWTEST_F(NetworkStatusHistoryManagerTest, IsInternetAccessByHistory01, TestSize.
 
 HWTEST_F(NetworkStatusHistoryManagerTest, ModifyAllHistoryRecordTest, TestSize.Level1)
 {
- 
     // portal 10 -> no internet 11
     unsigned int oldNetworkStatusHistory1 = 663;  // 663: historyRecord 00000000001010010111
     unsigned int newNetworkStatusHistory1 = 983;  // 983: historyRecord 00000000001111010111

@@ -56,7 +56,6 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/interfaces/inner_api",
   "$WIFI_ROOT_DIR/frameworks/native/interfaces",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
-  "$WIFI_ROOT_DIR/services/wifi_standard/include",
   "$WIFI_ROOT_DIR/utils/inc",
 ]
 
@@ -169,6 +168,7 @@ if (defined(ohos_lite)) {
       "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "samgr:samgr_proxy",
+      "window_manager:libdm_lite",
     ]
     if (wifi_feature_with_sta_asset) {
       defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]

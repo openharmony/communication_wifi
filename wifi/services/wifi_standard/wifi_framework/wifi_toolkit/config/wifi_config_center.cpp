@@ -19,7 +19,9 @@
 #include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_randommac_helper.h"
-
+#ifndef OHOS_ARCH_LITE
+#include "display_info.h"
+#endif
 DEFINE_WIFILOG_LABEL("WifiConfigCenter");
 
 namespace OHOS {
@@ -1552,5 +1554,18 @@ void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotCon
     std::unique_lock<std::mutex> lock(mApMutex);
     localOnlyHotspotConfig_ = hotspotConfig;
 }
+
+#ifndef OHOS_ARCH_LITE
+void WifiConfigCenter::SetScreenDispalyState(int32_t orientation)
+{
+    screenDisplayOrientation.store(orientation);
+}
+ 
+bool WifiConfigCenter::IsScreenLandscape()
+{
+    return screenDisplayOrientation.load() == static_cast<int32_t>(Rosen::DisplayOrientation::LANDSCAPE) ||
+           screenDisplayOrientation.load() == static_cast<int32_t>(Rosen::DisplayOrientation::LANDSCAPE_INVERTED);
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

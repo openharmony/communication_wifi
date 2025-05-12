@@ -109,10 +109,8 @@ ErrCode WifiServiceScheduler::AutoStartStaService(int instId, std::string &staIf
         instId);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("AutoStartStaService start wifi fail.");
-        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
-            "HAL_FAIL", static_cast<int>(staState));
         WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
+        DispatchWifiOpenRes(OperateResState::OPEN_WIFI_FAILED, instId);
         return WIFI_OPT_FAILED;
     } else {
         WIFI_LOGE("AutoStartStaService start wifi instId:%{public}d success.", instId);
@@ -722,6 +720,16 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENED));
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
+        return;
+    }
+    if (state == OperateResState::OPEN_WIFI_FAILED) {
+        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
+        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
+            "HAL_FAIL", static_cast<int>(staState));
+        WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
+        WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
+        WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
+        BroadCastWifiStateChange(WifiState::DISABLED, instId);
         return;
     }
 }

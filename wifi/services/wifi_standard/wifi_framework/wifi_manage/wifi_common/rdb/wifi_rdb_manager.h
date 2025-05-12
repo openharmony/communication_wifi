@@ -21,6 +21,9 @@
 #include "rdb_helper.h"
 namespace OHOS {
 namespace Wifi {
+inline const std::string AP_CONNECTION_DURATION_INFO_TABLE_NAME = "ap_connection_duration_info";
+inline const std::string ENTERPRISE_AP_INFO_TABLE_NAME = "enterprise_ap_info";
+
 enum RdbType {
     WIFI_PRO,
     WIFI_HISTORY_RECORD,

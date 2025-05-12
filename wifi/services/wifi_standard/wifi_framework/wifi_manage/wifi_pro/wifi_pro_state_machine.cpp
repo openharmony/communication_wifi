@@ -1067,6 +1067,13 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }
+#ifndef OHOS_ARCH_LITE
+    if (WifiConfigCenter::GetInstance().IsScreenLandscape()) {
+        WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape.");
+        pWifiProStateMachine_->Wifi2WifiFinish();
+        return;
+    }
+#endif
     // when wifiSwitchReason is APP_QOE_SLOW, skip IsReachWifiScanThreshold
     int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
     if (pWifiProStateMachine_->wifiSwitchReason_ != WIFI_SWITCH_REASON_APP_QOE_SLOW &&

@@ -23,6 +23,9 @@
 #include "wifi_base_hal_interface.h"
 #include "wifi_native_struct.h"
 #include "wifi_p2p_event_callback.h"
+#include "wifi_error_no.h"
+#include "wifi_hid2d_msg.h"
+#include "wifi_p2p_msg.h"
 
 namespace OHOS {
 namespace Wifi {

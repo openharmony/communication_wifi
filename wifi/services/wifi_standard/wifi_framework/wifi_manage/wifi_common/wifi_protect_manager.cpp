@@ -15,7 +15,6 @@
 
 #include "wifi_protect_manager.h"
 #include "wifi_log.h"
-#include "wifi_chip_hal_interface.h"
 #include "wifi_supplicant_hal_interface.h"
 #ifndef OHOS_ARCH_LITE
 #include "system_ability_definition.h"

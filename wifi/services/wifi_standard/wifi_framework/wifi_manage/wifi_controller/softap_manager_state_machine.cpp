@@ -17,7 +17,6 @@
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"
-#include "wifi_chip_hal_interface.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_hisysevent.h"
 #include "wifi_settings.h"

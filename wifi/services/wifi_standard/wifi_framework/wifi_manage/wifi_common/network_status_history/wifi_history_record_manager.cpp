@@ -407,7 +407,7 @@ void WifiHistoryRecordManager::AddOrUpdateApInfoRecord()
         return;
     }
     std::vector<ConnectedApInfo> dbConnectedApInfo;
-    int queryRet = QueryApInfoRecordByParam({{BSSID, connectedApInfo_.bssid_}}, dbConnectedApInfo)
+    int queryRet = QueryApInfoRecordByParam({{BSSID, connectedApInfo_.bssid_}}, dbConnectedApInfo);
     if (queryRet == QUERY_NO_RECORD) {
         HandleOldHistoryRecord();
         bool executeRet = wifiDataBaseUtils_->Insert(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
@@ -425,7 +425,7 @@ void WifiHistoryRecordManager::AddOrUpdateApInfoRecord()
     WIFI_LOGE("%{public}s fail", __func__);
 }
 
-nt WifiHistoryRecordManager::RemoveApInfoRecordByParam(const std::string tableName,
+int WifiHistoryRecordManager::RemoveApInfoRecordByParam(const std::string tableName,
     const std::map<std::string, std::string> &deleteParms)
 {
     std::lock_guard<std::recursive_mutex> lock(updateApInfoMutex_);

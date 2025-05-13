@@ -734,16 +734,15 @@ void WifiHistoryRecordManager::HandleOldHistoryRecord()
         return ap1.currentConnectedTime_ < ap2.currentConnectedTime_;  // asc
     });
     std::vector<ConnectedApInfo> deleteApInfoVector(dbApInfoVector.begin(), dbApInfoVector.begin() + DELETE_AP_NUM);
- 
-    std::string ssidList = "";
-    std::for_each(deleteApInfoVector.begin(), deleteApInfoVector.end(), [&](const ConnectedApInfo &info) {
-        ssidList += SsidAnonymize(info.ssid_) + "  ";
-    });
- 
+  
     for (const ConnectedApInfo &apInfo : deleteApInfoVector) {
         RemoveApInfoRecordByParam(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
             {{SSID, apInfo.ssid_}, {KEY_MGMT, apInfo.keyMgmt_}});
     }
+    std::string ssidList = "";
+    std::for_each(deleteApInfoVector.begin(), deleteApInfoVector.end(), [&](const ConnectedApInfo &info) {
+        ssidList += SsidAnonymize(info.ssid_) + "  ";
+    });
     WIFI_LOGI("delete old ap record, ssid=%{public}s", ssidList.c_str());
 }
 }

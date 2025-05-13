@@ -67,21 +67,21 @@ HWTEST_F(NetworkStatusHistoryManagerTest, ModifyAllHistoryRecordTest, TestSize.L
  
     // portal 10 -> has internet 01
     unsigned int oldNetworkStatusHistory2 = 663;  // 663: historyRecord 00000000001010010111
-    unsigned int newNetworkStatusHistory2 = 343;  // 983: historyRecord 00000000000101010111
+    unsigned int newNetworkStatusHistory2 = 343;  // 343: historyRecord 00000000000101010111
     NetworkStatusHistoryManager::ModifyAllHistoryRecord(oldNetworkStatusHistory2,
         NetworkStatus::PORTAL, NetworkStatus::HAS_INTERNET);
     EXPECT_TRUE(oldNetworkStatusHistory2 == newNetworkStatusHistory2);
  
     // has internet 01 -> portal 10
     unsigned int oldNetworkStatusHistory3 = 663;  // 663: historyRecord 00000000001010010111
-    unsigned int newNetworkStatusHistory3 = 683;  // 983: historyRecord 00000000001010101011
+    unsigned int newNetworkStatusHistory3 = 683;  // 683: historyRecord 00000000001010101011
     NetworkStatusHistoryManager::ModifyAllHistoryRecord(oldNetworkStatusHistory3,
         NetworkStatus::HAS_INTERNET, NetworkStatus::PORTAL);
     EXPECT_TRUE(oldNetworkStatusHistory3 == newNetworkStatusHistory3);
  
     // has internet 01 -> no internet 11
     unsigned int oldNetworkStatusHistory4 = 663;  // 663: historyRecord 00000000001010010111
-    unsigned int newNetworkStatusHistory4 = 703;  // 983: historyRecord 00000000001010111111
+    unsigned int newNetworkStatusHistory4 = 703;  // 703: historyRecord 00000000001010111111
     NetworkStatusHistoryManager::ModifyAllHistoryRecord(oldNetworkStatusHistory4,
         NetworkStatus::HAS_INTERNET, NetworkStatus::NO_INTERNET);
     EXPECT_TRUE(oldNetworkStatusHistory4 == newNetworkStatusHistory4);

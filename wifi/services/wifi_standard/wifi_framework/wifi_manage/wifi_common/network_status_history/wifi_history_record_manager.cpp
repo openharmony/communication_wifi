@@ -600,7 +600,6 @@ NativeRdb::ValuesBucket WifiHistoryRecordManager::CreateEnterpriseApInfoBucket(
 bool WifiHistoryRecordManager::CheckAndRecordEnterpriseAp(const WifiDeviceConfig &config)
 {
     bool isEnterpriseSecurityType = (config.keyMgmt == KEY_MGMT_EAP) ||
-
         (config.keyMgmt == KEY_MGMT_SUITE_B_192) || (config.keyMgmt == KEY_MGMT_WAPI_CERT);
     if (isEnterpriseSecurityType && (config.wifiEapConfig.eap != EAP_METHOD_NONE)) {
         WIFI_LOGI("%{public}s, EAP ap", __func__);
@@ -635,6 +634,7 @@ bool WifiHistoryRecordManager::CheckAndRecordEnterpriseAp(const WifiDeviceConfig
                 {{SSID, config.ssid}, {KEY_MGMT, config.keyMgmt}});
         WIFI_LOGI("%{public}s, quantity more than 20, record ssid=%{public}s as EAP AP, delete count=%{public}d",
             __func__, SsidAnonymize(config.ssid).c_str(), count);
+        return true;
     }
     WIFI_LOGI("%{public}s, AddEnterpriseApRecord fail", __func__);
     return true;

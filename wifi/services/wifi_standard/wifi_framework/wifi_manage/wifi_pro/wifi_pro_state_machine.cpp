@@ -391,7 +391,7 @@ bool WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
 }
 
 bool WifiProStateMachine::SelectNetwork(NetworkSelectionResult &networkSelectionResult,
-    std::vector<InterScanInfo> &scanInfos)
+    const std::vector<InterScanInfo> &scanInfos)
 {
     NetworkSelectType mNetworkSelectType;
     if (wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
@@ -1054,7 +1054,11 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         return;
     }
     qoeSwitch_ = false;
+    HandleScanResultInHasNetInner(scanInfos);
+}
 
+void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos)
+{
     WIFI_LOGI("wifi to wifi step 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_, scanInfos)) {
         WIFI_LOGI("wifi to wifi step X: Wifi2Wifi select network fail.");

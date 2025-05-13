@@ -111,14 +111,13 @@ int WifiDeviceCallBackStub::GetWifiState()
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 {
     WIFI_LOGI("OnWifiStateChanged, state:%{public}d!", state);
-
+    if (state == static_cast<int>(WifiState::ENABLED)) {
+        mState_ = true;
+    } else {
+        mState_ = false;
+    }
     if (callback_) {
         callback_->OnWifiStateChanged(state);
-        if (state == static_cast<int>(WifiState::ENABLED)) {
-            mState_ = true;
-        } else {
-            mState_ = false;
-        }
     }
     WriteWifiEventReceivedHiSysEvent(HISYS_STA_POWER_STATE_CHANGE, state);
 }

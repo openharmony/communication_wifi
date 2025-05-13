@@ -125,8 +125,7 @@ void WifiHistoryRecordManager::DealStaConnChanged(OperateResState state, const W
         SsidAnonymize(info.ssid).c_str(), MacAnonymize(info.bssid).c_str());
     WifiDeviceConfig config;
     int ret = WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config, instId);
-    if (CheckIsEnterpriseAp(config)) {
-        RecordToEapApTable(config);
+    if (CheckAndRecordEnterpriseAp(config)) {
         WIFI_LOGI("enterprise AP, not record, ssid=%{public}s, keyMgmt=%{public}s, state=%{public}d",
             SsidAnonymize(info.ssid).c_str(), config.keyMgmt.c_str(), static_cast<int>(state));
         return;
@@ -598,7 +597,7 @@ NativeRdb::ValuesBucket WifiHistoryRecordManager::CreateEnterpriseApInfoBucket(
     return enterpriseApInfoBucket;
 }
  
-bool WifiHistoryRecordManager::CheckIsEnterpriseAp(const WifiDeviceConfig &config)
+bool WifiHistoryRecordManager::CheckAndRecordEnterpriseAp(const WifiDeviceConfig &config)
 {
     bool isEnterpriseSecurityType = (config.keyMgmt == KEY_MGMT_EAP) ||
 
@@ -630,20 +629,15 @@ bool WifiHistoryRecordManager::CheckIsEnterpriseAp(const WifiDeviceConfig &confi
  
     // If more than 20 hotspots with the same SSID and encryption mode exist,
     // the hotspots are considered as enterprise networks. The encryption mode is not limited to EAP.
-    return true;
-}
- 
-void WifiHistoryRecordManager::RecordToEapApTable(const WifiDeviceConfig &config)
-{
     bool addRet = AddEnterpriseApRecord(EnterpriseApInfo(config.ssid, config.keyMgmt));
-
-    if (!addRet) {
-        return;
+    if (addRet) {
+        int count = RemoveApInfoRecordByParam(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
+                {{SSID, config.ssid}, {KEY_MGMT, config.keyMgmt}});
+        WIFI_LOGI("%{public}s, quantity more than 20, record ssid=%{public}s as EAP AP, delete count=%{public}d",
+            __func__, SsidAnonymize(config.ssid).c_str(), count);
     }
-    int count = RemoveApInfoRecordByParam(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
-            {{SSID, config.ssid}, {KEY_MGMT, config.keyMgmt}});
-    WIFI_LOGI("%{public}s, quantity more than 20, record ssid=%{public}s as EAP AP, delete count=%{public}d",
-        __func__, SsidAnonymize(config.ssid).c_str(), count);
+    WIFI_LOGI("%{public}s, AddEnterpriseApRecord fail", __func__);
+    return true;
 }
 
 bool WifiHistoryRecordManager::IsHomeAp(const std::string &bssid)

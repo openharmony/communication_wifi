@@ -18,7 +18,6 @@
 
 #include <stdint.h>
 #include "wifi_hdi_define.h"
-#include "i_wifi_struct.h"
 #include "wifi_error_no.h"
 
 #ifdef __cplusplus

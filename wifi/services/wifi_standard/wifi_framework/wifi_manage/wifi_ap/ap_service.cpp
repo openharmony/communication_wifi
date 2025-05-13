@@ -21,6 +21,7 @@
 #include "wifi_config_center.h"
 #include "wifi_ap_hal_interface.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_global_func.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApService");
 namespace OHOS {

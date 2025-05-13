@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "wifi_supplicant_hal_interface.h"
-#include <mutex>
 #include "wifi_log.h"
 #include "wifi_config_center.h"
 
@@ -35,10 +34,6 @@ WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
             if (inst.InitHdiWpaClient()) {
                 initFlag = 1;
             }
-#else
-            if (inst.InitIdlClient()) {
-                initFlag = 1;
-            }
 #endif
         }
     }
@@ -47,57 +42,32 @@ WifiSupplicantHalInterface &WifiSupplicantHalInterface::GetInstance(void)
 
 WifiErrorNo WifiSupplicantHalInterface::StartSupplicant(void) const
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
     return WIFI_HAL_OPT_FAILED;
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqStartSupplicant();
-#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::StopSupplicant(void) const
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
     return WIFI_HAL_OPT_FAILED;
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqStopSupplicant();
-#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::ConnectSupplicant(void) const
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
     return WIFI_HAL_OPT_FAILED;
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqConnectSupplicant();
-#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::DisconnectSupplicant(void) const
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
     return WIFI_HAL_OPT_FAILED;
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqDisconnectSupplicant();
-#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::RequestToSupplicant(const std::string &request) const
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
     LOGI("call WifiSupplicantHalInterface::%{public}s!", __func__);
     return WIFI_HAL_OPT_FAILED;
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqRequestToSupplicant(request);
-#endif
 }
 
 WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(SupplicantEventCallback &callback)
@@ -106,14 +76,8 @@ WifiErrorNo WifiSupplicantHalInterface::RegisterSupplicantEventCallback(Supplica
     std::lock_guard<std::mutex> lock(mSupplicantHalMutex);
     mCallback = callback;
     return WIFI_HAL_OPT_OK;
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    WifiErrorNo err = mIdlClient->ReqRegisterSupplicantEventCallback(callback);
-    if (err == WIFI_HAL_OPT_OK) {
-        mCallback = callback;
-    }
-    return err;
 #endif
+    return WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
@@ -122,12 +86,8 @@ WifiErrorNo WifiSupplicantHalInterface::UnRegisterSupplicantEventCallback(void)
     std::lock_guard<std::mutex> lock(mSupplicantHalMutex);
     mCallback.onScanNotify = nullptr;
     return WIFI_HAL_OPT_OK;
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    WifiErrorNo err = mIdlClient->ReqUnRegisterSupplicantEventCallback();
-    mCallback.onScanNotify = nullptr;
-    return err;
 #endif
+    return WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable) const
@@ -136,10 +96,8 @@ WifiErrorNo WifiSupplicantHalInterface::SetPowerSave(bool enable) const
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->ReqSetPowerSave(
         enable, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqSetPowerSave(enable);
 #endif
+    return WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo WifiSupplicantHalInterface::WpaSetCountryCode(const std::string &countryCode) const
@@ -148,10 +106,8 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetCountryCode(const std::string &cou
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->ReqWpaSetCountryCode(
         countryCode, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqWpaSetCountryCode(countryCode);
 #endif
+    return WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo WifiSupplicantHalInterface::WpaGetCountryCode(std::string &countryCode) const
@@ -160,10 +116,8 @@ WifiErrorNo WifiSupplicantHalInterface::WpaGetCountryCode(std::string &countryCo
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->ReqWpaGetCountryCode(
         countryCode, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqWpaGetCountryCode(countryCode);
 #endif
+    return WIFI_HAL_OPT_FAILED;
 }
 
 const SupplicantEventCallback &WifiSupplicantHalInterface::GetCallbackInst(void) const
@@ -177,10 +131,8 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetSuspendMode(bool mode) const
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->ReqWpaSetSuspendMode(
         mode, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqWpaSetSuspendMode(mode);
 #endif
+    return WIFI_HAL_OPT_FAILED;
 }
 
 WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode, int instId) const
@@ -188,10 +140,8 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode, int instId) c
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->ReqSetPowerSave(mode, WifiConfigCenter::GetInstance().GetStaIfaceName(instId).c_str());
-#else
-    CHECK_NULL_AND_RETURN(mIdlClient, WIFI_HAL_OPT_FAILED);
-    return mIdlClient->ReqWpaSetPowerMode(!mode);   // idl impl need revese power mode
 #endif
+    return WIFI_HAL_OPT_FAILED;
 }
 
 void WifiSupplicantHalInterface::NotifyScanResultEvent()

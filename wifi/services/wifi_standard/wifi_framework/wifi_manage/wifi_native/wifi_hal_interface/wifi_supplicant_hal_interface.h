@@ -17,8 +17,10 @@
 #define OHOS_WIFI_SUPPLICANT_HAL_INTERFACE_H
 
 #include <string>
+#include <mutex>
 #include "supplicant_event_callback.h"
 #include "wifi_base_hal_interface.h"
+#include "wifi_native_define.h"
 #include "wifi_error_no.h"
 #include "i_wifi_struct.h"
 #include "define.h"

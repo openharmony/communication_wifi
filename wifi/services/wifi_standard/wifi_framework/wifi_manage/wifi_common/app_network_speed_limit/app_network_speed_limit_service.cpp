@@ -21,6 +21,7 @@
 #include "app_mgr_client.h"
 #include "speed_limit_configs_writer.h"
 #include "wifi_app_state_aware.h"
+#include "wifi_global_func.h"
 
 namespace OHOS {
 namespace Wifi {

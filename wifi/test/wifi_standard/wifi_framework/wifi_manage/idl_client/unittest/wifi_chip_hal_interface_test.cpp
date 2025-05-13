@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include "wifi_chip_hal_interface_test.h"
-#include "wifi_chip_hal_interface.h"
 #include "wifi_log.h"
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_IDLCLIENT_CHIP_TEST"

@@ -23,6 +23,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_net_agent.h"
 #include "p2p_chr_reporter.h"
+#include "wifi_global_func.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupOperatingState");
 

@@ -140,6 +140,7 @@ public:
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
+        void HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
         void WifiHasNetStateInit();
         void RequestHttpDetect(bool forceHttpDetect);
@@ -253,7 +254,7 @@ private:
     void HandleWifi2WifiFailed();
     void FastScan(std::vector<WifiScanInfo> &scanInfoList);
     bool TrySelfCure(bool forceNoHttpCheck);
-    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, std::vector<InterScanInfo> &scanInfos);
+    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, const std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
     bool FullScan();

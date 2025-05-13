@@ -2185,7 +2185,9 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
         WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
         NetworkStatusHistoryManager::ModifyAllHistoryRecord(wifiDeviceConfig.networkStatusHistory,
             NetworkStatus::PORTAL, NetworkStatus::NO_INTERNET);
-        
+        WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);

@@ -680,7 +680,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, CheckIsEnterpriseApTest, TestSize.Level1)
     WifiDeviceConfig config1;
     config1.ssid = testSsid1;
     config1.keyMgmt = testKeyMgmt1;
-    bool ret11 = WifiHistoryRecordManager::GetInstance().CheckIsEnterpriseAp(config1);
+    bool ret11 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config1);
     EXPECT_TRUE(ret11);
 
     // test EAP AP
@@ -689,7 +689,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, CheckIsEnterpriseApTest, TestSize.Level1)
     WifiDeviceConfig config2;
     config2.ssid = testSsid2;
     config2.keyMgmt = testKeyMgmt2;
-    bool ret2 = WifiHistoryRecordManager::GetInstance().CheckIsEnterpriseAp(config2);
+    bool ret2 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config2);
     EXPECT_TRUE(ret2);
 
     // test no apInfo record
@@ -698,7 +698,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, CheckIsEnterpriseApTest, TestSize.Level1)
     WifiDeviceConfig config3;
     config3.ssid = testSsid3;
     config3.keyMgmt = testKeyMgmt3;
-    bool ret3 = WifiHistoryRecordManager::GetInstance().CheckIsEnterpriseAp(config3);
+    bool ret3 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config3);
     EXPECT_FALSE(ret3);
 
     // test has apInfo record, but the number is less than 20
@@ -713,7 +713,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, CheckIsEnterpriseApTest, TestSize.Level1)
     WifiDeviceConfig config4;
     config4.ssid = testSsid4;
     config4.keyMgmt = testKeyMgmt4;
-    bool ret4 = WifiHistoryRecordManager::GetInstance().CheckIsEnterpriseAp(config4);
+    bool ret4 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config4);
     EXPECT_FALSE(ret4);
     
     // test has apInfo record and more than 20
@@ -729,49 +729,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, CheckIsEnterpriseApTest, TestSize.Level1)
     WifiDeviceConfig config5;
     config5.ssid = testSsid5;
     config5.keyMgmt = testKeyMgmt5;
-    bool ret5 = WifiHistoryRecordManager::GetInstance().CheckIsEnterpriseAp(config5);
+    bool ret5 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config5);
     EXPECT_TRUE(ret5);
-}
-
-HWTEST_F(WifiHistoryRecordManagerTest, RecordToEapApTableTest, TestSize.Level1)
-{
-    if (wifiDataBaseUtils_ == nullptr) {
-        EXPECT_TRUE(false);
-        return;
-    }
-
-    int networkIdTest = 23;
-    std::string ssidTest = "RecordToEapApTableTest";
-    std::string keyMgmtTest = "SAE";
-    std::string bssidTest = "23:91:9c:41:aa:cc";
-
-    WifiHistoryRecordManager::ConnectedApInfo info;
-    info.networkId_ = networkIdTest;
-    info.ssid_ = ssidTest;
-    info.keyMgmt_ = keyMgmtTest;
-    info.bssid_ = bssidTest;
-    bool executeRet = wifiDataBaseUtils_->Insert(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
-        WifiHistoryRecordManager::GetInstance().CreateApInfoBucket(info));
-    
-    WifiDeviceConfig config;
-    config.ssid = ssidTest;
-    config.keyMgmt = keyMgmtTest;
-    WifiHistoryRecordManager::GetInstance().RecordToEapApTable(config);
-
-    std::vector<WifiHistoryRecordManager::ConnectedApInfo> dbApInfoVector;
-    int queryRet = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
-        {{BSSID, bssidTest}}, dbApInfoVector);
-    EXPECT_TRUE(queryRet == QUERY_NO_RECORD);
-
-    std::vector<WifiHistoryRecordManager::EnterpriseApInfo> dbEnterpriseApInfo;
-    int queryEapApRet = WifiHistoryRecordManager::GetInstance().QueryEnterpriseApRecordByParam(
-        {{SSID, ssidTest}, {KEY_MGMT, keyMgmtTest}}, dbEnterpriseApInfo);
-    EXPECT_TRUE(queryEapApRet != QUERY_NO_RECORD);
-    if (dbEnterpriseApInfo.size() > 0) {
-        WifiHistoryRecordManager::EnterpriseApInfo enterpriseApInfo = dbEnterpriseApInfo.front();
-        EXPECT_TRUE(enterpriseApInfo.ssid_ == ssidTest);
-        EXPECT_TRUE(enterpriseApInfo.keyMgmt_ == keyMgmtTest);
-    }
 }
 
 HWTEST_F(WifiHistoryRecordManagerTest, IsHomeApTest, TestSize.Level1)

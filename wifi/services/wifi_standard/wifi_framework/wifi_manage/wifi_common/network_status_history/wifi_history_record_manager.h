@@ -123,7 +123,6 @@ private:
     void NextUpdateApInfoTimer();
     void StopUpdateApInfoTimer();
     bool CheckIsHomeAp();
-    void RecordToEapApTable(const WifiDeviceConfig &config);
     void HomeApJudgeProcess();
     void UpdateConnectionTime(bool isNeedNext);
     bool IsAbnormalTimeRecords();
@@ -140,7 +139,7 @@ private:
     void ClearConnectedApInfo();
     bool IsFloatEqual(double a, double b);
     NativeRdb::ValuesBucket CreateEnterpriseApInfoBucket(const EnterpriseApInfo &enterpriseApInfo);
-    bool CheckIsEnterpriseAp(const WifiDeviceConfig &config);
+    bool CheckAndRecordEnterpriseAp(const WifiDeviceConfig &config);
     void HandleOldHistoryRecord();
 
     std::shared_ptr<WifiRdbManager> wifiDataBaseUtils_;

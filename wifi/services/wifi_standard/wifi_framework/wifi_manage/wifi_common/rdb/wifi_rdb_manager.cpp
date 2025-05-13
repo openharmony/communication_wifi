@@ -24,7 +24,7 @@ const std::string WIFI_DATABASE_PATH = "/data/service/el1/public/wifi";
 const std::string WIFI_PRO_RDB_NAME = "/wifi_pro.db";
 constexpr int32_t WIFI_PRO_DATABASE_VERSION = 1;
 const std::string WIFI_HISTORY_RECORD_DATEBASE_NAME = "/wifi_history_record.db";
-constexpr int WIFI_HISTORY_RECORD_DATEBASE_VERSION = 2;
+constexpr int WIFI_HISTORY_RECORD_DATABASE_VERSION = 2;
 
 static std::map<RdbType, std::shared_ptr<WifiRdbManager>> g_rdbManagerInstanceMap;
 static std::mutex g_mutex;
@@ -44,7 +44,7 @@ std::shared_ptr<WifiRdbManager> WifiRdbManager::GetRdbManger(const RdbType &rdbT
                 g_rdbManagerInstanceMap.insert_or_assign(RdbType::WIFI_HISTORY_RECORD,
                     std::make_shared<WifiRdbManager>(
                         WIFI_DATABASE_PATH + WIFI_HISTORY_RECORD_DATEBASE_NAME,
-                        WIFI_HISTORY_RECORD_DATEBASE_VERSION,
+                        WIFI_HISTORY_RECORD_DATABASE_VERSION,
                         std::make_shared<WifiRdbManager::WifiHistoryRecordRdbCallback>()));
             }
             return g_rdbManagerInstanceMap[RdbType::WIFI_HISTORY_RECORD];

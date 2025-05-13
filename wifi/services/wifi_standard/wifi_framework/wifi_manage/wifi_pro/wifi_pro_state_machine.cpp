@@ -391,7 +391,7 @@ bool WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
 }
 
 bool WifiProStateMachine::SelectNetwork(NetworkSelectionResult &networkSelectionResult,
-    std::vector<InterScanInfo> &scanInfos)
+    const std::vector<InterScanInfo> &scanInfos)
 {
     NetworkSelectType mNetworkSelectType;
     if (wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {

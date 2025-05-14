@@ -103,6 +103,15 @@ public:
      */
     static NetworkStatus GetLastNetworkStatus(uint32_t networkHistory);
 
+    /**
+     * modify all history record
+     * @param networkStatusHistory old network history record
+     * @param oldStatus old status
+     * @param newStatus new status
+     */
+    static void ModifyAllHistoryRecord(unsigned int &networkStatusHistory,
+        NetworkStatus oldStatus, NetworkStatus newStatus);
+
 private:
     /* the num of enum class NetworkStatus values */
     constexpr static int NETWORK_STATUS_NUM = 4;

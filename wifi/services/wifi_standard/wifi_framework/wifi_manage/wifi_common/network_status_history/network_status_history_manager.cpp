@@ -15,10 +15,11 @@
 
 #include <sstream>
 #include "network_status_history_manager.h"
+#include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {
-
+DEFINE_WIFILOG_LABEL("NetworkStatusHistoryManager");
 constexpr int THRESHOLD_CHECKED_NUM = 2;
 constexpr int SECOND_FROM_LAST = 1;
 constexpr int THIRD_FROM_LAST = 2;
@@ -143,6 +144,27 @@ std::vector<int> NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Arr
         networkStatusHistory = networkStatusHistory >> ITEM_BIT_NUM;
     }
     return vNetworkStatusHistory;
+}
+
+void NetworkStatusHistoryManager::ModifyAllHistoryRecord(unsigned int &networkStatusHistory,
+    NetworkStatus oldStatus, NetworkStatus newStatus)
+{
+    WIFI_LOGI("%{public}s, old networkStatusHistory=%{public}d, old status=%{public}d, new status=%{public}d",
+        __func__, networkStatusHistory, static_cast<int>(oldStatus), static_cast<int>(newStatus));
+    unsigned int oldNetworkStatusHistory = networkStatusHistory;
+    unsigned int newNetworkStatusHistory = 0;
+    int count = 0;
+    while (oldNetworkStatusHistory != 0) {
+        NetworkStatus networkStatus = GetLastNetworkStatus(oldNetworkStatusHistory);
+        if (networkStatus == oldStatus) {
+            networkStatus = newStatus;
+        }
+        newNetworkStatusHistory |= static_cast<int>(networkStatus) << (count * ITEM_BIT_NUM);
+        oldNetworkStatusHistory = oldNetworkStatusHistory >> ITEM_BIT_NUM;
+        count++;
+    }
+    networkStatusHistory = newNetworkStatusHistory;
+    WIFI_LOGI("%{public}s, new networkStatusHistory=%{public}d", __func__, newNetworkStatusHistory);
 }
 }
 }

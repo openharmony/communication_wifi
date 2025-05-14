@@ -4146,6 +4146,14 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         WIFI_LOGE("ConfigRandMacSelfCure failed!");
         return WIFI_OPT_FAILED;
     }
+    if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
+        SetAllowAutoConnectStatus(networkId, true);
+        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
+#ifndef OHOS_ARCH_LITE
+        BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
+#endif
+        WifiSettings::GetInstance().SetUserConnectChoice(networkId);
+    }
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
         WIFI_LOGE("StartConnectToNetwork get GetDeviceConfig failed!");
@@ -4156,14 +4164,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     SetRandomMac(deviceConfig, bssid);
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(bssid).c_str());
-    if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
-        SetAllowAutoConnectStatus(networkId, true);
-        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
-#ifndef OHOS_ARCH_LITE
-        BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
-#endif
-        WifiSettings::GetInstance().SetUserConnectChoice(networkId);
-    }
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     WriteWifiConnectionInfoHiSysEvent(networkId);
     WriteConnectTypeHiSysEvent(connTriggerMode, deviceConfig.lastConnectTime <= 0);

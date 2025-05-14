@@ -15,6 +15,46 @@
 #ifndef OHOS_WIFI_STATE_MACHINE_H
 #define OHOS_WIFI_STATE_MACHINE_H
 
+#include "wifi_country_code_manager.h"
+
+void StaStateMachine::HandlePortalNetworkPorcess()
+{
+#ifndef OHOS_ARCH_LITE
+    if (mPortalUrl.empty()) {
+        WIFI_LOGE("portal uri is nullptr\n");
+    }
+    if (!m_NetWorkState) {
+        WIFI_LOGE("m_NetWorkState is nullptr\n");
+        return;
+    }
+    int netId = m_NetWorkState->GetWifiNetId();
+    AAFwk::Want want;
+    want.SetParam("netId", netId);
+    std::string wifiCountryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(wifiCountryCode);
+    int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
+    if (wifiCountryCode == DEFAULT_REGION && deviceType != ProductDeviceType::TV) {
+        std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
+        want.SetAction(PORTAL_ACTION);
+        want.SetUri(mPortalUrl);
+        want.AddEntity(PORTAL_ENTITY);
+        want.SetBundle(bundle);
+        WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
+    } else {
+        want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
+        want.SetParam("url", mPortalUrl);
+        want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
+        WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d, wifiCountryCode is %{public}s",
+            netId, deviceType, wifiCountryCode.c_str());
+    }
+    OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
+    if (err != ERR_OK) {
+        WIFI_LOGI("portal login StartAbility is failed %{public}d", err);
+        WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
+    }
+#endif
+}
+
 #include <regex.h>
 #include <sys/types.h>
 #include <fstream>

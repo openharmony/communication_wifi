@@ -26,6 +26,7 @@
 #define HAL_INTERFACE_SUPPORT_COMBINATIONS 32   /* chip support valid interface combinations */
 #define HAL_PSK_MIN_LENGTH 8
 #define HAL_PSK_MAX_LENGTH 64
+#define HAL_SAE_PSK_MIN_LENGTH 1
 #define HAL_BSSID_LENGTH 17                     /* bssid - mac address length */
 #define HAL_PIN_CODE_LENGTH 8
 #define HAL_P2P_DEV_ADDRESS_LEN 32

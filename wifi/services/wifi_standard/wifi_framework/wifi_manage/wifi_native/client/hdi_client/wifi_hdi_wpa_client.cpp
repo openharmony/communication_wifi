@@ -585,8 +585,10 @@ int WifiHdiWpaClient::PushDeviceConfigParseMask(
 
 WifiErrorNo WifiHdiWpaClient::CheckValidDeviceConfig(const WifiHalDeviceConfig &config) const
 {
+    uint32_t minLen = config.keyMgmt == KEY_MGMT_SAE ? HAL_SAE_PSK_MIN_LENGTH : HAL_PSK_MIN_LENGTH;
+    uint32_t maxLen = HAL_PSK_MAX_LENGTH;
     if (config.psk.length() > 0) {
-        if (config.psk.length() < HAL_PSK_MIN_LENGTH || config.psk.length() > HAL_PSK_MAX_LENGTH) {
+        if (config.psk.length() < minLen || config.psk.length() > maxLen) {
             return WIFI_HAL_OPT_FAILED;
         }
     }

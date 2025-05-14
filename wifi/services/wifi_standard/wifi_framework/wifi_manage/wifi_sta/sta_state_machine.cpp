@@ -1921,7 +1921,6 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
     return true;
 }
 
-
 void StaStateMachine::HandlePortalNetworkPorcess()
 {
 #ifndef OHOS_ARCH_LITE

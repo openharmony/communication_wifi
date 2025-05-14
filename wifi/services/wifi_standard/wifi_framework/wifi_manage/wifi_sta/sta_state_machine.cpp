@@ -53,6 +53,7 @@
 #endif
 #include "sta_define.h"
 #include "ip_qos_monitor.h"
+#include "wifi_country_code_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1920,6 +1921,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
     return true;
 }
 
+
 void StaStateMachine::HandlePortalNetworkPorcess()
 {
 #ifndef OHOS_ARCH_LITE
@@ -1932,15 +1934,27 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     }
     int netId = m_NetWorkState->GetWifiNetId();
     AAFwk::Want want;
-    want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
-    want.SetParam("url", mPortalUrl);
     want.SetParam("netId", netId);
+    std::string wifiCountryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(wifiCountryCode);
     int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
-    want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
-    WIFI_LOGI("wifi netId is %{public}d, DeviceType is %{public}d", netId, deviceType);
+    if (wifiCountryCode == DEFAULT_REGION && deviceType != ProductDeviceType::TV) {
+        std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
+        want.SetAction(PORTAL_ACTION);
+        want.SetUri(mPortalUrl);
+        want.AddEntity(PORTAL_ENTITY);
+        want.SetBundle(bundle);
+        WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
+    } else {
+        want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
+        want.SetParam("url", mPortalUrl);
+        want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
+        WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d, wifiCountryCode is %{public}s",
+            netId, deviceType, wifiCountryCode.c_str());
+    }
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
     if (err != ERR_OK) {
-        WIFI_LOGI("StartAbility is failed %{public}d", err);
+        WIFI_LOGI("portal login StartAbility is failed %{public}d", err);
         WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
     }
 #endif

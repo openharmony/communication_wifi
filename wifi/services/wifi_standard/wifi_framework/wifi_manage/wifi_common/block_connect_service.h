@@ -65,7 +65,7 @@ public:
 
     // Check if the given BSSID has frequent disconnects with the last connected network
     // false - Not frequent disconnect true - Frequent disconnect
-    bool IsFrequentDisconnect(std::string bssid, int wpaReason);
+    bool IsFrequentDisconnect(std::string bssid, int wpaReason, int locallyGenerated);
 
     // Check if the given targetNetworkId is blocked due to wrong password
     bool IsWrongPassword(int targetNetworkId);

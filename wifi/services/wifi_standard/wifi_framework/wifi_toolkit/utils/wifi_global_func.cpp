@@ -18,6 +18,7 @@
 #include <iostream>
 #include <sstream>
 #include <random>
+#include "wifi_common_util.h"
 #include "wifi_log.h"
 #ifndef OHOS_ARCH_LITE
 #include "json/json.h"
@@ -134,14 +135,14 @@ std::vector<int> SplitStringToIntVector(const std::string &str, const std::strin
         if (endPos > begPos) {
             tmpStr = str.substr(begPos, endPos - begPos);
             if (IsValidateNum(tmpStr)) {
-                res.push_back(ConvertStringToInt(tmpStr));
+                res.push_back(CheckDataLegal(tmpStr));
             }
         }
         begPos = endPos + split.size();
     }
     tmpStr = str.substr(begPos);
     if (!tmpStr.empty() && IsValidateNum(tmpStr)) {
-        res.push_back(ConvertStringToInt(tmpStr));
+        res.push_back(CheckDataLegal(tmpStr));
     }
     return res;
 }
@@ -483,24 +484,6 @@ void StrToUpper(std::string &str)
     });
 }
 
-int ConvertCharToInt(const char &c)
-{
-    int result = 0;
-    std::stringstream ss;
-    ss << c;
-    ss >> result;
-    return result;
-}
-
-int ConvertStringToInt(const std::string str)
-{
-    int result = 0;
-    std::stringstream ss;
-    ss << str;
-    ss >> result;
-    return result;
-}
-
 int GetParamValue(const char *key, const char *def, char *value, uint32_t len)
 {
 #ifdef INIT_LIB_ENABLE
@@ -678,7 +661,7 @@ void ConvertDecStrToHexStr(const std::string &inData, std::string &outData)
     constexpr int hexCharLen = 2;
     std::stringstream temp;
     while (getline(ss, token, ',')) {
-        int num = ConvertStringToInt(token);
+        int num = CheckDataLegal(token);
         temp << std::setfill('0') << std::setw(hexCharLen) << std::hex << num;
     }
     outData = temp.str();

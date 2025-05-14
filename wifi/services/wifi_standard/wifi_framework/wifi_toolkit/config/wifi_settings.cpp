@@ -934,7 +934,8 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 
     std::vector<WifiBackupConfig> backupConfigs;
     for (auto &config : localConfigs) {
-        if (config.wifiEapConfig.eap.length() != 0 || config.isPasspoint == true) {
+        if (config.wifiEapConfig.eap.length() != 0 || config.isPasspoint || !(config.uid == -1 || config.isShared)) {
+            LOGI("OnBackup filterd, ssid : %{public}s.", SsidAnonymize(config.ssid).c_str());
             continue;
         }
 #ifdef FEATURE_ENCRYPTION_SUPPORT

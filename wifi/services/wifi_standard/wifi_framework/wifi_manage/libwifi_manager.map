@@ -231,7 +231,6 @@
         "OHOS::Wifi::CheckMacIsValid(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiCodeConvertUtil::GbkToUtf8(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::GetParamValue(char const*, char const*, char*, unsigned int)";
-        "OHOS::Wifi::ConvertStringToInt(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
         "OHOS::Wifi::IsValidCountryCode(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::StrToUpper(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::SetParamValue(char const*, char const*)";

@@ -24,6 +24,7 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_config_center.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -115,7 +116,8 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByMcc(std::string &wifiCountryC
         return WIFI_OPT_FAILED;
     }
     std::string cachedPlmnStr(cachedPlmn);
-    int integerCachedMcc = ConvertStringToInt(cachedPlmnStr.substr(PLMN_SUBSTR_LEFT, PLMN_SUBSTR_RIGHT));
+    std::string cacheMccStr = cachedPlmnStr.substr(PLMN_SUBSTR_LEFT, PLMN_SUBSTR_RIGHT);
+    int integerCachedMcc = CheckDataLegal(cacheMccStr);
     if (ConvertMncToIso(integerCachedMcc, wifiCountryCode) != true) {
         WIFI_LOGE("get wifi country code by cached mcc fail, cached plmn invalid, mcc=%{public}d", integerCachedMcc);
         return WIFI_OPT_FAILED;
@@ -131,7 +133,8 @@ ErrCode WifiCountryCodePolicy::GetWifiCountryCodeByMcc(std::string &wifiCountryC
             "cache code=%{public}s", dynamicPlmn.c_str(), wifiCountryCode.c_str());
         return WIFI_OPT_SUCCESS;
     }
-    int integerMcc = ConvertStringToInt(dynamicPlmn.substr(PLMN_SUBSTR_LEFT, PLMN_SUBSTR_RIGHT));
+    std::string mccStr = dynamicPlmn.substr(PLMN_SUBSTR_LEFT, PLMN_SUBSTR_RIGHT);
+    int integerMcc = CheckDataLegal(mccStr);
     if (ConvertMncToIso(integerMcc, wifiCountryCode) != true) {
         WIFI_LOGI("get wifi country code by dynamic mcc fail, convert fail, mcc=%{public}d, use cached plmn, "
             "cache code=%{public}s", integerMcc, wifiCountryCode.c_str());

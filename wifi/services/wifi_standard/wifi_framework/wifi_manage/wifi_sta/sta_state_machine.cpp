@@ -2163,6 +2163,13 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
               "%{public}s", __func__, linkedInfo.isHiLinkNetwork, isHomeAp, isHomeRouter, config.keyMgmt.c_str());
     if ((InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) || isHomeAp || isHomeRouter)
         && config.keyMgmt != KEY_MGMT_NONE) {
+        // Change the value of PORTAL in networkStatusHistory to NO_INTERNET
+        WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
+        NetworkStatusHistoryManager::ModifyAllHistoryRecord(wifiDeviceConfig.networkStatusHistory,
+            NetworkStatus::PORTAL, NetworkStatus::NO_INTERNET);
+        WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
+        WifiSettings::GetInstance().SyncDeviceConfig();
+
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);

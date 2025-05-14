@@ -64,6 +64,7 @@ public:
     /**
      * @Description is Home router
      *
+     * @param portalUrl portal redirect url
      * @return is home router
      */
     bool IsHomeRouter(const std::string &portalUrl);
@@ -77,14 +78,14 @@ public:
      * @Description Delete ApInfo
      *
      * @param ssid ap ssid
-     * @param bssid ap bssid
+     * @param keyMgmt ap keyMgmt
      */
-    void DeleteApInfo(const std::string &ssid, const std::string &bssid);
+    void DeleteApInfo(const std::string &ssid, const std::string &keyMgmt);
 private:
     class ConnectedApInfo {
     public:
         // archive attribute
-        int networkId_ = 0;
+        int networkId_ = INVALID_NETWORK_ID;
         std::string ssid_ = "";
         std::string bssid_ = "";
         std::string keyMgmt_ = "";
@@ -103,6 +104,15 @@ private:
         int currentRecordSecond_ = 0;
     };
 
+    class EnterpriseApInfo {
+    public:
+        std::string ssid_ = "";
+        std::string keyMgmt_ = "";
+        EnterpriseApInfo() {}
+        EnterpriseApInfo(const std::string& ssid,
+            const std::string& keyMgmt) : ssid_(ssid), keyMgmt_(keyMgmt) {}
+    };
+
     WifiHistoryRecordManager() = default;
     WifiHistoryRecordManager(const WifiHistoryRecordManager&) = delete;
     WifiHistoryRecordManager &operator=(const WifiHistoryRecordManager &) = delete;
@@ -110,7 +120,6 @@ private:
     void CreateTable();
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId = 0);
     void HandleWifiConnectedMsg(const WifiLinkedInfo &info, const WifiDeviceConfig &config);
-    bool IsEnterprise(const WifiDeviceConfig &config);
     void NextUpdateApInfoTimer();
     void StopUpdateApInfoTimer();
     bool CheckIsHomeAp();
@@ -120,12 +129,18 @@ private:
     void UpdateStaticTimePoint(const std::time_t &currentTime);
     void StaticDurationInNightAndWeekend(int day, int64_t startTime, int64_t endTime);
     void AddOrUpdateApInfoRecord();
-    void RemoveApInfoRecord(const std::string &bssid);
-    int QueryApInfoRecordByBssid(const std::string &bssid, ConnectedApInfo &dbApInfo);
-    int QueryAllApInfoRecord(std::vector<ConnectedApInfo> &dbApInfoVector);
+    bool AddEnterpriseApRecord(const EnterpriseApInfo &enterpriseApInfo);
+    int RemoveApInfoRecordByParam(const std::string tableName, const std::map<std::string, std::string> &deleteParms);
+    int QueryApInfoRecordByParam(const std::map<std::string, std::string> &queryParms,
+        std::vector<ConnectedApInfo> &dbApInfoVector);
+    int QueryEnterpriseApRecordByParam(const std::map<std::string, std::string> &queryParms,
+        std::vector<EnterpriseApInfo> &dbEnterpriseApInfoVector);
     NativeRdb::ValuesBucket CreateApInfoBucket(const ConnectedApInfo &apInfo);
     void ClearConnectedApInfo();
     bool IsFloatEqual(double a, double b);
+    NativeRdb::ValuesBucket CreateEnterpriseApInfoBucket(const EnterpriseApInfo &enterpriseApInfo);
+    bool CheckAndRecordEnterpriseAp(const WifiDeviceConfig &config);
+    void HandleOldHistoryRecord();
 
     std::shared_ptr<WifiRdbManager> wifiDataBaseUtils_;
     StaServiceCallback staCallback_;

@@ -15,7 +15,7 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <wifi_history_record_manager.h>
+#include "wifi_history_record_manager.h"
 #include "wifi_logger.h"
 #include "rdb_helper.h"
 #include "mock_wifi_settings.h"
@@ -38,7 +38,12 @@ constexpr long INVALID_TIME_POINT = 0;
 constexpr int QUERY_FAILED = 0;
 constexpr int QUERY_NO_RECORD = 1;
 constexpr int QUERY_HAS_RECORD = 2;
+constexpr int AP_NUM = 40;
 const std::string WIFI_HISTORY_RECORD_MANAGER_CLASS_NAME = "WifiHistoryRecordManager";
+const std::string NETWORK_ID = "networkId";
+const std::string SSID = "ssid";
+const std::string BSSID = "bssid";
+const std::string KEY_MGMT = "keyMgmt";
 static std::string g_errLog;
 void WifiHistoryRecordManagerCallback(const LogType type, const LogLevel level,
                                       const unsigned int domain, const char *tag,
@@ -49,13 +54,12 @@ void WifiHistoryRecordManagerCallback(const LogType type, const LogLevel level,
 
 class WifiHistoryRecordManagerTest : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
     virtual void SetUp()
     {
         LOG_SetCallback(WifiHistoryRecordManagerCallback);
+        wifiDataBaseUtils_ = WifiRdbManager::GetRdbManger(RdbType::WIFI_HISTORY_RECORD);
     }
     virtual void TearDown()
     {
@@ -68,6 +72,7 @@ public:
         return nowMs.time_since_epoch().count();
     }
     using ConnectedApInfo = WifiHistoryRecordManager::ConnectedApInfo;
+    std::shared_ptr<WifiRdbManager> wifiDataBaseUtils_ = nullptr;
 };
 
 HWTEST_F(WifiHistoryRecordManagerTest, InitTest, TestSize.Level1)
@@ -196,6 +201,12 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged3Test, TestSize.Level1)
     info6.bssid = recordBssid;
     int instId6 = 0;
     WifiDeviceConfig config6;
+    config6.networkId = recordNetworkId;
+    config6.ssid = recordSsid;
+    config6.bssid = recordBssid;
+    config6.keyMgmt = recordKeyMgmt;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config6), Return(0)));
     WifiHistoryRecordManager::GetInstance().DealStaConnChanged(state6, info6, instId6);
     std::string testSsid = WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_;
     std::string testBssid = WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_;
@@ -491,14 +502,16 @@ HWTEST_F(WifiHistoryRecordManagerTest, AddOrUpdateApInfoRecordTest, TestSize.Lev
 {
     WIFI_LOGI("AddOrUpdateApInfoRecordTest enter");
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
+    std::string testSsid = "AddOrUpdateApInfoRecordTest";
+    std::string testKeyMgmt = "SAE";
     std::string testBssid = "11:22:ff:3a:11:43";
 
     // insert
     long markedAsHomeApTime = 1736225374;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 8;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = "AddOrUpdateApInfoRecordTest";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = testSsid;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = "SAE";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = testKeyMgmt;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.firstConnectedTime_ = 1736225372;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentConnectedTime_ = 1736225373;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTime_ = 100;
@@ -507,98 +520,217 @@ HWTEST_F(WifiHistoryRecordManagerTest, AddOrUpdateApInfoRecordTest, TestSize.Lev
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.markedAsHomeApTime_ = markedAsHomeApTime;
     WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
 
-    ConnectedApInfo dbApInfo;
-    int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo);
-    EXPECT_TRUE(ret == QUERY_HAS_RECORD);
-    EXPECT_TRUE(dbApInfo.bssid_ == testBssid);
-    EXPECT_TRUE(dbApInfo.markedAsHomeApTime_ == markedAsHomeApTime);
+    std::vector<ConnectedApInfo> dbApInfoVector1;
+    int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}}, dbApInfoVector1);
+    if (dbApInfoVector1.size() >= 1) {
+        ConnectedApInfo dbApInfo1 = dbApInfoVector1.front();
+        EXPECT_TRUE(ret == QUERY_HAS_RECORD);
+        EXPECT_TRUE(dbApInfo1.bssid_ == testBssid);
+        EXPECT_TRUE(dbApInfo1.markedAsHomeApTime_ == markedAsHomeApTime);
+    }
 
     // update
     long markedAsHomeApTime2 = 1736225899;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.markedAsHomeApTime_ = markedAsHomeApTime2;
     WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
 
-    ConnectedApInfo dbApInfo2;
-    int ret2 = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo2);
-    EXPECT_TRUE(ret2 == QUERY_HAS_RECORD);
-    EXPECT_TRUE(dbApInfo2.bssid_ == testBssid);
-    EXPECT_TRUE(dbApInfo2.markedAsHomeApTime_ == markedAsHomeApTime2);
+    std::vector<ConnectedApInfo> dbApInfoVector2;
+    int ret2 = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}}, dbApInfoVector2);
+    if (dbApInfoVector2.size() >= 1) {
+        ConnectedApInfo dbApInfo2 = dbApInfoVector2.front();
+        EXPECT_TRUE(ret2 == QUERY_HAS_RECORD);
+        EXPECT_TRUE(dbApInfo2.bssid_ == testBssid);
+        EXPECT_TRUE(dbApInfo2.markedAsHomeApTime_ == markedAsHomeApTime2);
+    }
 }
 
-HWTEST_F(WifiHistoryRecordManagerTest, RemoveApInfoRecordTest, TestSize.Level1)
+HWTEST_F(WifiHistoryRecordManagerTest, AddEnterpriseApRecordTest, TestSize.Level1)
 {
     WIFI_LOGI("RemoveApInfoRecordTest enter");
+    WIFI_LOGI("AddEnterpriseApRecordTest enter");
+    WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
+    std::string testSsid = "AddEnterpriseApRecordTest";
+    std::string testKeyMgmt = "SAE";
+    WifiHistoryRecordManager::GetInstance().
+        RemoveApInfoRecordByParam(ENTERPRISE_AP_INFO_TABLE_NAME, {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}});
+
+    // test insert
+    WifiHistoryRecordManager::EnterpriseApInfo enterpriseApInfo(testSsid, testKeyMgmt);
+    bool ret = WifiHistoryRecordManager::GetInstance().AddEnterpriseApRecord(enterpriseApInfo);
+    EXPECT_TRUE(ret);
+
+    // test update
+    ret = WifiHistoryRecordManager::GetInstance().AddEnterpriseApRecord(enterpriseApInfo);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, RemoveApInfoRecordByParamTest, TestSize.Level1)
+{
+    WIFI_LOGI("RemoveApInfoRecordByParamTest enter");
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
 
+    std::string testSsid = "RemoveApInfoRecordByParamTest";
     std::string testBssid = "dd:aa:55:55:0c:ff";
+    std::string testKeyMgmt = "SAE";
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 66;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = "RemoveApInfoRecordTest";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = testSsid;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = "SAE";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = testKeyMgmt;
     WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
-    ConnectedApInfo dbApInfo;
-    int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo);
-    EXPECT_TRUE(ret == QUERY_HAS_RECORD);
-
-    WifiHistoryRecordManager::GetInstance().RemoveApInfoRecord(testBssid);
-    ConnectedApInfo dbApInfo2;
-    int ret2 = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo2);
-    EXPECT_TRUE(ret2 != QUERY_HAS_RECORD);
-}
-
-HWTEST_F(WifiHistoryRecordManagerTest, QueryApInfoRecordByBssidTest, TestSize.Level1)
-{
-    WIFI_LOGI("QueryApInfoRecordByBssidTest enter");
-    WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
-
-    std::string testBssid = "44:aa:12:55:0c:ff";
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 90;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = "QueryApInfoRecordByBssidTest";
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = "SAE";
-    WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
-    ConnectedApInfo dbApInfo;
-    int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo);
-    EXPECT_TRUE(ret == QUERY_HAS_RECORD);
-
-    std::string testBssid2 = "44:37:a5:55:aa:ff";
-    ConnectedApInfo dbApInfo2;
-    int ret2 = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid2, dbApInfo2);
-    EXPECT_TRUE(ret2 != QUERY_HAS_RECORD);
-}
-
-HWTEST_F(WifiHistoryRecordManagerTest, QueryAllApInfoRecordTest, TestSize.Level1)
-{
-    WIFI_LOGI("QueryAllApInfoRecordTest enter");
-    WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
-
-    std::string testBssid = "23:aa:6c:55:0c:cc";
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 52;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = "QueryAllApInfoRecordTest";
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = "SAE";
-    WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
-
     std::vector<ConnectedApInfo> dbApInfoVector;
-    int queryRet = WifiHistoryRecordManager::GetInstance().QueryAllApInfoRecord(dbApInfoVector);
-    EXPECT_TRUE(queryRet == QUERY_HAS_RECORD);
+    int ret1 = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}}, dbApInfoVector);
+    EXPECT_TRUE(ret1 == QUERY_HAS_RECORD);
 
-    bool addRet = false;
-    for (const ConnectedApInfo &info : dbApInfoVector) {
-        if (info.bssid_ == testBssid) {
-            addRet = true;
-            break;
-        }
-    }
-    EXPECT_TRUE(addRet);
+    WifiHistoryRecordManager::GetInstance().RemoveApInfoRecordByParam(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}});
+
+    std::vector<ConnectedApInfo> dbApInfoVector2;
+    int ret2 = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}}, dbApInfoVector2);
+    EXPECT_TRUE(ret2 != QUERY_HAS_RECORD);
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, QueryEnterpriseApRecordByParamTest, TestSize.Level1)
+{
+    WIFI_LOGI("QueryEnterpriseApRecordByParamTest enter");
+    WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
+    std::string testSsid = "QueryEnterpriseApRecordByParamTest";
+    std::string testKeyMgmt = "SAE";
+
+    WifiHistoryRecordManager::EnterpriseApInfo enterpriseApInfo(testSsid, testKeyMgmt);
+    bool ret = WifiHistoryRecordManager::GetInstance().AddEnterpriseApRecord(enterpriseApInfo);
+    EXPECT_TRUE(ret);
+
+    WifiHistoryRecordManager::GetInstance().
+        RemoveApInfoRecordByParam(ENTERPRISE_AP_INFO_TABLE_NAME, {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}});
+
+    std::vector<WifiHistoryRecordManager::EnterpriseApInfo> dbEnterpriseApInfo;
+    int queryEnterpriseApRet = WifiHistoryRecordManager::GetInstance().QueryEnterpriseApRecordByParam(
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}}, dbEnterpriseApInfo);
+    EXPECT_TRUE(queryEnterpriseApRet == QUERY_NO_RECORD);
+    EXPECT_TRUE(dbEnterpriseApInfo.size() == 0);
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, QueryApInfoRecordByParamTest, TestSize.Level1)
+{
+    WIFI_LOGI("QueryApInfoRecordByParamTest enter");
+    WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
+
+    std::string testSsid = "QueryApInfoRecordByParamTest";
+    std::string testBssid = "44:aa:12:55:0c:ff";
+    std::string testKeyMgmt = "SAE";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 90;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = testSsid;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = testKeyMgmt;
+    WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
+    std::vector<ConnectedApInfo> dbApInfoVector;
+    int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}}, dbApInfoVector);
+    EXPECT_TRUE(ret == QUERY_HAS_RECORD);
+
+    std::string testSsid2 = "QueryApInfoRecordByParamTest2";
+    std::string testKeyMgmt2 = "SAE";
+    std::vector<ConnectedApInfo> dbApInfoVector2;
+    int ret2 = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
+        {{SSID, testSsid2}, {KEY_MGMT, testKeyMgmt2}}, dbApInfoVector2);
+    EXPECT_TRUE(ret2 != QUERY_HAS_RECORD);
 }
 
 HWTEST_F(WifiHistoryRecordManagerTest, CreateApInfoBucketTest, TestSize.Level1)
 {
     WIFI_LOGI("CreateApInfoBucketTest enter");
     ConnectedApInfo apInfo;
-    WifiHistoryRecordManager::GetInstance().CreateApInfoBucket(apInfo);
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    apInfo.networkId_ = 12;  // 12: test networkId
+    NativeRdb::ValuesBucket ret = WifiHistoryRecordManager::GetInstance().CreateApInfoBucket(apInfo);
+    NativeRdb::ValueObject valueObject;
+    int networkId = INVALID_NETWORK_ID;
+    if (ret.GetObject("networkId", valueObject)) {
+        valueObject.GetInt(networkId);
+        EXPECT_TRUE(apInfo.networkId_ = networkId);
+    }
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, CreateEnterpriseApInfoBucketTest, TestSize.Level1)
+{
+    WIFI_LOGI("CreateEnterpriseApInfoBucketTest enter");
+    WifiHistoryRecordManager::EnterpriseApInfo apInfo;
+    apInfo.ssid_ = "CreateEnterpriseApInfoBucketTest";
+    NativeRdb::ValuesBucket ret = WifiHistoryRecordManager::GetInstance().CreateEnterpriseApInfoBucket(apInfo);
+    NativeRdb::ValueObject valueObject;
+    std::string ssid = "";
+    if (ret.GetObject("ssid", valueObject)) {
+        valueObject.GetString(ssid);
+        EXPECT_TRUE(apInfo.ssid_ == ssid);
+    }
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, CheckIsEnterpriseApTest, TestSize.Level1)
+{
+    WIFI_LOGI("CheckIsEnterpriseApTest enter");
+
+    // test enterpriseAp has record
+    std::string testSsid1 = "CheckIsEnterpriseApTest1";
+    std::string testKeyMgmt1 = "SAE";
+    WifiHistoryRecordManager::EnterpriseApInfo enterpriseApInfo(testSsid1, testKeyMgmt1);
+    bool ret1 = WifiHistoryRecordManager::GetInstance().AddEnterpriseApRecord(enterpriseApInfo);
+    WifiDeviceConfig config1;
+    config1.ssid = testSsid1;
+    config1.keyMgmt = testKeyMgmt1;
+    bool ret11 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config1);
+    EXPECT_TRUE(ret11);
+
+    // test EAP AP
+    std::string testSsid2 = "CheckIsEnterpriseApTest2";
+    std::string testKeyMgmt2 = "WPA-EAP";
+    WifiDeviceConfig config2;
+    config2.ssid = testSsid2;
+    config2.keyMgmt = testKeyMgmt2;
+    bool ret2 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config2);
+    EXPECT_TRUE(ret2);
+
+    // test no apInfo record
+    std::string testSsid3 = "CheckIsEnterpriseApTest3";
+    std::string testKeyMgmt3 = "SAE";
+    WifiDeviceConfig config3;
+    config3.ssid = testSsid3;
+    config3.keyMgmt = testKeyMgmt3;
+    bool ret3 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config3);
+    EXPECT_FALSE(ret3);
+
+    // test has apInfo record, but the number is less than 20
+    std::string testSsid4 = "CheckIsEnterpriseApTest4";
+    std::string testBssid4 = "11:22:33:44:55:6f";
+    std::string testKeyMgmt4 = "SAE";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 8;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = testSsid4;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid4;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = testKeyMgmt4;
+    WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
+    WifiDeviceConfig config4;
+    config4.ssid = testSsid4;
+    config4.keyMgmt = testKeyMgmt4;
+    bool ret4 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config4);
+    EXPECT_FALSE(ret4);
+    
+    // test has apInfo record and more than 20
+    std::string testSsid5 = "CheckIsEnterpriseApTest5";
+    std::string testKeyMgmt5 = "SAE";
+    for (int i = 10; i <= AP_NUM; i++) {
+        WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = i;
+        WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = testSsid5;
+        WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = "1a:44:5c:3d:21:" + std::to_string(i);
+        WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = testKeyMgmt5;
+        WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
+    }
+    WifiDeviceConfig config5;
+    config5.ssid = testSsid5;
+    config5.keyMgmt = testKeyMgmt5;
+    bool ret5 = WifiHistoryRecordManager::GetInstance().CheckAndRecordEnterpriseAp(config5);
+    EXPECT_TRUE(ret5);
 }
 
 HWTEST_F(WifiHistoryRecordManagerTest, IsHomeApTest, TestSize.Level1)
@@ -657,10 +789,36 @@ HWTEST_F(WifiHistoryRecordManagerTest, ClearConnectedApInfoTest, TestSize.Level1
 HWTEST_F(WifiHistoryRecordManagerTest, DeleteAllApInfoTest, TestSize.Level1)
 {
     WIFI_LOGI("DeleteAllApInfoTest enter");
-    WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
+    WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
+
+    std::string testBssid1 = "66:3b:12:6a:0c:ff";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 90;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = "DeleteAllApInfoTest1";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid1;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = "SAE";
+    WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
 
     std::vector<ConnectedApInfo> dbApInfoVector;
-    int ret = WifiHistoryRecordManager::GetInstance().QueryAllApInfoRecord(dbApInfoVector);
+    std::map<std::string, std::string> queryParms;
+    int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(queryParms, dbApInfoVector);
+    EXPECT_TRUE(ret == QUERY_HAS_RECORD);
+
+    std::string testBssid2 = "3b:99:12:6a:2a:ff";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 906;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = "DeleteAllApInfoTest2";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid2;
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = "SAE";
+    WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
+    std::vector<ConnectedApInfo> dbApInfoVector2;
+    std::map<std::string, std::string> queryParms2;
+    ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(queryParms2, dbApInfoVector2);
+    EXPECT_TRUE(ret == QUERY_HAS_RECORD);
+
+    WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
+
+    std::vector<ConnectedApInfo> dbApInfoVector3;
+    std::map<std::string, std::string> queryParms3;
+    ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(queryParms3, dbApInfoVector3);
     EXPECT_TRUE(ret == QUERY_NO_RECORD);
 }
 
@@ -671,20 +829,70 @@ HWTEST_F(WifiHistoryRecordManagerTest, DeleteApInfoTest, TestSize.Level1)
 
     std::string testSsid = "DeleteApInfoTest";
     std::string testBssid = "23:bb:9c:55:aa:cc";
+    std::string testKeyMgmt = "SAE";
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = 33;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = "DeleteApInfoTest";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_ = testSsid;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = testBssid;
-    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = "SAE";
+    WifiHistoryRecordManager::GetInstance().connectedApInfo_.keyMgmt_ = testKeyMgmt;
     WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
 
-    ConnectedApInfo dbApInfo;
-    int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo);
+    std::vector<ConnectedApInfo> dbApInfoVector1;
+    int ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}}, dbApInfoVector1);
     EXPECT_TRUE(ret == QUERY_HAS_RECORD);
 
-    WifiHistoryRecordManager::GetInstance().DeleteApInfo(testSsid, testBssid);
+    WifiHistoryRecordManager::GetInstance().DeleteApInfo(testSsid, testKeyMgmt);
 
-    ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByBssid(testBssid, dbApInfo);
+    std::vector<ConnectedApInfo> dbApInfoVector2;
+    ret = WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(
+        {{SSID, testSsid}, {KEY_MGMT, testKeyMgmt}}, dbApInfoVector2);
     EXPECT_TRUE(ret != QUERY_HAS_RECORD);
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, HandleOldHistoryRecordTest, TestSize.Level1)
+{
+    WIFI_LOGI("HandleOldHistoryRecordTest enter");
+    WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
+
+    // Preset 505 hotspot information
+    if (wifiDataBaseUtils_ == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    int64_t firstConnectedTimeTest = 1736225372;
+    int64_t currentConnectedTimeTest = 1736225374;
+    int ap_num = 505;
+    for (int i = 1; i <= ap_num; i++) {
+        ConnectedApInfo info;
+        info.networkId_ = i;
+        info.ssid_ = "HandleOldHistoryRecordTest_";
+        info.ssid_.append(std::to_string(i));
+        info.keyMgmt_ = "SAE";
+        info.bssid_ = "13:1b:9c:55:aa:cc";
+        info.firstConnectedTime_ = firstConnectedTimeTest;
+        info.currentConnectedTime_ = currentConnectedTimeTest + i;
+        info.totalUseTime_ = 1730;  // 1730: total use time
+        info.totalUseTimeAtNight_ = 100;  // 100: total use time at night
+        info.totalUseTimeAtWeekend_ = 32;  // 32: total use time at weekend
+        info.markedAsHomeApTime_ = 0;    // 0: not home ap
+        bool executeRet = wifiDataBaseUtils_->Insert(AP_CONNECTION_DURATION_INFO_TABLE_NAME,
+            WifiHistoryRecordManager::GetInstance().CreateApInfoBucket(info));
+    }
+
+    // Deleting historical hotspot information
+    WifiHistoryRecordManager::GetInstance().HandleOldHistoryRecord();
+
+    std::map<std::string, std::string> queryParms;
+    std::vector<ConnectedApInfo> dbApInfoVector;
+    WifiHistoryRecordManager::GetInstance().QueryApInfoRecordByParam(queryParms, dbApInfoVector);
+    EXPECT_TRUE(dbApInfoVector.size() <= 500);
+    for (ConnectedApInfo itemInfo : dbApInfoVector) {
+        if (itemInfo.currentConnectedTime_ <= currentConnectedTimeTest + 5) {
+            EXPECT_TRUE(false);  // Top 5 Hotspots for the Longest Time, need delete
+        }
+    }
+
+    WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
 }
 }
 }

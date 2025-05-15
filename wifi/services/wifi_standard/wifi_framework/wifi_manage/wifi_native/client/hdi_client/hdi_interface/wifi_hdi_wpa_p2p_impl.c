@@ -1339,4 +1339,30 @@ WifiErrorNo HdiSetMiracastSinkConfig(const char *config)
     LOGI("HdiSetMiracastSinkConfig success.");
     return WIFI_HAL_OPT_OK;
 }
+
+WifiErrorNo HdiP2pTempGroupAdd(int freq)
+{
+    char cmd[BUFF_SIZE] = {0};
+    LOGI("HdiP2pTempGroupAdd enter");
+    pthread_mutex_lock(GetWpaObjMutex());
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiP2pTempGroupAdd: wpaObj is NULL");
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    if (snprintf_s(cmd, sizeof(cmd),sizeof(cmd) - 1, "%d", freq) < 0) {
+        LOGE("HdiP2pTempGroupAdd snprintf_s failed");
+        return WIFI_HAL_OPT_FAILED;
+    }
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, GetHdiP2pIfaceName(), P2P_CREATE_TEMP_GROUP, 0, cmd);
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiP2pTempGroupAdd: send failed result:%{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("HdiP2pTempGroupAdd success.");
+    return WIFI_HAL_OPT_OK;
+}
 #endif

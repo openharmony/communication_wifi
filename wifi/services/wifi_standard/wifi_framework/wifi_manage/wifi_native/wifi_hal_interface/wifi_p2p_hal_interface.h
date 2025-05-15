@@ -502,6 +502,10 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo SetMiracastSinkConfig(const std::string& config);
+
+    WifiErrorNo TempGroupAdd(int freq);
+
+    WifiErrorNo P2pSetTempConfig(int networkId, const HalP2pGroupConfig &config) const;
 private:
     P2pHalCallback mP2pCallback;
 };

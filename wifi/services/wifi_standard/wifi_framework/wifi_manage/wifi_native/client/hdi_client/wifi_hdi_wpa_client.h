@@ -865,6 +865,10 @@ public:
     WifiErrorNo P2pReject(const std::string &mac);
 
     WifiErrorNo SetMiracastSinkConfig(const std::string& config);
+
+    WifiErrorNo P2pTempGroupAdd(int freq);
+
+    WifiErrorNo P2pSetTempConfig(int networkId, const HalP2pGroupConfig &config) const;
 private:
     int PushDeviceConfigString(SetNetworkConfig *pConfig, DeviceConfigType type,
         const std::string &msg, bool checkEmpty = true) const;

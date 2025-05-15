@@ -1631,6 +1631,30 @@ WifiErrorNo WifiHdiWpaClient::SetMiracastSinkConfig(const std::string& config)
     }
     return HdiSetMiracastSinkConfig(configBuf);
 }
+
+WifiErrorNo WifiHdiWpaClient::P2pSetTempConfig(int networkId, const HalP2pGroupConfig &config) const
+{
+    P2pGroupConfig conf[GROUP_CONFIG_END_POS];
+    if (memset_s(conf, sizeof(conf), 0, sizeof(conf)) != EOK) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    int num = 0;
+    num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_SSID, config.ssid);
+    // If the PSK length is less than 8 or greater than 63, Do not set this psk field.
+    if (config.psk.length() >= HAL_PSK_MIN_LENGTH && config.psk.length() < HAL_PSK_MAX_LENGTH) {
+        std::string tmp = config.psk;
+        num += PushP2pGroupConfigString(conf + num, GROUP_CONFIG_PSK, tmp);
+    }
+    if (num == 0) {
+        return WIFI_HAL_OPT_OK;
+    }
+    return HdiP2pSetGroupConfig(networkId, conf, num);
+}
+
+WifiErrorNo WifiHdiWpaClient::P2pTempGroupAdd(int freq)
+{
+    return HdiP2pTempGroupAdd(freq);
+}
 } // namespace Wifi
 }  // namespace OHOS
 #endif

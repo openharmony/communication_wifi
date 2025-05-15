@@ -195,7 +195,7 @@ public:
 
     void HandleResetupSelfCureTest()
     {
-        LOGI("Enter TransitionToSelfCureStateTest");
+        LOGI("Enter HandleResetupSelfCureTest");
         pSelfCureStateMachine_->pConnectedMonitorState_->HandleResetupSelfCure(nullptr);
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_CURE_CMD_RESETUP_SELF_CURE_MONITOR);
@@ -286,6 +286,65 @@ public:
         EXPECT_NE(pSelfCureStateMachine_->instId_, TEN);
     }
 
+    void ExecuteStateMsgTest()
+    {
+        LOGI("Enter ExecuteStateMsgTest");
+        InternalMessagePtr msg;
+        EXPECT_EQ(pSelfCureStateMachine_->pDisconnectedMonitorState_->ExecuteStateMsg(msg), 0);
+    }
+
+    void HandleWifi7BlacklistRecoverTest()
+    {
+        LOGI("Enter HandleWifi7BlacklistRecoverTest");
+        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7BlacklistRecover(nullptr);
+
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER);
+        msg->GetMessageObj(info);
+        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7BlacklistRecover(msg);
+    }
+
+    void HandleWifi7WithoutMldBackoffTest()
+    {
+        LOGI("Enter HandleWifi7WithoutMldBackoffTest");
+        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7WithoutMldBackoff(nullptr);
+
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF);
+        msg->GetMessageObj(info);
+        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7WithoutMldBackoff(msg);
+    }
+
+    void HandleWifi7MldBackoffTest()
+    {
+        LOGI("Enter HandleWifi7MldBackoffTest");
+        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7MldBackoff(nullptr);
+
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_MLD_BACKOFF);
+        msg->GetMessageObj(info);
+        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7MldBackoff(msg);
+    }
+
+    void HandleNetworkConnectFailCountTest()
+    {
+        LOGI("Enter HandleNetworkConnectFailCountTest");
+        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleNetworkConnectFailCount(nullptr);
+
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT);
+        msg->GetMessageObj(info);
+        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleNetworkConnectFailCount(msg);
+    }
+
     void RequestReassocWithFactoryMacTest()
     {
         LOGI("Enter RequestReassocWithFactoryMacTest");
@@ -310,6 +369,21 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _)).Times(AtLeast(0));
         pSelfCureStateMachine_->pConnectedMonitorState_->HandleInvalidIp(msg);
+    }
+
+    void HandleDnsFailedMonitorTest()
+    {
+        LOGI("Enter HandleDnsFailedMonitorTest");
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT);
+        pSelfCureStateMachine_->isHttpReachable_ = true;
+        pSelfCureStateMachine_->pConnectedMonitorState_->HandleDnsFailedMonitor(msg);
+    }
+
+    void IsNeedSelfCureTest()
+    {
+        LOGI("Enter IsNeedSelfCureTest");
+        pSelfCureStateMachine_->pConnectedMonitorState_->IsNeedSelfCure();
     }
 
     void HandleInternetFailedDetectedTest()
@@ -729,6 +803,14 @@ public:
         pSelfCureStateMachine_->pInternetSelfCureState_->IsNeedMultiGatewaySelfcure();
         pSelfCureStateMachine_->pInternetSelfCureState_->isUsedMultiGwSelfcure_ = true;
         EXPECT_EQ(pSelfCureStateMachine_->pInternetSelfCureState_->IsNeedMultiGatewaySelfcure(), false);
+    }
+
+    void HandleSelfCureResultFailedTest()
+    {
+        LOGI("Enter HandleSelfCureResultFailedTest");
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(WIFI_CURE_CMD_SELF_CURE_FAILED);
+        pSelfCureStateMachine_->pInternetSelfCureState_->HandleSelfCureResultFailed(msg);
     }
 
     void SelfcureForMultiGatewayTest()
@@ -1290,9 +1372,9 @@ public:
         pSelfCureStateMachine_->BlackListToString(wifi6BlackListCache);
     }
 
-    void ParseWifi6BlackListInfoTest()
+    void ParseWifiCategoryBlackListInfoTest()
     {
-        LOGI("Enter ParseWifi6BlackListInfoTest");
+        LOGI("Enter ParseWifiCategoryBlackListInfoTest");
         std::string currentBssid_ = CURR_BSSID;
         WifiCategoryBlackListInfo wifi6BlackListInfo(1, TIME_MILLS);
         std::pair<std::string, WifiCategoryBlackListInfo> iter = std::make_pair(CURR_BSSID, wifi6BlackListInfo);
@@ -1302,17 +1384,17 @@ public:
         EXPECT_NE(pSelfCureStateMachine_->ParseWifiCategoryBlackListInfo(iter), "AUIS");
     }
 
-    void AgeOutWifi6BlackTest()
+    void AgeOutWifiCategoryBlackTest()
     {
-        LOGI("Enter AgeOutWifi6BlackTest");
+        LOGI("Enter AgeOutWifiCategoryBlackTest");
         EXPECT_CALL(WifiConfigCenter::GetInstance(), RemoveWifiCategoryBlackListCache(_, _)).Times(AtLeast(0));
         pSelfCureStateMachine_->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST);
         pSelfCureStateMachine_->AgeOutWifiCategoryBlack(EVENT_AX_BLA_LIST);
     }
 
-    void AgeOutWifiConnectFailTest()
+    void AgeOutWifiConnectFailListTest()
     {
-        LOGI("Enter AgeOutWifiConnectFailTest");
+        LOGI("Enter AgeOutWifiConnectFailListTest");
         std::map<std::string, WifiCategoryConnectFailInfo> connectFailListCache;
         std::string currentBssid_ = CURR_BSSID;
         WifiCategoryConnectFailInfo connectFailListInfo(1, 1, TIME_MILLS);
@@ -1622,6 +1704,30 @@ public:
         pSelfCureStateMachine_->mNetWorkDetect_ = nullptr;
         EXPECT_TRUE(pSelfCureStateMachine_->IsHttpReachable() == false);
     }
+
+    void UpdateConnSelfCureFailedHistoryTest()
+    {
+        LOGI("Enter UpdateConnSelfCureFailedHistoryTest");
+        EXPECT_TRUE(pSelfCureStateMachine_->UpdateConnSelfCureFailedHistory() == false);
+    }
+
+    void RequestArpConflictTest()
+    {
+        LOGI("Enter RequestArpConflictTest");
+        pSelfCureStateMachine_->RequestArpConflictTest();
+    }
+
+    void IsMultiDhcpOfferTest()
+    {
+        LOGI("Enter IsMultiDhcpOfferTest");
+        pSelfCureStateMachine_->IsMultiDhcpOffer();
+    }
+
+    void ClearDhcpOfferTest()
+    {
+        LOGI("Enter ClearDhcpOfferTest");
+        pSelfCureStateMachine_->ClearDhcpOffer();
+    }
 };
 
 HWTEST_F(SelfCureStateMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
@@ -1730,6 +1836,35 @@ HWTEST_F(SelfCureStateMachineTest, HandleGatewayChangedTest, TestSize.Level1)
     HandleGatewayChangedTest();
 }
 
+HWTEST_F(SelfCureStateMachineTest, ExecuteStateMsgTest, TestSize.Level1)
+{
+    ExecuteStateMsgTest();
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleWifi7BlacklistRecoverTest, TestSize.Level1)
+{
+    HandleWifi7BlacklistRecoverTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleWifi7WithoutMldBackoffTest, TestSize.Level1)
+{
+    HandleWifi7WithoutMldBackoffTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleWifi7MldBackoffTest, TestSize.Level1)
+{
+    HandleWifi7MldBackoffTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureStateMachineTest, HandleNetworkConnectFailCountTest, TestSize.Level1)
+{
+    HandleNetworkConnectFailCountTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 HWTEST_F(SelfCureStateMachineTest, IsCustNetworkSelfCureTest, TestSize.Level1)
 {
     IsCustNetworkSelfCureTest();
@@ -1739,6 +1874,16 @@ HWTEST_F(SelfCureStateMachineTest, IsCustNetworkSelfCureTest, TestSize.Level1)
 HWTEST_F(SelfCureStateMachineTest, HandleInvalidIpTest, TestSize.Level1)
 {
     HandleInvalidIpTest();
+}
+HWTEST_F(SelfCureStateMachineTest, HandleDnsFailedMonitorTest, TestSize.Level1)
+{
+    HandleDnsFailedMonitorTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+HWTEST_F(SelfCureStateMachineTest, IsNeedSelfCureTest, TestSize.Level1)
+{
+    IsNeedSelfCureTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, HandleInternetFailedDetectedTest, TestSize.Level1)
@@ -1938,6 +2083,11 @@ HWTEST_F(SelfCureStateMachineTest, IsNeedMultiGatewaySelfcureTest, TestSize.Leve
     IsNeedMultiGatewaySelfcureTest();
 }
 
+HWTEST_F(SelfCureStateMachineTest, HandleSelfCureResultFailedTest, TestSize.Level1)
+{
+    HandleSelfCureResultFailedTest();
+}
+
 HWTEST_F(SelfCureStateMachineTest, SelfcureForMultiGatewayTest, TestSize.Level1)
 {
     SelfcureForMultiGatewayTest();
@@ -2099,19 +2249,19 @@ HWTEST_F(SelfCureStateMachineTest, BlackListToStringTest2, TestSize.Level1)
     BlackListToStringTest2();
 }
 
-HWTEST_F(SelfCureStateMachineTest, ParseWifi6BlackListInfoTest, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, ParseWifiCategoryBlackListInfoTest, TestSize.Level1)
 {
-    ParseWifi6BlackListInfoTest();
+    ParseWifiCategoryBlackListInfoTest();
 }
 
-HWTEST_F(SelfCureStateMachineTest, AgeOutWifi6BlackTest, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, AgeOutWifiCategoryBlackTest, TestSize.Level1)
 {
-    AgeOutWifi6BlackTest();
+    AgeOutWifiCategoryBlackTest();
 }
 
-HWTEST_F(SelfCureStateMachineTest, AgeOutWifiConnectFailTest, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, AgeOutWifiConnectFailListTest, TestSize.Level1)
 {
-    AgeOutWifiConnectFailTest();
+    AgeOutWifiConnectFailListTest();
 }
 
 HWTEST_F(SelfCureStateMachineTest, ShouldTransToWifi6SelfCureTest, TestSize.Level1)
@@ -2953,14 +3103,31 @@ HWTEST_F(SelfCureStateMachineTest, UpdateReassocAndResetHistoryInfo_FailedHighRe
     EXPECT_NE(historyInfo.lastResetSelfCureFailedTs, 0);
 }
 
-HWTEST_F(SelfCureStateMachineTest, IfMultiGateway_Test, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, IfMultiGatewayTest, TestSize.Level1)
 {
     EXPECT_EQ(pSelfCureStateMachine_->IfMultiGateway(), false);
 }
 
-HWTEST_F(SelfCureStateMachineTest, IsSelfCureOnGoing_Test, TestSize.Level1)
+HWTEST_F(SelfCureStateMachineTest, IsSelfCureOnGoingTest, TestSize.Level1)
 {
     EXPECT_EQ(pSelfCureStateMachine_->IsSelfCureOnGoing(), false);
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsSelfCureL2ConnectingTest, TestSize.Level1)
+{
+    EXPECT_EQ(pSelfCureStateMachine_->IsSelfCureL2Connecting(), false);
+}
+
+HWTEST_F(SelfCureStateMachineTest, IsMultiDhcpOfferTest, TestSize.Level1)
+{
+    IsMultiDhcpOfferTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureStateMachineTest, ClearDhcpOfferTest, TestSize.Level1)
+{
+    ClearDhcpOfferTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
@@ -3011,6 +3178,12 @@ HWTEST_F(SelfCureStateMachineTest, IsSoftApSsidSameWithWifiTest, TestSize.Level1
 HWTEST_F(SelfCureStateMachineTest, CheckConflictIpForSoftApTest, TestSize.Level1)
 {
     pSelfCureStateMachine_->CheckConflictIpForSoftAp();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureStateMachineTest, RequestArpConflictTest, TestSize.Level1)
+{
+    RequestArpConflictTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
  

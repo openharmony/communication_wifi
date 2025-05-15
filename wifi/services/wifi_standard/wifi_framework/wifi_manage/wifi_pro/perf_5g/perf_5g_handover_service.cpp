@@ -87,7 +87,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         return;
     }
     LoadRelationApInfo();
-    Pref5gStatisticsInfo perf5gChrInfo_{};
+    perf5gChrInfo_.Reset();
     perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
     WIFI_LOGI("OnConnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d),relationAps size(%{public}zu)",
         SsidAnonymize(connectedAp_->apInfo.ssid).data(), MacAnonymize(connectedAp_->apInfo.bssid).data(),
@@ -116,6 +116,7 @@ void Perf5gHandoverService::OnDisconnected()
         }
     }
     Write5gPrefFailedHisysevent(perf5gChrInfo_);
+    perf5gChrInfo_.Reset();
     bssidLastConnected_ = connectedAp_->apInfo.bssid;
     linkQualityLastConnected_ = connectedAp_->apInfo.apConnectionInfo.GetLinkQualitys();
     pDualBandRepostitory_->SaveApInfo(connectedAp_->apInfo);

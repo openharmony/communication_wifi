@@ -119,3 +119,15 @@ HWTEST_F(WifiRdbManagerTest, Delete_Success, TestSize.Level1)
     bool result = rdbManager->Delete(deletedRowCount, predicates);
     ASSERT_TRUE(result);
 }
+
+HWTEST_F(WifiRdbManagerTest, CreateEnterpriseApInfoTableTest, TestSize.Level1)
+{
+    auto rdbManager = WifiRdbManager::GetRdbManger(RdbType::WIFI_HISTORY_RECORD);
+    ASSERT_NE(rdbManager, nullptr);
+
+    std::shared_ptr<OHOS::NativeRdb::RdbStore> rdbStorePtr = rdbManager->GetRdbStore();
+    ASSERT_NE(rdbStorePtr, nullptr);
+
+    int32_t result = WifiRdbManager::CreateEnterpriseApInfoTable(*rdbStorePtr);
+    ASSERT_TRUE(result == OHOS::NativeRdb::E_OK);
+}

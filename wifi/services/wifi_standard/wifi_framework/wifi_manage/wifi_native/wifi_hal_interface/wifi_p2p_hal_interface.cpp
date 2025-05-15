@@ -669,5 +669,23 @@ WifiErrorNo WifiP2PHalInterface::SetMiracastSinkConfig(const std::string& config
     return WIFI_HAL_OPT_FAILED;
 #endif
 }
+
+WifiErrorNo WifiP2PHalInterface::P2pSetTempConfig(int networkId, const HalP2pGroupConfig &config) const
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->P2pSetTempConfig(networkId, config);
+#endif
+    return WIFI_HAL_OPT_FAILED;
+}
+
+WifiErrorNo WifiP2PHalInterface::TempGroupAdd(int freq)
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->P2pTempGroupAdd(freq);
+#endif
+    return WIFI_HAL_OPT_FAILED;
+}
 }  // namespace Wifi
 }  // namespace OHOS

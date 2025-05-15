@@ -52,6 +52,7 @@ const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
 const int CMD_TYPE_SET = 2;
 const int DATA_TYPE_P2P_BUSINESS = 1;
 const int ARP_TIMEOUT = 100;
+const int DEFAULT_TEMP_ID = -100;
 const std::string CARRY_DATA_MIRACAST = "1";
 const std::vector<int> FILTERED_FREQS = {2412, 2437, 2462};
 std::mutex P2pStateMachine::m_gcJoinmutex;
@@ -1126,6 +1127,18 @@ bool P2pStateMachine::SetGroupConfig(const WifiP2pConfigInternal &config, bool n
     return ret != WIFI_HAL_OPT_FAILED;
 }
 
+bool P2pStateMachine::SetTempGroupConfig(const WifiP2pConfigInternal &config) const
+{
+    WifiErrorNo ret;
+    HalP2pGroupConfig wpaConfig;
+
+    WIFI_LOGI("SetTempGroupConfig");
+    wpaConfig.ssid = config.GetGroupName();
+    wpaConfig.psk = config.GetPassphrase();
+    ret = WifiP2PHalInterface::GetInstance().P2pSetTempConfig(config.GetNetId(), wpaConfig);
+    return ret != WIFI_HAL_OPT_FAILED;
+}
+
 bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const
 {
     WifiP2pConfigInternal cfgBuf = config;
@@ -1159,6 +1172,23 @@ bool P2pStateMachine::DealCreateNewGroupWithConfig(const WifiP2pConfigInternal &
 
     UpdateGroupManager();
     UpdatePersistentGroups();
+    return ret != WIFI_HAL_OPT_FAILED;
+}
+
+bool P2pStateMachine::CreateTempGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const
+{
+    WifiP2pConfigInternal cfgBuf = config;
+    int createdNetId = DEFAULT_TEMP_ID;
+
+    cfgBuf.SetNetId(createdNetId);
+    if (!SetTempGroupConfig(cfgBuf)) {
+        WIFI_LOGE("Some configuration settings failed!");
+        return false;
+    }
+    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().TempGroupAdd(freq);
+    if (ret == WIFI_HAL_OPT_FAILED) {
+        WIFI_LOGE("TempGroupAdd failed");
+    }
     return ret != WIFI_HAL_OPT_FAILED;
 }
 

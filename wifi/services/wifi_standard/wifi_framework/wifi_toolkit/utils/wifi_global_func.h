@@ -359,22 +359,6 @@ bool ConvertMncToIso(int mnc, std::string &wifiCountryCode);
 void StrToUpper(std::string &str);
 
 /**
- * @Description Converting char to numbers
- *
- * @param c - char
- * @return numbers
- */
-int ConvertCharToInt(const char &c);
-
-/**
- * @Description Converting string to numbers
- *
- * @param str - string
- * @return numbers
- */
-int ConvertStringToInt(const std::string str);
-
-/**
  * @Description Obtains a system parameter matching the specified key.
  *
  * @param key - Indicates the key for the system parameter to query.

@@ -61,6 +61,7 @@ public:
     bool Delete(int &deletedRowCount, const NativeRdb::AbsRdbPredicates &predicates);
 private:
     void DelayCloseRdbStore();
+    static int32_t CreateEnterpriseApInfoTable(NativeRdb::RdbStore &rdbStore);
 
 private:
     std::shared_ptr<NativeRdb::RdbOpenCallback> pRdbOpenCallback_;

@@ -192,6 +192,12 @@ int32_t WifiRdbManager::WifiHistoryRecordRdbCallback::OnCreate(NativeRdb::RdbSto
         WIFI_LOGE("create ap_connection_duration_info table fail, err: %{public}d ", ret);
         return NativeRdb::E_ERROR;
     }
+
+    ret = CreateEnterpriseApInfoTable(rdbStore);
+    if (ret != NativeRdb::E_OK) {
+        WIFI_LOGE("create enterprise_ap_info table fail, err: %{public}d ", ret);
+        return NativeRdb::E_ERROR;
+    }
     WIFI_LOGI("OnCreate, CreateTable ExecuteSql success");
     return NativeRdb::E_OK;
 }
@@ -199,10 +205,7 @@ int32_t WifiRdbManager::WifiHistoryRecordRdbCallback::OnCreate(NativeRdb::RdbSto
 int32_t WifiRdbManager::WifiHistoryRecordRdbCallback::OnUpgrade(NativeRdb::RdbStore &rdbStore, int32_t currentVersion,
     int32_t targetVersion)
 {
-    std::string enterpriseApCreateTableSql = "CREATE TABLE IF NOT EXISTS ";
-    enterpriseApCreateTableSql.append(ENTERPRISE_AP_INFO_TABLE_NAME)
-        .append(" (ssid STRING, keyMgmt STRING);");
-    int32_t ret = rdbStore.ExecuteSql(enterpriseApCreateTableSql);
+    int32_t ret = CreateEnterpriseApInfoTable(rdbStore);
     if (ret != NativeRdb::E_OK) {
         WIFI_LOGE("create enterprise_ap_info table fail, err: %{public}d ", ret);
         return NativeRdb::E_ERROR;
@@ -227,5 +230,13 @@ void WifiRdbManager::DelayCloseRdbStore()
     }).detach();
 }
 
+int32_t WifiRdbManager::CreateEnterpriseApInfoTable(NativeRdb::RdbStore &rdbStore)
+{
+    WIFI_LOGI("%{public}s enter", __func__);
+    std::string enterpriseApCreateTableSql = "CREATE TABLE IF NOT EXISTS ";
+    enterpriseApCreateTableSql.append(ENTERPRISE_AP_INFO_TABLE_NAME)
+        .append(" (ssid STRING, keyMgmt STRING);");
+    return rdbStore.ExecuteSql(enterpriseApCreateTableSql);
+}
 }  // namespace Wifi
 }  // namespace OHOS

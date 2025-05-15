@@ -25,6 +25,7 @@
 #include "wifi_logger.h"
 #include "wifi_msg.h"
 #include "wifi_config_center.h"
+#include "wifi_common_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -250,7 +251,8 @@ std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> WifiCountryCodeManager::GetWifiCou
         WIFI_LOGI("get wifi country code policy config fail, use policyConf=0");
         return std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf);
     }
-    policyConf = ConvertStringToInt(preValue);
+    std::string policyStr(preValue);
+    policyConf = CheckDataLegal(policyStr);
     WIFI_LOGI("get wifi country code policy config is %{public}d", policyConf);
     return std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN>(policyConf);
 }

@@ -308,20 +308,6 @@ HWTEST_F(WifiGlobalFuncTest, ConvertStrToUpperTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(WifiGlobalFuncTest, ConvertConvertCharToIntTest, TestSize.Level1)
-{
-    char c = '2';
-    int i = ConvertCharToInt(c);
-    EXPECT_TRUE(i == 2);
-}
-
-HWTEST_F(WifiGlobalFuncTest, ConvertStringToIntTest, TestSize.Level1)
-{
-    string str = "2000";
-    int i = ConvertStringToInt(str);
-    EXPECT_TRUE(i == 2000);
-}
-
 HWTEST_F(WifiGlobalFuncTest, GetParamValueTest, TestSize.Level1)
 {
     char preValue[WIFI_COUNTRY_CODE_SIZE] = {0};

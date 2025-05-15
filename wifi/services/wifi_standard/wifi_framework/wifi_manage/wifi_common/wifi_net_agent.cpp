@@ -533,7 +533,8 @@ int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
     WIFI_LOGD("Enter NetConnCallback::RequestNetwork");
     LogNetCaps(ident, netCaps);
 #ifndef OHOS_ARCH_LITE
-    int networkId = ConvertStringToInt(netrequest.ident);
+    std::string netrequestIdent = netrequest.ident;
+    int networkId = CheckDataLegal(netrequestIdent);
     if (networkId <= INVALID_NETWORK_ID || std::to_string(networkId) != netrequest.ident) {
         WIFI_LOGD("networkId is invaild.");
         return -1;

@@ -465,7 +465,7 @@ int WifiEventSubscriberManager::GetLastStaStateByDatashare()
     }
 
     WIFI_LOGI("GetLastStaStateByDatashare, lastStaState:%{public}s", lastStaState.c_str());
-    int lastStaStateType = ConvertStringToInt(lastStaState);
+    int lastStaStateType = CheckDataLegal(lastStaState);
     return lastStaStateType;
 }
 

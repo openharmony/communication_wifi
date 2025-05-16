@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <cstddef>
 #include <cstdint>
+#include "parameters.h"
 #include "securec.h"
 #include "kits/c/wifi_device.h"
 #include "wifi_logger.h"
@@ -46,6 +47,7 @@ constexpr int BAND = 2;
 constexpr int ZERO = 0;
 
 const std::string g_errLog = "wifi_test";
+const std::string PARAM_FORCE_OPEN_WIFI = "persist.edm.force_open_wifi";
 class WifiCDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -318,6 +320,13 @@ HWTEST_F(WifiCDeviceTest, DisableWifiSuccess, TestSize.Level1)
 {
     DisableWifiSuccess();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(WifiCDeviceTest, DisableWifiFail, TestSize.Level1)
+{
+    system::SetParameter(PARAM_FORCE_OPEN_WIFI, "true");
+    EXPECT_TRUE(DisableWifi() != WIFI_SUCCESS);
+    system::SetParameter(PARAM_FORCE_OPEN_WIFI, "false");
 }
 
 HWTEST_F(WifiCDeviceTest, EnableSemiWifiSuccess, TestSize.Level1)

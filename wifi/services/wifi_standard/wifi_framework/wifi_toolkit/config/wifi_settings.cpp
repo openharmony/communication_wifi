@@ -1183,7 +1183,7 @@ void WifiSettings::ClearHotspotConfig()
     if (!ret.second) {
         mHotspotConfig[0] = config;
     }
-    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}d", __FUNCTION__,
+    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}zu", __FUNCTION__,
         SsidAnonymize(config.GetSsid()).c_str(), config.GetPreSharedKey().length());
 }
 
@@ -1884,7 +1884,7 @@ void WifiSettings::InitHotspotConfig()
         LOGI("load hotspot config fail, use default config");
         InitDefaultHotspotConfig();
     }
-    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}d", __FUNCTION__,
+    LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}zu", __FUNCTION__,
         SsidAnonymize(mHotspotConfig[0].GetSsid()).c_str(),
         PassWordAnonymize(mHotspotConfig[0].GetPreSharedKey()).length());
 

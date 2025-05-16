@@ -183,15 +183,16 @@ HWTEST_F(BlockConnectServiceTest, isFrequentDisconnect_ReturnsFalseWhenFrequentD
     // Test logic here
     std::string bssid = "00:00:00:00:00:00";
     int wpaDisconnectReason = 1;
-    bool result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason);
+    int locallyGenerated = 0;
+    bool result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason, locallyGenerated);
     EXPECT_EQ(result, false);
-    result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason);
+    result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason, locallyGenerated);
     EXPECT_EQ(result, false);
-    result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason);
+    result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason, locallyGenerated);
     EXPECT_EQ(result, false);
-    result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason);
+    result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason, locallyGenerated);
     EXPECT_EQ(result, false);
-    result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason);
+    result = BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, wpaDisconnectReason, locallyGenerated);
     EXPECT_EQ(result, true);
 }
 

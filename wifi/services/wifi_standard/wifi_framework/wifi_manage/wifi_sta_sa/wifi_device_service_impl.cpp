@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <chrono>
 #include <unistd.h>
+#include "parameter.h"
 #include "wifi_permission_utils.h"
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
@@ -144,6 +145,10 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     WIFI_LOGI("DisableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
+    if (IsDisableWifiProhibitedByEdm()) {
+        return WIFI_OPT_FAILED;
+    }
+
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -2645,5 +2650,27 @@ void WifiDeviceServiceImpl::StopUnloadStaTimer(void)
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 }
 #endif
+
+bool WifiDeviceServiceImpl::IsDisableWifiProhibitedByEdm(void)
+{
+    constexpr const char* WIFI_EDM_FORCE_OPEN_KEY = "persist.edm.force_open_wifi";
+    constexpr const uint32_t PARAM_TRUE_LEN = 4;
+    constexpr const uint32_t PARAM_FALSE_LEN = 5;
+    constexpr const char* PARAM_TRUE = "true";
+    constexpr const char* PARAM_FALSE = "false";
+ 
+    char result[PARAM_FALSE_LEN + 1] = {0};
+    int len = GetParameter(WIFI_EDM_FORCE_OPEN_KEY, PARAM_FALSE, result, PARAM_FALSE_LEN + 1);
+    if (len != PARAM_FALSE_LEN && len != PARAM_TRUE_LEN) {
+        WIFI_LOGE("GetParameter len is invalid.");
+        return false;
+    }
+
+    if (strncmp(result, PARAM_TRUE, PARAM_TRUE_LEN) == 0) {
+        WIFI_LOGE("wifi is prohibited by EDM. You won't be able to turn off wifi!");
+        return true;
+    }
+    return false;
+}
 }  // namespace Wifi
 }  // namespace OHOS

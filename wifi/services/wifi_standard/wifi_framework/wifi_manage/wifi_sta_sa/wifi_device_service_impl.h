@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -237,6 +237,7 @@ private:
 #ifdef DYNAMIC_UNLOAD_SA
     void StopUnloadStaTimer(void) override;
 #endif
+    bool IsDisableWifiProhibitedByEdm(void);
 
     private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;

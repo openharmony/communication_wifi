@@ -75,6 +75,13 @@ private:
      */
     std::string GetFilteredReasonForChr(
         std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
+    
+    /**
+     * get selected network info for chr
+     *
+     * @param networkCandidate best network candidate
+     */
+    std::string GetSelectedInfoForChr(NetworkSelection::NetworkCandidate networkCandidate);
 };
 }
 #endif

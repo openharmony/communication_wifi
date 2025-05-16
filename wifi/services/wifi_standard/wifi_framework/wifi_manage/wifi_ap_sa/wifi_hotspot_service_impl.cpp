@@ -112,7 +112,6 @@ ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
         WIFI_LOGE("IsOpenSoftApAllowed:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    WifiManager::GetInstance().GetWifiEventSubscriberManager()->GetAirplaneModeByDatashare();
     if (WifiConfigCenter::GetInstance().GetAirplaneModeState() != MODE_STATE_OPEN) {
         isSupported = true;
         return WIFI_OPT_SUCCESS;

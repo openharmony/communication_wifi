@@ -51,7 +51,7 @@ public:
     MOCK_METHOD3(UpdateNetworkSelectStatus, bool(int targetNetworkId, DisabledReason disableReason, int wpaReason));
     MOCK_METHOD2(UpdateNetworkSelectStatus, bool(int targetNetworkId, DisabledReason disableReason));
     MOCK_METHOD1(EnableNetworkSelectStatus, bool(int targetNetworkId));
-    MOCK_METHOD2(IsFrequentDisconnect, bool(std::string bssid, int wpaReason, int locallyGenerated));
+    MOCK_METHOD3(IsFrequentDisconnect, bool(std::string bssid, int wpaReason, int locallyGenerated));
     MOCK_METHOD1(IsWrongPassword, bool(int targetNetworkId));
     MOCK_METHOD1(OnReceiveSettingsEnterEvent, void(bool isEnter));
     MOCK_METHOD1(DealStaStopped, void(int instId));

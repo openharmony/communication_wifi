@@ -387,28 +387,18 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
     sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     dns->type_ = NetManagerStandard::INetAddr::IPV4;
     dns->family_ = NetManagerStandard::INetAddr::IPV4;
-    if (wifiIpInfo.primaryDns != 0) {
-        dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
-        netLinkInfo->dnsList_.push_back(*dns);
-        LOGI("SetNetLinkDnsInfo ipv4 address:%{public}s", IpAnonymize(dns->address_).c_str());
-    }
-    if (wifiIpInfo.secondDns != 0) {
-        dns->address_ = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+    for (auto iter = wifiIpInfo.dnsAddr.begin(); iter != wifiIpInfo.dnsAddr.end(); iter++) {
+        dns->address_ = IpTools::ConvertIpv4Address(*iter);
         netLinkInfo->dnsList_.push_back(*dns);
         LOGI("SetNetLinkDnsInfo ipv4 address:%{public}s", IpAnonymize(dns->address_).c_str());
     }
     sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     ipv6dns->type_ = NetManagerStandard::INetAddr::IPV6;
     ipv6dns->family_ = NetManagerStandard::INetAddr::IPV6;
-    if (!wifiIpV6Info.primaryDns.empty()) {
-        ipv6dns->address_ = wifiIpV6Info.primaryDns;
+    for (auto iter = wifiIpV6Info.dnsAddr.begin(); iter != wifiIpV6Info.dnsAddr.end(); iter++) {
+        ipv6dns->address_ = *iter;
         netLinkInfo->dnsList_.push_back(*ipv6dns);
-        LOGI("SetNetLinkDnsInfo ipv6:%{public}s", MacAnonymize(wifiIpV6Info.primaryDns).c_str());
-    }
-    if (!wifiIpV6Info.secondDns.empty()) {
-        ipv6dns->address_ = wifiIpV6Info.secondDns;
-        netLinkInfo->dnsList_.push_back(*ipv6dns);
-        LOGI("SetNetLinkDnsInfo ipv6:%{public}s", MacAnonymize(wifiIpV6Info.secondDns).c_str());
+        LOGI("SetNetLinkDnsInfo ipv6:%{public}s", MacAnonymize(ipv6dns->address_).c_str());
     }
 }
 

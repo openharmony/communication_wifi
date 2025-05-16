@@ -325,6 +325,7 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason,
     if (mLastConnectedApInfo.alreadyConnectedCount >= FREQUENT_DISCONNECT_COUNT) {
         WIFI_LOGI("isFrequentDisconnect %{public}s %{public}d count %{public}d",
             MacAnonymize(bssid).c_str(), wpaReason, mLastConnectedApInfo.alreadyConnectedCount);
+        mLastConnectedApInfo.alreadyConnectedCount = 1;
         return true;
     }
     return false;

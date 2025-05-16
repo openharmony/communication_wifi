@@ -771,7 +771,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         }
         BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
             DisabledReason::DISABLED_DISASSOC_REASON, reason);
-        if (BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, reason)) {
+        if (BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, reason, locallyGenerated)) {
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
                 DisabledReason::DISABLED_CONSECUTIVE_FAILURES);
         }

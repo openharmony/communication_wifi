@@ -110,6 +110,9 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged1Test, TestSize.Level1)
     int instId = 1;
     WifiHistoryRecordManager::GetInstance().DealStaConnChanged(state, info, instId);
 
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
+
     // test disconnected
     OperateResState state2 = OperateResState::DISCONNECT_DISCONNECTED;
     WifiLinkedInfo info2;
@@ -119,6 +122,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged1Test, TestSize.Level1)
     int instId2 = 0;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_ = "c3:aa:33:ff:55:66";
     WifiHistoryRecordManager::GetInstance().DealStaConnChanged(state2, info2, instId2);
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(WifiHistoryRecordManager::GetInstance().connectedApInfo_.ssid_.empty());
     EXPECT_TRUE(WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_.empty());
 }
@@ -176,6 +181,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged2Test3, TestSize.Level1
     WifiDeviceConfig config5;
     WifiHistoryRecordManager::GetInstance().DealStaConnChanged(state5, info5, instId5);
     long firstConnectedTime5 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.firstConnectedTime_;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(firstConnectedTime5 != 0);
 }
 
@@ -204,6 +211,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged3Test, TestSize.Level1)
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_ = recordTotalUseTimeAtWeekend;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.markedAsHomeApTime_ = recordMarkedAsHomeApTime;
     WifiHistoryRecordManager::GetInstance().AddOrUpdateApInfoRecord();
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     OperateResState state6 = OperateResState::CONNECT_AP_CONNECTED;
@@ -228,6 +237,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged3Test, TestSize.Level1)
     long testTotalUseTimeAtNight = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     long testTotalUseTimeAtWeekend = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_;
     long testMarkedAsHomeApTime = WifiHistoryRecordManager::GetInstance().connectedApInfo_.markedAsHomeApTime_;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 
     EXPECT_TRUE(recordSsid == testSsid);
     EXPECT_TRUE(recordBssid == testBssid);
@@ -241,6 +252,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, NextUpdateApInfoTimerTest, TestSize.Level
     WIFI_LOGI("NextUpdateApInfoTimerTest enter");
     WifiHistoryRecordManager::GetInstance().Init();
     WifiHistoryRecordManager::GetInstance().NextUpdateApInfoTimer();
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_ != nullptr);
 }
 
@@ -278,6 +290,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, HomeApJudgeProcessTest, TestSize.Level1)
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTime_ = 39000;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_ = 36000;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_ = 0;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 
     // already homeAp
     long recordMarkedAsHomeApTime1 = 1736405214;
@@ -285,12 +299,16 @@ HWTEST_F(WifiHistoryRecordManagerTest, HomeApJudgeProcessTest, TestSize.Level1)
     WifiHistoryRecordManager::GetInstance().HomeApJudgeProcess();
     long testMarkedAsHomeApTime1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.markedAsHomeApTime_;
     EXPECT_TRUE(recordMarkedAsHomeApTime1 == testMarkedAsHomeApTime1);
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 
     // set homeAp flag
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.markedAsHomeApTime_ = INVALID_TIME_POINT;
     WifiHistoryRecordManager::GetInstance().HomeApJudgeProcess();
     long testMarkedAsHomeApTime2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.markedAsHomeApTime_;
     EXPECT_TRUE(testMarkedAsHomeApTime2 != INVALID_TIME_POINT);
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 
     // not homeAp
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.markedAsHomeApTime_ = 1736225372;
@@ -312,6 +330,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateConnectionTimeTest, TestSize.Level1
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordMinute_ = 45;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordSecond_ = 54;
     WifiHistoryRecordManager::GetInstance().UpdateConnectionTime(true);
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 
     long testTotalUseTimeAtNight1 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     EXPECT_TRUE(testTotalUseTimeAtNight1 == 0);
@@ -326,6 +346,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateConnectionTimeTest, TestSize.Level1
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordMinute_ = localTime->tm_min;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordSecond_ = localTime->tm_sec;
     WifiHistoryRecordManager::GetInstance().UpdateConnectionTime(false);
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 
     long testTotalUseTimeAtNight2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     EXPECT_TRUE(testTotalUseTimeAtNight2 != 0);
@@ -340,6 +362,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateConnectionTimeTest, TestSize.Level1
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordMinute_ = localTime3->tm_min;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currentRecordSecond_ = localTime3->tm_sec;
     WifiHistoryRecordManager::GetInstance().UpdateConnectionTime(true);
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 
     long testTotalUseTime = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTime_;
     EXPECT_TRUE(testTotalUseTime != 0);
@@ -351,18 +375,24 @@ HWTEST_F(WifiHistoryRecordManagerTest, IsAbnormalTimeRecordsTest, TestSize.Level
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currenttStaticTimePoint_ = INVALID_TIME_POINT;
     bool ret1 = WifiHistoryRecordManager::GetInstance().IsAbnormalTimeRecords();
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(ret1);
 
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.firstConnectedTime_ = 32503689365;  // 3000-01-01
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currenttStaticTimePoint_ = GetCurrentTimeStampSeconds();
     bool ret2 = WifiHistoryRecordManager::GetInstance().IsAbnormalTimeRecords();
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(ret2);
 
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.firstConnectedTime_ = 315559083;  // 1980-01-01
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currenttStaticTimePoint_ = 315559083;  // 1980-01-01
     bool ret3 = WifiHistoryRecordManager::GetInstance().IsAbnormalTimeRecords();
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(ret3);
 
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
@@ -371,6 +401,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, IsAbnormalTimeRecordsTest, TestSize.Level
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.currenttStaticTimePoint_
         = GetCurrentTimeStampSeconds() - 2000;  // 2000:test time
     bool ret4 = WifiHistoryRecordManager::GetInstance().IsAbnormalTimeRecords();
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_FALSE(ret4);
 }
 
@@ -446,6 +478,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend2Test, Tes
     WifiHistoryRecordManager::GetInstance().StaticDurationInNightAndWeekend(day2, startTime2, endTime2);
     long nightTime2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     long weekendTime2 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(nightTime2 != 0);
     EXPECT_TRUE(weekendTime2 == 0);
 
@@ -457,6 +491,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend2Test, Tes
     WifiHistoryRecordManager::GetInstance().StaticDurationInNightAndWeekend(day3, startTime3, endTime3);
     long nightTime3 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     long weekendTime3 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(nightTime3 != 0);
     EXPECT_TRUE(weekendTime3 == 0);
 
@@ -468,6 +504,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend2Test, Tes
     WifiHistoryRecordManager::GetInstance().StaticDurationInNightAndWeekend(day4, startTime4, endTime4);
     long nightTime4 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     long weekendTime4 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(nightTime4 != 0);
     EXPECT_TRUE(weekendTime4 == 0);
 
@@ -479,6 +517,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend2Test, Tes
     WifiHistoryRecordManager::GetInstance().StaticDurationInNightAndWeekend(day5, startTime5, endTime5);
     long nightTime5 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     long weekendTime5 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(nightTime5 != 0);
     EXPECT_TRUE(weekendTime5 == 0);
 }
@@ -495,6 +535,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend3Test, Tes
     WifiHistoryRecordManager::GetInstance().StaticDurationInNightAndWeekend(day6, startTime6, endTime6);
     long nightTime6 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     long weekendTime6 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(nightTime6 != 0);
     EXPECT_TRUE(weekendTime6 == 0);
 
@@ -506,6 +548,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, StaticDurationInNightAndWeekend3Test, Tes
     WifiHistoryRecordManager::GetInstance().StaticDurationInNightAndWeekend(day7, startTime7, endTime7);
     long nightTime7 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtNight_;
     long weekendTime7 = WifiHistoryRecordManager::GetInstance().connectedApInfo_.totalUseTimeAtWeekend_;
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(nightTime7 == 0);
     EXPECT_TRUE(weekendTime7 == 0);
 }

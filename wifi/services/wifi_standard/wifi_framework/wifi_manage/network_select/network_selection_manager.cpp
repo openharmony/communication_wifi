@@ -70,19 +70,7 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
         WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
         return false;
     } else {
-        WifiDeviceConfig selectedConfig;
-        selectedConfig = bestNetworkCandidates.at(0)->wifiDeviceConfig;
-        selectedInfo += std::to_string(selectedConfig.networkId);
-        selectedInfo += "_";
-        selectedInfo += SsidAnonymize(selectedConfig.ssid);
-        selectedInfo += "_";
-        selectedInfo += MacAnonymize(selectedConfig.bssid);
-        selectedInfo += "_";
-        selectedInfo += selectedConfig.keyMgmt;
-        selectedInfo += "_";
-        selectedInfo += std::to_string(bestNetworkCandidates.at(0)->interScanInfo.frequency);
-        selectedInfo += "_";
-        selectedInfo += std::to_string(bestNetworkCandidates.at(0)->interScanInfo.rssi);
+        selectedInfo = GetSelectedInfoForChr(bestNetworkCandidates.at(0));
         WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
     }
 
@@ -209,5 +197,24 @@ std::string NetworkSelectionManager::GetFilteredReasonForChr(
     }
     filteredReasons += "]";
     return filteredReasons;
+}
+
+std::string NetworkSelectionManager::GetSelectedInfoForChr(NetworkSelection::NetworkCandidate networkCandidate)
+{
+    std::string selectedInfo;
+    WifiDeviceConfig selectedConfig;
+    selectedConfig = bestNetworkCandidates.at(0)->wifiDeviceConfig;
+    selectedInfo += std::to_string(selectedConfig.networkId);
+    selectedInfo += "_";
+    selectedInfo += SsidAnonymize(selectedConfig.ssid);
+    selectedInfo += "_";
+    selectedInfo += MacAnonymize(selectedConfig.bssid);
+    selectedInfo += "_";
+    selectedInfo += selectedConfig.keyMgmt;
+    selectedInfo += "_";
+    selectedInfo += std::to_string(bestNetworkCandidates.at(0)->interScanInfo.frequency);
+    selectedInfo += "_";
+    selectedInfo += std::to_string(bestNetworkCandidates.at(0)->interScanInfo.rssi);
+    return selectedInfo;
 }
 }

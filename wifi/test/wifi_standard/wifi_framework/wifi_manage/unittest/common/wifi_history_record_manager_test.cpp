@@ -122,7 +122,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged1Test, TestSize.Level1)
     EXPECT_TRUE(WifiHistoryRecordManager::GetInstance().connectedApInfo_.bssid_.empty());
 }
 
-HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged2Test, TestSize.Level1)
+HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged2Test1, TestSize.Level1)
 {
     WIFI_LOGI("DealStaConnChanged2Test enter");
 
@@ -139,7 +139,13 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged2Test, TestSize.Level1)
     info3.bssid = sameBssid;
     int instId3 = 0;
     WifiHistoryRecordManager::GetInstance().DealStaConnChanged(state3, info3, instId3);
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
 
+HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged2Test2, TestSize.Level1)
+{
     // test roam
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
 
@@ -152,7 +158,12 @@ HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged2Test, TestSize.Level1)
     int instId4 = 0;
     WifiHistoryRecordManager::GetInstance().connectedApInfo_.networkId_ = roamNetworkId;
     WifiHistoryRecordManager::GetInstance().DealStaConnChanged(state4, info4, instId4);
-
+    WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+HWTEST_F(WifiHistoryRecordManagerTest, DealStaConnChanged2Test3, TestSize.Level1)
+{
     // test no record
     WifiHistoryRecordManager::GetInstance().ClearConnectedApInfo();
     OperateResState state5 = OperateResState::CONNECT_AP_CONNECTED;
@@ -236,8 +247,8 @@ HWTEST_F(WifiHistoryRecordManagerTest, StopUpdateApInfoTimerTest, TestSize.Level
 {
     WIFI_LOGI("StopUpdateApInfoTimerTest enter");
     WifiHistoryRecordManager::GetInstance().Init();
-    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     EXPECT_TRUE(WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_ != nullptr);
+    WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
 }
 
 HWTEST_F(WifiHistoryRecordManagerTest, CheckIsHomeApTest, TestSize.Level1)

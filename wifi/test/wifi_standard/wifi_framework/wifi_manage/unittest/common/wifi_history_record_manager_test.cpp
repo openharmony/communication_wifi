@@ -64,6 +64,7 @@ public:
     virtual void TearDown()
     {
         WifiHistoryRecordManager::GetInstance().periodicUpdateApInfoThread_->RemoveAsyncTask("UpdateApInfoTask");
+        WifiHistoryRecordManager::GetInstance().StopUpdateApInfoTimer();
     }
     std::time_t GetCurrentTimeStampSeconds()
     {

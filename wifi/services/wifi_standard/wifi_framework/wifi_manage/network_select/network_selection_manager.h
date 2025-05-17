@@ -81,7 +81,7 @@ private:
      *
      * @param networkCandidate best network candidate
      */
-    std::string GetSelectedInfoForChr(NetworkSelection::NetworkCandidate networkCandidate);
+    std::string GetSelectedInfoForChr(NetworkSelection::NetworkCandidate *networkCandidate);
 };
 }
 #endif

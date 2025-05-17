@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <chrono>
 #include <unistd.h>
-#include "parameter.h"
 #include "wifi_permission_utils.h"
 #include "wifi_internal_msg.h"
 #include "wifi_auth_center.h"
@@ -145,10 +144,6 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     WIFI_LOGI("DisableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
-    if (IsDisableWifiProhibitedByEdm()) {
-        return WIFI_OPT_FAILED;
-    }
-
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -158,6 +153,10 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (m_instId == INSTID_WLAN0 && IsDisableWifiProhibitedByEdm()) {
+        return WIFI_OPT_FAILED;
     }
 
     if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
@@ -2660,7 +2659,7 @@ bool WifiDeviceServiceImpl::IsDisableWifiProhibitedByEdm(void)
     constexpr const char* PARAM_FALSE = "false";
  
     char result[PARAM_FALSE_LEN + 1] = {0};
-    int len = GetParameter(WIFI_EDM_FORCE_OPEN_KEY, PARAM_FALSE, result, PARAM_FALSE_LEN + 1);
+    int len = GetParamValue(WIFI_EDM_FORCE_OPEN_KEY, PARAM_FALSE, result, PARAM_FALSE_LEN + 1);
     if (len != PARAM_FALSE_LEN && len != PARAM_TRUE_LEN) {
         WIFI_LOGE("GetParameter len is invalid.");
         return false;

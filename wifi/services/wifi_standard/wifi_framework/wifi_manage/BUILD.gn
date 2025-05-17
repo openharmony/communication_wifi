@@ -89,10 +89,7 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
     ]
 
-    external_deps = [ 
-      "bounds_checking_function:libsec_shared",
-      "init:libbegetutil",
-    ]
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [
       "OHOS_ARCH_LITE",
@@ -358,7 +355,6 @@ if (defined(ohos_lite)) {
       "common_event_service:cesfwk_innerkits",
       "hilog:libhilog",
       "huks:libhukssdk",
-      "init:libbegetutil",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",

@@ -51,30 +51,26 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
 
     /* Get the device config for each scanInfo, then create networkCandidate and put it into networkCandidates */
     GetAllDeviceConfigs(networkCandidates, scanInfos);
+    bool isSavedNetEmpty = false;
+    std::string savedResult = GetSavedNetInfoForChr(networkCandidates, isSavedNetEmpty);
 
     /* Traverse networkCandidates and reserve qualified networkCandidate */
     TryNominate(networkCandidates, networkSelector);
 
-    std::string savedResult = GetSavedNetInfoForChr(networkCandidates);
     std::string filteredReason = GetFilteredReasonForChr(networkCandidates);
 
     /* Get best networkCandidate from the reserved networkCandidates */
     std::vector<NetworkSelection::NetworkCandidate *> bestNetworkCandidates;
     networkSelector->GetBestCandidates(bestNetworkCandidates);
+
     std::string selectedInfo;
     if (bestNetworkCandidates.empty()) {
-        WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
+        if (!isSavedNetEmpty) {
+            WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
+        }
         return false;
     } else {
-        WifiDeviceConfig selectedConfig;
-        selectedConfig = bestNetworkCandidates.at(0)->wifiDeviceConfig;
-        selectedInfo += selectedConfig.networkId;
-        selectedInfo += "_";
-        selectedInfo += SsidAnonymize(selectedConfig.ssid);
-        selectedInfo += "_";
-        selectedInfo += MacAnonymize(selectedConfig.bssid);
-        selectedInfo += "_";
-        selectedInfo += selectedConfig.keyMgmt;
+        selectedInfo = GetSelectedInfoForChr(bestNetworkCandidates.at(0));
         WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
     }
 
@@ -144,25 +140,28 @@ void NetworkSelectionManager::TryNominate(std::vector<NetworkSelection::NetworkC
 }
 
 std::string NetworkSelectionManager::GetSavedNetInfoForChr(
-    std::vector<NetworkSelection::NetworkCandidate> &networkCandidates)
+    std::vector<NetworkSelection::NetworkCandidate> &networkCandidates, bool &isSavedNetEmpty)
 {
-    std::map<int, WifiDeviceConfig> wifiDeviceConfigs;
+    std::map<int, NetworkSelection::NetworkCandidate> savedCandidates;
     for (size_t i = 0; i < networkCandidates.size(); i++) {
         if (networkCandidates.at(i).wifiDeviceConfig.networkId == INVALID_NETWORK_ID) {
             continue;
         }
-        wifiDeviceConfigs.insert({networkCandidates.at(i).wifiDeviceConfig.networkId,
-            networkCandidates.at(i).wifiDeviceConfig});
+        savedCandidates.insert({networkCandidates.at(i).wifiDeviceConfig.networkId,
+            networkCandidates.at(i)});
+    }
+    if (savedCandidates.empty()) {
+        isSavedNetEmpty = true;
     }
     std::string savedResult;
     savedResult += "[";
-    for (auto pair : wifiDeviceConfigs) {
+    for (auto pair : savedCandidates) {
         savedResult += "[";
-        savedResult += pair.first;
+        savedResult += std::to_string(pair.first);
         savedResult += "_";
-        savedResult += SsidAnonymize(pair.second.ssid);
+        savedResult += SsidAnonymize(pair.second.wifiDeviceConfig.ssid);
         savedResult += "_";
-        savedResult += pair.second.keyMgmt;
+        savedResult += pair.second.wifiDeviceConfig.keyMgmt;
         savedResult += "]";
     }
     savedResult += "]";
@@ -170,7 +169,7 @@ std::string NetworkSelectionManager::GetSavedNetInfoForChr(
 }
 
 std::string NetworkSelectionManager::GetFilteredReasonForChr(
-    std::vector<NetworkSelection::NetworkCandidate> &networkCandidates)\
+    std::vector<NetworkSelection::NetworkCandidate> &networkCandidates)
 {
     std::string filteredReasons;
     filteredReasons += "[";
@@ -198,5 +197,24 @@ std::string NetworkSelectionManager::GetFilteredReasonForChr(
     }
     filteredReasons += "]";
     return filteredReasons;
+}
+
+std::string NetworkSelectionManager::GetSelectedInfoForChr(NetworkSelection::NetworkCandidate *networkCandidate)
+{
+    std::string selectedInfo;
+    WifiDeviceConfig selectedConfig;
+    selectedConfig = networkCandidate->wifiDeviceConfig;
+    selectedInfo += std::to_string(selectedConfig.networkId);
+    selectedInfo += "_";
+    selectedInfo += SsidAnonymize(selectedConfig.ssid);
+    selectedInfo += "_";
+    selectedInfo += MacAnonymize(selectedConfig.bssid);
+    selectedInfo += "_";
+    selectedInfo += selectedConfig.keyMgmt;
+    selectedInfo += "_";
+    selectedInfo += std::to_string(networkCandidate->interScanInfo.frequency);
+    selectedInfo += "_";
+    selectedInfo += std::to_string(networkCandidate->interScanInfo.rssi);
+    return selectedInfo;
 }
 }

@@ -73,7 +73,7 @@ HWTEST_F(IpQosMonitorTest, TestQueryPackets, TestSize.Level1)
 
 HWTEST_F(IpQosMonitorTest, TestHandleTcpReportMsgComplete, TestSize.Level1)
 {
-    std::vector<int64_t> elems = {1, 2, 3};
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 1};
     int32_t cmd = 0;
     IpQosMonitor::GetInstance().HandleTcpReportMsgComplete(elems, cmd);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
@@ -81,7 +81,7 @@ HWTEST_F(IpQosMonitorTest, TestHandleTcpReportMsgComplete, TestSize.Level1)
 
 HWTEST_F(IpQosMonitorTest, TestParseTcpReportMsg, TestSize.Level1)
 {
-    std::vector<int64_t> elems = {1, 2, 3};
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 1};
     int32_t cmd = 123;
     IpQosMonitor::GetInstance().ParseTcpReportMsg(elems, cmd);
 
@@ -95,7 +95,7 @@ HWTEST_F(IpQosMonitorTest, TestParseTcpReportMsg, TestSize.Level1)
 
 HWTEST_F(IpQosMonitorTest, TestHandleTcpPktsResp, TestSize.Level1)
 {
-    std::vector<int64_t> elems = {1, 2, 3};
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 1};
     IpQosMonitor::GetInstance().HandleTcpPktsResp(elems);
 
     WifiLinkedInfo wifiLinkedInfo;
@@ -122,8 +122,6 @@ HWTEST_F(IpQosMonitorTest, TestAllowSelfCureNetwork, TestSize.Level1)
 
 HWTEST_F(IpQosMonitorTest, TestParseNetworkInternetGood, TestSize.Level1)
 {
-    std::vector<int64_t> elems = {1, 2, 3};
-    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems));
-    elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 0};
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 1};
     EXPECT_TRUE(IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems));
 }

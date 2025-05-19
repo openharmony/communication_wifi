@@ -2662,7 +2662,7 @@ bool WifiDeviceServiceImpl::IsDisableWifiProhibitedByEdm(void)
     char preValue[PARAM_FALSE_LEN] = {0};
     int errCode = GetParamValue(WIFI_EDM_FORCE_OPEN_KEY, PARAM_FALSE, preValue, PARAM_FALSE_LEN);
     if (errCode > 0) {
-        if (strncmp(result, PARAM_TRUE, PARAM_TRUE_LEN) == 0) {
+        if (strncmp(preValue, PARAM_TRUE, PARAM_TRUE_LEN) == 0) {
             return true;
         }
     }

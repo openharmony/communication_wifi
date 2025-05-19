@@ -67,7 +67,7 @@ private:
      * @param networkCandidates candidate networks
      */
     std::string GetSavedNetInfoForChr(
-        std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
+        std::vector<NetworkSelection::NetworkCandidate> &networkCandidates, bool &isSavedNetEmpty);
     /**
      * get filtered reason for chr
      *
@@ -75,6 +75,13 @@ private:
      */
     std::string GetFilteredReasonForChr(
         std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
+    
+    /**
+     * get selected network info for chr
+     *
+     * @param networkCandidate best network candidate
+     */
+    std::string GetSelectedInfoForChr(NetworkSelection::NetworkCandidate *networkCandidate);
 };
 }
 #endif

@@ -186,6 +186,9 @@ bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             break;
         }
+        case WIFI_CURE_CMD_IP_CONFLICT_DETECT:
+            pSelfCureStateMachine_->HandleIpConflictDetect();
+            break;
         default:
             WIFI_LOGD("DefaultState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
@@ -3051,6 +3054,31 @@ void SelfCureStateMachine::HandleConnectFailed()
         return;
     }
     pStaService->Disconnect();
+}
+
+void SelfCureStateMachine::HandleIpConflictDetect()
+{
+    WIFI_LOGI("HandleIpConflictDetect enter");
+    ArpChecker arpChecker;
+    std::string macAddress;
+    WifiConfigCenter::GetInstance().GetMacAddress(macAddress, instId_);
+    IpInfo ipInfo;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, instId_);
+    std::string targetIp = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId_);
+    std::string senderIp = "0.0.0.0";
+    if (targetIp.empty() || ifName.empty()) {
+        WIFI_LOGE("targetIp or ifName is empty");
+        return;
+    }
+    arpChecker.Start(ifName, macAddress, senderIp, targetIp);
+    for (int i = 0; i < DEFAULT_SLOW_NUM_ARP_PINGS; i++) {
+        if (arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true)) {
+            WIFI_LOGW("HandleIpConflictDetect, ip conflicted!");
+            WriteWifiAccessIntFailedHiSysEvent(1, NetworkFailReason::IP_STATE_CONFLICT, 1);
+            return;
+        }
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

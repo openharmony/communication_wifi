@@ -50,6 +50,7 @@ private:
     int m_instId;
     int32_t lastP2pEnhanceState_ = -1;
     OperateResState lastState = OperateResState::DISCONNECT_DISCONNECTED;
+    OperateResState lastNetworkState_ = OperateResState::DISCONNECT_DISCONNECTED;
     WifiLinkedInfo lastWifiLinkedInfo;
 };
 } //namespace Wifi

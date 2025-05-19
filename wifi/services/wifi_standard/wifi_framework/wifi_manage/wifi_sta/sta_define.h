@@ -118,10 +118,11 @@ typedef enum EnumStaArpState {
     ARP_STATE_UNREACHABLE,
 } StaArpState;
 
-typedef enum EnumStaDnsState {
+enum NetworkFailReason {
     DNS_STATE_WORKING,
     DNS_STATE_UNREACHABLE,
-} StaDnsState;
+    IP_STATE_CONFLICT,
+};
 
 typedef enum EnumNetWorkState {
     NETWORK_NOTWORKING,
@@ -139,7 +140,6 @@ typedef enum EnumStaNetState {
 } StaNetState;
 
 using ArpStateHandler = std::function<void(StaArpState arpState)>;
-using DnsStateHandler = std::function<void(StaDnsState dnsState)>;
 }  // namespace Wifi
 }  // namespace OHOS
 #endif /* OHOS_STA_DEFINE_H */

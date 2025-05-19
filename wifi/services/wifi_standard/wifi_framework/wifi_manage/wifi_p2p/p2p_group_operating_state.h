@@ -18,6 +18,7 @@
 
 #include "state.h"
 #include "p2p_define.h"
+#include "wifi_error_no.h"
 #include "wifi_p2p_group_manager.h"
 #include "wifi_p2p_device_manager.h"
 #include "ienhance_service.h"
@@ -144,6 +145,7 @@ private:
      */
     virtual bool ProcessCmdHid2dCreateGroup(const InternalMessagePtr msg) const;
 
+    WifiErrorNo CreateGroupByConfig(int netId, const WifiP2pConfigInternal &config, int freq) const;
 private:
     using ProcessFun = std::function<bool(const InternalMessagePtr)> const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;

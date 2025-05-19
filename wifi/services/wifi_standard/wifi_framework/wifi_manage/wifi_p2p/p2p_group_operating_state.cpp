@@ -114,6 +114,19 @@ bool P2pGroupOperatingState::ProcessCmdCreateRptGroup(const InternalMessagePtr m
     return EXECUTED;
 }
 
+WifiErrorNo P2pGroupOperatingState::CreateGroupByConfig(int netId,
+    const WifiP2pConfigInternal &config, int freq) const
+{
+    WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
+    bool isPersistent = (netId == PERSISTENT_NET_ID) ? true : false;
+    if (isPersistent && p2pStateMachine.DealCreateNewGroupWithConfig(config, freq)) {
+        ret = WIFI_HAL_OPT_OK;
+    } else if (!isPersistent && p2pStateMachine.CreateTempGroupWithConfig(config, freq)) {
+        ret = WIFI_HAL_OPT_OK;
+    }
+    return ret;
+}
+
 bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg) const
 {
     WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
@@ -145,11 +158,9 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg)
             p2pStateMachine.UpdateGroupManager();
             p2pStateMachine.UpdatePersistentGroups();
         } else if (!config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
-                   config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
+            config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
             WifiConfigCenter::GetInstance().SetExplicitGroup(true);
-            if (p2pStateMachine.DealCreateNewGroupWithConfig(config, freq)) {
-                ret = WIFI_HAL_OPT_OK;
-            }
+            ret = CreateGroupByConfig(netId, config, freq);
         }
     } else {
         WIFI_LOGE("Invalid parameter.");

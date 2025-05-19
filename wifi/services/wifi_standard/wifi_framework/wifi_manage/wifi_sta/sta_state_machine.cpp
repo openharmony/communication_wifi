@@ -5143,14 +5143,16 @@ void StaStateMachine::LogSignalInfo(WifiSignalPollInfo &signalInfo)
     WIFI_LOGI("SignalPoll,bssid:%{public}s,ssid:%{public}s,networkId:%{public}d,band:%{public}d,freq:%{public}d,"
         "rssi:%{public}d,noise:%{public}d,chload:%{public}d,snr:%{public}d,ulDelay:%{public}d,txLinkSpeed:%{public}d,"
         "rxLinkSpeed:%{public}d,txBytes:%{public}u,rxBytes:%{public}u,txFailed:%{public}d,txPackets:%{public}d,"
-        "rxPackets:%{public}d,GetWifiStandard:%{public}d,rxmax:%{public}d,txmax:%{public}d,connState:%{public}d,"
-        "detState:%{public}d,lastSignal:%{public}d,chloadSelf:%{public}d,c0Rssi:%{public}d,c1Rssi:%{public}d",
-        MacAnonymize(linkedInfo.bssid).c_str(), SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.networkId,
-        linkedInfo.band, signalInfo.frequency, signalInfo.signal, signalInfo.noise, signalInfo.chload, signalInfo.snr,
-        signalInfo.ulDelay, signalInfo.txrate, signalInfo.rxrate, signalInfo.txBytes, signalInfo.rxBytes,
-        signalInfo.txFailed, signalInfo.txPackets, signalInfo.rxPackets, linkedInfo.wifiStandard,
-        linkedInfo.maxSupportedRxLinkSpeed, linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.connState,
-        linkedInfo.detailedState, lastSignalLevel_, signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
+        "rxPackets:%{public}d,wifiCategory:%{public}d, wifiLinkType:%{public}d,GetWifiStandard:%{public}d,"
+        "rxmax:%{public}d,txmax:%{public}d,connState:%{public}d,detState:%{public}d,lastSignal:%{public}d,"
+        "chloadSelf:%{public}d,c0Rssi:%{public}d,c1Rssi:%{public}d", MacAnonymize(linkedInfo.bssid).c_str(),
+        SsidAnonymize(linkedInfo.ssid).c_str(), linkedInfo.networkId, linkedInfo.band, signalInfo.frequency,
+        signalInfo.signal, signalInfo.noise, signalInfo.chload, signalInfo.snr, signalInfo.ulDelay, signalInfo.txrate,
+        signalInfo.rxrate, signalInfo.txBytes, signalInfo.rxBytes, signalInfo.txFailed, signalInfo.txPackets,
+        signalInfo.rxPackets, static_cast<int>(linkedInfo.supportedWifiCategory),
+        static_cast<int>(linkedInfo.wifiLinkType), linkedInfo.wifiStandard, linkedInfo.maxSupportedRxLinkSpeed,
+        linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.connState, linkedInfo.detailedState, lastSignalLevel_,
+        signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
 }
 } // namespace Wifi
 } // namespace OHOS

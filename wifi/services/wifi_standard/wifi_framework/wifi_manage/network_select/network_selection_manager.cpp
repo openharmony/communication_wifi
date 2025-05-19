@@ -147,7 +147,7 @@ std::string NetworkSelectionManager::GetSavedNetInfoForChr(
         if (networkCandidates.at(i).wifiDeviceConfig.networkId == INVALID_NETWORK_ID) {
             continue;
         }
-        wifiDeviceConfigs.insert({networkCandidates.at(i).wifiDeviceConfig.networkId,
+        savedCandidates.insert({networkCandidates.at(i).wifiDeviceConfig.networkId,
             networkCandidates.at(i)});
     }
     if (savedCandidates.empty()) {

@@ -159,9 +159,9 @@ std::string NetworkSelectionManager::GetSavedNetInfoForChr(
         savedResult += "[";
         savedResult += std::to_string(pair.first);
         savedResult += "_";
-        savedResult += SsidAnonymize(pair.second.ssid);
+        savedResult += SsidAnonymize(pair.second.wifiDeviceConfig.ssid);
         savedResult += "_";
-        savedResult += pair.second.keyMgmt;
+        savedResult += pair.second.wifiDeviceConfig.keyMgmt;
         savedResult += "]";
     }
     savedResult += "]";

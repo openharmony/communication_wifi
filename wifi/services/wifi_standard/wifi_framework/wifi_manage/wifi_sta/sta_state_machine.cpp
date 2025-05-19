@@ -3736,6 +3736,7 @@ void StaStateMachine::SetSupportedWifiCategory()
     } else {
         linkedInfo.isMloConnected = false;
     }
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     WIFI_LOGI("%{public}s supportedWifiCategory:%{public}d, isMloConnected:%{public}d", __FUNCTION__,
         static_cast<int>(linkedInfo.supportedWifiCategory), linkedInfo.isMloConnected);
 }

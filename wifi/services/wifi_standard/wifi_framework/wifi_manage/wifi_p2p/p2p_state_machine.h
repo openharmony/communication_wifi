@@ -313,6 +313,8 @@ private:
     int GetRandomSocialFreq(const std::vector<int> &freqList) const;
 
     bool P2pReject(const std::string mac) const;
+
+    bool CreateTempGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const;
 private:
     /**
      * @Description - Broadcast state change event.
@@ -429,6 +431,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     void WakeUpScreenSaver();
 #endif
+    bool SetTempGroupConfig(const WifiP2pConfigInternal &config) const;
 
 private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;

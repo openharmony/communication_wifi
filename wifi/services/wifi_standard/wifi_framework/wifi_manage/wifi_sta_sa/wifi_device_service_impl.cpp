@@ -156,6 +156,7 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
     }
 
     if (m_instId == INSTID_WLAN0 && IsDisableWifiProhibitedByEdm()) {
+        WIFI_LOGE("DisableWifi:wifi is prohibited by EDM!");
         return WIFI_OPT_FAILED;
     }
 
@@ -2658,16 +2659,12 @@ bool WifiDeviceServiceImpl::IsDisableWifiProhibitedByEdm(void)
     constexpr const char* PARAM_TRUE = "true";
     constexpr const char* PARAM_FALSE = "false";
  
-    char result[PARAM_FALSE_LEN + 1] = {0};
-    int len = GetParamValue(WIFI_EDM_FORCE_OPEN_KEY, PARAM_FALSE, result, PARAM_FALSE_LEN + 1);
-    if (len != PARAM_FALSE_LEN && len != PARAM_TRUE_LEN) {
-        WIFI_LOGE("GetParameter len is invalid.");
-        return false;
-    }
-
-    if (strncmp(result, PARAM_TRUE, PARAM_TRUE_LEN) == 0) {
-        WIFI_LOGE("wifi is prohibited by EDM. You won't be able to turn off wifi!");
-        return true;
+    char preValue[PARAM_FALSE_LEN] = {0};
+    int errCode = GetParamValue(WIFI_EDM_FORCE_OPEN_KEY, PARAM_FALSE, preValue, PARAM_FALSE_LEN);
+    if (errCode > 0) {
+        if (strncmp(result, PARAM_TRUE, PARAM_TRUE_LEN) == 0) {
+            return true;
+        }
     }
     return false;
 }

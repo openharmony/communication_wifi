@@ -2199,8 +2199,9 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
 void StaStateMachine::PublishPortalNitificationAndLogin()
 {
 #ifndef OHOS_ARCH_LITE
-    if (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL
-        && WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+    if (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL && WifiConfigCenter::GetInstance().IsAllowPopUp() &&
+        !selfCureService_->IsSelfCureOnGoing()) {
+        WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);
         ShowPortalNitification();
     }
 #endif

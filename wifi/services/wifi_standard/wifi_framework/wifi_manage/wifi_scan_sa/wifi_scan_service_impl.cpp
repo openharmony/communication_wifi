@@ -42,7 +42,7 @@ namespace Wifi {
 const int USE_SIZE_50 = 50;
 const int USES_30 = 30; // 30 s
 const int USEM_10 = 10 * 60; // 10 min
-const int TIMES_19 = 19;
+const int TIMES_20 = 20;
 constexpr int32_t MAX_SCANMACINFO_WHITELIST_LEN = 200;
 constexpr const char *FIXED_MAC = "02:00:00:00:00:00";
 #ifdef OHOS_ARCH_LITE
@@ -288,16 +288,12 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
             return WIFI_OPT_PERMISSION_DENIED;
         }
     }
-    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() != PERMISSION_DENIED) {
-        if (ProcessScanInfoRequest() == WIFI_OPT_PERMISSION_DENIED) {
-            WIFI_LOGI("GetScanInfoList: Limited ScanInfo");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
-    }
+
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(result);
     if (!compatible) {
     #ifdef SUPPORT_RANDOM_MAC_ADDR
-        if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED ||
+            ProcessScanInfoRequest() == WIFI_OPT_PERMISSION_DENIED) {
             for (auto iter = result.begin(); iter != result.end(); ++iter) {
                 WifiMacAddrInfo macAddrInfo;
                 macAddrInfo.bssid = iter->bssid;
@@ -398,8 +394,8 @@ ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(std::string appId)
     
     callTimestampsMap_[appId].erase(callTimestampsMap_[appId].begin(), it);
  
-    // Check whether the number of calls exceeds 20 within 10 minutes
-    if (callTimestampsMap_[appId].size() >= TIMES_19) {
+    // Check whether the number of calls exceeds 19 within 10 minutes
+    if (callTimestampsMap_[appId].size() + 1 >= TIMES_20) {
         WIFI_LOGE("IsAllowedThirdPartyRequest 10min over 20!");
         return WIFI_OPT_PERMISSION_DENIED;
     }

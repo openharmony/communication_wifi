@@ -88,12 +88,14 @@ void NetworkBlockListManager::AddAbnormalWifiBlocklist(const std::string &bssid)
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
+    WIFI_LOGI("AddAbnormalWifiBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
     abnormalWifiBlockSet_.insert(bssid);
 }
 
 void NetworkBlockListManager::CleanAbnormalWifiBlocklist()
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    WIFI_LOGI("CleanAbnormalWifiBlocklist");
     abnormalWifiBlockSet_.clear();
 }
 

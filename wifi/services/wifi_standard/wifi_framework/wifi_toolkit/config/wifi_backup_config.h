@@ -40,6 +40,7 @@ struct WifiBackupConfig {
     WifiIpConfig wifiIpConfig;
     WifiProxyConfig wifiProxyconfig;
     WifiPrivacyConfig wifiPrivacySetting;
+    bool isAllowAutoConnect;
     WifiBackupConfig()
     {
         instanceId = 0;
@@ -53,6 +54,7 @@ struct WifiBackupConfig {
         noInternetAccess = false;
         wepTxKeyIndex = 0;
         wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+        isAllowAutoConnect = false;
     }
 };
 

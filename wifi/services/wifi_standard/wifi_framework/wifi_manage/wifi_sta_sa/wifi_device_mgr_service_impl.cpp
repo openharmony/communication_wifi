@@ -171,7 +171,7 @@ int32_t WifiDeviceMgrServiceImpl::OnSvcCmd(int32_t fd, const std::vector<std::u1
         }
         return svcResult;
     }
- 
+
     std::string cmd = Str16ToStr8(args[0]);
     std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
     WIFI_LOGI("svc command is %{public}s.", cmd.c_str());

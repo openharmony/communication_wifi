@@ -394,7 +394,7 @@ private:
     void NotifySelfCureCompleted(int status);
     void ForceStopSelfCure();
     void HandleConnectFailed();
-
+    void HandleIpConflictDetect();
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;
     std::map<std::string, SelfCureServiceCallback> mSelfCureCallback_;

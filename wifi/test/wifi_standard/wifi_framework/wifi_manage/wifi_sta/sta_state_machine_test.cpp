@@ -89,7 +89,6 @@ public:
         pStaStateMachine->InitStaStateMachine();
         pStaStateMachine->InitWifiLinkedInfo();
         ArpStateHandler arpHandle = nullptr;
-        DnsStateHandler dnsHandle = nullptr;
         pStaStateMachine->RegisterStaServiceCallback(WifiManager::GetInstance().GetStaCallback());
         pStaService = std::make_unique<StaService>();
         LOG_SetCallback(StaStateMachineCallback);

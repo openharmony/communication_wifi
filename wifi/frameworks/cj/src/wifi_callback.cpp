@@ -375,16 +375,16 @@ private:
 };
 
 sptr<CjWifiDeviceEventCallback> cjWifiDeviceCallback =
-    sptr<CjWifiDeviceEventCallback>(new (std::nothrow) CjWifiDeviceEventCallback());
+    sptr<CjWifiDeviceEventCallback>(new CjWifiDeviceEventCallback());
 
 sptr<CjWifiScanEventCallback> cjWifiScanCallback =
-    sptr<CjWifiScanEventCallback>(new (std::nothrow) CjWifiScanEventCallback());
+    sptr<CjWifiScanEventCallback>(new CjWifiScanEventCallback());
 
 sptr<CjWifiHotspotEventCallback> cjWifiHotspotCallback =
-    sptr<CjWifiHotspotEventCallback>(new (std::nothrow) CjWifiHotspotEventCallback());
+    sptr<CjWifiHotspotEventCallback>(new CjWifiHotspotEventCallback());
 
 sptr<CjWifiP2pEventCallback> cjWifiP2pCallback =
-    sptr<CjWifiP2pEventCallback>(new (std::nothrow) CjWifiP2pEventCallback());
+    sptr<CjWifiP2pEventCallback>(new CjWifiP2pEventCallback());
 
 int32_t CjEventRegister::Register(const std::string& type, void (*callback)())
 {

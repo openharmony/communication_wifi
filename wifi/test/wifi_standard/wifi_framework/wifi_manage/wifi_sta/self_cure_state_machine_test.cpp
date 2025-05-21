@@ -297,12 +297,9 @@ public:
     {
         LOGI("Enter HandleWifi7BlacklistRecoverTest");
         pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7BlacklistRecover(nullptr);
-
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        InternalMessagePtr msg;
         WifiLinkedInfo info;
         info.bssid = CURR_BSSID;
-        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER);
-        msg->GetMessageObj(info);
         pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7BlacklistRecover(msg);
     }
 
@@ -310,12 +307,9 @@ public:
     {
         LOGI("Enter HandleWifi7WithoutMldBackoffTest");
         pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7WithoutMldBackoff(nullptr);
-
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        InternalMessagePtr msg;
         WifiLinkedInfo info;
         info.bssid = CURR_BSSID;
-        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF);
-        msg->GetMessageObj(info);
         pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7WithoutMldBackoff(msg);
     }
 
@@ -323,12 +317,9 @@ public:
     {
         LOGI("Enter HandleWifi7MldBackoffTest");
         pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7MldBackoff(nullptr);
-
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        InternalMessagePtr msg;
         WifiLinkedInfo info;
         info.bssid = CURR_BSSID;
-        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_MLD_BACKOFF);
-        msg->GetMessageObj(info);
         pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7MldBackoff(msg);
     }
 
@@ -336,12 +327,9 @@ public:
     {
         LOGI("Enter HandleNetworkConnectFailCountTest");
         pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleNetworkConnectFailCount(nullptr);
-
-        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        InternalMessagePtr msg;
         WifiLinkedInfo info;
         info.bssid = CURR_BSSID;
-        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT);
-        msg->GetMessageObj(info);
         pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleNetworkConnectFailCount(msg);
     }
 

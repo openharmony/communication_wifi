@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -153,6 +153,11 @@ ErrCode WifiDeviceServiceImpl::DisableWifi()
         WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (m_instId == INSTID_WLAN0 && IsDisableWifiProhibitedByEdm()) {
+        WIFI_LOGE("DisableWifi:wifi is prohibited by EDM!");
+        return WIFI_OPT_FAILED;
     }
 
     if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
@@ -2645,5 +2650,23 @@ void WifiDeviceServiceImpl::StopUnloadStaTimer(void)
     WifiManager::GetInstance().GetWifiStaManager()->StopUnloadStaSaTimer();
 }
 #endif
+
+bool WifiDeviceServiceImpl::IsDisableWifiProhibitedByEdm(void)
+{
+    constexpr const char* WIFI_EDM_FORCE_OPEN_KEY = "persist.edm.force_open_wifi";
+    constexpr const uint32_t PARAM_TRUE_LEN = 4;
+    constexpr const uint32_t PARAM_FALSE_LEN = 5;
+    constexpr const char* PARAM_TRUE = "true";
+    constexpr const char* PARAM_FALSE = "false";
+ 
+    char preValue[PARAM_FALSE_LEN] = {0};
+    int errCode = GetParamValue(WIFI_EDM_FORCE_OPEN_KEY, PARAM_FALSE, preValue, PARAM_FALSE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, PARAM_TRUE, PARAM_TRUE_LEN) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
 }  // namespace Wifi
 }  // namespace OHOS

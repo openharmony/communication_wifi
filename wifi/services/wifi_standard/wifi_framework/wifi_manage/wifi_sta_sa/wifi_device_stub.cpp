@@ -542,6 +542,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
 {
     reply.WriteInt32(config.networkId);
     reply.WriteString(config.bssid);
+    reply.WriteString(config.userSelectBssid);
     reply.WriteInt32(config.bssidType);
     reply.WriteString(config.ssid);
     reply.WriteInt32(config.band);

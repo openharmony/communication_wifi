@@ -92,13 +92,20 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
             pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, lastWifiLinkedInfo);
         }
         IpQosMonitor::GetInstance().ResetTxRxProperty();
+        lastNetworkState_ = OperateResState::DISCONNECT_DISCONNECTED;
     } else if (state == OperateResState::CONNECT_OBTAINING_IP) {
         lastWifiLinkedInfo = info;
     } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
         pSelfCureStateMachine->SetHttpMonitorStatus(false);
+        if (lastNetworkState_ != state) {
+            lastNetworkState_ = state;
+            pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_IP_CONFLICT_DETECT);
+        }
     } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
         pSelfCureStateMachine->SetHttpMonitorStatus(true);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);
+        lastNetworkState_ = state == OperateResState::CONNECT_NETWORK_ENABLED ?
+            OperateResState::CONNECT_NETWORK_ENABLED : lastNetworkState_;
     } else if (state == OperateResState::CONNECT_CONNECTION_REJECT) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, info);
     }

@@ -2129,7 +2129,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
             (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL)) {
             const int httpOpt = 1;
             int selfCureResetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
-            WriteWifiAccessIntFailedHiSysEvent(httpOpt, StaDnsState::DNS_STATE_UNREACHABLE, selfCureResetState);
+            WriteWifiAccessIntFailedHiSysEvent(httpOpt, NetworkFailReason::DNS_STATE_UNREACHABLE, selfCureResetState);
             mIsWifiInternetCHRFlag = true;
         }
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);

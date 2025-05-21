@@ -22,6 +22,10 @@
 #include "wifi_base_hal_interface.h"
 #include "wifi_event_callback.h"
 #include "wifi_native_struct.h"
+#include "i_wifi_struct.h"
+#include "wifi_error_no.h"
+#include "wifi_msg.h"
+#include "inter_scan_info.h"
 
 namespace OHOS {
 namespace Wifi {

@@ -21,7 +21,6 @@
 #include "ip2p_service.h"
 #include "ip2p_service_callbacks.h"
 #include "p2p_state_machine.h"
-#include "i_wifi_p2p_iface.h"
 #include "wifi_error_no.h"
 #include "ienhance_service.h"
 

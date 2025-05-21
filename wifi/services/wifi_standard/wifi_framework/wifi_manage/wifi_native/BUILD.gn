@@ -82,26 +82,10 @@ idl_client_sources = [
   "hal_device_manage/hal_device_manage.cpp",
   "wifi_hal_interface/wifi_ap_hal_interface.cpp",
   "wifi_hal_interface/wifi_base_hal_interface.cpp",
-  "wifi_hal_interface/wifi_chip_hal_interface.cpp",
   "wifi_hal_interface/wifi_p2p_hal_interface.cpp",
   "wifi_hal_interface/wifi_sta_hal_interface.cpp",
   "wifi_hal_interface/wifi_supplicant_hal_interface.cpp",
 ]
-
-if (!wifi_feature_with_hdi_wpa_supported) {
-  idl_client_sources += [
-    "client/idl_client/idl_interface/i_wifi.c",
-    "client/idl_client/idl_interface/i_wifi_chip.c",
-    "client/idl_client/idl_interface/i_wifi_hotspot_iface.c",
-    "client/idl_client/idl_interface/i_wifi_iface.c",
-    "client/idl_client/idl_interface/i_wifi_p2p_iface.c",
-    "client/idl_client/idl_interface/i_wifi_public_func.c",
-    "client/idl_client/idl_interface/i_wifi_sta_iface.c",
-    "client/idl_client/idl_interface/i_wifi_supplicant_iface.c",
-    "client/idl_client/wifi_idl_client.cpp",
-    "client/idl_client/wifi_idl_inner_interface.cpp",
-  ]
-}
 
 if (defined(ohos_lite)) {
   shared_library("wifi_native") {

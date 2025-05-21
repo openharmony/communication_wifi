@@ -166,6 +166,9 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
         case P2P_WSC_PBC_DIALOG:
             param["p2pDeviceName"] = comInfo;
             break;
+        case CANDIDATE_CONNECT:
+            param["targetSsid"] = comInfo;
+            break;
         default: {
             break;
         }

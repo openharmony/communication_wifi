@@ -2520,6 +2520,7 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
 {
     config.networkId = reply.ReadInt32();
     config.bssid = reply.ReadString();
+    config.userSelectBssid = reply.ReadString();
     config.bssidType = reply.ReadInt32();
     config.ssid = reply.ReadString();
     config.band = reply.ReadInt32();

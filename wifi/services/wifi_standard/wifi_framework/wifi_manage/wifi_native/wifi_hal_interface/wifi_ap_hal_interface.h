@@ -19,8 +19,10 @@
 #include <string>
 #include <vector>
 #include "wifi_msg.h"
-#include "i_wifi_hotspot_iface.h"
 #include "wifi_base_hal_interface.h"
+#include "wifi_ap_event_callback.h"
+#include "wifi_error_no.h"
+#include "wifi_ap_msg.h"
 
 namespace OHOS {
 namespace Wifi {

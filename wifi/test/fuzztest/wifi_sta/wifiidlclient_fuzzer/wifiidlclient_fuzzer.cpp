@@ -25,10 +25,8 @@
 #include "i_wifi.h"
 #include "i_wifi_chip.h"
 #include "i_wifi_iface.h"
-#include "i_wifi_p2p_iface.h"
 #include "i_wifi_sta_iface.h"
 #include "i_wifi_supplicant_iface.h"
-#include "i_wifi_hotspot_iface.h"
 #include "wifi_idl_client.h"
 #include "wifi_log.h"
 

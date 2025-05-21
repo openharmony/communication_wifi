@@ -19,6 +19,7 @@
 #include "wifi_hdi_struct.h"
 #include "wifi_common_def.h"
 #include "wifi_hdi_common.h"
+#include "i_wifi_struct.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -19,56 +19,9 @@ if (defined(ohos_lite)) {
   import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 
-if (wifi_feature_with_hdi_wpa_supported) {
-  local_base_sources = [ "dhcp_service/main.c" ]
-} else {
-  local_base_sources = [
-    "common/wifi_hal_common_func.c",
-    "wifi_hal_service/main.c",
-    "wifi_hal_service/wifi_hal_adapter.c",
-    "wifi_hal_service/wifi_hal_ap_interface.c",
-    "wifi_hal_service/wifi_hal_base_interface.c",
-    "wifi_hal_service/wifi_hal_callback.c",
-    "wifi_hal_service/wifi_hal_chba_interface.c",
-    "wifi_hal_service/wifi_hal_chip_interface.c",
-    "wifi_hal_service/wifi_hal_crpc_ap.c",
-    "wifi_hal_service/wifi_hal_crpc_base.c",
-    "wifi_hal_service/wifi_hal_crpc_chip.c",
-    "wifi_hal_service/wifi_hal_crpc_common.c",
-    "wifi_hal_service/wifi_hal_crpc_p2p.c",
-    "wifi_hal_service/wifi_hal_crpc_server.c",
-    "wifi_hal_service/wifi_hal_crpc_sta.c",
-    "wifi_hal_service/wifi_hal_crpc_supplicant.c",
-    "wifi_hal_service/wifi_hal_module/hostapd_hal/wifi_hostapd_hal.c",
-    "wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wifi_wpa_common.c",
-    "wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wifi_wpa_hal.c",
-    "wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal/wifi_p2p_hal.c",
-    "wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal/wifi_common_hal.c",
-    "wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal/wifi_supplicant_hal.c",
-    "wifi_hal_service/wifi_hal_module_manage.c",
-    "wifi_hal_service/wifi_hal_p2p_interface.c",
-    "wifi_hal_service/wifi_hal_sta_interface.c",
-    "wifi_hal_service/wifi_hal_vendor_interface.c",
-  ]
-}
+local_base_sources = [ "dhcp_service/main.c" ]
 
-if (wifi_feature_with_hdi_wpa_supported) {
-  local_base_include_dirs = []
-} else {
-  local_base_include_dirs = [
-    "$WIFI_ROOT_DIR/base/state_machine/include",
-    "$WIFI_ROOT_DIR/base/cRPC/include",
-    "$WIFI_ROOT_DIR/interfaces/inner_api",
-    "$WIFI_ROOT_DIR/frameworks/native/interfaces",
-    "$WIFI_ROOT_DIR/relation_services/common",
-    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service",
-    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_module/hostapd_hal",
-    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_module/wpa_supplicant_hal",
-    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wpa_sta_hal",
-    "$WIFI_ROOT_DIR/relation_services/wifi_hal_service/wifi_hal_module/wpa_supplicant_hal/wpa_p2p_hal",
-    "$WIFI_ROOT_DIR/services/wifi_standard/include",
-  ]
-}
+local_base_include_dirs = []
 
 if (defined(ohos_lite)) {
   executable("wifi_hal_service") {

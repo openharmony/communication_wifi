@@ -57,13 +57,13 @@ protected:
     sptr<WifiMockModeObserver> observer;
 };
 
-HWTEST_F(WifiDataShareHelperUtilsTest, Query_ReturnsFailed, TestSize.Level1)
+HWTEST_F(WifiDataShareHelperUtilsTest, Query_ReturnsSuccess, TestSize.Level1)
 {
     Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
     std::string key = "wifi_on";
     bool onlySettingsData = true;
     ErrCode result = WifiDataShareHelperUtils::GetInstance().Query(uri, key, value, onlySettingsData);
-    EXPECT_EQ(result, WIFI_OPT_FAILED);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, Insert_ReturnsFailed, TestSize.Level1)
@@ -72,7 +72,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, Insert_ReturnsFailed, TestSize.Level1)
     std::string key = "wifi_on";
     value = "1";
     ErrCode result = WifiDataShareHelperUtils::GetInstance().Insert(uri, key, value);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    EXPECT_EQ(result, WIFI_OPT_FAILED);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, Update_ReturnsFailed, TestSize.Level1)

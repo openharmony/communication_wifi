@@ -324,6 +324,10 @@ void WifiEventSubscriberManager::GetAirplaneModeByDatashare()
             return;
         }
     }
+    if (airplaneMode.empty()) {
+        WIFI_LOGI("GetAirplaneModeByDatashare, airplaneMode is empty!");
+        return;
+    }
 
     WIFI_LOGI("GetAirplaneModeByDatashare, airplaneMode:%{public}s", airplaneMode.c_str());
     if (airplaneMode.compare("1") == 0) {
@@ -342,6 +346,10 @@ void WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()
         SETTINGS_DATASHARE_KEY_WIFI_ALLOW_SEMI_ACTIVE, isAllowed);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetWifiAllowSemiActiveByDatashare, Query wifiAllowSemiActive fail!");
+        return;
+    }
+    if (isAllowed.empty()) {
+        WIFI_LOGI("GetWifiAllowSemiActiveByDatashare, isAllowed is empty!");
         return;
     }
 

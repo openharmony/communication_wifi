@@ -137,6 +137,18 @@ ErrCode WifiDataShareHelperUtils::Query(Uri &uri, const std::string &key, std::s
         return WIFI_OPT_FAILED;
     }
 
+    int rowCount = 0;
+    if (result->GetRowCount(rowCount) != DataShare::E_OK) {
+        WIFI_LOGE("WifiDataShareHelper query failed, get row count fail");
+        ClearResources(queryHelper, result);
+        return WIFI_OPT_FAILED;
+    }
+    if (rowCount == 0) {
+        WIFI_LOGI("WifiDataShareHelper query success, but rowCount is 0");
+        ClearResources(queryHelper, result);
+        return WIFI_OPT_SUCCESS;
+    }
+
     if (result->GoToFirstRow() != DataShare::E_OK) {
         WIFI_LOGE("WifiDataShareHelper query failed,go to first row error");
         ClearResources(queryHelper, result);

@@ -106,6 +106,8 @@ ohos_fuzztest("WifiScansaFuzzTest") {
   ]
 
   external_deps = [
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libpub_utils",
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",

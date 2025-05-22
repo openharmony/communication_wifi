@@ -165,7 +165,7 @@ int32_t WifiDeviceMgrServiceImpl::OnSvcCmd(int32_t fd, const std::vector<std::u1
         impl = iface_cast<WifiDeviceServiceImpl>(mWifiService[instIdWlan0]);
     }
     if (!impl || args.size() != 1) {
-        info = !impl ? "wifi service in invalid state\n" : "wrong parameter size\n";
+        info = !impl ? "wifi service in invalid state\n" : "wrong parameter size\n" + info;
         if (!SaveStringToFd(fd, info)) {
             WIFI_LOGE("WiFi device save string to fd failed.");
         }

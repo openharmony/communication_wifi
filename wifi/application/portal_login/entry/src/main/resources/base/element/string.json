@@ -35,6 +35,22 @@
     {
       "name": "compatibility_mode_of_the_PC_version",
       "value": "Desktop site (Compatibility mode)"
+    },
+    {
+      "name":"continue_visit",
+      "value":"Continue to this site?"
+    },
+    {
+      "name":"ssl_normal_error_msg",
+      "value":"This site's SSL certificate has expired or is untrusted. There may be a security risk if you continue."
+    },
+    {
+      "name":"ssl_error_dialog_continue_btn",
+      "value":"Continue"
+    },
+    {
+      "name":"confirm_dialog_cancel",
+      "value":"Cancel"
     }
   ]
 }

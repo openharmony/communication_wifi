@@ -397,5 +397,6 @@ struct Index {
         DOMAIN, TAG, '%{public}s', 'Failed to unregister netconnect.' + JSON.stringify(err));
       });
     emitter.off('WANT_UPDATE');
+    this.webviewController.loadUrl('http://connectivitycheck.platform.hicloud.com/generate_204');
   }
 }

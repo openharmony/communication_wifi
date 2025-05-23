@@ -1857,6 +1857,8 @@ static int SetWifiBackupConfigFirst(WifiBackupConfig &item, const std::string &k
         item.keyMgmt = value;
     } else if (key == "keyMgmtBitset") {
         item.keyMgmtBitset = static_cast<uint32_t>(CheckDataLegal(tmpValue));
+    } else if (key == "isAllowAutoConnect") {
+        item.isAllowAutoConnect = CheckDataLegal(tmpValue);
     } else {
         return -1;
     }
@@ -1923,6 +1925,7 @@ static std::string OutPutWifiBackupConfig(WifiBackupConfig &item)
     ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
     ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
     ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
+    ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
     ss << "    " <<"wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         ss << "    " <<"wepKeys_" << i << "=" << item.wepKeys[i] << std::endl;

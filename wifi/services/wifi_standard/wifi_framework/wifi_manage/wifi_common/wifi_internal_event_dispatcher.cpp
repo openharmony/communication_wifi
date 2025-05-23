@@ -608,6 +608,9 @@ void WifiInternalEventDispatcher::DealStaCallbackMsg(
             case WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE:
                 callback->OnDeviceConfigChanged(ConfigChange(msg.msgData));
                 break;
+            case WIFI_CBK_MSG_CANDIDATE_CONNECT_CHANGE:
+                callback->OnCandidateApprovalStatusChanged(CandidateApprovalStatus(msg.msgData));
+                break;
             default:
                 WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
                 break;
@@ -738,6 +741,9 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
                     break;
                 case WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE:
                     callback->OnDeviceConfigChanged(ConfigChange(msg.msgData));
+                    break;
+                case WIFI_CBK_MSG_CANDIDATE_CONNECT_CHANGE:
+                    callback->OnCandidateApprovalStatusChanged(CandidateApprovalStatus(msg.msgData));
                     break;
                 default:
                     WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);

@@ -178,5 +178,27 @@ void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange value)
     }
     return;
 }
+
+void WifiDeviceCallBackProxy::OnCandidateApprovalStatusChanged(CandidateApprovalStatus status)
+{
+    WIFI_LOGD("WifiDeviceCallBackProxy::OnCandidateApprovalStatusChanged");
+    MessageOption option = {MessageOption::TF_ASYNC};
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(status));
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANDIDATE_CONNECT_APPROVAL),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANDIDATE_CONNECT_APPROVAL), error);
+        return;
+    }
+    return;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -273,6 +273,16 @@ ErrCode StaService::RemoveAllCandidateConfig(const int uid) const
     return WIFI_OPT_SUCCESS;
 }
 
+void StaService::NotifyCandidateApprovalStatus(CandidateApprovalStatus status) const
+{
+#ifndef OHOS_ARCH_LITE
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_CANDIDATE_CONNECT_CHANGE;
+    cbMsg.msgData = static_cast<int>(status);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+#endif
+}
+
 ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId) const
 {
     LOGI("Enter ConnectToCandidateConfig.\n");
@@ -303,6 +313,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
+    NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }

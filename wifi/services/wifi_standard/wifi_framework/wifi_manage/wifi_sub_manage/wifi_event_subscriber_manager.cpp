@@ -39,6 +39,7 @@
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
 #include "display_info.h"
+#include "wifi_internal_event_dispatcher.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -822,16 +823,14 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
         OnReceiveDialogAcceptEvent(dialogType);
     } else if (action == WIFI_EVENT_DIALOG_REJECT) {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
-        WIFI_LOGI("dialogType[%{public}d]", dialogType);
-        OnReceiveDialogRejectEvent(dialogType);
+        bool noAction = eventData.GetWant().GetBoolParam("noAction", false);
+        WIFI_LOGI("dialogType[%{public}d], noAction[%{public}d]", dialogType, static_cast<int>(noAction));
+        OnReceiveDialogRejectEvent(dialogType, noAction);
     } else if (action == EVENT_SETTINGS_WLAN_KEEP_CONNECTED) {
         OnReceiveWlanKeepConnected(eventData);
     } else {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);
-        if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
-            WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(INVALID_NETWORK_ID);
-        }
     }
 }
 
@@ -855,11 +854,14 @@ void NotificationEventSubscriber::OnReceiveNotificationEvent(int notificationId)
 void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
 {
     if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
+        NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
         int candidateNetworkId = WifiConfigCenter::GetInstance().GetSelectedCandidateNetworkId();
         if (candidateNetworkId == INVALID_NETWORK_ID) {
             WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");
             return;
         }
+        WifiSettings::GetInstance().SetDeviceEphemeral(candidateNetworkId, false);
+        WifiSettings::GetInstance().SyncDeviceConfig();
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
         if (pService != nullptr) {
             pService->ConnectToNetwork(candidateNetworkId);
@@ -887,7 +889,7 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
 #endif
 }
 
-void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
+void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType, bool noAction)
 {
     if (dialogType == static_cast<int>(WifiDialogType::AUTO_IDENTIFY_CONN)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
@@ -899,7 +901,15 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
         if (pEnhanceService != nullptr) {
             pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_AUTO_IDENTIFY_CONN);
         }
+    } else if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
+        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(INVALID_NETWORK_ID);
+        if (noAction) {
+            NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_NO_RESPOND);
+        } else {
+            NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_REJECT);
+        }
     }
+
 #ifdef FEATURE_P2P_SUPPORT
     if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
         WIFI_LOGI("OnReceiveNotification P2P_WSC_PBC_DIALOG Reject");
@@ -909,6 +919,14 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType)
         }
     }
 #endif
+}
+
+void NotificationEventSubscriber::NotifyCandidateApprovalStatus(CandidateApprovalStatus status)
+{
+    WifiEventCallbackMsg cbMsg;
+    cbMsg.msgCode = WIFI_CBK_MSG_CANDIDATE_CONNECT_CHANGE;
+    cbMsg.msgData = static_cast<int>(status);
+    WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 }
 
 #ifdef HAS_POWERMGR_PART

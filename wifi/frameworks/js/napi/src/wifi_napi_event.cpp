@@ -254,6 +254,32 @@ public:
         CheckAndNotify(EVENT_STA_DEVICE_CONFIG_CHANGE, static_cast<int>(value));
     }
 
+    void OnCandidateApprovalStatusChanged(CandidateApprovalStatus status) override
+    {
+        WIFI_LOGI("OnCandidateApprovalStatusChanged event: %{public}d", static_cast<int>(status));
+        AsyncContext *ctx = GetAsyncContext(NapiAsyncType::CANDIDATE_CONNECT);
+        if (ctx == nullptr) {
+            return;
+        }
+
+        ctx->errorCode = WIFI_OPT_USER_DOES_NOT_RESPOND;
+        switch (status) {
+            case CandidateApprovalStatus::USER_ACCEPT:
+                ctx->errorCode = WIFI_OPT_SUCCESS;
+                break;
+            case CandidateApprovalStatus::USER_REJECT:
+                ctx->errorCode = WIFI_OPT_USER_REFUSE_THE_ACTION;
+                break;
+            case CandidateApprovalStatus::USER_NO_RESPOND:
+                ctx->errorCode = WIFI_OPT_USER_DOES_NOT_RESPOND;
+                break;
+            default:
+                break;
+        }
+
+        ctx->callbackFunc(ctx);
+    }
+
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override {
         return nullptr;
     }

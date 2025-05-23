@@ -23,6 +23,22 @@
         {
             "name":"compatibility_mode_of_the_PC_version",
             "value":"ماسلاشما كومپيۇتېر ھالەت"
+        },
+        {
+            "name":"continue_visit",
+            "value":"داۋاملاشتۇرامسىز؟"
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"بۇ تور بېكەتنىڭ بىخەتەرلىك ئىجازەتنامىسىنىڭ ۋاقتى ئۆتكەن ياكى ئىشەنچسىز، خەتەر بولۇشى مۇمكىن. داۋاملىق زىيارەت قىلامسىز؟"
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"داۋاملاشتۇرۇش"
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"بىكار قىلىش"
         }
     ]
 }

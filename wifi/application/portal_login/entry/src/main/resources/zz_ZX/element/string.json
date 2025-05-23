@@ -42,3 +42,25 @@
         }
     ]
 }
+
+  want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
+    want.SetParam("url", mPortalUrl);
+    want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
+    WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
+    OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
+    if (err != ERR_OK) {
+        WIFI_LOGI("portal login StartAbility is failed %{public}d", err);
+        WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
+        AAFwk::Want wantBrowser;
+        wantBrowser.SetParam("netId", netId);
+        std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
+        wantBrowser.SetAction(PORTAL_ACTION);
+        wantBrowser.SetUri(mPortalUrl);
+        wantBrowser.AddEntity(PORTAL_ENTITY);
+        wantBrowser.SetBundle(bundle);
+        WIFI_LOGI("wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
+        OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(wantBrowser);
+        if (err != ERR_OK) {
+            WIFI_LOGI("wantbrowser portal StartAbility is failed %{public}d", err);
+        }
+    }

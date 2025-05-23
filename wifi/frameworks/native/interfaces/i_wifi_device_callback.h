@@ -78,6 +78,13 @@ public:
      */
     virtual void OnDeviceConfigChanged(ConfigChange value) = 0;
 
+    /**
+     * @Description Deal candidate approval status change message
+     *
+     * @param status - user approval status
+     */
+    virtual void OnCandidateApprovalStatusChanged(CandidateApprovalStatus status) {}
+
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceCallBack");

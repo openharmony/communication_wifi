@@ -71,6 +71,10 @@ int WifiDeviceCallBackStub::OnRemoteRequest(
             ret = RemoteOnDeviceConfigChanged(code, data, reply);
             break;
         }
+        case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANDIDATE_CONNECT_APPROVAL): {
+            ret = RemoteOnCandidateApprovalStatusChanged(code, data, reply);
+            break;
+        }
         default: {
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
             break;
@@ -164,6 +168,14 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChan
     }
 }
 
+NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnCandidateApprovalStatusChanged(CandidateApprovalStatus status)
+{
+    WIFI_LOGI("OnCandidateApprovalStatusChanged, status:%{public}d!", static_cast<int>(status));
+    if (callback_) {
+        callback_->OnCandidateApprovalStatusChanged(status);
+    }
+}
+
 int WifiDeviceCallBackStub::RemoteOnWifiStateChanged(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -249,6 +261,15 @@ int WifiDeviceCallBackStub::RemoteOnDeviceConfigChanged(uint32_t code, MessagePa
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int value = data.ReadInt32();
     OnDeviceConfigChanged(ConfigChange(value));
+    return 0;
+}
+
+int WifiDeviceCallBackStub::RemoteOnCandidateApprovalStatusChanged(uint32_t code, MessageParcel &data,
+    MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int status = data.ReadInt32();
+    OnCandidateApprovalStatusChanged(CandidateApprovalStatus(status));
     return 0;
 }
 }  // namespace Wifi

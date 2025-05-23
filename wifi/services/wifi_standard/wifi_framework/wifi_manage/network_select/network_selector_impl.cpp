@@ -225,6 +225,7 @@ SuggestionNetworkTracker::SuggestionNetworkTracker() : SimpleNetworkSelector("su
     auto andFilter = make_shared<AndWifiFilter>();
     andFilter->AddFilter(make_shared<SuggestionNetworkWifiFilter>());
     andFilter->AddFilter(make_shared<DisableWifiFilter>());
+    andFilter->AddFilter(make_shared<EphemeralWifiFilter>());
     SetWifiFilter(andFilter);
 }
 

@@ -54,7 +54,6 @@
 #endif
 #include "sta_define.h"
 #include "ip_qos_monitor.h"
-#include "wifi_country_code_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1935,27 +1934,27 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     int netId = m_NetWorkState->GetWifiNetId();
     AAFwk::Want want;
     want.SetParam("netId", netId);
-    std::string wifiCountryCode;
-    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(wifiCountryCode);
     int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
-    if (wifiCountryCode == DEFAULT_REGION && deviceType != ProductDeviceType::TV) {
-        std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
-        want.SetAction(PORTAL_ACTION);
-        want.SetUri(mPortalUrl);
-        want.AddEntity(PORTAL_ENTITY);
-        want.SetBundle(bundle);
-        WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
-    } else {
-        want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
-        want.SetParam("url", mPortalUrl);
-        want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
-        WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d, wifiCountryCode is %{public}s",
-            netId, deviceType, wifiCountryCode.c_str());
-    }
+    want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
+    want.SetParam("url", mPortalUrl);
+    want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
+    WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
     if (err != ERR_OK) {
         WIFI_LOGI("portal login StartAbility is failed %{public}d", err);
         WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
+        AAFwk::Want wantBrowser;
+        wantBrowser.SetParam("netId", netId);
+        std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
+        wantBrowser.SetAction(PORTAL_ACTION);
+        wantBrowser.SetUri(mPortalUrl);
+        wantBrowser.AddEntity(PORTAL_ENTITY);
+        wantBrowser.SetBundle(bundle);
+        WIFI_LOGI("wantbrowser wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
+        OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(wantBrowser);
+        if (err != ERR_OK) {
+            WIFI_LOGI("wantbrowser portal StartAbility is failed %{public}d", err);
+        }
     }
 #endif
 }

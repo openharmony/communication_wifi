@@ -23,6 +23,22 @@
         {
             "name":"compatibility_mode_of_the_PC_version",
             "value":"[TS_1035326]_Desktop site (Compatibility mode)"
+        },
+         {
+            "name":"continue_visit",
+            "value":"[TS_1002771]_Continue to this site?"
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"[TS_851559]_This site's SSL certificate has expired or is untrusted. There may be a security risk if you continue."
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"[TS_851544]_Continue"
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"[TS_851446]_Cancel"
         }
     ]
 }

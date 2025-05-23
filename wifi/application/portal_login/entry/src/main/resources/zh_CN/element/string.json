@@ -23,6 +23,22 @@
         {
             "name":"compatibility_mode_of_the_PC_version",
             "value":"电脑版"
+        },
+        {
+            "name":"continue_visit",
+            "value":"是否继续访问？"
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"当前网站的安全证书已过期或不可信，可能存在安全风险。是否继续访问？"
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"继续访问"
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"取消"
         }
     ]
 }

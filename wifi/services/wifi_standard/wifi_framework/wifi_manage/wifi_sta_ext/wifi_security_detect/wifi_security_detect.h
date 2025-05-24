@@ -66,11 +66,10 @@ public:
 
 
     static void PopupNotification(int status, int networkid);
-    // static std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId, const char *uri);
+    
     void WifiConnectConfigParma(const WifiLinkedInfo &info, Json::Value &root);
 
 private:
-    // std::map<std::string, time_t> lastDetectTime_;
     static Uri AssembleUri(const std::string &key);
     static std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
     std::unique_ptr<WifiEventHandler> SecurityDetectThread_ = nullptr;

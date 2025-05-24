@@ -42,6 +42,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_toggler_manager.cpp",
       "wifi_manager.cpp",
       "wifi_service_manager.cpp",
+      "$WIFI_ROOT_DIR/base/utils",
     ]
 
     include_dirs = [
@@ -165,7 +166,6 @@ if (defined(ohos_lite)) {
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "jsoncpp:jsoncpp",
-      "ipc:ipc_single",
     ]
 
     defines = [ "OHOS_ARCH_LITE" ]

@@ -372,6 +372,12 @@ enum class ConfigChange {
     CONFIG_REMOVE = 2,
 };
 
+enum class CandidateApprovalStatus {
+    USER_ACCEPT = 0,
+    USER_REJECT = 1,
+    USER_NO_RESPOND = 2,
+};
+
 struct VoWifiSignalInfo {
     int rssi;
     int noise;

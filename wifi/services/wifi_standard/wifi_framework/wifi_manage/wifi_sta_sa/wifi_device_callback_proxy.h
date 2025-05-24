@@ -82,6 +82,13 @@ public:
      */
     void OnDeviceConfigChanged(ConfigChange value) override;
 
+    /**
+     * @Description Deal candidate approval status change message
+     *
+     * @param status - user approval status
+     */
+    void OnCandidateApprovalStatusChanged(CandidateApprovalStatus status) override;
+
 private:
 #ifdef OHOS_ARCH_LITE
     SvcIdentity sid_;

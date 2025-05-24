@@ -121,6 +121,7 @@ public:
     virtual void InitWifiMdmRestrictedListConfig() = 0;
     virtual int SyncWifiRestrictedListConfig() = 0;
     virtual bool WhetherSetWhiteListConfig() = 0;
+    virtual int SetDeviceEphemeral(int networkId, bool isEphemeral) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -223,6 +224,7 @@ public:
     MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
     MOCK_METHOD1(GetScanOnlySwitchState, int(int instId));
     MOCK_METHOD1(SetMloWifiLinkedMaxSpeed, int(int));
+    MOCK_METHOD2(SetDeviceEphemeral, int(int networkId, bool isEphemeral));
 };
 }  // namespace OHOS
 }  // namespace Wifi

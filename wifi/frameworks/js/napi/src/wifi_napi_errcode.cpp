@@ -44,6 +44,9 @@ static std::map<int32_t, int32_t> errCodeMap = {
     { ErrCode::WIFI_OPT_P2P_ERR_INTENT, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
     { ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
     { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_USER_DOES_NOT_RESPOND, WifiNapiErrCode::WIFI_ERRCODE_USER_DOES_NOT_RESPOND },
+    { ErrCode::WIFI_OPT_USER_REFUSE_THE_ACTION, WifiNapiErrCode::WIFI_ERRCODE_USER_REFUSE_THE_ACTION },
+    { ErrCode::WIFI_OPT_INVALID_PARAM_NEW, WifiNapiErrCode::WIFI_ERRCODE_PARAM_VALIDATION_FAILED },
 };
 
 static std::map<int32_t, std::string> napiErrMsgMap {
@@ -55,6 +58,9 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
     { WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is being closed." },
     { WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
+    { WifiNapiErrCode::WIFI_ERRCODE_USER_DOES_NOT_RESPOND, "The user does not respond." },
+    { WifiNapiErrCode::WIFI_ERRCODE_USER_REFUSE_THE_ACTION, "The user refused the action." },
+    { WifiNapiErrCode::WIFI_ERRCODE_PARAM_VALIDATION_FAILED, "Parameter validation failed." },
 };
 
 static napi_value NapiGetUndefined(const napi_env &env)

@@ -70,7 +70,8 @@ public:
 private:
     void OnReceiveNotificationEvent(int notificationId);
     void OnReceiveDialogAcceptEvent(int dialogType);
-    void OnReceiveDialogRejectEvent(int dialogType);
+    void OnReceiveDialogRejectEvent(int dialogType, bool noAction);
+    void NotifyCandidateApprovalStatus(CandidateApprovalStatus status);
 };
 
 #ifdef HAS_POWERMGR_PART

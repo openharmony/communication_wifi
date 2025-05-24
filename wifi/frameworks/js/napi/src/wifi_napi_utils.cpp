@@ -18,6 +18,7 @@
 #include "wifi_logger.h"
 #include "context.h"
 #include "wifi_napi_errcode.h"
+#include <shared_mutex>
 
 namespace OHOS {
 namespace Wifi {
@@ -406,10 +407,15 @@ static napi_value DoPromiseAsyncWork(const napi_env& env, AsyncContext *asyncCon
                 return;
             }
             AsyncContext *context = (AsyncContext *)data;
-            context->completeFunc(data);
-            HandlePromiseErrCode(env, *context);
-            napi_delete_async_work(env, context->work);
-            delete context;
+            if (!context->waitCallback) {
+                context->completeFunc(data);
+                HandlePromiseErrCode(env, *context);
+                napi_delete_async_work(env, context->work);
+                delete context;
+            } else {
+                napi_delete_async_work(env, context->work);
+                context->completeFunc(data);
+            }
         },
         (void *)asyncContext,
         &asyncContext->work);
@@ -437,5 +443,40 @@ void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName,
         napi_set_named_property(env, dstObj, propName, prop);
     }
 }
+
+static std::shared_mutex g_asyncContextMutex;
+static std::map<NapiAsyncType, AsyncContext *> g_asyncContextMap;
+
+bool TryPushAsyncContext(NapiAsyncType type, AsyncContext *asyncContext)
+{
+    if (asyncContext == nullptr) {
+        WIFI_LOGE("asyncContext is nullptr!");
+        return false;
+    }
+
+    std::unique_lock<std::shared_mutex> guard(g_asyncContextMutex);
+    auto it = g_asyncContextMap.find(type);
+    if (it != g_asyncContextMap.end()) {
+        WIFI_LOGE("Async context(%{public}d) hasn't been triggered!", static_cast<int>(type));
+        return false;
+    }
+
+    g_asyncContextMap[type] = asyncContext;
+    return true;
+}
+
+void EraseAsyncContext(NapiAsyncType type)
+{
+    std::unique_lock<std::shared_mutex> guard(g_asyncContextMutex);
+    g_asyncContextMap.erase(type);
+}
+
+AsyncContext *GetAsyncContext(NapiAsyncType type)
+{
+    std::shared_lock<std::shared_mutex> guard(g_asyncContextMutex);
+    auto it = g_asyncContextMap.find(type);
+    return it != g_asyncContextMap.end() ? it->second : nullptr;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

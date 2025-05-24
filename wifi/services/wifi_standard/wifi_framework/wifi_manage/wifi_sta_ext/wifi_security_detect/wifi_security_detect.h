@@ -18,7 +18,6 @@
 #include "json/json.h"
 #include "sta_service_callback.h"
 #include "wifi_event_handler.h"
-#include "want_params_wrapper.h"
 #include "wifi_datashare_utils.h"
 #include "wifi_internal_msg.h"
 

@@ -139,6 +139,7 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/unittest/Mock",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock",
     "$WIFI_ROOT_DIR/frameworks/native/src",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect",
   ]
 
   deps = [

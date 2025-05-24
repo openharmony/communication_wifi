@@ -272,6 +272,7 @@ if (defined(ohos_lite)) {
       "ability_base:want",
       "ability_runtime:app_manager",
       "cJSON:cjson",
+      "jsoncpp:jsoncpp",
       "c_utils:utils",
       "hilog:libhilog",
       "huks:libhukssdk",
@@ -561,7 +562,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
       "time_service:time_client",
       "window_manager:libdm_lite",
-      "cJSON:cjson",
+      "jsoncpp:jsoncpp",
     ]
 
     if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {

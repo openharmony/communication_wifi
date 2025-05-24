@@ -89,7 +89,7 @@ ohos_static_library("wifi_sta_ext_service") {
     "security_guard:libsg_classify_sdk",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
-    "cJSON:cjson",
+    "jsoncpp:jsoncpp",
   ]
 
   defines = []

@@ -77,6 +77,7 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/include",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect",
     ]
 
     deps = [

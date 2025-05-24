@@ -65,6 +65,7 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect",
   ]
 
   cflags = [

@@ -93,7 +93,6 @@ if (defined(ohos_lite)) {
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "jsoncpp:jsoncpp",
-      "ability_base:want",
     ]
 
     defines = [

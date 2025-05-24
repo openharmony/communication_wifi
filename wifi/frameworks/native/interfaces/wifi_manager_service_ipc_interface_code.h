@@ -102,6 +102,7 @@ enum class  DevInterfaceCode {
     WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE = 0x3005,    /* device config change event */
     WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE = 0x3006,    /* device config change event */
     WIFI_SVR_CMD_GET_DEVICE_CONFIG = 0x3007,    /* get single saved network config */
+    WIFI_SVR_CMD_CANDIDATE_CONNECT_APPROVAL = 0x3008,   /* notify candidate connect user approval status */
 };
 
 /* SAID: 1121 */

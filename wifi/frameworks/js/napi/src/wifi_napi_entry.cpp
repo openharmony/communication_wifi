@@ -362,6 +362,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("addCandidateConfig", AddCandidateConfig),
         DECLARE_NAPI_FUNCTION("removeCandidateConfig", RemoveCandidateConfig),
         DECLARE_NAPI_FUNCTION("connectToCandidateConfig", ConnectToCandidateConfig),
+        DECLARE_NAPI_FUNCTION("connectToCandidateConfigWithUserAction", ConnectToCandidateConfigWithUserAction),
         DECLARE_NAPI_FUNCTION("getCandidateConfigs", GetCandidateConfigs),
         DECLARE_NAPI_FUNCTION("connectToNetwork", ConnectToNetwork),
         DECLARE_NAPI_FUNCTION("connectToDevice", ConnectToDevice),

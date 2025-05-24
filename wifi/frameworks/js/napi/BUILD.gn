@@ -47,7 +47,10 @@ ohos_shared_library("wifi") {
     "src/wifi_napi_utils.cpp",
   ]
 
-  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
+  deps = [
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
+  ]
 
   defines = []
   if (wifi_feature_with_random_mac_addr) {
@@ -156,7 +159,10 @@ ohos_shared_library("wifimanager") {
     "src/wifi_napi_p2p.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
+  deps = [
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
+  ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
 
   if (wifi_feature_with_random_mac_addr) {

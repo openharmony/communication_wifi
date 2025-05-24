@@ -36,6 +36,9 @@ enum WifiNapiErrCode {
     WIFI_ERRCODE_WIFI_NOT_OPENED  = 1001, /* sta service not opened */
     WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING = 1003, /* forbid when current airplane opened */
     WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING = 1004, /* forbid when current powersaving opened */
+    WIFI_ERRCODE_USER_DOES_NOT_RESPOND = 1005, /* user does not respond */
+    WIFI_ERRCODE_USER_REFUSE_THE_ACTION = 1006, /* user refuse the action */
+    WIFI_ERRCODE_PARAM_VALIDATION_FAILED = 1007, /* parameter validation failed */
 };
 
 #ifdef ENABLE_NAPI_WIFI_MANAGER

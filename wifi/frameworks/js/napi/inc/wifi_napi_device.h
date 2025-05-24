@@ -37,6 +37,7 @@ napi_value RemoveUntrustedConfig(napi_env env, napi_callback_info info);
 napi_value AddCandidateConfig(napi_env env, napi_callback_info info);
 napi_value RemoveCandidateConfig(napi_env env, napi_callback_info info);
 napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info);
+napi_value ConnectToCandidateConfigWithUserAction(napi_env env, napi_callback_info info);
 napi_value GetCandidateConfigs(napi_env env, napi_callback_info info);
 napi_value ConnectToNetwork(napi_env env, napi_callback_info info);
 napi_value ConnectToDevice(napi_env env, napi_callback_info info);

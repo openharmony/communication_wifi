@@ -23,7 +23,7 @@ enum ErrCode {
     WIFI_OPT_SUCCESS = 0,             /* successfully */
     WIFI_OPT_FAILED,                  /* failed */
     WIFI_OPT_NOT_SUPPORTED,           /* not supported */
-    WIFI_OPT_INVALID_PARAM,           /* invalid params */
+    WIFI_OPT_INVALID_PARAM,           /* invalid params @deprecated, use WIFI_OPT_INVALID_PARAM_NEW instead */
     WIFI_OPT_FORBID_AIRPLANE,         /* forbid when current airplane opened */
     WIFI_OPT_FORBID_POWSAVING,        /* forbid when current powersaving opened */
     WIFI_OPT_PERMISSION_DENIED,       /* permission denied */
@@ -49,6 +49,9 @@ enum ErrCode {
     WIFI_OPT_MDM_BLOCKLIST_OUT_MAX_NUM,  /* mdm blocklist over max num fail */
     WIFI_OPT_MDM_WHITELIST_OUT_MAX_NUM,  /* mdm whitelist over max num fail */
     WIFI_OPT_MDM_OUT_MAX_NUM,  /* mdm block and white list totail size over max num fail */
+    WIFI_OPT_USER_DOES_NOT_RESPOND,   /* user does not respond */
+    WIFI_OPT_USER_REFUSE_THE_ACTION,  /* user refuse the action */
+    WIFI_OPT_INVALID_PARAM_NEW,       /* invalid params since API-18 */
 };
 }  // namespace Wifi
 }  // namespace OHOS

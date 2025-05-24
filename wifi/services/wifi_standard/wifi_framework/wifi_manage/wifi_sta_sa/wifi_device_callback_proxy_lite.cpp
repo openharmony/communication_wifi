@@ -203,5 +203,30 @@ void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange state)
             static_cast<int32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE), ret);
     }
 }
+
+void WifiDeviceCallBackProxy::OnCandidateApprovalStatusChanged(CandidateApprovalStatus status)
+{
+    WIFI_LOGD("WifiDeviceCallBackProxy::OnCandidateApprovalStatusChanged");
+    IpcIo data;
+    uint8_t buff[DEFAULT_IPC_SIZE];
+    IpcIoInit(&data, buff, DEFAULT_IPC_SIZE, 0);
+    if (!WriteInterfaceToken(&data, DECLARE_INTERFACE_DESCRIPTOR_L1, DECLARE_INTERFACE_DESCRIPTOR_L1_LENGTH)) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return;
+    }
+    (void)WriteInt32(&data, 0);
+    (void)WriteInt32(&data, static_cast<int>(status));
+
+    IpcIo reply;
+    MessageOption option;
+    MessageOptionInit(&option);
+    option.flags = TF_OP_ASYNC;
+    int ret = SendRequest(sid_, static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANDIDATE_CONNECT_APPROVAL), &data,
+        &reply, option, nullptr);
+    if (ret != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANDIDATE_CONNECT_APPROVAL), ret);
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS

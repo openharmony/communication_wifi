@@ -456,6 +456,7 @@ virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wif
 #endif
 private:
     void NotifyDeviceConfigChange(ConfigChange value) const;
+    void NotifyCandidateApprovalStatus(CandidateApprovalStatus status) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
     std::string ConvertString(const std::u16string &wideText) const;
     int32_t GetDataSlotId(int32_t slotId) const;

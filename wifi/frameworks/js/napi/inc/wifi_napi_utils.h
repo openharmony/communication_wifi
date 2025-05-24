@@ -75,6 +75,11 @@ public:
     napi_value result;
     int32_t sysCap;
     int errorCode;
+    bool waitCallback;
+    std::function<void(void*)> callbackFunc;
+    bool callbackTriggered;
+    bool completeTriggered;
+    uint32_t timerId;
 
     AsyncContext(napi_env e, napi_async_work w = nullptr, napi_deferred d = nullptr)
     {
@@ -86,6 +91,11 @@ public:
         result = nullptr;
         sysCap = 0;
         errorCode = ERR_CODE_SUCCESS;
+        waitCallback = false;
+        callbackFunc = nullptr;
+        callbackTriggered = false;
+        completeTriggered = false;
+        timerId = 0;
     }
 
     AsyncContext() = delete;
@@ -117,6 +127,14 @@ napi_status SetValueU8Vector(const napi_env& env, const char* fieldStr,
 napi_value DoAsyncWork(const napi_env& env, AsyncContext *asyncContext,
     const size_t argc, const napi_value *argv, const size_t nonCallbackArgNum);
 void SetNamedPropertyByInteger(napi_env, napi_value dstObj, int32_t objName, const char *propName);
+
+enum class NapiAsyncType {
+    CANDIDATE_CONNECT = 0,
+};
+
+bool TryPushAsyncContext(NapiAsyncType type, AsyncContext *asyncContext);
+void EraseAsyncContext(NapiAsyncType type);
+AsyncContext *GetAsyncContext(NapiAsyncType type);
 
 enum class SecTypeJs {
     /** Invalid security type */

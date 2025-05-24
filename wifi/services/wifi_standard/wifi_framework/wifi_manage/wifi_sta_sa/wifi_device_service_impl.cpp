@@ -1044,17 +1044,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
                 return WIFI_OPT_INVALID_PARAM;
             }
         }
-        WifiSettings::GetInstance().SetDeviceEphemeral(networkId, false);
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
-        WifiLinkedInfo linkedInfo;
-        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-        if (linkedInfo.connState == ConnState::CONNECTING || linkedInfo.connState == ConnState::CONNECTED) {
-            bool isSame = linkedInfo.networkId == networkId;
-            WIFI_LOGE("ConnectToNetwork isCandidate isConnected isSame:%{public}s!", isSame ? "true" : "false");
-            if (isSame) {
-                return WIFI_OPT_SUCCESS;
-            }
-        }
         return pService->ConnectToCandidateConfig(uid, networkId);
     }
     return pService->ConnectToNetwork(networkId);

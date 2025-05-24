@@ -93,6 +93,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "jsoncpp:jsoncpp",
+      "ability_base:want",
     ]
 
     defines = [
@@ -165,6 +166,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "jsoncpp:jsoncpp",
+      "ability_base:want",
     ]
 
     defines = [ "OHOS_ARCH_LITE" ]
@@ -733,6 +735,7 @@ if (defined(ohos_lite)) {
       "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "jsoncpp:jsoncpp",
+      "ability_base:want",
     ]
 
     version_script = "libwifi_manager.map"
@@ -761,6 +764,7 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "netmanager_base:net_conn_manager_if",
       "jsoncpp:jsoncpp",
+      "ability_base:want",
     ]
     shlib_type = "sa"
     part_name = "wifi"
@@ -788,6 +792,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hilog:libhilog",
       "jsoncpp:jsoncpp",
+      "ability_base:want",
     ]
     shlib_type = "sa"
     part_name = "wifi"
@@ -814,6 +819,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hilog:libhilog",
       "jsoncpp:jsoncpp",
+      "ability_base:want",
     ]
     shlib_type = "sa"
     part_name = "wifi"

@@ -20,6 +20,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_event_helper.h"
+#include "wifi_security_detect.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service.h"
 #endif
@@ -568,6 +569,13 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             return WIFI_OPT_FAILED;
         }
 #endif
+        errCode = pService->RegisterStaServiceCallback(WifiSecurityDetect::GetInstance().GetStaCallback());
+        WIFI_LOGI("WifiSecurityDetect register");
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("WifiSecurityDetect register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
     }
     return WIFI_OPT_SUCCESS;
 }

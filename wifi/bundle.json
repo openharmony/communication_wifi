@@ -124,7 +124,8 @@
                 "libxml2",
                 "asset",
                 "icu",
-                "window_manager"
+                "window_manager",
+                "security_guard"
             ],
             "third_party": [
                 "googletest",

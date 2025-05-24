@@ -54,7 +54,7 @@ struct WifiBackupConfig {
         noInternetAccess = false;
         wepTxKeyIndex = 0;
         wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
-        isAllowAutoConnect = false;
+        isAllowAutoConnect = true;
     }
 };
 

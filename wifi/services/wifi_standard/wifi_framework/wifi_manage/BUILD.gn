@@ -90,7 +90,10 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
     ]
 
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "jsoncpp:jsoncpp",
+    ]
 
     defines = [
       "OHOS_ARCH_LITE",
@@ -159,7 +162,10 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
     ]
 
-    external_deps = [ "bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "jsoncpp:jsoncpp",
+    ]
 
     defines = [ "OHOS_ARCH_LITE" ]
     cflags_cc = [
@@ -364,6 +370,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",
       "netmanager_base:net_conn_manager_if",
+      "jsoncpp:jsoncpp",
     ]
   }
   ohos_source_set("wifi_hotspot_service_impl") {
@@ -409,6 +416,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",
       "netmanager_base:net_conn_manager_if",
+      "jsoncpp:jsoncpp",
     ]
 
     defines = [
@@ -473,6 +481,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",
+      "jsoncpp:jsoncpp",
     ]
     defines = [
       "FEATURE_P2P_SUPPORT",
@@ -723,6 +732,7 @@ if (defined(ohos_lite)) {
       "ipc:ipc_single",
       "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
+      "jsoncpp:jsoncpp",
     ]
 
     version_script = "libwifi_manager.map"
@@ -750,6 +760,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hilog:libhilog",
       "netmanager_base:net_conn_manager_if",
+      "jsoncpp:jsoncpp",
     ]
     shlib_type = "sa"
     part_name = "wifi"
@@ -774,7 +785,10 @@ if (defined(ohos_lite)) {
       ":wifi_scan_service_impl",
       "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     ]
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "jsoncpp:jsoncpp",
+    ]
     shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
@@ -797,7 +811,10 @@ if (defined(ohos_lite)) {
       ":wifi_hotspot_service_impl",
       ":wifi_manager_service",
     ]
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "jsoncpp:jsoncpp",
+    ]
     shlib_type = "sa"
     part_name = "wifi"
     subsystem_name = "communication"
@@ -821,7 +838,10 @@ if (defined(ohos_lite)) {
         ":wifi_manager_service",
         ":wifi_p2p_service_impl",
       ]
-      external_deps = [ "hilog:libhilog" ]
+      external_deps = [
+        "hilog:libhilog",
+        "jsoncpp:jsoncpp",
+      ]
       shlib_type = "sa"
       part_name = "wifi"
       subsystem_name = "communication"

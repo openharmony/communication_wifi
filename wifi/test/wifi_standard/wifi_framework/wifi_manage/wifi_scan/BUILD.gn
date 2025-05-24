@@ -161,6 +161,7 @@ ohos_unittest("wifi_scan_unittest") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
     "power_manager:powermgr_client",

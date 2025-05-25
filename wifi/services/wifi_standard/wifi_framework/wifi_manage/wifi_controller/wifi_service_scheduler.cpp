@@ -20,7 +20,6 @@
 #include "wifi_internal_msg.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_event_helper.h"
-#include "wifi_security_detect.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service.h"
 #endif
@@ -30,6 +29,7 @@
 #include "app_network_speed_limit_service.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_history_record_manager.h"
+#include "wifi_security_detect.h"
 #else
 #include "wifi_internal_event_dispatcher_lite.h"
 #endif

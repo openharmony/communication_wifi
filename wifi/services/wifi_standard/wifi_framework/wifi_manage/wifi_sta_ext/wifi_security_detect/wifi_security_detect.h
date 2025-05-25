@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,25 +21,14 @@
 #include "wifi_datashare_utils.h"
 #include "wifi_internal_msg.h"
 
-
-
 namespace OHOS {
 namespace Wifi {
-
 
 using SecurityModelResult = struct {
     std::string devId;
     uint32_t modelId;
     std::string param;
     std::string result;
-};
-
-struct RequestSecurityModelResultContext {
-    std::string deviceId;
-    std::string param;
-    uint32_t modelId;
-    SecurityModelResult result;
-    int32_t ret;
 };
 
 class WifiSecurityDetect {
@@ -62,7 +51,6 @@ public:
 
     void SecurityDetect(const WifiLinkedInfo &info);
 
-
     static void PopupNotification(int status, int networkid);
     
     void WifiConnectConfigParma(const WifiLinkedInfo &info, Json::Value &root);
@@ -70,7 +58,7 @@ public:
 private:
     static Uri AssembleUri(const std::string &key);
     static std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
-    std::unique_ptr<WifiEventHandler> SecurityDetectThread_ = nullptr;
+    std::unique_ptr<WifiEventHandler> securityDetectThread_ = nullptr;
     StaServiceCallback staCallback_;
     int currentConnectedNetworkId_ = -1;
 };

@@ -559,6 +559,13 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             WIFI_LOGE("WifiHistoryRecordManager register callback failed, ret=%{public}d", static_cast<int>(errCode));
             return WIFI_OPT_FAILED;
         }
+        errCode = pService->RegisterStaServiceCallback(WifiSecurityDetect::GetInstance().GetStaCallback());
+        WIFI_LOGI("WifiSecurityDetect register");
+        if (errCode != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("WifiSecurityDetect register sta service callback failed, ret=%{public}d!",
+                static_cast<int>(errCode));
+            return WIFI_OPT_FAILED;
+        }
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
         errCode = pService->RegisterStaServiceCallback(WifiAssetManager::GetInstance().GetStaCallback());
@@ -569,13 +576,6 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             return WIFI_OPT_FAILED;
         }
 #endif
-        errCode = pService->RegisterStaServiceCallback(WifiSecurityDetect::GetInstance().GetStaCallback());
-        WIFI_LOGI("WifiSecurityDetect register");
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("WifiSecurityDetect register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
-            return WIFI_OPT_FAILED;
-        }
     }
     return WIFI_OPT_SUCCESS;
 }

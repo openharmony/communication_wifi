@@ -330,7 +330,7 @@ struct Index {
           let json: OnSafeBrowsingCheckResultCallback = JSON.parse(jsonData);
           hilog.info(DOMAIN, TAG, '%{public}s', 'onSafeBrowsingCheckResult: [threatType]= ' + json.threatType);
         })
-            .onHttpErrorReceive((event) => {
+        .onHttpErrorReceive((event) => {
           if (event) {
             hilog.info(DOMAIN, TAG, 'getResponseCode:' + event.response.getResponseCode());
           }

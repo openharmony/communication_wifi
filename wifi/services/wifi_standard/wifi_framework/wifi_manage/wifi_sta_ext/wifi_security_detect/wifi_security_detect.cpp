@@ -121,7 +121,7 @@ bool WifiSecurityDetect::SettingDataOnOff()
     }
     std::string valueResult;
     resultSet->GoToFirstRow();
-    int32_t value = resultSet->GetString(0, valueResult);
+    resultSet->GetString(0, valueResult);
     if (valueResult == "1") {
         WIFI_LOGI("SettingDataOn");
         operatePtr->Release();

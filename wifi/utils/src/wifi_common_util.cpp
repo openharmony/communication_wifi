@@ -865,7 +865,14 @@ unsigned long StringToUlong(const std::string &word)
     std::istringstream(word) >> result;
     return result;
 }
- 
+
+float StringToFloat(const std::string &word)
+{
+    float result;
+    std::istringstream(word) >> result;
+    return result;
+}
+
 double StringToDouble(const std::string &word)
 {
     double result;

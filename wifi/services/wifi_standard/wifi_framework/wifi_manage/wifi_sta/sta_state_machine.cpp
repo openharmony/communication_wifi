@@ -2834,6 +2834,14 @@ void StaStateMachine::DealAudioStateChangedEvent(InternalMessagePtr msg)
         WIFI_LOGI("DealScreenOffPoll, poll start when screen off and audio on");
         EnableScreenOffSignalPoll();
     }
+#ifndef OHOS_ARCH_LITE
+    if (enhanceService_ == nullptr) {
+        WIFI_LOGE("%{public}s enhanceService NULL", __FUNCTION__);
+        return;
+    }
+    bool isAudioScene = isAudioOn_ == AUDIO_ON ? true : false;
+    enhanceService_->NotifyAudioSceneChanged(isAudioScene);
+#endif
 }
 
 void StaStateMachine::ResetWifi7WurInfo()

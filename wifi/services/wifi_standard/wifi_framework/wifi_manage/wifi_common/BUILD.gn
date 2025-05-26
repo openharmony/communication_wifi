@@ -171,6 +171,7 @@ if (defined(ohos_lite)) {
       "wifi_permission_utils.cpp",
       "wifi_protect.cpp",
       "wifi_protect_manager.cpp",
+      "wifi_sensor_scene.cpp",
       "wifi_system_ability_listerner.cpp",
       "wifi_system_timer.cpp",
     ]

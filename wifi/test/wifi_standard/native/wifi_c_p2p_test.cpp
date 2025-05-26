@@ -99,13 +99,13 @@ HWTEST_F(WifiP2pTest, StartP2pListenTest, TestSize.Level1)
     int period = 0;
     int interval = 0;
     StartP2pListen(period, interval);
-    EXPECT_NE(StartP2pListen(period, interval), 0);
+    EXPECT_NE(StartP2pListen(period, interval), g_networkid);
 }
 
 HWTEST_F(WifiP2pTest, StopP2pListenTests, TestSize.Level1)
 {
     StopP2pListen();
-    EXPECT_NE(StopP2pListen(), 0);
+    EXPECT_NE(StopP2pListen(), g_networkid);
 }
 
 HWTEST_F(WifiP2pTest, CreateGroupTests, TestSize.Level1)
@@ -127,7 +127,7 @@ HWTEST_F(WifiP2pTest, DeleteGroupTests, TestSize.Level1)
     WifiP2pGroupInfo group;
     group.networkId = g_networkid;
     DeleteGroup(&group);
-    EXPECT_NE(DeleteGroup(&group), 0);
+    EXPECT_NE(DeleteGroup(&group), g_networkid);
 }
 
 HWTEST_F(WifiP2pTest, P2pConnectTests, TestSize.Level1)

@@ -106,8 +106,6 @@ ohos_fuzztest("WifiScansaFuzzTest") {
   ]
 
   external_deps = [
-    "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libpub_utils",
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",
@@ -127,6 +125,8 @@ ohos_fuzztest("WifiScansaFuzzTest") {
     "drivers_interface_wlan:libchip_proxy_2.0",
     "drivers_interface_wlan:libhostapd_proxy_1.0",
     "drivers_interface_wlan:libwpa_proxy_2.0",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libpub_utils",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",

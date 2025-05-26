@@ -119,6 +119,13 @@ public:
      * @return result - true: no need broadcast state change,  false: broadcast state normally
      */
     bool CheckSelfCureWifiResult(int event) override;
+
+    /**
+     * @Description stop selfcure when user disconnect
+     *
+     * @return bool - true: have done selfcure or no need to do, false: selfcure not finish
+     */
+    bool IsWifiSelfcureDone() override;
 private:
     std::mutex mutex;
     std::vector<SelfCureServiceCallback> mSelfCureCallback;

@@ -615,10 +615,10 @@ if (defined(ohos_lite)) {
     }
 
     if (defined(global_parts_info) &&
-        defined(global_parts_info.account_os_account)) {
-      external_deps += [ "os_account:os_account_innerkits" ]
-      defines += [ "HAS_ACCOUNT_PART" ]
-    }
+        defined(global_parts_info.powermgr_power_manager)) {
+      if (wifi_feature_powermgr_support) {
+          defines += [ "HAS_POWERMGR_PART" ]
+      }
 
     if (wifi_feature_with_app_frozen) {
       defines += [ "FEATURE_APP_FROZEN" ]
@@ -714,6 +714,8 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hilog:libhilog",
       "ipc:ipc_single",
+      "libxml2:libxml2",
+      "netmanager_base:net_conn_manager_if",
     ]
 
     version_script = "libwifi_manager.map"

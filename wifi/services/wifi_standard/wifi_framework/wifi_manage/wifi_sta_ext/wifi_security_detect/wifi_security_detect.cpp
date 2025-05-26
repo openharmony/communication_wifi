@@ -122,15 +122,15 @@ bool WifiSecurityDetect::SettingDataOnOff()
     std::string valueResult;
     resultSet->GoToFirstRow();
     int32_t value = resultSet->GetString(0, valueResult);
-    WIFI_LOGI("SettingDataOnOff %{public}d", value);
     if (valueResult == "1") {
         WIFI_LOGI("SettingDataOn");
+        operatePtr->Release();
         return true;
     } else {
         WIFI_LOGI("SettingDataOff");
+        operatePtr->Release();
         return false;
     }
-    return true;
 }
 
 bool WifiSecurityDetect::SecurityDetectTime(const int &networkId)
@@ -147,11 +147,11 @@ bool WifiSecurityDetect::SecurityDetectTime(const int &networkId)
     auto DetectTime = std::chrono::system_clock::now();
     auto hours = std::chrono::duration_cast<std::chrono::hours>(
         DetectTime - std::chrono::system_clock::from_time_t(config.lastConnectTime));
-    if (hours.count() > NUM24) {
-        WIFI_LOGI("WifiDetect less than 24");
+    if (hours.count() >= NUM24) {
+        WIFI_LOGI("WifiDetect more than 24");
         return true;
     } else {
-        WIFI_LOGI("WifiDetect more than 24");
+        WIFI_LOGI("WifiDetect less than 24");
         return false;
     }
 }
@@ -178,13 +178,17 @@ bool WifiSecurityDetect::SecurityDetectResult(const std::string &devId, uint32_t
     }
 
     SecurityModelResult model = future.get();
-    std::string result = "0";
     nlohmann::json root = nlohmann::json::parse(model.result.c_str());
+    if (root == nullptr) {
+        WIFI_LOGE("root is null");
+        return false;
+    }
     if (root["status"] != 0) {
         WIFI_LOGE("RequestSecurityModelResultSync status error= %{public}d", root["status"].get<int>());
         return false;
     }
 
+    std::string result = "0";
     if (root["result"] == result) {
         WIFI_LOGI("SG wifi result is security");
         return true;
@@ -226,7 +230,7 @@ void WifiSecurityDetect::WifiConnectConfigParma(const WifiLinkedInfo &info, Json
             break;
         default:
             WIFI_LOGE("wifi wirelessType is unknown");
-            return;
+            root["wirelessType"] = "";
     }
 
     root["ssid"] = config.ssid;
@@ -261,12 +265,11 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
             return FAIL;
         }
         bool result = SecurityDetectResult(model.devId, model.modelId, model.param);
-        WIFI_LOGI("PopupNotification   result %{public}d", result);
         if (result == true) {
-            WIFI_LOGI("PopupNotification  open");
+            WIFI_LOGI("PopupNotification open result %{public}d", result);
             PopupNotification(1, info.networkId);
         } else {
-            WIFI_LOGI("PopupNotification  close");
+            WIFI_LOGI("PopupNotification close result %{public}d", result);
             PopupNotification(2, info.networkId);
         }
         return SUCCESS;

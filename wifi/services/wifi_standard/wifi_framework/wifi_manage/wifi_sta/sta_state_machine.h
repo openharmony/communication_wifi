@@ -994,7 +994,7 @@ private:
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif // OHOS_ARCH_LITE
     bool IsNewConnectionInProgress();
-    void StopDhcp();
+    void StopDhcp(bool isStopIpv4, bool isStopIpv6 = false);
     /**
      * @Description Replace empty dns
      */

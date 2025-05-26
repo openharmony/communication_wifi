@@ -15,8 +15,6 @@
 
 #include <chrono>
 #include "json/json.h"
-#include <nlohmann/json.hpp>
-
 #include "wifi_security_detect.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
@@ -178,18 +176,20 @@ bool WifiSecurityDetect::SecurityDetectResult(const std::string &devId, uint32_t
     }
 
     SecurityModelResult model = future.get();
-    nlohmann::json root = nlohmann::json::parse(model.result.c_str());
-    if (root == nullptr) {
-        WIFI_LOGE("root is null");
-        return false;
-    }
-    if (root["status"] != 0) {
-        WIFI_LOGE("RequestSecurityModelResultSync status error= %{public}d", root["status"].get<int>());
+    Json::Value root;
+    Json::Reader reader;
+    bool parsingSuccess = reader.parse(model.result, root);
+    if (!parsingSuccess) {
+        WIFI_LOGE("model.result is null");
         return false;
     }
 
-    std::string result = "0";
-    if (root["result"] == result) {
+    if (root["status"].asInt() != 0) {
+        WIFI_LOGE("RequestSecurityModelResultSync status error= %{public}d", root["status"].asInt());
+        return false;
+    }
+
+    if (std::stoi(root["result"].asString()) == 0) {
         WIFI_LOGI("SG wifi result is security");
         return true;
     } else {
@@ -232,7 +232,6 @@ void WifiSecurityDetect::WifiConnectConfigParma(const WifiLinkedInfo &info, Json
             WIFI_LOGE("wifi wirelessType is unknown");
             root["wirelessType"] = "";
     }
-
     root["ssid"] = config.ssid;
     root["bssid"] = config.bssid;
     root["signalStrength"] = config.rssi;
@@ -287,9 +286,8 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
         want.SetParam("notificationType", 2);
     }
     want.SetParam("networkId", networkid);
-    WifiNotificationUtil &NotificationUtil = WifiNotificationUtil::GetInstance();
 
-    auto result = NotificationUtil.StartAbility(want);
+    auto result = WifiNotificationUtil::GetInstance().StartAbility(want);
     WIFI_LOGI("wifi security pop-up notification End, result = %{public}d", result);
 }
 

@@ -40,7 +40,7 @@ private:
 
     int minRssi24G;
     int minRssi5G;
-}
+};
 
 }  // namespace Wifi
 }  // namespace OHOS

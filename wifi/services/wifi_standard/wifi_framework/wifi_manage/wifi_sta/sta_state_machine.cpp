@@ -83,7 +83,6 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define SELF_CURE_RAND_MAC_REASSOC 3
 #define USER_CONNECT "1"
 #define AUTO_CONNECT "0"
-#define SIGNAL_LEVEL_2 2
 
 #define CMD_BUFFER_SIZE 1024
 #define GSM_AUTH_RAND_LEN 16
@@ -117,6 +116,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_RAND_STR_LEN (2 * UMTS_AUTH_CHALLENGE_RAND_LEN)
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
+constexpr int32_t MAX_NO_INTERNET_CNT = 3;
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -1028,6 +1028,13 @@ void StaStateMachine::SeparatedState::GoInState()
     pStaStateMachine->InitWifiLinkedInfo();
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
     pStaStateMachine->linkSwitchDetectingFlag_ = false;
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if ((pStaStateMachine->selfCureService_ != nullptr &&
+        !pStaStateMachine->selfCureService_->IsSelfCureL2Connecting())) {
+        pStaStateMachine->noInternetAccessCnt_ = 0;
+        pStaStateMachine->StopTimer(CMD_NO_INTERNET_TIMEOUT);
+    }
+#endif
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     WifiConfigCenter::GetInstance().SetMacAddress("", pStaStateMachine->m_instId);
     WriteIsInternetHiSysEvent(DISCONNECTED_NETWORK);
@@ -1311,7 +1318,7 @@ void StaStateMachine::ApLinkedState::GoOutState()
 {
     WIFI_LOGI("ApLinkedState GoOutState function.");
     pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
-    pStaStateMachine->lastInternetAccessStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
+    pStaStateMachine->lastInternetIconStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
     return;
 }
 
@@ -1323,50 +1330,45 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 
     WIFI_LOGD("ApLinkedState-msgCode=%{public}d received. m_instId = %{public}d\n", msg->GetMessageName(),
         pStaStateMachine->m_instId);
-    bool ret = NOT_EXECUTED;
+    bool ret = EXECUTED;
     switch (msg->GetMessageName()) {
         case WIFI_SVR_CMD_STA_DISCONNECT: {
-            ret = EXECUTED;
             pStaStateMachine->StartDisConnectToNetwork();
             break;
         }
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT: {
-            ret = EXECUTED;
             HandleNetWorkConnectionEvent(msg);
             break;
         }
         case WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT: {
-            ret = EXECUTED;
             HandleStaBssidChangedEvent(msg);
             break;
         }
         case WIFI_SVR_CMD_STA_LINK_SWITCH_EVENT:
-            ret = EXECUTED;
             HandleLinkSwitchEvent(msg);
             break;
         case CMD_SIGNAL_POLL:
-            ret = EXECUTED;
             pStaStateMachine->DealSignalPollResult();
             break;
         case CMD_LINK_SWITCH_DETECT_TIMEOUT:
-            ret = EXECUTED;
             pStaStateMachine->linkSwitchDetectingFlag_ = false;
             break;
 #ifndef OHOS_ARCH_LITE
         case WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT:
-            ret = EXECUTED;
             pStaStateMachine->HandleForegroundAppChangedAction(msg);
             break;
 #endif
         case WIFI_SVR_COM_STA_START_ROAM:
-            ret = EXECUTED;
             DealStartRoamCmdInApLinkedState(msg);
             break;
         case WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT:
-            ret = EXECUTED;
             DealCsaChannelChanged(msg);
             break;
+        case CMD_NO_INTERNET_TIMEOUT:
+            DealNoInternetTimeout();
+            break;
         default:
+            ret = NOT_EXECUTED;
             break;
     }
     return ret;
@@ -1496,6 +1498,15 @@ void StaStateMachine::ApLinkedState::DealCsaChannelChanged(InternalMessagePtr ms
     pStaStateMachine->linkedInfo.frequency = newFrq;
     // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+}
+
+void StaStateMachine::ApLinkedState::DealNoInternetTimeout()
+{
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->m_NetWorkState) {
+        pStaStateMachine->m_NetWorkState->StartWifiDetection();
+    }
+#endif
 }
 
 void StaStateMachine::StartDisConnectToNetwork()
@@ -2151,7 +2162,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
     autoPullBrowserFlag = true;
     TryModifyPortalAttribute(netState);
-    InvokeOnInternetAccessChanged(netState);
+    HandleInternetAccessChanged(netState);
 }
 
 void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime)
@@ -5124,24 +5135,50 @@ void StaStateMachine::InvokeOnDhcpOfferReport(IpInfo ipInfo)
 
 void StaStateMachine::InvokeOnInternetAccessChanged(SystemNetWorkState internetAccessStatus)
 {
-    WIFI_LOGI("InvokeOnInternetAccessChanged, internetAccessStatus: %{public}d, lastInternetAccessStatus: %{public}d",
-        internetAccessStatus, lastInternetAccessStatus_);
-    if (lastInternetAccessStatus_ == internetAccessStatus) {
-        return;
-    }
-    if (internetAccessStatus == SystemNetWorkState::NETWORK_NOTWORKING &&
-        lastInternetAccessStatus_ == SystemNetWorkState::NETWORK_IS_WORKING &&
-        lastSignalLevel_ <= SIGNAL_LEVEL_2) {
-        WIFI_LOGI("net detection result is NETWORK_NOTWORKING, last status is NETWORK_IS_WORKING, signal level less 2");
-        return;
-    }
-    lastInternetAccessStatus_ = internetAccessStatus;
     std::shared_lock<std::shared_mutex> lock(m_staCallbackMutex);
     for (const auto &callBackItem : m_staCallback) {
         if (callBackItem.second.OnInternetAccessChange != nullptr) {
             callBackItem.second.OnInternetAccessChange(static_cast<int32_t>(internetAccessStatus), m_instId);
         }
     }
+}
+
+void StaStateMachine::HandleInternetAccessChanged(SystemNetWorkState internetAccessStatus)
+{
+    WIFI_LOGI("HandleInternetAccessChanged internetAccessStatus: %{public}d, lastInternetAccessStatus: %{public}d,"
+        "noInternetAccessCnt_: %{public}d", internetAccessStatus, lastInternetIconStatus_, noInternetAccessCnt_);
+    if (internetAccessStatus == SystemNetWorkState::NETWORK_IS_WORKING) {
+        noInternetAccessCnt_ = 0;
+        StopTimer(CMD_NO_INTERNET_TIMEOUT);
+    }
+
+    if (internetAccessStatus == SystemNetWorkState::NETWORK_NOTWORKING &&
+        lastInternetIconStatus_ == SystemNetWorkState::NETWORK_IS_WORKING) {
+        noInternetAccessCnt_++;
+        if (noInternetAccessCnt_ < MAX_NO_INTERNET_CNT) {
+            StopTimer(CMD_NO_INTERNET_TIMEOUT);
+            StartTimer(CMD_NO_INTERNET_TIMEOUT, STA_NO_INTERNET_TIMEOUT);
+            return;
+        } else if (noInternetAccessCnt_ == MAX_NO_INTERNET_CNT) {
+            StopTimer(CMD_NO_INTERNET_TIMEOUT);
+        }
+        if (lastSignalLevel_ <= RSSI_LEVEL_3) {
+            WIFI_LOGW("HandleInternetAccessChanged, signal level less 3");
+            return;
+        }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+        if ((selfCureService_ != nullptr && !selfCureService_->IsWifiSelfcureDone())) {
+            WIFI_LOGW("HandleInternetAccessChanged, selfcure is not finish");
+            return;
+        }
+#endif
+    }
+
+    if (lastInternetIconStatus_ == internetAccessStatus) {
+        return;
+    }
+    lastInternetIconStatus_ = internetAccessStatus;
+    InvokeOnInternetAccessChanged(internetAccessStatus);
 }
 
 void StaStateMachine::UpdateHiLinkAttribute()

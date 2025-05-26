@@ -150,6 +150,16 @@ bool SelfCureInterface::CheckSelfCureWifiResult(int event)
     return pSelfCureService->CheckSelfCureWifiResult(event);
 }
 
+bool SelfCureInterface::IsWifiSelfcureDone()
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGI("pSelfCureService is null");
+        return false;
+    }
+    return pSelfCureService->IsWifiSelfcureDone();
+}
+
 void SelfCureInterface::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     std::lock_guard<std::mutex> lock(mutex);

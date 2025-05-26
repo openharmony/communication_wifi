@@ -23,14 +23,12 @@
 #include "wifi_ap_msg.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_app_state_aware.h"
+#include "wifi_sensor_scene.h"
 #endif
 namespace OHOS::Wifi::NetworkSelection {
 DEFINE_WIFILOG_LABEL("WifiFilter")
 namespace {
 constexpr int RECHECK_DELAYED_SECONDS = 1 * 60 * 60;
-constexpr int MIN_5GHZ_BAND_FREQUENCY = 5000;
-constexpr int MIN_RSSI_VALUE_24G = -80;
-constexpr int MIN_RSSI_VALUE_5G = -77;
 constexpr int SIGNAL_LEVEL_TWO = 2;
 constexpr int POOR_PORTAL_RECHECK_DELAYED_SECONDS = 2 * RECHECK_DELAYED_SECONDS;
 constexpr int32_t MIN_SIGNAL_LEVEL_INTERVAL = 2;
@@ -73,7 +71,7 @@ SignalStrengthWifiFilter::~SignalStrengthWifiFilter()
 bool SignalStrengthWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &scanInfo = networkCandidate.interScanInfo;
-    auto rssiThreshold = scanInfo.frequency < MIN_5GHZ_BAND_FREQUENCY ? MIN_RSSI_VALUE_24G : MIN_RSSI_VALUE_5G;
+    int rssiThreshold = WifiSensorScene::GetInstance().GetMinRssiThres(scanInfo.frequency);
     if (scanInfo.rssi < rssiThreshold) {
         networkCandidate.filtedReason[filterName].insert(FiltedReason::POOR_SIGNAL);
         return false;

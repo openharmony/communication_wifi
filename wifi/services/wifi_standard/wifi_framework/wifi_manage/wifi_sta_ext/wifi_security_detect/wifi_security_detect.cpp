@@ -51,7 +51,7 @@ const int NUM24 = 24;
 WifiSecurityDetect::WifiSecurityDetect()
 {
     if (securityDetectThread_ == nullptr) {
-        securityDetectThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
+        securityDetectThread_ = std::make_unique<WifiEventHandler>("WifiSecurityDetect");
     }
     staCallback_.callbackModuleName = WIFI_SECURITY_NETWORK_ON_SYNC;
     staCallback_.OnStaConnChanged = [&](OperateResState state, const WifiLinkedInfo &info, int instId) {

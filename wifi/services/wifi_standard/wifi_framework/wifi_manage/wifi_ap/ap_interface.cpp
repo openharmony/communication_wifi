@@ -130,5 +130,11 @@ void ApInterface::OnNetCapabilitiesChanged(const int apStatus)
     m_ApService.HandleNetCapabilitiesChanged(apStatus);
     return;
 }
+
+void ApInterface::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    m_ApService.SetEnhanceService(enhanceService);
+    return; 
+}
 }  // namespace Wifi
 }  // namespace OHOS

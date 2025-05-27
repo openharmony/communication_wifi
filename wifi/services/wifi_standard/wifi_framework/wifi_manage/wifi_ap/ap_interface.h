@@ -166,6 +166,14 @@ public:
      * @param apStatus
      */
     void OnNetCapabilitiesChanged(const int apStatus) override;
+
+    /**
+     * @Description Set EnhanceService to Ap service
+     *
+     * @param enhanceService IEnhanceService object
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual void SetEnhanceService(IEnhanceService* enhanceService) override;
 private:
     ApRootState m_ApRootState;
     ApStartedState m_ApStartedState;

@@ -172,7 +172,7 @@ public:
      *
      * @param enhanceService IEnhanceService object
      */
-    virtual void SetEnhanceService(IEnhanceService* enhanceService) override;
+    void SetEnhanceService(IEnhanceService* enhanceService) override;
 #endif
 private:
     ApRootState m_ApRootState;

@@ -424,14 +424,14 @@ public:
     void StopDhcpSuccess1()
     {
         pStaStateMachine->currentTpType = IPTYPE_IPV4;
-        pStaStateMachine->StopDhcp();
+        pStaStateMachine->StopDhcp(true, false);
         EXPECT_NE(pStaStateMachine->currentTpType, TEN);
     }
  
     void StopDhcpSuccess2()
     {
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
-        pStaStateMachine->StopDhcp();
+        pStaStateMachine->StopDhcp(true, true);
         EXPECT_NE(pStaStateMachine->currentTpType, TEN);
     }
 };

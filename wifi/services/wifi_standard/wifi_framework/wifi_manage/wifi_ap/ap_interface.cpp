@@ -132,10 +132,10 @@ void ApInterface::OnNetCapabilitiesChanged(const int apStatus)
 }
 
 #ifndef OHOS_ARCH_LITE
-void ApInterface::SetEnhanceService(IEnhanceService* enhanceService)
+void ApInterface::SetEnhanceService(IEnhanceService *enhanceService)
 {
     m_ApService.SetEnhanceService(enhanceService);
-    return; 
+    return;
 }
 #endif
 }  // namespace Wifi

@@ -305,6 +305,13 @@ public:
      * @return 0: not limit, 1:dual band roam
      */
     virtual LimitSwitchScenes GetLimitSwitchScenes() = 0;
+
+    /**
+     * @Description obtain supported 160MHz
+     *
+     * @return int - supported 160MHz
+     */
+    virtual bool IsControl160M() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -40,6 +40,7 @@
 #include "wifi_global_func.h"
 #include "display_info.h"
 #include "wifi_internal_event_dispatcher.h"
+#include "wifi_sensor_scene.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -1367,6 +1368,7 @@ void DataShareReadySubscriber::OnReceiveEvent(const EventFwk::CommonEventData &e
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
         WifiManager::GetInstance().GetWifiEventSubscriberManager()->AccessDataShare();
         WifiManager::GetInstance().GetWifiEventSubscriberManager()->RegisterLocationEvent();
+        WifiSensorScene::GetInstance().Init();
     }
 }
 

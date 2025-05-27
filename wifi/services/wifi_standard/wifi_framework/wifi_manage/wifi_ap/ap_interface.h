@@ -166,13 +166,14 @@ public:
      * @param apStatus
      */
     void OnNetCapabilitiesChanged(const int apStatus) override;
-
+#ifndef OHOS_ARCH_LITE
     /**
      * @Description Set EnhanceService to Ap service
      *
      * @param enhanceService IEnhanceService object
      */
     virtual void SetEnhanceService(IEnhanceService* enhanceService) override;
+#endif
 private:
     ApRootState m_ApRootState;
     ApStartedState m_ApStartedState;

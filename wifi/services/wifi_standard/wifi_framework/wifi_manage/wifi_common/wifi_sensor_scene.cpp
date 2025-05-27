@@ -82,7 +82,7 @@ void WifiSensorScene::RegisterSensorEnhCallback()
     }
     std::function<void(int)> callback = [this](int scenario) {
         SensorEnhCallback(scenario);
-    }
+    };
     ErrCode ret = pEnhanceService->RegisterSensorEnhanceCallback(callback);
     WIFI_LOGI("%{public}s ret %{public}d", __FUNCTION__, ret);
 }

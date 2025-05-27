@@ -35,7 +35,7 @@ constexpr int MIN_RSSI_VALUE_OUTDOOR_24G = -75;
 constexpr int MIN_RSSI_VALUE_OUTDOOR_5G = -72;
 
 WifiSensorScene::WifiSensorScene() : scenario_(SCENARIO_UNKNOWN),
-    minRssi24G(MIN_RSSI_VALUE_24G), minRssi5G(MIN_RSSI_VALUE_5G) {}
+    minRssi24G_(MIN_RSSI_VALUE_24G), minRssi5G_(MIN_RSSI_VALUE_5G) {}
 
 WifiSensorScene &WifiSensorScene::GetInstance()
 {
@@ -53,13 +53,13 @@ int WifiSensorScene::GetMinRssiThres(int frequency)
     std::lock_guard<std::mutex> lock(mutex_);
 
     if (scenario_ == SCENARIO_OUTDOOR) {
-        minRssi24G = MIN_RSSI_VALUE_OUTDOOR_24G;
-        minRssi5G = MIN_RSSI_VALUE_OUTDOOR_5G;
+        minRssi24G_ = MIN_RSSI_VALUE_OUTDOOR_24G;
+        minRssi5G_ = MIN_RSSI_VALUE_OUTDOOR_5G;
     } else {
-        minRssi24G = MIN_RSSI_VALUE_24G;
-        minRssi5G = MIN_RSSI_VALUE_5G;
+        minRssi24G_ = MIN_RSSI_VALUE_24G;
+        minRssi5G_ = MIN_RSSI_VALUE_5G;
     }
-    int minRssi = frequency < MIN_5GHZ_BAND_FREQUENCY ? minRssi24G : minRssi5G;
+    int minRssi = frequency < MIN_5GHZ_BAND_FREQUENCY ? minRssi24G_ : minRssi5G_;
     WIFI_LOGI("%{public}s scene %{public}d thres %{public}d", __FUNCTION__, scenario_, minRssi);
     return minRssi;
 }

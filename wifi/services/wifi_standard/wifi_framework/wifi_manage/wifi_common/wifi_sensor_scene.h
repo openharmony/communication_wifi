@@ -38,8 +38,8 @@ private:
     std::mutex mutex_;
     int scenario_;
 
-    int minRssi24G;
-    int minRssi5G;
+    int minRssi24G_;
+    int minRssi5G_;
 };
 
 }  // namespace Wifi

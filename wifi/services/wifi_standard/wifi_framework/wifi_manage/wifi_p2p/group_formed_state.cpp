@@ -250,6 +250,7 @@ bool GroupFormedState::ProcessDisconnectEvt(const InternalMessagePtr msg) const
     deviceManager.UpdateDeviceStatus(device); // used for peers change event querying device infos
     deviceManager.UpdateGroupAddress(device);
     groupManager.RemoveCurrGroupClient(device);
+    groupManager.RefreshGroupsFromCurrentGroup();
     if (WIFI_OPT_SUCCESS != p2pStateMachine.RemoveClientInfo(device.GetDeviceAddress())) {
         WIFI_LOGE("Connect: remove client info faild");
     }
@@ -302,6 +303,7 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessagePtr msg) const
     } else {
         groupManager.UpdateCurrGroupClient(device);
     }
+    groupManager.RefreshGroupsFromCurrentGroup();
     p2pStateMachine.curClientList.emplace_back(device.GetDeviceAddress());
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();

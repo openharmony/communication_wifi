@@ -482,6 +482,10 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         return WIFI_OPT_FAILED;
     }
     pService->SetEnhanceService(pEnhanceService);
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
 #ifdef FEATURE_SELF_CURE_SUPPORT
     ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId);
     if (pSelfCureService == nullptr) {
@@ -946,11 +950,7 @@ ErrCode WifiServiceScheduler::TryToStartApService(int instId, int hotspotMode)
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_ENHANCE);
             break;
         }
-        errCode = pService->SetEnhanceService(pEnhanceService);
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
-            break;
-        }
+        pService->SetEnhanceService(pEnhanceService);
 #endif
         pService->SetHotspotMode(HotspotMode(hotspotMode));
         errCode = pService->EnableHotspot();

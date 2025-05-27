@@ -47,6 +47,13 @@ ErrCode ApService::EnableHotspot()
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     apStartedState_.SetRandomMac();
 #endif
+    bool iscontrol160M = false;
+    if (enhanceService_ != nullptr) {
+        iscontrol160M = enhanceService_->IsControl160M();
+        WIFI_LOGI("EnableHotspot iscontrol160M, %{public}d", iscontrol160M);
+    } else {
+        WIFI_LOGI("EnableHotspot enhanceService_nullptr");
+    }
     do {
         if (!(apStartedState_.SetCountry())) {
             break;
@@ -56,7 +63,7 @@ ErrCode ApService::EnableHotspot()
             break;
         }
         WIFI_LOGI("StartAP is ok.");
-        if (!(apStartedState_.SetConfig())) {
+        if (!(apStartedState_.SetConfig(iscontrol160M))) {
             WIFI_LOGE("wifi_settings.hotspotconfig is error.");
             break;
         }
@@ -351,6 +358,11 @@ ErrCode ApService::GetHotspotMode(HotspotMode &mode)
 ErrCode ApService::SetHotspotMode(const HotspotMode &mode)
 {
     return m_ApStateMachine.SetHotspotMode(mode);
+}
+
+void ApService::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    enhanceService_ = enhanceService;
 }
 }  // namespace Wifi
 }  // namespace OHOS

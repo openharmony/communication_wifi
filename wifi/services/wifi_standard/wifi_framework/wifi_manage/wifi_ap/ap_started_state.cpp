@@ -146,7 +146,6 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig, bool isControl160M)
     HotspotMode currentMode = HotspotMode::SOFTAP;
     m_ApStateMachine.GetHotspotMode(currentMode);
     if (isControl160M) {
-        WIFI_LOGI("SetConfig iscontrol160M, %{public}d", isControl160M);
         apConfig.SetBandWidth(AP_BANDWIDTH_DEFAULT);
     }
     if (currentMode == HotspotMode::LOCAL_ONLY_SOFTAP) {
@@ -182,7 +181,6 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig, bool isControl160M)
         WIFI_LOGE("Enableap failed.");
         return false;
     }
-
     if (apConfig.GetIpAddress().empty()) {
         WIFI_LOGI("IP is empty, set default ipaddr");
         apConfig.SetIpAddress(AP_DEFAULT_IP);

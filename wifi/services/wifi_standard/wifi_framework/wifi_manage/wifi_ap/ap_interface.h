@@ -171,7 +171,6 @@ public:
      * @Description Set EnhanceService to Ap service
      *
      * @param enhanceService IEnhanceService object
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual void SetEnhanceService(IEnhanceService* enhanceService) override;
 private:

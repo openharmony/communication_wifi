@@ -295,6 +295,7 @@ public:
     void StopSelfCureWifi(int32_t status);
     bool CheckSelfCureWifiResult(int event);
     void HandleP2pConnChanged(const WifiP2pLinkedInfo &info);
+    bool IsWifiSelfcureDone();
 private:
 
     /* *
@@ -432,6 +433,7 @@ private:
     sptr<NetStateObserver> mNetWorkDetect_;
     bool isP2pEnhanceConnected_ = false;
     bool isInternetFailureDetected_ = false;
+    std::atomic<bool> isSelfcureDone_ = false;
     DetailedState selfCureNetworkLastState_ = DetailedState::IDLE;
     WifiState selfCureWifiLastState_ = WifiState::UNKNOWN;
     SelfCureState selfCureL2State_ = SelfCureState::SCE_WIFI_INVALID_STATE;

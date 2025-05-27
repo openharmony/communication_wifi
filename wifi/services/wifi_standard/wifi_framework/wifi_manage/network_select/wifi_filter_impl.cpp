@@ -71,7 +71,11 @@ SignalStrengthWifiFilter::~SignalStrengthWifiFilter()
 bool SignalStrengthWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &scanInfo = networkCandidate.interScanInfo;
+#ifndef OHOS_ARCH_LITE
     int rssiThreshold = WifiSensorScene::GetInstance().GetMinRssiThres(scanInfo.frequency);
+#else
+    auto rssiThreshold = scanInfo.frequency < MIN_5GHZ_BAND_FREQUENCY ? MIN_RSSI_VALUE_24G : MIN_RSSI_VALUE_5G;
+#endif
     if (scanInfo.rssi < rssiThreshold) {
         networkCandidate.filtedReason[filterName].insert(FiltedReason::POOR_SIGNAL);
         return false;

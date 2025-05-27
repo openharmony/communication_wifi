@@ -309,7 +309,7 @@ public:
     /**
      * @Description obtain supported 160MHz
      *
-     * @return int - supported 160MHz
+     * @return bool - supported 160MHz
      */
     virtual bool IsControl160M() = 0;
 };

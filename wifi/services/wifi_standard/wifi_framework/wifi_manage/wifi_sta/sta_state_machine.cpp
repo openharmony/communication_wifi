@@ -645,6 +645,19 @@ StaStateMachine::LinkState::~LinkState()
 void StaStateMachine::LinkState::GoInState()
 {
     WIFI_LOGI("LinkState GoInState function.");
+    int result = pStaStateMachine->RegisterDhcpCallBack();
+    if (result != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Register dhcp callback failed, result = %{public}d", result);
+        return;
+    }
+    RouterConfig routerConfig;
+    routerConfig.bIpv6 = true;
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
+    if (strncpy_s(routerConfig.ifname, sizeof(routerConfig.ifname), ifaceName.c_str(), ifaceName.length()) < 0) {
+        WIFI_LOGE("LinkState GoInState, copy ifaceName failed");
+        return;
+    }
+    StartDhcpClient(routerConfig);
     return;
 }
 
@@ -779,7 +792,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
-        pStaStateMachine->StopDhcp();
+        pStaStateMachine->StopDhcp(true, false);
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
@@ -918,9 +931,27 @@ void StaStateMachine::LinkState::DealConnectTimeOutCmd(InternalMessagePtr msg)
     pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
 }
 
-void StaStateMachine::StopDhcp()
+void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
 {
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    StopTimer(static_cast<int>(CMD_START_NETCHECK));
+    WIFI_LOGI("StopDhcp, isStopV4: %{public}d, isStopV6: %{public}d", isStopV4, isStopV6);
+    if (isStopV4) {
+        StopDhcpClient(ifname.c_str(), false);
+        IpInfo ipInfo;
+        WifiConfigCenter::GetInstance().SaveIpInfo(ipInfo, m_instId);
+#ifdef OHOS_ARCH_LITE
+        IfConfig::GetInstance().FlushIpAddr(WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), IPTYPE_IPV4);
+#endif
+        getIpSucNum = 0;
+        getIpFailNum = 0;
+    }
+    if (isStopV6) {
+        StopDhcpClient(ifname.c_str(), true);
+        IpV6Info ipV6Info;
+        WifiConfigCenter::GetInstance().SaveIpV6Info(ipV6Info, m_instId);
+    }
+    
 #ifndef OHOS_ARCH_LITE
     if (NetSupplierInfo != nullptr) {
         NetSupplierInfo->isAvailable_ = false;
@@ -929,24 +960,7 @@ void StaStateMachine::StopDhcp()
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo, m_instId);
     }
 #endif
-    StopTimer(static_cast<int>(CMD_START_NETCHECK));
-
-    if (currentTpType == IPTYPE_IPV4) {
-        StopDhcpClient(ifname.c_str(), false);
-    } else {
-        StopDhcpClient(ifname.c_str(), true);
-    }
     HandlePostDhcpSetup();
-    getIpSucNum = 0;
-    getIpFailNum = 0;
-
-    IpInfo ipInfo;
-    WifiConfigCenter::GetInstance().SaveIpInfo(ipInfo, m_instId);
-    IpV6Info ipV6Info;
-    WifiConfigCenter::GetInstance().SaveIpV6Info(ipV6Info, m_instId);
-#ifdef OHOS_ARCH_LITE
-    IfConfig::GetInstance().FlushIpAddr(WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), IPTYPE_IPV4);
-#endif
 }
 
 bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::string &bssid)
@@ -1017,7 +1031,7 @@ void StaStateMachine::SeparatedState::GoInState()
         pStaStateMachine->linkedInfo.networkId);
 #endif
 #endif
-    pStaStateMachine->StopDhcp();
+    pStaStateMachine->StopDhcp(true, true);
     pStaStateMachine->isRoam = false;
     pStaStateMachine->mPortalUrl = "";
     /* Callback result to InterfaceService. */
@@ -1592,11 +1606,6 @@ void StaStateMachine::GetIpState::GoInState()
     }
     pStaStateMachine->HandlePreDhcpSetup();
     do {
-        int result = pStaStateMachine->RegisterDhcpCallBack();
-        if (result != DHCP_SUCCESS) {
-            WIFI_LOGE("RegisterDhcpCallBack failed!");
-            break;
-        }
         int dhcpRet;
         std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
         pStaStateMachine->currentTpType = static_cast<int>(
@@ -1608,7 +1617,7 @@ void StaStateMachine::GetIpState::GoInState()
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
         }
         config.isStaticIpv4 = assignMethod == AssignIpMethod::STATIC;
-        config.bIpv6 = pStaStateMachine->currentTpType == IPTYPE_IPV4 ? false : true;
+        config.bIpv6 = false;
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
             break;
@@ -3144,45 +3153,35 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         return;
     }
 
-    if ((ipv6Info.globalIpV6Address != result->strOptClientId) ||
-        (ipv6Info.randGlobalIpV6Address != result->strOptRandIpv6Addr) ||
-        (ipv6Info.uniqueLocalAddress1 != result->strOptLocalAddr1) ||
-        (ipv6Info.uniqueLocalAddress2 != result->strOptLocalAddr2) ||
-        (ipv6Info.gateway != result->strOptRouter1) || (ipv6Info.linkIpV6Address != result->strOptLinkIpv6Addr)) {
-        ipv6Info.linkIpV6Address = result->strOptLinkIpv6Addr;
-        ipv6Info.globalIpV6Address = result->strOptClientId;
-        ipv6Info.randGlobalIpV6Address = result->strOptRandIpv6Addr;
-        ipv6Info.gateway = result->strOptRouter1;
-        ipv6Info.netmask = result->strOptSubnet;
-        ipv6Info.primaryDns = result->strOptDns1;
-        ipv6Info.secondDns = result->strOptDns2;
-        ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
-        ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
-        if (result->dnsList.dnsNumber > 0 && result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
-            ipv6Info.dnsAddr.clear();
-            for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
-                ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
-            }
-            WIFI_LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}zu", ipv6Info.dnsAddr.size());
+    ipv6Info.linkIpV6Address = result->strOptLinkIpv6Addr;
+    ipv6Info.globalIpV6Address = result->strOptClientId;
+    ipv6Info.randGlobalIpV6Address = result->strOptRandIpv6Addr;
+    ipv6Info.gateway = result->strOptRouter1;
+    ipv6Info.netmask = result->strOptSubnet;
+    ipv6Info.primaryDns = result->strOptDns1;
+    ipv6Info.secondDns = result->strOptDns2;
+    ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
+    ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
+    if (result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
+        ipv6Info.dnsAddr.clear();
+        for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
+            ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
         }
-        WifiConfigCenter::GetInstance().SaveIpV6Info(ipv6Info, pStaStateMachine->m_instId);
-        WIFI_LOGI("SaveIpV6 addr=%{private}s, linkaddr=%{private}s, randaddr=%{private}s, gateway=%{private}s, "
-            "mask=%{private}s, dns=%{private}s, dns2=%{private}s",
-            ipv6Info.globalIpV6Address.c_str(), ipv6Info.linkIpV6Address.c_str(),
-            ipv6Info.randGlobalIpV6Address.c_str(), ipv6Info.gateway.c_str(), ipv6Info.netmask.c_str(),
-            ipv6Info.primaryDns.c_str(), ipv6Info.secondDns.c_str());
-#ifndef OHOS_ARCH_LITE
-        WifiDeviceConfig config;
-        WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
-            pStaStateMachine->m_instId);
-        if (!ipv6Info.primaryDns.empty()) {
-            WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
-                pStaStateMachine->m_instId);
-        }
-#endif
-    } else {
-        WIFI_LOGI("TryToSaveIpV6Result not UpdateNetLinkInfo");
+        WIFI_LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}zu", ipv6Info.dnsAddr.size());
     }
+    WifiConfigCenter::GetInstance().SaveIpV6Info(ipv6Info, pStaStateMachine->m_instId);
+    WIFI_LOGI("SaveIpV6 addr=%{private}s, linkaddr=%{private}s, randaddr=%{private}s, gateway=%{private}s, "
+        "mask=%{private}s, dns=%{private}s, dns2=%{private}s",
+        ipv6Info.globalIpV6Address.c_str(), ipv6Info.linkIpV6Address.c_str(),
+        ipv6Info.randGlobalIpV6Address.c_str(), ipv6Info.gateway.c_str(), ipv6Info.netmask.c_str(),
+        ipv6Info.primaryDns.c_str(), ipv6Info.secondDns.c_str());
+#ifndef OHOS_ARCH_LITE
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
+        pStaStateMachine->m_instId);
+    WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
+        pStaStateMachine->m_instId);
+#endif
 }
 
 void StaStateMachine::DhcpResultNotify::DhcpResultNotifyEvent(DhcpReturnCode result, int ipType)

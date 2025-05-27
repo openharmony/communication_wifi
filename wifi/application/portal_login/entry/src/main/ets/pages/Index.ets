@@ -330,6 +330,40 @@ struct Index {
           let json: OnSafeBrowsingCheckResultCallback = JSON.parse(jsonData);
           hilog.info(DOMAIN, TAG, '%{public}s', 'onSafeBrowsingCheckResult: [threatType]= ' + json.threatType);
         })
+        .onHttpErrorReceive((event) => {
+          if (event) {
+            hilog.info(DOMAIN, TAG, 'getResponseCode:' + event.response.getResponseCode());
+          }
+        })
+        .onErrorReceive((event) => {
+          if (event) {
+            hilog.info(DOMAIN, TAG, 'getErrorInfo:' + event.error.getErrorInfo());
+            hilog.info(DOMAIN, TAG, 'getErrorCode:' + event.error.getErrorCode());
+          }
+        })
+        .onSslErrorEventReceive((event) => {
+          hilog.info(DOMAIN, TAG, 'Ssl Error');
+          AlertDialog.show({
+            title: $r('app.string.continue_visit'),
+            message: $r('app.string.ssl_normal_error_msg'),
+            primaryButton: {
+              value: $r('app.string.confirm_dialog_cancel'),
+              action: () => {
+                event.handler.handleCancel();
+              }
+            },
+            secondaryButton: {
+              value: $r('app.string.ssl_error_dialog_continue_btn'),
+              fontColor: $r('sys.color.warning'),
+              action: () => {
+                event.handler.handleConfirm();
+              }
+            },
+            cancel: () => {
+              event.handler.handleCancel();
+            }
+          })
+        })
         .backgroundColor($r('sys.color.ohos_id_color_background'))
         .width('100%')
     }
@@ -363,5 +397,6 @@ struct Index {
         DOMAIN, TAG, '%{public}s', 'Failed to unregister netconnect.' + JSON.stringify(err));
       });
     emitter.off('WANT_UPDATE');
+    this.webviewController.loadUrl('http://connectivitycheck.platform.hicloud.com/generate_204');
   }
 }

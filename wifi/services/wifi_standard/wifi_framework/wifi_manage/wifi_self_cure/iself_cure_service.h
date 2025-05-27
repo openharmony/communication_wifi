@@ -85,6 +85,13 @@ public:
      * @return result - true: no need broadcast state change,  false: broadcast state normally
      */
     virtual bool CheckSelfCureWifiResult(int event) = 0;
+
+    /**
+     * @Description stop selfcure when user disconnect
+     *
+     * @return bool - true: have done selfcure or no need to do, false: selfcure not finish
+     */
+    virtual bool IsWifiSelfcureDone() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

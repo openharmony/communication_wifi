@@ -520,6 +520,7 @@ bool SelfCureStateMachine::ConnectedMonitorState::IsNeedSelfCure()
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
     if (!IsNeedSelfCure()) {
+        pSelfCureStateMachine_->isSelfcureDone_ = true;
         return;
     }
     WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
@@ -623,6 +624,7 @@ void SelfCureStateMachine::DisconnectedMonitorState::GoInState()
     pSelfCureStateMachine_->noAutoConnReason_ = -1;
     pSelfCureStateMachine_->connectedTime_ = 0;
     pSelfCureStateMachine_->isInternetFailureDetected_ = false;
+    pSelfCureStateMachine_->isSelfcureDone_ = false;
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_IDLE, false);
     pSelfCureStateMachine_->ClearDhcpOffer();
     pSelfCureStateMachine_->HandleWifiBlackListUpdateMsg();
@@ -1809,6 +1811,7 @@ SelfCureStateMachine::NoInternetState::~NoInternetState() {}
 void SelfCureStateMachine::NoInternetState::GoInState()
 {
     WIFI_LOGI("NoInternetState GoInState function.");
+    pSelfCureStateMachine_->isSelfcureDone_ = true;
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_IDLE, false);
     pSelfCureStateMachine_->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
         NO_INTERNET_DETECT_INTERVAL_MS);
@@ -2665,6 +2668,14 @@ void SelfCureStateMachine::HandleP2pConnChanged(const WifiP2pLinkedInfo &info)
     if (GetCurStateName() == pInternetSelfCureState_->GetStateName()) {
         SendMessage(WIFI_CURE_CMD_P2P_DISCONNECTED_EVENT);
     }
+}
+
+bool SelfCureStateMachine::IsWifiSelfcureDone()
+{
+    if (IsSelfCureOnGoing()) {
+        return false;
+    }
+    return isSelfcureDone_;
 }
 
 bool SelfCureStateMachine::IfMultiGateway()

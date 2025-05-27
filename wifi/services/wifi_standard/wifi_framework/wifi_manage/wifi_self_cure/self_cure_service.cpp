@@ -178,6 +178,15 @@ bool SelfCureService::CheckSelfCureWifiResult(int event)
     return pSelfCureStateMachine->CheckSelfCureWifiResult(event);
 }
 
+bool SelfCureService::IsWifiSelfcureDone()
+{
+    if (pSelfCureStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
+        return false;
+    }
+    return pSelfCureStateMachine->IsWifiSelfcureDone();
+}
+
 void SelfCureService::RegisterP2pEnhanceCallback()
 {
     P2pEnhanceCallback p2pEnhanceStateChangeCallback = [this](const std::string &ifName, int32_t state,

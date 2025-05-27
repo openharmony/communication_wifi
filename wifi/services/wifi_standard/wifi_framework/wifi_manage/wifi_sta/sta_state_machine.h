@@ -61,13 +61,14 @@ constexpr int STA_RENEWAL_MIN_TIME = 120;
 constexpr int STREAM_TXPACKET_THRESHOLD = 0;
 constexpr int STREAM_RXPACKET_THRESHOLD = 0;
 constexpr int STA_AP_ROAMING_TIMEOUT = 15000; // 15s->15000 ms
-
+constexpr int STA_NO_INTERNET_TIMEOUT = 60000; // 60s
 constexpr int CMD_NETWORK_CONNECT_TIMEOUT = 0X01;
 constexpr int CMD_SIGNAL_POLL = 0X02;
 constexpr int CMD_START_NETCHECK = 0X03;
 constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
 constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 constexpr int CMD_LINK_SWITCH_DETECT_TIMEOUT = 0x07;
+constexpr int CMD_NO_INTERNET_TIMEOUT = 0x08;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
@@ -291,7 +292,7 @@ public:
         void HandleLinkSwitchEvent(InternalMessagePtr msg);
         void DealStartRoamCmdInApLinkedState(InternalMessagePtr msg);
         void DealCsaChannelChanged(InternalMessagePtr msg);
-
+        void DealNoInternetTimeout();
     private:
         StaStateMachine *pStaStateMachine;
     };
@@ -1009,7 +1010,11 @@ private:
     void AddRandomMacCure();
     ErrCode ConfigRandMacSelfCure(const int networkId);
     void UpdateLinkedBssid(std::string &bssid);
+    /**
+     * @Description broadcast network state for system UI and setting
+     */
     void InvokeOnInternetAccessChanged(SystemNetWorkState internetAccessStatus);
+    void HandleInternetAccessChanged(SystemNetWorkState internetAccessStatus);
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void ResetWifi7WurInfo();
@@ -1084,7 +1089,8 @@ private:
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
     int isAudioOn_ = 0;
-    SystemNetWorkState lastInternetAccessStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
+    SystemNetWorkState lastInternetIconStatus_ = SystemNetWorkState::NETWORK_DEFAULT_STATE;
+    int32_t noInternetAccessCnt_ = 0;
     /*
      linkswitch detect flag to avoid freq linkswitch cause signal level jump,
      set to true when linkswitch start, to false when linkswitch duration 2s later

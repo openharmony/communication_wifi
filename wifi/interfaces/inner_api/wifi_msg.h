@@ -817,6 +817,7 @@ struct WifiDeviceConfig {
     bool isShared;
     int64_t lastTrySwitchWifiTimestamp { -1 };
     bool isAllowAutoConnect { true };
+    bool isSecurityWifi { true };
 
     WifiDeviceConfig()
     {

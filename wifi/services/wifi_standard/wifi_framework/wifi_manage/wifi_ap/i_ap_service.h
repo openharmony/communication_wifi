@@ -18,7 +18,9 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "i_ap_service_callbacks.h"
+#ifndef OHOS_ARCH_LITE
 #include "ienhance_service.h"
+#endif
 namespace OHOS {
 namespace Wifi {
 class IApService {

@@ -27,6 +27,7 @@ enum SettingsDialogClickType {
 };
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;
 using P2pEnhanceActionListenCallback = std::function<void(int)>;
+using SensorEnhanceCallback = std::function<void(int)>;
 class IEnhanceService {
 public:
     virtual ~IEnhanceService() = default;
@@ -101,7 +102,14 @@ public:
      * @param reasonCode - reason code
      */
     virtual void NotifyWurState(const int wurState, const uint16_t reasonCode) = 0;
-    
+
+    /**
+     * @Description Notify audio scene state
+     *
+     * @param isAudioScene - is audio scene
+     */
+    virtual void NotifyAudioSceneChanged(const bool isAudioScene) = 0;
+
     /**
      * @Description Notify wifi netlink message
      *
@@ -312,6 +320,14 @@ public:
      * @return bool - supported 160MHz
      */
     virtual bool IsControl160M() = 0;
+
+    /**
+     * @Description register sensor result callback
+     *
+     * @param callback - callback function
+     * @return Errcode - operation result
+     */
+    virtual ErrCode RegisterSensorEnhanceCallback(SensorEnhanceCallback callback) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

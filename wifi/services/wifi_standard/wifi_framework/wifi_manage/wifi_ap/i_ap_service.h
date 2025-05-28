@@ -18,7 +18,9 @@
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "i_ap_service_callbacks.h"
-
+#ifndef OHOS_ARCH_LITE
+#include "ienhance_service.h"
+#endif
 namespace OHOS {
 namespace Wifi {
 class IApService {
@@ -42,6 +44,9 @@ public:
     virtual ErrCode SetPowerModel(const PowerModel& model) = 0;
     virtual ErrCode SetHotspotIdleTimeout(int time) = 0;
     virtual void OnNetCapabilitiesChanged(const int apStatus) = 0;
+#ifndef OHOS_ARCH_LITE
+    virtual void SetEnhanceService(IEnhanceService* enhanceService) = 0;
+#endif
 
     /**
      * @Description - Registers all callbacks provided by the P2P service.

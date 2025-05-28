@@ -136,16 +136,18 @@ bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
     return EXECUTED;
 }
 
-bool ApStartedState::SetConfig(HotspotConfig &apConfig)
+bool ApStartedState::SetConfig(HotspotConfig &apConfig, bool isControl160M)
 {
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
     m_ApConfigUse.UpdateApChannelConfig(apConfig);
     std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
-    
     WifiErrorNo setSoftApConfigResult = WifiErrorNo::WIFI_HAL_OPT_OK;
     WifiErrorNo setApPasswdResult = WifiErrorNo::WIFI_HAL_OPT_OK;
     HotspotMode currentMode = HotspotMode::SOFTAP;
     m_ApStateMachine.GetHotspotMode(currentMode);
+    if (isControl160M) {
+        apConfig.SetBandWidth(AP_BANDWIDTH_DEFAULT);
+    }
     if (currentMode == HotspotMode::LOCAL_ONLY_SOFTAP) {
         // The localOnlyHotspot uses the temporary configuration and does not flush to disks,
         // The SSID and password are random values.
@@ -167,7 +169,6 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         WIFI_LOGE("set hostapd config failed.");
         return false;
     }
-
     if (BatteryUtils::GetInstance().GetBatteryCapacity() > SET_DUAL_ANTENNAS) {
         HotspotConfig hotspotConfig;
         WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
@@ -180,7 +181,6 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         WIFI_LOGE("Enableap failed.");
         return false;
     }
-
     if (apConfig.GetIpAddress().empty()) {
         WIFI_LOGI("IP is empty, set default ipaddr");
         apConfig.SetIpAddress(AP_DEFAULT_IP);
@@ -191,14 +191,14 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     return true;
 }
 
-bool ApStartedState::SetConfig()
+bool ApStartedState::SetConfig(bool isControl160M)
 {
     WIFI_LOGI("set softap config, id=%{public}d", m_id);
     if (WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id)) {
         WIFI_LOGE("get config failed");
         return false;
     }
-    return SetConfig(m_hotspotConfig);
+    return SetConfig(m_hotspotConfig, isControl160M);
 }
 
 bool ApStartedState::StartAp() const

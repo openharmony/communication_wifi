@@ -944,6 +944,14 @@ ErrCode WifiServiceScheduler::TryToStartApService(int instId, int hotspotMode)
                 static_cast<int>(errCode));
             break;
         }
+#ifndef OHOS_ARCH_LITE
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService == nullptr) {
+            WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_ENHANCE);
+            break;
+        }
+        pService->SetEnhanceService(pEnhanceService);
+#endif
         pService->SetHotspotMode(HotspotMode(hotspotMode));
         errCode = pService->EnableHotspot();
         if (errCode != WIFI_OPT_SUCCESS) {

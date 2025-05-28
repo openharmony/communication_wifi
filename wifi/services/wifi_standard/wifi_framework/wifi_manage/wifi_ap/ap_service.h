@@ -22,7 +22,9 @@
 #include "i_wifi_country_code_change_listener.h"
 #include "ap_started_state.h"
 #include "ap_network_monitor.h"
-
+#ifndef OHOS_ARCH_LITE
+#include "ienhance_service.h"
+#endif
 namespace OHOS {
 namespace Wifi {
 class ApStateMachine;
@@ -168,6 +170,14 @@ public:
      */
     ErrCode SetHotspotMode(const HotspotMode &mode);
     void HandleNetCapabilitiesChanged(const int apStatus);
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Set EnhanceService to Ap service
+     *
+     * @param enhanceService IEnhanceService object
+     */
+    void SetEnhanceService(IEnhanceService* enhanceService);
+#endif
 private:
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {
     public:
@@ -181,6 +191,9 @@ private:
     ApStartedState &apStartedState_;
     int m_id;
     std::shared_ptr<IWifiCountryCodeChangeListener> m_apObserver;
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *enhanceService_ = nullptr;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

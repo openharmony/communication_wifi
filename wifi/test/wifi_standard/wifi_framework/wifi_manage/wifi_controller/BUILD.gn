@@ -148,6 +148,7 @@ ohos_unittest("wifi_controller_unittest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
     "netmanager_base:net_stats_manager_if",

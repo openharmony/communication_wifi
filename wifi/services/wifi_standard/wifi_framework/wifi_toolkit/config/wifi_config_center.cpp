@@ -1363,7 +1363,11 @@ void WifiConfigCenter::UpdateLinkedInfo(int instId)
     LOGD("WifiSettings UpdateLinkedInfo.");
 }
 
+<<<<<<< HEAD
 void WifiConfigCenter::UpdateCenterFrequencyInfo(int instId)
+=======
+void WifiConfigCenter::UpdateCenterFrquencyInfo(int instId)
+>>>>>>> f38f60508e0ca035993658478ca91e2609a3ca52
 {
     std::vector<WifiScanInfo> wifiScanInfoList;
     wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);

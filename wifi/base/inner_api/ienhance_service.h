@@ -315,6 +315,13 @@ public:
     virtual LimitSwitchScenes GetLimitSwitchScenes() = 0;
 
     /**
+     * @Description obtain supported 160MHz
+     *
+     * @return bool - supported 160MHz
+     */
+    virtual bool IsControl160M() = 0;
+
+    /**
      * @Description register sensor result callback
      *
      * @param callback - callback function

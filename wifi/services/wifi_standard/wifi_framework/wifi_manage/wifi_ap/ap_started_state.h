@@ -94,7 +94,7 @@ public:
      */
     void StartMonitor() const;
 
-    bool SetConfig();
+    bool SetConfig(bool isControl160M = false);
 
     void SetRandomMac() const;
 
@@ -105,9 +105,10 @@ private:
      * @Description  Called inside the state，processing function
                      configured.
      * @param apConfig - Hotspot Configure
+     * @param isControl160M - Hotspot Configure
      * @return true: Set successfully    false: Set failed
      */
-    bool SetConfig(HotspotConfig &apConfig);
+    bool SetConfig(HotspotConfig &apConfig, bool isControl160M = false);
 
     /**
      * @Description  Status update notification APSERVICE.

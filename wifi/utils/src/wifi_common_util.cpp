@@ -778,7 +778,7 @@ int CheckDataLegalHex(const std::string &data)
         return 0;
     }
  
-    std::regex pattern("[0-9|a-f|A-F]+");
+    std::regex pattern("[0-9a-fA-F]+");
     if (!std::regex_match(data, pattern)) {
         return 0;
     }

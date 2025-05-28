@@ -1367,10 +1367,10 @@ void WifiConfigCenter::UpdateCenterFrequencyInfo(int instId)
 {
     std::vector<WifiScanInfo> wifiScanInfoList;
     wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
-    for (auto iter = wifiScanConfig.begin(); iter != wifiScanConfig.end(); ++iter) {
+    for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
         if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
             LOGD("centerFrequency0:%{public}d, centerFrequency1:%{public}d.",
-            iter->centerFrequency0, iter->centerFrequency1);
+                iter->centerFrequency0, iter->centerFrequency1);
             if (mWifiLinkedInfo[instId].centerFrequency0 == 0 || ((iter->centerFrequency0 != 0) &&
                 mWifiLinkedInfo[instId].centerFrequency0 != iter->centerFrequency0)) {
                 mWifiLinkedInfo[instId].centerFrequency0 = iter->centerFrequency0;

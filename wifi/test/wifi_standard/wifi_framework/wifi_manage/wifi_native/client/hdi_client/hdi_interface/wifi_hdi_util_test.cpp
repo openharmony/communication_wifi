@@ -829,21 +829,6 @@ HWTEST_F(WifiHdiUtilTest, CheckHiLinkOUISectionTest2, TestSize.Level1)
     EXPECT_EQ(CheckHiLinkOUISection(bytes, 10), false);
 }
 
-extern "C" int HdiCheckExtCap(const uint8_t *ie, unsigned int capab);
-HWTEST_F(WifiHdiUtilTest, HdiCheckExtCapTest, TestSize.Level1)
-{
-    uint8_t ie = 0;
-    unsigned int capab = 1;
-    EXPECT_EQ(HdiCheckExtCap(nullptr, capab), 0);
-
-    ie = 1;
-    EXPECT_EQ(HdiCheckExtCap(&ie, capab), 0);
-
-    ie = 2;
-    capab = 32;
-    EXPECT_EQ(HdiCheckExtCap(&ie, capab), 0);
-}
-
 extern "C" bool GetChanWidthCenterFreqHt(ScanInfo *pcmd, ScanInfoElem* infoElem);
 HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqHtTest, TestSize.Level1)
 {

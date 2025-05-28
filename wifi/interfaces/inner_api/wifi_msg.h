@@ -252,6 +252,8 @@ struct WifiLinkedInfo {
     int rssi; /* signal level */
     int band; /* 2.4G / 5G */
     int frequency;
+    int centerFrequency0;
+    int centerFrequency1;
     int linkSpeed; /* units: Mbps */
     std::string macAddress;
     int macType;
@@ -289,6 +291,8 @@ struct WifiLinkedInfo {
         rssi = 0;
         band = 0;
         frequency = 0;
+        centerFrequency0 = 0;
+        centerFrequency1 = 0;
         linkSpeed = 0;
         macType = 0;
         ipAddress = 0;

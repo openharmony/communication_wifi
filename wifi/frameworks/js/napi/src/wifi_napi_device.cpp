@@ -1487,6 +1487,8 @@ static void WapiConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDevi
     napi_value wapiCfgObj;
     napi_create_object(env, &wapiCfgObj);
     SetValueInt32(env, "wapiPskType", wifiDeviceConfig.wifiWapiConfig.wapiPskType, wapiCfgObj);
+    SetValueUtf8String(env, "wapiAsCert", wifiDeviceConfig.wifiWapiConfig.wapiAsCertData.c_str(), wapiCfgObj);
+    SetValueUtf8String(env, "wapiUserCert", wifiDeviceConfig.wifiWapiConfig.wapiUserCertData.c_str(), wapiCfgObj);
 
     napi_status status = napi_set_named_property(env, result, "wapiConfig", wapiCfgObj);
     if (status != napi_ok) {

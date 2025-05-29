@@ -34,10 +34,6 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
-#ifndef OHOS_ARCH_LITE
-const std::vector<std::string> g_countryCodeNotSupport5G = {"jp", "JP", "ru", "RU", "in", "IN", "qa", "QA", "il", "IL"};
-#endif
-
 WifiHotspotServiceImpl::WifiHotspotServiceImpl()
 {}
 
@@ -89,15 +85,6 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
             is2GSupported = true;
         } else if (bands[i] == BandType::BAND_5GHZ) {
             is5GSupported = true;
-#ifndef OHOS_ARCH_LITE
-            std::string countryCode;
-            WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
-            WIFI_LOGD("GetCountryCode: country code is %{public}s", countryCode.c_str());
-            auto iter = std::find(g_countryCodeNotSupport5G.begin(), g_countryCodeNotSupport5G.end(), countryCode);
-            if (iter != g_countryCodeNotSupport5G.end()) {
-                is5GSupported = false;
-            }
-#endif
         }
         if (is2GSupported && is5GSupported) {
             isSupported = true;

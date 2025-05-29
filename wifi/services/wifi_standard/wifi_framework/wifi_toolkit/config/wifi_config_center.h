@@ -343,8 +343,6 @@ public:
 
     void UpdateLinkedInfo(int instId = 0);
 
-    void UpdateCenterFrequencyInfo(int instId = 0);
-
     void SetSystemMode(int systemMode);
 
     int GetSystemMode();

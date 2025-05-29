@@ -2557,6 +2557,8 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
     config.callProcessName = reply.ReadString();
     config.ancoCallProcessName = reply.ReadString();
     config.wifiWapiConfig.wapiPskType = reply.ReadInt32();
+    config.wifiWapiConfig.wapiAsCertData = reply.ReadString();
+    config.wifiWapiConfig.wapiUserCertData = reply.ReadString();
     config.networkSelectionStatus.status = WifiDeviceConfigStatus(reply.ReadInt32());
     config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason(reply.ReadInt32());
     config.networkSelectionStatus.seenInLastQualifiedNetworkSelection = reply.ReadBool();

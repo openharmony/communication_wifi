@@ -579,6 +579,8 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteString(config.callProcessName);
     reply.WriteString(config.ancoCallProcessName);
     reply.WriteInt32(config.wifiWapiConfig.wapiPskType);
+    reply.WriteString(config.wifiWapiConfig.wapiAsCertData);
+    reply.WriteString(config.wifiWapiConfig.wapiUserCertData);
     reply.WriteInt32((int)config.networkSelectionStatus.status);
     reply.WriteInt32((int)config.networkSelectionStatus.networkSelectionDisableReason);
     reply.WriteBool(config.networkSelectionStatus.seenInLastQualifiedNetworkSelection);

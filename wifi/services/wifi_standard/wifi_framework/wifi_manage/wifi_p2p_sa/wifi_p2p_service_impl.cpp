@@ -1438,7 +1438,8 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         WIFI_LOGE("Hid2dSetUpperScene, pService is nullptr");
         return WIFI_OPT_FAILED;
     }
-    if (scene.scene == false) {
+    if (callingUid == SHARE_SERVICE_UID && scene.scene == false) {
+        WIFI_LOGI("Hid2dSetUpperScene, trigger scan");
         pScanService->Scan(true, ScanType::SCAN_TYPE_SYSTEMTIMER);
     }
     /* Not support currently */

@@ -351,7 +351,6 @@ int WifiConfigCenter::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
     } else {
         mWifiLinkedInfo.emplace(instId, info);
     }
-    UpdateCenterFrequencyInfo(instId);
 
     return 0;
 }
@@ -1361,24 +1360,6 @@ void WifiConfigCenter::UpdateLinkedInfo(int instId)
     WifiCategory category = wifiScanConfig->GetWifiCategoryRecord(mWifiLinkedInfo[instId].bssid);
     mWifiLinkedInfo[instId].supportedWifiCategory = category;
     LOGD("WifiSettings UpdateLinkedInfo.");
-}
-
-void WifiConfigCenter::UpdateCenterFrequencyInfo(int instId)
-{
-    std::vector<WifiScanInfo> wifiScanInfoList;
-    wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
-    for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
-        if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
-            LOGD("centerFrequency0:%{public}d, centerFrequency1:%{public}d.",
-                iter->centerFrequency0, iter->centerFrequency1);
-            if (mWifiLinkedInfo[instId].centerFrequency0 == 0 || ((iter->centerFrequency0 != 0) &&
-                mWifiLinkedInfo[instId].centerFrequency0 != iter->centerFrequency0)) {
-                mWifiLinkedInfo[instId].centerFrequency0 = iter->centerFrequency0;
-                mWifiLinkedInfo[instId].centerFrequency1 = iter->centerFrequency1;
-            }
-            break;
-        }
-    }
 }
 
 void WifiConfigCenter::SetPersistWifiState(int state, int instId)

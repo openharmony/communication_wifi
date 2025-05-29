@@ -1018,7 +1018,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     void ShowPortalNitification();
     void ResetWifi7WurInfo();
-    void UpdateWifiCategory();
+    void UpdateLinkedInfoFromScanInfo();
     void SetSupportedWifiCategory();
 #endif
     void SetConnectMethod(int connectMethod);

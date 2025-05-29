@@ -414,7 +414,7 @@ void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr
 
     #ifndef OHOS_ARCH_LITE
     pStaStateMachine->SaveWifiConfigForUpdate(pStaStateMachine->targetNetworkId_);
-    pStaStateMachine->UpdateWifiCategory();
+    pStaStateMachine->UpdateLinkedInfoFromScanInfo();
     pStaStateMachine->SetSupportedWifiCategory();
     #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
@@ -1419,7 +1419,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     pStaStateMachine->UpdateLinkedBssid(bssid);
 #ifndef OHOS_ARCH_LITE
     pStaStateMachine->ResetWifi7WurInfo();
-    pStaStateMachine->UpdateWifiCategory();
+    pStaStateMachine->UpdateLinkedInfoFromScanInfo();
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
@@ -3714,9 +3714,9 @@ void StaStateMachine::UpdateLinkedBssid(std::string &bssid)
 }
 
 #ifndef OHOS_ARCH_LITE
-void StaStateMachine::UpdateWifiCategory()
+void StaStateMachine::UpdateLinkedInfoFromScanInfo()
 {
-    WIFI_LOGI("UpdateWifiCategory");
+    WIFI_LOGI("UpdateLinkedInfoFromScanInfo");
     std::vector<InterScanInfo> scanInfos;
     if (WifiStaHalInterface::GetInstance().QueryScanInfos(
         WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), scanInfos) != WIFI_HAL_OPT_OK) {
@@ -3732,13 +3732,22 @@ void StaStateMachine::UpdateWifiCategory()
         WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), chipsetFeatrureCapability) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("GetChipsetWifiFeatrureCapability failed.\n");
     }
-    if (enhanceService_ != nullptr) {
-        for (auto iter = scanInfos.begin(); iter != scanInfos.end(); iter++) {
+    
+    for (auto iter = scanInfos.begin(); iter != scanInfos.end(); iter++) {
+        if (enhanceService_ != nullptr) {
             WifiCategory category = enhanceService_->GetWifiCategory(iter->infoElems,
                 chipsetCategory, chipsetFeatrureCapability);
             WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordWifiCategory(iter->bssid, category);
-            if (iter->bssid == linkedInfo.bssid) {
-                linkedInfo.channelWidth = iter->channelWidth;
+        }
+        if (iter->bssid == linkedInfo.bssid) {
+            linkedInfo.channelWidth = iter->channelWidth;
+            LOGI("centerFrequency0:%{public}d, centerFrequency1:%{public}d.",
+                iter->centerFrequency0, iter->centerFrequency1);
+            if ((iter->centerFrequency0 != 0) && (linkedInfo.centerFrequency0 != iter->centerFrequency0)) {
+                linkedInfo.centerFrequency0 = iter->centerFrequency0;
+            }
+            if ((iter->centerFrequency1 != 0) && (linkedInfo.centerFrequency1 != iter->centerFrequency1)) {
+                linkedInfo.centerFrequency1 = iter->centerFrequency1;
             }
         }
     }

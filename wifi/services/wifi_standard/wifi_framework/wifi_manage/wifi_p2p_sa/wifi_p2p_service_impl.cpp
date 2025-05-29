@@ -1433,6 +1433,14 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
         return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiConfigCenter::GetInstance().SetHid2dUpperScene(callingUid, scene);
+    IEnhanceService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(0);
+    if (pScanService == nullptr) {
+        WIFI_LOGE("Hid2dSetUpperScene, pService is nullptr");
+        return WIFI_OPT_FAILED;
+    }
+    if (scene.scene == false) {
+        pScanService->Scan(true, ScanType::SCAN_TYPE_SYSTEMTIMER);
+    }
     /* Not support currently */
     WIFI_LOGI("Set upper scene, ifName=%{public}s, scene=%{public}u, fps=%{public}d, bw=%{public}u",
         ifName.c_str(), scene.scene, scene.fps, scene.bw);

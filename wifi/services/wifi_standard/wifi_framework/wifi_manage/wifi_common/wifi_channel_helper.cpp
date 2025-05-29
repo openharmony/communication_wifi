@@ -20,6 +20,7 @@
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
+#include "wifi_country_code_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -42,6 +43,9 @@ constexpr int FREQ_2G_MIN_RANGE = 2400;
 constexpr int FREQ_2G_MAX_RANGE = 2500;
 constexpr int FREQ_5G_MIN_RANGE = 4900;
 constexpr int FREQ_5G_MAX_RANGE = 5900;
+#ifndef OHOS_ARCH_LITE
+const std::vector<std::string> g_countryCodeNotSupport5G = {"jp", "JP", "ru", "RU", "in", "IN", "qa", "QA", "il", "IL"};
+#endif
 
 WifiChannelHelper::WifiChannelHelper()
 {
@@ -63,6 +67,15 @@ int WifiChannelHelper::GetValidBands(std::vector<BandType> &bands)
     }
     it = mValidChannels.find(BandType::BAND_5GHZ);
     if (it != mValidChannels.end() && it->second.size() > 0) {
+#ifndef OHOS_ARCH_LITE
+        std::string countryCode;
+        WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
+        WIFI_LOGD("GetValidBands: country code is %{public}s", countryCode.c_str());
+        auto iter = std::find(g_countryCodeNotSupport5G.begin(), g_countryCodeNotSupport5G.end(), countryCode);
+        if (iter != g_countryCodeNotSupport5G.end()) {
+            return 0;
+        }
+#endif
         bands.push_back(BandType::BAND_5GHZ);
     }
     return 0;

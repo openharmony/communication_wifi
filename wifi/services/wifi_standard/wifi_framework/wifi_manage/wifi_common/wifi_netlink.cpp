@@ -163,7 +163,7 @@ int32_t WifiNetLink::SendQoeCmd(int32_t cmd, int32_t arg)
 
 int32_t WifiNetLink::ProcessReportMsg(int32_t sockFd, int32_t cmd)
 {
-    WIFI_LOGI("ProcessReportMsg cmd = %{public}d", cmd);
+    WIFI_LOGD("ProcessReportMsg cmd = %{public}d", cmd);
     struct sockaddr_nl stKpeer;
     struct PacketInfo info;
     struct timeval tv;

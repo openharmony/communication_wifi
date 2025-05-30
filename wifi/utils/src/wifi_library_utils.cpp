@@ -26,7 +26,7 @@ WifiLibraryUtils::WifiLibraryUtils(const std::string &libName, void*& libHandle,
         return;
     }
     if (libHandle_ != nullptr) {
-        WIFI_LOGI("Library %s has been loaded", libName.c_str());
+        WIFI_LOGD("Library %s has been loaded", libName.c_str());
         return;
     }
     libHandle_ = dlopen(libName.c_str(), RTLD_LAZY);

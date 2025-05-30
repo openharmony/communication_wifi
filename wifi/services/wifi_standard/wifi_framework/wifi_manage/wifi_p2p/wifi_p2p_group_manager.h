@@ -214,11 +214,11 @@ public:
     void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, const WifiP2pGroupInfo &group);
 #endif
 
-private:
     /**
      * @Description - Synchronize from the current group to all registry groups.
      */
     void RefreshGroupsFromCurrentGroup();
+private:
 
     /**
      * @Description - From all record groups, update to the current group in use.

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "parameters.h"
 #include "wifi_controller_state_machine.h"
 #include "wifi_controller_define.h"
 #include "wifi_manager.h"
@@ -35,6 +36,7 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiControllerMachine");
+constexpr const char* WIFI_EDM_FORCE_OPEN_KEY = "persist.edm.force_open_wifi";
 int WifiControllerMachine::mWifiStartFailCount{0};
 
 WifiControllerMachine::WifiControllerMachine()
@@ -327,6 +329,10 @@ void WifiControllerMachine::HandleAirplaneOpen()
 #endif
     if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() || !ShouldEnableWifi(INSTID_WLAN0)) {
         multiStaManagers.StopAllManagers();
+        if (system::GetBoolParameter(WIFI_EDM_FORCE_OPEN_KEY, false)) {
+            WIFI_LOGE("AirplaneOpen:wifi is prohibited by EDM!");
+            return;
+        }
         concreteManagers.StopAllManagers();
     }
 }
@@ -639,6 +645,10 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 
     if (pWifiControllerMachine->ShouldDisableWifi(msg)) {
         pWifiControllerMachine->multiStaManagers.StopAllManagers();
+        if (system::GetBoolParameter(WIFI_EDM_FORCE_OPEN_KEY, false)) {
+            WIFI_LOGE("WifiToggle:wifi is prohibited by EDM!");
+            return;
+        }
         pWifiControllerMachine->concreteManagers.StopAllManagers();
         return;
     }
@@ -966,6 +976,10 @@ void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
     }
 
     multiStaManagers.StopAllManagers();
+    if (system::GetBoolParameter(WIFI_EDM_FORCE_OPEN_KEY, false)) {
+        WIFI_LOGE("ShutdownWifi:wifi is prohibited by EDM!");
+        return;
+    }
     concreteManagers.StopAllManagers();
 }
 

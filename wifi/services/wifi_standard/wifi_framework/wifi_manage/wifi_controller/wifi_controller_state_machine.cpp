@@ -997,16 +997,16 @@ void WifiControllerMachine::IsLocalOnlyHotspot(bool isLohs)
 
 bool WifiControllerMachine::IsDisableWifiProhibitedByEdm(void)
 {
-    constexpr const char* WIFI_EDM_FORCE_OPEN_KEY = "persist.edm.force_open_wifi";
-    constexpr const uint32_t PARAM_TRUE_LEN = 4;
-    constexpr const uint32_t PARAM_FALSE_LEN = 5;
-    constexpr const char* PARAM_TRUE = "true";
-    constexpr const char* PARAM_FALSE = "false";
+    constexpr const char* wifiEdmForceOpenKey = "persist.edm.force_open_wifi";
+    constexpr const uint32_t paramTrueLen = 4;
+    constexpr const uint32_t paramFalseLen = 5;
+    constexpr const char* paramTrue = "true";
+    constexpr const char* paramFalse = "false";
  
-    char preValue[PARAM_FALSE_LEN] = {0};
-    int errCode = GetParamValue(WIFI_EDM_FORCE_OPEN_KEY, PARAM_FALSE, preValue, PARAM_FALSE_LEN);
+    char preValue[paramFalseLen] = {0};
+    int errCode = GetParamValue(wifiEdmForceOpenKey, paramFalse, preValue, paramFalseLen);
     if (errCode > 0) {
-        if (strncmp(preValue, PARAM_TRUE, PARAM_TRUE_LEN) == 0) {
+        if (strncmp(preValue, paramTrue, paramTrueLen) == 0) {
             return true;
         }
     }

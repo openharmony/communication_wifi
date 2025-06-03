@@ -927,8 +927,6 @@ void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedI
     reply.WriteInt32(wifiInfo.rssi);
     reply.WriteInt32(wifiInfo.band);
     reply.WriteInt32(wifiInfo.frequency);
-    reply.WriteInt32(wifiInfo.centerFrequency0);
-    reply.WriteInt32(wifiInfo.centerFrequency1);
     reply.WriteInt32(wifiInfo.linkSpeed);
     reply.WriteString(wifiInfo.macAddress);
     reply.WriteInt32(wifiInfo.macType);
@@ -954,6 +952,8 @@ void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedI
     reply.WriteInt32(wifiInfo.lastTxPackets);
     reply.WriteInt32(static_cast<int>(wifiInfo.wifiLinkType));
     reply.WriteInt32(wifiInfo.linkId);
+    reply.WriteInt32(wifiInfo.centerFrequency0);
+    reply.WriteInt32(wifiInfo.centerFrequency1);
 }
 
 void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)

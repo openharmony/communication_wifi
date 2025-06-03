@@ -1320,9 +1320,6 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.rssi = reply.ReadInt32();
     info.band = reply.ReadInt32();
     info.frequency = reply.ReadInt32();
-    info.centerFrequency0 = reply.ReadInt32();
-    info.centerFrequency1 = reply.ReadInt32();
-    info.frequency = reply.ReadInt32();
     info.linkSpeed = reply.ReadInt32();
     info.macAddress = reply.ReadString();
     info.macType = reply.ReadInt32();
@@ -1370,6 +1367,8 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.lastTxPackets = reply.ReadInt32();
     info.wifiLinkType = static_cast<WifiLinkType>(reply.ReadInt32());
     info.linkId = reply.ReadInt32();
+    info.centerFrequency0 = reply.ReadInt32();
+    info.centerFrequency1 = reply.ReadInt32();
 }
 
 void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos)

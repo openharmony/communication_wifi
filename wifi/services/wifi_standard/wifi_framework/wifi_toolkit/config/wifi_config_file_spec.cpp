@@ -648,6 +648,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"isShared=" << item.isShared << std::endl;
     ss << "    " <<"lastTrySwitchWifiTimestamp=" << item.lastTrySwitchWifiTimestamp << std::endl;
     ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
+    ss << "    " <<"isSecurityWifi=" << item.isSecurityWifi << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else

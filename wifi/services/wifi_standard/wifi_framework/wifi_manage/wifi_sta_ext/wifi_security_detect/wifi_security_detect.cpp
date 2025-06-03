@@ -68,8 +68,8 @@ enum Security {
 };
 const int NUM24 = 24;
 enum WifiNotification {
-	OPEN = 1, /* wifi_notification is open */
-	CLOSE = 2, /* wifi_notification is close */
+    OPEN = 1, /* wifi_notification is open */
+    CLOSE = 2, /* wifi_notification is close */
 };
 
 WifiSecurityDetect::WifiSecurityDetect()

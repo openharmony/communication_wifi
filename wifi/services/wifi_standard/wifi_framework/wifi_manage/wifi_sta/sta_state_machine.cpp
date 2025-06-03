@@ -3739,6 +3739,7 @@ void StaStateMachine::UpdateLinkedInfoFromScanInfo()
                 chipsetCategory, chipsetFeatrureCapability);
             WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordWifiCategory(iter->bssid, category);
         }
+
         if (iter->bssid == linkedInfo.bssid) {
             linkedInfo.channelWidth = iter->channelWidth;
             LOGI("centerFrequency0:%{public}d, centerFrequency1:%{public}d.",

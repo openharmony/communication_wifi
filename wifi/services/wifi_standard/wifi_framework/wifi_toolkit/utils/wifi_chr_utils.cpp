@@ -60,9 +60,9 @@ void WifiChrUtils::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiS
     }
 }
 
-void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
+bool WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
 {
-    if (signalLevel < 0) return;
+    if (signalLevel < 0) return false;
     std::vector<WifiSignalPollInfo> wifiCheckInfoArray = signalPollInfoArray;
     std::sort(wifiCheckInfoArray.begin(), wifiCheckInfoArray.end(),
         [](const WifiSignalPollInfo& a, const WifiSignalPollInfo& b) {return a.timeStamp > b.timeStamp;});
@@ -83,8 +83,10 @@ void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t sign
         if (currentTime - startTime_ >= SIGNAL_RECORD_5S) {
             startTime_ = currentTime;
             WriteWifiBeaconLostHiSysEvent(errorCode);
+            return true;
         }
     }
+    return false;
 }
 }  // namespace Wifi
 }  // namespace OHOS

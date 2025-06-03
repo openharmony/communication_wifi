@@ -97,6 +97,7 @@ static void ClearWifiDeviceConfigEap(WifiDeviceConfig &item)
 {
     item.wifiEapConfig.eap.clear();
     item.wifiEapConfig.identity.clear();
+    item.wifiEapConfig.eapSubId = -1;
     item.wifiEapConfig.password.clear();
     item.wifiEapConfig.clientCert.clear();
     if (memset_s(item.wifiEapConfig.certPassword, sizeof(item.wifiEapConfig.certPassword),
@@ -415,6 +416,8 @@ static int SetWifiDeviceConfigEap(WifiDeviceConfig &item, const std::string &key
         item.wifiEapConfig.eap = value;
     } else if (key == "wifiEapConfig.identity") {
         item.wifiEapConfig.identity = value;
+    } else if (key == "wifiEapConfig.eapSubId") {
+        item.wifiEapConfig.eapSubId = CheckDataLegal(tmpValue);
     } else if (key == "wifiEapConfig.password") {
         item.wifiEapConfig.password = value;
     } else if (key == "wifiEapConfig.clientCert") {
@@ -717,6 +720,7 @@ static std::string OutPutWifiDeviceConfigEap(WifiDeviceConfig &item)
     ss << "    " <<"<WifiDeviceConfigEap>" << std::endl;
     ss << "    " <<"wifiEapConfig.eap=" << item.wifiEapConfig.eap << std::endl;
     ss << "    " <<"wifiEapConfig.identity=" << item.wifiEapConfig.identity << std::endl;
+    ss << "    " <<"wifiEapConfig.eapSubId=" << item.wifiEapConfig.eapSubId << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     if (item.version == 1) {
         if (!item.wifiEapConfig.encryptedData.empty() && !item.wifiEapConfig.IV.empty()) {

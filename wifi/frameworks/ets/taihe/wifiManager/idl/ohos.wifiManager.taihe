@@ -1,0 +1,289 @@
+/*
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+@!namespace("@ohos.wifiManager", "wifiManager")
+@!sts_inject("""
+static { loadLibrary("wifiManager_taihe_native.z")}
+""")
+enum WifiSecurityType: i32 {
+    WIFI_SEC_TYPE_INVALID = 0,
+    WIFI_SEC_TYPE_OPEN = 1,
+    WIFI_SEC_TYPE_WEP = 2,
+    WIFI_SEC_TYPE_PSK = 3,
+    WIFI_SEC_TYPE_SAE = 4,
+    WIFI_SEC_TYPE_EAP = 5,
+    WIFI_SEC_TYPE_EAP_SUITE_B = 6,
+    WIFI_SEC_TYPE_OWE = 7,
+    WIFI_SEC_TYPE_WAPI_CERT = 8,
+    WIFI_SEC_TYPE_WAPI_PSK = 9
+}
+
+enum ConnState: i32 {
+    SCANNING = 0,
+    CONNECTING = 1,
+    AUTHENTICATING = 2,
+    OBTAINING_IPADDR = 3,
+    CONNECTED = 4,
+    DISCONNECTING = 5,
+    DISCONNECTED = 6,
+    UNKNOWN = 7
+}
+
+enum WifiCategory: i32 {
+    DEFAULT = 1,
+    WIFI6 = 2,
+    WIFI6_PLUS = 3,
+    WIFI7 = 4,
+    WIFI7_PLUS = 5
+}
+
+enum WifiDetailState: i32 {
+    UNKNOWN = -1,
+    INACTIVE = 0,
+    ACTIVATED = 1,
+    ACTIVATING = 2,
+    DEACTIVATING = 3,
+    SEMI_ACTIVATING = 4,
+    SEMI_ACTIVE = 5
+}
+
+enum P2pDeviceStatus: i32 {
+    CONNECTED = 0,
+    INVITED = 1,
+    FAILED = 2,
+    AVAILABLE = 3,
+    UNAVAILABLE = 4,
+}
+
+enum P2pConnectState: i32 {
+    DISCONNECTED = 0,
+    CONNECTED = 1
+}
+
+struct WifiDeviceConfig {
+    ssid: String;
+    bssid: Optional<String>;
+    preSharedKey: String;
+    securityType: WifiSecurityType;
+}
+
+function MakeWifiDeviceConfig(ssid: String, bssid: Optional<String>, preSharedKey: String, securityType: WifiSecurityType): WifiDeviceConfig;
+
+struct WifiScanInfo {
+    ssid: String;
+    bssid: String;
+    securityType: WifiSecurityType;
+    rssi: i32;
+    band: i32;
+    supportedWifiCategory: WifiCategory;
+}
+
+function MakeWifiScanInfo(ssid: String, bssid: String, securityType: WifiSecurityType, rssi: i32, band: i32, supportedWifiCategory: WifiCategory): WifiScanInfo;
+
+struct WifiLinkedInfo {
+    ssid: String;
+    bssid: String;
+    rssi: i32;
+    band: i32;
+    macAddress: String;
+    connState: ConnState;
+    supportedWifiCategory: WifiCategory;
+}
+
+function MakeWifiLinkedInfo(ssid: String, bssid: String, rssi: i32, band: i32, macAddress: String, connState: ConnState, supportedWifiCategory: WifiCategory): WifiLinkedInfo;
+
+struct IpInfo {
+    ipAddress: i32;
+}
+
+function MakeIpInfo(ipAddress: i32): IpInfo;
+
+struct Ipv6Info {
+    linkIpv6Address: String;
+}
+
+function MakeIpv6Info(linkIpv6Address: String): Ipv6Info;
+
+struct StationInfo {
+    macAddress: String;
+}
+
+function MakeStationInfo(macAddress: String): StationInfo;
+
+struct HotspotConfig {
+    ssid: String;
+    securityType: WifiSecurityType;
+    band: i32;
+    preSharedKey: String;
+}
+
+function MakeHotspotConfig(ssid: String, securityType: WifiSecurityType, band: i32, preSharedKey: String): HotspotConfig;
+
+struct WifiP2pLinkedInfo {
+    connectState: P2pConnectState;
+    isGroupOwner: bool;
+    groupOwnerAddr: String;
+}
+
+enum DeviceAddressType: i32 {
+    RANDOM_DEVICE_ADDRESS = 0,
+    REAL_DEVICE_ADDRESS = 1,
+}
+
+struct WifiP2pDevice {
+    deviceName: String;
+    deviceAddress: String;
+    deviceAddressType: DeviceAddressType;
+    primaryDeviceType: String;
+    deviceStatus: P2pDeviceStatus;
+    groupCapabilities: i32;
+}
+
+// 函数
+function IsConnected(): bool;
+function IsWifiActive(): bool;
+function GetSignalLevel(rssi: f64, band: f64): f64;
+function GetIpInfo(): IpInfo;
+function GetIpv6Info(): Ipv6Info;
+function IsOpenSoftApAllowed(): bool;
+function GetScanInfoList(): Array<WifiScanInfo>;
+function IsMeteredHotspot(): bool;
+function GetWifiDetailState(): WifiDetailState;
+function GetStations(): Array<StationInfo>;
+function EnableWifi(): void;
+function DisableWifi(): void;
+function EnableSemiWifi(): void;
+
+@!sts_inject("""
+export function on(type: string, cb: (arg_0: NullishType) => void) {
+    switch(type) {
+        case "wifiStateChange": return onWifiStateChange(cb);
+        case "wifiConnectionChange": return onWifiConnectionChange(cb);
+        case "wifiScanStateChange": return onWifiScanStateChange(cb);
+        case "wifiRssiChange": return onWifiRssiChange(cb);
+        case "streamChange": return onStreamChange(cb);
+        case "deviceConfigChange": return onDeviceConfigChange(cb);
+        case "hotspotStateChange": return onHotspotStateChange(cb);
+        case "hotspotStaJoin": return onHotspotStaJoin(cb);
+        case "hotspotStaLeave": return onHotspotStaLeave(cb);
+        case "p2pStateChange": return onP2pStateChange(cb);
+        case "p2pConnectionChange": return onP2pConnectionChange(cb);
+        case "p2pDeviceChange": return onP2pDeviceChange(cb);
+        case "p2pPeerDeviceChange": return onP2pPeerDeviceChange(cb);
+        case "p2pPersistentGroupChange": return onP2pPersistentGroupChange(cb);
+        case "p2pDiscoveryChange": return onP2pDiscoveryChange(cb);
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+export function off(type: string, cb?: (arg_0: NullishType) => void) {
+    switch(type) {
+        case "wifiStateChange": return offWifiStateChange(cb as (((data: double) => void) | undefined));
+        case "wifiConnectionChange":  return offWifiConnectionChange(cb as (((data: double) => void) | undefined));
+        case "wifiScanStateChange": return offWifiScanStateChange(cb as (((data: double) => void) | undefined));
+        case "wifiRssiChange": return offWifiRssiChange((cb as (((data: double) => void)|undefined)));
+        case "streamChange": return offStreamChange(cb as (((data: double) => void) | undefined));
+        case "deviceConfigChange": return offDeviceConfigChange(cb as (((data: double) => void) | undefined));
+        case "hotspotStateChange": return offHotspotStateChange(cb as (((data: double) => void) | undefined));
+        case "hotspotStaJoin": return offHotspotStaJoin(cb as (((data: StationInfo) => void) | undefined));
+        case "hotspotStaLeave": return offHotspotStaLeave(cb as (((data: StationInfo) => void) | undefined));
+        case "p2pStateChange": return offP2pStateChange(cb as (((data: double) => void) | undefined));
+        case "p2pConnectionChange": return offP2pConnectionChange(cb as (((data: WifiP2pLinkedInfo) => void) | undefined));
+        case "p2pDeviceChange": return offP2pDeviceChange(cb as (((data: WifiP2pDevice) => void) | undefined));
+        case "p2pPeerDeviceChange": return offP2pPeerDeviceChange(cb as (((data: Array<WifiP2pDevice>) => void) | undefined));
+        case "p2pPersistentGroupChange": return offP2pPersistentGroupChange(cb as ((() => void) | undefined));
+        case "p2pDiscoveryChange": return offP2pDiscoveryChange(cb as (((data: double) => void) | undefined));
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+""")
+
+// @on_off("wifiStateChange")
+function OnWifiStateChange(callback: (data: f64) => void): void;
+// @on_off("wifiStateChange")
+function OffWifiStateChange(callback: Optional<(data: f64) => void>): void;
+
+// @on_off("wifiConnectionChange")
+function OnWifiConnectionChange(callback: (data: f64) => void): void;
+// @on_off("wifiConnectionChange")
+function OffWifiConnectionChange(callback: Optional<(data: f64) => void>): void;
+
+// @on_off("wifiScanStateChange")
+function OnWifiScanStateChange(callback: (data: f64) => void): void;
+// @on_off("wifiScanStateChange")
+function OffWifiScanStateChange(callback: Optional<(data: f64) => void>): void;
+
+// @on_off("wifiRssiChange")
+function OnWifiRssiChange(callback: (data: f64) => void): void;
+// @on_off("wifiRssiChange")
+function OffWifiRssiChange(callback: Optional<(data: f64) => void>): void;
+
+// @on_off("streamChange")
+function OnStreamChange(callback: (data: f64) => void): void;
+// @on_off("streamChange")
+function OffStreamChange(callback: Optional<(data: f64) => void>): void;
+
+// @on_off("deviceConfigChange")
+function OnDeviceConfigChange(callback: (data: f64) => void): void;
+// @on_off("deviceConfigChange")
+function OffDeviceConfigChange(callback: Optional<(data: f64) => void>): void;
+
+// @on_off("hotspotStateChange")
+function OnHotspotStateChange(callback: (data: f64) => void): void;
+// @on_off("hotspotStateChange")
+function OffHotspotStateChange(callback: Optional<(data: f64) => void>): void;
+
+// @on_off("hotspotStaJoin")
+function OnHotspotStaJoin(callback: (data: StationInfo) => void): void;
+// @on_off("hotspotStaJoin")
+function OffHotspotStaJoin(callback: Optional<(data: StationInfo) => void>): void;
+
+// @on_off("hotspotStaLeave")
+function OnHotspotStaLeave(callback: (data: StationInfo) => void): void;
+// @on_off("hotspotStaLeave")
+function OffHotspotStaLeave(callback: Optional<(data: StationInfo) => void>): void;
+
+// @on_off("p2pStateChange")
+function OnP2pStateChange(callback: (data: f64) => void): void;
+// @on_off("p2pStateChange")
+function OffP2pStateChange(callback: Optional<(data: f64) => void>): void;
+
+// @on_off("p2pConnectionChange")
+function OnP2pConnectionChange(callback: (data: WifiP2pLinkedInfo) => void): void;
+// @on_off("p2pConnectionChange")
+function OffP2pConnectionChange(callback: Optional<(data: WifiP2pLinkedInfo) => void>): void;
+
+// @on_off("p2pDeviceChange")
+function OnP2pDeviceChange(callback: (data: WifiP2pDevice) => void): void;
+// @on_off("p2pDeviceChange")
+function OffP2pDeviceChange(callback: Optional<(data: WifiP2pDevice) => void>): void;
+
+// @on_off("p2pPeerDeviceChange")
+function OnP2pPeerDeviceChange(callback: (data: Array<WifiP2pDevice>) => void): void;
+// @on_off("p2pPeerDeviceChange")
+function OffP2pPeerDeviceChange(callback:Optional<(data: Array<WifiP2pDevice>) => void>): void;
+
+union UndefinedType {
+    @undefined undefined;
+}
+
+// @on_off("p2pPersistentGroupChange")
+function OnP2pPersistentGroupChange(callback: (data: UndefinedType) => void): void;
+// @on_off("p2pPersistentGroupChange")
+function OffP2pPersistentGroupChange(callback: Optional<(data: UndefinedType) => void>): void;
+
+// @on_off("p2pDiscoveryChange")
+function OnP2pDiscoveryChange(callback: (data: f64) => void): void;
+// @on_off("p2pDiscoveryChange")
+function OffP2pDiscoveryChange(callback: Optional<(data: f64) => void>): void;

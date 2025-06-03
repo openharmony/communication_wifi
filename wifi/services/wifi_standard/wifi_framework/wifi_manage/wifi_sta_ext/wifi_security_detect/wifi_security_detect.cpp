@@ -15,6 +15,7 @@
 
 #include <chrono>
 #include "json/json.h"
+#include "ip_tools.h"
 #include "wifi_security_detect.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
@@ -37,14 +38,39 @@ const std::string SETTINGS_DATASHARE_URI =
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 const std::string SETTINGS_DATA_KEYWORD = "KEYWORD";
 const std::string SETTINGS_DATA_VALUE = "VALUE";
+const int MIN_5G_FREQUENCY = 5160;
+const int MAX_5G_FREQUENCY = 5865;
 const uint32_t securityGuardModelID = 3001000011;
-const int wirelessType_802_11A = 1;
-const int wirelessType_802_11B = 2;
-const int wirelessType_802_11G = 3;
-const int wirelessType_802_11N = 4;
-const int wirelessType_802_11AC = 5;
-const int wirelessType_802_11AX = 6;
+enum WireType {
+    WIRE_802_11A = 1,
+    WIRE_802_11B = 2,
+    WIRE_802_11G = 3,
+    WIRE_802_11N = 4,
+    WIRE_802_11AC = 5,
+    WIRE_802_11AX = 6,
+};
+enum Security {
+    SECURITY_TYPE_OPEN = 0,
+    SECURITY_TYPE_WEP = 1,
+    SECURITY_TYPE_PSK = 2,
+    SECURITY_TYPE_EAP = 3,
+    SECURITY_TYPE_SAE = 4,
+    SECURITY_TYPE_EAP_WPA3_ENTERPRISE_192_BIT = 5,
+    SECURITY_TYPE_OWE = 6,
+    SECURITY_TYPE_WAPI_PSK = 7,
+    SECURITY_TYPE_WAPI_CERT = 8,
+    SECURITY_TYPE_EAP_WPA3_ENTERPRISE = 9,
+    SECURITY_TYPE_OSEN = 10,
+    SECURITY_TYPE_PASSPOINT_R1_R2 = 11,
+    SECURITY_TYPE_PASSPOINT_R3 = 12,
+    SECURITY_TYPE_DPP = 13,
+    SECURITY_TYPE_UNKNOWN = -1,
+};
 const int NUM24 = 24;
+enum WifiNotification {
+	OPEN = 1, /* wifi_notification is open */
+	CLOSE = 2, /* wifi_notification is close */
+};
 
 WifiSecurityDetect::WifiSecurityDetect()
 {
@@ -57,18 +83,17 @@ WifiSecurityDetect::WifiSecurityDetect()
     };
 }
 
-bool WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
+void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     WIFI_LOGI("WifiSecurityDetect network connected");
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         currentConnectedNetworkId_ = info.networkId;
+        sleep(1);
         SecurityDetect(info);
-        return true;
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         currentConnectedNetworkId_ = -1;
-        return false;
     } else {
-        return false;
+        return;
     }
 }
 
@@ -198,6 +223,30 @@ bool WifiSecurityDetect::SecurityDetectResult(const std::string &devId, uint32_t
     }
 }
 
+int32_t WifiSecurityDetect::AuthenticationCovert(std::string key)
+{
+    if (key == KEY_MGMT_NONE) {
+        return Security::SECURITY_TYPE_OPEN;
+    } else if (key == KEY_MGMT_WEP) {
+        return Security::SECURITY_TYPE_WEP;
+    } else if (key == KEY_MGMT_WPA_PSK) {
+        return Security::SECURITY_TYPE_PSK;
+    } else if (key == KEY_MGMT_SAE) {
+        return Security::SECURITY_TYPE_SAE;
+    } else if (key == KEY_MGMT_EAP) {
+        return Security::SECURITY_TYPE_EAP;
+    } else if (key == KEY_MGMT_SUITE_B_192) {
+        return Security::SECURITY_TYPE_EAP_WPA3_ENTERPRISE_192_BIT;
+    } else if (key == KEY_MGMT_WAPI_CERT) {
+        return Security::SECURITY_TYPE_WAPI_CERT;
+    } else if (key == KEY_MGMT_WAPI_PSK) {
+        return Security::SECURITY_TYPE_WAPI_PSK;
+    } else {
+        WIFI_LOGE("wifi authentication is unknown");
+        return -1;
+    }
+}
+
 void WifiSecurityDetect::WifiConnectConfigParma(const WifiLinkedInfo &info, Json::Value &root)
 {
     WifiDeviceConfig config;
@@ -205,27 +254,26 @@ void WifiSecurityDetect::WifiConnectConfigParma(const WifiLinkedInfo &info, Json
         WIFI_LOGE("%{public}s, not find networkId:%{public}d", __FUNCTION__, info.networkId);
         return;
     }
-
     IpInfo wifiIpInfo;
     int32_t m_instId = 0;
     WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
     switch (info.wifiStandard) {
-        case wirelessType_802_11A:
+        case WireType::WIRE_802_11A:
             root["wirelessType"] = "802.11a";
             break;
-        case wirelessType_802_11B:
+        case WireType::WIRE_802_11B:
             root["wirelessType"] = "802.11b";
             break;
-        case wirelessType_802_11G:
+        case WireType::WIRE_802_11G:
             root["wirelessType"] = "802.11g";
             break;
-        case wirelessType_802_11N:
+        case WireType::WIRE_802_11N:
             root["wirelessType"] = "802.11n";
             break;
-        case wirelessType_802_11AC:
+        case WireType::WIRE_802_11AC:
             root["wirelessType"] = "802.11ac";
             break;
-        case wirelessType_802_11AX:
+        case WireType::WIRE_802_11AX:
             root["wirelessType"] = "802.11ax";
             break;
         default:
@@ -235,16 +283,29 @@ void WifiSecurityDetect::WifiConnectConfigParma(const WifiLinkedInfo &info, Json
     root["ssid"] = config.ssid;
     root["bssid"] = config.bssid;
     root["signalStrength"] = config.rssi;
-    root["authentication"] = config.keyMgmt;
-    root["frequencyBand"] = config.frequency;
-    root["gatewayIp"] = wifiIpInfo.ipAddress;
+    root["authentication"] = AuthenticationCovert(config.keyMgmt);
+    if (config.frequency >= MIN_5G_FREQUENCY && config.frequency <= MAX_5G_FREQUENCY) {
+        root["frequencyBand"] = "5GHz";
+    } else {
+        root["frequencyBand"] = "2.4GHz";
+    }
+    root["gatewayIp"] = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
     root["gatewayMac"] = config.macAddress;
-    root["primaryDns"] = wifiIpInfo.primaryDns;
-    root["secondDns"] = wifiIpInfo.secondDns;
+    root["primaryDns"] = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+    if (wifiIpInfo.secondDns == 0) {
+        root["secondDns"] = "0.0.0.0";
+    } else {
+        root["secondDns"] = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+    }
 }
 
 void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
 {
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config) != 0) {
+        WIFI_LOGE("%{public}s, not find networkId:%{public}d", __FUNCTION__, info.networkId);
+        return;
+    }
     SecurityModelResult model;
     model.devId = "";
     model.modelId = securityGuardModelID;
@@ -265,12 +326,15 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
         }
         bool result = SecurityDetectResult(model.devId, model.modelId, model.param);
         if (result == true) {
+            config.isSecurityWifi = true;
             WIFI_LOGI("PopupNotification open result %{public}d", result);
-            PopupNotification(1, info.networkId);
+            PopupNotification(WifiNotification::OPEN, info.networkId);
         } else {
+            config.isSecurityWifi = false;
             WIFI_LOGI("PopupNotification close result %{public}d", result);
-            PopupNotification(2, info.networkId);
+            PopupNotification(WifiNotification::CLOSE, info.networkId);
         }
+        WifiSettings::GetInstance().SyncDeviceConfig();
         return SUCCESS;
     });
 }
@@ -281,9 +345,9 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
     OHOS::AAFwk::Want want;
     want.SetElementName("com.huawei.hmos.security.privacycenter", "WlanNotificationAbility");
     if (status == 1) {
-        want.SetParam("notificationType", 1);
+        want.SetParam("notificationType", WifiNotification::OPEN);
     } else {
-        want.SetParam("notificationType", 2);
+        want.SetParam("notificationType", WifiNotification::CLOSE);
     }
     want.SetParam("networkId", networkid);
 

@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Wifi {
 
-using SecurityModelResult = struct {
+struct SecurityModelResult {
     std::string devId;
     uint32_t modelId;
     std::string param;
@@ -34,26 +34,9 @@ using SecurityModelResult = struct {
 class WifiSecurityDetect {
 public:
     WifiSecurityDetect();
-
     ~WifiSecurityDetect();
-
     static WifiSecurityDetect &GetInstance();
-
-    bool DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
-
     StaServiceCallback GetStaCallback() const;
-
-    static bool SettingDataOnOff();
-
-    bool SecurityDetectTime(const int &networkId);
-
-    static bool SecurityDetectResult(const std::string &devId, uint32_t modelId, const std::string &param);
-
-    void SecurityDetect(const WifiLinkedInfo &info);
-
-    static void PopupNotification(int status, int networkid);
-    
-    void WifiConnectConfigParma(const WifiLinkedInfo &info, Json::Value &root);
 
 private:
     static Uri AssembleUri(const std::string &key);
@@ -61,6 +44,14 @@ private:
     std::unique_ptr<WifiEventHandler> securityDetectThread_ = nullptr;
     StaServiceCallback staCallback_;
     int currentConnectedNetworkId_ = -1;
+    void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
+    static bool SettingDataOnOff();
+    bool SecurityDetectTime(const int &networkId);
+    static bool SecurityDetectResult(const std::string &devId, uint32_t modelId, const std::string &param);
+    void SecurityDetect(const WifiLinkedInfo &info);
+    static void PopupNotification(int status, int networkid);
+    void WifiConnectConfigParma(const WifiLinkedInfo &info, Json::Value &root);
+    int32_t AuthenticationCovert(std::string key);
 };
 }
 }

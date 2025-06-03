@@ -4574,8 +4574,8 @@ int32_t StaStateMachine::GetCardType(CardType &cardType)
 {
     WifiDeviceConfig deviceConfig;
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId_, deviceConfig, m_instId);
-    return CoreServiceClient::GetInstance().GetCardType(GetDataSlotId(deviceConfig.wifiEapConfig.eapSubId),
-        cardType);
+    return CoreServiceClient::GetInstance().GetCardType(CoreServiceClient::GetInstance().GetSlotId(
+        deviceConfig.wifiEapConfig.eapSubId), cardType);
 }
 
 int32_t StaStateMachine::GetDefaultId(int32_t slotId)
@@ -4625,7 +4625,7 @@ std::string StaStateMachine::SimAkaAuth(const std::string &nonce, AuthType authT
     WIFI_LOGD("StaStateMachine::SimAkaAuth in, authType:%{public}d, nonce:%{private}s", authType, nonce.c_str());
     WifiDeviceConfig deviceConfig;
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId_, deviceConfig, m_instId);
-    auto slotId = GetDataSlotId(deviceConfig.wifiEapConfig.eapSubId);
+    auto slotId = CoreServiceClient::GetInstance().GetSlotId(deviceConfig.wifiEapConfig.eapSubId);
     SimAuthenticationResponse response;
     int32_t result = CoreServiceClient::GetInstance().SimAuthentication(slotId, authType, nonce, response);
     if (result != WIFI_OPT_SUCCESS) {

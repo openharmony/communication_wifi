@@ -389,7 +389,7 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
         return;
     }
 
-    int32_t slotId = GetDataSlotId(config.wifiEapConfig.eapSubId);
+    int32_t slotId = CoreServiceClient::GetInstance().GetSlotId(config.wifiEapConfig.eapSubId);
     if (slotId == -1) {
         return;
     }

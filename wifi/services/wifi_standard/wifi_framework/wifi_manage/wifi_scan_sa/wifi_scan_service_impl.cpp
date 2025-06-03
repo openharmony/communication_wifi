@@ -241,6 +241,10 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
             WIFI_LOGW("extern scan not allow when wifi disable");
             return false;
         }
+        if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
+            WIFI_LOGI("extern scan has allowed for FactoryMode.\n");
+            return true;
+        }
         if (scanInfo.idelState == MODE_STATE_OPEN) {
             WIFI_LOGW("extern scan not allow by power idel state");
             return false;

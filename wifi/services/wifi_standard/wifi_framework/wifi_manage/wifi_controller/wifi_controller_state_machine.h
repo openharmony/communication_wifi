@@ -150,6 +150,7 @@ private:
     void MakeRptManager(RptManager::Role role, int id);
 #endif
 #endif
+    bool IsDisableWifiProhibitedByEdm(void);
     bool ShouldDisableWifi(InternalMessagePtr msg);
     bool ShouldEnableWifi(int id = 0);
     ConcreteManagerRole GetWifiRole();

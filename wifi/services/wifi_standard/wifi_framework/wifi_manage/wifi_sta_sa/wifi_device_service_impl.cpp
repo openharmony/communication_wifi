@@ -194,6 +194,10 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
         WIFI_LOGE("EnableSemiWifi:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if (IsDisableWifiProhibitedByEdm()) {
+        WIFI_LOGE("EnableSemiWifi:wifi is prohibited by EDM!");
+        return WIFI_OPT_FAILED;
+    }
 #ifndef OHOS_ARCH_LITE
     if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden()) {
         WIFI_LOGE("EnableSemiWifi: Mdm forbidden PERMISSION_DENIED!");

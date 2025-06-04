@@ -68,6 +68,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isShared = true;
     item.lastTrySwitchWifiTimestamp = -1;
     item.isAllowAutoConnect = true;
+    item.isSecurityWifi = true;
     return;
 }
 
@@ -206,6 +207,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.isAllowAutoConnect = (CheckDataLegal(tmpValue) != 0);
     } else if (key == "lastUpdateTime") {
         item.lastUpdateTime = CheckDataLegal(tmpValue);
+    } else if (key == "isSecurityWifi") {
+        item.isSecurityWifi = (CheckDataLegal(tmpValue) != 0);
     } else {
         return -1;
     }

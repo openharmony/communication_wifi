@@ -333,6 +333,7 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
             WIFI_LOGI("PopupNotification close result %{public}d", result);
             PopupNotification(WifiNotification::CLOSE, info.networkId);
         }
+        WifiSettings::GetInstance().AddDeviceConfig(config);
         WifiSettings::GetInstance().SyncDeviceConfig();
         return SUCCESS;
     });

@@ -283,6 +283,8 @@ struct WifiLinkedInfo {
     int c0Rssi;
     int c1Rssi;
     int linkId;
+    int centerFrequency0; /* 40M center frequency */
+    int centerFrequency1; /* 160M center frequency */
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -317,6 +319,8 @@ struct WifiLinkedInfo {
         c0Rssi = 0;
         c1Rssi = 0;
         linkId = INVALID_LINK_ID;
+        centerFrequency0 = 0;
+        centerFrequency1 = 0;
     }
 };
 

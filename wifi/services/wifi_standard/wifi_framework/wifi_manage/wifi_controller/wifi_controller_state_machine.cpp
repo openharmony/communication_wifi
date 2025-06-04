@@ -643,10 +643,6 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 
     if (pWifiControllerMachine->ShouldDisableWifi(msg)) {
         pWifiControllerMachine->multiStaManagers.StopAllManagers();
-        if (pWifiControllerMachine->IsDisableWifiProhibitedByEdm()) {
-            WIFI_LOGE("WifiToggleChange:wifi is prohibited by EDM!");
-            return;
-        }
         pWifiControllerMachine->concreteManagers.StopAllManagers();
         return;
     }
@@ -723,10 +719,6 @@ void WifiControllerMachine::EnableState::HandleSoftapOpen(int id)
         if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
             pWifiControllerMachine->concreteManagers.HasAnyManager()) {
             pWifiControllerMachine->multiStaManagers.StopAllManagers();
-            if (pWifiControllerMachine->IsDisableWifiProhibitedByEdm()) {
-                WIFI_LOGE("HandleSoftapOpen:wifi is prohibited by EDM!");
-                return;
-            }
             pWifiControllerMachine->concreteManagers.StopAllManagers();
             pWifiControllerMachine->mApidStopWifi = id;
             WIFI_LOGI("%{public}s, has any manager", __func__);
@@ -978,10 +970,6 @@ void WifiControllerMachine::ShutdownWifi(bool shutDownAp)
     }
 
     multiStaManagers.StopAllManagers();
-    if (IsDisableWifiProhibitedByEdm()) {
-        WIFI_LOGE("ShutdownWifi:wifi is prohibited by EDM!");
-        return;
-    }
     concreteManagers.StopAllManagers();
 }
 

@@ -652,6 +652,7 @@ void StaStateMachine::LinkState::GoInState()
     }
     RouterConfig routerConfig;
     routerConfig.bIpv6 = true;
+    routerConfig.bIpv4 = false;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
     if (strncpy_s(routerConfig.ifname, sizeof(routerConfig.ifname), ifaceName.c_str(), ifaceName.length()) < 0) {
         WIFI_LOGE("LinkState GoInState, copy ifaceName failed");
@@ -937,7 +938,7 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
     StopTimer(static_cast<int>(CMD_START_NETCHECK));
     WIFI_LOGI("StopDhcp, isStopV4: %{public}d, isStopV6: %{public}d", isStopV4, isStopV6);
     if (isStopV4) {
-        StopDhcpClient(ifname.c_str(), false);
+        StopDhcpClient(ifname.c_str(), false, true);
         IpInfo ipInfo;
         WifiConfigCenter::GetInstance().SaveIpInfo(ipInfo, m_instId);
 #ifdef OHOS_ARCH_LITE
@@ -947,7 +948,7 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
         getIpFailNum = 0;
     }
     if (isStopV6) {
-        StopDhcpClient(ifname.c_str(), true);
+        StopDhcpClient(ifname.c_str(), true, false);
         IpV6Info ipV6Info;
         WifiConfigCenter::GetInstance().SaveIpV6Info(ipV6Info, m_instId);
     }
@@ -1622,6 +1623,8 @@ void StaStateMachine::GetIpState::GoInState()
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
             break;
         }
+        config.bIpv4 = true;
+        pStaStateMachine->RegisterDhcpCallBack();
         dhcpRet = StartDhcpClient(config);
         LOGI("StartDhcpClient type:%{public}d dhcpRet:%{public}d isRoam:%{public}d m_instId=%{public}d" \
             "IsSpecificNetwork %{public}d", pStaStateMachine->currentTpType, dhcpRet, pStaStateMachine->isRoam,

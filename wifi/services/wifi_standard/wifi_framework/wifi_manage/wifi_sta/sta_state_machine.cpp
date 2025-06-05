@@ -3651,6 +3651,10 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
 
 void StaStateMachine::SetConnectMethod(int connectMethod)
 {
+    if (m_instId != INSTID_WLAN0) {
+        WIFI_LOGI("instId:%{public}d, no need to set connect method.", m_instId);
+        return;
+    }
     std::string isConnectFromUser = "-1";
     switch (connectMethod) {
         case NETWORK_SELECTED_BY_AUTO:

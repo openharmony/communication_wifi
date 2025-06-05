@@ -159,7 +159,7 @@ void NetworkStatusHistoryManager::ModifyAllHistoryRecord(unsigned int &networkSt
         if (networkStatus == oldStatus) {
             networkStatus = newStatus;
         }
-        newNetworkStatusHistory |= static_cast<int>(networkStatus) << (count * ITEM_BIT_NUM);
+        newNetworkStatusHistory |= static_cast<unsigned int>(networkStatus) << (count * ITEM_BIT_NUM);
         oldNetworkStatusHistory = oldNetworkStatusHistory >> ITEM_BIT_NUM;
         count++;
     }

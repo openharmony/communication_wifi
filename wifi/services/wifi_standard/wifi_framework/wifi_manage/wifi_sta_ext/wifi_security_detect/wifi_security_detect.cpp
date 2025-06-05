@@ -326,12 +326,12 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
         bool result = SecurityDetectResult(model.devId, model.modelId, model.param);
         if (result == true) {
             config.isSecurityWifi = true;
-            WIFI_LOGI("PopupNotification open result %{public}d", result);
-            PopupNotification(WifiNotification::OPEN, info.networkId);
-        } else {
-            config.isSecurityWifi = false;
             WIFI_LOGI("PopupNotification close result %{public}d", result);
             PopupNotification(WifiNotification::CLOSE, info.networkId);
+        } else {
+            config.isSecurityWifi = false;
+            WIFI_LOGI("PopupNotification open result %{public}d", result);
+            PopupNotification(WifiNotification::OPEN, info.networkId);
         }
         WifiSettings::GetInstance().AddDeviceConfig(config);
         WifiSettings::GetInstance().SyncDeviceConfig();

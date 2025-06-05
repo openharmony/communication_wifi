@@ -327,6 +327,10 @@ void WifiControllerMachine::HandleAirplaneOpen()
 #endif
     if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() || !ShouldEnableWifi(INSTID_WLAN0)) {
         multiStaManagers.StopAllManagers();
+        if (IsDisableWifiProhibitedByEdm()) {
+            WIFI_LOGE("HandleAirplaneOpen:wifi is prohibited by EDM!");
+            return;
+        }
         concreteManagers.StopAllManagers();
     }
 }
@@ -977,6 +981,24 @@ void WifiControllerMachine::SelfcureResetWifi(int id)
 void WifiControllerMachine::IsLocalOnlyHotspot(bool isLohs)
 {
     isLocalOnlyHotspot_ = isLohs;
+}
+
+bool WifiControllerMachine::IsDisableWifiProhibitedByEdm(void)
+{
+    constexpr const char* wifiEdmForceOpenKey = "persist.edm.force_open_wifi";
+    constexpr const uint32_t paramTrueLen = 4;
+    constexpr const uint32_t paramFalseLen = 5;
+    constexpr const char* paramTrue = "true";
+    constexpr const char* paramFalse = "false";
+ 
+    char preValue[paramFalseLen] = {0};
+    int errCode = GetParamValue(wifiEdmForceOpenKey, paramFalse, preValue, paramFalseLen);
+    if (errCode > 0) {
+        if (strncmp(preValue, paramTrue, paramTrueLen) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace Wifi
 } // namespace OHOS

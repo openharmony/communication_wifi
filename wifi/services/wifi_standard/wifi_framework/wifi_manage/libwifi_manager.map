@@ -29,6 +29,7 @@
         "OHOS::Wifi::WifiConfigCenter::GetWifiStopState() const";
         "OHOS::Wifi::WifiConfigCenter::SetStaIfaceName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::WifiConfigCenter::GetStaIfaceName(int)";
+        "OHOS::Wifi::WifiConfigCenter::GetSystemMode()";
         "OHOS::Wifi::WifiConfigCenter::GetWifiState(int)";
         "OHOS::Wifi::WifiConfigCenter::SetWifiState(int, int)";
         "OHOS::Wifi::WifiConfigCenter::GetWifiDetailState(int)";

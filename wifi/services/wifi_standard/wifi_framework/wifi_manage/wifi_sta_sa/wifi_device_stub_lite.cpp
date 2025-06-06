@@ -201,6 +201,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig 
     (void)WriteInt32(reply, (int)config.uid);
     (void)WriteInt32(reply, (int)config.wifiWapiConfig.wapiPskType);
     (void)WriteBool(reply, config.isAllowAutoConnect);
+    (void)WriteBool(reply, config.isSecureWifi);
 }
 
 void WifiDeviceStub::OnEnableWifi(uint32_t code, IpcIo *req, IpcIo *reply)

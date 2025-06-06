@@ -587,6 +587,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteBool(config.isPortal);
     reply.WriteBool(config.noInternetAccess);
     reply.WriteBool(config.isAllowAutoConnect);
+    reply.WriteBool(config.isSecureWifi);
     return;
 }
 

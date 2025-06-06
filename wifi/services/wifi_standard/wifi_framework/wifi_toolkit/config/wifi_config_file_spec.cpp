@@ -68,6 +68,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isShared = true;
     item.lastTrySwitchWifiTimestamp = -1;
     item.isAllowAutoConnect = true;
+    item.isSecurityWifi = true;
     return;
 }
 
@@ -206,6 +207,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.isAllowAutoConnect = (CheckDataLegal(tmpValue) != 0);
     } else if (key == "lastUpdateTime") {
         item.lastUpdateTime = CheckDataLegal(tmpValue);
+    } else if (key == "isSecurityWifi") {
+        item.isSecurityWifi = (CheckDataLegal(tmpValue) != 0);
     } else {
         return -1;
     }
@@ -648,6 +651,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"isShared=" << item.isShared << std::endl;
     ss << "    " <<"lastTrySwitchWifiTimestamp=" << item.lastTrySwitchWifiTimestamp << std::endl;
     ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
+    ss << "    " <<"isSecurityWifi=" << item.isSecurityWifi << std::endl;
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else

@@ -52,6 +52,7 @@ declare_args() {
   wifi_feature_p2p_random_mac_addr = true
   wifi_feature_powermgr_support = false
   wifi_feature_with_sta_asset = true
+  wifi_feature_with_security_detect = true
   if (defined(global_parts_info) &&
       defined(global_parts_info.hdf_drivers_interface_wlan)) {
     wifi_feature_with_hdi_chip_supported = true

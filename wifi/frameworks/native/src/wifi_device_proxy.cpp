@@ -2567,6 +2567,7 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
     config.isPortal = reply.ReadBool();
     config.noInternetAccess = reply.ReadBool();
     config.isAllowAutoConnect = reply.ReadBool();
+    config.isSecureWifi = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)

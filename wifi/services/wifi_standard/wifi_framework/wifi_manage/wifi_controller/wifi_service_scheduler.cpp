@@ -541,29 +541,9 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
             return WIFI_OPT_FAILED;
         }
 #ifndef OHOS_ARCH_LITE
-        errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+        errCode = InitStaServiceExtral(pService, instId);
         if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
-            return WIFI_OPT_FAILED;
-        }
-
-        errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
-            return WIFI_OPT_FAILED;
-        }
-        errCode = pService->RegisterStaServiceCallback(WifiHistoryRecordManager::GetInstance().GetStaCallback());
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("WifiHistoryRecordManager register callback failed, ret=%{public}d", static_cast<int>(errCode));
-            return WIFI_OPT_FAILED;
-        }
-        errCode = pService->RegisterStaServiceCallback(WifiSecurityDetect::GetInstance().GetStaCallback());
-        WIFI_LOGI("WifiSecurityDetect register");
-        if (errCode != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("WifiSecurityDetect register sta service callback failed, ret=%{public}d!",
-                static_cast<int>(errCode));
+            WIFI_LOGE("InitStaServiceExtral Register callback failed!");
             return WIFI_OPT_FAILED;
         }
 #endif
@@ -577,6 +557,38 @@ ErrCode WifiServiceScheduler::InitStaService(IStaService *pService, int instId)
         }
 #endif
     }
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiServiceScheduler::InitStaServiceExtral(IStaService *pService, int instId)
+{
+#ifndef OHOS_ARCH_LITE
+    ErrCode errCode = pService->RegisterStaServiceCallback(
+        WifiManager::GetInstance().GetWifiStaManager()->GetStaCallback());
+    errCode = pService->RegisterStaServiceCallback(WifiCountryCodeManager::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("wifiCountryCodeManager register sta service callback failed, ret=%{public}d!",
+            static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+
+    errCode = pService->RegisterStaServiceCallback(AppNetworkSpeedLimitService::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AppNetworkSpeedLimitService register sta service callback failed, ret=%{public}d!",
+            static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+    errCode = pService->RegisterStaServiceCallback(WifiHistoryRecordManager::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("WifiHistoryRecordManager register callback failed, ret=%{public}d", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+    errCode = pService->RegisterStaServiceCallback(WifiSecurityDetect::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("WifiSecurityDetect register callback failed, ret=%{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+#endif
     return WIFI_OPT_SUCCESS;
 }
 

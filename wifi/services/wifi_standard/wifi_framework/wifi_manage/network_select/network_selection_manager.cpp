@@ -20,6 +20,7 @@
 #include "network_selection_utils.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
+#include "wifi_service_manager.h"
 
 namespace OHOS::Wifi {
 DEFINE_WIFILOG_LABEL("networkSelectionManager")
@@ -53,6 +54,15 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     GetAllDeviceConfigs(networkCandidates, scanInfos);
     bool isSavedNetEmpty = false;
     std::string savedResult = GetSavedNetInfoForChr(networkCandidates, isSavedNetEmpty);
+
+    /* Trigger the network selection policy in different scenarios */
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr && !isSavedNetEmpty) {
+        ErrCode ret = pEnhanceService->TriggerJudge();
+        WIFI_LOGI("%{public}s TriggerJudge ret %{public}d", __FUNCTION__, ret);
+    }
+#endif
 
     /* Traverse networkCandidates and reserve qualified networkCandidate */
     TryNominate(networkCandidates, networkSelector);

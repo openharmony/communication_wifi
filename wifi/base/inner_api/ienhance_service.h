@@ -328,6 +328,13 @@ public:
      * @return Errcode - operation result
      */
     virtual ErrCode RegisterSensorEnhanceCallback(SensorEnhanceCallback callback) = 0;
+
+    /**
+     * @Description Trigger Judge
+     *
+     * @return Errcode - operation result
+     */
+    virtual ErrCode TriggerJudge() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1402,6 +1402,13 @@ void StaStateMachine::ApLinkedState::HandleNetWorkConnectionEvent(InternalMessag
     pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+    if (!pStaStateMachine->CanArpReachable()) {
+        WIFI_LOGI("Arp not reachable, start to dhcp.");
+        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));
+        pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+    } else {
+        WIFI_LOGI("Arp reachable, stay in linked state.");
+    }
 }
 
 void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessagePtr msg)
@@ -1437,18 +1444,6 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
         return;
     }
 #endif
-    /* BSSID change is not received during roaming, only set BSSID */
-    if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid,
-        WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId)) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("SetBssid return fail.");
-    }
-    if (!pStaStateMachine->CanArpReachable()) {
-        WIFI_LOGI("Arp not reachable, start to dhcp.");
-        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));
-        pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
-    } else {
-        WIFI_LOGI("Arp reachable, stay in linked state.");
-    }
 }
 
 void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr msg)

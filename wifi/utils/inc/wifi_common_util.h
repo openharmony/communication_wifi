@@ -320,7 +320,7 @@ int FrequencyToChannel(int freq);
  */
 int ChannelToFrequency(int channel);
 bool IsOtherVapConnect();
-bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray);
+bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray);
 int HexString2Byte(const char *hex, uint8_t *buf, size_t len);
 void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t hexstrLen);
 bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);

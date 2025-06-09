@@ -146,7 +146,7 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
         mLastTcpRxCounter = tcpRxPkts;
         if (deltaTcpRxPkts == 0) {
             if (deltaTcpTxPkts < MIN_DELTA_TCP_TX) {
-                WIFI_LOGI("%{public}s deltaTcpRxPkts 0, deltaTcpTxPkts less 3, return last tx rx status %{public}d",
+                WIFI_LOGD("%{public}s deltaTcpRxPkts 0, deltaTcpTxPkts less 3, return last tx rx status %{public}d",
                     __FUNCTION__, lastTxRxGood_);
                 return lastTxRxGood_;
             }

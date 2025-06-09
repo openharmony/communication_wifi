@@ -1488,7 +1488,7 @@ void WifiConfigCenter::SetSystemMode(int systemMode)
 
 int WifiConfigCenter::GetSystemMode()
 {
-    LOGI("GetSystemMode %{public}d", systemMode_);
+    WIFI_LOGD("GetSystemMode %{public}d", systemMode_);
     return systemMode_;
 }
 

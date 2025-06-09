@@ -365,7 +365,7 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         }
         default:
-            WIFI_LOGI("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
+            WIFI_LOGD("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;

@@ -570,11 +570,6 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteString(config.wifiIpConfig.staticIpAddress.domains);
     WriteEapConfig(reply, config.wifiEapConfig);
     WriteWifiDeviceConfigProxyExtral(reply, config);
-    reply.WriteInt32((int)config.wifiProxyconfig.configureMethod);
-    reply.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
-    reply.WriteString(config.wifiProxyconfig.manualProxyConfig.serverHostName);
-    reply.WriteInt32(config.wifiProxyconfig.manualProxyConfig.serverPort);
-    reply.WriteString(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList);
     reply.WriteInt32((int)config.wifiPrivacySetting);
     reply.WriteInt32(config.uid);
     reply.WriteString(config.callProcessName);

@@ -1542,6 +1542,7 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
 
     WapiConfigToJs(env, vecDeviceConfigs[idx], result);
     SetValueBool(env, "isAutoConnectAllowed", vecDeviceConfigs[idx].isAllowAutoConnect, result);
+    SetValueBool(env, "isSecureWifi", vecDeviceConfigs[idx].isSecureWifi, result);
 
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {

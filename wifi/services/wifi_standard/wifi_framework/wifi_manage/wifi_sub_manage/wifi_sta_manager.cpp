@@ -243,7 +243,7 @@ static void HandleStaDisconnected(int instId)
 
 void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
 {
-    bool isBeaconLost = WifiChrUtils::GetInstance().BeaconLostReport(bssid, signalLevel, instId);
+    bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, instId);
     if (isBeaconLost) {
         WIFI_LOGI("Enter HandleBeaconLost");
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();

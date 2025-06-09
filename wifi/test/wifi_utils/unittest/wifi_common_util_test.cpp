@@ -234,7 +234,6 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest, TestSize.Level1)
     std::vector<WifiSignalPollInfo> wifiBeaconCheckInfoArray ={};
     bool result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_FALSE(result);
-    WIFI_LOGI("IsBeaconLostTest enter");
     bssidArray = {
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM",
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM"

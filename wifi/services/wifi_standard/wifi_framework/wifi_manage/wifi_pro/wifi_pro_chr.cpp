@@ -24,13 +24,13 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiProChr");
 const int64_t ONE_DAY_TIME = 24 * 60 * 60 * 1000;
-const int32_t TIME_LEVEL1_CNT = 3000;
-const int32_t TIME_LEVEL2_CNT = 5000;
-const int32_t TIME_START_TO_CONNECT_LEVEL1_CNT = 1000;
-const int32_t TIME_START_TO_CONNECT_LEVEL2_CNT = 1500;
-const int32_t TIME_CONNECT_TO_SUCC_LEVEL1_CNT = 2000;
-const int32_t TIME_CONNECT_TO_SUCC_LEVEL2_CNT = 3500;
-const int32_t USE_1000 = 1000;
+const int64_t TIME_LEVEL1_CNT = 3000;
+const int64_t TIME_LEVEL2_CNT = 5000;
+const int64_t TIME_START_TO_CONNECT_LEVEL1_CNT = 1000;
+const int64_t TIME_START_TO_CONNECT_LEVEL2_CNT = 1500;
+const int64_t TIME_CONNECT_TO_SUCC_LEVEL1_CNT = 2000;
+const int64_t TIME_CONNECT_TO_SUCC_LEVEL2_CNT = 3500;
+const int64_t USE_1000 = 1000;
 
 template<typename... Types>
 static void WriteEvent(const std::string& eventType, Types... args)

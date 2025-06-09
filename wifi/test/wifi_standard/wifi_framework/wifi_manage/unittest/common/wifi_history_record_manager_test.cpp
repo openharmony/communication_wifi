@@ -910,7 +910,7 @@ HWTEST_F(WifiHistoryRecordManagerTest, HandleOldHistoryRecordTest, TestSize.Leve
     WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
 
     // Preset 505 hotspot information
-    EXPECT_FALSE(wifiDataBaseUtils_, nullptr);
+    EXPECT_FALSE(wifiDataBaseUtils_ == nullptr);
     int64_t firstConnectedTimeTest = 1736225372;
     int64_t currentConnectedTimeTest = 1736225374;
     int ap_num = 505;

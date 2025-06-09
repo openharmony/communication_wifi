@@ -102,6 +102,7 @@ void WifiDeviceProxy::InitWifiState()
     }
 
     bool bActive = reply.ReadBool();
+    WIFI_LOGI("%{public}s bActive=%{public}d", __func__, bActive);
     g_deviceCallBackStub->SetWifiState(bActive);
     return;
 }
@@ -1249,6 +1250,7 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
     }
     if (g_deviceCallBackStub->GetWifiState() != DEFAULT_VALUES) {
         bActive = g_deviceCallBackStub->GetWifiState();
+        WIFI_LOGI("%{public}s bActive=%{public}d", __func__, bActive);
         return WIFI_OPT_SUCCESS;
     }
     MessageOption option;

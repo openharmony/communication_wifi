@@ -569,6 +569,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
     reply.WriteString(config.wifiIpConfig.staticIpAddress.domains);
     WriteEapConfig(reply, config.wifiEapConfig);
+    WriteWifiDeviceConfigProxyExtral(reply, config);
     reply.WriteInt32((int)config.wifiProxyconfig.configureMethod);
     reply.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
     reply.WriteString(config.wifiProxyconfig.manualProxyConfig.serverHostName);
@@ -589,6 +590,15 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteBool(config.isAllowAutoConnect);
     reply.WriteBool(config.isSecureWifi);
     return;
+}
+
+void WifiDeviceStub::WriteWifiDeviceConfigProxyExtral(MessageParcel &reply, const WifiDeviceConfig &config)
+{
+    reply.WriteInt32((int)config.wifiProxyconfig.configureMethod);
+    reply.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
+    reply.WriteString(config.wifiProxyconfig.manualProxyConfig.serverHostName);
+    reply.WriteInt32(config.wifiProxyconfig.manualProxyConfig.serverPort);
+    reply.WriteString(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList);
 }
 
 void WifiDeviceStub::WriteIpAddress(MessageParcel &reply, const WifiIpAddress &address)

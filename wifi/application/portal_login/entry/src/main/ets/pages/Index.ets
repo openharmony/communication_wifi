@@ -397,8 +397,8 @@ struct Index {
       "http://connectivitycheck.platform.hicloud.com/generate_204",
       {
         method: http.RequestMethod.HEAD,
-        connectTimeout: 200,
-        readTimeout: 200
+        connectTimeout: 100,
+        readTimeout: 100
       }, (err: BusinessError, data: http.HttpResponse) => {
       if (!err) {
         hilog.info(DOMAIN, TAG, '%{public}s', 'Success httpRequest request. Result:' + JSON.stringify(data.result) +

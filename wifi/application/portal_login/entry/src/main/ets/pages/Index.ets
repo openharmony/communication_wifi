@@ -7,7 +7,7 @@ import { SymbolGlyphModifier } from '@kit.ArkUI'
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet
 } from '../common/utils'
-import { connection } from '@kit.NetworkKit';
+import { connection, http } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x01560;
@@ -62,6 +62,7 @@ class OnSafeBrowsingCheckResultCallback {
 @Component
 struct Index {
   private webviewController: webview.WebviewController = new webview.WebviewController();
+  private httpRequest: http.HttpRequest = http.createHttp();
   private context = getContext(this) as common.UIAbilityContext;
   @State private webUrl: string = getUrl();
   private harmonyUA: string = UserAgentSet.harmonyUA;
@@ -392,11 +393,24 @@ struct Index {
   }
 
   aboutToDisappear(): void {
+    this.httpRequest.request(
+      "http://connectivitycheck.platform.hicloud.com/generate_204",
+      {
+        method: http.RequestMethod.HEAD,
+        connectTimeout: 200,
+        readTimeout: 200
+      }, (err: BusinessError, data: http.HttpResponse) => {
+      if (!err) {
+        hilog.info(DOMAIN, TAG, '%{public}s', 'Success httpRequest request. Result:' + JSON.stringify(data.result) +
+          'code:' + JSON.stringify(data.responseCode));
+      } else {
+        hilog.error(DOMAIN, TAG, '%{public}s', 'Failed httpRequest request. Error:' + JSON.stringify(err));
+      }
+    })
     this.netConnect.unregister((err: BusinessError) => {
       hilog.error(
         DOMAIN, TAG, '%{public}s', 'Failed to unregister netconnect.' + JSON.stringify(err));
       });
     emitter.off('WANT_UPDATE');
-    this.webviewController.loadUrl('http://connectivitycheck.platform.hicloud.com/generate_204');
   }
 }

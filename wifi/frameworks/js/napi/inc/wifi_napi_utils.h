@@ -88,6 +88,7 @@ public:
         deferred = d;
         executeFunc = nullptr;
         completeFunc = nullptr;
+        resourceName = nullptr;
         result = nullptr;
         sysCap = 0;
         errorCode = ERR_CODE_SUCCESS;

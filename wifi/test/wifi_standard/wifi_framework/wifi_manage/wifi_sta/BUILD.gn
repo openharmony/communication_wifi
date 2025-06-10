@@ -307,6 +307,7 @@ ohos_unittest("wifi_selfcure_unittest") {
     "self_cure_interface_test.cpp",
     "self_cure_service_test.cpp",
     "self_cure_state_machine_test.cpp",
+    "self_cure_utils_test.cpp",
   ]
 
   include_dirs = local_base_include_dirs

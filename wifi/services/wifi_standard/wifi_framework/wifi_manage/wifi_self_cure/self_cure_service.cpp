@@ -97,10 +97,10 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         lastWifiLinkedInfo = info;
     } else if (state == OperateResState::CONNECT_NETWORK_DISABLED) {
         pSelfCureStateMachine->SetHttpMonitorStatus(false);
-        if (lastNetworkState_ != state) {
-            lastNetworkState_ = state;
-            pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_IP_CONFLICT_DETECT);
+        if (lastNetworkState_ != state && IsWifiSelfcureDone()) {
+            SelfCureUtils::GetInstance().ReportNoInternetChrEvent();
         }
+        lastNetworkState_ = state;
     } else if (state == OperateResState::CONNECT_NETWORK_ENABLED || state == OperateResState::CONNECT_CHECK_PORTAL) {
         pSelfCureStateMachine->SetHttpMonitorStatus(true);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_HTTP_REACHABLE_RCV, info);

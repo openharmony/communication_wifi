@@ -890,5 +890,24 @@ bool InternalHiLinkNetworkToBool(int isHiLinkNetwork)
 {
     return (isHiLinkNetwork > 0 && isHiLinkNetwork <= INTERNAL_HILINK_MAX_VALUE) ? true : false;
 }
+
+std::string Ipv4IntAnonymize(uint32_t ipInt)
+{
+    // convert uint32_t to string
+    std::string address;
+    if (ipInt == 0) {
+        return address;
+    }
+    std::ostringstream stream;
+    stream << ((ipInt >> BITS_24) & 0xFF) << "." << ((ipInt >> BITS_16) & 0xFF) << "."
+    << ((ipInt >> BITS_8) & 0xFF) << "." << (ipInt & 0xFF);
+    address = stream.str();
+    return IpAnonymize(address);
+}
+
+std::string Ipv6Anonymize(std::string str)
+{
+    return DataAnonymize(str, ':', '*', 1);
+}
 }  // namespace Wifi
 }  // namespace OHOS

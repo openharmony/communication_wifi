@@ -77,6 +77,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define NETWORK 1
 #define NO_NETWORK 0
 #define DISCONNECTED_NETWORK 2
+#define CONNECTED_NETWORK 3
 #define WPA_DEFAULT_NETWORKID 0
 #define SELF_CURE_FAC_MAC_REASSOC 2
 #define SELF_CURE_RAND_MAC_REASSOC 3
@@ -2138,18 +2139,15 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         HandleNetCheckResultIsPortal(netState, updatePortalAuthTime);
+        if (!mIsWifiInternetCHRFlag) {
+            WriteWifiAccessIntFailedHiSysEvent(1, NetworkFailReason::DNS_STATE_UNREACHABLE, 1, "");
+            mIsWifiInternetCHRFlag = true;
+        }
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
 #ifndef OHOS_ARCH_LITE
         SyncDeviceEverConnectedState(false);
 #endif
-        if (!mIsWifiInternetCHRFlag &&
-            (portalState == PortalState::UNCHECKED || portalState == PortalState::NOT_PORTAL)) {
-            const int httpOpt = 1;
-            int selfCureResetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
-            WriteWifiAccessIntFailedHiSysEvent(httpOpt, NetworkFailReason::DNS_STATE_UNREACHABLE, selfCureResetState);
-            mIsWifiInternetCHRFlag = true;
-        }
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
@@ -3130,6 +3128,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
                 pStaStateMachine->linkedInfo.isDataRestricted, pStaStateMachine->linkedInfo.platformType.c_str());
             WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo,
                 pStaStateMachine->m_instId);
+            WriteDhcpInfoHiSysEvent(ipInfo, ipv6Info);
 #ifndef OHOS_ARCH_LITE
             WIFI_LOGI("TryToSaveIpV4Result Update NetLink info, strYourCli=%{private}s, strSubnet=%{private}s, \
                 strRouter1=%{private}s, strDns1=%{private}s, strDns2=%{private}s",
@@ -3187,6 +3186,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         pStaStateMachine->m_instId);
     WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
         pStaStateMachine->m_instId);
+    WriteDhcpInfoHiSysEvent(ipInfo, ipv6Info);
 #endif
 }
 
@@ -3215,6 +3215,7 @@ void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
     WIFI_LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d, isRoam=%{public}d",
         pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
     DhcpResultNotifyEvent(DhcpReturnCode::DHCP_JUMP);
+    WriteIsInternetHiSysEvent(CONNECTED_NETWORK);
     if (pStaStateMachine->getIpSucNum == 0) {
         pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
         pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);

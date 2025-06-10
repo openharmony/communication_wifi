@@ -36,7 +36,7 @@ sptr<WifiHotspotMgrServiceImpl> WifiHotspotMgrServiceImpl::GetInstance()
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
-            sptr<WifiHotspotMgrServiceImpl> service = new (std::nothrow) WifiHotspotMgrServiceImpl;
+            sptr<WifiHotspotMgrServiceImpl> service = new WifiHotspotMgrServiceImpl;
             g_instance = service;
         }
     }

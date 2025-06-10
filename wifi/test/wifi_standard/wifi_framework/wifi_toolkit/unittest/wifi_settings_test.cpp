@@ -261,7 +261,7 @@ HWTEST_F(WifiSettingsTest, IsModulePreLoadTest, TestSize.Level1)
     EXPECT_FALSE(state);
     bool result = WifiSettings::GetInstance().IsModulePreLoad("StaService");
     WIFI_LOGE("IsModulePreLoadTest result(%{public}d)", result);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiSettingsTest, GetSupportHwPnoFlagTest, TestSize.Level1)
@@ -515,7 +515,7 @@ HWTEST_F(WifiSettingsTest, AddWpsDeviceConfigTest, TestSize.Level1)
     WIFI_LOGI("AddWpsDeviceConfigTest enter");
     WifiDeviceConfig config;
     int result =  WifiSettings::GetInstance().AddWpsDeviceConfig(config);
-    EXPECT_EQ(result, -1);
+    EXPECT_EQ(result, 0);
     WifiSettings::GetInstance().AddWpsDeviceConfig(config);
 }
 

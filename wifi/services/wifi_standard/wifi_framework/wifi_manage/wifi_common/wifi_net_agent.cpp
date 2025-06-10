@@ -237,11 +237,7 @@ void WifiNetAgent::OnStaMachineUpdateNetLinkInfo(IpInfo wifiIpInfo, IpV6Info wif
     WifiProxyConfig wifiProxyConfig, int instId)
 {
     if (netAgentEventHandler_) {
-#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
         netAgentEventHandler_->PostSyncTask(
-#else
-        netAgentEventHandler_->PostAsyncTask(
-#endif
             [this, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId]() mutable {
                 this->UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
             });
@@ -252,11 +248,7 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
     int instId)
 {
     if (netAgentEventHandler_) {
-#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
         netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo, m_instId = instId]() {
-#else
-        netAgentEventHandler_->PostAsyncTask([this, netInfo = netSupplierInfo, m_instId = instId]() {
-#endif
            this->UpdateNetSupplierInfo(netInfo, m_instId);
         });
     }
@@ -265,11 +257,7 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 void WifiNetAgent::OnStaMachineWifiStart(int instId)
 {
     if (netAgentEventHandler_) {
-#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
         netAgentEventHandler_->PostSyncTask([this, m_instId = instId]() {
-#else
-        netAgentEventHandler_->PostAsyncTask([this, m_instId = instId]() {
-#endif
             this->RegisterNetSupplier(m_instId);
             this->RegisterNetSupplierCallback(m_instId);
             this->RegisterNetConnObserver(m_instId);
@@ -284,11 +272,7 @@ void WifiNetAgent::OnStaMachineNetManagerRestart(const sptr<NetManagerStandard::
         WIFI_LOGE("%{public}s netAgentEventHandler_ is null", __func__);
         return;
     }
-#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
     netAgentEventHandler_->PostSyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
-#else
-    netAgentEventHandler_->PostAsyncTask([this, supplierInfo = netSupplierInfo, m_instId = instId]() {
-#endif
         this->RegisterNetSupplier(m_instId);
         this->RegisterNetSupplierCallback(m_instId);
         this->RegisterNetConnObserver(m_instId);

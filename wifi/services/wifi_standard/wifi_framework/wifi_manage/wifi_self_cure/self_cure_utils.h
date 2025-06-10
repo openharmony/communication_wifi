@@ -51,6 +51,9 @@ public:
     int SetSelfCureFailInfo(OHOS::Wifi::WifiSelfCureHistoryInfo &info, std::vector<std::string>& histories, int cnt);
     int SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string>& histories, int cnt);
     bool IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& deviceKeymgmt);
+    bool IsIpConflictDetect();
+    std::string GetSelfCureHistory();
+    void ReportNoInternetChrEvent();
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:

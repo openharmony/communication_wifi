@@ -343,6 +343,10 @@ double StringToDouble(const std::string &word);
  * @return bool - isHiLinkNetwork
  */
 bool InternalHiLinkNetworkToBool(int isHiLinkNetwork);
+
+std::string Ipv4IntAnonymize(uint32_t ipInt);
+
+std::string Ipv6Anonymize(std::string str);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

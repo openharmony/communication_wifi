@@ -42,7 +42,7 @@ StaInterface::~StaInterface()
 
 extern "C" IStaService *Create(int instId = 0)
 {
-    return new (std::nothrow)StaInterface(instId);
+    return new StaInterface(instId);
 }
 
 extern "C" void Destroy(IStaService *pservice)

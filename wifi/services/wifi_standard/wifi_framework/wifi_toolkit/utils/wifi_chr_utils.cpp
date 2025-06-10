@@ -60,9 +60,9 @@ void WifiChrUtils::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiS
     }
 }
 
-void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
+bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
 {
-    if (signalLevel < 0) return;
+    if (signalLevel < 0) return false;
     std::vector<WifiSignalPollInfo> wifiCheckInfoArray = signalPollInfoArray;
     std::sort(wifiCheckInfoArray.begin(), wifiCheckInfoArray.end(),
         [](const WifiSignalPollInfo& a, const WifiSignalPollInfo& b) {return a.timeStamp > b.timeStamp;});
@@ -72,7 +72,7 @@ void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t sign
         std::lock_guard<std::mutex> arrayLock(bssidMutex_);
         if (bssidArray_.size() >= SIGNALARR_LENGTH) bssidArray_.pop_back();
         bssidArray_.insert(bssidArray_.begin(), bssid);
-        beaconLost = isBeaconLost(bssidArray_, wifiCheckInfoArray);
+        beaconLost = OHOS::Wifi::IsBeaconLost(bssidArray_, wifiCheckInfoArray);
     }
 
     if (beaconLost) {
@@ -85,6 +85,7 @@ void WifiChrUtils::BeaconLostReport(const std::string &bssid, const int32_t sign
             WriteWifiBeaconLostHiSysEvent(errorCode);
         }
     }
+    return beaconLost;
 }
 }  // namespace Wifi
 }  // namespace OHOS

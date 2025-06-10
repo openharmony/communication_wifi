@@ -308,6 +308,13 @@ public:
     virtual void OnWifiLinkTypeChanged(const WifiLinkType &wifiLinkType) = 0;
 
     /**
+     * @Description handle beacon lost
+     *
+     * @return void
+     */
+    virtual void HandleBeaconLost() = 0;
+
+    /**
      * @Description get limit switching network scenes
      *
      * @return 0: not limit, 1:dual band roam

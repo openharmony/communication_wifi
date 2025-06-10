@@ -441,5 +441,11 @@ HWTEST_F(WifiConfigCenterTest, SetScreenDispalyStateTest, TestSize.Level1)
     EXPECT_EQ(WifiConfigCenter::GetInstance().IsScreenLandscape(), true);
 }
 #endif
+
+HWTEST_F(WifiConfigCenterTest, IsAllowPcPopUpTest, TestSize.Level1)
+{
+    WifiConfigCenter::GetInstance().SetDeviceType(ProductDeviceType::PC);
+    EXPECT_EQ(WifiConfigCenter::GetInstance().IsAllowPcPopUp(), false);
+}
 }  // namespace Wifi
 }  // namespace OHOS

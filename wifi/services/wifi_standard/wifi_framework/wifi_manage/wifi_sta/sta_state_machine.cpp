@@ -2295,7 +2295,8 @@ void StaStateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig 
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
 {
     if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE
-        || !WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+        || !WifiConfigCenter::GetInstance().IsAllowPopUp()
+        || !WifiConfigCenter::GetInstance().IsAllowPcPopUp()) {
         WIFI_LOGI("factory version or device type no need to pop up diag");
         return;
     }

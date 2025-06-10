@@ -438,7 +438,7 @@ bool IsFactoryMode();
 /**
  * @Description get device type
  *
- * @return int - DEFAULT -1, PHONE 0, TABLET 1, WEARABLE 2
+ * @return int - DEFAULT -1, PHONE 0, TABLET 1, WEARABLE 2, TV 3, PC 4
  */
 int GetDeviceType();
 

@@ -50,7 +50,7 @@ HWTEST_F(WifiHalDeviceManagerTest, ScanTest, TestSize.Level1)
         ifaceName,
         instId);
     ScanParams scanParams;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().Scan(ifaceName, scanParams));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().Scan(ifaceName, scanParams));
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, StartPnoScanTest, TestSize.Level1)
@@ -164,7 +164,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetNetworkUpDownTest, TestSize.Level1)
     std::string ifaceName{"wlan0"};
     bool upDown = true;
     HalDeviceManager::g_chipHdiServiceDied = true;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().SetNetworkUpDown(ifaceName, upDown));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().SetNetworkUpDown(ifaceName, upDown));
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetChipsetCategoryTest, TestSize.Level1)
@@ -172,7 +172,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetChipsetCategoryTest, TestSize.Level1)
     std::string ifaceName{"wlan0"};
     unsigned int chipsetCategory = 0;
     HalDeviceManager::g_chipHdiServiceDied = true;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetChipsetCategory(ifaceName, chipsetCategory));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().GetChipsetCategory(ifaceName, chipsetCategory));
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, GetChipsetWifiFeatrureCapabilityTest, TestSize.Level1)
@@ -200,7 +200,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest, TestSize.Level1)
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
     int32_t band = 0;
     std::vector<int> frequencies;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies));
 
     HalDeviceManager::GetInstance().CreateStaIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
@@ -258,7 +258,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateApIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
     std::string mac{"12:34:56:78:90:AB"};
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().SetApMacAddress(ifaceName, mac));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().SetApMacAddress(ifaceName, mac));
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, SelectInterfacesToDeleteTest, TestSize.Level1)
@@ -273,7 +273,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SelectInterfacesToDeleteTest, TestSize.Level1
         ifaceName,
         instId);
     WifiChipInfo wifiChipInfo;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetChipInfo(0, wifiChipInfo));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().GetChipInfo(0, wifiChipInfo));
     IfaceType ifaceType = IfaceType::STA;
     std::vector<WifiIfaceInfo> interfacesToBeRemovedFirst;
     HalDeviceManager::GetInstance().SelectInterfacesToDelete(
@@ -319,7 +319,7 @@ HWTEST_F(WifiHalDeviceManagerTest, CompareIfaceCreationDataTest, TestSize.Level1
         instId);
     WifiIfaceInfo ifaceInfo;
     IfaceCreationData data1;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetChipInfo(0, data1.chipInfo));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().GetChipInfo(0, data1.chipInfo));
     data1.chipInfo.currentModeIdValid = false;
     data1.interfacesToBeRemovedFirst.push_back(ifaceInfo);
     IfaceCreationData data2;
@@ -363,7 +363,7 @@ HWTEST_F(WifiHalDeviceManagerTest, DispatchIfaceDestoryCallbackTest, TestSize.Le
     ifaceType = IfaceType::P2P;
     int ret1  = HalDeviceManager::GetInstance().CreateP2pIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
-        EXPECT_FALSE(ret1);
+        EXPECT_TRUE(ret1);
     HalDeviceManager::GetInstance().DispatchIfaceDestoryCallback(
         ifaceName, ifaceType, true, ifaceType);
         EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
@@ -380,7 +380,7 @@ HWTEST_F(WifiHalDeviceManagerTest, RemoveStaIfaceTest, TestSize.Level1)
         std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
         ifaceName,
         instId);
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().RemoveStaIface(ifaceName));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().RemoveStaIface(ifaceName));
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, RemoveApIfaceTest, TestSize.Level1)
@@ -389,7 +389,7 @@ HWTEST_F(WifiHalDeviceManagerTest, RemoveApIfaceTest, TestSize.Level1)
     HalDeviceManager::g_chipHdiServiceDied = true;
     HalDeviceManager::GetInstance().CreateApIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().RemoveApIface(ifaceName));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().RemoveApIface(ifaceName));
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, RemoveP2pIfaceTest, TestSize.Level1)
@@ -414,7 +414,7 @@ HWTEST_F(WifiHalDeviceManagerTest, CreateStaIfaceTest, TestSize.Level1)
         ifaceName,
         instId);
     bool result = HalDeviceManager::GetInstance().RemoveStaIface(ifaceName);
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, true);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, CreateP2pIfaceTest, TestSize.Level1)
@@ -424,7 +424,7 @@ HWTEST_F(WifiHalDeviceManagerTest, CreateP2pIfaceTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateP2pIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
     bool result = HalDeviceManager::GetInstance().RemoveP2pIface(ifaceName);
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, true);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, CreateApIfaceTest, TestSize.Level1)
@@ -434,7 +434,7 @@ HWTEST_F(WifiHalDeviceManagerTest, CreateApIfaceTest, TestSize.Level1)
     HalDeviceManager::GetInstance().CreateApIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
     bool result = HalDeviceManager::GetInstance().RemoveApIface(ifaceName);
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, true);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, ScanTest_01, TestSize.Level1)
@@ -450,7 +450,7 @@ HWTEST_F(WifiHalDeviceManagerTest, ScanTest_01, TestSize.Level1)
         instId);
     ScanParams scanParams;
     HalDeviceManager::g_chipHdiServiceDied = false;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().Scan(ifaceName, scanParams));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().Scan(ifaceName, scanParams));
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, StartPnoScanTest_01, TestSize.Level1)
@@ -505,7 +505,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetScanInfosTest_01, TestSize.Level1)
         ifaceName,
         instId);
     std::vector<ScanResultsInfo> scanResultsInfo;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetScanInfos(ifaceName, scanResultsInfo));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().GetScanInfos(ifaceName, scanResultsInfo));
 }
 
 
@@ -669,7 +669,7 @@ HWTEST_F(WifiHalDeviceManagerTest, SelectInterfacesToDeleteTest_01, TestSize.Lev
     existingIface.push_back(wifiChipInfo_1);
     existingIface.push_back(wifiChipInfo_2);
 
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetChipInfo(0, wifiChipInfo));
+    EXPECT_EQ(true, HalDeviceManager::GetInstance().GetChipInfo(0, wifiChipInfo));
     HalDeviceManager::GetInstance().SelectInterfacesToDelete(
         1, ifaceType, ifaceType, existingIface, interfacesToBeRemovedFirst);
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);

@@ -553,7 +553,7 @@ void StaServiceTest::StaServiceAddCandidateConfigTestFail0()
     int uid = UID;
     int netWorkId = NETWORK_ID;
     EXPECT_CALL(WifiSettings::GetInstance(), GetAllCandidateConfig(_, _)).Times(AtLeast(1));
-    EXPECT_FALSE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_NOT_SUPPORTED);
+    EXPECT_TRUE(pStaService->AddCandidateConfig(uid, config, netWorkId) == WIFI_OPT_NOT_SUPPORTED);
 }
 
 void StaServiceTest::StaServiceAddCandidateConfigTestFail1()

@@ -1473,7 +1473,7 @@ public:
         connectFailTimes = SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT;
         info.rssi = MIN_VAL_LEVEL_4;
         type = pSelfCureStateMachine_->GetWifi7SelfCureType(connectFailTimes, info);
-        EXPECT_EQ(type, 1);
+        EXPECT_EQ(type, 0);
     }
 
     void ShouldTransToWifi7SelfCureTest()

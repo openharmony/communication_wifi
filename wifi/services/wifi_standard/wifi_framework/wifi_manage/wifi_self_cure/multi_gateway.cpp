@@ -80,6 +80,11 @@ bool MultiGateway::IsMultiGateway()
     return m_gwMacLists.size() >= MULTI_GATEWAY_NUM;
 }
 
+int32_t MultiGateway::GetGatewayNum()
+{
+    return m_gwMacLists.size();
+}
+
 std::string MultiGateway::GetGatewayIp()
 {
     return m_gwIpAddr;

@@ -2294,6 +2294,10 @@ void StaStateMachine::ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig 
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
 {
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    WIFI_LOGI("PC no need to pop up diag");
+    return;
+#endif
     if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE
         || !WifiConfigCenter::GetInstance().IsAllowPopUp()) {
         WIFI_LOGI("factory version or device type no need to pop up diag");

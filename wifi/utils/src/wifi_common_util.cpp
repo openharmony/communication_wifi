@@ -505,7 +505,7 @@ bool IsOtherVapConnect()
     return p2pOrHmlConnected && hotspotEnable;
 }
 
-bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray)
+bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray)
 {
     if (wifiBeaconCheckInfoArray.empty() || bssidArray.empty()) {
         WIFI_LOGE("Empty array");

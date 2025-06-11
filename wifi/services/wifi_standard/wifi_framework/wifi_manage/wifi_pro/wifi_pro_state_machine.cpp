@@ -1101,19 +1101,16 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
 #ifndef OHOS_ARCH_LITE
     if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2) {
         WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape.");
+        bool switchInfoRequest = pWifiProStateMachine_->IsInAppWhiteList();
+        if (switchInfoRequest == true) {
+            WIFI_LOGI("Wifi2Wifi is blocked by foreground whitelist.");
+            pWifiProStateMachine_->Wifi2WifiFinish();
+            return;
+    }
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }
 #endif
-
-    bool switchInfoRequest = pWifiProStateMachine_->IsInAppWhiteList();
-    if (switchInfoRequest == true) {
-        WIFI_LOGI("Wifi2Wifi is blocked by foreground whitelist.");
-        pWifiProStateMachine_->Wifi2WifiFinish();
-        return;
-    } else {
-        WIFI_LOGI("Wifi2Wifi is blocked by foreground whitelist nonono.");
-    }
  
     WIFI_LOGI("wifi to wifi step 3: try wifi2wifi.");
     if (!pWifiProStateMachine_->TryWifi2Wifi(pWifiProStateMachine_->networkSelectionResult_)) {

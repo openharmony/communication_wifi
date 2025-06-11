@@ -1824,11 +1824,13 @@ void WifiSettings::InitPackageInfoConfig()
     std::map<std::string, std::vector<PackageInfo>> variableMap;
     std::vector<PackageInfo> permissionTrustList;
     std::vector<PackageInfo> scanLimitPackage;
+    std::vector<PackageInfo> switchLimitPackage;
     xmlParser->GetScanControlPackages(scanControlPackageMap);
     xmlParser->GetCandidateFilterPackages(candidateList);
     xmlParser->GetCorePackages(variableMap);
     xmlParser->GetAclAuthPackages(permissionTrustList);
     xmlParser->GetScanLimitPackages(scanLimitPackage);
+    xmlParser->GetSwitchLimitPackages(switchLimitPackage);
     
     std::unique_lock<std::mutex> lock(mPackageConfMutex);
     mPackageInfoMap.insert(scanControlPackageMap.begin(), scanControlPackageMap.end());
@@ -1836,6 +1838,7 @@ void WifiSettings::InitPackageInfoConfig()
     mPackageInfoMap.insert(variableMap.begin(), variableMap.end());
     mPackageInfoMap.insert_or_assign("AclAuthPackages", permissionTrustList);
     mPackageInfoMap.insert_or_assign("ScanLimitPackages", scanLimitPackage);
+    mPackageInfoMap.insert_or_assign("SwitchLimitPackages", switchLimitPackage);
 #endif
 }
 

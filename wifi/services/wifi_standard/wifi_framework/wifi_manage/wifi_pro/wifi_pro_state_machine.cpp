@@ -38,6 +38,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 const std::string WIFI_PRO_STATE_MACHINE = "WifiProStateMachine";
+const int USE_SIZE_50 = 50;
 constexpr int32_t DEFAULT_RSSI = -200;
 constexpr int32_t DEFAULT_SCAN_INTERVAL = 10 * 1000; // ms
 constexpr int64_t BLOCKLIST_VALID_TIME = 120 * 1000;  // ms
@@ -503,6 +504,26 @@ void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
         HandleWifi2WifiSucsess(BLOCKLIST_VALID_TIME);
     }
     Wifi2WifiFinish();
+}
+ 
+bool WifiProStateMachine::IsInAppWhiteList()
+{
+    WIFI_LOGI("IsInAppWhiteList enter");
+#ifndef OHOS_ARCH_LITE
+    std::vector<PackageInfo> specialList;
+    if (WifiSettings::GetInstance().GetPackageInfoByName("SwitchLimitPackages", specialList) != 0) {
+        WIFI_LOGI("ProcessSwitchInfoRequest GetPackageInfoByName failed");
+        return false;
+    }
+ 
+    for (size_t i = 0; i < specialList.size() && i < USE_SIZE_50; ++i) {
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(specialList[i].name)) {
+            WIFI_LOGI("App %{public}s is in white list and foreground", specialList[i].name.c_str());
+            return true;
+        }
+    }
+#endif
+    return false;
 }
 /* --------------------------- state machine default state ------------------------------ */
 WifiProStateMachine::DefaultState::DefaultState(WifiProStateMachine *pWifiProStateMachine)
@@ -1084,6 +1105,16 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
         return;
     }
 #endif
+
+    bool switchInfoRequest = pWifiProStateMachine_->IsInAppWhiteList();
+    if (switchInfoRequest == true) {
+        WIFI_LOGI("Wifi2Wifi is blocked by foreground whitelist.");
+        pWifiProStateMachine_->Wifi2WifiFinish();
+        return;
+    } else {
+        WIFI_LOGI("Wifi2Wifi is blocked by foreground whitelist nonono.");
+    }
+ 
     WIFI_LOGI("wifi to wifi step 3: try wifi2wifi.");
     if (!pWifiProStateMachine_->TryWifi2Wifi(pWifiProStateMachine_->networkSelectionResult_)) {
         WIFI_LOGI("wifi to wifi step X: TryWifi2Wifi Failed.");

@@ -88,6 +88,8 @@ public:
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiDeviceCallBack");
+
+    std::string name = "default";
 #endif
 };
 }  // namespace Wifi

@@ -19,8 +19,10 @@
 #ifndef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
 #include "core_service_client.h"
 #include "cellular_data_client.h"
+#endif //TELEPHONE_CORE_SERVICE_ENABLE
 #include "wifi_notification_util.h"
 #include "wifi_history_record_manager.h"
 #endif
@@ -326,6 +328,7 @@ std::string StaService::ConvertString(const std::u16string &wideText) const
 #ifndef OHOS_ARCH_LITE
 int32_t StaService::GetDataSlotId(int32_t slotId) const
 {
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
     if (slotId >= 0 && slotId < simCount) {
         LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
@@ -338,10 +341,15 @@ int32_t StaService::GetDataSlotId(int32_t slotId) const
     }
     LOGI("slotDefaultID: %{public}d, simCount:%{public}d", slotDefaultID, simCount);
     return slotDefaultID;
+#else
+    LOGW("telephony subsystem is disabled, query slotId is not supported");
+    return -1;
+#endif
 }
 
 std::string StaService::GetImsi(int32_t slotId) const
 {
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     std::u16string imsi;
     int32_t errCode = CoreServiceClient::GetInstance().GetIMSI(slotId, imsi);
     if (errCode != 0) {
@@ -349,10 +357,15 @@ std::string StaService::GetImsi(int32_t slotId) const
         return "";
     }
     return ConvertString(imsi);
+#else
+    LOGW("telephony subsystem is disabled, query imsi is not supported");
+    return "";
+#endif
 }
 
 std::string StaService::GetPlmn(int32_t slotId) const
 {
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     std::u16string plmn;
     int32_t errCode = CoreServiceClient::GetInstance().GetSimOperatorNumeric(slotId, plmn);
     if (errCode != 0) {
@@ -360,6 +373,10 @@ std::string StaService::GetPlmn(int32_t slotId) const
         return "";
     }
     return ConvertString(plmn);
+#else
+    LOGW("telephony subsystem is disabled, query plmn is not supported");
+    return "";
+#endif
 }
 #endif
 
@@ -388,8 +405,12 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
     } else {
         return;
     }
-
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     int32_t slotId = CoreServiceClient::GetInstance().GetSlotId(config.wifiEapConfig.eapSubId);
+#else
+    int32_t slotId = -1;
+    LOGW("telephony subsystem is disabled, slot Id is not supported");
+#endif
     if (slotId == -1) {
         return;
     }

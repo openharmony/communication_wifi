@@ -574,7 +574,8 @@ bool WifiScanServiceImpl::IsInScanMacInfoWhiteList()
         int size = cJSON_GetArraySize(scanMacInfoWifiWhiteList);
         for (int i = 0; i < size && i < MAX_SCANMACINFO_WHITELIST_LEN; i++) {
             cJSON* item = cJSON_GetArrayItem(scanMacInfoWifiWhiteList, i);
-            if (item != nullptr && bundleName.find(item->valuestring) != std::string::npos) {
+            if (item != nullptr && cJSON_IsString(item) &&
+                bundleName.find(item->valuestring) != std::string::npos) {
                 cJSON_Delete(scanMacInfoWhileListRoot);
                 return true;
             }

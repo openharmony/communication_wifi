@@ -62,6 +62,7 @@ static constexpr int MAX_STR_LENT = 127;
 constexpr int CHIPSET_FEATURE_CAPABILITY_WIFI6_TEST = 127;
 constexpr int CHIPSET_FEATURE_CAPABILITY_WIFI7_TEST = 255;
 constexpr int TEN = 10;
+constexpr int MAX_NO_INTERNET_CNTS = 3;
 static const std::string TEMP_TEST_DATA = "1234567890abcdef1234567890abcdef";
 static std::string g_errLog;
     void StaStateMachineCallback(const LogType type, const LogLevel level,

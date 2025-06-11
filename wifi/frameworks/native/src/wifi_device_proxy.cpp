@@ -70,7 +70,6 @@ void WifiDeviceProxy::InitWifiState()
     callBack->wifiStateChangeCallback = [=](int state) {
         this->OnWifiStateChanged(state);
     };
-    callBack->name = "InitWifiStateCb";
     const std::vector<std::string> event = {EVENT_STA_POWER_STATE_CHANGE};
     RegisterCallBack(callBack, event);
 

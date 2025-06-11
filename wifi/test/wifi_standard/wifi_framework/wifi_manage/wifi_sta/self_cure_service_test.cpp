@@ -129,7 +129,7 @@ public:
     void IsWifiSelfcureDoneTest()
     {
         pSelfCureService->IsWifiSelfcureDone();
-        pSelfCureInterface->pSelfCureStateMachine = nullptr;
+        pSelfCureService->pSelfCureStateMachine = nullptr;
         EXPECT_FALSE(pSelfCureService->IsWifiSelfcureDone());
     }
 };

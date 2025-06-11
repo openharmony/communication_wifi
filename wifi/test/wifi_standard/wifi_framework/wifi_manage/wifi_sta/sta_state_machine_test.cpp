@@ -1762,7 +1762,42 @@ public:
         pStaStateMachine->DealAudioStateChangedEvent(msg);
         EXPECT_EQ(pStaStateMachine->isAudioOn_, AUDIO_OFF);
     }
+
+    void HandleInternetAccessChangedTest1()
+    {
+        SystemNetWorkState internetAccessStatus = SystemNetWorkState::NETWORK_IS_WORKING;
+        pStaStateMachine->lastInternetIconStatus_ = SystemNetWorkState::NETWORK_IS_WORKING;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+        pStaStateMachine->lastInternetIconStatus_ = SystemNetWorkState::NETWORK_NOTWORKING;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+    }
+
+    void HandleInternetAccessChangedTest2()
+    {
+        SystemNetWorkState internetAccessStatus = SystemNetWorkState::NETWORK_NOTWORKING;
+        pStaStateMachine->lastInternetIconStatus_ = SystemNetWorkState::NETWORK_IS_WORKING;
+        pStaStateMachine->noInternetAccessCnt_ = 1;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+        pStaStateMachine->noInternetAccessCnt_ = MAX_NO_INTERNET_CNTS;
+        pStaStateMachine->lastSignalLevel_ = 1;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+        pStaStateMachine->noInternetAccessCnt_ = MAX_NO_INTERNET_CNTS;
+        pStaStateMachine->lastSignalLevel_ = TEST_FAIL_REASON;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+    }
 };
+
+HWTEST_F(StaStateMachineTest, HandleInternetAccessChanged_01, TestSize.Level1)
+{
+    HandleInternetAccessChangedTest1();
+    EXPECT_FALSE(g_errLog.find("ignore rssi changed")!=std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, HandleInternetAccessChanged_02, TestSize.Level1)
+{
+    HandleInternetAccessChangedTest2();
+    EXPECT_FALSE(g_errLog.find("ignore rssi changed")!=std::string::npos);
+}
 
 HWTEST_F(StaStateMachineTest, UpdateExpandOffsetRange, TestSize.Level1)
 {

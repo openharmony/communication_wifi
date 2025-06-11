@@ -76,8 +76,6 @@ ohos_static_library("wifi_sta_ext_service") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
-    "core_service:tel_core_service_api",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -100,6 +98,14 @@ ohos_static_library("wifi_sta_ext_service") {
   }
   if (wifi_feature_with_security_detect) {
     sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect/wifi_security_detect.cpp" ]
+  }
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
+      defined(global_parts_info.telephony_cellular_data)) {
+      external_deps += [
+        "cellular_data:tel_cellular_data_api",
+        "core_service:tel_core_service_api",]
+      defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
   }
   part_name = "wifi"
   subsystem_name = "communication"

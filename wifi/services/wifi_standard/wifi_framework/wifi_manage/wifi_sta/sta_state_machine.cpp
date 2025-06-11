@@ -4568,6 +4568,7 @@ void StaStateMachine::StartConnectToBssid(const int32_t networkId, std::string b
 #ifndef OHOS_ARCH_LITE
 int32_t StaStateMachine::GetDataSlotId(int32_t slotId)
 {
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
     if (slotId >= 0 && slotId < simCount) {
         WIFI_LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
@@ -4580,8 +4581,13 @@ int32_t StaStateMachine::GetDataSlotId(int32_t slotId)
     }
     WIFI_LOGI("slotId: %{public}d", slotDefaultID);
     return slotDefaultID;
+#else
+    WIFI_LOGW("telephony subsystem is disabled, query slotId is not supported");
+    return -1;
+#endif
 }
 
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
 int32_t StaStateMachine::GetCardType(CardType &cardType)
 {
     WifiDeviceConfig deviceConfig;
@@ -4589,18 +4595,25 @@ int32_t StaStateMachine::GetCardType(CardType &cardType)
     return CoreServiceClient::GetInstance().GetCardType(CoreServiceClient::GetInstance().GetSlotId(
         deviceConfig.wifiEapConfig.eapSubId), cardType);
 }
+#endif
 
 int32_t StaStateMachine::GetDefaultId(int32_t slotId)
 {
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     WIFI_LOGI("StaStateMachine::GetDefaultId in, slotId: %{public}d", slotId);
     if (slotId == WIFI_INVALID_SIM_ID) {
         return GetDataSlotId(slotId);
     }
     return slotId;
+#else
+    WIFI_LOGW("telephony subsystem is disabled, query defaultId is not supported");
+    return -1;
+#endif
 }
 
 int32_t StaStateMachine::GetSimCardState(int32_t slotId)
 {
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     WIFI_LOGI("StaStateMachine::GetSimCardState in, slotId: %{public}d", slotId);
     slotId = GetDefaultId(slotId);
     WIFI_LOGI("slotId: %{public}d", slotId);
@@ -4612,6 +4625,10 @@ int32_t StaStateMachine::GetSimCardState(int32_t slotId)
     }
     WIFI_LOGI("StaStateMachine::GetSimCardState out, simState:%{public}d", simState);
     return static_cast<int32_t>(simState);
+#else
+    WIFI_LOGW("telephony subsystem is disabled, query sim card state is not supported");
+    return -1;
+#endif
 }
 
 bool StaStateMachine::IsValidSimId(int32_t simId)
@@ -4624,14 +4641,17 @@ bool StaStateMachine::IsValidSimId(int32_t simId)
 
 bool StaStateMachine::IsMultiSimEnabled()
 {
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
     WIFI_LOGI("StaStateMachine::IsMultiSimEnabled simCount:%{public}d", simCount);
     if (simCount > 1) {
         return true;
     }
+#endif
     return false;
 }
 
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
 std::string StaStateMachine::SimAkaAuth(const std::string &nonce, AuthType authType)
 {
     WIFI_LOGD("StaStateMachine::SimAkaAuth in, authType:%{public}d, nonce:%{private}s", authType, nonce.c_str());
@@ -4646,6 +4666,7 @@ std::string StaStateMachine::SimAkaAuth(const std::string &nonce, AuthType authT
     }
     return response.response;
 }
+#endif
 
 /* Calculate SRES and KC as 2G authentication.
  * Protocol: 3GPP TS 31.102 2G_authentication
@@ -4687,7 +4708,10 @@ std::string StaStateMachine::GetGsmAuthResponseWithLength(EapSimGsmAuthParam par
 
         // encode data and initiate a challenge request
         std::string base64Challenge = EncodeBase64(randVec);
-        std::string response = SimAkaAuth(base64Challenge, SIM_AUTH_EAP_SIM_TYPE);
+        std::string response = "";
+    #ifdef TELEPHONE_CORE_SERVICE_ENABLE
+        response = SimAkaAuth(base64Challenge, SIM_AUTH_EAP_SIM_TYPE);
+    #endif
         if (response.empty()) {
             WIFI_LOGE("%{public}s: fail to sim authentication", __func__);
             return "";
@@ -4782,7 +4806,10 @@ std::string StaStateMachine::GetGsmAuthResponseWithoutLength(EapSimGsmAuthParam 
 
         // encode data and initiate a challenge request
         std::string base64Challenge = EncodeBase64(randVec);
-        std::string response = SimAkaAuth(base64Challenge, SIM_AUTH_EAP_SIM_TYPE);
+        std::string response = "";
+    #ifdef TELEPHONE_CORE_SERVICE_ENABLE
+        response = SimAkaAuth(base64Challenge, SIM_AUTH_EAP_SIM_TYPE);
+    #endif
         if (response.empty()) {
             WIFI_LOGE("%{public}s: fail to authenticate", __func__);
             return "";
@@ -4831,6 +4858,7 @@ std::string StaStateMachine::GetGsmAuthResponseWithoutLength(EapSimGsmAuthParam 
 
 bool StaStateMachine::PreWpaEapUmtsAuthEvent()
 {
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     CardType cardType;
     int32_t ret = GetCardType(cardType);
     if (ret != 0) {
@@ -4842,6 +4870,10 @@ bool StaStateMachine::PreWpaEapUmtsAuthEvent()
         return false;
     }
     return true;
+#else
+    WIFI_LOGW("telephony subsystem is disabled, sim card is not supported");
+    return false;
+#endif
 }
 
 std::vector<uint8_t> StaStateMachine::FillUmtsAuthReq(EapSimUmtsAuthParam &param)
@@ -4962,9 +4994,13 @@ std::string StaStateMachine::GetUmtsAuthResponse(EapSimUmtsAuthParam &param)
     if (inputChallenge.size() != UMTS_AUTH_REQUEST_CONTENT_LEN) {
         return "";
     }
-
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     std::string challenge = EncodeBase64(inputChallenge);
     return SimAkaAuth(challenge, SIM_AUTH_EAP_AKA_TYPE);
+#else
+    WIFI_LOGW("telephony subsystem is disabled, sim Auth is not supported");
+    return "";
+#endif
 }
 
 void StaStateMachine::DealWpaEapSimAuthEvent(InternalMessagePtr msg)

@@ -126,8 +126,6 @@ ohos_unittest("wifi_sta_new_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
-    "core_service:tel_core_service_api",
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",
     "googletest:gmock_main",

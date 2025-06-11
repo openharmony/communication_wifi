@@ -1520,8 +1520,10 @@ public:
     }
     void GetCardTypeTest()
     {
+    #ifdef TELEPHONE_CORE_SERVICE_ENABLE
         CardType cardType;
         pStaStateMachine->GetCardType(cardType);
+    #endif
     }
     void GetDefaultIdTest()
     {
@@ -1545,7 +1547,9 @@ public:
     }
     void SimAkaAuthTest()
     {
+    #ifdef TELEPHONE_CORE_SERVICE_ENABLE
         EXPECT_EQ(pStaStateMachine->SimAkaAuth("", SIM_AUTH_EAP_SIM_TYPE), "");
+    #endif
     }
 
     void GetGsmAuthResponseWithLengthTest()

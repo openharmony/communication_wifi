@@ -204,7 +204,6 @@ ohos_unittest("manager_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -258,8 +257,11 @@ ohos_unittest("manager_unittest") {
   }
 
   if (defined(global_parts_info) &&
-      defined(global_parts_info.telephony_core_service)) {
-    external_deps += [ "core_service:tel_core_service_api" ]
+      defined(global_parts_info.telephony_core_service) &&
+      defined(global_parts_info.telephony_cellular_data)) {
+    external_deps += [
+        "cellular_data:tel_cellular_data_api",
+        "core_service:tel_core_service_api",]
     defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
   }
 

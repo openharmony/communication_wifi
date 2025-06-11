@@ -162,9 +162,7 @@ local_base_external_deps = [
   "bundle_framework:appexecfwk_base",
   "bundle_framework:appexecfwk_core",
   "c_utils:utils",
-  "cellular_data:tel_cellular_data_api",
   "certificate_manager:cert_manager_sdk",
-  "core_service:tel_core_service_api",
   "data_share:datashare_consumer",
   "dhcp:dhcp_sdk",
   "dhcp:dhcp_sdk",
@@ -187,6 +185,14 @@ local_base_external_deps = [
   "window_manager:libdm_lite",
   "security_guard:libsg_classify_sdk",
 ]
+if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_core_service) &&
+    defined(global_parts_info.telephony_cellular_data)) {
+  local_base_external_deps += [
+    "cellular_data:tel_cellular_data_api",
+    "core_service:tel_core_service_api",]
+  defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
+}
 
 ohos_unittest("wifi_sta_unittest") {
   module_out_path = module_output_path

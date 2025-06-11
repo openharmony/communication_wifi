@@ -128,8 +128,6 @@ ohos_unittest("precompiled_macro_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
-    "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",

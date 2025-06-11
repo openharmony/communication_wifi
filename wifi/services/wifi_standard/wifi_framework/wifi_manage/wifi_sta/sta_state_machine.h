@@ -37,11 +37,13 @@
 #include "want.h"
 #include "wifi_net_agent.h"
 #include "wifi_net_observer.h"
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
 #include "sim_state_type.h"
 #include "core_service_client.h"
 #include "cellular_data_client.h"
 #include "core_manager_inner.h"
 #include "telephony_errors.h"
+#endif
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
 #include "wifi_common_event_helper.h"
@@ -55,7 +57,9 @@
 namespace OHOS {
 namespace Wifi {
 #ifndef OHOS_ARCH_LITE
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
 using namespace OHOS::Telephony;
+#endif
 #endif
 constexpr int STA_RENEWAL_MIN_TIME = 120;
 constexpr int STREAM_TXPACKET_THRESHOLD = 0;
@@ -884,12 +888,14 @@ private:
      */
     int32_t GetDataSlotId(int32_t slotId);
 
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     /**
      * @Description Get card type.
      * @param cardType - card type
      * @Return int32_t - 0:success, other value:failed
      */
     int32_t GetCardType(CardType &cardType);
+#endif
 
     /**
      * @Description Get default slot id.
@@ -918,12 +924,14 @@ private:
      */
     bool IsMultiSimEnabled();
 
+#ifdef TELEPHONE_CORE_SERVICE_ENABLE
     /**
      * @Description sim authenticate
      * @param nonce - sim id
      * @Return int32_t - 0:success, other value:failed
      */
     std::string SimAkaAuth(const std::string &nonce, AuthType authType);
+#endif
 
     /**
      * @Description Get SIM card authentication information.

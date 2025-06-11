@@ -23,7 +23,7 @@ namespace Wifi {
 
 constexpr int32_t ROAM_SCENE = 1;
 constexpr int64_t WIFI_SWITCH_RECORD_MAX_TIME = 1000 * 60 * 60 * 24 * 14; // 14天,单位:ms
-
+constexpr int32_t NUM_5 = 5;
 enum WifiProCommond {
     EVENT_NOTIFY_WIFI_PRO_SWITCH_CHANGED = 0,
     EVENT_WIFI_CONNECT_STATE_CHANGED = 1,
@@ -53,10 +53,10 @@ enum SigLevel {
     SIG_LEVEL_MAX = 4,
 };
 
-inline const int32_t QUICK_SCAN_INTERVAL[SIG_LEVEL_MAX] = { 10000, 10000, 15000, 30000 };
-inline const int32_t NORMAL_SCAN_INTERVAL[SIG_LEVEL_MAX] = { 15000, 15000, 30000, 60000 };
-inline const int32_t QUICK_SCAN_MAX_COUNTER[SIG_LEVEL_MAX] = { 20, 20, 10, 10 };
-inline const int32_t NORMAL_SCAN_MAX_COUNTER[SIG_LEVEL_MAX] = { 4, 4, 2, 2 };
+inline const int32_t QUICK_SCAN_INTERVAL[NUM_5] = { 10000, 10000, 15000, 30000, 30000};
+inline const int32_t NORMAL_SCAN_INTERVAL[NUM_5] = { 15000, 15000, 30000, 60000, 60000};
+inline const int32_t QUICK_SCAN_MAX_COUNTER[NUM_5] = { 20, 20, 10, 10, 10};
+inline const int32_t NORMAL_SCAN_MAX_COUNTER[NUM_5] = { 4, 4, 2, 2, 2};
 
 enum WifiSwitchReason {
     // Default

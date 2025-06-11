@@ -2,43 +2,73 @@
     "string":[
         {
             "name":"actions_menu_user_agent",
-            "value":"瀏覽器 UA 識別碼"
+            "value":"瀏覽器 UA 識別碼",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"contextmenu_open_in_browser",
-            "value":"在瀏覽器中開啟"
+            "value":"在瀏覽器中開啟",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"site_setting_single_website_title",
-            "value":"%s 的設定"
+            "value":"%s 的設定",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"user_agent_harmony",
-            "value":"HarmonyOS"
+            "value":"HarmonyOS",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
-            "value":"手機版"
+            "value":"手機版",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"compatibility_mode_of_the_PC_version",
-            "value":"電腦版"
+            "value":"電腦版",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"continue_visit",
-            "value":"是否繼續存取？"
+            "value":"是否繼續存取？",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"ssl_normal_error_msg",
-            "value":"目前網站的安全性憑證已過期或不可信，可能存在安全性風險。是否繼續存取？"
+            "value":"目前網站的安全性憑證已過期或不可信，可能存在安全性風險。是否繼續存取？",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"ssl_error_dialog_continue_btn",
-            "value":"繼續存取"
+            "value":"繼續存取",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"confirm_dialog_cancel",
-            "value":"取消"
+            "value":"取消",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -2,43 +2,43 @@
     "string":[
         {
             "name":"actions_menu_user_agent",
-            "value":"[TS_855844]_Browser UA"
+            "value":"[TS_1079368]_Browser UA"
         },
         {
             "name":"contextmenu_open_in_browser",
-            "value":"[TS_922302]_Open in Browser"
+            "value":"[TS_1079373]_Open in Browser"
         },
         {
             "name":"site_setting_single_website_title",
-            "value":"[TS_881176]_%s settings"
+            "value":"[TS_1079367]_%s settings"
         },
         {
             "name":"user_agent_harmony",
-            "value":"[TS_869551]_HarmonyOS"
+            "value":"[TS_1079375]_HarmonyOS"
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
-            "value":"[TS_1035323]_Mobile site (Compatibility mode)"
+            "value":"[TS_1079374]_Mobile site"
         },
         {
             "name":"compatibility_mode_of_the_PC_version",
-            "value":"[TS_1035326]_Desktop site (Compatibility mode)"
+            "value":"[TS_1079369]_Desktop site"
         },
-         {
+        {
             "name":"continue_visit",
-            "value":"[TS_1002771]_Continue to this site?"
+            "value":"[TS_1080169]_Continue to this site?"
         },
         {
             "name":"ssl_normal_error_msg",
-            "value":"[TS_851559]_This site's SSL certificate has expired or is untrusted. There may be a security risk if you continue."
+            "value":"[TS_1080171]_This site's SSL certificate has expired or is untrusted. There may be a security risk if you continue."
         },
         {
             "name":"ssl_error_dialog_continue_btn",
-            "value":"[TS_851544]_Continue"
+            "value":"[TS_1080170]_Continue"
         },
         {
             "name":"confirm_dialog_cancel",
-            "value":"[TS_851446]_Cancel"
+            "value":"[TS_1080168]_Cancel"
         }
     ]
 }

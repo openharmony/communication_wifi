@@ -24,7 +24,8 @@
 DEFINE_WIFILOG_LABEL("WifiDeviceCallBackStub");
 namespace OHOS {
 namespace Wifi {
-WifiDeviceCallBackStub::WifiDeviceCallBackStub() : callback_(nullptr), mRemoteDied(false)
+static const int CALLBACK_LIMIT = 1000;
+WifiDeviceCallBackStub::WifiDeviceCallBackStub() : callbackMap_ {}, mRemoteDied(false)
 {}
 
 WifiDeviceCallBackStub::~WifiDeviceCallBackStub()
@@ -86,10 +87,15 @@ int WifiDeviceCallBackStub::OnRemoteRequest(
 void WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack> &callBack)
 {
     if (callBack == nullptr) {
-        WIFI_LOGE("RegisterUserCallBack:callBack is nullptr!");
+        WIFI_LOGE("RegisterUserCallBack:callBack %{public}s is nullptr!", callBack->name.c_str());
         return;
     }
-    callback_ = callBack;
+    if (callbackMap_.size() >= CALLBACK_LIMIT &&
+        callbackMap_.find(callBack->name) == callbackMap_.end()) {
+        WIFI_LOGE("RegisterUserCallBack:callBack %{public}s reaches number limit!", callBack->name.c_str());
+        return;
+    }
+    callbackMap_[callBack->name] = callBack;
 }
 
 bool WifiDeviceCallBackStub::IsRemoteDied() const
@@ -120,8 +126,10 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
     } else {
         mState_ = false;
     }
-    if (callback_) {
-        callback_->OnWifiStateChanged(state);
+    if (!callbackMap_.empty()) {
+        for (auto& pair : callbackMap_) {
+            pair.second->OnWifiStateChanged(state);
+        }
     }
     WriteWifiEventReceivedHiSysEvent(HISYS_STA_POWER_STATE_CHANGE, state);
 }
@@ -129,8 +137,10 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
 {
     WIFI_LOGI("OnWifiConnectionChanged, state:%{public}d!", state);
-    if (callback_) {
-        callback_->OnWifiConnectionChanged(state, info);
+    if (!callbackMap_.empty()) {
+        for (auto& pair : callbackMap_) {
+            pair.second->OnWifiConnectionChanged(state, info);
+        }
     }
     WriteWifiEventReceivedHiSysEvent(HISYS_STA_CONN_STATE_CHANGE, state);
 }
@@ -138,8 +148,10 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int stat
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 {
     WIFI_LOGI("OnWifiRssiChanged, rssi:%{public}d!", rssi);
-    if (callback_) {
-        callback_->OnWifiRssiChanged(rssi);
+    if (!callbackMap_.empty()) {
+        for (auto& pair : callbackMap_) {
+            pair.second->OnWifiRssiChanged(rssi);
+        }
     }
     WriteWifiEventReceivedHiSysEvent(HISYS_STA_RSSI_STATE_CHANGE, rssi);
 }
@@ -147,32 +159,40 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string &pinCode)
 {
     WIFI_LOGI("OnWifiWpsStateChanged, state:%{public}d!", state);
-    if (callback_) {
-        callback_->OnWifiWpsStateChanged(state, pinCode);
+    if (!callbackMap_.empty()) {
+        for (auto& pair : callbackMap_) {
+            pair.second->OnWifiWpsStateChanged(state, pinCode);
+        }
     }
 }
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 {
     WIFI_LOGD("OnStreamChanged, direction:%{public}d!", direction);
-    if (callback_) {
-        callback_->OnStreamChanged(direction);
+    if (!callbackMap_.empty()) {
+        for (auto& pair : callbackMap_) {
+            pair.second->OnStreamChanged(direction);
+        }
     }
 }
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange value)
 {
     WIFI_LOGI("OnDeviceConfigChanged, value:%{public}d!", value);
-    if (callback_) {
-        callback_->OnDeviceConfigChanged(value);
+    if (!callbackMap_.empty()) {
+        for (auto& pair : callbackMap_) {
+            pair.second->OnDeviceConfigChanged(value);
+        }
     }
 }
 
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnCandidateApprovalStatusChanged(CandidateApprovalStatus status)
 {
     WIFI_LOGI("OnCandidateApprovalStatusChanged, status:%{public}d!", static_cast<int>(status));
-    if (callback_) {
-        callback_->OnCandidateApprovalStatusChanged(status);
+    if (!callbackMap_.empty()) {
+        for (auto& pair : callbackMap_) {
+            pair.second->OnCandidateApprovalStatusChanged(status);
+        }
     }
 }
 

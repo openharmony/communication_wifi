@@ -298,7 +298,7 @@ BandType WifiChannelHelper::TransformChannelToBand(int channel)
 
 bool WifiChannelHelper::IsValidFreq(int freq)
 {
-    return IsValid24GHz(freq) && IsValid5GHz(freq);
+    return IsValid24GHz(freq) || IsValid5GHz(freq);
 }
 
 bool WifiChannelHelper::IsValid24GHz(int freq)

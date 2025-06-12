@@ -302,11 +302,13 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     }
 #endif
 #ifndef OHOS_ARCH_LITE
+    if (!WifiConfigCenter::GetInstance().IsAllowPopUp() || !IsBundleInstalled("com.ohos.locationdialog")) {
+        LOGE("ConnectToCandidateConfig: no support to show dialog!");
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
     if (config.lastConnectTime <= 0) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
-        if (WifiConfigCenter::GetInstance().IsAllowPopUp()) {
-            WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT, config.ssid);
-        }
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT, config.ssid);
         return WIFI_OPT_SUCCESS;
     }
 #endif

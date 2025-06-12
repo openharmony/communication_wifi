@@ -379,7 +379,7 @@ bool IsBundleInstalled(const std::string &bundleName)
     AppExecFwk::BundleInfo bundleInfo;
     bool isInstalled = bundleInstance->GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
         bundleInfo, DEFAULT_USER_ID);
-    WIFI_LOGI("Bundle %{public}s is Installed: %{public}s", bundleName.c_str(), isInstalled);
+    WIFI_LOGI("Bundle %{public}s is Installed: %{public}d", bundleName.c_str(), isInstalled);
     return isInstalled;
 }
 

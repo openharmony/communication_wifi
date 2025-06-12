@@ -375,7 +375,7 @@ bool IsBundleInstalled(const std::string &bundleName)
         WIFI_LOGE("bundle instance is null!");
         return false;
     }
- 
+
     AppExecFwk::BundleInfo bundleInfo;
     bool isInstalled = bundleInstance->GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
         bundleInfo, DEFAULT_USER_ID);

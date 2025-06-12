@@ -234,6 +234,15 @@ int64_t GetElapsedMicrosecondsSinceBoot();
 std::string GetBundleName();
 
 std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &bundleName);
+
+/**
+ * @Description whether the bundle is installed.
+ *
+ * @param std::string - bundle name
+ * @return bool - true: installed
+ */
+bool IsBundleInstalled(const std::string &bundleName);
+
 /**
  * @Description get bundle name by uid
  *

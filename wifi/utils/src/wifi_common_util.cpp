@@ -96,6 +96,7 @@ constexpr int IP_ADDRESS_SECOND_BYTE_INDEX = 1;
 constexpr int IP_ADDRESS_THIRD_BYTE_INDEX = 2;
 constexpr int IP_ADDRESS_FOURTH_BYTE_INDEX = 3;
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
+
 constexpr int DEFAULT_USER_ID = 100;
 
 static std::string DataAnonymize(const std::string str, const char delim,
@@ -376,7 +377,7 @@ bool IsBundleInstalled(const std::string &bundleName)
     }
  
     AppExecFwk::BundleInfo bundleInfo;
-    bool isInstalled = bundleInstance->GetBundleInfo(bundleName, AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_DEFAULT,
+    bool isInstalled = bundleInstance->GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
         bundleInfo, DEFAULT_USER_ID);
     WIFI_LOGI("Bundle %{public}s is Installed: %{public}s", bundleName.c_str(), isInstalled);
     return isInstalled;

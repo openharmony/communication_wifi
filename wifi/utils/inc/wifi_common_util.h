@@ -241,7 +241,7 @@ std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &
  * @param std::string - bundle name
  * @return bool - true: installed
  */
-bool IsBundleInstalled(const std::string &bundleName)
+bool IsBundleInstalled(const std::string &bundleName);
 
 /**
  * @Description get bundle name by uid

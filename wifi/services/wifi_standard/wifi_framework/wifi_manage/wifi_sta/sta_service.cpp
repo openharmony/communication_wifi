@@ -303,7 +303,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
 #endif
 #ifndef OHOS_ARCH_LITE
     if (!WifiConfigCenter::GetInstance().IsAllowPopUp() || !IsBundleInstalled("com.ohos.locationdialog")) {
-        LOGE("ConnectToCandidateConfig: no support to show dialog!");
+        LOGE("ConnectToCandidateConfig: not support to show dialog!");
         return WIFI_OPT_NOT_SUPPORTED;
     }
     if (config.lastConnectTime <= 0) {

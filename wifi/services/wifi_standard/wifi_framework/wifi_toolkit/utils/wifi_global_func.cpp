@@ -63,6 +63,7 @@ constexpr const char* PHONE_PRODUCT_DEVICE_TYPE = "phone";
 constexpr const char* WEARABLE_PRODUCT_DEVICE_TYPE = "wearable";
 constexpr const char* TABLET_PRODUCT_DEVICE_TYPE = "table";
 constexpr const char* TV_PRODUCT_DEVICE_TYPE = "tv";
+constexpr const char* PC_PRODUCT_DEVICE_TYPE = "2in1";
 
 constexpr int PROP_FSS_ENABLE_LEN = 16;
 constexpr int FSS_ENABLE_LEN = 4;
@@ -573,6 +574,9 @@ int GetDeviceType()
         }
         if (strncmp(preValue, TV_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
             return ProductDeviceType::TV;
+        }
+        if (strncmp(preValue, PC_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
+            return ProductDeviceType::PC;
         }
     }
     return ProductDeviceType::DEFAULT;

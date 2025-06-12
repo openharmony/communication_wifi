@@ -38,7 +38,7 @@ sptr<WifiScanMgrServiceImpl> WifiScanMgrServiceImpl::GetInstance()
     if (g_instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(g_instanceLock);
         if (g_instance == nullptr) {
-            sptr<WifiScanMgrServiceImpl> service = new WifiScanMgrServiceImpl;
+            sptr<WifiScanMgrServiceImpl> service = sptr<WifiScanMgrServiceImpl>::MakeSptr();
             g_instance = service;
         }
     }

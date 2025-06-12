@@ -31,7 +31,7 @@ constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
 int g_bigDataRecvLen = 0;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
-    sptr<WifiDeviceCallBackStub>(new WifiDeviceCallBackStub());
+    sptr<WifiDeviceCallBackStub>::MakeSptr();
 
 WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiDevice>(impl),
     remote_(nullptr), mRemoteDied(false), deathRecipient_(nullptr)

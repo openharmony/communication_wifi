@@ -39,6 +39,7 @@
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
 #include "display_info.h"
+#include "net_eap_observer.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sensor_scene.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
@@ -131,6 +132,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
 #ifdef HAS_NETMANAGER_EVENT_PART
     UnRegisterNetmgrEvent();
 #endif
+    NetEapObserver::GetInstance().StopNetEapObserver();
 }
 
 void WifiEventSubscriberManager::Init()
@@ -204,6 +206,8 @@ void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbi
             pService->OnSystemAbilityChanged(systemAbilityId, add);
         }
     }
+ 
+    StartNetEapObserver();
 }
 
 #ifdef HAS_MOVEMENT_PART
@@ -540,6 +544,11 @@ void WifiEventSubscriberManager::MdmPropChangeEvt(const char *key, const char *v
     }
 }
 
+void WifiEventSubscriberManager::StartNetEapObserver()
+{
+    WIFI_LOGI("StartNetEapObserver");
+    NetEapObserver::GetInstance().StartNetEapObserver();
+}
 #ifdef HAS_MOVEMENT_PART
 void WifiEventSubscriberManager::RegisterMovementCallBack()
 {

@@ -342,5 +342,12 @@ HWTEST_F(WifiCommonUtilTest, StringToUlongTest03, TestSize.Level1)
     unsigned long output = 0;
     EXPECT_TRUE(StringToUlong(input) == output);
 }
+
+HWTEST_F(WifiCommonUtilTest, IsBundleInstalledTest01, TestSize.Level1)
+{
+    WIFI_LOGI("IsBundleInstalledTest01 enter");
+    std::string bundleName = "com.ohos.wifitest01";
+    EXPECT_FALSE(IsBundleInstalled(bundleName));
+}
 }  // namespace Wifi
 }  // namespace OHOS

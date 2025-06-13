@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <cstdio>
+#include <cstdio> 
 #include <chrono>
 #include <random>
 #include "sta_state_machine.h"
@@ -193,11 +193,11 @@ ErrCode StaStateMachine::InitStaStateMachine()
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
     m_NetWorkState->SetNetStateCallback(
         [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
-    NetEapObserver::GetInstance().SetRegisterCustomEapCallback(
+    NetEapObserver::GetInstance().RegisterCustomEapCallback(
         [this](const std::string &regCmd) { this->SetRegisterCustomEapCallback(regCmd); });
-    NetEapObserver::GetInstance().SetRegisterCustomEapCallback(
+    NetEapObserver::GetInstance().SetReplyCustomEapDataCallback(
         [this](int result, const std::string &strEapData) { this->ReplyCustomEapDataCallback(result, strEapData); });
-    NetEapObserver::GetInstance().SetRegisterCustomEapCallback();
+    NetEapObserver::GetInstance().ReRegisterCustomEapCallback();
 #endif
 
     return WIFI_OPT_SUCCESS;
@@ -774,7 +774,7 @@ void StaStateMachine::LinkState::DealWpaCustomEapAuthEvent(InternalMessagePtr ms
     WpaEapData wpaEapData = {0};
     msg->GetMessageObj(wpaEapData);
     NetEapObserver::GetInstance().NotifyWpaEapInterceptInfo(wpaEapData);
-    LOGI("%{public}s code=%{public}d, type=%{public}d, msgId:%{public}d", __func__, wpaEapData.code,
+    LOGI("%{public}s code=%{public}d, type=%{public}d, msgId:%{public}d success", __func__, wpaEapData.code,
         wpaEapData.type, wpaEapData.msgId);
 }
 
@@ -2121,33 +2121,33 @@ void StaStateMachine::RegisterCustomEapCallback(const std::string &regCmd) //net
     const int preNumberCount = 2;
     auto CheckStrEapData = [regCmd](const std::string &data) -> bool {
         if (data.empty()) {
-            WIFI_LOGI("${public}s regCmd is empty", __func__);
+            WIFI_LOGI("%{public}s regCmd is empty", __func__);
             return false;
         }
         std::vector<std::string> vecEapDatas = GetSplitInfo(data, ":");
         if (vecEapDatas.size() < 2 ) {
-            WIFI_LOGI("${public}s regCmd invalid, regCmd[${public}s]", __func__, regCmd.c_str());
+            WIFI_LOGI("%{public}s regCmd invalid, regCmd[%{public}s]", __func__, regCmd.c_str());
             return false;
         }
         if (CheckDataToUint(vecEapDatas[0]) != static_cast<int>(NetManagerStandard::NetType::WLAN0)) {
-            WIFI_LOGI("${public}s netType not WLAN0, regCmd[${public}s]", __func__, regCmd.c_str());
+            WIFI_LOGI("%{public}s netType not WLAN0, regCmd[%{public}s]", __func__, regCmd.c_str());
             return false;
         }
         if (CheckDataToUint(vecEapDatas[1]) + preNumberCount != vecEapDatas.size()) {
-            WIFI_LOGI("${public}s reg eapdata size error, regCmd[${public}s]", __func__, regCmd.c_str());
+            WIFI_LOGI("%{public}s reg eapdata size error, regCmd[%{public}s]", __func__, regCmd.c_str());
             return false;
         }
         return true;
     };
     if (!CheckStrEapData(regCmd)) {
-        WIFI_LOGI("${public}s regcmd error, regCmd[${public}s]", __func__, regCmd.c_str());
+        WIFI_LOGI("%{public}s regcmd error, regCmd[%{public}s]", __func__, regCmd.c_str());
         return;
     }
     std::string cmd = "EXT_AUTH_REG ";
     cmd += regCmd;
-    WIFI_LOGI("${public}s regCmd:${public}s", __func__, cmd.c_str());
+    WIFI_LOGI("%{public}s regCmd:%{public}s", __func__, cmd.c_str());
     if (WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGI("${public}s: failed to send the message, Custom Eap cmd: ${private}s", __func__, cmd.c_str());
+        WIFI_LOGI("%{public}s: failed to send the message, Custom Eap cmd: %{private}s", __func__, cmd.c_str());
         return;
     }
 }
@@ -2158,9 +2158,9 @@ void StaStateMachine::ReplyCustomEapDataCallback(int result, const std::string &
     cmd += std::to_string(result);
     cmd += std::string(":");
     cmd += strEapData;
-    WIFI_LOGI("${public}s, reply result:${public}d", __func__, result);
+    WIFI_LOGI("%{public}s, reply result:%{public}d", __func__, result);
     if (WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGI("${public}s: failed to send the message", __func__);
+        WIFI_LOGI("%{public}s: failed to send the message", __func__);
         return;
     }
 }

@@ -229,5 +229,13 @@ ErrCode ScanInterface::SetNetworkInterfaceUpDown(bool upDown)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanInterface::ResetScanInterval()
+{
+    WIFI_LOGI("Enter ScanInterface::ResetScanInterval.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
+    pScanService->ResetScanInterval();
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

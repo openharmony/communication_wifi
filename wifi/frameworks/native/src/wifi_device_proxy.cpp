@@ -26,9 +26,9 @@ DEFINE_WIFILOG_LABEL("WifiDeviceProxy");
 namespace OHOS {
 namespace Wifi {
 
+constexpr int EDM_UID = 3057;
 constexpr int MAX_SIZE = 256;
 constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
-constexpr int EDM_UID = 3057;
 int g_bigDataRecvLen = 0;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
@@ -1246,7 +1246,6 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
     }
 
     bActive = reply.ReadBool();
-    g_deviceCallBackStub->SetWifiState(bActive);
     return WIFI_OPT_SUCCESS;
 }
 

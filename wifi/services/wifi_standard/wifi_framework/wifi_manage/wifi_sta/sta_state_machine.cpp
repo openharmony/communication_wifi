@@ -193,6 +193,11 @@ ErrCode StaStateMachine::InitStaStateMachine()
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
     m_NetWorkState->SetNetStateCallback(
         [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
+    NetEapObserver::GetInstance().SetRegisterCustomEapCallback(
+        [this](const std::string &regCmd) { this->SetRegisterCustomEapCallback(regCmd); });
+    NetEapObserver::GetInstance().SetRegisterCustomEapCallback(
+        [this](int result, const std::string &strEapData) { this->ReplyCustomEapDataCallback(result, strEapData); });
+    NetEapObserver::GetInstance().SetRegisterCustomEapCallback();
 #endif
 
     return WIFI_OPT_SUCCESS;

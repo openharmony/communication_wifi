@@ -159,6 +159,9 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         case static_cast<int>(WpaEventCallback::MLO_STATE_NUM):
             OnWpaMloStateNotifyCallBack(data);
             break;
+        case static_cast<int>(WpaEventCallback::CUSTOMIZED_EAP_AUTH):
+            OnWpaCustomEapNotifyCallBack(data);
+            break;
         default:
             WIFI_LOGI("OnWpaStaNotifyCallBack() undefine event:%{public}d", num);
             break;
@@ -379,5 +382,40 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
     /* Notify sta state machine mlo state changed event. */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_MLO_WORK_STATE_EVENT, mloParam);
 }
+ 
+void StaMonitor::OnWpaCustomEapNotifyCallBack(const std::string &notifyParam)
+{
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s The statemachine pointer is null.", __FUNCTION__);
+        return;
+    }
+    if (notifyParam.empty()) {
+        WIFI_LOGE("%{public}s notifyParam is empty", __FUNCTION__);
+        return;
+    }
+    std::vector<std::string> vecEapDatas = GetSplitInfo(notifyParam, ":"); //msgId:eapCode:eapType:bufSize:buf
+    const size_t paramSize = 5;
+    if (vecEapDatas.size() != paramSize) {
+        WIFI_LOGE("%{public}s notifyParam size error: size: %{public}zu", __FUNCTION__, vecEapDatas.size());
+        return;
+    }
+    for (int i = 0; i < paramSize - 1; i++) {
+        if (CheckDataLegal(vecEapDatas[i]) == 0) {
+            WIFI_LOGE("%{public}s notifyParam %{public}d is not number", __FUNCTION__, i);
+            return;
+        }
+    }
+    WpaEapData wpaEapData;
+    wpaEapData.msgId = CheckDataToUint(vecEapDatas[0]);
+    wpaEapData.code = CheckDataToUint(vecEapDatas[1]);
+    wpaEapData.type = CheckDataToUint(vecEapDatas[2]);
+    wpaEapData.bufferLen = CheckDataToUint(vecEapDatas[3]);
+    wpaEapData.eapBuffer.reserve(wpaEapData.bufferLen);
+ 
+    DecodeBase64(vecEapDatas[4], wpaEapData.eapBuffer);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_EAP_CUSTOM_AUTH_EVENT, wpaEapData);
+    return;
+}
+ 
 }  // namespace Wifi
 }  // namespace OHOS

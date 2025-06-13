@@ -152,6 +152,8 @@ public:
      */
     void OnWpaMloStateNotifyCallBack(const std::string &notifyParam);
 
+    void OnWpaCustomEapNotifyCallBack(const std::string &notifyParam);
+ 
 private:
     StaStateMachine *pStaStateMachine;
     int m_instId;

@@ -41,7 +41,7 @@ constexpr int32_t P2P_ENABLE_WAIT_MS = 500;
 WifiP2pManager::WifiP2pManager()
 {
     WIFI_LOGI("create WifiP2pManager");
-    hasP2pActivatedOnce_ = WifiSettings::GetInstance().IsModulePreLoad(WIFI_SERVICE_P2P);
+    hasP2pActivatedOnce_ = true;
     InitP2pCallback();
 }
 

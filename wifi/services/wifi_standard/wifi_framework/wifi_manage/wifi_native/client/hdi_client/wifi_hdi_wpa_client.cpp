@@ -497,7 +497,8 @@ WifiErrorNo WifiHdiWpaClient::ReqWpaShellCmd(const std::string &ifName, const st
         return WIFI_HAL_OPT_FAILED;
     }
  
-    char cmdBuf[MAX_CMD_BUFFER_SIZE];
+    const int MAX_EAP_CMD_BUFFER_SIZE = 4096;
+    char cmdBuf[MAX_EAP_CMD_BUFFER_SIZE];
     if (strncpy_s(cmdBuf, sizeof(cmdBuf), cmd.c_str(), cmd.length()) != EOK) {
         LOGE("%{public}s: failed to copy", __func__);
         return WIFI_HAL_OPT_FAILED;

@@ -87,5 +87,10 @@ void WifiSensorScene::RegisterSensorEnhCallback()
     WIFI_LOGI("%{public}s ret %{public}d", __FUNCTION__, ret);
 }
 
+bool WifiSensorScene::IsOutdoorScene()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return scenario_ == SCENARIO_OUTDOOR;
+}
 }  // namespace Wifi
 }  // namespace OHOS

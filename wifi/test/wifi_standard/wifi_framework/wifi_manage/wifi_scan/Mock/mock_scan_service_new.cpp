@@ -55,6 +55,11 @@ void ScanService::SetEnhanceService(IEnhanceService* enhanceService)
     mEnhanceService = enhanceService;
 }
 
+void ScanService::ResetScanInterval()
+{
+    return;
+}
+
 void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
 {
     return;

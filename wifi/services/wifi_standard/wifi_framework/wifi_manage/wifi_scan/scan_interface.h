@@ -161,6 +161,12 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode SetNetworkInterfaceUpDown(bool upDown) override;
+    /**
+     * @Description Reset scan interval.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode ResetScanInterval() override;
 private:
     ScanService *pScanService;
     IScanSerivceCallbacks mScanSerivceCallbacks;

@@ -2116,6 +2116,34 @@ void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std:
 #endif
 }
 
+void StaStateMachine::RegisterCustomEapCallback(const std::string &regCmd) //netType:regSize:reg1:reg2
+{
+    const int preNumberCount = 2;
+    auto CheckStrEapData = [regCmd](const std::string &data) -> bool {
+        if (data.empty()) {
+            WIFI_LOGI("${public}s regCmd is empty", __func__);
+            return false;
+        }
+        std::vector<std::string> vecEapDatas = GetSplitInfo(data, ":");
+        if (vecEapDatas.size() < 2 ) {
+            WIFI_LOGI("${public}s regCmd invalid, regCmd[${public}s]", __func__, regCmd.c_str());
+            return false;
+        }
+        if (CheckDataToUint(vecEapDatas[0]) != static_cast<int>(NetManagerStandard::NetType::WLAN0)) {
+            WIFI_LOGI("${public}s netType not WLAN0, regCmd[${public}s]", __func__, regCmd.c_str());
+            return false;
+        }
+        if (CheckDataToUint(vecEapDatas[1]) + preNumberCount != vecEapDatas.size()) {
+            WIFI_LOGI("${public}s reg eapdata size error, regCmd[${public}s]", __func__, regCmd.c_str());
+            return false;
+        }
+        return true;
+    };
+    if (!CheckStrEapData(regCmd)) {
+        WIFI_LOGI("${public}s regcmd error, regCmd[${public}s]", __func__, regCmd.c_str());
+        return;
+    }
+}
 void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl)
 {
     WIFI_LOGD("Enter HandleNetCheckResult, netState:%{public}d screen:%{public}d "

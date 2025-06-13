@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hisysevent.h"
+#include "wifi_common_util.h"
 #include "hisysevent.h"
 #include "sta_define.h"
 #include "wifi_logger.h"
@@ -34,6 +35,7 @@ const std::map<int, std::string> g_connectTypeTransMap {
     { NETWORK_SELECTED_BY_ROAM, "ROMA_CONNECT" },
     { NETWORK_SELECTED_BY_REASSOC, "REASSOC" },
 };
+constexpr int MAX_DNS_NUM = 10;
 
 template<typename... Types>
 static void WriteEvent(const std::string& eventType, Types... args)
@@ -160,13 +162,15 @@ void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_OPEN_AND_CLOSE_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt, int selfCureResetState)
+void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt, int selfCureResetState,
+    std::string selfCureHistory)
 {
     Json::Value root;
     Json::FastWriter writer;
     root["OPERATE_TYPE"] = operateRes;
     root["FAIL_CNT"] = failCnt;
     root["RESET_STATE"] = selfCureResetState;
+    root["SELF_CURE_HISTORY"] = selfCureHistory;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ACCESS_INTERNET_FAILED", "EVENT_VALUE", writer.write(root));
 }
 
@@ -327,12 +331,13 @@ void WritePortalStateHiSysEvent(int portalState)
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_PORTAL_STATE", "EVENT_VALUE", writer.write(root));
 }
 
-void WriteArpInfoHiSysEvent(uint64_t arpRtt, int arpFailedCount)
+void WriteArpInfoHiSysEvent(uint64_t arpRtt, int32_t arpFailedCount, int32_t gatewayCnt)
 {
     Json::Value root;
     Json::FastWriter writer;
     root["ARP_RTT"] = arpRtt;
     root["ARP_FAILED_COUNT"] = arpFailedCount;
+    root["ARP_GWCOUNT"] = gatewayCnt;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_ARP_DETECTION_INFO", "EVENT_VALUE", writer.write(root));
 }
 
@@ -476,6 +481,38 @@ void WriteAutoSelectHiSysEvent(int selectType, const std::string &selectedInfo,
     root["AUTO_SELECT_FILTER"] = filteredReason;
     root["SAVED_NETWORK_IN_SCAN"] = savedResult;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_AUTO_SELECT_STATISTIC", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["IPV4_IPADDRESS"] = Ipv4IntAnonymize(ipInfo.ipAddress);
+    root["IPV4_GATEWAY"] = Ipv4IntAnonymize(ipInfo.gateway);
+    root["IPV4_NETMASK"] = Ipv4IntAnonymize(ipInfo.netmask);
+    root["IPV4_PRIMARYDNS"] = Ipv4IntAnonymize(ipInfo.primaryDns);
+    root["IPV4_SECONDDNS"] = Ipv4IntAnonymize(ipInfo.secondDns);
+    root["IPV4_SERVERIP"] = Ipv4IntAnonymize(ipInfo.serverIp);
+    root["IPV4_LEASE"] = ipInfo.leaseDuration;
+    root["IPV4_DNS_VEC_SIZE"] = static_cast<int32_t>(ipInfo.dnsAddr.size());
+    for (size_t i = 0; i < ipInfo.dnsAddr.size(); i++) {
+        if (i >= MAX_DNS_NUM) {
+            WIFI_LOGE("ipInfo.dnsAddr size over limit");
+            break;
+        }
+        std::string keyString = "IPV4_DNS" + std::to_string(i);
+        root[keyString] = Ipv4IntAnonymize(ipInfo.dnsAddr[i]);
+    }
+    root["IPV6_LINKIPV6ADDR"] = Ipv6Anonymize(ipv6Info.linkIpV6Address);
+    root["IPV6_GLOBALIPV6ADDR"] = Ipv6Anonymize(ipv6Info.globalIpV6Address);
+    root["IPV6_RANDGLOBALIPV6ADDR"] = Ipv6Anonymize(ipv6Info.randGlobalIpV6Address);
+    root["IPV6_GATEWAY"] = Ipv6Anonymize(ipv6Info.gateway);
+    root["IPV6_NETMASK"] = Ipv6Anonymize(ipv6Info.netmask);
+    root["IPV6_PRIMARYDNS"] = Ipv6Anonymize(ipv6Info.primaryDns);
+    root["IPV6_SECONDDNS"] = Ipv6Anonymize(ipv6Info.secondDns);
+    root["IPV6_UNIQUELOCALADDR1"] = Ipv6Anonymize(ipv6Info.uniqueLocalAddress1);
+    root["IPV6_UNIQUELOCALADDR2"] = Ipv6Anonymize(ipv6Info.uniqueLocalAddress2);
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_DHCP_INFO", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi
 }  // namespace OHOS

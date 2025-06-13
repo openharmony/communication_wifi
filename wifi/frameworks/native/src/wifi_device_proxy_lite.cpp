@@ -145,6 +145,7 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
         (void)ReadInt32(reply, &config.uid);
         (void)ReadInt32(reply, &config.wifiWapiConfig.wapiPskType);
         (void)ReadBool(reply, &config.isAllowAutoConnect);
+        (void)ReadBool(reply, &config.isSecureWifi);
         result.emplace_back(config);
         std::string().swap(config.preSharedKey);
     }

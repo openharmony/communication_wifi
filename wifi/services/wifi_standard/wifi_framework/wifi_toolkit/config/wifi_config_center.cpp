@@ -1488,7 +1488,7 @@ void WifiConfigCenter::SetSystemMode(int systemMode)
 
 int WifiConfigCenter::GetSystemMode()
 {
-    LOGI("GetSystemMode %{public}d", systemMode_);
+    WIFI_LOGD("GetSystemMode %{public}d", systemMode_);
     return systemMode_;
 }
 
@@ -1506,6 +1506,18 @@ bool WifiConfigCenter::IsAllowPopUp()
 {
     switch (mDeviceType) {
         case ProductDeviceType::WEARABLE:
+            LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
+            return false;
+        default:
+            LOGI("Allow pop up dialog, device type:%{public}d", mDeviceType);
+            return true;
+    }
+}
+
+bool WifiConfigCenter::IsAllowPcPopUp()
+{
+    switch (mDeviceType) {
+        case ProductDeviceType::PC:
             LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
             return false;
         default:

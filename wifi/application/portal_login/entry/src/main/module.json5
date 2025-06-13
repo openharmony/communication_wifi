@@ -37,6 +37,7 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": false,
+        "removeMissionAfterTerminate": true,
         "permissions": [
           "ohos.permission.GET_WIFI_PEERS_MAC",
           "ohos.permission.START_INVISIBLE_ABILITY"

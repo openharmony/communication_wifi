@@ -31,9 +31,7 @@ constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
 int g_bigDataRecvLen = 0;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
-    sptr<WifiDeviceCallBackStub>(new (std::nothrow) WifiDeviceCallBackStub());
-static sptr<WifiInternalCallback> g_InternalCallback =
-    sptr<WifiInternalCallback>(new (std::nothrow) WifiInternalCallback());
+    sptr<WifiDeviceCallBackStub>::MakeSptr();
 
 WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiDevice>(impl),
     remote_(nullptr), mRemoteDied(false), deathRecipient_(nullptr)
@@ -102,6 +100,7 @@ void WifiDeviceProxy::InitWifiState()
     }
 
     bool bActive = reply.ReadBool();
+    WIFI_LOGI("%{public}s bActive=%{public}d", __func__, bActive);
     g_deviceCallBackStub->SetWifiState(bActive);
     return;
 }
@@ -1249,6 +1248,7 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
     }
     if (g_deviceCallBackStub->GetWifiState() != DEFAULT_VALUES) {
         bActive = g_deviceCallBackStub->GetWifiState();
+        WIFI_LOGI("%{public}s bActive=%{public}d", __func__, bActive);
         return WIFI_OPT_SUCCESS;
     }
     MessageOption option;
@@ -2567,6 +2567,7 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
     config.isPortal = reply.ReadBool();
     config.noInternetAccess = reply.ReadBool();
     config.isAllowAutoConnect = reply.ReadBool();
+    config.isSecureWifi = reply.ReadBool();
 }
 
 ErrCode WifiDeviceProxy::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)

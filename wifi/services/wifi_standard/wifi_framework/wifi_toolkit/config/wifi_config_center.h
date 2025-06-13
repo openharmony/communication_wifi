@@ -353,6 +353,8 @@ public:
 
     bool IsAllowPopUp();
 
+    bool IsAllowPcPopUp();
+
     bool IsNeedFastScan(void);
 
     void SetFastScan(bool fastScan);

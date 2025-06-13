@@ -50,7 +50,7 @@ sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::GetInstance()
     if (instance == nullptr) {
         std::lock_guard<std::mutex> autoLock(instanceLock);
         if (instance == nullptr) {
-            sptr<WifiP2pServiceImpl> service = new (std::nothrow) WifiP2pServiceImpl;
+            sptr<WifiP2pServiceImpl> service = sptr<WifiP2pServiceImpl>::MakeSptr();
             instance = service;
         }
     }

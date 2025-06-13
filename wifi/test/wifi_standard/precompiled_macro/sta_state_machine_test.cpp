@@ -734,6 +734,34 @@ HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Lev
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
+HWTEST_F(StaStateMachineTest, DealWpaEapCustomAuthEventTest01, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    WpaEapData eapData;
+    eapData.code = 1;
+    eapData.type = 13;
+    eapData.msgId = 22;
+    eapData.bufferLen = 3;
+    std::vector<uint8_t> data = {0x11, 0x22, 0x12};
+    eapData.eapBuffer = data;
+    msg->SetMessageObj(eapData);
+    pStaStateMachine->pLinkState->pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
+    pStaStateMachine->pLinkState->DealWpaCustomEapAuthEvent(msg);
+}
+ 
+HWTEST_F(StaStateMachineTest, RegisterCustomEapCallbackTest01, TestSize.Level1)
+{
+    std::string regCmd = "2:277:288";
+    pStaStateMachine->RegisterCustomEapCallback(regCmd);
+}
+ 
+HWTEST_F(StaStateMachineTest, ReplyCustomEapDataCallbackTest01, TestSize.Level1)
+{
+    int result = 2;
+    std::string regCmd = "2:3:abc";
+    pStaStateMachine->ReplyCustomEapDataCallback(result, regCmd);
+}
+
 HWTEST_F(StaStateMachineTest, StopWifiProcessInLinkStateTest01, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();

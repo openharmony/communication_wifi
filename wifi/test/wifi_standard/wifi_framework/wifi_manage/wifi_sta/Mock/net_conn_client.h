@@ -60,6 +60,12 @@ public:
     int32_t RegisterNetConnCallback(const sptr<INetConnCallback> callback);
 
     int32_t UnregisterNetConnCallback(const sptr<INetConnCallback> &callback);
+ 
+    int32_t RegisterCustomEapCallback(const NetType netType, const sptr<INetRegisterEapCallback> &callback);
+ 
+    int32_t UnRegisterCustomEapCallback(const NetType netType, const sptr<INetRegisterEapCallback> &callback);
+ 
+    int32_t NotifyWpaEapInterceptInfo(const NetType netType, const EapData &eapData);
 };
 } // namespace NetManagerStandard
 } // namespace OHOS

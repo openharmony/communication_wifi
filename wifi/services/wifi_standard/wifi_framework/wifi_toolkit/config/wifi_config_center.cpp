@@ -31,8 +31,19 @@ static WifiConfigCenter* gWifiConfigCenter = nullptr;
 #endif
 WifiConfigCenter &WifiConfigCenter::GetInstance()
 {
+#ifdef DTFUZZ_TEST
+    if (gWifiConfigCenter == nullptr) {
+        gWifiConfigCenter = new (std::nothrow) WifiConfigCenter();
+    }
+    if (gWifiConfigCenter == nullptr) {
+        static WifiConfigCenter gWifiConfigCenter;
+        return gWifiConfigCenter;
+    }
+    return *gWifiConfigCenter;
+#else
     static WifiConfigCenter gWifiConfigCenter;
     return gWifiConfigCenter;
+#endif
 }
 
 WifiConfigCenter::WifiConfigCenter()

@@ -1716,7 +1716,18 @@ public:
         LOGI("Enter ClearDhcpOfferTest");
         pSelfCureStateMachine_->ClearDhcpOffer();
     }
+
+    void IsWifiSelfcureDoneTest()
+    {
+        LOGI("Enter IsWifiSelfcureDoneTest");
+        EXPECT_TRUE(pSelfCureStateMachine_->IsWifiSelfcureDone() == false);
+    }
 };
+
+HWTEST_F(SelfCureStateMachineTest, IsWifiSelfcureDoneTest_01, TestSize.Level1)
+{
+    IsWifiSelfcureDoneTest();
+}
 
 HWTEST_F(SelfCureStateMachineTest, DefaultStateGoInStateSuccess, TestSize.Level1)
 {

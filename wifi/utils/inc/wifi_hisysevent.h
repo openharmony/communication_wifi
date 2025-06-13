@@ -17,7 +17,7 @@
 #define OHOS_WIFI_HISYSEVENT_H
 
 #include <string>
-
+#include "wifi_msg.h"
 #define AP_ERR_CODE 3
 #define AP_STA_PSK_MISMATCH_CNT 1
 
@@ -158,7 +158,8 @@ void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReas
 
 void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason);
 
-void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt, int selfCureResetState);
+void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt, int selfCureResetState,
+    std::string selfCureHistory);
 
 void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason);
 
@@ -185,7 +186,7 @@ void WriteWifiEncryptionFailHiSysEvent(int event, const std::string &maskSsid,
 
 void WritePortalStateHiSysEvent(int portalState);
 
-void WriteArpInfoHiSysEvent(uint64_t arpRtt, int arpFailedCount);
+void WriteArpInfoHiSysEvent(uint64_t arpRtt, int32_t arpFailedCount, int32_t gatewayCnt = 0);
 
 void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed);
 
@@ -210,6 +211,8 @@ void Write5gPrefFailedHisysevent(Pref5gStatisticsInfo &info);
 
 void WriteAutoSelectHiSysEvent(int selectType, const std::string &selectedInfo,
     const std::string &filteredReason, const std::string &savedResult);
+
+void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

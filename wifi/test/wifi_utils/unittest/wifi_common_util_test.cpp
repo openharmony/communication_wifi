@@ -227,14 +227,13 @@ HWTEST_F(WifiCommonUtilTest, GetSplitInfoTest, TestSize.Level1)
     EXPECT_EQ(result.size(), 5);
 }
 
-HWTEST_F(WifiCommonUtilTest, isBeaconLostTest, TestSize.Level1)
+HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest, TestSize.Level1)
 {
-    WIFI_LOGI("isBeaconLostTest enter");
+    WIFI_LOGI("IsBeaconLostTest enter");
     std::vector<std::string> bssidArray = {};
     std::vector<WifiSignalPollInfo> wifiBeaconCheckInfoArray ={};
-    bool result = isBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    bool result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_FALSE(result);
-    WIFI_LOGI("isBeaconLostTest enter");
     bssidArray = {
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM",
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM"
@@ -258,7 +257,7 @@ HWTEST_F(WifiCommonUtilTest, isBeaconLostTest, TestSize.Level1)
     signalPoll4.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll5.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     wifiBeaconCheckInfoArray ={signalPoll0, signalPoll1, signalPoll2, signalPoll3, signalPoll4, signalPoll5};
-    result = isBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_TRUE(result);
 }
 
@@ -341,6 +340,13 @@ HWTEST_F(WifiCommonUtilTest, StringToUlongTest03, TestSize.Level1)
     std::string input = "a55";
     unsigned long output = 0;
     EXPECT_TRUE(StringToUlong(input) == output);
+}
+
+HWTEST_F(WifiCommonUtilTest, IsBundleInstalledTest01, TestSize.Level1)
+{
+    WIFI_LOGI("IsBundleInstalledTest01 enter");
+    std::string bundleName = "com.ohos.wifitest01";
+    EXPECT_FALSE(IsBundleInstalled(bundleName));
 }
 }  // namespace Wifi
 }  // namespace OHOS

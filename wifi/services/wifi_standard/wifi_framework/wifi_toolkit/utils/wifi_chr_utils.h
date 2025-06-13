@@ -30,7 +30,7 @@ public:
     void AddSignalPollInfoArray(WifiSignalPollInfo signalInfo);
     void GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
     void ClearSignalPollInfoArray();
-    void BeaconLostReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId);
+    bool IsBeaconLost(const std::string &bssid, const int32_t signalLevel, const int32_t instId);
 
 private:
     WifiChrUtils();

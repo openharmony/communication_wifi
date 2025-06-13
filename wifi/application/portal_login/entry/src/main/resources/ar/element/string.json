@@ -1,0 +1,60 @@
+{
+    "string":[
+        {
+            "name":"compatibility_mode_of_the_PC_version",
+            "value":"إصدار الموقع للحاسوب",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"actions_menu_user_agent",
+            "value":"برنامج وكيل المستخدم للمتصفح",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"إلغاء",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"فتح في المتصفح",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"compatibility_mode_of_the_mobile_version",
+            "value":"إصدار الموقع للجوال",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"شهادة SSL لهذا الموقع منتهية أو غير موثوقة، ومتابعة التصفح ينطوي على مخاطر أمنية. هل حقًا تريد المتابعة؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"متابعة",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"user_agent_harmony",
+            "value":"HarmonyOS",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

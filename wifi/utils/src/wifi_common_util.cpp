@@ -97,6 +97,8 @@ constexpr int IP_ADDRESS_THIRD_BYTE_INDEX = 2;
 constexpr int IP_ADDRESS_FOURTH_BYTE_INDEX = 3;
 constexpr int32_t UID_CALLINGUID_TRANSFORM_DIVISOR = 200000;
 
+constexpr int DEFAULT_USER_ID = 100;
+
 static std::string DataAnonymize(const std::string str, const char delim,
     const char hiddenCh, const int startIdx = 0)
 {
@@ -366,6 +368,21 @@ std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &
     return bundleInfo.signatureInfo.appIdentifier;
 }
 
+bool IsBundleInstalled(const std::string &bundleName)
+{
+    sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
+    if (bundleInstance == nullptr) {
+        WIFI_LOGE("bundle instance is null!");
+        return false;
+    }
+
+    AppExecFwk::BundleInfo bundleInfo;
+    bool isInstalled = bundleInstance->GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
+        bundleInfo, DEFAULT_USER_ID);
+    WIFI_LOGI("Bundle %{public}s is Installed: %{public}d", bundleName.c_str(), isInstalled);
+    return isInstalled;
+}
+
 ErrCode GetBundleNameByUid(const int uid, std::string &bundleName)
 {
     sptr<AppExecFwk::IBundleMgr> bundleInstance = GetBundleManager();
@@ -505,7 +522,7 @@ bool IsOtherVapConnect()
     return p2pOrHmlConnected && hotspotEnable;
 }
 
-bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray)
+bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray)
 {
     if (wifiBeaconCheckInfoArray.empty() || bssidArray.empty()) {
         WIFI_LOGE("Empty array");
@@ -889,6 +906,25 @@ uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode)
 bool InternalHiLinkNetworkToBool(int isHiLinkNetwork)
 {
     return (isHiLinkNetwork > 0 && isHiLinkNetwork <= INTERNAL_HILINK_MAX_VALUE) ? true : false;
+}
+
+std::string Ipv4IntAnonymize(uint32_t ipInt)
+{
+    // convert uint32_t to string
+    std::string address;
+    if (ipInt == 0) {
+        return address;
+    }
+    std::ostringstream stream;
+    stream << ((ipInt >> BITS_24) & 0xFF) << "." << ((ipInt >> BITS_16) & 0xFF) << "."
+    << ((ipInt >> BITS_8) & 0xFF) << "." << (ipInt & 0xFF);
+    address = stream.str();
+    return IpAnonymize(address);
+}
+
+std::string Ipv6Anonymize(std::string str)
+{
+    return DataAnonymize(str, ':', '*', 1);
 }
 }  // namespace Wifi
 }  // namespace OHOS

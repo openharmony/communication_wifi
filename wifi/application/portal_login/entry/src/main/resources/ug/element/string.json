@@ -2,43 +2,73 @@
     "string":[
         {
             "name":"actions_menu_user_agent",
-            "value":"تور كۆرگۈچ UA"
+            "value":"تور كۆرگۈچنىڭ UA نۇسخىسى",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"contextmenu_open_in_browser",
-            "value":"تور كۆرگۈچتە ئېچىش"
+            "value":"تور كۆرگۈچتە ئېچىش",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"site_setting_single_website_title",
-            "value":"\u200f%s تەڭشەكلىرى"
+            "value":"\u200f%s تەڭشەكلىرى",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"user_agent_harmony",
-            "value":"\u200fHarmonyOS"
+            "value":"HarmonyOS",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
-            "value":"ماسلاشما يانفون ھالەت"
+            "value":"يانفون نەشرى",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"compatibility_mode_of_the_PC_version",
-            "value":"ماسلاشما كومپيۇتېر ھالەت"
+            "value":"كومپيۇتېر نەشرى",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"continue_visit",
-            "value":"داۋاملاشتۇرامسىز؟"
+            "value":"داۋاملاشتۇرامسىز؟",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"ssl_normal_error_msg",
-            "value":"بۇ تور بېكەتنىڭ بىخەتەرلىك ئىجازەتنامىسىنىڭ ۋاقتى ئۆتكەن ياكى ئىشەنچسىز، خەتەر بولۇشى مۇمكىن. داۋاملىق زىيارەت قىلامسىز؟"
+            "value":"بۇ تور بېكەتنىڭ بىخەتەرلىك ئىجازەتنامىسىنىڭ ۋاقتى ئۆتكەن ياكى ئىشەنچسىز، خەتەر بولۇشى مۇمكىن. داۋاملىق زىيارەت قىلامسىز؟",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"ssl_error_dialog_continue_btn",
-            "value":"داۋاملاشتۇرۇش"
+            "value":"داۋاملاشتۇرۇش",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"confirm_dialog_cancel",
-            "value":"بىكار قىلىش"
+            "value":"بىكار قىلىش",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -32,7 +32,7 @@ public:
     void GetNextGatewayMac(std::string& mac);
     int32_t SetStaticArp(const std::string& iface, const std::string& ipAddr, const std::string& macAddr);
     int32_t DelStaticArp(const std::string& iface, const std::string& ipAddr);
-
+    int32_t GetGatewayNum(); // only called by selfcure thread
 private:
     int32_t GetMacAddr(char *buff, const char *macAddr);
     int32_t DoArpItem(int32_t cmd, struct arpreq *req);

@@ -234,6 +234,15 @@ int64_t GetElapsedMicrosecondsSinceBoot();
 std::string GetBundleName();
 
 std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &bundleName);
+
+/**
+ * @Description whether the bundle is installed.
+ *
+ * @param std::string - bundle name
+ * @return bool - true: installed
+ */
+bool IsBundleInstalled(const std::string &bundleName);
+
 /**
  * @Description get bundle name by uid
  *
@@ -320,7 +329,7 @@ int FrequencyToChannel(int freq);
  */
 int ChannelToFrequency(int channel);
 bool IsOtherVapConnect();
-bool isBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray);
+bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray);
 int HexString2Byte(const char *hex, uint8_t *buf, size_t len);
 void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t hexstrLen);
 bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);
@@ -343,6 +352,10 @@ double StringToDouble(const std::string &word);
  * @return bool - isHiLinkNetwork
  */
 bool InternalHiLinkNetworkToBool(int isHiLinkNetwork);
+
+std::string Ipv4IntAnonymize(uint32_t ipInt);
+
+std::string Ipv6Anonymize(std::string str);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

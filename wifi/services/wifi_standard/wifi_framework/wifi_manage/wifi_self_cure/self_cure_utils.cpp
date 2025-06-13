@@ -21,6 +21,7 @@
 #include "self_cure_msg.h"
 #include "wifi_logger.h"
 #include "self_cure_state_machine.h"
+#include "wifi_config_center.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_sta_hal_interface.h"
 
@@ -520,6 +521,58 @@ bool SelfCureUtils::IsSameEncryptType(const std::string& scanInfoKeymgmt, const 
     } else {
         return false;
     }
+}
+
+bool SelfCureUtils::IsIpConflictDetect()
+{
+    WIFI_LOGI("IsIpConflictDetect enter");
+    ArpChecker arpChecker;
+    std::string macAddress;
+    WifiConfigCenter::GetInstance().GetMacAddress(macAddress);
+    IpInfo ipInfo;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo);
+    std::string targetIp = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    std::string senderIp = "0.0.0.0";
+    if (targetIp.empty() || ifName.empty()) {
+        WIFI_LOGE("targetIp or ifName is empty");
+        return false;
+    }
+    arpChecker.Start(ifName, macAddress, senderIp, targetIp);
+    for (int i = 0; i < DEFAULT_SLOW_NUM_ARP_PINGS; i++) {
+        if (arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true)) {
+            WIFI_LOGW("IsIpConflictDetect, ip conflicted!");
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string SelfCureUtils::GetSelfCureHistory()
+{
+    WifiLinkedInfo wifiLinkedInfo;
+    if (WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo) != 0) {
+        WIFI_LOGE("GetSelfCureHistory Get current link info failed!");
+        return "";
+    }
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, config) != 0) {
+        WIFI_LOGE("GetSelfCureHistory Get device config failed!, netId: %{public}d", wifiLinkedInfo.networkId);
+        return "";
+    }
+    return config.internetSelfCureHistory;
+}
+
+void SelfCureUtils::ReportNoInternetChrEvent()
+{
+    WIFI_LOGI("ReportNoInternetChrEvent enter");
+    std::string selfcureHistory = GetSelfCureHistory();
+    int resetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
+    NetworkFailReason networkFailReason = NetworkFailReason::DNS_STATE_UNREACHABLE;
+    if (IsIpConflictDetect()) {
+        networkFailReason = NetworkFailReason::IP_STATE_CONFLICT;
+    }
+    WriteWifiAccessIntFailedHiSysEvent(1, networkFailReason, resetState, selfcureHistory);
 }
 } // namespace Wifi
 } // namespace OHOS

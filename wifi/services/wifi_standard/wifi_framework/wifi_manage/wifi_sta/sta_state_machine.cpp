@@ -2143,7 +2143,28 @@ void StaStateMachine::RegisterCustomEapCallback(const std::string &regCmd) //net
         WIFI_LOGI("${public}s regcmd error, regCmd[${public}s]", __func__, regCmd.c_str());
         return;
     }
+    std::string cmd = "EXT_AUTH_REG ";
+    cmd += regCmd;
+    WIFI_LOGI("${public}s regCmd:${public}s", __func__, cmd.c_str());
+    if (WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("${public}s: failed to send the message, Custom Eap cmd: ${private}s", __func__, cmd.c_str());
+        return;
+    }
 }
+
+void StaStateMachine::ReplyCustomEapDataCallback(int result, const std::string &strEapData)
+{
+    std::string cmd = "EXT_AUTH_DATA ";
+    cmd += std::to_string(result);
+    cmd += std::string(":");
+    cmd += strEapData;
+    WIFI_LOGI("${public}s, reply result:${public}d", __func__, result);
+    if (WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("${public}s: failed to send the message", __func__);
+        return;
+    }
+}
+
 void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl)
 {
     WIFI_LOGD("Enter HandleNetCheckResult, netState:%{public}d screen:%{public}d "

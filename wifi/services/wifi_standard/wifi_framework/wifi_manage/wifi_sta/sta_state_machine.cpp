@@ -709,6 +709,9 @@ int StaStateMachine::LinkState::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT] = [this](InternalMessagePtr msg) {
         return this->pStaStateMachine->DealWpaEapUmtsAuthEvent(msg);
     };
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_CUSTOM_AUTH_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaCustomEapAuthEvent(msg);
+    };
 #endif
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = [this](InternalMessagePtr msg) {
         return this->DealWpaStateChange(msg);
@@ -759,6 +762,20 @@ bool StaStateMachine::IsNewConnectionInProgress()
         targetId, currentLinkedId, SsidAnonymize(disconnectingSsid).c_str(),
         SsidAnonymize(targetSsid).c_str(), static_cast<int>(result));
     return result;
+}
+
+void StaStateMachine::LinkState::DealWpaCustomEapAuthEvent(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        LOGE("%{public}s InternalMessage msg is null.", __func__);
+        return;
+    }
+
+    WpaEapData wpaEapData = {0};
+    msg->GetMessageObj(wpaEapData);
+    NetEapObserver::GetInstance().NotifyWpaEapInterceptInfo(wpaEapData);
+    LOGI("%{public}s code=%{public}d, type=%{public}d, msgId:%{public}d", __func__, wpaEapData.code,
+        wpaEapData.type, wpaEapData.msgId);
 }
 
 void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessagePtr msg)

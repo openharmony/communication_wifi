@@ -28,6 +28,7 @@ namespace Wifi {
 
 constexpr int MAX_SIZE = 256;
 constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
+constexpr int EDM_UID = 3057;
 int g_bigDataRecvLen = 0;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
@@ -72,38 +73,6 @@ void WifiDeviceProxy::InitWifiState()
     };
     const std::vector<std::string> event = {EVENT_STA_POWER_STATE_CHANGE};
     RegisterCallBack(callBack, event);
-
-    if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
-        return;
-    }
-    MessageOption option;
-    MessageParcel data;
-    MessageParcel reply;
-    if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
-        return;
-    }
-    data.WriteInt32(0);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), data, reply,
-        option);
-    if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
-            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), error);
-        return;
-    }
-    int exception = reply.ReadInt32();
-    if (exception) {
-        return;
-    }
-    int ret = reply.ReadInt32();
-    if (ret != WIFI_OPT_SUCCESS) {
-        return;
-    }
-
-    bool bActive = reply.ReadBool();
-    WIFI_LOGI("%{public}s bActive=%{public}d", __func__, bActive);
-    g_deviceCallBackStub->SetWifiState(bActive);
     return;
 }
 
@@ -1682,6 +1651,13 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
+    }
+    int uid = GetCallingUid();  // 获取 UID
+    WIFI_LOGI("OnRegisterCallBack GetCallingUid UID %{public}d", uid);
+        // 检查禁止 UID 列表
+    if (uid == EDM_UID) {
+        WIFI_LOGE("UID %{public}d is forbidden to register callback", uid);
+        return;
     }
     MessageParcel data, reply;
     MessageOption option(MessageOption::TF_ASYNC);

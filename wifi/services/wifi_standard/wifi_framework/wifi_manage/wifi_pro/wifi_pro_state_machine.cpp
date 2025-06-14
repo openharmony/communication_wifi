@@ -900,6 +900,7 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     mLastDnsFailedCnt_ = 0;
     netDisableDetectCount_ = 0;
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+    qoeScaning_ = false;
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
     pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
     pWifiProStateMachine_->perf5gHandoverService_.NetworkStatusChanged(NetworkStatus::HAS_INTERNET);
@@ -1041,12 +1042,16 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
             rssiLevel0Or1ScanedCounter_++;
         }
         pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
-    } else if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
-        WIFI_LOGI("HandleReuqestScanInHasNet, reset qoe state.");
-        qoeScaning_ = false;
     } else {
         WIFI_LOGI("TryStartScan, do not scan, signalLevel:%{public}d,scanMaxCounter:%{public}d.",
             signalLevel, scanMaxCounter);
+    }
+    // qoe scan times reset
+    if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW &&
+        ((signalLevel == SIG_LEVEL_4 && rssiLevel4ScanedCounter_ >= scanMaxCounter) ||
+            (signalLevel == SIG_LEVEL_3 && rssiLevel2Or3ScanedCounter_ >= scanMaxCounter))) {
+        WIFI_LOGI("HandleReuqestScanInHasNet, reset qoe state.");
+        qoeScaning_ = false;
     }
 }
 

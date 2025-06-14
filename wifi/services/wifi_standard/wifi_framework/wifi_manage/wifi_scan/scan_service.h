@@ -330,6 +330,11 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode SetNetworkInterfaceUpDown(bool upDown);
+    /**
+     * @Description Reset scan interval.
+     *
+     */
+    virtual void ResetScanInterval();
 
 private:
     using ScanConfigMap = std::map<int, StoreScanConfig>;

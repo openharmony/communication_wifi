@@ -1048,8 +1048,8 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
     }
     // qoe scan times reset
     if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW &&
-        ((signalLevel == SIG_LEVEL_4 && rssiLevel4ScanedCounter_ >= scanMaxCounter) ||
-            (signalLevel == SIG_LEVEL_3 && rssiLevel2Or3ScanedCounter_ >= scanMaxCounter))) {
+        ((signalLevel == SIG_LEVEL_4 && rssiLevel4ScanedCounter_ > scanMaxCounter) ||
+            (signalLevel == SIG_LEVEL_3 && rssiLevel2Or3ScanedCounter_ > scanMaxCounter))) {
         WIFI_LOGI("HandleReuqestScanInHasNet, reset qoe state.");
         qoeScaning_ = false;
     }

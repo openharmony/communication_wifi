@@ -473,7 +473,7 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     return true;
 }
 
-bool WifiProStateMachine::FullScan()
+ErrCode WifiProStateMachine::FullScan()
 {
     WIFI_LOGD("start Fullscan");
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
@@ -1013,6 +1013,7 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
     if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
         qoeScaning_ = true;
     }
+    ErrCode ret = WIFI_OPT_FAILED;
     // calculate the interval and the max scan counter.
     int32_t scanInterval = WifiProUtils::GetScanInterval(hasSwitchRecord, signalLevel);
     int32_t scanMaxCounter = WifiProUtils::GetMaxCounter(hasSwitchRecord, signalLevel);
@@ -1020,7 +1021,7 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
         pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
                   "rssiLevel4ScanedCounter_:%{public}d.", signalLevel, rssiLevel4ScanedCounter_);
-        auto ret = pWifiProStateMachine_->FullScan();
+        ret = pWifiProStateMachine_->FullScan();
         if (ret == WIFI_OPT_SUCCESS) {
             rssiLevel4ScanedCounter_++;
         }
@@ -1048,8 +1049,8 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
     }
     // qoe scan times reset
     if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW &&
-        ((signalLevel == SIG_LEVEL_4 && rssiLevel4ScanedCounter_ > scanMaxCounter) ||
-            (signalLevel == SIG_LEVEL_3 && rssiLevel2Or3ScanedCounter_ > scanMaxCounter))) {
+        ((signalLevel == SIG_LEVEL_4 && rssiLevel4ScanedCounter_ >= scanMaxCounter) ||
+            (signalLevel == SIG_LEVEL_3 && rssiLevel2Or3ScanedCounter_ >= scanMaxCounter)) && ret == WIFI_OPT_FAILED) {
         WIFI_LOGI("HandleReuqestScanInHasNet, reset qoe state.");
         qoeScaning_ = false;
     }

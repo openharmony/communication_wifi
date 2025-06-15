@@ -17,6 +17,7 @@
 #ifndef OHOS_WIFI_NETWORK_SELECTION_MANAGER_H
 #define OHOS_WIFI_NETWORK_SELECTION_MANAGER_H
 
+#include <mutex>
 #include "network_selection.h"
 #include "network_selector_factory.h"
 
@@ -82,6 +83,17 @@ private:
      * @param networkCandidate best network candidate
      */
     std::string GetSelectedInfoForChr(NetworkSelection::NetworkCandidate *networkCandidate);
+    
+    /**
+     * is outdoor filter
+     *
+     * @param networkCandidate best network candidate
+     */
+    bool IsOutdoorFilter(NetworkSelection::NetworkCandidate *networkCandidate);
+
+private:
+    std::mutex rssiCntMutex_;
+    std::map<std::string, int> rssiCntMap_;
 };
 }
 #endif

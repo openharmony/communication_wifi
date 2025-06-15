@@ -125,7 +125,19 @@ public:
         int event = 0;
         pSelfCureService->CheckSelfCureWifiResult(event);
     }
+
+    void IsWifiSelfcureDoneTest()
+    {
+        pSelfCureService->IsWifiSelfcureDone();
+        pSelfCureService->pSelfCureStateMachine = nullptr;
+        EXPECT_FALSE(pSelfCureService->IsWifiSelfcureDone());
+    }
 };
+
+HWTEST_F(SelfCureServiceTest, IsWifiSelfcureDoneTest_01, TestSize.Level1)
+{
+    IsWifiSelfcureDoneTest();
+}
 
 HWTEST_F(SelfCureServiceTest, InitSelfCureServiceTest, TestSize.Level1)
 {

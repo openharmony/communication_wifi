@@ -30,6 +30,7 @@ public:
 
     void Init();
     int GetMinRssiThres(int frequency);
+    bool IsOutdoorScene();
 private:
     void RegisterSensorEnhCallback();
     void SensorEnhCallback(int scenario);

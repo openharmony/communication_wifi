@@ -25,6 +25,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_common_event_helper.h"
 #include "wifi_code_convert.h"
+#include "wifi_sensor_scene.h"
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
 #define MIN(A, B) (((A) >= (B)) ? (B) : (A))
@@ -1270,8 +1271,9 @@ void ScanService::HandleAutoConnectStateChanged(bool success)
 {
     WIFI_LOGI("Enter HandleAutoConnectStateChanged\n");
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-    if (staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)
-        && screenState != MODE_STATE_CLOSE && !success && systemScanIntervalMode.scanIntervalMode.count <= 1) {
+    bool isOutdoorScene = WifiSensorScene::GetInstance().IsOutdoorScene();
+    if (staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) && screenState != MODE_STATE_CLOSE &&
+        !success && systemScanIntervalMode.scanIntervalMode.count <= 1 && !isOutdoorScene) {
         if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Scan failed.");
         }
@@ -2919,6 +2921,12 @@ void ScanService::InitChipsetInfo()
     } else {
         isChipsetInfoObtained = true;
     }
+}
+
+void ScanService::ResetScanInterval()
+{
+    WIFI_LOGI("Enter ResetScanInterval");
+    systemScanIntervalMode.scanIntervalMode.interval = SYSTEM_SCAN_INTERVAL_10_SECOND;
 }
 
 #ifndef OHOS_ARCH_LITE

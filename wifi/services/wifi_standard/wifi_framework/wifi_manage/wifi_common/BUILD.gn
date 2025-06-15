@@ -288,6 +288,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
     }
 
+    if (wifi_feature_with_extensible_authentication) {
+      defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+    }
+
     if (wifi_feature_mdm_restricted_enable) {
       defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
     }

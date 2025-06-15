@@ -20,9 +20,14 @@
 #include "network_selection_utils.h"
 #include "wifi_common_util.h"
 #include "wifi_hisysevent.h"
+#include "wifi_sensor_scene.h"
+#include "wifi_channel_helper.h"
+#include "wifi_service_manager.h"
 
 namespace OHOS::Wifi {
 DEFINE_WIFILOG_LABEL("networkSelectionManager")
+
+const int OUTDOOR_NETWORK_SELECT_THRES = 3;
 
 NetworkSelectionManager::NetworkSelectionManager()
 {
@@ -72,6 +77,12 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     } else {
         selectedInfo = GetSelectedInfoForChr(bestNetworkCandidates.at(0));
         WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
+    }
+
+    /* Determine whether to select bestNetworkCandidates in outdoor scene */
+    if (IsOutdoorFilter(bestNetworkCandidates.at(0))) {
+        WIFI_LOGI("bestNetworkCandidates do not satisfy outdoor select condition");
+        return false;
     }
 
     /* if bestNetworkCandidates is not empty, assign the value of first bestNetworkCandidate
@@ -217,5 +228,44 @@ std::string NetworkSelectionManager::GetSelectedInfoForChr(NetworkSelection::Net
     selectedInfo += "_";
     selectedInfo += std::to_string(networkCandidate->interScanInfo.rssi);
     return selectedInfo;
+}
+
+bool NetworkSelectionManager::IsOutdoorFilter(NetworkSelection::NetworkCandidate *networkCandidate)
+{
+    std::lock_guard<std::mutex> lock(rssiCntMutex_);
+    if (!WifiSensorScene::GetInstance().IsOutdoorScene()) {
+        WIFI_LOGI("IsOutdoorFilter indoor scene do not filter");
+        rssiCntMap_.clear();
+        return false;
+    }
+    if ((WifiChannelHelper::GetInstance().IsValid5GHz(networkCandidate->interScanInfo.frequency) &&
+            networkCandidate->interScanInfo.rssi >= RSSI_LEVEL_4_5G) ||
+        (WifiChannelHelper::GetInstance().IsValid24GHz(networkCandidate->interScanInfo.frequency) &&
+            networkCandidate->interScanInfo.rssi >= RSSI_LEVEL_4_2G)) {
+        WIFI_LOGI("IsOutdoorFilter outdoor strong signal do not filter");
+        rssiCntMap_.clear();
+        return false;
+    }
+    if ((WifiChannelHelper::GetInstance().IsValid5GHz(networkCandidate->interScanInfo.frequency) &&
+            networkCandidate->interScanInfo.rssi < RSSI_LEVEL_3_5G) ||
+        (WifiChannelHelper::GetInstance().IsValid24GHz(networkCandidate->interScanInfo.frequency) &&
+            networkCandidate->interScanInfo.rssi < RSSI_LEVEL_3_2G)) {
+        rssiCntMap_.clear();
+        return true;
+    }
+    if (rssiCntMap_[networkCandidate->interScanInfo.bssid] < OUTDOOR_NETWORK_SELECT_THRES) {
+        rssiCntMap_[networkCandidate->interScanInfo.bssid]++;
+        int instId = 0;
+        IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
+        if (pScanService == nullptr || pScanService->ResetScanInterval() != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("IsOutdoorFilter ResetScanInterval failed");
+            rssiCntMap_.clear();
+            return false;
+        }
+        return true;
+    }
+    WIFI_LOGI("IsOutdoorFilter signal satisfy outdoor select condition");
+    rssiCntMap_.clear();
+    return false;
 }
 }

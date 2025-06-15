@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef WIFI_NET_EAP_OBSERVER_H
 #define WIFI_NET_EAP_OBSERVER_H
- 
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,37 +24,37 @@
 #include "iremote_broker.h"
 #include "net_conn_client.h"
 #include "net_eap_callback_stub.h"
- 
+
 namespace OHOS {
 namespace Wifi {
- 
+
 class NetEapCallback : public NetManagerStandard::NetRegisterEapCallbackStub {
 public:
- 
+
     /**
      * @Description Construct of NetEapObserver
      */
     NetEapCallback();
- 
+
     /**
      * @Description Destructor function
      */
     ~NetEapCallback();
- 
+
     /**
      * @Description registers the EapCustomHandler callback function of the Wi-Fi state machine.
      *
      * @param callback - callback func
      */
     bool SetRegisterCustomEapCallback(const std::function<void(const std::string &)> &callback);
- 
+
     /**
      * @Description registers the ReplyCustomEapData function of the Wi-Fi state machine.
      *
      * @param callback - callback func
      */
     bool SetReplyCustomEapDataCallback(const std::function<void(int, const std::string&)> &callback);
- 
+
 public:
     /**
      * @Description Register Custom Eap Callback
@@ -62,29 +62,27 @@ public:
      * @param regCmd - register command. eg: 2:277:278
      */
     int32_t OnRegisterCustomEapCallback(const std::string &regCmd) override;
- 
+
     /**
      * @Description callback function used to Reply Custom EapData Event
      * @param result - Indicates the result of custom authentication
-     * @param strEapData - Indicates eap data
+     * @param eapData - Indicates sptr of eap data
      */
-    int32_t OnReplyCustomEapDataEvent(int result, const NetManagerStandard::EapData &eapData) override;
- 
+    int32_t OnReplyCustomEapDataEvent(int result, const sptr<NetManagerStandard::EapData> &eapData) override;
+
     std::function<void(const std::string &)> GetRegisterCustomEapCallback();
 public:
     std::function<void(const std::string &)> regCallback_ = nullptr;
     std::function<void(int, const std::string&)> replyCallback_ = nullptr;
-    NetManagerStandard::EapData netEapData_ = {};
-    std::string regCmd_;
+    std::string regCmd_ = {};
 };
- 
+
 class NetEapObserver
 {
 public:    
     static NetEapObserver &GetInstance();
-    NetEapObserver() = delete;
     ~NetEapObserver();
- 
+
     void StartNetEapObserver();
     void StopNetEapObserver();
     bool SetRegisterCustomEapCallback(const std::function<void(const std::string &)> &callback);
@@ -94,11 +92,15 @@ public:
     sptr<NetEapCallback> GetNetEapCallbackPtr() {
         return netEapCallback_;
     }
- 
+
 public:
-    sptr<NetEapCallback> netEapCallback_;
+    sptr<NetEapCallback> netEapCallback_ = nullptr;
+
+private:
+    NetEapObserver();
+    std::mutex mutex_;
 };
- 
+
 }
 }
 #endif

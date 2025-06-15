@@ -676,6 +676,7 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_extensible_authentication) {
       defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+      external_deps += ["netmanager_ext:ethernet_manager_if"]
     }
 
     part_name = "wifi"

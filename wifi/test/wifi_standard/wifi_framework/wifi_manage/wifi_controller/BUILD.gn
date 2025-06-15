@@ -153,6 +153,7 @@ ohos_unittest("wifi_controller_unittest") {
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
     "netmanager_base:net_stats_manager_if",
+    "netmanager_ext:ethernet_manager_if",
     "netstack:http_client",
     "samgr:samgr_proxy",
     "time_service:time_client",

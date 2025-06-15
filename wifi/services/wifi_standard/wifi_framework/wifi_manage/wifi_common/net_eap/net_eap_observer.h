@@ -22,8 +22,7 @@
 #include "wifi_log.h"
 #include "wifi_msg.h"
 #include "iremote_broker.h"
-#include "net_conn_client.h"
-#include "net_eap_callback_stub.h"
+#include "ethernet_client.h"
 
 namespace OHOS {
 namespace Wifi {

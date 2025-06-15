@@ -37,7 +37,9 @@
 #include "want.h"
 #include "wifi_net_agent.h"
 #include "wifi_net_observer.h"
+#ifdef EXTENSIBLE_AUTHENTICATION
 #include "net_eap_observer.h"
+#endif
 #include "sim_state_type.h"
 #include "core_service_client.h"
 #include "cellular_data_client.h"

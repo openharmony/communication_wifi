@@ -155,7 +155,6 @@ if (defined(ohos_lite)) {
       "network_black_list/network_black_list_manager.cpp",
       "network_status_history/network_status_history_manager.cpp",
       "network_status_history/wifi_history_record_manager.cpp",
-      "net_eap/net_eap_observer.cpp",
       "rdb/wifi_rdb_manager.cpp",
       "wifi_app_state_aware.cpp",
       "wifi_auth_center.cpp",
@@ -289,7 +288,9 @@ if (defined(ohos_lite)) {
     }
 
     if (wifi_feature_with_extensible_authentication) {
+      sources += ["net_eap/net_eap_observer.cpp",]
       defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+      external_deps += ["netmanager_ext:ethernet_manager_if"]
     }
 
     if (wifi_feature_mdm_restricted_enable) {

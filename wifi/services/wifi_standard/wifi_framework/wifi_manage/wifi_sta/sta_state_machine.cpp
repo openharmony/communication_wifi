@@ -195,7 +195,7 @@ ErrCode StaStateMachine::InitStaStateMachine()
         [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
 #ifdef EXTENSIBLE_AUTHENTICATION
     NetEapObserver::GetInstance().SetRegisterCustomEapCallback(
-        [this](const std::string &regCmd) { this->SetRegisterCustomEapCallback(regCmd); });
+        [this](const std::string &regCmd) { this->RegisterCustomEapCallback(regCmd); });
     NetEapObserver::GetInstance().SetReplyCustomEapDataCallback(
         [this](int result, const std::string &strEapData) { this->ReplyCustomEapDataCallback(result, strEapData); });
     NetEapObserver::GetInstance().ReRegisterCustomEapCallback();

@@ -177,6 +177,7 @@ ohos_unittest("wifi_pro_unittest") {
     "netmanager_base:net_native_manager_if",
     "netmanager_base:net_stats_manager_if",
     "netmanager_base:netsys_controller",
+    "netmanager_ext:ethernet_manager_if",
     "netstack:http_client",
     "power_manager:powermgr_client",
     "samgr:samgr_proxy",

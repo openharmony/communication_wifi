@@ -112,6 +112,7 @@
                 "movement",
                 "napi",
                 "netmanager_base",
+                "netmanager_ext",
                 "netstack",
                 "os_account",
                 "openssl",

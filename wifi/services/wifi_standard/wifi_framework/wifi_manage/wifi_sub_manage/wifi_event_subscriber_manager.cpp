@@ -39,7 +39,9 @@
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
 #include "display_info.h"
+#ifdef EXTENSIBLE_AUTHENTICATION
 #include "net_eap_observer.h"
+#endif
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sensor_scene.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
@@ -208,9 +210,7 @@ void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbi
             pService->OnSystemAbilityChanged(systemAbilityId, add);
         }
     }
-#ifdef EXTENSIBLE_AUTHENTICATION
     StartNetEapObserver();
-#endif
 }
 
 #ifdef HAS_MOVEMENT_PART
@@ -549,8 +549,10 @@ void WifiEventSubscriberManager::MdmPropChangeEvt(const char *key, const char *v
 
 void WifiEventSubscriberManager::StartNetEapObserver()
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     WIFI_LOGI("StartNetEapObserver");
     NetEapObserver::GetInstance().StartNetEapObserver();
+#endif
 }
 #ifdef HAS_MOVEMENT_PART
 void WifiEventSubscriberManager::RegisterMovementCallBack()

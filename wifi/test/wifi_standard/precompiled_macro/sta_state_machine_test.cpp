@@ -748,13 +748,13 @@ HWTEST_F(StaStateMachineTest, DealWpaEapCustomAuthEventTest01, TestSize.Level1)
     pStaStateMachine->pLinkState->pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
     pStaStateMachine->pLinkState->DealWpaCustomEapAuthEvent(msg);
 }
- 
+
 HWTEST_F(StaStateMachineTest, RegisterCustomEapCallbackTest01, TestSize.Level1)
 {
     std::string regCmd = "2:277:288";
     pStaStateMachine->RegisterCustomEapCallback(regCmd);
 }
- 
+
 HWTEST_F(StaStateMachineTest, ReplyCustomEapDataCallbackTest01, TestSize.Level1)
 {
     int result = 2;

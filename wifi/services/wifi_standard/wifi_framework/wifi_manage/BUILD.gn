@@ -674,6 +674,10 @@ if (defined(ohos_lite)) {
       defines += [ "WIFI_DATA_REPORT_ENABLE" ]
     }
 
+    if (wifi_feature_with_extensible_authentication) {
+      defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+    }
+
     part_name = "wifi"
     subsystem_name = "communication"
   }

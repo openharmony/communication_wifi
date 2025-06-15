@@ -108,7 +108,6 @@ ohos_unittest("manager_unittest") {
     "Mock/mock_wifi_settings.cpp",
     "common/app_network_speed_limit_service_test.cpp",
     "common/block_connect_service_test.cpp",
-    "common/net_eap_observer_test.cpp",
     "common/speed_limit_configs_writer_test.cpp",
     "common/wifi_app_state_aware_test.cpp",
     "common/wifi_auth_center_test.cpp",
@@ -258,6 +257,11 @@ ohos_unittest("manager_unittest") {
 
   if (wifi_feature_with_rpt) {
     defines += [ "FEATURE_RPT_SUPPORT" ]
+  }
+
+  if (wifi_feature_with_extensible_authentication) {
+    sources += ["common/net_eap_observer_test.cpp",]
+    defines += [ "EXTENSIBLE_AUTHENTICATION" ]
   }
 
   if (defined(global_parts_info) &&

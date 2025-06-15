@@ -658,14 +658,14 @@ private:
      * @param eapType Indicates eap type need to customize
      */
     void RegisterCustomEapCallback(const std::string &regCmd);
- 
+
     /**
      * @Description implementation of Reply CustomEap Data
      *
      * @param eapBuf Indicates eap packet that customized
      */
     void ReplyCustomEapDataCallback(int result, const std::string &strEapData);
- 
+
     /**
      * @Description  notification portal network.
      *
@@ -969,7 +969,7 @@ private:
      * @param msg: register param
      */
     void DealRegCustomEapEvent(InternalMessagePtr msg);
- 
+
     /**
      * @Description aka/aka' authentication Pre-process
      *

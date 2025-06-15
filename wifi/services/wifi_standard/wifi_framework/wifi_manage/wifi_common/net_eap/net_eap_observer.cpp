@@ -16,52 +16,62 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <thread>
+#include <sstream>
 #include "wifi_common_util.h"
 #include "wifi_logger.h"
 #include "wifi_errcode.h"
- 
+
 DEFINE_WIFILOG_LABEL("WifiNetEapObserver");
- 
+
 namespace OHOS {
 namespace Wifi {
- 
+
 NetEapObserver::NetEapObserver()
 {
     WIFI_LOGD("construct NetEapObserver");
     netEapCallback_ = sptr<NetEapCallback>(new NetEapCallback());
 }
- 
+
 NetEapObserver::~NetEapObserver()
 {
     WIFI_LOGD("~NetEapObserver");
 }
- 
+
 NetEapObserver &NetEapObserver::GetInstance()
 {
     static NetEapObserver obj;
     return obj;
 }
- 
+
 bool NetEapObserver::SetRegisterCustomEapCallback(const std::function<void(const std::string &)> &callback)
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     if (netEapCallback_ == nullptr) {
         WIFI_LOGE("%{public}s, netEapCallback_ is nullptr", __func__);
         return false;
     }
     return netEapCallback_->SetRegisterCustomEapCallback(callback);
+#else
+    return true;
+#endif
 }
- 
+
 bool NetEapObserver::SetReplyCustomEapDataCallback(const std::function<void(int, const std::string&)> &callback)
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     if (netEapCallback_ == nullptr) {
         WIFI_LOGE("%{public}s, netEapCallback_ is nullptr", __func__);
         return false;
     }
     return netEapCallback_->SetReplyCustomEapDataCallback(callback);
+#else
+    return true;
+#endif
 }
- 
+
 void NetEapObserver::StartNetEapObserver()
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     int32_t ret = NetManagerStandard::NetConnClient::GetInstance().RegisterCustomEapCallback(
         NetManagerStandard::NetType::WLAN0, netEapCallback_);
     if (ret == NetManagerStandard::NETMANAGER_SUCCESS) {
@@ -69,10 +79,12 @@ void NetEapObserver::StartNetEapObserver()
         return;
     }
     WIFI_LOGI("StartNetEapObserver failed, ret=%{public}d", ret);
+#endif
 }
- 
+
 void NetEapObserver::StopNetEapObserver()
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     int32_t ret = NetManagerStandard::NetConnClient::GetInstance().UnRegisterCustomEapCallback(
         NetManagerStandard::NetType::WLAN0, netEapCallback_);
     if (ret == NetManagerStandard::NETMANAGER_SUCCESS) {
@@ -80,10 +92,12 @@ void NetEapObserver::StopNetEapObserver()
         return;
     }
     WIFI_LOGI("StopNetEapObserver failed, ret=%{public}d", ret);
+#endif
 }
- 
+
 void NetEapObserver::ReRegisterCustomEapCallback()
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     WIFI_LOGI("%{public}s, enter", __func__);
     if (netEapCallback_ == nullptr) {
         WIFI_LOGE("%{public}s, netEapCallback_ is nullptr", __func__);
@@ -95,33 +109,37 @@ void NetEapObserver::ReRegisterCustomEapCallback()
         return;
     }
     callback(netEapCallback_->regCmd_);
+#endif
 }
- 
+
 bool NetEapObserver::NotifyWpaEapInterceptInfo(const WpaEapData &wpaEapData)
 {
-    NetManagerStandard::EapData eapData;
-    eapData.eapCode = wpaEapData.code;
-    eapData.eapType = wpaEapData.type;
-    eapData.msgId = wpaEapData.msgId;
-    eapData.bufferLen = wpaEapData.bufferLen;
-    eapData.eapBuffer = std::move(wpaEapData.eapBuffer);
+#ifdef EXTENSIBLE_AUTHENTICATION
+    std::lock_guard<std::mutex> lock(mutex_);
+    sptr<NetManagerStandard::EapData> notifyEapData = (std::make_unique<NetManagerStandard::EapData>().release());
+    notifyEapData->eapCode = wpaEapData.code;
+    notifyEapData->eapType = wpaEapData.type;
+    notifyEapData->msgId = wpaEapData.msgId;
+    notifyEapData->bufferLen = wpaEapData.bufferLen;
+    notifyEapData->eapBuffer = std::move(wpaEapData.eapBuffer);
     int32_t ret = NetManagerStandard::NetConnClient::GetInstance().NotifyWpaEapInterceptInfo(
-        NetManagerStandard::NetType::WLAN0, eapData);
+        NetManagerStandard::NetType::WLAN0, notifyEapData);
     if (ret != NetManagerStandard::NETMANAGER_SUCCESS) {
-        WIFI_LOGE("NotifyWpaEapInterceptInfo fail, ret:%{public}d", ret);
+        WIFI_LOGE("%{public}s fail, ret:%{public}d", __func__, ret);
         return false;
     }
+#endif
     return true;
 }
- 
+
 NetEapCallback::NetEapCallback()
 {
 }
- 
+
 NetEapCallback::~NetEapCallback()
 {
 }
- 
+
 bool NetEapCallback::SetRegisterCustomEapCallback(const std::function<void(const std::string &regCmd)> &callback)
 {
     if (callback == nullptr) {
@@ -132,12 +150,12 @@ bool NetEapCallback::SetRegisterCustomEapCallback(const std::function<void(const
     return true;
  
 }
- 
+
 std::function<void(const std::string &)> NetEapCallback::GetRegisterCustomEapCallback()
 {
     return regCallback_;
 }
- 
+
 bool NetEapCallback::SetReplyCustomEapDataCallback(const std::function<void(int, const std::string&)> &callback)
 {
     if (callback == nullptr) {
@@ -147,7 +165,7 @@ bool NetEapCallback::SetReplyCustomEapDataCallback(const std::function<void(int,
     replyCallback_ = callback;
     return true;
 }
- 
+
 int32_t NetEapCallback::OnRegisterCustomEapCallback(const std::string &regCmd)
 {
     if (regCmd_ == regCmd) {
@@ -162,7 +180,7 @@ int32_t NetEapCallback::OnRegisterCustomEapCallback(const std::string &regCmd)
     regCallback_(regCmd_);
     return WIFI_OPT_SUCCESS;
 }
- 
+
 int32_t NetEapCallback::OnReplyCustomEapDataEvent(int result, const NetManagerStandard::EapData &eapData)
 {
     if (replyCallback_ == nullptr) {
@@ -179,6 +197,6 @@ int32_t NetEapCallback::OnReplyCustomEapDataEvent(int result, const NetManagerSt
     replyCallback_(result, strEapData);
     return WIFI_OPT_SUCCESS;
 }
- 
+
 }
 }

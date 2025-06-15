@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <cstdio> 
+#include <cstdio>
 #include <chrono>
 #include <random>
 #include "sta_state_machine.h"
@@ -193,11 +193,13 @@ ErrCode StaStateMachine::InitStaStateMachine()
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
     m_NetWorkState->SetNetStateCallback(
         [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
-    NetEapObserver::GetInstance().RegisterCustomEapCallback(
+#ifdef EXTENSIBLE_AUTHENTICATION
+    NetEapObserver::GetInstance().SetRegisterCustomEapCallback(
         [this](const std::string &regCmd) { this->SetRegisterCustomEapCallback(regCmd); });
     NetEapObserver::GetInstance().SetReplyCustomEapDataCallback(
         [this](int result, const std::string &strEapData) { this->ReplyCustomEapDataCallback(result, strEapData); });
     NetEapObserver::GetInstance().ReRegisterCustomEapCallback();
+#endif
 #endif
 
     return WIFI_OPT_SUCCESS;
@@ -709,9 +711,11 @@ int StaStateMachine::LinkState::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT] = [this](InternalMessagePtr msg) {
         return this->pStaStateMachine->DealWpaEapUmtsAuthEvent(msg);
     };
+#ifdef EXTENSIBLE_AUTHENTICATION
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_CUSTOM_AUTH_EVENT] = [this](InternalMessagePtr msg) {
         return this->DealWpaCustomEapAuthEvent(msg);
     };
+#endif
 #endif
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = [this](InternalMessagePtr msg) {
         return this->DealWpaStateChange(msg);
@@ -766,6 +770,7 @@ bool StaStateMachine::IsNewConnectionInProgress()
 
 void StaStateMachine::LinkState::DealWpaCustomEapAuthEvent(InternalMessagePtr msg)
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     if (msg == nullptr) {
         LOGE("%{public}s InternalMessage msg is null.", __func__);
         return;
@@ -776,6 +781,7 @@ void StaStateMachine::LinkState::DealWpaCustomEapAuthEvent(InternalMessagePtr ms
     NetEapObserver::GetInstance().NotifyWpaEapInterceptInfo(wpaEapData);
     LOGI("%{public}s code=%{public}d, type=%{public}d, msgId:%{public}d success", __func__, wpaEapData.code,
         wpaEapData.type, wpaEapData.msgId);
+#endif
 }
 
 void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessagePtr msg)
@@ -2118,6 +2124,7 @@ void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std:
 
 void StaStateMachine::RegisterCustomEapCallback(const std::string &regCmd) //netType:regSize:reg1:reg2
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     const int preNumberCount = 2;
     auto CheckStrEapData = [regCmd](const std::string &data) -> bool {
         if (data.empty()) {
@@ -2150,10 +2157,12 @@ void StaStateMachine::RegisterCustomEapCallback(const std::string &regCmd) //net
         WIFI_LOGI("%{public}s: failed to send the message, Custom Eap cmd: %{private}s", __func__, cmd.c_str());
         return;
     }
+#endif
 }
 
 void StaStateMachine::ReplyCustomEapDataCallback(int result, const std::string &strEapData)
 {
+#ifdef EXTENSIBLE_AUTHENTICATION
     std::string cmd = "EXT_AUTH_DATA ";
     cmd += std::to_string(result);
     cmd += std::string(":");
@@ -2163,6 +2172,7 @@ void StaStateMachine::ReplyCustomEapDataCallback(int result, const std::string &
         WIFI_LOGI("%{public}s: failed to send the message", __func__);
         return;
     }
+#endif
 }
 
 void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const std::string &portalUrl)

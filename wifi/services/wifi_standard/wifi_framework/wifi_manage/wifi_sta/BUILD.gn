@@ -190,6 +190,10 @@ if (defined(ohos_lite)) {
       defines += [ "READ_MAC_FROM_OEM" ]
     }
 
+    if (wifi_feature_with_extensible_authentication) {
+      defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",

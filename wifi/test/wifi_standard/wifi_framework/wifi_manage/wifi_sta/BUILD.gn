@@ -241,6 +241,10 @@ ohos_unittest("wifi_sta_unittest") {
     sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report/select_network_data_report.cpp" ]
   }
 
+  if (wifi_feature_with_extensible_authentication) {
+    defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+  }
+
   if (wifi_feature_mdm_restricted_enable) {
     defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
   }

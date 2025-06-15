@@ -132,7 +132,9 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
 #ifdef HAS_NETMANAGER_EVENT_PART
     UnRegisterNetmgrEvent();
 #endif
+#ifdef EXTENSIBLE_AUTHENTICATION
     NetEapObserver::GetInstance().StopNetEapObserver();
+#endif
 }
 
 void WifiEventSubscriberManager::Init()
@@ -206,8 +208,9 @@ void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbi
             pService->OnSystemAbilityChanged(systemAbilityId, add);
         }
     }
- 
+#ifdef EXTENSIBLE_AUTHENTICATION
     StartNetEapObserver();
+#endif
 }
 
 #ifdef HAS_MOVEMENT_PART

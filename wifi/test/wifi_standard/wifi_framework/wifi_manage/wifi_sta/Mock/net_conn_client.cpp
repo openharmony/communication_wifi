@@ -117,7 +117,7 @@ int32_t NetConnClient::UnRegisterCustomEapCallback(const NetType netType, const 
     return NETMANAGER;
 }
  
-int32_t NetConnClient::NotifyWpaEapInterceptInfo(const NetType netType, const EapData &eapData)
+int32_t NetConnClient::NotifyWpaEapInterceptInfo(const NetType netType, const sptr<EapData> &eapData)
 {
     return NETMANAGER;
 }

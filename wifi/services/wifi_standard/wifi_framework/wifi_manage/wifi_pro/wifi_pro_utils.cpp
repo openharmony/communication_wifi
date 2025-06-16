@@ -41,7 +41,7 @@ bool WifiProUtils::IsWifiConnected(int32_t instId)
 
 int32_t WifiProUtils::GetScanInterval(bool hasWifiSwitchRecord, int32_t rssiLevel)
 {
-    if (rssiLevel >= SIG_LEVEL_MAX) {
+    if (rssiLevel > SIG_LEVEL_MAX) {
         WIFI_LOGI("GetScanInterval, invalid rssiLevel:%{public}d.", rssiLevel);
         return 0;
     }
@@ -51,7 +51,7 @@ int32_t WifiProUtils::GetScanInterval(bool hasWifiSwitchRecord, int32_t rssiLeve
 
 int32_t WifiProUtils::GetMaxCounter(bool hasWifiSwitchRecord, int32_t rssiLevel)
 {
-    if (rssiLevel >= SIG_LEVEL_MAX) {
+    if (rssiLevel > SIG_LEVEL_MAX) {
         WIFI_LOGI("GetMaxCounter, invalid rssiLevel:%{public}d.", rssiLevel);
         return 0;
     }

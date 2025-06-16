@@ -87,7 +87,7 @@ int WifiDeviceCallBackStub::OnRemoteRequest(
 void WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack> &callBack)
 {
     if (callBack == nullptr) {
-        WIFI_LOGE("RegisterUserCallBack:callBack %{public}s is nullptr!", callBack->name.c_str());
+        WIFI_LOGE("RegisterUserCallBack:callBack is nullptr!");
         return;
     }
     if (callbackMap_.size() >= CALLBACK_LIMIT &&

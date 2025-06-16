@@ -130,6 +130,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr};
+        int32_t rssiLevel4ScanedCounter_ { 0 };
         int32_t rssiLevel2Or3ScanedCounter_ { 0 };
         int32_t rssiLevel0Or1ScanedCounter_ { 0 };
         int64_t mLastTcpTxCounter_ { 0 };
@@ -137,6 +138,7 @@ public:
         int32_t mLastDnsFailedCnt_ { 0 };
         int netDisableDetectCount_ { 0 };
         bool qoeSwitch_  { false } ;
+        bool qoeScaning_  { false } ;
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
@@ -247,7 +249,6 @@ private:
     void SetSwitchReason(WifiSwitchReason reason);
     bool IsDisableWifiAutoSwitch();
     void Wifi2WifiFinish();
-    bool IsFullscreen();
     bool IsCallingInCs();
     void UpdateWifiSwitchTimeStamp();
     void HandleWifi2WifiSucsess(int64_t blackListTime);
@@ -257,8 +258,10 @@ private:
     bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, const std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
-    bool FullScan();
+    ErrCode FullScan();
     void ProcessSwitchResult(const InternalMessagePtr msg);
+    // Default SIG_LEVEL_0, skip landscape
+    bool IsAllowScan(int32_t signalLevel = SIG_LEVEL_0, bool hasSwitchRecord = false);
 };
 } // namespace Wifi
 } // namespace OHOS

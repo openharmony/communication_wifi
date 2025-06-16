@@ -225,9 +225,9 @@ HWTEST_F(WifiProStateMachineTest, IsCallingInCsTest01, TestSize.Level1)
     EXPECT_EQ(pWifiProStateMachine_->IsCallingInCs(), false);
 }
 
-HWTEST_F(WifiProStateMachineTest, IsFullscreenTest01, TestSize.Level1)
+HWTEST_F(WifiProStateMachineTest, IsAllowScanest01, TestSize.Level1)
 {
-    EXPECT_EQ(pWifiProStateMachine_->IsFullscreen(), false);
+    EXPECT_EQ(pWifiProStateMachine_->IsAllowScan(), true);
 }
 
 HWTEST_F(WifiProStateMachineTest, UpdateWifiSwitchTimeStampTest01, TestSize.Level1)

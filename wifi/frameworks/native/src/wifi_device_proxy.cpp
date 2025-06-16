@@ -1656,7 +1656,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
         // 检查禁止 UID 列表
     if (uid == EDM_UID) {
         WIFI_LOGE("UID %{public}d is forbidden to register callback", uid);
-        return;
+        return WIFI_OPT_FAILED;
     }
     MessageParcel data, reply;
     MessageOption option(MessageOption::TF_ASYNC);

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <mutex>
 #include <sstream>
 #include "network_selection_manager.h"
 #include "wifi_settings.h"
@@ -240,9 +239,9 @@ bool NetworkSelectionManager::IsOutdoorFilter(NetworkSelection::NetworkCandidate
         return false;
     }
     if ((WifiChannelHelper::GetInstance().IsValid5GHz(networkCandidate->interScanInfo.frequency) &&
-            networkCandidate->interScanInfo.rssi > RSSI_LEVEL_4_5G) ||
+            networkCandidate->interScanInfo.rssi >= RSSI_LEVEL_4_5G) ||
         (WifiChannelHelper::GetInstance().IsValid24GHz(networkCandidate->interScanInfo.frequency) &&
-            networkCandidate->interScanInfo.rssi > RSSI_LEVEL_4_2G)) {
+            networkCandidate->interScanInfo.rssi >= RSSI_LEVEL_4_2G)) {
         WIFI_LOGI("IsOutdoorFilter outdoor strong signal do not filter");
         rssiCntMap_.clear();
         return false;

@@ -65,6 +65,10 @@ void WifiAbilityStatusChange::Init(int32_t systemAbilityId)
 {
     WIFI_LOGI("Init: samgrProxy systemAbilityId:%{public}d!", systemAbilityId);
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        WIFI_LOGE("WifiAbilityStatusChange, Init Failed");
+        return;
+    }
     int32_t ret = samgrProxy->SubscribeSystemAbility(systemAbilityId, this);
     WIFI_LOGI("SubscribeSystemAbility:systemAbilityId:%{public}d, ret:%{public}d!", systemAbilityId, ret);
     return;

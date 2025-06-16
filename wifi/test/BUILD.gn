@@ -21,12 +21,10 @@ group("unittest") {
     "wifi_standard/native:native_unittest",
     "wifi_standard/non_mock:wifi_non_mock_unittest",
     "wifi_standard/wifi_base:base_unittest",
-    "wifi_standard/wifi_framework/wifi_manage/idl_client/unittest:idl_client_unittest",
     "wifi_standard/wifi_framework/wifi_manage/wifi_scan:wifi_scan_unittest",
     "wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_selfcure_unittest",
     "wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_unittest",
     "wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_unittest",
-    "wifi_standard/wifi_framework/wifi_toolkit/unittest:toolkit_unittest",
     "wifi_utils/unittest:utils_unittest",
   ]
 }

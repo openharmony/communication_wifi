@@ -38,7 +38,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 const std::string WIFI_PRO_STATE_MACHINE = "WifiProStateMachine";
-const int USE_SIZE_50 = 50;
+const uint32_t LANDSCAPE_LIMIT_SWITHCH_LIST_MAX_SIZE = 50;
 constexpr int32_t DEFAULT_RSSI = -200;
 constexpr int32_t DEFAULT_SCAN_INTERVAL = 10 * 1000; // ms
 constexpr int64_t BLOCKLIST_VALID_TIME = 120 * 1000;  // ms
@@ -506,19 +506,17 @@ void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
     Wifi2WifiFinish();
 }
  
-bool WifiProStateMachine::IsInAppWhiteList()
+bool WifiProStateMachine::InLandscapeSwitchLimitList()
 {
-    WIFI_LOGI("IsInAppWhiteList enter");
 #ifndef OHOS_ARCH_LITE
     std::vector<PackageInfo> specialList;
-    if (WifiSettings::GetInstance().GetPackageInfoByName("SwitchLimitPackages", specialList) != 0) {
-        WIFI_LOGI("ProcessSwitchInfoRequest GetPackageInfoByName failed");
+    if (WifiSettings::GetInstance().GetPackageInfoByName("InLandscapeSwitchLimitList", specialList) != 0) {
+        WIFI_LOGE("ProcessSwitchInfoRequest GetPackageInfoByName failed");
         return false;
     }
  
-    for (size_t i = 0; i < specialList.size() && i < USE_SIZE_50; ++i) {
+    for (size_t i = 0; i < specialList.size() && i < LANDSCAPE_LIMIT_SWITHCH_LIST_MAX_SIZE; ++i) {
         if (WifiAppStateAware::GetInstance().IsForegroundApp(specialList[i].name)) {
-            WIFI_LOGI("App %{public}s is in white list and foreground", specialList[i].name.c_str());
             return true;
         }
     }
@@ -1098,15 +1096,10 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }
+    
 #ifndef OHOS_ARCH_LITE
-    if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2) {
-        WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape.");
-        bool switchInfoRequest = pWifiProStateMachine_->IsInAppWhiteList();
-        if (switchInfoRequest == true) {
-            WIFI_LOGI("Wifi2Wifi is blocked by foreground whitelist.");
-            pWifiProStateMachine_->Wifi2WifiFinish();
-            return;
-    }
+    if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2 && pWifiProStateMachine_->InLandscapeSwitchLimitList()) {
+        WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape and InLandscapeSwitchLimitList.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }

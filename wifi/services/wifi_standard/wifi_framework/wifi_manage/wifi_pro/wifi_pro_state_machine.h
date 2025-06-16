@@ -259,7 +259,7 @@ private:
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
     bool FullScan();
     void ProcessSwitchResult(const InternalMessagePtr msg);
-    bool IsInAppWhiteList();
+    bool InLandscapeSwitchLimitList();
 };
 } // namespace Wifi
 } // namespace OHOS

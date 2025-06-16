@@ -164,6 +164,7 @@ public:
     virtual bool GetWifiSelfcureResetEntered() const = 0;
     virtual int SetHotspotIdleTimeout(int time) = 0;
     virtual bool IsAllowPopUp() = 0;
+    virtual bool IsAllowPcPopUp() = 0;
     virtual void SetDeviceType(int deviceType) = 0;
     virtual int GetDeviceType() = 0;
     virtual int64_t GetHid2dSceneLastSetTime() = 0;
@@ -323,6 +324,7 @@ public:
     MOCK_METHOD0(GetHid2dSceneLastSetTime, int64_t());
     MOCK_METHOD1(SetHid2dSceneLastSetTime, int(int64_t setTime));
     MOCK_METHOD0(IsAllowPopUp, bool());
+    MOCK_METHOD0(IsAllowPcPopUp, bool());
     MOCK_METHOD1(SetDeviceType, void(int deviceType));
     MOCK_METHOD0(GetDeviceType, int());
     MOCK_METHOD1(SetHotspotIdleTimeout, int(int time));

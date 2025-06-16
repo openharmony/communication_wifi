@@ -53,7 +53,7 @@ private:
     int RemoteOnDeviceConfigChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
     int RemoteOnCandidateApprovalStatusChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
-    sptr<IWifiDeviceCallBack> callback_;
+    std::map<std::string, sptr<IWifiDeviceCallBack>> callbackMap_;
 
     bool mRemoteDied;
     std::atomic<int> mState_ = DEFAULT_VALUES;

@@ -62,6 +62,7 @@ static constexpr int MAX_STR_LENT = 127;
 constexpr int CHIPSET_FEATURE_CAPABILITY_WIFI6_TEST = 127;
 constexpr int CHIPSET_FEATURE_CAPABILITY_WIFI7_TEST = 255;
 constexpr int TEN = 10;
+constexpr int MAX_NO_INTERNET_CNTS = 3;
 static const std::string TEMP_TEST_DATA = "1234567890abcdef1234567890abcdef";
 static std::string g_errLog;
     void StaStateMachineCallback(const LogType type, const LogLevel level,
@@ -1762,7 +1763,42 @@ public:
         pStaStateMachine->DealAudioStateChangedEvent(msg);
         EXPECT_EQ(pStaStateMachine->isAudioOn_, AUDIO_OFF);
     }
+
+    void HandleInternetAccessChangedTest1()
+    {
+        SystemNetWorkState internetAccessStatus = SystemNetWorkState::NETWORK_IS_WORKING;
+        pStaStateMachine->lastInternetIconStatus_ = SystemNetWorkState::NETWORK_IS_WORKING;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+        pStaStateMachine->lastInternetIconStatus_ = SystemNetWorkState::NETWORK_NOTWORKING;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+    }
+
+    void HandleInternetAccessChangedTest2()
+    {
+        SystemNetWorkState internetAccessStatus = SystemNetWorkState::NETWORK_NOTWORKING;
+        pStaStateMachine->lastInternetIconStatus_ = SystemNetWorkState::NETWORK_IS_WORKING;
+        pStaStateMachine->noInternetAccessCnt_ = 1;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+        pStaStateMachine->noInternetAccessCnt_ = MAX_NO_INTERNET_CNTS;
+        pStaStateMachine->lastSignalLevel_ = 1;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+        pStaStateMachine->noInternetAccessCnt_ = MAX_NO_INTERNET_CNTS;
+        pStaStateMachine->lastSignalLevel_ = TEST_FAIL_REASON;
+        pStaStateMachine->HandleInternetAccessChanged(internetAccessStatus);
+    }
 };
+
+HWTEST_F(StaStateMachineTest, HandleInternetAccessChanged_01, TestSize.Level1)
+{
+    HandleInternetAccessChangedTest1();
+    EXPECT_FALSE(g_errLog.find("ignore rssi changed")!=std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, HandleInternetAccessChanged_02, TestSize.Level1)
+{
+    HandleInternetAccessChangedTest2();
+    EXPECT_FALSE(g_errLog.find("ignore rssi changed")!=std::string::npos);
+}
 
 HWTEST_F(StaStateMachineTest, UpdateExpandOffsetRange, TestSize.Level1)
 {

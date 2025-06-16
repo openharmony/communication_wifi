@@ -42,7 +42,7 @@ StaInterface::~StaInterface()
 
 extern "C" IStaService *Create(int instId = 0)
 {
-    return new (std::nothrow)StaInterface(instId);
+    return new StaInterface(instId);
 }
 
 extern "C" void Destroy(IStaService *pservice)
@@ -177,11 +177,7 @@ ErrCode StaInterface::ConnectToCandidateConfig(const int uid, const int networkI
     LOGI("Enter ConnectToCandidateConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    if (pStaService->ConnectToCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {
-        LOGE("ConnectToCandidateConfig failed.\n");
-        return WIFI_OPT_FAILED;
-    }
-    return WIFI_OPT_SUCCESS;
+    return pStaService->ConnectToCandidateConfig(uid, networkId);
 }
 
 ErrCode StaInterface::RemoveCandidateConfig(const int uid, const int networkId)

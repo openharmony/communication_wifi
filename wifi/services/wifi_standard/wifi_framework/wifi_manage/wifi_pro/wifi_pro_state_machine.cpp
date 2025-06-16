@@ -1098,7 +1098,8 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
     }
     
 #ifndef OHOS_ARCH_LITE
-    if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2 && pWifiProStateMachine_->InLandscapeSwitchLimitList()) {
+    if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2 &&
+     pWifiProStateMachine_->InLandscapeSwitchLimitList()) {
         WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape and InLandscapeSwitchLimitList.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;

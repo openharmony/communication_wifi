@@ -126,5 +126,10 @@ ErrCode ScanInterface::SetNetworkInterfaceUpDown(bool upDown)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode ScanInterface::ResetScanInterval()
+{
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1514,6 +1514,18 @@ bool WifiConfigCenter::IsAllowPopUp()
     }
 }
 
+bool WifiConfigCenter::IsAllowPcPopUp()
+{
+    switch (mDeviceType) {
+        case ProductDeviceType::PC:
+            LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
+            return false;
+        default:
+            LOGI("Allow pop up dialog, device type:%{public}d", mDeviceType);
+            return true;
+    }
+}
+
 bool WifiConfigCenter::IsNeedFastScan(void)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);

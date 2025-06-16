@@ -156,6 +156,12 @@ public:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     virtual ErrCode SetNetworkInterfaceUpDown(bool upDown) = 0;
+    /**
+     * @Description Reset scan interval.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode ResetScanInterval() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

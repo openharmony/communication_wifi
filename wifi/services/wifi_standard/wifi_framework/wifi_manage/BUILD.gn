@@ -190,7 +190,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report",
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa",
@@ -585,6 +585,12 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_sta_asset) {
       external_deps += [ "asset:asset_sdk" ]
       defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]
+    }
+
+    if (wifi_feature_with_security_detect) {
+      defines += [ "WIFI_SECURITY_DETECT_ENABLE" ]
+      external_deps += [ "security_guard:libsg_classify_sdk" ]
+      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp" ]
     }
 
     if (wifi_feature_wifi_pro_ctrl) {

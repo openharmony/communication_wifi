@@ -72,7 +72,8 @@
             "wifi_feature_with_wifi_oeminfo_mac",
             "wifi_feature_voicewifi_enable",
             "wifi_feature_mdm_restricted_enable",
-            "wifi_feature_with_scan_control_action_listen"
+            "wifi_feature_with_scan_control_action_listen",
+            "wifi_feature_with_security_detect"
         ],
         "adapted_system_type": [
             "small",

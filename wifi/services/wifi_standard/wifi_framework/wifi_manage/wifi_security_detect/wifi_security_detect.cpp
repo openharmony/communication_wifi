@@ -355,7 +355,9 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
 {
     WIFI_LOGI("wifi security pop-up notification start");
     OHOS::AAFwk::Want want;
-    want.SetElementName("com.huawei.hmos.security.privacycenter", "WlanNotificationAbility");
+    std::string bundleName = "com.huawei.hmos.security.privacycenter";
+    std::string abilityName = "WlanNotificationAbility";
+    want.SetElementName(bundleName, abilityName);
     if (status == 1) {
         want.SetParam("notificationType", WifiNotification::OPEN);
     } else {

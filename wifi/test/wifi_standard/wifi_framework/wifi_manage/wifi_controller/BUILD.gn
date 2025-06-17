@@ -115,7 +115,7 @@ ohos_unittest("wifi_controller_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect",
   ]
   ldflags = [
     "-fPIC",
@@ -157,6 +157,11 @@ ohos_unittest("wifi_controller_unittest") {
     "time_service:time_client",
     "window_manager:libdm_lite",
   ]
+  if (wifi_feature_with_security_detect) {
+    external_deps += [ "security_guard:libsg_classify_sdk" ]
+    defines += [ "WIFI_SECURITY_DETECT_ENABLE" ]
+    sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp" ]
+  }
 
   if (wifi_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]

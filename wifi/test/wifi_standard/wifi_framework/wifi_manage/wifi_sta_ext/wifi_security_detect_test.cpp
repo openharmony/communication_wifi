@@ -25,6 +25,5 @@ HWTEST_F(WifiSecurityDetect, AssembleUri, TestSize.Level1)
     EXPECT_TRUE(uri);
 }
 
-
 }
 }

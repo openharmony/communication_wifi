@@ -38,6 +38,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 const std::string WIFI_PRO_STATE_MACHINE = "WifiProStateMachine";
+const uint32_t LANDSCAPE_LIMIT_SWITHCH_LIST_MAX_SIZE = 50;
 constexpr int32_t DEFAULT_RSSI = -200;
 constexpr int32_t DEFAULT_SCAN_INTERVAL = 10 * 1000; // ms
 constexpr int64_t BLOCKLIST_VALID_TIME = 120 * 1000;  // ms
@@ -503,6 +504,24 @@ void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
         HandleWifi2WifiSucsess(BLOCKLIST_VALID_TIME);
     }
     Wifi2WifiFinish();
+}
+ 
+bool WifiProStateMachine::InLandscapeSwitchLimitList()
+{
+#ifndef OHOS_ARCH_LITE
+    std::vector<PackageInfo> specialList;
+    if (WifiSettings::GetInstance().GetPackageInfoByName("InLandscapeSwitchLimitList", specialList) != 0) {
+        WIFI_LOGE("ProcessSwitchInfoRequest GetPackageInfoByName failed");
+        return false;
+    }
+ 
+    for (size_t i = 0; i < specialList.size() && i < LANDSCAPE_LIMIT_SWITHCH_LIST_MAX_SIZE; ++i) {
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(specialList[i].name)) {
+            return true;
+        }
+    }
+#endif
+    return false;
 }
 
 bool WifiProStateMachine::IsAllowScan(int32_t signalLevel, bool hasSwitchRecord)
@@ -1110,13 +1129,16 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }
+    
 #ifndef OHOS_ARCH_LITE
-    if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2) {
-        WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape.");
+    if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2 &&
+        pWifiProStateMachine_->InLandscapeSwitchLimitList()) {
+        WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape and InLandscapeSwitchLimitList.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }
 #endif
+ 
     WIFI_LOGI("wifi to wifi step 3: try wifi2wifi.");
     if (!pWifiProStateMachine_->TryWifi2Wifi(pWifiProStateMachine_->networkSelectionResult_)) {
         WIFI_LOGI("wifi to wifi step X: TryWifi2Wifi Failed.");

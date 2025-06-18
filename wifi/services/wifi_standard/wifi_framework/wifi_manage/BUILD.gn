@@ -240,6 +240,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_callback_proxy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_death_recipient.cpp",
@@ -271,6 +272,7 @@ if (defined(ohos_lite)) {
       "ability_runtime:app_manager",
       "cJSON:cjson",
       "c_utils:utils",
+      "common_event_service:cesfwk_core",
       "hilog:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",
@@ -292,6 +294,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_callback_proxy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_death_recipient.cpp",
@@ -375,6 +378,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_callback_proxy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_death_recipient.cpp",
@@ -399,6 +403,7 @@ if (defined(ohos_lite)) {
       "ability_base:want",
       "ability_runtime:app_manager",
       "c_utils:utils",
+      "common_event_service:cesfwk_core",
       "hilog:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",
@@ -442,6 +447,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa/wifi_p2p_callback_proxy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa/wifi_p2p_death_recipient.cpp",
@@ -463,6 +469,7 @@ if (defined(ohos_lite)) {
       "ability_base:want",
       "ability_runtime:app_manager",
       "c_utils:utils",
+      "common_event_service:cesfwk_core",
       "hilog:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",

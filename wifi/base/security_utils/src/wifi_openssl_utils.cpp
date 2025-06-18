@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "../include/wifi_openssl_utils.h"
+#include "wifi_openssl_utils.h"
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include "common.h"

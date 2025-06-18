@@ -152,6 +152,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = []
 
     configs = [

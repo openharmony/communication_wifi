@@ -124,6 +124,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "src/wifi_device_impl.cpp",
       "src/wifi_device_mgr_proxy.cpp",
@@ -160,6 +161,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "src/wifi_hotspot_impl.cpp",
       "src/wifi_hotspot_mgr_proxy.cpp",
@@ -196,6 +198,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "src/wifi_scan_impl.cpp",
       "src/wifi_scan_mgr_proxy.cpp",
@@ -233,6 +236,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "src/wifi_p2p_impl.cpp",
       "src/wifi_p2p_proxy.cpp",

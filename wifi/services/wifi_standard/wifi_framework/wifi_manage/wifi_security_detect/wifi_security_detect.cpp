@@ -84,11 +84,12 @@ WifiSecurityDetect::WifiSecurityDetect()
 
 void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    WIFI_LOGI("WifiSecurityDetect network connected");
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
+        WIFI_LOGI("WifiSecurityDetect network connected");
         currentConnectedNetworkId_ = info.networkId;
         SecurityDetect(info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        WIFI_LOGI("WifiSecurityDetect network not connected");
         currentConnectedNetworkId_ = -1;
     } else {
         return;
@@ -330,7 +331,8 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
     Json::FastWriter writer;
     ConverWifiLinkInfoToJson(info, root);
     model.param = writer.write(root);
-    WIFI_LOGI("%{public}s", model.param.c_str());
+    WIFI_LOGI(
+        "ssid:%{public}s bssid:%{public}s", SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str());
     securityDetectThread_->PostAsyncTask([=]() mutable -> int32_t {
         if (!IsSettingSecurityDetectOn()) {
             return WIFI_OPT_FAILED;
@@ -342,9 +344,9 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
             return WIFI_OPT_FAILED;
         }
         WIFI_LOGI("PopupNotification result is %{public}d", result);
-        config.isSecureWifi = result? true : false;
+        config.isSecureWifi = result ? true : false;
         config.lastDetectTime = time(0);
-        PopupNotification(config.isSecureWifi ? WifiNotification::CLOSE: WifiNotification::OPEN, info.networkId);
+        PopupNotification(config.isSecureWifi ? WifiNotification::CLOSE : WifiNotification::OPEN, info.networkId);
         WifiSettings::GetInstance().AddDeviceConfig(config);
         WifiSettings::GetInstance().SyncDeviceConfig();
         return WIFI_OPT_SUCCESS;
@@ -355,9 +357,8 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
 {
     WIFI_LOGI("wifi security pop-up notification start");
     OHOS::AAFwk::Want want;
-    std::string bundleName = "com.huawei.hmos.security.privacycenter";
-    std::string abilityName = "WlanNotificationAbility";
-    want.SetElementName(bundleName, abilityName);
+    std::string bundleName = WifiSettings::GetInstance().GetPackageName("SECURITY_BUNDLE");
+    want.SetElementName(bundleName, "WlanNotificationAbility");
     if (status == 1) {
         want.SetParam("notificationType", WifiNotification::OPEN);
     } else {

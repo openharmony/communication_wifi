@@ -238,6 +238,8 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest, TestSize.Level1)
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM",
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM"
         };
+    bool result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    EXPECT_FALSE(result);
     WifiSignalPollInfo signalPoll0;
     WifiSignalPollInfo signalPoll1;
     WifiSignalPollInfo signalPoll2;
@@ -259,6 +261,15 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest, TestSize.Level1)
     wifiBeaconCheckInfoArray ={signalPoll0, signalPoll1, signalPoll2, signalPoll3, signalPoll4, signalPoll5};
     result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_TRUE(result);
+    signalPoll4.ext = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    EXPECT_FALSE(result);
+    bssidArray = {
+        "00::55::DD::ff::MM", "00::55::DD::ff::0M", "00::55::DD::ff::MM",
+        "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM"
+        };
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiCommonUtilTest, GetSplitInfoTest_1, TestSize.Level1)

@@ -26,6 +26,7 @@
 #include "wifi_error_no.h"
 #include "mock_block_connect_service.h"
 #include "wifi_history_record_manager.h"
+#include "wifi_telephony_utils.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -758,20 +759,20 @@ void StaServiceTest::DeliverStaIfaceDataSuccessTest()
 
 void StaServiceTest::GetDataSlotIdTest()
 {
-    pStaService->GetDataSlotId(0);
-    pStaService->GetDataSlotId(-1);
+    WifiTelephonyUtils::GetDataSlotId(0);
+    WifiTelephonyUtils::GetDataSlotId(-1);
 }
 
 void StaServiceTest::GetImsiTest()
 {
     int32_t slotId = 0;
-    EXPECT_EQ(pStaService->GetImsi(slotId), "");
+    EXPECT_EQ(WifiTelephonyUtils::GetImsi(slotId), "");
 }
 
 void StaServiceTest::GetPlmnTest()
 {
     int32_t slotId = 0;
-    EXPECT_EQ(pStaService->GetPlmn(slotId), "");
+    EXPECT_EQ(WifiTelephonyUtils::GetPlmn(slotId), "");
 }
 
 void StaServiceTest::GetMccTest()

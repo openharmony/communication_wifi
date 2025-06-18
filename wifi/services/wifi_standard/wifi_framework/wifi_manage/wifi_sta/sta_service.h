@@ -459,9 +459,6 @@ private:
     void NotifyCandidateApprovalStatus(CandidateApprovalStatus status) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;
     std::string ConvertString(const std::u16string &wideText) const;
-    int32_t GetDataSlotId(int32_t slotId) const;
-    std::string GetImsi(int32_t slotId) const;
-    std::string GetPlmn(int32_t slotId) const;
     std::string GetMcc(const std::string &imsi) const;
     std::string GetMnc(const std::string &imsi, const int mncLen) const;
     void UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &wifiEapConfig) const;

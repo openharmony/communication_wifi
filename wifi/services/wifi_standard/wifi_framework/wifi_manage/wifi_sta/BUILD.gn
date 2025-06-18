@@ -52,6 +52,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_telephony_utils",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
@@ -86,6 +87,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_telephony_utils",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     ]
@@ -147,6 +149,7 @@ if (defined(ohos_lite)) {
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_telephony_utils",
     ]
 
     defines = [ "FEATURE_STA_SUPPORT" ]

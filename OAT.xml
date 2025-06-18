@@ -44,7 +44,7 @@
             <filefilter name="readmeOpenSourcefileNamePolicyFilter" desc="Filters for README.OpenSource file policies">
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
-                <filteritem type="filename" name="*.png" desc="Image for markdown doc"/>
+                <filteritem type="filename" name="*.png|*.jpg|*.gif|*.ico" desc="Image for markdown doc"/>
             </filefilter>
         </filefilterlist>
         <licensematcherlist>

@@ -171,7 +171,7 @@ void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfo
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
         return;
     }
-    if (WifiConfigCenter::GetInstance().GetWifiMidState(instId) == WifiOprMidState::RUNNING) {
+    if (WifiConfigCenter::GetInstance().GetWifiMidState(instId_) == WifiOprMidState::RUNNING) {
         pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
     }
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT

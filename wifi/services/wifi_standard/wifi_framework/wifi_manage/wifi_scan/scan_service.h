@@ -911,6 +911,11 @@ private:
      * @return true: allow, false: not allowed.
      */
     bool AllowScanByGameScene();
+    /**
+     * @Description Get interval time between currentMs and startTime.
+     *
+     * @return int64_t: millisecond difference between two time point.
+     */
     int64_t GetIntervalTime(int64_t startTime);
 
     /**

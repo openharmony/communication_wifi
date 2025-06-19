@@ -544,12 +544,17 @@ bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPo
         }
         // 检查 RSSI 是否无效
         bool isInvalid = std::all_of(signalInfo.ext.begin(), signalInfo.ext.begin() + BEACON_LENGTH_RSSI,
-            [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI; });
+            [](uint8_t num) {
+                int8_t val = static_cast<int8_t>(num);
+                return val == BEACON_LOST_RSSI0 || val == BEACON_LOST_RSSI1 || val == 0;
+                })
+                && std::any_of(signalInfo.ext.begin(), signalInfo.ext.begin() + BEACON_LENGTH_RSSI,
+                [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI0; });
         if (!isInvalid) {
             return false;
         }
         accumulateTime = initTime - signalInfo.timeStamp;
-        if (accumulateTime >= SIGNAL_RECORD_5S) {
+        if (accumulateTime >= SIGNAL_RECORD_12S) {
             return true;
         }
     }

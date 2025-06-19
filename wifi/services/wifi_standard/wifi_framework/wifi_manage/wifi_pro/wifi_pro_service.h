@@ -56,7 +56,7 @@ public:
 #endif
 private:
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
-    std::shared_ptr<CellularStateObserver> cellularStateObserver_ { nullptr };
+    sptr<CellularStateObserver> cellularStateObserver_ { nullptr };
     std::shared_ptr<WifiIntelligenceStateMachine> pWifiIntelligenceStateMachine_ { nullptr };
     void RegisterCellularStateObserver();
     void UnRegisterCellularStateObserver();

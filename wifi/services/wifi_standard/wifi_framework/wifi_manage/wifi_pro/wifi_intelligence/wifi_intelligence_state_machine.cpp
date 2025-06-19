@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 const std::string WIFI_INTELLIGENCE_STATE_MACHINE = "WifiIntelligenceStateMachine";
-const int PING_PONG_TIME = 5 * 1000;;
+const int PING_PONG_TIME = 5 * 1000;
 const int PING_PONG_INTERVAL_TIME = 30 * 60 * 1000;
 const int PING_PONG_MAX_PUNISH_TIME = 300 * 1000;
 const int PING_PONG_PUNISH_TIME = 30 * 1000;
@@ -227,12 +227,7 @@ bool WifiIntelligenceStateMachine::InitialState::ExecuteStateMsg(InternalMessage
         return false;
     }
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("InitialState-msgCode=%{public}d is received.", msg->GetMessageName());
-    switch (msg->GetMessageName()) {
-        default:
-            WIFI_LOGI("InitialState-msgCode=%{public}d not handle.", msg->GetMessageName());
-            break;
-    }
+    WIFI_LOGD("InitialState-msgCode=%{public}d is received.", msg->GetMessageName());
     return ret;
 }
 
@@ -264,8 +259,11 @@ bool WifiIntelligenceStateMachine::EnabledState::ExecuteStateMsg(InternalMessage
     bool ret = NOT_EXECUTED;
     WIFI_LOGI("EnabledState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
+        case EVENT_WIFI_ENABLED:
+            ret = EXECUTED;
+            break;
         default:
-            WIFI_LOGI("EnabledState-msgCode=%{public}d not handle.", msg->GetMessageName());
+            WIFI_LOGD("EnabledState-msgCode=%{public}d not handle.", msg->GetMessageName());
             break;
     }
     return ret;
@@ -371,28 +369,7 @@ void WifiIntelligenceStateMachine::DisabledState::HandleMsgStateChange(InternalM
         return;
     }
 
-    if (ApInfoHelper::GetInstance().IsCellIdExit(cellId)) {
-        std::vector<ApInfoData> datas = ApInfoHelper::GetInstance().GetMonitorDatas(cellId);
-        pWifiIntelligenceStateMachine_->mTargetApInfoDatas_ = FilterFromBlackList(datas);
-        WIFI_LOGI("mTargetApInfoDatas_.size:%{public}lu", pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size());
-        if (pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size() > 0) {
-            if (screenState == MODE_STATE_OPEN &&
-                WifiConfigCenter::GetInstance().GetWifiMidState() != WifiOprMidState::RUNNING) {
-                if (msg->GetMessageName() == EVENT_CELL_STATE_CHANGE) {
-                    pWifiIntelligenceStateMachine_->SetPingPongPunishTime();
-                    if (pWifiIntelligenceStateMachine_->isInPingpongPunishTime()) {
-                        return;
-                    }
-                    pWifiIntelligenceStateMachine_->mLastScanPingpongTime_ = GetCurrentTimeMilliSeconds();
-                }
-                pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ = true;
-                pWifiIntelligenceStateMachine_->FullScan();
-            }
-        } else {
-            pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ = false;
-            pWifiIntelligenceStateMachine_->StopScanAp();
-        }
-    } else {
+    if (!ApInfoHelper::GetInstance().IsCellIdExit(cellId)) {
         std::vector<WifiScanInfo> scanInfoList;
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
         WIFI_LOGI("mIsAutoOpenSearch_:%{public}d, mTargetApInfoDatas_.size:%{public}lu, scanInfoList.size:%{public}lu",
@@ -406,6 +383,26 @@ void WifiIntelligenceStateMachine::DisabledState::HandleMsgStateChange(InternalM
             pWifiIntelligenceStateMachine_->UpdateScanResult(msg);
             return;
         }
+        pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ = false;
+        pWifiIntelligenceStateMachine_->StopScanAp();
+        return;
+    }
+
+    std::vector<ApInfoData> datas = ApInfoHelper::GetInstance().GetMonitorDatas(cellId);
+    pWifiIntelligenceStateMachine_->mTargetApInfoDatas_ = FilterFromBlackList(datas);
+    WIFI_LOGI("mTargetApInfoDatas_.size:%{public}lu", pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size());
+    if (pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size() > 0 && screenState == MODE_STATE_OPEN &&
+        WifiConfigCenter::GetInstance().GetWifiMidState() != WifiOprMidState::RUNNING) {
+        if (msg->GetMessageName() == EVENT_CELL_STATE_CHANGE) {
+            pWifiIntelligenceStateMachine_->SetPingPongPunishTime();
+            if (pWifiIntelligenceStateMachine_->IsInPingpongPunishTime()) {
+                return;
+            }
+            pWifiIntelligenceStateMachine_->mLastScanPingpongTime_ = GetCurrentTimeMilliSeconds();
+        }
+        pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ = true;
+        pWifiIntelligenceStateMachine_->FullScan();
+    } else {
         pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ = false;
         pWifiIntelligenceStateMachine_->StopScanAp();
     }
@@ -469,14 +466,14 @@ void WifiIntelligenceStateMachine::DisabledState::HandleWifiOpen(InternalMessage
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState();
     if (staState == WifiDetailState::STATE_SEMI_ACTIVE && !WifiConfigCenter::GetInstance().IsScreenLandscape() &&
         screenState == MODE_STATE_OPEN &&
-            (apState != WifiOprMidState::OPENING && apState != WifiOprMidState::RUNNING)) {
+        (apState != WifiOprMidState::OPENING && apState != WifiOprMidState::RUNNING)) {
         WIFI_LOGI("HandleWifiOpen, open wifi.");
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
         return;
     } else if (staState == WifiDetailState::STATE_SEMI_ACTIVATING &&
-                !WifiConfigCenter::GetInstance().IsScreenLandscape() && screenState == MODE_STATE_OPEN &&
-                (apState != WifiOprMidState::OPENING && apState != WifiOprMidState::RUNNING)) {
+        !WifiConfigCenter::GetInstance().IsScreenLandscape() && screenState == MODE_STATE_OPEN &&
+        (apState != WifiOprMidState::OPENING && apState != WifiOprMidState::RUNNING)) {
         WIFI_LOGI("HandleWifiOpen, open wifi wait.");
         pWifiIntelligenceStateMachine_->StartTimer(EVENT_WIFI_HANLE_OPEN, AUTO_OPEN_WIFI_DELAY_TIME);
         return;
@@ -486,7 +483,7 @@ void WifiIntelligenceStateMachine::DisabledState::HandleWifiOpen(InternalMessage
 }
 
 void WifiIntelligenceStateMachine::UpdateScanResult(InternalMessagePtr msg)
-{    
+{
     std::vector<WifiScanInfo> scanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     WIFI_LOGI("UpdateScanResult, results size:%{public}lu", scanInfoList.size());
@@ -572,7 +569,7 @@ void WifiIntelligenceStateMachine::SetPingPongPunishTime()
     mLastCellChangeScanTime_ = GetCurrentTimeMilliSeconds();
 }
 
-bool WifiIntelligenceStateMachine::isInPingpongPunishTime()
+bool WifiIntelligenceStateMachine::IsInPingpongPunishTime()
 {
     WIFI_LOGI("isInPingpongPunishTime mScanPingpongNum = %{public}d", mScanPingpongNum_);
     int punishTime = (mScanPingpongNum_ * PING_PONG_PUNISH_TIME)
@@ -629,7 +626,8 @@ bool WifiIntelligenceStateMachine::StopState::ExecuteStateMsg(InternalMessagePtr
 }
 
 /* --------------------------- state machine disconnected state ------------------------------ */
-WifiIntelligenceStateMachine::DisconnectedState::DisconnectedState(WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
+WifiIntelligenceStateMachine::DisconnectedState::DisconnectedState(
+    WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
     : State("DisconnectedState"),
       pWifiIntelligenceStateMachine_(pWifiIntelligenceStateMachine)
 {
@@ -670,7 +668,8 @@ bool WifiIntelligenceStateMachine::DisconnectedState::ExecuteStateMsg(InternalMe
 }
 
 /* --------------------------- state machine connected state ------------------------------ */
-WifiIntelligenceStateMachine::ConnectedState::ConnectedState(WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
+WifiIntelligenceStateMachine::ConnectedState::ConnectedState(
+    WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
     : State("ConnectedState"),
       pWifiIntelligenceStateMachine_(pWifiIntelligenceStateMachine)
 {
@@ -740,7 +739,8 @@ void WifiIntelligenceStateMachine::ConnectedState::HandleWifiInternetChangeRes(c
 }
 
 /* --------------------------- state machine internet ready state ------------------------------ */
-WifiIntelligenceStateMachine::InternetReadyState::InternetReadyState(WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
+WifiIntelligenceStateMachine::InternetReadyState::InternetReadyState(
+    WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
     : State("InternetReadyState")
 {
     WIFI_LOGD("InternetReadyState construct success.");
@@ -783,7 +783,7 @@ bool WifiIntelligenceStateMachine::InternetReadyState::ExecuteStateMsg(InternalM
             WifiLinkedInfo linkedInfo;
             WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
             bool isMobileAp = linkedInfo.isDataRestricted;
-            if (!isMobileAp) {               
+            if (!isMobileAp) {    
                 std::string cellId = ApInfoHelper::GetInstance().GetCurrentCellIdInfo();
                 if (!cellId.empty()) {
                     ApInfoHelper::GetInstance().AddApInfo(cellId, linkedInfo.networkId);
@@ -806,7 +806,8 @@ bool WifiIntelligenceStateMachine::InternetReadyState::ExecuteStateMsg(InternalM
 }
 
 /* --------------------------- state machine noInternet state ------------------------------ */
-WifiIntelligenceStateMachine::NoInternetState::NoInternetState(WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
+WifiIntelligenceStateMachine::NoInternetState::NoInternetState(
+    WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
     : State("NoInternetState")
 {
     WIFI_LOGD("NoInternetState construct success.");
@@ -835,12 +836,7 @@ bool WifiIntelligenceStateMachine::NoInternetState::ExecuteStateMsg(InternalMess
         return false;
     }
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("NoInternetState-msgCode=%{public}d is received.", msg->GetMessageName());
-    switch (msg->GetMessageName()) {
-        default:
-            WIFI_LOGI("NoInternetState-msgCode=%{public}d not handle.", msg->GetMessageName());
-            break;
-    }
+    WIFI_LOGD("NoInternetState-msgCode=%{public}d is received.", msg->GetMessageName());
     return ret;
 }
 
@@ -857,12 +853,12 @@ bool WifiIntelligenceStateMachine::FullScan()
 
 bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> scanInfoList)
 {
-    bool hasApInBlacklist = false;
-    bool hasTargetAp = false;
-
     if (scanInfoList.size() == 0) {
         return false;
     }
+    bool hasApInBlacklist = false;
+    bool hasTargetAp = false;
+    std::string cellId = ApInfoHelper::GetInstance().GetCurrentCellIdInfo();
 
     for (auto &scanInfo : scanInfoList) {
         ApInfoData data;
@@ -870,27 +866,26 @@ bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> sc
         if (index == -1) {
             continue;
         }
-        if (IsInTargetAp(scanInfo.bssid, scanInfo.ssid) || (data.ssid == scanInfo.ssid)) {
-            if (data.inBlacklist) {
-                hasApInBlacklist = true;
-                break;
-            }
-            if (!IsInTargetAp(scanInfo.bssid, scanInfo.ssid)) {
-                std::string cellId = ApInfoHelper::GetInstance().GetCurrentCellIdInfo();
-                if (!data.bssid.empty() && !cellId.empty()) {
-                    InlineUpdateCellInfo(data, cellId);
-                    mTargetApInfoDatas_.push_back(data);
-                }
-            }
-            if (scanInfo.rssi >= AUTO_OPEN_RSSI_VALUE) {
-                hasTargetAp = true;
-                WIFI_LOGI("HandleScanResult, hasTargetAp=true, ssid=%{public}s, bssid=%{public}s",
-                    SsidAnonymize(scanInfo.ssid).c_str(), MacAnonymize(scanInfo.bssid).c_str());
-            } else {
-                WIFI_LOGI("HandleScanResult, AP RSSI is weak, ssid=%{public}s, bssid=%{public}s",
-                    SsidAnonymize(scanInfo.ssid).c_str(), MacAnonymize(scanInfo.bssid).c_str());
-                continue;
-            }
+        bool isInTargetApVec = IsInTargetAp(scanInfo.bssid, scanInfo.ssid);
+        bool isTargetAp = isInTargetApVec || (data.ssid == scanInfo.ssid);
+        if (!isTargetAp) {
+            continue;
+        }
+        if (data.inBlacklist) {
+            hasApInBlacklist = true;
+            break;
+        }
+        if (!isInTargetApVec && !data.bssid.empty() && !cellId.empty()) {
+            InlineUpdateCellInfo(data, cellId);
+             mTargetApInfoDatas_.push_back(data);
+        }
+        if (scanInfo.rssi >= AUTO_OPEN_RSSI_VALUE) {
+            hasTargetAp = true;
+            WIFI_LOGI("HandleScanResult, hasTargetAp=true, ssid=%{public}s, bssid=%{public}s",
+                SsidAnonymize(scanInfo.ssid).c_str(), MacAnonymize(scanInfo.bssid).c_str());
+        } else {
+            WIFI_LOGI("HandleScanResult, AP RSSI is weak, ssid=%{public}s, bssid=%{public}s",
+                SsidAnonymize(scanInfo.ssid).c_str(), MacAnonymize(scanInfo.bssid).c_str());
         }
     }
 
@@ -941,8 +936,8 @@ bool WifiIntelligenceStateMachine::IsInMonitorNearbyAp(std::vector<WifiScanInfo>
         return false;
     }
     for (auto &scanResult : scanInfoList) {
-        for (auto apInfo : mTargetApInfoDatas_) {
-            for (auto nearbyAp : apInfo.nearbyApInfos) {
+        for (auto &apInfo : mTargetApInfoDatas_) {
+            for (auto &nearbyAp : apInfo.nearbyApInfos) {
                 if (nearbyAp == scanResult.bssid) {
                     return true;
                 }

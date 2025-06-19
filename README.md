@@ -1,3 +1,8 @@
+   1649行 if (!AllowScanByGameScene()) {
+        WIFI_LOGW("system timer scan not allow by gamescene scan control.");
+        WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::GAME_SCENE));
+        return WIFI_OPT_FAILED;
+    }
 # communication\_wifi<a name="EN-US_TOPIC_0000001162030287"></a>
 
 -   [Introduction](#section11660541593)

@@ -323,6 +323,8 @@
         "OHOS::Wifi::WifiServiceManager::GetScanServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::GetApServiceInst(int)";
         "OHOS::Wifi::WifiServiceManager::ApServiceSetHotspotConfig(OHOS::Wifi::HotspotConfig const&, int)";
+        "OHOS::Wifi::WifiServiceManager::GetServiceDll(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
+        "OHOS::Wifi::WifiServiceManager::LoadEnhanceService(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, bool)";
         "OHOS::Wifi::WifiEventSubscriberManager::GetAirplaneModeByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::GetLocationModeByDatashare()";

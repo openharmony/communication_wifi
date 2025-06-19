@@ -238,7 +238,7 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest, TestSize.Level1)
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM",
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM"
         };
-    bool result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_FALSE(result);
     WifiSignalPollInfo signalPoll0;
     WifiSignalPollInfo signalPoll1;

@@ -75,6 +75,35 @@ private:
      * @param wifiSignalPollInfo
      */
     void HandleSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo);
+
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    /**
+     * @Description receive screen state change event
+     *
+     * @param screenState - screen state
+     */
+    void OnScreenStateChanged(int32_t screenState);
+
+    /**
+     * @Description receive cell info updated
+     *
+     */
+    void OnCellInfoUpdated();
+
+    /**
+     * @Description receive wifi open result
+     *
+     * @param state - wifi open state
+     */
+    void OnWifiStateOpen(int32_t state);
+
+    /**
+     * @Description receive wifi close result
+     *
+     * @param state - wifi close state
+     */
+    void OnWifiStateClose(int32_t state);
+#endif
 private:
     std::mutex mutex_;
     std::shared_ptr<WifiProService> pWifiProService_ { nullptr };

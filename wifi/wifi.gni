@@ -61,6 +61,7 @@ declare_args() {
   wifi_feature_with_wifi_oeminfo_mac = false
   wifi_feature_mdm_restricted_enable = true
   wifi_feature_with_scan_control_action_listen = true
+  wifi_feature_autoopen_specified_location = false
 }
 
 memory_optimization_cflags = [

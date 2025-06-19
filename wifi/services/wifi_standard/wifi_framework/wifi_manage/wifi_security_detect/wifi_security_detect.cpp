@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifdef WIFI_SECURITY_DETECT_ENABLE
 #include <chrono>
 #include "json/json.h"
@@ -344,9 +345,9 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
             return WIFI_OPT_FAILED;
         }
         WIFI_LOGI("PopupNotification result is %{public}d", result);
-        config.isSecureWifi = result;
+        config.isSecureWifi = result ? true : false;
         config.lastDetectTime = time(0);
-        PopupNotification(config.isSecureWifi ? WifiNotification::CLOSE: WifiNotification::OPEN, info.networkId);
+        PopupNotification(config.isSecureWifi ? WifiNotification::CLOSE : WifiNotification::OPEN, info.networkId);
         WifiSettings::GetInstance().AddDeviceConfig(config);
         WifiSettings::GetInstance().SyncDeviceConfig();
         return WIFI_OPT_SUCCESS;

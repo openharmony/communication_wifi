@@ -585,13 +585,13 @@ ErrCode WifiServiceScheduler::InitStaServiceExtral(IStaService *pService, int in
         WIFI_LOGE("WifiHistoryRecordManager register callback failed, ret=%{public}d", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
-#endif
 #ifdef WIFI_SECURITY_DETECT_ENABLE
     errCode = pService->RegisterStaServiceCallback(WifiSecurityDetect::GetInstance().GetStaCallback());
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("WifiSecurityDetect register callback failed, ret=%{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
+#endif
 #endif
     return WIFI_OPT_SUCCESS;
 }

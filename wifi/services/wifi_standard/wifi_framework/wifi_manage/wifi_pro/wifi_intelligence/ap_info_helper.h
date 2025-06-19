@@ -89,6 +89,7 @@ public:
     bool GetAllApInfos();
     void DelApInfos(const std::string &bssid);
     void AddApInfo(std::string cellId, int32_t networkId);
+    void AddNewApInfo(const WifiDeviceConfig &config);
     int32_t GetOldestApInfoData(ApInfoData &data);
     int32_t GetApInfoByBssid(const std::string &bssid, ApInfoData &data);
     int32_t QueryCellIdInfoByParam(const std::map<std::string, std::string> &queryParams,

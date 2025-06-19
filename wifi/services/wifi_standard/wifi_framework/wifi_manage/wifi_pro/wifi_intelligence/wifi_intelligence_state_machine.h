@@ -234,7 +234,7 @@ private:
     bool HandleScanResult(std::vector<WifiScanInfo> scanInfoList);
     bool IsInTargetAp(std::string bssid, std::string ssid);
     void InlineUpdateCellInfo(ApInfoData data, std::string cellId);
-    bool IsInMonitorNearbyAp(std::vector<WifiScanInfo> scanInfoList);
+    bool IsInMonitorNearbyAp(const std::vector<WifiScanInfo>& scanInfoList);
     void StopScanAp();
 };
 }

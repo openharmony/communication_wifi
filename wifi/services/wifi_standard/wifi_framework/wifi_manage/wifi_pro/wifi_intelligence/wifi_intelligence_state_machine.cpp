@@ -935,7 +935,7 @@ bool WifiIntelligenceStateMachine::IsInMonitorNearbyAp(const std::vector<WifiSca
     if (mTargetApInfoDatas_.size() == 0) {
         return false;
     }
-    for (const auto &scanResult : scanInfoList) {
+    for (const auto &scanResult : scanInfoList) { 
         for (const auto &apInfo : mTargetApInfoDatas_) {
             for (const auto &nearbyAp : apInfo.nearbyApInfos) {
                 if (nearbyAp == scanResult.bssid) {

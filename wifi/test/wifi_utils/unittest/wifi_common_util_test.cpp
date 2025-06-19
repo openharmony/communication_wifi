@@ -256,19 +256,38 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest, TestSize.Level1)
     signalPoll1.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll2.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll3.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
-    signalPoll4.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll4.ext = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     signalPoll5.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     wifiBeaconCheckInfoArray ={signalPoll0, signalPoll1, signalPoll2, signalPoll3, signalPoll4, signalPoll5};
     result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
-    EXPECT_TRUE(result);
-    signalPoll4.ext = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_FALSE(result);
+    WifiSignalPollInfo signalPoll00;
+    WifiSignalPollInfo signalPoll01;
+    WifiSignalPollInfo signalPoll02;
+    WifiSignalPollInfo signalPoll03;
+    WifiSignalPollInfo signalPoll04;
+    WifiSignalPollInfo signalPoll05;
+    signalPoll00.timeStamp = 15;
+    signalPoll01.timeStamp = 12;
+    signalPoll02.timeStamp = 9;
+    signalPoll03.timeStamp = 6;
+    signalPoll04.timeStamp = 3;
+    signalPoll05.timeStamp = 0;
+    signalPoll00.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll01.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll02.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll03.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll04.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll05.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    std::vector<WifiSignalPollInfo> wifiBeaconCheckInfoArray0 =
+        {signalPoll0, signalPoll1, signalPoll2, signalPoll3, signalPoll4, signalPoll5};
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray0);
+    EXPECT_TRUE(result);
     bssidArray = {
         "00::55::DD::ff::MM", "00::55::DD::ff::0M", "00::55::DD::ff::MM",
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM"
         };
-    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray0);
     EXPECT_FALSE(result);
 }
 

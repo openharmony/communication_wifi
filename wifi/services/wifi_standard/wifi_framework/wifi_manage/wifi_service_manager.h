@@ -239,10 +239,8 @@ public:
     void UninstallAllService();
     static WifiServiceManager &GetInstance();
 
-    int GetServiceDll(const std::string &name, std::string &dlname);
-    int LoadEnhanceService(const std::string &dlname, bool bCreate);
-    int UnloadEnhanceService(bool bPreLoad);
 private:
+    int GetServiceDll(const std::string &name, std::string &dlname);
     int LoadStaService(const std::string &dlname, int instId, bool bCreate);
     int UnloadStaService(bool bPreLoad, int instId = 0);
 #ifdef FEATURE_WIFI_PRO_SUPPORT
@@ -263,6 +261,8 @@ private:
     int LoadP2pService(const std::string &dlname, bool bCreate);
     int UnloadP2pService(bool bPreLoad);
 #endif
+    int LoadEnhanceService(const std::string &dlname, bool bCreate);
+    int UnloadEnhanceService(bool bPreLoad);
 private:
     std::mutex mStaMutex;
     std::mutex mSelfCureMutex;

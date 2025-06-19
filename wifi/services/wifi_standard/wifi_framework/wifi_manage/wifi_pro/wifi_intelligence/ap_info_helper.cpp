@@ -126,70 +126,75 @@ void ApInfoHelper::DelApInfos(const std::string &bssid)
 
 void ApInfoHelper::AddApInfo(std::string cellId, int32_t networkId)
 {
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     WifiDeviceConfig config;
-    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
+    WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
     ApInfoData data;
-    int32_t index = GetApInfoByBssid(linkedInfo.bssid, data);
+    int32_t index = GetApInfoByBssid(config.bssid, data);
     std::lock_guard<std::mutex> lock(mutex_);
     if (index == -1) {
-        if (apInfos_.size() >= DB_BSSID_MAX_QUANTA) {
-            ApInfoData oldestData;
-            int32_t index = GetOldestApInfoData(oldestData);
-            if (index != -1) {
-                apInfos_.erase(apInfos_.begin() + index);
-                DelApInfos(oldestData.bssid);
-            }
-        }
-        data.time = GetCurrentTimeMilliSeconds();
-        data.authType = config.keyMgmt;
-        data.bssid = linkedInfo.bssid;
-        data.ssid = linkedInfo.ssid;
-        data.frequency = linkedInfo.frequency;
-        data.inBlacklist = 0;
-        data.isHomeAp = 0;        
-        SaveBssidInfo(data);
-        AddCellInfo(linkedInfo.bssid, cellId);
-        AddNearbyApInfo(linkedInfo.bssid);
-        std::vector<CellInfoData> curCellInfos;
-        QueryCellIdInfoByParam({{CellIdInfoTable::BSSID, linkedInfo.bssid}}, curCellInfos);
-        data.cellInfos = curCellInfos;
-        std::vector<std::string> curNearbyApInfos;
-        QueryNearbyInfoByParam({{NearByApInfoTable::BSSID, linkedInfo.bssid}}, curNearbyApInfos);
-        data.nearbyApInfos = curNearbyApInfos;
-        apInfos_.push_back(data);
+        AddNewApInfo(config);
         return;
     }
     if (data.cellInfos.size() >= DB_CELLID_MAX_QUANTA) {
         apInfos_.erase(apInfos_.begin() + index);
-        DelApInfos(linkedInfo.bssid);
+        DelApInfos(config.bssid);
     } else {
         if (!IsCellIdExitByData(data, cellId)) {
-            AddCellInfo(linkedInfo.bssid, cellId);
-            AddNearbyApInfo(linkedInfo.bssid);
+            AddCellInfo(config.bssid, cellId);
+            AddNearbyApInfo(config.bssid);
             std::vector<CellInfoData> curCellInfos;
-            QueryCellIdInfoByParam({{CellIdInfoTable::BSSID, linkedInfo.bssid}}, curCellInfos);
+            QueryCellIdInfoByParam({{CellIdInfoTable::BSSID, config.bssid}}, curCellInfos);
             if (curCellInfos.size() != 0) {
                 data.cellInfos = curCellInfos;
             }
             std::vector<std::string> curNearbyApInfos;
-            QueryNearbyInfoByParam({{NearByApInfoTable::BSSID, linkedInfo.bssid}}, curNearbyApInfos);
+            QueryNearbyInfoByParam({{NearByApInfoTable::BSSID, config.bssid}}, curNearbyApInfos);
             if (curNearbyApInfos.size() != 0) {
                 data.nearbyApInfos = curNearbyApInfos;
             }
         } else {
             WIFI_LOGI("addCurrentApInfo info is already there");
         }
-        data.bssid = linkedInfo.bssid;
-        data.ssid = linkedInfo.ssid;
-        data.frequency = linkedInfo.frequency;
+        data.bssid = config.bssid;
+        data.ssid = config.ssid;
+        data.frequency = config.frequency;
         data.authType = config.keyMgmt;
         data.time = GetCurrentTimeMilliSeconds();
         data.inBlacklist = 0;
         data.isHomeAp = 0;
         SaveBssidInfo(data);
     }
+}
+
+void ApInfoHelper::AddNewApInfo(const WifiDeviceConfig &config)
+{
+    ApInfoData data;
+    if (apInfos_.size() >= DB_BSSID_MAX_QUANTA) {
+        ApInfoData oldestData;
+        int32_t index = GetOldestApInfoData(oldestData);
+        if (index != -1) {
+            apInfos_.erase(apInfos_.begin() + index);
+            DelApInfos(oldestData.bssid);
+        }
+    }
+    data.time = GetCurrentTimeMilliSeconds();
+    data.authType = config.keyMgmt;
+    data.bssid = config.bssid;
+    data.ssid = config.ssid;
+    data.frequency = config.frequency;
+    data.inBlacklist = 0;
+    data.isHomeAp = 0;
+    SaveBssidInfo(data);
+    AddCellInfo(config.bssid, cellId);
+    AddNearbyApInfo(config.bssid);
+    std::vector<CellInfoData> curCellInfos;
+    QueryCellIdInfoByParam({{CellIdInfoTable::BSSID, config.bssid}}, curCellInfos);
+    data.cellInfos = curCellInfos;
+    std::vector<std::string> curNearbyApInfos;
+    QueryNearbyInfoByParam({{NearByApInfoTable::BSSID, config.bssid}}, curNearbyApInfos);
+    data.nearbyApInfos = curNearbyApInfos;
+    apInfos_.push_back(data);
+    return;
 }
 
 int32_t ApInfoHelper::GetOldestApInfoData(ApInfoData &data)
@@ -204,10 +209,10 @@ int32_t ApInfoHelper::GetOldestApInfoData(ApInfoData &data)
         if (iter->time < oldestData.time) {
             oldestData = *iter;
             index = std::distance(apInfos_.begin(), iter);
-        } 
+        }
     }
     data = oldestData;
-    return index;;
+    return index;
 }
 
 int32_t ApInfoHelper::QueryCellIdInfoByParam(const std::map<std::string, std::string> &queryParams,
@@ -279,7 +284,7 @@ int32_t ApInfoHelper::GetApInfoByBssid(const std::string &bssid, ApInfoData &dat
 bool ApInfoHelper::IsCellIdExitByData(ApInfoData info, std::string cellId)
 {
     for (CellInfoData data : info.cellInfos) {
-        if(data.cellId == cellId) {
+        if (data.cellId == cellId) {
             WIFI_LOGI("IsCellIdExitByData, yes!");
             return true;
         }
@@ -354,7 +359,7 @@ bool ApInfoHelper::SaveBssidInfo(ApInfoData &apInfoData)
     bssidInfo.PutInt(BssidInfoTable::FREQUENCY, apInfoData.frequency);
     bssidInfo.PutInt(BssidInfoTable::IS_HOME_AP, apInfoData.isHomeAp);
     WIFI_LOGI("SaveBssidInfo, bssid:%{public}s, ssid:%{public}s, inblacklist:%{public}d",
-        MacAnonymize(apInfoData.bssid).c_str(), SsidAnonymize(apInfoData.ssid).c_str(), apInfoData.inBlacklist);;
+        MacAnonymize(apInfoData.bssid).c_str(), SsidAnonymize(apInfoData.ssid).c_str(), apInfoData.inBlacklist);
     if (queryRet == QUERY_NO_RECORD) {
         bool executeRet = wifiDataBaseUtils_->Insert(BssidInfoTable::TABLE_NAME, bssidInfo);
         WIFI_LOGI("SaveBssidInfo, insert ret=%{public}d", executeRet);
@@ -364,7 +369,7 @@ bool ApInfoHelper::SaveBssidInfo(ApInfoData &apInfoData)
         predicates.EqualTo(BssidInfoTable::BSSID, apInfoData.bssid);
         bool executeRet = wifiDataBaseUtils_->Update(bssidInfo, predicates);
         WIFI_LOGI("SaveBssidInfo, update ret=%{public}d", executeRet);
-        return executeRet; 
+        return executeRet;
     }
     WIFI_LOGE("SaveBssidInfo fail.");
     return false;

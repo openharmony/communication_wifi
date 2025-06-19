@@ -177,7 +177,7 @@ void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfo
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
     if (pWifiIntelligenceStateMachine_ != nullptr) {
         pWifiIntelligenceStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
-    } 
+    }
 #endif
 }
 
@@ -262,7 +262,8 @@ void WifiProService::UnRegisterCellularStateObserver()
     if (celluarStateObserver_ != nullptr) {
         uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
         for (int32_t i = 0; i < simCount_; i++) {
-            auto result = Telephony::TelephonyObserverClient::GetInstance().RemoveStateObserver(i, telephonyObserverMask);
+            auto result = Telephony::TelephonyObserverClient::GetInstance().RemoveStateObserver(
+                i, telephonyObserverMask);
             if (result != 0) {
                 WIFI_LOGE("UnRegisterCellularStateObserver failed,slotId:%{public}d,res:%{public}d", i, result);
             }

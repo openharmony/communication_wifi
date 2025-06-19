@@ -229,7 +229,7 @@ private:
     void SetScanIntervel(int32_t scanType);
     void InitPunishParameter();
     void SetPingPongPunishTime();
-    bool isInPingpongPunishTime();
+    bool IsInPingpongPunishTime();
     bool FullScan();
     bool HandleScanResult(std::vector<WifiScanInfo> scanInfoList);
     bool IsInTargetAp(std::string bssid, std::string ssid);

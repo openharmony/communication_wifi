@@ -625,7 +625,7 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
         if (pWifiProService != nullptr) {
             pWifiProService->OnScreenStateChanged(screenStateNew);
         }
-#endif  
+#endif
     }
 }
 

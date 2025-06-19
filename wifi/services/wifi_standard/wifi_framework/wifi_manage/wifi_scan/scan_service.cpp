@@ -1647,7 +1647,7 @@ ErrCode ScanService::AllowSystemTimerScan()
         return WIFI_OPT_FAILED;
     }
     if (!AllowScanByGameScene()) {
-        WIFI_LOGW("extern scan not allow by gamescene scan control.")
+        WIFI_LOGW("system timer scan not allow by gamescene scan control.");
         WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::GAME_SCENE));
         return WIFI_OPT_FAILED;
     }

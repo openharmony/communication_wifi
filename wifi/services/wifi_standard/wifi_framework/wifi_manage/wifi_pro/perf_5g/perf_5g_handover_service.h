@@ -78,7 +78,7 @@ private:
         std::vector<InterScanInfo> &wifiScanInfos, std::unordered_set<std::string> &noExistRelationBssidSet,
         std::vector<RelationAp> &sameSsidAps, std::unordered_set<std::string> &existRelationBssidSet);
     void LoadRelationApInfo();
-    void PrintAssociateInfo();
+    void PrintRelationAps();
 };
 }
 }

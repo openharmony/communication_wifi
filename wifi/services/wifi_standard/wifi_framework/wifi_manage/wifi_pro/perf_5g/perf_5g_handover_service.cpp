@@ -89,7 +89,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     LoadRelationApInfo();
     perf5gChrInfo_.Reset();
     perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
-    PrintAssociateInfo();
+    PrintRelationAps();
 }
 void Perf5gHandoverService::OnDisconnected()
 {
@@ -653,7 +653,7 @@ void Perf5gHandoverService::LoadRelationApInfo()
     }
 }
 
-void Perf5gHandoverService::PrintAssociateInfo()
+void Perf5gHandoverService::PrintRelationAps()
 {
     std::stringstream associateInfo;
     for (auto iter : relationAps_) {

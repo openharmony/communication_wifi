@@ -227,7 +227,7 @@ HWTEST_F(WifiProStateMachineTest, IsCallingInCsTest01, TestSize.Level1)
 
 HWTEST_F(WifiProStateMachineTest, IsAllowScanest01, TestSize.Level1)
 {
-    EXPECT_EQ(pWifiProStateMachine_->IsAllowScan(), true);
+    EXPECT_EQ(pWifiProStateMachine_->IsAllowScan(true), true);
 }
 
 HWTEST_F(WifiProStateMachineTest, UpdateWifiSwitchTimeStampTest01, TestSize.Level1)

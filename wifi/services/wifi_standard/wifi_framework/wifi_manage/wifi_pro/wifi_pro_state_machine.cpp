@@ -524,7 +524,7 @@ bool WifiProStateMachine::InLandscapeSwitchLimitList()
     return false;
 }
 
-bool WifiProStateMachine::IsAllowScan(int32_t signalLevel, bool hasSwitchRecord)
+bool WifiProStateMachine::IsAllowScan(bool hasSwitchRecord)
 {
     if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
         WIFI_LOGI("IsAllowScan: screen state off.");
@@ -1020,7 +1020,7 @@ void WifiProStateMachine::WifiHasNetState::HandleReuqestScanInHasNet(const Inter
     // when not allow scan, clean flag qoeScaning_
     if ((!pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel) ||
         pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) &&
-        !pWifiProStateMachine_->IsAllowScan(signalLevel, hasSwitchRecord)) {
+        !pWifiProStateMachine_->IsAllowScan(hasSwitchRecord)) {
         qoeScaning_ = false;
         return;
     }

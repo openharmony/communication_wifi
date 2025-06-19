@@ -261,8 +261,7 @@ private:
     ErrCode FullScan();
     void ProcessSwitchResult(const InternalMessagePtr msg);
     bool InLandscapeSwitchLimitList();
-    // Default SIG_LEVEL_0, skip landscape
-    bool IsAllowScan(int32_t signalLevel = SIG_LEVEL_0, bool hasSwitchRecord = false);
+    bool IsAllowScan(bool hasSwitchRecord);
 };
 } // namespace Wifi
 } // namespace OHOS

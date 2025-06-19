@@ -421,10 +421,10 @@ ErrCode ScanService::ScanControlInner(ScanType scanType)
             WIFI_LOGW("internal scan not allow by ActionListen condition");
             return WIFI_OPT_FAILED;
         }
-    }
-    if (!AllowScanByGameScene()) {
-        WIFI_LOGW("internal scan not allow by Game Scene");
-        return WIFI_OPT_FAILED;
+        if (!AllowScanByGameScene()) {
+            WIFI_LOGW("internal scan not allow by Game Scene");
+            return WIFI_OPT_FAILED;
+        }
     }
     return WIFI_OPT_SUCCESS;
 }

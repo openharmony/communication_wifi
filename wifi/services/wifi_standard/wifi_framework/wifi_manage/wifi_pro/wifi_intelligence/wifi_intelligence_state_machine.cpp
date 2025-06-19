@@ -930,14 +930,14 @@ void WifiIntelligenceStateMachine::InlineUpdateCellInfo(ApInfoData data, std::st
     }
 }
 
-bool WifiIntelligenceStateMachine::IsInMonitorNearbyAp(std::vector<WifiScanInfo> scanInfoList)
+bool WifiIntelligenceStateMachine::IsInMonitorNearbyAp(const std::vector<WifiScanInfo>& scanInfoList)
 {
     if (mTargetApInfoDatas_.size() == 0) {
         return false;
     }
-    for (auto &scanResult : scanInfoList) {
-        for (auto &apInfo : mTargetApInfoDatas_) {
-            for (auto &nearbyAp : apInfo.nearbyApInfos) {
+    for (const auto &scanResult : scanInfoList) {
+        for (const auto &apInfo : mTargetApInfoDatas_) {
+            for (const auto &nearbyAp : apInfo.nearbyApInfos) {
                 if (nearbyAp == scanResult.bssid) {
                     return true;
                 }

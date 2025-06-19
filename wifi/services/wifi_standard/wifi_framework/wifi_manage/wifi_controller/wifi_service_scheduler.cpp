@@ -961,7 +961,7 @@ ErrCode WifiServiceScheduler::TryToStartApService(int instId, int hotspotMode)
         if (pEnhanceService == nullptr) {
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_ENHANCE);
             WifiManager::GetInstance().AutoStartEnhanceService();
-            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+            pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         }
         pService->SetEnhanceService(pEnhanceService);
 #endif

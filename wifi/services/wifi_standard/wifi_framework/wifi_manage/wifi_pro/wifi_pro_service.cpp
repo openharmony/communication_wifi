@@ -248,7 +248,7 @@ void WifiProService::RegisterCellularStateObserver()
     simCount_ = Telephony::CoreServiceClient::GetInstance().GetMaxSimCount();
     for (int32_t i = 0; i < simCount_; i++) {
         auto result = Telephony::TelephonyObserverClient::GetInstance().AddStateObserver(
-            celluarStateObserver_, i, telephonyObserverMask, true);
+            cellularStateObserver_, i, telephonyObserverMask, true);
         if (result != 0) {
             WIFI_LOGE("RegisterCellularStateObserver failed, slotId:%{public}d, res:%{public}d", i, result);
         } else {
@@ -259,7 +259,7 @@ void WifiProService::RegisterCellularStateObserver()
  
 void WifiProService::UnRegisterCellularStateObserver()
 {
-    if (celluarStateObserver_ != nullptr) {
+    if (cellularStateObserver_ != nullptr) {
         uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
         for (int32_t i = 0; i < simCount_; i++) {
             auto result = Telephony::TelephonyObserverClient::GetInstance().RemoveStateObserver(

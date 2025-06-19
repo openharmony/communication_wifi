@@ -401,6 +401,18 @@ int WifiScanConfig::GetHilinkAbility(const std::string &bssid)
     return false;
 }
 
+void WifiScanConfig::SetNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    networkControlInfoRecord = networkControlInfo;
+}
+ 
+WifiNetworkControlInfo WifiScanConfig::GetNetworkControlInfo()
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    return networkControlInfoRecord;
+}
+ 
 void WifiScanConfig::RecordWifiCategory(const std::string bssid, WifiCategory category)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);

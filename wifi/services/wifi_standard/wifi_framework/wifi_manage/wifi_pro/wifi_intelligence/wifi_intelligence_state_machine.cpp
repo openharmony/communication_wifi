@@ -783,7 +783,7 @@ bool WifiIntelligenceStateMachine::InternetReadyState::ExecuteStateMsg(InternalM
             WifiLinkedInfo linkedInfo;
             WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
             bool isMobileAp = linkedInfo.isDataRestricted;
-            if (!isMobileAp) {    
+            if (!isMobileAp) {
                 std::string cellId = ApInfoHelper::GetInstance().GetCurrentCellIdInfo();
                 if (!cellId.empty()) {
                     ApInfoHelper::GetInstance().AddApInfo(cellId, linkedInfo.networkId);
@@ -877,7 +877,7 @@ bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> sc
         }
         if (!isInTargetApVec && !data.bssid.empty() && !cellId.empty()) {
             InlineUpdateCellInfo(data, cellId);
-             mTargetApInfoDatas_.push_back(data);
+            mTargetApInfoDatas_.push_back(data);
         }
         if (scanInfo.rssi >= AUTO_OPEN_RSSI_VALUE) {
             hasTargetAp = true;
@@ -890,7 +890,7 @@ bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> sc
     }
 
     if (hasApInBlacklist) {
-        WIFI_LOGI("Has tartget in blacklist, update record.");
+        WIFI_LOGI("Has tartget in black list, update record.");
         ApInfoHelper::GetInstance().ResetBlacklist(scanInfoList, 1);
         return true;
     } else {

@@ -59,7 +59,7 @@ struct CellInfoData {
 struct ApInfoData {
     std::string bssid;
     std::string ssid;
-    long time;
+    int64_t time;
     std::string authType;
     int32_t isHomeAp;
     int32_t frequency;

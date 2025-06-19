@@ -2784,11 +2784,11 @@ bool ScanService::AllowScanByActionListen()
     return true;
 }
 
-bool ScanService::AllowscanByGameScene()
+bool ScanService::AllowScanByGameScene()
 {
     WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetNetworkControlInfo();
     WIFI_LOGI("AllowScanByGameScene %{public}d", NetworkControlInfo.state);
-    if (NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_END && NetWorkControlInfo.state != GameSceneId::MSG_GAME_STATE_BACKGROUND) {
+    if (NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_END && NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_BACKGROUND) {
         WIFI_LOGI("Scan is not allowed in GameScene condition AllowScanByGameScene = %{public}d", NetworkControlInfo.state);
         return false;
     }

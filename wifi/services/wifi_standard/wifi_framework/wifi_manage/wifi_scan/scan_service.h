@@ -395,6 +395,14 @@ private:
     bool isChipsetInfoObtained;
     std::atomic<int> currSingleScanCount {0};
     int lastP2pEnhanceState {0};
+    enum GameSceneId : int {
+        MSG_GAME_STATE_START = 0,
+        MSG_GAME_STATE_END = 1,
+        MSG_GAME_ENTER_PVP_BATTLE = 2,
+        MSG_GAME_EXIT_PVP_BATTLE = 3,
+        MSG_GAME_STATE_FOREGROUND = 4,
+        MSG_GAME_STATE_BACKGROUND = 5,
+    };
     /**
      * @Description Obtains the frequency of a specified band.
      *
@@ -898,10 +906,11 @@ private:
      */
     bool AllowScanByActionListen();
     /**
-     * @Description Get interval time between currentMs and startTime.
+     * @Description Determines whether scanning is allowed in Game Scene.
      *
-     * @return int64_t: millisecond difference between two time point.
+     * @return true: allow, false: not allowed.
      */
+    bool AllowScanByGameScene();
     int64_t GetIntervalTime(int64_t startTime);
 
     /**

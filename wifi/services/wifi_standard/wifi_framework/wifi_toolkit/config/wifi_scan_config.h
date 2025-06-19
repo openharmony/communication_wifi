@@ -17,6 +17,7 @@
 
 #include <mutex>
 #include "wifi_scan_control_msg.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -89,12 +90,17 @@ public:
 
     int GetHilinkAbility(const std::string &bssid);
 
+    void SetNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo);
+ 
+    WifiNetworkControlInfo GetNetworkControlInfo();
+
 private:
     void InitScanControlForbidList();
     void InitScanControlIntervalList();
 
     std::mutex mScanDeviceInfoMutex;
     WifiScanDeviceInfo mScanDeviceInfo;
+    WifiNetworkControlInfo networkControlInfoRecord;
     std::mutex mScanMutex;
     std::map<std::string, WifiCategory> mWifiCategoryRecord;
     std::vector<WifiScanInfo> mWifiScanInfoList;

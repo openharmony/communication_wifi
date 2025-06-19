@@ -122,7 +122,8 @@ enum class ScanLimitType {
     CANNOT_SWITCH_AP,
     STA_STATE,
     ACTION_LISTEN,
-    HID2D_CLONE
+    HID2D_CLONE,
+    GAME_SCENE
 };
 }  // namespace Wifi
 }  // namespace OHOS

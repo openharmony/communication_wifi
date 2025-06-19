@@ -2793,7 +2793,6 @@ bool ScanService::AllowScanByGameScene()
         return false;
     }
     return true;
-    }
 }
 
 int64_t ScanService::GetIntervalTime(int64_t startTime)

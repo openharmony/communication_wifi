@@ -960,10 +960,8 @@ ErrCode WifiServiceScheduler::TryToStartApService(int instId, int hotspotMode)
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService == nullptr) {
             WIFI_LOGE("Create %{public}s service failed!", WIFI_SERVICE_ENHANCE);
-            std::string dlname;
-            if (WifiServiceManager::GetInstance().GetServiceDll(WIFI_SERVICE_ENHANCE, dlname) >= 0) {
-                WifiServiceManager::GetInstance().LoadEnhanceService(dlname, true);
-            }
+            WifiManager::GetInstance().AutoStartEnhanceService();
+            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         }
         pService->SetEnhanceService(pEnhanceService);
 #endif

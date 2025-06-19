@@ -327,7 +327,6 @@ ohos_unittest("wifi_selfcure_unittest") {
     external_deps += [ "ffrt:libffrt" ]
     defines += [ "WIFI_FFRT_ENABLE" ]
   }
-
   defines += [
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",

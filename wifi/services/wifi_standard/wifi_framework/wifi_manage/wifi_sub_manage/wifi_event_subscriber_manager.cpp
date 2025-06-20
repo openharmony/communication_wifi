@@ -210,7 +210,14 @@ void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbi
             pService->OnSystemAbilityChanged(systemAbilityId, add);
         }
     }
-    StartNetEapObserver();
+}
+
+void WifiEventSubscriberManager::HandleEthernetServiceChange(int systemAbilityId, bool add)
+{
+#ifdef EXTENSIBLE_AUTHENTICATION
+    WIFI_LOGI("StartNetEapObserver");
+    NetEapObserver::GetInstance().StartNetEapObserver();
+#endif
 }
 
 #ifdef HAS_MOVEMENT_PART
@@ -314,6 +321,8 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
         case MOUSE_CROSS_SERVICE_ID:
             HandleMouseCrossServiceChange(add);
             break;
+        case COMM_ETHERNET_MANAGER_SYS_ABILITY_ID:
+            HandleEthernetServiceChange(systemAbilityId, add);
         default:
             break;
     }
@@ -547,13 +556,6 @@ void WifiEventSubscriberManager::MdmPropChangeEvt(const char *key, const char *v
     }
 }
 
-void WifiEventSubscriberManager::StartNetEapObserver()
-{
-#ifdef EXTENSIBLE_AUTHENTICATION
-    WIFI_LOGI("StartNetEapObserver");
-    NetEapObserver::GetInstance().StartNetEapObserver();
-#endif
-}
 #ifdef HAS_MOVEMENT_PART
 void WifiEventSubscriberManager::RegisterMovementCallBack()
 {

@@ -681,6 +681,10 @@ if (defined(ohos_lite)) {
       defines += [ "WIFI_DATA_REPORT_ENABLE" ]
     }
 
+    if (wifi_feature_autoopen_specified_location) {
+      defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
+    }
+
     part_name = "wifi"
     subsystem_name = "communication"
   }

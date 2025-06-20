@@ -67,6 +67,7 @@ ohos_static_library("wifi_sta_ext_service") {
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
+    ":wifi_telephony_utils",
   ]
 
   external_deps = [
@@ -76,8 +77,6 @@ ohos_static_library("wifi_sta_ext_service") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
-    "core_service:tel_core_service_api",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -100,6 +99,63 @@ ohos_static_library("wifi_sta_ext_service") {
   }
   if (wifi_feature_with_security_detect) {
     sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect/wifi_security_detect.cpp" ]
+  }
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
+      defined(global_parts_info.telephony_cellular_data)) {
+      external_deps += [
+        "cellular_data:tel_cellular_data_api",
+        "core_service:tel_core_service_api",]
+      defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
+  }
+  part_name = "wifi"
+  subsystem_name = "communication"
+}
+
+config("wifi_telephony_utils_config") {
+  include_dirs = [
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_telephony_utils",
+  ]
+}
+
+ohos_static_library("wifi_telephony_utils") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    boundary_sanitize = false
+    cfi_cross_dso = true
+    integer_overflow = false
+    ubsan = false
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+  sources = [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_telephony_utils/wifi_telephony_utils.cpp" ]
+  public_configs = [ ":wifi_telephony_utils_config"]
+  include_dirs = local_base_include_dirs
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
+  cflags_cc += [
+    "-std=c++17",
+    "-fno-rtti",
+  ]
+
+  ldflags += [
+    "-fPIC",
+    "-Wl,-E",
+  ]
+  external_deps = [
+    "hilog:libhilog",
+  ]
+
+  defines = []
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
+      defined(global_parts_info.telephony_cellular_data)) {
+      external_deps += [
+        "cellular_data:tel_cellular_data_api",
+        "core_service:tel_core_service_api",]
+      defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
   }
   part_name = "wifi"
   subsystem_name = "communication"

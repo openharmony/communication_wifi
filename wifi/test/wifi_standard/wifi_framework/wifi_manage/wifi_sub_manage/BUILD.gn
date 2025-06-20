@@ -161,8 +161,6 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
-    "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
     "googletest:gmock_main",
@@ -198,6 +196,14 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "SUPPORT_RANDOM_MAC_ADDR",
   ]
 
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
+      defined(global_parts_info.telephony_cellular_data)) {
+    external_deps += [
+      "cellular_data:tel_cellular_data_api",
+      "core_service:tel_core_service_api",]
+    defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
+  }
   if (defined(global_parts_info) && defined(global_parts_info.msdp_movement)) {
     external_deps += [ "movement:movement_client" ]
     defines += [ "HAS_MOVEMENT_PART" ]

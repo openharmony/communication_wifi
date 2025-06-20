@@ -21,7 +21,7 @@ namespace Wifi {
 
 HWTEST_F(WifiSecurityDetect, AssembleUri, TestSize.Level1)
 {
-    Uri uri WifiSecurityDetect::GetInstance().AssembleUri("wifi_cloud_security_check");
+    Uri uri = WifiSecurityDetect::GetInstance().AssembleUri("wifi_cloud_security_check");
     EXPECT_TRUE(uri);
 }
 

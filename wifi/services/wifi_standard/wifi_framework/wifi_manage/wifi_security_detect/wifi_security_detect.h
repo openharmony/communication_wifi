@@ -45,7 +45,7 @@ private:
     std::unique_ptr<WifiEventHandler> securityDetectThread_ = nullptr;
     StaServiceCallback staCallback_;
     int currentConnectedNetworkId_ = -1;
-    std::atomic<bool> datashareReady {false};
+    std::atomic<bool> datashareReady_ {false};
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
     bool IsSettingSecurityDetectOn();
     bool IsSecurityDetectTimeout(const int &networkId);

@@ -131,7 +131,7 @@ Uri WifiSecurityDetect::AssembleUri(const std::string &key)
 
 bool WifiSecurityDetect::IsSettingSecurityDetectOn()
 {
-    if (datashareReady == false) {
+    if (datashareReady_ == false) {
         return false;
     }
     auto operatePtr = CreateDataShareHelper();

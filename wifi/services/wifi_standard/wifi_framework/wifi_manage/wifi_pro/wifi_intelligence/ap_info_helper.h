@@ -69,9 +69,9 @@ struct ApInfoData {
 };
 
 struct LinkedCellInfo {
-    int32_t cellId;
-    std::string mcc;  // Physical Cell Id
-    std::string mnc;  // Tracking Area Code
+    int64_t cellId;
+    std::string mcc;
+    std::string mnc;
     int32_t rssi;
     int32_t rat;
 };

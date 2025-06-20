@@ -372,7 +372,7 @@ void WifiIntelligenceStateMachine::DisabledState::HandleMsgStateChange(InternalM
     if (!ApInfoHelper::GetInstance().IsCellIdExit(cellId)) {
         std::vector<WifiScanInfo> scanInfoList;
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
-        WIFI_LOGI("mIsAutoOpenSearch_:%{public}d, mTargetApInfoDatas_.size:%{public}lu, scanInfoList.size:%{public}lu",
+        WIFI_LOGI("mIsAutoOpenSearch_:%{public}d, mTargetApInfoDatas_.size:%{public}u, scanInfoList.size:%{public}u",
             pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_,
             pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size(), scanInfoList.size());
         if (pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ &&
@@ -390,7 +390,7 @@ void WifiIntelligenceStateMachine::DisabledState::HandleMsgStateChange(InternalM
 
     std::vector<ApInfoData> datas = ApInfoHelper::GetInstance().GetMonitorDatas(cellId);
     pWifiIntelligenceStateMachine_->mTargetApInfoDatas_ = FilterFromBlackList(datas);
-    WIFI_LOGI("mTargetApInfoDatas_.size:%{public}lu", pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size());
+    WIFI_LOGI("mTargetApInfoDatas_.size:%{public}u", pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size());
     if (pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size() > 0 && screenState == MODE_STATE_OPEN &&
         WifiConfigCenter::GetInstance().GetWifiMidState() != WifiOprMidState::RUNNING) {
         if (msg->GetMessageName() == EVENT_CELL_STATE_CHANGE) {
@@ -486,7 +486,7 @@ void WifiIntelligenceStateMachine::UpdateScanResult(InternalMessagePtr msg)
 {
     std::vector<WifiScanInfo> scanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
-    WIFI_LOGI("UpdateScanResult, results size:%{public}lu", scanInfoList.size());
+    WIFI_LOGI("UpdateScanResult, results size:%{public}u", scanInfoList.size());
     if (!HandleScanResult(scanInfoList)) {
         mScanTimes_++;
         if (mScanTimes_ < SCAN_TOTLE_TIMES) {
@@ -935,7 +935,7 @@ bool WifiIntelligenceStateMachine::IsInMonitorNearbyAp(const std::vector<WifiSca
     if (mTargetApInfoDatas_.size() == 0) {
         return false;
     }
-    for (const auto &scanResult : scanInfoList) { 
+    for (const auto &scanResult : scanInfoList) {
         for (const auto &apInfo : mTargetApInfoDatas_) {
             for (const auto &nearbyAp : apInfo.nearbyApInfos) {
                 if (nearbyAp == scanResult.bssid) {

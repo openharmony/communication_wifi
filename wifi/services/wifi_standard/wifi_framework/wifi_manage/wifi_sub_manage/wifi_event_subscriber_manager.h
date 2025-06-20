@@ -174,7 +174,7 @@ private:
 #ifdef HAS_MOVEMENT_PART
     void HandleHasMovementPartChange(int systemAbilityId, bool add);
 #endif
-    void StartNetEapObserver();
+    void HandleEthernetServiceChange(int systemAbilityId, bool add);
     void HandleDistributedKvDataServiceChange(bool add);
     void HandleCastServiceChange(bool add);
     void HandleShareServiceChange(bool add);

@@ -620,6 +620,12 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
         if (pScanService != nullptr) {
             pScanService->OnScreenStateChanged(screenStateNew);
         }
+#if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
+        IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(i);
+        if (pWifiProService != nullptr) {
+            pWifiProService->OnScreenStateChanged(screenStateNew);
+        }
+#endif
     }
 }
 

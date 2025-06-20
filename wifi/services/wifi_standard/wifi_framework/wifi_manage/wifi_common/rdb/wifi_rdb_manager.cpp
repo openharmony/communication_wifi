@@ -22,7 +22,7 @@ DEFINE_WIFILOG_LABEL("WifiRdbManager");
 
 const std::string WIFI_DATABASE_PATH = "/data/service/el1/public/wifi";
 const std::string WIFI_PRO_RDB_NAME = "/wifi_pro.db";
-constexpr int32_t WIFI_PRO_DATABASE_VERSION = 1;
+constexpr int32_t WIFI_PRO_DATABASE_VERSION = 2;
 const std::string WIFI_HISTORY_RECORD_DATEBASE_NAME = "/wifi_history_record.db";
 constexpr int WIFI_HISTORY_RECORD_DATABASE_VERSION = 2;
 
@@ -171,12 +171,46 @@ int32_t WifiRdbManager::WifiProRdbOpenCallback::OnCreate(NativeRdb::RdbStore &rd
     if (ret != NativeRdb::E_OK) {
         WIFI_LOGE("perf_ap_relation create failed");
     }
+    ret = rdbStore.ExecuteSql(
+        "CREATE TABLE IF NOT EXISTS bssid_info_table (bssid TEXT, "
+        "ssid TEXT, time BIGINT, inBlacklist INTEGER, authType TEXT, frequency INTEGER, isHomeAp INTEGER);");
+    if (ret != NativeRdb::E_OK) {
+        WIFI_LOGE("bssid_info_table creat failed");
+    }
+    ret = rdbStore.ExecuteSql(
+        "CREATE TABLE IF NOT EXISTS cellid_info_table (bssid TEXT, cellId TEXT, rssi INTEGER);");
+    if (ret != NativeRdb::E_OK) {
+        WIFI_LOGE("cellid_info_table creat failed");
+    }
+    ret = rdbStore.ExecuteSql(
+        "CREATE TABLE IF NOT EXISTS nearby_ap_info_table (bssid TEXT, nearbyBssid TEXT);");
+    if (ret != NativeRdb::E_OK) {
+        WIFI_LOGE("nearby_ap_info_table creat failed");
+    }
     return NativeRdb::E_OK;
 }
+
 int32_t WifiRdbManager::WifiProRdbOpenCallback::OnUpgrade(NativeRdb::RdbStore &rdbStore, int32_t currentVersion,
     int32_t targetVersion)
 {
     WIFI_LOGI("WifiProRdbOpenCallback OnUpgrade");
+    int32_t ret = rdbStore.ExecuteSql(
+        "CREATE TABLE IF NOT EXISTS bssid_info_table (bssid TEXT, "
+        "ssid TEXT, time BIGINT, inBlacklist INTEGER, authType TEXT, frequency INTEGER, isHomeAp INTEGER);");
+    if (ret != NativeRdb::E_OK) {
+        WIFI_LOGE("bssid_info_table creat failed");
+    }
+    ret = rdbStore.ExecuteSql(
+        "CREATE TABLE IF NOT EXISTS cellid_info_table (bssid TEXT, cellId TEXT, rssi INTEGER);");
+    if (ret != NativeRdb::E_OK) {
+        WIFI_LOGE("cellid_info_table creat failed");
+    }
+    ret = rdbStore.ExecuteSql(
+        "CREATE TABLE IF NOT EXISTS nearby_ap_info_table (bssid TEXT, nearbyBssid TEXT);");
+    if (ret != NativeRdb::E_OK) {
+        WIFI_LOGE("nearby_ap_info_table creat failed");
+    }
+    WIFI_LOGI("WifiProRdbOpenCallback::OnUpgrade, creatTable success.");
     return NativeRdb::E_OK;
 }
 

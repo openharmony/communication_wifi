@@ -740,6 +740,12 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENED));
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
+#if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
+        IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+        if (pWifiProService != nullptr) {
+            pWifiProService->OnWifiStateOpen(static_cast<int>(state));
+        }
+#endif
         return;
     }
     if (state == OperateResState::OPEN_WIFI_FAILED) {
@@ -800,6 +806,12 @@ void WifiServiceScheduler::DispatchWifiSemiActiveRes(OperateResState state, int 
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_SEMI_OPEN),
             static_cast<int>(WifiOperateState::STA_SEMI_OPENED));
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::SEMI_ENABLE);
+#if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
+        IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+        if (pWifiProService != nullptr) {
+            pWifiProService->OnWifiStateClose(static_cast<int>(state));
+        }
+#endif
         return;
     }
 }
@@ -825,6 +837,12 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
             static_cast<int>(WifiOperateState::STA_CLOSED));
         WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
+#if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
+        IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+        if (pWifiProService != nullptr) {
+            pWifiProService->OnWifiStateClose(static_cast<int>(state));
+        }
+#endif
         return;
     }
 }

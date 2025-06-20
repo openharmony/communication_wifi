@@ -32,6 +32,7 @@
 #include "mock_block_connect_service.h"
 #include "wifi_history_record_manager.h"
 #include "sta_define.h"
+#include "wifi_telephony_utils.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -1516,23 +1517,18 @@ public:
 
     void GetDataSlotIdTest()
     {
-        pStaStateMachine->GetDataSlotId(0);
-        pStaStateMachine->GetDataSlotId(-1);
-    }
-    void GetCardTypeTest()
-    {
-        CardType cardType;
-        pStaStateMachine->GetCardType(cardType);
+        WifiTelephonyUtils::GetDataSlotId(0);
+        WifiTelephonyUtils::GetDataSlotId(-1);
     }
     void GetDefaultIdTest()
     {
-        pStaStateMachine->GetDefaultId(WIFI_INVALID_SIM_ID);
-        pStaStateMachine->GetDefaultId(1);
+        WifiTelephonyUtils::GetDefaultId(WIFI_INVALID_SIM_ID);
+        WifiTelephonyUtils::GetDefaultId(1);
     }
 
     void GetSimCardStateTest()
     {
-        pStaStateMachine->GetSimCardState(0);
+        WifiTelephonyUtils::GetSimCardState(0);
     }
 
     void IsValidSimIdTest()
@@ -1542,11 +1538,13 @@ public:
     }
     void IsMultiSimEnabledTest()
     {
-        pStaStateMachine->IsMultiSimEnabled();
+        WifiTelephonyUtils::IsMultiSimEnabled();
     }
     void SimAkaAuthTest()
     {
-        EXPECT_EQ(pStaStateMachine->SimAkaAuth("", SIM_AUTH_EAP_SIM_TYPE), "");
+    #ifdef TELEPHONE_CORE_SERVICE_ENABLE
+        EXPECT_EQ(WifiTelephonyUtils::SimAkaAuth("", WifiTelephonyUtils::AuthType::SIM_TYPE, 0), "");
+    #endif
     }
 
     void GetGsmAuthResponseWithLengthTest()
@@ -2569,12 +2567,6 @@ HWTEST_F(StaStateMachineTest, InitRandomMacInfoTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, GetDataSlotIdTest, TestSize.Level1)
 {
     GetDataSlotIdTest();
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
-}
-
-HWTEST_F(StaStateMachineTest, GetCardTypeTest, TestSize.Level1)
-{
-    GetCardTypeTest();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 

@@ -169,7 +169,7 @@ void Handler::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
         return;
     }
     std::function<void()> func = std::bind([this, msg]() {
-        LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
+        LOGD("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
         ExecuteMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);
     });
@@ -238,7 +238,7 @@ void Handler::PlaceMessageTopOfQueue(InternalMessagePtr msg)
         return;
     }
     std::function<void()> func = std::bind([this, msg]() {
-        LOGI("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
+        LOGD("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
         ExecuteMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);
     });

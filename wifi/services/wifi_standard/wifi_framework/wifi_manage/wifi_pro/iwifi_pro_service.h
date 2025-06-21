@@ -50,6 +50,35 @@ public:
      * @Description deal wifi channel qoe
      */
     virtual void DealQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo) = 0;
+
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    /**
+     * @Description receive screen state change event
+     *
+     * @param screenState - screen state
+     */
+    virtual void OnScreenStateChanged(int32_t screenState) = 0;
+
+    /**
+     * @Description receive cell info updated
+     *
+     */
+    virtual void OnCellInfoUpdated() = 0;
+
+    /**
+     * @Description receive wifi open result
+     *
+     * @param state - wifi open state
+     */
+    virtual void OnWifiStateOpen(int32_t state) = 0;
+
+    /**
+     * @Description receive wifi close result
+     *
+     * @param state - wifi close state
+     */
+    virtual void OnWifiStateClose(int32_t state) = 0;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

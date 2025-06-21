@@ -19,8 +19,6 @@
 #ifndef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_country_code_manager.h"
-#include "core_service_client.h"
-#include "cellular_data_client.h"
 #include "wifi_notification_util.h"
 #include "wifi_history_record_manager.h"
 #endif
@@ -36,6 +34,7 @@
 #include "external_wifi_common_builder_manager.h"
 #include "block_connect_service.h"
 #include "parameters.h"
+#include "wifi_telephony_utils.h"
 
 DEFINE_WIFILOG_LABEL("StaService");
 
@@ -320,50 +319,6 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     return WIFI_OPT_SUCCESS;
 }
 
-std::string StaService::ConvertString(const std::u16string &wideText) const
-{
-    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(wideText);
-}
-
-#ifndef OHOS_ARCH_LITE
-int32_t StaService::GetDataSlotId(int32_t slotId) const
-{
-    int32_t simCount = CoreServiceClient::GetInstance().GetMaxSimCount();
-    if (slotId >= 0 && slotId < simCount) {
-        LOGI("slotId: %{public}d, simCount:%{public}d", slotId, simCount);
-        return slotId;
-    }
-    auto slotDefaultID = CellularDataClient::GetInstance().GetDefaultCellularDataSlotId();
-    if ((slotDefaultID < 0) || (slotDefaultID >= simCount)) {
-        LOGE("failed to get default slotId, slotId:%{public}d, simCount:%{public}d", slotDefaultID, simCount);
-        return -1;
-    }
-    LOGI("slotDefaultID: %{public}d, simCount:%{public}d", slotDefaultID, simCount);
-    return slotDefaultID;
-}
-
-std::string StaService::GetImsi(int32_t slotId) const
-{
-    std::u16string imsi;
-    int32_t errCode = CoreServiceClient::GetInstance().GetIMSI(slotId, imsi);
-    if (errCode != 0) {
-        LOGE("failed to get imsi, errCode: %{public}d", errCode);
-        return "";
-    }
-    return ConvertString(imsi);
-}
-
-std::string StaService::GetPlmn(int32_t slotId) const
-{
-    std::u16string plmn;
-    int32_t errCode = CoreServiceClient::GetInstance().GetSimOperatorNumeric(slotId, plmn);
-    if (errCode != 0) {
-        LOGE("failed to get plmn, errCode: %{public}d", errCode);
-        return "";
-    }
-    return ConvertString(plmn);
-}
-#endif
 
 std::string StaService::GetMcc(const std::string &imsi) const
 {
@@ -390,20 +345,19 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
     } else {
         return;
     }
-
-    int32_t slotId = CoreServiceClient::GetInstance().GetSlotId(config.wifiEapConfig.eapSubId);
+    int32_t slotId = WifiTelephonyUtils::GetSlotId(config.wifiEapConfig.eapSubId);
     if (slotId == -1) {
         return;
     }
 
-    std::string imsi = GetImsi(slotId);
+    std::string imsi = WifiTelephonyUtils::GetImsi(slotId);
     if (imsi.empty() || imsi.length() > EAP_AUTH_MAX_IMSI_LENGTH) {
         LOGE("invalid imsi, length: %{public}zu", imsi.length());
         return;
     }
 
     std::string mnc;
-    std::string plmn = GetPlmn(slotId);
+    std::string plmn = WifiTelephonyUtils::GetPlmn(slotId);
     LOGI("imsi: %{private}s, plmn: %{public}s", imsi.c_str(), plmn.c_str());
     if (plmn.length() == EAP_AUTH_MIN_PLMN_LEN) {
         mnc = "0" + GetMnc(imsi, EAP_AUTH_MIN_MNC_LEN);

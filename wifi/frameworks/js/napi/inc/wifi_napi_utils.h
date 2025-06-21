@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace Wifi {
 static constexpr int NAPI_MAX_STR_LENT = 128;
+static constexpr int NAPI_MAX_EXCLUSION_PROXY_LENT = 10240;
 static constexpr int NAPI_WAPI_MAX_STR_LENT = 2048;
 static constexpr int NAPI_MAX_IPV4_LEN = 16;
 static const std::int32_t SYSCAP_WIFI_CORE = 2400000;

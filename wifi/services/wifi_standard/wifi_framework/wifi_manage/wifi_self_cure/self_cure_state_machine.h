@@ -385,16 +385,19 @@ private:
     void ClearDhcpOffer();
     bool CheckSelfCureConnectState();
     void CheckSelfCureReassocState();
+    void CheckSelfCureDisconnectState();
     void UpdateSelfcureState(int currentCureLevel, bool isSelfCureOnGoing);
     void HandleSelfCureNormal();
     void HandleSelfCureException(int reasonCode);
+    void HandleSelfCureDisconnectException();
     void StopSelfCureDelay(int status, int delay);
     void HandleSceStopSelfCure(int status);
     void SetSelfCureWifiTimeOut(SelfCureState wifiSelfCureState);
     void ResetSelfCureParam();
     void NotifySelfCureCompleted(int status);
-    void ForceStopSelfCure();
     void HandleConnectFailed();
+    void ForceStopSelfCure();
+
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;
     std::map<std::string, SelfCureServiceCallback> mSelfCureCallback_;

@@ -126,6 +126,7 @@ public:
     virtual void UpdateLinkedChannelWidth(std::string bssid, WifiChannelWidth channelWidth, int instId = 0) = 0;
     virtual int GetNoChargerPlugModeState() const = 0  ;
     virtual int GetPackageInfoMap(std::map<std::string, std::vector<PackageInfo>> &filterMap) = 0;
+    virtual int GetPackageInfoByName(std::string name, std::vector<PackageInfo> &packageInfo) = 0;
     virtual int GetPowerIdelState()  const = 0 ;
     virtual int GetGnssFixState() const = 0;
     virtual int GetAbnormalApps(std::vector<std::string> &abnormalAppList) = 0;
@@ -309,6 +310,7 @@ public:
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
     MOCK_METHOD1(SetValidChannels, int(const ChannelsTable &channelsInfo));
     MOCK_METHOD1(GetPackageInfoMap,  int(std::map<std::string, std::vector<PackageInfo>> &filterMap));
+    MOCK_METHOD2(GetPackageInfoByName,  int(std::string name, std::vector<PackageInfo> &packageInfo));
     MOCK_METHOD1(GetAbnormalApps,  int (std::vector<std::string> &abnormalAppList));
     MOCK_METHOD0(ClearScanInfoList, int());
     MOCK_METHOD3(StoreWifiMacAddrPairInfo, bool(WifiMacAddrInfoType type, const std::string &realMacAddr,

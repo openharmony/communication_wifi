@@ -56,6 +56,7 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_system_timer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_sensor_scene.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_clientmode_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/concrete_manager_state_machine.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/multi_sta_manager.cpp",
@@ -204,7 +205,6 @@ ohos_unittest("manager_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -268,8 +268,11 @@ ohos_unittest("manager_unittest") {
   }
 
   if (defined(global_parts_info) &&
-      defined(global_parts_info.telephony_core_service)) {
-    external_deps += [ "core_service:tel_core_service_api" ]
+      defined(global_parts_info.telephony_core_service) &&
+      defined(global_parts_info.telephony_cellular_data)) {
+    external_deps += [
+        "cellular_data:tel_cellular_data_api",
+        "core_service:tel_core_service_api",]
     defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
   }
 

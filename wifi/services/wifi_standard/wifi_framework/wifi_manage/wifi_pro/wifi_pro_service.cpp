@@ -19,6 +19,14 @@
 #include "wifi_pro_service.h"
 #include "wifi_pro_utils.h"
 #include "wifi_common_util.h"
+#include "wifi_config_center.h"
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+#include "telephony_observer_client.h"
+#include "telephony_types.h"
+#include "core_service_client.h"
+#include "cellular_data_client.h"
+#include "telephony_observer_client.h"
+#endif
 
 #ifndef FALLTHROUGH_INTENDED
 #define FALLTHROUGH_INTENDED [[clang::fallthrough]]  // NOLINT
@@ -37,6 +45,15 @@ WifiProService::WifiProService(int32_t instId)
 WifiProService::~WifiProService()
 {
     WIFI_LOGI("Enter ~WifiProService");
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    UnRegisterCellularStateObserver();
+#endif
+}
+
+WifiProService &WifiProService::GetInstance()
+{
+    static WifiProService gWifiProService;
+    return gWifiProService;
 }
 
 ErrCode WifiProService::InitWifiProService()
@@ -51,6 +68,20 @@ ErrCode WifiProService::InitWifiProService()
         WIFI_LOGE("Init WifiProStateMachine failed.");
         return WIFI_OPT_FAILED;
     }
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    if (instId_ == INSTID_WLAN0) {
+        pWifiIntelligenceStateMachine_ = std::make_shared<WifiIntelligenceStateMachine>(instId_);
+        if (pWifiIntelligenceStateMachine_ == nullptr) {
+            WIFI_LOGE("Alloc WifiIntelligenceStateMachine failed.");
+            return WIFI_OPT_FAILED;
+        }
+        if (pWifiIntelligenceStateMachine_->Initialize() != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Init WifiIntelligenceStateMachine failed.");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    RegisterCellularStateObserver();
+#endif
     return WIFI_OPT_SUCCESS;
 }
 
@@ -104,12 +135,22 @@ void WifiProService::NotifyWifiConnectStateChanged(OperateResState state, const 
         MacAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkedInfo.bssid).c_str());
     pWifiProStateMachine_->SendMessage(EVENT_WIFI_CONNECT_STATE_CHANGED, static_cast<int32_t>(state),
         linkedInfo.networkId, linkedInfo);
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    if (pWifiIntelligenceStateMachine_ != nullptr) {
+        pWifiIntelligenceStateMachine_->SendMessage(EVENT_WIFI_CONNECT_STATE_CHANGED, static_cast<int32_t>(state));
+    }
+#endif
 }
 
 void WifiProService::NotifyCheckWifiInternetResult(OperateResState state)
 {
     WIFI_LOGD("NotifyCheckWifiInternetResult: wifi internet result:%{public}d", static_cast<int32_t>(state));
     pWifiProStateMachine_->SendMessage(EVENT_CHECK_WIFI_INTERNET_RESULT, static_cast<int32_t>(state));
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    if (pWifiIntelligenceStateMachine_ != nullptr) {
+        pWifiIntelligenceStateMachine_->SendMessage(EVENT_CHECK_WIFI_INTERNET_RESULT, static_cast<int32_t>(state));
+    }
+#endif
 }
 
 void WifiProService::HandleRssiLevelChanged(int32_t rssi)
@@ -130,8 +171,14 @@ void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfo
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
         return;
     }
-
-    pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
+    if (WifiConfigCenter::GetInstance().GetWifiMidState(instId_) == WifiOprMidState::RUNNING) {
+        pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
+    }
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    if (pWifiIntelligenceStateMachine_ != nullptr) {
+        pWifiIntelligenceStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
+    }
+#endif
 }
 
 void WifiProService::HandleQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo)
@@ -154,5 +201,82 @@ void WifiProService::HandleWifiHalSignalInfoChange(const WifiSignalPollInfo &wif
 {
     pWifiProStateMachine_->SendMessage(EVENT_SIGNAL_INFO_CHANGE, wifiSignalPollInfo);
 }
+
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+void WifiProService::OnScreenStateChanged(int32_t screenState)
+{
+    if (pWifiIntelligenceStateMachine_ != nullptr) {
+        if (screenState == MODE_STATE_OPEN) {
+            pWifiIntelligenceStateMachine_->SendMessage(EVENT_SCREEN_ON, screenState);
+        } else if (screenState == MODE_STATE_CLOSE) {
+            pWifiIntelligenceStateMachine_->SendMessage(EVENT_SCREEN_OFF, screenState);
+        }
+    }
+}
+ 
+void WifiProService::OnCellInfoUpdated()
+{
+    if (pWifiIntelligenceStateMachine_ != nullptr) {
+        pWifiIntelligenceStateMachine_->SendMessage(EVENT_CELL_STATE_CHANGE);
+    }
+}
+ 
+void WifiProService::OnWifiStateOpen(int32_t state)
+{
+    if (pWifiIntelligenceStateMachine_ != nullptr) {
+        pWifiIntelligenceStateMachine_->SendMessage(EVENT_WIFI_ENABLED, state);
+    }
+}
+ 
+void WifiProService::OnWifiStateClose(int32_t state)
+{
+    if (pWifiIntelligenceStateMachine_ != nullptr) {
+        pWifiIntelligenceStateMachine_->SendMessage(EVENT_WIFI_DISABLED, state);
+    }
+}
+ 
+void WifiProService::RegisterCellularStateObserver()
+{
+    WIFI_LOGI("RegisterCellularStateObserver.");
+    if (cellularStateObserver_ == nullptr) {
+        cellularStateObserver_ = sptr<CellularStateObserver>::MakeSptr();
+    } else {
+        WIFI_LOGI("RegisterCellularStateObserver success.");
+        return;
+    }
+    uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
+    simCount_ = Telephony::CoreServiceClient::GetInstance().GetMaxSimCount();
+    for (int32_t i = 0; i < simCount_; i++) {
+        auto result = Telephony::TelephonyObserverClient::GetInstance().AddStateObserver(
+            cellularStateObserver_, i, telephonyObserverMask, true);
+        if (result != 0) {
+            WIFI_LOGE("RegisterCellularStateObserver failed, slotId:%{public}d, res:%{public}d", i, result);
+        } else {
+            WIFI_LOGI("RegisterCellularStateObserver success, slotId:%{public}d, res:%{public}d", i, result);
+        }
+    }
+}
+ 
+void WifiProService::UnRegisterCellularStateObserver()
+{
+    if (cellularStateObserver_ != nullptr) {
+        uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
+        for (int32_t i = 0; i < simCount_; i++) {
+            auto result = Telephony::TelephonyObserverClient::GetInstance().RemoveStateObserver(
+                i, telephonyObserverMask);
+            if (result != 0) {
+                WIFI_LOGE("UnRegisterCellularStateObserver failed,slotId:%{public}d,res:%{public}d", i, result);
+            }
+        }
+    }
+    cellularStateObserver_ = nullptr;
+}
+ 
+void CellularStateObserver::OnCellInfoUpdated(int32_t slotId, const std::vector<sptr<Telephony::CellInformation>> &vec)
+{
+    WIFI_LOGI("CellularStateObserver::OnCellInfoUpdated");
+    WifiProService::GetInstance().OnCellInfoUpdated();
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

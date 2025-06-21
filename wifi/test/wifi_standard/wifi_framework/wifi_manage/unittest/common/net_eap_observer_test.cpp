@@ -76,13 +76,15 @@ HWTEST_F(NetEapObserverTest, SetReplyCustomEapDataCallbackTest, TestSize.Level1)
 HWTEST_F(NetEapObserverTest, StartNetEapObserverTest, TestSize.Level1)
 {
     WIFI_LOGI("StartNetEapObserverTest enter!");
-    NetEapObserver::GetInstance().StartNetEapObserver();
+    int ret = NetEapObserver::GetInstance().StartNetEapObserver();
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(NetEapObserverTest, StopNetEapObserverTest, TestSize.Level1)
 {
     WIFI_LOGI("StopNetEapObserverTest enter!");
-    NetEapObserver::GetInstance().StopNetEapObserver();
+    int ret = NetEapObserver::GetInstance().StopNetEapObserver();
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(NetEapObserverTest, ReRegisterCustomEapCallbackTest, TestSize.Level1)
@@ -112,7 +114,8 @@ HWTEST_F(NetEapObserverTest, NotifyWpaEapInterceptInfoTest, TestSize.Level1)
     eapData.bufferLen = 3;
     std::vector<uint8_t> data = {0x11, 0x22, 0x12};
     eapData.eapBuffer = data;
-    NetEapObserver::GetInstance().NotifyWpaEapInterceptInfo(eapData);
+    int ret = NetEapObserver::GetInstance().NotifyWpaEapInterceptInfo(eapData);
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(NetEapObserverTest, OnRegisterCustomEapCallbackTest, TestSize.Level1)

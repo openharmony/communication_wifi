@@ -76,19 +76,19 @@ public:
     std::string regCmd_ = {};
 };
 
-class NetEapObserver
-{
-public:    
+class NetEapObserver {
+public:
     static NetEapObserver &GetInstance();
     ~NetEapObserver();
 
-    void StartNetEapObserver();
-    void StopNetEapObserver();
+    bool StartNetEapObserver();
+    bool StopNetEapObserver();
     bool SetRegisterCustomEapCallback(const std::function<void(const std::string &)> &callback);
     bool SetReplyCustomEapDataCallback(const std::function<void(int, const std::string&)> &callback);
     void ReRegisterCustomEapCallback();
     bool NotifyWpaEapInterceptInfo(const WpaEapData &wpaEapData);
-    sptr<NetEapCallback> GetNetEapCallbackPtr() {
+    sptr<NetEapCallback> GetNetEapCallbackPtr()
+    {
         return netEapCallback_;
     }
 

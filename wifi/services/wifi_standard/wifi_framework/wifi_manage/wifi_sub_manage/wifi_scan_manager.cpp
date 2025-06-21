@@ -248,14 +248,13 @@ void WifiScanManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, in
         if (pService != nullptr) {
             pService->ConnectivityManager(results);
         }
-
-#ifdef FEATURE_WIFI_PRO_SUPPORT
-        IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
-        if (pWifiProService != nullptr) {
-            pWifiProService->DealScanResult(results);
-        }
-#endif
     }
+#ifdef FEATURE_WIFI_PRO_SUPPORT
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+    if (pWifiProService != nullptr) {
+        pWifiProService->DealScanResult(results);
+    }
+#endif
 }
 
 void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)

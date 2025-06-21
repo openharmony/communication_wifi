@@ -61,26 +61,28 @@ bool NetEapObserver::SetReplyCustomEapDataCallback(const std::function<void(int,
     return netEapCallback_->SetReplyCustomEapDataCallback(callback);
 }
 
-void NetEapObserver::StartNetEapObserver()
+bool NetEapObserver::StartNetEapObserver()
 {
     int32_t ret = DelayedSingleton<NetManagerStandard::EthernetClient>::GetInstance()->RegisterCustomEapCallback(
         NetManagerStandard::NetType::WLAN0, netEapCallback_);
     if (ret == NetManagerStandard::NETMANAGER_SUCCESS) {
         WIFI_LOGI("StartNetEapObserver register success");
-        return;
+        return true;
     }
     WIFI_LOGI("StartNetEapObserver failed, ret=%{public}d", ret);
+    return false;
 }
 
-void NetEapObserver::StopNetEapObserver()
+bool NetEapObserver::StopNetEapObserver()
 {
     int32_t ret = DelayedSingleton<NetManagerStandard::EthernetClient>::GetInstance()->UnRegisterCustomEapCallback(
         NetManagerStandard::NetType::WLAN0, netEapCallback_);
     if (ret == NetManagerStandard::NETMANAGER_SUCCESS) {
         WIFI_LOGI("StopNetEapObserver unregister success");
-        return;
+        return true;
     }
     WIFI_LOGI("StopNetEapObserver failed, ret=%{public}d", ret);
+    return false;
 }
 
 void NetEapObserver::ReRegisterCustomEapCallback()

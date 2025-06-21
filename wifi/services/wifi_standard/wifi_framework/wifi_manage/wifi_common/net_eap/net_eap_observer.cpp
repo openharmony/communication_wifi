@@ -100,7 +100,6 @@ void NetEapObserver::ReRegisterCustomEapCallback()
 
 bool NetEapObserver::NotifyWpaEapInterceptInfo(const WpaEapData &wpaEapData)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     sptr<NetManagerStandard::EapData> notifyEapData = (std::make_unique<NetManagerStandard::EapData>()).release();
     notifyEapData->eapCode = wpaEapData.code;
     notifyEapData->eapType = wpaEapData.type;

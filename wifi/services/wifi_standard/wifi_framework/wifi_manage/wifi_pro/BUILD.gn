@@ -69,6 +69,7 @@ ohos_static_library("wifi_pro") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/perf_5g/infrastructure",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/perf_5g/repostitory",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/perf_5g/service",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_intelligence",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/rdb",
   ]
 
@@ -89,6 +90,8 @@ ohos_static_library("wifi_pro") {
     "wifi_pro_service.cpp",
     "wifi_pro_state_machine.cpp",
     "wifi_pro_utils.cpp",
+    "wifi_intelligence/ap_info_helper.cpp",
+    "wifi_intelligence/wifi_intelligence_state_machine.cpp",
   ]
 
   deps = [
@@ -99,6 +102,7 @@ ohos_static_library("wifi_pro") {
   external_deps = [
     "ability_runtime:app_manager",
     "c_utils:utils",
+    "common_event_service:cesfwk_core",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -118,6 +122,17 @@ ohos_static_library("wifi_pro") {
   }
 
   defines += [ "FEATURE_SELF_CURE_SUPPORT" ]
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
+      defined(global_parts_info.telephony_state_registry) &&
+      defined(global_parts_info.telephony_cellular_data) &&
+      wifi_feature_autoopen_specified_location) {
+      external_deps += [ "core_service:tel_core_service_api" ]
+      external_deps += [ "cellular_data:tel_cellular_data_api" ]
+      external_deps += [ "state_registry:tel_state_registry_api" ]
+      defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
+  }
 
   cflags = memory_optimization_cflags
   cflags_cc = memory_optimization_cflags_cc

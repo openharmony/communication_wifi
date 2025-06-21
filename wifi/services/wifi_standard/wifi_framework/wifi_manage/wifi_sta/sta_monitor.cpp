@@ -418,9 +418,9 @@ void StaMonitor::OnWpaCustomEapNotifyCallBack(const std::string &notifyParam)
 
     DecodeBase64(vecEapDatas[4], wpaEapData.eapBuffer);
 
-    if(wpaEapData.eapBuffer.size() == 0) {
+    if (wpaEapData.eapBuffer.size() == 0) {
         WIFI_LOGE("%{public}s notifyParam eapData is empty", __FUNCTION__);
-        return;      
+        return;
     }
     WIFI_LOGI("%{public}s buffer size:%{public}zu, first char is:%{public}d", __FUNCTION__,
         wpaEapData.eapBuffer.size(), wpaEapData.eapBuffer[0]);

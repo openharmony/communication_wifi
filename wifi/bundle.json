@@ -128,7 +128,8 @@
                 "runtime_core",
                 "icu",
                 "window_manager",
-                "security_guard"
+                "security_guard",
+                "state_registry"
             ],
             "third_party": [
                 "googletest",

@@ -120,6 +120,48 @@ void WifiProInterface::HandleSignalInfoChange(const WifiSignalPollInfo &wifiSign
     pWifiProService_->HandleWifiHalSignalInfoChange(wifiSignalPollInfo);
 }
 
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+void WifiProInterface::OnScreenStateChanged(int32_t screenState)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return;
+    }
+    pWifiProService_->OnScreenStateChanged(screenState);
+}
+ 
+void WifiProInterface::OnCellInfoUpdated()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return;
+    }
+    pWifiProService_->OnCellInfoUpdated();
+}
+ 
+void WifiProInterface::OnWifiStateOpen(int32_t state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return;
+    }
+    pWifiProService_->OnWifiStateOpen(state);
+}
+ 
+void WifiProInterface::OnWifiStateClose(int32_t state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return;
+    }
+    pWifiProService_->OnWifiStateClose(state);
+}
+#endif
+
 StaServiceCallback WifiProInterface::GetStaCallback() const
 {
     return staCallback_;

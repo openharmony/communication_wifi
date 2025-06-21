@@ -38,6 +38,7 @@ namespace OHOS {
 namespace Wifi {
 namespace {
 const std::string WIFI_PRO_STATE_MACHINE = "WifiProStateMachine";
+const uint32_t LANDSCAPE_LIMIT_SWITHCH_LIST_MAX_SIZE = 50;
 constexpr int32_t DEFAULT_RSSI = -200;
 constexpr int32_t DEFAULT_SCAN_INTERVAL = 10 * 1000; // ms
 constexpr int64_t BLOCKLIST_VALID_TIME = 120 * 1000;  // ms
@@ -164,6 +165,11 @@ bool WifiProStateMachine::IsKeepCurrWifiConnected()
         WIFI_LOGI("IsKeepCurrWifiConnected, rpt is running, do not switch");
         return true;
     }
+
+    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
+        WIFI_LOGI("IsKeepCurrWifiConnected: screen state off.");
+        return true;
+    }
     return false;
 }
 
@@ -275,11 +281,6 @@ void WifiProStateMachine::Wifi2WifiFinish()
     badBssid_ = "";
     badSsid_ = "";
     targetBssid_ = "";
-}
-
-bool WifiProStateMachine::IsFullscreen()
-{
-    return false;
 }
 
 bool WifiProStateMachine::IsCallingInCs()
@@ -441,7 +442,7 @@ bool WifiProStateMachine::IsSatisfiedWifi2WifiCondition()
 
 bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult)
 {
-    if (wifiSwitchReason_ == WIFI_SWITCH_REASON_POOR_RSSI) {
+    if (wifiSwitchReason_ == WIFI_SWITCH_REASON_POOR_RSSI || wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
         StopTimer(EVENT_REQUEST_SCAN_DELAY);
     }
     UpdateWifiSwitchTimeStamp();
@@ -473,7 +474,7 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     return true;
 }
 
-bool WifiProStateMachine::FullScan()
+ErrCode WifiProStateMachine::FullScan()
 {
     WIFI_LOGD("start Fullscan");
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
@@ -503,6 +504,43 @@ void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
         HandleWifi2WifiSucsess(BLOCKLIST_VALID_TIME);
     }
     Wifi2WifiFinish();
+}
+ 
+bool WifiProStateMachine::InLandscapeSwitchLimitList()
+{
+#ifndef OHOS_ARCH_LITE
+    std::vector<PackageInfo> specialList;
+    if (WifiSettings::GetInstance().GetPackageInfoByName("InLandscapeSwitchLimitList", specialList) != 0) {
+        WIFI_LOGE("ProcessSwitchInfoRequest GetPackageInfoByName failed");
+        return false;
+    }
+ 
+    for (size_t i = 0; i < specialList.size() && i < LANDSCAPE_LIMIT_SWITHCH_LIST_MAX_SIZE; ++i) {
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(specialList[i].name)) {
+            return true;
+        }
+    }
+#endif
+    return false;
+}
+
+bool WifiProStateMachine::IsAllowScan(bool hasSwitchRecord)
+{
+    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
+        WIFI_LOGI("IsAllowScan: screen state off.");
+        return false;
+    }
+ 
+    // selfcure onging, pending scan for 10s
+    ISelfCureService *pSelfCureService =
+        WifiServiceManager::GetInstance().GetSelfCureServiceInst(instId_);
+    if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing()) {
+        WIFI_LOGI("IsAllowScan: self cure is ongoing.");
+        StopTimer(EVENT_REQUEST_SCAN_DELAY);
+        MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, DEFAULT_SCAN_INTERVAL);
+        return false;
+    }
+    return true;
 }
 /* --------------------------- state machine default state ------------------------------ */
 WifiProStateMachine::DefaultState::DefaultState(WifiProStateMachine *pWifiProStateMachine)
@@ -875,11 +913,13 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
 {
     rssiLevel0Or1ScanedCounter_ = 0;
     rssiLevel2Or3ScanedCounter_ = 0;
+    rssiLevel4ScanedCounter_ = 0;
     mLastTcpTxCounter_ = 0;
     mLastTcpRxCounter_ = 0;
     mLastDnsFailedCnt_ = 0;
     netDisableDetectCount_ = 0;
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+    qoeScaning_ = false;
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
     pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
     pWifiProStateMachine_->perf5gHandoverService_.NetworkStatusChanged(NetworkStatus::HAS_INTERNET);
@@ -950,19 +990,20 @@ void WifiProStateMachine::WifiHasNetState::HandleRssiChangedInHasNet(const Inter
         rssiLevel0Or1ScanedCounter_ = 0;
     }
 
-    if (!pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel)) {
+    if (!pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel) &&
+        pWifiProStateMachine_->wifiSwitchReason_ != WIFI_SWITCH_REASON_APP_QOE_SLOW) {
         WIFI_LOGD("HandleRssiChangedInHasNet, StopTimer EVENT_REQUEST_SCAN_DELAY.");
         pWifiProStateMachine_->StopTimer(EVENT_REQUEST_SCAN_DELAY);
         return;
-    }
-
-    ISelfCureService *pSelfCureService =
-        WifiServiceManager::GetInstance().GetSelfCureServiceInst(pWifiProStateMachine_->instId_);
-    if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing()) {
-        WIFI_LOGI("self cure ongoing.");
+    } else if (!pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel) &&
+               pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
+        WIFI_LOGD("HandleRssiChangedInHasNet, qoe slow.");
         return;
     }
 
+    pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
+    qoeScaning_ = false;
+    WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_POOR_RSSI);
     pWifiProStateMachine_->StopTimer(EVENT_REQUEST_SCAN_DELAY);
     pWifiProStateMachine_->SendMessage(EVENT_REQUEST_SCAN_DELAY, static_cast<int32_t>(hasSwitchRecord));
 }
@@ -974,34 +1015,38 @@ void WifiProStateMachine::WifiHasNetState::HandleReuqestScanInHasNet(const Inter
         return;
     }
 
-    // selfcure onging, pending scan for 10s
-    ISelfCureService *pSelfCureService =
-        WifiServiceManager::GetInstance().GetSelfCureServiceInst(pWifiProStateMachine_->instId_);
     bool hasSwitchRecord = static_cast<bool>(msg->GetParam1());
-    if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing()) {
-        WIFI_LOGI("HandleReuqestScanInHasNet: self cure is ongoing.");
-        pWifiProStateMachine_->StopTimer(EVENT_REQUEST_SCAN_DELAY);
-        pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, DEFAULT_SCAN_INTERVAL);
-        return;
-    }
-
     int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
-    if (!pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel)) {
+    // when not allow scan, clean flag qoeScaning_
+    if ((!pWifiProStateMachine_->IsReachWifiScanThreshold(signalLevel) ||
+        pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) &&
+        !pWifiProStateMachine_->IsAllowScan(hasSwitchRecord)) {
+        qoeScaning_ = false;
         return;
     }
-
-    pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_POOR_RSSI);
-    WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_POOR_RSSI);
     TryStartScan(hasSwitchRecord, signalLevel);
 }
 
 void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, int32_t signalLevel)
 {
+    if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
+        qoeScaning_ = true;
+    }
+    ErrCode ret = WIFI_OPT_FAILED;
     // calculate the interval and the max scan counter.
     int32_t scanInterval = WifiProUtils::GetScanInterval(hasSwitchRecord, signalLevel);
     int32_t scanMaxCounter = WifiProUtils::GetMaxCounter(hasSwitchRecord, signalLevel);
-    if ((signalLevel == SIG_LEVEL_2 || signalLevel == SIG_LEVEL_3) &&
-        rssiLevel2Or3ScanedCounter_ < scanMaxCounter) {
+    if (signalLevel == SIG_LEVEL_4 && rssiLevel4ScanedCounter_ < scanMaxCounter &&
+        pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
+        WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
+                  "rssiLevel4ScanedCounter_:%{public}d.", signalLevel, rssiLevel4ScanedCounter_);
+        ret = pWifiProStateMachine_->FullScan();
+        if (ret == WIFI_OPT_SUCCESS) {
+            rssiLevel4ScanedCounter_++;
+        }
+        pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
+    } else if ((signalLevel == SIG_LEVEL_2 || signalLevel == SIG_LEVEL_3) &&
+               rssiLevel2Or3ScanedCounter_ < scanMaxCounter) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel2Or3ScanedCounter:%{public}d.", signalLevel, rssiLevel2Or3ScanedCounter_);
         auto ret = pWifiProStateMachine_->FullScan();
@@ -1020,6 +1065,13 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
     } else {
         WIFI_LOGI("TryStartScan, do not scan, signalLevel:%{public}d,scanMaxCounter:%{public}d.",
             signalLevel, scanMaxCounter);
+    }
+    // qoe scan times reset
+    if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW &&
+        ((signalLevel == SIG_LEVEL_4 && rssiLevel4ScanedCounter_ >= scanMaxCounter) ||
+            (signalLevel == SIG_LEVEL_3 && rssiLevel2Or3ScanedCounter_ >= scanMaxCounter)) && ret == WIFI_OPT_FAILED) {
+        WIFI_LOGI("HandleReuqestScanInHasNet, reset qoe state.");
+        qoeScaning_ = false;
     }
 }
 
@@ -1077,13 +1129,16 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }
+    
 #ifndef OHOS_ARCH_LITE
-    if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2) {
-        WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape.");
+    if (WifiConfigCenter::GetInstance().IsScreenLandscape() && signalLevel >= SIG_LEVEL_2 &&
+        pWifiProStateMachine_->InLandscapeSwitchLimitList()) {
+        WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape and InLandscapeSwitchLimitList.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         return;
     }
 #endif
+ 
     WIFI_LOGI("wifi to wifi step 3: try wifi2wifi.");
     if (!pWifiProStateMachine_->TryWifi2Wifi(pWifiProStateMachine_->networkSelectionResult_)) {
         WIFI_LOGI("wifi to wifi step X: TryWifi2Wifi Failed.");
@@ -1143,10 +1198,17 @@ void WifiProStateMachine::WifiHasNetState::HandleWifiQoeSlow()
     int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
     if (signalLevel >= SIG_LEVEL_3) {
         WIFI_LOGI("wifi to wifi, app qoe slow");
-        pWifiProStateMachine_->FullScan();
-        pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_APP_QOE_SLOW);
-        WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_APP_QOE_SLOW);
         qoeSwitch_ = true;
+        if (!qoeScaning_) {
+            WIFI_LOGI("wifi to wifi, app qoe slow, try scan");
+            pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_APP_QOE_SLOW);
+            WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_APP_QOE_SLOW);
+            bool hasSwitchRecord = pWifiProStateMachine_->HasWifiSwitchRecord();
+            pWifiProStateMachine_->StopTimer(EVENT_REQUEST_SCAN_DELAY);
+            pWifiProStateMachine_->SendMessage(EVENT_REQUEST_SCAN_DELAY, static_cast<int32_t>(hasSwitchRecord));
+            rssiLevel4ScanedCounter_ = 0;
+            rssiLevel2Or3ScanedCounter_ = 0;
+        }
     }
 }
 /* --------------------------- state machine no net state ------------------------------ */
@@ -1246,6 +1308,9 @@ void WifiProStateMachine::WifiNoNetState::HandleReuqestScanInNoNet(const Interna
         WIFI_LOGI("ReuqestScanInNoNet, msg is nullptr.");
         return;
     }
+    if (!pWifiProStateMachine_->IsAllowScan(pWifiProStateMachine_->HasWifiSwitchRecord())) {
+        return;
+    }
     pWifiProStateMachine_->FullScan();
     fullScan_ = true;
 }
@@ -1267,7 +1332,9 @@ void WifiProStateMachine::WifiNoNetState::HandleNoNetChanged()
         WIFI_LOGI("self cure ongoing.");
         return;
     }
-
+    if (!pWifiProStateMachine_->IsAllowScan(pWifiProStateMachine_->HasWifiSwitchRecord())) {
+        return;
+    }
     // Fastscan Or fullScan
     std::vector<WifiScanInfo> scanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);

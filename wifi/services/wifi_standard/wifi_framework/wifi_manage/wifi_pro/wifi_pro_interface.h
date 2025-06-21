@@ -54,6 +54,35 @@ public:
      * @Description deal wifi channel qoe
      */
     void DealQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo) override;
+
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    /**
+     * @Description receive screen state change event
+     *
+     * @param screenState - screen state
+     */
+    void OnScreenStateChanged(int32_t screenState) override;
+
+    /**
+     * @Description receive cell info updated
+     *
+     */
+    void OnCellInfoUpdated() override;
+
+    /**
+     * @Description receive wifi open result
+     *
+     * @param state - wifi open state
+     */
+    void OnWifiStateOpen(int32_t state) override;
+
+    /**
+     * @Description receive wifi close result
+     *
+     * @param state - wifi close state
+     */
+    void OnWifiStateClose(int32_t state) override;
+#endif
 private:
     /**
      * @Description deal sta connection change

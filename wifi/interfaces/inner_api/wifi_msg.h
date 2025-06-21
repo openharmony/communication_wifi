@@ -1126,11 +1126,10 @@ enum class LimitSwitchScenes {
 struct WpaEapData {
     int32_t msgId;
     int32_t code; /* eap code */
-	int32_t type; /* eap type */
-	int32_t bufferLen; /* length of data in the buffer */
-	std::vector<uint8_t> eapBuffer; /* eap Data */
+    int32_t type; /* eap type */
+    int32_t bufferLen; /* length of data in the buffer */
+    std::vector<uint8_t> eapBuffer; /* eap Data */
 };
- 
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

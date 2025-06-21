@@ -28,6 +28,7 @@
 #include "wifi_config_center.h"
 #include "sta_service.h"
 #include "wifi_internal_msg.h"
+#include "wifi_telephony_utils.h"
 #include <mutex>
 
 namespace OHOS {
@@ -192,7 +193,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->StartPortalCertification();
     pStaService->EnableHiLinkHandshake(true, config, conditionName);
     pStaService->DeliverStaIfaceData(conditionName);
-    pStaService->GetDataSlotId(index);
+    WifiTelephonyUtils::GetDataSlotId(index);
     pStaService->AddDeviceConfig(config);
 }
 
@@ -352,7 +353,7 @@ void ConnectToCandidateConfigTest(const uint8_t* data, size_t size)
 void ConvertStringTest(const uint8_t* data, size_t size)
 {
     std::u16string wideText;
-    pStaService->ConvertString(wideText);
+    WifiTelephonyUtils::ConvertString(wideText);
 }
 
 void UpdateEapConfigTest(const uint8_t* data, size_t size)
@@ -450,10 +451,10 @@ void GetImsiFuzzTest(const uint8_t* data, size_t size)
     int slotId = static_cast<int>(data[index++]);
     int mncLen = static_cast<int>(data[index++]);
     std::string imsi = std::string(reinterpret_cast<const char*>(data), size);
-    pStaService->GetPlmn(slotId);
+    WifiTelephonyUtils::GetPlmn(slotId);
     pStaService->GetMcc(imsi);
     pStaService->GetMnc(imsi, mncLen);
-    pStaService->GetImsi(slotId);
+    WifiTelephonyUtils::GetImsi(slotId);
 }
 
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)

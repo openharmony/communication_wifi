@@ -23,7 +23,7 @@ namespace Wifi {
 
 constexpr int32_t ROAM_SCENE = 1;
 constexpr int64_t WIFI_SWITCH_RECORD_MAX_TIME = 1000 * 60 * 60 * 24 * 14; // 14天,单位:ms
-
+constexpr int32_t NUM_5 = 5;
 enum WifiProCommond {
     EVENT_NOTIFY_WIFI_PRO_SWITCH_CHANGED = 0,
     EVENT_WIFI_CONNECT_STATE_CHANGED = 1,
@@ -42,6 +42,17 @@ enum WifiProCommond {
     EVENT_SIGNAL_INFO_CHANGE = 14,
     EVENT_QOE_REPORT = 15,
     EVENT_DETECT_TIMEOUT = 16,
+    EVENT_SCREEN_ON = 17,
+    EVENT_SCREEN_OFF = 18,
+    EVENT_CELL_STATE_CHANGE = 19,
+    EVENT_UPDATE_TARGET_SSID = 20,
+    EVENT_WIFI_FIND_TARGET = 21,
+    EVENT_SCAN_AGAIN = 22,
+    EVENT_WIFI_HANLE_OPEN = 23,
+    EVENT_WIFI_ENABLED = 24,
+    EVENT_WIFI_DISABLED = 25,
+    EVENT_HANDLE_STATE_CHANGE = 26,
+    EVENT_CONFIGURATION_CHANGED = 27,
 };
 
 enum SigLevel {
@@ -53,10 +64,10 @@ enum SigLevel {
     SIG_LEVEL_MAX = 4,
 };
 
-inline const int32_t QUICK_SCAN_INTERVAL[SIG_LEVEL_MAX] = { 10000, 10000, 15000, 30000 };
-inline const int32_t NORMAL_SCAN_INTERVAL[SIG_LEVEL_MAX] = { 15000, 15000, 30000, 60000 };
-inline const int32_t QUICK_SCAN_MAX_COUNTER[SIG_LEVEL_MAX] = { 20, 20, 10, 10 };
-inline const int32_t NORMAL_SCAN_MAX_COUNTER[SIG_LEVEL_MAX] = { 4, 4, 2, 2 };
+inline const int32_t QUICK_SCAN_INTERVAL[NUM_5] = { 10000, 10000, 15000, 30000, 30000};
+inline const int32_t NORMAL_SCAN_INTERVAL[NUM_5] = { 15000, 15000, 30000, 60000, 60000};
+inline const int32_t QUICK_SCAN_MAX_COUNTER[NUM_5] = { 20, 20, 10, 10, 10};
+inline const int32_t NORMAL_SCAN_MAX_COUNTER[NUM_5] = { 4, 4, 2, 2, 2};
 
 enum WifiSwitchReason {
     // Default

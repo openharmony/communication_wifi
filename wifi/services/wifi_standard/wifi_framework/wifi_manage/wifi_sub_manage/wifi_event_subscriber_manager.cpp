@@ -467,6 +467,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 {
     SubscribeSystemAbility(APP_MGR_SERVICE_ID);
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
+    SubscribeSystemAbility(COMM_ETHERNET_MANAGER_SYS_ABILITY_ID);
 #ifdef HAS_MOVEMENT_PART
     SubscribeSystemAbility(MSDP_MOVEMENT_SERVICE_ID);
 #endif

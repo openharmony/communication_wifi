@@ -482,7 +482,7 @@ ErrCode ProcessProxyConfig(const napi_env& env, const napi_value& object, WifiDe
                 cppConfig.wifiProxyconfig.configureMethod = ConfigureProxyMethod::MANUALCONFIGUE;
                 JsObjectToString(env, proxyConfig, "serverHostName", NAPI_MAX_STR_LENT,
                     cppConfig.wifiProxyconfig.manualProxyConfig.serverHostName);
-                JsObjectToString(env, proxyConfig, "exclusionObjects", NAPI_MAX_STR_LENT,
+                JsObjectToString(env, proxyConfig, "exclusionObjects", NAPI_MAX_EXCLUSION_PROXY_LENT,
                     cppConfig.wifiProxyconfig.manualProxyConfig.exclusionObjectList);
                 JsObjectToInt(env, proxyConfig, "serverPort", cppConfig.wifiProxyconfig.manualProxyConfig.serverPort);
                 if (cppConfig.wifiProxyconfig.manualProxyConfig.serverPort < 0) {

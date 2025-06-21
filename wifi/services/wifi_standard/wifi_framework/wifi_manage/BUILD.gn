@@ -192,6 +192,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_telephony_utils",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa",
@@ -241,6 +242,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_callback_proxy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan_sa/wifi_scan_death_recipient.cpp",
@@ -272,6 +274,7 @@ if (defined(ohos_lite)) {
       "ability_runtime:app_manager",
       "cJSON:cjson",
       "c_utils:utils",
+      "common_event_service:cesfwk_core",
       "hilog:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",
@@ -293,6 +296,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_callback_proxy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/wifi_device_death_recipient.cpp",
@@ -376,6 +380,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_callback_proxy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap_sa/wifi_hotspot_death_recipient.cpp",
@@ -400,6 +405,7 @@ if (defined(ohos_lite)) {
       "ability_base:want",
       "ability_runtime:app_manager",
       "c_utils:utils",
+      "common_event_service:cesfwk_core",
       "hilog:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",
@@ -443,6 +449,7 @@ if (defined(ohos_lite)) {
       debug = false
     }
     part_name = "wifi"
+    subsystem_name = "communication"
     sources = [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa/wifi_p2p_callback_proxy.cpp",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa/wifi_p2p_death_recipient.cpp",
@@ -464,6 +471,7 @@ if (defined(ohos_lite)) {
       "ability_base:want",
       "ability_runtime:app_manager",
       "c_utils:utils",
+      "common_event_service:cesfwk_core",
       "hilog:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",
@@ -678,6 +686,10 @@ if (defined(ohos_lite)) {
       defines += [ "EXTENSIBLE_AUTHENTICATION" ]
       external_deps += ["netmanager_ext:ethernet_manager_if"]
     }
+  
+    if (wifi_feature_autoopen_specified_location) {
+      defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
+    }
 
     part_name = "wifi"
     subsystem_name = "communication"
@@ -714,6 +726,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_service",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
       "$WIFI_ROOT_DIR/utils:wifi_utils",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_telephony_utils",
     ]
 
     configs = [ ":wifi_manager_service_header" ]

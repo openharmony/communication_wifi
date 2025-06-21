@@ -63,7 +63,7 @@ bool NetEapObserver::SetReplyCustomEapDataCallback(const std::function<void(int,
 
 void NetEapObserver::StartNetEapObserver()
 {
-    int32_t ret = DelaydSigleton<NetManagerStandard::EthernetClient>::GetInstance()->RegisterCustomEapCallback(
+    int32_t ret = DelayedSingleton<NetManagerStandard::EthernetClient>::GetInstance()->RegisterCustomEapCallback(
         NetManagerStandard::NetType::WLAN0, netEapCallback_);
     if (ret == NetManagerStandard::NETMANAGER_SUCCESS) {
         WIFI_LOGI("StartNetEapObserver register success");
@@ -74,7 +74,7 @@ void NetEapObserver::StartNetEapObserver()
 
 void NetEapObserver::StopNetEapObserver()
 {
-    int32_t ret = DelaydSigleton<NetManagerStandard::EthernetClient>::GetInstance()->UnRegisterCustomEapCallback(
+    int32_t ret = DelayedSingleton<NetManagerStandard::EthernetClient>::GetInstance()->UnRegisterCustomEapCallback(
         NetManagerStandard::NetType::WLAN0, netEapCallback_);
     if (ret == NetManagerStandard::NETMANAGER_SUCCESS) {
         WIFI_LOGI("StopNetEapObserver unregister success");
@@ -107,7 +107,7 @@ bool NetEapObserver::NotifyWpaEapInterceptInfo(const WpaEapData &wpaEapData)
     notifyEapData->msgId = wpaEapData.msgId;
     notifyEapData->bufferLen = wpaEapData.bufferLen;
     notifyEapData->eapBuffer = std::move(wpaEapData.eapBuffer);
-    int32_t ret = DelaydSigleton<NetManagerStandard::EthernetClient>::GetInstance()->NotifyWpaEapInterceptInfo(
+    int32_t ret = DelayedSingleton<NetManagerStandard::EthernetClient>::GetInstance()->NotifyWpaEapInterceptInfo(
         NetManagerStandard::NetType::WLAN0, notifyEapData);
     if (ret != NetManagerStandard::NETMANAGER_SUCCESS) {
         WIFI_LOGE("%{public}s fail, ret:%{public}d", __func__, ret);
@@ -123,7 +123,7 @@ NetEapCallback::NetEapCallback()
 NetEapCallback::~NetEapCallback()
 {
 }
- 
+
 bool NetEapCallback::SetRegisterCustomEapCallback(const std::function<void(const std::string &regCmd)> &callback)
 {
     if (callback == nullptr) {

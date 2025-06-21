@@ -15,16 +15,28 @@
 
 #ifndef OHOS_WIFI_SECURITY_DETECT_TEST_H
 #define OHOS_WIFI_SECURITY_DETECT_TEST_H
+#include <gtest/gtest.h>
+#include "wifi_security_detect.h"
+#include "json/json.h"
+#include "datashare_helper.h"
+#include "sta_service_callback.h"
+#include "wifi_event_handler.h"
+#include "wifi_datashare_utils.h"
+#include "wifi_internal_msg.h"
 
 namespace OHOS {
 namespace Wifi {
 
-class WifiSecurityDetect : public testing::Test {
+class WifiSecurityDetectTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    void SetUp() override {}
+    void SetUp() override
+    {
+        wifiSecurityDetect_ = std::make_unique<WifiSecurityDetect>();
+    }
     void TearDown() override {}
+    std::unique_ptr<WifiSecurityDetect> wifiSecurityDetect_;
 };
 
 } // namespace Wifi

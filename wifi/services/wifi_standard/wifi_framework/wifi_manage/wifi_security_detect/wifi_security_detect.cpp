@@ -75,7 +75,7 @@ StaServiceCallback WifiSecurityDetect::GetStaCallback() const
 
 void WifiSecurityDetect::SetDatashareReady()
 {
-    datashareReady = true;
+    datashareReady_ = true;
 }
 
 std::shared_ptr<DataShare::DataShareHelper> WifiSecurityDetect::CreateDataShareHelper()
@@ -210,21 +210,21 @@ ErrCode WifiSecurityDetect::SecurityDetectResult(
 int32_t WifiSecurityDetect::AuthenticationConvert(std::string key)
 {
     if (key == KEY_MGMT_NONE) {
-        return Security::SECURITY_TYPE_OPEN;
+        return SecurityType::SECURITY_TYPE_OPEN;
     } else if (key == KEY_MGMT_WEP) {
-        return Security::SECURITY_TYPE_WEP;
+        return SecurityType::SECURITY_TYPE_WEP;
     } else if (key == KEY_MGMT_WPA_PSK) {
-        return Security::SECURITY_TYPE_PSK;
+        return SecurityType::SECURITY_TYPE_PSK;
     } else if (key == KEY_MGMT_SAE) {
-        return Security::SECURITY_TYPE_SAE;
+        return SecurityType::SECURITY_TYPE_SAE;
     } else if (key == KEY_MGMT_EAP) {
-        return Security::SECURITY_TYPE_EAP;
+        return SecurityType::SECURITY_TYPE_EAP;
     } else if (key == KEY_MGMT_SUITE_B_192) {
-        return Security::SECURITY_TYPE_EAP_WPA3_ENTERPRISE_192_BIT;
+        return SecurityType::SECURITY_TYPE_EAP_WPA3_ENTERPRISE_192_BIT;
     } else if (key == KEY_MGMT_WAPI_CERT) {
-        return Security::SECURITY_TYPE_WAPI_CERT;
+        return SecurityType::SECURITY_TYPE_WAPI_CERT;
     } else if (key == KEY_MGMT_WAPI_PSK) {
-        return Security::SECURITY_TYPE_WAPI_PSK;
+        return SecurityType::SECURITY_TYPE_WAPI_PSK;
     } else {
         WIFI_LOGE("wifi authentication is unknown");
         return -1;

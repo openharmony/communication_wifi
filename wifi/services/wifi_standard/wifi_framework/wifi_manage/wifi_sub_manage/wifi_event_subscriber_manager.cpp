@@ -323,6 +323,7 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
         case COMM_ETHERNET_MANAGER_SYS_ABILITY_ID:
             HandleEthernetServiceChange(systemAbilityId, add);
+            break;
         default:
             break;
     }

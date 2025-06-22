@@ -106,21 +106,5 @@ int32_t NetConnClient::UnregisterNetConnCallback(const sptr<INetConnCallback> &c
 {
     return NETMANAGER;
 }
-
-int32_t NetConnClient::RegisterCustomEapCallback(const NetType netType, const sptr<INetRegisterEapCallback> &callback)
-{
-    return NETMANAGER;
-}
- 
-int32_t NetConnClient::UnRegisterCustomEapCallback(const NetType netType, const sptr<INetRegisterEapCallback> &callback)
-{
-    return NETMANAGER;
-}
- 
-int32_t NetConnClient::NotifyWpaEapInterceptInfo(const NetType netType, const sptr<EapData> &eapData)
-{
-    return NETMANAGER;
-}
- 
 } // namespace Wifi
 } // namespace OHOS

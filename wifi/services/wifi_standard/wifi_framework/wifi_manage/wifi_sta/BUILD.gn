@@ -193,10 +193,6 @@ if (defined(ohos_lite)) {
       defines += [ "READ_MAC_FROM_OEM" ]
     }
 
-    if (wifi_feature_with_extensible_authentication) {
-      defines += [ "EXTENSIBLE_AUTHENTICATION" ]
-    }
-
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",
@@ -212,11 +208,16 @@ if (defined(ohos_lite)) {
       "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_stats_manager_if",
-      "netmanager_ext:ethernet_manager_if",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",
     ]
+
+    if (wifi_feature_with_extensible_authentication) {
+      defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+      external_deps += ["netmanager_ext:ethernet_manager_if",]
+    }
+    
     if (defined(global_parts_info) &&
         defined(global_parts_info.telephony_core_service) &&
         defined(global_parts_info.telephony_cellular_data)) {

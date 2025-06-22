@@ -180,7 +180,6 @@ local_base_external_deps = [
   "netmanager_base:net_native_manager_if",
   "netmanager_base:net_stats_manager_if",
   "netmanager_base:netsys_controller",
-  "netmanager_ext:ethernet_manager_if",
   "netstack:http_client",
   "power_manager:powermgr_client",
   "samgr:samgr_proxy",
@@ -253,6 +252,7 @@ ohos_unittest("wifi_sta_unittest") {
 
   if (wifi_feature_with_extensible_authentication) {
     defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+    external_deps += ["netmanager_ext:ethernet_manager_if"]
   }
 
   if (wifi_feature_mdm_restricted_enable) {
@@ -341,6 +341,11 @@ ohos_unittest("wifi_selfcure_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_telephony_utils",
   ]
   external_deps = local_base_external_deps
+
+  if (wifi_feature_with_extensible_authentication) {
+    defines += ["EXTENSIBLE_AUTHENTICATION"]
+    external_deps += ["netmanager_ext:ethernet_manager_if"]
+  }
 
   if (wifi_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]

@@ -106,5 +106,6 @@ int32_t NetConnClient::UnregisterNetConnCallback(const sptr<INetConnCallback> &c
 {
     return NETMANAGER;
 }
+
 } // namespace Wifi
 } // namespace OHOS

@@ -762,7 +762,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
 
         sptr<IWifiP2pCallback> callback_ = iface_cast<IWifiP2pCallback>(remote);
         if (callback_ == nullptr) {
-            callback_ = new (std::nothrow) WifiP2pCallbackProxy(remote);
+            callback_ = sptr<IWifiP2pCallback>::MakeSptr();
             WIFI_LOGI("create new `WifiP2pCallbackProxy`!");
         }
 
@@ -782,7 +782,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         } else {
             std::unique_lock<std::mutex> lock(deathRecipientMutex);
             if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiP2pDeathRecipient();
+                deathRecipient_ = sptr<IRemoteObject::DeathRecipient>::MakeSptr();
             }
             // Add death recipient to remote object if this is the first time to register callback.
             if ((remote->IsProxyObject()) &&

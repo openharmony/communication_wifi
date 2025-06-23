@@ -1,16 +1,3 @@
-bool ScanService::AllowScanByGameScene()
-{
-    WifiNetworkControlInfo NetworkControlInfo =
-        WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetNetworkControlInfo();
-    WIFI_LOGI("AllowScanByGameScene %{public}d", NetworkControlInfo.state);
-    if (NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_END &&
-        NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_BACKGROUND) {
-        WIFI_LOGI(
-            "Scan is not allowed in GameScene condition AllowScanByGameScene = %{public}d", NetworkControlInfo.state);
-        return false;
-    }
-    return true;
-}
 # communication\_wifi<a name="EN-US_TOPIC_0000001162030287"></a>
 
 -   [Introduction](#section11660541593)

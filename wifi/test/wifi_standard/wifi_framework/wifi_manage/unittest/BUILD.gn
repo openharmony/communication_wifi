@@ -104,7 +104,6 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_sta_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_state_machine.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect/wifi_security_detect.cpp",
     "Mock/mock_wifi_settings.cpp",
     "common/app_network_speed_limit_service_test.cpp",
     "common/block_connect_service_test.cpp",
@@ -178,7 +177,6 @@ ohos_unittest("manager_unittest") {
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect",
   ]
 
   deps = [
@@ -228,7 +226,6 @@ ohos_unittest("manager_unittest") {
     "samgr:samgr_proxy",
     "time_service:time_client",
     "window_manager:libdm_lite",
-    "security_guard:libsg_classify_sdk",
   ]
   external_deps += [ "drivers_interface_wlan:libchip_proxy_2.0" ]
   external_deps += [ "drivers_interface_wlan:libwpa_proxy_2.0" ]

@@ -57,11 +57,9 @@ WifiSecurityDetect::WifiSecurityDetect()
 void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
-        WIFI_LOGI("WifiSecurityDetect network connected");
         currentConnectedNetworkId_ = info.networkId;
         SecurityDetect(info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
-        WIFI_LOGI("WifiSecurityDetect network not connected");
         currentConnectedNetworkId_ = -1;
     } else {
         return;

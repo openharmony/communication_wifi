@@ -66,7 +66,6 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/hdi_client/hdi_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect",
   ]
 
   cflags = [
@@ -170,7 +169,6 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_scan_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_sta_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_toggler_manager.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_security_detect/wifi_security_detect.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/net_conn_client.cpp",
     "enablep2p_fuzzer.cpp",
@@ -222,7 +220,6 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "samgr:samgr_proxy",
     "time_service:time_client",
     "window_manager:libdm_lite",
-    "security_guard:libsg_classify_sdk",
   ]
 
   if (wifi_feature_with_extensible_authentication) {

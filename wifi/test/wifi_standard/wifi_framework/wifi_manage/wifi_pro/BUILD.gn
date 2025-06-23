@@ -196,7 +196,7 @@ ohos_unittest("wifi_pro_unittest") {
 
   if (wifi_feature_with_extensible_authentication) {
     defines += ["EXTENSIBLE_AUTHENTICATION"]
-    external_deps += ["netmanager_ext:ethernet_manager_if"]
+    external_deps += ["netmanager_ext:ethernet_manager_if",]
   }
 
   if (wifi_feature_wifi_pro_ctrl) {

@@ -2786,23 +2786,16 @@ bool ScanService::AllowScanByActionListen()
 
 bool ScanService::AllowScanByGameScene()
 {
-    WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetNetworkControlInfo();
+    WifiNetworkControlInfo NetworkControlInfo =
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetNetworkControlInfo();
     WIFI_LOGI("AllowScanByGameScene %{public}d", NetworkControlInfo.state);
-    if (NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_END && NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_BACKGROUND)
-    {
-        WIFI_LOGI("Scan is not allowed in GameScene condition AllowScanByGameScene = %{public}d", NetworkControlInfo.state);
+    if (NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_END &&
+        NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_BACKGROUND) {
+        WIFI_LOGI(
+            "Scan is not allowed in GameScene condition AllowScanByGameScene = %{public}d", NetworkControlInfo.state);
         return false;
     }
     return true;
-}
-
-int64_t ScanService::GetIntervalTime(int64_t startTime)
-{
-  struct timespec times = {0, 0};
-  clock_gettime(CLOCK_MONOTONIC, &times);
-  int64_t currentMs =
-    static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
-  return currentMs - startTime;
 }
 
 void ScanService::RecordScanLimitInfo(const WifiScanDeviceInfo &wifiScanDeviceInfo, const ScanLimitType &scanLimitType)

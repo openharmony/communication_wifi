@@ -29,12 +29,14 @@
 #include "app_network_speed_limit_service.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_history_record_manager.h"
-#include "wifi_security_detect.h"
 #else
 #include "wifi_internal_event_dispatcher_lite.h"
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 #include "wifi_asset_manager.h"
+#endif
+#ifdef WIFI_SECURITY_DETECT_ENABLE
+#include "wifi_security_detect.h"
 #endif
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
@@ -583,11 +585,13 @@ ErrCode WifiServiceScheduler::InitStaServiceExtral(IStaService *pService, int in
         WIFI_LOGE("WifiHistoryRecordManager register callback failed, ret=%{public}d", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
+#ifdef WIFI_SECURITY_DETECT_ENABLE
     errCode = pService->RegisterStaServiceCallback(WifiSecurityDetect::GetInstance().GetStaCallback());
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("WifiSecurityDetect register callback failed, ret=%{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
+#endif
 #endif
     return WIFI_OPT_SUCCESS;
 }

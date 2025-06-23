@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#ifdef WIFI_SECURITY_DETECT_ENABLE
 #include <chrono>
 #include "json/json.h"
 #include "ip_tools.h"
@@ -21,6 +22,7 @@
 #include "wifi_msg.h"
 #include "wifi_settings.h"
 #include "wifi_config_center.h"
+#include "wifi_common_util.h"
 #include "datashare_helper.h"
 #include "wifi_notification_util.h"
 #include "sg_classify_client.h"
@@ -31,8 +33,6 @@ namespace OHOS {
 namespace Wifi {
 
 const std::string WIFI_SECURITY_NETWORK_ON_SYNC = "WifiSecurityNetworkOnSync";
-constexpr int32_t SUCCESS = 0;
-constexpr int32_t FAIL = 1;
 const std::string SETTINGS_DATASHARE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
@@ -41,36 +41,7 @@ const std::string SETTINGS_DATA_VALUE = "VALUE";
 const int MIN_5G_FREQUENCY = 5160;
 const int MAX_5G_FREQUENCY = 5865;
 const uint32_t securityGuardModelID = 3001000011;
-enum WireType {
-    WIRE_802_11A = 1,
-    WIRE_802_11B = 2,
-    WIRE_802_11G = 3,
-    WIRE_802_11N = 4,
-    WIRE_802_11AC = 5,
-    WIRE_802_11AX = 6,
-};
-enum Security {
-    SECURITY_TYPE_OPEN = 0,
-    SECURITY_TYPE_WEP = 1,
-    SECURITY_TYPE_PSK = 2,
-    SECURITY_TYPE_EAP = 3,
-    SECURITY_TYPE_SAE = 4,
-    SECURITY_TYPE_EAP_WPA3_ENTERPRISE_192_BIT = 5,
-    SECURITY_TYPE_OWE = 6,
-    SECURITY_TYPE_WAPI_PSK = 7,
-    SECURITY_TYPE_WAPI_CERT = 8,
-    SECURITY_TYPE_EAP_WPA3_ENTERPRISE = 9,
-    SECURITY_TYPE_OSEN = 10,
-    SECURITY_TYPE_PASSPOINT_R1_R2 = 11,
-    SECURITY_TYPE_PASSPOINT_R3 = 12,
-    SECURITY_TYPE_DPP = 13,
-    SECURITY_TYPE_UNKNOWN = -1,
-};
 const int NUM24 = 24;
-enum WifiNotification {
-    OPEN = 1, /* wifi_notification is open */
-    CLOSE = 2, /* wifi_notification is close */
-};
 
 WifiSecurityDetect::WifiSecurityDetect()
 {
@@ -85,7 +56,6 @@ WifiSecurityDetect::WifiSecurityDetect()
 
 void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    WIFI_LOGI("WifiSecurityDetect network connected");
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         currentConnectedNetworkId_ = info.networkId;
         SecurityDetect(info);
@@ -99,6 +69,11 @@ void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLin
 StaServiceCallback WifiSecurityDetect::GetStaCallback() const
 {
     return staCallback_;
+}
+
+void WifiSecurityDetect::SetDatashareReady()
+{
+    datashareReady_ = true;
 }
 
 std::shared_ptr<DataShare::DataShareHelper> WifiSecurityDetect::CreateDataShareHelper()
@@ -123,8 +98,11 @@ Uri WifiSecurityDetect::AssembleUri(const std::string &key)
     return uri;
 }
 
-bool WifiSecurityDetect::SettingDataOnOff()
+bool WifiSecurityDetect::IsSettingSecurityDetectOn()
 {
+    if (datashareReady_ == false) {
+        return false;
+    }
     auto operatePtr = CreateDataShareHelper();
     if (operatePtr == nullptr) {
         WIFI_LOGE("wifioperatePtr is null");
@@ -145,17 +123,17 @@ bool WifiSecurityDetect::SettingDataOnOff()
     resultSet->GoToFirstRow();
     resultSet->GetString(0, valueResult);
     if (valueResult == "1") {
-        WIFI_LOGI("SettingDataOn");
+        WIFI_LOGI("SecurityDetectOn");
         operatePtr->Release();
         return true;
     } else {
-        WIFI_LOGI("SettingDataOff");
+        WIFI_LOGI("SecurityDetectOff");
         operatePtr->Release();
         return false;
     }
 }
 
-bool WifiSecurityDetect::SecurityDetectTime(const int &networkId)
+bool WifiSecurityDetect::IsSecurityDetectTimeout(const int &networkId)
 {
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
@@ -163,12 +141,11 @@ bool WifiSecurityDetect::SecurityDetectTime(const int &networkId)
         return false;
     }
 
-    if (config.lastConnectTime == -1) {
+    if (config.lastDetectTime == -1) {
         return true;
     }
-    auto DetectTime = std::chrono::system_clock::now();
     auto hours = std::chrono::duration_cast<std::chrono::hours>(
-        DetectTime - std::chrono::system_clock::from_time_t(config.lastConnectTime));
+        std::chrono::system_clock::now() - std::chrono::system_clock::from_time_t(config.lastDetectTime));
     if (hours.count() >= NUM24) {
         WIFI_LOGI("WifiDetect more than 24");
         return true;
@@ -184,19 +161,20 @@ WifiSecurityDetect &WifiSecurityDetect::GetInstance()
     return securitywifi;
 }
 
-bool WifiSecurityDetect::SecurityDetectResult(const std::string &devId, uint32_t modelId, const std::string &param)
+ErrCode WifiSecurityDetect::SecurityDetectResult(
+    const std::string &devId, uint32_t modelId, const std::string &param, bool &result)
 {
     auto promise = std::make_shared<std::promise<SecurityModelResult>>();
     auto future = promise->get_future();
     auto func = [promise](const OHOS::Security::SecurityGuard::SecurityModelResult &result) mutable -> int32_t {
         SecurityModelResult model = {.devId = result.devId, .modelId = result.modelId, .result = result.result};
         promise->set_value(model);
-        return SUCCESS;
+        return WIFI_OPT_SUCCESS;
     };
     auto ret = OHOS::Security::SecurityGuard::RequestSecurityModelResultAsync(devId, modelId, param, func);
-    if (ret != SUCCESS) {
+    if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("RequestSecurityModelResultSync error, ret=%{public}d", ret);
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
     SecurityModelResult model = future.get();
@@ -205,48 +183,53 @@ bool WifiSecurityDetect::SecurityDetectResult(const std::string &devId, uint32_t
     bool parsingSuccess = reader.parse(model.result, root);
     if (!parsingSuccess) {
         WIFI_LOGE("model.result is null");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
     if (root["status"].asInt() != 0) {
         WIFI_LOGE("RequestSecurityModelResultSync status error= %{public}d", root["status"].asInt());
-        return false;
+        return WIFI_OPT_FAILED;
     }
 
-    if (std::stoi(root["result"].asString()) == 0) {
-        WIFI_LOGI("SG wifi result is security");
-        return true;
+    std::string SecurityResult = root["result"].asString();
+    if (CheckDataLegal(SecurityResult) == 0) {
+        WIFI_LOGI("SG wifi result is secure");
+        result = true;
+        return WIFI_OPT_SUCCESS;
+    } else if (CheckDataLegal(SecurityResult) == 1) {
+        WIFI_LOGI("SG wifi result is not secure");
+        result = false;
+        return WIFI_OPT_SUCCESS;
     } else {
-        WIFI_LOGI("SG wifi result is not security");
-        return false;
+        return WIFI_OPT_FAILED;
     }
 }
 
-int32_t WifiSecurityDetect::AuthenticationCovert(std::string key)
+int32_t WifiSecurityDetect::AuthenticationConvert(std::string key)
 {
     if (key == KEY_MGMT_NONE) {
-        return Security::SECURITY_TYPE_OPEN;
+        return SecurityType::SECURITY_TYPE_OPEN;
     } else if (key == KEY_MGMT_WEP) {
-        return Security::SECURITY_TYPE_WEP;
+        return SecurityType::SECURITY_TYPE_WEP;
     } else if (key == KEY_MGMT_WPA_PSK) {
-        return Security::SECURITY_TYPE_PSK;
+        return SecurityType::SECURITY_TYPE_PSK;
     } else if (key == KEY_MGMT_SAE) {
-        return Security::SECURITY_TYPE_SAE;
+        return SecurityType::SECURITY_TYPE_SAE;
     } else if (key == KEY_MGMT_EAP) {
-        return Security::SECURITY_TYPE_EAP;
+        return SecurityType::SECURITY_TYPE_EAP;
     } else if (key == KEY_MGMT_SUITE_B_192) {
-        return Security::SECURITY_TYPE_EAP_WPA3_ENTERPRISE_192_BIT;
+        return SecurityType::SECURITY_TYPE_EAP_WPA3_ENTERPRISE_192_BIT;
     } else if (key == KEY_MGMT_WAPI_CERT) {
-        return Security::SECURITY_TYPE_WAPI_CERT;
+        return SecurityType::SECURITY_TYPE_WAPI_CERT;
     } else if (key == KEY_MGMT_WAPI_PSK) {
-        return Security::SECURITY_TYPE_WAPI_PSK;
+        return SecurityType::SECURITY_TYPE_WAPI_PSK;
     } else {
         WIFI_LOGE("wifi authentication is unknown");
         return -1;
     }
 }
 
-void WifiSecurityDetect::WifiConnectConfigParma(const WifiLinkedInfo &info, Json::Value &root)
+void WifiSecurityDetect::ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, Json::Value &root)
 {
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config) != 0) {
@@ -254,8 +237,8 @@ void WifiSecurityDetect::WifiConnectConfigParma(const WifiLinkedInfo &info, Json
         return;
     }
     IpInfo wifiIpInfo;
-    int32_t m_instId = 0;
-    WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, m_instId);
+    int32_t instId = 0;
+    WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, instId);
     switch (info.wifiStandard) {
         case WireType::WIRE_802_11A:
             root["wirelessType"] = "802.11a";
@@ -282,7 +265,7 @@ void WifiSecurityDetect::WifiConnectConfigParma(const WifiLinkedInfo &info, Json
     root["ssid"] = config.ssid;
     root["bssid"] = config.bssid;
     root["signalStrength"] = config.rssi;
-    root["authentication"] = AuthenticationCovert(config.keyMgmt);
+    root["authentication"] = AuthenticationConvert(config.keyMgmt);
     if (config.frequency >= MIN_5G_FREQUENCY && config.frequency <= MAX_5G_FREQUENCY) {
         root["frequencyBand"] = "5GHz";
     } else {
@@ -309,33 +292,34 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
     model.devId = "";
     model.modelId = securityGuardModelID;
     model.result = "";
-    if (!SecurityDetectTime(info.networkId)) {
+    if (!IsSecurityDetectTimeout(info.networkId)) {
         WIFI_LOGI("networkId:%{public}d detect less than 24 hours", info.networkId);
         return;
     }
 
     Json::Value root;
     Json::FastWriter writer;
-    WifiConnectConfigParma(info, root);
+    ConverWifiLinkInfoToJson(info, root);
     model.param = writer.write(root);
-    WIFI_LOGI("%{public}s", model.param.c_str());
+    WIFI_LOGI(
+        "ssid:%{public}s bssid:%{public}s", SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str());
     securityDetectThread_->PostAsyncTask([=]() mutable -> int32_t {
-        if (!SettingDataOnOff()) {
-            return FAIL;
+        if (!IsSettingSecurityDetectOn()) {
+            return WIFI_OPT_FAILED;
         }
-        bool result = SecurityDetectResult(model.devId, model.modelId, model.param);
-        if (result == true) {
-            config.isSecureWifi = true;
-            WIFI_LOGI("PopupNotification close result %{public}d", result);
-            PopupNotification(WifiNotification::CLOSE, info.networkId);
-        } else {
-            config.isSecureWifi = false;
-            WIFI_LOGI("PopupNotification open result %{public}d", result);
-            PopupNotification(WifiNotification::OPEN, info.networkId);
+        bool result = true;
+        ErrCode ret = SecurityDetectResult(model.devId, model.modelId, model.param, result);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("SecurityDetectResult result is fail");
+            return WIFI_OPT_FAILED;
         }
+        WIFI_LOGI("PopupNotification result is %{public}d", result);
+        config.isSecureWifi = result ? true : false;
+        config.lastDetectTime = time(0);
+        PopupNotification(config.isSecureWifi ? WifiNotification::CLOSE : WifiNotification::OPEN, info.networkId);
         WifiSettings::GetInstance().AddDeviceConfig(config);
         WifiSettings::GetInstance().SyncDeviceConfig();
-        return SUCCESS;
+        return WIFI_OPT_SUCCESS;
     });
 }
 
@@ -343,7 +327,8 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
 {
     WIFI_LOGI("wifi security pop-up notification start");
     OHOS::AAFwk::Want want;
-    want.SetElementName("com.huawei.hmos.security.privacycenter", "WlanNotificationAbility");
+    std::string bundleName = WifiSettings::GetInstance().GetPackageName("SECURITY_BUNDLE");
+    want.SetElementName(bundleName, "WlanNotificationAbility");
     if (status == 1) {
         want.SetParam("notificationType", WifiNotification::OPEN);
     } else {
@@ -362,3 +347,4 @@ WifiSecurityDetect::~WifiSecurityDetect()
 
 }  // namespace Wifi
 }  // namespace OHOS
+#endif

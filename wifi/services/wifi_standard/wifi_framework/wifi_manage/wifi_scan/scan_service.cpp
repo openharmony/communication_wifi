@@ -2798,6 +2798,15 @@ bool ScanService::AllowScanByGameScene()
     return true;
 }
 
+int64_t ScanService::GetIntervalTime(int64_t startTime)
+{
+  struct timespec times = {0, 0};
+  clock_gettime(CLOCK_MONOTONIC, &times);
+  int64_t currentMs =
+    static_cast<int64_t>(times.tv_sec) * SECOND_TO_MILLI_SECOND + times.tv_nsec / SECOND_TO_MICRO_SECOND;
+  return currentMs - startTime;
+}
+
 void ScanService::RecordScanLimitInfo(const WifiScanDeviceInfo &wifiScanDeviceInfo, const ScanLimitType &scanLimitType)
 {
     std::string scanInitiator = "";

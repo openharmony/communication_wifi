@@ -69,6 +69,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.lastTrySwitchWifiTimestamp = -1;
     item.isAllowAutoConnect = true;
     item.isSecureWifi = true;
+    item.lastDetectTime = -1;
     return;
 }
 
@@ -210,6 +211,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.lastUpdateTime = CheckDataLegal(tmpValue);
     } else if (key == "isSecureWifi") {
         item.isSecureWifi = (CheckDataLegal(tmpValue) != 0);
+    } else if (key == "lastDetectTime") {
+        item.lastDetectTime = CheckDataLegal(tmpValue);
     } else {
         return -1;
     }
@@ -623,6 +626,24 @@ static std::string OutPutWifiRestrictedInfoListInfo(WifiRestrictedInfo &item)
     return ss.str();
 }
 
+static std::string OutPutWifiDeviceConfigExtral(WifiDeviceConfig &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"isPortal=" << item.isPortal << std::endl;
+    ss << "    " <<"portalAuthTime=" << item.portalAuthTime << std::endl;
+    ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
+    ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
+    ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;
+    ss << "    " <<"isReassocSelfCureWithFactoryMacAddress=" << item.isReassocSelfCureWithFactoryMacAddress
+       << std::endl;
+    ss << "    " <<"isShared=" << item.isShared << std::endl;
+    ss << "    " <<"lastTrySwitchWifiTimestamp=" << item.lastTrySwitchWifiTimestamp << std::endl;
+    ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
+    ss << "    " <<"isSecureWifi=" << item.isSecureWifi << std::endl;
+    ss << "    " <<"lastDetectTime=" << item.lastDetectTime << std::endl;
+    return ss.str();
+}
+
 static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
@@ -644,17 +665,7 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"numRebootsSinceLastUse=" << item.numRebootsSinceLastUse << std::endl;
     ss << "    " <<"numAssociation=" << item.numAssociation << std::endl;
     ss << "    " <<"networkStatusHistory=" << item.networkStatusHistory << std::endl;
-    ss << "    " <<"isPortal=" << item.isPortal << std::endl;
-    ss << "    " <<"portalAuthTime=" << item.portalAuthTime << std::endl;
-    ss << "    " <<"lastHasInternetTime=" << item.lastHasInternetTime << std::endl;
-    ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
-    ss << "    " <<"internetSelfCureHistory=" << item.internetSelfCureHistory << std::endl;
-    ss << "    " <<"isReassocSelfCureWithFactoryMacAddress=" << item.isReassocSelfCureWithFactoryMacAddress
-       << std::endl;
-    ss << "    " <<"isShared=" << item.isShared << std::endl;
-    ss << "    " <<"lastTrySwitchWifiTimestamp=" << item.lastTrySwitchWifiTimestamp << std::endl;
-    ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
-    ss << "    " <<"isSecureWifi=" << item.isSecureWifi << std::endl;
+    ss << OutPutWifiDeviceConfigExtral(item);
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     ss <<OutPutEncryptionDeviceConfig(item);
 #else

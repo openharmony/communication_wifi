@@ -89,9 +89,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     LoadRelationApInfo();
     perf5gChrInfo_.Reset();
     perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
-    WIFI_LOGI("OnConnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d),relationAps size(%{public}zu)",
-        SsidAnonymize(connectedAp_->apInfo.ssid).data(), MacAnonymize(connectedAp_->apInfo.bssid).data(),
-        connectedAp_->apInfo.frequency, relationAps_.size());
+    PrintRelationAps();
 }
 void Perf5gHandoverService::OnDisconnected()
 {
@@ -654,6 +652,20 @@ void Perf5gHandoverService::LoadRelationApInfo()
             [](RelationInfo &relationInfo) {return relationInfo.bssid24g_;});
     }
 }
- 
+
+void Perf5gHandoverService::PrintRelationAps()
+{
+    std::stringstream associateInfo;
+    for (auto iter : relationAps_) {
+        if (associateInfo.rdbuf() ->in_avail() != 0) {
+            associateInfo << ",";
+        }
+        associateInfo << "\"" << SsidAnonymize(iter.apInfo_.ssid) << "_" <<
+            iter.apInfo_.keyMgmt << "_" << MacAnonymize(iter.apInfo_.bssid)<<"\"";
+    }
+    WIFI_LOGI("OnConnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d),relationAps [%{public}s]",
+        SsidAnonymize(connectedAp_->apInfo.ssid).data(), MacAnonymize(connectedAp_->apInfo.bssid).data(),
+        connectedAp_->apInfo.frequency, associateInfo.str().c_str());
+}
 }  // namespace Wifi
 }  // namespace OHOS

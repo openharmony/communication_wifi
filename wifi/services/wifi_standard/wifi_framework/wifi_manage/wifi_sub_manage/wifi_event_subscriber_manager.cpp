@@ -35,6 +35,9 @@
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 #include "wifi_asset_manager.h"
 #endif
+#ifdef WIFI_SECURITY_DETECT_ENABLE
+#include "wifi_security_detect.h"
+#endif
 #include "wifi_country_code_manager.h"
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
@@ -1393,6 +1396,9 @@ void DataShareReadySubscriber::OnReceiveEvent(const EventFwk::CommonEventData &e
         WifiManager::GetInstance().GetWifiEventSubscriberManager()->AccessDataShare();
         WifiManager::GetInstance().GetWifiEventSubscriberManager()->RegisterLocationEvent();
         WifiSensorScene::GetInstance().Init();
+#ifdef WIFI_SECURITY_DETECT_ENABLE
+        WifiSecurityDetect::GetInstance().SetDatashareReady();
+#endif
     }
 }
 

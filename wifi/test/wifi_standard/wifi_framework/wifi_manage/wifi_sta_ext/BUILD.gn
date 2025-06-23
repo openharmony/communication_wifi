@@ -80,6 +80,7 @@ ohos_unittest("wifi_sta_ext_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
     "$WIFI_ROOT_DIR/utils/inc",
@@ -153,6 +154,15 @@ ohos_unittest("wifi_sta_ext_unittest") {
     "-Wl,--wrap=SetDhcpName",
     "-Wl,--wrap=GetDhcpClientInfos",
   ]
+
+  if (wifi_feature_with_security_detect) {
+    external_deps += [ "security_guard:libsg_classify_sdk" ]
+    defines += [ "WIFI_SECURITY_DETECT_ENABLE" ]
+    sources += [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp",
+      "wifi_security_detect_test.cpp",
+    ]
+  }
 
   if (wifi_feature_with_data_report) {
     defines += [ "WIFI_DATA_REPORT_ENABLE" ]

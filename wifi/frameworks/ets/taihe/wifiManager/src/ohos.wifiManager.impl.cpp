@@ -86,7 +86,8 @@ bool IsWifiActive()
     return static_cast<ani_boolean>(activeStatus);
 }
 
-::ohos::wifiManager::WifiLinkedInfo GetLinkedInfoSync() {
+::ohos::wifiManager::WifiLinkedInfo GetLinkedInfoSync()
+{
     WifiLinkedInfo linkedInfo;
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);

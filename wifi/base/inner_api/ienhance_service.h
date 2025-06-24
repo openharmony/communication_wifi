@@ -349,7 +349,7 @@ public:
      * @param extValue - Extended value
      * @return void
      */
-     virtual void NotifyStateChanged(StateChangeEventType eventType, int state, const std::string &extValue) = 0;
+    virtual void NotifyStateChanged(StateChangeEventType eventType, int state, const std::string &extValue) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

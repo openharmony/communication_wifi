@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,302 +13,90 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_CALLBACK_TAIHE_H
-#define OHOS_WIFI_CALLBACK_TAIHE_H
 #include "ohos.wifiManager.proj.hpp"
 #include "ohos.wifiManager.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 
-#include "wifi_device.h"
-#include "wifi_device_impl.h"
-#include "wifi_hotspot.h"
-#include "wifi_hotspot_impl.h"
-#include "wifi_scan.h"
-#include "wifi_scan_impl.h"
-#include "wifi_msg.h"
-#include "wifi_p2p.h"
-#include "wifi_p2p_impl.h"
-
+#include "wifi_errorcode_taihe.h"
+#include "wifi_logger.h"
 namespace OHOS {
 namespace Wifi {
-class WifiIdlDeviceEventCallback : public IWifiDeviceCallBack {
-public:
-    WifiIdlDeviceEventCallback()
-    {
-    }
-
-    virtual ~WifiIdlDeviceEventCallback()
-    {
-    }
-public:
-    void OnWifiStateChanged(int state) override
-    {
-        double result = static_cast<double>(state);
-        if (wifiStateChangedCallback_) {
-            (*wifiStateChangedCallback_)(result);
-        }
-    }
-
-    void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override
-    {
-        double result = static_cast<double>(state);
-        if (wifiConnectionChangeCallback_) {
-            (*wifiConnectionChangeCallback_)(result);
-        }
-    }
-
-    void OnWifiRssiChanged(int rssi) override
-    {
-        double result = static_cast<double>(rssi);
-        if (wifiRssiChangeCallback_) {
-            (*wifiRssiChangeCallback_)(result);
-        }
-    }
-
-    void OnWifiWpsStateChanged(int state, const std::string &pinCode) override
-    {
-    }
-
-    void OnStreamChanged(int direction) override
-    {
-        double result = static_cast<double>(direction);
-        if (wifiStreamChangeCallback_) {
-            (*wifiStreamChangeCallback_)(result);
-        }
-    }
-
-    void OnDeviceConfigChanged(ConfigChange value) override
-    {
-        double result = static_cast<double>(value);
-        if (wifiDeviceConfigChangeCallback_) {
-            (*wifiDeviceConfigChangeCallback_)(result);
-        }
-    }
-
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
-    {
-        return nullptr;
-    }
-
-public:
-    ::taihe::optional<::taihe::callback<void(double)>> wifiStateChangedCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiConnectionChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiRssiChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiStreamChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiDeviceConfigChangeCallback_;
+DEFINE_WIFILOG_LABEL("WifiIdlErrorCode");
+std::map<int32_t, int32_t> WifiIdlErrorCode::errCodeMap_ = {
+    { ErrCode::WIFI_OPT_SUCCESS, WifiTaiheErrCode::WIFI_ERRCODE_SUCCESS },
+    { ErrCode::WIFI_OPT_FAILED, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_NOT_SUPPORTED, WifiTaiheErrCode::WIFI_ERRCODE_NOT_SUPPORTED },
+    { ErrCode::WIFI_OPT_INVALID_PARAM, WifiTaiheErrCode::WIFI_ERRCODE_INVALID_PARAM },
+    { ErrCode::WIFI_OPT_FORBID_AIRPLANE, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_FORBID_POWSAVING, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_PERMISSION_DENIED, WifiTaiheErrCode::WIFI_ERRCODE_PERMISSION_DENIED },
+    { ErrCode::WIFI_OPT_NON_SYSTEMAPP, WifiTaiheErrCode::WIFI_ERRCODE_NON_SYSTEMAPP },
+    { ErrCode::WIFI_OPT_OPEN_FAIL_WHEN_CLOSING, WifiTaiheErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING },
+    { ErrCode::WIFI_OPT_OPEN_SUCC_WHEN_OPENED, WifiTaiheErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING },
+    { ErrCode::WIFI_OPT_CLOSE_FAIL_WHEN_OPENING, WifiTaiheErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING },
+    { ErrCode::WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_STA_NOT_OPENED, WifiTaiheErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED },
+    { ErrCode::WIFI_OPT_SCAN_NOT_OPENED, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_AP_NOT_OPENED, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_INVALID_CONFIG, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_P2P_NOT_OPENED, WifiTaiheErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED },
+    { ErrCode::WIFI_OPT_P2P_MAC_NOT_FOUND, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_P2P_ERR_MAC_FORMAT, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_P2P_ERR_INTENT, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
 };
 
-class WifiIdlScanEventCallback : public IWifiScanCallback {
-public:
-    WifiIdlScanEventCallback()
-    {
-    }
-
-    virtual ~WifiIdlScanEventCallback()
-    {
-    }
-
-public:
-    void OnWifiScanStateChanged(int state) override
-    {
-        double result = static_cast<double>(state);
-        if (wifiScanStateChangeCallback_) {
-            (*wifiScanStateChangeCallback_)(result);
-        }
-    }
-
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
-    {
-        return nullptr;
-    }
-public:
-    ::taihe::optional<::taihe::callback<void(double)>> wifiScanStateChangeCallback_;
+std::map<int32_t, std::string> WifiIdlErrorCode::errMsgMap_ {
+    { WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED, "Operation failed." },
+    { WifiTaiheErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED, "Wi-Fi STA disabled." },
+    { WifiTaiheErrCode::WIFI_ERRCODE_PERMISSION_DENIED, "Permission denied." },
+    { WifiTaiheErrCode::WIFI_ERRCODE_NON_SYSTEMAPP, "non-system application." },
+    { WifiTaiheErrCode::WIFI_ERRCODE_INVALID_PARAM, "Parameter error." },
+    { WifiTaiheErrCode::WIFI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
+    { WifiTaiheErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is being closed." },
+    { WifiTaiheErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
 };
 
-class WifiIdlHotspotEventCallback : public IWifiHotspotCallback {
-public:
-    WifiIdlHotspotEventCallback()
-    {
+int32_t WifiIdlErrorCode::GetErrCode(const int32_t errCodeIn, const int32_t sysCap = 0)
+{
+    auto iter = errCodeMap_.find(errCodeIn);
+    if (iter == errCodeMap_.end()) {
+        return WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED + sysCap;
+    }
+    if (iter->second == WifiTaiheErrCode::WIFI_ERRCODE_PERMISSION_DENIED ||
+        iter->second == WifiTaiheErrCode::WIFI_ERRCODE_INVALID_PARAM ||
+        iter->second == WifiTaiheErrCode::WIFI_ERRCODE_NOT_SUPPORTED ||
+        iter->second == WifiTaiheErrCode::WIFI_ERRCODE_NON_SYSTEMAPP) {
+        return iter->second;
+    }
+    return iter->second + sysCap;
+}
+
+std::string WifiIdlErrorCode::GetErrMsg(const int32_t errCodeIn, int sysCap)
+{
+    if (errCodeIn == ErrCode::WIFI_OPT_SUCCESS) {
+        return "";
     }
 
-    virtual ~WifiIdlHotspotEventCallback()
-    {
+    int32_t errCode = GetErrCode(errCodeIn, sysCap);
+    auto iter = errMsgMap_.find(errCode);
+    if (iter != errMsgMap_.end()) {
+        std::string errMessage = "BussinessError ";
+        errMessage.append(std::to_string(errCode)).append(": ").append(iter->second);
+        return errMessage;
     }
+    return "Inner error.";
+}
 
-public:
-    void OnHotspotStateChanged(int state) override
-    {
-        double result = static_cast<double>(state);
-        if (wifiHotspotStateChangeCallback_) {
-            (*wifiHotspotStateChangeCallback_)(result);
-        }
-    }
-
-    void OnHotspotStaJoin(const StationInfo &info) override
-    {
-        // bssid -> macAddress
-        ::ohos::wifiManager::StationInfo result = {info.bssid};
-        if (wifiHotspotStaJoinCallback_) {
-            (*wifiHotspotStaJoinCallback_)(result);
-        }
-    }
-
-    void OnHotspotStaLeave(const StationInfo &info) override
-    {
-        // bssid -> macAddress
-        ::ohos::wifiManager::StationInfo result = {info.bssid};
-        if (wifiHotspotStaLeaveCallback_) {
-            (*wifiHotspotStaLeaveCallback_)(result);
-        }
-    }
-
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
-    {
-        return nullptr;
-    }
-
-public:
-    ::taihe::optional<::taihe::callback<void(double)>> wifiHotspotStateChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::StationInfo const&)>>
-        wifiHotspotStaJoinCallback_;
-    ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::StationInfo const&)>>
-        wifiHotspotStaLeaveCallback_;
-};
-
-class WifiIdlP2pEventCallback : public IWifiP2pCallback {
-public:
-    WifiIdlP2pEventCallback()
-    {
-    }
-
-    virtual ~WifiIdlP2pEventCallback()
-    {
-    }
-
-public:
-    void OnP2pStateChanged(int state) override
-    {
-        double result = static_cast<double>(state);
-        if (wifiP2pStateChangeCallback_) {
-            (*wifiP2pStateChangeCallback_)(result);
-        }
-    }
-
-    void OnP2pPersistentGroupsChanged(void) override
-    {
-        auto result = ::ohos::wifiManager::UndefinedType::make_undefined();
-        if (wifiP2pPersistentGroupChangeCallback_) {
-            (*wifiP2pPersistentGroupChangeCallback_)(result);
-        }
-    }
-
-    void OnP2pThisDeviceChanged(const WifiP2pDevice& device) override
-    {
-        ::taihe::string_view deviceName = static_cast<::taihe::string_view>(device.GetDeviceName());
-        ::taihe::string_view deviceAddress = static_cast<::taihe::string_view>(device.GetDeviceAddress());
-        ::ohos::wifiManager::DeviceAddressType deviceAddressType =
-            static_cast<::ohos::wifiManager::DeviceAddressType::key_t>(device.GetDeviceAddressType());
-        ::taihe::string_view primaryDeviceType = static_cast<::taihe::string_view>(device.GetPrimaryDeviceType());
-        ::ohos::wifiManager::P2pDeviceStatus deviceStatus =
-            static_cast<::ohos::wifiManager::P2pDeviceStatus::key_t>(device.GetP2pDeviceStatus());
-        int groupCapabilities = static_cast<int>(device.GetGroupCapabilitys());
-        ::ohos::wifiManager::WifiP2pDevice result = {deviceName, deviceAddress, deviceAddressType,
-            primaryDeviceType, deviceStatus, groupCapabilities};
-        if (wifiP2pDeviceChangeCallback_) {
-            (*wifiP2pDeviceChangeCallback_)(result);
-        }
-    }
-
-    void OnP2pPeersChanged(const std::vector<WifiP2pDevice>& devices) override
-    {
-        std::vector<::ohos::wifiManager::WifiP2pDevice> result;
-        for (WifiP2pDevice device : devices) {
-            ::taihe::string_view deviceName = static_cast<::taihe::string_view>(device.GetDeviceName());
-            ::taihe::string_view deviceAddress = static_cast<::taihe::string_view>(device.GetDeviceAddress());
-            ::ohos::wifiManager::DeviceAddressType deviceAddressType =
-                static_cast<::ohos::wifiManager::DeviceAddressType::key_t>(device.GetDeviceAddressType());
-            ::taihe::string_view primaryDeviceType =
-                static_cast<::taihe::string_view>(device.GetPrimaryDeviceType());
-            ::ohos::wifiManager::P2pDeviceStatus deviceStatus =
-                static_cast<::ohos::wifiManager::P2pDeviceStatus::key_t>(device.GetP2pDeviceStatus());
-            int groupCapabilities = static_cast<int>(device.GetGroupCapabilitys());
-            ::ohos::wifiManager::WifiP2pDevice tmpDevice = {deviceName, deviceAddress, deviceAddressType,
-                primaryDeviceType, deviceStatus, groupCapabilities};
-            result.emplace_back(tmpDevice);
-        }
-        ::taihe::array<::ohos::wifiManager::WifiP2pDevice> finalResult =
-            ::taihe::array<::ohos::wifiManager::WifiP2pDevice>(taihe::copy_data_t{}, result.data(), result.size());
-        if (wifiP2pPeerDeviceChangeCallback_) {
-            (*wifiP2pPeerDeviceChangeCallback_)(finalResult);
-        }
-    }
-
-    void OnP2pServicesChanged(const std::vector<WifiP2pServiceInfo>& srvInfo) override
-    {
-    }
-
-    void OnP2pConnectionChanged(const WifiP2pLinkedInfo& info) override
-    {
-        ::ohos::wifiManager::P2pConnectState state =
-            static_cast<::ohos::wifiManager::P2pConnectState::key_t>(info.GetConnectState());
-        ani_boolean isOwner = static_cast<ani_boolean>(info.IsGroupOwner());
-        ::taihe::string_view ownerAddr = static_cast<::taihe::string_view>(info.GetGroupOwnerAddress());
-        ::ohos::wifiManager::WifiP2pLinkedInfo result = {state, isOwner, ownerAddr};
-        if (wifiP2pConnectionChangeCallback_) {
-            (*wifiP2pConnectionChangeCallback_)(result);
-        }
-    }
-
-    void OnP2pDiscoveryChanged(bool isChange) override
-    {
-        double result = static_cast<double>(isChange);
-        if (wifiP2pDiscoveryChangeCallback_) {
-            (*wifiP2pDiscoveryChangeCallback_)(result);
-        }
-    }
-
-    void OnP2pActionResult(P2pActionCallback action, ErrCode code) override
-    {
-    }
-
-    void OnConfigChanged(CfgType type, char* data, int dataLen) override
-    {
-    }
-
-    void OnP2pGcJoinGroup(const OHOS::Wifi::GcInfo &info) override
-    {
-    }
-
-    void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override
-    {
-    }
-
-    void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override
-    {
-    }
-
-    void OnP2pChrErrCodeReport(const int errCode) override
-    {
-    }
-
-    OHOS::sptr<OHOS::IRemoteObject> AsObject() override
-    {
-        return nullptr;
-    }
-
-public:
-    ::taihe::optional<::taihe::callback<void(double)>> wifiP2pStateChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::WifiP2pLinkedInfo const&)>>
-        wifiP2pConnectionChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::WifiP2pDevice const&)>>
-        wifiP2pDeviceChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(::taihe::array_view<::ohos::wifiManager::WifiP2pDevice>)>>
-        wifiP2pPeerDeviceChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::UndefinedType const&)>>
-        wifiP2pPersistentGroupChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiP2pDiscoveryChangeCallback_;
-};
+void WifiIdlErrorCode::TaiheSetBusinessError(const char* funcName,
+    const int32_t errCodeIn, int sysCap)
+{
+    int32_t err = GetErrCode(errCodeIn, sysCap);
+    std::string errMsg = GetErrMsg(errCodeIn, sysCap);
+    WIFI_LOGE("sunjunyu %{public}s error %{public}d, %{public}s", funcName, err, errMsg.c_str());
+    taihe::set_business_error(err, errMsg);
+}
 }  // namespace Wifi
 }  // namespace OHOS
-#endif

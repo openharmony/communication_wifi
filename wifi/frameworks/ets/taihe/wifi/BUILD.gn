@@ -24,10 +24,10 @@ copy_taihe_idl("copy_wifi") {
 
 subsystem_name = "communication"
 part_name = "wifi"
-taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+taihe_generated_file_path_wifi = "$taihe_file_path/out/$subsystem_name/$part_name/wifi"
 
 ohos_taihe("run_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_wifi}"
   deps = [ ":copy_wifi" ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.wifi.ani.cpp",
@@ -42,7 +42,7 @@ taihe_shared_library("wifi_taihe_native") { #调用taihe_shared_library模板编
     cfi_cross_dso = true  # Cross-SO CFI Checks
     debug = false
   }
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_wifi}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")                                          
@@ -57,8 +57,8 @@ taihe_shared_library("wifi_taihe_native") { #调用taihe_shared_library模板编
 }
 
 generate_static_abc("wifi_framework_abc") {                   #调用generate_static_abc编译abc
-  base_url = "$taihe_generated_file_path"                             #base_url直接设置为taihe_generated_file_path
-  files = [ "$taihe_generated_file_path/@ohos.wifi.ets" ]                #files传入生成的ets文件
+  base_url = "${taihe_generated_file_path_wifi}"                             #base_url直接设置为taihe_generated_file_path
+  files = [ "${taihe_generated_file_path_wifi}/@ohos.wifi.ets" ]                #files传入生成的ets文件
   is_boot_abc = "True"
   device_dst_file = "/system/framework/wifi_framework_abc.abc"
   dependencies = [ ":run_taihe" ]                                             #编译abc依赖太和工具链调用

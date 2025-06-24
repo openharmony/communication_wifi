@@ -113,7 +113,6 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_black_list/network_black_list_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history/network_status_history_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history/wifi_history_record_manager.cpp",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap/net_eap_observer.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/rdb/wifi_rdb_manager.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_app_state_aware.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_channel_helper.cpp",
@@ -223,6 +222,7 @@ ohos_fuzztest("EnableP2pFuzzTest") {
   ]
 
   if (wifi_feature_with_extensible_authentication) {
+    sources += ["$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap/net_eap_observer.cpp",]
     defines += ["EXTENSIBLE_AUTHENTICATION"]
     external_deps += ["netmanager_ext:ethernet_manager_if"]
   }

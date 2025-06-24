@@ -25,6 +25,11 @@ namespace Wifi {
 enum SettingsDialogClickType {
     SETTINGS_5G_AUTO_IDENTIFY_CONN = 0
 };
+
+enum StateChangeEventType {
+    MovementState = 0
+};
+
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;
 using P2pEnhanceActionListenCallback = std::function<void(int)>;
 using SensorEnhanceCallback = std::function<void(int)>;
@@ -335,6 +340,16 @@ public:
      * @return Errcode - operation result
      */
     virtual ErrCode RegisterSensorEnhanceCallback(SensorEnhanceCallback callback) = 0;
+
+    /**
+     * @Description Notify State Changed
+     *
+     * @param eventType - State Change Event Type
+     * @param state - State
+     * @param extValue - Extended value
+     * @return void
+     */
+     virtual void NotifyStateChanged(StateChangeEventType eventType, int state, const std::string &extValue) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

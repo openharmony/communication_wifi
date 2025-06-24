@@ -39,6 +39,10 @@ void DeviceMovementCallback::OnMovementChanged(const Msdp::MovementDataUtils::Mo
 {
     WIFI_LOGI("enter DeviceMovementCallback::OnMovementChanged type=%{public}d, value=%{public}d",
         movementData.type, movementData.value);
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        pEnhanceService->NotifyStateChanged(movementData, movementData.type, std::to_string(movementData.value));
+    }
     if (movementData.type == Msdp::MovementDataUtils::MovementType::TYPE_STILL) {
         if (movementData.value == Msdp::MovementDataUtils::MovementValue::VALUE_ENTER) {
             WifiConfigCenter::GetInstance().SetFreezeModeState(MODE_STATE_OPEN);

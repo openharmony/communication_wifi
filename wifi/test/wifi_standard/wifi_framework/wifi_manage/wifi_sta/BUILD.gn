@@ -128,6 +128,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
   "$WIFI_ROOT_DIR/utils/inc",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
+  "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap",
   "$WIFI_ROOT_DIR/base/shared_util/",
   "$WIFI_ROOT_DIR/services/wifi_standard/include",
 ]
@@ -248,6 +249,12 @@ ohos_unittest("wifi_sta_unittest") {
     sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report/select_network_data_report.cpp" ]
   }
 
+  if (wifi_feature_with_extensible_authentication) {
+    sources += ["$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap/net_eap_observer.cpp",]
+    defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+    external_deps += ["netmanager_ext:ethernet_manager_if"]
+  }
+
   if (wifi_feature_mdm_restricted_enable) {
     defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
   }
@@ -332,6 +339,12 @@ ohos_unittest("wifi_selfcure_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_telephony_utils",
   ]
   external_deps = local_base_external_deps
+
+  if (wifi_feature_with_extensible_authentication) {
+    sources += ["$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap/net_eap_observer.cpp",]
+    defines += ["EXTENSIBLE_AUTHENTICATION"]
+    external_deps += ["netmanager_ext:ethernet_manager_if"]
+  }
 
   if (wifi_ffrt_enable) {
     external_deps += [ "ffrt:libffrt" ]

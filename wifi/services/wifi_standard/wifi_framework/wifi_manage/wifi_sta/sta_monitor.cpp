@@ -159,6 +159,11 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
         case static_cast<int>(WpaEventCallback::MLO_STATE_NUM):
             OnWpaMloStateNotifyCallBack(data);
             break;
+#ifdef EXTENSIBLE_AUTHENTICATION
+        case static_cast<int>(WpaEventCallback::CUSTOMIZED_EAP_AUTH):
+            OnWpaCustomEapNotifyCallBack(data);
+            break;
+#endif
         default:
             WIFI_LOGI("OnWpaStaNotifyCallBack() undefine event:%{public}d", num);
             break;
@@ -168,6 +173,7 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
 void StaMonitor::OnWpaHilinkCallBack(const std::string &bssid)
 {
     WIFI_LOGI("OnWpaHilinkCallBack() enter");
+
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS, bssid);
     return;
 }
@@ -379,5 +385,49 @@ void StaMonitor::OnWpaMloStateNotifyCallBack(const std::string &notifyParam)
     /* Notify sta state machine mlo state changed event. */
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_MLO_WORK_STATE_EVENT, mloParam);
 }
+
+void StaMonitor::OnWpaCustomEapNotifyCallBack(const std::string &notifyParam)
+{
+#ifdef EXTENSIBLE_AUTHENTICATION
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("%{public}s The statemachine pointer is null.", __FUNCTION__);
+        return;
+    }
+    if (notifyParam.empty()) {
+        WIFI_LOGE("%{public}s notifyParam is empty", __FUNCTION__);
+        return;
+    }
+    std::vector<std::string> vecEapDatas = GetSplitInfo(notifyParam, ":"); //msgId:eapCode:eapType:bufSize:buf
+    const size_t paramSize = 5;
+    if (vecEapDatas.size() != paramSize) {
+        WIFI_LOGE("%{public}s notifyParam size error: size: %{public}zu", __FUNCTION__, vecEapDatas.size());
+        return;
+    }
+    for (size_t i = 0; i < paramSize - 1; i++) {
+        if (CheckDataLegal(vecEapDatas[i]) == 0) {
+            WIFI_LOGE("%{public}s notifyParam %{public}zu is not number", __FUNCTION__, i);
+            return;
+        }
+    }
+    WpaEapData wpaEapData;
+    wpaEapData.msgId = CheckDataToUint(vecEapDatas[0]);
+    wpaEapData.code = CheckDataToUint(vecEapDatas[1]);
+    wpaEapData.type = CheckDataToUint(vecEapDatas[2]);
+    wpaEapData.bufferLen = CheckDataToUint(vecEapDatas[3]);
+    wpaEapData.eapBuffer.reserve(wpaEapData.bufferLen);
+
+    DecodeBase64(vecEapDatas[4], wpaEapData.eapBuffer);
+
+    if (wpaEapData.eapBuffer.size() == 0) {
+        WIFI_LOGE("%{public}s notifyParam eapData is empty", __FUNCTION__);
+        return;
+    }
+    WIFI_LOGI("%{public}s buffer size:%{public}zu, first char is:%{public}d", __FUNCTION__,
+        wpaEapData.eapBuffer.size(), wpaEapData.eapBuffer[0]);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_EAP_CUSTOM_AUTH_EVENT, wpaEapData);
+#endif
+    return;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -122,6 +122,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_network_stats",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
@@ -284,6 +285,12 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_network_selection) {
       defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
+    }
+
+    if (wifi_feature_with_extensible_authentication) {
+      sources += ["net_eap/net_eap_observer.cpp",]
+      defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+      external_deps += ["netmanager_ext:ethernet_manager_if"]
     }
 
     if (wifi_feature_mdm_restricted_enable) {

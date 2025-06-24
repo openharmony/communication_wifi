@@ -194,6 +194,13 @@ ErrCode StaStateMachine::InitStaStateMachine()
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
     m_NetWorkState->SetNetStateCallback(
         [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
+#ifdef EXTENSIBLE_AUTHENTICATION
+    NetEapObserver::GetInstance().SetRegisterCustomEapCallback(
+        [this](const std::string &regCmd) { this->RegisterCustomEapCallback(regCmd); });
+    NetEapObserver::GetInstance().SetReplyCustomEapDataCallback(
+        [this](int result, const std::string &strEapData) { this->ReplyCustomEapDataCallback(result, strEapData); });
+    NetEapObserver::GetInstance().ReRegisterCustomEapCallback();
+#endif
 #endif
 
     return WIFI_OPT_SUCCESS;
@@ -705,6 +712,11 @@ int StaStateMachine::LinkState::InitStaSMHandleMap()
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT] = [this](InternalMessagePtr msg) {
         return this->pStaStateMachine->DealWpaEapUmtsAuthEvent(msg);
     };
+#ifdef EXTENSIBLE_AUTHENTICATION
+    staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_EAP_CUSTOM_AUTH_EVENT] = [this](InternalMessagePtr msg) {
+        return this->DealWpaCustomEapAuthEvent(msg);
+    };
+#endif
 #endif
     staSmHandleFuncMap[WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT] = [this](InternalMessagePtr msg) {
         return this->DealWpaStateChange(msg);
@@ -755,6 +767,22 @@ bool StaStateMachine::IsNewConnectionInProgress()
         targetId, currentLinkedId, SsidAnonymize(disconnectingSsid).c_str(),
         SsidAnonymize(targetSsid).c_str(), static_cast<int>(result));
     return result;
+}
+
+void StaStateMachine::LinkState::DealWpaCustomEapAuthEvent(InternalMessagePtr msg)
+{
+#ifdef EXTENSIBLE_AUTHENTICATION
+    if (msg == nullptr) {
+        LOGE("%{public}s InternalMessage msg is null.", __func__);
+        return;
+    }
+
+    WpaEapData wpaEapData = {0};
+    msg->GetMessageObj(wpaEapData);
+    NetEapObserver::GetInstance().NotifyWpaEapInterceptInfo(wpaEapData);
+    LOGI("%{public}s code=%{public}d, type=%{public}d, msgId:%{public}d success", __func__, wpaEapData.code,
+        wpaEapData.type, wpaEapData.msgId);
+#endif
 }
 
 void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessagePtr msg)
@@ -2092,6 +2120,59 @@ void StaStateMachine::NetStateObserverCallback(SystemNetWorkState netState, std:
         return;
     }
     enhanceService_->NotifyInternetState(static_cast<int>(netState));
+#endif
+}
+
+void StaStateMachine::RegisterCustomEapCallback(const std::string &regCmd) //netType:regSize:reg1:reg2
+{
+#ifdef EXTENSIBLE_AUTHENTICATION
+    const int preNumberCount = 2;
+    auto CheckStrEapData = [regCmd](const std::string &data) -> bool {
+        if (data.empty()) {
+            WIFI_LOGI("%{public}s regCmd is empty", __func__);
+            return false;
+        }
+        std::vector<std::string> vecEapDatas = GetSplitInfo(data, ":");
+        if (vecEapDatas.size() < 2) {
+            WIFI_LOGI("%{public}s regCmd invalid, regCmd[%{public}s]", __func__, regCmd.c_str());
+            return false;
+        }
+        if (CheckDataToUint(vecEapDatas[0]) != static_cast<int>(NetManagerStandard::NetType::WLAN0)) {
+            WIFI_LOGI("%{public}s netType not WLAN0, regCmd[%{public}s]", __func__, regCmd.c_str());
+            return false;
+        }
+        if (CheckDataToUint(vecEapDatas[1]) + preNumberCount != vecEapDatas.size()) {
+            WIFI_LOGI("%{public}s reg eapdata size error, regCmd[%{public}s]", __func__, regCmd.c_str());
+            return false;
+        }
+        return true;
+    };
+    if (!CheckStrEapData(regCmd)) {
+        WIFI_LOGI("%{public}s regcmd error, regCmd[%{public}s]", __func__, regCmd.c_str());
+        return;
+    }
+    std::string cmd = "EXT_AUTH_REG ";
+    cmd += regCmd;
+    WIFI_LOGI("%{public}s regCmd:%{public}s", __func__, cmd.c_str());
+    if (WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("%{public}s: failed to send the message, Custom Eap cmd: %{private}s", __func__, cmd.c_str());
+        return;
+    }
+#endif
+}
+
+void StaStateMachine::ReplyCustomEapDataCallback(int result, const std::string &strEapData)
+{
+#ifdef EXTENSIBLE_AUTHENTICATION
+    std::string cmd = "EXT_AUTH_DATA ";
+    cmd += std::to_string(result);
+    cmd += std::string(":");
+    cmd += strEapData;
+    WIFI_LOGI("%{public}s, reply result:%{public}d", __func__, result);
+    if (WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("%{public}s: failed to send the message", __func__);
+        return;
+    }
 #endif
 }
 

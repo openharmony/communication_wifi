@@ -45,6 +45,7 @@ enum class WpaEventCallback {
     CSA_CHSWITCH_NUM = 3,
     CHR_EVENT_NUM = 4,
     MLO_STATE_NUM = 5,
+    CUSTOMIZED_EAP_AUTH = 6,
 };
 
 }  // namespace Wifi

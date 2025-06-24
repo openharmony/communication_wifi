@@ -180,6 +180,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/rdb",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
@@ -687,6 +688,11 @@ if (defined(ohos_lite)) {
       defines += [ "WIFI_DATA_REPORT_ENABLE" ]
     }
 
+    if (wifi_feature_with_extensible_authentication) {
+      defines += [ "EXTENSIBLE_AUTHENTICATION" ]
+      external_deps += ["netmanager_ext:ethernet_manager_if"]
+    }
+  
     if (wifi_feature_autoopen_specified_location) {
       defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
     }

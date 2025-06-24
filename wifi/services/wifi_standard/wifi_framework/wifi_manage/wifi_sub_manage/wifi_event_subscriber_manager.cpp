@@ -42,6 +42,9 @@
 #include "wifi_country_code_define.h"
 #include "wifi_global_func.h"
 #include "display_info.h"
+#ifdef EXTENSIBLE_AUTHENTICATION
+#include "net_eap_observer.h"
+#endif
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sensor_scene.h"
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
@@ -134,6 +137,9 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
 #ifdef HAS_NETMANAGER_EVENT_PART
     UnRegisterNetmgrEvent();
 #endif
+#ifdef EXTENSIBLE_AUTHENTICATION
+    NetEapObserver::GetInstance().StopNetEapObserver();
+#endif
 }
 
 void WifiEventSubscriberManager::Init()
@@ -207,6 +213,14 @@ void WifiEventSubscriberManager::HandleCommNetConnManagerSysChange(int systemAbi
             pService->OnSystemAbilityChanged(systemAbilityId, add);
         }
     }
+}
+
+void WifiEventSubscriberManager::HandleEthernetServiceChange(int systemAbilityId, bool add)
+{
+#ifdef EXTENSIBLE_AUTHENTICATION
+    WIFI_LOGI("StartNetEapObserver");
+    NetEapObserver::GetInstance().StartNetEapObserver();
+#endif
 }
 
 #ifdef HAS_MOVEMENT_PART
@@ -309,6 +323,9 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
         case MOUSE_CROSS_SERVICE_ID:
             HandleMouseCrossServiceChange(add);
+            break;
+        case COMM_ETHERNET_MANAGER_SYS_ABILITY_ID:
+            HandleEthernetServiceChange(systemAbilityId, add);
             break;
         default:
             break;
@@ -453,6 +470,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
 {
     SubscribeSystemAbility(APP_MGR_SERVICE_ID);
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
+    SubscribeSystemAbility(COMM_ETHERNET_MANAGER_SYS_ABILITY_ID);
 #ifdef HAS_MOVEMENT_PART
     SubscribeSystemAbility(MSDP_MOVEMENT_SERVICE_ID);
 #endif

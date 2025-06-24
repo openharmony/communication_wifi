@@ -14,10 +14,13 @@
  */
 #include "sta_monitor.h"
 #include <gtest/gtest.h>
+#include <string>
 #include "sta_state_machine.h"
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
-#include <string>
+#include "wifi_logger.h"
+
+DEFINE_WIFILOG_LABEL("StaMonitorTest");
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -89,6 +92,9 @@ public:
     void OnWpaStaNotifyCallBackFail();
     void OnWpaStaNotifyCallBackFail1();
     void OnWpaStaNotifyCallBackFail2();
+    void OnWpaCustomEapNotifyCallBackSuccess();
+    void OnWpaCustomEapNotifyCallBackFail1();
+    void OnWpaCustomEapNotifyCallBackFail2();
 };
 
 void StaMonitorTest::InitStaMonitorSuccess()
@@ -331,6 +337,24 @@ void StaMonitorTest::OnWpaStaNotifyCallBackFail2()
     pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
 }
 
+void StaMonitorTest::OnWpaCustomEapNotifyCallBackSuccess()
+{
+    std::string notifyParam = "06:55:1:13:10:AlwAxA0AFgMBALkBAAC1AwOfjdAqQ/Z==";
+    pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
+}
+
+void StaMonitorTest::OnWpaCustomEapNotifyCallBackFail1()
+{
+    std::string notifyParam = "06:55:1:13:10";
+    pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
+}
+
+void StaMonitorTest::OnWpaCustomEapNotifyCallBackFail2()
+{
+    std::string notifyParam = "06:55:1:13:A:AlwAxA0AFgMBALkBAAC1AwOfjdAqQ/Z==";
+    pStaMonitor->OnWpaStaNotifyCallBack(notifyParam);
+}
+
 HWTEST_F(StaMonitorTest, InitStaMonitorSuccess, TestSize.Level1)
 {
     InitStaMonitorSuccess();
@@ -510,5 +534,29 @@ HWTEST_F(StaMonitorTest, OnWpaStaNotifyCallBackFail2, TestSize.Level1)
     OnWpaStaNotifyCallBackFail2();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
+
+#ifdef EXTENSIBLE_AUTHENTICATION
+HWTEST_F(StaMonitorTest, OnWpaCustomEapNotifyCallBackFail1, TestSize.Level1)
+{
+    WIFI_LOGI("OnWpaCustomEapNotifyCallBackFail1 enter!");
+    OnWpaCustomEapNotifyCallBackFail1();
+    EXPECT_FALSE(g_errLog.find("callback") != std::string::npos);
+}
+
+HWTEST_F(StaMonitorTest, OnWpaCustomEapNotifyCallBackFail2, TestSize.Level1)
+{
+    WIFI_LOGI("OnWpaCustomEapNotifyCallBackFail2 enter!");
+    OnWpaCustomEapNotifyCallBackFail2();
+    EXPECT_FALSE(g_errLog.find("callback") != std::string::npos);
+}
+
+HWTEST_F(StaMonitorTest, OnWpaCustomEapNotifyCallBackSuccess, TestSize.Level1)
+{
+    WIFI_LOGI("OnWpaCustomEapNotifyCallBackSuccess enter!");
+    OnWpaCustomEapNotifyCallBackSuccess();
+    EXPECT_FALSE(g_errLog.find("callback") == std::string::npos);
+}
+#endif
+
 } // WIFI
 } // OHOS

@@ -37,6 +37,9 @@
 #include "want.h"
 #include "wifi_net_agent.h"
 #include "wifi_net_observer.h"
+#ifdef EXTENSIBLE_AUTHENTICATION
+#include "net_eap_observer.h"
+#endif
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
 #include "wifi_common_event_helper.h"
@@ -230,6 +233,7 @@ public:
         void DealNetworkRemoved(InternalMessagePtr msg);
         void DealWpaStateChange(InternalMessagePtr msg);
         void DealMloStateChange(InternalMessagePtr msg);
+        void DealWpaCustomEapAuthEvent(InternalMessagePtr msg);
     };
     /**
      * @Description  Definition of member function of SeparatedState class in StaStateMachine.
@@ -644,6 +648,21 @@ private:
     void NetStateObserverCallback(SystemNetWorkState netState, std::string url);
 
     /**
+     * @Description implementation of Register Eap Custom Handler
+     *
+     * @param eapCode Indicates eap code need to customize
+     * @param eapType Indicates eap type need to customize
+     */
+    void RegisterCustomEapCallback(const std::string &regCmd);
+
+    /**
+     * @Description implementation of Reply CustomEap Data
+     *
+     * @param eapBuf Indicates eap packet that customized
+     */
+    void ReplyCustomEapDataCallback(int result, const std::string &strEapData);
+
+    /**
      * @Description  notification portal network.
      *
      */
@@ -899,6 +918,13 @@ private:
      * @param msg: authentication data
      */
     void DealWpaEapSimAuthEvent(InternalMessagePtr msg);
+
+    /**
+     * @Description deal register custom eap event
+     *
+     * @param msg: register param
+     */
+    void DealRegCustomEapEvent(InternalMessagePtr msg);
 
     /**
      * @Description aka/aka' authentication Pre-process

@@ -18,6 +18,7 @@
 #include "wifi_config_center.h"
 #include "define.h"
 #include "wifi_service_manager.h"
+#include <string>
 
 namespace OHOS {
 namespace Wifi {

@@ -42,6 +42,8 @@ void P2pIdleState::GoInState()
     p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE), P2P_REMOVE_DEVICE_TIMEOUT);
     p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_INVALID);
     SharedLinkManager::ClearSharedLinkCount();
+    p2pStateMachine.UpdateGroupManager();
+    p2pStateMachine.UpdatePersistentGroups();
     P2pChrReporter::GetInstance().ResetState();
 }
 

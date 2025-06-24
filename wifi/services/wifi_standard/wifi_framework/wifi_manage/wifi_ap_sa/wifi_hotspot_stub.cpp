@@ -512,7 +512,7 @@ void WifiHotspotStub::OnRegisterCallBack(
         } else {
             std::unique_lock<std::mutex> lock(deathRecipientMutex);
             if (deathRecipient_ == nullptr) {
-                 deathRecipient_ = sptr<WifiHotspotDeathRecipient>::MakeSptr();
+                deathRecipient_ = sptr<WifiHotspotDeathRecipient>::MakeSptr();
             }
             // Add death recipient to remote object if this is the first time to register callback.
             if (remote->IsProxyObject() &&

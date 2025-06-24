@@ -167,7 +167,6 @@ void WifiScanInfoToTaihe(::ohos::wifiManager::WifiScanInfo &tmpInfo, WifiScanInf
     tmpInfo.ssid = scanInfo.ssid;
     tmpInfo.bssid = scanInfo.bssid;
     tmpInfo.securityType = static_cast<::ohos::wifiManager::WifiSecurityType::key_t>(scanInfo.securityType);
-    WIFI_LOGI("sunjunyu RSSI: %{public}d", scanInfo.rssi);
     tmpInfo.rssi = scanInfo.rssi;
     tmpInfo.band = scanInfo.band;
     tmpInfo.supportedWifiCategory =

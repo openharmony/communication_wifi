@@ -95,7 +95,7 @@ void WifiIdlErrorCode::TaiheSetBusinessError(const char* funcName,
 {
     int32_t err = GetErrCode(errCodeIn, sysCap);
     std::string errMsg = GetErrMsg(errCodeIn, sysCap);
-    WIFI_LOGE("sunjunyu %{public}s error %{public}d, %{public}s", funcName, err, errMsg.c_str());
+    WIFI_LOGE("%{public}s error %{public}d, %{public}s", funcName, err, errMsg.c_str());
     taihe::set_business_error(err, errMsg);
 }
 }  // namespace Wifi

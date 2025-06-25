@@ -227,7 +227,7 @@ HWTEST_F(WifiCommonUtilTest, GetSplitInfoTest, TestSize.Level1)
     EXPECT_EQ(result.size(), 5);
 }
 
-HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest, TestSize.Level1)
+HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest01, TestSize.Level1)
 {
     WIFI_LOGI("IsBeaconLostTest enter");
     std::vector<std::string> bssidArray = {};
@@ -256,23 +256,53 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest, TestSize.Level1)
     signalPoll1.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll2.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll3.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
-    signalPoll4.ext = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    signalPoll4.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll5.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     wifiBeaconCheckInfoArray ={signalPoll0, signalPoll1, signalPoll2, signalPoll3, signalPoll4, signalPoll5};
     result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
-    EXPECT_FALSE(result);
-    WifiSignalPollInfo signalPoll04;
-    signalPoll04.timeStamp = 3;
-    signalPoll04.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
-    std::vector<WifiSignalPollInfo> wifiBeaconCheckInfoArray0 =
-        {signalPoll0, signalPoll1, signalPoll2, signalPoll3, signalPoll04, signalPoll5};
-    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray0);
     EXPECT_TRUE(result);
-    bssidArray = {
-        "00::55::DD::ff::MM", "00::55::DD::ff::0M", "00::55::DD::ff::MM",
+    bssidArray[1] = "00::55::DD::ff::0M";
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest02, TestSize.Level1)
+{
+    WIFI_LOGI("IsBeaconLostTest enter");
+    std::vector<WifiSignalPollInfo> wifiBeaconCheckInfoArray ={};
+    std::vector<std::string> bssidArray = {
+        "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM",
         "00::55::DD::ff::MM", "00::55::DD::ff::MM", "00::55::DD::ff::MM"
         };
-    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray0);
+    WifiSignalPollInfo signalPoll0;
+    WifiSignalPollInfo signalPoll1;
+    WifiSignalPollInfo signalPoll2;
+    WifiSignalPollInfo signalPoll3;
+    WifiSignalPollInfo signalPoll4;
+    WifiSignalPollInfo signalPoll5;
+    signalPoll0.timeStamp = 15;
+    signalPoll1.timeStamp = 12;
+    signalPoll2.timeStamp = 9;
+    signalPoll3.timeStamp = 6;
+    signalPoll4.timeStamp = 3;
+    signalPoll5.timeStamp = 0;
+    signalPoll0.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll1.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll2.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll3.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll4.ext = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    signalPoll5.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    wifiBeaconCheckInfoArray ={signalPoll0, signalPoll1, signalPoll2, signalPoll3, signalPoll4, signalPoll5};
+    bool result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    EXPECT_FALSE(result);
+    WifiSignalPollInfo signalPoll04;
+    signalPoll4.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll04.signal = -55;
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
+    EXPECT_FALSE(result);
+    signalPoll04.signal = 0;
+    signalPoll04.rxBytes = 100;
+    result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_FALSE(result);
 }
 

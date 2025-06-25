@@ -29,8 +29,10 @@ std::shared_ptr<WifiP2p> g_wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID
 namespace {
 ::ohos::wifiManager::WifiScanInfo MakeTmpWifiScanInfo(WifiScanInfo scanInfo)
 {
-    return {scanInfo.ssid, scanInfo.bssid, static_cast<::ohos::wifiManager::WifiSecurityType::key_t>(scanInfo.securityType),
-        scanInfo.rssi, scanInfo.band, static_cast<::ohos::wifiManager::WifiCategory::key_t>(scanInfo.supportedWifiCategory)};
+    return {scanInfo.ssid, scanInfo.bssid,
+        static_cast<::ohos::wifiManager::WifiSecurityType::key_t>(scanInfo.securityType),
+        scanInfo.rssi, scanInfo.band,
+        static_cast<::ohos::wifiManager::WifiCategory::key_t>(scanInfo.supportedWifiCategory)};
 }
 
 ::ohos::wifiManager::WifiLinkedInfo MakeWifiLinkedInfo(WifiLinkedInfo linkedInfo)

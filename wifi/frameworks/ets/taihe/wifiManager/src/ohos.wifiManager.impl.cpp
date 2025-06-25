@@ -27,10 +27,10 @@ std::shared_ptr<WifiScan> g_wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILIT
 static std::shared_ptr<WifiHotspot> g_wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
 std::shared_ptr<WifiP2p> g_wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 namespace {
-::ohos::wifiManager::WifiScanInfo MakeTmpWifiScanInfo()
+::ohos::wifiManager::WifiScanInfo MakeTmpWifiScanInfo(WifiScanInfo scanInfo)
 {
-    return {"", "", ::ohos::wifiManager::WifiSecurityType::key_t::WIFI_SEC_TYPE_INVALID, 0, 0,
-        ::ohos::wifiManager::WifiCategory::key_t::DEFAULT};
+    return {scanInfo.ssid, scanInfo.bssid, static_cast<::ohos::wifiManager::WifiSecurityType::key_t>(scanInfo.securityType),
+        scanInfo.rssi, scanInfo.band, static_cast<::ohos::wifiManager::WifiCategory::key_t>(scanInfo.supportedWifiCategory)};
 }
 
 ::ohos::wifiManager::WifiLinkedInfo MakeWifiLinkedInfo(WifiLinkedInfo linkedInfo)
@@ -190,8 +190,7 @@ void WifiScanInfoToTaihe(::ohos::wifiManager::WifiScanInfo &tmpInfo, WifiScanInf
     }
     WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
     for (WifiScanInfo scanInfo : scanInfos) {
-        ::ohos::wifiManager::WifiScanInfo tmpInfo = MakeTmpWifiScanInfo();
-        WifiScanInfoToTaihe(tmpInfo, scanInfo);
+        ::ohos::wifiManager::WifiScanInfo tmpInfo = MakeTmpWifiScanInfo(scanInfo);
         result.emplace_back(tmpInfo);
     }
     return ::taihe::array<::ohos::wifiManager::WifiScanInfo>(taihe::copy_data_t{}, result.data(), result.size());

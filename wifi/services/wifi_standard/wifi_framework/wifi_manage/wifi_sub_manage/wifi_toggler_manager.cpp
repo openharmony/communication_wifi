@@ -275,10 +275,7 @@ void WifiTogglerManager::DealRptStartFailure(int id)
 void WifiTogglerManager::DealClientRemoved(int id)
 {
     if (pWifiControllerMachine) {
-        WIFI_LOGI("SendMessage msg is  CMD_CONCRETECLIENT_REMOVED");
         pWifiControllerMachine->SendMessage(CMD_CONCRETECLIENT_REMOVED, id);
-    } else {
-        WIFI_LOGE("pWifiControllerMachine is nullptr");
     }
 }
 

@@ -89,7 +89,6 @@ public:
 
     int GetHilinkAbility(const std::string &bssid);
 
-
 private:
     void InitScanControlForbidList();
     void InitScanControlIntervalList();

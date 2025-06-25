@@ -264,6 +264,7 @@ void AppNetworkSpeedLimitService::AsyncLimitSpeed(const AsyncParamInfo &asyncPar
 
 void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParamInfo)
 {
+    WifiConfigCenter::GetInstance().SetNetworkControlInfo(asyncParamInfo.networkControlInfo);
     if (asyncParamInfo.funcName == HANDLE_WIFI_CONNECT_CHANGED) {
         WifiConnectStateChanged();
     } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {

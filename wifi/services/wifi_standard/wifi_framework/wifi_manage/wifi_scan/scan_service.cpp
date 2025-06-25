@@ -2786,8 +2786,7 @@ bool ScanService::AllowScanByActionListen()
 
 bool ScanService::AllowScanByGameScene()
 {
-    WifiNetworkControlInfo NetworkControlInfo =
-        WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetNetworkControlInfo();
+    WifiNetworkControlInfo NetworkControlInfo =WifiConfigCenter::GetInstance().GetNetworkControlInfo();
     if (NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_END &&
         NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_BACKGROUND) {
         WIFI_LOGI(

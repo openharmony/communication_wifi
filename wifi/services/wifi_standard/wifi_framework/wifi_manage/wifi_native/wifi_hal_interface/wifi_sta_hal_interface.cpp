@@ -279,6 +279,7 @@ static void ConvertsScanInfo(InterScanInfo &interScanInfo, ScanInfo &scanInfo)
         scanInfo.infoElems = nullptr;
     }
     interScanInfo.isHiLinkNetwork = scanInfo.isHiLinkNetwork;
+    interScanInfo.isHiLinkProNetwork = scanInfo.isHiLinkProNetwork;
     return;
 }
 
@@ -325,6 +326,9 @@ static void ParseScanInfo(std::vector<ScanResultsInfo> &scanResultsInfo, std::ve
         GetScanResultInfoElem(&scanInfo, scanResult.ie.data(), scanResult.ie.size());
         scanInfo.timestamp = scanResult.tsf;
         scanInfo.isHiLinkNetwork = RouterSupportHiLinkByWifiInfo(scanResult.ie.data(), scanResult.ie.size());
+        if (scanInfo.isHiLinkNetwork == 4) {
+            scanInfo.isHiLinkProNetwork = true;
+        }
         int hiLinkNetwork = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetHilinkAbility(scanInfo.bssid);
         if (InternalHiLinkNetworkToBool(scanInfo.isHiLinkNetwork)) {
             WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordHilinkAbility(

@@ -165,17 +165,6 @@ bool IsOpenSoftApAllowed()
     return static_cast<ani_boolean>(isSupported);
 }
 
-void WifiScanInfoToTaihe(::ohos::wifiManager::WifiScanInfo &tmpInfo, WifiScanInfo scanInfo)
-{
-    tmpInfo.ssid = scanInfo.ssid;
-    tmpInfo.bssid = scanInfo.bssid;
-    tmpInfo.securityType = static_cast<::ohos::wifiManager::WifiSecurityType::key_t>(scanInfo.securityType);
-    tmpInfo.rssi = scanInfo.rssi;
-    tmpInfo.band = scanInfo.band;
-    tmpInfo.supportedWifiCategory =
-        static_cast<::ohos::wifiManager::WifiCategory::key_t>(scanInfo.supportedWifiCategory);
-}
-
 ::taihe::array<::ohos::wifiManager::WifiScanInfo> GetScanInfoList()
 {
     bool compatible = false;

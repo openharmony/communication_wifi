@@ -799,6 +799,7 @@ void ScanService::ConvertScanInfo(WifiScanInfo &scanInfo, const InterScanInfo &i
     scanInfo.maxSupportedTxLinkSpeed = GetWifiMaxSupportedMaxSpeed(interInfo, MAX_TX_SPATIAL_STREAMS);
     interInfo.GetWifiStandard(scanInfo.wifiStandard);
     scanInfo.isHiLinkNetwork = interInfo.isHiLinkNetwork;
+    scanInfo.isHiLinkProNetwork = interInfo.isHiLinkProNetwork;
     scanInfo.supportedWifiCategory = interInfo.supportedWifiCategory;
 }
 

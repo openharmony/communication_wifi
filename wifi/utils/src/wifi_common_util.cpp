@@ -535,7 +535,7 @@ bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPo
     const int64_t initTime = wifiBeaconCheckInfoArray[0].timeStamp;
     const std::string initBssid = bssidArray[0];
     const int initRssi = wifiBeaconCheckInfoArray[0].signal;
-    const unsigned int initRxBytes = wifiBeaconCheckInfoArray[0].rxBytes;    
+    const unsigned int initRxBytes = wifiBeaconCheckInfoArray[0].rxBytes;
     int accumulateTime = 0;
     for (size_t i = 0; i < wifiBeaconCheckInfoArray.size(); i++) {
         const auto &signalInfo = wifiBeaconCheckInfoArray[i];

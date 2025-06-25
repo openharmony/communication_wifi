@@ -26,8 +26,8 @@ enum SettingsDialogClickType {
     SETTINGS_5G_AUTO_IDENTIFY_CONN = 0
 };
 
-enum StateChangeEventType {
-    MovementState = 0
+enum class StateChangeEventType {
+    MOVEMENT_STATE = 0
 };
 
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;

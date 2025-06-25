@@ -41,7 +41,8 @@ void DeviceMovementCallback::OnMovementChanged(const Msdp::MovementDataUtils::Mo
         movementData.type, movementData.value);
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService != nullptr) {
-        pEnhanceService->NotifyStateChanged(movementData, movementData.type, std::to_string(movementData.value));
+        pEnhanceService->NotifyStateChanged(
+            StateChangeEventType::MOVEMENT_STATE, movementData.type, std::to_string(movementData.value));
     }
     if (movementData.type == Msdp::MovementDataUtils::MovementType::TYPE_STILL) {
         if (movementData.value == Msdp::MovementDataUtils::MovementValue::VALUE_ENTER) {

@@ -30,6 +30,7 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr int HILINK_PRO_NETWORK = 4;
 static int GetInstId(const std::string &ifaceName)
 {
     int inst = INSTID_WLAN0;
@@ -326,7 +327,7 @@ static void ParseScanInfo(std::vector<ScanResultsInfo> &scanResultsInfo, std::ve
         GetScanResultInfoElem(&scanInfo, scanResult.ie.data(), scanResult.ie.size());
         scanInfo.timestamp = scanResult.tsf;
         scanInfo.isHiLinkNetwork = RouterSupportHiLinkByWifiInfo(scanResult.ie.data(), scanResult.ie.size());
-        if (scanInfo.isHiLinkNetwork == 4) {
+        if (scanInfo.isHiLinkNetwork == HILINK_PRO_NETWORK) {
             scanInfo.isHiLinkProNetwork = true;
         }
         int hiLinkNetwork = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetHilinkAbility(scanInfo.bssid);

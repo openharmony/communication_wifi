@@ -83,23 +83,23 @@ struct WifiScanInfo {
     ssid: String;
     bssid: String;
     securityType: WifiSecurityType;
-    rssi: i32;
-    band: i32;
+    rssi: f64;
+    band: f64;
     supportedWifiCategory: WifiCategory;
 }
 
 struct WifiLinkedInfo {
     ssid: String;
     bssid: String;
-    rssi: i32;
-    band: i32;
+    rssi: f64;
+    band: f64;
     macAddress: String;
     connState: ConnState;
     supportedWifiCategory: WifiCategory;
 }
 
 struct IpInfo {
-    ipAddress: i32;
+    ipAddress: f64;
 }
 
 struct Ipv6Info {
@@ -113,7 +113,7 @@ struct StationInfo {
 struct HotspotConfig {
     ssid: String;
     securityType: WifiSecurityType;
-    band: i32;
+    band: f64;
     preSharedKey: String;
 }
 
@@ -134,7 +134,7 @@ struct WifiP2pDevice {
     deviceAddressType: DeviceAddressType;
     primaryDeviceType: String;
     deviceStatus: P2pDeviceStatus;
-    groupCapabilities: i32;
+    groupCapabilities: f64;
 }
 
 // 函数

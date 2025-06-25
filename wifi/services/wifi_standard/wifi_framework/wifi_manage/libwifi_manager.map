@@ -158,6 +158,8 @@
         "OHOS::Wifi::WifiConfigCenter::UpdateWifiConnectFailListCache(int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, OHOS::Wifi::WifiCategoryConnectFailInfo)";
         "OHOS::Wifi::WifiConfigCenter::RemoveWifiConnectFailListCache(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
         "OHOS::Wifi::WifiConfigCenter::GetLocalOnlyHotspotConfig(OHOS::Wifi::HotspotConfig&)";
+        "OHOS::Wifi::WifiConfigCenter::GetNetworkControlInfo()";
+        "OHOS::Wifi::WifiConfigCenter::SetNetworkControlInfo(OHOS::Wifi::WifiNetworkControlInfo const&)";
         "OHOS::Wifi::WifiConfigCenter::SetLocalOnlyHotspotConfig(OHOS::Wifi::HotspotConfig const&)";
         "OHOS::Wifi::WifiScanConfig::GetScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
         "OHOS::Wifi::WifiScanConfig::SaveScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
@@ -166,8 +168,6 @@
         "OHOS::Wifi::WifiScanConfig::GetScanControlInfo(OHOS::Wifi::tagScanControlInfo&, int)";
         "OHOS::Wifi::WifiScanConfig::SetAppPackageName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiScanConfig::GetScanInfoList(std::__h::vector<OHOS::Wifi::WifiScanInfo, std::__h::allocator<OHOS::Wifi::WifiScanInfo>>&)";
-        "OHOS::Wifi::WifiScanConfig::SetNetworkControlInfo(OHOS::Wifi::WifiNetworkControlInfo const&)";
-        "OHOS::Wifi::WifiScanConfig::GetNetworkControlInfo()";
         "OHOS::Wifi::WifiSettings::GetInstance()";
         "OHOS::Wifi::WifiSettings::ClearDeviceConfig()";
         "OHOS::Wifi::WifiSettings::GetDeviceConfig(std::__h::vector<OHOS::Wifi::WifiDeviceConfig, std::__h::allocator<OHOS::Wifi::WifiDeviceConfig>>&, int)";

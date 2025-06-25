@@ -1,12 +1,3 @@
-wifi/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan/scan_service.cpp 802
- scanInfo.isHiLinkNetwork = interInfo.isHiLinkNetwork;
-    scanInfo.isHiLinkProNetwork = interInfo.isHiLinkProNetwork;1111
-    scanInfo.supportedWifiCategory = interInfo.supportedWifiCategory;
-
-wifi/frameworks/native/src/wifi_device_proxy.cpp 1334
-info.isHiLinkNetwork = reply.ReadInt32();
-    info.isHiLinkProNetwork = reply.ReadBool();11111
-    info.lastRxPackets = reply.ReadInt32();
 # communication\_wifi<a name="EN-US_TOPIC_0000001162030287"></a>
 
 -   [Introduction](#section11660541593)

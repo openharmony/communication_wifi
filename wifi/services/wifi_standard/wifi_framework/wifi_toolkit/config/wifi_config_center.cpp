@@ -1571,6 +1571,18 @@ void WifiConfigCenter::SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotCon
     localOnlyHotspotConfig_ = hotspotConfig;
 }
 
+void WifiConfigCenter::SetNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    networkControlInfoRecord = networkControlInfo;
+}
+ 
+WifiNetworkControlInfo WifiConfigCenter::GetNetworkControlInfo()
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    return networkControlInfoRecord;
+}
+
 #ifndef OHOS_ARCH_LITE
 void WifiConfigCenter::SetScreenDispalyState(int32_t orientation)
 {

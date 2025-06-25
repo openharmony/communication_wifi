@@ -1451,7 +1451,8 @@ int RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
 {
     const struct HdiElem *elem;
     uint8_t num = 0;
-
+    uint8_t HiLinkSectionNum = 0;
+    uint8_t HiLinkOUISectionNum = 0;
     if (!start) {
         return num;
     }
@@ -1463,10 +1464,12 @@ int RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
         uint8_t id = elem->id, elen = elem->datalen;
         const uint8_t *pos = elem->data;
         if (id == HDI_EID_VENDOR_SPECIFIC) {
-            num |= CheckHiLinkSection(pos, elen);
-            num |= CheckHiLinkOUISection(pos, elen);
+            HiLinkSectionNum |= CheckHiLinkSection(pos, elen);
+            HiLinkOUISectionNum |= CheckHiLinkOUISection(pos, elen);
+            LOGI("RouterSupportHiLinkByWifiInfo HiLinkSectionNum=%{public}d  HiLinkOUISectionNum=%{public}d ",
+                HiLinkSectionNum,
+                HiLinkOUISectionNum);
         }
     }
-
-    return num;
+    return HiLinkOUISectionNum ? HiLinkOUISectionNum : HiLinkSectionNum;
 }

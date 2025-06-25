@@ -313,6 +313,7 @@ struct WifiLinkedInfo {
         lastTxPackets = 0;
         isAncoConnected = false;
         isHiLinkNetwork = 0;
+        isHiLinkProNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         isMloConnected = false;
         isWurEnable = false;

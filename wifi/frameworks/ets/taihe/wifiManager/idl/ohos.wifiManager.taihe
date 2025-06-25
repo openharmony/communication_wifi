@@ -79,57 +79,43 @@ struct WifiDeviceConfig {
     securityType: WifiSecurityType;
 }
 
-function MakeWifiDeviceConfig(ssid: String, bssid: Optional<String>, preSharedKey: String, securityType: WifiSecurityType): WifiDeviceConfig;
-
 struct WifiScanInfo {
     ssid: String;
     bssid: String;
     securityType: WifiSecurityType;
-    rssi: i32;
-    band: i32;
+    rssi: f64;
+    band: f64;
     supportedWifiCategory: WifiCategory;
 }
-
-function MakeWifiScanInfo(ssid: String, bssid: String, securityType: WifiSecurityType, rssi: i32, band: i32, supportedWifiCategory: WifiCategory): WifiScanInfo;
 
 struct WifiLinkedInfo {
     ssid: String;
     bssid: String;
-    rssi: i32;
-    band: i32;
+    rssi: f64;
+    band: f64;
     macAddress: String;
     connState: ConnState;
     supportedWifiCategory: WifiCategory;
 }
 
-function MakeWifiLinkedInfo(ssid: String, bssid: String, rssi: i32, band: i32, macAddress: String, connState: ConnState, supportedWifiCategory: WifiCategory): WifiLinkedInfo;
-
 struct IpInfo {
-    ipAddress: i32;
+    ipAddress: f64;
 }
-
-function MakeIpInfo(ipAddress: i32): IpInfo;
 
 struct Ipv6Info {
     linkIpv6Address: String;
 }
 
-function MakeIpv6Info(linkIpv6Address: String): Ipv6Info;
-
 struct StationInfo {
     macAddress: String;
 }
 
-function MakeStationInfo(macAddress: String): StationInfo;
-
 struct HotspotConfig {
     ssid: String;
     securityType: WifiSecurityType;
-    band: i32;
+    band: f64;
     preSharedKey: String;
 }
-
-function MakeHotspotConfig(ssid: String, securityType: WifiSecurityType, band: i32, preSharedKey: String): HotspotConfig;
 
 struct WifiP2pLinkedInfo {
     connectState: P2pConnectState;
@@ -148,12 +134,17 @@ struct WifiP2pDevice {
     deviceAddressType: DeviceAddressType;
     primaryDeviceType: String;
     deviceStatus: P2pDeviceStatus;
-    groupCapabilities: i32;
+    groupCapabilities: f64;
 }
 
 // 函数
 function IsConnected(): bool;
 function IsWifiActive(): bool;
+
+@gen_async("getLinkedInfo")
+@gen_promise("getLinkedInfo")
+function GetLinkedInfoSync(): WifiLinkedInfo;
+
 function GetSignalLevel(rssi: f64, band: f64): f64;
 function GetIpInfo(): IpInfo;
 function GetIpv6Info(): Ipv6Info;

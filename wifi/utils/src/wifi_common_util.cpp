@@ -534,12 +534,18 @@ bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPo
     }
     const int64_t initTime = wifiBeaconCheckInfoArray[0].timeStamp;
     const std::string initBssid = bssidArray[0];
+    const int initRssi = wifiBeaconCheckInfoArray[0].signal;
+    const unsigned int initRxBytes = wifiBeaconCheckInfoArray[0].rxBytes;    
     int accumulateTime = 0;
     for (size_t i = 0; i < wifiBeaconCheckInfoArray.size(); i++) {
         const auto &signalInfo = wifiBeaconCheckInfoArray[i];
         const std::string &bssid = bssidArray[i];
-        // 检查 ext 长度和 BSSID 是否一致
-        if (signalInfo.ext.size() < BEACON_LENGTH_RSSI || bssid != initBssid) {
+        // 检查 BSSID、RSSI 和 RxBytes 是否与初始值一致
+        if (initBssid != bssid || initRssi != signalInfo.signal || initRxBytes != signalInfo.rxBytes) {
+            return false;
+        }
+        // 检查 ext 长度
+        if (signalInfo.ext.size() < BEACON_LENGTH_RSSI) {
             return false;
         }
         // 检查 RSSI 是否无效

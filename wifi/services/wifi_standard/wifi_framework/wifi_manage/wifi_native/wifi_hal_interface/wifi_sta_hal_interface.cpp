@@ -30,7 +30,6 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr int HILINK_PRO_NETWORK = 4;
 static int GetInstId(const std::string &ifaceName)
 {
     int inst = INSTID_WLAN0;

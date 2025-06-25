@@ -1466,7 +1466,7 @@ int RouterSupportHiLinkByWifiInfo(const uint8_t *start, size_t len)
         if (id == HDI_EID_VENDOR_SPECIFIC) {
             HiLinkSectionNum |= CheckHiLinkSection(pos, elen);
             HiLinkOUISectionNum |= CheckHiLinkOUISection(pos, elen);
-            LOGI("RouterSupportHiLinkByWifiInfo HiLinkSectionNum=%{public}d  HiLinkOUISectionNum=%{public}d ",
+            LOGD("RouterSupportHiLinkByWifiInfo HiLinkSectionNum=%{public}d  HiLinkOUISectionNum=%{public}d ",
                 HiLinkSectionNum,
                 HiLinkOUISectionNum);
         }

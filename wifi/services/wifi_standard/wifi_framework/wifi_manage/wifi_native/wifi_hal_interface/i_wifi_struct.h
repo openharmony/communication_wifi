@@ -38,6 +38,7 @@ extern "C" {
 #define WIFI_MAX_CHIP_IDS 4096
 #define WIFI_MAX_WPA_STA_BUF_SIZE 2048
 
+#include <stdbool.h>
 /* IWifiIface */
 /*
  * This is a temporary definition. The empty structure compilation alarm needs
@@ -118,6 +119,7 @@ typedef struct ScanInfo {
     int maxRates;
     int extMaxRates;
     int isHiLinkNetwork;
+    bool isHiLinkProNetwork;
 } ScanInfo;
 
 typedef struct WifiNetworkInfo {

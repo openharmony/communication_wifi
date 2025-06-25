@@ -45,17 +45,28 @@ taihe_shared_library("wifiManager_taihe_native") { #调用taihe_shared_library�
   taihe_generated_file_path = "${taihe_generated_file_path_wifiManager}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
+  include_dirs = [
+    "$WIFI_ROOT_DIR/frameworks/ets/taihe/wifiManager/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
+  ]
+
   sources = get_target_outputs(":run_taihe")                                          
   sources += [
-    "./src/ani_constructor.cpp",
-    "./src/ohos.wifiManager.impl.cpp",
+    "src/ani_constructor.cpp",
+    "src/ohos.wifiManager.impl.cpp",
+    "src/wifi_callback_taihe.cpp",
+    "src/wifi_errorcode_taihe.cpp"
   ]
   deps = [
     ":run_taihe",
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk"
   ]
   external_deps = [
-    "c_utils:utils"
+    "c_utils:utils",
+    "hilog:libhilog",
+    "runtime_core:ani",
+    "runtime_core:libarkruntime",
+    "samgr:samgr_proxy",
   ]
 }
 

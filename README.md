@@ -10,6 +10,8 @@ WifiNetworkControlInfo WifiConfigCenter::GetNetworkControlInfo()
     return networkControlInfoRecord;
 }
 wifi_config_center 1561行localOnlyHotspotConfig_ = hotspotConfig;下面
+
+WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetNetworkControlInfo(networkControlInfo);删掉wifi_device_service_impl.cpp
 # communication\_wifi<a name="EN-US_TOPIC_0000001162030287"></a>
 
 -   [Introduction](#section11660541593)

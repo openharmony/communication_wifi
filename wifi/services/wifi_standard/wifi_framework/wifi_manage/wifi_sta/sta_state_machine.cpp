@@ -4176,7 +4176,7 @@ void StaStateMachine::HilinkSaveConfig(void)
         m_hilinkDeviceConfig.networkId = WifiSettings::GetInstance().GetNextNetworkId();
     }
     targetNetworkId_ = m_hilinkDeviceConfig.networkId;
-    WifiSettings::GetInstance().SetKeyMgmtBitSet(m_hilinkDeviceConfig);
+    WifiSettings::GetInstance().SetKeyMgmtBitset(m_hilinkDeviceConfig);
     WifiStaHalInterface::GetInstance().GetPskPassphrase("wlan0", m_hilinkDeviceConfig.preSharedKey);
     m_hilinkDeviceConfig.version = -1;
     if (!WifiSettings::GetInstance().EncryptionDeviceConfig(m_hilinkDeviceConfig)) {

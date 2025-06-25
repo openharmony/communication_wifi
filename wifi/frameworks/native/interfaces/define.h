@@ -134,5 +134,6 @@
 #endif
 
 #define WIFI_OEMINFO_MAC (1)
+#define HILINK_PRO_NETWORK (4)
 
 #endif

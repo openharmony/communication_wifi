@@ -2147,7 +2147,6 @@ ErrCode WifiDeviceServiceImpl::ReceiveNetworkControlInfo(const WifiNetworkContro
         return WIFI_OPT_FAILED;
     }
     AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
-    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetNetworkControlInfo(networkControlInfo);
     return WIFI_OPT_SUCCESS;
 }
 

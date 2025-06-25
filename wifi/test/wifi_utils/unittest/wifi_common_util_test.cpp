@@ -296,7 +296,7 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest02, TestSize.Level1)
     bool result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_FALSE(result);
     WifiSignalPollInfo signalPoll04;
-    signalPoll4.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
+    signalPoll04.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll04.signal = -55;
     result = IsBeaconLost(bssidArray, wifiBeaconCheckInfoArray);
     EXPECT_FALSE(result);

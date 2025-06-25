@@ -1,0 +1,80 @@
+# Copyright (C) 2025-2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+ 
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+import("//build/ohos/taihe_idl/taihe.gni")
+import("//foundation/communication/wifi/wifi/wifi.gni")    # 导入taihe.gni
+
+copy_taihe_idl("copy_wifi") {
+  sources = [ 
+    "./idl/ohos.wifi.taihe"
+  ]
+}
+
+subsystem_name = "communication"
+part_name = "wifi"
+taihe_generated_file_path_wifi = "$taihe_file_path/out/$subsystem_name/$part_name/wifi"
+
+ohos_taihe("run_taihe") {
+  taihe_generated_file_path = "${taihe_generated_file_path_wifi}"
+  deps = [ ":copy_wifi" ]
+  outputs = [
+    "$taihe_generated_file_path/src/ohos.wifi.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.wifi.abi.c",
+  ]
+}
+
+taihe_shared_library("wifi_taihe_native") { #调用taihe_shared_library模板编译so
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = true  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    debug = false
+  }
+  taihe_generated_file_path = "${taihe_generated_file_path_wifi}"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  sources = get_target_outputs(":run_taihe")                                          
+  sources += [
+    "./src/ani_constructor.cpp",
+    "./src/ohos.wifi.impl.cpp",
+  ]
+  deps = [
+    ":run_taihe",
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk"
+  ]
+}
+
+generate_static_abc("wifi_framework_abc") {                   #调用generate_static_abc编译abc
+  base_url = "${taihe_generated_file_path_wifi}"                             #base_url直接设置为taihe_generated_file_path
+  files = [ "${taihe_generated_file_path_wifi}/@ohos.wifi.ets" ]                #files传入生成的ets文件
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/wifi_framework_abc.abc"
+  dependencies = [ ":run_taihe" ]                                             #编译abc依赖太和工具链调用
+}
+
+ohos_prebuilt_etc("wifi_framework_etc") {                            #调用ohos_prebuilt_etc将abc拷贝到/system/framework下
+  source = "$target_out_dir/wifi_framework_abc.abc"           
+  module_install_dir = "framework"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  deps = [ ":wifi_framework_abc" ]                                         #拷贝abc依赖编译abc
+}
+
+group("wifi_framework_taihe") {
+  deps = [
+    ":wifi_framework_etc",
+    ":wifi_taihe_native"
+  ]                                        #单独运行run_taihe目标即可只调用工具链并生成对应代码
+}

@@ -421,6 +421,10 @@ ErrCode ScanService::ScanControlInner(ScanType scanType)
             WIFI_LOGW("internal scan not allow by ActionListen condition");
             return WIFI_OPT_FAILED;
         }
+        if (!AllowScanByGameScene()) {
+            WIFI_LOGW("internal scan not allow by Game Scene");
+            return WIFI_OPT_FAILED;
+        }
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -1617,6 +1621,13 @@ ErrCode ScanService::AllowExternScan()
         return WIFI_OPT_FAILED;
     }
 
+    if (!AllowScanByGameScene()) {
+        WIFI_LOGW("extern scan not allow by gamescene scan control.");
+        RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::GAME_SCENE);
+        return WIFI_OPT_FAILED;
+    }
+
     WIFI_LOGI("extern scan has allowed");
     return WIFI_OPT_SUCCESS;
 }
@@ -1633,6 +1644,11 @@ ErrCode ScanService::AllowSystemTimerScan()
     if (!AllowScanByDisableScanCtrl()) {
         WIFI_LOGW("system timer scan not allow by disable scan control.");
         WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::SCAN_DISABLE));
+        return WIFI_OPT_FAILED;
+    }
+    if (!AllowScanByGameScene()) {
+        WIFI_LOGW("system timer scan not allow by gamescene scan control.");
+        WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::GAME_SCENE));
         return WIFI_OPT_FAILED;
     }
     /* The network is connected and cannot be automatically switched. */
@@ -2765,6 +2781,18 @@ bool ScanService::AllowScanByActionListen()
         return false;
     }
 #endif
+    return true;
+}
+
+bool ScanService::AllowScanByGameScene()
+{
+    WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
+    if (NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_END &&
+        NetworkControlInfo.state != GameSceneId::MSG_GAME_STATE_BACKGROUND) {
+        WIFI_LOGI(
+            "Scan is not allowed in GameScene condition AllowScanByGameScene = %{public}d", NetworkControlInfo.state);
+        return false;
+    }
     return true;
 }
 

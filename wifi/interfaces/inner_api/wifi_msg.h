@@ -85,6 +85,15 @@ enum WifiRestrictedType {
     MDM_INVALID_LIST = 2
 };
 
+enum GameSceneId : int {
+    MSG_GAME_STATE_START = 0,
+    MSG_GAME_STATE_END = 1,
+    MSG_GAME_ENTER_PVP_BATTLE = 2,
+    MSG_GAME_EXIT_PVP_BATTLE = 3,
+    MSG_GAME_STATE_FOREGROUND = 4,
+    MSG_GAME_STATE_BACKGROUND = 5,
+};
+ 
 enum class SupplicantState {
     DISCONNECTED = 0,
     INTERFACE_DISABLED = 1,

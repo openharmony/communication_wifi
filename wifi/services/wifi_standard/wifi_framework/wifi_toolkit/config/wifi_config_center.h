@@ -389,6 +389,10 @@ public:
      * @param hotspotConfig  config value
      */
     void SetLocalOnlyHotspotConfig(const HotspotConfig &hotspotConfig);
+     
+    void SetNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo);
+ 
+    WifiNetworkControlInfo GetNetworkControlInfo();
 private:
     WifiConfigCenter();
     std::string GetPairMacAddress(std::map<WifiMacAddrInfo, std::string>& macAddrInfoMap,
@@ -436,7 +440,8 @@ private:
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
     bool isNeedFastScan = false;
-
+    WifiNetworkControlInfo networkControlInfoRecord;
+    
     // AP
     std::mutex mApMutex;
     std::atomic<bool> mSoftapToggled {false};

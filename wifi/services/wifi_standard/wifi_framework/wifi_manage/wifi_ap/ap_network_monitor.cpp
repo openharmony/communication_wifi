@@ -18,9 +18,9 @@
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
 
-DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApNetworkMonitor");
 namespace OHOS {
 namespace Wifi {
+DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApNetworkMonitor");
 
 const int AP_SERVICE_ID = 0;
 const int AP_NET_ERROR = 1;

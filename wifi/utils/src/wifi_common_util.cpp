@@ -87,6 +87,14 @@ static constexpr uint8_t STEP_2BIT = 2;
 static constexpr uint8_t HEX_OFFSET = 4;
 static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
 
+static int64_t g_beaconLostTime = 0;
+static std::string g_beaconLostBssid = "";
+static int g_beaconLostRssi = 0;
+static unsigned int g_beaconLostRxBytes = 0;
+static int64_t g_beaconAbTime = 0;
+static std::string g_beaconAbBssid = "";
+static std::vector<uint8_t> g_beaconAbRssiArr(BEACON_LENGTH_RSSI);
+
 constexpr int IP_ADDRESS_FIRST_BYTE_OFFSET = 24;
 constexpr int IP_ADDRESS_SECOND_BYTE_OFFSET = 16;
 constexpr int IP_ADDRESS_THIRD_BYTE_OFFSET = 8;
@@ -522,47 +530,67 @@ bool IsOtherVapConnect()
     return p2pOrHmlConnected && hotspotEnable;
 }
 
-bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray)
+bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo)
 {
-    if (wifiBeaconCheckInfoArray.empty() || bssidArray.empty()) {
-        WIFI_LOGE("Empty array");
+    const int64_t checkTime = checkInfo.timeStamp;
+    const std::string checkBssid = bssid;
+    const int checkRssi = checkInfo.signal;
+    const unsigned int checkRxBytes = checkInfo.rxBytes;
+    // 检查 BSSID、RSSI 和 RxBytes 是否与初始值一致,ext 长度
+    if (g_beaconLostBssid != bssid || g_beaconLostRssi != checkRssi || g_beaconLostRxBytes != checkRxBytes
+        || checkInfo.ext.size() < BEACON_LENGTH_RSSI) {
+        g_beaconLostBssid = bssid;
+        g_beaconLostRssi = checkRssi;
+        g_beaconLostRxBytes = checkRxBytes;
+        g_beaconLostTime = checkTime;
         return false;
     }
-    if (wifiBeaconCheckInfoArray.size() != bssidArray.size()) {
-        WIFI_LOGE("Array sizes are inconsistent");
+    // 检查 RSSI 是否无效
+    bool isInvalid = std::all_of(checkInfo.ext.begin(), checkInfo.ext.begin() + BEACON_LENGTH_RSSI,
+        [](uint8_t num) {
+            int8_t val = static_cast<int8_t>(num);
+            return val == BEACON_LOST_RSSI0 || val == BEACON_LOST_RSSI1 || val == 0;
+            })
+            && std::any_of(checkInfo.ext.begin(), checkInfo.ext.begin() + BEACON_LENGTH_RSSI,
+            [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI0; });
+    if (!isInvalid) {
+        g_beaconLostTime = checkTime;
         return false;
     }
-    const int64_t initTime = wifiBeaconCheckInfoArray[0].timeStamp;
-    const std::string initBssid = bssidArray[0];
-    const int initRssi = wifiBeaconCheckInfoArray[0].signal;
-    const unsigned int initRxBytes = wifiBeaconCheckInfoArray[0].rxBytes;
-    int accumulateTime = 0;
-    for (size_t i = 0; i < wifiBeaconCheckInfoArray.size(); i++) {
-        const auto &signalInfo = wifiBeaconCheckInfoArray[i];
-        const std::string &bssid = bssidArray[i];
-        // 检查 BSSID、RSSI 和 RxBytes 是否与初始值一致
-        if (initBssid != bssid || initRssi != signalInfo.signal || initRxBytes != signalInfo.rxBytes) {
-            return false;
+    int64_t accumulateTime = checkTime - g_beaconLostTime;
+    if (accumulateTime >= SIGNAL_RECORD_12S) {
+        g_beaconLostTime = checkTime;
+        return true;
+    }
+    return false;
+}
+
+bool IsBeaconAbnormal(std::string bssid, WifiSignalPollInfo checkInfo)
+{
+    const int64_t checkTime = checkInfo.timeStamp;
+    const std::string checkBssid = bssid;
+    // 检查 BSSID是否与初始值一致,ext 长度
+    if (g_beaconAbBssid != bssid || checkInfo.ext.size() < BEACON_LENGTH_RSSI) {
+        g_beaconAbBssid = bssid;
+        g_beaconAbTime = checkTime;
+        return false;
+    }
+    // 检查未平滑rssi数组是否相等
+    bool areVectorsEqual = true;
+    for (int i = 0; i < BEACON_LENGTH_RSSI; i++) {
+        if (g_beaconAbRssiArr[i] != checkInfo.ext[i]) {
+            g_beaconAbRssiArr[i] = checkInfo.ext[i];
+            areVectorsEqual = false;
         }
-        // 检查 ext 长度
-        if (signalInfo.ext.size() < BEACON_LENGTH_RSSI) {
-            return false;
-        }
-        // 检查 RSSI 是否无效
-        bool isInvalid = std::all_of(signalInfo.ext.begin(), signalInfo.ext.begin() + BEACON_LENGTH_RSSI,
-            [](uint8_t num) {
-                int8_t val = static_cast<int8_t>(num);
-                return val == BEACON_LOST_RSSI0 || val == BEACON_LOST_RSSI1 || val == 0;
-                })
-                && std::any_of(signalInfo.ext.begin(), signalInfo.ext.begin() + BEACON_LENGTH_RSSI,
-                [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI0; });
-        if (!isInvalid) {
-            return false;
-        }
-        accumulateTime = initTime - signalInfo.timeStamp;
-        if (accumulateTime >= SIGNAL_RECORD_12S) {
-            return true;
-        }
+    }
+    if (!areVectorsEqual) {
+        g_beaconAbTime = checkTime;
+        return false;
+    }
+    int64_t accumulateTime = checkTime - g_beaconAbTime;
+    if (accumulateTime >= SIGNAL_RECORD_5S) {
+        g_beaconAbTime = checkTime;
+        return true;
     }
     return false;
 }

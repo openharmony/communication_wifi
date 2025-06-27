@@ -533,16 +533,18 @@ bool IsOtherVapConnect()
 bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo)
 {
     const int64_t checkTime = checkInfo.timeStamp;
-    const std::string checkBssid = bssid;
     const int checkRssi = checkInfo.signal;
     const unsigned int checkRxBytes = checkInfo.rxBytes;
+
     // 检查 BSSID、RSSI 和 RxBytes 是否与初始值一致,ext 长度
-    if (g_beaconLostBssid != bssid || g_beaconLostRssi != checkRssi || g_beaconLostRxBytes != checkRxBytes
-        || checkInfo.ext.size() < BEACON_LENGTH_RSSI) {
+    if (g_beaconLostBssid != bssid || g_beaconLostRssi != checkRssi || g_beaconLostRxBytes != checkRxBytes) {
         g_beaconLostBssid = bssid;
         g_beaconLostRssi = checkRssi;
         g_beaconLostRxBytes = checkRxBytes;
-        g_beaconLostTime = checkTime;
+        g_beaconLostTime = 0;
+    }
+    if (checkInfo.ext.size() < BEACON_LENGTH_RSSI) {
+        g_beaconLostTime = 0;
         return false;
     }
     // 检查 RSSI 是否无效
@@ -554,6 +556,10 @@ bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo)
             && std::any_of(checkInfo.ext.begin(), checkInfo.ext.begin() + BEACON_LENGTH_RSSI,
             [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI0; });
     if (!isInvalid) {
+        g_beaconLostTime = 0;
+        return false;
+    }
+    if (g_beaconLostTime == 0) {
         g_beaconLostTime = checkTime;
         return false;
     }
@@ -568,11 +574,13 @@ bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo)
 bool IsBeaconAbnormal(std::string bssid, WifiSignalPollInfo checkInfo)
 {
     const int64_t checkTime = checkInfo.timeStamp;
-    const std::string checkBssid = bssid;
     // 检查 BSSID是否与初始值一致,ext 长度
-    if (g_beaconAbBssid != bssid || checkInfo.ext.size() < BEACON_LENGTH_RSSI) {
+    if (g_beaconAbBssid != bssid) {
         g_beaconAbBssid = bssid;
-        g_beaconAbTime = checkTime;
+        g_beaconAbTime = 0;
+    }
+    if (checkInfo.ext.size() < BEACON_LENGTH_RSSI) {
+        g_beaconAbTime = 0;
         return false;
     }
     // 检查未平滑rssi数组是否相等
@@ -584,6 +592,10 @@ bool IsBeaconAbnormal(std::string bssid, WifiSignalPollInfo checkInfo)
         }
     }
     if (!areVectorsEqual) {
+        g_beaconAbTime = checkTime;
+        return false;
+    }
+    if (g_beaconAbTime == 0) {
         g_beaconAbTime = checkTime;
         return false;
     }

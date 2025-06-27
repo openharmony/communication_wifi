@@ -55,10 +55,12 @@ inline const uint8_t P2P_SUB_SYSTEM_ID = 2;
 inline const int SYSTEM_OFFSET = 21;
 inline const int SUB_SYSTEM_OFFSET = 16;
 inline const int SIGNAL_RECORD_12S = 12;
+inline const int SIGNAL_RECORD_5S = 5;
 inline const int BEACON_LENGTH_RSSI = 10;
 inline const int8_t BEACON_LOST_RSSI0 = -128;
 inline const int8_t BEACON_LOST_RSSI1 = 127;
 inline const int SIGNAL_LEVEL_TWO = 2;
+inline const int BEACON_ABNORMAL = 2;
 
 enum BeaconLostType : int32_t {
     SIGNAL_LEVEL_LOW = 0,
@@ -330,7 +332,8 @@ int FrequencyToChannel(int freq);
  */
 int ChannelToFrequency(int channel);
 bool IsOtherVapConnect();
-bool IsBeaconLost(std::vector<std::string> &bssidArray, std::vector<WifiSignalPollInfo> &wifiBeaconCheckInfoArray);
+bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo);
+bool IsBeaconAbnormal(std::string bssid, WifiSignalPollInfo checkInfo);
 int HexString2Byte(const char *hex, uint8_t *buf, size_t len);
 void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t hexstrLen);
 bool DecodeBase64(const std::string &input, std::vector<uint8_t> &output);

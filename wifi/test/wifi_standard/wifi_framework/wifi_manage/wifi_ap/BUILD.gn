@@ -140,7 +140,6 @@ ohos_unittest("WifiApServiceTest") {
     "ability_base:base",
     "ability_base:want",
     "c_utils:utils",
-    "common_event_service:cesfwk_core",
     "dhcp:dhcp_sdk",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -152,6 +151,10 @@ ohos_unittest("WifiApServiceTest") {
     "netmanager_base:net_conn_manager_if",
     "samgr:samgr_proxy",
   ]
+
+   if(ohos_indep_compiler_enable){
+    external_deps += ["common_event_service:cesfwk_core"]
+  }
 
   if (defined(global_parts_info.powermgr_battery_manager)) {
     external_deps += [ "battery_manager:batterysrv_client" ]

@@ -57,6 +57,7 @@ ConcreteMangerMachine::~ConcreteMangerMachine()
     ParsePointer(pSemiActiveState);
     WIFI_LOGE("set wifi stoping state is false");
     WifiConfigCenter::GetInstance().SetWifiStopState(false);
+    StopTimer(CONCRETE_CMD_STOP_MACHINE_RETRY);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
         WIFI_LOGW("destroy ConcreteMangerMachine RemoveStaIface ifaceName:%{public}s, instId:%{public}d",
@@ -168,6 +169,12 @@ bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
             ConcreteManagerRole targetRole = static_cast<ConcreteManagerRole>(role);
             pConcreteMangerMachine->SetTargetRole(targetRole);
             break;
+        }
+        case CONCRETE_CMD_STOP_MACHINE_RETRY: {
+            ret = EXECUTED;
+            WIFI_LOGI("CONCRETE_CMD_STOP_MACHINE_RETRY");
+            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+            ins->HandleStopConcretRetry();
         }
         default:
             WIFI_LOGI("DefaultState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
@@ -523,6 +530,7 @@ void ConcreteMangerMachine::HandleStaStop()
 {
     if (WifiConfigCenter::GetInstance().GetWifiStopState()) {
         WIFI_LOGE("Sta stoped remove manager.");
+        StartTimer(CONCRETE_CMD_STOP_MACHINE_RETRY, CONCRETE_STOP_TIMEOUT);
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStopScanOnly(mid, true);
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
@@ -564,6 +572,7 @@ void ConcreteMangerMachine::ReportClose()
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
+        WIFI_LOGI("ReportClose onStopped");
         mcb.onStopped(mid);
     } else {
         mcb.onRemoved(mid);

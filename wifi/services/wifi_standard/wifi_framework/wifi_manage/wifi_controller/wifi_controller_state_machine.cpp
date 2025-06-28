@@ -200,9 +200,14 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             msg->GetParam1() == INSTID_WLAN0 ? HandleStaStartFailure(INSTID_WLAN0) :
                 pWifiControllerMachine->multiStaManagers.RemoveManager(INSTID_WLAN1);
             break;
-        case CMD_CONCRETE_STOPPED:
+        case CMD_CONCRETE_STOPPED: {
+            if (!pWifiControllerMachine->concreteManagers.IdExist(INSTID_WLAN0)) {
+                WIFI_LOGI("HandleStopConcretRetry concreteManagers not IdExist");
+                break;
+            }
             pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0);
             break;
+            }
         case CMD_MULTI_STA_STOPPED:
             pWifiControllerMachine->multiStaManagers.RemoveManager(INSTID_WLAN1);
             break;
@@ -815,6 +820,12 @@ void WifiControllerMachine::HandleStaStartSuccess(int id)
     concreteManagers.SendMessageToAll(CONCRETE_CMD_STA_START);
 }
 
+void WifiControllerMachine::HandleStopConcretRetry()
+{
+    WIFI_LOGE("HandleStopConcretRetry SendMessage CMD_CONCRETE_STOPPED");
+    SendMessage(CMD_CONCRETE_STOPPED);
+}
+ 
 void WifiControllerMachine::HandleWifi2Start(int id)
 {
     multiStaManagers.SendMessageToAll(MULTI_STA_CMD_STARTED);

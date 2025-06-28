@@ -564,6 +564,7 @@ void ConcreteMangerMachine::ReportClose()
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!ifaceName.empty()) {
+        WIFI_LOGI("ReportClose onStopped");
         mcb.onStopped(mid);
     } else {
         mcb.onRemoved(mid);

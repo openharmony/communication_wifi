@@ -813,10 +813,12 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         if (shouldStopTimer) {
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
         }
-        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
+        int curNetworkId = (pStaStateMachine->linkedInfo.networkId == INVALID_NETWORK_ID) ?
+            pStaStateMachine->targetNetworkId_ : pStaStateMachine->linkedInfo.networkId;
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(curNetworkId,
             DisabledReason::DISABLED_DISASSOC_REASON, reason);
         if (BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, reason, locallyGenerated)) {
-            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
+            BlockConnectService::GetInstance().UpdateNetworkSelectStatus(curNetworkId,
                 DisabledReason::DISABLED_CONSECUTIVE_FAILURES);
         }
         WriteWifiAbnormalDisconnectHiSysEvent(reason, locallyGenerated);

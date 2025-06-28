@@ -207,7 +207,7 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             }
             pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0);
             break;
-            }
+        }
         case CMD_MULTI_STA_STOPPED:
             pWifiControllerMachine->multiStaManagers.RemoveManager(INSTID_WLAN1);
             break;

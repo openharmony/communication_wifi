@@ -175,6 +175,7 @@ bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
             WIFI_LOGI("CONCRETE_CMD_STOP_MACHINE_RETRY");
             auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
             ins->HandleStopConcretRetry();
+            break;
         }
         default:
             WIFI_LOGI("DefaultState-msgCode=%{public}d not handled.\n", msg->GetMessageName());

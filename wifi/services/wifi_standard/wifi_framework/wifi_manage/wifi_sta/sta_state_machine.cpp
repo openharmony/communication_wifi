@@ -3173,10 +3173,20 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4ResultExt(IpInfo &ipInfo, I
     ipInfo.secondDns = IpTools::ConvertIpv4Address(result->strOptDns2);
     ipInfo.serverIp = IpTools::ConvertIpv4Address(result->strOptServerId);
     ipInfo.leaseDuration = result->uOptLeasetime;
+    ipInfo.dnsAddr.clear();
+    if (ipInfo.primaryDns != 0) {
+        ipInfo.dnsAddr.push_back(ipInfo.primaryDns);
+    }
+    if (ipInfo.secondDns != 0) {
+        ipInfo.dnsAddr.push_back(ipInfo.secondDns);
+    }
     if (result->dnsList.dnsNumber > 0 && result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
-        ipInfo.dnsAddr.clear();
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
             unsigned int ipv4Address = IpTools::ConvertIpv4Address(result->dnsList.dnsAddr[i]);
+            if (std::find(ipInfo.dnsAddr.begin(), ipInfo.dnsAddr.end(), ipv4Address) != ipInfo.dnsAddr.end()) {
+                WIFI_LOGD("TryToSaveIpV4ResultExt dnsAddr already exists, skip it.");
+                continue;
+            }
             ipInfo.dnsAddr.push_back(ipv4Address);
         }
     }
@@ -3250,10 +3260,19 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     ipv6Info.secondDns = result->strOptDns2;
     ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
     ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
+    ipv6Info.dnsAddr.clear();
+    if (ipv6Info.primaryDns.length() > 0 && ipv6Info.primaryDns != "0") {
+        ipv6Info.dnsAddr.push_back(ipv6Info.primaryDns);
+    }
+    if (ipv6Info.secondDns.length() > 0 && ipv6Info.secondDns != "0") {
+        ipv6Info.dnsAddr.push_back(ipv6Info.secondDns);
+    }
     if (result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
-        ipv6Info.dnsAddr.clear();
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
-            ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
+            if (std::find(ipv6Info.dnsAddr.begin(), ipv6Info.dnsAddr.end(), result->dnsList.dnsAddr[i]) ==
+                ipv6Info.dnsAddr.end()) {
+                ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
+            }
         }
         WIFI_LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}zu", ipv6Info.dnsAddr.size());
     }
@@ -3374,10 +3393,20 @@ void StaStateMachine::DhcpResultNotify::DealDhcpOfferResult()
         ipInfo.secondDns = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptDns2);
         ipInfo.serverIp = IpTools::ConvertIpv4Address(DhcpOfferInfo.strOptServerId);
         ipInfo.leaseDuration = DhcpOfferInfo.uOptLeasetime;
+        ipInfo.dnsAddr.clear();
+        if (ipInfo.primaryDns != 0) {
+            ipInfo.dnsAddr.push_back(ipInfo.primaryDns);
+        }
+        if (ipInfo.secondDns != 0) {
+            ipInfo.dnsAddr.push_back(ipInfo.secondDns);
+        }
         if (DhcpOfferInfo.dnsList.dnsNumber > 0 && DhcpOfferInfo.dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
-            ipInfo.dnsAddr.clear();
             for (uint32_t i = 0; i < DhcpOfferInfo.dnsList.dnsNumber; i++) {
                 uint32_t ipv4Address = IpTools::ConvertIpv4Address(DhcpOfferInfo.dnsList.dnsAddr[i]);
+                if (std::find(ipInfo.dnsAddr.begin(), ipInfo.dnsAddr.end(), ipv4Address) != ipInfo.dnsAddr.end()) {
+                    WIFI_LOGD("DealDhcpOfferResult dnsAddr already exists, skip it.");
+                    continue;
+                }
                 ipInfo.dnsAddr.push_back(ipv4Address);
             }
         }

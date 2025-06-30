@@ -80,6 +80,7 @@ private:
     bool IsSettingSecurityDetectOn();
     bool IsSecurityDetectTimeout(const int &networkId);
     ErrCode SecurityDetectResult(const std::string &devId, uint32_t modelId, const std::string &param, bool &result);
+    ErrCode SecurityModelJsonResult(SecurityModelResult model, bool &result);
     void SecurityDetect(const WifiLinkedInfo &info);
     void PopupNotification(int status, int networkid);
     void ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, Json::Value &root);

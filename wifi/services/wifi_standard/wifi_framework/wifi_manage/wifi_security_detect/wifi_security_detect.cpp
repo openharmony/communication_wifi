@@ -42,6 +42,7 @@ const int MIN_5G_FREQUENCY = 5160;
 const int MAX_5G_FREQUENCY = 5865;
 const uint32_t securityGuardModelID = 3001000011;
 const int NUM24 = 24;
+#define SECURITY_WAITING_TIME 500
 
 WifiSecurityDetect::WifiSecurityDetect()
 {
@@ -177,7 +178,16 @@ ErrCode WifiSecurityDetect::SecurityDetectResult(
         return WIFI_OPT_FAILED;
     }
 
-    SecurityModelResult model = future.get();
+    if (future.wait_for(std::chrono::milliseconds(SECURITY_WAITING_TIME)) == std::future_status::ready) {
+        SecurityModelResult model = future.get();
+        return SecurityModelJsonResult(model, result);
+    } else {
+        return WIFI_OPT_FAILED;
+    }
+}
+
+ErrCode WifiSecurityDetect::SecurityModelJsonResult(SecurityModelResult model, bool &result)
+{
     Json::Value root;
     Json::Reader reader;
     bool parsingSuccess = reader.parse(model.result, root);
@@ -314,7 +324,7 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
             return WIFI_OPT_FAILED;
         }
         WIFI_LOGI("PopupNotification result is %{public}d", result);
-        config.isSecureWifi = result ? true : false;
+        config.isSecureWifi = result;
         config.lastDetectTime = time(0);
         PopupNotification(config.isSecureWifi ? WifiNotification::CLOSE : WifiNotification::OPEN, info.networkId);
         WifiSettings::GetInstance().AddDeviceConfig(config);

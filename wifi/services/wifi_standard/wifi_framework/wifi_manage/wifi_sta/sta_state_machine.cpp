@@ -4027,7 +4027,7 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
         if (callBackItem.second.OnWifiHalSignalInfoChange != nullptr) {
             callBackItem.second.OnWifiHalSignalInfoChange(signalInfo);
         }
-        if (callBackItem.second.OnSignalPollReport != nullptr) {
+        if (callBackItem.second.OnSignalPollReport != nullptr && linkedInfo.wifiLinkType != WifiLinkType::WIFI7_EMLSR) {
             callBackItem.second.OnSignalPollReport(linkedInfo.bssid, lastSignalLevel_, m_instId);
         }
     }

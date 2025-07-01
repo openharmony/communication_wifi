@@ -96,6 +96,8 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     return WIFI_OPT_SUCCESS;
 }
 
+// Prerequisites: Flight mode must be turned on
+// If flight mode is not turned on, there is no need to call this interface, and can directly enable the personal hotspot.
 ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
 {
     WIFI_LOGI("IsOpenSoftApAllowed enter");
@@ -111,10 +113,6 @@ ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsOpenSoftApAllowed:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
-    }
-    if (WifiConfigCenter::GetInstance().GetAirplaneModeState() != MODE_STATE_OPEN) {
-        isSupported = true;
-        return WIFI_OPT_SUCCESS;
     }
     long features = 0;
     WifiManager::GetInstance().GetSupportedFeatures(features);

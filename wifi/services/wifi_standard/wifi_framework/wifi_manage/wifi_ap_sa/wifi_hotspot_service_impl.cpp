@@ -96,8 +96,6 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     return WIFI_OPT_SUCCESS;
 }
 
-// Prerequisites: Flight mode must be turned on
-// If flight mode is not turned on, there is no need to call this interface, and can directly enable the personal hotspot.
 ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
 {
     WIFI_LOGI("IsOpenSoftApAllowed enter");

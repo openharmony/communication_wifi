@@ -128,7 +128,7 @@ public:
         pStaStateMachine->pInitState->GoOutState();
     }
 
-    void InitStateExeMsgSuccess()
+    void ClosedStateExeMsgSuccess()
     {
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
         EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(0));
@@ -140,7 +140,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).Times(testing::AtLeast(0));
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_SVR_CMD_STA_ENABLE_STA);
-        EXPECT_TRUE(pStaStateMachine->pInitState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pStaStateMachine->pClosedState->ExecuteStateMsg(msg));
     }
 
     void InitStateExeMsgFail1()
@@ -189,7 +189,7 @@ public:
             .WillRepeatedly(DoAll(SetArgReferee<0>(results), Return(0)));
         EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->pInitState->StartWifiProcess();
+        pStaStateMachine->pClosedState->StartWifiProcess();
     }
 
     void StartWifiProcessFail2()
@@ -199,7 +199,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->pInitState->StartWifiProcess();
+        pStaStateMachine->pClosedState->StartWifiProcess();
     }
 
     void StartWifiProcessFail1()
@@ -217,7 +217,7 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), SetRealMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->pInitState->StartWifiProcess();
+        pStaStateMachine->pClosedState->StartWifiProcess();
     }
 
     void StopWifiProcessSuccess1()
@@ -228,7 +228,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->pInitState->StopWifiProcess();
+        pStaStateMachine->pClosedState->StopWifiProcess();
     }
 
     void StopWifiProcessSuccess2()
@@ -238,7 +238,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetMacAddress(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->pInitState->StopWifiProcess();
+        pStaStateMachine->pClosedState->StopWifiProcess();
     }
 
     void StopWifiProcessSuccess3()
@@ -250,7 +250,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->pInitState->StopWifiProcess();
+        pStaStateMachine->pClosedState->StopWifiProcess();
     }
 
     void StopWifiProcessFail()
@@ -261,7 +261,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
-        pStaStateMachine->pInitState->StopWifiProcess();
+        pStaStateMachine->pClosedState->StopWifiProcess();
     }
 
     void InitStaSMHandleMapSuccess()
@@ -1870,9 +1870,9 @@ HWTEST_F(StaStateMachineTest, InitStateGoOutStateSuccess, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(StaStateMachineTest, InitStateExeMsgSuccess, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, ClosedStateExeMsgSuccess, TestSize.Level1)
 {
-    InitStateExeMsgSuccess();
+    ClosedStateExeMsgSuccess();
 }
 
 HWTEST_F(StaStateMachineTest, InitStateExeMsgFail1, TestSize.Level1)

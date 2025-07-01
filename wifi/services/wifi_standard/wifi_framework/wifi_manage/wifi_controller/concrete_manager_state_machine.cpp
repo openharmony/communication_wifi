@@ -49,6 +49,7 @@ ConcreteMangerMachine::ConcreteMangerMachine()
 ConcreteMangerMachine::~ConcreteMangerMachine()
 {
     WIFI_LOGE("~ConcreteMangerMachine");
+    StopTimer(CONCRETE_CMD_STOP_MACHINE_RETRY);
     StopHandlerThread();
     ParsePointer(pDefaultState);
     ParsePointer(pIdleState);
@@ -167,6 +168,13 @@ bool ConcreteMangerMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg
             int role = msg->GetParam1();
             ConcreteManagerRole targetRole = static_cast<ConcreteManagerRole>(role);
             pConcreteMangerMachine->SetTargetRole(targetRole);
+            break;
+        }
+        case CONCRETE_CMD_STOP_MACHINE_RETRY: {
+            ret = EXECUTED;
+            WIFI_LOGI("CONCRETE_CMD_STOP_MACHINE_RETRY");
+            auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+            ins->HandleStopConcretRetry();
             break;
         }
         default:
@@ -527,6 +535,7 @@ void ConcreteMangerMachine::HandleStaStop()
         if (ret != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Stop scanonly failed ret = %{public}d", ret);
         }
+        StartTimer(CONCRETE_CMD_STOP_MACHINE_RETRY, CONCRETE_STOP_TIMEOUT);
         return ReportClose();
     }
     if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY)) {

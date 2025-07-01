@@ -224,6 +224,27 @@ public:
         groupInfo.SetOwner(owner);
         pP2pStateMachine->groupManager.AddGroup(groupInfo);
     }
+    void AddGroupManager4()
+    {
+        WifiP2pGroupInfo groupInfo;
+        groupInfo.SetNetworkId(1);
+        groupInfo.SetGroupName("AAA");
+        groupInfo.SetIsGroupOwner(true);
+        WifiP2pDevice owner;
+        groupInfo.SetOwner(owner);
+        pP2pStateMachine->groupManager.AddGroup(groupInfo);
+    }
+    void AddGroupManager5()
+    {
+        WifiP2pGroupInfo groupInfo;
+        groupInfo.SetNetworkId(2);
+        groupInfo.SetGroupName("BBB");
+        groupInfo.SetIsGroupOwner(true);
+        groupInfo.SetPassphrase("xxxxxxxx");
+        WifiP2pDevice owner;
+        groupInfo.SetOwner(owner);
+        pP2pStateMachine->groupManager.AddGroup(groupInfo);
+    }
     void WarpHandlerDiscoverPeers()
     {
         pP2pStateMachine->HandlerDiscoverPeers();
@@ -394,6 +415,14 @@ public:
     void WarpWakeUpScreenSaver()
     {
         pP2pStateMachine->WakeUpScreenSaver();
+    }
+    void WarpFilterInvalidGroup() const
+    {
+        pP2pStateMachine->FilterInvalidGroup();
+    }
+    void WarpGroupClearAll() const
+    {
+        pP2pStateMachine->groupManager.ClearAll();
     }
 };
 
@@ -779,6 +808,21 @@ HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand3, TestSize.Level1)
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(freqList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     WarpGetAvailableFreqByBand(band);
+}
+
+HWTEST_F(P2pStateMachineTest, FilterInvalidGroup1, TestSize.Level1)
+{
+    WarpGroupClearAll();
+    AddGroupManager4();
+    AddGroupManager5();
+    WarpFilterInvalidGroup();
+}
+
+HWTEST_F(P2pStateMachineTest, FilterInvalidGroup2, TestSize.Level1)
+{
+    WarpGroupClearAll();
+    AddGroupManager4();
+    WarpFilterInvalidGroup();
 }
 
 HWTEST_F(P2pStateMachineTest, SetGroupConfig1, TestSize.Level1)

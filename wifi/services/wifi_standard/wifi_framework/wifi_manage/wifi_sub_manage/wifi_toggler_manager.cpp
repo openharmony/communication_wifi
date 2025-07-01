@@ -223,7 +223,6 @@ void WifiTogglerManager::InitRptCallback()
 void WifiTogglerManager::DealConcreateStop(int id)
 {
     if (pWifiControllerMachine) {
-        WIFI_LOGI("SendMessage msg is  CMD_CONCRETE_STOPPED");
         pWifiControllerMachine->SendMessage(CMD_CONCRETE_STOPPED, id);
     }
 }
@@ -273,7 +272,6 @@ void WifiTogglerManager::DealRptStartFailure(int id)
 void WifiTogglerManager::DealClientRemoved(int id)
 {
     if (pWifiControllerMachine) {
-        WIFI_LOGI("SendMessage msg is  CMD_CONCRETECLIENT_REMOVED");
         pWifiControllerMachine->SendMessage(CMD_CONCRETECLIENT_REMOVED, id);
     }
 }

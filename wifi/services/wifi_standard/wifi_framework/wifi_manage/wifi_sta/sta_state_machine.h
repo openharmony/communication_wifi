@@ -178,7 +178,7 @@ public:
      */
     class ClosedState : public State {
     public:
-        explicit ClosedState();
+        explicit ClosedState(StaStateMachine *staStateMachine);
         ~ClosedState() override;
         void GoInState() override;
         void GoOutState() override;

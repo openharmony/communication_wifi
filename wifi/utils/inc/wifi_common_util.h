@@ -67,6 +67,21 @@ enum BeaconLostType : int32_t {
     SIGNAL_LEVEL_HIGH = 1
 };
 
+struct BeaconLostInfo {
+    int64_t time;
+    int cnt;
+    std::string bssid;
+    int rssi;
+    unsigned int rxBytes;
+};
+
+struct BeaconAbnormalInfo {
+    int64_t time;
+    int cnt;
+    std::string bssid;
+    std::vector<uint8_t> rssiArr;
+};
+
 /* StaCallBackNameEventIdMap */
 static std::map<std::string, int> g_staCallBackNameEventIdMap = {
     { EVENT_STA_POWER_STATE_CHANGE, WIFI_CBK_MSG_STATE_CHANGE },

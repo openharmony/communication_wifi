@@ -87,15 +87,9 @@ static constexpr uint8_t STEP_2BIT = 2;
 static constexpr uint8_t HEX_OFFSET = 4;
 static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
 
-static int64_t g_beaconLostTime = 0;
-static int g_beaconLostCnt = 0;
-static std::string g_beaconLostBssid = "";
-static int g_beaconLostRssi = 0;
-static unsigned int g_beaconLostRxBytes = 0;
-static int64_t g_beaconAbTime = 0;
-static int g_beaconAbCnt = 0;
-static std::string g_beaconAbBssid = "";
-static std::vector<uint8_t> g_beaconAbRssiArr(BEACON_LENGTH_RSSI);
+static BeaconLostInfo g_beaconLostInfo = {0, 0, "", 0, 0};
+static BeaconAbnormalInfo g_beaconAbnormalInfo = {0, 0, "", std::vector<uint8_t>(BEACON_LENGTH_RSSI)};
+
 constexpr int BEACON_LOST_MIN_CNT = 5; // 12s/(3s/time)
 constexpr int BEACON_ABN_MIN_CNT = 3; // 5s/(3s/time)
 
@@ -539,46 +533,48 @@ bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo)
     const int64_t checkTime = checkInfo.timeStamp;
     const int checkRssi = checkInfo.signal;
     const unsigned int checkRxBytes = checkInfo.rxBytes;
-    // 检查 BSSID、RSSI 和 RxBytes 是否与初始值一致,ext 长度
-    if (g_beaconLostBssid != bssid || g_beaconLostRssi != checkRssi || g_beaconLostRxBytes != checkRxBytes) {
-        g_beaconLostBssid = bssid;
-        g_beaconLostRssi = checkRssi;
-        g_beaconLostRxBytes = checkRxBytes;
-        g_beaconLostTime = 0;
-        g_beaconLostCnt = 0;
+    
+    // 检查 BSSID、RSSI 和 RxBytes 是否与初始值一致
+    if (g_beaconLostInfo.bssid != bssid || g_beaconLostInfo.rssi != checkRssi
+        || g_beaconLostInfo.rxBytes != checkRxBytes) {
+        g_beaconLostInfo.bssid = bssid;
+        g_beaconLostInfo.rssi = checkRssi;
+        g_beaconLostInfo.rxBytes = checkRxBytes;
+        g_beaconLostInfo.time = 0;
+        g_beaconLostInfo.cnt = 0;
+        return false;
     }
     if (checkInfo.ext.size() < BEACON_LENGTH_RSSI) {
-        g_beaconLostTime = 0;
-        g_beaconLostCnt = 0;
+        g_beaconLostInfo.time = 0;
+        g_beaconLostInfo.cnt = 0;
         return false;
     }
-    // 检查 RSSI 是否无效
-    bool isInvalid = std::all_of(checkInfo.ext.begin(), checkInfo.ext.begin() + BEACON_LENGTH_RSSI,
-        [](uint8_t num) {
+     // 检查 RSSI 是否无效
+    const auto* extData = checkInfo.ext.data();
+    bool isInvalid = std::all_of(extData, extData + BEACON_LENGTH_RSSI, [](uint8_t num) {
             int8_t val = static_cast<int8_t>(num);
             return val == BEACON_LOST_RSSI0 || val == BEACON_LOST_RSSI1 || val == 0;
-            })
-            && std::any_of(checkInfo.ext.begin(), checkInfo.ext.begin() + BEACON_LENGTH_RSSI,
-            [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI0; });
+        }) && std::any_of(extData, extData + BEACON_LENGTH_RSSI,
+        [](uint8_t num) { return static_cast<int8_t>(num) == BEACON_LOST_RSSI0; });
     if (!isInvalid) {
-        g_beaconLostTime = 0;
-        g_beaconLostCnt = 0;
+        g_beaconLostInfo.time = 0;
+        g_beaconLostInfo.cnt = 0;
         return false;
     }
-    g_beaconLostCnt += 1;
-    if (g_beaconLostTime == 0) {
-        g_beaconLostTime = checkTime;
+    g_beaconLostInfo.cnt += 1;
+    if (g_beaconLostInfo.time == 0) {
+        g_beaconLostInfo.time = checkTime;
         return false;
     }
-    int64_t accumulateTime = checkTime - g_beaconLostTime;
+    int64_t accumulateTime = checkTime - g_beaconLostInfo.time;
     if (accumulateTime <= 0) {
-        g_beaconLostTime = checkTime;
-        g_beaconLostCnt = 1;
+        g_beaconLostInfo.time = checkTime;
+        g_beaconLostInfo.cnt = 1;
         return false;
     }
-    if (accumulateTime >= SIGNAL_RECORD_12S && g_beaconLostCnt >= BEACON_LOST_MIN_CNT) {
-        g_beaconLostTime = checkTime;
-        g_beaconLostCnt = 1;
+    if (accumulateTime >= SIGNAL_RECORD_12S && g_beaconLostInfo.cnt >= BEACON_LOST_MIN_CNT) {
+        g_beaconLostInfo.time = checkTime;
+        g_beaconLostInfo.cnt = 1;
         return true;
     }
     return false;
@@ -587,44 +583,45 @@ bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo)
 bool IsBeaconAbnormal(std::string bssid, WifiSignalPollInfo checkInfo)
 {
     const int64_t checkTime = checkInfo.timeStamp;
-    // 检查 BSSID是否与初始值一致,ext 长度
-    if (g_beaconAbBssid != bssid) {
-        g_beaconAbBssid = bssid;
-        g_beaconAbTime = 0;
-        g_beaconAbCnt = 0;
+    // 检查 BSSID是否与初始值一致
+    if (g_beaconAbnormalInfo.bssid != bssid) {
+        g_beaconAbnormalInfo.bssid = bssid;
+        g_beaconAbnormalInfo.time = 0;
+        g_beaconAbnormalInfo.cnt = 0;
+        return false;
     }
     if (checkInfo.ext.size() < BEACON_LENGTH_RSSI) {
-        g_beaconAbTime = 0;
-        g_beaconAbCnt = 0;
+        g_beaconAbnormalInfo.time = 0;
+        g_beaconAbnormalInfo.cnt = 0;
         return false;
     }
     // 检查未平滑rssi数组是否相等
     bool areVectorsEqual = true;
     for (int i = 0; i < BEACON_LENGTH_RSSI; i++) {
-        if (g_beaconAbRssiArr[i] != checkInfo.ext[i]) {
-            g_beaconAbRssiArr[i] = checkInfo.ext[i];
+        if (g_beaconAbnormalInfo.rssiArr[i] != checkInfo.ext[i]) {
+            g_beaconAbnormalInfo.rssiArr[i] = checkInfo.ext[i];
             areVectorsEqual = false;
         }
     }
     if (!areVectorsEqual) {
-        g_beaconAbTime = checkTime;
-        g_beaconAbCnt = 1;
+        g_beaconAbnormalInfo.time = checkTime;
+        g_beaconAbnormalInfo.cnt = 1;
         return false;
     }
-    g_beaconAbCnt += 1;
-    if (g_beaconAbTime == 0) {
-        g_beaconAbTime = checkTime;
+    g_beaconAbnormalInfo.cnt += 1;
+    if (g_beaconAbnormalInfo.time == 0) {
+        g_beaconAbnormalInfo.time = checkTime;
         return false;
     }
-    int64_t accumulateTime = checkTime - g_beaconAbTime;
+    int64_t accumulateTime = checkTime - g_beaconAbnormalInfo.time;
     if (accumulateTime <= 0) {
-        g_beaconAbTime = checkTime;
-        g_beaconAbCnt = 1;
+        g_beaconAbnormalInfo.time = checkTime;
+        g_beaconAbnormalInfo.cnt = 1;
         return false;
     }
-    if (accumulateTime >= SIGNAL_RECORD_5S && g_beaconAbCnt >= BEACON_ABN_MIN_CNT) {
-        g_beaconAbTime = checkTime;
-        g_beaconAbCnt = 1;
+    if (accumulateTime >= SIGNAL_RECORD_5S && g_beaconAbnormalInfo.cnt >= BEACON_ABN_MIN_CNT) {
+        g_beaconAbnormalInfo.time = checkTime;
+        g_beaconAbnormalInfo.cnt = 1;
         return true;
     }
     return false;

@@ -227,8 +227,8 @@ public:
     void AddGroupManager4()
     {
         WifiP2pGroupInfo groupInfo;
-        int NETWORK_ID = 1;
-        groupInfo.SetNetworkId(NETWORK_ID);
+        int networkId = 1;
+        groupInfo.SetNetworkId(networkId);
         groupInfo.SetGroupName("AAA");
         groupInfo.SetIsGroupOwner(true);
         WifiP2pDevice owner;
@@ -238,8 +238,8 @@ public:
     void AddGroupManager5()
     {
         WifiP2pGroupInfo groupInfo;
-        int NETWORK_ID = 2;
-        groupInfo.SetNetworkId(NETWORK_ID);
+        int networkId = 2;
+        groupInfo.SetNetworkId(networkId);
         groupInfo.SetGroupName("BBB");
         groupInfo.SetIsGroupOwner(true);
         groupInfo.SetPassphrase("xxxxxxxx");

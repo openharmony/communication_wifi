@@ -54,6 +54,8 @@ private:
     int RemoteOnCandidateApprovalStatusChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
     std::map<std::string, sptr<IWifiDeviceCallBack>> callbackMap_;
+    // lock on callbackMap_
+    std::mutex callbackMutex_;
 
     bool mRemoteDied;
     std::atomic<int> mState_ = DEFAULT_VALUES;

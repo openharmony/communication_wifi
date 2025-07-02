@@ -18,7 +18,7 @@
 #include "iremote_stub.h"
 #include "iremote_object.h"
 #include "i_wifi_device_callback.h"
-
+#include <mutex>
 #define DEFAULT_VALUES (-1024)
 
 namespace OHOS {

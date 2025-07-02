@@ -227,7 +227,8 @@ public:
     void AddGroupManager4()
     {
         WifiP2pGroupInfo groupInfo;
-        groupInfo.SetNetworkId(1);
+        int NETWORK_ID = 1;
+        groupInfo.SetNetworkId(NETWORK_ID);
         groupInfo.SetGroupName("AAA");
         groupInfo.SetIsGroupOwner(true);
         WifiP2pDevice owner;
@@ -237,7 +238,8 @@ public:
     void AddGroupManager5()
     {
         WifiP2pGroupInfo groupInfo;
-        groupInfo.SetNetworkId(2);
+        int NETWORK_ID = 2;
+        groupInfo.SetNetworkId(NETWORK_ID);
         groupInfo.SetGroupName("BBB");
         groupInfo.SetIsGroupOwner(true);
         groupInfo.SetPassphrase("xxxxxxxx");
@@ -423,6 +425,11 @@ public:
     void WarpGroupClearAll() const
     {
         pP2pStateMachine->groupManager.ClearAll();
+    }
+    int WarpGetGroups() const
+    {
+        std::vector<WifiP2pGroupInfo> groups = pP2pStateMachine->groupManager.GetGroups();
+        return groups.size();
     }
 };
 
@@ -816,6 +823,7 @@ HWTEST_F(P2pStateMachineTest, FilterInvalidGroup1, TestSize.Level1)
     AddGroupManager4();
     AddGroupManager5();
     WarpFilterInvalidGroup();
+    EXPECT_EQ(WarpGetGroups(), 1);
 }
 
 HWTEST_F(P2pStateMachineTest, FilterInvalidGroup2, TestSize.Level1)
@@ -823,6 +831,7 @@ HWTEST_F(P2pStateMachineTest, FilterInvalidGroup2, TestSize.Level1)
     WarpGroupClearAll();
     AddGroupManager4();
     WarpFilterInvalidGroup();
+    EXPECT_EQ(WarpGetGroups(), 1);
 }
 
 HWTEST_F(P2pStateMachineTest, SetGroupConfig1, TestSize.Level1)

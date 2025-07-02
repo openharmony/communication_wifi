@@ -829,7 +829,7 @@ HWTEST_F(P2pStateMachineTest, FilterInvalidGroup1, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, FilterInvalidGroup2, TestSize.Level1)
 {
     WarpGroupClearAll();
-    AddGroupManager4();
+    AddGroupManager5();
     WarpFilterInvalidGroup();
     EXPECT_EQ(WarpGetGroups(), 1);
 }

@@ -143,11 +143,11 @@ public:
         EXPECT_TRUE(pStaStateMachine->pClosedState->ExecuteStateMsg(msg));
     }
 
-    void InitStateExeMsgFail1()
+    void CLosedStateExeMsgFail1()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(WIFI_SVR_CMD_STA_DISABLE_STA);
-        EXPECT_TRUE(pStaStateMachine->pInitState->ExecuteStateMsg(msg));
+        EXPECT_TRUE(pStaStateMachine->pClosedState->ExecuteStateMsg(msg));
     }
 
     void InitStateExeMsgFail2()
@@ -1875,9 +1875,9 @@ HWTEST_F(StaStateMachineTest, ClosedStateExeMsgSuccess, TestSize.Level1)
     ClosedStateExeMsgSuccess();
 }
 
-HWTEST_F(StaStateMachineTest, InitStateExeMsgFail1, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, CLosedStateExeMsgFail1, TestSize.Level1)
 {
-    InitStateExeMsgFail1();
+    CLosedStateExeMsgFail1();
 }
 
 HWTEST_F(StaStateMachineTest, InitStateExeMsgFail2, TestSize.Level1)

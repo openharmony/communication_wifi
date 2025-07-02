@@ -49,7 +49,8 @@ public:
     /**
      * @Description Check whether Wi-Fi hotspot is can be operated under some situation. 
      * Prerequisites: Flight mode must be turned on
-     * If flight mode is not turned off, there is no need to call this interface, and can directly enable the personal hotspot.
+     * If flight mode is not turned off, there is no need to call this interface, 
+     * and can directly enable the personal hotspot.
      *
      * @param isSpuported - Supported / NOT supported
      * @return ErrCode - operation result

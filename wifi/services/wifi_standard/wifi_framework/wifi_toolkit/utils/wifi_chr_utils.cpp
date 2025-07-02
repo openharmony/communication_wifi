@@ -33,6 +33,7 @@ WifiChrUtils::WifiChrUtils()
 void WifiChrUtils::AddSignalPollInfoArray(WifiSignalPollInfo signalInfo)
 {
     std::unique_lock<std::mutex> lock(signalInfoMutex);
+    signalPollInfoItem_ = signalInfo;
     if (signalPollInfoArray.size() >= SIGNALARR_LENGTH) {
         signalPollInfoArray.pop_back();
         signalPollInfoArray.insert(signalPollInfoArray.begin(), signalInfo);
@@ -63,27 +64,22 @@ void WifiChrUtils::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiS
 bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
 {
     if (signalLevel < 0) return false;
-    std::vector<WifiSignalPollInfo> wifiCheckInfoArray = signalPollInfoArray;
-    std::sort(wifiCheckInfoArray.begin(), wifiCheckInfoArray.end(),
-        [](const WifiSignalPollInfo& a, const WifiSignalPollInfo& b) {return a.timeStamp > b.timeStamp;});
- 
-    bool beaconLost = false;
+    WifiSignalPollInfo wifiCheckInfo;
     {
-        std::lock_guard<std::mutex> arrayLock(bssidMutex_);
-        if (bssidArray_.size() >= SIGNALARR_LENGTH) bssidArray_.pop_back();
-        bssidArray_.insert(bssidArray_.begin(), bssid);
-        beaconLost = OHOS::Wifi::IsBeaconLost(bssidArray_, wifiCheckInfoArray);
+        std::unique_lock<std::mutex> lock(signalInfoMutex);
+        wifiCheckInfo = signalPollInfoItem_;
     }
-
+    bool beaconLost = OHOS::Wifi::IsBeaconLost(bssid, wifiCheckInfo);
     if (beaconLost) {
         LOGW("Beacon Lost, signalLevel: %{public}d", signalLevel);
         int32_t errorCode = (signalLevel <= SIGNAL_LEVEL_TWO) ?
             BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH;
-        int64_t currentTime = GetCurrentTimeSeconds();
-        if (currentTime - startTime_ >= SIGNAL_RECORD_12S) {
-            startTime_ = currentTime;
-            WriteWifiBeaconLostHiSysEvent(errorCode);
-        }
+        WriteWifiBeaconLostHiSysEvent(errorCode);
+    }
+    bool beaconAbnormal = OHOS::Wifi::IsBeaconAbnormal(bssid, wifiCheckInfo);
+    if (beaconAbnormal) {
+        LOGW("Beacon Abnormal, signalLevel: %{public}d", signalLevel);
+        WriteWifiBeaconLostHiSysEvent(BEACON_ABNORMAL);
     }
     return beaconLost;
 }

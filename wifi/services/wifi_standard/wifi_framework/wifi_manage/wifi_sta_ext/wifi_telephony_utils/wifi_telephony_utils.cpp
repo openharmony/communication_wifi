@@ -34,8 +34,8 @@ std::string ConvertString(const std::u16string &wideText)
 
 std::string SimAkaAuth(const std::string &nonce, AuthType authType, int32_t eapSubId)
 {
-    SimAuthenticationResponse response;
 #ifdef TELEPHONE_CORE_SERVICE_ENABLE
+    SimAuthenticationResponse response;
     Telephony::AuthType type;
     switch (authType) {
         case AuthType::SIM_TYPE:
@@ -53,10 +53,11 @@ std::string SimAkaAuth(const std::string &nonce, AuthType authType, int32_t eapS
         WIFI_LOGE("StaStateMachine::SimAkaAuth: errCode=%{public}d", result);
         return "";
     }
+    return response.response;
 #else
     WIFI_LOGW("telephony subsystem is disabled, sim auth is not supported");
+    return "";
 #endif
-    return response.response;
 }
 
 #ifndef OHOS_ARCH_LITE

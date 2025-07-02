@@ -60,6 +60,7 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p_sa",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
@@ -136,6 +137,15 @@ ohos_fuzztest("WifiStaServerFuzzTest") {
     "time_service:time_client",
     "window_manager:libdm_lite",
   ]
+
+  if (wifi_feature_with_security_detect) {
+    defines += [ "WIFI_SECURITY_DETECT_ENABLE" ]
+    external_deps += [ "security_guard:libsg_classify_sdk" ]
+    sources += [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect_observer.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp",
+    ]
+  }
 
   part_name = "wifi"
   subsystem_name = "communication"

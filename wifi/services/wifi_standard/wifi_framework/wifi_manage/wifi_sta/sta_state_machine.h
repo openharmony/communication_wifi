@@ -176,13 +176,17 @@ public:
      * @Description  Definition of member function of State base class in StaStateMachine.
      *
      */
-    class RootState : public State {
+    class ClosedState : public State {
     public:
-        explicit RootState();
-        ~RootState() override;
+        explicit ClosedState(StaStateMachine *staStateMachine);
+        ~ClosedState() override;
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
+    private:
+        void StartWifiProcess();
+        void StopWifiProcess();
+        StaStateMachine *pStaStateMachine;
     };
     /**
      * @Description : Definition of member function of InitState class in StaStateMachine.
@@ -196,8 +200,6 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
-        void StartWifiProcess();
-        void StopWifiProcess();
         void StartConnectEvent(InternalMessagePtr msg);
         void UpdateCountryCode(InternalMessagePtr msg);
         bool AllowAutoConnect();
@@ -1051,6 +1053,7 @@ private:
     DhcpResultNotify *pDhcpResultNotify;
     ClientCallBack dhcpclientCallBack_;
     DhcpClientReport dhcpClientReport_;
+    ClosedState *pClosedState;
     InitState *pInitState;
     LinkState *pLinkState;
     SeparatedState *pSeparatedState;

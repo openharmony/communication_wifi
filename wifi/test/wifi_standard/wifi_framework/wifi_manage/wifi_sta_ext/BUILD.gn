@@ -159,6 +159,7 @@ ohos_unittest("wifi_sta_ext_unittest") {
     defines += [ "WIFI_SECURITY_DETECT_ENABLE" ]
     sources += [
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect_observer.cpp",
       "wifi_security_detect_test.cpp",
     ]
   }

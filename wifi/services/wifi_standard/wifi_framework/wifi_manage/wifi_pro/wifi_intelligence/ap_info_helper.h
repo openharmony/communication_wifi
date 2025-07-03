@@ -87,7 +87,7 @@ public:
     bool IsCellIdExitByData(ApInfoData info, std::string cellId);
     std::vector<ApInfoData> GetMonitorDatas(std::string cellId);
     bool GetAllApInfos();
-    void DelApInfos(const std::string &bssid);
+    void DelApInfoByBssid(const std::string &bssid);
     void AddApInfo(std::string cellId, int32_t networkId);
     void AddNewApInfo(const std::string &cellId, const WifiDeviceConfig &config);
     int32_t GetOldestApInfoData(ApInfoData &data);
@@ -104,11 +104,12 @@ public:
     int32_t DelCellInfoByBssid(std::string bssid);
     int32_t AddNearbyApInfo(std::string bssid);
     int32_t DelNearbyApInfo(std::string bssid);
-    void DeleteApInfoBySsidForPortal(WifiLinkedInfo linkedInfo);
+    void DelApInfoBySsid(const std::string &ssid, const std::string &keyMgmt);
     void UpdateBssidIsBlacklist(std::string bssid, int32_t inBlacklist);
     void SetBlackListBySsid(std::string ssid, std::string authType, int32_t isBlacklist);
     void ResetBlacklist(std::vector<WifiScanInfo> scanInfoList, int32_t isBlacklist);
     void ResetAllBalcklist();
+    void DelAllApInfo();
     std::string GetCurrentCellIdInfo();
 private:
     explicit ApInfoHelper();

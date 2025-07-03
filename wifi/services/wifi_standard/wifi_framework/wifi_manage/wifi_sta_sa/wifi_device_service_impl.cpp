@@ -1972,6 +1972,14 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
     FactoryResetNotify();
 #endif
+#if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+    if (pWifiProService != nullptr) {
+        WifiDeviceConfig config;
+        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE),
+            config, ieRemoveAll);
+    }
+#endif
     /* p2p */
     WifiSettings::GetInstance().RemoveWifiP2pGroupInfo();
     WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();

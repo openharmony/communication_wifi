@@ -1398,6 +1398,7 @@ void DataShareReadySubscriber::OnReceiveEvent(const EventFwk::CommonEventData &e
         WifiSensorScene::GetInstance().Init();
 #ifdef WIFI_SECURITY_DETECT_ENABLE
         WifiSecurityDetect::GetInstance().SetDatashareReady();
+        WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
 #endif
     }
 }

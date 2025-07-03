@@ -599,7 +599,10 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_security_detect) {
       defines += [ "WIFI_SECURITY_DETECT_ENABLE" ]
       external_deps += [ "security_guard:libsg_classify_sdk" ]
-      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp" ]
+      sources += [ 
+        "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp",
+        "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect_observer.cpp",
+      ]
     }
 
     if (wifi_feature_wifi_pro_ctrl) {

@@ -117,11 +117,29 @@ bool ApInfoHelper::GetAllApInfos()
     return true;
 }
 
-void ApInfoHelper::DelApInfos(const std::string &bssid)
+void ApInfoHelper::DelApInfoByBssid(const std::string &bssid)
 {
+    WIFI_LOGI("DelApInfoByBssid:%{public}s", MacAnonymize(bssid).c_str());
+    ApInfoData data;
+    int32_t index = GetApInfoByBssid(bssid, data);
+    if (index == -1) {
+        WIFI_LOGI("DelApInfoByBssid, no such bssid.");
+        return;
+    }
     DelBssidInfo(bssid);
     DelCellInfoByBssid(bssid);
     DelNearbyApInfo(bssid);
+    std::lock_guard<std::mutex> lock(mutex_);
+    apInfos_.erase(apInfos_.begin() + index);
+}
+
+void ApInfoHelper::DelAllApInfo()
+{
+    auto iter = apInfos_.begin();
+    for (; iter != apInfos_.end();) {
+        DelApInfoByBssid(iter->bssid);
+    }
+    WIFI_LOGI("DelAllApInfo success.");
 }
 
 void ApInfoHelper::AddApInfo(std::string cellId, int32_t networkId)
@@ -130,14 +148,12 @@ void ApInfoHelper::AddApInfo(std::string cellId, int32_t networkId)
     WifiSettings::GetInstance().GetDeviceConfig(networkId, config);
     ApInfoData data;
     int32_t index = GetApInfoByBssid(config.bssid, data);
-    std::lock_guard<std::mutex> lock(mutex_);
     if (index == -1) {
         AddNewApInfo(cellId, config);
         return;
     }
     if (data.cellInfos.size() >= DB_CELLID_MAX_QUANTA) {
-        apInfos_.erase(apInfos_.begin() + index);
-        DelApInfos(config.bssid);
+        DelApInfoByBssid(config.bssid);
     } else {
         if (!IsCellIdExitByData(data, cellId)) {
             AddCellInfo(config.bssid, cellId);
@@ -171,10 +187,8 @@ void ApInfoHelper::AddNewApInfo(const std::string &cellId, const WifiDeviceConfi
     ApInfoData data;
     if (apInfos_.size() >= DB_BSSID_MAX_QUANTA) {
         ApInfoData oldestData;
-        int32_t index = GetOldestApInfoData(oldestData);
-        if (index != -1) {
-            apInfos_.erase(apInfos_.begin() + index);
-            DelApInfos(oldestData.bssid);
+        if (index != -1) { 
+            DelApInfoByBssid(oldestData.bssid);
         }
     }
     data.time = GetCurrentTimeMilliSeconds();
@@ -193,6 +207,7 @@ void ApInfoHelper::AddNewApInfo(const std::string &cellId, const WifiDeviceConfi
     std::vector<std::string> curNearbyApInfos;
     QueryNearbyInfoByParam({{NearByApInfoTable::BSSID, config.bssid}}, curNearbyApInfos);
     data.nearbyApInfos = curNearbyApInfos;
+    std::lock_guard<std::mutex> lock(mutex_);
     apInfos_.push_back(data);
     return;
 }
@@ -512,22 +527,12 @@ int32_t ApInfoHelper::DelNearbyApInfo(std::string bssid)
     return deleteRowCount;
 }
 
-void ApInfoHelper::DeleteApInfoBySsidForPortal(WifiLinkedInfo linkedInfo)
+void ApInfoHelper::DelApInfoBySsid(const std::string &ssid, const std::string &keyMgmt)
 {
-    if (linkedInfo.bssid.empty()) {
-        return;
-    }
-    WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config) != 0) {
-        WIFI_LOGE("DeleteApInfoBySsidForPortal GetDeviceConfig fail.");
-        return;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
     auto iter = apInfos_.begin();
     for (; iter != apInfos_.end();) {
-        if (iter->ssid == linkedInfo.ssid && config.keyMgmt == iter->authType) {
-            apInfos_.erase(iter);
-            DelApInfos(linkedInfo.bssid);
+        if (iter->ssid == ssid && iter->authType == keyMgmt) {
+            DelApInfoByBssid(linkedInfo.bssid);
         } else {
             iter++;
         }

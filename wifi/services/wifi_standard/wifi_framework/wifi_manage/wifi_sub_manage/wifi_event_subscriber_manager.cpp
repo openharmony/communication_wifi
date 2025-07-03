@@ -47,6 +47,14 @@
 #endif
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sensor_scene.h"
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+#include "telephony_observer_client.h"
+#include "telephony_types.h"
+#include "core_service_client.h"
+#include "cellular_data_client.h"
+#include "telephony_observer_client.h"
+#endif
+
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
 namespace OHOS {
@@ -114,6 +122,13 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 #ifdef HAS_NETMANAGER_EVENT_PART
     RegisterNetmgrEvent();
 #endif
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    mWifiEventSubsThread_ = std::make_unique<>("WifiRegisterThread");
+    if (mWifiEventSubsThread_) {
+        mWifiEventSubsThread_->PostAsyncTask([this]() { this->RegisterCellularStateObserver(); },
+            "TelStateRegistry", 5 * 1000);
+    }
+#endif
 }
 
 WifiEventSubscriberManager::~WifiEventSubscriberManager()
@@ -139,6 +154,12 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
 #endif
 #ifdef EXTENSIBLE_AUTHENTICATION
     NetEapObserver::GetInstance().StopNetEapObserver();
+#endif
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    UnRegisterCellularStateObserver();
+    if (mWifiEventSubsThread_) {
+        mWifiEventSubsThread_.reset();
+    }
 #endif
 }
 
@@ -1558,7 +1579,50 @@ int NetworkConnSubscriber::NetCapabilitiesChange(sptr<NetManagerStandard::NetHan
     }
     return 0;
 }
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+void WifiEventSubscriberManager::RegisterCellularStateObserver()
+{
+    WIFI_LOGI("RegisterCellularStateObserver.");
+    if (cellularStateObserver_ == nullptr) {
+        cellularStateObserver_ = sptr<CellularStateObserver>::MakeSptr();
+    } else {
+        WIFI_LOGI("RegisterCellularStateObserver success.");
+        return;
+    }
+    uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
+    simCount_ = Telephony::CoreServiceClient::GetInstance().GetMaxSimCount();
+    for (int32_t i = 0; i < simCount_; i++) {
+        auto result = Telephony::TelephonyObserverClient::GetInstance().AddStateObserver(
+            cellularStateObserver_, i, telephonyObserverMask, true);
+        if (result != 0) {
+            WIFI_LOGE("RegisterCellularStateObserver failed, slotId:%{public}d, res:%{public}d", i, result);
+        } else {
+            WIFI_LOGI("RegisterCellularStateObserver success, slotId:%{public}d, res:%{public}d", i, result);
+        }
+    }
+}
 
+void WifiEventSubscriberManager::UnRegisterCellularStateObserver()
+{
+    if (cellularStateObserver_ != nullptr) {
+        uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
+        for (int32_t i = 0; i < simCount_; i++) {
+            auto result = Telephony::TelephonyObserverClient::GetInstance().RemoveStateObserver(
+                i, telephonyObserverMask);
+            if (result != 0) {
+                WIFI_LOGE("UnRegisterCellularStateObserver failed,slotId:%{public}d,res:%{public}d", i, result);
+            }
+        }
+    }
+    cellularStateObserver_ = nullptr;
+}
+
+void CellularStateObserver::OnCellInfoUpdated(int32_t slotId, const std::vector<sptr<Telephony::CellInformation>> &vec)
+{
+    WIFI_LOGI("CellularStateObserver::OnCellInfoUpdated");
+    WifiProService::GetInstance().OnCellInfoUpdated();
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

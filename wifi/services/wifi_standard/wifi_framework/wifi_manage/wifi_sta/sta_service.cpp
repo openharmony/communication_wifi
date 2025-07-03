@@ -35,7 +35,7 @@
 #include "block_connect_service.h"
 #include "parameters.h"
 #include "wifi_telephony_utils.h"
-
+#include "wifi_service_manager.h"
 DEFINE_WIFILOG_LABEL("StaService");
 
 namespace OHOS {
@@ -456,7 +456,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     /* update net link proxy info */
     pStaStateMachine->ReUpdateNetLinkInfo(tempDeviceConfig);
     ConfigChange changeType = isUpdate ? ConfigChange::CONFIG_UPDATE : ConfigChange::CONFIG_ADD;
-    NotifyDeviceConfigChange(changeType);
+    NotifyDeviceConfigChange(changeType, tempDeviceConfig, 0);
     return netWorkId;
 }
 
@@ -484,7 +484,7 @@ ErrCode StaService::RemoveDevice(int networkId) const
     WifiSettings::GetInstance().RemoveDevice(networkId);
     WifiSettings::GetInstance().RemoveConnectChoiceFromAllNetwork(networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
-    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
+    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE, config, 0);
 #ifndef OHOS_ARCH_LITE
     WifiHistoryRecordManager::GetInstance().DeleteApInfo(config.ssid, config.keyMgmt);
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
@@ -515,7 +515,8 @@ ErrCode StaService::RemoveAllDevice() const
         LOGE("RemoveAllDevice-SyncDeviceConfig() failed!");
         return WIFI_OPT_FAILED;
     }
-    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE);
+    WifiDeviceConfig config;
+    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE, config, 1);
 #ifndef OHOS_ARCH_LITE
     WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
     WifiDeviceConfig config;
@@ -822,9 +823,15 @@ ErrCode StaService::SetPowerMode(bool mode) const
     return WIFI_OPT_SUCCESS;
 }
 
-void StaService::NotifyDeviceConfigChange(ConfigChange value) const
+void StaService::NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig config, int32_t isRemoveAll) const
 {
     WIFI_LOGI("Notify device config change: %{public}d\n", static_cast<int>(value));
+#if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+    if (pWifiProService != nullptr) {
+        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(value), config, ieRemoveAll);
+    }
+#endif
 #ifndef OHOS_ARCH_LITE
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE;

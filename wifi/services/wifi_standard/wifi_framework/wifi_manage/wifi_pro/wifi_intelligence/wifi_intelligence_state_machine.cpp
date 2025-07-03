@@ -152,12 +152,7 @@ bool WifiIntelligenceStateMachine::DefaultState::ExecuteStateMsg(InternalMessage
     switch (msg->GetMessageName()) {
         case EVENT_WIFI_CONNECT_STATE_CHANGED: {
             ret = EXECUTED;
-            int32_t state = msg->GetParam1();
-            if (state == static_cast<int32_t>(OperateResState::CONNECT_AP_CONNECTED)) {
-                pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pConnectedState_);
-            } else if (state == static_cast<int32_t>(OperateResState::DISCONNECT_DISCONNECTED)) {
-                pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pDisconnectedState_);
-            }
+            HandlWifiConnectStateChange(msg);
             break;
         }
         case EVENT_WIFI_ENABLED: {
@@ -167,12 +162,7 @@ bool WifiIntelligenceStateMachine::DefaultState::ExecuteStateMsg(InternalMessage
         }
         case EVENT_WIFI_DISABLED: {
             ret = EXECUTED;
-            int32_t state = msg->GetParam1();
-            if (state == static_cast<int>(OperateResState::CLOSE_WIFI_SUCCEED)) {
-                pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pStopState_);
-            } else if (state == static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_SUCCEED)) {
-                pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pDisabledState_);
-            }
+            HandleWifiDisabled(msg);
             break;
         }
         case EVENT_SCREEN_ON: {
@@ -190,11 +180,60 @@ bool WifiIntelligenceStateMachine::DefaultState::ExecuteStateMsg(InternalMessage
             pWifiIntelligenceStateMachine_->FullScan();
             break;
         }
+        case EVENT_CONFIGURATION_CHANGED: {
+            ret = EXECUTED;
+            HandleWifiConfigurationChange(msg);
+            break;
+        }
         default:
             WIFI_LOGW("DefaultState msg %{public}d.", msg->GetMessageName());
             break;
     }
     return ret;
+}
+
+void WifiIntelligenceStateMachine::DefaultState::HandlWifiConnectStateChange(InternalMessagePtr msg)
+{
+    int32_t state = msg->GetParam1();
+    if (state == static_cast<int32_t>(OperateResState::CONNECT_AP_CONNECTED)) {
+        pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pConnectedState_);
+    } else if (state == static_cast<int32_t>(OperateResState::DISCONNECT_DISCONNECTED)) {
+        pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pDisconnectedState_);
+    }
+    return;
+}
+
+void WifiIntelligenceStateMachine::DefaultState::HandleWifiDisabled(InternalMessagePtr msg)
+{
+    int32_t state = msg->GetParam1();
+    if (state == static_cast<int>(OperateResState::CLOSE_WIFI_SUCCEED)) {
+        pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pStopState_);
+    } else if (state == static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_SUCCEED)) {
+        pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pDisabledState_);
+    }
+    return;
+}
+
+void WifiIntelligenceStateMachine::DefaultState::HandleWifiConfigurationChange(InternalMessagePtr msg)
+{
+    int32_t state = msg->GetParam1();
+    int32_t isRemoveAll = msg->GetParam2();
+    WifiDeviceConfig config;
+    if (!msg->GetMessageObj(config)) {
+        WIFI_LOGE("HandleWifiConfigurationChange: failed to obtain config info.");
+        return;
+    }
+    if (state == static_cast<int32_t>(ConfigChange::COMFIG_REMOVE) && isRemoveAll) {
+        ApInfoHelper::GetInatance().DelAllApInfo();
+        return;
+    }
+    if (state == static_cast<int32_t>(ConfigChange::COMFIG_REMOVE)) {
+        if (!config.ssid.empty()) {
+            ApInfoHelper::GetInatance().DelApInfoBySsid(ssid);
+        } else {
+            ApInfoHelper::GetInatance().DelApInfoByBssid(config.bssid);
+        }
+    }
 }
 
 /* --------------------------- state machine initial state ------------------------------ */
@@ -619,6 +658,10 @@ bool WifiIntelligenceStateMachine::StopState::ExecuteStateMsg(InternalMessagePtr
             }
             break;
         }
+        case EVENT_WIFI_CONNECT_STATE_CHANGED: {
+            ret = EXECUTED;
+            break;
+        }
         default:
             break;
     }
@@ -725,16 +768,30 @@ void WifiIntelligenceStateMachine::ConnectedState::HandleWifiInternetChangeRes(c
         return;
     }
 
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config) != 0) {
+        WIFI_LOGE("HandleWifiInternetChangeRes:Get Device Config failed, networkId:%{public}d", linkedInfo.networkId);
+        return;
+    }
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
         pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pNoInternetState_);
+        return;
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
-        WifiLinkedInfo linkedInfo;
-        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-        ApInfoHelper::GetInstance().DeleteApInfoBySsidForPortal(linkedInfo);
+        ApInfoHelper::GetInstance().DelApInfoBySsid(config.ssid, config.keyMgmt);
         pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pNoInternetState_);
+        return;
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_ENABLED)) {
+        if (config.isPortal) {
+            Wifi_LOGI("current network has network but is portal, no need to record it.");
+            ApInfoHelper::GetInstance().DelApInfoBySsid(config.ssid, config.keyMgmt);
+            pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pNoInternetState_);
+            return;
+        }
         pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pInternetReadyState_);
+        return;
     }
 }
 
@@ -821,7 +878,7 @@ void WifiIntelligenceStateMachine::NoInternetState::GoInState()
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (!linkedInfo.bssid.empty()) {
-        ApInfoHelper::GetInstance().DelApInfos(linkedInfo.bssid);
+        ApInfoHelper::GetInstance().DelApInfoByBssid(linkedInfo.bssid);
     }
 }
 
@@ -843,10 +900,14 @@ bool WifiIntelligenceStateMachine::NoInternetState::ExecuteStateMsg(InternalMess
 bool WifiIntelligenceStateMachine::FullScan()
 {
     WIFI_LOGD("start Fullscan");
+    if (!WifiConfigCenter::GetInstance().CheckScanOnlyAvailable(instId_)) {
+        WIFI_LOGI("scan only is not available, can not start scan.");
+        return false;
+    }
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
     if (pScanService == nullptr) {
         WIFI_LOGI("TryStartScan, pService is nullptr.");
-        return WIFI_OPT_FAILED;
+        return false;
     }
     return pScanService->Scan(false);
 }

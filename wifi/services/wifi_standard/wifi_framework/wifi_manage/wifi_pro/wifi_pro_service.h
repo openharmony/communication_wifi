@@ -23,25 +23,15 @@
 #include "wifi_pro_state_machine.h"
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 #include "wifi_intelligence_state_machine.h"
-#include "telephony_observer.h"
 #endif
 
 namespace OHOS {
 namespace Wifi {
-#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
-class CellularStateObserver : public Telephony::TelephonyObserver {
-public:
-    CellularStateObserver() = default;
-    ~CellularStateObserver() = default;
-    void OnCellInfoUpdated(int32_t slotId, const std::vector<sptr<Telephony::CellInformation>> &vec) override;
-};
-#endif
 class WifiProService {
     FRIEND_GTEST(WifiProService);
 public:
     explicit WifiProService(int32_t instId = 0);
     ~WifiProService();
-    static WifiProService &GetInstance();
     ErrCode InitWifiProService();
     void HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo);
     void HandleRssiLevelChanged(int32_t rssi);
@@ -53,14 +43,11 @@ public:
     void OnCellInfoUpdated();
     void OnWifiStateOpen(int32_t state);
     void OnWifiStateClose(int32_t state);
+    void OnWifiDeviceConfigChange(int32_t status, WifiDeviceConfig config, int32_t isRemoveAll);
 #endif
 private:
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
-    sptr<CellularStateObserver> cellularStateObserver_ { nullptr };
     std::shared_ptr<WifiIntelligenceStateMachine> pWifiIntelligenceStateMachine_ { nullptr };
-    void RegisterCellularStateObserver();
-    void UnRegisterCellularStateObserver();
-    int32_t simCount_ { 0 };
 #endif
     std::shared_ptr<WifiProStateMachine> pWifiProStateMachine_ { nullptr };
     int32_t instId_ { 0 };

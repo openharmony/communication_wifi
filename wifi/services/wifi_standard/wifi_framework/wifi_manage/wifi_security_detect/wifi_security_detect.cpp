@@ -18,6 +18,7 @@
 #include "json/json.h"
 #include "ip_tools.h"
 #include "wifi_security_detect.h"
+#include "wifi_security_detect_observer.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 #include "wifi_settings.h"
@@ -42,6 +43,7 @@ const int MIN_5G_FREQUENCY = 5160;
 const int MAX_5G_FREQUENCY = 5865;
 const uint32_t securityGuardModelID = 3001000011;
 const int NUM24 = 24;
+static sptr<SecurityDetectObserver> SecurityDetectObserver_ = nullptr;
 #define SECURITY_WAITING_TIME 500
 
 WifiSecurityDetect::WifiSecurityDetect()
@@ -61,6 +63,7 @@ void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLin
         currentConnectedNetworkId_ = info.networkId;
         SecurityDetect(info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        PopupNotification(WifiNotification::CLOSE, info.networkId);
         currentConnectedNetworkId_ = -1;
     } else {
         return;
@@ -186,6 +189,52 @@ ErrCode WifiSecurityDetect::SecurityDetectResult(
     }
 }
 
+void WifiSecurityDetect::RegisterSecurityDetectObserver()
+{
+    std::unique_lock<std::mutex> lock(shareSecurityObserverMutex_);
+    if (isSecurityDetectObservered_) {
+        return;
+    }
+
+    auto datashareHelper = CreateDataShareHelper();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("SecurityDetectObserver operatePtr is nullptr");
+        return;
+    }
+    SecurityDetectObserver_ = sptr<SecurityDetectObserver>::MakeSptr();
+    if (SecurityDetectObserver_ == nullptr) {
+        WIFI_LOGI("%{public}s SecurityDetectObserver_ is null", __func__);
+        return;
+    }
+    auto uri = AssembleUri("wifi_cloud_security_check");
+    datashareHelper->RegisterObserver(uri, SecurityDetectObserver_);
+    isSecurityDetectObservered_ = true;
+    WIFI_LOGI("registerSecurityDetectObserver success");
+}
+
+void WifiSecurityDetect::UnRegisterSecurityDetectObserver()
+{
+    std::unique_lock<std::mutex> lock(shareSecurityObserverMutex_);
+    if (!isSecurityDetectObservered_) {
+        return;
+    }
+
+    auto datashareHelper = CreateDataShareHelper();
+    if (datashareHelper == nullptr) {
+        WIFI_LOGE("SecurityDetectObserver operatePtr is nullptr");
+        return;
+    }
+    SecurityDetectObserver_ = sptr<SecurityDetectObserver>::MakeSptr();
+    if (SecurityDetectObserver_ == nullptr) {
+        WIFI_LOGI("%{public}s SecurityDetectObserver_ is null", __func__);
+        return;
+    }
+    auto uri = AssembleUri("wifi_cloud_security_check");
+    datashareHelper->UnregisterObserver(uri, SecurityDetectObserver_);
+    isSecurityDetectObservered_ = false;
+    WIFI_LOGI("unregisterSecurityDetectObserver success");
+}
+
 ErrCode WifiSecurityDetect::SecurityModelJsonResult(SecurityModelResult model, bool &result)
 {
     Json::Value root;
@@ -196,7 +245,7 @@ ErrCode WifiSecurityDetect::SecurityModelJsonResult(SecurityModelResult model, b
         return WIFI_OPT_FAILED;
     }
 
-    if (root["status"].asInt() != 0) {
+    if (root["status"].isInt() && root["status"].asInt() != 0) {
         WIFI_LOGE("RequestSecurityModelResultSync status error= %{public}d", root["status"].asInt());
         return WIFI_OPT_FAILED;
     }
@@ -352,6 +401,7 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
 
 WifiSecurityDetect::~WifiSecurityDetect()
 {
+    UnRegisterSecurityDetectObserver();
     WIFI_LOGI("enter ~WifiSecurityDetect");
 }
 

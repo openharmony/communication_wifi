@@ -67,24 +67,28 @@ public:
     ~WifiSecurityDetect();
     static WifiSecurityDetect &GetInstance();
     StaServiceCallback GetStaCallback() const;
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
+    bool IsSettingSecurityDetectOn();
+    Uri AssembleUri(const std::string &key);
     void SetDatashareReady();
+    void RegisterSecurityDetectObserver();
+    void SecurityDetect(const WifiLinkedInfo &info);
+    void PopupNotification(int status, int networkid);
 
 private:
-    Uri AssembleUri(const std::string &key);
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
     std::unique_ptr<WifiEventHandler> securityDetectThread_ = nullptr;
     StaServiceCallback staCallback_;
     int currentConnectedNetworkId_ = -1;
     std::atomic<bool> datashareReady_ {false};
+    std::mutex shareSecurityObserverMutex_;
+    std::atomic<bool> isSecurityDetectObservered_ {false};
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
-    bool IsSettingSecurityDetectOn();
     bool IsSecurityDetectTimeout(const int &networkId);
     ErrCode SecurityDetectResult(const std::string &devId, uint32_t modelId, const std::string &param, bool &result);
     ErrCode SecurityModelJsonResult(SecurityModelResult model, bool &result);
-    void SecurityDetect(const WifiLinkedInfo &info);
-    void PopupNotification(int status, int networkid);
     void ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, Json::Value &root);
     int32_t AuthenticationConvert(std::string key);
+    void UnRegisterSecurityDetectObserver();
 };
 }
 }

@@ -63,6 +63,7 @@ constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
 constexpr uint32_t PROP_LEN = 26;
 constexpr uint32_t PROP_TRUE_LEN = 4;
 constexpr uint32_t PROP_FALSE_LEN = 5;
+constexpr uint32_t TEL_STATE_REGISTRY_DELAY_TIME = 5 * 1000;
 const std::string PROP_TRUE = "true";
 const std::string PROP_FALSE = "false";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
@@ -126,7 +127,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     mWifiEventSubsThread_ = std::make_unique<>("WifiRegisterThread");
     if (mWifiEventSubsThread_) {
         mWifiEventSubsThread_->PostAsyncTask([this]() { this->RegisterCellularStateObserver(); },
-            "TelStateRegistry", 5 * 1000);
+            "TelStateRegistry", TEL_STATE_REGISTRY_DELAY_TIME);
     }
 #endif
 }

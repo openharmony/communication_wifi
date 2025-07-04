@@ -205,7 +205,7 @@ void ApInfoHelper::AddNewApInfo(const std::string &cellId, const WifiDeviceConfi
     if (apInfos_.size() >= DB_BSSID_MAX_QUANTA) {
         ApInfoData oldestData;
         int32_t index = GetOldestApInfoData(oldestData);
-        if (index != -1) { 
+        if (index != -1) {
             DelApInfoByBssid(oldestData.bssid);
         }
     }

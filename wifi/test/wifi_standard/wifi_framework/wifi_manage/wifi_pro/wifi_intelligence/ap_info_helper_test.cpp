@@ -54,7 +54,6 @@ HWTEST_F(ApInfoHelperTest, IsCellIdExitTest, TestSize.Level1)
     apInfoData.cellInfos.push_back(cellInfoData);
     helper->apInfos_.push_back(apInfoData);
     EXPECT_EQ(helper->IsCellIdExit(cellInfoData.cellId), true);
-    // EXPECT_EQ(helper->IsCellIdExit(2), false);
 }
 
 HWTEST_F(ApInfoHelperTest, GetMonitorDatasTest, TestSize.Level1)
@@ -80,7 +79,6 @@ HWTEST_F(ApInfoHelperTest, AddApInfoTest1, TestSize.Level1)
 {
     std::string cellId = "1";
     int32_t networkId = 1;
-    // ApInfoData data;
     helper->apInfos_.clear();
     int32_t size = helper->apInfos_.size();
     EXPECT_EQ(size, 0);

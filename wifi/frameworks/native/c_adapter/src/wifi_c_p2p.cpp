@@ -185,8 +185,12 @@ NO_SANITIZE("cfi") WifiErrorCode P2pCancelConnect()
 static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevice& cppDevice, WifiP2pDevice* p2pDevice)
 {
     CHECK_PTR_RETURN(p2pDevice, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
-    if (memcpy_s(p2pDevice->deviceName, P2P_NAME_LENGTH,
-        cppDevice.GetDeviceName().c_str(), cppDevice.GetDeviceName().size() + 1) != EOK) {
+    size_t nameLen = cppDevice.GetDeviceName().size();
+    if (nameLen >= P2P_NAME_LENGTH) {
+        WIFI_LOGE("device name len is invalid! nameLen=%zu", nameLen);
+        return OHOS::Wifi::WIFI_OPT_FAILED;
+    }
+    if (memcpy_s(p2pDevice->deviceName, P2P_NAME_LENGTH, cppDevice.GetDeviceName().c_str(), nameLen + 1) != EOK) {
         WIFI_LOGE("memcpy_s device name failed!");
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }

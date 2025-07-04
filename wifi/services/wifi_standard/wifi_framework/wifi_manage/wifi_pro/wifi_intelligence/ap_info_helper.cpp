@@ -120,25 +120,42 @@ bool ApInfoHelper::GetAllApInfos()
 void ApInfoHelper::DelApInfoByBssid(const std::string &bssid)
 {
     WIFI_LOGI("DelApInfoByBssid:%{public}s", MacAnonymize(bssid).c_str());
-    ApInfoData data;
-    int32_t index = GetApInfoByBssid(bssid, data);
-    if (index == -1) {
-        WIFI_LOGI("DelApInfoByBssid, no such bssid.");
-        return;
-    }
     DelBssidInfo(bssid);
     DelCellInfoByBssid(bssid);
     DelNearbyApInfo(bssid);
     std::lock_guard<std::mutex> lock(mutex_);
-    apInfos_.erase(apInfos_.begin() + index);
+    for (auto iter = apInfos_.begin(); iter != apInfos_.end();) {
+        if (iter->bssid == bssid) {
+            iter = apInfos_.erase(iter);
+        } else {
+            iter++;
+        }
+    }
 }
 
 void ApInfoHelper::DelAllApInfo()
 {
-    auto iter = apInfos_.begin();
-    for (; iter != apInfos_.end();) {
-        DelApInfoByBssid(iter->bssid);
+    if (wifiDataBaseUtils_ == nullptr) {
+        WIFI_LOGE("%{public}s fail, wifiDataBaseUtils_ is nullptr", __func__);
+ 
+        return;
     }
+    std::string deleteAllBssidSql = "delete from ";
+    deleteAllBssidSql.append(BssidInfoTable::TABLE_NAME);
+    bool deletebssidRet = wifiDataBaseUtils_->ExecuteSql(deleteAllBssidSql);
+ 
+    std::string deleteAllCellIdSql = "delete from ";
+    deleteAllCellIdSql.append(CellIdInfoTable::TABLE_NAME);
+    bool deleteCellIdRet = wifiDataBaseUtils_->ExecuteSql(deleteAllCellIdSql);
+
+    std::string deleteAllNearBySql = "delete from ";
+    deleteAllNearBySql.append(NearByApInfoTable::TABLE_NAME);
+    bool deleteNearByRet = wifiDataBaseUtils_->ExecuteSql(deleteAllNearBySql);
+ 
+    WIFI_LOGI("%{public}s, deletebssidRet=%{public}d, deleteCellIdRet=%{public}d, deleteNearByRet=%{public}d",
+        __func__, deletebssidRet, deleteCellIdRet, deleteNearByRet);
+    auto iter = apInfos_.begin();
+    std::vector<ApInfoData>().swap(apInfos_);
     WIFI_LOGI("DelAllApInfo success.");
 }
 
@@ -282,6 +299,7 @@ int32_t ApInfoHelper::GetApInfoByBssid(const std::string &bssid, ApInfoData &dat
     auto iter = apInfos_.begin();
     if (apInfos_.size() == 0) {
         WIFI_LOGE("GetApInfoByBssid no apInfos_.");
+        return -1;
     }
     for (; iter != apInfos_.end();) {
         if (iter->bssid == bssid) {
@@ -498,7 +516,7 @@ int32_t ApInfoHelper::QueryNearbyInfoByParam(const std::map<std::string, std::st
     int32_t resultSetNum = resultSet->GoToFirstRow();
     if (resultSetNum != NativeRdb::E_OK) {
         resultSet->Close();
-        WIFI_LOGI("%{public}s, query empty", __func__);
+        WIFI_LOGD("%{public}s, query empty", __func__);
         return QUERY_NO_RECORD;
     }
     do {
@@ -529,10 +547,13 @@ int32_t ApInfoHelper::DelNearbyApInfo(std::string bssid)
 
 void ApInfoHelper::DelApInfoBySsid(const std::string &ssid, const std::string &keyMgmt)
 {
-    auto iter = apInfos_.begin();
-    for (; iter != apInfos_.end();) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto iter = apInfos_.begin(); iter != apInfos_.end();) {
         if (iter->ssid == ssid && iter->authType == keyMgmt) {
-            DelApInfoByBssid(linkedInfo.bssid);
+            DelBssidInfo(iter->bssid);
+            DelCellInfoByBssid(iter->bssid);
+            DelNearbyApInfo(iter->bssid);
+            iter = apInfos_.erase(iter);
         } else {
             iter++;
         }

@@ -231,14 +231,6 @@ ohos_fuzztest("EnableP2pFuzzTest") {
     defines += [ "WIFI_DATA_REPORT_ENABLE" ]
     sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext/wifi_data_report/select_network_data_report.cpp" ]
   }
-  if (defined(global_parts_info) &&
-    defined(global_parts_info.telephony_state_registry) &&
-    defined(global_parts_info.telephony_celluar_data) &&
-    wifi_feature_autoopen_specified_location) {
-    external_deps += [ "core_service:tel_celluar_data_api" ]
-    external_deps += [ "state_registry:tel_state_registry_api"]
-    defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
-  }
   part_name = "wifi"
   subsystem_name = "communication"
 }

@@ -112,7 +112,7 @@ public:
 
 void StaServerFuzzTest(const uint8_t* data, size_t size)
 {
-    int isRemoveAll = 0
+    int isRemoveAll = 0;
     int index = 0;
     int networkId = static_cast<int>(data[index++]);
     int uid = static_cast<int>(data[index++]);

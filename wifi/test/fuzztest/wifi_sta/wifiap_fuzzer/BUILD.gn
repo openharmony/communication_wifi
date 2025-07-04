@@ -114,6 +114,7 @@ ohos_fuzztest("WifiApFuzzTest") {
     "netmanager_base:net_conn_manager_if",
     "samgr:samgr_proxy",
   ]
+
   part_name = "wifi"
   subsystem_name = "communication"
 }

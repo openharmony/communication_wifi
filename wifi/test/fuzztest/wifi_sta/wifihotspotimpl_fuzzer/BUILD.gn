@@ -120,6 +120,7 @@ ohos_fuzztest("WifiHotspotImplFuzzTest") {
     "time_service:time_client",
     "window_manager:libdm_lite",
   ]
+
   part_name = "wifi"
   subsystem_name = "communication"
 }

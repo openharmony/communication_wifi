@@ -166,15 +166,6 @@ ohos_unittest("precompiled_macro_unittest") {
     external_deps += ["netmanager_ext:ethernet_manager_if",]
   }
 
-  if (defined(global_parts_info) &&
-    defined(global_parts_info.telephony_state_registry) &&
-    defined(global_parts_info.telephony_celluar_data) &&
-    wifi_feature_autoopen_specified_location) {
-    external_deps += [ "core_service:tel_celluar_data_api" ]
-    external_deps += [ "state_registry:tel_state_registry_api"]
-    defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
-  }
-
   part_name = "wifi"
   subsystem_name = "communication"
   testonly = true

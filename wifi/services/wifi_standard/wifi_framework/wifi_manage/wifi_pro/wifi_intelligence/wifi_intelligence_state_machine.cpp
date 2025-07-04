@@ -223,15 +223,15 @@ void WifiIntelligenceStateMachine::DefaultState::HandleWifiConfigurationChange(I
         WIFI_LOGE("HandleWifiConfigurationChange: failed to obtain config info.");
         return;
     }
-    if (state == static_cast<int32_t>(ConfigChange::COMFIG_REMOVE) && isRemoveAll) {
-        ApInfoHelper::GetInatance().DelAllApInfo();
+    if (state == static_cast<int32_t>(ConfigChange::CONFIG_REMOVE) && isRemoveAll) {
+        ApInfoHelper::GetInstance().DelAllApInfo();
         return;
     }
-    if (state == static_cast<int32_t>(ConfigChange::COMFIG_REMOVE)) {
+    if (state == static_cast<int32_t>(ConfigChange::CONFIG_REMOVE)) {
         if (!config.ssid.empty()) {
-            ApInfoHelper::GetInatance().DelApInfoBySsid(ssid);
+            ApInfoHelper::GetInstance().DelApInfoBySsid(config.ssid, config.keyMgmt);
         } else {
-            ApInfoHelper::GetInatance().DelApInfoByBssid(config.bssid);
+            ApInfoHelper::GetInstance().DelApInfoByBssid(config.bssid);
         }
     }
 }
@@ -785,7 +785,7 @@ void WifiIntelligenceStateMachine::ConnectedState::HandleWifiInternetChangeRes(c
         return;
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_ENABLED)) {
         if (config.isPortal) {
-            Wifi_LOGI("current network has network but is portal, no need to record it.");
+            WIFI_LOGI("current network has network but is portal, no need to record it.");
             ApInfoHelper::GetInstance().DelApInfoBySsid(config.ssid, config.keyMgmt);
             pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pNoInternetState_);
             return;

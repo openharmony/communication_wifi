@@ -15,6 +15,7 @@
 
 #include "dual_band_selector.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 #include "dual_band_learning_alg_service.h"
 #include "dual_band_utils.h"
 
@@ -22,9 +23,27 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("DualBandSelector");
 
+static void PrintSatisfyRssiAps(std::vector<CandidateRelationApInfo> &candidateRelationApInfos)
+{
+    std::stringstream associateInfo;
+    for (auto iter : candidateRelationApInfos) {
+        if (associateInfo.rdbuf() ->in_avail() != 0) {
+            associateInfo << ",";
+        }
+        if (iter.apInfo.bssid.length() < MAC_LAST2) {
+            WIFI_LOGE("PrintSatisfyRssiAps, mac length error");
+            continue;
+        }
+        associateInfo << "\"" << SsidAnonymize(iter.apInfo.ssid) << "_" <<
+            iter.apInfo.keyMgmt << "_" << iter.apInfo.bssid.substr(iter.apInfo.bssid.length() - MAC_LAST2) <<"\"";
+    }
+    WIFI_LOGI("SatisfyRssiAps [%{public}s]", associateInfo.str().c_str());
+}
+
 std::shared_ptr<CandidateRelationApInfo> DualBandSelector::Select(ApInfo &currentApInfo,
     std::vector<CandidateRelationApInfo> &candidateRelationApInfos)
 {
+    PrintSatisfyRssiAps(candidateRelationApInfos);
     ScoreResult currentApScoreResult;
     CalculateScore(currentApScoreResult, currentApInfo, candidateRelationApInfos);
     CandidateRelationApInfo *bestCandidateRelationAp =
@@ -32,8 +51,9 @@ std::shared_ptr<CandidateRelationApInfo> DualBandSelector::Select(ApInfo &curren
     if (bestCandidateRelationAp == nullptr) {
         return nullptr;
     }
-    WIFI_LOGI("DualBandSelector::Select, currentapfino totalScore(%{public}d), bestRelationAp totalScore(%{public}d)",
-        currentApScoreResult.totalScore, bestCandidateRelationAp->scoreResult.totalScore);
+    WIFI_LOGI("DualBandSelector::Select, currentap Score(%{public}d), bestAp Score(%{public}d), tar(%{public}s)",
+        currentApScoreResult.totalScore, bestCandidateRelationAp->scoreResult.totalScore,
+        MacAnonymize(bestCandidateRelationAp->apInfo.bssid).data());
     std::vector<DualBandSelectionStrategy *> dualBandSelectionStrategys;
     MakeSelectionStrategy(currentApInfo.bssid, dualBandSelectionStrategys, *bestCandidateRelationAp,
         currentApScoreResult);
@@ -133,6 +153,7 @@ bool Ap5gScoreSelectionStrategy::IsSelected()
         && candidateRelationApInfo_.apInfo.rssi >= HANDOVER_5G_DIRECTLY_RSSI) {
         return true;
     }
+    WIFI_LOGI("Ap5gScoreFilter: tarApRssi: %{public}d", candidateRelationApInfo_.apInfo.rssi);
     return false;
 }
 
@@ -147,10 +168,12 @@ SameAp5gSelectionStrategy::~SameAp5gSelectionStrategy()
 bool SameAp5gSelectionStrategy::IsSelected()
 {
     int handover5gSignalRssi = -65;
-    if (DualBandUtils::IsSameRouterAp(connectedApBssid_, candidateRelationApInfo_.apInfo.bssid)
-        && candidateRelationApInfo_.apInfo.rssi >= handover5gSignalRssi) {
+    bool isSameRouterAp = DualBandUtils::IsSameRouterAp(connectedApBssid_, candidateRelationApInfo_.apInfo.bssid);
+    if (isSameRouterAp && candidateRelationApInfo_.apInfo.rssi >= handover5gSignalRssi) {
         return true;
     }
+    WIFI_LOGI("SameAp5gFilter: isSameRouterAp: %{public}d, tarRssi: %{public}d", isSameRouterAp,
+        candidateRelationApInfo_.apInfo.rssi);
     return false;
 }
 
@@ -170,6 +193,8 @@ bool Ap5gScoreGreater24gSelectionStrategy::IsSelected()
     if (candidateApCalibScore > currentApCalibScore + handover5gDiffrenceScore) {
         return true;
     }
+    WIFI_LOGI("Ap5gScoreGreater24gFilter: candidateAp: %{public}d, currentApScore: %{public}d",
+        candidateApCalibScore, currentApCalibScore);
     return false;
 }
 

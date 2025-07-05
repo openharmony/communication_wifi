@@ -22,7 +22,7 @@
 using ::testing::ext::TestSize;
 namespace OHOS {
 namespace Wifi {
-const std::string g_errLog = "wifiTest";
+static std::string g_errLog = "wifi_test";
 
 class ApInfoHelperTest : public testing::Test {
 public:

@@ -534,7 +534,8 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
             hasMonitor = true;
         }
         if (!hasMonitor) {
-            WIFI_LOGI("FoundMonitorAp, enter relationAp InitMonitorInfo");
+            WIFI_LOGI(
+                "FoundMonitorAp, bssid %{public}s", MacAnonymize(relationAps_[relationApIndex].apInfo_.bssid).data());
             relationAps_[relationApIndex].InitMonitorInfo();
             monitorApIndexs_.push_back(relationApIndex);
         }

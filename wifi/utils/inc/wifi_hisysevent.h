@@ -123,7 +123,7 @@ struct IodStatisticInfo {
     int32_t out2InCnt =0;
     int32_t outdoorFilterCnt =0;
     int32_t outdoorAutoSelectCnt = 0;
-}
+};
 
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 

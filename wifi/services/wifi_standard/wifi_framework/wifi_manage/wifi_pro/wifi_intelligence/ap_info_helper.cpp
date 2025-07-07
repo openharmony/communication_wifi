@@ -154,7 +154,7 @@ void ApInfoHelper::DelAllApInfo()
  
     WIFI_LOGI("%{public}s, deletebssidRet=%{public}d, deleteCellIdRet=%{public}d, deleteNearByRet=%{public}d",
         __func__, deletebssidRet, deleteCellIdRet, deleteNearByRet);
-
+    std::lock_guard<std::mutex> lock(mutex_);
     std::vector<ApInfoData>().swap(apInfos_);
     WIFI_LOGI("DelAllApInfo success.");
 }

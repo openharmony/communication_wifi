@@ -80,10 +80,15 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     }
 
     /* Determine whether to select bestNetworkCandidates in outdoor scene */
+    IodStatisticInfo iodStatisticInfo;
+    iodStatisticInfo.outdoorAutoSelectCnt++;
     if (IsOutdoorFilter(bestNetworkCandidates.at(0))) {
         WIFI_LOGI("bestNetworkCandidates do not satisfy outdoor select condition");
+        iodStatisticInfo.outdoorFilterCnt++;
+        WriteIodHiSysEvent(iodStatisticInfo);
         return false;
     }
+    WriteIodHiSysEvent(iodStatisticInfo);
 
     /* if bestNetworkCandidates is not empty, assign the value of first bestNetworkCandidate
      * to the network selection result, and return true which means the network selection is successful */

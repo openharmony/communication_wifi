@@ -78,6 +78,15 @@ public:
      * @param state - wifi close state
      */
     virtual void OnWifiStateClose(int32_t state) = 0;
+
+    /**
+     * @Description receive device config change
+     *
+     * @param status - device config change type, update/remove
+     * @param config - chaned config
+     * @param isRemoveAll - is remove all device config 1:remove all 0:not remove all
+     */
+    virtual void OnWifiDeviceConfigChange(int32_t status, WifiDeviceConfig config, int32_t isRemoveAll) = 0;
 #endif
 };
 }  // namespace Wifi

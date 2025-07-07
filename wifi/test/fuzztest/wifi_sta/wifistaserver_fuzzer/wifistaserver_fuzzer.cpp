@@ -114,6 +114,7 @@ public:
 
 void StaServerFuzzTest(const uint8_t* data, size_t size)
 {
+    int isRemoveAll = 0;
     int index = 0;
     int networkId = static_cast<int>(data[index++]);
     int uid = static_cast<int>(data[index++]);
@@ -171,7 +172,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->RemoveCandidateConfig(uid, networkId);
     pStaService->FindDeviceConfig(config, config);
     pStaService->OnSystemAbilityChanged(networkId, attemptEnable);
-    pStaService->NotifyDeviceConfigChange(value);
+    pStaService->NotifyDeviceConfigChange(value, config, isRemoveAll);
     pStaService->AddCandidateConfig(uid, config, networkId);
     pStaService->RemoveAllCandidateConfig(uid);
     pStaService->ConnectToCandidateConfig(uid, networkId);

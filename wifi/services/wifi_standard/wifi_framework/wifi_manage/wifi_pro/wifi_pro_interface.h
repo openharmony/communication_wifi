@@ -82,6 +82,15 @@ public:
      * @param state - wifi close state
      */
     void OnWifiStateClose(int32_t state) override;
+
+    /**
+     * @Description receive device config change
+     *
+     * @param status - device config change type, update/remove
+     * @param config - chaned config
+     * @param isRemoveAll - is remove all device config 1:remove all 0:not remove all
+     */
+    void OnWifiDeviceConfigChange(int32_t status, WifiDeviceConfig config, int32_t isRemoveAll) override;
 #endif
 private:
     /**

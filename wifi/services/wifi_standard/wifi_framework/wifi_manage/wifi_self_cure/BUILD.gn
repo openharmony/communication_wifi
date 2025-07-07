@@ -88,6 +88,14 @@ ohos_static_library("wifi_self_cure") {
   if (wifi_feature_with_local_random_mac) {
     defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
   }
+  if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_state_registry) &&
+    defined(global_parts_info.telephony_celluar_data) &&
+    wifi_feature_autoopen_specified_location) {
+    external_deps += [ "core_service:tel_celluar_data_api" ]
+    external_deps += [ "state_registry:tel_state_registry_api"]
+    defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
+  }
   cflags = memory_optimization_cflags
   cflags_cc = memory_optimization_cflags_cc
   cflags_cc += [

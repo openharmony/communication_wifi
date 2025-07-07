@@ -19,6 +19,7 @@
 #include "sta_define.h"
 #include "wifi_logger.h"
 #include "json/json.h"
+#include <json/value.h>
 #include <map>
 
 namespace OHOS {
@@ -513,6 +514,17 @@ void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
     root["IPV6_UNIQUELOCALADDR1"] = Ipv6Anonymize(ipv6Info.uniqueLocalAddress1);
     root["IPV6_UNIQUELOCALADDR2"] = Ipv6Anonymize(ipv6Info.uniqueLocalAddress2);
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_DHCP_INFO", "EVENT_VALUE", writer.write(root));
+}
+
+void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OUTDOOR_FILTER_CNT"] = iodStatisticInfo.outdoorFilterCnt;
+    root["OUTDOOR_SELECT_CNT"] = iodStatisticInfo.outdoorAutoSelectCnt;
+    root["IN_TO_OUTDOOR_CNT"] = iodStatisticInfo.in2OutCnt;
+    root["OUT_TO_INDOOR_CNT"] = iodStatisticInfo.out2InCnt;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_IOD_STATISTIC", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi
 }  // namespace OHOS

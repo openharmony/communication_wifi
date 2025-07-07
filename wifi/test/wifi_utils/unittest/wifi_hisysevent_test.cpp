@@ -101,5 +101,12 @@ HWTEST_F(WifiHisyseventTest, Write5gPrefFailedHisyseventTest, TestSize.Level1)
     Write5gPrefFailedHisysevent(info);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+HWTEST_F(WifiHisyseventTest, WriteIodHiSysEventTest, TestSize.Level1)
+{
+    IodStatisticInfo info;
+    WriteIodHiSysEvent(info);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 }  // namespace Wifi
 }  // namespace OHOS

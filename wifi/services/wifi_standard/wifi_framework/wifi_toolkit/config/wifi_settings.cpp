@@ -53,7 +53,7 @@ WifiSettings &WifiSettings::GetInstance()
     return gWifiSettings;
 #else
     if (gWifiSettings == nullptr) {
-        gWifiSettings = new (std::nothrow) WifiSettings();
+        gWifiSettings = new WifiSettings();
     }
     return *gWifiSettings;
 #endif

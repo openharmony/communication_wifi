@@ -149,7 +149,9 @@ ohos_static_library("wifi_telephony_utils") {
       defined(global_parts_info.telephony_cellular_data)) {
       external_deps += [
         "cellular_data:tel_cellular_data_api",
-        "core_service:tel_core_service_api",]
+        "core_service:tel_core_service_api",
+        "ipc:ipc_core",
+        ]
       defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
   }
   part_name = "wifi"

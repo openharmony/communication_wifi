@@ -158,7 +158,7 @@ WifiScanProxy *WifiScanProxy::GetInstance(void)
         return g_instance;
     }
 
-    WifiScanProxy *tempInstance = new(std::nothrow) WifiScanProxy();
+    WifiScanProxy *tempInstance = new WifiScanProxy();
     g_instance = tempInstance;
     return g_instance;
 }

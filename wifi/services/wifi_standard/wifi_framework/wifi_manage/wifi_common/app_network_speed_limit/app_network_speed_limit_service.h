@@ -29,15 +29,6 @@ namespace Wifi {
 constexpr const int UNKNOWN_UID = -1;
 constexpr const int UNKNOWN_MODE = -1;
 
-enum GameSceneId : int {
-    MSG_GAME_STATE_START = 0,
-    MSG_GAME_STATE_END = 1,
-    MSG_GAME_ENTER_PVP_BATTLE = 2,
-    MSG_GAME_EXIT_PVP_BATTLE = 3,
-    MSG_GAME_STATE_FOREGROUND = 4,
-    MSG_GAME_STATE_BACKGROUND = 5,
-};
-
 struct AsyncParamInfo {
     int controlId;
     int limitMode;

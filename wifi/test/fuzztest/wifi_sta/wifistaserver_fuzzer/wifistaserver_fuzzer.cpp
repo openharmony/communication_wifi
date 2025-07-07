@@ -16,6 +16,8 @@
 #include "wifistaserver_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 #include "mock_sta_state_machine.h"
+#include "wifi_security_detect.h"
+#include "wifi_security_detect_observer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -112,6 +114,7 @@ public:
 
 void StaServerFuzzTest(const uint8_t* data, size_t size)
 {
+    int isRemoveAll = 0;
     int index = 0;
     int networkId = static_cast<int>(data[index++]);
     int uid = static_cast<int>(data[index++]);
@@ -169,7 +172,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->RemoveCandidateConfig(uid, networkId);
     pStaService->FindDeviceConfig(config, config);
     pStaService->OnSystemAbilityChanged(networkId, attemptEnable);
-    pStaService->NotifyDeviceConfigChange(value);
+    pStaService->NotifyDeviceConfigChange(value, config, isRemoveAll);
     pStaService->AddCandidateConfig(uid, config, networkId);
     pStaService->RemoveAllCandidateConfig(uid);
     pStaService->ConnectToCandidateConfig(uid, networkId);
@@ -457,6 +460,44 @@ void GetImsiFuzzTest(const uint8_t* data, size_t size)
     WifiTelephonyUtils::GetImsi(slotId);
 }
 
+void TelephonyUtilsFuzzTest(const uint8_t* data)
+{
+    int index = 0;
+    int slotId = static_cast<int>(data[index++]);
+    int eapSubId = static_cast<int>(data[index++]);
+    WifiTelephonyUtils::GetDefaultId(slotId);
+    WifiTelephonyUtils::GetSimCardState(slotId);
+    WifiTelephonyUtils::IsMultiSimEnabled();
+    WifiTelephonyUtils::IsSupportCardType(eapSubId);
+    WifiTelephonyUtils::GetSlotId(eapSubId);
+}
+
+void SimAkaAuthFuzzTest(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    std::string nonce = std::string(reinterpret_cast<const char*>(data), size);
+    WifiTelephonyUtils::AuthType authType = static_cast<WifiTelephonyUtils::AuthType>(data[index++]);
+    int32_t eapSubId = static_cast<int32_t>(data[index++]);
+    SimAkaAuth(nonce, authType, eapSubId);
+}
+
+void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
+{
+    WifiLinkedInfo info;
+    if (size >= sizeof(WifiLinkedInfo)) {
+        int index = 0;
+        info.networkId = static_cast<int>(data[index++]);
+        info.rssi = static_cast<int>(data[index++]);
+        info.band = static_cast<int>(data[index++]);
+        info.linkSpeed = static_cast<int>(data[index++]);
+        info.macType = static_cast<int>(data[index++]);
+        info.ssid = std::string(reinterpret_cast<const char*>(data), size);
+        info.bssid = std::string(reinterpret_cast<const char*>(data), size);
+        info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
+    }
+    WifiSecurityDetect::GetInstance().SecurityDetect(info);
+}
+    
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     if (!OHOS::Wifi::InitParam()) {
@@ -489,6 +530,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::RegisterFilterBuilderFuzzTest(data, size);
     OHOS::Wifi::DeregisterFilterBuilderFuzzTest(data, size);
     OHOS::Wifi::GetImsiFuzzTest(data, size);
+    OHOS::Wifi::TelephonyUtilsFuzzTest(data);
+    OHOS::Wifi::SimAkaAuthFuzzTest(data, size);
+    OHOS::Wifi::SecurityDetectFuzzTest(data, size);
     return 0;
 }
 }

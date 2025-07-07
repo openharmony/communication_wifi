@@ -29,6 +29,9 @@
 #include "net_conn_callback_stub.h"
 #include "net_handle.h"
 #include "net_all_capabilities.h"
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+#include "telephony_observer.h"
+#endif
 namespace OHOS {
 namespace Wifi {
 #ifdef HAS_POWERMGR_PART
@@ -150,6 +153,14 @@ public:
         const sptr<NetManagerStandard::NetAllCapabilities> &netAllCap) override;
 };
 
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+class CellularStateObserver : public Telephony::TelephonyObserver {
+public:
+    CellularStateObserver() = default;
+    ~CellularStateObserver() = default;
+    void OnCellInfoUpdated(int32_t slotId, const std::vector<sptr<Telephony::CellInformation>> &vec) override;
+};
+#endif
 class WifiEventSubscriberManager : public WifiSystemAbilityListener {
 public:
     WifiEventSubscriberManager();
@@ -226,6 +237,10 @@ private:
     void UnregisterDisplayListener();
     void RegisterNetworkConnSubscriber();
     void UnRegisterNetworkConnSubscriber();
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    void RegisterCellularStateObserver();
+    void UnRegisterCellularStateObserver();
+#endif
 
 private:
     uint32_t cesTimerId{0};
@@ -253,7 +268,7 @@ private:
     static bool mIsMdmForbidden;
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;
-    std::unique_ptr<WifiEventHandler> mWifiEventSubsThread = nullptr;
+    std::unique_ptr<WifiEventHandler> mWifiEventSubsThread_ = nullptr;
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     std::shared_ptr<AssetEventSubscriber> wifiAssetrEventSubsciber_ = nullptr;
     std::mutex AssetEventMutex;
@@ -268,6 +283,10 @@ private:
     std::mutex displayStatusListenerMutex_;
     std::mutex networkConnSubscriberLock_;
     sptr<NetworkConnSubscriber> networkConnSubscriber_ = nullptr;
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    sptr<CellularStateObserver> cellularStateObserver_ { nullptr };
+    int32_t simCount_ { 0 };
+#endif
 };
 
 }  // namespace Wifi

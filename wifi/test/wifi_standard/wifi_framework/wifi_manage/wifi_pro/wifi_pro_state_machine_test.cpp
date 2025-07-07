@@ -611,8 +611,8 @@ HWTEST_F(WifiProStateMachineTest, WifiHasNetStateRequestHttpDetectTest01, TestSi
 
 HWTEST_F(WifiProStateMachineTest, WifiHasNetStateHandleWifiQoeSlowTest01, TestSize.Level1)
 {
-    wifiHasNetState_->HandleWifiQoeSlow();
-    EXPECT_NE(wifiHasNetState_->pWifiProStateMachine_->wifiSwitchReason_, TEN);
+    pWifiProStateMachine_->pWifiHasNetState_->HandleWifiQoeSlow();
+    EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
 
 HWTEST_F(WifiProStateMachineTest, WifiNoNetStateExecuteStateMsgTest01, TestSize.Level1)

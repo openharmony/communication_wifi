@@ -495,7 +495,7 @@ void WifiHotspotStub::OnRegisterCallBack(
         }
         sptr<IWifiHotspotCallback> callback_ = iface_cast<IWifiHotspotCallback>(remote);
         if (callback_ == nullptr) {
-            callback_ = new (std::nothrow) WifiHotspotCallbackProxy(remote);
+            callback_ = sptr<WifiHotspotCallbackProxy>::MakeSptr(remote);
             WIFI_LOGI("create new WifiHotspotCallbackProxy!");
         }
 
@@ -512,7 +512,7 @@ void WifiHotspotStub::OnRegisterCallBack(
         } else {
             std::unique_lock<std::mutex> lock(deathRecipientMutex);
             if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiHotspotDeathRecipient();
+                deathRecipient_ = sptr<WifiHotspotDeathRecipient>::MakeSptr();
             }
             // Add death recipient to remote object if this is the first time to register callback.
             if (remote->IsProxyObject() &&

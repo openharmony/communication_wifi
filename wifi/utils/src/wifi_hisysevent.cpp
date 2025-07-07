@@ -19,7 +19,6 @@
 #include "sta_define.h"
 #include "wifi_logger.h"
 #include "json/json.h"
-#include <json/value.h>
 #include <map>
 
 namespace OHOS {

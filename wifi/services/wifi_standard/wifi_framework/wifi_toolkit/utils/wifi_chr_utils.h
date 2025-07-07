@@ -17,7 +17,6 @@
 #define OHOS_WIFI_CHR_UTILS_H
 
 #include "wifi_msg.h"
-#include <set>
 
 namespace OHOS {
 namespace Wifi {
@@ -38,9 +37,7 @@ private:
 private:
     std::vector<WifiSignalPollInfo> signalPollInfoArray;
     std::mutex signalInfoMutex;
-    std::mutex bssidMutex_;
-    std::vector<std::string> bssidArray_;
-    int64_t startTime_ = 0;
+    WifiSignalPollInfo signalPollInfoItem_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

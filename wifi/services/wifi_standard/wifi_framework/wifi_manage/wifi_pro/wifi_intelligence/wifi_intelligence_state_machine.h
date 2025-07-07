@@ -42,6 +42,9 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine_ { nullptr };
+        void HandlWifiConnectStateChange(InternalMessagePtr msg);
+        void HandleWifiDisabled(InternalMessagePtr msg);
+        void HandleWifiConfigurationChange(InternalMessagePtr msg);
     };
 
     /**

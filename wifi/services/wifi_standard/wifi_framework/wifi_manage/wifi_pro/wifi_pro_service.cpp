@@ -20,13 +20,6 @@
 #include "wifi_pro_utils.h"
 #include "wifi_common_util.h"
 #include "wifi_config_center.h"
-#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
-#include "telephony_observer_client.h"
-#include "telephony_types.h"
-#include "core_service_client.h"
-#include "cellular_data_client.h"
-#include "telephony_observer_client.h"
-#endif
 
 #ifndef FALLTHROUGH_INTENDED
 #define FALLTHROUGH_INTENDED [[clang::fallthrough]]  // NOLINT
@@ -45,15 +38,6 @@ WifiProService::WifiProService(int32_t instId)
 WifiProService::~WifiProService()
 {
     WIFI_LOGI("Enter ~WifiProService");
-#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
-    UnRegisterCellularStateObserver();
-#endif
-}
-
-WifiProService &WifiProService::GetInstance()
-{
-    static WifiProService gWifiProService;
-    return gWifiProService;
 }
 
 ErrCode WifiProService::InitWifiProService()
@@ -80,7 +64,6 @@ ErrCode WifiProService::InitWifiProService()
             return WIFI_OPT_FAILED;
         }
     }
-    RegisterCellularStateObserver();
 #endif
     return WIFI_OPT_SUCCESS;
 }
@@ -213,69 +196,33 @@ void WifiProService::OnScreenStateChanged(int32_t screenState)
         }
     }
 }
- 
+
 void WifiProService::OnCellInfoUpdated()
 {
     if (pWifiIntelligenceStateMachine_ != nullptr) {
         pWifiIntelligenceStateMachine_->SendMessage(EVENT_CELL_STATE_CHANGE);
     }
 }
- 
+
 void WifiProService::OnWifiStateOpen(int32_t state)
 {
     if (pWifiIntelligenceStateMachine_ != nullptr) {
         pWifiIntelligenceStateMachine_->SendMessage(EVENT_WIFI_ENABLED, state);
     }
 }
- 
+
 void WifiProService::OnWifiStateClose(int32_t state)
 {
     if (pWifiIntelligenceStateMachine_ != nullptr) {
         pWifiIntelligenceStateMachine_->SendMessage(EVENT_WIFI_DISABLED, state);
     }
 }
- 
-void WifiProService::RegisterCellularStateObserver()
+
+void WifiProService::OnWifiDeviceConfigChange(int32_t status, WifiDeviceConfig config, int32_t isRemoveAll)
 {
-    WIFI_LOGI("RegisterCellularStateObserver.");
-    if (cellularStateObserver_ == nullptr) {
-        cellularStateObserver_ = sptr<CellularStateObserver>::MakeSptr();
-    } else {
-        WIFI_LOGI("RegisterCellularStateObserver success.");
-        return;
+    if (pWifiIntelligenceStateMachine_ != nullptr) {
+        pWifiIntelligenceStateMachine_->SendMessage(EVENT_CONFIGURATION_CHANGED, status, isRemoveAll, config);
     }
-    uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
-    simCount_ = Telephony::CoreServiceClient::GetInstance().GetMaxSimCount();
-    for (int32_t i = 0; i < simCount_; i++) {
-        auto result = Telephony::TelephonyObserverClient::GetInstance().AddStateObserver(
-            cellularStateObserver_, i, telephonyObserverMask, true);
-        if (result != 0) {
-            WIFI_LOGE("RegisterCellularStateObserver failed, slotId:%{public}d, res:%{public}d", i, result);
-        } else {
-            WIFI_LOGI("RegisterCellularStateObserver success, slotId:%{public}d, res:%{public}d", i, result);
-        }
-    }
-}
- 
-void WifiProService::UnRegisterCellularStateObserver()
-{
-    if (cellularStateObserver_ != nullptr) {
-        uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
-        for (int32_t i = 0; i < simCount_; i++) {
-            auto result = Telephony::TelephonyObserverClient::GetInstance().RemoveStateObserver(
-                i, telephonyObserverMask);
-            if (result != 0) {
-                WIFI_LOGE("UnRegisterCellularStateObserver failed,slotId:%{public}d,res:%{public}d", i, result);
-            }
-        }
-    }
-    cellularStateObserver_ = nullptr;
-}
- 
-void CellularStateObserver::OnCellInfoUpdated(int32_t slotId, const std::vector<sptr<Telephony::CellInformation>> &vec)
-{
-    WIFI_LOGI("CellularStateObserver::OnCellInfoUpdated");
-    WifiProService::GetInstance().OnCellInfoUpdated();
 }
 #endif
 }  // namespace Wifi

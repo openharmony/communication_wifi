@@ -1223,6 +1223,30 @@ bool P2pStateMachine::HasPersisentGroup(void)
     return !grpInfo.empty();
 }
 
+void P2pStateMachine::FilterInvalidGroup() const
+{
+    bool hasFilter = false;
+    std::vector<WifiP2pGroupInfo> groups = groupManager.GetGroups();
+    for (auto it = groups.begin(); it != groups.end();) {
+        if (it->GetPassphrase().empty()) {
+            WIFI_LOGE("FilterInvalidGroup config psk is empty");
+            it = groups.erase(it);
+            hasFilter = true;
+        } else {
+            it++;
+        }
+    }
+    if (!hasFilter) {
+        return;
+    }
+    groupManager.ClearAll();
+    for (auto group : groups) {
+        groupManager.AddGroup(group);
+    }
+    WifiSettings::GetInstance().SetWifiP2pGroupInfo(groups);
+    WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();
+}
+
 void P2pStateMachine::SetClientInfo(HalP2pGroupConfig &wpaConfig, WifiP2pGroupInfo &grpBuf) const
 {
     std::vector<WifiP2pDevice> devices = grpBuf.GetPersistentDevices();
@@ -1240,6 +1264,7 @@ void P2pStateMachine::UpdateGroupInfoToWpa() const
     /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
      * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
      */
+    FilterInvalidGroup();
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     if (grpInfo.size() > 0) {
         if (WifiP2PHalInterface::GetInstance().RemoveNetwork(-1) != WIFI_HAL_OPT_OK) {

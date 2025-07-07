@@ -440,6 +440,7 @@ private:
     void DoP2pArp(std::string serverIp, std::string clientIp);
     bool ReinvokeGroup(WifiP2pConfigInternal &config, int networkId, const WifiP2pDevice &device) const;
     void SetClientInfo(HalP2pGroupConfig &wpaConfig, WifiP2pGroupInfo &grpBuf) const;
+    void FilterInvalidGroup() const;
 
 private:
     mutable std::mutex cbMapMutex;

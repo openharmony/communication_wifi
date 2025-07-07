@@ -327,7 +327,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
 
         sptr<IWifiScanCallback> callback_ = iface_cast<IWifiScanCallback>(remote);
         if (callback_ == nullptr) {
-            callback_ = new (std::nothrow) WifiScanCallbackProxy(remote);
+            callback_ = sptr<WifiScanCallbackProxy>::MakeSptr(remote);
             WIFI_LOGI("create new `WifiScanCallbackProxy`!");
         }
 
@@ -347,7 +347,7 @@ int WifiScanStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         } else {
             std::unique_lock<std::mutex> lock(deathRecipientMutex);
             if (deathRecipient_ == nullptr) {
-                deathRecipient_ = new (std::nothrow) WifiScanDeathRecipient();
+                deathRecipient_ = sptr<WifiScanDeathRecipient>::MakeSptr();
             }
             // Add death recipient to remote object if this is the first time to register callback.
             if ((remote->IsProxyObject()) &&

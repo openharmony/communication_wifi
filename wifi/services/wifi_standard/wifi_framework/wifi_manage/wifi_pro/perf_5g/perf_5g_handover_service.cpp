@@ -186,7 +186,6 @@ void Perf5gHandoverService::ScanResultUpdated(std::vector<InterScanInfo> &scanIn
     if (connectedAp_ == nullptr || connectedAp_->canNotPerf) {
         return;
     }
-    WIFI_LOGI("ScanResultUpdated, start update");
     InterScanInfo *currentApScanResult = nullptr;
     for (auto &wifiScanInfo : scanInfos) {
         if (wifiScanInfo.bssid == connectedAp_->apInfo.bssid) {

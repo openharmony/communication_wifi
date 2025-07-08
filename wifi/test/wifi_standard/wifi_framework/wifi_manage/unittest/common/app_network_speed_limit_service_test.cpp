@@ -231,6 +231,8 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, HandleRequest, TestSize.Level1)
     asyncParamInfo.networkControlInfo.state = 1;
     asyncParamInfo.networkControlInfo.uid = 20020022;
     AppNetworkSpeedLimitService::GetInstance().HandleRequest(asyncParamInfo);
+    asyncParamInfo.networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_VIDEO_CALL;
+    AppNetworkSpeedLimitService::GetInstance().HandleRequest(asyncParamInfo);
     int audioUidSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
     EXPECT_EQ(audioUidSize, 1);
 }
@@ -260,6 +262,20 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControlInfo, TestSize.Le
     AppNetworkSpeedLimitService::GetInstance().m_additionalWindowUidSet.clear();
     int windowUidSize = AppNetworkSpeedLimitService::GetInstance().m_additionalWindowUidSet.size();
     EXPECT_EQ(windowUidSize, 0);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, VideoCallNetworkSpeedLimitConfigs, TestSize.Level1)
+{
+    WIFI_LOGI("VideoCallNetworkSpeedLimitConfigs enter");
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.state = 1;
+    AppNetworkSpeedLimitService::GetInstance().VideoCallNetworkSpeedLimitConfigs(networkControlInfo);
+    auto level = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL];
+    EXPECT_EQ(level, BG_LIMIT_LEVEL_7);
+    networkControlInfo.state = 0;
+    AppNetworkSpeedLimitService::GetInstance().VideoCallNetworkSpeedLimitConfigs(networkControlInfo);
+    level = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL];
+    EXPECT_EQ(level, BG_LIMIT_OFF);
 }
 
 HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateNoSpeedLimitConfigs, TestSize.Level1)

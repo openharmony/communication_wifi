@@ -18,6 +18,7 @@
 #include <functional>
 #include "wifi_logger.h"
 #include "wifi_service_manager.h"
+#include "wifi_hisysevent.h"
 #include <mutex>
 
 namespace OHOS {
@@ -69,6 +70,13 @@ void WifiSensorScene::SensorEnhCallback(int scenario)
     WIFI_LOGI("%{public}s scene %{public}d", __FUNCTION__, scenario);
     std::lock_guard<std::mutex> lock(mutex_);
     if (scenario_ != scenario) {
+        IodStatisticInfo iodStatisticInfo;
+        if (scenario == SCENARIO_OUTDOOR) {
+            iodStatisticInfo.in2OutCnt++;
+        } else {
+            iodStatisticInfo.out2InCnt++;
+        }
+        WriteIodHiSysEvent(iodStatisticInfo);
         scenario_ = scenario;
     }
 }

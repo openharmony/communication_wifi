@@ -405,6 +405,7 @@ public:
         void DealDhcpResult(int ipType);
         void DealDhcpResultFailed();
         void DealDhcpOfferResult();
+        void Clear();
     private:
         void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
@@ -413,6 +414,7 @@ public:
         void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
         void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
         void DhcpResultNotifyEvent(DhcpReturnCode result, int ipType = -1);
+        void ClearDhcpResult(DhcpResult *result);
         static StaStateMachine *pStaStateMachineList[STA_INSTANCE_MAX_NUM];
         StaStateMachine *pStaStateMachine;
         std::mutex dhcpResultMutex;

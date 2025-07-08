@@ -2748,5 +2748,31 @@ HWTEST_F(StaStateMachineTest, AudioStateNotifyTest, TestSize.Level1)
 {
     AudioStateNotifyTest();
 }
+
+HWTEST_F(StaStateMachineTest, DhcpResultNotifyClearTest, TestSize.Level1)
+{
+    StaStateMachine staStateMachine;
+    pStaStateMachine->pDhcpResultNotify
+        = new StaStateMachine::DhcpResultNotify(&staStateMachine);
+    pStaStateMachine->pDhcpResultNotify->DhcpIpv6Result.isOptSuc = 1;
+    pStaStateMachine->pDhcpResultNotify->Clear();
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->DhcpIpv6Result.isOptSuc == 0);
+    pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result.isOptSuc = 1;
+    pStaStateMachine->pDhcpResultNotify->Clear();
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result.isOptSuc == 0);
+}
+
+HWTEST_F(StaStateMachineTest, DhcpResultNotifyClear2Test, TestSize.Level1)
+{
+    StaStateMachine staStateMachine;
+    pStaStateMachine->pDhcpResultNotify
+        = new StaStateMachine::DhcpResultNotify(&staStateMachine);
+    pStaStateMachine->pDhcpResultNotify->DhcpIpv6Result.isOptSuc = 1;
+    pStaStateMachine->pDhcpResultNotify->ClearDhcpResult(&pStaStateMachine->pDhcpResultNotify->DhcpIpv6Result);
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->DhcpIpv6Result.isOptSuc == 0);
+    pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result.isOptSuc = 1;
+    pStaStateMachine->pDhcpResultNotify->ClearDhcpResult(&pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result);
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result.isOptSuc == 0);
+}
 } // namespace Wifi
 } // namespace OHOS

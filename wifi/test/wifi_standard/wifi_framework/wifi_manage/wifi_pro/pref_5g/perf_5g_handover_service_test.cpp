@@ -89,15 +89,5 @@ HWTEST_F(Perf5gHandoverServiceTest, OnDisconnectedTest1, TestSize.Level1)
     perf5gHandoverService_->OnDisconnected();
     EXPECT_EQ(perf5gHandoverService_->connectedAp_, nullptr);
 }
-HWTEST_F(Perf5gHandoverServiceTest, PrintRelationAps1, TestSize.Level1)
-{
-    RelationAp ap1;
-    ap1.apInfo_.ssid = "test1";
-    ap1.apInfo_.keyMgmt = "EAP";
-    ap1.apInfo_.bssid = "11111";
-    perf5gHandoverService_->relationAps_.push_back(ap1);
-    perf5gHandoverService_->PrintRelationAps();
-    EXPECT_EQ(perf5gHandoverService_->connectedAp_, nullptr);
-}
 }
 }

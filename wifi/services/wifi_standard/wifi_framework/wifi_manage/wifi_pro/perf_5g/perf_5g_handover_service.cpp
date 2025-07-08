@@ -186,7 +186,6 @@ void Perf5gHandoverService::ScanResultUpdated(std::vector<InterScanInfo> &scanIn
     if (connectedAp_ == nullptr || connectedAp_->canNotPerf) {
         return;
     }
-    WIFI_LOGI("ScanResultUpdated, start update");
     InterScanInfo *currentApScanResult = nullptr;
     for (auto &wifiScanInfo : scanInfos) {
         if (wifiScanInfo.bssid == connectedAp_->apInfo.bssid) {
@@ -534,7 +533,8 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
             hasMonitor = true;
         }
         if (!hasMonitor) {
-            WIFI_LOGI("FoundMonitorAp, enter relationAp InitMonitorInfo");
+            WIFI_LOGI(
+                "FoundMonitorAp, bssid %{public}s", MacAnonymize(relationAps_[relationApIndex].apInfo_.bssid).data());
             relationAps_[relationApIndex].InitMonitorInfo();
             monitorApIndexs_.push_back(relationApIndex);
         }

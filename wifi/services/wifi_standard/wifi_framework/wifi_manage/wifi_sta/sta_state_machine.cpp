@@ -1013,6 +1013,7 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     StopTimer(static_cast<int>(CMD_START_NETCHECK));
     WIFI_LOGI("StopDhcp, isStopV4: %{public}d, isStopV6: %{public}d", isStopV4, isStopV6);
+    pDhcpResultNotify->Clear();
     if (isStopV4) {
         StopDhcpClient(ifname.c_str(), false, true);
         IpInfo ipInfo;
@@ -3458,6 +3459,24 @@ void StaStateMachine::DhcpResultNotify::DealDhcpOfferResult()
         }
     }
     pStaStateMachine->InvokeOnDhcpOfferReport(ipInfo);
+}
+
+void StaStateMachine::DhcpResultNotify::Clear()
+{
+    std::unique_lock<std::mutex> lock(dhcpResultMutex);
+    ClearDhcpResult(&DhcpIpv4Result);
+    ClearDhcpResult(&DhcpIpv6Result);
+    ClearDhcpResult(&DhcpOfferInfo);
+    WIFI_LOGI("Clear all DHCP results for StaStateMachine instance %{public}d",
+        pStaStateMachine->m_instId);
+}
+
+void StaStateMachine::DhcpResultNotify::ClearDhcpResult(DhcpResult *result)
+{
+    if (result == nullptr) {
+        return;
+    }
+    memset_s(result, sizeof(DhcpResult), 0, sizeof(DhcpResult));
 }
 
 /* ------------------ state machine Commont function ----------------- */

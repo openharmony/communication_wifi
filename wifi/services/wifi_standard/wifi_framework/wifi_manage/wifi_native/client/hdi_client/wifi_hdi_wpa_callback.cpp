@@ -33,6 +33,8 @@
 
 constexpr int WIFI_HDI_STR_MAC_LENGTH = 17;
 constexpr int WIFI_HDI_REASON_LENGTH = 32;
+constexpr int WIFI_SSID_MAX_LENGTH = 32;
+constexpr int WIFI_DEVICE_INFO_MAX_LENGTH = 128;
 constexpr int PD_STATUS_CODE_SHOW_PIN = 0;
 constexpr int PD_STATUS_CODE_ENTER_PIN = 1;
 constexpr int PD_STATUS_CODE_PBC_REQ = 2;
@@ -170,7 +172,11 @@ int32_t OnEventStateChanged(struct IWpaCallback *self,
 
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     g_currentWpaStatus = statechangedParam->status;
-    std::string ssid = std::string(statechangedParam->ssid, statechangedParam->ssid + statechangedParam->ssidLen);
+    std::string ssid;
+    if (statechangedParam->ssid != NULL && statechangedParam->ssidLen > 0 &&
+        statechangedParam->ssidLen <= WIFI_SSID_MAX_LENGTH) {
+        ssid = std::string(statechangedParam->ssid, statechangedParam->ssid + statechangedParam->ssidLen);
+    }
     if (cbk.onWpaStateChanged) {
         cbk.onWpaStateChanged(g_currentWpaStatus, ssid);
     }
@@ -192,7 +198,8 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
         return 1;
     }
     std::string ssid = "";
-    if (tempDisabledParam->ssid != NULL && tempDisabledParam->ssidLen > 0) {
+    if (tempDisabledParam->ssid != NULL && tempDisabledParam->ssidLen > 0 &&
+        tempDisabledParam->ssidLen <= WIFI_SSID_MAX_LENGTH) {
         ssid = std::string(tempDisabledParam->ssid, tempDisabledParam->ssid + tempDisabledParam->ssidLen);
     }
     std::string reason = "";
@@ -485,8 +492,12 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
         cbInfo.configMethods = deviceInfoParam->configMethods;
         cbInfo.deviceCapabilities = deviceInfoParam->deviceCapabilities;
         cbInfo.groupCapabilities = deviceInfoParam->groupCapabilities;
-        cbInfo.wfdDeviceInfo.insert(cbInfo.wfdDeviceInfo.begin(), deviceInfoParam->wfdDeviceInfo,
-            deviceInfoParam->wfdDeviceInfo + deviceInfoParam->wfdLength);
+        if (deviceInfoParam && deviceInfoParam->wfdDeviceInfo && deviceInfoParam->wfdLength > 0 &&
+            deviceInfoParam->wfdLength <= WIFI_DEVICE_INFO_MAX_LENGTH) {
+            cbInfo.wfdDeviceInfo.insert(cbInfo.wfdDeviceInfo.begin(),
+                deviceInfoParam->wfdDeviceInfo,
+                deviceInfoParam->wfdDeviceInfo + deviceInfoParam->wfdLength);
+        }
         cbk.onDeviceFound(cbInfo);
         LOGI("OnEventDeviceFound p2pDeviceAddress=%{private}s deviceName=%{private}s",
             p2pDeviceAddress, deviceInfoParam->deviceName);

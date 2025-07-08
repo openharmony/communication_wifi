@@ -514,5 +514,16 @@ void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
     root["IPV6_UNIQUELOCALADDR2"] = Ipv6Anonymize(ipv6Info.uniqueLocalAddress2);
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_DHCP_INFO", "EVENT_VALUE", writer.write(root));
 }
+
+void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
+{
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OUTDOORFILTERCNT"] = iodStatisticInfo.outdoorFilterCnt;
+    root["OUTDOORSELECTWIFICNT"] = iodStatisticInfo.outdoorAutoSelectCnt;
+    root["INTOOUTDOORCNT"] = iodStatisticInfo.in2OutCnt;
+    root["OUTTOINDOORCNT"] = iodStatisticInfo.out2InCnt;
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_IOD_STATISTIC", "EVENT_VALUE", writer.write(root));
+}
 }  // namespace Wifi
 }  // namespace OHOS

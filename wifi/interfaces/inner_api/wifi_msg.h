@@ -288,6 +288,7 @@ struct WifiLinkedInfo {
     WifiCategory supportedWifiCategory;
     bool isMloConnected;
     int isHiLinkNetwork;
+    bool isHiLinkProNetwork;
     bool isWurEnable;
     int c0Rssi;
     int c1Rssi;
@@ -322,6 +323,7 @@ struct WifiLinkedInfo {
         lastTxPackets = 0;
         isAncoConnected = false;
         isHiLinkNetwork = 0;
+        isHiLinkProNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         isMloConnected = false;
         isWurEnable = false;

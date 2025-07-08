@@ -187,6 +187,7 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
         isHiLinkNetwork = static_cast<bool>((each.isHiLinkNetwork > 0
             && each.isHiLinkNetwork <= EXTERNAL_HILINK_MAX_VALUE) ? true : false);
         SetValueBool(env, "isHiLinkNetwork", isHiLinkNetwork, eachObj);
+        SetValueBool(env, "isHiLinkProNetwork", each.isHiLinkProNetwork, eachObj);
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
@@ -1141,6 +1142,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
     SetValueInt32(env, "supportedWifiCategory", static_cast<int>(linkedInfo.supportedWifiCategory), result);
     SetValueBool(env, "isHiLinkNetwork", static_cast<bool>((linkedInfo.isHiLinkNetwork > 0
         && linkedInfo.isHiLinkNetwork <= EXTERNAL_HILINK_MAX_VALUE) ? true : false), result);
+    SetValueBool(env, "isHiLinkProNetwork", static_cast<bool>(linkedInfo.isHiLinkProNetwork), result);
     SetValueInt32(env, "wifiLinkType", static_cast<int>(linkedInfo.wifiLinkType), result);
 }
 

@@ -28,6 +28,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int MAC_STRING_SIZE = 17;
+constexpr int MAX_CHAR_LEN = 128;
 constexpr int MIN_SSID_LEN = 1;
 constexpr int MAX_SSID_LEN = 32;
 constexpr int MIN_PSK_LEN = 8;
@@ -136,8 +137,10 @@ int Char2Vec(const T *pChar, int len, std::vector<T> &vec)
         return -1;
     }
 
-    for (int i = 0; i < len; i++) {
-        vec.push_back(pChar[i]);
+    if (pChar != nullptr && len > 0 && len <= MAX_CHAR_LEN) {
+        for (int i = 0; i < len; i++) {
+            vec.push_back(pChar[i]);
+        }
     }
 
     return 0;

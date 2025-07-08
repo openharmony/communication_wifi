@@ -1650,7 +1650,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
-    int uid = getuid();  // 获取 UID
+    uint32_t uid = getuid();  // 获取 UID
     WIFI_LOGI("OnRegisterCallBack GetCallingUid UID %{public}d", uid);
         // 检查禁止 UID 列表
     if (uid == EDM_UID) {

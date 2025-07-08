@@ -118,6 +118,13 @@ struct Pref5gStatisticsInfo {
     }
 };
 
+struct IodStatisticInfo {
+    int32_t in2OutCnt = 0;
+    int32_t out2InCnt = 0;
+    int32_t outdoorFilterCnt = 0;
+    int32_t outdoorAutoSelectCnt = 0;
+};
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
 void WriteWifiApStateHiSysEvent(int32_t state);
@@ -213,6 +220,8 @@ void WriteAutoSelectHiSysEvent(int selectType, const std::string &selectedInfo,
     const std::string &filteredReason, const std::string &savedResult);
 
 void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info);
+
+void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

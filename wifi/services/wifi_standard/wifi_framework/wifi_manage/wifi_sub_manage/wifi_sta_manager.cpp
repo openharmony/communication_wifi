@@ -248,7 +248,7 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
     if (isBeaconLost) {
         WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-        if (pEnhanceService != nullptr && screenState) {
+        if (pEnhanceService != nullptr && screenState == MODE_STATE_OPEN) {
             pEnhanceService->HandleBeaconLost();
         }
     }

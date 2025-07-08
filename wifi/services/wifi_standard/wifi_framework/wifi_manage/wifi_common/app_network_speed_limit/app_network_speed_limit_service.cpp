@@ -494,7 +494,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
 
 void AppNetworkSpeedLimitService::VideoCallNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
 {
-    if (networkControlInfo.state == 1) {
+    if (networkControlInfo.state == ON) {
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_VIDEO_CALL, BG_LIMIT_LEVEL_7, m_isHighPriorityTransmit);
     } else {
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_VIDEO_CALL, BG_LIMIT_OFF, m_isHighPriorityTransmit);

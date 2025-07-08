@@ -24,6 +24,7 @@ namespace Wifi {
 constexpr int32_t ROAM_SCENE = 1;
 constexpr int64_t WIFI_SWITCH_RECORD_MAX_TIME = 1000 * 60 * 60 * 24 * 14; // 14天,单位:ms
 constexpr int32_t NUM_5 = 5;
+constexpr int32_t MAC_LAST2 = 2;
 enum WifiProCommond {
     EVENT_NOTIFY_WIFI_PRO_SWITCH_CHANGED = 0,
     EVENT_WIFI_CONNECT_STATE_CHANGED = 1,

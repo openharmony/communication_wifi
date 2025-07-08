@@ -34,6 +34,7 @@
 #define MIRACAST_SERVICE_SA_ID 5527
 #define SHARE_SERVICE_UID 5520
 #define MOUSE_CROSS_SERVICE_UID 6699
+#define HILINK_PRO_NETWORK 4
 namespace OHOS {
 namespace Wifi {
 inline const int HID2D_TIMEOUT_INTERVAL = 10 * 1000;

@@ -118,6 +118,7 @@ typedef struct ScanInfo {
     int maxRates;
     int extMaxRates;
     int isHiLinkNetwork;
+    bool isHiLinkProNetwork;
 } ScanInfo;
 
 typedef struct WifiNetworkInfo {

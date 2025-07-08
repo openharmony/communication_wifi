@@ -266,7 +266,6 @@ void AppNetworkSpeedLimitService::AsyncLimitSpeed(const AsyncParamInfo &asyncPar
 
 void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParamInfo)
 {
-    WifiConfigCenter::GetInstance().SetNetworkControlInfo(asyncParamInfo.networkControlInfo);
     if (asyncParamInfo.funcName == HANDLE_WIFI_CONNECT_CHANGED) {
         WifiConnectStateChanged();
     } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
@@ -276,6 +275,7 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
     } else if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL) {
         if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
             GameNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
+            WifiConfigCenter::GetInstance().SetNetworkControlInfo(asyncParamInfo.networkControlInfo);
         } else if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_VIDEO_CALL) {
             VideoCallNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         } else {

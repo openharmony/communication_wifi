@@ -1331,6 +1331,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.isAncoConnected = reply.ReadBool();
     info.supportedWifiCategory = static_cast<WifiCategory>(reply.ReadInt32());
     info.isHiLinkNetwork = reply.ReadInt32();
+    info.isHiLinkProNetwork = reply.ReadBool();
     info.lastRxPackets = reply.ReadInt32();
     info.lastTxPackets = reply.ReadInt32();
     info.wifiLinkType = static_cast<WifiLinkType>(reply.ReadInt32());
@@ -1649,7 +1650,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
-    int uid = getuid();  // 获取 UID
+    uint32_t uid = getuid();  // 获取 UID
     WIFI_LOGI("OnRegisterCallBack GetCallingUid UID %{public}d", uid);
         // 检查禁止 UID 列表
     if (uid == EDM_UID) {

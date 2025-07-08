@@ -62,6 +62,8 @@ bool DualBandLearningAlgService::Selected(std::string meanPstring, int rssi)
     double bValue = (1.0 - meanPvalues[meanPIndex]) * BASE_VALUE;
     double pValue = Random(aValue, bValue);
     double selectedThreshold = 0.5;
+    WIFI_LOGI(
+        "%{public}s, aValue: %{public}f, rssi: %{public}d, pValue: %{public}f", __FUNCTION__, aValue, rssi, pValue);
     return DualBandUtils::Compare(pValue, selectedThreshold) >= 0;
 }
 void DualBandLearningAlgService::UpdateMeanPValue(std::list<LinkQuality> &rate2gList,

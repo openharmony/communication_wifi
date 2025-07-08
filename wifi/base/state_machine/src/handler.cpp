@@ -185,7 +185,6 @@ void Handler::MessageExecutedAtTime(InternalMessagePtr msg, int64_t execTime)
         return;
     }
 
-    LOGD("{%public}s MessageExecutedAtTime msg: %{public}d", mThreadName.c_str(), msg->GetMessageName());
 #ifdef OHOS_ARCH_LITE
     if (pMyQueue == nullptr) {
         LOGE("pMyQueue is null.\n");

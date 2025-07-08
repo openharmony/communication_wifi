@@ -76,6 +76,7 @@ struct InterScanInfo {
     bool isErpExist;
     int maxRates;
     int isHiLinkNetwork;
+    bool isHiLinkProNetwork;
     WifiCategory supportedWifiCategory;
 
     InterScanInfo()
@@ -96,6 +97,7 @@ struct InterScanInfo {
           isErpExist(false),
           maxRates(0),
           isHiLinkNetwork(0),
+          isHiLinkProNetwork(false),
           supportedWifiCategory(WifiCategory::DEFAULT) {}
 
     ~InterScanInfo() {}

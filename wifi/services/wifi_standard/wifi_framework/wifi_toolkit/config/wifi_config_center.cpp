@@ -1358,6 +1358,9 @@ void WifiConfigCenter::UpdateLinkedInfo(int instId)
                 mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
             }
             mWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
+            if (iter->isHiLinkNetwork == HILINK_PRO_NETWORK) {
+                mWifiLinkedInfo[instId].isHiLinkProNetwork = true;
+            }
             break;
         }
     }

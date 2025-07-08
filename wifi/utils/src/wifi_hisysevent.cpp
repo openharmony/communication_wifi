@@ -519,10 +519,10 @@ void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
 {
     Json::Value root;
     Json::FastWriter writer;
-    root["OUTDOOR_FILTER_CNT"] = iodStatisticInfo.outdoorFilterCnt;
-    root["OUTDOOR_SELECT_CNT"] = iodStatisticInfo.outdoorAutoSelectCnt;
-    root["IN_TO_OUTDOOR_CNT"] = iodStatisticInfo.in2OutCnt;
-    root["OUT_TO_INDOOR_CNT"] = iodStatisticInfo.out2InCnt;
+    root["OUTDOORFILTERCNT"] = iodStatisticInfo.outdoorFilterCnt;
+    root["OUTDOORSELECTWIFICNT"] = iodStatisticInfo.outdoorAutoSelectCnt;
+    root["INTOOUTDOORCNT"] = iodStatisticInfo.in2OutCnt;
+    root["OUTTOINDOORCNT"] = iodStatisticInfo.out2InCnt;
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_IOD_STATISTIC", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi

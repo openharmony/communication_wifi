@@ -1,0 +1,39 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"ব্রাউজার UA",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"বাতিল করুন",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"ব্রাউজারে খুলুন",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"এই সাইটটির SSL শংসাপত্রের মেয়াদ শেষ হয়ে গেছে বা অনির্ভরযোগ্য। আপনি অবিরত থাকলে একটি নিরাপত্তা ঝুঁকি থাকতে পারে।",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"অবিরত রাখুন",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

@@ -48,6 +48,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"continue_visit",
+            "value":"이 사이트로 계속하시겠습니까?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"%s 설정",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"user_agent_harmony",
+            "value":"HarmonyOS",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -1,0 +1,39 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"UA Προγράμματος περιήγησης",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"Ακύρωση",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"Άνοιγμα σε πρόγραμμα περιήγησης",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"Το πιστοποιητικό SSL αυτού του ιστοτόπου έχει λήξει ή δεν είναι αξιόπιστο. Εάν συνεχίσετε, ενδέχεται να προκύψουν κίνδυνοι ασφαλείας.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"Συνέχεια",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

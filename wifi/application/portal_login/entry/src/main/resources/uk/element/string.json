@@ -1,0 +1,39 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"Браузер-агент користувача",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"Скасувати",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"Відкрити в Браузері",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"Сертифікат SSL цього веб-сайту ненадійний, або термін його дії сплинув. Якщо продовжити, може виникнути загроза безпеці.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"Продовжити",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

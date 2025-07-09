@@ -55,6 +55,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"continue_visit",
+            "value":"このサイトに進みますか？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"%s設定",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

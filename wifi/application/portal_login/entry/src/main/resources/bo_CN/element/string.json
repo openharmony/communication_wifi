@@ -4,70 +4,70 @@
             "name":"actions_menu_user_agent",
             "value":"བཤར་ཆས་ UA གསལ་འབྱེད།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"contextmenu_open_in_browser",
-            "value":"བཤར་ཆས་ཀྱི་ཁྲོད་ནས་ཁ་ཕྱེ་བ།",
+            "value":"བཤར་ཆས་ཀྱི་ཁྲོད་ནས་ཁ་འབྱེད།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"site_setting_single_website_title",
             "value":"%s ཡི་སྒྲིག་འགོད།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"user_agent_harmony",
             "value":"HarmonyOS",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
             "value":"ལག་ཐོགས་ཁ་པར་པར་མ།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"compatibility_mode_of_the_PC_version",
             "value":"གློག་ཀླད་པར་མ།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"continue_visit",
             "value":"མུ་མཐུད་ལྟ་སྤྱོད་བྱེད་ཀྱི་ཡིན་ནམ།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_normal_error_msg",
             "value":"མིག་སྔའི་དྲ་ཚུགས་ཀྱི་བདེ་འཇགས་ལག་ཁྱེར་དུས་ལས་བརྒལ་ཟིན་པའམ་ཡིད་རྟོན་མི་རུང་བས། བདེ་འཇགས་ཀྱི་ཉེན་ཁ་ཡོད་སྲིད། མུ་མཐུད་དུ་ལྟ་སྤྱོད་བྱེད་དམ།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_error_dialog_continue_btn",
-            "value":"མུ་མཐུད་དུ་ལྟ་སྤྱོད་བྱེད།",
+            "value":"མུ་མཐུད་ལྟ་སྤྱོད།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"confirm_dialog_cancel",
             "value":"འདོར་བ།",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

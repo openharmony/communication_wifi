@@ -55,6 +55,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"continue_visit",
+            "value":"¿Continuar a este sitio?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"Ajustes de %s",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -55,6 +55,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"continue_visit",
+            "value":"هل تريد المتابعة إلى هذا الموقع؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"إعدادات %s",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

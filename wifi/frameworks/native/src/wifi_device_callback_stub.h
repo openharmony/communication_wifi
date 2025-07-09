@@ -18,7 +18,7 @@
 #include "iremote_stub.h"
 #include "iremote_object.h"
 #include "i_wifi_device_callback.h"
-#include <shared_mutex>
+#include <mutex>
 #define DEFAULT_VALUES (-1024)
 
 namespace OHOS {
@@ -54,7 +54,7 @@ private:
 
     std::map<std::string, sptr<IWifiDeviceCallBack>> callbackMap_;
     // lock on callbackMap_
-    std::shared_mutex callbackMutex_;
+    std::recursive_mutex callbackMutex_;
 
     bool mRemoteDied;
     std::atomic<int> mState_ = DEFAULT_VALUES;

@@ -1,0 +1,39 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"Pārlūka UA",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"Atcelt",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"Atvērt lietotnē Pārlūks",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"Šīs vietnes SSL sertifikāta derīgums ir beidzies, vai tas ir neuzticams. Ja turpināsiet, ir iespējams drošības risks.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"Turpināt",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

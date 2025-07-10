@@ -1,0 +1,39 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"Smlouva s uživatelem prohlížeče",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"Zrušit",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"Otevřít v prohlížeči",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"Platnost SSL certifikátu stránky vypršela nebo je stránka nedůvěryhodná. Pokud budete pokračovat, může to být bezpečnostní riziko.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"Pokračovat",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

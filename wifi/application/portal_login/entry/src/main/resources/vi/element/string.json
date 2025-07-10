@@ -48,6 +48,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"continue_visit",
+            "value":"Tiếp tục đến trang web này?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"site_setting_single_website_title",
+            "value":"Cài đặt %s",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"user_agent_harmony",
+            "value":"HarmonyOS",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

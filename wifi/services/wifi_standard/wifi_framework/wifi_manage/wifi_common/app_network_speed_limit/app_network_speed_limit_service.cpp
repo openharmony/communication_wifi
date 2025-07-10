@@ -188,6 +188,8 @@ bool AppNetworkSpeedLimitService::CheckNetWorkCanBeLimited(const int controlId)
             return true;
         case BgLimitControl::BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT:
             return true;
+        case BgLimitControl::BG_LIMIT_CONTROL_ID_VIDEO_CALL:
+            return true;
         default:
             break;
     }
@@ -274,6 +276,8 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
         if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
             GameNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
             WifiConfigCenter::GetInstance().SetNetworkControlInfo(asyncParamInfo.networkControlInfo);
+        } else if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_VIDEO_CALL) {
+            VideoCallNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         } else {
             UpdateNoSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         }
@@ -485,6 +489,15 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
         default:
             WIFI_LOGE("%{public}s there is no such state.", __FUNCTION__);
             break;
+    }
+}
+
+void AppNetworkSpeedLimitService::VideoCallNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
+{
+    if (networkControlInfo.state == ON) {
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_VIDEO_CALL, BG_LIMIT_LEVEL_7, m_isHighPriorityTransmit);
+    } else {
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_VIDEO_CALL, BG_LIMIT_OFF, m_isHighPriorityTransmit);
     }
 }
 

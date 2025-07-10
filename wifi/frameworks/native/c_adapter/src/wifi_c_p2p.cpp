@@ -186,13 +186,19 @@ static OHOS::Wifi::ErrCode ConvertP2PDeviceCppToC(const OHOS::Wifi::WifiP2pDevic
 {
     CHECK_PTR_RETURN(p2pDevice, OHOS::Wifi::WIFI_OPT_INVALID_PARAM);
     size_t nameLen = cppDevice.GetDeviceName().size();
-    if (nameLen >= P2P_NAME_LENGTH) {
-        WIFI_LOGE("device name len is invalid! nameLen=%zu", nameLen);
-        return OHOS::Wifi::WIFI_OPT_FAILED;
-    }
-    if (memcpy_s(p2pDevice->deviceName, P2P_NAME_LENGTH, cppDevice.GetDeviceName().c_str(), nameLen + 1) != EOK) {
-        WIFI_LOGE("memcpy_s device name failed!");
-        return OHOS::Wifi::WIFI_OPT_FAILED;
+    if (static_cast<unsigned int>(nameLen + 1) >= P2P_NAME_LENGTH) {
+        WIFI_LOGE("device name len is invalid! nameLen=%{public}zu", nameLen);
+        if (memcpy_s(p2pDevice->deviceName, P2P_NAME_LENGTH,
+            cppDevice.GetDeviceName().c_str(), P2P_NAME_LENGTH) != EOK) {
+            WIFI_LOGE("memcpy_s device name failed!");
+            return OHOS::Wifi::WIFI_OPT_FAILED;
+        }
+    } else {
+        if (memcpy_s(p2pDevice->deviceName, P2P_NAME_LENGTH,
+            cppDevice.GetDeviceName().c_str(), nameLen + 1) != EOK) {
+            WIFI_LOGE("memcpy_s device name failed!");
+            return OHOS::Wifi::WIFI_OPT_FAILED;
+        }
     }
     if (OHOS::Wifi::MacStrToArray(cppDevice.GetDeviceAddress(), p2pDevice->devAddr) != EOK) {
         WIFI_LOGE("Mac str to array failed!");

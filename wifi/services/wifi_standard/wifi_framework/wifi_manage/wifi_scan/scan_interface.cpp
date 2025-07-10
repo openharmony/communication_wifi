@@ -149,6 +149,7 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus, int networkId)
             wifiScanParams.ssid = std::string(deviceConfig.ssid);
             wifiScanParams.band = SCAN_BAND_BOTH_WITH_DFS;
             pScanService->ScanWithParam(wifiScanParams, ScanType::SCAN_TYPE_NATIVE_EXTERN);
+        }
     } else {
         pScanService->HandleStaStatusChanged(staStatus);
         pScanService->SetStaCurrentTime();

@@ -340,7 +340,12 @@ StateInfo *StateMachineHandler::StatePlus(State *state, State *upper)
     }
 
     StateInfo *stateInfo = nullptr;
-    it = mStateInfoMap.find(state->GetStateName());
+    if (state == nullptr) {
+        LOGE("state is null");
+        return nullptr;
+    } else {
+        it = mStateInfoMap.find(state->GetStateName());
+    }
     if (it != mStateInfoMap.end()) {
         stateInfo = it->second;
     }

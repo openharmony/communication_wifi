@@ -66,6 +66,10 @@ WifiDeviceProxy::~WifiDeviceProxy()
 void WifiDeviceProxy::InitWifiState()
 {
     auto callBack = sptr<WifiInternalCallback>(new WifiInternalCallback());
+    if (callBack == nullptr) {
+        WIFI_LOGE("%{public}s callBack is null", __func__);
+        return;
+    }
     callBack->wifiStateChangeCallback = [=](int state) {
         this->OnWifiStateChanged(state);
     };

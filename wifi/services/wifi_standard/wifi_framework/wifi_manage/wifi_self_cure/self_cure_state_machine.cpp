@@ -520,6 +520,10 @@ bool SelfCureStateMachine::ConnectedMonitorState::IsNeedSelfCure()
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(InternalMessagePtr msg)
 {
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is null", __func__);
+        return;
+    }
     if (!IsNeedSelfCure()) {
         pSelfCureStateMachine_->isSelfcureDone_ = true;
         return;
@@ -557,7 +561,12 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
             WIFI_LOGI("Handle network disable, there is not a expectant condition!.");
         }
         return;
+        HandleInternetFailedDetectedInner();
     }
+}
+
+void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetectedInner()
+{
     if (pSelfCureStateMachine_->IsHttpReachable()) {
         WIFI_LOGI("http is reachable, no need self cure");
         pSelfCureStateMachine_->noTcpRxCounter_ = 0;
@@ -574,6 +583,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
         "selfCureReason_: %{public}d", pSelfCureStateMachine_->selfCureReason_);
     TransitionToSelfCureState(pSelfCureStateMachine_->selfCureReason_);
 }
+
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(InternalMessagePtr msg)
 {

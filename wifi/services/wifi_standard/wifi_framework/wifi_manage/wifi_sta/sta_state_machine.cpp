@@ -193,6 +193,10 @@ ErrCode StaStateMachine::InitStaStateMachine()
 #ifndef OHOS_ARCH_LITE
     NetSupplierInfo = std::make_unique<NetManagerStandard::NetSupplierInfo>().release();
     m_NetWorkState = sptr<NetStateObserver>(new NetStateObserver());
+    if (m_NetWorkState == nullptr) {
+        WIFI_LOGE("%{public}s m_NetWorkState is null", __func__);
+        return WIFI_OPT_FAILED;
+    }
     m_NetWorkState->SetNetStateCallback(
         [this](SystemNetWorkState netState, std::string url) { this->NetStateObserverCallback(netState, url); });
 #ifdef EXTENSIBLE_AUTHENTICATION

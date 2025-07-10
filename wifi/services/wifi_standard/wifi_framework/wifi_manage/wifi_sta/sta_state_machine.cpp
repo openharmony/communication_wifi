@@ -594,7 +594,7 @@ void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId) {
     int tmp = pStaStateMachine->linkedInfo.networkId;
     pStaStateMachine->linkedInfo.networkId = networkId;
     pStaStateMachine->InvokeOnStaConnChanged(
-        OperataResState::CONNECT_MISS_MATCH, pStaStateMachine->linkedInfo);
+        OperateResState::CONNECT_MISS_MATCH, pStaStateMachine->linkedInfo);
     WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     pStaStateMachine->linkedInfo.networkId = tmp;
 }

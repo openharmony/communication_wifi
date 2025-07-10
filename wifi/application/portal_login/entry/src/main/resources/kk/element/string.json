@@ -1,0 +1,39 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"Шолғыш ПК",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"Бас тарту",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"Шолғыш ішінде ашу",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"Бұл сайттың SSL сертификатының мерзімі бітті немесе сенімсіз. Жалғастырған жағдайда қауіпсіздік қаупі болуы мүмкін.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"Жалғастыру",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

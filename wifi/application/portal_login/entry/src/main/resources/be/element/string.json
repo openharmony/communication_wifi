@@ -1,0 +1,39 @@
+{
+    "string":[
+        {
+            "name":"actions_menu_user_agent",
+            "value":"UA Браўзера",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"confirm_dialog_cancel",
+            "value":"Адмяніць",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"contextmenu_open_in_browser",
+            "value":"Адкрыць у Браўзеры",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_normal_error_msg",
+            "value":"Тэрмін дзеяння SSL-сертыфіката гэтага сайта скончыўся або сертыфікат не з’яўляецца давераным. Калі вы працягнеце, можа ўзнікнуць рызыка для бяспекі.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"ssl_error_dialog_continue_btn",
+            "value":"Працягнуць",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

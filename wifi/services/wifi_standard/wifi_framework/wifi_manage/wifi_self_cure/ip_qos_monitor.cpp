@@ -101,6 +101,10 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
             if (mNetWorkDetect == nullptr) {
                 mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
             }
+            if (mNetWorkDetect == nullptr) {
+                WIFI_LOGE("%{public}s mNetWorkDetect is null", __func__);
+                return;
+            }
             mNetWorkDetect->StartWifiDetection();
             mHttpDetectedAllowed = false;
             return;

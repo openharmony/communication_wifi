@@ -96,7 +96,7 @@ public:
      * @param staStatus sta status[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    ErrCode OnClientModeStatusChanged(int staStatus) override;
+    ErrCode OnClientModeStatusChanged(int staStatus, int networkId = 0) override;
     /**
      * @Description Processes interface service appMode change request.
      *

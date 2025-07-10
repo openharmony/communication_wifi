@@ -210,6 +210,7 @@ public:
         void SaveFoldStatus(InternalMessagePtr msg);
         bool NotExistInScanList(WifiDeviceConfig &config);
         void DealScreenStateChangedEvent(InternalMessagePtr msg);
+        void DealHiddenSsidConnctMiss(int networkId);
         StaStateMachine *pStaStateMachine;
     };
 

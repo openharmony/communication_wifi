@@ -14,6 +14,7 @@
  */
 #include "scan_interface.h"
 #include "wifi_logger.h"
+#include "wifi_settings.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("ScanInterface");
 
@@ -128,7 +129,7 @@ ErrCode ScanInterface::OnStandbyStateChanged(bool sleeping)
     return pScanService->Scan(ScanType::SCAN_TYPE_SYSTEMTIMER);
 }
 
-ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
+ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus, int networkId)
 {
     WIFI_LOGI("Enter ScanInterface::OnClientModeStatusChanged, staStatus=%{public}d.", staStatus);
     std::lock_guard<std::mutex> lock(mutex);
@@ -137,7 +138,17 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
         || staStatus == static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED)) {
         pScanService->HandleNetworkQualityChanged(staStatus);
     } else if (staStatus == static_cast<int>(OperateResState::CONNECT_MISS_MATCH)) {
-        pScanService->Scan(ScanType::SCAN_TYPE_HIDDEN_AP);
+        if(networkId > 0) {
+            WifiDeviceConfig deviceConfig;
+            WifiScanParams wifiScanParams;
+            if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
+                WIFI_LOGE("StartConnectToNetwork get GetDeviceConfig failed");
+                return WIFI_OPT_FAILED;
+            }
+            WIFI_LOGI("start new scan for hidden ssid");
+            wifiScanParams.ssid = std::string(deviceConfig.ssid);
+            wifiScanParams.band = SCAN_BAND_BOTH_WITH_DFS;
+            pScanService->ScanWithParam(wifiScanParams, ScanType::SCAN_TYPE_NATIVE_EXTERN);
     } else {
         pScanService->HandleStaStatusChanged(staStatus);
         pScanService->SetStaCurrentTime();

@@ -682,7 +682,10 @@ ErrCode WifiHotspotProxy::RegisterCallBack(const sptr<IWifiHotspotCallback> &cal
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-
+    if (g_wifiHotspotCallbackStub == nullptr) {
+        WIFI_LOGE("%{public}s g_wifiHotspotCallbackStub is null", __func__);
+        return WIFI_OPT_FAILED;
+    }
     g_wifiHotspotCallbackStub->RegisterCallBack(callback);
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);

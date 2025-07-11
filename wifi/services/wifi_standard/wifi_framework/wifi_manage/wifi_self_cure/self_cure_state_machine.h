@@ -125,6 +125,7 @@ public:
         void RequestReassocWithFactoryMac();
         void HandleInvalidIp(InternalMessagePtr msg);
         void HandleInternetFailedDetected(InternalMessagePtr msg);
+        void HandleInternetFailedDetectedInner();
         void HandleTcpQualityQuery(InternalMessagePtr msg);
         void HandleGatewayChanged(InternalMessagePtr msg);
         bool IsGatewayChanged();

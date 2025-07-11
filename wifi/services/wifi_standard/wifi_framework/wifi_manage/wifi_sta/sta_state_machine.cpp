@@ -1508,6 +1508,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
     pStaStateMachine->DealMloConnectionLinkInfo();
+    pStaStateMachine->DealSignalPollResult();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     WifiDeviceConfig config;
@@ -1535,6 +1536,8 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
     pStaStateMachine->StopTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT);
     pStaStateMachine->StartTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT, STA_LINK_SWITCH_DETECT_DURATION);
     pStaStateMachine->AfterApLinkedprocess(bssid);
+    pStaStateMachine->UpdateLinkedInfoFromScanInfo();
+    pStaStateMachine->SetSupportedWifiCategory();
     pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }

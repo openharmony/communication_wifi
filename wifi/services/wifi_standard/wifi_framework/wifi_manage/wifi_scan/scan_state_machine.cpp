@@ -20,6 +20,7 @@
 #include "wifi_config_center.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
+#include "wifi_common_event_helper.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -937,6 +938,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiHalScanParam &scanParam)
     }
 
     WIFI_LOGI("Begin call Scan.\n");
+    WifiCommonEventHelper::PublishScanStartEvent(COMMON_SCAN_START, "");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), scanParam);
     if ((ret != WIFI_HAL_OPT_OK) && (ret != WIFI_HAL_OPT_SCAN_BUSY)) {
@@ -1404,6 +1406,7 @@ bool ScanStateMachine::StartPnoScanHardware()
         runningPnoScanConfig.savedNetworkSsid.begin(), runningPnoScanConfig.savedNetworkSsid.end());
     pnoScanParam.scanFreqs.assign(runningPnoScanConfig.freqs.begin(), runningPnoScanConfig.freqs.end());
     WIFI_LOGI("pnoScanParam.scanInterval is %{public}d.\n", pnoScanParam.scanInterval);
+    WifiCommonEventHelper::PublishScanStartEvent(PNO_SCAN_START, "");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), pnoScanParam);
     if ((ret != WIFI_HAL_OPT_OK) && (ret != WIFI_HAL_OPT_SCAN_BUSY)) {

@@ -300,6 +300,9 @@ struct Index {
         .fileAccess(false)
         .geolocationAccess(false)
         .domStorageAccess(true)
+        .onConsole((event) => {
+          return true;
+        })
         .onControllerAttached(() => {
           try {
             this.harmonyUA = this.webviewController.getUserAgent();

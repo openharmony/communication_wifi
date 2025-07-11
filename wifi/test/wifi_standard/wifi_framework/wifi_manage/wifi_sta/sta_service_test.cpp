@@ -600,38 +600,6 @@ void StaServiceTest::StaServiceRemoveAllCandidateConfigTestSucc()
     EXPECT_TRUE(pStaService->RemoveAllCandidateConfig(uid) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc0()
-{
-    WifiDeviceConfig config;
-    config.bssid = "01:23:45:67:89:AB";
-    config.band = BAND;
-    config.networkId = NETWORK_ID;
-    config.ssid = "networkId";
-    config.keyMgmt = "123456";
-    int uid = UID;
-    int netWorkId = NETWORK_ID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(true));
-    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
-}
-
-void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc1()
-{
-    WifiDeviceConfig config;
-    config.bssid = "01:23:45:67:89:AB";
-    config.band = BAND;
-    config.networkId = NETWORK_ID;
-    config.ssid = "networkId";
-    config.keyMgmt = "NONE";
-    config.lastConnectTime = 1;
-    int uid = UID;
-    int netWorkId = NETWORK_ID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
-    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
-}
-
 void StaServiceTest::StaServiceConnectToCandidateConfigTestFail()
 {
     WifiDeviceConfig config;

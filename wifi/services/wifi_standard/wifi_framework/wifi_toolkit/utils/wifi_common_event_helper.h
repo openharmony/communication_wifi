@@ -69,7 +69,7 @@ public:
     static bool PublishWifi2PowerStateChangeEvent(const int &code, const std::string &data);
     static bool PublishScanFinishedEvent(const int &code, const std::string &data);
     static bool PublishScanStateChangedEvent(const int &code, const std::string &data);
-    static bool PublishScanStartEvent(const ing &code, const std::string &data);
+    static bool PublishScanStartEvent(const int &code, const std::string &data);
     static bool PublishWifiSemiStateChangedEvent(const int &code, const std::string &data);
     static bool PublishRssiValueChangedEvent(const std::string &pramKey, int paramValue,
         const int &code, const std::string &data);

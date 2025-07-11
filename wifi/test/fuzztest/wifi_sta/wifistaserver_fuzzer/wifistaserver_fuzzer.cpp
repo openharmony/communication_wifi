@@ -495,7 +495,10 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
         info.bssid = std::string(reinterpret_cast<const char*>(data), size);
         info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
     }
-    WifiSecurityDetect::GetInstance().SecurityDetect(info);
+    WifiSecurityDetect::GetInstance().SetDatashareReady();
+    WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
+    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
+    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
 }
     
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)

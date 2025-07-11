@@ -561,8 +561,8 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
             WIFI_LOGI("Handle network disable, there is not a expectant condition!.");
         }
         return;
-        HandleInternetFailedDetectedInner();
     }
+    HandleInternetFailedDetectedInner();
 }
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetectedInner()

@@ -9,6 +9,7 @@ import {
 } from '../common/utils'
 import { connection } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
+import settings from '@ohos.settings';
 
 const DOMAIN = 0x01560;
 const TAG = 'Pages';
@@ -76,6 +77,9 @@ struct Index {
   private sheetItemHeight = 50;
   private contextMenuWidth = 224;
   private netConnect: connection.NetConnection = connection.createNetConnection();
+  private isInOOBE: boolean = false;
+  @State mode: WebDarkMode = WebDarkMode.Auto;
+  @State access: boolean = true;
 
   @Builder
   ContextMenu() {
@@ -92,7 +96,7 @@ struct Index {
          symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.worldclock')).fontSize('24vp'),
          content: $r('app.string.contextmenu_open_in_browser')
        })
-         .visibility(shouldShowBrowseItem() ? Visibility.Visible : Visibility.None)
+         .visibility((shouldShowBrowseItem() && !this.isInOOBE) ? Visibility.Visible : Visibility.None)
          .onClick(() => {
            const link: string = this.webUrl;
            const openLinkOptions: OpenLinkOptions = {
@@ -367,6 +371,8 @@ struct Index {
             }
           })
         })
+        .darkMode(this.mode)
+        .forceDarkAccess(this.access)
         .backgroundColor($r('sys.color.ohos_id_color_background'))
         .width('100%')
     }
@@ -392,6 +398,10 @@ struct Index {
       this.webUrl = getUrl();
       this.webviewController.loadUrl(this.webUrl);
     });
+    if (settings.getValueSync(this.context, 'user_setup_complete', '0', settings.domainName.DEVICE_SHARED) === '0') {
+        hilog.info(DOMAIN, TAG, '%{public}s', 'in oobe.');
+        this.isInOOBE = true;
+    }
   }
 
   aboutToDisappear(): void {

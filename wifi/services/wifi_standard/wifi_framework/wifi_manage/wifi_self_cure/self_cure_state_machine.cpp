@@ -584,7 +584,6 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetectedIn
     TransitionToSelfCureState(pSelfCureStateMachine_->selfCureReason_);
 }
 
-
 void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(InternalMessagePtr msg)
 {
     if (msg == nullptr) {

@@ -15,6 +15,7 @@
 
 #include "wifi_config_file_spec.h"
 #include <unordered_set>
+#include <set>
 #include "wifi_global_func.h"
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
@@ -1298,8 +1299,22 @@ std::map<std::string, Func> g_wifiConfigSetValueMap = {
         item.staApExclusionType = CheckDataLegal(tmpValue);
     }}
 };
+
+static bool IsIgnoredWifiConfigKey(const std::string &key)
+{
+    std::set<std::string> ignoredKey;
+    ignoredKey.insert("version");
+    if (ignoredKey.find(key) != ignoredKey.end()) {
+        return true;
+    }
+    return false;
+}
+
 static int SetWifiConfigValue(WifiConfig &item, const std::string &key, const std::string &value)
 {
+    if (IsIgnoredWifiConfigKey(key)) {
+        return 0;
+    }
     auto it = g_wifiConfigSetValueMap.find(key);
     if (it == g_wifiConfigSetValueMap.end()) {
         return -1;

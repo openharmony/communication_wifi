@@ -1305,6 +1305,7 @@ static bool IsIgnoredWifiConfigKey(const std::string &key)
     std::set<std::string> ignoredKey;
     ignoredKey.insert("version");
     if (ignoredKey.find(key) != ignoredKey.end()) {
+        LOGW("%{public}s ignore WifiConfig key, %{public}s", __func__, key.c_str());
         return true;
     }
     return false;
@@ -1330,7 +1331,7 @@ int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, cons
     if (SetWifiConfigValue(item, key, value) == 0) {
         return errorKeyValue;
     }
-    LOGE("Invalid config key value");
+    LOGE("SetTClassKeyValue<WifiConfig> Invalid config key value, %{public}s", key.c_str());
     errorKeyValue++;
     return errorKeyValue;
 }

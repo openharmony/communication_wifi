@@ -1298,24 +1298,12 @@ std::map<std::string, Func> g_wifiConfigSetValueMap = {
         std::string tmpValue = value;
         item.staApExclusionType = CheckDataLegal(tmpValue);
     }}
+    {"version", [](WifiConfig &item, const std::string &value) -> void {
+        //@deprecated
+    }}
 };
-
-static bool IsIgnoredWifiConfigKey(const std::string &key)
-{
-    std::set<std::string> ignoredKey;
-    ignoredKey.insert("version");
-    if (ignoredKey.find(key) != ignoredKey.end()) {
-        LOGW("%{public}s ignore WifiConfig key, %{public}s", __func__, key.c_str());
-        return true;
-    }
-    return false;
-}
-
 static int SetWifiConfigValue(WifiConfig &item, const std::string &key, const std::string &value)
 {
-    if (IsIgnoredWifiConfigKey(key)) {
-        return 0;
-    }
     auto it = g_wifiConfigSetValueMap.find(key);
     if (it == g_wifiConfigSetValueMap.end()) {
         return -1;

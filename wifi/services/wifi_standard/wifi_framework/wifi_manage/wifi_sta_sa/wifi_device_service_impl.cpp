@@ -1001,6 +1001,18 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 #endif
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
     }
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiMultiVapManager()->CheckEnhanceWifiConnected() &&
+        WifiManager::GetInstance().GetWifiMultiVapManager()->CheckP2pConnected()) {
+            IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+            if (pService == nullptr) {
+                WIFI_LOGE("Get P2P service failed");
+            } else {
+                ErrCode ret = pService->RemoveGroup();
+                WIFI_LOGI("P2P RemoveGroup ret is %{public}d", ret);
+            }
+        }
+#endif
     int apiVersion = WifiPermissionUtils::GetApiVersion();
     if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);

@@ -419,8 +419,8 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
     }
     if (WifiConfigCenter::GetInstance().GetWifiToggledEnable(INSTID_WLAN1) == WIFI_STATE_ENABLED) {
         WIFI_LOGI("SetWifiToggledState DISABLED");
-        WifiConfigCenter::GetInstance.SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN1);
-        WifiManager::GetInstance.GetWifiTogglerManager()->WifiToggled(0, 1);
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, INSTID_WLAN1);
+        WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 1);
     }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {

@@ -128,17 +128,40 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
     if (memcpy_s(string, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
         return;
     }
+    int gameRtt = *reinterpret_cast<const int*>(data);
+    m_appXmlParser->Init();
+    m_appXmlParser->IsLowLatencyApp(conditionName);
     m_appXmlParser->IsWhiteListApp(conditionName);
     m_appXmlParser->IsBlackListApp(conditionName);
+    m_appXmlParser->IsMultiLinkApp(conditionName);
     m_appXmlParser->IsChariotApp(conditionName);
     m_appXmlParser->IsHighTempLimitSpeedApp(conditionName);
+    m_appXmlParser->IsKeyForegroundApp(conditionName);
+    m_appXmlParser->IsKeyBackgroundLimitApp(conditionName);
+    m_appXmlParser->IsLiveStreamApp(conditionName);
+    m_appXmlParser->IsGameBackgroundLimitApp(conditionName);
+    m_appXmlParser->IsOverGameRtt(conditionName, gameRtt);
+    m_appXmlParser->GetAsyncLimitSpeedDelayTime();
     m_appXmlParser->appParserInner_->InitAppParser(string);
-
     m_appXmlParser->appParserInner_->ParseInternal(root_node);
+    m_appXmlParser->appParserInner_->ParseAppList(root_node);
+    m_appXmlParser->appParserInner_->ParseNetworkControlAppList(root_node);
+    m_appXmlParser->appParserInner_->ParseLowLatencyAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseWhiteAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseBlackAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseMultiLinkAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseChariotAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseHighTempLimitSpeedAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseKeyForegroundListAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseKeyBackgroundLimitListAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseLiveStreamAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseGameBackgroundLimitListAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseAsyncLimitSpeedDelayTime(root_node);
     m_appXmlParser->appParserInner_->GetAppTypeAsInt(root_node);
     m_appXmlParser->appParserInner_->GetLocalFileVersion(root_node);
     m_xmlParser->LoadConfiguration(string);
     m_xmlParser->LoadConfigurationMemory(string);
+    ConvertStringToBool(string);
 }
 
 void AppParserTest(const uint8_t* data, size_t size)

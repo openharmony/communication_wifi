@@ -181,6 +181,7 @@ public:
     virtual bool IsScreenLandscape() = 0;
     virtual void SetScreenDispalyState(int32_t orientation) = 0;
     virtual void SetNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) = 0;
+    virtual WifiNetworkControlInfo GetNetworkControlInfo() = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -342,6 +343,7 @@ public:
     MOCK_METHOD0(IsScreenLandscape, bool());
     MOCK_METHOD1(SetScreenDispalyState, void(int32_t orientation));
     MOCK_METHOD1(SetNetworkControlInfo, void(const WifiNetworkControlInfo& networkControlInfo));
+    MOCK_METHOD0(GetNetworkControlInfo, WifiNetworkControlInfo());
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

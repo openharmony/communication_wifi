@@ -450,6 +450,8 @@
         "OHOS::Wifi::WifiTogglerManager::StopWifiToggledTimer()";
         "OHOS::Wifi::WifiProtectManager::IsHeldWifiProtect(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiMultiVapManager::VapConflictReport()";
+        "OHOS::Wifi::WifiMultiVapManager::CheckP2pConnected()";
+        "OHOS::Wifi::WifiMultiVapManager::CheckEnhanceWifiConnected()";
         "OHOS::Wifi::WifiTogglerManager::SoftapToggled(int, int)";
         "OHOS::Wifi::WifiTogglerManager::StartSemiWifiToggledTimer()";
         "OHOS::Wifi::WifiTogglerManager::IsSatelliteStateStart()";

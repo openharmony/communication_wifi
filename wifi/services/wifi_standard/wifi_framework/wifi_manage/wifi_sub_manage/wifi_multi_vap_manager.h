@@ -29,11 +29,11 @@ public:
     bool CheckCanUseP2p();
     bool CheckCanUseSoftAp();
     void VapConflictReport();
+    bool CheckP2pConnected();
+    bool CheckEnhanceWifiConnected();
 private:
     bool CheckStaConnected();
-    bool CheckP2pConnected();
     bool CheckSoftApStarted();
-    bool CheckEnhanceWifiConnected();
     void ForceStopSoftAp();
     void ShowToast();
 };

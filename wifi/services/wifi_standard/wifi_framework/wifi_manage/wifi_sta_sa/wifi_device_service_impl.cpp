@@ -1004,7 +1004,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
 #ifndef OHOS_ARCH_LITE
     if (WifiManager::GetInstance().GetWifiMultiVapManager()->CheckEnhanceWifiConnected() &&
         WifiManager::GetInstance().GetWifiMultiVapManager()->CheckP2pConnected()) {
-            IP2pService *pService = WifiServiceManager::GetInstance.GetP2pServiceInst();
+            IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
             if (pService == nullptr) {
                 WIFI_LOGE("Get P2P service failed");
             } else {

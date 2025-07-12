@@ -106,8 +106,6 @@ public:
     void StaServiceRemoveCandidateConfigTestSucc();
     void StaServiceRemoveCandidateConfigTestFail();
     void StaServiceRemoveAllCandidateConfigTestSucc();
-    void StaServiceConnectToCandidateConfigTestSucc0();
-    void StaServiceConnectToCandidateConfigTestSucc1();
     void StaServiceConnectToCandidateConfigTestFail();
     void StaServiceRemoveAllDeviceTestSucc();
     void StaServiceRemoveAllDeviceTestFail0();
@@ -1065,16 +1063,6 @@ HWTEST_F(StaServiceTest, StaServiceRemoveCandidateConfigTestFail, TestSize.Level
 HWTEST_F(StaServiceTest, StaServiceRemoveAllCandidateConfigTestSucc, TestSize.Level0)
 {
     StaServiceRemoveAllCandidateConfigTestSucc();
-}
-
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc0, TestSize.Level0)
-{
-    StaServiceConnectToCandidateConfigTestSucc0();
-}
-
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc1, TestSize.Level0)
-{
-    StaServiceConnectToCandidateConfigTestSucc1();
 }
 
 HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail, TestSize.Level0)

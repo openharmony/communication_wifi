@@ -47,5 +47,6 @@ group("fuzztest") {
     "wifiscanserver_fuzzer:WifiScanServerFuzzTest",
     "wifiscanstub_fuzzer:WifiScanStubFuzzTest",
     "wifistaserver_fuzzer:WifiStaServerFuzzTest",
+    "wifitoolkit_fuzzer:WifiToolkitFuzzTest",
   ]
 }

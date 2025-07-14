@@ -15,7 +15,6 @@
 
 #include "wifi_config_file_spec.h"
 #include <unordered_set>
-#include <set>
 #include "wifi_global_func.h"
 #ifdef FEATURE_ENCRYPTION_SUPPORT
 #include "wifi_encryption_util.h"
@@ -1297,7 +1296,7 @@ std::map<std::string, Func> g_wifiConfigSetValueMap = {
     {"staApExclusionType", [](WifiConfig &item, const std::string &value) -> void {
         std::string tmpValue = value;
         item.staApExclusionType = CheckDataLegal(tmpValue);
-    }}
+    }},
     {"version", [](WifiConfig &item, const std::string &value) -> void {
         //@deprecated
     }}

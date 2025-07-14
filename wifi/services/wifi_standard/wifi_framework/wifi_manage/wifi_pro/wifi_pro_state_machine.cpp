@@ -553,7 +553,6 @@ bool WifiProStateMachine::IsFirstConnectAndNonet()
     }
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
-    WIFI_LOGI("IsFirstConnectAndNonet %{public}d.", config.numAssociation);
     return currentState_ == WifiProState::WIFI_NONET && WifiProUtils::IsUserSelectNetwork() &&
            config.numAssociation <= 1;
 }

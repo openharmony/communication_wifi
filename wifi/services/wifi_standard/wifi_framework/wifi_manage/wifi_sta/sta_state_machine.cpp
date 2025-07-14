@@ -1539,6 +1539,8 @@ void StaStateMachine::ApLinkedState::HandleLinkSwitchEvent(InternalMessagePtr ms
     pStaStateMachine->StopTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT);
     pStaStateMachine->StartTimer(CMD_LINK_SWITCH_DETECT_TIMEOUT, STA_LINK_SWITCH_DETECT_DURATION);
     pStaStateMachine->AfterApLinkedprocess(bssid);
+    pStaStateMachine->UpdateLinkedInfoFromScanInfo();
+    pStaStateMachine->SetSupportedWifiCategory();
     pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }

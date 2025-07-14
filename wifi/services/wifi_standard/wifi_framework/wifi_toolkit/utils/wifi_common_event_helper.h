@@ -24,6 +24,7 @@ inline const std::string COMMON_EVENT_WIFI_POWER_STATE = "usual.event.wifi.POWER
 inline const std::string COMMON_EVENT_WIFI2_POWER_STATE = "usual.event.wifi.WIFI2_POWER_STATE";
 inline const std::string COMMON_EVENT_WIFI_SCAN_FINISHED = "usual.event.wifi.SCAN_FINISHED";
 inline const std::string COMMON_EVENT_WIFI_SCAN_STATE = "usual.event.wifi.SCAN_STATE";
+inline const std::string COMMON_EVENT_WIFI_SCAN_START = "usual.event.wifi.SCAN_START";
 inline const std::string COMMON_EVENT_WIFI_SEMI_STATE = "usual.event.wifi.SEMI_STATE";
 inline const std::string COMMON_EVENT_WIFI_RSSI_VALUE = "usual.event.wifi.RSSI_VALUE";
 inline const std::string COMMON_EVENT_WITAS_RSSI_VALUE = "usual.event.wifi.WITAS_RSSI_VALUE";
@@ -51,6 +52,8 @@ inline const std::string COMMON_EVENT_GET_WIFI_INFO_PERMISSION = "ohos.permissio
 inline const std::string COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION = "ohos.permission.MANAGE_WIFI_CONNECTION";
 inline const std::string COMMON_EVENT_NOT_AVAILABLE_DIALOG = "event.settings.wlan.close_not_available_dialog";
 inline const int CANCEL_DIAG = 0;
+inline const int COMMON_SCAN_START = 0;
+inline const int PNO_SCAN_START = 1;
 
 class WifiCommonEventHelper {
 public:
@@ -66,6 +69,7 @@ public:
     static bool PublishWifi2PowerStateChangeEvent(const int &code, const std::string &data);
     static bool PublishScanFinishedEvent(const int &code, const std::string &data);
     static bool PublishScanStateChangedEvent(const int &code, const std::string &data);
+    static bool PublishScanStartEvent(const int &code, const std::string &data);
     static bool PublishWifiSemiStateChangedEvent(const int &code, const std::string &data);
     static bool PublishRssiValueChangedEvent(const std::string &pramKey, int paramValue,
         const int &code, const std::string &data);

@@ -119,6 +119,8 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     int networkId = static_cast<int>(data[index++]);
     int uid = static_cast<int>(data[index++]);
     bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
+    bool isAllowed = (static_cast<int>(data[0]) % TWO) ? true : false;
+    std::string cmd = std::string(reinterpret_cast<const char*>(data), size);
     std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
     FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % THREE);
     ConfigChange value = static_cast<ConfigChange>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
@@ -168,6 +170,45 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->StartPortalCertification();
     pStaInterface->EnableHiLinkHandshake(true, config, conditionName);
     pStaInterface->DeregisterFilterBuilder(filterTag, conditionName);
+    pStaInterface->AllowAutoConnect(networkId, isAllowed);
+    pStaInterface->EnableStaService();
+    pStaInterface->StartConnectToUserSelectNetwork(networkId, config.bssid);
+    TagType tagType = static_cast<TagType>(data[index++]);
+    std::string tagName;
+    CommonBuilder commonBuilder;
+    pStaInterface->RegisterCommonBuilder(tagType, tagName, commonBuilder);
+    pStaInterface->DeregisterCommonBuilder(tagType, tagName);
+    pStaInterface->DeliverAudioState(networkId);
+    pStaInterface->InitStaServiceLocked();
+    pStaInterface->OnFoldStateChanged(networkId);
+    VoWifiSignalInfo signalInfo;
+    pStaInterface->FetchWifiSignalInfoForVoWiFi(signalInfo);
+    pStaInterface->IsSupportVoWifiDetect(isAllowed);
+    WifiDetectConfInfo wifiDetectConfInfo;
+    pStaInterface->SetVoWifiDetectMode(wifiDetectConfInfo);
+    pStaInterface->GetVoWifiDetectMode(wifiDetectConfInfo);
+    pStaInterface->SetVoWifiDetectPeriod(networkId);
+    pStaInterface->GetVoWifiDetectPeriod(networkId);
+    pStaInterface->ProcessVoWifiNetlinkReportEvent(networkId);
+    std::vector<WifiSignalPollInfo> wifiSignalPollInfos = {};
+    pStaInterface->GetSignalPollInfoArray(wifiSignalPollInfos, networkId);
+    OperateResState state;
+    pStaInterface->GetDetectNetState(state);
+    pStaService->StartConnectToUserSelectNetwork(networkId, config.bssid);
+    pStaService->AllowAutoConnect(networkId, isAllowed);
+    pStaService->HandleScreenStatusChanged(networkId);
+    pStaService->RegisterCommonBuilder(tagType, tagName, commonBuilder);
+    pStaService->DeregisterCommonBuilder(tagType, tagName);
+    pStaService->DeliverAudioState(networkId);
+    pStaService->HandleFoldStatusChanged(networkId);
+    pStaService->VoWifiDetect(cmd);
+    pStaService->FetchWifiSignalInfoForVoWiFi();
+    pStaService->ConvertToAccessType(networkId, uid);
+    pStaService->ProcessSetVoWifiDetectMode(wifiDetectConfInfo);
+    pStaService->ProcessSetVoWifiDetectPeriod(networkId);
+    pStaService->GetSignalPollInfoArray(wifiSignalPollInfos, networkId);
+    pStaService->VoWifiDetectSet(cmd);
+    pStaService->GetDetectNetState(state);
     pStaService->UpdateEapConfig(config, config.wifiEapConfig);
     pStaService->RemoveCandidateConfig(uid, networkId);
     pStaService->FindDeviceConfig(config, config);
@@ -315,6 +356,8 @@ void RegisterStaServiceCallbackFuzzTest(const uint8_t* data, size_t size)
     WifiStaServerManager wifiStaServerManager;
     wifiStaServerManager.InitStaServercallback();
     pStaInterface->RegisterStaServiceCallback(callbacks);
+    pStaInterface->UnRegisterStaServiceCallback(callbacks);
+    pStaService->UnRegisterStaServiceCallback(callbacks);
 }
 
 void StaInterfaceFuzzTest(const uint8_t* data, size_t size)
@@ -334,6 +377,7 @@ void RegisterStaServiceCallbackTest(const uint8_t* data, size_t size)
     std::vector<StaServiceCallback> callbacks;
     WifiStaServerManager wifiStaServerManager;
     wifiStaServerManager.InitStaServercallback();
+    pStaService->InitStaService(callbacks);
     pStaService->RegisterStaServiceCallback(callbacks);
 }
 

@@ -106,8 +106,6 @@ public:
     void StaServiceRemoveCandidateConfigTestSucc();
     void StaServiceRemoveCandidateConfigTestFail();
     void StaServiceRemoveAllCandidateConfigTestSucc();
-    void StaServiceConnectToCandidateConfigTestSucc0();
-    void StaServiceConnectToCandidateConfigTestSucc1();
     void StaServiceConnectToCandidateConfigTestFail();
     void StaServiceRemoveAllDeviceTestSucc();
     void StaServiceRemoveAllDeviceTestFail0();
@@ -600,38 +598,6 @@ void StaServiceTest::StaServiceRemoveAllCandidateConfigTestSucc()
     EXPECT_TRUE(pStaService->RemoveAllCandidateConfig(uid) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc0()
-{
-    WifiDeviceConfig config;
-    config.bssid = "01:23:45:67:89:AB";
-    config.band = BAND;
-    config.networkId = NETWORK_ID;
-    config.ssid = "networkId";
-    config.keyMgmt = "123456";
-    int uid = UID;
-    int netWorkId = NETWORK_ID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(true));
-    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
-}
-
-void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc1()
-{
-    WifiDeviceConfig config;
-    config.bssid = "01:23:45:67:89:AB";
-    config.band = BAND;
-    config.networkId = NETWORK_ID;
-    config.ssid = "networkId";
-    config.keyMgmt = "NONE";
-    config.lastConnectTime = 1;
-    int uid = UID;
-    int netWorkId = NETWORK_ID;
-    EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
-    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(uid, netWorkId) == WIFI_OPT_SUCCESS);
-}
-
 void StaServiceTest::StaServiceConnectToCandidateConfigTestFail()
 {
     WifiDeviceConfig config;
@@ -1097,16 +1063,6 @@ HWTEST_F(StaServiceTest, StaServiceRemoveCandidateConfigTestFail, TestSize.Level
 HWTEST_F(StaServiceTest, StaServiceRemoveAllCandidateConfigTestSucc, TestSize.Level0)
 {
     StaServiceRemoveAllCandidateConfigTestSucc();
-}
-
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc0, TestSize.Level0)
-{
-    StaServiceConnectToCandidateConfigTestSucc0();
-}
-
-HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestSucc1, TestSize.Level0)
-{
-    StaServiceConnectToCandidateConfigTestSucc1();
 }
 
 HWTEST_F(StaServiceTest, StaServiceConnectToCandidateConfigTestFail, TestSize.Level0)

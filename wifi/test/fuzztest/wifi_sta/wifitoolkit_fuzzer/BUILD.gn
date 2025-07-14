@@ -84,6 +84,7 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "netstack:http_client",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "wifi"

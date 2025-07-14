@@ -1296,6 +1296,9 @@ std::map<std::string, Func> g_wifiConfigSetValueMap = {
     {"staApExclusionType", [](WifiConfig &item, const std::string &value) -> void {
         std::string tmpValue = value;
         item.staApExclusionType = CheckDataLegal(tmpValue);
+    }},
+    {"version", [](WifiConfig &item, const std::string &value) -> void {
+        //@deprecated
     }}
 };
 static int SetWifiConfigValue(WifiConfig &item, const std::string &key, const std::string &value)
@@ -1315,7 +1318,7 @@ int SetTClassKeyValue<WifiConfig>(WifiConfig &item, const std::string &key, cons
     if (SetWifiConfigValue(item, key, value) == 0) {
         return errorKeyValue;
     }
-    LOGE("Invalid config key value");
+    LOGE("SetTClassKeyValue<WifiConfig> Invalid config key value, %{public}s", key.c_str());
     errorKeyValue++;
     return errorKeyValue;
 }

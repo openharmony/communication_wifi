@@ -356,7 +356,8 @@ public:
           netId(-1),
           passphrase(""),
           groupOwnerIntent(AUTO_GROUP_OWNER_VALUE),
-          groupName("")
+          groupName(""),
+          freq(-1)
     {}
     WifiP2pConfig(const WifiP2pConfig &config)
         : mDeviceAddress(config.GetDeviceAddress()),
@@ -365,7 +366,8 @@ public:
           netId(config.GetNetId()),
           passphrase(config.GetPassphrase()),
           groupOwnerIntent(config.GetGroupOwnerIntent()),
-          groupName(config.GetGroupName())
+          groupName(config.GetGroupName()),
+          freq(config.GetFreq())
     {}
     ~WifiP2pConfig()
     {}
@@ -383,6 +385,8 @@ public:
     int GetGroupOwnerIntent() const;
     void SetGroupName(const std::string &setGroupName);
     const std::string &GetGroupName() const;
+    void SetFreq(int frequency);
+    int GetFreq() const;
 
 private:
     std::string mDeviceAddress; /* the device MAC address, the length is 17 characters. */
@@ -392,6 +396,7 @@ private:
     std::string passphrase; /* the value ranges from 8 to 63. */
     int groupOwnerIntent; /* the value is -1.(A value of -1 indicates the system can choose an appropriate value.) */
     std::string groupName; /* the value ranges from 1 to 32. */
+    int freq;
 };
 
 class WifiP2pConfigInternal : public WifiP2pConfig {

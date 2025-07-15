@@ -290,6 +290,8 @@
         "OHOS::Wifi::WifiSettings::SetRealMacAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::IsFactoryMode()";
         "OHOS::Wifi::GetDeviceType()";
+        "OHOS::Wifi::IsValid24GHz(int)";
+        "OHOS::Wifi::IsValid5GHz(int)";
         "OHOS::Wifi::WatchParamValue(char const*, void (*)(char const*, char const*, void*), void*)";
         "OHOS::Wifi::WifiConfigCenter::SetP2pIfaceName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::IsAllowScanAnyTime(OHOS::Wifi::tagScanControlInfo const&)";

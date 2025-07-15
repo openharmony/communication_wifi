@@ -646,6 +646,16 @@ const std::string &WifiP2pConfig::GetGroupName() const
     return groupName;
 }
 
+void WifiP2pConfig::SetFreq(int frequency)
+{
+    freq = frequency;
+}
+
+int WifiP2pConfig::GetFreq() const
+{
+    return freq;
+}
+
 void WifiP2pLinkedInfo::SetConnectState(P2pConnectedState setConnectState)
 {
     connectState = setConnectState;

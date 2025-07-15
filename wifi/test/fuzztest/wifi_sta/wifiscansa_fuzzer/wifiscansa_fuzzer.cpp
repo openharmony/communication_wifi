@@ -24,6 +24,7 @@
 #include "wifi_logger.h"
 #include "iscan_service.h"
 #include "wifi_scan_service_impl.h"
+#include "wifi_scan_mgr_service_impl.h"
 #include "wifi_settings.h"
 #include "wifi_toggler_manager.h"
 #include "wifi_errcode.h"
@@ -34,6 +35,7 @@ constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
 
 OHOS::Wifi::WifiScanServiceImpl pWifiScanServiceImpl;
+WifiScanMgrServiceImpl pWifiScanMgrServiceImpl;
 class IWifiScanCallbackMock : public IWifiScanCallback {
 public:
     IWifiScanCallbackMock()
@@ -128,6 +130,20 @@ void RegisterCallBackFuzzTest(const uint8_t* data, size_t size)
     pWifiScanServiceImpl.RegisterCallBack(callback, event);
 }
 
+void WifiScanServiceImplFuzzTest(const uint8_t* data, size_t size)
+{
+    std::string appId = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiScanServiceImpl.IsAllowedThirdPartyRequest(appId);
+    pWifiScanServiceImpl.IsRemoteDied();
+    pWifiScanServiceImpl.IsInScanMacInfoWhiteList();
+}
+
+void WifiScanMgrServiceImplFuzzTest(const uint8_t* data, size_t size)
+{
+    pWifiScanMgrServiceImpl.OnStart();
+    pWifiScanMgrServiceImpl.OnStop();
+    pWifiScanMgrServiceImpl.Init();
+}
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -145,6 +161,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::GetSupportedFeaturesFuzzTest(data, size);
     OHOS::Wifi::SaBasicDumpFuzzTest(data, size);
     OHOS::Wifi::RegisterCallBackFuzzTest(data, size);
+    OHOS::Wifi::WifiScanServiceImplFuzzTest(data, size);
+    OHOS::Wifi::WifiScanMgrServiceImplFuzzTest(data, size);
 
     return 0;
 }

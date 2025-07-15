@@ -318,6 +318,20 @@ void SetHotspotModeFuzzTest(const uint8_t* data, size_t size)
     pApService->SetHotspotMode(model);
 }
 
+void WifiApFuzzTest(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    int apStatus = static_cast<int>(data[index++]);
+    bool enable = (static_cast<int>(data[0]) % TWO) ? true : false;
+    std::string wifiCountryCode = std::string(reinterpret_cast<const char*>(data), size);
+    std::string outInterfaceName = std::string(reinterpret_cast<const char*>(data), size);
+    pWifiApNatManager->SetInterfaceRoute(enable);
+    pWifiApNatManager->SetInterfaceNat(enable, outInterfaceName);
+    pApService->DisableHotspot();
+    pApService->HandleNetCapabilitiesChanged(apStatus);
+    pApService->m_apObserver->OnWifiCountryCodeChanged(wifiCountryCode);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -357,6 +371,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::WifiApIdleStateFuzzTest(data, size);
     OHOS::Wifi::GetHotspotModeFuzzTest(data, size);
     OHOS::Wifi::SetHotspotModeFuzzTest(data, size);
+    OHOS::Wifi::WifiApFuzzTest(data, size);
     return 0;
 }
 }

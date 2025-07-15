@@ -591,7 +591,7 @@ bool StaStateMachine::InitState::RestrictedByMdm(WifiDeviceConfig &config)
 #endif
 
 void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId) {
-    InitWifiLinkedInfo linkInfo = pStaStateMachine->linkedInfo;
+    WifiLinkedInfo linkInfo = pStaStateMachine->linkedInfo;
     linkedInfo.networkId = networkId;
     pStaStateMachine->linkedInfo.networkId = networkId;
     pStaStateMachine->InvokeOnStaConnChanged(

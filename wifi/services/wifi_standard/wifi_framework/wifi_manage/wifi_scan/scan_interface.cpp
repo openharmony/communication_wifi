@@ -142,7 +142,7 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus, int networkId)
             WifiDeviceConfig deviceConfig;
             WifiScanParams wifiScanParams;
             if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
-                WIFI_LOGE("StartConnectToNetwork get GetDeviceConfig failed");
+                WIFI_LOGE("OnClientModeStatusChanged get GetDeviceConfig failed");
                 return WIFI_OPT_FAILED;
             }
             WIFI_LOGI("start new scan for hidden ssid");

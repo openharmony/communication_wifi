@@ -108,23 +108,6 @@ int WifiAuthCenter::VerifyGetWifiConfigPermission(const int &pid, const int &uid
     return PERMISSION_GRANTED;
 }
 
-NetworkSelectionManager::NetworkSelectionManager()
-{}
-
-bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelectionResult,
-                                            NetworkSelectType type,
-                                            const std::vector<InterScanInfo> &scanInfos)
-{
-    return true;
-}
-
-void NetworkSelectionManager::TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
-                                          const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector)
-{
-    return;
-}
-
-
 WifiNetAgent &WifiNetAgent::GetInstance()
 {
     static WifiNetAgent gWifiNetAgent;

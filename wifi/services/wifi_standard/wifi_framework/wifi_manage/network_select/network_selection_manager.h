@@ -30,6 +30,23 @@ struct NetworkSelectionResult {
 class NetworkSelectionManager {
 public:
     NetworkSelectionManager();
+
+    /**
+     * the function to select network with ssid
+     *
+     * @param deviceConfig Ap device config information
+     * @param autoSelectBssid Candidate network bssid
+     */
+    void SelectNetworkWithSsid(WifiDeviceConfig &deviceConfig, std::string& autoSelectBssid);
+
+    /**
+     * Convert WifiScanInfo to InterScanInfo
+     *
+     * @param wifiScanInfo wifiScanInfo
+     * @param interScanInfo interScanInfo
+     */
+    void ConvertScanInfo(WifiScanInfo &wifiScanInfo, InterScanInfo &interScanInfo);
+
     /**
      * the function to select network.
      *

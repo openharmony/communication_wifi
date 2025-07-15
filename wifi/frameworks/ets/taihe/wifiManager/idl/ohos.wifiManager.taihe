@@ -481,7 +481,7 @@ function GetCurrentGroupSync(): WifiP2pGroupInfo;
 @async function GetCurrentGroupWithCallback(): WifiP2pGroupInfo;
 
 @!sts_inject("""
-export function on(type: string, cb: (arg_0: NullishType) => void) {
+export function on(type: string, cb: (arg_0: Any) => void) {
     switch(type) {
         case "wifiStateChange": return onWifiStateChange(cb);
         case "wifiConnectionChange": return onWifiConnectionChange(cb);
@@ -501,7 +501,7 @@ export function on(type: string, cb: (arg_0: NullishType) => void) {
         default: throw new Error(`Unknown type: ${type}`);
     }
 }
-export function off(type: string, cb?: (arg_0: NullishType) => void) {
+export function off(type: string, cb?: (arg_0: Any) => void) {
     switch(type) {
         case "wifiStateChange": return offWifiStateChange(cb as (((data: int) => void) | undefined));
         case "wifiConnectionChange":  return offWifiConnectionChange(cb as (((data: int) => void) | undefined));

@@ -35,7 +35,8 @@ NetworkSelectionManager::NetworkSelectionManager()
     pNetworkSelectorFactory = std::make_unique<NetworkSelectorFactory>();
 }
 
-void NetworkSelectionManager::SelectNetworkWithSsid(WifiDeviceConfig& deviceConfig, std::string& autoSelectBssid) {
+void NetworkSelectionManager::SelectNetworkWithSsid(WifiDeviceConfig& deviceConfig, std::string& autoSelectBssid)
+{
     WIFI_LOGI("Enter SelectNetworkWithSsid.");
     std::vector<WifiScanInfo> wifiScanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
@@ -43,7 +44,7 @@ void NetworkSelectionManager::SelectNetworkWithSsid(WifiDeviceConfig& deviceConf
     for (auto &wifiScanInfo : wifiScanInfoList) {
         std::string deviceKeyMgmt;
         wifiScanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (wifiScanInfo.ssid == deviceConfig.ssid && 
+        if (wifiScanInfo.ssid == deviceConfig.ssid &&
             WifiSettings::GetInstance().InKeyMgmtBitset(deviceConfig, deviceKeyMgmt)) {
             InterScanInfo interScanInfo;
             ConvertScanInfo(wifiScanInfo, interScanInfo);

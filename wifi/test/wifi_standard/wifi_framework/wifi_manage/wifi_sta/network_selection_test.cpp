@@ -25,11 +25,46 @@ using ::testing::An;
 using ::testing::ext::TestSize;
 using ::testing::ReturnRoundRobin;
 using ::testing::Invoke;
+using ::testing::DoAll;
+using ::testing::SetArgReferee;
 
 
 namespace OHOS {
 namespace Wifi {
 class NetworkSelectionTest : public testing::Test {};
+
+HWTEST_F(NetworkSelectionTest, TestSelectNetworkWithSsid, TestSize.Level1)
+{
+    WifiDeviceConfig deviceConfig;
+    std::string autoSelectBssid;
+    deviceConfig.ssid = "test";
+    deviceConfig.keyMgmt = "WPA-PSK";
+    deviceConfig.keyMgmtBitset = 12;
+
+    std::vector<WifiScanInfo> wifiScanInfoList;
+    WifiScanInfo wifiScanInfo1;
+    wifiScanInfo1.bssid = "11:11:11:11:11";
+    wifiScanInfo1.ssid = "test1";
+    wifiScanInfo1.frequency = 2407;
+    wifiScanInfo1.rssi = -60;
+    wifiScanInfo1.securityType = WifiSecurity::PSK;
+    wifiScanInfoList.push_back(wifiScanInfo1);
+
+    WifiScanInfo wifiScanInfo2;
+    wifiScanInfo2.bssid = "22:22:22:22:22";
+    wifiScanInfo2.ssid = "test1";
+    wifiScanInfo2.frequency = 5028;
+    wifiScanInfo2.rssi = -60;
+    wifiScanInfo2.securityType = WifiSecurity::PSK;
+    wifiScanInfoList.push_back(wifiScanInfo2);
+
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetScanInfoList(_)).
+        WillRepeatedly(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
+    
+    NetworkSelectionManager selectionManager;
+    selectionManager.SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
+    EXPECT_FALSE(autoSelectBssid == "22:22:22:22:22");
+}
 
 HWTEST_F(NetworkSelectionTest, TestHiddenNetwork, TestSize.Level1)
 {

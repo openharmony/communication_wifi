@@ -138,7 +138,7 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus, int networkId)
         || staStatus == static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED)) {
         pScanService->HandleNetworkQualityChanged(staStatus);
     } else if (staStatus == static_cast<int>(OperateResState::CONNECT_MISS_MATCH)) {
-        if (networkId > 0) {
+        if (networkId >= 0) {
             WifiDeviceConfig deviceConfig;
             WifiScanParams wifiScanParams;
             if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {

@@ -552,7 +552,10 @@ bool WifiProStateMachine::IsFirstConnectAndNonet()
         return true;
     }
     WifiDeviceConfig config;
-    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config);
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config) != 0) {
+        WIFI_LOGE("IsFirstConnectAndNonet: Failed to get device config.");
+        return true;
+    }
     return currentState_ == WifiProState::WIFI_NONET && WifiProUtils::IsUserSelectNetwork() &&
            config.numAssociation <= 1;
 }

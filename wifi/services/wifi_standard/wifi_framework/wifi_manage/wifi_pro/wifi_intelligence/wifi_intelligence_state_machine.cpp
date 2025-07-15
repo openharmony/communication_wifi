@@ -365,7 +365,7 @@ bool WifiIntelligenceStateMachine::DisabledState::ExecuteStateMsg(InternalMessag
             }
         }
         case EVENT_CELL_STATE_CHANGE:
-        [[fallthrough]];
+            [[fallthrough]];
         case EVENT_HANDLE_STATE_CHANGE:
             ret = EXECUTED;
             HandleMsgStateChange(msg);

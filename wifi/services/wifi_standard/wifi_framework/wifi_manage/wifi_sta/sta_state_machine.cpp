@@ -592,10 +592,8 @@ bool StaStateMachine::InitState::RestrictedByMdm(WifiDeviceConfig &config)
 
 void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId) {
     WifiLinkedInfo linkInfo = pStaStateMachine->linkedInfo;
-    linkedInfo.networkId = networkId;
-    pStaStateMachine->linkedInfo.networkId = networkId;
-    pStaStateMachine->InvokeOnStaConnChanged(
-        OperateResState::CONNECT_MISS_MATCH, linkInfo);
+    linkInfo.networkId = networkId;
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_MISS_MATCH, linkInfo);
     WifiSettings::GetInstance().SetUserConnectChoice(networkId);
 }
 

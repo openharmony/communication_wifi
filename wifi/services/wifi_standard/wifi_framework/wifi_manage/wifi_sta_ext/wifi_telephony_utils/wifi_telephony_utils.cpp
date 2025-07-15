@@ -43,6 +43,7 @@ std::string SimAkaAuth(const std::string &nonce, AuthType authType, int32_t eapS
             break;
         case AuthType::AKA_TYPE:
             type = Telephony::AuthType::SIM_AUTH_EAP_AKA_TYPE;
+            [[fallthrough]];
         default:
             break;
     }

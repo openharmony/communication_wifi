@@ -4356,7 +4356,6 @@ void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig,
         networkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
         WIFI_LOGI("SetBssid autoSelectBssid=%{public}s", MacAnonymize(autoSelectBssid).c_str());
         WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, autoSelectBssid, ifaceName);
-        return;
     }
     deviceConfig.userSelectBssid = "";
     WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);

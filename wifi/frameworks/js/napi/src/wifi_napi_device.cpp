@@ -431,7 +431,8 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
     NAPI_CALL(env, napi_has_named_property(env, object, "family", &hasProperty));
     if (!hasProperty) {
         WIFI_LOGE("ConfigStaticIp, Js has no property: family.");
-        return UndefinedNapiValue(env);
+        cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = IPV4_ADDRESS_TYPE;
+        return ConfigStaticIpv4(env, object, cppConfig);
     }
 
     napi_value family;

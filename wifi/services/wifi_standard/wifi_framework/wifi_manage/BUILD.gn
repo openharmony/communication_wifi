@@ -284,10 +284,12 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_conn_manager_if",
     ]
     if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
       defined(global_parts_info.telephony_state_registry) &&
-      defined(global_parts_info.telephony_celluar_data) &&
+      defined(global_parts_info.telephony_cellular_data) &&
       wifi_feature_autoopen_specified_location) {
-      external_deps += [ "core_service:tel_celluar_data_api" ]
+      external_deps += [ "core_service:tel_core_service_api" ]
+      external_deps += [ "cellular_data:tel_cellular_data_api" ]
       external_deps += [ "state_registry:tel_state_registry_api"]
       defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
     }
@@ -376,10 +378,12 @@ if (defined(ohos_lite)) {
       "netmanager_base:net_conn_manager_if",
     ]
     if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
       defined(global_parts_info.telephony_state_registry) &&
-      defined(global_parts_info.telephony_celluar_data) &&
+      defined(global_parts_info.telephony_cellular_data) &&
       wifi_feature_autoopen_specified_location) {
-      external_deps += [ "core_service:tel_celluar_data_api" ]
+      external_deps += [ "core_service:tel_core_service_api" ]
+      external_deps += [ "cellular_data:tel_cellular_data_api" ]
       external_deps += [ "state_registry:tel_state_registry_api"]
       defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
     }
@@ -454,10 +458,12 @@ if (defined(ohos_lite)) {
     }
 
     if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
       defined(global_parts_info.telephony_state_registry) &&
-      defined(global_parts_info.telephony_celluar_data) &&
+      defined(global_parts_info.telephony_cellular_data) &&
       wifi_feature_autoopen_specified_location) {
-      external_deps += [ "core_service:tel_celluar_data_api" ]
+      external_deps += [ "core_service:tel_core_service_api" ]
+      external_deps += [ "cellular_data:tel_cellular_data_api" ]
       external_deps += [ "state_registry:tel_state_registry_api"]
       defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
     }
@@ -514,10 +520,12 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
     if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_core_service) &&
       defined(global_parts_info.telephony_state_registry) &&
-      defined(global_parts_info.telephony_celluar_data) &&
+      defined(global_parts_info.telephony_cellular_data) &&
       wifi_feature_autoopen_specified_location) {
-      external_deps += [ "core_service:tel_celluar_data_api" ]
+      external_deps += [ "core_service:tel_core_service_api" ]
+      external_deps += [ "cellular_data:tel_cellular_data_api" ]
       external_deps += [ "state_registry:tel_state_registry_api"]
       defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
     }
@@ -731,9 +739,9 @@ if (defined(ohos_lite)) {
   
     if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_state_registry) &&
-      defined(global_parts_info.telephony_celluar_data) &&
+      defined(global_parts_info.telephony_cellular_data) &&
       wifi_feature_autoopen_specified_location) {
-      external_deps += [ "core_service:tel_celluar_data_api" ]
+      external_deps += [ "cellular_data:tel_cellular_data_api" ]
       external_deps += [ "state_registry:tel_state_registry_api"]
       defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
     }

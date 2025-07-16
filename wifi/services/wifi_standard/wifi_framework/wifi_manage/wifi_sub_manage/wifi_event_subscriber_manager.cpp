@@ -1624,7 +1624,12 @@ void WifiEventSubscriberManager::UnRegisterCellularStateObserver()
 void CellularStateObserver::OnCellInfoUpdated(int32_t slotId, const std::vector<sptr<Telephony::CellInformation>> &vec)
 {
     WIFI_LOGI("CellularStateObserver::OnCellInfoUpdated");
-    WifiProService::GetInstance().OnCellInfoUpdated();
+#if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(INSTID_WLAN0);
+    if (pWifiProService != nullptr) {
+        pWifiProService->OnCellInfoUpdated();
+    }
+#endif
 }
 #endif
 }  // namespace Wifi

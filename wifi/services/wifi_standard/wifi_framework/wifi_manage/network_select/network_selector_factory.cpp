@@ -30,6 +30,8 @@ NetworkSelectorFactory::NetworkSelectorFactory()
         &NetworkSelectorFactory::CreateWifi2WifiNoNetNetworkSelector;
     handleFuncMap[static_cast<uint32_t>(NetworkSelectType::WIFI2WIFI_QOE_BAD)] =
         &NetworkSelectorFactory::CreateWifi2WifiQoeSlowNetworkSelector;
+    handleFuncMap[static_cast<uint32_t>(NetworkSelectType::USER_CONNECT)] =
+        &NetworkSelectorFactory::CreateAutoConnectNetworkSelector;
 }
 
 std::optional<std::unique_ptr<NetworkSelection::INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(

@@ -96,16 +96,7 @@ struct NetworkSelectionResult {
 
 class NetworkSelectionManager {
 public:
-    NetworkSelectionManager();
-
-    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult,
-                       NetworkSelectType type,
-                       const std::vector<InterScanInfo> &scanInfos);
-
     std::unique_ptr<NetworkSelectorFactory> pNetworkSelectorFactory = nullptr;
-
-    static void TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
-                            const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector);
 };
 
 } // namespace Wifi

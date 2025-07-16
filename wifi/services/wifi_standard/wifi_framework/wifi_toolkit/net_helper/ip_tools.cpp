@@ -153,15 +153,17 @@ std::string IpTools::ConvertIpv6Mask(int prefixLength)
     }
     // 初始化 16 字节的 IPv6 掩码（全 0）
     uint8_t mask[16];
-    memset(mask, 0, sizeof(mask));
+    memset_s(mask, sizeof(mask), 0, sizeof(mask));
 
     // 逐字节设置掩码
-    for (unsigned int i = 0; i < 16; i++) {
-        if (prefixLength >= 8) {
+    uint8_t bytesLen = 8;
+    uint8_t ipv6Bytes = 16;
+    for (unsigned int i = 0; i < ipv6Bytes; i++) {
+        if (prefixLength >= bytesLen) {
             mask[i] = 0xFF;  // 当前字节全 1
-            prefixLength -= 8;
+            prefixLength -= bytesLen;
         } else if (prefixLength > 0) {
-            mask[i] = 0xFF << (8 - prefixLength);  // 部分 1
+            mask[i] = 0xFF << (bytesLen - prefixLength);  // 部分 1
             prefixLength = 0;
         }
         // 剩余字节保持 0

@@ -126,7 +126,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     RegisterNetmgrEvent();
 #endif
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
-    mWifiEventSubsThread_ = std::make_unique<>("WifiRegisterThread");
+    mWifiEventSubsThread_ = std::make_unique<WifiEventHandler>("WifiRegisterThread");
     if (mWifiEventSubsThread_) {
         mWifiEventSubsThread_->PostAsyncTask([this]() { this->RegisterCellularStateObserver(); },
             "TelStateRegistry", TEL_STATE_REGISTRY_DELAY_TIME);

@@ -440,7 +440,7 @@ public:
         return;
     }
 
-    std::string GetIpv6Address()
+    std::string GetIpv6Address() const
     {
         return IpTools::ConvertIpv6Address(addressIpv6);
     }

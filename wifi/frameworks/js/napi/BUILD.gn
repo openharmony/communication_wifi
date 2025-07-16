@@ -50,6 +50,7 @@ ohos_shared_library("wifi") {
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
   ]
 
   defines = []
@@ -162,6 +163,7 @@ ohos_shared_library("wifimanager") {
   deps = [
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
   ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
 

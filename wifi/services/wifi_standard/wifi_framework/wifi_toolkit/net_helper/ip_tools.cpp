@@ -148,16 +148,31 @@ std::string IpTools::ConvertIpv4Mask(int prefixLength)
 
 std::string IpTools::ConvertIpv6Mask(int prefixLength)
 {
-    std::string netMask;
     if (prefixLength < MIN_PREFIX_LEN || prefixLength > MAX_IPV6_PREFIX_LEN) {
-        return netMask;
+        return "";
+    }
+    // 初始化 16 字节的 IPv6 掩码（全 0）
+    uint8_t mask[16];
+    memset_s(mask, sizeof(mask), 0, sizeof(mask));
+
+    // 逐字节设置掩码
+    uint8_t bytesLen = 8;
+    uint8_t ipv6Bytes = 16;
+    for (unsigned int i = 0; i < ipv6Bytes; i++) {
+        if (prefixLength >= bytesLen) {
+            mask[i] = 0xFF;  // 当前字节全 1
+            prefixLength -= bytesLen;
+        } else if (prefixLength > 0) {
+            mask[i] = 0xFF << (bytesLen - prefixLength);  // 部分 1
+            prefixLength = 0;
+        }
+        // 剩余字节保持 0
     }
 
-    std::ostringstream stream;
-    stream << prefixLength;
-    netMask = stream.str();
-
-    return netMask;
+    // 转换为 IPv6 字符串格式（压缩形式，如 "ffff::"）
+    char buffer[INET6_ADDRSTRLEN];
+    inet_ntop(AF_INET6, mask, buffer, INET6_ADDRSTRLEN);
+    return std::string(buffer);
 }
 
 int IpTools::GetMaskLength(std::string mask)
@@ -249,6 +264,47 @@ void IpTools::GetExclusionObjectList(const std::string &exclusionObjectList, std
     list.push_back(tmpExclusionList);
     exclusionList.assign(list.begin(), list.end());
     return;
+}
+
+std::string IpTools::ConvertIpv6AddressToCompleted(const std::string &address)
+{
+    size_t dblColonPos = address.find("::");
+    bool hasDblColon = (dblColonPos != std::string::npos);
+    std::vector<std::string> parts;
+    std::string firstPart = address.substr(0, dblColonPos);
+    std::string secondPart = hasDblColon ? address.substr(dblColonPos + 2) : "";
+ 
+    std::istringstream firstStream(firstPart);
+    std::string segment;
+    while (getline(firstStream, segment, ':')) {
+        parts.push_back(segment);
+    }
+ 
+    std::istringstream secondStream(secondPart);
+    std::vector<std::string> secondParts;
+    while (getline(secondStream, segment, ':')) {
+        secondParts.push_back(segment);
+    }
+ 
+    size_t totalParts = 8;
+    size_t existingParts = parts.size() + secondParts.size();
+    size_t zeroPartsToInsert = totalParts - existingParts;
+    int8_t bitNum = 4;
+    parts.insert(parts.end(), zeroPartsToInsert, "0");
+    parts.insert(parts.end(), secondParts.begin(), secondParts.end());
+    std::ostringstream stream;
+    for (size_t i = 0; i < parts.size(); i++) {
+        if (i != 0) {
+            stream << ":";
+        }
+        std::string seg = parts[i];
+        if (seg.empty()) {
+            seg = "0";
+        }
+        unsigned int num = std::stoul(seg, nullptr, 16);
+        stream << std::setw(bitNum) << std::setfill('0') << std::hex << num;
+    }
+    return stream.str();
 }
 }  // namespace Wifi
 }  // namespace OHOS

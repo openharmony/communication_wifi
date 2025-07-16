@@ -15,7 +15,7 @@
 
 #ifdef WIFI_SECURITY_DETECT_ENABLE
 #include <chrono>
-#include "json/json.h"
+#include "cJSON.h"
 #include "ip_tools.h"
 #include "wifi_security_detect.h"
 #include "wifi_security_detect_observer.h"
@@ -237,19 +237,30 @@ void WifiSecurityDetect::UnRegisterSecurityDetectObserver()
 
 ErrCode WifiSecurityDetect::SecurityModelJsonResult(SecurityModelResult model, bool &result)
 {
-    Json::Value root;
-    Json::Reader reader;
-    bool parsingSuccess = reader.parse(model.result, root);
-    if (!parsingSuccess) {
+    cJSON *root = cJSON_Parse(model.result.c_str());
+    if (root == nullptr) {
+ 
+ 
         WIFI_LOGE("model.result is null");
         return WIFI_OPT_FAILED;
     }
-
-    if (root["status"].isInt() && root["status"].asInt() != 0) {
-        WIFI_LOGE("RequestSecurityModelResultSync status error= %{public}d", root["status"].asInt());
+ 
+    cJSON *statusItem = cJSON_GetObjectItem(root, "status");
+    if (statusItem && cJSON_IsNumber(statusItem) && statusItem->valueint != 0) {
+        WIFI_LOGE("RequestSecurityModelResultSync status error= %d", statusItem->valueint);
+        cJSON_Delete(root);
         return WIFI_OPT_FAILED;
     }
+ 
+    cJSON *resultItem = cJSON_GetObjectItem(root, "result");
     std::string SecurityResult;
+    if (resultItem && cJSON_IsString(resultItem)) {
+        SecurityResult = resultItem->valuestring;
+    } else {
+        SecurityResult = "";
+    }
+ 
+    cJSON_Delete(root);
     if (root["result"].isString()) {
         SecurityResult = root["result"].asString();
     } else {
@@ -293,7 +304,7 @@ int32_t WifiSecurityDetect::AuthenticationConvert(std::string key)
     }
 }
 
-void WifiSecurityDetect::ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, Json::Value &root)
+void WifiSecurityDetect::ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, cJSON *root)
 {
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config) != 0) {
@@ -303,45 +314,53 @@ void WifiSecurityDetect::ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, Js
     IpInfo wifiIpInfo;
     int32_t instId = 0;
     WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, instId);
-    switch (info.wifiStandard) {
+ 
+    AddWifiStandardToJson(root, info.wifiStandard);
+ 
+    cJSON_AddStringToObject(root, "ssid", config.ssid.c_str());
+    cJSON_AddStringToObject(root, "bssid", config.bssid.c_str());
+    cJSON_AddNumberToObject(root, "signalStrength", config.rssi);
+    cJSON_AddNumberToObject(root, "authentication", AuthenticationConvert(config.keyMgmt));
+    if (config.frequency >= MIN_5G_FREQUENCY && config.frequency <= MAX_5G_FREQUENCY) {
+        cJSON_AddStringToObject(root, "frequencyBand", "5GHz");
+    } else {
+        cJSON_AddStringToObject(root, "frequencyBand", "2.4GHz");
+    }
+    cJSON_AddStringToObject(root, "gatewayIp", IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress).c_str());
+    cJSON_AddStringToObject(root, "gatewayMac", config.macAddress.c_str());
+    cJSON_AddStringToObject(root, "primaryDns", IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns).c_str());
+    if (wifiIpInfo.secondDns == 0) {
+        cJSON_AddStringToObject(root, "secondDns", "0.0.0.0");
+    } else {
+        cJSON_AddStringToObject(root, "secondDns", IpTools::ConvertIpv4Address(wifiIpInfo.secondDns).c_str());
+    }
+}
+ 
+void WifiSecurityDetect::AddWifiStandardToJson(cJSON *root, int wifiStandard)
+{
+    switch (wifiStandard) {
         case WireType::WIRE_802_11A:
-            root["wirelessType"] = "802.11a";
+            cJSON_AddStringToObject(root, "wirelessType", "802.11a");
             break;
         case WireType::WIRE_802_11B:
-            root["wirelessType"] = "802.11b";
+            cJSON_AddStringToObject(root, "wirelessType", "802.11b");
             break;
         case WireType::WIRE_802_11G:
-            root["wirelessType"] = "802.11g";
+            cJSON_AddStringToObject(root, "wirelessType", "802.11g");
             break;
         case WireType::WIRE_802_11N:
-            root["wirelessType"] = "802.11n";
+            cJSON_AddStringToObject(root, "wirelessType", "802.11n");
             break;
         case WireType::WIRE_802_11AC:
-            root["wirelessType"] = "802.11ac";
+            cJSON_AddStringToObject(root, "wirelessType", "802.11ac");
             break;
         case WireType::WIRE_802_11AX:
-            root["wirelessType"] = "802.11ax";
+            cJSON_AddStringToObject(root, "wirelessType", "802.11ax");
             break;
         default:
             WIFI_LOGE("wifi wirelessType is unknown");
-            root["wirelessType"] = "";
-    }
-    root["ssid"] = config.ssid;
-    root["bssid"] = config.bssid;
-    root["signalStrength"] = config.rssi;
-    root["authentication"] = AuthenticationConvert(config.keyMgmt);
-    if (config.frequency >= MIN_5G_FREQUENCY && config.frequency <= MAX_5G_FREQUENCY) {
-        root["frequencyBand"] = "5GHz";
-    } else {
-        root["frequencyBand"] = "2.4GHz";
-    }
-    root["gatewayIp"] = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
-    root["gatewayMac"] = config.macAddress;
-    root["primaryDns"] = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
-    if (wifiIpInfo.secondDns == 0) {
-        root["secondDns"] = "0.0.0.0";
-    } else {
-        root["secondDns"] = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
+            cJSON_AddStringToObject(root, "wirelessType", "");
+            break;
     }
 }
 
@@ -361,10 +380,18 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
         return;
     }
 
-    Json::Value root;
-    Json::FastWriter writer;
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
     ConverWifiLinkInfoToJson(info, root);
-    model.param = writer.write(root);
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr != nullptr) {
+        model.param = jsonStr;
+        free(jsonStr);
+    }
+    cJSON_Delete(root);
     WIFI_LOGI(
         "ssid:%{public}s bssid:%{public}s", SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str());
     securityDetectThread_->PostAsyncTask([=]() mutable -> int32_t {

@@ -116,6 +116,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_runtime:extension_manager",
       "c_utils:utils",
+      "cJSON:cjson",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
       "hicollie:libhicollie",

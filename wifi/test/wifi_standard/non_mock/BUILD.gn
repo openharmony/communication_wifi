@@ -80,6 +80,7 @@ ohos_unittest("wifi_non_mock_unittest") {
     "ability_base:zuri",
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
+    "cJSON:cjson",
     "hilog:libhilog",
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",

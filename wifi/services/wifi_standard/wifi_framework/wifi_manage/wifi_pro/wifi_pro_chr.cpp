@@ -20,6 +20,7 @@
 #include "wifi_hisysevent.h"
 #include "hisysevent.h"
 #include "json/json.h"
+#include "cJSON.h"
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiProChr");
@@ -248,44 +249,84 @@ void WifiProChr::RecordCountWiFiPro(bool isValid)
 void WifiProChr::WriteWifiProSysEvent()
 {
     WIFI_LOGI("WriteWifiProSysEvent enter");
-    Json::Value root;
-    Json::FastWriter writer;
-    root["FAST_SCAN_CNT"] = fastScanCnt_;
-    root["FULL_SCAN_CNT"] = fullScanCnt_;
-    root["WIFIPRO_POOR_LINK_CNT"] = poorLinkCnt_;
-    root["WIFIPRO_NONET_CNT"] = noNetCnt_;
-    root["WIFIPRO_QOE_SLOW_CNT"] = qoeSlowCnt_;
-    root["POOR_LINK_SELECT_NET_SUCC_CNT"] = selectNetResultCnt_[WifiProEventResult::POORLINK_SUCC];
-    root["NONET_SELECT_NET_SUCC_CNT"] = selectNetResultCnt_[WifiProEventResult::NONET_SUCC];
-    root["QOE_SLOW_SELECT_NET_SUCC_CNT"] = selectNetResultCnt_[WifiProEventResult::QOE_SUCCC];
-    root["POOR_LINK_SELECT_NET_FAILED_CNT"] = selectNetResultCnt_[WifiProEventResult::POORLINK_FAILED];
-    root["NONET_SELECT_NET_FAILED_CNT"] = selectNetResultCnt_[WifiProEventResult::NONET_FAILED];
-    root["QOE_SLOW_SELECT_NET_FAILED_CNT"] = selectNetResultCnt_[WifiProEventResult::QOESLOW_FAILED];
-    root["POOR_LINK_SWITCH_SUCC_CNT"] = wifiProResultCnt_[WifiProEventResult::POORLINK_SUCC];
-    root["NONET_SWITCH_SUCC_CNT"] = wifiProResultCnt_[WifiProEventResult::NONET_SUCC];
-    root["QOE_SLOW_SWITCH_SUCC_CNT"] = wifiProResultCnt_[WifiProEventResult::QOE_SUCCC];
-    root["POOR_LINK_SWITCH_FAILED_CNT"] = wifiProResultCnt_[WifiProEventResult::POORLINK_FAILED];
-    root["NONET_SWITCH_FAILED_CNT"] = wifiProResultCnt_[WifiProEventResult::NONET_FAILED];
-    root["QOE_SLOW_SWITCH_FAILED_CNT"] = wifiProResultCnt_[WifiProEventResult::QOESLOW_FAILED];
-    root["TIME_LEVEL1_CNT"] = wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL1];
-    root["TIME_LEVEL2_CNT"] = wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL2];
-    root["TIME_LEVEL3_CNT"] = wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL3];
-    root["TIME_START_TO_CONNECT_LEVEL1_CNT"] = wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL1];
-    root["TIME_START_TO_CONNECT_LEVEL2_CNT"] = wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL2];
-    root["TIME_START_TO_CONNECT_LEVEL3_CNT"] = wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL3];
-    root["TIME_CONNECT_TO_SUCC_LEVEL1_CNT"] = wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL1];
-    root["TIME_CONNECT_TO_SUCC_LEVEL2_CNT"] = wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL2];
-    root["TIME_CONNECT_TO_SUCC_LEVEL3_CNT"] = wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL3];
-    root["REASON_NOT_SWTICH_SWITCHING"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SWITCHING];
-    root["REASON_NOT_SWTICH_SELFCURING"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SELFCURING];
-    root["REASON_NOT_SWTICH_NONET_BEFORE"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NONET_BEFORE_CONNECT];
-    root["REASON_NOT_SWTICH_SIGNAL_BRIDGE"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SIGNAL_BRIDGE_ON];
-    root["REASON_NOT_SWTICH_AP_STA_ON"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_AP_STA_ON];
-    root["REASON_NOT_SWTICH_APP_WLISTS"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_APP_WHITE_LISTS];
-    root["REASON_NOT_SWTICH_ISCALLING"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_ISCALLING];
-    root["REASON_NOT_SWTICH_NOT_AUTOSWITCH"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NOT_ALLOW_AUTOSWITCH];
-    root["REASON_NOT_SWTICH_DISABLED"] = reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_DISABLED];
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PRO_STATISTICS", "EVENT_VALUE", writer.write(root));
+    cJSON *root = FillWifiProStatisticsJson();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+ 
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PRO_STATISTICS", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+
+cJSON *WifiProChr::FillWifiProStatisticsJson()
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return nullptr;
+    }
+    cJSON_AddNumberToObject(root, "FAST_SCAN_CNT", fastScanCnt_);
+    cJSON_AddNumberToObject(root, "FULL_SCAN_CNT", fullScanCnt_);
+    cJSON_AddNumberToObject(root, "WIFIPRO_POOR_LINK_CNT", poorLinkCnt_);
+    cJSON_AddNumberToObject(root, "WIFIPRO_NONET_CNT", noNetCnt_);
+    cJSON_AddNumberToObject(root, "WIFIPRO_QOE_SLOW_CNT", qoeSlowCnt_);
+    cJSON_AddNumberToObject(
+        root, "POOR_LINK_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::POORLINK_SUCC]);
+    cJSON_AddNumberToObject(root, "NONET_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::NONET_SUCC]);
+    cJSON_AddNumberToObject(root, "QOE_SLOW_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::QOE_SUCCC]);
+    cJSON_AddNumberToObject(
+        root, "POOR_LINK_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::POORLINK_FAILED]);
+    cJSON_AddNumberToObject(root, "NONET_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::NONET_FAILED]);
+    cJSON_AddNumberToObject(
+        root, "QOE_SLOW_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::QOESLOW_FAILED]);
+    cJSON_AddNumberToObject(root, "POOR_LINK_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_SUCC]);
+    cJSON_AddNumberToObject(root, "NONET_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::NONET_SUCC]);
+    cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::QOE_SUCCC]);
+    cJSON_AddNumberToObject(
+        root, "POOR_LINK_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_FAILED]);
+        
+    FillWifiProStatisticsJsons(root);
+    return root;
+}
+ 
+void WifiProChr::FillWifiProStatisticsJsons(cJSON *root)
+{
+    cJSON_AddNumberToObject(root, "NONET_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::NONET_FAILED]);
+    cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::QOESLOW_FAILED]);
+    cJSON_AddNumberToObject(root, "TIME_LEVEL1_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL1]);
+    cJSON_AddNumberToObject(root, "TIME_LEVEL2_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL2]);
+    cJSON_AddNumberToObject(root, "TIME_LEVEL3_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL3]);
+    cJSON_AddNumberToObject(root, "TIME_START_TO_CONNECT_LEVEL1_CNT", wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL1]);
+    cJSON_AddNumberToObject(root, "TIME_START_TO_CONNECT_LEVEL2_CNT", wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL2]);
+    cJSON_AddNumberToObject(root, "TIME_START_TO_CONNECT_LEVEL3_CNT", wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL3]);
+    cJSON_AddNumberToObject(root, "TIME_CONNECT_TO_SUCC_LEVEL1_CNT", wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL1]);
+    cJSON_AddNumberToObject(root, "TIME_CONNECT_TO_SUCC_LEVEL2_CNT", wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL2]);
+    cJSON_AddNumberToObject(root, "TIME_CONNECT_TO_SUCC_LEVEL3_CNT", wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL3]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_SWITCHING", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SWITCHING]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_SELFCURING", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SELFCURING]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_NONET_BEFORE", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NONET_BEFORE_CONNECT]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_SIGNAL_BRIDGE", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SIGNAL_BRIDGE_ON]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_AP_STA_ON", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_AP_STA_ON]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_APP_WLISTS", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_APP_WHITE_LISTS]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_ISCALLING", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_ISCALLING]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_NOT_AUTOSWITCH", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NOT_ALLOW_AUTOSWITCH]);
+    cJSON_AddNumberToObject(root, "REASON_NOT_SWITCH_DISABLED", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_DISABLED]);
 }
 }  // namespace Wifi
 }  // namespace OHOS

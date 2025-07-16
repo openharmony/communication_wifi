@@ -21,7 +21,7 @@
 #include "wifi_common_util.h"
 #include "wifi_log.h"
 #ifndef OHOS_ARCH_LITE
-#include "json/json.h"
+#include "cJSON.h"
 #include "wifi_country_code_define.h"
 #endif
 #ifdef INIT_LIB_ENABLE
@@ -637,24 +637,31 @@ bool ParseJsonKey(const Json::Value &jsonValue, const std::string &key, std::str
 
 bool ParseJson(const std::string &jsonString, const std::string &type, const std::string &key, std::string &value)
 {
-    LOGI("ParseJson enter.");
-    Json::Value root;
-    Json::Reader reader;
-    bool success = reader.parse(jsonString, root);
-    if (!success) {
+    cJSON *root = cJSON_Parse(jsonString.c_str());
+    if (root == nullptr) {
         LOGE("ParseJson failed to parse json data.");
         return false;
     }
-    int nSize = static_cast<int>(root.size());
+    if (!cJSON_IsArray(root)) {
+        cJSON_Delete(root);
+        return false;
+    }
+    int nSize = cJSON_GetArraySize(root);
     for (int i = 0; i < nSize; i++) {
-        if (!root[i].isMember(type)) {
-            LOGW("ParseJson JSON[%{public}d] has no member %{public}s.", nSize, type.c_str());
+        cJSON *item = cJSON_GetArrayItem(root, i);
+        if (item == nullptr || !cJSON_IsObject(item)) {
             continue;
         }
-        if (ParseJsonKey(root[i][type], key, value)) {
+        cJSON *typeItem = cJSON_GetObjectItem(item, type.c_str()); // 比如 "data"
+        if (typeItem == nullptr) {
+            continue;
+        }
+        if (ParseJsonKey(typeItem, key, value)) {
+            cJSON_Delete(root);
             return true;
         }
     }
+    cJSON_Delete(root);
     return false;
 }
 

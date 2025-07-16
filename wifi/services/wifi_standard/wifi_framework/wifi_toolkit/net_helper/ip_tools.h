@@ -123,6 +123,14 @@ public:
      * @param exclusionList - Website List.[in]
      */
     static void GetExclusionObjectList(const std::string &exclusionObjectList, std::vector<std::string> &exclusionList);
+
+    /**
+     * @Description : Converts the simple IPv6 address to the complete IPv6 address.
+     *
+     * @param address - IPv6 address in string format.[in]
+     * @return std::string : IPv6 address in string format
+     */
+    static std::string ConvertIpv6AddressToCompleted(const std::string &address);
 };
 }  // namespace Wifi
 }  // namespace OHOS

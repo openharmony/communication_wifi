@@ -74,6 +74,9 @@ napi_value FactoryReset(napi_env env, napi_callback_info info);
 napi_value EnableHiLinkHandshake(napi_env env, napi_callback_info info);
 napi_value EnableSemiWifi(napi_env env, napi_callback_info info);
 napi_value GetWifiDetailState(napi_env env, napi_callback_info info);
+napi_value ConfigStaticIp(const napi_env &env, const napi_value &object, WifiDeviceConfig &cppConfig);
+napi_value ConfigStaticIpv4(const napi_env &env, const napi_value &object, WifiDeviceConfig &cppConfig);
+napi_value ConfigStaticIpv6(const napi_env &env, const napi_value &object, WifiDeviceConfig &cppConfig);
 
 class ScanInfoAsyncContext : public AsyncContext {
 public:

@@ -21,6 +21,14 @@
 #include "wifi_napi_errcode.h"
 #include "wifi_napi_event.h"
 #include "wifi_timer.h"
+#include "wifi_msg.h"
+
+// Number of DNS
+#define DNS_NUM 2
+// Length of DNS
+#define DNS_LENGTH 128
+// Number of Domains
+#define DOMAINS_NUM 1
 
 namespace OHOS {
 namespace Wifi {
@@ -30,6 +38,9 @@ static const std::string EAP_METHOD[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", 
 std::shared_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
 constexpr uint32_t CANDIDATE_CALLBACK_TIMEOUT = 12 * 1000; // 12s
+
+void Ipv4ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result);
+void Ipv6ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result);
 
 NO_SANITIZE("cfi") napi_value EnableWifi(napi_env env, napi_callback_info info)
 {
@@ -417,39 +428,105 @@ napi_value ProcessEapConfig(const napi_env& env, const napi_value& object, WifiD
 napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
 {
     bool hasProperty = false;
-    NAPI_CALL(env, napi_has_named_property(env, object, "staticIp", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, object, "family", &hasProperty));
     if (!hasProperty) {
-        WIFI_LOGE("ConfigStaticIp, Js has no property: staticIp.");
+        WIFI_LOGE("ConfigStaticIp, Js has no property: family.");
         return UndefinedNapiValue(env);
     }
+
+    napi_value family;
+    napi_get_named_property(env, object, "family", &family);
+    JsObjectToInt(env, object, "family", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family);
+    if (cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV4_ADDRESS_TYPE) {
+        ConfigStaticIpv4(env, object, cppConfig);
+    } else if (cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV6_ADDRESS_TYPE) {
+        ConfigStaticIpv6(env, object, cppConfig);
+    }
+
+    return CreateInt32(env);
+}
+
+napi_value ConfigStaticIpv4(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
+{
     napi_value staticIp;
     napi_value dnsServers;
     napi_value primaryDns;
     napi_value secondDns;
+    bool hasProperty = false;
+    NAPI_CALL(env, napi_has_named_property(env, object, "staticIp", &hasProperty));
+    if (!hasProperty) {
+        WIFI_LOGE("ConfigStaticIpv4, Js has no property: staticIp.");
+        return UndefinedNapiValue(env);
+    }
     napi_get_named_property(env, object, "staticIp", &staticIp);
-    JsObjectToUint(env, staticIp, "ipAddress",
-        cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4);
-    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = 0;
+    JsObjectToUint(env, staticIp, "ipAddress", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4);
     JsObjectToUint(env, staticIp, "gateway", cppConfig.wifiIpConfig.staticIpAddress.gateway.addressIpv4);
     JsObjectToInt(env, staticIp, "prefixLength", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
-
     NAPI_CALL(env, napi_has_named_property(env, staticIp, "dnsServers", &hasProperty));
     if (!hasProperty) {
-        WIFI_LOGE("ConfigStaticIp, Js has no property: dnsServers.");
+        WIFI_LOGE("ConfigStaticIpv4, Js has no property: dnsServers.");
         return UndefinedNapiValue(env);
     }
     uint32_t arrayLength = 0;
-    const int DNS_NUM = 2;
     napi_get_named_property(env, staticIp, "dnsServers", &dnsServers);
     napi_get_array_length(env, dnsServers, &arrayLength);
     if (arrayLength == 0 || arrayLength > DNS_NUM) {
-        WIFI_LOGE("ConfigStaticIp, It needs dns servers or dns too much.");
+        WIFI_LOGE("ConfigStaticIpv4, It needs dns servers or dns too much.");
         return UndefinedNapiValue(env);
     }
     napi_get_element(env, dnsServers, 0, &primaryDns);
     napi_get_element(env, dnsServers, 1, &secondDns);
     napi_get_value_uint32(env, primaryDns, &cppConfig.wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4);
     napi_get_value_uint32(env, secondDns, &cppConfig.wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4);
+
+    return CreateInt32(env);
+}
+
+napi_value ConfigStaticIpv6(const napi_env& env, const napi_value& object, WifiDeviceConfig& cppConfig)
+{
+    napi_value staticIp;
+    napi_value dnsServers;
+    napi_value primaryDns;
+    napi_value secondDns;
+    bool hasProperty = false;
+    NAPI_CALL(env, napi_has_named_property(env, object, "staticIpv6", &hasProperty));
+    if (!hasProperty) {
+        WIFI_LOGE("ConfigStaticIpv6, Js has no property: staticIpv6.");
+        return UndefinedNapiValue(env);
+    }
+    napi_get_named_property(env, object, "staticIpv6", &staticIp);
+    std::string ipv6Temp;
+    JsObjectToString(env, staticIp, "ipAddress", NAPI_MAX_STR_LENT, ipv6Temp);
+    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.SetIpv6Address(
+        IpTools::ConvertIpv6AddressToCompleted(ipv6Temp));
+    std::string gatewayTemp;
+    JsObjectToString(env, staticIp, "gateway", NAPI_MAX_STR_LENT, gatewayTemp);
+    cppConfig.wifiIpConfig.staticIpAddress.gateway.SetIpv6Address(
+        IpTools::ConvertIpv6AddressToCompleted(gatewayTemp));
+    JsObjectToInt(env, staticIp, "prefixLength", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
+    NAPI_CALL(env, napi_has_named_property(env, staticIp, "dnsServers", &hasProperty));
+    if (!hasProperty) {
+        WIFI_LOGE("ConfigStaticIpv6, Js has no property: dnsServers.");
+        return UndefinedNapiValue(env);
+    }
+    uint32_t arrayLength = 0;
+    napi_get_named_property(env, staticIp, "dnsServers", &dnsServers);
+    napi_get_array_length(env, dnsServers, &arrayLength);
+    if (arrayLength == 0 || arrayLength > DNS_NUM) {
+        WIFI_LOGE("ConfigStaticIpv6, It needs dns servers or dns too much.");
+        return UndefinedNapiValue(env);
+    }
+    napi_get_element(env, dnsServers, 0, &primaryDns);
+    napi_get_element(env, dnsServers, 1, &secondDns);
+    size_t result = 0;
+    char dnsServer1Ipv6[DNS_LENGTH] = {0};
+    napi_get_value_string_utf8(env, primaryDns, dnsServer1Ipv6, NAPI_MAX_STR_LENT, &result);
+    cppConfig.wifiIpConfig.staticIpAddress.dnsServer1.SetIpv6Address(
+        IpTools::ConvertIpv6AddressToCompleted(std::string(dnsServer1Ipv6)));
+    char dnsServer2Ipv6[DNS_LENGTH] = {0};
+    napi_get_value_string_utf8(env, secondDns, dnsServer2Ipv6, NAPI_MAX_STR_LENT, &result);
+    cppConfig.wifiIpConfig.staticIpAddress.dnsServer2.SetIpv6Address(
+        IpTools::ConvertIpv6AddressToCompleted(std::string(dnsServer2Ipv6)));
 
     return CreateInt32(env);
 }
@@ -1361,51 +1438,87 @@ static SecTypeJs ConvertKeyMgmtToSecType(const std::string& keyMgmt)
     return iter == mapKeyMgmtToSecType.end() ? SecTypeJs::SEC_TYPE_OPEN : iter->second;
 }
 
-static void IpConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& ipCfgObj)
+static void IpConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result)
 {
+    if (wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV4_ADDRESS_TYPE) {
+        Ipv4ConfigToJs(env, wifiIpConfig, result);
+    } else if (wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV6_ADDRESS_TYPE) {
+        Ipv6ConfigToJs(env, wifiIpConfig, result);
+    }
+}
+
+void Ipv4ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result)
+{
+    napi_value ipCfgObj;
+    napi_create_object(env, &ipCfgObj);
     SetValueInt32(env, "ipAddress", wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4, ipCfgObj);
     SetValueInt32(env, "gateway", wifiIpConfig.staticIpAddress.gateway.addressIpv4, ipCfgObj);
     SetValueInt32(env, "prefixLength", wifiIpConfig.staticIpAddress.ipAddress.prefixLength, ipCfgObj);
-    const int DNS_NUM = 2;
     napi_value dnsArray;
     napi_create_array_with_length(env, DNS_NUM, &dnsArray);
     std::vector<unsigned int> vecDns = {wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4,
         wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4};
     for (int i = 0; i != DNS_NUM; ++i) {
         napi_value value;
-        napi_status status = napi_create_int32(env, vecDns[i], &value);
-        if (status != napi_ok) {
-            WIFI_LOGE("Ip config to js create int32 error!");
-            return;
+        if (napi_create_int32(env, vecDns[i], &value) != napi_ok) {
+            WIFI_LOGE("Ipv4ConfigToJs, Ip config to js create int32 error!");
         }
-        status = napi_set_element(env, dnsArray, i, value);
-        if (status != napi_ok) {
-            WIFI_LOGE("Ip config to js set element error: %{public}d", status);
-            return;
+        if (napi_set_element(env, dnsArray, i, value) != napi_ok) {
+            WIFI_LOGE("Ipv4ConfigToJs, Ip config to js set element error!");
         }
     }
     if (napi_set_named_property(env, ipCfgObj, "dnsServers", dnsArray) != napi_ok) {
-        WIFI_LOGE("Set dnsServers named property error!");
+        WIFI_LOGE("Ipv4ConfigToJs, Set dnsServers named property error!");
     }
 
-    const int DOMAINS_NUM = 1;
     napi_value domainsArray;
     napi_create_array_with_length(env, DOMAINS_NUM, &domainsArray);
     std::vector<std::string> vecDomains = {wifiIpConfig.staticIpAddress.domains};
     for (int i = 0; i != DOMAINS_NUM; ++i) {
         napi_value value;
-        napi_status status = napi_create_string_utf8(env, vecDomains[i].c_str(), NAPI_AUTO_LENGTH, &value);
-        if (status != napi_ok) {
-            WIFI_LOGE("Ip config to js create utf8 string error!");
-            return;
+        if (napi_create_string_utf8(env, vecDomains[i].c_str(), NAPI_AUTO_LENGTH, &value) != napi_ok) {
+            WIFI_LOGE("Ipv4ConfigToJs, Ip config to js create utf8 string error!");
         }
-        status = napi_set_element(env, domainsArray, i, value);
-        if (status != napi_ok) {
-            WIFI_LOGE("Ip config to js set element error: %{public}d", status);
+        if (napi_set_element(env, domainsArray, i, value) != napi_ok) {
+            WIFI_LOGE("Ipv4ConfigToJs, Ip config to js set element error!");
         }
     }
     if (napi_set_named_property(env, ipCfgObj, "domains", domainsArray) != napi_ok) {
-        WIFI_LOGE("Set domains named property error!");
+        WIFI_LOGE("Ipv4ConfigToJs, Set domains named property error!");
+    }
+    if (napi_set_named_property(env, result, "staticIp", ipCfgObj) != napi_ok) {
+        WIFI_LOGE("Ipv4ConfigToJs, Set staticIp named property error!");
+    }
+}
+
+void Ipv6ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result)
+{
+    napi_value ipCfgObj;
+    napi_create_object(env, &ipCfgObj);
+    std::string ipAddress = wifiIpConfig.staticIpAddress.ipAddress.address.GetIpv6Address();
+    SetValueUtf8String(env, "ipAddress", ipAddress.c_str(), ipCfgObj);
+    std::string gateway = wifiIpConfig.staticIpAddress.gateway.GetIpv6Address();
+    SetValueUtf8String(env, "gateway", gateway.c_str(), ipCfgObj);
+    SetValueInt32(env, "prefixLength", wifiIpConfig.staticIpAddress.ipAddress.prefixLength, ipCfgObj);
+    std::string dnsServer1 = wifiIpConfig.staticIpAddress.dnsServer1.GetIpv6Address();
+    std::string dnsServer2 = wifiIpConfig.staticIpAddress.dnsServer2.GetIpv6Address();
+    napi_value dnsArray;
+    napi_create_array_with_length(env, DNS_NUM, &dnsArray);
+    std::vector<std::string> vecDns = {dnsServer1, dnsServer2};
+    for (int i = 0; i != DNS_NUM; ++i) {
+        napi_value value;
+        if (napi_create_string_utf8(env, vecDns[i].c_str(), NAPI_AUTO_LENGTH, &value) != napi_ok) {
+            WIFI_LOGE("Ipv6ConfigToJs, Ipv6 config to js create utf8 string error!");
+        }
+        if (napi_set_element(env, dnsArray, i, value) != napi_ok) {
+            WIFI_LOGE("Ipv6ConfigToJs, Ipv6 config to js set element error!");
+        }
+    }
+    if (napi_set_named_property(env, ipCfgObj, "dnsServers", dnsArray) != napi_ok) {
+        WIFI_LOGE("Ipv6ConfigToJs, Set dnsServers named property error!");
+    }
+    if (napi_set_named_property(env, result, "staticIpv6", ipCfgObj) != napi_ok) {
+        WIFI_LOGE("Ipv6ConfigToJs, Set staticIpv6 named property error!");
     }
 }
 
@@ -1525,19 +1638,14 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     } else {
         SetValueInt32(env, "ipType", static_cast<int>(IpTypeJs::IP_TYPE_DHCP), result);
     }
-    napi_value ipCfgObj;
-    napi_create_object(env, &ipCfgObj);
-    IpConfigToJs(env, vecDeviceConfigs[idx].wifiIpConfig, ipCfgObj);
-    napi_status status = napi_set_named_property(env, result, "staticIp", ipCfgObj);
-    if (status != napi_ok) {
-        WIFI_LOGE("Set staticIp field!");
-    }
+    SetValueInt32(env, "family", vecDeviceConfigs[idx].wifiIpConfig.staticIpAddress.ipAddress.address.family, result);
+    IpConfigToJs(env, vecDeviceConfigs[idx].wifiIpConfig, result);
     ProxyConfigToJs(env, vecDeviceConfigs[idx], result);
 
     napi_value eapCfgObj;
     napi_create_object(env, &eapCfgObj);
     EapConfigToJs(env, vecDeviceConfigs[idx].wifiEapConfig, eapCfgObj);
-    status = napi_set_named_property(env, result, "eapConfig", eapCfgObj);
+    napi_status status = napi_set_named_property(env, result, "eapConfig", eapCfgObj);
     if (status != napi_ok) {
         WIFI_LOGE("failed to set eapConfig!");
     }

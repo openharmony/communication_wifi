@@ -90,8 +90,8 @@ HWTEST_F(WifiIpToolsTest, ConvertIpv6MaskTest, TestSize.Level1)
 {
     EXPECT_TRUE(IpTools::ConvertIpv6Mask(-1) == "");
     EXPECT_TRUE(IpTools::ConvertIpv6Mask(129) == "");
-    EXPECT_TRUE(IpTools::ConvertIpv6Mask(0) == "0");
-    EXPECT_TRUE(IpTools::ConvertIpv6Mask(128) == "128");
+    EXPECT_TRUE(IpTools::ConvertIpv6Mask(0) == "::");
+    EXPECT_TRUE(IpTools::ConvertIpv6Mask(128) == "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
 }
 
 HWTEST_F(WifiIpToolsTest, GetMaskLengthTest, TestSize.Level1)
@@ -123,6 +123,20 @@ HWTEST_F(WifiIpToolsTest, GetExclusionObjectListTest, TestSize.Level1)
     vec.clear();
     IpTools::GetExclusionObjectList(str, vec);
     EXPECT_TRUE(vec.size() == 1);
+}
+
+HWTEST_F(WifiIpToolsTest, ConvertIpv6AddressToCompletedTest, TestSize.Level1) +
+{
+    // 2001:0db8:1234:5678:0000:0000:0000:0001
+    std::string tmp = "2001:0db8:1234:5678:0000:0000:0000:0001";
+    std::string ipv6Str = "2001:0db8:1234:5678::0001";
+    EXPECT_TRUE(IpTools::ConvertIpv6AddressToCompleted(ipv6Str) == tmp);
+    ipv6Str = "2001:0db8:1234:5678::1";
+    EXPECT_TRUE(IpTools::ConvertIpv6AddressToCompleted(ipv6Str) == tmp);
+    ipv6Str = "2001:db8:1234:5678::1";
+    EXPECT_TRUE(IpTools::ConvertIpv6AddressToCompleted(ipv6Str) == tmp);
+    ipv6Str = "123";
+    EXPECT_FALSE(IpTools::ConvertIpv6AddressToCompleted(ipv6Str) == "1230:0000:0000:0000:0000:0000:0000:0000");
 }
 }  // namespace Wifi
 }  // namespace OHOS

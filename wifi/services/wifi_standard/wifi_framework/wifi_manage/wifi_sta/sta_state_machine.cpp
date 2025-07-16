@@ -4347,8 +4347,16 @@ void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
 
 void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName)
 {
-    WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
-    WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid, ifaceName);
+    if (!deviceConfig.userSelectBssid.empty()) {
+        WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
+        WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid, ifaceName);
+    } else {
+        std::string autoSelectBssid;
+        std::unique_ptr<NetworkSelectionManager> networkSelectionManager = std::make_unique<NetworkSelectionManager>();
+        networkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
+        WIFI_LOGI("SetBssid autoSelectBssid=%{public}s", MacAnonymize(autoSelectBssid).c_str());
+        WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, autoSelectBssid, ifaceName);
+    }
     deviceConfig.userSelectBssid = "";
     WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();

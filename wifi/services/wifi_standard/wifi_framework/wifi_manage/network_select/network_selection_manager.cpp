@@ -23,6 +23,7 @@
 #include "wifi_sensor_scene.h"
 #include "wifi_channel_helper.h"
 #include "wifi_service_manager.h"
+#include "wifi_config_center.h"
 
 namespace OHOS::Wifi {
 DEFINE_WIFILOG_LABEL("networkSelectionManager")
@@ -32,6 +33,48 @@ const int OUTDOOR_NETWORK_SELECT_THRES = 3;
 NetworkSelectionManager::NetworkSelectionManager()
 {
     pNetworkSelectorFactory = std::make_unique<NetworkSelectorFactory>();
+}
+
+void NetworkSelectionManager::SelectNetworkWithSsid(WifiDeviceConfig& deviceConfig, std::string& autoSelectBssid)
+{
+    WIFI_LOGI("Enter SelectNetworkWithSsid.");
+    std::vector<WifiScanInfo> wifiScanInfoList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
+    std::vector<InterScanInfo> interScanInfoList;
+    for (auto &wifiScanInfo : wifiScanInfoList) {
+        std::string deviceKeyMgmt;
+        wifiScanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (wifiScanInfo.ssid == deviceConfig.ssid &&
+            WifiSettings::GetInstance().InKeyMgmtBitset(deviceConfig, deviceKeyMgmt)) {
+            InterScanInfo interScanInfo;
+            ConvertScanInfo(wifiScanInfo, interScanInfo);
+            interScanInfoList.push_back(interScanInfo);
+        }
+    }
+    WIFI_LOGI("select scanInfo size: %{public}zu", interScanInfoList.size());
+    NetworkSelectionResult networkSelectionResult;
+    SelectNetwork(networkSelectionResult, NetworkSelectType::USER_CONNECT, interScanInfoList);
+    autoSelectBssid = networkSelectionResult.interScanInfo.bssid;
+}
+
+void NetworkSelectionManager::ConvertScanInfo(WifiScanInfo &wifiScanInfo, InterScanInfo &interScanInfo)
+{
+    interScanInfo.bssid = wifiScanInfo.bssid;
+    interScanInfo.ssid = wifiScanInfo.ssid;
+    interScanInfo.oriSsid = wifiScanInfo.oriSsid;
+    interScanInfo.capabilities = wifiScanInfo.capabilities;
+    interScanInfo.frequency = wifiScanInfo.frequency;
+    interScanInfo.channelWidth = wifiScanInfo.channelWidth;
+    interScanInfo.centerFrequency0 = wifiScanInfo.centerFrequency0;
+    interScanInfo.centerFrequency1 = wifiScanInfo.centerFrequency1;
+    interScanInfo.rssi = wifiScanInfo.rssi;
+    interScanInfo.securityType = wifiScanInfo.securityType;
+    interScanInfo.infoElems = wifiScanInfo.infoElems;
+    interScanInfo.features = wifiScanInfo.features;
+    interScanInfo.timestamp = wifiScanInfo.timestamp;
+    interScanInfo.band = wifiScanInfo.band;
+    interScanInfo.isHiLinkNetwork = wifiScanInfo.isHiLinkNetwork;
+    interScanInfo.supportedWifiCategory = wifiScanInfo.supportedWifiCategory;
 }
 
 bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelectionResult,

@@ -32,6 +32,7 @@
 #include "network_status_history_manager.h"
 #include "wifi_native_struct.h"
 #include "wifi_chr_utils.h"
+#include "network_selection_manager.h"
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"

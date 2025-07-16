@@ -1,0 +1,1254 @@
+#include "cJSON.h"
+
+
+
+    cJSON *param = cJSON_CreateObject();
+    if (param == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(param, "ability.want.params.uiExtensionType", "sysDialog/common");
+    cJSON_AddNumberToObject(param, "wifiDialogType", static_cast<int32_t>(type));
+    switch (type) {
+        case AUTO_IDENTIFY_CONN:
+        case SETTINGS_AUTO_IDENTIFY_CONN:
+            cJSON_AddStringToObject(param, "wifi5gSsid", comInfo.c_str());
+            break;
+        case P2P_WSC_PBC_DIALOG:
+            cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
+            break;
+        case CANDIDATE_CONNECT:
+            cJSON_AddStringToObject(param, "targetSsid", comInfo.c_str());
+            break;
+        default:
+            break;
+ 
+    }
+    char *cjsonStr = cJSON_PrintUnformatted(param);
+    if (cjsonStr == nullptr) {
+        WIFI_LOGE("Failed to print cJSON object");
+        cJSON_Delete(param);
+        return;
+    }
+    std::string cmdData(cjsonStr);
+    free(cjsonStr);
+    cJSON_Delete(param);
+
+
+
+
+
+    cJSON *param = cJSON_CreateObject();
+    if (param == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(param, "ability.want.params.uiExtensionType", "sysDialog/common");
+    char *cjsonStr = cJSON_PrintUnformatted(param);
+    if (cjsonStr == nullptr) {
+        WIFI_LOGE("Failed to print cJSON object");
+        cJSON_Delete(param);
+        return;
+    }
+    std::string cmdData(cjsonStr);
+    free(cjsonStr);
+    cJSON_Delete(param);
+
+
+
+
+#include "cJSON.h"
+
+
+
+    cJSON *root = FillWifiProStatisticsJson();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+ 
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PRO_STATISTICS", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+
+
+
+ 
+cJSON *WifiProChr::FillWifiProStatisticsJson()
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return nullptr;
+    }
+    cJSON_AddNumberToObject(root, "FAST_SCAN_CNT", fastScanCnt_);
+    cJSON_AddNumberToObject(root, "FULL_SCAN_CNT", fullScanCnt_);
+    cJSON_AddNumberToObject(root, "WIFIPRO_POOR_LINK_CNT", poorLinkCnt_);
+    cJSON_AddNumberToObject(root, "WIFIPRO_NONET_CNT", noNetCnt_);
+    cJSON_AddNumberToObject(root, "WIFIPRO_QOE_SLOW_CNT", qoeSlowCnt_);
+    cJSON_AddNumberToObject(
+        root, "POOR_LINK_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::POORLINK_SUCC]);
+    cJSON_AddNumberToObject(root, "NONET_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::NONET_SUCC]);
+    cJSON_AddNumberToObject(root, "QOE_SLOW_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::QOE_SUCCC]);
+    cJSON_AddNumberToObject(
+        root, "POOR_LINK_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::POORLINK_FAILED]);
+    cJSON_AddNumberToObject(root, "NONET_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::NONET_FAILED]);
+    cJSON_AddNumberToObject(
+        root, "QOE_SLOW_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::QOESLOW_FAILED]);
+    cJSON_AddNumberToObject(root, "POOR_LINK_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_SUCC]);
+    cJSON_AddNumberToObject(root, "NONET_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::NONET_SUCC]);
+    cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::QOE_SUCCC]);
+    cJSON_AddNumberToObject(
+        root, "POOR_LINK_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_FAILED]);
+        
+    FillWifiProStatisticsJsons(root);
+    return root;
+}
+ 
+void WifiProChr::FillWifiProStatisticsJsons(cJSON *root)
+{
+    cJSON_AddNumberToObject(root, "NONET_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::NONET_FAILED]);
+    cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::QOESLOW_FAILED]);
+    cJSON_AddNumberToObject(root, "TIME_LEVEL1_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL1]);
+    cJSON_AddNumberToObject(root, "TIME_LEVEL2_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL2]);
+    cJSON_AddNumberToObject(root, "TIME_LEVEL3_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL3]);
+    cJSON_AddNumberToObject(root, "TIME_START_TO_CONNECT_LEVEL1_CNT", wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL1]);
+    cJSON_AddNumberToObject(root, "TIME_START_TO_CONNECT_LEVEL2_CNT", wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL2]);
+    cJSON_AddNumberToObject(root, "TIME_START_TO_CONNECT_LEVEL3_CNT", wifiProSwitchTimeCnt_[START_TO_CONNECT_LEVEL3]);
+    cJSON_AddNumberToObject(root, "TIME_CONNECT_TO_SUCC_LEVEL1_CNT", wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL1]);
+    cJSON_AddNumberToObject(root, "TIME_CONNECT_TO_SUCC_LEVEL2_CNT", wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL2]);
+    cJSON_AddNumberToObject(root, "TIME_CONNECT_TO_SUCC_LEVEL3_CNT", wifiProSwitchTimeCnt_[CONNECT_TO_SUCC_LEVEL3]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_SWITCHING", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SWITCHING]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_SELFCURING", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SELFCURING]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_NONET_BEFORE", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NONET_BEFORE_CONNECT]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_SIGNAL_BRIDGE", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_SIGNAL_BRIDGE_ON]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_AP_STA_ON", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_AP_STA_ON]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_APP_WLISTS", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_APP_WHITE_LISTS]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_ISCALLING", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_ISCALLING]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_NOT_AUTOSWITCH", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NOT_ALLOW_AUTOSWITCH]);
+    cJSON_AddNumberToObject(root, "REASON_NOT_SWITCH_DISABLED", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_DISABLED]);
+}
+ 
+
+
+
+
+    cJSON *FillWifiProStatisticsJson();
+    void FillWifiProStatisticsJsons(cJSON *root);
+
+
+
+
+
+    cJSON *root = cJSON_Parse(model.result.c_str());
+    if (root == nullptr) {
+ 
+ 
+        WIFI_LOGE("model.result is null");
+        return WIFI_OPT_FAILED;
+    }
+ 
+    cJSON *statusItem = cJSON_GetObjectItem(root, "status");
+    if (statusItem && cJSON_IsNumber(statusItem) && statusItem->valueint != 0) {
+        WIFI_LOGE("RequestSecurityModelResultSync status error= %d", statusItem->valueint);
+        cJSON_Delete(root);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    cJSON *resultItem = cJSON_GetObjectItem(root, "result");
+    std::string SecurityResult;
+    if (resultItem && cJSON_IsString(resultItem)) {
+        SecurityResult = resultItem->valuestring;
+    } else {
+        SecurityResult = "";
+    }
+ 
+    cJSON_Delete(root);
+ 
+
+
+
+
+
+
+
+
+void WifiSecurityDetect::ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, cJSON *root)
+{
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config) != 0) {
+        WIFI_LOGE("%{public}s, not find networkId:%{public}d", __FUNCTION__, info.networkId);
+        return;
+    }
+    IpInfo wifiIpInfo;
+    int32_t instId = 0;
+    WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, instId);
+ 
+    AddWifiStandardToJson(root, info.wifiStandard);
+ 
+    cJSON_AddStringToObject(root, "ssid", config.ssid.c_str());
+    cJSON_AddStringToObject(root, "bssid", config.bssid.c_str());
+    cJSON_AddNumberToObject(root, "signalStrength", config.rssi);
+    cJSON_AddNumberToObject(root, "authentication", AuthenticationConvert(config.keyMgmt));
+    if (config.frequency >= MIN_5G_FREQUENCY && config.frequency <= MAX_5G_FREQUENCY) {
+        cJSON_AddStringToObject(root, "frequencyBand", "5GHz");
+    } else {
+        cJSON_AddStringToObject(root, "frequencyBand", "2.4GHz");
+    }
+    cJSON_AddStringToObject(root, "gatewayIp", IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress).c_str());
+    cJSON_AddStringToObject(root, "gatewayMac", config.macAddress.c_str());
+    cJSON_AddStringToObject(root, "primaryDns", IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns).c_str());
+    if (wifiIpInfo.secondDns == 0) {
+        cJSON_AddStringToObject(root, "secondDns", "0.0.0.0");
+    } else {
+        cJSON_AddStringToObject(root, "secondDns", IpTools::ConvertIpv4Address(wifiIpInfo.secondDns).c_str());
+    }
+}
+ 
+void WifiSecurityDetect::AddWifiStandardToJson(cJSON *root, int wifiStandard)
+{
+    switch (wifiStandard) {
+        case WireType::WIRE_802_11A:
+            cJSON_AddStringToObject(root, "wirelessType", "802.11a");
+            break;
+        case WireType::WIRE_802_11B:
+            cJSON_AddStringToObject(root, "wirelessType", "802.11b");
+            break;
+        case WireType::WIRE_802_11G:
+            cJSON_AddStringToObject(root, "wirelessType", "802.11g");
+            break;
+        case WireType::WIRE_802_11N:
+            cJSON_AddStringToObject(root, "wirelessType", "802.11n");
+            break;
+        case WireType::WIRE_802_11AC:
+            cJSON_AddStringToObject(root, "wirelessType", "802.11ac");
+            break;
+        case WireType::WIRE_802_11AX:
+            cJSON_AddStringToObject(root, "wirelessType", "802.11ax");
+            break;
+        default:
+            WIFI_LOGE("wifi wirelessType is unknown");
+            cJSON_AddStringToObject(root, "wirelessType", "");
+            break;
+
+
+
+
+
+
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    ConverWifiLinkInfoToJson(info, root);
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr != nullptr) {
+        model.param = jsonStr;
+        WIFI_LOGI("%s", model.param.c_str());
+        free(jsonStr);
+    }
+    cJSON_Delete(root);
+
+
+
+
+
+void AddWifiStandardToJson(cJSON *root, int wifiStandard);
+
+    void ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, cJSON *root);
+
+
+
+
+
+
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        LOGE("Failed to create cJSON object");
+        return "";
+    }
+    cJSON *resultInfo = cJSON_CreateArray();
+    if (resultInfo == nullptr) {
+        LOGE("Failed to create cJSON Arr");
+        cJSON_Delete(root);
+        return "";
+    }
+    cJSON *errorInfo = cJSON_CreateObject();
+    if (errorInfo == nullptr) {
+        LOGE("Failed to create cJSON object");
+        cJSON_Delete(root);
+        return "";
+    }
+ 
+    cJSON_AddStringToObject(errorInfo, "type", "ErrorInfo");
+    std::string codeStr = std::to_string(replyCode);
+    cJSON_AddStringToObject(errorInfo, "errorCode", codeStr.c_str());
+    cJSON_AddStringToObject(errorInfo, "errorInfo", "");
+ 
+    cJSON_AddItemToArray(resultInfo, errorInfo);
+ 
+ 
+    cJSON_AddItemToObject(root, "resultInfo", resultInfo);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    std::string result;
+    if (jsonStr != nullptr) {
+        result = jsonStr;
+        free(jsonStr);
+    }
+ 
+    cJSON_Delete(root);
+    return result;
+
+
+
+
+    if (errorInfo == nullptr) {
+        LOGE("Failed to create cJSON object");
+        cJSON_Delete(root);
+        return "";
+    }
+ 
+    cJSON_AddStringToObject(errorInfo, "type", "ErrorInfo");
+    std::string codeStr = std::to_string(replyCode);
+    cJSON_AddStringToObject(errorInfo, "errorCode", codeStr.c_str());
+    cJSON_AddStringToObject(errorInfo, "errorInfo", "");
+ 
+    cJSON_AddItemToArray(resultInfo, errorInfo);
+ 
+ 
+    cJSON_AddItemToObject(root, "resultInfo", resultInfo);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    std::string result;
+    if (jsonStr != nullptr) {
+        result = jsonStr;
+        free(jsonStr);
+    }
+ 
+    cJSON_Delete(root);
+    return result;
+
+
+
+
+
+    cJSON *root = cJSON_Parse(jsonString.c_str());
+    if (root == nullptr) {
+ 
+ 
+ 
+        LOGE("ParseJson failed to parse json data.");
+        return false;
+    }
+    if (!cJSON_IsArray(root)) {
+        cJSON_Delete(root);
+        return false;
+    }
+    int nSize = cJSON_GetArraySize(root);
+    for (int i = 0; i < nSize; i++) {
+        cJSON *item = cJSON_GetArrayItem(root, i);
+        if (item == nullptr || !cJSON_IsObject(item)) {
+            continue;
+        }
+        cJSON *typeItem = cJSON_GetObjectItem(item, type.c_str()); // 比如 "data"
+        if (typeItem == nullptr) {
+            continue;
+        }
+        if (ParseJsonKey(typeItem, key, value)) {
+            cJSON_Delete(root);
+            return true;
+        }
+    }
+    cJSON_Delete(root);
+    return false;
+}
+
+
+
+
+
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "WIFI_STATE", static_cast<int>(operType));
+    cJSON_AddStringToObject(root, "TYPE", serviceType.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WIFI_STATE", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+
+
+
+
+
+void WriteWifiOperateStateHiSysEvent(int operateType, int operateState)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "OPERATE_TYPE", operateType);
+    cJSON_AddNumberToObject(root, "OPERATE_STATE", operateState);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_OPERATE_STATE", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiAbnormalDisconnectHiSysEvent(int errorCode, int locallyGenerated)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "ERROR_CODE", errorCode);
+    cJSON_AddNumberToObject(root, "IS_ACTIVE_DISCONNECT", locallyGenerated);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ABNORMAL_DISCONNECT", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiBeaconLostHiSysEvent(int32_t errorCode)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "ERROR_CODE", errorCode);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_BEACON_LOST", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiConnectionInfoHiSysEvent(int networkId)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "NETWORK_ID", networkId);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONNECTION_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReason, int apState)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "OPERATE_TYPE", operateType);
+    cJSON_AddStringToObject(root, "FAIL_REASON", failReason.c_str());
+    cJSON_AddNumberToObject(root, "AP_STATE", apState);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_OPEN_AND_CLOSE_FAILED", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason)
+{
+    WIFI_LOGE("WriteSoftApOpenAndCloseFailedEvent operateType=%{public}d", operateType);
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "OPERATE_TYPE", operateType);
+    cJSON_AddStringToObject(root, "FAIL_REASON", failReason.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_OPEN_AND_CLOSE_FAILED", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiAccessIntFailedHiSysEvent(
+    int operateRes, int failCnt, int selfCureResetState, std::string selfCureHistory)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "OPERATE_TYPE", operateRes);
+    cJSON_AddNumberToObject(root, "FAIL_CNT", failCnt);
+    cJSON_AddNumberToObject(root, "RESET_STATE", selfCureResetState);
+    cJSON_AddStringToObject(root, "SELF_CURE_HISTORY", selfCureHistory.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ACCESS_INTERNET_FAILED", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "IS_START", isStartScan);
+    cJSON_AddNumberToObject(root, "SUSPEND_REASON", suspendReason);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PNO_SCAN_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "RESP_CODE", respCode);
+    cJSON_AddStringToObject(root, "SERVER", server.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BROWSER_FAILED_FOR_PORTAL", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteAuthFailHiSysEvent(const std::string &authFailReason, int subErrCode)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "FAIL_REASON", authFailReason.c_str());
+    cJSON_AddNumberToObject(root, "SUB_ERR_CODE", subErrCode);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_AUTH_FAIL_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteAssocFailHiSysEvent(const std::string &assocFailReason, int subErrCode)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "FAIL_REASON", assocFailReason.c_str());
+    cJSON_AddNumberToObject(root, "SUB_ERR_CODE", subErrCode);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_ASSOC_FAIL_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+
+void WriteDhcpFailHiSysEvent(const std::string &dhcpFailReason, int subErrCode)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "FAIL_REASON", dhcpFailReason.c_str());
+    cJSON_AddNumberToObject(root, "SUB_ERR_CODE", subErrCode);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_DHCP_FAIL_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteScanLimitHiSysEvent(const std::string &scanInitiator, int scanLimitType, bool isForeground)
+    if (scanInitiator.empty()) {
+        return;
+    }
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "SCAN_INITIATOR", scanInitiator.c_str());
+    cJSON_AddBoolToObject(root, "IS_FOREGROUND", isForeground);
+    cJSON_AddNumberToObject(root, "SCAN_LIMIT_TYPE", scanLimitType);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SCAN_LIMIT_STATISTICS", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteAutoConnectFailEvent(const std::string &failReason, const std::string &subReason)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "FAIL_REASON", failReason.c_str());
+    cJSON_AddStringToObject(root, "SUB_REASON", subReason.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_AUTO_RECONNECT_FAILED", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteP2pKpiCountHiSysEvent(int eventType)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "EVENT_TYPE", eventType);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_CONNECT_STATICS", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "EVENT_TYPE", errCode);
+    cJSON_AddNumberToObject(root, "FAIL_RES", failRes);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_CONNECT_FAIL", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteP2pAbDisConnectHiSysEvent(int errCode, int failRes)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "EVENT_TYPE", errCode);
+    cJSON_AddNumberToObject(root, "FAIL_RES", failRes);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "P2P_ABNORMAL_DISCONNECT", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteSoftApAbDisconnectHiSysEvent(int errorCode)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "ERROR_CODE", errorCode);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_ABNORMAL_DISCONNECT", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteIsInternetHiSysEvent(int isInternet)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "IS_INTERNET", isInternet);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_KPI_INTERNET", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteSoftApConnectFailHiSysEvent(int errorCnt)
+{
+    WIFI_LOGE("WriteSoftApConnectFailHiSysEvent errorCnt=%{public}d", errorCnt);
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "ERROR_CODE", errorCnt);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CONNECT_FAILED", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteSoftApClientAccessNetErrorHiSysEvent(int errorCode)
+{
+    WIFI_LOGE("WriteSoftApClientAccessNetErrorHiSysEvent errorCode=%{public}d", errorCode);
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "ERROR_CODE", errorCode);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_CLIENT_ACCESS_NET_ERROR", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiScanApiFailHiSysEvent(const std::string &pkgName, const WifiScanFailReason failReason)
+{
+#ifndef OHOS_ARCH_LITE
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "PKG_NAME", pkgName.c_str());
+    cJSON_AddNumberToObject(root, "FAIL_REASON", static_cast<int>(failReason));
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFISCANCONTROL_TRIGGER_API_FAIL", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+#endif
+}
+ 
+void WriteWifiEncryptionFailHiSysEvent(
+    int event, const std::string &maskSsid, const std::string &keyMgmt, int encryptedModule)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "ENCRY_OR_DECRY_EVENT", event);
+    cJSON_AddStringToObject(root, "SSID", maskSsid.c_str());
+    cJSON_AddStringToObject(root, "ENCRYKEYMANAGEMENT", keyMgmt.c_str());
+    cJSON_AddNumberToObject(root, "ENCRYEVENTMODULE", encryptedModule);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFIENCRY_OR_DECRY_FAIL", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WritePortalStateHiSysEvent(int portalState)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "PORTAL_STATE", portalState);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_PORTAL_STATE", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteArpInfoHiSysEvent(uint64_t arpRtt, int32_t arpFailedCount, int32_t gatewayCnt)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "ARP_RTT", static_cast<double>(arpRtt));
+    cJSON_AddNumberToObject(root, "ARP_FAILED_COUNT", arpFailedCount);
+    cJSON_AddNumberToObject(root, "ARP_GWCOUNT", gatewayCnt);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_ARP_DETECTION_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "LEVEL", signalLevel);
+    cJSON_AddNumberToObject(root, "BAND", band);
+    cJSON_AddNumberToObject(root, "RSSI", rssi);
+    cJSON_AddNumberToObject(root, "LINKSPEED", linkSpeed);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_LINK_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    std::string connectTypeStr = "";
+    if (g_connectTypeTransMap.find(connectType) != g_connectTypeTransMap.end()) {
+        connectTypeStr = g_connectTypeTransMap.at(connectType);
+    if (isFirstConnect) {
+        connectTypeStr = "FIRST_CONNECT";
+    }
+    cJSON_AddStringToObject(root, "CONNECT_TYPE", connectTypeStr.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "_CONNECT_TYPE", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiLinkTypeHiSysEvent(const std::string &ssid, int32_t wifiLinkType, const std::string &triggerReason)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "SSID", ssid.c_str());
+    cJSON_AddNumberToObject(root, "WIFI_LINK_TYPE", wifiLinkType);
+    cJSON_AddStringToObject(root, "TRIGGER_REASON", triggerReason.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WIFI_LINK_TYPE_UPDATE", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteEmlsrExitReasonHiSysEvent(const std::string &ssid, int32_t reason)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "SSID", ssid.c_str());
+    cJSON_AddNumberToObject(root, "EMLSR_EXIT_REASON", reason);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WIFI_EMLSR_EXIT_REASON", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteStaConnectIface(const std::string &ifName)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "IFACE_NAME", ifName.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_STA_CONNECT_IFNAME", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiWpaStateHiSysEvent(int state)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "WPA_STATE", state);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_WPA_STATE", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WritePortalAuthExpiredHisysevent(
+    int respCode, int detectNum, time_t connTime, time_t portalAuthTime, bool isNotificationClicked)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    time_t now = time(nullptr);
+    if (now < 0) {
+        now = 0;
+    }
+    int64_t authDura = (now > 0 && portalAuthTime > 0 && now > portalAuthTime) ? (now - portalAuthTime) : 0;
+    int64_t connDura = (now > 0 && connTime > 0 && now > connTime) ? (now - connTime) : 0;
+    int64_t authCostDura =
+        (portalAuthTime > 0 && connTime > 0 && portalAuthTime > connTime) ? (portalAuthTime - connTime) : 0;
+    cJSON_AddNumberToObject(root, "RESP_CODE", respCode);
+    cJSON_AddNumberToObject(root, "DURA", authDura);
+    cJSON_AddNumberToObject(root, "CONN_DURA", connDura);
+    cJSON_AddNumberToObject(root, "AUTH_COST_DURA", authCostDura);
+    cJSON_AddNumberToObject(root, "DET_NUM", detectNum);
+    cJSON_AddBoolToObject(root, "IS_NOTIFICA_CLICKED", isNotificationClicked);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "PORTAL_AUTH_EXPIRED", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteWifiSelfcureHisysevent(int type)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "WIFI_SELFCURE_TYPE", type);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SELFCURE", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void Write3VapConflictHisysevent(int type)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "WIFI_3VAP_CONFLICT_TYPE", type);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_3VAP_CONFLICT", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void Write5gPrefFailedHisysevent(Pref5gStatisticsInfo &info)
+    int64_t conDuration = 0;
+    if (info.isIn5gPref && !info.has5gPrefSwitch) {
+        if (info.noInternetTime != std::chrono::steady_clock::time_point::min()) {
+            info.durationNoInternet +=
+                std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - info.noInternetTime)
+                    .count();
+        }
+        if (info.connectTime != std::chrono::steady_clock::time_point::min()) {
+            conDuration =
+                std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - info.connectTime)
+                    .count();
+        }
+        cJSON *root = cJSON_CreateObject();
+        if (root == nullptr) {
+            WIFI_LOGE("Failed to create cJSON object");
+            return;
+        }
+        cJSON_AddStringToObject(root, "BSSID", info.bssid.c_str());
+        cJSON_AddStringToObject(root, "SSID", info.ssid.c_str());
+        cJSON_AddNumberToObject(root, "FREQ", info.freq);
+        cJSON_AddNumberToObject(root, "CON_DURATION", conDuration);
+        cJSON_AddNumberToObject(root, "DURATION_NO_INTERNET", info.durationNoInternet);
+        cJSON_AddNumberToObject(root, "ENTER_MONITOR_NUM", info.enterMonitorNum);
+        cJSON_AddNumberToObject(root, "MONITOR_ACTIVE_SCAN_NUM", info.monitorActiveScanNum);
+        cJSON_AddNumberToObject(root, "RELA_5G_NUM", info.rela5gNum);
+        cJSON_AddNumberToObject(root, "NOT_ADJ_5g_NUM", info.notAdj5gNum);
+        cJSON_AddNumberToObject(root, "NOT_INTERNET_RELA_5G_NUM", info.notInternetRela5gNum);
+        cJSON_AddNumberToObject(root, "ALL_RELA_5G_IN_BLOCK_LIST_NUM", info.allRela5gInBlockListNum);
+        cJSON_AddNumberToObject(root, "SATISFY_NO_SELECTED_NUM", info.satisfySwitchRssiNoSelectedNum);
+        cJSON_AddNumberToObject(root, "IS_USER_CONNECTED", info.isUserConnected ? 1 : 0);
+ 
+        char *jsonStr = cJSON_PrintUnformatted(root);
+        if (jsonStr == nullptr) {
+            cJSON_Delete(root);
+            return;
+        }
+        WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_5G_PREF_FAILED", "EVENT_VALUE", std::string(jsonStr));
+        free(jsonStr);
+        cJSON_Delete(root);
+    }
+}
+ 
+void WriteAutoSelectHiSysEvent(
+    int selectType, const std::string &selectedInfo, const std::string &filteredReason, const std::string &savedResult)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "AUTO_SELECT_TYPE", selectType);
+    cJSON_AddStringToObject(root, "AUTO_SELECT_RESULT", selectedInfo.c_str());
+    cJSON_AddStringToObject(root, "AUTO_SELECT_FILTER", filteredReason.c_str());
+    cJSON_AddStringToObject(root, "SAVED_NETWORK_IN_SCAN", savedResult.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_AUTO_SELECT_STATISTIC", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "IPV4_IPADDRESS", Ipv4IntAnonymize(ipInfo.ipAddress).c_str());
+    cJSON_AddStringToObject(root, "IPV4_GATEWAY", Ipv4IntAnonymize(ipInfo.gateway).c_str());
+    cJSON_AddStringToObject(root, "IPV4_NETMASK", Ipv4IntAnonymize(ipInfo.netmask).c_str());
+    cJSON_AddStringToObject(root, "IPV4_PRIMARYDNS", Ipv4IntAnonymize(ipInfo.primaryDns).c_str());
+    cJSON_AddStringToObject(root, "IPV4_SECONDDNS", Ipv4IntAnonymize(ipInfo.secondDns).c_str());
+    cJSON_AddStringToObject(root, "IPV4_SERVERIP", Ipv4IntAnonymize(ipInfo.serverIp).c_str());
+    cJSON_AddNumberToObject(root, "IPV4_LEASE", ipInfo.leaseDuration);
+    cJSON_AddNumberToObject(root, "IPV4_DNS_VEC_SIZE", static_cast<int32_t>(ipInfo.dnsAddr.size()));
+    for (size_t i = 0; i < ipInfo.dnsAddr.size(); i++) {
+        if (i >= MAX_DNS_NUM) {
+            WIFI_LOGE("ipInfo.dnsAddr size over limit");
+            break;
+        }
+        std::string keyString = "IPV4_DNS" + std::to_string(i);
+        cJSON_AddStringToObject(root, keyString.c_str(), Ipv4IntAnonymize(ipInfo.dnsAddr[i]).c_str());
+    }
+    cJSON_AddStringToObject(root, "IPV6_LINKIPV6ADDR", Ipv6Anonymize(ipv6Info.linkIpV6Address).c_str());
+    cJSON_AddStringToObject(root, "IPV6_GLOBALIPV6ADDR", Ipv6Anonymize(ipv6Info.globalIpV6Address).c_str());
+    cJSON_AddStringToObject(root, "IPV6_RANDGLOBALIPV6ADDR", Ipv6Anonymize(ipv6Info.randGlobalIpV6Address).c_str());
+    cJSON_AddStringToObject(root, "IPV6_GATEWAY", Ipv6Anonymize(ipv6Info.gateway).c_str());
+    cJSON_AddStringToObject(root, "IPV6_NETMASK", Ipv6Anonymize(ipv6Info.netmask).c_str());
+    cJSON_AddStringToObject(root, "IPV6_PRIMARYDNS", Ipv6Anonymize(ipv6Info.primaryDns).c_str());
+    cJSON_AddStringToObject(root, "IPV6_SECONDDNS", Ipv6Anonymize(ipv6Info.secondDns).c_str());
+    cJSON_AddStringToObject(root, "IPV6_UNIQUELOCALADDR1", Ipv6Anonymize(ipv6Info.uniqueLocalAddress1).c_str());
+    cJSON_AddStringToObject(root, "IPV6_UNIQUELOCALADDR2", Ipv6Anonymize(ipv6Info.uniqueLocalAddress2).c_str());
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_DHCP_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+ 
+void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "OUTDOORFILTERCNT", iodStatisticInfo.outdoorFilterCnt);
+    cJSON_AddNumberToObject(root, "OUTDOORSELECTWIFICNT", iodStatisticInfo.outdoorAutoSelectCnt);
+    cJSON_AddNumberToObject(root, "INTOOUTDOORCNT", iodStatisticInfo.in2OutCnt);
+    cJSON_AddNumberToObject(root, "OUTTOINDOORCNT", iodStatisticInfo.out2InCnt);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_IOD_STATISTIC", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -124,6 +124,7 @@ ohos_unittest("toolkit_unittest") {
   ]
   external_deps = [
     "c_utils:utils",
+    "cJSON:cjson",
     "certificate_manager:cert_manager_sdk",
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",

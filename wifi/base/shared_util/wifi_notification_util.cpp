@@ -14,6 +14,7 @@
  */
 
 #include "ability_manager_ipc_interface_code.h"
+#include "cJSON.h"
 #include "extension_manager_client.h"
 #include "iservice_registry.h"
 #include "message_parcel.h"
@@ -155,25 +156,37 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
-    nlohmann::json param;
-    param["ability.want.params.uiExtensionType"] = "sysDialog/common";
-    param["wifiDialogType"] = static_cast<int32_t>(type);
+    cJSON *param = cJSON_CreateObject();
+    if (param == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(param, "ability.want.params.uiExtensionType", "sysDialog/common");
+    cJSON_AddNumberToObject(param, "wifiDialogType", static_cast<int32_t>(type));
     switch (type) {
         case AUTO_IDENTIFY_CONN:
         case SETTINGS_AUTO_IDENTIFY_CONN:
-            param["wifi5gSsid"] = comInfo;
+            cJSON_AddStringToObject(param, "wifi5gSsid", comInfo.c_str());
             break;
         case P2P_WSC_PBC_DIALOG:
-            param["p2pDeviceName"] = comInfo;
+            cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
             break;
         case CANDIDATE_CONNECT:
-            param["targetSsid"] = comInfo;
+            cJSON_AddStringToObject(param, "targetSsid", comInfo.c_str());
             break;
-        default: {
+        default:
             break;
-        }
+ 
     }
-    std::string cmdData = param.dump();
+    char *cjsonStr = cJSON_PrintUnformatted(param);
+    if (cjsonStr == nullptr) {
+        WIFI_LOGE("Failed to print cJSON object");
+        cJSON_Delete(param);
+        return;
+    }
+    std::string cmdData(cjsonStr);
+    free(cjsonStr);
+    cJSON_Delete(param);
     sptr<UIExtensionAbilityConnection> connection(
         new (std::nothrow) UIExtensionAbilityConnection(cmdData, "com.ohos.locationdialog", "WifiUIExtAbility"));
     if (connection == nullptr) {
@@ -194,9 +207,21 @@ void WifiNotificationUtil::ShowSettingsDialog(WifiDialogType type, std::string s
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
-    nlohmann::json param;
-    param["ability.want.params.uiExtensionType"] = "sysDialog/common";
-    std::string cmdData = param.dump();
+    cJSON *param = cJSON_CreateObject();
+    if (param == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(param, "ability.want.params.uiExtensionType", "sysDialog/common");
+    char *cjsonStr = cJSON_PrintUnformatted(param);
+    if (cjsonStr == nullptr) {
+        WIFI_LOGE("Failed to print cJSON object");
+        cJSON_Delete(param);
+        return;
+    }
+    std::string cmdData(cjsonStr);
+    free(cjsonStr);
+    cJSON_Delete(param);
     if (settings.empty()) {
         WIFI_LOGI("settings name is null");
         return;

@@ -90,6 +90,7 @@ if (defined(ohos_lite)) {
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "c_utils:utils",
+      "cJSON:cjson",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
       "ipc:ipc_single",

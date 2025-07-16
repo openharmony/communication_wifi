@@ -107,6 +107,7 @@ ohos_unittest("wifi_sta_ext_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "cJSON:cjson",
     "certificate_manager:cert_manager_sdk",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",

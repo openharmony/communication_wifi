@@ -125,7 +125,7 @@ HWTEST_F(WifiIpToolsTest, GetExclusionObjectListTest, TestSize.Level1)
     EXPECT_TRUE(vec.size() == 1);
 }
 
-HWTEST_F(WifiIpToolsTest, ConvertIpv6AddressToCompletedTest, TestSize.Level1) +
+HWTEST_F(WifiIpToolsTest, ConvertIpv6AddressToCompletedTest, TestSize.Level1)
 {
     // 2001:0db8:1234:5678:0000:0000:0000:0001
     std::string tmp = "2001:0db8:1234:5678:0000:0000:0000:0001";

@@ -201,7 +201,7 @@ void WifiStaManager::PublishWifiOperateStateHiSysEvent(OperateResState state)
     return;
 }
 
-void WifiStaManager::NotifyScanForStaConnChanged(OperateResState state, int instId)
+void WifiStaManager::NotifyScanForStaConnChanged(OperateResState state, int networkId, int instId)
 {
     if (state == OperateResState::CONNECT_CONNECTING || state == OperateResState::CONNECT_AP_CONNECTED ||
         state == OperateResState::DISCONNECT_DISCONNECTING || state == OperateResState::DISCONNECT_DISCONNECTED ||
@@ -212,7 +212,7 @@ void WifiStaManager::NotifyScanForStaConnChanged(OperateResState state, int inst
         if (WifiConfigCenter::GetInstance().GetScanMidState(instId) == WifiOprMidState::RUNNING) {
             IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(instId);
             if (pService != nullptr) {
-                pService->OnClientModeStatusChanged(static_cast<int>(state));
+                pService->OnClientModeStatusChanged(static_cast<int>(state), networkId);
             }
         }
     }
@@ -273,7 +273,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         cbMsg.id = instId;
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     }
-    NotifyScanForStaConnChanged(state, instId);
+    NotifyScanForStaConnChanged(state, info.networkId, instId);
     PublishWifiOperateStateHiSysEvent(state);
     if (info.connState == ConnState::AUTHENTICATING)
     {

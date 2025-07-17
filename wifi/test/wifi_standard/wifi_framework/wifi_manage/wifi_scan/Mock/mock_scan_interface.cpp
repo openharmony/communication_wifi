@@ -71,7 +71,7 @@ ErrCode ScanInterface::OnStandbyStateChanged(bool sleeping)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus)
+ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus, int networkId)
 {
     return WIFI_OPT_SUCCESS;
 }

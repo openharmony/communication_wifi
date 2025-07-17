@@ -261,12 +261,7 @@ ErrCode WifiSecurityDetect::SecurityModelJsonResult(SecurityModelResult model, b
     }
  
     cJSON_Delete(root);
-    if (root["result"].isString()) {
-        SecurityResult = root["result"].asString();
-    } else {
-        WIFI_LOGE("The result is not string");
-        return WIFI_OPT_FAILED;
-    }
+
     if (CheckDataLegal(SecurityResult) == 0) {
         WIFI_LOGI("SG wifi result is secure");
         result = true;

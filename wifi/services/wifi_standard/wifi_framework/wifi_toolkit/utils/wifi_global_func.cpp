@@ -613,22 +613,28 @@ bool IsSignalSmoothingEnable()
 }
 
 #ifndef OHOS_ARCH_LITE
-bool ParseJsonKey(const Json::Value &jsonValue, const std::string &key, std::string &value)
+bool ParseJsonKey(const cJSON *jsonValue, const std::string &key, std::string &value)
 {
-    if (jsonValue.isArray()) {
-        int nSize = static_cast<int>(jsonValue.size());
-        for (int i = 0; i < nSize; i++) {
-            if (!jsonValue[i].isMember(key)) {
-                LOGW("ParseJsonKey JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
-                return false;
-            }
-            if (jsonValue[i][key].isString()) {
-                value = jsonValue[i][key].asString();
-                return true;
-            } else if (jsonValue[i][key].isInt()) {
-                value = std::to_string(jsonValue[i][key].asInt());
-                return true;
-            }
+    if (!cJSON_IsArray(jsonValue)) {
+        return false;
+    }
+    int nSize = cJSON_GetArraySize(jsonValue);
+    for (int i = 0; i < nSize; ++i) {
+        cJSON *item = cJSON_GetArrayItem(jsonValue, i);
+        if (item == nullptr || !cJSON_IsObject(item)) {
+            return false;
+        }
+        cJSON *keyItem = cJSON_GetObjectItem(item, key.c_str());
+        if (keyItem == nullptr) {
+            return false;
+        }
+        if (cJSON_IsString(keyItem) && keyItem->valuestring != nullptr) {
+            value = keyItem->valuestring;
+            return true;
+        } else if (cJSON_IsNumber(keyItem)) {
+            value = std::to_string(keyItem->valueint);
+            return true;
+        } else {
             return false;
         }
     }
@@ -652,7 +658,7 @@ bool ParseJson(const std::string &jsonString, const std::string &type, const std
         if (item == nullptr || !cJSON_IsObject(item)) {
             continue;
         }
-        cJSON *typeItem = cJSON_GetObjectItem(item, type.c_str()); // 比如 "data"
+        cJSON *typeItem = cJSON_GetObjectItem(item, type.c_str()); 
         if (typeItem == nullptr) {
             continue;
         }

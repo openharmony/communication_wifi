@@ -90,7 +90,7 @@ void WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack
         WIFI_LOGE("RegisterUserCallBack:callBack is nullptr!");
         return;
     }
-    std::unique_lock<std::recursive_mutex> lock(callbackMutex_);
+
     if (callbackMap_.size() >= CALLBACK_LIMIT &&
         callbackMap_.find(callBack->name) == callbackMap_.end()) {
         WIFI_LOGE("RegisterUserCallBack:callBack %{public}s reaches number limit!", callBack->name.c_str());
@@ -127,7 +127,7 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
     } else {
         mState_ = false;
     }
-    std::unique_lock<std::recursive_mutex> lock(callbackMutex_);
+
     for (auto& pair : callbackMap_) {
         if (pair.second) {
             pair.second->OnWifiStateChanged(state);
@@ -139,7 +139,6 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
 {
     WIFI_LOGI("OnWifiConnectionChanged, state:%{public}d!", state);
-    std::unique_lock<std::recursive_mutex> lock(callbackMutex_);
     for (auto& pair : callbackMap_) {
         if (pair.second) {
             pair.second->OnWifiConnectionChanged(state, info);
@@ -151,7 +150,6 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int stat
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 {
     WIFI_LOGI("OnWifiRssiChanged, rssi:%{public}d!", rssi);
-    std::unique_lock<std::recursive_mutex> lock(callbackMutex_);
     for (auto& pair : callbackMap_) {
         if (pair.second) {
             pair.second->OnWifiRssiChanged(rssi);
@@ -163,7 +161,6 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string &pinCode)
 {
     WIFI_LOGI("OnWifiWpsStateChanged, state:%{public}d!", state);
-    std::unique_lock<std::recursive_mutex> lock(callbackMutex_);
     for (auto& pair : callbackMap_) {
         if (pair.second) {
             pair.second->OnWifiWpsStateChanged(state, pinCode);
@@ -174,7 +171,6 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state,
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 {
     WIFI_LOGD("OnStreamChanged, direction:%{public}d!", direction);
-    std::unique_lock<std::recursive_mutex> lock(callbackMutex_);
     for (auto& pair : callbackMap_) {
         if (pair.second) {
             pair.second->OnStreamChanged(direction);
@@ -185,7 +181,6 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange value)
 {
     WIFI_LOGI("OnDeviceConfigChanged, value:%{public}d!", value);
-    std::unique_lock<std::recursive_mutex> lock(callbackMutex_);
     for (auto& pair : callbackMap_) {
         if (pair.second) {
             pair.second->OnDeviceConfigChanged(value);
@@ -196,7 +191,6 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChan
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnCandidateApprovalStatusChanged(CandidateApprovalStatus status)
 {
     WIFI_LOGI("OnCandidateApprovalStatusChanged, status:%{public}d!", static_cast<int>(status));
-    std::unique_lock<std::recursive_mutex> lock(callbackMutex_);
     for (auto& pair : callbackMap_) {
         if (pair.second) {
             pair.second->OnCandidateApprovalStatusChanged(status);

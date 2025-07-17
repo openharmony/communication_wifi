@@ -102,7 +102,8 @@ HWTEST_F(ScanInterfaceTest, OnStandbyStateChangedFail, TestSize.Level1)
 
 HWTEST_F(ScanInterfaceTest, OnClientModeStatusChangedSuccess, TestSize.Level1)
 {
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnClientModeStatusChanged(0));
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->OnClientModeStatusChanged(
+        static_cast<int>(OperateResState::CONNECT_MISS_MATCH), 1));
 }
 
 HWTEST_F(ScanInterfaceTest, OnAppRunningModeChangedSuccess, TestSize.Level1)

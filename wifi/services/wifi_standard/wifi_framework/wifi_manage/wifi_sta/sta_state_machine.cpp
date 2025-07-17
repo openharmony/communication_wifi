@@ -594,6 +594,13 @@ bool StaStateMachine::InitState::RestrictedByMdm(WifiDeviceConfig &config)
 }
 #endif
 
+void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId) {
+    WifiLinkedInfo linkInfo = pStaStateMachine->linkedInfo;
+    linkInfo.networkId = networkId;
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_MISS_MATCH, linkInfo);
+    WifiSettings::GetInstance().SetUserConnectChoice(networkId);
+}
+
 void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
 {
     WIFI_LOGI("enter StartConnectEvent m_instId = %{public}d\n", pStaStateMachine->m_instId);
@@ -629,9 +636,7 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
     }
 
     if (config.hiddenSSID && NotExistInScanList(config)) {
-        pStaStateMachine->InvokeOnStaConnChanged(
-            OperateResState::CONNECT_MISS_MATCH, pStaStateMachine->linkedInfo);
-        WifiSettings::GetInstance().SetUserConnectChoice(networkId);
+        DealHiddenSsidConnectMiss(networkId);
         return;
     }
 

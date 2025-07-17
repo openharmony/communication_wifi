@@ -47,7 +47,7 @@ private:
     void DealRssiChanged(int rssi, int instId = 0);
     void DealAutoSelectNetworkChanged(int networkId, int instId);
     void PublishWifiOperateStateHiSysEvent(OperateResState state);
-    void NotifyScanForStaConnChanged(OperateResState state, int instId = 0);
+    void NotifyScanForStaConnChanged(OperateResState state, int networkId, int instId = 0);
     void DealInternetAccessChanged(int internetAccessStatus, int instId);
     void DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId = 0);
 private:

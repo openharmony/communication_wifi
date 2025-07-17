@@ -128,6 +128,15 @@ WifiErrorNo P2pGroupOperatingState::CreateGroupByConfig(int netId,
     return ret;
 }
 
+int P2pGroupOperatingState::GetGroupFreq(WifiP2pConfigInternal &config) const
+{
+    if (IsValid24GHz(config.GetFreq()) || IsValid5GHz(config.GetFreq())) {
+        return config.GetFreq();
+    } else {
+        return p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
+    }
+}
+
 bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg) const
 {
     WifiErrorNo ret = WIFI_HAL_OPT_FAILED;
@@ -135,7 +144,7 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg)
     WifiP2pConfigInternal config;
     SharedLinkManager::SetGroupUid(msg->GetParam1());
     msg->GetMessageObj(config);
-    int freq = p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
+    int freq = GetGroupFreq(config);
     int netId = config.GetNetId();
     if (netId >= minValidNetworkid) {
         // Restart the group using an existing network ID.

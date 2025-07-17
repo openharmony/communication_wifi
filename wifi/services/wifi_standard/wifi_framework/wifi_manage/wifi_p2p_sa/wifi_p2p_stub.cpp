@@ -747,6 +747,7 @@ void WifiP2pStub::ReadWifiP2pConfigData(MessageParcel &data, WifiP2pConfig &conf
     config.SetGoBand(static_cast<GroupOwnerBand>(data.ReadInt32()));
     config.SetNetId(data.ReadInt32());
     config.SetGroupOwnerIntent(data.ReadInt32());
+    config.SetFreq(data.ReadInt32());
 }
 
 void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)

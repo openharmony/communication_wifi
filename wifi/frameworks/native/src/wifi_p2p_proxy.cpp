@@ -660,6 +660,7 @@ void WifiP2pProxy::WriteWifiP2pConfigData(MessageParcel &data, const WifiP2pConf
     data.WriteInt32(static_cast<int>(config.GetGoBand()));
     data.WriteInt32(config.GetNetId());
     data.WriteInt32(config.GetGroupOwnerIntent());
+    data.WriteInt32(config.GetFreq());
 }
 
 ErrCode WifiP2pProxy::P2pConnect(const WifiP2pConfig &config)

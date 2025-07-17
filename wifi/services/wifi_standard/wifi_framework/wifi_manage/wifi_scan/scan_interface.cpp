@@ -138,11 +138,11 @@ ErrCode ScanInterface::OnClientModeStatusChanged(int staStatus, int networkId)
         || staStatus == static_cast<int>(OperateResState::CONNECT_NETWORK_ENABLED)) {
         pScanService->HandleNetworkQualityChanged(staStatus);
     } else if (staStatus == static_cast<int>(OperateResState::CONNECT_MISS_MATCH)) {
-        if (networkId >= 0) {
+        if (networkId != INVALID_NETWORK_ID) {
             WifiDeviceConfig deviceConfig;
             WifiScanParams wifiScanParams;
             if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
-                WIFI_LOGE("OnClientModeStatusChanged get GetDeviceConfig failed");
+                WIFI_LOGE("OnClientModeStatusChanged GetDeviceConfig failed networkId=%{public}d.", networkId);
                 return WIFI_OPT_FAILED;
             }
             WIFI_LOGI("start new scan for hidden ssid");

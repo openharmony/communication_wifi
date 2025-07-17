@@ -239,8 +239,6 @@ ErrCode WifiSecurityDetect::SecurityModelJsonResult(SecurityModelResult model, b
 {
     cJSON *root = cJSON_Parse(model.result.c_str());
     if (root == nullptr) {
- 
- 
         WIFI_LOGE("model.result is null");
         return WIFI_OPT_FAILED;
     }

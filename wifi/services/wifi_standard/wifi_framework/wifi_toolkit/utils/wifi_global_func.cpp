@@ -658,7 +658,7 @@ bool ParseJson(const std::string &jsonString, const std::string &type, const std
         if (item == nullptr || !cJSON_IsObject(item)) {
             continue;
         }
-        cJSON *typeItem = cJSON_GetObjectItem(item, type.c_str()); 
+        cJSON *typeItem = cJSON_GetObjectItem(item, type.c_str());
         if (typeItem == nullptr) {
             continue;
         }

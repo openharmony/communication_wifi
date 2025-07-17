@@ -176,7 +176,6 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
             break;
         default:
             break;
- 
     }
     char *cjsonStr = cJSON_PrintUnformatted(param);
     if (cjsonStr == nullptr) {

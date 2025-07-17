@@ -828,7 +828,7 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig c
 #if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
     IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
     if (pWifiProService != nullptr) {
-        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(value), config, ieRemoveAll);
+        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(value), config, isRemoveAll);
     }
 #endif
 #ifndef OHOS_ARCH_LITE

@@ -476,6 +476,8 @@ bool SignalLevelFilter::Filter(NetworkCandidate &networkCandidate)
     if (signalLevel > SIGNAL_LEVEL_TWO) {
         return true;
     }
+    WIFI_LOGI("SignalLevelFilter, rssi:%{public}d, band:%{public}d, skip candidate:%{public}s", interScanInfo.rssi,
+        interScanInfo.band, networkCandidate.ToString().c_str());
     networkCandidate.filtedReason[filterName].insert(FiltedReason::POOR_SIGNAL);
     return false;
 }
@@ -634,7 +636,7 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
 
     // disable network filtering
     auto &networkSelectionStatus = networkCandidate.wifiDeviceConfig.networkSelectionStatus;
-    if (networkSelectionStatus.networkSelectionDisableReason != DisabledReason::DISABLED_NONE ||
+    if (networkSelectionStatus.status != WifiDeviceConfigStatus::ENABLED ||
         !networkCandidate.wifiDeviceConfig.isAllowAutoConnect) {
         WIFI_LOGI("ValidConfigNetworkFilter, disable network, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());

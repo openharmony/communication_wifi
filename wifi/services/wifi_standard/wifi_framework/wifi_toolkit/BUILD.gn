@@ -158,6 +158,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "c_utils:utils",
+      "cJSON:cjson",
       "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
       "dhcp:dhcp_sdk",

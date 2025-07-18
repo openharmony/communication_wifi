@@ -21,7 +21,7 @@ namespace Wifi {
 
 HWTEST_F(WifiSecurityDetectTest, DealStaConnChangedTest01, TestSize.Level1)
 {
-    OperateResState state = OperateResState::CONNECT_AP_CONNECTED;
+    OperateResState state = OperateResState::CONNECT_NETWORK_ENABLED;
     WifiLinkedInfo info;
     info.networkId = 1;
     int instId = 1;

@@ -43,6 +43,9 @@
 #ifdef WIFI_CONFIG_UPDATE
 #include "wifi_config_update.h"
 #endif
+#ifdef WIFI_SECURITY_DETECT_ENABLE
+#include "wifi_security_detect.h"
+#endif
 #include "wifi_notification_util.h"
 #include "wifi_net_stats_manager.h"
 #include "wifi_history_record_manager.h"
@@ -4386,6 +4389,9 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
 #ifndef OHOS_ARCH_LITE
         BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
+#ifdef WIFI_SECURITY_DETECT_ENABLE
+        WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
+#endif
 #endif
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     }

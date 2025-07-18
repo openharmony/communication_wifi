@@ -59,12 +59,15 @@ WifiSecurityDetect::WifiSecurityDetect()
 
 void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    if (state == OperateResState::CONNECT_AP_CONNECTED) {
-        currentConnectedNetworkId_ = info.networkId;
-        SecurityDetect(info);
+    if (state == OperateResState::CONNECT_NETWORK_ENABLED) {
+        if (!networkDetecting_.load()) {
+            networkDetecting_.store(true);
+            SecurityDetect(info);
+        }
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         PopupNotification(WifiNotification::CLOSE, info.networkId);
         currentConnectedNetworkId_ = -1;
+        networkDetecting_.store(false);
     } else {
         return;
     }
@@ -78,6 +81,11 @@ StaServiceCallback WifiSecurityDetect::GetStaCallback() const
 void WifiSecurityDetect::SetDatashareReady()
 {
     datashareReady_ = true;
+}
+
+void WifiSecurityDetect::SetChangeNetworkid(int networkId)
+{
+    currentConnectedNetworkId_ = networkId;
 }
 
 std::shared_ptr<DataShare::DataShareHelper> WifiSecurityDetect::CreateDataShareHelper()
@@ -185,6 +193,7 @@ ErrCode WifiSecurityDetect::SecurityDetectResult(
         SecurityModelResult model = future.get();
         return SecurityModelJsonResult(model, result);
     } else {
+        WIFI_LOGE("RequestSecurityModelResultSync timeout");
         return WIFI_OPT_FAILED;
     }
 }
@@ -394,6 +403,20 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
     std::string bundleName = WifiSettings::GetInstance().GetPackageName("SECURITY_BUNDLE");
     want.SetElementName(bundleName, "WlanNotificationAbility");
     if (status == 1) {
+        if (!IsSettingSecurityDetectOn()) {
+            WIFI_LOGI("The SecurityDetect is off");
+            return;
+        }
+        if (networkid == -1) {
+            WIFI_LOGI("The networkid is off");
+            return;
+        }
+        if (currentConnectedNetworkId_ != networkid) {
+            WIFI_LOGI("The networkid is changed  current networkid:%{public}d  detect networkid:%{public}d",
+                currentConnectedNetworkId_,
+                networkid);
+            return;
+        }
         want.SetParam("notificationType", WifiNotification::OPEN);
     } else {
         want.SetParam("notificationType", WifiNotification::CLOSE);

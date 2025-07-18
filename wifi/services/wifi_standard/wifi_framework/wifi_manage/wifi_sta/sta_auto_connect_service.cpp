@@ -133,13 +133,11 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     }
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
-    int connTriggerMode = SelectedType::NETWORK_SELECTED_BY_AUTO;
+    
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
         std::string bssid = "";
         if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
             bssid = networkSelectionResult.interScanInfo.bssid;
-        } else {
-            connTriggerMode = SelectedType::NETWORK_SELECTED_BY_USER;
         }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
         std::string &ssid = networkSelectionResult.wifiDeviceConfig.ssid;
@@ -147,7 +145,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
                   SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
         message->SetParam1(networkId);
-        message->SetParam2(connTriggerMode);
+        message->SetParam2(NETWORK_SELECTED_BY_AUTO);
         message->AddStringMessageBody(bssid);
         pStaStateMachine->SendMessage(message);
     } else {

@@ -1985,11 +1985,10 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     FactoryResetNotify();
 #endif
 #if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
-    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
     if (pWifiProService != nullptr) {
         WifiDeviceConfig config;
-        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE),
-            config, ieRemoveAll);
+        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE), config, 1);
     }
 #endif
     /* p2p */

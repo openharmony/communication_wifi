@@ -61,6 +61,7 @@ void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLin
 {
     std::unique_lock<std::mutex> lock(shareDetectMutex_);
     if (state == OperateResState::CONNECT_NETWORK_ENABLED) {
+        currentConnectedNetworkId_ = info.networkId;
         if (!networkDetecting_.load()) {
             networkDetecting_.store(true);
             SecurityDetect(info);

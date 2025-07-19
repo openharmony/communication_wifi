@@ -309,9 +309,9 @@ struct Index {
           if (!url.startsWith('http') && !url.startsWith('https')) {
             (this.getUIContext().getHostContext() as common.UIAbilityContext).openLink(url)
               .then(() => {
-                hilog.info(DOMAIN, 'testTag', 'open link success.');               
+                hilog.info(DOMAIN, TAG, 'open link success.');               
               }).catch((err: BusinessError) => {
-                hilog.error(DOMAIN, 'testTag', `open link failed. Code is ${err.code}, message is ${err.message}`);
+                hilog.error(DOMAIN, TAG, `open link failed. Code is ${err.code}, message is ${err.message}`);
               })
             return true;
           }

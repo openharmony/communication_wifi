@@ -467,6 +467,7 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
     sptr<NetManagerStandard::Route> localRoute = (std::make_unique<NetManagerStandard::Route>()).release();
     if (localRoute == nullptr) {
         WIFI_LOGE("%{public}s localRoute is null", __func__);
+        return;
     }
     std::string strLocalRoute = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress & wifiIpInfo.netmask);
     localRoute->iface_ = netLinkInfo->ifaceName_;

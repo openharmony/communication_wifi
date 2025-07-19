@@ -304,6 +304,19 @@ struct Index {
         .fileAccess(false)
         .geolocationAccess(false)
         .domStorageAccess(true)
+        .onOverrideUrlLoading((request) => {
+          const url = request.getRequestUrl();
+          if (!url.startsWith('http') && !url.startsWith('https')) {
+            (this.getUIContext().getHostContext() as common.UIAbilityContext).openLink(url)
+              .then(() => {
+                hilog.info(DOMAIN, 'testTag', 'open link success.');               
+              }).catch((err: BusinessError) => {
+                hilog.error(DOMAIN, 'testTag', `open link failed. Code is ${err.code}, message is ${err.message}`);
+              })
+            return true;
+          }
+          return false;
+        })
         .onConsole((event) => {
           return true;
         })

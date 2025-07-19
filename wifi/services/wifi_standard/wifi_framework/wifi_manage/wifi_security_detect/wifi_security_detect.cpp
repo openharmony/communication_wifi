@@ -60,11 +60,13 @@ WifiSecurityDetect::WifiSecurityDetect()
 void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
     if (state == OperateResState::CONNECT_NETWORK_ENABLED) {
+        std::unique_lock<std::mutex> lock(shareDetectMutex_);
         if (!networkDetecting_.load()) {
             networkDetecting_.store(true);
             SecurityDetect(info);
         }
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        std::unique_lock<std::mutex> lock(shareDetectMutex_);
         PopupNotification(WifiNotification::CLOSE, info.networkId);
         currentConnectedNetworkId_ = -1;
         networkDetecting_.store(false);
@@ -85,6 +87,7 @@ void WifiSecurityDetect::SetDatashareReady()
 
 void WifiSecurityDetect::SetChangeNetworkid(int networkId)
 {
+    std::unique_lock<std::mutex> lock(shareDetectMutex_);
     currentConnectedNetworkId_ = networkId;
 }
 
@@ -412,8 +415,8 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
             return;
         }
         if (currentConnectedNetworkId_ != networkid) {
-            WIFI_LOGI("The networkid is changed  current networkid:%{public}d  detect networkid:%{public}d",
-                currentConnectedNetworkId_,
+            WIFI_LOGI("The networkid is changed current networkid:%{public}d detect networkid:%{public}d",
+                currentConnectedNetworkId_.load(),
                 networkid);
             return;
         }

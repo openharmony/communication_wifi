@@ -431,19 +431,17 @@ napi_value ConfigStaticIp(const napi_env& env, const napi_value& object, WifiDev
     NAPI_CALL(env, napi_has_named_property(env, object, "family", &hasProperty));
     if (!hasProperty) {
         WIFI_LOGE("ConfigStaticIp, Js has no property: family.");
-        cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = IPV4_ADDRESS_TYPE;
         return ConfigStaticIpv4(env, object, cppConfig);
     }
 
     napi_value family;
     napi_get_named_property(env, object, "family", &family);
     JsObjectToInt(env, object, "family", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family);
-    if (cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV4_ADDRESS_TYPE) {
-        ConfigStaticIpv4(env, object, cppConfig);
-    } else if (cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV6_ADDRESS_TYPE) {
-        ConfigStaticIpv6(env, object, cppConfig);
+    if (cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV6_ADDRESS_TYPE) {
+        return ConfigStaticIpv6(env, object, cppConfig);
+    } else {
+        return ConfigStaticIpv4(env, object, cppConfig);
     }
-
     return CreateInt32(env);
 }
 
@@ -461,6 +459,7 @@ napi_value ConfigStaticIpv4(const napi_env& env, const napi_value& object, WifiD
     }
     napi_get_named_property(env, object, "staticIp", &staticIp);
     JsObjectToUint(env, staticIp, "ipAddress", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4);
+    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = IPV4_ADDRESS_TYPE;
     JsObjectToUint(env, staticIp, "gateway", cppConfig.wifiIpConfig.staticIpAddress.gateway.addressIpv4);
     JsObjectToInt(env, staticIp, "prefixLength", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
     NAPI_CALL(env, napi_has_named_property(env, staticIp, "dnsServers", &hasProperty));
@@ -500,6 +499,7 @@ napi_value ConfigStaticIpv6(const napi_env& env, const napi_value& object, WifiD
     JsObjectToString(env, staticIp, "ipAddress", NAPI_MAX_STR_LENT, ipv6Temp);
     cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.SetIpv6Address(
         IpTools::ConvertIpv6AddressToCompleted(ipv6Temp));
+    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = IPV6_ADDRESS_TYPE;
     std::string gatewayTemp;
     JsObjectToString(env, staticIp, "gateway", NAPI_MAX_STR_LENT, gatewayTemp);
     cppConfig.wifiIpConfig.staticIpAddress.gateway.SetIpv6Address(
@@ -1441,10 +1441,10 @@ static SecTypeJs ConvertKeyMgmtToSecType(const std::string& keyMgmt)
 
 static void IpConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result)
 {
-    if (wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV4_ADDRESS_TYPE) {
-        Ipv4ConfigToJs(env, wifiIpConfig, result);
-    } else if (wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV6_ADDRESS_TYPE) {
+    if (wifiIpConfig.staticIpAddress.ipAddress.address.family == IPV6_ADDRESS_TYPE) {
         Ipv6ConfigToJs(env, wifiIpConfig, result);
+    } else {
+        Ipv4ConfigToJs(env, wifiIpConfig, result);
     }
 }
 
@@ -1463,9 +1463,11 @@ void Ipv4ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_
         napi_value value;
         if (napi_create_int32(env, vecDns[i], &value) != napi_ok) {
             WIFI_LOGE("Ipv4ConfigToJs, Ip config to js create int32 error!");
+            return;
         }
         if (napi_set_element(env, dnsArray, i, value) != napi_ok) {
             WIFI_LOGE("Ipv4ConfigToJs, Ip config to js set element error!");
+            return;
         }
     }
     if (napi_set_named_property(env, ipCfgObj, "dnsServers", dnsArray) != napi_ok) {
@@ -1479,6 +1481,7 @@ void Ipv4ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_
         napi_value value;
         if (napi_create_string_utf8(env, vecDomains[i].c_str(), NAPI_AUTO_LENGTH, &value) != napi_ok) {
             WIFI_LOGE("Ipv4ConfigToJs, Ip config to js create utf8 string error!");
+            return;
         }
         if (napi_set_element(env, domainsArray, i, value) != napi_ok) {
             WIFI_LOGE("Ipv4ConfigToJs, Ip config to js set element error!");
@@ -1510,6 +1513,7 @@ void Ipv6ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_
         napi_value value;
         if (napi_create_string_utf8(env, vecDns[i].c_str(), NAPI_AUTO_LENGTH, &value) != napi_ok) {
             WIFI_LOGE("Ipv6ConfigToJs, Ipv6 config to js create utf8 string error!");
+            return;
         }
         if (napi_set_element(env, dnsArray, i, value) != napi_ok) {
             WIFI_LOGE("Ipv6ConfigToJs, Ipv6 config to js set element error!");

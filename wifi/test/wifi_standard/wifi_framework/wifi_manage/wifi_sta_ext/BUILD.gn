@@ -117,7 +117,6 @@ ohos_unittest("wifi_sta_ext_unittest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",

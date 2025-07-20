@@ -122,7 +122,6 @@ if (defined(ohos_lite)) {
       "hicollie:libhicollie",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "openssl:libcrypto_shared",
       "openssl:libssl_shared",

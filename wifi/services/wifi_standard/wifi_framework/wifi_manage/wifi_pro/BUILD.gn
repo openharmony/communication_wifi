@@ -106,7 +106,6 @@ ohos_static_library("wifi_pro") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
-    "jsoncpp:jsoncpp",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_stats_manager_if",
     "netmanager_base:netsys_controller",

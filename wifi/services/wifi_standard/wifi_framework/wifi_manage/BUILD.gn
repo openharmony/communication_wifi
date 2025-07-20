@@ -602,7 +602,6 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
       "time_service:time_client",
       "window_manager:libdm_lite",
-      "jsoncpp:jsoncpp",
     ]
 
     if (wifi_feature_with_encryption || wifi_feature_with_local_random_mac) {

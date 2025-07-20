@@ -82,7 +82,6 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
     "dhcp:dhcp_utils",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "netstack:http_client",
     "samgr:samgr_proxy",

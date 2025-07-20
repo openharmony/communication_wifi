@@ -100,7 +100,6 @@ ohos_unittest("idl_client_unittest") {
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
-    "jsoncpp:jsoncpp",
     "samgr:samgr_proxy",
   ]
 

@@ -82,7 +82,6 @@ ohos_unittest("wifi_non_mock_unittest") {
     "c_utils:utils",
     "cJSON:cjson",
     "hilog:libhilog",
-    "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "samgr:samgr_proxy",
     "time_service:time_client",

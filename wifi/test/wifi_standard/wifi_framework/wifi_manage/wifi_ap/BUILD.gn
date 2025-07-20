@@ -148,7 +148,6 @@ ohos_unittest("WifiApServiceTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "icu:shared_icuuc",
-    "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "samgr:samgr_proxy",

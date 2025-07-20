@@ -167,7 +167,6 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "icu:shared_icuuc",
       "ipc:ipc_single",
-      "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",

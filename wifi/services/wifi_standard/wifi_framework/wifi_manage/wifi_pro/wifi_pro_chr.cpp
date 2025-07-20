@@ -19,7 +19,6 @@
 #include "wifi_settings.h"
 #include "wifi_hisysevent.h"
 #include "hisysevent.h"
-#include "json/json.h"
 #include "cJSON.h"
 namespace OHOS {
 namespace Wifi {

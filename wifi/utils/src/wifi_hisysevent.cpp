@@ -519,10 +519,23 @@ void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
 {
     Json::Value root;
     Json::FastWriter writer;
-    root["OUTDOORFILTERCNT"] = iodStatisticInfo.outdoorFilterCnt;
-    root["OUTDOORSELECTWIFICNT"] = iodStatisticInfo.outdoorAutoSelectCnt;
-    root["INTOOUTDOORCNT"] = iodStatisticInfo.in2OutCnt;
-    root["OUTTOINDOORCNT"] = iodStatisticInfo.out2InCnt;
+    root["OUTDOOR_FILTER_CNT"] = iodStatisticInfo.outdoorFilterCnt;
+    root["OUTDOOR_SELECT_WIFI_CNT"] = iodStatisticInfo.outdoorAutoSelectCnt;
+    root["IN_TO_OUTDOOR_CNT"] = iodStatisticInfo.in2OutCnt;
+    root["OUT_TO_INDOOR_CNT"] = iodStatisticInfo.out2InCnt;
+    root["OUTDOOR_CONN_LEVEL0"] = iodStatisticInfo.outdoorConnLevel0;
+    root["OUTDOOR_CONN_LEVEL1"] = iodStatisticInfo.outdoorConnLevel1;
+    root["OUTDOOR_CONN_LEVEL2"] = iodStatisticInfo.outdoorConnLevel2;
+    root["OUTDOOR_CONN_LEVEL3"] = iodStatisticInfo.outdoorConnLevel3;
+    root["OUTDOOR_CONN_LEVEL4"] = iodStatisticInfo.outdoorConnLevel4;
+    root["INDOOR_CONN_LEVEL0"] = iodStatisticInfo.indoorConnLevel0;
+    root["INDOOR_CONN_LEVEL1"] = iodStatisticInfo.indoorConnLevel1;
+    root["INDOOR_CONN_LEVEL2"] = iodStatisticInfo.indoorConnLevel2;
+    root["INDOOR_CONN_LEVEL3"] = iodStatisticInfo.indoorConnLevel3;
+    root["INDOOR_CONN_LEVEL4"] = iodStatisticInfo.indoorConnLevel4;
+    root["OUTDOOR_CONN_SHORT"] = iodStatisticInfo.outdoorConnShortTime;
+    root["INDOOR_CONN_SHORT"] = iodStatisticInfo.indoorConnShortTime;
+    
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_IOD_STATISTIC", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi

@@ -93,13 +93,13 @@ ohos_unittest("idl_client_unittest") {
 
   external_deps = [
     "c_utils:utils",
+    "cJSON:cjson",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
-    "jsoncpp:jsoncpp",
     "samgr:samgr_proxy",
   ]
 

@@ -942,10 +942,22 @@ void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
         WIFI_LOGE("Failed to create cJSON object");
         return;
     }
-    cJSON_AddNumberToObject(root, "OUTDOORFILTERCNT", iodStatisticInfo.outdoorFilterCnt);
-    cJSON_AddNumberToObject(root, "OUTDOORSELECTWIFICNT", iodStatisticInfo.outdoorAutoSelectCnt);
-    cJSON_AddNumberToObject(root, "INTOOUTDOORCNT", iodStatisticInfo.in2OutCnt);
-    cJSON_AddNumberToObject(root, "OUTTOINDOORCNT", iodStatisticInfo.out2InCnt);
+    cJSON_AddNumberToObject(root, "OUTDOOR_FILTER_CNT", iodStatisticInfo.outdoorFilterCnt);
+    cJSON_AddNumberToObject(root, "OUTDOOR_SELECT_WIFI_CNT", iodStatisticInfo.outdoorAutoSelectCnt);
+    cJSON_AddNumberToObject(root, "IN_TO_OUTDOOR_CNT", iodStatisticInfo.in2OutCnt);
+    cJSON_AddNumberToObject(root, "OUT_TO_INDOOR_CNT", iodStatisticInfo.out2InCnt);
+    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL0", iodStatisticInfo.outdoorConnLevel0);
+    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL1", iodStatisticInfo.outdoorConnLevel1);
+    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL2", iodStatisticInfo.outdoorConnLevel2);
+    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL3", iodStatisticInfo.outdoorConnLevel3);
+    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL4", iodStatisticInfo.outdoorConnLevel4);
+    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL0", iodStatisticInfo.indoorConnLevel0);
+    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL1", iodStatisticInfo.indoorConnLevel1);
+    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL2", iodStatisticInfo.indoorConnLevel2);
+    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL3", iodStatisticInfo.indoorConnLevel3);
+    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL4", iodStatisticInfo.indoorConnLevel4);
+    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_SHORT", iodStatisticInfo.outdoorConnShortTime);
+    cJSON_AddNumberToObject(root, "INDOOR_CONN_SHORT", iodStatisticInfo.indoorConnShortTime);
  
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {

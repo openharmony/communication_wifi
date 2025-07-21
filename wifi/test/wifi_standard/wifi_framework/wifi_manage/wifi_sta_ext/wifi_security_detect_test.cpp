@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "cJSON.h"
+#include "json/json.h"
 #include "wifi_security_detect_test.h"
 
 using namespace testing::ext;
@@ -21,12 +21,12 @@ namespace Wifi {
 
 HWTEST_F(WifiSecurityDetectTest, DealStaConnChangedTest01, TestSize.Level1)
 {
-    OperateResState state = OperateResState::CONNECT_AP_CONNECTED;
+    OperateResState state = OperateResState::CONNECT_NETWORK_ENABLED;
     WifiLinkedInfo info;
     info.networkId = 1;
     int instId = 1;
     wifiSecurityDetect_->DealStaConnChanged(state, info, instId);
-    EXPECT_EQ(wifiSecurityDetect_->currentConnectedNetworkId_, info.networkId);
+    EXPECT_EQ(wifiSecurityDetect_->networkDetecting_, true);
 }
 
 HWTEST_F(WifiSecurityDetectTest, DealStaConnChangedTest02, TestSize.Level1)

@@ -148,6 +148,18 @@ ohos_unittest("wifi_sta_new_unittest") {
     "FEATURE_SELF_CURE_SUPPORT",
   ]
 
+  if (wifi_feature_with_security_detect) {
+    external_deps += [
+      "data_share:datashare_consumer",
+      "security_guard:libsg_classify_sdk",
+    ]
+    defines += [ "WIFI_SECURITY_DETECT_ENABLE" ]
+    sources += [ 
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp",
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect_observer.cpp",
+    ]
+  }
+
   part_name = "wifi"
   subsystem_name = "communication"
   testonly = true

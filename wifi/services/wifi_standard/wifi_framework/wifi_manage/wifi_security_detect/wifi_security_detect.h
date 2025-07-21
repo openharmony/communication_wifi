@@ -15,7 +15,7 @@
 
 #ifndef WIFI_SECURITY_DETECT_H
 #define WIFI_SECURITY_DETECT_H
-#include "cJSON.h"
+#include "json/json.h"
 #include "sta_service_callback.h"
 #include "wifi_event_handler.h"
 #include "wifi_datashare_utils.h"
@@ -71,23 +71,25 @@ public:
     bool IsSettingSecurityDetectOn();
     Uri AssembleUri(const std::string &key);
     void SetDatashareReady();
+    void SetChangeNetworkid(int networkid);
     void RegisterSecurityDetectObserver();
     void SecurityDetect(const WifiLinkedInfo &info);
-    void AddWifiStandardToJson(cJSON *root, int wifiStandard);
     void PopupNotification(int status, int networkid);
 
 private:
     std::unique_ptr<WifiEventHandler> securityDetectThread_ = nullptr;
     StaServiceCallback staCallback_;
-    int currentConnectedNetworkId_ = -1;
+    std::atomic<int> currentConnectedNetworkId_ {-1};
     std::atomic<bool> datashareReady_ {false};
+    std::atomic<bool> networkDetecting_ {false};
     std::mutex shareSecurityObserverMutex_;
+    std::mutex shareDetectMutex_;
     std::atomic<bool> isSecurityDetectObservered_ {false};
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
     bool IsSecurityDetectTimeout(const int &networkId);
     ErrCode SecurityDetectResult(const std::string &devId, uint32_t modelId, const std::string &param, bool &result);
     ErrCode SecurityModelJsonResult(SecurityModelResult model, bool &result);
-    void ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, cJSON *root);
+    void ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, Json::Value &root);
     int32_t AuthenticationConvert(std::string key);
     void UnRegisterSecurityDetectObserver();
 };

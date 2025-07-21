@@ -18,7 +18,6 @@
 #include <string>
 #include <iostream>
 #include <map>
-#include "cJSON.h"
 #include "wifi_logger.h"
 #include "wifi_pro_common.h"
 #include "wifi_msg.h"
@@ -79,8 +78,6 @@ public:
     void RecordWifiProSwitchSuccTime();
     void RecordCountWiFiPro(bool isValid);
     void WriteWifiProSysEvent();
-    cJSON *FillWifiProStatisticsJson();
-    void FillWifiProStatisticsJsons(cJSON *root);
 
 private:
     int64_t wifiProStartTime_ = 0;

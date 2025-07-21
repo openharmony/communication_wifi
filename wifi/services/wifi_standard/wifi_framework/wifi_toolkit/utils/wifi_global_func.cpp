@@ -21,7 +21,7 @@
 #include "wifi_common_util.h"
 #include "wifi_log.h"
 #ifndef OHOS_ARCH_LITE
-#include "cJSON.h"
+#include "json/json.h"
 #include "wifi_country_code_define.h"
 #endif
 #ifdef INIT_LIB_ENABLE
@@ -613,28 +613,22 @@ bool IsSignalSmoothingEnable()
 }
 
 #ifndef OHOS_ARCH_LITE
-bool ParseJsonKey(const cJSON *jsonValue, const std::string &key, std::string &value)
+bool ParseJsonKey(const Json::Value &jsonValue, const std::string &key, std::string &value)
 {
-    if (!cJSON_IsArray(jsonValue)) {
-        return false;
-    }
-    int nSize = cJSON_GetArraySize(jsonValue);
-    for (int i = 0; i < nSize; ++i) {
-        cJSON *item = cJSON_GetArrayItem(jsonValue, i);
-        if (item == nullptr || !cJSON_IsObject(item)) {
-            return false;
-        }
-        cJSON *keyItem = cJSON_GetObjectItem(item, key.c_str());
-        if (keyItem == nullptr) {
-            return false;
-        }
-        if (cJSON_IsString(keyItem) && keyItem->valuestring != nullptr) {
-            value = keyItem->valuestring;
-            return true;
-        } else if (cJSON_IsNumber(keyItem)) {
-            value = std::to_string(keyItem->valueint);
-            return true;
-        } else {
+    if (jsonValue.isArray()) {
+        int nSize = static_cast<int>(jsonValue.size());
+        for (int i = 0; i < nSize; i++) {
+            if (!jsonValue[i].isMember(key)) {
+                LOGW("ParseJsonKey JSON[%{public}d] has no member %{public}s.", nSize, key.c_str());
+                return false;
+            }
+            if (jsonValue[i][key].isString()) {
+                value = jsonValue[i][key].asString();
+                return true;
+            } else if (jsonValue[i][key].isInt()) {
+                value = std::to_string(jsonValue[i][key].asInt());
+                return true;
+            }
             return false;
         }
     }
@@ -643,31 +637,24 @@ bool ParseJsonKey(const cJSON *jsonValue, const std::string &key, std::string &v
 
 bool ParseJson(const std::string &jsonString, const std::string &type, const std::string &key, std::string &value)
 {
-    cJSON *root = cJSON_Parse(jsonString.c_str());
-    if (root == nullptr) {
+    LOGI("ParseJson enter.");
+    Json::Value root;
+    Json::Reader reader;
+    bool success = reader.parse(jsonString, root);
+    if (!success) {
         LOGE("ParseJson failed to parse json data.");
         return false;
     }
-    if (!cJSON_IsArray(root)) {
-        cJSON_Delete(root);
-        return false;
-    }
-    int nSize = cJSON_GetArraySize(root);
+    int nSize = static_cast<int>(root.size());
     for (int i = 0; i < nSize; i++) {
-        cJSON *item = cJSON_GetArrayItem(root, i);
-        if (item == nullptr || !cJSON_IsObject(item)) {
+        if (!root[i].isMember(type)) {
+            LOGW("ParseJson JSON[%{public}d] has no member %{public}s.", nSize, type.c_str());
             continue;
         }
-        cJSON *typeItem = cJSON_GetObjectItem(item, type.c_str());
-        if (typeItem == nullptr) {
-            continue;
-        }
-        if (ParseJsonKey(typeItem, key, value)) {
-            cJSON_Delete(root);
+        if (ParseJsonKey(root[i][type], key, value)) {
             return true;
         }
     }
-    cJSON_Delete(root);
     return false;
 }
 

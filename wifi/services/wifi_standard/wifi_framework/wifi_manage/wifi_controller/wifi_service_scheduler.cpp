@@ -42,6 +42,7 @@
 #include "hal_device_manage.h"
 #endif
 #include "wifi_global_func.h"
+#include "wifi_sensor_scene.h"
 
 namespace OHOS {
 namespace Wifi {

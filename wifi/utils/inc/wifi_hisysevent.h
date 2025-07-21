@@ -123,6 +123,18 @@ struct IodStatisticInfo {
     int32_t out2InCnt = 0;
     int32_t outdoorFilterCnt = 0;
     int32_t outdoorAutoSelectCnt = 0;
+    int32_t outdoorConnLevel0 = 0;
+    int32_t outdoorConnLevel1 = 0;
+    int32_t outdoorConnLevel2 = 0;
+    int32_t outdoorConnLevel3 = 0;
+    int32_t outdoorConnLevel4 = 0;
+    int32_t indoorConnLevel0 = 0;
+    int32_t indoorConnLevel1 = 0;
+    int32_t indoorConnLevel2 = 0;
+    int32_t indoorConnLevel3 = 0;
+    int32_t indoorConnLevel4 = 0;
+    int32_t outdoorConnShortTime = 0;
+    int32_t indoorConnShortTime = 0;
 };
 
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);

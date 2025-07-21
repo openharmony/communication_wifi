@@ -56,15 +56,6 @@ enum WifiProCommond {
     EVENT_CONFIGURATION_CHANGED = 27,
 };
 
-enum SigLevel {
-    SIG_LEVEL_0 = 0,
-    SIG_LEVEL_1 = 1,
-    SIG_LEVEL_2 = 2,
-    SIG_LEVEL_3 = 3,
-    SIG_LEVEL_4 = 4,
-    SIG_LEVEL_MAX = 4,
-};
-
 inline const int32_t QUICK_SCAN_INTERVAL[NUM_5] = { 10000, 10000, 15000, 30000, 30000};
 inline const int32_t NORMAL_SCAN_INTERVAL[NUM_5] = { 15000, 15000, 30000, 60000, 60000};
 inline const int32_t QUICK_SCAN_MAX_COUNTER[NUM_5] = { 20, 20, 10, 10, 10};

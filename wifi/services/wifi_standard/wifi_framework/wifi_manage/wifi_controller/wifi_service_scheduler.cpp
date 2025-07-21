@@ -42,6 +42,7 @@
 #include "hal_device_manage.h"
 #endif
 #include "wifi_global_func.h"
+#include "wifi_sensor_scene.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -592,6 +593,10 @@ ErrCode WifiServiceScheduler::InitStaServiceExtral(IStaService *pService, int in
         return WIFI_OPT_FAILED;
     }
 #endif
+    errCode = pService->RegisterStaServiceCallback(WifiSensorScene::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGI("WifiSensorScene register sta service callback failed, ret=%{public}d!", static_cast<int>(errCode));
+    }
 #endif
     return WIFI_OPT_SUCCESS;
 }

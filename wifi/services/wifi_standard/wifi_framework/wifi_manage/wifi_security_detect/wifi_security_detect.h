@@ -71,6 +71,7 @@ public:
     bool IsSettingSecurityDetectOn();
     Uri AssembleUri(const std::string &key);
     void SetDatashareReady();
+    void SetChangeNetworkid(int networkid);
     void RegisterSecurityDetectObserver();
     void SecurityDetect(const WifiLinkedInfo &info);
     void AddWifiStandardToJson(cJSON *root, int wifiStandard);
@@ -79,9 +80,11 @@ public:
 private:
     std::unique_ptr<WifiEventHandler> securityDetectThread_ = nullptr;
     StaServiceCallback staCallback_;
-    int currentConnectedNetworkId_ = -1;
+    std::atomic<int> currentConnectedNetworkId_ {-1};
     std::atomic<bool> datashareReady_ {false};
+    std::atomic<bool> networkDetecting_ {false};
     std::mutex shareSecurityObserverMutex_;
+    std::mutex shareDetectMutex_;
     std::atomic<bool> isSecurityDetectObservered_ {false};
     void DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId);
     bool IsSecurityDetectTimeout(const int &networkId);

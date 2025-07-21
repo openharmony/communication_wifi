@@ -19,6 +19,8 @@
 #include "wifi_logger.h"
 #include "wifi_service_manager.h"
 #include "wifi_hisysevent.h"
+#include "wifi_settings.h"
+#include "wifi_config_center.h"
 #include <mutex>
 
 namespace OHOS {
@@ -34,9 +36,13 @@ constexpr int MIN_RSSI_VALUE_24G = -80;
 constexpr int MIN_RSSI_VALUE_5G = -77;
 constexpr int MIN_RSSI_VALUE_OUTDOOR_24G = -75;
 constexpr int MIN_RSSI_VALUE_OUTDOOR_5G = -72;
+constexpr int CONN_RSSI_CNT = 10;
 
 WifiSensorScene::WifiSensorScene() : scenario_(SCENARIO_UNKNOWN),
-    minRssi24G_(MIN_RSSI_VALUE_24G), minRssi5G_(MIN_RSSI_VALUE_5G) {}
+    minRssi24G_(MIN_RSSI_VALUE_24G), minRssi5G_(MIN_RSSI_VALUE_5G)
+{
+    InitCallback();
+}
 
 WifiSensorScene &WifiSensorScene::GetInstance()
 {
@@ -47,6 +53,93 @@ WifiSensorScene &WifiSensorScene::GetInstance()
 void WifiSensorScene::Init()
 {
     RegisterSensorEnhCallback();
+}
+
+void WifiSensorScene::InitCallback()
+{
+    using namespace std::placeholders;
+    WIFI_LOGI("Enter InitCallback");
+    staCallback_.callbackModuleName = "WifiSensorScene";
+    staCallback_.OnStaConnChanged = [this](OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId) {
+        this->DealStaConnChanged(state, linkedInfo, instId);
+    };
+    staCallback_.OnWifiHalSignalInfoChange = [this](const WifiSignalPollInfo &wifiSignalPollInfo) {
+        this->HandleSignalInfoChange(wifiSignalPollInfo);
+    };
+}
+
+void WifiSensorScene::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
+{
+    std::lock_guard<std::mutex> lock(staCbMutex_);
+    if (instId != INSTID_WLAN0 || info.networkId == INVALID_NETWORK_ID || info.bssid.empty() ||
+        (state != OperateResState::DISCONNECT_DISCONNECTED && state != OperateResState::CONNECT_AP_CONNECTED)) {
+        return;
+    }
+    if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        if (rssiCnt_ < CONN_RSSI_CNT) {
+            ReportLinkedQuality(0);
+        }
+        connScene_ = UNKNOW_SCENE;
+        rssiCnt_ = 0;
+        reportRssi_ = 0;
+        return;
+    }
+    IsOutdoorScene() ? connScene_ = OUTDOOR_SCENE : connScene_ = INDOOR_SCENE;
+}
+
+void WifiSensorScene::HandleSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo)
+{
+    WIFI_LOGD("Enter HandleSignalInfoChange");
+    std::lock_guard<std::mutex> lock(staCbMutex_);
+    if (rssiCnt_ == CONN_RSSI_CNT) {
+        ReportLinkedQuality(reportRssi_);
+    }
+    if (rssiCnt_ > CONN_RSSI_CNT) {
+        WIFI_LOGD("Current link has collected rssi data");
+        return;
+    }
+    rssiCnt_++;
+    reportRssi_ = wifiSignalPollInfo.signal < reportRssi_ ? wifiSignalPollInfo.signal : reportRssi_;
+}
+
+StaServiceCallback WifiSensorScene::GetStaCallback() const
+{
+    return staCallback_;
+}
+
+void WifiSensorScene::ReportLinkedQuality(int32_t rssi, int32_t instId)
+{
+    IodStatisticInfo iodStatisticInfo;
+    if (rssi == 0) {
+        WIFI_LOGI("Connection duration is short, connScene_: %{public}d", connScene_);
+        connScene_ == OUTDOOR_SCENE ? iodStatisticInfo.outdoorConnShortTime++ : iodStatisticInfo.indoorConnShortTime++;
+        return;
+    }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int32_t signalLevel = WifiSettings::GetInstance().GetSignalLevel(rssi, linkedInfo.band, instId);
+    WIFI_LOGI("ReportLinkedQuality, connScene_: %{public}d, signalLevel: %{public}d", connScene_, signalLevel);
+    switch (signalLevel) {
+        case SIG_LEVEL_0:
+            connScene_ == OUTDOOR_SCENE ? iodStatisticInfo.outdoorConnLevel0++ : iodStatisticInfo.indoorConnLevel0++;
+            break;
+        case SIG_LEVEL_1:
+            connScene_ == OUTDOOR_SCENE ? iodStatisticInfo.outdoorConnLevel1++ : iodStatisticInfo.indoorConnLevel1++;
+            break;
+        case SIG_LEVEL_2:
+            connScene_ == OUTDOOR_SCENE ? iodStatisticInfo.outdoorConnLevel2++ : iodStatisticInfo.indoorConnLevel2++;
+            break;
+        case SIG_LEVEL_3:
+            connScene_ == OUTDOOR_SCENE ? iodStatisticInfo.outdoorConnLevel3++ : iodStatisticInfo.indoorConnLevel3++;
+            break;
+        case SIG_LEVEL_4:
+            connScene_ == OUTDOOR_SCENE ? iodStatisticInfo.outdoorConnLevel4++ : iodStatisticInfo.indoorConnLevel4++;
+            break;
+        default:
+            WIFI_LOGE("Invalid signal level");
+            break;
+    }
+    WriteIodHiSysEvent(iodStatisticInfo);
 }
 
 int WifiSensorScene::GetMinRssiThres(int frequency)
@@ -61,7 +154,6 @@ int WifiSensorScene::GetMinRssiThres(int frequency)
         minRssi5G_ = MIN_RSSI_VALUE_5G;
     }
     int minRssi = frequency < MIN_5GHZ_BAND_FREQUENCY ? minRssi24G_ : minRssi5G_;
-    WIFI_LOGI("%{public}s scene %{public}d thres %{public}d", __FUNCTION__, scenario_, minRssi);
     return minRssi;
 }
 

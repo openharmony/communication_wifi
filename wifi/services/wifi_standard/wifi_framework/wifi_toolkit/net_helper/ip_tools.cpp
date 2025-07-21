@@ -301,7 +301,7 @@ std::string IpTools::ConvertIpv6AddressToCompleted(const std::string &address)
         if (seg.empty()) {
             seg = "0";
         }
-        int value = CheckDataLegal(seg);
+        int value = CheckDataLegalHex(seg);
         stream << std::setw(bitNum) << std::setfill('0') << std::hex << value;
     }
     return stream.str();

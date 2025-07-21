@@ -124,7 +124,6 @@ ohos_unittest("toolkit_unittest") {
   ]
   external_deps = [
     "c_utils:utils",
-    "cJSON:cjson",
     "certificate_manager:cert_manager_sdk",
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",
@@ -134,6 +133,7 @@ ohos_unittest("toolkit_unittest") {
     "icu:shared_icuuc",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "netstack:http_client",
     "samgr:samgr_proxy",

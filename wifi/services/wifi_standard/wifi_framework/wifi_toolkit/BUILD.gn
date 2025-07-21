@@ -158,7 +158,6 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_base:want",
       "c_utils:utils",
-      "cJSON:cjson",
       "certificate_manager:cert_manager_sdk",
       "common_event_service:cesfwk_innerkits",
       "dhcp:dhcp_sdk",
@@ -167,6 +166,7 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "icu:shared_icuuc",
       "ipc:ipc_single",
+      "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",

@@ -15,7 +15,7 @@
 
 #ifdef WIFI_SECURITY_DETECT_ENABLE
 #include <chrono>
-#include "cJSON.h"
+#include "json/json.h"
 #include "ip_tools.h"
 #include "wifi_security_detect.h"
 #include "wifi_security_detect_observer.h"
@@ -59,12 +59,17 @@ WifiSecurityDetect::WifiSecurityDetect()
 
 void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    if (state == OperateResState::CONNECT_AP_CONNECTED) {
+    std::unique_lock<std::mutex> lock(shareDetectMutex_);
+    if (state == OperateResState::CONNECT_NETWORK_ENABLED) {
         currentConnectedNetworkId_ = info.networkId;
-        SecurityDetect(info);
+        if (!networkDetecting_.load()) {
+            networkDetecting_.store(true);
+            SecurityDetect(info);
+        }
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         PopupNotification(WifiNotification::CLOSE, info.networkId);
-        currentConnectedNetworkId_ = -1;
+        currentConnectedNetworkId_.store(-1);
+        networkDetecting_.store(false);
     } else {
         return;
     }
@@ -77,7 +82,12 @@ StaServiceCallback WifiSecurityDetect::GetStaCallback() const
 
 void WifiSecurityDetect::SetDatashareReady()
 {
-    datashareReady_ = true;
+    datashareReady_.store(true);
+}
+
+void WifiSecurityDetect::SetChangeNetworkid(int networkId)
+{
+    currentConnectedNetworkId_.store(networkId);
 }
 
 std::shared_ptr<DataShare::DataShareHelper> WifiSecurityDetect::CreateDataShareHelper()
@@ -185,6 +195,7 @@ ErrCode WifiSecurityDetect::SecurityDetectResult(
         SecurityModelResult model = future.get();
         return SecurityModelJsonResult(model, result);
     } else {
+        WIFI_LOGE("RequestSecurityModelResultSync timeout");
         return WIFI_OPT_FAILED;
     }
 }
@@ -237,29 +248,25 @@ void WifiSecurityDetect::UnRegisterSecurityDetectObserver()
 
 ErrCode WifiSecurityDetect::SecurityModelJsonResult(SecurityModelResult model, bool &result)
 {
-    cJSON *root = cJSON_Parse(model.result.c_str());
-    if (root == nullptr) {
+    Json::Value root;
+    Json::Reader reader;
+    bool parsingSuccess = reader.parse(model.result, root);
+    if (!parsingSuccess) {
         WIFI_LOGE("model.result is null");
         return WIFI_OPT_FAILED;
     }
- 
-    cJSON *statusItem = cJSON_GetObjectItem(root, "status");
-    if (statusItem && cJSON_IsNumber(statusItem) && statusItem->valueint != 0) {
-        WIFI_LOGE("RequestSecurityModelResultSync status error= %d", statusItem->valueint);
-        cJSON_Delete(root);
+
+    if (root["status"].isInt() && root["status"].asInt() != 0) {
+        WIFI_LOGE("RequestSecurityModelResultSync status error= %{public}d", root["status"].asInt());
         return WIFI_OPT_FAILED;
     }
- 
-    cJSON *resultItem = cJSON_GetObjectItem(root, "result");
     std::string SecurityResult;
-    if (resultItem && cJSON_IsString(resultItem)) {
-        SecurityResult = resultItem->valuestring;
+    if (root["result"].isString()) {
+        SecurityResult = root["result"].asString();
     } else {
-        SecurityResult = "";
+        WIFI_LOGE("The result is not string");
+        return WIFI_OPT_FAILED;
     }
- 
-    cJSON_Delete(root);
-
     if (CheckDataLegal(SecurityResult) == 0) {
         WIFI_LOGI("SG wifi result is secure");
         result = true;
@@ -297,7 +304,7 @@ int32_t WifiSecurityDetect::AuthenticationConvert(std::string key)
     }
 }
 
-void WifiSecurityDetect::ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, cJSON *root)
+void WifiSecurityDetect::ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, Json::Value &root)
 {
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config) != 0) {
@@ -307,53 +314,45 @@ void WifiSecurityDetect::ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, cJ
     IpInfo wifiIpInfo;
     int32_t instId = 0;
     WifiConfigCenter::GetInstance().GetIpInfo(wifiIpInfo, instId);
- 
-    AddWifiStandardToJson(root, info.wifiStandard);
- 
-    cJSON_AddStringToObject(root, "ssid", config.ssid.c_str());
-    cJSON_AddStringToObject(root, "bssid", config.bssid.c_str());
-    cJSON_AddNumberToObject(root, "signalStrength", config.rssi);
-    cJSON_AddNumberToObject(root, "authentication", AuthenticationConvert(config.keyMgmt));
-    if (config.frequency >= MIN_5G_FREQUENCY && config.frequency <= MAX_5G_FREQUENCY) {
-        cJSON_AddStringToObject(root, "frequencyBand", "5GHz");
-    } else {
-        cJSON_AddStringToObject(root, "frequencyBand", "2.4GHz");
-    }
-    cJSON_AddStringToObject(root, "gatewayIp", IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress).c_str());
-    cJSON_AddStringToObject(root, "gatewayMac", config.macAddress.c_str());
-    cJSON_AddStringToObject(root, "primaryDns", IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns).c_str());
-    if (wifiIpInfo.secondDns == 0) {
-        cJSON_AddStringToObject(root, "secondDns", "0.0.0.0");
-    } else {
-        cJSON_AddStringToObject(root, "secondDns", IpTools::ConvertIpv4Address(wifiIpInfo.secondDns).c_str());
-    }
-}
- 
-void WifiSecurityDetect::AddWifiStandardToJson(cJSON *root, int wifiStandard)
-{
-    switch (wifiStandard) {
+    switch (info.wifiStandard) {
         case WireType::WIRE_802_11A:
-            cJSON_AddStringToObject(root, "wirelessType", "802.11a");
+            root["wirelessType"] = "802.11a";
             break;
         case WireType::WIRE_802_11B:
-            cJSON_AddStringToObject(root, "wirelessType", "802.11b");
+            root["wirelessType"] = "802.11b";
             break;
         case WireType::WIRE_802_11G:
-            cJSON_AddStringToObject(root, "wirelessType", "802.11g");
+            root["wirelessType"] = "802.11g";
             break;
         case WireType::WIRE_802_11N:
-            cJSON_AddStringToObject(root, "wirelessType", "802.11n");
+            root["wirelessType"] = "802.11n";
             break;
         case WireType::WIRE_802_11AC:
-            cJSON_AddStringToObject(root, "wirelessType", "802.11ac");
+            root["wirelessType"] = "802.11ac";
             break;
         case WireType::WIRE_802_11AX:
-            cJSON_AddStringToObject(root, "wirelessType", "802.11ax");
+            root["wirelessType"] = "802.11ax";
             break;
         default:
             WIFI_LOGE("wifi wirelessType is unknown");
-            cJSON_AddStringToObject(root, "wirelessType", "");
-            break;
+            root["wirelessType"] = "";
+    }
+    root["ssid"] = config.ssid;
+    root["bssid"] = config.bssid;
+    root["signalStrength"] = config.rssi;
+    root["authentication"] = AuthenticationConvert(config.keyMgmt);
+    if (config.frequency >= MIN_5G_FREQUENCY && config.frequency <= MAX_5G_FREQUENCY) {
+        root["frequencyBand"] = "5GHz";
+    } else {
+        root["frequencyBand"] = "2.4GHz";
+    }
+    root["gatewayIp"] = IpTools::ConvertIpv4Address(wifiIpInfo.ipAddress);
+    root["gatewayMac"] = config.macAddress;
+    root["primaryDns"] = IpTools::ConvertIpv4Address(wifiIpInfo.primaryDns);
+    if (wifiIpInfo.secondDns == 0) {
+        root["secondDns"] = "0.0.0.0";
+    } else {
+        root["secondDns"] = IpTools::ConvertIpv4Address(wifiIpInfo.secondDns);
     }
 }
 
@@ -373,18 +372,10 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
         return;
     }
 
-    cJSON *root = cJSON_CreateObject();
-    if (root == nullptr) {
-        WIFI_LOGE("Failed to create cJSON object");
-        return;
-    }
+    Json::Value root;
+    Json::FastWriter writer;
     ConverWifiLinkInfoToJson(info, root);
-    char *jsonStr = cJSON_PrintUnformatted(root);
-    if (jsonStr != nullptr) {
-        model.param = jsonStr;
-        free(jsonStr);
-    }
-    cJSON_Delete(root);
+    model.param = writer.write(root);
     WIFI_LOGI(
         "ssid:%{public}s bssid:%{public}s", SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str());
     securityDetectThread_->PostAsyncTask([=]() mutable -> int32_t {
@@ -414,6 +405,20 @@ void WifiSecurityDetect::PopupNotification(int status, int networkid)
     std::string bundleName = WifiSettings::GetInstance().GetPackageName("SECURITY_BUNDLE");
     want.SetElementName(bundleName, "WlanNotificationAbility");
     if (status == 1) {
+        if (!IsSettingSecurityDetectOn()) {
+            WIFI_LOGI("The SecurityDetect is off");
+            return;
+        }
+        if (networkid == -1) {
+            WIFI_LOGI("The networkid is off");
+            return;
+        }
+        if (currentConnectedNetworkId_.load() != networkid) {
+            WIFI_LOGI("The networkid is changed current networkid:%{public}d detect networkid:%{public}d",
+                currentConnectedNetworkId_.load(),
+                networkid);
+            return;
+        }
         want.SetParam("notificationType", WifiNotification::OPEN);
     } else {
         want.SetParam("notificationType", WifiNotification::CLOSE);

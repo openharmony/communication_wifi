@@ -517,36 +517,26 @@ void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
 
 void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
 {
-    cJSON *root = cJSON_CreateObject();
-    if (root == nullptr) {
-        WIFI_LOGE("Failed to create cJSON object");
-        return;
-    }
-    cJSON_AddNumberToObject(root, "OUTDOOR_FILTER_CNT", iodStatisticInfo.outdoorFilterCnt);
-    cJSON_AddNumberToObject(root, "OUTDOOR_SELECT_WIFI_CNT", iodStatisticInfo.outdoorAutoSelectCnt);
-    cJSON_AddNumberToObject(root, "IN_TO_OUTDOOR_CNT", iodStatisticInfo.in2OutCnt);
-    cJSON_AddNumberToObject(root, "OUT_TO_INDOOR_CNT", iodStatisticInfo.out2InCnt);
-    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL0", iodStatisticInfo.outdoorConnLevel0);
-    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL1", iodStatisticInfo.outdoorConnLevel1);
-    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL2", iodStatisticInfo.outdoorConnLevel2);
-    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL3", iodStatisticInfo.outdoorConnLevel3);
-    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_LEVEL4", iodStatisticInfo.outdoorConnLevel4);
-    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL0", iodStatisticInfo.indoorConnLevel0);
-    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL1", iodStatisticInfo.indoorConnLevel1);
-    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL2", iodStatisticInfo.indoorConnLevel2);
-    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL3", iodStatisticInfo.indoorConnLevel3);
-    cJSON_AddNumberToObject(root, "INDOOR_CONN_LEVEL4", iodStatisticInfo.indoorConnLevel4);
-    cJSON_AddNumberToObject(root, "OUTDOOR_CONN_SHORT", iodStatisticInfo.outdoorConnShortTime);
-    cJSON_AddNumberToObject(root, "INDOOR_CONN_SHORT", iodStatisticInfo.indoorConnShortTime);
- 
-    char *jsonStr = cJSON_PrintUnformatted(root);
-    if (jsonStr == nullptr) {
-        cJSON_Delete(root);
-        return;
-    }
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_IOD_STATISTIC", "EVENT_VALUE", std::string(jsonStr));
-    free(jsonStr);
-    cJSON_Delete(root);
+    Json::Value root;
+    Json::FastWriter writer;
+    root["OUTDOOR_FILTER_CNT"] = iodStatisticInfo.outdoorFilterCnt;
+    root["OUTDOOR_SELECT_WIFI_CNT"] = iodStatisticInfo.outdoorAutoSelectCnt;
+    root["IN_TO_OUTDOOR_CNT"] = iodStatisticInfo.in2OutCnt;
+    root["OUT_TO_INDOOR_CNT"] = iodStatisticInfo.out2InCnt;
+    root["OUTDOOR_CONN_LEVEL0"] = iodStatisticInfo.outdoorConnLevel0;
+    root["OUTDOOR_CONN_LEVEL1"] = iodStatisticInfo.outdoorConnLevel1;
+    root["OUTDOOR_CONN_LEVEL2"] = iodStatisticInfo.outdoorConnLevel2;
+    root["OUTDOOR_CONN_LEVEL3"] = iodStatisticInfo.outdoorConnLevel3;
+    root["OUTDOOR_CONN_LEVEL4"] = iodStatisticInfo.outdoorConnLevel4;
+    root["INDOOR_CONN_LEVEL0"] = iodStatisticInfo.indoorConnLevel0;
+    root["INDOOR_CONN_LEVEL1"] = iodStatisticInfo.indoorConnLevel1;
+    root["INDOOR_CONN_LEVEL2"] = iodStatisticInfo.indoorConnLevel2;
+    root["INDOOR_CONN_LEVEL3"] = iodStatisticInfo.indoorConnLevel3;
+    root["INDOOR_CONN_LEVEL4"] = iodStatisticInfo.indoorConnLevel4;
+    root["OUTDOOR_CONN_SHORT"] = iodStatisticInfo.outdoorConnShortTime;
+    root["INDOOR_CONN_SHORT"] = iodStatisticInfo.indoorConnShortTime;
+    
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_IOD_STATISTIC", "EVENT_VALUE", writer.write(root));
 }
 }  // namespace Wifi
 }  // namespace OHOS

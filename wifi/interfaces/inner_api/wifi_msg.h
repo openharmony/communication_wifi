@@ -79,6 +79,15 @@ inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
 inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 
+enum SigLevel {
+    SIG_LEVEL_0 = 0,
+    SIG_LEVEL_1 = 1,
+    SIG_LEVEL_2 = 2,
+    SIG_LEVEL_3 = 3,
+    SIG_LEVEL_4 = 4,
+    SIG_LEVEL_MAX = 4,
+};
+
 enum WifiRestrictedType {
     MDM_BLOCKLIST = 0,
     MDM_WHITELIST = 1,

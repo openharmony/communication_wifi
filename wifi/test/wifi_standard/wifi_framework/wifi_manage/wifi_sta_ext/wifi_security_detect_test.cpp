@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "json/json.h"
+#include "cJSON.h"
 #include "wifi_security_detect_test.h"
 
 using namespace testing::ext;

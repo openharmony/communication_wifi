@@ -17,6 +17,7 @@
 #define OHOS_WIFI_SECURITY_DETECT_TEST_H
 #include <gtest/gtest.h>
 #include "wifi_security_detect.h"
+#include "json/json.h"
 #include "datashare_helper.h"
 #include "sta_service_callback.h"
 #include "wifi_event_handler.h"

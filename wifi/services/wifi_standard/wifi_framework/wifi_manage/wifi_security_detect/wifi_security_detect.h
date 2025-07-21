@@ -15,7 +15,7 @@
 
 #ifndef WIFI_SECURITY_DETECT_H
 #define WIFI_SECURITY_DETECT_H
-#include "cJSON.h"
+#include "json/json.h"
 #include "sta_service_callback.h"
 #include "wifi_event_handler.h"
 #include "wifi_datashare_utils.h"
@@ -74,7 +74,6 @@ public:
     void SetChangeNetworkid(int networkid);
     void RegisterSecurityDetectObserver();
     void SecurityDetect(const WifiLinkedInfo &info);
-    void AddWifiStandardToJson(cJSON *root, int wifiStandard);
     void PopupNotification(int status, int networkid);
 
 private:
@@ -90,7 +89,7 @@ private:
     bool IsSecurityDetectTimeout(const int &networkId);
     ErrCode SecurityDetectResult(const std::string &devId, uint32_t modelId, const std::string &param, bool &result);
     ErrCode SecurityModelJsonResult(SecurityModelResult model, bool &result);
-    void ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, cJSON *root);
+    void ConverWifiLinkInfoToJson(const WifiLinkedInfo &info, Json::Value &root);
     int32_t AuthenticationConvert(std::string key);
     void UnRegisterSecurityDetectObserver();
 };

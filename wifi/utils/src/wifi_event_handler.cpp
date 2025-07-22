@@ -108,6 +108,7 @@ private:
 #elif WIFI_FFRT_ENABLE
 constexpr int WIFI_THREAD_TIMEOUT_LIMIT = 30 * 1000 * 1000; // 30s
 constexpr int WIFI_THREAD_MAX_CONCURRENCY = 1;
+const std::string WIFI_TASK_NAME = "WifiEventHandlerTask";
 inline ffrt_queue_t* TransferQueuePtr(std::shared_ptr<ffrt::queue> queue)
 {
     if (queue) {
@@ -185,14 +186,15 @@ public:
             WIFI_LOGE("PostAsyncTask: eventQueue is nullptr!");
             return false;
         }
+        std::string taskName = WIFI_TASK_NAME + "(" + name + ")";
         int64_t delayTimeUs = delayTime * 1000;
-        WIFI_LOGD("PostAsyncTask Enter %{public}s", name.c_str());
+        WIFI_LOGD("PostAsyncTask Enter %{public}s", taskName.c_str());
         ffrt::task_handle handle = nullptr;
         if (isHighPriority) {
             handle = eventQueue->submit_h(callback,
-                ffrt::task_attr().name(name.c_str()).delay(delayTimeUs).priority(ffrt_queue_priority_immediate));
+                ffrt::task_attr().name(taskName.c_str()).delay(delayTimeUs).priority(ffrt_queue_priority_immediate));
         } else {
-            handle = eventQueue->submit_h(callback, ffrt::task_attr().name(name.c_str()).delay(delayTimeUs));
+            handle = eventQueue->submit_h(callback, ffrt::task_attr().name(taskName.c_str()).delay(delayTimeUs));
         }
         if (handle == nullptr) {
             return false;
@@ -202,13 +204,14 @@ public:
     void RemoveAsyncTask(const std::string &name)
     {
         std::lock_guard<ffrt::mutex> lock(eventQurueMutex);
-        WIFI_LOGD("RemoveAsyncTask Enter %{public}s", name.c_str());
+        std::string taskName = WIFI_TASK_NAME + "(" + name + ")";
+        WIFI_LOGD("RemoveAsyncTask Enter %{public}s", taskName.c_str());
         ffrt_queue_t* queue = TransferQueuePtr(eventQueue);
         if (queue == nullptr) {
             WIFI_LOGE("RemoveAsyncTask is unavailable.");
             return;
         }
-        int ret = ffrt_queue_cancel_by_name(*queue, name.c_str());
+        int ret = ffrt_queue_cancel_by_name(*queue, taskName.c_str());
         if (ret != 0) {
             WIFI_LOGD("RemoveAsyncTask failed.");
         }
@@ -221,8 +224,9 @@ public:
             WIFI_LOGE("HasAsyncTask is unavailable.");
             return -1;
         }
-        bool result = ffrt_queue_has_task(*queue, name.c_str());
-        WIFI_LOGD("HasAsyncTask Enter %{public}s %{public}d", name.c_str(), static_cast<int>(result));
+        std::string taskName = WIFI_TASK_NAME + "(" + name + ")";
+        bool result = ffrt_queue_has_task(*queue, taskName.c_str());
+        WIFI_LOGD("HasAsyncTask Enter %{public}s %{public}d", taskName.c_str(), static_cast<int>(result));
         hasTask = result;
         return 0;
     }

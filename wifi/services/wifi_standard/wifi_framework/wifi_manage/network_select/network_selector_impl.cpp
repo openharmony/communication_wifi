@@ -23,6 +23,7 @@
 #include "wifi_filter_impl.h"
 #include "wifi_logger.h"
 #include "parameters.h"
+#include "wifi_global_func.h"
 
 using namespace std;
 
@@ -168,7 +169,7 @@ SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetw
     ExternalWifiFilterBuildManager::GetInstance().BuildFilter(FilterTag::SAVED_NETWORK_TRACKER_FILTER_TAG, *andFilter);
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
     shared_ptr<CustNetPreferredNetworkSelector> custNetPreferredNetworkSelector = nullptr;
-    if (NetworkSelectionUtils::CheckDeviceTypeByVendorCountry()) {
+    if (CheckDeviceTypeByVendorCountry()) {
         custNetPreferredNetworkSelector = make_shared<CustNetPreferredNetworkSelector>();
     }
 #endif

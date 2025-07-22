@@ -66,7 +66,7 @@ constexpr const char* TV_PRODUCT_DEVICE_TYPE = "tv";
 constexpr const char* PC_PRODUCT_DEVICE_TYPE = "2in1";
 constexpr const char* VENDOR_COUNTRY_KEY = "const.cust.custPath";
 constexpr const char* VENDOR_COUNTRY_DEFAULT = "";
-constexpr const char* SYS_PARAMETER_SIZE = "256";
+constexpr const int32_t SYS_PARAMETER_SIZE = "256";
 
 constexpr int PROP_FSS_ENABLE_LEN = 16;
 constexpr int FSS_ENABLE_LEN = 4;
@@ -590,11 +590,11 @@ bool CheckDeviceTypeByVendorCountry()
     char param[SYS_PARAMETER_SIZE] = { 0 };
     int errorCode = GetParamValue(VENDOR_COUNTRY_KEY, VENDOR_COUNTRY_DEFAULT, param, SYS_PARAMETER_SIZE);
     if (errorCode <= SYSTEM_PARAMETER_ERROR_CODE) {
-        WIFI_LOGE("get vendor country fail, errorCode: %{public}d", errorCode);
+        LOGE("get vendor country fail, errorCode: %{public}d", errorCode);
         return false;
     }
 
-    WIFI_LOGI("vendor country: %{public}s, errorCode: %{public}d.", param, errorCode);
+    LOGI("vendor country: %{public}s, errorCode: %{public}d.", param, errorCode);
     auto iter = std::string(param).find("hwit");
     return iter != std::string::npos;
 }

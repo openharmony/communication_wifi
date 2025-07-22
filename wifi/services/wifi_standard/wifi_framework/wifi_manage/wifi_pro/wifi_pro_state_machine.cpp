@@ -170,6 +170,14 @@ bool WifiProStateMachine::IsKeepCurrWifiConnected()
         WIFI_LOGI("IsKeepCurrWifiConnected: screen state off.");
         return true;
     }
+
+#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
+    if (CheckDeviceTypeByVendorCountry()) {
+        WIFI_LOGI("IsKeepCurrWifiConnected, IsItVersion, do not switch");
+        return true;
+    }
+#endif
+
     return false;
 }
 

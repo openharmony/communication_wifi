@@ -49,7 +49,7 @@ static void OnWpaStateChangedMock(int status, const std::string &ssid)
     LOGI("OnWpaStateChangedMock");
 }
 
-static void OnWpaSsidWrongKeyMock()
+static void OnWpaSsidWrongKeyMock(const std::string &bssid)
 {
     LOGI("OnWpaSsidWrongKeyMock");
 }
@@ -421,7 +421,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
               WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnWpaStateChanged(status, "test");
-    OnWpaSsidWrongKey();
+    OnWpaSsidWrongKey("");
     OnWpaConnectionFull(status);
     OnWpaConnectionReject(status);
     OnWpsOverlap(status);
@@ -430,7 +430,7 @@ HWTEST_F(WifiIdlInnerInterfaceTest, OnWpaStateChangedTest, TestSize.Level1)
     EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED,
             WifiStaHalInterface::GetInstance().RegisterStaEventCallback(callback, ifaceName));
     OnWpaStateChanged(status, "test");
-    OnWpaSsidWrongKey();
+    OnWpaSsidWrongKey("");
     OnWpaConnectionFull(status);
     OnWpaConnectionReject(status);
     OnWpsOverlap(status);

@@ -33,7 +33,7 @@ void OnWpaStateChanged(int status, const std::string &ssid)
     LOGD("OnWpaStateChanged status %d, ssid %s", status, ssid.c_str());
 }
 
-void OnWpaSsidWrongKey()
+void OnWpaSsidWrongKey(const std::string &ssid)
 {
     LOGD("OnWpaSsidWrongKey");
 }

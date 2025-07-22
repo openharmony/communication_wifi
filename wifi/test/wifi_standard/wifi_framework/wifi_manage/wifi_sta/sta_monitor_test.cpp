@@ -204,13 +204,13 @@ void StaMonitorTest::OnWpaStateChangedCallBackFail1()
 
 void StaMonitorTest::OnWpaSsidWrongKeyCallBackSuccess()
 {
-    pStaMonitor->OnWpaSsidWrongKeyCallBack();
+    pStaMonitor->OnWpaSsidWrongKeyCallBack("");
 }
 
 void StaMonitorTest::OnWpaSsidWrongKeyCallBackFail()
 {
     pStaMonitor->pStaStateMachine = nullptr;
-    pStaMonitor->OnWpaSsidWrongKeyCallBack();
+    pStaMonitor->OnWpaSsidWrongKeyCallBack("");
 }
 
 void StaMonitorTest::OnWpsPbcOverlapCallBackSuccess()

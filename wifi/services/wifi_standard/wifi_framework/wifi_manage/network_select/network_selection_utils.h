@@ -106,15 +106,6 @@ public:
     static bool HasWepKeys(const WifiDeviceConfig &wifiConfig);
  
     static bool IsSameFreqAsP2p(const NetworkCandidate &networkCandidate);
-
-#ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
-    /**
-     * Get vendor country from param to determine it is ItDevice.
-     * @param non
-     * @return return true if the vendor country is ItDevice
-     */
-    static bool CheckDeviceTypeByVendorCountry();
-#endif
 };
 }
 #endif

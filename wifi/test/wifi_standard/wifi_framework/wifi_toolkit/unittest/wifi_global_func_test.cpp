@@ -345,6 +345,11 @@ HWTEST_F(WifiGlobalFuncTest, IsFactoryModeTest, TestSize.Level1)
     EXPECT_FALSE(IsFactoryMode());
 }
 
+HWTEST_F(WifiGlobalFuncTest, CheckDeviceTypeByVendorCountryTest, TestSize.Level1)
+{
+    EXPECT_FALSE(CheckDeviceTypeByVendorCountry());
+}
+
 HWTEST_F(WifiGlobalFuncTest, ParseJsonTest, TestSize.Level1)
 {
     std::string jsonString = R"(

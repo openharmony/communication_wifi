@@ -31,7 +31,7 @@ public:
     virtual void OnConnectChangedCallBack(int status, int networkId, const std::string &bssid,
         int locallyGenerated) = 0;
     virtual void OnWpaStateChangedCallBack(int status, void *pInstance) = 0;
-    virtual void OnWpaSsidWrongKeyCallBack(void *pInstance) = 0;
+    virtual void OnWpaSsidWrongKeyCallBack(const std::string &bssid, void *pInstance) = 0;
     virtual void OnWpsPbcOverlapCallBack(int status, void *pInstance) = 0;
     virtual void OnWpsTimeOutCallBack(int status, void *pInstance) = 0;
 };
@@ -45,7 +45,7 @@ public:
     MOCK_METHOD4(OnConnectChangedCallBack, void(int status, int networkId, const std::string &bssid,
         int locallyGenerated));
     MOCK_METHOD2(OnWpaStateChangedCallBack, void(int status, void *pInstance));
-    MOCK_METHOD2(OnWpaSsidWrongKeyCallBack, void(void *pInstance));
+    MOCK_METHOD2(OnWpaSsidWrongKeyCallBack, void(const std::string &bssid, void *pInstance));
     MOCK_METHOD2(OnWpsPbcOverlapCallBack, void(int status, void *pInstance));
     MOCK_METHOD2(OnWpsTimeOutCallBack, void(int status, void *pInstance));
 };

@@ -446,6 +446,13 @@ bool IsFactoryMode();
 int GetDeviceType();
 
 /**
+ * @Description get vendor country from param to determine it is ItDevice.
+ *
+ * @return true - vendor country is ItDevice
+ */
+bool CheckDeviceTypeByVendorCountry();
+
+/**
  * @Description is wifi support opening automatically when first start up
  *
  * @return true - open

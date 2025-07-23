@@ -770,7 +770,6 @@ void WifiControllerMachine::EnableState::HandleSoftapClose(int id)
 void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 {
     WIFI_LOGE("HandleStaStartFailure");
-    pWifiControllerMachine->concreteManagers.RemoveManager(id);
     mWifiStartFailCount++;
     if (pWifiControllerMachine->ShouldEnableWifi(id) && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {
         pWifiControllerMachine->StartTimer(CMD_OPEN_WIFI_RETRY, WIFI_OPEN_RETRY_TIMEOUT);

@@ -17,6 +17,7 @@
 
 #include <functional>
 #include "net_all_capabilities.h"
+#include "net_supplier_info.h"
 #include "wifi_logger.h"
 #include "wifi_service_manager.h"
 #include "wifi_hisysevent.h"
@@ -26,16 +27,6 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiSensorScene");
-
-// same as NetManagerStandard::NetConnState
-enum NetConnState {
-    NET_CONN_STATE_UNKNOWN = 0,
-    NET_CONN_STATE_IDLE = 1,
-    NET_CONN_STATE_CONNECTING = 2,
-    NET_CONN_STATE_CONNECTED = 3,
-    NET_CONN_STATE_DISCONNECTING = 4,
-    NET_CONN_STATE_DISCONNECTED = 5,
-};
 
 constexpr int SCENARIO_UNKNOWN = -1;
 constexpr int SCENARIO_OUTDOOR = 1;
@@ -210,7 +201,7 @@ void WifiSensorScene::OnConnectivityChanged(int32_t bearType, int32_t code)
 {
     if ((bearType == NetManagerStandard::NetBearType::BEARER_WIFI ||
         bearType == NetManagerStandard::NetBearType::BEARER_CELLULAR) &&
-        code == NetConnState::NET_CONN_STATE_CONNECTED) {
+        code == NetManagerStandard::NetConnState::NET_CONN_STATE_CONNECTED) {
         RegisterSensorEnhCallback();
     }
 }

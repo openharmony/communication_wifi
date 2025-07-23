@@ -31,12 +31,6 @@ public:
     virtual void TearDown() {}
 };
 
-HWTEST_F(WifiSensorSceneTest, InitTest01, TestSize.Level1)
-{
-    WifiSensorScene::GetInstance().Init();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
-}
-
 HWTEST_F(WifiSensorSceneTest, InitCallbackTest01, TestSize.Level1)
 {
     WifiSensorScene::GetInstance().InitCallback();
@@ -106,10 +100,18 @@ HWTEST_F(WifiSensorSceneTest, SensorEnhCallbackTest03, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(WifiSensorSceneTest, RegisterSensorEnhCallbackTest01, TestSize.Level1)
+HWTEST_F(WifiSensorSceneTest, RegisterSensorEnhCallbackTestNotReg, TestSize.Level1)
 {
     WifiSensorScene::GetInstance().RegisterSensorEnhCallback();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiSensorSceneTest, RegisterSensorEnhCallbackTestAlreadyReg, TestSize.Level1)
+{
+    WifiSensorScene::GetInstance().isCallbackReg_ = true;
+    WifiSensorScene::GetInstance().RegisterSensorEnhCallback();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_TRUE(WifiSensorScene::GetInstance().isCallbackReg_);
 }
 
 HWTEST_F(WifiSensorSceneTest, IsOutdoorSceneTest01, TestSize.Level1)
@@ -117,5 +119,24 @@ HWTEST_F(WifiSensorSceneTest, IsOutdoorSceneTest01, TestSize.Level1)
     WifiSensorScene::GetInstance().IsOutdoorScene();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+HWTEST_F(WifiSensorSceneTest, OnConnectivityChangedTestWiFiConn, TestSize.Level1)
+{
+    WifiSensorScene::GetInstance().OnConnectivityChanged(1, 1);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+
+    WifiSensorScene::GetInstance().OnConnectivityChanged(1, 3);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiSensorSceneTest, OnConnectivityChangedTestCellConn, TestSize.Level1)
+{
+    WifiSensorScene::GetInstance().OnConnectivityChanged(0, 1);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+
+    WifiSensorScene::GetInstance().OnConnectivityChanged(0, 3);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 }
 }

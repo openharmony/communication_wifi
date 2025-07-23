@@ -97,7 +97,9 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DEVICE_IDLE_MODE_CHANGED, &
     CesEventSubscriber::OnReceiveStandbyEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED, &
-    CesEventSubscriber::OnReceiveUserUnlockedEvent}
+    CesEventSubscriber::OnReceiveUserUnlockedEvent},
+    {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE, &
+    CesEventSubscriber::OnReceiveConnectivityChangedEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -1191,6 +1193,17 @@ void CesEventSubscriber::OnReceiveUserUnlockedEvent(const OHOS::EventFwk::Common
 #endif
 }
 
+void CesEventSubscriber::OnReceiveConnectivityChangedEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    const std::string netBearTypeKey = "NetType";
+    const int32_t netBearTypeDefault = -1;
+    int32_t bearType = eventData.GetWant().GetIntParam(netBearTypeKey, netBearTypeDefault);
+    int32_t code = eventData.GetCode();
+
+    WIFI_LOGI("%{public}s net: %{public}d code: %{public}d", __FUNCTION__, bearType, code);
+    WifiSensorScene::GetInstance().OnConnectivityChanged(bearType, code);
+}
+
 void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()
 {
     std::unique_lock<std::mutex> lock(networkStateChangeEventMutex);
@@ -1419,7 +1432,6 @@ void DataShareReadySubscriber::OnReceiveEvent(const EventFwk::CommonEventData &e
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
         WifiManager::GetInstance().GetWifiEventSubscriberManager()->AccessDataShare();
         WifiManager::GetInstance().GetWifiEventSubscriberManager()->RegisterLocationEvent();
-        WifiSensorScene::GetInstance().Init();
 #ifdef WIFI_SECURITY_DETECT_ENABLE
         WifiSecurityDetect::GetInstance().SetDatashareReady();
         WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();

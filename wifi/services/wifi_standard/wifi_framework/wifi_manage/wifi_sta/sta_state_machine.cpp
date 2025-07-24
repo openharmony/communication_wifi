@@ -615,39 +615,9 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
 
-    if (networkId == pStaStateMachine->targetNetworkId_) {
-        WIFI_LOGI("This network is connecting and does not need to be reconnected m_instId = %{public}d",
-            pStaStateMachine->m_instId);
+    if (NotAllowConnectToNetwork(networkId, bssid, connTriggerMode)) {
         return;
     }
-
-    WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, pStaStateMachine->m_instId) != 0) {
-        WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", networkId);
-        return;
-    }
-
-    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE) {
-        WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
-            pStaStateMachine->m_instId);
-        return;
-    }
-
-    if (connTriggerMode == NETWORK_SELECTED_BY_AUTO && !AllowAutoConnect()) {
-        WIFI_LOGI("SupplicantState is TransientState, refuse auto connect");
-        return;
-    }
-
-    if (config.hiddenSSID && NotExistInScanList(config)) {
-        DealHiddenSsidConnectMiss(networkId);
-        return;
-    }
-
-#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
-    if (RestrictedByMdm(config)) {
-        return;
-    }
-#endif
 
     if (pStaStateMachine->StartConnectToNetwork(networkId, bssid, connTriggerMode) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to network failed: %{public}d.\n", networkId);
@@ -659,6 +629,48 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
     }
     pStaStateMachine->SwitchState(pStaStateMachine->pApLinkingState);
     return;
+}
+
+bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode)
+{
+    if (networkId == pStaStateMachine->targetNetworkId_) {
+        WIFI_LOGI("This network is connecting and does not need to be reconnected m_instId = %{public}d",
+            pStaStateMachine->m_instId);
+        return true;
+    }
+
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, pStaStateMachine->m_instId) != 0) {
+        WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", networkId);
+        return true;
+    }
+
+    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE) {
+        WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
+            pStaStateMachine->m_instId);
+        return true;
+    }
+
+    if (connTriggerMode == NETWORK_SELECTED_BY_AUTO && !AllowAutoConnect()) {
+        WIFI_LOGI("SupplicantState is TransientState, refuse auto connect");
+        return true;
+    }
+
+    if (config.hiddenSSID && NotExistInScanList(config)) {
+        DealHiddenSsidConnectMiss(networkId);
+        return true;
+    }
+
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, !config.bssid.empty())) {
+        WIFI_LOGI("NotAllowConnectToNetwork, RestrictedByMdm");
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
+            DisabledReason::DISABLED_MDM_RESTRICTED);
+        return true;
+    }
+#endif
+
+    return false;
 }
 
 bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)

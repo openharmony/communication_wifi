@@ -26,6 +26,7 @@ ohos_shared_library("wifimanager_ani") {
   sources = [ "src/wifi_manager_ani.cpp" ]
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   external_deps = [
+    "c_utils:utils",
     "runtime_core:ani",
     "runtime_core:libarkruntime",
     "samgr:samgr_proxy",

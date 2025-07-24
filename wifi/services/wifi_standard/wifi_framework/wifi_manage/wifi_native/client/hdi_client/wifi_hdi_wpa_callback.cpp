@@ -58,7 +58,7 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         return 1;
     }
     uint32_t bssidLen = disconectParam->bssidLen;
-    char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+    char szBssid[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
     if (ConvertMacArr2String(disconectParam->bssid, bssidLen, szBssid, sizeof(szBssid)) != 0) {
         LOGE("%{public}s: failed to convert mac!", __func__);
         return 1;
@@ -84,7 +84,8 @@ int32_t OnEventDisconnected(struct IWpaCallback *self,
         g_currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
         (reasonCode != Wifi80211ReasonCode::WLAN_REASON_IE_IN_4WAY_DIFFERS || !locallyGenerated)) {
         LOGI("OnEventDisconnected, wrong password");
-        cbk.onWpaSsidWrongKey();
+        std::string bssid = std::string(szBssid);
+        cbk.onWpaSsidWrongKey(bssid);
         OHOS::Wifi::WriteAuthFailHiSysEvent("WRONG_PSWD", reasonCode);
     }
     if (cbk.onConnectChanged) {
@@ -110,7 +111,7 @@ int32_t OnEventConnected(struct IWpaCallback *self,
         return 1;
     }
     uint32_t bssidLen = connectParam->bssidLen;
-    char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+    char szBssid[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
     if (ConvertMacArr2String(connectParam->bssid, bssidLen, szBssid, sizeof(szBssid)) != 0) {
         LOGE("%{public}s: failed to convert mac!", __func__);
         return 1;
@@ -142,7 +143,7 @@ int32_t OnEventBssidChanged(struct IWpaCallback *self,
     } else {
         LOGE("OnEventBssidChanged: invalid reasonLen:%{public}u", bssidChangedParam->reasonLen);
     }
-    char szBssid[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+    char szBssid[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
     if (ConvertMacArr2String(bssidChangedParam->bssid, bssidChangedParam->bssidLen, szBssid, sizeof(szBssid)) != 0) {
         LOGE("OnEventBssidChanged: failed to convert mac!");
         return 1;
@@ -212,7 +213,7 @@ int32_t OnEventTempDisabled(struct IWpaCallback *self,
         ifName);
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (cbk.onWpaSsidWrongKey && reason == "AUTH_FAILED") {
-        cbk.onWpaSsidWrongKey();
+        cbk.onWpaSsidWrongKey("");
     }
     return 0;
 }
@@ -260,7 +261,8 @@ int32_t OnEventAssociateReject(struct IWpaCallback *self,
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
     if (isWrongPwd && cbk.onWpaSsidWrongKey) {
         LOGI("onWpaConnectionRejectCallBack, wrong password");
-        cbk.onWpaSsidWrongKey();
+        std::string bssidString = std::string(bssid);
+        cbk.onWpaSsidWrongKey(bssidString);
         OHOS::Wifi::WriteAuthFailHiSysEvent(failReason, statusCode);
         return 0;
     }
@@ -351,7 +353,7 @@ int32_t OnEventAuthTimeout(struct IWpaCallback *self, const char *ifName)
     if (g_currentWpaStatus == static_cast<int>(OHOS::Wifi::SupplicantState::FOUR_WAY_HANDSHAKE) &&
         cbk.onWpaSsidWrongKey) {
         LOGI("OnEventAuthTimeout, wrong password");
-        cbk.onWpaSsidWrongKey();
+        cbk.onWpaSsidWrongKey("");
         OHOS::Wifi::WriteAuthFailHiSysEvent("WRONG_PSWD");
         return 0;
     }
@@ -481,12 +483,12 @@ int32_t OnEventDeviceFound(struct IWpaCallback *self,
     if (cbk.onDeviceFound) {
         OHOS::Wifi::HalP2pDeviceFound cbInfo;
         uint32_t srcAddressLen = deviceInfoParam->srcAddressLen;
-        char srcAddress[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char srcAddress[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(deviceInfoParam->srcAddress, srcAddressLen, srcAddress, sizeof(srcAddress));
         cbInfo.srcAddress = srcAddress;
 
         uint32_t p2pDeviceAddressLen = deviceInfoParam->p2pDeviceAddressLen;
-        char p2pDeviceAddress[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char p2pDeviceAddress[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(deviceInfoParam->p2pDeviceAddress, p2pDeviceAddressLen,
             p2pDeviceAddress, sizeof(p2pDeviceAddress));
         cbInfo.p2pDeviceAddress = p2pDeviceAddress;
@@ -519,7 +521,7 @@ int32_t OnEventDeviceLost(struct IWpaCallback *self,
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onDeviceLost) {
         uint32_t p2pDeviceAddressLen = deviceLostParam->p2pDeviceAddressLen;
-        char p2pDeviceAddress[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char p2pDeviceAddress[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(deviceLostParam->p2pDeviceAddress, p2pDeviceAddressLen,
             p2pDeviceAddress, sizeof(p2pDeviceAddress));
         cbk.onDeviceLost(p2pDeviceAddress);
@@ -537,7 +539,7 @@ int32_t OnEventGoNegotiationRequest(struct IWpaCallback *self,
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onGoNegotiationRequest) {
-        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(goNegotiationRequestParam->srcAddress,
             goNegotiationRequestParam->srcAddressLen, address, sizeof(address));
 
@@ -582,17 +584,17 @@ int32_t OnEventInvitationReceived(struct IWpaCallback *self,
         cbInfo.persistentNetworkId = invitationReceivedParam->persistentNetworkId;
         cbInfo.operatingFrequency = invitationReceivedParam->operatingFrequency;
 
-        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(invitationReceivedParam->srcAddress,
             invitationReceivedParam->srcAddressLen, address, sizeof(address));
         cbInfo.srcAddress = address;
 
-        char address1[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address1[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(invitationReceivedParam->goDeviceAddress,
             invitationReceivedParam->goDeviceAddressLen, address1, sizeof(address1));
         cbInfo.goDeviceAddress = address1;
 
-        char address2[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address2[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(invitationReceivedParam->bssid,
             invitationReceivedParam->bssidLen, address2, sizeof(address2));
         cbInfo.bssid = address2;
@@ -611,7 +613,7 @@ int32_t OnEventInvitationResult(struct IWpaCallback *self,
     }
     const OHOS::Wifi::P2pHalCallback &cbk = OHOS::Wifi::WifiP2PHalInterface::GetInstance().GetP2pCallbackInst();
     if (cbk.onInvitationResult) {
-        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(invitationResultParam->bssid,
             invitationResultParam->bssidLen, address, sizeof(address));
         cbk.onInvitationResult(address, invitationResultParam->status);
@@ -665,7 +667,7 @@ int32_t OnEventGroupStarted(struct IWpaCallback *self,
         LOGI("OnEventGroupStarted groupName=%{public}s ssid=%{private}s len=%{public}zu",
             cbInfo.groupName.c_str(), OHOS::Wifi::SsidAnonymize(cbInfo.ssid).c_str(), cbInfo.ssid.size());
 
-        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(groupStartedParam->goDeviceAddress,
             groupStartedParam->goDeviceAddressLen, address, sizeof(address));
         cbInfo.goDeviceAddress = address;
@@ -695,8 +697,8 @@ int32_t OnEventGroupInfoStarted(struct IWpaCallback *self,
         cbInfo.ssid = (char *)(tempSsid);
         cbInfo.psk = (char *)(groupStartedParam->psk);
         cbInfo.passphrase = (char *)(groupStartedParam->passphrase);
-        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
-        char address1[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
+        char address1[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(groupStartedParam->goDeviceAddress,
             groupStartedParam->goDeviceAddressLen, address, sizeof(address));
         ConvertMacArr2String(groupStartedParam->goRandomDeviceAddress,
@@ -734,7 +736,7 @@ int32_t OnEventProvisionDiscoveryCompleted(struct IWpaCallback *self,
     LOGI("OnEventProvisionDiscoveryCompleted provDiscStatusCode=%{public}d",
         provisionDiscoveryCompletedParam->provDiscStatusCode);
     uint32_t addressLen = provisionDiscoveryCompletedParam->p2pDeviceAddressLen;
-    char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+    char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
     ConvertMacArr2String(provisionDiscoveryCompletedParam->p2pDeviceAddress,
         addressLen, address, sizeof(address));
 
@@ -788,7 +790,7 @@ int32_t OnEventServDiscReq(struct IWpaCallback *self,
         cbInfo.dialogToken = servDiscReqInfoParam->dialogToken;
         cbInfo.updateIndic = servDiscReqInfoParam->updateIndic;
 
-        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(servDiscReqInfoParam->mac, servDiscReqInfoParam->macLen,
             address, sizeof(address));
         cbInfo.mac = address;
@@ -814,7 +816,7 @@ int32_t OnEventServDiscResp(struct IWpaCallback *self,
         if (servDiscRespParam->tlvs != nullptr) {
             OHOS::Wifi::Char2Vec(servDiscRespParam->tlvs, servDiscRespParam->tlvsLen, tlvList);
         }
-        char address[WIFI_HDI_STR_MAC_LENGTH +1] = {0};
+        char address[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
         ConvertMacArr2String(servDiscRespParam->srcAddress, servDiscRespParam->srcAddressLen,
             address, sizeof(address));
         cbk.onServiceDiscoveryResponse(address, servDiscRespParam->updateIndicator, tlvList);

@@ -1298,6 +1298,11 @@ void StaStateMachine::ApLinkingState::HandleStaBssidChangedEvent(InternalMessage
 
 void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMessagePtr msg)
 {
+    std::string bssid = msg->GetStringFromMessage();
+    WIFI_LOGI("ApLinkingState reveived wpa passwd wrong event, bssid:%{public}s.\n", MacAnonymize(bssid).c_str());
+    if (bssid != "") {
+        pStaStateMachine->linkedInfo.bssid = bssid;
+    }
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
     if (BlockConnectService::GetInstance().IsWrongPassword(pStaStateMachine->targetNetworkId_)) {

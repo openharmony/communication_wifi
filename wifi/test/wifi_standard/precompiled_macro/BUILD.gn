@@ -139,7 +139,6 @@ ohos_unittest("precompiled_macro_unittest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "jsoncpp:jsoncpp",
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",

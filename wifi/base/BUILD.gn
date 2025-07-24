@@ -116,12 +116,12 @@ if (defined(ohos_lite)) {
     external_deps = [
       "ability_runtime:extension_manager",
       "c_utils:utils",
+      "cJSON:cjson",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
       "hicollie:libhicollie",
       "hilog:libhilog",
       "ipc:ipc_single",
-      "jsoncpp:jsoncpp",
       "libxml2:libxml2",
       "openssl:libcrypto_shared",
       "openssl:libssl_shared",

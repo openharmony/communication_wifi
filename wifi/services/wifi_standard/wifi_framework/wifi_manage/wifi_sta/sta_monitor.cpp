@@ -49,7 +49,7 @@ ErrCode StaMonitor::InitStaMonitor()
         },
         [this](const std::string &reason, const std::string &bssid) { this->OnBssidChangedCallBack(reason, bssid); },
         [this](int status, const std::string &ssid) { this->OnWpaStateChangedCallBack(status, ssid); },
-        [this]() { this->OnWpaSsidWrongKeyCallBack(); },
+        [this](const std::string &bssid) { this->OnWpaSsidWrongKeyCallBack(bssid); },
         [this](int status) { this->OnWpsPbcOverlapCallBack(status); },
         [this](int status) { this->OnWpsTimeOutCallBack(status); },
         [this]() { this->OnWpaAuthTimeOutCallBack(); },
@@ -222,7 +222,7 @@ void StaMonitor::OnWpaStateChangedCallBack(int status, const std::string &ssid)
     pStaStateMachine->SendMessage(msg);
 }
 
-void StaMonitor::OnWpaSsidWrongKeyCallBack()
+void StaMonitor::OnWpaSsidWrongKeyCallBack(const std::string &bssid)
 {
     WIFI_LOGI("OnWpaSsidWrongKeyCallBack");
     if (pStaStateMachine == nullptr) {
@@ -231,7 +231,10 @@ void StaMonitor::OnWpaSsidWrongKeyCallBack()
     }
 
     /* Notification state machine wpa password wrong event. */
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
+    msg->AddStringMessageBody(bssid);
+    pStaStateMachine->SendMessage(msg);
 }
 
 void StaMonitor::OnWpaConnectionFullCallBack(int status)

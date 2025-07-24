@@ -88,8 +88,10 @@ public:
 
     /**
      * @Description : Callback of the Wpa ssid wrong key event.
+     *
+     * @param bssid: bssid of the network [in]
      */
-    void OnWpaSsidWrongKeyCallBack();
+    void OnWpaSsidWrongKeyCallBack(const std::string &bssid);
 
     /**
      * @Description : Callback of the Connection Full event.

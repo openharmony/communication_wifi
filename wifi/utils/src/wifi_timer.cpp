@@ -26,6 +26,7 @@ WifiTimer *WifiTimer::GetInstance()
 #ifdef WIFI_FFRT_ENABLE
 WifiTimer::WifiTimer() : timer_(std::make_unique<WifiEventHandler>("WifiManagerTimer"))
 {
+    std::lock_guard<std::mutex> lock(timerMutex_);
     timerIdInit = 0;
 }
 
@@ -42,6 +43,7 @@ ErrCode WifiTimer::Register(const TimerCallback &callback, uint32_t &outTimerId,
         WIFI_LOGE("timer_ is nullptr");
         return WIFI_OPT_FAILED;
     }
+    std::lock_guard<std::mutex> lock(timerMutex_);
     timerIdInit++;
     outTimerId = timerIdInit;
     bool ret = timer_->PostAsyncTask(callback, std::to_string(timerIdInit), interval);

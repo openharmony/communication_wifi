@@ -41,6 +41,7 @@ public:
 
 private:
     std::unique_ptr<WifiEventHandler> timer_{nullptr};
+    std::mutex timerMutex_;
     uint32_t timerIdInit = 0;
 };
 #else

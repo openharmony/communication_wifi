@@ -345,6 +345,11 @@ HWTEST_F(WifiHdiWpaCallbackTest, onEventStaJoinTest, TestSize.Level1)
     apCbParm.content = const_cast<char *>(str4);
     result = onEventStaJoin(nullptr, &apCbParm, "wlan0");
     EXPECT_EQ(result, 1);
+
+    const char *str5 = "AP-STA-CONNECTED 11:22:**:**:**:330";
+    apCbParm.content = const_cast<char *>(str5);
+    result = onEventStaJoin(nullptr, &apCbParm, "wlan0");
+    EXPECT_EQ(result, 0);
 }
 
 HWTEST_F(WifiHdiWpaCallbackTest, onEventApStateTest, TestSize.Level1)

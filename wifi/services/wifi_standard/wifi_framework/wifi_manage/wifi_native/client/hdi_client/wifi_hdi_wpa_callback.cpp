@@ -400,7 +400,11 @@ int32_t onEventStaJoin(struct IHostapdCallback *self, const struct HdiApCbParm *
         return 1;
     }
 
-    if (strcpy_s(tmpBuf, sizeof(tmpBuf), apCbParm->content + len + 1) != 0) {
+    if (sizeof(tmpBuf) < WIFI_HDI_STR_MAC_LENGTH) {
+        LOGE("onEvenStaJoin: tmpBuf len invalid!");
+    }
+
+    if (memcpy_s(tmpBuf, sizeof(tmpBuf), apCbParm->content + len + 1, WIFI_HDI_STR_MAC_LENGTH) != 0) {
         LOGE("onEvenStaJoin: strcpy_s failed!");
     }
 

@@ -321,21 +321,6 @@ WifiIntelligenceStateMachine::DisabledState::~DisabledState() {}
 void WifiIntelligenceStateMachine::DisabledState::GoInState()
 {
     WIFI_LOGI("Enter DisabledState GoInState function.");
-    pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ = false;
-    pWifiIntelligenceStateMachine_->StopScanAp();
-    std::vector<WifiScanInfo> scanInfoList;
-    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
-    if (scanInfoList.size() == 0) {
-        WIFI_LOGE("get scan result is null.");
-    }
-    if (!pWifiIntelligenceStateMachine_->mTargetSsid_.empty()) {
-        ApInfoHelper::GetInstance().SetBlackListBySsid(pWifiIntelligenceStateMachine_->mTargetSsid_,
-            pWifiIntelligenceStateMachine_->mTargetAuthType_, 1);
-    }
-    pWifiIntelligenceStateMachine_->mTargetSsid_ = "";
-    pWifiIntelligenceStateMachine_->mTargetAuthType_ = "";
-    ApInfoHelper::GetInstance().ResetBlacklist(scanInfoList, 1);
-    pWifiIntelligenceStateMachine_->InitPunishParameter();
 }
 
 void WifiIntelligenceStateMachine::InitPunishParameter()
@@ -636,6 +621,21 @@ WifiIntelligenceStateMachine::StopState::~StopState() {}
 void WifiIntelligenceStateMachine::StopState::GoInState()
 {
     WIFI_LOGI("Enter StopState GoInState function.");
+    pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ = false;
+    pWifiIntelligenceStateMachine_->StopScanAp();
+    std::vector<WifiScanInfo> scanInfoList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
+    if (scanInfoList.size() == 0) {
+        WIFI_LOGE("get scan result is null.");
+    }
+    if (!pWifiIntelligenceStateMachine_->mTargetSsid_.empty()) {
+        ApInfoHelper::GetInstance().SetBlackListBySsid(pWifiIntelligenceStateMachine_->mTargetSsid_,
+            pWifiIntelligenceStateMachine_->mTargetAuthType_, 1);
+    }
+    pWifiIntelligenceStateMachine_->mTargetSsid_ = "";
+    pWifiIntelligenceStateMachine_->mTargetAuthType_ = "";
+    ApInfoHelper::GetInstance().ResetBlacklist(scanInfoList, 1);
+    pWifiIntelligenceStateMachine_->InitPunishParameter();
 }
 
 void WifiIntelligenceStateMachine::StopState::GoOutState()

@@ -822,7 +822,7 @@ WifiErrorNo SetHdiApIfaceName(const char *ifaceName)
         return WIFI_HAL_OPT_FAILED;
     }
 
-    if (strncmp(ifaceName, AP_IFNAME_COEX, IFACENAME_LEN -1) == 0) {
+    if (strncmp(ifaceName, AP_IFNAME_COEX, strlen(AP_IFNAME_COEX)) == 0) {
         if (strcpy_s(g_apCfgName, CFGNAME_LEN, WIFI_COEX_CFG) != EOK
             || strcpy_s(g_apIfaceName, IFACENAME_LEN, AP_IFNAME_COEX) != EOK
             || strcpy_s(g_hostapdCfg, CTRL_LEN, HOSTAPD_DEFAULT_CFG_COEX) != EOK) {

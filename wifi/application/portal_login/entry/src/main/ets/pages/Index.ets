@@ -214,7 +214,7 @@ struct Index {
   }
 
   build() {
-    Flex({ direction: FlexDirection.Column }) { {
+    Flex({ direction: FlexDirection.Column }) {
       // Action bar
       Column() {
         Row() {

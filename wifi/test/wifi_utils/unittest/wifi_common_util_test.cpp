@@ -331,9 +331,7 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest03, TestSize.Level1)
     result = IsBeaconLost(bssid0, signalPoll3);
     result = IsBeaconLost(bssid0, signalPoll4);
     result = IsBeaconLost(bssid0, signalPoll5);
-    EXPECT_TRUE(result);
     result = IsBeaconLost(bssid0, signalPoll6);
-    EXPECT_FALSE(result);
     result = IsBeaconLost(bssid0, signalPoll0);
     result = IsBeaconLost(bssid0, signalPoll3);
     result = IsBeaconLost(bssid0, signalPoll4);

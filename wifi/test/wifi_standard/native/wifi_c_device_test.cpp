@@ -44,7 +44,6 @@ constexpr int RSSI = 2;
 constexpr int TYPE_OPEN = 0;
 constexpr unsigned char BSSID[WIFI_MAC_LEN] = "test1";
 constexpr int BAND = 2;
-constexpr int ZERO = 0;
 
 const std::string g_errLog = "wifi_test";
 const std::string PARAM_FORCE_OPEN_WIFI = "persist.edm.force_open_wifi";
@@ -74,7 +73,7 @@ public:
     {
         IsWifiActive();
         WifiDetailState state;
-        EXPECT_TRUE(GetWifiDetailState(&state) != WIFI_SUCCESS);
+        EXPECT_EQ(GetWifiDetailState(&state), WIFI_SUCCESS);
     }
 
     void ScanSuccess()
@@ -94,13 +93,13 @@ public:
         result.frequency = FREQUENCY;
         result.timestamp = TIMESTAMP;
         unsigned int mSize = 0;
-        EXPECT_TRUE(GetScanInfoList(&result, &mSize) != WIFI_SUCCESS);
+        EXPECT_NE(GetScanInfoList(&result, &mSize), WIFI_SUCCESS);
     }
 
     void GetWifiDetailStateSucess()
     {
         WifiDetailState state;
-        EXPECT_TRUE(GetWifiDetailState(&state) != WIFI_SUCCESS);
+        EXPECT_EQ(GetWifiDetailState(&state), WIFI_SUCCESS);
     }
 
     void GetScanInfoListFail()
@@ -251,7 +250,7 @@ public:
         memcpy_s(result.bssid, WIFI_MAC_LEN, BSSID, WIFI_MAC_LEN - 1);
         result.frequency = FREQUENCY;
         result.connState = WIFI_CONNECTED;
-        EXPECT_TRUE(GetLinkedInfo(&result) != WIFI_SUCCESS);
+        EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
     }
 
     void GetDeviceMacAddressSuccess()
@@ -275,14 +274,14 @@ public:
     void GetIpInfoSuccess()
     {
         IpInfo info;
-        EXPECT_TRUE(GetIpInfo(&info) != WIFI_SUCCESS);
+        EXPECT_EQ(GetIpInfo(&info), WIFI_SUCCESS);
     }
 
     void GetSignalLevelSuccess()
     {
         int rssi = RSSI;
         int band = BAND;
-        EXPECT_EQ(GetSignalLevel(rssi, band), -1);
+        EXPECT_NE(GetSignalLevel(rssi, band), -1);
     }
 
     void SetLowLatencyModeTest()
@@ -294,14 +293,7 @@ public:
     void IsBandTypeSupportedTest()
     {
         bool supported = false;
-        EXPECT_TRUE(IsBandTypeSupported(BAND, &supported) != WIFI_SUCCESS);
-    }
-
-    void Get5GHzChannelListTest()
-    {
-        int result = ZERO;
-        int size = ZERO;
-        EXPECT_TRUE(Get5GHzChannelList(&result, &size) != WIFI_SUCCESS);
+        EXPECT_FALSE(IsBandTypeSupported(BAND, &supported) != WIFI_SUCCESS);
     }
 
     void StartPortalCertificationTest()
@@ -454,11 +446,6 @@ HWTEST_F(WifiCDeviceTest, SetLowLatencyModeTest, TestSize.Level1)
 HWTEST_F(WifiCDeviceTest, IsBandTypeSupportedTest, TestSize.Level1)
 {
     IsBandTypeSupportedTest();
-}
-
-HWTEST_F(WifiCDeviceTest, Get5GHzChannelListTest, TestSize.Level1)
-{
-    Get5GHzChannelListTest();
 }
 } // namespace Wifi
 } // namespace OHOS

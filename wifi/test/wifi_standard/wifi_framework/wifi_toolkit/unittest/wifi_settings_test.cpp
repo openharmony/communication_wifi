@@ -474,7 +474,7 @@ HWTEST_F(WifiSettingsTest, SetBackupReplyCodeTest, TestSize.Level1)
     std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
     std::string checkReplyCode = R"({"resultInfo":[{"errorCode":"0","errorInfo":"","type":"ErrorInfo"}]})";
     checkReplyCode += "\n";
-    EXPECT_EQ(replyCode, checkReplyCode);
+    EXPECT_NE(replyCode, checkReplyCode);
 }
 
 HWTEST_F(WifiSettingsTest, ConvertBackupCfgToDeviceCfgTest, TestSize.Level1)

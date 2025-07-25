@@ -35,10 +35,11 @@ public:
 
     static WifiSensorScene &GetInstance();
 
-    void Init();
+    void OnConnectivityChanged(int32_t bearType, int32_t code);
     int GetMinRssiThres(int frequency);
     bool IsOutdoorScene();
     StaServiceCallback GetStaCallback() const;
+
 private:
     void RegisterSensorEnhCallback();
     void SensorEnhCallback(int scenario);
@@ -59,6 +60,7 @@ private:
     int connScene_ = UNKNOW_SCENE;
     int reportRssi_ = 0;
     StaServiceCallback staCallback_;
+    bool isCallbackReg_;
 };
 
 }  // namespace Wifi

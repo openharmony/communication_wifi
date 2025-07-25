@@ -3,6 +3,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { setUrl, setNetId, setShouldShowBrowseItem } from '../common/utils';
 import { emitter } from '@kit.BasicServicesKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x01560;
 const TAG = 'Entry';
@@ -37,6 +38,23 @@ export default class EntryAbility extends UIAbility {
         hilog.error(DOMAIN, TAG, 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;
       }
+      let windowClass: window.Window = windowStage.getMainWindowSync();
+      let isLayoutFullScreen = true;
+      windowClass.setWindowLayoutFullScreen(isLayoutFullScreen).then(() => {
+        console.info('Succeeded in setting the window layout to full-screen mode.');
+      }).catch((err: BusinessError) => {
+        console.error('Failed to set the window layout to full-screen mode. Cause:' + JSON.stringify(err));
+      });
+      let type = window.AvoidAreaType.TYPE_SYSTEM;
+      let avoidArea = windowClass.getWindowAvoidArea(type);
+      let topRectHeight = avoidArea.topRect.height;
+      AppStorage.setOrCreate('topRectHeight', topRectHeight);
+      windowClass.on('avoidAreaChange', (data) => {
+        if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
+          let topRectHeight = data.area.topRect.height;
+          AppStorage.setOrCreate('topRectHeight', topRectHeight);
+        }
+      });
       hilog.info(DOMAIN, TAG, 'Succeeded in loading the content.');
     });
   }

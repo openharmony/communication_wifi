@@ -26,7 +26,7 @@ ohos_shared_library("wifimanager_ani") {
   sources = [ "src/wifi_manager_ani.cpp" ]
   deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
   external_deps = [
-    "bounds_checking_function:libsec_static",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "runtime_core:ani",
     "runtime_core:libarkruntime",

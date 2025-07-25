@@ -16,12 +16,13 @@
 #include "wifi_sensor_scene.h"
 
 #include <functional>
+#include "net_all_capabilities.h"
+#include "net_supplier_info.h"
 #include "wifi_logger.h"
 #include "wifi_service_manager.h"
 #include "wifi_hisysevent.h"
 #include "wifi_settings.h"
 #include "wifi_config_center.h"
-#include <mutex>
 
 namespace OHOS {
 namespace Wifi {
@@ -39,7 +40,7 @@ constexpr int MIN_RSSI_VALUE_OUTDOOR_5G = -72;
 constexpr int CONN_RSSI_CNT = 10;
 
 WifiSensorScene::WifiSensorScene() : scenario_(SCENARIO_UNKNOWN),
-    minRssi24G_(MIN_RSSI_VALUE_24G), minRssi5G_(MIN_RSSI_VALUE_5G)
+    minRssi24G_(MIN_RSSI_VALUE_24G), minRssi5G_(MIN_RSSI_VALUE_5G), isCallbackReg_(false)
 {
     InitCallback();
 }
@@ -48,11 +49,6 @@ WifiSensorScene &WifiSensorScene::GetInstance()
 {
     static WifiSensorScene gWifiSensorScene;
     return gWifiSensorScene;
-}
-
-void WifiSensorScene::Init()
-{
-    RegisterSensorEnhCallback();
 }
 
 void WifiSensorScene::InitCallback()
@@ -175,6 +171,11 @@ void WifiSensorScene::SensorEnhCallback(int scenario)
 
 void WifiSensorScene::RegisterSensorEnhCallback()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (isCallbackReg_) {
+        return;
+    }
+
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("%{public}s get pEnhance service failed!", __FUNCTION__);
@@ -184,6 +185,9 @@ void WifiSensorScene::RegisterSensorEnhCallback()
         SensorEnhCallback(scenario);
     };
     ErrCode ret = pEnhanceService->RegisterSensorEnhanceCallback(callback);
+    if (ret == WIFI_OPT_SUCCESS) {
+        isCallbackReg_ = true;
+    }
     WIFI_LOGI("%{public}s ret %{public}d", __FUNCTION__, ret);
 }
 
@@ -192,5 +196,15 @@ bool WifiSensorScene::IsOutdoorScene()
     std::lock_guard<std::mutex> lock(mutex_);
     return scenario_ == SCENARIO_OUTDOOR;
 }
+
+void WifiSensorScene::OnConnectivityChanged(int32_t bearType, int32_t code)
+{
+    if ((bearType == NetManagerStandard::NetBearType::BEARER_WIFI ||
+        bearType == NetManagerStandard::NetBearType::BEARER_CELLULAR) &&
+        code == NetManagerStandard::NetConnState::NET_CONN_STATE_CONNECTED) {
+        RegisterSensorEnhCallback();
+    }
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

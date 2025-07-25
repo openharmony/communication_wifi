@@ -5,7 +5,7 @@ import { common, OpenLinkOptions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
 import {
-  getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet
+  getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet, validateURL
 } from '../common/utils'
 import { connection } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
@@ -73,13 +73,13 @@ struct Index {
   @State private isSelectUASheetVisible: boolean = false;
   @State private adaptPadding: number = 16;
   @State private loadProgress: number = 0;
-  private actionBarHeight = 56;
   private sheetItemHeight = 50;
   private contextMenuWidth = 224;
   private netConnect: connection.NetConnection = connection.createNetConnection();
   private isInOOBE: boolean = false;
   @State mode: WebDarkMode = WebDarkMode.Auto;
   @State access: boolean = true;
+  @StorageProp('topRectHeight') topRectHeight: number = 0;
 
   @Builder
   ContextMenu() {
@@ -136,7 +136,6 @@ struct Index {
         .alignItems(HorizontalAlign.Start)
       }
       .alignItems(VerticalAlign.Bottom)
-      .height(this.actionBarHeight)
 
       // UA list
       Column() {
@@ -215,7 +214,7 @@ struct Index {
   }
 
   build() {
-    Column() {
+    Flex({ direction: FlexDirection.Column }) { {
       // Action bar
       Column() {
         Row() {
@@ -296,7 +295,9 @@ struct Index {
           })
       }
       .width('100%')
-      .height(this.actionBarHeight)
+      .constraintSize({
+        minHeight: '56vp'
+      })
       .backgroundColor($r('sys.color.ohos_id_color_background'))
 
       Web({ src: this.webUrl, controller: this.webviewController })
@@ -306,7 +307,7 @@ struct Index {
         .domStorageAccess(true)
         .onOverrideUrlLoading((request) => {
           const url = request.getRequestUrl();
-          if (!url.startsWith('http') && !url.startsWith('https')) {
+          if (validateURL(url) && !url.startsWith('http') && !url.startsWith('https')) {
             (this.getUIContext().getHostContext() as common.UIAbilityContext).openLink(url)
               .then(() => {
                 hilog.info(DOMAIN, TAG, 'open link success.');               
@@ -389,6 +390,7 @@ struct Index {
         .backgroundColor($r('sys.color.ohos_id_color_background'))
         .width('100%')
     }
+    .padding({ top: px2vp(this.topRectHeight) })
   }
 
   aboutToAppear(): void {

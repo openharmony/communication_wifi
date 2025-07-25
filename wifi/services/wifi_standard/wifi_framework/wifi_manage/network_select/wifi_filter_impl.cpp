@@ -476,8 +476,6 @@ bool SignalLevelFilter::Filter(NetworkCandidate &networkCandidate)
     if (signalLevel > SIGNAL_LEVEL_TWO) {
         return true;
     }
-    WIFI_LOGI("SignalLevelFilter, rssi:%{public}d, band:%{public}d, skip candidate:%{public}s", interScanInfo.rssi,
-        interScanInfo.band, networkCandidate.ToString().c_str());
     networkCandidate.filtedReason[filterName].insert(FiltedReason::POOR_SIGNAL);
     return false;
 }

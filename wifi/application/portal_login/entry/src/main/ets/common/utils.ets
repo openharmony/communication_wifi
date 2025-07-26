@@ -24,10 +24,11 @@ export function shouldShowBrowseItem(): boolean {
   return shouldShowBrowseItem_;
 }
 
-function validateURL(urlString: string): boolean {
+export function validateURL(urlString: string): boolean {
   try {
     const urlObject = url.URL.parseURL(urlString);
     if (urlObject && urlObject.hostname) {
+      hilog.info(DOMAIN, TAG, '%{public}s', 'validateURL:' + urlObject.hostname);
       return true;
     }
   } catch (error) {

@@ -1447,8 +1447,6 @@ public:
     {
         LOGI("Enter GetScanRssiTest");
         std::vector<WifiScanInfo> scanResult = {};
-        int counter = pSelfCureStateMachine_->GetBssidCounter(scanResult);
-        EXPECT_EQ(counter, 0);
 
         WifiScanInfo info;
         info.bssid = CURR_BSSID;

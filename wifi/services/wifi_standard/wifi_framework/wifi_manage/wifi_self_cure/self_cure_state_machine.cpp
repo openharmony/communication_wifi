@@ -2172,32 +2172,6 @@ bool SelfCureStateMachine::IsUseFactoryMac()
     return false;
 }
 
-int SelfCureStateMachine::GetBssidCounter(const std::vector<WifiScanInfo> &scanResults)
-{
-    WifiLinkedInfo wifiLinkedInfo;
-    WifiDeviceConfig config;
-    int counter = 0;
-    if (scanResults.empty()) {
-        WIFI_LOGI("scanResults ie empty.");
-        return 0;
-    }
-    WifiConfigCenter::GetInstance().GetLinkedInfo(wifiLinkedInfo);
-    std::string currentSsid = wifiLinkedInfo.ssid;
-    WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, config);
-    std::string configKey = config.keyMgmt;
-    if (currentSsid.empty() || configKey.empty()) {
-        return 0;
-    }
-    for (WifiScanInfo nextResult : scanResults) {
-        std::string scanSsid = nextResult.ssid;
-        std::string capabilities = nextResult.capabilities;
-        if (currentSsid == scanSsid && SelfCureUtils::GetInstance().IsSameEncryptType(capabilities, configKey)) {
-            counter += 1;
-        }
-    }
-    return counter;
-}
-
 bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
 {
     WIFI_LOGI("enter %{public}s", __FUNCTION__);
@@ -2218,7 +2192,7 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
     }
     std::vector<WifiScanInfo> scanResults;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
-    if (GetBssidCounter(scanResults) < MULTI_BSSID_NUM) {
+    if (GetBssidCounter(config, scanResults) < MULTI_BSSID_NUM) {
         WIFI_LOGI("not multi bssid condition!");
         return false;
     }

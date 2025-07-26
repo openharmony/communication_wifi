@@ -429,5 +429,72 @@ HWTEST_F(WifiGlobalFuncTest, SplitStringBySubstringTest3, TestSize.Level1)
     SplitStringBySubstring(inData, outData, subBegin, subEnd);
     EXPECT_TRUE(outData.length() == 0);
 }
+
+HWTEST_F(WifiGlobalFuncTest, IsSameEncryptTypeTest, TestSize.Level1)
+{
+    std::string deviceKeymgmt = "WPA-PSK";
+    std::string scanInfoKeymgmt = "WPA-PSK";
+    bool result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    deviceKeymgmt = "WPA-EAP";
+    scanInfoKeymgmt = "WPA-EAP";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    deviceKeymgmt = "SAE";
+    scanInfoKeymgmt = "SAE";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    deviceKeymgmt = "SAE";
+    scanInfoKeymgmt = "WPA2-PSK";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+
+    deviceKeymgmt = "NONE";
+    scanInfoKeymgmt = "NONE";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    deviceKeymgmt = "NONE";
+    scanInfoKeymgmt = "WPA-PSK";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+
+    deviceKeymgmt = "Invalid";
+    scanInfoKeymgmt = "WPA-PSK";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiGlobalFuncTest, GetBssidCounterTest, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = {};
+    int counter = GetBssidCounter(scanResults);
+    EXPECT_EQ(counter, 0);
+    
+    WifiScanInfo info;
+    info.bssid = "";
+    info.ssid = "ssid";
+    info.bssidType = 0;
+    scanResults = {info};
+    GetBssidCounter(scanResults);
+
+    WifiDeviceConfig config;
+    config.keyMgmt = "";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    GetBssidCounter(scanResults);
+
+    info.bssid = CURR_BSSID;
+    scanResults = {info};
+    GetBssidCounter(scanResults);
+
+    config.keyMgmt = "WPA_PSK";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    GetBssidCounter(scanResults);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -496,6 +496,10 @@ void ConvertDecStrToHexStr(const std::string &inData, std::string &outData);
  */
 void SplitStringBySubstring(const std::string &inData, std::string &outData, const std::string &subBegin,
     const std::string &subEnd);
+
+int GetBssidCounter(const WifiDeviceConfig &config, const std::vector<WifiScanInfo> &scanResults);
+
+bool IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& deviceKeymgmt);
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

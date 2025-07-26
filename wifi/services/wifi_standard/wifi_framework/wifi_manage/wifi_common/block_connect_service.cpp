@@ -28,6 +28,8 @@ constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 1 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 0.5 * 60 * 1000 * 1000;
 #ifndef OHOS_ARCH_LITE
 constexpr int64_t TIMEOUT_CLEAR_SET = 4 * 60 * 1000;
+constexpr int32_t MIN_RSSI_LEVEL_3 = -75
+constexpr int32_t MIN_BSSID_COUNT = 2;
 #endif
 
 BlockConnectService &BlockConnectService::GetInstance()
@@ -446,6 +448,7 @@ void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::str
     if (disableReason == DisabledReason::DISABLED_DHCP_FAILURE) {
         std::lock_guard<std::mutex> lock(dhcpFailMutex_);
         IpInfo lastDhcpResults;
+        WifiConfigCenter::GetInstance().GetIpInfo(lastDhcpResults);
         std::vector<WifiScanInfo> scanResults;
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
         int32_t rssi = -200;
@@ -455,7 +458,8 @@ void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::str
             }
         }
         int32_t bssidCnt = GetBssidCounter(targetNetwork, scanResults);
-        if (!bssid.empty() && rssi >= -70 && bssidCnt >= 2 && lastDhcpResults.ipAddress == 0) {
+        if (!bssid.empty() && rssi >= MIN_RSSI_LEVEL_3 && bssidCnt >= MIN_BSSID_COUNT
+            && lastDhcpResults.ipAddress == 0) {
             WIFI_LOGI("NotifyWifiConnFailedInfo, add %{public}s as dhcpFailBssidSet, reason:%{public}s",
                 MacAnonymize(bssid).c_str(), static_cast<int32_t>(disableReason));
             dhcpFailBssids_.insert(bssid);

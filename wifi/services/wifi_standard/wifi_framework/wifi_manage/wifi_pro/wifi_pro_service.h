@@ -54,6 +54,7 @@ private:
     void NotifyWifi2WifiFailed(OperateResState state);
     void NotifyWifiConnectStateChanged(OperateResState state, const WifiLinkedInfo &linkedInfo);
     void NotifyCheckWifiInternetResult(OperateResState state);
+    void NotifyWifiEmlsrStateChanged(OperateResState state, const WifiLinkedInfo &linkedInfo);
 };
 
 }  // namespace Wifi

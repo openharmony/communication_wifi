@@ -55,6 +55,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     }
     WifiDeviceConfig wifiDeviceConfig;
     WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, wifiDeviceConfig);
+    InitConnectedAp(wifiLinkedInfo, wifiDeviceConfig);
     connectedAp_->is5gAfterPerf = is5gAfterPerf;
     connectedAp_->perf5gStrategyName = strategyName;
     bool isHwItCustNetwork = false;

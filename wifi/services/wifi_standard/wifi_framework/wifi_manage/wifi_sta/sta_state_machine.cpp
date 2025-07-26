@@ -1806,6 +1806,8 @@ void StaStateMachine::GetIpState::DealGetDhcpIpTimeout(InternalMessagePtr msg)
     WIFI_LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT DealGetDhcpIpTimeout");
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
                                                                  DisabledReason::DISABLED_DHCP_FAILURE);
+    BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
+        pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_DHCP_FAILURE);
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     pStaStateMachine->StartDisConnectToNetwork();
     WriteDhcpFailHiSysEvent("DHCP_TIMEOUT");
@@ -3434,6 +3436,8 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResultFailed()
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
         DisabledReason::DISABLED_DHCP_FAILURE);
+    BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
+        pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_DHCP_FAILURE);
 
     WIFI_LOGI("DhcpResultNotify OnFailed type: %{public}d, sucNum: %{public}d, failNum: %{public}d",
         pStaStateMachine->currentTpType, pStaStateMachine->getIpSucNum, pStaStateMachine->getIpFailNum);

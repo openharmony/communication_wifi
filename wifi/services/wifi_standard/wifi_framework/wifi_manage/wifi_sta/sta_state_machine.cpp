@@ -2526,6 +2526,7 @@ void StaStateMachine::LinkedState::GoInState()
     BlockConnectService::GetInstance().EnableNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId);
 #ifndef OHOS_ARCH_LITE
     BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
+    BlockConnectService::GetInstance().ReleaseDhcpFailBssidSet();
 #endif
     WifiSettings::GetInstance().SyncDeviceConfig();
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);

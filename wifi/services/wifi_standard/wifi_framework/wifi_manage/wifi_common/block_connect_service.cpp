@@ -47,7 +47,7 @@ BlockConnectService::BlockConnectService()
         {DisabledReason::DISABLED_AUTHENTICATION_FAILURE,
          DisablePolicy(5 * 60 * 1000 * 1000, 3, WifiDeviceConfigStatus::DISABLED)},
         {DisabledReason::DISABLED_DHCP_FAILURE,
-         DisablePolicy(5 * 60 * 1000 * 1000, 2, WifiDeviceConfigStatus::DISABLED)},
+         DisablePolicy(5 * 60 * 1000 * 1000, 5, WifiDeviceConfigStatus::DISABLED)},
         {DisabledReason::DISABLED_NO_INTERNET_TEMPORARY,
          DisablePolicy(5 * 60 * 1000 * 1000, 1, WifiDeviceConfigStatus::DISABLED)},
         {DisabledReason::DISABLED_AUTHENTICATION_NO_CREDENTIALS,

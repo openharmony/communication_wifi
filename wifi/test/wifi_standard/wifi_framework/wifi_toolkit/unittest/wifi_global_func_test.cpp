@@ -470,31 +470,31 @@ HWTEST_F(WifiGlobalFuncTest, IsSameEncryptTypeTest, TestSize.Level1)
 
 HWTEST_F(WifiGlobalFuncTest, GetBssidCounterTest, TestSize.Level1)
 {
-    std::vector<WifiScanInfo> scanResults = {};
-    int counter = GetBssidCounter(scanResults);
-    EXPECT_EQ(counter, 0);
-    
-    WifiScanInfo info;
-    info.bssid = "";
-    info.ssid = "ssid";
-    info.bssidType = 0;
-    scanResults = {info};
-    GetBssidCounter(scanResults);
-
     WifiDeviceConfig config;
-    config.keyMgmt = "";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
-    GetBssidCounter(scanResults);
-
-    info.bssid = CURR_BSSID;
-    scanResults = {info};
-    GetBssidCounter(scanResults);
-
-    config.keyMgmt = "WPA_PSK";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
-    GetBssidCounter(scanResults);
+    config.ssid = "test111";
+    config.keyMgmt = "WPA-PSK";
+    std::vector<WifiScanInfo> scanResults = {};
+    EXPECT_EQ(0, GetBssidCounter(config, scanResults));
+    
+    WifiScanInfo temp1;
+    temp1.ssid = "test111";
+    temp1.bssid ="11:22:33:44:55:66";
+    temp1.capabilities = "PSK+SAE";
+    scanResults.push_back(temp1);
+    EXPECT_EQ(1, GetBssidCounter(config, scanResults));
+ 
+    WifiScanInfo temp2;
+    temp2.ssid = "test111";
+    temp2.bssid ="22:33:44:55:66:77";
+    temp2.capabilities = "PSK";
+    scanResults.push_back(temp2);
+    EXPECT_EQ(2, GetBssidCounter(config, scanResults));
+ 
+    config.keyMgmt = "WPA-SAE";
+    EXPECT_EQ(1, GetBssidCounter(config, scanResults));
+ 
+    config.keyMgmt = "WPA-EAP";
+    EXPECT_EQ(0, GetBssidCounter(config, scanResults));
 }
 }  // namespace Wifi
 }  // namespace OHOS

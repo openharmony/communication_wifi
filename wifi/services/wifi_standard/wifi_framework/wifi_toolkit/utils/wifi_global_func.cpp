@@ -197,6 +197,10 @@ ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport)
         case OperateResState::CONNECT_ASSOCIATED:
             isReport = false;
             return ConnState::UNKNOWN;
+        case OperateResState::CONNECT_EMLSR_START:
+        case OperateResState::CONNECT_EMLSR_END:
+            isReport = false;
+            return ConnState::UNKNOWN;
         default:
             isReport = true;
             return ConnState::UNKNOWN;

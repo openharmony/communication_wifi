@@ -972,10 +972,24 @@ bool WifiProStateMachine::WifiHasNetState::ExecuteStateMsg(InternalMessagePtr ms
         case EVENT_DETECT_TIMEOUT:
             RequestHttpDetect(true);
             break;
+        case EVENT_EMLSR_STATE_CHANGED:
+            HandleWifiEmlsrStateChanged(msg);
+            break;
         default:
             return false;
     }
     return true;
+}
+
+void WifiProStateMachine::WifiHasNetState::HandleWifiEmlsrStateChanged(const InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGI("HandleWifiEmlsrStateChanged, msg is nullptr.");
+        return;
+    }
+    WifiLinkedInfo linkedInfo;
+    msg->GetMessageObj(linkedInfo);
+    pWifiProStateMachine_->perf5gHandoverService_.OnConnected(linkedInfo);
 }
 
 void WifiProStateMachine::WifiHasNetState::HandleRssiChangedInHasNet(const InternalMessagePtr msg)

@@ -56,6 +56,7 @@ struct ConnectedAp {
     std::string perf5gStrategyName;
     bool canNotPerf;
     bool isMloConnected;
+    WifiLinkType wifiLinkType = WifiLinkType::DEFAULT_LINK;
     ConnectedAp()
     {}
 };

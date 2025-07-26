@@ -110,6 +110,8 @@ private:
     std::mutex bssidMutex_;
     std::mutex clearSetTimerMutex_;
     uint32_t clearSetTimerId_ {0};
+    std::set<std::string> dhcpFailBssids_;
+    std::mutex dhcpFailMutex_;
 #endif
 };
 }

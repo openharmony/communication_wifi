@@ -312,8 +312,7 @@ static void ParseScanInfo(std::vector<ScanResultsInfo> &scanResultsInfo, std::ve
         WifiScanResultExt wifiScanResultExt = {0};
         ConvertScanResultsInfo(wifiScanResultExt, scanResult);
         char buff[HDI_SCAN_RESULTS_MAX_LEN] = {0};
-        int buffLen = HDI_SCAN_RESULTS_MAX_LEN;
-        buffLen = GetScanResultText(&wifiScanResultExt, &elems, buff, buffLen);
+        int buffLen = GetScanResultText(&wifiScanResultExt, &elems, buff, HDI_SCAN_RESULTS_MAX_LEN);
         ScanInfo scanInfo;
         if (memset_s(&scanInfo, sizeof(scanInfo), 0, sizeof(scanInfo)) != EOK) {
             LOGE("%{public}s: memset_s is failed", __func__);

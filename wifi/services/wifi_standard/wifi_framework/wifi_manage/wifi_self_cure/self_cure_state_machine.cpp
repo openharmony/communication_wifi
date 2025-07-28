@@ -34,6 +34,7 @@
 #include "wifi_common_event_helper.h"
 #include "wifi_country_code_manager.h"
 #include "self_cure_utils.h"
+#include "wifi_global_func.h"
 
 namespace OHOS {
 namespace Wifi {

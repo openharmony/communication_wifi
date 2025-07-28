@@ -314,12 +314,12 @@ int HexStringToVec(const std::string &str, std::vector<char> &vec)
     }
     const int hexShiftNum = 4;
     for (unsigned i = 0; i + 1 < len;) {
-        uint8_t high = static_cast<uint8_t>(IsValidHexCharAndConvert(str[i]));
-        uint8_t low = static_cast<uint8_t>(IsValidHexCharAndConvert(str[i + 1]));
+        int8_t high = IsValidHexCharAndConvert(str[i]);
+        int8_t low = IsValidHexCharAndConvert(str[i + 1]);
         if (high < 0 || low < 0) {
             return -1;
         }
-        char tmp = ((high << hexShiftNum) | (low & 0x0F));
+        char tmp = ((static_cast<uint8_t>(high) << hexShiftNum) | (static_cast<uint8_t>(low) & 0x0F));
         vec.push_back(tmp);
         i += 2; //2:拼接char类型的高四位和第四位
     }

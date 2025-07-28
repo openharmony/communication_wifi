@@ -152,6 +152,19 @@ std::vector<int> SplitStringToIntVector(const std::string &str, const std::strin
     return res;
 }
 
+ConnState ConvertConnStateInternalExtral(OperateResState resState, bool &isReport)
+{
+    switch (resState) {
+        case OperateResState::CONNECT_EMLSR_START:
+        case OperateResState::CONNECT_EMLSR_END:
+            isReport = false;
+            return ConnState::UNKNOWN;
+        default:
+            isReport = true;
+            return ConnState::UNKNOWN;
+    }
+}
+
 ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport)
 {
     switch (resState) {
@@ -197,13 +210,8 @@ ConnState ConvertConnStateInternal(OperateResState resState, bool &isReport)
         case OperateResState::CONNECT_ASSOCIATED:
             isReport = false;
             return ConnState::UNKNOWN;
-        case OperateResState::CONNECT_EMLSR_START:
-        case OperateResState::CONNECT_EMLSR_END:
-            isReport = false;
-            return ConnState::UNKNOWN;
         default:
-            isReport = true;
-            return ConnState::UNKNOWN;
+            return ConvertConnStateInternalExtral(resState, isReport);
     }
 }
 

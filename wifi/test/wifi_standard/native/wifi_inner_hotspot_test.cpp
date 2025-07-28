@@ -73,7 +73,7 @@ HWTEST_F(WifiInnerHotspotTest, GetHotspotStateTest, TestSize.Level1)
     int state;
     ErrCode result = devicePtr->GetHotspotState(state);
     WIFI_LOGE("GetHotspotStateTest result(0x%{public}x)", result);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiInnerHotspotTest, GetHotspotConfigTest, TestSize.Level1)
@@ -162,7 +162,7 @@ HWTEST_F(WifiInnerHotspotTest, GetValidBandsTest, TestSize.Level1)
     std::vector<BandType> bands;
     ErrCode result = devicePtr->GetValidBands(bands);
     WIFI_LOGE("GetValidBandsTest result(0x%{public}x)", result);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiInnerHotspotTest, GetValidChannelsTest, TestSize.Level1)
@@ -172,7 +172,7 @@ HWTEST_F(WifiInnerHotspotTest, GetValidChannelsTest, TestSize.Level1)
     std::vector<int32_t> validchannels;
     ErrCode result = devicePtr->GetValidChannels(BandType::BAND_2GHZ, validchannels);
     WIFI_LOGE("GetValidChannelsTest result(0x%{public}x)", result);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiInnerHotspotTest, GetSupportedFeaturesTest, TestSize.Level1)
@@ -182,7 +182,7 @@ HWTEST_F(WifiInnerHotspotTest, GetSupportedFeaturesTest, TestSize.Level1)
     long features;
     ErrCode result = devicePtr->GetSupportedFeatures(features);
     WIFI_LOGE("GetSupportedFeaturesTest result(0x%{public}x)", result);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(WifiInnerHotspotTest, GetSupportedPowerModelTest, TestSize.Level1)

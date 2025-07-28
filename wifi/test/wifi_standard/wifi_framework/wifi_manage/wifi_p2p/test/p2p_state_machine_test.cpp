@@ -431,6 +431,10 @@ public:
         std::vector<WifiP2pGroupInfo> groups = pP2pStateMachine->groupManager.GetGroups();
         return groups.size();
     }
+    bool WarpHasP2pConnected()
+    {
+        return pP2pStateMachine->HasP2pConnected();
+    }
 };
 
 void ButtonTest(AlertDialog &dialog, std::any ctx)
@@ -987,6 +991,11 @@ HWTEST_F(P2pStateMachineTest, WakeUpScreenSaverTest, TestSize.Level1)
 {
     WarpWakeUpScreenSaver();
     EXPECT_FALSE(g_errLog.find("P2pStateMachine") != std::string::npos);
+}
+
+HWTEST_F(P2pStateMachineTest, HasP2pConnectedTest, TestSize.Level1)
+{
+    EXPECT_FALSE(WarpHasP2pConnected());
 }
 }  // namespace Wifi
 }  // namespace OHOS

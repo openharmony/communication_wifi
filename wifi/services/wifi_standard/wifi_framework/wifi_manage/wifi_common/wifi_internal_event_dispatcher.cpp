@@ -1100,5 +1100,18 @@ bool WifiInternalEventDispatcher::IsAppFrozen(int pid)
     }
     return false;
 }
+
+int WifiInternalEventDispatcher::GetRemoteUid(const sptr<IRemoteObject> &remote)
+{
+    int uid = -1;
+    if (remote != nullptr) {
+        std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
+        auto cbInfo = mP2pCallbackInfo.find(remote);
+        if (cbInfo != mP2pCallbackInfo.end()) {
+            uid = cbInfo->second.callingUid;
+        }
+    }
+    return uid;
+}
 }  // namespace Wifi
 }  // namespace OHOS

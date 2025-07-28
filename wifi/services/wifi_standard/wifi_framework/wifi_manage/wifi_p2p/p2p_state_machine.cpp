@@ -1437,5 +1437,11 @@ void P2pStateMachine::WakeUpScreenSaver()
     WIFI_LOGI("Wake up screen saver success");
 }
 #endif
+
+bool P2pStateMachine::HasP2pConnected(void)
+{
+    WifiP2pLinkedInfo info = groupManager.GetP2pInfo();
+    return info.GetConnectState() == P2pConnectedState::P2P_CONNECTED;
+}
 } // namespace Wifi
 } // namespace OHOS

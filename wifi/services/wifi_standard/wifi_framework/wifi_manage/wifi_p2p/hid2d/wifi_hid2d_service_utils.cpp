@@ -209,5 +209,23 @@ void SharedLinkManager::PrintMapInfo(void)
     }
     WIFI_LOGI("sharelink map is %{public}s", mapInfo.c_str());
 }
+
+bool SharedLinkManager::CheckNeedRemoveGroup(int uid)
+{
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+    if (sharedLinkCountMap.find(uid) != sharedLinkCountMap.end()) {
+        sharedLinkCountMap[uid] = 0;
+    }
+    PrintMapInfo();
+    int sharedLinkCount = 0;
+    for (auto iter : sharedLinkCountMap) {
+        sharedLinkCount += iter.second;
+    }
+    if (sharedLinkCount == 0) {
+        WIFI_LOGI("all create group server has died, need remove group");
+        return true;
+    }
+    return false;
+}
 }  // namespace Wifi
 }  // namespace OHOS

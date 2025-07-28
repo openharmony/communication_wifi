@@ -710,7 +710,7 @@ int GetBssidCounter(const WifiDeviceConfig &config, const std::vector<WifiScanIn
 {
     int counter = 0;
     if (scanResults.empty()) {
-        WIFI_LOGI("scanResults ie empty.");
+        LOGI("scanResults ie empty.");
         return 0;
     }
 

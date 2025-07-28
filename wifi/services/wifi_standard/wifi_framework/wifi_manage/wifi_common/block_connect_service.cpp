@@ -28,8 +28,9 @@ constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 1 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 0.5 * 60 * 1000 * 1000;
 #ifndef OHOS_ARCH_LITE
 constexpr int64_t TIMEOUT_CLEAR_SET = 4 * 60 * 1000;
-constexpr int32_t MIN_RSSI_LEVEL_3 = -75
+constexpr int32_t MIN_RSSI_LEVEL_3 = -75;
 constexpr int32_t MIN_BSSID_COUNT = 2;
+constexpr int32_t INVALID_RSSI = -200;
 #endif
 
 BlockConnectService &BlockConnectService::GetInstance()
@@ -438,7 +439,7 @@ void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::str
             autoJoinUnusableBssidSet_.clear();
         }
         if (!bssid.empty()) {
-            WIFI_LOGI("NotifyWifiConnFailedInfo, add %{public}s as unusableBssidSet, reason:%{public}s",
+            WIFI_LOGI("NotifyWifiConnFailedInfo, add %{public}s as unusableBssidSet, reason:%{public}d",
                 MacAnonymize(bssid).c_str(), static_cast<int32_t>(disableReason));
             autoJoinUnusableBssidSet_.insert(bssid);
             curUnusableSsid_ = targetNetwork.ssid;
@@ -451,7 +452,7 @@ void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::str
         WifiConfigCenter::GetInstance().GetIpInfo(lastDhcpResults);
         std::vector<WifiScanInfo> scanResults;
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
-        int32_t rssi = -200;
+        int32_t rssi = INVALID_RSSI;
         for (auto scanInfo : scanResults) {
             if (scanInfo.bssid == bssid) {
                 rssi = scanInfo.rssi;
@@ -460,7 +461,7 @@ void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::str
         int32_t bssidCnt = GetBssidCounter(targetNetwork, scanResults);
         if (!bssid.empty() && rssi >= MIN_RSSI_LEVEL_3 && bssidCnt >= MIN_BSSID_COUNT
             && lastDhcpResults.ipAddress == 0) {
-            WIFI_LOGI("NotifyWifiConnFailedInfo, add %{public}s as dhcpFailBssidSet, reason:%{public}s",
+            WIFI_LOGI("NotifyWifiConnFailedInfo, add %{public}s as dhcpFailBssidSet, reason:%{public}d",
                 MacAnonymize(bssid).c_str(), static_cast<int32_t>(disableReason));
             dhcpFailBssids_.insert(bssid);
         }
@@ -484,19 +485,22 @@ void BlockConnectService::ReleaseDhcpFailBssidSet()
 
 bool BlockConnectService::IsBssidMatchUnusableSet(std::string bssid)
 {
-    std::lock_guard<std::mutex> lock(bssidMutex_);
-    for (auto curBssid : autoJoinUnusableBssidSet_) {
-        if (bssid == curBssid) {
-            WIFI_LOGI("current bssid %{public}s match unusable bssid set.", MacAnonymize(bssid).c_str());
-            return true;
+    {
+        std::lock_guard<std::mutex> lock(bssidMutex_);
+        for (auto curBssid : autoJoinUnusableBssidSet_) {
+            if (bssid == curBssid) {
+                WIFI_LOGI("current bssid %{public}s match unusable bssid set.", MacAnonymize(bssid).c_str());
+                return true;
+            }
         }
     }
-
-    std::lock_guard<std::mutex> lock(dhcpFailMutex_);
-    for (auto dhcpBssid : dhcpFailBssids_) {
-        if (bssid == dhcpBssid) {
-            WIFI_LOGI("current bssid %{public}s match dhcp fail bssid set.", MacAnonymize(bssid).c_str());
-            return true;
+    {
+        std::lock_guard<std::mutex> lock(dhcpFailMutex_);
+        for (auto dhcpBssid : dhcpFailBssids_) {
+            if (bssid == dhcpBssid) {
+                WIFI_LOGI("current bssid %{public}s match dhcp fail bssid set.", MacAnonymize(bssid).c_str());
+                return true;
+            }
         }
     }
     return false;

@@ -209,6 +209,7 @@ public:
 #endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void SaveFoldStatus(InternalMessagePtr msg);
+        bool NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode);
         bool NotExistInScanList(WifiDeviceConfig &config);
         void DealScreenStateChangedEvent(InternalMessagePtr msg);
         void DealHiddenSsidConnectMiss(int networkId);

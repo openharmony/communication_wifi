@@ -90,6 +90,9 @@ public:
 
     // check if the given bssid match the unusable bssid set
     bool IsBssidMatchUnusableSet(std::string bssid);
+
+    // release all dhcp fail bssid
+    void ReleaseDhcpFailBssidSet();
 #endif
 private:
     DisablePolicy CalculateDisablePolicy(DisabledReason disableReason);
@@ -110,6 +113,8 @@ private:
     std::mutex bssidMutex_;
     std::mutex clearSetTimerMutex_;
     uint32_t clearSetTimerId_ {0};
+    std::set<std::string> dhcpFailBssids_;
+    std::mutex dhcpFailMutex_;
 #endif
 };
 }

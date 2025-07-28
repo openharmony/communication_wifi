@@ -348,7 +348,6 @@ private:
     bool DoSlowArpTest(const std::string& testIpAddr);
     bool IsIpAddressInvalid();
     bool IsUseFactoryMac();
-    int GetBssidCounter(const std::vector<WifiScanInfo> &scanResults);
     bool IsNeedWifiReassocUseDeviceMac();
     bool IfP2pConnected();
     bool ShouldTransToWifi6SelfCure(InternalMessagePtr msg, std::string currConnectedBssid);

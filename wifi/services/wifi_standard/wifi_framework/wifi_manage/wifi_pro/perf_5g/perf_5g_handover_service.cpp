@@ -74,7 +74,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         WIFI_LOGI("OnConnected, ap is not allow perf 5g");
         return;
     }
-    if (isLoadRelationApInfo_.load()) {
+    if (isNewBssidConnected_.load()) {
         ApConnectionInfo apConnectionInfo(wifiLinkedInfo.bssid);
         apConnectionInfo.SetConnectedTime(std::chrono::steady_clock::now());
         connectedAp_->apInfo.apConnectionInfo = apConnectionInfo;
@@ -87,7 +87,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         LoadRelationApInfo();
         perf5gChrInfo_.Reset();
         perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
-        isLoadRelationApInfo_.store(false);
+        isNewBssidConnected_.store(false);
     }
     PrintRelationAps();
 }
@@ -106,7 +106,7 @@ void Perf5gHandoverService::InitConnectedAp(WifiLinkedInfo &wifiLinkedInfo, Wifi
 
 void Perf5gHandoverService::OnDisconnected()
 {
-    isLoadRelationApInfo_.store(true);
+    isNewBssidConnected_.store(true);
     if (connectedAp_ == nullptr) {
         return;
     }
@@ -580,7 +580,8 @@ void Perf5gHandoverService::LoadMonitorScanController()
 }
 std::string Perf5gHandoverService::HandleSwitchResult(WifiLinkedInfo &wifiLinkedInfo)
 {
-    if (connectedAp_ != nullptr && connectedAp_->wifiLinkType == wifiLinkedInfo.wifiLinkType) {
+    if (connectedAp_ != nullptr && connectedAp_->wifiLinkType == wifiLinkedInfo.wifiLinkType &&
+        connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {
         WIFI_LOGI("HandleSwitchResult, connectedAp_->wifiLinkType %{public}d, wifiLinkedInfo.wifiLinkType %{public}d",
             static_cast<int32_t>(connectedAp_->wifiLinkType), static_cast<int32_t>(wifiLinkedInfo.wifiLinkType));
         return "";

@@ -102,7 +102,6 @@ void WifiProService::HandleStaConnChanged(OperateResState state, const WifiLinke
             NotifyWifi2WifiFailed(state);
             break;
         case OperateResState::CONNECT_EMLSR_START:
-            FALLTHROUGH_INTENDED;
         case OperateResState::CONNECT_EMLSR_END:
             NotifyWifiEmlsrStateChanged(state, linkedInfo);
             break;

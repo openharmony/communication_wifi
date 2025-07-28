@@ -584,7 +584,7 @@ int32_t WifiNetAgent::NetConnCallback::RequestNetwork(
 int32_t WifiNetAgent::NetConnCallback::ReleaseNetwork(const NetManagerStandard::NetRequest &netrequest)
 {
     WIFI_LOGD("Enter NetConnCallback::ReleaseNetwork");
-    LogNetCaps(ident, netCaps);
+    LogNetCaps(netrequest.ident, netrequest.netCaps);
     return 0;
 }
 

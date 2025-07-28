@@ -583,8 +583,7 @@ std::string Perf5gHandoverService::HandleSwitchResult(WifiLinkedInfo &wifiLinked
 {
     if (connectedAp_ != nullptr && connectedAp_->wifiLinkType == wifiLinkedInfo.wifiLinkType &&
         connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {
-        WIFI_LOGI("HandleSwitchResult, connectedAp_->wifiLinkType %{public}d, wifiLinkedInfo.wifiLinkType %{public}d",
-            static_cast<int32_t>(connectedAp_->wifiLinkType), static_cast<int32_t>(wifiLinkedInfo.wifiLinkType));
+        WIFI_LOGI("HandleSwitchResult, duplicate message");
         return "";
     }
     if (selectRelationAp_ == nullptr) {

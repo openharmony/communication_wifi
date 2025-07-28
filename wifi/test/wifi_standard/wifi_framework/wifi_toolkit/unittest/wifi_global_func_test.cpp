@@ -490,7 +490,7 @@ HWTEST_F(WifiGlobalFuncTest, GetBssidCounterTest, TestSize.Level1)
     scanResults.push_back(temp2);
     EXPECT_EQ(2, GetBssidCounter(config, scanResults));
  
-    config.keyMgmt = "WPA-SAE";
+    config.keyMgmt = "SAE";
     EXPECT_EQ(1, GetBssidCounter(config, scanResults));
  
     config.keyMgmt = "WPA-EAP";

@@ -666,16 +666,16 @@ NO_SANITIZE("cfi") napi_value AddDeviceConfig(napi_env env, napi_callback_info i
     WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "addDeviceConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    WifiDeviceConfig *config = new WifiDeviceConfig();
+    std::unique_ptr<WifiDeviceConfig> = std::make_unique<WifiDeviceConfig>();
     if (config == nullptr) {
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
+    asyncContext->config = std::move(config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
     napi_typeof(env, ret, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
-    asyncContext->config = config;
     asyncContext->isCandidate = false;
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
@@ -721,15 +721,15 @@ NO_SANITIZE("cfi") napi_value AddUntrustedConfig(napi_env env, napi_callback_inf
     WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "AddUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    WifiDeviceConfig *config = new WifiDeviceConfig();
+    std::unique_ptr<WifiDeviceConfig> = std::make_unique<WifiDeviceConfig>();
     if (config == nullptr) {
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
+    asyncContext->config = std::move(config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
     napi_typeof(env, ret, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-    asyncContext->config = config;
     asyncContext->isCandidate = true;
 
     asyncContext->executeFunc = [&](void* data) -> void {
@@ -776,15 +776,15 @@ NO_SANITIZE("cfi") napi_value RemoveUntrustedConfig(napi_env env, napi_callback_
     WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "RemoveUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    WifiDeviceConfig *config = new WifiDeviceConfig();
+    std::unique_ptr<WifiDeviceConfig> = std::make_unique<WifiDeviceConfig>();
     if (config == nullptr) {
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
+    asyncContext->config = std::move(config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
     napi_typeof(env, ret, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-    asyncContext->config = config;
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveCandidateConfig");
@@ -825,16 +825,16 @@ NO_SANITIZE("cfi") napi_value AddCandidateConfig(napi_env env, napi_callback_inf
     WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "AddCandidateConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    WifiDeviceConfig *config = new WifiDeviceConfig();
+    std::unique_ptr<WifiDeviceConfig> = std::make_unique<WifiDeviceConfig>();
     if (config == nullptr) {
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
 
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
+    asyncContext->config = std::move(config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
     napi_typeof(env, ret, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-    asyncContext->config = config;
     asyncContext->isCandidate = true;
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);

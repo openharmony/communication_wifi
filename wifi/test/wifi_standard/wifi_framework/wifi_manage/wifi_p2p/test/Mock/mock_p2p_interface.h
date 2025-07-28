@@ -69,6 +69,7 @@ public:
     virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result);
     virtual void NotifyWscDialogConfirmResult(bool isAccept);
     virtual ErrCode SetMiracastSinkConfig(const std::string& config);
+    virtual ErrCode NotifyRemoteDie(int uid);
 };
 }  // namespace Wifi
 }  // namespace OHOS

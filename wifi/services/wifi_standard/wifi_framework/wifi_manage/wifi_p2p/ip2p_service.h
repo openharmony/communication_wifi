@@ -365,6 +365,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetMiracastSinkConfig(const std::string& config) = 0;
+
+    /**
+     * @Description notify remote die for remove p2p group
+     *
+     * @param uid - remote's uid
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode NotifyRemoteDie(int uid) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

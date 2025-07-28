@@ -22,6 +22,7 @@
 #include "wifi_errcode.h"
 #include "wifi_internal_msg.h"
 #include "ip2p_service_callbacks.h"
+#include "wifi_internal_event_dispatcher.h"
 
 namespace OHOS {
 namespace Wifi {

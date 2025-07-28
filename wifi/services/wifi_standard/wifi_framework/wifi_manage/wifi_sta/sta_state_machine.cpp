@@ -2049,7 +2049,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     AAFwk::Want want;
     want.SetParam("netId", netId);
     int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
-#ifdef SUPPORT_PORTAL_LOGIN_BACKUP
+#ifndef SUPPORT_PORTAL_LOGIN
     std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
     want.SetAction(PORTAL_ACTION);
     want.SetUri(mPortalUrl);

@@ -1132,6 +1132,7 @@ void StaStateMachine::SeparatedState::GoInState()
     /* Callback result to InterfaceService. */
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, pStaStateMachine->linkedInfo);
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_EMLSR_END, pStaStateMachine->linkedInfo);
     /* clear connection information. */
     pStaStateMachine->InitWifiLinkedInfo();
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;

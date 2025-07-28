@@ -429,5 +429,72 @@ HWTEST_F(WifiGlobalFuncTest, SplitStringBySubstringTest3, TestSize.Level1)
     SplitStringBySubstring(inData, outData, subBegin, subEnd);
     EXPECT_TRUE(outData.length() == 0);
 }
+
+HWTEST_F(WifiGlobalFuncTest, IsSameEncryptTypeTest, TestSize.Level1)
+{
+    std::string deviceKeymgmt = "WPA-PSK";
+    std::string scanInfoKeymgmt = "WPA-PSK";
+    bool result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    deviceKeymgmt = "WPA-EAP";
+    scanInfoKeymgmt = "WPA-EAP";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    deviceKeymgmt = "SAE";
+    scanInfoKeymgmt = "SAE";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    deviceKeymgmt = "SAE";
+    scanInfoKeymgmt = "WPA2-PSK";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+
+    deviceKeymgmt = "NONE";
+    scanInfoKeymgmt = "NONE";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_TRUE(result);
+
+    deviceKeymgmt = "NONE";
+    scanInfoKeymgmt = "WPA-PSK";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+
+    deviceKeymgmt = "Invalid";
+    scanInfoKeymgmt = "WPA-PSK";
+    result = IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(WifiGlobalFuncTest, GetBssidCounterTest, TestSize.Level1)
+{
+    WifiDeviceConfig config;
+    config.ssid = "test111";
+    config.keyMgmt = "WPA-PSK";
+    std::vector<WifiScanInfo> scanResults = {};
+    EXPECT_EQ(0, GetBssidCounter(config, scanResults));
+    
+    WifiScanInfo temp1;
+    temp1.ssid = "test111";
+    temp1.bssid ="11:22:33:44:55:66";
+    temp1.capabilities = "PSK+SAE";
+    scanResults.push_back(temp1);
+    EXPECT_EQ(1, GetBssidCounter(config, scanResults));
+ 
+    WifiScanInfo temp2;
+    temp2.ssid = "test111";
+    temp2.bssid ="22:33:44:55:66:77";
+    temp2.capabilities = "PSK";
+    scanResults.push_back(temp2);
+    EXPECT_EQ(2, GetBssidCounter(config, scanResults));
+ 
+    config.keyMgmt = "SAE";
+    EXPECT_EQ(1, GetBssidCounter(config, scanResults));
+ 
+    config.keyMgmt = "WPA-EAP";
+    EXPECT_EQ(0, GetBssidCounter(config, scanResults));
+}
 }  // namespace Wifi
 }  // namespace OHOS

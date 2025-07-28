@@ -39,6 +39,7 @@ public:
     virtual bool IsBssidMatchUnusableSet(std::string bssid) = 0;
     virtual bool UpdateNetworkSelectStatusForMdmRestrictedList() = 0;
     virtual bool ClearBlockConnectForMdmRestrictedList() = 0;
+    virtual void ReleaseDhcpFailBssidSet() = 0;
 };
  
 class BlockConnectService : public MockBlockConnectService {
@@ -60,6 +61,7 @@ public:
     MOCK_METHOD1(IsBssidMatchUnusableSet, bool(std::string bssid));
     MOCK_METHOD0(ClearBlockConnectForMdmRestrictedList, bool());
     MOCK_METHOD0(UpdateNetworkSelectStatusForMdmRestrictedList, bool());
+    MOCK_METHOD0(ReleaseDhcpFailBssidSet, void());
 };
 }  // namespace OHOS
 }  // namespace Wifi

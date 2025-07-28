@@ -507,22 +507,6 @@ int SelfCureUtils::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info,
     return 0;
 }
 
-bool SelfCureUtils::IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& deviceKeymgmt)
-{
-    if (deviceKeymgmt == "WPA-PSK") {
-        return scanInfoKeymgmt.find("PSK") != std::string::npos;
-    } else if (deviceKeymgmt == "WPA-EAP") {
-        return scanInfoKeymgmt.find("EAP") != std::string::npos;
-    } else if (deviceKeymgmt == "SAE") {
-        return scanInfoKeymgmt.find("SAE") != std::string::npos;
-    } else if (deviceKeymgmt == "NONE") {
-        return (scanInfoKeymgmt.find("PSK") == std::string::npos) &&
-               (scanInfoKeymgmt.find("EAP") == std::string::npos) && (scanInfoKeymgmt.find("SAE") == std::string::npos);
-    } else {
-        return false;
-    }
-}
-
 bool SelfCureUtils::IsIpConflictDetect()
 {
     WIFI_LOGI("IsIpConflictDetect enter");

@@ -1447,8 +1447,6 @@ public:
     {
         LOGI("Enter GetScanRssiTest");
         std::vector<WifiScanInfo> scanResult = {};
-        int counter = pSelfCureStateMachine_->GetBssidCounter(scanResult);
-        EXPECT_EQ(counter, 0);
 
         WifiScanInfo info;
         info.bssid = CURR_BSSID;
@@ -2583,73 +2581,6 @@ HWTEST_F(SelfCureStateMachineTest, IsUseFactoryMacTest, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(), GetRealMacAddress(_, _)).
         WillRepeatedly(DoAll(SetArgReferee<0>(RealMacAddress), Return(0)));
     pSelfCureStateMachine_->IsUseFactoryMac();
-}
-
-HWTEST_F(SelfCureStateMachineTest, IsSameEncryptTypeTest, TestSize.Level1)
-{
-    std::string deviceKeymgmt = "WPA-PSK";
-    std::string scanInfoKeymgmt = "WPA-PSK";
-    bool result = SelfCureUtils::GetInstance().IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
-    EXPECT_TRUE(result);
-
-    deviceKeymgmt = "WPA-EAP";
-    scanInfoKeymgmt = "WPA-EAP";
-    result = SelfCureUtils::GetInstance().IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
-    EXPECT_TRUE(result);
-
-    deviceKeymgmt = "SAE";
-    scanInfoKeymgmt = "SAE";
-    result = SelfCureUtils::GetInstance().IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
-    EXPECT_TRUE(result);
-
-    deviceKeymgmt = "SAE";
-    scanInfoKeymgmt = "WPA2-PSK";
-    result = SelfCureUtils::GetInstance().IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
-    EXPECT_FALSE(result);
-
-    deviceKeymgmt = "NONE";
-    scanInfoKeymgmt = "NONE";
-    result = SelfCureUtils::GetInstance().IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
-    EXPECT_TRUE(result);
-
-    deviceKeymgmt = "NONE";
-    scanInfoKeymgmt = "WPA-PSK";
-    result = SelfCureUtils::GetInstance().IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
-    EXPECT_FALSE(result);
-
-    deviceKeymgmt = "Invalid";
-    scanInfoKeymgmt = "WPA-PSK";
-    result = SelfCureUtils::GetInstance().IsSameEncryptType(scanInfoKeymgmt, deviceKeymgmt);
-    EXPECT_FALSE(result);
-}
-
-HWTEST_F(SelfCureStateMachineTest, GetBssidCounterTest, TestSize.Level1)
-{
-    std::vector<WifiScanInfo> scanResults = {};
-    int counter = pSelfCureStateMachine_->GetBssidCounter(scanResults);
-    EXPECT_EQ(counter, 0);
-    
-    WifiScanInfo info;
-    info.bssid = "";
-    info.ssid = "ssid";
-    info.bssidType = 0;
-    scanResults = {info};
-    pSelfCureStateMachine_->GetBssidCounter(scanResults);
-
-    WifiDeviceConfig config;
-    config.keyMgmt = "";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
-    pSelfCureStateMachine_->GetBssidCounter(scanResults);
-
-    info.bssid = CURR_BSSID;
-    scanResults = {info};
-    pSelfCureStateMachine_->GetBssidCounter(scanResults);
-
-    config.keyMgmt = "WPA_PSK";
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
-    pSelfCureStateMachine_->GetBssidCounter(scanResults);
 }
 
 HWTEST_F(SelfCureStateMachineTest, IsNeedWifiReassocUseDeviceMac_Test1, TestSize.Level1)

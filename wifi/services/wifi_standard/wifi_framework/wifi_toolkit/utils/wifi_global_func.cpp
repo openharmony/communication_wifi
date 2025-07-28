@@ -718,6 +718,45 @@ void SplitStringBySubstring(const std::string &inData, std::string &outData, con
     outData = inData.substr(posBegin, posEnd - posBegin + subEnd.length());
     return;
 }
+
+int GetBssidCounter(const WifiDeviceConfig &config, const std::vector<WifiScanInfo> &scanResults)
+{
+    int counter = 0;
+    if (scanResults.empty()) {
+        LOGI("scanResults ie empty.");
+        return 0;
+    }
+
+    std::string currentSsid = config.ssid;
+    std::string configKey = config.keyMgmt;
+    if (currentSsid.empty() || configKey.empty()) {
+        return 0;
+    }
+    for (WifiScanInfo nextResult : scanResults) {
+        std::string scanSsid = nextResult.ssid;
+        std::string capabilities = nextResult.capabilities;
+        if (currentSsid == scanSsid && IsSameEncryptType(capabilities, configKey)) {
+            counter += 1;
+        }
+    }
+    return counter;
+}
+
+bool IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& deviceKeymgmt)
+{
+    if (deviceKeymgmt == "WPA-PSK") {
+        return scanInfoKeymgmt.find("PSK") != std::string::npos;
+    } else if (deviceKeymgmt == "WPA-EAP") {
+        return scanInfoKeymgmt.find("EAP") != std::string::npos;
+    } else if (deviceKeymgmt == "SAE") {
+        return scanInfoKeymgmt.find("SAE") != std::string::npos;
+    } else if (deviceKeymgmt == "NONE") {
+        return (scanInfoKeymgmt.find("PSK") == std::string::npos) &&
+               (scanInfoKeymgmt.find("EAP") == std::string::npos) && (scanInfoKeymgmt.find("SAE") == std::string::npos);
+    } else {
+        return false;
+    }
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

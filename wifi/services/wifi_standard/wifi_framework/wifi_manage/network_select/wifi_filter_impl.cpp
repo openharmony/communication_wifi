@@ -634,7 +634,7 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
 
     // disable network filtering
     auto &networkSelectionStatus = networkCandidate.wifiDeviceConfig.networkSelectionStatus;
-    if (networkSelectionStatus.networkSelectionDisableReason != DisabledReason::DISABLED_NONE ||
+    if (networkSelectionStatus.status != WifiDeviceConfigStatus::ENABLED ||
         !networkCandidate.wifiDeviceConfig.isAllowAutoConnect) {
         WIFI_LOGI("ValidConfigNetworkFilter, disable network, skip candidate:%{public}s",
             networkCandidate.ToString().c_str());

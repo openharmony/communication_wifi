@@ -368,7 +368,7 @@ void Perf5gHandoverService::Monitor5gAp(std::vector<InterScanInfo> &wifiScanInfo
 {
     perf5gChrInfo_.isIn5gPref = true;
     if (WifiProUtils::IsUserSelectNetwork()) {
-        WIFI_LOGD("Monitor5gAp, IsUserSelectNetwork, can not monitor");
+        WIFI_LOGI("Monitor5gAp, IsUserSelectNetwork, can not monitor");
         perf5gChrInfo_.isUserConnected = true;
         return;
     }

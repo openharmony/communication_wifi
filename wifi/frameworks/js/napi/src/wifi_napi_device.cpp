@@ -671,7 +671,7 @@ NO_SANITIZE("cfi") napi_value AddDeviceConfig(napi_env env, napi_callback_info i
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    asyncContext->config = std::move(config);
+    asyncContext->config = config.release();
     napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
     napi_typeof(env, ret, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
@@ -726,7 +726,7 @@ NO_SANITIZE("cfi") napi_value AddUntrustedConfig(napi_env env, napi_callback_inf
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    asyncContext->config = std::move(config);
+    asyncContext->config = config.release();
     napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
     napi_typeof(env, ret, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
@@ -781,7 +781,7 @@ NO_SANITIZE("cfi") napi_value RemoveUntrustedConfig(napi_env env, napi_callback_
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    asyncContext->config = std::move(config);
+    asyncContext->config = config.release();
     napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
     napi_typeof(env, ret, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
@@ -831,7 +831,7 @@ NO_SANITIZE("cfi") napi_value AddCandidateConfig(napi_env env, napi_callback_inf
         return UndefinedNapiValue(env);
     }
 
-    asyncContext->config = std::move(config);
+    asyncContext->config = config.release();
     napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
     napi_typeof(env, ret, &valueType);
     WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);

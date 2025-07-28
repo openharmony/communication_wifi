@@ -71,7 +71,7 @@ bool IsAllowScanAnyTime(const ScanControlInfo &info);
  * @param isReport - true : need report; flase : not report
  * @return ConnState - convert output connection state
  */
-ConnState ConvertConnStateInternalExtral(OperateResState resState, bool &isReport)
+ConnState ConvertConnStateInternalExtral(OperateResState resState, bool &isReport);
 
 /**
  * @Description Internal transition from OperateResState struct to ConnState

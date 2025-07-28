@@ -20,6 +20,7 @@
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 
+#include <shared_mutex>
 #include "wifi_logger.h"
 #include "wifi_device.h"
 #include "wifi_device_impl.h"
@@ -33,6 +34,72 @@
 
 namespace OHOS {
 namespace Wifi {
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiStateChangeVec;
+extern std::shared_mutex g_wifiStateChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiConnectionChangeVec;
+extern std::shared_mutex g_wifiConnectionChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiRssiChangeVec;
+extern std::shared_mutex g_wifiRssiChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiStreamChangeVec;
+extern std::shared_mutex g_wifiStreamChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiDeviceConfigChangeVec;
+extern std::shared_mutex g_wifiDeviceConfigChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiScanStateChangeVec;
+extern std::shared_mutex g_wifiScanStateChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiHotspotStateChangeVec;
+extern std::shared_mutex g_wifiHotspotStateChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<
+    void(::ohos::wifiManager::StationInfo const&)>>>
+    g_wifiHotspotStaJoinVec;
+extern std::shared_mutex g_wifiHotspotStaJoinLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<
+    void(::ohos::wifiManager::StationInfo const&)>>>
+    g_wifiHotspotStaLeaveVec;
+extern std::shared_mutex g_wifiHotspotStaLeaveLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiP2pStateChangeVec;
+extern std::shared_mutex g_wifiP2pStateChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<
+    void(::ohos::wifiManager::WifiP2pLinkedInfo const&)>>>
+    g_wifiP2pConnectionChangeVec;
+extern std::shared_mutex g_wifiP2pConnectionChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<
+    void(::ohos::wifiManager::WifiP2pDevice const&)>>>
+    g_wifiP2pDeviceChangeVec;
+extern std::shared_mutex g_wifiP2pDeviceChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<
+    void(::taihe::array_view<::ohos::wifiManager::WifiP2pDevice>)>>>
+    g_wifiP2pPeerDeviceChangeVec;
+extern std::shared_mutex g_wifiP2pPeerDeviceChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<
+    void(::ohos::wifiManager::UndefinedType const&)>>>
+    g_wifiP2pPersistentGroupChangeVec;
+extern std::shared_mutex g_wifiP2pPersistentGroupChangeLock;
+ 
+extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+    g_wifiP2pDiscoveryChangeVec;
+extern std::shared_mutex g_wifiP2pDiscoveryChangeLock;
+
 class WifiIdlDeviceEventCallback : public IWifiDeviceCallBack {
 public:
     void OnWifiStateChanged(int state) override;

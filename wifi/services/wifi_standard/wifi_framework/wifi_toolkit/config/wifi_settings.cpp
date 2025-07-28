@@ -27,7 +27,7 @@
 #include "softap_parser.h"
 #include "package_parser.h"
 #include "wifi_backup_config.h"
-#include "json/json.h"
+#include "cJSON.h"
 #endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 #include "wifi_asset_manager.h"
@@ -966,19 +966,43 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 
 std::string WifiSettings::SetBackupReplyCode(int replyCode)
 {
-    Json::Value root;
-    Json::Value resultInfo;
-    Json::Value errorInfo;
-
-    errorInfo["type"] = "ErrorInfo";
-    errorInfo["errorCode"] = std::to_string(replyCode);
-    errorInfo["errorInfo"] = "";
-
-    resultInfo.append(errorInfo);
-    root["resultInfo"] = resultInfo;
-
-    Json::FastWriter writer;
-    return writer.write(root);
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        LOGE("Failed to create cJSON object");
+        return "";
+    }
+    cJSON *resultInfo = cJSON_CreateArray();
+    if (resultInfo == nullptr) {
+        LOGE("Failed to create cJSON Arr");
+        cJSON_Delete(root);
+        return "";
+    }
+    cJSON *errorInfo = cJSON_CreateObject();
+    if (errorInfo == nullptr) {
+        LOGE("Failed to create cJSON object");
+        cJSON_Delete(resultInfo);
+        cJSON_Delete(root);
+        return "";
+    }
+ 
+    cJSON_AddStringToObject(errorInfo, "type", "ErrorInfo");
+    std::string codeStr = std::to_string(replyCode);
+    cJSON_AddStringToObject(errorInfo, "errorCode", codeStr.c_str());
+    cJSON_AddStringToObject(errorInfo, "errorInfo", "");
+ 
+    cJSON_AddItemToArray(resultInfo, errorInfo);
+ 
+    cJSON_AddItemToObject(root, "resultInfo", resultInfo);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    std::string result;
+    if (jsonStr != nullptr) {
+        result = jsonStr;
+        free(jsonStr);
+    }
+ 
+    cJSON_Delete(root);
+    return result;
 }
 
 void WifiSettings::RemoveBackupFile()

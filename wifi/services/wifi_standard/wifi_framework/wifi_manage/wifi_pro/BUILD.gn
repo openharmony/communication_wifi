@@ -100,12 +100,12 @@ ohos_static_library("wifi_pro") {
   external_deps = [
     "ability_runtime:app_manager",
     "c_utils:utils",
+    "cJSON:cjson",
     "common_event_service:cesfwk_core",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
-    "jsoncpp:jsoncpp",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_stats_manager_if",
     "netmanager_base:netsys_controller",

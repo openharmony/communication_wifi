@@ -59,7 +59,6 @@ ohos_unittest("utils_unittest") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_single",
-    "jsoncpp:jsoncpp",
     "openssl:libcrypto_shared",
     "openssl:libssl_shared",
     "samgr:samgr_proxy",

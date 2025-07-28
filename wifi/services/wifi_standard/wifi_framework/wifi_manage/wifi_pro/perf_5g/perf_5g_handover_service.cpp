@@ -82,6 +82,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         connectedAp_->canNotPerf = wifiDeviceConfig.isPortal && !connectedAp_->hasHistoryInfo;
         if (connectedAp_->canNotPerf) {
             WIFI_LOGI("OnConnected, ap is not history record,not allow pref");
+            isNewBssidConnected_.store(false);
             return;
         }
         LoadRelationApInfo();

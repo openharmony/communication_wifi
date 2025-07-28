@@ -1092,7 +1092,10 @@ VoWifiSignalInfo StaService::FetchWifiSignalInfoForVoWiFi()
     voWifiSignalInfo.noise = noise;
  
     // set bler
-    int bler = static_cast<int>((static_cast<double>(nativeTxFailed) / static_cast<double>(txPacketCounter)) * 100);
+    int bler = 0;
+    if (txPacketCounter != 0) {
+        bler = static_cast<int>((static_cast<double>(nativeTxFailed) / static_cast<double>(txPacketCounter)) * 100);
+    }
     voWifiSignalInfo.bler = bler;
  
     // delta tx packet count

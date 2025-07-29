@@ -48,7 +48,6 @@ constexpr int MIN_RSSI = -128;
 constexpr int INTERNET_ACCESS_AWARD = 2;
 constexpr int EMPTY_NETWORK_STATUS_HISTORY_AWARD = 1;
 constexpr int MAX_HISTORY_NETWORK_STATUS_NUM = 10;
-constexpr int WIFI_SECURE_SCORE = 1;
 constexpr int HISTORY_NETWORK_STATUS_WEIGHTED_SCORE[MAX_HISTORY_NETWORK_STATUS_NUM] = {
     81920, 40960, 20480, 10240, 5120, 2560, 1280, 640, 320, 160};
 }
@@ -230,17 +229,6 @@ double RssiLevelBonusScorer::Score(NetworkCandidate &networkCandidate)
     return 0;
 }
 
-WifiExtScorer::WifiExtScorer() : SimpleWifiScorer("WifiExtScorer") {}
- 
-double WifiExtScorer::Score(NetworkCandidate &networkCandidate)
-{
-    int32_t levelScore = 0;
-    if (networkCandidate.wifiDeviceConfig.isSecureWifi) {
-        levelScore += WIFI_SECURE_SCORE;
-    }
-    return levelScore;
-}
-
 SignalLevelScorer::SignalLevelScorer() : SimpleWifiScorer("SignalLevelScorer") {}
 
 double SignalLevelScorer::Score(NetworkCandidate &networkCandidate)
@@ -279,7 +267,6 @@ SavedNetworkScorer::SavedNetworkScorer(const std::string &scorerName) : Composit
     AddScorer(std::make_shared<RssiLevelBonusScorer>());
     AddScorer(std::make_shared<SecurityBonusScorer>());
     AddScorer(std::make_shared<Network5gBonusScorer>());
-    AddScorer(std::make_shared<WifiExtScorer>());
     ExternalWifiCommonBuildManager::GetInstance().BuildScore(
         TagType::HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG, *this);
 }

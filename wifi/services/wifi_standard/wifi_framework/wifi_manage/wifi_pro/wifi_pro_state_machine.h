@@ -148,6 +148,7 @@ public:
         void RequestHttpDetect(bool forceHttpDetect);
         void ParseQoeInfoAndRequestDetect();
         void HandleWifiQoeSlow();
+        void HandleWifiEmlsrStateChanged(const InternalMessagePtr msg);
     };
 
     class WifiNoNetState : public State {

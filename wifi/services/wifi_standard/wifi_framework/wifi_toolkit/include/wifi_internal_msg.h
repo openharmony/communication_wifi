@@ -118,6 +118,8 @@ enum class OperateResState {
     ENABLE_SEMI_WIFI_SUCCEED,               /* enable semi wifi succeed */
     ENABLE_SEMI_WIFI_FAILED,                /* enable semi wifi failed */
     CONNECT_MISS_MATCH,                 /* miss match in scan when connect */
+    CONNECT_EMLSR_START,                /* emlsr start */
+    CONNECT_EMLSR_END,                  /* emlsr end */
 };
 
 enum SystemMode : int {

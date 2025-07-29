@@ -671,7 +671,7 @@ void OnP2pStateChange(::taihe::callback_view<void(double)> callback)
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
         return;
     }
-    if ( g_wifiP2pStateChangeVec.size() > REGISTERINFO_MAX_NUM) {
+    if (g_wifiP2pStateChangeVec.size() > REGISTERINFO_MAX_NUM) {
         WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
         return;
     }

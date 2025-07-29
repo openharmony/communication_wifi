@@ -88,6 +88,18 @@ HWTEST_F(WifiProServiceTest, HandleStaConnChangedTest03, TestSize.Level1)
     EXPECT_NE(wifiProService_->instId_, TEN);
 }
 
+HWTEST_F(WifiProServiceTest, HandleStaConnChangedTest04, TestSize.Level1)
+{
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.networkId = 1;
+    linkedInfo.bssid = "TEST";
+    linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR;
+    wifiProService_->HandleStaConnChanged(OperateResState::CONNECT_EMLSR_START, linkedInfo);
+    linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR;
+    wifiProService_->HandleStaConnChanged(OperateResState::CONNECT_EMLSR_END, linkedInfo);
+    EXPECT_NE(wifiProService_->instId_, TEN);
+}
+
 HWTEST_F(WifiProServiceTest, HandleRssiLevelChangedTest01, TestSize.Level1)
 {
     int32_t rssi = 1;

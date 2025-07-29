@@ -46,7 +46,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
 {
     std::string strategyName = HandleSwitchResult(wifiLinkedInfo);
     bool is5gAfterPerf = (strategyName != "");
-    if (connectedAp_ != nullptr) {
+    if (connectedAp_ != nullptr && connectedAp_->wifiLinkType == wifiLinkedInfo.wifiLinkType) {
         if (connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {
             return;
         }
@@ -55,11 +55,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     }
     WifiDeviceConfig wifiDeviceConfig;
     WifiSettings::GetInstance().GetDeviceConfig(wifiLinkedInfo.networkId, wifiDeviceConfig);
-    connectedAp_ = std::make_shared<ConnectedAp>();
-    ApInfo apInfo(wifiLinkedInfo.networkId, wifiLinkedInfo.ssid, wifiLinkedInfo.bssid,
-        wifiDeviceConfig.keyMgmt, wifiLinkedInfo.frequency);
-    connectedAp_->apInfo = apInfo;
-    connectedAp_->isMloConnected = wifiLinkedInfo.isMloConnected;
+    InitConnectedAp(wifiLinkedInfo, wifiDeviceConfig);
     connectedAp_->is5gAfterPerf = is5gAfterPerf;
     connectedAp_->perf5gStrategyName = strategyName;
     bool isHwItCustNetwork = false;
@@ -68,31 +64,50 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         isHwItCustNetwork = pEnhanceService->IsHwItCustNetwork(wifiDeviceConfig);
     }
     bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
-    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted ||
-        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || isHwItCustNetwork;
-    WIFI_LOGI("OnConnected, canNotPerf:isEnterprise(%{public}d),isPortal(%{public}d),isDataRestricted(%{public}d),"
-        "openNet(%{public}d),isHwItCustNetwork(%{public}d)", isEnterprise, wifiDeviceConfig.isPortal,
-        wifiLinkedInfo.isDataRestricted, wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, isHwItCustNetwork);
-    ApConnectionInfo apConnectionInfo(wifiLinkedInfo.bssid);
-    apConnectionInfo.SetConnectedTime(std::chrono::steady_clock::now());
-    connectedAp_->apInfo.apConnectionInfo = apConnectionInfo;
+    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isHwItCustNetwork ||
+        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
+    WIFI_LOGI("OnConnected, canNotPerf:isEnterprise(%{public}d),isHwItCustNetwork(%{public}d),isPortal(%{public}d),"
+        "isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise, isHwItCustNetwork,
+        wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted, wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE,
+        connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
     if (connectedAp_->canNotPerf) {
         WIFI_LOGI("OnConnected, ap is not allow perf 5g");
         return;
     }
-    pDualBandRepostitory_->LoadApHistoryInfo(connectedAp_->apInfo, connectedAp_->hasHistoryInfo);
-    connectedAp_->canNotPerf = wifiDeviceConfig.isPortal && !connectedAp_->hasHistoryInfo;
-    if (connectedAp_->canNotPerf) {
-        WIFI_LOGI("OnConnected, ap is not history record,not allow pref");
-        return;
+    if (isNewBssidConnected_.load()) {
+        ApConnectionInfo apConnectionInfo(wifiLinkedInfo.bssid);
+        apConnectionInfo.SetConnectedTime(std::chrono::steady_clock::now());
+        connectedAp_->apInfo.apConnectionInfo = apConnectionInfo;
+        pDualBandRepostitory_->LoadApHistoryInfo(connectedAp_->apInfo, connectedAp_->hasHistoryInfo);
+        connectedAp_->canNotPerf = wifiDeviceConfig.isPortal && !connectedAp_->hasHistoryInfo;
+        if (connectedAp_->canNotPerf) {
+            WIFI_LOGI("OnConnected, ap is not history record,not allow pref");
+            isNewBssidConnected_.store(false);
+            return;
+        }
+        LoadRelationApInfo();
+        perf5gChrInfo_.Reset();
+        perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
+        isNewBssidConnected_.store(false);
     }
-    LoadRelationApInfo();
-    perf5gChrInfo_.Reset();
-    perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
     PrintRelationAps();
 }
+
+void Perf5gHandoverService::InitConnectedAp(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig)
+{
+    if (connectedAp_ == nullptr) {
+        connectedAp_ = std::make_shared<ConnectedAp>();
+    }
+    ApInfo apInfo(wifiLinkedInfo.networkId, wifiLinkedInfo.ssid, wifiLinkedInfo.bssid,
+        wifiDeviceConfig.keyMgmt, wifiLinkedInfo.frequency);
+    connectedAp_->apInfo = apInfo;
+    connectedAp_->isMloConnected = wifiLinkedInfo.isMloConnected;
+    connectedAp_->wifiLinkType = wifiLinkedInfo.wifiLinkType;
+}
+
 void Perf5gHandoverService::OnDisconnected()
 {
+    isNewBssidConnected_.store(true);
     if (connectedAp_ == nullptr) {
         return;
     }
@@ -566,6 +581,11 @@ void Perf5gHandoverService::LoadMonitorScanController()
 }
 std::string Perf5gHandoverService::HandleSwitchResult(WifiLinkedInfo &wifiLinkedInfo)
 {
+    if (connectedAp_ != nullptr && connectedAp_->wifiLinkType == wifiLinkedInfo.wifiLinkType &&
+        connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {
+        WIFI_LOGI("HandleSwitchResult, duplicate message");
+        return "";
+    }
     if (selectRelationAp_ == nullptr) {
         if (connectedAp_ != nullptr && connectedAp_->apInfo.bssid == wifiLinkedInfo.bssid) {
             WIFI_LOGI("HandleSwitchResult, ignore duplicate connect message");

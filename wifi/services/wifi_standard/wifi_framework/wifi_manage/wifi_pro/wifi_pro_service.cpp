@@ -101,6 +101,10 @@ void WifiProService::HandleStaConnChanged(OperateResState state, const WifiLinke
         case OperateResState::CONNECT_OBTAINING_IP_FAILED:
             NotifyWifi2WifiFailed(state);
             break;
+        case OperateResState::CONNECT_EMLSR_START:
+        case OperateResState::CONNECT_EMLSR_END:
+            NotifyWifiEmlsrStateChanged(state, linkedInfo);
+            break;
         default:
             break;
     }
@@ -182,9 +186,18 @@ void WifiProService::HandleQoeReport(const NetworkLagType &networkLagType, const
 }
 void WifiProService::HandleWifiHalSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo)
 {
+    if (pWifiProStateMachine_ == nullptr) {
+        WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
+        return;
+    }
     pWifiProStateMachine_->SendMessage(EVENT_SIGNAL_INFO_CHANGE, wifiSignalPollInfo);
 }
 
+void WifiProService::NotifyWifiEmlsrStateChanged(OperateResState state, const WifiLinkedInfo &linkedInfo)
+{
+    pWifiProStateMachine_->SendMessage(EVENT_EMLSR_STATE_CHANGED, static_cast<int32_t>(state), linkedInfo.networkId,
+        linkedInfo);
+}
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 void WifiProService::OnScreenStateChanged(int32_t screenState)
 {

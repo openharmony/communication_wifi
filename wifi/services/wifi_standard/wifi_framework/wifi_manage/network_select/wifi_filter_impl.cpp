@@ -170,6 +170,10 @@ bool DisableWifiFilter::Filter(NetworkCandidate &networkCandidate)
         networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_ALLOW_AUTO_CONNECT);
         return false;
     }
+    if (!networkCandidate.wifiDeviceConfig.isSecureWifi) {
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_SECURE_WIFI);
+        return false;
+    }
     return true;
 }
 

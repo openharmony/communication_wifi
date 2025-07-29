@@ -74,6 +74,7 @@
             "wifi_feature_mdm_restricted_enable",
             "wifi_feature_with_extensible_authentication",
             "wifi_feature_with_scan_control_action_listen",
+            "wifi_feature_with_portal_login",
             "wifi_feature_with_security_detect"
         ],
         "adapted_system_type": [

@@ -651,8 +651,12 @@ bool ParseJsonKey(const cJSON *jsonValue, const std::string &key, std::string &v
     int nSize = cJSON_GetArraySize(jsonValue);
     for (int i = 0; i < nSize; ++i) {
         cJSON *item = cJSON_GetArrayItem(jsonValue, i);
-        if (item == nullptr || !cJSON_IsObject(item)) {
+        if (item == nullptr) {
             return false;
+        }
+        if (!cJSON_IsObject(item)) {
+            cJSON_Delete(item);
+            continue;
         }
         cJSON *keyItem = cJSON_GetObjectItem(item, key.c_str());
         if (keyItem == nullptr) {

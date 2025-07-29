@@ -160,6 +160,10 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
     }
 
+    if (wifi_feature_with_portal_login) {
+      defines += [ "SUPPORT_PORTAL_LOGIN" ]
+    }
+
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }

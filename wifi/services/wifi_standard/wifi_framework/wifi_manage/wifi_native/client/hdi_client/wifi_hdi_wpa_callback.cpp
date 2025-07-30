@@ -382,7 +382,7 @@ int32_t OnEventAuthReject(struct IWpaCallback *self,
     int authType = authRejectParam->authType;
 
     const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
-    if (cbk.onWpaSsidWrongKey && statusCode == 15 && authType == 3) {
+    if (cbk.onWpaSsidWrongKey && statusCode == Wifi80211StatusCode::WLAN_STATUS_CHALLENGE_FAIL && authType == 3) {
         LOGI("OnEventAuthReject, wrong password");
         cbk.onWpaSsidWrongKey(bssid);
         OHOS::Wifi::WriteAuthFailHiSysEvent("WRONG_PSWD");

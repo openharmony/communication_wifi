@@ -909,7 +909,6 @@ void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
     for (size_t i = 0; i < ipInfo.dnsAddr.size(); i++) {
         if (i >= MAX_DNS_NUM) {
             WIFI_LOGE("ipInfo.dnsAddr size over limit");
-            cJSON_Delete(root);
             break;
         }
         std::string keyString = "IPV4_DNS" + std::to_string(i);

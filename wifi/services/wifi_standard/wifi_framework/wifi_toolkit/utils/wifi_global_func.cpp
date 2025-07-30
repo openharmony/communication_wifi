@@ -656,7 +656,7 @@ bool ParseJsonKey(const cJSON *jsonValue, const std::string &key, std::string &v
         }
         if (!cJSON_IsObject(item)) {
             cJSON_Delete(item);
-            continue;
+            return false;
         }
         cJSON *keyItem = cJSON_GetObjectItem(item, key.c_str());
         if (keyItem == nullptr) {
@@ -689,7 +689,11 @@ bool ParseJson(const std::string &jsonString, const std::string &type, const std
     int nSize = cJSON_GetArraySize(root);
     for (int i = 0; i < nSize; i++) {
         cJSON *item = cJSON_GetArrayItem(root, i);
-        if (item == nullptr || !cJSON_IsObject(item)) {
+        if (item == nullptr) {
+            continue;
+        }
+        if (!cJSON_IsObject(item)) {
+            cJSON_Delete(item);
             continue;
         }
         cJSON *typeItem = cJSON_GetObjectItem(item, type.c_str());

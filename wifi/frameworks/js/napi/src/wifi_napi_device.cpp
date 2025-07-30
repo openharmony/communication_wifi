@@ -849,10 +849,7 @@ NO_SANITIZE("cfi") napi_value AddCandidateConfig(napi_env env, napi_callback_inf
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddCandidateConfig");
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
-        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Add candidate device config failed: %{public}d", static_cast<int>(ret));
-            context->networkId = -1;
-        }
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
     };
 

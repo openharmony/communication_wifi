@@ -110,6 +110,9 @@ struct IWpaCallback {
 
     int32_t (*OnEventWpsTimeout)(struct IWpaCallback *self, const char* ifName);
 
+    int32_t OnEventAssociateReject(struct IWpaCallback *self,
+          const struct HdiWpaAssociateRejectParam *associateRejectParam, const char *ifName);
+
     int32_t (*OnEventScanResult)(struct IWpaCallback *self, const struct HdiWpaRecvScanResultParam* recvScanResultParam,
          const char* ifName);
 

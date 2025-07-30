@@ -788,6 +788,7 @@ WifiErrorNo RegisterHdiWpaStaEventCallback(struct IWpaCallback *callback, const 
     g_hdiWpaStaCallbackObj[instId]->OnEventScanResult = callback->OnEventScanResult;
 #endif
     g_hdiWpaStaCallbackObj[instId]->OnEventStaNotify = callback->OnEventStaNotify;
+    g_hdiWpaStaCallbackObj[instId]->OnEventAuthReject = callback->OnEventAuthReject;
     pthread_mutex_unlock(GetWpaObjMutex());
     LOGI("RegisterHdiWpaStaEventCallback3 success.");
     return WIFI_HAL_OPT_OK;

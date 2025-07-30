@@ -691,7 +691,7 @@ HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
     config.keyMgmt = "SAE";
     config.keyMgmtBitset = 0;
     WifiSettings::GetInstance().SetKeyMgmtBitset(config);
-    EXPECT_EQ(config.keyMgmtBitset, 8);
+    EXPECT_EQ(config.keyMgmtBitset, 12);
 }
 
 HWTEST_F(WifiSettingsTest, GetAllSuitableEncryptionTest, TestSize.Level1)

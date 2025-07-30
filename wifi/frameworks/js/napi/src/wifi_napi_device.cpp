@@ -684,9 +684,7 @@ NO_SANITIZE("cfi") napi_value AddDeviceConfig(napi_env env, napi_callback_info i
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddDeviceConfig");
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
-        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
-            context->networkId = -1;
-        }
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
     };
 
@@ -743,9 +741,7 @@ NO_SANITIZE("cfi") napi_value AddUntrustedConfig(napi_env env, napi_callback_inf
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddUntrustedConfig");
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
-        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
-            context->networkId = -1;
-        }
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
     };
 
@@ -801,7 +797,6 @@ NO_SANITIZE("cfi") napi_value RemoveUntrustedConfig(napi_env env, napi_callback_
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveCandidateConfig");
         context->errorCode = wifiDevicePtr->RemoveCandidateConfig(*context->config);
     };
-
     asyncContext->completeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         napi_get_boolean(context->env, context->errorCode == WIFI_OPT_SUCCESS, &context->result);

@@ -136,4 +136,8 @@ typedef enum Wifi80211StatusCode {
 typedef enum Wifi80211ReasonCode {
     WLAN_REASON_IE_IN_4WAY_DIFFERS = 17,
 } Wifi80211ReasonCode;
+
+typedef enum Wifi80211AuthType {
+    WLAN_AUTH_SAE = 3,
+} Wifi80211AuthType;
 #endif

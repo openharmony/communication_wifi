@@ -376,7 +376,7 @@ int32_t OnEventAuthReject(struct IWpaCallback *self,
         LOGE("OnEventAuthReject:param invalid");
         return 1;
     }
-    char bssid[WIFI_STR_MAC_LENGTH + 1] = {0};
+    char bssid[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
     ConvertMacArr2String(authRejectParam->bssid, authRejectParam->bssidLen, bssid, sizeof(bssid));
     int statusCode = authRejectParam->statusCode;
     int authType = authRejectParam->authType;

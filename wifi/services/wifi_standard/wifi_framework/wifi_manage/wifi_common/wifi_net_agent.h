@@ -190,7 +190,7 @@ public:
          * @param ident - identity
          * @param netCaps - Net capability to request a network
          */
-        int32_t ReleaseNetwork(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) override;
+        int32_t ReleaseNetwork(const NetManagerStandard::NetRequest &netrequest) override;
     private:
         void LogNetCaps(const std::string &ident, const std::set<NetManagerStandard::NetCap> &netCaps) const;
 

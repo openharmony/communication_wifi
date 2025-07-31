@@ -281,9 +281,8 @@ HWTEST_F(WifiNetAgentTest, RequestNetworkTest002, TestSize.Level1)
 HWTEST_F(WifiNetAgentTest, ReleaseNetworkTest001, TestSize.Level1)
 {
     WifiNetAgent::NetConnCallback netConnCallback;
-    std::string ident = "";
-    std::set<NetManagerStandard::NetCap> netCaps;
-    EXPECT_EQ(netConnCallback.ReleaseNetwork(ident, netCaps), 0);
+    NetManagerStandard::NetRequest netrequest;
+    EXPECT_EQ(netConnCallback.ReleaseNetwork(netrequest), 0);
 }
 
 HWTEST_F(WifiNetAgentTest, NetAvailableTest001, TestSize.Level1)

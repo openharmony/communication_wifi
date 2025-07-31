@@ -55,6 +55,7 @@ enum FiltedReason {
     MAYBE_PORTAL_NETWORK,
     LESS_THAN_8RSSI,
     NOT_HML_FREQ_AT_5G,
+    NOT_SECURE_WIFI,
 };
 
 struct FiltedReasonComparator {

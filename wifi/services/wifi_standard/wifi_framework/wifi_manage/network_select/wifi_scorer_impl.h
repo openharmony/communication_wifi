@@ -137,12 +137,6 @@ public:
     double Score(NetworkCandidate &networkCandidate) override;
 };
 
-class WifiExtScorer : public SimpleWifiScorer {
-public:
-    WifiExtScorer();
-    double Score(NetworkCandidate &networkCandidate) override;
-};
-
 class SignalLevelScorer : public SimpleWifiScorer {
 public:
     SignalLevelScorer();

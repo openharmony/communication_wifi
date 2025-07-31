@@ -41,6 +41,7 @@ std::map<FiltedReason, std::string> filtReasonToString = {
     {FiltedReason::POOR_SIGNAL, "POOR_SIGNAL"},
     {FiltedReason::TIMEOUT_AND_NEED_RECHECK, "TIMEOUT_AND_NEED_RECHECK"},
     {FiltedReason::NOT_ALLOW_AUTO_CONNECT, "NOT_ALLOW_AUTO_CONNECT"},
+    {FiltedReason::NOT_SECURE_WIFI, "NOT_SECURE_WIFI"},
 };
 
 std::string NetworkCandidate::ToString(const std::string &filterName) const

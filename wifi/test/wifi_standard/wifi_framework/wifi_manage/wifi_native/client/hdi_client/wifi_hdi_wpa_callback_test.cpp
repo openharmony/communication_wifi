@@ -110,6 +110,17 @@ HWTEST_F(WifiHdiWpaCallbackTest, OnEventAssociateRejectTEST, TestSize.Level1)
     EXPECT_EQ(result, 1);
 }
 
+HWTEST_F(WifiHdiWpaCallbackTest, OnEventAuthRejectTEST, TestSize.Level1)
+{
+    struct HdiWpaAuthRejectParam authRejectParam;
+    authRejectParam.statusCode = 15;
+    authRejectParam.authType = 3;
+    int32_t result = OnEventAuthReject(nullptr, &authRejectParam, "wlan0");
+    EXPECT_EQ(result, 0);
+    result = OnEventAuthReject(nullptr, nullptr, "wlan0");
+    EXPECT_EQ(result, 1);
+}
+
 HWTEST_F(WifiHdiWpaCallbackTest, OnEventDeviceFoundTest, TestSize.Level1)
 {
     struct HdiP2pDeviceInfoParam deviceInfoParam;

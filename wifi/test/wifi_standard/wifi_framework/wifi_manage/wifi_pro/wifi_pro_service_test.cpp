@@ -93,9 +93,9 @@ HWTEST_F(WifiProServiceTest, HandleStaConnChangedTest04, TestSize.Level1)
     WifiLinkedInfo linkedInfo;
     linkedInfo.networkId = 1;
     linkedInfo.bssid = "TEST";
-    linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR;
+    linkedInfo.wifiLinkType = WifiLinkType::WIFI7_EMLSR;
     wifiProService_->HandleStaConnChanged(OperateResState::CONNECT_EMLSR_START, linkedInfo);
-    linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR;
+    linkedInfo.wifiLinkType = WifiLinkType::WIFI7_MLSR;
     wifiProService_->HandleStaConnChanged(OperateResState::CONNECT_EMLSR_END, linkedInfo);
     EXPECT_NE(wifiProService_->instId_, TEN);
 }

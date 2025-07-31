@@ -666,24 +666,25 @@ NO_SANITIZE("cfi") napi_value AddDeviceConfig(napi_env env, napi_callback_info i
     WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "addDeviceConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    std::unique_ptr<WifiDeviceConfig> config = std::make_unique<WifiDeviceConfig>();
-    if (!config) {
+    WifiDeviceConfig *config = new WifiDeviceConfig();
+    if (config == nullptr) {
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    asyncContext->config = config.release();
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
     napi_typeof(env, ret, &valueType);
-    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-
+    if (valueType == napi_undefined) {
+        delete config;
+        delete asyncContext;
+        WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    }
+    asyncContext->config = config;
     asyncContext->isCandidate = false;
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddDeviceConfig");
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
-        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
-            context->networkId = -1;
-        }
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
     };
 
@@ -721,24 +722,26 @@ NO_SANITIZE("cfi") napi_value AddUntrustedConfig(napi_env env, napi_callback_inf
     WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "AddUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    std::unique_ptr<WifiDeviceConfig> config = std::make_unique<WifiDeviceConfig>();
-    if (!config) {
+    WifiDeviceConfig *config = new WifiDeviceConfig();
+    if (config == nullptr) {
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    asyncContext->config = config.release();
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
+    
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
     napi_typeof(env, ret, &valueType);
-    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    if (valueType == napi_undefined) {
+        delete config;
+        delete asyncContext;
+        WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    }
+    asyncContext->config = config;
     asyncContext->isCandidate = true;
-
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddUntrustedConfig");
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
-        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
-            context->networkId = -1;
-        }
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
     };
 
@@ -776,21 +779,24 @@ NO_SANITIZE("cfi") napi_value RemoveUntrustedConfig(napi_env env, napi_callback_
     WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "RemoveUntrustedConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    std::unique_ptr<WifiDeviceConfig> config = std::make_unique<WifiDeviceConfig>();
-    if (!config) {
+    WifiDeviceConfig *config = new WifiDeviceConfig();
+    if (config == nullptr) {
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-    asyncContext->config = config.release();
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
     napi_typeof(env, ret, &valueType);
-    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    if (valueType == napi_undefined) {
+        delete config;
+        delete asyncContext;
+        WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    }
+    asyncContext->config = config;
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->RemoveCandidateConfig");
         context->errorCode = wifiDevicePtr->RemoveCandidateConfig(*context->config);
     };
-
     asyncContext->completeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         napi_get_boolean(context->env, context->errorCode == WIFI_OPT_SUCCESS, &context->result);
@@ -825,25 +831,25 @@ NO_SANITIZE("cfi") napi_value AddCandidateConfig(napi_env env, napi_callback_inf
     WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     napi_create_string_latin1(env, "AddCandidateConfig", NAPI_AUTO_LENGTH, &asyncContext->resourceName);
 
-    std::unique_ptr<WifiDeviceConfig> config = std::make_unique<WifiDeviceConfig>();
-    if (!config) {
+    WifiDeviceConfig *config = new WifiDeviceConfig();
+    if (config == nullptr) {
         delete asyncContext;
         return UndefinedNapiValue(env);
     }
-
-    asyncContext->config = config.release();
-    napi_value ret = JsObjToDeviceConfig(env, argv[0], *asyncContext->config);
+    napi_value ret = JsObjToDeviceConfig(env, argv[0], *config);
     napi_typeof(env, ret, &valueType);
-    WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    if (valueType == napi_undefined) {
+        delete config;
+        delete asyncContext;
+        WIFI_NAPI_ASSERT(env, valueType != napi_undefined, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    }
+    asyncContext->config = config;
     asyncContext->isCandidate = true;
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->AddCandidateConfig");
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
-        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Add candidate device config failed: %{public}d", static_cast<int>(ret));
-            context->networkId = -1;
-        }
+        if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
     };
 

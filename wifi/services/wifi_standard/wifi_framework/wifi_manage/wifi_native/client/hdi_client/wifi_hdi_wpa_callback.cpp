@@ -364,6 +364,34 @@ int32_t OnEventAuthTimeout(struct IWpaCallback *self, const char *ifName)
     return 0;
 }
 
+int32_t OnEventAuthReject(struct IWpaCallback *self,
+    const struct HdiWpaAuthRejectParam *authRejectParam, const char *ifName)
+{
+    if (ifName == nullptr) {
+        LOGE("OnEventAuthReject: invalid ifName!");
+        return 1;
+    }
+    LOGI("OnEventAuthReject: callback enter! ifName = %{public}s", ifName);
+    if (authRejectParam == NULL) {
+        LOGE("OnEventAuthReject:param invalid");
+        return 1;
+    }
+    char bssid[WIFI_HDI_STR_MAC_LENGTH + 1] = {0};
+    ConvertMacArr2String(authRejectParam->bssid, authRejectParam->bssidLen, bssid, sizeof(bssid));
+    int statusCode = authRejectParam->statusCode;
+    int authType = authRejectParam->authType;
+
+    const OHOS::Wifi::WifiEventCallback &cbk = OHOS::Wifi::WifiStaHalInterface::GetInstance().GetCallbackInst(ifName);
+    if (cbk.onWpaSsidWrongKey && statusCode == Wifi80211StatusCode::WLAN_STATUS_CHALLENGE_FAIL &&
+        authType == Wifi80211AuthType::WLAN_AUTH_SAE) {
+        LOGI("OnEventAuthReject, wrong password");
+        cbk.onWpaSsidWrongKey(bssid);
+        OHOS::Wifi::WriteAuthFailHiSysEvent("WRONG_PSWD");
+        return 0;
+    }
+    return 0;
+}
+
 int32_t OnEventScanResult(struct IWpaCallback *self,
     const struct HdiWpaRecvScanResultParam *recvScanResultParam, const char* ifName)
 {

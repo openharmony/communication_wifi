@@ -127,6 +127,7 @@ typedef enum HalCallbackEvent {
 
 typedef enum Wifi80211StatusCode {
     WLAN_STATUS_UNSPECIFIED_FAILURE = 1,
+    WLAN_STATUS_CHALLENGE_FAIL = 15,
     WLAN_STATUS_AP_UNABLE_TO_HANDLE_NEW_STA = 17,
     WLAN_STATUS_ASSOC_REJECTED_TEMPORARILY = 30,
     WLAN_STATUS_DENIED_INSUFFICIENT_BANDWIDTH = 33,
@@ -135,4 +136,8 @@ typedef enum Wifi80211StatusCode {
 typedef enum Wifi80211ReasonCode {
     WLAN_REASON_IE_IN_4WAY_DIFFERS = 17,
 } Wifi80211ReasonCode;
+
+typedef enum Wifi80211AuthType {
+    WLAN_AUTH_SAE = 3,
+} Wifi80211AuthType;
 #endif

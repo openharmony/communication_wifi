@@ -757,7 +757,12 @@ ErrCode WifiP2pProxy::QueryP2pLinkedInfo(WifiP2pLinkedInfo &linkedInfo)
     std::string groupOwnerAddr = reply.ReadString();
     linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddr);
 
+    constexpr int maxSize = 8;
     int size = reply.ReadInt32();
+    if (size > maxSize || size < 0) {
+        WIFI_LOGE("P2p service size error: %{public}d", size);
+        return WIFI_OPT_FAILED;
+    }
     for (int i = 0; i < size; i++) {
         linkedInfo.AddClientInfoList(reply.ReadString(), reply.ReadString(), reply.ReadString());
     }

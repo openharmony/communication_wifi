@@ -263,6 +263,7 @@ private:
     void ProcessSwitchResult(const InternalMessagePtr msg);
     bool InLandscapeSwitchLimitList();
     bool IsAllowScan(bool hasSwitchRecord);
+    bool IsFirstConnectAndNonet();
 };
 } // namespace Wifi
 } // namespace OHOS

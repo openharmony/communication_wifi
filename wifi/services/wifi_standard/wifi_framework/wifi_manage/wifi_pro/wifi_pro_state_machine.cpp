@@ -550,6 +550,23 @@ bool WifiProStateMachine::IsAllowScan(bool hasSwitchRecord)
     }
     return true;
 }
+
+bool WifiProStateMachine::IsFirstConnectAndNonet()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.networkId == INVALID_NETWORK_ID) {
+        WIFI_LOGE("IsFirstConnectAndNonet: current state : disconnected.");
+        return true;
+    }
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config) != 0) {
+        WIFI_LOGE("IsFirstConnectAndNonet: Failed to get device config.");
+        return true;
+    }
+    return currentState_ == WifiProState::WIFI_NONET && WifiProUtils::IsUserSelectNetwork() &&
+           config.numAssociation <= 1;
+}
 /* --------------------------- state machine default state ------------------------------ */
 WifiProStateMachine::DefaultState::DefaultState(WifiProStateMachine *pWifiProStateMachine)
     : State("DefaultState"),
@@ -1302,6 +1319,10 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
             return;
         }
         WIFI_LOGI("NoInternet X: select network fail.");
+        if (pWifiProStateMachine_->IsFirstConnectAndNonet()) {
+            WIFI_LOGI("user select and nonet, not selfcure.");
+            return;
+        }
         if (pWifiProStateMachine_->TrySelfCure(false)) {
             pWifiProStateMachine_->Wifi2WifiFinish();
         }
@@ -1310,6 +1331,10 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
 
     WIFI_LOGI("NoNetSwitch 2: receive good ap.");
     if (!pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition()) {
+        if (pWifiProStateMachine_->IsFirstConnectAndNonet()) {
+            WIFI_LOGI("user select and nonet, not selfcure.");
+            return;
+        }
         if (pWifiProStateMachine_->TrySelfCure(false)) {
             pWifiProStateMachine_->Wifi2WifiFinish();
         }

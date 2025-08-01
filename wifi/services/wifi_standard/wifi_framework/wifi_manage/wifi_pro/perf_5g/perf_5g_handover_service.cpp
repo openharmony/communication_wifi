@@ -58,16 +58,16 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     InitConnectedAp(wifiLinkedInfo, wifiDeviceConfig);
     connectedAp_->is5gAfterPerf = is5gAfterPerf;
     connectedAp_->perf5gStrategyName = strategyName;
-    bool isHwItCustNetwork = false;
+    bool isItCustNetwork = false;
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService != nullptr) {
-        isHwItCustNetwork = pEnhanceService->IsHwItCustNetwork(wifiDeviceConfig);
+        isItCustNetwork = pEnhanceService->IsItCustNetwork(wifiDeviceConfig);
     }
     bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
-    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isHwItCustNetwork ||
+    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isItCustNetwork ||
         wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
-    WIFI_LOGI("OnConnected, canNotPerf:isEnterprise(%{public}d),isHwItCustNetwork(%{public}d),isPortal(%{public}d),"
-        "isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise, isHwItCustNetwork,
+    WIFI_LOGI("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),isPortal(%{public}d),"
+        "isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise, isItCustNetwork,
         wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted, wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE,
         connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
     if (connectedAp_->canNotPerf) {

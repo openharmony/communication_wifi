@@ -2518,7 +2518,7 @@ bool SelfCureStateMachine::IsCustNetworkSelfCure()
     if (GetCurrentWifiDeviceConfig(config) != WIFI_OPT_SUCCESS) {
         return false;
     }
-    if (pEnhanceService->IsHwItCustNetwork(config)) {
+    if (pEnhanceService->IsItCustNetwork(config)) {
         WIFI_LOGD("selfcure is not triggered under currrent network.");
         return true;
     }

@@ -310,6 +310,12 @@ HWTEST_F(WifiProStateMachineTest, TryNoNetSwitchTest, TestSize.Level1)
     EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
 
+HWTEST_F(WifiProStateMachineTest, IsFirstConnectAndNonetTest01, TestSize.Level1)
+{
+    pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
+    EXPECT_EQ(pWifiProStateMachine_->IsFirstConnectAndNonet(), false);
+}
+
 HWTEST_F(WifiProStateMachineTest, WifiProEnableStateTransitionNetStateTest01, TestSize.Level1)
 {
     wifiProEnableState_->pWifiProStateMachine_ = new WifiProStateMachine();

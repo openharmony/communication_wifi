@@ -147,7 +147,7 @@ public:
      * @param scanDeviceInfo - scan device info
      * @return true: allowed, false: not allowed
      */
-    virtual bool IsHwItCustNetwork(WifiDeviceConfig &config) = 0;
+    virtual bool IsItCustNetwork(WifiDeviceConfig &config) = 0;
 
     /**
      * @Description selfcure for multi dhcp server.

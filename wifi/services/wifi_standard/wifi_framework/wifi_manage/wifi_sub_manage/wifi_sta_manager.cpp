@@ -284,10 +284,6 @@ void WifiStaManager::DealOffScreenAudioBeaconLost()
 
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    {
-        std::lock_guard<std::mutex> lock(netStateMutex);
-        mNetState = internetAccessStatus;
-    }
     WIFI_LOGD("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
         magic_enum::Enum2Name(state).c_str());
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
@@ -381,6 +377,8 @@ void WifiStaManager::DealInternetAccessChanged(int internetAccessStatus, int ins
     cbMsg.msgData = internetAccessStatus;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    std::lock_guard<std::mutex> lock(netStateMutex);
+    mNetState = internetAccessStatus;
 }
 
 #ifndef OHOS_ARCH_LITE

@@ -49,12 +49,16 @@ export default class EntryAbility extends UIAbility {
       let avoidArea = windowClass.getWindowAvoidArea(type);
       let topRectHeight = avoidArea.topRect.height;
       AppStorage.setOrCreate('topRectHeight', topRectHeight);
-      windowClass.on('avoidAreaChange', (data) => {
-        if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
-          let topRectHeight = data.area.topRect.height;
-          AppStorage.setOrCreate('topRectHeight', topRectHeight);
-        }
-      });
+      try {
+        windowClass.on('avoidAreaChange', (data) => {
+          if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
+            let topRectHeight = data.area.topRect.height;
+            AppStorage.setOrCreate('topRectHeight', topRectHeight);
+          }
+        });
+      } catch (exception) {
+        console.error(`Failed to enable the listener for system avoid area changes. code: ${exception.code}`);
+      }
       hilog.info(DOMAIN, TAG, 'Succeeded in loading the content.');
     });
   }

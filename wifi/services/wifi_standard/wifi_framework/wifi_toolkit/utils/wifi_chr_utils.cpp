@@ -61,7 +61,8 @@ void WifiChrUtils::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiS
     }
 }
 
-bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
+bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLevel, const int32_t screenState,
+    const int32_t instId)
 {
     if (signalLevel < 0) return false;
     WifiSignalPollInfo wifiCheckInfo;
@@ -69,17 +70,21 @@ bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLe
         std::unique_lock<std::mutex> lock(signalInfoMutex);
         wifiCheckInfo = signalPollInfoItem_;
     }
-    bool beaconLost = OHOS::Wifi::IsBeaconLost(bssid, wifiCheckInfo);
+    bool beaconLost = OHOS::Wifi::IsBeaconLost(bssid, wifiCheckInfo, screenState);
     if (beaconLost) {
         LOGW("Beacon Lost, signalLevel: %{public}d", signalLevel);
-        int32_t errorCode = (signalLevel <= SIGNAL_LEVEL_TWO) ?
-            BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH;
-        WriteWifiBeaconLostHiSysEvent(errorCode);
+        if (screenState == MODE_STATE_OPEN) {
+            WriteWifiBeaconLostHiSysEvent((signalLevel <= SIGNAL_LEVEL_TWO) ?
+                BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH);
+        } else {
+            WriteWifiBeaconLostHiSysEvent((signalLevel <= SIGNAL_LEVEL_TWO) ?
+                BeaconLostType::SIGNAL_LEVEL_LOW_OFF_SCREEN : BeaconLostType::SIGNAL_LEVEL_HIGH_OFF_SCREEN);
+        }
     }
     bool beaconAbnormal = OHOS::Wifi::IsBeaconAbnormal(bssid, wifiCheckInfo);
     if (beaconAbnormal) {
         LOGW("Beacon Abnormal, signalLevel: %{public}d", signalLevel);
-        WriteWifiBeaconLostHiSysEvent(BEACON_ABNORMAL);
+        WriteWifiBeaconLostHiSysEvent(BeaconLostType::BEACON_ABNORMAL);
     }
     return beaconLost;
 }

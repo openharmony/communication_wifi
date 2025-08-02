@@ -104,16 +104,14 @@ bool IsWifiActive()
     return MakeWifiLinkedInfo(linkedInfo);
 }
 
-double GetSignalLevel(double rssi, double band)
+int GetSignalLevel(int rssi, int band)
 {
     int level = -1;
-    int tmpRssi = static_cast<int>(rssi);
-    int tmpBand = static_cast<int>(band);
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return 0.0;
     }
-    ErrCode ret = g_wifiDevicePtr->GetSignalLevel(tmpRssi, tmpBand, level);
+    ErrCode ret = g_wifiDevicePtr->GetSignalLevel(rssi, band, level);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
@@ -291,11 +289,11 @@ OHOS::sptr<WifiIdlHotspotEventCallback> wifiHotspotCallback =
 OHOS::sptr<WifiIdlP2pEventCallback> wifiP2pCallback =
     OHOS::sptr<WifiIdlP2pEventCallback>(new (std::nothrow) WifiIdlP2pEventCallback());
 
-void OnWifiStateChange(::taihe::callback_view<void(double)> callback)
+void OnWifiStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
     auto wifiStateChangedCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiStateChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -312,7 +310,7 @@ void OnWifiStateChange(::taihe::callback_view<void(double)> callback)
     g_wifiStateChangeVec.emplace_back(wifiStateChangedCallback);
 }
 
-void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
     if (g_wifiStateChangeVec.empty()) {
@@ -331,11 +329,11 @@ void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(double)>> 
     }
 }
 
-void OnWifiConnectionChange(::taihe::callback_view<void(double)> callback)
+void OnWifiConnectionChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiConnectionChangeLock);
     auto wifiConnectionChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiConnectionChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -353,7 +351,7 @@ void OnWifiConnectionChange(::taihe::callback_view<void(double)> callback)
     g_wifiConnectionChangeVec.emplace_back(wifiConnectionChangeCallback);
 }
  
-void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiConnectionChangeLock);
     if (g_wifiConnectionChangeVec.empty()) {
@@ -372,11 +370,11 @@ void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(doubl
     }
 }
  
-void OnWifiScanStateChange(::taihe::callback_view<void(double)> callback)
+void OnWifiScanStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
     auto wifiScanStateChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiScanStateChange"};
     if (g_wifiScanPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -394,7 +392,7 @@ void OnWifiScanStateChange(::taihe::callback_view<void(double)> callback)
     g_wifiScanStateChangeVec.emplace_back(wifiScanStateChangeCallback);
 }
  
-void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
     if (g_wifiScanStateChangeVec.empty()) {
@@ -413,11 +411,11 @@ void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(double
     }
 }
  
-void OnWifiRssiChange(::taihe::callback_view<void(double)> callback)
+void OnWifiRssiChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
     auto wifiRssiChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiRssiChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -435,7 +433,7 @@ void OnWifiRssiChange(::taihe::callback_view<void(double)> callback)
     g_wifiRssiChangeVec.emplace_back(wifiRssiChangeCallback);
 }
  
-void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
     if (g_wifiRssiChangeVec.empty()) {
@@ -454,11 +452,11 @@ void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(double)>> c
     }
 }
 
-void OnStreamChange(::taihe::callback_view<void(double)> callback)
+void OnStreamChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
     auto wifiRssiChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"streamChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -476,7 +474,7 @@ void OnStreamChange(::taihe::callback_view<void(double)> callback)
     g_wifiStreamChangeVec.emplace_back(wifiRssiChangeCallback);
 }
 
-void OffStreamChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffStreamChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
     if (g_wifiStreamChangeVec.empty()) {
@@ -495,11 +493,11 @@ void OffStreamChange(::taihe::optional_view<::taihe::callback<void(double)>> cal
     }
 }
 
-void OnDeviceConfigChange(::taihe::callback_view<void(double)> callback)
+void OnDeviceConfigChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
     auto wifiDeviceConfigChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"deviceConfigChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -517,7 +515,7 @@ void OnDeviceConfigChange(::taihe::callback_view<void(double)> callback)
     g_wifiDeviceConfigChangeVec.emplace_back(wifiDeviceConfigChangeCallback);
 }
 
-void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
     if (g_wifiDeviceConfigChangeVec.empty()) {
@@ -536,11 +534,11 @@ void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(double)
     }
 }
 
-void OnHotspotStateChange(::taihe::callback_view<void(double)> callback)
+void OnHotspotStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
     auto wifiHotspotStateChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"hotspotStateChange"};
     if (g_wifiHotspotPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
@@ -558,7 +556,7 @@ void OnHotspotStateChange(::taihe::callback_view<void(double)> callback)
     g_wifiHotspotStateChangeVec.emplace_back(wifiHotspotStateChangeCallback);
 }
 
-void OffHotspotStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffHotspotStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
     if (g_wifiHotspotStateChangeVec.empty()) {
@@ -661,11 +659,11 @@ void OffHotspotStaLeave(
     }
 }
 
-void OnP2pStateChange(::taihe::callback_view<void(double)> callback)
+void OnP2pStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
     auto wifiP2pStateChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pStateChange"};
     if (g_wifiP2pPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
@@ -683,7 +681,7 @@ void OnP2pStateChange(::taihe::callback_view<void(double)> callback)
     g_wifiP2pStateChangeVec.emplace_back(wifiP2pStateChangeCallback);
 }
 
-void OffP2pStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffP2pStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
     if (g_wifiP2pStateChangeVec.empty()) {
@@ -872,11 +870,11 @@ void OffP2pPersistentGroupChange(::taihe::optional_view<::taihe::callback<void(
     }
 }
 
-void OnP2pDiscoveryChange(::taihe::callback_view<void(double)> callback)
+void OnP2pDiscoveryChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
     auto wifiP2pDiscoveryChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pDiscoveryChange"};
     if (g_wifiP2pPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
@@ -894,7 +892,7 @@ void OnP2pDiscoveryChange(::taihe::callback_view<void(double)> callback)
     g_wifiP2pDiscoveryChangeVec.emplace_back(wifiP2pDiscoveryChangeCallback);
 }
 
-void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
     if (g_wifiP2pDiscoveryChangeVec.empty()) {

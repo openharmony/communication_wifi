@@ -144,8 +144,8 @@ void WifiStaManager::InitStaCallback(void)
         this->DealInternetAccessChanged(internetAccessStatus, instId);
     };
     mStaCallback.OnSignalPollReport =
-        [this](const std::string &bssid, const int32_t signalLevel, const int32_t instId) {
-            this->DealSignalPollReport(bssid, signalLevel, instId);
+        [this](const std::string &bssid, const int32_t signalLevel, const bool isAudioOn, const int32_t instId) {
+            this->DealSignalPollReport(bssid, signalLevel, isAudioOn, instId);
         };
     return;
 }
@@ -241,21 +241,53 @@ static void HandleStaDisconnected(int instId)
     }
 }
 
-void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
+void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const bool isAudioOn,
+    const int32_t instId)
 {
-    bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, instId);
+ 
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-    if (isBeaconLost) {
-        WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
-        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-        if (pEnhanceService != nullptr && screenState == MODE_STATE_OPEN) {
-            pEnhanceService->HandleBeaconLost();
+    if (screenState == MODE_STATE_CLOSE && isAudioOn) {
+        bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);
+        if (isBeaconLost) {
+            WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
+            DealOffScreenAudioBeaconLost();
+        }
+    } else if (screenState == MODE_STATE_OPEN) {
+        bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);
+        if (isBeaconLost) {
+            WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
+            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+            if (pEnhanceService != nullptr) { pEnhanceService->HandleBeaconLost(); }
         }
     }
 }
 
+void WifiStaManager::DealOffScreenAudioBeaconLost()
+{
+    mNetWorkDetect->StartWifiDetection();
+    std::shared_ptr<WifiStaManager> sharedPtr(this);
+    std::weak_ptr<WifiStaManager> weakPtr = sharedPtr;
+    std::thread([weakPtr, this]() {
+        WIFI_LOGI("Delay deal beacon lost thread begin");
+        constexpr int BEACON_LOST_DELAY_TIME = 500;
+        std::this_thread::sleep_for(std::chrono::milliseconds(BEACON_LOST_DELAY_TIME));
+        auto sharedPtr = weakPtr.lock();
+        if (sharedPtr != nullptr) {
+            std::lock_guard<std::mutex> lock(netStateMutex);
+            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+            if (mNetState != SystemNetWorkState::NETWORK_IS_WORKING && pEnhanceService != nullptr) {
+                pEnhanceService->HandleBeaconLost();
+            }
+        }
+    }).detach();
+}
+
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
+    {
+        std::lock_guard<std::mutex> lock(netStateMutex);
+        mNetState = internetAccessStatus;
+    }
     WIFI_LOGD("Enter, DealStaConnChanged, state: %{public}d!, message:%{public}s\n", static_cast<int>(state),
         magic_enum::Enum2Name(state).c_str());
     if (state == OperateResState::CONNECT_AP_CONNECTED) {

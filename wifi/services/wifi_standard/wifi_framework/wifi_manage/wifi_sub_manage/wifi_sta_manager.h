@@ -21,6 +21,7 @@
 #include "wifi_errcode.h"
 #include "sta_service_callback.h"
 #include "wifi_internal_msg.h"
+#include "wifi_net_observer.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -49,13 +50,18 @@ private:
     void PublishWifiOperateStateHiSysEvent(OperateResState state);
     void NotifyScanForStaConnChanged(OperateResState state, int networkId, int instId = 0);
     void DealInternetAccessChanged(int internetAccessStatus, int instId);
-    void DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId = 0);
+    void DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const bool isAudioOn,
+        const int32_t instId = 0);
+    void DealOffScreenAudioBeaconLost();
 private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
+    int mNetState;
+    sptr<NetStateObserver> mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
+    std::mutex netStateMutex;
 };
 }  // namespace Wifi
 }  // namespace OHOS

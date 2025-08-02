@@ -244,7 +244,6 @@ static void HandleStaDisconnected(int instId)
 void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const bool isAudioOn,
     const int32_t instId)
 {
- 
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     if (screenState == MODE_STATE_CLOSE && isAudioOn) {
         bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);

@@ -80,7 +80,7 @@ HWTEST_F(WifiHdiCommonTest, HdiSSid2TxtTest, TestSize.Level1)
     const uint8_t *ssid = NULL;
     size_t ssidLen = 0;
     const char *result = HdiSSid2Txt(ssid, ssidLen);
-    EXPECT_STREQ(result, "");
+    EXPECT_TRUE(strlen(result) == 0);
 }
 
 HWTEST_F(WifiHdiCommonTest, HdiGetWifiCategoryTxtTest_11be, TestSize.Level1)

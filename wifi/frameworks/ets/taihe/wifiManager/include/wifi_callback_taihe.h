@@ -34,31 +34,31 @@
 
 namespace OHOS {
 namespace Wifi {
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiStateChangeVec;
 extern std::shared_mutex g_wifiStateChangeLock;
  
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiConnectionChangeVec;
 extern std::shared_mutex g_wifiConnectionChangeLock;
  
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiRssiChangeVec;
 extern std::shared_mutex g_wifiRssiChangeLock;
  
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiStreamChangeVec;
 extern std::shared_mutex g_wifiStreamChangeLock;
  
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiDeviceConfigChangeVec;
 extern std::shared_mutex g_wifiDeviceConfigChangeLock;
  
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiScanStateChangeVec;
 extern std::shared_mutex g_wifiScanStateChangeLock;
  
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiHotspotStateChangeVec;
 extern std::shared_mutex g_wifiHotspotStateChangeLock;
  
@@ -72,7 +72,7 @@ extern std::vector<::taihe::optional<::taihe::callback<
     g_wifiHotspotStaLeaveVec;
 extern std::shared_mutex g_wifiHotspotStaLeaveLock;
  
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiP2pStateChangeVec;
 extern std::shared_mutex g_wifiP2pStateChangeLock;
  
@@ -96,7 +96,7 @@ extern std::vector<::taihe::optional<::taihe::callback<
     g_wifiP2pPersistentGroupChangeVec;
 extern std::shared_mutex g_wifiP2pPersistentGroupChangeLock;
  
-extern std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiP2pDiscoveryChangeVec;
 extern std::shared_mutex g_wifiP2pDiscoveryChangeLock;
 
@@ -111,11 +111,11 @@ public:
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
 
 public:
-    ::taihe::optional<::taihe::callback<void(double)>> wifiStateChangedCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiConnectionChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiRssiChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiStreamChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiDeviceConfigChangeCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiStateChangedCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiConnectionChangeCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiRssiChangeCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiStreamChangeCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiDeviceConfigChangeCallback_;
 };
 
 class WifiIdlScanEventCallback : public IWifiScanCallback {
@@ -124,7 +124,7 @@ public:
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
 
 public:
-    ::taihe::optional<::taihe::callback<void(double)>> wifiScanStateChangeCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiScanStateChangeCallback_;
 };
 
 class WifiIdlHotspotEventCallback : public IWifiHotspotCallback {
@@ -135,7 +135,7 @@ public:
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
 
 public:
-    ::taihe::optional<::taihe::callback<void(double)>> wifiHotspotStateChangeCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiHotspotStateChangeCallback_;
     ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::StationInfo const&)>>
         wifiHotspotStaJoinCallback_;
     ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::StationInfo const&)>>
@@ -160,7 +160,7 @@ public:
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
 
 public:
-    ::taihe::optional<::taihe::callback<void(double)>> wifiP2pStateChangeCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiP2pStateChangeCallback_;
     ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::WifiP2pLinkedInfo const&)>>
         wifiP2pConnectionChangeCallback_;
     ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::WifiP2pDevice const&)>>
@@ -169,7 +169,7 @@ public:
         wifiP2pPeerDeviceChangeCallback_;
     ::taihe::optional<::taihe::callback<void(::ohos::wifiManager::UndefinedType const&)>>
         wifiP2pPersistentGroupChangeCallback_;
-    ::taihe::optional<::taihe::callback<void(double)>> wifiP2pDiscoveryChangeCallback_;
+    ::taihe::optional<::taihe::callback<void(int)>> wifiP2pDiscoveryChangeCallback_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -4176,7 +4176,8 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
             callBackItem.second.OnWifiHalSignalInfoChange(signalInfo);
         }
         if (callBackItem.second.OnSignalPollReport != nullptr && linkedInfo.wifiLinkType != WifiLinkType::WIFI7_EMLSR) {
-            callBackItem.second.OnSignalPollReport(linkedInfo.bssid, lastSignalLevel_, m_instId);
+            callBackItem.second.OnSignalPollReport(linkedInfo.bssid, lastSignalLevel_,
+                isAudioOn_ == AUDIO_ON ? true :false, m_instId);
         }
     }
     if (enableSignalPoll) {

@@ -147,7 +147,8 @@ HWTEST_F(WifiStaManagerTest, DealSignalPollReportTest01, TestSize.Level1)
     std::string bssid = "11:22:33:44:55:66";
     int32_t signalLevel = 2;
     int32_t instId = 0;
-    wifiStaManager_->DealSignalPollReport(bssid, signalLevel, instId);
+    bool isAudioOn = true;
+    wifiStaManager_->DealSignalPollReport(bssid, signalLevel, isAudioOn, instId);
     EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
 }
 

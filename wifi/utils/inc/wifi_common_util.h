@@ -60,11 +60,13 @@ inline const int BEACON_LENGTH_RSSI = 10;
 inline const int8_t BEACON_LOST_RSSI0 = -128;
 inline const int8_t BEACON_LOST_RSSI1 = 127;
 inline const int SIGNAL_LEVEL_TWO = 2;
-inline const int BEACON_ABNORMAL = 2;
 
 enum BeaconLostType : int32_t {
     SIGNAL_LEVEL_LOW = 0,
-    SIGNAL_LEVEL_HIGH = 1
+    SIGNAL_LEVEL_HIGH = 1,
+    BEACON_ABNORMAL = 2,
+    SIGNAL_LEVEL_LOW_OFF_SCREEN = 3,
+    SIGNAL_LEVEL_HIGH_OFF_SCREEN  = 4,
 };
 
 struct BeaconLostInfo {
@@ -73,6 +75,7 @@ struct BeaconLostInfo {
     std::string bssid;
     int rssi;
     unsigned int rxBytes;
+    int32_t screenState;
 };
 
 struct BeaconAbnormalInfo {
@@ -347,7 +350,7 @@ int FrequencyToChannel(int freq);
  */
 int ChannelToFrequency(int channel);
 bool IsOtherVapConnect();
-bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo);
+bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo, int32_t screenState);
 bool IsBeaconAbnormal(std::string bssid, WifiSignalPollInfo checkInfo);
 int HexString2Byte(const char *hex, uint8_t *buf, size_t len);
 void Byte2HexString(const uint8_t* byte, uint8_t bytesLen, char* hexstr, uint8_t hexstrLen);

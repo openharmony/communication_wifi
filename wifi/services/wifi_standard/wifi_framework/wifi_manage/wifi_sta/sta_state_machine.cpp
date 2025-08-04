@@ -4425,7 +4425,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         return WIFI_OPT_FAILED;
     }
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
-        SetAllowAutoConnectStatus(networkId, true);
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
 #ifndef OHOS_ARCH_LITE
         BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
@@ -4477,22 +4476,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     SetConnectMethod(connTriggerMode);
     WifiConfigCenter::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
     return WIFI_OPT_SUCCESS;
-}
-
-void StaStateMachine::SetAllowAutoConnectStatus(int32_t networkId, bool status)
-{
-    WifiDeviceConfig deviceConfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {
-        WIFI_LOGE("SetAllowAutoConnectStatus get GetDeviceConfig failed!");
-        return;
-    }
-    if (deviceConfig.isAllowAutoConnect == status) {
-        return;
-    }
-
-    deviceConfig.isAllowAutoConnect = status;
-    WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
-    WifiSettings::GetInstance().SyncDeviceConfig();
 }
 
 void StaStateMachine::MacAddressGenerate(WifiStoreRandomMac &randomMacInfo)

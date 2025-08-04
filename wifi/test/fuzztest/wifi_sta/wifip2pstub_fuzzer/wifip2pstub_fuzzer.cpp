@@ -704,6 +704,19 @@ void OnGetSupportChanForBandTest(const uint8_t* data, size_t size)
         datas, reply, option);
 }
 
+void OnSetP2pHighPerfTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_HIGH_PERF_MODE),
+        datas, reply, option);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

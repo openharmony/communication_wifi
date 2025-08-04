@@ -93,6 +93,7 @@ public:
     virtual WifiErrorNo GroupClientRemove(const std::string &deviceMac) const = 0;
     virtual WifiErrorNo P2pReject(const std::string &mac);
     virtual WifiErrorNo SetMiracastSinkConfig(const std::string &config);
+    virtual WifiErrorNo SetP2pHighPerf(bool isEnable);
 };
 
 class WifiP2PHalInterface : public MockWifiP2PHalInterface {
@@ -164,6 +165,7 @@ public:
     MOCK_CONST_METHOD1(GroupClientRemove, WifiErrorNo(const std::string &deviceMac));
     MOCK_METHOD1(P2pReject, WifiErrorNo(const std::string &mac));
     MOCK_METHOD1(SetMiracastSinkConfig, WifiErrorNo(const std::string &config));
+    MOCK_METHOD1(SetP2pHighPerf, WifiErrorNo(bool isEnable));
 };
 }  // namespace Wifi
 }  // namespace OHOS

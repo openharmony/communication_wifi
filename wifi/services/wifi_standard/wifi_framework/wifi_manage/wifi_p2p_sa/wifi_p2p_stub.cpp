@@ -122,6 +122,10 @@ void WifiP2pStub::InitHandleMapExPart3()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
             OnGetSupportChanForBand(code, data, reply, option);
         };
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_HIGH_PERF_MODE)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnSetP2pHighPerf(code, data, reply, option);
+        };
 }
 
 void WifiP2pStub::InitHandleMap()
@@ -1152,6 +1156,17 @@ void WifiP2pStub::OnGetSupportChanForBand(
             reply.WriteInt32(channel);
         }
     }
+}
+
+void WifiP2pStub::OnSetP2pHighPerf(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    bool isEnable = data.ReadBool();
+    WIFI_LOGD("run %{public}s code %{public}u, isEnable = %{public}d", __func__, code, isEnable);
+
+    ErrCode ret = SetP2pHighPerf(isEnable);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
 }
 }  // namespace Wifi
 }  // namespace OHOS

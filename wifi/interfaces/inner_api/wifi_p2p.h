@@ -308,6 +308,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetSupportedChanForBand(std::vector<int> &channels, int band) = 0;
+
+    /**
+     * @Description Set p2p high perf mode
+     *
+     * @param isEnable - enable high perf mode or not
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetP2pHighPerf(bool isEnable) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

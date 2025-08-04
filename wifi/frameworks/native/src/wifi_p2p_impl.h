@@ -436,6 +436,14 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetSupportedChanForBand(std::vector<int> &channels, int band) override;
+
+    /**
+     * @Description Set p2p high perf mode
+     *
+     * @param isEnable - enable high perf mode or not
+     * @return ErrCode - operation result
+     */
+    ErrCode SetP2pHighPerf(bool isEnable) override;
 private:
     bool GetWifiP2pProxy();
     std::atomic<int> systemAbilityId_;

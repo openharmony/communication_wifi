@@ -129,6 +129,8 @@ void P2pEnabledState::InitProcessMsg()
         [this](InternalMessagePtr msg) { return this->ProcessChrReport(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_MIRACAST_SINK_CONFIG,
         [this](InternalMessagePtr msg) { return this->ProcessSetMiracastSinkConfig(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_P2P_HIGH_PERF,
+        [this](InternalMessagePtr msg) { return this->ProcessSetP2pHighPerf(msg); }));
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
@@ -710,6 +712,14 @@ bool P2pEnabledState::ProcessSetMiracastSinkConfig(InternalMessagePtr msg) const
         return EXECUTED;
     }
     WifiP2PHalInterface::GetInstance().SetMiracastSinkConfig(config);
+    return EXECUTED;
+}
+
+bool P2pEnabledState::ProcessSetP2pHighPerf(InternalMessagePtr msg) const
+{
+    const bool isEnable = msg->GetParam1();
+    WIFI_LOGI("P2pEnabledState receive set p2p high perf mode, isEnable: %{public}d", isEnable);
+    WifiP2PHalInterface::GetInstance().SetP2pHighPerf(isEnable);
     return EXECUTED;
 }
 } // namespace Wifi

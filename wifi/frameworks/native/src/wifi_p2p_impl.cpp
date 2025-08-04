@@ -433,5 +433,12 @@ ErrCode WifiP2pImpl::GetSupportedChanForBand(std::vector<int> &channels, int ban
     RETURN_IF_FAIL(GetWifiP2pProxy());
     return client_->GetSupportedChanForBand(channels, band);
 }
+
+ErrCode WifiP2pImpl::SetP2pHighPerf(bool isEnable)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->SetP2pHighPerf(isEnable);
+}
 }  // namespace Wifi
 }  // namespace OHOS

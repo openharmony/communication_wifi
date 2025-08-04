@@ -315,6 +315,8 @@ private:
     bool P2pReject(const std::string mac) const;
 
     bool CreateTempGroupWithConfig(const WifiP2pConfigInternal &config, int freq) const;
+
+    bool HasP2pConnected(void);
 private:
     /**
      * @Description - Broadcast state change event.

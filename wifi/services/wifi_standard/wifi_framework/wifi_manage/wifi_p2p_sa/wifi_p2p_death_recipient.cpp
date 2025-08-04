@@ -15,6 +15,7 @@
 #include "wifi_p2p_death_recipient.h"
 #include "wifi_logger.h"
 #include "wifi_internal_event_dispatcher.h"
+#include "wifi_service_manager.h"
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pDeathRecipient");
 
 namespace OHOS {
@@ -22,7 +23,12 @@ namespace Wifi {
 void WifiP2pDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
 {
     WIFI_LOGD("WifiP2pDeathRecipient::OnRemoteDied!");
+    int uid = WifiInternalEventDispatcher::GetInstance().GetRemoteUid(remoteObject.promote());
     WifiInternalEventDispatcher::GetInstance().RemoveP2pCallback(remoteObject.promote());
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (uid != -1 && pService != nullptr) {
+        pService->NotifyRemoteDie(uid);
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -509,6 +509,14 @@ public:
     WifiErrorNo TempGroupAdd(int freq);
 
     WifiErrorNo P2pSetTempConfig(int networkId, const HalP2pGroupConfig &config) const;
+
+    /**
+     * @Description Set p2p high perf mode
+     *
+     * @param isEnable - enable high perf mode or not
+     * @return WifiErrorNo
+     */
+    WifiErrorNo SetP2pHighPerf(bool isEnable);
 private:
     P2pHalCallback mP2pCallback;
 };

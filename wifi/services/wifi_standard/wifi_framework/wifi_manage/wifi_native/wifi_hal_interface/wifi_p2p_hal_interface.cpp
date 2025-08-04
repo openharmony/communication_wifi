@@ -574,5 +574,17 @@ WifiErrorNo WifiP2PHalInterface::TempGroupAdd(int freq)
 #endif
     return WIFI_HAL_OPT_FAILED;
 }
+
+WifiErrorNo WifiP2PHalInterface::SetP2pHighPerf(bool isEnable)
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    std::string ifName = WifiConfigCenter::GetInstance().GetP2pIfaceName();
+    if (!HalDeviceManager::GetInstance().SetP2pHighPerf(ifName, isEnable)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+#endif
+    return WIFI_HAL_OPT_FAILED;
+}
 }  // namespace Wifi
 }  // namespace OHOS

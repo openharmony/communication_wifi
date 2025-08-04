@@ -27,6 +27,7 @@
         RegisterP2pConnectionChangedCallback;
         RegisterP2pPeersChangedCallback;
         CheckCanUseP2p;
+        SetP2pHighPerf;
         SetMiracastSinkConfig;
         EnableHotspot;
         DisableHotspot;

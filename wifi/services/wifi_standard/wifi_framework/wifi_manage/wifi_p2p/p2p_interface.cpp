@@ -297,5 +297,10 @@ ErrCode P2pInterface::NotifyRemoteDie(int uid)
 {
     return p2pService.NotifyRemoteDie(uid);
 }
+
+ErrCode P2pInterface::SetP2pHighPerf(bool isEnable)
+{
+    return p2pService.SetP2pHighPerf(isEnable);
+}
 }  // namespace Wifi
 }  // namespace OHOS

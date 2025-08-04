@@ -1635,5 +1635,32 @@ ErrCode WifiP2pServiceImpl::GetSupportedChanForBand(std::vector<int> &channels, 
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiP2pServiceImpl::SetP2pHighPerf(bool isEnable)
+{
+    WIFI_LOGI("SetP2pHighPerf");
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetP2pHighPerf:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetP2pHighPerf:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get P2P service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->SetP2pHighPerf(isEnable);
+}
 }  // namespace Wifi
 }  // namespace OHOS

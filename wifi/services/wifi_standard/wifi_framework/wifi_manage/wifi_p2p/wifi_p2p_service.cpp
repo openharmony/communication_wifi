@@ -537,5 +537,12 @@ ErrCode WifiP2pService::NotifyRemoteDie(int uid)
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_NOTIFY_REMOTE_DIE), uid);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiP2pService::SetP2pHighPerf(bool isEnable)
+{
+    WIFI_LOGI("SetP2pHighPerf");
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_P2P_HIGH_PERF), isEnable);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

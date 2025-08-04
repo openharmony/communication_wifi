@@ -356,6 +356,14 @@ public:
      */
     virtual ErrCode NotifyRemoteDie(int uid) override;
 
+    /**
+     * @Description Set p2p high perf mode
+     *
+     * @param isEnable - enable high perf mode or not
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetP2pHighPerf(bool isEnable) override;
+
 private:
     /**
      * @Description - P2P state machine deregistration event callback.

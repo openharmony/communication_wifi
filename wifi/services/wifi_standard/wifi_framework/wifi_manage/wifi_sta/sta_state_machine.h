@@ -610,8 +610,6 @@ private:
      */
     void AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName);
 
-    void SetAllowAutoConnectStatus(int32_t networkId, bool status);
-
     /**
      * @Description  Disconnect network
      *

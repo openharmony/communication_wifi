@@ -385,8 +385,8 @@ int32_t OnEventAuthReject(struct IWpaCallback *self,
     if (cbk.onWpaSsidWrongKey && statusCode == Wifi80211StatusCode::WLAN_STATUS_CHALLENGE_FAIL &&
         authType == Wifi80211AuthType::WLAN_AUTH_SAE) {
         LOGI("OnEventAuthReject, wrong password");
-        std::string bssid = std::string(bssid);
-        cbk.onWpaSsidWrongKey(bssid);
+        std::string bssid1 = std::string(bssid);
+        cbk.onWpaSsidWrongKey(bssid1);
         OHOS::Wifi::WriteAuthFailHiSysEvent("WRONG_PSWD");
         return 0;
     }

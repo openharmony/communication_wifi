@@ -49,6 +49,7 @@ public:
     static void ClearSharedLinkCount();
     static int GetSharedLinkCount();
     static void ClearUidCount(int uid);
+    static bool CheckNeedRemoveGroup(int uid);
 private:
     static void PrintMapInfo(void);
 

@@ -378,6 +378,7 @@
         "OHOS::Wifi::WifiInternalEventDispatcher::SetSingleP2pCallback(OHOS::sptr<OHOS::Wifi::IWifiP2pCallback> const&)";
         "OHOS::Wifi::WifiInternalEventDispatcher::RemoveP2pCallback(OHOS::sptr<OHOS::IRemoteObject> const&)";
         "OHOS::Wifi::WifiInternalEventDispatcher::ResetAllFrozenApp()";
+        "OHOS::Wifi::WifiInternalEventDispatcher::GetRemoteUid(OHOS::sptr<OHOS::IRemoteObject> const&)";
         "OHOS::Wifi::WifiInternalEventDispatcher::IsAppFrozen(int)";
         "OHOS::Wifi::WifiInternalEventDispatcher::SetAppFrozen(std::__h::set<int, std::__h::less<int>, std::__h::allocator<int>>, bool)";
         "OHOS::Wifi::WifiInternalEventDispatcher::AddBroadCastMsg(OHOS::Wifi::WifiEventCallbackMsg const&)";

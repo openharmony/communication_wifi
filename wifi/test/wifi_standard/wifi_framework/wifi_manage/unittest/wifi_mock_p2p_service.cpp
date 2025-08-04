@@ -441,6 +441,11 @@ ErrCode WifiMockP2pService::SetMiracastSinkConfig(const std::string& config)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiMockP2pService::NotifyRemoteDie(int uid)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
 extern "C" IP2pService *Create(void)
 {
     return new (std::nothrow) WifiMockP2pService();

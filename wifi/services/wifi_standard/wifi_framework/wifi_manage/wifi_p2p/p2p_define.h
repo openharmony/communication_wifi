@@ -119,6 +119,7 @@ enum class P2P_STATE_MACHINE_CMD {
     CMD_UNREGISTER_SERVICE_CB,
     CMD_CLEAR_SERVICE_CB,
     CMD_SET_MIRACAST_SINK_CONFIG,
+    CMD_NOTIFY_REMOTE_DIE,
 
     /* monitor to state machine */
     WPA_CONNECTED_EVENT = 100,  // result of connect

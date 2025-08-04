@@ -69,6 +69,16 @@ bool P2pDefaultState::ExecuteStateMsg(InternalMessagePtr msg)
             p2pStateMachine.ClearAllP2pServiceCallbacks();
             break;
         }
+        case P2P_STATE_MACHINE_CMD::CMD_NOTIFY_REMOTE_DIE: {
+            if (SharedLinkManager::GetSharedLinkCount() == 0 || !p2pStateMachine.HasP2pConnected()) {
+                return EXECUTED;
+            }
+            int uid = msg->GetParam1();
+            if (SharedLinkManager::CheckNeedRemoveGroup(uid)) {
+                p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
+            }
+            break;
+        }
         default:
             WIFI_LOGE("Failed:The  P2P state machine does not process messages: [%{public}d]", msgName);
             return NOT_EXECUTED;

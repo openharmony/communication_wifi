@@ -242,5 +242,10 @@ ErrCode P2pInterface::SetMiracastSinkConfig(const std::string& config)
 {
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode P2pInterface::NotifyRemoteDie(int uid)
+{
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

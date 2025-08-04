@@ -530,5 +530,12 @@ ErrCode WifiP2pService::SetMiracastSinkConfig(const std::string& config)
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_MIRACAST_SINK_CONFIG), info);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiP2pService::NotifyRemoteDie(int uid)
+{
+    WIFI_LOGI("NotifyRemoteDie");
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_NOTIFY_REMOTE_DIE), uid);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

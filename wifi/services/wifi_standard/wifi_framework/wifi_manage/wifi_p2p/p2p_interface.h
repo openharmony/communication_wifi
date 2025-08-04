@@ -377,6 +377,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetMiracastSinkConfig(const std::string& config) override;
+
+    /**
+     * @Description notify remote die for remove p2p group
+     *
+     * @param uid - remote's uid
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode NotifyRemoteDie(int uid) override;
 private:
     WifiP2pGroupManager groupManager;    /* group manager */
     WifiP2pDeviceManager deviceMgr;  /* device manager */

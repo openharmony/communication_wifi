@@ -106,7 +106,7 @@ private:
     void OnSetMiracastSinkConfig(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetSupportChanForBand(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-
+    void OnSetP2pHighPerf(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 private:
     HandleFuncMap handleFuncMap;
     std::mutex deathRecipientMutex;

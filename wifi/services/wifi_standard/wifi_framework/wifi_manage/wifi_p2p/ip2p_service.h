@@ -373,6 +373,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode NotifyRemoteDie(int uid) = 0;
+
+    /**
+     * @Description Set p2p high perf mode
+     *
+     * @param isEnable - enable high perf mode or not
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode SetP2pHighPerf(bool isEnable) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

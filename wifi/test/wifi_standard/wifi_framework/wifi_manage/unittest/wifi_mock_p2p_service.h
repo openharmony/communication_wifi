@@ -56,6 +56,7 @@ public:
     void NotifyWscDialogConfirmResult(bool isAccept);
     ErrCode SetMiracastSinkConfig(const std::string& config);
     ErrCode NotifyRemoteDie(int uid);
+    ErrCode SetP2pHighPerf(bool isEnable);
 
 public:
     IP2pServiceCallbacks mCallback;

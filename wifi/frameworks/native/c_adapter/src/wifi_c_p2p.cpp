@@ -625,3 +625,10 @@ NO_SANITIZE("cfi") WifiErrorCode SetMiracastSinkConfig(const char* config)
     CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
     return GetCErrorCode(wifiP2pPtr->SetMiracastSinkConfig(config));
 }
+
+NO_SANITIZE("cfi") WifiErrorCode SetP2pHighPerf(bool isEnable)
+{
+    CHECK_PTR_RETURN(wifiP2pPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiP2pPtr->SetP2pHighPerf(isEnable));
+}
+

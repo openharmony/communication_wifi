@@ -51,6 +51,7 @@ sptr<ChipIfaceCallback> HalDeviceManager::g_chipIfaceCallback = nullptr;
 OnChipServiceDied HalDeviceManager::g_chipHdiServiceDiedCb = nullptr;
 constexpr int32_t CMD_SET_MAX_CONNECT = 102;
 constexpr int32_t MAX_CONNECT_DEFAULT = 8;
+constexpr int32_t CMD_SET_P2P_HIGH_PERF = 103;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -846,6 +847,14 @@ bool HalDeviceManager::SetMaxConnectNum(const std::string &ifaceName, int32_t ch
     LOGI("SetMaxConnectNum param is %{public}s", param.c_str());
     std::string result;
     return SendCmdToDriver(ifaceName, ifaceName, CMD_SET_MAX_CONNECT, param, result);
+}
+
+bool HalDeviceManager::SetP2pHighPerf(const std::string &ifaceName, bool isEnable)
+{
+    std::string param = std::to_string(static_cast<int>(isEnable));
+    LOGI("SetP2pHighPerf param is %{public}s", param.c_str());
+    std::string result;
+    return SendCmdToDriver(ifaceName, ifaceName, CMD_SET_P2P_HIGH_PERF, param, result);
 }
 
 void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)

@@ -247,5 +247,10 @@ ErrCode P2pInterface::NotifyRemoteDie(int uid)
 {
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode P2pInterface::SetP2pHighPerf(bool isEnable)
+{
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

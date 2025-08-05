@@ -432,6 +432,14 @@ public:
      */
     bool SetMaxConnectNum(const std::string &ifaceName, int32_t channel, int32_t maxConn);
 
+    /**
+     * @Description Set p2p high perf mode
+     * @param interfaceName interfaceName
+     * @param isEnable - enable high perf mode or not
+     * @return bool
+     */
+    bool SetP2pHighPerf(const std::string &ifaceName, bool isEnable);
+
     void RegisterChipHdiDeathCallback(OnChipServiceDied cb);
 private:
     bool CheckReloadChipHdiService();

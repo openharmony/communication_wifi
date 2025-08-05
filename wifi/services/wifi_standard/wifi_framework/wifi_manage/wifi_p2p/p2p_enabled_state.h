@@ -285,6 +285,15 @@ private:
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessSetMiracastSinkConfig(InternalMessagePtr msg) const;
+
+    /**
+     * @Description Set p2p high perf mode
+     *
+     * @param Message body sent by the state machine
+     * @return - bool true:handle	false:not handle
+     */
+    virtual bool ProcessSetP2pHighPerf(InternalMessagePtr msg) const;
+
 private:
     void P2pConfigInitExt(bool &result);
 

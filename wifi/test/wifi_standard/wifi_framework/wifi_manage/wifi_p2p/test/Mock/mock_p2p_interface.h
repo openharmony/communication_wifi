@@ -70,6 +70,7 @@ public:
     virtual void NotifyWscDialogConfirmResult(bool isAccept);
     virtual ErrCode SetMiracastSinkConfig(const std::string& config);
     virtual ErrCode NotifyRemoteDie(int uid);
+    virtual ErrCode SetP2pHighPerf(bool isEnable);
 };
 }  // namespace Wifi
 }  // namespace OHOS

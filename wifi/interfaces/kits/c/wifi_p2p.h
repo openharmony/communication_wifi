@@ -255,6 +255,14 @@ WifiErrorCode CheckCanUseP2p();
  */
 WifiErrorCode SetMiracastSinkConfig(const char* config);
 
+/**
+ * @Description Set p2p high perf mode
+ *
+ * @param isEnable - enable high perf mode or not
+ * @return WifiErrorCode - operation result
+ */
+WifiErrorCode SetP2pHighPerf(bool isEnable);
+
 #ifdef __cplusplus
 }
 #endif

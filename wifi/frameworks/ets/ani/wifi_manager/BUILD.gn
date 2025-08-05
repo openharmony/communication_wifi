@@ -28,10 +28,10 @@ ohos_shared_library("wifimanager_ani") {
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "c_utils:utils",
+    "hilog:libhilog",
     "runtime_core:ani",
     "runtime_core:libarkruntime",
     "samgr:samgr_proxy",
-    "hilog:libhilog",
   ]
   part_name = "wifi"
   subsystem_name = "communication"

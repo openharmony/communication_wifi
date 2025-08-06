@@ -768,6 +768,12 @@ HWTEST_F(StaInterfaceTest, EnableHiLinkHandshakeSuccess, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(StaInterfaceTest, StartWifiDetectionSuceess, TestSize.Level1)
+{
+    StartWifiDetectionSuceess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 HWTEST_F(StaInterfaceTest, DeliverStaIfaceDataSuccess, TestSize.Level1)
 {
     DeliverStaIfaceDataSuceess();

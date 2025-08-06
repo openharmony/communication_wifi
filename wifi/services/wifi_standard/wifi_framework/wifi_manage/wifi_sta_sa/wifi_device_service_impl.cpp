@@ -2004,6 +2004,10 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 
 ErrCode WifiDeviceServiceImpl::StartWifiDetection()
 {
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("StartWifiDetection(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("%{public}s NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -2012,8 +2016,7 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
         WIFI_LOGE("%{public}s set wifi info PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED
-        && WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("%{public}s manage wifi PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_PERMISSION_DENIED;
     }

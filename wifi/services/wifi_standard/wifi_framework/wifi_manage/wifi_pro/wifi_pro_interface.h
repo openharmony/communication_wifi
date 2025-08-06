@@ -90,7 +90,7 @@ public:
      * @param config - chaned config
      * @param isRemoveAll - is remove all device config 1:remove all 0:not remove all
      */
-    void OnWifiDeviceConfigChange(int32_t status, WifiDeviceConfig config, int32_t isRemoveAll) override;
+    void OnWifiDeviceConfigChange(int32_t status, const WifiDeviceConfig &config, bool isRemoveAll) override;
 #endif
 private:
     /**

@@ -43,8 +43,8 @@
 #endif
 #include "ienhance_service.h"
 #include "iself_cure_service.h"
-#include "wifi_common_event_helper.h"
 #include "appmgr/app_mgr_interface.h"
+#include "wifi_common_event_helper.h"
 #include "sta_sm_ext.h"
 #ifdef WIFI_DATA_REPORT_ENABLE
 #include "select_network_data_report.h"

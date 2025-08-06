@@ -161,7 +161,7 @@ void WifiProInterface::OnWifiStateClose(int32_t state)
     pWifiProService_->OnWifiStateClose(state);
 }
 
-void WifiProInterface::OnWifiDeviceConfigChange(int32_t status, WifiDeviceConfig config, int32_t isRemoveAll)
+void WifiProInterface::OnWifiDeviceConfigChange(int32_t status, const WifiDeviceConfig &config, bool isRemoveAll)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (pWifiProService_ == nullptr) {

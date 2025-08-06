@@ -39,6 +39,7 @@ const int SCAN_INTERVAL_NORMAL_3 = 3 * 60 * 1000;
 const int SCAN_INTERVAL_NORMAL_5 = 5 * 60 * 1000;
 const int SCAN_INTERVAL_SHORT = 20 * 1000;
 const int AUTO_OPEN_WIFI_DELAY_TIME = 3 * 1000;
+const int UPDATE_TARGET_SSID_TIME = 10 * 1000;
 }
 DEFINE_WIFILOG_LABEL("WifiIntelligenceStateMachine");
 
@@ -348,6 +349,7 @@ bool WifiIntelligenceStateMachine::DisabledState::ExecuteStateMsg(InternalMessag
             if (WifiConfigCenter::GetInstance().IsScreenLandscape()) {
                 break;
             }
+            [[fallthrough]];
         }
         case EVENT_CELL_STATE_CHANGE:
             [[fallthrough]];
@@ -683,11 +685,15 @@ WifiIntelligenceStateMachine::DisconnectedState::~DisconnectedState() {}
 void WifiIntelligenceStateMachine::DisconnectedState::GoInState()
 {
     WIFI_LOGI("Enter DisconnectedState GoInState function.");
+    if (!pWifiIntelligenceStateMachine_->mTargetSsid_.empty()) {
+        pWifiIntelligenceStateMachine_->StartTimer(EVENT_UPDATE_TARGET_SSID, UPDATE_TARGET_SSID_TIME);
+    }
 }
 
 void WifiIntelligenceStateMachine::DisconnectedState::GoOutState()
 {
     WIFI_LOGI("Enter DisconnectedState GoOutState function.");
+    pWifiIntelligenceStateMachine_->StopTimer(EVENT_UPDATE_TARGET_SSID);
 }
 
 bool WifiIntelligenceStateMachine::DisconnectedState::ExecuteStateMsg(InternalMessagePtr msg)

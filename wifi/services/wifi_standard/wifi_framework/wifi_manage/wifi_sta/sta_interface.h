@@ -417,8 +417,7 @@ public:
      * @Description Fetch Wifi SignalInfo For VoWiFi.
      *
      * @return VoWifiSignalInfo : wifi signal info
-     */
-    
+     */    
     ErrCode FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo) override;
  
     /**

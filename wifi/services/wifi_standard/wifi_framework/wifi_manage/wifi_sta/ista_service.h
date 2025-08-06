@@ -396,6 +396,13 @@ public:
     virtual ErrCode DeliverStaIfaceData(const std::string &currentMac) = 0;
 
     /**
+     * @Description deliver mac
+     *
+	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartWifiDetection() = 0;
+
+    /**
      * @Description Deliver Audio State
      *
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED

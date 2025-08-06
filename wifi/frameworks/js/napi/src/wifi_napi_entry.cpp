@@ -437,6 +437,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getWifiProtect", GetWifiProtect),
         DECLARE_NAPI_FUNCTION("putWifiProtect", PutWifiProtect),
         DECLARE_NAPI_FUNCTION("factoryReset", FactoryReset),
+        DECLARE_NAPI_FUNCTION("startWifiDetection", StartWifiDetection),
         DECLARE_NAPI_FUNCTION("enableHiLinkHandshake", EnableHiLinkHandshake),
     };
 

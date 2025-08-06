@@ -220,3 +220,97 @@ Set up a WLAN connection.
 
 **communication\_wifi**
 
+
+
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+ 
+NO_SANITIZE("cfi") napi_value StartWifiDetection(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    ErrCode ret = wifiDevicePtr->StartWifiDetection();
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+ 
+NO_SANITIZE("cfi") napi_value EnableHiLinkHandshake(napi_env env, napi_callback_info info)
+{
+
+
+ErrCode WifiDeviceProxy::StartWifiDetection()
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`, remote service is died.", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error, func:%{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WIFI_DETECTION), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("StartWifiDetection(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WIFI_DETECTION), error);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode WifiDeviceProxy::ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
+
+
+ErrCode WifiDeviceServiceImpl::StartWifiDetection()
+{
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("%{public}s NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s set wifi info PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED
+        && WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s manage wifi PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    pService->StartWifiDetection();
+    return WIFI_OPT_SUCCESS;
+}
+ 
+#ifndef OHOS_ARCH_LITE
+ErrCode WifiDeviceServiceImpl::FactoryResetNotify()
+
+
+
+ErrCode StaInterface::StartWifiDetection()
+{
+    WIFI_LOGI("Enter StartWifiDetection");
+    return WIFI_OPT_SUCCESS;
+}
+ 
+#ifndef OHOS_ARCH_LITE
+ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
+{

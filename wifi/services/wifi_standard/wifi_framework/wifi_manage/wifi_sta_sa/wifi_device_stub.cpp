@@ -149,6 +149,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetVoWifiDetectPeriod(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetSignalPollInfoArray(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WIFI_DETECTION)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnStartWifiDetection(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_MULTI_LINKED_INFO)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetMultiLinkedInfo(code, data, reply); };
 }
@@ -1384,6 +1386,15 @@ void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageP
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = FactoryReset();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnStartWifiDetection(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = StartWifiDetection();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

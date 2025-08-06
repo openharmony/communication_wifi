@@ -219,3 +219,4 @@ Set up a WLAN connection.
 [DSoftBus](https://gitee.com/openharmony/docs/blob/master/en/readme/dsoftbus.md)
 
 **communication\_wifi**
+

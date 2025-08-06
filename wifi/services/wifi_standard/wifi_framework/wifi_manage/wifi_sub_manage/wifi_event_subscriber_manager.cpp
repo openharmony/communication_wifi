@@ -1369,7 +1369,7 @@ void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &ev
     const auto &action = eventData.GetWant().GetAction();
     bool isSettingsEnter = eventData.GetWant().GetBoolParam(WLAN_PAGE_ENTER, false);
     WIFI_LOGI("SettingsEnterSubscriber OnReceiveEvent: %{public}s, isSettingsEnter : %{public}d",
-        action.c_str(), isSettingsEnter)
+        action.c_str(), isSettingsEnter);
     if (action == ENTER_SETTINGS) {
         WifiConfigCenter::GetInstance().SetWlanPage(isSettingsEnter);
         if (isSettingsEnter) {

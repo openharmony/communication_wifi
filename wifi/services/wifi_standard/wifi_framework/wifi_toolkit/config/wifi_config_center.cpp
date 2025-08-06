@@ -1049,14 +1049,14 @@ int WifiConfigCenter::GetScreenState() const
     return mScreenState.load();
 }
 
-void WifiConfigCenter::SetWlanPage(bool isOnWlanPage)
+void WifiConfigCenter::SetWlanPage(bool isWlanPage)
 {
-    isOnWlanPage_.store(isOnWlanPage);
+    isWlanPage_.store(isWlanPage);
 }
 
 int WifiConfigCenter::IsWlanPage() const
 {
-    return isOnWlanPage_.load();
+    return isWlanPage_.load();
 }
 
 void WifiConfigCenter::SetThermalLevel(const int &level)

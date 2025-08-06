@@ -565,7 +565,7 @@ bool WifiProStateMachine::IsFirstConnectAndNonet()
         return true;
     }
     return currentState_ == WifiProState::WIFI_NONET && WifiProUtils::IsUserSelectNetwork() &&
-           config.numAssociation <= 1;
+           config.numAssociation <= 1 && isFirstNetDectect_;
 }
 /* --------------------------- state machine default state ------------------------------ */
 WifiProStateMachine::DefaultState::DefaultState(WifiProStateMachine *pWifiProStateMachine)

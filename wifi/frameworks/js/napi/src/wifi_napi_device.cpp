@@ -1947,6 +1947,14 @@ NO_SANITIZE("cfi") napi_value FactoryReset(napi_env env, napi_callback_info info
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
+NO_SANITIZE("cfi") napi_value StartWifiDetection(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    ErrCode ret = wifiDevicePtr->StartWifiDetection();
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+}
+
 NO_SANITIZE("cfi") napi_value EnableHiLinkHandshake(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;

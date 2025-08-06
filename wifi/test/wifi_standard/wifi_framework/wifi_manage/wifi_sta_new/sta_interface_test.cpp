@@ -98,6 +98,11 @@ HWTEST_F(StaInterfaceTest, StartPortalCertificationTest01, TestSize.Level1)
     EXPECT_TRUE(pStaInterface->StartPortalCertification() == WIFI_OPT_SUCCESS);
 }
 
+HWTEST_F(StaInterfaceTest, StartWifiDetectionTest01, TestSize.Level1)
+{
+    EXPECT_TRUE(pStaInterface->StartWifiDetection() == WIFI_OPT_SUCCESS);
+}
+
 HWTEST_F(StaInterfaceTest, HandleForegroundAppChangedActionTest01, TestSize.Level1)
 {
     AppExecFwk::AppStateData appStateData;

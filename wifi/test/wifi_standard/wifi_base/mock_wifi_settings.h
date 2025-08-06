@@ -120,6 +120,8 @@ public:
     virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
     virtual void SetWifiToggledState(int state) = 0;
     virtual int GetScreenState() const = 0;
+    virtual void SetWlanPage(bool isOnWlanPage) = 0;
+    virtual bool IsWlanPage() const = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
     virtual bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
         const std::string &randomAddr) = 0;

@@ -281,7 +281,7 @@ public:
 
     int GetScreenState() const;
 
-    void SetWlanPage(bool isOnWlanPage);
+    void SetWlanPage(bool isWlanPage);
 
     int IsWlanPage() const;
 
@@ -482,7 +482,7 @@ private:
     // COMMON
     std::atomic<bool> mIsSupportCoex {false};
     std::atomic<int> mScreenState {MODE_STATE_DEFAULT};
-    std::atomic<bool> isOnWlanPage_{false};
+    std::atomic<bool> isWlanPage_{false};
     std::atomic<int> mThermalLevel {static_cast<int>(ThermalLevel::NORMAL)};
     std::atomic<int> mPowerIdelState {MODE_STATE_CLOSE};
     std::atomic<int> mGnssFixState {MODE_STATE_CLOSE};

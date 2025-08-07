@@ -445,6 +445,37 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilter5gReturnFalse, TestSize.Level1)
     EXPECT_FALSE(poorPortalWifiFilter->DoFilter(networkCandidate5));
 }
 
+HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilterIsWlanPageReturnTrue, TestSize.Level1) {
+    InterScanInfo scanInfo3;
+    scanInfo4.ssid = "x";
+    scanInfo4.rssi = -50;
+    scanInfo4.band = 2;
+    scanInfo4.bssid = "11:11:11:11:11:22";
+    NetworkSelection::NetworkCandidate networkCandidate3(scanInfo4);
+    networkCandidate4.wifiDeviceConfig.isPortal = 1;
+    networkCandidate4.wifiDeviceConfig.networkId = 1;
+    networkCandidate4.wifiDeviceConfig.noInternetAccess = 0;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
+    EXPECT_CALL(WifiSettings::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+
+    auto poorportalWifiFilter = std::make_shared<NetworkSelection::PortalWifiFilter>();
+    EXPECT_TRUE(poorportalWifiFilter->DoFilter(networkCandidate4));
+
+
+HWTEST_F(WifiFilterImplTest, PortalWifiFilterIsWlanPageReturnTrue, TestSize.Level1) {
+    InterScanInfo scanInfo3;
+    scanInfo3.ssid = "x";
+    scanInfo3.bssid = "11:11:11:11:11:22";
+    NetworkSelection::NetworkCandidate networkCandidate3(scanInfo3);
+    networkCandidate3.wifiDeviceConfig.isPortal = 1;
+    networkCandidate3.wifiDeviceConfig.networkId = 1;
+    networkCandidate3.wifiDeviceConfig.noInternetAccess = 0;
+    EXPECT_CALL(WifiSettings::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+
+    auto portalWifiFilter = std::make_shared<NetworkSelection::PortalWifiFilter>();
+    EXPECT_TRUE(portalWifiFilter->DoFilter(networkCandidate3));
+}
+
 HWTEST_F(WifiFilterImplTest, PortalWifiFilterReturnTrue, TestSize.Level1) {
     InterScanInfo scanInfo3;
     scanInfo3.ssid = "x";
@@ -475,6 +506,7 @@ HWTEST_F(WifiFilterImplTest, PortalWifiFilterReturnFalse, TestSize.Level1) {
     networkCandidate2.wifiDeviceConfig.isPortal = 0;
     networkCandidate2.wifiDeviceConfig.networkId = 1;
     networkCandidate2.wifiDeviceConfig.noInternetAccess = 0;
+    EXPECT_CALL(WifiSettings::GetInstance(), IsWlanPage()).WillRepeatedly(Return(false));
 
     auto portalWifiFilter = std::make_shared<NetworkSelection::PortalWifiFilter>();
     EXPECT_FALSE(portalWifiFilter->DoFilter(networkCandidate1));

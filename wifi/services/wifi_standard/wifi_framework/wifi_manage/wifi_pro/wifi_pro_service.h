@@ -43,7 +43,7 @@ public:
     void OnCellInfoUpdated();
     void OnWifiStateOpen(int32_t state);
     void OnWifiStateClose(int32_t state);
-    void OnWifiDeviceConfigChange(int32_t status, WifiDeviceConfig config, int32_t isRemoveAll);
+    void OnWifiDeviceConfigChange(int32_t status, const WifiDeviceConfig &config, bool isRemoveAll);
 #endif
 private:
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT

@@ -1988,7 +1988,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
     if (pWifiProService != nullptr) {
         WifiDeviceConfig config;
-        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE), config, 1);
+        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE), config, true);
     }
 #endif
     /* p2p */

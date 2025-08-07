@@ -50,6 +50,7 @@
 #include "wifi_net_stats_manager.h"
 #include "wifi_history_record_manager.h"
 #endif // OHOS_ARCH_LITE
+
 #include "wifi_channel_helper.h"
 #ifndef OHOS_WIFI_STA_TEST
 #else
@@ -1613,7 +1614,7 @@ void StaStateMachine::ApLinkedState::DealCsaChannelChanged(InternalMessagePtr ms
         return;
     }
     int newFrq = msg->GetParam1();
-    WIFI_LOGI("%{public}s update freq from %{public}d  to %{public}d", __FUNCTION__,
+    WIFI_LOGI("%{public}s update freq from %{public}d to %{public}d", __FUNCTION__,
         pStaStateMachine->linkedInfo.frequency, newFrq);
     if (newFrq == pStaStateMachine->linkedInfo.frequency) {
         return;
@@ -2385,7 +2386,7 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     } else {
         if (GetDeviceType() == ProductDeviceType::TV) {
             PublishPortalNitificationAndLogin();
-        }        
+        }
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
@@ -2395,9 +2396,9 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
 void StaStateMachine::PublishPortalNitificationAndLogin()
 {
 #ifndef OHOS_ARCH_LITE
-    bool shouldShowNotification = 
+    bool shouldShowNotification =
         (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL) && WifiConfigCenter::GetInstance().IsAllowPopUp();
- 
+
     if (shouldShowNotification) {
         if (selfCureService_ == nullptr || (selfCureService_ != nullptr && !selfCureService_->IsSelfCureOnGoing())) {
             WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);

@@ -204,14 +204,13 @@ if (defined(ohos_lite)) {
       "ability_runtime:wantagent_innerkits",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
-      "c_utils:utils",
       "cJSON:cjson",
+      "c_utils:utils",
       "dhcp:dhcp_sdk",
       "hilog:libhilog",
       "init:libbegetutil",
       "ipc:ipc_core",
       "ipc:ipc_single",
-      "libxml2:libxml2",
       "netmanager_base:net_conn_manager_if",
       "netmanager_base:net_stats_manager_if",
       "safwk:system_ability_fwk",
@@ -236,6 +235,9 @@ if (defined(ohos_lite)) {
         "cellular_data:tel_cellular_data_api",
         "core_service:tel_core_service_api",]
       defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
+    }
+    if (wifi_feature_autoopen_specified_location) {
+      defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
     }
     part_name = "wifi"
     subsystem_name = "communication"

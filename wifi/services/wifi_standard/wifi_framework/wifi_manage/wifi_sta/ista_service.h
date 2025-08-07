@@ -401,6 +401,12 @@ public:
 	 * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode DeliverAudioState(int state) = 0;
+    /**
+     * @Description fold status
+     *
+     * @param success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnFoldStateChanged(const int foldStatus) = 0;
 
     /**
      * @Description  wifiPro service initialization function.
@@ -461,13 +467,6 @@ public:
     virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) = 0;
 
     /**
-     * @Description fold status
-     *
-     * @param success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
-     */
-    virtual ErrCode OnFoldStateChanged(const int foldStatus) = 0;
-
-    /**
      * @Description Add wifi block list and wifi white list
      *
      * @param config - WifiRestrictedInfo object
@@ -475,7 +474,7 @@ public:
      * @return ErrCode - operation result
      */
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
-virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
+    virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
 #endif
 };
 }  // namespace Wifi

@@ -223,7 +223,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
 #ifndef OHOS_ARCH_LITE
         auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
         std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-        if (wifiBrokerFrameProcessName.empty() || ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
+        if (ancoBrokerFrameProcessName != wifiBrokerFrameProcessName) {
             LOGE("AddCandidateConfig unsupport wep key!");
             return WIFI_OPT_NOT_SUPPORTED;
         }
@@ -456,7 +456,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     /* update net link proxy info */
     pStaStateMachine->ReUpdateNetLinkInfo(tempDeviceConfig);
     ConfigChange changeType = isUpdate ? ConfigChange::CONFIG_UPDATE : ConfigChange::CONFIG_ADD;
-    NotifyDeviceConfigChange(changeType, tempDeviceConfig, 0);
+    NotifyDeviceConfigChange(changeType, tempDeviceConfig, false);
     return netWorkId;
 }
 
@@ -484,12 +484,12 @@ ErrCode StaService::RemoveDevice(int networkId) const
     WifiSettings::GetInstance().RemoveDevice(networkId);
     WifiSettings::GetInstance().RemoveConnectChoiceFromAllNetwork(networkId);
     WifiSettings::GetInstance().SyncDeviceConfig();
-    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE, config, 0);
+    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE, config, false);
 #ifndef OHOS_ARCH_LITE
     WifiHistoryRecordManager::GetInstance().DeleteApInfo(config.ssid, config.keyMgmt);
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (!wifiBrokerFrameProcessName.empty() && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;
     } else {
         config.callProcessName = "";
@@ -516,13 +516,13 @@ ErrCode StaService::RemoveAllDevice() const
         return WIFI_OPT_FAILED;
     }
     WifiDeviceConfig config;
-    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE, config, 1);
+    NotifyDeviceConfigChange(ConfigChange::CONFIG_REMOVE, config, true);
 #ifndef OHOS_ARCH_LITE
     WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
     config.networkId = REMOVE_ALL_DEVICECONFIG;
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (!wifiBrokerFrameProcessName.empty() && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         config.callProcessName = wifiBrokerFrameProcessName;
     } else {
         config.callProcessName = "";
@@ -758,7 +758,7 @@ ErrCode StaService::AutoConnectService(const std::vector<InterScanInfo> &scanInf
     }
     auto wifiBrokerFrameProcessName = WifiSettings::GetInstance().GetPackageName("anco_broker_name");
     std::string ancoBrokerFrameProcessName = GetBrokerProcessNameByPid(GetCallingUid(), GetCallingPid());
-    if (!wifiBrokerFrameProcessName.empty() && ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
+    if (ancoBrokerFrameProcessName == wifiBrokerFrameProcessName) {
         WifiConfigCenter::GetInstance().SetWifiConnectedMode(true, m_instId);
         WIFI_LOGD("StaService %{public}s, anco, %{public}d", __func__, m_instId);
     } else {
@@ -822,11 +822,11 @@ ErrCode StaService::SetPowerMode(bool mode) const
     return WIFI_OPT_SUCCESS;
 }
 
-void StaService::NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig config, int32_t isRemoveAll) const
+void StaService::NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig config, bool isRemoveAll) const
 {
     WIFI_LOGI("Notify device config change: %{public}d\n", static_cast<int>(value));
 #if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
-    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
     if (pWifiProService != nullptr) {
         pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(value), config, isRemoveAll);
     }
@@ -1053,6 +1053,7 @@ void StaService::HandleFoldStatusChanged(int foldstatus)
     }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT, foldstatus);
 }
+
 std::string StaService::VoWifiDetect(std::string cmd)
 {
     std::unique_lock<std::shared_mutex> lock(voWifiCallbackMutex_);

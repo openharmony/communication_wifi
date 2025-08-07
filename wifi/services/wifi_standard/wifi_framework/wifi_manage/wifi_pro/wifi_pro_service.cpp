@@ -231,7 +231,7 @@ void WifiProService::OnWifiStateClose(int32_t state)
     }
 }
 
-void WifiProService::OnWifiDeviceConfigChange(int32_t status, WifiDeviceConfig config, int32_t isRemoveAll)
+void WifiProService::OnWifiDeviceConfigChange(int32_t status, const WifiDeviceConfig &config, bool isRemoveAll)
 {
     if (pWifiIntelligenceStateMachine_ != nullptr) {
         pWifiIntelligenceStateMachine_->SendMessage(EVENT_CONFIGURATION_CHANGED, status, isRemoveAll, config);

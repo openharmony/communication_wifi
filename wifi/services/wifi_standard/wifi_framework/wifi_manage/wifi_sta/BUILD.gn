@@ -154,8 +154,7 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_telephony_utils",
     ]
 
-    defines = [ "FEATURE_STA_SUPPORT",
-      "WIFI_CONFIG_UPDATE" ]
+    defines = [ "FEATURE_STA_SUPPORT" ]
 
     if (wifi_feature_with_local_random_mac) {
       defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]

@@ -767,7 +767,7 @@ bool WifiHdiWpaClient::WriteConfigToFile(const std::string &fileContext)
     }
     file << fileContext << std::endl;
     file.close();
-    if (chmod(destPath.c_str(), S_IRUSR | S_IWUSR | S_IRGRP) != 0) {
+    if (chmod(destPath.c_str(), S_IRUSR | S_IWUSR) != 0) {
         LOGE("Set file permissions failed: %s", strerror(errno));
         return false;
     }

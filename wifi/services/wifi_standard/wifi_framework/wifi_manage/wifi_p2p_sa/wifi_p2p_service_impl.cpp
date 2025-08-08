@@ -1518,7 +1518,7 @@ ErrCode WifiP2pServiceImpl::DiscoverPeers(int32_t channelid)
 ErrCode WifiP2pServiceImpl::DisableRandomMac(int setmode)
 {
     WIFI_LOGE("DisableRandomMac");
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisableRandomMac:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }

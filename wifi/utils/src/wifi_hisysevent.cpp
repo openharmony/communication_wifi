@@ -239,6 +239,25 @@ void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason)
     cJSON_Delete(root);
 }
 
+void WriteSoftApOperateHiSysEvent(int operateType)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "OPERATE_TYPE", operateType);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "SOFTAP_OPERATE_STATE", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+
 void WriteWifiAccessIntFailedHiSysEvent(
     int operateRes, int failCnt, int selfCureResetState, std::string selfCureHistory)
 {

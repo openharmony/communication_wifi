@@ -26,6 +26,7 @@
 #include "wifi_msg.h"
 #include "wifi_config_center.h"
 #include "wifi_common_util.h"
+#include "wifi_controller_define.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -225,6 +226,7 @@ void WifiCountryCodeManager::DealApStateChanged(ApState state, int id, int hotsp
     } else if (state != ApState::AP_STATE_STARTING && state != ApState::AP_STATE_STARTED) {
         std::string moduleName = "ApService_" + std::to_string(id);
         WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
+        WriteSoftApOperateHiSysEvent(static_cast<int>(SoftApChrEventType::SOFT_AP_OPEN_SUC_CNT));
     }
 }
 #endif

@@ -21,6 +21,7 @@
 #include "ap_state_machine.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "wifi_controller_define.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStationsManager");
 
@@ -170,6 +171,7 @@ void ApStationsManager::StationJoin(const StationInfo &staInfo) const
     if (it == results.end() || it->ipAddr != staInfo.ipAddr) {
         if (m_stationChangeCallback) {
             m_stationChangeCallback(staInfoTemp, ApStatemachineEvent::CMD_STATION_JOIN);
+            WriteSoftApOperateHiSysEvent(static_cast<int>(SoftApChrEventType::SOFT_AP_CONN_SUC_CNT));
         }
     }
     return;

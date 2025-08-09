@@ -177,6 +177,8 @@ void WriteWifiOpenAndCloseFailedHiSysEvent(int operateType, std::string failReas
 
 void WriteSoftApOpenAndCloseFailedEvent(int operateType, std::string failReason);
 
+void WriteSoftApOperateHiSysEvent(int operateType);
+
 void WriteWifiAccessIntFailedHiSysEvent(int operateRes, int failCnt, int selfCureResetState,
     std::string selfCureHistory);
 

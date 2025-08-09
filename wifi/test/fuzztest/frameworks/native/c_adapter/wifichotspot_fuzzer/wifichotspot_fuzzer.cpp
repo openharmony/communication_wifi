@@ -19,6 +19,7 @@
 #include "wifichotspot_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 #include "kits/c/wifi_hotspot.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 static void SetHotspotConfigTest(const uint8_t* data, size_t size)
 {
@@ -92,6 +93,9 @@ static void DisassociateStaTest(const uint8_t* data, size_t size)
 static void GetHotspotModeTest(const uint8_t* data, size_t size)
 {
     int mode = 3;  // 3: HotspotMode::LOCAL_ONLY_SOFTAP
+    (void)GetHotspotMode(&mode);
+    FuzzedDataProvider fdp(data, size);
+    mode = fdp.ConsumeIntegral<int>();
     (void)GetHotspotMode(&mode);
 }
  

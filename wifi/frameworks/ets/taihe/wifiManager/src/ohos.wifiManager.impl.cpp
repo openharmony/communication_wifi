@@ -18,6 +18,7 @@
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 
+#include "define.h"
 #include "wifi_callback_taihe.h"
 #include "wifi_errorcode_taihe.h"
 using namespace OHOS::Wifi;
@@ -103,16 +104,14 @@ bool IsWifiActive()
     return MakeWifiLinkedInfo(linkedInfo);
 }
 
-double GetSignalLevel(double rssi, double band)
+int GetSignalLevel(int rssi, int band)
 {
     int level = -1;
-    int tmpRssi = static_cast<int>(rssi);
-    int tmpBand = static_cast<int>(band);
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return 0.0;
     }
-    ErrCode ret = g_wifiDevicePtr->GetSignalLevel(tmpRssi, tmpBand, level);
+    ErrCode ret = g_wifiDevicePtr->GetSignalLevel(rssi, band, level);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
@@ -277,6 +276,7 @@ void EnableSemiWifi()
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
 }
+
 OHOS::sptr<WifiIdlDeviceEventCallback> wifiDeviceCallback =
         OHOS::sptr<WifiIdlDeviceEventCallback>(new (std::nothrow) WifiIdlDeviceEventCallback());
 
@@ -289,243 +289,506 @@ OHOS::sptr<WifiIdlHotspotEventCallback> wifiHotspotCallback =
 OHOS::sptr<WifiIdlP2pEventCallback> wifiP2pCallback =
     OHOS::sptr<WifiIdlP2pEventCallback>(new (std::nothrow) WifiIdlP2pEventCallback());
 
-void OnWifiStateChange(::taihe::callback_view<void(double)> callback)
+void OnWifiStateChange(::taihe::callback_view<void(int)> callback)
 {
-    wifiDeviceCallback->wifiStateChangedCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+    std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
+    auto wifiStateChangedCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiStateChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
+    if (g_wifiStateChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
+    g_wifiStateChangeVec.emplace_back(wifiStateChangedCallback);
 }
 
-void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
+    if (g_wifiStateChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiStateChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiStateChangeVec[i] == callback) {
+                g_wifiStateChangeVec.erase(g_wifiStateChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: wifiStateChange");
+        g_wifiStateChangeVec.clear();
+    }
 }
 
-void OnWifiConnectionChange(::taihe::callback_view<void(double)> callback)
+void OnWifiConnectionChange(::taihe::callback_view<void(int)> callback)
 {
-    wifiDeviceCallback->wifiConnectionChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+    std::unique_lock<std::shared_mutex> guard(g_wifiConnectionChangeLock);
+    auto wifiConnectionChangeCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiConnectionChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
+    if (g_wifiConnectionChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+    g_wifiConnectionChangeVec.emplace_back(wifiConnectionChangeCallback);
+}
+ 
+void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_wifiConnectionChangeLock);
+    if (g_wifiConnectionChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiConnectionChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiConnectionChangeVec[i] == callback) {
+                g_wifiConnectionChangeVec.erase(g_wifiConnectionChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: wifiConnectionChange");
+        g_wifiConnectionChangeVec.clear();
     }
 }
-
-void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+ 
+void OnWifiScanStateChange(::taihe::callback_view<void(int)> callback)
 {
-}
-
-void OnWifiScanStateChange(::taihe::callback_view<void(double)> callback)
-{
-    wifiScanCallback->wifiScanStateChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+    std::unique_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
+    auto wifiScanStateChangeCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiScanStateChange"};
     if (g_wifiScanPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
+    if (g_wifiScanStateChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiScanPtr->RegisterCallBack(wifiScanCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+    g_wifiScanStateChangeVec.emplace_back(wifiScanStateChangeCallback);
+}
+ 
+void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
+    if (g_wifiScanStateChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiScanStateChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiScanStateChangeVec[i] == callback) {
+                g_wifiScanStateChangeVec.erase(g_wifiScanStateChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: wifiScanStateChange");
+        g_wifiScanStateChangeVec.clear();
     }
 }
-
-void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+ 
+void OnWifiRssiChange(::taihe::callback_view<void(int)> callback)
 {
-}
-
-void OnWifiRssiChange(::taihe::callback_view<void(double)> callback)
-{
-    wifiDeviceCallback->wifiRssiChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+    std::unique_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
+    auto wifiRssiChangeCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiRssiChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
+    if (g_wifiRssiChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+    g_wifiRssiChangeVec.emplace_back(wifiRssiChangeCallback);
+}
+ 
+void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
+    if (g_wifiRssiChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiRssiChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiRssiChangeVec[i] == callback) {
+                g_wifiRssiChangeVec.erase(g_wifiRssiChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: wifiRssiChange");
+        g_wifiRssiChangeVec.clear();
     }
 }
 
-void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OnStreamChange(::taihe::callback_view<void(int)> callback)
 {
-}
-
-void OnStreamChange(::taihe::callback_view<void(double)> callback)
-{
-    wifiDeviceCallback->wifiStreamChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+    std::unique_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
+    auto wifiRssiChangeCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"streamChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
+    if (g_wifiStreamChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+    g_wifiStreamChangeVec.emplace_back(wifiRssiChangeCallback);
+}
+
+void OffStreamChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
+    if (g_wifiStreamChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiStreamChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiStreamChangeVec[i] == callback) {
+                g_wifiStreamChangeVec.erase(g_wifiStreamChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: streamChange");
+        g_wifiStreamChangeVec.clear();
     }
 }
 
-void OffStreamChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OnDeviceConfigChange(::taihe::callback_view<void(int)> callback)
 {
-}
-
-void OnDeviceConfigChange(::taihe::callback_view<void(double)> callback)
-{
-    wifiDeviceCallback->wifiDeviceConfigChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+    std::unique_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
+    auto wifiDeviceConfigChangeCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"deviceConfigChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
+    if (g_wifiDeviceConfigChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+    g_wifiDeviceConfigChangeVec.emplace_back(wifiDeviceConfigChangeCallback);
+}
+
+void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
+    if (g_wifiDeviceConfigChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiDeviceConfigChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiDeviceConfigChangeVec[i] == callback) {
+                g_wifiDeviceConfigChangeVec.erase(g_wifiDeviceConfigChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: deviceConfigChange");
+        g_wifiDeviceConfigChangeVec.clear();
     }
 }
 
-void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OnHotspotStateChange(::taihe::callback_view<void(int)> callback)
 {
-}
-
-void OnHotspotStateChange(::taihe::callback_view<void(double)> callback)
-{
-    wifiHotspotCallback->wifiHotspotStateChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+    std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
+    auto wifiHotspotStateChangeCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"hotspotStateChange"};
     if (g_wifiHotspotPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
         return;
     }
+    if (g_wifiHotspotStateChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+        return;
     }
+    g_wifiHotspotStateChangeVec.emplace_back(wifiHotspotStateChangeCallback);
 }
 
-void OffHotspotStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffHotspotStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
+    if (g_wifiHotspotStateChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiHotspotStateChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiHotspotStateChangeVec[i] == callback) {
+                g_wifiHotspotStateChangeVec.erase(g_wifiHotspotStateChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: hotspotStateChange");
+        g_wifiHotspotStateChangeVec.clear();
+    }
 }
 
 void OnHotspotStaJoin(::taihe::callback_view<void(::ohos::wifiManager::StationInfo const&)> callback)
 {
-    wifiHotspotCallback->wifiHotspotStaJoinCallback_ = ::taihe::optional<::taihe::callback<void(
+    std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStaJoinLock);
+    auto wifiHotspotStaJoinCallback = ::taihe::optional<::taihe::callback<void(
         ::ohos::wifiManager::StationInfo const&)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"hotspotStaJoin"};
     if (g_wifiHotspotPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
         return;
     }
+    if (g_wifiHotspotStaJoinVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+        return;
     }
+    g_wifiHotspotStaJoinVec.emplace_back(wifiHotspotStaJoinCallback);
 }
 
 void OffHotspotStaJoin(
     ::taihe::optional_view<::taihe::callback<void(::ohos::wifiManager::StationInfo const&)>> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStaJoinLock);
+    if (g_wifiHotspotStaJoinVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiHotspotStaJoinVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiHotspotStaJoinVec[i] == callback) {
+                g_wifiHotspotStaJoinVec.erase(g_wifiHotspotStaJoinVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: hotspotStaJoin");
+        g_wifiHotspotStaJoinVec.clear();
+    }
 }
 
 void OnHotspotStaLeave(::taihe::callback_view<void(::ohos::wifiManager::StationInfo const&)> callback)
 {
-    wifiHotspotCallback->wifiHotspotStaLeaveCallback_ = ::taihe::optional<::taihe::callback<void(
+    std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStaLeaveLock);
+    auto wifiHotspotStaLeaveCallback = ::taihe::optional<::taihe::callback<void(
         ::ohos::wifiManager::StationInfo const&)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"hotspotStaLeave"};
     if (g_wifiHotspotPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
         return;
     }
+    if (g_wifiHotspotStaLeaveVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiHotspotPtr->RegisterCallBack(wifiHotspotCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+        return;
     }
+    g_wifiHotspotStaLeaveVec.emplace_back(wifiHotspotStaLeaveCallback);
 }
 
 void OffHotspotStaLeave(
     ::taihe::optional_view<::taihe::callback<void(::ohos::wifiManager::StationInfo const&)>> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStaLeaveLock);
+    if (g_wifiHotspotStaLeaveVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiHotspotStaLeaveVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiHotspotStaLeaveVec[i] == callback) {
+                g_wifiHotspotStaLeaveVec.erase(g_wifiHotspotStaLeaveVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: hotspotStaLeave");
+        g_wifiHotspotStaLeaveVec.clear();
+    }
 }
 
-void OnP2pStateChange(::taihe::callback_view<void(double)> callback)
+void OnP2pStateChange(::taihe::callback_view<void(int)> callback)
 {
-    wifiP2pCallback->wifiP2pStateChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
+    auto wifiP2pStateChangeCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pStateChange"};
     if (g_wifiP2pPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
         return;
     }
+    if (g_wifiP2pStateChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return;
     }
+    g_wifiP2pStateChangeVec.emplace_back(wifiP2pStateChangeCallback);
 }
 
-void OffP2pStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffP2pStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
+    if (g_wifiP2pStateChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiP2pStateChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiP2pStateChangeVec[i] == callback) {
+                g_wifiP2pStateChangeVec.erase(g_wifiP2pStateChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: p2pStateChange");
+        g_wifiP2pStateChangeVec.clear();
+    }
 }
 
 void OnP2pConnectionChange(::taihe::callback_view<void(::ohos::wifiManager::WifiP2pLinkedInfo const&)> callback)
 {
-    wifiP2pCallback->wifiP2pConnectionChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pConnectionChangeLock);
+    auto wifiP2pConnectionChangeCallback = ::taihe::optional<::taihe::callback<void(
         ::ohos::wifiManager::WifiP2pLinkedInfo const&)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pConnectionChange"};
     if (g_wifiP2pPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
         return;
     }
+    if (g_wifiP2pConnectionChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return;
     }
+    g_wifiP2pConnectionChangeVec.emplace_back(wifiP2pConnectionChangeCallback);
 }
 
 void OffP2pConnectionChange(
     ::taihe::optional_view<::taihe::callback<void(::ohos::wifiManager::WifiP2pLinkedInfo const&)>> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pConnectionChangeLock);
+    if (g_wifiP2pConnectionChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiP2pConnectionChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiP2pConnectionChangeVec[i] == callback) {
+                g_wifiP2pConnectionChangeVec.erase(g_wifiP2pConnectionChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: p2pConnectionChange");
+        g_wifiP2pConnectionChangeVec.clear();
+    }
 }
 
 void OnP2pDeviceChange(::taihe::callback_view<void(::ohos::wifiManager::WifiP2pDevice const&)> callback)
 {
-    wifiP2pCallback->wifiP2pDeviceChangeCallback_ = ::taihe::optional<::taihe::callback<void(
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pDeviceChangeLock);
+    auto wifiP2pDeviceChangeCallback = ::taihe::optional<::taihe::callback<void(
         ::ohos::wifiManager::WifiP2pDevice const&)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pDeviceChange"};
     if (g_wifiP2pPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
         return;
     }
+    if (g_wifiP2pDeviceChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return;
     }
+    g_wifiP2pDeviceChangeVec.emplace_back(wifiP2pDeviceChangeCallback);
 }
 
 void OffP2pDeviceChange(::taihe::optional_view<::taihe::callback<void(
     ::ohos::wifiManager::WifiP2pDevice const&)>> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pDeviceChangeLock);
+    if (g_wifiP2pDeviceChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiP2pDeviceChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiP2pDeviceChangeVec[i] == callback) {
+                g_wifiP2pDeviceChangeVec.erase(g_wifiP2pDeviceChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: p2pDeviceChange");
+        g_wifiP2pDeviceChangeVec.clear();
+    }
 }
 
 void OnP2pPeerDeviceChange(::taihe::callback_view<void(
     ::taihe::array_view<::ohos::wifiManager::WifiP2pDevice>)> callback)
 {
-    wifiP2pCallback->wifiP2pPeerDeviceChangeCallback_ =
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pPeerDeviceChangeLock);
+    auto wifiP2pPeerDeviceChangeCallback =
         ::taihe::optional<::taihe::callback<void(
         ::taihe::array_view<::ohos::wifiManager::WifiP2pDevice>)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pPeerDeviceChange"};
@@ -533,54 +796,119 @@ void OnP2pPeerDeviceChange(::taihe::callback_view<void(
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
         return;
     }
+    if (g_wifiP2pPeerDeviceChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
     ErrCode ret = g_wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return;
     }
+    g_wifiP2pPeerDeviceChangeVec.emplace_back(wifiP2pPeerDeviceChangeCallback);
 }
 
 void OffP2pPeerDeviceChange(::taihe::optional_view<::taihe::callback<void(
     ::taihe::array_view<::ohos::wifiManager::WifiP2pDevice>)>> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pPeerDeviceChangeLock);
+    if (g_wifiP2pPeerDeviceChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiP2pPeerDeviceChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiP2pPeerDeviceChangeVec[i] == callback) {
+                g_wifiP2pPeerDeviceChangeVec.erase(g_wifiP2pPeerDeviceChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: p2pPeerDeviceChange");
+        g_wifiP2pPeerDeviceChangeVec.clear();
+    }
 }
 
 void OnP2pPersistentGroupChange(::taihe::callback_view<void(::ohos::wifiManager::UndefinedType const&)> callback)
 {
-    wifiP2pCallback->wifiP2pPersistentGroupChangeCallback_ = ::taihe::optional<::taihe::callback<void(
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pPersistentGroupChangeLock);
+    auto wifiP2pPersistentGroupChangeCallback = ::taihe::optional<::taihe::callback<void(
         ::ohos::wifiManager::UndefinedType const&)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pPersistentGroupChange"};
     if (g_wifiP2pPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
         return;
     }
-    ErrCode ret = g_wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
-    }
-}
-
-void OffP2pPersistentGroupChange(::taihe::optional_view<::taihe::callback<void(
-    ::ohos::wifiManager::UndefinedType const&)>> callback)
-{
-}
-
-void OnP2pDiscoveryChange(::taihe::callback_view<void(double)> callback)
-{
-    wifiP2pCallback->wifiP2pDiscoveryChangeCallback_ =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
-    std::vector<std::string> event = {"p2pDiscoveryChange"};
-    if (g_wifiP2pPtr == nullptr) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+    if (g_wifiP2pPersistentGroupChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
         return;
     }
     ErrCode ret = g_wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return;
+    }
+    g_wifiP2pPersistentGroupChangeVec.emplace_back(wifiP2pPersistentGroupChangeCallback);
+}
+
+void OffP2pPersistentGroupChange(::taihe::optional_view<::taihe::callback<void(
+    ::ohos::wifiManager::UndefinedType const&)>> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pPersistentGroupChangeLock);
+    if (g_wifiP2pPersistentGroupChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiP2pPersistentGroupChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiP2pPersistentGroupChangeVec[i] == callback) {
+                g_wifiP2pPersistentGroupChangeVec.erase(g_wifiP2pPersistentGroupChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: p2pPersistentGroupChange");
+        g_wifiP2pPersistentGroupChangeVec.clear();
     }
 }
 
-void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OnP2pDiscoveryChange(::taihe::callback_view<void(int)> callback)
 {
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
+    auto wifiP2pDiscoveryChangeCallback =
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
+    std::vector<std::string> event = {"p2pDiscoveryChange"};
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    if (g_wifiP2pDiscoveryChangeVec.size() > REGISTERINFO_MAX_NUM) {
+        WIFI_LOGE("RegisterInfo Exceeding the maximum value!");
+        return;
+    }
+    ErrCode ret = g_wifiP2pPtr->RegisterCallBack(wifiP2pCallback, event);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return;
+    }
+    g_wifiP2pDiscoveryChangeVec.emplace_back(wifiP2pDiscoveryChangeCallback);
+}
+
+void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
+{
+    std::unique_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
+    if (g_wifiP2pDiscoveryChangeVec.empty()) {
+        WIFI_LOGE("Unregister type not registered!");
+        return;
+    }
+    if (callback != nullptr) {
+        for (int i = static_cast<int>(g_wifiP2pDiscoveryChangeVec.size()) - 1; i >= 0; --i) {
+            if (g_wifiP2pDiscoveryChangeVec[i] == callback) {
+                g_wifiP2pDiscoveryChangeVec.erase(g_wifiP2pDiscoveryChangeVec.begin() + i);
+            }
+        }
+    } else {
+        WIFI_LOGW("Unregister all relevant subscribe for: p2pDiscoveryChange");
+        g_wifiP2pDiscoveryChangeVec.clear();
+    }
 }
 }
 

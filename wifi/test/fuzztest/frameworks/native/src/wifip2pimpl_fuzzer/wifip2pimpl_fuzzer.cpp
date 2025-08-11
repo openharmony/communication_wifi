@@ -20,6 +20,7 @@
 #include "wifi_fuzz_common_func.h"
 #include "src/wifi_p2p_impl.h"
 #include "wifi_p2p.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
@@ -95,6 +96,13 @@ namespace Wifi {
     void QueryP2pServicesTest(const uint8_t* data, size_t size)
     {
         std::vector<WifiP2pServiceInfo> services;
+        WifiP2pPtr->QueryP2pServices(services);
+        FuzzedDataProvider fdp(data, size);
+        int vectorLength = fdp.ConsumeIntegral<int>();
+        for (int i = 0; i < vectorLength; i++) {
+            WifiP2pServiceInfo servicetmp;
+            services.push_back(servicetmp);
+        }
         WifiP2pPtr->QueryP2pServices(services);
     }
 

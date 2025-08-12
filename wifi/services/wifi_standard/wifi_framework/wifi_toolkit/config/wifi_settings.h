@@ -399,10 +399,9 @@ public:
 private:
     // STA
     std::mutex mStaMutex;
-    std::mutex mConfigOnBootMutex;
     int mNetworkId;
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
-    std::atomic_flag mEncryptionOnBootFalg = ATOMIC_FLAG_INIT;
+    std::atomic_flag mEncryptionOnBootFlag = ATOMIC_FLAG_INIT;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;

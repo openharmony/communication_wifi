@@ -502,6 +502,11 @@ bool ScanService::AllowScanByHid2dState()
     return true;
 }
 
+bool ScanService::AllowScanByGameScene()
+{
+    return true;
+}
+
 bool ScanService::IsPackageInTrustList(const std::string &trustList, int sceneId,
     const std::string &appPackageName) const
 {

@@ -1756,6 +1756,12 @@ public:
         EXPECT_TRUE(pScanService->AllowScanByHid2dState() == true);
     }
 
+    void AllowScanByGameSceneTest()
+    {
+        pScanService->staStatus = static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED);
+        EXPECT_TRUE(pScanService->AllowScanByGameScene() == true);
+    }
+
     void AllowCustomSceneCheckTest1()
     {
         std::map<int, time_t> customIter;

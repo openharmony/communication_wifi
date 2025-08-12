@@ -67,6 +67,7 @@ taihe_shared_library("wifiManager_taihe_native") { #调用taihe_shared_library�
     "runtime_core:ani",
     "runtime_core:libarkruntime",
     "samgr:samgr_proxy",
+    "ipc:ipc_single",
   ]
 }
 

@@ -2787,6 +2787,9 @@ bool ScanService::AllowScanByActionListen()
 
 bool ScanService::AllowScanByGameScene()
 {
+    if (staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
+        return true;
+    }
     WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
     if (NetworkControlInfo.state == GameSceneId::MSG_GAME_ENTER_PVP_BATTLE ||
         NetworkControlInfo.state == GameSceneId::MSG_GAME_STATE_FOREGROUND) {

@@ -40,6 +40,7 @@
 #include "wifi_randommac_helper.h"
 #include "wifi_battery_utils.h"
 #include "ap_define.h"
+#include "wifi_controller_define.h"
 
 #define SET_DUAL_ANTENNAS 45
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
@@ -278,6 +279,7 @@ void ApStartedState::ProcessCmdStationJoin(InternalMessagePtr msg)
         WIFI_LOGE("sta has removed.");
         return;
     }
+    WriteSoftApOperateHiSysEvent(static_cast<int>(SoftApChrEventType::SOFT_AP_CONN_CNT));
     m_ApStateMachine.m_ApStationsManager.StationJoin(staInfo);
 }
 

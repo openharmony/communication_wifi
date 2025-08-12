@@ -847,7 +847,7 @@ int WifiSettings::ReloadDeviceConfig()
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
     LOGI("ReloadDeviceConfig load deviceConfig size: %{public}d", static_cast<int>(mWifiDeviceConfig.size()));
-    if (!mEncryptionOnBootFalg.test_and_set()) {
+    if (!mEncryptionOnBootFlag.test_and_set()) {
         mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
         mWifiEncryptionThread->PostAsyncTask([this]() {
             LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot start.");

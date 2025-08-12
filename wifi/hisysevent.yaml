@@ -95,6 +95,13 @@ SOFTAP_CONNECT_FAILED:
   __BASE: {type: FAULT, level: MINOR, desc: soft ap connect failed event}
   ERROR_CODE: {type: INT32, desc: error code}
 
+SOFTAP_OPERATE_STATE:
+  __BASE: {type: STATISTIC, level: MINOR, desc: softap chr event}
+  CONNECTED_COUNT: {type: INT32, desc: softap connect success count}
+  CONNECT_TOTAL_COUNT: {type: INT32, desc: softap connect total count}
+  OPEN_COUNT: {type: INT32, desc: softap open count}
+  OPEN_SUCCESS_COUNT: {type: INT32, desc: softap open success count}
+
 WIFI_CHR_EVENT:
   __BASE: {type: STATISTIC, level: MINOR, desc: Wifi chr event}
   EVENT_NAME: {type: STRING, desc: event name}

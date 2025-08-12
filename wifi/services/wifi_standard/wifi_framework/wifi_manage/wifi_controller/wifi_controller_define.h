@@ -119,6 +119,13 @@ enum class SoftApperateType {
     CLOSE_SOFT_AP_FAILED = 1,
 };
 
+enum class SoftApChrEventType {
+    SOFT_AP_OPEN_CNT = 0,
+    SOFT_AP_OPEN_SUC_CNT,
+    SOFT_AP_CONN_CNT,
+    SOFT_AP_CONN_SUC_CNT,
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

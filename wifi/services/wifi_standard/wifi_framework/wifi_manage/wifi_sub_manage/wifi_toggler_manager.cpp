@@ -26,6 +26,7 @@
 #include "netsys_native_service_proxy.h"
 #include "system_ability_definition.h"
 #endif
+#include "wifi_controller_define.h"
 
 DEFINE_WIFILOG_LABEL("WifiTogglerManager")
 
@@ -147,6 +148,7 @@ ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
     if (isOpen) {
         WIFI_LOGI("set softap toggled true");
         WifiConfigCenter::GetInstance().SetSoftapToggledState(true);
+        WriteSoftApOperateHiSysEvent(static_cast<int>(SoftApChrEventType::SOFT_AP_OPEN_CNT));
     } else {
         WIFI_LOGI("set softap toggled false");
         WifiConfigCenter::GetInstance().SetSoftapToggledState(false);

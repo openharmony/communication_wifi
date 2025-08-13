@@ -705,7 +705,7 @@ void WifiProStateMachine::WifiProEnableState::HandleWifiConnectStateChangedInEna
     } else if (state == static_cast<int32_t>(OperateResState::DISCONNECT_DISCONNECTED)) {
         WIFI_LOGI("state transition: WifiProEnableState -> WifiDisConnectedStat.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiDisConnectedState_);
-        pWifiProStateMachine_->perf5gHandoverService_.OnDisconnected();
+        pWifiProStateMachine_->perf5gHandoverService_.OnDisconnectedExternal();
     } else {
         return;
     }
@@ -834,7 +834,7 @@ void WifiProStateMachine::WifiConnectedState::HandleWifiConnectStateChangedInCon
     if (state == static_cast<int32_t>(OperateResState::DISCONNECT_DISCONNECTED)) {
         WIFI_LOGI("state transition: WifiConnectedState -> WifiDisconnectedState.");
         pWifiProStateMachine_->SwitchState(pWifiProStateMachine_->pWifiDisConnectedState_);
-        pWifiProStateMachine_->perf5gHandoverService_.OnDisconnected();
+        pWifiProStateMachine_->perf5gHandoverService_.OnDisconnectedExternal();
     } else {
         if (state == static_cast<int32_t>(OperateResState::CONNECT_AP_CONNECTED)) {
             pWifiProStateMachine_->ProcessSwitchResult(msg);

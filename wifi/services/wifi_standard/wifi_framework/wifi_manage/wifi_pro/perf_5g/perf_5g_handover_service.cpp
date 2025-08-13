@@ -44,6 +44,7 @@ Perf5gHandoverService::~Perf5gHandoverService()
 {}
 void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
 {
+    std::unique_lock<std::mutex> lock(mPerf5gMutex);
     std::string strategyName = HandleSwitchResult(wifiLinkedInfo);
     bool is5gAfterPerf = (strategyName != "");
     if (connectedAp_ != nullptr && connectedAp_->wifiLinkType == wifiLinkedInfo.wifiLinkType) {
@@ -93,6 +94,13 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     PrintRelationAps();
 }
 
+// Encapsulate the function into external and internal types.
+void Perf5gHandoverService::OnDisconnectedExternal()
+{
+    std::unique_lock<std::mutex> lock(mPerf5gMutex);
+    OnDisconnected();
+}
+
 void Perf5gHandoverService::InitConnectedAp(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig)
 {
     if (connectedAp_ == nullptr) {
@@ -132,8 +140,10 @@ void Perf5gHandoverService::OnDisconnected()
     perf5gChrInfo_.Reset();
     bssidLastConnected_ = connectedAp_->apInfo.bssid;
     linkQualityLastConnected_ = connectedAp_->apInfo.apConnectionInfo.GetLinkQualitys();
-    pDualBandRepostitory_->SaveApInfo(connectedAp_->apInfo);
-    pDualBandRepostitory_->SaveRelationApInfo(relationAps_);
+    if (pDualBandRepostitory_ != nullptr) {
+        pDualBandRepostitory_->SaveApInfo(connectedAp_->apInfo);
+        pDualBandRepostitory_->SaveRelationApInfo(relationAps_);
+    }
     StopMonitor();
     WIFI_LOGI("OnDisconnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d)",
         SsidAnonymize(connectedAp_->apInfo.ssid).data(), MacAnonymize(connectedAp_->apInfo.bssid).data(),
@@ -145,6 +155,7 @@ void Perf5gHandoverService::OnDisconnected()
 }
 void Perf5gHandoverService::NetworkStatusChanged(NetworkStatus networkStatus)
 {
+    std::unique_lock<std::mutex> lock(mPerf5gMutex);
     if (connectedAp_ == nullptr) {
         return;
     }
@@ -170,6 +181,7 @@ void Perf5gHandoverService::NetworkStatusChanged(NetworkStatus networkStatus)
 }
 std::string Perf5gHandoverService::Switch5g()
 {
+    std::unique_lock<std::mutex> lock(mPerf5gMutex);
     if (selectRelationAp_ == nullptr || connectedAp_ == nullptr) {
         return "";
     }
@@ -198,6 +210,7 @@ std::string Perf5gHandoverService::Switch5g()
 }
 void Perf5gHandoverService::ScanResultUpdated(std::vector<InterScanInfo> &scanInfos)
 {
+    std::unique_lock<std::mutex> lock(mPerf5gMutex);
     if (connectedAp_ == nullptr || connectedAp_->canNotPerf) {
         return;
     }
@@ -226,6 +239,7 @@ void Perf5gHandoverService::ScanResultUpdated(std::vector<InterScanInfo> &scanIn
 }
 void Perf5gHandoverService::HandleSignalInfoChange(InternalMessagePtr msg)
 {
+    std::unique_lock<std::mutex> lock(mPerf5gMutex);
     if (msg == nullptr) {
         WIFI_LOGI("HandleSignalInfoChange, msg is nullptr");
         return;
@@ -270,6 +284,7 @@ void Perf5gHandoverService::HandleSignalInfoChange(InternalMessagePtr msg)
 }
 void Perf5gHandoverService::QoeUpdate(InternalMessagePtr msg)
 {
+    std::unique_lock<std::mutex> lock(mPerf5gMutex);
     if (msg == nullptr) {
         WIFI_LOGI("QoeUpdate, msg is nullptr");
         return;
@@ -353,7 +368,10 @@ void Perf5gHandoverService::AddRelationAp(std::vector<WifiDeviceConfig> &wifiDev
         WIFI_LOGD("AddRelationAp, not found new relation ap");
         return;
     }
-    std::vector<RelationAp> relationApInfos = pDualBandRepostitory_->QueryRelationApInfos(noExistRelationBssidSet);
+    std::vector<RelationAp> relationApInfos;
+    if (pDualBandRepostitory_ != nullptr) {
+        relationApInfos = pDualBandRepostitory_->QueryRelationApInfos(noExistRelationBssidSet);
+    }
     for (auto &relationApInfo : relationApInfos) {
         AddRelationApInfo(relationApInfo);
         if (sameSsidAps.empty()) {
@@ -457,7 +475,7 @@ void Perf5gHandoverService::ClearDeletedRelationAp(std::vector<WifiDeviceConfig>
             }
         }
     }
-    if (!deletedBssids.empty()) {
+    if (!deletedBssids.empty() && pDualBandRepostitory_ != nullptr) {
         pDualBandRepostitory_->DeleteAll(deletedBssids);
         relationAps_ = relationApsAfterDel;
     }
@@ -483,6 +501,7 @@ void Perf5gHandoverService::StopMonitor()
 void Perf5gHandoverService::ActiveScan(int32_t rssi)
 {
     if (pWifiScanController_ == nullptr) {
+        WIFI_LOGE("ActiveScan, pWifiScanController_ is nullptr");
         return;
     }
     bool needScanInMonitor = false;
@@ -610,6 +629,10 @@ std::string Perf5gHandoverService::HandleSwitchResult(WifiLinkedInfo &wifiLinked
 }
 void Perf5gHandoverService::UpdateTriggerScanRssiThreshold()
 {
+    if (pWifiScanController_ == nullptr || connectedAp_ == nullptr) {
+        WIFI_LOGE("UpdateTriggerScanRssiThreshold, pWifiScanController_ or connectedAp_ is nullptr");
+        return;
+    }
     if (pWifiScanController_->IsFastScan()) {
         return;
     }
@@ -664,6 +687,10 @@ void Perf5gHandoverService::GetNoExistRelationInfo(std::vector<WifiDeviceConfig>
 }
 void Perf5gHandoverService::LoadRelationApInfo()
 {
+    if (pDualBandRepostitory_ == nullptr || connectedAp_ == nullptr) {
+        WIFI_LOGE("LoadRelationApInfo, pDualBandRepostitory_ or connectedAp_ is nullptr");
+        return;
+    }
     if (IsValid24GHz(connectedAp_->apInfo.frequency)) {
         pDualBandRepostitory_->LoadRelationApInfo(connectedAp_->apInfo.bssid, relationAps_,
             [](RelationInfo &relationInfo) {return relationInfo.relationBssid5g_;});

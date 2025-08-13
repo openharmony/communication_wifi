@@ -1122,7 +1122,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkIncrease()
 {
     int callingUid = GetCallingUid();
     WIFI_LOGI("Uid %{public}d Hid2dSharedlinkIncrease", callingUid);
-    if (callingUid != SOFT_BUS_SERVICE_UID) {
+    if (callingUid != SOFT_BUS_SERVICE_UID && callingUid != WAUDIO_SERVICE_UID) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }
@@ -1153,7 +1153,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
 {
     int callingUid = GetCallingUid();
     WIFI_LOGI("Uid %{public}d Hid2dSharedlinkDecrease", callingUid);
-    if (callingUid != SOFT_BUS_SERVICE_UID) {
+    if (callingUid != SOFT_BUS_SERVICE_UID && callingUid != WAUDIO_SERVICE_UID) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }

@@ -847,7 +847,7 @@ int WifiSettings::ReloadDeviceConfig()
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
     LOGI("ReloadDeviceConfig load deviceConfig size: %{public}d", static_cast<int>(mWifiDeviceConfig.size()));
-    if (!mEncryptionOnBootFalg.test_and_set()) {
+    if (!mEncryptionOnBootFlag.test_and_set()) {
         mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
         mWifiEncryptionThread->PostAsyncTask([this]() {
             LOGI("ReloadDeviceConfig EncryptionWifiDeviceConfigOnBoot start.");
@@ -928,9 +928,13 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
         LOGE("OnBackup key or iv is empty.");
         return -1;
     }
-    mSavedDeviceConfig.LoadConfig();
+
     std::vector<WifiDeviceConfig> localConfigs;
-    mSavedDeviceConfig.GetValue(localConfigs);
+    {
+        std::unique_lock<std::mutex> lock(mStaMutex);
+        mSavedDeviceConfig.LoadConfig();
+        mSavedDeviceConfig.GetValue(localConfigs);
+    }
 
     std::vector<WifiBackupConfig> backupConfigs;
     for (auto &config : localConfigs) {
@@ -1780,12 +1784,15 @@ int WifiSettings::IncreaseNumRebootsSinceLastUse()
 void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
 {
 #ifdef FEATURE_ENCRYPTION_SUPPORT
-    std::unique_lock<std::mutex> lock(mConfigOnBootMutex);
-    if (mSavedDeviceConfig.LoadConfig() < 0) {
-        return;
-    }
     std::vector<WifiDeviceConfig> tmp;
-    mSavedDeviceConfig.GetValue(tmp);
+    {
+        std::unique_lock<std::mutex> lock(mStaMutex);
+        if (mSavedDeviceConfig.LoadConfig() < 0) {
+            return;
+        }
+        mSavedDeviceConfig.GetValue(tmp);
+    }
+
     int count = 0;
 
     for (std::size_t i = 0; i < tmp.size(); ++i) {
@@ -1795,8 +1802,11 @@ void WifiSettings::EncryptionWifiDeviceConfigOnBoot()
         }
     }
     if (count > 0) {
-        mSavedDeviceConfig.SetValue(tmp);
-        mSavedDeviceConfig.SaveConfig();
+        {
+            std::unique_lock<std::mutex> lock(mStaMutex);
+            mSavedDeviceConfig.SetValue(tmp);
+            mSavedDeviceConfig.SaveConfig();
+        }
         ReloadDeviceConfig();
     }
     LOGI("EncryptionWifiDeviceConfigOnBoot end count:%{public}d", count);
@@ -2140,9 +2150,9 @@ void WifiSettings::MergeWifiConfig()
         LOGE("MergeWifiConfig wifideviceConfig empty");
         return;
     }
+    std::unique_lock<std::mutex> lock(mStaMutex);
     mSavedDeviceConfig.SetValue(wifideviceConfig);
     mSavedDeviceConfig.SaveConfig();
-    std::unique_lock<std::mutex> lock(mStaMutex);
     std::vector<WifiStoreRandomMac> wifiStoreRandomMac = xmlParser->GetRandomMacmap();
     mSavedWifiStoreRandomMac.SetValue(wifiStoreRandomMac);
     mSavedWifiStoreRandomMac.SaveConfig();
@@ -2192,9 +2202,13 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
         LOGE("NewConfigs is empty!");
         return;
     }
-    mSavedDeviceConfig.LoadConfig();
+
     std::vector<WifiDeviceConfig> localConfigs;
-    mSavedDeviceConfig.GetValue(localConfigs);
+    {
+        std::unique_lock<std::mutex> lock(mStaMutex);
+        mSavedDeviceConfig.LoadConfig();
+        mSavedDeviceConfig.GetValue(localConfigs);
+    }
 
     std::set<std::string> tmp;
     for (const auto &localConfig : localConfigs) {
@@ -2219,8 +2233,11 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
     WifiAssetManager::GetInstance().WifiAssetAddPack(addConfigs);
 #endif
     std::vector<WifiDeviceConfig>().swap(newConfigs);
-    mSavedDeviceConfig.SetValue(localConfigs);
-    mSavedDeviceConfig.SaveConfig();
+    {
+        std::unique_lock<std::mutex> lock(mStaMutex);
+        mSavedDeviceConfig.SetValue(localConfigs);
+        mSavedDeviceConfig.SaveConfig();
+    }
     ReloadDeviceConfig();
 }
 

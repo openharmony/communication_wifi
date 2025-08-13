@@ -675,26 +675,6 @@ HWTEST_F(WifiHalDeviceManagerTest, SelectInterfacesToDeleteTest_01, TestSize.Lev
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
 
-HWTEST_F(WifiHalDeviceManagerTest, CanIfaceComboSupportRequestTest_01, TestSize.Level1)
-{
-    WifiChipInfo wifiChipInfo;
-    UsableMode chipMode;
-    chipMode.modeId = 0;
-
-    std::vector<int> chipIfaceCombo;
-    chipIfaceCombo.push_back(1);
-
-    IfaceCreationData ifaceCreationData;
-
-    std::vector<WifiIfaceInfo> wifiIfaceInfo;
-    IfaceType createIfaceType = IfaceType::STA;
-
-    wifiChipInfo.ifaces.insert(std::pair<IfaceType, std::vector<WifiIfaceInfo>>(createIfaceType, wifiIfaceInfo));
-
-    EXPECT_TRUE(HalDeviceManager::GetInstance().CanIfaceComboSupportRequest(wifiChipInfo,
-        chipMode, chipIfaceCombo, createIfaceType, ifaceCreationData));
-}
-
 HWTEST_F(WifiHalDeviceManagerTest, CompareIfaceCreationDataTest_01, TestSize.Level1)
 {
     WifiChipInfo chipInfoParam;

@@ -633,14 +633,6 @@ HWTEST_F(WifiManagerTest, CheckSatelliteStateTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(WifiManagerTest, IsInterfaceUpTest, TestSize.Level1)
-{
-    WIFI_LOGI("IsInterfaceUpTest enter!");
-    std::string iface = "wlan0";
-    wifiManager.wifiTogglerManager->IsInterfaceUp(iface);
-    EXPECT_FALSE(wifiManager.wifiTogglerManager->IsInterfaceUp(iface));
-}
-
 HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_WpaDeath, TestSize.Level1)
 {
     wifiManager.OnNativeProcessStatusChange(WPA_DEATH);

@@ -36,14 +36,14 @@ public:
     Perf5gHandoverService();
     ~Perf5gHandoverService();
     void OnConnected(WifiLinkedInfo &wifiLinkedInfo);
-    void OnDisconnected();
     void NetworkStatusChanged(NetworkStatus networkStatus);
     std::string Switch5g();
     void ScanResultUpdated(std::vector<InterScanInfo> &scanInfos);
     void HandleSignalInfoChange(InternalMessagePtr msg);
     void QoeUpdate(InternalMessagePtr msg);
-    void HandleSwitchFailed(Perf5gSwitchResult switchResult);
+    void OnDisconnectedExternal();
 private:
+    std::mutex mPerf5gMutex;
     std::shared_ptr<ConnectedAp> connectedAp_ = nullptr;
     std::vector<RelationAp> relationAps_;
     std::vector<int32_t> monitorApIndexs_;
@@ -80,6 +80,8 @@ private:
     void LoadRelationApInfo();
     void PrintRelationAps();
     void InitConnectedAp(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig);
+    void HandleSwitchFailed(Perf5gSwitchResult switchResult);
+    void OnDisconnected();
 };
 }
 }

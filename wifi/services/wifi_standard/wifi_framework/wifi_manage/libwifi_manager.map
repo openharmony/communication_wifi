@@ -121,8 +121,6 @@
         "OHOS::Wifi::WifiConfigCenter::GetCoexSupport() const";
         "OHOS::Wifi::WifiConfigCenter::SetScreenState(int const&)";
         "OHOS::Wifi::WifiConfigCenter::GetScreenState() const";
-        "OHOS::Wifi::WifiConfigCenter::SetWlanPage(bool)";
-        "OHOS::Wifi::WifiConfigCenter::IsWlanPage() const";
         "OHOS::Wifi::WifiConfigCenter::SetThermalLevel(int const&)";
         "OHOS::Wifi::WifiConfigCenter::GetThermalLevel() const";
         "OHOS::Wifi::WifiConfigCenter::SetPowerIdelState(int const&)";

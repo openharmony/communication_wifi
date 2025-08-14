@@ -5383,5 +5383,10 @@ void StaStateMachine::LogSignalInfo(WifiSignalPollInfo &signalInfo)
         linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.connState, linkedInfo.detailedState, lastSignalLevel_,
         signalInfo.chloadSelf, signalInfo.c0Rssi, signalInfo.c1Rssi);
 }
+
+int32_t StaStateMachine::GetTargetNetworkId()
+{
+    return targetNetworkId_;
+}
 } // namespace Wifi
 } // namespace OHOS

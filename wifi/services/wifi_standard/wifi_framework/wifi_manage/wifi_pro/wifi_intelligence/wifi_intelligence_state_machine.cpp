@@ -363,7 +363,7 @@ bool WifiIntelligenceStateMachine::DisabledState::ExecuteStateMsg(InternalMessag
             break;
         case EVENT_HANDLE_SCAN_RESULT:
             ret = EXECUTED;
-            if (mIsScanning_) {
+            if (pWifiIntelligenceStateMachine_->mIsScanning_) {
                 pWifiIntelligenceStateMachine_->UpdateScanResult(msg);
             }
             break;

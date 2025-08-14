@@ -457,11 +457,19 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilterIsWlanPageReturnTrue, TestSize.
     networkCandidate4.wifiDeviceConfig.networkId = 1;
     networkCandidate4.wifiDeviceConfig.noInternetAccess = 0;
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
+<<<<<<< HEAD
     EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
 
     auto poorportalWifiFilter = std::make_shared<NetworkSelection::PortalWifiFilter>();
     EXPECT_TRUE(poorportalWifiFilter->DoFilter(networkCandidate4));
 }
+=======
+    EXPECT_CALL(WifiSettings::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+
+    auto poorportalWifiFilter = std::make_shared<NetworkSelection::PortalWifiFilter>();
+    EXPECT_TRUE(poorportalWifiFilter->DoFilter(networkCandidate4));
+
+>>>>>>> e8fa0f6427e019ae073fac197cb66b353f4df9ca
 
 HWTEST_F(WifiFilterImplTest, PortalWifiFilterIsWlanPageReturnTrue, TestSize.Level1) {
     InterScanInfo scanInfo3;
@@ -471,7 +479,11 @@ HWTEST_F(WifiFilterImplTest, PortalWifiFilterIsWlanPageReturnTrue, TestSize.Leve
     networkCandidate3.wifiDeviceConfig.isPortal = 1;
     networkCandidate3.wifiDeviceConfig.networkId = 1;
     networkCandidate3.wifiDeviceConfig.noInternetAccess = 0;
+<<<<<<< HEAD
     EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+=======
+    EXPECT_CALL(WifiSettings::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+>>>>>>> e8fa0f6427e019ae073fac197cb66b353f4df9ca
 
     auto portalWifiFilter = std::make_shared<NetworkSelection::PortalWifiFilter>();
     EXPECT_TRUE(portalWifiFilter->DoFilter(networkCandidate3));
@@ -507,7 +519,11 @@ HWTEST_F(WifiFilterImplTest, PortalWifiFilterReturnFalse, TestSize.Level1) {
     networkCandidate2.wifiDeviceConfig.isPortal = 0;
     networkCandidate2.wifiDeviceConfig.networkId = 1;
     networkCandidate2.wifiDeviceConfig.noInternetAccess = 0;
+<<<<<<< HEAD
     EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(false));
+=======
+    EXPECT_CALL(WifiSettings::GetInstance(), IsWlanPage()).WillRepeatedly(Return(false));
+>>>>>>> e8fa0f6427e019ae073fac197cb66b353f4df9ca
 
     auto portalWifiFilter = std::make_shared<NetworkSelection::PortalWifiFilter>();
     EXPECT_FALSE(portalWifiFilter->DoFilter(networkCandidate1));

@@ -363,7 +363,9 @@ bool WifiIntelligenceStateMachine::DisabledState::ExecuteStateMsg(InternalMessag
             break;
         case EVENT_HANDLE_SCAN_RESULT:
             ret = EXECUTED;
-            pWifiIntelligenceStateMachine_->UpdateScanResult(msg);
+            if (mIsScanning_) {
+                pWifiIntelligenceStateMachine_->UpdateScanResult(msg);
+            }
             break;
         case EVENT_WIFI_HANLE_OPEN:
             ret = EXECUTED;
@@ -483,6 +485,8 @@ bool WifiIntelligenceStateMachine::IsInBlacklist(std::string bssid)
 
 void WifiIntelligenceStateMachine::DisabledState::HandleWifiFindTarget(InternalMessagePtr msg)
 {
+    WIFI_LOGI("DsiabledState, EVENT_WIFI_FIND_TARGET");
+    pWifiIntelligenceStateMachine_->StopScanAp();
     pWifiIntelligenceStateMachine_->StartTimer(EVENT_WIFI_HANLE_OPEN, AUTO_OPEN_WIFI_DELAY_TIME);
 }
 
@@ -524,9 +528,7 @@ void WifiIntelligenceStateMachine::UpdateScanResult(InternalMessagePtr msg)
             SetScanIntervel(mScanType_);
         } else {
             if (mScanType_ == SCAN_TYPE_THREE) {
-                StopTimer(EVENT_SCAN_AGAIN);
-                mScanTimes_ = 0;
-                mScanType_ = SCAN_TYPE_ONE;
+                StopScanAp();
             } else {
                 mScanType_++;
                 mScanTimes_ = 0;
@@ -908,7 +910,12 @@ bool WifiIntelligenceStateMachine::FullScan()
 {
     WIFI_LOGD("start Fullscan");
     if (!WifiConfigCenter::GetInstance().CheckScanOnlyAvailable(instId_)) {
-        WIFI_LOGI("scan only is not available, can not start scan.");
+        WIFI_LOGE("scan only is not available, can not start scan.");
+        return false;
+    }
+    if (WifiConfigCenter::GetInstance().GetWifiMidState() == WifiOprMidState::RUNNING) {
+        WIFI_LOGE("Wifi is already open, no need to start scan.");
+        StopScanAp();
         return false;
     }
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
@@ -916,6 +923,7 @@ bool WifiIntelligenceStateMachine::FullScan()
         WIFI_LOGI("TryStartScan, pService is nullptr.");
         return false;
     }
+    mIsScanning_ = true;
     return pScanService->Scan(false);
 }
 
@@ -1019,6 +1027,7 @@ void WifiIntelligenceStateMachine::StopScanAp()
 {
     mScanTimes_ = 0;
     mScanType_ = SCAN_TYPE_ONE;
+    mIsScanning_ = false;
     StopTimer(EVENT_SCAN_AGAIN);
 }
 }

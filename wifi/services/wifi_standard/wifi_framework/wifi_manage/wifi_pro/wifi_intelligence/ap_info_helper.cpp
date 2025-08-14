@@ -299,7 +299,7 @@ int32_t ApInfoHelper::GetApInfoByBssid(const std::string &bssid, ApInfoData &dat
     int32_t index = -1;
     auto iter = apInfos_.begin();
     if (apInfos_.size() == 0) {
-        WIFI_LOGE("GetApInfoByBssid no apInfos_.");
+        WIFI_LOGD("GetApInfoByBssid no apInfos_.");
         return -1;
     }
     for (; iter != apInfos_.end();) {

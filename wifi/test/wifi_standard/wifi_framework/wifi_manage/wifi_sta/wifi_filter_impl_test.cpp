@@ -463,7 +463,6 @@ HWTEST_F(WifiFilterImplTest, PoorPortalWifiFilterIsWlanPageReturnTrue, TestSize.
     EXPECT_TRUE(poorportalWifiFilter->DoFilter(networkCandidate4));
 }
 
-
 HWTEST_F(WifiFilterImplTest, PortalWifiFilterIsWlanPageReturnTrue, TestSize.Level1) {
     InterScanInfo scanInfo3;
     scanInfo3.ssid = "x";

@@ -16,6 +16,7 @@
 #include "wifistaserver_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 #include "mock_sta_state_machine.h"
+#include "wifi_config_center.h"
 #include "wifi_security_detect.h"
 #include "wifi_security_detect_observer.h"
 
@@ -27,7 +28,7 @@
 #include "wifi_log.h"
 #include "sta_interface.h"
 #include "sta_auto_connect_service.h"
-#include "wifi_config_center.h"
+#include "wifi_settings.h"
 #include "sta_service.h"
 #include "wifi_internal_msg.h"
 #include "wifi_telephony_utils.h"
@@ -114,11 +115,11 @@ public:
 
 void StaServerFuzzTest(const uint8_t* data, size_t size)
 {
-    int isRemoveAll = 0;
     int index = 0;
     int networkId = static_cast<int>(data[index++]);
     int uid = static_cast<int>(data[index++]);
     bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
+    bool isRemoveAll = (static_cast<int>(data[0]) % TWO) ? true : false;
     bool isAllowed = (static_cast<int>(data[0]) % TWO) ? true : false;
     std::string cmd = std::string(reinterpret_cast<const char*>(data), size);
     std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);

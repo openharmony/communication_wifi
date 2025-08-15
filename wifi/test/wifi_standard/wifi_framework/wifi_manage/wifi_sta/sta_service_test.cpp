@@ -847,11 +847,11 @@ void StaServiceTest::StartConnectToBssidTest()
 int StaServiceTest::StartConnectToUserSelectNetworkSuccessTest()
 {
     WifiDeviceConfig config;
-    config.bssid = "01:23:45:67:89:AB";
+    config.bssid = "01:23:45:67:89:CD";
     config.band = BAND;
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
-    config.keyMgmt = "123456";
+    config.keyMgmt = "123";
     WifiLinkedInfo info;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
@@ -861,11 +861,11 @@ int StaServiceTest::StartConnectToUserSelectNetworkSuccessTest()
 int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
 {
     WifiDeviceConfig config;
-    config.bssid = "01:23:45:67:89:AB";
+    config.bssid = "01:23:45:67:89:EF";
     config.band = BAND;
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
-    config.keyMgmt = "123456";
+    config.keyMgmt = "456";
     WifiLinkedInfo info;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(1)));

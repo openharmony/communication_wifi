@@ -1397,7 +1397,6 @@ HWTEST_F(WifiHdiWpaClientTest, SetWapiConfigTest, TestSize.Level1)
     wifiHdiWpaClient->SetWapiConfig(config, &conf, num);
     config.keyMgmt = KEY_MGMT_WAPI_PSK;
     wifiHdiWpaClient->SetWapiConfig(config, &conf, num);
-    WifiHalDeviceConfig config;
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     wifiHdiWpaClient->SetWapiConfig(config, &conf, num);
     EXPECT_NE(num, 0);

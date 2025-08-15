@@ -32,7 +32,6 @@
 #include "sta_service_callback.h"
 #include "wifi_log.h"
 #include "net_manager_constants.h"
-#include "net_conn_callback_stub.h"
 namespace OHOS {
 namespace Wifi {
 struct WifiNetAgentCallbacks {
@@ -110,13 +109,6 @@ public:
      * @param
      */
     void OnStaMachineWifiStart(int instId);
-
-    /**
-     * Register network connect call back
-     *
-     * @return true if register success else return false;
-     */
-    bool RegisterNetConnObserver(int instId);
 
     /**
      * Add OnStaMachineNetManagerRestart
@@ -231,12 +223,6 @@ private:
     WifiNetAgentCallbacks wifiNetAgentCallbacks_;
     std::unique_ptr<WifiEventHandler> netAgentEventHandler_ = nullptr;
     std::mutex netAgentMutex_;
-    class NetInfoObserver final : public NetManagerStandard::NetConnCallbackStub {
-    public:
-        int32_t NetAvailable(sptr<NetManagerStandard::NetHandle> &netHandle) override;
-    };
-    sptr<NetInfoObserver> netConnCallback_ { nullptr };
-    static bool IsDefaultBtNet();
 };
 } // namespace Wifi
 } // namespace OHOS

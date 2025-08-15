@@ -360,9 +360,6 @@ public:
     bool IsNeedFastScan(void);
 
     void SetFastScan(bool fastScan);
-    void SetAutoConnect(bool autoConnectEnable);
-
-    bool GetAutoConnect();
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description set screen state
@@ -409,7 +406,6 @@ private:
 private:
     // STA
     std::mutex mStaMutex;
-    std::atomic<bool> autoConnectEnable_ {true};
     std::atomic<bool> mWifiSelfcureReset {false};
     std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};

@@ -1544,22 +1544,6 @@ void WifiConfigCenter::SetFastScan(bool fastScan)
     std::unique_lock<std::mutex> lock(mScanMutex);
     isNeedFastScan = fastScan;
 }
-
-void WifiConfigCenter::SetAutoConnect(bool autoConnectEnable)
-{
-    if (GetDeviceType() != ProductDeviceType::WEARABLE) {
-        LOGD("SetAutoConnect not wearable device");
-        return;
-    }
-
-    LOGI("SetAutoConnect autoConnectEnable:%{public}d", autoConnectEnable);
-    autoConnectEnable_.store(autoConnectEnable);
-}
-
-bool WifiConfigCenter::GetAutoConnect()
-{
-    return autoConnectEnable_.load();
-}
  
 int WifiConfigCenter::GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig)
 {

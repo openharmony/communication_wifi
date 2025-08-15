@@ -196,7 +196,7 @@ HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest, TestSize.Level1)
     std::string ifaceName;
     int instId = 0;
     HalDeviceManager::g_chipHdiServiceDied = true;
-    HalDeviceManager::GetInstance().CreateApIface(
+    DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
         std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
     int32_t band = 0;
     std::vector<int> frequencies;
@@ -626,6 +626,16 @@ HWTEST_F(WifiHalDeviceManagerTest, SetApMacAddressTest_01, TestSize.Level1)
     EXPECT_EQ(result, true);
 }
 
+HWTEST_F(WifiHalDeviceManagerTest, OnRssiReportCallbackTest_01, TestSize.Level1)
+{
+    int32_t index = 0;
+    int32_t c0Rssi = -60;
+    int32_t c1Rssi = -70;
+    ChipIfaceCallback data;
+    int result = data.OnRssiReport(index, c0Rssi, c1Rssi);
+    EXPECT_EQ(result, 0);
+}
+
 HWTEST_F(WifiHalDeviceManagerTest, ValidateInterfaceCacheTest_01, TestSize.Level1)
 {
     std::string ifaceName = "Wlan0";
@@ -732,16 +742,6 @@ HWTEST_F(WifiHalDeviceManagerTest, OnScanResultsCallbackTest_01, TestSize.Level1
     uint32_t event = 1;
     ChipIfaceCallback data;
     int result = data.OnScanResultsCallback(event);
-    EXPECT_EQ(result, 0);
-}
-
-HWTEST_F(WifiHalDeviceManagerTest, OnRssiReportCallbackTest_01, TestSize.Level1)
-{
-    int32_t index = 0;
-    int32_t c0Rssi = -60;
-    int32_t c1Rssi = -70;
-    ChipIfaceCallback data;
-    int result = data.OnRssiReport(index, c0Rssi, c1Rssi);
     EXPECT_EQ(result, 0);
 }
 

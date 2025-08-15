@@ -116,6 +116,7 @@ export class LogDataManager {
   testEnableSemiWifi_EndLog = "testEnableSemiWifi End----------"
   testStartScanManager_StartLog = "testStartScan Start----------"
   testStartScanManager_EndLog = "testStartScan End----------"
+
   //hotspot
   testEnableHotspotManager_StartLog = "testEnableHotspot start--------------"
   testEnableHotspotManager_EndLog = "testEnableHotspot End--------------"
@@ -137,6 +138,7 @@ export class LogDataManager {
   testOnHotspotStaJoinManager_EndLog = "testOnHotspotStaJoin End--------------"
   testOnHotspotStaLeaveManager_StartLog = "testOnHotspotStaLeave start--------------"
   testOnHotspotStaLeaveManager_EndLog = "testOnHotspotStaLeave End--------------"
+  
   //p2p
   testGetP2pLinkedInfoPromiseManager_StartLog = "testGetP2pLinkedInfoPromise Start----------"
   testGetP2pLinkedInfoPromiseManager_EndLog = "testGetP2pLinkedInfoPromise End----------"

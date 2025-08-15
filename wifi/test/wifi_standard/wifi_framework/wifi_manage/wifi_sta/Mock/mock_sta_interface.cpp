@@ -173,7 +173,7 @@ ErrCode StaInterface::ConnectivityManager(const std::vector<InterScanInfo> &scan
 
 ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
 {
-    LOGD("Enter RegisterStaServiceCallback.\n");
+    LOGI("Enter test: RegisterStaServiceCallback.\n");
     return WIFI_OPT_SUCCESS;
 }
 

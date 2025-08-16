@@ -64,10 +64,16 @@ ohos_shared_library("wifi") {
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
+  if (wifi_hiappevent_enable) {
+    external_deps += [ "hiappevent:hiappevent_innerapi" ]
+    defines += [ "WIFI_HIAPPEVENT_ENABLE" ]
+    sources += [ "src/wifi_hiappevent.cpp" ]
+  }
   cflags = memory_optimization_cflags
   cflags_cc = memory_optimization_cflags_cc
   ldflags = memory_optimization_ldflags
@@ -102,13 +108,17 @@ ohos_shared_library("wifiext") {
     "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
+  deps = [
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
+  ]
 
   external_deps = [
     "ability_runtime:app_context",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
@@ -121,6 +131,13 @@ ohos_shared_library("wifiext") {
   if (wifi_feature_with_random_mac_addr) {
     defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   }
+
+  if (wifi_hiappevent_enable) {
+    external_deps += [ "hiappevent:hiappevent_innerapi" ]
+    defines += [ "WIFI_HIAPPEVENT_ENABLE" ]
+    sources += [ "src/wifi_hiappevent.cpp" ]
+  }
+
   cflags = memory_optimization_cflags
   cflags_cc = memory_optimization_cflags_cc
   ldflags = memory_optimization_ldflags
@@ -177,10 +194,18 @@ ohos_shared_library("wifimanager") {
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
+
+  if (wifi_hiappevent_enable) {
+    external_deps += [ "hiappevent:hiappevent_innerapi" ]
+    defines += [ "WIFI_HIAPPEVENT_ENABLE" ]
+    sources += [ "src/wifi_hiappevent.cpp" ]
+  }
+
   cflags = memory_optimization_cflags
   cflags_cc = memory_optimization_cflags_cc
   ldflags = memory_optimization_ldflags
@@ -215,7 +240,10 @@ ohos_shared_library("wifimanagerext") {
     "src/wifi_napi_errcode.cpp",
     "src/wifi_napi_utils.cpp",
   ]
-  deps = [ "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk" ]
+  deps = [
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
+    "$WIFI_ROOT_DIR/utils:wifi_utils",
+  ]
   defines = [ "ENABLE_NAPI_WIFI_MANAGER" ]
   if (wifi_feature_with_ap_extension) {
     defines += [ "FEATURE_AP_EXTENSION" ]
@@ -228,9 +256,17 @@ ohos_shared_library("wifimanagerext") {
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
+
+  if (wifi_hiappevent_enable) {
+    external_deps += [ "hiappevent:hiappevent_innerapi" ]
+    defines += [ "WIFI_HIAPPEVENT_ENABLE" ]
+    sources += [ "src/wifi_hiappevent.cpp" ]
+  }
+
   cflags = memory_optimization_cflags
   cflags_cc = memory_optimization_cflags_cc
   ldflags = memory_optimization_ldflags

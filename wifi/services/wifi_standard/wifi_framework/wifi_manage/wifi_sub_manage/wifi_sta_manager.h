@@ -54,8 +54,8 @@ private:
         const int32_t instId = 0);
 #ifndef OHOS_ARCH_LITE
     void DealOffScreenAudioBeaconLost(void);
-#endif
     void BeaconLostTimerCallback(void);
+#endif
 private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};

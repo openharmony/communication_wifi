@@ -701,7 +701,7 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
     if (!isAllowed) {
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-        if (linkedInfo.networkId != networkId) {
+        if (linkedInfo.networkId != networkId && pStaStateMachine->GetTargetNetworkId() != networkId) {
             WIFI_LOGI("AllowAutoConnect, networkid is not correct, linked networkid:%{public}d", linkedInfo.networkId);
             return WIFI_OPT_SUCCESS;
         }

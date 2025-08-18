@@ -52,16 +52,18 @@ private:
     void DealInternetAccessChanged(int internetAccessStatus, int instId);
     void DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const bool isAudioOn,
         const int32_t instId = 0);
-    void DealOffScreenAudioBeaconLost();
+    void DealOffScreenAudioBeaconLost(void);
+    void BeaconLostTimerCallback(void);
 private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
-    int mNetState;
-    sptr<NetStateObserver> mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
+    uint32_t beaconLostTimerId{0};
+    std::mutex beaconLostTimerMutex;
     std::mutex netStateMutex;
+    int32_t netState_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

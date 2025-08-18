@@ -66,7 +66,6 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/interfaces/innerkits/samgr",
       "//third_party/bounds_checking_function/include",
       "$WIFI_ROOT_DIR/services/wifi_standard/include",
-      "//foundation/communication/netmanager_base/interfaces/innerkits/netconnclient/include",
     ]
 
     deps = [
@@ -77,15 +76,9 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils:wifi_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
-      
     ]
 
-    external_deps = [
-      "bounds_checking_function:libsec_shared",
-      "netmanager_base:net_conn_manager_if",
-      "netmanager_base:net_native_manager_if",
-      "netmanager_base:net_stats_manager_if",
-    ]
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [
       "OHOS_ARCH_LITE",

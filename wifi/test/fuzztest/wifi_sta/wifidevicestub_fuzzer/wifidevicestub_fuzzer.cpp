@@ -640,6 +640,18 @@ void OnEnableHiLinkHandshakeFuzzTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), datas);
 }
 
+void OnStartWifiDetectionFuzzTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WIFI_DETECTION), datas);
+}
+
 void OnSetSatelliteStateFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
@@ -1039,6 +1051,11 @@ void EnableHiLinkHandshakeTest(const uint8_t* data, size_t size)
     pWifiDeviceServiceImpl->EnableHiLinkHandshake(uiFlag, bssid, config);
 }
 
+void StartWifiDetectionTest(const uint8_t* data, size_t size)
+{
+    pWifiDeviceServiceImpl->StartWifiDetection();
+}
+
 void RegisterFilterBuilderTest(const uint8_t* data, size_t size)
 {
     FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
@@ -1203,6 +1220,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnGetChangeDeviceConfigFuzzTest(data, size);
     OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
     OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
+    OHOS::Wifi::OnStartWifiDetectionFuzzTest(data, size);
     OHOS::Wifi::OnGetWifiDetailStateFuzzTest(data, size);
     OHOS::Wifi::OnSetTxPowerFuzzTest(data, size);
     OHOS::Wifi::OnSetSatelliteStateFuzzTest(data, size);
@@ -1227,6 +1245,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::CheckCanEnableWifiTest(data, size);
     OHOS::Wifi::HilinkGetMacAddressTest(data, size);
     OHOS::Wifi::EnableHiLinkHandshakeTest(data, size);
+    OHOS::Wifi::StartWifiDetectionTest(data, size);
     OHOS::Wifi::RegisterFilterBuilderTest(data, size);
     OHOS::Wifi::OnSetDpiMarkRuleTest(data, size);
     OHOS::Wifi::OnGetDeviceConfigTest(data, size);

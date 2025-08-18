@@ -264,6 +264,12 @@ ErrCode StaInterface::StartPortalCertification()
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::StartWifiDetection()
+{
+    WIFI_LOGI("Enter StartWifiDetection");
+    return WIFI_OPT_SUCCESS;
+}
+
 #ifndef OHOS_ARCH_LITE
 ErrCode StaInterface::HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData)
 {

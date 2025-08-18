@@ -2238,6 +2238,42 @@ ErrCode WifiDeviceProxy::FactoryReset()
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode WifiDeviceProxy::StartWifiDetection()
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`, remote service is died.", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error, func:%{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WIFI_DETECTION), data,
+        reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("StartWifiDetection(%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WIFI_DETECTION), error);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        WIFI_LOGE("Reply Read failed, exception:%{public}d", exception);
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Reply Read failed, ret:%{public}d", ret);
+        return ErrCode(ret);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceProxy::ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)
 {
     if (mRemoteDied) {

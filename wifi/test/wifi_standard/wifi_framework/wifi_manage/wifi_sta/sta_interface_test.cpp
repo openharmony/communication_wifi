@@ -375,6 +375,11 @@ public:
         pStaInterface->EnableHiLinkHandshake(true, config, bssid);
     }
 
+    void StartWifiDetectionSuceess()
+    {
+        pStaInterface->StartWifiDetection();
+    }
+
     void DeliverStaIfaceDataSuceess()
     {
         std::string mac = "01:23:45:67:89:ab";
@@ -760,6 +765,12 @@ HWTEST_F(StaInterfaceTest, DeregisterFilterBuilderFail, TestSize.Level1)
 HWTEST_F(StaInterfaceTest, EnableHiLinkHandshakeSuccess, TestSize.Level1)
 {
     EnableHiLinkHandshakeSuceess();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaInterfaceTest, StartWifiDetectionSuceess, TestSize.Level1)
+{
+    StartWifiDetectionSuceess();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

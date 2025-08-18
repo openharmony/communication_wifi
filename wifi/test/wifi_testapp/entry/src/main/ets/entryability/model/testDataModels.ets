@@ -105,6 +105,7 @@ import {
   testGet5GChannelList,
   testGetDisconnectedReason,
   testStartPortalCertification,
+  testStartWifiDetection,
   testOnWifiStateChangeManager ,
   testOnWifiConnectionChangeManager ,
   testOnWifiScanStateChangeManager ,
@@ -488,6 +489,14 @@ const WifiTestCase: WifiTest[] = [
     'api' : testRemoveDevice ,
     'result' : 'None' ,
     'category' : CaseCategory.Wifi
+  },
+  {
+    'name' : '启动网络探测' ,
+    'detail' : '启动网络探测' ,
+    'method' : 'StartWifiDetection' ,
+    'api' : testStartWifiDetection ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
   },
   {
     'name' : '移除所有网络配置' ,

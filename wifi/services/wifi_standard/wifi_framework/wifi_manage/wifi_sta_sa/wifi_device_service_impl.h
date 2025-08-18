@@ -181,6 +181,8 @@ public:
 
     ErrCode FactoryReset() override;
 
+    ErrCode StartWifiDetection() override;
+
     ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) override;
 
     ErrCode LimitSpeed(const int controlId, const int limitMode) override;

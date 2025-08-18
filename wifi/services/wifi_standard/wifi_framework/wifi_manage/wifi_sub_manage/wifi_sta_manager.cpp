@@ -69,6 +69,16 @@ static void SatelliteTimerCallback()
     WifiManager::GetInstance().GetWifiStaManager()->StopSatelliteTimer();
 }
 
+void WifiStaManager::BeaconLostTimerCallback(void)
+{
+    WIFI_LOGI("It's time for beacon lost timer.");
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    std::lock_guard<std::mutex> lock(netStateMutex);
+    if (netState_ != SystemNetWorkState::NETWORK_IS_WORKING && pEnhanceService != nullptr) {
+        pEnhanceService->HandleBeaconLost();
+    }
+}
+
 void WifiStaManager::StopUnloadStaSaTimer(void)
 {
     WIFI_LOGI("StopUnloadStaSaTimer! unloadStaSaTimerId:%{public}u", unloadStaSaTimerId);
@@ -244,8 +254,10 @@ static void HandleStaDisconnected(int instId)
 void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const bool isAudioOn,
     const int32_t instId)
 {
+#ifndef OHOS_ARCH_LITE
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     if (screenState == MODE_STATE_CLOSE && isAudioOn) {
+        // 因为灭屏下5s判断beacon lost会频繁上报，判断放在约束条件内。
         bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);
         if (isBeaconLost) {
             WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
@@ -259,27 +271,25 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
             if (pEnhanceService != nullptr) { pEnhanceService->HandleBeaconLost(); }
         }
     }
+#endif
 }
 
-void WifiStaManager::DealOffScreenAudioBeaconLost()
+#ifndef OHOS_ARCH_LITE
+void WifiStaManager::DealOffScreenAudioBeaconLost(void)
 {
+    sptr<NetStateObserver> mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
     mNetWorkDetect->StartWifiDetection();
-    std::shared_ptr<WifiStaManager> sharedPtr(this);
-    std::weak_ptr<WifiStaManager> weakPtr = sharedPtr;
-    std::thread([weakPtr, this]() {
-        WIFI_LOGI("Delay deal beacon lost thread begin");
-        constexpr int BEACON_LOST_DELAY_TIME = 500;
-        std::this_thread::sleep_for(std::chrono::milliseconds(BEACON_LOST_DELAY_TIME));
-        auto sharedPtr = weakPtr.lock();
-        if (sharedPtr != nullptr) {
-            std::lock_guard<std::mutex> lock(netStateMutex);
-            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-            if (mNetState != SystemNetWorkState::NETWORK_IS_WORKING && pEnhanceService != nullptr) {
-                pEnhanceService->HandleBeaconLost();
-            }
-        }
-    }).detach();
+    std::unique_lock<std::mutex> lock(beaconLostTimerMutex);
+    std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+    std::function<void()> callback = [this]() { this->BeaconLostTimerCallback(); };
+    wifiSysTimer->SetCallbackInfo(callback);
+    beaconLostTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
+    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
+    MiscServices::TimeServiceClient::GetInstance()->StartTimer(beaconLostTimerId,
+        currentTime + BEACON_LOST_DELAY_TIME);
+    WIFI_LOGI("beaconLostTimer success! beaconLostTimerId:%{public}u", beaconLostTimerId);
 }
+#endif
 
 void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
@@ -377,7 +387,7 @@ void WifiStaManager::DealInternetAccessChanged(int internetAccessStatus, int ins
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
     std::lock_guard<std::mutex> lock(netStateMutex);
-    mNetState = internetAccessStatus;
+    netState_ = internetAccessStatus;
 }
 
 #ifndef OHOS_ARCH_LITE

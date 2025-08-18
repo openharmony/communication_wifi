@@ -25,6 +25,8 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr uint32_t BEACON_LOST_DELAY_TIME = 800;
+
 class WifiStaManager {
 public:
     WifiStaManager();

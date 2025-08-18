@@ -32,6 +32,7 @@ ohos_shared_library("wifimanager_ani") {
     "runtime_core:ani",
     "runtime_core:libarkruntime",
     "samgr:samgr_proxy",
+    "ipc:ipc_single",
   ]
   part_name = "wifi"
   subsystem_name = "communication"

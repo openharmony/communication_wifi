@@ -34,6 +34,7 @@ ohos_unittest("wifi_sta_ext_unittest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/mock_wifi_settings.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/net_conn_client.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/mock/mock_wifi_service_manager.cpp",
   ]
 
   include_dirs = [
@@ -92,6 +93,7 @@ ohos_unittest("wifi_sta_ext_unittest") {
     "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select:network_select",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure:wifi_self_cure",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_service",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
     "$WIFI_ROOT_DIR/utils:wifi_utils",
@@ -134,6 +136,7 @@ ohos_unittest("wifi_sta_ext_unittest") {
     "private = public",
     "protected = public",
     "SUPPORT_RANDOM_MAC_ADDR",
+    "FEATURE_SELF_CURE_SUPPORT",
   ]
 
   ldflags = [

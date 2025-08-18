@@ -27,7 +27,6 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
-const std::string g_errLog = "wifi_test";
 class WifiHdiWpaClientTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -1390,33 +1389,17 @@ HWTEST_F(WifiHdiWpaClientTest, ReqP2pHid2dConnectTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_HAL_OPT_FAILED);
 }
 
-HWTEST_F(WifiHdiWpaClientTest, SetWapiConfigTest01, TestSize.Level1)
+HWTEST_F(WifiHdiWpaClientTest, SetWapiConfigTest, TestSize.Level1)
 {
     WifiHalDeviceConfig config;
     SetNetworkConfig conf;
     int num = 0;
     wifiHdiWpaClient->SetWapiConfig(config, &conf, num);
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
-}
-
-HWTEST_F(WifiHdiWpaClientTest, SetWapiConfigTest02, TestSize.Level1)
-{
-    WifiHalDeviceConfig config;
-    SetNetworkConfig conf;
-    int num = 0;
     config.keyMgmt = KEY_MGMT_WAPI_PSK;
     wifiHdiWpaClient->SetWapiConfig(config, &conf, num);
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
-}
-
-HWTEST_F(WifiHdiWpaClientTest, SetWapiConfigTest03, TestSize.Level1)
-{
-    WifiHalDeviceConfig config;
-    SetNetworkConfig conf;
-    int num = 0;
     config.keyMgmt = KEY_MGMT_WAPI_CERT;
     wifiHdiWpaClient->SetWapiConfig(config, &conf, num);
-    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+    EXPECT_NE(num, 0);
 }
 
 HWTEST_F(WifiHdiWpaClientTest, ReqWpaGetPskPassphraseTest, TestSize.Level1)

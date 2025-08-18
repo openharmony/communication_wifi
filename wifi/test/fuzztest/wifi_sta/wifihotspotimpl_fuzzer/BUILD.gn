@@ -23,7 +23,6 @@ ohos_fuzztest("WifiHotspotImplFuzzTest") {
       "$WIFI_ROOT_DIR/test/fuzztest/wifi_sta/wifihotspotimpl_fuzzer"
 
   include_dirs = [
-    "$WIFI_ROOT_DIR/base/utils",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",

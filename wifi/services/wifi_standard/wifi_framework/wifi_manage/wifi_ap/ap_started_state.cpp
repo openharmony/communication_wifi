@@ -48,11 +48,10 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 namespace OHOS {
 namespace Wifi {
 const int STA_JOIN_HANDLE_DELAY = 5 * 1000;
-ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id)
+ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
       m_hotspotConfig(HotspotConfig()),
       m_ApStateMachine(apStateMachine),
-      m_ApConfigUse(apConfigUse),
       m_ApMonitor(apMonitor),
       m_id(id)
 {
@@ -140,7 +139,7 @@ bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
 bool ApStartedState::SetConfig(HotspotConfig &apConfig, bool isControl160M)
 {
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
-    m_ApConfigUse.UpdateApChannelConfig(apConfig);
+    ApConfigUse::GetInstance().UpdateApChannelConfig(apConfig);
     std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
     WifiErrorNo setSoftApConfigResult = WifiErrorNo::WIFI_HAL_OPT_OK;
     WifiErrorNo setApPasswdResult = WifiErrorNo::WIFI_HAL_OPT_OK;
@@ -372,8 +371,7 @@ void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessagePtr msg) const
     if (ret == WifiErrorNo::WIFI_HAL_OPT_OK) {
         m_wifiCountryCode = wifiCountryCode;
         WIFI_LOGI("update wifi country code success, wifiCountryCode=%{public}s", wifiCountryCode.c_str());
-        WifiChannelHelper::GetInstance().UpdateValidChannels(
-            WifiConfigCenter::GetInstance().GetApIfaceName(), m_id);
+        WifiChannelHelper::GetInstance().UpdateValidFreqs();
         return;
     }
     WIFI_LOGE("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",

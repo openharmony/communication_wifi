@@ -429,6 +429,7 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "huks:libhukssdk",
       "ipc:ipc_single",
+      "libxml2:libxml2",
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",

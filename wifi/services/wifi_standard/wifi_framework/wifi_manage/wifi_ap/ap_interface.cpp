@@ -19,13 +19,12 @@ namespace OHOS {
 namespace Wifi {
 ApInterface::ApInterface(int id)
     : m_ApRootState(id),
-      m_ApStartedState(m_ApStateMachine, m_ApConfigUse, m_ApMonitor, id),
+      m_ApStartedState(m_ApStateMachine, m_ApMonitor, id),
       m_ApIdleState(m_ApStateMachine, id),
       m_ApMonitor(id),
       m_ApStateMachine(m_ApStationsManager, m_ApRootState, m_ApIdleState, m_ApStartedState, m_ApMonitor, id),
       m_ApService(m_ApStateMachine, m_ApStartedState, id),
-      m_ApStationsManager(id),
-      m_ApConfigUse(id)
+      m_ApStationsManager(id)
 {}
 
 ApInterface::~ApInterface()
@@ -83,16 +82,6 @@ ErrCode ApInterface::DisconnetStation(const StationInfo &stationInfo)
 ErrCode ApInterface::GetStationList(std::vector<StationInfo> &result)
 {
     return m_ApService.GetStationList(result);
-}
-
-ErrCode ApInterface::GetValidBands(std::vector<BandType> &bands)
-{
-    return m_ApService.GetValidBands(bands);
-}
-
-ErrCode ApInterface::GetValidChannels(BandType band, std::vector<int32_t> &validChannel)
-{
-    return m_ApService.GetValidChannels(band, validChannel);
 }
 
 ErrCode ApInterface::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)

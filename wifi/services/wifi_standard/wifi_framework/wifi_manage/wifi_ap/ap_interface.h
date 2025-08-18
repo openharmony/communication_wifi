@@ -104,23 +104,6 @@ public:
     virtual ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks) override;
 
     /**
-     * @Description Get valid bands.
-     *
-     * @param bands - return valid bands
-     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
-     */
-    virtual ErrCode GetValidBands(std::vector<BandType> &bands) override;
-
-    /**
-     * @Description Get valid channels.
-     *
-     * @param band - input band
-     * @param validchannel - band's valid channel
-     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
-     */
-    virtual ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validChannel) override;
-
-    /**
      * @Description Get supported power model list
      *
      * @param setPowerModelList - supported power model list
@@ -184,7 +167,6 @@ private:
     ApService m_ApService;
 
     ApStationsManager m_ApStationsManager;
-    ApConfigUse m_ApConfigUse;
 };
 }  // namespace Wifi
 }  // namespace OHOS

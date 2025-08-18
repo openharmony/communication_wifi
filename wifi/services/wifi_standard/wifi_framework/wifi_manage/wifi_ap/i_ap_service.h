@@ -37,8 +37,6 @@ public:
     virtual ErrCode SetHotspotConfig(const HotspotConfig &hotspotConfig) = 0;
     virtual ErrCode DisconnetStation(const StationInfo &stationInfo) = 0;
     virtual ErrCode GetStationList(std::vector<StationInfo> &result) = 0;
-    virtual ErrCode GetValidBands(std::vector<BandType> &bands) = 0;
-    virtual ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validChannel) = 0;
     virtual ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) = 0;
     virtual ErrCode GetPowerModel(PowerModel& model) = 0;
     virtual ErrCode SetPowerModel(const PowerModel& model) = 0;

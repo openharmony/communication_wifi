@@ -24,8 +24,8 @@ namespace OHOS {
 namespace Wifi {
 class MockApStartedState : public ApStartedState {
 public:
-    MockApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor)
-        : ApStartedState(apStateMachine, apConfigUse, apMonitor)
+    MockApStartedState(ApStateMachine &apStateMachine, ApMonitor &apMonitor)
+        : ApStartedState(apStateMachine, apMonitor)
     {}
     MOCK_METHOD0(GoInState, void());
     MOCK_METHOD0(GoOutState, void());

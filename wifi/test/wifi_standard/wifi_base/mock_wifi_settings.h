@@ -120,6 +120,8 @@ public:
     virtual int GetP2pInfo(WifiP2pLinkedInfo &linkedInfo) = 0;
     virtual void SetWifiToggledState(int state) = 0;
     virtual int GetScreenState() const = 0;
+    virtual void SetWlanPage(bool isWlanPage) = 0;
+    virtual bool IsWlanPage() const = 0;
     virtual int SetDeviceRandomizedMacSuccessEver(int networkId) = 0;
     virtual bool StoreWifiMacAddrPairInfo(WifiMacAddrInfoType type, const std::string &realMacAddr,
         const std::string &randomAddr) = 0;
@@ -303,6 +305,8 @@ public:
     MOCK_METHOD1(GetP2pInfo, int(WifiP2pLinkedInfo &linkedInfo));
     MOCK_METHOD1(SetWifiToggledState, void(int state));
     MOCK_CONST_METHOD0(GetScreenState, int());
+    MOCK_METHOD1(SetWlanPage, void(bool isWlanPage));
+    MOCK_CONST_METHOD0(IsWlanPage, bool());
     MOCK_METHOD1(SetDeviceRandomizedMacSuccessEver, int(int networkId));
     MOCK_METHOD1(SetValidChannels, int(const ChannelsTable &channelsInfo));
     MOCK_METHOD1(GetPackageInfoMap,  int(std::map<std::string, std::vector<PackageInfo>> &filterMap));

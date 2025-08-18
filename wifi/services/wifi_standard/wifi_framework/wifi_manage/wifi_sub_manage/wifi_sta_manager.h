@@ -21,7 +21,9 @@
 #include "wifi_errcode.h"
 #include "sta_service_callback.h"
 #include "wifi_internal_msg.h"
+#ifndef OHOS_ARCH_LITE
 #include "wifi_net_observer.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {

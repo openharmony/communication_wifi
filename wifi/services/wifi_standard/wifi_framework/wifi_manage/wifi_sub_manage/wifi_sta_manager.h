@@ -52,7 +52,9 @@ private:
     void DealInternetAccessChanged(int internetAccessStatus, int instId);
     void DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const bool isAudioOn,
         const int32_t instId = 0);
+#ifndef OHOS_ARCH_LITE
     void DealOffScreenAudioBeaconLost(void);
+#endif
     void BeaconLostTimerCallback(void);
 private:
     StaServiceCallback mStaCallback;

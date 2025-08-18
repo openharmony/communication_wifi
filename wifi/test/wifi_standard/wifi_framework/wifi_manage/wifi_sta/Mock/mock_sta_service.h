@@ -60,6 +60,7 @@ public:
     MOCK_CONST_METHOD1(SetTxPower, ErrCode(int power));
     MOCK_METHOD2(OnSystemAbilityChanged, ErrCode(int systemAbilityid, bool add));
     MOCK_METHOD1(GetDetectNetState, void(OperateResState &state));
+    MOCK_METHOD0(StartWifiDetection, ErrCode());
     MOCK_CONST_METHOD1(SetWifiRestrictedList, ErrCode(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList));
 };
 }  // namespace OHOS

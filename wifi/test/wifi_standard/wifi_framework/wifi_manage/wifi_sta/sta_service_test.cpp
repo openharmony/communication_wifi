@@ -117,6 +117,7 @@ public:
     void StaServiceSetPowerModeTest();
     void StaServiceOnSystemAbilityChangedTest();
     void StaServiceStartPortalCertificationTest();
+    void StaServiceStartWifiDetectionTest();
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     void StaServiceSetWifiRestrictedListSuccess();
 #endif
@@ -138,6 +139,7 @@ public:
     void UpdateEapConfigTest();
     void OnWifiCountryCodeChangedTest();
     void StartPortalCertificationTest();
+    void StartWifiDetectionTest();
     void HandleForegroundAppChangedActionTest();
     void EnableHiLinkHandshakeTest();
     void DeliverStaIfaceDataTest();
@@ -708,6 +710,13 @@ void StaServiceTest::StaServiceStartPortalCertificationTest()
     EXPECT_TRUE(pStaService->StartPortalCertification() == WIFI_OPT_FAILED);
 }
 
+void StaServiceTest::StaServiceStartWifiDetectionTest()
+{
+    EXPECT_TRUE(pStaService->StartWifiDetection() == WIFI_OPT_SUCCESS);
+    pStaService->pStaStateMachine = nullptr;
+    EXPECT_TRUE(pStaService->StartWifiDetection() == WIFI_OPT_FAILED);
+}
+
 void StaServiceTest::DisableAutoJoin()
 {
     EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->DisableAutoJoin("testCondition"));
@@ -808,6 +817,11 @@ void StaServiceTest::OnWifiCountryCodeChangedTest()
 void StaServiceTest::StartPortalCertificationTest()
 {
     pStaService->StartPortalCertification();
+}
+
+void StaServiceTest::StartWifiDetectionTest()
+{
+    pStaService->StartWifiDetection();
 }
 
 void StaServiceTest::HandleForegroundAppChangedActionTest()
@@ -912,6 +926,11 @@ HWTEST_F(StaServiceTest, GetSignalPollInfoArrayTest, TestSize.Level0)
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level0)
 {
     StaServiceStartPortalCertificationTest();
+}
+
+HWTEST_F(StaServiceTest, StaServiceStartWifiDetectionTest, TestSize.Level0)
+{
+    StaServiceStartWifiDetectionTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level0)
@@ -1234,6 +1253,12 @@ HWTEST_F(StaServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level0)
 HWTEST_F(StaServiceTest, StartPortalCertificationTest, TestSize.Level0)
 {
     StartPortalCertificationTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
+}
+
+HWTEST_F(StaServiceTest, StartWifiDetectionTest, TestSize.Level0)
+{
+    StartWifiDetectionTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 

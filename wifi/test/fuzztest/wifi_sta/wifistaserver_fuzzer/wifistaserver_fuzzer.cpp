@@ -170,6 +170,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->EnableAutoJoin(conditionName);
     pStaInterface->StartPortalCertification();
     pStaInterface->EnableHiLinkHandshake(true, config, conditionName);
+    pStaInterface->StartWifiDetection();
     pStaInterface->DeregisterFilterBuilder(filterTag, conditionName);
     pStaInterface->AllowAutoConnect(networkId, isAllowed);
     pStaInterface->EnableStaService();
@@ -237,6 +238,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->EnableAutoJoin(conditionName);
     pStaService->StartPortalCertification();
     pStaService->EnableHiLinkHandshake(true, config, conditionName);
+    pStaService->StartWifiDetection();
     pStaService->DeliverStaIfaceData(conditionName);
     WifiTelephonyUtils::GetDataSlotId(index);
     pStaService->AddDeviceConfig(config);

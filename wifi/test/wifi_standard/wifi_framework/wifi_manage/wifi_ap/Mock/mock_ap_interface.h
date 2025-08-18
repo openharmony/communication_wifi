@@ -35,8 +35,6 @@ public:
     virtual ErrCode DisconnetStation(const StationInfo &stationInfo);
     virtual ErrCode GetStationList(std::vector<StationInfo> &result);
     virtual ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks);
-    virtual ErrCode GetValidBands(std::vector<BandType> &bands);
-    virtual ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validChannel);
     virtual ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList);
     virtual ErrCode GetPowerModel(PowerModel& model);
     virtual ErrCode SetPowerModel(const PowerModel& model);

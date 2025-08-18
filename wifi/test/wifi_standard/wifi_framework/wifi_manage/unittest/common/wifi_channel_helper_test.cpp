@@ -67,16 +67,6 @@ HWTEST_F(WifiChannelHelperTest, TestGetValidChannels, TestSize.Level1)
     EXPECT_EQ(WifiChannelHelper::GetInstance().GetValidChannels(validChannels), 0);
 }
 
-HWTEST_F(WifiChannelHelperTest, TestUpdateValidChannels, TestSize.Level1)
-{
-    std::string ifaceName = "wlan0";
-    WifiChannelHelper::GetInstance().UpdateValidChannels(ifaceName);
-
-    ifaceName = "wlan1";
-    WifiChannelHelper::GetInstance().UpdateValidChannels(ifaceName);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
-
 HWTEST_F(WifiChannelHelperTest, UpdateValidFreqsTest, TestSize.Level1)
 {
     WifiChannelHelper::GetInstance().UpdateValidFreqs();

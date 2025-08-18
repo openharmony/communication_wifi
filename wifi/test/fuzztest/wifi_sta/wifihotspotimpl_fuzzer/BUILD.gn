@@ -81,6 +81,7 @@ ohos_fuzztest("WifiHotspotImplFuzzTest") {
   sources = [
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_netconn_client.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_hal_device_manage.cpp",
     "wifihotspotimpl_fuzzer.cpp",
   ]
 
@@ -119,6 +120,8 @@ ohos_fuzztest("WifiHotspotImplFuzzTest") {
     "samgr:samgr_proxy",
     "time_service:time_client",
     "window_manager:libdm_lite",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 
   part_name = "wifi"

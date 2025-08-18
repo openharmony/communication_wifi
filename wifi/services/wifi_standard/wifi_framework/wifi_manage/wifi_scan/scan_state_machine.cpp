@@ -250,8 +250,7 @@ void ScanStateMachine::InitState::HandleUpdateCountryCode(InternalMessagePtr msg
         WifiConfigCenter::GetInstance().GetStaIfaceName(), wifiCountryCode);
     if (result == WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGI("update wifi country code sucess, wifiCountryCode=%{public}s", wifiCountryCode.c_str());
-        WifiChannelHelper::GetInstance().UpdateValidChannels(
-            WifiConfigCenter::GetInstance().GetStaIfaceName(), pScanStateMachine->m_instId);
+        WifiChannelHelper::GetInstance().UpdateValidFreqs();
         return;
     }
     WIFI_LOGE("update wifi country code fail, wifiCountryCode=%{public}s, ret=%{public}d",

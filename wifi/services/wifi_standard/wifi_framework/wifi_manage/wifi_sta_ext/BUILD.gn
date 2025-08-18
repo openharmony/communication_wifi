@@ -141,6 +141,7 @@ ohos_static_library("wifi_telephony_utils") {
   ]
   external_deps = [
     "hilog:libhilog",
+    "ipc:ipc_single",
   ]
 
   defines = []

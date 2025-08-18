@@ -216,7 +216,6 @@ public:
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
 };
-
 class WifiSettings : public MockWifiSettings {
 public:
     static WifiSettings &GetInstance(void);

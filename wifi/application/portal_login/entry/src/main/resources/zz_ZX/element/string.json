@@ -39,18 +39,6 @@
         {
             "name":"confirm_dialog_cancel",
             "value":"[TS_1080168]_Cancel"
-        },
-        {
-            "name":"EntryAbility_label",
-            "value":"[TS_1079372]_portal login"
-        },
-        {
-            "name":"EntryAbility_desc",
-            "value":"[TS_1079371]_description"
-        },
-        {
-            "name":"module_desc",
-            "value":"[TS_1079370]_module description"
         }
     ]
 }

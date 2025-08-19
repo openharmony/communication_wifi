@@ -1054,7 +1054,7 @@ void WifiConfigCenter::SetWlanPage(bool isWlanPage)
     isWlanPage_.store(isWlanPage);
 }
 
-int WifiConfigCenter::IsWlanPage() const
+bool WifiConfigCenter::IsWlanPage() const
 {
     return isWlanPage_.load();
 }

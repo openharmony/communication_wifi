@@ -103,6 +103,7 @@
                 "eventhandler",
                 "ffrt",
                 "hdf_core",
+                "hiappevent",
                 "hicollie",
                 "hilog",
                 "hisysevent",

@@ -19,6 +19,9 @@
 #include "context.h"
 #include "wifi_napi_errcode.h"
 #include <shared_mutex>
+#ifdef WIFI_HIAPPEVENT_ENABLE
+#include "wifi_hiappevent.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -30,6 +33,9 @@ TraceFuncCall::TraceFuncCall(std::string funcName): m_funcName(funcName)
         m_startTime = std::chrono::steady_clock::now();
         WIFI_LOGI("Call wifi func: %{public}s (start)", m_funcName.c_str());
     }
+#ifdef WIFI_HIAPPEVENT_ENABLE
+    eventStartTime_ = WifiHiAppEvent::GetInstance()->GetCurrentMillis();
+#endif
 }
 
 TraceFuncCall::~TraceFuncCall()
@@ -41,6 +47,9 @@ TraceFuncCall::~TraceFuncCall()
         WIFI_LOGI("Call wifi func: %{public}s (end), time cost:%{public}lldus, %{public}lldms",
             m_funcName.c_str(), us, us / usForPerMs);
     }
+#ifdef WIFI_HIAPPEVENT_ENABLE
+    WifiHiAppEvent::GetInstance()->WriteEndEvent(eventStartTime_, 1, 0, m_funcName);
+#endif
 }
 
 napi_value UndefinedNapiValue(const napi_env& env)

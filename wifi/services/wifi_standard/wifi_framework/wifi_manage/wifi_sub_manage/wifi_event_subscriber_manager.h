@@ -198,6 +198,7 @@ private:
     void UnRegisterPowermgrEvent();
     std::shared_ptr<PowermgrEventSubscriber> wifiPowermgrEventSubsciber_ = nullptr;
     std::mutex powermgrEventMutex;
+    uint32_t powerMgrId{0};
 #endif
     void UnRegisterCesEvent();
     void UnRegisterLocationEvent();
@@ -287,6 +288,7 @@ private:
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
     sptr<CellularStateObserver> cellularStateObserver_ { nullptr };
     int32_t simCount_ { 0 };
+    std::mutex cellularObserverLock_;
 #endif
 };
 

@@ -293,18 +293,23 @@ ErrCode WifiInternalEventDispatcher::AddScanCallback(
 
 int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &remote, int instId)
 {
-    if (remote != nullptr) {
-        std::unique_lock<std::mutex> lock(mScanCallbackMutex);
-        auto iter = mScanCallbacks.find(instId);
-        if (iter != mScanCallbacks.end()) {
-            auto itr = iter->second.find(remote);
-            if (itr != iter->second.end()) {
-                iter->second.erase(itr);
-                mScanCallBackInfo[instId].erase(mScanCallBackInfo[instId].find(remote));
-                WIFI_LOGD("WifiInternalEventDispatcher::RemoveScanCallback!");
-            }
-        }
+    if (remote == nullptr) {
+        return 0;
     }
+    std::unique_lock<std::mutex> lock(mScanCallbackMutex);
+    auto iter = mScanCallbacks.find(instId);
+    if (iter == mScanCallbacks.end()) {
+        return 0;
+    }
+    auto itr = iter->second.find(remote);
+    if (itr == iter->second.end()) {
+        return 0;
+    }
+    iter->second.erase(itr);
+    if (mScanCallBackInfo[instId].find(remote) != mScanCallBackInfo[instId].end()) {
+        mScanCallBackInfo[instId].erase(mScanCallBackInfo[instId].find(remote));
+    }
+    WIFI_LOGD("WifiInternalEventDispatcher::RemoveScanCallback!");
     return 0;
 }
 

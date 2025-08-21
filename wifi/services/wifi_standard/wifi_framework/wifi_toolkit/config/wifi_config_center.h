@@ -284,7 +284,7 @@ public:
 
     void SetWlanPage(bool isWlanPage);
 
-    int IsWlanPage() const;
+    bool IsWlanPage() const;
 
     void SetThermalLevel(const int &level);
 

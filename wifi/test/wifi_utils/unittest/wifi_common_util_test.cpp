@@ -359,9 +359,9 @@ HWTEST_F(WifiCommonUtilTest, IsBeaconLostTest04, TestSize.Level1)
     WifiSignalPollInfo signalPoll3;
     WifiSignalPollInfo signalPoll4;
     signalPoll0.timeStamp = 1;
-    signalPoll1.timeStamp = 4;
-    signalPoll3.timeStamp = 7;
-    signalPoll4.timeStamp = 10;
+    signalPoll1.timeStamp = 2;
+    signalPoll3.timeStamp = 3;
+    signalPoll4.timeStamp = 4;
     signalPoll0.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll1.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 128};
     signalPoll3.ext = {128, 128, 128, 128, 128, 128, 128, 128, 128, 0};

@@ -330,7 +330,7 @@ struct Index {
             } else {
               this.selectedUA = this.desktopUA;
             }
-            this.webviewController.setCustomUserAgent(this.mobileUA);
+            this.webviewController.setCustomUserAgent(this.selectedUA);
             hilog.info(DOMAIN, TAG, '%{public}s', 'UA is:' + this.harmonyUA + isPhone);
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to set UA. Code:${error.code}, message:${error.message}`);

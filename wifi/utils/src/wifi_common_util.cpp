@@ -91,7 +91,7 @@ static BeaconLostInfo g_beaconLostInfo = {0, 0, "", 0, 0, 0};
 static BeaconAbnormalInfo g_beaconAbnormalInfo = {0, 0, "", std::vector<uint8_t>(BEACON_LENGTH_RSSI)};
 
 constexpr int BEACON_LOST_MIN_CNT = 5; // 12s/(3s/time)
-constexpr int BEACON_LOST_MIN_CNT_OFF_SCREEN = 2; // 6s/(3s/time)
+constexpr int BEACON_LOST_MIN_CNT_OFF_SCREEN = 3;
 constexpr int BEACON_ABN_MIN_CNT = 3; // 5s/(3s/time)
 
 constexpr int IP_ADDRESS_FIRST_BYTE_OFFSET = 24;
@@ -569,7 +569,7 @@ bool IsBeaconLost(std::string bssid, WifiSignalPollInfo checkInfo, int32_t scree
         g_beaconLostInfo.cnt = 1;
         return false;
     }
-    int64_t timePeriod = (screenState == MODE_STATE_OPEN) ? SIGNAL_RECORD_12S : SIGNAL_RECORD_5S;
+    int64_t timePeriod = (screenState == MODE_STATE_OPEN) ? SIGNAL_RECORD_12S : SIGNAL_RECORD_3S;
     int32_t minCount = (screenState == MODE_STATE_OPEN) ? BEACON_LOST_MIN_CNT : BEACON_LOST_MIN_CNT_OFF_SCREEN;
     if (accumulateTime >= timePeriod && g_beaconLostInfo.cnt >= minCount) {
         g_beaconLostInfo.time = checkTime;

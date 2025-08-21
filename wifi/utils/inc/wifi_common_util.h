@@ -56,6 +56,7 @@ inline const int SYSTEM_OFFSET = 21;
 inline const int SUB_SYSTEM_OFFSET = 16;
 inline const int SIGNAL_RECORD_12S = 12;
 inline const int SIGNAL_RECORD_5S = 5;
+inline const int SIGNAL_RECORD_3S = 3;
 inline const int BEACON_LENGTH_RSSI = 10;
 inline const int8_t BEACON_LOST_RSSI0 = -128;
 inline const int8_t BEACON_LOST_RSSI1 = 127;

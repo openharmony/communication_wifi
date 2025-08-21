@@ -44,6 +44,8 @@ namespace Wifi {
 WifiStaManager::WifiStaManager()
 {
     WIFI_LOGI("create WifiStaManager");
+    netWorkDetect_ = sptr<NetStateObserver>(new NetStateObserver());
+    staManagerEventHandler_ = std::make_unique<WifiEventHandler>(TASK_NAME_WIFI_NET_DETECTION);
     InitStaCallback();
 }
 
@@ -67,16 +69,6 @@ static void SatelliteTimerCallback()
     WIFI_LOGI("It's time for satellite timer.");
     WifiManager::GetInstance().GetWifiTogglerManager()->SetSatelliteStartState(false);
     WifiManager::GetInstance().GetWifiStaManager()->StopSatelliteTimer();
-}
-
-void WifiStaManager::BeaconLostTimerCallback(void)
-{
-    WIFI_LOGI("It's time for beacon lost timer.");
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    std::lock_guard<std::mutex> lock(netStateMutex);
-    if (netState_ != SystemNetWorkState::NETWORK_IS_WORKING && pEnhanceService != nullptr) {
-        pEnhanceService->HandleBeaconLost();
-    }
 }
 
 void WifiStaManager::StopUnloadStaSaTimer(void)
@@ -277,17 +269,24 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
 #ifndef OHOS_ARCH_LITE
 void WifiStaManager::DealOffScreenAudioBeaconLost(void)
 {
-    sptr<NetStateObserver> mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
-    mNetWorkDetect->StartWifiDetection();
-    std::unique_lock<std::mutex> lock(beaconLostTimerMutex);
-    std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
-    std::function<void()> callback = [this]() { this->BeaconLostTimerCallback(); };
-    wifiSysTimer->SetCallbackInfo(callback);
-    beaconLostTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(wifiSysTimer);
-    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
-    MiscServices::TimeServiceClient::GetInstance()->StartTimer(beaconLostTimerId,
-        currentTime + BEACON_LOST_DELAY_TIME);
-    WIFI_LOGI("beaconLostTimer success! beaconLostTimerId:%{public}u", beaconLostTimerId);
+    WIFI_LOGI("Enter DealOffScreenAudioBeaconLost");
+    if (staManagerEventHandler_ == nullptr || netWorkDetect_ == nullptr) {
+        WIFI_LOGE("%{public}s staManagerEventHandler netWorkDetect is null", __func__);
+        return;
+    }
+    bool hasTask = false;
+    staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_NET_DETECTION, hasTask);
+    if (!hasTask) {
+        staManagerEventHandler_->PostAsyncTask([this]() { netWorkDetect_->StartWifiDetection(); },
+            TASK_NAME_WIFI_NET_DETECTION, 0);
+        staManagerEventHandler_->PostAsyncTask([this]() {
+            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+            std::lock_guard<std::mutex> lock(netStateMutex);
+            if (netState_ != SystemNetWorkState::NETWORK_IS_WORKING && pEnhanceService != nullptr) {
+                pEnhanceService->HandleBeaconLost();
+            }
+        }, TASK_NAME_WIFI_NET_DETECTION, BEACON_LOST_DELAY_TIME);
+    }
 }
 #endif
 

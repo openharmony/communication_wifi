@@ -24,10 +24,12 @@
 #ifndef OHOS_ARCH_LITE
 #include "wifi_net_observer.h"
 #endif
+#include "wifi_event_handler.h"
 
 namespace OHOS {
 namespace Wifi {
 constexpr uint32_t BEACON_LOST_DELAY_TIME = 800;
+const std::string TASK_NAME_WIFI_NET_DETECTION = "WifiNetDetection";
 
 class WifiStaManager {
 public:
@@ -58,18 +60,18 @@ private:
         const int32_t instId = 0);
 #ifndef OHOS_ARCH_LITE
     void DealOffScreenAudioBeaconLost(void);
-    void BeaconLostTimerCallback(void);
 #endif
+
 private:
     StaServiceCallback mStaCallback;
     uint32_t unloadStaSaTimerId{0};
     std::mutex unloadStaSaTimerMutex;
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
-    uint32_t beaconLostTimerId{0};
-    std::mutex beaconLostTimerMutex;
     std::mutex netStateMutex;
     int32_t netState_;
+    sptr<NetStateObserver> netWorkDetect_ = nullptr;
+    std::unique_ptr<WifiEventHandler> staManagerEventHandler_ = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

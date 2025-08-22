@@ -23,15 +23,16 @@
 #include "wifi_internal_msg.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_net_observer.h"
-#endif
 #include "wifi_event_handler.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
+#ifndef OHOS_ARCH_LITE
 constexpr uint32_t BEACON_LOST_DELAY_TIME = 800;
 const std::string TASK_NAME_WIFI_NET_DETECTION = "WifiNetDetection";
 const std::string TASK_NAME_WIFI_DISCONNECT = "WifiDisconnect";
-
+#endif
 class WifiStaManager {
 public:
     WifiStaManager();

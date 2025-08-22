@@ -62,16 +62,6 @@ ErrCode ApInterface::GetStationList(std::vector<StationInfo> &result)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ApInterface::GetValidBands(std::vector<BandType> &bands)
-{
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode ApInterface::GetValidChannels(BandType band, std::vector<int32_t> &validChannel)
-{
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode ApInterface::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
 {
     return WIFI_OPT_SUCCESS;

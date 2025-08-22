@@ -34,8 +34,6 @@ public:
     MOCK_METHOD1(DelBlockList, ErrCode(const StationInfo &stationInfo));
     MOCK_METHOD1(SetHotspotConfig, ErrCode(const HotspotConfig &hotspotConfig));
     MOCK_METHOD1(DisconnetStation, ErrCode(const StationInfo &stationInfo));
-    MOCK_METHOD1(GetValidBands, ErrCode(std::vector<BandType> &bands));
-    MOCK_METHOD2(GetValidChannels, ErrCode(BandType band, std::vector<int32_t> &validchannel));
     MOCK_METHOD1(RegisterApServiceCallbacks, ErrCode(const IApServiceCallbacks &callbacks));
 };
 } /* namespace Wifi */

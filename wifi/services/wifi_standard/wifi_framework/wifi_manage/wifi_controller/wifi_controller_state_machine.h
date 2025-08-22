@@ -106,6 +106,7 @@ public:
     void HandleConcreteStop(int id);
     void ClearWifiStartFailCount();
     void HandleStopConcretRetry();
+    bool IsOpenSoftApAllowed(int id);
 #ifdef FEATURE_AP_SUPPORT
     template <class T> void HandleHotspotStop(int id, HotspotMode THotspotMode, ManagerControl<T> &TManagers);
     void HandleSoftapStop(int id);

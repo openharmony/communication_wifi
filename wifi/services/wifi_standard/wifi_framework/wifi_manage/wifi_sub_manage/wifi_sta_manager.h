@@ -30,6 +30,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr uint32_t BEACON_LOST_DELAY_TIME = 800;
 const std::string TASK_NAME_WIFI_NET_DETECTION = "WifiNetDetection";
+const std::string TASK_NAME_WIFI_DISCONNECT = "WifiDisconnect";
 
 class WifiStaManager {
 public:
@@ -68,10 +69,10 @@ private:
     std::mutex unloadStaSaTimerMutex;
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
-    std::mutex netStateMutex;
-    int32_t netState_;
+#ifndef OHOS_ARCH_LITE
     sptr<NetStateObserver> netWorkDetect_ = nullptr;
     std::unique_ptr<WifiEventHandler> staManagerEventHandler_ = nullptr;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

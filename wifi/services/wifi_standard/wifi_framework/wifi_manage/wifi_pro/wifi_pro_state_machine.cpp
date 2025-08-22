@@ -526,7 +526,7 @@ bool WifiProStateMachine::InLandscapeSwitchLimitList()
 {
 #ifndef OHOS_ARCH_LITE
     std::vector<PackageInfo> specialList;
-    if (WifiSettings::GetInstance().GetPackageInfoByName("InLandscapeSwitchLimitList", specialList) != 0) {
+    if (WifiSettings::GetInstance().GetPackageInfoByName("LandscapeSwitchLimitList", specialList) != 0) {
         WIFI_LOGE("ProcessSwitchInfoRequest GetPackageInfoByName failed");
         return false;
     }

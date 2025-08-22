@@ -112,27 +112,15 @@ ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
         WIFI_LOGE("IsOpenSoftApAllowed:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    long features = 0;
-    WifiManager::GetInstance().GetSupportedFeatures(features);
-    if (static_cast<uint64_t>(features) & static_cast<uint64_t>(WifiFeatures::WIFI_FEATURE_AP_STA)) {
-        WifiLinkedInfo linkInfo;
-        WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
-        if (linkInfo.connState == ConnState::CONNECTED) {
-            isSupported = true;
-            return WIFI_OPT_SUCCESS;
-        }
-    }
-#ifdef FEATURE_RPT_SUPPORT
     if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
         WIFI_LOGE("IsOpenSoftApAllowed, GetWifiTogglerManager get failed");
         return WIFI_OPT_FAILED;
     }
     auto &wifiControllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    if (wifiControllerMachine != nullptr && wifiControllerMachine->ShouldUseRpt(0)) {
+    if (wifiControllerMachine != nullptr && wifiControllerMachine->IsOpenSoftApAllowed(0)) {
         isSupported = true;
         return WIFI_OPT_SUCCESS;
     }
-#endif
     WIFI_LOGI("IsOpenSoftApAllowed: false");
     return WIFI_OPT_SUCCESS;
 }

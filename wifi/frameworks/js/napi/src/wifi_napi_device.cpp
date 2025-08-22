@@ -621,6 +621,7 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     /* "randomMacAddr" is not supported currently */
     int ipType = static_cast<int>(AssignIpMethod::UNASSIGNED);
     JsObjectToInt(env, object, "ipType", ipType);
+    JsObjectToInt(env, object, "isAutoConnectAllowed", cppConfig.isAllowAutoConnect);
     WIFI_LOGI("JsObjToDeviceConfig, ipType: %{public}d, type: %{public}d.", ipType, type);
     if (IpTypeJs(ipType) == IpTypeJs::IP_TYPE_DHCP) {
         cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;

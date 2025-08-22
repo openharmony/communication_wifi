@@ -281,11 +281,11 @@ void WifiStaManager::DealOffScreenAudioBeaconLost(void)
             TASK_NAME_WIFI_NET_DETECTION, 0);
         staManagerEventHandler_->PostAsyncTask([this]() {
             IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-            std::lock_guard<std::mutex> lock(netStateMutex);
-            if (netState_ != SystemNetWorkState::NETWORK_IS_WORKING && pEnhanceService != nullptr) {
+            if (pEnhanceService != nullptr) {
                 pEnhanceService->HandleBeaconLost();
             }
-        }, TASK_NAME_WIFI_NET_DETECTION, BEACON_LOST_DELAY_TIME);
+        },
+        TASK_NAME_WIFI_DISCONNECT, BEACON_LOST_DELAY_TIME);
     }
 }
 #endif
@@ -385,8 +385,14 @@ void WifiStaManager::DealInternetAccessChanged(int internetAccessStatus, int ins
     cbMsg.msgData = internetAccessStatus;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    std::lock_guard<std::mutex> lock(netStateMutex);
-    netState_ = internetAccessStatus;
+#ifndef OHOS_ARCH_LITE
+    bool hasTask = false;
+    staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);
+    if (hasTask && internetAccessStatus == SystemNetWorkState::NETWORK_IS_WORKING) {
+        WIFI_LOGI("Remove TASK_NAME_WIFI_DISCONNECT");
+        staManagerEventHandler_->RemoveAsyncTask(TASK_NAME_WIFI_DISCONNECT);
+    }
+#endif
 }
 
 #ifndef OHOS_ARCH_LITE

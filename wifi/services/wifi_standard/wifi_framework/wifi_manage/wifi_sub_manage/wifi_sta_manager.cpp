@@ -283,11 +283,8 @@ void WifiStaManager::DealOffScreenAudioBeaconLost(void)
             TASK_NAME_WIFI_NET_DETECTION, 0);
         staManagerEventHandler_->PostAsyncTask([this]() {
             IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-            if (pEnhanceService != nullptr) {
-                pEnhanceService->HandleBeaconLost();
-            }
-        },
-        TASK_NAME_WIFI_DISCONNECT, BEACON_LOST_DELAY_TIME);
+            if (pEnhanceService != nullptr) { pEnhanceService->HandleBeaconLost(); }
+        }, TASK_NAME_WIFI_DISCONNECT, BEACON_LOST_DELAY_TIME);
     }
 }
 #endif

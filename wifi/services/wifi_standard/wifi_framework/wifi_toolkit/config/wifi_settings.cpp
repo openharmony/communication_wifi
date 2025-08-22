@@ -155,7 +155,7 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 ErrCode WifiSettings::AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo& wifiListInfo)
 {
     if ((wifiListInfo.ssid.empty() && wifiListInfo.wifiRestrictedType == MDM_BLOCKLIST) ||
-    (wifiListInfo.wifiRestrictedType == MDM_WHITELIST && (wifiListInfo.bssid.empty() || wifiListInfo.ssid.empty()))) {
+    (wifiListInfo.wifiRestrictedType == MDM_WHITELIST && wifiListInfo.ssid.empty())) {
         return WIFI_OPT_INVALID_PARAM;
     }
     std::unique_lock<std::mutex> lock(mStaMutex);

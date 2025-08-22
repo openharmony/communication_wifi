@@ -323,13 +323,15 @@ void WifiControllerMachine::HandleAirplaneOpen()
     WIFI_LOGI("airplane open set softap false");
     this->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
     this->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
+    if (!IsOpenSoftApAllowed(0)) {
 #ifdef FEATURE_AP_SUPPORT
-    WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-    softApManagers.StopAllManagers();
+        WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+        softApManagers.StopAllManagers();
 #ifdef FEATURE_RPT_SUPPORT
     rptManagers.StopAllManagers();
 #endif
 #endif
+    }
     if (!WifiSettings::GetInstance().GetWifiFlagOnAirplaneMode() || !ShouldEnableWifi(INSTID_WLAN0)) {
         multiStaManagers.StopAllManagers();
         if (IsDisableWifiProhibitedByEdm()) {
@@ -559,6 +561,25 @@ bool WifiControllerMachine::ShouldEnableWifi(int id)
 
     WIFI_LOGI("no need to start Wifi or scanonly");
     return false;
+}
+
+bool WifiControllerMachine::IsOpenSoftApAllowed(int id)
+{
+    long features = 0;
+    WifiManager::GetInstance().GetSupportedFeatures(features);
+    if (static_cast<uint64_t>(features) & static_cast<uint64_t>(WifiFeatures::WIFI_FEATURE_AP_STA)) {
+        WifiLinkedInfo linkInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo);
+        if (linkInfo.connState == ConnState::CONNECTED) {
+            return true;
+        }
+    }
+ 
+#ifdef FEATURE_RPT_SUPPORT
+    return ShouldUseRpt(id);
+#else
+    return false;
+#endif
 }
 
 ConcreteManagerRole WifiControllerMachine::GetWifiRole()

@@ -323,7 +323,7 @@ WifiErrorNo HdiWpaStart()
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_HAL_OPT_FAILED;
     }
-    
+
     RegistHdfDeathCallBack();
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("HdiWpaStart start success!");
@@ -337,7 +337,7 @@ WifiErrorNo HdiWpaStop()
     if (g_wpaObj == NULL) {
         pthread_mutex_unlock(&g_wpaObjMutex);
         LOGE("%{public}s g_wpaObj is NULL or wpa hdi already stopped", __func__);
-        return WIFI_HAL_OPT_OK;
+        return WIFI_HAL_OPT_FAILED;
     }
 
     int32_t ret = g_wpaObj->Stop(g_wpaObj);
@@ -765,7 +765,7 @@ WifiErrorNo HdiApStop(int id)
     if (g_apObj == NULL) {
         LOGE("%{public}s, g_apObj is NULL", __func__);
         pthread_mutex_unlock(&g_apObjMutex);
-        return WIFI_HAL_OPT_OK;
+        return WIFI_HAL_OPT_FAILED;
     }
     ret = g_apObj->DisableAp(g_apObj, g_apIfaceName, id);
     ret = g_apObj->StopAp(g_apObj);

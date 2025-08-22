@@ -303,6 +303,7 @@ int WifiInternalEventDispatcher::RemoveScanCallback(const sptr<IRemoteObject> &r
     }
     auto itr = iter->second.find(remote);
     if (itr == iter->second.end()) {
+        WIFI_LOGW("WifiInternalEventDispatcher::remote not find");
         return 0;
     }
     iter->second.erase(itr);

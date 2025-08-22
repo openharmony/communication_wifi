@@ -83,7 +83,6 @@ int WifiChannelHelper::GetValidBands(std::vector<BandType> &bands)
 
 int WifiChannelHelper::SetValidChannels(const ChannelsTable &channelsInfo)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
     mValidChannels = channelsInfo;
     return 0;
 }
@@ -95,48 +94,9 @@ int WifiChannelHelper::GetValidChannels(ChannelsTable &channelsInfo)
     return 0;
 }
 
-void WifiChannelHelper::UpdateValidChannels(std::string ifaceName, int instId)
-{
-    WIFI_LOGI("enter UpdateValidChannels");
-    ChannelsTable chanTbs;
-    std::vector<int> freqs2G;
-    std::vector<int> freqs5G;
-    int band = static_cast<int>(BandType::BAND_2GHZ);
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs2G)) {
-        WIFI_LOGE("get 2g frequencies failed.");
-        WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_2GHZ, freqs2G, instId);
-    }
-#endif
-    band = static_cast<int>(BandType::BAND_5GHZ);
-#ifdef HDI_CHIP_INTERFACE_SUPPORT
-    if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs5G)) {
-        WIFI_LOGE("get 5g frequencies failed.");
-    }
-#endif
-    std::vector<int32_t> supp2Gfreqs(freqs2G.begin(), freqs2G.end());
-    std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
-    for (auto iter = supp2Gfreqs.begin(); iter != supp2Gfreqs.end(); iter++) {
-        int32_t channel = TransformFrequencyIntoChannel(*iter);
-        if (channel == INVALID_FREQ_OR_CHANNEL) {
-            continue;
-        }
-        chanTbs[BandType::BAND_2GHZ].push_back(channel);
-    }
-    for (auto iter = supp5Gfreqs.begin(); iter != supp5Gfreqs.end(); iter++) {
-        int32_t channel = TransformFrequencyIntoChannel(*iter);
-        if (channel == INVALID_FREQ_OR_CHANNEL) {
-            continue;
-        }
-        chanTbs[BandType::BAND_5GHZ].push_back(channel);
-    }
-    if (SetValidChannels(chanTbs)) {
-        WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
-    }
-}
-
 void WifiChannelHelper::UpdateValidFreqs()
 {
+    std::unique_lock<std::mutex> lock(mMutex);
     std::vector<int> freqs2G;
     std::vector<int> freqs5G;
     std::vector<int> freqsDfs;
@@ -162,10 +122,16 @@ void WifiChannelHelper::UpdateValidFreqs()
     mValidFreqs[ScanBandType::SCAN_BAND_24_GHZ] = freqs2G;
     mValidFreqs[ScanBandType::SCAN_BAND_5_GHZ] = freqs5G;
     mValidFreqs[ScanBandType::SCAN_BAND_5_GHZ_DFS_ONLY] = freqsDfs;
+
+    std::vector<int32_t> supp5Gfreqs(freqs5G.begin(), freqs5G.end());
+    supp5Gfreqs.insert(supp5Gfreqs.end(), freqsDfs.begin(), freqsDfs.end());
+    std::sort(supp5Gfreqs.begin(), supp5Gfreqs.end());
+    UpdateValidChannels(freqs2G, supp5Gfreqs);
 }
 
 bool WifiChannelHelper::GetAvailableScanFreqs(ScanBandType band, std::vector<int32_t>& freqs)
 {
+    std::unique_lock<std::mutex> lock(mMutex);
     switch (band) {
         case ScanBandType::SCAN_BAND_24_GHZ: {
             freqs.assign(mValidFreqs[ScanBandType::SCAN_BAND_24_GHZ].begin(),
@@ -319,6 +285,27 @@ bool WifiChannelHelper::IsValid24GChannel(int channel)
 bool WifiChannelHelper::IsValid5GChannel(int channel)
 {
     return channel >= CHANNEL_5G_MIN && channel <= CHANNEL_5G_MAX;
+}
+void WifiChannelHelper::UpdateValidChannels(std::vector<int32_t> &supp2Gfreqs, std::vector<int32_t> &supp5Gfreqs)
+{
+    ChannelsTable chanTbs;
+    for (auto iter = supp2Gfreqs.begin(); iter != supp2Gfreqs.end(); iter++) {
+        int32_t channel = TransformFrequencyIntoChannel(*iter);
+        if (channel == INVALID_FREQ_OR_CHANNEL) {
+            continue;
+        }
+        chanTbs[BandType::BAND_2GHZ].push_back(channel);
+    }
+    for (auto iter = supp5Gfreqs.begin(); iter != supp5Gfreqs.end(); iter++) {
+        int32_t channel = TransformFrequencyIntoChannel(*iter);
+        if (channel == INVALID_FREQ_OR_CHANNEL) {
+            continue;
+        }
+        chanTbs[BandType::BAND_5GHZ].push_back(channel);
+    }
+    if (SetValidChannels(chanTbs)) {
+        WIFI_LOGE("%{public}s, fail to SetValidChannels", __func__);
+    }
 }
 
 } // namespace Wifi

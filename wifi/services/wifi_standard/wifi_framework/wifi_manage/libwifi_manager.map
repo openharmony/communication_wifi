@@ -347,7 +347,6 @@
         "OHOS::Wifi::WifiAppStateAware::IsForegroundApp(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiChannelHelper::GetInstance()";
         "OHOS::Wifi::WifiChannelHelper::GetValidBands(std::__h::vector<OHOS::Wifi::BandType, std::__h::allocator<OHOS::Wifi::BandType>>&)";
-        "OHOS::Wifi::WifiChannelHelper::SetValidChannels(std::__h::map<OHOS::Wifi::BandType, std::__h::vector<int, std::__h::allocator<int>>, std::__h::less<OHOS::Wifi::BandType>, std::__h::allocator<std::__h::pair<OHOS::Wifi::BandType const, std::__h::vector<int, std::__h::allocator<int>>>>> const&)";
         "OHOS::Wifi::WifiChannelHelper::GetValidChannels(std::__h::map<OHOS::Wifi::BandType, std::__h::vector<int, std::__h::allocator<int>>, std::__h::less<OHOS::Wifi::BandType>, std::__h::allocator<std::__h::pair<OHOS::Wifi::BandType const, std::__h::vector<int, std::__h::allocator<int>>>>>&)";
         "OHOS::Wifi::WifiCountryCodeManager::GetInstance()";
         "OHOS::Wifi::WifiCountryCodeManager::Init()";
@@ -459,7 +458,6 @@
         "OHOS::Wifi::WifiTogglerManager::StartSemiWifiToggledTimer()";
         "OHOS::Wifi::WifiTogglerManager::IsSatelliteStateStart()";
         "OHOS::Wifi::WifiTogglerManager::SatelliteToggled(int)";
-        "OHOS::Wifi::WifiChannelHelper::UpdateValidChannels(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, int)";
         "OHOS::Wifi::WifiP2pManager::HasP2pActivatedBefore()";
         "OHOS::Wifi::WifiSettings::GetPackageInfoByName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::vector<OHOS::Wifi::PackageInfo, std::__h::allocator<OHOS::Wifi::PackageInfo>>&)";
         "OHOS::Wifi::WifiSecurityDetect::GetInstance()";
@@ -467,6 +465,12 @@
         "OHOS::Wifi::WifiSecurityDetect::SecurityDetectThread_";
         "OHOS::Wifi::WifiSecurityDetect::SettingDataOnOff()";
         "OHOS::Wifi::WifiSecurityDetect::SecurityDetect(OHOS::Wifi::WifiDeviceConfig const&, int)";
+        "OHOS::Wifi::WifiChannelHelper::GetAvailableScanFreqs(OHOS::Wifi::ScanBandType, std::__h::vector<int, std::__h::allocator<int>>&)";
+        "OHOS::Wifi::WifiChannelHelper::UpdateValidFreqs()";
+        "OHOS::Wifi::ApConfigUse::GetInstance()";
+        "OHOS::Wifi::ApConfigUse::GetApVaildBands(std::__h::vector<OHOS::Wifi::BandType, std::__h::allocator<OHOS::Wifi::BandType>>&) const";
+        "OHOS::Wifi::ApConfigUse::GetApVaildChannel(OHOS::Wifi::BandType, std::__h::vector<int, std::__h::allocator<int>>&) const";
+        "OHOS::Wifi::ApConfigUse::UpdateApChannelConfig(OHOS::Wifi::HotspotConfig&) const";
     };
     local:
         *;

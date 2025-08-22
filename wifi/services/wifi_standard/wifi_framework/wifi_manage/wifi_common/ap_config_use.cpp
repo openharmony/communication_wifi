@@ -27,6 +27,7 @@
 #include "wifi_msg.h"
 #include "wifi_p2p_msg.h"
 #include "wifi_config_center.h"
+#include "wifi_channel_helper.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -39,6 +40,12 @@ ApConfigUse::ApConfigUse(int id) : m_id(id)
     m_softapIndoorChannels = m_softapChannelPolicyPtr->GetAllIndoorChannels();
     m_softapPreferredChannels = m_softapChannelPolicyPtr->GetAllPreferredChannels();
     m_softapChannelPolicyPtr = nullptr;  // xml loading completed, release pointer
+}
+
+ApConfigUse &ApConfigUse::GetInstance()
+{
+    static ApConfigUse gApConfigUse;
+    return gApConfigUse;
 }
 
 void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig) const
@@ -70,9 +77,58 @@ void ApConfigUse::UpdateApChannelConfig(HotspotConfig &apConfig) const
         apConfig.GetChannel());
 }
 
+bool ApConfigUse::GetApVaildChannel(BandType band, std::vector<int32_t> &validChannel) const
+{
+    WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+    std::vector<int32_t> freqs;
+    switch (band) {
+        case BandType::BAND_2GHZ:
+            if (!WifiChannelHelper::GetInstance().GetAvailableScanFreqs(
+                ScanBandType::SCAN_BAND_24_GHZ, freqs)) {
+                WIFI_LOGE("Failed to obtain 2.4g channels from the WifiChannelHelper.");
+                return false;
+            }
+            TransformFrequencyIntoChannel(freqs, validChannel);
+            break;
+        case BandType::BAND_5GHZ:
+            if (!WifiChannelHelper::GetInstance().GetAvailableScanFreqs(
+                ScanBandType::SCAN_BAND_5_GHZ, freqs)) {
+                WIFI_LOGE("Failed to obtain 5g channels from the WifiChannelHelper.");
+                return false;
+            }
+            TransformFrequencyIntoChannel(freqs, validChannel);
+            FilterIndoorChannel(validChannel);
+            break;
+        default:
+            WIFI_LOGE("band param is wrong");
+            return false;
+    }
+    std::string channelString;
+    for (auto ite : validChannel) {
+        channelString = channelString + std::to_string(ite) + ", ";
+    }
+    WIFI_LOGI("Instance %{public}s channelString %{public}s", __func__, channelString.data());
+    return true;
+}
+
+void ApConfigUse::GetApVaildBands(std::vector<BandType> &bands) const
+{
+    std::vector<int32_t> validChannel;
+    GetApVaildChannel(BandType::BAND_2GHZ, validChannel);
+    if (validChannel.size() > 0) {
+        bands.push_back(BandType::BAND_2GHZ);
+    }
+    validChannel.clear();
+    GetApVaildChannel(BandType::BAND_5GHZ, validChannel);
+    if (validChannel.size() > 0) {
+        bands.push_back(BandType::BAND_5GHZ);
+    }
+}
+
 int ApConfigUse::GetBestChannelFor2G() const
 {
-    std::vector<int> channels = GetChannelFromDrvOrXmlByBand(BandType::BAND_2GHZ);
+    std::vector<int> channels;
+    GetApVaildChannel(BandType::BAND_2GHZ, channels);
     if (channels.empty()) {
         WIFI_LOGI("GetBestChannelFor2G is empty");
         return AP_CHANNEL_INVALID;
@@ -84,8 +140,8 @@ int ApConfigUse::GetBestChannelFor2G() const
 
 int ApConfigUse::GetBestChannelFor5G(HotspotConfig &apConfig) const
 {
-    std::vector<int> channels = GetChannelFromDrvOrXmlByBand(BandType::BAND_5GHZ);
-    FilterIndoorChannel(channels);
+    std::vector<int> channels;
+    GetApVaildChannel(BandType::BAND_5GHZ, channels);
     Filter165Channel(channels);
     WIFI_LOGD("Instance %{public}d %{public}s band:%{public}d, channel:%{public}d, bandwidth:%{public}d",
         m_id, __func__, static_cast<int>(apConfig.GetBand()), apConfig.GetChannel(), apConfig.GetBandWidth());
@@ -198,7 +254,7 @@ std::set<int> ApConfigUse::GetIndoorChanByCountryCode(const std::string &country
 {
     std::set<int> indoorChannelByCode;
     if (countryCode.empty() || m_softapIndoorChannels.find(countryCode) == m_softapIndoorChannels.end()) {
-        return indoorChannelByCode;
+        return defaultIndoorChannel_;
     }
     indoorChannelByCode = m_softapIndoorChannels.find(countryCode)->second;
     return indoorChannelByCode;

@@ -29,6 +29,7 @@
 #include "wifi_country_code_manager.h"
 #include "mac_address.h"
 #include "wifi_randommac_helper.h"
+#include "ap_config_use.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
@@ -72,10 +73,7 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     }
 
     std::vector<BandType> bands;
-    if (WifiChannelHelper::GetInstance().GetValidBands(bands) < 0) {
-        WIFI_LOGE("IsHotspotDualBandSupported:GetValidBands return failed!");
-        return WIFI_OPT_FAILED;
-    }
+    ApConfigUse::GetInstance().GetApVaildBands(bands);
 
     bool is2GSupported = false;
     bool is5GSupported = false;
@@ -247,29 +245,11 @@ ErrCode WifiHotspotServiceImpl::GetLocalOnlyHotspotConfig(HotspotConfig &result)
 
 ErrCode WifiHotspotServiceImpl::VerifyConfigValidity(const HotspotConfig &config)
 {
-    if (!mGetChannels) {
-        IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
-        if (IsApServiceRunning() && pService != nullptr) {
-            std::vector<int32_t> valid2GChannel;
-            std::vector<int32_t> valid5GChannel;
-            (void)pService->GetValidChannels(BandType::BAND_2GHZ, valid2GChannel);
-            (void)pService->GetValidChannels(BandType::BAND_5GHZ, valid5GChannel);
-            if (valid2GChannel.size() + valid5GChannel.size() == 0) {
-                WIFI_LOGE("Failed to get supported band and channel!");
-            } else {
-                mGetChannels = true;
-            }
-        } else {
-            WIFI_LOGE("Instance %{public}d, ap service is not started!", m_id);
-        }
-    }
     std::vector<BandType> bandsFromCenter;
-    WifiChannelHelper::GetInstance().GetValidBands(bandsFromCenter);
-    ChannelsTable channInfoFromCenter;
-    WifiChannelHelper::GetInstance().GetValidChannels(channInfoFromCenter);
+    ApConfigUse::GetInstance().GetApVaildBands(bandsFromCenter);
     HotspotConfig configFromCenter;
     WifiSettings::GetInstance().GetHotspotConfig(configFromCenter, m_id);
-    ErrCode validRetval = IsValidHotspotConfig(config, configFromCenter, bandsFromCenter, channInfoFromCenter);
+    ErrCode validRetval = IsValidHotspotConfig(config, configFromCenter, bandsFromCenter);
     if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Instance %{public}d Hotspot config is invalid!", m_id);
         return validRetval;
@@ -695,9 +675,7 @@ ErrCode WifiHotspotServiceImpl::GetValidBands(std::vector<BandType> &bands)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    if (WifiChannelHelper::GetInstance().GetValidBands(bands) < 0) {
-        return WIFI_OPT_FAILED;
-    }
+    ApConfigUse::GetInstance().GetApVaildBands(bands);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -713,12 +691,7 @@ ErrCode WifiHotspotServiceImpl::GetValidChannels(BandType band, std::vector<int3
     if (band == BandType::BAND_NONE) {
         return WIFI_OPT_INVALID_PARAM;
     }
-    ChannelsTable channInfoFromCenter;
-    WifiChannelHelper::GetInstance().GetValidChannels(channInfoFromCenter);
-    auto iter = channInfoFromCenter.find(band);
-    if (iter != channInfoFromCenter.end()) {
-        validchannels = iter->second;
-    }
+    ApConfigUse::GetInstance().GetApVaildChannel(band, validchannels);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -1014,13 +987,6 @@ ErrCode WifiHotspotServiceImpl::CfgCheckBand(const HotspotConfig &cfg, std::vect
     return ErrCode::WIFI_OPT_INVALID_PARAM;
 }
 
-ErrCode WifiHotspotServiceImpl::CfgCheckChannel(const HotspotConfig &cfg, ChannelsTable &channInfoFromCenter)
-{
-    std::vector<int32_t> channels = channInfoFromCenter[static_cast<BandType>(cfg.GetBand())];
-    auto it = find(channels.begin(), channels.end(), cfg.GetChannel());
-    return ((it == channels.end()) ? ErrCode::WIFI_OPT_INVALID_PARAM : ErrCode::WIFI_OPT_SUCCESS);
-}
-
 static bool isNumber(std::string &str)
 {
     return !str.empty() && (str.find_first_not_of("0123456789") == std::string::npos);
@@ -1057,7 +1023,7 @@ ErrCode WifiHotspotServiceImpl::CfgCheckIpAddress(const std::string &ipAddress)
 }
 
 ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgFromCenter,
-    std::vector<BandType> &bandsFromCenter, ChannelsTable &channInfoFromCenter)
+    std::vector<BandType> &bandsFromCenter)
 {
     if (CfgCheckIpAddress(cfg.GetIpAddress()) == ErrCode::WIFI_OPT_INVALID_PARAM) {
         return ErrCode::WIFI_OPT_INVALID_PARAM;

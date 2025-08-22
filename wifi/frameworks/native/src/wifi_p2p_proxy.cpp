@@ -1930,6 +1930,5 @@ ErrCode WifiP2pProxy::SetP2pHighPerf(bool isEnable)
 
     return WIFI_OPT_SUCCESS;
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

@@ -44,8 +44,10 @@ namespace Wifi {
 WifiStaManager::WifiStaManager()
 {
     WIFI_LOGI("create WifiStaManager");
+#ifndef OHOS_ARCH_LITE
     netWorkDetect_ = sptr<NetStateObserver>(new NetStateObserver());
     staManagerEventHandler_ = std::make_unique<WifiEventHandler>(TASK_NAME_WIFI_NET_DETECTION);
+#endif
     InitStaCallback();
 }
 

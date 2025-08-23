@@ -35,12 +35,6 @@ int32_t NetConnClient::RegisterNetSupplierCallback(uint32_t supplierId, const sp
     return NETMANAGER;
 }
 
-int32_t NetConnClient::RegisterNetConnCallback(const sptr<NetSpecifier> &netSpecifier,
-    const sptr<INetConnCallback> callback, const uint32_t &timeoutMS)
-{
-    return NETMANAGER;
-}
-
 int32_t NetConnClient::UpdateNetSupplierInfo(uint32_t supplierId, const sptr<NetSupplierInfo> &netSupplierInfo)
 {
     return NETMANAGER;

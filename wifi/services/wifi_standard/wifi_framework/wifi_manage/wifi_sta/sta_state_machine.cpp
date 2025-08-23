@@ -1676,6 +1676,16 @@ StaStateMachine::GetIpState::~GetIpState()
 void StaStateMachine::GetIpState::GoInState()
 {
     WIFI_LOGI("GetIpState GoInState function. m_instId=%{public}d", pStaStateMachine->m_instId);
+
+    // 静态ipv6，stop DHCP
+    WifiDeviceConfig wificonfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, wificonfig,
+        pStaStateMachine->m_instId) == 0 &&
+        wificonfig.wifiIpConfig.assignMethod ==  AssignIpMethod::STATIC &&
+        wificonfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == 1) {
+        WIFI_LOGI("Static IPv6 stop DHCP.\n");
+        pStaStateMachine->StopDhcp(false, true);
+    }
 #ifdef WIFI_DHCP_DISABLED
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
@@ -3409,8 +3419,12 @@ void StaStateMachine::DhcpResultNotify::DhcpResultNotifyEvent(DhcpReturnCode res
 void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
 {
     std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
-    if (iptype == 1) {
-        WIFI_LOGI("TryToCloseDhcpClient iptype ipv6 return");
+    WifiDeviceConfig config;
+    int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId,
+        config, pStaStateMachine->m_instId);
+    int family = config.wifiIpConfig.staticIpAddress.ipAddress.address.family;
+    if (iptype == 1 && (config.wifiIpConfig.assignMethod != AssignIpMethod::STATIC || family == 0 || ret != 0)) {
+        WIFI_LOGI("TryToCloseDhcpClient DHCP or StaticV4: iptype ipv6 return");
         return;
     }
 

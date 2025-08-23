@@ -723,20 +723,6 @@ StaStateMachine::LinkState::~LinkState()
 void StaStateMachine::LinkState::GoInState()
 {
     WIFI_LOGI("LinkState GoInState function.");
-    int result = pStaStateMachine->RegisterDhcpCallBack();
-    if (result != WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("Register dhcp callback failed, result = %{public}d", result);
-        return;
-    }
-    RouterConfig routerConfig;
-    routerConfig.bIpv6 = true;
-    routerConfig.bIpv4 = false;
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
-    if (strncpy_s(routerConfig.ifname, sizeof(routerConfig.ifname), ifaceName.c_str(), ifaceName.length()) < 0) {
-        WIFI_LOGE("LinkState GoInState, copy ifaceName failed");
-        return;
-    }
-    StartDhcpClient(routerConfig);
     return;
 }
 
@@ -894,7 +880,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
-        pStaStateMachine->StopDhcp(true, false);
+        pStaStateMachine->StopDhcp(true, true);
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
@@ -1676,16 +1662,6 @@ StaStateMachine::GetIpState::~GetIpState()
 void StaStateMachine::GetIpState::GoInState()
 {
     WIFI_LOGI("GetIpState GoInState function. m_instId=%{public}d", pStaStateMachine->m_instId);
-
-    // 静态ipv6，stop DHCP
-    WifiDeviceConfig wificonfig;
-    if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, wificonfig,
-        pStaStateMachine->m_instId) == 0 &&
-        wificonfig.wifiIpConfig.assignMethod ==  AssignIpMethod::STATIC &&
-        wificonfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == 1) {
-        WIFI_LOGI("Static IPv6 stop DHCP.\n");
-        pStaStateMachine->StopDhcp(false, true);
-    }
 #ifdef WIFI_DHCP_DISABLED
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
@@ -1715,6 +1691,16 @@ void StaStateMachine::GetIpState::GoInState()
     if (ret == 0) {
         assignMethod = config.wifiIpConfig.assignMethod;
     }
+    bool isStaticIpv6 = false;
+    // static ipv6 does not need dhcp
+    WifiDeviceConfig wificonfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, wificonfig,
+        pStaStateMachine->m_instId) == 0 &&
+        wificonfig.wifiIpConfig.assignMethod ==  AssignIpMethod::STATIC &&
+        wificonfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == 1) {
+        WIFI_LOGI("Static IPv6 stop DHCP.\n");
+        isStaticIpv6 = true;
+    }
 
     if (assignMethod == AssignIpMethod::STATIC) {
         pStaStateMachine->currentTpType = config.wifiIpConfig.staticIpAddress.ipAddress.address.family;
@@ -1726,6 +1712,8 @@ void StaStateMachine::GetIpState::GoInState()
         }
     }
     pStaStateMachine->HandlePreDhcpSetup();
+    pStaStateMachine->StopDhcp(false, true); // stop previous dhcp ipv6 first
+    /* start dhcp */
     do {
         int dhcpRet;
         std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
@@ -1738,7 +1726,7 @@ void StaStateMachine::GetIpState::GoInState()
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
         }
         config.isStaticIpv4 = assignMethod == AssignIpMethod::STATIC;
-        config.bIpv6 = false;
+        config.bIpv6 = !isStaticIpv6;
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
             break;

@@ -439,6 +439,20 @@ ErrCode WifiDeviceImpl::GetDeviceMacAddress(std::string &result)
     return client_->GetDeviceMacAddress(result);
 }
 
+ErrCode WifiDeviceImpl::IsRandomMacDisabled(bool &isRandomMacDisabled)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->IsRandomMacDisabled(isRandomMacDisabled);
+}
+
+ErrCode WifiDeviceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());     
+    return client_->SetRandomMacDisabled(isRandomMacDisabled);
+}
+
 ErrCode WifiDeviceImpl::IsBandTypeSupported(int bandType, bool &supported)
 {
     std::lock_guard<std::mutex> lock(mutex_);

@@ -710,6 +710,49 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
     return WIFI_OPT_SUCCESS;
 }
 
+bool StaService::IsRandomMacDisabled() const
+{
+    return WifiSettings::GetInstance().IsRandomMacDisabled(); 
+}
+
+ErrCode StaService::SetRandomMacDisabled(bool isRandomMacDisabled) const
+{
+    if (IsRandomMacDisabled() == isRandomMacDisabled) {
+        return WIFI_OPT_SUCCESS;
+    }
+    WifiSettings::GetInstance().SetRandomMacDisabled(isRandomMacDisabled);
+    ReconnectByMDM();
+    return WIFI_OPT_SUCCESS;
+}
+
+void StaService::ReconnectByMdm()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    if (networkId == INVALID_NETWORK_ID) {
+        WIFI_LOGE("No network connect");
+        return;
+    }
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, targetNetwork)) {
+        WIFI_LOGE("Failed tot get device config");
+        return;
+    }
+    std::string realMac;
+    std::string randomMac;
+    WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
+    WifiSettings::GetInstance().GetRandomMac(randomMac, m_instId);
+    bool isRandomMacDisabled = IsRandomMacDisabled();
+    if ((isRandomMacDisabled && realMac != targetNetwork.macAddress) ||
+        (!isRandomMacDisabled && randomMac != targetNetwork.macAddress)) {
+        if (ConnectToNetwork(networkId, NETWORK_SELECTED_BY_MDM) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Connect to network failed");
+        }
+    }
+    return;
+}
+
 ErrCode StaService::Disconnect() const
 {
     WIFI_LOGI("Enter Disconnect.\n");

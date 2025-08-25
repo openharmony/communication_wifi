@@ -34,6 +34,7 @@ const std::map<int, std::string> g_connectTypeTransMap {
     { NETWORK_SELECTED_BY_SELFCURE, "SELFCURE_CONNECT" },
     { NETWORK_SELECTED_BY_ROAM, "ROMA_CONNECT" },
     { NETWORK_SELECTED_BY_REASSOC, "REASSOC" },
+    { NETWORK_SELECTED_BY_MDM, "MDM" },
 };
 constexpr int MAX_DNS_NUM = 10;
 

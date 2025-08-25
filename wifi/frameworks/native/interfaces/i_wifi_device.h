@@ -177,7 +177,7 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) = 0;
-
+    
     /**
      * @Description Connecting to a Specified Network
      *

@@ -1120,6 +1120,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.scanOnlySwitch = true;
     item.realMacAddress = "";
     item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
+    item.isRandomMacDisabled = flase;
     return;
 }
 
@@ -1297,6 +1298,10 @@ std::map<std::string, Func> g_wifiConfigSetValueMap = {
         std::string tmpValue = value;
         item.staApExclusionType = CheckDataLegal(tmpValue);
     }},
+    {"isRandomMacDisabled", [](WifiConfig &item, const std::string &value) -> void {
+        std::string tmpValue = value;
+        item.isRandomMacDisabled = CheckDataLegal(tmpValue);
+    }},
     {"version", [](WifiConfig &item, const std::string &value) -> void {
         //@deprecated
     }}
@@ -1376,6 +1381,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"scanOnlySwitch=" << item.scanOnlySwitch << std::endl;
     ss << "    " <<"realMacAddress=" << item.realMacAddress << std::endl;
     ss << "    " <<"staApExclusionType=" << item.staApExclusionType << std::endl;
+    ss << "    " <<"isRandomMacDisabled=" << item.isRandomMacDisabled << std::endl
     ss << "    " <<"</WifiConfig>" << std::endl;
     return ss.str();
 }

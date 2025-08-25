@@ -1797,6 +1797,22 @@ NO_SANITIZE("cfi") napi_value GetDeviceMacAddress(napi_env env, napi_callback_in
     return addr;
 }
 
+NO_SANITIZE("cfi") napi_value IsRandomMacDisabled(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    bool isRandomMacDisabled = false;
+    ErrCode ret = wifiDevicePtr->IsRandomMacDisabled(isRandomMacDisabled);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Is Random Mac Disabeld: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == true, ret, SYSCAP_WIFI_STA);
+    }
+    
+    napi_value result;
+    napi_get_boolean(env, isRandomMacDisabled, &result);
+    return result;
+}
+
 NO_SANITIZE("cfi") napi_value IsBandTypeSupported(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;

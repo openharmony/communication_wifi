@@ -123,6 +123,10 @@ public:
 
     ErrCode GetCountryCode(std::string &countryCode) override;
 
+    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
+
+    bool IsRandomMacDisabled() override;
+
     ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) override;
 
     ErrCode ResetAllFrozenApp() override;

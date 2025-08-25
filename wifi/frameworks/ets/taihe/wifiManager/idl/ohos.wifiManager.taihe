@@ -276,6 +276,7 @@ struct WifiLinkedInfo {
     maxSupportedRxLinkSpeed: i32;
     frequency: i32;
     isHidden: bool;
+    isRestricted: bool;
     chload: i32;
     snr: i32;
     macType: i32;
@@ -480,81 +481,124 @@ function GetCurrentGroupSync(): WifiP2pGroupInfo;
 @static_overload("getCurrentGroup")
 @async function GetCurrentGroupWithCallback(): WifiP2pGroupInfo;
 
-@static_overload("on")
-function OnWifiStateChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffWifiStateChange(type: String, callback: Optional<(data: i32) => void>): void;
+@!sts_inject("""
+export function on(type: string, cb: (arg_0: NullishType) => void) {
+    switch(type) {
+        case "wifiStateChange": return onWifiStateChange(cb);
+        case "wifiConnectionChange": return onWifiConnectionChange(cb);
+        case "wifiScanStateChange": return onWifiScanStateChange(cb);
+        case "wifiRssiChange": return onWifiRssiChange(cb);
+        case "streamChange": return onStreamChange(cb);
+        case "deviceConfigChange": return onDeviceConfigChange(cb);
+        case "hotspotStateChange": return onHotspotStateChange(cb);
+        case "hotspotStaJoin": return onHotspotStaJoin(cb);
+        case "hotspotStaLeave": return onHotspotStaLeave(cb);
+        case "p2pStateChange": return onP2pStateChange(cb);
+        case "p2pConnectionChange": return onP2pConnectionChange(cb);
+        case "p2pDeviceChange": return onP2pDeviceChange(cb);
+        case "p2pPeerDeviceChange": return onP2pPeerDeviceChange(cb);
+        case "p2pPersistentGroupChange": return onP2pPersistentGroupChange(cb);
+        case "p2pDiscoveryChange": return onP2pDiscoveryChange(cb);
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+export function off(type: string, cb?: (arg_0: NullishType) => void) {
+    switch(type) {
+        case "wifiStateChange": return offWifiStateChange(cb as (((data: int) => void) | undefined));
+        case "wifiConnectionChange":  return offWifiConnectionChange(cb as (((data: int) => void) | undefined));
+        case "wifiScanStateChange": return offWifiScanStateChange(cb as (((data: int) => void) | undefined));
+        case "wifiRssiChange": return offWifiRssiChange((cb as (((data: int) => void)|undefined)));
+        case "streamChange": return offStreamChange(cb as (((data: int) => void) | undefined));
+        case "deviceConfigChange": return offDeviceConfigChange(cb as (((data: int) => void) | undefined));
+        case "hotspotStateChange": return offHotspotStateChange(cb as (((data: int) => void) | undefined));
+        case "hotspotStaJoin": return offHotspotStaJoin(cb as (((data: StationInfo) => void) | undefined));
+        case "hotspotStaLeave": return offHotspotStaLeave(cb as (((data: StationInfo) => void) | undefined));
+        case "p2pStateChange": return offP2pStateChange(cb as (((data: int) => void) | undefined));
+        case "p2pConnectionChange": return offP2pConnectionChange(cb as (((data: WifiP2pLinkedInfo) => void) | undefined));
+        case "p2pDeviceChange": return offP2pDeviceChange(cb as (((data: WifiP2pDevice) => void) | undefined));
+        case "p2pPeerDeviceChange": return offP2pPeerDeviceChange(cb as (((data: Array<WifiP2pDevice>) => void) | undefined));
+        case "p2pPersistentGroupChange": return offP2pPersistentGroupChange(cb as ((() => void) | undefined));
+        case "p2pDiscoveryChange": return offP2pDiscoveryChange(cb as (((data: int) => void) | undefined));
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+""")
 
-@static_overload("on")
-function OnWifiConnectionChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffWifiConnectionChange(type: String, callback: Optional<(data: i32) => void>): void;
+// @on_off("wifiStateChange")
+function OnWifiStateChange(callback: (data: i32) => void): void;
+// @on_off("wifiStateChange")
+function OffWifiStateChange(callback: Optional<(data: i32) => void>): void;
 
-@static_overload("on")
-function OnWifiScanStateChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffWifiScanStateChange(type: String, callback: Optional<(data: i32) => void>): void;
+// @on_off("wifiConnectionChange")
+function OnWifiConnectionChange(callback: (data: i32) => void): void;
+// @on_off("wifiConnectionChange")
+function OffWifiConnectionChange(callback: Optional<(data: i32) => void>): void;
 
-@static_overload("on")
-function OnWifiRssiChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffWifiRssiChange(type: String, callback: Optional<(data: i32) => void>): void;
+// @on_off("wifiScanStateChange")
+function OnWifiScanStateChange(callback: (data: i32) => void): void;
+// @on_off("wifiScanStateChange")
+function OffWifiScanStateChange(callback: Optional<(data: i32) => void>): void;
 
-@static_overload("on")
-function OnStreamChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffStreamChange(type: String, callback: Optional<(data: i32) => void>): void;
+// @on_off("wifiRssiChange")
+function OnWifiRssiChange(callback: (data: i32) => void): void;
+// @on_off("wifiRssiChange")
+function OffWifiRssiChange(callback: Optional<(data: i32) => void>): void;
 
-@static_overload("on")
-function OnDeviceConfigChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffDeviceConfigChange(type: String, callback: Optional<(data: i32) => void>): void;
+// @on_off("streamChange")
+function OnStreamChange(callback: (data: i32) => void): void;
+// @on_off("streamChange")
+function OffStreamChange(callback: Optional<(data: i32) => void>): void;
 
-@static_overload("on")
-function OnHotspotStateChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffHotspotStateChange(type: String, callback: Optional<(data: i32) => void>): void;
+// @on_off("deviceConfigChange")
+function OnDeviceConfigChange(callback: (data: i32) => void): void;
+// @on_off("deviceConfigChange")
+function OffDeviceConfigChange(callback: Optional<(data: i32) => void>): void;
 
-@static_overload("on")
-function OnHotspotStaJoin(type: String, callback: (data: StationInfo) => void): void;
-@static_overload("off")
-function OffHotspotStaJoin(type: String, callback: Optional<(data: StationInfo) => void>): void;
+// @on_off("hotspotStateChange")
+function OnHotspotStateChange(callback: (data: i32) => void): void;
+// @on_off("hotspotStateChange")
+function OffHotspotStateChange(callback: Optional<(data: i32) => void>): void;
 
-@static_overload("on")
-function OnHotspotStaLeave(type: String, callback: (data: StationInfo) => void): void;
-@static_overload("off")
-function OffHotspotStaLeave(type: String, callback: Optional<(data: StationInfo) => void>): void;
+// @on_off("hotspotStaJoin")
+function OnHotspotStaJoin(callback: (data: StationInfo) => void): void;
+// @on_off("hotspotStaJoin")
+function OffHotspotStaJoin(callback: Optional<(data: StationInfo) => void>): void;
 
-@static_overload("on")
-function OnP2pStateChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffP2pStateChange(type: String, callback: Optional<(data: i32) => void>): void;
+// @on_off("hotspotStaLeave")
+function OnHotspotStaLeave(callback: (data: StationInfo) => void): void;
+// @on_off("hotspotStaLeave")
+function OffHotspotStaLeave(callback: Optional<(data: StationInfo) => void>): void;
 
-@static_overload("on")
-function OnP2pConnectionChange(type: String, callback: (data: WifiP2pLinkedInfo) => void): void;
-@static_overload("off")
-function OffP2pConnectionChange(type: String, callback: Optional<(data: WifiP2pLinkedInfo) => void>): void;
+// @on_off("p2pStateChange")
+function OnP2pStateChange(callback: (data: i32) => void): void;
+// @on_off("p2pStateChange")
+function OffP2pStateChange(callback: Optional<(data: i32) => void>): void;
 
-@static_overload("on")
-function OnP2pDeviceChange(type: String, callback: (data: WifiP2pDevice) => void): void;
-@static_overload("off")
-function OffP2pDeviceChange(type: String, callback: Optional<(data: WifiP2pDevice) => void>): void;
+// @on_off("p2pConnectionChange")
+function OnP2pConnectionChange(callback: (data: WifiP2pLinkedInfo) => void): void;
+// @on_off("p2pConnectionChange")
+function OffP2pConnectionChange(callback: Optional<(data: WifiP2pLinkedInfo) => void>): void;
 
-@static_overload("on")
-function OnP2pPeerDeviceChange(type: String, callback: (data: Array<WifiP2pDevice>) => void): void;
-@static_overload("off")
-function OffP2pPeerDeviceChange(type: String, callback:Optional<(data: Array<WifiP2pDevice>) => void>): void;
+// @on_off("p2pDeviceChange")
+function OnP2pDeviceChange(callback: (data: WifiP2pDevice) => void): void;
+// @on_off("p2pDeviceChange")
+function OffP2pDeviceChange(callback: Optional<(data: WifiP2pDevice) => void>): void;
+
+// @on_off("p2pPeerDeviceChange")
+function OnP2pPeerDeviceChange(callback: (data: Array<WifiP2pDevice>) => void): void;
+// @on_off("p2pPeerDeviceChange")
+function OffP2pPeerDeviceChange(callback:Optional<(data: Array<WifiP2pDevice>) => void>): void;
 
 union UndefinedType {
     @undefined undefined;
 }
 
-@static_overload("on")
-function OnP2pPersistentGroupChange(type: String, callback: (data: UndefinedType) => void): void;
-@static_overload("off")
-function OffP2pPersistentGroupChange(type: String, callback: Optional<(data: UndefinedType) => void>): void;
+// @on_off("p2pPersistentGroupChange")
+function OnP2pPersistentGroupChange(callback: (data: UndefinedType) => void): void;
+// @on_off("p2pPersistentGroupChange")
+function OffP2pPersistentGroupChange(callback: Optional<(data: UndefinedType) => void>): void;
 
-@static_overload("on")
-function OnP2pDiscoveryChange(type: String, callback: (data: i32) => void): void;
-@static_overload("off")
-function OffP2pDiscoveryChange(type: String, callback: Optional<(data: i32) => void>): void;
+// @on_off("p2pDiscoveryChange")
+function OnP2pDiscoveryChange(callback: (data: i32) => void): void;
+// @on_off("p2pDiscoveryChange")
+function OffP2pDiscoveryChange(callback: Optional<(data: i32) => void>): void;

@@ -190,7 +190,7 @@ HWTEST_F(ApService_test, OnWifiCountryCodeChangedSuccess, TestSize.Level1)
     EXPECT_EQ(ErrCode::WIFI_OPT_SUCCESS, pApService->m_apObserver->OnWifiCountryCodeChanged(countryCode));
 }
 
-HWTEST_F(ApService_test, GetPowerModelTest, TestSize.Level1)
+HWTEST_F(ApService_test, GetHotspotModeTest, TestSize.Level1)
 {
     WIFI_LOGI("GetPowerModelTest enter");
     HotspotMode mode = HotspotMode::NONE;

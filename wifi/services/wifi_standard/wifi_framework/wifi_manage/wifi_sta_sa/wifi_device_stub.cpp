@@ -655,7 +655,7 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
         return;
     }
     std::string name = "deviceconfigs";
-    int32_t ashmemSize = 1000; // add buff for max 1000 device config  
+    int32_t ashmemSize = 1000; // add buff for max 1000 device config
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
         WriteWifiDeviceConfig(outParcel, result[i]);
@@ -1014,6 +1014,7 @@ void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data
     }
     return;
 }
+
 void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());

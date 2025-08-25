@@ -214,8 +214,7 @@ ErrCode WifiSettings::CheckWifiMdmRestrictedList(const std::vector<WifiRestricte
     ErrCode code = WIFI_OPT_SUCCESS;
     for (size_t i = 0; i < wifiRestrictedInfoList.size(); i++) {
         if ((wifiRestrictedInfoList[i].ssid.empty() && wifiRestrictedInfoList[i].wifiRestrictedType == MDM_BLOCKLIST) ||
-        (wifiRestrictedInfoList[i].wifiRestrictedType == MDM_WHITELIST &&
-        (wifiRestrictedInfoList[i].ssid.empty() || wifiRestrictedInfoList[i].bssid.empty()))) {
+        (wifiRestrictedInfoList[i].wifiRestrictedType == MDM_WHITELIST && wifiRestrictedInfoList[i].ssid.empty())) {
             code = WIFI_OPT_INVALID_PARAM;
             break;
         }

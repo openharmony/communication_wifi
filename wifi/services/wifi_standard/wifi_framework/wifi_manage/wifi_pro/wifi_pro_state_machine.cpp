@@ -33,6 +33,9 @@
 #include "ip_qos_monitor.h"
 #include "wifi_global_func.h"
 #include "wifi_pro_chr.h"
+#ifndef OHOS_ARCH_LITE
+#include "package_parser.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -526,7 +529,7 @@ bool WifiProStateMachine::InLandscapeSwitchLimitList()
 {
 #ifndef OHOS_ARCH_LITE
     std::vector<PackageInfo> specialList;
-    if (WifiSettings::GetInstance().GetPackageInfoByName("LandscapeSwitchLimitList", specialList) != 0) {
+    if (WifiSettings::GetInstance().GetPackageInfoByName(TAG_LANDSCAPE_SWITCH_LIMIT, specialList) != 0) {
         WIFI_LOGE("ProcessSwitchInfoRequest GetPackageInfoByName failed");
         return false;
     }

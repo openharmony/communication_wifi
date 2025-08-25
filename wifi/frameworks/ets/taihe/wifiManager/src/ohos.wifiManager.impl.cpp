@@ -1014,8 +1014,7 @@ OHOS::sptr<WifiIdlHotspotEventCallback> wifiHotspotCallback =
 OHOS::sptr<WifiIdlP2pEventCallback> wifiP2pCallback =
     OHOS::sptr<WifiIdlP2pEventCallback>(new (std::nothrow) WifiIdlP2pEventCallback());
 
-void OnWifiStateChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnWifiStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
     auto wifiStateChangedCallback =
@@ -1036,8 +1035,7 @@ void OnWifiStateChange(taihe::string_view,
     g_wifiStateChangeVec.emplace_back(wifiStateChangedCallback);
 }
 
-void OffWifiStateChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
     if (g_wifiStateChangeVec.empty()) {
@@ -1056,8 +1054,7 @@ void OffWifiStateChange(taihe::string_view,
     }
 }
 
-void OnWifiConnectionChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnWifiConnectionChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiConnectionChangeLock);
     auto wifiConnectionChangeCallback =
@@ -1079,8 +1076,7 @@ void OnWifiConnectionChange(taihe::string_view,
     g_wifiConnectionChangeVec.emplace_back(wifiConnectionChangeCallback);
 }
  
-void OffWifiConnectionChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiConnectionChangeLock);
     if (g_wifiConnectionChangeVec.empty()) {
@@ -1099,8 +1095,7 @@ void OffWifiConnectionChange(taihe::string_view,
     }
 }
  
-void OnWifiScanStateChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnWifiScanStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
     auto wifiScanStateChangeCallback =
@@ -1122,8 +1117,7 @@ void OnWifiScanStateChange(taihe::string_view,
     g_wifiScanStateChangeVec.emplace_back(wifiScanStateChangeCallback);
 }
  
-void OffWifiScanStateChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
     if (g_wifiScanStateChangeVec.empty()) {
@@ -1142,8 +1136,7 @@ void OffWifiScanStateChange(taihe::string_view,
     }
 }
  
-void OnWifiRssiChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnWifiRssiChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
     auto wifiRssiChangeCallback =
@@ -1165,8 +1158,7 @@ void OnWifiRssiChange(taihe::string_view,
     g_wifiRssiChangeVec.emplace_back(wifiRssiChangeCallback);
 }
  
-void OffWifiRssiChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
     if (g_wifiRssiChangeVec.empty()) {
@@ -1185,8 +1177,7 @@ void OffWifiRssiChange(taihe::string_view,
     }
 }
 
-void OnStreamChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnStreamChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
     auto wifiRssiChangeCallback =
@@ -1208,8 +1199,7 @@ void OnStreamChange(taihe::string_view,
     g_wifiStreamChangeVec.emplace_back(wifiRssiChangeCallback);
 }
 
-void OffStreamChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffStreamChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
     if (g_wifiStreamChangeVec.empty()) {
@@ -1228,8 +1218,7 @@ void OffStreamChange(taihe::string_view,
     }
 }
 
-void OnDeviceConfigChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnDeviceConfigChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
     auto wifiDeviceConfigChangeCallback =
@@ -1251,8 +1240,7 @@ void OnDeviceConfigChange(taihe::string_view,
     g_wifiDeviceConfigChangeVec.emplace_back(wifiDeviceConfigChangeCallback);
 }
 
-void OffDeviceConfigChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
     if (g_wifiDeviceConfigChangeVec.empty()) {
@@ -1271,8 +1259,7 @@ void OffDeviceConfigChange(taihe::string_view,
     }
 }
 
-void OnHotspotStateChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnHotspotStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
     auto wifiHotspotStateChangeCallback =
@@ -1294,8 +1281,7 @@ void OnHotspotStateChange(taihe::string_view,
     g_wifiHotspotStateChangeVec.emplace_back(wifiHotspotStateChangeCallback);
 }
 
-void OffHotspotStateChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffHotspotStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
     if (g_wifiHotspotStateChangeVec.empty()) {
@@ -1314,8 +1300,7 @@ void OffHotspotStateChange(taihe::string_view,
     }
 }
 
-void OnHotspotStaJoin(taihe::string_view,
-    ::taihe::callback_view<void(::ohos::wifiManager::StationInfo const&)> callback)
+void OnHotspotStaJoin(::taihe::callback_view<void(::ohos::wifiManager::StationInfo const&)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStaJoinLock);
     auto wifiHotspotStaJoinCallback = ::taihe::optional<::taihe::callback<void(
@@ -1337,7 +1322,7 @@ void OnHotspotStaJoin(taihe::string_view,
     g_wifiHotspotStaJoinVec.emplace_back(wifiHotspotStaJoinCallback);
 }
 
-void OffHotspotStaJoin(taihe::string_view,
+void OffHotspotStaJoin(
     ::taihe::optional_view<::taihe::callback<void(::ohos::wifiManager::StationInfo const&)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStaJoinLock);
@@ -1357,8 +1342,7 @@ void OffHotspotStaJoin(taihe::string_view,
     }
 }
 
-void OnHotspotStaLeave(taihe::string_view,
-    ::taihe::callback_view<void(::ohos::wifiManager::StationInfo const&)> callback)
+void OnHotspotStaLeave(::taihe::callback_view<void(::ohos::wifiManager::StationInfo const&)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStaLeaveLock);
     auto wifiHotspotStaLeaveCallback = ::taihe::optional<::taihe::callback<void(
@@ -1380,7 +1364,7 @@ void OnHotspotStaLeave(taihe::string_view,
     g_wifiHotspotStaLeaveVec.emplace_back(wifiHotspotStaLeaveCallback);
 }
 
-void OffHotspotStaLeave(taihe::string_view,
+void OffHotspotStaLeave(
     ::taihe::optional_view<::taihe::callback<void(::ohos::wifiManager::StationInfo const&)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStaLeaveLock);
@@ -1400,8 +1384,7 @@ void OffHotspotStaLeave(taihe::string_view,
     }
 }
 
-void OnP2pStateChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnP2pStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
     auto wifiP2pStateChangeCallback =
@@ -1423,8 +1406,7 @@ void OnP2pStateChange(taihe::string_view,
     g_wifiP2pStateChangeVec.emplace_back(wifiP2pStateChangeCallback);
 }
 
-void OffP2pStateChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffP2pStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
     if (g_wifiP2pStateChangeVec.empty()) {
@@ -1443,8 +1425,7 @@ void OffP2pStateChange(taihe::string_view,
     }
 }
 
-void OnP2pConnectionChange(taihe::string_view,
-    ::taihe::callback_view<void(::ohos::wifiManager::WifiP2pLinkedInfo const&)> callback)
+void OnP2pConnectionChange(::taihe::callback_view<void(::ohos::wifiManager::WifiP2pLinkedInfo const&)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pConnectionChangeLock);
     auto wifiP2pConnectionChangeCallback = ::taihe::optional<::taihe::callback<void(
@@ -1466,7 +1447,7 @@ void OnP2pConnectionChange(taihe::string_view,
     g_wifiP2pConnectionChangeVec.emplace_back(wifiP2pConnectionChangeCallback);
 }
 
-void OffP2pConnectionChange(taihe::string_view,
+void OffP2pConnectionChange(
     ::taihe::optional_view<::taihe::callback<void(::ohos::wifiManager::WifiP2pLinkedInfo const&)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pConnectionChangeLock);
@@ -1486,8 +1467,7 @@ void OffP2pConnectionChange(taihe::string_view,
     }
 }
 
-void OnP2pDeviceChange(taihe::string_view,
-    ::taihe::callback_view<void(::ohos::wifiManager::WifiP2pDevice const&)> callback)
+void OnP2pDeviceChange(::taihe::callback_view<void(::ohos::wifiManager::WifiP2pDevice const&)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pDeviceChangeLock);
     auto wifiP2pDeviceChangeCallback = ::taihe::optional<::taihe::callback<void(
@@ -1509,8 +1489,7 @@ void OnP2pDeviceChange(taihe::string_view,
     g_wifiP2pDeviceChangeVec.emplace_back(wifiP2pDeviceChangeCallback);
 }
 
-void OffP2pDeviceChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(
+void OffP2pDeviceChange(::taihe::optional_view<::taihe::callback<void(
     ::ohos::wifiManager::WifiP2pDevice const&)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pDeviceChangeLock);
@@ -1530,8 +1509,8 @@ void OffP2pDeviceChange(taihe::string_view,
     }
 }
 
-void OnP2pPeerDeviceChange(taihe::string_view,
-    ::taihe::callback_view<void(::taihe::array_view<::ohos::wifiManager::WifiP2pDevice>)> callback)
+void OnP2pPeerDeviceChange(::taihe::callback_view<void(
+    ::taihe::array_view<::ohos::wifiManager::WifiP2pDevice>)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pPeerDeviceChangeLock);
     auto wifiP2pPeerDeviceChangeCallback =
@@ -1554,8 +1533,7 @@ void OnP2pPeerDeviceChange(taihe::string_view,
     g_wifiP2pPeerDeviceChangeVec.emplace_back(wifiP2pPeerDeviceChangeCallback);
 }
 
-void OffP2pPeerDeviceChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(
+void OffP2pPeerDeviceChange(::taihe::optional_view<::taihe::callback<void(
     ::taihe::array_view<::ohos::wifiManager::WifiP2pDevice>)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pPeerDeviceChangeLock);
@@ -1575,8 +1553,7 @@ void OffP2pPeerDeviceChange(taihe::string_view,
     }
 }
 
-void OnP2pPersistentGroupChange(taihe::string_view,
-    ::taihe::callback_view<void(::ohos::wifiManager::UndefinedType const&)> callback)
+void OnP2pPersistentGroupChange(::taihe::callback_view<void(::ohos::wifiManager::UndefinedType const&)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pPersistentGroupChangeLock);
     auto wifiP2pPersistentGroupChangeCallback = ::taihe::optional<::taihe::callback<void(
@@ -1598,8 +1575,7 @@ void OnP2pPersistentGroupChange(taihe::string_view,
     g_wifiP2pPersistentGroupChangeVec.emplace_back(wifiP2pPersistentGroupChangeCallback);
 }
 
-void OffP2pPersistentGroupChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(
+void OffP2pPersistentGroupChange(::taihe::optional_view<::taihe::callback<void(
     ::ohos::wifiManager::UndefinedType const&)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pPersistentGroupChangeLock);
@@ -1619,8 +1595,7 @@ void OffP2pPersistentGroupChange(taihe::string_view,
     }
 }
 
-void OnP2pDiscoveryChange(taihe::string_view,
-    ::taihe::callback_view<void(int)> callback)
+void OnP2pDiscoveryChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
     auto wifiP2pDiscoveryChangeCallback =
@@ -1642,8 +1617,7 @@ void OnP2pDiscoveryChange(taihe::string_view,
     g_wifiP2pDiscoveryChangeVec.emplace_back(wifiP2pDiscoveryChangeCallback);
 }
 
-void OffP2pDiscoveryChange(taihe::string_view,
-    ::taihe::optional_view<::taihe::callback<void(int)>> callback)
+void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
     if (g_wifiP2pDiscoveryChangeVec.empty()) {

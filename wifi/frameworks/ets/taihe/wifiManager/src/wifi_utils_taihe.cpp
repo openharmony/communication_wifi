@@ -153,7 +153,7 @@ SecTypeTaihe ConvertKeyMgmtToSecType(const std::string& keyMgmt)
             MakeWifiWapiConfig(wifiDeviceConfig.wifiWapiConfig));
     }
     return {
-        wifiDeviceConfig.ssid, 
+        wifiDeviceConfig.ssid,
         ::taihe::optional<taihe::string>(std::in_place_t{}, wifiDeviceConfig.userSelectBssid),
         ::taihe::optional<::ohos::wifiManager::DeviceAddressType>(std::in_place_t{},
             static_cast<::ohos::wifiManager::DeviceAddressType::key_t>(wifiDeviceConfig.bssidType)),
@@ -174,9 +174,9 @@ SecTypeTaihe ConvertKeyMgmtToSecType(const std::string& keyMgmt)
         ::taihe::optional<::ohos::wifiManager::WifiProxyConfig>(std::in_place_t{},
             MakeWifiProxyConfig(wifiDeviceConfig.wifiProxyconfig)),
         wapiConfig,
-        ::taihe::optional<int32_t>(std::in_place_t{}, 
+        ::taihe::optional<int32_t>(std::in_place_t{},
             static_cast<int32_t>(wifiDeviceConfig.networkSelectionStatus.status)),
-        ::taihe::optional<bool>(std::in_place_t{}, 
+        ::taihe::optional<bool>(std::in_place_t{},
             static_cast<bool>(wifiDeviceConfig.isAllowAutoConnect)),
     };
 }
@@ -468,15 +468,15 @@ HotspotConfig ConvertHotspotConfig(const ::ohos::wifiManager::HotspotConfig &con
         static_cast<::ohos::wifiManager::WifiCategory::key_t>(linkedInfo.supportedWifiCategory);
     bool isHiLinkNetwork = static_cast<bool>((linkedInfo.isHiLinkNetwork > 0
         && linkedInfo.isHiLinkNetwork <= EXTERNAL_HILINK_MAX_VALUE) ? true : false);
-    return {linkedInfo.ssid, linkedInfo.bssid, linkedInfo.networkId, 
+    return {linkedInfo.ssid, linkedInfo.bssid, linkedInfo.networkId,
         linkedInfo.rssi, linkedInfo.band, linkedInfo.linkSpeed, linkedInfo.rxLinkSpeed,
         linkedInfo.maxSupportedTxLinkSpeed, linkedInfo.maxSupportedRxLinkSpeed,
-        linkedInfo.frequency, linkedInfo.ifHiddenSSID, linkedInfo.chload,
-        linkedInfo.snr, linkedInfo.macType, 
+        linkedInfo.frequency, linkedInfo.ifHiddenSSID, linkedInfo.isDataRestricted,
+        linkedInfo.chload, linkedInfo.snr, linkedInfo.macType,
         linkedInfo.macAddress, static_cast<int32_t>(linkedInfo.ipAddress),
         suppState, connState, channelWidth,
         wifiStandard, supportedWifiCategory, isHiLinkNetwork,
-        ::taihe::optional<::ohos::wifiManager::WifiLinkType>(std::in_place_t{}, 
+        ::taihe::optional<::ohos::wifiManager::WifiLinkType>(std::in_place_t{},
             static_cast<::ohos::wifiManager::WifiLinkType::key_t>(linkedInfo.wifiLinkType))
     };
 }

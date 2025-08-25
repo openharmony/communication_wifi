@@ -1,3 +1,24 @@
+self_cure_state_machine_test.cpp 
+HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)
+{
+    pSelfCureStateMachine_->GetCurrentRssi();
+    EXPECT_EQ(pSelfCureStateMachine_->GetCurrentRssi(), 0);
+}
+
+e/wifi_sta_sa/wifi_device_service_impl.cpp
+ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)在两个if下加换行 然后在  if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkInfo, m_instId) < 0) 上面加上    
+    WifiLinkedInfo info;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
+    if (info.wifiLinkType != WifiLinkType::WIFI7_EMLSR) {
+        WIFI_LOGI("GetMultiLinkedInfo failed, not emlsr connected");
+        return WIFI_OPT_FAILED;
+    }
+
+    在 pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE), config, true);的confi那里换行跟i对齐
+
+    bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)第二个打印改成wifi_loge
+
+
 # WLAN组件<a name="ZH-CN_TOPIC_0000001162030287"></a>
 
 -   [简介](#section11660541593)

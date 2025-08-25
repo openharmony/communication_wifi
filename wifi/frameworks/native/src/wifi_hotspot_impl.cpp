@@ -267,14 +267,14 @@ ErrCode WifiHotspotImpl::EnableLocalOnlyHotspot(const ServiceType type)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
-    return client_->EnableLocalOnlyHotspot();
+    return client_->EnableLocalOnlyHotspot(type);
 }
  
 ErrCode WifiHotspotImpl::DisableLocalOnlyHotspot(const ServiceType type)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
-    return client_->DisableLocalOnlyHotspot();
+    return client_->DisableLocalOnlyHotspot(type);
 }
  
 ErrCode WifiHotspotImpl::GetHotspotMode(HotspotMode &mode)

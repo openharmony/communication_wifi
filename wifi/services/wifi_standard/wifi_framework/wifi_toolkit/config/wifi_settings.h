@@ -296,6 +296,10 @@ public:
 
     int SetWifiDisabledByAirplane(bool disabledByAirplane, int instId = 0);
 
+    int SetRandomMacDisabled(bool isRandomMacDisabled, int instId = 0);
+
+    bool IsRandomMacDisabled(int instId = 0);
+
     int GetStaLastRunState(int instId = 0);
 
     int SetStaLastRunState(int bRun, int instId = 0);
@@ -341,6 +345,8 @@ public:
     int GetScanOnlySwitchState(int instId = 0);
 
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
+
+    int GetPackageInfoByName(std::string name, std::vector<PackageInfo> &packageInfo);
 
     int GetPackageInfoByName(std::string name, std::vector<PackageInfo> &packageInfo);
 #ifdef SUPPORT_ClOUD_WIFI_ASSET

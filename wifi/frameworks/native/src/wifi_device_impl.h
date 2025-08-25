@@ -238,6 +238,21 @@ public:
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
 
     /**
+     * @Description Is Random Mac Disabeled.
+     *
+     * @return bool
+     */
+    virtual bool IsRandomMacDisabled(bool &isRandomMacDisabled) override;
+
+    /**
+     * @Description Set Random Mac Disabeled.
+     *
+     * @param isRandomMacDisabeled: True for disabeled   False for not disabeled.
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
+    
+    /**
      * @Description Set the Country Code
      *
      * @param countryCode - country code

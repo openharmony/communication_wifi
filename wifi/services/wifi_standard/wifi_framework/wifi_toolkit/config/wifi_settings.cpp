@@ -1470,6 +1470,24 @@ int WifiSettings::SetWifiDisabledByAirplane(bool disabledByAirplane, int instId)
     return 0;
 }
 
+int WifiSettings::SetRandomMacDisabled(bool isRandomMacDisabled, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    mWifiConfig[instId].isRandomMacDisabled = isRandomMacDisabled;
+    SyncWifiConfig();
+    return 0;
+}
+
+bool WifiSettings::IsRandomMacDisabled(int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    auto iter = mWifiConfig.find(instId);
+    if (iter != mWifiConfig.end()) {
+        return iter->second.isRandomMacDisabled;
+    }
+    return false;
+}
+
 bool WifiSettings::GetWifiDisabledByAirplane(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);

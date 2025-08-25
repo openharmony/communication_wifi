@@ -229,6 +229,21 @@ public:
     virtual ErrCode GetDisconnectedReason(DisconnectedReason &reason) = 0;
 
     /**
+     * @Description Get Random Mac Disabeled.
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) {}
+
+    /**
+     * @Description Set Random Mac Disabled.
+     *
+     * @param isRandomMacDisabled: True for disabeled; False for not disabled.
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) {}
+    
+    /**
      * @Description Set the country code.
      *
      * @param countryCode - country code

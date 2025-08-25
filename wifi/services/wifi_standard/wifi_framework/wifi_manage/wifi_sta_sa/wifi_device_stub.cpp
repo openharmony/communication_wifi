@@ -153,6 +153,10 @@ void WifiDeviceStub::InitHandleMapEx2()
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnStartWifiDetection(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_MULTI_LINKED_INFO)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetMultiLinkedInfo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetandomMacDisabled(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnIsRandomMacDisabled(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1223,7 +1227,6 @@ void WifiDeviceStub::OnGetSupportedFeatures(uint32_t code, MessageParcel &data, 
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt64(features);
     }
-
     return;
 }
 
@@ -1240,6 +1243,29 @@ void WifiDeviceStub::OnIsFeatureSupported(uint32_t code, MessageParcel &data, Me
         reply.WriteInt32(isSupported);
     }
 
+    return;
+}
+
+void WifiDeviceStub::OnIsRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isRandomMacDisabled = false;
+    ErrCode ret = IsRandomMacDisabled(isRandomMacDisabled);
+    reply.WriteInt32(0);
+    reply.WriteBool(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(isRandomMacDisabled);
+    }
+    return;
+}
+
+void WifiDeviceStub::OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isRandomMacDisabled = false;
+    bool ret = SetRandomMacDisabled(isRandomMacDisabled);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 

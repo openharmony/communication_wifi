@@ -197,6 +197,8 @@ public:
     virtual int SetOperatorWifiType(int type, int instId = 0) = 0;
     virtual int GetLastAirplaneMode(int instId = 0) = 0;
     virtual int SetLastAirplaneMode(int mode, int instId = 0) = 0;
+    virtual int SetRandomMacDisabled(bool IsRandomMacDisabled, int instId = 0) = 0;
+    virtual bool IsRandomMacDisabled(int instId = 0) = 0;
     virtual bool GetCanOpenStaWhenAirplaneMode(int instId = 0) = 0;
     virtual bool GetWifiFlagOnAirplaneMode(int instId = 0) = 0;
     virtual int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0) = 0;
@@ -383,6 +385,8 @@ public:
     MOCK_METHOD2(SetOperatorWifiType, int(int type, int instId));
     MOCK_METHOD1(GetLastAirplaneMode, int(int instId));
     MOCK_METHOD2(SetLastAirplaneMode, int(int mode, int instId));
+    MOCK_METHOD1(IsRandomMacDisabled, bool(int instId));
+    MOCK_METHOD2(SetRandomMacDisabled, int(bool IsRandomMacDisabled, int instId));
     MOCK_METHOD1(GetCanOpenStaWhenAirplaneMode, bool(int instId));
     MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
     MOCK_METHOD2(SetWifiFlagOnAirplaneMode, int(bool ifOpen, int instId));

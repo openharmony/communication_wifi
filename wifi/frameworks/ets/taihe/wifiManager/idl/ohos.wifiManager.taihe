@@ -395,7 +395,7 @@ function Reconnect(): void;
 function Reassociate(): void;
 function ConnectToDevice(config: WifiDeviceConfig): void;
 function SetHotspotConfig(config: HotspotConfig): void;
-function IsFeatureSupported(featureId: i32): bool;
+function IsFeatureSupported(featureId: i64): bool;
 function GetHotspotConfig(): HotspotConfig;
 function DisableHotspot(): void;
 function EnableHotspot(): void;

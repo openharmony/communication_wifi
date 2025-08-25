@@ -440,7 +440,7 @@ void SetHotspotConfig(::ohos::wifiManager::HotspotConfig const& config)
     }
 }
 
-bool IsFeatureSupported(int32_t featureId)
+bool IsFeatureSupported(int64_t featureId)
 {
     bool isSupported = false;
     if (g_wifiDevicePtr == nullptr) {
@@ -856,8 +856,20 @@ void StartScan()
     }
 }
 
-::ohos::wifiManager::DisconnectedReason GetDisconnectedReason() {
-    TH_THROW(std::runtime_error, "GetDisconnectedReason not implemented");
+::ohos::wifiManager::DisconnectedReason GetDisconnectedReason()
+{
+    DisconnectedReason reason = DisconnectedReason::DISC_REASON_DEFAULT;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return static_cast<::ohos::wifiManager::DisconnectedReason::key_t>(reason);
+    }
+    
+    ErrCode ret = g_wifiDevicePtr->GetDisconnectedReason(reason);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetDisconnectedReason failed:%{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return static_cast<::ohos::wifiManager::DisconnectedReason::key_t>(reason);
 }
 
 bool GetScanAlwaysAllowed()

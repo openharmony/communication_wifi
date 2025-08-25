@@ -35,9 +35,6 @@
 #include "self_cure_state_machine.h"
 #include "self_cure_utils.h"
 #include "ip_qos_monitor.h"
-#ifndef OHOS_ARCH_LITE
-#include "package_parser.h"
-#endif
 
 using ::testing::_;
 using ::testing::AtLeast;

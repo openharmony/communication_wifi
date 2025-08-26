@@ -324,7 +324,7 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
     }
 }
 
-void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
+void ApStartedState::ProcessCmdEnableApTimeout(InternalMessagePtr msg) const
 {
     WIFI_LOGI("Ap enable timeout, set softap toggled false.");
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);

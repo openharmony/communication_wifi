@@ -1652,8 +1652,6 @@ void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(int)>> 
 TH_EXPORT_CPP_API_IsConnected(IsConnected);
 TH_EXPORT_CPP_API_IsWifiActive(IsWifiActive);
 TH_EXPORT_CPP_API_GetLinkedInfoSync(GetLinkedInfoSync);
-TH_EXPORT_CPP_API_GetLinkedInfoReturnsPromise(GetLinkedInfoSync);
-TH_EXPORT_CPP_API_GetLinkedInfoWithCallback(GetLinkedInfoSync);
 TH_EXPORT_CPP_API_GetSignalLevel(GetSignalLevel);
 TH_EXPORT_CPP_API_GetIpInfo(GetIpInfo);
 TH_EXPORT_CPP_API_GetIpv6Info(GetIpv6Info);

@@ -370,6 +370,11 @@ struct WifiP2pGroupInfo {
 // 函数
 function IsConnected(): bool;
 function IsWifiActive(): bool;
+
+@gen_async("getLinkedInfo")
+@gen_promise("getLinkedInfo")
+function GetLinkedInfoSync(): WifiLinkedInfo;
+
 function GetSignalLevel(rssi: i32, band: i32): i32;
 function GetIpInfo(): IpInfo;
 function GetIpv6Info(): Ipv6Info;
@@ -426,12 +431,6 @@ function Get5GChannelList(): Array<i32>;
 function StartScan(): void;
 function GetDisconnectedReason(): DisconnectedReason;
 function GetScanAlwaysAllowed(): bool;
-
-function GetLinkedInfoSync(): WifiLinkedInfo;
-@static_overload("getLinkedInfo")
-@promise function GetLinkedInfoReturnsPromise(): WifiLinkedInfo;
-@static_overload("getLinkedInfo")
-@async function GetLinkedInfoWithCallback(): WifiLinkedInfo;
 
 function AddDeviceConfigSync(config: WifiDeviceConfig): i32;
 @static_overload("addDeviceConfig")

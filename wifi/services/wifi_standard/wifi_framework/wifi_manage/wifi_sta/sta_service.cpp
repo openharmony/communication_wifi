@@ -1022,6 +1022,13 @@ ErrCode StaService::EnableHiLinkHandshake(bool uiFlag, const WifiDeviceConfig &c
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaService::StartWifiDetection()
+{
+    CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+    pStaStateMachine->SendMessage(CMD_START_NETCHECK);
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaService::DeliverStaIfaceData(const std::string &currentMac)
 {
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);

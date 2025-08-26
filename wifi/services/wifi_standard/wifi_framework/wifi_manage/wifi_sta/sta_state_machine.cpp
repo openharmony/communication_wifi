@@ -1669,6 +1669,7 @@ void StaStateMachine::GetIpState::GoInState()
     pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
     return;
 #endif
+    pStaStateMachine->StopDhcp(false, true); // stop previous dhcp ipv6 first
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine->NetSupplierInfo != nullptr) {
         pStaStateMachine->NetSupplierInfo->isAvailable_ = true;
@@ -1712,7 +1713,6 @@ void StaStateMachine::GetIpState::GoInState()
         }
     }
     pStaStateMachine->HandlePreDhcpSetup();
-    pStaStateMachine->StopDhcp(false, true); // stop previous dhcp ipv6 first
     /* start dhcp */
     do {
         int dhcpRet;

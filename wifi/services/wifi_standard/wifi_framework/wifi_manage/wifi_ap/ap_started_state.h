@@ -231,6 +231,7 @@ private:
     void ProcessCmdHotspotChannelChanged(InternalMessagePtr msg);
     void ProcessCmdAssociatedStaChanged(InternalMessagePtr msg);
     void ProcessCmdEnableAp(InternalMessagePtr msg);
+    void ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
 
 private:
     // Store the configuration when set to hostapd, hostapd will asynchronously notify the setting result

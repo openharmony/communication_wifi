@@ -375,6 +375,11 @@ public:
         pStaInterface->EnableHiLinkHandshake(true, config, bssid);
     }
 
+    void StartWifiDetectionSuceess()
+    {
+        pStaInterface->StartWifiDetection();
+    }
+
     void DeliverStaIfaceDataSuceess()
     {
         std::string mac = "01:23:45:67:89:ab";

@@ -22,7 +22,6 @@
 #include "sta_service_callback.h"
 #include "wifi_internal_msg.h"
 #ifndef OHOS_ARCH_LITE
-#include "wifi_net_observer.h"
 #include "wifi_event_handler.h"
 #endif
 
@@ -30,6 +29,7 @@ namespace OHOS {
 namespace Wifi {
 #ifndef OHOS_ARCH_LITE
 constexpr uint32_t BEACON_LOST_DELAY_TIME = 800;
+constexpr uint32_t MAX_WIFI_DETECTION_TIME = 3;
 const std::string TASK_NAME_WIFI_NET_DETECTION = "WifiNetDetection";
 const std::string TASK_NAME_WIFI_DISCONNECT = "WifiDisconnect";
 #endif
@@ -71,8 +71,8 @@ private:
     uint32_t satelliteTimerId{0};
     std::mutex satelliteTimerMutex;
 #ifndef OHOS_ARCH_LITE
-    sptr<NetStateObserver> netWorkDetect_ = nullptr;
     std::unique_ptr<WifiEventHandler> staManagerEventHandler_ = nullptr;
+    uint32_t screenOffCnt_ = 0;
 #endif
 };
 }  // namespace Wifi

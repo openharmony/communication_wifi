@@ -17,6 +17,109 @@
 @!sts_inject("""
 static { loadLibrary("wifiManager_taihe_native.z")}
 """)
+enum DisconnectedReason: i32 {
+    DISC_REASON_DEFAULT = 0,
+    DISC_REASON_WRONG_PWD = 1,
+    DISC_REASON_CONNECTION_FULL = 2
+}
+
+enum EapMethod: i32 {
+    EAP_NONE = 0,
+    EAP_PEAP = 1,
+    EAP_TLS = 2,
+    EAP_TTLS = 3,
+    EAP_PWD = 4,
+    EAP_SIM = 5,
+    EAP_AKA = 6,
+    EAP_AKA_PRIME = 7,
+    EAP_UNAUTH_TLS = 8
+}
+
+enum GroupOwnerBand: i32 {
+    GO_BAND_AUTO = 0,
+    GO_BAND_2GHZ = 1,
+    GO_BAND_5GHZ = 2
+}
+
+enum IpType: i32 {
+    STATIC = 0,
+    DHCP = 1,
+    UNKNOWN = 2
+}
+
+enum Phase2Method: i32 {
+    PHASE2_NONE = 0,
+    PHASE2_PAP = 1,
+    PHASE2_MSCHAP = 2,
+    PHASE2_MSCHAPV2 = 3,
+    PHASE2_GTC = 4,
+    PHASE2_SIM = 5,
+    PHASE2_AKA = 6,
+    PHASE2_AKA_PRIME = 7
+}
+
+enum ProxyMethod: i32 {
+    METHOD_NONE = 0,
+    METHOD_AUTO = 1,
+    METHOD_MANUAL = 2
+}
+
+enum SuppState: i32 {
+    DISCONNECTED = 0,
+    INTERFACE_DISABLED = 1,
+    INACTIVE = 2,
+    SCANNING = 3,
+    AUTHENTICATING = 4,
+    ASSOCIATING = 5,
+    ASSOCIATED = 6,
+    FOUR_WAY_HANDSHAKE = 7,
+    GROUP_HANDSHAKE = 8,
+    COMPLETED = 9,
+    UNINITIALIZED = 10,
+    INVALID = 11
+}
+
+enum WapiPskType: i32 {
+    WAPI_PSK_ASCII = 0,
+    WAPI_PSK_HEX = 1
+}
+
+enum WifiBandType: i32 {
+    WIFI_BAND_NONE = 0,
+    WIFI_BAND_2G = 1,
+    WIFI_BAND_5G = 2,
+    WIFI_BAND_6G = 3,
+    WIFI_BAND_60G = 4
+}
+
+enum WifiChannelWidth: i32 {
+    WIDTH_20MHZ = 0,
+    WIDTH_40MHZ = 1,
+    WIDTH_80MHZ = 2,
+    WIDTH_160MHZ = 3,
+    WIDTH_80MHZ_PLUS = 4,
+    WIDTH_INVALID = 5
+}
+
+enum WifiLinkType: i32 {
+    DEFAULT_LINK = 0,
+    WIFI7_SINGLE_LINK = 1,
+    WIFI7_MLSR = 2,
+    WIFI7_EMLSR = 3,
+    WIFI7_STR = 4
+}
+
+enum WifiStandard: i32 {
+    WIFI_STANDARD_UNDEFINED = 0,
+    WIFI_STANDARD_11A = 1,
+    WIFI_STANDARD_11B = 2,
+    WIFI_STANDARD_11G = 3,
+    WIFI_STANDARD_11N = 4,
+    WIFI_STANDARD_11AC = 5,
+    WIFI_STANDARD_11AX = 6,
+    WIFI_STANDARD_11AD = 7
+}
+
 enum WifiSecurityType: i32 {
     WIFI_SEC_TYPE_INVALID = 0,
     WIFI_SEC_TYPE_OPEN = 1,
@@ -72,60 +175,165 @@ enum P2pConnectState: i32 {
     CONNECTED = 1
 }
 
+enum DeviceAddressType: i32 {
+    RANDOM_DEVICE_ADDRESS = 0,
+    REAL_DEVICE_ADDRESS = 1,
+}
+
+struct WifiProxyConfig {
+    proxyMethod: Optional<ProxyMethod>;
+    pacWebAddress: Optional<String>;
+    serverHostName: Optional<String>;
+    serverPort: Optional<i32>;
+    exclusionObjects: Optional<String>;
+}
+
+struct WifiEapConfig {
+    eapMethod: EapMethod;
+    phase2Method: Phase2Method;
+    identity: String;
+    anonymousIdentity: String;
+    password: String;
+    caCertAlias: String;
+    caPath: String;
+    clientCertAlias: String;
+    certEntry: Array<u8>;
+    certPassword: String;
+    altSubjectMatch: String;
+    domainSuffixMatch: String;
+    realm: String;
+    plmn: String;
+    eapSubId: i32;
+}
+
+struct IpConfig {
+    ipAddress: i32;
+    gateway: i32;
+    prefixLength: i32;
+    dnsServers: Array<i32>;
+    domains: Array<String>;
+}
+
+struct WifiWapiConfig {
+    wapiPskType: WapiPskType;
+    wapiAsCert: String;
+    wapiUserCert: String;
+}
+
 struct WifiDeviceConfig {
     ssid: String;
     bssid: Optional<String>;
+    bssidType: Optional<DeviceAddressType>;
     preSharedKey: String;
+    isHiddenSsid: Optional<bool>;
     securityType: WifiSecurityType;
+    creatorUid: Optional<i32>;
+    disableReason: Optional<i32>;
+    netId: Optional<i32>;
+    randomMacType: Optional<i32>;
+    randomMacAddr: Optional<String>;
+    ipType: Optional<IpType>;
+    staticIp: Optional<IpConfig>;
+    eapConfig: Optional<WifiEapConfig>;
+    proxyConfig: Optional<WifiProxyConfig>;
+    wapiConfig: Optional<WifiWapiConfig>;
+    configStatus: Optional<i32>;
+    isAutoConnectAllowed: Optional<bool>;
+}
+
+struct WifiInfoElem {
+    eid: i32;
+    content: Array<u8>;
 }
 
 struct WifiScanInfo {
     ssid: String;
     bssid: String;
+    bssidType: DeviceAddressType;
+    capabilities: String;
     securityType: WifiSecurityType;
     rssi: i32;
     band: i32;
+    frequency: i32;
+    channelWidth: i32;
+    centerFrequency0: i32;
+    centerFrequency1: i32;
+    infoElems: Array<WifiInfoElem>;
+    timestamp: i64;
     supportedWifiCategory: WifiCategory;
+    isHiLinkNetwork: bool;
 }
 
 struct WifiLinkedInfo {
     ssid: String;
     bssid: String;
+    networkId: i32;
     rssi: i32;
     band: i32;
+    linkSpeed: i32;
+    rxLinkSpeed: i32;
+    maxSupportedTxLinkSpeed: i32;
+    maxSupportedRxLinkSpeed: i32;
+    frequency: i32;
+    isHidden: bool;
+    isRestricted: bool;
+    chload: i32;
+    snr: i32;
+    macType: i32;
     macAddress: String;
+    ipAddress: i32;
+    suppState: SuppState;
     connState: ConnState;
+    channelWidth: WifiChannelWidth;
+    wifiStandard: WifiStandard;
     supportedWifiCategory: WifiCategory;
+    isHiLinkNetwork: bool;
+    wifiLinkType: Optional<WifiLinkType>;
 }
 
 struct IpInfo {
     ipAddress: i32;
+    gateway: i32;
+    netmask: i32;
+    primaryDns: i32;
+    secondDns: i32;
+    serverIp: i32;
+    leaseDuration: i32;
 }
 
 struct Ipv6Info {
     linkIpv6Address: String;
+    globalIpv6Address: String;
+    randomGlobalIpv6Address: String;
+    uniqueIpv6Address: Optional<String>;
+    randomUniqueIpv6Address: Optional<String>;
+    gateway: String;
+    netmask: String;
+    primaryDNS: String;
+    secondDNS: String;
 }
 
 struct StationInfo {
+    name: String;
     macAddress: String;
+    macAddressType: Optional<DeviceAddressType>;
+    ipAddress: String;
 }
 
 struct HotspotConfig {
     ssid: String;
     securityType: WifiSecurityType;
     band: i32;
+    channel: Optional<i32>;
     preSharedKey: String;
+    maxConn: i32;
+    ipAddress: Optional<String>;
 }
 
 struct WifiP2pLinkedInfo {
     connectState: P2pConnectState;
     isGroupOwner: bool;
     groupOwnerAddr: String;
-}
-
-enum DeviceAddressType: i32 {
-    RANDOM_DEVICE_ADDRESS = 0,
-    REAL_DEVICE_ADDRESS = 1,
 }
 
 struct WifiP2pDevice {
@@ -136,6 +344,28 @@ struct WifiP2pDevice {
     deviceStatus: P2pDeviceStatus;
     groupCapabilities: i32;
 }
+
+struct WifiP2PConfig {
+    deviceAddress: String;
+    deviceAddressType: Optional<DeviceAddressType>;
+    netId: i32;
+    passphrase: String;
+    groupName: String;
+    goBand: GroupOwnerBand;
+}
+
+struct WifiP2pGroupInfo {
+    isP2pGo: bool;
+    ownerInfo: WifiP2pDevice;
+    passphrase: String;
+    interfaceName: String;
+    groupName: String;
+    networkId: i32;
+    frequency: i32;
+    clientDevices: Array<WifiP2pDevice>;
+    goIpAddress: String;
+}
+
 
 // 函数
 function IsConnected(): bool;
@@ -156,6 +386,99 @@ function GetStations(): Array<StationInfo>;
 function EnableWifi(): void;
 function DisableWifi(): void;
 function EnableSemiWifi(): void;
+
+function GetDeviceConfigs(): Array<WifiDeviceConfig>;
+function Disconnect(): void;
+function ConnectToNetwork(networkId: i32): void;
+function GetDeviceMacAddress(): Array<String>;
+function IsHotspotActive(): bool;
+function P2pConnect(config: WifiP2PConfig): void;
+function GetCandidateConfigs(): Array<WifiDeviceConfig>;
+function P2pCancelConnect(): void;
+function ConnectToCandidateConfig(networkId: i32): void;
+function Reconnect(): void;
+function Reassociate(): void;
+function ConnectToDevice(config: WifiDeviceConfig): void;
+function SetHotspotConfig(config: HotspotConfig): void;
+function IsFeatureSupported(featureId: i64): bool;
+function GetHotspotConfig(): HotspotConfig;
+function DisableHotspot(): void;
+function EnableHotspot(): void;
+function IsHotspotDualBandSupported(): bool;
+function GetSupportedFeatures(): i64;
+function GetCountryCode(): String;
+function RemoveDevice(id: i32): void;
+function GetMultiLinkedInfo(): Array<WifiLinkedInfo>;
+function AllowAutoConnect(netId: i32, isAllowed: bool): void;
+function IsBandTypeSupported(bandType: WifiBandType): bool;
+function CreateGroup(config: WifiP2PConfig): void;
+function StartDiscoverDevices(): void;
+function RemoveGroup(): void;
+function StopDiscoverDevices(): void;
+function GetHotspotBlockList(): Array<StationInfo>;
+function SetDeviceName(devName: String): void;
+function EnableHiLinkHandshake(isHiLinkEnable: bool, bssid: String, config: WifiDeviceConfig): void;
+function StartPortalCertification(): void;
+function DeletePersistentGroup(netId: i32): void;
+function DisableNetwork(netId: i32): void;
+function UpdateNetwork(config: WifiDeviceConfig): i32;
+function RemoveAllNetwork(): void;
+function DelHotspotBlockList(stationInfo: StationInfo);
+function AddHotspotBlockList(stationInfo: StationInfo);
+function SetScanAlwaysAllowed(isScanAlwaysAllowed: bool): void;
+function FactoryReset(): void;
+function Get5GChannelList(): Array<i32>;
+function StartScan(): void;
+function GetDisconnectedReason(): DisconnectedReason;
+function GetScanAlwaysAllowed(): bool;
+
+function AddDeviceConfigSync(config: WifiDeviceConfig): i32;
+@static_overload("addDeviceConfig")
+@promise function AddDeviceConfigReturnsPromise(config: WifiDeviceConfig): i32;
+@static_overload("addDeviceConfig")
+@async function AddDeviceConfigWithCallback(config: WifiDeviceConfig): i32;
+
+function GetP2pPeerDevicesSync(): Array<WifiP2pDevice>;
+@static_overload("getP2pPeerDevices")
+@promise function GetP2pPeerDevicesReturnsPromise(): Array<WifiP2pDevice>;
+@static_overload("getP2pPeerDevices")
+@async function GetP2pPeerDevicesWithCallback(): Array<WifiP2pDevice>;
+
+function GetP2pLinkedInfoSync(): WifiP2pLinkedInfo;
+@static_overload("getP2pLinkedInfo")
+@promise function GetP2pLinkedInfoReturnsPromise(): WifiP2pLinkedInfo;
+@static_overload("getP2pLinkedInfo")
+@async function GetP2pLinkedInfoWithCallback(): WifiP2pLinkedInfo;
+
+function AddCandidateConfigSync(config: WifiDeviceConfig): i32;
+@static_overload("addCandidateConfig")
+@promise function AddCandidateConfigReturnsPromise(config: WifiDeviceConfig): i32;
+@static_overload("addCandidateConfig")
+@async function AddCandidateConfigWithCallback(config: WifiDeviceConfig): i32;
+
+function RemoveCandidateConfigSync(networkId: i32): void;
+@static_overload("removeCandidateConfig")
+@promise function RemoveCandidateConfigReturnsPromise(networkId: i32): void;
+@static_overload("removeCandidateConfig")
+@async function RemoveCandidateConfigWithCallback(networkId: i32): void;
+
+function GetP2pLocalDeviceSync(): WifiP2pDevice;
+@static_overload("getP2pLocalDevice")
+@promise function GetP2pLocalDeviceReturnsPromise(): WifiP2pDevice;
+@static_overload("getP2pLocalDevice")
+@async function GetP2pLocalDeviceWithCallback(): WifiP2pDevice;
+
+function GetP2pGroupsSync(): Array<WifiP2pGroupInfo>;
+@static_overload("getP2pGroups")
+@promise function GetP2pGroupsReturnsPromise(): Array<WifiP2pGroupInfo>;
+@static_overload("getP2pGroups")
+@async function GetP2pGroupsWithCallback(): Array<WifiP2pGroupInfo>;
+
+function GetCurrentGroupSync(): WifiP2pGroupInfo;
+@static_overload("getCurrentGroup")
+@promise function GetCurrentGroupReturnsPromise(): WifiP2pGroupInfo;
+@static_overload("getCurrentGroup")
+@async function GetCurrentGroupWithCallback(): WifiP2pGroupInfo;
 
 @!sts_inject("""
 export function on(type: string, cb: (arg_0: NullishType) => void) {

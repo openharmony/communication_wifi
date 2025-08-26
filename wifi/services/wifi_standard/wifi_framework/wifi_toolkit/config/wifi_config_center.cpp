@@ -91,7 +91,7 @@ int WifiConfigCenter::Init()
 std::unique_ptr<WifiScanConfig>& WifiConfigCenter::GetWifiScanConfig()
 {
     if (wifiScanConfig == nullptr) {
-    wifiScanConfig = std::make_unique<WifiScanConfig>();
+        wifiScanConfig = std::make_unique<WifiScanConfig>();
     }
     return wifiScanConfig;
 }

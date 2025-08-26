@@ -806,6 +806,10 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
         index = FindKeyMgmtPosition(KEY_MGMT_SAE);
         config.keyMgmtBitset |= (1 << index);
     }
+    if (config.keyMgmt == KEY_MGMT_SAE) {
+        index = FindKeyMgmtPosition(KEY_MGMT_WPA_PSK);
+        config.keyMgmtBitset |= (1 << index);
+    }
 }
 
 void WifiSettings::GetAllSuitableEncryption(const WifiDeviceConfig &config,

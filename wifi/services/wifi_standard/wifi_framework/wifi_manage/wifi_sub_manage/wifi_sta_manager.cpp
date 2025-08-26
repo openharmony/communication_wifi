@@ -34,6 +34,8 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sa_manager.h"
 #include "wifi_notification_util.h"
+#include "ista_service.h"
+#include "wifi_service_manager.h"
 #endif
 #include "wifi_chr_utils.h"
 
@@ -45,7 +47,6 @@ WifiStaManager::WifiStaManager()
 {
     WIFI_LOGI("create WifiStaManager");
 #ifndef OHOS_ARCH_LITE
-    netWorkDetect_ = sptr<NetStateObserver>(new NetStateObserver());
     staManagerEventHandler_ = std::make_unique<WifiEventHandler>(TASK_NAME_WIFI_NET_DETECTION);
 #endif
     InitStaCallback();
@@ -148,8 +149,8 @@ void WifiStaManager::InitStaCallback(void)
         this->DealInternetAccessChanged(internetAccessStatus, instId);
     };
     mStaCallback.OnSignalPollReport =
-        [this](const std::string &bssid, const int32_t signalLevel, const bool isAudioOn, const int32_t instId) {
-            this->DealSignalPollReport(bssid, signalLevel, isAudioOn, instId);
+        [this](const std::string &bssid, const int32_t signalLevel, const int32_t instId) {
+            this->DealSignalPollReport(bssid, signalLevel, instId);
         };
     return;
 }
@@ -245,25 +246,22 @@ static void HandleStaDisconnected(int instId)
     }
 }
 
-void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const bool isAudioOn,
-    const int32_t instId)
+void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
 {
 #ifndef OHOS_ARCH_LITE
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-    if (screenState == MODE_STATE_CLOSE && isAudioOn) {
-        // 因为灭屏下5s判断beacon lost会频繁上报，判断放在约束条件内。
-        bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);
-        if (isBeaconLost) {
-            WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
+    bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);
+    if (isBeaconLost) {
+        WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
+        if (screenState == MODE_STATE_CLOSE && screenOffCnt_ <= MAX_WIFI_DETECTION_TIME) {
             DealOffScreenAudioBeaconLost();
-        }
-    } else if (screenState == MODE_STATE_OPEN) {
-        bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);
-        if (isBeaconLost) {
-            WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
+            screenOffCnt_ += 1;
+        } else if (screenState == MODE_STATE_OPEN) {
             IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
             if (pEnhanceService != nullptr) { pEnhanceService->HandleBeaconLost(); }
         }
+    } else {
+        screenOffCnt_ = 0;
     }
 #endif
 }
@@ -272,19 +270,28 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
 void WifiStaManager::DealOffScreenAudioBeaconLost(void)
 {
     WIFI_LOGI("Enter DealOffScreenAudioBeaconLost");
-    if (staManagerEventHandler_ == nullptr || netWorkDetect_ == nullptr) {
+    if (staManagerEventHandler_ == nullptr) {
         WIFI_LOGE("%{public}s staManagerEventHandler netWorkDetect is null", __func__);
         return;
     }
     bool hasTask = false;
     staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_NET_DETECTION, hasTask);
     if (!hasTask) {
-        staManagerEventHandler_->PostAsyncTask([this]() { netWorkDetect_->StartWifiDetection(); },
-            TASK_NAME_WIFI_NET_DETECTION, 0);
+        staManagerEventHandler_->PostAsyncTask([this]() {
+            WIFI_LOGI("Enter DealOffScreenAudioBeaconLost StartWifiDetection");
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+            if (pService == nullptr) {
+                WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
+            } else {
+                pService->StartWifiDetection();
+            }
+            }, TASK_NAME_WIFI_NET_DETECTION, 0);
         staManagerEventHandler_->PostAsyncTask([this]() {
             IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-            if (pEnhanceService != nullptr) { pEnhanceService->HandleBeaconLost(); }
-        }, TASK_NAME_WIFI_DISCONNECT, BEACON_LOST_DELAY_TIME);
+            if (pEnhanceService != nullptr) {
+                pEnhanceService->HandleBeaconLost();
+            }
+            }, TASK_NAME_WIFI_DISCONNECT, BEACON_LOST_DELAY_TIME);
     }
 }
 #endif

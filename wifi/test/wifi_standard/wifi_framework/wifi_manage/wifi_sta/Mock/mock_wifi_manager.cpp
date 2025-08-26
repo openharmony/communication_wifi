@@ -39,7 +39,7 @@ void WifiManager::InitStaCallback(void)
     mStaCallback.OnStaOpenRes = std::bind(&WifiManager::DealStaOpenRes, this, _1, _2);
     mStaCallback.OnStaCloseRes = std::bind(&WifiManager::DealStaCloseRes, this, _1, _2);
     mStaCallback.OnStaConnChanged = std::bind(&WifiManager::DealStaConnChanged, this, _1, _2, _3);
-    mStaCallback.OnSignalPollReport = std::bind(&WifiManager::DealSignalPollReport, this, _1, _2, _3, _4);
+    mStaCallback.OnSignalPollReport = std::bind(&WifiManager::DealSignalPollReport, this, _1, _2, _3);
     mStaCallback.OnWpsChanged = std::bind(&WifiManager::DealWpsChanged, this, _1, _2, _3);
     mStaCallback.OnStaStreamChanged = std::bind(&WifiManager::DealStreamChanged, this, _1, _2);
     mStaCallback.OnStaRssiLevelChanged = std::bind(&WifiManager::DealRssiChanged, this, _1, _2);

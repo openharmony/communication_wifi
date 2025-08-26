@@ -36,7 +36,7 @@ struct StaServiceCallback {
     std::function<void(int, int)> OnAutoSelectNetworkRes { nullptr };
     std::function<void(const WifiSignalPollInfo &)> OnWifiHalSignalInfoChange { nullptr };
     std::function<void(int, int)> OnInternetAccessChange { nullptr };
-    std::function<void(const std::string, const int, const bool, const int)> OnSignalPollReport { nullptr };
+    std::function<void(const std::string, const int, const int)> OnSignalPollReport { nullptr };
 };
 }  // namespace Wifi
 }  // namespace OHOS

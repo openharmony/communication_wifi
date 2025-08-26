@@ -689,12 +689,10 @@ void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEven
             /* open airplane mode */
             WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_OPEN);
             WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(1);
-            }
         } else {
             /* close airplane mode */
             WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_CLOSE);
             WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(0);
-            }
         }
     }
 }

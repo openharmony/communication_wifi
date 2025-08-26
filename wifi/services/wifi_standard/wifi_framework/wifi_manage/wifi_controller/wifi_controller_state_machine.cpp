@@ -901,6 +901,12 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
     } else {
 #endif
+        if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
+            WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning() &&
+            WifiConfigCenter::GetInstance().GetApIfaceName() == "wlan0") {
+            WIFI_LOGE("Softap(wlan0) mode do not start scanonly after turn off wifi.");
+            return;
+        }
         if (ShouldEnableWifi(id)) {
             ConcreteManagerRole presentRole = GetWifiRole();
             MakeConcreteManager(presentRole, 0);

@@ -48,6 +48,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 namespace OHOS {
 namespace Wifi {
 const int STA_JOIN_HANDLE_DELAY = 5 * 1000;
+const int START_HOTSPOT_TIMEOUT = 3 * 1000;
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
       m_hotspotConfig(HotspotConfig()),
@@ -64,11 +65,14 @@ ApStartedState::~ApStartedState()
 void ApStartedState::GoInState()
 {
     WIFI_LOGI("Instance %{public}d %{public}s  GoInState.", m_id, GetStateName().c_str());
+    m_ApStateMachine.StartTimer(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT),
+        START_HOTSPOT_TIMEOUT);
 }
 
 void ApStartedState::GoOutState()
 {
     WIFI_LOGI("Instance %{public}d %{public}s", m_id, __func__);
+    m_ApStateMachine.StopTimer(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT));
     m_ApStateMachine.OnApStateChange(ApState::AP_STATE_CLOSING);
     DisableInterfaceNat();
     m_ApStateMachine.StopDhcpServer();
@@ -89,8 +93,8 @@ void ApStartedState::GoOutState()
 
 void ApStartedState::Init()
 {
-    mProcessFunMap.insert(
-        std::make_pair(ApStatemachineEvent::CMD_FAIL, [this](InternalMessagePtr msg) { this->ProcessCmdFail(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_FAIL,
+        [this](InternalMessagePtr msg) { this->ProcessCmdFail(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_STATION_JOIN,
         [this](InternalMessagePtr msg) { this->ProcessCmdStationJoin(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_STATION_LEAVE,
@@ -105,8 +109,7 @@ void ApStartedState::Init()
         [this](InternalMessagePtr msg) { this->ProcessCmdStopHotspot(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_DISCONNECT_STATION,
         [this](InternalMessagePtr msg) { this->ProcessCmdDisconnectStation(msg); }));
-    mProcessFunMap.insert(std::make_pair(
-        ApStatemachineEvent::CMD_SET_IDLE_TIMEOUT,
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_SET_IDLE_TIMEOUT,
         (ProcessFun)[this](InternalMessagePtr msg) { this->ProcessCmdSetHotspotIdleTimeout(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_UPDATE_COUNTRY_CODE,
         [this](InternalMessagePtr msg) { this->ProcessCmdUpdateCountryCode(msg); }));
@@ -116,6 +119,8 @@ void ApStartedState::Init()
         [this](InternalMessagePtr msg) { this->ProcessCmdAssociatedStaChanged(msg); }));
     mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_START_HOTSPOT,
         [this](InternalMessagePtr msg) { this->ProcessCmdEnableAp(msg); }));
+    mProcessFunMap.insert(std::make_pair(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT,
+        [this](InternalMessagePtr msg) { this->ProcessCmdEnableApTimeout(msg); }));
 }
 
 bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -306,6 +311,7 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
         m_ApStateMachine.StopDhcpServer();
         if (m_ApStateMachine.StartDhcpServer(m_hotspotConfig.GetIpAddress(), m_hotspotConfig.GetLeaseTime())) {
             m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
+            m_ApStateMachine.StopTimer(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT));
         }
 #else
         m_ApStateMachine.OnApStateChange(ApState::AP_STATE_STARTED);
@@ -316,6 +322,13 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
         WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
         m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
     }
+}
+
+void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
+{
+    WIFI_LOGI("Ap enable timeout, set softap toggled false.");
+    WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+    m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
 }
 
 void ApStartedState::ProcessCmdAddBlockList(InternalMessagePtr msg) const

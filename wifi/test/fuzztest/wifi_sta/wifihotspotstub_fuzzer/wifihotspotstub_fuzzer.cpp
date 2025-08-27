@@ -390,7 +390,6 @@ void WifiHotspotServiceImplFuzzTest(const uint8_t* data, size_t size)
     std::string secondaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
     std::vector<BandType> bandsFromCenter;
     bandsFromCenter.push_back(newBand);
-    ChannelsTable channInfoFromCenter;
     HotspotConfig config;
     StationInfo updateInfo;
     if (size >= U32_AT_SIZE_ZERO) {
@@ -419,7 +418,7 @@ void WifiHotspotServiceImplFuzzTest(const uint8_t* data, size_t size)
     mWifiHotspotServiceImpl.CfgCheckPsk(config);
     mWifiHotspotServiceImpl.CfgCheckBand(config, bandsFromCenter);
     mWifiHotspotServiceImpl.CfgCheckIpAddress(secondaryDeviceType);
-    mWifiHotspotServiceImpl.IsValidHotspotConfig(config, config, bandsFromCenter, channInfoFromCenter);
+    mWifiHotspotServiceImpl.IsValidHotspotConfig(config, config, bandsFromCenter);
 }
 
 /* Fuzzer entry point */

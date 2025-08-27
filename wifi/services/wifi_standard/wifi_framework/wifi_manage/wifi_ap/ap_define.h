@@ -54,6 +54,7 @@ enum class ApStatemachineEvent {
     CMD_UPDATE_COUNTRY_CODE,         /* update wifi conuntry code */
     CMD_HOTSPOT_CHANNEL_CHANGED,     /* hotspot channel changed */
     CMD_ASSOCIATED_STATIONS_CHANGED, /* associated stations changed */
+    CMD_START_HOTSPOT_TIMEOUT,       /* start timeout */
                                      /* (asynchronous result) */
 };
 

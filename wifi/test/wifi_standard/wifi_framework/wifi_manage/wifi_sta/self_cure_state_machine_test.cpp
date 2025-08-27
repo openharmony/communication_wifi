@@ -3053,6 +3053,7 @@ HWTEST_F(SelfCureStateMachineTest, SetHttpMonitorStatusTest, TestSize.Level1)
 
 HWTEST_F(SelfCureStateMachineTest, GetCurrentRssiTest, TestSize.Level1)
 {
+    pSelfCureStateMachine_->GetCurrentRssi();
     EXPECT_EQ(pSelfCureStateMachine_->GetCurrentRssi(), 0);
 }
 

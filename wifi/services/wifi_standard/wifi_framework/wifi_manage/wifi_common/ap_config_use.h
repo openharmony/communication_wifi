@@ -28,6 +28,7 @@ namespace Wifi {
 class ApConfigUse {
     FRIEND_GTEST(ApIdleState);
 public:
+    static ApConfigUse &GetInstance();
     /**
      * @Description  construction method
      *
@@ -50,6 +51,21 @@ public:
      * @param apConfig - ap configuration input
      */
     void UpdateApChannelConfig(HotspotConfig &apConfig) const;
+
+    /**
+     * @Description Filter Indoor Channel
+     *
+     * @param band - band
+     * @param validChannel - channels
+     */
+    bool GetApVaildChannel(BandType band, std::vector<int32_t> &validChannel) const;
+
+    /**
+     * @Description GetApVaildBands
+     *
+     * @param bands - bands
+     */
+    void GetApVaildBands(std::vector<BandType> &bands) const;
 private:
     static constexpr int DEFAULT_STA_INSTANCE_ID = 0;
 
@@ -97,6 +113,7 @@ private:
     std::unique_ptr<SoftapChannelPolicyParser> m_softapChannelPolicyPtr;
     std::map<std::string, std::set<int>> m_softapIndoorChannels;
     std::map<BandType, std::vector<int>> m_softapPreferredChannels;
+    std::set<int> defaultIndoorChannel_ = {36, 40, 44, 48, 52, 56, 60, 64};
     DISALLOW_COPY_AND_ASSIGN(ApConfigUse)
 
     int GetBestChannelFor2G() const;

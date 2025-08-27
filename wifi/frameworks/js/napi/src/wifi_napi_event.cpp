@@ -453,7 +453,7 @@ public:
 
     void OnP2pGcLeaveGroup(const OHOS::Wifi::GcInfo &info) override
     {
-        WIFI_LOGI("received OnP2pGcLease event");
+        WIFI_LOGI("received OnP2pGcLeave event");
     }
 
     void OnP2pPrivatePeersChanged(const std::string &priWfdInfo) override

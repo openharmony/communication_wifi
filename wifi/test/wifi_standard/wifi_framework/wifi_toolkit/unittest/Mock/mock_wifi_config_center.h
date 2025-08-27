@@ -174,8 +174,6 @@ public:
     virtual int GetP2pEnhanceFreq() = 0;
     virtual bool IsNeedFastScan(void) = 0;
     virtual void SetFastScan(bool fastScan) = 0;
-    virtual void SetAutoConnect(bool autoConnectEnable) = 0;
-    virtual bool GetAutoConnect() = 0;
     virtual HotspotMode GetHotspotMode() = 0;
     virtual void SetHotspotMode(const HotspotMode &mode) = 0;
     virtual int GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig) = 0;
@@ -338,8 +336,6 @@ public:
     MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());
     MOCK_METHOD0(IsNeedFastScan, bool());
     MOCK_METHOD1(SetFastScan, void(bool fastScan));
-    MOCK_METHOD1(SetAutoConnect, void(bool));
-    MOCK_METHOD0(GetAutoConnect, bool());
     MOCK_METHOD0(GetHotspotMode, HotspotMode());
     MOCK_METHOD1(SetHotspotMode, void(const HotspotMode &mode));
     MOCK_METHOD1(GetLocalOnlyHotspotConfig, int(HotspotConfig &hotspotConfig));

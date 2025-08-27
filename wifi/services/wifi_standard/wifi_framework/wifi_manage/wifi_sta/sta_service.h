@@ -203,14 +203,14 @@ public:
      *
      * @return True for Disabeled, false for Not Disabeled
      */
-    virtual bool IsRandomMacDisabeled() const;    
+    virtual bool IsRandomMacDisabled() const;    
     /**
      * @Description Set Random Mac Disabeled.
      *
      * @param isRandomMacDisabeled: True for Disabeled, false for Not Disabeled
      * @return WifiErrorNo
      */
-    virtual ErrCode SetRandomMacDisabeled(bool isRandomMacDisabeled) const;
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabeled) const;
     /**
      * @Description  Start WPS Connection
      *

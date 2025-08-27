@@ -154,7 +154,7 @@ void WifiDeviceStub::InitHandleMapEx2()
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_MULTI_LINKED_INFO)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetMultiLinkedInfo(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED)] = [this]
-        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetandomMacDisabled(code, data, reply); };
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetRandomMacDisabled(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnIsRandomMacDisabled(code, data, reply); };
 }
@@ -1262,7 +1262,7 @@ void WifiDeviceStub::OnIsRandomMacDisabled(uint32_t code, MessageParcel &data, M
 void WifiDeviceStub::OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    bool isRandomMacDisabled = false;
+    bool isRandomMacDisabled = data.ReadBool();
     ErrCode ret = SetRandomMacDisabled(isRandomMacDisabled);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);

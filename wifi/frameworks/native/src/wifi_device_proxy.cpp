@@ -1880,6 +1880,10 @@ ErrCode WifiDeviceProxy::IsRandomMacDisabled(bool &isRandomMacDisabled)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
     isRandomMacDisabled = reply.Readbool();
     return WIFI_OPT_SUCCESS;
 }
@@ -1911,7 +1915,7 @@ ErrCode WifiDeviceProxy::SetRandomMacDisabled(bool isRandomMacDisabled)
     if (exception) {
         return WIFI_OPT_FAILED;
     }
-    return WIFI_OPT_SUCCESS;
+    return ErrCode(reply.ReadInt32());
 }
 
 bool WifiDeviceProxy::SetLowLatencyMode(bool enabled)

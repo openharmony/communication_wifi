@@ -434,7 +434,7 @@ public:
 
     /**
      * @Description Set p2p high perf mode
-     * @param interfaceName interfaceName
+     * @param ifaceName interfaceName
      * @param isEnable - enable high perf mode or not
      * @return bool
      */

@@ -250,21 +250,6 @@ void GetStationListFuzzTest(const uint8_t* data, size_t size)
     pApInterface->GetStationList(result);
 }
 
-void GetValidBandsFuzzTest(const uint8_t* data, size_t size)
-{
-    std::vector<BandType> bands;
-    pApService->GetValidBands(bands);
-    pApInterface->GetValidBands(bands);
-}
-
-void GetValidChannelsFuzzTest(const uint8_t* data, size_t size)
-{
-    BandType bandType = static_cast<BandType>(static_cast<int>(data[0]) % SIX);
-    std::vector<int32_t> validChannel;
-    pApService->GetValidChannels(bandType, validChannel);
-    pApInterface->GetValidChannels(bandType, validChannel);
-}
-
 void RegisterApServiceCallbacksFuzzTest(const uint8_t* data, size_t size)
 {
     IApServiceCallbacks callbacks;
@@ -362,8 +347,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::DelBlockListFuzzTest(data, size);
     OHOS::Wifi::DisconnetStationFuzzTest(data, size);
     OHOS::Wifi::GetStationListFuzzTest(data, size);
-    OHOS::Wifi::GetValidBandsFuzzTest(data, size);
-    OHOS::Wifi::GetValidChannelsFuzzTest(data, size);
     OHOS::Wifi::RegisterApServiceCallbacksFuzzTest(data, size);
     OHOS::Wifi::GetSupportedPowerModelFuzzTest(data, size);
     OHOS::Wifi::GetPowerModelFuzzTest(data, size);

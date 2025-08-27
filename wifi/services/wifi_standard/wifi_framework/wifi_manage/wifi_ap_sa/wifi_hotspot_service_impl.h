@@ -273,15 +273,6 @@ public:
     ErrCode CfgCheckBand(const HotspotConfig &cfg, std::vector<BandType> &bandsFromCenter);
 
     /**
-     * @Description Check valid channel config
-     *
-     * @param cfg - HotspotConfig
-     * @param channInfoFromCenter - ChannelsTable object
-     * @return ErrCode - WIFI_OPT_SUCCESS or others
-     */
-    ErrCode CfgCheckChannel(const HotspotConfig &cfg, ChannelsTable &channInfoFromCenter);
-
-    /**
      * @Description Check dhcp server ip address
      *
      * @param ipAddress - string
@@ -295,11 +286,10 @@ public:
      * @param cfg - HotspotConfig
      * @param cfgFromCenter - Get HotspotConfig from config center
      * @param bandsFromCenter - vector of BandType
-     * @param channInfoFromCenter - ChannelsTable object
      * @return ErrCode - WIFI_OPT_SUCCESS or others
      */
     ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgFromCenter,
-        std::vector<BandType> &bandsFromCenter, ChannelsTable &channInfoFromCenter);
+        std::vector<BandType> &bandsFromCenter);
 
     /**
      * @Description Get ap iface name
@@ -323,9 +313,6 @@ private:
     static void ConfigInfoDump(std::string& result);
     static void StationsInfoDump(std::string& result);
     ErrCode VerifyConfigValidity(const HotspotConfig &config);
-
-private:
-    bool mGetChannels = false;
 };
 }  // namespace Wifi
 }  // namespace OHOS

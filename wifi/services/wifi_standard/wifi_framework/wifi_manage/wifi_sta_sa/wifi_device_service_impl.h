@@ -68,7 +68,7 @@ public:
     ErrCode RemoveDevice(int networkId) override;
 
     ErrCode RemoveAllDevice() override;
-
+    
     ErrCode SetTxPower(int power) override;
 
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;
@@ -109,9 +109,9 @@ public:
 
     ErrCode GetLinkedInfo(WifiLinkedInfo &info) override;
 
-    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
-
     ErrCode GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &mloLinkInfo) override;
+
+    ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) override;
 
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
 

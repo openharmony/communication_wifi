@@ -65,6 +65,7 @@ ErrCode ScanInterface::UnInit()
     return WIFI_OPT_SUCCESS;
 }
 
+// scanType takes precedence over externFlag, when scanType is not SCAN_DEFAULT, externFlag invalid
 ErrCode ScanInterface::Scan(bool externFlag, ScanType scanType)
 {
     WIFI_LOGI("Enter ScanInterface::Scan\n");
@@ -76,6 +77,7 @@ ErrCode ScanInterface::Scan(bool externFlag, ScanType scanType)
     return pScanService->Scan(externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN);
 }
 
+// scanType takes precedence over externFlag, when scanType is not SCAN_DEFAULT, externFlag invalid
 ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag, ScanType scanType)
 {
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");

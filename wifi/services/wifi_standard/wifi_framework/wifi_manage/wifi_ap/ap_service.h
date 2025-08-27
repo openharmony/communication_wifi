@@ -106,23 +106,6 @@ public:
     ErrCode GetStationList(std::vector<StationInfo> &result) const;
 
     /**
-     * @Description Get valid bands.
-     *
-     * @param bands - return valid bands
-     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
-     */
-    ErrCode GetValidBands(std::vector<BandType> &bands);
-
-    /**
-     * @Description Get valid channels.
-     *
-     * @param band - input band
-     * @param validchannel - band's valid channel
-     * @return ErrCode - success: WIFI_OPT_SUCCESS    failed: ERROR_CODE
-     */
-    ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validChannel);
-
-    /**
      * @Description Sets the callback function for the state machine.
      *
      * @param callbacks - callbacks list.
@@ -157,7 +140,7 @@ public:
     /**
      * @Description get hotspot mode
      *
-     * @param model - the model to be set
+     * @param mode - the mode to be get
      * @return ErrCode - operation result
      */
     ErrCode GetHotspotMode(HotspotMode &mode);
@@ -165,7 +148,7 @@ public:
     /**
      * @Description set hotspot mode
      *
-     * @param model - the model to be set
+     * @param mode - the mode to be set
      * @return ErrCode - operation result
      */
     ErrCode SetHotspotMode(const HotspotMode &mode);

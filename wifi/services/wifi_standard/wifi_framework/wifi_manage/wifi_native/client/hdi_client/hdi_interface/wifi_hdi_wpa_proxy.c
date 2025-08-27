@@ -323,7 +323,7 @@ WifiErrorNo HdiWpaStart()
         pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_HAL_OPT_FAILED;
     }
-    
+
     RegistHdfDeathCallBack();
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("HdiWpaStart start success!");

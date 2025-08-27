@@ -324,7 +324,14 @@ struct Index {
         .onControllerAttached(() => {
           try {
             this.harmonyUA = this.webviewController.getUserAgent();
-            this.selectedUA = this.harmonyUA;
+            const isPhone = /Phone/i.test(this.harmonyUA);
+            if (isPhone) {
+              this.selectedUA = this.mobileUA;
+            } else {
+              this.selectedUA = this.desktopUA;
+            }
+            this.webviewController.setCustomUserAgent(this.selectedUA);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone: '  + isPhone);
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to set UA. Code:${error.code}, message:${error.message}`);
           }

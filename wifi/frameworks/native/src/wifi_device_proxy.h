@@ -187,7 +187,7 @@ public:
      * @param isRandomMacDisabeled: True for disabeled   False for not enabeled.
      * @return ErrCode - operation result
      */
-    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
+    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 
     /**
      * @Description Set Random Mac Disabeled.
@@ -195,7 +195,7 @@ public:
      * @param isRandomMacDisabeled: True for disabeled   False for not disabeled.
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
+    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
 
     /**
      * @Description Connecting to a Specified Network

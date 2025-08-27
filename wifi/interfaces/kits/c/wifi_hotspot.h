@@ -168,7 +168,6 @@ WifiErrorCode GetApIfaceName(char *ifaceName, int nameLen);
 /**
  * @Description Enable local only Hotspot
   *
- * @param type - service type
  * @return ErrCode - operation result
  */
 WifiErrorCode EnableLocalOnlyHotspot(void);
@@ -176,7 +175,6 @@ WifiErrorCode EnableLocalOnlyHotspot(void);
 /**
  * @Description Disable local only Hotspot
  *
- * @param type - service type
  * @return ErrCode - operation result
  */
 WifiErrorCode DisableLocalOnlyHotspot(void);
@@ -184,7 +182,7 @@ WifiErrorCode DisableLocalOnlyHotspot(void);
 /**
  * @Description Get local only Hotspot mode
  *
- * @param mode - hotspot mode
+ * @param hotspotMode - hotspot mode
  * @return ErrCode - operation result
  */
 WifiErrorCode GetHotspotMode(int *hotspotMode);

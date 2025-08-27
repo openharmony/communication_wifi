@@ -154,7 +154,6 @@ void GroupNegotiationState::DoDhcpInGroupStart(void) const
             WIFI_LOGI("ProcessGroupStartedEvt %{private}s %{private}s",
                 device.GetDeviceAddress().c_str(), device.GetRandomDeviceAddress().c_str());
             deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
-
             p2pStateMachine.BroadcastP2pPeersChanged();
         } else {
             WIFI_LOGE("fail:No GO device information is found.");

@@ -238,8 +238,8 @@ std::string NetworkSelectionManager::GetFilteredReasonForChr(
             continue;
         }
         std::map<std::string, std::set<NetworkSelection::FiltedReason,
-            NetworkSelection::FiltedReasonComparator, std::allocator<NetworkSelection::FiltedReason>>> filtedReason;
-        filtedReason = networkCandidates.at(i).filtedReason;
+            NetworkSelection::FiltedReasonComparator, std::allocator<NetworkSelection::FiltedReason>>> filtedReason
+                = networkCandidates.at(i).filtedReason;
         if (filtedReason.size() == 0) {
             continue;
         }
@@ -262,8 +262,7 @@ std::string NetworkSelectionManager::GetFilteredReasonForChr(
 std::string NetworkSelectionManager::GetSelectedInfoForChr(NetworkSelection::NetworkCandidate *networkCandidate)
 {
     std::string selectedInfo;
-    WifiDeviceConfig selectedConfig;
-    selectedConfig = networkCandidate->wifiDeviceConfig;
+    WifiDeviceConfig selectedConfig = networkCandidate->wifiDeviceConfig;
     selectedInfo += std::to_string(selectedConfig.networkId);
     selectedInfo += "_";
     selectedInfo += SsidAnonymize(selectedConfig.ssid);

@@ -240,15 +240,15 @@ public:
     /**
      * @Description Is Random Mac Disabeled.
      *
-     * @return bool
+     * @return ErrCode - operation result
      */
-    virtual bool IsRandomMacDisabled(bool &isRandomMacDisabled) override;
+    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 
     /**
      * @Description Set Random Mac Disabeled.
      *
-     * @param isRandomMacDisabeled: True for disabeled   False for not disabeled.
-     * @return WifiErrorNo
+     * @param isRandomMacDisabeled: True for disabeled   False for not enabeled.
+     * @return ErrCode - operation result
      */
     virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
     

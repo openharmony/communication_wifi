@@ -141,18 +141,24 @@ bool ApStartedState::ExecuteStateMsg(InternalMessagePtr msg)
     return EXECUTED;
 }
 
-bool ApStartedState::SetConfig(HotspotConfig &apConfig, bool isControl160M)
+bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 {
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
     ApConfigUse::GetInstance().UpdateApChannelConfig(apConfig);
+#ifndef OHOS_ARCH_LITE
+    if ((apConfig.GetBandWidth() == AP_BANDWIDTH_160 ||
+            (apConfig.GetChannel() >= CHANNEL50 && apConfig.GetChannel() <= CHANNEL144))) {
+        if (enhanceService_ != nullptr && enhanceService_->GetDfsControlData().enableAidfs_) {
+            WIFI_LOGI("DfsControl. use Dfs Channel and Aidfs enable, Stop 60s CAC");
+            enhanceService_->CloseCAC();
+        }
+    }
+#endif
     std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
     WifiErrorNo setSoftApConfigResult = WifiErrorNo::WIFI_HAL_OPT_OK;
     WifiErrorNo setApPasswdResult = WifiErrorNo::WIFI_HAL_OPT_OK;
     HotspotMode currentMode = HotspotMode::SOFTAP;
     m_ApStateMachine.GetHotspotMode(currentMode);
-    if (isControl160M) {
-        apConfig.SetBandWidth(AP_BANDWIDTH_DEFAULT);
-    }
     if (currentMode == HotspotMode::LOCAL_ONLY_SOFTAP) {
         // The localOnlyHotspot uses the temporary configuration and does not flush to disks,
         // The SSID and password are random values.
@@ -174,6 +180,11 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig, bool isControl160M)
         WIFI_LOGE("set hostapd config failed.");
         return false;
     }
+    return SetConfigExtral(apConfig, ifName);
+}
+ 
+bool ApStartedState::SetConfigExtral(HotspotConfig &apConfig, std::string ifName)
+{
     if (BatteryUtils::GetInstance().GetBatteryCapacity() > SET_DUAL_ANTENNAS) {
         HotspotConfig hotspotConfig;
         WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, m_id);
@@ -196,14 +207,14 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig, bool isControl160M)
     return true;
 }
 
-bool ApStartedState::SetConfig(bool isControl160M)
+bool ApStartedState::SetConfig()
 {
     WIFI_LOGI("set softap config, id=%{public}d", m_id);
     if (WifiSettings::GetInstance().GetHotspotConfig(m_hotspotConfig, m_id)) {
         WIFI_LOGE("get config failed");
         return false;
     }
-    return SetConfig(m_hotspotConfig, isControl160M);
+    return SetConfig(m_hotspotConfig);
 }
 
 bool ApStartedState::StartAp() const
@@ -518,5 +529,12 @@ void ApStartedState::ProcessCmdEnableAp(InternalMessagePtr msg)
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
 }
+
+#ifndef OHOS_ARCH_LITE
+void ApStartedState::SetEnhanceService(IEnhanceService* enhanceService)
+{
+    enhanceService_ = enhanceService;
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

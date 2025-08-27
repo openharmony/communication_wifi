@@ -435,6 +435,10 @@ void WifiP2pStub::OnQueryP2pLinkedInfo(uint32_t code, MessageParcel &data, Messa
         reply.WriteString(config.GetGroupOwnerAddress());
         std::vector<GcInfo> gcInfos = config.GetClientInfoList();
         int size = static_cast<int>(gcInfos.size());
+        if (size <= 0) {
+            WIFI_LOGE("gcInfos.size is %{public}d", size);
+            return;
+        }
         reply.WriteInt32(size);
         for (int i = 0; i < size; i++) {
             reply.WriteString(gcInfos[i].mac);

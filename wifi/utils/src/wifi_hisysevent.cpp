@@ -524,6 +524,7 @@ void WriteIsInternetHiSysEvent(int isInternet)
 
 void WriteSoftApConnectFailHiSysEvent(int errorCnt)
 {
+    WIFI_LOGE("WriteSoftApConnectFailHiSysEvent errorCnt=%{public}d", errorCnt);
     cJSON *root = cJSON_CreateObject();
     if (root == nullptr) {
         WIFI_LOGE("Failed to create cJSON object");
@@ -543,6 +544,7 @@ void WriteSoftApConnectFailHiSysEvent(int errorCnt)
 
 void WriteSoftApClientAccessNetErrorHiSysEvent(int errorCode)
 {
+    WIFI_LOGE("WriteSoftApClientAccessNetErrorHiSysEvent errorCode=%{public}d", errorCode);
     cJSON *root = cJSON_CreateObject();
     if (root == nullptr) {
         WIFI_LOGE("Failed to create cJSON object");

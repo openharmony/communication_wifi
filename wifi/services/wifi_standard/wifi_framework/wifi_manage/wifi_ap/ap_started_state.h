@@ -20,6 +20,10 @@
 #include "state.h"
 #include "wifi_ap_nat_manager.h"
 #include "wifi_ap_msg.h"
+#include "wifi_msg.h"
+#ifndef OHOS_ARCH_LITE
+#include "ienhance_service.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -93,21 +97,29 @@ public:
      */
     void StartMonitor() const;
 
-    bool SetConfig(bool isControl160M = false);
+    bool SetConfig();
+ 
+    bool SetConfigExtral(HotspotConfig &apConfig, std::string ifName);
 
     void SetRandomMac() const;
 
     bool SetCountry();
-
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Set EnhanceService to Ap start
+     *
+     * @param enhanceService IEnhanceService object
+     */
+    void SetEnhanceService(IEnhanceService* enhanceService);
+#endif
 private:
     /**
      * @Description  Called inside the state，processing function
                      configured.
      * @param apConfig - Hotspot Configure
-     * @param isControl160M - Hotspot Configure
      * @return true: Set successfully    false: Set failed
      */
-    bool SetConfig(HotspotConfig &apConfig, bool isControl160M = false);
+    bool SetConfig(HotspotConfig &apConfig);
 
     /**
      * @Description  Status update notification APSERVICE.
@@ -247,6 +259,9 @@ private:
     bool idleTimerExist = false;
     mutable std::string m_wifiCountryCode;
     std::set<std::string> curAssocMacList;
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *enhanceService_ = nullptr;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

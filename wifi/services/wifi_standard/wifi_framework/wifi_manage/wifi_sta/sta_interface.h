@@ -257,17 +257,17 @@ public:
     /**
      * @Description Set Random Mac Disabled.
      *
-     * @param isRandomMacDisabled: True for Disabled, false for Not Disabled.
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
      * @return WifiErrorNo
      */
     virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
 
     /**
-     * @Description Get Is Random Mac Disabled.
-     *
-     * @return True for Disabled, false for Not Disabled.
+     * @Description Is Random Mac Disabeled.
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @return ErrCode - operation result
      */
-    virtual bool IsRandomMacDisabled() override;
+    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 
     /**
      * @Description send power mode for wpa.

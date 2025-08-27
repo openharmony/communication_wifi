@@ -125,7 +125,7 @@ public:
 
     ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
 
-    bool IsRandomMacDisabled() override;
+    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 
     ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) override;
 

@@ -184,7 +184,7 @@ public:
 
     /**
      * @Description Is Random Mac Disabeled.
-     * @param isRandomMacDisabeled: True for disabeled   False for not enabeled.
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
      * @return ErrCode - operation result
      */
     ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
@@ -192,7 +192,7 @@ public:
     /**
      * @Description Set Random Mac Disabeled.
      *
-     * @param isRandomMacDisabeled: True for disabeled   False for not disabeled.
+     * @param isRandomMacDisabeled: True for disabeled   False for not disabeled
      * @return ErrCode - operation result
      */
     ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;

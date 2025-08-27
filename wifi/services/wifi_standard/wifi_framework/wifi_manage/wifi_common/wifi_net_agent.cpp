@@ -374,7 +374,13 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
     route->gateway_.family_ = NetManagerStandard::INetAddr::IPV4;
     netLinkInfo->routeList_.push_back(*route);
     LOGI("SetNetLinkRouteInfo gateway:%{public}s", IpAnonymize(route->gateway_.address_).c_str());
-    if (!wifiIpV6Info.gateway.empty()) {
+    
+    // Check if we have IPv6 addresses other than link-local before adding default route
+    bool hasUsableIpv6Address = !wifiIpV6Info.globalIpV6Address.empty() ||
+                                !wifiIpV6Info.randGlobalIpV6Address.empty() ||
+                                !wifiIpV6Info.uniqueLocalAddress1.empty() ||
+                                !wifiIpV6Info.uniqueLocalAddress2.empty();
+    if (!wifiIpV6Info.gateway.empty() && hasUsableIpv6Address) {
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
         if (ipv6route == nullptr) {
             WIFI_LOGE("%{public}s ipv6route is null", __func__);
@@ -388,7 +394,9 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
         ipv6route->gateway_.address_ = wifiIpV6Info.gateway;
         ipv6route->gateway_.family_ = NetManagerStandard::INetAddr::IPV6;
         netLinkInfo->routeList_.push_back(*ipv6route);
-        LOGI("SetNetLinkRouteInfo gateway:%{public}s", MacAnonymize(wifiIpV6Info.gateway).c_str());
+        LOGI("SetNetLinkRouteInfo ipv6 gateway:%{public}s", MacAnonymize(wifiIpV6Info.gateway).c_str());
+    } else if (!wifiIpV6Info.gateway.empty() && !hasUsableIpv6Address) {
+        LOGI("Skip IPv6 default route: gateway exists but no usable IPv6 addresses available");
     }
 }
 

@@ -1252,7 +1252,7 @@ void WifiDeviceStub::OnIsRandomMacDisabled(uint32_t code, MessageParcel &data, M
     bool isRandomMacDisabled = false;
     ErrCode ret = IsRandomMacDisabled(isRandomMacDisabled);
     reply.WriteInt32(0);
-    reply.WriteBool(ret);
+    reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteBool(isRandomMacDisabled);
     }
@@ -1263,7 +1263,7 @@ void WifiDeviceStub::OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, 
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool isRandomMacDisabled = false;
-    bool ret = SetRandomMacDisabled(isRandomMacDisabled);
+    ErrCode ret = SetRandomMacDisabled(isRandomMacDisabled);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

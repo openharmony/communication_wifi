@@ -1302,6 +1302,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
         return;
     }
     isUsedMultiGwSelfcure_ = true;
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MULTI_GATEWAY, true);
     std::string ipAddr = MultiGateway::GetInstance().GetGatewayIp();
     std::string macString = "";
     MultiGateway::GetInstance().GetNextGatewayMac(macString);
@@ -1313,21 +1314,12 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
         }
         return;
     }
+
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
-    if (MultiGateway::GetInstance().SetStaticArp(ifaceName, ipAddr, macString) != 0) {
-        WIFI_LOGE("SetStaticArp failed");
-        if (lastMultiGwSelfFailedType_ != -1) {
-            SelectSelfCureByFailedReason(lastMultiGwSelfFailedType_);
-        }
-        return;
-    }
-    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::MULTI_GATEWAY_SELFCURE));
-    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MULTI_GATEWAY, true);
     if (!pSelfCureStateMachine_->IsHttpReachable()) {
         MultiGateway::GetInstance().DelStaticArp(ifaceName, ipAddr);
         pSelfCureStateMachine_->SendMessage(WIFI_CURE_CMD_MULTI_GATEWAY);
     } else {
-        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::MULTI_GATEWAY_SELFCURE_SUCC));
         pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pConnectedMonitorState_);
     }
 }
@@ -1546,8 +1538,6 @@ void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableAfterSelfCu
         WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::REASSOC_SELFCURE_SUCC));
     } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_HIGH_RESET) {
         WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RESET_SELFCURE_SUCC));
-    } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC) {
-        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RAND_MAC_REASSOC_SELFCURE_SUCC));
     }
 }
 

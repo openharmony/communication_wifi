@@ -251,7 +251,7 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
 #ifndef OHOS_ARCH_LITE
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);
-    if (!(isBeaconLost)) {
+    if (!isBeaconLost) {
         screenOffCnt_ = 0;
         return;
     }

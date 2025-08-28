@@ -1347,7 +1347,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
     WifiConfigCenter::GetInstance().SetLastNetworkId(networkId);
-    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RAND_MAC_REASSOC_SELFCURE));
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
     if (pStaService == nullptr) {
         WIFI_LOGE("Get pStaService failed!");
@@ -3034,7 +3033,7 @@ void SelfCureStateMachine::HandleConnectFailed()
             WIFI_LOGE("%{public}s: GetDeviceConfig failed!.", __FUNCTION__);
             return;
         }
-        //Connect failed, updateSelfcureConnectHistoryInfo
+        // Connect failed, updateSelfcureConnectHistoryInfo
         WifiSelfCureHistoryInfo selfCureHistoryInfo;
         std::string internetSelfCureHistory = config.internetSelfCureHistory;
         SelfCureUtils::GetInstance().String2InternetSelfCureHistoryInfo(internetSelfCureHistory, selfCureHistoryInfo);

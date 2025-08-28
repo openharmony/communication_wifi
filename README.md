@@ -1,6 +1,3 @@
-https://gitee.com/openharmony/communication_wifi/pulls/3741
-//Connect failed, updateSelfcureConnectHistoryInfo加个空格
-删掉void SelfCureStateMachine::InternetSelfCureState::HandleSelfCureResultFailed(InternalMessagePtr msg)下面的WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RAND_MAC_REASSOC_SELFCURE));
 # communication\_wifi<a name="EN-US_TOPIC_0000001162030287"></a>
 
 -   [Introduction](#section11660541593)

@@ -58,6 +58,8 @@ public:
 
     bool IsValid5GChannel(int channel);
     void UpdateValidFreqs();
+
+    void FilterDfsChannel(std::vector<int> &channels);
 private:
     WifiChannelHelper();
     void UpdateValidChannels(std::vector<int32_t> &supp2Gfreqs, std::vector<int32_t> &supp5Gfreqs);

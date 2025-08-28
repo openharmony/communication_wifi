@@ -69,7 +69,7 @@ HWTEST_F(WifiOpensslUtilsTest, OpensslAesEncryptTest1, TestSize.Level1)
 }
 
 HWTEST_F(WifiOpensslUtilsTest, OpensslAesDecryptTest1, TestSize.Level1)
-{   
+{
     int cipherTextLen = 0;
     uint8_t newCipherText[CIPHER_TEXT_MAX_LEN];
     AesCipherInfo info;

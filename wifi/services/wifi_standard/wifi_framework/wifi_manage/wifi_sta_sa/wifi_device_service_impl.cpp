@@ -349,7 +349,7 @@ static bool CheckOriSsidLength(const WifiDeviceConfig &config)
 
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
-    if (config.ssid.length() <= 0 || (config.keyMgmt.length()) <= 0) {
+    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
         WIFI_LOGE("CheckConfigPwd: invalid ssid or keyMgmt!");
         return false;
     }

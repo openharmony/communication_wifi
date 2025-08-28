@@ -640,7 +640,7 @@ bool HalDeviceManager::SetTxPower(int power)
     if (!CheckReloadChipHdiService()) {
         return false;
     }
-    
+
     std::lock_guard<std::mutex> lock(mMutex);
     int32_t staResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetStaIfaceName(),
                                         mIWifiStaIfaces, power);

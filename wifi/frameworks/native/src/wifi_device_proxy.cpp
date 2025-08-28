@@ -1895,6 +1895,7 @@ void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
     }
     if (g_deviceCallBackStub != nullptr) {
         g_deviceCallBackStub->SetRemoteDied(true);
+        g_deviceCallBackStub->SetWifiState(DEFAULT_VALUES);
     }
 }
 

@@ -251,17 +251,19 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
 #ifndef OHOS_ARCH_LITE
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     bool isBeaconLost = WifiChrUtils::GetInstance().IsBeaconLost(bssid, signalLevel, screenState, instId);
-    if (isBeaconLost) {
-        WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
-        if (screenState == MODE_STATE_CLOSE && screenOffCnt_ <= MAX_WIFI_DETECTION_TIME) {
-            DealOffScreenAudioBeaconLost();
-            screenOffCnt_ += 1;
-        } else if (screenState == MODE_STATE_OPEN) {
-            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-            if (pEnhanceService != nullptr) { pEnhanceService->HandleBeaconLost(); }
-        }
-    } else {
+    if (!(isBeaconLost)) {
         screenOffCnt_ = 0;
+        return;
+    }
+    WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
+    if (screenState == MODE_STATE_CLOSE && screenOffCnt_ <= MAX_WIFI_DETECTION_TIME) {
+        DealOffScreenAudioBeaconLost();
+        screenOffCnt_ += 1;
+    } else if (screenState == MODE_STATE_OPEN) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->HandleBeaconLost();
+        }
     }
 #endif
 }
@@ -280,9 +282,7 @@ void WifiStaManager::DealOffScreenAudioBeaconLost(void)
         staManagerEventHandler_->PostAsyncTask([this]() {
             WIFI_LOGI("Enter DealOffScreenAudioBeaconLost StartWifiDetection");
             IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
-            if (pService == nullptr) {
-                WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
-            } else {
+            if (pService != nullptr) {
                 pService->StartWifiDetection();
             }
             }, TASK_NAME_WIFI_NET_DETECTION, 0);
@@ -392,6 +392,10 @@ void WifiStaManager::DealInternetAccessChanged(int internetAccessStatus, int ins
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
 #ifndef OHOS_ARCH_LITE
+    if (staManagerEventHandler_ == nullptr) {
+        WIFI_LOGE("%{public}s staManagerEventHandler netWorkDetect is null", __func__);
+        return;
+    }
     bool hasTask = false;
     staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);
     if (hasTask && internetAccessStatus == SystemNetWorkState::NETWORK_IS_WORKING) {

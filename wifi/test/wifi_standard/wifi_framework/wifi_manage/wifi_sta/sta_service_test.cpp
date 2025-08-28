@@ -122,7 +122,10 @@ public:
     void StaServiceSetWifiRestrictedListSuccess();
     void StaServiceIsRandomMacDisabledTrue();
     void StaServiceIsRandomMacDisabledFalse();
-    void StaServiceSetRandomMacDisabledSuccess();
+    void StaServiceSetRandomMacDisabledTrueSuccess1();
+    void StaServiceSetRandomMacDisabledTrueSuccess2();
+    void StaServiceSetRandomMacDisabledFalseSuccess1();
+    void StaServiceSetRandomMacDisabledFalseSuccess2();
 #endif
     void DisableAutoJoin();
     void EnableAutoJoin();

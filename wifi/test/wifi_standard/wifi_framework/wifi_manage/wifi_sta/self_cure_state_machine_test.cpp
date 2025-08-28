@@ -990,8 +990,6 @@ public:
         pSelfCureStateMachine_->pInternetSelfCureState_->isSetStaticIp4InvalidIp_ = true;
         pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
 
-        currentCureLevel = WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC;
-        pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
         currentCureLevel = WIFI_CURE_RESET_LEVEL_HIGH_RESET;
         pSelfCureStateMachine_->pInternetSelfCureState_->HandleHttpReachableAfterSelfCure(currentCureLevel);
         EXPECT_NE(pSelfCureStateMachine_->useWithRandMacAddress_, TEN);

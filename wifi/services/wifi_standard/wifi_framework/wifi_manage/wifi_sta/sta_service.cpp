@@ -721,11 +721,11 @@ ErrCode StaService::SetRandomMacDisabled(bool isRandomMacDisabled) const
         return WIFI_OPT_SUCCESS;
     }
     WifiSettings::GetInstance().SetRandomMacDisabled(isRandomMacDisabled);
-    ReconnectByMDM();
+    ReconnectByMdm();
     return WIFI_OPT_SUCCESS;
 }
 
-void StaService::ReconnectByMdm()
+void StaService::ReconnectByMdm() const
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
@@ -740,12 +740,10 @@ void StaService::ReconnectByMdm()
         return;
     }
     std::string realMac;
-    std::string randomMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
-    WifiSettings::GetInstance().GetRandomMac(randomMac, m_instId);
     bool isRandomMacDisabled = IsRandomMacDisabled();
     if ((isRandomMacDisabled && realMac != targetNetwork.macAddress) ||
-        (!isRandomMacDisabled && randomMac != targetNetwork.macAddress)) {
+        (!isRandomMacDisabled && realMac == targetNetwork.macAddress)) {
         if (ConnectToNetwork(networkId, NETWORK_SELECTED_BY_MDM) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Connect to network failed");
         }

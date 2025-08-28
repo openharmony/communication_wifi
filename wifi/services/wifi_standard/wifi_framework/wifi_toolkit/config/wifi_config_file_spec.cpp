@@ -1120,7 +1120,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.scanOnlySwitch = true;
     item.realMacAddress = "";
     item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
-    item.isRandomMacDisabled = flase;
+    item.isRandomMacDisabled = false;
     return;
 }
 
@@ -1381,7 +1381,7 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"scanOnlySwitch=" << item.scanOnlySwitch << std::endl;
     ss << "    " <<"realMacAddress=" << item.realMacAddress << std::endl;
     ss << "    " <<"staApExclusionType=" << item.staApExclusionType << std::endl;
-    ss << "    " <<"isRandomMacDisabled=" << item.isRandomMacDisabled << std::endl
+    ss << "    " <<"isRandomMacDisabled=" << item.isRandomMacDisabled << std::endl;
     ss << "    " <<"</WifiConfig>" << std::endl;
     return ss.str();
 }

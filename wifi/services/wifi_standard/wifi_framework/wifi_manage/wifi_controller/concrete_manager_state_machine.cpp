@@ -504,7 +504,7 @@ bool ConcreteMangerMachine::HandleCommonMessage(InternalMessagePtr msg)
             HandleStaStart();
             return true;
         case CONCRETE_CMD_STOP:
-            DelayMessage(msg);
+            SendMessage(CONCRETE_CMD_STOP);
             SwitchState(pDefaultState);
             return true;
         case CONCRETE_CMD_STA_SEMI_ACTIVE:

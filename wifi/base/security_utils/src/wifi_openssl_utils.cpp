@@ -128,6 +128,7 @@ int WifiOpensslUtils::OpensslAesDecrypt(const uint8_t *cipherText, int cipherTex
     LOGI("enter %{public}s", __func__);
     int res = -1;
     if (cipherText == nullptr || cipherTextLen == 0 || info == nullptr ||
+        plainText == nullptr || plainTextLen == nullptr ||
         cipherTextLen <= AES_GCM_TAG_LEN) {
         LOGE("%{public}s param is illegal", __func__);
         return res;

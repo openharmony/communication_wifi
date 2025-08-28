@@ -39,6 +39,8 @@
 namespace OHOS {
 namespace Wifi {
 inline const int HID2D_TIMEOUT_INTERVAL = 10 * 1000;
+const int CHANNEL50 = 50;
+const int CHANNEL144 = 144;
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 
 class WifiConfigCenter {
@@ -364,6 +366,10 @@ public:
     bool IsNeedFastScan(void);
 
     void SetFastScan(bool fastScan);
+
+    void SetDfsControlData(DfsControlData dfsControlData);
+ 
+    DfsControlData GetDfsControlData();
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description set screen state
@@ -501,6 +507,7 @@ private:
     std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
     int systemMode_ = SystemMode::M_DEFAULT;
     int mDeviceType = ProductDeviceType::DEFAULT;
+    DfsControlData dfsControlData_ = DfsControlData();
 };
 } // namespace Wifi
 } // namespace OHOS

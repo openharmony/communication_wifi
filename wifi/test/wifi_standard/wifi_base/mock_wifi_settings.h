@@ -384,7 +384,7 @@ public:
     MOCK_METHOD2(SetOperatorWifiType, int(int type, int instId));
     MOCK_METHOD1(GetLastAirplaneMode, int(int instId));
     MOCK_METHOD2(SetLastAirplaneMode, int(int mode, int instId));
-    MOCK_CONST_METHOD0(IsRandomMacDisabled, bool(int instId));
+    MOCK_CONST_METHOD1(IsRandomMacDisabled, bool(int instId));
     MOCK_METHOD2(SetRandomMacDisabled, int(bool IsRandomMacDisabled, int instId));
     MOCK_METHOD1(GetCanOpenStaWhenAirplaneMode, bool(int instId));
     MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));

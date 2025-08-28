@@ -998,7 +998,7 @@ ErrCode WifiDeviceServiceImpl::IsRandomMacDisabled(bool &isRandomMacDisabled)
         WIFI_LOGE("IsRandomMacDisabeled:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (WifiPermissionUtils::VerifyGetWifiIConfigPermission() == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsRandomMacDisabeled:VerifyGetWifiIConfigPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }

@@ -83,6 +83,7 @@
         SetVoWifiDetectPeriod;
         GetVoWifiDetectPeriod;
         GetMultiLinkedInfo;
+        IsRandomMacDisabled;
         "*CompositeWifiFilter*";
         EnableLocalOnlyHotspot;
         DisableLocalOnlyHotspot;

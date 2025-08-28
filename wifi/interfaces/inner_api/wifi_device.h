@@ -233,7 +233,10 @@ public:
      * @param isRandomMacDisabeled: True for disabeled   False for enabeled
      * @return ErrCode - operation result
      */
-    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) {}
+    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
 
     /**
      * @Description Set Random Mac Disabled.
@@ -241,7 +244,10 @@ public:
      * @param isRandomMacDisabeled: True for disabeled   False for enabeled
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) {}
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
     
     /**
      * @Description Set the country code.

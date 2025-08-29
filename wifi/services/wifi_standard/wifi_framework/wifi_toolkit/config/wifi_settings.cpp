@@ -188,7 +188,12 @@ int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig
             }
         }
         if (wifiRestrictedList_[i].wifiRestrictedType == MDM_WHITELIST) {
-            whiteBlocks.emplace(wifiRestrictedList_[i].ssid + wifiRestrictedList_[i].bssid, wifiRestrictedList_[i]);
+            if (!wifiRestrictedList_[i].bssid.empty()) {
+                whiteBlocks.emplace(wifiRestrictedList_[i].ssid + wifiRestrictedList_[i].bssid, wifiRestrictedList_[i]);
+            } else {
+                whiteBlocks.emplace(wifiRestrictedList_[i].ssid + wifiRestrictedList_[i].bssid, wifiRestrictedList_[i]);
+            }
+            
         }
     }
     if (blockSsids.size() <= 0 && blockBssids.size() <= 0 && whiteBlocks.size() <= 0) {
@@ -197,8 +202,9 @@ int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig
     
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.instanceId == instId && ((blockSsids.find(iter->second.ssid) != blockSsids.end() ||
-            blockBssids.find(iter->second.bssid) != blockBssids.end()) ||
-            whiteBlocks.find(iter->second.ssid + iter->second.bssid) == whiteBlocks.end())) {
+            blockBssids.find(iter->second.bssid) != blockBssids.end()) || (!iter->second.bssid.empty() &&
+            whiteBlocks.find(iter->second.ssid + iter->second.bssid) == whiteBlocks.end()) ||
+            (iter->second.bssid.empty() && whiteBlocks.find(iter->second.ssid) == whiteBlocks.end()) {
             results.push_back(iter->second);
         }
     }
@@ -262,8 +268,9 @@ bool WifiSettings::FindWifiWhiteListConfig(const std::string &ssid,
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (size_t i = 0; i < wifiRestrictedList_.size(); i++) {
-        if (wifiRestrictedList_[i].wifiRestrictedType == MDM_WHITELIST && (wifiRestrictedList_[i].ssid == ssid ||
-            (!wifiRestrictedList_[i].bssid.empty() && wifiRestrictedList_[i].bssid == bssid))) {
+        if (wifiRestrictedList_[i].wifiRestrictedType == MDM_WHITELIST && wifiRestrictedList_[i].ssid == ssid &&
+            ((!wifiRestrictedList_[i].bssid.empty() && wifiRestrictedList_[i].bssid == bssid) ||
+            wifiRestrictedList_[i].bssid.empty()))) {
             LOGI("find wifi white list info successful!");
             return true;
         }

@@ -39,7 +39,7 @@ public:
      *
      * @param state - Wifi State
      */
-    virtual void OnWifiStateChanged(int state) = 0;
+    virtual void OnWifiStateChanged(int state) {};
 
     /**
      * @Description Deal wifi connection state change message
@@ -47,14 +47,14 @@ public:
      * @param state - Wifi connect state
      * @param info - WifiLinkedInfo object
      */
-    virtual void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) = 0;
+    virtual void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) {};
 
     /**
      * @Description Deal wifi rssi change message
      *
      * @param rssi - rssi
      */
-    virtual void OnWifiRssiChanged(int rssi) = 0;
+    virtual void OnWifiRssiChanged(int rssi) {};
 
     /**
      * @Description Deal wps state change message
@@ -62,21 +62,21 @@ public:
      * @param state - wps state
      * @param pinCode - when wps pin mode, open wps successfully, return the pin code
      */
-    virtual void OnWifiWpsStateChanged(int state, const std::string &pinCode) = 0;
+    virtual void OnWifiWpsStateChanged(int state, const std::string &pinCode) {};
 
     /**
      * @Description Deal stream change message
      *
      * @param direction - stream direction
      */
-    virtual void OnStreamChanged(int direction) = 0;
+    virtual void OnStreamChanged(int direction) {};
 
     /**
      * @Description Deal device config change message
      *
      * @param ConfigChange - change type of config
      */
-    virtual void OnDeviceConfigChanged(ConfigChange value) = 0;
+    virtual void OnDeviceConfigChanged(ConfigChange value) {};
 
     /**
      * @Description Deal candidate approval status change message

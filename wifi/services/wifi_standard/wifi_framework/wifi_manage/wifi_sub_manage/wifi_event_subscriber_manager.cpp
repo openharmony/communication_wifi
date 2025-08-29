@@ -686,14 +686,12 @@ void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEven
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_AIRPLANE_MODE_CHANGED) {
         if (code == 1) {
             /* open airplane mode */
-            if (WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_OPEN)) {
-                WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(1);
-            }
+            WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_OPEN);
+            WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(1);
         } else {
             /* close airplane mode */
-            if (WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_CLOSE)) {
-                WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(0);
-            }
+            WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_CLOSE);
+            WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(0);
         }
     }
 }

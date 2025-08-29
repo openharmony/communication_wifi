@@ -431,6 +431,7 @@
         "OHOS::Wifi::ArpChecker::~ArpChecker()";
         "OHOS::Wifi::WifiControllerMachine::IsLocalOnlyHotspot(bool)";
         "OHOS::Wifi::WifiControllerMachine::ShouldUseRpt(int)";
+        "OHOS::Wifi::WifiControllerMachine::IsOpenSoftApAllowed(int)";
         "OHOS::Wifi::WifiSettings::SyncP2pVendorConfig()";
         "OHOS::Wifi::WifiSettings::AddRandomMac(OHOS::Wifi::WifiStoreRandomMac&)";
         "OHOS::Wifi::WifiNetAgent::DelInterfaceAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";

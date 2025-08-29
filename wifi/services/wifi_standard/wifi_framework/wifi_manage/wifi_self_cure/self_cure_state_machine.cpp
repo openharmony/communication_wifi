@@ -1316,6 +1316,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
     }
 
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    MultiGateway::GetInstance().SetStaticArp(ifaceName, ipAddr, macString);
     if (!pSelfCureStateMachine_->IsHttpReachable()) {
         MultiGateway::GetInstance().DelStaticArp(ifaceName, ipAddr);
         pSelfCureStateMachine_->SendMessage(WIFI_CURE_CMD_MULTI_GATEWAY);

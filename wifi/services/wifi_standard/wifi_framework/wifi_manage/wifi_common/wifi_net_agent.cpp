@@ -286,7 +286,7 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
 {
     unsigned int prefixLength =
         static_cast<unsigned int>(IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask)));
-    sptr<NetManagerStandard::INetAddr> netAddr = sptr<NetManagerStandard::INetAddr>::MakeSptr();
+    sptr<NetManagerStandard::INetAddr> netAddr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     if (netAddr == nullptr) {
         WIFI_LOGE("%{public}s netAddr is null", __func__);
         return;
@@ -298,7 +298,7 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netAddr->prefixlen_ = prefixLength;
     netLinkInfo->netAddrList_.push_back(*netAddr);
 
-    sptr<NetManagerStandard::INetAddr> netIpv6Addr = sptr<NetManagerStandard::INetAddr>::MakeSptr();
+    sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
     if (netIpv6Addr == nullptr) {
         WIFI_LOGE("%{public}s netIpv6Addr is null", __func__);
         return;

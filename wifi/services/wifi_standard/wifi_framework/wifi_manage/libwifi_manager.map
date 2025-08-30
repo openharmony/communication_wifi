@@ -161,6 +161,7 @@
         "OHOS::Wifi::WifiConfigCenter::GetNetworkControlInfo()";
         "OHOS::Wifi::WifiConfigCenter::SetNetworkControlInfo(OHOS::Wifi::WifiNetworkControlInfo const&)";
         "OHOS::Wifi::WifiConfigCenter::SetLocalOnlyHotspotConfig(OHOS::Wifi::HotspotConfig const&)";
+        "OHOS::Wifi::WifiConfigCenter::GetDfsControlData()";
         "OHOS::Wifi::WifiScanConfig::GetScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
         "OHOS::Wifi::WifiScanConfig::SaveScanDeviceInfo(OHOS::Wifi::WifiScanDeviceInfo&)";
         "OHOS::Wifi::WifiScanConfig::SetAppRunningState(OHOS::Wifi::ScanMode)";
@@ -349,7 +350,6 @@
         "OHOS::Wifi::WifiChannelHelper::GetValidBands(std::__h::vector<OHOS::Wifi::BandType, std::__h::allocator<OHOS::Wifi::BandType>>&)";
         "OHOS::Wifi::WifiChannelHelper::GetValidChannels(std::__h::map<OHOS::Wifi::BandType, std::__h::vector<int, std::__h::allocator<int>>, std::__h::less<OHOS::Wifi::BandType>, std::__h::allocator<std::__h::pair<OHOS::Wifi::BandType const, std::__h::vector<int, std::__h::allocator<int>>>>>&)";
         "OHOS::Wifi::WifiChannelHelper::FilterDfsChannel(std::__h::vector<int, std::__h::allocator<int>>&)";
-        "OHOS::Wifi::WifiConfigCenter::GetDfsControlData()";
         "OHOS::Wifi::WifiCountryCodeManager::GetInstance()";
         "OHOS::Wifi::WifiCountryCodeManager::Init()";
         "OHOS::Wifi::WifiCountryCodeManager::GetWifiCountryCode(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&) const";

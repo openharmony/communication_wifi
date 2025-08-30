@@ -193,7 +193,6 @@ int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig
             } else {
                 whiteBlocks.emplace(wifiRestrictedList_[i].ssid, wifiRestrictedList_[i]);
             }
-            
         }
     }
     if (blockSsids.size() <= 0 && blockBssids.size() <= 0 && whiteBlocks.size() <= 0) {

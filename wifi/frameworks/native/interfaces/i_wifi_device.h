@@ -177,27 +177,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) = 0;
-    
-    /**
-     * @Description Get Random Mac Disabeled.
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled)
-    {
-        return WIFI_OPT_NOT_SUPPORTED;
-    }
-
-    /**
-     * @Description Set Random Mac Disabled.
-     *
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled)
-    {
-        return WIFI_OPT_NOT_SUPPORTED;
-    }
 
     /**
      * @Description Connecting to a Specified Network
@@ -682,6 +661,27 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
+
+    /**
+     * @Description Get Random Mac Disabeled.
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+
+    /**
+     * @Description Set Random Mac Disabled.
+     *
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

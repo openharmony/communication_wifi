@@ -1248,29 +1248,6 @@ void WifiDeviceStub::OnIsFeatureSupported(uint32_t code, MessageParcel &data, Me
     return;
 }
 
-void WifiDeviceStub::OnIsRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply)
-{
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    bool isRandomMacDisabled = false;
-    ErrCode ret = IsRandomMacDisabled(isRandomMacDisabled);
-    reply.WriteInt32(0);
-    reply.WriteInt32(ret);
-    if (ret == WIFI_OPT_SUCCESS) {
-        reply.WriteBool(isRandomMacDisabled);
-    }
-    return;
-}
-
-void WifiDeviceStub::OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply)
-{
-    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
-    bool isRandomMacDisabled = data.ReadBool();
-    ErrCode ret = SetRandomMacDisabled(isRandomMacDisabled);
-    reply.WriteInt32(0);
-    reply.WriteInt32(ret);
-    return;
-}
-
 void WifiDeviceStub::OnGetDeviceMacAdd(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -1655,6 +1632,29 @@ void WifiDeviceStub::OnGetVoWifiDetectPeriod(uint32_t code, MessageParcel &data,
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(period);
     }
+    return;
+}
+
+void WifiDeviceStub::OnIsRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isRandomMacDisabled = false;
+    ErrCode ret = IsRandomMacDisabled(isRandomMacDisabled);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(isRandomMacDisabled);
+    }
+    return;
+}
+
+void WifiDeviceStub::OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isRandomMacDisabled = data.ReadBool();
+    ErrCode ret = SetRandomMacDisabled(isRandomMacDisabled);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
     return;
 }
 }  // namespace Wifi

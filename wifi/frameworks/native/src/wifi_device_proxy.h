@@ -183,21 +183,6 @@ public:
     ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) override;
 
     /**
-     * @Description Is Random Mac Disabeled.
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
-     * @return ErrCode - operation result
-     */
-    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
-
-    /**
-     * @Description Set Random Mac Disabeled.
-     *
-     * @param isRandomMacDisabeled: True for disabeled   False for not disabeled
-     * @return ErrCode - operation result
-     */
-    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
-
-    /**
      * @Description Connecting to a Specified Network
      *
      * @param networkId - network id
@@ -678,6 +663,21 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
+    
+    /**
+     * @Description Is Random Mac Disabeled.
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @return ErrCode - operation result
+     */
+    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
+
+    /**
+     * @Description Set Random Mac Disabeled.
+     *
+     * @param isRandomMacDisabeled: True for disabeled   False for not disabeled
+     * @return ErrCode - operation result
+     */
+    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

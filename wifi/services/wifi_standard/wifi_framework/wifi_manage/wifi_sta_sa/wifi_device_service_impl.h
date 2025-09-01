@@ -123,10 +123,6 @@ public:
 
     ErrCode GetCountryCode(std::string &countryCode) override;
 
-    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
-
-    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
-
     ErrCode SetAppFrozen(std::set<int> pidList, bool isFrozen) override;
 
     ErrCode ResetAllFrozenApp() override;
@@ -218,6 +214,10 @@ public:
     ErrCode GetVoWifiDetectPeriod(int &period) override;
 
     ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
+
+    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
+
+    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

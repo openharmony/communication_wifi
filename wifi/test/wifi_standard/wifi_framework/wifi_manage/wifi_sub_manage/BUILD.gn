@@ -32,6 +32,7 @@ ohos_unittest("wifi_sub_manage_unittest") {
     ubsan = false  # Enable some Ubsan options
     cfi_vcall_icall_only = true
     debug = false
+    blocklist = "$WIFI_ROOT_DIR/test/cfi_blocklist.txt"
   }
 
   sources = [

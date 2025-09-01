@@ -152,9 +152,6 @@ WifiErrorCode AllowAutoConnect(int32_t networkId, bool isAllowed);
  * @return ErrCode - operation result
  */
 WifiErrorCode  IsRandomMacDisabled(bool &isRandomMacDisabled)
-    {
-        return WIFI_OPT_NOT_SUPPORTED;
-    }
 
 /**
  * @Description Set Random Mac Disabled.
@@ -163,9 +160,6 @@ WifiErrorCode  IsRandomMacDisabled(bool &isRandomMacDisabled)
  * @return ErrCode - operation result
  */
 WifiErrorCode  SetRandomMacDisabled(bool isRandomMacDisabled)
-    {
-        return WIFI_OPT_NOT_SUPPORTED;
-    }
 
 /**
  * @brief Disable a hotspot configuration matching a specified <b>networkId</b>. If the config is disabled, it will

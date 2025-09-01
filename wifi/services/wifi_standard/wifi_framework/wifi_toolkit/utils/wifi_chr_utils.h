@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Wifi {
 const int SIGNALARR_LENGTH = 6;
+inline const int BEACON_ABNORMAL_TWO_HOUR = 2 * 60 * 60;
 
 class WifiChrUtils {
 public:
@@ -39,6 +40,7 @@ private:
     std::vector<WifiSignalPollInfo> signalPollInfoArray;
     std::mutex signalInfoMutex;
     WifiSignalPollInfo signalPollInfoItem_;
+    int64_t intTime_ = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

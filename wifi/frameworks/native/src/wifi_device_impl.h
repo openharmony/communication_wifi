@@ -236,21 +236,6 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetDisconnectedReason(DisconnectedReason &reason) override;
-
-    /**
-     * @Description Is Random Mac Disabeled.
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
-     * @return ErrCode - operation result
-     */
-    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
-
-    /**
-     * @Description Set Random Mac Disabeled.
-     *
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
-     * @return ErrCode - operation result
-     */
-    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
     
     /**
      * @Description Set the Country Code
@@ -693,6 +678,21 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
+    
+    /**
+     * @Description Is Random Mac Disabeled.
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @return ErrCode - operation result
+     */
+    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
+
+    /**
+     * @Description Set Random Mac Disabeled.
+     *
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @return ErrCode - operation result
+     */
+    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

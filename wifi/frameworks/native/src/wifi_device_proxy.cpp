@@ -1855,70 +1855,6 @@ ErrCode WifiDeviceProxy::GetDeviceMacAddress(std::string &result)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiDeviceProxy::IsRandomMacDisabled(bool &isRandomMacDisabled)
-{
-    if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
-        return WIFI_OPT_FAILED;
-    }
-    MessageOption option;
-    MessageParcel data;
-    MessageParcel reply;
-    if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
-        return WIFI_OPT_FAILED;
-    }
-    data.WriteInt32(0);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED),
-        data, reply, option);
-    if (error != ERR_NONE) {
-        WIFI_LOGE("Is Random Mac Disabeled (%{public}d) failed,error code is %{public}d",
-            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED), error);
-        return WIFI_OPT_FAILED;
-    }
-
-    int exception = reply.ReadInt32();
-    if (exception) {
-        return WIFI_OPT_FAILED;
-    }
-    int ret = reply.ReadInt32();
-    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
-        return ErrCode(ret);
-    }
-    isRandomMacDisabled = reply.ReadBool();
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode WifiDeviceProxy::SetRandomMacDisabled(bool isRandomMacDisabled)
-{
-    if (mRemoteDied) {
-        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
-        return WIFI_OPT_FAILED;
-    }
-    MessageOption option;
-    MessageParcel data;
-    MessageParcel reply;
-    if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
-        return WIFI_OPT_FAILED;
-    }
-    data.WriteInt32(0);
-    data.WriteBool(isRandomMacDisabled);
-    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED),
-        data, reply, option);
-    if (error != ERR_NONE) {
-        WIFI_LOGE("Is Random Mac Disabeled (%{public}d) failed,error code is %{public}d",
-            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED), error);
-        return WIFI_OPT_FAILED;
-    }
-
-    int exception = reply.ReadInt32();
-    if (exception) {
-        return WIFI_OPT_FAILED;
-    }
-    return ErrCode(reply.ReadInt32());
-}
-
 bool WifiDeviceProxy::SetLowLatencyMode(bool enabled)
 {
     if (mRemoteDied) {
@@ -3006,6 +2942,70 @@ void WifiDeviceProxy::OnWifiStateChanged(int state)
     } else {
         g_deviceCallBackStub->SetWifiState(false);
     }
+}
+
+ErrCode WifiDeviceProxy::IsRandomMacDisabled(bool &isRandomMacDisabled)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Is Random Mac Disabeled (%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED), error);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    int ret = reply.ReadInt32();
+    if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
+        return ErrCode(ret);
+    }
+    isRandomMacDisabled = reply.ReadBool();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceProxy::SetRandomMacDisabled(bool isRandomMacDisabled)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteBool(isRandomMacDisabled);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Is Random Mac Disabeled (%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED), error);
+        return WIFI_OPT_FAILED;
+    }
+
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
 }
 }  // namespace Wifi
 }  // namespace OHOS

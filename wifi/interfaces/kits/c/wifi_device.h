@@ -147,21 +147,6 @@ WifiErrorCode RemoveDevice(int networkId);
 WifiErrorCode AllowAutoConnect(int32_t networkId, bool isAllowed);
 
 /**
- * @Description Get Random Mac Disabeled.
- * @param isRandomMacDisabeled: True for disabeled   False for enabeled
- * @return ErrCode - operation result
- */
-WifiErrorCode  IsRandomMacDisabled(bool &isRandomMacDisabled);
-
-/**
- * @Description Set Random Mac Disabled.
- *
- * @param isRandomMacDisabeled: True for disabeled   False for enabeled
- * @return ErrCode - operation result
- */
-WifiErrorCode  SetRandomMacDisabled(bool isRandomMacDisabled);
-
-/**
  * @brief Disable a hotspot configuration matching a specified <b>networkId</b>. If the config is disabled, it will
  * not be auto connected.
  *
@@ -377,6 +362,27 @@ WifiErrorCode GetWifiDetailState(WifiDetailState *state);
  * @return ErrCode - operation result
  */
 WifiErrorCode GetMultiLinkedInfo(WifiLinkedInfo *result, unsigned int *size);
+
+    /**
+     * @Description Get Random Mac Disabeled.
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsRandomMacDisabled(bool *isRandomMacDisabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+
+    /**
+     * @Description Set Random Mac Disabled.
+     *
+     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
 #ifdef __cplusplus
 }
 #endif

@@ -203,7 +203,7 @@ public:
      *
      * @return True for Disabeled, false for Not Disabeled
      */
-    virtual bool IsRandomMacDisabled() const;    
+    virtual bool IsRandomMacDisabled() const;
     /**
      * @Description Set Random Mac Disabeled.
      *

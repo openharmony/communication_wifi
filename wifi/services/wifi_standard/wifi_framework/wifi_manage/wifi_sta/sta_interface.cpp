@@ -287,7 +287,7 @@ ErrCode StaInterface::IsRandomMacDisabled(bool &isRandomMacDisabled)
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     isRandomMacDisabled = pStaService->IsRandomMacDisabled();
-    return WIFI_OPT_SUCCESS;;
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaInterface::SetRandomMacDisabled(bool isRandomMacDisabled)

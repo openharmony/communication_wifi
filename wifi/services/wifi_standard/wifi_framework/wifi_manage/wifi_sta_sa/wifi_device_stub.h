@@ -110,7 +110,7 @@ private:
     void OnSetVoWifiDetectPeriod(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetVoWifiDetectPeriod(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply);   
+    void OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply);
 
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);

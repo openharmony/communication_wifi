@@ -712,7 +712,7 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
 
 bool StaService::IsRandomMacDisabled() const
 {
-    return WifiSettings::GetInstance().IsRandomMacDisabled(); 
+    return WifiSettings::GetInstance().IsRandomMacDisabled();
 }
 
 ErrCode StaService::SetRandomMacDisabled(bool isRandomMacDisabled) const

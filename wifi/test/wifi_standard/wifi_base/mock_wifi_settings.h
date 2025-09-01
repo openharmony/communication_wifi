@@ -198,8 +198,6 @@ public:
     virtual int SetOperatorWifiType(int type, int instId = 0) = 0;
     virtual int GetLastAirplaneMode(int instId = 0) = 0;
     virtual int SetLastAirplaneMode(int mode, int instId = 0) = 0;
-    virtual int SetRandomMacDisabled(bool IsRandomMacDisabled, int instId = 0) = 0;
-    virtual bool IsRandomMacDisabled(int instId = 0) const = 0;
     virtual bool GetCanOpenStaWhenAirplaneMode(int instId = 0) = 0;
     virtual bool GetWifiFlagOnAirplaneMode(int instId = 0) = 0;
     virtual int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0) = 0;
@@ -219,6 +217,8 @@ public:
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
+    virtual bool IsRandomMacDisabled(int instId = 0) = 0;
+    virtual int SetRandomMacDisabled(bool isRandomMacDisabled, int instId = 0) = 0;
 };
 class WifiSettings : public MockWifiSettings {
 public:
@@ -384,8 +384,6 @@ public:
     MOCK_METHOD2(SetOperatorWifiType, int(int type, int instId));
     MOCK_METHOD1(GetLastAirplaneMode, int(int instId));
     MOCK_METHOD2(SetLastAirplaneMode, int(int mode, int instId));
-    MOCK_CONST_METHOD1(IsRandomMacDisabled, bool(int instId));
-    MOCK_METHOD2(SetRandomMacDisabled, int(bool IsRandomMacDisabled, int instId));
     MOCK_METHOD1(GetCanOpenStaWhenAirplaneMode, bool(int instId));
     MOCK_METHOD1(GetWifiFlagOnAirplaneMode, bool(int instId));
     MOCK_METHOD2(SetWifiFlagOnAirplaneMode, int(bool ifOpen, int instId));
@@ -406,6 +404,9 @@ public:
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetSupportHwPnoFlag, bool(int instId));
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
+    MOCK_METHOD1(IsRandomMacDisabled, bool(int instId));
+    MOCK_METHOD2(SetRandomMacDisabled, int(bool isRandomMacDisabled, int instId));
+    
 };
 }  // namespace Wifi
 }  // namespace OHOS

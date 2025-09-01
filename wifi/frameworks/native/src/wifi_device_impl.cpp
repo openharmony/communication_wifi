@@ -450,7 +450,7 @@ ErrCode WifiDeviceImpl::IsRandomMacDisabled(bool &isRandomMacDisabled)
 ErrCode WifiDeviceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    RETURN_IF_FAIL(GetWifiDeviceProxy());     
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->SetRandomMacDisabled(isRandomMacDisabled);
 }
 

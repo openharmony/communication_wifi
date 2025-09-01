@@ -320,6 +320,14 @@ ErrCode WifiP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 ErrCode WifiP2pService::QueryP2pLocalDevice(WifiP2pDevice &device)
 {
     LOGI("QueryP2pLocalDevice");
+#ifdef NON_SEPERATE_P2P
+    std::string deviceAddr;
+    if (WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddr) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+        WIFI_LOGE("Failed to get device address.");
+        return ErrCode::WIFI_OPT_FAILED;
+    }
+    deviceManager.GetThisDevice().SetDeviceAddress(deviceAddr);
+#endif
     device = deviceManager.GetThisDevice();
     return ErrCode::WIFI_OPT_SUCCESS;
 }

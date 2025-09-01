@@ -220,13 +220,13 @@ ErrCode StaInterface::EnableAutoJoin(const std::string &conditionName)
 
 ErrCode StaInterface::SetRandomMacDisabled(bool isRandomMacDisabled)
 {
-    LOGI("SetRandomMacDisabled, isRandomMacDisabled=[%{public}d]!", isRandomMacDisabled);
+    LOGI("Enter SetRandomMacDisabled, isRandomMacDisabled=[%{public}d]!", isRandomMacDisabled);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaInterface::IsRandomMacDisabled(bool &isRandomMacDisabled)
 {
-    LOGI("Enter IsRandomMacDisabled", mode);
+    LOGI("Enter IsRandomMacDisabled");
     return WIFI_OPT_SUCCESS;
 }
 

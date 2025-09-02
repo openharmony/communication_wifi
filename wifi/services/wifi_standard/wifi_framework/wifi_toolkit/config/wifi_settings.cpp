@@ -155,7 +155,7 @@ int WifiSettings::AddDeviceConfig(const WifiDeviceConfig &config)
 ErrCode WifiSettings::AddWifiRestrictedListConfig(int uid, const WifiRestrictedInfo& wifiListInfo)
 {
     if ((wifiListInfo.ssid.empty() && wifiListInfo.wifiRestrictedType == MDM_BLOCKLIST) ||
-    (wifiListInfo.wifiRestrictedType == MDM_WHITELIST && wifiListInfo.ssid.empty())) {
+        (wifiListInfo.wifiRestrictedType == MDM_WHITELIST && wifiListInfo.ssid.empty())) {
         return WIFI_OPT_INVALID_PARAM;
     }
     std::unique_lock<std::mutex> lock(mStaMutex);
@@ -188,7 +188,11 @@ int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig
             }
         }
         if (wifiRestrictedList_[i].wifiRestrictedType == MDM_WHITELIST) {
-            whiteBlocks.emplace(wifiRestrictedList_[i].ssid + wifiRestrictedList_[i].bssid, wifiRestrictedList_[i]);
+            if (!wifiRestrictedList_[i].bssid.empty()) {
+                whiteBlocks.emplace(wifiRestrictedList_[i].ssid + wifiRestrictedList_[i].bssid, wifiRestrictedList_[i]);
+            } else {
+                whiteBlocks.emplace(wifiRestrictedList_[i].ssid, wifiRestrictedList_[i]);
+            }
         }
     }
     if (blockSsids.size() <= 0 && blockBssids.size() <= 0 && whiteBlocks.size() <= 0) {
@@ -197,8 +201,9 @@ int WifiSettings::GetMdmRestrictedBlockDeviceConfig(std::vector<WifiDeviceConfig
     
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
         if (iter->second.instanceId == instId && ((blockSsids.find(iter->second.ssid) != blockSsids.end() ||
-            blockBssids.find(iter->second.bssid) != blockBssids.end()) ||
-            whiteBlocks.find(iter->second.ssid + iter->second.bssid) == whiteBlocks.end())) {
+            blockBssids.find(iter->second.bssid) != blockBssids.end()) || (!iter->second.bssid.empty() &&
+            whiteBlocks.find(iter->second.ssid + iter->second.bssid) == whiteBlocks.end()) ||
+            (iter->second.bssid.empty() && whiteBlocks.find(iter->second.ssid) == whiteBlocks.end()))) {
             results.push_back(iter->second);
         }
     }
@@ -214,7 +219,7 @@ ErrCode WifiSettings::CheckWifiMdmRestrictedList(const std::vector<WifiRestricte
     ErrCode code = WIFI_OPT_SUCCESS;
     for (size_t i = 0; i < wifiRestrictedInfoList.size(); i++) {
         if ((wifiRestrictedInfoList[i].ssid.empty() && wifiRestrictedInfoList[i].wifiRestrictedType == MDM_BLOCKLIST) ||
-        (wifiRestrictedInfoList[i].wifiRestrictedType == MDM_WHITELIST && wifiRestrictedInfoList[i].ssid.empty())) {
+            (wifiRestrictedInfoList[i].wifiRestrictedType == MDM_WHITELIST && wifiRestrictedInfoList[i].ssid.empty())) {
             code = WIFI_OPT_INVALID_PARAM;
             break;
         }
@@ -263,7 +268,8 @@ bool WifiSettings::FindWifiWhiteListConfig(const std::string &ssid,
     std::unique_lock<std::mutex> lock(mStaMutex);
     for (size_t i = 0; i < wifiRestrictedList_.size(); i++) {
         if (wifiRestrictedList_[i].wifiRestrictedType == MDM_WHITELIST && wifiRestrictedList_[i].ssid == ssid &&
-            wifiRestrictedList_[i].bssid == bssid) {
+            ((!wifiRestrictedList_[i].bssid.empty() && wifiRestrictedList_[i].bssid == bssid) ||
+            wifiRestrictedList_[i].bssid.empty())) {
             LOGI("find wifi white list info successful!");
             return true;
         }

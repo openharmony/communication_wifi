@@ -284,14 +284,18 @@ ErrCode StaInterface::AllowAutoConnect(int32_t networkId, bool isAllowed)
 ErrCode StaInterface::IsRandomMacDisabled(bool &isRandomMacDisabled)
 {
     LOGI("Enter IsRandomMacDisabled.\n");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    isRandomMacDisabled = pStaService->IsRandomMacDisabled();
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaInterface::SetRandomMacDisabled(bool isRandomMacDisabled)
 {
-    LOGI("Enter SetRandomMacDisabled, isRandomMacDisabled:%{public}d", isRandomMacDisabled);
-
-    return WIFI_OPT_SUCCESS;
+    lOGI("Enter SetRandomMacDisabled, isRandomMacDisabled:%{public}d", isRandomMacDisabled);
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->SetRandomMacDisabled(isRandomMacDisabled);
 }
 
 ErrCode StaInterface::StartWps(const WpsConfig &config)

@@ -364,19 +364,22 @@ WifiErrorCode GetWifiDetailState(WifiDetailState *state);
 WifiErrorCode GetMultiLinkedInfo(WifiLinkedInfo *result, unsigned int *size);
 
     /**
-     * @Description Get Random Mac Disabeled.
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
-     * @return ErrCode - operation result
+     * @Description Get Random Mac Disabled.
+     * @param isRandomMacDisabled: True for disabled   False for enabled
+     * @return Returns {@link WIFI_SUCCESS} get randommacdisabled successfully; returns an error code defined in
+ * {@link WifiErrorCode} otherwise.
      */
 WifiErrorCode IsRandomMacDisabled(bool *isRandomMacDisabled);
 
     /**
      * @Description Set Random Mac Disabled.
      *
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
-     * @return ErrCode - operation result
+     * @param isRandomMacDisabled: True for disabled   False for enabled
+     * @return Returns {@link WIFI_SUCCESS} set randommacdisabled successfully; returns an error code defined in
+ * {@link WifiErrorCode} otherwise.
      */
 WifiErrorCode SetRandomMacDisabled(bool isRandomMacDisabled);
+
 #ifdef __cplusplus
 }
 #endif

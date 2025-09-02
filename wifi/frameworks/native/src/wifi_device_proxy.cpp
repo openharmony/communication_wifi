@@ -2996,7 +2996,7 @@ ErrCode WifiDeviceProxy::SetRandomMacDisabled(bool isRandomMacDisabled)
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED),
         data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Is Random Mac Disabeled (%{public}d) failed,error code is %{public}d",
+        WIFI_LOGE("Set Random Mac Disabeled (%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED), error);
         return WIFI_OPT_FAILED;
     }

@@ -710,14 +710,9 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
     return WIFI_OPT_SUCCESS;
 }
 
-bool StaService::IsRandomMacDisabled() const
-{
-    return WifiSettings::GetInstance().IsRandomMacDisabled();
-}
-
 ErrCode StaService::SetRandomMacDisabled(bool isRandomMacDisabled) const
 {
-    if (IsRandomMacDisabled() == isRandomMacDisabled) {
+    if (WifiSettings::GetInstance().IsRandomMacDisabled() == isRandomMacDisabled) {
         return WIFI_OPT_SUCCESS;
     }
     WifiSettings::GetInstance().SetRandomMacDisabled(isRandomMacDisabled);
@@ -725,30 +720,32 @@ ErrCode StaService::SetRandomMacDisabled(bool isRandomMacDisabled) const
     return WIFI_OPT_SUCCESS;
 }
 
-void StaService::ReconnectByMdm() const
+ErrCode StaService::ReconnectByMdm() const
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
     if (networkId == INVALID_NETWORK_ID) {
         WIFI_LOGE("No network connect");
-        return;
+        return WIFI_OPT_FAILED;
     }
     WifiDeviceConfig targetNetwork;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, targetNetwork)) {
         WIFI_LOGE("Failed tot get device config");
-        return;
+        return WIFI_OPT_FAILED;
     }
     std::string realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
-    bool isRandomMacDisabled = IsRandomMacDisabled();
+    bool isRandomMacDisabled = WifiSettings::GetInstance().IsRandomMacDisabled();
     if ((isRandomMacDisabled && realMac != targetNetwork.macAddress) ||
-        (!isRandomMacDisabled && realMac == targetNetwork.macAddress)) {
+        (!isRandomMacDisabled && targetNetwork.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC)) {
+        Disconnect();
         if (ConnectToNetwork(networkId, NETWORK_SELECTED_BY_MDM) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Connect to network failed");
+            return WIFI_OPT_FAILED;
         }
     }
-    return;
+    return WIFI_OPT_SUCCESS;
 }
 
 ErrCode StaService::Disconnect() const

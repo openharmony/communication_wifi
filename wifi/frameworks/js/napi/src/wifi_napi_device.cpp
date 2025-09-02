@@ -2019,7 +2019,7 @@ NO_SANITIZE("cfi") napi_value IsRandomMacDisabled(napi_env env, napi_callback_in
     ErrCode ret = wifiDevicePtr->IsRandomMacDisabled(isRandomMacDisabled);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Is Random Mac Disabeld: %{public}d", ret);
-        WIFI_NAPI_ASSERT(env, ret == true, ret, SYSCAP_WIFI_STA);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
     
     napi_value result;

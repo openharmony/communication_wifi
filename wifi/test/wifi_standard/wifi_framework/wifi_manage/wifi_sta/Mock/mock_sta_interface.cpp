@@ -224,12 +224,6 @@ ErrCode StaInterface::SetRandomMacDisabled(bool isRandomMacDisabled)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::IsRandomMacDisabled(bool &isRandomMacDisabled)
-{
-    LOGI("Enter IsRandomMacDisabled");
-    return WIFI_OPT_SUCCESS;
-}
-
 ErrCode StaInterface::RegisterAutoJoinCondition(const std::string &conditionName,
                                                 const std::function<bool()> &autoJoinCondition)
 {

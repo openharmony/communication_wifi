@@ -406,7 +406,6 @@ public:
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
     MOCK_METHOD1(IsRandomMacDisabled, bool(int instId));
     MOCK_METHOD2(SetRandomMacDisabled, int(bool isRandomMacDisabled, int instId));
-    
 };
 }  // namespace Wifi
 }  // namespace OHOS

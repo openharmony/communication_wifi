@@ -193,6 +193,9 @@ int ContextAppendWrite(Context *context, const char *buf, int len)
         return -1;
     }
 
+    if (ExpandWriteCache(context, len) < 0) {
+        return -1;
+    }
     if (context->rCapacity < context->wEnd || len < 0) {
         return -1;
     }

@@ -170,7 +170,7 @@ static int ContextAppendRead(Context *context, const char *buf, int len)
         return -1;
     }
     unsigned int tmp = context->rCapacity - context->rEnd;
-    if (len < tmp) {
+    if ((unsigned int)len < tmp) {
         if (memmove_s(context->szRead + context->rEnd, context->rCapacity - context->rEnd, buf, len) != EOK) {
             return -1;
         }
@@ -182,7 +182,7 @@ static int ContextAppendRead(Context *context, const char *buf, int len)
         if (tmp < len && memmove_s(context->szRead, len - tmp, buf + tmp, len - tmp) != EOK) {
             return -1;
         }
-        context->rEnd = (uint32_t)len - tmp;
+        context->rEnd = (unsigned int)len - tmp;
     }
     return 0;
 }
@@ -200,7 +200,7 @@ int ContextAppendWrite(Context *context, const char *buf, int len)
         return -1;
     }
     unsigned int tmp = context->wCapacity - context->wEnd;
-    if (len < tmp) {
+    if ((unsigned int)len < tmp) {
         if (memmove_s(context->szWrite + context->wEnd, context->wCapacity - context->wEnd, buf, len) != EOK) {
             return -1;
         }
@@ -212,7 +212,7 @@ int ContextAppendWrite(Context *context, const char *buf, int len)
         if (tmp < len && memmove_s(context->szWrite, len - tmp, buf + tmp, len - tmp) != EOK) {
             return -1;
         }
-        context->wEnd = (uint32_t)len - tmp;
+        context->wEnd = (unsigned int)len - tmp;
     }
     return 0;
 }

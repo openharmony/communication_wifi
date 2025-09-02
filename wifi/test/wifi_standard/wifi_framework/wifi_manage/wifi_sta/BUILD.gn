@@ -272,6 +272,16 @@ ohos_unittest("wifi_sta_unittest") {
 ohos_unittest("wifi_selfcure_unittest") {
   module_out_path = module_self_cure_output_path
   sources = local_base_sources
+  sanitize = {
+    cfi = true  # Enable/disable control flow integrity detection
+    boundary_sanitize = false  # Enable boundary san detection
+    cfi_cross_dso = true  # Cross-SO CFI Checks
+    integer_overflow = false  # Enable integer overflow detection
+    ubsan = false  # Enable some Ubsan options
+    cfi_vcall_icall_only = true
+    debug = false
+    blocklist = "$WIFI_ROOT_DIR/test/cfi_blocklist.txt"
+  }
   sources += [
     "$WIFI_ROOT_DIR/base/utils/wifi_datashare_utils.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hid2d_msg.cpp",

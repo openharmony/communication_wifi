@@ -665,16 +665,16 @@ public:
     ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
     
     /**
-     * @Description Is Random Mac Disabeled.
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @Description Is Random Mac Disabled.
+     * @param isRandomMacDisabled: True for disabled   False for enabled
      * @return ErrCode - operation result
      */
     ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 
     /**
-     * @Description Set Random Mac Disabeled.
+     * @Description Set Random Mac Disabled.
      *
-     * @param isRandomMacDisabeled: True for disabeled   False for not disabeled
+     * @param isRandomMacDisabled: True for disabled   False for enabled
      * @return ErrCode - operation result
      */
     ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;

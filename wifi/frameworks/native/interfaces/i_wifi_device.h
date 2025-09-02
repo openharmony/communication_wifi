@@ -664,7 +664,7 @@ public:
 
     /**
      * @Description Get Random Mac Disabeled.
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @param isRandomMacDisabled: True for disabled   False for enabled
      * @return ErrCode - operation result
      */
     virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled)
@@ -675,7 +675,7 @@ public:
     /**
      * @Description Set Random Mac Disabled.
      *
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @param isRandomMacDisabled: True for disabled   False for enabled
      * @return ErrCode - operation result
      */
     virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled)

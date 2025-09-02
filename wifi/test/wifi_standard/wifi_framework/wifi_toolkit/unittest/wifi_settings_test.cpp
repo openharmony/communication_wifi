@@ -828,6 +828,17 @@ HWTEST_F(WifiSettingsTest, whetherSetWhiteListConfigTest, TestSize.Level1)
     result = WifiSettings::GetInstance().WhetherSetWhiteListConfig();
     EXPECT_EQ(result, false);
 }
+
+HWTEST_F(WifiSettingsTest, IsRandomMacDisabledTest, TestSize.Level1)
+{
+    WIFI_LOGE("IsRandomMacDisabled enter!");
+    WifiSettings::GetInstance().SetRandomMacDisabled(true);
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    EXPECT_EQ(result, true);
+    WifiSettings::GetInstance().SetRandomMacDisabled(false);
+    result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    EXPECT_EQ(result, false);
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHO

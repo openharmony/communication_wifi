@@ -1063,8 +1063,7 @@ bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::st
     std::string currentMac, realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC ||
-        WifiSettings::GetInstance().IsRandomMacDisabled() ||
-        ShouldUseFactoryMac(deviceConfig)) {
+        WifiSettings::GetInstance().IsRandomMacDisabled() || ShouldUseFactoryMac(deviceConfig)) {
         currentMac = realMac;
     } else {
         WifiStoreRandomMac randomMacInfo;
@@ -1097,8 +1096,10 @@ bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::st
         return false;
     }
     deviceConfig.macAddress = currentMac;
-    deviceConfig.wifiPrivacySetting =
-        (currentMac == realMac) ? WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC;
+    if (!WifiSettings::GetInstance().IsRandomMacDisabled()) {
+        deviceConfig.wifiPrivacySetting =
+            (currentMac == realMac) ? WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC;
+    }
     WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
     LOGI("SetRandomMac wifiPrivacySetting:%{public}d,ssid:%{public}s,keyMgmt:%{public}s,macAddress:%{public}s",

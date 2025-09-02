@@ -254,18 +254,10 @@ public:
     /**
      * @Description Set Random Mac Disabled.
      *
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
+     * @param isRandomMacDisabled: True for disabled   False for enabled
      * @return WifiErrorNo
      */
     virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) = 0;
-
-    /**
-     * @Description Set Random Mac Disabled.
-     *
-     * @param isRandomMacDisabeled: True for disabeled   False for enabeled
-     * @return WifiErrorNo
-     */
-    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) = 0;
 
     /**
      * @Description send power mode for wpa.

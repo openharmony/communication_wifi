@@ -199,18 +199,12 @@ public:
      */
     virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) const;
     /**
-     * @Description Get Random Mac Disabeled.
+     * @Description Set Random Mac Disabled.
      *
-     * @return True for Disabeled, false for Not Disabeled
+     * @param isRandomMacDisabled: True for Disabled, false for enabled
+     * @return ErrCode - operation result
      */
-    virtual bool IsRandomMacDisabled() const;
-    /**
-     * @Description Set Random Mac Disabeled.
-     *
-     * @param isRandomMacDisabeled: True for Disabeled, false for Not Disabeled
-     * @return WifiErrorNo
-     */
-    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabeled) const;
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) const;
     /**
      * @Description  Start WPS Connection
      *
@@ -475,7 +469,7 @@ public:
     virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) const;
 #endif
 private:
-    void ReconnectByMdm() const;
+    ErrCode ReconnectByMdm() const;
     void NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig config, bool isRemoveAll) const;
     void NotifyCandidateApprovalStatus(CandidateApprovalStatus status) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;

@@ -1300,7 +1300,7 @@ std::map<std::string, Func> g_wifiConfigSetValueMap = {
     }},
     {"isRandomMacDisabled", [](WifiConfig &item, const std::string &value) -> void {
         std::string tmpValue = value;
-        item.isRandomMacDisabled = CheckDataLegal(tmpValue);
+        item.isRandomMacDisabled = (CheckDataLegal(tmpValue) != 0);
     }},
     {"version", [](WifiConfig &item, const std::string &value) -> void {
         //@deprecated

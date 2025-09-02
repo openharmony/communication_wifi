@@ -82,6 +82,10 @@ napi_value IsRandomMacDisabled(napi_env env, napi_callback_info info);
 class ScanInfoAsyncContext : public AsyncContext {
 public:
     std::vector<WifiScanInfo> vecScanInfos;
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 1e715629318cf0dde14515211e0fce7f2a2515ad
     ScanInfoAsyncContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr) :
         AsyncContext(env, work, deferred){}
 

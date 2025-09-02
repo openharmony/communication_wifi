@@ -368,10 +368,7 @@ WifiErrorCode GetMultiLinkedInfo(WifiLinkedInfo *result, unsigned int *size);
      * @param isRandomMacDisabeled: True for disabeled   False for enabeled
      * @return ErrCode - operation result
      */
-    virtual ErrCode IsRandomMacDisabled(bool *isRandomMacDisabled)
-    {
-        return WIFI_OPT_NOT_SUPPORTED;
-    }
+    virtual ErrCode IsRandomMacDisabled(bool *isRandomMacDisabled);
 
     /**
      * @Description Set Random Mac Disabled.
@@ -379,10 +376,7 @@ WifiErrorCode GetMultiLinkedInfo(WifiLinkedInfo *result, unsigned int *size);
      * @param isRandomMacDisabeled: True for disabeled   False for enabeled
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled)
-    {
-        return WIFI_OPT_NOT_SUPPORTED;
-    }
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled);
 #ifdef __cplusplus
 }
 #endif

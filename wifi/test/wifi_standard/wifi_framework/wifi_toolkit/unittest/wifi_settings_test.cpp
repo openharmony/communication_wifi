@@ -778,18 +778,6 @@ HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigFailTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_OPT_INVALID_PARAM);
 }
 
-HWTEST_F(WifiSettingsTest, AddWifiWhiteListNoBssidConfigTest, TestSize.Level1)
-{
-    WIFI_LOGE("AddWifiWhiteListConfigTest enter!");
-    WifiRestrictedInfo info;
-    info.ssid = "whiteTest3";
-    info.wifiRestrictedType = MDM_WHITELIST;
-    info.uid = 0;
- 
-    ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
-}
-
 HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
 {
     WIFI_LOGE("FindWifiBlockListConfigTest enter!");

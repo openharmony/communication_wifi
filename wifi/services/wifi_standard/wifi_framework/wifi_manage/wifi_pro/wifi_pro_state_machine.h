@@ -176,6 +176,11 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
+        int64_t screenOnTimeStamp_ = 0;
+        int64_t lastScanTimeStamp_ = 0;
+        int64_t scanIntervalTime_ = 20 * 1000 * 1000;
+        void HandleWifiScanResultInPortal(const InternalMessagePtr msg);
+        bool HandleHttpResultInPortal(const InternalMessagePtr msg);
     };
 
     ErrCode Initialize();

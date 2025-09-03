@@ -368,6 +368,7 @@ public:
     bool IsNeedFastScan(void);
 
     void SetFastScan(bool fastScan);
+    
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description set screen state

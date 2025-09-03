@@ -24,5 +24,18 @@ group("unittest") {
     "wifi_standard/wifi_framework/wifi_manage/wifi_scan:wifi_scan_unittest",
     "wifi_standard/wifi_framework/wifi_manage/wifi_sta_ext:wifi_sta_ext_unittest",
     "wifi_utils/unittest:utils_unittest",
+    "wifi_standard/native:native_unittest",
+    "wifi_standard/precompiled_macro:precompiled_macro_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/unittest:manager_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_ap:WifiApServiceTest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_controller:wifi_controller_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native_test",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_p2p/test:wifi_p2p_test",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_pro:wifi_pro_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_selfcure_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_sta:wifi_sta_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_sta_new:wifi_sta_new_unittest",
+    "wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage:wifi_sub_manage_unittest",
+    "wifi_standard/wifi_framework/wifi_toolkit/unittest:toolkit_unittest",
   ]
 }

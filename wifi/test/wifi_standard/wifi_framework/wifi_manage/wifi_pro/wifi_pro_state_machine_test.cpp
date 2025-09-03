@@ -730,7 +730,7 @@ HWTEST_F(WifiProStateMachineTest, WifiPortalStateExecuteStateMsgTest04, TestSize
     EXPECT_EQ(wifiPortalState_->ExecuteStateMsg(msg), false);
 }
 
-HWTEST_F(WifiProStateMachineTest, wifiPortalStateHandleHttpResultInPortalTest05, TestSize.Level1) 
+HWTEST_F(WifiProStateMachineTest, wifiPortalStateHandleHttpResultInPortalTest05, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(EVENT_CHECK_WIFI_INTERNET_RESULT);

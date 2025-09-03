@@ -1525,7 +1525,7 @@ bool WifiProStateMachine::WifiPortalState::HandleHttpResultInPortal(const Intern
     }
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
-        if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE || 
+        if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE ||
             WifiConfigCenter::GetInstance().GetBrowserState()) {
             WIFI_LOGI("IsNotAllowedToScan: screen state off or open browser.");
             return EXECUTED;

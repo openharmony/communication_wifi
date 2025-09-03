@@ -84,7 +84,11 @@ bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLe
     bool beaconAbnormal = OHOS::Wifi::IsBeaconAbnormal(bssid, wifiCheckInfo);
     if (beaconAbnormal) {
         LOGW("Beacon Abnormal, signalLevel: %{public}d", signalLevel);
-        WriteWifiBeaconLostHiSysEvent(BeaconLostType::BEACON_ABNORMAL);
+        const int64_t checkTime = wifiCheckInfo.timeStamp;
+        if (checkTime - intTime_ > BEACON_ABNORMAL_TWO_HOUR) {
+            intTime_ = checkTime;
+            WriteWifiBeaconLostHiSysEvent(BeaconLostType::BEACON_ABNORMAL);
+        }
     }
     return beaconLost;
 }

@@ -42,7 +42,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_OUT_OF_REF;
     }
 
-    static const char *NameSpaceName = "L@ohos/wifiManager/wifiManager;";
+    static const char *NameSpaceName = "@ohos.wifiManager.wifiManager";
     ani_namespace wifimanager {};
     if (ANI_OK != env->FindNamespace(NameSpaceName, &wifimanager)) {
         std::cerr << "Not found '" << NameSpaceName << "'" << std::endl;
@@ -50,7 +50,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     std::array functions = {
-        ani_native_function {"isWifiActive", ":Z", reinterpret_cast<ani_boolean *>(IsWifiActive)},
+        ani_native_function {"isWifiActive", ":z", reinterpret_cast<ani_boolean *>(IsWifiActive)},
     };
 
     if (ANI_OK != env->Namespace_BindNativeFunctions(wifimanager, functions.data(), functions.size())) {

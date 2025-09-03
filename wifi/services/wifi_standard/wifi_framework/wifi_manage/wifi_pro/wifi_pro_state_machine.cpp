@@ -47,6 +47,9 @@ constexpr int64_t DEFAULT_NET_DISABLE_DETECT_COUNT = 2;
 constexpr int64_t MIN_TCP_TX = 2;
 constexpr int64_t MIN_DNS_FAILED_CNT = 2;
 constexpr int32_t WIFI_PRO_DETECT_TIMEOUT = 16 * 1000;  // ms
+constexpr int64_t MAX_INTERVAL_TIME = 120 * 1000 * 1000;
+constexpr int64_t SCREEN_ON_DURATIONSECS = 30 * 1000 * 1000;
+constexpr int64_t DEFAULT_SCAN_INTERVAL_TIME = 20 * 1000 * 1000;
 // show reason
 std::map<WifiSwitchReason, std::string> g_switchReason = {
     {WIFI_SWITCH_REASON_NO_INTERNET, "NO_INTERNET"},
@@ -405,6 +408,8 @@ bool WifiProStateMachine::SelectNetwork(NetworkSelectionResult &networkSelection
         mNetworkSelectType = NetworkSelectType::WIFI2WIFI_QOE_BAD;
     } else if (wifiSwitchReason_ == WIFI_SWITCH_REASON_NO_INTERNET) {
         mNetworkSelectType = NetworkSelectType::WIFI2WIFI_NONET;
+    } else if (wifiSwitchReason_ == WIFI_SWITCH_REASON_PORTAL) {
+        mNetworkSelectType = NetworkSelectType::WIFI2WIFI_PORTAL;
     } else {
         mNetworkSelectType = NetworkSelectType::WIFI2WIFI;
     }
@@ -1428,13 +1433,24 @@ WifiProStateMachine::WifiPortalState::~WifiPortalState() {}
 void WifiProStateMachine::WifiPortalState::GoInState()
 {
     WIFI_LOGI("WifiPortalState GoInState function.");
+    pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_PORTAL;
     pWifiProStateMachine_->perf5gHandoverService_.NetworkStatusChanged(NetworkStatus::PORTAL);
+    pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_PORTAL);
+
+    if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
+        screenOnTimeStamp_ = GetElapsedMicrosecondsSinceBoot();
+    } else {
+        screenOnTimeStamp_ = 0;
+    }
 }
 
 void WifiProStateMachine::WifiPortalState::GoOutState()
 {
     WIFI_LOGI("WifiPortalState GoOutState function.");
+    scanIntervalTime_ = DEFAULT_SCAN_INTERVAL_TIME;
+    lastScanTimeStamp_ = 0;
+    WifiConfigCenter::GetInstance().SetBrowserState(false);
 }
 
 bool WifiProStateMachine::WifiPortalState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -1442,14 +1458,98 @@ bool WifiProStateMachine::WifiPortalState::ExecuteStateMsg(InternalMessagePtr ms
     if (msg == nullptr) {
         return false;
     }
+    bool ret = NOT_EXECUTED;
     WIFI_LOGD("WifiPortalState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_HANDLE_SCAN_RESULT:
+            HandleWifiScanResultInPortal(msg);
+            ret = EXECUTED;
+            break;
+        case EVENT_CHECK_WIFI_INTERNET_RESULT:
+            ret = HandleHttpResultInPortal(msg);
             break;
         default:
-            return false;
+            return ret;
     }
-    return true;
+    return ret;
+}
+
+void WifiProStateMachine::WifiPortalState::HandleWifiScanResultInPortal(const InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGI("HandleWifiScanResultInPortal: msg is nullptr.");
+        return;
+    }
+    std::vector<InterScanInfo> scanInfos;
+    msg->GetMessageObj(scanInfos);
+    if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
+        WIFI_LOGI("HandleWifiScanResultInPortal: Wifi2WifiSwitching.");
+        return;
+    }
+
+    if (WifiConfigCenter::GetInstance().GetBrowserState() ||
+        WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
+        WIFI_LOGI("HandleWifiScanResultInPortal: browser opened just now or screen off, cannot switch");
+        return;
+    }
+
+    if (screenOnTimeStamp_ != 0) {
+        auto currentTime = GetElapsedMicrosecondsSinceBoot();
+        if ((currentTime - screenOnTimeStamp_) < SCREEN_ON_DURATIONSECS) {
+            WIFI_LOGI("HandleWifiScanResultInPortal: screen-on is not enough.");
+            return;
+        }
+    }
+
+    if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_, scanInfos)) {
+        WIFI_LOGI("Portal: select network fail.");
+        return;
+    }
+
+    if (!pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition()) {
+        WIFI_LOGI("HandleWifiScanResultInPortal: don't meet wifi2wifi condition.");
+        return;
+    }
+
+    if (!pWifiProStateMachine_->TryWifi2Wifi(pWifiProStateMachine_->networkSelectionResult_)) {
+        WIFI_LOGI("PortalSwitch step X: TryWifi2Wifi Failed.");
+        pWifiProStateMachine_->Wifi2WifiFinish();
+    }
+}
+
+bool WifiProStateMachine::WifiPortalState::HandleHttpResultInPortal(const InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGI("ReuqestScanInPortal, msg is nullptr.");
+        return EXECUTED;
+    }
+    int32_t state = msg->GetParam1();
+    if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
+        if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE || 
+            WifiConfigCenter::GetInstance().GetBrowserState()) {
+            WIFI_LOGI("IsNotAllowedToScan: screen state off or open browser.");
+            return EXECUTED;
+        }
+
+        if (screenOnTimeStamp_ != 0) {
+            auto currentTime = GetElapsedMicrosecondsSinceBoot();
+            if ((currentTime - screenOnTimeStamp_) < SCREEN_ON_DURATIONSECS) {
+                WIFI_LOGI("HandleHttpResultInPortal: screen-on is not enough.");
+                return EXECUTED;
+            }
+        }
+
+        auto checkTimeStamp = GetElapsedMicrosecondsSinceBoot();
+        if (lastScanTimeStamp_ == 0 || (checkTimeStamp - lastScanTimeStamp_) > scanIntervalTime_) {
+            pWifiProStateMachine_->FullScan();
+            lastScanTimeStamp_ = GetElapsedMicrosecondsSinceBoot();
+            scanIntervalTime_ = std::min(scanIntervalTime_ + scanIntervalTime_, MAX_INTERVAL_TIME);
+            WIFI_LOGI("HandleHttpResultInPortal:: FullScan executed.");
+            return EXECUTED;
+        }
+        return EXECUTED;
+    }
+    return NOT_EXECUTED;
 }
 
 } // namespace Wifi

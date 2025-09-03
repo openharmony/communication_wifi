@@ -282,6 +282,10 @@ public:
 
     int GetScreenState() const;
 
+    void SetBrowserState(bool browser);
+
+    bool GetBrowserState();
+
     void SetWlanPage(bool isWlanPage);
 
     bool IsWlanPage() const;
@@ -501,6 +505,7 @@ private:
     std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
     int systemMode_ = SystemMode::M_DEFAULT;
     int mDeviceType = ProductDeviceType::DEFAULT;
+    std::atomic<bool> browserOn_ {false};
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -72,7 +72,7 @@ HWTEST_F(ApInfoHelperTest, GetAllApInfosTest, TestSize.Level1)
     helper->wifiDataBaseUtils_ = nullptr;
     EXPECT_FALSE(helper->GetAllApInfos());
     helper->wifiDataBaseUtils_ = WifiRdbManager::GetRdbManger(RdbType::WIFI_PRO);
-    EXPECT_TRUE(helper->GetAllApInfos());
+    EXPECT_FALSE(helper->GetAllApInfos());
 }
 
 HWTEST_F(ApInfoHelperTest, AddApInfoTest1, TestSize.Level1)

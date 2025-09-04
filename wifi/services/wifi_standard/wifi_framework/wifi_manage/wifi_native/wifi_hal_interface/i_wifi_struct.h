@@ -14,7 +14,6 @@
  */
 #ifndef OHOS_IDL_IWIFI_STRUCT_H
 #define OHOS_IDL_IWIFI_STRUCT_H
-
 #include <stdint.h>
 #include <stdbool.h>
 #ifdef __cplusplus

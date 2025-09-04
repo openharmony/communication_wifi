@@ -68,7 +68,7 @@ public:
     ErrCode RemoveDevice(int networkId) override;
 
     ErrCode RemoveAllDevice() override;
-
+    
     ErrCode SetTxPower(int power) override;
 
     ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) override;

@@ -150,15 +150,14 @@ void IsValidHotspotConfigFuzzTest(const uint8_t* data, size_t size)
     HotspotConfig cfg;
     HotspotConfig cfgFromCenter;
     std::vector<BandType> bandsFromCenter;
-    ChannelsTable channInfoFromCenter;
     cfg.SetIpAddress("192.168.8.100");
     cfg.SetMaxConn(MAX_AP_CONN + 1);
     cfg.SetSecurityType(KeyMgmt::NONE);
     cfg.SetPreSharedKey(std::string(reinterpret_cast<const char*>(data), size));
-    pWifiHotspotServiceImpl->IsValidHotspotConfig(cfg, cfgFromCenter, bandsFromCenter, channInfoFromCenter);
+    pWifiHotspotServiceImpl->IsValidHotspotConfig(cfg, cfgFromCenter, bandsFromCenter);
 
     cfg.SetSecurityType(KeyMgmt::WPA_PSK);
-    pWifiHotspotServiceImpl->IsValidHotspotConfig(cfg, cfgFromCenter, bandsFromCenter, channInfoFromCenter);
+    pWifiHotspotServiceImpl->IsValidHotspotConfig(cfg, cfgFromCenter, bandsFromCenter);
 }
 
 /* Fuzzer entry point */

@@ -28,7 +28,6 @@ ohos_shared_library("wifi_ap_service") {
   }
   install_enable = true
   sources = [
-    "ap_config_use.cpp",
     "ap_idle_state.cpp",
     "ap_interface.cpp",
     "ap_monitor.cpp",

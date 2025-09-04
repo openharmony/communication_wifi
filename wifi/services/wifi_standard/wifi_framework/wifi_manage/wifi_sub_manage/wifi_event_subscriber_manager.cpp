@@ -1367,13 +1367,17 @@ SettingsEnterSubscriber::SettingsEnterSubscriber(
 void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventData)
 {
     const auto &action = eventData.GetWant().GetAction();
-    WIFI_LOGI("SettingsEnterSubscriber OnReceiveEvent: %{public}s", action.c_str());
+    bool isSettingsEnter = eventData.GetWant().GetBoolParam(WLAN_PAGE_ENTER, false);
+    WIFI_LOGI("SettingsEnterSubscriber OnReceiveEvent: %{public}s, isSettingsEnter : %{public}d",
+        action.c_str(), isSettingsEnter);
     if (action == ENTER_SETTINGS) {
-        bool isSettingsEnter = eventData.GetWant().GetBoolParam(WLAN_PAGE_ENTER, false);
-        BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
-        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-        if (pEnhanceService != nullptr) {
-            pEnhanceService->OnSettingsWlanEnterReceive();
+        WifiConfigCenter::GetInstance().SetWlanPage(isSettingsEnter);
+        if (isSettingsEnter) {
+            BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
+            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+            if (pEnhanceService != nullptr) {
+                pEnhanceService->OnSettingsWlanEnterReceive();
+            }
         }
     }
 }

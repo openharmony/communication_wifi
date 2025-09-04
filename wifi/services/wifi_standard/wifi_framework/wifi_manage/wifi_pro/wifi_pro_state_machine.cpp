@@ -485,6 +485,14 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
 ErrCode WifiProStateMachine::FullScan()
 {
     WIFI_LOGD("start Fullscan");
+    int32_t signalLevel = WifiProUtils::GetSignalLevel(instId_);
+#ifndef OHOS_ARCH_LITE
+    if (currentState_ == WifiProState::WIFI_HASNET && WifiConfigCenter::GetInstance().IsScreenLandscape() &&
+        signalLevel >= SIG_LEVEL_2 && InLandscapeSwitchLimitList()) {
+        WIFI_LOGI("FullScan ScreenLandscape and InLandscapeSwitchLimitList.");
+        return WIFI_OPT_SUCCESS;
+    }
+#endif
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
     if (pScanService == nullptr) {
         WIFI_LOGI("TryStartScan, pService is nullptr.");
@@ -518,7 +526,7 @@ bool WifiProStateMachine::InLandscapeSwitchLimitList()
 {
 #ifndef OHOS_ARCH_LITE
     std::vector<PackageInfo> specialList;
-    if (WifiSettings::GetInstance().GetPackageInfoByName("InLandscapeSwitchLimitList", specialList) != 0) {
+    if (WifiSettings::GetInstance().GetPackageInfoByName("LandscapeSwitchLimitList", specialList) != 0) {
         WIFI_LOGE("ProcessSwitchInfoRequest GetPackageInfoByName failed");
         return false;
     }

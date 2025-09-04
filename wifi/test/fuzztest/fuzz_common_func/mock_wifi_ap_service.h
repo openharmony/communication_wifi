@@ -48,8 +48,8 @@ public:
 
 class MockApStartedState : public ApStartedState {
 public:
-    MockApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor)
-        : ApStartedState(apStateMachine, apConfigUse, apMonitor)
+    MockApStartedState(ApStateMachine &apStateMachine, ApMonitor &apMonitor)
+        : ApStartedState(apStateMachine, apMonitor)
     {}
     void GoInState();
     void GoOutState();
@@ -67,8 +67,6 @@ public:
     ErrCode DelBlockList(const StationInfo &stationInfo);
     ErrCode SetHotspotConfig(const HotspotConfig &hotspotConfig);
     ErrCode DisconnetStation(const StationInfo &stationInfo);
-    ErrCode GetValidBands(std::vector<BandType> &bands);
-    ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannel);
     ErrCode RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks);
 };
 
@@ -127,7 +125,7 @@ public:
     MockPendant()
         : mockApRootState(),
           mockApIdleState(mockApStateMachine),
-          mockApStartedState(mockApStateMachine, mockApConfigUse, mockApMonitor),
+          mockApStartedState(mockApStateMachine, mockApMonitor),
           mockApService(mockApStateMachine, mockApStartedState),
           mockApStateMachine(
               mockApStationsManager, mockApRootState, mockApIdleState, mockApStartedState, mockApMonitor),

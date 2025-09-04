@@ -486,6 +486,13 @@ public:
     virtual ErrCode FactoryReset() = 0;
     
     /**
+     * @Description strat wifi detection
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartWifiDetection() = 0;
+
+    /**
      * @Description  limit speed
      *
      * @param controlId 1: game 2: stream 3：temp 4: cellular speed limit

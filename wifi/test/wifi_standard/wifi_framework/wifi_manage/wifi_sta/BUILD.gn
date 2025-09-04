@@ -97,6 +97,7 @@ local_base_include_dirs = [
   "$WIFI_ROOT_DIR/base/utils",
   "$WIFI_ROOT_DIR/base/inner_api",
   "$WIFI_ROOT_DIR/base/state_machine/include",
+  "$WIFI_ROOT_DIR/base/shared_util",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
@@ -162,8 +163,8 @@ local_base_external_deps = [
   "access_token:libaccesstoken_sdk",
   "bundle_framework:appexecfwk_base",
   "bundle_framework:appexecfwk_core",
-  "c_utils:utils",
   "cJSON:cjson",
+  "c_utils:utils",
   "certificate_manager:cert_manager_sdk",
   "data_share:datashare_consumer",
   "dhcp:dhcp_sdk",
@@ -184,7 +185,6 @@ local_base_external_deps = [
   "samgr:samgr_proxy",
   "time_service:time_client",
   "window_manager:libdm_lite",
-  "security_guard:libsg_classify_sdk",
 ]
 if (defined(global_parts_info) &&
     defined(global_parts_info.telephony_core_service) &&

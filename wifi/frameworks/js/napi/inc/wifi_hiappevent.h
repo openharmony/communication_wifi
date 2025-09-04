@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_WIFI_MSDP_STATE_LISTENER_H
-#define OHOS_WIFI_MSDP_STATE_LISTENER_H
+#ifndef WIFI_HIAPPEVENT_H_
+#define WIFI_HIAPPEVENT_H_
 
-#include "movement_client.h"
-#include "movement_callback_stub.h"
-#include "wifi_event_handler.h"
+#include <string>
 
 namespace OHOS {
 namespace Wifi {
-class DeviceMovementCallback : public Msdp::MovementCallbackStub {
+class WifiHiAppEvent {
 public:
-    DeviceMovementCallback();
-    ~DeviceMovementCallback();
-    void OnMovementChanged(const Msdp::MovementDataUtils::MovementData &movementData) override;
-
+    static WifiHiAppEvent* GetInstance();
+    void WriteEndEvent(const int64_t beginTime, const int result, const int errCode,
+        const std::string& apiName);
+    int64_t GetCurrentMillis();
 private:
-    void HandleMovementChange();
-    std::unique_ptr<WifiEventHandler> movementChangeEventHandler = nullptr;
+    WifiHiAppEvent();
+    ~WifiHiAppEvent();
+    void AddProcessor();
+    int64_t processorId_{-1};
 };
-
-} // namespace Wifi
-} // namespace OHOS
+}  // namespace Wifi
+}  // namespace OHOS
 #endif

@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace Wifi {
 class ApStateMachine;
-class ApConfigUse;
 class ApMonitor;
 class ApStartedState : public State {
     FRIEND_GTEST(ApStartedState);
@@ -34,7 +33,7 @@ public:
      * @param None
      * @return None
      */
-    ApStartedState(ApStateMachine &apStateMachine, ApConfigUse &apConfigUse, ApMonitor &apMonitor, int id = 0);
+    ApStartedState(ApStateMachine &apStateMachine, ApMonitor &apMonitor, int id = 0);
     /**
      * @Description  destructor method.
      * @param None
@@ -242,7 +241,6 @@ private:
     // Message processing function map of the state machine
     std::map<ApStatemachineEvent, ProcessFun> mProcessFunMap;
     ApStateMachine &m_ApStateMachine;
-    ApConfigUse &m_ApConfigUse;
     ApMonitor &m_ApMonitor;
     int m_id;
     bool idleTimerExist = false;

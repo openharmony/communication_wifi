@@ -515,6 +515,13 @@ public:
      */
     virtual ErrCode FactoryReset() = 0;
 
+     /**
+     * @Description start wifi detection
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode StartWifiDetection() = 0;
+
     /**
      * @Description Accept network control information from RSS.
      *

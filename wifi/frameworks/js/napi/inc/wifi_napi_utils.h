@@ -45,6 +45,9 @@ private:
     std::string m_funcName;
     std::chrono::steady_clock::time_point m_startTime;
     bool m_isTrace = true;
+#ifdef WIFI_HIAPPEVENT_ENABLE
+    int64_t eventStartTime_;
+#endif
 };
 
 #define TRACE_FUNC_CALL TraceFuncCall func(__func__)

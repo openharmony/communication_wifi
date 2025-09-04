@@ -512,6 +512,13 @@ public:
      */
     ErrCode FactoryReset() override;
 
+     /**
+     * @Description start wifi detection
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode StartWifiDetection() override;
+
     /**
      * @Description Accept network control information from RSS.
      *

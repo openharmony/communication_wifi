@@ -392,6 +392,13 @@ public:
     virtual ErrCode EnableHiLinkHandshake(bool uiFlag, const WifiDeviceConfig &config,
         const std::string &bssid) override;
 
+    /**
+     * @Description StartWifiDetection.
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartWifiDetection() override;
+
 	/**
      * @Description DeliverStaIfaceData.
      *

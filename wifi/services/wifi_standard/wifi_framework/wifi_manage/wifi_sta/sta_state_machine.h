@@ -504,6 +504,7 @@ public:
      */
     void HandleForegroundAppChangedAction(InternalMessagePtr msg);
 #endif
+    int32_t GetTargetNetworkId();
 /* ------------------ state machine private function ----------------- */
 private:
     /**

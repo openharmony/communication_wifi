@@ -65,7 +65,7 @@ public:
 
         pMockApNatManager = new MockWifiApNatManager();
 
-        pApStartedState = std::make_unique<ApStartedState>(*pMockApStateMachine, *pMockApConfigUse, *pMockApMonitor);
+        pApStartedState = std::make_unique<ApStartedState>(*pMockApStateMachine, *pMockApMonitor);
 
         msg = std::make_shared<InternalMessage>();
 

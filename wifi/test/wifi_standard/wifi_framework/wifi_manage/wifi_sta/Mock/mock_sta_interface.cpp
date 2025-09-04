@@ -173,7 +173,7 @@ ErrCode StaInterface::ConnectivityManager(const std::vector<InterScanInfo> &scan
 
 ErrCode StaInterface::RegisterStaServiceCallback(const StaServiceCallback &callbacks)
 {
-    LOGD("Enter RegisterStaServiceCallback.\n");
+    LOGI("Enter test: RegisterStaServiceCallback.\n");
     return WIFI_OPT_SUCCESS;
 }
 
@@ -261,6 +261,12 @@ ErrCode StaInterface::DeregisterCommonBuilder(const TagType &tagType, const std:
 ErrCode StaInterface::StartPortalCertification()
 {
     WIFI_LOGI("Enter StartPortalCertification");
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode StaInterface::StartWifiDetection()
+{
+    WIFI_LOGI("Enter StartWifiDetection");
     return WIFI_OPT_SUCCESS;
 }
 

@@ -123,6 +123,7 @@ enum NetworkFailReason {
     DNS_STATE_WORKING,
     DNS_STATE_UNREACHABLE,
     IP_STATE_CONFLICT,
+    IPV6_STATE_UNREACHABLE,
 };
 
 typedef enum EnumNetWorkState {

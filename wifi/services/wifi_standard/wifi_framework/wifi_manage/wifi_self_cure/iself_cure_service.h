@@ -92,6 +92,12 @@ public:
      * @return bool - true: have done selfcure or no need to do, false: selfcure not finish
      */
     virtual bool IsWifiSelfcureDone() = 0;
+    /**
+     * @Description Notify IPv6 connection failure detected
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode NotifyIpv6FailureDetected() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

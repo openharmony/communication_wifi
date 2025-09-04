@@ -22,6 +22,8 @@
 namespace OHOS {
 namespace Wifi {
 
+const int DEFAULT_MIN_RSSI = -140;
+
 enum ConnScene {
     UNKNOW_SCENE = 0,
     OUTDOOR_SCENE = 1,
@@ -60,7 +62,7 @@ private:
     int connScene_ = UNKNOW_SCENE;
     int reportRssi_ = 0;
     int connRssi_ = 0;
-    int maxRssi_ = -140;
+    int maxRssi_ = DEFAULT_MIN_RSSI;
     OperateResState lastState_ = OperateResState::DISCONNECT_DISCONNECTED;
     StaServiceCallback staCallback_;
     bool isCallbackReg_;

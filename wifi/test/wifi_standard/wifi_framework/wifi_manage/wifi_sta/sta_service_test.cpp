@@ -496,7 +496,7 @@ void StaServiceTest::StaServiceSetRandomMacDisabledTrueSuccess1()
 {
     pStaService->SetRandomMacDisabled(true);
     pStaService->SetRandomMacDisabled(true);
-    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled(0);
     EXPECT_EQ(result, true);
 }
 
@@ -504,7 +504,7 @@ void StaServiceTest::StaServiceSetRandomMacDisabledTrueSuccess2()
 {
     pStaService->SetRandomMacDisabled(false);
     pStaService->SetRandomMacDisabled(true);
-    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled(0);
     EXPECT_EQ(result, true);
 }
 
@@ -512,7 +512,7 @@ void StaServiceTest::StaServiceSetRandomMacDisabledFalseSuccess1()
 {
     pStaService->SetRandomMacDisabled(true);
     pStaService->SetRandomMacDisabled(false);
-    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled(0);
     EXPECT_EQ(result, false);
 }
 
@@ -520,7 +520,7 @@ void StaServiceTest::StaServiceSetRandomMacDisabledFalseSuccess2()
 {
     pStaService->SetRandomMacDisabled(false);
     pStaService->SetRandomMacDisabled(false);
-    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled(0);
     EXPECT_EQ(result, false);
 }
 

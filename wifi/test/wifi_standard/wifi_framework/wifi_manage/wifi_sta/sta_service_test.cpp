@@ -495,25 +495,33 @@ void StaServiceTest::StaServiceDisconnectSuccess()
 void StaServiceTest::StaServiceSetRandomMacDisabledTrueSuccess1()
 {
     pStaService->SetRandomMacDisabled(true);
-    EXPECT_TRUE(pStaService->SetRandomMacDisabled(true) == WIFI_OPT_SUCCESS);
+    pStaService->SetRandomMacDisabled(true);
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    EXPECT_EQ(result, true);
 }
 
 void StaServiceTest::StaServiceSetRandomMacDisabledTrueSuccess2()
 {
     pStaService->SetRandomMacDisabled(false);
-    EXPECT_TRUE(pStaService->SetRandomMacDisabled(true) == WIFI_OPT_SUCCESS);
+    pStaService->SetRandomMacDisabled(true);
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    EXPECT_EQ(result, true);
 }
 
 void StaServiceTest::StaServiceSetRandomMacDisabledFalseSuccess1()
 {
     pStaService->SetRandomMacDisabled(true);
-    EXPECT_TRUE(pStaService->SetRandomMacDisabled(false) == WIFI_OPT_SUCCESS);
+    pStaService->SetRandomMacDisabled(false);
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    EXPECT_EQ(result, false);
 }
 
 void StaServiceTest::StaServiceSetRandomMacDisabledFalseSuccess2()
 {
     pStaService->SetRandomMacDisabled(false);
-    EXPECT_TRUE(pStaService->SetRandomMacDisabled(false) == WIFI_OPT_SUCCESS);
+    pStaService->SetRandomMacDisabled(false);
+    bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
+    EXPECT_EQ(result, false);
 }
 
 void StaServiceTest::StaServiceReconnectByMdmTest1()

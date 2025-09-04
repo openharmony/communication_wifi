@@ -802,10 +802,7 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
         return;
     }
     static_cast<unsigned int>(index) = FindKeyMgmtPosition(config.keyMgmt);
-    // Invalid keyMgmt
-    if (index < 0) {
-        return;
-    }
+
     config.keyMgmtBitset |= (1 << index);
     if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
         index = FindKeyMgmtPosition(KEY_MGMT_SAE);

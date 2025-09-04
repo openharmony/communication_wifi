@@ -19,11 +19,10 @@ if (defined(ohos_lite)) {
   import("//foundation/communication/wifi/wifi/wifi.gni")
 }
 
-local_base_sources = [ "dhcp_service/main.c" ]
-
-local_base_include_dirs = []
 
 if (defined(ohos_lite)) {
+  local_base_sources = [ "dhcp_service/main.c" ]
+  local_base_include_dirs = []
   executable("wifi_hal_service") {
     sources = local_base_sources
 
@@ -53,62 +52,10 @@ if (defined(ohos_lite)) {
     ]
     ldflags += [ "-lwpa_client" ]
   }
-} else {
-  ohos_executable("wifi_hal_service") {
-    branch_protector_ret = "pac_ret"
-    sanitize = {
-      cfi = true  # Enable/disable control flow integrity detection
-      boundary_sanitize = false  # Enable boundary san detection
-      cfi_cross_dso = true  # Cross-SO CFI Checks
-      integer_overflow = false  # Enable integer overflow detection
-      ubsan = false  # Enable some Ubsan options
-      cfi_vcall_icall_only = true
-      debug = false
-    }
-    install_enable = true
-    sources = local_base_sources
 
-    include_dirs = local_base_include_dirs
-
-    deps = [ "$WIFI_ROOT_DIR/relation_services/etc/init:etc" ]
-
-    if (wifi_feature_with_hdi_wpa_supported) {
-    } else {
-      deps += [ "$WIFI_ROOT_DIR/base/cRPC:crpc_server" ]
-
-      external_deps = [
-        "c_utils:utils",
-        "hilog:libhilog",
-      ]
-
-      external_deps += [ "wpa_supplicant:wpa_client" ]
-    }
-
-    defines = [
-      "AP_INTF=\"$wifi_feature_with_ap_intf\"",
-      "AP_NUM=$wifi_feature_with_ap_num",
-    ]
-
-    if (wifi_feature_with_local_random_mac) {
-      defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
-    }
-
-    if ("${CONFIG_CTRL_IFACE}" == "unix") {
-      defines += [ "WPA_CTRL_IFACE_UNIX" ]
-    }
-
-    if (wifi_feature_non_seperate_p2p) {
-      defines += [ "NON_SEPERATE_P2P" ]
-    }
-
-    cflags_cc = [ "-fno-rtti" ]
-    cflags = [ "-Wno-deprecated-non-prototype" ]
-    install_images = [ "system" ]
-    part_name = "wifi"
-    subsystem_name = "communication"
+  group("relation_services") {
+    deps = [ ":wifi_hal_service" ]
   }
-}
-
-group("relation_services") {
-  deps = [ ":wifi_hal_service" ]
+} else {
+  group("relation_services") {}
 }

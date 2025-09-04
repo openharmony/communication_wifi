@@ -59,6 +59,9 @@ private:
     int rssiCnt_ = 0;
     int connScene_ = UNKNOW_SCENE;
     int reportRssi_ = 0;
+    int connRssi_ = 0;
+    int maxRssi_ = -140;
+    OperateResState lastState_ = OperateResState::DISCONNECT_DISCONNECTED;
     StaServiceCallback staCallback_;
     bool isCallbackReg_;
 };

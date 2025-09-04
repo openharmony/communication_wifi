@@ -801,7 +801,7 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
     if (InKeyMgmtBitset(config, config.keyMgmt)) {
         return;
     }
-    unsigned int index = FindKeyMgmtPosition(config.keyMgmt);
+    static_cast<unsigned int>(index) = FindKeyMgmtPosition(config.keyMgmt);
     // Invalid keyMgmt
     if (index < 0) {
         return;

@@ -735,7 +735,6 @@ ErrCode StaService::ReconnectByMdm() const
         return WIFI_OPT_FAILED;
     }
 
-    bool isRandomMacDisabled = WifiSettings::GetInstance().IsRandomMacDisabled();
     if (targetNetwork.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC) {
         Disconnect();
         if (ConnectToNetwork(networkId, NETWORK_SELECTED_BY_MDM) != WIFI_OPT_SUCCESS) {

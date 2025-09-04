@@ -477,6 +477,7 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.wifiWapiConfig.wapiPskType = data.ReadInt32();
     config.wifiWapiConfig.wapiAsCertData = data.ReadString();
     config.wifiWapiConfig.wapiUserCertData = data.ReadString();
+    config.isAllowAutoConnect = data.ReadBool();
     return;
 }
 

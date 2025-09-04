@@ -629,7 +629,7 @@ HWTEST_F(WifiSettingsTest, DecryptionWapiConfigTest, TestSize.Level1)
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
 {
-    WIFI_LOGE("UpdateWifiConfigFormCloudTest enter!");
+    WIFI_LOGI("UpdateWifiConfigFormCloudTest enter!");
     WifiDeviceConfig config;
     config.networkId = 0;
     config.ssid = "test1";
@@ -659,7 +659,7 @@ HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
 
 HWTEST_F(WifiSettingsTest, InKeyMgmtBitsetTest, TestSize.Level1)
 {
-    WIFI_LOGE("InKeyMgmtBitsetTest enter!");
+    WIFI_LOGI("InKeyMgmtBitsetTest enter!");
     WifiDeviceConfig config;
     std::string keyMgmt;
     keyMgmt = "ABC";
@@ -681,7 +681,7 @@ HWTEST_F(WifiSettingsTest, InKeyMgmtBitsetTest, TestSize.Level1)
 
 HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
 {
-    WIFI_LOGE("SetKeyMgmtBitset enter!");
+    WIFI_LOGI("SetKeyMgmtBitset enter!");
     WifiDeviceConfig config;
     config.keyMgmt = "WPA-PSK";
     config.keyMgmtBitset = 0;
@@ -695,7 +695,7 @@ HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
 
 HWTEST_F(WifiSettingsTest, GetAllSuitableEncryptionTest, TestSize.Level1)
 {
-    WIFI_LOGE("GetAllSuitableEncryptionTest enter!");
+    WIFI_LOGI("GetAllSuitableEncryptionTest enter!");
     WifiDeviceConfig config;
     std::string keyMgmt;
     std::vector<std::string> result;
@@ -728,7 +728,7 @@ HWTEST_F(WifiSettingsTest, GetDefaultApSsidTest, TestSize.Level1)
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
 HWTEST_F(WifiSettingsTest, AddWifiBlockListConfigTest, TestSize.Level1)
 {
-    WIFI_LOGE("AddWifiBlockListConfigTest enter!");
+    WIFI_LOGI("AddWifiBlockListConfigTest enter!");
     WifiRestrictedInfo info;
     info.ssid = "blockTest1";
     info.bssid = "blockTest_bssid_1";
@@ -741,7 +741,7 @@ HWTEST_F(WifiSettingsTest, AddWifiBlockListConfigTest, TestSize.Level1)
  
 HWTEST_F(WifiSettingsTest, AddWifiBlockListConfigFailTest, TestSize.Level1)
 {
-    WIFI_LOGE("AddWifiBlockListConfigFailTest enter!");
+    WIFI_LOGI("AddWifiBlockListConfigFailTest enter!");
     WifiRestrictedInfo info;
     info.ssid = "";
     info.bssid = "111";
@@ -754,7 +754,7 @@ HWTEST_F(WifiSettingsTest, AddWifiBlockListConfigFailTest, TestSize.Level1)
  
 HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigTest, TestSize.Level1)
 {
-    WIFI_LOGE("AddWifiWhiteListConfigTest enter!");
+    WIFI_LOGI("AddWifiWhiteListConfigTest enter!");
     WifiRestrictedInfo info;
     info.ssid = "whiteTest1";
     info.bssid = "whiteTest_bssid_1";
@@ -767,7 +767,7 @@ HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigTest, TestSize.Level1)
  
 HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigFailTest, TestSize.Level1)
 {
-    WIFI_LOGE("AddWifiWhiteListConfigFailTest enter!");
+    WIFI_LOGI("AddWifiWhiteListConfigFailTest enter!");
     WifiRestrictedInfo info;
     info.ssid = "whiteTest2";
     info.bssid = "";
@@ -780,7 +780,7 @@ HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigFailTest, TestSize.Level1)
  
 HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
 {
-    WIFI_LOGE("FindWifiBlockListConfigTest enter!");
+    WIFI_LOGI("FindWifiBlockListConfigTest enter!");
     WifiRestrictedInfo info;
     info.ssid = "blockTest1";
     info.bssid = "blockTest_bssid_1";
@@ -799,7 +799,7 @@ HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
  
 HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
 {
-    WIFI_LOGE("FindWifiWhiteListConfigTest enter!");
+    WIFI_LOGI("FindWifiWhiteListConfigTest enter!");
     WifiRestrictedInfo info;
     info.ssid = "whiteTest1";
     info.bssid = "whiteTest_bssid_1";
@@ -818,7 +818,7 @@ HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
  
 HWTEST_F(WifiSettingsTest, whetherSetWhiteListConfigTest, TestSize.Level1)
 {
-    WIFI_LOGE("whetherSetWhiteListConfigTest enter!");
+    WIFI_LOGI("whetherSetWhiteListConfigTest enter!");
     
     bool result = WifiSettings::GetInstance().WhetherSetWhiteListConfig();
     EXPECT_EQ(result, true);
@@ -831,7 +831,7 @@ HWTEST_F(WifiSettingsTest, whetherSetWhiteListConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiSettingsTest, IsRandomMacDisabledTest, TestSize.Level1)
 {
-    WIFI_LOGE("IsRandomMacDisabled enter!");
+    WIFI_LOGI("IsRandomMacDisabled enter!");
     WifiSettings::GetInstance().SetRandomMacDisabled(true);
     bool result = WifiSettings::GetInstance().IsRandomMacDisabled();
     EXPECT_EQ(result, true);

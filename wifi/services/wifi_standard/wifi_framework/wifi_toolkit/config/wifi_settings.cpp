@@ -801,12 +801,17 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
     if (InKeyMgmtBitset(config, config.keyMgmt)) {
         return;
     }
-    static_cast<unsigned int>(index) = FindKeyMgmtPosition(config.keyMgmt);
+    int index = FindKeyMgmtPosition(config.keyMgmt);
+    // Invalid keyMgmt
+    if (index < 0) {
+        return;
+    }
+    unsigned int uindex =  static_cast<unsigned int>(index);
 
-    config.keyMgmtBitset |= (1 << index);
+    config.keyMgmtBitset |= (1 << uindex);
     if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
         index = FindKeyMgmtPosition(KEY_MGMT_SAE);
-        config.keyMgmtBitset |= (1 << index);
+        config.keyMgmtBitset |= (1 << uindex);
     }
     if (config.keyMgmt == KEY_MGMT_SAE) {
         index = FindKeyMgmtPosition(KEY_MGMT_WPA_PSK);

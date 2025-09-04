@@ -131,7 +131,7 @@ public:
     /**
      * @Description Remove a P2P client of current group.
      *
-     * @param deviceMac - client deviceMac address
+     * @param info - WifiP2pGroupClient object
      * @return ErrCode - operation result
      */
     virtual ErrCode RemoveGroupClient(const GcInfo &info) = 0;
@@ -436,7 +436,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetP2pHighPerf(bool isEnable) = 0;
-
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiP2pService");
 };

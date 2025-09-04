@@ -94,6 +94,7 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
             WIFI_LOGE("failed to get DEVICE_SERVICE again!");
             return false;
         }
+        return false;
     }
 
     sptr<IWifiDeviceMgr> deviceMgr = iface_cast<IWifiDeviceMgr>(object);

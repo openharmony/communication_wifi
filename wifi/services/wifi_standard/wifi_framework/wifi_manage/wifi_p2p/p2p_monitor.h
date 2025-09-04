@@ -413,9 +413,11 @@ private:
      * @Description Register the callback function for connecting STA to AP
      *
      * @param p2pDeviceAddress - the MAC address of the STA connected
-     * @param p2pGroupAddress - the group address of the STA connected
+     * @param p2pGroupAddress - the group MAC address of the STA connected
      */
-    void WpaEventApStaConnected(const std::string &p2pDeviceAddress, const std::string &p2pGroupAddress) const;
+    void WpaEventApStaConnected(const std::string &p2pDeviceAddress,
+        const std::string &p2pGroupAddress) const;
+
     /**
      * @Description Register Wpa_supplicant client connection failure callback function
      *

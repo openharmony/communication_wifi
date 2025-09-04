@@ -646,11 +646,11 @@ void CesEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &e
 void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
     std::string action = eventData.GetWant().GetAction();
-    WIFI_LOGI("OnReceiveScreenEvent: %{public}s.", action.c_str());
+    WIFI_LOGI("OnReceiveEvent: %{public}s.", action.c_str());
 
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-    int screenStateNew = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON)
-        ? MODE_STATE_OPEN : MODE_STATE_CLOSE;
+    int screenStateNew =
+        (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) ? MODE_STATE_OPEN : MODE_STATE_CLOSE;
     WifiConfigCenter::GetInstance().SetScreenState(screenStateNew);
     if (screenStateNew == screenState) {
         return;
@@ -675,7 +675,6 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
 #endif
     }
 }
-
 
 void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
@@ -987,6 +986,9 @@ void NotificationEventSubscriber::NotifyCandidateApprovalStatus(CandidateApprova
 void WifiEventSubscriberManager::RegisterPowermgrEvent()
 {
     std::unique_lock<std::mutex> lock(powermgrEventMutex);
+    if (powerMgrId != 0) {
+        WifiTimer::GetInstance()->UnRegister(powerMgrId);
+    }
     if (wifiPowermgrEventSubsciber_) {
         return;
     }
@@ -1000,14 +1002,20 @@ void WifiEventSubscriberManager::RegisterPowermgrEvent()
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(wifiPowermgrEventSubsciber_)) {
         WIFI_LOGE("Powermgr SubscribeCommonEvent() failed");
         wifiPowermgrEventSubsciber_ = nullptr;
+        WifiTimer::TimerCallback timeoutCallBack = std::bind(&WifiEventSubscriberManager::RegisterPowermgrEvent, this);
+        WifiTimer::GetInstance()->Register(timeoutCallBack, powerMgrId, TIMEOUT_EVENT_SUBSCRIBER, false);
+        WIFI_LOGI("RegisterPowermgrEvent retry, powerMgrId = %{public}u", powerMgrId);
     } else {
-        WIFI_LOGI("RegisterCesEvent success");
+        WIFI_LOGI("RegisterPowermgrEvent success");
     }
 }
 
 void WifiEventSubscriberManager::UnRegisterPowermgrEvent()
 {
     std::unique_lock<std::mutex> lock(powermgrEventMutex);
+    if (powerMgrId != 0) {
+        WifiTimer::GetInstance()->UnRegister(powerMgrId);
+    }
     if (!wifiPowermgrEventSubsciber_) {
         return;
     }
@@ -1034,14 +1042,13 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
     std::string action = eventData.GetWant().GetAction();
 #ifdef FEATURE_HPF_SUPPORT
     if (action == COMMON_EVENT_POWER_MANAGER_STATE_CHANGED) {
-        WIFI_LOGI("Receive power manager state Event: %{public}s", eventData.GetCode());
+        WIFI_LOGI("Receive power manager state Event: %{public}d", eventData.GetCode());
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
             WifiManager::GetInstance().InstallPacketFilterProgram(eventData.GetCode(), i);
         }
     }
 #endif
 }
-
 #endif
 #ifdef HAS_NETMANAGER_EVENT_PART
 void WifiEventSubscriberManager::RegisterNetmgrEvent()
@@ -1100,7 +1107,7 @@ NetmgrEventSubscriber::~NetmgrEventSubscriber()
 
 void NetmgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
-    int bgContinuousTaskState = eventData.GetCode();
+    uint32_t bgContinuousTaskState = eventData.GetCode();
     WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by BgTaskAware %{public}d", bgContinuousTaskState);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pService == nullptr) {
@@ -1603,6 +1610,7 @@ int NetworkConnSubscriber::NetCapabilitiesChange(sptr<NetManagerStandard::NetHan
 void WifiEventSubscriberManager::RegisterCellularStateObserver()
 {
     WIFI_LOGI("RegisterCellularStateObserver.");
+    std::lock_guard<std::mutex> lock(cellularObserverLock_);
     if (cellularStateObserver_ == nullptr) {
         cellularStateObserver_ = sptr<CellularStateObserver>::MakeSptr();
     } else {
@@ -1624,6 +1632,7 @@ void WifiEventSubscriberManager::RegisterCellularStateObserver()
 
 void WifiEventSubscriberManager::UnRegisterCellularStateObserver()
 {
+    std::lock_guard<std::mutex> lock(cellularObserverLock_);
     if (cellularStateObserver_ != nullptr) {
         uint32_t telephonyObserverMask = Telephony::TelephonyObserverBroker::OBSERVER_MASK_CELL_INFO;
         for (int32_t i = 0; i < simCount_; i++) {

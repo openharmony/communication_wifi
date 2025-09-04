@@ -734,11 +734,9 @@ ErrCode StaService::ReconnectByMdm() const
         WIFI_LOGE("Failed tot get device config");
         return WIFI_OPT_FAILED;
     }
-    std::string realMac;
-    WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
+
     bool isRandomMacDisabled = WifiSettings::GetInstance().IsRandomMacDisabled();
-    if ((isRandomMacDisabled && realMac != targetNetwork.macAddress) ||
-        (!isRandomMacDisabled && targetNetwork.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC)) {
+    if (targetNetwork.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC) {
         Disconnect();
         if (ConnectToNetwork(networkId, NETWORK_SELECTED_BY_MDM) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Connect to network failed");

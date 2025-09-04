@@ -2727,7 +2727,6 @@ ErrCode WifiDeviceServiceImpl::IsRandomMacDisabled(bool &isRandomMacDisabled)
 
     isRandomMacDisabled = WifiSettings::GetInstance().IsRandomMacDisabled();
     WIFI_LOGI("Get isRandomMacDisabled success, isRandomMacDisabled= %{public}d", isRandomMacDisabled);
-    WifiDeviceConfig targetNetwork;
     return WIFI_OPT_SUCCESS;
 }
 

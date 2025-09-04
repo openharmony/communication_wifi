@@ -125,3 +125,172 @@ HWTEST_F(IpQosMonitorTest, TestParseNetworkInternetGood, TestSize.Level1)
     std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 1};
     EXPECT_TRUE(IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems));
 }
+
+HWTEST_F(IpQosMonitorTest, TestQueryIpv6Packets, TestSize.Level1)
+{
+    int32_t arg = 0;
+    using namespace std::placeholders;
+    WifiNetLinkCallbacks mWifiNetLinkCallbacks;
+    mWifiNetLinkCallbacks.OnTcpReportMsgComplete =
+        std::bind(&IpQosMonitorTest::OnTcpReportMsgCompleteTest, this, _1, _2, _3);
+    WifiNetLink::GetInstance().InitWifiNetLink(mWifiNetLinkCallbacks);
+    IpQosMonitor::GetInstance().QueryIpv6Packets(arg);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(IpQosMonitorTest, TestHandleIpv6TcpPktsResp, TestSize.Level1)
+{
+    // Test IPv6 network good case
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 10, 5, 0, 5}; // elems[9] = QOS_IPV6_MSG_FROM = 5
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
+    IpQosMonitor::GetInstance().HandleIpv6TcpPktsResp(elems);
+    EXPECT_EQ(IpQosMonitor::GetInstance().GetIpv6FailedCounter(), 0);
+}
+
+HWTEST_F(IpQosMonitorTest, TestHandleIpv6TcpPktsRespFailure, TestSize.Level1)
+{
+    // Test IPv6 failure case - TX packets but no RX packets
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 15, 5, 0, 5}; // TX=15, RX=5, MSG_FROM=5
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
+    // First call to set initial counters
+    IpQosMonitor::GetInstance().HandleIpv6TcpPktsResp(elems);
+
+    // Second call with same RX but more TX packets (failure condition)
+    elems[6] = 20; // Increase TX packets
+    IpQosMonitor::GetInstance().HandleIpv6TcpPktsResp(elems);
+
+    EXPECT_GT(IpQosMonitor::GetInstance().GetIpv6FailedCounter(), 0);
+}
+
+HWTEST_F(IpQosMonitorTest, TestHandleIpv6TcpPktsRespDisconnected, TestSize.Level1)
+{
+    // Test IPv6 failure when WiFi is disconnected
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 15, 5, 0, 5};
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
+    int32_t initialFailedCount = IpQosMonitor::GetInstance().GetIpv6FailedCounter();
+    IpQosMonitor::GetInstance().HandleIpv6TcpPktsResp(elems);
+
+    // Should not increment failure counter when disconnected
+    EXPECT_EQ(IpQosMonitor::GetInstance().GetIpv6FailedCounter(), initialFailedCount);
+}
+
+HWTEST_F(IpQosMonitorTest, TestParseIpv6NetworkInternetGood, TestSize.Level1)
+{
+    // Test normal IPv6 response
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 10, 8, 0, 5}; // QOS_IPV6_MSG_FROM = 5
+    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseIpv6NetworkInternetGood(elems));
+}
+
+HWTEST_F(IpQosMonitorTest, TestParseIpv6NetworkInternetGoodShortLength, TestSize.Level1)
+{
+    // Test with insufficient length
+    std::vector<int64_t> elems = {1, 2, 3}; // Length <= MIN_PACKET_LEN
+    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseIpv6NetworkInternetGood(elems));
+}
+
+HWTEST_F(IpQosMonitorTest, TestParseIpv6NetworkInternetGoodWrongMsgFrom, TestSize.Level1)
+{
+    // Test with wrong MSG_FROM (not IPv6 response)
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 10, 8, 0, 0}; // MSG_FROM = 0 (IPv4)
+    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseIpv6NetworkInternetGood(elems));
+}
+
+HWTEST_F(IpQosMonitorTest, TestParseIpv6NetworkInternetGoodFailure, TestSize.Level1)
+{
+    // Test IPv6 failure detection - TX > 3 but RX = 0
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 15, 8, 0, 5}; // TX=15, RX=8, MSG_FROM=5
+
+    // First call to initialize counters
+    IpQosMonitor::GetInstance().ParseIpv6NetworkInternetGood(elems);
+
+    // Second call with no RX increase but TX increase >= 3
+    elems[6] = 20; // TX increases to 20, delta = 5 >= 3
+    // RX stays same, delta = 0
+    EXPECT_FALSE(IpQosMonitor::GetInstance().ParseIpv6NetworkInternetGood(elems));
+}
+
+HWTEST_F(IpQosMonitorTest, TestParseIpv6NetworkInternetGoodOverflow, TestSize.Level1)
+{
+    // Test counter overflow handling
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 100, 50, 0, 5};
+
+    // Set initial large values
+    IpQosMonitor::GetInstance().ParseIpv6NetworkInternetGood(elems);
+
+    // Simulate overflow with smaller values
+    elems[6] = 10; // TX counter wrapped around
+    elems[7] = 5;  // RX counter wrapped around
+
+    // Should return true on overflow detection
+    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseIpv6NetworkInternetGood(elems));
+}
+
+HWTEST_F(IpQosMonitorTest, TestGetCurrentIpv6Counters, TestSize.Level1)
+{
+    // Test IPv6 counter getters
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 25, 15, 0, 5};
+    IpQosMonitor::GetInstance().ParseIpv6NetworkInternetGood(elems);
+
+    EXPECT_EQ(IpQosMonitor::GetInstance().GetCurrentIpv6TcpTxCounter(), 25);
+    EXPECT_EQ(IpQosMonitor::GetInstance().GetCurrentIpv6TcpRxCounter(), 15);
+}
+
+HWTEST_F(IpQosMonitorTest, TestGetIpv6FailedCounter, TestSize.Level1)
+{
+    // Test IPv6 failed counter getter
+    int32_t initialCount = IpQosMonitor::GetInstance().GetIpv6FailedCounter();
+    EXPECT_GE(initialCount, 0);
+}
+
+HWTEST_F(IpQosMonitorTest, TestParseTcpReportMsgWithIpv6Cmd, TestSize.Level1)
+{
+    // Test ParseTcpReportMsg with IPv6 command
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 10, 8, 0, 5};
+    int32_t cmd = 24; // CMD_QUERY_IPV6_PKTS
+
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
+    IpQosMonitor::GetInstance().ParseTcpReportMsg(elems, cmd);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(IpQosMonitorTest, TestStartMonitorResetsIpv6Counter, TestSize.Level1)
+{
+    // Test that StartMonitor resets IPv6 failed counter
+
+    // First simulate some IPv6 failures to increment counter
+    std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 15, 8, 0, 5};
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
+
+    // Initialize and cause failure
+    IpQosMonitor::GetInstance().HandleIpv6TcpPktsResp(elems);
+    elems[6] = 20; // Increase TX to cause failure
+    IpQosMonitor::GetInstance().HandleIpv6TcpPktsResp(elems);
+
+    // Verify counter is incremented
+    EXPECT_GT(IpQosMonitor::GetInstance().GetIpv6FailedCounter(), 0);
+
+    // Call StartMonitor to reset
+    IpQosMonitor::GetInstance().StartMonitor(0);
+
+    // Verify counter is reset to 0
+    EXPECT_EQ(IpQosMonitor::GetInstance().GetIpv6FailedCounter(), 0);
+}

@@ -188,6 +188,14 @@ HWTEST_F(SelfCureServiceTest, NotifyInternetFailureDetectedTest, TestSize.Level1
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetectedTest, TestSize.Level1)
+{
+    // Test IPv6 failure detection notification
+    bool result = pSelfCureService->NotifyIpv6FailureDetected();
+    EXPECT_EQ(result, true);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 HWTEST_F(SelfCureServiceTest, IsSelfCureOnGoingTest, TestSize.Level1)
 {
     EXPECT_EQ(pSelfCureService->IsSelfCureOnGoing(), false);

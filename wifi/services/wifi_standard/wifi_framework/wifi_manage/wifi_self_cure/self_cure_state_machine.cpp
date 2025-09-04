@@ -594,6 +594,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(Internal
     pSelfCureStateMachine_->StopTimer(CMD_INTERNET_STATUS_DETECT_INTERVAL);
     if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_CLOSE) {
         IpQosMonitor::GetInstance().QueryPackets();
+        IpQosMonitor::GetInstance().QueryIpv6Packets();
     }
     pSelfCureStateMachine_->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
         INTERNET_STATUS_DETECT_INTERVAL_MS);

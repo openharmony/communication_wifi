@@ -801,7 +801,7 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
     if (InKeyMgmtBitset(config, config.keyMgmt)) {
         return;
     }
-    int index = FindKeyMgmtPosition(config.keyMgmt);
+    unsigned int index = FindKeyMgmtPosition(config.keyMgmt);
     // Invalid keyMgmt
     if (index < 0) {
         return;
@@ -813,9 +813,6 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
     }
     if (config.keyMgmt == KEY_MGMT_SAE) {
         index = FindKeyMgmtPosition(KEY_MGMT_WPA_PSK);
-        if (index < 0) {
-            return;
-        }
         config.keyMgmtBitset |= (1 << index);
     }
 }

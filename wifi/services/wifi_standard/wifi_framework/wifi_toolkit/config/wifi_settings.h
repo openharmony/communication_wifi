@@ -343,6 +343,8 @@ public:
     bool EncryptionDeviceConfig(WifiDeviceConfig &config) const;
 
     int GetPackageInfoByName(std::string name, std::vector<PackageInfo> &packageInfo);
+
+    void SetDeviceNameApSsid(std::string ssid);
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
     void ApplyCloudWifiConfig(const std::vector<WifiDeviceConfig> &newWifiDeviceConfigs,
         const std::set<int> &wifiLinkedNetworkIds, std::map<int, WifiDeviceConfig> &tempConfigs);

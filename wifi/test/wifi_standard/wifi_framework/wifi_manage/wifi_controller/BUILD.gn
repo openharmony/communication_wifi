@@ -25,16 +25,6 @@ config("module_private_config") {
 ohos_unittest("wifi_controller_unittest") {
   module_out_path = module_output_path
 
-  sanitize = {
-    cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = false  # Enable boundary san detection
-    cfi_cross_dso = true  # Cross-SO CFI Checks
-    integer_overflow = false  # Enable integer overflow detection
-    ubsan = false  # Enable some Ubsan options
-    cfi_vcall_icall_only = true
-    debug = false
-  }
-
   sources = [
     "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
@@ -73,6 +63,35 @@ ohos_unittest("wifi_controller_unittest") {
     "softap_manager_test.cpp",
     "wifi_controller_state_machine_test.cpp",
     "wifi_service_scheduler_test.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_supplicant_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/wifi_hal_interface/wifi_base_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_common_event_helper.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_settings.cpp",
+    "$WIFI_ROOT_DIR/utils/src/wifi_event_handler.cpp",
+    "$WIFI_ROOT_DIR/utils/src/wifi_hisysevent.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code/wifi_country_code_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_sensor_scene.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_system_ability_listerner.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
+    "$WIFI_ROOT_DIR/utils/src/wifi_timer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_app_state_aware.cpp",
+    "$WIFI_ROOT_DIR/utils/src/wifi_common_util.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/block_connect_service.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_system_timer.cpp",
+    "$WIFI_ROOT_DIR/utils/src/wifi_sa_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_backup_config.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_chr_utils.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_file_spec.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_cert_utils.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code/wifi_country_code_policy.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/app_network_speed_limit_service.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/network_parser.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_protect.cpp",
+    "$WIFI_ROOT_DIR/utils/src/wifi_library_utils.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ip_tools.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/speed_limit_configs_writer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_internal_event_dispatcher_lite.cpp",
   ]
 
   include_dirs = [
@@ -86,9 +105,6 @@ ohos_unittest("wifi_controller_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select",
@@ -113,9 +129,13 @@ ohos_unittest("wifi_controller_unittest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock",
     "$WIFI_ROOT_DIR/utils/inc",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/interfaces/inner_api",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/idl_client/unittest",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
   ]
   ldflags = [
     "-fPIC",
@@ -124,10 +144,6 @@ ohos_unittest("wifi_controller_unittest") {
   deps = [
     "$WIFI_ROOT_DIR/base:wifi_base",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage:wifi_manager_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common:wifi_common_service",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native:wifi_native",
-    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit",
-    "$WIFI_ROOT_DIR/utils:wifi_utils",
   ]
   external_deps = [
     "ability_base:want",
@@ -138,12 +154,14 @@ ohos_unittest("wifi_controller_unittest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "cJSON:cjson",
     "certificate_manager:cert_manager_sdk",
     "data_share:datashare_consumer",
     "dhcp:dhcp_sdk",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_single",
     "libxml2:libxml2",
@@ -151,6 +169,8 @@ ohos_unittest("wifi_controller_unittest") {
     "netmanager_base:net_native_manager_if",
     "netmanager_base:net_stats_manager_if",
     "netstack:http_client",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
     "samgr:samgr_proxy",
     "time_service:time_client",
     "window_manager:libdm_lite",

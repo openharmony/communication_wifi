@@ -806,17 +806,16 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
     if (index < 0) {
         return;
     }
-    config.keyMgmtBitset |= (1 << index);
+    unsigned int uindex =  static_cast<unsigned int>(index);
+
+    config.keyMgmtBitset |= (1 << uindex);
     if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
         index = FindKeyMgmtPosition(KEY_MGMT_SAE);
-        config.keyMgmtBitset |= (1 << index);
+        config.keyMgmtBitset |= (1 << uindex);
     }
     if (config.keyMgmt == KEY_MGMT_SAE) {
         index = FindKeyMgmtPosition(KEY_MGMT_WPA_PSK);
-        if (index < 0) {
-            return;
-        }
-        config.keyMgmtBitset |= (1 << index);
+        config.keyMgmtBitset |= (1 << uindex);
     }
 }
 

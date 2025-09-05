@@ -271,5 +271,29 @@ std::string WifiDataShareHelperUtils::GetScanMacInfoWhiteListDataShareUri()
         "?Proxy=true&key=" + SETTINGS_DATASHARE_KEY_SCANMACINFO_WHITELIST;
     return uri;
 }
+
+std::string WifiDataShareHelperUtils::GetDisplayDeviceNameDataShareUri()
+{
+    std::string userId = DEFAULT_USERID;
+    std::string uri = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_" + userId +
+        "?Proxy=true&key=" + SETTINGS_DATASHARE_KEY_DISPLAY_DEVICE_NAME;
+    return uri;
+}
+ 
+std::string WifiDataShareHelperUtils::GetDatashareNameApSsid()
+{
+    if (!CheckIfSettingsDataReady()) {
+        LOGE("GetDisplayDeviceNameDataShareUri, SettingsDataIsNotReady!");
+        return "";
+    }
+    std::string ssid;
+    Uri uri(GetDisplayDeviceNameDataShareUri());
+    int ret = Query(uri, SETTINGS_DATASHARE_KEY_DISPLAY_DEVICE_NAME, ssid);
+    if (ret != WIFI_OPT_SUCCESS) {
+        LOGE("GetDisplayDeviceNameDataShareUri, Query DisplayName fail!");
+        return "";
+    }
+    return ssid;
+}
 }   // namespace Wifi
 }   // namespace OHOS

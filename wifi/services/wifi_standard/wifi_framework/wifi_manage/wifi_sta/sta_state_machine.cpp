@@ -646,7 +646,8 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
         return true;
     }
 
-    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE) {
+    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE &&
+        connTriggerMode != NETWORK_SELECTED_BY_MDM) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
         return true;
@@ -1062,7 +1063,8 @@ bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::st
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     std::string currentMac, realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
-    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC ||
+        WifiSettings::GetInstance().IsRandomMacDisabled() || ShouldUseFactoryMac(deviceConfig)) {
         currentMac = realMac;
     } else {
         WifiStoreRandomMac randomMacInfo;
@@ -1095,8 +1097,10 @@ bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::st
         return false;
     }
     deviceConfig.macAddress = currentMac;
-    deviceConfig.wifiPrivacySetting =
-        (currentMac == realMac) ? WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC;
+    if (!WifiSettings::GetInstance().IsRandomMacDisabled()) {
+        deviceConfig.wifiPrivacySetting =
+            (currentMac == realMac) ? WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC;
+    }
     WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
     LOGI("SetRandomMac wifiPrivacySetting:%{public}d,ssid:%{public}s,keyMgmt:%{public}s,macAddress:%{public}s",

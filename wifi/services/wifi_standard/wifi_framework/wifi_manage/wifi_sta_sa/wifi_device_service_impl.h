@@ -214,6 +214,10 @@ public:
     ErrCode GetVoWifiDetectPeriod(int &period) override;
 
     ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
+
+    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
+
+    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

@@ -560,6 +560,16 @@ NO_SANITIZE("cfi") WifiErrorCode Get5GHzChannelList(int *result, int *size)
     }
     return GetCErrorCode(ret);
 }
+
+NO_SANITIZE("cfi") WifiErrorCode IsRandomMacDisabled(bool *isRandomMacDisabled)
+{
+    return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
+}
+
+NO_SANITIZE("cfi") WifiErrorCode SetRandomMacDisabled(bool isRandomMacDisabled)
+{
+    return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
+}
 #ifndef OHOS_ARCH_LITE
 NO_SANITIZE("cfi") WifiErrorCode GetWifiProtect(OHOS::Wifi::WifiProtectMode mode)
 {

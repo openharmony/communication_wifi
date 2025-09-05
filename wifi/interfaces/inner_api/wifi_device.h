@@ -227,7 +227,7 @@ public:
      * @since 10
      */
     virtual ErrCode GetDisconnectedReason(DisconnectedReason &reason) = 0;
-
+    
     /**
      * @Description Set the country code.
      *
@@ -650,6 +650,27 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
+    
+    /**
+     * @Description Get Random Mac Disabeled.
+     * @param isRandomMacDisabled: True for disabeled   False for enabled
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+
+    /**
+     * @Description Set Random Mac Disabled.
+     *
+     * @param isRandomMacDisabled: True for disabled   False for enabled
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

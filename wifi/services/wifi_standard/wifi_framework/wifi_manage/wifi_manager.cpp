@@ -115,12 +115,18 @@ int WifiManager::Init()
             WifiConfigCenter::GetInstance().SetPersistWifiState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         }
     }
+#ifdef FEATURE_GLASS_AUTO_STARTUP_SUPPORT
+    /* Automatic startup upon startup */
+    if (WifiConfigCenter::GetInstance().GetSystemMode() != SystemMode::M_FACTORY_MODE) {
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN0);
+#else
     int lastState = WifiConfigCenter::GetInstance().GetPersistWifiState(INSTID_WLAN0);
     if (lastState != WIFI_STATE_DISABLED
         && WifiConfigCenter::GetInstance().GetSystemMode() != SystemMode::M_FACTORY_MODE) {
-        /* Automatic startup upon startup */
+ 
         WIFI_LOGI("AutoStartServiceThread lastState:%{public}d", lastState);
         WifiConfigCenter::GetInstance().SetWifiToggledState(lastState, INSTID_WLAN0);
+#endif
         mStartServiceThread = std::make_unique<WifiEventHandler>("StartServiceThread");
         mStartServiceThread->PostAsyncTask([this]() {
             AutoStartServiceThread();

@@ -169,7 +169,7 @@ void Handler::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
         return;
     }
     std::function<void()> func = std::bind([this, msg]() {
-        LOGD("%{public}s ExecuteMessage msg:%{public}d", mThreadName.c_str(), msg->GetMessageName());
+        msg->PrintMsg(mThreadName);
         ExecuteMessage(msg);
         MessageManage::GetInstance().ReclaimMsg(msg);
     });

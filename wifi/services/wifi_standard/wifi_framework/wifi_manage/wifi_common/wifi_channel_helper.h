@@ -60,6 +60,8 @@ public:
     void UpdateValidFreqs();
 
     void FilterDfsChannel(std::vector<int> &channels);
+
+    void FilterDfsFreq(std::vector<int> &freqList);
 private:
     WifiChannelHelper();
     void UpdateValidChannels(std::vector<int32_t> &supp2Gfreqs, std::vector<int32_t> &supp5Gfreqs);

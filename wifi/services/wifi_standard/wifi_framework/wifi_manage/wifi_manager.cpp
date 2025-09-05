@@ -115,7 +115,7 @@ int WifiManager::Init()
             WifiConfigCenter::GetInstance().SetPersistWifiState(WIFI_STATE_ENABLED, INSTID_WLAN0);
         }
     }
-#ifdef FEATURE_GLASS_AUTO_STARTUP_SUPPORT
+#ifdef FEATURE_AUTO_STARTUP_SUPPORT
     if (WifiConfigCenter::GetInstance().GetSystemMode() != SystemMode::M_FACTORY_MODE) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, INSTID_WLAN0);
 #else

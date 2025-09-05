@@ -69,7 +69,7 @@ declare_args() {
       defined(global_parts_info.hiviewdfx_hiappevent)) {
     wifi_hiappevent_enable = true
   }
-  wifi_feature_glass_support = false
+  wifi_feature_auto_enable_support = false
 }
 
 memory_optimization_cflags = [

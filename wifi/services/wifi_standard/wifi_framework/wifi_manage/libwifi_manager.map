@@ -267,7 +267,6 @@
         "OHOS::Wifi::WifiSettings::SetP2pVendorConfig(OHOS::Wifi::P2pVendorConfig const&)";
         "OHOS::Wifi::WifiSettings::GetDefaultApSsid()";
         "OHOS::Wifi::WifiSettings::SetWifiP2pGroupInfo(std::__h::vector<OHOS::Wifi::WifiP2pGroupInfo, std::__h::allocator<OHOS::Wifi::WifiP2pGroupInfo>> const&)";
-        "OHOS::Wifi::WifiSettings::SetDeviceNameApSsid(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>)";
         "OHOS::Wifi::GetRandomStr(int)";
         "OHOS::Wifi::Ipv4Address::defaultInetAddress";
         "OHOS::Wifi::MacAddress::GetMacAddr(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, unsigned char*)";

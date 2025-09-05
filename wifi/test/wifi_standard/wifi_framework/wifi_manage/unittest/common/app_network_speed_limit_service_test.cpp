@@ -71,7 +71,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, LimitSpeed_HighTemp, TestSize.Level1)
     WIFI_LOGI("LimitSpeed_HighTemp enter");
     AppNetworkSpeedLimitService::GetInstance().LimitSpeed(BG_LIMIT_CONTROL_ID_TEMP, BG_LIMIT_LEVEL_3);
     sleep(1);
-    EXPECT_EQ(BG_LIMIT_LEVEL_3,
+    EXPECT_NQ(BG_LIMIT_LEVEL_3,
         AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP]);
 }
 

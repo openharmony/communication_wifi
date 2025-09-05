@@ -78,9 +78,14 @@ void WifiSensorScene::DealStaConnChanged(OperateResState state, const WifiLinked
         connScene_ = UNKNOW_SCENE;
         rssiCnt_ = 0;
         reportRssi_ = 0;
+        connRssi_ = 0;
         return;
     }
-    IsOutdoorScene() ? connScene_ = OUTDOOR_SCENE : connScene_ = INDOOR_SCENE;
+    if (lastState_ == OperateResState::DISCONNECT_DISCONNECTED) {
+        connRssi_ = info.rssi;
+        IsOutdoorScene() ? connScene_ = OUTDOOR_SCENE : connScene_ = INDOOR_SCENE;
+    }
+    lastState_ = state;
 }
 
 void WifiSensorScene::HandleSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo)
@@ -88,7 +93,14 @@ void WifiSensorScene::HandleSignalInfoChange(const WifiSignalPollInfo &wifiSigna
     WIFI_LOGD("Enter HandleSignalInfoChange");
     std::lock_guard<std::mutex> lock(staCbMutex_);
     if (rssiCnt_ == CONN_RSSI_CNT) {
-        ReportLinkedQuality(reportRssi_);
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        int32_t maxSignalLevel = WifiSettings::GetInstance().GetSignalLevel(maxRssi_, linkedInfo.band, INSTID_WLAN0);
+        if (maxSignalLevel == SIG_LEVEL_4) {
+            ReportLinkedQuality(connRssi_);
+        } else {
+            ReportLinkedQuality(reportRssi_);
+        }
     }
     if (rssiCnt_ > CONN_RSSI_CNT) {
         WIFI_LOGD("Current link has collected rssi data");
@@ -96,6 +108,7 @@ void WifiSensorScene::HandleSignalInfoChange(const WifiSignalPollInfo &wifiSigna
     }
     rssiCnt_++;
     reportRssi_ = wifiSignalPollInfo.signal < reportRssi_ ? wifiSignalPollInfo.signal : reportRssi_;
+    maxRssi_ = wifiSignalPollInfo.signal < maxRssi_ ? maxRssi_ : wifiSignalPollInfo.signal;
 }
 
 StaServiceCallback WifiSensorScene::GetStaCallback() const

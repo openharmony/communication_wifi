@@ -4473,6 +4473,12 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         AutoSelectConnectToNetwork(bssid, ifaceName);
     }
 
+    if (WifiStaHalInterface::GetInstance().EnableNetwork(WPA_DEFAULT_NETWORKID, ifaceName) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("EnableNetwork failed!");
+        InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);
+        return WIFI_OPT_FAILED;
+    }
+
     if (WifiStaHalInterface::GetInstance().Connect(WPA_DEFAULT_NETWORKID, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Connect failed!");
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);

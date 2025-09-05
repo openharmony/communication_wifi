@@ -181,8 +181,11 @@ void WifiProService::HandleQoeReport(const NetworkLagType &networkLagType, const
         default:
             break;
     }
- 
-    pWifiProStateMachine_->SendMessage(EVENT_QOE_REPORT, networkLagInfo);
+    InternalMessage msg;
+    msg.SetMessageName(EVENT_QOE_REPORT);
+    msg.SetMessageObj(networkLagInfo);
+    msg.msgLogLevel_ = MsgLogLevel::LOG_D;
+    pWifiProStateMachine_->SendMessage(msg);
 }
 void WifiProService::HandleWifiHalSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo)
 {
@@ -190,7 +193,11 @@ void WifiProService::HandleWifiHalSignalInfoChange(const WifiSignalPollInfo &wif
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
         return;
     }
-    pWifiProStateMachine_->SendMessage(EVENT_SIGNAL_INFO_CHANGE, wifiSignalPollInfo);
+    InternalMessage msg;
+    msg.SetMessageName(EVENT_SIGNAL_INFO_CHANGE);
+    msg.SetMessageObj(wifiSignalPollInfo);
+    msg.msgLogLevel_ = MsgLogLevel::LOG_D;
+    pWifiProStateMachine_->SendMessage(msg);
 }
 
 void WifiProService::NotifyWifiEmlsrStateChanged(OperateResState state, const WifiLinkedInfo &linkedInfo)

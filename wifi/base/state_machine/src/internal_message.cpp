@@ -185,6 +185,26 @@ void InternalMessage::SetHandleTime(int64_t time)
     return;
 }
 
+void InternalMessage::PrintMsg(const std::string prefix)
+{
+    switch (msgLogLevel_)
+        case MsgLogLevel::LOG_D:
+            LOGD("%{public}s ExecuteMessage msg:%{public}d", prefix.c_str(), mMsgName);
+            break;
+        case MsgLogLevel::LOG_I:
+            LOGI("%{public}s ExecuteMessage msg:%{public}d", prefix.c_str(), mMsgName);
+            break;
+        case MsgLogLevel::LOG_W:
+            LOGW("%{public}s ExecuteMessage msg:%{public}d", prefix.c_str(), mMsgName);
+            break;
+        case MsgLogLevel::LOG_E:
+            LOGE("%{public}s ExecuteMessage msg:%{public}d", prefix.c_str(), mMsgName);
+            break;
+        default:
+            break;
+    }
+}
+
 std::unique_ptr<MessageManage> MessageManage::msgManage;
 
 MessageManage &MessageManage::GetInstance()
@@ -219,7 +239,7 @@ InternalMessagePtr MessageManage::CreateMessage(const InternalMessagePtr orig)
     m->SetParam2(orig->GetParam2());
     m->SetMessageObj(orig->GetMessageObj());
     m->CopyMessageBody(orig->GetMessageBody());
-
+    m->msgLogLevel_ = orig->msgLogLevel_;
     return m;
 }
 

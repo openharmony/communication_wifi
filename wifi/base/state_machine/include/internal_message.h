@@ -26,6 +26,14 @@
 namespace OHOS {
 namespace Wifi {
 const int MAX_POOL_SIZE_INIT = 50;
+
+enum class MsgLogLevel {
+    LOG_D,
+    LOG_I,
+    LOG_W,
+    LOG_E
+};
+
 class MessageBody {
 public:
     /**
@@ -259,6 +267,13 @@ public:
      */
     void SetHandleTime(int64_t time);
 
+    /**
+     * @Description : Print msg
+     *
+     * @param prefix - prefix of msg
+     */
+    void PrintMsg(const std::string prefix);
+
 private:
     /* Message Name */
     int mMsgName;
@@ -274,6 +289,9 @@ private:
     std::shared_ptr<InternalMessage> pNextMsg;
     /* Message execution time */
     int64_t mHandleTime;
+
+public:
+    MsgLogLevel msgLogLevel_ {MsgLogLevel::LOG_I};
 };
 using InternalMessagePtr = std::shared_ptr<InternalMessage>;
 class MessageManage {

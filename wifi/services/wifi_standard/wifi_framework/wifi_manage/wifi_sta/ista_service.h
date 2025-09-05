@@ -252,6 +252,14 @@ public:
     virtual ErrCode SetSuspendMode(bool mode) = 0;
 
     /**
+     * @Description Set Random Mac Disabled.
+     *
+     * @param isRandomMacDisabled: True for disabled   False for enabled
+     * @return WifiErrorNo
+     */
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) = 0;
+
+    /**
      * @Description send power mode for wpa.
      *
      * @param mode: true for power, false for resume.

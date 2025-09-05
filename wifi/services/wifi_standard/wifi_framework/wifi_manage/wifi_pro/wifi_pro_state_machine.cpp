@@ -1487,7 +1487,8 @@ void WifiProStateMachine::WifiPortalState::HandleWifiScanResultInPortal(const In
         return;
     }
 
-    if (WifiConfigCenter::GetInstance().GetBrowserState() ||
+    if (WifiConfigCenter::GetInstance().GetDeviceType() == ProductDeviceType::TV ||
+        WifiConfigCenter::GetInstance().GetBrowserState() ||
         WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
         WIFI_LOGI("HandleWifiScanResultInPortal: browser opened just now or screen off, cannot switch");
         return;
@@ -1525,7 +1526,8 @@ bool WifiProStateMachine::WifiPortalState::HandleHttpResultInPortal(const Intern
     }
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
-        if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE ||
+        if (WifiConfigCenter::GetInstance().GetDeviceType() == ProductDeviceType::TV ||
+            WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE ||
             WifiConfigCenter::GetInstance().GetBrowserState()) {
             WIFI_LOGI("IsNotAllowedToScan: screen state off or open browser.");
             return EXECUTED;

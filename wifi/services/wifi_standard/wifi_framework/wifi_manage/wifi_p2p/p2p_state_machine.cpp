@@ -1056,7 +1056,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     if (freqList.empty()) {
         return 0;
     }
-    WifiChannelHelper::GetInstance().FilterDfsChannel(freqList);
+    WifiChannelHelper::GetInstance().FilterDfsFreq(freqList);
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int retFreq = 0;

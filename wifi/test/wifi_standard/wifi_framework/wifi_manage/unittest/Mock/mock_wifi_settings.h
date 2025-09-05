@@ -218,6 +218,7 @@ public:
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
     virtual int GetHotspotConfig(HotspotConfig &hotspotConfig, int id) = 0;
     virtual int SetDeviceEphemeral(int networkId, bool isEphemeral) = 0;
+    virtual void SetDeviceNameApSsid(std::string ssid) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -405,6 +406,7 @@ public:
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
     MOCK_METHOD2(GetHotspotConfig, int(HotspotConfig &hotspotConfig, int id));
     MOCK_METHOD2(SetDeviceEphemeral, int(int networkId, bool isEphemeral));
+    MOCK_METHOD1(SetDeviceNameApSsid, void(std::string ssid));
 };
 }  // namespace Wifi
 }  // namespace OHOS

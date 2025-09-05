@@ -36,6 +36,7 @@ constexpr const char *SETTINGS_DATASHARE_URL_AIRPLANE_MODE =
 constexpr const char *SETTINGS_DATASHARE_KEY_AIRPLANE_MODE = "settings.telephony.airplanemode";
 constexpr const char *SETTINGS_DATASHARE_KEY_LOCATION_MODE = "location_switch_enable";
 constexpr const char *SETTINGS_DATASHARE_KEY_SCANMACINFO_WHITELIST = "location_kit_api_control_white_list";
+constexpr const char *SETTINGS_DATASHARE_KEY_DISPLAY_DEVICE_NAME = "settings.general.display_device_name";
 
 #ifndef OHOS_ARCH_LITE
 constexpr const char *SETTINGS_DATASHARE_URI_WIFI_ON =
@@ -127,12 +128,14 @@ public:
 
     std::string GetLoactionDataShareUri();
     std::string GetScanMacInfoWhiteListDataShareUri();
+    std::string GetDatashareNameApSsid();
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> WifiCreateDataShareHelper(bool onlySettingsData = false);
     void ClearResources(std::shared_ptr<DataShare::DataShareHelper> operatrPtr,
         std::shared_ptr<DataShare::DataShareResultSet> result);
     bool IsDataMgrServiceActive();
+    std::string GetDisplayDeviceNameDataShareUri();
 
     bool isDataShareReady_ = false;
 };

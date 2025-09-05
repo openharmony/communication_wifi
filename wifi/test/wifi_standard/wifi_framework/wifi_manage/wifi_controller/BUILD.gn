@@ -91,6 +91,7 @@ ohos_unittest("wifi_controller_unittest") {
     "$WIFI_ROOT_DIR/utils/src/wifi_library_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/ip_tools.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/app_network_speed_limit/speed_limit_configs_writer.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_internal_event_dispatcher_lite.cpp",
   ]
 
   include_dirs = [

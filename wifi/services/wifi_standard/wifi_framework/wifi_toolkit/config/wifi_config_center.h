@@ -41,6 +41,8 @@ namespace Wifi {
 inline const int HID2D_TIMEOUT_INTERVAL = 10 * 1000;
 const int CHANNEL50 = 50;
 const int CHANNEL144 = 144;
+const int FREQ5240 = 5240;
+const int FREQ5730 = 5730;
 using ChannelsTable = std::map<BandType, std::vector<int32_t>>;
 
 class WifiConfigCenter {

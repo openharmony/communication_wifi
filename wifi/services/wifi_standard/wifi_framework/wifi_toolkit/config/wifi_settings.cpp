@@ -42,7 +42,7 @@
 
 namespace OHOS {
 namespace Wifi {
-std::string defaultApSsid;
+std::string g_defaultApSsid;
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
 #endif
@@ -1217,7 +1217,7 @@ void WifiSettings::ClearHotspotConfig()
     config.SetChannel(AP_CHANNEL_DEFAULT);
     config.SetMaxConn(GetApMaxConnNum());
     config.SetBandWidth(AP_BANDWIDTH_DEFAULT);
-    config.SetSsid(defaultApSsid.empty()? GetDefaultApSsid() : defaultApSsid);
+    config.SetSsid(g_defaultApSsid.empty()? GetDefaultApSsid() : g_defaultApSsid);
     config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, config);
     if (!ret.second) {
@@ -1901,7 +1901,7 @@ std::string WifiSettings::GetPackageName(std::string tag)
 
 void WifiSettings::SetDeviceNameApSsid(std::string ssid)
 {
-    defaultApSsid = ssid;
+    g_defaultApSsid = ssid;
 }
 
 void WifiSettings::InitDefaultHotspotConfig()
@@ -1912,7 +1912,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetChannel(AP_CHANNEL_DEFAULT);
     cfg.SetMaxConn(GetApMaxConnNum());
     cfg.SetBandWidth(AP_BANDWIDTH_DEFAULT);
-    cfg.SetSsid(defaultApSsid.empty()? GetDefaultApSsid() : defaultApSsid);
+    cfg.SetSsid(g_defaultApSsid.empty()? GetDefaultApSsid() : g_defaultApSsid);
     cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {

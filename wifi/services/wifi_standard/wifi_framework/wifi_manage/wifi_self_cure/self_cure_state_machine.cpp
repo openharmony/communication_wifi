@@ -596,7 +596,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(Internal
         IpQosMonitor::GetInstance().QueryPackets();
     }
     pSelfCureStateMachine_->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
-        INTERNET_STATUS_DETECT_INTERVAL_MS);
+        INTERNET_STATUS_DETECT_INTERVAL_MS, MsgLogLevel::LOG_D);
 }
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleGatewayChanged(InternalMessagePtr msg)

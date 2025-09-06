@@ -187,7 +187,7 @@ void InternalMessage::SetHandleTime(int64_t time)
 
 void InternalMessage::PrintMsg(const std::string prefix)
 {
-    switch (msgLogLevel_)
+    switch (msgLogLevel_) {
         case MsgLogLevel::LOG_D:
             LOGD("%{public}s ExecuteMessage msg:%{public}d", prefix.c_str(), mMsgName);
             break;

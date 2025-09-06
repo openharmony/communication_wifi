@@ -4187,7 +4187,7 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), staSignalPollDelayTime_);
+        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), staSignalPollDelayTime_, MsgLogLevel::LOG_D);
     }
 }
 

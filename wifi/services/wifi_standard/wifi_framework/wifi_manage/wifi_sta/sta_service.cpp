@@ -987,11 +987,11 @@ ErrCode StaService::HandleForegroundAppChangedAction(const AppExecFwk::AppStateD
         WIFI_LOGE("pStaStateMachine is null");
         return WIFI_OPT_FAILED;
     }
-    InternalMessage msg;
-    msg.SetMessageName(WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT);
-    msg.SetMessageObj(appStateData);
-    msg.msgLogLevel_ = MsgLogLevel::LOG_D;
-    pWifiProStateMachine_->SendMessage(msg);
+
+    InternalMessagePtr msg = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT);
+    msg->SetMessageObj(appStateData);
+    msg->msgLogLevel_ = MsgLogLevel::LOG_D;
+    pStaStateMachine->SendMessage(msg);
     return WIFI_OPT_SUCCESS;
 }
 

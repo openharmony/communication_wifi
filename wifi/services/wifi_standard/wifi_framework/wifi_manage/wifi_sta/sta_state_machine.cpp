@@ -647,7 +647,8 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
     }
 
     if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE &&
-        connTriggerMode != NETWORK_SELECTED_BY_MDM) {
+        connTriggerMode != NETWORK_SELECTED_BY_MDM &&
+        pStaStateMachine->linkedInfo.connState != ConnState::DISCONNECTING) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
         return true;

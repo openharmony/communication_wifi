@@ -74,7 +74,7 @@ void StateMachine::StopTimer(int timerName)
     WIFI_LOGD("StateMachine::StopTimer, timerName is %{private}d.", timerName);
 }
 
-void StateMachine::StartTimer(int timerName, int64_t interval)
+void StateMachine::StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel)
 {
     WIFI_LOGD("StateMachine::StartTimer, timerName is %{private}d.", timerName);
 }

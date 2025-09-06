@@ -199,6 +199,13 @@ public:
      */
     virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) const;
     /**
+     * @Description Set Random Mac Disabled.
+     *
+     * @param isRandomMacDisabled: True for Disabled, false for enabled
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) const;
+    /**
      * @Description  Start WPS Connection
      *
      * @Output: Return operating results to Interface Service after enable wifi
@@ -411,7 +418,7 @@ public:
      */
     virtual ErrCode DeliverAudioState(int state);
 
-/**
+    /**
      * @Description fold status
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
@@ -462,6 +469,7 @@ public:
     virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) const;
 #endif
 private:
+    ErrCode ReconnectByMdm() const;
     void NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig config, bool isRemoveAll) const;
     void NotifyCandidateApprovalStatus(CandidateApprovalStatus status) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;

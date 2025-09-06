@@ -43,7 +43,7 @@ void MockScanStateMachine::SendMessage(InternalMessagePtr msg)
     WIFI_LOGE("MockScanStateMachine::SendMessage, msg is %{public}d.", msg->GetMessageName());
 }
 
-void MockScanStateMachine::StartTimer(int timerName, int64_t interval)
+void MockScanStateMachine::StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel)
 {
     (void)timerName;
     (void)interval;

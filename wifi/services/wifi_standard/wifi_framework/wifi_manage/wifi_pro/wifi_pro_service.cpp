@@ -182,7 +182,6 @@ void WifiProService::HandleQoeReport(const NetworkLagType &networkLagType, const
             break;
     }
     InternalMessagePtr msg = pWifiProStateMachine_->CreateMessage(EVENT_QOE_REPORT);
-    msg->SetMessageName(EVENT_QOE_REPORT);
     msg->SetMessageObj(networkLagInfo);
     msg->msgLogLevel_ = MsgLogLevel::LOG_D;
     pWifiProStateMachine_->SendMessage(msg);

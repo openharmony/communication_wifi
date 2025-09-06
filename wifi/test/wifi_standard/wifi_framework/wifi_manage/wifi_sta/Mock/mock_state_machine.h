@@ -32,7 +32,7 @@ public:
     virtual void SendMessage(int msgName, const std::any &messageObj);
     virtual void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
     void StopTimer(int timerName);
-    void StartTimer(int timerName, int64_t interval);
+    void StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel = MsgLogLevel::LOG_I);
     void StartConnectToBssid(const int32_t networkId, std::string bssid);
     void StopHandlerThread();
     bool InitialStateMachine(const std::string &name = "RunHandleThread");

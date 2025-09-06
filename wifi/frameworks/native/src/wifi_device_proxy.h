@@ -663,6 +663,21 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
+    
+    /**
+     * @Description Is Random Mac Disabled.
+     * @param isRandomMacDisabled: True for disabled   False for enabled
+     * @return ErrCode - operation result
+     */
+    ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
+
+    /**
+     * @Description Set Random Mac Disabled.
+     *
+     * @param isRandomMacDisabled: True for disabled   False for enabled
+     * @return ErrCode - operation result
+     */
+    ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

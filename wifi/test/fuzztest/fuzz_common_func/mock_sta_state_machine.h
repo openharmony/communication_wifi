@@ -31,7 +31,7 @@ public:
     void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
     void StartConnectToBssid(const int32_t networkId, std::string bssid);
     void StopTimer(int timerName);
-    void MessageExecutedLater(int msgName, int64_t delayTimeMs);
+    void MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel = MsgLogLevel::LOG_I);
 };
 }  // namespace OHOS
 }  // namespace Wifi

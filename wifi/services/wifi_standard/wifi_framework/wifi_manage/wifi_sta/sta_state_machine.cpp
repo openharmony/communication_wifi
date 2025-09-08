@@ -3121,7 +3121,7 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(DhcpResult *dest, Dhcp
         WIFI_LOGE("SaveDhcpResultExt strOptLocalAddr2 strcpy_s failed!");
         return;
     }
-    if (source->dnsList.dnsNumber > 0 && source->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
+    if (source->dnsList.dnsNumber >= 0 && source->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         dest->dnsList.dnsNumber = 0;
         for (uint32_t i = 0; i < source->dnsList.dnsNumber; i++) {
             if (memcpy_s(dest->dnsList.dnsAddr[i], DHCP_LEASE_DATA_MAX_LEN, source->dnsList.dnsAddr[i],
@@ -3284,7 +3284,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4ResultExt(IpInfo &ipInfo, I
     if (ipInfo.secondDns != 0) {
         ipInfo.dnsAddr.push_back(ipInfo.secondDns);
     }
-    if (result->dnsList.dnsNumber > 0 && result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
+    if (result->dnsList.dnsNumber >= 0 && result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
             unsigned int ipv4Address = IpTools::ConvertIpv4Address(result->dnsList.dnsAddr[i]);
             if (std::find(ipInfo.dnsAddr.begin(), ipInfo.dnsAddr.end(), ipv4Address) != ipInfo.dnsAddr.end()) {
@@ -3512,7 +3512,7 @@ void StaStateMachine::DhcpResultNotify::DealDhcpOfferResult()
         if (ipInfo.secondDns != 0) {
             ipInfo.dnsAddr.push_back(ipInfo.secondDns);
         }
-        if (DhcpOfferInfo.dnsList.dnsNumber > 0 && DhcpOfferInfo.dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
+        if (DhcpOfferInfo.dnsList.dnsNumber >= 0 && DhcpOfferInfo.dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
             for (uint32_t i = 0; i < DhcpOfferInfo.dnsList.dnsNumber; i++) {
                 uint32_t ipv4Address = IpTools::ConvertIpv4Address(DhcpOfferInfo.dnsList.dnsAddr[i]);
                 if (std::find(ipInfo.dnsAddr.begin(), ipInfo.dnsAddr.end(), ipv4Address) != ipInfo.dnsAddr.end()) {

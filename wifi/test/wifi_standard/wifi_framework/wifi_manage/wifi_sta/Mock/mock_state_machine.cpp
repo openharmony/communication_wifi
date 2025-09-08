@@ -74,7 +74,7 @@ void StateMachine::StopTimer(int timerName)
     WIFI_LOGD("StateMachine::StopTimer, timerName is %{private}d.", timerName);
 }
 
-void StateMachine::StartTimer(int timerName, int64_t interval)
+void StateMachine::StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel)
 {
     WIFI_LOGD("StateMachine::StartTimer, timerName is %{private}d.", timerName);
 }
@@ -169,7 +169,7 @@ InternalMessagePtr StateMachine::CreateMessage(int msgName, int param1, int para
     m->SetMessageObj(messageObj);
     return m;
 }
-void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs)
+void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel)
 {}
 
 void StateMachine::MessageExecutedLater(int msgName, int param1, int64_t delayTimeMs)

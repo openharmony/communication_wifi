@@ -307,6 +307,11 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
     netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
     netIpv6Addr->prefixlen_ = 0;
+    if (!wifiIpV6Info.linkIpV6Address.empty()) {
+        netIpv6Addr->address_ = wifiIpV6Info.linkIpV6Address;
+        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo linkIpv6:%{public}s", MacAnonymize(wifiIpV6Info.linkIpV6Address).c_str());
+    }
     if (!wifiIpV6Info.globalIpV6Address.empty()) {
         netIpv6Addr->address_ = wifiIpV6Info.globalIpV6Address;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);

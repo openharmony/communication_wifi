@@ -45,7 +45,7 @@ public:
     InternalMessagePtr CreateMessage(int msgName, int param1, int param2);
     InternalMessagePtr CreateMessage(int msgName, const std::any &messageObj);
     InternalMessagePtr CreateMessage(int msgName, int param1, int param2, const std::any &messageObj);
-    void MessageExecutedLater(int msgName, int64_t delayTimeMs);
+    void MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel = MsgLogLevel::LOG_I);
     void MessageExecutedLater(int msgName, int param1, int64_t delayTimeMs);
     void MessageExecutedLater(int msgName, int param1, int param2, int64_t delayTimeMs);
     void MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs);

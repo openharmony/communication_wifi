@@ -169,7 +169,7 @@ InternalMessagePtr StateMachine::CreateMessage(int msgName, int param1, int para
     m->SetMessageObj(messageObj);
     return m;
 }
-void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs)
+void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel)
 {}
 
 void StateMachine::MessageExecutedLater(int msgName, int param1, int64_t delayTimeMs)

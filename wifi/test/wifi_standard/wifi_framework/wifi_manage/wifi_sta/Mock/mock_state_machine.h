@@ -32,7 +32,7 @@ public:
     virtual void SendMessage(int msgName, const std::any &messageObj);
     virtual void SendMessage(int msgName, int param1, int param2, const std::any &messageObj);
     void StopTimer(int timerName);
-    void StartTimer(int timerName, int64_t interval);
+    void StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel = MsgLogLevel::LOG_I);
     void StartConnectToBssid(const int32_t networkId, std::string bssid);
     void StopHandlerThread();
     bool InitialStateMachine(const std::string &name = "RunHandleThread");
@@ -45,7 +45,7 @@ public:
     InternalMessagePtr CreateMessage(int msgName, int param1, int param2);
     InternalMessagePtr CreateMessage(int msgName, const std::any &messageObj);
     InternalMessagePtr CreateMessage(int msgName, int param1, int param2, const std::any &messageObj);
-    void MessageExecutedLater(int msgName, int64_t delayTimeMs);
+    void MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel = MsgLogLevel::LOG_I);
     void MessageExecutedLater(int msgName, int param1, int64_t delayTimeMs);
     void MessageExecutedLater(int msgName, int param1, int param2, int64_t delayTimeMs);
     void MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs);

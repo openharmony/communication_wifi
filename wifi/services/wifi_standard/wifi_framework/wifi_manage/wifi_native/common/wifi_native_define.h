@@ -126,6 +126,7 @@ typedef enum HalCallbackEvent {
 } HalCallbackEvent;
 
 typedef enum Wifi80211StatusCode {
+    WLAN_STATUS_EXT_DRIVER_FAIL = -1,
     WLAN_STATUS_UNSPECIFIED_FAILURE = 1,
     WLAN_STATUS_CHALLENGE_FAIL = 15,
     WLAN_STATUS_AP_UNABLE_TO_HANDLE_NEW_STA = 17,

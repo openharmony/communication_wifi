@@ -702,6 +702,11 @@ ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
+    if (!CheckConfigPwd(config)) {
+        WIFI_LOGE("UpdateDeviceConfig CheckConfigPwd failed!");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }

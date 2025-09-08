@@ -1221,8 +1221,9 @@ void WifiProStateMachine::WifiHasNetState::RequestHttpDetect(bool forceHttpDetec
 void WifiProStateMachine::WifiHasNetState::ParseQoeInfoAndRequestDetect()
 {
     pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
-    pWifiProStateMachine_->MessageExecutedLater(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL,
-        INTERNET_STATUS_DETECT_INTERVAL_MS);
+    InternalMessagePtr msg = pWifiProStateMachine_->CreateMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
+    msg->msgLogLevel_ = MsgLogLevel::LOG_D;
+    pWifiProStateMachine_->MessageExecutedLater(msg, INTERNET_STATUS_DETECT_INTERVAL_MS);
     int64_t mCurrentTcpTxCounter = IpQosMonitor::GetInstance().GetCurrentTcpTxCounter();
     int64_t mCurrentTcpRxCounter = IpQosMonitor::GetInstance().GetCurrentTcpRxCounter();
     int32_t mCurrentDnsFailedCnt = SelfCureUtils::GetInstance().GetCurrentDnsFailedCounter();

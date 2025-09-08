@@ -647,7 +647,8 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
     }
 
     if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE &&
-        connTriggerMode != NETWORK_SELECTED_BY_MDM) {
+        connTriggerMode != NETWORK_SELECTED_BY_MDM &&
+        pStaStateMachine->linkedInfo.connState != ConnState::DISCONNECTING) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
         return true;
@@ -4192,7 +4193,7 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), staSignalPollDelayTime_);
+        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), staSignalPollDelayTime_, MsgLogLevel::LOG_D);
     }
 }
 

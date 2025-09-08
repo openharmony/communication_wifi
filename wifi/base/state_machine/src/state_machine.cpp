@@ -214,9 +214,11 @@ void StateMachine::SendMessage(int msgName, int param1, int param2, const std::a
     return;
 }
 
-void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs)
+void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel)
 {
-    pStateMachineHandler->MessageExecutedLater(CreateMessage(msgName), delayTimeMs);
+    InternalMessagePtr msg = CreateMessage(msgName);
+    msg->msgLogLevel_ = logLevel;
+    pStateMachineHandler->MessageExecutedLater(msg, delayTimeMs);
     return;
 }
 
@@ -257,10 +259,10 @@ void StateMachine::SendMessageAtFrontOfQueue(int msgName, int param1)
     return;
 }
 
-void StateMachine::StartTimer(int timerName, int64_t interval)
+void StateMachine::StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel)
 {
     LOGD("Enter StartTimer, timerName is %{public}d, interval is %" PRId64 ".", timerName, interval);
-    MessageExecutedLater(timerName, interval);
+    MessageExecutedLater(timerName, interval, logLevel);
     return;
 }
 

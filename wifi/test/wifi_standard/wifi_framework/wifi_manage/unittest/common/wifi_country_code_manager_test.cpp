@@ -67,7 +67,7 @@ class MockStateMachine : public StateMachine {
 public:
     explicit MockStateMachine(const std::string &name) : StateMachine(name) {};
     ~MockStateMachine() {};
-    MOCK_METHOD2(StartTimer, void(int, int64_t));
+    MOCK_METHOD3(StartTimer, void(int, int64_t, MsgLogLevel));
     MOCK_METHOD1(StopTimer, void(int));
     MOCK_METHOD1(SendMessage, void(int));
     MOCK_METHOD2(SendMessage, void(int, int));

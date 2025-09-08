@@ -67,7 +67,7 @@ void MockStaStateMachine::StopTimer(int timerName)
     WIFI_LOGD("MockStaStateMachine::StartConnectToBssid, bssid is %{private}d.", timerName);
 }
 
-void MessageExecutedLater(int msgName, int64_t delayTimeMs)
+void MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel)
 {}
 }  // namespace Wifi
 }  // namespace OHOS

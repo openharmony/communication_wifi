@@ -65,18 +65,16 @@ Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddr
     if (g_WifiDevicePtr == nullptr) {
         return WIFI_OPERATION_FAILED;
     }
- 
+
     std::string mac;
     OHOS::Wifi::ErrCode ret = g_WifiDevicePtr->GetDeviceMacAddress(mac);
     if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
         return WifiErrCodeToResultCode(ret);
     }
- 
-    if (*macAddrLen > mac.length()) {
-        strcpy_s(macAddr, macAddrLen, mac.c_str());
-    } else {
+
+    if (*macAddrLen <= mac.length() || strcpy_s(macAddr, macAddrLen, mac.c_str()) != 0) {
         return WIFI_OPERATION_FAILED;
     }
- 
+
     return WIFI_SUCCESS;
 }

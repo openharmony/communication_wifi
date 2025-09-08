@@ -730,5 +730,42 @@ HWTEST_F(WifiProStateMachineTest, WifiPortalStateExecuteStateMsgTest04, TestSize
     EXPECT_EQ(wifiPortalState_->ExecuteStateMsg(msg), false);
 }
 
+HWTEST_F(WifiProStateMachineTest, wifiPortalStateHandleHttpResultInPortalTest05, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(EVENT_CHECK_WIFI_INTERNET_RESULT);
+    msg->SetParam1(20);
+    pWifiProStateMachine_->pWifiPortalState_->HandleHttpResultInPortal(msg);
+    EXPECT_EQ(wifiPortalState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+}
+ 
+HWTEST_F(WifiProStateMachineTest, wifiPortalStateHandleHttpResultInPortalTest06, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(EVENT_CHECK_WIFI_INTERNET_RESULT);
+    msg->SetParam1(19);
+    pWifiProStateMachine_->pWifiPortalState_->HandleHttpResultInPortal(msg);
+    EXPECT_EQ(wifiPortalState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+}
+
+HWTEST_F(WifiProStateMachineTest, wifiPortalStateHandleHttpResultInPortalTest07, TestSize.Level1)
+{
+    InternalMessagePtr msg = nullptr;
+    EXPECT_EQ(wifiPortalState_->HandleHttpResultInPortal(msg), true);
+}
+
+HWTEST_F(WifiProStateMachineTest, wifiPortalStateExecuteStateMsgTest08, TestSize.Level1)
+{
+    InternalMessagePtr msg = nullptr;
+    EXPECT_EQ(wifiPortalState_->ExecuteStateMsg(msg), false);
+}
+
+HWTEST_F(WifiProStateMachineTest, wifiPortalStateExecuteStateMsgTest09, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(EVENT_REQUEST_SCAN_DELAY);
+    EXPECT_EQ(wifiPortalState_->ExecuteStateMsg(msg), false);
+}
+
 } // namespace Wifi
 } // namespace OHOS

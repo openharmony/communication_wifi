@@ -1583,6 +1583,16 @@ WifiNetworkControlInfo WifiConfigCenter::GetNetworkControlInfo()
     return networkControlInfoRecord;
 }
 
+void WifiConfigCenter::SetBrowserState(bool browser)
+{
+    browserOn_ = browser;
+}
+ 
+bool WifiConfigCenter::GetBrowserState()
+{
+    return browserOn_;
+}
+
 #ifndef OHOS_ARCH_LITE
 void WifiConfigCenter::SetScreenDispalyState(int32_t orientation)
 {

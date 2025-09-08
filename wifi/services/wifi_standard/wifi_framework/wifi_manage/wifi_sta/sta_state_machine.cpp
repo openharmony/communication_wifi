@@ -2106,6 +2106,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     }
 #endif
 #endif
+    WifiConfigCenter::GetInstance().SetBrowserState(err == ERR_OK);
 }
 
 void StaStateMachine::SetPortalBrowserFlag(bool flag)

@@ -28,6 +28,7 @@ enum class NetworkSelectType {
     WIFI2WIFI_NONET,
     WIFI2WIFI_QOE_BAD,
     USER_CONNECT,
+    WIFI2WIFI_PORTAL
 };
 
 class NetworkSelectorFactory {

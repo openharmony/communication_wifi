@@ -83,6 +83,7 @@ typedef enum Wifi_ResultCode {
  */
 Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
 
+Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddress, size_t size);
 #ifdef __cplusplus
 }
 #endif

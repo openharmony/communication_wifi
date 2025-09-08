@@ -15,6 +15,8 @@
 
 #include "oh_wifi.h"
 #include "wifi_device.h"
+#include <cstring>
+#include <string>
 
 std::shared_ptr<OHOS::Wifi::WifiDevice> g_WifiDevicePtr = OHOS::Wifi::WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 
@@ -51,5 +53,30 @@ Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled)
     }
 
     *enabled = isEnabled;
+    return WIFI_SUCCESS;
+}
+
+Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddress, size_t size)
+{
+    if (macAddress == nullptr) {
+        return WIFI_INVALID_PARAM;
+    }
+ 
+    if (g_WifiDevicePtr == nullptr) {
+        return WIFI_OPERATION_FAILED;
+    }
+ 
+    std::string mac;
+    OHOS::Wifi::ErrCode ret = g_WifiDevicePtr->GetDeviceMacAddress(mac);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        return WifiErrCodeToResultCode(ret);
+    }
+ 
+    if (size > mac.length()) {
+        strcpy_s(macAddress, size, mac.c_str());
+    } else {
+        return WIFI_OPERATION_FAILED;
+    }
+ 
     return WIFI_SUCCESS;
 }

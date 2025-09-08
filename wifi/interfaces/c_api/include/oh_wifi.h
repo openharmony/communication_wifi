@@ -83,6 +83,18 @@ typedef enum Wifi_ResultCode {
  */
 Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
 
+/**
+ * @brief Get the wifi real Mac.
+ *
+ * @param enabled - It is a char * pointer used to receive wifi real Mac.\n
+ * The caller needs to pass in a non empty pointer, otherwise an error will be returned.\n
+ * @return wifi functions result code.\n
+ *     For a detailed definition, please refer to {@link Wifi_ResultCode}.\n
+ *     {@link WIFI_SUCCESS} Successfully obtained the wifi switch status.\n
+ *     {@link WIFI_INVALID_PARAM} The input parameter enabled is a null pointer.\n
+ *     {@link WIFI_OPERATION_FAILED} Internal execution failed.\n
+ * @since 13
+ */
 Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddress, size_t size);
 #ifdef __cplusplus
 }

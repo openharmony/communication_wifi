@@ -36,6 +36,7 @@ public:
     ErrCode AutoStopP2pService();
     void StopUnloadP2PSaTimer(void);
     void StartUnloadP2PSaTimer(void);
+    void StopRemoveGroupTimer(void);
     bool HasP2pActivatedBefore(void);
 
 private:
@@ -56,10 +57,14 @@ private:
     void DealP2pPrivatePeersChanged(const std::string &privateInfo);
     // do not call this function directly, use AutoStartP2pService instead
     void CloseP2pService(void);
+    void StartRemoveGroupTimer(void);
+
 private:
     IP2pServiceCallbacks mP2pCallback;
     uint32_t unloadP2PSaTimerId{0};
+    uint32_t removeGroupTimerId{0};
     std::mutex unloadP2PSaTimerMutex;
+    std::mutex removeGroupTimerMutex;
     std::string ifaceName{""};
     // mutex to avoid EnableP2p and DisableP2p at the same time
     std::mutex p2pEnableMutex;

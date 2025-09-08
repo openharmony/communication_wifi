@@ -23,6 +23,7 @@
 #include "wifi_system_timer.h"
 #include "wifi_hisysevent.h"
 #include "p2p_define.h"
+#include "wifi_global_func.h"
 #ifdef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
@@ -38,6 +39,7 @@ DEFINE_WIFILOG_LABEL("WifiP2pManager");
 namespace OHOS {
 namespace Wifi {
 constexpr int32_t P2P_ENABLE_WAIT_MS = 500;
+constexpr int64_t TIMEOUT_REMOVE_GROUP = 15 * 60 * 1000;
 WifiP2pManager::WifiP2pManager()
 {
     WIFI_LOGI("create WifiP2pManager");
@@ -214,6 +216,48 @@ void WifiP2pManager::StartUnloadP2PSaTimer(void)
 }
 #endif
 
+static void RemoveGroupTimerCallback(void)
+{
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService != nullptr) {
+        WIFI_LOGI("p2p group has 0 client in 15min, remove it for powersave");
+        pService->RemoveGroup();
+    }
+    WifiManager::GetInstance().GetWifiP2pManager()->StopRemoveGroupTimer();
+}
+
+void WifiP2pManager::StopRemoveGroupTimer(void)
+{
+    WIFI_LOGD("StopRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
+    std::unique_lock<std::mutex> lock(removeGroupTimerMutex);
+    if (removeGroupTimerId == 0) {
+        return;
+    }
+    MiscServices::TimeServiceClient::GetInstance()->StopTimer(removeGroupTimerId);
+    MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(removeGroupTimerId);
+    removeGroupTimerId = 0;
+    return;
+}
+
+void WifiP2pManager::StartRemoveGroupTimer(void)
+{
+    if (GetDeviceType() != ProductDeviceType::PHONE) {
+        return;
+    }
+    WIFI_LOGD("StartRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
+    std::unique_lock<std::mutex> lock(removeGroupTimerMutex);
+    if (removeGroupTimerId == 0) {
+        std::shared_ptr<WifiSysTimer> removeTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
+        removeTimer->SetCallbackInfo(RemoveGroupTimerCallback);
+        removeGroupTimerId = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(removeTimer);
+        int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
+        MiscServices::TimeServiceClient::GetInstance()->StartTimer(removeGroupTimerId,
+            currentTime + TIMEOUT_REMOVE_GROUP);
+        WIFI_LOGI("StartRemoveGroupTimer success! removeGroupTimerId:%{public}u", removeGroupTimerId);
+    }
+    return;
+}
+
 void WifiP2pManager::CloseP2pService(void)
 {
     WIFI_LOGD("close p2p service");
@@ -371,6 +415,7 @@ void WifiP2pManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     ErrCode errCode = pService->GetCurrentGroup(group);
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get current group info failed!");
+        StopRemoveGroupTimer();
         return;
     }
     WriteWifiP2pStateHiSysEvent(group.GetInterface(), (int32_t)info.IsGroupOwner(), (int32_t)info.GetConnectState());
@@ -386,6 +431,19 @@ void WifiP2pManager::DealP2pConnectionChanged(const WifiP2pLinkedInfo &info)
     auto rptManager = WifiManager::GetInstance().GetRptInterface();
     if (rptManager != nullptr) {
         rptManager->OnP2pConnectionChanged(info.GetConnectState());
+    }
+    if (!group.IsGroupOwner()) {
+        return;
+    }
+    std::vector<WifiP2pDevice> devices = group.GetClientDevices();
+    if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
+        if (devices.empty()) {
+            StartRemoveGroupTimer();
+        } else {
+            StopRemoveGroupTimer();
+        }
+    } else {
+        StopRemoveGroupTimer();
     }
     return;
 }

@@ -283,6 +283,8 @@ HWTEST_F(WifiManagerTest, StartUnloadP2PSaTimerTest, TestSize.Level1)
 HWTEST_F(WifiManagerTest, CloseP2pServiceTest, TestSize.Level1)
 {
     WIFI_LOGI("CloseP2pServiceTest enter!");
+    wifiManager.wifiP2pManager->StartRemoveGroupTimer();
+    wifiManager.wifiP2pManager->StopRemoveGroupTimer();
     wifiManager.wifiP2pManager->CloseP2pService();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }

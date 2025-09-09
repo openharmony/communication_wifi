@@ -387,6 +387,31 @@ ErrCode StaService::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> 
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaService::ReconnectByMdm() const
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    int networkId = linkedInfo.networkId;
+    if (networkId == INVALID_NETWORK_ID) {
+        WIFI_LOGE("No network connect");
+        return WIFI_OPT_FAILED;
+    }
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, targetNetwork)) {
+        WIFI_LOGE("Failed tot get device config");
+        return WIFI_OPT_FAILED;
+    }
+
+    if (targetNetwork.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC) {
+        Disconnect();
+        if (ConnectToNetwork(networkId, NETWORK_SELECTED_BY_MDM) != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("Connect to network failed");
+            return WIFI_OPT_FAILED;
+        }
+    }
+    return WIFI_OPT_SUCCESS;
+}
 #endif
 
 int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
@@ -706,41 +731,6 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
             return WIFI_OPT_SUCCESS;
         }
         Disconnect();
-    }
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaService::SetRandomMacDisabled(bool isRandomMacDisabled) const
-{
-    if (WifiSettings::GetInstance().IsRandomMacDisabled() == isRandomMacDisabled) {
-        return WIFI_OPT_SUCCESS;
-    }
-    WifiSettings::GetInstance().SetRandomMacDisabled(isRandomMacDisabled);
-    ReconnectByMdm();
-    return WIFI_OPT_SUCCESS;
-}
-
-ErrCode StaService::ReconnectByMdm() const
-{
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    int networkId = linkedInfo.networkId;
-    if (networkId == INVALID_NETWORK_ID) {
-        WIFI_LOGE("No network connect");
-        return WIFI_OPT_FAILED;
-    }
-    WifiDeviceConfig targetNetwork;
-    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, targetNetwork)) {
-        WIFI_LOGE("Failed tot get device config");
-        return WIFI_OPT_FAILED;
-    }
-
-    if (targetNetwork.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC) {
-        Disconnect();
-        if (ConnectToNetwork(networkId, NETWORK_SELECTED_BY_MDM) != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Connect to network failed");
-            return WIFI_OPT_FAILED;
-        }
     }
     return WIFI_OPT_SUCCESS;
 }

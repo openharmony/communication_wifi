@@ -252,14 +252,6 @@ public:
     virtual ErrCode SetSuspendMode(bool mode) = 0;
 
     /**
-     * @Description Set Random Mac Disabled.
-     *
-     * @param isRandomMacDisabled: True for disabled   False for enabled
-     * @return WifiErrorNo
-     */
-    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) = 0;
-
-    /**
      * @Description send power mode for wpa.
      *
      * @param mode: true for power, false for resume.
@@ -481,6 +473,7 @@ public:
 
     virtual ErrCode GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length) = 0;
 
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     /**
      * @Description Add wifi block list and wifi white list
      *
@@ -488,8 +481,14 @@ public:
      * @param result - the result of wifi access list
      * @return ErrCode - operation result
      */
-#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) = 0;
+    
+    /**
+     * @Description Reconnect By Mdm
+     *
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ReconnectByMdm() = 0;
 #endif
 };
 }  // namespace Wifi

@@ -200,14 +200,13 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             msg->GetParam1() == INSTID_WLAN0 ? HandleStaStartFailure(INSTID_WLAN0) :
                 pWifiControllerMachine->multiStaManagers.RemoveManager(INSTID_WLAN1);
             break;
-        case CMD_CONCRETE_STOPPED: {
+        case CMD_CONCRETE_STOPPED:
             if (!pWifiControllerMachine->concreteManagers.IdExist(INSTID_WLAN0)) {
                 WIFI_LOGI("HandleStopConcretRetry concreteManagers not IdExist");
                 break;
             }
             pWifiControllerMachine->HandleConcreteStop(INSTID_WLAN0);
             break;
-        }
         case CMD_MULTI_STA_STOPPED:
             pWifiControllerMachine->multiStaManagers.RemoveManager(INSTID_WLAN1);
             break;
@@ -901,6 +900,12 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
     } else {
 #endif
+        if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
+            WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning() &&
+            WifiConfigCenter::GetInstance().GetApIfaceName() == "wlan0") {
+            WIFI_LOGI("Softap(wlan0) mode do not start scanonly after turn off wifi.");
+            return;
+        }
         if (ShouldEnableWifi(id)) {
             ConcreteManagerRole presentRole = GetWifiRole();
             MakeConcreteManager(presentRole, 0);

@@ -75,6 +75,7 @@
         EnableSemiWifi;
         GetWifiDetailState;
         UpdateNetworkLagInfo;
+        StartWifiDetection;
         FetchWifiSignalInfoForVoWiFi;
         IsSupportVoWifiDetect;
         SetVoWifiDetectMode;

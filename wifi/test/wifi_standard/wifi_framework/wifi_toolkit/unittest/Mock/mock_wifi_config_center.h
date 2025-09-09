@@ -103,6 +103,8 @@ public:
     virtual bool GetCoexSupport() const = 0;
     virtual void SetScreenState(const int &state) = 0;
     virtual int GetScreenState() const = 0;
+    virtual void SetWlanPage(bool isWlanPage) = 0;
+    virtual bool IsWlanPage() const = 0;
     virtual void SetThermalLevel(const int &level) = 0;
     virtual int GetThermalLevel() const = 0;
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
@@ -172,8 +174,6 @@ public:
     virtual int GetP2pEnhanceFreq() = 0;
     virtual bool IsNeedFastScan(void) = 0;
     virtual void SetFastScan(bool fastScan) = 0;
-    virtual void SetAutoConnect(bool autoConnectEnable) = 0;
-    virtual bool GetAutoConnect() = 0;
     virtual HotspotMode GetHotspotMode() = 0;
     virtual void SetHotspotMode(const HotspotMode &mode) = 0;
     virtual int GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig) = 0;
@@ -265,6 +265,8 @@ public:
     MOCK_CONST_METHOD0(GetCoexSupport, bool());
     MOCK_METHOD1(SetScreenState, void(const int &state));
     MOCK_CONST_METHOD0(GetScreenState, int());
+    MOCK_METHOD1(SetWlanPage, void(bool isWlanPage));
+    MOCK_CONST_METHOD0(IsWlanPage, bool());
     MOCK_METHOD1(SetThermalLevel, void(const int &level));
     MOCK_CONST_METHOD0(GetThermalLevel, int());
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
@@ -334,8 +336,6 @@ public:
     MOCK_CONST_METHOD0(GetWifiSelfcureResetEntered, bool());
     MOCK_METHOD0(IsNeedFastScan, bool());
     MOCK_METHOD1(SetFastScan, void(bool fastScan));
-    MOCK_METHOD1(SetAutoConnect, void(bool));
-    MOCK_METHOD0(GetAutoConnect, bool());
     MOCK_METHOD0(GetHotspotMode, HotspotMode());
     MOCK_METHOD1(SetHotspotMode, void(const HotspotMode &mode));
     MOCK_METHOD1(GetLocalOnlyHotspotConfig, int(HotspotConfig &hotspotConfig));

@@ -65,7 +65,7 @@ public:
 
         pMockApNatManager = new MockWifiApNatManager();
 
-        pApStartedState = std::make_unique<ApStartedState>(*pMockApStateMachine, *pMockApConfigUse, *pMockApMonitor);
+        pApStartedState = std::make_unique<ApStartedState>(*pMockApStateMachine, *pMockApMonitor);
 
         msg = std::make_shared<InternalMessage>();
 
@@ -271,6 +271,9 @@ HWTEST_F(ApStartedState_test, GoOutState_FAILED, TestSize.Level1)
 HWTEST_F(ApStartedState_test, ExecuteStateMsg_SUCCESS, TestSize.Level1)
 {
     msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_FAIL));
+    EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
+
+    msg->SetMessageName(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT));
     EXPECT_TRUE(pApStartedState->ExecuteStateMsg(msg));
 
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStationList(_, 0)).WillRepeatedly(Return(ErrCode::WIFI_OPT_FAILED));

@@ -68,8 +68,8 @@ private:
     void OnIsMeteredHotspot(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    void OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetIpV6Info(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetCountryCode(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -90,6 +90,7 @@ private:
     void OnDisableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnEnableAutoJoin(uint32_t code, MessageParcel& data, MessageParcel& reply);
     void OnFactoryReset(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnStartWifiDetection(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnLimitSpeed(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnEnableHiLinkHandshake(uint32_t code, MessageParcel &data, MessageParcel &reply);

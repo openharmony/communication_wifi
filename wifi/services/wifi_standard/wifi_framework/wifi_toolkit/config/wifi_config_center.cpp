@@ -90,6 +90,9 @@ int WifiConfigCenter::Init()
 
 std::unique_ptr<WifiScanConfig>& WifiConfigCenter::GetWifiScanConfig()
 {
+    if (wifiScanConfig == nullptr) {
+        wifiScanConfig = std::make_unique<WifiScanConfig>();
+    }
     return wifiScanConfig;
 }
 
@@ -1049,6 +1052,16 @@ int WifiConfigCenter::GetScreenState() const
     return mScreenState.load();
 }
 
+void WifiConfigCenter::SetWlanPage(bool isWlanPage)
+{
+    isWlanPage_.store(isWlanPage);
+}
+
+bool WifiConfigCenter::IsWlanPage() const
+{
+    return isWlanPage_.load();
+}
+
 void WifiConfigCenter::SetThermalLevel(const int &level)
 {
     mThermalLevel = level;
@@ -1543,22 +1556,6 @@ void WifiConfigCenter::SetFastScan(bool fastScan)
 {
     std::unique_lock<std::mutex> lock(mScanMutex);
     isNeedFastScan = fastScan;
-}
-
-void WifiConfigCenter::SetAutoConnect(bool autoConnectEnable)
-{
-    if (GetDeviceType() != ProductDeviceType::WEARABLE) {
-        LOGD("SetAutoConnect not wearable device");
-        return;
-    }
-
-    LOGI("SetAutoConnect autoConnectEnable:%{public}d", autoConnectEnable);
-    autoConnectEnable_.store(autoConnectEnable);
-}
-
-bool WifiConfigCenter::GetAutoConnect()
-{
-    return autoConnectEnable_.load();
 }
  
 int WifiConfigCenter::GetLocalOnlyHotspotConfig(HotspotConfig &hotspotConfig)

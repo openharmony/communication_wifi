@@ -1118,6 +1118,22 @@ export function testStartPortalCertification() {
   }
 }
 
+export function testStartWifiDetection() {
+  try {
+    let message = ''
+    wifiManager.StartWifiDetection()
+    message = "StartWifiDetection 调用成功"
+    promptAction.showToast({ message : message })
+    console.log(TAG , LogDataManager.testRemoveDeviceManager_EndLog);
+    return message
+  } catch( e ) {
+    console.log(TAG , `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+    let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
+    promptAction.showToast({ message : message })
+    return message
+  }
+}
+
 let wifiStateChangeManager = false
 
 export function testOnWifiStateChangeManager() {

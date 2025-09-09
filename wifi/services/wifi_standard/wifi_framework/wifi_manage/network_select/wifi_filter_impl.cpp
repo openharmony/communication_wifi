@@ -288,7 +288,7 @@ bool PoorPortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
     if (networkCandidate.wifiDeviceConfig.isPortal &&
         networkCandidate.wifiDeviceConfig.noInternetAccess &&
         !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
-            networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
+            networkCandidate.wifiDeviceConfig.networkStatusHistory) && !WifiConfigCenter::GetInstance().IsWlanPage()) {
         networkCandidate.filtedReason[filterName].insert({FiltedReason::PORTAL_NETWORK, FiltedReason::NO_INTERNET,
             FiltedReason::UNRECOVERABLE_NETWORK});
         return false;
@@ -331,7 +331,7 @@ bool PortalWifiFilter::Filter(NetworkCandidate &networkCandidate)
     if (networkCandidate.wifiDeviceConfig.isPortal &&
         networkCandidate.wifiDeviceConfig.noInternetAccess &&
         !NetworkStatusHistoryManager::IsAllowRecoveryByHistory(
-            networkCandidate.wifiDeviceConfig.networkStatusHistory)) {
+            networkCandidate.wifiDeviceConfig.networkStatusHistory) && !WifiConfigCenter::GetInstance().IsWlanPage()) {
         networkCandidate.filtedReason[filterName].insert({FiltedReason::PORTAL_NETWORK, FiltedReason::NO_INTERNET,
             FiltedReason::UNRECOVERABLE_NETWORK});
         return false;

@@ -30,11 +30,7 @@ public:
 
     int GetValidBands(std::vector<BandType> &bands);
 
-    int SetValidChannels(const ChannelsTable &channelsInfo);
-
     int GetValidChannels(ChannelsTable &channelsInfo);
-
-    void UpdateValidChannels(std::string ifaceName, int instId = 0);
 
     bool GetAvailableScanFreqs(ScanBandType band, std::vector<int32_t>& freqs);
 
@@ -61,10 +57,11 @@ public:
     bool IsValid24GChannel(int channel);
 
     bool IsValid5GChannel(int channel);
-
+    void UpdateValidFreqs();
 private:
     WifiChannelHelper();
-    void UpdateValidFreqs();
+    void UpdateValidChannels(std::vector<int32_t> &supp2Gfreqs, std::vector<int32_t> &supp5Gfreqs);
+    int SetValidChannels(const ChannelsTable &channelsInfo);
     ChannelsTable mValidChannels {DEFAULT_VALID_CHANNEL};
     std::mutex mMutex;
     std::map<ScanBandType, std::vector<int>> mValidFreqs;

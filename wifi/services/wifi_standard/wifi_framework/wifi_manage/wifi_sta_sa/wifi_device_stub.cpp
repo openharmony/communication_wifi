@@ -131,10 +131,10 @@ void WifiDeviceStub::InitHandleMapEx2()
         MessageParcel &data, MessageParcel &reply) { OnSetDpiMarkRule(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_FEATURE_SUPPORTED)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnIsFeatureSupported(code, data, reply); };
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_NET_CONTROL_INFO)] = [this](uint32_t code,
-        MessageParcel &data, MessageParcel &reply) { OnReceiveNetworkControlInfo(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_NETWORK_LAG_INFO)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnUpdateNetworkLagInfo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_NET_CONTROL_INFO)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnReceiveNetworkControlInfo(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_FETCH_SIGNALINFO_VOWIFI)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnFetchWifiSignalInfoForVoWiFi(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SUPPORT_VOWIFI_DETECT)] = [this]
@@ -147,10 +147,12 @@ void WifiDeviceStub::InitHandleMapEx2()
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetVoWifiDetectPeriod(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetVoWifiDetectPeriod(code, data, reply); };
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY)] = [this]
-        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetSignalPollInfoArray(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_MULTI_LINKED_INFO)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetMultiLinkedInfo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNALPOLL_INFO_ARRAY)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnGetSignalPollInfoArray(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WIFI_DETECTION)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnStartWifiDetection(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -475,6 +477,7 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.wifiWapiConfig.wapiPskType = data.ReadInt32();
     config.wifiWapiConfig.wapiAsCertData = data.ReadString();
     config.wifiWapiConfig.wapiUserCertData = data.ReadString();
+    config.isAllowAutoConnect = data.ReadBool();
     return;
 }
 
@@ -653,7 +656,7 @@ void WifiDeviceStub::SendDeviceConfig(int contentSize, std::vector<WifiDeviceCon
         return;
     }
     std::string name = "deviceconfigs";
-    int32_t ashmemSize = 1000; // add buff for max 1000 device config  
+    int32_t ashmemSize = 1000; // add buff for max 1000 device config
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
         WriteWifiDeviceConfig(outParcel, result[i]);
@@ -1012,6 +1015,7 @@ void WifiDeviceStub::OnGetSignalPollInfoArray(uint32_t code, MessageParcel &data
     }
     return;
 }
+
 void WifiDeviceStub::OnGetMultiLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -1384,6 +1388,15 @@ void WifiDeviceStub::OnFactoryReset(uint32_t code, MessageParcel &data, MessageP
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     ErrCode ret = FactoryReset();
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnStartWifiDetection(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ErrCode ret = StartWifiDetection();
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

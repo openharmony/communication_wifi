@@ -349,13 +349,13 @@ static bool CheckOriSsidLength(const WifiDeviceConfig &config)
 
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
-    if (config.ssid.length() <= 0 || (config.keyMgmt.length()) <= 0) {
+    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
         WIFI_LOGE("CheckConfigPwd: invalid ssid or keyMgmt!");
         return false;
     }
     if (config.ssid.length() > DEVICE_NAME_LENGTH) {
         if (!CheckOriSsidLength(config)) {
-            LOGE("CheckConfigPwd: invalid ssid");
+            WIFI_LOGE("CheckConfigPwd: invalid ssid");
             return false;
         }
     }
@@ -1405,9 +1405,11 @@ ErrCode WifiDeviceServiceImpl::GetLinkedInfo(WifiLinkedInfo &info)
     if (VerifyGetLinkedInfofoPermission() != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_PERMISSION_DENIED;
     }
+
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
+
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
     UpdateWifiLinkInfo(info);
     return WIFI_OPT_SUCCESS;
@@ -1424,6 +1426,12 @@ ErrCode WifiDeviceServiceImpl::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &m
     }
     if (!IsStaServiceRunning()) {
         return WIFI_OPT_STA_NOT_OPENED;
+    }
+    WifiLinkedInfo info;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
+    if (info.wifiLinkType != WifiLinkType::WIFI7_EMLSR) {
+        WIFI_LOGI("GetMultiLinkedInfo failed, not emlsr connected");
+        return WIFI_OPT_FAILED;
     }
     if (WifiConfigCenter::GetInstance().GetMloLinkedInfo(mloLinkInfo, m_instId) < 0) {
         WIFI_LOGE("GetMultiLinkedInfo failed, not find valid mloLinkInfo");
@@ -1988,7 +1996,8 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
     if (pWifiProService != nullptr) {
         WifiDeviceConfig config;
-        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE), config, true);
+        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE),
+            config, true);
     }
 #endif
     /* p2p */
@@ -1999,6 +2008,33 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     WifiSettings::GetInstance().ClearHotspotConfig();
     WifiSettings::GetInstance().SyncHotspotConfig();
     WIFI_LOGI("WifiDeviceServiceImpl FactoryReset ok!");
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiDeviceServiceImpl::StartWifiDetection()
+{
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("StartWifiDetection(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("%{public}s NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s set wifi info PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s manage wifi PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    pService->StartWifiDetection();
     return WIFI_OPT_SUCCESS;
 }
 

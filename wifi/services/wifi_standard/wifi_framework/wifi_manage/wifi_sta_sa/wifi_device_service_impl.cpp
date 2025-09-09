@@ -2735,7 +2735,7 @@ ErrCode WifiDeviceServiceImpl::IsRandomMacDisabled(bool &isRandomMacDisabled)
     WIFI_LOGI("Get isRandomMacDisabled success, isRandomMacDisabled= %{public}d", isRandomMacDisabled);
     return WIFI_OPT_SUCCESS;
 #else
-    return WIFI_OPT_FAILED;
+    return WIFI_OPT_NOT_SUPPORTED;
 #endif
 }
 
@@ -2755,7 +2755,7 @@ ErrCode WifiDeviceServiceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
     }
     return WIFI_OPT_SUCCESS;
 #else
-    return WIFI_OPT_FAILED;
+    return WIFI_OPT_NOT_SUPPORTED;
 #endif
 }
 }  // namespace Wifi

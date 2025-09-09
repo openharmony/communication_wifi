@@ -117,6 +117,7 @@ public:
     void StaServiceSetPowerModeTest();
     void StaServiceOnSystemAbilityChangedTest();
     void StaServiceStartPortalCertificationTest();
+    void StaServiceStartWifiDetectionTest();
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     void StaServiceSetWifiRestrictedListSuccess();
 #endif
@@ -138,6 +139,7 @@ public:
     void UpdateEapConfigTest();
     void OnWifiCountryCodeChangedTest();
     void StartPortalCertificationTest();
+    void StartWifiDetectionTest();
     void HandleForegroundAppChangedActionTest();
     void EnableHiLinkHandshakeTest();
     void DeliverStaIfaceDataTest();
@@ -708,6 +710,13 @@ void StaServiceTest::StaServiceStartPortalCertificationTest()
     EXPECT_TRUE(pStaService->StartPortalCertification() == WIFI_OPT_FAILED);
 }
 
+void StaServiceTest::StaServiceStartWifiDetectionTest()
+{
+    EXPECT_TRUE(pStaService->StartWifiDetection() == WIFI_OPT_SUCCESS);
+    pStaService->pStaStateMachine = nullptr;
+    EXPECT_TRUE(pStaService->StartWifiDetection() == WIFI_OPT_FAILED);
+}
+
 void StaServiceTest::DisableAutoJoin()
 {
     EXPECT_EQ(WIFI_OPT_SUCCESS, pStaService->DisableAutoJoin("testCondition"));
@@ -810,6 +819,11 @@ void StaServiceTest::StartPortalCertificationTest()
     pStaService->StartPortalCertification();
 }
 
+void StaServiceTest::StartWifiDetectionTest()
+{
+    pStaService->StartWifiDetection();
+}
+
 void StaServiceTest::HandleForegroundAppChangedActionTest()
 {
     AppExecFwk::AppStateData appData;
@@ -847,11 +861,11 @@ void StaServiceTest::StartConnectToBssidTest()
 int StaServiceTest::StartConnectToUserSelectNetworkSuccessTest()
 {
     WifiDeviceConfig config;
-    config.bssid = "01:23:45:67:89:AB";
+    config.bssid = "01:23:45:67:89:CD";
     config.band = BAND;
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
-    config.keyMgmt = "123456";
+    config.keyMgmt = "123";
     WifiLinkedInfo info;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
@@ -861,11 +875,11 @@ int StaServiceTest::StartConnectToUserSelectNetworkSuccessTest()
 int StaServiceTest::StartConnectToUserSelectNetworkSuccessFail()
 {
     WifiDeviceConfig config;
-    config.bssid = "01:23:45:67:89:AB";
+    config.bssid = "01:23:45:67:89:EF";
     config.band = BAND;
     config.networkId = NETWORK_ID;
     config.ssid = "networkId";
-    config.keyMgmt = "123456";
+    config.keyMgmt = "456";
     WifiLinkedInfo info;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(1)));
@@ -912,6 +926,11 @@ HWTEST_F(StaServiceTest, GetSignalPollInfoArrayTest, TestSize.Level0)
 HWTEST_F(StaServiceTest, StaServiceStartPortalCertificationTest, TestSize.Level0)
 {
     StaServiceStartPortalCertificationTest();
+}
+
+HWTEST_F(StaServiceTest, StaServiceStartWifiDetectionTest, TestSize.Level0)
+{
+    StaServiceStartWifiDetectionTest();
 }
 
 HWTEST_F(StaServiceTest, StaServiceOnSystemAbilityChangedTest, TestSize.Level0)
@@ -1234,6 +1253,12 @@ HWTEST_F(StaServiceTest, OnWifiCountryCodeChangedTest, TestSize.Level0)
 HWTEST_F(StaServiceTest, StartPortalCertificationTest, TestSize.Level0)
 {
     StartPortalCertificationTest();
+    EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
+}
+
+HWTEST_F(StaServiceTest, StartWifiDetectionTest, TestSize.Level0)
+{
+    StartWifiDetectionTest();
     EXPECT_FALSE(g_errLog.find("callback")!=std::string::npos);
 }
 

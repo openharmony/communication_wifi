@@ -447,5 +447,4 @@ private:
 };
 }  // namespace Wifi
 }  // namespace OHOS
-
 #endif

@@ -49,6 +49,7 @@ HWTEST_F(MultiGatewayTest, GetGatewayAddr_test, TestSize.Level1)
 
 HWTEST_F(MultiGatewayTest, IsMultiGateway_test, TestSize.Level1)
 {
+    MultiGateway::GetInstance().IsMultiGateway();
     EXPECT_FALSE(MultiGateway::GetInstance().IsMultiGateway());
 }
 

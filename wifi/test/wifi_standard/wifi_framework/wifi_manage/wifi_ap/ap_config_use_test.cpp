@@ -26,6 +26,7 @@
 #include "wifi_msg.h"
 #include "wifi_p2p_msg.h"
 #include "wifi_country_code_manager.h"
+#include "wifi_channel_helper.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -98,6 +99,7 @@ HWTEST_F(ApConfigUse_Test, GetChannelFromDrvOrXmlByBandTest, TestSize.Level1)
 HWTEST_F(ApConfigUse_Test, GetBestChannelFor2GTest, TestSize.Level1)
 {
     WIFI_LOGI("GetBestChannelFor2GTest enter");
+    WifiChannelHelper::GetInstance().mValidFreqs[ScanBandType::SCAN_BAND_24_GHZ] = {2412, 2417, 2422};
     int channel = m_apConfigUse->GetBestChannelFor2G();
     WIFI_LOGI("GetBestChannelFor2GTest channel=%{public}d", channel);
     EXPECT_TRUE(IsValid24GChannel(channel));
@@ -106,13 +108,12 @@ HWTEST_F(ApConfigUse_Test, GetBestChannelFor2GTest, TestSize.Level1)
 HWTEST_F(ApConfigUse_Test, GetBestChannelFor5GTest, TestSize.Level1)
 {
     WIFI_LOGI("GetBestChannelFor5GTest enter");
-    std::vector<int> frequencies = {5180, 5200, 5220};
     HotspotConfig apConfig;
     apConfig.SetBandWidth(AP_BANDWIDTH_DEFAULT);
-    EXPECT_CALL(WifiApHalInterface::GetInstance(), GetFrequenciesByBand(_, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<2>(frequencies), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+    WifiChannelHelper::GetInstance().mValidFreqs[ScanBandType::SCAN_BAND_5_GHZ] = {5180, 5200, 5220, 5745};
     int channel = m_apConfigUse->GetBestChannelFor5G(apConfig);
     WIFI_LOGI("GetBestChannelFor5GTest channel=%{public}d", channel);
+    EXPECT_TRUE(IsValid5GChannel(channel));
 }
 
 HWTEST_F(ApConfigUse_Test, GetBestChannelFor5G160MTest, TestSize.Level1)
@@ -168,5 +169,36 @@ HWTEST_F(ApConfigUse_Test, JudgeDbacWithP2pTest, TestSize.Level1)
         .WillOnce(DoAll(Return(wifiP2pGroupInfo)));
     m_apConfigUse->JudgeDbacWithP2p(apConfig);
 }
+HWTEST_F(ApConfigUse_Test, GetApVaildChannelTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetApVaildChannelTest enter");
+    WifiChannelHelper::GetInstance().mValidFreqs[ScanBandType::SCAN_BAND_24_GHZ] = {2412, 2417, 2422};
+
+    std::vector<int> channels;
+    m_apConfigUse->GetApVaildChannel(BandType::BAND_2GHZ, channels);
+    EXPECT_FALSE(channels.size() == 0);
+}
+
+HWTEST_F(ApConfigUse_Test, GetApVaildChannelTest1, TestSize.Level1)
+{
+    WIFI_LOGI("GetApVaildChannelTest1 enter");
+    WifiChannelHelper::GetInstance().mValidFreqs[ScanBandType::SCAN_BAND_5_GHZ] = {5180, 5200, 5220, 5745};
+
+    std::vector<int> channels;
+    m_apConfigUse->GetApVaildChannel(BandType::BAND_5GHZ, channels);
+    EXPECT_FALSE(channels.size() == 0);
+}
+
+HWTEST_F(ApConfigUse_Test, GetGetApVaildBandsTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetApVaildChannelTest enter");
+    WifiChannelHelper::GetInstance().mValidFreqs[ScanBandType::SCAN_BAND_24_GHZ] = {2412, 2417, 2422};
+    WifiChannelHelper::GetInstance().mValidFreqs[ScanBandType::SCAN_BAND_5_GHZ] = {5180, 5200, 5220, 5745};
+
+    std::vector<BandType> bands;
+    m_apConfigUse->GetApVaildBands(bands);
+    EXPECT_FALSE(bands.size() == 0);
+}
+
 } // namespace Wifi
 } // namespace OHOS

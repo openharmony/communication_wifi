@@ -59,7 +59,6 @@ public:
     {
         WifiManager::GetInstance().Init();
         pConcreteManagerMachine = std::make_unique<ConcreteMangerMachine>();
-        pWifiTogglerManager = std::make_unique<WifiTogglerManager>();
         pConcreteManagerMachine->InitConcreteMangerMachine();
         mCb.onStartFailure = DealConcreteStartFailure;
         mCb.onStopped = DealConcreteStop;

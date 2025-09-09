@@ -225,6 +225,7 @@ private:
     bool mIsScanInShort_ { false };
     int32_t mScanType_ { 1 };
     bool mIsAutoOpenSearch_ { false };
+    bool mIsScanning_ { false };
     bool ProcessScanResult(std::vector<WifiScanInfo> scanInfoList, std::string cellId);
     bool IsHasTargetAp(std::vector<WifiScanInfo> &scanInfoLis);
     bool IsInBlacklist(std::string bssid);

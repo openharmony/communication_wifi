@@ -391,6 +391,13 @@ public:
     virtual ErrCode EnableHiLinkHandshake(bool uiFlag, const WifiDeviceConfig &config, const std::string &cmd);
 
     /**
+     * @Description start wifi detection
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode StartWifiDetection();
+
+    /**
      * @Description deliver mac
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED

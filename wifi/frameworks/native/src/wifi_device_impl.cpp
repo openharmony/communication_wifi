@@ -94,6 +94,7 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
             WIFI_LOGE("failed to get DEVICE_SERVICE again!");
             return false;
         }
+        return false;
     }
 
     sptr<IWifiDeviceMgr> deviceMgr = iface_cast<IWifiDeviceMgr>(object);
@@ -570,6 +571,13 @@ ErrCode WifiDeviceImpl::FactoryReset()
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->FactoryReset();
+}
+
+ErrCode WifiDeviceImpl::StartWifiDetection()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->StartWifiDetection();
 }
 
 ErrCode WifiDeviceImpl::ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo)

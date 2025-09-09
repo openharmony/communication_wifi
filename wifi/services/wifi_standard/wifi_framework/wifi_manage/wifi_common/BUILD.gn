@@ -175,6 +175,7 @@ if (defined(ohos_lite)) {
       "wifi_sensor_scene.cpp",
       "wifi_system_ability_listerner.cpp",
       "wifi_system_timer.cpp",
+      "ap_config_use.cpp",
     ]
 
     deps = [

@@ -238,7 +238,6 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToConnectMode(InternalMessage
 {
     ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartStaService(mid, ifaceName);
     if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
@@ -249,7 +248,6 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToScanOnlyMode(InternalMessag
 {
     ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
     if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
@@ -260,7 +258,6 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMess
 {
     ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartSemiStaService(mid, ifaceName);
     if (ret != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
@@ -273,14 +270,12 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr
     WIFI_LOGI("HandleStartInIdleState mTargetRole:%{public}d mid:%{public}d", mTargetRole, mid);
     ErrCode res = WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
     if (res != WIFI_OPT_SUCCESS) {
-        WifiConfigCenter::GetInstance().SetWifiStopState(true);
         pConcreteMangerMachine->mcb.onStartFailure(mid);
         return;
     }
     if (mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA)) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartStaService(mid, ifaceName);
         if (ret != WIFI_OPT_SUCCESS) {
-            WifiConfigCenter::GetInstance().SetWifiStopState(true);
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }
@@ -292,7 +287,6 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr
         mTargetRole == static_cast<int>(ConcreteManagerRole::ROLE_CLIENT_STA_SEMI_ACTIVE)) {
         ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartSemiStaService(mid, ifaceName);
         if (ret != WIFI_OPT_SUCCESS) {
-            WifiConfigCenter::GetInstance().SetWifiStopState(true);
             pConcreteMangerMachine->mcb.onStartFailure(mid);
             return;
         }

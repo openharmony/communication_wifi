@@ -79,6 +79,7 @@ if (defined(ohos_lite)) {
       "bounds_checking_function:libsec_shared",
       "init:libbegetutil",
       "samgr:samgr_proxy",
+      "ipc:ipc_single",
     ]
 
     configs -= [ "//build/lite/config:language_cpp" ]
@@ -139,6 +140,7 @@ if (defined(ohos_lite)) {
       "hilog:libhilog",
       "init:libbegetutil",
       "samgr:samgr_proxy",
+      "ipc:ipc_single",
     ]
     part_name = "wifi"
     subsystem_name = "communication"

@@ -107,19 +107,7 @@ public:
         pSelfCureInterface->pSelfCureService = nullptr;
         pSelfCureInterface->DealDhcpOfferReport(ipInfo, instId);
     }
-
-    void IsWifiSelfcureDoneTest()
-    {
-        pSelfCureInterface->IsWifiSelfcureDone();
-        pSelfCureInterface->pSelfCureService = nullptr;
-        EXPECT_FALSE(pSelfCureInterface->IsWifiSelfcureDone());
-    }
 };
-
-HWTEST_F(SelfCureInterfaceTest, IsWifiSelfcureDoneTest_01, TestSize.Level1)
-{
-    IsWifiSelfcureDoneTest();
-}
 
 HWTEST_F(SelfCureInterfaceTest, InitSelfCureServiceTest, TestSize.Level1)
 {

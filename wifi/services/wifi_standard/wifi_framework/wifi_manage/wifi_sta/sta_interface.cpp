@@ -517,6 +517,15 @@ ErrCode StaInterface::EnableHiLinkHandshake(bool uiFlag, const WifiDeviceConfig 
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode StaInterface::StartWifiDetection()
+{
+    WIFI_LOGI("Enter StartWifiDetection");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->StartWifiDetection();
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
 {
     WIFI_LOGI("Enter DeliverStaIfaceData");

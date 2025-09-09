@@ -64,6 +64,11 @@ declare_args() {
   wifi_feature_with_extensible_authentication = false
   wifi_feature_with_scan_control_action_listen = true
   wifi_feature_autoopen_specified_location = true
+  wifi_hiappevent_enable = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.hiviewdfx_hiappevent)) {
+    wifi_hiappevent_enable = true
+  }
 }
 
 memory_optimization_cflags = [

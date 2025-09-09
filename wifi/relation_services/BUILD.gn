@@ -57,5 +57,19 @@ if (defined(ohos_lite)) {
     deps = [ ":wifi_hal_service" ]
   }
 } else {
-  group("relation_services") {}
+  group("relation_services") {
+    deps = [ "$WIFI_ROOT_DIR/relation_services/etc/init:etc" ]
+
+    if (wifi_feature_with_hdi_wpa_supported) {
+    } else {
+      deps += [ "$WIFI_ROOT_DIR/base/cRPC:crpc_server" ]
+
+      external_deps = [
+        "c_utils:utils",
+        "hilog:libhilog",
+      ]
+
+      external_deps += [ "wpa_supplicant:wpa_client" ]
+    }
+  }
 }

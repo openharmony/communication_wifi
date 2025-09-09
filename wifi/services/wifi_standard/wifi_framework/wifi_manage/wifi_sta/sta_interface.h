@@ -149,6 +149,7 @@ public:
      * @Return success: networkId  fail: -1
      */
     virtual int AddDeviceConfig(const WifiDeviceConfig &config) override;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     /**
      * @Description Add wifi block list and wifi white list
      *
@@ -156,8 +157,13 @@ public:
      * @param result - the result of wifi access list
      * @return ErrCode - operation result
      */
-#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) override;
+    /**
+     * @Description Reconnect By Mdm
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ReconnectByMdm() override;
 #endif
     /**
      * @Description  Update a network to config
@@ -253,14 +259,6 @@ public:
      * @return WifiErrorNo
      */
     virtual ErrCode SetSuspendMode(bool mode) override;
-
-    /**
-     * @Description Set Random Mac Disabled.
-     *
-     * @param isRandomMacDisabled: True for disabled   False for enabled
-     * @return WifiErrorNo
-     */
-    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
 
     /**
      * @Description send power mode for wpa.

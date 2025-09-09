@@ -2721,6 +2721,7 @@ bool WifiDeviceServiceImpl::IsDisableWifiProhibitedByEdm(void)
 
 ErrCode WifiDeviceServiceImpl::IsRandomMacDisabled(bool &isRandomMacDisabled)
 {
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsRandomMacDisabled:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -2733,23 +2734,29 @@ ErrCode WifiDeviceServiceImpl::IsRandomMacDisabled(bool &isRandomMacDisabled)
     isRandomMacDisabled = WifiSettings::GetInstance().IsRandomMacDisabled();
     WIFI_LOGI("Get isRandomMacDisabled success, isRandomMacDisabled= %{public}d", isRandomMacDisabled);
     return WIFI_OPT_SUCCESS;
+#else
+    return WIFI_OPT_FAILED;
+#endif
 }
 
 ErrCode WifiDeviceServiceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
 {
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     if (WifiPermissionUtils::VerifyManageEdmPolicyPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetRandomMacDisabeled:VerifyManageEdmPolicyPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (!IsStaServiceRunning()) {
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
 
+    WifiSettings::GetInstance().SetRandomMacDisabled(isRandomMacDisabled);
+    WIFI_LOGI("Set isRandomMacDisabled success, isRandomMacDisabled= %{public}d", isRandomMacDisabled);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if (pService == nullptr) {
-        return WIFI_OPT_STA_NOT_OPENED;
+    if (pService != nullptr) {
+        pService->ReconnectByMdm();
     }
-    return pService->SetRandomMacDisabled(isRandomMacDisabled);
+    return WIFI_OPT_SUCCESS;
+#else
+    return WIFI_OPT_FAILED;
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

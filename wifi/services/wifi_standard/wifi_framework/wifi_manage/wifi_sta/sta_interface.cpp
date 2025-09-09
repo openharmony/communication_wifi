@@ -224,6 +224,14 @@ ErrCode StaInterface::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo
     }
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::ReconnectByMdm()
+{
+    LOGI("Enter ReconnectByMdm");
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    return pStaService->ReconnectByMdm();
+}
 #endif
 
 int StaInterface::UpdateDeviceConfig(const WifiDeviceConfig &config)
@@ -279,14 +287,6 @@ ErrCode StaInterface::AllowAutoConnect(int32_t networkId, bool isAllowed)
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->AllowAutoConnect(networkId, isAllowed);
-}
-
-ErrCode StaInterface::SetRandomMacDisabled(bool isRandomMacDisabled)
-{
-    LOGI("Enter SetRandomMacDisabled, isRandomMacDisabled:%{public}d", isRandomMacDisabled);
-    std::lock_guard<std::mutex> lock(mutex);
-    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    return pStaService->SetRandomMacDisabled(isRandomMacDisabled);
 }
 
 ErrCode StaInterface::StartWps(const WpsConfig &config)

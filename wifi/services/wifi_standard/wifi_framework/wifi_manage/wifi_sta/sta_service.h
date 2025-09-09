@@ -199,13 +199,6 @@ public:
      */
     virtual ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) const;
     /**
-     * @Description Set Random Mac Disabled.
-     *
-     * @param isRandomMacDisabled: True for Disabled, false for enabled
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) const;
-    /**
      * @Description  Start WPS Connection
      *
      * @Output: Return operating results to Interface Service after enable wifi
@@ -458,6 +451,7 @@ public:
      */
     virtual void GetDetectNetState(OperateResState &state);
 
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     /**
      * @Description Add wifi block list and wifi white list
      *
@@ -465,11 +459,16 @@ public:
      * @param result - the result of wifi access list
      * @return ErrCode - operation result
      */
-#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) const;
+    
+    /**
+     * @Description Reconnect By Mdm
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ReconnectByMdm() const;
 #endif
 private:
-    ErrCode ReconnectByMdm() const;
     void NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig config, bool isRemoveAll) const;
     void NotifyCandidateApprovalStatus(CandidateApprovalStatus status) const;
     int FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfig &outConfig) const;

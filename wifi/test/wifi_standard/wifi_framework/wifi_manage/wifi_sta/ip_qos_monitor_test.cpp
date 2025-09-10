@@ -178,12 +178,10 @@ HWTEST_F(IpQosMonitorTest, TestHandleIpv6TcpPktsRespDisconnected, TestSize.Level
     wifiLinkedInfo.connState = ConnState::DISCONNECTED;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
-
-    int32_t initialFailedCount = IpQosMonitor::GetInstance().GetIpv6FailedCounter();
     IpQosMonitor::GetInstance().HandleIpv6TcpPktsResp(elems);
 
     // Should not increment failure counter when disconnected
-    EXPECT_EQ(IpQosMonitor::GetInstance().GetIpv6FailedCounter(), initialFailedCount);
+    EXPECT_EQ(IpQosMonitor::GetInstance().GetIpv6FailedCounter(), 0);
 }
 
 HWTEST_F(IpQosMonitorTest, TestParseIpv6NetworkInternetGood, TestSize.Level1)

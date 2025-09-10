@@ -34,7 +34,12 @@ static std::string g_errLog = "wifitest";
 class WifiNetLinkTest : public testing::Test {
 protected:
     void SetUp() override
-    {}
+    {
+        WifiNetLinkCallbacks callbacks;
+        callbacks.OnTcpReportMsgComplete = [](const std::vector<int64_t> &elems, const int32_t cmd,
+                                              const int32_t mInstId) {};
+        WifiNetLink::GetInstance().InitWifiNetLink(callbacks);
+    }
 
     void TearDown() override
     {}

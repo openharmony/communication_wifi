@@ -655,6 +655,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::TelephonyUtilsFuzzTest(data);
     OHOS::Wifi::SimAkaAuthFuzzTest(data, size);
     OHOS::Wifi::SecurityDetectFuzzTest(data, size);
+    OHOS::Wifi::SecurityDetectFuzzTest02(data, size);
     return 0;
 }
 }

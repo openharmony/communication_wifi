@@ -85,6 +85,10 @@ ohos_static_library("wifi_self_cure") {
 
   defines = [ "FEATURE_SELF_CURE_SUPPORT" ]
 
+  if (wifi_feature_with_ipv6_selfcure) {
+    defines += [ "FEATURE_IPV6_SELF_CURE" ]
+  }
+
   if (wifi_feature_with_local_random_mac) {
     defines += [ "SUPPORT_LOCAL_RANDOM_MAC" ]
   }

@@ -166,6 +166,7 @@ void IpQosMonitor::HandleIpv6TcpPktsResp(const std::vector<int64_t> &elems)
                 __FUNCTION__, mIpv6FailedCounter);
         } else {
             WIFI_LOGE("%{public}s: Failed to notify IPv6 failure to SelfCure", __FUNCTION__);
+            mIpv6FailedCounter = 0; // Reset counter to avoid repeated notifications
         }
     }
 }

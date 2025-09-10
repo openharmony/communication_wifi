@@ -227,7 +227,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::AppXmlParserTest(data, size);
     OHOS::Wifi::AppParserTest(data, size);
     OHOS::Wifi::SoftapParserTest(data, size);
-    OHOS::Wifi::WifiRandomMacHelperTest(data, size)；
+    OHOS::Wifi::WifiRandomMacHelperTest(data, size);
     return 0;
 }
 }

@@ -72,7 +72,7 @@ Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddr
         return WifiErrCodeToResultCode(ret);
     }
 
-    if (*macAddrLen <= mac.length() || strcpy_s(macAddr, macAddrLen, mac.c_str()) != 0) {
+    if (*macAddrLen <= mac.length() || strcpy_s(macAddr, *macAddrLen, mac.c_str()) != 0) {
         return WIFI_OPERATION_FAILED;
     }
 

@@ -501,7 +501,7 @@ void RegisterFilterBuilderFuzzTest(const uint8_t* data, size_t size)
 
 void DeregisterFilterBuilderFuzzTest(const uint8_t* data, size_t size)
 {
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE));
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
     std::string filterName = std::string(reinterpret_cast<const char*>(data), size);
     pStaService->DeregisterFilterBuilder(filterTag, filterName);
 }

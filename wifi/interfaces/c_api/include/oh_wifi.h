@@ -64,7 +64,7 @@ typedef enum Wifi_ResultCode {
      * @error Operation failed.
      * Possible reasons: Internal execution failed.
      */
-    WIFI_OPERATION_FAILED = 2501000
+    WIFI_OPERATION_FAILED = 2501000,
     /**
      * @error Wi-Fi STA disabled.
      * @since 21

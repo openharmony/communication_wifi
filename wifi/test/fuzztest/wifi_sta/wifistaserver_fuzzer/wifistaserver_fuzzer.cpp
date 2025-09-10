@@ -542,6 +542,7 @@ void SimAkaAuthFuzzTest(const uint8_t* data, size_t size)
 void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
 {
     WifiLinkedInfo info;
+    std::string key = std::string(reinterpret_cast<const char*>(data), size);
 
     if (size >= sizeof(WifiLinkedInfo)) {
         int index = 0;
@@ -563,17 +564,16 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
     WifiSecurityDetect::GetInstance().CreateDataShareHelper();
     WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
     WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
+    WifiSecurityDetect::GetInstance().AssembleUri(key);
 }
 
 void SecurityDetectFuzzTest02(const uint8_t* data, size_t size)
 {
     int networkId = 0;
     int modelId = 0;
-    std::string key = std::string(reinterpret_cast<const char*>(data), size);
     std::string devId = std::string(reinterpret_cast<const char*>(data), size);
     std::string param = std::string(reinterpret_cast<const char*>(data), size);
-    int rawvalue = static_cast<int>(data[0]) % FIVE);
- 
+    int rawvalue = static_cast<int>(data[0]) % FIVE;
 SecurityModelResult model;
 switch (rawvalue) {
     case ZERO:
@@ -611,10 +611,9 @@ switch (rawvalue) {
         model.modelId = 0;
         model.param = "unknown";
         model.result = "unknown";
-    } 
+    }
     bool result = (static_cast<int>(data[0]) % TWO) ? true : false;
     WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
-    WifiSecurityDetect::GetInstance().AssembleUri(key);
     WifiSecurityDetect::GetInstance().IsSecurityDetectTimeout(networkId);
     WifiSecurityDetect::GetInstance().SecurityDetectResult(devId, modelId, param, result);
     WifiSecurityDetect::GetInstance().SecurityModelJsonResult(model, result);

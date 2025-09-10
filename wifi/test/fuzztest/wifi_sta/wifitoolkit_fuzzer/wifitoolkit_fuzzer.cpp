@@ -202,7 +202,7 @@ void WifiRandomMacHelperTest(const uint8_t* data, size_t size)
     std::vector<uint8_t> byte;
     std::vector<uint8_t> bytes;
     std::vector<uint8_t> addr;
-    bool value = (static_cast<int>(data[0]) % TWO) ? true : false; 
+    bool value = (static_cast<int>(data[0]) % TWO) ? true : false;
     #ifdef SUPPORT_LOCAL_RANDOM_MAC
     m_WifiRandomMacHelper->CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr);
     #endif

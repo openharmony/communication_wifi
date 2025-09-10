@@ -126,6 +126,13 @@ public:
      * @return bool - true: have done selfcure or no need to do, false: selfcure not finish
      */
     bool IsWifiSelfcureDone() override;
+
+    /**
+     * @Description Notify IPv6 connection failure detected
+     *
+     * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    ErrCode NotifyIpv6FailureDetected() override;
 private:
     std::mutex mutex;
     std::vector<SelfCureServiceCallback> mSelfCureCallback;

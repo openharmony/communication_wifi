@@ -223,5 +223,33 @@ void SelfCureService::P2pEnhanceStateChange(const std::string &ifName, int32_t s
         WifiConfigCenter::GetInstance().SetP2pEnhanceState(p2pEnhanceState);
     }
 }
+
+bool SelfCureService::NotifyIpv6FailureDetected()
+{
+    WIFI_LOGI("Enter NotifyIpv6FailureDetected");
+    // Check WiFi connection state, only handle IPv6 failure when connected
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGI("WiFi not connected, ignore IPv6 failure");
+        return false;
+    }
+
+    // Check if the system supports IPv6 self-cure functionality
+    if (!SelfCureUtils::GetInstance().IsIpv6SelfCureSupported()) {
+        WIFI_LOGI("IPv6 self-cure not supported, ignore IPv6 failure");
+        return false;
+    }
+
+    // Disable IPv6 to avoid potential connection issues
+    bool result = SelfCureUtils::GetInstance().DisableIpv6();
+    if (result) {
+        WIFI_LOGI("IPv6 disabled successfully due to connection failure");
+        return true;
+    } else {
+        WIFI_LOGE("Failed to disable IPv6");
+    }
+    return false;
+}
 } //namespace Wifi
 } //namespace OHOS

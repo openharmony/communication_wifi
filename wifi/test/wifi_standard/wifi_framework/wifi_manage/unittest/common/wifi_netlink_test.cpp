@@ -94,3 +94,18 @@ HWTEST_F(WifiNetLinkTest, SendQoeCmdTest001, TestSize.Level1)
     WifiNetLink::GetInstance().SendQoeCmd(cmd, arg);
     EXPECT_NE(WifiNetLink::GetInstance().SendQoeCmd(cmd, arg), -1);
 }
+
+HWTEST_F(WifiNetLinkTest, TestProcessQueryIpv6Tcp, TestSize.Level1)
+{
+    int32_t sockFd = 123;
+    WifiNetLink::GetInstance().ProcessQueryIpv6Tcp(sockFd);
+    EXPECT_EQ(WifiNetLink::GetInstance().ProcessQueryIpv6Tcp(sockFd), -1);
+}
+
+HWTEST_F(WifiNetLinkTest, SendIpv6QoeCmdTest, TestSize.Level1)
+{
+    int32_t cmd = 24; // CMD_QUERY_IPV6_PKTS
+    int32_t arg = 0;
+    WifiNetLink::GetInstance().SendQoeCmd(cmd, arg);
+    EXPECT_EQ(WifiNetLink::GetInstance().SendQoeCmd(cmd, arg), -1);
+}

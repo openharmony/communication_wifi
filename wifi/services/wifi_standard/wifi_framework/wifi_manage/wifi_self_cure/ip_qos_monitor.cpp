@@ -22,9 +22,12 @@ static const int32_t MIN_DELTA_TCP_TX = 3;
 static const int32_t QOS_TCP_TX_PKTS = 6;
 static const int32_t QOS_TCP_RX_PKTS = 7;
 static const int32_t QOS_MSG_FROM = 9;
-static const int32_t MIN_PACKET_LEN = 7;
+static const int32_t QOS_IPV6_MSG_FROM = 5;
+static const int32_t MIN_PACKET_LEN = 9;
 static const int32_t CMD_START_MONITOR = 10;
 static const int32_t CMD_QUERY_PKTS = 15;
+static const int32_t CMD_QUERY_IPV6_PKTS = 24;
+static const int32_t IPV6_FAILURE_THRESHOLD = 3;
 
 namespace OHOS {
 namespace Wifi {
@@ -39,6 +42,13 @@ IpQosMonitor &IpQosMonitor::GetInstance()
 void IpQosMonitor::StartMonitor(int32_t arg)
 {
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
+    
+    // Reset IPv6 failed counter when starting monitor, indicating a new connection
+    if (mIpv6FailedCounter > 0) {
+        WIFI_LOGI("StartMonitor: reset IPv6 failed counter from %{public}d to 0", mIpv6FailedCounter);
+        mIpv6FailedCounter = 0;
+    }
+    
     WifiNetLink::GetInstance().SendQoeCmd(CMD_START_MONITOR, arg);
 }
 
@@ -46,6 +56,12 @@ void IpQosMonitor::QueryPackets(int32_t arg)
 {
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
     WifiNetLink::GetInstance().SendQoeCmd(CMD_QUERY_PKTS, arg);
+}
+
+void IpQosMonitor::QueryIpv6Packets(int32_t arg)
+{
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
+    WifiNetLink::GetInstance().SendQoeCmd(CMD_QUERY_IPV6_PKTS, arg);
 }
 
 void IpQosMonitor::HandleTcpReportMsgComplete(const std::vector<int64_t> &elems, int32_t cmd)
@@ -62,6 +78,8 @@ void IpQosMonitor::ParseTcpReportMsg(const std::vector<int64_t> &elems, int32_t 
     }
     if (cmd == CMD_QUERY_PKTS) {
         HandleTcpPktsResp(elems);
+    } else if (cmd == CMD_QUERY_IPV6_PKTS) {
+        HandleIpv6TcpPktsResp(elems);
     }
 }
 
@@ -112,6 +130,46 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     }
 }
 
+void IpQosMonitor::HandleIpv6TcpPktsResp(const std::vector<int64_t> &elems)
+{
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
+    bool ipv6InternetGood = ParseIpv6NetworkInternetGood(elems);
+    if (ipv6InternetGood) {
+        mIpv6FailedCounter = 0;
+        WIFI_LOGD("IPv6 connection is good, reset failed counter");
+        return;
+    }
+    
+    mIpv6FailedCounter++;
+    WIFI_LOGI("%{public}s: IPv6 mIpv6FailedCounter = %{public}d", __FUNCTION__, mIpv6FailedCounter);
+    
+    // Check WiFi connection state, only handle IPv6 failure when connected
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGD("WiFi not connected, ignore IPv6 failure");
+        return;
+    }
+    
+    // Notify SelfCure service when IPv6 fails 3 times consecutively
+    if (mIpv6FailedCounter >= IPV6_FAILURE_THRESHOLD) {
+        ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
+        if (pSelfCureService == nullptr) {
+            WIFI_LOGE("%{public}s: pSelfCureService is null", __FUNCTION__);
+            return;
+        }
+        
+        // Notify SelfCure service about IPv6 connection failure to trigger IPv6 disable mechanism
+        ErrCode result = pSelfCureService->NotifyIpv6FailureDetected();
+        if (result == WIFI_OPT_SUCCESS) {
+            WIFI_LOGI("%{public}s: IPv6 failure notified to SelfCure successfully after %{public}d failures",
+                __FUNCTION__, mIpv6FailedCounter);
+        } else {
+            WIFI_LOGE("%{public}s: Failed to notify IPv6 failure to SelfCure", __FUNCTION__);
+        }
+    }
+}
+
 bool IpQosMonitor::AllowSelfCureNetwork(int32_t currentRssi)
 {
     ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
@@ -129,9 +187,15 @@ bool IpQosMonitor::AllowSelfCureNetwork(int32_t currentRssi)
 bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
 {
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
-    bool queryResp = (elems[QOS_MSG_FROM] == 0);
     int32_t packetsLength = static_cast<int32_t>(elems.size());
-    if ((queryResp) && (packetsLength > MIN_PACKET_LEN)) {
+    // Check if array length is sufficient to access required indices
+    if (packetsLength <= QOS_MSG_FROM) {
+        WIFI_LOGE("elems length %{public}d is too short, expected > %{public}d", packetsLength, QOS_MSG_FROM);
+        return true;
+    }
+    
+    bool queryResp = (elems[QOS_MSG_FROM] == 0);
+    if (queryResp) {
         int64_t tcpTxPkts = elems[QOS_TCP_TX_PKTS];
         int64_t tcpRxPkts = elems[QOS_TCP_RX_PKTS];
         WIFI_LOGD("tcpTxPkts = %{public}" PRId64 ", tcpRxPkts = %{public}" PRId64, tcpTxPkts, tcpRxPkts);
@@ -144,6 +208,15 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
         }
         int64_t deltaTcpTxPkts = tcpTxPkts - mLastTcpTxCounter;
         int64_t deltaTcpRxPkts = tcpRxPkts - mLastTcpRxCounter;
+        
+        // Handle integer overflow wraparound
+        if (deltaTcpTxPkts < 0 || deltaTcpRxPkts < 0) {
+            WIFI_LOGW("TCP counter overflow detected, reset counters");
+            mLastTcpTxCounter = tcpTxPkts;
+            mLastTcpRxCounter = tcpRxPkts;
+            return true; // Return true on overflow to avoid false negative
+        }
+        
         WIFI_LOGI("deltaTcpTxPkts = %{public}" PRId64 ", deltaTcpRxPkts = %{public}" PRId64,
             deltaTcpTxPkts, deltaTcpRxPkts);
         mLastTcpTxCounter = tcpTxPkts;
@@ -160,6 +233,64 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
             }
         }
     }
+    return true;
+}
+
+bool IpQosMonitor::ParseIpv6NetworkInternetGood(const std::vector<int64_t> &elems)
+{
+    WIFI_LOGD("enter %{public}s", __FUNCTION__);
+    
+    // First check elems length
+    int32_t packetsLength = static_cast<int32_t>(elems.size());
+    if (packetsLength <= MIN_PACKET_LEN) {
+        WIFI_LOGE("IPv6 elems length %{public}d is too short, expected > %{public}d", packetsLength, MIN_PACKET_LEN);
+        return true; // Return true when length is insufficient to avoid false negative
+    }
+    
+    // Check if this is an IPv6 query response, elems[QOS_MSG_FROM] should equal QOS_IPV6_MSG_FROM(5)
+    bool queryResp = (elems[QOS_MSG_FROM] == QOS_IPV6_MSG_FROM);
+    if (!queryResp) {
+        WIFI_LOGD("IPv6 not a query response, msgFrom = %{public}" PRId64 ", expected = %{public}d",
+            elems[QOS_MSG_FROM], QOS_IPV6_MSG_FROM);
+        return true; // Return true when not IPv6 query response
+    }
+    
+    int64_t tcpTxPkts = elems[QOS_TCP_TX_PKTS];
+    int64_t tcpRxPkts = elems[QOS_TCP_RX_PKTS];
+    WIFI_LOGD("IPv6 tcpTxPkts = %{public}" PRId64 ", tcpRxPkts = %{public}" PRId64, tcpTxPkts, tcpRxPkts);
+    
+    if ((mLastIpv6TcpTxCounter == 0) || (mLastIpv6TcpRxCounter == 0)) {
+        mLastIpv6TcpTxCounter = tcpTxPkts;
+        mLastIpv6TcpRxCounter = tcpRxPkts;
+        WIFI_LOGI("IPv6 mLastTcpTxCounter = %{public}" PRId64 ", mLastTcpRxCounter = %{public}" PRId64,
+            mLastIpv6TcpTxCounter, mLastIpv6TcpRxCounter);
+        return true;
+    }
+    
+    int64_t deltaTcpTxPkts = tcpTxPkts - mLastIpv6TcpTxCounter;
+    int64_t deltaTcpRxPkts = tcpRxPkts - mLastIpv6TcpRxCounter;
+    
+    // Handle integer overflow wraparound
+    if (deltaTcpTxPkts < 0 || deltaTcpRxPkts < 0) {
+        WIFI_LOGW("IPv6 TCP counter overflow detected, reset counters");
+        mLastIpv6TcpTxCounter = tcpTxPkts;
+        mLastIpv6TcpRxCounter = tcpRxPkts;
+        return true; // Return true on overflow to avoid false negative
+    }
+    
+    WIFI_LOGI("IPv6 deltaTcpTxPkts = %{public}" PRId64 ", deltaTcpRxPkts = %{public}" PRId64,
+        deltaTcpTxPkts, deltaTcpRxPkts);
+    
+    mLastIpv6TcpTxCounter = tcpTxPkts;
+    mLastIpv6TcpRxCounter = tcpRxPkts;
+    
+    if (deltaTcpRxPkts == 0) {
+        if (deltaTcpTxPkts >= MIN_DELTA_TCP_TX) {
+            WIFI_LOGI("%{public}s IPv6 internetGood: false", __FUNCTION__);
+            return false;
+        }
+    }
+    
     return true;
 }
 
@@ -188,5 +319,19 @@ bool IpQosMonitor::GetTxRxStatus()
     return lastTxRxGood_;
 }
 
+int64_t IpQosMonitor::GetCurrentIpv6TcpTxCounter()
+{
+    return mLastIpv6TcpTxCounter;
+}
+ 
+int64_t IpQosMonitor::GetCurrentIpv6TcpRxCounter()
+{
+    return mLastIpv6TcpRxCounter;
+}
+
+int32_t IpQosMonitor::GetIpv6FailedCounter()
+{
+    return mIpv6FailedCounter;
+}
 } // namespace Wifi
 } // namespace OHOS

@@ -182,6 +182,17 @@ void AppParserTest(const uint8_t* data, size_t size)
 
 void SoftapParserTest(const uint8_t* data, size_t size)
 {
+    m_softapXmlParser->ParseInternal(root_node);
+    m_softapXmlParser->GotoSoftApNode(root_node);
+    m_softapXmlParser->ParseSoftap(root_node);
+    m_softapXmlParser->GetConfigNameAsInt(root_node);
+    m_softapXmlParser->GetBandInfo(root_node);
+    m_softapXmlParser->TransBandinfo(root_node);
+    m_softapXmlParser->GetSoftapConfigs();
+}
+
+void WifiRandomMacHelperTest(const uint8_t* data, size_t size)
+{
     int index = 0;
     unsigned long long addr1 = static_cast<unsigned long long>(data[index++]);
     unsigned long long random = static_cast<unsigned long long>(data[index++]);
@@ -192,13 +203,6 @@ void SoftapParserTest(const uint8_t* data, size_t size)
     std::vector<uint8_t> bytes;
     std::vector<uint8_t> addr;
     bool value = (static_cast<int>(data[0]) % TWO) ? true : false; 
-    m_softapXmlParser->ParseInternal(root_node);
-    m_softapXmlParser->GotoSoftApNode(root_node);
-    m_softapXmlParser->ParseSoftap(root_node);
-    m_softapXmlParser->GetConfigNameAsInt(root_node);
-    m_softapXmlParser->GetBandInfo(root_node);
-    m_softapXmlParser->TransBandinfo(root_node);
-    m_softapXmlParser->GetSoftapConfigs();
     #ifdef SUPPORT_LOCAL_RANDOM_MAC
     m_WifiRandomMacHelper->CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr);
     #endif
@@ -211,6 +215,7 @@ void SoftapParserTest(const uint8_t* data, size_t size)
     m_WifiRandomMacHelper->LongAddrFromByteAddr(addr);
     m_WifiRandomMacHelper->GenerateRandomMacAddressByLong(random, randomMacAddr);
 }
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -222,6 +227,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::AppXmlParserTest(data, size);
     OHOS::Wifi::AppParserTest(data, size);
     OHOS::Wifi::SoftapParserTest(data, size);
+    OHOS::Wifi::WifiRandomMacHelperTest(data, size)；
     return 0;
 }
 }

@@ -42,11 +42,13 @@ static const int32_t QOS_MSG_FROM = 9;
 enum WifiKnlMsgType {
     NETLINK_WIFIPRO_START_MONITOR = 0,
     NETLINK_WIFIPRO_GET_MSG,
+    NETLINK_WIFIPRO_GET_IPV6_MSG = 9,
 };
 
 enum CmdWord {
     CMD_START_MONITOR = 10,
     CMD_QUERY_PKTS = 15,
+    CMD_QUERY_IPV6_PKTS = 24,
     MSG_REPORT_IPQOS = 100,
 };
 
@@ -129,6 +131,11 @@ int32_t WifiNetLink::ProcessQueryTcp(int32_t sockFd)
     return SendCmdKernel(sockFd, NETLINK_WIFIPRO_GET_MSG, 0);
 }
 
+int32_t WifiNetLink::ProcessQueryIpv6Tcp(int32_t sockFd)
+{
+    return SendCmdKernel(sockFd, NETLINK_WIFIPRO_GET_IPV6_MSG, 0);
+}
+
 int32_t WifiNetLink::SendQoeCmd(int32_t cmd, int32_t arg)
 {
     int32_t sockFd = -1;
@@ -147,6 +154,10 @@ int32_t WifiNetLink::SendQoeCmd(int32_t cmd, int32_t arg)
             break;
         case CMD_QUERY_PKTS:
             sendResult = ProcessQueryTcp(sockFd);
+            isNeedReport = true;
+            break;
+        case CMD_QUERY_IPV6_PKTS:
+            sendResult = ProcessQueryIpv6Tcp(sockFd);
             isNeedReport = true;
             break;
         default:
@@ -199,7 +210,8 @@ int32_t WifiNetLink::ProcessReportMsg(int32_t sockFd, int32_t cmd)
         mWifiNetLinkCallbacks.OnTcpReportMsgComplete(elems, cmd, mInstId);
         return 0;
     } else {
-        WIFI_LOGI("Received invalid message info.hdr.nlmsg_type = %{public}d", info.hdr.nlmsg_type);
+        const char* type = (cmd == CMD_QUERY_IPV6_PKTS) ? "IPv6" : "IPv4";
+        WIFI_LOGI("Received invalid %{public}s message info.hdr.nlmsg_type = %{public}d", type, info.hdr.nlmsg_type);
         return -1;
     }
 }

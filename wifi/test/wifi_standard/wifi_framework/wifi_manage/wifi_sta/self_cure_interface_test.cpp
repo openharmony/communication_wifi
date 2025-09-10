@@ -184,6 +184,16 @@ HWTEST_F(SelfCureInterfaceTest, DealDhcpOfferReportTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(SelfCureInterfaceTest, NotifyIpv6FailureDetectedTest, TestSize.Level1)
+{
+    // Test IPv6 failure notification interface
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pSelfCureInterface->NotifyIpv6FailureDetected());
+
+    // Test with null service
+    pSelfCureInterface->pSelfCureService = nullptr;
+    EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyIpv6FailureDetected());
+}
+
 
 } // namespace Wifi
 } // namespace OHOS

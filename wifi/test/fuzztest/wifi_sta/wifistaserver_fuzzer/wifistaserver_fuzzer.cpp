@@ -282,6 +282,8 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
     config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
     std::vector<std::string> blocklistBssids;
+    std::vector<StaServiceCallback> callbacks;
+    NetworkSelectionResult candidate;
     blocklistBssids.push_back(std::string(reinterpret_cast<const char*>(data), size));
     WifiSettings::GetInstance().AddDeviceConfig(config);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(info);
@@ -297,12 +299,12 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->RoamingSelection(config, scanInfo, info);
     pStaAutoConnectService->EnableOrDisableBssid(conditionName, attemptEnable, frequency);
     pStaAutoConnectService->firmwareRoamFlag = true;
-    pStaAutoConnectService->OnScanInfosReadyHandler(scanInfo);
-    pStaAutoConnectService->AutoSelectDevice(config, scanInfo, blocklistBssids, info);
     pStaAutoConnectService->WhetherDevice5GAvailable(scanInfo);
     pStaAutoConnectService->GetAvailableScanInfos(scanInfo, scanInfo, blocklistBssids, info);
+    pStaAutoConnectService->InitAutoConnectService();
+    pStaAutoConnectService->SetAutoConnectStateCallback(callbacks);
+    pStaAutoConnectService->OverrideCandidateWithUserSelectChoice(candidate);
     pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfo);
-    pStaService->AutoConnectService(scanInfo);
 }
 
 void RegisterDeviceAppraisalTest(const uint8_t* data, size_t size)
@@ -531,6 +533,8 @@ void SimAkaAuthFuzzTest(const uint8_t* data, size_t size)
 void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
 {
     WifiLinkedInfo info;
+    int networkId = 0;
+    int modelId = 0;
     if (size >= sizeof(WifiLinkedInfo)) {
         int index = 0;
         info.networkId = static_cast<int>(data[index++]);
@@ -542,10 +546,76 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
         info.bssid = std::string(reinterpret_cast<const char*>(data), size);
         info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
     }
+    std::string key = std::string(reinterpret_cast<const char*>(data), size);
+    std::string devId = std::string(reinterpret_cast<const char*>(data), size);
+    std::string param = std::string(reinterpret_cast<const char*>(data), size);
+    int raw_value = static_cast<int>(data[0]) % THREE;
+ 
+SecurityModelResult model;
+switch (raw_value) {
+    case 0:
+        model.devId = "device_001";
+        model.modelId = 1001;
+        model.param = "psk";
+        model.result = "success";
+        break;
+    case 1:
+        model.devId = "device_002";
+        model.modelId = 1002;
+        model.param = "wpa2";
+        model.result = "fail";
+        break;
+    case 2:
+        model.devId = "device_003";
+        model.modelId = 1003;
+        model.param = "invalid";
+        model.result = "invalid_params";
+        break;
+    case 3:
+        model.devId = "device_004";
+        model.modelId = 1004;
+        model.param = "unsupported";
+        model.result = "not_supported";
+        break;
+    case 4:
+        model.devId = "device_005";
+        model.modelId = 1005;
+        model.param = "timeout";
+        model.result = "timeout";
+        break;
+    default:
+        model.devId = "unknown";
+        model.modelId = 0;
+        model.param = "unknown";
+        model.result = "unknown";
+} 
+    bool result = (static_cast<int>(data[0]) % TWO) ? true : false;
     WifiSecurityDetect::GetInstance().SetDatashareReady();
     WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
     WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
     WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
+    WifiSecurityDetect::GetInstance().SecurityDetect(info);
+    WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
+    WifiSecurityDetect::GetInstance().CreateDataShareHelper();
+    WifiSecurityDetect::GetInstance().AssembleUri(key);
+    WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
+    WifiSecurityDetect::GetInstance().IsSecurityDetectTimeout(networkId);
+    WifiSecurityDetect::GetInstance().SecurityDetectResult(devId, modelId, param, result);
+    WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
+    WifiSecurityDetect::GetInstance().SecurityModelJsonResult(model, result);
+    WifiSecurityDetect::GetInstance().SetDatashareReady();
+    WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
+    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
+    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
+    WifiSecurityDetect::GetInstance().SecurityDetect(info);
+    WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
+    WifiSecurityDetect::GetInstance().CreateDataShareHelper();
+    WifiSecurityDetect::GetInstance().AssembleUri(key);
+    WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
+    WifiSecurityDetect::GetInstance().IsSecurityDetectTimeout(networkId);
+    WifiSecurityDetect::GetInstance().SecurityDetectResult(devId, modelId, param, result);
+    WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
+    WifiSecurityDetect::GetInstance().SecurityModelJsonResult(model, result);
 }
     
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)

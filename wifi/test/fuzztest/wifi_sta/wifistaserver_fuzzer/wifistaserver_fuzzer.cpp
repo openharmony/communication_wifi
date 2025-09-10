@@ -37,12 +37,21 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int U32_AT_SIZE_ZERO = 4;
+constexpr int ZERO = 0;
+constexpr int ONE = 1;
 constexpr int TWO = 2;
-constexpr int THREE = 5;
+constexpr int THREE = 3;
+constexpr int FOUR = 4;
+constexpr int FIVE = 5;
 constexpr int ID = 123;
 constexpr int WORK_ID = 10;
 static bool g_isInsted = false;
 constexpr int STATE = 20;
+const int MODEL_ID_1001 = 1001;
+const int MODEL_ID_1002 = 1002;
+const int MODEL_ID_1003 = 1003;
+const int MODEL_ID_1004 = 1004;
+const int MODEL_ID_1005 = 1005;
 static std::unique_ptr<StaInterface> pStaInterface = nullptr;
 static std::unique_ptr<StaAutoConnectService> pStaAutoConnectService = nullptr;
 static std::unique_ptr<StaService> pStaService = nullptr;
@@ -123,12 +132,12 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     bool isAllowed = (static_cast<int>(data[0]) % TWO) ? true : false;
     std::string cmd = std::string(reinterpret_cast<const char*>(data), size);
     std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % THREE);
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
     ConfigChange value = static_cast<ConfigChange>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
     WpsConfig sconfig;
     sconfig.pin = std::string(reinterpret_cast<const char*>(data), size);
     sconfig.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    sconfig.setup = static_cast<SetupMethod>(static_cast<int>(data[0]) % THREE);
+    sconfig.setup = static_cast<SetupMethod>(static_cast<int>(data[0]) % FIVE);
     WifiDeviceConfig config;
     config.ssid = std::string(reinterpret_cast<const char*>(data), size);
     config.bssid = std::string(reinterpret_cast<const char*>(data), size);
@@ -369,7 +378,7 @@ void StaInterfaceFuzzTest(const uint8_t* data, size_t size)
 {
     std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
     std::string filterName = std::string(reinterpret_cast<const char*>(data), size);
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % THREE);
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
     FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
     AppExecFwk::AppStateData appData;
     pStaInterface->RegisterAutoJoinCondition(conditionName, []() {return true;});
@@ -484,7 +493,7 @@ void StaServiceFuzzTest(const uint8_t* data, size_t size)
 
 void RegisterFilterBuilderFuzzTest(const uint8_t* data, size_t size)
 {
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % THREE);
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
     std::string filterName = std::string(reinterpret_cast<const char*>(data), size);
     FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
     pStaService->RegisterFilterBuilder(filterTag, filterName, filterBuilder);
@@ -492,7 +501,7 @@ void RegisterFilterBuilderFuzzTest(const uint8_t* data, size_t size)
 
 void DeregisterFilterBuilderFuzzTest(const uint8_t* data, size_t size)
 {
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % THREE);
+    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE));
     std::string filterName = std::string(reinterpret_cast<const char*>(data), size);
     pStaService->DeregisterFilterBuilder(filterTag, filterName);
 }
@@ -533,8 +542,7 @@ void SimAkaAuthFuzzTest(const uint8_t* data, size_t size)
 void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
 {
     WifiLinkedInfo info;
-    int networkId = 0;
-    int modelId = 0;
+
     if (size >= sizeof(WifiLinkedInfo)) {
         int index = 0;
         info.networkId = static_cast<int>(data[index++]);
@@ -546,40 +554,55 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
         info.bssid = std::string(reinterpret_cast<const char*>(data), size);
         info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
     }
+ 
+    WifiSecurityDetect::GetInstance().SetDatashareReady();
+    WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
+    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
+    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
+    WifiSecurityDetect::GetInstance().SecurityDetect(info);
+    WifiSecurityDetect::GetInstance().CreateDataShareHelper();
+    WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
+    WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
+}
+
+void SecurityDetectFuzzTest02(const uint8_t* data, size_t size)
+{
+    int networkId = 0;
+    int modelId = 0;
     std::string key = std::string(reinterpret_cast<const char*>(data), size);
     std::string devId = std::string(reinterpret_cast<const char*>(data), size);
     std::string param = std::string(reinterpret_cast<const char*>(data), size);
-    int raw_value = static_cast<int>(data[0]) % THREE;
+    int rawvalue = static_cast<int>(data[0]) % FIVE);
  
 SecurityModelResult model;
-switch (raw_value) {
-    case 0:
+switch (rawvalue) {
+    case ZERO:
         model.devId = "device_001";
-        model.modelId = 1001;
+        model.modelId = MODEL_ID_1001;
         model.param = "psk";
         model.result = "success";
         break;
-    case 1:
+    case ONE:
         model.devId = "device_002";
-        model.modelId = 1002;
+        model.modelId = MODEL_ID_1002;
         model.param = "wpa2";
         model.result = "fail";
         break;
-    case 2:
+    case TWO:
         model.devId = "device_003";
-        model.modelId = 1003;
+        model.modelId = MODEL_ID_1003;
         model.param = "invalid";
         model.result = "invalid_params";
         break;
-    case 3:
+    case THREE:
         model.devId = "device_004";
-        model.modelId = 1004;
+        model.modelId = MODEL_ID_1004;
         model.param = "unsupported";
         model.result = "not_supported";
         break;
-    case 4:
+    case FOUR:
         model.devId = "device_005";
-        model.modelId = 1005;
+        model.modelId = MODEL_ID_1005;
         model.param = "timeout";
         model.result = "timeout";
         break;
@@ -588,33 +611,12 @@ switch (raw_value) {
         model.modelId = 0;
         model.param = "unknown";
         model.result = "unknown";
-} 
+    } 
     bool result = (static_cast<int>(data[0]) % TWO) ? true : false;
-    WifiSecurityDetect::GetInstance().SetDatashareReady();
-    WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
-    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
-    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
-    WifiSecurityDetect::GetInstance().SecurityDetect(info);
     WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
-    WifiSecurityDetect::GetInstance().CreateDataShareHelper();
     WifiSecurityDetect::GetInstance().AssembleUri(key);
-    WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
     WifiSecurityDetect::GetInstance().IsSecurityDetectTimeout(networkId);
     WifiSecurityDetect::GetInstance().SecurityDetectResult(devId, modelId, param, result);
-    WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
-    WifiSecurityDetect::GetInstance().SecurityModelJsonResult(model, result);
-    WifiSecurityDetect::GetInstance().SetDatashareReady();
-    WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
-    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
-    WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, info, 0);
-    WifiSecurityDetect::GetInstance().SecurityDetect(info);
-    WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
-    WifiSecurityDetect::GetInstance().CreateDataShareHelper();
-    WifiSecurityDetect::GetInstance().AssembleUri(key);
-    WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
-    WifiSecurityDetect::GetInstance().IsSecurityDetectTimeout(networkId);
-    WifiSecurityDetect::GetInstance().SecurityDetectResult(devId, modelId, param, result);
-    WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
     WifiSecurityDetect::GetInstance().SecurityModelJsonResult(model, result);
 }
     

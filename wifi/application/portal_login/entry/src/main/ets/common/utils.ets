@@ -6,6 +6,7 @@ import { url } from '@kit.ArkTS'
 
 const DOMAIN = 0x01560
 const TAG = 'Utils';
+const MAX_URL_LENGTH = 2048;
 
 let url_: string = '';
 let netId_: number = -1;
@@ -25,6 +26,10 @@ export function shouldShowBrowseItem(): boolean {
 }
 
 export function validateURL(urlString: string): boolean {
+  if (urlString.length > MAX_URL_LENGTH) {
+    hilog.error(DOMAIN, TAG, '%{public}s', 'Invalid URL: url length exceed 2048.');
+    return false;
+  }
   try {
     const urlObject = url.URL.parseURL(urlString);
     if (urlObject && urlObject.hostname) {

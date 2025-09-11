@@ -78,7 +78,7 @@ inline const std::string EAP_METHOD_AKA = "AKA";
 inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
 inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
-
+inline const int ENABLE_AIDFS = 7;
 enum SigLevel {
     SIG_LEVEL_0 = 0,
     SIG_LEVEL_1 = 1,
@@ -1148,6 +1148,11 @@ struct WpaEapData {
     int32_t type; /* eap type */
     int32_t bufferLen; /* length of data in the buffer */
     std::vector<uint8_t> eapBuffer; /* eap Data */
+};
+
+struct DfsControlData {
+    uint32_t enableAidfs_ = ENABLE_AIDFS;
+    uint32_t enableDfs_ = 1;
 };
 }  // namespace Wifi
 }  // namespace OHOS

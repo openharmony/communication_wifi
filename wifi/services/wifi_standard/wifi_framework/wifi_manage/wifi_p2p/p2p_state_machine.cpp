@@ -38,6 +38,7 @@
 #include "wifi_settings.h"
 #include "p2p_chr_reporter.h"
 #include "wifi_notification_util.h"
+#include "wifi_channel_helper.h"
 #ifndef OHOS_ARCH_LITE
 #include "power_mgr_client.h"
 #endif
@@ -1055,6 +1056,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     if (freqList.empty()) {
         return 0;
     }
+    WifiChannelHelper::GetInstance().FilterDfsFreq(freqList);
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int retFreq = 0;

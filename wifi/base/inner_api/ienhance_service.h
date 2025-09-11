@@ -322,11 +322,16 @@ public:
     virtual LimitSwitchScenes GetLimitSwitchScenes() = 0;
 
     /**
-     * @Description obtain supported 160MHz
+     * @Description get DFS Control Ability
      *
-     * @return bool - supported 160MHz
+     * @return DfsControlData DFS data info
      */
-    virtual bool IsControl160M() = 0;
+    virtual DfsControlData GetDfsControlData() = 0;
+ 
+    /**
+     * @Description Stop Cac
+     */
+    virtual void CloseCAC() = 0;
 
     /**
      * @Description register sensor result callback

@@ -143,11 +143,17 @@ int ApConfigUse::GetBestChannelFor5G(HotspotConfig &apConfig) const
     std::vector<int> channels;
     GetApVaildChannel(BandType::BAND_5GHZ, channels);
     Filter165Channel(channels);
+    WifiChannelHelper::GetInstance().FilterDfsChannel(channels);
     WIFI_LOGD("Instance %{public}d %{public}s band:%{public}d, channel:%{public}d, bandwidth:%{public}d",
         m_id, __func__, static_cast<int>(apConfig.GetBand()), apConfig.GetChannel(), apConfig.GetBandWidth());
     if (apConfig.GetBandWidth() == AP_BANDWIDTH_160) {
-        WIFI_LOGI("GetBestChannelFor5G BandWidth is 160M");
-        return AP_CHANNEL_5G_160M_DEFAULT;
+        if (WifiConfigCenter::GetInstance().GetDfsControlData().enableDfs_ == 1) {
+            WIFI_LOGI("GetBestChannelFor5G BandWidth is 160M");
+            return AP_CHANNEL_5G_160M_DEFAULT;
+        } else {
+            WIFI_LOGI("GetBestChannelFor5G Invalid BandWidth");
+            return AP_CHANNEL_INVALID;
+        }
     }
     if (channels.empty()) {
         WIFI_LOGI("GetBestChannelFor5G is empty");

@@ -308,5 +308,34 @@ void WifiChannelHelper::UpdateValidChannels(std::vector<int32_t> &supp2Gfreqs, s
     }
 }
 
+void WifiChannelHelper::FilterDfsChannel(std::vector<int> &channels)
+{
+    if (WifiConfigCenter::GetInstance().GetDfsControlData().enableDfs_ == 1 || channels.empty()) {
+        return;
+    }
+    for (auto it = channels.begin(); it != channels.end();) {
+        if (*it >= CHANNEL50 && *it <= CHANNEL144) {
+            WIFI_LOGI("filter: not recommend DFS:%{public}d", *it);
+            it = channels.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void WifiChannelHelper::FilterDfsFreq(std::vector<int> &freqList)
+{
+    if (WifiConfigCenter::GetInstance().GetDfsControlData().enableDfs_ == 1 || freqList.empty()) {
+        return;
+    }
+    for (auto it = freqList.begin(); it != freqList.end();) {
+        if (*it >= FREQ5240 && *it <= FREQ5730) {
+            WIFI_LOGI("filter: not recommend DFS:%{public}d", *it);
+            it = freqList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
 } // namespace Wifi
 } // namespace OHOS

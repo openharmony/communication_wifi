@@ -147,6 +147,8 @@ ohos_unittest("wifi_sta_new_unittest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
+    "netmanager_base:net_native_manager_if",
+    "netmanager_base:netsys_controller",
     "time_service:time_client",
     "window_manager:libdm_lite",
   ]

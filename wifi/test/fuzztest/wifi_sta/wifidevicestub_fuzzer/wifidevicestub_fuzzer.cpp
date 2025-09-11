@@ -15,6 +15,7 @@
 
 #include "wifidevicestub_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -37,8 +38,8 @@
 
 namespace OHOS {
 namespace Wifi {
-constexpr size_t U32_AT_SIZE_ZERO = 4;
-constexpr int TWO = 2;
+FuzzedDataProvider *FDP = nullptr;
+const int32_t NUM_BYTES = 1;
 constexpr int FIVE = 5;
 constexpr int NINE = 9;
 static bool g_isInsted = false;
@@ -124,663 +125,773 @@ bool OnRemoteRequest(uint32_t code, MessageParcel &data)
     return true;
 }
 
-void OnInitWifiProtectFuzzTest(const uint8_t* data, size_t size)
+void OnInitWifiProtectFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), datas);
 }
 
-void OnGetWifiProtectRefFuzzTest(const uint8_t* data, size_t size)
+void OnGetWifiProtectRefFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_PROTECT), datas);
 }
 
-void OnPutWifiProtectRefFuzzTest(const uint8_t* data, size_t size)
+void OnPutWifiProtectRefFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_PUT_WIFI_PROTECT), datas);
 }
 
-void OnIsHeldWifiProtectRefFuzzTest(const uint8_t* data, size_t size)
+void OnIsHeldWifiProtectRefFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HELD_WIFI_PROTECT), datas);
 }
 
-void OnAddDeviceConfigFuzzTest(const uint8_t* data, size_t size)
+void OnAddDeviceConfigFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ADD_DEVICE_CONFIG), datas);
 }
 
-void OnUpdateDeviceConfigFuzzTest(const uint8_t* data, size_t size)
+void OnUpdateDeviceConfigFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG), datas);
 }
 
-void OnRemoveDeviceFuzzTest(const uint8_t* data, size_t size)
+void OnRemoveDeviceFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_DEVICE_CONFIG), datas);
 }
 
-void OnRemoveAllDeviceFuzzTest(const uint8_t* data, size_t size)
+void OnRemoveAllDeviceFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_ALL_DEVICE_CONFIG), datas);
 }
 
-void OnGetDeviceConfigsFuzzTest(const uint8_t* data, size_t size)
+void OnGetDeviceConfigsFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIGS), datas);
 }
 
-void OnEnableDeviceConfigFuzzTest(const uint8_t* data, size_t size)
+void OnEnableDeviceConfigFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_DEVICE), datas);
 }
 
-void OnDisableDeviceConfigFuzzTest(const uint8_t* data, size_t size)
+void OnDisableDeviceConfigFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE), datas);
 }
 
-void OnConnectToFuzzTest(const uint8_t* data, size_t size)
+void OnConnectToFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO), datas);
 }
 
-void OnConnect2ToFuzzTest(const uint8_t* data, size_t size)
+void OnConnect2ToFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO), datas);
 }
 
-void OnReConnectFuzzTest(const uint8_t* data, size_t size)
+void OnReConnectFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT), datas);
 }
 
-void OnReAssociateFuzzTest(const uint8_t* data, size_t size)
+void OnReAssociateFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE), datas);
 }
 
-void OnDisconnectFuzzTest(const uint8_t* data, size_t size)
+void OnDisconnectFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISCONNECT), datas);
 }
 
-void OnStartWpsFuzzTest(const uint8_t* data, size_t size)
+void OnStartWpsFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WPS), datas);
 }
 
-void OnCancelWpsFuzzTest(const uint8_t* data, size_t size)
+void OnCancelWpsFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CANCEL_WPS), datas);
 }
 
-void OnIsWifiActiveFuzzTest(const uint8_t* data, size_t size)
+void OnIsWifiActiveFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE), datas);
 }
 
-void OnGetWifiStateFuzzTest(const uint8_t* data, size_t size)
+void OnGetWifiStateFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_STATE), datas);
 }
 
-void OnGetLinkedInfoFuzzTest(const uint8_t* data, size_t size)
+void OnGetLinkedInfoFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO), datas);
 }
 
-void OnIsMeteredHotspotFuzzTest(const uint8_t* data, size_t size)
+void OnIsMeteredHotspotFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_METERED_HOTSPOT), datas);
 }
 
-void OnGetIpInfoFuzzTest(const uint8_t* data, size_t size)
+void OnGetIpInfoFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO), datas);
 }
 
-void OnSetCountryCodeFuzzTest(const uint8_t* data, size_t size)
+void OnSetCountryCodeFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_COUNTRY_CODE), datas);
 }
 
-void OnGetCountryCodeFuzzTest(const uint8_t* data, size_t size)
+void OnGetCountryCodeFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE), datas);
 }
 
-void OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
+void OnRegisterCallBackFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REGISTER_CALLBACK_CLIENT), datas);
 }
 
-void OnGetSignalLevelFuzzTest(const uint8_t* data, size_t size)
+void OnGetSignalLevelFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL), datas);
 }
 
-void OnGetIpV6InfoFuzzTest(const uint8_t* data, size_t size)
+void OnGetIpV6InfoFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_IPV6INFO), datas);
 }
 
-void OnGetDeviceMacAddFuzzTest(const uint8_t* data, size_t size)
+void OnGetDeviceMacAddFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DERVICE_MAC_ADD), datas);
 }
 
-void OnIsWifiConnectedFuzzTest(const uint8_t* data, size_t size)
+void OnIsWifiConnectedFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED), datas);
 }
 
-void OnSetLowLatencyModeFuzzTest(const uint8_t* data, size_t size)
+void OnSetLowLatencyModeFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_LATENCY_MODE), datas);
 }
 
-void OnRemoveCandidateConfigFuzzTest(const uint8_t* data, size_t size)
+void OnRemoveCandidateConfigFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REMOVE_CANDIDATE_CONFIG), datas);
 }
 
-void OnIsBandTypeSupportedFuzzTest(const uint8_t* data, size_t size)
+void OnIsBandTypeSupportedFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED), datas);
 }
 
-void OnGet5GHzChannelListFuzzTest(const uint8_t* data, size_t size)
+void OnGet5GHzChannelListFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNELLIST), datas);
 }
 
-void OnGetDisconnectedReasonFuzzTest(const uint8_t* data, size_t size)
+void OnGetDisconnectedReasonFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DISCONNECTED_REASON), datas);
 }
 
-void OnSetFrozenAppFuzzTest(const uint8_t* data, size_t size)
+void OnSetFrozenAppFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_FROZEN_APP), datas);
 }
 
-void OnResetAllFrozenAppFuzzTest(const uint8_t* data, size_t size)
+void OnResetAllFrozenAppFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RESET_ALL_FROZEN_APP), datas);
 }
 
-void OnDisableAutoJoinFuzzTest(const uint8_t* data, size_t size)
+void OnDisableAutoJoinFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_AUTO_JOIN), datas);
 }
 
-void OnEnableAutoJoinFuzzTest(const uint8_t* data, size_t size)
+void OnEnableAutoJoinFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_AUTO_JOIN), datas);
 }
 
-void OnStartPortalCertificationFuzzTest(const uint8_t* data, size_t size)
+void OnStartPortalCertificationFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_PORTAL_CERTIF), datas);
 }
 
-void OnGetChangeDeviceConfigFuzzTest(const uint8_t* data, size_t size)
+void OnGetChangeDeviceConfigFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG_CHANGE), datas);
 }
 
-void OnLimitSpeedFuzzTest(const uint8_t* data, size_t size)
+void OnLimitSpeedFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_LIMIT_SPEED), datas);
 }
 
-void OnEnableHiLinkHandshakeFuzzTest(const uint8_t* data, size_t size)
+void OnEnableHiLinkHandshakeFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_HILINK_CONNECT), datas);
 }
 
-void OnStartWifiDetectionFuzzTest(const uint8_t* data, size_t size)
+void OnStartWifiDetectionFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_START_WIFI_DETECTION), datas);
 }
 
-void OnSetSatelliteStateFuzzTest(const uint8_t* data, size_t size)
+void OnSetSatelliteStateFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_SATELLITE_STATE), datas);
 }
 
-void OnFactoryResetFuzzTest(const uint8_t* data, size_t size)
+void OnFactoryResetFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SET_FACTORY_RESET), datas);
 }
 
-void OnEnableWifiFuzzTest(const uint8_t* data, size_t size)
+void OnEnableWifiFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI), datas);
 }
 
-void OnDisableWifiFuzzTest(const uint8_t* data, size_t size)
+void OnDisableWifiFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_WIFI), datas);
 }
 
-void OnGetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
+void OnGetSupportedFeaturesFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
 }
 
-void OnEnableSemiWifiFuzzTest(const uint8_t* data, size_t size)
+void OnEnableSemiWifiFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ENABLE_SEMI_WIFI), datas);
 }
 
-void OnGetWifiDetailStateFuzzTest(const uint8_t* data, size_t size)
+void OnGetWifiDetailStateFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_DETAIL_STATE), datas);
 }
 
-void OnSetTxPowerFuzzTest(const uint8_t* data, size_t size)
+void OnSetTxPowerFuzzTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_TX_POWER), datas);
 }
 
-void OnSetLowTxPowerTest(const uint8_t* data, size_t size)
+void OnSetLowTxPowerTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_TX_POWER), datas);
 }
 
-void OnSetDpiMarkRuleTest(const uint8_t* data, size_t size)
+void OnSetDpiMarkRuleTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_DPI_MARK_RULE), datas);
 }
 
-void DoSomethingDeviceMgrStubTest(const uint8_t* data, size_t size)
+void DoSomethingDeviceMgrStubTest()
 {
     std::string networkName = "backup";
     std::string name = "restore";
     uint32_t code = static_cast<uint32_t>(DevInterfaceCode::WIFI_MGR_GET_DEVICE_SERVICE);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE_EX);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
@@ -795,26 +906,26 @@ bool WifiFuzzTest()
     return true;
 }
 
-void WifiDeviceServiceImplTest(const uint8_t* data, size_t size)
+void WifiDeviceServiceImplTest()
 {
-    int index = 0;
-    int networkId = static_cast<int>(data[index++]);
-    int uid = static_cast<int>(data[index++]);
-    std::string networkName = std::string(reinterpret_cast<const char*>(data), size);
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
-    bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
+
+    int networkId = FDP->ConsumeIntegral<int>();
+    int uid = FDP->ConsumeIntegral<int>();
+    std::string networkName = FDP->ConsumeBytesAsString(NUM_BYTES);
+    FilterTag filterTag = static_cast<FilterTag>(FDP->ConsumeIntegral<uint8_t>() % FIVE);
+    bool attemptEnable = FDP->ConsumeBool();
     WifiDeviceServiceImpl mWifiDeviceServiceImpl;
     MessageParcel datas;
     WifiDeviceConfig config;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
 
     mWifiDeviceServiceImpl.DeregisterAutoJoinCondition(networkName);
     mWifiDeviceServiceImpl.DeregisterFilterBuilder(filterTag, networkName);
@@ -830,19 +941,18 @@ void WifiDeviceServiceImplTest(const uint8_t* data, size_t size)
     pWifiDeviceStub->WriteWifiDeviceConfig(datas, config);
 }
 
-void CheckConfigEapTest(const uint8_t* data, size_t size)
+void CheckConfigEapTest()
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
     std::string keyMgmtWapiPsk = "WPA-PSK";
     config.keyMgmt = keyMgmtWapiPsk;
     pWifiDeviceServiceImpl->CheckConfigEap(config);
@@ -850,160 +960,152 @@ void CheckConfigEapTest(const uint8_t* data, size_t size)
     std::string eapMethodPeap = "PEAP";
     config.wifiEapConfig.eap = EAP_METHOD_PEAP;
     pWifiDeviceServiceImpl->CheckConfigEap(config);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
     pWifiDeviceServiceImpl->CheckConfigEap(config);
 }
 
-void CheckConfigWapiTest(const uint8_t* data, size_t size)
+void CheckConfigWapiTest()
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
     std::string keyMgmtwapiPsk = "WAPI-PSK";
     config.keyMgmt = keyMgmtwapiPsk;
     pWifiDeviceServiceImpl->CheckConfigWapi(config);
     config.keyMgmt.clear();
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
     pWifiDeviceServiceImpl->CheckConfigWapi(config);
 }
 
-void CheckConfigPwdTest(const uint8_t* data, size_t size)
+void CheckConfigPwdTest()
 {
     WifiDeviceConfig config;
-    int index = 0;
     std::string ssidLength = "name";
     config.ssid = ssidLength;
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
     pWifiDeviceServiceImpl->CheckConfigPwd(config);
 }
 
-void InitWifiBrokerProcessInfoTest(const uint8_t* data, size_t size)
+void InitWifiBrokerProcessInfoTest()
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
     std::string ancoServiceBroker = "anco_service_broker";
     config.callProcessName = ancoServiceBroker;
     pWifiDeviceServiceImpl->InitWifiBrokerProcessInfo(config);
 }
 
-void SetWifiConnectedModeTest(const uint8_t* data, size_t size)
+void SetWifiConnectedModeTest()
 {
     pWifiDeviceServiceImpl->SetWifiConnectedMode();
 }
 
-void RemoveCandidateConfigFuzzTest(const uint8_t* data, size_t size)
+void RemoveCandidateConfigFuzzTest()
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
-    config.callProcessName = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.callProcessName = FDP->ConsumeBytesAsString(NUM_BYTES);
     pWifiDeviceServiceImpl->RemoveCandidateConfig(config);
 }
 
-void RemoveCandidateConfigTest(const uint8_t* data, size_t size)
+void RemoveCandidateConfigTest()
 {
-    int index = 0;
-    int networkId = static_cast<int>(data[index++]);
+    int networkId = FDP->ConsumeIntegral<int>();
     pWifiDeviceServiceImpl->RemoveCandidateConfig(networkId);
 }
 
-void AddDeviceConfigTest(const uint8_t* data, size_t size)
+void AddDeviceConfigTest()
 {
     WifiDeviceConfig config;
     int result = 0;
-    int index = 0;
-    bool isCandidate = (static_cast<int>(data[0]) % TWO) ? true : false;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
-    config.callProcessName = std::string(reinterpret_cast<const char*>(data), size);
+    bool isCandidate = FDP->ConsumeBool();
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.callProcessName = FDP->ConsumeBytesAsString(NUM_BYTES);
     pWifiDeviceServiceImpl->AddDeviceConfig(config, result, isCandidate);
 }
 
-void ConnectToNetworkTest(const uint8_t* data, size_t size)
+void ConnectToNetworkTest()
 {
-    int index = 0;
-    int networkId = static_cast<int>(data[index++]);
-    bool isCandidate = (static_cast<int>(data[0]) % TWO) ? true : false;
+    int networkId = FDP->ConsumeIntegral<int>();
+    bool isCandidate = FDP->ConsumeBool();
     pWifiDeviceServiceImpl->ConnectToNetwork(networkId, isCandidate);
 }
 
-void ConnectToDeviceTest(const uint8_t* data, size_t size)
+void ConnectToDeviceTest()
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
     pWifiDeviceServiceImpl->ConnectToDevice(config);
 }
 
-void SaBasicDumpTest(const uint8_t* data, size_t size)
+void SaBasicDumpTest()
 {
     WifiLinkedInfo info;
-    info.connState = static_cast<ConnState>(static_cast<int>(data[0]) % NINE);
+    info.connState = static_cast<ConnState>(FDP->ConsumeIntegral<uint8_t>() % NINE);
     WifiConfigCenter::GetInstance().SaveLinkedInfo(info, 0);
     std::string result;
     pWifiDeviceServiceImpl->SaBasicDump(result);
 }
 
-void IsRemoteDiedTest(const uint8_t* data, size_t size)
+void IsRemoteDiedTest()
 {
     pWifiDeviceServiceImpl->IsRemoteDied();
 }
 
-void IsBandTypeSupportedTest(const uint8_t* data, size_t size)
+void IsBandTypeSupportedTest()
 {
-    int bandType = static_cast<int>(data[0]);
-    bool supported = (static_cast<int>(data[0]) % TWO) ? true : false;
+    int bandType = FDP->ConsumeIntegral<int>();
+    bool supported = FDP->ConsumeBool();
     pWifiDeviceServiceImpl->IsBandTypeSupported(bandType, supported);
 }
 
-void RegisterCallBackTest(const uint8_t* data, size_t size)
+void RegisterCallBackTest()
 {
     std::vector<std::string> event;
     sptr<IWifiDeviceCallBack> callBack = new (std::nothrow) IWifiDeviceCallBackMock();
@@ -1011,279 +1113,272 @@ void RegisterCallBackTest(const uint8_t* data, size_t size)
     pWifiDeviceServiceImpl->RegisterCallBack(nullptr, event);
 }
 
-void CheckCanEnableWifiTest(const uint8_t* data, size_t size)
+void CheckCanEnableWifiTest()
 {
     pWifiDeviceServiceImpl->CheckCanEnableWifi();
 }
 
-void HilinkGetMacAddressTest(const uint8_t* data, size_t size)
+void HilinkGetMacAddressTest()
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
-    std::string currentMac = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string currentMac = FDP->ConsumeBytesAsString(NUM_BYTES);
     pWifiDeviceServiceImpl->HilinkGetMacAddress(config, currentMac);
 }
 
-void EnableHiLinkHandshakeTest(const uint8_t* data, size_t size)
+void EnableHiLinkHandshakeTest()
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
-    bool uiFlag = (static_cast<int>(data[0]) % TWO) ? true : false;
-    std::string bssid = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP->ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
+    bool uiFlag = FDP->ConsumeBool();
+    std::string bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
     pWifiDeviceServiceImpl->EnableHiLinkHandshake(uiFlag, bssid, config);
 }
 
-void StartWifiDetectionTest(const uint8_t* data, size_t size)
+void StartWifiDetectionTest()
 {
     pWifiDeviceServiceImpl->StartWifiDetection();
 }
 
-void RegisterFilterBuilderTest(const uint8_t* data, size_t size)
+void RegisterFilterBuilderTest()
 {
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
-    std::string bssid = std::string(reinterpret_cast<const char*>(data), size);
+    FilterTag filterTag = static_cast<FilterTag>(FDP->ConsumeIntegral<uint8_t>() % FIVE);
+    std::string bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
     FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
     pWifiDeviceServiceImpl->RegisterFilterBuilder(filterTag, bssid, filterBuilder);
 }
 
-void OnGetDeviceConfigTest(const uint8_t* data, size_t size)
+void OnGetDeviceConfigTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIG), datas);
 }
 
-void OnIsFeatureSupportedTest(const uint8_t* data, size_t size)
+void OnIsFeatureSupportedTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_FEATURE_SUPPORTED), datas);
 }
 
-void OnUpdateNetworkLagInfoTest(const uint8_t* data, size_t size)
+void OnUpdateNetworkLagInfoTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_NETWORK_LAG_INFO), datas);
 }
 
-void OnReceiveNetworkControlInfoTest(const uint8_t* data, size_t size)
+void OnReceiveNetworkControlInfoTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_NET_CONTROL_INFO), datas);
 }
 
-void OnFetchWifiSignalInfoForVoWiFiTest(const uint8_t* data, size_t size)
+void OnFetchWifiSignalInfoForVoWiFiTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_FETCH_SIGNALINFO_VOWIFI), datas);
 }
 
-void OnIsSupportVoWifiDetectTest(const uint8_t* data, size_t size)
+void OnIsSupportVoWifiDetectTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_SUPPORT_VOWIFI_DETECT), datas);
 }
 
-void OnSetVoWifiDetectModeTest(const uint8_t* data, size_t size)
+void OnSetVoWifiDetectModeTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_VOWIFI_DETECT_MODE), datas);
 }
 
-void OnSetVoWifiDetectPeriodTest(const uint8_t* data, size_t size)
+void OnSetVoWifiDetectPeriodTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_VOWIFI_DETECT_PERIOD), datas);
 }
 
-void OnIsRandomMacDisabledTest(const uint8_t* data, size_t size)
+void OnGetVoWifiDetectPeriodTest()
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED), datas);
-}
-
-void OnSetRandomMacDisabledTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED), datas);
-}
-
-void OnGetVoWifiDetectPeriodTest(const uint8_t* data, size_t size)
-{
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        LOGE("WriteInterfaceToken failed!");
-        return;
-    }
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_VOWIFI_DETECT_PERIOD), datas);
+}
+
+void WifiDeviceFuzzTest()
+{
+    OHOS::Wifi::OnInitWifiProtectFuzzTest();
+    OHOS::Wifi::OnGetWifiProtectRefFuzzTest();
+    OHOS::Wifi::OnPutWifiProtectRefFuzzTest();
+    OHOS::Wifi::OnIsHeldWifiProtectRefFuzzTest();
+    OHOS::Wifi::OnAddDeviceConfigFuzzTest();
+    OHOS::Wifi::OnUpdateDeviceConfigFuzzTest();
+    OHOS::Wifi::OnRemoveDeviceFuzzTest();
+    OHOS::Wifi::OnRemoveAllDeviceFuzzTest();
+    OHOS::Wifi::OnGetDeviceConfigsFuzzTest();
+    OHOS::Wifi::OnEnableDeviceConfigFuzzTest();
+    OHOS::Wifi::OnDisableDeviceConfigFuzzTest();
+    OHOS::Wifi::OnConnectToFuzzTest();
+    OHOS::Wifi::OnConnect2ToFuzzTest();
+    OHOS::Wifi::OnReConnectFuzzTest();
+    OHOS::Wifi::OnReAssociateFuzzTest();
+    OHOS::Wifi::OnDisconnectFuzzTest();
+    OHOS::Wifi::OnStartWpsFuzzTest();
+    OHOS::Wifi::OnCancelWpsFuzzTest();
+    OHOS::Wifi::OnIsWifiActiveFuzzTest();
+    OHOS::Wifi::OnGetWifiStateFuzzTest();
+    OHOS::Wifi::OnIsMeteredHotspotFuzzTest();
+    OHOS::Wifi::OnGetLinkedInfoFuzzTest();
+    OHOS::Wifi::OnGetIpInfoFuzzTest();
+    OHOS::Wifi::OnGetCountryCodeFuzzTest();
+    OHOS::Wifi::OnRegisterCallBackFuzzTest();
+    OHOS::Wifi::OnGetSignalLevelFuzzTest();
+    OHOS::Wifi::OnGetIpV6InfoFuzzTest();
+    OHOS::Wifi::OnGetDeviceMacAddFuzzTest();
+    OHOS::Wifi::OnIsWifiConnectedFuzzTest();
+    OHOS::Wifi::OnSetLowLatencyModeFuzzTest();
+    OHOS::Wifi::OnRemoveCandidateConfigFuzzTest();
+    OHOS::Wifi::OnIsBandTypeSupportedFuzzTest();
+    OHOS::Wifi::OnGet5GHzChannelListFuzzTest();
+    OHOS::Wifi::OnGetDisconnectedReasonFuzzTest();
+    OHOS::Wifi::OnSetFrozenAppFuzzTest();
+    OHOS::Wifi::OnResetAllFrozenAppFuzzTest();
+    OHOS::Wifi::OnDisableAutoJoinFuzzTest();
+    OHOS::Wifi::OnEnableAutoJoinFuzzTest();
+    OHOS::Wifi::OnStartPortalCertificationFuzzTest();
+    OHOS::Wifi::OnGetChangeDeviceConfigFuzzTest();
+    OHOS::Wifi::OnLimitSpeedFuzzTest();
+    OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest();
+    OHOS::Wifi::OnGetWifiDetailStateFuzzTest();
+    OHOS::Wifi::OnSetTxPowerFuzzTest();
+    OHOS::Wifi::OnStartWifiDetectionFuzzTest();
+    OHOS::Wifi::OnSetSatelliteStateFuzzTest();
+    OHOS::Wifi::OnGetSupportedFeaturesFuzzTest();
+    OHOS::Wifi::OnSetLowTxPowerTest();
+    OHOS::Wifi::DoSomethingDeviceMgrStubTest();
+    OHOS::Wifi::WifiDeviceServiceImplTest();
+    OHOS::Wifi::CheckConfigEapTest();
+    OHOS::Wifi::CheckConfigWapiTest();
+    OHOS::Wifi::CheckConfigPwdTest();
+    OHOS::Wifi::InitWifiBrokerProcessInfoTest();
+    OHOS::Wifi::SetWifiConnectedModeTest();
+    OHOS::Wifi::RemoveCandidateConfigFuzzTest();
+    OHOS::Wifi::RemoveCandidateConfigTest();
+    OHOS::Wifi::AddDeviceConfigTest();
+    OHOS::Wifi::ConnectToNetworkTest();
+    OHOS::Wifi::ConnectToDeviceTest();
+    OHOS::Wifi::SaBasicDumpTest();
+    OHOS::Wifi::IsRemoteDiedTest();
+    OHOS::Wifi::IsBandTypeSupportedTest();
+    OHOS::Wifi::RegisterCallBackTest();
+    OHOS::Wifi::CheckCanEnableWifiTest();
+    OHOS::Wifi::HilinkGetMacAddressTest();
+    OHOS::Wifi::EnableHiLinkHandshakeTest();
+    OHOS::Wifi::StartWifiDetectionTest();
+    OHOS::Wifi::RegisterFilterBuilderTest();
+    OHOS::Wifi::OnSetDpiMarkRuleTest();
+    OHOS::Wifi::OnGetDeviceConfigTest();
+    OHOS::Wifi::OnIsFeatureSupportedTest();
+    OHOS::Wifi::OnUpdateNetworkLagInfoTest();
+    OHOS::Wifi::OnReceiveNetworkControlInfoTest();
+    OHOS::Wifi::OnFetchWifiSignalInfoForVoWiFiTest();
+    OHOS::Wifi::OnIsSupportVoWifiDetectTest();
+    OHOS::Wifi::OnSetVoWifiDetectModeTest();
+    OHOS::Wifi::OnSetVoWifiDetectPeriodTest();
+    OHOS::Wifi::OnGetVoWifiDetectPeriodTest();
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
-        return 0;
-    }
-    OHOS::Wifi::OnInitWifiProtectFuzzTest(data, size);
-    OHOS::Wifi::OnGetWifiProtectRefFuzzTest(data, size);
-    OHOS::Wifi::OnPutWifiProtectRefFuzzTest(data, size);
-    OHOS::Wifi::OnIsHeldWifiProtectRefFuzzTest(data, size);
-    OHOS::Wifi::OnAddDeviceConfigFuzzTest(data, size);
-    OHOS::Wifi::OnUpdateDeviceConfigFuzzTest(data, size);
-    OHOS::Wifi::OnRemoveDeviceFuzzTest(data, size);
-    OHOS::Wifi::OnRemoveAllDeviceFuzzTest(data, size);
-    OHOS::Wifi::OnGetDeviceConfigsFuzzTest(data, size);
-    OHOS::Wifi::OnEnableDeviceConfigFuzzTest(data, size);
-    OHOS::Wifi::OnDisableDeviceConfigFuzzTest(data, size);
-    OHOS::Wifi::OnConnectToFuzzTest(data, size);
-    OHOS::Wifi::OnConnect2ToFuzzTest(data, size);
-    OHOS::Wifi::OnReConnectFuzzTest(data, size);
-    OHOS::Wifi::OnReAssociateFuzzTest(data, size);
-    OHOS::Wifi::OnDisconnectFuzzTest(data, size);
-    OHOS::Wifi::OnStartWpsFuzzTest(data, size);
-    OHOS::Wifi::OnCancelWpsFuzzTest(data, size);
-    OHOS::Wifi::OnIsWifiActiveFuzzTest(data, size);
-    OHOS::Wifi::OnGetWifiStateFuzzTest(data, size);
-    OHOS::Wifi::OnIsMeteredHotspotFuzzTest(data, size);
-    OHOS::Wifi::OnGetLinkedInfoFuzzTest(data, size);
-    OHOS::Wifi::OnGetIpInfoFuzzTest(data, size);
-    OHOS::Wifi::OnGetCountryCodeFuzzTest(data, size);
-    OHOS::Wifi::OnRegisterCallBackFuzzTest(data, size);
-    OHOS::Wifi::OnGetSignalLevelFuzzTest(data, size);
-    OHOS::Wifi::OnGetIpV6InfoFuzzTest(data, size);
-    OHOS::Wifi::OnGetDeviceMacAddFuzzTest(data, size);
-    OHOS::Wifi::OnIsWifiConnectedFuzzTest(data, size);
-    OHOS::Wifi::OnSetLowLatencyModeFuzzTest(data, size);
-    OHOS::Wifi::OnRemoveCandidateConfigFuzzTest(data, size);
-    OHOS::Wifi::OnIsBandTypeSupportedFuzzTest(data, size);
-    OHOS::Wifi::OnGet5GHzChannelListFuzzTest(data, size);
-    OHOS::Wifi::OnGetDisconnectedReasonFuzzTest(data, size);
-    OHOS::Wifi::OnSetFrozenAppFuzzTest(data, size);
-    OHOS::Wifi::OnResetAllFrozenAppFuzzTest(data, size);
-    OHOS::Wifi::OnDisableAutoJoinFuzzTest(data, size);
-    OHOS::Wifi::OnEnableAutoJoinFuzzTest(data, size);
-    OHOS::Wifi::OnStartPortalCertificationFuzzTest(data, size);
-    OHOS::Wifi::OnGetChangeDeviceConfigFuzzTest(data, size);
-    OHOS::Wifi::OnLimitSpeedFuzzTest(data, size);
-    OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest(data, size);
-    OHOS::Wifi::OnStartWifiDetectionFuzzTest(data, size);
-    OHOS::Wifi::OnGetWifiDetailStateFuzzTest(data, size);
-    OHOS::Wifi::OnSetTxPowerFuzzTest(data, size);
-    OHOS::Wifi::OnSetSatelliteStateFuzzTest(data, size);
-    OHOS::Wifi::OnGetSupportedFeaturesFuzzTest(data, size);
-    OHOS::Wifi::OnSetLowTxPowerTest(data, size);
-    OHOS::Wifi::DoSomethingDeviceMgrStubTest(data, size);
-    OHOS::Wifi::WifiDeviceServiceImplTest(data, size);
-    OHOS::Wifi::CheckConfigEapTest(data, size);
-    OHOS::Wifi::CheckConfigWapiTest(data, size);
-    OHOS::Wifi::CheckConfigPwdTest(data, size);
-    OHOS::Wifi::InitWifiBrokerProcessInfoTest(data, size);
-    OHOS::Wifi::SetWifiConnectedModeTest(data, size);
-    OHOS::Wifi::RemoveCandidateConfigFuzzTest(data, size);
-    OHOS::Wifi::RemoveCandidateConfigTest(data, size);
-    OHOS::Wifi::AddDeviceConfigTest(data, size);
-    OHOS::Wifi::ConnectToNetworkTest(data, size);
-    OHOS::Wifi::ConnectToDeviceTest(data, size);
-    OHOS::Wifi::SaBasicDumpTest(data, size);
-    OHOS::Wifi::IsRemoteDiedTest(data, size);
-    OHOS::Wifi::IsBandTypeSupportedTest(data, size);
-    OHOS::Wifi::RegisterCallBackTest(data, size);
-    OHOS::Wifi::CheckCanEnableWifiTest(data, size);
-    OHOS::Wifi::HilinkGetMacAddressTest(data, size);
-    OHOS::Wifi::EnableHiLinkHandshakeTest(data, size);
-    OHOS::Wifi::StartWifiDetectionTest(data, size);
-    OHOS::Wifi::RegisterFilterBuilderTest(data, size);
-    OHOS::Wifi::OnSetDpiMarkRuleTest(data, size);
-    OHOS::Wifi::OnGetDeviceConfigTest(data, size);
-    OHOS::Wifi::OnIsFeatureSupportedTest(data, size);
-    OHOS::Wifi::OnUpdateNetworkLagInfoTest(data, size);
-    OHOS::Wifi::OnReceiveNetworkControlInfoTest(data, size);
-    OHOS::Wifi::OnFetchWifiSignalInfoForVoWiFiTest(data, size);
-    OHOS::Wifi::OnIsSupportVoWifiDetectTest(data, size);
-    OHOS::Wifi::OnSetVoWifiDetectModeTest(data, size);
-    OHOS::Wifi::OnSetVoWifiDetectPeriodTest(data, size);
-    OHOS::Wifi::OnGetVoWifiDetectPeriodTest(data, size);
-    OHOS::Wifi::OnIsRandomMacDisabledTest(data, size);
-    OHOS::Wifi::OnSetRandomMacDisabledTest(data, size);
-    sleep(4);
+    FuzzedDataProvider fdp(data, size);
+    OHOS::Wifi::FDP = &fdp;
+    OHOS::Wifi::WifiDeviceFuzzTest();
     return 0;
 }
 }

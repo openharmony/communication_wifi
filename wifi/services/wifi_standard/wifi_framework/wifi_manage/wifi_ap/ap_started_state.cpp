@@ -145,15 +145,18 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
 {
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
     ApConfigUse::GetInstance().UpdateApChannelConfig(apConfig);
+    {
+        std::unique_lock<std::mutex> lock(enhanceServiceMutex_);
 #ifndef OHOS_ARCH_LITE
-    if ((apConfig.GetBandWidth() == AP_BANDWIDTH_160 ||
-            (apConfig.GetChannel() >= CHANNEL50 && apConfig.GetChannel() <= CHANNEL144))) {
-        if (enhanceService_ != nullptr && enhanceService_->GetDfsControlData().enableAidfs_) {
-            WIFI_LOGI("DfsControl. use Dfs Channel and Aidfs enable, Stop 60s CAC");
-            enhanceService_->CloseCAC();
+        if ((apConfig.GetBandWidth() == AP_BANDWIDTH_160 ||
+                (apConfig.GetChannel() >= CHANNEL50 && apConfig.GetChannel() <= CHANNEL144))) {
+            if (enhanceService_ != nullptr && enhanceService_->GetDfsControlData().enableAidfs_) {
+                WIFI_LOGI("DfsControl. use Dfs Channel and Aidfs enable, Stop 60s CAC");
+                enhanceService_->CloseCAC();
+            }
         }
-    }
 #endif
+    }
     std::string ifName = WifiConfigCenter::GetInstance().GetApIfaceName();
     WifiErrorNo setSoftApConfigResult = WifiErrorNo::WIFI_HAL_OPT_OK;
     WifiErrorNo setApPasswdResult = WifiErrorNo::WIFI_HAL_OPT_OK;
@@ -533,6 +536,7 @@ void ApStartedState::ProcessCmdEnableAp(InternalMessagePtr msg)
 #ifndef OHOS_ARCH_LITE
 void ApStartedState::SetEnhanceService(IEnhanceService* enhanceService)
 {
+    std::unique_lock<std::mutex> lock(enhanceServiceMutex_);
     enhanceService_ = enhanceService;
 }
 #endif

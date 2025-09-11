@@ -262,6 +262,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     IEnhanceService *enhanceService_ = nullptr;
 #endif
+    std::mutex enhanceServiceMutex_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

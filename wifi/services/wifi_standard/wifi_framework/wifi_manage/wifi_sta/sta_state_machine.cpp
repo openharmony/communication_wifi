@@ -1534,6 +1534,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
     pStaStateMachine->UpdateLinkedInfoFromScanInfo();
     pStaStateMachine->SetSupportedWifiCategory();
 #endif
+    pStaStateMachine->DealSignalPollResult();
     pStaStateMachine->DealMloConnectionLinkInfo();
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT

@@ -1583,6 +1583,16 @@ WifiNetworkControlInfo WifiConfigCenter::GetNetworkControlInfo()
     return networkControlInfoRecord;
 }
 
+void WifiConfigCenter::SetDfsControlData(DfsControlData dfsControlData)
+{
+    dfsControlData_ = dfsControlData;
+}
+ 
+DfsControlData WifiConfigCenter::GetDfsControlData()
+{
+    return dfsControlData_;
+}
+
 void WifiConfigCenter::SetBrowserState(bool browser)
 {
     browserOn_ = browser;

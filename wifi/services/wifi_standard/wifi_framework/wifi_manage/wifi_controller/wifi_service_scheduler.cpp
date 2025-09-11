@@ -466,7 +466,6 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
     if (StartDependentService(instId) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
     }
-
     WIFI_LOGD("StartWifiStaService InitStaService instId:%{public}d", instId);
     if (InitStaService(pService, instId) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("StartWifiStaService InitStaService failed!");
@@ -485,6 +484,7 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         return WIFI_OPT_FAILED;
     }
     errCode = pService->SetEnhanceService(pEnhanceService);
+    WifiConfigCenter::GetInstance().SetDfsControlData(pEnhanceService->GetDfsControlData());
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("SetEnhanceService failed, ret %{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;

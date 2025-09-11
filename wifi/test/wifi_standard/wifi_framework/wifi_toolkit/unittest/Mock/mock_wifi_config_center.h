@@ -184,6 +184,8 @@ public:
     virtual void SetScreenDispalyState(int32_t orientation) = 0;
     virtual void SetNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) = 0;
     virtual WifiNetworkControlInfo GetNetworkControlInfo() = 0;
+    virtual void SetDfsControlData(DfsControlData dfsControlData) = 0;
+    virtual DfsControlData GetDfsControlData() = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -348,6 +350,8 @@ public:
     MOCK_METHOD1(SetScreenDispalyState, void(int32_t orientation));
     MOCK_METHOD1(SetNetworkControlInfo, void(const WifiNetworkControlInfo& networkControlInfo));
     MOCK_METHOD0(GetNetworkControlInfo, WifiNetworkControlInfo());
+    MOCK_METHOD1(SetDfsControlData, void(DfsControlData dfsControlData));
+    MOCK_METHOD0(GetDfsControlData, DfsControlData());
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

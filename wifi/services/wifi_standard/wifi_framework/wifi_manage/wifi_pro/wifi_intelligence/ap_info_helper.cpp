@@ -111,7 +111,7 @@ bool ApInfoHelper::GetAllApInfos()
         std::vector<std::string> curNearbyApInfos;
         QueryNearbyInfoByParam({{NearByApInfoTable::BSSID, apInfo.bssid}}, curNearbyApInfos);
         apInfo.nearbyApInfos = curNearbyApInfos;
-        WIFI_LOGI("GetAllApInfos, apInfo.bssid:%{public}s, apInfo.ssid:%{public}s.",
+        WIFI_LOGD("GetAllApInfos, apInfo.bssid:%{public}s, apInfo.ssid:%{public}s.",
             MacAnonymize(apInfo.bssid).c_str(), SsidAnonymize(apInfo.ssid).c_str());
     }
     return true;

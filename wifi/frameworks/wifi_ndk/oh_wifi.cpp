@@ -58,7 +58,7 @@ Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled)
 
 Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddrLen)
 {
-    if (macAddr == nullptr) {
+    if (macAddr == nullptr || macAddrLen == nullptr) {
         return WIFI_INVALID_PARAM;
     }
  
@@ -72,7 +72,7 @@ Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddr
         return WifiErrCodeToResultCode(ret);
     }
 
-    if (*macAddrLen <= mac.length() || strcpy_s(macAddr, *macAddrLen, mac.c_str()) != 0) {
+    if (strncpy_s(macAddr, *macAddrLen, mac.c_str(), mac.length()) != 0) {
         return WIFI_OPERATION_FAILED;
     }
 

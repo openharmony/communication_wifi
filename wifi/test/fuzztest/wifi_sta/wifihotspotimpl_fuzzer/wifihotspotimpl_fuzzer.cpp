@@ -15,7 +15,7 @@
 
 #include "wifihotspotimpl_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "wifi_hotspot_service_impl.h"
 #include "wifi_hotspot_mgr_stub.h"
 #include "wifi_hotspot_mgr_service_impl.h"
@@ -30,6 +30,7 @@
 #include <map>
 namespace OHOS {
 namespace Wifi {
+FuzzedDataProvider *FDP = nullptr;
 constexpr int BAND_WIFI_TYPES = 6;
 constexpr int IDLE_TIME_OUT_MAX = 60;
 constexpr int IPADDR_SEG_NUMS = 4;
@@ -92,6 +93,7 @@ void SetHotspotConfigFuzzTest(const uint8_t* data, size_t size)
     std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
     ChannelsTable node{{ BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel }};
     HotspotConfig config;
+    config.apBandWidth = FDP->ConsumeIntegral<int>();
     WifiChannelHelper::GetInstance().SetValidChannels(node);
     pWifiHotspotServiceImpl->SetHotspotConfig(config);
 }
@@ -166,6 +168,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == NULL) || (size < DATA_SIZE_MIN)) {
         return 0;
     }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::Wifi::FDP = &fdp;
     OHOS::Wifi::TransRandomToRealMacFuzzTest(data, size);
     OHOS::Wifi::IsHotspotDualBandSupportedFuzzTest(data, size);
     OHOS::Wifi::IsOpenSoftApAllowedFuzzTest(data, size);
